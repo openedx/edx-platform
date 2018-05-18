@@ -25,7 +25,7 @@ def counter(fn):
     """
     def _counted(*largs, **kargs):
         _counted.invocations += 1
-        fn(*largs, **kargs)
+        return fn(*largs, **kargs)
 
     _counted.invocations = 0
     return _counted
@@ -90,8 +90,11 @@ class EdxClearExpiredTokensTests(TestCase):
             AccessToken.objects.filter(refresh_token__isnull=True, expires__lt=now).count(),
             initial_count
         )
+        original_delete = QuerySet.delete
         QuerySet.delete = counter(QuerySet.delete)
-
-        call_command('edx_clear_expired_tokens', batch_size=1, sleep_time=0)
-        self.assertEqual(QuerySet.delete.invocations, initial_count)
-        self.assertEqual(AccessToken.objects.filter(refresh_token__isnull=True, expires__lt=now).count(), 0)
+        try:
+            call_command('edx_clear_expired_tokens', batch_size=1, sleep_time=0)
+            self.assertEqual(QuerySet.delete.invocations, initial_count)
+            self.assertEqual(AccessToken.objects.filter(refresh_token__isnull=True, expires__lt=now).count(), 0)
+        finally:
+            QuerySet.delete = original_delete

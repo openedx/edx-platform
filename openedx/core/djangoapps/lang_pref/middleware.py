@@ -29,7 +29,7 @@ class LanguagePreferenceMiddleware(object):
         """
         cookie_lang = request.COOKIES.get(settings.LANGUAGE_COOKIE, None)
         if cookie_lang:
-            if request.user.is_authenticated():
+            if request.user.is_authenticated:
                 set_user_preference(request.user, LANGUAGE_KEY, cookie_lang)
             else:
                 request._anonymous_user_cookie_lang = cookie_lang
@@ -57,7 +57,7 @@ class LanguagePreferenceMiddleware(object):
         if hasattr(request, 'user'):
             current_user = getattr(request.user, 'real_user', request.user)
 
-        if current_user and current_user.is_authenticated():
+        if current_user and current_user.is_authenticated:
             anonymous_cookie_lang = getattr(request, '_anonymous_user_cookie_lang', None)
             if anonymous_cookie_lang:
                 user_pref = anonymous_cookie_lang

@@ -127,10 +127,14 @@ from lms.envs.common import (
     VIDEO_IMAGE_SETTINGS,
     VIDEO_TRANSCRIPTS_SETTINGS,
 
+    RETIRED_USERNAME_PREFIX,
     RETIRED_USERNAME_FMT,
+    RETIRED_EMAIL_PREFIX,
+    RETIRED_EMAIL_DOMAIN,
     RETIRED_EMAIL_FMT,
     RETIRED_USER_SALTS,
     RETIREMENT_SERVICE_WORKER_USERNAME,
+    RETIREMENT_STATES,
 
     # Methods to derive settings
     _make_mako_template_dirs,
@@ -165,6 +169,10 @@ FEATURES = {
     'ENABLE_DISCUSSION_SERVICE': True,
     'ENABLE_TEXTBOOK': True,
     'ENABLE_STUDENT_NOTES': True,
+
+    # DO NOT SET TO True IN THIS FILE
+    # Doing so will cause all courses to be released on production
+    'DISABLE_START_DATES': False,  # When True, all courses will be active, regardless of start date
 
     'AUTH_USE_CERTIFICATES': False,
 
@@ -296,6 +304,15 @@ FEATURES = {
     # Whether archived courses (courses with end dates in the past) should be
     # shown in Studio in a separate list.
     'ENABLE_SEPARATE_ARCHIVED_COURSES': True,
+
+    # For acceptance and load testing
+    'AUTOMATIC_AUTH_FOR_TESTING': False,
+
+    # Prevent auto auth from creating superusers or modifying existing users
+    'RESTRICT_AUTOMATIC_AUTH': True,
+
+    # Set this to true to make API docs available at /api-docs/.
+    'ENABLE_API_DOCS': False,
 }
 
 ENABLE_JASMINE = False
@@ -806,10 +823,7 @@ PIPELINE_JS = {
     },
 }
 
-PIPELINE_COMPILERS = (
-    'pipeline.compilers.coffee.CoffeeScriptCompiler',
-)
-
+PIPELINE_COMPILERS = ()
 PIPELINE_CSS_COMPRESSOR = None
 PIPELINE_JS_COMPRESSOR = None
 
@@ -825,10 +839,6 @@ STATICFILES_IGNORE_PATTERNS = (
     "sass/*/*.scss",
     "sass/*/*/*.scss",
     "sass/*/*/*/*.scss",
-    "coffee/*.coffee",
-    "coffee/*/*.coffee",
-    "coffee/*/*/*.coffee",
-    "coffee/*/*/*/*.coffee",
 
     # Ignore tests
     "spec",
@@ -1132,6 +1142,9 @@ INSTALLED_APPS = [
 
     # Asset management for mako templates
     'pipeline_mako',
+
+    # API Documentation
+    'rest_framework_swagger',
 ]
 
 
@@ -1244,6 +1257,9 @@ OPTIONAL_APPS = (
     # Enterprise App (http://github.com/edx/edx-enterprise)
     ('enterprise', None),
     ('consent', None),
+    ('integrated_channels.integrated_channel', None),
+    ('integrated_channels.degreed', None),
+    ('integrated_channels.sap_success_factors', None),
 )
 
 
@@ -1468,6 +1484,9 @@ RECALCULATE_GRADES_ROUTING_KEY = LOW_PRIORITY_QUEUE
 
 # Queue to use for updating grades due to grading policy change
 POLICY_CHANGE_GRADES_ROUTING_KEY = LOW_PRIORITY_QUEUE
+
+# Rate limit for regrading tasks that a grading policy change can kick off
+POLICY_CHANGE_TASK_RATE_LIMIT = '300/h'
 
 ############## Settings for CourseGraph ############################
 COURSEGRAPH_JOB_QUEUE = LOW_PRIORITY_QUEUE

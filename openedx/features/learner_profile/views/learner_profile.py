@@ -12,6 +12,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
 from django_countries import countries
 from edxmako.shortcuts import marketing_link
+from openedx.core.djangoapps.credentials.utils import get_credentials_records_url
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
@@ -139,6 +140,7 @@ def learner_profile_context(request, profile_username, user_is_staff):
         'show_dashboard_tabs': True,
         'disable_courseware_js': True,
         'nav_hidden': True,
+        'records_url': get_credentials_records_url(),
     }
 
     if badges_enabled():

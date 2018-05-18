@@ -1,6 +1,6 @@
 ## mako
 
-<%page expression_filter="h" args="online_help_token"/>
+<%page expression_filter="h" args="online_help_token, use_cookie_banner=False"/>
 
 <%namespace name='static' file='../static_content.html'/>
 <%namespace file='../main.html' import="login_query"/>
@@ -14,6 +14,9 @@ from openedx.core.djangolib.markup import HTML, Text
 # App that handles subdomain specific branding
 from branding import api as branding_api
 from openedx.core.djangoapps.lang_pref.api import header_language_selector_is_enabled, released_languages
+
+# GDPR Flag
+from openedx.features.course_experience import ENABLE_GDPR_COMPAT_FLAG
 %>
 
 ## Provide a hook for themes to inject branding on top.
@@ -29,6 +32,13 @@ from openedx.core.djangoapps.lang_pref.api import header_language_selector_is_en
 % endif
 
 <header class="global-header ${'slim' if course else ''}">
+    % if use_cookie_banner and ENABLE_GDPR_COMPAT_FLAG.is_enabled_without_course_context():
+        ${static.renderReact(
+            component="CookiePolicyBanner",
+            id="cookie-policy-banner",
+            props={}
+        )}
+    % endif
     <div class="main-header">
         <%include file="navbar-logo-header.html" args="online_help_token=online_help_token"/>
         <div class="hamburger-menu" role="button" aria-label=${_("Options Menu")} aria-expanded="false" aria-controls="mobile-menu" tabindex="0">
@@ -37,7 +47,7 @@ from openedx.core.djangoapps.lang_pref.api import header_language_selector_is_en
             <span class="line"></span>
             <span class="line"></span>
         </div>
-        % if user.is_authenticated():
+        % if user.is_authenticated:
             <%include file="navbar-authenticated.html" args="online_help_token=online_help_token"/>
         % else:
             <%include file="navbar-not-authenticated.html" args="online_help_token=online_help_token"/>
@@ -66,7 +76,7 @@ from openedx.core.djangoapps.lang_pref.api import header_language_selector_is_en
     % if len(languages) > 1:
         <form action="/i18n/setlang/" method="post" class="settings-language-form" id="language-settings-form">
             <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
-            % if user.is_authenticated():
+            % if user.is_authenticated:
                 <input title="preference api" type="hidden" class="url-endpoint" value="${reverse('preferences_api', kwargs={'username': user.username})}" data-user-is-authenticated="true">
             % else:
                 <input title="session update url" type="hidden" class="url-endpoint" value="${reverse('session_language')}" data-user-is-authenticated="false">

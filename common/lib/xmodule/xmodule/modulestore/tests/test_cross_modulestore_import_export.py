@@ -42,6 +42,7 @@ COURSE_DATA_NAMES = (
 EXPORTED_COURSE_DIR_NAME = u'exported_source_course'
 
 
+@attr(shard=2)
 @ddt.ddt
 @attr('mongo')
 class CrossStoreXMLRoundtrip(CourseComparisonTest, PartitionTestCase):

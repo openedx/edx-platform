@@ -65,6 +65,8 @@ from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.user_api import accounts as accounts_settings
+from openedx.core.djangoapps.user_api.accounts.utils import generate_password
+from openedx.core.djangoapps.user_api.models import UserRetirementRequest
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangolib.markup import HTML, Text
@@ -202,7 +204,7 @@ def register_user(request, extra_context=None):
     """
     # Determine the URL to redirect to following login:
     redirect_to = get_next_url_for_login_page(request)
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         return redirect(redirect_to)
 
     external_auth_response = external_auth_register(request)
@@ -351,7 +353,7 @@ def change_enrollment(request, check_access=True):
     user = request.user
 
     # Ensure the user is authenticated
-    if not user.is_authenticated():
+    if not user.is_authenticated:
         return HttpResponseForbidden()
 
     # Ensure we received a course_id
@@ -555,6 +557,7 @@ def user_signup_handler(sender, **kwargs):  # pylint: disable=unused-argument
             log.info(u'user {} originated from a white labeled "Microsite"'.format(kwargs['instance'].id))
 
 
+@transaction.non_atomic_requests
 def create_account_with_params(request, params):
     """
     Given a request and a dict of parameters (which may or may not have come
@@ -570,14 +573,13 @@ def create_account_with_params(request, params):
     parameters is invalid for any other reason.
 
     Issues with this code:
-    * It is not transactional. If there is a failure part-way, an incomplete
-      account will be created and left in the database.
+    * It is non-transactional except where explicitly wrapped in atomic to
+      alleviate deadlocks and improve performance. This means failures at
+      different places in registration can leave users in inconsistent
+      states.
     * Third-party auth passwords are not verified. There is a comment that
       they are unused, but it would be helpful to have a sanity check that
       they are sane.
-    * It is over 300 lines long (!) and includes disprate functionality, from
-      registration e-mails to all sorts of other things. It should be broken
-      up into semantically meaningful functions.
     * The user-facing text is rather unfriendly (e.g. "Username must be a
       minimum of two characters long" rather than "Please use a username of
       at least two characters").
@@ -610,7 +612,7 @@ def create_account_with_params(request, params):
     is_third_party_auth_enabled = third_party_auth.is_enabled()
 
     if is_third_party_auth_enabled and (pipeline.running(request) or third_party_auth_credentials_in_api):
-        params["password"] = pipeline.make_random_password()
+        params["password"] = generate_password()
 
     # in case user is registering via third party (Google, Facebook) and pipeline has expired, show appropriate
     # error message
@@ -662,8 +664,12 @@ def create_account_with_params(request, params):
     )
     custom_form = get_registration_extension_form(data=params)
 
+    third_party_provider = None
+    running_pipeline = None
+    new_user = None
+
     # Perform operations within a transaction that are critical to account creation
-    with transaction.atomic():
+    with outer_atomic(read_committed=True):
         # first, create the account
         (user, profile, registration) = do_create_account(form, custom_form)
 
@@ -701,6 +707,39 @@ def create_account_with_params(request, params):
                 request.social_strategy.clean_partial_pipeline(social_access_token)
                 raise ValidationError({'access_token': [error_message]})
 
+        # If the user is registering via 3rd party auth, track which provider they use
+        if is_third_party_auth_enabled and pipeline.running(request):
+            running_pipeline = pipeline.get(request)
+            third_party_provider = provider.Registry.get_from_pipeline(running_pipeline)
+
+        new_user = authenticate_new_user(request, user.username, params['password'])
+        django_login(request, new_user)
+        request.session.set_expiry(0)
+
+        if do_external_auth:
+            eamap.user = new_user
+            eamap.dtsignup = datetime.datetime.now(UTC)
+            eamap.save()
+            AUDIT_LOG.info(u"User registered with external_auth %s", new_user.username)
+            AUDIT_LOG.info(u'Updated ExternalAuthMap for %s to be %s', new_user.username, eamap)
+
+            if settings.FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'):
+                log.info('bypassing activation email')
+                new_user.is_active = True
+                new_user.save()
+                AUDIT_LOG.info(
+                    u"Login activated on extauth account - {0} ({1})".format(new_user.username, new_user.email))
+
+    # Check if system is configured to skip activation email for the current user.
+    skip_email = skip_activation_email(
+        user, do_external_auth, running_pipeline, third_party_provider,
+    )
+
+    if skip_email:
+        registration.activate()
+    else:
+        compose_and_send_activation_email(user, profile, registration)
+
     # Perform operations that are non-critical parts of account creation
     create_or_set_user_attribute_created_on_site(user, request.site)
 
@@ -713,13 +752,6 @@ def create_account_with_params(request, params):
             log.exception("Enable discussion notifications failed for user {id}.".format(id=user.id))
 
     dog_stats_api.increment("common.student.account_created")
-
-    # If the user is registering via 3rd party auth, track which provider they use
-    third_party_provider = None
-    running_pipeline = None
-    if is_third_party_auth_enabled and pipeline.running(request):
-        running_pipeline = pipeline.get(request)
-        third_party_provider = provider.Registry.get_from_pipeline(running_pipeline)
 
     # Track the user's registration
     if hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
@@ -770,20 +802,6 @@ def create_account_with_params(request, params):
 
     create_comments_service_user(user)
 
-    # Check if we system is configured to skip activation email for the current user.
-    skip_email = skip_activation_email(
-        user, do_external_auth, running_pipeline, third_party_provider,
-    )
-
-    if skip_email:
-        registration.activate()
-    else:
-        compose_and_send_activation_email(user, profile, registration)
-
-    new_user = authenticate_new_user(request, user.username, params['password'])
-    django_login(request, new_user)
-    request.session.set_expiry(0)
-
     try:
         record_registration_attributions(request, new_user)
     # Don't prevent a user from registering due to attribution errors.
@@ -794,19 +812,6 @@ def create_account_with_params(request, params):
     # and is not yet an active user.
     if new_user is not None:
         AUDIT_LOG.info(u"Login success on new account creation - {0}".format(new_user.username))
-
-    if do_external_auth:
-        eamap.user = new_user
-        eamap.dtsignup = datetime.datetime.now(UTC)
-        eamap.save()
-        AUDIT_LOG.info(u"User registered with external_auth %s", new_user.username)
-        AUDIT_LOG.info(u'Updated ExternalAuthMap for %s to be %s', new_user.username, eamap)
-
-        if settings.FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'):
-            log.info('bypassing activation email')
-            new_user.is_active = True
-            new_user.save()
-            AUDIT_LOG.info(u"Login activated on extauth account - {0} ({1})".format(new_user.username, new_user.email))
 
     return new_user
 
@@ -919,6 +924,7 @@ def record_registration_attributions(request, user):
 
 
 @csrf_exempt
+@transaction.non_atomic_requests
 def create_account(request, post_override=None):
     """
     JSON call to create new edX account.
@@ -1015,7 +1021,7 @@ def activate_account(request, key):
             # Success message for logged in users.
             message = _('{html_start}Success{html_end} You have activated your account.')
 
-            if not request.user.is_authenticated():
+            if not request.user.is_authenticated:
                 # Success message for logged out users
                 message = _(
                     '{html_start}Success! You have activated your account.{html_end}'
@@ -1049,7 +1055,7 @@ def activate_account_studio(request, key):
             {'csrf': csrf(request)['csrf_token']}
         )
     else:
-        user_logged_in = request.user.is_authenticated()
+        user_logged_in = request.user.is_authenticated
         already_active = True
         if not registration.user.is_active:
             if waffle().is_enabled(PREVENT_AUTH_USER_WRITES):
@@ -1145,6 +1151,19 @@ def password_reset_confirm_wrapper(request, uidb36=None, token=None):
             request, uidb64=uidb64, token=token, extra_context=platform_name
         )
 
+    if UserRetirementRequest.has_user_requested_retirement(user):
+        # Refuse to reset the password of any user that has requested retirement.
+        context = {
+            'validlink': True,
+            'form': None,
+            'title': _('Password reset unsuccessful'),
+            'err_msg': _('Error in resetting your password.'),
+        }
+        context.update(platform_name)
+        return TemplateResponse(
+            request, 'registration/password_reset_confirm.html', context
+        )
+
     if waffle().is_enabled(PREVENT_AUTH_USER_WRITES):
         context = {
             'validlink': False,
@@ -1159,25 +1178,18 @@ def password_reset_confirm_wrapper(request, uidb36=None, token=None):
 
     if request.method == 'POST':
         password = request.POST['new_password1']
-        valid_link = True  # password reset link will be valid if there is no security violation
-        error_message = None
+
         try:
             validate_password(password, user=user)
-        except SecurityPolicyError as err:
-            error_message = err.message
-            valid_link = False
         except ValidationError as err:
-            error_message = err.message
-
-        if error_message:
             # We have a password reset attempt which violates some security
             # policy, or any other validation. Use the existing Django template to communicate that
             # back to the user.
             context = {
-                'validlink': valid_link,
+                'validlink': True,
                 'form': None,
                 'title': _('Password reset unsuccessful'),
-                'err_msg': error_message,
+                'err_msg': err.message,
             }
             context.update(platform_name)
             return TemplateResponse(

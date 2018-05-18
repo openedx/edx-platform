@@ -23,13 +23,14 @@ from urllib import urlencode
 
 import analytics
 from config_models.models import ConfigurationModel
+from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.core.cache import cache
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
-from django.db import IntegrityError, models
+from django.db import IntegrityError, models, transaction
 from django.db.models import Count, Q
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
@@ -64,6 +65,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.request_cache import clear_cache, get_cache
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
+from openedx.core.djangolib.model_mixins import DeletableByUserValue
 from track import contexts
 from util.milestones_helpers import is_entrance_exams_enabled
 from util.model_utils import emit_field_changed_events, get_changed_fields_dict
@@ -145,7 +147,7 @@ def anonymous_id_for_user(user, course_id, save=True):
     # This part is for ability to get xblock instance in xblock_noauth handlers, where user is unauthenticated.
     assert user
 
-    if user.is_anonymous():
+    if user.is_anonymous:
         return None
 
     cached_id = getattr(user, '_anonymous_id', {}).get(course_id)
@@ -215,15 +217,33 @@ def is_username_retired(username):
 
 def get_retired_username_by_username(username):
     """
-    Returns a "retired username" hashed using the newest configured salt
+    If a UserRetirementStatus object with an original_username matching the given username exists,
+    returns that UserRetirementStatus.retired_username value.  Otherwise, returns a "retired username"
+    hashed using the newest configured salt.
     """
+    UserRetirementStatus = apps.get_model('user_api', 'UserRetirementStatus')
+    try:
+        status = UserRetirementStatus.objects.filter(original_username=username).order_by('-modified').first()
+        if status:
+            return status.retired_username
+    except UserRetirementStatus.DoesNotExist:
+        pass
     return user_util.get_retired_username(username, settings.RETIRED_USER_SALTS, settings.RETIRED_USERNAME_FMT)
 
 
 def get_retired_email_by_email(email):
     """
-    Returns a "retired email" hashed using the newest configured salt
+    If a UserRetirementStatus object with an original_email matching the given email exists,
+    returns that UserRetirementStatus.retired_email value.  Otherwise, returns a "retired email"
+    hashed using the newest configured salt.
     """
+    UserRetirementStatus = apps.get_model('user_api', 'UserRetirementStatus')
+    try:
+        status = UserRetirementStatus.objects.filter(original_email=email).order_by('-modified').first()
+        if status:
+            return status.retired_email
+    except UserRetirementStatus.DoesNotExist:
+        pass
     return user_util.get_retired_email(email, settings.RETIRED_USER_SALTS, settings.RETIRED_EMAIL_FMT)
 
 
@@ -245,6 +265,17 @@ def get_all_retired_emails_by_email(email):
     return user_util.get_all_retired_emails(email, settings.RETIRED_USER_SALTS, settings.RETIRED_EMAIL_FMT)
 
 
+def get_potentially_retired_user_by_username(username):
+    """
+    Attempt to return a User object based on the username, or if it
+    does not exist, then any hashed username salted with the historical
+    salts.
+    """
+    locally_hashed_usernames = list(get_all_retired_usernames_by_username(username))
+    locally_hashed_usernames.append(username)
+    return User.objects.get(username__in=locally_hashed_usernames)
+
+
 def get_potentially_retired_user_by_username_and_hash(username, hashed_username):
     """
     To assist in the retirement process this method will:
@@ -259,13 +290,8 @@ def get_potentially_retired_user_by_username_and_hash(username, hashed_username)
     if hashed_username not in locally_hashed_usernames:
         raise Exception('Mismatched hashed_username, bad salt?')
 
-    try:
-        return User.objects.get(username=username)
-    except User.DoesNotExist:
-        # The 2nd DoesNotExist will bubble up from here if necessary,
-        # an assumption is being made here that our hashed username format
-        # is something that a user cannot create for themselves.
-        return User.objects.get(username__in=locally_hashed_usernames)
+    locally_hashed_usernames.append(username)
+    return User.objects.get(username__in=locally_hashed_usernames)
 
 
 class UserStanding(models.Model):
@@ -664,13 +690,16 @@ class Registration(models.Model):
             analytics.identify(*identity_args)
 
 
-class PendingNameChange(models.Model):
+class PendingNameChange(DeletableByUserValue, models.Model):
     user = models.OneToOneField(User, unique=True, db_index=True)
     new_name = models.CharField(blank=True, max_length=255)
     rationale = models.CharField(blank=True, max_length=1024)
 
 
-class PendingEmailChange(models.Model):
+class PendingEmailChange(DeletableByUserValue, models.Model):
+    """
+    This model keeps track of pending requested changes to a user's email address.
+    """
     user = models.OneToOneField(User, unique=True, db_index=True)
     new_email = models.CharField(blank=True, max_length=255, db_index=True)
     activation_key = models.CharField(('activation key'), max_length=32, unique=True, db_index=True)
@@ -889,6 +918,14 @@ class PasswordHistory(models.Model):
                 return False
 
         return True
+
+    @classmethod
+    def retire_user(cls, user_id):
+        """
+        Updates the password in all rows corresponding to a user
+        to an empty string as part of removing PII for user retirement.
+        """
+        return cls.objects.filter(user_id=user_id).update(password="")
 
 
 class LoginFailures(models.Model):
@@ -1220,7 +1257,7 @@ class CourseEnrollment(models.Model):
         """
         assert user
 
-        if user.is_anonymous():
+        if user.is_anonymous:
             return None
         try:
             return cls.objects.get(
@@ -1637,7 +1674,7 @@ class CourseEnrollment(models.Model):
         """
         assert user
 
-        if user.is_anonymous():
+        if user.is_anonymous:
             return None
 
         cache_key = cls.enrollment_status_hash_cache_key(user)
@@ -1960,7 +1997,7 @@ class CourseEnrollment(models.Model):
         """
         assert user
 
-        if user.is_anonymous():
+        if user.is_anonymous:
             return CourseEnrollmentState(None, None)
         enrollment_state = cls._get_enrollment_in_request_cache(user, course_key)
         if not enrollment_state:
@@ -2080,8 +2117,16 @@ class ManualEnrollmentAudit(models.Model):
             manual_enrollment = None
         return manual_enrollment
 
+    @classmethod
+    def retire_manual_enrollments(cls, enrollments, retired_email):
+        """
+        Removes PII (enrolled_email and reason) from any rows corresponding to
+        the enrollment passed in. Bubbles up any exceptions.
+        """
+        return cls.objects.filter(enrollment__in=enrollments).update(reason="", enrolled_email=retired_email)
 
-class CourseEnrollmentAllowed(models.Model):
+
+class CourseEnrollmentAllowed(DeletableByUserValue, models.Model):
     """
     Table of users (specified by email address strings) who are allowed to enroll in a specified course.
     The user may or may not (yet) exist.  Enrollment by users listed in this table is allowed

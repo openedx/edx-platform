@@ -28,6 +28,7 @@ from discussion_api.tests.utils import (
 )
 from django_comment_client.tests.utils import ForumsEnableMixin
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_storage
+from openedx.core.djangoapps.user_api.models import RetirementState, UserRetirementStatus
 from openedx.core.lib.token_utils import JwtBuilder
 from student.models import get_retired_username_by_username
 from student.tests.factories import CourseEnrollmentFactory, UserFactory, SuperuserFactory
@@ -123,6 +124,7 @@ class DiscussionAPIViewTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, Ur
         self.test_basic()
 
 
+@attr(shard=8)
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for CourseView"""
@@ -157,18 +159,23 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         )
 
 
+@attr(shard=8)
 @httpretty.activate
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
     """Tests for CourseView"""
     def setUp(self):
         super(RetireViewTest, self).setUp()
+        RetirementState.objects.create(state_name='PENDING', state_execution_order=1)
+        self.retire_forums_state = RetirementState.objects.create(state_name='RETIRE_FORUMS', state_execution_order=11)
+
+        self.retirement = UserRetirementStatus.create_retirement(self.user)
+        self.retirement.current_state = self.retire_forums_state
+        self.retirement.save()
+
         self.superuser = SuperuserFactory()
         self.retired_username = get_retired_username_by_username(self.user.username)
-        self.url = reverse(
-            "retire_discussion_user",
-            kwargs={"username": text_type(self.user.username)}
-        )
+        self.url = reverse("retire_discussion_user")
 
     def assert_response_correct(self, response, expected_status, expected_content):
         """
@@ -193,16 +200,9 @@ class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         """
         self.register_get_user_retire_response(self.user)
         headers = self.build_jwt_headers(self.superuser)
-        response = self.client.post(self.url, {'retired_username': self.retired_username}, **headers)
+        data = {'username': self.user.username}
+        response = self.client.post(self.url, data, **headers)
         self.assert_response_correct(response, 204, "")
-
-    def test_bad_hash(self):
-        """
-        Check that we fail on a hash mismatch with an appropriate error
-        """
-        headers = self.build_jwt_headers(self.superuser)
-        response = self.client.post(self.url, {'retired_username': "this will never match"}, **headers)
-        self.assert_response_correct(response, 500, '"Mismatched hashed_username, bad salt?"')
 
     def test_downstream_forums_error(self):
         """
@@ -210,7 +210,8 @@ class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         """
         self.register_get_user_retire_response(self.user, status=500, body="Server error")
         headers = self.build_jwt_headers(self.superuser)
-        response = self.client.post(self.url, {'retired_username': self.retired_username}, **headers)
+        data = {'username': self.user.username}
+        response = self.client.post(self.url, data, **headers)
         self.assert_response_correct(response, 500, '"Server error"')
 
     def test_nonexistent_user(self):
@@ -218,23 +219,20 @@ class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         Check that we handle unknown users appropriately
         """
         nonexistent_username = "nonexistent user"
-        self.url = reverse(
-            "retire_discussion_user",
-            kwargs={"username": nonexistent_username}
-        )
         self.retired_username = get_retired_username_by_username(nonexistent_username)
-
+        data = {'username': nonexistent_username}
         headers = self.build_jwt_headers(self.superuser)
-        response = self.client.post(self.url, {'retired_username': self.retired_username}, **headers)
+        response = self.client.post(self.url, data, **headers)
         self.assert_response_correct(response, 404, None)
 
     def test_not_authenticated(self):
         """
-        Override the parent implementation of this, we auth differently
+        Override the parent implementation of this, we JWT auth for this API
         """
         pass
 
 
+@attr(shard=8)
 @ddt.ddt
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
@@ -389,7 +387,7 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         )
 
 
-@attr(shard=3)
+@attr(shard=8)
 @ddt.ddt
 @httpretty.activate
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -730,6 +728,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
         self.assertEqual({}, response_thread['users'])
 
 
+@attr(shard=8)
 @httpretty.activate
 @disable_signal(api, 'thread_created')
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -794,7 +793,7 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assertEqual(response_data, expected_response_data)
 
 
-@attr(shard=3)
+@attr(shard=8)
 @ddt.ddt
 @httpretty.activate
 @disable_signal(api, 'thread_edited')
@@ -952,6 +951,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
         )
 
 
+@attr(shard=8)
 @httpretty.activate
 @disable_signal(api, 'thread_deleted')
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -987,7 +987,7 @@ class ThreadViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assertEqual(response.status_code, 404)
 
 
-@attr(shard=3)
+@attr(shard=8)
 @ddt.ddt
 @httpretty.activate
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -1362,6 +1362,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
             self.assertNotIn(response_comment['endorsed_by'], response_users)
 
 
+@attr(shard=8)
 @httpretty.activate
 @disable_signal(api, 'comment_deleted')
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -1404,6 +1405,7 @@ class CommentViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assertEqual(response.status_code, 404)
 
 
+@attr(shard=8)
 @httpretty.activate
 @disable_signal(api, 'comment_created')
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -1492,6 +1494,7 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assertEqual(response.status_code, 403)
 
 
+@attr(shard=8)
 @ddt.ddt
 @disable_signal(api, 'comment_edited')
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -1611,6 +1614,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
         self.assertEqual(response.status_code, 400)
 
 
+@attr(shard=8)
 @httpretty.activate
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class ThreadViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, ProfileImageTestMixin):
@@ -1662,6 +1666,7 @@ class ThreadViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase,
         self.assertEqual(expected_profile_data, response_users[self.user.username])
 
 
+@attr(shard=8)
 @httpretty.activate
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class CommentViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, ProfileImageTestMixin):

@@ -4,6 +4,7 @@ too.
 """
 from datetime import datetime, timedelta
 import ddt
+from django.test import TestCase
 from nose.plugins.attrib import attr
 import pytz
 import unittest
@@ -61,6 +62,8 @@ class TestSortedAssetList(unittest.TestCase):
     """
     Tests the SortedAssetList class.
     """
+    shard = 1
+
     def setUp(self):
         super(TestSortedAssetList, self).setUp()
         asset_list = [dict(zip(AssetStoreTestData.asset_fields, asset)) for asset in AssetStoreTestData.all_asset_data]
@@ -84,10 +87,12 @@ class TestSortedAssetList(unittest.TestCase):
 
 @attr('mongo')
 @ddt.ddt
-class TestMongoAssetMetadataStorage(unittest.TestCase):
+class TestMongoAssetMetadataStorage(TestCase):
     """
     Tests for storing/querying course asset metadata.
     """
+    shard = 1
+
     def setUp(self):
         super(TestMongoAssetMetadataStorage, self).setUp()
         self.addTypeEqualityFunc(datetime, self._compare_datetimes)

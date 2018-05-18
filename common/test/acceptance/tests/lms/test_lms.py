@@ -42,7 +42,7 @@ from common.test.acceptance.tests.helpers import (
 )
 
 
-@attr(shard=8)
+@attr(shard=19)
 class ForgotPasswordPageTest(UniqueCourseTest):
     """
     Test that forgot password forms is rendered if url contains 'forgot-password-modal'
@@ -84,7 +84,7 @@ class ForgotPasswordPageTest(UniqueCourseTest):
         self.assertIn("Check Your Email", self.reset_password_page.get_success_message())
 
 
-@attr(shard=8)
+@attr(shard=19)
 class LoginFromCombinedPageTest(UniqueCourseTest):
     """Test that we can log in using the combined login/registration page.
 
@@ -277,7 +277,7 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
         return (email, password)
 
 
-@attr(shard=8)
+@attr(shard=19)
 class RegisterFromCombinedPageTest(UniqueCourseTest):
     """Test that we can register a new user from the combined login/registration page. """
 
@@ -302,7 +302,7 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         self.assertEqual(self.register_page.current_form, "login")
 
 
-@attr(shard=8)
+@attr(shard=19)
 class PayAndVerifyTest(EventsTestMixin, UniqueCourseTest):
     """Test that we can proceed through the payment and verification flow."""
     def setUp(self):
@@ -332,33 +332,6 @@ class PayAndVerifyTest(EventsTestMixin, UniqueCourseTest):
 
         # Add a verified mode to the course
         ModeCreationPage(self.browser, self.course_id, mode_slug=u'verified', mode_display_name=u'Verified Certificate', min_price=10, suggested_prices='10,20').visit()
-
-    def test_immediate_verification_enrollment(self):
-        # Create a user and log them in
-        student_id = AutoAuthPage(self.browser).visit().get_user_id()
-
-        enroll_user_track(self.browser, self.course_id, 'verified')
-
-        # Proceed to verification
-        self.payment_and_verification_flow.immediate_verification()
-
-        # Take face photo and proceed to the ID photo step
-        self.payment_and_verification_flow.webcam_capture()
-        self.payment_and_verification_flow.next_verification_step(self.immediate_verification_page)
-
-        # Take ID photo and proceed to the review photos step
-        self.payment_and_verification_flow.webcam_capture()
-        self.payment_and_verification_flow.next_verification_step(self.immediate_verification_page)
-
-        # Submit photos and proceed to the enrollment confirmation step
-        self.payment_and_verification_flow.next_verification_step(self.immediate_verification_page)
-
-        # Navigate to the dashboard
-        self.dashboard_page.visit()
-
-        # Expect that we're enrolled as verified in the course
-        enrollment_mode = self.dashboard_page.get_enrollment_mode(self.course_info["display_name"])
-        self.assertEqual(enrollment_mode, 'verified')
 
     def test_deferred_verification_enrollment(self):
         # Create a user and log them in

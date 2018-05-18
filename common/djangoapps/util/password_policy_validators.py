@@ -149,7 +149,7 @@ def password_instructions():
                          min_length).format(num=min_length, requirements=' & '.join(reqs))
 
 
-def validate_password(password, user=None, username=None):
+def validate_password(password, user=None, username=None, password_reset=True):
     """
     Checks user-provided password against our current site policy.
 
@@ -159,10 +159,18 @@ def validate_password(password, user=None, username=None):
         password: The user-provided password as a string
         user: A User model object, if available. Required to check against security policy.
         username: The user-provided username, if available. Taken from 'user' if not provided.
+        password_reset: Whether to run validators that only make sense in a password reset
+         context (like PasswordHistory).
     """
+    if not isinstance(password, text_type):
+        try:
+            password = text_type(password, encoding='utf8')  # some checks rely on unicode semantics (e.g. length)
+        except UnicodeDecodeError:
+            raise ValidationError(_('Invalid password.'))  # no reason to get into weeds
+
     username = username or (user and user.username)
 
-    if user:
+    if user and password_reset:
         _validate_password_security(password, user)
 
     _validate_password_dictionary(password)
@@ -308,7 +316,7 @@ def _validate_password_dictionary(value):
 
     if password_max_edit_distance and password_dictionary:
         for word in password_dictionary:
-            edit_distance = distance(text_type(value), text_type(word))
+            edit_distance = distance(value, text_type(word))
             if edit_distance <= password_max_edit_distance:
                 raise ValidationError(_("Password is too similar to a dictionary word."),
                                       code="dictionary_word")

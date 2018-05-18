@@ -21,20 +21,10 @@ COVERAGE_REQ_FILE = 'requirements/edx/coverage.txt'
 # If you make any changes to this list you also need to make
 # a corresponding change to circle.yml, which is how the python
 # prerequisites are installed for builds on circleci.com
-PYTHON_REQ_FILES = [
-    'requirements/edx/pre.txt',
-    'requirements/edx/github.txt',
-    'requirements/edx/local.txt',
-    'requirements/edx/django.txt',
-    'requirements/edx/base.txt',
-    'requirements/edx/paver.txt',
-    'requirements/edx/development.txt',
-    'requirements/edx/testing.txt',
-    'requirements/edx/post.txt',
-]
 if 'TOXENV' in os.environ:
-    # Let tox manage the Django version
-    PYTHON_REQ_FILES.remove('requirements/edx/django.txt')
+    PYTHON_REQ_FILES = ['requirements/edx/testing.txt']
+else:
+    PYTHON_REQ_FILES = ['requirements/edx/development.txt']
 
 # Developers can have private requirements, for local copies of github repos,
 # or favorite debugging tools, etc.

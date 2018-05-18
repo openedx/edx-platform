@@ -377,7 +377,8 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
                 'key': 'course-v1:FAKE+FA1-MA1.X+3T2017',
                 'enrollment_end': str(self.TOMORROW),
                 'pacing_type': 'instructor_paced',
-                'type': 'verified'
+                'type': 'verified',
+                'status': 'published'
             }
         ]
         mock_pseudo_session.return_value = {
@@ -403,7 +404,8 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
                 'key': 'course-v1:edX+toy+2012_Fall',
                 'enrollment_end': str(self.TOMORROW),
                 'pacing_type': 'instructor_paced',
-                'type': 'verified'
+                'type': 'verified',
+                'status': 'published'
             }
         ]
         response = self.client.get(self.path)
@@ -432,7 +434,8 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
                 'key': 'course-v1:FAKE+FA1-MA1.X+3T2017',
                 'enrollment_end': str(self.TOMORROW),
                 'pacing_type': 'instructor_paced',
-                'type': 'verified'
+                'type': 'verified',
+                'status': 'published'
             }
         ]
         response = self.client.get(self.path)
@@ -464,7 +467,8 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
                 'key': str(mocked_course_overview.id),
                 'enrollment_end': str(mocked_course_overview.enrollment_end),
                 'pacing_type': 'self_paced',
-                'type': 'verified'
+                'type': 'verified',
+                'status': 'published'
             }
         ]
         CourseEntitlementFactory(user=self.user, enrollment_course_run=course_enrollment)
@@ -482,7 +486,8 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
                 'key': str(mocked_course_overview.id),
                 'enrollment_end': str(mocked_course_overview.enrollment_end),
                 'pacing_type': 'self_paced',
-                'type': 'verified'
+                'type': 'verified',
+                'status': 'published'
             }
         ]
         # response = self.client.get(self.path)
@@ -499,7 +504,8 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
                 'key': str(mocked_course_overview.id),
                 'enrollment_end': None,
                 'pacing_type': 'self_paced',
-                'type': 'verified'
+                'type': 'verified',
+                'status': 'published'
             }
         ]
         # response = self.client.get(self.path)
@@ -529,7 +535,8 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
                 'key': str(mocked_course_overview.id),
                 'enrollment_end': str(mocked_course_overview.enrollment_end),
                 'pacing_type': 'self_paced',
-                'type': 'verified'
+                'type': 'verified',
+                'status': 'published'
             }
         ]
         entitlement = CourseEntitlementFactory(user=self.user, enrollment_course_run=course_enrollment)
@@ -565,7 +572,8 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
                 'key': str(mocked_course_overview.id),
                 'enrollment_end': str(mocked_course_overview.enrollment_end),
                 'pacing_type': 'self_paced',
-                'type': 'verified'
+                'type': 'verified',
+                'status': 'published'
             }
         ]
         entitlement = CourseEntitlementFactory(user=self.user, enrollment_course_run=course_enrollment, created=self.THREE_YEARS_AGO)
@@ -720,8 +728,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
 
         submit_completions_for_testing(self.user, course_key, block_keys)
 
-        with patch('completion.utilities.visual_progress_enabled', return_value=True):
-            response = self.client.get(reverse('dashboard'))
+        response = self.client.get(reverse('dashboard'))
 
         course_key_string = str(course_key)
         resume_block_key_string = str(block_keys[-1])
@@ -808,8 +815,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
                 )
             )
 
-        with patch('completion.utilities.visual_progress_enabled', return_value=True):
-            response = self.client.get(reverse('dashboard'))
+        response = self.client.get(reverse('dashboard'))
 
         html_for_view_buttons = [
             self._remove_whitespace_from_html_string(button)

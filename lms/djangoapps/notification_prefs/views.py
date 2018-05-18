@@ -123,7 +123,7 @@ def ajax_enable(request):
     user, this has no effect. Otherwise, a preference is created with the
     unsubscribe token (an encryption of the username) as the value.username
     """
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         raise PermissionDenied
 
     enable_notifications(request.user)
@@ -139,7 +139,7 @@ def ajax_disable(request):
     This view should be invoked by an AJAX POST call. It returns status 204
     (no content) or an error.
     """
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         raise PermissionDenied
 
     delete_user_preference(request.user, NOTIFICATION_PREF_KEY)
@@ -155,7 +155,7 @@ def ajax_status(request):
     This view should be invoked by an AJAX GET call. It returns status 200,
     with a JSON-formatted payload, or an error.
     """
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         raise PermissionDenied
 
     qs = UserPreference.objects.filter(

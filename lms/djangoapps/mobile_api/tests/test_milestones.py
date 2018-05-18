@@ -20,6 +20,7 @@ class MobileAPIMilestonesMixin(object):
     the mobile api will appropriately block content until the milestone is
     fulfilled.
     """
+    shard = 4
 
     ALLOW_ACCESS_TO_MILESTONE_COURSE = False  # pylint: disable=invalid-name
 

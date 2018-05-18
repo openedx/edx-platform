@@ -887,7 +887,6 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
             alert.accept()
 
 
-@attr(shard=5)
 class TeamFormActions(TeamsTabBase):
     """
     Base class for create, edit, and delete team.
@@ -986,6 +985,7 @@ class TeamFormActions(TeamsTabBase):
         )
 
 
+@attr(shard=5)
 @ddt.ddt
 class CreateTeamTest(TeamFormActions):
     """
@@ -1180,6 +1180,7 @@ class CreateTeamTest(TeamFormActions):
             self.verify_and_navigate_to_create_team_page()
 
 
+@attr(shard=21)
 @ddt.ddt
 class DeleteTeamTest(TeamFormActions):
     """
@@ -1303,6 +1304,7 @@ class DeleteTeamTest(TeamFormActions):
         self.teams_page.verify_topic_team_count(0)
 
 
+@attr(shard=17)
 @ddt.ddt
 class EditTeamTest(TeamFormActions):
     """
@@ -1519,6 +1521,7 @@ class EditTeamTest(TeamFormActions):
             self.verify_and_navigate_to_edit_team_page()
 
 
+@attr(shard=17)
 @ddt.ddt
 class EditMembershipTest(TeamFormActions):
     """
@@ -1620,7 +1623,7 @@ class EditMembershipTest(TeamFormActions):
         self.edit_membership_helper(role, cancel=True)
 
 
-@attr(shard=5)
+@attr(shard=17)
 @ddt.ddt
 class TeamPageTest(TeamsTabBase):
     """Tests for viewing a specific team"""

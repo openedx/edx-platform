@@ -75,21 +75,10 @@ DEFAULT_VARIABLES = {
     'j': numpy.complex(0, 1),
     'e': numpy.e,
     'pi': numpy.pi,
-    'k': scipy.constants.k,  # Boltzmann: 1.3806488e-23 (Joules/Kelvin)
-    'c': scipy.constants.c,  # Light Speed: 2.998e8 (m/s)
-    'T': 298.15,  # Typical room temperature: 298.15 (Kelvin), same as 25C/77F
-    'q': scipy.constants.e  # Fund. Charge: 1.602176565e-19 (Coulombs)
 }
 
-# We eliminated the following extreme suffixes:
-#   P (1e15), E (1e18), Z (1e21), Y (1e24),
-#   f (1e-15), a (1e-18), z (1e-21), y (1e-24)
-# since they're rarely used, and potentially confusing.
-# They may also conflict with variables if we ever allow e.g.
-#   5R instead of 5*R
 SUFFIXES = {
-    '%': 0.01, 'k': 1e3, 'M': 1e6, 'G': 1e9, 'T': 1e12,
-    'c': 1e-2, 'm': 1e-3, 'u': 1e-6, 'n': 1e-9, 'p': 1e-12
+    '%': 0.01,
 }
 
 

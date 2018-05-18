@@ -135,11 +135,16 @@ def get_course_last_published(course_key):
         was published.
     """
     # Import is placed here to avoid model import at project startup.
-    from openedx.core.djangoapps.content.course_structures.models import CourseStructure
+    from xmodule.modulestore.django import modulestore
+    from openedx.core.djangoapps.content.block_structure.models import BlockStructureModel
+    from openedx.core.djangoapps.content.block_structure.exceptions import BlockStructureNotFound
+
+    store = modulestore()
+    course_usage_key = store.make_course_usage_key(course_key)
     try:
-        structure = CourseStructure.objects.get(course_id=course_key)
+        structure = BlockStructureModel.get(course_usage_key)
         course_last_published_date = six.text_type(structure.modified)
-    except CourseStructure.DoesNotExist:
+    except BlockStructureNotFound:
         course_last_published_date = None
 
     return course_last_published_date

@@ -24,12 +24,10 @@ UNDERSCORE_LINTER = UnderscoreTemplateLinter(
 )
 
 
-JAVASCRIPT_SKIP_DIRS = SKIP_DIRS + ('i18n', 'static/coffee')
-COFFEESCRIPT_SKIP_DIRS = SKIP_DIRS
+JAVASCRIPT_SKIP_DIRS = SKIP_DIRS + ('i18n',)
 JAVASCRIPT_LINTER = JavaScriptLinter(
     underscore_linter=UNDERSCORE_LINTER,
     javascript_skip_dirs=JAVASCRIPT_SKIP_DIRS,
-    coffeescript_skip_dirs=COFFEESCRIPT_SKIP_DIRS
 )
 
 

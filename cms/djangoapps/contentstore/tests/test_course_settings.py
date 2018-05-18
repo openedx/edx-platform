@@ -41,6 +41,8 @@ class CourseSettingsEncoderTest(CourseTestCase):
     """
     Tests for CourseSettingsEncoder.
     """
+    shard = 1
+
     def test_encoder(self):
         details = CourseDetails.fetch(self.course.id)
         jsondetails = json.dumps(details, cls=CourseSettingsEncoder)
@@ -87,6 +89,8 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
     """
     Tests for modifying content on the first course settings page (course dates, overview, etc.).
     """
+    shard = 1
+
     def alter_field(self, url, details, field, val):
         """
         Change the one field to the given value and then invoke the update post to see if it worked.
@@ -435,6 +439,8 @@ class CourseGradingTest(CourseTestCase):
     """
     Tests for the course settings grading page.
     """
+    shard = 1
+
     def test_initial_grader(self):
         test_grader = CourseGradingModel(self.course)
         self.assertIsNotNone(test_grader.graders)
@@ -769,6 +775,8 @@ class CourseMetadataEditingTest(CourseTestCase):
     """
     Tests for CourseMetadata.
     """
+    shard = 1
+
     def setUp(self):
         CourseTestCase.setUp(self)
         self.fullcourse = CourseFactory.create()
@@ -1158,6 +1166,8 @@ class CourseGraderUpdatesTest(CourseTestCase):
     """
     Test getting, deleting, adding, & updating graders
     """
+    shard = 1
+
     def setUp(self):
         """Compute the url to use in tests"""
         super(CourseGraderUpdatesTest, self).setUp()
@@ -1223,6 +1233,8 @@ class CourseEnrollmentEndFieldTest(CourseTestCase):
     Base class to test the enrollment end fields in the course settings details view in Studio
     when using marketing site flag and global vs non-global staff to access the page.
     """
+    shard = 1
+
     NOT_EDITABLE_HELPER_MESSAGE = "Contact your edX partner manager to update these settings."
     NOT_EDITABLE_DATE_WRAPPER = "<div class=\"field date is-not-editable\" id=\"field-enrollment-end-date\">"
     NOT_EDITABLE_TIME_WRAPPER = "<div class=\"field time is-not-editable\" id=\"field-enrollment-end-time\">"

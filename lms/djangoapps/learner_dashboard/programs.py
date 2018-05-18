@@ -12,6 +12,7 @@ from web_fragments.fragment import Fragment
 
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.learner_dashboard.utils import FAKE_COURSE_KEY, strip_course_id
+from openedx.core.djangoapps.credentials.utils import get_credentials_records_url
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.utils import (
@@ -38,7 +39,7 @@ class ProgramsFragmentView(EdxFragmentView):
             mobile_only = False
 
         programs_config = kwargs.get('programs_config') or ProgramsApiConfig.current()
-        if not programs_config.enabled or not user.is_authenticated():
+        if not programs_config.enabled or not user.is_authenticated:
             raise Http404
 
         meter = ProgramProgressMeter(request.site, user, mobile_only=mobile_only)
@@ -75,7 +76,7 @@ class ProgramDetailsFragmentView(EdxFragmentView):
     def render_to_fragment(self, request, program_uuid, **kwargs):
         """View details about a specific program."""
         programs_config = kwargs.get('programs_config') or ProgramsApiConfig.current()
-        if not programs_config.enabled or not request.user.is_authenticated():
+        if not programs_config.enabled or not request.user.is_authenticated:
             raise Http404
 
         meter = ProgramProgressMeter(request.site, request.user, uuid=program_uuid)
@@ -97,13 +98,22 @@ class ProgramDetailsFragmentView(EdxFragmentView):
         skus = program_data.get('skus')
         ecommerce_service = EcommerceService()
 
+        # TODO: Don't have business logic of course-certificate==record-available here in LMS.
+        # Eventually, the UI should ask Credentials if there is a record available and get a URL from it.
+        # But this is here for now so that we can gate this URL behind both this business logic and
+        # a waffle flag. This feature is in active developoment.
+        program_record_url = get_credentials_records_url(program_uuid=program_uuid)
+        if not certificate_data:
+            program_record_url = None
+
         urls = {
             'program_listing_url': reverse('program_listing_view'),
             'track_selection_url': strip_course_id(
                 reverse('course_modes_choose', kwargs={'course_id': FAKE_COURSE_KEY})
             ),
             'commerce_api_url': reverse('commerce_api:v0:baskets:create'),
-            'buy_button_url': ecommerce_service.get_checkout_page_url(*skus)
+            'buy_button_url': ecommerce_service.get_checkout_page_url(*skus),
+            'program_record_url': program_record_url,
         }
 
         context = {

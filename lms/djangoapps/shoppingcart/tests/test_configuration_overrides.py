@@ -18,6 +18,8 @@ class TestOrderHistoryOnSiteDashboard(SiteMixin, ModuleStoreTestCase):
     """
     Test for dashboard order history site configuration overrides.
     """
+    shard = 4
+
     def setUp(self):
         super(TestOrderHistoryOnSiteDashboard, self).setUp()
 

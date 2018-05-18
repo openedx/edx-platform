@@ -30,7 +30,7 @@ def user_can_preview_themes(user):
     """
     Returns true if the specified user is allowed to preview themes.
     """
-    if not user or user.is_anonymous():
+    if not user or user.is_anonymous:
         return False
 
     # In development mode, all users can preview themes
@@ -46,7 +46,7 @@ def get_user_preview_site_theme(request):
     Returns the preview site for the current user, or None if not set.
     """
     user = request.user
-    if not user or user.is_anonymous():
+    if not user or user.is_anonymous:
         return None
     preview_site_name = get_user_preference(user, PREVIEW_SITE_THEME_PREFERENCE_KEY)
     if not preview_site_name:

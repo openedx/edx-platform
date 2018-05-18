@@ -15,6 +15,7 @@ from django.conf import settings
 from django.db.utils import IntegrityError
 from mock import MagicMock, patch
 
+from lms.djangoapps.grades import tasks
 from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag
 from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
 from lms.djangoapps.grades.models import PersistentCourseGrade, PersistentSubsectionGrade
@@ -40,6 +41,9 @@ from .utils import mock_get_score
 
 
 class MockGradesService(GradesService):
+    """
+    A mock grades service.
+    """
     def __init__(self, mocked_return_value=None):
         super(MockGradesService, self).__init__()
         self.mocked_return_value = mocked_return_value
@@ -56,7 +60,6 @@ class HasCourseWithProblemsMixin(object):
         """
         Configures the course for this test.
         """
-        # pylint: disable=attribute-defined-outside-init,no-member
         self.course = CourseFactory.create(
             org='edx',
             name='course',
@@ -136,6 +139,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
     """
     Ensures that the recalculate subsection grade task functions as expected when run.
     """
+    shard = 4
     ENABLED_SIGNALS = ['course_published', 'pre_publish']
 
     def setUp(self):
@@ -233,7 +237,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
         # So in total, 3 sequential parents, with one inaccessible.
         for sequential in (accessible_seq, inaccessible_seq):
             sequential.children = [self.problem.location]
-            modulestore().update_item(sequential, self.user.id)  # pylint: disable=no-member
+            modulestore().update_item(sequential, self.user.id)
 
         # Make sure the signal is sent for only the 2 accessible sequentials.
         self._apply_recalculate_subsection_grade()
@@ -431,6 +435,7 @@ class ComputeGradesForCourseTest(HasCourseWithProblemsMixin, ModuleStoreTestCase
     """
     Test compute_grades_for_course_v2 task.
     """
+    shard = 4
 
     ENABLED_SIGNALS = ['course_published', 'pre_publish']
 
@@ -469,3 +474,50 @@ class ComputeGradesForCourseTest(HasCourseWithProblemsMixin, ModuleStoreTestCase
             self.assertEqual(batch_size, test_batch_size)
             self.assertEqual(offset, offset_expected)
             offset_expected += test_batch_size
+
+
+class RecalculateGradesForUserTest(HasCourseWithProblemsMixin, ModuleStoreTestCase):
+    """
+    Test recalculate_course_and_subsection_grades_for_user task.
+    """
+    def setUp(self):
+        super(RecalculateGradesForUserTest, self).setUp()
+        self.user = UserFactory.create()
+        self.set_up_course()
+        CourseEnrollment.enroll(self.user, self.course.id)
+
+    def test_recalculation_happy_path(self):
+        with patch('lms.djangoapps.grades.tasks.CourseGradeFactory') as mock_factory:
+            factory = mock_factory.return_value
+            factory.read.return_value = MagicMock(attempted=True)
+
+            kwargs = {
+                'user_id': self.user.id,
+                'course_key': six.text_type(self.course.id),
+            }
+
+            task_result = tasks.recalculate_course_and_subsection_grades_for_user.apply_async(kwargs=kwargs)
+            task_result.get()
+
+            factory.read.assert_called_once_with(self.user, course_key=self.course.id)
+            factory.update.assert_called_once_with(
+                user=self.user,
+                course_key=self.course.id,
+                force_update_subsections=True,
+            )
+
+    def test_recalculation_doesnt_happen_if_not_previously_attempted(self):
+        with patch('lms.djangoapps.grades.tasks.CourseGradeFactory') as mock_factory:
+            factory = mock_factory.return_value
+            factory.read.return_value = MagicMock(attempted=False)
+
+            kwargs = {
+                'user_id': self.user.id,
+                'course_key': six.text_type(self.course.id),
+            }
+
+            task_result = tasks.recalculate_course_and_subsection_grades_for_user.apply_async(kwargs=kwargs)
+            task_result.get()
+
+            factory.read.assert_called_once_with(self.user, course_key=self.course.id)
+            self.assertFalse(factory.update.called)

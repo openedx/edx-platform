@@ -2,6 +2,7 @@
 
 import datetime
 import json
+from unittest import skip
 
 import ddt
 from nose.plugins.attrib import attr
@@ -58,6 +59,7 @@ class VideoEventsTestMixin(EventsTestMixin, VideoBaseTest):
         )
 
 
+@attr(shard=21)
 class VideoEventsTest(VideoEventsTestMixin):
     """ Test video player event emission """
 
@@ -188,7 +190,7 @@ class VideoHLSEventsTest(VideoEventsTestMixin):
         self.assert_events_match(expected_events, captured_events)
 
 
-@attr(shard=8)
+@attr(shard=19)
 @ddt.ddt
 class VideoBumperEventsTest(VideoEventsTestMixin):
     """ Test bumper video event emission """
@@ -230,6 +232,7 @@ class VideoBumperEventsTest(VideoEventsTestMixin):
         }
         self.course_fixture.add_advanced_settings(additional_data)
 
+    @skip("student: 5/2/18: flaky test")
     @ddt.data(
         ('edx.video.bumper.skipped', watch_video_and_skip),
         ('edx.video.bumper.dismissed', watch_video_and_dismiss),

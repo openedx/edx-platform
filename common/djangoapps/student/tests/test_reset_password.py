@@ -22,6 +22,7 @@ from provider.oauth2 import models as dop_models
 
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_api.models import UserRetirementRequest
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory
@@ -38,7 +39,8 @@ from .test_configuration_overrides import fake_get_value
 )
 @ddt.ddt
 class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
-    """ Tests that clicking reset password sends email, and doesn't activate the user
+    """
+    Tests that clicking reset password sends email, and doesn't activate the user
     """
     request_factory = RequestFactory()
 
@@ -59,7 +61,9 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
 
     @patch('student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_user_bad_password_reset(self):
-        """Tests password reset behavior for user with password marked UNUSABLE_PASSWORD_PREFIX"""
+        """
+        Tests password reset behavior for user with password marked UNUSABLE_PASSWORD_PREFIX
+        """
 
         bad_pwd_req = self.request_factory.post('/password_reset/', {'email': self.user_bad_passwd.email})
         bad_pwd_resp = password_reset(bad_pwd_req)
@@ -74,7 +78,9 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
 
     @patch('student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_nonexist_email_password_reset(self):
-        """Now test the exception cases with of reset_password called with invalid email."""
+        """
+        Now test the exception cases with of reset_password called with invalid email.
+        """
 
         bad_email_req = self.request_factory.post('/password_reset/', {'email': self.user.email + "makeItFail"})
         bad_email_resp = password_reset(bad_email_req)
@@ -91,7 +97,9 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
 
     @patch('student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_password_reset_ratelimited(self):
-        """ Try (and fail) resetting password 30 times in a row on an non-existant email address """
+        """
+        Try (and fail) resetting password 30 times in a row on an non-existant email address
+        """
         cache.clear()
 
         for i in xrange(30):
@@ -113,7 +121,9 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
     @patch('django.core.mail.send_mail')
     @patch('student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_reset_password_email(self, send_email):
-        """Tests contents of reset password email, and that user is not active"""
+        """
+        Tests contents of reset password email, and that user is not active
+        """
 
         good_req = self.request_factory.post('/password_reset/', {'email': self.user.email})
         good_req.user = self.user
@@ -236,7 +246,9 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
     )
     @ddt.unpack
     def test_reset_password_bad_token(self, uidb36, token):
-        """Tests bad token and uidb36 in password reset"""
+        """
+        Tests bad token and uidb36 in password reset
+        """
         if uidb36 is None:
             uidb36 = self.uidb36
         if token is None:
@@ -253,7 +265,9 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         self.assertFalse(self.user.is_active)
 
     def test_reset_password_good_token(self):
-        """Tests good token and uidb36 in password reset"""
+        """
+        Tests good token and uidb36 in password reset
+        """
         url = reverse(
             "password_reset_confirm",
             kwargs={"uidb36": self.uidb36, "token": self.token}
@@ -264,7 +278,9 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         self.assertTrue(self.user.is_active)
 
     def test_password_reset_fail(self):
-        """Tests that if we provide mismatched passwords, user is not marked as active."""
+        """
+        Tests that if we provide mismatched passwords, user is not marked as active.
+        """
         self.assertFalse(self.user.is_active)
 
         url = reverse(
@@ -276,6 +292,27 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
 
         # Make a password reset request with mismatching passwords.
         resp = password_reset_confirm_wrapper(confirm_request, self.uidb36, self.token)
+
+        # Verify the response status code is: 200 with password reset fail and also verify that
+        # the user is not marked as active.
+        self.assertEqual(resp.status_code, 200)
+        self.assertFalse(User.objects.get(pk=self.user.pk).is_active)
+
+    def test_password_reset_retired_user_fail(self):
+        """
+        Tests that if a retired user attempts to reset their password, it fails.
+        """
+        self.assertFalse(self.user.is_active)
+
+        # Retire the user.
+        UserRetirementRequest.create_retirement_request(self.user)
+
+        url = reverse(
+            'password_reset_confirm',
+            kwargs={'uidb36': self.uidb36, 'token': self.token}
+        )
+        reset_req = self.request_factory.get(url)
+        resp = password_reset_confirm_wrapper(reset_req, self.uidb36, self.token)
 
         # Verify the response status code is: 200 with password reset fail and also verify that
         # the user is not marked as active.
@@ -307,7 +344,8 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         }
     )
     def test_password_reset_with_invalid_length(self, password_dict):
-        """Tests that if we provide password characters less then PASSWORD_MIN_LENGTH,
+        """
+        Tests that if we provide password characters less then PASSWORD_MIN_LENGTH,
         or more than PASSWORD_MAX_LENGTH, password reset will fail with error message.
         """
 
@@ -326,7 +364,9 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
     @patch('student.views.management.password_reset_confirm')
     @patch("openedx.core.djangoapps.site_configuration.helpers.get_value", fake_get_value)
     def test_reset_password_good_token_configuration_override(self, reset_confirm):
-        """Tests password reset confirmation page for site configuration override."""
+        """
+        Tests password reset confirmation page for site configuration override.
+        """
         url = reverse(
             "password_reset_confirm",
             kwargs={"uidb36": self.uidb36, "token": self.token}

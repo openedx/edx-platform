@@ -17,7 +17,7 @@ from common.test.acceptance.tests.helpers import UniqueCourseTest, create_user_p
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID, MINIMUM_STATIC_PARTITION_ID, Group
 
 
-@attr(shard=10)
+@attr(shard=20)
 class StaffViewTest(UniqueCourseTest):
     """
     Tests that verify the staff view.
@@ -55,7 +55,7 @@ class StaffViewTest(UniqueCourseTest):
         return staff_page
 
 
-@attr(shard=10)
+@attr(shard=20)
 class CourseWithoutContentGroupsTest(StaffViewTest):
     """
     Setup for tests that have no content restricted to specific content groups.
@@ -86,7 +86,7 @@ class CourseWithoutContentGroupsTest(StaffViewTest):
         )
 
 
-@attr(shard=10)
+@attr(shard=20)
 class StaffViewToggleTest(CourseWithoutContentGroupsTest):
     """
     Tests for the staff view toggle button.
@@ -103,7 +103,7 @@ class StaffViewToggleTest(CourseWithoutContentGroupsTest):
         self.assertFalse(course_page.has_tab('Instructor'))
 
 
-@attr(shard=10)
+@attr(shard=20)
 class StaffDebugTest(CourseWithoutContentGroupsTest):
     """
     Tests that verify the staff debug info.
@@ -324,7 +324,7 @@ class CourseWithContentGroupsTest(StaffViewTest):
             )
         )
 
-    @attr(shard=10)
+    @attr(shard=20)
     def test_staff_sees_all_problems(self):
         """
         Scenario: Staff see all problems

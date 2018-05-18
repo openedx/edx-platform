@@ -97,56 +97,28 @@ class TestCourseGradeFactory(GradeTestBase):
         with self.assertNumQueries(2), mock_get_score(1, 2):
             _assert_read(expected_pass=False, expected_percent=0)  # start off with grade of 0
 
-        # TODO: Remove Django 1.11 upgrade shim
-        # SHIM: Django 1.11 results in a few more SAVEPOINTs due to:
-        # https://github.com/django/django/commit/d44afd88#diff-5b0dda5eb9a242c15879dc9cd2121379L485
-        if django.VERSION >= (1, 11):
-            num_queries = 37
-        else:
-            num_queries = 29
-
+        num_queries = 40
         with self.assertNumQueries(num_queries), mock_get_score(1, 2):
             grade_factory.update(self.request.user, self.course, force_update_subsections=True)
 
         with self.assertNumQueries(2):
             _assert_read(expected_pass=True, expected_percent=0.5)  # updated to grade of .5
 
-        # TODO: Remove Django 1.11 upgrade shim
-        # SHIM: Django 1.11 results in a few more SAVEPOINTs due to:
-        # https://github.com/django/django/commit/d44afd88#diff-5b0dda5eb9a242c15879dc9cd2121379L485
-        if django.VERSION >= (1, 11):
-            num_queries = 6
-        else:
-            num_queries = 4
-
+        num_queries = 6
         with self.assertNumQueries(num_queries), mock_get_score(1, 4):
             grade_factory.update(self.request.user, self.course, force_update_subsections=False)
 
         with self.assertNumQueries(2):
             _assert_read(expected_pass=True, expected_percent=0.5)  # NOT updated to grade of .25
 
-        # TODO: Remove Django 1.11 upgrade shim
-        # SHIM: Django 1.11 results in a few more SAVEPOINTs due to:
-        # https://github.com/django/django/commit/d44afd88#diff-5b0dda5eb9a242c15879dc9cd2121379L485
-        if django.VERSION >= (1, 11):
-            num_queries = 20
-        else:
-            num_queries = 12
-
+        num_queries = 20
         with self.assertNumQueries(num_queries), mock_get_score(2, 2):
             grade_factory.update(self.request.user, self.course, force_update_subsections=True)
 
         with self.assertNumQueries(2):
             _assert_read(expected_pass=True, expected_percent=1.0)  # updated to grade of 1.0
 
-        # TODO: Remove Django 1.11 upgrade shim
-        # SHIM: Django 1.11 results in a few more SAVEPOINTs due to:
-        # https://github.com/django/django/commit/d44afd88#diff-5b0dda5eb9a242c15879dc9cd2121379L485
-        if django.VERSION >= (1, 11):
-            num_queries = 20
-        else:
-            num_queries = 12
-
+        num_queries = 23
         with self.assertNumQueries(num_queries), mock_get_score(0, 0):  # the subsection now is worth zero
             grade_factory.update(self.request.user, self.course, force_update_subsections=True)
 

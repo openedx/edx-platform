@@ -20,7 +20,7 @@ import xmodule.graders as xmgraders
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from courseware.models import StudentModule
 from lms.djangoapps.grades.context import grading_context_for_course
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from shoppingcart.models import (
     CouponRedemption,
@@ -286,9 +286,8 @@ def enrolled_students_features(course_key, features):
         if include_enrollment_mode or include_verification_status:
             enrollment_mode = CourseEnrollment.enrollment_mode_for_user(student, course_key)[0]
             if include_verification_status:
-                student_dict['verification_status'] = SoftwareSecurePhotoVerification.verification_status_for_user(
+                student_dict['verification_status'] = IDVerificationService.verification_status_for_user(
                     student,
-                    course_key,
                     enrollment_mode
                 )
             if include_enrollment_mode:

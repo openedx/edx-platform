@@ -23,7 +23,7 @@ class AssetIndexPageStudioFrontend(CoursePage):
 
     PAGINATION_PAGE_ELEMENT = ".pagination li"
     TABLE_SORT_BUTTONS = 'th.sortable button.btn-header'
-    TYPE_FILTER_ELEMENT = ".filter-set .form-group"
+    TYPE_FILTER_ELEMENT = 'div[data-identifier="asset-filters"] .form-group'
     URL_PATH = "assets"
 
     @property
@@ -78,6 +78,11 @@ class AssetIndexPageStudioFrontend(CoursePage):
         return self.q(css='.pagination').present
 
     @wait_for_js
+    def is_search_element_on_page(self):
+        """Checks that search bar is on the page."""
+        return self.q(css="[name='search']").present
+
+    @wait_for_js
     def is_status_alert_element_on_page(self):
         """Checks that status alert is hidden on page."""
         return all([
@@ -88,14 +93,7 @@ class AssetIndexPageStudioFrontend(CoursePage):
     @wait_for_js
     def are_no_results_headings_on_page(self):
         """Checks that no results page text is on page."""
-        return all([
-            self.q(css='.SFE-wrapper h3').filter(
-                lambda el: el.text == '0 files'
-            ).present,
-            self.q(css='.SFE-wrapper h4').filter(
-                lambda el: el.text == 'No files were found.'
-            ).present,
-        ])
+        return self.q(css='.SFE-wrapper h3').filter(lambda el: el.text == '0 files found').present
 
     @wait_for_js
     def is_no_results_clear_filter_button_on_page(self):
@@ -245,18 +243,21 @@ class AssetIndexPageStudioFrontend(CoursePage):
         Arguments:
             file_names (list): file name(s) we want to upload.
         """
-
-        # Make file input field visible.
         file_input_css = 'input[type=file]'
-        self.browser.execute_script('$("{}").css("display","block");'.format(file_input_css))
 
         for file_name in file_names:
+            # Make file input field visible.
+            self.browser.execute_script('$("{}").css("display","block");'.format(file_input_css))
+            self.wait_for_element_visibility(file_input_css, "Input is visible")
+            #Send file to upload
             self.q(css=file_input_css).results[0].send_keys(
                 UPLOAD_FILE_DIR + file_name)
             self.q(css=file_input_css).results[0].clear()
+            # Wait for status alert and close
+            self.wait_for_element_visibility(
+                '.alert', 'Upload status alert is visible.')
+            self.q(css='.close').first.click()
 
-        self.wait_for_element_visibility(
-            '.alert', 'Upload status alert is visible.')
         self.wait_for_ajax()
         self.wait_for_files_upload(len(file_names))
 

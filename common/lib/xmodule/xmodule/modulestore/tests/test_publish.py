@@ -25,6 +25,7 @@ from xmodule.modulestore.tests.utils import (
 )
 
 
+@attr(shard=1)
 @attr('mongo')
 class TestPublish(SplitWMongoCourseBootstrapper):
     """
@@ -114,8 +115,7 @@ class TestPublish(SplitWMongoCourseBootstrapper):
         #      compute inheritance
         #   15 get published vert
         #   16-18 get ancestor chain
-        #   19 compute inheritance
-        #   20-22 get draft and published vert, compute parent
+        #   19 compute inheritance #   20-22 get draft and published vert, compute parent
         # Sends:
         #   delete the subtree of drafts (1 call),
         #   update the published version of each node in subtree (4 calls),
@@ -157,6 +157,7 @@ class TestPublish(SplitWMongoCourseBootstrapper):
         self.assertTrue(self.draft_mongo.has_item(other_child_loc), "Oops, lost moved item")
 
 
+@attr(shard=1)
 class DraftPublishedOpTestCourseSetup(unittest.TestCase):
     """
     This class exists to test XML import and export between different modulestore
@@ -271,6 +272,7 @@ class DraftPublishedOpTestCourseSetup(unittest.TestCase):
         super(DraftPublishedOpTestCourseSetup, self).setUp()
 
 
+@attr(shard=1)
 class OLXFormatChecker(unittest.TestCase):
     """
     Examines the on-disk course export to verify that specific items are present/missing
@@ -643,6 +645,7 @@ class DraftPublishedOpBaseTestSetup(OLXFormatChecker, DraftPublishedOpTestCourse
         self.export_dir = self._make_new_export_dir_name()
 
 
+@attr(shard=1)
 @ddt.ddt
 class ElementalPublishingTests(DraftPublishedOpBaseTestSetup):
     """
@@ -817,6 +820,7 @@ class ElementalPublishingTests(DraftPublishedOpBaseTestSetup):
             self.assertOLXIsDraftOnly(block_list_untouched)
 
 
+@attr(shard=1)
 @ddt.ddt
 class ElementalUnpublishingTests(DraftPublishedOpBaseTestSetup):
     """
@@ -936,6 +940,7 @@ class ElementalUnpublishingTests(DraftPublishedOpBaseTestSetup):
                 self.unpublish(block_list_to_unpublish)
 
 
+@attr(shard=1)
 @ddt.ddt
 class ElementalDeleteItemTests(DraftPublishedOpBaseTestSetup):
     """
@@ -1133,6 +1138,7 @@ class ElementalDeleteItemTests(DraftPublishedOpBaseTestSetup):
             self.assertOLXIsDeleted(block_list_draft_children)
 
 
+@attr(shard=1)
 @ddt.ddt
 class ElementalConvertToDraftTests(DraftPublishedOpBaseTestSetup):
     """
@@ -1190,6 +1196,7 @@ class ElementalConvertToDraftTests(DraftPublishedOpBaseTestSetup):
                 raise Exception("Must test either Old Mongo or Split modulestore!")
 
 
+@attr(shard=1)
 @ddt.ddt
 class ElementalRevertToPublishedTests(DraftPublishedOpBaseTestSetup):
     """

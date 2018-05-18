@@ -10,6 +10,8 @@ from xmodule.tests import DATA_DIR
 
 class IgnoredFilesTestCase(unittest.TestCase):
     "Tests for ignored files"
+    shard = 1
+
     def test_ignore_tilde_static_files(self):
         course_dir = DATA_DIR / "tilde"
         course_id = CourseLocator("edX", "tilde", "Fall_2012")

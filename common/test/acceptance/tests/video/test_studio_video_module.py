@@ -46,6 +46,7 @@ class CMSVideoBaseTest(UniqueCourseTest):
         )
 
         self.assets = []
+        self.metadata = None
         self.addCleanup(YouTubeStubConfig.reset)
 
     def _create_course_unit(self, youtube_stub_config=None, subtitles=False):
@@ -87,6 +88,7 @@ class CMSVideoBaseTest(UniqueCourseTest):
             Create a user and make that user a course author
             Log the user into studio
         """
+
         if self.assets:
             self.course_fixture.add_asset(self.assets)
 
@@ -95,7 +97,7 @@ class CMSVideoBaseTest(UniqueCourseTest):
             XBlockFixtureDesc('chapter', 'Test Section').add_children(
                 XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
                     XBlockFixtureDesc('vertical', 'Test Unit').add_children(
-                        XBlockFixtureDesc('video', 'Video')
+                        XBlockFixtureDesc('video', 'Video', metadata=self.metadata)
                     )
                 )
             )
@@ -162,7 +164,7 @@ class CMSVideoBaseTest(UniqueCourseTest):
         self.unit_page.xblocks[1].save_settings()
 
 
-@attr(shard=4)
+@attr(shard=13)
 class CMSVideoTest(CMSVideoBaseTest):
     """
     CMS Video Test Class

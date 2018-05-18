@@ -4,7 +4,7 @@ from factory import SubFactory
 from student.tests.factories import UserFactory
 from opaque_keys.edx.locator import CourseLocator
 
-from ..models import UserPreference, UserCourseTag, UserOrgTag
+from ..models import UserCourseTag, UserOrgTag, UserPreference
 
 
 # Factories are self documenting

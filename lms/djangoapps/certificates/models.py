@@ -570,12 +570,13 @@ def certificate_info_for_user(user, course_id, grade, user_is_whitelisted, user_
     """
     certificate_is_delivered = 'N'
     certificate_type = 'N/A'
-    eligible_for_certificate = 'Y' if (user_is_whitelisted or grade is not None) and user.profile.allow_certificate \
-        else 'N'
-
     status = certificate_status(user_certificate)
-    can_have_certificate = CourseOverview.get_from_id(course_id).may_certify()
     certificate_generated = status['status'] == CertificateStatuses.downloadable
+    can_have_certificate = CourseOverview.get_from_id(course_id).may_certify()
+
+    eligible_for_certificate = 'Y' if (user_is_whitelisted or grade is not None or certificate_generated) \
+        and user.profile.allow_certificate else 'N'
+
     if certificate_generated and can_have_certificate:
         certificate_is_delivered = 'Y'
         certificate_type = status['mode']

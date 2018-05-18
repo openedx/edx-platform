@@ -37,7 +37,7 @@ class OAuth2ProviderConfigAdmin(KeyedConfigurationModelAdmin):
     def get_list_display(self, request):
         """ Don't show every single field in the admin change list """
         return (
-            'name', 'enabled', 'provider_slug', 'site', 'backend_name', 'secondary', 'skip_registration_form',
+            'name', 'enabled', 'slug', 'site', 'backend_name', 'secondary', 'skip_registration_form',
             'skip_email_verification', 'change_date', 'changed_by', 'edit_link',
         )
 
@@ -66,7 +66,7 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
         """
         with transaction.atomic():
             for obj in queryset:
-                self.model.objects.filter(pk=obj.pk).update(archived=True)
+                self.model.objects.filter(pk=obj.pk).update(archived=True, enabled=False)
         self.message_user(request, _("Deleted the selected configuration(s)."))
 
     def get_list_display(self, request):

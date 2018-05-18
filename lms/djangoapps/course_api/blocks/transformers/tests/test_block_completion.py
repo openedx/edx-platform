@@ -41,6 +41,7 @@ class BlockCompletionTransformerTestCase(TransformerRegistryTestMixin, Completio
     """
     Tests behaviour of BlockCompletionTransformer
     """
+    shard = 4
     TRANSFORMER_CLASS_TO_TEST = BlockCompletionTransformer
     COMPLETION_TEST_VALUE = 0.4
 

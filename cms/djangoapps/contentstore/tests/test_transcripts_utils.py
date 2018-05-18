@@ -191,7 +191,9 @@ class TestYoutubeSubsBase(SharedModuleStoreTestCase):
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
-    """Tests for `download_youtube_subs` function."""
+    """
+    Tests for `download_youtube_subs` function.
+    """
 
     org = 'MITx'
     number = '999'
@@ -238,13 +240,6 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
 
         mock_get.assert_any_call('http://video.google.com/timedtext', params={'lang': 'en', 'v': 'good_id_2'})
 
-        # Check asset status after import of transcript.
-        filename = 'subs_{0}.srt.sjson'.format(good_youtube_sub)
-        content_location = StaticContent.compute_location(self.course.id, filename)
-        self.assertTrue(contentstore().find(content_location))
-
-        self.clear_sub_content(good_youtube_sub)
-
     def test_subs_for_html5_vid_with_periods(self):
         """
         This is to verify a fix whereby subtitle files uploaded against
@@ -268,16 +263,6 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
 
         with self.assertRaises(transcripts_utils.GetTranscriptsFromYouTubeException):
             transcripts_utils.download_youtube_subs(bad_youtube_sub, self.course, settings)
-
-        # Check asset status after import of transcript.
-        filename = 'subs_{0}.srt.sjson'.format(bad_youtube_sub)
-        content_location = StaticContent.compute_location(
-            self.course.id, filename
-        )
-        with self.assertRaises(NotFoundError):
-            contentstore().find(content_location)
-
-        self.clear_sub_content(bad_youtube_sub)
 
     def test_success_downloading_chinese_transcripts(self):
 
@@ -366,13 +351,6 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
             'http://video.google.com/timedtext',
             params={'lang': 'en', 'v': 'good_id_2', 'name': 'Custom'}
         )
-
-        # Check asset status after import of transcript.
-        filename = 'subs_{0}.srt.sjson'.format(good_youtube_sub)
-        content_location = StaticContent.compute_location(self.course.id, filename)
-        self.assertTrue(contentstore().find(content_location))
-
-        self.clear_sub_content(good_youtube_sub)
 
 
 class TestGenerateSubsFromSource(TestDownloadYoutubeSubs):
@@ -766,7 +744,7 @@ class TestGetTranscript(SharedModuleStoreTestCase):
             edx_video_id=u'1234-5678-90'
         )
 
-    def create_transcript(self, subs_id, language=u'en', filename='video.srt'):
+    def create_transcript(self, subs_id, language=u'en', filename='video.srt', youtube_id_1_0='', html5_sources=None):
         """
         create transcript.
         """
@@ -774,21 +752,26 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         if language != u'en':
             transcripts = {language: filename}
 
+        html5_sources = html5_sources or []
         self.video = ItemFactory.create(
             category='video',
             parent_location=self.vertical.location,
             sub=subs_id,
+            youtube_id_1_0=youtube_id_1_0,
             transcripts=transcripts,
-            edx_video_id=u'1234-5678-90'
+            edx_video_id=u'1234-5678-90',
+            html5_sources=html5_sources
         )
 
-        if subs_id:
-            transcripts_utils.save_subs_to_store(
-                self.subs_sjson,
-                subs_id,
-                self.video,
-                language=language,
-            )
+        possible_subs = [subs_id, youtube_id_1_0] + transcripts_utils.get_html5_ids(html5_sources)
+        for possible_sub in possible_subs:
+            if possible_sub:
+                transcripts_utils.save_subs_to_store(
+                    self.subs_sjson,
+                    possible_sub,
+                    self.video,
+                    language=language,
+                )
 
     def create_srt_file(self, content):
         """
@@ -834,31 +817,69 @@ class TestGetTranscript(SharedModuleStoreTestCase):
             )
 
     @ddt.data(
+        # video.sub transcript
         {
             'language': u'en',
             'subs_id': 'video_101',
-            'filename': 'en_video_101.srt',
+            'youtube_id_1_0': '',
+            'html5_sources': [],
+            'expected_filename': 'en_video_101.srt',
         },
+        # if video.sub is present, rest will be skipped.
+        {
+            'language': u'en',
+            'subs_id': 'video_101',
+            'youtube_id_1_0': 'test_yt_id',
+            'html5_sources': ['www.abc.com/foo.mp4'],
+            'expected_filename': 'en_video_101.srt',
+        },
+        # video.youtube_id_1_0 transcript
+        {
+            'language': u'en',
+            'subs_id': '',
+            'youtube_id_1_0': 'test_yt_id',
+            'html5_sources': [],
+            'expected_filename': 'en_test_yt_id.srt',
+        },
+        # video.html5_sources transcript
+        {
+            'language': u'en',
+            'subs_id': '',
+            'youtube_id_1_0': '',
+            'html5_sources': ['www.abc.com/foo.mp4'],
+            'expected_filename': 'en_foo.srt',
+        },
+        # non-english transcript
         {
             'language': u'ur',
             'subs_id': '',
-            'filename': 'ur_video_101.srt',
+            'youtube_id_1_0': '',
+            'html5_sources': [],
+            'expected_filename': 'ur_video_101.srt',
         },
     )
     @ddt.unpack
-    def test_get_transcript_from_content_store(self, language, subs_id, filename):
+    def test_get_transcript_from_contentstore(
+        self,
+        language,
+        subs_id,
+        youtube_id_1_0,
+        html5_sources,
+        expected_filename
+    ):
         """
         Verify that `get_transcript` function returns correct data when transcript is in content store.
         """
-        self.upload_file(self.create_srt_file(self.subs_srt), self.video.location, filename)
-        self.create_transcript(subs_id, language, filename)
-        content, filename, mimetype = transcripts_utils.get_transcript(
+        base_filename = 'video_101.srt'
+        self.upload_file(self.create_srt_file(self.subs_srt), self.video.location, base_filename)
+        self.create_transcript(subs_id, language, base_filename, youtube_id_1_0, html5_sources)
+        content, file_name, mimetype = transcripts_utils.get_transcript(
             self.video,
             language
         )
 
         self.assertEqual(content, self.subs[language])
-        self.assertEqual(filename, filename)
+        self.assertEqual(file_name, expected_filename)
         self.assertEqual(mimetype, self.srt_mime_type)
 
     def test_get_transcript_from_content_store_for_ur(self):
@@ -938,3 +959,43 @@ class TestGetTranscript(SharedModuleStoreTestCase):
 
         exception_message = text_type(no_en_transcript_exception.exception)
         self.assertEqual(exception_message, 'No transcript for `en` language')
+
+    @ddt.data(
+        transcripts_utils.TranscriptsGenerationException,
+        UnicodeDecodeError('aliencodec', b'\x02\x01', 1, 2, 'alien codec found!')
+    )
+    @patch('xmodule.video_module.transcripts_utils.Transcript')
+    def test_get_transcript_val_exceptions(self, exception_to_raise, mock_Transcript):
+        """
+        Verify that `get_transcript_from_val` function raises `NotFoundError` when specified exceptions raised.
+        """
+        mock_Transcript.convert.side_effect = exception_to_raise
+        transcripts_info = self.video.get_transcripts_info()
+        lang = self.video.get_default_transcript_language(transcripts_info)
+        edx_video_id = transcripts_utils.clean_video_id(self.video.edx_video_id)
+        with self.assertRaises(NotFoundError):
+            transcripts_utils.get_transcript_from_val(
+                edx_video_id,
+                lang=lang,
+                output_format=transcripts_utils.Transcript.SRT
+            )
+
+    @ddt.data(
+        transcripts_utils.TranscriptsGenerationException,
+        UnicodeDecodeError('aliencodec', b'\x02\x01', 1, 2, 'alien codec found!')
+    )
+    @patch('xmodule.video_module.transcripts_utils.Transcript')
+    def test_get_transcript_content_store_exceptions(self, exception_to_raise, mock_Transcript):
+        """
+        Verify that `get_transcript_from_contentstore` function raises `NotFoundError` when specified exceptions raised.
+        """
+        mock_Transcript.asset.side_effect = exception_to_raise
+        transcripts_info = self.video.get_transcripts_info()
+        lang = self.video.get_default_transcript_language(transcripts_info)
+        with self.assertRaises(NotFoundError):
+            transcripts_utils.get_transcript_from_contentstore(
+                self.video,
+                language=lang,
+                output_format=transcripts_utils.Transcript.SRT,
+                transcripts_info=transcripts_info
+            )

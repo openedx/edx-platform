@@ -10,6 +10,7 @@ from rss_proxy.models import WhitelistedRssUrl
 
 class RssProxyViewTests(TestCase):
     """ Tests for the rss_proxy views """
+    shard = 4
 
     def setUp(self):
         super(RssProxyViewTests, self).setUp()

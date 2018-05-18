@@ -30,6 +30,7 @@ def _get_context(requester_id, is_requester_privileged, is_cohorted=False, threa
     }
 
 
+@attr(shard=8)
 @ddt.ddt
 class GetInitializableFieldsTest(ModuleStoreTestCase):
     """Tests for get_*_initializable_fields"""
@@ -66,7 +67,7 @@ class GetInitializableFieldsTest(ModuleStoreTestCase):
         self.assertEqual(actual, expected)
 
 
-@attr(shard=3)
+@attr(shard=8)
 @ddt.ddt
 class GetEditableFieldsTest(ModuleStoreTestCase):
     """Tests for get_editable_fields"""
@@ -105,6 +106,7 @@ class GetEditableFieldsTest(ModuleStoreTestCase):
         self.assertEqual(actual, expected)
 
 
+@attr(shard=8)
 @ddt.ddt
 class CanDeleteTest(ModuleStoreTestCase):
     """Tests for can_delete"""

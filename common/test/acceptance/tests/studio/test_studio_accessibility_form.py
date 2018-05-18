@@ -12,6 +12,7 @@ class AccessibilityPageTest(AcceptanceTest):
     """
     Test that a user can access the page and submit studio accessibility feedback.
     """
+    shard = 21
 
     def setUp(self):
         """

@@ -71,7 +71,7 @@ class TestPasswordHistory(LoginEnrollmentTestCase):
         history = PasswordHistory()
         history.create(user)
 
-    def assertPasswordResetError(self, response, error_message, valid_link=False):
+    def assertPasswordResetError(self, response, error_message, valid_link=True):
         """
         This method is a custom assertion that verifies that a password reset
         view returns an error response as expected.
@@ -363,4 +363,4 @@ class TestPasswordHistory(LoginEnrollmentTestCase):
             'new_password1': password1,
             'new_password2': password2,
         }, follow=True)
-        self.assertPasswordResetError(resp, err_msg, valid_link=True)
+        self.assertPasswordResetError(resp, err_msg)

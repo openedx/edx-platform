@@ -291,7 +291,7 @@ class StudentAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
         self.assertFalse(dop_refresh_token.objects.filter(user=user).exists())
 
 
-@attr(shard=3)
+@attr(shard=7)
 @ddt.ddt
 class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleStoreTestCase):
     """ Tests for the student account views that update the user's account information. """
@@ -499,7 +499,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         kwargs.setdefault('name', provider_name)
         kwargs.setdefault('enabled', True)
         kwargs.setdefault('visible', True)
-        kwargs.setdefault('idp_slug', idp_slug)
+        kwargs.setdefault('slug', idp_slug)
         kwargs.setdefault('entity_id', 'https://idp.testshib.org/idp/shibboleth')
         kwargs.setdefault('metadata_source', 'https://mock.testshib.org/metadata/testshib-providers.xml')
         kwargs.setdefault('icon_class', 'fa-university')
@@ -682,12 +682,16 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         else:
             self.assertContains(response, text=enterprise_sidebar_div_id)
             welcome_message = settings.ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE
-            expected_message = welcome_message.format(
-                start_bold=u'<b>',
-                end_bold=u'</b>',
-                line_break=u'<br/>',
+            expected_message = Text(welcome_message).format(
+                start_bold=HTML('<b>'),
+                end_bold=HTML('</b>'),
+                line_break=HTML('<br/>'),
                 enterprise_name=ec_name,
-                platform_name=settings.PLATFORM_NAME
+                platform_name=settings.PLATFORM_NAME,
+                privacy_policy_link_start=HTML("<a href='{pp_url}' target='_blank'>").format(
+                    pp_url=settings.MKTG_URLS.get('PRIVACY', 'https://www.edx.org/edx-privacy-policy')
+                ),
+                privacy_policy_link_end=HTML("</a>"),
             )
             self.assertContains(response, expected_message)
             if logo_url:

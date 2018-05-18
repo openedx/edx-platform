@@ -6,6 +6,7 @@ import urlparse
 from contextlib import contextmanager
 from datetime import datetime
 from unittest import skipUnless
+import mock
 
 import ddt
 import jwt
@@ -526,6 +527,26 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             NOTES_VIEW_EMPTY_RESPONSE,
             helpers.get_notes(self.request, self.course)
         )
+
+    @override_settings(EDXNOTES_PUBLIC_API="http://example.com")
+    @override_settings(EDXNOTES_INTERNAL_API="http://example.com")
+    @patch("edxnotes.helpers.requests.delete")
+    def test_delete_all_notes_for_user(self, mock_delete):
+        """
+        Test GDPR data deletion for Notes user_id
+        """
+        with mock.patch('edxnotes.helpers.get_edxnotes_id_token', return_value="test_token"):
+            helpers.delete_all_notes_for_user(user=self.user, user_id="anonymous_id")
+            mock_delete.assert_called_with(
+                url='http://example.com/',
+                headers={
+                    'x-annotator-auth-token': 'test_token'
+                },
+                data={
+                    'user_id': 'anonymous_id'
+                },
+                timeout=(settings.EDXNOTES_CONNECT_TIMEOUT, settings.EDXNOTES_READ_TIMEOUT)
+            )
 
     def test_preprocess_collection_no_item(self):
         """

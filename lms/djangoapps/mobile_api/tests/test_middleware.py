@@ -19,6 +19,7 @@ class TestAppVersionUpgradeMiddleware(CacheIsolationTestCase):
     """
     Tests for version based app upgrade middleware
     """
+    shard = 4
 
     ENABLED_CACHES = ['default']
 

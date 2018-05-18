@@ -126,7 +126,7 @@
                         fieldView.requiresParentalConsent = settings.get('requires_parental_consent');
                         fieldView.isAboveMinimumAge = settings.isAboveMinimumAge();
                         fieldView.undelegateEvents();
-                        this.$('.wrapper-profile-field-account-privacy').append(fieldView.render().el);
+                        this.$('.wrapper-profile-field-account-privacy').prepend(fieldView.render().el);
                         fieldView.delegateEvents();
                     }
 

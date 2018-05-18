@@ -15,6 +15,8 @@ from openedx.core.djangoapps.util.test_forms import FormTestMixin
 
 class PaginationTestMixin(object):
     """A mixin for testing forms with pagination fields"""
+    shard = 8
+
     def test_missing_page(self):
         self.form_data.pop("page")
         self.assert_field_value("page", 1)
@@ -39,6 +41,7 @@ class PaginationTestMixin(object):
 @ddt.ddt
 class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
     """Tests for ThreadListGetForm"""
+    shard = 8
     FORM_CLASS = ThreadListGetForm
 
     def setUp(self):
@@ -165,6 +168,7 @@ class ThreadListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
 @ddt.ddt
 class CommentListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
     """Tests for CommentListGetForm"""
+    shard = 8
     FORM_CLASS = CommentListGetForm
 
     def setUp(self):

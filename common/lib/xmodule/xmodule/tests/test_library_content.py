@@ -71,6 +71,7 @@ class LibraryContentModuleTestMixin(object):
     """
     Basic unit tests for LibraryContentModule
     """
+    shard = 1
     problem_types = [
         ["multiplechoiceresponse"], ["optionresponse"], ["optionresponse", "coderesponse"],
         ["coderesponse", "optionresponse"]
@@ -323,6 +324,8 @@ class TestLibraryContentRender(LibraryContentTest):
     """
     Rendering unit tests for LibraryContentModule
     """
+    shard = 1
+
     def test_preview_view(self):
         """ Test preview view rendering """
         self.lc_block.refresh_children()
@@ -347,6 +350,8 @@ class TestLibraryContentAnalytics(LibraryContentTest):
     """
     Test analytics features of LibraryContentModule
     """
+    shard = 1
+
     def setUp(self):
         super(TestLibraryContentAnalytics, self).setUp()
         self.publisher = Mock()

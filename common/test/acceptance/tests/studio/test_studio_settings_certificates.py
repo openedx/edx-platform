@@ -12,7 +12,7 @@ from common.test.acceptance.tests.helpers import skip_if_browser
 from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
 
 
-@attr(shard=8)
+@attr(shard=22)
 class CertificatesTest(StudioCourseTest):
     """
     Tests for settings/certificates Page.

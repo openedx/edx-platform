@@ -7,7 +7,7 @@ import EntitlementSupportTableContainer from '../Table/EntitlementSupportTableCo
 import EntitlementFormContainer from '../EntitlementForm/container.jsx';
 
 const Main = props => (
-  <div>
+  <div className="entitlement-support-wrapper">
     <StatusAlert
       alertType="danger"
       dialog={props.errorMessage}
@@ -28,15 +28,17 @@ const Main = props => (
 const MainContent = (props) => {
   if (props.isFormOpen) {
     return <EntitlementFormContainer />;
-  } 
+  }
   return (
     <div>
-      <SearchContainer />
-      <Button
-        className={['btn', 'btn-primary']}
-        label="Create New Entitlement"
-        onClick={props.openCreationForm}
-      />
+      <div className="actions">
+        <SearchContainer />
+        <Button
+          className={['btn', 'btn-primary']}
+          label="Create New Entitlement"
+          onClick={props.openCreationForm}
+        />
+      </div>
       <EntitlementSupportTableContainer ecommerceUrl={props.ecommerceUrl} />
     </div>
   );

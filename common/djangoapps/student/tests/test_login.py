@@ -19,6 +19,10 @@ from social_django.models import UserSocialAuth
 
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, waffle
+from openedx.core.djangoapps.password_policy.compliance import (
+    NonCompliantPasswordException,
+    NonCompliantPasswordWarning
+)
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.tests.util import expected_redirect_url
 from student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
@@ -432,6 +436,51 @@ class LoginTest(CacheIsolationTestCase):
         self.assertIsNone(response_content["redirect_url"])
         self._assert_response(response, success=True)
 
+    @override_settings(PASSWORD_POLICY_COMPLIANCE_ROLLOUT_CONFIG={'ENFORCE_COMPLIANCE_ON_LOGIN': True})
+    def test_check_password_policy_compliance(self):
+        """
+        Tests _enforce_password_policy_compliance succeeds when no exception is thrown
+        """
+        with patch('student.views.login.password_policy_compliance.enforce_compliance_on_login') as mock_check_password_policy_compliance:
+            mock_check_password_policy_compliance.return_value = HttpResponse()
+            response, _ = self._login_response(
+                'test@edx.org',
+                'test_password',
+            )
+            response_content = json.loads(response.content)
+        self.assertTrue(response_content.get('success'))
+
+    @override_settings(PASSWORD_POLICY_COMPLIANCE_ROLLOUT_CONFIG={'ENFORCE_COMPLIANCE_ON_LOGIN': True})
+    def test_check_password_policy_compliance_exception(self):
+        """
+        Tests _enforce_password_policy_compliance fails with an exception thrown
+        """
+        with patch('student.views.login.password_policy_compliance.enforce_compliance_on_login') as \
+                mock_enforce_compliance_on_login:
+            mock_enforce_compliance_on_login.side_effect = NonCompliantPasswordException()
+            response, _ = self._login_response(
+                'test@edx.org',
+                'test_password'
+            )
+            response_content = json.loads(response.content)
+        self.assertFalse(response_content.get('success'))
+
+    @override_settings(PASSWORD_POLICY_COMPLIANCE_ROLLOUT_CONFIG={'ENFORCE_COMPLIANCE_ON_LOGIN': True})
+    def test_check_password_policy_compliance_warning(self):
+        """
+        Tests _enforce_password_policy_compliance succeeds with a warning thrown
+        """
+        with patch('student.views.login.password_policy_compliance.enforce_compliance_on_login') as \
+                mock_enforce_compliance_on_login:
+            mock_enforce_compliance_on_login.side_effect = NonCompliantPasswordWarning('Test warning')
+            response, _ = self._login_response(
+                'test@edx.org',
+                'test_password'
+            )
+            response_content = json.loads(response.content)
+            self.assertIn('Test warning', self.client.session['_messages'])
+        self.assertTrue(response_content.get('success'))
+
     def _login_response(self, email, password, patched_audit_log='student.views.AUDIT_LOG', extra_post_params=None):
         """
         Post the login info
@@ -638,3 +687,55 @@ class LoginOAuthTokenTestFacebook(LoginOAuthTokenMixin, ThirdPartyOAuthTestMixin
 class LoginOAuthTokenTestGoogle(LoginOAuthTokenMixin, ThirdPartyOAuthTestMixinGoogle, TestCase):
     """Tests login_oauth_token with the Google backend"""
     pass
+
+
+class TestPasswordVerificationView(CacheIsolationTestCase):
+    """
+    Test the password verification endpoint.
+    """
+    def setUp(self):
+        super(TestPasswordVerificationView, self).setUp()
+        self.user = UserFactory.build(username='test_user', is_active=True)
+        self.password = 'test_password'
+        self.user.set_password(self.password)
+        self.user.save()
+        # Create a registration for the user
+        RegistrationFactory(user=self.user)
+
+        # Create a profile for the user
+        UserProfileFactory(user=self.user)
+
+        # Create the test client
+        self.client = Client()
+        cache.clear()
+        self.url = reverse('verify_password')
+
+    def test_password_logged_in_valid(self):
+        success = self.client.login(username=self.user.username, password=self.password)
+        assert success
+        response = self.client.post(self.url, {'password': self.password})
+        assert response.status_code == 200
+
+    def test_password_logged_in_invalid(self):
+        success = self.client.login(username=self.user.username, password=self.password)
+        assert success
+        response = self.client.post(self.url, {'password': 'wrong_password'})
+        assert response.status_code == 403
+
+    def test_password_logged_out(self):
+        response = self.client.post(self.url, {'username': self.user.username, 'password': self.password})
+        assert response.status_code == 302
+
+    @patch.dict("django.conf.settings.FEATURES", {'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': True})
+    @override_settings(MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS=6000)
+    def test_locked_out(self):
+        success = self.client.login(username=self.user.username, password=self.password)
+        assert success
+        # Attempt a password check greater than the number of allowed times.
+        for _ in xrange(settings.MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED + 1):
+            self.client.post(self.url, {'password': 'wrong_password'})
+
+        response = self.client.post(self.url, {'password': self.password})
+        assert response.status_code == 403
+        assert response.content == ('This account has been temporarily locked due '
+                                    'to excessive login failures. Try again later.')

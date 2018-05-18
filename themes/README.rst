@@ -179,6 +179,13 @@ In addition, there are some other changes you'll need to make:
   in the Django settings, or by setting the newly-added "GOOGLE_ANALYTICS_ACCOUNT"
   config value in your site configuration.
 
+* You can set the google site verification ID in the GOOGLE_SITE_VERIFICATION_ID
+  in your site configuration. Otherwise, edit the /edx/app/edxapp/lms.env.json
+  file to set the value for GOOGLE_SITE_VERIFICATION_ID. Setting the value for
+  GOOGLE_SITE_VERIFICATION_ID will add the meta tag for google site verification
+  in the lms/templates/main.html which is the main Mako template that all page
+  templates should include.
+
 * If you don't want the Google Analytics JavaScript to be output at all in your
   site, set the "GOOGLE_ANALYTICS_ACCOUNT" config value to the empty string.
   If you want to customize the way that Google Analytics is loaded, set the

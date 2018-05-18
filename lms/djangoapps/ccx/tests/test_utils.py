@@ -22,7 +22,7 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, 
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=1)
+@attr(shard=7)
 class TestGetCCXFromCCXLocator(ModuleStoreTestCase):
     """Verify that get_ccx_from_ccx_locator functions properly"""
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
@@ -53,50 +53,6 @@ class TestGetCCXFromCCXLocator(ModuleStoreTestCase):
         course_key = CCXLocator.from_course_locator(self.course.id, ccx.id)
         result = self.call_fut(course_key)
         self.assertEqual(result, ccx)
-
-
-@attr(shard=1)
-class TestGetCourseChapters(CcxTestCase):
-    """
-    Tests for the `get_course_chapters` util function
-    """
-    ENABLED_SIGNALS = ['course_published']
-
-    def setUp(self):
-        """
-        Set up tests
-        """
-        super(TestGetCourseChapters, self).setUp()
-        self.course_key = self.course.location.course_key
-
-    def test_get_structure_non_existing_key(self):
-        """
-        Test to get the course structure
-        """
-        self.assertEqual(utils.get_course_chapters(None), None)
-        # build a fake key
-        fake_course_key = CourseKey.from_string('course-v1:FakeOrg+CN1+CR-FALLNEVER1')
-        self.assertEqual(utils.get_course_chapters(fake_course_key), None)
-
-    @mock.patch('openedx.core.djangoapps.content.course_structures.models.CourseStructure.structure',
-                new_callable=mock.PropertyMock)
-    def test_wrong_course_structure(self, mocked_attr):
-        """
-        Test the case where the course  has an unexpected structure.
-        """
-        mocked_attr.return_value = {'foo': 'bar'}
-        self.assertEqual(utils.get_course_chapters(self.course_key), [])
-
-    def test_get_chapters(self):
-        """
-        Happy path
-        """
-        course_chapters = utils.get_course_chapters(self.course_key)
-        self.assertEqual(len(course_chapters), 2)
-        self.assertEqual(
-            sorted(course_chapters),
-            sorted([unicode(child) for child in self.course.children])
-        )
 
 
 class TestStaffOnCCX(CcxTestCase):

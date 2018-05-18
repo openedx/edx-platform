@@ -60,13 +60,6 @@ def strip_blank(dic):
 # TODO should we be checking if d1 and d2 have the same keys with different values?
 
 
-def merge_dict(dic1, dic2):
-    """
-    Combines the keys from the two provided dictionaries
-    """
-    return dict(dic1.items() + dic2.items())
-
-
 def get_role_ids(course_id):
     """
     Returns a dictionary having role names as keys and a list of users as values
@@ -131,10 +124,11 @@ def get_accessible_discussion_xblocks(course, user, include_all=False):  # pylin
     return get_accessible_discussion_xblocks_by_course_id(course.id, user, include_all=include_all)
 
 
-def get_accessible_discussion_xblocks_by_course_id(course_id, user, include_all=False):  # pylint: disable=invalid-name
+@request_cached
+def get_accessible_discussion_xblocks_by_course_id(course_id, user=None, include_all=False):  # pylint: disable=invalid-name
     """
-    Return a list of all valid discussion xblocks in this course that
-    are accessible to the given user.
+    Return a list of all valid discussion xblocks in this course.
+    Checks for the given user's access if include_all is False.
     """
     all_xblocks = modulestore().get_items(course_id, qualifiers={'category': 'discussion'}, include_orphans=False)
 
@@ -198,7 +192,7 @@ def get_cached_discussion_id_map_by_course_id(course_id, discussion_ids, user): 
             key = get_cached_discussion_key(course_id, discussion_id)
             if not key:
                 continue
-            xblock = modulestore().get_item(key)
+            xblock = _get_item_from_modulestore(key)
             if not (has_required_keys(xblock) and has_access(user, 'load', xblock, course_id)):
                 continue
             entries.append(get_discussion_id_map_entry(xblock))
@@ -222,6 +216,11 @@ def get_discussion_id_map_by_course_id(course_id, user):  # pylint: disable=inva
     """
     xblocks = get_accessible_discussion_xblocks_by_course_id(course_id, user)
     return dict(map(get_discussion_id_map_entry, xblocks))
+
+
+@request_cached
+def _get_item_from_modulestore(key):
+    return modulestore().get_item(key)
 
 
 def _filter_unstarted_categories(category_map, course):
@@ -434,7 +433,7 @@ def discussion_category_id_access(course, user, discussion_id, xblock=None):
             key = get_cached_discussion_key(course.id, discussion_id)
             if not key:
                 return False
-            xblock = modulestore().get_item(key)
+            xblock = _get_item_from_modulestore(key)
         return has_required_keys(xblock) and has_access(user, 'load', xblock, course.id)
     except DiscussionIdMapIsNotCached:
         return discussion_id in get_discussion_categories_ids(course, user)
@@ -592,15 +591,14 @@ def get_user_group_ids(course_id, content, user=None):
     content_user_group_id = None
     user_group_id = None
     if course_id is not None:
-        course_discussion_settings = get_course_discussion_settings(course_id)
         if content.get('username'):
             try:
                 content_user = get_user_by_username_or_email(content.get('username'))
-                content_user_group_id = get_group_id_for_user(content_user, course_discussion_settings)
+                content_user_group_id = get_group_id_for_user_from_cache(content_user, course_id)
             except User.DoesNotExist:
                 content_user_group_id = None
 
-        user_group_id = get_group_id_for_user(user, course_discussion_settings) if user else None
+        user_group_id = get_group_id_for_user_from_cache(user, course_id) if user else None
     return user_group_id, content_user_group_id
 
 
@@ -648,7 +646,9 @@ def get_metadata_for_threads(course_id, threads, user, user_info):
     def infogetter(thread):
         return get_annotated_content_infos(course_id, thread, user, user_info)
 
-    metadata = reduce(merge_dict, map(infogetter, threads), {})
+    metadata = {}
+    for thread in threads:
+        metadata.update(infogetter(thread))
     return metadata
 
 
@@ -685,7 +685,8 @@ def extend_content(content):
         'roles': roles,
         'updated': content['created_at'] != content['updated_at'],
     }
-    return merge_dict(content, content_info)
+    content.update(content_info)
+    return content
 
 
 def add_courseware_context(content_list, course, user, id_map=None):
@@ -711,7 +712,7 @@ def add_courseware_context(content_list, course, user, id_map=None):
             content.update({"courseware_url": url, "courseware_title": title})
 
 
-def prepare_content(content, course_key, is_staff=False, discussion_division_enabled=None):
+def prepare_content(content, course_key, is_staff=False, discussion_division_enabled=None, group_names_by_id=None):
     """
     This function is used to pre-process thread and comment models in various
     ways before adding them to the HTTP response.  This includes fixing empty
@@ -774,7 +775,13 @@ def prepare_content(content, course_key, is_staff=False, discussion_division_ena
     for child_content_key in ["children", "endorsed_responses", "non_endorsed_responses"]:
         if child_content_key in content:
             children = [
-                prepare_content(child, course_key, is_staff, discussion_division_enabled=discussion_division_enabled)
+                prepare_content(
+                    child,
+                    course_key,
+                    is_staff,
+                    discussion_division_enabled=discussion_division_enabled,
+                    group_names_by_id=group_names_by_id
+                )
                 for child in content[child_content_key]
             ]
             content[child_content_key] = children
@@ -783,7 +790,10 @@ def prepare_content(content, course_key, is_staff=False, discussion_division_ena
         # Augment the specified thread info to include the group name if a group id is present.
         if content.get('group_id') is not None:
             course_discussion_settings = get_course_discussion_settings(course_key)
-            content['group_name'] = get_group_name(content.get('group_id'), course_discussion_settings)
+            if group_names_by_id:
+                content['group_name'] = group_names_by_id.get(content.get('group_id'))
+            else:
+                content['group_name'] = get_group_name(content.get('group_id'), course_discussion_settings)
             content['is_commentable_divided'] = is_commentable_divided(
                 course_key, content['commentable_id'], course_discussion_settings
             )
@@ -819,12 +829,21 @@ def get_group_id_for_comments_service(request, course_key, commentable_id=None):
             _verify_group_exists(group_id, course_discussion_settings)
         else:
             # regular users always query with their own id.
-            group_id = get_group_id_for_user(request.user, course_discussion_settings)
+            group_id = get_group_id_for_user_from_cache(request.user, course_key)
         return group_id
     else:
         # Never pass a group_id to the comments service for a non-divided
         # commentable
         return None
+
+
+@request_cached
+def get_group_id_for_user_from_cache(user, course_id):
+    """
+    Caches the results of get_group_id_for_user, but serializes the course_id
+    instead of the course_discussions_settings object as cache keys.
+    """
+    return get_group_id_for_user(user, get_course_discussion_settings(course_id))
 
 
 def get_group_id_for_user(user, course_discussion_settings):

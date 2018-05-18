@@ -6,9 +6,16 @@ from django.conf import settings
 from django.conf.urls import url
 
 from ..profile_images.views import ProfileImageView
-from .accounts.views import AccountDeactivationView, AccountViewSet
+from .accounts.views import (
+    AccountDeactivationView,
+    AccountRetireMailingsView,
+    AccountRetirementStatusView,
+    AccountRetirementView,
+    AccountViewSet,
+    DeactivateLogoutView
+)
 from .preferences.views import PreferencesDetailView, PreferencesView
-from .verification_api.views import PhotoVerificationStatusView
+from .verification_api.views import IDVerificationStatusView
 from .validation.views import RegistrationValidationView
 
 ME = AccountViewSet.as_view({
@@ -23,6 +30,23 @@ ACCOUNT_DETAIL = AccountViewSet.as_view({
     'get': 'retrieve',
     'patch': 'partial_update',
 })
+
+RETIREMENT_QUEUE = AccountRetirementStatusView.as_view({
+    'get': 'retirement_queue'
+})
+
+RETIREMENT_RETRIEVE = AccountRetirementStatusView.as_view({
+    'get': 'retrieve'
+})
+
+RETIREMENT_UPDATE = AccountRetirementStatusView.as_view({
+    'patch': 'partial_update',
+})
+
+RETIREMENT_POST = AccountRetirementView.as_view({
+    'post': 'post',
+})
+
 
 urlpatterns = [
     url(
@@ -51,9 +75,39 @@ urlpatterns = [
         name='accounts_deactivation'
     ),
     url(
+        r'^v1/accounts/retire_mailings/$',
+        AccountRetireMailingsView.as_view(),
+        name='accounts_retire_mailings'
+    ),
+    url(
+        r'^v1/accounts/deactivate_logout/$',
+        DeactivateLogoutView.as_view(),
+        name='deactivate_logout'
+    ),
+    url(
         r'^v1/accounts/{}/verification_status/$'.format(settings.USERNAME_PATTERN),
-        PhotoVerificationStatusView.as_view(),
+        IDVerificationStatusView.as_view(),
         name='verification_status'
+    ),
+    url(
+        r'^v1/accounts/{}/retirement_status/$'.format(settings.USERNAME_PATTERN),
+        RETIREMENT_RETRIEVE,
+        name='accounts_retirement_retrieve'
+    ),
+    url(
+        r'^v1/accounts/retirement_queue/$',
+        RETIREMENT_QUEUE,
+        name='accounts_retirement_queue'
+    ),
+    url(
+        r'^v1/accounts/retire/$',
+        RETIREMENT_POST,
+        name='accounts_retire'
+    ),
+    url(
+        r'^v1/accounts/update_retirement_status/$',
+        RETIREMENT_UPDATE,
+        name='accounts_retirement_update'
     ),
     url(
         r'^v1/validation/registration$',

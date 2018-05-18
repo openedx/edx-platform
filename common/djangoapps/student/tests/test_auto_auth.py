@@ -55,6 +55,7 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase):
         self.assertTrue(user.is_active)
         self.assertFalse(user.profile.requires_parental_consent())
 
+    @patch.dict("django.conf.settings.FEATURES", {'RESTRICT_AUTOMATIC_AUTH': False})
     def test_create_same_user(self):
         self._auto_auth({'username': 'test'})
         self._auto_auth({'username': 'test'})
@@ -92,6 +93,7 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase):
         # By default, the user should not be global staff
         self.assertFalse(user.is_staff)
 
+    @patch.dict("django.conf.settings.FEATURES", {'RESTRICT_AUTOMATIC_AUTH': False})
     def test_create_staff_user(self):
 
         # Create a staff user
@@ -118,6 +120,7 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase):
 
     @ddt.data(*COURSE_IDS_DDT)
     @ddt.unpack
+    @patch.dict("django.conf.settings.FEATURES", {'RESTRICT_AUTOMATIC_AUTH': False})
     def test_double_enrollment(self, course_id, course_key):
 
         # Create a user and enroll in a course
@@ -309,3 +312,38 @@ class AutoAuthDisabledTestCase(AutoAuthTestCase):
         """
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 404)
+
+
+class AutoAuthRestrictedTestCase(AutoAuthTestCase):
+    """
+    Test that the default security restrictions on automatic authentication
+    work as intended.  These restrictions are in place for load tests.
+    """
+
+    @patch.dict('django.conf.settings.FEATURES', {'AUTOMATIC_AUTH_FOR_TESTING': True})
+    def setUp(self):
+        # Patching the settings.FEATURES['AUTOMATIC_AUTH_FOR_TESTING']
+        # value affects the contents of urls.py,
+        # so we need to call super.setUp() which reloads urls.py (because
+        # of the UrlResetMixin)
+        super(AutoAuthRestrictedTestCase, self).setUp()
+        self.url = '/auto_auth'
+        self.client = Client()
+
+    @patch.dict("django.conf.settings.FEATURES", {'RESTRICT_AUTOMATIC_AUTH': True})
+    def test_superuser(self):
+        """
+        Make sure that superusers cannot be created.
+        """
+        response = self.client.get(self.url, {'username': 'test', 'superuser': 'true'})
+        assert response.status_code == 403
+
+    @patch.dict("django.conf.settings.FEATURES", {'RESTRICT_AUTOMATIC_AUTH': True})
+    def test_modify_user(self):
+        """
+        Make sure that existing users cannot be modified.
+        """
+        response = self.client.get(self.url, {'username': 'test'})
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(self.url, {'username': 'test'})
+        self.assertEqual(response.status_code, 403)

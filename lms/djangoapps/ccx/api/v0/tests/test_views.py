@@ -30,7 +30,6 @@ from lms.djangoapps.ccx.models import CcxFieldOverride, CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import override_field_for_ccx
 from lms.djangoapps.ccx.tests.utils import CcxTestCase
 from lms.djangoapps.ccx.utils import ccx_course as ccx_course_cm
-from lms.djangoapps.ccx.utils import get_course_chapters
 from lms.djangoapps.instructor.access import allow_access, list_with_level
 from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params
 from student.models import CourseEnrollment
@@ -78,7 +77,7 @@ class CcxRestApiTest(CcxTestCase, APITestCase):
         self.course.enable_ccx = True
         self.mstore.update_item(self.course, self.coach.id)
         # making the master course chapters easily available
-        self.master_course_chapters = get_course_chapters(self.master_course_key)
+        self.master_course_chapters = courses.get_course_chapter_ids(self.master_course_key)
 
     def get_auth_token(self, app_grant, app_client):
         """
@@ -162,7 +161,7 @@ class CcxRestApiTest(CcxTestCase, APITestCase):
         self.assertEqual(expected_field_errors, resp_dict_error)
 
 
-@attr(shard=1)
+@attr(shard=9)
 @ddt.ddt
 class CcxListTest(CcxRestApiTest):
     """
@@ -873,7 +872,7 @@ class CcxListTest(CcxRestApiTest):
             self.assertEqual(course_user, ccx_user)
 
 
-@attr(shard=1)
+@attr(shard=9)
 @ddt.ddt
 class CcxDetailTest(CcxRestApiTest):
     """

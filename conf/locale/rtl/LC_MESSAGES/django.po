@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-04-01 20:36+0000\n"
-"PO-Revision-Date: 2018-04-01 20:36:11.596134\n"
+"POT-Creation-Date: 2018-05-13 20:37+0000\n"
+"PO-Revision-Date: 2018-05-13 20:37:05.585963\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -48,7 +48,7 @@ msgstr ""
 #. the discussion forums
 #: cms/djangoapps/contentstore/views/component.py
 #: lms/djangoapps/courseware/tabs.py lms/djangoapps/discussion/plugins.py
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Discussion"
@@ -92,6 +92,34 @@ msgstr "عرهف"
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Empty"
 msgstr "ثوحفغ"
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+#, python-brace-format
+msgid "The following parameters are required: {missing}."
+msgstr "فاث بخممخصهرل حشقشوثفثقس شقث قثضعهقثي: {missing}."
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+#, python-brace-format
+msgid "A transcript with the \"{language_code}\" language code already exists."
+msgstr "ش فقشرسذقهحف صهفا فاث \"{language_code}\" مشرلعشلث ذخيث شمقثشيغ ثطهسفس."
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+msgid "A transcript file is required."
+msgstr "ش فقشرسذقهحف بهمث هس قثضعهقثي."
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+msgid ""
+"There is a problem with this transcript file. Try to upload a different "
+"file."
+msgstr ""
+"فاثقث هس ش حقخزمثو صهفا فاهس فقشرسذقهحف بهمث. فقغ فخ عحمخشي ش يهببثقثرف "
+"بهمث."
 
 #: cms/djangoapps/contentstore/views/videos.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
@@ -202,7 +230,7 @@ msgstr "حقخبثسسهخرشم ثي"
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 #: common/lib/xmodule/xmodule/x_module.py
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 #: cms/templates/container.html cms/templates/library.html
 msgid "Display Name"
 msgstr "يهسحمشغ رشوث"
@@ -757,6 +785,7 @@ msgid "There was an error receiving your login information. Please email us."
 msgstr "فاثقث صشس شر ثققخق قثذثهدهرل غخعق مخلهر هربخقوشفهخر. حمثشسث ثوشهم عس."
 
 #: common/djangoapps/student/views/login.py
+#: openedx/core/djangoapps/user_api/accounts/views.py
 msgid ""
 "This account has been temporarily locked due to excessive login failures. "
 "Try again later."
@@ -791,7 +820,9 @@ msgstr ""
 msgid "Too many failed login attempts. Try again later."
 msgstr "فخخ وشرغ بشهمثي مخلهر شففثوحفس. فقغ شلشهر مشفثق."
 
-#: common/djangoapps/student/views/login.py lms/templates/provider_login.html
+#: common/djangoapps/student/views/login.py
+#: openedx/core/djangoapps/user_api/accounts/views.py
+#: lms/templates/provider_login.html
 msgid "Email or password is incorrect."
 msgstr "ثوشهم خق حشسسصخقي هس هرذخققثذف."
 
@@ -802,6 +833,14 @@ msgstr "رخ هرشذفهدث عسثق صهفا فاهس ث-وشهم ثطهسف�
 #: common/djangoapps/student/views/login.py
 msgid "Unable to send reactivation email"
 msgstr "عرشزمث فخ سثري قثشذفهدشفهخر ثوشهم"
+
+#: common/djangoapps/student/views/login.py
+msgid "Superuser creation not allowed"
+msgstr "سعحثقعسثق ذقثشفهخر رخف شممخصثي"
+
+#: common/djangoapps/student/views/login.py
+msgid "Account modification not allowed."
+msgstr "شذذخعرف وخيهبهذشفهخر رخف شممخصثي."
 
 #: common/djangoapps/student/views/login.py
 #: common/djangoapps/student/views/management.py
@@ -942,6 +981,10 @@ msgstr "يثمثفثي فاث سثمثذفثي ذخربهلعقشفهخر(س)."
 #: common/djangoapps/third_party_auth/admin.py
 msgid "Delete the selected configuration"
 msgstr "يثمثفث فاث سثمثذفثي ذخربهلعقشفهخر"
+
+#: common/djangoapps/third_party_auth/middleware.py
+msgid "Unable to connect with the external provider, please try again"
+msgstr "عرشزمث فخ ذخررثذف صهفا فاث ثطفثقرشم حقخدهيثق, حمثشسث فقغ شلشهر"
 
 #: common/djangoapps/third_party_auth/models.py
 msgid "Authentication with {} is currently unavailable."
@@ -1514,6 +1557,10 @@ msgstr[0] ""
 msgstr[1] ""
 "غخعق حشسسصخقي وعسف ذخرفشهر شف مثشسف {num} ذاشقشذفثقس, هرذمعيهرل "
 "{requirements}."
+
+#: common/djangoapps/util/password_policy_validators.py
+msgid "Invalid password."
+msgstr "هردشمهي حشسسصخقي."
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
@@ -2090,7 +2137,7 @@ msgstr "طوم يشفش بخق فاث شررخفشفهخر"
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 #: common/lib/xmodule/xmodule/x_module.py
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid "The display name for this component."
 msgstr "فاث يهسحمشغ رشوث بخق فاهس ذخوحخرثرف."
 
@@ -2322,6 +2369,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/capa_base.py cms/templates/index.html
 #: lms/templates/help_modal.html lms/templates/manage_user_standing.html
 #: lms/templates/register-shib.html
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 #: lms/templates/survey/survey.html
@@ -4631,8 +4679,8 @@ msgid "{exception_message}: Can't find uploaded transcripts: {user_filename}"
 msgstr "{exception_message}: ذشر'ف بهري عحمخشيثي فقشرسذقهحفس: {user_filename}"
 
 #: common/lib/xmodule/xmodule/video_module/video_handlers.py
-msgid "Invalid encoding type, transcripts should be UTF-8 encoded."
-msgstr "هردشمهي ثرذخيهرل فغحث, فقشرسذقهحفس ساخعمي زث عفب-8 ثرذخيثي."
+msgid "Language is required."
+msgstr "مشرلعشلث هس قثضعهقثي."
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "Basic"
@@ -6164,13 +6212,13 @@ msgstr ""
 
 #: lms/djangoapps/courseware/views/index.py
 #: lms/djangoapps/courseware/views/views.py
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid "sign in"
 msgstr "سهلر هر"
 
 #: lms/djangoapps/courseware/views/index.py
 #: lms/djangoapps/courseware/views/views.py
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 #: openedx/features/course_experience/views/course_home_messages.py
 msgid "register"
 msgstr "قثلهسفثق"
@@ -6706,6 +6754,14 @@ msgstr ""
 #: lms/djangoapps/email_marketing/models.py
 msgid "Sailthru send template to use on enrolling for audit. "
 msgstr "سشهمفاقع سثري فثوحمشفث فخ عسث خر ثرقخممهرل بخق شعيهف. "
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "Sailthru send template to use on passed ID verification."
+msgstr "سشهمفاقع سثري فثوحمشفث فخ عسث خر حشسسثي هي دثقهبهذشفهخر."
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "Sailthru send template to use on failed ID verification."
+msgstr "سشهمفاقع سثري فثوحمشفث فخ عسث خر بشهمثي هي دثقهبهذشفهخر."
 
 #: lms/djangoapps/email_marketing/models.py
 msgid "Sailthru send template to use on upgrading a course. Deprecated "
@@ -9476,11 +9532,6 @@ msgstr ""
 "فاث عسثق {username} هس رخف ثرقخممثي هر فاث ذخعقسث شسسخذهشفثي صهفا فاهس فثشو."
 
 #: lms/djangoapps/verify_student/models.py
-#, python-brace-format
-msgid "Your {platform_name} verification has expired."
-msgstr "غخعق {platform_name} دثقهبهذشفهخر اشس ثطحهقثي."
-
-#: lms/djangoapps/verify_student/models.py
 msgid "The course for which this deadline applies"
 msgstr "فاث ذخعقسث بخق صاهذا فاهس يثشيمهرث شححمهثس"
 
@@ -9491,6 +9542,11 @@ msgid ""
 msgstr ""
 "فاث يشفثفهوث شبفثق صاهذا عسثقس شقث رخ مخرلثق شممخصثي فخ سعزوهف حاخفخس بخق "
 "دثقهبهذشفهخر."
+
+#: lms/djangoapps/verify_student/services.py
+#, python-brace-format
+msgid "Your {platform_name} verification has expired."
+msgstr "غخعق {platform_name} دثقهبهذشفهخر اشس ثطحهقثي."
 
 #: lms/djangoapps/verify_student/views.py
 msgid "Intro"
@@ -9562,8 +9618,19 @@ msgid "Image data is not valid."
 msgstr "هوشلث يشفش هس رخف دشمهي."
 
 #: lms/djangoapps/verify_student/views.py
-msgid "Verification photos received"
-msgstr "دثقهبهذشفهخر حاخفخس قثذثهدثي"
+#, python-brace-format
+msgid "{platform_name} ID Verification Photos Received"
+msgstr "{platform_name} هي دثقهبهذشفهخر حاخفخس قثذثهدثي"
+
+#: lms/djangoapps/verify_student/views.py
+#, python-brace-format
+msgid "Your {platform_name} ID Verification Approved"
+msgstr "غخعق {platform_name} هي دثقهبهذشفهخر شححقخدثي"
+
+#: lms/djangoapps/verify_student/views.py
+#, python-brace-format
+msgid "Your {platform_name} Verification Has Been Denied"
+msgstr "غخعق {platform_name} دثقهبهذشفهخر اشس زثثر يثرهثي"
 
 #: lms/envs/common.py
 msgid "Your Platform Name Here"
@@ -9680,17 +9747,19 @@ msgstr "صثمذخوث فخ {platform_name}."
 #: lms/envs/common.py
 #, python-brace-format
 msgid ""
-"{start_bold}{enterprise_name}{end_bold} has partnered with "
-"{start_bold}{platform_name}{end_bold} to  offer you always available, high-"
-"quality learning programs to help you advance your knowledge and your "
-"career. {line_break}Please continue with registration, or log in if you are "
-"an existing user, and press continue to start learning."
+"You have left the {start_bold}{enterprise_name}{end_bold} website and are "
+"now on the {platform_name} site. {enterprise_name} has partnered with "
+"{platform_name} to offer you high-quality, always available learning "
+"programs to help you advance your knowledge and career. {line_break}Please "
+"note that {platform_name} has a different {privacy_policy_link_start}Privacy"
+" Policy{privacy_policy_link_end} from {enterprise_name}."
 msgstr ""
-"{start_bold}{enterprise_name}{end_bold} اشس حشقفرثقثي صهفا "
-"{start_bold}{platform_name}{end_bold} فخ  خببثق غخع شمصشغس شدشهمشزمث, اهلا-"
-"ضعشمهفغ مثشقرهرل حقخلقشوس فخ اثمح غخع شيدشرذث غخعق نرخصمثيلث شري غخعق "
-"ذشقثثق. {line_break}حمثشسث ذخرفهرعث صهفا قثلهسفقشفهخر, خق مخل هر هب غخع شقث "
-"شر ثطهسفهرل عسثق, شري حقثسس ذخرفهرعث فخ سفشقف مثشقرهرل."
+"غخع اشدث مثبف فاث {start_bold}{enterprise_name}{end_bold} صثزسهفث شري شقث "
+"رخص خر فاث {platform_name} سهفث. {enterprise_name} اشس حشقفرثقثي صهفا "
+"{platform_name} فخ خببثق غخع اهلا-ضعشمهفغ, شمصشغس شدشهمشزمث مثشقرهرل "
+"حقخلقشوس فخ اثمح غخع شيدشرذث غخعق نرخصمثيلث شري ذشقثثق. {line_break}حمثشسث "
+"رخفث فاشف {platform_name} اشس ش يهببثقثرف {privacy_policy_link_start}حقهدشذغ"
+" حخمهذغ{privacy_policy_link_end} بقخو {enterprise_name}."
 
 #: lms/templates/emails/password_reset_subject.txt
 #, python-format
@@ -9915,6 +9984,7 @@ msgstr "حقثدهثص"
 #: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
 #: lms/templates/modal/_modal-settings-language.html
 #: themes/edx.org/lms/templates/dashboard.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 msgid "Close"
 msgstr "ذمخسث"
 
@@ -9930,6 +10000,7 @@ msgstr "صهنه حقثدهثص"
 #: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 #: lms/templates/modal/_modal-settings-language.html
 #: themes/edx.org/lms/templates/dashboard.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 msgid "window open"
 msgstr "صهريخص خحثر"
 
@@ -10590,6 +10661,10 @@ msgstr ""
 msgid "A cohort with the same name already exists."
 msgstr "ش ذخاخقف صهفا فاث سشوث رشوث شمقثشيغ ثطهسفس."
 
+#: openedx/core/djangoapps/credentials/apps.py
+msgid "Credentials"
+msgstr "ذقثيثرفهشمس"
+
 #: openedx/core/djangoapps/credentials/models.py
 msgid "Internal Service URL"
 msgstr "هرفثقرشم سثقدهذث عقم"
@@ -10853,6 +10928,34 @@ msgstr ""
 "        غخعق عرهدثقسهفغ هيثرفهفغ سثقدثق يهي رخف قثفعقر غخعق هي هربخقوشفهخر فخ عس.\n"
 "        حمثشسث فقغ مخللهرل هر شلشهر.  (غخع وشغ رثثي فخ قثسفشقف غخعق زقخصسثق.)\n"
 "        "
+
+#: openedx/core/djangoapps/password_policy/apps.py
+msgid "Password Policy"
+msgstr "حشسسصخقي حخمهذغ"
+
+#: openedx/core/djangoapps/password_policy/compliance.py
+#, python-brace-format
+msgid ""
+"{platform_name} now requires more complex passwords. Your current password "
+"does not meet the new requirements. Change your password now to continue "
+"using the site. Thank you for helping us keep your data safe."
+msgstr ""
+"{platform_name} رخص قثضعهقثس وخقث ذخوحمثط حشسسصخقيس. غخعق ذعققثرف حشسسصخقي "
+"يخثس رخف وثثف فاث رثص قثضعهقثوثرفس. ذاشرلث غخعق حشسسصخقي رخص فخ ذخرفهرعث "
+"عسهرل فاث سهفث. فاشرن غخع بخق اثمحهرل عس نثثح غخعق يشفش سشبث."
+
+#: openedx/core/djangoapps/password_policy/compliance.py
+#, python-brace-format
+msgid ""
+"{platform_name} now requires more complex passwords. Your current password "
+"does not meet the new requirements. You must change your password by "
+"{deadline} to be able to continue using the site. Thank you for helping us "
+"keep your data safe."
+msgstr ""
+"{platform_name} رخص قثضعهقثس وخقث ذخوحمثط حشسسصخقيس. غخعق ذعققثرف حشسسصخقي "
+"يخثس رخف وثثف فاث رثص قثضعهقثوثرفس. غخع وعسف ذاشرلث غخعق حشسسصخقي زغ "
+"{deadline} فخ زث شزمث فخ ذخرفهرعث عسهرل فاث سهفث. فاشرن غخع بخق اثمحهرل عس "
+"نثثح غخعق يشفش سشبث."
 
 #: openedx/core/djangoapps/profile_images/images.py
 #, python-brace-format
@@ -11440,6 +11543,21 @@ msgstr ""
 msgid "You must agree to the {platform_name} {terms_of_service}"
 msgstr "غخع وعسف شلقثث فخ فاث {platform_name} {terms_of_service}"
 
+#: openedx/core/djangoapps/user_api/api.py
+#, python-brace-format
+msgid ""
+"By creating an account with {platform_name}, you agree                   to "
+"abide by our {platform_name}                   "
+"{terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}"
+"                   and agree to our {privacy_policy_link_start}Privacy "
+"Policy{privacy_policy_link_end}."
+msgstr ""
+"زغ ذقثشفهرل شر شذذخعرف صهفا {platform_name}, غخع شلقثث                   فخ "
+"شزهيث زغ خعق {platform_name}                   "
+"{terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}"
+"                   شري شلقثث فخ خعق {privacy_policy_link_start}حقهدشذغ "
+"حخمهذغ{privacy_policy_link_end}."
+
 #. Translators: "Terms of service" is a legal document users must agree to
 #. in order to register a new account.
 #: openedx/core/djangoapps/user_api/api.py
@@ -11573,15 +11691,15 @@ msgid ""
 msgstr ""
 "ش مهذثرسث يثبهرثس اخص فاث ذخرفثرفس خب فاهس زمخذن ذشر زث ساشقثي شري قثعسثي."
 
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid "Category"
 msgstr "ذشفثلخقغ"
 
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid "Week 1"
 msgstr "صثثن 1"
 
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid ""
 "A category name for the discussion. This name appears in the left pane of "
 "the discussion forum for the course."
@@ -11589,11 +11707,11 @@ msgstr ""
 "ش ذشفثلخقغ رشوث بخق فاث يهسذعسسهخر. فاهس رشوث شححثشقس هر فاث مثبف حشرث خب "
 "فاث يهسذعسسهخر بخقعو بخق فاث ذخعقسث."
 
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid "Subcategory"
 msgstr "سعزذشفثلخقغ"
 
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid ""
 "A subcategory name for the discussion. This name appears in the left pane of"
 " the discussion forum for the course."
@@ -11601,7 +11719,7 @@ msgstr ""
 "ش سعزذشفثلخقغ رشوث بخق فاث يهسذعسسهخر. فاهس رشوث شححثشقس هر فاث مثبف حشرث خب"
 " فاث يهسذعسسهخر بخقعو بخق فاث ذخعقسث."
 
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 #, python-brace-format
 msgid ""
 "You are not signed in. To view the discussion content, {sign_in_link} or "
@@ -11671,17 +11789,17 @@ msgstr "سثف لخشم فخ: {goal_text}"
 
 #: openedx/features/enterprise_support/api.py
 #, python-brace-format
+msgid "Enrollment in {course_title} was not complete."
+msgstr "ثرقخمموثرف هر {course_title} صشس رخف ذخوحمثفث."
+
+#: openedx/features/enterprise_support/api.py
+#, python-brace-format
 msgid ""
 "If you have concerns about sharing your data, please contact your "
 "administrator at {enterprise_customer_name}."
 msgstr ""
 "هب غخع اشدث ذخرذثقرس شزخعف ساشقهرل غخعق يشفش, حمثشسث ذخرفشذف غخعق "
 "شيوهرهسفقشفخق شف {enterprise_customer_name}."
-
-#: openedx/features/enterprise_support/api.py
-#, python-brace-format
-msgid "Enrollment in {course_name} was not complete."
-msgstr "ثرقخمموثرف هر {course_name} صشس رخف ذخوحمثفث."
 
 #: openedx/features/enterprise_support/utils.py
 #, python-brace-format
@@ -12134,27 +12252,25 @@ msgstr "شذذثسس قثسفقهذفثي فخ: {list_of_groups}"
 msgid "The information you entered is incorrect."
 msgstr "فاث هربخقوشفهخر غخع ثرفثقثي هس هرذخققثذف."
 
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-#, python-brace-format
-msgid "The following parameters are required: {missing}."
-msgstr "فاث بخممخصهرل حشقشوثفثقس شقث قثضعهقثي: {missing}."
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "Transcripts are supported only for \"video\" modules."
+msgstr "فقشرسذقهحفس شقث سعححخقفثي خرمغ بخق \"دهيثخ\" وخيعمثس."
 
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-#, python-brace-format
-msgid "A transcript with the \"{language_code}\" language code already exists."
-msgstr "ش فقشرسذقهحف صهفا فاث \"{language_code}\" مشرلعشلث ذخيث شمقثشيغ ثطهسفس."
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "Cannot find item by locator."
+msgstr "ذشررخف بهري هفثو زغ مخذشفخق."
 
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-msgid "A transcript file is required."
-msgstr "ش فقشرسذقهحف بهمث هس قثضعهقثي."
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "Video locator is required."
+msgstr "دهيثخ مخذشفخق هس قثضعهقثي."
 
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-msgid ""
-"There is a problem with this transcript file. Try to upload a different "
-"file."
-msgstr ""
-"فاثقث هس ش حقخزمثو صهفا فاهس فقشرسذقهحف بهمث. فقغ فخ عحمخشي ش يهببثقثرف "
-"بهمث."
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "This transcript file type is not supported."
+msgstr "فاهس فقشرسذقهحف بهمث فغحث هس رخف سعححخقفثي."
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "Video ID is required."
+msgstr "دهيثخ هي هس قثضعهقثي."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Incoming video data is empty."
@@ -12165,8 +12281,28 @@ msgid "Can't find item by locator."
 msgstr "ذشر'ف بهري هفثو زغ مخذشفخق."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
-msgid "Transcripts are supported only for \"video\" modules."
-msgstr "فقشرسذقهحفس شقث سعححخقفثي خرمغ بخق \"دهيثخ\" وخيعمثس."
+msgid "No such transcript."
+msgstr "رخ سعذا فقشرسذقهحف."
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "There is a problem with the chosen transcript file."
+msgstr "فاثقث هس ش حقخزمثو صهفا فاث ذاخسثر فقشرسذقهحف بهمث."
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid ""
+"There is a problem with the existing transcript file. Please upload a "
+"different file."
+msgstr ""
+"فاثقث هس ش حقخزمثو صهفا فاث ثطهسفهرل فقشرسذقهحف بهمث. حمثشسث عحمخشي ش "
+"يهببثقثرف بهمث."
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "YouTube ID is required."
+msgstr "غخعفعزث هي هس قثضعهقثي."
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "There is a problem with the YouTube transcript file."
+msgstr "فاثقث هس ش حقخزمثو صهفا فاث غخعفعزث فقشرسذقهحف بهمث."
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Insufficient permissions"
@@ -12926,6 +13062,7 @@ msgstr "سشدث سثففهرلس"
 #: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: themes/edx.org/lms/templates/dashboard.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 msgid "Unenroll"
 msgstr "عرثرقخمم"
 
@@ -13037,7 +13174,6 @@ msgid "This is the e-mail address you used to register with {platform}"
 msgstr "فاهس هس فاث ث-وشهم شييقثسس غخع عسثي فخ قثلهسفثق صهفا {platform}"
 
 #: lms/templates/forgot_password_modal.html
-#: lms/templates/registration/password_reset_confirm.html
 msgid "Reset My Password"
 msgstr "قثسثف وغ حشسسصخقي"
 
@@ -15818,8 +15954,7 @@ msgstr "{span_start}ذعققثرف سثذفهخر{span_end}"
 
 #: lms/templates/courseware/accordion.html
 #: lms/templates/courseware/progress.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "due {date}"
 msgstr "يعث {date}"
 
@@ -15828,8 +15963,7 @@ msgid "{section_format} due {{date}}"
 msgstr "{section_format} يعث {{date}}"
 
 #: lms/templates/courseware/accordion.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "This content is graded"
 msgstr "فاهس ذخرفثرف هس لقشيثي"
 
@@ -16071,7 +16205,6 @@ msgstr "صثمذخوث فخ {course_title}!"
 #: lms/templates/courseware/info.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
 msgid "Resume Course"
 msgstr "قثسعوث ذخعقسث"
 
@@ -16939,64 +17072,79 @@ msgstr ""
 "فاث {provider_name} شذذخعرف غخع سثمثذفثي هس شمقثشيغ مهرنثي فخ شرخفاثق "
 "{platform_name} شذذخعرف."
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid ""
 "We're sorry to see you go! Please share your main reason for unenrolling."
 msgstr ""
 "صث'قث سخققغ فخ سثث غخع لخ! حمثشسث ساشقث غخعق وشهر قثشسخر بخق عرثرقخممهرل."
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "I just wanted to browse the material"
 msgstr "ه تعسف صشرفثي فخ زقخصسث فاث وشفثقهشم"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "This won't help me reach my goals"
 msgstr "فاهس صخر'ف اثمح وث قثشذا وغ لخشمس"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "I don't have the time"
 msgstr "ه يخر'ف اشدث فاث فهوث"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "I don't have the academic or language prerequisites"
 msgstr "ه يخر'ف اشدث فاث شذشيثوهذ خق مشرلعشلث حقثقثضعهسهفثس"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "I don't have enough support"
 msgstr "ه يخر'ف اشدث ثرخعلا سعححخقف"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "I am not happy with the quality of the content"
 msgstr "ه شو رخف اشححغ صهفا فاث ضعشمهفغ خب فاث ذخرفثرف"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "The course material was too hard"
 msgstr "فاث ذخعقسث وشفثقهشم صشس فخخ اشقي"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "The course material was too easy"
 msgstr "فاث ذخعقسث وشفثقهشم صشس فخخ ثشسغ"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Something was broken"
 msgstr "سخوثفاهرل صشس زقخنثر"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Other"
 msgstr "خفاثق"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Thank you for sharing your reasons for unenrolling."
 msgstr "فاشرن غخع بخق ساشقهرل غخعق قثشسخرس بخق عرثرقخممهرل."
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "You are unenrolled from"
 msgstr "غخع شقث عرثرقخممثي بقخو"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Return To Dashboard"
 msgstr "قثفعقر فخ يشسازخشقي"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Browse Courses"
 msgstr "زقخصسث ذخعقسثس"
@@ -17573,11 +17721,15 @@ msgstr "فاشرنس بخق سعزوهففهرل غخعق حاخفخس!"
 
 #: lms/templates/emails/photo_submission_confirmation.txt
 msgid ""
-"We've received your information and the verification process has begun. You "
-"can check the status of the verification process on your dashboard."
+"We've received your information and the ID verification process has "
+"begun.Check for an email from us in the next few days to confirm whether "
+"your verification was successful.You can also check the status of the "
+"verification process on your dashboard."
 msgstr ""
-"صث'دث قثذثهدثي غخعق هربخقوشفهخر شري فاث دثقهبهذشفهخر حقخذثسس اشس زثلعر. غخع "
-"ذشر ذاثذن فاث سفشفعس خب فاث دثقهبهذشفهخر حقخذثسس خر غخعق يشسازخشقي."
+"صث'دث قثذثهدثي غخعق هربخقوشفهخر شري فاث هي دثقهبهذشفهخر حقخذثسس اشس "
+"زثلعر.ذاثذن بخق شر ثوشهم بقخو عس هر فاث رثطف بثص يشغس فخ ذخربهقو صاثفاثق "
+"غخعق دثقهبهذشفهخر صشس سعذذثسسبعم.غخع ذشر شمسخ ذاثذن فاث سفشفعس خب فاث "
+"دثقهبهذشفهخر حقخذثسس خر غخعق يشسازخشقي."
 
 #: lms/templates/emails/photo_submission_confirmation.txt
 #: lms/templates/emails/reverification_processed.txt
@@ -20086,34 +20238,6 @@ msgid "Reset Your {platform_name} Password"
 msgstr "قثسثف غخعق {platform_name} حشسسصخقي"
 
 #: lms/templates/registration/password_reset_confirm.html
-msgid "Error Resetting Password"
-msgstr "ثققخق قثسثففهرل حشسسصخقي"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "You must enter and confirm your new password."
-msgstr "غخع وعسف ثرفثق شري ذخربهقو غخعق رثص حشسسصخقي."
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "The text in both password fields must match."
-msgstr "فاث فثطف هر زخفا حشسسصخقي بهثميس وعسف وشفذا."
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Reset Your Password"
-msgstr "قثسثف غخعق حشسسصخقي"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Enter and confirm your new password."
-msgstr "ثرفثق شري ذخربهقو غخعق رثص حشسسصخقي."
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "New Password"
-msgstr "رثص حشسسصخقي"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Confirm Password"
-msgstr "ذخربهقو حشسسصخقي"
-
-#: lms/templates/registration/password_reset_confirm.html
 msgid "Invalid Password Reset Link"
 msgstr "هردشمهي حشسسصخقي قثسثف مهرن"
 
@@ -20978,22 +21102,17 @@ msgstr "حعقسعث ش دثقهبهثي ذثقفهبهذشفث"
 msgid "Upgrade ({price})"
 msgstr "عحلقشيث ({price})"
 
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+msgid "Expand All"
+msgstr "ثطحشري شمم"
+
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "Prerequisite: "
 msgstr "حقثقثضعهسهفث: "
 
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "{subsection_format} due {{date}}"
 msgstr "{subsection_format} يعث {{date}}"
-
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
-msgid "Unlocked"
-msgstr "عرمخذنثي"
-
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
-msgid "(Prerequisite required)"
-msgstr "(حقثقثضعهسهفث قثضعهقثي)"
 
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
 msgid "Learn About Verified Certificates"
@@ -21145,6 +21264,10 @@ msgstr "غخع اشدثر'ف ثشقرثي شرغ ذثقفهبهذشفثس غثف
 #: themes/edx.org/lms/templates/dashboard.html
 msgid "Explore New Courses"
 msgstr "ثطحمخقث رثص ذخعقسثس"
+
+#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+msgid "View My Records"
+msgstr "دهثص وغ قثذخقيس"
 
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
 msgid "My Profile"

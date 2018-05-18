@@ -288,8 +288,8 @@ def sanitize_html_id(html_id):
     return sanitized_html_id
 
 
-@contract(user=User, has_instructor_access=bool, block=XBlock, view=basestring, frag=Fragment, context="dict|None")
-def add_staff_markup(user, has_instructor_access, disable_staff_debug_info, block, view, frag, context):  # pylint: disable=unused-argument
+@contract(user=User, block=XBlock, view=basestring, frag=Fragment, context="dict|None")
+def add_staff_markup(user, disable_staff_debug_info, block, view, frag, context):  # pylint: disable=unused-argument
     """
     Updates the supplied module with a new get_html function that wraps
     the output of the old get_html function with additional information
@@ -383,7 +383,6 @@ def add_staff_markup(user, has_instructor_access, disable_staff_debug_info, bloc
         'render_histogram': render_histogram,
         'block_content': frag.content,
         'is_released': is_released,
-        'has_instructor_access': has_instructor_access,
         'can_reset_attempts': 'attempts' in block.fields,
         'can_rescore_problem': hasattr(block, 'rescore'),
         'can_override_problem_score': isinstance(block, ScorableXBlockMixin),

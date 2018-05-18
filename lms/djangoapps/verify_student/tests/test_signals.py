@@ -16,6 +16,7 @@ class VerificationDeadlineSignalTest(ModuleStoreTestCase):
     """
     Tests for the VerificationDeadline signal
     """
+    shard = 4
 
     def setUp(self):
         super(VerificationDeadlineSignalTest, self).setUp()

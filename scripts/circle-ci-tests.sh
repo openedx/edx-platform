@@ -37,11 +37,11 @@ if [ "$CIRCLE_NODE_TOTAL" == "1" ] ; then
     echo "via the CircleCI UI and adjust scripts/circle-ci-tests.sh to match."
 
     echo "Running tests for common/lib/ and pavelib/"
-    paver test_lib --with-flaky --cov-args="-p" --with-xunitmp || EXIT=1
+    paver test_lib --cov-args="-p" || EXIT=1
     echo "Running python tests for Studio"
-    paver test_system -s cms --with-flaky --cov-args="-p" --with-xunitmp || EXIT=1
+    paver test_system -s cms --cov-args="-p" || EXIT=1
     echo "Running python tests for lms"
-    paver test_system -s lms --with-flaky --cov-args="-p" --with-xunitmp || EXIT=1
+    paver test_system -s lms --cov-args="-p" || EXIT=1
 
     exit $EXIT
 else
@@ -51,7 +51,7 @@ else
             echo "Finding fixme's and storing report..."
             paver find_fixme > fixme.log || { cat fixme.log; EXIT=1; }
 
-            echo "Finding pep8 violations and storing report..."
+            echo "Finding PEP 8 violations and storing report..."
             paver run_pep8 > pep8.log || { cat pep8.log; EXIT=1; }
 
             echo "Finding pylint violations and storing in report..."
@@ -78,15 +78,15 @@ else
             ;;
 
         1)  # run all of the lms unit tests
-            paver test_system -s lms --with-flaky --cov-args="-p" --with-xunitmp
+            paver test_system -s lms --cov-args="-p"
             ;;
 
         2)  # run all of the cms unit tests
-            paver test_system -s cms --with-flaky --cov-args="-p" --with-xunitmp
+            paver test_system -s cms --cov-args="-p"
             ;;
 
         3)  # run the commonlib unit tests
-            paver test_lib --with-flaky --cov-args="-p" --with-xunitmp
+            paver test_lib --cov-args="-p"
             ;;
 
         *)

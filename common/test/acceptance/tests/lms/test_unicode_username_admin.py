@@ -12,6 +12,7 @@ class UnicodeUsernameAdminTest(AcceptanceTest):
     """
     Tests if it is possible to update users with unicode usernames in the admin.
     """
+    shard = 21
 
     # The word below reads "Omar II", in Arabic. It also contains a space and
     # an Eastern Arabic Number another option is to use the Esperanto fake

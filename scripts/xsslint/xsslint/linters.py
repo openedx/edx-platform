@@ -309,7 +309,7 @@ class UnderscoreTemplateLinter(BaseLinter):
 
 class JavaScriptLinter(BaseLinter):
     """
-    The linter for JavaScript and CoffeeScript files.
+    The linter for JavaScript files.
     """
 
     LINE_COMMENT_DELIM = "//"
@@ -325,7 +325,7 @@ class JavaScriptLinter(BaseLinter):
         javascript_interpolate='javascript-interpolate',
     )
 
-    def __init__(self, underscore_linter, javascript_skip_dirs=None, coffeescript_skip_dirs=None):
+    def __init__(self, underscore_linter, javascript_skip_dirs=None):
         """
         Init method.
         """
@@ -333,7 +333,6 @@ class JavaScriptLinter(BaseLinter):
         self.underscore_linter = underscore_linter
         self.ruleset = self.ruleset + self.underscore_linter.ruleset
         self._skip_javascript_dirs = javascript_skip_dirs or ()
-        self._skip_coffeescript_dirs = coffeescript_skip_dirs or ()
 
     def process_file(self, directory, file_name):
         """
@@ -356,8 +355,6 @@ class JavaScriptLinter(BaseLinter):
 
         if file_name.lower().endswith('.js') and not file_name.lower().endswith('.min.js'):
             skip_dirs = self._skip_javascript_dirs
-        elif file_name.lower().endswith('.coffee'):
-            skip_dirs = self._skip_coffeescript_dirs
         else:
             return results
 

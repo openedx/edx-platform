@@ -135,6 +135,7 @@
                 },
                 'submit .forum-new-post-form': 'createPost',
                 'change .post-option-input': 'postOptionChange',
+                'change .js-group-select': 'groupOptionChange',
                 'click .cancel': 'cancel',
                 'click  .add-post-cancel': 'cancel',
                 'reset .forum-new-post-form': 'updateStyles',
@@ -146,6 +147,7 @@
             NewPostView.prototype.toggleGroupDropdown = function($target) {
                 if ($target.data('divided')) {
                     $('.js-group-select').prop('disabled', false);
+                    $('.js-group-select').val('').prop('selected', true);
                     return $('.group-selector-wrapper').removeClass('disabled');
                 } else {
                     $('.js-group-select').val('').prop('disabled', true);
@@ -255,6 +257,14 @@
             NewPostView.prototype.updateStyles = function() {
                 var self = this;
                 return setTimeout(function() { return self.$('.post-option-input').trigger('change'); }, 1);
+            };
+
+            NewPostView.prototype.groupOptionChange = function(event) {
+                var $target = $(event.target),
+                    data = $target.data();
+                this.group_name = this.$('.js-group-select option:selected').text();
+                data.divided = true;
+                this.updateVisibilityMessage($target);
             };
 
             return NewPostView;

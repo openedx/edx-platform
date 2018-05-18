@@ -24,7 +24,7 @@ from common.test.acceptance.tests.helpers import create_user_partition_json, ele
 from xmodule.partitions.partitions import Group
 
 
-@attr(shard=8)
+@attr(shard=19)
 class ContentGroupConfigurationTest(StudioCourseTest):
     """
     Tests for content groups in the Group Configurations Page.
@@ -233,8 +233,11 @@ class ContentGroupConfigurationTest(StudioCourseTest):
         self.outline_page.wait_for_page()
 
 
-@attr(shard=5)
+@attr(shard=17)
 class EnrollmentTrackModeTest(StudioCourseTest):
+    """
+    Tests for the enrollment tracks section
+    """
 
     def setUp(self, is_staff=True, test_xss=True):
         super(EnrollmentTrackModeTest, self).setUp(is_staff=is_staff)
@@ -283,7 +286,7 @@ class EnrollmentTrackModeTest(StudioCourseTest):
         self.assertEqual(len(groups), 0)
 
 
-@attr(shard=8)
+@attr(shard=19)
 class AdvancedSettingsValidationTest(StudioCourseTest):
     """
     Tests for validation feature in Studio's advanced settings tab
@@ -455,7 +458,7 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
         self.assertEquals(set(displayed_fields), set(expected_fields))
 
 
-@attr(shard=1)
+@attr(shard=16)
 class ContentLicenseTest(StudioCourseTest):
     """
     Tests for course-level licensing (that is, setting the license,
@@ -617,7 +620,7 @@ class StudioSubsectionSettingsA11yTest(StudioCourseTest):
         self.course_outline.a11y_audit.check_for_accessibility_errors()
 
 
-@attr(shard=1)
+@attr(shard=16)
 class StudioSettingsImageUploadTest(StudioCourseTest):
     """
     Class to test course settings image uploads.
@@ -655,7 +658,7 @@ class StudioSettingsImageUploadTest(StudioCourseTest):
         self.assertIn(file_to_upload, self.settings_page.get_uploaded_image_path('#video-thumbnail-image'))
 
 
-@attr(shard=1)
+@attr(shard=16)
 class CourseSettingsTest(StudioCourseTest):
     """
     Class to test course settings.

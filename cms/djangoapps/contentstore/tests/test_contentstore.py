@@ -92,6 +92,8 @@ class ImportRequiredTestCases(ContentStoreTestCase):
     """
     Tests which legitimately need to import a course
     """
+    shard = 1
+
     def test_no_static_link_rewrites_on_import(self):
         course_items = import_course_from_xml(
             self.store, self.user.id, TEST_DATA_DIR, ['toy'], create_if_not_present=True
@@ -609,6 +611,8 @@ class MiscCourseTests(ContentStoreTestCase):
     """
     Tests that rely on the toy courses.
     """
+    shard = 1
+
     def setUp(self):
         super(MiscCourseTests, self).setUp()
         # save locs not items b/c the items won't have the subsequently created children in them until refetched
@@ -1157,6 +1161,7 @@ class ContentStoreTest(ContentStoreTestCase):
     """
     Tests for the CMS ContentStore application.
     """
+    shard = 1
     duplicate_course_error = ("There is already a course defined with the same organization and course number. "
                               "Please change either organization or course number to be unique.")
 
@@ -1805,6 +1810,7 @@ class ContentStoreTest(ContentStoreTestCase):
 
 class MetadataSaveTestCase(ContentStoreTestCase):
     """Test that metadata is correctly cached and decached."""
+    shard = 1
 
     def setUp(self):
         super(MetadataSaveTestCase, self).setUp()
@@ -1866,6 +1872,8 @@ class RerunCourseTest(ContentStoreTestCase):
     """
     Tests for Rerunning a course via the view handler
     """
+    shard = 1
+
     def setUp(self):
         super(RerunCourseTest, self).setUp()
         self.destination_course_data = {
@@ -1950,6 +1958,23 @@ class RerunCourseTest(ContentStoreTestCase):
         self.assertEqual(0, len(videos))
         self.assertInCourseListing(destination_course_key)
 
+    def test_rerun_course_video_upload_token(self):
+        """
+        Test when rerunning a course with video upload token, video upload token is not copied to new course.
+        """
+        # Create a course with video upload token.
+        source_course = CourseFactory.create(video_upload_pipeline={"course_video_upload_token": 'test-token'})
+
+        destination_course_key = self.post_rerun_request(source_course.id)
+        self.verify_rerun_course(source_course.id, destination_course_key, self.destination_course_data['display_name'])
+        self.assertInCourseListing(destination_course_key)
+
+        # Verify video upload pipeline is empty.
+        source_course = self.store.get_course(source_course.id)
+        new_course = self.store.get_course(destination_course_key)
+        self.assertDictEqual(source_course.video_upload_pipeline, {"course_video_upload_token": 'test-token'})
+        self.assertEqual(new_course.video_upload_pipeline, {})
+
     def test_rerun_course_success(self):
         source_course = CourseFactory.create()
         create_video(
@@ -1969,6 +1994,10 @@ class RerunCourseTest(ContentStoreTestCase):
         target_videos = list(get_videos_for_course(text_type(destination_course_key)))
         self.assertEqual(1, len(source_videos))
         self.assertEqual(source_videos, target_videos)
+
+        # Verify that video upload token is empty for rerun.
+        new_course = self.store.get_course(destination_course_key)
+        self.assertEqual(new_course.video_upload_pipeline, {})
 
     def test_rerun_course_resets_advertised_date(self):
         source_course = CourseFactory.create(advertised_start="01-12-2015")
@@ -2108,6 +2137,8 @@ class ContentLicenseTest(ContentStoreTestCase):
     """
     Tests around content licenses
     """
+    shard = 1
+
     def test_course_license_export(self):
         content_store = contentstore()
         root_dir = path(mkdtemp_clean())
@@ -2146,6 +2177,8 @@ class EntryPageTestCase(TestCase):
     """
     Tests entry pages that aren't specific to a course.
     """
+    shard = 1
+
     def setUp(self):
         super(EntryPageTestCase, self).setUp()
         self.client = AjaxEnabledTestClient()
@@ -2180,6 +2213,7 @@ class SigninPageTestCase(TestCase):
     important to make sure that the script is functional independently of any
     other script.
     """
+    shard = 1
 
     def test_csrf_token_is_present_in_form(self):
         # Expected html:

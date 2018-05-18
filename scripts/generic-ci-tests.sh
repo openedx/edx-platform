@@ -13,7 +13,7 @@ set -e
 #   `TEST_SUITE` defines which kind of test to run.
 #   Possible values are:
 #
-#       - "quality": Run the quality (pep8/pylint) checks
+#       - "quality": Run the quality (pycodestyle/pylint) checks
 #       - "lms-unit": Run the LMS Python unit tests
 #       - "cms-unit": Run the CMS Python unit tests
 #       - "js-unit": Run the JavaScript tests
@@ -122,7 +122,7 @@ case "$TEST_SUITE" in
             4)
                 echo "Finding fixme's and storing report..."
                 run_paver_quality find_fixme || { EXIT=1; }
-                echo "Finding pep8 violations and storing report..."
+                echo "Finding pycodestyle violations and storing report..."
                 run_paver_quality run_pep8 || { EXIT=1; }
                 echo "Finding ESLint violations and storing report..."
                 run_paver_quality run_eslint -l $ESLINT_THRESHOLD || { EXIT=1; }
@@ -144,23 +144,7 @@ case "$TEST_SUITE" in
         exit $EXIT
         ;;
 
-    "lms-unit")
-        case "$SHARD" in
-            "all"|[1-4]|"noshard")
-                $TOX bash scripts/unit-tests.sh
-                ;;
-            *)
-                # If no shard is specified, rather than running all tests, create an empty xunit file. This is a
-                # backwards compatibility feature. If a new shard (e.g., shard n) is introduced in the build
-                # system, but the tests are called with the old code, then builds will not fail because the
-                # code is out of date. Instead, there will be an instantly-passing shard.
-                mkdir -p reports/lms
-                emptyxunit "lms/nosetests"
-                ;;
-        esac
-        ;;
-
-    "cms-unit"|"commonlib-unit")
+    "lms-unit"|"cms-unit"|"commonlib-unit")
         $TOX bash scripts/unit-tests.sh
         ;;
 
@@ -205,11 +189,11 @@ case "$TEST_SUITE" in
                 $TOX paver test_bokchoy $PAVER_ARGS
                 ;;
 
-            [1-9]|10)
+            [1-9]|1[0-9]|2[0-1])
                 $TOX paver test_bokchoy --eval-attr="shard==$SHARD" $PAVER_ARGS
                 ;;
 
-            11|"noshard")
+            22|"noshard")
                 $TOX paver test_bokchoy --eval-attr='not shard and not a11y' $PAVER_ARGS
                 ;;
 

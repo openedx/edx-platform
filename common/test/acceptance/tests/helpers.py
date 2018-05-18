@@ -427,9 +427,7 @@ def assert_opened_help_link_is_correct(test, url):
         url (str): url to verify.
     """
     test.browser.switch_to_window(test.browser.window_handles[-1])
-    WebDriverWait(test.browser, 10).until(lambda driver: driver.current_url != "about:blank")
-    # Assert that url in the browser is the same.
-    test.assertEqual(url, test.browser.current_url)
+    WebDriverWait(test.browser, 10).until(lambda driver: driver.current_url == url)
     # Check that the URL loads. Can't do this in the browser because it might
     # be loading a "Maze Found" missing content page.
     response = requests.get(url)

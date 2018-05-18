@@ -26,6 +26,8 @@ class TestGetBlocks(SharedModuleStoreTestCase):
     """
     Tests for the get_blocks function
     """
+    shard = 4
+
     @classmethod
     def setUpClass(cls):
         super(TestGetBlocks, cls).setUpClass()
@@ -113,6 +115,8 @@ class TestGetBlocksQueryCountsBase(SharedModuleStoreTestCase):
     """
     Base for the get_blocks tests.
     """
+    shard = 4
+
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
@@ -144,6 +148,8 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
     """
     Tests query counts for the get_blocks function.
     """
+    shard = 4
+
     @ddt.data(
         *product(
             (ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split),
@@ -197,6 +203,8 @@ class TestQueryCountsWithIndividualOverrideProvider(TestGetBlocksQueryCountsBase
     """
     Tests query counts for the get_blocks function when IndividualStudentOverrideProvider is set.
     """
+    shard = 4
+
     @ddt.data(
         *product(
             (ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split),

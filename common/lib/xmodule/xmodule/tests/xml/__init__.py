@@ -2,10 +2,10 @@
 Xml parsing tests for XModules
 """
 import pprint
+from django.test import TestCase
 from lxml import etree
 from mock import Mock
 from six import text_type
-from unittest import TestCase
 
 from xmodule.x_module import XMLParsingSystem, policy_key
 from xmodule.mako_module import MakoDescriptorSystem

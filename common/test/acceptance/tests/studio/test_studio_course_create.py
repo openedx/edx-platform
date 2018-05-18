@@ -11,7 +11,7 @@ from common.test.acceptance.pages.studio.overview import CourseOutlinePage
 from common.test.acceptance.tests.helpers import AcceptanceTest
 
 
-@attr(shard=8)
+@attr(shard=19)
 class CreateCourseTest(AcceptanceTest):
     """
     Test that we can create a new course the studio home page.

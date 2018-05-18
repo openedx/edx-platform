@@ -88,13 +88,10 @@ class EvaluatorTest(unittest.TestCase):
         """
         Test calc.py's unique functionality of interpreting si 'suffixes'.
 
-        For instance 'k' stand for 'kilo-' so '1k' should be 1,000
+        For instance '%' stand for 1/100th so '1%' should be 0.01
         """
         test_mapping = [
-            ('4.2%', 0.042), ('2.25k', 2250), ('8.3M', 8300000),
-            ('9.9G', 9.9e9), ('1.2T', 1.2e12), ('7.4c', 0.074),
-            ('5.4m', 0.0054), ('8.7u', 0.0000087),
-            ('5.6n', 5.6e-9), ('4.2p', 4.2e-12)
+            ('4.2%', 0.042)
         ]
 
         for (expr, answer) in test_mapping:
@@ -355,7 +352,7 @@ class EvaluatorTest(unittest.TestCase):
         """
         Test the default constants provided in calc.py
 
-        which are: j (complex number), e, pi, k, c, T, q
+        which are: j (complex number), e, pi
         """
 
         # Of the form ('expr', python value, tolerance (or None for exact))
@@ -364,10 +361,6 @@ class EvaluatorTest(unittest.TestCase):
             ('j', 1j, None),
             ('e', 2.7183, 1e-4),
             ('pi', 3.1416, 1e-4),
-            ('k', 1.3806488e-23, 1e-26),  # Boltzmann constant (Joules/Kelvin)
-            ('c', 2.998e8, 1e5),  # Light Speed in (m/s)
-            ('T', 298.15, 0.01),  # Typical room temperature (Kelvin)
-            ('q', 1.602176565e-19, 1e-22)  # Fund. Charge (Coulombs)
         ]
         for (variable, value, tolerance) in default_variables:
             fail_msg = "Failed on constant '{0}', not within bounds".format(
@@ -404,10 +397,6 @@ class EvaluatorTest(unittest.TestCase):
         self.assertAlmostEqual(
             calc.evaluator({}, {}, "sin(e)"),
             0.41, delta=0.01
-        )
-        self.assertAlmostEqual(
-            calc.evaluator({}, {}, "k*T/q"),
-            0.025, delta=1e-3
         )
         self.assertAlmostEqual(
             calc.evaluator({}, {}, "e^(j*pi)"),
@@ -484,17 +473,15 @@ class EvaluatorTest(unittest.TestCase):
             8.0
         )
 
-        variables = {'t': 1.0}
-        self.assertEqual(calc.evaluator(variables, {}, "t"), 1.0)
-        self.assertEqual(calc.evaluator(variables, {}, "T"), 1.0)
+        variables = {'E': 1.0}
         self.assertEqual(
-            calc.evaluator(variables, {}, "t", case_sensitive=True),
+            calc.evaluator(variables, {}, "E", case_sensitive=True),
             1.0
         )
-        # Recall 'T' is a default constant, with value 298.15
+        # Recall 'e' is a default constant, with value 2.718
         self.assertAlmostEqual(
-            calc.evaluator(variables, {}, "T", case_sensitive=True),
-            298, delta=0.2
+            calc.evaluator(variables, {}, "e", case_sensitive=True),
+            2.718, delta=0.02
         )
 
     def test_simple_funcs(self):

@@ -31,6 +31,7 @@ class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, Cach
 
         self.user = UserFactory()
 
+        httpretty.httpretty.reset()
         cache.clear()
 
     def _mock_catalog_api(self, responses, url=None):

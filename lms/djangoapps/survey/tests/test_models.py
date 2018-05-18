@@ -19,6 +19,8 @@ class SurveyModelsTests(TestCase):
     """
     All tests for the Survey models.py file
     """
+    shard = 4
+
     def setUp(self):
         """
         Set up the test data used in the specific tests
@@ -280,3 +282,28 @@ class SurveyModelsTests(TestCase):
         names = survey.get_field_names()
 
         self.assertEqual(sorted(names), ['ddl', 'field1', 'field2'])
+
+    def test_retire_user_successful(self):
+        survey = self._create_test_survey()
+        self.assertIsNotNone(survey)
+
+        survey.save_user_answers(self.student, self.student_answers, self.course_id)
+        survey.save_user_answers(self.student2, self.student2_answers, self.course_id)
+
+        retire_result = SurveyAnswer.retire_user(self.student.id)
+        self.assertTrue(retire_result)
+        answers = survey.get_answers(self.student)
+        blanked_out_student_answser = {key: '' for key in self.student_answers}
+        self.assertEquals(answers[self.student.id], blanked_out_student_answser)
+        self.assertEquals(survey.get_answers(self.student2)[self.student2.id], self.student2_answers)
+
+    def test_retire_user_not_exist(self):
+        survey = self._create_test_survey()
+        self.assertIsNotNone(survey)
+
+        survey.save_user_answers(self.student, self.student_answers, self.course_id)
+
+        retire_result = SurveyAnswer.retire_user(self.student2.id)
+        self.assertFalse(retire_result)
+        answers = survey.get_answers(self.student)
+        self.assertEquals(answers[self.student.id], self.student_answers)

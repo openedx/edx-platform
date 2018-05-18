@@ -6,7 +6,7 @@ The instructor dashboard is broken into sections.
 Only one section is visible at a time,
   and is responsible for its own functionality.
 
-NOTE: plantTimeout (which is just setTimeout from util.coffee)
+NOTE: plantTimeout (which is just setTimeout from util.js)
       is used frequently in the instructor dashboard to isolate
       failures. If one piece of code under a plantTimeout fails
       then it will not crash the rest of the dashboard.
@@ -19,7 +19,7 @@ NOTE: Server endpoints in the dashboard are stored in
       The urls are rendered there by a template.
 
 NOTE: For an example of what a section object should look like
-      see course_info.coffee
+      see course_info.js
 
 imports from other modules
 wrap in (-> ... apply) to defer evaluation

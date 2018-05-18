@@ -65,11 +65,27 @@ def _check_condition(user, condition, content):
         if not content:
             return False
         try:
+            request_cache_dict = RequestCache.get_request_cache().data
             if content["type"] == "thread":
-                return content["thread_type"] == "question" and content["user_id"] == str(user.id)
+                cache_key = "django_comment_client.permissions._check_condition.check_question_author.{}.{}".format(
+                    user.id, content['id']
+                )
+                if cache_key in request_cache_dict:
+                    return request_cache_dict[cache_key]
+                else:
+                    result = content["thread_type"] == "question" and content["user_id"] == str(user.id)
+                    request_cache_dict[cache_key] = result
+                    return result
             else:
-                # N.B. This will trigger a comments service query
-                return check_question_author(user, Thread(id=content["thread_id"]).to_dict())
+                cache_key = "django_comment_client.permissions._check_condition.check_question_author.{}.{}".format(
+                    user.id, content['thread_id']
+                )
+                if cache_key in request_cache_dict:
+                    return request_cache_dict[cache_key]
+                else:
+                    # make the now-unavoidable comments service query
+                    thread = Thread(id=content['thread_id']).to_dict()
+                    return check_question_author(user, thread)
         except KeyError:
             return False
 

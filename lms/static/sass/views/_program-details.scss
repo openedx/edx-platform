@@ -630,6 +630,11 @@
 .program-sidebar {
   padding: 30px 10px;
 
+  .program-record {
+    text-align: center;
+    padding-bottom: 2em;
+  }
+
   @media (min-width: $bp-screen-md) {
     @include float(right);
 

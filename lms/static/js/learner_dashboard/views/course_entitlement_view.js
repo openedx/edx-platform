@@ -2,7 +2,6 @@
 
 import 'bootstrap';
 
-import _ from 'underscore';
 import Backbone from 'backbone';
 import moment from 'moment';
 
@@ -97,9 +96,10 @@ class CourseEntitlementView extends Backbone.View {
     The new session id is stored as a data attribute on the option in the session-select element.
     */
     // Do not allow for enrollment when button is disabled
+    const prevSession = this.entitlementModel.get('currentSessionId');
     if (this.$('.enroll-btn-initial').hasClass('disabled')) return;
 
-    // Grab the id for the desired session, an leave session event will return null
+    // Grab the id for the desired session, a leave session event will return null
     this.currentSessionSelection = this.$('.session-select')
       .find('option:selected').data('session_id');
     const isLeavingSession = !this.currentSessionSelection;
@@ -118,14 +118,14 @@ class CourseEntitlementView extends Backbone.View {
         course_run_id: this.currentSessionSelection,
       }),
       statusCode: {
-        201: _.bind(this.enrollSuccess, this),
-        204: _.bind(this.unenrollSuccess, this),
+        201: this.enrollSuccess.bind(this, prevSession, this.currentSessionSelection),
+        204: this.unenrollSuccess.bind(this, prevSession),
       },
-      error: _.bind(this.enrollError, this),
+      error: this.enrollError.bind(this),
     });
   }
 
-  enrollSuccess(data) {
+  enrollSuccess(prevSession, newSession) {
     /*
     Update external elements on the course card to represent the now available course session.
 
@@ -134,6 +134,11 @@ class CourseEntitlementView extends Backbone.View {
     3) Hide the 'View Course' button to the course card.
     */
     const successIconEl = '<span class="fa fa-check" aria-hidden="true"></span>';
+    const eventPage = this.$parentEl ? 'program-details' : 'course-dashboard';
+    const eventAction = prevSession ? 'switch' : 'new';
+
+    // Emit analytics event to track user leaving current session
+    this.trackSessionChange(eventPage, eventAction, prevSession);
 
     // With a containing backbone view, we can simply re-render the parent card
     if (this.$parentEl) {
@@ -151,19 +156,19 @@ class CourseEntitlementView extends Backbone.View {
     HtmlUtils.setHtml(this.$dateDisplayField,
       HtmlUtils.joinHtml(
         HtmlUtils.HTML(successIconEl),
-        this.getAvailableSessionWithId(data.course_run_id).session_dates,
+        this.getAvailableSessionWithId(newSession).session_dates,
       ),
     );
 
     // Ensure the view course button links to new session home page and place focus there
     this.$enterCourseBtn
-      .attr('href', this.formatCourseHomeUrl(data.course_run_id))
+      .attr('href', this.formatCourseHomeUrl(newSession))
       .removeClass('hidden')
       .focus();
     this.toggleSessionSelectionPanel();
   }
 
-  unenrollSuccess() {
+  unenrollSuccess(prevSession) {
     /*
     Update external elements on the course card to represent the unenrolled state.
 
@@ -172,6 +177,10 @@ class CourseEntitlementView extends Backbone.View {
     3) Remove the messages associated with the enrolled state.
     4) Remove the link from the course card image and title.
     */
+    // Emit analytics event to track user leaving current session
+    const eventPage = this.$parentEl ? 'program-details' : 'course-dashboard';
+    this.trackSessionChange(eventPage, 'leave', prevSession);
+
     // With a containing backbone view, we can simply re-render the parent card
     if (this.$parentEl) {
       this.courseCardModel.setUnselected();
@@ -371,29 +380,24 @@ class CourseEntitlementView extends Backbone.View {
     the object with a session_dates attribute representing a formatted date string that highlights
     the start and end dates of the particular session.
     */
-    const formattedSessionData = sessionData;
-    let startDate;
-    let endDate;
     // Set the date format string to the user's selected language
     moment.locale(document.documentElement.lang);
     const dateFormat = moment.localeData().longDateFormat('L').indexOf('DD') >
       moment.localeData().longDateFormat('L').indexOf('MM') ? 'MMMM D, YYYY' : 'D MMMM, YYYY';
 
-    return _.map(formattedSessionData, (session) => {
-      const formattedSession = session;
-      startDate = CourseEntitlementView.formatDate(formattedSession.start, dateFormat);
-      endDate = CourseEntitlementView.formatDate(formattedSession.end, dateFormat);
-      formattedSession.enrollment_end = CourseEntitlementView.formatDate(
-        formattedSession.enrollment_end,
-        dateFormat);
-      formattedSession.session_dates = this.courseCardModel.formatDateString({
-        start_date: startDate,
-        advertised_start: session.advertised_start,
-        end_date: endDate,
-        pacing_type: formattedSession.pacing_type,
+    sessionData.forEach((session) => {
+      Object.assign(session, {
+        enrollment_end: CourseEntitlementView.formatDate(session.enrollment_end, dateFormat),
+        session_dates: this.courseCardModel.formatDateString({
+          start_date: CourseEntitlementView.formatDate(session.start, dateFormat),
+          advertised_start: session.advertised_start,
+          end_date: CourseEntitlementView.formatDate(session.end, dateFormat),
+          pacing_type: session.pacing_type,
+        }),
       });
-      return formattedSession;
-    }, this);
+    });
+
+    return sessionData;
   }
 
   static formatDate(date, dateFormat) {
@@ -403,6 +407,15 @@ class CourseEntitlementView extends Backbone.View {
   getAvailableSessionWithId(sessionId) {
     /* Returns an available session given a sessionId */
     return this.entitlementModel.get('availableSessions').find(session => session.session_id === sessionId);
+  }
+
+  trackSessionChange(eventPage, action, prevSession) {
+    const eventName = `${eventPage}.${action}-session`;
+
+    window.analytics.track(eventName, {
+      fromCourseRun: prevSession,
+      toCourseRun: this.entitlementModel.get('currentSessionId'),
+    });
   }
 }
 

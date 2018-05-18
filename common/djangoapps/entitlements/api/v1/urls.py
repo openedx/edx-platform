@@ -11,7 +11,7 @@ ENROLLMENTS_VIEW = EntitlementEnrollmentViewSet.as_view({
     'delete': 'destroy',
 })
 
-
+app_name = 'v1'
 urlpatterns = [
     url(r'', include(router.urls)),
     url(

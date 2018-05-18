@@ -182,6 +182,7 @@ if submission[0] == '':
 
 @ddt.ddt
 class CapaModuleTest(unittest.TestCase):
+    shard = 1
 
     def setUp(self):
         super(CapaModuleTest, self).setUp()
@@ -1095,31 +1096,35 @@ class CapaModuleTest(unittest.TestCase):
     def test_rescore_problem_additional_correct(self):
         # make sure it also works when new correct answer has been added
         module = CapaFactory.create(attempts=0)
+        answer_id = CapaFactory.answer_key()
 
-        # Simulate that all answers are marked correct, no matter
-        # what the input is, by patching CorrectMap.is_correct()
-        with patch('capa.correctmap.CorrectMap.is_correct') as mock_is_correct:
-                mock_is_correct.return_value = True
+        # Check the problem
+        get_request_dict = {CapaFactory.input_key(): '1'}
+        result = module.submit_problem(get_request_dict)
 
-                # Check the problem
-                get_request_dict = {CapaFactory.input_key(): '1'}
-                result = module.submit_problem(get_request_dict)
-
-        # Expect that the problem is marked correct
-        self.assertEqual(result['success'], 'correct')
+        # Expect that the problem is marked incorrect and user didn't earn score
+        self.assertEqual(result['success'], 'incorrect')
+        self.assertEqual(module.get_score(), (0, 1))
+        self.assertEqual(module.correct_map[answer_id]['correctness'], 'incorrect')
         # Expect that the number of attempts is incremented
         self.assertEqual(module.attempts, 1)
-        self.assertEqual(module.get_score(), (1, 1))
 
-        # Simulate that after adding a new correct answer the new calculated score is (0,1)
-        # by patching CapaMixin.calculate_score()
-        # In case of rescore with only_if_higher=True it should not update score of module
-        # if previous score was higher
-        with patch('xmodule.capa_base.CapaMixin.calculate_score') as mock_calculate_score:
-            mock_calculate_score.return_value = Score(raw_earned=0, raw_possible=1)
-            module.rescore(only_if_higher=True)
-        self.assertEqual(module.get_score(), (1, 1))
+        # Simulate that after making an incorrect answer to the correct answer
+        # the new calculated score is (1,1)
+        # by patching CorrectMap.is_correct() and NumericalResponse.get_staff_ans()
+        # In case of rescore with only_if_higher=True it should update score of module
+        # if previous score was lower
 
+        with patch('capa.correctmap.CorrectMap.is_correct') as mock_is_correct:
+            mock_is_correct.return_value = True
+            module.set_score(module.score_from_lcp())
+            with patch('capa.responsetypes.NumericalResponse.get_staff_ans') as get_staff_ans:
+                get_staff_ans.return_value = 1 + 0j
+                module.rescore(only_if_higher=True)
+
+        # Expect that the problem is marked correct and user earned the score
+        self.assertEqual(module.get_score(), (1, 1))
+        self.assertEqual(module.correct_map[answer_id]['correctness'], 'correct')
         # Expect that the number of attempts is not incremented
         self.assertEqual(module.attempts, 1)
 
@@ -1998,6 +2003,7 @@ class CapaModuleTest(unittest.TestCase):
 
 @ddt.ddt
 class CapaDescriptorTest(unittest.TestCase):
+    shard = 1
 
     sample_checkbox_problem_xml = textwrap.dedent("""
         <problem>
@@ -2793,6 +2799,8 @@ class CapaDescriptorTest(unittest.TestCase):
 
 
 class ComplexEncoderTest(unittest.TestCase):
+    shard = 1
+
     def test_default(self):
         """
         Check that complex numbers can be encoded into JSON.
@@ -2807,6 +2815,7 @@ class TestProblemCheckTracking(unittest.TestCase):
     """
     Ensure correct tracking information is included in events emitted during problem checks.
     """
+    shard = 1
 
     def setUp(self):
         super(TestProblemCheckTracking, self).setUp()

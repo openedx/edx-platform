@@ -16,6 +16,8 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_un
 @skipUnless('openedx.core.djangoapps.schedules.apps.SchedulesConfig' in settings.INSTALLED_APPS,
             "Can't test schedules if the app isn't installed")
 class TestSendEmailBaseCommand(CacheIsolationTestCase):
+    shard = 6
+
     def setUp(self):
         self.command = SendEmailBaseCommand()
         self.site = SiteFactory()

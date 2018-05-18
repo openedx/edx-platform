@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Tests for util.password_policy_validators module."""
 
 import mock
@@ -8,7 +9,9 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.test.utils import override_settings
 
-from util.password_policy_validators import password_instructions, validate_password, _validate_password_dictionary
+from util.password_policy_validators import (
+    password_instructions, password_min_length, validate_password, _validate_password_dictionary
+)
 
 
 @ddt
@@ -22,18 +25,38 @@ class PasswordPolicyValidatorsTestCase(unittest.TestCase):
         """ Tests dictionary checks """
         # Direct match
         with self.assertRaises(ValidationError):
-            _validate_password_dictionary('testme')
+            _validate_password_dictionary(u'testme')
 
         # Off by one
         with self.assertRaises(ValidationError):
-            _validate_password_dictionary('estme')
+            _validate_password_dictionary(u'estme')
 
         # Off by two
         with self.assertRaises(ValidationError):
-            _validate_password_dictionary('bestmet')
+            _validate_password_dictionary(u'bestmet')
 
         # Off by three (should pass)
-        _validate_password_dictionary('bestem')
+        _validate_password_dictionary(u'bestem')
+
+    def test_unicode_password(self):
+        """ Tests that validate_password enforces unicode """
+        byte_str = b'𤭮'
+        unicode_str = u'𤭮'
+
+        # Sanity checks and demonstration of why this test is useful
+        self.assertEqual(len(byte_str), 4)
+        self.assertEqual(len(unicode_str), 1)
+        self.assertEqual(password_min_length(), 2)
+
+        # Test length check
+        with self.assertRaises(ValidationError):
+            validate_password(byte_str)
+        validate_password(byte_str + byte_str)
+
+        # Test badly encoded password
+        with self.assertRaises(ValidationError) as cm:
+            validate_password(b'\xff\xff')
+        self.assertEquals('Invalid password.', cm.exception.message)
 
     @data(
         (u'', 'at least 2 characters & 2 letters & 1 number.'),

@@ -27,7 +27,7 @@ def is_survey_required_and_unanswered(user, course_descriptor):
         return False
 
     # anonymous users do not need to answer the survey
-    if user.is_anonymous():
+    if user.is_anonymous:
         return False
 
     # course staff do not need to answer survey

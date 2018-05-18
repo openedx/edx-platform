@@ -95,6 +95,25 @@
                 $('.post-topic').trigger('change');
                 return checkVisibility(this.view, true, false, false);
             });
+            it('visibility message changes when group is changed', function() {
+                DiscussionSpecHelper.makeModerator();
+                checkVisibility(this.view, true, false, true);
+
+                $('option:contains(Topic)').prop('selected', true);
+                $('.post-topic').trigger('change');
+                expect($('.js-group-select option:selected').text())
+                    .toEqual('All Groups');
+                expect($('.group-visibility').text().trim())
+                    .toEqual('This post will be visible only to All Groups.');
+
+                $('.js-group-select option:contains(Cohort1)').prop('selected', true);
+                $('.js-group-select').trigger('change');
+                expect($('.js-group-select option:selected').text())
+                    .toEqual('Cohort1');
+                expect($('.group-visibility').text().trim())
+                    .toEqual('This post will be visible only to Cohort1.');
+                return checkVisibility(this.view, true, false, false);
+            });
             it('allows the user to make a group selection', function() {
                 var expectedGroupId,
                     self = this;

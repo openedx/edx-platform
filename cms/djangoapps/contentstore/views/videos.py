@@ -15,6 +15,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.images import get_image_dimensions
+from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseNotFound
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
@@ -533,15 +534,12 @@ def _get_videos(course):
     """
     Retrieves the list of videos from VAL corresponding to this course.
     """
-    is_video_transcript_enabled = VideoTranscriptEnabledFlag.feature_enabled(course.id)
     videos = list(get_videos_for_course(unicode(course.id), VideoSortField.created, SortDirection.desc))
 
     # convert VAL's status to studio's Video Upload feature status.
     for video in videos:
         video["status"] = convert_video_status(video)
-
-        if is_video_transcript_enabled:
-            video['transcripts'] = get_available_transcript_languages(video_id=video['edx_video_id'])
+        video['transcripts'] = get_available_transcript_languages(video_id=video['edx_video_id'])
 
     return videos
 
@@ -558,10 +556,7 @@ def _get_index_videos(course):
     Returns the information about each video upload required for the video list
     """
     course_id = unicode(course.id)
-    attrs = ['edx_video_id', 'client_video_id', 'created', 'duration', 'status', 'courses']
-
-    if VideoTranscriptEnabledFlag.feature_enabled(course.id):
-        attrs += ['transcripts']
+    attrs = ['edx_video_id', 'client_video_id', 'created', 'duration', 'status', 'courses', 'transcripts']
 
     def _get_values(video):
         """
@@ -631,14 +626,19 @@ def videos_index_html(course):
             'supported_file_formats': settings.VIDEO_IMAGE_SUPPORTED_FILE_FORMATS
         },
         'is_video_transcript_enabled': is_video_transcript_enabled,
-        'video_transcript_settings': None,
         'active_transcript_preferences': None,
         'transcript_credentials': None,
-        'transcript_available_languages': None
+        'transcript_available_languages': get_all_transcript_languages(),
+        'video_transcript_settings': {
+            'transcript_download_handler_url': reverse('transcript_download_handler'),
+            'transcript_upload_handler_url': reverse('transcript_upload_handler'),
+            'transcript_delete_handler_url': reverse_course_url('transcript_delete_handler', unicode(course.id)),
+            'trancript_download_file_format': Transcript.SRT
+        }
     }
 
     if is_video_transcript_enabled:
-        context['video_transcript_settings'] = {
+        context['video_transcript_settings'].update({
             'transcript_preferences_handler_url': reverse_course_url(
                 'transcript_preferences_handler',
                 unicode(course.id)
@@ -647,25 +647,11 @@ def videos_index_html(course):
                 'transcript_credentials_handler',
                 unicode(course.id)
             ),
-            'transcript_download_handler_url': reverse_course_url(
-                'transcript_download_handler',
-                unicode(course.id)
-            ),
-            'transcript_upload_handler_url': reverse_course_url(
-                'transcript_upload_handler',
-                unicode(course.id)
-            ),
-            'transcript_delete_handler_url': reverse_course_url(
-                'transcript_delete_handler',
-                unicode(course.id)
-            ),
             'transcription_plans': get_3rd_party_transcription_plans(),
-            'trancript_download_file_format': Transcript.SRT
-        }
+        })
         context['active_transcript_preferences'] = get_transcript_preferences(unicode(course.id))
         # Cached state for transcript providers' credentials (org-specific)
         context['transcript_credentials'] = get_transcript_credentials_state_for_org(course.id.org)
-        context['transcript_available_languages'] = get_all_transcript_languages()
 
     return render_to_response('videos_index.html', context)
 

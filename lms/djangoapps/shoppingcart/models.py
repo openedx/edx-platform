@@ -170,7 +170,7 @@ class Order(models.Model):
         If a item_type is passed in, then we check to see if the cart has at least one of
         those types of OrderItems
         """
-        if not user.is_authenticated():
+        if not user.is_authenticated:
             return False
         cart = cls.get_cart_for_user(user)
 
@@ -645,6 +645,7 @@ class OrderItem(TimeStampedModel):
     """
     class Meta(object):
         app_label = "shoppingcart"
+        base_manager_name = 'objects'
 
     objects = InheritanceManager()
     order = models.ForeignKey(Order, db_index=True)
@@ -1091,6 +1092,7 @@ class InvoiceItem(TimeStampedModel):
     """
     class Meta(object):
         app_label = "shoppingcart"
+        base_manager_name = 'objects'
 
     objects = InheritanceManager()
     invoice = models.ForeignKey(Invoice, db_index=True)

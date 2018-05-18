@@ -17,6 +17,8 @@ class SurveyModelsTests(ModuleStoreTestCase):
     """
     All tests for the utils.py file
     """
+    shard = 4
+
     def setUp(self):
         """
         Set up the test data used in the specific tests

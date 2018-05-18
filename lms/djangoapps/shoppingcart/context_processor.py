@@ -23,7 +23,7 @@ def user_has_cart_context_processor(request):
         """
         return (
             # user is logged in and
-            request.user.is_authenticated() and
+            request.user.is_authenticated and
             # do we have the feature turned on
             is_shopping_cart_enabled() and
             # does the user actually have a cart (optimized query to prevent creation of a cart when not needed)

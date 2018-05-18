@@ -14,7 +14,7 @@ class SystemUserTestCase(unittest.TestCase):
 
     def test_system_user_is_anonymous(self):
         self.assertIsInstance(self.sysuser, AnonymousUser)
-        self.assertTrue(self.sysuser.is_anonymous())
+        self.assertTrue(self.sysuser.is_anonymous)
         self.assertIsNone(self.sysuser.id)
 
     def test_system_user_has_custom_unicode_representation(self):

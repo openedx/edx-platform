@@ -10,6 +10,7 @@ from common.test.acceptance.pages.studio.asset_index import UPLOAD_FILE_DIR
 
 class AssetIndexTestStudioFrontend(StudioCourseTest):
     """Tests for the Asset index page."""
+    shard = 21
 
     def setUp(self, is_staff=False):  # pylint: disable=arguments-differ
         super(AssetIndexTestStudioFrontend, self).setUp()
@@ -34,6 +35,7 @@ class AssetIndexTestStudioFrontend(StudioCourseTest):
         assert self.assert_sortable_table_heading_elements_exist()
         assert self.assert_status_element_exists()
         assert self.assert_pagination_element_exists()
+        assert self.assert_search_element_exists()
 
     def assert_page_without_filter_results_elements_load(self):
         """Make sure correct elements are on page for a filter with no results."""
@@ -42,6 +44,7 @@ class AssetIndexTestStudioFrontend(StudioCourseTest):
         assert not self.assert_sortable_table_heading_elements_exist()
         assert not self.assert_pagination_element_exists()
 
+        assert self.assert_search_element_exists()
         assert self.assert_status_element_exists()
         assert self.assert_type_filter_exists()
         assert self.assert_upload_element_exists()
@@ -75,6 +78,10 @@ class AssetIndexTestStudioFrontend(StudioCourseTest):
     def assert_pagination_element_exists(self):
         """Make sure pagination element is on the page."""
         return self.asset_page.is_pagination_element_on_page() is True
+
+    def assert_search_element_exists(self):
+        """Make sure search element is on the page."""
+        return self.asset_page.is_search_element_on_page() is True
 
     def assert_no_results_headings_exist(self):
         """Make sure headings with text for no results is on the page."""

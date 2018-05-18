@@ -78,3 +78,24 @@ class AccountSettingsPage(FieldsMixin, PageObject):
         order detail link or not.
         """
         return self.q(css='.u-field-{} .u-field-{}'.format(field_id, 'link')).visible
+
+    @property
+    def is_delete_button_visible(self):
+        self.scroll_to_element('#account-deletion-container')
+        return self.q(css='#delete-account-btn').visible
+
+    def click_delete_button(self):
+        self.q(css="#delete-account-btn").click()
+
+    @property
+    def is_delete_modal_visible(self):
+        return self.q(css='.delete-confirmation-wrapper').visible
+
+    def delete_confirm_button_enabled(self):
+        return self.q(css='.paragon__modal-footer .paragon__btn')[0].is_enabled()
+
+    def click_delete_confirm_button(self):
+        return self.q(css='.paragon__modal-footer .paragon__btn')[0].click()
+
+    def fill_in_password_field(self, password):
+        self.q(css='#asInput1').fill(password)
