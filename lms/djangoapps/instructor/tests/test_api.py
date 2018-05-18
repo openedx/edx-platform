@@ -3139,12 +3139,13 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
                 {
                     "url": "https://1.mock.url",
                     "link": "<a href=\"https://1.mock.url\">mock_file_name_1</a>",
-                    "name": "mock_file_name_1"
-                },
-                {
+                    "preview_url": '/csv-viewer?csvUrl=https://1.mock.url',
+                    "name": "mock_file_name_1",
+                }, {
                     "url": "https://2.mock.url",
                     "link": "<a href=\"https://2.mock.url\">mock_file_name_2</a>",
-                    "name": "mock_file_name_2"
+                    "preview_url": '/csv-viewer?csvUrl=https://2.mock.url',
+                    "name": "mock_file_name_2",
                 }
             ]
         }

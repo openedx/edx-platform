@@ -2395,10 +2395,17 @@ def list_report_downloads(request, course_id):
 
     response_payload = {
         'downloads': [
-            dict(name=name, url=url, link=HTML('<a href="{}">{}</a>').format(HTML(url), Text(name)))
-            for name, url in report_store.links_for(course_id) if report_name is None or name == report_name
+            dict(
+                name=name,
+                url=url,
+                preview_url='{}?csvUrl={}'.format(reverse('csv-viewer'), url),
+                link=HTML('<a href="{}">{}</a>').format(HTML(url), Text(name))
+            )
+            for name, url in report_store.links_for(course_id)
+            if report_name is None or name == report_name
         ]
     }
+
     return JsonResponse(response_payload)
 
 
@@ -2420,6 +2427,7 @@ def list_financial_report_downloads(_request, course_id):
             for name, url in report_store.links_for(course_id)
         ]
     }
+
     return JsonResponse(response_payload)
 
 

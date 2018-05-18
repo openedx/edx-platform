@@ -1515,6 +1515,13 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/lms-style-vendor.css',
     },
+    'style-vendor-ag-grid': {
+        'source_filenames': [
+            'css/vendor/ag-grid.css',
+            'css/vendor/ag-theme-fresh.css',
+        ],
+        'output_filename': 'css/lms-style-vendor-ag-grid.css',
+    },
     'style-vendor-tinymce-content': {
         'source_filenames': [
             'js/vendor/tinymce/js/tinymce/skins/studio-tmce4/content.min.css'

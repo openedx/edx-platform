@@ -75,6 +75,8 @@ module.exports = Merge.smart({
 
         CookiePolicyBanner: './common/static/js/src/CookiePolicyBanner.jsx',
 
+        CSVViewer: './lms/static/js/csv_viewer/index.jsx',
+
         // Common
         ReactRenderer: './common/static/js/src/ReactRenderer.jsx',
         XModuleShim: 'xmodule/js/src/xmodule.js',

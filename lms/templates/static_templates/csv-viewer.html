@@ -1,0 +1,43 @@
+<%page expression_filter="h"/>
+<%! from django.utils.translation import ugettext as _ %>
+<%inherit file="../main.html" />
+<%namespace name='static' file='../static_content.html'/>
+
+<%block name="pagetitle">${_("CSV Viewer")}</%block>
+
+<%block name="head_extra">
+  <%static:css group='style-vendor-ag-grid'/>
+  <style>
+    .csv-viewer-grid.error-message {
+      font-size: 1.5rem;
+      text-align: center;
+    }
+
+    .csv-viewer-grid.loading-message {
+      font-size: 1.5rem;
+      text-align: center;
+    }
+
+    .ie .csv-viewer-grid {
+      height: 800px;
+    }
+
+    .csv-viewer-grid {
+      height: 80vh;
+    }
+  </style>
+</%block>
+
+<main id="main" aria-label="Content" tabindex="-1">
+  ${static.renderReact(
+    component="CSVViewer",
+    id="react-csv-viewer",
+    props={
+      "enableRtl": LANGUAGE_BIDI,
+      "errorMessages": {
+        "csv_load_error": _("Unable to load data"),
+      },
+      "loadingMessage": _("Loading..."),
+    }
+  )}
+</main>

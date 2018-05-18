@@ -492,7 +492,22 @@
                             edx.HtmlUtils.HTML('">'), dataContext.name,
                             edx.HtmlUtils.HTML('</a>'));
                     }
-                }
+                }, {
+                    id: 'preview-report',
+                    field: 'preview_url',
+                    name: gettext('Preview Report in Browser'),
+                    toolTip: gettext('Links are generated on demand and expire within 5 minutes due to the sensitive nature of student information.'), //  eslint-disable-line max-len
+                    sortable: false,
+                    maxWidth: 100,
+                    cssClass: 'file-preview-link',
+                    formatter: function(row, cell, value, columnDef, dataContext) {
+                        return edx.HtmlUtils.joinHtml(edx.HtmlUtils.HTML(
+                            '<a target="_blank" href="'), dataContext.preview_url,
+                            edx.HtmlUtils.HTML('">'), gettext('Preview'),
+                            edx.HtmlUtils.HTML('</a>'));
+                    }
+                },
+
             ];
             $tablePlaceholder = $('<div/>', {
                 class: 'slickgrid'
