@@ -4,6 +4,7 @@
 #
 #    make upgrade
 #
+
 common/lib/calc
 common/lib/chem
 common/lib/sandbox-packages
@@ -11,7 +12,7 @@ common/lib/symmath
 asn1crypto==0.24.0
 backports-abc==0.5        # via tornado
 cffi==1.11.5
-cryptography==2.1.4
+cryptography==2.2.2
 enum34==1.1.6
 futures==3.2.0            # via tornado
 idna==2.6

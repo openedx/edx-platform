@@ -4,13 +4,14 @@
 #
 #    make upgrade
 #
+
 -e common/lib/calc
 -e common/lib/chem
 -e common/lib/sandbox-packages
 -e common/lib/symmath
 asn1crypto==0.24.0        # via cryptography
 cffi==1.11.5              # via cryptography
-cryptography==2.1.4
+cryptography==2.2.2
 enum34==1.1.6             # via cryptography
 idna==2.6                 # via cryptography
 ipaddress==1.0.22         # via cryptography
