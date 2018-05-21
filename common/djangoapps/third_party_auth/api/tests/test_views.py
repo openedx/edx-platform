@@ -68,9 +68,10 @@ class TpaAPITestCase(ThirdPartyAuthTestMixin, APITestCase):
             make_staff = (username == STAFF_USERNAME) or make_superuser
             user = UserFactory.create(
                 username=username,
+                email='{}@example.com'.format(username),
                 password=PASSWORD,
                 is_staff=make_staff,
-                is_superuser=make_superuser
+                is_superuser=make_superuser,
             )
             UserSocialAuth.objects.create(
                 user=user,
@@ -83,59 +84,7 @@ class TpaAPITestCase(ThirdPartyAuthTestMixin, APITestCase):
                 uid='{}:remote_{}'.format(testshib.idp_slug, username),
             )
         # Create another user not linked to any providers:
-        UserFactory.create(username=CARL_USERNAME, password=PASSWORD)
-
-
-@ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class ProviderViewAPITests(TpaAPITestCase):
-    """
-    Test that the provider endpoint returns the appropriate data
-    """
-    @ddt.data(*LINKED_USERS)
-    def test_linked_users(self, username):
-        for identifier_type in (u'username', u'email'):
-            identifier = getattr(User.objects.get(username=username), identifier_type)
-            url = reverse(
-                u'third_party_auth_providers_api',
-                kwargs={u'identifier': identifier},
-            )
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, 200)
-            data = json.loads(response.content)
-            self.assertEqual(
-                data,
-                {
-                    u"identifier": identifier,
-                    u"identifier_type": identifier_type,
-                    u"providers": [
-                        {
-                            u'backend_name': u'google-oauth2',
-                            u'name': u'Google',
-                            u'provider_id': u'oa2-google-oauth2'
-                        }, {
-                            u'backend_name': u'tpa-saml',
-                            u'name': u'TestShib',
-                            u'provider_id': u'saml-testshib'
-                        },
-                    ],
-                },
-            )
-
-    @ddt.data(CARL_USERNAME, NONEXISTENT_USERNAME)
-    def test_unlinked_users(self, username):
-        url = reverse(u'third_party_auth_providers_api', kwargs={u'identifier': username})
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
-        self.assertEqual(
-            data,
-            {
-                u'identifier': username,
-                u'identifier_type': u'username',
-                u'providers': [],
-            },
-        )
+        UserFactory.create(username=CARL_USERNAME, email='{}@example.com'.format(CARL_USERNAME), password=PASSWORD)
 
 
 @override_settings(EDX_API_KEY=VALID_API_KEY)
@@ -205,6 +154,31 @@ class UserViewAPITests(TpaAPITestCase):
         if expect_result == 200:
             self.assertIn("active", response.data)
             self.assertItemsEqual(response.data["active"], self.expected_active(target_user))
+
+    @ddt.data(
+        (True, ALICE_USERNAME, 200, True),
+        (True, CARL_USERNAME, 200, False),
+        (False, ALICE_USERNAME, 200, True),
+        (False, CARL_USERNAME, 403, None),
+    )
+    @ddt.unpack
+    def test_allow_unprivileged_response(self, allow_unprivileged, requesting_user, expect, include_remote_id):
+        self.client.login(username=requesting_user, password=PASSWORD)
+        with override_settings(ALLOW_UNPRIVILEGED_SSO_PROVIDER_QUERY=allow_unprivileged):
+            url = reverse('third_party_auth_users_api', kwargs={'username': ALICE_USERNAME})
+            response = self.client.get(url)
+        self.assertEqual(response.status_code, expect)
+        if response.status_code == 200:
+            self.assertGreater(len(response.data['active']), 0)
+            for provider_data in response.data['active']:
+                self.assertEqual(include_remote_id, 'remote_id' in provider_data)
+
+    def test_allow_query_by_email(self):
+        self.client.login(username=ALICE_USERNAME, password=PASSWORD)
+        url = reverse('third_party_auth_users_api', kwargs={'username': '{}@example.com'.format(ALICE_USERNAME)})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(len(response.data['active']), 0)
 
 
 @override_settings(EDX_API_KEY=VALID_API_KEY)

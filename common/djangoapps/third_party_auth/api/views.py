@@ -1,6 +1,7 @@
 """
 Third Party Auth REST API views
 """
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.http import Http404
@@ -22,87 +23,32 @@ from third_party_auth.api.permissions import ThirdPartyAuthProviderApiPermission
 from third_party_auth.provider import Registry
 
 
-class ProviderBurstThrottle(throttling.UserRateThrottle):
+class ProviderBaseThrottle(throttling.UserRateThrottle):
+    """
+    Base throttle for provider queries
+    """
+
+    def allow_request(self, request, view):
+        """
+        Only throttle unauthenticated requests.
+        """
+        if view.is_unprivileged_query(request, view.kwargs[u'username']):
+            return True
+        return super(ProviderBaseThrottle, self).allow_request(request, view)
+
+
+class ProviderBurstThrottle(ProviderBaseThrottle):
     """
     Maximum number of provider requests in a quick burst.
     """
     rate = '10/min'
 
 
-class ProviderSustainedThrottle(throttling.UserRateThrottle):
+class ProviderSustainedThrottle(ProviderBaseThrottle):
     """
     Maximum number of provider requests over time.
     """
     rate = '50/day'
-
-
-class ProviderView(APIView):
-    """
-    List the third party auth accounts linked to the specified user account.
-
-    **Example Request**
-
-        GET /api/third_party_auth/v0/users/{username|email}/providers/
-
-    **Response Values**
-
-        If the request for information about the user is successful, an HTTP 200
-        "OK" response is returned.
-
-        The HTTP 200 response has the following values.
-
-        *   identifier: The username or email address provided in the request
-        *   identifier_type: "username"|"email"
-        *   providers:
-                A list of all the third party auth providers currently linked
-                to the given user's account. Each object in this list has the
-                following attributes:
-                    *   provider_id: the slug used to identify the provider in
-                        request URLs.
-                    *   name: A human readable name for the provider.
-                    *   backend_name: The python-social-auth backend used by
-                        this provider. E.g.: facebook-oauth, tpa-saml.
-
-    """
-    throttle_classes = [ProviderSustainedThrottle, ProviderBurstThrottle]
-
-    def get(self, request, identifier):
-        """
-        List the third party auth accounts linked to the specified user account.
-
-        Args:
-            request (Request): The HTTP GET request
-            identifier (str): Fetch the list of providers linked to this user
-
-        Return:
-            JSON serialized list of the providers linked to this user.
-            See class docstring for specifics of the data format.
-
-        """
-        if '@' in identifier:
-            identifier_type = u"email"
-        else:
-            identifier_type = u"username"
-        try:
-            user = User.objects.get(**{identifier_type: identifier})
-        except User.DoesNotExist:
-            active_providers = []
-        else:
-            providers = pipeline.get_provider_user_states(user)
-            active_providers = [
-                {
-                    u"provider_id": assoc.provider.provider_id,
-                    u"name": assoc.provider.name,
-                    u"backend_name": assoc.provider.backend_name,
-                }
-                for assoc in providers if assoc.has_account
-            ]
-
-        return Response({
-            u"identifier": identifier,
-            u"identifier_type": identifier_type,
-            u"providers": active_providers
-        })
 
 
 class UserView(APIView):
@@ -112,6 +58,7 @@ class UserView(APIView):
     **Example Request**
 
         GET /api/third_party_auth/v0/users/{username}
+        GET /api/third_party_auth/v0/users/{email@example.com}
 
     **Response Values**
 
@@ -136,6 +83,7 @@ class UserView(APIView):
         OAuth2AuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
+    throttle_classes = [ProviderSustainedThrottle, ProviderBurstThrottle]
 
     def get(self, request, username):
         """Create, read, or update enrollment information for a user.
@@ -151,26 +99,22 @@ class UserView(APIView):
             JSON serialized list of the providers linked to this user.
 
         """
-        if request.user.username != username:
-            # We are querying permissions for a user other than the current user.
-            if not request.user.is_superuser and not ApiKeyHeaderPermission().has_permission(request, self):
-                # Return a 403 (Unauthorized) without validating 'username', so that we
-                # do not let users probe the existence of other user accounts.
+        is_unprivileged = self.is_unprivileged_query(request, username)
+        if is_unprivileged:
+            if not getattr(settings, 'ALLOW_UNPRIVILEGED_SSO_PROVIDER_QUERY', False):
                 return Response(status=status.HTTP_403_FORBIDDEN)
-
         try:
-            user = User.objects.get(username=username)
+            if '@' in username:
+                user = User.objects.get(email=username)
+            else:
+                user = User.objects.get(username=username)
         except User.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         providers = pipeline.get_provider_user_states(user)
 
         active_providers = [
-            {
-                "provider_id": assoc.provider.provider_id,
-                "name": assoc.provider.name,
-                "remote_id": assoc.remote_id,
-            }
+            self.get_provider_data(assoc, is_unprivileged)
             for assoc in providers if assoc.has_account
         ]
 
@@ -179,6 +123,33 @@ class UserView(APIView):
         return Response({
             "active": active_providers
         })
+
+    def get_provider_data(self, assoc, is_unprivileged):
+        """
+        Return the data for the specified provider.
+
+        If the request is unprivileged, do not return the remote ID of the user.
+        """
+        provider_data = {
+            "provider_id": assoc.provider.provider_id,
+            "name": assoc.provider.name,
+        }
+        if not is_unprivileged:
+            provider_data["remote_id"] = assoc.remote_id
+        return provider_data
+
+    def is_unprivileged_query(self, request, username):
+        """
+        Return True if a non-superuser requests information about another user.
+        """
+        # AnonymousUser does not have an email attribute, so fall back to something
+        # that will never compare equal to username.
+        if username not in {request.user.username, getattr(request.user, 'email', object())}:
+            # We are querying permissions for a user other than the current user.
+            if not request.user.is_superuser and not ApiKeyHeaderPermission().has_permission(request, self):
+                # The user does not have elevated permissions.
+                return True
+        return False
 
 
 class UserMappingView(ListAPIView):
