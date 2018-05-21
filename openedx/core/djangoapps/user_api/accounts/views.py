@@ -16,6 +16,7 @@ from django.db import transaction
 from django.utils.translation import ugettext as _
 from edx_rest_framework_extensions.authentication import JwtAuthentication
 from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomerUser, PendingEnterpriseCustomerUser
+from integrated_channels.degreed.models import DegreedLearnerDataTransmissionAudit
 from integrated_channels.sap_success_factors.models import SapSuccessFactorsLearnerDataTransmissionAudit
 from rest_framework import permissions, status
 from rest_framework.authentication import SessionAuthentication
@@ -25,20 +26,29 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
 from six import text_type
 from social_django.models import UserSocialAuth
+from wiki.models import ArticleRevision
+from wiki.models.pluginbase import RevisionPluginRevision
 
 from entitlements.models import CourseEntitlement
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
+from openedx.core.djangoapps.credit.models import CreditRequirementStatus, CreditRequest
 from openedx.core.djangoapps.course_groups.models import UnregisteredLearnerCohortAssignments
 from openedx.core.djangoapps.profile_images.images import remove_profile_images
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
-from openedx.core.djangolib.oauth2_retirement_utils import retire_dop_oauth2_models, retire_dot_oauth2_models
+from openedx.core.djangolib.oauth2_retirement_utils import retire_dot_oauth2_models, retire_dop_oauth2_models
 from openedx.core.lib.api.authentication import (
     OAuth2AuthenticationAllowInactiveUser,
     SessionAuthenticationAllowInactiveUser
 )
 from openedx.core.lib.api.parsers import MergePatchParser
+from survey.models import SurveyAnswer
 from student.models import (
+    CourseEnrollment,
+    ManualEnrollmentAudit,
+    PasswordHistory,
+    PendingNameChange,
     CourseEnrollmentAllowed,
     PendingEmailChange,
     Registration,
@@ -581,6 +591,54 @@ class AccountRetirementStatusView(ViewSet):
             return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+class LMSAccountRetirementView(ViewSet):
+    """
+    Provides an API endpoint for retiring a user in the LMS.
+    """
+    authentication_classes = (JwtAuthentication,)
+    permission_classes = (permissions.IsAuthenticated, CanRetireUser,)
+    parser_classes = (JSONParser,)
+
+    @request_requires_username
+    def post(self, request):
+        """
+        POST /api/user/v1/accounts/retire_misc/
+
+        {
+            'username': 'user_to_retire'
+        }
+
+        Retires the user with the given username in the LMS.
+        """
+
+        username = request.data['username']
+        if is_username_retired(username):
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            retirement = UserRetirementStatus.get_retirement_for_retirement_action(username)
+            RevisionPluginRevision.retire_user(retirement.user)
+            ArticleRevision.retire_user(retirement.user)
+            PendingNameChange.delete_by_user_value(retirement.user, field='user')
+            PasswordHistory.retire_user(retirement.user.id)
+            course_enrollments = CourseEnrollment.objects.filter(user=retirement.user)
+            ManualEnrollmentAudit.retire_manual_enrollments(course_enrollments, retirement.retired_email)
+
+            CreditRequest.retire_user(retirement.original_username, retirement.retired_username)
+            ApiAccessRequest.retire_user(retirement.user)
+            CreditRequirementStatus.retire_user(retirement.user.username)
+            SurveyAnswer.retire_user(retirement.user.id)
+
+        except UserRetirementStatus.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        except RetirementStateError as exc:
+            return Response(text_type(exc), status=status.HTTP_400_BAD_REQUEST)
+        except Exception as exc:  # pylint: disable=broad-except
+            return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 class AccountRetirementView(ViewSet):
     """
     Provides API endpoint for retiring a user.
@@ -621,6 +679,7 @@ class AccountRetirementView(ViewSet):
             # Retire data from Enterprise models
             self.retire_users_data_sharing_consent(username, retired_username)
             self.retire_sapsf_data_transmission(user)
+            self.retire_degreed_data_transmission(user)
             self.retire_user_from_pending_enterprise_customer_user(user, retired_email)
             self.retire_entitlement_support_detail(user)
 
@@ -687,6 +746,17 @@ class AccountRetirementView(ViewSet):
                     enterprise_course_enrollment_id=enrollment.id
                 )
                 audits.update(sapsf_user_id='')
+
+    @staticmethod
+    def retire_degreed_data_transmission(user):
+        for ent_user in EnterpriseCustomerUser.objects.filter(user_id=user.id):
+            for enrollment in EnterpriseCourseEnrollment.objects.filter(
+                enterprise_customer_user=ent_user
+            ):
+                audits = DegreedLearnerDataTransmissionAudit.objects.filter(
+                    enterprise_course_enrollment_id=enrollment.id
+                )
+                audits.update(degreed_user_email='')
 
     @staticmethod
     def retire_user_from_pending_enterprise_customer_user(user, retired_email):

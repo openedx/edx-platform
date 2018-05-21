@@ -12,6 +12,7 @@ from consent.models import DataSharingConsent
 import ddt
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.test import TestCase
@@ -35,10 +36,18 @@ from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 from six import text_type
 from social_django.models import UserSocialAuth
+from wiki.models import ArticleRevision, Article
+from wiki.models.pluginbase import RevisionPluginRevision, RevisionPlugin
+from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from entitlements.models import CourseEntitlementSupportDetail
 from entitlements.tests.factories import CourseEntitlementFactory
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
+from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
+from openedx.core.djangoapps.credit.models import (
+    CreditRequirementStatus, CreditRequest, CreditCourse, CreditProvider, CreditRequirement
+)
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup, UnregisteredLearnerCohortAssignments
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.user_api.accounts import ACCOUNT_VISIBILITY_PREF_KEY
@@ -47,9 +56,14 @@ from openedx.core.djangoapps.user_api.models import RetirementState, UserRetirem
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.token_utils import JwtBuilder
+from survey.models import SurveyAnswer
 from student.models import (
+    CourseEnrollment,
     CourseEnrollmentAllowed,
+    ManualEnrollmentAudit,
+    PasswordHistory,
     PendingEmailChange,
+    PendingNameChange,
     Registration,
     SocialLink,
     UserProfile,
@@ -1918,3 +1932,124 @@ class TestAccountRetirementPost(RetirementTestCase):
         self.assertEqual(self.test_user, self.photo_verification.user)
         for field in ('name', 'face_image_url', 'photo_id_image_url', 'photo_id_key'):
             self.assertEqual('', getattr(self.photo_verification, field))
+
+
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
+class TestLMSAccountRetirementPost(RetirementTestCase, ModuleStoreTestCase):
+    """
+    Tests the LMS account retirement (GDPR P2) endpoint.
+    """
+    def setUp(self):
+        super(TestLMSAccountRetirementPost, self).setUp()
+        self.pii_standin = 'PII here'
+        self.course = CourseFactory()
+        self.test_user = UserFactory()
+        self.test_superuser = SuperuserFactory()
+        self.original_username = self.test_user.username
+        self.original_email = self.test_user.email
+        self.retired_username = get_retired_username_by_username(self.original_username)
+        self.retired_email = get_retired_email_by_email(self.original_email)
+
+        retirement_state = RetirementState.objects.get(state_name='RETIRING_LMS')
+        self.retirement_status = UserRetirementStatus.create_retirement(self.test_user)
+        self.retirement_status.current_state = retirement_state
+        self.retirement_status.last_state = retirement_state
+        self.retirement_status.save()
+
+        # wiki data setup
+        rp = RevisionPlugin.objects.create(article_id=0)
+        RevisionPluginRevision.objects.create(
+            revision_number=1,
+            ip_address="ipaddresss",
+            plugin=rp,
+            user=self.test_user,
+        )
+        article = Article.objects.create()
+        ArticleRevision.objects.create(ip_address="ipaddresss", user=self.test_user, article=article)
+
+        # ManualEnrollmentAudit setup
+        course_enrollment = CourseEnrollment.enroll(user=self.test_user, course_key=self.course.id)
+        ManualEnrollmentAudit.objects.create(
+            enrollment=course_enrollment, reason=self.pii_standin, enrolled_email=self.pii_standin
+        )
+
+        # CreditRequest and CreditRequirementStatus setup
+        provider = CreditProvider.objects.create(provider_id="Hogwarts")
+        credit_course = CreditCourse.objects.create(course_key=self.course.id)
+        CreditRequest.objects.create(
+            username=self.test_user.username,
+            course=credit_course,
+            provider_id=provider.id,
+            parameters={self.pii_standin},
+        )
+        req = CreditRequirement.objects.create(course_id=credit_course.id)
+        CreditRequirementStatus.objects.create(username=self.test_user.username, requirement=req)
+
+        # ApiAccessRequest setup
+        site = Site.objects.create()
+        ApiAccessRequest.objects.create(
+            user=self.test_user,
+            site=site,
+            website=self.pii_standin,
+            company_address=self.pii_standin,
+            company_name=self.pii_standin,
+            reason=self.pii_standin,
+        )
+
+        # SurveyAnswer setup
+        SurveyAnswer.objects.create(user=self.test_user, field_value=self.pii_standin, form_id=0)
+
+        # other setup
+        PendingNameChange.objects.create(user=self.test_user, new_name=self.pii_standin, rationale=self.pii_standin)
+        PasswordHistory.objects.create(user=self.test_user, password=self.pii_standin)
+
+        # setup for doing POST from test client
+        self.headers = self.build_jwt_headers(self.test_superuser)
+        self.headers['content_type'] = "application/json"
+        self.url = reverse('accounts_retire_misc')
+
+    def post_and_assert_status(self, data, expected_status=status.HTTP_204_NO_CONTENT):
+        """
+        Helper function for making a request to the retire subscriptions endpoint, and asserting the status.
+        """
+        response = self.client.post(self.url, json.dumps(data), **self.headers)
+        self.assertEqual(response.status_code, expected_status)
+        return response
+
+    def test_retire_user(self):
+        # check that rows that will not exist after retirement exist now
+        self.assertTrue(CreditRequest.objects.filter(username=self.test_user.username).exists())
+        self.assertTrue(CreditRequirementStatus.objects.filter(username=self.test_user.username).exists())
+        self.assertTrue(PendingNameChange.objects.filter(user=self.test_user).exists())
+
+        retirement = UserRetirementStatus.get_retirement_for_retirement_action(self.test_user.username)
+        data = {'username': self.original_username}
+        self.post_and_assert_status(data)
+
+        self.test_user.refresh_from_db()
+        self.test_user.profile.refresh_from_db()  # pylint: disable=no-member
+        self.assertEqual(RevisionPluginRevision.objects.get(user=self.test_user).ip_address, None)
+        self.assertEqual(ArticleRevision.objects.get(user=self.test_user).ip_address, None)
+        self.assertFalse(PendingNameChange.objects.filter(user=self.test_user).exists())
+        self.assertEqual(PasswordHistory.objects.get(user=self.test_user).password, '')
+
+        self.assertEqual(
+            ManualEnrollmentAudit.objects.get(
+                enrollment=CourseEnrollment.objects.get(user=self.test_user)
+            ).enrolled_email,
+            retirement.retired_email
+        )
+        self.assertFalse(CreditRequest.objects.filter(username=self.test_user.username).exists())
+        self.assertTrue(CreditRequest.objects.filter(username=retirement.retired_username).exists())
+        self.assertEqual(CreditRequest.objects.get(username=retirement.retired_username).parameters, {})
+
+        self.assertFalse(CreditRequirementStatus.objects.filter(username=self.test_user.username).exists())
+        self.assertTrue(CreditRequirementStatus.objects.filter(username=retirement.retired_username).exists())
+        self.assertEqual(CreditRequirementStatus.objects.get(username=retirement.retired_username).reason, {})
+
+        retired_api_access_request = ApiAccessRequest.objects.get(user=self.test_user)
+        self.assertEqual(retired_api_access_request.website, '')
+        self.assertEqual(retired_api_access_request.company_address, '')
+        self.assertEqual(retired_api_access_request.company_name, '')
+        self.assertEqual(retired_api_access_request.reason, '')
+        self.assertEqual(SurveyAnswer.objects.get(user=self.test_user).field_value, '')
