@@ -19,6 +19,7 @@ from nose.plugins.attrib import attr
 from nose.tools import raises
 from six import iteritems
 
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.user_api.accounts import PRIVATE_VISIBILITY, USERNAME_MAX_LENGTH
 from openedx.core.djangoapps.user_api.accounts.api import (
     activate_account,
@@ -431,8 +432,13 @@ class AccountCreationActivationAndPasswordChangeTest(TestCase):
         activation_key = create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
         activate_account(activation_key)
 
-        # Request a password change
-        request_password_change(self.EMAIL, self.IS_SECURE)
+        request = RequestFactory().post('/password')
+        request.user = Mock()
+        request.site = SiteFactory()
+
+        with patch('crum.get_current_request', return_value=request):
+            # Request a password change
+            request_password_change(self.EMAIL, self.IS_SECURE)
 
         # Verify that one email message has been sent
         self.assertEqual(len(mail.outbox), 1)
@@ -456,7 +462,12 @@ class AccountCreationActivationAndPasswordChangeTest(TestCase):
         # Create an account, but do not activate it
         create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
 
-        request_password_change(self.EMAIL, self.IS_SECURE)
+        request = RequestFactory().post('/password')
+        request.user = Mock()
+        request.site = SiteFactory()
+
+        with patch('crum.get_current_request', return_value=request):
+            request_password_change(self.EMAIL, self.IS_SECURE)
 
         # Verify that the activation email was still sent
         self.assertEqual(len(mail.outbox), 1)

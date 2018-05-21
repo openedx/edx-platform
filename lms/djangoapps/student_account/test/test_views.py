@@ -164,13 +164,18 @@ class StudentAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
         self.assertEqual(len(mail.outbox), 1)
 
         # Verify that the body contains the failed password reset message
-        email_body = mail.outbox[0].body
-        self.assertIn(
-            'However, there is currently no user account associated with your email address: {email}'.format(
+        sent_message = mail.outbox[0]
+        text_body = sent_message.body
+        html_body = sent_message.alternatives[0][0]
+
+        for email_body in [text_body, html_body]:
+            msg = 'However, there is currently no user account associated with your email address: {email}'.format(
                 email=bad_email
-            ),
-            email_body,
-        )
+            )
+
+            assert u'reset for your user account at {}'.format(settings.PLATFORM_NAME) in email_body
+            assert 'password_reset_confirm' not in email_body, 'The link should not be added if user was not found'
+            assert msg in email_body
 
     @ddt.data(True, False)
     def test_password_change_logged_out(self, send_email):
