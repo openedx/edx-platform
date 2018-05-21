@@ -716,7 +716,12 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         Test that we write the correct XML on export.
         """
         edx_video_id = u'test_edx_video_id'
-        mock_val_api.export_to_xml = Mock(return_value=etree.Element('video_asset'))
+        mock_val_api.export_to_xml = Mock(
+            return_value=dict(
+                xml=etree.Element('video_asset'),
+                transcripts={}
+            )
+        )
         self.descriptor.youtube_id_0_75 = 'izygArpw-Qo'
         self.descriptor.youtube_id_1_0 = 'p2Q6BrNhdh8'
         self.descriptor.youtube_id_1_25 = '1EeWXzPdhSA'
@@ -736,14 +741,23 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         xml = self.descriptor.definition_to_xml(self.file_system)
         parser = etree.XMLParser(remove_blank_text=True)
         xml_string = '''\
-         <video url_name="SampleProblem" start_time="0:00:01" youtube="0.75:izygArpw-Qo,1.00:p2Q6BrNhdh8,1.25:1EeWXzPdhSA,1.50:rABDYkeK0x8" show_captions="false" end_time="0:01:00" download_video="true" download_track="true">
+         <video
+            url_name="SampleProblem"
+            start_time="0:00:01"
+            show_captions="false"
+            end_time="0:01:00"
+            download_video="true"
+            download_track="true"
+            youtube="0.75:izygArpw-Qo,1.00:p2Q6BrNhdh8,1.25:1EeWXzPdhSA,1.50:rABDYkeK0x8"
+            transcripts='{"ge": "german_translation.srt", "ua": "ukrainian_translation.srt"}'
+         >
            <source src="http://www.example.com/source.mp4"/>
            <source src="http://www.example.com/source1.ogg"/>
            <track src="http://www.example.com/track"/>
            <handout src="http://www.example.com/handout"/>
+           <video_asset />
            <transcript language="ge" src="german_translation.srt" />
            <transcript language="ua" src="ukrainian_translation.srt" />
-           <video_asset />
          </video>
         '''
         expected = etree.XML(xml_string, parser=parser)

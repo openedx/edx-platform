@@ -41,6 +41,9 @@ git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.1.6#egg=xblock-d
 git+https://github.com/open-craft/xblock-poll@7ba819b968fe8faddb78bb22e1fe7637005eb414#egg=xblock-poll==1.2.7
 git+https://github.com/edx/xblock-utils.git@v1.1.1#egg=xblock-utils==1.1.1
 -e common/lib/xmodule
+
+-e git+https://github.com/edx/edx-val.git@mrehan/backward-transcript-export#egg=edxval
+
 amqp==1.4.9
 analytics-python==1.1.0
 anyjson==0.3.3
@@ -143,7 +146,7 @@ edx-rest-api-client==1.7.1
 edx-search==1.1.0
 edx-submissions==2.0.12
 edx-user-state-client==1.0.4
-edxval==0.1.14
+#edxval==0.1.14
 elasticsearch==1.9.0
 enum34==1.1.6
 event-tracking==0.2.4
