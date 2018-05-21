@@ -113,7 +113,7 @@ def are_permissions_roles_seeded(course_id):
     return True
 
 
-@request_cached
+#@request_cached
 def get_course_discussion_settings(course_key):
     try:
         course_discussion_settings = CourseDiscussionSettings.objects.get(course_id=course_key)
