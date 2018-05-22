@@ -1,4 +1,5 @@
 import copy
+import crum
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -12,6 +13,7 @@ from edxmako.shortcuts import marketing_link
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.helpers import FormDescription
+from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 from openedx.features.course_experience import ENABLE_GDPR_COMPAT_FLAG
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
 from student.forms import get_registration_extension_form
@@ -831,7 +833,11 @@ class RegistrationFormFactory(object):
         field_type = 'checkbox'
 
         if ENABLE_GDPR_COMPAT_FLAG.is_enabled_without_course_context() and not separate_honor_and_tos:
-            field_type = 'plaintext'
+            current_request = crum.get_current_request()
+
+            if not is_request_from_mobile_app(current_request):
+                field_type = 'plaintext'
+
             pp_link = marketing_link("PRIVACY")
             label = Text(_(
                 u"By creating an account with {platform_name}, you agree \
