@@ -1,9 +1,14 @@
+from common.djangoapps.student.views import get_course_related_keys
+from django.core.urlresolvers import reverse
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from lms.djangoapps.courseware.courses import get_course_by_id
 from student.models import Registration
 from util.json_request import JsonResponse
 from util.request import safe_get_host
 from common.lib.mandrill_client.client import MandrillClient
+from crum import get_current_request
+from django.conf import settings
 
 
 def get_course_details(course_id):
@@ -35,4 +40,22 @@ def reactivation_email_for_user_custom(request, user):
             "success": False,
             "error": _('No inactive user with this e-mail exists'),
         })  # TODO: this should be status code 400  # pylint: disable=fixme
+
+
+def get_course_first_chapter_link(course):
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(
+        course.id.to_deprecated_string())
+
+    request = get_current_request()
+
+    first_chapter_url, first_section = get_course_related_keys(
+        request, get_course_by_id(course_key, 0))
+    first_target = reverse('courseware_section', args=[
+        course.id.to_deprecated_string(),
+        first_chapter_url,
+        first_section
+    ])
+    base_url = settings.LMS_ROOT_URL
+    return base_url + first_target
+
 
