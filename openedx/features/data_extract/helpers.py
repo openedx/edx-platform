@@ -1,6 +1,5 @@
 import requests
 import json
-from urlparse import urlparse, unquote
 
 from django.conf import settings
 
