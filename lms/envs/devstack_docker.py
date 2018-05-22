@@ -22,6 +22,9 @@ COMMENTS_SERVICE_URL = 'http://edx.devstack.forum:4567'
 
 ENTERPRISE_API_URL = '{}/enterprise/api/v1/'.format(LMS_INTERNAL_ROOT_URL)
 
+JOURNALS_URL_ROOT = 'http://localhost:18606'
+JOURNALS_API_URL = 'http://journals.app:18606/api/v1/'
+
 CREDENTIALS_INTERNAL_SERVICE_URL = 'http://edx.devstack.credentials:18150'
 CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'
 

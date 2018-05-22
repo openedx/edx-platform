@@ -47,9 +47,9 @@ def get_journal_about_page_url(slug=''):
     Returns:
         url (str): url points to Journals Service login, w/ a redirect to journal about page
     """
-    login_url = urljoin(settings.JOURNALS_ROOT_URL, 'login')
+    login_url = urljoin(settings.JOURNALS_URL_ROOT, 'login')
 
-    about_page_url = urljoin(settings.JOURNALS_ROOT_URL, slug)
+    about_page_url = urljoin(settings.JOURNALS_URL_ROOT, slug)
     query = 'next={next_url}'.format(next_url=about_page_url)
 
     split_url = urlsplit(login_url)
