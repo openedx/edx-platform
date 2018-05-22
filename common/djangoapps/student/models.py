@@ -2261,20 +2261,22 @@ def strip_if_string(value):
 
 def get_user_by_username_or_email(username_or_email):
     """
-    Return a User object, looking up by email if username_or_email contains a
-    '@', otherwise by username.
+    Return a User object by looking up a user against username_or_email.
 
     Raises:
         User.DoesNotExist if no user object can be found, the user was
         retired, or the user is in the process of being retired.
+
+        MultipleObjectsReturned if one user has same email as username of
+        second user
+
+        MultipleObjectsReturned if more than one user has same email or
+        username
     """
     username_or_email = strip_if_string(username_or_email)
-    user = None
-    if '@' in username_or_email:
-        user = User.objects.filter(email=username_or_email).first()
-
-    if user is None:
-        user = User.objects.get(username=username_or_email)
+    # there should be one user with either username or email equal to username_or_email
+    user = User.objects.get(Q(email=username_or_email) | Q(username=username_or_email))
+    if user is not None and user.username == username_or_email:
         UserRetirementRequest = apps.get_model('user_api', 'UserRetirementRequest')
         if UserRetirementRequest.has_user_requested_retirement(user):
             raise User.DoesNotExist

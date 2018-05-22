@@ -18,7 +18,12 @@ import time
 import unicodecsv
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, ValidationError
+from django.core.exceptions import (
+    MultipleObjectsReturned,
+    ObjectDoesNotExist,
+    PermissionDenied,
+    ValidationError
+)
 from django.core.mail.message import EmailMessage
 from django.core.urlresolvers import reverse
 from django.core.validators import validate_email
@@ -153,6 +158,8 @@ def common_exceptions_400(func):
             return func(request, *args, **kwargs)
         except User.DoesNotExist:
             message = _('User does not exist.')
+        except MultipleObjectsReturned:
+            message = _('Found a conflict with given identifier. Please try an alternative identifier')
         except (AlreadyRunningError, QueueConnectionError) as err:
             message = unicode(err)
 

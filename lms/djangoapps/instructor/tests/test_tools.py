@@ -9,6 +9,7 @@ import unittest
 import mock
 import six
 from django.contrib.auth.models import User
+from django.core.exceptions import MultipleObjectsReturned
 from django.test import TestCase
 from django.test.utils import override_settings
 from pytz import UTC
@@ -365,24 +366,38 @@ class TestStudentFromIdentifier(TestCase):
     """
     Test get_student_from_identifier()
     """
-    def setUp(self):
-        """
-        Fixtures
-        """
-        super(TestStudentFromIdentifier, self).setUp()
-        self.students = [
-            UserFactory.create(username='foo@touchstone'),  # a student with character `@` in user name
-            UserFactory.create()
-        ]
+    @classmethod
+    def setUpClass(cls):
+        super(TestStudentFromIdentifier, cls).setUpClass()
+        cls.valid_student = UserFactory.create(username='baz@touchstone')
+        cls.duplicate_email = UserFactory.create(email='foo@touchstone.com')
+        cls.duplicate_user_name = UserFactory.create(username='foo@touchstone.com')
 
     def test_valid_student_id(self):
-        for student in self.students:
-            assert student == tools.get_student_from_identifier(student.username)
+        """Test with valid username"""
+        assert self.valid_student == tools.get_student_from_identifier(self.valid_student.username)
 
     def test_valid_student_email(self):
-        for student in self.students:
-            assert student == tools.get_student_from_identifier(student.email)
+        """Test with valid email"""
+        assert self.valid_student == tools.get_student_from_identifier(self.valid_student.email)
+
+    def test_student_username_has_conflict_with_others_email(self):
+        """
+        An edge case where there is a user A with username example: foo@touchstone.com and
+        there is user B with email example: foo@touchstone.com
+        """
+        with self.assertRaises(MultipleObjectsReturned):
+            tools.get_student_from_identifier(self.duplicate_user_name.username)
+
+    def test_student_email_has_conflict_with_others_username(self):
+        """
+        An edge case where there is a user A with email example: foo@touchstone.com and
+        there is user B with username example: foo@touchstone.com
+        """
+        with self.assertRaises(MultipleObjectsReturned):
+            tools.get_student_from_identifier(self.duplicate_email.email)
 
     def test_invalid_student_id(self):
+        """Test with invalid identifier"""
         with self.assertRaises(User.DoesNotExist):
             assert tools.get_student_from_identifier("invalid")
