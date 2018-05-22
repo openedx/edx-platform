@@ -71,7 +71,9 @@ urlpatterns = [
     url(r'^$', contentstore.views.howitworks, name='homepage'),
     url(r'^howitworks$', contentstore.views.howitworks, name='howitworks'),
     url(r'^signup$', contentstore.views.signup, name='signup'),
+    url(r'^register$', contentstore.views.signup),
     url(r'^signin$', contentstore.views.login_page, name='login'),
+    url(r'^login$', contentstore.views.login_page),
     url(r'^request_course_creator$', contentstore.views.request_course_creator, name='request_course_creator'),
     url(r'^course_team/{}(?:/(?P<email>.+))?$'.format(COURSELIKE_KEY_PATTERN),
         contentstore.views.course_team_handler, name='course_team_handler'),
@@ -218,6 +220,13 @@ if settings.FEATURES.get('CERTIFICATES_HTML_VIEW'):
             certificates_detail_handler, name='certificates_detail_handler'),
         url(r'^certificates/{}$'.format(settings.COURSE_KEY_PATTERN),
             certificates_list_handler, name='certificates_list_handler')
+    ]
+
+# Third-party auth.
+if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
+    urlpatterns += [
+        url(r'', include('third_party_auth.urls')),
+        url(r'api/third_party_auth/', include('third_party_auth.api.urls')),
     ]
 
 # Maintenance Dashboard

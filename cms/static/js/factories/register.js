@@ -1,6 +1,8 @@
 define(['jquery', 'jquery.cookie'], function($) {
     'use strict';
-    return function() {
+    return function(options) {
+        var $registerForm = $('form#register_form');
+
         $('form :input')
             .focus(function() {
                 $('label[for="' + this.id + '"]').addClass('is-focused');
@@ -9,7 +11,7 @@ define(['jquery', 'jquery.cookie'], function($) {
                 $('label').removeClass('is-focused');
             });
 
-        $('form#register_form').submit(function(event) {
+        $registerForm.submit(function(event) {
             event.preventDefault();
             var submit_data = $('#register_form').serialize();
 
@@ -21,10 +23,15 @@ define(['jquery', 'jquery.cookie'], function($) {
                 notifyOnError: false,
                 data: submit_data,
                 success: function(json) {
-                    location.href = '/course/';
+                    if (json.redirect_url) {
+                        location.href = json.redirect_url;
+                    } else {
+                        location.href = '/course/';
+                    }
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     var json = $.parseJSON(jqXHR.responseText);
+                    $('body').show();
                     $('#register_error').html(json.value).stop().addClass('is-shown');
                 }
             });
@@ -55,5 +62,10 @@ define(['jquery', 'jquery.cookie'], function($) {
                 }
             });
         });
+
+        if (options.autoSubmitRegForm) {
+            $('body').hide();
+            $registerForm.submit();
+        }
     };
 });

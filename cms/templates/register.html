@@ -1,8 +1,14 @@
+<%namespace name='static' file='/static_content.html'/>
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "register" %></%def>
 <%!
+import third_party_auth
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
+from openedx.core.djangolib.js_utils import dump_js_escaped_json
+from third_party_auth import provider, pipeline
+
+providers = provider.Registry.displayed_for_login()
 %>
 
 <%block name="title">${_("Sign Up")}</%block>
@@ -21,6 +27,39 @@ from django.core.urlresolvers import reverse
 
     <article class="content-primary" role="main">
       <form id="register_form" method="post">
+
+        % if third_party_auth.is_enabled() and providers and not running_pipeline:
+        <div class="login-providers">
+          <div class="section-title lines">
+              <h3>
+                  <span class="text">${_("Create an account using")}</span>
+              </h3>
+          </div>
+          % for enabled in providers:
+          <button type="button"
+                  class="button button-primary button-${enabled.provider_id} login-provider register-${enabled.provider_id}"
+                  onclick="thirdPartySignin(event, '${pipeline_urls.get(enabled.provider_id, "")}');">
+            <div class="icon fa ${enabled.icon_class if enabled.icon_class else ''}" aria-hidden="true">
+              % if enabled.icon_image:
+              <img class="icon-image" src="${enabled.icon_image.url}" alt="${enabled.name} icon"  />
+              % endif
+            </div>
+            <span aria-hidden="true">${enabled.name}</span>
+            <span class="sr">${_("Create account using {}".format(enabled.name))}</span>
+          </button>
+          % endfor
+        </div>
+
+        % if not static.get_value('ONLY_THIRD_PARTY_AUTH', settings.FEATURES.get('ONLY_THIRD_PARTY_AUTH', False)):
+        <div class="section-title lines">
+          <h3>
+            <span class="text">${_("or create a new one here")}</span>
+          </h3>
+        </div>
+        % endif
+        % endif
+
+        % if not static.get_value('ONLY_THIRD_PARTY_AUTH', settings.FEATURES.get('ONLY_THIRD_PARTY_AUTH', False)) or running_pipeline:
         <div id="register_error" name="register_error" class="message message-status message-status error">
         </div>
 
@@ -31,23 +70,23 @@ from django.core.urlresolvers import reverse
             <li class="field text required" id="field-email">
               <label for="email">${_("E-mail")}</label>
               ## Translators: This is the placeholder text for a field that requests an email address.
-              <input id="email" type="email" name="email" placeholder="${_("example: username@domain.com")}" />
+              <input id="email" type="email" name="email" placeholder="${_("example: username@domain.com")}" value="${email}"/>
             </li>
 
             <li class="field text required" id="field-name">
               <label for="name">${_("Full Name")}</label>
               ## Translators: This is the placeholder text for a field that requests the user's full name.
-              <input id="name" type="text" name="name" placeholder="${_("example: Jane Doe")}" />
+              <input id="name" type="text" name="name" placeholder="${_("example: Jane Doe")}" value="${name}"/>
             </li>
 
             <li class="field text required" id="field-username">
               <label for="username">${_("Public Username")}</label>
               ## Translators: This is the placeholder text for a field that asks the user to pick a username
-              <input id="username" type="text" name="username" placeholder="${_("example: JaneDoe")}" />
+              <input id="username" type="text" name="username" placeholder="${_("example: JaneDoe")}" value="${username}" />
               <span class="tip tip-stacked">${_("This will be used in public discussions with your courses and in our edX101 support forums")}</span>
             </li>
 
-            <li class="field text required" id="field-password">
+            <li class="field text required ${'is-hidden' if running_pipeline else ''}" id="field-password">
               <label for="password">${_("Password")}</label>
               <input id="password" type="password" name="password" />
               <span id="password_error" class="tip tip-error hidden" role="alert"></span>
@@ -66,7 +105,7 @@ from django.core.urlresolvers import reverse
             </li>
 
             <li class="field checkbox required" id="field-tos">
-              <input id="tos" name="terms_of_service" type="checkbox" value="true" />
+              <input id="tos" name="terms_of_service" type="checkbox" value="true" ${'checked' if running_pipeline else ''} />
               <label for="tos">
                 ${_("I agree to the {a_start} Terms of Service {a_end}").format(a_start='<a data-rel="edx.org" href="{}">'.format(marketing_link('TOS')), a_end="</a>")}
               </label>
@@ -80,6 +119,8 @@ from django.core.urlresolvers import reverse
 
         <!-- no honor code for CMS, but need it because we're using the lms student object -->
         <input name="honor_code" type="checkbox" value="true" checked="true" hidden="true">
+        % endif
+
       </form>
     </article>
 
@@ -111,6 +152,18 @@ from django.core.urlresolvers import reverse
 
 <%block name="requirejs">
     require(["js/factories/register"], function (RegisterFactory) {
-        RegisterFactory();
+        var options = {
+          autoSubmitRegForm: ${selected_provider and selected_provider.skip_registration_form | n, dump_js_escaped_json}
+        }
+        RegisterFactory(options);
     });
+</%block>
+
+<%block name="jsextra">
+  <script type="text/javascript">
+    function thirdPartySignin(event, url) {
+      event.preventDefault();
+      window.location.href = url;
+    }
+  </script>
 </%block>

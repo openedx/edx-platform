@@ -71,6 +71,154 @@
       padding: $baseline ($baseline*1.5);
       background: $white;
 
+      .login-providers {
+        text-align: center;
+        $third-party-button-height: ($baseline*1.75);
+
+        .login-provider {
+          @extend %btn-secondary-grey-outline;
+          @extend %t-action4;
+
+          @include padding(0, 0, 0, $baseline*2);
+          @include text-align(left);
+
+          position: relative;
+          margin-right: ($baseline/4);
+          margin-bottom: ($baseline/4);
+          border-color: $gray-l3;
+          width: $baseline*6.5;
+          height: $third-party-button-height;
+          text-shadow: none;
+          text-transform: none;
+
+          .icon {
+            @extend %sso-icon;
+
+            @include left(0);
+
+            position: absolute;
+            top: -1px;
+            width: 30px;
+            bottom: -1px;
+            background: $blue-d3;
+            line-height: $third-party-button-height;
+            text-align: center;
+            color: $white;
+          }
+
+          span {
+            color: inherit;
+          }
+
+          &:hover,
+          &:focus {
+            background-image: none;
+
+            .icon {
+              top: 0;
+              bottom: 0;
+              line-height: ($third-party-button-height - 2px);
+            }
+          }
+
+          &.button-oa2-google-oauth2 {
+            color: $google-red;
+
+            .icon {
+              background: $google-red;
+            }
+
+            &:hover,
+            &:focus {
+              background-color: $google-red;
+              border: 1px solid #a5382b;
+              color: $white;
+            }
+          }
+
+          &.button-oa2-facebook {
+            color: $facebook-blue;
+
+            .icon {
+              background: $facebook-blue;
+            }
+
+            &:hover,
+            &:focus {
+              background-color: $facebook-blue;
+              border: 1px solid #263a62;
+              color: $white;
+            }
+          }
+
+          &.button-oa2-linkedin-oauth2 {
+            color: $linkedin-blue;
+
+            .icon {
+              background: $linkedin-blue;
+            }
+
+            &:hover,
+            &:focus {
+              background-color: $linkedin-blue;
+              border: 1px solid #06527d;
+              color: $white;
+            }
+          }
+
+          &.button-oa2-azuread-oauth2 {
+            color: $microsoft-black;
+
+            .icon {
+              background: $microsoft-black;
+            }
+
+            &:hover,
+            &:focus {
+              background-color: $microsoft-black;
+              border: 1px solid $microsoft-black;
+              color: $white;
+            }
+          }
+
+        }
+      }
+
+      .section-title {
+        position: relative;
+        margin: $baseline 0 ($baseline/2);
+
+        &.lines {
+          margin-bottom: $baseline;
+          margin-top: $baseline;
+          text-align: center;
+
+          &::after {
+            position: absolute;
+            left: 0;
+            top: ($baseline/2);
+            width: 100%;
+            height: 1px;
+            background: $gray-l3;
+            content: '';
+            z-index: 5;
+          }
+
+          .text {
+            position: relative;
+            top: -2px; // Aligns center of text with center of line (CR)
+            z-index: 6;
+            padding: 0 $baseline;
+            background: $white;
+          }
+        }
+
+        h2 {
+          text-align: center;
+          text-transform: none;
+        }
+      }
+
       .form-actions {
         margin-top: $baseline;
 

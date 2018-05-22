@@ -6,6 +6,10 @@
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.js_utils import js_escaped_string
+import third_party_auth
+from third_party_auth import provider, pipeline
+
+providers = provider.Registry.displayed_for_login()
 %>
 <%block name="title">${_("Sign In")}</%block>
 <%block name="bodyclass">not-signedin view-signin</%block>
@@ -23,7 +27,7 @@ from openedx.core.djangolib.js_utils import js_escaped_string
 
     <article class="content-primary" role="main">
       <form id="login_form" method="post" action="login_post" onsubmit="return false;">
-
+        % if not static.get_value('ONLY_THIRD_PARTY_AUTH', settings.FEATURES.get('ONLY_THIRD_PARTY_AUTH', False)):
         <fieldset>
           <legend class="sr">${_("Required Information to Sign In to {studio_name}").format(studio_name=settings.STUDIO_NAME)}</legend>
           <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf }" />
@@ -48,6 +52,35 @@ from openedx.core.djangolib.js_utils import js_escaped_string
 
         <!-- no honor code for CMS, but need it because we're using the lms student object -->
         <input name="honor_code" type="checkbox" value="true" checked="true" hidden="true">
+        % endif
+
+        % if third_party_auth.is_enabled() and providers:
+        <div class="login-providers">
+          % if not static.get_value('ONLY_THIRD_PARTY_AUTH', settings.FEATURES.get('ONLY_THIRD_PARTY_AUTH', False)):
+          <div class="section-title lines">
+            <h3>
+              <span class="text">${_("or sign in with")}</span>
+            </h3>
+          </div>
+          % endif
+
+          % for enabled in providers:
+          <button type="button"
+                  class="button button-primary button-${enabled.provider_id} login-provider login-${enabled.provider_id}"
+                  onclick="thirdPartySignin(event, '${pipeline.get_login_url(enabled.provider_id, pipeline.AUTH_ENTRY_LOGIN, redirect_url=reverse("home"))}');">
+            <div class="icon fa ${enabled.icon_class if enabled.icon_class else ''}" aria-hidden="true">
+              % if enabled.icon_image:
+              <img class="icon-image" src="${enabled.icon_image.url}" alt="${enabled.name} icon" />
+              % endif
+            </div>
+            <span aria-hidden="true">${enabled.name}</span>
+            <span class="sr">${_("Sign in with {}".format(enabled.name))}</span>
+          </button>
+          % endfor
+
+        </div>
+        % endif
+
       </form>
     </article>
   </section>
@@ -58,4 +91,13 @@ from openedx.core.djangolib.js_utils import js_escaped_string
   <%static:invoke_page_bundle page_name="js/pages/login" class_name="LoginFactory">
     "${reverse('homepage') | n, js_escaped_string}"
   </%static:invoke_page_bundle>
+</%block>
+
+<%block name="jsextra">
+  <script type="text/javascript">
+    function thirdPartySignin(event, url) {
+      event.preventDefault();
+      window.location.href = url;
+    }
+  </script>
 </%block>

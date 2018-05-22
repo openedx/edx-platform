@@ -985,6 +985,7 @@ INSTALLED_APPS = [
 
     # edX Video Pipeline integration
     'openedx.core.djangoapps.video_pipeline',
+    'third_party_auth',
 
     # For CMS
     'contentstore.apps.ContentstoreConfig',
