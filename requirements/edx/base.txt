@@ -214,3 +214,6 @@ xblock==1.0.0
 
 # Third Party XBlocks
 edx-sga==0.6.2
+
+# Redis version
+redis==2.10.6
