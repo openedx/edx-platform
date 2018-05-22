@@ -43,6 +43,9 @@ def reactivation_email_for_user_custom(request, user):
 
 
 def get_course_first_chapter_link(course):
+    """
+    Helper function to get first chapter link in course enrollment email
+    """
     course_key = SlashSeparatedCourseKey.from_deprecated_string(
         course.id.to_deprecated_string())
 
