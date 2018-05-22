@@ -266,7 +266,6 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             self.assertContains(response, "Course End Date")
             self.assertContains(response, "Enrollment Start Date")
             self.assertContains(response, "Enrollment End Date")
-            self.assertContains(response, "not the dates shown on your course summary page")
 
             self.assertContains(response, "Introducing Your Course")
             self.assertContains(response, "Course Card Image")
@@ -418,7 +417,6 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
             self.assertContains(response, "Course End Date")
             self.assertContains(response, "Enrollment Start Date")
             self.assertContains(response, "Enrollment End Date")
-            self.assertNotContains(response, "not the dates shown on your course summary page")
 
             self.assertContains(response, "Introducing Your Course")
             self.assertContains(response, "Course Card Image")
