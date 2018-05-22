@@ -5,6 +5,7 @@ import datetime
 import logging
 from random import randint
 
+import backoff
 import crum
 from celery.exceptions import TimeoutError
 from django.conf import settings
@@ -263,7 +264,23 @@ def _log_sailthru_api_call_time(time_before_call):
              delta_sailthru_api_call_time.microseconds / 1000)
 
 
+def _backoff_handler(details):
+    """
+    Simple logging handler for when timeout backoff occurs.
+    """
+    log.info('Trying again in {wait:0.1f} seconds after {tries} tries calling {target}'.format(**details))
+
+
+def _not_a_timeout(e):
+    return 'timed out' not in e.message
+
+
 @receiver(USER_RETIRE_MAILINGS)
+@backoff.on_exception(backoff.expo,
+                      Exception,
+                      max_time=600,  # Only 10 minutes of trying
+                      giveup=_not_a_timeout,  # Stop trying if exception is *not* a timeout.
+                      on_backoff=_backoff_handler)
 def force_unsubscribe_all(sender, **kwargs):  # pylint: disable=unused-argument
     """
     Synchronously(!) unsubscribes the given user from all Sailthru email lists.
