@@ -273,6 +273,9 @@ def get_journals_root_url():
     Return the base url used to display Journals
     '''
     if journals_enabled():
-        return configuration_helpers.get_configuration_value('JOURNALS_URL_ROOT', settings.JOURNALS_URL_ROOT)
+        return configuration_helpers.get_configuration_value(
+            'JOURNALS_URL_ROOT',
+            settings.JOURNALS_URL_ROOT
+        ) if configuration_helpers.is_site_configuration_enabled() else settings.JOURNALS_URL_ROOT
     else:
         return None
