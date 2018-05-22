@@ -352,7 +352,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-05-06 20:42+0000\n"
+"POT-Creation-Date: 2018-05-20 20:42+0000\n"
 "PO-Revision-Date: 2018-03-13 13:51+0000\n"
 "Last-Translator: zhaojina <zhaojianwei187@126.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -408,6 +408,32 @@ msgstr "单元"
 #: cms/djangoapps/contentstore/views/helpers.py
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Empty"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+#, python-brace-format
+msgid "The following parameters are required: {missing}."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+#, python-brace-format
+msgid "A transcript with the \"{language_code}\" language code already exists."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+msgid "A transcript file is required."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+msgid ""
+"There is a problem with this transcript file. Try to upload a different "
+"file."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/videos.py
@@ -995,6 +1021,14 @@ msgstr ""
 
 #: common/djangoapps/student/views/dashboard.py
 #, python-brace-format
+msgid ""
+"Check your {email_start}{email}{email_end} inbox for an account activation "
+"link from {platform_name}. If you need help, contact "
+"{link_start}{platform_name} Support{link_end}."
+msgstr ""
+
+#: common/djangoapps/student/views/dashboard.py
+#, python-brace-format
 msgid "The course you are looking for does not start until {date}."
 msgstr "您查找的课程将在{date}后开课。"
 
@@ -1070,6 +1104,14 @@ msgstr "无非激活用户与本邮件地址关联。"
 #: common/djangoapps/student/views/login.py
 msgid "Unable to send reactivation email"
 msgstr "无法发送重新激活的电子邮件"
+
+#: common/djangoapps/student/views/login.py
+msgid "Superuser creation not allowed"
+msgstr ""
+
+#: common/djangoapps/student/views/login.py
+msgid "Account modification not allowed."
+msgstr ""
 
 #: common/djangoapps/student/views/login.py
 #: common/djangoapps/student/views/management.py
@@ -1176,6 +1218,10 @@ msgstr ""
 #: common/djangoapps/student/views/management.py
 msgid "Password reset unsuccessful"
 msgstr "重新设置密码不成功"
+
+#: common/djangoapps/student/views/management.py
+msgid "Error in resetting your password."
+msgstr ""
 
 #: common/djangoapps/student/views/management.py
 msgid "Error in resetting your password. Please try again."
@@ -4518,8 +4564,8 @@ msgid "{exception_message}: Can't find uploaded transcripts: {user_filename}"
 msgstr "{exception_message}: 找不到上传的成绩单: {user_filename}"
 
 #: common/lib/xmodule/xmodule/video_module/video_handlers.py
-msgid "Invalid encoding type, transcripts should be UTF-8 encoded."
-msgstr "无效的编码类型，字幕应该是UTF-8编码。"
+msgid "Language is required."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "Basic"
@@ -6427,6 +6473,14 @@ msgstr ""
 
 #: lms/djangoapps/email_marketing/models.py
 msgid "Sailthru send template to use on enrolling for audit. "
+msgstr ""
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "Sailthru send template to use on passed ID verification."
+msgstr ""
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "Sailthru send template to use on failed ID verification."
 msgstr ""
 
 #: lms/djangoapps/email_marketing/models.py
@@ -9026,13 +9080,6 @@ msgstr "该日期之后，用户将不再允许提交照片用于认证了。"
 msgid "Your {platform_name} verification has expired."
 msgstr "您的 {platform_name} 认证已经过期。"
 
-#: lms/djangoapps/verify_student/utils.py
-#, python-brace-format
-msgid ""
-"Could not send verification status email having subject: {subject} and email"
-" of user: {email}"
-msgstr ""
-
 #: lms/djangoapps/verify_student/views.py
 msgid "Intro"
 msgstr "简介"
@@ -11461,24 +11508,24 @@ msgstr ""
 msgid "The information you entered is incorrect."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-#, python-brace-format
-msgid "The following parameters are required: {missing}."
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "Transcripts are supported only for \"video\" modules."
+msgstr "字幕只支持视频模块。"
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "Cannot find item by locator."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-#, python-brace-format
-msgid "A transcript with the \"{language_code}\" language code already exists."
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "Video locator is required."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-msgid "A transcript file is required."
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "This transcript file type is not supported."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-msgid ""
-"There is a problem with this transcript file. Try to upload a different "
-"file."
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "Video ID is required."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
@@ -11490,8 +11537,26 @@ msgid "Can't find item by locator."
 msgstr "定位器无法找到它们。"
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
-msgid "Transcripts are supported only for \"video\" modules."
-msgstr "字幕只支持视频模块。"
+msgid "No such transcript."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "There is a problem with the chosen transcript file."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid ""
+"There is a problem with the existing transcript file. Please upload a "
+"different file."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "YouTube ID is required."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "There is a problem with the YouTube transcript file."
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Insufficient permissions"
@@ -12180,6 +12245,11 @@ msgstr "您尚未参加任何课程。"
 #: themes/edx.org/lms/templates/dashboard.html
 msgid "Explore courses"
 msgstr "探索课程"
+
+#: lms/templates/dashboard.html
+#: lms/templates/registration/account_activation_sidebar_notice.html
+msgid "Activate your account!"
+msgstr ""
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Course-loading errors"
@@ -16418,34 +16488,6 @@ msgstr "这封邮件是由 {site_name} 向 {full_name} 自动发出的"
 msgid "You have been enrolled in {course_name}"
 msgstr "你已经选修了{course_name}"
 
-#: lms/templates/emails/failed_verification_email.txt
-msgid ""
-"Sorry! The photos you submitted for ID verification were not accepted, for "
-"the following reason(s):"
-msgstr ""
-
-#: lms/templates/emails/failed_verification_email.txt
-msgid "The photo(s) of you: {reason}"
-msgstr ""
-
-#: lms/templates/emails/failed_verification_email.txt
-msgid "Resubmit Verification: {reverify_url}"
-msgstr ""
-
-#: lms/templates/emails/failed_verification_email.txt
-#: lms/templates/emails/order_confirmation_email.txt
-#: lms/templates/emails/photo_submission_confirmation.txt
-#: lms/templates/emails/successfull_verification_email.txt
-msgid "Thank you,"
-msgstr "谢谢，"
-
-#: lms/templates/emails/failed_verification_email.txt
-#: lms/templates/emails/photo_submission_confirmation.txt
-#: lms/templates/emails/reverification_processed.txt
-#: lms/templates/emails/successfull_verification_email.txt
-msgid "The {platform_name} team"
-msgstr "{platform_name}团队"
-
 #: lms/templates/emails/order_confirmation_email.txt
 msgid ""
 "Your payment was successful. You will see the charge below on your next "
@@ -16453,11 +16495,15 @@ msgid ""
 msgstr "你已付款成功。你最近一期的信用卡或储蓄卡结单将会包括来自公司名{merchant_name}的扣款。"
 
 #: lms/templates/emails/order_confirmation_email.txt
+#: lms/templates/emails/photo_submission_confirmation.txt
+msgid "Thank you,"
+msgstr "谢谢，"
+
+#: lms/templates/emails/order_confirmation_email.txt
 msgid "Your order number is: {order_number}"
 msgstr "您的订单号为：{order_number}"
 
 #: lms/templates/emails/photo_submission_confirmation.txt
-#: lms/templates/emails/successfull_verification_email.txt
 msgid "Hi {full_name},"
 msgstr "{full_name}您好，"
 
@@ -16472,6 +16518,11 @@ msgid ""
 "your verification was successful.You can also check the status of the "
 "verification process on your dashboard."
 msgstr ""
+
+#: lms/templates/emails/photo_submission_confirmation.txt
+#: lms/templates/emails/reverification_processed.txt
+msgid "The {platform_name} team"
+msgstr "{platform_name}团队"
 
 #: lms/templates/emails/registration_codes_sale_email.txt
 msgid "Thank you for purchasing enrollments in {course_name}."
@@ -16674,15 +16725,6 @@ msgstr "如果您有任何问题，您可以联系学生支持团队{support_lin
 #: lms/templates/emails/reverification_processed.txt
 msgid "Thanks,"
 msgstr "谢谢，"
-
-#: lms/templates/emails/successfull_verification_email.txt
-msgid "Congratulations! Your ID verification process was successful."
-msgstr ""
-
-#: lms/templates/emails/successfull_verification_email.txt
-msgid ""
-"Your verification is effective for one year. It will expire on {expiry_date}"
-msgstr ""
 
 #: lms/templates/emails/unenroll_email_allowedmessage.txt
 msgid "Dear Student,"
@@ -18710,29 +18752,6 @@ msgstr "管理您的数据：{permission}"
 msgid "Account Activation Info"
 msgstr ""
 
-#: lms/templates/registration/account_activation_sidebar_notice.html
-msgid "Activate your account!"
-msgstr ""
-
-#: lms/templates/registration/account_activation_sidebar_notice.html
-msgid ""
-"Check your {email_start}{email}{email_end} inbox for an account activation "
-"link from {platform_name}. If you need help, contact "
-"{link_start}{platform_name} Support{link_end}."
-msgstr ""
-
-#: lms/templates/registration/activate_account_notice.html
-msgid "You're almost there!"
-msgstr ""
-
-#: lms/templates/registration/activate_account_notice.html
-msgid ""
-"There's just one more step: Before you enroll in a course, you need to "
-"activate your account. We've sent an email message to "
-"{email_start}{email}{email_end} with instructions for activating your "
-"account. If you don't receive this message, check your spam folder."
-msgstr ""
-
 #: lms/templates/registration/password_reset_complete.html
 msgid "Your Password Reset is Complete"
 msgstr "您的密码重置已完成"
@@ -19699,6 +19718,10 @@ msgstr ""
 #: themes/edx.org/lms/templates/dashboard.html
 msgid "Explore New Courses"
 msgstr "探索新课程"
+
+#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+msgid "View My Records"
+msgstr ""
 
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
 msgid "My Profile"

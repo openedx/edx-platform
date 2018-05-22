@@ -85,7 +85,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-05-06 20:42+0000\n"
+"POT-Creation-Date: 2018-05-20 20:42+0000\n"
 "PO-Revision-Date: 2018-05-02 07:51+0000\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
@@ -93,7 +93,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % 1 == 0) ? 1: (n % 10 == 0 && n % 1 == 0 && n > 10) ? 2 : 3;\n"
 "Generated-By: Babel 1.3\n"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
@@ -144,6 +144,32 @@ msgstr "יחידה"
 #: cms/djangoapps/contentstore/views/helpers.py
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Empty"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+#, python-brace-format
+msgid "The following parameters are required: {missing}."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+#, python-brace-format
+msgid "A transcript with the \"{language_code}\" language code already exists."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+msgid "A transcript file is required."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+msgid ""
+"There is a problem with this transcript file. Try to upload a different "
+"file."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/videos.py
@@ -753,6 +779,14 @@ msgstr "תמונה מזהה מטושטשת"
 
 #: common/djangoapps/student/views/dashboard.py
 #, python-brace-format
+msgid ""
+"Check your {email_start}{email}{email_end} inbox for an account activation "
+"link from {platform_name}. If you need help, contact "
+"{link_start}{platform_name} Support{link_end}."
+msgstr ""
+
+#: common/djangoapps/student/views/dashboard.py
+#, python-brace-format
 msgid "The course you are looking for does not start until {date}."
 msgstr "הקורס שאתה מחפש לא מתחיל עד {date}."
 
@@ -842,6 +876,14 @@ msgstr "לא קיים משתמש לא-פעיל עבור כתובת דואר אל
 #: common/djangoapps/student/views/login.py
 msgid "Unable to send reactivation email"
 msgstr "אין אפשרות לשלוח דואר אלקטרוני הפעלה"
+
+#: common/djangoapps/student/views/login.py
+msgid "Superuser creation not allowed"
+msgstr ""
+
+#: common/djangoapps/student/views/login.py
+msgid "Account modification not allowed."
+msgstr ""
 
 #: common/djangoapps/student/views/login.py
 #: common/djangoapps/student/views/management.py
@@ -952,6 +994,10 @@ msgstr ""
 #: common/djangoapps/student/views/management.py
 msgid "Password reset unsuccessful"
 msgstr "איפוס סיסמה נכשל"
+
+#: common/djangoapps/student/views/management.py
+msgid "Error in resetting your password."
+msgstr ""
 
 #: common/djangoapps/student/views/management.py
 msgid "Error in resetting your password. Please try again."
@@ -1445,6 +1491,8 @@ msgid_plural ""
 "The file must end with one of the following extensions: '{file_types}'."
 msgstr[0] "הקובץ חייב להסתיים עם התוסף '{file_types}'."
 msgstr[1] "הקובץ חייב להסתיים באחד מהתוספים הבאים: '{file_types}'."
+msgstr[2] "הקובץ חייב להסתיים באחד מהתוספים הבאים: '{file_types}'."
+msgstr[3] "הקובץ חייב להסתיים באחד מהתוספים הבאים: '{file_types}'."
 
 #: common/djangoapps/util/file.py
 #, python-brace-format
@@ -1467,6 +1515,8 @@ msgid "{num} letter"
 msgid_plural "{num} letters"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #. Translators: This appears in a list of password requirements
 #: common/djangoapps/util/password_policy_validators.py
@@ -1475,6 +1525,8 @@ msgid "{num} uppercase letter"
 msgid_plural "{num} uppercase letters"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #. Translators: This appears in a list of password requirements
 #: common/djangoapps/util/password_policy_validators.py
@@ -1483,6 +1535,8 @@ msgid "{num} lowercase letter"
 msgid_plural "{num} lowercase letters"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #. Translators: This appears in a list of password requirements
 #: common/djangoapps/util/password_policy_validators.py
@@ -1491,6 +1545,8 @@ msgid "{num} digit"
 msgid_plural "{num} digits"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #. Translators: This appears in a list of password requirements
 #: common/djangoapps/util/password_policy_validators.py
@@ -1499,6 +1555,8 @@ msgid "{num} number"
 msgid_plural "{num} numbers"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #. Translators: This appears in a list of password requirements
 #: common/djangoapps/util/password_policy_validators.py
@@ -1507,6 +1565,8 @@ msgid "{num} punctuation mark"
 msgid_plural "{num} punctuation marks"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #. Translators: This appears in a list of password requirements
 #: common/djangoapps/util/password_policy_validators.py
@@ -1515,6 +1575,8 @@ msgid "{num} symbol"
 msgid_plural "{num} symbols"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #. Translators: This appears in a list of password requirements
 #: common/djangoapps/util/password_policy_validators.py
@@ -1523,6 +1585,8 @@ msgid "{num} word"
 msgid_plural "{num} words"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
@@ -1530,6 +1594,8 @@ msgid "Your password must contain at least {num} character."
 msgid_plural "Your password must contain at least {num} characters."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
@@ -1541,6 +1607,8 @@ msgid_plural ""
 "{requirements}."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "Invalid password."
@@ -1565,6 +1633,12 @@ msgstr[0] ""
 msgstr[1] ""
 "הינך ממחזר סיסמה שהשתמשת בה לאחרונה. עליך ליצור {num} סיסמאות ייחודיות בטרם "
 "תמחזר סיסמה קודמת."
+msgstr[2] ""
+"הינך ממחזר סיסמה שהשתמשת בה לאחרונה. עליך ליצור {num} סיסמאות ייחודיות בטרם "
+"תמחזר סיסמה קודמת."
+msgstr[3] ""
+"הינך ממחזר סיסמה שהשתמשת בה לאחרונה. עליך ליצור {num} סיסמאות ייחודיות בטרם "
+"תמחזר סיסמה קודמת."
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
@@ -1580,6 +1654,12 @@ msgstr[0] ""
 msgstr[1] ""
 "אתה מאפס סיסמאות לעיתים קרובות מדי. בשל מדיניות אבטחה, חייבים לעבור {num} "
 "ימים בין איפוסי הסיסמה."
+msgstr[2] ""
+"אתה מאפס סיסמאות לעיתים קרובות מדי. בשל מדיניות אבטחה, חייבים לעבור {num} "
+"ימים בין איפוסי הסיסמה."
+msgstr[3] ""
+"אתה מאפס סיסמאות לעיתים קרובות מדי. בשל מדיניות אבטחה, חייבים לעבור {num} "
+"ימים בין איפוסי הסיסמה."
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
@@ -1587,6 +1667,8 @@ msgid "{num} character"
 msgid_plural "{num} characters"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
@@ -1594,6 +1676,8 @@ msgid "Enter a password with at most {num} character."
 msgid_plural "Enter a password with at most {num} characters."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #. Translators: This message is shown to users who enter a password matching
 #. the username they enter(ed).
@@ -2398,6 +2482,8 @@ msgid "Incorrect ({progress} point)"
 msgid_plural "Incorrect ({progress} points)"
 msgstr[0] "(נקודה שגויה {progress})"
 msgstr[1] "({progress} נקודות שגויות)"
+msgstr[2] "({progress} נקודות שגויות)"
+msgstr[3] "({progress} נקודות שגויות)"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #, python-brace-format
@@ -2405,6 +2491,8 @@ msgid "Correct ({progress} point)"
 msgid_plural "Correct ({progress} points)"
 msgstr[0] "(נקודה נכונה {progress})"
 msgstr[1] "({progress} נקודות נכונות)"
+msgstr[2] "({progress} נקודות נכונות)"
+msgstr[3] "({progress} נקודות נכונות)"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #, python-brace-format
@@ -2412,6 +2500,8 @@ msgid "Partially correct ({progress} point)"
 msgid_plural "Partially correct ({progress} points)"
 msgstr[0] "נקודה נכונה חלקית ({progress})"
 msgstr[1] " ({progress} נקודות נכונות חלקית)"
+msgstr[2] " ({progress} נקודות נכונות חלקית)"
+msgstr[3] " ({progress} נקודות נכונות חלקית)"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Partially Correct"
@@ -2449,6 +2539,8 @@ msgid "{num_hour} hour"
 msgid_plural "{num_hour} hours"
 msgstr[0] "{num_hour} שעה"
 msgstr[1] "{num_hour} שעות"
+msgstr[2] "{num_hour} שעות"
+msgstr[3] "{num_hour} שעות"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #, python-brace-format
@@ -2456,6 +2548,8 @@ msgid "{num_minute} minute"
 msgid_plural "{num_minute} minutes"
 msgstr[0] "{num_minute} דקה"
 msgstr[1] "{num_minute} דקות"
+msgstr[2] "{num_minute} דקות"
+msgstr[3] "{num_minute} דקות"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #, python-brace-format
@@ -2463,6 +2557,8 @@ msgid "{num_second} second"
 msgid_plural "{num_second} seconds"
 msgstr[0] "{num_second} שניה"
 msgstr[1] "{num_second} שניות"
+msgstr[2] "{num_second} שניות"
+msgstr[3] "{num_second} שניות"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Problem needs to be reset prior to save."
@@ -3775,6 +3871,8 @@ msgid "The specified library is configured to fetch {count} problem, "
 msgid_plural "The specified library is configured to fetch {count} problems, "
 msgstr[0] "הספריה שצוינה מוגדרת למשיכת בעיה {count}, "
 msgstr[1] "הספרייה שצוינה מוגדרת למשיכת {count}בעיות, "
+msgstr[2] "הספרייה שצוינה מוגדרת למשיכת {count}בעיות, "
+msgstr[3] "הספרייה שצוינה מוגדרת למשיכת {count}בעיות, "
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 #, python-brace-format
@@ -3782,6 +3880,8 @@ msgid "but there is only {actual} matching problem."
 msgid_plural "but there are only {actual} matching problems."
 msgstr[0] "אך יש רק בעיית התאמה {actual}."
 msgstr[1] "אך יש רק {actual} בעיות התאמה."
+msgstr[2] "אך יש רק {actual} בעיות התאמה."
+msgstr[3] "אך יש רק {actual} בעיות התאמה."
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Edit the library configuration."
@@ -4550,8 +4650,8 @@ msgstr ""
 "{exception_message}: לא ניתן למצוא את התעתיקים שהועלו: {user_filename}"
 
 #: common/lib/xmodule/xmodule/video_module/video_handlers.py
-msgid "Invalid encoding type, transcripts should be UTF-8 encoded."
-msgstr "סוג הקידוד אינו חוקי, על התמליל להיות מקודד ב-UTF-8 "
+msgid "Language is required."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "Basic"
@@ -4564,6 +4664,8 @@ msgid_plural ""
 "There are no transcript files associated with the {lang} languages."
 msgstr[0] "אין קובצי תמלול המשויכים לשפה {lang}."
 msgstr[1] "אין קבצי תמלול המשוייכים ל- {lang} שפות."
+msgstr[2] "אין קבצי תמלול המשוייכים ל- {lang} שפות."
+msgstr[3] "אין קבצי תמלול המשוייכים ל- {lang} שפות."
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid ""
@@ -6557,6 +6659,14 @@ msgid "Sailthru send template to use on enrolling for audit. "
 msgstr "Sailthru שולחת תבנית לשימוש ברישום לביקורת."
 
 #: lms/djangoapps/email_marketing/models.py
+msgid "Sailthru send template to use on passed ID verification."
+msgstr ""
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "Sailthru send template to use on failed ID verification."
+msgstr ""
+
+#: lms/djangoapps/email_marketing/models.py
 msgid "Sailthru send template to use on upgrading a course. Deprecated "
 msgstr "Sailthru שולחת תבנית לשימוש בעדכון קורס. מיושן"
 
@@ -7323,6 +7433,8 @@ msgid "{num_emails} sent"
 msgid_plural "{num_emails} sent"
 msgstr[0] "{num_emails} נשלחו"
 msgstr[1] "{num_emails} נשלחו"
+msgstr[2] "{num_emails} נשלחו"
+msgstr[3] "{num_emails} נשלחו"
 
 #: lms/djangoapps/instructor/views/instructor_task_helpers.py
 #, python-brace-format
@@ -7330,6 +7442,8 @@ msgid "{num_emails} failed"
 msgid_plural "{num_emails} failed"
 msgstr[0] "{num_emails} נכשלו"
 msgstr[1] "{num_emails} נכשלו"
+msgstr[2] "{num_emails} נכשלו"
+msgstr[3] "{num_emails} נכשלו"
 
 #: lms/djangoapps/instructor/views/instructor_task_helpers.py
 msgid "Complete"
@@ -9238,13 +9352,6 @@ msgstr "התאריך והשעה שלאחריהם לא ניתן לשלוח תמו
 #, python-brace-format
 msgid "Your {platform_name} verification has expired."
 msgstr "אימות ל {platform_name} פג תוקף."
-
-#: lms/djangoapps/verify_student/utils.py
-#, python-brace-format
-msgid ""
-"Could not send verification status email having subject: {subject} and email"
-" of user: {email}"
-msgstr ""
 
 #: lms/djangoapps/verify_student/views.py
 msgid "Intro"
@@ -11763,24 +11870,24 @@ msgstr ""
 msgid "The information you entered is incorrect."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-#, python-brace-format
-msgid "The following parameters are required: {missing}."
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "Transcripts are supported only for \"video\" modules."
+msgstr "תמלילים נתמכים רק במודולים מסוג \"וידאו\". "
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "Cannot find item by locator."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-#, python-brace-format
-msgid "A transcript with the \"{language_code}\" language code already exists."
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "Video locator is required."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-msgid "A transcript file is required."
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "This transcript file type is not supported."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-msgid ""
-"There is a problem with this transcript file. Try to upload a different "
-"file."
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "Video ID is required."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
@@ -11792,8 +11899,26 @@ msgid "Can't find item by locator."
 msgstr "לא ניתן לאתר פריט באמצעות מאתר."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
-msgid "Transcripts are supported only for \"video\" modules."
-msgstr "תמלילים נתמכים רק במודולים מסוג \"וידאו\". "
+msgid "No such transcript."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "There is a problem with the chosen transcript file."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid ""
+"There is a problem with the existing transcript file. Please upload a "
+"different file."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "YouTube ID is required."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "There is a problem with the YouTube transcript file."
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Insufficient permissions"
@@ -12397,6 +12522,8 @@ msgid "%s discussion started"
 msgid_plural "%s discussions started"
 msgstr[0] "דיון %s החל"
 msgstr[1] "%s דיונים שהחלו"
+msgstr[2] "%s דיונים שהחלו"
+msgstr[3] "%s דיונים שהחלו"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 #: lms/templates/discussion/_user_profile.html
@@ -12405,6 +12532,8 @@ msgid "%s comment"
 msgid_plural "%s comments"
 msgstr[0] "תגובה %s"
 msgstr[1] "%s תגובות"
+msgstr[2] "%s תגובות"
+msgstr[3] "%s תגובות"
 
 #: lms/djangoapps/discussion/templates/discussion/maintenance_fragment.html
 msgid "Discussion unavailable"
@@ -12488,6 +12617,11 @@ msgstr "אינך רשום עדיין באף קורס."
 #: themes/edx.org/lms/templates/dashboard.html
 msgid "Explore courses"
 msgstr "גלה קורסים"
+
+#: lms/templates/dashboard.html
+#: lms/templates/registration/account_activation_sidebar_notice.html
+msgid "Activate your account!"
+msgstr ""
 
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Course-loading errors"
@@ -12873,6 +13007,12 @@ msgstr[0] ""
 msgstr[1] ""
 "מציג את כל התוכן התואם ושניתן להוסיף ל{display_name}. לכל סטודנט יוקצו "
 "{max_count} רכיבים שנשלפו באופן אקראי מרשימה זו."
+msgstr[2] ""
+"מציג את כל התוכן התואם ושניתן להוסיף ל{display_name}. לכל סטודנט יוקצו "
+"{max_count} רכיבים שנשלפו באופן אקראי מרשימה זו."
+msgstr[3] ""
+"מציג את כל התוכן התואם ושניתן להוסיף ל{display_name}. לכל סטודנט יוקצו "
+"{max_count} רכיבים שנשלפו באופן אקראי מרשימה זו."
 
 #: lms/templates/login-sidebar.html
 msgid "Helpful Information"
@@ -13121,6 +13261,8 @@ msgid "You have used {num_used} of {num_total} attempt"
 msgid_plural "You have used {num_used} of {num_total} attempts"
 msgstr[0] "השתמשת בניסיון {num_used} מתוך {num_total}"
 msgstr[1] "השתמשת ב-{num_used} מתוך {num_total} ניסיונות"
+msgstr[2] "השתמשת ב-{num_used} מתוך {num_total} ניסיונות"
+msgstr[3] "השתמשת ב-{num_used} מתוך {num_total} ניסיונות"
 
 #: lms/templates/problem.html
 msgid ""
@@ -16144,6 +16286,8 @@ msgid "You only have {days} day left to verify for this course."
 msgid_plural "You only have {days} days left to verify for this course."
 msgstr[0] "יש לך יום {days} לאימות קורס זה."
 msgstr[1] "נשארו לך רק {days} ימים לאימות קורס זה."
+msgstr[2] "נשארו לך רק {days} ימים לאימות קורס זה."
+msgstr[3] "נשארו לך רק {days} ימים לאימות קורס זה."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Almost there!"
@@ -16982,34 +17126,6 @@ msgstr "הודעה זו נשלחה באופן אוטומטי מ{site_name} ל{fu
 msgid "You have been enrolled in {course_name}"
 msgstr "נרשמת לקורס {course_name}"
 
-#: lms/templates/emails/failed_verification_email.txt
-msgid ""
-"Sorry! The photos you submitted for ID verification were not accepted, for "
-"the following reason(s):"
-msgstr ""
-
-#: lms/templates/emails/failed_verification_email.txt
-msgid "The photo(s) of you: {reason}"
-msgstr ""
-
-#: lms/templates/emails/failed_verification_email.txt
-msgid "Resubmit Verification: {reverify_url}"
-msgstr ""
-
-#: lms/templates/emails/failed_verification_email.txt
-#: lms/templates/emails/order_confirmation_email.txt
-#: lms/templates/emails/photo_submission_confirmation.txt
-#: lms/templates/emails/successfull_verification_email.txt
-msgid "Thank you,"
-msgstr "תודה רבה,"
-
-#: lms/templates/emails/failed_verification_email.txt
-#: lms/templates/emails/photo_submission_confirmation.txt
-#: lms/templates/emails/reverification_processed.txt
-#: lms/templates/emails/successfull_verification_email.txt
-msgid "The {platform_name} team"
-msgstr "צוות {platform_name}"
-
 #: lms/templates/emails/order_confirmation_email.txt
 msgid ""
 "Your payment was successful. You will see the charge below on your next "
@@ -17019,11 +17135,15 @@ msgstr ""
 "{merchant_name}. "
 
 #: lms/templates/emails/order_confirmation_email.txt
+#: lms/templates/emails/photo_submission_confirmation.txt
+msgid "Thank you,"
+msgstr "תודה רבה,"
+
+#: lms/templates/emails/order_confirmation_email.txt
 msgid "Your order number is: {order_number}"
 msgstr "מספר הזמנתך הוא: {order_number}"
 
 #: lms/templates/emails/photo_submission_confirmation.txt
-#: lms/templates/emails/successfull_verification_email.txt
 msgid "Hi {full_name},"
 msgstr "היי  {full_name},"
 
@@ -17038,6 +17158,11 @@ msgid ""
 "your verification was successful.You can also check the status of the "
 "verification process on your dashboard."
 msgstr ""
+
+#: lms/templates/emails/photo_submission_confirmation.txt
+#: lms/templates/emails/reverification_processed.txt
+msgid "The {platform_name} team"
+msgstr "צוות {platform_name}"
 
 #: lms/templates/emails/registration_codes_sale_email.txt
 msgid "Thank you for purchasing enrollments in {course_name}."
@@ -17253,15 +17378,6 @@ msgstr ""
 #: lms/templates/emails/reverification_processed.txt
 msgid "Thanks,"
 msgstr "תודה,"
-
-#: lms/templates/emails/successfull_verification_email.txt
-msgid "Congratulations! Your ID verification process was successful."
-msgstr ""
-
-#: lms/templates/emails/successfull_verification_email.txt
-msgid ""
-"Your verification is effective for one year. It will expire on {expiry_date}"
-msgstr ""
 
 #: lms/templates/emails/unenroll_email_allowedmessage.txt
 msgid "Dear Student,"
@@ -19407,32 +19523,6 @@ msgstr "נהל את נתוניך: {permission}"
 msgid "Account Activation Info"
 msgstr ""
 
-#: lms/templates/registration/account_activation_sidebar_notice.html
-msgid "Activate your account!"
-msgstr ""
-
-#: lms/templates/registration/account_activation_sidebar_notice.html
-msgid ""
-"Check your {email_start}{email}{email_end} inbox for an account activation "
-"link from {platform_name}. If you need help, contact "
-"{link_start}{platform_name} Support{link_end}."
-msgstr ""
-
-#: lms/templates/registration/activate_account_notice.html
-msgid "You're almost there!"
-msgstr "אתה כמעט שם!"
-
-#: lms/templates/registration/activate_account_notice.html
-msgid ""
-"There's just one more step: Before you enroll in a course, you need to "
-"activate your account. We've sent an email message to "
-"{email_start}{email}{email_end} with instructions for activating your "
-"account. If you don't receive this message, check your spam folder."
-msgstr ""
-"רק עוד צעד אחד: לפני שתירשם לקורס, עליך להפעיל את חשבונך. שלחנו הודעת דואר "
-"אלקטרוני אל  {email_start}{email}{email_end} עם הוראות להפעלת החשבון. אם "
-"אינך מקבל הודעה זו, בדוק את תיקיית דואר הזבל שלך."
-
 #: lms/templates/registration/password_reset_complete.html
 msgid "Your Password Reset is Complete"
 msgstr "איפוס סיסמתך הושלם"
@@ -19598,6 +19688,10 @@ msgid_plural ""
 msgstr[0] ""
 "רכשת בהצלחה את <b>{number} קוד הרשמה לקורס</b> עבור {course_names}."
 msgstr[1] ""
+"רכשת בהצלחה את <b>{number} קודי ההרשמה לקורס</b> עבור {course_names}."
+msgstr[2] ""
+"רכשת בהצלחה את <b>{number} קודי ההרשמה לקורס</b> עבור {course_names}."
+msgstr[3] ""
 "רכשת בהצלחה את <b>{number} קודי ההרשמה לקורס</b> עבור {course_names}."
 
 #: lms/templates/shoppingcart/receipt.html
@@ -19793,6 +19887,8 @@ msgid_plural ""
 "{course_names} have been removed because the enrollment period has closed."
 msgstr[0] "{course_names} הוסרו מאחר שפרק הזמן להרשמה נסגר."
 msgstr[1] "{course_names} הוסרו היות ופרק הזמן להרשמה נסגר."
+msgstr[2] "{course_names} הוסרו היות ופרק הזמן להרשמה נסגר."
+msgstr[3] "{course_names} הוסרו היות ופרק הזמן להרשמה נסגר."
 
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid "Cover Image"
@@ -20444,6 +20540,10 @@ msgstr ""
 #: themes/edx.org/lms/templates/dashboard.html
 msgid "Explore New Courses"
 msgstr "חקור קורסים חדשים"
+
+#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+msgid "View My Records"
+msgstr ""
 
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
 msgid "My Profile"
