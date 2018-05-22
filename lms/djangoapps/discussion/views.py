@@ -61,22 +61,25 @@ PAGES_NEARBY_DELTA = 2
 BOOTSTRAP_DISCUSSION_CSS_PATH = 'css/discussion/lms-discussion-bootstrap.css'
 
 
-def make_course_settings(course, user):
+def make_course_settings(course, user, include_category_map=True):
     """
     Generate a JSON-serializable model for course settings, which will be used to initialize a
     DiscussionCourseSettings object on the client.
     """
     course_discussion_settings = get_course_discussion_settings(course.id)
     group_names_by_id = get_group_names_by_id(course_discussion_settings)
-    return {
+    course_setting = {
         'is_discussion_division_enabled': course_discussion_division_enabled(course_discussion_settings),
         'allow_anonymous': course.allow_anonymous,
         'allow_anonymous_to_peers': course.allow_anonymous_to_peers,
         'groups': [
             {"id": str(group_id), "name": group_name} for group_id, group_name in group_names_by_id.iteritems()
-        ],
-        'category_map': utils.get_discussion_category_map(course, user)
+        ]
     }
+    if include_category_map:
+        course_setting['category_map'] = utils.get_discussion_category_map(course, user)
+
+    return course_setting
 
 
 def get_threads(request, course, user_info, discussion_id=None, per_page=THREADS_PER_PAGE):
@@ -234,7 +237,7 @@ def inline_discussion(request, course_key, discussion_id):
         'page': query_params['page'],
         'num_pages': query_params['num_pages'],
         'roles': utils.get_role_ids(course_key),
-        'course_settings': make_course_settings(course, request.user)
+        'course_settings': make_course_settings(course, request.user, False)
     })
 
 
