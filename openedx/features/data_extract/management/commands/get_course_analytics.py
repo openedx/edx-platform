@@ -77,7 +77,7 @@ class Command(BaseCommand):
 
             user_profiles = get_enrolled_students(target_course.course_id)
             # filter users that are from eu_states
-            user_profiles = list(filter((lambda x: x.country not in eu_states), user_profiles))
+            # user_profiles = list(filter((lambda x: x.country not in eu_states), user_profiles))
             # get dict of anonymous user ids
             anon_user_ids = dict(list(map(lambda x: (x.user.username, x.anonymous_user_id,),
                                           AnonymousUserId.objects.filter(course_id=course_key))))
