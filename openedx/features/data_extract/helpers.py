@@ -1,5 +1,6 @@
 import requests
 import json
+from urlparse import urlparse, unquote
 
 from django.conf import settings
 
@@ -16,6 +17,9 @@ from submissions.models import StudentItem, Submission, Score
 
 
 def get_file_url(answer):
+    """
+    returns the signed URL of the file
+    """
     if answer.get('file_key'):
         return ora_file_upload_api.get_download_url(answer['file_key'])
     return None
