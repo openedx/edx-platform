@@ -92,6 +92,7 @@ class Command(BaseCommand):
                 })
             with tempfile.NamedTemporaryFile() as tmp:
                 tmp.write(json.dumps(course_data))
+                tmp.flush()
                 pyminizip.compress(tmp.name, '/tmp/data.zip', options['password'], 1)
                 for email in emails:
                     email_message = EmailMessage(
