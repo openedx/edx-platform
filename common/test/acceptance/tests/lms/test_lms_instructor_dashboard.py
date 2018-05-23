@@ -421,6 +421,23 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         exam_attempts_section.remove_student_attempt()
         self.assertFalse(exam_attempts_section.is_student_attempt_visible)
 
+    def test_can_add_remove_allowance(self):
+        """
+            Make sure that allowances can be added and removed.
+            """
+        # Given that an exam has been configured to be a timed exam.
+        self._create_a_timed_exam_and_attempt()
+
+        # When I log in as an instructor,
+        __, __ = self.log_in_as_instructor()
+
+        # And visit the Allowance Section of Instructor Dashboard's Special Exams tab
+        instructor_dashboard_page = self.visit_instructor_dashboard()
+        allowance_section = instructor_dashboard_page.select_special_exams().select_allowance_section()
+
+        # Then I can add Allowance to that exam for a student
+        self.assertTrue(allowance_section.is_add_allowance_button_visible)
+
 
 @attr(shard=10)
 @ddt.ddt
