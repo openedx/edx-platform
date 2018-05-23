@@ -4,7 +4,6 @@
 #
 #    make upgrade
 #
-
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
 -e common/lib/calc
 -e common/lib/capa
@@ -35,7 +34,6 @@ git+https://github.com/edx/edx-ora2.git@2.1.16#egg=ora2==2.1.16
 -e git+https://github.com/dementrock/pystache_custom.git@776973740bdaad83a3b029f96e415a7d1e8bec2f#egg=pystache_custom-dev
 -e git+https://github.com/edx/RateXBlock.git@367e19c0f6eac8a5f002fd0f1559555f8e74bfff#egg=rate-xblock
 git+https://github.com/edx/RecommenderXBlock.git@1.3#egg=recommender-xblock==1.3
-git+https://github.com/edx/rfc6266.git@v0.0.5-edx#egg=rfc6266==0.0.5-edx
 -e common/lib/safe_lxml
 -e common/lib/sandbox-packages
 -e common/lib/symmath
@@ -55,6 +53,7 @@ argh==0.26.2
 argparse==1.4.0
 asn1crypto==0.24.0
 astroid==1.5.2
+atomicwrites==1.1.5
 attrs==17.4.0
 babel==1.3
 backports.functools-lru-cache==1.5
@@ -63,7 +62,7 @@ beautifulsoup==3.2.1
 before-after==1.0.1
 billiard==3.3.0.23
 bleach==1.4
-bok-choy==0.7.2
+bok-choy==0.7.3
 boto3==1.4.8
 boto==2.39.0
 botocore==1.8.17
@@ -271,7 +270,7 @@ pytest-django==3.1.2
 pytest-forked==0.2
 pytest-randomly==1.2.3
 pytest-xdist==1.22.2
-pytest==3.5.1
+pytest==3.6.0
 python-dateutil==2.4.0
 python-levenshtein==0.12.0
 python-memcached==1.48
@@ -290,6 +289,7 @@ redis==2.10.6
 reportlab==3.1.44
 requests-oauthlib==0.6.1
 requests==2.9.1
+rfc6266-parser==0.0.5.post2
 rules==1.3
 s3transfer==0.1.13
 sailthru-client==2.2.3
