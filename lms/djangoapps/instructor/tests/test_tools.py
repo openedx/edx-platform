@@ -389,6 +389,9 @@ class TestStudentFromIdentifier(TestCase):
         with self.assertRaises(MultipleObjectsReturned):
             tools.get_student_from_identifier(self.duplicate_user_name.username)
 
+        # can get student with alternative identifier, in this case email.
+        assert self.duplicate_user_name == tools.get_student_from_identifier(self.duplicate_user_name.email)
+
     def test_student_email_has_conflict_with_others_username(self):
         """
         An edge case where there is a user A with email example: foo@touchstone.com and
@@ -396,6 +399,9 @@ class TestStudentFromIdentifier(TestCase):
         """
         with self.assertRaises(MultipleObjectsReturned):
             tools.get_student_from_identifier(self.duplicate_email.email)
+
+        # can get student with alternative identifier, in this case username.
+        assert self.duplicate_email == tools.get_student_from_identifier(self.duplicate_email.username)
 
     def test_invalid_student_id(self):
         """Test with invalid identifier"""
