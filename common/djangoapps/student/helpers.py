@@ -337,7 +337,7 @@ def get_redirect_to(request):
             )
             redirect_to = None
         elif 'text/html' not in header_accept:
-            log.warning(
+            log.info(
                 u'Redirect to non html content %(content_type)r detected from %(user_agent)r'
                 u' after login page: %(redirect_to)r',
                 {
