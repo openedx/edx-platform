@@ -14,6 +14,7 @@ from openedx.core.djangoapps.theming.storage import ThemeCachedFilesMixin, Theme
 import pytz
 from datetime import datetime, timedelta
 
+
 class ProductionStorage(
         PipelineForgivingStorage,
         OptimizedFilesMixin,
