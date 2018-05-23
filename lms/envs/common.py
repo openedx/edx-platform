@@ -2204,7 +2204,7 @@ INSTALLED_APPS = (
     'database_fixups',
 
     'lms.djangoapps.onboarding',
-
+    'lms.djangoapps.mailchimp_pipeline',
 
     # OEF survey
     'lms.djangoapps.oef',
@@ -3077,3 +3077,4 @@ GOOGLE_PLACE_API_KEY = 'AIzaSyDhkKEySp0g2Ip8bovRHCI5KE257DSAJkA'
 # OEF renewal
 
 OEF_RENEWAL_DAYS = 180
+MAILCHIMP_API_KEY = "e6c22b333c17e79494ae5e307e3364e5-us12"
