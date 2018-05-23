@@ -223,61 +223,6 @@ class VideoEditorTest(CMSVideoBaseTest):
         uk_unicode_text = "Привіт, edX вітає вас.".decode('utf-8')
         self.assertTrue(self.video.download_translation('uk', uk_unicode_text))
 
-    def test_translations_remove_works_w_saving(self):
-        """
-        Scenario: Translations removing works correctly w/ preliminary saving
-        Given I have created a Video component
-        And I edit the component
-        And I open tab "Advanced"
-        And I upload transcript files:
-          |lang_code|filename               |
-          |uk       |uk_transcripts.srt     |
-          |zh       |chinese_transcripts.srt|
-        And I save changes
-        Then when I view the video it does show the captions
-        And I see "Привіт, edX вітає вас." text in the captions
-        And video language menu has "uk, zh" translations
-        And I edit the component
-        And I open tab "Advanced"
-        And I see translations for "uk, zh"
-        Then I remove translation for "uk" language code
-        And I save changes
-        Then when I view the video it does show the captions
-        And I see "好 各位同学" text in the captions
-        And I edit the component
-        And I open tab "Advanced"
-        And I see translations for "zh"
-        Then I remove translation for "zh" language code
-        And I save changes
-        Then when I view the video it does not show the captions
-        """
-        self._create_video_component()
-        self.edit_component()
-        self.open_advanced_tab()
-        self.video.upload_translation('uk_transcripts.srt', 'uk')
-        self.video.upload_translation('chinese_transcripts.srt', 'zh')
-        self.save_unit_settings()
-        self.assertTrue(self.video.is_captions_visible())
-        unicode_text = "Привіт, edX вітає вас.".decode('utf-8')
-        self.assertIn(unicode_text, self.video.captions_text)
-        self.assertEqual(self.video.caption_languages.keys(), ['zh', 'uk'])
-        self.edit_component()
-        self.open_advanced_tab()
-        self.assertEqual(self.video.translations(), ['zh', 'uk'])
-        self.video.remove_translation('uk')
-        confirm_prompt(self.video)
-        self.save_unit_settings()
-        self.assertTrue(self.video.is_captions_visible())
-        unicode_text = "好 各位同学".decode('utf-8')
-        self.assertIn(unicode_text, self.video.captions_text)
-        self.edit_component()
-        self.open_advanced_tab()
-        self.assertEqual(self.video.translations(), ['zh'])
-        self.video.remove_translation('zh')
-        confirm_prompt(self.video)
-        self.save_unit_settings()
-        self.assertFalse(self.video.is_captions_visible())
-
     def test_translations_remove_works_wo_saving(self):
         """
         Scenario: Translations removing works correctly w/o preliminary saving

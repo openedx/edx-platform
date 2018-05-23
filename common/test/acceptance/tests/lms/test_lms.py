@@ -762,33 +762,6 @@ class VisibleToStaffOnlyTest(UniqueCourseTest):
         self.course_home_page = CourseHomePage(self.browser, self.course_id)
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
 
-    def test_visible_to_staff(self):
-        """
-        Scenario: All content is visible for a user marked is_staff (different from course staff)
-            Given some of the course content has been marked 'visible_to_staff_only'
-            And I am logged on with an account marked 'is_staff'
-            Then I can see all course content
-        """
-        AutoAuthPage(self.browser, username="STAFF_TESTER", email="johndoe_staff@example.com",
-                     course_id=self.course_id, staff=True).visit()
-
-        self.course_home_page.visit()
-        self.assertEqual(3, len(self.course_home_page.outline.sections['Test Section']))
-
-        self.course_home_page.outline.go_to_section("Test Section", "Subsection With Locked Unit")
-        self.courseware_page.wait_for_page()
-        self.assertEqual([u'Locked Unit', u'Unlocked Unit'], self.courseware_page.nav.sequence_items)
-
-        self.course_home_page.visit()
-        self.course_home_page.outline.go_to_section("Test Section", "Unlocked Subsection")
-        self.courseware_page.wait_for_page()
-        self.assertEqual([u'Test Unit'], self.courseware_page.nav.sequence_items)
-
-        self.course_home_page.visit()
-        self.course_home_page.outline.go_to_section("Test Section", "Locked Subsection")
-        self.courseware_page.wait_for_page()
-        self.assertEqual([u'Test Unit'], self.courseware_page.nav.sequence_items)
-
     def test_visible_to_student(self):
         """
         Scenario: Content marked 'visible_to_staff_only' is not visible for students in the course

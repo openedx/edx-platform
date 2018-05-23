@@ -293,25 +293,6 @@ class ProctoredExamTest(UniqueCourseTest):
         self.courseware_page.visit()
         self.assertEqual(self.courseware_page.has_submitted_exam_message(), hide_after_due)
 
-    def test_masquerade_visibility_override(self):
-        """
-        Given that a timed exam problem exists in the course
-        And a student has taken that exam
-        And that exam is hidden to the student
-        And I am a staff user masquerading as the student
-        Then I should be able to see the exam content
-        """
-        self._setup_and_take_timed_exam()
-
-        LogoutPage(self.browser).visit()
-        auto_auth(self.browser, "STAFF_TESTER", "staff101@example.com", True, self.course_id)
-        self.courseware_page.visit()
-        staff_page = StaffCoursewarePage(self.browser, self.course_id)
-        self.assertEqual(staff_page.staff_view_mode, 'Staff')
-
-        staff_page.set_staff_view_mode_specific_student(self.USERNAME)
-        self.assertFalse(self.courseware_page.has_submitted_exam_message())
-
     def test_field_visiblity_with_all_exam_types(self):
         """
         Given that I am a staff member
