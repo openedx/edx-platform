@@ -75,9 +75,6 @@
 # This can go away when we update auth to not use django-rest-framework-oauth
 -e git+https://github.com/edx/django-oauth-plus.git@01ec2a161dfc3465f9d35b9211ae790177418316#egg=django-oauth-plus==2.2.9.edx-1
 
-# NOTE (CCB): This must remain. There is one commit on the upstream repo that has not been released to PyPI.
--e git+https://github.com/edx/rfc6266.git@v0.0.5-edx#egg=rfc6266==0.0.5-edx
-
 # Why a DRF fork? See: https://openedx.atlassian.net/browse/PLAT-1581
 -e git+https://github.com/edx/django-rest-framework.git@1ceda7c086fddffd1c440cc86856441bbf0bd9cb#egg=djangorestframework==3.6.3
 

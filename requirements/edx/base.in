@@ -125,6 +125,7 @@ python-openid
 python-saml==2.4.0
 pyuca==1.1                          # For more accurate sorting of translated country names in django-countries
 reportlab==3.1.44                   # Used for shopping cart's pdf invoice/receipt generation
+rfc6266-parser                      # Used to generate Content-Disposition headers.
 social-auth-app-django==1.2.0
 social-auth-core==1.4.0
 pysrt==0.4.7                        # Support for SubRip subtitle files, used in the video XModule
