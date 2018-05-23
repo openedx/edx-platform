@@ -585,45 +585,6 @@ class BookmarksTest(BookmarksTestMixin):
             total_pages=2
         )
 
-    def test_bookmarked_unit_accessed_event(self):
-        """
-        Scenario: Bookmark events are emitted with correct data when we access/visit a bookmarked unit.
-
-        Given that I am a registered user
-        And I visit my courseware page
-        And I have bookmarked a unit
-        When I click on bookmarked unit
-        Then `edx.course.bookmark.accessed` event is emitted
-        """
-        self.setup_test(num_chapters=1)
-        self.reset_event_tracking()
-
-        # create expected event data
-        xblocks = self.course_fixture.get_nested_xblocks(category="vertical")
-        event_data = [
-            {
-                'event': {
-                    'bookmark_id': '{},{}'.format(self.USERNAME, xblocks[0].locator),
-                    'component_type': xblocks[0].category,
-                    'component_usage_id': xblocks[0].locator,
-                }
-            }
-        ]
-        self.bookmark_units(num_units=1)
-        self.bookmarks_page.visit()
-
-        self._verify_pagination_info(
-            bookmark_count_on_current_page=1,
-            header_text='Showing 1 out of 1 total',
-            previous_button_enabled=False,
-            next_button_enabled=False,
-            current_page_number=1,
-            total_pages=1
-        )
-
-        self.bookmarks_page.click_bookmarked_block(0)
-        self.verify_event_data('edx.bookmark.accessed', event_data)
-
 
 @attr('a11y')
 class BookmarksA11yTests(BookmarksTestMixin):
