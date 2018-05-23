@@ -11,6 +11,7 @@ def enrollment_confirmation(sender, event=None, user=None, **kwargs):
         course = modulestore().get_course(kwargs.get('course_id'))
         context = {
             'course_name': course.display_name,
+            # TODO: find a way to move this code to PhilU overrides
             'course_url': get_course_first_chapter_link(course),
             'full_name': user.first_name + " " + user.last_name
         }
