@@ -11,6 +11,7 @@ import httpretty
 import pytz
 from django.conf import settings
 from django.core.cache import cache
+from django.core.exceptions import ImproperlyConfigured
 from django.core.handlers.wsgi import WSGIRequest
 from django.core.urlresolvers import reverse
 from django.test import Client
@@ -554,6 +555,19 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         for attempt in xrange(self.rate_limit + 2):
             expected_status = status.HTTP_429_TOO_MANY_REQUESTS if attempt >= self.rate_limit else status.HTTP_200_OK
             self.assert_enrollment_status(expected_status=expected_status)
+
+    @ddt.data('staff', 'user')
+    def test_enrollment_throttle_is_set_correctly(self, user_scope):
+        """ Make sure throttle rate is set correctly for different user scopes. """
+        self.rate_limit_config.enabled = True
+        self.rate_limit_config.save()
+
+        throttle = EnrollmentUserThrottle()
+        throttle.scope = user_scope
+        try:
+            throttle.parse_rate(throttle.get_rate())
+        except ImproperlyConfigured:
+            self.fail("No throttle rate set for {}".format(user_scope))
 
     def test_create_enrollment_with_mode(self):
         """With the right API key, create a new enrollment with a mode set other than the default."""
