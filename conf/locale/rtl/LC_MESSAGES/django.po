@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-05-22 16:25+0000\n"
-"PO-Revision-Date: 2018-05-22 16:25:58.778438\n"
+"POT-Creation-Date: 2018-05-24 10:20+0000\n"
+"PO-Revision-Date: 2018-05-24 10:20:56.261767\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -24180,6 +24180,30 @@ msgid "In-Course Reverification {number}"
 msgstr "هر-ذخعقسث قثدثقهبهذشفهخر {number}"
 
 #: cms/templates/settings.html
+msgid "Set the pacing for this course"
+msgstr "سثف فاث حشذهرل بخق فاهس ذخعقسث"
+
+#: cms/templates/settings.html
+msgid ""
+"Instructor-paced courses progress at the pace that the course author sets. "
+"You can configure release dates for course content and due dates for "
+"assignments."
+msgstr ""
+"هرسفقعذفخق-حشذثي ذخعقسثس حقخلقثسس شف فاث حشذث فاشف فاث ذخعقسث شعفاخق سثفس. "
+"غخع ذشر ذخربهلعقث قثمثشسث يشفثس بخق ذخعقسث ذخرفثرف شري يعث يشفثس بخق "
+"شسسهلروثرفس."
+
+#: cms/templates/settings.html
+msgid ""
+"Self-paced courses do not have release dates for course content or due dates"
+" for assignments. Learners can complete course material at any time before "
+"the course end date."
+msgstr ""
+"سثمب-حشذثي ذخعقسثس يخ رخف اشدث قثمثشسث يشفثس بخق ذخعقسث ذخرفثرف خق يعث يشفثس"
+" بخق شسسهلروثرفس. مثشقرثقس ذشر ذخوحمثفث ذخعقسث وشفثقهشم شف شرغ فهوث زثبخقث "
+"فاث ذخعقسث ثري يشفث."
+
+#: cms/templates/settings.html
 msgid "Course Schedule"
 msgstr "ذخعقسث سذاثيعمث"
 
@@ -24242,24 +24266,6 @@ msgstr "ذخرفشذف غخعق ثيط حشقفرثق وشرشلثق فخ عحي
 #: cms/templates/settings.html
 msgid "Enrollment End Time"
 msgstr "ثرقخمموثرف ثري فهوث"
-
-#: cms/templates/settings.html
-msgid "These Dates Are Not Used When Promoting Your Course"
-msgstr "فاثسث يشفثس شقث رخف عسثي صاثر حقخوخفهرل غخعق ذخعقسث"
-
-#: cms/templates/settings.html
-msgid ""
-"These dates impact {strong_start}when your courseware can be "
-"viewed{strong_end}, but they are {strong_start}not the dates shown on your "
-"course summary page{strong_end}. To provide the course start and "
-"registration dates as shown on your course summary page, follow the "
-"instructions provided by your Program Manager."
-msgstr ""
-"فاثسث يشفثس هوحشذف {strong_start}صاثر غخعق ذخعقسثصشقث ذشر زث "
-"دهثصثي{strong_end}, زعف فاثغ شقث {strong_start}رخف فاث يشفثس ساخصر خر غخعق "
-"ذخعقسث سعووشقغ حشلث{strong_end}. فخ حقخدهيث فاث ذخعقسث سفشقف شري "
-"قثلهسفقشفهخر يشفثس شس ساخصر خر غخعق ذخعقسث سعووشقغ حشلث, بخممخص فاث "
-"هرسفقعذفهخرس حقخدهيثي زغ غخعق حقخلقشو وشرشلثق."
 
 #: cms/templates/settings.html
 msgid "Course Details"
@@ -24535,30 +24541,6 @@ msgid ""
 msgstr ""
 "فاث سذخقث سفعيثرف وعسف وثثف هر خقيثق فخ سعذذثسسبعممغ ذخوحمثفث فاث ثرفقشرذث "
 "ثطشو. "
-
-#: cms/templates/settings.html
-msgid "Set the pacing for this course"
-msgstr "سثف فاث حشذهرل بخق فاهس ذخعقسث"
-
-#: cms/templates/settings.html
-msgid ""
-"Instructor-paced courses progress at the pace that the course author sets. "
-"You can configure release dates for course content and due dates for "
-"assignments."
-msgstr ""
-"هرسفقعذفخق-حشذثي ذخعقسثس حقخلقثسس شف فاث حشذث فاشف فاث ذخعقسث شعفاخق سثفس. "
-"غخع ذشر ذخربهلعقث قثمثشسث يشفثس بخق ذخعقسث ذخرفثرف شري يعث يشفثس بخق "
-"شسسهلروثرفس."
-
-#: cms/templates/settings.html
-msgid ""
-"Self-paced courses do not have release dates for course content or due dates"
-" for assignments. Learners can complete course material at any time before "
-"the course end date."
-msgstr ""
-"سثمب-حشذثي ذخعقسثس يخ رخف اشدث قثمثشسث يشفثس بخق ذخعقسث ذخرفثرف خق يعث يشفثس"
-" بخق شسسهلروثرفس. مثشقرثقس ذشر ذخوحمثفث ذخعقسث وشفثقهشم شف شرغ فهوث زثبخقث "
-"فاث ذخعقسث ثري يشفث."
 
 #: cms/templates/settings.html
 msgid "Course Content License"
