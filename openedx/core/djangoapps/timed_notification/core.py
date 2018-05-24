@@ -101,9 +101,12 @@ def get_course_first_chapter_link(course):
     Helper function to get first chapter link in course enrollment email
     """
     course_desc = get_course_by_id(course.id)
-
-    first_chapter_url = course_desc.get_children()[0].scope_ids.usage_id.block_id
-    first_section = course_desc.get_children()[0].get_children()[0].scope_ids.usage_id.block_id
+    first_chapter_url = ''
+    first_section = ''
+    if course_desc.get_children():
+        first_chapter_url = course_desc.get_children()[0].scope_ids.usage_id.block_id
+        if course_desc.get_children()[0].get_children():
+            first_section = course_desc.get_children()[0].get_children()[0].scope_ids.usage_id.block_id
 
     course_target = reverse(
         'courseware_section',
