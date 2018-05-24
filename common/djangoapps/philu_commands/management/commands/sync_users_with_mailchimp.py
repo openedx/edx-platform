@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
-from lms.djangoapps.mailchimp_pipeline.client import ChimpClient
+from mailchimp_pipeline.client import ChimpClient
 from django.contrib.auth.models import User
+from lms.djangoapps.onboarding.models import FocusArea, OrgSector
 
 from logging import getLogger
 log = getLogger(__name__)
@@ -23,9 +24,13 @@ class Command(BaseCommand):
         for user in users:
             profile = user.profile
             extended_profile = user.extended_profile
+
+            focus_areas = FocusArea.get_map()
+            org_sectors = OrgSector.get_map()
+
             org_type = ""
             if extended_profile.organization and extended_profile.organization.org_type:
-                org_type = extended_profile.organization.org_type
+                org_type = org_sectors.get(extended_profile.organization.org_type, '')
 
             user_json = {
                 "email_address": user.email,
@@ -42,7 +47,7 @@ class Command(BaseCommand):
                     "ENROLLS": "",
                     "ORG": extended_profile.organization.label if extended_profile.organization else "",
                     "ORGTYPE": org_type,
-                    "WORKAREA": "",
+                    "WORKAREA": str(focus_areas.get(extended_profile.organization.focus_area, "")) if extended_profile.organization else "",
                 }
             }
 

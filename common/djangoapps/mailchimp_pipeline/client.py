@@ -4,6 +4,7 @@ from requests import request
 from requests.exceptions import HTTPError
 from django.conf import settings
 
+
 class MailChimpException(Exception):
     pass
 
@@ -49,7 +50,8 @@ class Connection(object):
         try:
             response.raise_for_status()
         except HTTPError, e:
-            message = response.json()['detail']
+            message = "Exception detail: %s, Errors: %s " % (response.json().get('detail', ''),
+                                                             str(response.json().get('errors', '')))
             if response.json()['status'] == 404:
                 return None
             else:
@@ -61,6 +63,7 @@ class Connection(object):
     def get_connection(cls):
         connection = cls(apikey=settings.MAILCHIMP_API_KEY, secure=True)
         return connection
+
 
 class ChimpClient(object):
     def __init__(self):

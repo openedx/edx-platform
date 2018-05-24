@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from lms.djangoapps.mailchimp_pipeline.client import ChimpClient
+from mailchimp_pipeline.client import ChimpClient
 from django.contrib.auth.models import User
 
 from logging import getLogger

@@ -7,8 +7,9 @@ from django.dispatch import receiver
 from common.lib.nodebb_client.client import NodeBBClient
 from lms.djangoapps.onboarding.helpers import COUNTRIES
 from lms.djangoapps.onboarding.models import UserExtendedProfile, Organization, FocusArea
-from nodebb.models import DiscussionCommunity, TeamGroupChat
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
+from mailchimp_pipeline.signals.handlers import send_user_info_to_mailchimp, send_user_profile_info_to_mailchimp
+from nodebb.models import DiscussionCommunity, TeamGroupChat
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import ENROLL_STATUS_CHANGE, EnrollStatusChange, UserProfile
 from xmodule.modulestore.django import modulestore
@@ -34,6 +35,8 @@ def sync_user_info_with_nodebb(sender, instance, created, **kwargs):  # pylint: 
 
     request = get_current_request()
     user = request.user
+
+    send_user_profile_info_to_mailchimp(sender, instance, kwargs)
 
     if sender == UserProfile:
         data_to_sync = {
@@ -66,6 +69,7 @@ def update_user_profile_on_nodebb(sender, instance, created, **kwargs):
     """
         Create user account at nodeBB when user created at edx Platform
     """
+    send_user_info_to_mailchimp(sender, instance, created, kwargs)
     if created:
         data_to_sync = {
             'edx_user_id': instance.id,
@@ -88,6 +92,8 @@ def update_user_profile_on_nodebb(sender, instance, created, **kwargs):
         }
         status_code, response_body = NodeBBClient().users.update_profile(instance.username, kwargs=data_to_sync)
         log_action_response(instance, status_code, response_body)
+
+
 
 
 @receiver(post_delete, sender=User)
