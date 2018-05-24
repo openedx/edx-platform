@@ -1,6 +1,6 @@
+from openedx.core.djangoapps.timed_notification.core import get_course_link
 from student.models import ENROLL_STATUS_CHANGE, EnrollStatusChange
 from xmodule.modulestore.django import modulestore
-from lms.djangoapps.philu_overrides.helpers import get_course_first_chapter_link
 from django.dispatch import receiver
 from common.lib.mandrill_client.client import MandrillClient
 
@@ -12,7 +12,7 @@ def enrollment_confirmation(sender, event=None, user=None, **kwargs):
         context = {
             'course_name': course.display_name,
             # TODO: find a way to move this code to PhilU overrides
-            'course_url': get_course_first_chapter_link(course),
+            'course_url': get_course_link(course_id=course.id),
             'full_name': user.first_name + " " + user.last_name
         }
         MandrillClient().send_mail(
