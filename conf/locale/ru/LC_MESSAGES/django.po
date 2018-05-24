@@ -249,7 +249,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-05-20 20:42+0000\n"
+"POT-Creation-Date: 2018-05-24 10:01+0000\n"
 "PO-Revision-Date: 2018-03-13 13:51+0000\n"
 "Last-Translator: Maksimenkova Olga <omaksimenkova@hse.ru>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
@@ -5329,6 +5329,62 @@ msgstr ""
 msgid "Top num_top_words words for word cloud."
 msgstr "Наиболее часто встречающиеся num_top_words слов для облака."
 
+#: lms/templates/forgot_password_modal.html
+msgid "Password Reset"
+msgstr "Сброс пароля"
+
+#: common/templates/student/edx_ace/passwordreset/email/body.html
+#: common/templates/student/edx_ace/passwordreset/email/body.txt
+#, python-format
+msgid ""
+"You're receiving this e-mail because you requested a password reset for your"
+" user account at %(platform_name)s."
+msgstr ""
+
+#: common/templates/student/edx_ace/passwordreset/email/body.html
+#: common/templates/student/edx_ace/passwordreset/email/body.txt
+#, python-format
+msgid ""
+"However, there is currently no user account associated with your email "
+"address: %(email_address)s."
+msgstr ""
+
+#: common/templates/student/edx_ace/passwordreset/email/body.html
+#: common/templates/student/edx_ace/passwordreset/email/body.txt
+msgid "If you did not request this change, you can ignore this email."
+msgstr ""
+
+#: common/templates/student/edx_ace/passwordreset/email/body.html
+#: common/templates/student/edx_ace/passwordreset/email/body.txt
+msgid ""
+"If you didn't request this change, you can disregard this email - we have "
+"not yet reset your password."
+msgstr ""
+"Если вы не подавали заявку на смену пароля, вы можете не обращать внимания "
+"на это сообщение – ваш пароль ещё не был изменён."
+
+#: common/templates/student/edx_ace/passwordreset/email/body.html
+msgid "Change my Password"
+msgstr ""
+
+#: common/templates/student/edx_ace/passwordreset/email/body.txt
+msgid "Please go to the following page and choose a new password:"
+msgstr "Пожалуйста, перейдите на следующую страницу и выберите новый пароль:"
+
+#: common/templates/student/edx_ace/passwordreset/email/body.txt
+msgid "Thanks for using our site!"
+msgstr "Спасибо за использование нашего сайта!"
+
+#: common/templates/student/edx_ace/passwordreset/email/body.txt
+#, python-format
+msgid "The %(platform_name)s Team"
+msgstr "Команда %(platform_name)s"
+
+#: common/templates/student/edx_ace/passwordreset/email/subject.txt
+#, python-format
+msgid "Password reset on %(platform_name)s"
+msgstr ""
+
 #: lms/djangoapps/badges/events/course_complete.py
 #, python-brace-format
 msgid ""
@@ -8020,7 +8076,6 @@ msgid "Last Name"
 msgstr "Фамилия"
 
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/api_admin/forms.py
 #: lms/templates/shoppingcart/receipt.html
 msgid "Company Name"
 msgstr "Наименование организации"
@@ -9994,11 +10049,6 @@ msgid ""
 " Policy{privacy_policy_link_end} from {enterprise_name}."
 msgstr ""
 
-#: lms/templates/emails/password_reset_subject.txt
-#, python-format
-msgid "Password reset on %(platform_name)s"
-msgstr ""
-
 #: lms/templates/logout.html
 msgid "Signed Out"
 msgstr "Выход выполнен"
@@ -10053,45 +10103,6 @@ msgstr ""
 #: lms/templates/ccx/schedule.html
 msgid "Error"
 msgstr "Ошибка"
-
-#: lms/templates/registration/password_reset_email.html
-#, python-format
-msgid ""
-"You're receiving this e-mail because you requested a password reset for your"
-" user account at %(platform_name)s."
-msgstr ""
-
-#: lms/templates/registration/password_reset_email.html
-#, python-format
-msgid ""
-"However, there is currently no user account associated with your email "
-"address: %(email_address)s."
-msgstr ""
-
-#: lms/templates/registration/password_reset_email.html
-msgid "If you did not request this change, you can ignore this email."
-msgstr ""
-
-#: lms/templates/registration/password_reset_email.html
-msgid "Please go to the following page and choose a new password:"
-msgstr "Пожалуйста, перейдите на следующую страницу и выберите новый пароль:"
-
-#: lms/templates/registration/password_reset_email.html
-msgid ""
-"If you didn't request this change, you can disregard this email - we have "
-"not yet reset your password."
-msgstr ""
-"Если вы не подавали заявку на смену пароля, вы можете не обращать внимания "
-"на это сообщение – ваш пароль ещё не был изменён."
-
-#: lms/templates/registration/password_reset_email.html
-msgid "Thanks for using our site!"
-msgstr "Спасибо за использование нашего сайта!"
-
-#: lms/templates/registration/password_reset_email.html
-#, python-format
-msgid "The %(platform_name)s Team"
-msgstr "Команда %(platform_name)s"
 
 #: lms/templates/wiki/article.html
 msgid "Last modified:"
@@ -10602,16 +10613,6 @@ msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-msgid "View on Web"
-msgstr ""
-
-#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-msgid "Unsubscribe from this list"
-msgstr ""
-
-#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Our mailing address is"
 msgstr ""
 
@@ -10640,25 +10641,29 @@ msgid ""
 "catalog for this user."
 msgstr ""
 
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "Organization Name"
+msgstr "Наименование организации"
+
 #: openedx/core/djangoapps/api_admin/forms.py
-msgid "Company Address"
-msgstr "Адрес организации"
+msgid "Organization Address"
+msgstr ""
 
 #: openedx/core/djangoapps/api_admin/forms.py
 msgid "Describe what your application does."
 msgstr ""
 
 #: openedx/core/djangoapps/api_admin/forms.py
-msgid "The URL of your company's website."
-msgstr "URL веб-сайта вашей организации."
+msgid "The URL of your organization's website."
+msgstr ""
 
 #: openedx/core/djangoapps/api_admin/forms.py
-msgid "The name of your company."
-msgstr "Наименование вашей организации."
+msgid "The name of your organization."
+msgstr ""
 
 #: openedx/core/djangoapps/api_admin/forms.py
-msgid "The contact address of your company."
-msgstr "Адрес для связи с вашей организацией."
+msgid "The contact address of your organization."
+msgstr ""
 
 #: openedx/core/djangoapps/api_admin/forms.py
 #, python-brace-format
@@ -10699,17 +10704,12 @@ msgstr "Запрос доступа к API от {company}"
 msgid "API access request"
 msgstr "Запрос доступа к API"
 
-#. Translators: link_start and link_end are HTML tags for a link to the terms
-#. of service.
-#. platform_name is the name of this Open edX installation.
 #: openedx/core/djangoapps/api_admin/widgets.py
 #, python-brace-format
 msgid ""
-"I, and my company, accept the {link_start}{platform_name} API Terms of "
+"I, and my organization, accept the {link_start}{platform_name} API Terms of "
 "Service{link_end}."
 msgstr ""
-"Я, а также моя организация, принимаем {link_start} Условия предоставления "
-"услуг API {platform_name}{link_end}."
 
 #: lms/templates/courseware/courseware.html
 #: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
@@ -11823,6 +11823,7 @@ msgstr ""
 
 #: openedx/features/course_experience/plugins.py
 #: cms/templates/widgets/header.html
+#: lms/templates/api_admin/terms_of_service.html
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
 msgid "Updates"
 msgstr ""
@@ -13204,10 +13205,6 @@ msgstr "Отладка:"
 #: lms/templates/extauth_failure.html
 msgid "External Authentication failed"
 msgstr "Ошибка внешней аутентификации"
-
-#: lms/templates/forgot_password_modal.html
-msgid "Password Reset"
-msgstr "Сброс пароля"
 
 #: lms/templates/forgot_password_modal.html
 msgid ""
@@ -14617,29 +14614,30 @@ msgstr "Дата вступления в силу: 12 апреля 2016 г."
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
 "Welcome to {platform_name}. Thank you for using {platform_name}'s Course "
-"Discovery API and any additional APIs that we may offer from time to time "
-"(collectively, the \"APIs\"). Please read these Terms of Service prior to "
-"accessing or using the APIs. These Terms of Service, any additional terms "
-"within accompanying API documentation, and any applicable policies and "
-"guidelines that {platform_name} makes available and/or updates from time to "
-"time are agreements (collectively, the \"Terms\") between you and "
-"{platform_name}. By accessing or using the APIs, you accept and agree to be "
-"legally bound by the Terms, whether or not you are a registered user. If you"
-" do not understand or do not wish to be bound by the Terms, you should not "
-"use the APIs."
+"Discovery API, Enterprise API and/or any additional APIs that we may offer "
+"from time to time (collectively, the \"APIs\"). Please read these Terms of "
+"Service prior to accessing or using the APIs. These Terms of Service, any "
+"additional terms within accompanying API documentation, and any applicable "
+"policies and guidelines that {platform_name} makes available and/or updates "
+"from time to time are agreements (collectively, the \"Terms\") between you "
+"and {platform_name}. These Terms are issued under the enterprise product "
+"agreement, member participation agreement, or other direct agreement "
+"governing the purchase of {platform_name} products, if any (the "
+"\"Agreement\"), executed by you or the party on whose behalf you are "
+"accessing or using the APIs and {platform_name}.  In the event that you have"
+" such an Agreement that applies to your use of the APIs, the Agreement will "
+"control in the event of any conflict between it and these Terms. By "
+"accessing or using the APIs, you accept and agree to be legally bound by the"
+" Terms, whether or not you are a registered user. If you are accessing or "
+"using the APIs on behalf of a company, organization or other legal entity, "
+"you are agreeing to these Terms for that entity and representing and "
+"warranting to {platform_name} that you have full authority to accept and "
+"agree to these Terms for such entity, in which case the terms \"you,\" "
+"\"your\" or related terms herein shall refer to such entity on whose behalf "
+"you are accessing or using the APIs. If you do not have such authority or if"
+" you do not understand or do not wish to be bound by the Terms, you should "
+"not use the APIs."
 msgstr ""
-"Добро пожаловать на {platform_name}. Благодарим вас за использование API "
-"поиска курсов на {platform_name}, а также других видов API, которые могут "
-"быть предложены вам в случае необходимости (далее «Различные API»). "
-"Пожалуйста, ознакомьтесь с условиями предоставления услуг, прежде чем "
-"получить доступ к различным API или использовать их. Данный документ, а "
-"также все дополнительные условия из технической документации по API, включая"
-" соответствующие правила, составленные и время от времени дополняемые "
-"{platform_name} (далее «Условия») являются соглашением между вами и "
-"{platform_name}. Доступ к различным API или их использование означают, что "
-"вы приняли Условия и официально согласились действовать согласно им. Если "
-"Условия изложены непонятно или вы не хотели бы их выполнять, пожалуйста, не "
-"используйте API."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "API Access"
@@ -14653,21 +14651,11 @@ msgid ""
 " complete the API request form including a description of your proposed uses"
 " for the APIs. Any account and registration information that you provide to "
 "{platform_name} must be accurate and up to date, and you agree to inform us "
-"promptly of any changes. {platform_name} will review your API request form "
-"and, upon approval in {platform_name}'s sole discretion, will provide you "
-"with instructions for obtaining your API shared secret and client ID."
+"promptly of any changes. {platform_name_capitalized} will review your API "
+"request form and, upon approval in {platform_name}'s sole discretion, will "
+"provide you with instructions for obtaining your API shared secret and "
+"client ID."
 msgstr ""
-"Для получения доступа к различным API необходимо создать учётную запись "
-"{platform_name} для вашего приложения (не для личного пользования). "
-"Пользуясь этой учётной записью, вы сможете зайти на страницу для запроса "
-"доступа к API {request_url}. Заполните форму запроса API, включая описание "
-"предполагаемого использования API. Вся информация, предоставленная при "
-"регистрации вашей учётной записи на {platform_name}, должна быть точной и "
-"актуальной; вы также даёте согласие немедленно информировать нас об "
-"изменениях. {platform_name} рассмотрит ваш запрос доступа к API, и, в случае"
-" положительного решения, вынесенного по усмотрению {platform_name}, отправит"
-" вам указания по получению общего секретного ключа API и вашего "
-"идентификатора пользователя."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Permissible Use"
@@ -14677,31 +14665,18 @@ msgstr "Разрешенные цели использования"
 msgid ""
 "You agree to use the APIs solely for the purpose of delivering content that "
 "is accessed through the APIs (the \"API Content\") to your own website, "
-"mobile site, app, blog, email distribution list, or social media property or"
-" for another commercial use that you described in your request for access "
-"and that {platform_name} has approved on a case-by-case basis. "
-"{platform_name} may monitor your use of the APIs for compliance with the "
-"Terms and may deny your access or shut down your integration if you try to "
-"go around or exceed the requirements and limitations set by {platform_name}."
-" Your Application or other approved use of the API or the API Content must "
-"not prompt your end users to provide their {platform_name} username, "
-"password or other {platform_name} user credentials anywhere other than the "
-"{platform_name} website at {platform_url}."
+"mobile site, app, blog, email distribution list, or social media property "
+"(\"Your Application\") or for another commercial use that you described in "
+"your request for access and that {platform_name} has approved on a case-by-"
+"case basis. {platform_name_capitalized} may monitor your use of the APIs for"
+" compliance with the Terms and may deny your access or shut down your "
+"integration if you attempt to go around or exceed the requirements and "
+"limitations set by {platform_name}. Your Application or other approved use "
+"of the API or the API Content must not prompt your end users to provide "
+"their {platform_name} username, password or other {platform_name} user "
+"credentials anywhere other than on the {platform_name} website at "
+"{platform_url}."
 msgstr ""
-"Вы даёте согласие использовать различные API исключительно с целью "
-"обеспечить доступ к материалам, предоставляемым через API («материалы API»),"
-" со своей веб-страницы, мобильной версии страницы, через свои приложение, "
-"блог, рассылку или страницу в социальной сети, или для других коммерческих "
-"целей, описанных вами в запросе доступа, одобренном {platform_name} в "
-"индивидуальном порядке. {platform_name} может наблюдать за тем, как вы "
-"используете различные API, проверяя выполнение Условий, и, если вы "
-"попытаетесь действовать в обход правил или выйти за рамки установленных "
-"требований и ограничений, {platform_name} может лишить вас доступа к API или"
-" прекратить действие встроенных приложений. Ваше приложение или другие "
-"разрешённые инструменты, использующие API или материалы API, не должны "
-"требовать от пользователей их имя пользователя на {platform_name}, а также "
-"пароль или другие учётные данные пользователя на {platform_name}, где бы то "
-"ни было, кроме веб-страницы {platform_name} по адресу {platform_url}."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Prohibited Uses and Activities"
@@ -14709,18 +14684,12 @@ msgstr "Запрещённые действия"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
-"{platform_name} shall have the sole right to determine whether or not any "
-"given use of the APIs is acceptable, and {platform_name} reserves the right "
-"to revoke API access for any use that {platform_name} determines at any "
-"time, in its sole discretion, does not benefit or serve the best interests "
-"of {platform_name}, its users and its partners."
+"{platform_name_capitalized} shall have the sole right to determine whether "
+"or not any given use of the APIs is acceptable, and {platform_name} reserves"
+" the right to revoke API access for any use that {platform_name} determines "
+"at any time, in its sole discretion, does not benefit or serve the best "
+"interests of {platform_name}, its users and its partners."
 msgstr ""
-"{platform_name} оставляет за собой эксклюзивное право решать, является ли "
-"определённая цель использования API приемлемой.  Кроме того, {platform_name}"
-" имеет право отозвать доступ к API, если он будет использоваться с целью, "
-"которая, по усмотрению {platform_name} на тот момент времени, не будет "
-"приносить пользу или отвечать интересам {platform_name} её пользователей или"
-" её партнёров."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -14758,6 +14727,12 @@ msgstr ""
 "или любые другие права других лиц или организаций;"
 
 #: lms/templates/api_admin/terms_of_service.html
+msgid "altering or editing any content or graphics in the API Content"
+msgstr ""
+"внесение изменений в содержимое или редактирование графических изображений "
+"контента API"
+
+#: lms/templates/api_admin/terms_of_service.html
 msgid ""
 "altering or removing any trademark, copyright or other proprietary or legal "
 "notices contained in, or appearing on, the APIs or any API Content;"
@@ -14766,12 +14741,6 @@ msgstr ""
 " уведомлений о праве собственности либо иных правовых уведомлений, "
 "содержащихся или встречающихся в различных API, а равно и любого контента "
 "API;"
-
-#: lms/templates/api_admin/terms_of_service.html
-msgid "altering or editing any content or graphics in the API Content"
-msgstr ""
-"внесение изменений в содержимое или редактирование графических изображений "
-"контента API"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -14805,15 +14774,11 @@ msgstr "Использование и ограничения"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
-"{platform_name} reserves the right, in its discretion, to impose "
-"restrictions and limitations on the number and frequency of calls made by "
-"you or your Application to the APIs. You must not attempt to circumvent any "
-"restrictions or limitations that we impose."
+"{platform_name_capitalized} reserves the right, in its discretion, to impose"
+" reasonable restrictions and limitations on the number and frequency of "
+"calls made by you or Your Application to the APIs. You must not attempt to "
+"circumvent any restrictions or limitations imposed by {platform_name}."
 msgstr ""
-"{platform_name} оставляет за собой право по своему усмотрению устанавливать "
-"ограничения по количеству и частоте обращений к различным API, "
-"инициированных вами или вашим приложением. Не пытайтесь обойти установленные"
-" ограничения."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Compliance"
@@ -14821,26 +14786,16 @@ msgstr "Соблюдение условий"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
-"You agree to comply with all applicable law, regulation, and third party "
+"You agree to comply with all applicable laws, regulations, and third party "
 "rights (including without limitation laws regarding the import or export of "
 "data or software, privacy, copyright, and local laws). You will not use the "
 "APIs to encourage or promote illegal activity or violation of third party "
 "rights. You will not violate any other terms of service with "
 "{platform_name}. You will only access (or attempt to access) an API by the "
 "means described in the documentation of that API. You will not misrepresent "
-"or mask either your identity or yourApplication's identity when using the "
+"or mask either your identity or Your Application's identity when using the "
 "APIs."
 msgstr ""
-"Вы даёте согласие соблюдать все действующие законы и правила, а также права "
-"третьих лиц (в том числе законы об импорте и экспорте данных или "
-"программного обеспечения, право на неприкосновенность частной жизни, "
-"авторские права и законы страны пребывания). Вы обязуетесь не использовать "
-"различные API для содействия или поддержки незаконной деятельности, а также "
-"нарушения прав третьих лиц. Вы также обязуетесь не нарушать другие условия "
-"предоставления услуг {platform_name}. Вы обязуетесь обращаться к API (или "
-"делать попытку такого обращения) строго в соответствии с документацией "
-"соответствующего API. При использовании API вы обязуетесь не давать ложные "
-"сведения и не скрывать сведения о себе или своём приложении."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Ownership"
@@ -14885,27 +14840,17 @@ msgid ""
 "Content, or on or through the services made available on or through the "
 "APIs, if any, are the property of their respective owners. You may not "
 "remove, alter, or obscure any copyright, Trademark, or other proprietary "
-"rightrs notices incorporated in or accompanying the API Content. If any "
-"third party revokes access to API Content owned or controlled by that third "
-"party, including without limitation any Trademarks, you must ensure that all"
-" API Content pertaining to that third party is deleted from your app, "
-"networks, systems and servers as soon as reasonably possible. If you stop "
-"using the APIs altogether or if your API access is revoked, you must delete "
-"all API Content in the same way."
+"rights notices incorporated in or accompanying the API Content. If any "
+"{platform_name} Participant (as hereinafter defined) or other third party "
+"revokes access to API Content owned or controlled by that {platform_name} "
+"Participant or third party, including without limitation any Trademarks, you"
+" must ensure that all API Content pertaining to that {platform_name} "
+"Participant or third party is deleted from Your application, networks, "
+"systems and servers as soon as reasonably possible. "
+"\"{platform_name_capitalized} Participants\" means MIT, Harvard, and the "
+"other entities providing information, API Content or services for the APIs, "
+"the course instructors and their staffs."
 msgstr ""
-"Все имена, названия, логотипы и печати (далее – торговые знаки), "
-"использованные в API и материалах API, а также в службах, к которым дают "
-"доступ API, если таковые имеются, являются собственностью их владельцев. Не "
-"разрешается удалять, изменять или скрывать пометки об авторских правах, "
-"торговые знаки или другую информацию о правах частной собственности, "
-"содержащиеся в материалах API или сопровождающие их. Если третье лицо "
-"отзовёт доступ к материалам API, принадлежащим или находящимся в ведомстве "
-"этого третьего лица, включая, среди всего прочего, торговые знаки, вы "
-"гарантируете, что все материалы API, принадлежащие этому третьему лицу, "
-"будут удалены из вашего приложения, сети, систем и с серверов в ближайшие "
-"возможные сроки. При полном прекращении использования API или в случае "
-"отзыва вашего права доступа вы должны таким же образом удалить все материалы"
-" API."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -14937,18 +14882,11 @@ msgstr "Защита личной информации"
 msgid ""
 "You agree to comply with all applicable privacy laws and regulations and to "
 "be transparent with respect to any collection and use of end user data. You "
-"will provide and adhere to a privacy policy for your Application that "
+"will provide and adhere to a privacy policy for Your Application that "
 "clearly and accurately describes to your end users what user information you"
 " collect and how you may use and share such information (including for "
 "advertising) with {platform_name} and other third parties."
 msgstr ""
-"Вы даёте согласие соблюдать все законы и правила, охраняющие право на "
-"частную жизнь, сохранять прозрачность во всём, что касается сбора и "
-"использования пользовательских данных. Вы обязуетесь составить для своего "
-"приложения правила соблюдения конфиденциальности, чётко и ясно  дающие "
-"пользователям знать, какую информацию вы собираете, как можете её "
-"использовать и передавать (в том числе с целью рекламы) {platform_name} или "
-"другим независимым сторонам, и в дальнейшем придерживаться этих правил."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Right to Charge"
@@ -14956,37 +14894,39 @@ msgstr ""
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
-"{platform_name} reserves the right to modify the Terms at any time without "
-"advance notice. Any changes to the Terms will be effective immediately upon "
-"posting on this page, with an updated effective date. By accessing or using "
-"the APIs after any changes have been made, you signify your agreement on a "
-"prospective basis to the modified Terms and all of the changes. Be sure to "
-"return to this page periodically to ensure familiarity with the most current"
-" version of the Terms."
+"Certain access to the APIs may be provided free of charge, but "
+"{platform_name} reserves the right to charge fees for future use or access "
+"to the APIs."
 msgstr ""
-"{platform_name} сохраняет за собой право в любое время без предупреждения "
-"вносить изменения в Условия. Все изменения в Условиях вступают в силу сразу "
-"после их публикации на данной странице с обновлённой датой вступления в "
-"силу. Просмотр или использование различных API после внесения изменений в "
-"Условия подтверждает ваше согласие с этого момента действовать в "
-"соответствии с новыми условиями и всеми внесёнными в них изменениями. Время "
-"от времени обязательно просматривайте эту страницу, чтобы убедиться, что вы "
-"ознакомлены с последней версией Условий."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
-"{platform_name} may also update or modify the APIs from time to time without"
-" advance notice. These changes may affect your use of the APIs or the way "
-"your integration interacts with the API. If we make a change that is "
-"unacceptable to you, you should stop using the APIs. Continued use of the "
-"APIs means you accept the change."
+"{platform_name_capitalized} may also update or modify the APIs from time to "
+"time without advance notice. These changes may affect your use of the APIs "
+"or the way your integration interacts with the API. If we make a change that"
+" is unacceptable to you, you should stop using the APIs. Continued use of "
+"the APIs means you accept the change."
 msgstr ""
-"{platform_name} может также время от времени без предупреждения обновлять "
-"или изменять различные API. Эти изменения могут повлиять на использование "
-"API или на то, как модули вашего приложения взаимодействуют с API. Если "
-"произведённые изменения неприемлемы для вас, прекратите использование API. "
-"Если вы продолжаете использовать API, это означает, что вы согласны с "
-"изменениями."
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"{platform_name_capitalized} reserves the right to modify the Terms at any "
+"time without advance notice.  Any changes to the Terms will be effective "
+"immediately upon posting on this page, with an updated effective date.  By "
+"accessing or using the APIs after any changes have been made, you signify "
+"your agreement on a prospective basis to the modified Terms and all of the "
+"changes.  Be sure to return to this page periodically to ensure familiarity "
+"with the most current version of the Terms."
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"{platform_name_capitalized} may also update or modify the APIs from time to "
+"time without advance notice.  These changes may affect your use of the APIs "
+"or the way your integration interacts with the API.  If we make a change "
+"that is unacceptable to you, you should stop using the APIs. Continued use "
+"of the APIs means you accept the change."
+msgstr ""
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Confidentiality"
@@ -15011,12 +14951,12 @@ msgid ""
 "Information to anyone without {platform_name}'s prior written consent, and "
 "you agree to protect the Confidential Information from unauthorized use and "
 "disclosure in the same way that you would protect your own confidential "
-"information. Confidential information does not include information that you "
+"information. Confidential Information does not include information that you "
 "independently developed, that was rightfully given to you by a third party "
-"without confidentiality obligation, or that becomes public through no fault "
-"of your own. You may disclose Confidential Information when compelled to do "
-"so by law if you provide {platform_name} with reasonable prior notice, "
-"unless a court orders that {platform_name} not receive notice."
+"without any confidentiality obligation, or that becomes public through no "
+"fault of your own. You may disclose Confidential Information when compelled "
+"to do so by law if you provide {platform_name} with reasonable prior notice,"
+" unless a court orders that {platform_name} not receive notice."
 msgstr ""
 
 #: lms/templates/api_admin/terms_of_service.html
@@ -15035,16 +14975,13 @@ msgstr ""
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
-"{platform_name} AND THE {platform_name} PARTICIPANTS (AS HERINAFTER DEFINED)"
-" DO NOT WARRANT THAT THE APIS WILL OPERATE IN AN UNINTERRUPTED OR ERROR-FREE"
-" MANNER, THAT THE APIS ARE FREE OF VIRUSES OR OTHER HARMFUL COMPONENTS, OR "
-"THAT THE APIS OR API CONTENT PROVIDED WILL MEET YOUR NEEDS OR EXPECTATIONS. "
-"{platform_name} AND THE {platform_name} PARTICIPANTS ALSO MAKE NO WARRANTY "
-"ABOUT THE ACCURACY, COMPLETENESS, TIMELINESS, OR QUALITY OF THE APIS OR ANY "
-"API CONTENT, OR THAT ANY PARTICULAR API CONTENT WILL CONTINUE TO BE MADE "
-"AVAILABLE. \"{platform_name} PARTICIPANTS\" MEANS MIT, HARVARD, THE OTHER "
-"MEMBERS, THE ENTITIES PROVIDING INFORMATION, API CONTENT OR SERVICES FOR THE"
-" APIS, THE COURSE INSTRUCTORS AND THEIR STAFFS."
+"{platform_name} AND THE {platform_name} PARTICIPANTS DO NOT WARRANT THAT THE"
+" APIS WILL OPERATE IN AN UNINTERRUPTED OR ERROR-FREE MANNER, THAT THE APIS "
+"ARE FREE OF VIRUSES OR OTHER HARMFUL COMPONENTS, OR THAT THE APIS OR API "
+"CONTENT PROVIDED WILL MEET YOUR NEEDS OR EXPECTATIONS. {platform_name} AND "
+"THE {platform_name} PARTICIPANTS ALSO MAKE NO WARRANTY ABOUT THE ACCURACY, "
+"COMPLETENESS, TIMELINESS, OR QUALITY OF THE APIS OR ANY API CONTENT, OR THAT"
+" ANY PARTICULAR API CONTENT WILL CONTINUE TO BE MADE AVAILABLE."
 msgstr ""
 
 #: lms/templates/api_admin/terms_of_service.html
@@ -15054,8 +14991,8 @@ msgid ""
 "INFORMATION, MATERIALS OR DATA THROUGH THE APIS IS AT YOUR OWN DISCRETION "
 "AND RISK, AND YOU WILL BE SOLELY RESPONSIBLE FOR ANY DAMAGE TO YOUR PROPERTY"
 " (INCLUDING YOUR COMPUTER SYSTEM) OR LOSS OF DATA THAT RESULTS FROM THE "
-"DOWNLOAD OR USE OF SUCH MATERIAL OR DATA, UNLESS OTHERWISE EXPRESSLY "
-"PROVIDED FOR IN THE {platform_name} PRIVACY POLICY."
+"DOWNLOAD OR USE OF SUCH INFORMATION, MATERIALS OR DATA, UNLESS OTHERWISE "
+"EXPRESSLY PROVIDED FOR IN THE {platform_name} PRIVACY POLICY."
 msgstr ""
 
 #: lms/templates/api_admin/terms_of_service.html
@@ -15063,7 +15000,7 @@ msgid ""
 "TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, YOU AGREE THAT NEITHER "
 "{platform_name} NOR ANY OF THE {platform_name} PARTICIPANTS WILL BE LIABLE "
 "TO YOU FOR ANY LOSS OR DAMAGES, EITHER ACTUAL OR CONSEQUENTIAL, ARISING OUT "
-"OF OR RELATING TO THESE TERMS, OR YOUR (OR ANY THIRD PARTY'S) USE OF OR "
+"OF OR RELATING TO THE TERMS, OR YOUR (OR ANY THIRD PARTY'S) USE OF OR "
 "INABILITY TO USE THE APIS OR ANY API CONTENT, OR YOUR RELIANCE UPON "
 "INFORMATION OBTAINED FROM OR THROUGH THE APIS, WHETHER YOUR CLAIM IS BASED "
 "IN CONTRACT, TORT, STATUTORY OR OTHER LAW."
@@ -15092,11 +15029,12 @@ msgstr ""
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
 "The APIs and API Content may include hyperlinks to sites maintained or "
-"controlled by others. {platform_name} and the {platform_name} Participants "
-"are not responsible for and do not routinely screen, approve, review or "
-"endorse the contents of or use of any of the products or services that may "
-"be offered at these sites. If you decide to access linked third-party "
-"websites, you do so at your own risk."
+"controlled by others and not affiliated with or under the control of "
+"{platform_name}. {platform_name_capitalized} and the {platform_name} "
+"Participants are not responsible for and do not routinely screen, approve, "
+"review or endorse the contents of or use of any of the products or services "
+"that may be offered at these third-party sites. If you decide to access "
+"linked third-party websites, you do so at your own risk."
 msgstr ""
 
 #: lms/templates/api_admin/terms_of_service.html
@@ -15111,7 +15049,7 @@ msgid ""
 " losses, damages (actual and consequential), suits, judgments, litigation "
 "costs and attorneys' fees, of every kind and nature. In such a case, "
 "{platform_name} or one of the {platform_name} Participants will provide you "
-"with written notice of such claim, suit or action."
+"with written notice of such claim, action or demand."
 msgstr ""
 
 #: lms/templates/api_admin/terms_of_service.html
@@ -15147,8 +15085,8 @@ msgid ""
 "objection to such proceedings in those courts (including any defense or "
 "objection of lack of proper jurisdiction or venue or inconvenience of "
 "forum). Notwithstanding the foregoing, you agree that {platform_name} shall "
-"still be allowed to apply to injunctive remedies (or an equivalent type of "
-"urgent legal relief) in any jursdiction."
+"still be allowed to apply for injunctive remedies (or an equivalent type of "
+"urgent legal relief) in any jurisdiction."
 msgstr ""
 
 #: lms/templates/api_admin/terms_of_service.html
@@ -15160,15 +15098,15 @@ msgid ""
 "You may stop using the APIs at any time. You agree that {platform_name}, in "
 "its sole discretion and at any time, may terminate your use of the APIs or "
 "any API Content for any reason or no reason, without prior notice or "
-"liabiliy."
+"liability."
 msgstr ""
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
-"{platform_name} and the {platform_name} Participants reserve the right at "
-"any time in their sole discretion to cancel, delay, reschedule or alter the "
-"format of any API or API Content offered through {platform_name}, or to "
-"cease providing any part or all of the APIs or API Content or related "
+"{platform_name_capitalized} and the {platform_name} Participants reserve the"
+" right at any time in their sole discretion to cancel, delay, reschedule or "
+"alter the format of any API or API Content offered through {platform_name}, "
+"or to cease providing any part or all of the APIs or API Content or related "
 "services, and you agree that neither {platform_name} nor any of the "
 "{platform_name} Participants will have any liability to you for such an "
 "action."
@@ -15179,13 +15117,14 @@ msgid ""
 "Upon any termination of the Terms or discontinuation of your access to an "
 "API for any reason, your right to use any API and API Content will "
 "immediately cease. You will immediately stop using the APIs and delete any "
-"cached or stored API Content. All provisions of the Terms that by their "
-"nature should survive termination shall survive termination, including, "
-"without limitation, ownership provisions, warranty disclaimers, and "
-"limitation of liability. Termination of your access to and use of the APIs "
-"and API Content shall not relieve you of any obligations arising or "
-"accrusing prior to such termination or limit any liability that you "
-"otherwise may have to {platform_name}, including without limitation any "
+"cached or stored API Content from Your Application and your networks, "
+"systems and servers as soon as reasonably possible. All provisions of the "
+"Terms that by their nature should survive termination shall survive "
+"termination, including, without limitation, ownership provisions, warranty "
+"disclaimers, and limitations of liability. Termination of your access to and"
+" use of the APIs and API Content shall not relieve you of any obligations "
+"arising or accruing prior to such termination or limit any liability that "
+"you otherwise may have to {platform_name}, including without limitation any "
 "indemnification obligations contained herein."
 msgstr ""
 
@@ -19082,10 +19021,6 @@ msgstr "Создайте регистрационный код "
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "* Required Information"
 msgstr "* Обязательная информация"
-
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-msgid "Organization Name"
-msgstr "Наименование организации"
 
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "The organization that purchased enrollments in the course"
@@ -24014,6 +23949,30 @@ msgid "In-Course Reverification {number}"
 msgstr "Повторное подтверждение личности {number}"
 
 #: cms/templates/settings.html
+msgid "Set the pacing for this course"
+msgstr "Задать порядок обучения на курсе"
+
+#: cms/templates/settings.html
+msgid ""
+"Instructor-paced courses progress at the pace that the course author sets. "
+"You can configure release dates for course content and due dates for "
+"assignments."
+msgstr ""
+"Курсы с определённым расписанием проходят по расписанию, заданному автором "
+"курса. Вы можете задать даты выпуска для материалов курса и сроки сдачи "
+"заданий."
+
+#: cms/templates/settings.html
+msgid ""
+"Self-paced courses do not have release dates for course content or due dates"
+" for assignments. Learners can complete course material at any time before "
+"the course end date."
+msgstr ""
+"Курсы, обучение на которых проходит в произвольном темпе, не устанавливают "
+"дат выпуска содержимого курса и сроков сдачи заданий.  Слушатели могут "
+"работать с материалами курса в любое время до даты окончания курса."
+
+#: cms/templates/settings.html
 msgid "Course Schedule"
 msgstr "Расписание курса"
 
@@ -24076,24 +24035,6 @@ msgstr ""
 #: cms/templates/settings.html
 msgid "Enrollment End Time"
 msgstr "Время окончания регистрации "
-
-#: cms/templates/settings.html
-msgid "These Dates Are Not Used When Promoting Your Course"
-msgstr "Эти даты не могут быть использованы для продвижения вашего курса"
-
-#: cms/templates/settings.html
-msgid ""
-"These dates impact {strong_start}when your courseware can be "
-"viewed{strong_end}, but they are {strong_start}not the dates shown on your "
-"course summary page{strong_end}. To provide the course start and "
-"registration dates as shown on your course summary page, follow the "
-"instructions provided by your Program Manager."
-msgstr ""
-"Эти даты определяют, {strong_start}когда материалы курса станут доступны для"
-" просмотра{strong_end}, но {strong_start}не они отображаются на странице "
-"«Описание курса»{strong_end}. Чтобы установить даты начала курса и "
-"регистрации, отображаемые на странице «Описание курса», следуйте инструкциям"
-" администратора программ."
 
 #: cms/templates/settings.html
 msgid "Course Details"
@@ -24368,30 +24309,6 @@ msgid ""
 msgstr ""
 "Количество баллов, которое должен набрать слушатель для успешного "
 "прохождения вступительного испытания."
-
-#: cms/templates/settings.html
-msgid "Set the pacing for this course"
-msgstr "Задать порядок обучения на курсе"
-
-#: cms/templates/settings.html
-msgid ""
-"Instructor-paced courses progress at the pace that the course author sets. "
-"You can configure release dates for course content and due dates for "
-"assignments."
-msgstr ""
-"Курсы с определённым расписанием проходят по расписанию, заданному автором "
-"курса. Вы можете задать даты выпуска для материалов курса и сроки сдачи "
-"заданий."
-
-#: cms/templates/settings.html
-msgid ""
-"Self-paced courses do not have release dates for course content or due dates"
-" for assignments. Learners can complete course material at any time before "
-"the course end date."
-msgstr ""
-"Курсы, обучение на которых проходит в произвольном темпе, не устанавливают "
-"дат выпуска содержимого курса и сроков сдачи заданий.  Слушатели могут "
-"работать с материалами курса в любое время до даты окончания курса."
 
 #: cms/templates/settings.html
 msgid "Course Content License"
