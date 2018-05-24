@@ -52,17 +52,17 @@ def get_teams_data(course_key):
     course_teams = CourseTeam.objects.filter(course_id=course_key)
     team_data = []
     for team in course_teams:
-        team_data.push({
-            'team_id': course_team.team_id,
-            'name': course_team.name,
-            'course_id': course_team.course_id.to_deprecated_string(),
-            'topic_id': course_team.topic_id,
-            'date_created': course_team.date_created.__str__(),
-            'description': course_team.description,
-            'country': course_team.country,
-            'language': course_team.language,
-            'last_activity_at': course_team.last_activity_at.__str__(),
-            'team_size': course_team.team_size,
+        team_data.append({
+            'team_id': team.team_id,
+            'name': team.name,
+            'course_id': team.course_id.to_deprecated_string(),
+            'topic_id': team.topic_id,
+            'date_created': team.date_created.__str__(),
+            'description': team.description,
+            'country': team.country.__str__(),
+            'language': team.language,
+            'last_activity_at': team.last_activity_at.__str__(),
+            'team_size': team.team_size,
         })
     return team_data
 
