@@ -506,13 +506,13 @@ OAUTH2_PROVIDER = {
         # conform profile scope message that is presented to end-user
         # to lms/templates/provider/authorize.html. This may be revised later.
         'profile': 'Know your name and username',
-        'grades:read': 'Retrieve your grades for your enrolled courses'
+        'grades:read': 'Retrieve your grades for your enrolled courses',
+        'certificates:read': 'Retrieve your course certificates'
     },
     'REQUEST_APPROVAL_PROMPT': 'auto_even_if_expired',
 }
 # This is required for the migrations in oauth_dispatch.models
 # otherwise it fails saying this attribute is not present in Settings
-##OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
 OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth_dispatch.OauthRestrictedApplication'
 ################################## TEMPLATE CONFIGURATION #####################################
 # Mako templating

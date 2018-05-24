@@ -26,7 +26,7 @@ def on_access_token_presave(sender, instance, *args, **kwargs):  # pylint: disab
     We do this as a pre-save hook on the ORM
     """
     if not is_oauth_scope_enforcement_enabled():
-        OauthRestrictedApplication.set_access_token_as_expired(instance)
+        RestrictedApplication.set_access_token_as_expired(instance)
 
 # TODO: Remove Django 1.11 upgrade shim
 # SHIM: Allow users that are inactive to still authenticate while keeping rate-limiting functionality.
@@ -127,20 +127,3 @@ class EdxOAuth2Validator(OAuth2Validator):
         # Restore the original request attributes
         request.grant_type = grant_type
         request.user = user
-
-    def validate_scopes(self, client_id, scopes, client, request, *args, **kwargs):
-        """
-        Override the DOT implementation to add checks to make sure that a
-        RestrictedApplication is not granted scopes that it has not been
-        permitted to do
-        """
-
-        restricted_application = RestrictedApplication.get_restricted_application(client)
-        if restricted_application:
-            # caller is restricted, so we must vet the allowed scopes for that restricted application
-            return set(scopes).issubset(restricted_application.allowed_scopes)
-
-        # not a restricted application, call into base implementation,
-        # which - basically - pulls the list of scopes from configuration settings as a global
-        # definition
-        return super(EdxOAuth2Validator, self).validate_scopes(client_id, scopes, client, request, *args, **kwargs)

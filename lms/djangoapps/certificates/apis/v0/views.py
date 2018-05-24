@@ -2,6 +2,7 @@
 import logging
 
 from edx_rest_framework_extensions.authentication import JwtAuthentication
+from edx_rest_framework_extensions.permissions import JWTRestrictedApplicationPermission
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.generics import GenericAPIView
@@ -68,6 +69,7 @@ class CertificatesDetailView(GenericAPIView):
                 "grade": "0.98"
             }
     """
+    required_scopes = ['certificates:read']
 
     authentication_classes = (
         authentication.OAuth2AuthenticationAllowInactiveUser,
@@ -76,7 +78,7 @@ class CertificatesDetailView(GenericAPIView):
     )
     permission_classes = (
         IsAuthenticated,
-        permissions.IsUserInUrlOrStaff
+        JWTRestrictedApplicationPermission
     )
 
     def get(self, request, username, course_id):
@@ -99,6 +101,14 @@ class CertificatesDetailView(GenericAPIView):
                 status=404,
                 data={'error_code': 'course_id_not_valid'}
             )
+
+        if hasattr(request, 'auth') and hasattr(request, 'oauth_scopes_filters'):
+            if 'content_org' in request.oauth_scopes_filters.keys():
+                if course_key.org not in request.oauth_scopes_filters['content_org']:
+                    return Response(
+                        status=403,
+                        data={'error_code': 'course_org_not_associated_with_calling_application'}
+                    )
 
         user_cert = get_certificate_for_user(username=username, course_key=course_key)
         if user_cert is None:
