@@ -12,13 +12,12 @@ class Command(BaseCommand):
     Delete user from mail chimp learners list
         manage.py delete_users_from_mailchimp
     """
-    list_id = settings.MAILCHIMP_LEARNERS_LIST_ID
 
     def handle(self, *args, **options):
         client = ChimpClient()
 
         users = User.objects.all()
         for user in users:
-            client.delete_user_from_list(self.list_id, user.email)
+            client.delete_user_from_list(settings.MAILCHIMP_LEARNERS_LIST_ID, user.email)
 
         pass

@@ -18,11 +18,8 @@ class Command(BaseCommand):
         manage.py sync_users_with_mailchimp
     """
 
-    def __int__(self):
-        self.list_id = settings.MAILCHIMP_LEARNERS_LIST_ID
-
     def send_user_to_mailchimp(self, client, users):
-        client.add_list_members_in_batch(self.list_id, {"members": users})
+        client.add_list_members_in_batch(settings.MAILCHIMP_LEARNERS_LIST_ID, {"members": users})
 
     def get_users_data_to_send(self, users):
         users_set = []
