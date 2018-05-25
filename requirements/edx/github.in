@@ -98,8 +98,6 @@
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@138e6fa0bf3a2013e904a085b9fed77dab7f3f21#egg=xblock-google-drive
 -e git+https://github.com/edx/xblock-lti-consumer.git@v1.1.8#egg=lti_consumer-xblock==1.1.8
 
--e git+https://github.com/edx/edx-val.git@mrehan/backward-transcript-export#egg=edxval
-
 # Third Party XBlocks
 
 -e git+https://github.com/mitodl/edx-sga.git@6b2f7aa2a18206023c8407e2c46f86d4b4c3ac96#egg=edx-sga==0.8.0

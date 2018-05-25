@@ -82,7 +82,7 @@ edx-rest-api-client
 edx-search
 edx-submissions
 edx-user-state-client
-#edxval
+edxval
 enum34==1.1.6                       # Backport of Enum from Python 3.4+
 event-tracking
 feedparser==5.1.3
