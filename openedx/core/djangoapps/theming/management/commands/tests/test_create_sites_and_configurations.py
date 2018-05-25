@@ -63,9 +63,8 @@ class TestCreateSiteAndConfiguration(TestCase):
         """
         Checks that data of all sites is valid
         """
-        sites = Site.objects.all()
-        # there is an extra default site.
-        self.assertEqual(len(sites), len(SITES) + 1)
+        sites = Site.objects.filter(domain__contains=self.dns_name)
+        self.assertEqual(len(sites), len(SITES))
         for site in sites:
             if site.name in SITES:
                 site_theme = SiteTheme.objects.get(site=site)
@@ -199,6 +198,18 @@ class TestCreateSiteAndConfiguration(TestCase):
             "--theme-path", self.theme_path
         )
         # if we run command with same dns then it will not duplicates the sites and oauth2 clients.
+        self._assert_sites_are_valid()
+        self._assert_discovery_clients_are_valid()
+        self._assert_ecommerce_clients_are_valid()
+
+        self.dns_name = "new-dns"
+        mock_get_sites.return_value = _get_sites(self.dns_name)
+        call_command(
+            "create_sites_and_configurations",
+            "--dns-name", self.dns_name,
+            "--theme-path", self.theme_path
+        )
+        # if we run command with different dns existing oauth2 clients are updated with new dns
         self._assert_sites_are_valid()
         self._assert_discovery_clients_are_valid()
         self._assert_ecommerce_clients_are_valid()

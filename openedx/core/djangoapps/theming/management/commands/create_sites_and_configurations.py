@@ -63,33 +63,34 @@ class Command(BaseCommand):
             help="Use devstack config, otherwise sandbox config is assumed",
         )
 
-    def _create_oauth2_client(self, url, site_name, is_discovery=True):
+    def _create_oauth2_client(self, url, site_name, service_name, service_user):
         """
         Creates the oauth2 client and add it in trusted clients.
         """
-
-        client, _ = Client.objects.get_or_create(
-            redirect_uri="{url}complete/edx-oidc/".format(url=url),
+        client_id = "{service_name}-key{site_name}".format(
+            service_name=service_name,
+            site_name="" if site_name == "edx" else "-{}".format(site_name)
+        )
+        client, created = Client.objects.update_or_create(
+            client_id=client_id,
             defaults={
-                "user": self.discovery_user if is_discovery else self.ecommerce_user,
-                "name": "{site_name}_{client_type}_client".format(
+                "user": service_user,
+                "name": "{site_name}_{service_name}_client".format(
                     site_name=site_name,
-                    client_type="discovery" if is_discovery else "ecommerce",
+                    service_name=service_name,
                 ),
                 "url": url,
-                "client_id": "{client_type}-key{site_name}".format(
-                    client_type="discovery" if is_discovery else "ecommerce",
-                    site_name="" if site_name == "edx" else "-{}".format(site_name)
-                ),
-                "client_secret": "{client_type}-secret".format(
-                    client_type="discovery" if is_discovery else "ecommerce"
+                "client_secret": "{service_name}-secret".format(
+                    service_name=service_name
                 ),
                 "client_type": CONFIDENTIAL,
+                "redirect_uri": "{url}complete/edx-oidc/".format(url=url),
                 "logout_uri": "{url}logout/".format(url=url)
             }
         )
-        LOG.info("Adding {client} oauth2 client as trusted client".format(client=client.name))
-        TrustedClient.objects.get_or_create(client=client)
+        if created:
+            LOG.info("Adding {client} oauth2 client as trusted client".format(client=client.name))
+            TrustedClient.objects.get_or_create(client=client)
 
     def _create_sites(self, site_domain, theme_dir_name, site_configuration):
         """
@@ -229,9 +230,9 @@ class Command(BaseCommand):
             self._create_sites(site_domain, site_data['theme_dir_name'], site_data['configuration'])
 
             LOG.info("Creating discovery oauth2 client for '{site_name}' site".format(site_name=site_name))
-            self._create_oauth2_client(discovery_url, site_name, is_discovery=True)
+            self._create_oauth2_client(discovery_url, site_name, 'discovery', self.discovery_user)
 
             LOG.info("Creating ecommerce oauth2 client for '{site_name}' site".format(site_name=site_name))
-            self._create_oauth2_client(ecommerce_url, site_name, is_discovery=False)
+            self._create_oauth2_client(ecommerce_url, site_name, 'ecommerce', self.ecommerce_user)
 
         self._enable_commerce_configuration()
