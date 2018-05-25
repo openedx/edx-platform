@@ -1,5 +1,7 @@
 import logging
 
+from common.djangoapps.student.views import get_course_related_keys
+from lms.djangoapps.courseware.access import has_access
 from student.models import CourseEnrollment
 from django.core.urlresolvers import reverse
 from django.conf import settings
@@ -12,10 +14,7 @@ from boto.ses.exceptions import (
     SESIllegalAddressError,
 )
 from common.lib.mandrill_client.client import MandrillClient
-from crum import get_current_request
-from util.request import safe_get_host
-
-
+from lms.djangoapps.courseware.courses import get_course_by_id
 
 log = logging.getLogger('timed_notifications')
 
@@ -95,3 +94,26 @@ def get_course_link(course_id):
     course_link = reverse("about_course", args=[course_id])
     base_url = settings.LMS_ROOT_URL
     return base_url + course_link
+
+
+def get_course_first_chapter_link(course):
+    """
+    Helper function to get first chapter link in course enrollment email
+    """
+    course_desc = get_course_by_id(course.id)
+    first_chapter_url = ''
+    first_section = ''
+    if course_desc.get_children():
+        first_chapter_url = course_desc.get_children()[0].scope_ids.usage_id.block_id
+        if course_desc.get_children()[0].get_children():
+            first_section = course_desc.get_children()[0].get_children()[0].scope_ids.usage_id.block_id
+
+    course_target = reverse(
+        'courseware_section',
+        args=[course.id.to_deprecated_string(),
+              first_chapter_url,
+              first_section]
+    )
+
+    base_url = settings.LMS_ROOT_URL
+    return base_url + course_target

@@ -3,7 +3,7 @@ import logging
 from datetime import datetime, timedelta, date
 from pytz import utc
 
-from openedx.core.djangoapps.timed_notification.core import send_course_notification_email, get_course_link
+from openedx.core.djangoapps.timed_notification.core import send_course_notification_email, get_course_link, get_course_first_chapter_link
 from lms.djangoapps.branding import get_visible_courses
 from common.lib.mandrill_client.client import MandrillClient
 
@@ -26,10 +26,9 @@ def task_course_notifications():
         date_now = datetime.now(utc).date()
 
         log.info('Setting up email context')
-        # Email-template context
         context = {
             'course_name': course.display_name,
-            'course_url': get_course_link(course_id=course.id),
+            'course_url': get_course_link(course_id=course.id)
         }
 
         # send email when 7 days left to course start
@@ -46,7 +45,10 @@ def task_course_notifications():
         elif course_start_date == date_now:
             send_course_notification_email(course=course,
                                            template_name=MandrillClient.COURSE_WELCOME_TEMPLATE,
-                                           context=context)
+                                           context={'course_name': course.display_name,
+                                                    'course_url': get_course_first_chapter_link(course)
+                                                    }
+                                           )
 
         log.info('CELERY-TASK: date_now: %s, course_start_date: %s',
             date_now,
