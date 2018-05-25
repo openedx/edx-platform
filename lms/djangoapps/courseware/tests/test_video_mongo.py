@@ -20,6 +20,7 @@ from fs.path import combine
 from edxval.api import (
     ValCannotCreateError,
     ValVideoNotFoundError,
+    create_video_transcript,
     create_or_update_video_transcript,
     create_profile,
     create_video,
@@ -54,7 +55,7 @@ MODULESTORES = {
     ModuleStoreEnum.Type.split: TEST_DATA_SPLIT_MODULESTORE,
 }
 
-TRANSCRIPT_FILE_SRT_DATA = """
+TRANSCRIPT_FILE_SRT_DATA = u"""
 1
 00:00:14,370 --> 00:00:16,530
 I am overwatch.
@@ -1589,16 +1590,19 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
 
         actual = self.descriptor.definition_to_xml(resource_fs=self.file_system)
         expected_str = """
-            <video download_video="false" url_name="SampleProblem">
+            <video download_video="false" url_name="SampleProblem" transcripts='{transcripts}'>
                 <video_asset client_video_id="test_client_video_id" duration="111.0" image="">
                     <encoded_video profile="mobile" url="http://example.com/video" file_size="222" bitrate="333"/>
                     <transcripts>
                         <transcript file_format="srt" language_code="{language_code}" provider="Cielo24"/>
                     </transcripts>
                 </video_asset>
+                <transcript language="{language_code}" src="{transcript_file}"/>
             </video>
         """.format(
-            language_code=language_code
+            language_code=language_code,
+            transcript_file=transcript_file_name,
+            transcripts=json.dumps({language_code: transcript_file_name})
         )
         parser = etree.XMLParser(remove_blank_text=True)
         expected = etree.XML(expected_str, parser=parser)
@@ -1611,6 +1615,66 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         expected_transcript_content = File(open(expected_transcript_path)).read()
         transcript = get_video_transcript_data(video_id=self.descriptor.edx_video_id, language_code=language_code)
         self.assertEqual(transcript['content'], expected_transcript_content)
+
+    @ddt.data(
+        (['en', 'da'], 'test_sub', ''),
+        (['da'], 'test_sub', 'test_sub')
+    )
+    @ddt.unpack
+    def test_export_val_transcripts_backward_compatibility(self, languages, sub, expected_sub):
+        """
+        Tests new transcripts export for backward compatibility.
+        """
+        self.descriptor.edx_video_id = 'test_video_id'
+        self.descriptor.sub = sub
+
+        # Setup VAL encode profile, video and transcripts
+        create_profile('mobile')
+        create_video({
+            'edx_video_id': self.descriptor.edx_video_id,
+            'client_video_id': 'test_client_video_id',
+            'duration': 111.0,
+            'status': 'dummy',
+            'encoded_videos': [{
+                'profile': 'mobile',
+                'url': 'http://example.com/video',
+                'file_size': 222,
+                'bitrate': 333,
+            }],
+        })
+
+        for language in languages:
+            create_video_transcript(
+                video_id=self.descriptor.edx_video_id,
+                language_code=language,
+                file_format=Transcript.SRT,
+                content=ContentFile(TRANSCRIPT_FILE_SRT_DATA)
+            )
+
+        # Export the video module into xml
+        video_xml = self.descriptor.definition_to_xml(resource_fs=self.file_system)
+
+        # Assert `sub` and `transcripts` attribute in the xml
+        self.assertEqual(video_xml.get('sub'), expected_sub)
+
+        expected_transcripts = {
+            language: "{edx_video_id}-{language}.srt".format(
+                edx_video_id=self.descriptor.edx_video_id,
+                language=language
+            )
+            for language in languages
+        }
+        self.assertDictEqual(json.loads(video_xml.get('transcripts')), expected_transcripts)
+
+        # Assert transcript content from course OLX
+        for language in languages:
+            expected_transcript_path = combine(
+                combine(self.temp_dir, EXPORT_IMPORT_COURSE_DIR),
+                combine(EXPORT_IMPORT_STATIC_DIR, expected_transcripts[language])
+            )
+            expected_transcript_content = File(open(expected_transcript_path)).read()
+            transcript = get_video_transcript_data(video_id=self.descriptor.edx_video_id, language_code=language)
+            self.assertEqual(transcript['content'], expected_transcript_content)
 
     def test_export_val_data_not_found(self):
         """

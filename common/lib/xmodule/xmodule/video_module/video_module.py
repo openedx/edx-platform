@@ -739,13 +739,9 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             ele.set('src', self.handout)
             xml.append(ele)
 
+        transcripts = {}
         if self.transcripts is not None:
-            # sorting for easy testing of resulting xml
-            for transcript_language in sorted(self.transcripts.keys()):
-                ele = etree.Element('transcript')
-                ele.set('language', transcript_language)
-                ele.set('src', self.transcripts[transcript_language])
-                xml.append(ele)
+            transcripts.update(self.transcripts)
 
         edx_video_id = clean_video_id(self.edx_video_id)
         if edxval_api and edx_video_id:
@@ -753,16 +749,41 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                 # Create static dir if not created earlier.
                 resource_fs.makedirs(EXPORT_IMPORT_STATIC_DIR, recreate=True)
 
-                xml.append(
-                    edxval_api.export_to_xml(
-                        video_id=edx_video_id,
-                        resource_fs=resource_fs,
-                        static_dir=EXPORT_IMPORT_STATIC_DIR,
-                        course_id=unicode(self.runtime.course_id.for_branch(None))
-                    )
+                # Backward compatible exports
+                # edxval exports new transcripts into the course OLX and returns a transcript
+                # files map so that it can also be rewritten in old transcript metadata fields
+                # (i.e. `self.transcripts`) on import and older open-releases (<= ginkgo),
+                # who do not have deprecated contentstore yet, can also import and use new-style
+                # transcripts into their openedX instances.
+
+                exported_metadata = edxval_api.export_to_xml(
+                    video_id=edx_video_id,
+                    resource_fs=resource_fs,
+                    static_dir=EXPORT_IMPORT_STATIC_DIR,
+                    course_id=unicode(self.runtime.course_id.for_branch(None))
                 )
+                # Update xml with edxval metadata
+                xml.append(exported_metadata['xml'])
+
+                # we don't need sub if english transcript
+                # is also in new transcripts.
+                new_transcripts = exported_metadata['transcripts']
+                transcripts.update(new_transcripts)
+                if new_transcripts.get('en'):
+                    xml.set('sub', '')
+
+                # Update `transcripts` attribute in the xml
+                xml.set('transcripts', json.dumps(transcripts))
+
             except edxval_api.ValVideoNotFoundError:
                 pass
+
+            # Sorting transcripts for easy testing of resulting xml
+            for transcript_language in sorted(transcripts.keys()):
+                ele = etree.Element('transcript')
+                ele.set('language', transcript_language)
+                ele.set('src', transcripts[transcript_language])
+                xml.append(ele)
 
         # handle license specifically
         self.add_license_to_xml(xml)
