@@ -2276,7 +2276,7 @@ def get_user_by_username_or_email(username_or_email):
     username_or_email = strip_if_string(username_or_email)
     # there should be one user with either username or email equal to username_or_email
     user = User.objects.get(Q(email=username_or_email) | Q(username=username_or_email))
-    if user is not None and user.username == username_or_email:
+    if user.username == username_or_email:
         UserRetirementRequest = apps.get_model('user_api', 'UserRetirementRequest')
         if UserRetirementRequest.has_user_requested_retirement(user):
             raise User.DoesNotExist

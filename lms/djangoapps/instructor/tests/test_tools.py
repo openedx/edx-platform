@@ -370,8 +370,8 @@ class TestStudentFromIdentifier(TestCase):
     def setUpClass(cls):
         super(TestStudentFromIdentifier, cls).setUpClass()
         cls.valid_student = UserFactory.create(username='baz@touchstone')
-        cls.duplicate_email = UserFactory.create(email='foo@touchstone.com')
-        cls.duplicate_user_name = UserFactory.create(username='foo@touchstone.com')
+        cls.student_conflicting_email = UserFactory.create(email='foo@touchstone.com')
+        cls.student_conflicting_username = UserFactory.create(username='foo@touchstone.com')
 
     def test_valid_student_id(self):
         """Test with valid username"""
@@ -387,10 +387,12 @@ class TestStudentFromIdentifier(TestCase):
         there is user B with email example: foo@touchstone.com
         """
         with self.assertRaises(MultipleObjectsReturned):
-            tools.get_student_from_identifier(self.duplicate_user_name.username)
+            tools.get_student_from_identifier(self.student_conflicting_username.username)
 
         # can get student with alternative identifier, in this case email.
-        assert self.duplicate_user_name == tools.get_student_from_identifier(self.duplicate_user_name.email)
+        assert self.student_conflicting_username == tools.get_student_from_identifier(
+            self.student_conflicting_username.email
+        )
 
     def test_student_email_has_conflict_with_others_username(self):
         """
@@ -398,10 +400,12 @@ class TestStudentFromIdentifier(TestCase):
         there is user B with username example: foo@touchstone.com
         """
         with self.assertRaises(MultipleObjectsReturned):
-            tools.get_student_from_identifier(self.duplicate_email.email)
+            tools.get_student_from_identifier(self.student_conflicting_email.email)
 
         # can get student with alternative identifier, in this case username.
-        assert self.duplicate_email == tools.get_student_from_identifier(self.duplicate_email.username)
+        assert self.student_conflicting_email == tools.get_student_from_identifier(
+            self.student_conflicting_email.username
+        )
 
     def test_invalid_student_id(self):
         """Test with invalid identifier"""
