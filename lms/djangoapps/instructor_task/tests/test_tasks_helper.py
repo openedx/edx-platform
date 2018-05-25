@@ -12,7 +12,8 @@ import os
 import shutil
 import tempfile
 import urllib
-from datetime import datetime
+from contextlib import contextmanager
+from datetime import datetime, timedelta
 
 import ddt
 import unicodecsv
@@ -20,17 +21,19 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from freezegun import freeze_time
-from mock import MagicMock, Mock, patch
+from mock import ANY, MagicMock, Mock, patch
 from nose.plugins.attrib import attr
 from pytz import UTC
+from six import text_type
 
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from certificates.models import CertificateStatuses, GeneratedCertificate
-from certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory
 from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from courseware.tests.factories import InstructorFactory
-from instructor_analytics.basic import UNAVAILABLE
+from instructor_analytics.basic import UNAVAILABLE, list_problem_responses
+from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
+from lms.djangoapps.certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory
 from lms.djangoapps.grades.models import PersistentCourseGrade
 from lms.djangoapps.grades.transformer import GradesTransformer
 from lms.djangoapps.instructor_task.tasks_helper.certs import generate_students_certificates
@@ -62,6 +65,7 @@ from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVer
 from openedx.core.djangoapps.course_groups.models import CohortMembership, CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.djangoapps.credit.tests.factories import CreditCourseFactory
+from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase, TestConditionalContent
 from request_cache.middleware import RequestCache
@@ -460,25 +464,163 @@ class TestTeamGradeReport(InstructorGradeReportTestCase):
         self._verify_cell_data_for_user(self.student2.username, self.course.id, 'Team Name', team2.name)
 
 
-class TestProblemResponsesReport(TestReportMixin, InstructorTaskCourseTestCase):
+# pylint: disable=protected-access
+class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
     """
     Tests that generation of CSV files listing student answers to a
     given problem works.
     """
     def setUp(self):
         super(TestProblemResponsesReport, self).setUp()
-        self.course = CourseFactory.create()
+        self.initialize_course()
+        self.instructor = self.create_instructor('instructor')
+        self.student = self.create_student('student')
+
+    @contextmanager
+    def _remove_capa_report_generator(self):
+        """
+        Temporarily removes the generate_report_data method so we can test
+        report generation when it's absent.
+        """
+        from xmodule.capa_module import CapaDescriptor
+        generate_report_data = CapaDescriptor.generate_report_data
+        del CapaDescriptor.generate_report_data
+        yield
+        CapaDescriptor.generate_report_data = generate_report_data
+
+    @patch.dict('django.conf.settings.FEATURES', {'MAX_PROBLEM_RESPONSES_COUNT': 4})
+    def test_build_student_data_limit(self):
+        """
+        Ensure that the _build_student_data method respects the global setting for
+        maximum responses to return in a report.
+        """
+        self.define_option_problem(u'Problem1')
+        for ctr in range(5):
+            student = self.create_student('student{}'.format(ctr))
+            self.submit_student_answer(student.username, u'Problem1', ['Option 1'])
+
+        student_data = ProblemResponses._build_student_data(
+            user_id=self.instructor.id,
+            course_key=self.course.id,
+            usage_key_str=str(self.course.location),
+        )
+
+        self.assertEquals(len(student_data), 4)
+
+    @patch(
+        'lms.djangoapps.instructor_task.tasks_helper.grades.list_problem_responses',
+        wraps=list_problem_responses
+    )
+    def test_build_student_data_for_block_without_generate_report_data(self, mock_list_problem_responses):
+        """
+        Ensure that building student data for a block the doesn't have the
+        ``generate_report_data`` method works as expected.
+        """
+        problem = self.define_option_problem(u'Problem1')
+        self.submit_student_answer(self.student.username, u'Problem1', ['Option 1'])
+        with self._remove_capa_report_generator():
+            student_data = ProblemResponses._build_student_data(
+                user_id=self.instructor.id,
+                course_key=self.course.id,
+                usage_key_str=str(problem.location),
+            )
+        self.assertEquals(len(student_data), 1)
+        self.assertDictContainsSubset({
+            'username': 'student',
+            'location': 'Problem1',
+            'block_key': 'i4x://edx/1.23x/problem/Problem1',
+            'title': 'Problem1',
+        }, student_data[0])
+        self.assertIn('state', student_data[0])
+        mock_list_problem_responses.assert_called_with(self.course.id, ANY, ANY)
+
+    @patch('xmodule.capa_module.CapaDescriptor.generate_report_data', create=True)
+    def test_build_student_data_for_block_with_mock_generate_report_data(self, mock_generate_report_data):
+        """
+        Ensure that building student data for a block that supports the
+        ``generate_report_data`` method works as expected.
+        """
+        self.define_option_problem(u'Problem1')
+        state = {'some': 'state'}
+        mock_generate_report_data.return_value = iter([
+            ('student', state),
+        ])
+        student_data = ProblemResponses._build_student_data(
+            user_id=self.instructor.id,
+            course_key=self.course.id,
+            usage_key_str=str(self.course.location),
+        )
+        self.assertEquals(len(student_data), 1)
+        self.assertDictContainsSubset({
+            'username': 'student',
+            'location': 'test_course > Section > Subsection > Problem1',
+            'block_key': 'i4x://edx/1.23x/problem/Problem1',
+            'title': 'Problem1',
+            'state': state,
+        }, student_data[0])
+
+    def test_build_student_data_for_block_with_real_generate_report_data(self):
+        """
+        Ensure that building student data for a block that supports the
+        ``generate_report_data`` method works as expected.
+        """
+        self.define_option_problem(u'Problem1')
+        self.submit_student_answer(self.student.username, u'Problem1', ['Option 1'])
+        student_data = ProblemResponses._build_student_data(
+            user_id=self.instructor.id,
+            course_key=self.course.id,
+            usage_key_str=str(self.course.location),
+        )
+        self.assertEquals(len(student_data), 1)
+        self.assertDictContainsSubset({
+            'username': 'student',
+            'location': 'test_course > Section > Subsection > Problem1',
+            'block_key': 'i4x://edx/1.23x/problem/Problem1',
+            'title': 'Problem1',
+            'state': {
+                'Answer ID': 'i4x-edx-1_23x-problem-Problem1_2_1',
+                'Answer': 'Option 1',
+                'Question': u'The correct answer is Option 1'
+            },
+        }, student_data[0])
+
+    @patch('lms.djangoapps.instructor_task.tasks_helper.grades.list_problem_responses')
+    @patch('xmodule.capa_module.CapaDescriptor.generate_report_data', create=True)
+    def test_build_student_data_for_block_with_generate_report_data_not_implemented(
+            self,
+            mock_generate_report_data,
+            mock_list_problem_responses,
+    ):
+        """
+        Ensure that if ``generate_report_data`` raises a NotImplementedError,
+        the report falls back to the alternative method.
+        """
+        problem = self.define_option_problem(u'Problem1')
+        mock_generate_report_data.side_effect = NotImplementedError
+        ProblemResponses._build_student_data(
+            user_id=self.instructor.id,
+            course_key=self.course.id,
+            usage_key_str=str(problem.location),
+        )
+        mock_generate_report_data.assert_called_with(ANY, ANY)
+        mock_list_problem_responses.assert_called_with(self.course.id, ANY, ANY)
 
     def test_success(self):
-        task_input = {'problem_location': ''}
+        task_input = {
+            'problem_location': str(self.course.location),
+            'user_id': self.instructor.id
+        }
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
-            with patch('lms.djangoapps.instructor_task.tasks_helper.grades.list_problem_responses') as patched_data_source:
-                patched_data_source.return_value = [
+            with patch('lms.djangoapps.instructor_task.tasks_helper.grades'
+                       '.ProblemResponses._build_student_data') as mock_build_student_data:
+                mock_build_student_data.return_value = [
                     {'username': 'user0', 'state': u'state0'},
                     {'username': 'user1', 'state': u'state1'},
                     {'username': 'user2', 'state': u'state2'},
                 ]
-                result = ProblemResponses.generate(None, None, self.course.id, task_input, 'calculated')
+                result = ProblemResponses.generate(
+                    None, None, self.course.id, task_input, 'calculated'
+                )
         report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
         links = report_store.links_for(self.course.id)
 

@@ -196,6 +196,8 @@ FEATURES = {
     # Grade calculation started from the instructor dashboard will write grades
     # CSV files to the configured storage backend and give links for downloads.
     'ENABLE_GRADE_DOWNLOADS': False,
+    # Maximum number of rows to include in the csv file for downloading problem responses.
+    'MAX_PROBLEM_RESPONSES_COUNT': 5000,
 
     # whether to use password policy enforcement or not
     'ENFORCE_PASSWORD_POLICY': True,
