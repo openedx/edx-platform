@@ -488,18 +488,17 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         self.instructor = self.create_instructor('instructor')
         self.student = self.create_student('student')
 
-    # Can be used once CapaDescriptor gets ``generate_report_data`` method.
-    # @contextmanager
-    # def _remove_report_generator(self):
-    #     """
-    #     Temporarily removes the generate_report_data method so we can test
-    #     report generation when it's absent.
-    #     """
-    #     from xmodule.capa_module import CapaDescriptor
-    #     generate_report_data = CapaDescriptor.generate_report_data
-    #     del CapaDescriptor.generate_report_data
-    #     yield
-    #     CapaDescriptor.generate_report_data = generate_report_data
+    @contextmanager
+    def _remove_capa_report_generator(self):
+        """
+        Temporarily removes the generate_report_data method so we can test
+        report generation when it's absent.
+        """
+        from xmodule.capa_module import CapaDescriptor
+        generate_report_data = CapaDescriptor.generate_report_data
+        del CapaDescriptor.generate_report_data
+        yield
+        CapaDescriptor.generate_report_data = generate_report_data
 
     @patch.dict('django.conf.settings.FEATURES', {'MAX_PROBLEM_RESPONSES_COUNT': 4})
     def test_build_student_data_limit(self):
@@ -529,18 +528,18 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         Ensure that building student data for a block the doesn't have the
         ``generate_report_data`` method works as expected.
         """
-        self.define_option_problem(u'Problem1')
+        problem = self.define_option_problem(u'Problem1')
         self.submit_student_answer(self.student.username, u'Problem1', ['Option 1'])
-
-        student_data = ProblemResponses._build_student_data(
-            user_id=self.instructor.id,
-            course_key=self.course.id,
-            usage_key_str=str(self.course.location),
-        )
+        with self._remove_capa_report_generator():
+            student_data = ProblemResponses._build_student_data(
+                user_id=self.instructor.id,
+                course_key=self.course.id,
+                usage_key_str=str(problem.location),
+            )
         self.assertEquals(len(student_data), 1)
         self.assertDictContainsSubset({
             'username': 'student',
-            'location': 'test_course > Section > Subsection > Problem1',
+            'location': 'Problem1',
             'block_key': 'i4x://edx/1.23x/problem/Problem1',
             'title': 'Problem1',
         }, student_data[0])
@@ -548,7 +547,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         mock_list_problem_responses.assert_called_with(self.course.id, ANY, ANY)
 
     @patch('xmodule.capa_module.CapaDescriptor.generate_report_data', create=True)
-    def test_build_student_data_for_block_with_generate_report_data(self, mock_generate_report_data):
+    def test_build_student_data_for_block_with_mock_generate_report_data(self, mock_generate_report_data):
         """
         Ensure that building student data for a block that supports the
         ``generate_report_data`` method works as expected.
@@ -570,6 +569,31 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             'block_key': 'i4x://edx/1.23x/problem/Problem1',
             'title': 'Problem1',
             'state': state,
+        }, student_data[0])
+
+    def test_build_student_data_for_block_with_real_generate_report_data(self):
+        """
+        Ensure that building student data for a block that supports the
+        ``generate_report_data`` method works as expected.
+        """
+        self.define_option_problem(u'Problem1')
+        self.submit_student_answer(self.student.username, u'Problem1', ['Option 1'])
+        student_data = ProblemResponses._build_student_data(
+            user_id=self.instructor.id,
+            course_key=self.course.id,
+            usage_key_str=str(self.course.location),
+        )
+        self.assertEquals(len(student_data), 1)
+        self.assertDictContainsSubset({
+            'username': 'student',
+            'location': 'test_course > Section > Subsection > Problem1',
+            'block_key': 'i4x://edx/1.23x/problem/Problem1',
+            'title': 'Problem1',
+            'state': {
+                'Answer ID': 'i4x-edx-1_23x-problem-Problem1_2_1',
+                'Answer': 'Option 1',
+                'Question': u'The correct answer is Option 1'
+            },
         }, student_data[0])
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.grades.list_problem_responses')
