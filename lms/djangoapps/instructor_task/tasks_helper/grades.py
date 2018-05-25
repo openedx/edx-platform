@@ -8,11 +8,16 @@ from datetime import datetime
 from itertools import chain, izip, izip_longest
 from time import time
 
+from django.contrib.auth import get_user_model
+from django.conf import settings
 from lazy import lazy
+from opaque_keys.edx.keys import UsageKey
 from pytz import UTC
 from six import text_type
 
+from course_blocks.api import get_course_blocks
 from courseware.courses import get_course_by_id
+from courseware.user_state_client import DjangoXBlockUserStateClient
 from instructor_analytics.basic import list_problem_responses
 from instructor_analytics.csvs import format_dictlist
 from lms.djangoapps.certificates.models import CertificateWhitelist, GeneratedCertificate, certificate_info_for_user
@@ -548,6 +553,99 @@ class ProblemGradeReport(object):
 
 
 class ProblemResponses(object):
+
+    @classmethod
+    def _build_problem_list(cls, course_blocks, root, path=None):
+        """
+        Generate a tuple of display names, block location paths and block keys
+        for all problem blocks under the ``root`` block.
+
+        Arguments:
+            course_blocks (BlockStructureBlockData): Block structure for a course.
+            root (UsageKey): This block and its children will be used to generate
+                the problem list
+            path (List[str]): The list of display names for the parent of root block
+
+        Yields:
+            Tuple[str, List[str], UsageKey]: tuple of a block's display name, path, and
+                usage key
+        """
+        display_name = course_blocks.get_xblock_field(root, 'display_name')
+        if path is None:
+            path = [display_name]
+
+        yield display_name, path, root
+
+        for block in course_blocks.get_children(root):
+            display_name = course_blocks.get_xblock_field(block, 'display_name')
+            for result in cls._build_problem_list(course_blocks, block, path + [display_name]):
+                yield result
+
+    @classmethod
+    def _build_student_data(cls, user_id, course_key, usage_key_str):
+        """
+        Generate a list of problem responses for all problem under the
+        ``problem_location`` root.
+
+        Arguments:
+            user_id (int): The user id for the user generating the report
+            course_key (CourseKey): The ``CourseKey`` for the course whose report
+                is being generated
+            usage_key_str (str): The generated report will include this
+                block and it child blocks.
+
+        Returns:
+              List[Dict]: Returns a list of dictionaries containing the student
+                data which will be included in the final csv.
+        """
+        usage_key = UsageKey.from_string(usage_key_str).map_into_course(course_key)
+        user = get_user_model().objects.get(pk=user_id)
+        course_blocks = get_course_blocks(user, usage_key)
+
+        student_data = []
+        max_count = settings.FEATURES.get('MAX_PROBLEM_RESPONSES_COUNT')
+
+        store = modulestore()
+        user_state_client = DjangoXBlockUserStateClient()
+
+        with store.bulk_operations(course_key):
+            for title, path, block_key in cls._build_problem_list(course_blocks, usage_key):
+                # Chapter and sequential blocks are filtered out since they include state
+                # which isn't useful for this report.
+                if block_key.block_type in ('sequential', 'chapter'):
+                    continue
+
+                block = store.get_item(block_key)
+
+                # Blocks can implement the generate_report_data method to provide their own
+                # human-readable formatting for user state.
+                if hasattr(block, 'generate_report_data'):
+                    try:
+                        user_state_iterator = user_state_client.iter_all_for_block(block_key)
+                        responses = [
+                            {'username': username, 'state': state}
+                            for username, state in
+                            block.generate_report_data(user_state_iterator, max_count)
+                        ]
+                    except NotImplementedError:
+                        responses = list_problem_responses(course_key, block_key, max_count)
+                else:
+                    responses = list_problem_responses(course_key, block_key, max_count)
+
+                student_data += responses
+                for response in responses:
+                    response['title'] = title
+                    # A human-readable location for the current block
+                    response['location'] = ' > '.join(path)
+                    # A machine-friendly location for the current block
+                    response['block_key'] = str(block_key)
+                if max_count is not None:
+                    max_count -= len(responses)
+                    if max_count <= 0:
+                        break
+
+        return student_data
+
     @classmethod
     def generate(cls, _xmodule_instance_args, _entry_id, course_id, task_input, action_name):
         """
@@ -560,11 +658,16 @@ class ProblemResponses(object):
         task_progress = TaskProgress(action_name, num_reports, start_time)
         current_step = {'step': 'Calculating students answers to problem'}
         task_progress.update_task_state(extra_meta=current_step)
+        problem_location = task_input.get('problem_location')
 
         # Compute result table and format it
-        problem_location = task_input.get('problem_location')
-        student_data = list_problem_responses(course_id, problem_location)
-        features = ['username', 'state']
+        student_data = cls._build_student_data(
+            user_id=task_input.get('user_id'),
+            course_key=course_id,
+            usage_key_str=problem_location
+        )
+
+        features = ['username', 'title', 'location', 'block_key', 'state']
         header, rows = format_dictlist(student_data, features)
 
         task_progress.attempted = task_progress.succeeded = len(rows)

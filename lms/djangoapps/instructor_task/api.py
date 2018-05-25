@@ -330,7 +330,7 @@ def submit_calculate_problem_responses_csv(request, course_key, problem_location
     """
     task_type = 'problem_responses_csv'
     task_class = calculate_problem_responses_csv
-    task_input = {'problem_location': problem_location}
+    task_input = {'problem_location': problem_location, 'user_id': request.user.pk}
     task_key = ""
 
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)

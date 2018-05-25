@@ -206,6 +206,9 @@ FEATURES = {
     # Automatically approve student identity verification attempts
     'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': False,
 
+    # Maximum number of rows to include in the csv file for downloading problem responses.
+    'MAX_PROBLEM_RESPONSES_COUNT': 5000,
+
     # whether to use password policy enforcement or not
     'ENFORCE_PASSWORD_POLICY': True,
 
