@@ -626,6 +626,12 @@ urlpatterns += [
         name='edxnotes_endpoints',
     ),
 
+    # Student Notes API
+    url(
+        r'^api/edxnotes/v1/',
+        include('edxnotes.api_urls'),
+    ),
+
     # Branding API
     url(
         r'^api/branding/v1/',
