@@ -14,7 +14,15 @@
     };
 
     Courseware.prototype.render = function() {
-      XBlock.initializeBlocks($('.course-content'));
+      var courseContentElement = $('.course-content')[0];
+      var blocks = XBlock.initializeBlocks(courseContentElement);
+
+      if (courseContentElement.dataset.enableCompletionOnViewService === 'true') {
+        RequireJS.require(['bundles/CompletionOnViewService'], function() {
+            markBlocksCompletedOnViewIfNeeded(blocks[0].runtime, courseContentElement);
+        });
+      }
+
       return $('.course-content .histogram').each(function() {
         var error, histg, id;
         id = $(this).attr('id').replace(/histogram_/, '');

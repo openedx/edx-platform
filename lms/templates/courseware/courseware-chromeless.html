@@ -70,7 +70,13 @@ ${HTML(fragment.foot_html())}
 </%block>
 
 <div class="course-wrapper chromeless">
-  <section class="course-content" id="course-content">
+  <section class="course-content" id="course-content"\
+    % if enable_completion_on_view_service:
+      data-enable-completion-on-view-service="true" \
+    % else:
+      data-enable-completion-on-view-service="false" \
+    % endif
+  >
       <main id="main" tabindex="-1" aria-label="Content">
         ${HTML(fragment.body_html())}
       </main>

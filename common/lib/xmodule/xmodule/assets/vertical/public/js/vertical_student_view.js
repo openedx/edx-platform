@@ -9,7 +9,6 @@
 // navigates back within a given sequential) to protect against duplicate calls
 // to the server.
 
-
 var SEEN_COMPLETABLES = new Set();
 
 window.VerticalStudentView = function(runtime, element) {
@@ -25,46 +24,7 @@ window.VerticalStudentView = function(runtime, element) {
             apiUrl: $bookmarkButtonElement.data('bookmarksApiUrl')
         });
     });
-    RequireJS.require(['bundles/ViewedEvent'], function() {
-        var tracker, vertical, viewedAfter;
-        var completableBlocks = [];
-        var vertModDivs = element.getElementsByClassName('vert-mod');
-        if (vertModDivs.length === 0) {
-            return;
-        }
-        vertical = vertModDivs[0];
-        $(element).find('.vert').each(function(idx, block) {
-            if (block.dataset.completableByViewing !== undefined) {
-                completableBlocks.push(block);
-            }
-        });
-        if (completableBlocks.length > 0) {
-            viewedAfter = parseInt(vertical.dataset.completionDelayMs, 10);
-            if (!(viewedAfter >= 0)) {
-                // parseInt will return NaN if it fails to parse, which is not >= 0.
-                viewedAfter = 5000;
-            }
-            tracker = new ViewedEventTracker(completableBlocks, viewedAfter);
-            tracker.addHandler(function(block, event) {
-                var blockKey = block.dataset.id;
-
-                if (blockKey && !SEEN_COMPLETABLES.has(blockKey)) {
-                    if (event.elementHasBeenViewed) {
-                        $.ajax({
-                            type: 'POST',
-                            url: runtime.handlerUrl(element, 'publish_completion'),
-                            data: JSON.stringify({
-                                block_key: blockKey,
-                                completion: 1.0
-                            })
-                        }).then(
-                            function() {
-                                SEEN_COMPLETABLES.add(blockKey);
-                            }
-                        );
-                    }
-                }
-            });
-        }
+    RequireJS.require(['bundles/CompletionOnViewService'], function() {
+        markBlocksCompletedOnViewIfNeeded(runtime, element);
     });
 };

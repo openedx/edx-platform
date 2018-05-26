@@ -239,6 +239,10 @@ if RELEASE_LINE == "master":
 
 WAFFLE_OVERRIDE = True
 
+############## Settings for Completion API #########################
+
+COMPLETION_BY_VIEWING_DELAY_MS = 1000
+
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:

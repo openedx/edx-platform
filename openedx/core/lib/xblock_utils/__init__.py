@@ -92,6 +92,9 @@ def wrap_xblock(
     data = {}
     data.update(extra_data)
 
+    if context:
+        data.update(context.get('wrap_xblock_data', {}))
+
     css_classes = [
         'xblock',
         'xblock-{}'.format(markupsafe.escape(view)),

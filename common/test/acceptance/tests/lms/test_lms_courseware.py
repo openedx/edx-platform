@@ -13,7 +13,7 @@ from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ...pages.common.auto_auth import AutoAuthPage
 from ...pages.common.logout import LogoutPage
 from ...pages.lms.course_home import CourseHomePage
-from ...pages.lms.courseware import CoursewarePage, CoursewareSequentialTabPage
+from ...pages.lms.courseware import CoursewarePage, CoursewareSequentialTabPage, RenderXBlockPage
 from ...pages.lms.create_mode import ModeCreationPage
 from ...pages.lms.dashboard import DashboardPage
 from ...pages.lms.pay_and_verify import FakePaymentPage, FakeSoftwareSecureVerificationPage, PaymentAndVerificationFlow
@@ -847,3 +847,129 @@ class SubsectionHiddenAfterDueDateTest(UniqueCourseTest):
 
         self.progress_page.visit()
         self.assertEqual(self.progress_page.scores('Test Section 1', 'Test Subsection 1'), [(0, 1)])
+
+
+@attr(shard=9)
+class CompletionTestCase(UniqueCourseTest, EventsTestMixin):
+    """
+    Test the completion on view functionality.
+    """
+    USERNAME = "STUDENT_TESTER"
+    EMAIL = "student101@example.com"
+    COMPLETION_BY_VIEWING_DELAY_MS = '1000'
+
+    def setUp(self):
+        super(CompletionTestCase, self).setUp()
+
+        self.studio_course_outline = StudioCourseOutlinePage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+
+        # Install a course with sections/problems, tabs, updates, and handouts
+        course_fix = CourseFixture(
+            self.course_info['org'], self.course_info['number'],
+            self.course_info['run'], self.course_info['display_name']
+        )
+
+        self.html_1_block = XBlockFixtureDesc('html', 'html 1', data="<html>html 1 dummy body</html>")
+        self.problem_1_block = XBlockFixtureDesc(
+            'problem', 'Test Problem 1', data='<problem>problem 1 dummy body</problem>'
+        )
+
+        course_fix.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section 1').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection 1,1').add_children(
+                    XBlockFixtureDesc('vertical', 'Test Unit 1,1,1').add_children(
+                        XBlockFixtureDesc('html', 'html 1', data="<html>html 1 dummy body</html>"),
+                        XBlockFixtureDesc(
+                            'html', 'html 2',
+                            data=("<html>html 2 dummy body</html>" * 100) + "<span id='html2-end'>End</span>",
+                        ),
+                        XBlockFixtureDesc('problem', 'Test Problem 1', data='<problem>problem 1 dummy body</problem>'),
+                    ),
+                    XBlockFixtureDesc('vertical', 'Test Unit 1,1,2').add_children(
+                        XBlockFixtureDesc('html', 'html 1', data="<html>html 1 dummy body</html>"),
+                        XBlockFixtureDesc('problem', 'Test Problem 1', data='<problem>problem 1 dummy body</problem>'),
+                    ),
+                    XBlockFixtureDesc('vertical', 'Test Unit 1,1,2').add_children(
+                        self.html_1_block,
+                        self.problem_1_block,
+                    ),
+                ),
+            ),
+        ).install()
+
+        # Auto-auth register for the course.
+        AutoAuthPage(self.browser, username=self.USERNAME, email=self.EMAIL,
+                     course_id=self.course_id, staff=False).visit()
+
+    def test_courseware_publish_completion_is_sent_on_view(self):
+        """
+        Test that when viewing courseware XBlocks are correctly marked as completed on view.
+        """
+        courseware_page = CoursewarePage(self.browser, self.course_id)
+        courseware_page.visit()
+        courseware_page.wait_for_page()
+
+        # Initially, the first two blocks in the first vertical should be marked as needing to be completed on view.
+        self.assertEqual(
+            courseware_page.xblock_components_mark_completed_on_view_value(),
+            [self.COMPLETION_BY_VIEWING_DELAY_MS, self.COMPLETION_BY_VIEWING_DELAY_MS, None],
+        )
+        # Wait and verify that the first block which is completely visible is marked as completed.
+        courseware_page.wait_for_xblock_component_to_be_marked_completed_on_view(0)
+        self.assertEqual(
+            courseware_page.xblock_components_mark_completed_on_view_value(),
+            ['0', self.COMPLETION_BY_VIEWING_DELAY_MS, None],
+        )
+
+        # Scroll to the bottom of the second block.
+        courseware_page.scroll_to_element('#html2-end', 'Scroll to end of html 2 block')
+        # Wait and verify that the second block is also now marked as completed.
+        courseware_page.wait_for_xblock_component_to_be_marked_completed_on_view(1)
+        self.assertEqual(courseware_page.xblock_components_mark_completed_on_view_value(), ['0', '0', None])
+
+        # After page refresh, no blocks in the vertical should be marked as needing to be completed on view.
+        self.browser.refresh()
+        courseware_page.wait_for_page()
+        self.assertEqual(courseware_page.xblock_components_mark_completed_on_view_value(), [None, None, None])
+
+        courseware_page.go_to_sequential_position(2)
+
+        # Initially, the first block in the second vertical should be marked as needing to be completed on view.
+        self.assertEqual(
+            courseware_page.xblock_components_mark_completed_on_view_value(),
+            [self.COMPLETION_BY_VIEWING_DELAY_MS, None],
+        )
+        # Wait and verify that the first block which is completely visible is marked as completed.
+        courseware_page.wait_for_xblock_component_to_be_marked_completed_on_view(0)
+        self.assertEqual(courseware_page.xblock_components_mark_completed_on_view_value(), ['0', None])
+
+        # After page refresh, no blocks in the vertical should be marked as needing to be completed on view.
+        self.browser.refresh()
+        courseware_page.wait_for_page()
+        self.assertEqual(courseware_page.xblock_components_mark_completed_on_view_value(), [None, None])
+
+    def test_render_xblock_publish_completion_is_sent_on_view(self):
+        """
+        Test that when viewing a XBlock in render_xblock, it is correctly marked as completed on view.
+        """
+        block_page = RenderXBlockPage(self.browser, self.html_1_block.locator)
+        block_page.visit()
+        block_page.wait_for_page()
+
+        # Initially the block should be marked as needing to be completed on view.
+        self.assertEqual(
+            block_page.xblock_components_mark_completed_on_view_value(), [self.COMPLETION_BY_VIEWING_DELAY_MS]
+        )
+        # Wait and verify that the block is marked as completed on view.
+        block_page.wait_for_xblock_component_to_be_marked_completed_on_view(0)
+        self.assertEqual(block_page.xblock_components_mark_completed_on_view_value(), ['0'])
+
+        # After page refresh, it should not be marked as needing to be completed on view.
+        self.browser.refresh()
+        block_page.wait_for_page()
+        self.assertEqual(block_page.xblock_components_mark_completed_on_view_value(), [None])
