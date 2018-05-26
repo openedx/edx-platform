@@ -59,11 +59,14 @@ class StubCompletionService(object):
         """
         return {candidate: self._completion_value for candidate in candidates}
 
-    def get_completion_by_viewing_delay_ms(self):
+    def get_complete_on_view_delay_ms(self):
         """
         Return the completion-by-viewing delay in milliseconds.
         """
         return self.delay
+
+    def blocks_to_mark_complete_on_view(self, blocks):
+        return {} if self._completion_value == 1.0 else blocks
 
 
 class BaseVerticalBlockTest(XModuleXmlImportTest):
@@ -136,39 +139,31 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
         self.assertIn(self.test_html_1, html)
         self.assertIn(self.test_html_2, html)
         self.assert_bookmark_info_in(html)
-        self.assertIn(six.text_type(COMPLETION_DELAY), html)
-
-    @staticmethod
-    def _render_completable_blocks(template, context):  # pylint: disable=unused-argument
-        """
-        A custom template rendering function that displays the
-        watched_completable_blocks of the template.
-
-        This is used because the default test renderer is haphazardly
-        formatted, and is difficult to make assertions about.
-        """
-        return u'|'.join(context['watched_completable_blocks'])
 
     @ddt.unpack
     @ddt.data(
-        (True, 0.9, 'assertIn'),
-        (False, 0.9, 'assertNotIn'),
-        (True, 1.0, 'assertNotIn'),
+        (True, 0.9, True),
+        (False, 0.9, False),
+        (True, 1.0, False),
     )
-    def test_completion_data_attrs(self, completion_enabled, completion_value, assertion_method):
+    def test_mark_completed_on_view_after_delay_in_context(
+            self, completion_enabled, completion_value, mark_completed_enabled
+    ):
         """
-        Test that data-completable-by-viewing attributes are included only when
-        the completion service is enabled, and only for blocks with a
-        completion value less than 1.0.
+        Test that mark-completed-on-view-after-delay is only set for relevant child Xblocks.
         """
-        with patch.object(self.module_system, 'render_template', new=self._render_completable_blocks):
+        with patch.object(self.html1block, 'render') as mock_student_view:
             self.module_system._services['completion'] = StubCompletionService(
                 enabled=completion_enabled,
                 completion_value=completion_value,
             )
-            response = self.module_system.render(self.vertical, STUDENT_VIEW, self.default_context)
-        getattr(self, assertion_method)(six.text_type(self.html1block.location), response.content)
-        getattr(self, assertion_method)(six.text_type(self.html2block.location), response.content)
+            self.module_system.render(self.vertical, STUDENT_VIEW, self.default_context)
+            if (mark_completed_enabled):
+                self.assertEqual(
+                    mock_student_view.call_args[0][1]['wrap_xblock_data']['mark-completed-on-view-after-delay'], 9876
+                )
+            else:
+                self.assertNotIn('wrap_xblock_data', mock_student_view.call_args[0][1])
 
     def test_render_studio_view(self):
         """
@@ -191,14 +186,3 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
         html = self.module_system.render(self.vertical, AUTHOR_VIEW, context).content
         self.assertIn(self.test_html_1, html)
         self.assertIn(self.test_html_2, html)
-
-    def test_publish_completion(self):
-        request = get_json_request({"block_key": six.text_type(self.html1block.location), "completion": 1.0})
-        with patch.object(self.vertical.runtime, 'publish') as mock_publisher:
-            response = self.vertical.publish_completion(request)
-            self.assertEqual(
-                response.status_code,
-                200,
-                "Expected 200, got {}: {}".format(response.status_code, response.body),
-            )
-            mock_publisher.assert_called_with(self.html1block, "completion", {"completion": 1.0})

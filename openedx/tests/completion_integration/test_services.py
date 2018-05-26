@@ -36,6 +36,10 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
                 parent=cls.sequence,
                 category='vertical',
             )
+            cls.html = ItemFactory.create(
+                parent=cls.vertical,
+                category='html',
+            )
             cls.problem = ItemFactory.create(
                 parent=cls.vertical,
                 category="problem",
@@ -70,6 +74,13 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
         self.completion_service = CompletionService(self.user, self.course_key)
 
         # Proper completions for the given runtime
+        BlockCompletion.objects.submit_completion(
+            user=self.user,
+            course_key=self.course_key,
+            block_key=self.html.location,
+            completion=1.0,
+        )
+
         for idx, block_key in enumerate(self.block_keys[0:3]):
             BlockCompletion.objects.submit_completion(
                 user=self.user,
@@ -148,3 +159,12 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
             self.completion_service.vertical_is_complete(self.vertical),
             False,
         )
+
+    def test_can_mark_block_complete_on_view(self):
+
+        self.assertEqual(self.completion_service.can_mark_block_complete_on_view(self.course), False)
+        self.assertEqual(self.completion_service.can_mark_block_complete_on_view(self.chapter), False)
+        self.assertEqual(self.completion_service.can_mark_block_complete_on_view(self.sequence), False)
+        self.assertEqual(self.completion_service.can_mark_block_complete_on_view(self.vertical), False)
+        self.assertEqual(self.completion_service.can_mark_block_complete_on_view(self.html), True)
+        self.assertEqual(self.completion_service.can_mark_block_complete_on_view(self.problem), False)

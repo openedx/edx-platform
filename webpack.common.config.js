@@ -40,7 +40,7 @@ module.exports = {
         ProgramDetailsFactory: './lms/static/js/learner_dashboard/program_details_factory.js',
         ProgramListFactory: './lms/static/js/learner_dashboard/program_list_factory.js',
         UnenrollmentFactory: './lms/static/js/learner_dashboard/unenrollment_factory.js',
-        ViewedEvent: './lms/static/completion/js/ViewedEvent.js',
+        CompletionOnViewService: './lms/static/completion/js/CompletionOnViewService.js',
 
         // Features
         CourseGoals: './openedx/features/course_experience/static/course_experience/js/CourseGoals.js',

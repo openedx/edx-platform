@@ -1472,6 +1472,15 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
         student_view_context = request.GET.dict()
         student_view_context['show_bookmark_button'] = False
 
+        enable_completion_on_view_service = False
+        completion_service = block.runtime.service(block, 'completion')
+        if completion_service and completion_service.completion_tracking_enabled():
+            if completion_service.blocks_to_mark_complete_on_view({block}):
+                enable_completion_on_view_service = True
+                student_view_context['wrap_xblock_data'] = {
+                    'mark-completed-on-view-after-delay': completion_service.get_complete_on_view_delay_ms()
+                }
+
         context = {
             'fragment': block.render('student_view', context=student_view_context),
             'course': course,
@@ -1480,6 +1489,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             'disable_header': True,
             'disable_footer': True,
             'disable_window_wrap': True,
+            'enable_completion_on_view_service': enable_completion_on_view_service,
             'staff_access': bool(has_access(request.user, 'staff', course)),
             'xqa_server': settings.FEATURES.get('XQA_SERVER', 'http://your_xqa_server.com'),
         }

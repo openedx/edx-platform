@@ -13,7 +13,10 @@ describe('ViewedTracker', () => {
 
   it('calls the handlers when an element is viewed', () => {
     document.body.innerHTML = '<div id="d1"></div><div id="d2"></div><div id="d3"></div>';
-    const tracker = new ViewedEventTracker(Array.from(document.getElementsByTagName('div')), 1000);
+    const tracker = new ViewedEventTracker();
+    for (const element of document.getElementsByTagName('div')) {
+      tracker.addElement(element, 1000);
+    }
     const handlerSpy = jasmine.createSpy('handlerSpy');
     tracker.addHandler(handlerSpy);
     const elvIter = tracker.elementViewings.values();

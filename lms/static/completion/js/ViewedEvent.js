@@ -107,22 +107,22 @@ export class ViewedEventTracker {
    * *   hasBeenViewed (bool): true if all the conditions for being
    *     considered "viewed" have been met.
    */
-  constructor(elements, viewedAfterMs) {
-    this.viewedAfterMs = viewedAfterMs;
+  constructor() {
     this.elementViewings = new Set();
     this.handlers = [];
-
-    this.interval = undefined;
-    elements.forEach((el) => {
-      this.elementViewings.add(
-        new ElementViewing(
-          el,
-          viewedAfterMs,
-          (element, event) => this.callHandlers(element, event),
-        ),
-      );
-    });
     this.registerDomHandlers();
+  }
+
+  /** Add an element to track.  */
+  addElement(element, viewedAfterMs) {
+    this.elementViewings.add(
+     new ElementViewing(
+       element,
+       viewedAfterMs,
+       (el, event) => this.callHandlers(el, event),
+      ),
+    );
+    this.updateVisible();
   }
 
   /** Register a new handler to be called when an element has been viewed.  */

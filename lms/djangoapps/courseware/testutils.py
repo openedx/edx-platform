@@ -105,6 +105,11 @@ class RenderXBlockTestMixin(object):
                 category='html',
                 data="<p>Test HTML Content<p>"
             )
+            self.problem_block = ItemFactory.create(
+                parent=self.vertical_block,
+                category='problem',
+                display_name='Problem'
+            )
         CourseOverview.load_from_module_store(self.course.id)
 
         # block_name_to_be_tested can be `html_block` or `vertical_block`.
@@ -150,9 +155,9 @@ class RenderXBlockTestMixin(object):
         return response
 
     @ddt.data(
-        ('vertical_block', ModuleStoreEnum.Type.mongo, 10),
+        ('vertical_block', ModuleStoreEnum.Type.mongo, 11),
         ('vertical_block', ModuleStoreEnum.Type.split, 6),
-        ('html_block', ModuleStoreEnum.Type.mongo, 11),
+        ('html_block', ModuleStoreEnum.Type.mongo, 12),
         ('html_block', ModuleStoreEnum.Type.split, 6),
     )
     @ddt.unpack

@@ -10,6 +10,7 @@ from HTMLParser import HTMLParser
 from urllib import quote, urlencode
 from uuid import uuid4
 
+from completion.test_utils import CompletionWaffleTestMixin
 import ddt
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
@@ -37,7 +38,7 @@ from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.access_utils import check_course_open_for_learner
 from courseware.model_data import FieldDataCache, set_score
-from courseware.module_render import get_module
+from courseware.module_render import get_module, handle_xblock_callback
 from courseware.tests.factories import GlobalStaffFactory, StudentModuleFactory
 from courseware.testutils import RenderXBlockTestMixin
 from courseware.url_helpers import get_redirect_url
@@ -61,6 +62,7 @@ from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNam
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.gating import api as gating_api
+from openedx.core.lib.url_utils import quote_slashes
 from openedx.features.course_experience import COURSE_OUTLINE_PAGE_FLAG, UNIFIED_COURSE_TAB_FLAG
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from student.models import CourseEnrollment
@@ -2352,6 +2354,143 @@ class TestIndexView(ModuleStoreTestCase):
 
 @attr(shard=5)
 @ddt.ddt
+class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin):
+    """
+    Tests CompleteOnView is set up correctly in CoursewareIndex.
+    """
+
+    def setup_course(self, default_store):
+        """
+        Set up course content for modulestore.
+        """
+        # pylint:disable=attribute-defined-outside-init
+
+        self.request_factory = RequestFactory()
+        self.user = UserFactory()
+
+        with modulestore().default_store(default_store):
+            self.course = CourseFactory.create()
+
+            with self.store.bulk_operations(self.course.id):
+
+                self.chapter = ItemFactory.create(
+                    parent_location=self.course.location, category='chapter', display_name='Week 1'
+                )
+                self.section_1 = ItemFactory.create(
+                    parent_location=self.chapter.location, category='sequential', display_name='Lesson 1'
+                )
+                self.vertical_1 = ItemFactory.create(
+                    parent_location=self.section_1.location, category='vertical', display_name='Subsection 1'
+                )
+                self.html_1_1 = ItemFactory.create(
+                    parent_location=self.vertical_1.location, category='html', display_name="HTML 1_1"
+                )
+                self.problem_1 = ItemFactory.create(
+                    parent_location=self.vertical_1.location, category='problem', display_name="Problem 1"
+                )
+                self.html_1_2 = ItemFactory.create(
+                    parent_location=self.vertical_1.location, category='html', display_name="HTML 1_2"
+                )
+
+                self.section_2 = ItemFactory.create(
+                    parent_location=self.chapter.location, category='sequential', display_name='Lesson 2'
+                )
+                self.vertical_2 = ItemFactory.create(
+                    parent_location=self.section_2.location, category='vertical', display_name='Subsection 2'
+                )
+                self.video_2 = ItemFactory.create(
+                    parent_location=self.vertical_2.location, category='video', display_name="Video 2"
+                )
+                self.problem_2 = ItemFactory.create(
+                    parent_location=self.vertical_2.location, category='problem', display_name="Problem 2"
+                )
+
+        self.section_1_url = reverse(
+            'courseware_section',
+            kwargs={
+                'course_id': unicode(self.course.id),
+                'chapter': self.chapter.url_name,
+                'section': self.section_1.url_name,
+            }
+        )
+
+        self.section_2_url = reverse(
+            'courseware_section',
+            kwargs={
+                'course_id': unicode(self.course.id),
+                'chapter': self.chapter.url_name,
+                'section': self.section_2.url_name,
+            }
+        )
+
+        CourseOverview.load_from_module_store(self.course.id)
+        CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_completion_service_disabled(self, default_store):
+
+        self.setup_course(default_store)
+        self.assertTrue(self.client.login(username=self.user.username, password='test'))
+
+        response = self.client.get(self.section_1_url)
+        self.assertNotIn('data-mark-completed-on-view-after-delay', response.content)
+
+        response = self.client.get(self.section_2_url)
+        self.assertNotIn('data-mark-completed-on-view-after-delay', response.content)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_completion_service_enabled(self, default_store):
+
+        self.override_waffle_switch(True)
+
+        self.setup_course(default_store)
+        self.assertTrue(self.client.login(username=self.user.username, password='test'))
+
+        response = self.client.get(self.section_1_url)
+        self.assertIn('data-mark-completed-on-view-after-delay', response.content)
+        self.assertEquals(response.content.count("data-mark-completed-on-view-after-delay"), 2)
+
+        request = self.request_factory.post(
+            '/',
+            data=json.dumps({"completion": 1}),
+            content_type='application/json',
+        )
+        request.user = self.user
+        response = handle_xblock_callback(
+            request,
+            unicode(self.course.id),
+            quote_slashes(unicode(self.html_1_1.scope_ids.usage_id)),
+            'publish_completion',
+        )
+        self.assertEqual(json.loads(response.content), {'result': "ok"})
+
+        response = self.client.get(self.section_1_url)
+        self.assertIn('data-mark-completed-on-view-after-delay', response.content)
+        self.assertEquals(response.content.count("data-mark-completed-on-view-after-delay"), 1)
+
+        request = self.request_factory.post(
+            '/',
+            data=json.dumps({"completion": 1}),
+            content_type='application/json',
+        )
+        request.user = self.user
+        response = handle_xblock_callback(
+            request,
+            unicode(self.course.id),
+            quote_slashes(unicode(self.html_1_2.scope_ids.usage_id)),
+            'publish_completion',
+        )
+        self.assertEqual(json.loads(response.content), {'result': "ok"})
+
+        response = self.client.get(self.section_1_url)
+        self.assertNotIn('data-mark-completed-on-view-after-delay', response.content)
+
+        response = self.client.get(self.section_2_url)
+        self.assertNotIn('data-mark-completed-on-view-after-delay', response.content)
+
+
+@attr(shard=5)
+@ddt.ddt
 class TestIndexViewWithVerticalPositions(ModuleStoreTestCase):
     """
     Test the index view to handle vertical positions. Confirms that first position is loaded
@@ -2471,7 +2610,7 @@ class TestIndexViewWithGating(ModuleStoreTestCase, MilestonesTestCaseMixin):
 
 
 @attr(shard=5)
-class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase):
+class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaffleTestMixin):
     """
     Tests for the courseware.render_xblock endpoint.
     This class overrides the get_response method, which is used by
@@ -2497,6 +2636,57 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase):
         if url_encoded_params:
             url += '?' + url_encoded_params
         return self.client.get(url)
+
+    def test_render_xblock_with_completion_service_disabled(self):
+        """
+        Test that render_xblock does not set up the CompletionOnViewService.
+        """
+        self.setup_course(ModuleStoreEnum.Type.split)
+        self.setup_user(admin=True, enroll=True, login=True)
+
+        response = self.get_response(usage_key=self.html_block.location)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('data-enable-completion-on-view-service="false"', response.content)
+        self.assertNotIn('data-mark-completed-on-view-after-delay', response.content)
+
+    def test_render_xblock_with_completion_service_enabled(self):
+        """
+        Test that render_xblock sets up the CompletionOnViewService for relevant xblocks.
+        """
+        self.override_waffle_switch(True)
+
+        self.setup_course(ModuleStoreEnum.Type.split)
+        self.setup_user(admin=False, enroll=True, login=True)
+
+        response = self.get_response(usage_key=self.html_block.location)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('data-enable-completion-on-view-service="true"', response.content)
+        self.assertIn('data-mark-completed-on-view-after-delay', response.content)
+
+        request = RequestFactory().post(
+            '/',
+            data=json.dumps({"completion": 1}),
+            content_type='application/json',
+        )
+        request.user = self.user
+        response = handle_xblock_callback(
+            request,
+            unicode(self.course.id),
+            quote_slashes(unicode(self.html_block.location)),
+            'publish_completion',
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content), {'result': "ok"})
+
+        response = self.get_response(usage_key=self.html_block.location)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('data-enable-completion-on-view-service="false"', response.content)
+        self.assertNotIn('data-mark-completed-on-view-after-delay', response.content)
+
+        response = self.get_response(usage_key=self.problem_block.location)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('data-enable-completion-on-view-service="false"', response.content)
+        self.assertNotIn('data-mark-completed-on-view-after-delay', response.content)
 
 
 class TestRenderXBlockSelfPaced(TestRenderXBlock):
