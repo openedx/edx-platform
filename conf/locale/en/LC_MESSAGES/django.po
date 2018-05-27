@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-05-24 10:20+0000\n"
-"PO-Revision-Date: 2018-05-24 10:20:56.261767\n"
+"POT-Creation-Date: 2018-05-27 20:37+0000\n"
+"PO-Revision-Date: 2018-05-27 20:37:20.299161\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -1583,6 +1583,11 @@ msgid "Cannot rescore problems with possible file submissions"
 msgstr ""
 
 #: common/lib/capa/capa/capa_problem.py
+#, python-brace-format
+msgid "Question {0}"
+msgstr ""
+
+#: common/lib/capa/capa/capa_problem.py
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Incorrect"
 msgstr ""
@@ -1746,6 +1751,7 @@ msgid "Incorrect:"
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Answer"
 msgstr ""
 
@@ -2406,6 +2412,14 @@ msgstr ""
 msgid ""
 "The state of this problem has changed since you loaded this page. Please "
 "refresh your page."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Answer ID"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Question"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/conditional_module.py
@@ -13348,7 +13362,7 @@ msgid ""
 msgstr ""
 
 #: lms/templates/api_admin/terms_of_service.html
-msgid "altering or editing any content or graphics in the API Content"
+msgid "altering or editing any content or graphics in the API Content;"
 msgstr ""
 
 #: lms/templates/api_admin/terms_of_service.html
@@ -13436,8 +13450,8 @@ msgid ""
 "revokes access to API Content owned or controlled by that {platform_name} "
 "Participant or third party, including without limitation any Trademarks, you"
 " must ensure that all API Content pertaining to that {platform_name} "
-"Participant or third party is deleted from Your application, networks, "
-"systems and servers as soon as reasonably possible. "
+"Participant or third party is deleted from Your Application and your "
+"networks, systems and servers as soon as reasonably possible. "
 "\"{platform_name_capitalized} Participants\" means MIT, Harvard, and the "
 "other entities providing information, API Content or services for the APIs, "
 "the course instructors and their staffs."
@@ -13482,15 +13496,6 @@ msgstr ""
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
-"{platform_name_capitalized} may also update or modify the APIs from time to "
-"time without advance notice. These changes may affect your use of the APIs "
-"or the way your integration interacts with the API. If we make a change that"
-" is unacceptable to you, you should stop using the APIs. Continued use of "
-"the APIs means you accept the change."
-msgstr ""
-
-#: lms/templates/api_admin/terms_of_service.html
-msgid ""
 "{platform_name_capitalized} reserves the right to modify the Terms at any "
 "time without advance notice.  Any changes to the Terms will be effective "
 "immediately upon posting on this page, with an updated effective date.  By "
@@ -13516,9 +13521,9 @@ msgstr ""
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
 "Your credentials (such as client secret and IDs) are intended to be used "
-"solely by you. You will keep your credentials confidential and discourage "
-"others from using your credentials. Your credentials may not be embedded in "
-"open source projects."
+"solely by you. You will keep your credentials confidential and prevent and "
+"discourage others from using your credentials. Your credentials may not be "
+"embedded in open source projects."
 msgstr ""
 
 #: lms/templates/api_admin/terms_of_service.html
