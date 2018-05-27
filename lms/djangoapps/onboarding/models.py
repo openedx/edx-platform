@@ -43,6 +43,10 @@ class OrgSector(models.Model):
     def __str__(self):
         return self.label
 
+    @classmethod
+    def get_map(cls):
+        return {os.code: os.label for os in cls.objects.all()}
+
     class Meta:
         ordering = ['order']
 
@@ -72,6 +76,10 @@ class FocusArea(models.Model):
 
     def __str__(self):
         return self.label
+
+    @classmethod
+    def get_map(cls):
+        return {fa.code: fa.label for fa in cls.objects.all()}
 
     class Meta:
         ordering = ['order']

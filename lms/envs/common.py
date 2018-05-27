@@ -2205,7 +2205,6 @@ INSTALLED_APPS = (
 
     'lms.djangoapps.onboarding',
 
-
     # OEF survey
     'lms.djangoapps.oef',
 
@@ -2214,6 +2213,8 @@ INSTALLED_APPS = (
 
     # NodeBB
     'nodebb',
+
+    'mailchimp_pipeline',
 
     # Custom settings App
     'custom_settings',
