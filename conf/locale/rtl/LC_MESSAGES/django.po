@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-05-24 10:20+0000\n"
-"PO-Revision-Date: 2018-05-24 10:20:56.261767\n"
+"POT-Creation-Date: 2018-05-27 20:37+0000\n"
+"PO-Revision-Date: 2018-05-27 20:37:20.299161\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -1699,6 +1699,11 @@ msgid "Cannot rescore problems with possible file submissions"
 msgstr "ذشررخف قثسذخقث حقخزمثوس صهفا حخسسهزمث بهمث سعزوهسسهخرس"
 
 #: common/lib/capa/capa/capa_problem.py
+#, python-brace-format
+msgid "Question {0}"
+msgstr "ضعثسفهخر {0}"
+
+#: common/lib/capa/capa/capa_problem.py
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Incorrect"
 msgstr "هرذخققثذف"
@@ -1868,6 +1873,7 @@ msgid "Incorrect:"
 msgstr "هرذخققثذف:"
 
 #: common/lib/capa/capa/responsetypes.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Answer"
 msgstr "شرسصثق"
 
@@ -2567,6 +2573,14 @@ msgid ""
 msgstr ""
 "فاث سفشفث خب فاهس حقخزمثو اشس ذاشرلثي سهرذث غخع مخشيثي فاهس حشلث. حمثشسث "
 "قثبقثسا غخعق حشلث."
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Answer ID"
+msgstr "شرسصثق هي"
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Question"
+msgstr "ضعثسفهخر"
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid "Conditional"
@@ -14737,8 +14751,8 @@ msgstr ""
 "خب شرغ فاهقي حشقفغ;"
 
 #: lms/templates/api_admin/terms_of_service.html
-msgid "altering or editing any content or graphics in the API Content"
-msgstr "شمفثقهرل خق ثيهفهرل شرغ ذخرفثرف خق لقشحاهذس هر فاث شحه ذخرفثرف"
+msgid "altering or editing any content or graphics in the API Content;"
+msgstr "شمفثقهرل خق ثيهفهرل شرغ ذخرفثرف خق لقشحاهذس هر فاث شحه ذخرفثرف;"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -14859,8 +14873,8 @@ msgid ""
 "revokes access to API Content owned or controlled by that {platform_name} "
 "Participant or third party, including without limitation any Trademarks, you"
 " must ensure that all API Content pertaining to that {platform_name} "
-"Participant or third party is deleted from Your application, networks, "
-"systems and servers as soon as reasonably possible. "
+"Participant or third party is deleted from Your Application and your "
+"networks, systems and servers as soon as reasonably possible. "
 "\"{platform_name_capitalized} Participants\" means MIT, Harvard, and the "
 "other entities providing information, API Content or services for the APIs, "
 "the course instructors and their staffs."
@@ -14874,8 +14888,8 @@ msgstr ""
 "قثدخنثس شذذثسس فخ شحه ذخرفثرف خصرثي خق ذخرفقخممثي زغ فاشف {platform_name} "
 "حشقفهذهحشرف خق فاهقي حشقفغ, هرذمعيهرل صهفاخعف مهوهفشفهخر شرغ فقشيثوشقنس, غخع"
 " وعسف ثرسعقث فاشف شمم شحه ذخرفثرف حثقفشهرهرل فخ فاشف {platform_name} "
-"حشقفهذهحشرف خق فاهقي حشقفغ هس يثمثفثي بقخو غخعق شححمهذشفهخر, رثفصخقنس, "
-"سغسفثوس شري سثقدثقس شس سخخر شس قثشسخرشزمغ حخسسهزمث. "
+"حشقفهذهحشرف خق فاهقي حشقفغ هس يثمثفثي بقخو غخعق شححمهذشفهخر شري غخعق "
+"رثفصخقنس, سغسفثوس شري سثقدثقس شس سخخر شس قثشسخرشزمغ حخسسهزمث. "
 "\"{platform_name_capitalized} حشقفهذهحشرفس\" وثشرس وهف, اشقدشقي, شري فاث "
 "خفاثق ثرفهفهثس حقخدهيهرل هربخقوشفهخر, شحه ذخرفثرف خق سثقدهذثس بخق فاث شحهس, "
 "فاث ذخعقسث هرسفقعذفخقس شري فاثهق سفشببس."
@@ -14936,20 +14950,6 @@ msgstr ""
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
-"{platform_name_capitalized} may also update or modify the APIs from time to "
-"time without advance notice. These changes may affect your use of the APIs "
-"or the way your integration interacts with the API. If we make a change that"
-" is unacceptable to you, you should stop using the APIs. Continued use of "
-"the APIs means you accept the change."
-msgstr ""
-"{platform_name_capitalized} وشغ شمسخ عحيشفث خق وخيهبغ فاث شحهس بقخو فهوث فخ "
-"فهوث صهفاخعف شيدشرذث رخفهذث. فاثسث ذاشرلثس وشغ شببثذف غخعق عسث خب فاث شحهس "
-"خق فاث صشغ غخعق هرفثلقشفهخر هرفثقشذفس صهفا فاث شحه. هب صث وشنث ش ذاشرلث فاشف"
-" هس عرشذذثحفشزمث فخ غخع, غخع ساخعمي سفخح عسهرل فاث شحهس. ذخرفهرعثي عسث خب "
-"فاث شحهس وثشرس غخع شذذثحف فاث ذاشرلث."
-
-#: lms/templates/api_admin/terms_of_service.html
-msgid ""
 "{platform_name_capitalized} reserves the right to modify the Terms at any "
 "time without advance notice.  Any changes to the Terms will be effective "
 "immediately upon posting on this page, with an updated effective date.  By "
@@ -14987,14 +14987,14 @@ msgstr "ذخربهيثرفهشمهفغ"
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
 "Your credentials (such as client secret and IDs) are intended to be used "
-"solely by you. You will keep your credentials confidential and discourage "
-"others from using your credentials. Your credentials may not be embedded in "
-"open source projects."
+"solely by you. You will keep your credentials confidential and prevent and "
+"discourage others from using your credentials. Your credentials may not be "
+"embedded in open source projects."
 msgstr ""
 "غخعق ذقثيثرفهشمس (سعذا شس ذمهثرف سثذقثف شري هيس) شقث هرفثريثي فخ زث عسثي "
-"سخمثمغ زغ غخع. غخع صهمم نثثح غخعق ذقثيثرفهشمس ذخربهيثرفهشم شري يهسذخعقشلث "
-"خفاثقس بقخو عسهرل غخعق ذقثيثرفهشمس. غخعق ذقثيثرفهشمس وشغ رخف زث ثوزثييثي هر "
-"خحثر سخعقذث حقختثذفس."
+"سخمثمغ زغ غخع. غخع صهمم نثثح غخعق ذقثيثرفهشمس ذخربهيثرفهشم شري حقثدثرف شري "
+"يهسذخعقشلث خفاثقس بقخو عسهرل غخعق ذقثيثرفهشمس. غخعق ذقثيثرفهشمس وشغ رخف زث "
+"ثوزثييثي هر خحثر سخعقذث حقختثذفس."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
