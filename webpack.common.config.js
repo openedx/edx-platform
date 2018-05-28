@@ -241,7 +241,7 @@ module.exports = {
             'node_modules',
             'cms/static',
             'common/static',
-            'common/static/jsx/',
+            'common/static/common/js/components',
             'common/static/js/src',
             'common/static/js/vendor/',
             'common/static/js/vendor/jQuery-File-Upload/js/'
