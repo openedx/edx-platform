@@ -10,6 +10,13 @@ const RightIcon = (<Icon className={['fa', 'fa-arrow-right']}
 const UpIcon = (<Icon className={['fa', 'fa-arrow-up']}
                       screenReaderText={gettext('Navigate up')}/>);
 
+const BLOCK_TYPE_NAME = {
+    'course': 'Course',
+    'chapter': 'Section',
+    'sequential': 'Sub-section',
+    'vertical': 'Unit',
+};
+
 const BlockList = ({blocks, selectedBlock, onSelectBlock, onChangeRoot}) => (
     <ul className="block-list">
         {blocks.map(block => (
@@ -32,13 +39,15 @@ export const BlockBrowser = ({blocks, selectedBlock, onSelectBlock, onChangeRoot
                         onClick={() => blocks.parent && onChangeRoot(blocks.parent)}
                         label={UpIcon}/>
                 <span className="title">
-                    {gettext('Browsing')} {gettext(blocks.type)} "
+                    {gettext('Browsing')} {gettext(BLOCK_TYPE_NAME[blocks.type])} "
                     <a href="#"
                        onClick={(event) => {
                            event.preventDefault();
                            onSelectBlock(blocks.id);
                        }}
-                       title={gettext('Select') + ' '+ gettext(blocks.type)}>{blocks.display_name}</a>":
+                       title={gettext('Select') + ' ' + gettext(BLOCK_TYPE_NAME[blocks.type])}>
+                        {blocks.display_name}
+                    </a>":
                 </span>
             </div>
             <BlockList blocks={blocks.children}
