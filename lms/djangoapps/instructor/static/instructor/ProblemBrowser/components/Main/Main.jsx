@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as PropTypes from 'prop-types';
 import {Button} from '@edx/paragon';
-import {BlockBrowserContainer} from '../BlockBrowser/BlockBrowserContainer';
+import BlockBrowser from 'BlockBrowser/index.jsx';
 
 export default class Main extends React.Component {
     constructor(props) {
@@ -29,7 +29,7 @@ export default class Main extends React.Component {
                 <Button onClick={this.handleToggleDropdown} label={gettext("Select a section or problem")}/>
                 <input type="text" name="problem-location" value={selectedBlock} disabled/>
                 {this.state.showDropdown &&
-                <BlockBrowserContainer onSelectBlock={(blockId) => {
+                <BlockBrowser onSelectBlock={(blockId) => {
                     this.hideDropdown();
                     onSelectBlock(blockId);
                 }}/>}

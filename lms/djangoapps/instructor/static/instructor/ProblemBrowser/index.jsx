@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {Provider} from 'react-redux';
-import store from './data/store';
+import store from 'BlockBrowser/data/store';
 
 import MainContainer from './components/Main/MainContainer.jsx';
 

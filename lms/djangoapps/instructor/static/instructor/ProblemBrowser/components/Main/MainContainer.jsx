@@ -1,7 +1,7 @@
 import {connect} from 'react-redux';
 
 import Main from './Main.jsx';
-import {fetchCourseBlocks, selectBlock} from '../../data/actions/courseBlocks';
+import {fetchCourseBlocks, selectBlock} from 'BlockBrowser/data/actions/courseBlocks';
 
 const mapStateToProps = state => ({
     selectedBlock: state.selectedBlock,
