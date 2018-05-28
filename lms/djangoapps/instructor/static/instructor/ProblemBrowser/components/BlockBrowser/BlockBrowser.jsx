@@ -2,14 +2,13 @@
 import * as React from 'react';
 import * as PropTypes from 'prop-types';
 import * as classNames from 'classnames';
-import {Button} from '@edx/paragon';
+import {Button, Icon} from '@edx/paragon';
 
-const FAIcon = ({iconName, altlabel}) => (
-    <div>
-        <span className={classNames('icon fa', `fa-${iconName}`)} aria-hidden="true"/>
-        <span className="sr">{altlabel}</span>
-    </div>
-);
+const RightIcon = (<Icon className={['fa', 'fa-arrow-right']}
+                         screenReaderText={gettext('View child items')}/>);
+
+const UpIcon = (<Icon className={['fa', 'fa-arrow-up']}
+                      screenReaderText={gettext('Navigate up')}/>);
 
 const BlockList = ({blocks, selectedBlock, onSelectBlock, onChangeRoot}) => (
     <ul className="block-list">
@@ -19,8 +18,7 @@ const BlockList = ({blocks, selectedBlock, onSelectBlock, onChangeRoot}) => (
                 <Button className={['block-name']}
                         onClick={() => onSelectBlock(block.id)} label={block.display_name}/>
                 {block.children &&
-                <Button onClick={() => onChangeRoot(block.id)}
-                        label={<FAIcon iconName="arrow-right" altlabel={gettext('View child items')}/>}/>}
+                <Button onClick={() => onChangeRoot(block.id)} label={RightIcon}/>}
             </li>
         ))}
     </ul>
@@ -32,7 +30,7 @@ export const BlockBrowser = ({blocks, selectedBlock, onSelectBlock, onChangeRoot
             <div className="header">
                 <Button disabled={!blocks.parent}
                         onClick={() => blocks.parent && onChangeRoot(blocks.parent)}
-                        label={<FAIcon iconName="arrow-up" altlabel={gettext('Navigate up')}/>}/>
+                        label={UpIcon}/>
                 <span className="title">
                     {gettext('Browsing')} {gettext(blocks.type)} "
                     <a href="#"
