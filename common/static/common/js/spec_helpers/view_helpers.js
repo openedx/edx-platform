@@ -1,10 +1,11 @@
 /**
  * Provides helper methods for invoking Studio modal windows in Jasmine tests.
  */
-define(['underscore', 'jquery', 'common/js/components/views/feedback_notification', 'common/js/components/views/feedback_prompt',
-    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'],
-    function(_, $, NotificationView, Prompt, AjaxHelpers) {
-        'use strict';
+(function(define) {
+    'use strict';
+    define(['jquery', 'common/js/components/views/feedback_notification', 'common/js/components/views/feedback_prompt',
+        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'],
+    function($, NotificationView, Prompt, AjaxHelpers) {
         var installViewTemplates, createFeedbackSpy, verifyFeedbackShowing,
             verifyFeedbackHidden, createNotificationSpy, verifyNotificationShowing,
             verifyNotificationHidden, createPromptSpy, confirmPrompt, inlineEdit, verifyInlineEditChange,
@@ -41,11 +42,11 @@ define(['underscore', 'jquery', 'common/js/components/views/feedback_notificatio
             return createFeedbackSpy(NotificationView, type || 'Mini');
         };
 
-        verifyNotificationShowing = function() {
+        verifyNotificationShowing = function(notificationSpy, text) {
             verifyFeedbackShowing.apply(this, arguments);
         };
 
-        verifyNotificationHidden = function() {
+        verifyNotificationHidden = function(notificationSpy) {
             verifyFeedbackHidden.apply(this, arguments);
         };
 
@@ -62,11 +63,11 @@ define(['underscore', 'jquery', 'common/js/components/views/feedback_notificatio
             }
         };
 
-        verifyPromptShowing = function() {
+        verifyPromptShowing = function(promptSpy, text) {
             verifyFeedbackShowing.apply(this, arguments);
         };
 
-        verifyPromptHidden = function() {
+        verifyPromptHidden = function(promptSpy) {
             verifyFeedbackHidden.apply(this, arguments);
         };
 
@@ -147,5 +148,5 @@ define(['underscore', 'jquery', 'common/js/components/views/feedback_notificatio
             submitAndVerifyFormSuccess: submitAndVerifyFormSuccess,
             submitAndVerifyFormError: submitAndVerifyFormError
         };
-    }
-);
+    });
+}).call(this, define || RequireJS.define);

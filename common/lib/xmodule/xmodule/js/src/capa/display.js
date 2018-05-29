@@ -155,9 +155,7 @@
                     return MathJax.Hub.Queue(['Typeset', MathJax.Hub, element]);
                 });
             }
-            if (window.hasOwnProperty('update_schematics')) {
-                window.update_schematics();
-            }
+            window.update_schematics();
             problemPrefix = this.element_id.replace(/problem_/, '');
             this.inputs = this.$('[id^="input_' + problemPrefix + '_"]');
             this.$('div.action button').click(this.refreshAnswers);

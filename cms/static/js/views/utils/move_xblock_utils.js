@@ -9,8 +9,7 @@ define([
     'common/js/components/views/feedback_alert',
     'js/views/utils/xblock_utils',
     'js/views/utils/move_xblock_utils',
-    'edx-ui-toolkit/js/utils/string-utils',
-    'jquery.smoothScroll'
+    'edx-ui-toolkit/js/utils/string-utils'
 ],
 function($, _, Backbone, Feedback, AlertView, XBlockViewUtils, MoveXBlockUtils, StringUtils) {
     'use strict';

@@ -134,8 +134,6 @@ def wrap_xblock(
         'display_name': block.display_name_with_default_escaped,
         'data_attributes': u' '.join(u'data-{}="{}"'.format(markupsafe.escape(key), markupsafe.escape(value))
                                      for key, value in data.iteritems()),
-        'class_name': class_name,
-        'is_xmodule': isinstance(block, (XModule, XModuleDescriptor)),
     }
 
     if hasattr(frag, 'json_init_args') and frag.json_init_args is not None:
@@ -202,7 +200,6 @@ def wrap_xblock_aside(
         'classes': css_classes,
         'data_attributes': u' '.join(u'data-{}="{}"'.format(markupsafe.escape(key), markupsafe.escape(value))
                                      for key, value in data.iteritems()),
-        'is_xmodule': False,
     }
 
     if hasattr(frag, 'json_init_args') and frag.json_init_args is not None:

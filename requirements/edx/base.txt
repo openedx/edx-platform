@@ -4,7 +4,6 @@
 #
 #    make upgrade
 #
-
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
 -e common/lib/calc
 -e common/lib/capa
@@ -100,7 +99,7 @@ django-statici18n==1.4.0
 django-storages==1.4.1
 django-user-tasks==0.1.5
 django-waffle==0.12.0
-django-webpack-loader==0.6.0
+django-webpack-loader==0.4.1
 django==1.11.13
 djangorestframework-jwt==1.11.0
 djangorestframework-xml==1.3.0  # via edx-enterprise
