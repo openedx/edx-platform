@@ -5,8 +5,10 @@ from logging import getLogger
 log = getLogger(__name__)
 
 
-@task(bind=True, ignore_result=True)
-def update_org_details_at_mailchimp(self, org_name, list_id):
+@task()
+def update_org_details_at_mailchimp(org_name, list_id):
+    log.info("Task to send  organization details to Mailchimp")
+    log.info(org_name)
     organization = Organization.objects.filter(label__iexact=org_name.lower()).first()
     extended_profiles = UserExtendedProfile.objects.filter(organization=organization).values("user__email")
     focus_areas = FocusArea.get_map()
