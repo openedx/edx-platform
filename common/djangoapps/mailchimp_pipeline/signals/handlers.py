@@ -1,8 +1,9 @@
 import json
 from enrollment.api import get_enrollments
 from mailchimp_pipeline.client import ChimpClient, MailChimpException
+from mailchimp_pipeline.helpers import get_org_data_for_mandrill
 from mailchimp_pipeline.tasks import update_org_details_at_mailchimp
-from lms.djangoapps.onboarding.models import (UserExtendedProfile, FocusArea, OrgSector, Organization,)
+from lms.djangoapps.onboarding.models import (UserExtendedProfile, Organization,)
 from lms.djangoapps.certificates import api as certificate_api
 from student.models import (UserProfile, CourseEnrollment, )
 from django.conf import settings
@@ -25,20 +26,17 @@ def send_user_profile_info_to_mailchimp(sender, instance, kwargs):  # pylint: di
         }
     elif sender == UserExtendedProfile:
         extended_profile = instance
-        focus_areas = FocusArea.get_map()
-        org_sectors = OrgSector.get_map()
-        org_type = ""
-        if extended_profile.organization.org_type:
-            org_type = org_sectors.get(extended_profile.organization.org_type, "")
+        org_label, org_type, work_area = get_org_data_for_mandrill(extended_profile.organization)
         user_json = {
             "merge_fields": {
-                "ORG": extended_profile.organization.label if extended_profile.organization else "",
+                "ORG": org_label,
                 "ORGTYPE": org_type,
-                "WORKAREA": str(focus_areas.get(extended_profile.organization.focus_area, "")) if extended_profile.organization else ""
+                "WORKAREA": work_area
             }
         }
     elif sender == Organization:
-        update_org_details_at_mailchimp.delay(instance.label, settings.MAILCHIMP_LEARNERS_LIST_ID)
+        org_label, org_type, work_area = get_org_data_for_mandrill(instance)
+        update_org_details_at_mailchimp.delay(org_label, org_type, work_area, settings.MAILCHIMP_LEARNERS_LIST_ID)
 
     if user_json and not sender == Organization:
         try:
