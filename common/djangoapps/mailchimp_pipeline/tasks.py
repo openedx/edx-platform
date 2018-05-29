@@ -1,29 +1,23 @@
 from celery import task
-from lms.djangoapps.onboarding.models import (UserExtendedProfile, Organization, FocusArea, OrgSector)
+from lms.djangoapps.onboarding.models import UserExtendedProfile
 from mailchimp_pipeline.client import ChimpClient, MailChimpException
 from logging import getLogger
 log = getLogger(__name__)
 
 
 @task()
-def update_org_details_at_mailchimp(org_name, list_id):
-    log.info("Task to send  organization details to Mailchimp")
-    log.info(org_name)
-    organization = Organization.objects.filter(label__iexact=org_name.lower()).first()
-    extended_profiles = UserExtendedProfile.objects.filter(organization=organization).values("user__email")
-    focus_areas = FocusArea.get_map()
-    org_sectors = OrgSector.get_map()
+def update_org_details_at_mailchimp(org_label, org_type, work_area, list_id):
+    log.info("Task to send organization details to MailChimp")
+    log.info(org_label)
+
+    extended_profiles = UserExtendedProfile.objects.filter(organization__label__iexact=org_label.lower()).values("user__email")
 
     for extended_profile in extended_profiles:
-        org_type = ""
-        if organization.org_type:
-            org_type = org_sectors.get(organization.org_type, "")
-
         user_json = {
             "merge_fields": {
-                "ORG": organization.label,
+                "ORG": org_label,
                 "ORGTYPE": org_type,
-                "WORKAREA": str(focus_areas.get(organization.focus_area, "")) if organization else "",
+                "WORKAREA": work_area
             }
         }
         try:
