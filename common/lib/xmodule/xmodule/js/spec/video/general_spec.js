@@ -1,5 +1,7 @@
 (function(undefined) {
     describe('Video', function() {
+        var oldOTBD, state;
+
         afterEach(function() {
             $('source').remove();
             window.VideoState = {};
@@ -9,8 +11,6 @@
 
         describe('constructor', function() {
             describe('YT', function() {
-                var state;
-
                 beforeEach(function() {
                     loadFixtures('video.html');
                     $.cookie.and.returnValue('0.50');
@@ -18,24 +18,24 @@
 
                 describe('by default', function() {
                     beforeEach(function() {
-                        state = jasmine.initializePlayerYouTube('video_html5.html');
+                        this.state = jasmine.initializePlayerYouTube('video_html5.html');
                     });
 
                     afterEach(function() {
-                        state.storage.clear();
-                        state.videoPlayer.destroy();
+                        this.state.storage.clear();
+                        this.state.videoPlayer.destroy();
                     });
 
                     it('check videoType', function() {
-                        expect(state.videoType).toEqual('youtube');
+                        expect(this.state.videoType).toEqual('youtube');
                     });
 
                     it('set the elements', function() {
-                        expect(state.el).toEqual($('#video_id'));
+                        expect(this.state.el).toEqual($('#video_id'));
                     });
 
                     it('parse the videos', function() {
-                        expect(state.videos).toEqual({
+                        expect(this.state.videos).toEqual({
                             '0.50': '7tqY6eQzVhE',
                             '1.0': 'cogebirgzzM',
                             '1.50': 'abcdefghijkl'
@@ -43,11 +43,11 @@
                     });
 
                     it('parse available video speeds', function() {
-                        expect(state.speeds).toEqual(['0.50', '1.0', '1.50']);
+                        expect(this.state.speeds).toEqual(['0.50', '1.0', '1.50']);
                     });
 
                     it('set current video speed via cookie', function() {
-                        expect(state.speed).toEqual('1.50');
+                        expect(this.state.speed).toEqual('1.50');
                     });
                 });
             });

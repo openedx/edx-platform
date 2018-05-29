@@ -1,8 +1,5 @@
-import * as Time from 'time.js';
-
 (function(undefined) {
     'use strict';
-
     describe('VideoPlayer Save State plugin', function() {
         var state, oldOTBD;
 
@@ -45,6 +42,7 @@ import * as Time from 'time.js';
 
             beforeEach(function() {
                 state.videoPlayer.currentTime = videoPlayerCurrentTime;
+                spyOn(window.Time, 'formatFull').and.callThrough();
             });
 
             it('data is not an object, async is true', function() {
@@ -149,7 +147,9 @@ import * as Time from 'time.js';
                         positionVal,
                         true
                     );
-                    expect(ajaxData.saved_video_position).toBe(Time.formatFull(positionVal));
+                    expect(Time.formatFull).toHaveBeenCalledWith(
+                        positionVal
+                    );
                 }
                 expect($.ajax).toHaveBeenCalledWith({
                     url: state.config.saveStateUrl,
