@@ -13,7 +13,7 @@ class CourseImportLog(mongoengine.Document):
     location = mongoengine.StringField(max_length=168)
     import_log = mongoengine.StringField(max_length=20 * 65535)
     git_log = mongoengine.StringField(max_length=65535)
-    repo_dir = mongoengine.StringField(max_length=128)
+    repo_dir = mongoengine.StringField(max_length=128, null=True)
     commit = mongoengine.StringField(max_length=40, null=True)
     author = mongoengine.StringField(max_length=500, null=True)
     date = mongoengine.DateTimeField()
