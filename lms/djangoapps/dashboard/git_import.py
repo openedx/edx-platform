@@ -3,7 +3,9 @@ Provides a function for importing a git repository into the lms
 instance when using a mongo modulestore
 """
 
+from dateutil import parser
 import logging
+import json
 import os
 import re
 import StringIO
@@ -175,19 +177,8 @@ def switch_branch(branch, rdir):
         raise GitImportErrorCannotBranch()
 
 
-def add_repo(repo, rdir_in, branch=None):
-    """
-    This will add a git repo into the mongo modulestore.
-    If branch is left as None, it will fetch the most recent
-    version of the current branch.
-    """
-    # pylint: disable=too-many-statements
-
-    git_repo_dir = getattr(settings, 'GIT_REPO_DIR', DEFAULT_GIT_REPO_DIR)
-    git_import_static = getattr(settings, 'GIT_IMPORT_STATIC', True)
-    git_import_python_lib = getattr(settings, 'GIT_IMPORT_PYTHON_LIB', True)
-    python_lib_filename = getattr(settings, 'PYTHON_LIB_FILENAME', DEFAULT_PYTHON_LIB_FILENAME)
-
+def open_mongo_connection():
+    """open mongo connection for edit"""
     # Set defaults even if it isn't defined in settings
     mongo_db = {
         'host': 'localhost',
@@ -202,6 +193,35 @@ def add_repo(repo, rdir_in, branch=None):
         for config_item in ['host', 'user', 'password', 'db', 'port']:
             mongo_db[config_item] = settings.MONGODB_LOG.get(
                 config_item, mongo_db[config_item])
+
+    # store import-command-run output in mongo
+    mongouri = 'mongodb://{user}:{password}@{host}:{port}/{db}'.format(**mongo_db)
+
+    mdb = None
+    try:
+        if mongo_db['user'] and mongo_db['password']:
+            mdb = mongoengine.connect(mongo_db['db'], host=mongouri)
+        else:
+            mdb = mongoengine.connect(mongo_db['db'], host=mongo_db['host'], port=mongo_db['port'])
+    except mongoengine.connection.ConnectionError:
+        log.exception('Unable to connect to mongodb to save log, please '
+                      'check MONGODB_LOG settings')
+
+    return mdb
+
+
+def add_repo(repo, rdir_in, branch=None):
+    """
+    This will add a git repo into the mongo modulestore.
+    If branch is left as None, it will fetch the most recent
+    version of the current branch.
+    """
+    # pylint: disable=too-many-statements
+
+    git_repo_dir = getattr(settings, 'GIT_REPO_DIR', DEFAULT_GIT_REPO_DIR)
+    git_import_static = getattr(settings, 'GIT_IMPORT_STATIC', True)
+    git_import_python_lib = getattr(settings, 'GIT_IMPORT_PYTHON_LIB', True)
+    python_lib_filename = getattr(settings, 'PYTHON_LIB_FILENAME', DEFAULT_PYTHON_LIB_FILENAME)
 
     if not os.path.isdir(git_repo_dir):
         raise GitImportErrorNoDir(git_repo_dir)
@@ -237,9 +257,10 @@ def add_repo(repo, rdir_in, branch=None):
         switch_branch(branch, rdirp)
 
     # get commit id
-    cmd = ['git', 'log', '-1', '--format=%H', ]
+    cmd = ['git', 'log', '-1', '--format=format:{ "commit": "%H", "author": "%an %ae", "date": "%ad"}', ]
     try:
-        commit_id = cmd_log(cmd, cwd=rdirp)
+         git_log_json = json.loads(cmd_log(cmd, cwd=rdirp))
+         commit_id = git_log_json['commit']
     except subprocess.CalledProcessError as ex:
         log.exception('Unable to get git log: %r', ex.output)
         raise GitImportErrorBadRepo()
@@ -326,26 +347,23 @@ def add_repo(repo, rdir_in, branch=None):
             log.debug(subprocess.check_output(['ls', '-l', ],
                                               cwd=os.path.abspath(cdir)))
 
-    # store import-command-run output in mongo
-    mongouri = 'mongodb://{user}:{password}@{host}:{port}/{db}'.format(**mongo_db)
+    mdb = open_mongo_connection()
+    if mdb is not None:
+        cil = CourseImportLog(
+            course_id=course_key,
+            location=location,
+            repo_dir=rdir,
+            created=timezone.now(),
+            import_log=ret_import,
+            author=git_log_json['author'],
+            commit=git_log_json['commit'],
+            date=parser.parse(git_log_json['date']),
+            git_log=ret_git,
+        )
+        cil.save()
 
-    try:
-        if mongo_db['user'] and mongo_db['password']:
-            mdb = mongoengine.connect(mongo_db['db'], host=mongouri)
-        else:
-            mdb = mongoengine.connect(mongo_db['db'], host=mongo_db['host'], port=mongo_db['port'])
-    except mongoengine.connection.ConnectionError:
-        log.exception('Unable to connect to mongodb to save log, please '
-                      'check MONGODB_LOG settings')
-    cil = CourseImportLog(
-        course_id=course_key,
-        location=location,
-        repo_dir=rdir,
-        created=timezone.now(),
-        import_log=ret_import,
-        git_log=ret_git,
-    )
-    cil.save()
+        log.debug('saved CourseImportLog for %s', cil.course_id)
+        mdb.disconnect()
+    else:
+        log.error('Unable to save CourseImportLog because of an error in building mongo connection')
 
-    log.debug('saved CourseImportLog for %s', cil.course_id)
-    mdb.disconnect()
