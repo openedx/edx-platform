@@ -25,9 +25,16 @@ def send_user_profile_info_to_mailchimp(sender, instance, kwargs):  # pylint: di
         }
     elif sender == UserExtendedProfile:
         extended_profile = instance
+        focus_areas = FocusArea.get_map()
+        org_sectors = OrgSector.get_map()
+        org_type = ""
+        if extended_profile.organization.org_type:
+            org_type = org_sectors.get(extended_profile.organization.org_type, "")
         user_json = {
             "merge_fields": {
-                "ORG": extended_profile.organization.label if extended_profile.organization else ""
+                "ORG": extended_profile.organization.label if extended_profile.organization else "",
+                "ORGTYPE": org_type,
+                "WORKAREA": str(focus_areas.get(extended_profile.organization.focus_area, "")) if extended_profile.organization else ""
             }
         }
     elif sender == Organization:
