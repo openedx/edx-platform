@@ -1,11 +1,10 @@
 /**
  * Provides helper methods for invoking Studio modal windows in Jasmine tests.
  */
-(function(define) {
-    'use strict';
-    define(['jquery', 'common/js/components/views/feedback_notification', 'common/js/components/views/feedback_prompt',
-        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'],
-    function($, NotificationView, Prompt, AjaxHelpers) {
+define(['underscore', 'jquery', 'common/js/components/views/feedback_notification', 'common/js/components/views/feedback_prompt',
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'],
+    function(_, $, NotificationView, Prompt, AjaxHelpers) {
+        'use strict';
         var installViewTemplates, createFeedbackSpy, verifyFeedbackShowing,
             verifyFeedbackHidden, createNotificationSpy, verifyNotificationShowing,
             verifyNotificationHidden, createPromptSpy, confirmPrompt, inlineEdit, verifyInlineEditChange,
@@ -42,11 +41,11 @@
             return createFeedbackSpy(NotificationView, type || 'Mini');
         };
 
-        verifyNotificationShowing = function(notificationSpy, text) {
+        verifyNotificationShowing = function() {
             verifyFeedbackShowing.apply(this, arguments);
         };
 
-        verifyNotificationHidden = function(notificationSpy) {
+        verifyNotificationHidden = function() {
             verifyFeedbackHidden.apply(this, arguments);
         };
 
@@ -63,11 +62,11 @@
             }
         };
 
-        verifyPromptShowing = function(promptSpy, text) {
+        verifyPromptShowing = function() {
             verifyFeedbackShowing.apply(this, arguments);
         };
 
-        verifyPromptHidden = function(promptSpy) {
+        verifyPromptHidden = function() {
             verifyFeedbackHidden.apply(this, arguments);
         };
 
@@ -148,5 +147,5 @@
             submitAndVerifyFormSuccess: submitAndVerifyFormSuccess,
             submitAndVerifyFormError: submitAndVerifyFormError
         };
-    });
-}).call(this, define || RequireJS.define);
+    }
+);

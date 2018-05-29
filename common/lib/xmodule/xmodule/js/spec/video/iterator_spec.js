@@ -100,4 +100,4 @@ function(Iterator) {
         });
     });
 });
-}(RequireJS.require));
+}(require));

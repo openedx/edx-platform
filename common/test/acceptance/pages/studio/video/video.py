@@ -29,6 +29,7 @@ CLASS_SELECTORS = {
     'collapse_bar': '.videolist-extra-videos',
     'status': '.transcripts-message-status',
     'attach_transcript': '.file-chooser > input[type="file"]',
+    'basic_metadata': '.basic_metadata_edit',
 }
 
 BUTTON_SELECTORS = {
@@ -91,8 +92,8 @@ FIELDS_WO_CLEAR = [
 DELAY = 0.5
 
 
-@js_defined('window.Video', 'window.RequireJS.require', 'window.jQuery', 'window.XModule', 'window.XBlock',
-            'window.MathJax', 'window.MathJax.isReady')
+@js_defined('window.Video', 'window.jQuery', 'window.XModule', 'window.XBlock',
+            'window.MathJax')
 class VideoComponentPage(VideoPage):
     """
     CMS Video Component Page
@@ -102,8 +103,10 @@ class VideoComponentPage(VideoPage):
 
     @wait_for_js
     def is_browser_on_page(self):
-        return self.q(css='div{0}'.format(CLASS_SELECTORS['video_xmodule'])).present or self.q(
-            css='div{0}'.format(CLASS_SELECTORS['xblock'])).present
+        return (
+            self.q(css='div{0}'.format(CLASS_SELECTORS['video_xmodule'])).present or
+            self.q(css='div{0}'.format(CLASS_SELECTORS['xblock'])).present
+        )
 
     def get_element_selector(self, class_name, vertical=False):
         return super(VideoComponentPage, self).get_element_selector(class_name, vertical=vertical)

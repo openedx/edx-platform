@@ -16,3 +16,9 @@ LOGGING['handlers']['local'] = LOGGING['handlers']['tracking'] = {
 }
 
 LOGGING['loggers']['tracking']['handlers'] = ['console']
+
+# Point the URL used to test YouTube availability to our stub YouTube server
+BOK_CHOY_HOST = os.environ['BOK_CHOY_HOSTNAME']
+YOUTUBE['API'] = "http://{}:{}/get_youtube_api/".format(BOK_CHOY_HOST, YOUTUBE_PORT)
+YOUTUBE['METADATA_URL'] = "http://{}:{}/test_youtube/".format(BOK_CHOY_HOST, YOUTUBE_PORT)
+YOUTUBE['TEXT_API']['url'] = "{}:{}/test_transcripts_youtube/".format(BOK_CHOY_HOST, YOUTUBE_PORT)
