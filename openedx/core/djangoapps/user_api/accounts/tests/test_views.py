@@ -13,6 +13,7 @@ import ddt
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
+from django.core import mail
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.test import TestCase
@@ -1148,6 +1149,10 @@ class TestDeactivateLogout(RetirementTestCase):
         retirement_utils_mock.retire_dot_oauth2_models.assertCalledWith(self.test_user)
         # make sure the user cannot log in
         self.assertFalse(self.client.login(username=self.test_user.username, password=self.test_password))
+        # make sure that an email has been sent
+        self.assertEqual(len(mail.outbox), 1)
+        # ensure that it's been sent to the correct email address
+        self.assertIn(self.test_user.email, mail.outbox[0].to)
 
     def test_password_mismatch(self):
         """

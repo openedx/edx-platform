@@ -22,6 +22,8 @@ def get_base_template_context(site):
             site=site,
             site_config_name='platform_name',
         ),
+        'contact_email': get_config_value_from_site_or_settings(
+            'CONTACT_EMAIL', site=site, site_config_name='contact_email'),
         'contact_mailing_address': get_config_value_from_site_or_settings(
             'CONTACT_MAILING_ADDRESS', site=site, site_config_name='contact_mailing_address'),
         'social_media_urls': get_config_value_from_site_or_settings('SOCIAL_MEDIA_FOOTER_URLS', site=site),
