@@ -3,6 +3,7 @@ This module creates a sysadmin dashboard for managing and viewing
 courses.
 """
 from __future__ import absolute_import
+from dateutil import parser
 import unicodecsv as csv
 import json
 import logging
@@ -336,30 +337,56 @@ class Courses(SysadminDashboardView):
     provides course listing information.
     """
 
-    def git_info_for_course(self, cdir):
+    def git_info_for_course(self, cdir, course_id):
         """This pulls out some git info like the last commit"""
-
-        cmd = ''
-        gdir = settings.DATA_DIR / cdir
         info = ['', '', '']
+        # only if course has git import history
+        if CourseImportLog.objects.filter(course_id=course_id).count() > 0:
+            # check if course has git commit hash
+            logs = CourseImportLog.objects.filter(
+                course_id=course_id,
+                commit__ne=None
+            ).values_list(
+                'commit',
+                'date',
+                'author'
+            ).order_by('-created').first()
 
-        # Try the data dir, then try to find it in the git import dir
-        if not gdir.exists():
-            git_repo_dir = getattr(settings, 'GIT_REPO_DIR', git_import.DEFAULT_GIT_REPO_DIR)
-            gdir = path(git_repo_dir) / cdir
-            if not gdir.exists():
-                return info
+            if logs:
+                info[0] = logs[0]
+                info[1] = logs[1]
+                info[2] = logs[2]
+            else:
+                # if a course do not have git commit hash then fetch from git and cache.
+                cmd = ''
+                gdir = settings.DATA_DIR / cdir
 
-        cmd = ['git', 'log', '-1',
-               '--format=format:{ "commit": "%H", "author": "%an %ae", "date": "%ad"}', ]
-        try:
-            output_json = json.loads(subprocess.check_output(cmd, cwd=gdir))
-            info = [output_json['commit'],
-                    output_json['date'],
-                    output_json['author'], ]
-        except (ValueError, subprocess.CalledProcessError):
-            pass
+                # Try the data dir, then try to find it in the git import dir
+                if not gdir.exists():
+                    git_repo_dir = getattr(settings, 'GIT_REPO_DIR', git_import.DEFAULT_GIT_REPO_DIR)
+                    gdir = path(git_repo_dir) / cdir
+                    if not gdir.exists():
+                        return info
 
+                cmd = ['git', 'log', '-1',
+                       '--format=format:{ "commit": "%H", "author": "%an %ae", "date": "%ad"}', ]
+                try:
+                    output_json = json.loads(subprocess.check_output(cmd, cwd=gdir))
+                    info = [output_json['commit'],
+                            output_json['date'],
+                            output_json['author'], ]
+
+                    # cache the git log info
+                    course = CourseImportLog.objects.filter(
+                        course_id=course_id,
+                    ).order_by('-created').first()
+                    course.author = output_json['author']
+                    course.commit = output_json['commit']
+                    course.date = parser.parse(output_json['date'])
+                    course.save()
+                    log.debug('Updated git logs for course %s', course_id)
+                except (ValueError, subprocess.CalledProcessError):
+                    pass
         return info
 
     def get_course_from_git(self, gitloc, branch):
@@ -424,22 +451,25 @@ class Courses(SysadminDashboardView):
 
     def make_datatable(self):
         """Creates course information datatable"""
-
         data = []
+        mdb = git_import.open_mongo_connection()
+        if mdb is not None:
+            for course in self.get_courses():
+                gdir = course.id.course
+                data.append([course.display_name, text_type(course.id)]
+                            + self.git_info_for_course(gdir, course.id))
 
-        for course in self.get_courses():
-            gdir = course.id.course
-            data.append([course.display_name, text_type(course.id)]
-                        + self.git_info_for_course(gdir))
-
-        return dict(header=[_('Course Name'),
-                            _('Directory/ID'),
-                            # Translators: "Git Commit" is a computer command; see http://gitref.org/basic/#commit
-                            _('Git Commit'),
-                            _('Last Change'),
-                            _('Last Editor')],
-                    title=_('Information about all courses'),
-                    data=data)
+            mdb.disconnect()
+            return dict(header=[_('Course Name'),
+                                _('Directory/ID'),
+                                # Translators: "Git Commit" is a computer command; see http://gitref.org/basic/#commit
+                                _('Git Commit'),
+                                _('Last Change'),
+                                _('Last Editor')],
+                        title=_('Information about all courses'),
+                        data=data)
+        else:
+            log.error('Unable to save CourseImportLog because of an error in building mongo connection')
 
     def get(self, request):
         """Displays forms and course information"""
@@ -589,34 +619,9 @@ class GitLogs(TemplateView):
             course_id = CourseKey.from_string(course_id)
 
         page_size = 10
-
-        # Set mongodb defaults even if it isn't defined in settings
-        mongo_db = {
-            'host': 'localhost',
-            'user': '',
-            'password': '',
-            'db': 'xlog',
-        }
-
-        # Allow overrides
-        if hasattr(settings, 'MONGODB_LOG'):
-            for config_item in ['host', 'user', 'password', 'db', ]:
-                mongo_db[config_item] = settings.MONGODB_LOG.get(
-                    config_item, mongo_db[config_item])
-
-        mongouri = 'mongodb://{user}:{password}@{host}/{db}'.format(**mongo_db)
-
         error_msg = ''
 
-        try:
-            if mongo_db['user'] and mongo_db['password']:
-                mdb = mongoengine.connect(mongo_db['db'], host=mongouri)
-            else:
-                mdb = mongoengine.connect(mongo_db['db'], host=mongo_db['host'])
-        except mongoengine.connection.ConnectionError:
-            log.exception('Unable to connect to mongodb to save log, '
-                          'please check MONGODB_LOG settings.')
-
+        mdb = git_import.open_mongo_connection()
         if course_id is None:
             # Require staff if not going to specific course
             if not request.user.is_staff:
