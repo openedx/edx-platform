@@ -111,7 +111,7 @@ class StudentModule(models.Model):
         ('f', 'FINISHED'),
         ('i', 'INCOMPLETE'),
     )
-    done = models.CharField(max_length=8, choices=DONE_TYPES, default='na', db_index=True)
+    done = models.CharField(max_length=8, choices=DONE_TYPES, default='na')
 
     created = models.DateTimeField(auto_now_add=True, db_index=True)
     modified = models.DateTimeField(auto_now=True, db_index=True)
