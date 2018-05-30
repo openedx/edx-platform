@@ -129,9 +129,8 @@ def delete_all_notes_for_user(user, user_id):
     :return: response (requests) object
 
     Raises:
-        RequestException - when notes api is not found/misconfigured.
+        EdxNotesServiceUnavailable - when notes api is not found/misconfigured.
     """
-    # TODO:PLAT-2001 add to master LMS endpoint.
     url = get_internal_endpoint()
     headers = {
         "x-annotator-auth-token": get_edxnotes_id_token(user),
