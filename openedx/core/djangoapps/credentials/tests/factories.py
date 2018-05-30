@@ -28,4 +28,4 @@ class UserCredential(DictFactoryBase):
     status = 'awarded'
     uuid = factory.Faker('uuid4')
     certificate_url = factory.Faker('url')
-    credential = factory.LazyFunction(partial(generate_instances, ProgramCredential, count=1))
+    credential = ProgramCredential()

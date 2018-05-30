@@ -68,3 +68,22 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
         self.assertEqual(kwargs['querystring'], querystring)
 
         self.assertEqual(actual, expected)
+
+    def test_programs_only(self, mock_get_edx_api_data):
+        expected = factories.UserCredential.create_batch(3)
+        expected[0]['credential'] = factories.CourseCredential()
+        mock_get_edx_api_data.return_value = expected
+
+        actual = get_credentials(self.user, programs_only=True)
+
+        mock_get_edx_api_data.assert_called_once()
+        call = mock_get_edx_api_data.mock_calls[0]
+        __, __, kwargs = call
+
+        querystring = {
+            'username': self.user.username,
+            'status': 'awarded',
+        }
+        self.assertEqual(kwargs['querystring'], querystring)
+
+        self.assertEqual(actual, expected[1:])
