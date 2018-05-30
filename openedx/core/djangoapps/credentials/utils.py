@@ -55,14 +55,11 @@ def get_credentials(user, program_uuid=None):
     # Bypass caching for staff users, who may be generating credentials and
     # want to see them displayed immediately.
     use_cache = credential_configuration.is_cache_enabled and not user.is_staff
-    cache_key = credential_configuration.CACHE_KEY + '.' + user.username if use_cache else None
+    cache_key = '{}.{}'.format(credential_configuration.CACHE_KEY, user.username) if use_cache else None
+    if cache_key and program_uuid:
+        cache_key = '{}.{}'.format(cache_key, program_uuid)
     api = get_credentials_api_client(user)
 
     return get_edx_api_data(
-        credential_configuration,
-        'credentials',
-        api=api,
-        resource_id=program_uuid,
-        querystring=querystring,
-        cache_key=cache_key
+        credential_configuration, 'credentials', api=api, querystring=querystring, cache_key=cache_key
     )

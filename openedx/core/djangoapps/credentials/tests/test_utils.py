@@ -28,7 +28,7 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
 
         ClientFactory(name=CredentialsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
 
-        self.create_credentials_config()
+        self.credentials_config = self.create_credentials_config(cache_ttl=1)
         self.user = UserFactory()
 
     def test_get_many(self, mock_get_edx_api_data):
@@ -45,8 +45,9 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
             'username': self.user.username,
             'status': 'awarded',
         }
+        cache_key = '{}.{}'.format(self.credentials_config.CACHE_KEY, self.user.username)
         self.assertEqual(kwargs['querystring'], querystring)
-        self.assertIsNone(kwargs['resource_id'])
+        self.assertEqual(kwargs['cache_key'], cache_key)
 
         self.assertEqual(actual, expected)
 
@@ -66,7 +67,8 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
             'status': 'awarded',
             'program_uuid': program_uuid,
         }
+        cache_key = '{}.{}.{}'.format(self.credentials_config.CACHE_KEY, self.user.username, program_uuid)
         self.assertEqual(kwargs['querystring'], querystring)
-        self.assertEqual(kwargs['resource_id'], program_uuid)
+        self.assertEqual(kwargs['cache_key'], cache_key)
 
         self.assertEqual(actual, expected)
