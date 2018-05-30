@@ -17,6 +17,7 @@ from lms.djangoapps.certificates.models import (
     certificate_status_for_student
 )
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
+from student.models import CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.milestones_helpers import milestones_achieved_by_user, set_prerequisite_courses
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -58,7 +59,7 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
     @data(
         {'allow_certificate': False, 'whitelisted': False, 'grade': None, 'output': ['N', 'N', 'N/A']},
         {'allow_certificate': True, 'whitelisted': True, 'grade': None, 'output': ['Y', 'N', 'N/A']},
-        {'allow_certificate': True, 'whitelisted': False, 'grade': 0.9, 'output': ['Y', 'N', 'N/A']},
+        {'allow_certificate': True, 'whitelisted': False, 'grade': 0.9, 'output': ['N', 'N', 'N/A']},
         {'allow_certificate': False, 'whitelisted': True, 'grade': 0.8, 'output': ['N', 'N', 'N/A']},
         {'allow_certificate': False, 'whitelisted': None, 'grade': 0.8, 'output': ['N', 'N', 'N/A']}
     )
@@ -130,6 +131,26 @@ class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
         certificate_info = certificate_info_for_user(
             student, self.self_paced_course.id, grade,
             whitelisted, certificate2
+        )
+        self.assertEqual(certificate_info, output)
+
+    @unpack
+    @data(
+        {'allow_certificate': True, 'whitelisted': False, 'grade': 0.8, 'mode': 'audit', 'output': ['N', 'N', 'N/A']},
+        {'allow_certificate': True, 'whitelisted': True, 'grade': 0.8, 'mode': 'audit', 'output': ['Y', 'N', 'N/A']},
+        {'allow_certificate': True, 'whitelisted': False, 'grade': 0.8, 'mode': 'verified', 'output': ['Y', 'N', 'N/A']}
+    )
+    def test_certificate_info_for_user_with_course_modes(self, allow_certificate, whitelisted, grade, mode, output):
+        """
+        Verify that certificate_info_for_user works with course modes.
+        """
+        user = UserFactory.create()
+        user.profile.allow_certificate = allow_certificate
+        user.profile.save()
+        _ = CourseEnrollment.enroll(user, self.instructor_paced_course.id, mode)
+        certificate_info = certificate_info_for_user(
+            user, self.instructor_paced_course.id, grade,
+            whitelisted, user_certificate=None
         )
         self.assertEqual(certificate_info, output)
 
