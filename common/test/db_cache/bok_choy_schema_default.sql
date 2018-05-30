@@ -2094,7 +2094,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=453 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=454 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2671,6 +2671,7 @@ CREATE TABLE `enterprise_enterprisecustomeruser` (
   `modified` datetime(6) NOT NULL,
   `user_id` int(10) unsigned NOT NULL,
   `enterprise_customer_id` char(32) NOT NULL,
+  `active` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `enterprise_enterpri_enterprise_customer_id_257cf08ca29bc48b_uniq` (`enterprise_customer_id`,`user_id`),
   CONSTRAINT `D38bb8d455e64dd8470b7606517efded` FOREIGN KEY (`enterprise_customer_id`) REFERENCES `enterprise_enterprisecustomer` (`uuid`)
