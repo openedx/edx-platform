@@ -6,6 +6,7 @@ from util.request import safe_get_host
 from common.lib.mandrill_client.client import MandrillClient
 
 
+
 def get_course_details(course_id):
     course_descriptor = get_course_by_id(course_id)
     course = CourseDetails.populate(course_descriptor)
@@ -35,4 +36,6 @@ def reactivation_email_for_user_custom(request, user):
             "success": False,
             "error": _('No inactive user with this e-mail exists'),
         })  # TODO: this should be status code 400  # pylint: disable=fixme
+
+
 
