@@ -28,7 +28,7 @@ def get_third_party_surveys():
 
 def save_responses(survey_responses):
     for response in survey_responses:
-        if not response.get('[url("sguid")]'):
+        if not response.get('[url("edx_uid")]'):
             continue
 
         date = datetime.strptime(response['datesubmitted'], "%Y-%m-%d %H:%M:%S")
@@ -36,7 +36,7 @@ def save_responses(survey_responses):
 
         third_party_survey = ThirdPartySurvey(
             response=response,
-            user_id=response['[url("sguid")]'],
+            user_id=response['[url("edx_uid")]'],
             request_date=date
         )
 
