@@ -31,7 +31,7 @@ def get_credentials_api_client(user):
     return EdxRestApiClient(CredentialsApiConfig.current().internal_api_url, jwt=jwt)
 
 
-def get_credentials(user, program_uuid=None):
+def get_credentials(user, program_uuid=None, credential_type=None):
     """
     Given a user, get credentials earned from the credentials service.
 
@@ -40,6 +40,7 @@ def get_credentials(user, program_uuid=None):
 
     Keyword Arguments:
         program_uuid (str): UUID of the program whose credential to retrieve.
+        credential_type (str): Which type of credentials to return (course-run or program)
 
     Returns:
         list of dict, representing credentials returned by the Credentials
@@ -51,6 +52,9 @@ def get_credentials(user, program_uuid=None):
 
     if program_uuid:
         querystring['program_uuid'] = program_uuid
+
+    if credential_type:
+        querystring['type'] = credential_type
 
     # Bypass caching for staff users, who may be generating credentials and
     # want to see them displayed immediately.
