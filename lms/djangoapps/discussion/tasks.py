@@ -15,7 +15,6 @@ from celery_utils.logged_task import LoggedTask
 from django_comment_common.utils import set_course_discussion_settings
 from edx_ace import ace
 from edx_ace.utils import date
-from edx_ace.message import MessageType
 from edx_ace.recipient import Recipient
 from opaque_keys.edx.keys import CourseKey
 from lms.djangoapps.django_comment_client.utils import permalink, get_accessible_discussion_xblocks_by_course_id
@@ -23,6 +22,7 @@ import lms.lib.comment_client as cc
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
+from openedx.core.djangoapps.ace_common.message import BaseMessageType
 from openedx.core.lib.celery.task_utils import emulate_http_request
 
 
@@ -51,7 +51,7 @@ def update_discussions_map(context):
     set_course_discussion_settings(course_key, discussions_id_map=discussions_id_map)
 
 
-class ResponseNotification(MessageType):
+class ResponseNotification(BaseMessageType):
     pass
 
 
