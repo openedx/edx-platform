@@ -1652,7 +1652,6 @@ CREATE TABLE `courseware_studentmodule` (
   KEY `courseware_studentmodule_82bd5515` (`module_type`),
   KEY `courseware_studentmodule_ea134da7` (`course_id`),
   KEY `courseware_studentmodule_de6a20aa` (`grade`),
-  KEY `courseware_studentmodule_6b2ded51` (`done`),
   KEY `courseware_studentmodule_e2fa5388` (`created`),
   KEY `courseware_studentmodule_9ae73c65` (`modified`),
   CONSTRAINT `courseware_studentmodule_student_id_c7ed88a0_fk` FOREIGN KEY (`student_id`) REFERENCES `auth_user` (`id`)
@@ -2095,7 +2094,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=452 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=453 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
