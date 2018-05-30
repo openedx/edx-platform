@@ -26,19 +26,20 @@ from common.test.acceptance.tests.helpers import (
 )
 
 VIDEO_SOURCE_PORT = 8777
+VIDEO_HOSTNAME = os.environ.get('BOK_CHOY_HOSTNAME', 'localhost')
 
 HTML5_SOURCES = [
-    'http://localhost:{0}/gizmo.mp4'.format(VIDEO_SOURCE_PORT),
-    'http://localhost:{0}/gizmo.webm'.format(VIDEO_SOURCE_PORT),
-    'http://localhost:{0}/gizmo.ogv'.format(VIDEO_SOURCE_PORT),
+    'http://{}:{}/gizmo.mp4'.format(VIDEO_HOSTNAME, VIDEO_SOURCE_PORT),
+    'http://{}:{}/gizmo.webm'.format(VIDEO_HOSTNAME, VIDEO_SOURCE_PORT),
+    'http://{}:{}/gizmo.ogv'.format(VIDEO_HOSTNAME, VIDEO_SOURCE_PORT),
 ]
 
 HTML5_SOURCES_INCORRECT = [
-    'http://localhost:{0}/gizmo.mp99'.format(VIDEO_SOURCE_PORT),
+    'http://{}:{}/gizmo.mp99'.format(VIDEO_HOSTNAME, VIDEO_SOURCE_PORT),
 ]
 
 HLS_SOURCES = [
-    'http://localhost:{0}/hls/history.m3u8'.format(VIDEO_SOURCE_PORT),
+    'http://{}:{}/hls/history.m3u8'.format(VIDEO_HOSTNAME, VIDEO_SOURCE_PORT),
 ]
 
 

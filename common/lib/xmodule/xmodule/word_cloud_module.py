@@ -91,11 +91,7 @@ class WordCloudFields(object):
 
 class WordCloudModule(WordCloudFields, XModule):
     """WordCloud Xmodule"""
-    js = {
-        'js': [
-            resource_string(__name__, 'js/src/javascript_loader.js'),
-        ],
-    }
+    js = {'js': [resource_string(__name__, 'assets/word_cloud/src/js/word_cloud.js')]}
     css = {'scss': [resource_string(__name__, 'css/word_cloud/display.scss')]}
     js_module_name = "WordCloud"
 
@@ -249,11 +245,6 @@ class WordCloudModule(WordCloudFields, XModule):
             'num_inputs': self.num_inputs,
             'submitted': self.submitted,
         }))
-
-        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/d3.min.js'))
-        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/d3.layout.cloud.js'))
-        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/word_cloud.js'))
-        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/word_cloud_main.js'))
 
         return fragment
 

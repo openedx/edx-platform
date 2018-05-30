@@ -52,7 +52,7 @@ from django.utils.translation import ugettext as _
 </%block>
 
 <%block name="page_bundle">
-  <%static:invoke_page_bundle page_name="js/pages/login" class_name="LoginFactory">
-    "${reverse('homepage') | n, js_escaped_string}"
-  </%static:invoke_page_bundle>
+  <%static:webpack entry="js/factories/login">
+     LoginFactory("${reverse('homepage') | n, js_escaped_string}");
+  </%static:webpack>
 </%block>

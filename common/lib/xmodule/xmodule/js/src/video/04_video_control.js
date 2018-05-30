@@ -2,8 +2,8 @@
 // VideoControl module.
     define(
 'video/04_video_control.js',
-[],
-function() {
+['time.js'],
+function(Time) {
     // VideoControl() function - what this module "exports".
     return function(state) {
         var dfd = $.Deferred();

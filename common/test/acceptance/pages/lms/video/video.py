@@ -68,8 +68,7 @@ VIDEO_MENUS = {
 }
 
 
-@js_defined('window.Video', 'window.RequireJS.require', 'window.jQuery',
-            'window.MathJax', 'window.MathJax.isReady')
+@js_defined('window.Video', 'window.jQuery', 'window.MathJax')
 class VideoPage(PageObject):
     """
     Video player in the courseware.

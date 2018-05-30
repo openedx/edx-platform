@@ -252,9 +252,16 @@ def shim_xmodule_js(block, fragment):
     """
     Set up the XBlock -> XModule shim on the supplied :class:`web_fragments.fragment.Fragment`
     """
+    # Delay this import so that it is only used (and django settings are parsed) when
+    # they are required (rather than at startup)
+    import webpack_loader.utils
+
     if not fragment.js_init_fn:
         fragment.initialize_js('XBlockToXModuleShim')
         fragment.json_init_args = {'xmodule-type': block.js_module_name}
+
+        for tag in webpack_loader.utils.get_as_tags('XModuleShim'):
+            fragment.add_resource(tag, mimetype='text/html', placement='head')
 
 
 class XModuleFields(object):

@@ -7,6 +7,7 @@ from lms.lib.utils import is_unit
 from openedx.core.djangolib.js_utils import (
     dump_js_escaped_json, js_escaped_string
 )
+from xmodule.x_module import XModule, XModuleDescriptor
 %>
 <%
 xblock_url = xblock_studio_url(xblock)
@@ -26,17 +27,19 @@ block_is_unit = is_unit(xblock)
 </script>
 </%block>
 
-<script>
-    require(["jquery", "js/factories/xblock_validation"], function($, XBlockValidationFactory) {
-        XBlockValidationFactory(
-            ${messages | n, dump_js_escaped_json},
-            ${bool(xblock_url) | n, dump_js_escaped_json},  // xblock_url will be None or a string
-            ${bool(is_root) | n, dump_js_escaped_json},  // is_root will be None or a boolean
-            ${bool(block_is_unit) | n, dump_js_escaped_json},  // block_is_unit will be None or a boolean
-            $('div.xblock-validation-messages[data-locator="${xblock.location | n, js_escaped_string}"]')
-        );
-    });
-</script>
+<%static:webpack entry="js/factories/xblock_validation">
+    XBlockValidationFactory(
+        ${messages | n, dump_js_escaped_json},
+        ${bool(xblock_url) | n, dump_js_escaped_json},  // xblock_url will be None or a string
+        ${bool(is_root) | n, dump_js_escaped_json},  // is_root will be None or a boolean
+        ${bool(block_is_unit) | n, dump_js_escaped_json},  // block_is_unit will be None or a boolean
+        $('div.xblock-validation-messages[data-locator="${xblock.location | n, js_escaped_string}"]')
+    );
+</%static:webpack>
+
+% if isinstance(xblock, (XModule, XModuleDescriptor)):
+    <%static:webpack entry="${getattr(xblock.__class__, 'unmixed_class', xblock.__class__).__name__}"/>
+% endif
 
 % if not is_root:
     % if is_reorderable:
