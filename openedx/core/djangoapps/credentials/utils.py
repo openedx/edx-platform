@@ -59,5 +59,10 @@ def get_credentials(user, program_uuid=None):
     api = get_credentials_api_client(user)
 
     return get_edx_api_data(
-        credential_configuration, 'credentials', api=api, querystring=querystring, cache_key=cache_key
+        credential_configuration,
+        'credentials',
+        api=api,
+        resource_id=program_uuid,
+        querystring=querystring,
+        cache_key=cache_key
     )
