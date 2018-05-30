@@ -1336,7 +1336,7 @@ class ProgressPageTests(ProgressPageBaseTests):
             user=self.user,
             course_id=self.course.id,
             status=CertificateStatuses.downloadable,
-            download_url="http://www.example.com/certificate.pdf",
+            download_url="",
             mode='verified'
         )
 
