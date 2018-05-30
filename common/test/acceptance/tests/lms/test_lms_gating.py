@@ -106,7 +106,7 @@ class GatingTest(UniqueCourseTest):
         self.studio_course_outline.visit()
         self.studio_course_outline.open_subsection_settings_dialog(1)
         self.studio_course_outline.select_advanced_tab(desired_item='gated_content')
-        self.studio_course_outline.add_prerequisite_to_subsection("80")
+        self.studio_course_outline.add_prerequisite_to_subsection("80", "")
 
     def _fulfill_prerequisite(self):
         """

@@ -720,12 +720,13 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         self.q(css=".action-save").first.click()
         self.wait_for_ajax()
 
-    def add_prerequisite_to_subsection(self, min_score):
+    def add_prerequisite_to_subsection(self, min_score, min_completion):
         """
         Adds a prerequisite to a subsection.
         """
         Select(self.q(css="#prereq")[0]).select_by_index(1)
         self.q(css="#prereq_min_score").fill(min_score)
+        self.q(css="#prereq_min_completion").fill(min_completion)
         self.q(css=".action-save").first.click()
         self.wait_for_ajax()
 

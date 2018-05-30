@@ -16,7 +16,7 @@ from openedx.core.djangolib.markup import Text
     </h3>
     <p>
         ${Text(_(
-            "You must earn a passing score for '{prereq_section_name}' to access this content."
+            "You must complete the prerequisites for '{prereq_section_name}' to access this content."
         )).format(prereq_section_name=prereq_section_name)}
         <p>
             <a href="${prereq_url}" class="btn btn-brand">${_("Go to Prerequisite Section")}

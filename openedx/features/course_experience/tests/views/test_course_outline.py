@@ -251,10 +251,10 @@ class TestCourseOutlinePageWithPrerequisites(SharedModuleStoreTestCase, Mileston
 
         # complete the prerequisite to unlock the gated content
         # this call triggers reevaluation of prerequisites fulfilled by the gating block.
-        with patch('openedx.core.lib.gating.api._get_subsection_percentage', Mock(return_value=100)):
+        with patch('openedx.core.lib.gating.api.get_subsection_completion_percentage', Mock(return_value=100)):
             lms_gating_api.evaluate_prerequisite(
                 self.course,
-                Mock(location=self.course_blocks['prerequisite'].location),
+                Mock(location=self.course_blocks['prerequisite'].location, percent_graded=1.0),
                 self.user,
             )
 
