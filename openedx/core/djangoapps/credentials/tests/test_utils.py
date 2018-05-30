@@ -46,6 +46,7 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
             'status': 'awarded',
         }
         self.assertEqual(kwargs['querystring'], querystring)
+        self.assertIsNone(kwargs['resource_id'])
 
         self.assertEqual(actual, expected)
 
@@ -66,5 +67,6 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
             'program_uuid': program_uuid,
         }
         self.assertEqual(kwargs['querystring'], querystring)
+        self.assertEqual(kwargs['resource_id'], program_uuid)
 
         self.assertEqual(actual, expected)
