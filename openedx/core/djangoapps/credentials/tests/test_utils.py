@@ -72,3 +72,17 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
         self.assertEqual(kwargs['cache_key'], cache_key)
 
         self.assertEqual(actual, expected)
+
+    def test_type_filter(self, mock_get_edx_api_data):
+        get_credentials(self.user, credential_type='program')
+
+        mock_get_edx_api_data.assert_called_once()
+        call = mock_get_edx_api_data.mock_calls[0]
+        __, __, kwargs = call
+
+        querystring = {
+            'username': self.user.username,
+            'status': 'awarded',
+            'type': 'program',
+        }
+        self.assertEqual(kwargs['querystring'], querystring)

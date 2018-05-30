@@ -673,7 +673,7 @@ def get_certificates(user, extended_program):
                 # We only want one certificate per course to be returned.
                 break
 
-    program_credentials = get_credentials(user, program_uuid=extended_program['uuid'])
+    program_credentials = get_credentials(user, program_uuid=extended_program['uuid'], credential_type='program')
     # only include a program certificate if a certificate is available for every course
     if program_credentials and (len(certificates) == len(extended_program['courses'])):
         enabled_force_program_cert_auth = configuration_helpers.get_value(
