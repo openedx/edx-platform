@@ -530,6 +530,7 @@ def use_coupon_code(coupons, user):
 
 
 @require_config(DonationConfiguration)
+@csrf_exempt
 @require_POST
 @login_required
 def donate(request):
