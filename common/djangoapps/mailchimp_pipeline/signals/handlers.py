@@ -1,7 +1,6 @@
-import json
 from enrollment.api import get_enrollments
 from mailchimp_pipeline.client import ChimpClient, MailChimpException
-from mailchimp_pipeline.helpers import get_org_data_for_mandrill
+from mailchimp_pipeline.helpers import get_org_data_for_mandrill, is_active_enrollment
 from mailchimp_pipeline.tasks import update_org_details_at_mailchimp
 from lms.djangoapps.onboarding.models import (UserExtendedProfile, Organization,)
 from lms.djangoapps.certificates import api as certificate_api
@@ -72,13 +71,14 @@ def send_user_info_to_mailchimp(sender, user, created, kwargs):
 def send_user_enrollments_to_mailchimp(sender, instance, created, kwargs):
     user_json = {
         "merge_fields": {
-            "ENROLLS": json.dumps([{"course_id": enrollment.get('course_details', {}).get('course_id', ''),
-                                    "course_name": enrollment.get('course_details', {}).get('course_name', '')}
-                                   for enrollment in get_enrollments(instance.user.username)]),
+            "ENROLLS": ", ".join([enrollment.get('course_details', {}).get('course_name', '')
+                                  for enrollment in get_enrollments(instance.user.username)
+                                  if is_active_enrollment(enrollment.get('course_details', {}).get('course_end', ''))]),
         }
     }
     try:
-        response = ChimpClient().add_update_member_to_list(settings.MAILCHIMP_LEARNERS_LIST_ID, instance.user.email, user_json)
+        response = ChimpClient().add_update_member_to_list(settings.MAILCHIMP_LEARNERS_LIST_ID, instance.user.email,
+                                                           user_json)
         log.info(response)
     except MailChimpException as ex:
         log.exception(ex)
@@ -93,9 +93,8 @@ def send_user_course_completions_to_mailchimp(sender, user, course_key, kwargs):
 
     user_json = {
         "merge_fields": {
-            "COMPLETES": json.dumps([{"course_id": cert.get('course_key', {}).__str__(),
-                                    "course_name": cert.get('course_key', {}).course} for cert in all_certs
-                                     if certificate_api.is_passing_status(cert['status'])]),
+            "COMPLETES": ", ".join([cert.get('course_key', {}).course for cert in all_certs
+                                    if certificate_api.is_passing_status(cert['status'])]),
         }
     }
     try:

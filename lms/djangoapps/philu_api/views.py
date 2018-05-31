@@ -3,7 +3,7 @@ restAPI Views
 """
 import logging
 import requests
-
+from celery.result import AsyncResult
 from datetime import datetime
 from django.http import JsonResponse
 from django.conf import settings
@@ -13,6 +13,7 @@ from rest_framework.views import APIView
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from lms.djangoapps.onboarding.forms import RegModelForm
 from lms.djangoapps.onboarding.helpers import get_country_iso
+from mailchimp_pipeline.tasks import update_enrollments_completions_at_mailchimp
 from student.models import User
 
 from lms.djangoapps.onboarding.models import Organization, UserExtendedProfile
@@ -20,6 +21,28 @@ from lms.djangoapps.oef.decorators import eligible_for_oef
 from lms.djangoapps.philu_api.helpers import get_encoded_token
 
 log = logging.getLogger("edx.philu_api")
+
+
+class MailChimpDataSyncAPI(APIView):
+
+    def get(self, request):
+        """ Send data shared between platform & community """
+        #
+        if request.GET.get('task_id'):
+
+            res = AsyncResult(request.GET.get('task_id'))
+
+            return JsonResponse({
+                'state': res.state,
+                'task_id': request.GET.get('task_id')
+            }, status=status.HTTP_200_OK)
+
+        x = update_enrollments_completions_at_mailchimp.delay(settings.MAILCHIMP_LEARNERS_LIST_ID)
+
+        return JsonResponse({
+            'state': "PENDING",
+            'task_id': x.task_id
+        }, status=status.HTTP_200_OK)
 
 
 class PlatformSyncService(APIView):
