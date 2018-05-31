@@ -162,7 +162,6 @@ class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
             password="123456",
             username=username,
             full_name="Test User",
-            terms_of_service=True,
             country="US",
             favorite_movie="Harry Potter",
         )

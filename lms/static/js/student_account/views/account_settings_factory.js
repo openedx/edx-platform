@@ -27,8 +27,7 @@
             enterpriseReadonlyAccountFields,
             edxSupportUrl,
             extendedProfileFields,
-            displayAccountDeletion,
-            enableGDPRFlag
+            displayAccountDeletion
         ) {
             var $accountSettingsElement, userAccountModel, userPreferencesModel, aboutSectionsData,
                 accountsSectionData, ordersSectionData, accountSettingsView, showAccountSettingsPage,
@@ -303,8 +302,8 @@
                 aboutSectionsData.push(accountDeletionFields);
             }
 
-
             // set TimeZoneField to listen to CountryField
+
             getUserField = function(list, search) {
                 return _.find(list, function(field) {
                     return field.view.options.valueAttribute === search;
