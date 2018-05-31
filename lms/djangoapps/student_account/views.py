@@ -568,6 +568,9 @@ def account_settings_context(request):
         'show_program_listing': ProgramsApiConfig.is_enabled(),
         'show_dashboard_tabs': True,
         'order_history': user_orders,
+        'enable_account_deletion': configuration_helpers.get_value(
+            'ENABLE_ACCOUNT_DELETION', settings.FEATURES.get('ENABLE_ACCOUNT_DELETION', False)
+        ),
         'extended_profile_fields': _get_extended_profile_fields(),
     }
 
