@@ -402,6 +402,9 @@ FEATURES = {
 
     # Set this to true to make API docs available at /api-docs/.
     'ENABLE_API_DOCS': False,
+
+    # Whether to display the account deletion section the account settings page
+    'ENABLE_ACCOUNT_DELETION': True,
 }
 
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews

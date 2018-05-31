@@ -27,6 +27,7 @@
             enterpriseReadonlyAccountFields,
             edxSupportUrl,
             extendedProfileFields,
+            displayAccountDeletion,
             enableGDPRFlag
         ) {
             var $accountSettingsElement, userAccountModel, userPreferencesModel, aboutSectionsData,
@@ -292,7 +293,7 @@
             aboutSectionsData.push(socialFields);
 
             // Add account deletion fields
-            if (enableGDPRFlag) {
+            if (displayAccountDeletion) {
                 accountDeletionFields = {
                     title: gettext('Delete My Account'),
                     fields: [],

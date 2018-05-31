@@ -196,7 +196,11 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
                     'Facebook Link',
                     'LinkedIn Link',
                 ]
-            }
+            },
+            {
+                'title': 'Delete My Account',
+                'fields': []
+            },
         ]
 
         self.assertEqual(self.account_settings_page.sections_structure(), expected_sections_structure)

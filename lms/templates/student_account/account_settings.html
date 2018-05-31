@@ -48,6 +48,7 @@ from openedx.features.course_experience import ENABLE_GDPR_COMPAT_FLAG
         enterpriseReadonlyAccountFields = ${ enterprise_readonly_account_fields | n, dump_js_escaped_json },
         edxSupportUrl = '${ edx_support_url | n, js_escaped_string }',
         extendedProfileFields = ${ extended_profile_fields | n, dump_js_escaped_json },
+        displayAccountDeletion = ${ enable_account_deletion | n, dump_js_escaped_json};
         enableGDPRFlag = ${ ENABLE_GDPR_COMPAT_FLAG.is_enabled_without_course_context() | n, dump_js_escaped_json };
 
     AccountSettingsFactory(
@@ -68,6 +69,7 @@ from openedx.features.course_experience import ENABLE_GDPR_COMPAT_FLAG
         enterpriseReadonlyAccountFields,
         edxSupportUrl,
         extendedProfileFields,
+        displayAccountDeletion,
         enableGDPRFlag
     );
 </%static:require_module>
