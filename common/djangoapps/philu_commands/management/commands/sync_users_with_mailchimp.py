@@ -6,6 +6,7 @@ from mailchimp_pipeline.helpers import is_active_enrollment
 from django.contrib.auth.models import User
 from lms.djangoapps.onboarding.models import FocusArea, OrgSector
 from lms.djangoapps.certificates import api as certificate_api
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from django.conf import settings
 
 from logging import getLogger
@@ -41,8 +42,9 @@ class Command(BaseCommand):
             except Exception as ex:
                 log.exception(str(ex.args))
 
-            if user.email == "muhammad.nadeem@arbisoft.com":
-                pass
+            completed_course_keys = [cert.get('course_key', '') for cert in all_certs
+                                     if certificate_api.is_passing_status(cert['status'])]
+            completed_courses = CourseOverview.objects.filter(id__in=completed_course_keys)
 
             user_json = {
                 "email_address": user.email,
@@ -55,8 +57,7 @@ class Command(BaseCommand):
                     "CITY": profile.city if profile.city else "",
                     "DATEREGIS": str(user.date_joined.strftime("%m/%d/%Y")),
                     "LSOURCE": "",
-                    "COMPLETES": ", ".join([cert.get('course_key', {}).course for cert in all_certs
-                                            if certificate_api.is_passing_status(cert['status'])]),
+                    "COMPLETES": ", ".join([course.display_name for course in completed_courses]),
                     "ENROLLS": ", ".join([enrollment.get('course_details', {}).get('course_name', '')
                                           for enrollment in get_enrollments(user.username)
                                           if is_active_enrollment(enrollment.get('course_details', {}
