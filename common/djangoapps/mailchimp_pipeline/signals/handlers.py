@@ -4,6 +4,7 @@ from mailchimp_pipeline.helpers import get_org_data_for_mandrill, is_active_enro
 from mailchimp_pipeline.tasks import update_org_details_at_mailchimp
 from lms.djangoapps.onboarding.models import (UserExtendedProfile, Organization,)
 from lms.djangoapps.certificates import api as certificate_api
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import (UserProfile, CourseEnrollment, )
 from django.conf import settings
 
@@ -88,13 +89,15 @@ def send_user_course_completions_to_mailchimp(sender, user, course_key, kwargs):
     all_certs = []
     try:
         all_certs = certificate_api.get_certificates_for_user(user.username)
-    except:
-        pass
+    except Exception as ex:
+        log.exception(str(ex.args))
 
+    completed_course_keys = [cert.get('course_key', '') for cert in all_certs
+                             if certificate_api.is_passing_status(cert['status'])]
+    completed_courses = CourseOverview.objects.filter(id__in=completed_course_keys)
     user_json = {
         "merge_fields": {
-            "COMPLETES": ", ".join([cert.get('course_key', {}).course for cert in all_certs
-                                    if certificate_api.is_passing_status(cert['status'])]),
+            "COMPLETES": ", ".join([course.display_name for course in completed_courses]),
         }
     }
     try:

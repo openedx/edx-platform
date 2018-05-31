@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.sessions.backends.db import SessionStore
 from lms.djangoapps.certificates import api as certificate_api
 from lms.djangoapps.onboarding.models import UserExtendedProfile
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from mailchimp_pipeline.client import ChimpClient, MailChimpException
 from mailchimp_pipeline.helpers import is_active_enrollment
 
@@ -46,13 +47,16 @@ def update_enrollments_completions_at_mailchimp(list_id):
         except Exception as ex:
             log.exception(str(ex.args))
 
+        completed_course_keys = [cert.get('course_key', '') for cert in all_certs
+                                 if certificate_api.is_passing_status(cert['status'])]
+        completed_courses = CourseOverview.objects.filter(id__in=completed_course_keys)
+
         user_json = {
             "merge_fields": {
                 "ENROLLS": ", ".join([enrollment.get('course_details', {}).get('course_name', '')
                           for enrollment in get_enrollments(user["username"])
                           if is_active_enrollment(enrollment.get('course_details', {}).get('course_end', ''))]),
-                "COMPLETES": ", ".join([cert.get('course_key', {}).course for cert in all_certs
-                                        if certificate_api.is_passing_status(cert['status'])]),
+                "COMPLETES": ", ".join([course.display_name for course in completed_courses])
             }
         }
         try:
