@@ -155,7 +155,6 @@ from openedx.core.djangolib.js_utils import (
                   saveContent("text/csv," + response, 'ccx_grades.csv');
               },
               error: function (jqXHR) {
-                  console.log(jqXHR.responseText);
                   alert("${_('Something went wrong.') | n, js_escaped_string}")
               },
           });
