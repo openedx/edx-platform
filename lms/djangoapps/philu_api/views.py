@@ -40,7 +40,7 @@ class MailChimpDataSyncAPI(APIView):
         x = update_enrollments_completions_at_mailchimp.delay(settings.MAILCHIMP_LEARNERS_LIST_ID)
 
         return JsonResponse({
-            'state': "PENDING",
+            'state': "STARTED",
             'task_id': x.task_id
         }, status=status.HTTP_200_OK)
 
