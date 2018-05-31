@@ -2,11 +2,15 @@
 """
 Tests for the Third Party Auth REST API
 """
+import json
 import unittest
 
 import ddt
+from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.http import QueryDict
+from django.test.utils import override_settings
 from mock import patch
 from provider.constants import CONFIDENTIAL
 from provider.oauth2.models import Client, AccessToken
@@ -30,6 +34,7 @@ ALICE_USERNAME = "alice"
 CARL_USERNAME = "carl"
 STAFF_USERNAME = "staff"
 ADMIN_USERNAME = "admin"
+NONEXISTENT_USERNAME = "nobody"
 # These users will be created and linked to third party accounts:
 LINKED_USERS = (ALICE_USERNAME, STAFF_USERNAME, ADMIN_USERNAME)
 PASSWORD = "edx"
@@ -63,9 +68,10 @@ class TpaAPITestCase(ThirdPartyAuthTestMixin, APITestCase):
             make_staff = (username == STAFF_USERNAME) or make_superuser
             user = UserFactory.create(
                 username=username,
+                email='{}@example.com'.format(username),
                 password=PASSWORD,
                 is_staff=make_staff,
-                is_superuser=make_superuser
+                is_superuser=make_superuser,
             )
             UserSocialAuth.objects.create(
                 user=user,
@@ -78,7 +84,7 @@ class TpaAPITestCase(ThirdPartyAuthTestMixin, APITestCase):
                 uid='{}:remote_{}'.format(testshib.idp_slug, username),
             )
         # Create another user not linked to any providers:
-        UserFactory.create(username=CARL_USERNAME, password=PASSWORD)
+        UserFactory.create(username=CARL_USERNAME, email='{}@example.com'.format(CARL_USERNAME), password=PASSWORD)
 
 
 @override_settings(EDX_API_KEY=VALID_API_KEY)
@@ -141,13 +147,38 @@ class UserViewAPITests(TpaAPITestCase):
         (None, ALICE_USERNAME, 403),
     )
     @ddt.unpack
-    def test_list_connected_providers__withapi_key(self, api_key, target_user, expect_result):
+    def test_list_connected_providers_with_api_key(self, api_key, target_user, expect_result):
         url = reverse('third_party_auth_users_api', kwargs={'username': target_user})
         response = self.client.get(url, HTTP_X_EDX_API_KEY=api_key)
         self.assertEqual(response.status_code, expect_result)
         if expect_result == 200:
             self.assertIn("active", response.data)
             self.assertItemsEqual(response.data["active"], self.expected_active(target_user))
+
+    @ddt.data(
+        (True, ALICE_USERNAME, 200, True),
+        (True, CARL_USERNAME, 200, False),
+        (False, ALICE_USERNAME, 200, True),
+        (False, CARL_USERNAME, 403, None),
+    )
+    @ddt.unpack
+    def test_allow_unprivileged_response(self, allow_unprivileged, requesting_user, expect, include_remote_id):
+        self.client.login(username=requesting_user, password=PASSWORD)
+        with override_settings(ALLOW_UNPRIVILEGED_SSO_PROVIDER_QUERY=allow_unprivileged):
+            url = reverse('third_party_auth_users_api', kwargs={'username': ALICE_USERNAME})
+            response = self.client.get(url)
+        self.assertEqual(response.status_code, expect)
+        if response.status_code == 200:
+            self.assertGreater(len(response.data['active']), 0)
+            for provider_data in response.data['active']:
+                self.assertEqual(include_remote_id, 'remote_id' in provider_data)
+
+    def test_allow_query_by_email(self):
+        self.client.login(username=ALICE_USERNAME, password=PASSWORD)
+        url = reverse('third_party_auth_users_api', kwargs={'username': '{}@example.com'.format(ALICE_USERNAME)})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(len(response.data['active']), 0)
 
 
 @override_settings(EDX_API_KEY=VALID_API_KEY)

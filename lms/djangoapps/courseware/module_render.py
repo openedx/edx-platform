@@ -1011,7 +1011,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
 
     # Check submitted files
     if request.method == 'POST' and request.META.get('CONTENT_TYPE', '').startswith('multipart/form-data'):
-        files = request.FILES
+        files = request.FILES or {}
         error_msg = _check_files_limits(files)
         if error_msg:
             return JsonResponse({'success': error_msg}, status=413)

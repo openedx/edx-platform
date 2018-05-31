@@ -198,7 +198,7 @@ FEATURES = {
     'ENABLE_CONTENT_LIBRARIES': True,
 
     # Solutions apps flag
-    'EDX_SOLUTIONS_API': False,
+    'EDX_SOLUTIONS_API': True,
 
     # Milestones application flag
     'MILESTONES_APP': False,

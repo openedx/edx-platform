@@ -1,10 +1,11 @@
 """
 Third Party Auth REST API views
 """
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.http import Http404
-from rest_framework import exceptions, status
+from rest_framework import exceptions, status, throttling
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -22,6 +23,34 @@ from third_party_auth.api.permissions import ThirdPartyAuthProviderApiPermission
 from third_party_auth.provider import Registry
 
 
+class ProviderBaseThrottle(throttling.UserRateThrottle):
+    """
+    Base throttle for provider queries
+    """
+
+    def allow_request(self, request, view):
+        """
+        Only throttle unauthenticated requests.
+        """
+        if view.is_unprivileged_query(request, view.kwargs[u'username']):
+            return True
+        return super(ProviderBaseThrottle, self).allow_request(request, view)
+
+
+class ProviderBurstThrottle(ProviderBaseThrottle):
+    """
+    Maximum number of provider requests in a quick burst.
+    """
+    rate = '10/min'
+
+
+class ProviderSustainedThrottle(ProviderBaseThrottle):
+    """
+    Maximum number of provider requests over time.
+    """
+    rate = '50/day'
+
+
 class UserView(APIView):
     """
     List the third party auth accounts linked to the specified user account.
@@ -29,6 +58,7 @@ class UserView(APIView):
     **Example Request**
 
         GET /api/third_party_auth/v0/users/{username}
+        GET /api/third_party_auth/v0/users/{email@example.com}
 
     **Response Values**
 
@@ -53,6 +83,7 @@ class UserView(APIView):
         OAuth2AuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
+    throttle_classes = [ProviderSustainedThrottle, ProviderBurstThrottle]
 
     def get(self, request, username):
         """Create, read, or update enrollment information for a user.
@@ -68,26 +99,22 @@ class UserView(APIView):
             JSON serialized list of the providers linked to this user.
 
         """
-        if request.user.username != username:
-            # We are querying permissions for a user other than the current user.
-            if not request.user.is_superuser and not ApiKeyHeaderPermission().has_permission(request, self):
-                # Return a 403 (Unauthorized) without validating 'username', so that we
-                # do not let users probe the existence of other user accounts.
+        is_unprivileged = self.is_unprivileged_query(request, username)
+        if is_unprivileged:
+            if not getattr(settings, 'ALLOW_UNPRIVILEGED_SSO_PROVIDER_QUERY', False):
                 return Response(status=status.HTTP_403_FORBIDDEN)
-
         try:
-            user = User.objects.get(username=username)
+            if '@' in username:
+                user = User.objects.get(email=username)
+            else:
+                user = User.objects.get(username=username)
         except User.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         providers = pipeline.get_provider_user_states(user)
 
         active_providers = [
-            {
-                "provider_id": assoc.provider.provider_id,
-                "name": assoc.provider.name,
-                "remote_id": assoc.remote_id,
-            }
+            self.get_provider_data(assoc, is_unprivileged)
             for assoc in providers if assoc.has_account
         ]
 
@@ -96,6 +123,33 @@ class UserView(APIView):
         return Response({
             "active": active_providers
         })
+
+    def get_provider_data(self, assoc, is_unprivileged):
+        """
+        Return the data for the specified provider.
+
+        If the request is unprivileged, do not return the remote ID of the user.
+        """
+        provider_data = {
+            "provider_id": assoc.provider.provider_id,
+            "name": assoc.provider.name,
+        }
+        if not is_unprivileged:
+            provider_data["remote_id"] = assoc.remote_id
+        return provider_data
+
+    def is_unprivileged_query(self, request, username):
+        """
+        Return True if a non-superuser requests information about another user.
+        """
+        # AnonymousUser does not have an email attribute, so fall back to something
+        # that will never compare equal to username.
+        if username not in {request.user.username, getattr(request.user, 'email', object())}:
+            # We are querying permissions for a user other than the current user.
+            if not request.user.is_superuser and not ApiKeyHeaderPermission().has_permission(request, self):
+                # The user does not have elevated permissions.
+                return True
+        return False
 
 
 class UserMappingView(ListAPIView):
