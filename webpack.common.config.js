@@ -103,7 +103,6 @@ module.exports = Merge.smart({
             jQuery: 'jquery',
             'window.jQuery': 'jquery',
             Popper: 'popper.js', // used by bootstrap
-            CodeMirror: 'codemirror',
             'edx.HtmlUtils': 'edx-ui-toolkit/js/utils/html-utils',
             AjaxPrefix: 'ajax_prefix'
         }),
@@ -305,7 +304,6 @@ module.exports = Merge.smart({
         alias: {
             AjaxPrefix: 'ajax_prefix',
             accessibility: 'accessibility_tools',
-            codemirror: 'codemirror-compressed',
             datepair: 'timepicker/datepair',
             'edx-ui-toolkit': 'edx-ui-toolkit/src/',  // @TODO: some paths in toolkit are not valid relative paths
             ieshim: 'ie_shim',
@@ -366,7 +364,9 @@ module.exports = Merge.smart({
         underscore: '_',
         URI: 'URI',
         XBlockToXModuleShim: 'XBlockToXModuleShim',
-        XModule: 'XModule'
+        XModule: 'XModule',
+        CodeMirror: 'CodeMirror',
+        codemirror: 'CodeMirror'
     },
 
     watchOptions: {
