@@ -113,11 +113,4 @@ class Command(BaseCommand):
         Invokes the migrate transcripts enqueue function.
         """
         course_keys, force_update, commit = self._get_migration_options(options)
-        kwargs = {'force_update': force_update, 'commit': commit}
-        try:
-            enqueue_async_migrate_transcripts_tasks(
-                course_keys,
-                **kwargs
-            )
-        except InvalidKeyError as exc:
-            raise CommandError(u'Invalid course key: ' + unicode(exc))
+        enqueue_async_migrate_transcripts_tasks(course_keys, force_update=force_update, commit=commit)
