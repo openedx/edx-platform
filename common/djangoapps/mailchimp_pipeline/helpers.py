@@ -1,4 +1,11 @@
+from datetime import datetime
+import pytz
 from lms.djangoapps.onboarding.models import (FocusArea, OrgSector, )
+
+
+def is_active_enrollment(course_end_date):
+    """Check if enrollment is still active"""
+    return datetime.now(pytz.timezone("UTC")) < course_end_date
 
 
 def get_org_data_for_mandrill(organization):

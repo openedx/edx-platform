@@ -2,6 +2,7 @@ import json
 from enrollment.api import get_enrollments
 from django.core.management.base import BaseCommand
 from mailchimp_pipeline.client import ChimpClient
+from mailchimp_pipeline.helpers import is_active_enrollment
 from django.contrib.auth.models import User
 from lms.djangoapps.onboarding.models import FocusArea, OrgSector
 from lms.djangoapps.certificates import api as certificate_api
@@ -37,8 +38,8 @@ class Command(BaseCommand):
             all_certs = []
             try:
                 all_certs = certificate_api.get_certificates_for_user(user.username)
-            except:
-                pass
+            except Exception as ex:
+                log.exception(str(ex.args))
 
             if user.email == "muhammad.nadeem@arbisoft.com":
                 pass
@@ -54,12 +55,12 @@ class Command(BaseCommand):
                     "CITY": profile.city if profile.city else "",
                     "DATEREGIS": str(user.date_joined.strftime("%m/%d/%Y")),
                     "LSOURCE": "",
-                    "COMPLETES": json.dumps([{"course_id": cert.get('course_key', {}).__str__(),
-                                            "course_name": cert.get('course_key', {}).course} for cert in all_certs
-                                             if certificate_api.is_passing_status(cert['status'])]),
-                    "ENROLLS": json.dumps([{"course_id": enrollment.get('course_details', {}).get('course_id', ''),
-                                            "course_name": enrollment.get('course_details', {}).get('course_name', '')}
-                                           for enrollment in get_enrollments(user.username)]),
+                    "COMPLETES": ", ".join([cert.get('course_key', {}).course for cert in all_certs
+                                            if certificate_api.is_passing_status(cert['status'])]),
+                    "ENROLLS": ", ".join([enrollment.get('course_details', {}).get('course_name', '')
+                                          for enrollment in get_enrollments(user.username)
+                                          if is_active_enrollment(enrollment.get('course_details', {}
+                                                                                 ).get('course_end', ''))]),
                     "ORG": extended_profile.organization.label if extended_profile.organization else "",
                     "ORGTYPE": org_type,
                     "WORKAREA": str(focus_areas.get(extended_profile.organization.focus_area, ""))
