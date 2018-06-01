@@ -125,11 +125,17 @@ def does_fingerprint_on_disk_match(fingerprint):
 
 def is_fingerprint_in_bucket(fingerprint, bucket_name):
     """
-    Test if a zip file matching the given fingerprint is present within an s3 bucket
+    Test if a zip file matching the given fingerprint is present within an s3 bucket.
+    If there is any issue reaching the bucket, show the exception but continue by
+    returning False
     """
     zipfile_name = '{}.tar.gz'.format(fingerprint)
-    conn = boto.connect_s3(anon=True)
-    bucket = conn.get_bucket(bucket_name)
+    try:
+        conn = boto.connect_s3(anon=True)
+        bucket = conn.get_bucket(bucket_name)
+    except Exception as e:  # pylint: disable=broad-except
+        print("Exception caught trying to reach S3 bucket {}: {}".format(bucket_name, e))
+        return False
     key = boto.s3.key.Key(bucket=bucket, name=zipfile_name)
     return key.exists()
 

@@ -7,17 +7,17 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 import logging
 
+from openedx.core.djangoapps.request_cache.middleware import request_cached
 from xmodule.partitions.partitions import UserPartition, UserPartitionError, ENROLLMENT_TRACK_PARTITION_ID
 from xmodule.modulestore.django import modulestore
 
 
 log = logging.getLogger(__name__)
 
-
-# settings will not be available when running nosetests.
 FEATURES = getattr(settings, 'FEATURES', {})
 
 
+@request_cached
 def get_all_partitions_for_course(course, active_only=False):
     """
     A method that returns all `UserPartitions` associated with a course, as a List.

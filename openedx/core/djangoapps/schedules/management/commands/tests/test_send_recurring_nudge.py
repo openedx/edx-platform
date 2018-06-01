@@ -24,6 +24,7 @@ from openedx.core.djangolib.testing.utils import skip_unless_lms, CacheIsolation
     "Can't test schedules if the app isn't installed",
 )
 class TestSendRecurringNudge(ScheduleUpsellTestMixin, ScheduleSendEmailTestMixin, CacheIsolationTestCase):
+    shard = 6
     __test__ = True
 
     # pylint: disable=protected-access

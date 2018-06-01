@@ -15,15 +15,15 @@ class ApiAccessRequestForm(forms.ModelForm):
         model = ApiAccessRequest
         fields = ('company_name', 'website', 'company_address', 'reason', 'terms_of_service')
         labels = {
-            'company_name': _('Company Name'),
-            'company_address': _('Company Address'),
+            'company_name': _('Organization Name'),
+            'company_address': _('Organization Address'),
             'reason': _('Describe what your application does.'),
         }
         help_texts = {
             'reason': None,
-            'website': _("The URL of your company's website."),
-            'company_name': _('The name of your company.'),
-            'company_address': _('The contact address of your company.'),
+            'website': _("The URL of your organization's website."),
+            'company_name': _('The name of your organization.'),
+            'company_address': _('The contact address of your organization.'),
         }
         widgets = {
             'company_address': forms.Textarea()
@@ -38,8 +38,11 @@ class ApiAccessRequestForm(forms.ModelForm):
 class ViewersWidget(forms.widgets.TextInput):
     """Form widget to display a comma-separated list of usernames."""
 
-    def render(self, name, value, attrs=None):
-        return super(ViewersWidget, self).render(name, ', '.join(value), attrs)
+    def format_value(self, value):
+        """
+        Return a serialized value as it should appear when rendered in a template.
+        """
+        return ', '.join(value) if isinstance(value, list) else value
 
 
 class ViewersField(forms.Field):

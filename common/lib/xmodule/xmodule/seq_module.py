@@ -210,10 +210,10 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
 
         if dispatch == 'get_completion':
             completion_service = self.runtime.service(self, 'completion')
-            if not completion_service.visual_progress_enabled():
-                return None
 
             usage_key = data.get('usage_key', None)
+            if not usage_key:
+                return None
             item = self.get_child(UsageKey.from_string(usage_key))
             if not item:
                 return None
@@ -470,10 +470,12 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 'id': text_type(usage_id),
                 'bookmarked': is_bookmarked,
                 'path': " > ".join(display_names + [item.display_name_with_default]),
+                'graded': item.graded
             }
 
-            if is_user_authenticated and completion_service.visual_progress_enabled():
-                iteminfo['complete'] = completion_service.vertical_is_complete(item)
+            if is_user_authenticated:
+                if item.location.block_type == 'vertical':
+                    iteminfo['complete'] = completion_service.vertical_is_complete(item)
 
             contents.append(iteminfo)
 
@@ -599,9 +601,9 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
 
             # inject verification status
             if verification_service:
-                verification_status, __ = verification_service.get_status(user_id)
+                verification_status = verification_service.get_status(user_id)
                 context.update({
-                    'verification_status': verification_status,
+                    'verification_status': verification_status['status'],
                     'reverify_url': verification_service.reverify_url(),
                 })
 
@@ -643,7 +645,7 @@ class SequenceDescriptor(SequenceFields, ProctoringFields, MakoModuleDescriptor,
     show_in_read_only_mode = True
 
     js = {
-        'coffee': [resource_string(__name__, 'js/src/sequence/edit.coffee')],
+        'js': [resource_string(__name__, 'js/src/sequence/edit.js')],
     }
     js_module_name = "SequenceDescriptor"
 

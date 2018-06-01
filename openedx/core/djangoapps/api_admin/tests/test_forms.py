@@ -3,7 +3,7 @@
 import ddt
 from django.test import TestCase
 
-from openedx.core.djangoapps.api_admin.forms import ApiAccessRequestForm
+from openedx.core.djangoapps.api_admin.forms import ApiAccessRequestForm, ViewersWidget
 from openedx.core.djangoapps.api_admin.tests.utils import VALID_DATA
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 
@@ -21,3 +21,25 @@ class ApiAccessFormTest(TestCase):
     def test_form_valid(self, data, is_valid):
         form = ApiAccessRequestForm(data)
         self.assertEqual(form.is_valid(), is_valid)
+
+
+@skip_unless_lms
+class ViewersWidgetTest(TestCase):
+    widget = ViewersWidget()
+
+    def test_render_value(self):
+        """
+        Verify that ViewersWidget always displays serialized value on rendering.
+        """
+        dummy_string_value = 'staff, verified'
+        input_field_name = 'viewers'
+        expected_widget_html = '<input type="text" name="{input_field_name}" value="{serialized_value}" />'.format(
+            input_field_name=input_field_name,
+            serialized_value=dummy_string_value,
+        )
+        output = self.widget.render(name=input_field_name, value=dummy_string_value)
+        self.assertEqual(expected_widget_html, output)
+
+        dummy_list_value = ['staff', 'verified']
+        output = self.widget.render(name=input_field_name, value=dummy_list_value)
+        self.assertEqual(expected_widget_html, output)

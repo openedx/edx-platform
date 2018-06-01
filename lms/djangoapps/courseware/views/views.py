@@ -70,7 +70,7 @@ from lms.djangoapps.experiments.utils import get_experiment_user_metadata_contex
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.instructor.enrollment import uses_shib
 from lms.djangoapps.instructor.views.api import require_global_staff
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.utils import get_programs, get_programs_with_type
 from openedx.core.djangoapps.certificates import api as auto_certs_api
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -185,7 +185,7 @@ def user_groups(user):
     """
     TODO (vshnayder): This is not used. When we have a new plan for groups, adjust appropriately.
     """
-    if not user.is_authenticated():
+    if not user.is_authenticated:
         return []
 
     # TODO: Rewrite in Django
@@ -345,7 +345,7 @@ def course_info(request, course_id):
         # LEARNER-1697: Transition banner messages to new Course Home (DONE)
         # if user is not enrolled in a course then app will show enroll/get register link inside course info page.
         user_is_enrolled = CourseEnrollment.is_enrolled(user, course.id)
-        show_enroll_banner = request.user.is_authenticated() and not user_is_enrolled
+        show_enroll_banner = request.user.is_authenticated and not user_is_enrolled
 
         # If the user is not enrolled but this is a course that does not support
         # direct enrollment then redirect them to the dashboard.
@@ -368,7 +368,7 @@ def course_info(request, course_id):
         # Construct the dates fragment
         dates_fragment = None
 
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             # TODO: LEARNER-611: Remove enable_course_home_improvements
             if SelfPacedConfiguration.current().enable_course_home_improvements:
                 # Shared code with the new Course Home (DONE)
@@ -530,7 +530,7 @@ class CourseTabView(EdxFragmentView):
         """
         Register messages to be shown to the user if they have limited access.
         """
-        if request.user.is_anonymous():
+        if request.user.is_anonymous:
             PageLevelMessages.register_warning_message(
                 request,
                 Text(_("To see course content, {sign_in_link} or {register_link}.")).format(
@@ -687,7 +687,7 @@ def registered_for_course(course, user):
     """
     if user is None:
         return False
-    if user.is_authenticated():
+    if user.is_authenticated:
         return CourseEnrollment.is_enrolled(user, course.id)
     else:
         return False
@@ -795,7 +795,7 @@ def course_about(request, course_id):
 
         _is_shopping_cart_enabled = is_shopping_cart_enabled()
         if _is_shopping_cart_enabled:
-            if request.user.is_authenticated():
+            if request.user.is_authenticated:
                 cart = shoppingcart.models.Order.get_cart_for_user(request.user)
                 in_cart = shoppingcart.models.PaidCourseRegistration.contained_in_order(cart, course_key) or \
                     shoppingcart.models.CourseRegCodeItem.contained_in_order(cart, course_key)
@@ -1027,7 +1027,7 @@ def _downloadable_certificate_message(course, cert_downloadable_status):
 
 def _missing_required_verification(student, enrollment_mode):
     return (
-        enrollment_mode in CourseMode.VERIFIED_MODES and not SoftwareSecurePhotoVerification.user_is_verified(student)
+        enrollment_mode in CourseMode.VERIFIED_MODES and not IDVerificationService.user_is_verified(student)
     )
 
 
@@ -1370,7 +1370,7 @@ def generate_user_cert(request, course_id):
 
     """
 
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         log.info(u"Anon user trying to generate certificate for %s", course_id)
         return HttpResponseBadRequest(
             _('You must be signed in to {platform_name} to create a certificate.').format(

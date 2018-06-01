@@ -139,6 +139,14 @@ class XmlParserMixin(object):
                          # Used for storing xml attributes between import and export, for roundtrips
                          'xml_attributes')
 
+    # This is a categories to fields map that contains the block category specific fields which should not be
+    # cleaned and/or override while adding xml to node.
+    metadata_to_not_to_clean = {
+        # A category `video` having `sub` and `transcripts` fields
+        # which should not be cleaned/override in an xml object.
+        'video': ('sub', 'transcripts')
+    }
+
     metadata_to_export_to_policy = ('discussion_topics',)
 
     @staticmethod
@@ -165,13 +173,15 @@ class XmlParserMixin(object):
         raise NotImplementedError("%s does not implement definition_from_xml" % cls.__name__)
 
     @classmethod
-    def clean_metadata_from_xml(cls, xml_object):
+    def clean_metadata_from_xml(cls, xml_object, excluded_fields=()):
         """
         Remove any attribute named for a field with scope Scope.settings from the supplied
         xml_object
         """
         for field_name, field in cls.fields.items():
-            if field.scope == Scope.settings and xml_object.get(field_name) is not None:
+            if (field.scope == Scope.settings
+                    and field_name not in excluded_fields
+                    and xml_object.get(field_name) is not None):
                 del xml_object.attrib[field_name]
 
     @classmethod
@@ -448,7 +458,8 @@ class XmlParserMixin(object):
                 aside.add_xml_to_node(aside_node)
                 xml_object.append(aside_node)
 
-        self.clean_metadata_from_xml(xml_object)
+        not_to_clean_fields = self.metadata_to_not_to_clean.get(self.category, ())
+        self.clean_metadata_from_xml(xml_object, excluded_fields=not_to_clean_fields)
 
         # Set the tag on both nodes so we get the file path right.
         xml_object.tag = self.category
@@ -457,7 +468,9 @@ class XmlParserMixin(object):
         # Add the non-inherited metadata
         for attr in sorted(own_metadata(self)):
             # don't want e.g. data_dir
-            if attr not in self.metadata_to_strip and attr not in self.metadata_to_export_to_policy:
+            if (attr not in self.metadata_to_strip
+                    and attr not in self.metadata_to_export_to_policy
+                    and attr not in not_to_clean_fields):
                 val = serialize_field(self._field_data.get(self, attr))
                 try:
                     xml_object.set(attr, val)

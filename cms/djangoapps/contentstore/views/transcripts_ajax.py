@@ -14,12 +14,13 @@ import requests
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.core.files.base import ContentFile
 from django.http import Http404, HttpResponse
 from django.utils.translation import ugettext as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
 from six import text_type
-
+from edxval.api import create_or_update_video_transcript, create_external_video
 from student.auth import has_course_author_access
 from util.json_request import JsonResponse
 from xmodule.contentstore.content import StaticContent
@@ -28,21 +29,24 @@ from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.video_module.transcripts_utils import (
+    clean_video_id,
     copy_or_rename_transcript,
     download_youtube_subs,
     GetTranscriptsFromYouTubeException,
     get_video_transcript_content,
     generate_subs_from_source,
+    get_transcript_for_video,
     get_transcripts_from_youtube,
-    manage_video_subtitles_save,
     remove_subs_from_store,
     Transcript,
     TranscriptsRequestValidationException,
+    TranscriptsGenerationException,
     youtube_video_transcript_name,
+    get_transcript,
+    get_transcript_from_val,
 )
-from xmodule.video_module.transcripts_model_utils import (
-    is_val_transcript_feature_enabled_for_course
-)
+
+from cms.djangoapps.contentstore.views.videos import TranscriptProvider
 
 __all__ = [
     'upload_transcripts',
@@ -51,7 +55,6 @@ __all__ = [
     'choose_transcripts',
     'replace_transcripts',
     'rename_transcripts',
-    'save_transcripts',
 ]
 
 log = logging.getLogger(__name__)
@@ -68,6 +71,126 @@ def error_response(response, message, status_code=400):
     return JsonResponse(response, status_code)
 
 
+def link_video_to_component(video_component, user):
+    """
+    Links a VAL video to the video component.
+
+    Arguments:
+        video_component: video descriptor item.
+        user: A requesting user.
+
+    Returns:
+        A cleaned Video ID.
+    """
+    edx_video_id = clean_video_id(video_component.edx_video_id)
+    if not edx_video_id:
+        edx_video_id = create_external_video(display_name=u'external video')
+        video_component.edx_video_id = edx_video_id
+        video_component.save_with_metadata(user)
+
+    return edx_video_id
+
+
+def save_video_transcript(edx_video_id, input_format, transcript_content, language_code):
+    """
+    Saves a video transcript to the VAL and its content to the configured django storage(DS).
+
+    Arguments:
+        edx_video_id: A Video ID to associate the transcript.
+        input_format: Input transcript format for content being passed.
+        transcript_content: Content of the transcript file
+        language_code: transcript language code
+
+    Returns:
+        A boolean indicating whether the transcript was saved or not.
+    """
+    try:
+        # Convert the transcript into the 'sjson' and upload it to
+        # configured transcript storage. For example, S3.
+        sjson_subs = Transcript.convert(
+            content=transcript_content,
+            input_format=input_format,
+            output_format=Transcript.SJSON
+        )
+        create_or_update_video_transcript(
+            video_id=edx_video_id,
+            language_code=language_code,
+            metadata={
+                'provider': TranscriptProvider.CUSTOM,
+                'file_format': Transcript.SJSON,
+                'language_code': language_code
+            },
+            file_data=ContentFile(sjson_subs),
+        )
+        result = True
+    except (TranscriptsGenerationException, UnicodeDecodeError):
+        result = False
+
+    return result
+
+
+def validate_video_module(request, locator):
+    """
+    Validates video module given its locator and request. Also, checks
+    if requesting user has course authoring access.
+
+    Arguments:
+        request: WSGI request.
+        locator: video locator.
+
+    Returns:
+        A tuple containing error(or None) and video descriptor(i.e. if validation succeeds).
+
+    Raises:
+        PermissionDenied: if requesting user does not have access to author the video component.
+    """
+    error, item = None, None
+    try:
+        item = _get_item(request, {'locator': locator})
+        if item.category != 'video':
+            error = _(u'Transcripts are supported only for "video" modules.')
+    except (InvalidKeyError, ItemNotFoundError):
+        error = _(u'Cannot find item by locator.')
+
+    return error, item
+
+
+def validate_transcript_upload_data(request):
+    """
+    Validates video transcript file.
+
+    Arguments:
+        request: A WSGI request's data part.
+
+    Returns:
+        Tuple containing an error and validated data
+        If there is a validation error then, validated data will be empty.
+    """
+    error, validated_data = None, {}
+    data, files = request.POST, request.FILES
+    video_locator = data.get('locator')
+    edx_video_id = data.get('edx_video_id')
+    if not video_locator:
+        error = _(u'Video locator is required.')
+    elif 'transcript-file' not in files:
+        error = _(u'A transcript file is required.')
+    elif os.path.splitext(files['transcript-file'].name)[1][1:] != Transcript.SRT:
+        error = _(u'This transcript file type is not supported.')
+    elif 'edx_video_id' not in data:
+        error = _(u'Video ID is required.')
+
+    if not error:
+        error, video = validate_video_module(request, video_locator)
+        if not error:
+            validated_data.update({
+                'video': video,
+                'edx_video_id': clean_video_id(edx_video_id) or clean_video_id(video.edx_video_id),
+                'transcript_file': files['transcript-file']
+            })
+
+    return error, validated_data
+
+
 @login_required
 def upload_transcripts(request):
     """
@@ -78,67 +201,51 @@ def upload_transcripts(request):
         status: 'Success' and HTTP 200 or 'Error' and HTTP 400.
         subs: Value of uploaded and saved html5 sub field in video item.
     """
-    response = {
-        'status': 'Unknown server error',
-        'subs': '',
-    }
-
-    locator = request.POST.get('locator')
-    if not locator:
-        return error_response(response, 'POST data without "locator" form data.')
-
-    try:
-        item = _get_item(request, request.POST)
-    except (InvalidKeyError, ItemNotFoundError):
-        return error_response(response, "Can't find item by locator.")
-
-    if 'transcript-file' not in request.FILES:
-        return error_response(response, 'POST data without "file" form data.')
-
-    video_list = request.POST.get('video_list')
-    if not video_list:
-        return error_response(response, 'POST data without video names.')
-
-    try:
-        video_list = json.loads(video_list)
-    except ValueError:
-        return error_response(response, 'Invalid video_list JSON.')
-
-    # Used utf-8-sig encoding type instead of utf-8 to remove BOM(Byte Order Mark), e.g. U+FEFF
-    source_subs_filedata = request.FILES['transcript-file'].read().decode('utf-8-sig')
-    source_subs_filename = request.FILES['transcript-file'].name
-
-    if '.' not in source_subs_filename:
-        return error_response(response, "Undefined file extension.")
-
-    basename = os.path.basename(source_subs_filename)
-    source_subs_name = os.path.splitext(basename)[0]
-    source_subs_ext = os.path.splitext(basename)[1][1:]
-
-    if item.category != 'video':
-        return error_response(response, 'Transcripts are supported only for "video" modules.')
-
-    # Allow upload only if any video link is presented
-    if video_list:
-        sub_attr = source_subs_name
-        try:
-            # Generate and save for 1.0 speed, will create subs_sub_attr.srt.sjson subtitles file in storage.
-            generate_subs_from_source({1: sub_attr}, source_subs_ext, source_subs_filedata, item)
-
-            for video_dict in video_list:
-                video_name = video_dict['video']
-                # We are creating transcripts for every video source, if in future some of video sources would be deleted.
-                # Updates item.sub with `video_name` on success.
-                copy_or_rename_transcript(video_name, sub_attr, item, user=request.user)
-
-            response['subs'] = item.sub
-            response['status'] = 'Success'
-        except Exception as ex:
-            return error_response(response, text_type(ex))
+    error, validated_data = validate_transcript_upload_data(request)
+    if error:
+        response = JsonResponse({'status': error}, status=400)
     else:
-        return error_response(response, 'Empty video sources.')
+        video = validated_data['video']
+        edx_video_id = validated_data['edx_video_id']
+        transcript_file = validated_data['transcript_file']
+        # check if we need to create an external VAL video to associate the transcript
+        # and save its ID on the video component.
+        if not edx_video_id:
+            edx_video_id = create_external_video(display_name=u'external video')
+            video.edx_video_id = edx_video_id
+            video.save_with_metadata(request.user)
 
-    return JsonResponse(response)
+        response = JsonResponse({'edx_video_id': edx_video_id, 'status': 'Success'}, status=200)
+
+        try:
+            # Convert 'srt' transcript into the 'sjson' and upload it to
+            # configured transcript storage. For example, S3.
+            sjson_subs = Transcript.convert(
+                content=transcript_file.read(),
+                input_format=Transcript.SRT,
+                output_format=Transcript.SJSON
+            )
+            transcript_created = create_or_update_video_transcript(
+                video_id=edx_video_id,
+                language_code=u'en',
+                metadata={
+                    'provider': TranscriptProvider.CUSTOM,
+                    'file_format': Transcript.SJSON,
+                    'language_code': u'en'
+                },
+                file_data=ContentFile(sjson_subs),
+            )
+
+            if transcript_created is None:
+                response = JsonResponse({'status': 'Invalid Video ID'}, status=400)
+
+        except (TranscriptsGenerationException, UnicodeDecodeError):
+
+            response = JsonResponse({
+                'status': _(u'There is a problem with this transcript file. Try to upload a different file.')
+            }, status=400)
+
+    return response
 
 
 @login_required
@@ -148,54 +255,18 @@ def download_transcripts(request):
 
     Raises Http404 if unsuccessful.
     """
-    locator = request.GET.get('locator')
-    subs_id = request.GET.get('subs_id')
-    if not locator:
-        log.debug('GET data without "locator" property.')
+    error, video = validate_video_module(request, locator=request.GET.get('locator'))
+    if error:
         raise Http404
 
     try:
-        item = _get_item(request, request.GET)
-    except (InvalidKeyError, ItemNotFoundError):
-        log.debug("Can't find item by locator.")
-        raise Http404
-
-    if item.category != 'video':
-        log.debug('transcripts are supported only for video" modules.')
-        raise Http404
-
-    try:
-        if not subs_id:
-            raise NotFoundError
-
-        filename = subs_id
-        content_location = StaticContent.compute_location(
-            item.location.course_key,
-            'subs_{filename}.srt.sjson'.format(filename=filename),
-        )
-        input_format = Transcript.SJSON
-        transcript_content = contentstore().find(content_location).data
+        content, filename, mimetype = get_transcript(video, lang=u'en')
     except NotFoundError:
-        # Try searching in VAL for the transcript as a last resort
-        transcript = None
-        if is_val_transcript_feature_enabled_for_course(item.location.course_key):
-            transcript = get_video_transcript_content(edx_video_id=item.edx_video_id, language_code=u'en')
-
-        if not transcript:
-            raise Http404
-
-        name_and_extension = os.path.splitext(transcript['file_name'])
-        filename, input_format = name_and_extension[0], name_and_extension[1][1:]
-        transcript_content = transcript['content']
-
-    # convert sjson content into srt format.
-    transcript_content = Transcript.convert(transcript_content, input_format=input_format, output_format=Transcript.SRT)
-    if not transcript_content:
         raise Http404
 
     # Construct an HTTP response
-    response = HttpResponse(transcript_content, content_type='application/x-subrip; charset=utf-8')
-    response['Content-Disposition'] = 'attachment; filename="{filename}.srt"'.format(filename=filename)
+    response = HttpResponse(content, content_type=mimetype)
+    response['Content-Disposition'] = 'attachment; filename="{filename}"'.format(filename=filename.encode('utf-8'))
     return response
 
 
@@ -237,6 +308,7 @@ def check_transcripts(request):
         'current_item_subs': None,
         'status': 'Error',
     }
+
     try:
         __, videos, item = _validate_transcripts_data(request)
     except TranscriptsRequestValidationException as e:
@@ -244,75 +316,72 @@ def check_transcripts(request):
 
     transcripts_presence['status'] = 'Success'
 
-    filename = 'subs_{0}.srt.sjson'.format(item.sub)
-    content_location = StaticContent.compute_location(item.location.course_key, filename)
     try:
-        local_transcripts = contentstore().find(content_location).data
-        transcripts_presence['current_item_subs'] = item.sub
+        edx_video_id = clean_video_id(videos.get('edx_video_id'))
+        get_transcript_from_val(edx_video_id=edx_video_id, lang=u'en')
+        command = 'found'
     except NotFoundError:
-        pass
-
-    # Check for youtube transcripts presence
-    youtube_id = videos.get('youtube', None)
-    if youtube_id:
-        transcripts_presence['is_youtube_mode'] = True
-
-        # youtube local
-        filename = 'subs_{0}.srt.sjson'.format(youtube_id)
+        filename = 'subs_{0}.srt.sjson'.format(item.sub)
         content_location = StaticContent.compute_location(item.location.course_key, filename)
         try:
             local_transcripts = contentstore().find(content_location).data
-            transcripts_presence['youtube_local'] = True
+            transcripts_presence['current_item_subs'] = item.sub
         except NotFoundError:
-            log.debug("Can't find transcripts in storage for youtube id: %s", youtube_id)
+            pass
 
-        # youtube server
-        youtube_text_api = copy.deepcopy(settings.YOUTUBE['TEXT_API'])
-        youtube_text_api['params']['v'] = youtube_id
-        youtube_transcript_name = youtube_video_transcript_name(youtube_text_api)
-        if youtube_transcript_name:
-            youtube_text_api['params']['name'] = youtube_transcript_name
-        youtube_response = requests.get('http://' + youtube_text_api['url'], params=youtube_text_api['params'])
+        # Check for youtube transcripts presence
+        youtube_id = videos.get('youtube', None)
+        if youtube_id:
+            transcripts_presence['is_youtube_mode'] = True
 
-        if youtube_response.status_code == 200 and youtube_response.text:
-            transcripts_presence['youtube_server'] = True
-        #check youtube local and server transcripts for equality
-        if transcripts_presence['youtube_server'] and transcripts_presence['youtube_local']:
+            # youtube local
+            filename = 'subs_{0}.srt.sjson'.format(youtube_id)
+            content_location = StaticContent.compute_location(item.location.course_key, filename)
             try:
-                youtube_server_subs = get_transcripts_from_youtube(
-                    youtube_id,
-                    settings,
-                    item.runtime.service(item, "i18n")
-                )
-                if json.loads(local_transcripts) == youtube_server_subs:  # check transcripts for equality
-                    transcripts_presence['youtube_diff'] = False
-            except GetTranscriptsFromYouTubeException:
-                pass
+                local_transcripts = contentstore().find(content_location).data
+                transcripts_presence['youtube_local'] = True
+            except NotFoundError:
+                log.debug("Can't find transcripts in storage for youtube id: %s", youtube_id)
 
-    # Check for html5 local transcripts presence
-    html5_subs = []
-    for html5_id in videos['html5']:
-        filename = 'subs_{0}.srt.sjson'.format(html5_id)
-        content_location = StaticContent.compute_location(item.location.course_key, filename)
-        try:
-            html5_subs.append(contentstore().find(content_location).data)
-            transcripts_presence['html5_local'].append(html5_id)
-        except NotFoundError:
-            log.debug("Can't find transcripts in storage for non-youtube video_id: %s", html5_id)
-        if len(html5_subs) == 2:  # check html5 transcripts for equality
-            transcripts_presence['html5_equal'] = json.loads(html5_subs[0]) == json.loads(html5_subs[1])
+            # youtube server
+            youtube_text_api = copy.deepcopy(settings.YOUTUBE['TEXT_API'])
+            youtube_text_api['params']['v'] = youtube_id
+            youtube_transcript_name = youtube_video_transcript_name(youtube_text_api)
+            if youtube_transcript_name:
+                youtube_text_api['params']['name'] = youtube_transcript_name
+            youtube_response = requests.get('http://' + youtube_text_api['url'], params=youtube_text_api['params'])
 
-    command, subs_to_use = _transcripts_logic(transcripts_presence, videos)
-    if command == 'not_found':
-        # Try searching in VAL for the transcript as a last resort
-        if is_val_transcript_feature_enabled_for_course(item.location.course_key):
-            video_transcript = get_video_transcript_content(edx_video_id=item.edx_video_id, language_code=u'en')
-            command = 'found' if video_transcript else command
+            if youtube_response.status_code == 200 and youtube_response.text:
+                transcripts_presence['youtube_server'] = True
+            #check youtube local and server transcripts for equality
+            if transcripts_presence['youtube_server'] and transcripts_presence['youtube_local']:
+                try:
+                    youtube_server_subs = get_transcripts_from_youtube(
+                        youtube_id,
+                        settings,
+                        item.runtime.service(item, "i18n")
+                    )
+                    if json.loads(local_transcripts) == youtube_server_subs:  # check transcripts for equality
+                        transcripts_presence['youtube_diff'] = False
+                except GetTranscriptsFromYouTubeException:
+                    pass
 
-    transcripts_presence.update({
-        'command': command,
-        'subs': subs_to_use,
-    })
+        # Check for html5 local transcripts presence
+        html5_subs = []
+        for html5_id in videos['html5']:
+            filename = 'subs_{0}.srt.sjson'.format(html5_id)
+            content_location = StaticContent.compute_location(item.location.course_key, filename)
+            try:
+                html5_subs.append(contentstore().find(content_location).data)
+                transcripts_presence['html5_local'].append(html5_id)
+            except NotFoundError:
+                log.debug("Can't find transcripts in storage for non-youtube video_id: %s", html5_id)
+            if len(html5_subs) == 2:  # check html5 transcripts for equality
+                transcripts_presence['html5_equal'] = json.loads(html5_subs[0]) == json.loads(html5_subs[1])
+
+        command, __ = _transcripts_logic(transcripts_presence, videos)
+
+    transcripts_presence.update({'command': command})
     return JsonResponse(transcripts_presence)
 
 
@@ -374,78 +443,6 @@ def _transcripts_logic(transcripts_presence, videos):
     return command, subs
 
 
-@login_required
-def choose_transcripts(request):
-    """
-    Replaces html5 subtitles, presented for both html5 sources, with chosen one.
-
-    Code removes rejected html5 subtitles and updates sub attribute with chosen html5_id.
-
-    It does nothing with youtube id's.
-
-    Returns: status `Success` and resulted item.sub value or status `Error` and HTTP 400.
-    """
-    response = {
-        'status': 'Error',
-        'subs': '',
-    }
-
-    try:
-        data, videos, item = _validate_transcripts_data(request)
-    except TranscriptsRequestValidationException as e:
-        return error_response(response, text_type(e))
-
-    html5_id = data.get('html5_id')  # html5_id chosen by user
-
-    # find rejected html5_id and remove appropriate subs from store
-    html5_id_to_remove = [x for x in videos['html5'] if x != html5_id]
-    if html5_id_to_remove:
-        remove_subs_from_store(html5_id_to_remove, item)
-
-    if item.sub != html5_id:  # update sub value
-        item.sub = html5_id
-        item.save_with_metadata(request.user)
-    response = {
-        'status': 'Success',
-        'subs': item.sub,
-    }
-    return JsonResponse(response)
-
-
-@login_required
-def replace_transcripts(request):
-    """
-    Replaces all transcripts with youtube ones.
-
-    Downloads subtitles from youtube and replaces all transcripts with downloaded ones.
-
-    Returns: status `Success` and resulted item.sub value or status `Error` and HTTP 400.
-    """
-    response = {'status': 'Error', 'subs': ''}
-
-    try:
-        __, videos, item = _validate_transcripts_data(request)
-    except TranscriptsRequestValidationException as e:
-        return error_response(response, text_type(e))
-
-    youtube_id = videos['youtube']
-    if not youtube_id:
-        return error_response(response, 'YouTube id {} is not presented in request data.'.format(youtube_id))
-
-    try:
-        download_youtube_subs(youtube_id, item, settings)
-    except GetTranscriptsFromYouTubeException as e:
-        return error_response(response, text_type(e))
-
-    item.sub = youtube_id
-    item.save_with_metadata(request.user)
-    response = {
-        'status': 'Success',
-        'subs': item.sub,
-    }
-    return JsonResponse(response)
-
-
 def _validate_transcripts_data(request):
     """
     Validates, that request contains all proper data for transcripts processing.
@@ -476,6 +473,9 @@ def _validate_transcripts_data(request):
     for video_data in data.get('videos'):
         if video_data['type'] == 'youtube':
             videos['youtube'] = video_data['video']
+        elif video_data['type'] == 'edx_video_id':
+            if clean_video_id(video_data['video']):
+                videos['edx_video_id'] = video_data['video']
         else:  # do not add same html5 videos
             if videos['html5'].get('video') != video_data['video']:
                 videos['html5'][video_data['video']] = video_data['mode']
@@ -483,78 +483,162 @@ def _validate_transcripts_data(request):
     return data, videos, item
 
 
+def validate_transcripts_request(request, include_yt=False, include_html5=False):
+    """
+    Validates transcript handler's request.
+
+    NOTE: This is one central validation flow for `choose_transcripts`,
+    `check_transcripts` and `replace_transcripts` handlers.
+
+    Returns:
+        A tuple containing:
+            1. An error message in case of validation failure.
+            2. validated video data
+    """
+    error = None
+    validated_data = {'video': None, 'youtube': '', 'html5': {}}
+    # Loads the request data
+    data = json.loads(request.GET.get('data', '{}'))
+    if not data:
+        error = _(u'Incoming video data is empty.')
+    else:
+        error, video = validate_video_module(request, locator=data.get('locator'))
+        if not error:
+            validated_data.update({'video': video})
+
+    videos = data.get('videos', [])
+    if include_yt:
+        validated_data.update({
+            video['type']: video['video']
+            for video in videos
+            if video['type'] == 'youtube'
+        })
+
+    if include_html5:
+        validated_data['chosen_html5_id'] = data.get('html5_id')
+        validated_data['html5'] = {
+            video['video']: video['mode']
+            for video in videos
+            if video['type'] != 'youtube'
+        }
+
+    return error, validated_data
+
+
+@login_required
+def choose_transcripts(request):
+    """
+    Create/Update edx transcript in DS with chosen html5 subtitles from contentstore.
+
+    Returns:
+        status `Success` and resulted `edx_video_id` value
+        Or error in case of validation failures.
+    """
+    error, validated_data = validate_transcripts_request(request, include_html5=True)
+    if error:
+        response = error_response({}, error)
+    else:
+        # 1. Retrieve transcript file for `chosen_html5_id` from contentstore.
+        try:
+            video = validated_data['video']
+            chosen_html5_id = validated_data['chosen_html5_id']
+            input_format, __, transcript_content = get_transcript_for_video(
+                video.location,
+                subs_id=chosen_html5_id,
+                file_name=chosen_html5_id,
+                language=u'en'
+            )
+        except NotFoundError:
+            return error_response({}, _('No such transcript.'))
+
+        # 2. Link a video to video component if its not already linked to one.
+        edx_video_id = link_video_to_component(video, request.user)
+
+        # 3. Upload the retrieved transcript to DS for the linked video ID.
+        success = save_video_transcript(edx_video_id, input_format, transcript_content, language_code=u'en')
+        if success:
+            response = JsonResponse({'edx_video_id': edx_video_id, 'status': 'Success'}, status=200)
+        else:
+            response = error_response({}, _('There is a problem with the chosen transcript file.'))
+
+    return response
+
+
 @login_required
 def rename_transcripts(request):
     """
-    Create copies of existing subtitles with new names of HTML5 sources.
+    Copies existing transcript on video component's `sub`(from contentstore) into the
+    DS for a video.
 
-    Old subtitles are not deleted now, because we do not have rollback functionality.
-
-    If succeed, Item.sub will be chosen randomly from html5 video sources provided by front-end.
+    Returns:
+        status `Success` and resulted `edx_video_id` value
+        Or error in case of validation failures.
     """
-    response = {'status': 'Error', 'subs': ''}
-
-    try:
-        __, videos, item = _validate_transcripts_data(request)
-    except TranscriptsRequestValidationException as e:
-        return error_response(response, text_type(e))
-
-    old_name = item.sub
-
-    for new_name in videos['html5'].keys():  # copy subtitles for every HTML5 source
+    error, validated_data = validate_transcripts_request(request)
+    if error:
+        response = error_response({}, error)
+    else:
+        # 1. Retrieve transcript file for `video.sub` from contentstore.
         try:
-            # updates item.sub with new_name if it is successful.
-            copy_or_rename_transcript(new_name, old_name, item, user=request.user)
+            video = validated_data['video']
+            input_format, __, transcript_content = get_transcript_for_video(
+                video.location,
+                subs_id=video.sub,
+                file_name=video.sub,
+                language=u'en'
+            )
         except NotFoundError:
-            # subtitles file `item.sub` is not presented in the system. Nothing to copy or rename.
-            error_response(response, "Can't find transcripts in storage for {}".format(old_name))
+            return error_response({}, _('No such transcript.'))
 
-    response['status'] = 'Success'
-    response['subs'] = item.sub  # item.sub has been changed, it is not equal to old_name.
-    log.debug("Updated item.sub to %s", item.sub)
-    return JsonResponse(response)
+        # 2. Link a video to video component if its not already linked to one.
+        edx_video_id = link_video_to_component(video, request.user)
+
+        # 3. Upload the retrieved transcript to DS for the linked video ID.
+        success = save_video_transcript(edx_video_id, input_format, transcript_content, language_code=u'en')
+        if success:
+            response = JsonResponse({'edx_video_id': edx_video_id, 'status': 'Success'}, status=200)
+        else:
+            response = error_response(
+                {}, _('There is a problem with the existing transcript file. Please upload a different file.')
+            )
+
+    return response
 
 
 @login_required
-def save_transcripts(request):
+def replace_transcripts(request):
     """
-    Saves video module with updated values of fields.
+    Downloads subtitles from youtube and replaces edx transcripts in DS with youtube ones.
 
-    Returns: status `Success` or status `Error` and HTTP 400.
+    Returns:
+        status `Success` and resulted `edx_video_id` value
+        Or error on validation failures.
     """
-    response = {'status': 'Error'}
+    error, validated_data = validate_transcripts_request(request, include_yt=True)
+    youtube_id = validated_data['youtube']
+    if error:
+        response = error_response({}, error)
+    elif not youtube_id:
+        response = error_response({}, _(u'YouTube ID is required.'))
+    else:
+        # 1. Download transcript from YouTube.
+        try:
+            video = validated_data['video']
+            transcript_content = download_youtube_subs(youtube_id, video, settings)
+        except GetTranscriptsFromYouTubeException as e:
+            return error_response({}, text_type(e))
 
-    data = json.loads(request.GET.get('data', '{}'))
-    if not data:
-        return error_response(response, 'Incoming video data is empty.')
+        # 2. Link a video to video component if its not already linked to one.
+        edx_video_id = link_video_to_component(video, request.user)
 
-    try:
-        item = _get_item(request, data)
-    except (InvalidKeyError, ItemNotFoundError):
-        return error_response(response, "Can't find item by locator.")
-
-    metadata = data.get('metadata')
-    if metadata is not None:
-        new_sub = metadata.get('sub')
-
-        for metadata_key, value in metadata.items():
-            setattr(item, metadata_key, value)
-
-        item.save_with_metadata(request.user)  # item becomes updated with new values
-
-        if new_sub:
-            manage_video_subtitles_save(item, request.user)
+        # 3. Upload YT transcript to DS for the linked video ID.
+        success = save_video_transcript(edx_video_id, Transcript.SJSON, transcript_content, language_code=u'en')
+        if success:
+            response = JsonResponse({'edx_video_id': edx_video_id, 'status': 'Success'}, status=200)
         else:
-            # If `new_sub` is empty, it means that user explicitly does not want to use
-            # transcripts for current video ids and we remove all transcripts from storage.
-            current_subs = data.get('current_subs')
-            if current_subs is not None:
-                for sub in current_subs:
-                    remove_subs_from_store(sub, item)
+            response = error_response({}, _('There is a problem with the YouTube transcript file.'))
 
-        response['status'] = 'Success'
-
-    return JsonResponse(response)
+    return response
 
 
 def _get_item(request, data):

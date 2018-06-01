@@ -3,6 +3,7 @@ Test entitlements utilities
 """
 
 from datetime import timedelta
+from opaque_keys.edx.keys import CourseKey
 
 from django.conf import settings
 from django.utils.timezone import now
@@ -20,13 +21,13 @@ if settings.ROOT_URLCONF == 'lms.urls':
 
 
 @skip_unless_lms
-class TestCourseRunFullfillableForEntitlement(ModuleStoreTestCase):
+class TestCourseRunFulfillableForEntitlement(ModuleStoreTestCase):
     """
     Tests for the utility function is_course_run_entitlement_fulfillable
     """
 
     def setUp(self):
-        super(TestCourseRunFullfillableForEntitlement, self).setUp()
+        super(TestCourseRunFulfillableForEntitlement, self).setUp()
 
         self.user = UserFactory(is_staff=True)
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
@@ -54,7 +55,7 @@ class TestCourseRunFullfillableForEntitlement(ModuleStoreTestCase):
         )
         return course_overview
 
-    def test_course_run_fullfillble(self):
+    def test_course_run_fulfillable(self):
         course_overview = self.create_course(
             start_from_now=-2,
             end_from_now=2,
@@ -66,7 +67,29 @@ class TestCourseRunFullfillableForEntitlement(ModuleStoreTestCase):
 
         assert is_course_run_entitlement_fulfillable(course_overview.id, entitlement)
 
-    def test_course_run_not_fullfillable_run_ended(self):
+    def test_course_run_missing_overview_not_fulfillable(self):
+        entitlement = CourseEntitlementFactory.create(mode=CourseMode.VERIFIED)
+
+        assert not is_course_run_entitlement_fulfillable(
+            CourseKey.from_string('course-v1:edx+FakeCourse+3T2017'),
+            entitlement
+        )
+
+    def test_course_run_not_fulfillable_no_start_date(self):
+        course_overview = self.create_course(
+            start_from_now=-2,
+            end_from_now=2,
+            enrollment_start_from_now=-1,
+            enrollment_end_from_now=1
+        )
+        course_overview.start = None
+        course_overview.save()
+
+        entitlement = CourseEntitlementFactory.create(mode=CourseMode.VERIFIED)
+
+        assert not is_course_run_entitlement_fulfillable(course_overview.id, entitlement)
+
+    def test_course_run_not_fulfillable_run_ended(self):
         course_overview = self.create_course(
             start_from_now=-3,
             end_from_now=-1,
@@ -78,7 +101,7 @@ class TestCourseRunFullfillableForEntitlement(ModuleStoreTestCase):
 
         assert not is_course_run_entitlement_fulfillable(course_overview.id, entitlement)
 
-    def test_course_run_not_fullfillable_enroll_period_ended(self):
+    def test_course_run_not_fulfillable_enroll_period_ended(self):
         course_overview = self.create_course(
             start_from_now=-3,
             end_from_now=2,
@@ -90,7 +113,19 @@ class TestCourseRunFullfillableForEntitlement(ModuleStoreTestCase):
 
         assert not is_course_run_entitlement_fulfillable(course_overview.id, entitlement)
 
-    def test_course_run_fullfillable_user_enrolled(self):
+    def test_course_run_not_fulfillable_enrollment_start_in_future(self):
+        course_overview = self.create_course(
+            start_from_now=-3,
+            end_from_now=2,
+            enrollment_start_from_now=2,
+            enrollment_end_from_now=4
+        )
+
+        entitlement = CourseEntitlementFactory.create(mode=CourseMode.VERIFIED)
+
+        assert not is_course_run_entitlement_fulfillable(course_overview.id, entitlement)
+
+    def test_course_run_fulfillable_user_enrolled(self):
         course_overview = self.create_course(
             start_from_now=-3,
             end_from_now=2,
@@ -104,7 +139,7 @@ class TestCourseRunFullfillableForEntitlement(ModuleStoreTestCase):
 
         assert is_course_run_entitlement_fulfillable(course_overview.id, entitlement)
 
-    def test_course_run_not_fullfillable_upgrade_ended(self):
+    def test_course_run_not_fulfillable_upgrade_ended(self):
         course_overview = self.create_course(
             start_from_now=-3,
             end_from_now=2,

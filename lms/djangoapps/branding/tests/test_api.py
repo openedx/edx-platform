@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 import mock
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -13,6 +14,7 @@ from edxmako.shortcuts import marketing_link
 
 class TestHeader(TestCase):
     """Test API end-point for retrieving the header. """
+    shard = 4
 
     def test_cdn_urls_for_logo(self):
         # Ordinarily, we'd use `override_settings()` to override STATIC_URL,
@@ -40,6 +42,7 @@ class TestHeader(TestCase):
 
 
 class TestFooter(TestCase):
+    shard = 4
     maxDiff = None
     """Test retrieving the footer. """
     @mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True})
@@ -58,16 +61,13 @@ class TestFooter(TestCase):
         "TOS_AND_HONOR": "/edx-terms-service",
         "PRIVACY": "/edx-privacy-policy",
         "ACCESSIBILITY": "/accessibility",
-        "AFFILIATES": '/affiliates',
+        "AFFILIATES": '/affiliate-program',
         "MEDIA_KIT": "/media-kit",
         "ENTERPRISE": "/enterprise"
     })
     @override_settings(PLATFORM_NAME='\xe9dX')
     def test_get_footer(self):
         actual_footer = get_footer(is_secure=True)
-        import pprint
-        pprint.pprint(actual_footer)
-        print('******************************************!!!!!!!!!!!!!!!!!!!!!!!!!!!*******************************************')
         expected_footer = {
             'copyright': '\xa9 \xe9dX.  All rights reserved except where noted. '
                          ' EdX, Open edX and their respective logos are '
@@ -85,7 +85,7 @@ class TestFooter(TestCase):
             'business_links': [
                 {'url': 'https://edx.org/about-us', 'name': 'about', 'title': 'About'},
                 {'url': 'https://edx.org/enterprise', 'name': 'enterprise', 'title': '\xe9dX for Business'},
-                {'url': 'https://edx.org/affiliates', 'name': 'affiliates', 'title': 'Affiliates'},
+                {'url': 'https://edx.org/affiliate-program', 'name': 'affiliates', 'title': 'Affiliates'},
                 {'url': 'http://open.edx.org', 'name': 'openedx', 'title': 'Open edX'},
                 {'url': 'https://edx.org/careers', 'name': 'careers', 'title': 'Careers'},
                 {'url': 'https://edx.org/news-announcements', 'name': 'news', 'title': 'News'},
@@ -99,13 +99,14 @@ class TestFooter(TestCase):
                 {'url': 'https://edx.org/accessibility',
                  'name': 'accessibility_policy',
                  'title': 'Accessibility Policy'},
-                {'url': 'https://edx.org/trademarks', 'name': 'trademarks', 'title': 'Trademarks'},
+                {'url': 'https://edx.org/trademarks', 'name': 'trademarks', 'title': 'Trademark Policy'},
                 {'url': 'https://edx.org/sitemap', 'name': 'sitemap', 'title': 'Sitemap'},
 
             ],
             'connect_links': [
                 {'url': 'https://edx.org/edx-blog', 'name': 'blog', 'title': 'Blog'},
-                {'url': '/support/contact_us', 'name': 'contact', 'title': 'Contact Us'},
+                # pylint: disable=line-too-long
+                {'url': '{base_url}/support/contact_us'.format(base_url=settings.LMS_ROOT_URL), 'name': 'contact', 'title': 'Contact Us'},
                 {'url': 'https://support.example.com', 'name': 'help-center', 'title': 'Help Center'},
                 {'url': 'https://edx.org/media-kit', 'name': 'media_kit', 'title': 'Media Kit'},
                 {'url': 'https://edx.org/donate', 'name': 'donate', 'title': 'Donate'}
@@ -149,5 +150,4 @@ class TestFooter(TestCase):
                 'text': 'Take free online courses at edX.org',
             },
         }
-        pprint.pprint(expected_footer)
         self.assertEqual(actual_footer, expected_footer)

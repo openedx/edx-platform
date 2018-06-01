@@ -3,7 +3,7 @@ from logging import getLogger
 
 from celery_utils.persist_on_failure import LoggedPersistOnFailureTask
 from django.contrib.auth.models import User
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+from lms.djangoapps.verify_student.services import IDVerificationService
 from opaque_keys.edx.keys import CourseKey
 
 from .api import generate_user_certificates
@@ -31,7 +31,16 @@ def generate_certificate(self, **kwargs):
     course_key = CourseKey.from_string(kwargs.pop('course_key'))
     expected_verification_status = kwargs.pop('expected_verification_status', None)
     if expected_verification_status:
-        actual_verification_status, _ = SoftwareSecurePhotoVerification.user_status(student)
+        actual_verification_status = IDVerificationService.user_status(student)
+        actual_verification_status = actual_verification_status['status']
         if expected_verification_status != actual_verification_status:
+            logger.warn('Expected verification status {expected} '
+                        'differs from actual verification status {actual} '
+                        'for user {user} in course {course}'.format(
+                            expected=expected_verification_status,
+                            actual=actual_verification_status,
+                            user=student.id,
+                            course=course_key
+                        ))
             raise self.retry(kwargs=original_kwargs)
     generate_user_certificates(student=student, course_key=course_key, **kwargs)

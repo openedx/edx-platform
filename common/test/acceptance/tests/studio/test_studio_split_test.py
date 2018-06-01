@@ -62,7 +62,7 @@ class SplitTestMixin(object):
         Promise(missing_groups_button_not_present, "Add missing groups button should not be showing.").fulfill()
 
 
-@attr(shard=2)
+@attr(shard=15)
 class SplitTest(ContainerBase, SplitTestMixin):
     """
     Tests for creating and editing split test instances in Studio.
@@ -177,7 +177,7 @@ class SplitTest(ContainerBase, SplitTestMixin):
         self.verify_groups(container, ['alpha'], [], verify_missing_groups_not_present=False)
 
 
-@attr(shard=2)
+@attr(shard=15)
 class GroupConfigurationsNoSplitTest(StudioCourseTest):
     """
     Tests how the Group Configuration page should look when the split_test module is not enabled.
@@ -202,7 +202,7 @@ class GroupConfigurationsNoSplitTest(StudioCourseTest):
         self.assertFalse(self.group_configurations_page.experiment_group_sections_present)
 
 
-@attr(shard=2)
+@attr(shard=15)
 class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
     """
     Tests that Group Configurations page works correctly with previously

@@ -71,6 +71,8 @@ class SendLeafOutcomeTest(BaseOutcomeTest):
     """
     Tests for the send_leaf_outcome method in tasks.py
     """
+    shard = 4
+
     @ddt.data(
         (2.0, 2.0, 1.0),
         (2.0, 0.0, 0.0),
@@ -91,6 +93,8 @@ class SendCompositeOutcomeTest(BaseOutcomeTest):
     """
     Tests for the send_composite_outcome method in tasks.py
     """
+    shard = 4
+
     def setUp(self):
         super(SendCompositeOutcomeTest, self).setUp()
         self.descriptor = MagicMock()

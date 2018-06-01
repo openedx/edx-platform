@@ -226,7 +226,7 @@ class BlockStructureModel(TimeStampedModel):
         """
         Deletes previous file versions for data_usage_key.
         """
-        if not config.waffle().is_enabled(config.PRUNE_OLD_VERSIONS):
+        if not settings.BLOCK_STRUCTURES_SETTINGS.get('PRUNING_ACTIVE', False):
             return
 
         if num_to_keep is None:

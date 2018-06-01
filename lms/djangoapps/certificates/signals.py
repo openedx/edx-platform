@@ -13,7 +13,7 @@ from lms.djangoapps.certificates.models import (
 )
 from lms.djangoapps.certificates.tasks import generate_certificate
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.certificates.api import auto_certificate_generation_enabled
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.signals import COURSE_PACING_CHANGED
@@ -82,7 +82,8 @@ def _listen_for_id_verification_status_changed(sender, user, **kwargs):  # pylin
 
     user_enrollments = CourseEnrollment.enrollments_for_user(user=user)
     grade_factory = CourseGradeFactory()
-    expected_verification_status, _ = SoftwareSecurePhotoVerification.user_status(user)
+    expected_verification_status = IDVerificationService.user_status(user)
+    expected_verification_status = expected_verification_status['status']
     for enrollment in user_enrollments:
         if grade_factory.read(user=user, course=enrollment.course_overview).passed:
             if fire_ungenerated_certificate_task(user, enrollment.course_id, expected_verification_status):

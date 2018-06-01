@@ -25,7 +25,6 @@ DEFAULT_SETTINGS = Env.DEVSTACK_SETTINGS
 @needs(
     "pavelib.prereqs.install_prereqs",
     "pavelib.i18n.i18n_validate_gettext",
-    "pavelib.assets.compile_coffeescript",
 )
 @cmdopts([
     ("verbose", "v", "Sets 'verbose' to True"),

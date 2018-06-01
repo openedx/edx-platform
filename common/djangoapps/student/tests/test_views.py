@@ -27,6 +27,7 @@ from milestones.tests.utils import MilestonesTestCaseMixin
 from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 from pyquery import PyQuery as pq
 from student.cookies import get_user_info_cookie_data
 from student.helpers import DISABLE_UNENROLL_CERT_STATES
@@ -264,6 +265,11 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             'DASHBOARD_TWITTER': True,
         },
     }
+    MOCK_SETTINGS_HIDE_COURSES = {
+        'FEATURES': {
+            'HIDE_DASHBOARD_COURSES_UNTIL_ACTIVATED': True,
+        }
+    }
 
     def setUp(self):
         """
@@ -377,7 +383,8 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
                 'key': 'course-v1:FAKE+FA1-MA1.X+3T2017',
                 'enrollment_end': str(self.TOMORROW),
                 'pacing_type': 'instructor_paced',
-                'type': 'verified'
+                'type': 'verified',
+                'status': 'published'
             }
         ]
         mock_pseudo_session.return_value = {
@@ -403,7 +410,8 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
                 'key': 'course-v1:edX+toy+2012_Fall',
                 'enrollment_end': str(self.TOMORROW),
                 'pacing_type': 'instructor_paced',
-                'type': 'verified'
+                'type': 'verified',
+                'status': 'published'
             }
         ]
         response = self.client.get(self.path)
@@ -432,7 +440,8 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
                 'key': 'course-v1:FAKE+FA1-MA1.X+3T2017',
                 'enrollment_end': str(self.TOMORROW),
                 'pacing_type': 'instructor_paced',
-                'type': 'verified'
+                'type': 'verified',
+                'status': 'published'
             }
         ]
         response = self.client.get(self.path)
@@ -464,7 +473,8 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
                 'key': str(mocked_course_overview.id),
                 'enrollment_end': str(mocked_course_overview.enrollment_end),
                 'pacing_type': 'self_paced',
-                'type': 'verified'
+                'type': 'verified',
+                'status': 'published'
             }
         ]
         CourseEntitlementFactory(user=self.user, enrollment_course_run=course_enrollment)
@@ -482,7 +492,8 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
                 'key': str(mocked_course_overview.id),
                 'enrollment_end': str(mocked_course_overview.enrollment_end),
                 'pacing_type': 'self_paced',
-                'type': 'verified'
+                'type': 'verified',
+                'status': 'published'
             }
         ]
         # response = self.client.get(self.path)
@@ -499,7 +510,8 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
                 'key': str(mocked_course_overview.id),
                 'enrollment_end': None,
                 'pacing_type': 'self_paced',
-                'type': 'verified'
+                'type': 'verified',
+                'status': 'published'
             }
         ]
         # response = self.client.get(self.path)
@@ -529,7 +541,8 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
                 'key': str(mocked_course_overview.id),
                 'enrollment_end': str(mocked_course_overview.enrollment_end),
                 'pacing_type': 'self_paced',
-                'type': 'verified'
+                'type': 'verified',
+                'status': 'published'
             }
         ]
         entitlement = CourseEntitlementFactory(user=self.user, enrollment_course_run=course_enrollment)
@@ -565,7 +578,8 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
                 'key': str(mocked_course_overview.id),
                 'enrollment_end': str(mocked_course_overview.enrollment_end),
                 'pacing_type': 'self_paced',
-                'type': 'verified'
+                'type': 'verified',
+                'status': 'published'
             }
         ]
         entitlement = CourseEntitlementFactory(user=self.user, enrollment_course_run=course_enrollment, created=self.THREE_YEARS_AGO)
@@ -610,6 +624,40 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         CourseEntitlementFactory(user=self.user)
         response = self.client.get(self.path)
         self.assertEqual(pq(response.content)(self.EMAIL_SETTINGS_ELEMENT_ID).length, 0)
+
+    @patch.multiple('django.conf.settings', **MOCK_SETTINGS_HIDE_COURSES)
+    def test_hide_dashboard_courses_until_activated(self):
+        """
+        Verify that when the HIDE_DASHBOARD_COURSES_UNTIL_ACTIVATED feature is enabled,
+        inactive users don't see the Courses list, but active users still do.
+        """
+        # Ensure active users see the course list
+        self.assertTrue(self.user.is_active)
+        response = self.client.get(reverse('dashboard'))
+        self.assertIn('You are not enrolled in any courses yet.', response.content)
+
+        # Ensure inactive users don't see the course list
+        self.user.is_active = False
+        self.user.save()
+        response = self.client.get(reverse('dashboard'))
+        self.assertNotIn('You are not enrolled in any courses yet.', response.content)
+
+    def test_show_empty_dashboard_message(self):
+        """
+        Verify that when the EMPTY_DASHBOARD_MESSAGE feature is set,
+        its text is displayed in an empty courses list.
+        """
+        empty_dashboard_message = "Check out our lovely <i>free</i> courses!"
+        response = self.client.get(reverse('dashboard'))
+        self.assertIn('You are not enrolled in any courses yet.', response.content)
+        self.assertNotIn(empty_dashboard_message, response.content)
+
+        with with_site_configuration_context(configuration={
+            "EMPTY_DASHBOARD_MESSAGE": empty_dashboard_message,
+        }):
+            response = self.client.get(reverse('dashboard'))
+            self.assertIn('You are not enrolled in any courses yet.', response.content)
+            self.assertIn(empty_dashboard_message, response.content)
 
     @staticmethod
     def _remove_whitespace_from_html_string(html):
@@ -762,8 +810,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
 
         submit_completions_for_testing(self.user, course_key, block_keys)
 
-        with patch('completion.utilities.visual_progress_enabled', return_value=True):
-            response = self.client.get(reverse('dashboard'))
+        response = self.client.get(reverse('dashboard'))
 
         course_key_string = str(course_key)
         resume_block_key_string = str(block_keys[-1])
@@ -850,8 +897,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
                 )
             )
 
-        with patch('completion.utilities.visual_progress_enabled', return_value=True):
-            response = self.client.get(reverse('dashboard'))
+        response = self.client.get(reverse('dashboard'))
 
         html_for_view_buttons = [
             self._remove_whitespace_from_html_string(button)

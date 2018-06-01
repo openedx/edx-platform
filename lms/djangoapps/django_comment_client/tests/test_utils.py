@@ -38,6 +38,7 @@ from openedx.core.djangoapps.content.course_structures.models import CourseStruc
 from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory, config_course_cohorts
+from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
 from student.roles import CourseStaffRole
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
@@ -64,12 +65,6 @@ class DictionaryTestCase(TestCase):
         d = {'cats': 'meow', 'dogs': 'woof', 'hamsters': ' ', 'yetis': ''}
         expected = {'cats': 'meow', 'dogs': 'woof'}
         self.assertEqual(utils.strip_blank(d), expected)
-
-    def test_merge_dict(self):
-        d1 = {'cats': 'meow', 'dogs': 'woof'}
-        d2 = {'lions': 'roar', 'ducks': 'quack'}
-        expected = {'cats': 'meow', 'dogs': 'woof', 'lions': 'roar', 'ducks': 'quack'}
-        self.assertEqual(utils.merge_dict(d1, d2), expected)
 
 
 @attr(shard=1)
@@ -137,7 +132,6 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
     """
     def setUp(self):
         super(CoursewareContextTestCase, self).setUp()
-
         self.course = CourseFactory.create(org="TestX", number="101", display_name="Test Course")
         self.discussion1 = ItemFactory.create(
             parent_location=self.course.location,
@@ -224,6 +218,8 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
         # Assert that there is only one discussion xblock in the course at the moment.
         self.assertEqual(len(utils.get_accessible_discussion_xblocks(course, self.user)), 1)
 
+        # The above call is request cached, so we need to clear it for this test.
+        RequestCache.clear_request_cache()
         # Add an orphan discussion xblock to that course
         orphan = course.id.make_usage_key('discussion', 'orphan_discussion')
         self.store.create_item(self.user.id, orphan.course_key, orphan.block_type, block_id=orphan.block_id)
@@ -1785,6 +1781,7 @@ class GroupModeratorPermissionsTestCase(ModuleStoreTestCase):
             'can_vote': True,
             'can_report': True
         })
+        RequestCache.clear_request_cache()
 
         set_discussion_division_settings(self.course.id, division_scheme=CourseDiscussionSettings.ENROLLMENT_TRACK)
         content = {'user_id': self.verified_user.id, 'type': 'thread', 'username': self.verified_user.username}

@@ -12,6 +12,8 @@ class TestMobilePlatform(TestCase):
     """
     Tests for platform against mobile app request
     """
+    shard = 4
+
     @ddt.data(
         ("edX/org.edx.mobile (0.1.5; OS Version 9.2 (Build 13C75))", "iOS", "0.1.5"),
         ("edX/org.edx.mobile (1.01.1; OS Version 9.2 (Build 13C75))", "iOS", "1.01.1"),

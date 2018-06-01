@@ -33,6 +33,7 @@ class MembershipSerializerTestCase(SerializerTestCase):
     """
     Tests for the membership serializer.
     """
+    shard = 4
 
     def setUp(self):
         super(MembershipSerializerTestCase, self).setUp()
@@ -71,6 +72,8 @@ class TopicSerializerTestCase(SerializerTestCase):
     Tests for the `TopicSerializer`, which should serialize team count data for
     a single topic.
     """
+    shard = 4
+
     def test_topic_with_no_team_count(self):
         """
         Verifies that the `TopicSerializer` correctly displays a topic with a
@@ -119,6 +122,8 @@ class BaseTopicSerializerTestCase(SerializerTestCase):
     """
     Base class for testing the two paginated topic serializers.
     """
+    shard = 4
+
     __test__ = False
     PAGE_SIZE = 5
     # Extending test classes should specify their serializer class.
@@ -174,6 +179,7 @@ class BulkTeamCountTopicSerializerTestCase(BaseTopicSerializerTestCase):
     Tests for the `BulkTeamCountTopicSerializer`, which should serialize team_count
     data for many topics with constant time SQL queries.
     """
+    shard = 4
     __test__ = True
     serializer = BulkTeamCountTopicSerializer
 

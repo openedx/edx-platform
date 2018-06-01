@@ -241,8 +241,8 @@ class TestModels(TestCase):
         assert expired_at_datetime is None
         assert entitlement.expired_at is None
 
-        # Verify an entitlement from two years ago is expired and the db row is updated
-        past_datetime = now() - timedelta(days=365 * 2)
+        # Verify an entitlement from three years ago day is expired and the db row is updated
+        past_datetime = now() - timedelta(days=365 * 3)
         entitlement.created = past_datetime
         entitlement.save()
         expired_at_datetime = entitlement.expired_at_datetime
@@ -285,10 +285,10 @@ class TestModels(TestCase):
         assert expired_at_datetime is None
         assert entitlement.expired_at is None
 
-        # Verify a date 451 days in the past (1 days after the policy expiration)
+        # Verify a date 731 days in the past (1 days after the policy expiration)
         # That is enrolled and started in within the regain period is still expired
         entitlement = CourseEntitlementFactory.create(enrollment_course_run=self.enrollment)
-        expired_datetime = now() - timedelta(days=451)
+        expired_datetime = now() - timedelta(days=731)
         entitlement.created = expired_datetime
         start = now()
         self.enrollment.created = start

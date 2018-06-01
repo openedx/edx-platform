@@ -80,6 +80,7 @@ for log_name, log_level in LOG_OVERRIDES:
 
 # Use the auto_auth workflow for creating users and logging them in
 FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
+FEATURES['RESTRICT_AUTOMATIC_AUTH'] = False
 
 # Enable milestones app
 FEATURES['MILESTONES_APP'] = True
@@ -144,6 +145,16 @@ if RELEASE_LINE == "master":
         'learner': 'http://edx.readthedocs.io/projects/edx-guide-for-students',
         'course_author': 'http://edx.readthedocs.io/projects/edx-partner-course-staff',
     }
+
+########################## VIDEO TRANSCRIPTS STORAGE ############################
+VIDEO_TRANSCRIPTS_SETTINGS = dict(
+    VIDEO_TRANSCRIPTS_MAX_BYTES=3 * 1024 * 1024,    # 3 MB
+    STORAGE_KWARGS=dict(
+        location=MEDIA_ROOT,
+        base_url=MEDIA_URL,
+    ),
+    DIRECTORY_PREFIX='video-transcripts/',
+)
 
 #####################################################################
 # Lastly, see if the developer has any local overrides.

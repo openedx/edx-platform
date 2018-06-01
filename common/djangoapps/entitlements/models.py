@@ -6,18 +6,18 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.contrib.sites.models import Site
-from django.db import models
-from django.db import transaction
+from django.db import models, transaction
 from django.utils.timezone import now
+from model_utils import Choices
 from model_utils.models import TimeStampedModel
 
+from course_modes.models import CourseMode
+from entitlements.utils import is_course_run_entitlement_fulfillable
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from openedx.core.djangoapps.catalog.utils import get_course_uuid_for_course
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from student.models import CourseEnrollment
-from student.models import CourseEnrollmentException
+from student.models import CourseEnrollment, CourseEnrollmentException
 from util.date_utils import strftime_localized
-from entitlements.utils import is_course_run_entitlement_fulfillable
 
 log = logging.getLogger("common.entitlements.models")
 
@@ -27,9 +27,10 @@ class CourseEntitlementPolicy(models.Model):
     Represents the Entitlement's policy for expiration, refunds, and regaining a used certificate
     """
 
-    DEFAULT_EXPIRATION_PERIOD_DAYS = 450
+    DEFAULT_EXPIRATION_PERIOD_DAYS = 730
     DEFAULT_REFUND_PERIOD_DAYS = 60
     DEFAULT_REGAIN_PERIOD_DAYS = 14
+    MODES = Choices((None, '---------'), CourseMode.VERIFIED, CourseMode.PROFESSIONAL)
 
     # Use a DurationField to calculate time as it returns a timedelta, useful in performing operations with datetimes
     expiration_period = models.DurationField(
@@ -48,7 +49,8 @@ class CourseEntitlementPolicy(models.Model):
                    "it is no longer able to be regained by a user."),
         null=False
     )
-    site = models.ForeignKey(Site)
+    site = models.ForeignKey(Site, null=True)
+    mode = models.CharField(max_length=32, choices=MODES, null=True)
 
     def get_days_until_expiration(self, entitlement):
         """
@@ -131,11 +133,12 @@ class CourseEntitlementPolicy(models.Model):
                 and not entitlement.expired_at)
 
     def __unicode__(self):
-        return u'Course Entitlement Policy: expiration_period: {}, refund_period: {}, regain_period: {}'\
+        return u'Course Entitlement Policy: expiration_period: {}, refund_period: {}, regain_period: {}, mode: {}'\
             .format(
                 self.expiration_period,
                 self.refund_period,
                 self.regain_period,
+                self.mode
             )
 
 
@@ -159,6 +162,7 @@ class CourseEntitlement(TimeStampedModel):
         blank=True
     )
     order_number = models.CharField(max_length=128, null=True)
+    refund_locked = models.BooleanField(default=False)
     _policy = models.ForeignKey(CourseEntitlementPolicy, null=True, blank=True)
 
     @property
@@ -223,7 +227,7 @@ class CourseEntitlement(TimeStampedModel):
         """
         Returns a boolean as to whether or not the entitlement can be refunded based on the entitlement's policy
         """
-        return self.policy.is_entitlement_refundable(self)
+        return not self.refund_locked and self.policy.is_entitlement_refundable(self)
 
     def is_entitlement_redeemable(self):
         """
@@ -262,23 +266,6 @@ class CourseEntitlement(TimeStampedModel):
         """
         self.enrollment_course_run = enrollment
         self.save()
-
-    def reinstate(self):
-        """
-        Unenrolls a user from the run in which they have spent the given entitlement and
-        sets the entitlement's expired_at date to null.
-
-        Returns:
-            CourseOverview: course run from which the user has been unenrolled
-        """
-        unenrolled_run = self.enrollment_course_run.course
-        self.expired_at = None
-        CourseEnrollment.unenroll(
-            user=self.enrollment_course_run.user, course_id=unenrolled_run.id, skip_refund=True
-        )
-        self.enrollment_course_run = None
-        self.save()
-        return unenrolled_run
 
     @classmethod
     def unexpired_entitlements_for_user(cls, user):

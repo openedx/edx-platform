@@ -14,3 +14,10 @@ def plugin_settings(settings):
         'ACE_CHANNEL_SAILTHRU_API_SECRET', settings.ACE_CHANNEL_SAILTHRU_API_SECRET,
     )
     settings.ACE_ROUTING_KEY = settings.ENV_TOKENS.get('ACE_ROUTING_KEY', settings.ACE_ROUTING_KEY)
+
+    settings.ACE_CHANNEL_DEFAULT_EMAIL = settings.ENV_TOKENS.get(
+        'ACE_CHANNEL_DEFAULT_EMAIL', settings.ACE_CHANNEL_DEFAULT_EMAIL
+    )
+    settings.ACE_CHANNEL_TRANSACTIONAL_EMAIL = settings.ENV_TOKENS.get(
+        'ACE_CHANNEL_TRANSACTIONAL_EMAIL', settings.ACE_CHANNEL_TRANSACTIONAL_EMAIL
+    )

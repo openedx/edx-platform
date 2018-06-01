@@ -15,6 +15,7 @@ from openedx.core.djangolib.js_utils import (
     dump_js_escaped_json, js_escaped_string
 )
 from openedx.core.djangolib.markup import HTML
+from openedx.core.release import RELEASE_LINE
 %>
 
 <%page expression_filter="h"/>
@@ -24,6 +25,7 @@ from openedx.core.djangolib.markup import HTML
   <head dir="${static.dir_rtl()}">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="openedx-release-line" content="${RELEASE_LINE}" />
     <title>
         <%block name="title"></%block> |
         % if context_course:
@@ -108,7 +110,7 @@ from openedx.core.djangolib.markup import HTML
         </div>
       </main>
 
-      % if user.is_authenticated():
+      % if user.is_authenticated:
         <%include file="widgets/sock.html" args="online_help_token=online_help_token" />
       % endif
       <%include file="widgets/footer.html" />
@@ -140,7 +142,7 @@ from openedx.core.djangolib.markup import HTML
         }
       </script>
     % endif
-    % if user.is_authenticated():
+    % if user.is_authenticated:
       <%static:invoke_page_bundle page_name='js/sock'/>
     % endif
     <%block name='page_bundle'>

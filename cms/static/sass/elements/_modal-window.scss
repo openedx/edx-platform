@@ -674,6 +674,11 @@
           width: ($baseline*7);
         }
 
+        input.percentage {
+          display: inline-block;
+          width: ($baseline*3);
+        }
+
         .tip {
           @extend %t-copy-sub1;
 
@@ -810,6 +815,9 @@
     .edit-settings-access {
       .gating-prereq {
         margin-bottom: 10px;
+        .list-fields .field {
+          display: block;
+        }
       }
     }
   }

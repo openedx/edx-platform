@@ -352,7 +352,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-03-13 15:30+0000\n"
+"POT-Creation-Date: 2018-05-24 10:01+0000\n"
 "PO-Revision-Date: 2018-03-13 13:51+0000\n"
 "Last-Translator: zhaojina <zhaojianwei187@126.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -367,7 +367,7 @@ msgstr ""
 #. the discussion forums
 #: cms/djangoapps/contentstore/views/component.py
 #: lms/djangoapps/courseware/tabs.py lms/djangoapps/discussion/plugins.py
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid "Discussion"
 msgstr "讨论"
 
@@ -408,6 +408,32 @@ msgstr "单元"
 #: cms/djangoapps/contentstore/views/helpers.py
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Empty"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+#, python-brace-format
+msgid "The following parameters are required: {missing}."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+#, python-brace-format
+msgid "A transcript with the \"{language_code}\" language code already exists."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+msgid "A transcript file is required."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+msgid ""
+"There is a problem with this transcript file. Try to upload a different "
+"file."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/videos.py
@@ -515,7 +541,7 @@ msgstr "专业教育"
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 #: common/lib/xmodule/xmodule/x_module.py
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 #: cms/templates/container.html cms/templates/library.html
 msgid "Display Name"
 msgstr "显示名称"
@@ -709,15 +735,6 @@ msgstr "您必须遵循诚信准则才能选修。"
 #: common/djangoapps/student/forms.py
 msgid "You are missing one or more required fields"
 msgstr "您遗漏了一个或多个必须填写字段"
-
-#: common/djangoapps/student/forms.py
-msgid "Username and password fields cannot match"
-msgstr "用户名和密码不能相同"
-
-#: common/djangoapps/student/forms.py
-#: common/djangoapps/student/views/management.py
-msgid "Password: "
-msgstr "密码: "
 
 #: common/djangoapps/student/forms.py
 msgid "Unauthorized email address."
@@ -1004,6 +1021,14 @@ msgstr ""
 
 #: common/djangoapps/student/views/dashboard.py
 #, python-brace-format
+msgid ""
+"Check your {email_start}{email}{email_end} inbox for an account activation "
+"link from {platform_name}. If you need help, contact "
+"{link_start}{platform_name} Support{link_end}."
+msgstr ""
+
+#: common/djangoapps/student/views/dashboard.py
+#, python-brace-format
 msgid "The course you are looking for does not start until {date}."
 msgstr "您查找的课程将在{date}后开课。"
 
@@ -1040,6 +1065,7 @@ msgid "There was an error receiving your login information. Please email us."
 msgstr "接受您的登录信息时出现错误，请发电子邮件给我们。"
 
 #: common/djangoapps/student/views/login.py
+#: openedx/core/djangoapps/user_api/accounts/views.py
 msgid ""
 "This account has been temporarily locked due to excessive login failures. "
 "Try again later."
@@ -1065,7 +1091,9 @@ msgstr ""
 msgid "Too many failed login attempts. Try again later."
 msgstr "失败次数超过限制，请稍后再试！"
 
-#: common/djangoapps/student/views/login.py lms/templates/provider_login.html
+#: common/djangoapps/student/views/login.py
+#: openedx/core/djangoapps/user_api/accounts/views.py
+#: lms/templates/provider_login.html
 msgid "Email or password is incorrect."
 msgstr "邮箱或密码错误。"
 
@@ -1076,6 +1104,14 @@ msgstr "无非激活用户与本邮件地址关联。"
 #: common/djangoapps/student/views/login.py
 msgid "Unable to send reactivation email"
 msgstr "无法发送重新激活的电子邮件"
+
+#: common/djangoapps/student/views/login.py
+msgid "Superuser creation not allowed"
+msgstr ""
+
+#: common/djangoapps/student/views/login.py
+msgid "Account modification not allowed."
+msgstr ""
 
 #: common/djangoapps/student/views/login.py
 #: common/djangoapps/student/views/management.py
@@ -1180,28 +1216,12 @@ msgid ""
 msgstr ""
 
 #: common/djangoapps/student/views/management.py
-#, python-brace-format
-msgid ""
-"You are re-using a password that you have used recently. You must have {num}"
-" distinct password before reusing a previous password."
-msgid_plural ""
-"You are re-using a password that you have used recently. You must have {num}"
-" distinct passwords before reusing a previous password."
-msgstr[0] "你正在重复使用最近已使用过的密码。在重复使用一个用过的密码之前，你必须有 {num} 个不同的密码。"
-
-#: common/djangoapps/student/views/management.py
-#, python-brace-format
-msgid ""
-"You are resetting passwords too frequently. Due to security policies, {num} "
-"day must elapse between password resets."
-msgid_plural ""
-"You are resetting passwords too frequently. Due to security policies, {num} "
-"days must elapse between password resets."
-msgstr[0] "你设置密码的次数过于频繁。根据安全策略，重置密码必须间隔 {num} 天。"
-
-#: common/djangoapps/student/views/management.py
 msgid "Password reset unsuccessful"
 msgstr "重新设置密码不成功"
+
+#: common/djangoapps/student/views/management.py
+msgid "Error in resetting your password."
+msgstr ""
 
 #: common/djangoapps/student/views/management.py
 msgid "Error in resetting your password. Please try again."
@@ -1229,6 +1249,10 @@ msgstr ""
 
 #: common/djangoapps/third_party_auth/admin.py
 msgid "Delete the selected configuration"
+msgstr ""
+
+#: common/djangoapps/third_party_auth/middleware.py
+msgid "Unable to connect with the external provider, please try again"
 msgstr ""
 
 #: common/djangoapps/third_party_auth/models.py
@@ -1266,6 +1290,12 @@ msgid ""
 "If this option is selected, users will not be required to confirm their "
 "email, and their account will be activated immediately upon registration."
 msgstr "如果选择该选项，用户将不会被要求验证他们的邮箱，他们的账户将在注册后立刻被激活。"
+
+#: common/djangoapps/third_party_auth/models.py
+msgid ""
+"If this option is selected, users will be sent a welcome email upon "
+"registration."
+msgstr ""
 
 #: common/djangoapps/third_party_auth/models.py
 msgid ""
@@ -1683,69 +1713,128 @@ msgstr "课程{course_id}要求 {prerequisite_course_id}"
 msgid "System defined milestone"
 msgstr "系统定义的里程碑"
 
+#. Translators: This appears in a list of password requirements
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
-msgid "Invalid Length ({0})"
-msgstr "无效长度 ({0})"
+msgid "{num} letter"
+msgid_plural "{num} letters"
+msgstr[0] ""
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} uppercase letter"
+msgid_plural "{num} uppercase letters"
+msgstr[0] ""
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} lowercase letter"
+msgid_plural "{num} lowercase letters"
+msgstr[0] ""
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} digit"
+msgid_plural "{num} digits"
+msgstr[0] ""
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} number"
+msgid_plural "{num} numbers"
+msgstr[0] ""
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} punctuation mark"
+msgid_plural "{num} punctuation marks"
+msgstr[0] ""
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} symbol"
+msgid_plural "{num} symbols"
+msgstr[0] ""
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} word"
+msgid_plural "{num} words"
+msgstr[0] ""
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
-msgid "must be {0} characters or more"
-msgstr "必须包含 {0} 个或更多字符"
+msgid "Your password must contain at least {num} character."
+msgid_plural "Your password must contain at least {num} characters."
+msgstr[0] ""
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
-msgid "must be {0} characters or fewer"
+msgid ""
+"Your password must contain at least {num} character, including "
+"{requirements}."
+msgid_plural ""
+"Your password must contain at least {num} characters, including "
+"{requirements}."
+msgstr[0] ""
+
+#: common/djangoapps/util/password_policy_validators.py
+msgid "Invalid password."
 msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
-msgid "Must be more complex ({0})"
-msgstr "必须更加复杂({0})"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more uppercase characters"
-msgstr "必须包含{0}个或者更多大写字母"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more lowercase characters"
-msgstr "必须包含{0}个或者更多小写字母"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more digits"
-msgstr "必须包含{0}个或者更多数字"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more punctuation characters"
-msgstr "必须包含{0}个或者更多标点符号"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more non ascii characters"
-msgstr "必须包含{0}个或更多非ASCII字符"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more unique words"
-msgstr "必须包含{0}个或更多不重复的单词"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more numbers"
+msgid "Enter a password with at least {requirements}."
 msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
-msgid "must contain {0} or more letters"
+msgid ""
+"You are re-using a password that you have used recently. You must have {num}"
+" distinct password before reusing a previous password."
+msgid_plural ""
+"You are re-using a password that you have used recently. You must have {num}"
+" distinct passwords before reusing a previous password."
+msgstr[0] "你正在重复使用最近已使用过的密码。在重复使用一个用过的密码之前，你必须有 {num} 个不同的密码。"
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid ""
+"You are resetting passwords too frequently. Due to security policies, {num} "
+"day must elapse between password resets."
+msgid_plural ""
+"You are resetting passwords too frequently. Due to security policies, {num} "
+"days must elapse between password resets."
+msgstr[0] "你设置密码的次数过于频繁。根据安全策略，重置密码必须间隔 {num} 天。"
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} character"
+msgid_plural "{num} characters"
+msgstr[0] ""
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "Enter a password with at most {num} character."
+msgid_plural "Enter a password with at most {num} characters."
+msgstr[0] ""
+
+#. Translators: This message is shown to users who enter a password matching
+#. the username they enter(ed).
+#: common/djangoapps/util/password_policy_validators.py
+msgid "Password cannot be the same as the username."
 msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
-msgid "Too similar to a restricted dictionary word."
-msgstr "与受限词字典中的词语过于相似。"
+msgid "Password is too similar to a dictionary word."
+msgstr ""
 
 #: common/djangoapps/xblock_django/admin.py
 msgid ""
@@ -2238,7 +2327,7 @@ msgstr "用于批注的XML数据"
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 #: common/lib/xmodule/xmodule/x_module.py
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid "The display name for this component."
 msgstr ""
 
@@ -2450,6 +2539,7 @@ msgstr ""
 
 #: cms/templates/index.html lms/templates/help_modal.html
 #: lms/templates/manage_user_standing.html lms/templates/register-shib.html
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 #: lms/templates/survey/survey.html
@@ -4474,8 +4564,8 @@ msgid "{exception_message}: Can't find uploaded transcripts: {user_filename}"
 msgstr "{exception_message}: 找不到上传的成绩单: {user_filename}"
 
 #: common/lib/xmodule/xmodule/video_module/video_handlers.py
-msgid "Invalid encoding type, transcripts should be UTF-8 encoded."
-msgstr "无效的编码类型，字幕应该是UTF-8编码。"
+msgid "Language is required."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "Basic"
@@ -4816,6 +4906,60 @@ msgstr ""
 msgid "Top num_top_words words for word cloud."
 msgstr "词云中的最热门词汇"
 
+#: lms/templates/forgot_password_modal.html
+msgid "Password Reset"
+msgstr "密码重置"
+
+#: common/templates/student/edx_ace/passwordreset/email/body.html
+#: common/templates/student/edx_ace/passwordreset/email/body.txt
+#, python-format
+msgid ""
+"You're receiving this e-mail because you requested a password reset for your"
+" user account at %(platform_name)s."
+msgstr ""
+
+#: common/templates/student/edx_ace/passwordreset/email/body.html
+#: common/templates/student/edx_ace/passwordreset/email/body.txt
+#, python-format
+msgid ""
+"However, there is currently no user account associated with your email "
+"address: %(email_address)s."
+msgstr ""
+
+#: common/templates/student/edx_ace/passwordreset/email/body.html
+#: common/templates/student/edx_ace/passwordreset/email/body.txt
+msgid "If you did not request this change, you can ignore this email."
+msgstr ""
+
+#: common/templates/student/edx_ace/passwordreset/email/body.html
+#: common/templates/student/edx_ace/passwordreset/email/body.txt
+msgid ""
+"If you didn't request this change, you can disregard this email - we have "
+"not yet reset your password."
+msgstr "如果你没有请求该变更，请忽略本邮件——我们尚未重置你的密码。"
+
+#: common/templates/student/edx_ace/passwordreset/email/body.html
+msgid "Change my Password"
+msgstr ""
+
+#: common/templates/student/edx_ace/passwordreset/email/body.txt
+msgid "Please go to the following page and choose a new password:"
+msgstr "请到以下页面设置新的密码："
+
+#: common/templates/student/edx_ace/passwordreset/email/body.txt
+msgid "Thanks for using our site!"
+msgstr "谢谢您访问我们的网站！"
+
+#: common/templates/student/edx_ace/passwordreset/email/body.txt
+#, python-format
+msgid "The %(platform_name)s Team"
+msgstr "%(platform_name)s 团队"
+
+#: common/templates/student/edx_ace/passwordreset/email/subject.txt
+#, python-format
+msgid "Password reset on %(platform_name)s"
+msgstr ""
+
 #: lms/djangoapps/badges/events/course_complete.py
 #, python-brace-format
 msgid ""
@@ -5006,7 +5150,7 @@ msgid "Open edX"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py
-msgid "Trademarks"
+msgid "Trademark Policy"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py
@@ -5502,8 +5646,8 @@ msgid "Use the checkout page hosted by the E-Commerce service."
 msgstr "透过使用电子商务服务承载结帐页面。"
 
 #: lms/djangoapps/commerce/models.py
-msgid "Path to single course checkout page hosted by the E-Commerce service."
-msgstr "透过电子商务服务承载单门课程结帐页面之途径"
+msgid "Path to course(s) checkout page hosted by the E-Commerce service."
+msgstr ""
 
 #: lms/djangoapps/commerce/models.py openedx/core/djangoapps/catalog/models.py
 #: openedx/core/djangoapps/credentials/models.py
@@ -5870,13 +6014,13 @@ msgstr ""
 
 #: lms/djangoapps/courseware/views/index.py
 #: lms/djangoapps/courseware/views/views.py
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid "sign in"
 msgstr ""
 
 #: lms/djangoapps/courseware/views/index.py
 #: lms/djangoapps/courseware/views/views.py
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 #: openedx/features/course_experience/views/course_home_messages.py
 msgid "register"
 msgstr ""
@@ -6386,6 +6530,14 @@ msgid "Sailthru send template to use on enrolling for audit. "
 msgstr ""
 
 #: lms/djangoapps/email_marketing/models.py
+msgid "Sailthru send template to use on passed ID verification."
+msgstr ""
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "Sailthru send template to use on failed ID verification."
+msgstr ""
+
+#: lms/djangoapps/email_marketing/models.py
 msgid "Sailthru send template to use on upgrading a course. Deprecated "
 msgstr ""
 
@@ -6474,6 +6626,10 @@ msgid ""
 "A proctored exam attempt for {exam_name} in {course_name} by username: "
 "{student_username} was reviewed as {review_status} by the proctored exam "
 "review provider."
+msgstr ""
+
+#: lms/djangoapps/instructor/settings/common.py
+msgid "Your Platform Insights"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -7331,7 +7487,6 @@ msgid "Last Name"
 msgstr "姓"
 
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/api_admin/forms.py
 #: lms/templates/shoppingcart/receipt.html
 msgid "Company Name"
 msgstr "公司名称"
@@ -8820,6 +8975,15 @@ msgstr ""
 msgid "Disable User Account"
 msgstr ""
 
+#: lms/djangoapps/support/views/index.py
+#: lms/templates/support/entitlement.html
+msgid "Entitlements"
+msgstr ""
+
+#: lms/djangoapps/support/views/index.py
+msgid "View, create, and reissue learner entitlements"
+msgstr ""
+
 #: lms/djangoapps/support/views/manage_user.py
 msgid "user_support_url"
 msgstr ""
@@ -8955,11 +9119,6 @@ msgid ""
 msgstr "{username}用户未选修与该团队相关的课程。"
 
 #: lms/djangoapps/verify_student/models.py
-#, python-brace-format
-msgid "Your {platform_name} verification has expired."
-msgstr "您的 {platform_name} 认证已经过期。"
-
-#: lms/djangoapps/verify_student/models.py
 msgid "The course for which this deadline applies"
 msgstr "使用该截止日期的课程"
 
@@ -8968,6 +9127,11 @@ msgid ""
 "The datetime after which users are no longer allowed to submit photos for "
 "verification."
 msgstr "该日期之后，用户将不再允许提交照片用于认证了。"
+
+#: lms/djangoapps/verify_student/services.py
+#, python-brace-format
+msgid "Your {platform_name} verification has expired."
+msgstr "您的 {platform_name} 认证已经过期。"
 
 #: lms/djangoapps/verify_student/views.py
 msgid "Intro"
@@ -9037,8 +9201,19 @@ msgid "Image data is not valid."
 msgstr "图像数据无效."
 
 #: lms/djangoapps/verify_student/views.py
-msgid "Verification photos received"
-msgstr "认证照片已收到"
+#, python-brace-format
+msgid "{platform_name} ID Verification Photos Received"
+msgstr ""
+
+#: lms/djangoapps/verify_student/views.py
+#, python-brace-format
+msgid "Your {platform_name} ID Verification Approved"
+msgstr ""
+
+#: lms/djangoapps/verify_student/views.py
+#, python-brace-format
+msgid "Your {platform_name} Verification Has Been Denied"
+msgstr ""
 
 #: lms/envs/common.py
 msgid "Your Platform Name Here"
@@ -9144,10 +9319,6 @@ msgid "Subscribe to the {platform_name} YouTube channel"
 msgstr "订阅{platform_name}的YouTube频道"
 
 #: lms/envs/common.py
-msgid "Your Platform Insights"
-msgstr ""
-
-#: lms/envs/common.py
 msgid "Kosovo"
 msgstr "Kosovo"
 
@@ -9159,16 +9330,12 @@ msgstr ""
 #: lms/envs/common.py
 #, python-brace-format
 msgid ""
-"{start_bold}{enterprise_name}{end_bold} has partnered with "
-"{start_bold}{platform_name}{end_bold} to  offer you always available, high-"
-"quality learning programs to help you advance your knowledge and your "
-"career. {line_break}Please continue with registration, or log in if you are "
-"an existing user, and press continue to start learning."
-msgstr ""
-
-#: lms/templates/emails/password_reset_subject.txt
-#, python-format
-msgid "Password reset on %(platform_name)s"
+"You have left the {start_bold}{enterprise_name}{end_bold} website and are "
+"now on the {platform_name} site. {enterprise_name} has partnered with "
+"{platform_name} to offer you high-quality, always available learning "
+"programs to help you advance your knowledge and career. {line_break}Please "
+"note that {platform_name} has a different {privacy_policy_link_start}Privacy"
+" Policy{privacy_policy_link_end} from {enterprise_name}."
 msgstr ""
 
 #: lms/templates/logout.html
@@ -9222,43 +9389,6 @@ msgstr ""
 #: lms/templates/ccx/schedule.html
 msgid "Error"
 msgstr "错误"
-
-#: lms/templates/registration/password_reset_email.html
-#, python-format
-msgid ""
-"You're receiving this e-mail because you requested a password reset for your"
-" user account at %(platform_name)s."
-msgstr ""
-
-#: lms/templates/registration/password_reset_email.html
-#, python-format
-msgid ""
-"However, there is currently no user account associated with your email "
-"address: %(email_address)s."
-msgstr ""
-
-#: lms/templates/registration/password_reset_email.html
-msgid "If you did not request this change, you can ignore this email."
-msgstr ""
-
-#: lms/templates/registration/password_reset_email.html
-msgid "Please go to the following page and choose a new password:"
-msgstr "请到以下页面设置新的密码："
-
-#: lms/templates/registration/password_reset_email.html
-msgid ""
-"If you didn't request this change, you can disregard this email - we have "
-"not yet reset your password."
-msgstr "如果你没有请求该变更，请忽略本邮件——我们尚未重置你的密码。"
-
-#: lms/templates/registration/password_reset_email.html
-msgid "Thanks for using our site!"
-msgstr "谢谢您访问我们的网站！"
-
-#: lms/templates/registration/password_reset_email.html
-#, python-format
-msgid "The %(platform_name)s Team"
-msgstr "%(platform_name)s 团队"
 
 #: lms/templates/wiki/article.html
 msgid "Last modified:"
@@ -9355,6 +9485,7 @@ msgstr "预览"
 #: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
 #: lms/templates/modal/_modal-settings-language.html
 #: themes/edx.org/lms/templates/dashboard.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 msgid "Close"
 msgstr "关闭"
 
@@ -9370,6 +9501,7 @@ msgstr "Wiki预览"
 #: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 #: lms/templates/modal/_modal-settings-language.html
 #: themes/edx.org/lms/templates/dashboard.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 msgid "window open"
 msgstr "窗口打开"
 
@@ -9747,16 +9879,6 @@ msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-msgid "View on Web"
-msgstr ""
-
-#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-msgid "Unsubscribe from this list"
-msgstr ""
-
-#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Our mailing address is"
 msgstr ""
 
@@ -9785,25 +9907,29 @@ msgid ""
 "catalog for this user."
 msgstr ""
 
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "Organization Name"
+msgstr "机构名称"
+
 #: openedx/core/djangoapps/api_admin/forms.py
-msgid "Company Address"
-msgstr "公司地址"
+msgid "Organization Address"
+msgstr ""
 
 #: openedx/core/djangoapps/api_admin/forms.py
 msgid "Describe what your application does."
 msgstr "描述你的应用的功能。"
 
 #: openedx/core/djangoapps/api_admin/forms.py
-msgid "The URL of your company's website."
-msgstr "你的公司网站的 URL。"
+msgid "The URL of your organization's website."
+msgstr ""
 
 #: openedx/core/djangoapps/api_admin/forms.py
-msgid "The name of your company."
-msgstr "你的公司的名称。"
+msgid "The name of your organization."
+msgstr ""
 
 #: openedx/core/djangoapps/api_admin/forms.py
-msgid "The contact address of your company."
-msgstr "你的公司的联系地址。"
+msgid "The contact address of your organization."
+msgstr ""
 
 #: openedx/core/djangoapps/api_admin/forms.py
 #, python-brace-format
@@ -9844,15 +9970,12 @@ msgstr "{company} 的 API 访问请求"
 msgid "API access request"
 msgstr "API 访问请求"
 
-#. Translators: link_start and link_end are HTML tags for a link to the terms
-#. of service.
-#. platform_name is the name of this Open edX installation.
 #: openedx/core/djangoapps/api_admin/widgets.py
 #, python-brace-format
 msgid ""
-"I, and my company, accept the {link_start}{platform_name} API Terms of "
+"I, and my organization, accept the {link_start}{platform_name} API Terms of "
 "Service{link_end}."
-msgstr "我本人和我的公司接受 {link_start}{platform_name} API 的服务条款 {link_end}。"
+msgstr ""
 
 #: lms/templates/courseware/courseware.html
 #: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
@@ -9957,6 +10080,10 @@ msgstr "必须存在一个可以将学生自动分配进去的群组。"
 #: openedx/core/djangoapps/course_groups/views.py
 msgid "A cohort with the same name already exists."
 msgstr "具有相同名称的群组已存在。"
+
+#: openedx/core/djangoapps/credentials/apps.py
+msgid "Credentials"
+msgstr ""
 
 #: openedx/core/djangoapps/credentials/models.py
 msgid "Internal Service URL"
@@ -10188,6 +10315,27 @@ msgid ""
 "        Your university identity server did not return your ID information to us.\n"
 "        Please try logging in again.  (You may need to restart your browser.)\n"
 "        "
+msgstr ""
+
+#: openedx/core/djangoapps/password_policy/apps.py
+msgid "Password Policy"
+msgstr ""
+
+#: openedx/core/djangoapps/password_policy/compliance.py
+#, python-brace-format
+msgid ""
+"{platform_name} now requires more complex passwords. Your current password "
+"does not meet the new requirements. Change your password now to continue "
+"using the site. Thank you for helping us keep your data safe."
+msgstr ""
+
+#: openedx/core/djangoapps/password_policy/compliance.py
+#, python-brace-format
+msgid ""
+"{platform_name} now requires more complex passwords. Your current password "
+"does not meet the new requirements. You must change your password by "
+"{deadline} to be able to continue using the site. Thank you for helping us "
+"keep your data safe."
 msgstr ""
 
 #: openedx/core/djangoapps/profile_images/images.py
@@ -10539,25 +10687,6 @@ msgstr ""
 msgid "Enter a valid email address that contains at least {min} characters."
 msgstr ""
 
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Enter a password."
-msgstr ""
-
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Password is not long enough."
-msgstr ""
-
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-#, python-brace-format
-msgid "Password cannot be longer than {max} character."
-msgstr ""
-
-#. Translators: This message is shown to users who enter a password matching
-#. the username they enter(ed).
-#: openedx/core/djangoapps/user_api/accounts/__init__.py
-msgid "Password cannot be the same as the username."
-msgstr ""
-
 #. Translators: These messages are shown to users who do not enter information
 #. into the required field or enter it incorrectly.
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
@@ -10732,6 +10861,16 @@ msgstr ""
 msgid "You must agree to the {platform_name} {terms_of_service}"
 msgstr ""
 
+#: openedx/core/djangoapps/user_api/api.py
+#, python-brace-format
+msgid ""
+"By creating an account with {platform_name}, you agree                   to "
+"abide by our {platform_name}                   "
+"{terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}"
+"                   and agree to our {privacy_policy_link_start}Privacy "
+"Policy{privacy_policy_link_end}."
+msgstr ""
+
 #. Translators: "Terms of service" is a legal document users must agree to
 #. in order to register a new account.
 #: openedx/core/djangoapps/user_api/api.py
@@ -10857,31 +10996,31 @@ msgid ""
 "A license defines how the contents of this block can be shared and reused."
 msgstr "许可定义了此块的内容能如何被分享和重用。"
 
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid "Category"
 msgstr "分类"
 
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid "Week 1"
 msgstr ""
 
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid ""
 "A category name for the discussion. This name appears in the left pane of "
 "the discussion forum for the course."
 msgstr "讨论类别名称时，该名称会出现在课程论坛的左窗格里"
 
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid "Subcategory"
 msgstr "子分类"
 
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid ""
 "A subcategory name for the discussion. This name appears in the left pane of"
 " the discussion forum for the course."
 msgstr "讨论子类别名称时，该名称会出现在课程论坛的左窗格里。"
 
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 #, python-brace-format
 msgid ""
 "You are not signed in. To view the discussion content, {sign_in_link} or "
@@ -10890,6 +11029,7 @@ msgstr ""
 
 #: openedx/features/course_experience/plugins.py
 #: cms/templates/widgets/header.html
+#: lms/templates/api_admin/terms_of_service.html
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
 msgid "Updates"
 msgstr ""
@@ -10945,14 +11085,14 @@ msgstr ""
 
 #: openedx/features/enterprise_support/api.py
 #, python-brace-format
-msgid ""
-"If you have concerns about sharing your data, please contact your "
-"administrator at {enterprise_customer_name}."
+msgid "Enrollment in {course_title} was not complete."
 msgstr ""
 
 #: openedx/features/enterprise_support/api.py
 #, python-brace-format
-msgid "Enrollment in {course_name} was not complete."
+msgid ""
+"If you have concerns about sharing your data, please contact your "
+"administrator at {enterprise_customer_name}."
 msgstr ""
 
 #: openedx/features/enterprise_support/utils.py
@@ -11371,24 +11511,24 @@ msgstr ""
 msgid "The information you entered is incorrect."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-#, python-brace-format
-msgid "The following parameters are required: {missing}."
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "Transcripts are supported only for \"video\" modules."
+msgstr "字幕只支持视频模块。"
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "Cannot find item by locator."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-#, python-brace-format
-msgid "A transcript with the \"{language_code}\" language code already exists."
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "Video locator is required."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-msgid "A transcript file is required."
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "This transcript file type is not supported."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-msgid ""
-"There is a problem with this transcript file. Try to upload a different "
-"file."
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "Video ID is required."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
@@ -11400,8 +11540,26 @@ msgid "Can't find item by locator."
 msgstr "定位器无法找到它们。"
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
-msgid "Transcripts are supported only for \"video\" modules."
-msgstr "字幕只支持视频模块。"
+msgid "No such transcript."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "There is a problem with the chosen transcript file."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid ""
+"There is a problem with the existing transcript file. Please upload a "
+"different file."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "YouTube ID is required."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "There is a problem with the YouTube transcript file."
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Insufficient permissions"
@@ -11831,7 +11989,6 @@ msgid "Reset"
 msgstr "重置"
 
 #: cms/templates/widgets/footer.html lms/templates/footer.html
-#: themes/edx.org/lms/templates/footer.html
 #: themes/red-theme/lms/templates/footer.html
 msgid "Legal"
 msgstr "合法"
@@ -12025,8 +12182,8 @@ msgstr ""
 
 #: lms/templates/_gated_content.html
 msgid ""
-"You must complete the section '{prereq_section_name}' with the required "
-"score before you are able to view this content."
+"You must earn a passing score for '{prereq_section_name}' to access this "
+"content."
 msgstr ""
 
 #: lms/templates/_gated_content.html
@@ -12092,6 +12249,11 @@ msgstr "您尚未参加任何课程。"
 msgid "Explore courses"
 msgstr "探索课程"
 
+#: lms/templates/dashboard.html
+#: lms/templates/registration/account_activation_sidebar_notice.html
+msgid "Activate your account!"
+msgstr ""
+
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Course-loading errors"
 msgstr "课程加载错误"
@@ -12131,6 +12293,7 @@ msgstr "保存设置"
 #: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: themes/edx.org/lms/templates/dashboard.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 msgid "Unenroll"
 msgstr "放弃选修"
 
@@ -12209,10 +12372,6 @@ msgid "External Authentication failed"
 msgstr "外部认证失败"
 
 #: lms/templates/forgot_password_modal.html
-msgid "Password Reset"
-msgstr "密码重置"
-
-#: lms/templates/forgot_password_modal.html
 msgid ""
 "Please enter your e-mail address below, and we will e-mail instructions for "
 "setting a new password."
@@ -12239,7 +12398,6 @@ msgid "This is the e-mail address you used to register with {platform}"
 msgstr "这是您在{platform}注册时使用的e-mail地址。"
 
 #: lms/templates/forgot_password_modal.html
-#: lms/templates/registration/password_reset_confirm.html
 msgid "Reset My Password"
 msgstr "重置我的密码"
 
@@ -13536,22 +13694,30 @@ msgstr "生效日期：2016 年 4 月 12 日"
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
 "Welcome to {platform_name}. Thank you for using {platform_name}'s Course "
-"Discovery API and any additional APIs that we may offer from time to time "
-"(collectively, the \"APIs\"). Please read these Terms of Service prior to "
-"accessing or using the APIs. These Terms of Service, any additional terms "
-"within accompanying API documentation, and any applicable policies and "
-"guidelines that {platform_name} makes available and/or updates from time to "
-"time are agreements (collectively, the \"Terms\") between you and "
-"{platform_name}. By accessing or using the APIs, you accept and agree to be "
-"legally bound by the Terms, whether or not you are a registered user. If you"
-" do not understand or do not wish to be bound by the Terms, you should not "
-"use the APIs."
+"Discovery API, Enterprise API and/or any additional APIs that we may offer "
+"from time to time (collectively, the \"APIs\"). Please read these Terms of "
+"Service prior to accessing or using the APIs. These Terms of Service, any "
+"additional terms within accompanying API documentation, and any applicable "
+"policies and guidelines that {platform_name} makes available and/or updates "
+"from time to time are agreements (collectively, the \"Terms\") between you "
+"and {platform_name}. These Terms are issued under the enterprise product "
+"agreement, member participation agreement, or other direct agreement "
+"governing the purchase of {platform_name} products, if any (the "
+"\"Agreement\"), executed by you or the party on whose behalf you are "
+"accessing or using the APIs and {platform_name}.  In the event that you have"
+" such an Agreement that applies to your use of the APIs, the Agreement will "
+"control in the event of any conflict between it and these Terms. By "
+"accessing or using the APIs, you accept and agree to be legally bound by the"
+" Terms, whether or not you are a registered user. If you are accessing or "
+"using the APIs on behalf of a company, organization or other legal entity, "
+"you are agreeing to these Terms for that entity and representing and "
+"warranting to {platform_name} that you have full authority to accept and "
+"agree to these Terms for such entity, in which case the terms \"you,\" "
+"\"your\" or related terms herein shall refer to such entity on whose behalf "
+"you are accessing or using the APIs. If you do not have such authority or if"
+" you do not understand or do not wish to be bound by the Terms, you should "
+"not use the APIs."
 msgstr ""
-"欢迎来到 {platform_name}。感谢您使用 {platform_name} 的课程探索 API 和我们不时提供的任何其他 API(统称 "
-"\"API\")。请在访问或使用 API 之前先阅读这些服务条款。这些服务条款、所有随同 API 文档的附加条款、所有 {platform_name} "
-"提供的适用政策和指南和/或不时的更新均为您与 {platform_name} "
-"之间达成的协议(统称\"条款\")。无论您是否为已注册用户，只要您访问或使用 "
-"API，就表明您接受并同意此条款的法律约束。如果您不理解或不愿意接受此条款约束，那么您不应当使用此 API。"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "API Access"
@@ -13565,14 +13731,11 @@ msgid ""
 " complete the API request form including a description of your proposed uses"
 " for the APIs. Any account and registration information that you provide to "
 "{platform_name} must be accurate and up to date, and you agree to inform us "
-"promptly of any changes. {platform_name} will review your API request form "
-"and, upon approval in {platform_name}'s sole discretion, will provide you "
-"with instructions for obtaining your API shared secret and client ID."
+"promptly of any changes. {platform_name_capitalized} will review your API "
+"request form and, upon approval in {platform_name}'s sole discretion, will "
+"provide you with instructions for obtaining your API shared secret and "
+"client ID."
 msgstr ""
-"要访问 API，你需要为你的应用程序创建一个 {platform_name} 用户帐号（非个人使用）。该帐号将为你提供权限在 {request_url}"
-" 访问我们的 API 请求页面。在此页面上，你必须完成 API 申请表格，其中包括关于你的 API 计划用途的描述。你为 {platform_name}"
-" 提供的任何帐户和注册信息必须是准确的和最新的，而且如有任何变更，你应立即通知我们。{platform_name} 将审查你的 API "
-"申请表，并将在获得 {platform_name} 的完全自主决定批准后为你提供有关获得你的 API 共享密码和客户端 ID 的说明。"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Permissible Use"
@@ -13582,23 +13745,18 @@ msgstr "允许的用途"
 msgid ""
 "You agree to use the APIs solely for the purpose of delivering content that "
 "is accessed through the APIs (the \"API Content\") to your own website, "
-"mobile site, app, blog, email distribution list, or social media property or"
-" for another commercial use that you described in your request for access "
-"and that {platform_name} has approved on a case-by-case basis. "
-"{platform_name} may monitor your use of the APIs for compliance with the "
-"Terms and may deny your access or shut down your integration if you try to "
-"go around or exceed the requirements and limitations set by {platform_name}."
-" Your Application or other approved use of the API or the API Content must "
-"not prompt your end users to provide their {platform_name} username, "
-"password or other {platform_name} user credentials anywhere other than the "
-"{platform_name} website at {platform_url}."
+"mobile site, app, blog, email distribution list, or social media property "
+"(\"Your Application\") or for another commercial use that you described in "
+"your request for access and that {platform_name} has approved on a case-by-"
+"case basis. {platform_name_capitalized} may monitor your use of the APIs for"
+" compliance with the Terms and may deny your access or shut down your "
+"integration if you attempt to go around or exceed the requirements and "
+"limitations set by {platform_name}. Your Application or other approved use "
+"of the API or the API Content must not prompt your end users to provide "
+"their {platform_name} username, password or other {platform_name} user "
+"credentials anywhere other than on the {platform_name} website at "
+"{platform_url}."
 msgstr ""
-"你同意仅将 API 用于把通过 API (\"API Content\") "
-"访问的内容传送至你的个人网站、移动网站、应用程序、博客、电子邮件分配表、社交媒体属性或你在访问申请表中所描述的和 {platform_name} "
-"逐案审查批准的用途中。{platform_name} 可能监控你的 API 使用是否符合条款，而且如果你尝试绕过或越过 {platform_name} "
-"所设定的要求和限制，可能会拒绝你的访问或关闭你的数据集成。你的应用程序、API 的其他批准用途或 API Content，不得提示你的终端用户在 "
-"{platform_name} 网站 {platform_url} 以外的任何地方提供他们的 {platform_name} 用户名、密码或其他 "
-"{platform_name} 用户凭证。"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Prohibited Uses and Activities"
@@ -13606,15 +13764,12 @@ msgstr "禁止的用途与活动"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
-"{platform_name} shall have the sole right to determine whether or not any "
-"given use of the APIs is acceptable, and {platform_name} reserves the right "
-"to revoke API access for any use that {platform_name} determines at any "
-"time, in its sole discretion, does not benefit or serve the best interests "
-"of {platform_name}, its users and its partners."
+"{platform_name_capitalized} shall have the sole right to determine whether "
+"or not any given use of the APIs is acceptable, and {platform_name} reserves"
+" the right to revoke API access for any use that {platform_name} determines "
+"at any time, in its sole discretion, does not benefit or serve the best "
+"interests of {platform_name}, its users and its partners."
 msgstr ""
-"{platform_name} 具有确定 API 的任何给定用途是否可接受的独占权，并且 {platform_name} 保留随时撤销针对由 "
-"{platform_name} 在任何时候自行决定确认的不是为了盈利或为了 {platform_name} 、其用户和其合作伙伴的最大利益的任何用途的 "
-"API 访问权限。"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -13642,14 +13797,14 @@ msgid ""
 msgstr "侵犯、滥用或侵害任何版权、商标权利、隐私权或宣传材料、机密信息或其他第三方的任何权利；"
 
 #: lms/templates/api_admin/terms_of_service.html
+msgid "altering or editing any content or graphics in the API Content"
+msgstr "更改或编辑 API Content 中的任何内容或图表"
+
+#: lms/templates/api_admin/terms_of_service.html
 msgid ""
 "altering or removing any trademark, copyright or other proprietary or legal "
 "notices contained in, or appearing on, the APIs or any API Content;"
 msgstr "变更或去除包含在或出现在 API 或任何 API Content 中的任何商标、版权或其他所有权或法律声明；"
-
-#: lms/templates/api_admin/terms_of_service.html
-msgid "altering or editing any content or graphics in the API Content"
-msgstr "更改或编辑 API Content 中的任何内容或图表"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -13675,12 +13830,11 @@ msgstr "使用和限制"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
-"{platform_name} reserves the right, in its discretion, to impose "
-"restrictions and limitations on the number and frequency of calls made by "
-"you or your Application to the APIs. You must not attempt to circumvent any "
-"restrictions or limitations that we impose."
+"{platform_name_capitalized} reserves the right, in its discretion, to impose"
+" reasonable restrictions and limitations on the number and frequency of "
+"calls made by you or Your Application to the APIs. You must not attempt to "
+"circumvent any restrictions or limitations imposed by {platform_name}."
 msgstr ""
-"{platform_name} 保留酌情对你或你连接到 API 的应用程序的拨号次数及频率施加限制和约束的权利。你不得尝试规避我们施加的任何限制或约束。"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Compliance"
@@ -13688,19 +13842,16 @@ msgstr "合规性"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
-"You agree to comply with all applicable law, regulation, and third party "
+"You agree to comply with all applicable laws, regulations, and third party "
 "rights (including without limitation laws regarding the import or export of "
 "data or software, privacy, copyright, and local laws). You will not use the "
 "APIs to encourage or promote illegal activity or violation of third party "
 "rights. You will not violate any other terms of service with "
 "{platform_name}. You will only access (or attempt to access) an API by the "
 "means described in the documentation of that API. You will not misrepresent "
-"or mask either your identity or yourApplication's identity when using the "
+"or mask either your identity or Your Application's identity when using the "
 "APIs."
 msgstr ""
-"你同意遵守所有适用法律、法规和第三方权利（包括但不限于有关导入或导出数据或软件的法律、隐私、版权及当地法律）。你不会使用 API "
-"鼓励或提倡非法活动或违反第三方权利的行为。你不会使用 {platform_name} 违反任何其他服务条款。你仅会通过 API "
-"的文档中所描述的方式访问（或尝试访问）某个 API。你不会在使用 API 时歪曲或掩饰你的身份或你的应用程序的身份。"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Ownership"
@@ -13735,19 +13886,17 @@ msgid ""
 "Content, or on or through the services made available on or through the "
 "APIs, if any, are the property of their respective owners. You may not "
 "remove, alter, or obscure any copyright, Trademark, or other proprietary "
-"rightrs notices incorporated in or accompanying the API Content. If any "
-"third party revokes access to API Content owned or controlled by that third "
-"party, including without limitation any Trademarks, you must ensure that all"
-" API Content pertaining to that third party is deleted from your app, "
-"networks, systems and servers as soon as reasonably possible. If you stop "
-"using the APIs altogether or if your API access is revoked, you must delete "
-"all API Content in the same way."
+"rights notices incorporated in or accompanying the API Content. If any "
+"{platform_name} Participant (as hereinafter defined) or other third party "
+"revokes access to API Content owned or controlled by that {platform_name} "
+"Participant or third party, including without limitation any Trademarks, you"
+" must ensure that all API Content pertaining to that {platform_name} "
+"Participant or third party is deleted from Your application, networks, "
+"systems and servers as soon as reasonably possible. "
+"\"{platform_name_capitalized} Participants\" means MIT, Harvard, and the "
+"other entities providing information, API Content or services for the APIs, "
+"the course instructors and their staffs."
 msgstr ""
-"在 API、API Content 上或通过 API "
-"上的可用服务出现的所有名称、标识和印章（\"商标\"）均为其各自所有者的财产。你不得撤销、修改或隐藏并入或随附于 API Content "
-"的任何版权、商标或其他所有权条款。如果任何第三方撤销访问由此第三方拥有或控制的 API "
-"Content，包括但不限于任何商标，则你必须确保在合理时间内从你的应用程序、网络、系统和服务器上尽快删除与此第三方有关的所有 API "
-"Content。如果你已完全停止使用 API 或者你的 API 访问权限已被撤销，你必须以相同方式删除所有 API Content。"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -13772,13 +13921,11 @@ msgstr "隐私"
 msgid ""
 "You agree to comply with all applicable privacy laws and regulations and to "
 "be transparent with respect to any collection and use of end user data. You "
-"will provide and adhere to a privacy policy for your Application that "
+"will provide and adhere to a privacy policy for Your Application that "
 "clearly and accurately describes to your end users what user information you"
 " collect and how you may use and share such information (including for "
 "advertising) with {platform_name} and other third parties."
 msgstr ""
-"你同意遵守所有适用的隐私法律和法规，并对终端用户数据的任何收集和使用均保持公开透明。你将提供你的应用程序的隐私政策并予以遵守，该隐私政策应向你的终端用户清楚且准确地描述了你所收集的用户信息、你可能如何使用这些信息以及如何与"
-" {platform_name} 和其他第三方分享此类信息（包括用于广告）。"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Right to Charge"
@@ -13786,28 +13933,39 @@ msgstr "收费权"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
-"{platform_name} reserves the right to modify the Terms at any time without "
-"advance notice. Any changes to the Terms will be effective immediately upon "
-"posting on this page, with an updated effective date. By accessing or using "
-"the APIs after any changes have been made, you signify your agreement on a "
-"prospective basis to the modified Terms and all of the changes. Be sure to "
-"return to this page periodically to ensure familiarity with the most current"
-" version of the Terms."
+"Certain access to the APIs may be provided free of charge, but "
+"{platform_name} reserves the right to charge fees for future use or access "
+"to the APIs."
 msgstr ""
-"{platform_name} "
-"保留在不事先通知的情况下随时更改此条款的权力。此条款的任何变更在此页面公布后将立即生效，附带最新生效日期。在任何变更后访问或使用 "
-"API，就意味着你前瞻性地同意更改后的条款及所有变更。请务必定期返回此页面以确保熟悉最新版本的条款。"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
-"{platform_name} may also update or modify the APIs from time to time without"
-" advance notice. These changes may affect your use of the APIs or the way "
-"your integration interacts with the API. If we make a change that is "
-"unacceptable to you, you should stop using the APIs. Continued use of the "
-"APIs means you accept the change."
+"{platform_name_capitalized} may also update or modify the APIs from time to "
+"time without advance notice. These changes may affect your use of the APIs "
+"or the way your integration interacts with the API. If we make a change that"
+" is unacceptable to you, you should stop using the APIs. Continued use of "
+"the APIs means you accept the change."
 msgstr ""
-"{platform_name} 也可能在不事先通知的情况下不时更新或修改 API。这些更改可能影响你对 API 的使用或影响你的数据集成与 API "
-"互动的方式。如果你无法接受我们所作的某个更改，你应停止使用 API。继续使用 API 就意味着你接受该更改。"
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"{platform_name_capitalized} reserves the right to modify the Terms at any "
+"time without advance notice.  Any changes to the Terms will be effective "
+"immediately upon posting on this page, with an updated effective date.  By "
+"accessing or using the APIs after any changes have been made, you signify "
+"your agreement on a prospective basis to the modified Terms and all of the "
+"changes.  Be sure to return to this page periodically to ensure familiarity "
+"with the most current version of the Terms."
+msgstr ""
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"{platform_name_capitalized} may also update or modify the APIs from time to "
+"time without advance notice.  These changes may affect your use of the APIs "
+"or the way your integration interacts with the API.  If we make a change "
+"that is unacceptable to you, you should stop using the APIs. Continued use "
+"of the APIs means you accept the change."
+msgstr ""
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Confidentiality"
@@ -13832,19 +13990,13 @@ msgid ""
 "Information to anyone without {platform_name}'s prior written consent, and "
 "you agree to protect the Confidential Information from unauthorized use and "
 "disclosure in the same way that you would protect your own confidential "
-"information. Confidential information does not include information that you "
+"information. Confidential Information does not include information that you "
 "independently developed, that was rightfully given to you by a third party "
-"without confidentiality obligation, or that becomes public through no fault "
-"of your own. You may disclose Confidential Information when compelled to do "
-"so by law if you provide {platform_name} with reasonable prior notice, "
-"unless a court orders that {platform_name} not receive notice."
+"without any confidentiality obligation, or that becomes public through no "
+"fault of your own. You may disclose Confidential Information when compelled "
+"to do so by law if you provide {platform_name} with reasonable prior notice,"
+" unless a court orders that {platform_name} not receive notice."
 msgstr ""
-"如果 {platform_name} 为你提供权限访问针对 {platform_name} 和/或 API "
-"的信息，而该信息被标记为\"机密\"或一个理性的人在给定的披露条款基础上会假定该信息为机密或专有权利（\"机密信息\"），则你同意只会将此信息用于涉及 "
-"API 的使用与创建。在无 {platform_name} "
-"事先书面同意的情况下，你不得将机密信息泄露给任何人，且你同意以你保护自己的机密信息一样的方式保护机密信息免于未授权使用与泄露。机密信息不包括你独立开发的信息、由第三方在无保密义务的情况下正当给予你的信息或不是因你本人的过失而公开的信息。除非法院命令"
-" {platform_name} 不接收通知，否则如果你为 {platform_name} "
-"提供合理的事先通知，则在法律强制要求的情况下你可以公开机密信息。"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Disclaimer of Warranty / Limitation of Liabilities"
@@ -13864,22 +14016,14 @@ msgstr ""
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
-"{platform_name} AND THE {platform_name} PARTICIPANTS (AS HERINAFTER DEFINED)"
-" DO NOT WARRANT THAT THE APIS WILL OPERATE IN AN UNINTERRUPTED OR ERROR-FREE"
-" MANNER, THAT THE APIS ARE FREE OF VIRUSES OR OTHER HARMFUL COMPONENTS, OR "
-"THAT THE APIS OR API CONTENT PROVIDED WILL MEET YOUR NEEDS OR EXPECTATIONS. "
-"{platform_name} AND THE {platform_name} PARTICIPANTS ALSO MAKE NO WARRANTY "
-"ABOUT THE ACCURACY, COMPLETENESS, TIMELINESS, OR QUALITY OF THE APIS OR ANY "
-"API CONTENT, OR THAT ANY PARTICULAR API CONTENT WILL CONTINUE TO BE MADE "
-"AVAILABLE. \"{platform_name} PARTICIPANTS\" MEANS MIT, HARVARD, THE OTHER "
-"MEMBERS, THE ENTITIES PROVIDING INFORMATION, API CONTENT OR SERVICES FOR THE"
-" APIS, THE COURSE INSTRUCTORS AND THEIR STAFFS."
+"{platform_name} AND THE {platform_name} PARTICIPANTS DO NOT WARRANT THAT THE"
+" APIS WILL OPERATE IN AN UNINTERRUPTED OR ERROR-FREE MANNER, THAT THE APIS "
+"ARE FREE OF VIRUSES OR OTHER HARMFUL COMPONENTS, OR THAT THE APIS OR API "
+"CONTENT PROVIDED WILL MEET YOUR NEEDS OR EXPECTATIONS. {platform_name} AND "
+"THE {platform_name} PARTICIPANTS ALSO MAKE NO WARRANTY ABOUT THE ACCURACY, "
+"COMPLETENESS, TIMELINESS, OR QUALITY OF THE APIS OR ANY API CONTENT, OR THAT"
+" ANY PARTICULAR API CONTENT WILL CONTINUE TO BE MADE AVAILABLE."
 msgstr ""
-"{platform_name} 和 {platform_name} 参与者（如下文所定义）不保证 API 运行不会中断或无错误，不保证 API "
-"无病毒或无其他有害组件，不保证提供的 API 或 API Content 将满足你的需要或期望。{platform_name} 和 "
-"{platform_name} 参与者也不保证 API 或任何 API Content 的准确性、完整性、时效性或质量，不担保任何特定 API "
-"Content 将继续可用。\"{platform_name} 参与者\"是指 MIT、HARVARD、其他成员、提供信息的实体、API Content"
-" 或 API 的服务、课程导师及其员工。"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -13888,27 +14032,20 @@ msgid ""
 "INFORMATION, MATERIALS OR DATA THROUGH THE APIS IS AT YOUR OWN DISCRETION "
 "AND RISK, AND YOU WILL BE SOLELY RESPONSIBLE FOR ANY DAMAGE TO YOUR PROPERTY"
 " (INCLUDING YOUR COMPUTER SYSTEM) OR LOSS OF DATA THAT RESULTS FROM THE "
-"DOWNLOAD OR USE OF SUCH MATERIAL OR DATA, UNLESS OTHERWISE EXPRESSLY "
-"PROVIDED FOR IN THE {platform_name} PRIVACY POLICY."
+"DOWNLOAD OR USE OF SUCH INFORMATION, MATERIALS OR DATA, UNLESS OTHERWISE "
+"EXPRESSLY PROVIDED FOR IN THE {platform_name} PRIVACY POLICY."
 msgstr ""
-"你需自行承担使用 API、API Conten 及从（或通过） API 获得的任何服务的风险。通过 API "
-"访问或下载信息、材料或数据均由你自行决定和自行承担负责，而且你将独立承担因下载或使用此类材料或数据所导致的损害你的财产（包括你的电脑系统）或数据丢失的后果（{platform_name}"
-" 隐私政策中另有明确规定的除外）。"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
 "TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, YOU AGREE THAT NEITHER "
 "{platform_name} NOR ANY OF THE {platform_name} PARTICIPANTS WILL BE LIABLE "
 "TO YOU FOR ANY LOSS OR DAMAGES, EITHER ACTUAL OR CONSEQUENTIAL, ARISING OUT "
-"OF OR RELATING TO THESE TERMS, OR YOUR (OR ANY THIRD PARTY'S) USE OF OR "
+"OF OR RELATING TO THE TERMS, OR YOUR (OR ANY THIRD PARTY'S) USE OF OR "
 "INABILITY TO USE THE APIS OR ANY API CONTENT, OR YOUR RELIANCE UPON "
 "INFORMATION OBTAINED FROM OR THROUGH THE APIS, WHETHER YOUR CLAIM IS BASED "
 "IN CONTRACT, TORT, STATUTORY OR OTHER LAW."
 msgstr ""
-"在适用法律允许的最大范围内，无论你的索赔是否基于合同、侵权行为、法令或其他法律，你同意 {platform_name} 和 "
-"{platform_name} "
-"的任何参与者均不就你的任何损失或损害对你承担责任，无论这些损失或损害是否实际或继起的由这些条款、你（或任何第三方）使用或无法使用 API 或任何 API"
-" Content、因你信赖来自（或通过）API 所获得的信息所引起或相关。"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -13938,14 +14075,13 @@ msgstr ""
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
 "The APIs and API Content may include hyperlinks to sites maintained or "
-"controlled by others. {platform_name} and the {platform_name} Participants "
-"are not responsible for and do not routinely screen, approve, review or "
-"endorse the contents of or use of any of the products or services that may "
-"be offered at these sites. If you decide to access linked third-party "
-"websites, you do so at your own risk."
+"controlled by others and not affiliated with or under the control of "
+"{platform_name}. {platform_name_capitalized} and the {platform_name} "
+"Participants are not responsible for and do not routinely screen, approve, "
+"review or endorse the contents of or use of any of the products or services "
+"that may be offered at these third-party sites. If you decide to access "
+"linked third-party websites, you do so at your own risk."
 msgstr ""
-"API 和 API Content 可能包含跳转至他人维护或控制的网站的超链接。{platform_name} 和 {platform_name} "
-"参与者不负责并且也不会对这些网站上可能提供的任何产品或服务的内容和使用进行例行筛选、批准、审查或认可。如果你决定访问链接的第三方网站，则你自行承担相应风险。"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -13959,13 +14095,8 @@ msgid ""
 " losses, damages (actual and consequential), suits, judgments, litigation "
 "costs and attorneys' fees, of every kind and nature. In such a case, "
 "{platform_name} or one of the {platform_name} Participants will provide you "
-"with written notice of such claim, suit or action."
+"with written notice of such claim, action or demand."
 msgstr ""
-"在适用法律允许的最大范围内，你同意保护并让 {platform_name} 和 "
-"{platform_name}参与者、及其各自的子公司、分公司、人员、教员、学生、同事、董事会成员、代理和来自第三方的员工免受由你使用 API 和任何 "
-"API Content "
-"所引起、导致或以任何方式相关的任何第三方索赔、诉讼或行动，包括由索赔、损失、损害（直接和间接）、诉讼、审判、诉讼费用和律师费用所产生的所有类型与性质的责任和费用。在此种情况下，{platform_name}"
-" 或其中一位 {platform_name} 参与者将为你提供此类索赔、诉讼或行动的书面通知。"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "General Legal Terms"
@@ -14005,12 +14136,9 @@ msgid ""
 "objection to such proceedings in those courts (including any defense or "
 "objection of lack of proper jurisdiction or venue or inconvenience of "
 "forum). Notwithstanding the foregoing, you agree that {platform_name} shall "
-"still be allowed to apply to injunctive remedies (or an equivalent type of "
-"urgent legal relief) in any jursdiction."
+"still be allowed to apply for injunctive remedies (or an equivalent type of "
+"urgent legal relief) in any jurisdiction."
 msgstr ""
-"你同意此条款、API 以及此条款或 API "
-"引起的或与之相关的任何索赔或纠纷都将受美国马萨诸塞州联邦法律管治（不包括与法律规定的冲突）。你同意所有此类索赔和纠纷都将仅由位于美国马萨诸塞州坎布里奇的联邦或州立法院受理和解决。你同意这些法院可以就此目的以其属人管辖权对你进行管辖，且你放弃并同意不对这些法院的此类诉讼提出任何异议（包括对缺乏适当管辖权、审判地或法庭不便原则的抗辩或异议）。尽管有上述规定，你同意"
-" {platform_name} 仍然被允许在任何管辖权情况下应用命令性法律救济（或某个同等类型的紧急法律救济）。"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Termination"
@@ -14021,44 +14149,35 @@ msgid ""
 "You may stop using the APIs at any time. You agree that {platform_name}, in "
 "its sole discretion and at any time, may terminate your use of the APIs or "
 "any API Content for any reason or no reason, without prior notice or "
-"liabiliy."
+"liability."
 msgstr ""
-"你可以随时停止使用 API。你同意 {platform_name} 保留因任何原因或无原因，在不另行通知的情况下随时终止你使用 API 或所有 API "
-"Content 的自由裁量权。"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
-"{platform_name} and the {platform_name} Participants reserve the right at "
-"any time in their sole discretion to cancel, delay, reschedule or alter the "
-"format of any API or API Content offered through {platform_name}, or to "
-"cease providing any part or all of the APIs or API Content or related "
+"{platform_name_capitalized} and the {platform_name} Participants reserve the"
+" right at any time in their sole discretion to cancel, delay, reschedule or "
+"alter the format of any API or API Content offered through {platform_name}, "
+"or to cease providing any part or all of the APIs or API Content or related "
 "services, and you agree that neither {platform_name} nor any of the "
 "{platform_name} Participants will have any liability to you for such an "
 "action."
 msgstr ""
-"{platform_name} 和 {platform_name} 参与者保留随时酌情取消、延期、重新安排或变更通过 {platform_name} "
-"提供的任何 API 或 API Content 的格式、或停止提供 API 或 API Content 或相关服务的任何部分或全部，且你同意无论 "
-"{platform_name} 或任何 {platform_name} 参与者都不对此类行为承担任何责任。"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
 "Upon any termination of the Terms or discontinuation of your access to an "
 "API for any reason, your right to use any API and API Content will "
 "immediately cease. You will immediately stop using the APIs and delete any "
-"cached or stored API Content. All provisions of the Terms that by their "
-"nature should survive termination shall survive termination, including, "
-"without limitation, ownership provisions, warranty disclaimers, and "
-"limitation of liability. Termination of your access to and use of the APIs "
-"and API Content shall not relieve you of any obligations arising or "
-"accrusing prior to such termination or limit any liability that you "
-"otherwise may have to {platform_name}, including without limitation any "
+"cached or stored API Content from Your Application and your networks, "
+"systems and servers as soon as reasonably possible. All provisions of the "
+"Terms that by their nature should survive termination shall survive "
+"termination, including, without limitation, ownership provisions, warranty "
+"disclaimers, and limitations of liability. Termination of your access to and"
+" use of the APIs and API Content shall not relieve you of any obligations "
+"arising or accruing prior to such termination or limit any liability that "
+"you otherwise may have to {platform_name}, including without limitation any "
 "indemnification obligations contained herein."
 msgstr ""
-"在你无论出于任何原因终止此条款或中止您对某个 API 的访问权限后，你使用任何 API 和 API Content 的权利也将立即停止。你将立即停止使用"
-" API 并删除所有缓存或存储的 API "
-"Content。从其本质来说应当在终止之后继续有效的此条款的所有规定在终止之后继续有效，包括但不限于所有权规定、担保免责声明和责任限制。终止你访问和使用"
-" API 和 API Content 不能免除你应承担的此类终止之前出现或产生的任何义务或限制你本来可能向 {platform_name} "
-"承担的任何责任，包括但不限于此条款包含的任何赔偿义务。"
 
 #: lms/templates/api_admin/catalogs/edit.html
 msgid "Edit {catalog_name}"
@@ -14733,8 +14852,7 @@ msgstr "{span_start}当前部分{span_end}"
 
 #: lms/templates/courseware/accordion.html
 #: lms/templates/courseware/progress.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "due {date}"
 msgstr "截止日期{date}"
 
@@ -14743,8 +14861,7 @@ msgid "{section_format} due {{date}}"
 msgstr ""
 
 #: lms/templates/courseware/accordion.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "This content is graded"
 msgstr "该内容计入总分。"
 
@@ -14977,7 +15094,6 @@ msgstr ""
 #: lms/templates/courseware/info.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
 msgid "Resume Course"
 msgstr "继续课程"
 
@@ -15761,63 +15877,78 @@ msgid ""
 "{platform_name} account."
 msgstr "你选择的 {provider_name}账户已经和{platform_name}账户相关联。"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid ""
 "We're sorry to see you go! Please share your main reason for unenrolling."
 msgstr ""
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "I just wanted to browse the material"
 msgstr ""
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "This won't help me reach my goals"
 msgstr ""
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "I don't have the time"
 msgstr ""
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "I don't have the academic or language prerequisites"
 msgstr ""
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "I don't have enough support"
 msgstr ""
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "I am not happy with the quality of the content"
 msgstr ""
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "The course material was too hard"
 msgstr ""
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "The course material was too easy"
 msgstr ""
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Something was broken"
 msgstr ""
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Other"
 msgstr ""
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Thank you for sharing your reasons for unenrolling."
 msgstr ""
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "You are unenrolled from"
 msgstr ""
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Return To Dashboard"
 msgstr ""
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Browse Courses"
 msgstr ""
@@ -16342,9 +16473,11 @@ msgstr "谢谢您的照片提交！"
 
 #: lms/templates/emails/photo_submission_confirmation.txt
 msgid ""
-"We've received your information and the verification process has begun. You "
-"can check the status of the verification process on your dashboard."
-msgstr "我们已经收到了你的信息，验证过程已经开始。你可以在你的课程面板中查看验证过程的状态。"
+"We've received your information and the ID verification process has "
+"begun.Check for an email from us in the next few days to confirm whether "
+"your verification was successful.You can also check the status of the "
+"verification process on your dashboard."
+msgstr ""
 
 #: lms/templates/emails/photo_submission_confirmation.txt
 #: lms/templates/emails/reverification_processed.txt
@@ -17602,10 +17735,6 @@ msgid "* Required Information"
 msgstr "* 必填信息"
 
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-msgid "Organization Name"
-msgstr "机构名称"
-
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "The organization that purchased enrollments in the course"
 msgstr "购买了本课程的机构"
 
@@ -17731,6 +17860,10 @@ msgid ""
 "You will not get notification for emails that bounce, so please double-check"
 " spelling."
 msgstr "对该类问题您不会受到提示邮件，因此请仔细检查，确保拼写无误。"
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Role of the users being enrolled."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -18575,29 +18708,6 @@ msgstr "管理您的数据：{permission}"
 msgid "Account Activation Info"
 msgstr ""
 
-#: lms/templates/registration/account_activation_sidebar_notice.html
-msgid "Activate your account!"
-msgstr ""
-
-#: lms/templates/registration/account_activation_sidebar_notice.html
-msgid ""
-"Check your {email_start}{email}{email_end} inbox for an account activation "
-"link from {platform_name}. If you need help, contact "
-"{link_start}{platform_name} Support{link_end}."
-msgstr ""
-
-#: lms/templates/registration/activate_account_notice.html
-msgid "You're almost there!"
-msgstr ""
-
-#: lms/templates/registration/activate_account_notice.html
-msgid ""
-"There's just one more step: Before you enroll in a course, you need to "
-"activate your account. We've sent an email message to "
-"{email_start}{email}{email_end} with instructions for activating your "
-"account. If you don't receive this message, check your spam folder."
-msgstr ""
-
 #: lms/templates/registration/password_reset_complete.html
 msgid "Your Password Reset is Complete"
 msgstr "您的密码重置已完成"
@@ -18614,34 +18724,6 @@ msgstr "你的密码已重置。{start_link}登录你的帐号。{end_link}"
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Reset Your {platform_name} Password"
 msgstr "重置你的 {platform_name} 密码"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Error Resetting Password"
-msgstr "重置密码错误"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "You must enter and confirm your new password."
-msgstr "你必须输入并确认你的新密码。"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "The text in both password fields must match."
-msgstr "两个密码字段的文本必须相同。"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Reset Your Password"
-msgstr "重置你的密码"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Enter and confirm your new password."
-msgstr "输入并确认你的新密码。"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "New Password"
-msgstr "新密码"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Confirm Password"
-msgstr "确认密码"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Invalid Password Reset Link"
@@ -19148,10 +19230,6 @@ msgstr ""
 msgid "Student Support: Enrollment"
 msgstr "学生支持：选课"
 
-#: lms/templates/support/entitlement.html
-msgid "Entitlements"
-msgstr ""
-
 #: lms/templates/support/manage_user.html
 msgid "Student Support: Manage User"
 msgstr ""
@@ -19442,21 +19520,16 @@ msgstr ""
 msgid "Upgrade ({price})"
 msgstr ""
 
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+msgid "Expand All"
+msgstr ""
+
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "Prerequisite: "
 msgstr ""
 
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "{subsection_format} due {{date}}"
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
-msgid "Unlocked"
-msgstr ""
-
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
-msgid "(Prerequisite required)"
 msgstr ""
 
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
@@ -19603,6 +19676,10 @@ msgid "Explore New Courses"
 msgstr "探索新课程"
 
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+msgid "View My Records"
+msgstr ""
+
+#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
 msgid "My Profile"
 msgstr ""
 
@@ -19644,21 +19721,7 @@ msgid "© 2012–{year} edX Inc. "
 msgstr ""
 
 #: themes/edx.org/lms/templates/footer.html
-msgid ""
-"EdX, Open edX, and MicroMasters are registered trademarks of edX Inc. "
-"ç²¤ICPå¤17044299å·-2. "
-msgstr ""
-
-#: themes/edx.org/lms/templates/footer.html
-#: themes/edx.org/lms/templates/certificates/_about-edx.html
-msgid "About edX"
-msgstr "关于 edX"
-
-#: themes/edx.org/lms/templates/footer.html
-msgid ""
-"© 2012–{year} edX Inc.  All rights reserved except where noted.  EdX, Open "
-"edX and the edX and Open edX logos are registered trademarks or trademarks "
-"of edX Inc."
+msgid "EdX, Open edX, and MicroMasters are registered trademarks of edX Inc. "
 msgstr ""
 
 #: themes/edx.org/lms/templates/certificates/_about-accomplishments.html
@@ -19672,6 +19735,10 @@ msgid ""
 " under its guidelines, as well as having their photo ID checked to verify "
 "their identity."
 msgstr ""
+
+#: themes/edx.org/lms/templates/certificates/_about-edx.html
+msgid "About edX"
+msgstr "关于 edX"
 
 #: themes/edx.org/lms/templates/certificates/_about-edx.html
 msgid ""
@@ -22096,6 +22163,24 @@ msgid "In-Course Reverification {number}"
 msgstr ""
 
 #: cms/templates/settings.html
+msgid "Set the pacing for this course"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid ""
+"Instructor-paced courses progress at the pace that the course author sets. "
+"You can configure release dates for course content and due dates for "
+"assignments."
+msgstr ""
+
+#: cms/templates/settings.html
+msgid ""
+"Self-paced courses do not have release dates for course content or due dates"
+" for assignments. Learners can complete course material at any time before "
+"the course end date."
+msgstr ""
+
+#: cms/templates/settings.html
 msgid "Course Schedule"
 msgstr "课程时间表"
 
@@ -22158,19 +22243,6 @@ msgstr ""
 #: cms/templates/settings.html
 msgid "Enrollment End Time"
 msgstr "选课截止时间"
-
-#: cms/templates/settings.html
-msgid "These Dates Are Not Used When Promoting Your Course"
-msgstr "当推广您的课程的时候这些日期将不会被使用"
-
-#: cms/templates/settings.html
-msgid ""
-"These dates impact {strong_start}when your courseware can be "
-"viewed{strong_end}, but they are {strong_start}not the dates shown on your "
-"course summary page{strong_end}. To provide the course start and "
-"registration dates as shown on your course summary page, follow the "
-"instructions provided by your Program Manager."
-msgstr ""
 
 #: cms/templates/settings.html
 msgid "Course Details"
@@ -22418,24 +22490,6 @@ msgid ""
 "The score student must meet in order to successfully complete the entrance "
 "exam. "
 msgstr "学生要顺利完成入学考试所必须满足的分数。"
-
-#: cms/templates/settings.html
-msgid "Set the pacing for this course"
-msgstr ""
-
-#: cms/templates/settings.html
-msgid ""
-"Instructor-paced courses progress at the pace that the course author sets. "
-"You can configure release dates for course content and due dates for "
-"assignments."
-msgstr ""
-
-#: cms/templates/settings.html
-msgid ""
-"Self-paced courses do not have release dates for course content or due dates"
-" for assignments. Learners can complete course material at any time before "
-"the course end date."
-msgstr ""
 
 #: cms/templates/settings.html
 msgid "Course Content License"
@@ -22867,6 +22921,10 @@ msgstr ""
 
 #: cms/templates/widgets/footer.html
 msgid "Accessibility Accommodation Request"
+msgstr ""
+
+#: cms/templates/widgets/footer.html
+msgid "LMS"
 msgstr ""
 
 #. Translators: 'EdX', 'edX', 'Studio', and 'Open edX' are trademarks of 'edX

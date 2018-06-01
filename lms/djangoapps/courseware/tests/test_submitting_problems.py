@@ -335,7 +335,7 @@ class TestCourseGrades(TestSubmittingProblems):
         self._verify_grade(expected_problem_score=(0.0, 1.0), expected_hw_grade=(0.0, 1.0))
 
 
-@attr(shard=3)
+@attr(shard=9)
 @ddt.ddt
 class TestCourseGrader(TestSubmittingProblems):
     """
@@ -752,7 +752,7 @@ class TestCourseGrader(TestSubmittingProblems):
         self.assertEqual(req_status[0]["status"], 'satisfied')
 
 
-@attr(shard=1)
+@attr(shard=9)
 class ProblemWithUploadedFilesTest(TestSubmittingProblems):
     """Tests of problems with uploaded files."""
     # Tell Django to clean out all databases, not just default
@@ -807,7 +807,7 @@ class ProblemWithUploadedFilesTest(TestSubmittingProblems):
         self.assertItemsEqual(kwargs['files'].keys(), filenames.split())
 
 
-@attr(shard=1)
+@attr(shard=9)
 class TestPythonGradedResponse(TestSubmittingProblems):
     """
     Check that we can submit a schematic and custom response, and it answers properly.
@@ -1058,7 +1058,7 @@ class TestPythonGradedResponse(TestSubmittingProblems):
         self._check_ireset(name)
 
 
-@attr(shard=1)
+@attr(shard=9)
 class TestConditionalContent(TestSubmittingProblems):
     """
     Check that conditional content works correctly with grading.

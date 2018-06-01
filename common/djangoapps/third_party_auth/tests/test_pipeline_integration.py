@@ -2,7 +2,9 @@
 
 import unittest
 
+import datetime
 import mock
+import pytz
 import ddt
 from django import test
 from django.contrib.auth import models
@@ -12,6 +14,7 @@ from social_django import models as social_models
 from student.tests.factories import UserFactory
 from third_party_auth import pipeline, provider
 from third_party_auth.tests import testutil
+from lms.djangoapps.verify_student.models import SSOVerification
 
 # Get Django User model by reference from python-social-auth. Not a type
 # constant, pylint.
@@ -440,3 +443,101 @@ class UserDetailsForceSyncTestCase(testutil.TestCase, test.TestCase):
 
         # An email should still be sent because the email changed.
         assert len(mail.outbox) == 1
+
+
+@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
+class SetIDVerificationStatusTestCase(testutil.TestCase, test.TestCase):
+    """Tests to ensure SSO ID Verification for the user is set if the provider requires it."""
+
+    def setUp(self):
+        super(SetIDVerificationStatusTestCase, self).setUp()
+        self.user = UserFactory.create()
+        self.provider_class_name = 'third_party_auth.models.SAMLProviderConfig'
+        self.provider_slug = 'default'
+        self.details = {}
+
+        # Mocks
+        self.strategy = mock.MagicMock()
+        self.strategy.storage.user.changed.side_effect = lambda user: user.save()
+
+        get_from_pipeline = mock.patch('third_party_auth.pipeline.provider.Registry.get_from_pipeline')
+        self.get_from_pipeline = get_from_pipeline.start()
+        self.get_from_pipeline.return_value = mock.MagicMock(
+            enable_sso_id_verification=True,
+            full_class_name=self.provider_class_name,
+            slug=self.provider_slug,
+        )
+        self.addCleanup(get_from_pipeline.stop)
+
+    def test_set_id_verification_status_new_user(self):
+        """
+        The user details are synced properly and an email is sent when the email is changed.
+        """
+        # Begin the pipeline.
+        pipeline.set_id_verification_status(
+            auth_entry=pipeline.AUTH_ENTRY_LOGIN,
+            strategy=self.strategy,
+            details=self.details,
+            user=self.user,
+        )
+
+        verification = SSOVerification.objects.get(user=self.user)
+
+        assert verification.identity_provider_type == self.provider_class_name
+        assert verification.identity_provider_slug == self.provider_slug
+        assert verification.status == 'approved'
+        assert verification.name == self.user.profile.name
+
+    def test_set_id_verification_status_returning_user(self):
+        """
+        The user details are synced properly and an email is sent when the email is changed.
+        """
+
+        SSOVerification.objects.create(
+            user=self.user,
+            status="approved",
+            name=self.user.profile.name,
+            identity_provider_type=self.provider_class_name,
+            identity_provider_slug=self.provider_slug,
+        )
+
+        # Begin the pipeline.
+        pipeline.set_id_verification_status(
+            auth_entry=pipeline.AUTH_ENTRY_LOGIN,
+            strategy=self.strategy,
+            details=self.details,
+            user=self.user,
+        )
+
+        assert SSOVerification.objects.filter(user=self.user).count() == 1
+
+    def test_set_id_verification_status_expired(self):
+        """
+        The user details are synced properly and an email is sent when the email is changed.
+        """
+
+        SSOVerification.objects.create(
+            user=self.user,
+            status="approved",
+            name=self.user.profile.name,
+            identity_provider_type=self.provider_class_name,
+            identity_provider_slug=self.provider_slug,
+        )
+
+        with mock.patch('third_party_auth.pipeline.earliest_allowed_verification_date') as earliest_date:
+            earliest_date.return_value = datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=1)
+            # Begin the pipeline.
+            pipeline.set_id_verification_status(
+                auth_entry=pipeline.AUTH_ENTRY_LOGIN,
+                strategy=self.strategy,
+                details=self.details,
+                user=self.user,
+            )
+
+            assert SSOVerification.objects.filter(
+                user=self.user,
+                status="approved",
+                name=self.user.profile.name,
+                identity_provider_type=self.provider_class_name,
+                identity_provider_slug=self.provider_slug,
+            ).count() == 2

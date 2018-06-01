@@ -503,6 +503,7 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         Clicks the "View Live" link and switches to the new tab
         """
         click_css(self, '.view-live-button', require_notification=False)
+        self.wait_for_page()
         self.browser.switch_to_window(self.browser.window_handles[-1])
 
     def section(self, title):
@@ -719,12 +720,13 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         self.q(css=".action-save").first.click()
         self.wait_for_ajax()
 
-    def add_prerequisite_to_subsection(self, min_score):
+    def add_prerequisite_to_subsection(self, min_score, min_completion):
         """
         Adds a prerequisite to a subsection.
         """
         Select(self.q(css="#prereq")[0]).select_by_index(1)
         self.q(css="#prereq_min_score").fill(min_score)
+        self.q(css="#prereq_min_completion").fill(min_completion)
         self.q(css=".action-save").first.click()
         self.wait_for_ajax()
 

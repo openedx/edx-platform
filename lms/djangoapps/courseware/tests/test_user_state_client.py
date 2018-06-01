@@ -11,12 +11,15 @@ from edx_user_state_client.tests import UserStateClientTestBase
 
 from courseware.tests.factories import UserFactory
 from courseware.user_state_client import DjangoXBlockUserStateClient
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
-class TestDjangoUserStateClient(UserStateClientTestBase, TestCase):
+class TestDjangoUserStateClient(UserStateClientTestBase, ModuleStoreTestCase):
     """
     Tests of the DjangoUserStateClient backend.
+    It reuses all tests from :class:`~UserStateClientTestBase`.
     """
+    shard = 4
     __test__ = True
     # Tell Django to clean out all databases, not just default
     multi_db = True
@@ -33,37 +36,3 @@ class TestDjangoUserStateClient(UserStateClientTestBase, TestCase):
         super(TestDjangoUserStateClient, self).setUp()
         self.client = DjangoXBlockUserStateClient()
         self.users = defaultdict(UserFactory.create)
-
-    # We're skipping these tests because the iter_all_by_block and iter_all_by_course
-    # are not implemented in the DjangoXBlockUserStateClient
-    @skip("Not supported by DjangoXBlockUserStateClient")
-    def test_iter_blocks_deleted_block(self):
-        pass
-
-    @skip("Not supported by DjangoXBlockUserStateClient")
-    def test_iter_blocks_empty(self):
-        pass
-
-    @skip("Not supported by DjangoXBlockUserStateClient")
-    def test_iter_blocks_many_users(self):
-        pass
-
-    @skip("Not supported by DjangoXBlockUserStateClient")
-    def test_iter_blocks_single_user(self):
-        pass
-
-    @skip("Not supported by DjangoXBlockUserStateClient")
-    def test_iter_course_deleted_block(self):
-        pass
-
-    @skip("Not supported by DjangoXBlockUserStateClient")
-    def test_iter_course_empty(self):
-        pass
-
-    @skip("Not supported by DjangoXBlockUserStateClient")
-    def test_iter_course_single_user(self):
-        pass
-
-    @skip("Not supported by DjangoXBlockUserStateClient")
-    def test_iter_course_many_users(self):
-        pass

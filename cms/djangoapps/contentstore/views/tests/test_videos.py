@@ -63,6 +63,8 @@ class VideoUploadTestBase(object):
     """
     Test cases for the video upload feature
     """
+    shard = 1
+
     def get_url_for_course_key(self, course_key, kwargs=None):
         """Return video handler URL for the given course"""
         return reverse_course_url(self.VIEW_NAME, course_key, kwargs)
@@ -172,6 +174,8 @@ class VideoUploadTestMixin(VideoUploadTestBase):
     """
     Test cases for the video upload feature
     """
+    shard = 1
+
     def test_anon_user(self):
         self.client.logout()
         response = self.client.get(self.url)
@@ -211,6 +215,7 @@ class VideoUploadTestMixin(VideoUploadTestBase):
 @override_settings(VIDEO_UPLOAD_PIPELINE={"BUCKET": "test_bucket", "ROOT_PATH": "test_root"})
 class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
     """Test cases for the main video upload endpoint"""
+    shard = 1
 
     VIEW_NAME = 'videos_handler'
 
@@ -224,7 +229,15 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
             original_video = self.previous_uploads[-(i + 1)]
             self.assertEqual(
                 set(response_video.keys()),
-                set(['edx_video_id', 'client_video_id', 'created', 'duration', 'status', 'course_video_image_url'])
+                set([
+                    'edx_video_id',
+                    'client_video_id',
+                    'created',
+                    'duration',
+                    'status',
+                    'course_video_image_url',
+                    'transcripts'
+                ])
             )
             dateutil.parser.parse(response_video['created'])
             for field in ['edx_video_id', 'client_video_id', 'duration']:
@@ -236,13 +249,6 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
 
     @ddt.data(
         (
-            False,
-            ['edx_video_id', 'client_video_id', 'created', 'duration', 'status', 'course_video_image_url'],
-            [],
-            []
-        ),
-        (
-            True,
             ['edx_video_id', 'client_video_id', 'created', 'duration', 'status', 'course_video_image_url',
                 'transcripts'],
             [
@@ -257,7 +263,6 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
             ['en']
         ),
         (
-            True,
             ['edx_video_id', 'client_video_id', 'created', 'duration', 'status', 'course_video_image_url',
                 'transcripts'],
             [
@@ -280,14 +285,10 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         )
     )
     @ddt.unpack
-    @patch('openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled')
-    def test_get_json_transcripts(self, is_video_transcript_enabled, expected_video_keys, uploaded_transcripts,
-                                  expected_transcripts, video_transcript_feature):
+    def test_get_json_transcripts(self, expected_video_keys, uploaded_transcripts, expected_transcripts):
         """
         Test that transcripts are attached based on whether the video transcript feature is enabled.
         """
-        video_transcript_feature.return_value = is_video_transcript_enabled
-
         for transcript in uploaded_transcripts:
             create_or_update_video_transcript(
                 transcript['video_id'],
@@ -658,6 +659,7 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
     """
     Tests for video image.
     """
+    shard = 1
 
     VIEW_NAME = "video_images_handler"
 
@@ -966,6 +968,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
     """
     Tests for video transcripts preferences.
     """
+    shard = 1
 
     VIEW_NAME = 'transcript_preferences_handler'
 
@@ -1277,6 +1280,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
 @override_settings(VIDEO_UPLOAD_PIPELINE={"BUCKET": "test_bucket", "ROOT_PATH": "test_root"})
 class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
     """Test cases for the CSV download endpoint for video uploads"""
+    shard = 1
 
     VIEW_NAME = "video_encodings_download"
 

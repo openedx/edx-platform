@@ -28,8 +28,8 @@ REQUIRED_PARAMETERS = [
 ]
 
 OPTIONAL_PARAMETERS = [
-    'lis_result_sourcedid', 'lis_outcome_service_url',
-    'tool_consumer_instance_guid'
+    'context_title', 'context_label', 'lis_result_sourcedid',
+    'lis_outcome_service_url', 'tool_consumer_instance_guid'
 ]
 
 

@@ -21,11 +21,11 @@
   % endif
 >
 
-% if uses_bootstrap:
 <div class="container">
     <div class="row main-row"><!-- row -->
-        <div class="col-xl-2 col-lg-12 col-md-3 col-sm-8 col-xs-10 flex-column">
-
+        <div class="col-xl-2 col-lg-12 col-md-3 col-sm-8 col-xs-10 column-1 flex-column column-styles">
+            <div class="row">
+                <div class="col-12 column-2-2 column-styles">
                 <div class="edx-footer-logo">
                     <a href="${marketing_link('ROOT')}">
                         <img alt="${_('edX Home Page')}" src="${footer['logo_image']}">
@@ -36,13 +36,16 @@
                 % if context.get('include_language_selector', footer_language_selector_is_enabled()):
                 <%include file="${static.get_template_path('widgets/footer-language-selector.html')}"/>
                 % endif
+                </div>
+            </div>
+
         </div>
-        <div class="col-xl-6 col-lg-8 col-md-9 col-sm-5 col-xs-12 flex-column">
+        <div class="col-xl-6 col-lg-8 col-md-9 col-sm-5 col-xs-12 column-2 flex-column column-styles">
              <div class="row full-height">
 
-                 <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 col-xs-12 first-div-border ">
+                 <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 column-2-1 col-xs-12 first-div-border column-styles ">
                     <div class="row full-height">
-                        <div class="ml-xl-0 col-lg-10 ml-lg-auto col-md-12 col-sm-10 full-height">
+                        <div class="ml-xl-0 col-lg-10 ml-lg-auto col-md-12 column-2-2 col-sm-10 full-height column-styles">
                               <h2 class="heading">edX</h2>
                                   <ul class="list-unstyled clear-margins  ">
                                       % for link in footer["business_links"]:
@@ -54,9 +57,9 @@
                         </div>
                     </div>
                  </div>
-                 <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 col-xs-12 second-div-border ">
+                 <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 col-xs-12 column-2-1 second-div-border column-styles ">
                         <div class="row full-height">
-                            <div class="col-lg-12 col-md-12 col-sm-10 full-height">
+                            <div class="col-lg-12 col-md-12 col-sm-10 column-2-2 full-height column-styles">
                                   <h2 class="heading">Legal</h2>
                                     <ul class="list-unstyled clear-margins  ">
                                         % for link in footer["more_info_links"]:
@@ -68,9 +71,9 @@
                             </div>
                           </div>
                 </div>
-                 <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 col-xs-12 third-div-border ">
+                 <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 col-xs-12 column-2-1 third-div-border column-styles">
                       <div class="row full-height">
-                        <div class="col-lg-12 col-md-12 col-sm-10 full-height ">
+                        <div class="col-lg-12 col-md-12 col-sm-10 full-height column-2-2 column-styles">
                               <h2 class="heading">Connect</h2>
                               <ul class="list-unstyled clear-margins  ">
                                 % for link in footer["connect_links"]:
@@ -87,7 +90,7 @@
               ## The Open edX link may be hidden when this view is served
               ## through an API to partner sites (such as marketing sites or blogs),
               ## which are not technically powered by Open edX.
-            % if not hide_openedx_link and not hide_openedx_link is Undefined:
+            % if not hide_openedx_link and hide_openedx_link != Undefined:
                   <div class="openedx-link">
                     <a href="${footer['openedx_link']['url']}" title="${footer['openedx_link']['title']}">
                       <img alt="${footer['openedx_link']['title']}" src="${footer['openedx_link']['image']}" width="140">
@@ -99,11 +102,11 @@
 
             </div>
         </div>
-        <div class="col-xl-4 col-lg-4 col-md-9 ml-md-auto col-sm-7 flex-column fourth-div-border">
+        <div class="col-xl-4 col-lg-4 col-md-9 ml-md-auto col-sm-7 column-3 flex-column fourth-div-border column-styles">
                 <div class="row">
-                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-xs-12 social-app-links-div">
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-xs-12 column-3-1 social-app-links-div column-styles ml-auto">
                       <div class="row">
-                        <div class="col-lg-12 col-md-12">
+                        <div class="col-lg-12 col-md-12 column-3-2 column-styles">
                              <ul class="list-inline list-unstyled social">
                                     % for link in footer['social_links']:
                                     <li>
@@ -123,7 +126,6 @@
                                     </li>
                                     % endfor
                             </ul>
-                          <div>
                                 ## \u00A9 is the copyright symbol.
                                 ## \u2013 is the en-dash. It looks like a year, but it isn't.
                               <!--"EdX, Open edX, and MicroMasters are trademarks of edX Inc. registered in the U.S. and other countries-->
@@ -132,12 +134,11 @@
                                   <br/>
                                   ${_(
 
-                                  u"EdX, Open edX, and MicroMasters are registered trademarks of edX Inc. 粤ICP备17044299号-2. "
+                                  u"EdX, Open edX, and MicroMasters are registered trademarks of edX Inc. "
 
                                   )}
                                   ${u" | {icp}".format(icp=getattr(settings,'ICP_LICENSE')) if getattr(settings,'ICP_LICENSE',False) else ""}
                               </p>
-                          </div>
                         </div>
                   </div>
                 </div>
@@ -151,88 +152,7 @@
 
 
 </div>
-% else:
 
-    <h2 class="sr footer-about-title">${_("About edX")}</h2>
-    <div class="footer-content-wrapper">
-      <div class="footer-logo">
-          <a href="${marketing_link('ROOT')}">
-            <img alt="${_('edX Home Page')}" src="${footer['logo_image']}">
-          </a>
-      </div>
-
-      <div class="site-details">
-          <nav class="site-nav" aria-label="${_("About edX")}">
-            <ul class="about-links">
-                % for link in footer["navigation_links"]:
-                <li class="list-item">
-                  <a href="${link['url']}">${link['title']}</a>
-                </li>
-                % endfor
-            </ul>
-          </nav>
-          <nav class="legal-notices" aria-label="${_("Legal")}">
-            <ul class="legal-links">
-              % for link in footer["legal_links"]:
-                <li class="list-item">
-                  <a href="${link['url']}">${link['title']}</a>
-                </li>
-              % endfor
-            </ul>
-          </nav>
-
-          % if context.get('include_language_selector', footer_language_selector_is_enabled()):
-              <%include file="${static.get_template_path('widgets/footer-language-selector.html')}"/>
-          % endif
-
-          ## \u00A9 is the copyright symbol.
-          ## \u2013 is the en-dash. It looks like a year, but it isn't.
-          <p class="copyright">${_(
-          u"\u00A9 2012\u2013{year} edX Inc.  All rights reserved except where noted.  "
-          u"EdX, Open edX and the edX and Open edX logos are registered trademarks "
-          u"or trademarks of edX Inc."
-          ).format(year=datetime.datetime.now().year)}
-          ${u" | {icp}".format(icp=getattr(settings,'ICP_LICENSE')) if getattr(settings,'ICP_LICENSE',False) else ""}
-	  </p>
-
-          ## The Open edX link may be hidden when this view is served
-          ## through an API to partner sites (such as marketing sites or blogs),
-          ## which are not technically powered by Open edX.
-          % if not hide_openedx_link:
-          <div class="openedx-link">
-            <a href="${footer['openedx_link']['url']}" title="${footer['openedx_link']['title']}">
-              <img alt="${footer['openedx_link']['title']}" src="${footer['openedx_link']['image']}" width="140">
-            </a>
-          </div>
-          % endif
-      </div>
-
-      <div class="external-links">
-        <ul class="social-media-links">
-            % for link in footer['social_links']:
-            <li class="list-item">
-                <a href="${link['url']}" class="sm-link external" title="${link['title']}" rel="noreferrer">
-                    <span class="icon fa ${link['icon-class']}" aria-hidden="true"></span>
-                    <span class="sr">${link['action']}</span>
-                </a>
-            </li>
-            % endfor
-        </ul>
-
-        <ul class="mobile-app-links">
-            % for link in footer['mobile_links']:
-            <li class="list-item">
-                <a href="${link['url']}" class="app-link external">
-                    <img alt="${link['title']}" src="${link['image']}">
-                </a>
-            </li>
-            % endfor
-        </ul>
-      </div>
-    </div>
-
-
-% endif
 
 </footer>
 

@@ -1,4 +1,4 @@
-import { errorActions } from './constants';
+import { errorActions } from '../constants/actionTypes';
 
 const displayError = (message, error) => ({
   type: errorActions.DISPLAY_ERROR,

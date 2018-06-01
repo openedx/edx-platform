@@ -32,7 +32,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 USER_COUNT = 11
 
 
-@attr(shard=1)
+@attr(shard=6)
 class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
     """
     Tests related to class_dashboard/dashboard_data.py

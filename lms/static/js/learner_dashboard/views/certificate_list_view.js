@@ -1,11 +1,12 @@
-import _ from 'underscore';
 import Backbone from 'backbone';
+
+import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
 
 import certificateTpl from '../../../templates/learner_dashboard/certificate_list.underscore';
 
 class CertificateListView extends Backbone.View {
   initialize(options) {
-    this.tpl = _.template(certificateTpl);
+    this.tpl = HtmlUtils.template(certificateTpl);
     this.title = options.title || false;
     this.render();
   }
@@ -16,7 +17,7 @@ class CertificateListView extends Backbone.View {
       certificateList: this.collection.toJSON(),
     };
 
-    this.$el.html(this.tpl(data));
+    HtmlUtils.setHtml(this.$el, this.tpl(data));
   }
 }
 

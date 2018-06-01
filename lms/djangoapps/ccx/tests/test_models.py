@@ -18,7 +18,7 @@ from .factories import CcxFactory
 
 
 @ddt.ddt
-@attr(shard=1)
+@attr(shard=7)
 class TestCCX(ModuleStoreTestCase):
     """Unit tests for the CustomCourseForEdX model
     """

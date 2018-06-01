@@ -168,7 +168,7 @@
 
       position: relative;
       display: inline-block;
-      width: 250px;
+      width: 265px;
       vertical-align: middle;
       border: 1px solid $lightGrey1;
       background: $white;
@@ -177,7 +177,7 @@
     }
 
     .file-browse {
-      @include margin-left(-4px);
+      @include margin-left(-5px);
 
       display: inline-block;
       position: absolute;
@@ -185,6 +185,9 @@
       left: 0;
       width: 100%;
       overflow: hidden;
+      padding: 0;
+      border: none;
+      background: transparent;
 
       .browse {
         @include button(simple, $primary);
@@ -613,6 +616,13 @@
       margin-top: 0.2em;
       height: auto;
       width: 90%;
+    }
+
+    .role {
+      margin: 20px 0;
+      select {
+        margin-left: 15px;
+      }
     }
 
     input {

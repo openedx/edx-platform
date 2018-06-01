@@ -59,13 +59,13 @@ PLATFORM_TWITTER_ACCOUNT = "@YourPlatformTwitterAccount"
 
 ENABLE_JASMINE = False
 
-DISCUSSION_SETTINGS = {
-    'MAX_COMMENT_DEPTH': 2,
-}
-
 LMS_ROOT_URL = "http://localhost:8000"
 LMS_INTERNAL_ROOT_URL = LMS_ROOT_URL
 LMS_ENROLLMENT_API_PATH = "/api/enrollment/v1/"
+
+# Default choices for role dropdown in the membership tab of the instructor dashboard
+# This setting is used when a site does not define its own choices via site configuration
+MANUAL_ENROLLMENT_ROLE_CHOICES = ['Learner', 'Support', 'Partner']
 
 # Features
 FEATURES = {
@@ -133,6 +133,9 @@ FEATURES = {
     # Can be turned off if course lists need to be hidden. Effects views and templates.
     'COURSES_ARE_BROWSABLE': True,
 
+    # Set to hide the courses list on the Learner Dashboard if they are not enrolled in any courses yet.
+    'HIDE_DASHBOARD_COURSES_UNTIL_ACTIVATED': False,
+
     # Enables ability to restrict enrollment in specific courses by the user account login method
     'RESTRICT_ENROLL_BY_REG_METHOD': False,
 
@@ -182,8 +185,11 @@ FEATURES = {
     # Toggle to enable certificates of courses on dashboard
     'ENABLE_VERIFIED_CERTIFICATES': False,
 
-    # for load testing
+    # for acceptance and load testing
     'AUTOMATIC_AUTH_FOR_TESTING': False,
+
+    # Prevent auto auth from creating superusers or modifying existing users
+    'RESTRICT_AUTOMATIC_AUTH': True,
 
     # Toggle the availability of the shopping cart page
     'ENABLE_SHOPPING_CART': False,
@@ -200,20 +206,11 @@ FEATURES = {
     # Automatically approve student identity verification attempts
     'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': False,
 
-    # Disable instructor dash buttons for downloading course data
-    # when enrollment exceeds this number
-    'MAX_ENROLLMENT_INSTR_BUTTONS': 200,
-
-    # Grade calculation started from the instructor dashboard will write grades
-    # CSV files to the configured storage backend and give links for downloads.
-    'ENABLE_GRADE_DOWNLOADS': False,
+    # Maximum number of rows to include in the csv file for downloading problem responses.
+    'MAX_PROBLEM_RESPONSES_COUNT': 5000,
 
     # whether to use password policy enforcement or not
     'ENFORCE_PASSWORD_POLICY': True,
-
-    # Give course staff unrestricted access to grade downloads (if set to False,
-    # only edX superusers can perform the downloads)
-    'ALLOW_COURSE_STAFF_GRADE_DOWNLOADS': False,
 
     'ENABLED_PAYMENT_REPORTS': [
         "refund_report",
@@ -274,14 +271,6 @@ FEATURES = {
     # Enable organizational email opt-in
     'ENABLE_MKTG_EMAIL_OPT_IN': False,
 
-    # Show a section in the membership tab of the instructor dashboard
-    # to allow an upload of a CSV file that contains a list of new accounts to create
-    # and register for course.
-    'ALLOW_AUTOMATED_SIGNUPS': False,
-
-    # Enable display of enrollment counts in instructor dash, analytics section
-    'DISPLAY_ANALYTICS_ENROLLMENTS': True,
-
     # Show the mobile app links in the footer
     'ENABLE_FOOTER_MOBILE_APP_LINKS': False,
 
@@ -324,9 +313,6 @@ FEATURES = {
 
     # Certificates Web/HTML Views
     'CERTIFICATES_HTML_VIEW': False,
-
-    # Batch-Generated Certificates from Instructor Dashboard
-    'CERTIFICATES_INSTRUCTOR_GENERATION': False,
 
     # Course discovery feature
     'ENABLE_COURSE_DISCOVERY': False,
@@ -378,11 +364,6 @@ FEATURES = {
     # making multiple queries.
     'ENABLE_READING_FROM_MULTIPLE_HISTORY_TABLES': True,
 
-    # Display the 'Analytics' tab in the instructor dashboard for CCX courses.
-    # Note: This has no effect unless ANALYTICS_DASHBOARD_URL is already set,
-    #       because without that setting, the tab does not show up for any courses.
-    'ENABLE_CCX_ANALYTICS_DASHBOARD_URL': False,
-
     # Set this to False to facilitate cleaning up invalid xml from your modulestore.
     'ENABLE_XBLOCK_XML_VALIDATION': True,
 
@@ -400,15 +381,8 @@ FEATURES = {
     # See LEARNER-493
     'ENABLE_ONE_CLICK_PROGRAM_PURCHASE': False,
 
-    # Whether to display account activation notification on dashboard.
-    'DISPLAY_ACCOUNT_ACTIVATION_MESSAGE_ON_SIDEBAR': False,
-
     # Allow users to change their email address.
     'ALLOW_EMAIL_ADDRESS_CHANGE': True,
-
-    # Whether to check the "Notify users by email" checkbox in the batch enrollment form
-    # in the instructor dashboard.
-    'BATCH_ENROLLMENT_NOTIFY_USERS_DEFAULT': True,
 
     # Whether the bulk enrollment view is enabled.
     'ENABLE_BULK_ENROLLMENT_VIEW': False,
@@ -425,8 +399,15 @@ FEATURES = {
     # Whether to send an email for failed password reset attempts or not. This is mainly useful for notifying users
     # that they don't have an account associated with email addresses they believe they've registered with.
     'ENABLE_PASSWORD_RESET_FAILURE_EMAIL': False,
-    # Whether filter and show courses that are the same as the user language
-    'ENABLE_FILTER_COURSES_BY_USER_LANG': False
+
+    # Set this to true to make API docs available at /api-docs/.
+    'ENABLE_API_DOCS': False,
+
+    # Whether to display the account deletion section the account settings page
+    'ENABLE_ACCOUNT_DELETION': True,
+    
+     # Whether filter and show courses that are the same as the user language
+    'ENABLE_FILTER_COURSES_BY_USER_LANG': False,
 }
 
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews
@@ -478,7 +459,6 @@ system_node_path = os.environ.get("NODE_PATH", NODE_MODULES_ROOT)
 
 node_paths = [
     COMMON_ROOT / "static/js/vendor",
-    COMMON_ROOT / "static/coffee/src",
     system_node_path,
 ]
 NODE_PATH = ':'.join(node_paths)
@@ -826,6 +806,7 @@ TRACKING_SEGMENTIO_SOURCE_MAP = {
 
 ######################## GOOGLE ANALYTICS ###########################
 GOOGLE_ANALYTICS_ACCOUNT = None
+GOOGLE_SITE_VERIFICATION_ID = None
 GOOGLE_ANALYTICS_LINKEDIN = 'GOOGLE_ANALYTICS_LINKEDIN_DUMMY'
 
 ######################## BRANCH.IO ###########################
@@ -836,7 +817,6 @@ OPTIMIZELY_PROJECT_ID = None
 
 ######################## subdomain specific settings ###########################
 COURSE_LISTINGS = {}
-VIRTUAL_UNIVERSITIES = []
 
 ############# XBlock Configuration ##########
 
@@ -1193,10 +1173,6 @@ EDXNOTES_READ_TIMEOUT = 1.5  # time in seconds
 # if parental consent is never required.
 PARENTAL_CONSENT_AGE_LIMIT = 13
 
-################################# Jasmine ##################################
-JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
-
-
 ######################### Branded Footer ###################################
 # Constants for the footer used on the site and shared with other sites
 # (such as marketing and the blog) via the branding API.
@@ -1310,8 +1286,6 @@ MIDDLEWARE_CLASSES = [
     # Must be after DarkLangMiddleware.
     'django.middleware.locale.LocaleMiddleware',
 
-    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
-
     'django_comment_client.utils.ViewNameMiddleware',
     'codejail.django_integration.ConfigureCodeJailMiddleware',
 
@@ -1325,6 +1299,7 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     # to redirected unenrolled students to the course info page
+    'courseware.middleware.CacheCourseIdMiddleware',
     'courseware.middleware.RedirectMiddleware',
 
     'course_wiki.middleware.WikiAccessMiddleware',
@@ -1332,6 +1307,9 @@ MIDDLEWARE_CLASSES = [
     'openedx.core.djangoapps.theming.middleware.CurrentSiteThemeMiddleware',
 
     'waffle.middleware.WaffleMiddleware',
+
+    # Inserts Enterprise content.
+    'openedx.features.enterprise_support.middleware.EnterpriseMiddleware',
 
     # This must be last
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
@@ -1370,14 +1348,13 @@ PIPELINE_UGLIFYJS_BINARY = 'node_modules/.bin/uglifyjs'
 
 from openedx.core.lib.rooted_paths import rooted_glob
 
-courseware_js = (
-    [
-        'coffee/src/' + pth + '.js'
-        for pth in ['courseware', 'histogram', 'navigation']
-    ] +
-    ['js/' + pth + '.js' for pth in ['ajax-error']] +
-    sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/modules/**/*.js'))
-)
+courseware_js = [
+    'js/ajax-error.js',
+    'js/courseware.js',
+    'js/histogram.js',
+    'js/navigation.js',
+    'js/modules/tab.js',
+]
 
 proctoring_js = (
     [
@@ -1458,9 +1435,9 @@ dashboard_js = (
 )
 discussion_js = (
     rooted_glob(COMMON_ROOT / 'static', 'common/js/discussion/mathjax_include.js') +
-    rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/customwmd.js') +
-    rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/mathjax_accessible.js') +
-    rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/mathjax_delay_renderer.js') +
+    rooted_glob(PROJECT_ROOT / 'static', 'js/customwmd.js') +
+    rooted_glob(PROJECT_ROOT / 'static', 'js/mathjax_accessible.js') +
+    rooted_glob(PROJECT_ROOT / 'static', 'js/mathjax_delay_renderer.js') +
     sorted(rooted_glob(COMMON_ROOT / 'static', 'common/js/discussion/**/*.js'))
 )
 
@@ -1475,7 +1452,7 @@ discussion_vendor_js = [
     'js/split.js'
 ]
 
-notes_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/notes/**/*.js'))
+notes_js = ['js/notes.js']
 instructor_dash_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/instructor_dashboard/**/*.js'))
 
 verify_student_js = [
@@ -1712,15 +1689,21 @@ PIPELINE_CSS = {
     },
 }
 
-
-separately_bundled_js = set(courseware_js + discussion_js + notes_js + instructor_dash_js)
-common_js = sorted(set(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.js')) - separately_bundled_js)
+common_js = [
+    'js/src/ajax_prefix.js',
+    'js/src/jquery.immediateDescendents.js',
+    'js/src/xproblem.js',
+]
 xblock_runtime_js = [
     'common/js/xblock/core.js',
     'common/js/xblock/runtime.v1.js',
     'lms/js/xblock/lms.runtime.v1.js',
 ]
-lms_application_js = sorted(set(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.js')) - separately_bundled_js)
+lms_application_js = [
+    'js/calculator.js',
+    'js/feedback_form.js',
+    'js/main.js',
+]
 
 PIPELINE_JS = {
     'base_application': {
@@ -1826,10 +1809,6 @@ STATICFILES_IGNORE_PATTERNS = (
     "sass/*/*.scss",
     "sass/*/*/*.scss",
     "sass/*/*/*/*.scss",
-    "coffee/*.coffee",
-    "coffee/*/*.coffee",
-    "coffee/*/*/*.coffee",
-    "coffee/*/*/*/*.coffee",
 
     # Ignore tests
     "spec",
@@ -1975,10 +1954,8 @@ BLOCK_STRUCTURES_SETTINGS = dict(
     # Maximum number of retries per task.
     TASK_MAX_RETRIES=5,
 
-    # Backend storage
-    # STORAGE_CLASS='storages.backends.s3boto.S3BotoStorage',
-    # STORAGE_KWARGS=dict(bucket='nim-beryl-test'),
-    # DIRECTORY_PREFIX='/modeltest/',
+    # Backend storage options
+    PRUNING_ACTIVE=False,
 )
 
 ################################ Bulk Email ###################################
@@ -2127,7 +2104,6 @@ INSTALLED_APPS = [
     'util',
     'lms.djangoapps.certificates.apps.CertificatesConfig',
     'dashboard',
-    'lms.djangoapps.instructor.apps.InstructorConfig',
     'lms.djangoapps.instructor_task',
     'openedx.core.djangoapps.course_groups',
     'bulk_email',
@@ -2260,9 +2236,6 @@ INSTALLED_APPS = [
     # Coursegraph
     'openedx.core.djangoapps.coursegraph.apps.CoursegraphConfig',
 
-    # Old course structure API
-    'course_structure_api',
-
     # Mailchimp Syncing
     'mailing',
 
@@ -2290,9 +2263,6 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.self_paced',
 
     'sorl.thumbnail',
-
-    # Credentials support
-    'openedx.core.djangoapps.credentials',
 
     # edx-milestones service
     'milestones',
@@ -2352,6 +2322,9 @@ INSTALLED_APPS = [
 
     # DRF filters
     'django_filters',
+
+    # API Documentation
+    'rest_framework_swagger',
 ]
 
 ######################### CSRF #########################################
@@ -2405,6 +2378,7 @@ MKTG_URL_LINK_MAP = {
 STATIC_TEMPLATE_VIEW_DEFAULT_FILE_EXTENSION = 'html'
 
 SUPPORT_SITE_LINK = ''
+ID_VERIFICATION_SUPPORT_LINK = ''
 PASSWORD_RESET_SUPPORT_LINK = ''
 ACTIVATION_EMAIL_SUPPORT_LINK = ''
 
@@ -2659,6 +2633,10 @@ FINANCIAL_REPORTS = {
     'CUSTOM_DOMAIN': 'edx-financial-reports.s3.amazonaws.com',
     'ROOT_PATH': '/tmp/edx-s3/financial_reports',
 }
+
+#### Grading policy change-related settings #####
+# Rate limit for regrading tasks that a grading policy change can kick off
+POLICY_CHANGE_TASK_RATE_LIMIT = '300/h'
 
 #### PASSWORD POLICY SETTINGS #####
 PASSWORD_MIN_LENGTH = 8
@@ -2968,10 +2946,6 @@ ADVANCED_SECURITY_CONFIG = {}
 ### External auth usage -- prefixes for ENROLLMENT_DOMAIN
 SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
 OPENID_DOMAIN_PREFIX = 'openid:'
-
-### Analytics Dashboard (Insights) settings
-ANALYTICS_DASHBOARD_URL = ""
-ANALYTICS_DASHBOARD_NAME = _('Your Platform Insights')
 
 ### Analytics API
 ANALYTICS_API_KEY = ""
@@ -3389,11 +3363,11 @@ ENTERPRISE_CUSTOMER_LOGO_IMAGE_SIZE = 512   # Enterprise logo image size limit i
 
 ENTERPRISE_PLATFORM_WELCOME_TEMPLATE = _(u'Welcome to {platform_name}.')
 ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE = _(
-    u'{start_bold}{enterprise_name}{end_bold} has partnered with {start_bold}'
-    '{platform_name}{end_bold} to  offer you always available, high-quality learning '
-    'programs to help you advance your knowledge and your career. '
-    '{line_break}Please continue with registration, or log in if you are an existing user, '
-    'and press continue to start learning.'
+    'You have left the {start_bold}{enterprise_name}{end_bold} website and are now on the {platform_name} site. '
+    '{enterprise_name} has partnered with {platform_name} to offer you high-quality, always available learning '
+    'programs to help you advance your knowledge and career. '
+    '{line_break}Please note that {platform_name} has a different {privacy_policy_link_start}Privacy Policy'
+    '{privacy_policy_link_end} from {enterprise_name}.'
 )
 ENTERPRISE_TAGLINE = ''
 ENTERPRISE_EXCLUDED_REGISTRATION_FIELDS = {
@@ -3439,15 +3413,67 @@ EDX_PLATFORM_REVISION = 'unknown'
 # Once a user has watched this percentage of a video, mark it as complete:
 # (0.0 = 0%, 1.0 = 100%)
 COMPLETION_VIDEO_COMPLETE_PERCENTAGE = 0.95
+COMPLETION_BY_VIEWING_DELAY_MS = 5000
 
 ############### Settings for Django Rate limit #####################
 RATELIMIT_ENABLE = True
 RATELIMIT_RATE = '120/m'
 
+############### Settings for Retirement #####################
+RETIRED_USERNAME_PREFIX = 'retired__user_'
+RETIRED_EMAIL_PREFIX = 'retired__user_'
+RETIRED_EMAIL_DOMAIN = 'retired.invalid'
+RETIRED_USERNAME_FMT = lambda settings: settings.RETIRED_USERNAME_PREFIX + '{}'
+RETIRED_EMAIL_FMT = lambda settings: settings.RETIRED_EMAIL_PREFIX + '{}@' + settings.RETIRED_EMAIL_DOMAIN
+derived('RETIRED_USERNAME_FMT', 'RETIRED_EMAIL_FMT')
+RETIRED_USER_SALTS = ['abc', '123']
+RETIREMENT_SERVICE_WORKER_USERNAME = 'RETIREMENT_SERVICE_USER'
+
+# These states are the default, but are designed to be overridden in configuration.
+RETIREMENT_STATES = [
+    'PENDING',
+
+    'LOCKING_ACCOUNT',
+    'LOCKING_COMPLETE',
+
+    'RETIRING_CREDENTIALS',
+    'CREDENTIALS_COMPLETE',
+
+    'RETIRING_ECOM',
+    'ECOM_COMPLETE',
+
+    'RETIRING_FORUMS',
+    'FORUMS_COMPLETE',
+
+    'RETIRING_EMAIL_LISTS',
+    'EMAIL_LISTS_COMPLETE',
+
+    'RETIRING_ENROLLMENTS',
+    'ENROLLMENTS_COMPLETE',
+
+    'RETIRING_NOTES',
+    'NOTES_COMPLETE',
+
+    'NOTIFYING_PARTNERS',
+    'PARTNERS_NOTIFIED',
+
+    'RETIRING_LMS',
+    'LMS_COMPLETE',
+
+    'ERRORED',
+    'ABORTED',
+    'COMPLETE',
+]
+
 ############### Settings for django-fernet-fields ##################
 FERNET_KEYS = [
     'DUMMY KEY CHANGE BEFORE GOING TO PRODUCTION',
 ]
+
+############### Settings for user-state-client ##################
+# Maximum number of rows to fetch in XBlockUserStateClient calls. Adjust for performance
+USER_STATE_BATCH_SIZE = 5000
+
 
 ############## Plugin Django Apps #########################
 

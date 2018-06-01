@@ -32,6 +32,8 @@ class BlockRecordListTestCase(TestCase):
     """
     Verify the behavior of BlockRecordList, particularly around edge cases
     """
+    shard = 4
+
     def setUp(self):
         super(BlockRecordListTestCase, self).setUp()
         self.course_key = CourseLocator(
@@ -88,6 +90,8 @@ class BlockRecordTest(GradesModelTestCase):
     """
     Test the BlockRecord model.
     """
+    shard = 4
+
     def test_creation(self):
         """
         Tests creation of a BlockRecord.
@@ -126,11 +130,18 @@ class VisibleBlocksTest(GradesModelTestCase):
     """
     Test the VisibleBlocks model.
     """
-    def _create_block_record_list(self, blocks):
+    shard = 4
+
+    def setUp(self):
+        super(VisibleBlocksTest, self).setUp()
+        self.user_id = 12345
+
+    def _create_block_record_list(self, blocks, user_id=None):
         """
         Creates and returns a BlockRecordList for the given blocks.
         """
-        return VisibleBlocks.cached_get_or_create(BlockRecordList.from_list(blocks, self.course_key))
+        block_record_list = BlockRecordList.from_list(blocks, self.course_key)
+        return VisibleBlocks.cached_get_or_create(user_id or self.user_id, block_record_list)
 
     def test_creation(self):
         """
@@ -193,6 +204,8 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
     """
     Test the PersistentSubsectionGrade model.
     """
+    shard = 4
+
     def setUp(self):
         super(PersistentSubsectionGradeTest, self).setUp()
         self.usage_key = BlockUsageLocator(
@@ -324,6 +337,8 @@ class PersistentCourseGradesTest(GradesModelTestCase):
     """
     Tests the PersistentCourseGrade model.
     """
+    shard = 4
+
     def setUp(self):
         super(PersistentCourseGradesTest, self).setUp()
         self.params = {

@@ -152,6 +152,8 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
             'overlimit' (set) of dropped (block_type, block_id) tuples that were previously selected
             'added' (set) of newly added (block_type, block_id) tuples
         """
+        rand = random.Random()
+
         selected = set(tuple(k) for k in selected)  # set of (block_type, block_id) tuples assigned to this student
 
         # Determine which of our children we will show:
@@ -164,8 +166,10 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
 
         # If max_count has been decreased, we may have to drop some previously selected blocks:
         overlimit_block_keys = set()
-        while len(selected) > max_count:
-            overlimit_block_keys.add(selected.pop())
+        if len(selected) > max_count:
+            num_to_remove = len(selected) - max_count
+            overlimit_block_keys = set(rand.sample(selected, num_to_remove))
+            selected -= overlimit_block_keys
 
         # Do we have enough blocks now?
         num_to_add = max_count - len(selected)
@@ -176,7 +180,6 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
             pool = valid_block_keys - selected
             if mode == "random":
                 num_to_add = min(len(pool), num_to_add)
-                rand = random.Random()
                 added_block_keys = set(rand.sample(pool, num_to_add))
                 # We now have the correct n random children to show for this user.
             else:
@@ -349,6 +352,7 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
             'xblock_context': context,
             'show_bookmark_button': False,
             'watched_completable_blocks': set(),
+            'completion_delay_ms': None,
         }))
         return fragment
 
@@ -405,7 +409,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
 
     module_class = LibraryContentModule
     mako_template = 'widgets/metadata-edit.html'
-    js = {'coffee': [resource_string(__name__, 'js/src/vertical/edit.coffee')]}
+    js = {'js': [resource_string(__name__, 'js/src/vertical/edit.js')]}
     js_module_name = "VerticalDescriptor"
 
     show_in_read_only_mode = True

@@ -28,7 +28,7 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
 
         ClientFactory(name=CredentialsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
 
-        self.create_credentials_config()
+        self.credentials_config = self.create_credentials_config(cache_ttl=1)
         self.user = UserFactory()
 
     def test_get_many(self, mock_get_edx_api_data):
@@ -45,7 +45,9 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
             'username': self.user.username,
             'status': 'awarded',
         }
+        cache_key = '{}.{}'.format(self.credentials_config.CACHE_KEY, self.user.username)
         self.assertEqual(kwargs['querystring'], querystring)
+        self.assertEqual(kwargs['cache_key'], cache_key)
 
         self.assertEqual(actual, expected)
 
@@ -65,6 +67,22 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
             'status': 'awarded',
             'program_uuid': program_uuid,
         }
+        cache_key = '{}.{}.{}'.format(self.credentials_config.CACHE_KEY, self.user.username, program_uuid)
         self.assertEqual(kwargs['querystring'], querystring)
+        self.assertEqual(kwargs['cache_key'], cache_key)
 
         self.assertEqual(actual, expected)
+
+    def test_type_filter(self, mock_get_edx_api_data):
+        get_credentials(self.user, credential_type='program')
+
+        mock_get_edx_api_data.assert_called_once()
+        call = mock_get_edx_api_data.mock_calls[0]
+        __, __, kwargs = call
+
+        querystring = {
+            'username': self.user.username,
+            'status': 'awarded',
+            'type': 'program',
+        }
+        self.assertEqual(kwargs['querystring'], querystring)

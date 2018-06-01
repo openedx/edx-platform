@@ -18,6 +18,8 @@ class MongoUtilsTests(TestCase):
     """
     Tests for methods exposed in mongo_utils
     """
+    shard = 1
+
     @ddt.data(
         ('PRIMARY', 'primary', ReadPreference.PRIMARY),
         ('SECONDARY_PREFERRED', 'secondaryPreferred', ReadPreference.SECONDARY_PREFERRED),

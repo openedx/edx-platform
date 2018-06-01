@@ -6,10 +6,10 @@ import os
 import re
 import textwrap
 
+from xsslint import visitors
 from xsslint.reporting import ExpressionRuleViolation, FileResults, RuleViolation
-from xsslint.rules import Rules
+from xsslint.rules import RuleSet
 from xsslint.utils import Expression, ParseString, StringLines, is_skip_dir
-from xsslint.visitors import AllNodeVisitor, HtmlStringVisitor, OuterFormatVisitor
 
 
 class BaseLinter(object):
@@ -194,6 +194,11 @@ class UnderscoreTemplateLinter(BaseLinter):
     """
     The linter for Underscore.js template files.
     """
+
+    ruleset = RuleSet(
+        underscore_not_escaped='underscore-not-escaped',
+    )
+
     def __init__(self, skip_dirs=None):
         """
         Init method.
@@ -250,7 +255,7 @@ class UnderscoreTemplateLinter(BaseLinter):
         for expression in expressions:
             if not self._is_safe_unescaped_expression(expression):
                 results.violations.append(ExpressionRuleViolation(
-                    Rules.underscore_not_escaped, expression
+                    self.ruleset.underscore_not_escaped, expression
                 ))
 
     def _is_safe_unescaped_expression(self, expression):
@@ -304,19 +309,30 @@ class UnderscoreTemplateLinter(BaseLinter):
 
 class JavaScriptLinter(BaseLinter):
     """
-    The linter for JavaScript and CoffeeScript files.
+    The linter for JavaScript files.
     """
 
     LINE_COMMENT_DELIM = "//"
 
-    def __init__(self, underscore_linter, javascript_skip_dirs=None, coffeescript_skip_dirs=None):
+    ruleset = RuleSet(
+        javascript_jquery_append='javascript-jquery-append',
+        javascript_jquery_prepend='javascript-jquery-prepend',
+        javascript_jquery_insertion='javascript-jquery-insertion',
+        javascript_jquery_insert_into_target='javascript-jquery-insert-into-target',
+        javascript_jquery_html='javascript-jquery-html',
+        javascript_concat_html='javascript-concat-html',
+        javascript_escape='javascript-escape',
+        javascript_interpolate='javascript-interpolate',
+    )
+
+    def __init__(self, underscore_linter, javascript_skip_dirs=None):
         """
         Init method.
         """
         super(JavaScriptLinter, self).__init__()
         self.underscore_linter = underscore_linter
+        self.ruleset = self.ruleset + self.underscore_linter.ruleset
         self._skip_javascript_dirs = javascript_skip_dirs or ()
-        self._skip_coffeescript_dirs = coffeescript_skip_dirs or ()
 
     def process_file(self, directory, file_name):
         """
@@ -339,8 +355,6 @@ class JavaScriptLinter(BaseLinter):
 
         if file_name.lower().endswith('.js') and not file_name.lower().endswith('.min.js'):
             skip_dirs = self._skip_javascript_dirs
-        elif file_name.lower().endswith('.coffee'):
-            skip_dirs = self._skip_coffeescript_dirs
         else:
             return results
 
@@ -361,28 +375,28 @@ class JavaScriptLinter(BaseLinter):
         no_caller_check = None
         no_argument_check = None
         self._check_jquery_function(
-            file_contents, "append", Rules.javascript_jquery_append, no_caller_check,
+            file_contents, "append", self.ruleset.javascript_jquery_append, no_caller_check,
             self._is_jquery_argument_safe, results
         )
         self._check_jquery_function(
-            file_contents, "prepend", Rules.javascript_jquery_prepend, no_caller_check,
+            file_contents, "prepend", self.ruleset.javascript_jquery_prepend, no_caller_check,
             self._is_jquery_argument_safe, results
         )
         self._check_jquery_function(
             file_contents, "unwrap|wrap|wrapAll|wrapInner|after|before|replaceAll|replaceWith",
-            Rules.javascript_jquery_insertion, no_caller_check, self._is_jquery_argument_safe, results
+            self.ruleset.javascript_jquery_insertion, no_caller_check, self._is_jquery_argument_safe, results
         )
         self._check_jquery_function(
             file_contents, "appendTo|prependTo|insertAfter|insertBefore",
-            Rules.javascript_jquery_insert_into_target, self._is_jquery_insert_caller_safe, no_argument_check, results
+            self.ruleset.javascript_jquery_insert_into_target, self._is_jquery_insert_caller_safe, no_argument_check, results
         )
         self._check_jquery_function(
-            file_contents, "html", Rules.javascript_jquery_html, no_caller_check,
+            file_contents, "html", self.ruleset.javascript_jquery_html, no_caller_check,
             self._is_jquery_html_argument_safe, results
         )
         self._check_javascript_interpolate(file_contents, results)
         self._check_javascript_escape(file_contents, results)
-        self._check_concat_with_html(file_contents, Rules.javascript_concat_html, results)
+        self._check_concat_with_html(file_contents, self.ruleset.javascript_concat_html, results)
         self.underscore_linter.check_underscore_file_is_safe(file_contents, results)
         results.prepare_results(file_contents, line_comment_delim=self.LINE_COMMENT_DELIM)
 
@@ -430,7 +444,7 @@ class JavaScriptLinter(BaseLinter):
         regex = re.compile(r"(?<!StringUtils).interpolate\(")
         for function_match in regex.finditer(file_contents):
             expression = self._get_expression_for_function(file_contents, function_match)
-            results.violations.append(ExpressionRuleViolation(Rules.javascript_interpolate, expression))
+            results.violations.append(ExpressionRuleViolation(self.ruleset.javascript_interpolate, expression))
 
     def _check_javascript_escape(self, file_contents, results):
         """
@@ -447,7 +461,7 @@ class JavaScriptLinter(BaseLinter):
         regex = regex = re.compile(r"(?<!_).escape\(")
         for function_match in regex.finditer(file_contents):
             expression = self._get_expression_for_function(file_contents, function_match)
-            results.violations.append(ExpressionRuleViolation(Rules.javascript_escape, expression))
+            results.violations.append(ExpressionRuleViolation(self.ruleset.javascript_escape, expression))
 
     def _check_jquery_function(self, file_contents, function_names, rule, is_caller_safe, is_argument_safe, results):
         """
@@ -459,7 +473,7 @@ class JavaScriptLinter(BaseLinter):
             function_names: A pipe delimited list of names of the functions
                 (e.g. "wrap|after|before").
             rule: The name of the rule to use for validation errors (e.g.
-                Rules.javascript_jquery_append).
+                self.ruleset.javascript_jquery_append).
             is_caller_safe: A function to test if caller of the JQuery function
                 is safe.
             is_argument_safe: A function to test if the argument passed to the
@@ -697,6 +711,14 @@ class PythonLinter(BaseLinter):
 
     LINE_COMMENT_DELIM = "#"
 
+    ruleset = RuleSet(
+        python_parse_error='python-parse-error',
+        python_custom_escape='python-custom-escape',
+
+        # The Visitor classes are python-specific and should be moved into the PythonLinter once they have
+        # been decoupled from the MakoTemplateLinter.
+    ) + visitors.ruleset
+
     def __init__(self, skip_dirs=None):
         """
         Init method.
@@ -756,7 +778,7 @@ class PythonLinter(BaseLinter):
         # different assumptions.
         if root_node is not None:
             # check format() rules that can be run on outer-most format() calls
-            visitor = OuterFormatVisitor(file_contents, results)
+            visitor = visitors.OuterFormatVisitor(file_contents, results)
             visitor.visit(root_node)
         results.prepare_results(file_contents, line_comment_delim=self.LINE_COMMENT_DELIM)
 
@@ -773,7 +795,7 @@ class PythonLinter(BaseLinter):
         """
         if root_node is not None:
             # check illegal concatenation and interpolation
-            visitor = AllNodeVisitor(python_code, results)
+            visitor = visitors.AllNodeVisitor(python_code, results)
             visitor.visit(root_node)
         # check rules parse with regex
         self._check_custom_escape(python_code, results)
@@ -801,7 +823,7 @@ class PythonLinter(BaseLinter):
                 line_start_index = lines.line_number_to_start_index(e.lineno)
                 expression = Expression(line_start_index + e.offset)
             results.violations.append(ExpressionRuleViolation(
-                Rules.python_parse_error, expression
+                self.ruleset.python_parse_error, expression
             ))
             return None
 
@@ -846,7 +868,7 @@ class PythonLinter(BaseLinter):
         for match in re.finditer("(<.*&lt;|&lt;.*<)", file_contents):
             expression = Expression(match.start(), match.end())
             results.violations.append(ExpressionRuleViolation(
-                Rules.python_custom_escape, expression
+                self.ruleset.python_custom_escape, expression
             ))
 
 
@@ -856,6 +878,25 @@ class MakoTemplateLinter(BaseLinter):
     """
     LINE_COMMENT_DELIM = "##"
 
+    ruleset = RuleSet(
+        mako_missing_default='mako-missing-default',
+        mako_multiple_page_tags='mako-multiple-page-tags',
+        mako_unparseable_expression='mako-unparseable-expression',
+        mako_unwanted_html_filter='mako-unwanted-html-filter',
+        mako_invalid_html_filter='mako-invalid-html-filter',
+        mako_invalid_js_filter='mako-invalid-js-filter',
+        mako_js_missing_quotes='mako-js-missing-quotes',
+        mako_js_html_string='mako-js-html-string',
+        mako_html_entities='mako-html-entities',
+        mako_unknown_context='mako-unknown-context',
+
+        # NOTE The MakoTemplateLinter directly checks for python_wrap_html and directly
+        # instantiates Visitor instances to check for python issues. This logic should
+        # be moved into the PythonLinter. The MakoTemplateLinter should only check for
+        # Mako-specific issues.
+        python_wrap_html='python-wrap-html',
+    ) + visitors.ruleset
+
     def __init__(self, javascript_linter, python_linter, skip_dirs=None):
         """
         Init method.
@@ -863,6 +904,7 @@ class MakoTemplateLinter(BaseLinter):
         super(MakoTemplateLinter, self).__init__()
         self.javascript_linter = javascript_linter
         self.python_linter = python_linter
+        self.ruleset = self.ruleset + self.javascript_linter.ruleset + self.python_linter.ruleset
         self._skip_mako_dirs = skip_dirs or ()
 
     def process_file(self, directory, file_name):
@@ -986,18 +1028,18 @@ class MakoTemplateLinter(BaseLinter):
         page_tag_count = self._get_page_tag_count(mako_template)
         # check if there are too many page expressions
         if 2 <= page_tag_count:
-            results.violations.append(RuleViolation(Rules.mako_multiple_page_tags))
+            results.violations.append(RuleViolation(self.ruleset.mako_multiple_page_tags))
             return False
         # make sure there is exactly 1 page expression, excluding commented out
         # page expressions, before proceeding
         elif page_tag_count != 1:
-            results.violations.append(RuleViolation(Rules.mako_missing_default))
+            results.violations.append(RuleViolation(self.ruleset.mako_missing_default))
             return False
         # check that safe by default (h filter) is turned on
         page_h_filter_regex = re.compile('<%page[^>]*expression_filter=(?:"h"|\'h\')[^>]*/>')
         page_match = page_h_filter_regex.search(mako_template)
         if not page_match:
-            results.violations.append(RuleViolation(Rules.mako_missing_default))
+            results.violations.append(RuleViolation(self.ruleset.mako_missing_default))
         return page_match
 
     def _check_mako_expressions(self, mako_template, has_page_default, results):
@@ -1019,7 +1061,7 @@ class MakoTemplateLinter(BaseLinter):
         for expression in expressions:
             if expression.end_index is None:
                 results.violations.append(ExpressionRuleViolation(
-                    Rules.mako_unparseable_expression, expression
+                    self.ruleset.mako_unparseable_expression, expression
                 ))
                 continue
 
@@ -1128,16 +1170,16 @@ class MakoTemplateLinter(BaseLinter):
         self.python_linter.check_python_code_is_safe(python_code, root_node, python_results)
         # Check mako expression specific Python rules.
         if root_node is not None:
-            visitor = HtmlStringVisitor(python_code, python_results, True)
+            visitor = visitors.HtmlStringVisitor(python_code, python_results, True)
             visitor.visit(root_node)
             for unsafe_html_string_node in visitor.unsafe_html_string_nodes:
                 python_results.violations.append(ExpressionRuleViolation(
-                    Rules.python_wrap_html, visitor.node_to_expression(unsafe_html_string_node)
+                    self.ruleset.python_wrap_html, visitor.node_to_expression(unsafe_html_string_node)
                 ))
             if has_page_default:
                 for over_escaped_entity_string_node in visitor.over_escaped_entity_string_nodes:
                     python_results.violations.append(ExpressionRuleViolation(
-                        Rules.mako_html_entities, visitor.node_to_expression(over_escaped_entity_string_node)
+                        self.ruleset.mako_html_entities, visitor.node_to_expression(over_escaped_entity_string_node)
                     ))
         python_results.prepare_results(python_code, line_comment_delim=self.LINE_COMMENT_DELIM)
         self._shift_and_add_violations(python_results, start_offset, results)
@@ -1183,7 +1225,7 @@ class MakoTemplateLinter(BaseLinter):
         """
         if context == 'unknown':
             results.violations.append(ExpressionRuleViolation(
-                Rules.mako_unknown_context, expression
+                self.ruleset.mako_unknown_context, expression
             ))
             return
 
@@ -1202,7 +1244,7 @@ class MakoTemplateLinter(BaseLinter):
         if filters_match is None:
             if context == 'javascript':
                 results.violations.append(ExpressionRuleViolation(
-                    Rules.mako_invalid_js_filter, expression
+                    self.ruleset.mako_invalid_js_filter, expression
                 ))
             return
         filters = filters_match.group(1).replace(" ", "").split(",")
@@ -1215,14 +1257,14 @@ class MakoTemplateLinter(BaseLinter):
                     # suppress this violation if the page default hasn't been set,
                     # otherwise the template might get less safe
                     results.violations.append(ExpressionRuleViolation(
-                        Rules.mako_unwanted_html_filter, expression
+                        self.ruleset.mako_unwanted_html_filter, expression
                     ))
             elif filters == ['n', 'strip_all_tags_but_br']:
                 # {x | n,  strip_all_tags_but_br} is valid in html context
                 pass
             else:
                 results.violations.append(ExpressionRuleViolation(
-                    Rules.mako_invalid_html_filter, expression
+                    self.ruleset.mako_invalid_html_filter, expression
                 ))
         elif context == 'javascript':
             self._check_js_expression_not_with_html(mako_template, expression, results)
@@ -1234,7 +1276,7 @@ class MakoTemplateLinter(BaseLinter):
                 self._check_js_string_expression_in_quotes(mako_template, expression, results)
             else:
                 results.violations.append(ExpressionRuleViolation(
-                    Rules.mako_invalid_js_filter, expression
+                    self.ruleset.mako_invalid_js_filter, expression
                 ))
 
     def _check_js_string_expression_in_quotes(self, mako_template, expression, results):
@@ -1250,7 +1292,7 @@ class MakoTemplateLinter(BaseLinter):
         parse_string = self._find_string_wrapping_expression(mako_template, expression)
         if parse_string is None:
             results.violations.append(ExpressionRuleViolation(
-                Rules.mako_js_missing_quotes, expression
+                self.ruleset.mako_js_missing_quotes, expression
             ))
 
     def _check_js_expression_not_with_html(self, mako_template, expression, results):
@@ -1266,7 +1308,7 @@ class MakoTemplateLinter(BaseLinter):
         parse_string = self._find_string_wrapping_expression(mako_template, expression)
         if parse_string is not None and re.search('[<>]', parse_string.string) is not None:
             results.violations.append(ExpressionRuleViolation(
-                Rules.mako_js_html_string, expression
+                self.ruleset.mako_js_html_string, expression
             ))
 
     def _find_string_wrapping_expression(self, mako_template, expression):

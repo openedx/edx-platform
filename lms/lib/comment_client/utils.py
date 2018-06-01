@@ -30,10 +30,6 @@ def extract(dic, keys):
         return strip_none({k: dic.get(k) for k in keys})
 
 
-def merge_dict(dic1, dic2):
-    return dict(dic1.items() + dic2.items())
-
-
 @contextmanager
 def request_timer(request_id, method, url, tags=None):
     start = time()
@@ -83,7 +79,8 @@ def perform_request(method, url, data_or_params=None, raw=False,
         params = request_id_dict
     else:
         data = None
-        params = merge_dict(data_or_params, request_id_dict)
+        params = data_or_params.copy()
+        params.update(request_id_dict)
     with request_timer(request_id, method, url, metric_tags):
         response = requests.request(
             method,

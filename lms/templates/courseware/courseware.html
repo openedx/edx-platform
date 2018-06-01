@@ -94,7 +94,7 @@ from openedx.features.course_experience import course_home_page_title, COURSE_OU
     var $$course_id = "${course.id | n, js_escaped_string}";
   </script>
 
-  % if not request.user.is_authenticated():
+  % if not request.user.is_authenticated:
       <script type="text/javascript">
         // Disable discussions
         $('.xblock-student_view-discussion button.discussion-show').attr('disabled', true);
@@ -176,7 +176,7 @@ ${HTML(fragment.foot_html())}
                                 <span class="icon fa fa-angle-right" aria-hidden="true"></span>
                             % endif
                             % if chapter:
-                                <span class="nav-item nav-item-chapter">
+                                <span class="nav-item nav-item-chapter" data-course-position="${course.position}" data-chapter-position="${chapter.position}">
                                     <a href="${course_url}#${unicode(chapter.location)}">${chapter.display_name_with_default}</a>
                                 </span>
                                 <span class="icon fa fa-angle-right" aria-hidden="true"></span>

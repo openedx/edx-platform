@@ -90,6 +90,7 @@ class ScoreChangedSignalRelayTest(TestCase):
     This ensures that listeners in the LMS only have to handle one type
     of signal for all scoring events regardless of their origin.
     """
+    shard = 4
     SIGNALS = {
         'score_set': score_set,
         'score_reset': score_reset,

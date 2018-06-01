@@ -2,19 +2,24 @@ import json
 import logging
 import unittest
 import uuid
-from datetime import timedelta
+from datetime import datetime, timedelta
 
+from courseware.models import (
+    DynamicUpgradeDeadlineConfiguration
+)
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.utils.timezone import now
-
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
 from mock import patch
 from opaque_keys.edx.locator import CourseKey
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
+from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from student.models import CourseEnrollment
 from student.tests.factories import (TEST_PASSWORD, CourseEnrollmentFactory, UserFactory)
 
@@ -23,8 +28,9 @@ log = logging.getLogger(__name__)
 # Entitlements is not in CMS' INSTALLED_APPS so these imports will error during test collection
 if settings.ROOT_URLCONF == 'lms.urls':
     from entitlements.tests.factories import CourseEntitlementFactory
-    from entitlements.models import CourseEntitlement
+    from entitlements.models import CourseEntitlement, CourseEntitlementPolicy, CourseEntitlementSupportDetail
     from entitlements.api.v1.serializers import CourseEntitlementSerializer
+    from entitlements.api.v1.views import set_entitlement_policy
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -51,10 +57,20 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         """
         return {
             "user": user.username,
-            "mode": "verified",
+            "mode": CourseMode.VERIFIED,
             "course_uuid": course_uuid,
-            "order_number": "EDX-1001"
+            "order_number": "EDX-1001",
         }
+
+    def _assert_default_policy(self, policy):
+        """
+        Assert that a policy is equal to the default Course Entitlement Policy.
+        """
+        default_policy = CourseEntitlementPolicy()
+        assert policy.expiration_period == default_policy.expiration_period
+        assert policy.refund_period == default_policy.refund_period
+        assert policy.regain_period == default_policy.regain_period
+        assert policy.mode == default_policy.mode
 
     def test_auth_required(self):
         self.client.logout()
@@ -124,6 +140,202 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         )
         assert results == CourseEntitlementSerializer(course_entitlement).data
 
+    def test_default_no_policy_entry(self):
+        """
+        Verify that, when there are no entries in the course entitlement policy table,
+        the default policy is used for a newly created entitlement.
+        """
+        course_uuid = uuid.uuid4()
+        entitlement_data = self._get_data_set(self.user, str(course_uuid))
+
+        self.client.post(
+            self.entitlements_list_url,
+            data=json.dumps(entitlement_data),
+            content_type='application/json',
+        )
+
+        course_entitlement = CourseEntitlement.objects.get(
+            user=self.user,
+            course_uuid=course_uuid
+        )
+        self._assert_default_policy(course_entitlement.policy)
+
+    def test_default_no_matching_policy_entry(self):
+        """
+        Verify that, when no course entitlement policy is found with the same mode or site
+        as the created entitlement, the default policy is used for the entitlement.
+        """
+        CourseEntitlementPolicy.objects.create(mode=CourseMode.PROFESSIONAL, site=None)
+        course_uuid = uuid.uuid4()
+        entitlement_data = self._get_data_set(self.user, str(course_uuid))
+
+        self.client.post(
+            self.entitlements_list_url,
+            data=json.dumps(entitlement_data),
+            content_type='application/json',
+        )
+
+        course_entitlement = CourseEntitlement.objects.get(
+            user=self.user,
+            course_uuid=course_uuid
+        )
+        self._assert_default_policy(course_entitlement.policy)
+
+    def test_set_custom_mode_policy_on_create(self):
+        """
+        Verify that, when there does not exist a course entitlement policy with the same mode and site as
+        a created entitlement, but there does exist a policy with the same mode and a null site,
+        that policy is assigned to the entitlement.
+        """
+        policy = CourseEntitlementPolicy.objects.create(mode=CourseMode.PROFESSIONAL, site=None)
+        course_uuid = uuid.uuid4()
+        entitlement_data = self._get_data_set(self.user, str(course_uuid))
+        entitlement_data['mode'] = CourseMode.PROFESSIONAL
+
+        self.client.post(
+            self.entitlements_list_url,
+            data=json.dumps(entitlement_data),
+            content_type='application/json',
+        )
+
+        course_entitlement = CourseEntitlement.objects.get(
+            user=self.user,
+            course_uuid=course_uuid
+        )
+        assert course_entitlement.policy == policy
+
+    # To verify policy selecting behavior involving site specificity, we interact directly
+    # with the 'set_entitlement_policy' method due to an inablity to predict or manually assign
+    # the site associated with the requests made in unittests.
+    def test_set_custom_site_policy_on_create(self):
+        """
+        Verify that, when there does not exist a course entitlement policy with the same mode and site as
+        a created entitlement, but there does exist a policy with the same site and a null mode,
+        that policy is assigned to the entitlement.
+        """
+        course_uuid = uuid.uuid4()
+        entitlement_data = self._get_data_set(self.user, str(course_uuid))
+
+        self.client.post(
+            self.entitlements_list_url,
+            data=json.dumps(entitlement_data),
+            content_type='application/json',
+        )
+        course_entitlement = CourseEntitlement.objects.get(
+            user=self.user,
+            course_uuid=course_uuid
+        )
+
+        policy_site = SiteFactory.create()
+        policy = CourseEntitlementPolicy.objects.create(mode=None, site=policy_site)
+
+        set_entitlement_policy(course_entitlement, policy_site)
+        assert course_entitlement.policy == policy
+
+    def test_set_policy_match_site_over_mode(self):
+        """
+        Verify that, when both a mode-agnostic policy matching the site of a created entitlement and a site-agnostic
+        policy matching the mode of a created entitlement exist but no policy matching both the site and mode of the
+        created entitlement exists, the site-specific (mode-agnostic) policy matching the entitlement is selected over
+        the mode-specific (site-agnostic) policy.
+        """
+        course_uuid = uuid.uuid4()
+        entitlement_data = self._get_data_set(self.user, str(course_uuid))
+
+        self.client.post(
+            self.entitlements_list_url,
+            data=json.dumps(entitlement_data),
+            content_type='application/json',
+        )
+        course_entitlement = CourseEntitlement.objects.get(
+            user=self.user,
+            course_uuid=course_uuid
+        )
+
+        policy_site = SiteFactory.create()
+        policy = CourseEntitlementPolicy.objects.create(mode=None, site=policy_site)
+        CourseEntitlementPolicy.objects.create(mode=entitlement_data['mode'], site=None)
+
+        set_entitlement_policy(course_entitlement, policy_site)
+        assert course_entitlement.policy == policy
+
+    def test_set_policy_site_and_mode_specific(self):
+        """
+        Verify that, when there exists a policy matching both the mode and site of the a given course entitlement,
+        it is selected over appropriate site- and mode-specific (mode- and site-agnostic) policies and the default
+        policy for assignment to the entitlement.
+        """
+        course_uuid = uuid.uuid4()
+        entitlement_data = self._get_data_set(self.user, str(course_uuid))
+        entitlement_data['mode'] = CourseMode.PROFESSIONAL
+
+        self.client.post(
+            self.entitlements_list_url,
+            data=json.dumps(entitlement_data),
+            content_type='application/json',
+        )
+        course_entitlement = CourseEntitlement.objects.get(
+            user=self.user,
+            course_uuid=course_uuid
+        )
+
+        policy_site = SiteFactory.create()
+        policy = CourseEntitlementPolicy.objects.create(mode=entitlement_data['mode'], site=policy_site)
+        CourseEntitlementPolicy.objects.create(mode=entitlement_data['mode'], site=None)
+        CourseEntitlementPolicy.objects.create(mode=None, site=policy_site)
+
+        set_entitlement_policy(course_entitlement, policy_site)
+        assert course_entitlement.policy == policy
+
+    def test_professional_policy_for_no_id_professional(self):
+        """
+        Verify that when there exists a policy with a professional mode that it is assigned
+        to new entitlements with the mode no-id-professional.
+        """
+        policy = CourseEntitlementPolicy.objects.create(mode=CourseMode.PROFESSIONAL)
+        course_uuid = uuid.uuid4()
+        entitlement_data = self._get_data_set(self.user, str(course_uuid))
+        entitlement_data['mode'] = CourseMode.NO_ID_PROFESSIONAL_MODE
+
+        self.client.post(
+            self.entitlements_list_url,
+            data=json.dumps(entitlement_data),
+            content_type='application/json',
+        )
+
+        course_entitlement = CourseEntitlement.objects.get(
+            user=self.user,
+            course_uuid=course_uuid
+        )
+        assert course_entitlement.policy == policy
+
+    def test_add_entitlement_with_support_detail(self):
+        """
+        Verify that an EntitlementSupportDetail entry is made when the request includes support interaction information.
+        """
+        course_uuid = uuid.uuid4()
+        entitlement_data = self._get_data_set(self.user, str(course_uuid))
+        entitlement_data['support_details'] = [
+            {
+                "action": "CREATE",
+                "comments": "Family emergency."
+            },
+        ]
+
+        response = self.client.post(
+            self.entitlements_list_url,
+            data=json.dumps(entitlement_data),
+            content_type='application/json',
+        )
+        assert response.status_code == 201
+        results = response.data
+
+        course_entitlement = CourseEntitlement.objects.get(
+            user=self.user,
+            course_uuid=course_uuid
+        )
+        assert results == CourseEntitlementSerializer(course_entitlement).data
+
     @patch("entitlements.api.v1.views.get_course_runs_for_course")
     def test_add_entitlement_and_upgrade_audit_enrollment(self, mock_get_course_runs):
         """
@@ -151,6 +363,55 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         )
         # Assert that enrollment mode is now verified
         enrollment_mode = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)[0]
+        assert enrollment_mode == course_entitlement.mode
+        assert course_entitlement.enrollment_course_run == enrollment
+        assert results == CourseEntitlementSerializer(course_entitlement).data
+
+    @patch("entitlements.api.v1.views.get_course_runs_for_course")
+    def test_add_entitlement_and_upgrade_audit_enrollment_with_dynamic_deadline(self, mock_get_course_runs):
+        """
+        Verify that if an entitlement is added for a user, if the user has one upgradeable enrollment
+        that enrollment is upgraded to the mode of the entitlement and linked to the entitlement regardless of
+        dynamic upgrade deadline being set.
+        """
+        DynamicUpgradeDeadlineConfiguration.objects.create(enabled=True)
+        course = CourseFactory.create(self_paced=True)
+        course_uuid = uuid.uuid4()
+        course_mode = CourseModeFactory(
+            course_id=course.id,
+            mode_slug=CourseMode.VERIFIED,
+            # This must be in the future to ensure it is returned by downstream code.
+            expiration_datetime=now() + timedelta(days=1)
+        )
+
+        # Set up Entitlement
+        entitlement_data = self._get_data_set(self.user, str(course_uuid))
+        mock_get_course_runs.return_value = [{'key': str(course.id)}]
+
+        # Add an audit course enrollment for user.
+        enrollment = CourseEnrollment.enroll(self.user, course.id, mode=CourseMode.AUDIT)
+
+        # Set an upgrade schedule so that dynamic upgrade deadlines are used
+        ScheduleFactory.create(
+            enrollment=enrollment,
+            upgrade_deadline=course_mode.expiration_datetime + timedelta(days=-3)
+        )
+
+        # The upgrade should complete and ignore the deadline
+        response = self.client.post(
+            self.entitlements_list_url,
+            data=json.dumps(entitlement_data),
+            content_type='application/json',
+        )
+        assert response.status_code == 201
+        results = response.data
+
+        course_entitlement = CourseEntitlement.objects.get(
+            user=self.user,
+            course_uuid=course_uuid
+        )
+        # Assert that enrollment mode is now verified
+        enrollment_mode = CourseEnrollment.enrollment_mode_for_user(self.user, course.id)[0]
         assert enrollment_mode == course_entitlement.mode
         assert course_entitlement.enrollment_course_run == enrollment
         assert results == CourseEntitlementSerializer(course_entitlement).data
@@ -332,6 +593,106 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         course_entitlement.refresh_from_db()
         assert course_entitlement.expired_at is not None
         assert course_entitlement.enrollment_course_run is None
+
+    def test_reinstate_entitlement(self):
+        enrollment = CourseEnrollmentFactory(user=self.user, is_active=True)
+        expired_entitlement = CourseEntitlementFactory.create(
+            user=self.user, enrollment_course_run=enrollment, expired_at=datetime.now()
+        )
+        url = reverse(self.ENTITLEMENTS_DETAILS_PATH, args=[str(expired_entitlement.uuid)])
+
+        update_data = {
+            'expired_at': None,
+            'enrollment_course_run': None,
+            'support_details': [
+                {
+                    'unenrolled_run': str(enrollment.course.id),
+                    'action': CourseEntitlementSupportDetail.REISSUE,
+                    'comments': 'Severe illness.'
+                }
+            ]
+        }
+
+        response = self.client.patch(
+            url,
+            data=json.dumps(update_data),
+            content_type='application/json'
+        )
+        assert response.status_code == 200
+
+        results = response.data
+        reinstated_entitlement = CourseEntitlement.objects.get(
+            uuid=expired_entitlement.uuid
+        )
+        assert results == CourseEntitlementSerializer(reinstated_entitlement).data
+
+    def test_reinstate_refundable_entitlement(self):
+        """ Verify that an entitlement that is refundable stays refundable when support reinstates it. """
+        enrollment = CourseEnrollmentFactory(user=self.user, is_active=True, course=CourseOverviewFactory(start=now()))
+        fulfilled_entitlement = CourseEntitlementFactory.create(
+            user=self.user, enrollment_course_run=enrollment
+        )
+        assert fulfilled_entitlement.is_entitlement_refundable() is True
+        url = reverse(self.ENTITLEMENTS_DETAILS_PATH, args=[str(fulfilled_entitlement.uuid)])
+
+        update_data = {
+            'expired_at': None,
+            'enrollment_course_run': None,
+            'support_details': [
+                {
+                    'unenrolled_run': str(enrollment.course.id),
+                    'action': CourseEntitlementSupportDetail.REISSUE,
+                    'comments': 'Severe illness.'
+                }
+            ]
+        }
+
+        response = self.client.patch(
+            url,
+            data=json.dumps(update_data),
+            content_type='application/json'
+        )
+        assert response.status_code == 200
+
+        reinstated_entitlement = CourseEntitlement.objects.get(
+            uuid=fulfilled_entitlement.uuid
+        )
+        assert reinstated_entitlement.refund_locked is False
+        assert reinstated_entitlement.is_entitlement_refundable() is True
+
+    def test_reinstate_unrefundable_entitlement(self):
+        """ Verify that a no longer refundable entitlement does not become refundable when support reinstates it. """
+        enrollment = CourseEnrollmentFactory(user=self.user, is_active=True)
+        expired_entitlement = CourseEntitlementFactory.create(
+            user=self.user, enrollment_course_run=enrollment, expired_at=datetime.now()
+        )
+        assert expired_entitlement.is_entitlement_refundable() is False
+        url = reverse(self.ENTITLEMENTS_DETAILS_PATH, args=[str(expired_entitlement.uuid)])
+
+        update_data = {
+            'expired_at': None,
+            'enrollment_course_run': None,
+            'support_details': [
+                {
+                    'unenrolled_run': str(enrollment.course.id),
+                    'action': CourseEntitlementSupportDetail.REISSUE,
+                    'comments': 'Severe illness.'
+                }
+            ]
+        }
+
+        response = self.client.patch(
+            url,
+            data=json.dumps(update_data),
+            content_type='application/json'
+        )
+        assert response.status_code == 200
+
+        reinstated_entitlement = CourseEntitlement.objects.get(
+            uuid=expired_entitlement.uuid
+        )
+        assert reinstated_entitlement.refund_locked is True
+        assert reinstated_entitlement.is_entitlement_refundable() is False
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

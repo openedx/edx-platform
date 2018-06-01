@@ -11,6 +11,8 @@ class LmsUtilsTest(ModuleStoreTestCase):
     """
     Tests for the LMS utility functions
     """
+    shard = 4
+
     def setUp(self):
         """
         Setup a dummy course content.

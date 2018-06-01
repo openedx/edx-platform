@@ -58,7 +58,7 @@ class SessionAuthenticationAllowInactiveUser(SessionAuthentication):
         # This is where regular `SessionAuthentication` checks that the user is active.
         # We have removed that check in this implementation.
         # But we added a check to prevent anonymous users since we require a logged-in account.
-        if not user or user.is_anonymous():
+        if not user or user.is_anonymous:
             return None
 
         self.enforce_csrf(request)

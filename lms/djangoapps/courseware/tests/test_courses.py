@@ -13,6 +13,7 @@ from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from nose.plugins.attrib import attr
+from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
 from courseware.courses import (
@@ -21,11 +22,12 @@ from courseware.courses import (
     get_cms_course_link,
     get_course_about_section,
     get_course_by_id,
+    get_course_chapter_ids,
     get_course_info_section,
     get_course_overview_with_access,
     get_course_with_access,
     get_courses,
-    get_current_child
+    get_current_child,
 )
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
@@ -424,3 +426,33 @@ class CourseInstantiationTests(ModuleStoreTestCase):
                 for section in chapter.get_children():
                     for item in section.get_children():
                         self.assertTrue(item.graded)
+
+
+@attr(shard=1)
+class TestGetCourseChapters(ModuleStoreTestCase):
+    """
+    Tests for the `get_course_chapter_ids` function.
+    """
+
+    def test_get_non_existant_course(self):
+        """
+        Test non-existant course returns empty list.
+        """
+        self.assertEqual(get_course_chapter_ids(None), [])
+        # build a fake key
+        fake_course_key = CourseKey.from_string('course-v1:FakeOrg+CN1+CR-FALLNEVER1')
+        self.assertEqual(get_course_chapter_ids(fake_course_key), [])
+
+    def test_get_chapters(self):
+        """
+        Test get_course_chapter_ids returns expected result.
+        """
+        course = CourseFactory()
+        ItemFactory(parent=course, category='chapter')
+        ItemFactory(parent=course, category='chapter')
+        course_chapter_ids = get_course_chapter_ids(course.location.course_key)
+        self.assertEqual(len(course_chapter_ids), 2)
+        self.assertEqual(
+            course_chapter_ids,
+            [unicode(child) for child in course.children]
+        )

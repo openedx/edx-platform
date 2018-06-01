@@ -1,0 +1,25 @@
+# Dependencies that are used in development environments.
+# Please do not use this file for packages that are needed in production or for test runs.
+#
+# These are installed automatically in devstack, and can also be installed manually using:
+#
+#    pip install -r requirements/edx/development.txt
+#
+# When adding a new dependency which is imported from edx-platform code as a library,
+# update scripts/dependencies/development.txt accordingly.
+
+-r pip-tools.txt                    # pip-tools and its dependencies, for managing requirements files
+-r testing.txt                      # Dependencies for running the various test suites
+
+click                               # Used for perf_tests utilities in modulestore
+django-debug-toolbar==1.8           # A set of panels that display debug information about the current request/response
+edx-sphinx-theme                    # Documentation theme
+pyinotify                           # More efficient checking for runserver reload trigger events
+snakefood                           # Lists dependencies between Python modules, used in scripts/dependencies/*
+sphinx                              # Developer documentation builder
+
+# Performance timer used in modulestore/perf_tests/test_asset_import_export.py
+-e git+https://github.com/doctoryes/code_block_timer.git@f3d0629f086bcc649c3c77f4bc5b9c2c8172c3bf#egg=code_block_timer
+
+# The officially released version of django-debug-toolbar-mongo doesn't support DJDT 1.x. This commit does.
+-e git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c4aee6e76b9abe61cc808#egg=django-debug-toolbar-mongo==0.1.10

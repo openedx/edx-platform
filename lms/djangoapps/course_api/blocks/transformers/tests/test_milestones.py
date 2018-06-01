@@ -49,7 +49,7 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
             gating_block: The block that must be completed before access is granted
         """
         gating_api.add_prerequisite(self.course.id, unicode(gating_block.location))
-        gating_api.set_required_content(self.course.id, gated_block.location, gating_block.location, 100)
+        gating_api.set_required_content(self.course.id, gated_block.location, gating_block.location, 100, 0)
 
     ALL_BLOCKS = (
         'course', 'A', 'B', 'C', 'ProctoredExam', 'D', 'E', 'PracticeExam', 'F', 'G', 'H', 'I', 'TimedExam', 'J', 'K'
@@ -170,12 +170,11 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
         self.clear_caches()
 
         # this call triggers reevaluation of prerequisites fulfilled by the gating block.
-        with patch('openedx.core.lib.gating.api._get_subsection_percentage', Mock(return_value=100)):
-            lms_gating_api.evaluate_prerequisite(
-                self.course,
-                Mock(location=self.blocks[gating_block_ref].location),
-                self.user,
-            )
+        lms_gating_api.evaluate_prerequisite(
+            self.course,
+            Mock(location=self.blocks[gating_block_ref].location, percent_graded=1.0),
+            self.user,
+        )
 
         with self.assertNumQueries(6):
             self.get_blocks_and_check_against_expected(self.user, self.ALL_BLOCKS_EXCEPT_SPECIAL)
@@ -205,12 +204,11 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
         self.clear_caches()
 
         # this call triggers reevaluation of prerequisites fulfilled by the gating block.
-        with patch('openedx.core.lib.gating.api._get_subsection_percentage', Mock(return_value=100)):
-            lms_gating_api.evaluate_prerequisite(
-                self.course,
-                Mock(location=self.blocks['A'].location),
-                self.user,
-            )
+        lms_gating_api.evaluate_prerequisite(
+            self.course,
+            Mock(location=self.blocks['A'].location, percent_graded=1.0),
+            self.user,
+        )
         self.get_blocks_and_check_against_expected(self.user, self.ALL_BLOCKS)
 
     def get_blocks_and_check_against_expected(self, user, expected_blocks):

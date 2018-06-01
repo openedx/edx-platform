@@ -21,7 +21,7 @@ from lms.djangoapps.certificates.models import (
 )
 from course_modes.models import CourseMode
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+from lms.djangoapps.verify_student.services import IDVerificationService
 from student.models import CourseEnrollment, UserProfile
 from xmodule.modulestore.django import modulestore
 
@@ -271,7 +271,7 @@ class XQueueCertInterface(object):
         course_grade = CourseGradeFactory().read(student, course)
         enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(student, course_id)
         mode_is_verified = enrollment_mode in GeneratedCertificate.VERIFIED_CERTS_MODES
-        user_is_verified = SoftwareSecurePhotoVerification.user_is_verified(student)
+        user_is_verified = IDVerificationService.user_is_verified(student)
         cert_mode = enrollment_mode
         is_eligible_for_certificate = is_whitelisted or CourseMode.is_eligible_for_certificate(enrollment_mode)
         unverified = False
@@ -298,14 +298,16 @@ class XQueueCertInterface(object):
                 u"Certificate generated for student %s in the course: %s with template: %s. "
                 u"given template: %s, "
                 u"user is verified: %s, "
-                u"mode is verified: %s"
+                u"mode is verified: %s,"
+                u"generate_pdf is: %s"
             ),
             student.username,
             unicode(course_id),
             template_pdf,
             template_file,
             user_is_verified,
-            mode_is_verified
+            mode_is_verified,
+            generate_pdf
         )
 
         cert, created = GeneratedCertificate.objects.get_or_create(user=student, course_id=course_id)
@@ -442,6 +444,8 @@ class XQueueCertInterface(object):
             cert.verify_uuid = uuid4().hex
 
         cert.save()
+        logging.info(u'certificate generated for user: %s with generate_pdf status: %s',
+                     student.username, generate_pdf)
 
         if generate_pdf:
             try:

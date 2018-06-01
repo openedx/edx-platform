@@ -18,6 +18,7 @@ class ContactUsView(View):
     def get(self, request):
         context = {
             'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
+            'support_email': configuration_helpers.get_value('CONTACT_EMAIL', settings.CONTACT_EMAIL),
             'custom_fields': settings.ZENDESK_CUSTOM_FIELDS
         }
 
@@ -30,9 +31,10 @@ class ContactUsView(View):
             current_site_name = current_site_name.replace(".", "_")
             tags.append("site_name_{site}".format(site=current_site_name))
 
-        if request.user.is_authenticated():
-            context['user_enrollments'] = CourseEnrollment.enrollments_for_user(request.user)
-            enterprise_learner_data = enterprise_api.get_enterprise_learner_data(site=request.site, user=request.user)
+        if request.user.is_authenticated:
+            context['course_id'] = request.session.get('course_id', '')
+            context['user_enrollments'] = CourseEnrollment.enrollments_for_user_with_overviews_preload(request.user)
+            enterprise_learner_data = enterprise_api.get_enterprise_learner_data(user=request.user)
             if enterprise_learner_data:
                 tags.append('enterprise_learner')
 

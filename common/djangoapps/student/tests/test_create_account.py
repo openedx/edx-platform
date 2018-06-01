@@ -711,7 +711,7 @@ class TestCreateAccountValidation(TestCase):
 
         # Matching username
         params["username"] = params["password"] = "test_username_and_password"
-        assert_password_error("Password cannot be the same as the username")
+        assert_password_error("Password cannot be the same as the username.")
 
     def test_name(self):
         params = dict(self.minimal_params)

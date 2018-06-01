@@ -12,6 +12,8 @@ class TestPolicy(XModuleXmlImportTest):
     """
     Tests that policy json files import correctly when loading xml
     """
+    shard = 2
+
     def test_no_attribute_mapping(self):
         # Policy files are json, and thus the values aren't passed through 'deserialize_field'
         # Therefor, the string 'null' is passed unchanged to the Float field, which will trigger

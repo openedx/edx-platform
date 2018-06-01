@@ -12,7 +12,7 @@ from ..tasks import _calculate_course_xblocks_data, _update_xblocks_cache
 from .test_models import BookmarksTestsBase
 
 
-@attr(shard=2)
+@attr(shard=9)
 @ddt.ddt
 @pytest.mark.django111_expected_failure
 class XBlockCacheTaskTests(BookmarksTestsBase):

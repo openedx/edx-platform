@@ -215,7 +215,7 @@ class VideoBaseTest(UniqueCourseTest):
         self.video.wait_for_video_player_render()
 
 
-@attr(shard=4)
+@attr(shard=13)
 @ddt
 class YouTubeVideoTest(VideoBaseTest):
     """ Test YouTube Video Player """
@@ -784,6 +784,7 @@ class YouTubeVideoTest(VideoBaseTest):
 
         langs = {'zh_HANS': '在线学习是革', 'zh_HANT': '在線學習是革'}
         for lang_code, text in langs.items():
+            self.video.scroll_to_button("transcript_button")
             self.assertTrue(self.video.select_language(lang_code))
             unicode_text = text.decode('utf-8')
             self.assertIn(unicode_text, self.video.captions_text)
@@ -870,7 +871,7 @@ class YouTubeVideoTest(VideoBaseTest):
         execute_video_steps(tab1_video_names)
 
 
-@attr(shard=4)
+@attr(shard=13)
 class YouTubeHtml5VideoTest(VideoBaseTest):
     """ Test YouTube HTML5 Video Player """
 
@@ -888,7 +889,7 @@ class YouTubeHtml5VideoTest(VideoBaseTest):
         self.assertTrue(self.video.is_video_rendered('youtube'))
 
 
-@attr(shard=4)
+@attr(shard=19)
 class Html5VideoTest(VideoBaseTest):
     """ Test HTML5 Video Player """
 
@@ -1073,7 +1074,7 @@ class Html5VideoTest(VideoBaseTest):
         self.assertTrue(all([source in HTML5_SOURCES for source in self.video.sources]))
 
 
-@attr(shard=4)
+@attr(shard=13)
 class YouTubeQualityTest(VideoBaseTest):
     """ Test YouTube Video Quality Button """
 
@@ -1119,49 +1120,6 @@ class YouTubeQualityTest(VideoBaseTest):
         self.video.wait_for(lambda: self.video.is_quality_button_active, 'waiting for quality button activation')
 
 
-@attr(shard=4)
-class DragAndDropTest(VideoBaseTest):
-    """
-    Tests draggability of closed captions within videos.
-    """
-    def test_if_captions_are_draggable(self):
-        """
-        Loads transcripts so that closed-captioning is available.
-        Ensures they are draggable by checking start and dropped location.
-        """
-        self.assets.append('subs_3_yD_cEKoCk.srt.sjson')
-        data = {'sub': '3_yD_cEKoCk'}
-
-        self.metadata = self.metadata_for_mode('html5', additional_data=data)
-        self.navigate_to_video()
-        self.assertTrue(self.video.is_video_rendered('html5'))
-        self.video.show_closed_captions()
-        self.video.wait_for_closed_captions()
-        self.assertTrue(self.video.is_closed_captions_visible)
-
-        action = ActionChains(self.browser)
-        captions = self.browser.find_element(By.CLASS_NAME, 'closed-captions')
-
-        captions_start = captions.location
-        action.drag_and_drop_by_offset(captions, 0, -15).perform()
-
-        captions_end = captions.location
-        # We have to branch here due to unexpected behaviour of chrome.
-        # Chrome sets the y offset of element to 834 instead of 650
-        if self.browser.name == 'chrome':
-            self.assertEqual(
-                captions_end.get('y') - 168,
-                captions_start.get('y'),
-                'Closed captions did not get dragged.'
-            )
-        else:
-            self.assertEqual(
-                captions_end.get('y') + 16,
-                captions_start.get('y'),
-                'Closed captions did not get dragged.'
-            )
-
-
 @attr('a11y')
 class LMSVideoModuleA11yTest(VideoBaseTest):
     """
@@ -1199,7 +1157,7 @@ class LMSVideoModuleA11yTest(VideoBaseTest):
         self.video.a11y_audit.check_for_accessibility_errors()
 
 
-@attr(shard=4)
+@attr(shard=11)
 class VideoPlayOrderTest(VideoBaseTest):
     """
     Test video play order with multiple videos
@@ -1243,7 +1201,7 @@ class VideoPlayOrderTest(VideoBaseTest):
         self.assertTrue(self.video.is_video_rendered('hls'))
 
 
-@attr(shard=4)
+@attr(shard=11)
 class HLSVideoTest(VideoBaseTest):
     """
     Tests related to HLS video

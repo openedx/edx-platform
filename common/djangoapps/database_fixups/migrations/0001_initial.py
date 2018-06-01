@@ -31,5 +31,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(add_email_uniqueness_constraint)
+        migrations.RunPython(add_email_uniqueness_constraint, atomic=False)
     ]

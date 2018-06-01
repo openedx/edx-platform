@@ -233,12 +233,12 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
         factory = OptionResponseXMLFactory()
         factory_args = self._option_problem_factory_args()
         problem_xml = factory.build_xml(**factory_args)
-        ItemFactory.create(parent_location=parent.location,
-                           parent=parent,
-                           category="problem",
-                           display_name=problem_url_name,
-                           data=problem_xml,
-                           **kwargs)
+        return ItemFactory.create(parent_location=parent.location,
+                                  parent=parent,
+                                  category="problem",
+                                  display_name=problem_url_name,
+                                  data=problem_xml,
+                                  **kwargs)
 
     def redefine_option_problem(self, problem_url_name, correct_answer=OPTION_1, num_inputs=1, num_responses=2):
         """Change the problem definition so the answer is Option 2"""
@@ -303,6 +303,8 @@ class TestReportMixin(object):
     """
     Cleans up after tests that place files in the reports directory.
     """
+    shard = 4
+
     def setUp(self):
 
         def clean_up_tmpdir():
@@ -352,7 +354,7 @@ class TestReportMixin(object):
         report_path = report_store.path_to(self.course.id, report_csv_filename)
         with report_store.storage.open(report_path) as csv_file:
             # Expand the dict reader generator so we don't lose it's content
-            csv_rows = [row for row in unicodecsv.DictReader(csv_file)]
+            csv_rows = [row for row in unicodecsv.DictReader(csv_file, encoding='utf-8-sig')]
 
             if ignore_other_columns:
                 csv_rows = [
@@ -372,5 +374,5 @@ class TestReportMixin(object):
         report_csv_filename = report_store.links_for(self.course.id)[0][0]
         report_path = report_store.path_to(self.course.id, report_csv_filename)
         with report_store.storage.open(report_path) as csv_file:
-            rows = unicodecsv.reader(csv_file, encoding='utf-8')
+            rows = unicodecsv.reader(csv_file, encoding='utf-8-sig')
             return rows.next()

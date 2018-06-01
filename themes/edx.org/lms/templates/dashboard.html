@@ -73,7 +73,9 @@ from student.models import CourseEnrollment
     $(document).ready(function() {
       EntitlementUnenrollmentFactory({
         dashboardPath: "${reverse('dashboard') | n, js_escaped_string}",
-        signInPath: "${reverse('signin_user') | n, js_escaped_string}"
+        signInPath: "${reverse('signin_user') | n, js_escaped_string}",
+        browseCourses: "${marketing_link('COURSES') | n, js_escaped_string}",
+        isEdx: true
       });
     });
   </%static:webpack>
@@ -335,7 +337,7 @@ from student.models import CourseEnrollment
 </section>
 
 <section id="unenroll-modal" class="modal unenroll-modal" aria-hidden="true">
-  <div class="inner-wrapper" role="dialog" aria-labelledby="unenrollment-modal-title">
+  <div class="inner-wrapper" role="dialog" aria-labelledby="unenrollment-modal-title" aria-live="polite">
     <button class="close-modal">
       <span class="icon fa fa-remove" aria-hidden="true"></span>
       <span class="sr">
@@ -360,7 +362,7 @@ from student.models import CourseEnrollment
       <input name="course_id" id="unenroll_course_id" type="hidden" />
       <input name="enrollment_action" type="hidden" value="unenroll" />
       <div class="submit">
-        <input name="submit" type="submit" value="${_("Unenroll")}" />
+        <input class="submit-button" name="submit" type="submit" value="${_("Unenroll")}" />
       </div>
     </form>
     <%include file='dashboard/_reason_survey.html' />

@@ -18,7 +18,12 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, CacheIsolationMixin
-from student.models import PendingEmailChange, Registration, UserProfile
+from student.models import (
+    PendingEmailChange,
+    Registration,
+    UserProfile,
+    get_retired_email_by_email
+)
 from student.tests.factories import PendingEmailChangeFactory, RegistrationFactory, UserFactory
 from student.views import (
     SETTING_CHANGE_INITIATED,
@@ -323,6 +328,16 @@ class EmailChangeRequestTests(EventTestMixin, CacheIsolationTestCase):
         that is already in use by another account.
         """
         UserFactory.create(email=self.new_email)
+        self.assertEqual(self.do_email_validation(self.new_email), 'An account with this e-mail already exists.')
+
+    def test_retired_email(self):
+        """
+        Assert the expected error message from the email validation method for an email address
+        that corresponds with an already-retired account.
+        """
+        user = UserFactory.create(email=self.new_email)
+        user.email = get_retired_email_by_email(self.new_email)
+        user.save()
         self.assertEqual(self.do_email_validation(self.new_email), 'An account with this e-mail already exists.')
 
     @patch('django.core.mail.send_mail')

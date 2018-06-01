@@ -12,6 +12,7 @@ from openedx.core.djangoapps.video_config.forms import (
 from openedx.core.djangoapps.video_config.models import (
     CourseHLSPlaybackEnabledFlag, HLSPlaybackEnabledFlag,
     CourseVideoTranscriptEnabledFlag, VideoTranscriptEnabledFlag,
+    TranscriptMigrationSetting,
 )
 
 
@@ -53,3 +54,4 @@ admin.site.register(CourseHLSPlaybackEnabledFlag, CourseHLSPlaybackEnabledFlagAd
 
 admin.site.register(VideoTranscriptEnabledFlag, ConfigurationModelAdmin)
 admin.site.register(CourseVideoTranscriptEnabledFlag, CourseVideoTranscriptEnabledFlagAdmin)
+admin.site.register(TranscriptMigrationSetting, ConfigurationModelAdmin)

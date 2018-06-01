@@ -12,16 +12,17 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 
 from celery_utils.logged_task import LoggedTask
+from django_comment_common.utils import set_course_discussion_settings
 from edx_ace import ace
 from edx_ace.utils import date
-from edx_ace.message import MessageType
 from edx_ace.recipient import Recipient
 from opaque_keys.edx.keys import CourseKey
-from lms.djangoapps.django_comment_client.utils import permalink
+from lms.djangoapps.django_comment_client.utils import permalink, get_accessible_discussion_xblocks_by_course_id
 import lms.lib.comment_client as cc
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
+from openedx.core.djangoapps.ace_common.message import BaseMessageType
 from openedx.core.lib.celery.task_utils import emulate_http_request
 
 
@@ -32,7 +33,25 @@ DEFAULT_LANGUAGE = 'en'
 ROUTING_KEY = getattr(settings, 'ACE_ROUTING_KEY', None)
 
 
-class ResponseNotification(MessageType):
+@task(base=LoggedTask)
+def update_discussions_map(context):
+    """
+    Updates the mapping between discussion_id to discussion block usage key
+    for all discussion blocks in the given course.
+
+    context is a dict that contains:
+        course_id (string): identifier of the course
+    """
+    course_key = CourseKey.from_string(context['course_id'])
+    discussion_blocks = get_accessible_discussion_xblocks_by_course_id(course_key, include_all=True)
+    discussions_id_map = {
+        discussion_block.discussion_id: unicode(discussion_block.location)
+        for discussion_block in discussion_blocks
+    }
+    set_course_discussion_settings(course_key, discussions_id_map=discussions_id_map)
+
+
+class ResponseNotification(BaseMessageType):
     pass
 
 
@@ -66,7 +85,8 @@ def _track_notification_sent(message, context):
         'uuid': unicode(message.uuid),
         'send_uuid': unicode(message.send_uuid),
         'thread_id': context['thread_id'],
-        'thread_created_at': date.deserialize(context['thread_created_at'])
+        'thread_created_at': date.deserialize(context['thread_created_at']),
+        'nonInteraction': 1,
     }
     analytics.track(
         user_id=context['thread_author_id'],

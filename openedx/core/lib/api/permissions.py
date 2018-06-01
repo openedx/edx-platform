@@ -21,17 +21,13 @@ class ApiKeyHeaderPermission(permissions.BasePermission):
         """
         Check for permissions by matching the configured API key and header
 
-        If settings.DEBUG is True and settings.EDX_API_KEY is not set or None,
-        then allow the request. Otherwise, allow the request if and only if
-        settings.EDX_API_KEY is set and the X-Edx-Api-Key HTTP header is
-        present in the request and matches the setting.
+        Allow the request if and only if settings.EDX_API_KEY is set and
+        the X-Edx-Api-Key HTTP header is present in the request and
+        matches the setting.
         """
         api_key = getattr(settings, "EDX_API_KEY", None)
 
-        if settings.DEBUG and api_key is None:
-            return True
-
-        elif api_key is not None and request.META.get("HTTP_X_EDX_API_KEY") == api_key:
+        if api_key is not None and request.META.get("HTTP_X_EDX_API_KEY") == api_key:
             audit_log("ApiKeyHeaderPermission used",
                       path=request.path,
                       ip=request.META.get("REMOTE_ADDR"))
@@ -66,7 +62,10 @@ class IsUserInUrl(permissions.BasePermission):
         Note: a 404 is returned for non-staff instead of a 403. This is to prevent
         users from being able to detect the existence of accounts.
         """
-        url_username = request.parser_context.get('kwargs', {}).get('username', '')
+        url_username = (
+            request.parser_context.get('kwargs', {}).get('username') or
+            request.GET.get('username', '')
+        )
         if request.user.username.lower() != url_username.lower():
             if request.user.is_staff:
                 return False  # staff gets 403

@@ -8,17 +8,29 @@ from openedx.core.djangolib.markup import HTML, Text
 
 <main id="main" aria-label="Content" tabindex="-1">
     <section class="outside-app">
-      <h1>
-        ${Text(_(u"There has been a 500 error on the {platform_name} servers")).format(
-            platform_name=HTML("<em>{platform_name}</em>").format(platform_name=Text(static.get_platform_name()))
-        )}
-      </h1>
-      <p>
-        ${Text(_('Please wait a few seconds and then reload the page. If the problem persists, please email us at {email}.')).format(
-            email=HTML('<a href="mailto:{email}">{email}</a>').format(
-                email=Text(static.get_tech_support_email_address())
-            )
-        )}
-      </p>
+        <h1>
+            <%block name="pageheader">
+                % if page_header:
+                    ${page_header}
+                % else:
+                    ${Text(_(u"There has been a 500 error on the {platform_name} servers")).format(
+                    platform_name=HTML("<em>{platform_name}</em>").format(platform_name=Text(static.get_platform_name()))
+                    )}
+                % endif
+            </%block>
+        </h1>
+        <p>
+            <%block name="pagecontent">
+                % if page_content:
+                    ${page_content}
+                % else:
+                    ${Text(_('Please wait a few seconds and then reload the page. If the problem persists, please email us at {email}.')).format(
+                    email=HTML('<a href="mailto:{email}">{email}</a>').format(
+                    email=Text(static.get_tech_support_email_address())
+                    )
+                    )}
+                % endif
+            </%block>
+        </p>
     </section>
 </main>

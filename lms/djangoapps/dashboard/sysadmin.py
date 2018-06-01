@@ -37,7 +37,7 @@ from dashboard.git_import import GitImportError
 from dashboard.models import CourseImportLog
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
-from openedx.core.djangoapps.external_auth.views import generate_password
+from openedx.core.djangoapps.user_api.accounts.utils import generate_password
 from student.models import CourseEnrollment, Registration, UserProfile
 from student.roles import CourseInstructorRole, CourseStaffRole
 from xmodule.modulestore.django import modulestore
@@ -559,7 +559,7 @@ class Staffing(SysadminDashboardView):
                 for role in roles:
                     for user in role(course.id).users_with_role():
                         datum = [course.id, role, user.username, user.email,
-                                 user.profile.name]
+                                 user.profile.name.encode('utf-8')]
                         data.append(datum)
             header = [_('course_id'),
                       _('role'), _('username'),

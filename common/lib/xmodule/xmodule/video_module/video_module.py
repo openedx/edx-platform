@@ -16,7 +16,7 @@ import copy
 import json
 import logging
 import random
-from collections import OrderedDict
+from collections import defaultdict, OrderedDict
 from operator import itemgetter
 
 from pkg_resources import resource_string
@@ -48,10 +48,10 @@ from .transcripts_utils import (
     Transcript,
     VideoTranscriptsMixin,
     clean_video_id,
+    subs_filename,
+    get_transcript_for_video
 )
-from .transcripts_model_utils import (
-    is_val_transcript_feature_enabled_for_course
-)
+
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 from .video_utils import create_youtube_string, format_xml_exception_message, get_poster, rewrite_video_url
 from .video_xfields import VideoFields
@@ -99,7 +99,8 @@ log = logging.getLogger(__name__)
 _ = lambda text: text
 
 
-EXPORT_STATIC_DIR = u'static'
+EXPORT_IMPORT_COURSE_DIR = u'course'
+EXPORT_IMPORT_STATIC_DIR = u'static'
 
 
 @XBlock.wants('settings', 'completion')
@@ -302,8 +303,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             if download_video_link and download_video_link.endswith('.m3u8'):
                 download_video_link = None
 
-        feature_enabled = is_val_transcript_feature_enabled_for_course(self.course_id)
-        transcripts = self.get_transcripts_info(include_val_transcripts=feature_enabled)
+        transcripts = self.get_transcripts_info()
         track_url, transcript_language, sorted_languages = self.get_transcripts_for_student(transcripts=transcripts)
 
         # CDN_VIDEO_URLS is only to be used here and will be deleted
@@ -361,7 +361,6 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             'saveStateUrl': self.system.ajax_url + '/save_user_state',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
             'streams': self.youtube_streams,
-            'sub': self.sub,
             'sources': sources,
             'poster': poster,
             'duration': video_duration,
@@ -605,10 +604,39 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         else:
             editable_fields.pop('source')
 
+        # Default Timed Transcript a.k.a `sub` has been deprecated and end users shall
+        # not be able to modify it.
+        editable_fields.pop('sub')
+
         languages = [{'label': label, 'code': lang} for lang, label in settings.ALL_LANGUAGES]
         languages.sort(key=lambda l: l['label'])
+        editable_fields['transcripts']['custom'] = True
         editable_fields['transcripts']['languages'] = languages
         editable_fields['transcripts']['type'] = 'VideoTranslations'
+
+        # We need to send ajax requests to show transcript status
+        # whenever edx_video_id changes on frontend. Thats why we
+        # are changing type to `VideoID` so that a specific
+        # Backbonjs view can handle it.
+        editable_fields['edx_video_id']['type'] = 'VideoID'
+
+        # construct transcripts info and also find if `en` subs exist
+        transcripts_info = self.get_transcripts_info()
+        possible_sub_ids = [self.sub, self.youtube_id_1_0] + get_html5_ids(self.html5_sources)
+        for sub_id in possible_sub_ids:
+            try:
+                get_transcript_for_video(
+                    self.location,
+                    subs_id=sub_id,
+                    file_name=sub_id,
+                    language=u'en'
+                )
+                transcripts_info['transcripts'] = dict(transcripts_info['transcripts'], en=sub_id)
+                break
+            except NotFoundError:
+                continue
+
+        editable_fields['transcripts']['value'] = transcripts_info['transcripts']
         editable_fields['transcripts']['urlRoot'] = self.runtime.handler_url(
             self,
             'studio_transcript',
@@ -649,8 +677,12 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             field_data,
         )
 
-        # update val with info extracted from `xml_object`
-        video.import_video_info_into_val(xml_object, getattr(id_generator, 'target_course_id', None))
+        # Update VAL with info extracted from `xml_object`
+        video.edx_video_id = video.import_video_info_into_val(
+            xml_object,
+            system.resources_fs,
+            getattr(id_generator, 'target_course_id', None)
+        )
 
         return video
 
@@ -707,30 +739,51 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             ele.set('src', self.handout)
             xml.append(ele)
 
+        transcripts = {}
         if self.transcripts is not None:
-            # sorting for easy testing of resulting xml
-            for transcript_language in sorted(self.transcripts.keys()):
-                ele = etree.Element('transcript')
-                ele.set('language', transcript_language)
-                ele.set('src', self.transcripts[transcript_language])
-                xml.append(ele)
+            transcripts.update(self.transcripts)
 
         edx_video_id = clean_video_id(self.edx_video_id)
-        if edx_video_id:
+        if edxval_api and edx_video_id:
             try:
                 # Create static dir if not created earlier.
-                resource_fs.makedirs(EXPORT_STATIC_DIR, recreate=True)
+                resource_fs.makedirs(EXPORT_IMPORT_STATIC_DIR, recreate=True)
 
-                xml.append(
-                    edxval_api.export_to_xml(
-                        video_id=edx_video_id,
-                        resource_fs=resource_fs,
-                        static_dir=EXPORT_STATIC_DIR,
-                        course_id=unicode(self.runtime.course_id.for_branch(None))
-                    )
+                # Backward compatible exports
+                # edxval exports new transcripts into the course OLX and returns a transcript
+                # files map so that it can also be rewritten in old transcript metadata fields
+                # (i.e. `self.transcripts`) on import and older open-releases (<= ginkgo),
+                # who do not have deprecated contentstore yet, can also import and use new-style
+                # transcripts into their openedX instances.
+
+                exported_metadata = edxval_api.export_to_xml(
+                    video_id=edx_video_id,
+                    resource_fs=resource_fs,
+                    static_dir=EXPORT_IMPORT_STATIC_DIR,
+                    course_id=unicode(self.runtime.course_id.for_branch(None))
                 )
+                # Update xml with edxval metadata
+                xml.append(exported_metadata['xml'])
+
+                # we don't need sub if english transcript
+                # is also in new transcripts.
+                new_transcripts = exported_metadata['transcripts']
+                transcripts.update(new_transcripts)
+                if new_transcripts.get('en'):
+                    xml.set('sub', '')
+
+                # Update `transcripts` attribute in the xml
+                xml.set('transcripts', json.dumps(transcripts))
+
             except edxval_api.ValVideoNotFoundError:
                 pass
+
+            # Sorting transcripts for easy testing of resulting xml
+            for transcript_language in sorted(transcripts.keys()):
+                ele = etree.Element('transcript')
+                ele.set('language', transcript_language)
+                ele.set('src', transcripts[transcript_language])
+                xml.append(ele)
 
         # handle license specifically
         self.add_license_to_xml(xml)
@@ -934,28 +987,49 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
 
         return field_data
 
-    def import_video_info_into_val(self, xml, course_id):
+    def import_video_info_into_val(self, xml, resource_fs, course_id):
         """
         Import parsed video info from `xml` into edxval.
 
         Arguments:
-            xml (lxml object): xml representation of video to be imported
+            xml (lxml object): xml representation of video to be imported.
+            resource_fs (OSFS): Import file system.
             course_id (str): course id
         """
-        edx_video_id = ''
-        if self.edx_video_id is not None:
-            edx_video_id = self.edx_video_id.strip()
+        edx_video_id = clean_video_id(self.edx_video_id)
 
+        # Create video_asset is not already present.
         video_asset_elem = xml.find('video_asset')
-        if edxval_api and video_asset_elem is not None:
-            # Always pass the edx_video_id, Whether the video is internal or external
-            # In case of external, we only need to import transcripts and for that
-            # purpose video id is already present in the xml
-            edxval_api.import_from_xml(
+        if video_asset_elem is None:
+            video_asset_elem = etree.Element('video_asset')
+
+        # This will be a dict containing the list of names of the external transcripts.
+        # Example:
+        # {
+        #     'en': ['The_Flash.srt', 'Harry_Potter.srt'],
+        #     'es': ['Green_Arrow.srt']
+        # }
+        external_transcripts = defaultdict(list)
+
+        # Add trancript from self.sub and self.youtube_id_1_0 fields.
+        external_transcripts['en'] = [
+            subs_filename(transcript, 'en')
+            for transcript in [self.sub, self.youtube_id_1_0] if transcript
+        ]
+
+        for language_code, transcript in self.transcripts.items():
+            external_transcripts[language_code].append(transcript)
+
+        if edxval_api:
+            edx_video_id = edxval_api.import_from_xml(
                 video_asset_elem,
                 edx_video_id,
+                resource_fs,
+                EXPORT_IMPORT_STATIC_DIR,
+                external_transcripts,
                 course_id=course_id
             )
+        return edx_video_id
 
     def index_dictionary(self):
         xblock_body = super(VideoDescriptor, self).index_dictionary()
@@ -1071,9 +1145,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                     "file_size": 0,  # File size is not relevant for external link
                 }
 
-        feature_enabled = is_val_transcript_feature_enabled_for_course(self.runtime.course_id.for_branch(None))
-        transcripts_info = self.get_transcripts_info(include_val_transcripts=feature_enabled)
-        available_translations = self.available_translations(transcripts_info, include_val_transcripts=feature_enabled)
+        available_translations = self.available_translations(self.get_transcripts_info())
         transcripts = {
             lang: self.runtime.handler_url(self, 'transcript', 'download', query="lang=" + lang, thirdparty=True)
             for lang in available_translations

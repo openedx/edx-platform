@@ -22,6 +22,7 @@ from django.utils.translation import ugettext as _
 
 from branding.models import BrandingApiConfig
 from edxmako.shortcuts import marketing_link
+
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger("edx.footer")
@@ -171,6 +172,7 @@ def _footer_social_links():
 
 def _footer_connect_links():
     """Return the connect links to display in the footer. """
+
     return [
         {
             "name": link_name,
@@ -179,13 +181,17 @@ def _footer_connect_links():
         }
         for link_name, link_url, link_title in [
             ("blog", marketing_link("BLOG"), _("Blog")),
-            ("contact", reverse("support:contact_us"), _("Contact Us")),
+            ("contact", _build_support_form_url(), _("Contact Us")),
             ("help-center", settings.SUPPORT_SITE_LINK, _("Help Center")),
             ("media_kit", marketing_link("MEDIA_KIT"), _("Media Kit")),
             ("donate", marketing_link("DONATE"), _("Donate")),
         ]
         if link_url and link_url != "#"
     ]
+
+
+def _build_support_form_url():
+    return '{base_url}/support/contact_us'.format(base_url=settings.LMS_ROOT_URL)
 
 
 def _footer_navigation_links():
@@ -273,7 +279,7 @@ def _footer_more_info_links():
         ("terms_of_service_and_honor_code", marketing_link("TOS_AND_HONOR"), _("Terms of Service & Honor Code")),
         ("privacy_policy", marketing_link("PRIVACY"), _("Privacy Policy")),
         ("accessibility_policy", marketing_link("ACCESSIBILITY"), _("Accessibility Policy")),
-        ("trademarks", marketing_link("TRADEMARKS"), _("Trademarks")),
+        ("trademarks", marketing_link("TRADEMARKS"), _("Trademark Policy")),
         ("sitemap", marketing_link("SITE_MAP"), _("Sitemap")),
     ]
 

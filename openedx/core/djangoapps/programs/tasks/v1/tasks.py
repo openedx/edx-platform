@@ -75,9 +75,8 @@ def get_certified_programs(student):
 
     """
     certified_programs = []
-    for credential in get_credentials(student):
-        if 'program_uuid' in credential['credential']:
-            certified_programs.append(credential['credential']['program_uuid'])
+    for credential in get_credentials(student, credential_type='program'):
+        certified_programs.append(credential['credential']['program_uuid'])
     return certified_programs
 
 

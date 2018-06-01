@@ -3,6 +3,7 @@ from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib.admin import autodiscover as django_autodiscover
 from django.utils.translation import ugettext_lazy as _
+from rest_framework_swagger.views import get_swagger_view
 
 import contentstore.views
 from cms.djangoapps.contentstore.views.organization import OrganizationListView
@@ -10,12 +11,18 @@ import openedx.core.djangoapps.common_views.xblock
 import openedx.core.djangoapps.debug.views
 import openedx.core.djangoapps.external_auth.views
 import openedx.core.djangoapps.lang_pref.views
+from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
+from openedx.core.djangoapps.password_policy.forms import PasswordPolicyAwareAdminAuthForm
 
 from ratelimitbackend import admin
 
 django_autodiscover()
 admin.site.site_header = _('Studio Administration')
 admin.site.site_title = admin.site.site_header
+
+if password_policy_compliance.should_enforce_compliance_on_login():
+    admin.site.login_form = PasswordPolicyAwareAdminAuthForm
+
 
 # Pattern to match a course key or a library key
 COURSELIKE_KEY_PATTERN = r'(?P<course_key_string>({}|{}))'.format(
@@ -33,7 +40,6 @@ urlpatterns = [
     url(r'^transcripts/choose$', contentstore.views.choose_transcripts, name='choose_transcripts'),
     url(r'^transcripts/replace$', contentstore.views.replace_transcripts, name='replace_transcripts'),
     url(r'^transcripts/rename$', contentstore.views.rename_transcripts, name='rename_transcripts'),
-    url(r'^transcripts/save$', contentstore.views.save_transcripts, name='save_transcripts'),
     url(r'^preview/xblock/(?P<usage_key_string>.*?)/handler/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$',
         contentstore.views.preview_handler, name='preview_handler'),
     url(r'^xblock/(?P<usage_key_string>.*?)/handler/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$',
@@ -140,10 +146,8 @@ urlpatterns = [
         contentstore.views.transcript_preferences_handler, name='transcript_preferences_handler'),
     url(r'^transcript_credentials/{}$'.format(settings.COURSE_KEY_PATTERN),
         contentstore.views.transcript_credentials_handler, name='transcript_credentials_handler'),
-    url(r'^transcript_download/{}$'.format(settings.COURSE_KEY_PATTERN),
-        contentstore.views.transcript_download_handler, name='transcript_download_handler'),
-    url(r'^transcript_upload/{}$'.format(settings.COURSE_KEY_PATTERN),
-        contentstore.views.transcript_upload_handler, name='transcript_upload_handler'),
+    url(r'^transcript_download/$', contentstore.views.transcript_download_handler, name='transcript_download_handler'),
+    url(r'^transcript_upload/$', contentstore.views.transcript_upload_handler, name='transcript_upload_handler'),
     url(r'^transcript_delete/{}(?:/(?P<edx_video_id>[-\w]+))?(?:/(?P<language_code>[^/]*))?$'.format(
         settings.COURSE_KEY_PATTERN
     ), contentstore.views.transcript_delete_handler, name='transcript_delete_handler'),
@@ -259,6 +263,11 @@ urlpatterns += [
     url(r'^404$', handler404),
     url(r'^500$', handler500),
 ]
+
+if settings.FEATURES.get('ENABLE_API_DOCS'):
+    urlpatterns += [
+        url(r'^api-docs/$', get_swagger_view(title='Studio API')),
+    ]
 
 from openedx.core.djangoapps.plugins import constants as plugin_constants, plugin_urls
 urlpatterns.extend(plugin_urls.get_patterns(plugin_constants.ProjectType.CMS))

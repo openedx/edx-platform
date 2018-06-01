@@ -7,6 +7,7 @@ authored by dstufft (https://github.com/dstufft)
 """
 from __future__ import division
 
+import logging
 import string
 import unicodedata
 
@@ -18,6 +19,21 @@ from Levenshtein import distance
 from six import text_type
 
 from student.models import PasswordHistory
+
+
+log = logging.getLogger(__name__)
+
+# In description order
+_allowed_password_complexity = [
+    'ALPHABETIC',
+    'UPPER',
+    'LOWER',
+    'NUMERIC',
+    'DIGITS',
+    'PUNCTUATION',
+    'NON ASCII',
+    'WORDS',
+]
 
 
 class SecurityPolicyError(ValidationError):
@@ -47,7 +63,93 @@ def password_max_length():
     return max_length
 
 
-def validate_password(password, user=None, username=None):
+def password_complexity():
+    """
+    :return: A dict of complexity requirements from settings
+    """
+    complexity = {}
+    if settings.FEATURES.get('ENFORCE_PASSWORD_POLICY', False):
+        complexity = getattr(settings, 'PASSWORD_COMPLEXITY', {})
+
+    valid_complexity = {x: y for x, y in complexity.iteritems() if x in _allowed_password_complexity}
+
+    if not password_complexity.logged:
+        invalid = frozenset(complexity.keys()) - frozenset(valid_complexity.keys())
+        for key in invalid:
+            log.warning('Unrecognized %s value in PASSWORD_COMPLEXITY setting.', key)
+        password_complexity.logged = True
+
+    return valid_complexity
+
+
+# Declare static variable for the function above, which helps avoid issuing multiple log warnings.
+# We don't instead keep a cached version of the complexity rules, because that might trip up unit tests.
+password_complexity.logged = False
+
+
+def _password_complexity_descriptions(which=None):
+    """
+    which: A list of which complexities to describe, None if you want the configured ones
+    :return: A list of complexity descriptions
+    """
+    descs = []
+    complexity = password_complexity()
+    if which is None:
+        which = complexity.keys()
+
+    for key in _allowed_password_complexity:  # we iterate over allowed keys so that we get the order right
+        value = complexity.get(key, 0) if key in which else 0
+        if not value:
+            continue
+
+        if key == 'ALPHABETIC':
+            # Translators: This appears in a list of password requirements
+            descs.append(ungettext('{num} letter', '{num} letters', value).format(num=value))
+        elif key == 'UPPER':
+            # Translators: This appears in a list of password requirements
+            descs.append(ungettext('{num} uppercase letter', '{num} uppercase letters', value).format(num=value))
+        elif key == 'LOWER':
+            # Translators: This appears in a list of password requirements
+            descs.append(ungettext('{num} lowercase letter', '{num} lowercase letters', value).format(num=value))
+        elif key == 'DIGITS':
+            # Translators: This appears in a list of password requirements
+            descs.append(ungettext('{num} digit', '{num} digits', value).format(num=value))
+        elif key == 'NUMERIC':
+            # Translators: This appears in a list of password requirements
+            descs.append(ungettext('{num} number', '{num} numbers', value).format(num=value))
+        elif key == 'PUNCTUATION':
+            # Translators: This appears in a list of password requirements
+            descs.append(ungettext('{num} punctuation mark', '{num} punctuation marks', value).format(num=value))
+        elif key == 'NON ASCII':  # note that our definition of non-ascii is non-letter, non-digit, non-punctuation
+            # Translators: This appears in a list of password requirements
+            descs.append(ungettext('{num} symbol', '{num} symbols', value).format(num=value))
+        elif key == 'WORDS':
+            # Translators: This appears in a list of password requirements
+            descs.append(ungettext('{num} word', '{num} words', value).format(num=value))
+        else:
+            raise Exception('Unexpected complexity value {}'.format(key))
+
+    return descs
+
+
+def password_instructions():
+    """
+    :return: A string suitable for display to the user to tell them what password to enter
+    """
+    min_length = password_min_length()
+    reqs = _password_complexity_descriptions()
+
+    if not reqs:
+        return ungettext('Your password must contain at least {num} character.',
+                         'Your password must contain at least {num} characters.',
+                         min_length).format(num=min_length)
+    else:
+        return ungettext('Your password must contain at least {num} character, including {requirements}.',
+                         'Your password must contain at least {num} characters, including {requirements}.',
+                         min_length).format(num=min_length, requirements=' & '.join(reqs))
+
+
+def validate_password(password, user=None, username=None, password_reset=True):
     """
     Checks user-provided password against our current site policy.
 
@@ -57,23 +159,34 @@ def validate_password(password, user=None, username=None):
         password: The user-provided password as a string
         user: A User model object, if available. Required to check against security policy.
         username: The user-provided username, if available. Taken from 'user' if not provided.
+        password_reset: Whether to run validators that only make sense in a password reset
+         context (like PasswordHistory).
     """
+    if not isinstance(password, text_type):
+        try:
+            password = text_type(password, encoding='utf8')  # some checks rely on unicode semantics (e.g. length)
+        except UnicodeDecodeError:
+            raise ValidationError(_('Invalid password.'))  # no reason to get into weeds
+
     username = username or (user and user.username)
 
-    if user:
-        validate_password_security(password, user)
+    if user and password_reset:
+        _validate_password_security(password, user)
 
-    validate_password_length(password)
+    _validate_password_dictionary(password)
+    _validate_password_against_username(password, username)
 
-    if settings.FEATURES.get('ENFORCE_PASSWORD_POLICY', False):
-        validate_password_complexity(password)
-        validate_password_dictionary(password)
+    # Some messages are composable, so we'll add them together here
+    errors = [_validate_password_length(password)]
+    errors += _validate_password_complexity(password)
+    errors = filter(None, errors)
 
-    if username:
-        validate_password_against_username(password, username)
+    if errors:
+        msg = _('Enter a password with at least {requirements}.').format(requirements=' & '.join(errors))
+        raise ValidationError(msg)
 
 
-def validate_password_security(password, user):
+def _validate_password_security(password, user):
     """
     Check password reuse and similar operational security policy considerations.
     """
@@ -103,33 +216,36 @@ def validate_password_security(password, user):
         ).format(num=num_days))
 
 
-def validate_password_length(value):
+def _validate_password_length(value):
     """
     Validator that enforces minimum length of a password
     """
-    message = _("Password: Invalid Length ({0})")
-    code = "length"
-
     min_length = password_min_length()
     max_length = password_max_length()
 
     if min_length and len(value) < min_length:
-        raise ValidationError(message.format(_("must be {0} characters or more").format(min_length)), code=code)
+        # This is an error that can be composed with other requirements, so just return a fragment
+        # Translators: This appears in a list of password requirements
+        return ungettext(
+            "{num} character",
+            "{num} characters",
+            min_length
+        ).format(num=min_length)
     elif max_length and len(value) > max_length:
-        raise ValidationError(message.format(_("must be {0} characters or fewer").format(max_length)), code=code)
+        raise ValidationError(ungettext(
+            "Enter a password with at most {num} character.",
+            "Enter a password with at most {num} characters.",
+            max_length
+        ).format(num=max_length))
 
 
-def validate_password_complexity(value):
+def _validate_password_complexity(value):
     """
     Validator that enforces minimum complexity
     """
-    message = _("Password: Must be more complex ({0})")
-    code = "complexity"
-
-    complexities = getattr(settings, "PASSWORD_COMPLEXITY", None)
-
-    if complexities is None:
-        return
+    complexities = password_complexity()
+    if not complexities:
+        return []
 
     # Sets are here intentionally
     uppercase, lowercase, digits, non_ascii, punctuation = set(), set(), set(), set(), set()
@@ -156,43 +272,51 @@ def validate_password_complexity(value):
 
     errors = []
     if len(uppercase) < complexities.get("UPPER", 0):
-        errors.append(_("must contain {0} or more uppercase characters").format(complexities["UPPER"]))
+        errors.append('UPPER')
     if len(lowercase) < complexities.get("LOWER", 0):
-        errors.append(_("must contain {0} or more lowercase characters").format(complexities["LOWER"]))
+        errors.append('LOWER')
     if len(digits) < complexities.get("DIGITS", 0):
-        errors.append(_("must contain {0} or more digits").format(complexities["DIGITS"]))
+        errors.append('DIGITS')
     if len(punctuation) < complexities.get("PUNCTUATION", 0):
-        errors.append(_("must contain {0} or more punctuation characters").format(complexities["PUNCTUATION"]))
+        errors.append('PUNCTUATION')
     if len(non_ascii) < complexities.get("NON ASCII", 0):
-        errors.append(_("must contain {0} or more non ascii characters").format(complexities["NON ASCII"]))
+        errors.append('NON ASCII')
     if len(words) < complexities.get("WORDS", 0):
-        errors.append(_("must contain {0} or more unique words").format(complexities["WORDS"]))
+        errors.append('WORDS')
     if len(numeric) < complexities.get("NUMERIC", 0):
-        errors.append(_("must contain {0} or more numbers").format(complexities["NUMERIC"]))
+        errors.append('NUMERIC')
     if len(alphabetic) < complexities.get("ALPHABETIC", 0):
-        errors.append(_("must contain {0} or more letters").format(complexities["ALPHABETIC"]))
+        errors.append('ALPHABETIC')
 
     if errors:
-        raise ValidationError(message.format(u', '.join(errors)), code=code)
+        return _password_complexity_descriptions(errors)
+    else:
+        return []
 
 
-def validate_password_against_username(password, username):
+def _validate_password_against_username(password, username):
+    if not username:
+        return
+
     if password == username:
         # Translators: This message is shown to users who enter a password matching
         # the username they enter(ed).
-        raise ValidationError(_(u"Password cannot be the same as the username"))
+        raise ValidationError(_(u"Password cannot be the same as the username."))
 
 
-def validate_password_dictionary(value):
+def _validate_password_dictionary(value):
     """
     Insures that the password is not too similar to a defined set of dictionary words
     """
+    if not settings.FEATURES.get('ENFORCE_PASSWORD_POLICY', False):
+        return
+
     password_max_edit_distance = getattr(settings, "PASSWORD_DICTIONARY_EDIT_DISTANCE_THRESHOLD", None)
     password_dictionary = getattr(settings, "PASSWORD_DICTIONARY", None)
 
     if password_max_edit_distance and password_dictionary:
         for word in password_dictionary:
-            edit_distance = distance(text_type(value), text_type(word))
+            edit_distance = distance(value, text_type(word))
             if edit_distance <= password_max_edit_distance:
-                raise ValidationError(_("Password: Too similar to a restricted dictionary word."),
+                raise ValidationError(_("Password is too similar to a dictionary word."),
                                       code="dictionary_word")

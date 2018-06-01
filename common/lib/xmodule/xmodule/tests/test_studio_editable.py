@@ -10,6 +10,8 @@ class StudioEditableModuleTestCase(BaseVerticalBlockTest):
     """
     Class containing StudioEditableModule tests.
     """
+    shard = 1
+
     def test_render_reorderable_children(self):
         """
         Test the behavior of render_reorderable_children.

@@ -15,12 +15,15 @@ user_metadata = {
         'upgrade_link',
         'upgrade_price',
         'pacing_type',
+        'has_staff_access'
     )
 }
 
 if user:
     user_metadata['username'] = user.username
     user_metadata['user_id'] = user.id
+    if hasattr(user, 'email'):
+        user_metadata['email'] = user.email
 
 for datekey in (
         'schedule_start',

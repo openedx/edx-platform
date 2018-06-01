@@ -12,6 +12,7 @@ file and check it in at the same time as your model changes. To do that,
 ASSUMPTIONS: modules have unique IDs, even across different module_types
 
 """
+import codecs
 import csv
 import hashlib
 import json
@@ -270,6 +271,8 @@ class DjangoStorageReportStore(ReportStore):
         strings), write the rows to the storage backend in csv format.
         """
         output_buffer = ContentFile('')
+        # Adding unicode signature (BOM) for MS Excel 2013 compatibility
+        output_buffer.write(codecs.BOM_UTF8)
         csvwriter = csv.writer(output_buffer)
         csvwriter.writerows(self._get_utf8_encoded_rows(rows))
         output_buffer.seek(0)

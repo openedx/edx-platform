@@ -52,6 +52,7 @@ class TestScoredBlockTypes(TestCase):
     """
     Tests for the possibly_scored function.
     """
+    shard = 4
     possibly_scored_block_types = {
         'course', 'chapter', 'sequential', 'vertical',
         'library_content', 'split_test', 'conditional', 'library', 'randomize',
@@ -60,10 +61,7 @@ class TestScoredBlockTypes(TestCase):
     }
 
     def test_block_types_possibly_scored(self):
-        self.assertSetEqual(
-            self.possibly_scored_block_types,
-            scores._block_types_possibly_scored()
-        )
+        self.assertTrue(self.possibly_scored_block_types.issubset(scores._block_types_possibly_scored()))
 
     def test_possibly_scored(self):
         course_key = CourseLocator(u'org', u'course', u'run')
@@ -77,6 +75,7 @@ class TestGetScore(TestCase):
     """
     Tests for get_score
     """
+    shard = 4
     display_name = 'test_name'
     location = 'test_location'
 
@@ -229,6 +228,8 @@ class TestWeightedScore(TestCase):
     """
     Tests the helper method: weighted_score
     """
+    shard = 4
+
     @ddt.data(
         (0, 0, 1),
         (5, 0, 0),
@@ -269,6 +270,8 @@ class TestInternalGetGraded(TestCase):
     """
     Tests the internal helper method: _get_explicit_graded
     """
+    shard = 4
+
     def _create_block(self, explicit_graded_value):
         """
         Creates and returns a minimal BlockData object with the give value
@@ -308,6 +311,8 @@ class TestInternalGetScoreFromBlock(TestCase):
     """
     Tests the internal helper method: _get_score_from_persisted_or_latest_block
     """
+    shard = 4
+
     def _create_block(self, raw_possible):
         """
         Creates and returns a minimal BlockData object with the give value

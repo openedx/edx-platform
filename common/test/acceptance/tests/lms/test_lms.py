@@ -42,7 +42,7 @@ from common.test.acceptance.tests.helpers import (
 )
 
 
-@attr(shard=8)
+@attr(shard=19)
 class ForgotPasswordPageTest(UniqueCourseTest):
     """
     Test that forgot password forms is rendered if url contains 'forgot-password-modal'
@@ -84,7 +84,7 @@ class ForgotPasswordPageTest(UniqueCourseTest):
         self.assertIn("Check Your Email", self.reset_password_page.get_success_message())
 
 
-@attr(shard=8)
+@attr(shard=19)
 class LoginFromCombinedPageTest(UniqueCourseTest):
     """Test that we can log in using the combined login/registration page.
 
@@ -277,7 +277,7 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
         return (email, password)
 
 
-@attr(shard=8)
+@attr(shard=19)
 class RegisterFromCombinedPageTest(UniqueCourseTest):
     """Test that we can register a new user from the combined login/registration page. """
 
@@ -335,11 +335,11 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
             full_name="Test User",
             terms_of_service=False
         )
-
         # Verify that the expected errors are displayed.
         errors = self.register_page.wait_for_errors()
         self.assertIn(u'Please enter your Public Username.', errors)
-        self.assertIn(u'You must agree to the édX Terms of Service and Honor Code', errors)
+        self.assertIn(u'You must agree to the édX Terms of Service and Honor Code',
+                      errors)
         self.assertIn(u'Select your country or region of residence.', errors)
         self.assertIn(u'Please tell us your favorite movie.', errors)
 
@@ -400,7 +400,7 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         account_settings.wait_for_message(field_id, "Successfully unlinked")
 
 
-@attr(shard=8)
+@attr(shard=19)
 class PayAndVerifyTest(EventsTestMixin, UniqueCourseTest):
     """Test that we can proceed through the payment and verification flow."""
     def setUp(self):
@@ -430,33 +430,6 @@ class PayAndVerifyTest(EventsTestMixin, UniqueCourseTest):
 
         # Add a verified mode to the course
         ModeCreationPage(self.browser, self.course_id, mode_slug=u'verified', mode_display_name=u'Verified Certificate', min_price=10, suggested_prices='10,20').visit()
-
-    def test_immediate_verification_enrollment(self):
-        # Create a user and log them in
-        student_id = AutoAuthPage(self.browser).visit().get_user_id()
-
-        enroll_user_track(self.browser, self.course_id, 'verified')
-
-        # Proceed to verification
-        self.payment_and_verification_flow.immediate_verification()
-
-        # Take face photo and proceed to the ID photo step
-        self.payment_and_verification_flow.webcam_capture()
-        self.payment_and_verification_flow.next_verification_step(self.immediate_verification_page)
-
-        # Take ID photo and proceed to the review photos step
-        self.payment_and_verification_flow.webcam_capture()
-        self.payment_and_verification_flow.next_verification_step(self.immediate_verification_page)
-
-        # Submit photos and proceed to the enrollment confirmation step
-        self.payment_and_verification_flow.next_verification_step(self.immediate_verification_page)
-
-        # Navigate to the dashboard
-        self.dashboard_page.visit()
-
-        # Expect that we're enrolled as verified in the course
-        enrollment_mode = self.dashboard_page.get_enrollment_mode(self.course_info["display_name"])
-        self.assertEqual(enrollment_mode, 'verified')
 
     def test_deferred_verification_enrollment(self):
         # Create a user and log them in
@@ -788,33 +761,6 @@ class VisibleToStaffOnlyTest(UniqueCourseTest):
 
         self.course_home_page = CourseHomePage(self.browser, self.course_id)
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
-
-    def test_visible_to_staff(self):
-        """
-        Scenario: All content is visible for a user marked is_staff (different from course staff)
-            Given some of the course content has been marked 'visible_to_staff_only'
-            And I am logged on with an account marked 'is_staff'
-            Then I can see all course content
-        """
-        AutoAuthPage(self.browser, username="STAFF_TESTER", email="johndoe_staff@example.com",
-                     course_id=self.course_id, staff=True).visit()
-
-        self.course_home_page.visit()
-        self.assertEqual(3, len(self.course_home_page.outline.sections['Test Section']))
-
-        self.course_home_page.outline.go_to_section("Test Section", "Subsection With Locked Unit")
-        self.courseware_page.wait_for_page()
-        self.assertEqual([u'Locked Unit', u'Unlocked Unit'], self.courseware_page.nav.sequence_items)
-
-        self.course_home_page.visit()
-        self.course_home_page.outline.go_to_section("Test Section", "Unlocked Subsection")
-        self.courseware_page.wait_for_page()
-        self.assertEqual([u'Test Unit'], self.courseware_page.nav.sequence_items)
-
-        self.course_home_page.visit()
-        self.course_home_page.outline.go_to_section("Test Section", "Locked Subsection")
-        self.courseware_page.wait_for_page()
-        self.assertEqual([u'Test Unit'], self.courseware_page.nav.sequence_items)
 
     def test_visible_to_student(self):
         """
@@ -1151,37 +1097,6 @@ class EnrollmentClosedRedirectTest(UniqueCourseTest):
         AutoAuthPage(self.browser).visit()
         url = BASE_URL + "/course_modes/choose/" + self.course_id
         self.browser.get(url)
-        self._assert_dashboard_message()
-
-    def test_login_redirect(self):
-        """
-        Test that the user is correctly redirected after logistration when
-        attempting to enroll in a closed course.
-        """
-        url = '{base_url}/register?{params}'.format(
-            base_url=BASE_URL,
-            params=urllib.urlencode({
-                'course_id': self.course_id,
-                'enrollment_action': 'enroll',
-                'email_opt_in': 'false'
-            })
-        )
-        self.browser.get(url)
-        register_page = CombinedLoginAndRegisterPage(
-            self.browser,
-            start_page="register",
-            course_id=self.course_id
-        )
-        register_page.wait_for_page()
-        register_page.register(
-            email="email@example.com",
-            password="password",
-            username="username",
-            full_name="Test User",
-            country="US",
-            favorite_movie="Mad Max: Fury Road",
-            terms_of_service=True
-        )
         self._assert_dashboard_message()
 
 

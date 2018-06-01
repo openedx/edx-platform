@@ -37,6 +37,7 @@ class TestRefundSignal(TestCase):
     """
     Exercises logic triggered by the REFUND_ORDER signal.
     """
+    shard = 4
 
     def setUp(self):
         super(TestRefundSignal, self).setUp()

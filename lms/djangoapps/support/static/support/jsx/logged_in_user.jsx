@@ -3,6 +3,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
+
 import FileUpload from './file_upload';
 
 function LoggedInUser({ userInformation, setErrorState, zendeskApiHost, submitForm }) {
@@ -10,7 +12,11 @@ function LoggedInUser({ userInformation, setErrorState, zendeskApiHost, submitFo
   if (userInformation.enrollments) {
     courseElement = (<div>
       <label className="label-course" htmlFor="course">{gettext('Course Name')}</label>
-      <select className="form-control select-course" id="course">
+      <select className="form-control select-course" id="course" defaultValue={userInformation.course_id}>
+        <option key="select-course" value="">--------</option>
+        <option key="not-course-specific" value="Not specific to a course">
+          {gettext('Not specific to a course')}
+        </option>
         {userInformation.enrollments.map(enrollment =>
                 (<option key={enrollment.course_id} value={enrollment.course_id}>
                   {enrollment.course_name}
@@ -20,7 +26,7 @@ function LoggedInUser({ userInformation, setErrorState, zendeskApiHost, submitFo
     </div>);
   } else {
     courseElement = (<div>
-      <label htmlFor="course">{gettext('Course Name')}<span> {gettext('(Optional)')}</span></label>
+      <label htmlFor="course">{gettext('Course Name')}</label>
       <input type="text" className="form-control" id="course" />
     </div>);
   }
@@ -32,7 +38,12 @@ function LoggedInUser({ userInformation, setErrorState, zendeskApiHost, submitFo
         data-username={userInformation.username}
         data-email={userInformation.email}
       >
-        <p>{gettext(`What can we help you with, ${userInformation.username}?`)}</p>
+        <p>
+          {StringUtils.interpolate(
+            gettext('What can we help you with, {username}?'),
+            { username: userInformation.username },
+          )}
+        </p>
       </div>
     </div>
 
@@ -70,12 +81,12 @@ function LoggedInUser({ userInformation, setErrorState, zendeskApiHost, submitFo
       </div>
     </div>
 
-    {/*TODO file uploading will be done after initial release*/}
-    {/*<FileUpload*/}
-      {/*setErrorState={setErrorState}*/}
-      {/*zendeskApiHost={zendeskApiHost}*/}
-      {/*accessToken={accessToken}*/}
-    {/*/>*/}
+    {/* TODO file uploading will be done after initial release */}
+    {/* <FileUpload */}
+      {/* setErrorState={setErrorState} */}
+      {/* zendeskApiHost={zendeskApiHost} */}
+      {/* accessToken={accessToken} */}
+    {/* /> */}
 
     <div className="row">
       <div className="col-sm-12">

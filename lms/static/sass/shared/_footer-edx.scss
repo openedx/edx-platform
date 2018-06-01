@@ -19,22 +19,34 @@ footer#footer-edx-v3 {
   padding: $baseline*0.75 0;
   border-top: 1px solid $courseware-button-border-color;
 
-  .first-div-border {
-    @include border-left(1px solid $courseware-button-border-color);
+  // There is a generic style similar applying div and box shadow on the wiki page of course.
+  // so disabling that design for footer in the lines below
+  .container > div {
+    border: none;
+    box-shadow: none;
+    background: inherit;
   }
 
-  .second-div-border {
-    @include border-left(1px solid $courseware-button-border-color);
+  .column-styles {
+    position: relative;
+    width: 100%;
+    flex: 0 0 100%;
+    max-width: 100%;
+    min-height: 1px;
+    padding-right: 15px;
+    padding-left: 15px;
   }
 
-  .third-div-border {
-    @include border-left(1px solid $courseware-button-border-color);
+  a.social-links {
+    font-size: 35px;
   }
 
+  .first-div-border,
+  .second-div-border,
+  .third-div-border,
   .fourth-div-border {
-    @include border-left(1px solid $courseware-button-border-color);
+    @include border-left(none);
   }
-
 
   .main-row {
     display: -webkit-box;
@@ -42,6 +54,24 @@ footer#footer-edx-v3 {
     display: -ms-flexbox;
     display: flex;
     flex-wrap: wrap;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -15px;
+    margin-left: -15px;
+  }
+
+
+  .list-unstyled {
+    list-style: none;
+
+    @include padding-left(0);
   }
 
   .flex-column {
@@ -95,6 +125,7 @@ footer#footer-edx-v3 {
     @include margin-left(8px);
 
     border-bottom: 1px solid $courseware-button-border-color;
+    line-height: 1.5;
   }
 
   .footer-language-selector {
@@ -105,6 +136,10 @@ footer#footer-edx-v3 {
     margin-top: $baseline*0.75;
     height: auto;
     display: inline-flex;
+  }
+
+  .app-link img {
+    height: 35px;
   }
 
   .social {
@@ -321,40 +356,76 @@ footer#footer-edx-v3 {
   @include media-breakpoint-up(sm) {
     padding: $baseline $baseline*0.5;
 
+    .column-1 {
+      flex: 0 0 58.33333%;
+      max-width: 58.33333%;
+    }
+
+    .column-2,
+    .column-3 {
+      flex: 0 0 50%;
+      max-width: 50%;
+    }
+
+    .column-2-1,
+    .column-3-1,
+    .column-3-2 {
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+
+    .column-2-2 {
+      flex: 0 0 80%;
+      max-width: 80%;
+
+      @include margin-left(10%);
+    }
+
+    ul.social {
+      padding: 0;
+      margin: 0;
+      list-style-type: none;
+      margin-top: 15px;
+    }
+
+    .logo-div {
+      @include margin-left(7%);
+
+      display: inline-flex;
+    }
+
+    ul.social li {
+      width: 65px;
+      height: 35px;
+      float: left;
+      margin-left: 7px;
+    }
+
     div.container {
       min-width: 0;
       padding: 0;
     }
 
-
-    .first-div-border {
-      @include border-left(none);
-    }
-
     .first-div-border div div {
       border-bottom: 1px solid $courseware-button-border-color;
 
-      @include margin-left(7px);
+      @include margin-left(10%);
     }
 
     .second-div-border div div {
       border-bottom: 1px solid $courseware-button-border-color;
 
-      @include margin-left(7px);
+      @include margin-left(10%);
     }
 
     .third-div-border div div {
       border-bottom: none;
 
-      @include margin-left(7px);
+      @include margin-left(10%);
     }
 
-    .second-div-border {
-      @include border-left(none);
-    }
-
-    .third-div-border {
-      @include border-left(none);
+    .fourth-div-border {
+      @include border-left(1px solid $courseware-button-border-color);
     }
 
     .site-details {
@@ -380,7 +451,7 @@ footer#footer-edx-v3 {
     }
 
     .app-link img {
-      height: 40px;
+      height: 35px;
       margin-top: 10px;
     }
 
@@ -392,24 +463,56 @@ footer#footer-edx-v3 {
       @include margin-left($baseline*0.25);
     }
 
-    .social {
-      display: inline;
-      margin-top: 0;
-    }
-
-
     .footer-language-selector {
       display: inline-block;
       float: none;
     }
-
-    ul.social li {
-      display: inline;
-      width: 0;
-    }
   }
 
   @include media-breakpoint-up(md) {
+    .ml-auto {
+      margin-left: auto;
+    }
+
+    .footer-language-selector {
+      display: inline-block;
+      width: max-content;
+    }
+
+    .column-1 {
+      flex: 0 0 25%;
+      max-width: 25%;
+    }
+
+    .column-2 {
+      flex: 0 0 75%;
+      max-width: 75%;
+    }
+
+    .column-2-2 {
+      flex: 0 0 80%;
+      max-width: 80%;
+
+      @include margin-left(0);
+    }
+
+    .column-2-2,
+    .column-3,
+    .column-3-2 {
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+
+    .column-2-1 {
+      flex: 0 0 33.3333%;
+      max-width: 33.3333%;
+    }
+
+    .column-3-1 {
+      flex: 0 0 75%;
+      max-width: 75%;
+    }
+
     .edx-footer-logo {
       display: inline-flex;
 
@@ -426,10 +529,14 @@ footer#footer-edx-v3 {
 
     .first-div-border div div {
       border-bottom: none;
+
+      @include margin-left(0);
     }
 
     .second-div-border div div {
       border-bottom: none;
+
+      @include margin-left(0);
     }
 
     .second-div-border {
@@ -440,10 +547,6 @@ footer#footer-edx-v3 {
 
     .third-div-border {
       @include border-left(1px solid $courseware-button-border-color);
-    }
-
-    .fourth-div-border {
-      @include border-left(none);
     }
 
     padding: $baseline $baseline*0.5;
@@ -470,18 +573,13 @@ footer#footer-edx-v3 {
       border-bottom: none;
     }
 
-    .app-link img {
-      height: 40px;
-    }
-
-    a.social-links {
-      @include font-size(40);
-    }
-
     .social {
       display: inline-flex;
       vertical-align: middle;
-      margin-top: 18px;
+    }
+
+    ul.social {
+      margin-top: 29px;
     }
 
     .app-links {
@@ -516,7 +614,30 @@ footer#footer-edx-v3 {
   @include media-breakpoint-up(lg) {
     padding: $baseline $baseline*0.5;
 
-    .margin {
+    .column-1,
+    .column-2-2,
+    .column-3-1,
+    .column-3-2 {
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+
+    .column-2 {
+      flex: 0 0 66.66667%;
+      max-width: 66.66667%;
+    }
+
+    .column-2-1,
+    .column-3 {
+      flex: 0 0 33.3333%;
+      max-width: 33.3333%;
+    }
+
+    .column-2-2 {
+      @include margin-left(0);
+    }
+
+    .edx-footer-logo {
       @include margin-left($baseline);
     }
 
@@ -580,14 +701,6 @@ footer#footer-edx-v3 {
       border-bottom: none;
     }
 
-    .app-link img {
-      height: 40px;
-    }
-
-    a.social-links {
-      @include font-size(40);
-    }
-
     .social {
       display: inline-flex;
       vertical-align: middle;
@@ -612,6 +725,7 @@ footer#footer-edx-v3 {
 
     .col-xl-2 .footer-language-selector {
       display: inline-block;
+      width: max-content;
     }
 
     ul.social li {
@@ -626,6 +740,33 @@ footer#footer-edx-v3 {
 
     .first-div-border {
       @include border-left(1px solid $courseware-button-border-color);
+    }
+
+    .column-1 {
+      flex: 0 0 16.6667%;
+      max-width: 16.6667%;
+    }
+
+    .column-2 {
+      flex: 0 0 50%;
+      max-width: 50%;
+    }
+
+    .column-2-1,
+    .column-3 {
+      flex: 0 0 33.3333%;
+      max-width: 33.3333%;
+    }
+
+    .column-2-2 {
+      @include margin-left(0%);
+    }
+
+    .column-2-2,
+    .column-3-1,
+    .column-3-2 {
+      flex: 0 0 100%;
+      max-width: 100%;
     }
 
     .second-div-border {
@@ -700,6 +841,6 @@ footer#footer-edx-v3 {
       cursor: initial;
     }
   }
-  
+
   @extend %ui-print-excluded;
 }

@@ -79,11 +79,11 @@ class GetAwardedCertificateProgramsTestCase(TestCase):
         student = UserFactory(username='test-username')
         mock_get_credentials.return_value = [
             self.make_credential_result(status='awarded', credential={'program_uuid': 1}),
-            self.make_credential_result(status='awarded', credential={'course_id': 2}),
         ]
 
         result = tasks.get_certified_programs(student)
         self.assertEqual(mock_get_credentials.call_args[0], (student,))
+        self.assertEqual(mock_get_credentials.call_args[1], {'credential_type': 'program'})
         self.assertEqual(result, [1])
 
 

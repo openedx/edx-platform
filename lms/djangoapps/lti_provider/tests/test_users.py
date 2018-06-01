@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.test import TestCase
 from django.test.client import RequestFactory
-from mock import MagicMock, patch
+from mock import MagicMock, patch, PropertyMock
 
 import lti_provider.users as users
 from lti_provider.models import LtiConsumer, LtiUser
@@ -19,6 +19,7 @@ class UserManagementHelperTest(TestCase):
     """
     Tests for the helper functions in users.py
     """
+    shard = 4
 
     def setUp(self):
         super(UserManagementHelperTest, self).setUp()
@@ -77,6 +78,8 @@ class AuthenticateLtiUserTest(TestCase):
     """
     Tests for the authenticate_lti_user function in users.py
     """
+    shard = 4
+
     def setUp(self):
         super(AuthenticateLtiUserTest, self).setUp()
         self.lti_consumer = LtiConsumer(
@@ -116,7 +119,7 @@ class AuthenticateLtiUserTest(TestCase):
     def test_authentication_with_authenticated_user(self, create_user, switch_user):
         lti_user = self.create_lti_user_model()
         self.request.user = lti_user.edx_user
-        assert self.request.user.is_authenticated()
+        assert self.request.user.is_authenticated
         users.authenticate_lti_user(self.request, self.lti_user_id, self.lti_consumer)
         self.assertFalse(create_user.called)
         self.assertFalse(switch_user.called)
@@ -124,7 +127,7 @@ class AuthenticateLtiUserTest(TestCase):
     def test_authentication_with_unauthenticated_user(self, create_user, switch_user):
         lti_user = self.create_lti_user_model()
         self.request.user = lti_user.edx_user
-        with patch('django.contrib.auth.models.User.is_authenticated') as mock_is_auth:
+        with patch('django.contrib.auth.models.User.is_authenticated', new_callable=PropertyMock) as mock_is_auth:
             mock_is_auth.return_value = False
             users.authenticate_lti_user(self.request, self.lti_user_id, self.lti_consumer)
             self.assertFalse(create_user.called)
@@ -133,7 +136,7 @@ class AuthenticateLtiUserTest(TestCase):
     def test_authentication_with_wrong_user(self, create_user, switch_user):
         lti_user = self.create_lti_user_model()
         self.request.user = self.old_user
-        assert self.request.user.is_authenticated()
+        assert self.request.user.is_authenticated
         users.authenticate_lti_user(self.request, self.lti_user_id, self.lti_consumer)
         self.assertFalse(create_user.called)
         switch_user.assert_called_with(self.request, lti_user, self.lti_consumer)
@@ -143,6 +146,7 @@ class CreateLtiUserTest(TestCase):
     """
     Tests for the create_lti_user function in users.py
     """
+    shard = 4
 
     def setUp(self):
         super(CreateLtiUserTest, self).setUp()
@@ -180,6 +184,7 @@ class LtiBackendTest(TestCase):
     """
     Tests for the authentication backend that authenticates LTI users.
     """
+    shard = 4
 
     def setUp(self):
         super(LtiBackendTest, self).setUp()

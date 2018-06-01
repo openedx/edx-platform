@@ -29,7 +29,7 @@ class TextbooksTest(StudioCourseTest):
 
         self.textbook_view_page = TextbookViewPage(self.browser, self.course_id)
 
-    @attr(shard=2)
+    @attr(shard=9)
     def test_create_first_book_message(self):
         """
         Scenario: A message is displayed on the textbooks page when there are no uploaded textbooks
@@ -40,7 +40,7 @@ class TextbooksTest(StudioCourseTest):
         message = self.textbook_upload_page.get_element_text('.wrapper-content .no-textbook-content')
         self.assertIn("You haven't added any textbooks", message)
 
-    @attr(shard=2)
+    @attr(shard=9)
     def test_new_textbook_upload(self):
         """
         Scenario: View Live link for textbook is correctly populated

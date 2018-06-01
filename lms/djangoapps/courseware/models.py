@@ -91,7 +91,7 @@ class StudentModule(models.Model):
     module_type = models.CharField(max_length=32, choices=MODULE_TYPES, default='problem', db_index=True)
 
     # Key used to share state. This is the XBlock usage_id
-    module_state_key = UsageKeyField(max_length=255, db_index=True, db_column='module_id')
+    module_state_key = UsageKeyField(max_length=255, db_column='module_id')
     student = models.ForeignKey(User, db_index=True)
 
     course_id = CourseKeyField(max_length=255, db_index=True)
@@ -111,7 +111,7 @@ class StudentModule(models.Model):
         ('f', 'FINISHED'),
         ('i', 'INCOMPLETE'),
     )
-    done = models.CharField(max_length=8, choices=DONE_TYPES, default='na', db_index=True)
+    done = models.CharField(max_length=8, choices=DONE_TYPES, default='na')
 
     created = models.DateTimeField(auto_now_add=True, db_index=True)
     modified = models.DateTimeField(auto_now=True, db_index=True)

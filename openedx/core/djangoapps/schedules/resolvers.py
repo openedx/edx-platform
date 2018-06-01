@@ -357,20 +357,21 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
                         user, week_num, enrollment.course_id
                     )
                 )
+                # continue to the next schedule, don't yield an email for this one
+            else:
+                template_context.update({
+                    'course_name': schedule.enrollment.course.display_name,
+                    'course_url': _get_trackable_course_home_url(enrollment.course_id),
 
-            template_context.update({
-                'course_name': schedule.enrollment.course.display_name,
-                'course_url': _get_trackable_course_home_url(enrollment.course_id),
+                    'week_num': week_num,
+                    'week_highlights': week_highlights,
 
-                'week_num': week_num,
-                'week_highlights': week_highlights,
+                    # This is used by the bulk email optout policy
+                    'course_ids': [str(enrollment.course_id)],
+                })
+                template_context.update(_get_upsell_information_for_schedule(user, schedule))
 
-                # This is used by the bulk email optout policy
-                'course_ids': [str(enrollment.course_id)],
-            })
-            template_context.update(_get_upsell_information_for_schedule(user, schedule))
-
-            yield (user, schedule.enrollment.course.closest_released_language, template_context)
+                yield (user, schedule.enrollment.course.closest_released_language, template_context)
 
 
 def _get_trackable_course_home_url(course_id):

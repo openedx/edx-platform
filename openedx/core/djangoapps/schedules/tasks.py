@@ -216,6 +216,7 @@ def _track_message_sent(site, user, msg):
         'language': msg.language,
         'uuid': unicode(msg.uuid),
         'send_uuid': unicode(msg.send_uuid),
+        'nonInteraction': 1,
     }
     course_ids = msg.context.get('course_ids', [])
     properties['num_courses'] = len(course_ids)

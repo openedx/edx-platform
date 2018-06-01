@@ -15,7 +15,7 @@ from lms.djangoapps.certificates.models import (
 from lms.djangoapps.certificates.signals import fire_ungenerated_certificate_task, CERTIFICATE_DELAY_SECONDS
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+from lms.djangoapps.verify_student.models import IDVerificationAttempt, SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.certificates.config import waffle
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -26,6 +26,7 @@ class SelfGeneratedCertsSignalTest(ModuleStoreTestCase):
     """
     Tests for enabling/disabling self-generated certificates according to course-pacing.
     """
+    shard = 4
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
@@ -53,6 +54,8 @@ class WhitelistGeneratedCertificatesTest(ModuleStoreTestCase):
     """
     Tests for whitelisted student auto-certificate generation
     """
+    shard = 4
+
     def setUp(self):
         super(WhitelistGeneratedCertificatesTest, self).setUp()
         self.course = CourseFactory.create(self_paced=True)
@@ -132,6 +135,8 @@ class PassingGradeCertsTest(ModuleStoreTestCase):
     """
     Tests for certificate generation task firing on passing grade receipt
     """
+    shard = 4
+
     def setUp(self):
         super(PassingGradeCertsTest, self).setUp()
         self.course = CourseFactory.create(
@@ -221,6 +226,8 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
     """
     Tests for certificate generation task firing on learner verification
     """
+    shard = 4
+
     def setUp(self):
         super(LearnerTrackChangeCertsTest, self).setUp()
         self.course_one = CourseFactory.create(self_paced=True)
@@ -261,7 +268,7 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
                     kwargs={
                         'student': unicode(self.user_one.id),
                         'course_key': unicode(self.course_one.id),
-                        'expected_verification_status': SoftwareSecurePhotoVerification.STATUS.approved
+                        'expected_verification_status': IDVerificationAttempt.STATUS.approved,
                     }
                 )
 
@@ -282,7 +289,7 @@ class LearnerTrackChangeCertsTest(ModuleStoreTestCase):
                     kwargs={
                         'student': unicode(self.user_two.id),
                         'course_key': unicode(self.course_two.id),
-                        'expected_verification_status': SoftwareSecurePhotoVerification.STATUS.approved
+                        'expected_verification_status': IDVerificationAttempt.STATUS.approved,
                     }
                 )
 
@@ -292,6 +299,7 @@ class CertificateGenerationTaskTest(ModuleStoreTestCase):
     """
     Tests for certificate generation task.
     """
+    shard = 4
 
     def setUp(self):
         super(CertificateGenerationTaskTest, self).setUp()

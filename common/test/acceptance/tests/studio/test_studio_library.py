@@ -12,7 +12,7 @@ from common.test.acceptance.pages.studio.utils import add_component
 from common.test.acceptance.tests.studio.base_studio_test import StudioLibraryTest
 
 
-@attr(shard=2)
+@attr(shard=15)
 @ddt
 class LibraryEditPageTest(StudioLibraryTest):
     """
@@ -184,7 +184,7 @@ class LibraryEditPageTest(StudioLibraryTest):
         self.assertIn("Checkboxes", problem_block.name)
 
 
-@attr(shard=2)
+@attr(shard=15)
 @ddt
 class LibraryNavigationTest(StudioLibraryTest):
     """
@@ -500,6 +500,7 @@ class LibraryNavigationTest(StudioLibraryTest):
         self.assertFalse(target_block.is_placeholder())
 
 
+@attr(shard=21)
 class LibraryUsersPageTest(StudioLibraryTest):
     """
     Test the functionality of the library "Instructor Access" page.

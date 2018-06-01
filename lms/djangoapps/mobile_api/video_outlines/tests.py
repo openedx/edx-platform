@@ -203,7 +203,7 @@ class TestVideoAPIMixin(object):
         return sub_block_a, sub_block_b
 
 
-@attr(shard=2)
+@attr(shard=9)
 class TestNonStandardCourseStructure(MobileAPITestCase, TestVideoAPIMixin, MilestonesTestCaseMixin):
     """
     Tests /api/mobile/v0.5/video_outlines/courses/{course_id} with no course set
@@ -413,7 +413,7 @@ class TestNonStandardCourseStructure(MobileAPITestCase, TestVideoAPIMixin, Miles
         )
 
 
-@attr(shard=2)
+@attr(shard=9)
 @ddt.ddt
 class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin,
                            TestVideoAPIMixin, MilestonesTestCaseMixin):
@@ -922,7 +922,6 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileCour
         ({'uk': 1, 'de': 1}, 'en-subs', ['de', 'en'], ['en', 'uk', 'de']),
     )
     @ddt.unpack
-    @patch('openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled', Mock(return_value=True))
     @patch('xmodule.video_module.transcripts_utils.edxval_api.get_available_transcript_languages')
     def test_val_transcripts_with_feature_enabled(self, transcripts, english_sub, val_transcripts,
                                                   expected_transcripts, mock_get_transcript_languages):
@@ -944,7 +943,7 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileCour
         self.assertItemsEqual(course_outline[0]['summary']['transcripts'].keys(), expected_transcripts)
 
 
-@attr(shard=2)
+@attr(shard=9)
 class TestTranscriptsDetail(TestVideoAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin,
                             TestVideoAPIMixin, MilestonesTestCaseMixin):
     """
@@ -973,10 +972,6 @@ class TestTranscriptsDetail(TestVideoAPITestCase, MobileAuthTestMixin, MobileCou
         self.login_and_enroll()
         self.api_response(expected_response_code=200, lang='en')
 
-    @patch(
-        'openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled',
-        Mock(return_value=True),
-    )
     @patch(
         'xmodule.video_module.transcripts_utils.edxval_api.get_available_transcript_languages',
         Mock(return_value=['uk']),
@@ -1009,20 +1004,3 @@ class TestTranscriptsDetail(TestVideoAPITestCase, MobileAuthTestMixin, MobileCou
         self.assertEqual(response.content, expected_content)
         for attribute, value in expected_headers.iteritems():
             self.assertEqual(response.get(attribute), value)
-
-    @patch(
-        'openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled',
-        Mock(return_value=False),
-    )
-    @patch(
-        'xmodule.video_module.transcripts_utils.edxval_api.get_available_transcript_languages',
-        Mock(return_value=['uk']),
-    )
-    def test_val_transcript_feature_disabled(self):
-        """
-        Tests transcript retrieval view with val transcripts when
-        the corresponding feature is disabled.
-        """
-        self.login_and_enroll()
-        # request to retrieval endpoint will result in 404 as val transcripts are disabled.
-        self.api_response(expected_response_code=404, lang='uk')

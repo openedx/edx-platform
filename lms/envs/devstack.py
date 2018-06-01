@@ -39,13 +39,8 @@ for log_name, log_level in LOG_OVERRIDES:
 
 ################################ EMAIL ########################################
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
-########################## ANALYTICS TESTING ########################
-
-# Set this to the dashboard URL in order to display the link from the
-# dashboard to the Analytics Dashboard.
-ANALYTICS_DASHBOARD_URL = None
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = '/edx/src/ace_messages/'
 
 ############################ PYFS XBLOCKS SERVICE #############################
 # Set configuration for Django pyfilesystem
@@ -92,6 +87,10 @@ def should_show_debug_toolbar(request):
     if request.get_host().startswith('edx.devstack.lms:'):
         return False
     return True
+
+########################### API DOCS #################################
+
+FEATURES['ENABLE_API_DOCS'] = True
 
 ########################### PIPELINE #################################
 
@@ -222,9 +221,6 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and 'third_party_auth.dummy.DummyBack
 
 ############## ECOMMERCE API CONFIGURATION SETTINGS ###############
 ECOMMERCE_PUBLIC_URL_ROOT = "http://localhost:8002"
-
-CREDENTIALS_INTERNAL_SERVICE_URL = 'http://localhost:8008'
-CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:8008'
 
 ###################### Cross-domain requests ######################
 FEATURES['ENABLE_CORS_HEADERS'] = True

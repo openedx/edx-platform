@@ -108,6 +108,16 @@ class ScorableCompletionHandlerTestCase(CompletionSetUpMixin, TestCase):
         )
         self.assertFalse(completion.exists())
 
+    def test_handler_skips_discussion_block(self):
+        discussion_block_key = self.course_key.make_usage_key(block_type='discussion', block_id='blue')
+        self.call_scorable_block_completion_handler(discussion_block_key)
+        completion = BlockCompletion.objects.filter(
+            user=self.user,
+            course_key=self.course_key,
+            block_key=discussion_block_key,
+        )
+        self.assertFalse(completion.exists())
+
     def test_signal_calls_handler(self):
         with patch('completion.handlers.scorable_block_completion') as mock_handler:
             PROBLEM_WEIGHTED_SCORE_CHANGED.send_robust(

@@ -1,10 +1,11 @@
 """Admin forms for Course Entitlements"""
 from django import forms
 from django.contrib import admin
-
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+
 from xmodule.modulestore.django import modulestore
+
 from .models import CourseEntitlement, CourseEntitlementPolicy, CourseEntitlementSupportDetail
 
 
@@ -64,6 +65,18 @@ class CourseEntitlementSupportDetailAdmin(admin.ModelAdmin):
     form = CourseEntitlementSupportDetailForm
 
 
+class CourseEntitlementPolicyForm(forms.ModelForm):
+    """ Form for creating custom course entitlement policies. """
+    def __init__(self, *args, **kwargs):
+        super(CourseEntitlementPolicyForm, self).__init__(*args, **kwargs)
+        self.fields['site'].required = False
+        self.fields['mode'].required = False
+
+    class Meta:
+        fields = '__all__'
+        model = CourseEntitlementPolicy
+
+
 @admin.register(CourseEntitlementPolicy)
 class CourseEntitlementPolicyAdmin(admin.ModelAdmin):
     """
@@ -72,4 +85,6 @@ class CourseEntitlementPolicyAdmin(admin.ModelAdmin):
     list_display = ('expiration_period',
                     'refund_period',
                     'regain_period',
+                    'mode',
                     'site')
+    form = CourseEntitlementPolicyForm

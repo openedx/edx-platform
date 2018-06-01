@@ -11,9 +11,10 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from django.core.validators import validate_email, ValidationError
 from django.http import HttpResponseForbidden
+from openedx.core.djangoapps.theming.helpers import get_current_request
 from six import text_type
 
-from student.models import User, UserProfile, Registration
+from student.models import User, UserProfile, Registration, email_exists_or_retired
 from student import forms as student_forms
 from student import views as student_views
 from util.model_utils import emit_setting_changed_event
@@ -432,7 +433,8 @@ def request_password_change(email, is_secure):
         # and email it to the user.
         form.save(
             from_email=configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
-            use_https=is_secure
+            use_https=is_secure,
+            request=get_current_request(),
         )
     else:
         # No user with the provided email address exists.
@@ -692,7 +694,7 @@ def _validate_email_doesnt_exist(email):
     :return: None
     :raises: errors.AccountEmailAlreadyExists
     """
-    if email is not None and User.objects.filter(email=email).exists():
+    if email is not None and email_exists_or_retired(email):
         raise errors.AccountEmailAlreadyExists(_(accounts.EMAIL_CONFLICT_MSG).format(email_address=email))
 
 

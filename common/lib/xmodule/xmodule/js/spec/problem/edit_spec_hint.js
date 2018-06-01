@@ -885,8 +885,6 @@ hint
 );
 
 describe('Markdown to xml extended hint with tricky syntax cases', function() {
-  // I'm entering this as utf-8 in this file.
-  // I cannot find a way to set the encoding for .coffee files but it seems to work.
   it('produces xml with unicode', function() {
     const data = MarkdownEditingDescriptor.markdownToXml(`\
 >>á and Ø<<

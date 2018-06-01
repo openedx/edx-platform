@@ -21,9 +21,7 @@ from xmodule.video_module.transcripts_utils import (
     convert_video_transcript,
     get_video_transcript_content,
     Transcript,
-)
-from xmodule.video_module.transcripts_model_utils import (
-    is_val_transcript_feature_enabled_for_course
+    get_transcript,
 )
 
 from ..decorators import mobile_course_access, mobile_view
@@ -122,26 +120,11 @@ class VideoTranscripts(generics.RetrieveAPIView):
 
         usage_key = BlockUsageLocator(course.id, block_type='video', block_id=block_id)
         video_descriptor = modulestore().get_item(usage_key)
-        feature_enabled = is_val_transcript_feature_enabled_for_course(usage_key.course_key)
+
         try:
-            transcripts = video_descriptor.get_transcripts_info(include_val_transcripts=feature_enabled)
-            content, filename, mimetype = video_descriptor.get_transcript(transcripts, lang=lang)
-        except (ValueError, NotFoundError):
-            # Fallback mechanism for edx-val transcripts
-            transcript = None
-            if feature_enabled:
-                transcript = get_video_transcript_content(video_descriptor.edx_video_id, lang)
-
-            if not transcript:
-                raise Http404(u'Transcript not found for {}, lang: {}'.format(block_id, lang))
-
-            transcript_conversion_props = dict(transcript, output_format=Transcript.SRT)
-            transcript = convert_video_transcript(**transcript_conversion_props)
-            filename = transcript['filename']
-            content = transcript['content']
-            mimetype = Transcript.mime_types[Transcript.SRT]
-        except KeyError:
-            raise Http404(u"Transcript not found for {}, lang: {}".format(block_id, lang))
+            content, filename, mimetype = get_transcript(video_descriptor, lang=lang)
+        except NotFoundError:
+            raise Http404(u'Transcript not found for {}, lang: {}'.format(block_id, lang))
 
         response = HttpResponse(content, content_type=mimetype)
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename.encode('utf-8'))

@@ -8,11 +8,12 @@ from lms.djangoapps.ccx.api.v0 import views
 
 CCX_COURSE_ID_PATTERN = settings.COURSE_ID_PATTERN.replace('course_id', 'ccx_course_id')
 
-CCX_URLS = [
+CCX_URLS = ([
     url(r'^$', views.CCXListView.as_view(), name='list'),
     url(r'^{}/?$'.format(CCX_COURSE_ID_PATTERN), views.CCXDetailView.as_view(), name='detail'),
-]
+], 'ccx')
 
+app_name = 'v0'
 urlpatterns = [
-    url(r'^ccx/', include(CCX_URLS, namespace='ccx')),
+    url(r'^ccx/', include(CCX_URLS)),
 ]

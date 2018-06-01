@@ -16,6 +16,7 @@ import traceback
 import unittest
 
 from contextlib import contextmanager, nested
+from django.test import TestCase
 from functools import wraps
 from mock import Mock
 from path import Path as path
@@ -176,6 +177,8 @@ def mock_render_template(*args, **kwargs):
 
 
 class ModelsTest(unittest.TestCase):
+    shard = 1
+
     def test_load_class(self):
         vc = XModuleDescriptor.load_class('video')
         vc_str = "<class 'xmodule.video_module.video_module.VideoDescriptor'>"
@@ -184,6 +187,7 @@ class ModelsTest(unittest.TestCase):
 
 class LogicTest(unittest.TestCase):
     """Base class for testing xmodule logic."""
+    shard = 1
     descriptor_class = None
     raw_field_data = {}
 
@@ -255,7 +259,7 @@ class _BulkAssertionManager(object):
             raise BulkAssertionError(self._assertion_errors)
 
 
-class BulkAssertionTest(unittest.TestCase):
+class BulkAssertionTest(TestCase):
     """
     This context manager provides a _BulkAssertionManager to assert with,
     and then calls `raise_assertion_errors` at the end of the block to validate all
@@ -399,6 +403,7 @@ class CourseComparisonTest(BulkAssertionTest):
     """
     Mixin that has methods for comparing courses for equality.
     """
+    shard = 1
 
     def setUp(self):
         super(CourseComparisonTest, self).setUp()

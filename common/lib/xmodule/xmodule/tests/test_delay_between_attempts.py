@@ -124,6 +124,7 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
     """
     Class to test delay between quiz attempts.
     """
+    shard = 1
 
     def create_and_check(self,
                          num_attempts=None,

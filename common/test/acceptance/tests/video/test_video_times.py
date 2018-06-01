@@ -6,6 +6,7 @@ from common.test.acceptance.tests.video.test_video_module import VideoBaseTest
 
 class VideoTimesTest(VideoBaseTest):
     """ Test Video Player Times """
+    shard = 21
 
     def test_video_start_time(self):
         """
@@ -49,31 +50,6 @@ class VideoTimesTest(VideoBaseTest):
         self.video.wait_for_state('pause')
 
         self.assertIn(self.video.position, ('0:05', '0:06'))
-
-    def test_video_end_time_wo_default_start_time(self):
-        """
-        Scenario: End time works for Youtube video if starts playing from between.
-        Given we have a video in "Youtube" mode  with end time set to 00:01:00
-        And I seek video to "0:55" position
-        And I click video button "play"
-        And I wait until video stop playing
-        Then I see video slider at "1:00" position
-
-        """
-        data = {'end_time': '00:01:00'}
-        self.metadata = self.metadata_for_mode('youtube', additional_data=data)
-
-        # go to video
-        self.navigate_to_video()
-
-        self.video.seek('0:55')
-
-        self.video.click_player_button('play')
-
-        # wait until video stop playing
-        self.video.wait_for_state('pause')
-
-        self.assertIn(self.video.position, ('1:00', '1:01'))
 
     def test_video_start_time_and_end_time(self):
         """

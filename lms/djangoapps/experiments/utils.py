@@ -1,4 +1,5 @@
 from student.models import CourseEnrollment
+from courseware.access import has_staff_access_to_preview_mode
 from course_modes.models import (
     get_cosmetic_verified_display_price
 )
@@ -31,7 +32,7 @@ def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
     if enrollment is None:
         enrollment = CourseEnrollment.get_enrollment(user, course.id)
 
-    if user.is_authenticated() and verified_upgrade_link_is_valid(enrollment):
+    if user.is_authenticated and verified_upgrade_link_is_valid(enrollment):
         return (
             verified_upgrade_deadline_link(user, course),
             enrollment.upgrade_deadline
@@ -58,6 +59,7 @@ def get_experiment_user_metadata_context(course, user):
         pass  # Not enrolled, used the default None values
 
     upgrade_link, upgrade_date = check_and_get_upgrade_link_and_date(user, enrollment, course)
+    has_staff_access = has_staff_access_to_preview_mode(user, course)
 
     return {
         'upgrade_link': upgrade_link,
@@ -69,4 +71,5 @@ def get_experiment_user_metadata_context(course, user):
         'course_key': course.id,
         'course_start': course.start,
         'course_end': course.end,
+        'has_staff_access': has_staff_access,
     }

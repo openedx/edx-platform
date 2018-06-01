@@ -12,6 +12,7 @@ from openedx.core.lib.tempdir import create_symlink, delete_symlink, mkdtemp_cle
 
 class TestComprehensiveTheming(TestCase):
     """Test comprehensive theming."""
+    shard = 4
 
     def setUp(self):
         super(TestComprehensiveTheming, self).setUp()

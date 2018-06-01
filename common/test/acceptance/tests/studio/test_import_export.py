@@ -161,104 +161,6 @@ class ImportTestMixin(object):
         """
         return []
 
-    def test_upload(self):
-        """
-        Scenario: I want to upload a course or library for import.
-            Given that I have a library or course to import into
-            And I have a valid .tar.gz file containing data to replace it with
-            I can select the file and upload it
-            And the page will give me confirmation that it uploaded successfully
-        """
-        self.import_page.upload_tarball(self.tarball_name)
-        self.import_page.wait_for_upload()
-
-    def test_import_timestamp(self):
-        """
-        Scenario: I perform a course / library import
-            On import success, the page displays a UTC timestamp previously not visible
-            And if I refresh the page, the timestamp is still displayed
-        """
-        self.assertFalse(self.import_page.is_timestamp_visible())
-
-        # Get the time when the import has started.
-        # import_page timestamp is in (MM/DD/YYYY at HH:mm) so replacing (second, microsecond) to
-        # keep the comparison consistent
-        upload_start_time = datetime.utcnow().replace(microsecond=0, second=0)
-        self.import_page.upload_tarball(self.tarball_name)
-        self.import_page.wait_for_upload()
-
-        # Get the time when the import has finished.
-        # import_page timestamp is in (MM/DD/YYYY at HH:mm) so replacing (second, microsecond) to
-        # keep the comparison consistent
-        upload_finish_time = datetime.utcnow().replace(microsecond=0, second=0)
-
-        import_timestamp = self.import_page.parsed_timestamp
-        self.import_page.wait_for_timestamp_visible()
-
-        # Verify that 'import_timestamp' is between start and finish upload time
-        self.assertLessEqual(
-            upload_start_time,
-            import_timestamp,
-            "Course import timestamp should be upload_start_time <= import_timestamp <= upload_end_time"
-        )
-        self.assertGreaterEqual(
-            upload_finish_time,
-            import_timestamp,
-            "Course import timestamp should be upload_start_time <= import_timestamp <= upload_end_time"
-        )
-
-        self.import_page.visit()
-        self.import_page.wait_for_tasks(completed=True)
-        self.import_page.wait_for_timestamp_visible()
-
-    def test_landing_url(self):
-        """
-        Scenario: When uploading a library or course, a link appears for me to view the changes.
-            Given that I upload a library or course
-            A button will appear that contains the URL to the library or course's main page
-        """
-        self.import_page.upload_tarball(self.tarball_name)
-        self.import_page.wait_for_upload()
-        self.assertEqual(self.import_page.finished_target_url(), self.landing_page.url)
-
-    def test_bad_filename_error(self):
-        """
-        Scenario: I should be reprimanded for trying to upload something that isn't a .tar.gz file.
-            Given that I select a file that is an .mp4 for upload
-            An error message will appear
-        """
-        self.import_page.upload_tarball('funny_cat_video.mp4')
-        self.import_page.wait_for_filename_error()
-
-    def test_task_list(self):
-        """
-        Scenario: I should see feedback checkpoints when uploading a course or library
-            Given that I am on an import page
-            No task checkpoint list should be showing
-            When I upload a valid tarball
-            Each task in the checklist should be marked confirmed
-            And the task list should be visible
-        """
-        # The task list shouldn't be visible to start.
-        self.assertFalse(self.import_page.is_task_list_showing(), "Task list shown too early.")
-        self.import_page.wait_for_tasks()
-        self.import_page.upload_tarball(self.tarball_name)
-        self.import_page.wait_for_upload()
-        self.import_page.wait_for_tasks(completed=True)
-        self.assertTrue(self.import_page.is_task_list_showing(), "Task list did not display.")
-
-    def test_bad_import(self):
-        """
-        Scenario: I should see a failed checklist when uploading an invalid course or library
-            Given that I am on an import page
-            And I upload a tarball with a broken XML file
-            The tasks should be confirmed up until the 'Updating' task
-            And the 'Updating' task should be marked failed
-            And the remaining tasks should not be marked as started
-        """
-        self.import_page.upload_tarball(self.bad_tarball_name)
-        self.import_page.wait_for_tasks(fail_on='Updating')
-
 
 @attr(shard=7)
 class TestEntranceExamCourseImport(ImportTestMixin, StudioCourseTest):
@@ -272,48 +174,6 @@ class TestEntranceExamCourseImport(ImportTestMixin, StudioCourseTest):
 
     def page_args(self):
         return [self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run']]
-
-    def test_course_updated_with_entrance_exam(self):
-        """
-        Given that I visit an empty course before import
-        I should not see a section named 'Section' or 'Entrance Exam'
-        When I visit the import page
-        And I upload a course that has an entrance exam section named 'Entrance Exam'
-        And I visit the course outline page again
-        The section named 'Entrance Exam' should now be available
-        When I visit the LMS Course Home page
-        Then I should see a section named 'Section' or 'Entrance Exam'
-        When I switch the view mode to student view
-        Then I should only see a section named 'Entrance Exam'
-        When I visit the courseware page
-        Then a message regarding the 'Entrance Exam'
-        """
-        self.landing_page.visit()
-        # Should not exist yet.
-        self.assertRaises(IndexError, self.landing_page.section, "Section")
-        self.assertRaises(IndexError, self.landing_page.section, "Entrance Exam")
-        self.import_page.visit()
-        self.import_page.upload_tarball(self.tarball_name)
-        self.import_page.wait_for_upload()
-        self.landing_page.visit()
-        # There should be two sections. 'Entrance Exam' and 'Section' on the landing page.
-        self.landing_page.section("Entrance Exam")
-        self.landing_page.section("Section")
-
-        self.landing_page.view_live()
-
-        course_home = CourseHomePage(self.browser, self.course_id)
-        course_home.visit()
-        self.assertEqual(course_home.outline.num_sections, 2)
-        course_home.preview.set_staff_view_mode('Learner')
-        self.assertEqual(course_home.outline.num_sections, 1)
-
-        courseware = CoursewarePage(self.browser, self.course_id)
-        courseware.visit()
-        StaffCoursewarePage(self.browser, self.course_id).set_staff_view_mode('Learner')
-        self.assertIn(
-            "To access course materials, you must score", courseware.entrance_exam_message_selector.text[0]
-        )
 
 
 @attr(shard=7)
@@ -329,25 +189,6 @@ class TestCourseImport(ImportTestMixin, StudioCourseTest):
     def page_args(self):
         return [self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run']]
 
-    def test_course_updated(self):
-        """
-        Given that I visit an empty course before import
-        I should not see a section named 'Section'
-        When I visit the import page
-        And I upload a course that has a section named 'Section'
-        And I visit the course outline page again
-        The section named 'Section' should now be available
-        """
-        self.landing_page.visit()
-        # Should not exist yet.
-        self.assertRaises(IndexError, self.landing_page.section, "Section")
-        self.import_page.visit()
-        self.import_page.upload_tarball(self.tarball_name)
-        self.import_page.wait_for_upload()
-        self.landing_page.visit()
-        # There's a section named 'Section' in the tarball.
-        self.landing_page.section("Section")
-
     def test_header(self):
         """
         Scenario: I should see the correct text when importing a course.
@@ -356,34 +197,6 @@ class TestCourseImport(ImportTestMixin, StudioCourseTest):
             The correct header should be shown
         """
         self.assertEqual(self.import_page.header_text, 'Course Import')
-
-    def test_multiple_course_import_message(self):
-        """
-        Given that I visit an empty course before import
-        When I visit the import page
-        And I upload a course with file name 2015.lzdwNM.tar.gz
-        Then timestamp is visible after course is updated successfully
-        And then I create a new course
-        When I visit the import page of this new course
-        Then timestamp is not visible
-        """
-        self.import_page.visit()
-        self.import_page.upload_tarball(self.tarball_name)
-        self.import_page.wait_for_upload()
-        self.assertTrue(self.import_page.is_timestamp_visible())
-
-        # Create a new course and visit the import page
-        self.course_info = {
-            'org': 'orgX',
-            'number': self.unique_id + '_2',
-            'run': 'test_run_2',
-            'display_name': 'Test Course 2' + self.unique_id
-        }
-        self.install_course_fixture()
-        self.import_page = self.import_page_class(*self.page_args())
-        self.import_page.visit()
-        # As this is new course which is never import so timestamp should not present
-        self.assertFalse(self.import_page.is_timestamp_visible())
 
 
 @attr(shard=7)
@@ -398,27 +211,6 @@ class TestLibraryImport(ImportTestMixin, StudioLibraryTest):
 
     def page_args(self):
         return [self.browser, self.library_key]
-
-    def test_library_updated(self):
-        """
-        Given that I visit an empty library
-        No XBlocks should be shown
-        When I visit the import page
-        And I upload a library that contains three XBlocks
-        And I visit the library page
-        Three XBlocks should be shown
-        """
-        self.landing_page.visit()
-        self.landing_page.wait_until_ready()
-        # No items should be in the library to start.
-        self.assertEqual(len(self.landing_page.xblocks), 0)
-        self.import_page.visit()
-        self.import_page.upload_tarball(self.tarball_name)
-        self.import_page.wait_for_upload()
-        self.landing_page.visit()
-        self.landing_page.wait_until_ready()
-        # There are three blocks in the tarball.
-        self.assertEqual(len(self.landing_page.xblocks), 3)
 
     def test_header(self):
         """

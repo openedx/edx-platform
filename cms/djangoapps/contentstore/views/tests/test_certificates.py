@@ -106,6 +106,7 @@ class CertificatesBaseTestCase(object):
     """
     Mixin with base test cases for the certificates.
     """
+    shard = 1
 
     def _remove_ids(self, content):
         """
@@ -199,6 +200,8 @@ class CertificatesListHandlerTestCase(
     """
     Test cases for certificates_list_handler.
     """
+    shard = 1
+
     def setUp(self):
         """
         Set up CertificatesListHandlerTestCase.
@@ -425,6 +428,7 @@ class CertificatesDetailHandlerTestCase(
     """
     Test cases for CertificatesDetailHandlerTestCase.
     """
+    shard = 1
 
     _id = 0
 

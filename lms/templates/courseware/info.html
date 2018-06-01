@@ -76,7 +76,7 @@ from openedx.core.djangolib.markup import HTML, Text
         % endif
       </div>
       <div class="info-wrapper">
-      % if user.is_authenticated():
+      % if user.is_authenticated:
         <section class="updates">
           % if studio_url is not None and masquerade and masquerade.role == 'staff':
             <div class="wrap-instructor-info studio-view">

@@ -165,7 +165,13 @@ class CourseEnrollmentForm(forms.ModelForm):
         fields = '__all__'
 
 
-@admin.register(CourseEnrollment)
+# Page disabled because it makes DB quries that impact performance enough to
+# cause a site outage. It may be re-enabled when it is updated to make more
+# efficent DB queries
+# https://openedx.atlassian.net/browse/OPS-2943
+# Learner ticket to add functionality to /support
+# https://openedx.atlassian.net/browse/LEARNER-4744
+#@admin.register(CourseEnrollment)
 class CourseEnrollmentAdmin(admin.ModelAdmin):
     """ Admin interface for the CourseEnrollment model. """
     list_display = ('id', 'course_id', 'mode', 'user', 'is_active',)
@@ -189,14 +195,15 @@ class UserAdmin(BaseUserAdmin):
     """ Admin interface for the User model. """
     inlines = (UserProfileInline,)
 
-    def get_readonly_fields(self, *args, **kwargs):
+    def get_readonly_fields(self, request, obj=None):
         """
         Allows editing the users while skipping the username check, so we can have Unicode username with no problems.
-        The username is marked read-only regardless of `ENABLE_UNICODE_USERNAME`, to simplify the bokchoy tests.
+        The username is marked read-only when editing existing users regardless of `ENABLE_UNICODE_USERNAME`, to simplify the bokchoy tests.
         """
-
-        django_readonly = super(UserAdmin, self).get_readonly_fields(*args, **kwargs)
-        return django_readonly + ('username',)
+        django_readonly = super(UserAdmin, self).get_readonly_fields(request, obj)
+        if obj:
+            return django_readonly + ('username',)
+        return django_readonly
 
 
 @admin.register(UserAttribute)

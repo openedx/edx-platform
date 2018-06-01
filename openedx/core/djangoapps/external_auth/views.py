@@ -19,6 +19,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.core.validators import validate_email
+from django.db import transaction
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.utils.http import is_safe_url, urlquote
@@ -37,8 +38,10 @@ from edxmako.shortcuts import render_to_response, render_to_string
 from openedx.core.djangoapps.external_auth.djangostore import DjangoOpenIDStore
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangoapps.site_configuration.helpers import get_value
+from openedx.core.djangoapps.user_api.accounts.utils import generate_password
 from student.helpers import get_next_url_for_login_page
 from student.models import UserProfile
+from util.db import outer_atomic
 from xmodule.modulestore.django import modulestore
 
 if settings.FEATURES.get('AUTH_USE_CAS'):
@@ -76,18 +79,14 @@ def default_render_failure(request,  # pylint: disable=unused-argument
 # -----------------------------------------------------------------------------
 
 
-def generate_password(length=12, chars=string.letters + string.digits):
-    """Generate internal password for externally authenticated user"""
-    choice = random.SystemRandom().choice
-    return ''.join([choice(chars) for _i in range(length)])
-
-
+@transaction.non_atomic_requests
 @csrf_exempt
 def openid_login_complete(request,
                           redirect_field_name=REDIRECT_FIELD_NAME,  # pylint: disable=unused-argument
                           render_failure=None):
-    """Complete the openid login process"""
-
+    """
+    Complete the openid login process
+    """
     render_failure = (render_failure or default_render_failure)
 
     openid_response = openid_views.parse_openid_response(request)
@@ -127,23 +126,31 @@ def _external_login_or_signup(request,
                               email,
                               fullname,
                               retfun=None):
-    """Generic external auth login or signup"""
+    """
+    Generic external auth login or signup
+    """
     # pylint: disable=too-many-statements
     # see if we have a map from this external_id to an edX username
-    try:
-        eamap = ExternalAuthMap.objects.get(external_id=external_id,
-                                            external_domain=external_domain)
-        log.debug(u'Found eamap=%s', eamap)
-    except ExternalAuthMap.DoesNotExist:
-        # go render form for creating edX user
-        eamap = ExternalAuthMap(external_id=external_id,
-                                external_domain=external_domain,
-                                external_credentials=json.dumps(credentials))
-        eamap.external_email = email
-        eamap.external_name = fullname
-        eamap.internal_password = generate_password()
+    eamap_defaults = {
+        'external_credentials': json.dumps(credentials),
+        'external_email': email,
+        'external_name': fullname,
+        'internal_password': generate_password()
+    }
+
+    # We are not guaranteed to be in a transaction here since some upstream views
+    # use non_atomic_requests
+    with outer_atomic():
+        eamap, created = ExternalAuthMap.objects.get_or_create(
+            external_id=external_id,
+            external_domain=external_domain,
+            defaults=eamap_defaults
+        )
+
+    if created:
         log.debug(u'Created eamap=%s', eamap)
-        eamap.save()
+    else:
+        log.debug(u'Found eamap=%s', eamap)
 
     log.info(u"External_Auth login_or_signup for %s : %s : %s : %s", external_domain, external_id, email, fullname)
     uses_shibboleth = settings.FEATURES.get('AUTH_USE_SHIB') and external_domain.startswith(SHIBBOLETH_DOMAIN_PREFIX)
@@ -156,25 +163,26 @@ def _external_login_or_signup(request,
             # Since the id the idps return is not user-editable, and is of the from "username@stanford.edu",
             # use the id to link accounts instead.
             try:
-                link_user = User.objects.get(email=eamap.external_id)
-                if not ExternalAuthMap.objects.filter(user=link_user).exists():
-                    # if there's no pre-existing linked eamap, we link the user
-                    eamap.user = link_user
-                    eamap.save()
-                    internal_user = link_user
-                    log.info(u'SHIB: Linking existing account for %s', eamap.external_id)
-                    # now pass through to log in
-                else:
-                    # otherwise, there must have been an error, b/c we've already linked a user with these external
-                    # creds
-                    failure_msg = _(
-                        "You have already created an account using "
-                        "an external login like WebAuth or Shibboleth. "
-                        "Please contact {tech_support_email} for support."
-                    ).format(
-                        tech_support_email=get_value('email_from_address', settings.TECH_SUPPORT_EMAIL),
-                    )
-                    return default_render_failure(request, failure_msg)
+                with outer_atomic():
+                    link_user = User.objects.get(email=eamap.external_id)
+                    if not ExternalAuthMap.objects.filter(user=link_user).exists():
+                        # if there's no pre-existing linked eamap, we link the user
+                        eamap.user = link_user
+                        eamap.save()
+                        internal_user = link_user
+                        log.info(u'SHIB: Linking existing account for %s', eamap.external_id)
+                        # now pass through to log in
+                    else:
+                        # otherwise, there must have been an error, b/c we've already linked a user with these external
+                        # creds
+                        failure_msg = _(
+                            "You have already created an account using "
+                            "an external login like WebAuth or Shibboleth. "
+                            "Please contact {tech_support_email} for support."
+                        ).format(
+                            tech_support_email=get_value('email_from_address', settings.TECH_SUPPORT_EMAIL),
+                        )
+                        return default_render_failure(request, failure_msg)
             except User.DoesNotExist:
                 log.info(u'SHIB: No user for %s yet, doing signup', eamap.external_email)
                 return _signup(request, eamap, retfun)
@@ -184,6 +192,7 @@ def _external_login_or_signup(request,
 
     # We trust shib's authentication, so no need to authenticate using the password again
     uname = internal_user.username
+
     if uses_shibboleth:
         user = internal_user
         # Assuming this 'AUTHENTICATION_BACKENDS' is set in settings, which I think is safe
@@ -206,6 +215,7 @@ def _external_login_or_signup(request,
             AUDIT_LOG.info(u'Linked user "{0}" logged in via SSL certificate'.format(user.email))
     else:
         user = authenticate(username=uname, password=eamap.internal_password, request=request)
+
     if user is None:
         # we want to log the failure, but don't want to log the password attempted:
         if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
@@ -378,6 +388,8 @@ def ssl_login_shortcut(func):
     Python function decorator for login procedures, to allow direct login
     based on existing ExternalAuth record and MIT ssl certificate.
     """
+
+    @transaction.non_atomic_requests
     def wrapped(*args, **kwargs):
         """
         This manages the function wrapping, by determining whether to inject
@@ -389,7 +401,7 @@ def ssl_login_shortcut(func):
             return func(*args, **kwargs)
         request = args[0]
 
-        if request.user and request.user.is_authenticated():  # don't re-authenticate
+        if request.user and request.user.is_authenticated:  # don't re-authenticate
             return func(*args, **kwargs)
 
         cert = ssl_get_cert_from_request(request)
@@ -472,7 +484,7 @@ def cas_login(request, next_page=None, required=False):
 
     ret = django_cas_login(request, next_page, required)
 
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         user = request.user
         UserProfile.objects.get_or_create(
             user=user,
@@ -485,6 +497,7 @@ def cas_login(request, next_page=None, required=False):
 # -----------------------------------------------------------------------------
 # Shibboleth (Stanford and others.  Uses *Apache* environment variables)
 # -----------------------------------------------------------------------------
+@transaction.non_atomic_requests
 def shib_login(request):
     """
         Uses Apache's REMOTE_USER environment variable as the external id.

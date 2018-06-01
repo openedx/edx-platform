@@ -311,7 +311,7 @@ class DiscussionNavigationTest(BaseDiscussionTestCase):
             self.assertEqual(self.thread_page.q(css=".forum-nav-thread-title").text[0], 'dummy thread title')
 
 
-@attr(shard=2)
+@attr(shard=19)
 class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePaginationTestMixin):
     """
     Tests for the discussion page displaying a single thread
@@ -1016,7 +1016,7 @@ class DiscussionEditorPreviewTest(UniqueCourseTest):
 
 
 @attr(shard=2)
-class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMixin):
+class InlineDiscussionTest(UniqueCourseTest):
     """
     Tests for inline discussions
     """
@@ -1051,11 +1051,6 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         self.courseware_page.visit()
         self.discussion_page = InlineDiscussionPage(self.browser, self.discussion_id)
         self.additional_discussion_page = InlineDiscussionPage(self.browser, self.additional_discussion_id)
-
-    def setup_thread_page(self, thread_id):
-        self.discussion_page.expand_discussion()
-        self.discussion_page.show_thread(thread_id)
-        self.thread_page = self.discussion_page.thread_page  # pylint: disable=attribute-defined-outside-init
 
     # This test is too flaky to run at all. TNL-6215
     @attr('a11y')
@@ -1098,39 +1093,10 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         self.assertFalse(self.discussion_page.is_new_post_button_visible())
 
     def test_initial_render(self):
-        self.assertFalse(self.discussion_page.is_discussion_expanded())
+        self.assertTrue(self.discussion_page.is_discussion_expanded())
 
-    def test_expand_discussion_empty(self):
-        self.discussion_page.expand_discussion()
+    def test_discussion_empty(self):
         self.assertEqual(self.discussion_page.get_num_displayed_threads(), 0)
-
-    def check_anonymous_to_peers(self, is_staff):
-        thread = Thread(id=uuid4().hex, anonymous_to_peers=True, commentable_id=self.discussion_id)
-        thread_fixture = SingleThreadViewFixture(thread)
-        thread_fixture.push()
-        self.setup_thread_page(thread.get("id"))  # pylint: disable=no-member
-        self.assertEqual(self.thread_page.is_thread_anonymous(), not is_staff)
-
-    def test_anonymous_to_peers_threads_as_staff(self):
-        AutoAuthPage(self.browser, course_id=self.course_id, roles="Administrator").visit()
-        self.courseware_page.visit()
-        self.check_anonymous_to_peers(True)
-
-    def test_anonymous_to_peers_threads_as_peer(self):
-        self.check_anonymous_to_peers(False)
-
-    def test_discussion_blackout_period(self):
-        self.start_discussion_blackout_period()
-        self.browser.refresh()
-        thread = Thread(id=uuid4().hex, commentable_id=self.discussion_id)
-        thread_fixture = SingleThreadViewFixture(thread)
-        thread_fixture.addResponse(
-            Response(id="response1"),
-            [Comment(id="comment1", user_id="other"), Comment(id="comment2", user_id=self.user_id)])
-        thread_fixture.push()
-        self.setup_thread_page(thread.get("id"))  # pylint: disable=no-member
-        self.assertFalse(self.thread_page.has_add_response_button())
-        self.assertFalse(self.thread_page.is_element_visible("action-more"))
 
     def test_dual_discussion_xblock(self):
         """
@@ -1151,16 +1117,14 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         self.discussion_page.wait_for_page()
         self.additional_discussion_page.wait_for_page()
 
-        # Expand the first discussion, click to add a post
-        self.discussion_page.expand_discussion()
+        # Click to add a post to the first discussion
         self.discussion_page.click_new_post_button()
 
         # Verify that only the first discussion's form is shown
         self.assertIsNotNone(self.discussion_page.new_post_form)
         self.assertIsNone(self.additional_discussion_page.new_post_form)
 
-        # Expand the second discussion, click to add a post
-        self.additional_discussion_page.expand_discussion()
+        # Click to add a post to the second discussion
         self.additional_discussion_page.click_new_post_button()
 
         # Verify that both discussion's forms are shown

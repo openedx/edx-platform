@@ -312,7 +312,6 @@
     .program-heading-message {
       font-weight: 300;
     }
-
   }
 
   .course-enroll-view {
@@ -629,6 +628,11 @@
 
 .program-sidebar {
   padding: 30px 10px;
+
+  .program-record {
+    text-align: center;
+    padding-bottom: 2em;
+  }
 
   @media (min-width: $bp-screen-md) {
     @include float(right);

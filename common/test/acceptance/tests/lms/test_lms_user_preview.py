@@ -17,7 +17,7 @@ from common.test.acceptance.tests.helpers import UniqueCourseTest, create_user_p
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID, MINIMUM_STATIC_PARTITION_ID, Group
 
 
-@attr(shard=10)
+@attr(shard=20)
 class StaffViewTest(UniqueCourseTest):
     """
     Tests that verify the staff view.
@@ -55,7 +55,7 @@ class StaffViewTest(UniqueCourseTest):
         return staff_page
 
 
-@attr(shard=10)
+@attr(shard=20)
 class CourseWithoutContentGroupsTest(StaffViewTest):
     """
     Setup for tests that have no content restricted to specific content groups.
@@ -86,7 +86,7 @@ class CourseWithoutContentGroupsTest(StaffViewTest):
         )
 
 
-@attr(shard=10)
+@attr(shard=20)
 class StaffViewToggleTest(CourseWithoutContentGroupsTest):
     """
     Tests for the staff view toggle button.
@@ -103,7 +103,7 @@ class StaffViewToggleTest(CourseWithoutContentGroupsTest):
         self.assertFalse(course_page.has_tab('Instructor'))
 
 
-@attr(shard=10)
+@attr(shard=20)
 class StaffDebugTest(CourseWithoutContentGroupsTest):
     """
     Tests that verify the staff debug info.
@@ -324,7 +324,7 @@ class CourseWithContentGroupsTest(StaffViewTest):
             )
         )
 
-    @attr(shard=10)
+    @attr(shard=20)
     def test_staff_sees_all_problems(self):
         """
         Scenario: Staff see all problems
@@ -413,23 +413,6 @@ class CourseWithContentGroupsTest(StaffViewTest):
         add_cohort_with_student("Cohort Alpha", "alpha", student_a_username)
         add_cohort_with_student("Cohort Beta", "beta", student_b_username)
         cohort_management_page.wait_for_ajax()
-
-    @attr(shard=3)
-    def test_as_specific_student(self):
-        student_a_username = 'tass_student_a'
-        student_b_username = 'tass_student_b'
-        AutoAuthPage(self.browser, username=student_a_username, course_id=self.course_id, no_login=True).visit()
-        AutoAuthPage(self.browser, username=student_b_username, course_id=self.course_id, no_login=True).visit()
-        self.create_cohorts_and_assign_students(student_a_username, student_b_username)
-
-        # Masquerade as learner in alpha cohort:
-        course_page = self._goto_staff_page()
-        course_page.set_staff_view_mode_specific_student(student_a_username)
-        verify_expected_problem_visibility(self, course_page, [self.alpha_text, self.audit_text, self.everyone_text])
-
-        # Masquerade as learner in beta cohort:
-        course_page.set_staff_view_mode_specific_student(student_b_username)
-        verify_expected_problem_visibility(self, course_page, [self.beta_text, self.audit_text, self.everyone_text])
 
     @attr('a11y')
     def test_course_page(self):

@@ -17,6 +17,10 @@
             </div>
         <% } %>
 
+        <% if (section.domHookId) { %>
+            <div id="<%- section.domHookId %>"></div>
+        <% } %>
+
         <div class="account-settings-section-body <%- tabName %>-section-body">
             <div class="ui-loading-error is-hidden">
                 <span class="fa fa-exclamation-triangle message-error" aria-hidden="true"></span>

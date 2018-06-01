@@ -2,6 +2,7 @@
 Models for credentials support for the LMS and Studio.
 """
 
+import waffle
 from urlparse import urljoin
 
 from config_models.models import ConfigurationModel
@@ -10,6 +11,8 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from openedx.core.djangoapps.site_configuration import helpers
+
+from . import STUDENT_RECORDS_FLAG
 
 API_VERSION = 'v2'
 
@@ -76,6 +79,17 @@ class CredentialsApiConfig(ConfigurationModel):
         """
         root = helpers.get_value('CREDENTIALS_PUBLIC_SERVICE_URL', settings.CREDENTIALS_PUBLIC_SERVICE_URL)
         return urljoin(root, '/api/{}/'.format(API_VERSION))
+
+    @property
+    def public_records_url(self):
+        """
+        Publicly-accessible Records URL root.
+        """
+        # Temporarily disable this feature while we work on it
+        if not STUDENT_RECORDS_FLAG.is_enabled():
+            return None
+        root = helpers.get_value('CREDENTIALS_PUBLIC_SERVICE_URL', settings.CREDENTIALS_PUBLIC_SERVICE_URL)
+        return urljoin(root, '/records/')
 
     @property
     def is_learner_issuance_enabled(self):

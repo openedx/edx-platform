@@ -95,7 +95,11 @@ def get_enterprise_sidebar_context(enterprise_customer):
         end_bold=HTML('</b>'),
         line_break=HTML('<br/>'),
         enterprise_name=enterprise_customer['name'],
-        platform_name=platform_name
+        platform_name=platform_name,
+        privacy_policy_link_start=HTML("<a href='{pp_url}' target='_blank'>").format(
+            pp_url=settings.MKTG_URLS.get('PRIVACY', 'https://www.edx.org/edx-privacy-policy')
+        ),
+        privacy_policy_link_end=HTML("</a>"),
     )
 
     platform_welcome_template = configuration_helpers.get_value(
@@ -220,3 +224,20 @@ def update_account_settings_context_for_enterprise(context, enterprise_customer)
             enterprise_context['sync_learner_profile_data'] = identity_provider.sync_learner_profile_data
 
     context.update(enterprise_context)
+
+
+def get_enterprise_learner_generic_name(request):
+    """
+    Get a generic name concatenating the Enterprise Customer name and 'Learner'.
+
+    ENT-924: Temporary solution for hiding potentially sensitive SSO names.
+    When a more complete solution is put in place, delete this function and all of its uses.
+    """
+    # Prevent a circular import. This function makes sense to be in this module though. And see function description.
+    from openedx.features.enterprise_support.api import enterprise_customer_for_request
+    enterprise_customer = enterprise_customer_for_request(request)
+    return (
+        enterprise_customer['name'] + 'Learner'
+        if enterprise_customer and enterprise_customer['replace_sensitive_sso_username']
+        else ''
+    )

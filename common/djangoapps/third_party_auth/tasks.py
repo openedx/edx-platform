@@ -47,7 +47,7 @@ def fetch_saml_metadata():
     """
 
     # First make a list of all the metadata XML URLs:
-    saml_providers = SAMLProviderConfig.key_values('idp_slug', flat=True)
+    saml_providers = SAMLProviderConfig.key_values('slug', flat=True)
     num_total = len(saml_providers)
     num_skipped = 0
     url_map = {}

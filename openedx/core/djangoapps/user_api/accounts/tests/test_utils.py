@@ -16,7 +16,7 @@ from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
-from ..utils import format_social_link, validate_social_link
+from ..utils import format_social_link, validate_social_link, generate_password
 
 
 @ddt.ddt
@@ -113,9 +113,8 @@ class CompletionUtilsTestCase(SharedModuleStoreTestCase, CompletionWaffleTestMix
             )
 
     @override_settings(LMS_ROOT_URL='test_url:9999')
-    @patch('completion.waffle.get_current_site')
     @ddt.data(True, False)
-    def test_retrieve_last_sitewide_block_completed(self, use_username, get_patched_current_site):  # pylint: disable=unused-argument
+    def test_retrieve_last_sitewide_block_completed(self, use_username):
         """
         Test that the method returns a URL for the "last completed" block
         when sending a user object
@@ -136,3 +135,29 @@ class CompletionUtilsTestCase(SharedModuleStoreTestCase, CompletionWaffleTestMix
             )
         )
         self.assertEqual(empty_block_url, None)
+
+
+class GeneratePasswordTest(TestCase):
+    """Tests formation of randomly generated passwords."""
+
+    def test_default_args(self):
+        password = generate_password()
+        self.assertEqual(12, len(password))
+        self.assertTrue(any(c.isdigit for c in password))
+        self.assertTrue(any(c.isalpha for c in password))
+
+    def test_length(self):
+        length = 25
+        self.assertEqual(length, len(generate_password(length=length)))
+
+    def test_chars(self):
+        char = '!'
+        password = generate_password(length=12, chars=(char,))
+
+        self.assertTrue(any(c.isdigit for c in password))
+        self.assertTrue(any(c.isalpha for c in password))
+        self.assertEqual(char * 10, password[2:])
+
+    def test_min_length(self):
+        with self.assertRaises(ValueError):
+            generate_password(length=7)

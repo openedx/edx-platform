@@ -15,6 +15,7 @@ class ProgressTest(unittest.TestCase):
     ''' Test that basic Progress objects work.  A Progress represents a
     fraction between 0 and 1.
     '''
+    shard = 1
     not_started = Progress(0, 17)
     part_done = Progress(2, 6)
     half_done = Progress(3, 6)
@@ -117,6 +118,8 @@ class ProgressTest(unittest.TestCase):
 class ModuleProgressTest(unittest.TestCase):
     ''' Test that get_progress() does the right thing for the different modules
     '''
+    shard = 1
+
     def test_xmodule_default(self):
         '''Make sure default get_progress exists, returns None'''
         xmod = x_module.XModule(Mock(), get_test_system(), DictFieldData({'location': 'a://b/c/d/e'}), Mock())

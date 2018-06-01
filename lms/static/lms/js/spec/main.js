@@ -31,7 +31,7 @@
             'jquery.fileupload': 'xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload',
             'jquery.iframe-transport': 'xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.iframe-transport',  // eslint-disable-line max-len
             'jquery.inputnumber': 'xmodule_js/common_static/js/vendor/html5-input-polyfills/number-polyfill',
-            'jquery.immediateDescendents': 'xmodule_js/common_static/coffee/src/jquery.immediateDescendents',
+            'jquery.immediateDescendents': 'xmodule_js/common_static/js/src/jquery.immediateDescendents',
             'jquery.simulate': 'xmodule_js/common_static/js/vendor/jquery.simulate',
             'jquery.timeago': 'xmodule_js/common_static/js/vendor/jquery.timeago',
             'jquery.url': 'xmodule_js/common_static/js/vendor/url.min',
@@ -58,7 +58,7 @@
             'domReady': 'xmodule_js/common_static/js/vendor/domReady',
             mathjax: '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured',  // eslint-disable-line max-len
             'youtube': '//www.youtube.com/player_api?noext',
-            'coffee/src/ajax_prefix': 'xmodule_js/common_static/coffee/src/ajax_prefix',
+            'js/src/ajax_prefix': 'xmodule_js/common_static/js/src/ajax_prefix',
             'js/instructor_dashboard/student_admin': 'js/instructor_dashboard/student_admin',
             'xmodule_js/common_static/js/test/add_ajax_prefix': 'xmodule_js/common_static/js/test/add_ajax_prefix',
             'xblock/lms.runtime.v1': 'lms/js/xblock/lms.runtime.v1',
@@ -71,8 +71,8 @@
             'Markdown.Editor': 'js/Markdown.Editor',
             'Markdown.Sanitizer': 'js/Markdown.Sanitizer',
             '_split': 'js/split',
-            'mathjax_delay_renderer': 'coffee/src/mathjax_delay_renderer',
-            'MathJaxProcessor': 'coffee/src/customwmd',
+            'mathjax_delay_renderer': 'js/mathjax_delay_renderer',
+            'MathJaxProcessor': 'js/customwmd',
             'picturefill': 'common/js/vendor/picturefill',
             'bootstrap': 'common/js/vendor/bootstrap.bundle',
             'draggabilly': 'xmodule_js/common_static/js/vendor/draggabilly',
@@ -282,7 +282,7 @@
             },
             'xmodule_js/common_static/js/test/add_ajax_prefix': {
                 exports: 'AjaxPrefix',
-                deps: ['coffee/src/ajax_prefix']
+                deps: ['js/src/ajax_prefix']
             },
             'js/instructor_dashboard/util': {
                 exports: 'js/instructor_dashboard/util',
@@ -690,6 +690,7 @@
     });
 
     testFiles = [
+        'completion/js/spec/ViewedEvent_spec.js',
         'course_bookmarks/js/spec/bookmark_button_view_spec.js',
         'course_bookmarks/js/spec/bookmarks_list_view_spec.js',
         'course_bookmarks/js/spec/course_bookmarks_factory_spec.js',
@@ -778,7 +779,6 @@
         'js/spec/student_account/account_settings_factory_spec.js',
         'js/spec/student_account/account_settings_fields_spec.js',
         'js/spec/student_account/account_settings_view_spec.js',
-        'js/spec/student_account/account_spec.js',
         'js/spec/student_account/emailoptin_spec.js',
         'js/spec/student_account/enrollment_spec.js',
         'js/spec/student_account/finish_auth_spec.js',

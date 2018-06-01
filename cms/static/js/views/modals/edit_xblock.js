@@ -3,9 +3,9 @@
  * It is invoked using the edit method which is passed an existing rendered xblock,
  * and upon save an optional refresh function can be invoked to update the display.
  */
-define(['jquery', 'underscore', 'gettext', 'js/views/modals/base_modal', 'common/js/components/utils/view_utils',
-    'js/views/utils/xblock_utils', 'js/views/xblock_editor'],
-    function($, _, gettext, BaseModal, ViewUtils, XBlockViewUtils, XBlockEditorView) {
+define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/modals/base_modal',
+    'common/js/components/utils/view_utils', 'js/views/utils/xblock_utils', 'js/views/xblock_editor'],
+    function($, _, Backbone, gettext, BaseModal, ViewUtils, XBlockViewUtils, XBlockEditorView) {
         'use strict';
 
         var EditXBlockModal = BaseModal.extend({
@@ -181,6 +181,9 @@ define(['jquery', 'underscore', 'gettext', 'js/views/modals/base_modal', 'common
             },
 
             hide: function() {
+                // Notify child views to stop listening events
+                Backbone.trigger('xblock:editorModalHidden');
+
                 BaseModal.prototype.hide.call(this);
 
                 // Notify the runtime that the modal has been hidden

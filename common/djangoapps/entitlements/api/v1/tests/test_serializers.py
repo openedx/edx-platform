@@ -27,10 +27,12 @@ class EntitlementsSerializerTests(ModuleStoreTestCase):
             'expired_at': entitlement.expired_at,
             'course_uuid': str(entitlement.course_uuid),
             'mode': entitlement.mode,
+            'refund_locked': False,
             'enrollment_course_run': None,
             'order_number': entitlement.order_number,
             'created': entitlement.created.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
             'modified': entitlement.modified.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
+            'support_details': [],
         }
 
         assert serializer.data == expected

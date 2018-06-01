@@ -8,6 +8,7 @@ from instructor_analytics.csvs import create_csv_response, format_dictlist, form
 
 class TestAnalyticsCSVS(TestCase):
     """ Test analytics rendering of csv files."""
+    shard = 4
 
     def test_create_csv_response_nodata(self):
         header = ['Name', 'Email']
@@ -39,6 +40,7 @@ class TestAnalyticsCSVS(TestCase):
 
 class TestAnalyticsFormatDictlist(TestCase):
     """ Test format_dictlist method """
+    shard = 4
 
     def test_format_dictlist(self):
         dictlist = [
@@ -83,6 +85,8 @@ class TestAnalyticsFormatDictlist(TestCase):
 
 class TestAnalyticsFormatInstances(TestCase):
     """ test format_instances method """
+    shard = 4
+
     class TestDataClass(object):
         """ Test class to generate objects for format_instances """
         def __init__(self):

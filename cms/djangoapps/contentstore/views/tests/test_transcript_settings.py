@@ -5,6 +5,7 @@ from io import BytesIO
 from mock import Mock, patch, ANY
 
 from django.test.testcases import TestCase
+from django.core.urlresolvers import reverse
 from edxval import api
 
 from contentstore.tests.utils import CourseTestCase
@@ -177,26 +178,24 @@ class TranscriptCredentialsValidationTest(TestCase):
 
 
 @ddt.ddt
-@patch(
-    'openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled',
-    Mock(return_value=True)
-)
 class TranscriptDownloadTest(CourseTestCase):
     """
     Tests for transcript download handler.
     """
-    VIEW_NAME = 'transcript_download_handler'
 
-    def get_url_for_course_key(self, course_id):
-        return reverse_course_url(self.VIEW_NAME, course_id)
+    @property
+    def view_url(self):
+        """
+        Returns url for this view
+        """
+        return reverse('transcript_download_handler')
 
     def test_302_with_anonymous_user(self):
         """
         Verify that redirection happens in case of unauthorized request.
         """
         self.client.logout()
-        transcript_download_url = self.get_url_for_course_key(self.course.id)
-        response = self.client.get(transcript_download_url, content_type='application/json')
+        response = self.client.get(self.view_url, content_type='application/json')
         self.assertEqual(response.status_code, 302)
 
     def test_405_with_not_allowed_request_method(self):
@@ -204,26 +203,14 @@ class TranscriptDownloadTest(CourseTestCase):
         Verify that 405 is returned in case of not-allowed request methods.
         Allowed request methods include GET.
         """
-        transcript_download_url = self.get_url_for_course_key(self.course.id)
-        response = self.client.post(transcript_download_url, content_type='application/json')
+        response = self.client.post(self.view_url, content_type='application/json')
         self.assertEqual(response.status_code, 405)
-
-    def test_404_with_feature_disabled(self):
-        """
-        Verify that 404 is returned if the corresponding feature is disabled.
-        """
-        transcript_download_url = self.get_url_for_course_key(self.course.id)
-        with patch('openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled') as feature:
-            feature.return_value = False
-            response = self.client.get(transcript_download_url, content_type='application/json')
-            self.assertEqual(response.status_code, 404)
 
     @patch('contentstore.views.transcript_settings.get_video_transcript_data')
     def test_transcript_download_handler(self, mock_get_video_transcript_data):
         """
         Tests that transcript download handler works as expected.
         """
-        transcript_download_url = self.get_url_for_course_key(self.course.id)
         mock_get_video_transcript_data.return_value = {
             'content': json.dumps({
                 "start": [10],
@@ -235,7 +222,7 @@ class TranscriptDownloadTest(CourseTestCase):
 
         # Make request to transcript download handler
         response = self.client.get(
-            transcript_download_url,
+            self.view_url,
             data={
                 'edx_video_id': '123',
                 'language_code': 'en'
@@ -277,34 +264,30 @@ class TranscriptDownloadTest(CourseTestCase):
         Tests that transcript download handler with missing attributes.
         """
         # Make request to transcript download handler
-        transcript_download_url = self.get_url_for_course_key(self.course.id)
-        response = self.client.get(transcript_download_url, data=request_payload)
+        response = self.client.get(self.view_url, data=request_payload)
         # Assert the response
         self.assertEqual(response.status_code, 400)
         self.assertEqual(json.loads(response.content)['error'], expected_error_message)
 
 
 @ddt.ddt
-@patch(
-    'openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled',
-    Mock(return_value=True)
-)
 class TranscriptUploadTest(CourseTestCase):
     """
     Tests for transcript upload handler.
     """
-    VIEW_NAME = 'transcript_upload_handler'
-
-    def get_url_for_course_key(self, course_id):
-        return reverse_course_url(self.VIEW_NAME, course_id)
+    @property
+    def view_url(self):
+        """
+        Returns url for this view
+        """
+        return reverse('transcript_upload_handler')
 
     def test_302_with_anonymous_user(self):
         """
         Verify that redirection happens in case of unauthorized request.
         """
         self.client.logout()
-        transcript_upload_url = self.get_url_for_course_key(self.course.id)
-        response = self.client.post(transcript_upload_url, content_type='application/json')
+        response = self.client.post(self.view_url, content_type='application/json')
         self.assertEqual(response.status_code, 302)
 
     def test_405_with_not_allowed_request_method(self):
@@ -312,19 +295,8 @@ class TranscriptUploadTest(CourseTestCase):
         Verify that 405 is returned in case of not-allowed request methods.
         Allowed request methods include POST.
         """
-        transcript_upload_url = self.get_url_for_course_key(self.course.id)
-        response = self.client.get(transcript_upload_url, content_type='application/json')
+        response = self.client.get(self.view_url, content_type='application/json')
         self.assertEqual(response.status_code, 405)
-
-    def test_404_with_feature_disabled(self):
-        """
-        Verify that 404 is returned if the corresponding feature is disabled.
-        """
-        transcript_upload_url = self.get_url_for_course_key(self.course.id)
-        with patch('openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled') as feature:
-            feature.return_value = False
-            response = self.client.post(transcript_upload_url, content_type='application/json')
-            self.assertEqual(response.status_code, 404)
 
     @patch('contentstore.views.transcript_settings.create_or_update_video_transcript')
     @patch('contentstore.views.transcript_settings.get_available_transcript_languages', Mock(return_value=['en']))
@@ -332,11 +304,10 @@ class TranscriptUploadTest(CourseTestCase):
         """
         Tests that transcript upload handler works as expected.
         """
-        transcript_upload_url = self.get_url_for_course_key(self.course.id)
         transcript_file_stream = BytesIO('0\n00:00:00,010 --> 00:00:00,100\nПривіт, edX вітає вас.\n\n')
         # Make request to transcript upload handler
         response = self.client.post(
-            transcript_upload_url,
+            self.view_url,
             {
                 'edx_video_id': '123',
                 'language_code': 'en',
@@ -395,9 +366,8 @@ class TranscriptUploadTest(CourseTestCase):
         """
         Tests the transcript upload handler when the required attributes are missing.
         """
-        transcript_upload_url = self.get_url_for_course_key(self.course.id)
         # Make request to transcript upload handler
-        response = self.client.post(transcript_upload_url, request_payload, format='multipart')
+        response = self.client.post(self.view_url, request_payload, format='multipart')
         self.assertEqual(response.status_code, 400)
         self.assertEqual(json.loads(response.content)['error'], expected_error_message)
 
@@ -407,14 +377,13 @@ class TranscriptUploadTest(CourseTestCase):
         Tests that upload handler do not update transcript's language if a transcript
         with the same language already present for an edx_video_id.
         """
-        transcript_upload_url = self.get_url_for_course_key(self.course.id)
         # Make request to transcript upload handler
         request_payload = {
             'edx_video_id': '1234',
             'language_code': 'en',
             'new_language_code': 'es'
         }
-        response = self.client.post(transcript_upload_url, request_payload, format='multipart')
+        response = self.client.post(self.view_url, request_payload, format='multipart')
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
             json.loads(response.content)['error'],
@@ -427,10 +396,9 @@ class TranscriptUploadTest(CourseTestCase):
         Tests the transcript upload handler with an image file.
         """
         with make_image_file() as image_file:
-            transcript_upload_url = self.get_url_for_course_key(self.course.id)
             # Make request to transcript upload handler
             response = self.client.post(
-                transcript_upload_url,
+                self.view_url,
                 {
                     'edx_video_id': '123',
                     'language_code': 'en',
@@ -451,11 +419,10 @@ class TranscriptUploadTest(CourseTestCase):
         """
         Tests the transcript upload handler with an invalid transcript file.
         """
-        transcript_upload_url = self.get_url_for_course_key(self.course.id)
         transcript_file_stream = BytesIO('An invalid transcript SubRip file content')
         # Make request to transcript upload handler
         response = self.client.post(
-            transcript_upload_url,
+            self.view_url,
             {
                 'edx_video_id': '123',
                 'language_code': 'en',
@@ -473,11 +440,7 @@ class TranscriptUploadTest(CourseTestCase):
 
 
 @ddt.ddt
-@patch(
-    'openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled',
-    Mock(return_value=True)
-)
-class TranscriptUploadTest(CourseTestCase):
+class TranscriptDeleteTest(CourseTestCase):
     """
     Tests for transcript deletion handler.
     """
@@ -503,16 +466,6 @@ class TranscriptUploadTest(CourseTestCase):
         transcript_delete_url = self.get_url_for_course_key(self.course.id, edx_video_id='test_id', language_code='en')
         response = self.client.post(transcript_delete_url)
         self.assertEqual(response.status_code, 405)
-
-    def test_404_with_feature_disabled(self):
-        """
-        Verify that 404 is returned if the corresponding feature is disabled.
-        """
-        transcript_delete_url = self.get_url_for_course_key(self.course.id, edx_video_id='test_id', language_code='en')
-        with patch('openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled') as feature:
-            feature.return_value = False
-            response = self.client.delete(transcript_delete_url)
-            self.assertEqual(response.status_code, 404)
 
     def test_404_with_non_staff_user(self):
         """

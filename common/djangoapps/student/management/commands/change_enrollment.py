@@ -41,7 +41,7 @@ class Command(BaseCommand):
           $ ... change_enrollment -u joe,frank,bill -c some/course/id --from audit --to honor -n
     """
 
-    enrollment_modes = ('audit', 'verified', 'honor')
+    enrollment_modes = ('audit', 'verified', 'honor', 'credit')
 
     def add_arguments(self, parser):
         parser.add_argument('-f', '--from',

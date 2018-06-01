@@ -207,6 +207,10 @@ def regenerate_user_certificates(student, course_key, course=None,
         course = modulestore().get_course(course_key, depth=0)
 
     generate_pdf = not has_html_certificates_enabled(course)
+    log.info(
+        "Started regenerating certificates for user %s in course %s with generate_pdf status: %s",
+        student.username, unicode(course_key), generate_pdf
+    )
 
     return xqueue.regen_cert(
         student,

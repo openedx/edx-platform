@@ -42,6 +42,8 @@ class TestCourseIndex(CourseTestCase):
     """
     Unit tests for getting the list of courses and the course outline.
     """
+    shard = 1
+
     def setUp(self):
         """
         Add a course with odd characters in the fields
@@ -315,6 +317,8 @@ class TestCourseIndexArchived(CourseTestCase):
     """
     Unit tests for testing the course index list when there are archived courses.
     """
+    shard = 1
+
     NOW = datetime.datetime.now(pytz.utc)
     DAY = datetime.timedelta(days=1)
     YESTERDAY = NOW - DAY
@@ -426,6 +430,7 @@ class TestCourseOutline(CourseTestCase):
     """
     Unit tests for the course outline.
     """
+    shard = 1
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
@@ -628,79 +633,12 @@ class TestCourseOutline(CourseTestCase):
             expected_block_types
         )
 
-    @ddt.data(
-        {'delete_vertical': True},
-        {'delete_vertical': False},
-    )
-    @ddt.unpack
-    def test_deprecated_blocks_list_updated_correctly(self, delete_vertical):
-        """
-        Verify that deprecated blocks list shown on banner is updated correctly.
-
-        Here is the scenario:
-            This list of deprecated blocks shown on banner contains published
-            and un-published blocks. That list should be updated when we delete
-            un-published block(s). This behavior should be same if we delete
-            unpublished vertical or problem.
-        """
-        block_types = ['notes']
-        course_module = modulestore().get_item(self.course.location)
-
-        vertical1 = ItemFactory.create(
-            parent_location=self.sequential.location, category='vertical', display_name='Vert1 Subsection1'
-        )
-        problem1 = ItemFactory.create(
-            parent_location=vertical1.location,
-            category='notes',
-            display_name='notes problem in vert1',
-            publish_item=False
-        )
-
-        info = _deprecated_blocks_info(course_module, block_types)
-        # info['blocks'] should be empty here because there is nothing
-        # published or un-published present
-        self.assertEqual(info['blocks'], [])
-
-        vertical2 = ItemFactory.create(
-            parent_location=self.sequential.location, category='vertical', display_name='Vert2 Subsection1'
-        )
-        ItemFactory.create(
-            parent_location=vertical2.location,
-            category='notes',
-            display_name='notes problem in vert2',
-            pubish_item=True
-        )
-        # At this point CourseStructure will contain both the above
-        # published and un-published verticals
-
-        info = _deprecated_blocks_info(course_module, block_types)
-        self.assertItemsEqual(
-            info['blocks'],
-            [
-                [reverse_usage_url('container_handler', vertical1.location), 'notes problem in vert1'],
-                [reverse_usage_url('container_handler', vertical2.location), 'notes problem in vert2']
-            ]
-        )
-
-        # Delete the un-published vertical or problem so that CourseStructure updates its data
-        if delete_vertical:
-            self.store.delete_item(vertical1.location, self.user.id)
-        else:
-            self.store.delete_item(problem1.location, self.user.id)
-
-        info = _deprecated_blocks_info(course_module, block_types)
-        # info['blocks'] should only contain the info about vertical2 which is published.
-        # There shouldn't be any info present about un-published vertical1
-        self.assertEqual(
-            info['blocks'],
-            [[reverse_usage_url('container_handler', vertical2.location), 'notes problem in vert2']]
-        )
-
 
 class TestCourseReIndex(CourseTestCase):
     """
     Unit tests for the course outline.
     """
+    shard = 1
     SUCCESSFUL_RESPONSE = _("Course has been successfully reindexed.")
 
     ENABLED_SIGNALS = ['course_published']

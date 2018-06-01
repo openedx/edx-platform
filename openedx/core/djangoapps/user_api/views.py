@@ -2,6 +2,7 @@
 
 from django.contrib.auth.models import User
 from django.core.exceptions import NON_FIELD_ERRORS, PermissionDenied, ValidationError
+from django.db import transaction
 from django.http import HttpResponse, HttpResponseForbidden
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
@@ -171,6 +172,7 @@ class RegistrationView(APIView):
         set_logged_in_cookies(request, response, user)
         return response
 
+    @method_decorator(transaction.non_atomic_requests)
     @method_decorator(sensitive_post_parameters("password"))
     def dispatch(self, request, *args, **kwargs):
         return super(RegistrationView, self).dispatch(request, *args, **kwargs)

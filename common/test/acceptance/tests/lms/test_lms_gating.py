@@ -106,7 +106,7 @@ class GatingTest(UniqueCourseTest):
         self.studio_course_outline.visit()
         self.studio_course_outline.open_subsection_settings_dialog(1)
         self.studio_course_outline.select_advanced_tab(desired_item='gated_content')
-        self.studio_course_outline.add_prerequisite_to_subsection("80")
+        self.studio_course_outline.add_prerequisite_to_subsection("80", "")
 
     def _fulfill_prerequisite(self):
         """
@@ -182,16 +182,9 @@ class GatingTest(UniqueCourseTest):
         Then I can see a gated subsection
             The gated subsection should have a lock icon
             and be in the format: "<Subsection Title> (Prerequisite Required)"
-        When I fufill the gating prerequisite
-        Then I can see the gated subsection (without a banner)
         """
         self._setup_prereq()
         self._setup_gated_subsection()
-
-        # Fulfill prerequisites for specific student
-        self._auto_auth(self.STUDENT_USERNAME, self.STUDENT_EMAIL, False)
-        self.courseware_page.visit()
-        self._fulfill_prerequisite()
 
         self._auto_auth(self.STAFF_USERNAME, self.STAFF_EMAIL, True)
 
@@ -210,15 +203,9 @@ class GatingTest(UniqueCourseTest):
 
         self.course_home_page.visit()
         self.course_home_page.preview.set_staff_view_mode('Learner')
+        self.course_home_page.wait_for_page()
         self.assertEqual(self.course_home_page.outline.num_subsections, 2)
         self.course_home_page.outline.go_to_section('Test Section 1', 'Test Subsection 1')
         self.courseware_page.wait_for_page()
         # banner displayed informing section is a prereq
         self.assertTrue(self.courseware_page.has_banner())
-
-        self.course_home_page.visit()
-        self.course_home_page.preview.set_staff_view_mode_specific_student(self.STUDENT_USERNAME)
-        self.assertEqual(self.course_home_page.outline.num_subsections, 2)
-        self.course_home_page.outline.go_to_section('Test Section 1', 'Test Subsection 2')
-        self.courseware_page.wait_for_page()
-        self.assertFalse(self.courseware_page.has_banner())

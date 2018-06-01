@@ -85,10 +85,13 @@
          }
 
          function setDialogAttributes(isPaidCourse, certNameLong,
-                                        courseNumber, courseName, enrollmentMode, showRefundOption) {
-             var diagAttr = {};
+                                        courseNumber, courseName, enrollmentMode, showRefundOption, courseKey) {
+             // This flag is added for REV-19 experiment
+             var auditRefundableCourses = (window.experimentVariables || {}).auditRefundableCourses,
+                 courseInExperiment = auditRefundableCourses ? auditRefundableCourses.indexOf(courseKey) > -1 : false,
+                 diagAttr = {};
 
-             if (isPaidCourse) {
+             if (isPaidCourse || courseInExperiment) {
                  if (showRefundOption) {
                      diagAttr['data-refund-info'] = gettext('You will be refunded the amount you paid.');
                  } else {
@@ -133,14 +136,14 @@
              }
          });
          $('.action-unenroll').click(function(event) {
-             var isPaidCourse = $(event.target).data('course-is-paid-course') === 'True';
-             var certNameLong = $(event.target).data('course-cert-name-long');
-             var enrollmentMode = $(event.target).data('course-enrollment-mode');
-
-             var courseNumber = $(event.target).data('course-number');
-             var courseName = $(event.target).data('course-name');
-             var courseRefundUrl = $(event.target).data('course-refund-url');
-             var dialogMessageAttr;
+             var isPaidCourse = $(event.target).data('course-is-paid-course') === 'True',
+                 certNameLong = $(event.target).data('course-cert-name-long'),
+                 enrollmentMode = $(event.target).data('course-enrollment-mode'),
+                 courseNumber = $(event.target).data('course-number'),
+                 courseName = $(event.target).data('course-name'),
+                 courseRefundUrl = $(event.target).data('course-refund-url'),
+                 courseKey = $(event.target).data('course-id'),
+                 dialogMessageAttr;
 
              var request = $.ajax({
                  url: courseRefundUrl,
@@ -150,7 +153,7 @@
              request.success(function(data, textStatus, xhr) {
                  if (xhr.status === 200) {
                      dialogMessageAttr = setDialogAttributes(isPaidCourse, certNameLong,
-                                    courseNumber, courseName, enrollmentMode, data.course_refundable_status);
+                                    courseNumber, courseName, enrollmentMode, data.course_refundable_status, courseKey);
 
                      $('#track-info').empty();
                      $('#refund-info').empty();

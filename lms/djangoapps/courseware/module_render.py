@@ -46,7 +46,7 @@ from lms.djangoapps.grades.signals.signals import SCORE_PUBLISHED
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
-from lms.djangoapps.verify_student.services import VerificationService
+from lms.djangoapps.verify_student.services import XBlockVerificationService
 from openedx.core.djangoapps.bookmarks.services import BookmarksService
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.services import CreditService
@@ -582,7 +582,7 @@ def get_module_system_for_user(
         Returns:
             nothing (but the side effect is that module is re-bound to real_user)
         """
-        if user.is_authenticated():
+        if user.is_authenticated:
             err_msg = ("rebind_noauth_module_to_user can only be called from a module bound to "
                        "an anonymous user")
             log.error(err_msg)
@@ -688,13 +688,11 @@ def get_module_system_for_user(
             # the result would always be "False".
             masquerade_settings = user.real_user.masquerade_settings
             del user.real_user.masquerade_settings
-            instructor_access = bool(has_access(user.real_user, 'instructor', descriptor, course_id))
             user.real_user.masquerade_settings = masquerade_settings
         else:
             staff_access = has_access(user, 'staff', descriptor, course_id)
-            instructor_access = bool(has_access(user, 'instructor', descriptor, course_id))
         if staff_access:
-            block_wrappers.append(partial(add_staff_markup, user, instructor_access, disable_staff_debug_info))
+            block_wrappers.append(partial(add_staff_markup, user, disable_staff_debug_info))
 
     # These modules store data using the anonymous_student_id as a key.
     # To prevent loss of data, we will continue to provide old modules with
@@ -758,7 +756,7 @@ def get_module_system_for_user(
             'fs': FSService(),
             'field-data': field_data,
             'user': DjangoXBlockUserService(user, user_is_staff=user_is_staff),
-            'verification': VerificationService(),
+            'verification': XBlockVerificationService(),
             'proctoring': ProctoringService(),
             'milestones': milestones_helpers.get_service(),
             'credit': CreditService(),
@@ -945,10 +943,10 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     """
     # NOTE (CCB): Allow anonymous GET calls (e.g. for transcripts). Modifying this view is simpler than updating
     # the XBlocks to use `handle_xblock_callback_noauth`...which is practically identical to this view.
-    if request.method != 'GET' and not request.user.is_authenticated():
+    if request.method != 'GET' and not request.user.is_authenticated:
         return HttpResponseForbidden()
 
-    request.user.known = request.user.is_authenticated()
+    request.user.known = request.user.is_authenticated
 
     try:
         course_key = CourseKey.from_string(course_id)
@@ -1121,7 +1119,7 @@ def xblock_view(request, course_id, usage_id, view_name):
                  " see FEATURES['ENABLE_XBLOCK_VIEW_ENDPOINT']")
         raise Http404
 
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         raise PermissionDenied
 
     try:

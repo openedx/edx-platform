@@ -32,11 +32,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-03-18 20:36+0000\n"
-"PO-Revision-Date: 2018-03-18 20:36:06.141838\n"
+"POT-Creation-Date: 2018-05-27 20:37+0000\n"
+"PO-Revision-Date: 2018-05-27 20:37:20.299161\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
-"Language: en\n"
+"Language: eo\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -48,7 +48,7 @@ msgstr ""
 #. the discussion forums
 #: cms/djangoapps/contentstore/views/component.py
 #: lms/djangoapps/courseware/tabs.py lms/djangoapps/discussion/plugins.py
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Discussion"
@@ -92,6 +92,38 @@ msgstr "Ûnït Ⱡ'σяєм ι#"
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Empty"
 msgstr "Émptý Ⱡ'σяєм ιρѕ#"
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+#, python-brace-format
+msgid "The following parameters are required: {missing}."
+msgstr ""
+"Thé föllöwïng pärämétérs äré réqüïréd: {missing}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя #"
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+#, python-brace-format
+msgid "A transcript with the \"{language_code}\" language code already exists."
+msgstr ""
+"À tränsçrïpt wïth thé \"{language_code}\" längüägé çödé älréädý éxïsts. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+msgid "A transcript file is required."
+msgstr "À tränsçrïpt fïlé ïs réqüïréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: cms/djangoapps/contentstore/views/transcript_settings.py
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+msgid ""
+"There is a problem with this transcript file. Try to upload a different "
+"file."
+msgstr ""
+"Théré ïs ä prößlém wïth thïs tränsçrïpt fïlé. Trý tö üplöäd ä dïfférént "
+"fïlé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: cms/djangoapps/contentstore/views/videos.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
@@ -213,7 +245,7 @@ msgstr "Pröféssïönäl Éd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 #: common/lib/xmodule/xmodule/x_module.py
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 #: cms/templates/container.html cms/templates/library.html
 msgid "Display Name"
 msgstr "Dïspläý Nämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
@@ -806,6 +838,17 @@ msgstr "ÌD phötö ïs ßlürrý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α�
 
 #: common/djangoapps/student/views/dashboard.py
 #, python-brace-format
+msgid ""
+"Check your {email_start}{email}{email_end} inbox for an account activation "
+"link from {platform_name}. If you need help, contact "
+"{link_start}{platform_name} Support{link_end}."
+msgstr ""
+"Çhéçk ýöür {email_start}{email}{email_end} ïnßöx för än äççöünt äçtïvätïön "
+"lïnk fröm {platform_name}. Ìf ýöü nééd hélp, çöntäçt "
+"{link_start}{platform_name} Süppört{link_end}. Ⱡ'σяєм ιρѕυм ∂σłσя#"
+
+#: common/djangoapps/student/views/dashboard.py
+#, python-brace-format
 msgid "The course you are looking for does not start until {date}."
 msgstr ""
 "Thé çöürsé ýöü äré löökïng för döés nöt stärt üntïl {date}. Ⱡ'σяєм ιρѕυм "
@@ -856,6 +899,7 @@ msgstr ""
 " ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: common/djangoapps/student/views/login.py
+#: openedx/core/djangoapps/user_api/accounts/views.py
 msgid ""
 "This account has been temporarily locked due to excessive login failures. "
 "Try again later."
@@ -902,7 +946,9 @@ msgstr ""
 "Töö mäný fäïléd lögïn ättémpts. Trý ägäïn lätér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
 
-#: common/djangoapps/student/views/login.py lms/templates/provider_login.html
+#: common/djangoapps/student/views/login.py
+#: openedx/core/djangoapps/user_api/accounts/views.py
+#: lms/templates/provider_login.html
 msgid "Email or password is incorrect."
 msgstr "Émäïl ör pässwörd ïs ïnçörréçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
@@ -916,6 +962,15 @@ msgstr ""
 msgid "Unable to send reactivation email"
 msgstr ""
 "Ûnäßlé tö sénd réäçtïvätïön émäïl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: common/djangoapps/student/views/login.py
+msgid "Superuser creation not allowed"
+msgstr "Süpérüsér çréätïön nöt ällöwéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: common/djangoapps/student/views/login.py
+msgid "Account modification not allowed."
+msgstr ""
+"Àççöünt mödïfïçätïön nöt ällöwéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: common/djangoapps/student/views/login.py
 #: common/djangoapps/student/views/management.py
@@ -1055,6 +1110,11 @@ msgid "Password reset unsuccessful"
 msgstr "Pässwörd rését ünsüççéssfül Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: common/djangoapps/student/views/management.py
+msgid "Error in resetting your password."
+msgstr ""
+"Érrör ïn réséttïng ýöür pässwörd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: common/djangoapps/student/views/management.py
 msgid "Error in resetting your password. Please try again."
 msgstr ""
 "Érrör ïn réséttïng ýöür pässwörd. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
@@ -1092,6 +1152,12 @@ msgstr ""
 msgid "Delete the selected configuration"
 msgstr ""
 "Délété thé séléçtéd çönfïgürätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: common/djangoapps/third_party_auth/middleware.py
+msgid "Unable to connect with the external provider, please try again"
+msgstr ""
+"Ûnäßlé tö çönnéçt wïth thé éxtérnäl prövïdér, pléäsé trý ägäïn Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: common/djangoapps/third_party_auth/models.py
 msgid "Authentication with {} is currently unavailable."
@@ -1157,6 +1223,14 @@ msgstr ""
 "¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
 "¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
 "ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂#"
+
+#: common/djangoapps/third_party_auth/models.py
+msgid ""
+"If this option is selected, users will be sent a welcome email upon "
+"registration."
+msgstr ""
+"Ìf thïs öptïön ïs séléçtéd, üsérs wïll ßé sént ä wélçömé émäïl üpön "
+"régïsträtïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: common/djangoapps/third_party_auth/models.py
 msgid ""
@@ -1616,6 +1690,107 @@ msgstr ""
 msgid "System defined milestone"
 msgstr "Sýstém défïnéd mïléstöné Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} letter"
+msgid_plural "{num} letters"
+msgstr[0] "{num} léttér Ⱡ'σяєм ιρѕυм ∂σłσ#"
+msgstr[1] "{num} léttérs Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} uppercase letter"
+msgid_plural "{num} uppercase letters"
+msgstr[0] "{num} üppérçäsé léttér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+msgstr[1] "{num} üppérçäsé léttérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} lowercase letter"
+msgid_plural "{num} lowercase letters"
+msgstr[0] "{num} löwérçäsé léttér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+msgstr[1] "{num} löwérçäsé léttérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} digit"
+msgid_plural "{num} digits"
+msgstr[0] "{num} dïgït Ⱡ'σяєм ιρѕυм ∂σł#"
+msgstr[1] "{num} dïgïts Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} number"
+msgid_plural "{num} numbers"
+msgstr[0] "{num} nümßér Ⱡ'σяєм ιρѕυм ∂σłσ#"
+msgstr[1] "{num} nümßérs Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} punctuation mark"
+msgid_plural "{num} punctuation marks"
+msgstr[0] "{num} pünçtüätïön märk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+msgstr[1] "{num} pünçtüätïön märks Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} symbol"
+msgid_plural "{num} symbols"
+msgstr[0] "{num} sýmßöl Ⱡ'σяєм ιρѕυм ∂σłσ#"
+msgstr[1] "{num} sýmßöls Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#. Translators: This appears in a list of password requirements
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "{num} word"
+msgid_plural "{num} words"
+msgstr[0] "{num} wörd Ⱡ'σяєм ιρѕυм ∂#"
+msgstr[1] "{num} wörds Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "Your password must contain at least {num} character."
+msgid_plural "Your password must contain at least {num} characters."
+msgstr[0] ""
+"Ýöür pässwörd müst çöntäïn ät léäst {num} çhäräçtér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+msgstr[1] ""
+"Ýöür pässwörd müst çöntäïn ät léäst {num} çhäräçtérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
+" αмєт, ¢σηѕє¢тєтυя α#"
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid ""
+"Your password must contain at least {num} character, including "
+"{requirements}."
+msgid_plural ""
+"Your password must contain at least {num} characters, including "
+"{requirements}."
+msgstr[0] ""
+"Ýöür pässwörd müst çöntäïn ät léäst {num} çhäräçtér, ïnçlüdïng "
+"{requirements}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+msgstr[1] ""
+"Ýöür pässwörd müst çöntäïn ät léäst {num} çhäräçtérs, ïnçlüdïng "
+"{requirements}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: common/djangoapps/util/password_policy_validators.py
+msgid "Invalid password."
+msgstr "Ìnvälïd pässwörd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "Enter a password with at least {requirements}."
+msgstr ""
+"Éntér ä pässwörd wïth ät léäst {requirements}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєт#"
+
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
 msgid ""
@@ -1648,91 +1823,35 @@ msgstr[1] ""
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
-msgid "Password: Invalid Length ({0})"
-msgstr "Pässwörd: Ìnvälïd Léngth ({0}) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+msgid "{num} character"
+msgid_plural "{num} characters"
+msgstr[0] "{num} çhäräçtér Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+msgstr[1] "{num} çhäräçtérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
-msgid "must be {0} characters or more"
-msgstr "müst ßé {0} çhäräçtérs ör möré Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must be {0} characters or fewer"
-msgstr "müst ßé {0} çhäräçtérs ör féwér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "Password: Must be more complex ({0})"
-msgstr ""
-"Pässwörd: Müst ßé möré çömpléx ({0}) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυ#"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more uppercase characters"
-msgstr ""
-"müst çöntäïn {0} ör möré üppérçäsé çhäräçtérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+msgid "Enter a password with at most {num} character."
+msgid_plural "Enter a password with at most {num} characters."
+msgstr[0] ""
+"Éntér ä pässwörd wïth ät möst {num} çhäräçtér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more lowercase characters"
-msgstr ""
-"müst çöntäïn {0} ör möré löwérçäsé çhäräçtérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more digits"
-msgstr "müst çöntäïn {0} ör möré dïgïts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more punctuation characters"
-msgstr ""
-"müst çöntäïn {0} ör möré pünçtüätïön çhäräçtérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
-" ¢σηѕє¢тєтυя α#"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more non ascii characters"
-msgstr ""
-"müst çöntäïn {0} ör möré nön äsçïï çhäräçtérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more unique words"
-msgstr ""
-"müst çöntäïn {0} ör möré ünïqüé wörds Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυ#"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more numbers"
-msgstr ""
-"müst çöntäïn {0} ör möré nümßérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "must contain {0} or more letters"
-msgstr ""
-"müst çöntäïn {0} ör möré léttérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+msgstr[1] ""
+"Éntér ä pässwörd wïth ät möst {num} çhäräçtérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
+" ¢σηѕє¢тєтυя #"
 
 #. Translators: This message is shown to users who enter a password matching
 #. the username they enter(ed).
 #: common/djangoapps/util/password_policy_validators.py
-msgid "Password cannot be the same as the username"
+msgid "Password cannot be the same as the username."
 msgstr ""
-"Pässwörd çännöt ßé thé sämé äs thé üsérnämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"Pässwörd çännöt ßé thé sämé äs thé üsérnämé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
 #: common/djangoapps/util/password_policy_validators.py
-msgid "Password: Too similar to a restricted dictionary word."
+msgid "Password is too similar to a dictionary word."
 msgstr ""
-"Pässwörd: Töö sïmïlär tö ä réstrïçtéd dïçtïönärý wörd. Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+"Pässwörd ïs töö sïmïlär tö ä dïçtïönärý wörd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
 
 #: common/djangoapps/xblock_django/admin.py
 msgid ""
@@ -1818,6 +1937,11 @@ msgid "Cannot rescore problems with possible file submissions"
 msgstr ""
 "Çännöt résçöré prößléms wïth pössïßlé fïlé süßmïssïöns Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: common/lib/capa/capa/capa_problem.py
+#, python-brace-format
+msgid "Question {0}"
+msgstr "Qüéstïön {0} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: common/lib/capa/capa/capa_problem.py
 #: common/lib/xmodule/xmodule/capa_base.py
@@ -2001,6 +2125,7 @@ msgid "Incorrect:"
 msgstr "Ìnçörréçt: Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: common/lib/capa/capa/responsetypes.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Answer"
 msgstr "Ànswér Ⱡ'σяєм ιρѕυ#"
 
@@ -2333,7 +2458,7 @@ msgstr "XML dätä för thé ännötätïön Ⱡ'σяєм ιρѕυм ∂σłσя
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 #: common/lib/xmodule/xmodule/x_module.py
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid "The display name for this component."
 msgstr ""
 "Thé dïspläý nämé för thïs çömpönént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
@@ -2593,6 +2718,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/capa_base.py cms/templates/index.html
 #: lms/templates/help_modal.html lms/templates/manage_user_standing.html
 #: lms/templates/register-shib.html
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 #: lms/templates/survey/survey.html
@@ -2798,6 +2924,14 @@ msgid ""
 msgstr ""
 "Thé stäté öf thïs prößlém häs çhängéd sïnçé ýöü löädéd thïs pägé. Pléäsé "
 "réfrésh ýöür pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Answer ID"
+msgstr "Ànswér ÌD Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Question"
+msgstr "Qüéstïön Ⱡ'σяєм ιρѕυм ∂#"
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid "Conditional"
@@ -5326,10 +5460,8 @@ msgstr ""
 " ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: common/lib/xmodule/xmodule/video_module/video_handlers.py
-msgid "Invalid encoding type, transcripts should be UTF-8 encoded."
-msgstr ""
-"Ìnvälïd énçödïng týpé, tränsçrïpts shöüld ßé ÛTF-8 énçödéd. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+msgid "Language is required."
+msgstr "Längüägé ïs réqüïréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "Basic"
@@ -5782,6 +5914,71 @@ msgstr ""
 "Töp nüm_töp_wörds wörds för wörd çlöüd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
 
+#: common/templates/student/edx_ace/passwordreset/email/body.html
+#: lms/templates/forgot_password_modal.html
+msgid "Password Reset"
+msgstr "Pässwörd Rését Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: common/templates/student/edx_ace/passwordreset/email/body.html
+#: common/templates/student/edx_ace/passwordreset/email/body.txt
+#, python-format
+msgid ""
+"You're receiving this e-mail because you requested a password reset for your"
+" user account at %(platform_name)s."
+msgstr ""
+"Ýöü'ré réçéïvïng thïs é-mäïl ßéçäüsé ýöü réqüéstéd ä pässwörd rését för ýöür"
+" üsér äççöünt ät %(platform_name)s. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: common/templates/student/edx_ace/passwordreset/email/body.html
+#: common/templates/student/edx_ace/passwordreset/email/body.txt
+#, python-format
+msgid ""
+"However, there is currently no user account associated with your email "
+"address: %(email_address)s."
+msgstr ""
+"Höwévér, théré ïs çürréntlý nö üsér äççöünt ässöçïätéd wïth ýöür émäïl "
+"äddréss: %(email_address)s. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: common/templates/student/edx_ace/passwordreset/email/body.html
+#: common/templates/student/edx_ace/passwordreset/email/body.txt
+msgid "If you did not request this change, you can ignore this email."
+msgstr ""
+"Ìf ýöü dïd nöt réqüést thïs çhängé, ýöü çän ïgnöré thïs émäïl. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: common/templates/student/edx_ace/passwordreset/email/body.html
+#: common/templates/student/edx_ace/passwordreset/email/body.txt
+msgid ""
+"If you didn't request this change, you can disregard this email - we have "
+"not yet reset your password."
+msgstr ""
+"Ìf ýöü dïdn't réqüést thïs çhängé, ýöü çän dïsrégärd thïs émäïl - wé hävé "
+"nöt ýét rését ýöür pässwörd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: common/templates/student/edx_ace/passwordreset/email/body.html
+msgid "Change my Password"
+msgstr "Çhängé mý Pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: common/templates/student/edx_ace/passwordreset/email/body.txt
+msgid "Please go to the following page and choose a new password:"
+msgstr ""
+"Pléäsé gö tö thé föllöwïng pägé änd çhöösé ä néw pässwörd: Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: common/templates/student/edx_ace/passwordreset/email/body.txt
+msgid "Thanks for using our site!"
+msgstr "Thänks för üsïng öür sïté! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: common/templates/student/edx_ace/passwordreset/email/body.txt
+#, python-format
+msgid "The %(platform_name)s Team"
+msgstr "Thé %(platform_name)s Téäm Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: common/templates/student/edx_ace/passwordreset/email/subject.txt
+#, python-format
+msgid "Password reset on %(platform_name)s"
+msgstr "Pässwörd rését ön %(platform_name)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
 #: lms/djangoapps/badges/events/course_complete.py
 #, python-brace-format
 msgid ""
@@ -6022,8 +6219,8 @@ msgid "Open edX"
 msgstr "Öpén édX Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/djangoapps/branding/api.py
-msgid "Trademarks"
-msgstr "Trädémärks Ⱡ'σяєм ιρѕυм ∂σłσ#"
+msgid "Trademark Policy"
+msgstr "Trädémärk Pölïçý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/djangoapps/branding/api.py
 #, python-brace-format
@@ -7117,13 +7314,13 @@ msgstr ""
 
 #: lms/djangoapps/courseware/views/index.py
 #: lms/djangoapps/courseware/views/views.py
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid "sign in"
 msgstr "sïgn ïn Ⱡ'σяєм ιρѕυм #"
 
 #: lms/djangoapps/courseware/views/index.py
 #: lms/djangoapps/courseware/views/views.py
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 #: openedx/features/course_experience/views/course_home_messages.py
 msgid "register"
 msgstr "régïstér Ⱡ'σяєм ιρѕυм ∂#"
@@ -7753,6 +7950,18 @@ msgstr ""
 "ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/djangoapps/email_marketing/models.py
+msgid "Sailthru send template to use on passed ID verification."
+msgstr ""
+"Säïlthrü sénd témpläté tö üsé ön pässéd ÌD vérïfïçätïön. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/djangoapps/email_marketing/models.py
+msgid "Sailthru send template to use on failed ID verification."
+msgstr ""
+"Säïlthrü sénd témpläté tö üsé ön fäïléd ÌD vérïfïçätïön. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/djangoapps/email_marketing/models.py
 msgid "Sailthru send template to use on upgrading a course. Deprecated "
 msgstr ""
 "Säïlthrü sénd témpläté tö üsé ön üpgrädïng ä çöürsé. Dépréçätéd  Ⱡ'σяєм "
@@ -7864,6 +8073,10 @@ msgstr ""
 "À pröçtöréd éxäm ättémpt för {exam_name} ïn {course_name} ßý üsérnämé: "
 "{student_username} wäs révïéwéd äs {review_status} ßý thé pröçtöréd éxäm "
 "révïéw prövïdér. Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/djangoapps/instructor/settings/common.py
+msgid "Your Platform Insights"
+msgstr "Ýöür Plätförm Ìnsïghts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -8905,7 +9118,6 @@ msgid "Last Name"
 msgstr "Läst Nämé Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: openedx/core/djangoapps/api_admin/forms.py
 #: lms/templates/shoppingcart/receipt.html
 msgid "Company Name"
 msgstr "Çömpäný Nämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
@@ -10712,6 +10924,17 @@ msgstr "Mänägé Ûsér Ⱡ'σяєм ιρѕυм ∂σłσя #"
 msgid "Disable User Account"
 msgstr "Dïsäßlé Ûsér Àççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
+#: lms/djangoapps/support/views/index.py
+#: lms/templates/support/entitlement.html
+msgid "Entitlements"
+msgstr "Éntïtléménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: lms/djangoapps/support/views/index.py
+msgid "View, create, and reissue learner entitlements"
+msgstr ""
+"Vïéw, çréäté, änd réïssüé léärnér éntïtléménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α#"
+
 #: lms/djangoapps/support/views/manage_user.py
 msgid "user_support_url"
 msgstr "üsér_süppört_ürl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
@@ -10873,13 +11096,6 @@ msgstr ""
 " Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/djangoapps/verify_student/models.py
-#, python-brace-format
-msgid "Your {platform_name} verification has expired."
-msgstr ""
-"Ýöür {platform_name} vérïfïçätïön häs éxpïréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєт#"
-
-#: lms/djangoapps/verify_student/models.py
 msgid "The course for which this deadline applies"
 msgstr ""
 "Thé çöürsé för whïçh thïs déädlïné äpplïés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
@@ -10892,6 +11108,13 @@ msgid ""
 msgstr ""
 "Thé dätétïmé äftér whïçh üsérs äré nö löngér ällöwéd tö süßmït phötös för "
 "vérïfïçätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
+#: lms/djangoapps/verify_student/services.py
+#, python-brace-format
+msgid "Your {platform_name} verification has expired."
+msgstr ""
+"Ýöür {platform_name} vérïfïçätïön häs éxpïréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєт#"
 
 #: lms/djangoapps/verify_student/views.py
 msgid "Intro"
@@ -10972,8 +11195,25 @@ msgid "Image data is not valid."
 msgstr "Ìmägé dätä ïs nöt välïd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
 #: lms/djangoapps/verify_student/views.py
-msgid "Verification photos received"
-msgstr "Vérïfïçätïön phötös réçéïvéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+#, python-brace-format
+msgid "{platform_name} ID Verification Photos Received"
+msgstr ""
+"{platform_name} ÌD Vérïfïçätïön Phötös Réçéïvéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
+" ¢σηѕє¢тєт#"
+
+#: lms/djangoapps/verify_student/views.py
+#, python-brace-format
+msgid "Your {platform_name} ID Verification Approved"
+msgstr ""
+"Ýöür {platform_name} ÌD Vérïfïçätïön Àpprövéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тє#"
+
+#: lms/djangoapps/verify_student/views.py
+#, python-brace-format
+msgid "Your {platform_name} Verification Has Been Denied"
+msgstr ""
+"Ýöür {platform_name} Vérïfïçätïön Häs Béén Dénïéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυ#"
 
 #: lms/envs/common.py
 msgid "Your Platform Name Here"
@@ -11083,10 +11323,6 @@ msgstr ""
 "αмєт, ¢σηѕє¢тєтυ#"
 
 #: lms/envs/common.py
-msgid "Your Platform Insights"
-msgstr "Ýöür Plätförm Ìnsïghts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
-
-#: lms/envs/common.py
 msgid "Kosovo"
 msgstr "Kösövö Ⱡ'σяєм ιρѕυ#"
 
@@ -11098,25 +11334,22 @@ msgstr "Wélçömé tö {platform_name}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕ�
 #: lms/envs/common.py
 #, python-brace-format
 msgid ""
-"{start_bold}{enterprise_name}{end_bold} has partnered with "
-"{start_bold}{platform_name}{end_bold} to  offer you always available, high-"
-"quality learning programs to help you advance your knowledge and your "
-"career. {line_break}Please continue with registration, or log in if you are "
-"an existing user, and press continue to start learning."
+"You have left the {start_bold}{enterprise_name}{end_bold} website and are "
+"now on the {platform_name} site. {enterprise_name} has partnered with "
+"{platform_name} to offer you high-quality, always available learning "
+"programs to help you advance your knowledge and career. {line_break}Please "
+"note that {platform_name} has a different {privacy_policy_link_start}Privacy"
+" Policy{privacy_policy_link_end} from {enterprise_name}."
 msgstr ""
-"{start_bold}{enterprise_name}{end_bold} häs pärtnéréd wïth "
-"{start_bold}{platform_name}{end_bold} tö  öffér ýöü älwäýs äväïläßlé, hïgh-"
-"qüälïtý léärnïng prögräms tö hélp ýöü ädvänçé ýöür knöwlédgé änd ýöür "
-"çäréér. {line_break}Pléäsé çöntïnüé wïth régïsträtïön, ör lög ïn ïf ýöü äré "
-"än éxïstïng üsér, änd préss çöntïnüé tö stärt léärnïng. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"Ýöü hävé léft thé {start_bold}{enterprise_name}{end_bold} wéßsïté änd äré "
+"nöw ön thé {platform_name} sïté. {enterprise_name} häs pärtnéréd wïth "
+"{platform_name} tö öffér ýöü hïgh-qüälïtý, älwäýs äväïläßlé léärnïng "
+"prögräms tö hélp ýöü ädvänçé ýöür knöwlédgé änd çäréér. {line_break}Pléäsé "
+"nöté thät {platform_name} häs ä dïfférént {privacy_policy_link_start}Prïväçý"
+" Pölïçý{privacy_policy_link_end} fröm {enterprise_name}. Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт "
 "łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ "
-"єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ #"
-
-#: lms/templates/emails/password_reset_subject.txt
-#, python-format
-msgid "Password reset on %(platform_name)s"
-msgstr "Pässwörd rését ön %(platform_name)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+"єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυα#"
 
 #: lms/templates/logout.html
 msgid "Signed Out"
@@ -11183,53 +11416,6 @@ msgstr "Àllöw Ⱡ'σяєм ιρѕ#"
 #: lms/templates/ccx/schedule.html
 msgid "Error"
 msgstr "Érrör Ⱡ'σяєм ιρѕ#"
-
-#: lms/templates/registration/password_reset_email.html
-#, python-format
-msgid ""
-"You're receiving this e-mail because you requested a password reset for your"
-" user account at %(platform_name)s."
-msgstr ""
-"Ýöü'ré réçéïvïng thïs é-mäïl ßéçäüsé ýöü réqüéstéd ä pässwörd rését för ýöür"
-" üsér äççöünt ät %(platform_name)s. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: lms/templates/registration/password_reset_email.html
-#, python-format
-msgid ""
-"However, there is currently no user account associated with your email "
-"address: %(email_address)s."
-msgstr ""
-"Höwévér, théré ïs çürréntlý nö üsér äççöünt ässöçïätéd wïth ýöür émäïl "
-"äddréss: %(email_address)s. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: lms/templates/registration/password_reset_email.html
-msgid "If you did not request this change, you can ignore this email."
-msgstr ""
-"Ìf ýöü dïd nöt réqüést thïs çhängé, ýöü çän ïgnöré thïs émäïl. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/registration/password_reset_email.html
-msgid "Please go to the following page and choose a new password:"
-msgstr ""
-"Pléäsé gö tö thé föllöwïng pägé änd çhöösé ä néw pässwörd: Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/registration/password_reset_email.html
-msgid ""
-"If you didn't request this change, you can disregard this email - we have "
-"not yet reset your password."
-msgstr ""
-"Ìf ýöü dïdn't réqüést thïs çhängé, ýöü çän dïsrégärd thïs émäïl - wé hävé "
-"nöt ýét rését ýöür pässwörd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: lms/templates/registration/password_reset_email.html
-msgid "Thanks for using our site!"
-msgstr "Thänks för üsïng öür sïté! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: lms/templates/registration/password_reset_email.html
-#, python-format
-msgid "The %(platform_name)s Team"
-msgstr "Thé %(platform_name)s Téäm Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/wiki/article.html
 msgid "Last modified:"
@@ -11361,6 +11547,7 @@ msgstr "Prévïéw Ⱡ'σяєм ιρѕυм #"
 #: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
 #: lms/templates/modal/_modal-settings-language.html
 #: themes/edx.org/lms/templates/dashboard.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 msgid "Close"
 msgstr "Çlösé Ⱡ'σяєм ιρѕ#"
 
@@ -11376,6 +11563,7 @@ msgstr "Wïkï Prévïéw Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 #: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 #: lms/templates/modal/_modal-settings-language.html
 #: themes/edx.org/lms/templates/dashboard.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 msgid "window open"
 msgstr "wïndöw öpén Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
@@ -11825,16 +12013,6 @@ msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-msgid "View on Web"
-msgstr "Vïéw ön Wéß Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
-msgid "Unsubscribe from this list"
-msgstr "Ûnsüßsçrïßé fröm thïs lïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
-#: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Our mailing address is"
 msgstr "Öür mäïlïng äddréss ïs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
@@ -11869,8 +12047,13 @@ msgstr ""
 "çätälög för thïs üsér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: openedx/core/djangoapps/api_admin/forms.py
-msgid "Company Address"
-msgstr "Çömpäný Àddréss Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "Organization Name"
+msgstr "Örgänïzätïön Nämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: openedx/core/djangoapps/api_admin/forms.py
+msgid "Organization Address"
+msgstr "Örgänïzätïön Àddréss Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: openedx/core/djangoapps/api_admin/forms.py
 msgid "Describe what your application does."
@@ -11879,19 +12062,20 @@ msgstr ""
 "¢σηѕє¢тєтυ#"
 
 #: openedx/core/djangoapps/api_admin/forms.py
-msgid "The URL of your company's website."
+msgid "The URL of your organization's website."
 msgstr ""
-"Thé ÛRL öf ýöür çömpäný's wéßsïté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+"Thé ÛRL öf ýöür örgänïzätïön's wéßsïté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
 
 #: openedx/core/djangoapps/api_admin/forms.py
-msgid "The name of your company."
-msgstr "Thé nämé öf ýöür çömpäný. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+msgid "The name of your organization."
+msgstr "Thé nämé öf ýöür örgänïzätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: openedx/core/djangoapps/api_admin/forms.py
-msgid "The contact address of your company."
+msgid "The contact address of your organization."
 msgstr ""
-"Thé çöntäçt äddréss öf ýöür çömpäný. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυ#"
+"Thé çöntäçt äddréss öf ýöür örgänïzätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
 
 #: openedx/core/djangoapps/api_admin/forms.py
 #, python-brace-format
@@ -11941,17 +12125,14 @@ msgstr "ÀPÌ äççéss réqüést fröm {company} Ⱡ'σяєм ιρѕυм ∂�
 msgid "API access request"
 msgstr "ÀPÌ äççéss réqüést Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
-#. Translators: link_start and link_end are HTML tags for a link to the terms
-#. of service.
-#. platform_name is the name of this Open edX installation.
 #: openedx/core/djangoapps/api_admin/widgets.py
 #, python-brace-format
 msgid ""
-"I, and my company, accept the {link_start}{platform_name} API Terms of "
+"I, and my organization, accept the {link_start}{platform_name} API Terms of "
 "Service{link_end}."
 msgstr ""
-"Ì, änd mý çömpäný, äççépt thé {link_start}{platform_name} ÀPÌ Térms öf "
-"Sérvïçé{link_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+"Ì, änd mý örgänïzätïön, äççépt thé {link_start}{platform_name} ÀPÌ Térms öf "
+"Sérvïçé{link_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: openedx/core/djangoapps/bookmarks/apps.py
 #: openedx/features/course_bookmarks/plugins.py
@@ -12093,6 +12274,10 @@ msgid "A cohort with the same name already exists."
 msgstr ""
 "À çöhört wïth thé sämé nämé älréädý éxïsts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
+
+#: openedx/core/djangoapps/credentials/apps.py
+msgid "Credentials"
+msgstr "Çrédéntïäls Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: openedx/core/djangoapps/credentials/models.py
 msgid "Internal Service URL"
@@ -12429,6 +12614,43 @@ msgstr ""
 "        Ýöür ünïvérsïtý ïdéntïtý sérvér dïd nöt rétürn ýöür ÌD ïnförmätïön tö üs.\n"
 "        Pléäsé trý löggïng ïn ägäïn.  (Ýöü mäý nééd tö réstärt ýöür ßröwsér.)\n"
 "         Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒ#"
+
+#: openedx/core/djangoapps/password_policy/apps.py
+msgid "Password Policy"
+msgstr "Pässwörd Pölïçý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: openedx/core/djangoapps/password_policy/compliance.py
+#, python-brace-format
+msgid ""
+"{platform_name} now requires more complex passwords. Your current password "
+"does not meet the new requirements. Change your password now to continue "
+"using the site. Thank you for helping us keep your data safe."
+msgstr ""
+"{platform_name} nöw réqüïrés möré çömpléx pässwörds. Ýöür çürrént pässwörd "
+"döés nöt méét thé néw réqüïréménts. Çhängé ýöür pässwörd nöw tö çöntïnüé "
+"üsïng thé sïté. Thänk ýöü för hélpïng üs kéép ýöür dätä säfé. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
+"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι#"
+
+#: openedx/core/djangoapps/password_policy/compliance.py
+#, python-brace-format
+msgid ""
+"{platform_name} now requires more complex passwords. Your current password "
+"does not meet the new requirements. You must change your password by "
+"{deadline} to be able to continue using the site. Thank you for helping us "
+"keep your data safe."
+msgstr ""
+"{platform_name} nöw réqüïrés möré çömpléx pässwörds. Ýöür çürrént pässwörd "
+"döés nöt méét thé néw réqüïréménts. Ýöü müst çhängé ýöür pässwörd ßý "
+"{deadline} tö ßé äßlé tö çöntïnüé üsïng thé sïté. Thänk ýöü för hélpïng üs "
+"kéép ýöür dätä säfé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg "
+"єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт "
+"єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт "
+"αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη "
+"νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ρ#"
 
 #: openedx/core/djangoapps/profile_images/images.py
 #, python-brace-format
@@ -13123,6 +13345,27 @@ msgstr ""
 "Ýöü müst ägréé tö thé {platform_name} {terms_of_service} Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢#"
 
+#: openedx/core/djangoapps/user_api/api.py
+#, python-brace-format
+msgid ""
+"By creating an account with {platform_name}, you agree                   to "
+"abide by our {platform_name}                   "
+"{terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}"
+"                   and agree to our {privacy_policy_link_start}Privacy "
+"Policy{privacy_policy_link_end}."
+msgstr ""
+"Bý çréätïng än äççöünt wïth {platform_name}, ýöü ägréé                   tö "
+"äßïdé ßý öür {platform_name}                   "
+"{terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}"
+"                   änd ägréé tö öür {privacy_policy_link_start}Prïväçý "
+"Pölïçý{privacy_policy_link_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
+" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
+"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
+"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
+"ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι "
+"σƒƒι¢ια#"
+
 #. Translators: "Terms of service" is a legal document users must agree to
 #. in order to register a new account.
 #: openedx/core/djangoapps/user_api/api.py
@@ -13279,15 +13522,15 @@ msgstr ""
 "À lïçénsé défïnés höw thé çönténts öf thïs ßlöçk çän ßé shäréd änd réüséd. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
 
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid "Category"
 msgstr "Çätégörý Ⱡ'σяєм ιρѕυм ∂#"
 
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid "Week 1"
 msgstr "Wéék 1 Ⱡ'σяєм ιρѕυ#"
 
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid ""
 "A category name for the discussion. This name appears in the left pane of "
 "the discussion forum for the course."
@@ -13295,11 +13538,11 @@ msgstr ""
 "À çätégörý nämé för thé dïsçüssïön. Thïs nämé äppéärs ïn thé léft päné öf "
 "thé dïsçüssïön förüm för thé çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid "Subcategory"
 msgstr "Süßçätégörý Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid ""
 "A subcategory name for the discussion. This name appears in the left pane of"
 " the discussion forum for the course."
@@ -13307,7 +13550,7 @@ msgstr ""
 "À süßçätégörý nämé för thé dïsçüssïön. Thïs nämé äppéärs ïn thé léft päné öf"
 " thé dïsçüssïön förüm för thé çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 #, python-brace-format
 msgid ""
 "You are not signed in. To view the discussion content, {sign_in_link} or "
@@ -13318,6 +13561,7 @@ msgstr ""
 
 #: openedx/features/course_experience/plugins.py
 #: cms/templates/widgets/header.html
+#: lms/templates/api_admin/terms_of_service.html
 #: openedx/features/course_experience/templates/course_experience/course-updates-fragment.html
 msgid "Updates"
 msgstr "Ûpdätés Ⱡ'σяєм ιρѕυм #"
@@ -13381,6 +13625,13 @@ msgstr "Sét göäl tö: {goal_text} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт 
 
 #: openedx/features/enterprise_support/api.py
 #, python-brace-format
+msgid "Enrollment in {course_title} was not complete."
+msgstr ""
+"Énröllmént ïn {course_title} wäs nöt çömplété. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєт#"
+
+#: openedx/features/enterprise_support/api.py
+#, python-brace-format
 msgid ""
 "If you have concerns about sharing your data, please contact your "
 "administrator at {enterprise_customer_name}."
@@ -13388,13 +13639,6 @@ msgstr ""
 "Ìf ýöü hävé çönçérns äßöüt shärïng ýöür dätä, pléäsé çöntäçt ýöür "
 "ädmïnïsträtör ät {enterprise_customer_name}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє#"
-
-#: openedx/features/enterprise_support/api.py
-#, python-brace-format
-msgid "Enrollment in {course_name} was not complete."
-msgstr ""
-"Énröllmént ïn {course_name} wäs nöt çömplété. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєт#"
 
 #: openedx/features/enterprise_support/utils.py
 #, python-brace-format
@@ -13927,31 +14171,29 @@ msgstr ""
 "Thé ïnförmätïön ýöü éntéréd ïs ïnçörréçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-#, python-brace-format
-msgid "The following parameters are required: {missing}."
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "Transcripts are supported only for \"video\" modules."
 msgstr ""
-"Thé föllöwïng pärämétérs äré réqüïréd: {missing}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя #"
+"Tränsçrïpts äré süppörtéd önlý för \"vïdéö\" mödülés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
+" αмєт, ¢σηѕє¢тєтυя α#"
 
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-#, python-brace-format
-msgid "A transcript with the \"{language_code}\" language code already exists."
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "Cannot find item by locator."
+msgstr "Çännöt fïnd ïtém ßý löçätör. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "Video locator is required."
+msgstr "Vïdéö löçätör ïs réqüïréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "This transcript file type is not supported."
 msgstr ""
-"À tränsçrïpt wïth thé \"{language_code}\" längüägé çödé älréädý éxïsts. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+"Thïs tränsçrïpt fïlé týpé ïs nöt süppörtéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
 
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-msgid "A transcript file is required."
-msgstr "À tränsçrïpt fïlé ïs réqüïréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-msgid ""
-"There is a problem with this transcript file. Try to upload a different "
-"file."
-msgstr ""
-"Théré ïs ä prößlém wïth thïs tränsçrïpt fïlé. Trý tö üplöäd ä dïfférént "
-"fïlé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "Video ID is required."
+msgstr "Vïdéö ÌD ïs réqüïréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Incoming video data is empty."
@@ -13962,10 +14204,32 @@ msgid "Can't find item by locator."
 msgstr "Çän't fïnd ïtém ßý löçätör. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
-msgid "Transcripts are supported only for \"video\" modules."
+msgid "No such transcript."
+msgstr "Nö süçh tränsçrïpt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "There is a problem with the chosen transcript file."
 msgstr ""
-"Tränsçrïpts äré süppörtéd önlý för \"vïdéö\" mödülés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
-" αмєт, ¢σηѕє¢тєтυя α#"
+"Théré ïs ä prößlém wïth thé çhösén tränsçrïpt fïlé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid ""
+"There is a problem with the existing transcript file. Please upload a "
+"different file."
+msgstr ""
+"Théré ïs ä prößlém wïth thé éxïstïng tränsçrïpt fïlé. Pléäsé üplöäd ä "
+"dïfférént fïlé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "YouTube ID is required."
+msgstr "ÝöüTüßé ÌD ïs réqüïréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+msgid "There is a problem with the YouTube transcript file."
+msgstr ""
+"Théré ïs ä prößlém wïth thé ÝöüTüßé tränsçrïpt fïlé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Insufficient permissions"
@@ -14446,7 +14710,6 @@ msgid "Reset"
 msgstr "Rését Ⱡ'σяєм ιρѕ#"
 
 #: cms/templates/widgets/footer.html lms/templates/footer.html
-#: themes/edx.org/lms/templates/footer.html
 #: themes/red-theme/lms/templates/footer.html
 msgid "Legal"
 msgstr "Légäl Ⱡ'σяєм ιρѕ#"
@@ -14732,6 +14995,11 @@ msgstr ""
 msgid "Explore courses"
 msgstr "Éxplöré çöürsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
+#: lms/templates/dashboard.html
+#: lms/templates/registration/account_activation_sidebar_notice.html
+msgid "Activate your account!"
+msgstr "Àçtïväté ýöür äççöünt! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
 #: lms/templates/dashboard.html themes/edx.org/lms/templates/dashboard.html
 msgid "Course-loading errors"
 msgstr "Çöürsé-löädïng érrörs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
@@ -14771,6 +15039,7 @@ msgstr "Sävé Séttïngs Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 #: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: themes/edx.org/lms/templates/dashboard.html
+#: themes/edx.org/lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
 msgid "Unenroll"
 msgstr "Ûnénröll Ⱡ'σяєм ιρѕυм ∂#"
 
@@ -14859,10 +15128,6 @@ msgid "External Authentication failed"
 msgstr "Éxtérnäl Àüthéntïçätïön fäïléd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/templates/forgot_password_modal.html
-msgid "Password Reset"
-msgstr "Pässwörd Rését Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
-
-#: lms/templates/forgot_password_modal.html
 msgid ""
 "Please enter your e-mail address below, and we will e-mail instructions for "
 "setting a new password."
@@ -14893,7 +15158,6 @@ msgstr ""
 " ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/forgot_password_modal.html
-#: lms/templates/registration/password_reset_confirm.html
 msgid "Reset My Password"
 msgstr "Rését Mý Pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
@@ -16480,28 +16744,54 @@ msgstr ""
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
 "Welcome to {platform_name}. Thank you for using {platform_name}'s Course "
-"Discovery API and any additional APIs that we may offer from time to time "
-"(collectively, the \"APIs\"). Please read these Terms of Service prior to "
-"accessing or using the APIs. These Terms of Service, any additional terms "
-"within accompanying API documentation, and any applicable policies and "
-"guidelines that {platform_name} makes available and/or updates from time to "
-"time are agreements (collectively, the \"Terms\") between you and "
-"{platform_name}. By accessing or using the APIs, you accept and agree to be "
-"legally bound by the Terms, whether or not you are a registered user. If you"
-" do not understand or do not wish to be bound by the Terms, you should not "
-"use the APIs."
+"Discovery API, Enterprise API and/or any additional APIs that we may offer "
+"from time to time (collectively, the \"APIs\"). Please read these Terms of "
+"Service prior to accessing or using the APIs. These Terms of Service, any "
+"additional terms within accompanying API documentation, and any applicable "
+"policies and guidelines that {platform_name} makes available and/or updates "
+"from time to time are agreements (collectively, the \"Terms\") between you "
+"and {platform_name}. These Terms are issued under the enterprise product "
+"agreement, member participation agreement, or other direct agreement "
+"governing the purchase of {platform_name} products, if any (the "
+"\"Agreement\"), executed by you or the party on whose behalf you are "
+"accessing or using the APIs and {platform_name}.  In the event that you have"
+" such an Agreement that applies to your use of the APIs, the Agreement will "
+"control in the event of any conflict between it and these Terms. By "
+"accessing or using the APIs, you accept and agree to be legally bound by the"
+" Terms, whether or not you are a registered user. If you are accessing or "
+"using the APIs on behalf of a company, organization or other legal entity, "
+"you are agreeing to these Terms for that entity and representing and "
+"warranting to {platform_name} that you have full authority to accept and "
+"agree to these Terms for such entity, in which case the terms \"you,\" "
+"\"your\" or related terms herein shall refer to such entity on whose behalf "
+"you are accessing or using the APIs. If you do not have such authority or if"
+" you do not understand or do not wish to be bound by the Terms, you should "
+"not use the APIs."
 msgstr ""
 "Wélçömé tö {platform_name}. Thänk ýöü för üsïng {platform_name}'s Çöürsé "
-"Dïsçövérý ÀPÌ änd äný äddïtïönäl ÀPÌs thät wé mäý öffér fröm tïmé tö tïmé "
-"(çölléçtïvélý, thé \"ÀPÌs\"). Pléäsé réäd thésé Térms öf Sérvïçé prïör tö "
-"äççéssïng ör üsïng thé ÀPÌs. Thésé Térms öf Sérvïçé, äný äddïtïönäl térms "
-"wïthïn äççömpänýïng ÀPÌ döçüméntätïön, änd äný äpplïçäßlé pölïçïés änd "
-"güïdélïnés thät {platform_name} mäkés äväïläßlé änd/ör üpdätés fröm tïmé tö "
-"tïmé äré ägrééménts (çölléçtïvélý, thé \"Térms\") ßétwéén ýöü änd "
-"{platform_name}. Bý äççéssïng ör üsïng thé ÀPÌs, ýöü äççépt änd ägréé tö ßé "
-"légällý ßöünd ßý thé Térms, whéthér ör nöt ýöü äré ä régïstéréd üsér. Ìf ýöü"
-" dö nöt ündérständ ör dö nöt wïsh tö ßé ßöünd ßý thé Térms, ýöü shöüld nöt "
-"üsé thé ÀPÌs.#"
+"Dïsçövérý ÀPÌ, Éntérprïsé ÀPÌ änd/ör äný äddïtïönäl ÀPÌs thät wé mäý öffér "
+"fröm tïmé tö tïmé (çölléçtïvélý, thé \"ÀPÌs\"). Pléäsé réäd thésé Térms öf "
+"Sérvïçé prïör tö äççéssïng ör üsïng thé ÀPÌs. Thésé Térms öf Sérvïçé, äný "
+"äddïtïönäl térms wïthïn äççömpänýïng ÀPÌ döçüméntätïön, änd äný äpplïçäßlé "
+"pölïçïés änd güïdélïnés thät {platform_name} mäkés äväïläßlé änd/ör üpdätés "
+"fröm tïmé tö tïmé äré ägrééménts (çölléçtïvélý, thé \"Térms\") ßétwéén ýöü "
+"änd {platform_name}. Thésé Térms äré ïssüéd ündér thé éntérprïsé prödüçt "
+"ägréémént, mémßér pärtïçïpätïön ägréémént, ör öthér dïréçt ägréémént "
+"gövérnïng thé pürçhäsé öf {platform_name} prödüçts, ïf äný (thé "
+"\"Àgréémént\"), éxéçütéd ßý ýöü ör thé pärtý ön whösé ßéhälf ýöü äré "
+"äççéssïng ör üsïng thé ÀPÌs änd {platform_name}.  Ìn thé évént thät ýöü hävé"
+" süçh än Àgréémént thät äpplïés tö ýöür üsé öf thé ÀPÌs, thé Àgréémént wïll "
+"çöntröl ïn thé évént öf äný çönflïçt ßétwéén ït änd thésé Térms. Bý "
+"äççéssïng ör üsïng thé ÀPÌs, ýöü äççépt änd ägréé tö ßé légällý ßöünd ßý thé"
+" Térms, whéthér ör nöt ýöü äré ä régïstéréd üsér. Ìf ýöü äré äççéssïng ör "
+"üsïng thé ÀPÌs ön ßéhälf öf ä çömpäný, örgänïzätïön ör öthér légäl éntïtý, "
+"ýöü äré ägrééïng tö thésé Térms för thät éntïtý änd répréséntïng änd "
+"wärräntïng tö {platform_name} thät ýöü hävé füll äüthörïtý tö äççépt änd "
+"ägréé tö thésé Térms för süçh éntïtý, ïn whïçh çäsé thé térms \"ýöü,\" "
+"\"ýöür\" ör rélätéd térms héréïn shäll référ tö süçh éntïtý ön whösé ßéhälf "
+"ýöü äré äççéssïng ör üsïng thé ÀPÌs. Ìf ýöü dö nöt hävé süçh äüthörïtý ör ïf"
+" ýöü dö nöt ündérständ ör dö nöt wïsh tö ßé ßöünd ßý thé Térms, ýöü shöüld "
+"nöt üsé thé ÀPÌs.#"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "API Access"
@@ -16515,9 +16805,10 @@ msgid ""
 " complete the API request form including a description of your proposed uses"
 " for the APIs. Any account and registration information that you provide to "
 "{platform_name} must be accurate and up to date, and you agree to inform us "
-"promptly of any changes. {platform_name} will review your API request form "
-"and, upon approval in {platform_name}'s sole discretion, will provide you "
-"with instructions for obtaining your API shared secret and client ID."
+"promptly of any changes. {platform_name_capitalized} will review your API "
+"request form and, upon approval in {platform_name}'s sole discretion, will "
+"provide you with instructions for obtaining your API shared secret and "
+"client ID."
 msgstr ""
 "Tö äççéss thé ÀPÌs, ýöü wïll nééd tö çréäté än {platform_name} üsér äççöünt "
 "för ýöür äpplïçätïön (nöt för pérsönäl üsé). Thïs äççöünt wïll prövïdé ýöü "
@@ -16525,9 +16816,10 @@ msgstr ""
 " çömplété thé ÀPÌ réqüést förm ïnçlüdïng ä désçrïptïön öf ýöür pröpöséd üsés"
 " för thé ÀPÌs. Àný äççöünt änd régïsträtïön ïnförmätïön thät ýöü prövïdé tö "
 "{platform_name} müst ßé äççüräté änd üp tö däté, änd ýöü ägréé tö ïnförm üs "
-"prömptlý öf äný çhängés. {platform_name} wïll révïéw ýöür ÀPÌ réqüést förm "
-"änd, üpön äppröväl ïn {platform_name}'s sölé dïsçrétïön, wïll prövïdé ýöü "
-"wïth ïnstrüçtïöns för ößtäïnïng ýöür ÀPÌ shäréd séçrét änd çlïént ÌD.#"
+"prömptlý öf äný çhängés. {platform_name_capitalized} wïll révïéw ýöür ÀPÌ "
+"réqüést förm änd, üpön äppröväl ïn {platform_name}'s sölé dïsçrétïön, wïll "
+"prövïdé ýöü wïth ïnstrüçtïöns för ößtäïnïng ýöür ÀPÌ shäréd séçrét änd "
+"çlïént ÌD.#"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Permissible Use"
@@ -16537,29 +16829,31 @@ msgstr "Pérmïssïßlé Ûsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 msgid ""
 "You agree to use the APIs solely for the purpose of delivering content that "
 "is accessed through the APIs (the \"API Content\") to your own website, "
-"mobile site, app, blog, email distribution list, or social media property or"
-" for another commercial use that you described in your request for access "
-"and that {platform_name} has approved on a case-by-case basis. "
-"{platform_name} may monitor your use of the APIs for compliance with the "
-"Terms and may deny your access or shut down your integration if you try to "
-"go around or exceed the requirements and limitations set by {platform_name}."
-" Your Application or other approved use of the API or the API Content must "
-"not prompt your end users to provide their {platform_name} username, "
-"password or other {platform_name} user credentials anywhere other than the "
-"{platform_name} website at {platform_url}."
+"mobile site, app, blog, email distribution list, or social media property "
+"(\"Your Application\") or for another commercial use that you described in "
+"your request for access and that {platform_name} has approved on a case-by-"
+"case basis. {platform_name_capitalized} may monitor your use of the APIs for"
+" compliance with the Terms and may deny your access or shut down your "
+"integration if you attempt to go around or exceed the requirements and "
+"limitations set by {platform_name}. Your Application or other approved use "
+"of the API or the API Content must not prompt your end users to provide "
+"their {platform_name} username, password or other {platform_name} user "
+"credentials anywhere other than on the {platform_name} website at "
+"{platform_url}."
 msgstr ""
 "Ýöü ägréé tö üsé thé ÀPÌs sölélý för thé pürpösé öf délïvérïng çöntént thät "
 "ïs äççésséd thröügh thé ÀPÌs (thé \"ÀPÌ Çöntént\") tö ýöür öwn wéßsïté, "
-"mößïlé sïté, äpp, ßlög, émäïl dïstrïßütïön lïst, ör söçïäl médïä pröpértý ör"
-" för änöthér çömmérçïäl üsé thät ýöü désçrïßéd ïn ýöür réqüést för äççéss "
-"änd thät {platform_name} häs äpprövéd ön ä çäsé-ßý-çäsé ßäsïs. "
-"{platform_name} mäý mönïtör ýöür üsé öf thé ÀPÌs för çömplïänçé wïth thé "
-"Térms änd mäý déný ýöür äççéss ör shüt döwn ýöür ïntégrätïön ïf ýöü trý tö "
-"gö äröünd ör éxçééd thé réqüïréménts änd lïmïtätïöns sét ßý {platform_name}."
-" Ýöür Àpplïçätïön ör öthér äpprövéd üsé öf thé ÀPÌ ör thé ÀPÌ Çöntént müst "
-"nöt prömpt ýöür énd üsérs tö prövïdé théïr {platform_name} üsérnämé, "
-"pässwörd ör öthér {platform_name} üsér çrédéntïäls änýwhéré öthér thän thé "
-"{platform_name} wéßsïté ät {platform_url}.#"
+"mößïlé sïté, äpp, ßlög, émäïl dïstrïßütïön lïst, ör söçïäl médïä pröpértý "
+"(\"Ýöür Àpplïçätïön\") ör för änöthér çömmérçïäl üsé thät ýöü désçrïßéd ïn "
+"ýöür réqüést för äççéss änd thät {platform_name} häs äpprövéd ön ä çäsé-ßý-"
+"çäsé ßäsïs. {platform_name_capitalized} mäý mönïtör ýöür üsé öf thé ÀPÌs för"
+" çömplïänçé wïth thé Térms änd mäý déný ýöür äççéss ör shüt döwn ýöür "
+"ïntégrätïön ïf ýöü ättémpt tö gö äröünd ör éxçééd thé réqüïréménts änd "
+"lïmïtätïöns sét ßý {platform_name}. Ýöür Àpplïçätïön ör öthér äpprövéd üsé "
+"öf thé ÀPÌ ör thé ÀPÌ Çöntént müst nöt prömpt ýöür énd üsérs tö prövïdé "
+"théïr {platform_name} üsérnämé, pässwörd ör öthér {platform_name} üsér "
+"çrédéntïäls änýwhéré öthér thän ön thé {platform_name} wéßsïté ät "
+"{platform_url}.#"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Prohibited Uses and Activities"
@@ -16567,20 +16861,20 @@ msgstr "Pröhïßïtéd Ûsés änd Àçtïvïtïés Ⱡ'σяєм ιρѕυм ∂
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
-"{platform_name} shall have the sole right to determine whether or not any "
-"given use of the APIs is acceptable, and {platform_name} reserves the right "
-"to revoke API access for any use that {platform_name} determines at any "
-"time, in its sole discretion, does not benefit or serve the best interests "
-"of {platform_name}, its users and its partners."
+"{platform_name_capitalized} shall have the sole right to determine whether "
+"or not any given use of the APIs is acceptable, and {platform_name} reserves"
+" the right to revoke API access for any use that {platform_name} determines "
+"at any time, in its sole discretion, does not benefit or serve the best "
+"interests of {platform_name}, its users and its partners."
 msgstr ""
-"{platform_name} shäll hävé thé sölé rïght tö détérmïné whéthér ör nöt äný "
-"gïvén üsé öf thé ÀPÌs ïs äççéptäßlé, änd {platform_name} résérvés thé rïght "
-"tö révöké ÀPÌ äççéss för äný üsé thät {platform_name} détérmïnés ät äný "
-"tïmé, ïn ïts sölé dïsçrétïön, döés nöt ßénéfït ör sérvé thé ßést ïntérésts "
-"öf {platform_name}, ïts üsérs änd ïts pärtnérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
-" ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт"
-" ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
-"υłłα#"
+"{platform_name_capitalized} shäll hävé thé sölé rïght tö détérmïné whéthér "
+"ör nöt äný gïvén üsé öf thé ÀPÌs ïs äççéptäßlé, änd {platform_name} résérvés"
+" thé rïght tö révöké ÀPÌ äççéss för äný üsé thät {platform_name} détérmïnés "
+"ät äný tïmé, ïn ïts sölé dïsçrétïön, döés nöt ßénéfït ör sérvé thé ßést "
+"ïntérésts öf {platform_name}, ïts üsérs änd ïts pärtnérs. Ⱡ'σяєм ιρѕυм ∂σłσя"
+" ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт"
+" łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ "
+"єχєя¢ιтαтιση υłłα#"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -16622,6 +16916,12 @@ msgstr ""
 "σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σ#"
 
 #: lms/templates/api_admin/terms_of_service.html
+msgid "altering or editing any content or graphics in the API Content;"
+msgstr ""
+"ältérïng ör édïtïng äný çöntént ör gräphïçs ïn thé ÀPÌ Çöntént; Ⱡ'σяєм ιρѕυм"
+" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/api_admin/terms_of_service.html
 msgid ""
 "altering or removing any trademark, copyright or other proprietary or legal "
 "notices contained in, or appearing on, the APIs or any API Content;"
@@ -16634,12 +16934,6 @@ msgstr ""
 "¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
 "¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
 "ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕ#"
-
-#: lms/templates/api_admin/terms_of_service.html
-msgid "altering or editing any content or graphics in the API Content"
-msgstr ""
-"ältérïng ör édïtïng äný çöntént ör gräphïçs ïn thé ÀPÌ Çöntént Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -16671,19 +16965,19 @@ msgstr "Ûsägé änd Qüötäs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
-"{platform_name} reserves the right, in its discretion, to impose "
-"restrictions and limitations on the number and frequency of calls made by "
-"you or your Application to the APIs. You must not attempt to circumvent any "
-"restrictions or limitations that we impose."
+"{platform_name_capitalized} reserves the right, in its discretion, to impose"
+" reasonable restrictions and limitations on the number and frequency of "
+"calls made by you or Your Application to the APIs. You must not attempt to "
+"circumvent any restrictions or limitations imposed by {platform_name}."
 msgstr ""
-"{platform_name} résérvés thé rïght, ïn ïts dïsçrétïön, tö ïmpösé "
-"réstrïçtïöns änd lïmïtätïöns ön thé nümßér änd fréqüénçý öf çälls mädé ßý "
-"ýöü ör ýöür Àpplïçätïön tö thé ÀPÌs. Ýöü müst nöt ättémpt tö çïrçümvént äný "
-"réstrïçtïöns ör lïmïtätïöns thät wé ïmpösé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
-"∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
-"υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє "
-"∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρ#"
+"{platform_name_capitalized} résérvés thé rïght, ïn ïts dïsçrétïön, tö ïmpösé"
+" réäsönäßlé réstrïçtïöns änd lïmïtätïöns ön thé nümßér änd fréqüénçý öf "
+"çälls mädé ßý ýöü ör Ýöür Àpplïçätïön tö thé ÀPÌs. Ýöü müst nöt ättémpt tö "
+"çïrçümvént äný réstrïçtïöns ör lïmïtätïöns ïmpöséd ßý {platform_name}. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
+"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
+" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη я#"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Compliance"
@@ -16691,24 +16985,24 @@ msgstr "Çömplïänçé Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
-"You agree to comply with all applicable law, regulation, and third party "
+"You agree to comply with all applicable laws, regulations, and third party "
 "rights (including without limitation laws regarding the import or export of "
 "data or software, privacy, copyright, and local laws). You will not use the "
 "APIs to encourage or promote illegal activity or violation of third party "
 "rights. You will not violate any other terms of service with "
 "{platform_name}. You will only access (or attempt to access) an API by the "
 "means described in the documentation of that API. You will not misrepresent "
-"or mask either your identity or yourApplication's identity when using the "
+"or mask either your identity or Your Application's identity when using the "
 "APIs."
 msgstr ""
-"Ýöü ägréé tö çömplý wïth äll äpplïçäßlé läw, régülätïön, änd thïrd pärtý "
+"Ýöü ägréé tö çömplý wïth äll äpplïçäßlé läws, régülätïöns, änd thïrd pärtý "
 "rïghts (ïnçlüdïng wïthöüt lïmïtätïön läws régärdïng thé ïmpört ör éxpört öf "
 "dätä ör söftwäré, prïväçý, çöpýrïght, änd löçäl läws). Ýöü wïll nöt üsé thé "
 "ÀPÌs tö énçöürägé ör prömöté ïllégäl äçtïvïtý ör vïölätïön öf thïrd pärtý "
 "rïghts. Ýöü wïll nöt vïöläté äný öthér térms öf sérvïçé wïth "
 "{platform_name}. Ýöü wïll önlý äççéss (ör ättémpt tö äççéss) än ÀPÌ ßý thé "
 "méäns désçrïßéd ïn thé döçüméntätïön öf thät ÀPÌ. Ýöü wïll nöt mïsréprésént "
-"ör mäsk éïthér ýöür ïdéntïtý ör ýöürÀpplïçätïön's ïdéntïtý whén üsïng thé "
+"ör mäsk éïthér ýöür ïdéntïtý ör Ýöür Àpplïçätïön's ïdéntïtý whén üsïng thé "
 "ÀPÌs.#"
 
 #: lms/templates/api_admin/terms_of_service.html
@@ -16751,25 +17045,31 @@ msgid ""
 "Content, or on or through the services made available on or through the "
 "APIs, if any, are the property of their respective owners. You may not "
 "remove, alter, or obscure any copyright, Trademark, or other proprietary "
-"rightrs notices incorporated in or accompanying the API Content. If any "
-"third party revokes access to API Content owned or controlled by that third "
-"party, including without limitation any Trademarks, you must ensure that all"
-" API Content pertaining to that third party is deleted from your app, "
-"networks, systems and servers as soon as reasonably possible. If you stop "
-"using the APIs altogether or if your API access is revoked, you must delete "
-"all API Content in the same way."
+"rights notices incorporated in or accompanying the API Content. If any "
+"{platform_name} Participant (as hereinafter defined) or other third party "
+"revokes access to API Content owned or controlled by that {platform_name} "
+"Participant or third party, including without limitation any Trademarks, you"
+" must ensure that all API Content pertaining to that {platform_name} "
+"Participant or third party is deleted from Your Application and your "
+"networks, systems and servers as soon as reasonably possible. "
+"\"{platform_name_capitalized} Participants\" means MIT, Harvard, and the "
+"other entities providing information, API Content or services for the APIs, "
+"the course instructors and their staffs."
 msgstr ""
 "Àll nämés, lögös änd séäls (\"Trädémärks\") thät äppéär ïn thé ÀPÌs, ÀPÌ "
 "Çöntént, ör ön ör thröügh thé sérvïçés mädé äväïläßlé ön ör thröügh thé "
 "ÀPÌs, ïf äný, äré thé pröpértý öf théïr réspéçtïvé öwnérs. Ýöü mäý nöt "
 "rémövé, ältér, ör ößsçüré äný çöpýrïght, Trädémärk, ör öthér pröprïétärý "
-"rïghtrs nötïçés ïnçörpörätéd ïn ör äççömpänýïng thé ÀPÌ Çöntént. Ìf äný "
-"thïrd pärtý révökés äççéss tö ÀPÌ Çöntént öwnéd ör çöntrölléd ßý thät thïrd "
-"pärtý, ïnçlüdïng wïthöüt lïmïtätïön äný Trädémärks, ýöü müst énsüré thät äll"
-" ÀPÌ Çöntént pértäïnïng tö thät thïrd pärtý ïs délétéd fröm ýöür äpp, "
-"nétwörks, sýstéms änd sérvérs äs söön äs réäsönäßlý pössïßlé. Ìf ýöü stöp "
-"üsïng thé ÀPÌs ältögéthér ör ïf ýöür ÀPÌ äççéss ïs révökéd, ýöü müst délété "
-"äll ÀPÌ Çöntént ïn thé sämé wäý.#"
+"rïghts nötïçés ïnçörpörätéd ïn ör äççömpänýïng thé ÀPÌ Çöntént. Ìf äný "
+"{platform_name} Pärtïçïpänt (äs héréïnäftér défïnéd) ör öthér thïrd pärtý "
+"révökés äççéss tö ÀPÌ Çöntént öwnéd ör çöntrölléd ßý thät {platform_name} "
+"Pärtïçïpänt ör thïrd pärtý, ïnçlüdïng wïthöüt lïmïtätïön äný Trädémärks, ýöü"
+" müst énsüré thät äll ÀPÌ Çöntént pértäïnïng tö thät {platform_name} "
+"Pärtïçïpänt ör thïrd pärtý ïs délétéd fröm Ýöür Àpplïçätïön änd ýöür "
+"nétwörks, sýstéms änd sérvérs äs söön äs réäsönäßlý pössïßlé. "
+"\"{platform_name_capitalized} Pärtïçïpänts\" méäns MÌT, Härvärd, änd thé "
+"öthér éntïtïés prövïdïng ïnförmätïön, ÀPÌ Çöntént ör sérvïçés för thé ÀPÌs, "
+"thé çöürsé ïnstrüçtörs änd théïr stäffs.#"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -16799,14 +17099,14 @@ msgstr "Prïväçý Ⱡ'σяєм ιρѕυм #"
 msgid ""
 "You agree to comply with all applicable privacy laws and regulations and to "
 "be transparent with respect to any collection and use of end user data. You "
-"will provide and adhere to a privacy policy for your Application that "
+"will provide and adhere to a privacy policy for Your Application that "
 "clearly and accurately describes to your end users what user information you"
 " collect and how you may use and share such information (including for "
 "advertising) with {platform_name} and other third parties."
 msgstr ""
 "Ýöü ägréé tö çömplý wïth äll äpplïçäßlé prïväçý läws änd régülätïöns änd tö "
 "ßé tränspärént wïth réspéçt tö äný çölléçtïön änd üsé öf énd üsér dätä. Ýöü "
-"wïll prövïdé änd ädhéré tö ä prïväçý pölïçý för ýöür Àpplïçätïön thät "
+"wïll prövïdé änd ädhéré tö ä prïväçý pölïçý för Ýöür Àpplïçätïön thät "
 "çléärlý änd äççürätélý désçrïßés tö ýöür énd üsérs whät üsér ïnförmätïön ýöü"
 " çölléçt änd höw ýöü mäý üsé änd shäré süçh ïnförmätïön (ïnçlüdïng för "
 "ädvértïsïng) wïth {platform_name} änd öthér thïrd pärtïés.#"
@@ -16817,37 +17117,53 @@ msgstr "Rïght tö Çhärgé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
-"{platform_name} reserves the right to modify the Terms at any time without "
-"advance notice. Any changes to the Terms will be effective immediately upon "
-"posting on this page, with an updated effective date. By accessing or using "
-"the APIs after any changes have been made, you signify your agreement on a "
-"prospective basis to the modified Terms and all of the changes. Be sure to "
-"return to this page periodically to ensure familiarity with the most current"
-" version of the Terms."
+"Certain access to the APIs may be provided free of charge, but "
+"{platform_name} reserves the right to charge fees for future use or access "
+"to the APIs."
 msgstr ""
-"{platform_name} résérvés thé rïght tö mödïfý thé Térms ät äný tïmé wïthöüt "
-"ädvänçé nötïçé. Àný çhängés tö thé Térms wïll ßé éfféçtïvé ïmmédïätélý üpön "
-"pöstïng ön thïs pägé, wïth än üpdätéd éfféçtïvé däté. Bý äççéssïng ör üsïng "
-"thé ÀPÌs äftér äný çhängés hävé ßéén mädé, ýöü sïgnïfý ýöür ägréémént ön ä "
-"pröspéçtïvé ßäsïs tö thé mödïfïéd Térms änd äll öf thé çhängés. Bé süré tö "
-"rétürn tö thïs pägé pérïödïçällý tö énsüré fämïlïärïtý wïth thé möst çürrént"
-" vérsïön öf thé Térms.#"
+"Çértäïn äççéss tö thé ÀPÌs mäý ßé prövïdéd fréé öf çhärgé, ßüt "
+"{platform_name} résérvés thé rïght tö çhärgé féés för fütüré üsé ör äççéss "
+"tö thé ÀPÌs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ "
+"∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ "
+"мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ "
+"єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє "
+"νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
+"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ "
+"єѕт łαв#"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
-"{platform_name} may also update or modify the APIs from time to time without"
-" advance notice. These changes may affect your use of the APIs or the way "
-"your integration interacts with the API. If we make a change that is "
-"unacceptable to you, you should stop using the APIs. Continued use of the "
-"APIs means you accept the change."
+"{platform_name_capitalized} reserves the right to modify the Terms at any "
+"time without advance notice.  Any changes to the Terms will be effective "
+"immediately upon posting on this page, with an updated effective date.  By "
+"accessing or using the APIs after any changes have been made, you signify "
+"your agreement on a prospective basis to the modified Terms and all of the "
+"changes.  Be sure to return to this page periodically to ensure familiarity "
+"with the most current version of the Terms."
 msgstr ""
-"{platform_name} mäý älsö üpdäté ör mödïfý thé ÀPÌs fröm tïmé tö tïmé wïthöüt"
-" ädvänçé nötïçé. Thésé çhängés mäý äfféçt ýöür üsé öf thé ÀPÌs ör thé wäý "
-"ýöür ïntégrätïön ïntéräçts wïth thé ÀPÌ. Ìf wé mäké ä çhängé thät ïs "
-"ünäççéptäßlé tö ýöü, ýöü shöüld stöp üsïng thé ÀPÌs. Çöntïnüéd üsé öf thé "
-"ÀPÌs méäns ýöü äççépt thé çhängé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
-"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
-" αłιqυα. υт єηιм α∂ мιηι#"
+"{platform_name_capitalized} résérvés thé rïght tö mödïfý thé Térms ät äný "
+"tïmé wïthöüt ädvänçé nötïçé.  Àný çhängés tö thé Térms wïll ßé éfféçtïvé "
+"ïmmédïätélý üpön pöstïng ön thïs pägé, wïth än üpdätéd éfféçtïvé däté.  Bý "
+"äççéssïng ör üsïng thé ÀPÌs äftér äný çhängés hävé ßéén mädé, ýöü sïgnïfý "
+"ýöür ägréémént ön ä pröspéçtïvé ßäsïs tö thé mödïfïéd Térms änd äll öf thé "
+"çhängés.  Bé süré tö rétürn tö thïs pägé pérïödïçällý tö énsüré fämïlïärïtý "
+"wïth thé möst çürrént vérsïön öf thé Térms.#"
+
+#: lms/templates/api_admin/terms_of_service.html
+msgid ""
+"{platform_name_capitalized} may also update or modify the APIs from time to "
+"time without advance notice.  These changes may affect your use of the APIs "
+"or the way your integration interacts with the API.  If we make a change "
+"that is unacceptable to you, you should stop using the APIs. Continued use "
+"of the APIs means you accept the change."
+msgstr ""
+"{platform_name_capitalized} mäý älsö üpdäté ör mödïfý thé ÀPÌs fröm tïmé tö "
+"tïmé wïthöüt ädvänçé nötïçé.  Thésé çhängés mäý äfféçt ýöür üsé öf thé ÀPÌs "
+"ör thé wäý ýöür ïntégrätïön ïntéräçts wïth thé ÀPÌ.  Ìf wé mäké ä çhängé "
+"thät ïs ünäççéptäßlé tö ýöü, ýöü shöüld stöp üsïng thé ÀPÌs. Çöntïnüéd üsé "
+"öf thé ÀPÌs méäns ýöü äççépt thé çhängé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
+"∂σłσяє мαgηα αłιqυα. υт єηιм α∂ #"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Confidentiality"
@@ -16856,18 +17172,17 @@ msgstr "Çönfïdéntïälïtý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
 "Your credentials (such as client secret and IDs) are intended to be used "
-"solely by you. You will keep your credentials confidential and discourage "
-"others from using your credentials. Your credentials may not be embedded in "
-"open source projects."
+"solely by you. You will keep your credentials confidential and prevent and "
+"discourage others from using your credentials. Your credentials may not be "
+"embedded in open source projects."
 msgstr ""
 "Ýöür çrédéntïäls (süçh äs çlïént séçrét änd ÌDs) äré ïnténdéd tö ßé üséd "
-"sölélý ßý ýöü. Ýöü wïll kéép ýöür çrédéntïäls çönfïdéntïäl änd dïsçöürägé "
-"öthérs fröm üsïng ýöür çrédéntïäls. Ýöür çrédéntïäls mäý nöt ßé émßéddéd ïn "
-"öpén söürçé pröjéçts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg "
-"єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт "
-"єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт "
-"αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη "
-"νσłυρтαтє#"
+"sölélý ßý ýöü. Ýöü wïll kéép ýöür çrédéntïäls çönfïdéntïäl änd prévént änd "
+"dïsçöürägé öthérs fröm üsïng ýöür çrédéntïäls. Ýöür çrédéntïäls mäý nöt ßé "
+"émßéddéd ïn öpén söürçé pröjéçts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
+" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
+"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρ#"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -16880,12 +17195,12 @@ msgid ""
 "Information to anyone without {platform_name}'s prior written consent, and "
 "you agree to protect the Confidential Information from unauthorized use and "
 "disclosure in the same way that you would protect your own confidential "
-"information. Confidential information does not include information that you "
+"information. Confidential Information does not include information that you "
 "independently developed, that was rightfully given to you by a third party "
-"without confidentiality obligation, or that becomes public through no fault "
-"of your own. You may disclose Confidential Information when compelled to do "
-"so by law if you provide {platform_name} with reasonable prior notice, "
-"unless a court orders that {platform_name} not receive notice."
+"without any confidentiality obligation, or that becomes public through no "
+"fault of your own. You may disclose Confidential Information when compelled "
+"to do so by law if you provide {platform_name} with reasonable prior notice,"
+" unless a court orders that {platform_name} not receive notice."
 msgstr ""
 "Ìn thé évént thät {platform_name} prövïdés ýöü wïth äççéss tö ïnförmätïön "
 "spéçïfïç tö {platform_name} änd/ör thé ÀPÌs thät ïs éïthér märkéd äs "
@@ -16896,12 +17211,12 @@ msgstr ""
 "Ìnförmätïön tö änýöné wïthöüt {platform_name}'s prïör wrïttén çönsént, änd "
 "ýöü ägréé tö prötéçt thé Çönfïdéntïäl Ìnförmätïön fröm ünäüthörïzéd üsé änd "
 "dïsçlösüré ïn thé sämé wäý thät ýöü wöüld prötéçt ýöür öwn çönfïdéntïäl "
-"ïnförmätïön. Çönfïdéntïäl ïnförmätïön döés nöt ïnçlüdé ïnförmätïön thät ýöü "
+"ïnförmätïön. Çönfïdéntïäl Ìnförmätïön döés nöt ïnçlüdé ïnförmätïön thät ýöü "
 "ïndépéndéntlý dévélöpéd, thät wäs rïghtfüllý gïvén tö ýöü ßý ä thïrd pärtý "
-"wïthöüt çönfïdéntïälïtý ößlïgätïön, ör thät ßéçömés püßlïç thröügh nö fäült "
-"öf ýöür öwn. Ýöü mäý dïsçlösé Çönfïdéntïäl Ìnförmätïön whén çömpélléd tö dö "
-"sö ßý läw ïf ýöü prövïdé {platform_name} wïth réäsönäßlé prïör nötïçé, "
-"ünléss ä çöürt ördérs thät {platform_name} nöt réçéïvé nötïçé.#"
+"wïthöüt äný çönfïdéntïälïtý ößlïgätïön, ör thät ßéçömés püßlïç thröügh nö "
+"fäült öf ýöür öwn. Ýöü mäý dïsçlösé Çönfïdéntïäl Ìnförmätïön whén çömpélléd "
+"tö dö sö ßý läw ïf ýöü prövïdé {platform_name} wïth réäsönäßlé prïör nötïçé,"
+" ünléss ä çöürt ördérs thät {platform_name} nöt réçéïvé nötïçé.#"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Disclaimer of Warranty / Limitation of Liabilities"
@@ -16927,27 +17242,21 @@ msgstr ""
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
-"{platform_name} AND THE {platform_name} PARTICIPANTS (AS HERINAFTER DEFINED)"
-" DO NOT WARRANT THAT THE APIS WILL OPERATE IN AN UNINTERRUPTED OR ERROR-FREE"
-" MANNER, THAT THE APIS ARE FREE OF VIRUSES OR OTHER HARMFUL COMPONENTS, OR "
-"THAT THE APIS OR API CONTENT PROVIDED WILL MEET YOUR NEEDS OR EXPECTATIONS. "
-"{platform_name} AND THE {platform_name} PARTICIPANTS ALSO MAKE NO WARRANTY "
-"ABOUT THE ACCURACY, COMPLETENESS, TIMELINESS, OR QUALITY OF THE APIS OR ANY "
-"API CONTENT, OR THAT ANY PARTICULAR API CONTENT WILL CONTINUE TO BE MADE "
-"AVAILABLE. \"{platform_name} PARTICIPANTS\" MEANS MIT, HARVARD, THE OTHER "
-"MEMBERS, THE ENTITIES PROVIDING INFORMATION, API CONTENT OR SERVICES FOR THE"
-" APIS, THE COURSE INSTRUCTORS AND THEIR STAFFS."
+"{platform_name} AND THE {platform_name} PARTICIPANTS DO NOT WARRANT THAT THE"
+" APIS WILL OPERATE IN AN UNINTERRUPTED OR ERROR-FREE MANNER, THAT THE APIS "
+"ARE FREE OF VIRUSES OR OTHER HARMFUL COMPONENTS, OR THAT THE APIS OR API "
+"CONTENT PROVIDED WILL MEET YOUR NEEDS OR EXPECTATIONS. {platform_name} AND "
+"THE {platform_name} PARTICIPANTS ALSO MAKE NO WARRANTY ABOUT THE ACCURACY, "
+"COMPLETENESS, TIMELINESS, OR QUALITY OF THE APIS OR ANY API CONTENT, OR THAT"
+" ANY PARTICULAR API CONTENT WILL CONTINUE TO BE MADE AVAILABLE."
 msgstr ""
-"{platform_name} ÀND THÉ {platform_name} PÀRTÌÇÌPÀNTS (ÀS HÉRÌNÀFTÉR DÉFÌNÉD)"
-" DÖ NÖT WÀRRÀNT THÀT THÉ ÀPÌS WÌLL ÖPÉRÀTÉ ÌN ÀN ÛNÌNTÉRRÛPTÉD ÖR ÉRRÖR-FRÉÉ"
-" MÀNNÉR, THÀT THÉ ÀPÌS ÀRÉ FRÉÉ ÖF VÌRÛSÉS ÖR ÖTHÉR HÀRMFÛL ÇÖMPÖNÉNTS, ÖR "
-"THÀT THÉ ÀPÌS ÖR ÀPÌ ÇÖNTÉNT PRÖVÌDÉD WÌLL MÉÉT ÝÖÛR NÉÉDS ÖR ÉXPÉÇTÀTÌÖNS. "
-"{platform_name} ÀND THÉ {platform_name} PÀRTÌÇÌPÀNTS ÀLSÖ MÀKÉ NÖ WÀRRÀNTÝ "
-"ÀBÖÛT THÉ ÀÇÇÛRÀÇÝ, ÇÖMPLÉTÉNÉSS, TÌMÉLÌNÉSS, ÖR QÛÀLÌTÝ ÖF THÉ ÀPÌS ÖR ÀNÝ "
-"ÀPÌ ÇÖNTÉNT, ÖR THÀT ÀNÝ PÀRTÌÇÛLÀR ÀPÌ ÇÖNTÉNT WÌLL ÇÖNTÌNÛÉ TÖ BÉ MÀDÉ "
-"ÀVÀÌLÀBLÉ. \"{platform_name} PÀRTÌÇÌPÀNTS\" MÉÀNS MÌT, HÀRVÀRD, THÉ ÖTHÉR "
-"MÉMBÉRS, THÉ ÉNTÌTÌÉS PRÖVÌDÌNG ÌNFÖRMÀTÌÖN, ÀPÌ ÇÖNTÉNT ÖR SÉRVÌÇÉS FÖR THÉ"
-" ÀPÌS, THÉ ÇÖÛRSÉ ÌNSTRÛÇTÖRS ÀND THÉÌR STÀFFS.#"
+"{platform_name} ÀND THÉ {platform_name} PÀRTÌÇÌPÀNTS DÖ NÖT WÀRRÀNT THÀT THÉ"
+" ÀPÌS WÌLL ÖPÉRÀTÉ ÌN ÀN ÛNÌNTÉRRÛPTÉD ÖR ÉRRÖR-FRÉÉ MÀNNÉR, THÀT THÉ ÀPÌS "
+"ÀRÉ FRÉÉ ÖF VÌRÛSÉS ÖR ÖTHÉR HÀRMFÛL ÇÖMPÖNÉNTS, ÖR THÀT THÉ ÀPÌS ÖR ÀPÌ "
+"ÇÖNTÉNT PRÖVÌDÉD WÌLL MÉÉT ÝÖÛR NÉÉDS ÖR ÉXPÉÇTÀTÌÖNS. {platform_name} ÀND "
+"THÉ {platform_name} PÀRTÌÇÌPÀNTS ÀLSÖ MÀKÉ NÖ WÀRRÀNTÝ ÀBÖÛT THÉ ÀÇÇÛRÀÇÝ, "
+"ÇÖMPLÉTÉNÉSS, TÌMÉLÌNÉSS, ÖR QÛÀLÌTÝ ÖF THÉ ÀPÌS ÖR ÀNÝ ÀPÌ ÇÖNTÉNT, ÖR THÀT"
+" ÀNÝ PÀRTÌÇÛLÀR ÀPÌ ÇÖNTÉNT WÌLL ÇÖNTÌNÛÉ TÖ BÉ MÀDÉ ÀVÀÌLÀBLÉ.#"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -16956,23 +17265,23 @@ msgid ""
 "INFORMATION, MATERIALS OR DATA THROUGH THE APIS IS AT YOUR OWN DISCRETION "
 "AND RISK, AND YOU WILL BE SOLELY RESPONSIBLE FOR ANY DAMAGE TO YOUR PROPERTY"
 " (INCLUDING YOUR COMPUTER SYSTEM) OR LOSS OF DATA THAT RESULTS FROM THE "
-"DOWNLOAD OR USE OF SUCH MATERIAL OR DATA, UNLESS OTHERWISE EXPRESSLY "
-"PROVIDED FOR IN THE {platform_name} PRIVACY POLICY."
+"DOWNLOAD OR USE OF SUCH INFORMATION, MATERIALS OR DATA, UNLESS OTHERWISE "
+"EXPRESSLY PROVIDED FOR IN THE {platform_name} PRIVACY POLICY."
 msgstr ""
 "ÛSÉ ÖF THÉ ÀPÌS, ÀND THÉ ÀPÌ ÇÖNTÉNT ÀND ÀNÝ SÉRVÌÇÉS ÖBTÀÌNÉD FRÖM ÖR "
 "THRÖÛGH THÉ ÀPÌS, ÌS ÀT ÝÖÛR ÖWN RÌSK. ÝÖÛR ÀÇÇÉSS TÖ ÖR DÖWNLÖÀD ÖF "
 "ÌNFÖRMÀTÌÖN, MÀTÉRÌÀLS ÖR DÀTÀ THRÖÛGH THÉ ÀPÌS ÌS ÀT ÝÖÛR ÖWN DÌSÇRÉTÌÖN "
 "ÀND RÌSK, ÀND ÝÖÛ WÌLL BÉ SÖLÉLÝ RÉSPÖNSÌBLÉ FÖR ÀNÝ DÀMÀGÉ TÖ ÝÖÛR PRÖPÉRTÝ"
 " (ÌNÇLÛDÌNG ÝÖÛR ÇÖMPÛTÉR SÝSTÉM) ÖR LÖSS ÖF DÀTÀ THÀT RÉSÛLTS FRÖM THÉ "
-"DÖWNLÖÀD ÖR ÛSÉ ÖF SÛÇH MÀTÉRÌÀL ÖR DÀTÀ, ÛNLÉSS ÖTHÉRWÌSÉ ÉXPRÉSSLÝ "
-"PRÖVÌDÉD FÖR ÌN THÉ {platform_name} PRÌVÀÇÝ PÖLÌÇÝ.#"
+"DÖWNLÖÀD ÖR ÛSÉ ÖF SÛÇH ÌNFÖRMÀTÌÖN, MÀTÉRÌÀLS ÖR DÀTÀ, ÛNLÉSS ÖTHÉRWÌSÉ "
+"ÉXPRÉSSLÝ PRÖVÌDÉD FÖR ÌN THÉ {platform_name} PRÌVÀÇÝ PÖLÌÇÝ.#"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
 "TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, YOU AGREE THAT NEITHER "
 "{platform_name} NOR ANY OF THE {platform_name} PARTICIPANTS WILL BE LIABLE "
 "TO YOU FOR ANY LOSS OR DAMAGES, EITHER ACTUAL OR CONSEQUENTIAL, ARISING OUT "
-"OF OR RELATING TO THESE TERMS, OR YOUR (OR ANY THIRD PARTY'S) USE OF OR "
+"OF OR RELATING TO THE TERMS, OR YOUR (OR ANY THIRD PARTY'S) USE OF OR "
 "INABILITY TO USE THE APIS OR ANY API CONTENT, OR YOUR RELIANCE UPON "
 "INFORMATION OBTAINED FROM OR THROUGH THE APIS, WHETHER YOUR CLAIM IS BASED "
 "IN CONTRACT, TORT, STATUTORY OR OTHER LAW."
@@ -16980,7 +17289,7 @@ msgstr ""
 "TÖ THÉ FÛLLÉST ÉXTÉNT PÉRMÌTTÉD BÝ ÀPPLÌÇÀBLÉ LÀW, ÝÖÛ ÀGRÉÉ THÀT NÉÌTHÉR "
 "{platform_name} NÖR ÀNÝ ÖF THÉ {platform_name} PÀRTÌÇÌPÀNTS WÌLL BÉ LÌÀBLÉ "
 "TÖ ÝÖÛ FÖR ÀNÝ LÖSS ÖR DÀMÀGÉS, ÉÌTHÉR ÀÇTÛÀL ÖR ÇÖNSÉQÛÉNTÌÀL, ÀRÌSÌNG ÖÛT "
-"ÖF ÖR RÉLÀTÌNG TÖ THÉSÉ TÉRMS, ÖR ÝÖÛR (ÖR ÀNÝ THÌRD PÀRTÝ'S) ÛSÉ ÖF ÖR "
+"ÖF ÖR RÉLÀTÌNG TÖ THÉ TÉRMS, ÖR ÝÖÛR (ÖR ÀNÝ THÌRD PÀRTÝ'S) ÛSÉ ÖF ÖR "
 "ÌNÀBÌLÌTÝ TÖ ÛSÉ THÉ ÀPÌS ÖR ÀNÝ ÀPÌ ÇÖNTÉNT, ÖR ÝÖÛR RÉLÌÀNÇÉ ÛPÖN "
 "ÌNFÖRMÀTÌÖN ÖBTÀÌNÉD FRÖM ÖR THRÖÛGH THÉ ÀPÌS, WHÉTHÉR ÝÖÛR ÇLÀÌM ÌS BÀSÉD "
 "ÌN ÇÖNTRÀÇT, TÖRT, STÀTÛTÖRÝ ÖR ÖTHÉR LÀW.#"
@@ -17023,18 +17332,20 @@ msgstr ""
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
 "The APIs and API Content may include hyperlinks to sites maintained or "
-"controlled by others. {platform_name} and the {platform_name} Participants "
-"are not responsible for and do not routinely screen, approve, review or "
-"endorse the contents of or use of any of the products or services that may "
-"be offered at these sites. If you decide to access linked third-party "
-"websites, you do so at your own risk."
+"controlled by others and not affiliated with or under the control of "
+"{platform_name}. {platform_name_capitalized} and the {platform_name} "
+"Participants are not responsible for and do not routinely screen, approve, "
+"review or endorse the contents of or use of any of the products or services "
+"that may be offered at these third-party sites. If you decide to access "
+"linked third-party websites, you do so at your own risk."
 msgstr ""
 "Thé ÀPÌs änd ÀPÌ Çöntént mäý ïnçlüdé hýpérlïnks tö sïtés mäïntäïnéd ör "
-"çöntrölléd ßý öthérs. {platform_name} änd thé {platform_name} Pärtïçïpänts "
-"äré nöt réspönsïßlé för änd dö nöt röütïnélý sçréén, äpprövé, révïéw ör "
-"éndörsé thé çönténts öf ör üsé öf äný öf thé prödüçts ör sérvïçés thät mäý "
-"ßé öfféréd ät thésé sïtés. Ìf ýöü déçïdé tö äççéss lïnkéd thïrd-pärtý "
-"wéßsïtés, ýöü dö sö ät ýöür öwn rïsk.#"
+"çöntrölléd ßý öthérs änd nöt äffïlïätéd wïth ör ündér thé çöntröl öf "
+"{platform_name}. {platform_name_capitalized} änd thé {platform_name} "
+"Pärtïçïpänts äré nöt réspönsïßlé för änd dö nöt röütïnélý sçréén, äpprövé, "
+"révïéw ör éndörsé thé çönténts öf ör üsé öf äný öf thé prödüçts ör sérvïçés "
+"thät mäý ßé öfféréd ät thésé thïrd-pärtý sïtés. Ìf ýöü déçïdé tö äççéss "
+"lïnkéd thïrd-pärtý wéßsïtés, ýöü dö sö ät ýöür öwn rïsk.#"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -17048,7 +17359,7 @@ msgid ""
 " losses, damages (actual and consequential), suits, judgments, litigation "
 "costs and attorneys' fees, of every kind and nature. In such a case, "
 "{platform_name} or one of the {platform_name} Participants will provide you "
-"with written notice of such claim, suit or action."
+"with written notice of such claim, action or demand."
 msgstr ""
 "Tö thé mäxïmüm éxtént pérmïttéd ßý äpplïçäßlé läw, ýöü ägréé tö défénd, höld"
 " härmléss änd ïndémnïfý {platform_name} änd thé {platform_name} "
@@ -17060,7 +17371,7 @@ msgstr ""
 " lössés, dämägés (äçtüäl änd çönséqüéntïäl), süïts, jüdgménts, lïtïgätïön "
 "çösts änd ättörnéýs' féés, öf évérý kïnd änd nätüré. Ìn süçh ä çäsé, "
 "{platform_name} ör öné öf thé {platform_name} Pärtïçïpänts wïll prövïdé ýöü "
-"wïth wrïttén nötïçé öf süçh çläïm, süït ör äçtïön.#"
+"wïth wrïttén nötïçé öf süçh çläïm, äçtïön ör démänd.#"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "General Legal Terms"
@@ -17108,8 +17419,8 @@ msgid ""
 "objection to such proceedings in those courts (including any defense or "
 "objection of lack of proper jurisdiction or venue or inconvenience of "
 "forum). Notwithstanding the foregoing, you agree that {platform_name} shall "
-"still be allowed to apply to injunctive remedies (or an equivalent type of "
-"urgent legal relief) in any jursdiction."
+"still be allowed to apply for injunctive remedies (or an equivalent type of "
+"urgent legal relief) in any jurisdiction."
 msgstr ""
 "Ýöü ägréé thät thé Térms, thé ÀPÌs, änd äný çläïm ör dïspüté ärïsïng öüt öf "
 "ör rélätïng tö thé Térms ör thé ÀPÌs wïll ßé gövérnéd ßý thé läws öf thé "
@@ -17121,8 +17432,8 @@ msgstr ""
 "ößjéçtïön tö süçh pröçéédïngs ïn thösé çöürts (ïnçlüdïng äný défénsé ör "
 "ößjéçtïön öf läçk öf pröpér jürïsdïçtïön ör vénüé ör ïnçönvénïénçé öf "
 "förüm). Nötwïthständïng thé förégöïng, ýöü ägréé thät {platform_name} shäll "
-"stïll ßé ällöwéd tö äpplý tö ïnjünçtïvé rémédïés (ör än éqüïvälént týpé öf "
-"ürgént légäl rélïéf) ïn äný jürsdïçtïön.#"
+"stïll ßé ällöwéd tö äpplý för ïnjünçtïvé rémédïés (ör än éqüïvälént týpé öf "
+"ürgént légäl rélïéf) ïn äný jürïsdïçtïön.#"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Termination"
@@ -17133,31 +17444,31 @@ msgid ""
 "You may stop using the APIs at any time. You agree that {platform_name}, in "
 "its sole discretion and at any time, may terminate your use of the APIs or "
 "any API Content for any reason or no reason, without prior notice or "
-"liabiliy."
+"liability."
 msgstr ""
 "Ýöü mäý stöp üsïng thé ÀPÌs ät äný tïmé. Ýöü ägréé thät {platform_name}, ïn "
 "ïts sölé dïsçrétïön änd ät äný tïmé, mäý térmïnäté ýöür üsé öf thé ÀPÌs ör "
 "äný ÀPÌ Çöntént för äný réäsön ör nö réäsön, wïthöüt prïör nötïçé ör "
-"lïäßïlïý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ "
-"єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм"
-" νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα "
-"¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт"
-" єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαт#"
+"lïäßïlïtý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ"
+" єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ "
+"мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ "
+"єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє "
+"νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяι#"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
-"{platform_name} and the {platform_name} Participants reserve the right at "
-"any time in their sole discretion to cancel, delay, reschedule or alter the "
-"format of any API or API Content offered through {platform_name}, or to "
-"cease providing any part or all of the APIs or API Content or related "
+"{platform_name_capitalized} and the {platform_name} Participants reserve the"
+" right at any time in their sole discretion to cancel, delay, reschedule or "
+"alter the format of any API or API Content offered through {platform_name}, "
+"or to cease providing any part or all of the APIs or API Content or related "
 "services, and you agree that neither {platform_name} nor any of the "
 "{platform_name} Participants will have any liability to you for such an "
 "action."
 msgstr ""
-"{platform_name} änd thé {platform_name} Pärtïçïpänts résérvé thé rïght ät "
-"äný tïmé ïn théïr sölé dïsçrétïön tö çänçél, déläý, résçhédülé ör ältér thé "
-"förmät öf äný ÀPÌ ör ÀPÌ Çöntént öfféréd thröügh {platform_name}, ör tö "
-"çéäsé prövïdïng äný pärt ör äll öf thé ÀPÌs ör ÀPÌ Çöntént ör rélätéd "
+"{platform_name_capitalized} änd thé {platform_name} Pärtïçïpänts résérvé thé"
+" rïght ät äný tïmé ïn théïr sölé dïsçrétïön tö çänçél, déläý, résçhédülé ör "
+"ältér thé förmät öf äný ÀPÌ ör ÀPÌ Çöntént öfféréd thröügh {platform_name}, "
+"ör tö çéäsé prövïdïng äný pärt ör äll öf thé ÀPÌs ör ÀPÌ Çöntént ör rélätéd "
 "sérvïçés, änd ýöü ägréé thät néïthér {platform_name} nör äný öf thé "
 "{platform_name} Pärtïçïpänts wïll hävé äný lïäßïlïtý tö ýöü för süçh än "
 "äçtïön.#"
@@ -17167,25 +17478,27 @@ msgid ""
 "Upon any termination of the Terms or discontinuation of your access to an "
 "API for any reason, your right to use any API and API Content will "
 "immediately cease. You will immediately stop using the APIs and delete any "
-"cached or stored API Content. All provisions of the Terms that by their "
-"nature should survive termination shall survive termination, including, "
-"without limitation, ownership provisions, warranty disclaimers, and "
-"limitation of liability. Termination of your access to and use of the APIs "
-"and API Content shall not relieve you of any obligations arising or "
-"accrusing prior to such termination or limit any liability that you "
-"otherwise may have to {platform_name}, including without limitation any "
+"cached or stored API Content from Your Application and your networks, "
+"systems and servers as soon as reasonably possible. All provisions of the "
+"Terms that by their nature should survive termination shall survive "
+"termination, including, without limitation, ownership provisions, warranty "
+"disclaimers, and limitations of liability. Termination of your access to and"
+" use of the APIs and API Content shall not relieve you of any obligations "
+"arising or accruing prior to such termination or limit any liability that "
+"you otherwise may have to {platform_name}, including without limitation any "
 "indemnification obligations contained herein."
 msgstr ""
 "Ûpön äný térmïnätïön öf thé Térms ör dïsçöntïnüätïön öf ýöür äççéss tö än "
 "ÀPÌ för äný réäsön, ýöür rïght tö üsé äný ÀPÌ änd ÀPÌ Çöntént wïll "
 "ïmmédïätélý çéäsé. Ýöü wïll ïmmédïätélý stöp üsïng thé ÀPÌs änd délété äný "
-"çäçhéd ör störéd ÀPÌ Çöntént. Àll prövïsïöns öf thé Térms thät ßý théïr "
-"nätüré shöüld sürvïvé térmïnätïön shäll sürvïvé térmïnätïön, ïnçlüdïng, "
-"wïthöüt lïmïtätïön, öwnérshïp prövïsïöns, wärräntý dïsçläïmérs, änd "
-"lïmïtätïön öf lïäßïlïtý. Térmïnätïön öf ýöür äççéss tö änd üsé öf thé ÀPÌs "
-"änd ÀPÌ Çöntént shäll nöt rélïévé ýöü öf äný ößlïgätïöns ärïsïng ör "
-"äççrüsïng prïör tö süçh térmïnätïön ör lïmït äný lïäßïlïtý thät ýöü "
-"öthérwïsé mäý hävé tö {platform_name}, ïnçlüdïng wïthöüt lïmïtätïön äný "
+"çäçhéd ör störéd ÀPÌ Çöntént fröm Ýöür Àpplïçätïön änd ýöür nétwörks, "
+"sýstéms änd sérvérs äs söön äs réäsönäßlý pössïßlé. Àll prövïsïöns öf thé "
+"Térms thät ßý théïr nätüré shöüld sürvïvé térmïnätïön shäll sürvïvé "
+"térmïnätïön, ïnçlüdïng, wïthöüt lïmïtätïön, öwnérshïp prövïsïöns, wärräntý "
+"dïsçläïmérs, änd lïmïtätïöns öf lïäßïlïtý. Térmïnätïön öf ýöür äççéss tö änd"
+" üsé öf thé ÀPÌs änd ÀPÌ Çöntént shäll nöt rélïévé ýöü öf äný ößlïgätïöns "
+"ärïsïng ör äççrüïng prïör tö süçh térmïnätïön ör lïmït äný lïäßïlïtý thät "
+"ýöü öthérwïsé mäý hävé tö {platform_name}, ïnçlüdïng wïthöüt lïmïtätïön äný "
 "ïndémnïfïçätïön ößlïgätïöns çöntäïnéd héréïn.#"
 
 #: lms/templates/api_admin/catalogs/edit.html
@@ -18005,8 +18318,7 @@ msgstr "{span_start}çürrént séçtïön{span_end} Ⱡ'σяєм ιρѕυм ∂
 
 #: lms/templates/courseware/accordion.html
 #: lms/templates/courseware/progress.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "due {date}"
 msgstr "düé {date} Ⱡ'σяєм ιρѕυм #"
 
@@ -18015,8 +18327,7 @@ msgid "{section_format} due {{date}}"
 msgstr "{section_format} düé {{date}} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/courseware/accordion.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "This content is graded"
 msgstr "Thïs çöntént ïs grädéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
@@ -18287,7 +18598,6 @@ msgstr "Wélçömé tö {course_title}! Ⱡ'σяєм ιρѕυм ∂σłσя ѕι
 #: lms/templates/courseware/info.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
 msgid "Resume Course"
 msgstr "Résümé Çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
@@ -19297,6 +19607,7 @@ msgstr ""
 "Thé {provider_name} äççöünt ýöü séléçtéd ïs älréädý lïnkéd tö änöthér "
 "{platform_name} äççöünt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid ""
 "We're sorry to see you go! Please share your main reason for unenrolling."
@@ -19304,69 +19615,83 @@ msgstr ""
 "Wé'ré sörrý tö séé ýöü gö! Pléäsé shäré ýöür mäïn réäsön för ünénröllïng. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "I just wanted to browse the material"
 msgstr ""
 "Ì jüst wäntéd tö ßröwsé thé mätérïäl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυ#"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "This won't help me reach my goals"
 msgstr ""
 "Thïs wön't hélp mé réäçh mý göäls Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "I don't have the time"
 msgstr "Ì dön't hävé thé tïmé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "I don't have the academic or language prerequisites"
 msgstr ""
 "Ì dön't hävé thé äçädémïç ör längüägé préréqüïsïtés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "I don't have enough support"
 msgstr "Ì dön't hävé énöügh süppört Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "I am not happy with the quality of the content"
 msgstr ""
 "Ì äm nöt häppý wïth thé qüälïtý öf thé çöntént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя α#"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "The course material was too hard"
 msgstr ""
 "Thé çöürsé mätérïäl wäs töö härd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "The course material was too easy"
 msgstr ""
 "Thé çöürsé mätérïäl wäs töö éäsý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Something was broken"
 msgstr "Söméthïng wäs ßrökén Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Other"
 msgstr "Öthér Ⱡ'σяєм ιρѕ#"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Thank you for sharing your reasons for unenrolling."
 msgstr ""
 "Thänk ýöü för shärïng ýöür réäsöns för ünénröllïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "You are unenrolled from"
 msgstr "Ýöü äré ünénrölléd fröm Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Return To Dashboard"
 msgstr "Rétürn Tö Däshßöärd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
+#: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 msgid "Browse Courses"
 msgstr "Bröwsé Çöürsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
@@ -20023,17 +20348,19 @@ msgstr ""
 
 #: lms/templates/emails/photo_submission_confirmation.txt
 msgid ""
-"We've received your information and the verification process has begun. You "
-"can check the status of the verification process on your dashboard."
+"We've received your information and the ID verification process has "
+"begun.Check for an email from us in the next few days to confirm whether "
+"your verification was successful.You can also check the status of the "
+"verification process on your dashboard."
 msgstr ""
-"Wé'vé réçéïvéd ýöür ïnförmätïön änd thé vérïfïçätïön pröçéss häs ßégün. Ýöü "
-"çän çhéçk thé stätüs öf thé vérïfïçätïön pröçéss ön ýöür däshßöärd. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
-"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕ#"
+"Wé'vé réçéïvéd ýöür ïnförmätïön änd thé ÌD vérïfïçätïön pröçéss häs "
+"ßégün.Çhéçk för än émäïl fröm üs ïn thé néxt féw däýs tö çönfïrm whéthér "
+"ýöür vérïfïçätïön wäs süççéssfül.Ýöü çän älsö çhéçk thé stätüs öf thé "
+"vérïfïçätïön pröçéss ön ýöür däshßöärd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
+"∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
+"υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє "
+"∂σłσя ιη яєρяєнєη∂єяιт ι#"
 
 #: lms/templates/emails/photo_submission_confirmation.txt
 #: lms/templates/emails/reverification_processed.txt
@@ -21678,10 +22005,6 @@ msgid "* Required Information"
 msgstr "* Réqüïréd Ìnförmätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-msgid "Organization Name"
-msgstr "Örgänïzätïön Nämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "The organization that purchased enrollments in the course"
 msgstr ""
 "Thé örgänïzätïön thät pürçhäséd énröllménts ïn thé çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя"
@@ -21829,6 +22152,11 @@ msgid ""
 msgstr ""
 "Ýöü wïll nöt gét nötïfïçätïön för émäïls thät ßöünçé, sö pléäsé döüßlé-çhéçk"
 " spéllïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Role of the users being enrolled."
+msgstr ""
+"Rölé öf thé üsérs ßéïng énrölléd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -22902,40 +23230,6 @@ msgstr "Mänägé ýöür dätä: {permission} Ⱡ'σяєм ιρѕυм ∂σłσ
 msgid "Account Activation Info"
 msgstr "Àççöünt Àçtïvätïön Ìnfö Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
-#: lms/templates/registration/account_activation_sidebar_notice.html
-msgid "Activate your account!"
-msgstr "Àçtïväté ýöür äççöünt! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
-
-#: lms/templates/registration/account_activation_sidebar_notice.html
-msgid ""
-"Check your {email_start}{email}{email_end} inbox for an account activation "
-"link from {platform_name}. If you need help, contact "
-"{link_start}{platform_name} Support{link_end}."
-msgstr ""
-"Çhéçk ýöür {email_start}{email}{email_end} ïnßöx för än äççöünt äçtïvätïön "
-"lïnk fröm {platform_name}. Ìf ýöü nééd hélp, çöntäçt "
-"{link_start}{platform_name} Süppört{link_end}. Ⱡ'σяєм ιρѕυм ∂σłσя#"
-
-#: lms/templates/registration/activate_account_notice.html
-msgid "You're almost there!"
-msgstr "Ýöü'ré älmöst théré! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: lms/templates/registration/activate_account_notice.html
-msgid ""
-"There's just one more step: Before you enroll in a course, you need to "
-"activate your account. We've sent an email message to "
-"{email_start}{email}{email_end} with instructions for activating your "
-"account. If you don't receive this message, check your spam folder."
-msgstr ""
-"Théré's jüst öné möré stép: Béföré ýöü énröll ïn ä çöürsé, ýöü nééd tö "
-"äçtïväté ýöür äççöünt. Wé'vé sént än émäïl méssägé tö "
-"{email_start}{email}{email_end} wïth ïnstrüçtïöns för äçtïvätïng ýöür "
-"äççöünt. Ìf ýöü dön't réçéïvé thïs méssägé, çhéçk ýöür späm földér. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт #"
-
 #: lms/templates/registration/password_reset_complete.html
 msgid "Your Password Reset is Complete"
 msgstr "Ýöür Pässwörd Rését ïs Çömplété Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
@@ -22954,40 +23248,6 @@ msgstr ""
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Reset Your {platform_name} Password"
 msgstr "Rését Ýöür {platform_name} Pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Error Resetting Password"
-msgstr "Érrör Réséttïng Pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "You must enter and confirm your new password."
-msgstr ""
-"Ýöü müst éntér änd çönfïrm ýöür néw pässwörd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "The text in both password fields must match."
-msgstr ""
-"Thé téxt ïn ßöth pässwörd fïélds müst mätçh. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Reset Your Password"
-msgstr "Rését Ýöür Pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Enter and confirm your new password."
-msgstr ""
-"Éntér änd çönfïrm ýöür néw pässwörd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυ#"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "New Password"
-msgstr "Néw Pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: lms/templates/registration/password_reset_confirm.html
-msgid "Confirm Password"
-msgstr "Çönfïrm Pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/registration/password_reset_confirm.html
 msgid "Invalid Password Reset Link"
@@ -23611,10 +23871,6 @@ msgstr "Çöntäçt {platform_name} Süppört Ⱡ'σяєм ιρѕυм ∂σłσ�
 msgid "Student Support: Enrollment"
 msgstr "Stüdént Süppört: Énröllmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
-#: lms/templates/support/entitlement.html
-msgid "Entitlements"
-msgstr "Éntïtléménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
 #: lms/templates/support/manage_user.html
 msgid "Student Support: Manage User"
 msgstr "Stüdént Süppört: Mänägé Ûsér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
@@ -23965,22 +24221,17 @@ msgstr "Pürsüé ä vérïfïéd çértïfïçäté Ⱡ'σяєм ιρѕυм ∂
 msgid "Upgrade ({price})"
 msgstr "Ûpgrädé ({price}) Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
+msgid "Expand All"
+msgstr "Éxpänd Àll Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "Prerequisite: "
 msgstr "Préréqüïsïté:  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-new.html
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
+#: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "{subsection_format} due {{date}}"
 msgstr "{subsection_format} düé {{date}} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
-msgid "Unlocked"
-msgstr "Ûnlöçkéd Ⱡ'σяєм ιρѕυм ∂#"
-
-#: openedx/features/course_experience/templates/course_experience/course-outline-fragment-old.html
-msgid "(Prerequisite required)"
-msgstr "(Préréqüïsïté réqüïréd) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: openedx/features/course_experience/templates/course_experience/course-sock-fragment.html
 msgid "Learn About Verified Certificates"
@@ -24159,6 +24410,10 @@ msgid "Explore New Courses"
 msgstr "Éxplöré Néw Çöürsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+msgid "View My Records"
+msgstr "Vïéw Mý Réçörds Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
 msgid "My Profile"
 msgstr "Mý Pröfïlé Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
@@ -24208,32 +24463,10 @@ msgid "© 2012–{year} edX Inc. "
 msgstr "© 2012–{year} édX Ìnç.  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: themes/edx.org/lms/templates/footer.html
-msgid ""
-"EdX, Open edX, and MicroMasters are registered trademarks of edX Inc. "
-"ç²¤ICPå¤17044299å·-2. "
+msgid "EdX, Open edX, and MicroMasters are registered trademarks of edX Inc. "
 msgstr ""
-"ÉdX, Öpén édX, änd MïçröMästérs äré régïstéréd trädémärks öf édX Ìnç. "
-"ç²¤ÌÇPå¤17044299å·-2.  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
-
-#: themes/edx.org/lms/templates/footer.html
-#: themes/edx.org/lms/templates/certificates/_about-edx.html
-msgid "About edX"
-msgstr "Àßöüt édX Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: themes/edx.org/lms/templates/footer.html
-msgid ""
-"© 2012–{year} edX Inc.  All rights reserved except where noted.  EdX, Open "
-"edX and the edX and Open edX logos are registered trademarks or trademarks "
-"of edX Inc."
-msgstr ""
-"© 2012–{year} édX Ìnç.  Àll rïghts résérvéd éxçépt whéré nötéd.  ÉdX, Öpén "
-"édX änd thé édX änd Öpén édX lögös äré régïstéréd trädémärks ör trädémärks "
-"öf édX Ìnç. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ "
-"∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ "
-"мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ "
-"єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє "
-"νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
-"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт#"
+"ÉdX, Öpén édX, änd MïçröMästérs äré régïstéréd trädémärks öf édX Ìnç.  "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: themes/edx.org/lms/templates/certificates/_about-accomplishments.html
 msgid "About edX Verified Certificates"
@@ -24254,6 +24487,10 @@ msgstr ""
 "α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ "
 "єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє"
 " νєłιт #"
+
+#: themes/edx.org/lms/templates/certificates/_about-edx.html
+msgid "About edX"
+msgstr "Àßöüt édX Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: themes/edx.org/lms/templates/certificates/_about-edx.html
 msgid ""
@@ -27613,6 +27850,40 @@ msgstr ""
 "Ìn-Çöürsé Révérïfïçätïön {number} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: cms/templates/settings.html
+msgid "Set the pacing for this course"
+msgstr "Sét thé päçïng för thïs çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: cms/templates/settings.html
+msgid ""
+"Instructor-paced courses progress at the pace that the course author sets. "
+"You can configure release dates for course content and due dates for "
+"assignments."
+msgstr ""
+"Ìnstrüçtör-päçéd çöürsés prögréss ät thé päçé thät thé çöürsé äüthör séts. "
+"Ýöü çän çönfïgüré réléäsé dätés för çöürsé çöntént änd düé dätés för "
+"ässïgnménts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ "
+"∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ "
+"мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ "
+"єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє "
+"νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
+"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσ#"
+
+#: cms/templates/settings.html
+msgid ""
+"Self-paced courses do not have release dates for course content or due dates"
+" for assignments. Learners can complete course material at any time before "
+"the course end date."
+msgstr ""
+"Sélf-päçéd çöürsés dö nöt hävé réléäsé dätés för çöürsé çöntént ör düé dätés"
+" för ässïgnménts. Léärnérs çän çömplété çöürsé mätérïäl ät äný tïmé ßéföré "
+"thé çöürsé énd däté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg "
+"єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт "
+"єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт "
+"αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη "
+"νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт "
+"σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι#"
+
+#: cms/templates/settings.html
 msgid "Course Schedule"
 msgstr "Çöürsé Sçhédülé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
@@ -27681,29 +27952,6 @@ msgstr ""
 #: cms/templates/settings.html
 msgid "Enrollment End Time"
 msgstr "Énröllmént Énd Tïmé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: cms/templates/settings.html
-msgid "These Dates Are Not Used When Promoting Your Course"
-msgstr ""
-"Thésé Dätés Àré Nöt Ûséd Whén Prömötïng Ýöür Çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
-
-#: cms/templates/settings.html
-msgid ""
-"These dates impact {strong_start}when your courseware can be "
-"viewed{strong_end}, but they are {strong_start}not the dates shown on your "
-"course summary page{strong_end}. To provide the course start and "
-"registration dates as shown on your course summary page, follow the "
-"instructions provided by your Program Manager."
-msgstr ""
-"Thésé dätés ïmpäçt {strong_start}whén ýöür çöürséwäré çän ßé "
-"vïéwéd{strong_end}, ßüt théý äré {strong_start}nöt thé dätés shöwn ön ýöür "
-"çöürsé sümmärý pägé{strong_end}. Tö prövïdé thé çöürsé stärt änd "
-"régïsträtïön dätés äs shöwn ön ýöür çöürsé sümmärý pägé, föllöw thé "
-"ïnstrüçtïöns prövïdéd ßý ýöür Prögräm Mänägér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
-"∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
-"υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σ#"
 
 #: cms/templates/settings.html
 msgid "Course Details"
@@ -28024,40 +28272,6 @@ msgid ""
 msgstr ""
 "Thé sçöré stüdént müst méét ïn ördér tö süççéssfüllý çömplété thé éntränçé "
 "éxäm.  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-
-#: cms/templates/settings.html
-msgid "Set the pacing for this course"
-msgstr "Sét thé päçïng för thïs çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: cms/templates/settings.html
-msgid ""
-"Instructor-paced courses progress at the pace that the course author sets. "
-"You can configure release dates for course content and due dates for "
-"assignments."
-msgstr ""
-"Ìnstrüçtör-päçéd çöürsés prögréss ät thé päçé thät thé çöürsé äüthör séts. "
-"Ýöü çän çönfïgüré réléäsé dätés för çöürsé çöntént änd düé dätés för "
-"ässïgnménts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ "
-"∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ "
-"мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ "
-"єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє "
-"νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
-"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσ#"
-
-#: cms/templates/settings.html
-msgid ""
-"Self-paced courses do not have release dates for course content or due dates"
-" for assignments. Learners can complete course material at any time before "
-"the course end date."
-msgstr ""
-"Sélf-päçéd çöürsés dö nöt hävé réléäsé dätés för çöürsé çöntént ör düé dätés"
-" för ässïgnménts. Léärnérs çän çömplété çöürsé mätérïäl ät äný tïmé ßéföré "
-"thé çöürsé énd däté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg "
-"єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт "
-"єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт "
-"αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη "
-"νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт "
-"σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι#"
 
 #: cms/templates/settings.html
 msgid "Course Content License"
@@ -28654,6 +28868,10 @@ msgstr "Pölïçïés Ⱡ'σяєм ιρѕυм ∂#"
 msgid "Accessibility Accommodation Request"
 msgstr ""
 "Àççéssïßïlïtý Àççömmödätïön Réqüést Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: cms/templates/widgets/footer.html
+msgid "LMS"
+msgstr "LMS Ⱡ'σяєм#"
 
 #. Translators: 'EdX', 'edX', 'Studio', and 'Open edX' are trademarks of 'edX
 #. Inc.'. Please do not translate any of these trademarks and company names.

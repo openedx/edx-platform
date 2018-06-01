@@ -178,7 +178,7 @@ class CatalogListView(CatalogApiMixin, View):
         if not form.is_valid():
             return render_to_response(self.template, self.get_context_data(client, username, form), status=400)
 
-        attrs = form.instance.attributes
+        attrs = form.cleaned_data
         catalog = client.catalogs.post(attrs)
         return redirect(reverse('api_admin:catalog-edit', kwargs={'catalog_id': catalog['id']}))
 
@@ -218,7 +218,7 @@ class CatalogEditView(CatalogApiMixin, View):
             response = client.catalogs(catalog_id).get()
             catalog = Catalog(attributes=response)
             return render_to_response(self.template_name, self.get_context_data(catalog, form, client), status=400)
-        catalog = client.catalogs(catalog_id).patch(form.instance.attributes)
+        catalog = client.catalogs(catalog_id).patch(form.cleaned_data)
         return redirect(reverse('api_admin:catalog-edit', kwargs={'catalog_id': catalog['id']}))
 
 

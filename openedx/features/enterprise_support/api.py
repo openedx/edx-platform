@@ -22,7 +22,8 @@ from third_party_auth.pipeline import get as get_partial_pipeline
 from third_party_auth.provider import Registry
 
 try:
-    from enterprise.models import EnterpriseCustomer
+    from enterprise.models import EnterpriseCustomer, EnterpriseCustomerUser
+    from consent.models import DataSharingConsent, DataSharingConsentTextOverrides
 except ImportError:
     pass
 
@@ -160,73 +161,72 @@ class EnterpriseApiClient(object):
             LOGGER.exception(message)
             raise EnterpriseApiException(message)
 
-    def fetch_enterprise_learner_data(self, site, user):
+    def fetch_enterprise_learner_data(self, user):
         """
         Fetch information related to enterprise from the Enterprise Service.
 
         Example:
-            fetch_enterprise_learner_data(site, user)
+            fetch_enterprise_learner_data(user)
 
         Argument:
-            site: (Site) site instance
             user: (User) django auth user
 
         Returns:
-            dict: {
-                "enterprise_api_response_for_learner": {
-                    "count": 1,
-                    "num_pages": 1,
-                    "current_page": 1,
-                    "results": [
-                        {
-                            "enterprise_customer": {
-                                "uuid": "cf246b88-d5f6-4908-a522-fc307e0b0c59",
-                                "name": "TestShib",
-                                "catalog": 2,
-                                "active": true,
-                                "site": {
-                                    "domain": "example.com",
-                                    "name": "example.com"
-                                },
-                                "enable_data_sharing_consent": true,
-                                "enforce_data_sharing_consent": "at_login",
-                                "branding_configuration": {
-                                    "enterprise_customer": "cf246b88-d5f6-4908-a522-fc307e0b0c59",
-                                    "logo": "https://open.edx.org/sites/all/themes/edx_open/logo.png"
-                                },
-                                "enterprise_customer_entitlements": [
-                                    {
-                                        "enterprise_customer": "cf246b88-d5f6-4908-a522-fc307e0b0c59",
-                                        "entitlement_id": 69
-                                    }
-                                ]
+            dict:
+            {
+                "count": 1,
+                "num_pages": 1,
+                "current_page": 1,
+                "next": null,
+                "start": 0,
+                "previous": null
+                "results": [
+                    {
+                        "enterprise_customer": {
+                            "uuid": "cf246b88-d5f6-4908-a522-fc307e0b0c59",
+                            "name": "TestShib",
+                            "catalog": 2,
+                            "active": true,
+                            "site": {
+                                "domain": "example.com",
+                                "name": "example.com"
                             },
-                            "user_id": 5,
-                            "user": {
-                                "username": "staff",
-                                "first_name": "",
-                                "last_name": "",
-                                "email": "staff@example.com",
-                                "is_staff": true,
-                                "is_active": true,
-                                "date_joined": "2016-09-01T19:18:26.026495Z"
+                            "enable_data_sharing_consent": true,
+                            "enforce_data_sharing_consent": "at_login",
+                            "branding_configuration": {
+                                "enterprise_customer": "cf246b88-d5f6-4908-a522-fc307e0b0c59",
+                                "logo": "https://open.edx.org/sites/all/themes/edx_open/logo.png"
                             },
-                            "data_sharing_consent_records": [
+                            "enterprise_customer_entitlements": [
                                 {
-                                    "username": "staff",
-                                    "enterprise_customer_uuid": "cf246b88-d5f6-4908-a522-fc307e0b0c59",
-                                    "exists": true,
-                                    "course_id": "course-v1:edX DemoX Demo_Course",
-                                    "consent_provided": true,
-                                    "consent_required": false
+                                    "enterprise_customer": "cf246b88-d5f6-4908-a522-fc307e0b0c59",
+                                    "entitlement_id": 69
                                 }
-                            ]
-                        }
-                    ],
-                    "next": null,
-                    "start": 0,
-                    "previous": null
-                }
+                            ],
+                            "replace_sensitive_sso_username": False,
+                        },
+                        "user_id": 5,
+                        "user": {
+                            "username": "staff",
+                            "first_name": "",
+                            "last_name": "",
+                            "email": "staff@example.com",
+                            "is_staff": true,
+                            "is_active": true,
+                            "date_joined": "2016-09-01T19:18:26.026495Z"
+                        },
+                        "data_sharing_consent_records": [
+                            {
+                                "username": "staff",
+                                "enterprise_customer_uuid": "cf246b88-d5f6-4908-a522-fc307e0b0c59",
+                                "exists": true,
+                                "course_id": "course-v1:edX DemoX Demo_Course",
+                                "consent_provided": true,
+                                "consent_required": false
+                            }
+                        ]
+                    }
+                ],
             }
 
         Raises:
@@ -238,7 +238,7 @@ class EnterpriseApiClient(object):
                 a response. This exception is raised for both connection timeout and read timeout.
 
         """
-        if not user.is_authenticated():
+        if not user.is_authenticated:
             return None
 
         api_resource_name = 'enterprise-learner'
@@ -268,17 +268,12 @@ class EnterpriseApiServiceClient(EnterpriseServiceClientMixin, EnterpriseApiClie
         Fetch enterprise customer with enterprise service user and cache the
         API response`.
         """
-        cache_key = get_cache_key(
-            resource='enterprise-customer',
-            resource_id=uuid,
-            username=settings.ENTERPRISE_SERVICE_WORKER_USERNAME,
-        )
-        enterprise_customer = cache.get(cache_key)
+        enterprise_customer = enterprise_customer_from_cache(uuid=uuid)
         if not enterprise_customer:
             endpoint = getattr(self.client, 'enterprise-customer')
             enterprise_customer = endpoint(uuid).get()
             if enterprise_customer:
-                cache.set(cache_key, enterprise_customer, settings.ENTERPRISE_API_CACHE_TIMEOUT)
+                cache_enterprise(enterprise_customer)
 
         return enterprise_customer
 
@@ -327,14 +322,79 @@ def enterprise_enabled():
     return 'enterprise' in settings.INSTALLED_APPS and settings.FEATURES.get('ENABLE_ENTERPRISE_INTEGRATION', False)
 
 
+def enterprise_is_enabled(otherwise=None):
+    """Decorator which requires that the Enterprise feature be enabled before the function can run."""
+    def decorator(func):
+        """Decorator for ensuring the Enterprise feature is enabled."""
+        def wrapper(*args, **kwargs):
+            if enterprise_enabled():
+                return func(*args, **kwargs)
+            return otherwise
+        return wrapper
+    return decorator
+
+
+@enterprise_is_enabled()
+def get_enterprise_customer_cache_key(uuid, username=settings.ENTERPRISE_SERVICE_WORKER_USERNAME):
+    """The cache key used to get cached Enterprise Customer data."""
+    return get_cache_key(
+        resource='enterprise-customer',
+        resource_id=uuid,
+        username=username,
+    )
+
+
+@enterprise_is_enabled()
+def cache_enterprise(enterprise_customer):
+    """Cache this customer's data."""
+    cache_key = get_enterprise_customer_cache_key(enterprise_customer['uuid'])
+    cache.set(cache_key, enterprise_customer, settings.ENTERPRISE_API_CACHE_TIMEOUT)
+
+
+@enterprise_is_enabled()
+def enterprise_customer_from_cache(request=None, uuid=None):
+    """Check all available caches for Enterprise Customer data."""
+    enterprise_customer = None
+
+    # Check if it's cached in the general cache storage.
+    if uuid:
+        cache_key = get_enterprise_customer_cache_key(uuid)
+        enterprise_customer = cache.get(cache_key)
+
+    # Check if it's cached in the session.
+    if not enterprise_customer and request and request.user.is_authenticated:
+        enterprise_customer = request.session.get('enterprise_customer')
+
+    return enterprise_customer
+
+
+@enterprise_is_enabled()
+def enterprise_customer_from_api(request):
+    """Use an API to get Enterprise Customer data from request context clues."""
+    enterprise_customer = None
+    enterprise_customer_uuid = enterprise_customer_uuid_for_request(request)
+    if enterprise_customer_uuid:
+        # If we were able to obtain an EnterpriseCustomer UUID, go ahead
+        # and use it to attempt to retrieve EnterpriseCustomer details
+        # from the EnterpriseCustomer API.
+        enterprise_api_client = (
+            EnterpriseApiClient(user=request.user)
+            if request.user.is_authenticated
+            else EnterpriseApiServiceClient()
+        )
+
+        try:
+            enterprise_customer = enterprise_api_client.get_enterprise_customer(enterprise_customer_uuid)
+        except HttpNotFoundError:
+            enterprise_customer = None
+    return enterprise_customer
+
+
+@enterprise_is_enabled()
 def enterprise_customer_uuid_for_request(request):
     """
     Check all the context clues of the request to gather a particular EnterpriseCustomer's UUID.
     """
-    if not enterprise_enabled():
-        return None
-
-    enterprise_customer_uuid = None
     sso_provider_id = request.GET.get('tpa_hint')
     running_pipeline = get_partial_pipeline(request)
     if running_pipeline:
@@ -354,7 +414,7 @@ def enterprise_customer_uuid_for_request(request):
                 enterprise_customer_identity_provider__provider_id=sso_provider_id
             ).uuid
         except EnterpriseCustomer.DoesNotExist:
-            pass
+            enterprise_customer_uuid = None
     else:
         # Check if we got an Enterprise UUID passed directly as either a query
         # parameter, or as a value in the Enterprise cookie.
@@ -362,53 +422,40 @@ def enterprise_customer_uuid_for_request(request):
             settings.ENTERPRISE_CUSTOMER_COOKIE_NAME
         )
 
-    if not enterprise_customer_uuid and request.user.is_authenticated():
+    if not enterprise_customer_uuid and request.user.is_authenticated:
         # If there's no way to get an Enterprise UUID for the request, check to see
         # if there's already an Enterprise attached to the requesting user on the backend.
-        learner_data = get_enterprise_learner_data(request.site, request.user)
+        learner_data = get_enterprise_learner_data(request.user)
         if learner_data:
             enterprise_customer_uuid = learner_data[0]['enterprise_customer']['uuid']
 
     return enterprise_customer_uuid
 
 
+@enterprise_is_enabled()
 def enterprise_customer_for_request(request):
     """
     Check all the context clues of the request to determine if
     the request being made is tied to a particular EnterpriseCustomer.
     """
-    enterprise_customer = None
-    enterprise_customer_uuid = enterprise_customer_uuid_for_request(request)
-    if enterprise_customer_uuid:
-        # If we were able to obtain an EnterpriseCustomer UUID, go ahead
-        # and use it to attempt to retrieve EnterpriseCustomer details
-        # from the EnterpriseCustomer API.
-        enterprise_api_client = EnterpriseApiServiceClient()
-        if request.user.is_authenticated():
-            enterprise_api_client = EnterpriseApiClient(user=request.user)
-
-        try:
-            enterprise_customer = enterprise_api_client.get_enterprise_customer(enterprise_customer_uuid)
-        except HttpNotFoundError:
-            enterprise_customer = None
-
-    return enterprise_customer
+    if 'enterprise_customer' in request.session:
+        return enterprise_customer_from_cache(request=request)
+    else:
+        return enterprise_customer_from_api(request)
 
 
+@enterprise_is_enabled(otherwise=False)
 def consent_needed_for_course(request, user, course_id, enrollment_exists=False):
     """
     Wrap the enterprise app check to determine if the user needs to grant
     data sharing permissions before accessing a course.
     """
-    if not enterprise_enabled():
-        return False
-
     consent_key = ('data_sharing_consent_needed', course_id)
 
     if request.session.get(consent_key) is False:
         return False
 
-    enterprise_learner_details = get_enterprise_learner_data(request.site, user)
+    enterprise_learner_details = get_enterprise_learner_data(user)
     if not enterprise_learner_details:
         consent_needed = False
     else:
@@ -430,6 +477,30 @@ def consent_needed_for_course(request, user, course_id, enrollment_exists=False)
     return consent_needed
 
 
+@enterprise_is_enabled(otherwise=set())
+def get_consent_required_courses(user, course_ids):
+    """
+    Returns a set of course_ids that require consent
+    Note that this function makes use of the Enterprise models directly instead of using the API calls
+    """
+    result = set()
+    enterprise_learner = EnterpriseCustomerUser.objects.filter(user_id=user.id).first()
+    if not enterprise_learner or not enterprise_learner.enterprise_customer:
+        return result
+
+    enterprise_uuid = enterprise_learner.enterprise_customer.uuid
+    data_sharing_consent = DataSharingConsent.objects.filter(username=user.username,
+                                                             course_id__in=course_ids,
+                                                             enterprise_customer__uuid=enterprise_uuid)
+
+    for consent in data_sharing_consent:
+        if consent.consent_required():
+            result.add(consent.course_id)
+
+    return result
+
+
+@enterprise_is_enabled(otherwise='')
 def get_enterprise_consent_url(request, course_id, user=None, return_to=None, enrollment_exists=False):
     """
     Build a URL to redirect the user to the Enterprise app to provide data sharing
@@ -442,9 +513,6 @@ def get_enterprise_consent_url(request, course_id, user=None, return_to=None, en
     * return_to: url name label for the page to return to after consent is granted.
                  If None, return to request.path instead.
     """
-    if not enterprise_enabled():
-        return ''
-
     user = user or request.user
 
     if not consent_needed_for_course(request, user, course_id, enrollment_exists=enrollment_exists):
@@ -473,32 +541,47 @@ def get_enterprise_consent_url(request, course_id, user=None, return_to=None, en
     return full_url
 
 
-def get_enterprise_learner_data(site, user):
+@enterprise_is_enabled()
+def get_enterprise_learner_data(user):
     """
     Client API operation adapter/wrapper
     """
-    if not enterprise_enabled():
-        return None
-
-    enterprise_learner_data = EnterpriseApiClient(user=user).fetch_enterprise_learner_data(site=site, user=user)
+    enterprise_learner_data = EnterpriseApiClient(user=user).fetch_enterprise_learner_data(user)
     if enterprise_learner_data:
         return enterprise_learner_data['results']
 
 
+@enterprise_is_enabled(otherwise={})
 def get_enterprise_customer_for_learner(site, user):
     """
     Return enterprise customer to whom given learner belongs.
     """
-    if not enterprise_enabled():
-        return {}
-
-    enterprise_learner_data = get_enterprise_learner_data(site, user)
+    enterprise_learner_data = get_enterprise_learner_data(user)
     if enterprise_learner_data:
         return enterprise_learner_data[0]['enterprise_customer']
-
     return {}
 
 
+def get_consent_notification_data(enterprise_customer):
+    """
+    Returns the consent notification data from DataSharingConsentPage modal
+    """
+    title_template = None
+    message_template = None
+    try:
+        consent_page = DataSharingConsentTextOverrides.objects.get(enterprise_customer_id=enterprise_customer['uuid'])
+        title_template = consent_page.declined_notification_title
+        message_template = consent_page.declined_notification_message
+    except DataSharingConsentTextOverrides.DoesNotExist:
+        LOGGER.info(
+            "DataSharingConsentPage object doesn't exit for {enterprise_customer_name}".format(
+                enterprise_customer_name=enterprise_customer['name']
+            )
+        )
+    return title_template, message_template
+
+
+@enterprise_is_enabled(otherwise='')
 def get_dashboard_consent_notification(request, user, course_enrollments):
     """
     If relevant to the request at hand, create a banner on the dashboard indicating consent failed.
@@ -511,9 +594,6 @@ def get_dashboard_consent_notification(request, user, course_enrollments):
     Returns:
         str: Either an empty string, or a string containing the HTML code for the notification banner.
     """
-    if not enterprise_enabled():
-        return ''
-
     enrollment = None
     consent_needed = False
     course_id = request.GET.get(CONSENT_FAILED_PARAMETER)
@@ -538,18 +618,22 @@ def get_dashboard_consent_notification(request, user, course_enrollments):
 
     if consent_needed and enrollment:
 
-        message_template = _(
-            'If you have concerns about sharing your data, please contact your administrator '
-            'at {enterprise_customer_name}.'
-        )
+        title_template, message_template = get_consent_notification_data(enterprise_customer)
+        if not title_template:
+            title_template = _(
+                'Enrollment in {course_title} was not complete.'
+            )
+        if not message_template:
+            message_template = _(
+                'If you have concerns about sharing your data, please contact your administrator '
+                'at {enterprise_customer_name}.'
+            )
 
+        title = title_template.format(
+            course_title=enrollment.course_overview.display_name,
+        )
         message = message_template.format(
             enterprise_customer_name=enterprise_customer['name'],
-        )
-        title = _(
-            'Enrollment in {course_name} was not complete.'
-        ).format(
-            course_name=enrollment.course_overview.display_name,
         )
 
         return render_to_string(
@@ -563,14 +647,12 @@ def get_dashboard_consent_notification(request, user, course_enrollments):
     return ''
 
 
+@enterprise_is_enabled()
 def insert_enterprise_pipeline_elements(pipeline):
     """
     If the enterprise app is enabled, insert additional elements into the
     pipeline related to enterprise.
     """
-    if not enterprise_enabled():
-        return
-
     additional_elements = (
         'enterprise.tpa_pipeline.handle_enterprise_logistration',
     )

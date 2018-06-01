@@ -1,8 +1,9 @@
 /* globals gettext */
 
-import _ from 'underscore';
 import Backbone from 'backbone';
 import picturefill from 'picturefill';
+
+import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
 
 import programCardTpl from '../../../templates/learner_dashboard/program_card.underscore';
 
@@ -21,7 +22,7 @@ class ProgramCardView extends Backbone.View {
   }
 
   initialize(data) {
-    this.tpl = _.template(programCardTpl);
+    this.tpl = HtmlUtils.template(programCardTpl);
     this.progressCollection = data.context.progressCollection;
     if (this.progressCollection) {
       this.progressModel = this.progressCollection.findWhere({
@@ -32,14 +33,14 @@ class ProgramCardView extends Backbone.View {
   }
 
   render() {
-    const orgList = _.map(this.model.get('authoring_organizations'), org => gettext(org.key));
+    const orgList = this.model.get('authoring_organizations').map(org => gettext(org.key));
     const data = $.extend(
       this.model.toJSON(),
       this.getProgramProgress(),
       { orgList: orgList.join(' ') },
     );
 
-    this.$el.html(this.tpl(data));
+    HtmlUtils.setHtml(this.$el, this.tpl(data));
     this.postRender();
   }
 

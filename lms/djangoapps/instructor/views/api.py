@@ -18,7 +18,12 @@ import time
 import unicodecsv
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, ValidationError
+from django.core.exceptions import (
+    MultipleObjectsReturned,
+    ObjectDoesNotExist,
+    PermissionDenied,
+    ValidationError
+)
 from django.core.mail.message import EmailMessage
 from django.core.urlresolvers import reverse
 from django.core.validators import validate_email
@@ -105,7 +110,8 @@ from student.models import (
     UserProfile,
     anonymous_id_for_user,
     get_user_by_username_or_email,
-    unique_id_for_user
+    unique_id_for_user,
+    is_email_retired
 )
 from student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
 from submissions import api as sub_api  # installed from the edx-submissions repository
@@ -152,6 +158,8 @@ def common_exceptions_400(func):
             return func(request, *args, **kwargs)
         except User.DoesNotExist:
             message = _('User does not exist.')
+        except MultipleObjectsReturned:
+            message = _('Found a conflict with given identifier. Please try an alternative identifier')
         except (AlreadyRunningError, QueueConnectionError) as err:
             message = unicode(err)
 
@@ -412,6 +420,16 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=too-man
                             state_transition=UNENROLLED_TO_ENROLLED,
                         )
                         enroll_email(course_id=course_id, student_email=email, auto_enroll=True, email_students=True, email_params=email_params)
+                elif is_email_retired(email):
+                    # We are either attempting to enroll a retired user or create a new user with an email which is
+                    # already associated with a retired account.  Simply block these attempts.
+                    row_errors.append({
+                        'username': username,
+                        'email': email,
+                        'response': _('Invalid email {email_address}.').format(email_address=email),
+                    })
+                    log.warning(u'Email address %s is associated with a retired user, so course enrollment was ' +
+                                u'blocked.', email)
                 else:
                     # This email does not yet exist, so we need to create a new account
                     # If username already exists in the database, then create_and_enroll_user
@@ -628,16 +646,19 @@ def students_update_enrollment(request, course_id):
     identifiers = _split_input_list(identifiers_raw)
     auto_enroll = _get_boolean_param(request, 'auto_enroll')
     email_students = _get_boolean_param(request, 'email_students')
-    is_white_label = CourseMode.is_white_label(course_id)
     reason = request.POST.get('reason')
-    if is_white_label:
-        if not reason:
-            return JsonResponse(
-                {
-                    'action': action,
-                    'results': [{'error': True}],
-                    'auto_enroll': auto_enroll,
-                }, status=400)
+    role = request.POST.get('role')
+
+    allowed_role_choices = configuration_helpers.get_value('MANUAL_ENROLLMENT_ROLE_CHOICES',
+                                                           settings.MANUAL_ENROLLMENT_ROLE_CHOICES)
+    if role and role not in allowed_role_choices:
+        return JsonResponse(
+            {
+                'action': action,
+                'results': [{'error': True, 'message': 'Not a valid role choice'}],
+                'auto_enroll': auto_enroll,
+            }, status=400)
+
     enrollment_obj = None
     state_transition = DEFAULT_TRANSITION_STATE
 
@@ -729,7 +750,7 @@ def students_update_enrollment(request, course_id):
 
         else:
             ManualEnrollmentAudit.create_manual_enrollment_audit(
-                request.user, email, state_transition, reason, enrollment_obj
+                request.user, email, state_transition, reason, enrollment_obj, role
             )
             results.append({
                 'identifier': identifier,
@@ -1238,7 +1259,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
         ]
 
     # Provide human-friendly and translatable names for these features. These names
-    # will be displayed in the table generated in data_download.coffee. It is not (yet)
+    # will be displayed in the table generated in data_download.js. It is not (yet)
     # used as the header row in the CSV, but could be in the future.
     query_features_names = {
         'id': _('User ID'),
@@ -1904,13 +1925,16 @@ def reset_student_attempts(request, course_id):
     course = get_course_with_access(
         request.user, 'staff', course_id, depth=None
     )
+    all_students = _get_boolean_param(request, 'all_students')
+
+    if all_students and not has_access(request.user, 'instructor', course):
+        return HttpResponseForbidden("Requires instructor access.")
 
     problem_to_reset = strip_if_string(request.POST.get('problem_to_reset'))
     student_identifier = request.POST.get('unique_student_identifier', None)
     student = None
     if student_identifier is not None:
         student = get_student_from_identifier(student_identifier)
-    all_students = _get_boolean_param(request, 'all_students')
     delete_module = _get_boolean_param(request, 'delete_module')
 
     # parameter combinations
@@ -1922,11 +1946,6 @@ def reset_student_attempts(request, course_id):
         return HttpResponseBadRequest(
             "all_students and delete_module are mutually exclusive."
         )
-
-    # instructor authorization
-    if all_students or delete_module:
-        if not has_access(request.user, 'instructor', course):
-            return HttpResponseForbidden("Requires instructor access.")
 
     try:
         module_state_key = UsageKey.from_string(problem_to_reset).map_into_course(course_id)
@@ -2041,13 +2060,13 @@ def reset_student_attempts_for_entrance_exam(request, course_id):  # pylint: dis
 @require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('instructor')
+@require_level('staff')
 @require_post_params(problem_to_reset="problem urlname to reset")
 @common_exceptions_400
 def rescore_problem(request, course_id):
     """
     Starts a background process a students attempts counter. Optionally deletes student state for a problem.
-    Limited to instructor access.
+    Rescore for all students is limited to instructor access.
 
     Takes either of the following query paremeters
         - problem_to_reset is a urlname of a problem
@@ -2057,14 +2076,18 @@ def rescore_problem(request, course_id):
     all_students and unique_student_identifier cannot both be present.
     """
     course_id = CourseKey.from_string(course_id)
+    course = get_course_with_access(request.user, 'staff', course_id)
+    all_students = _get_boolean_param(request, 'all_students')
+
+    if all_students and not has_access(request.user, 'instructor', course):
+        return HttpResponseForbidden("Requires instructor access.")
+
+    only_if_higher = _get_boolean_param(request, 'only_if_higher')
     problem_to_reset = strip_if_string(request.POST.get('problem_to_reset'))
     student_identifier = request.POST.get('unique_student_identifier', None)
     student = None
     if student_identifier is not None:
         student = get_student_from_identifier(student_identifier)
-
-    all_students = _get_boolean_param(request, 'all_students')
-    only_if_higher = _get_boolean_param(request, 'only_if_higher')
 
     if not (problem_to_reset and (all_students or student)):
         return HttpResponseBadRequest("Missing query parameters.")
@@ -2113,7 +2136,7 @@ def rescore_problem(request, course_id):
 @require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('instructor')
+@require_level('staff')
 @require_post_params(problem_to_reset="problem urlname to reset", score='overriding score')
 @common_exceptions_400
 def override_problem_score(request, course_id):
@@ -2139,7 +2162,7 @@ def override_problem_score(request, course_id):
         return _create_error_response(request, "Unable to parse problem id {}.".format(problem_to_reset))
 
     # check the user's access to this specific problem
-    if not has_access(request.user, "instructor", modulestore().get_item(usage_key)):
+    if not has_access(request.user, "staff", modulestore().get_item(usage_key)):
         _create_error_response(request, "User {} does not have permission to override scores for problem {}.".format(
             request.user.id,
             problem_to_reset

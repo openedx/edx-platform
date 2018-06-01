@@ -80,6 +80,30 @@ class ApiAccessRequest(TimeStampedModel):
         except cls.DoesNotExist:
             return None
 
+    @classmethod
+    def retire_user(cls, user):
+        """
+        Retires the user's API acccess request table for GDPR
+
+        Arguments:
+            user (User): The user linked to the data to retire in the model.
+
+        Returns:
+            True: If the user has a linked data in the model and retirement is successful
+            False: user has no linked data in the model.
+        """
+        try:
+            retire_target = cls.objects.get(user=user)
+        except cls.DoesNotExist:
+            return False
+        else:
+            retire_target.website = ''
+            retire_target.company_address = ''
+            retire_target.company_name = ''
+            retire_target.reason = ''
+            retire_target.save()
+            return True
+
     def approve(self):
         """Approve this request."""
         log.info('Approving API request from user [%s].', self.user.id)

@@ -2,13 +2,19 @@
 Discussion API views
 """
 from django.core.exceptions import ValidationError
+from django.contrib.auth import get_user_model
+from edx_rest_framework_extensions.authentication import JwtAuthentication
 from opaque_keys.edx.keys import CourseKey
+from rest_framework import permissions
+from rest_framework import status
 from rest_framework.exceptions import UnsupportedMediaType
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
+from six import text_type
 
+from lms.lib import comment_client
 from discussion_api.api import (
     create_comment,
     create_thread,
@@ -26,6 +32,8 @@ from discussion_api.api import (
 from discussion_api.forms import CommentGetForm, CommentListGetForm, ThreadListGetForm
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
+from openedx.core.djangoapps.user_api.accounts.permissions import CanRetireUser
+from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from xmodule.modulestore.django import modulestore
 
 
@@ -512,3 +520,51 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
         if request.content_type != MergePatchParser.media_type:
             raise UnsupportedMediaType(request.content_type)
         return Response(update_comment(request, comment_id, request.data))
+
+
+class RetireUserView(APIView):
+    """
+    **Use Cases**
+
+        A superuser or the user with the settings.RETIREMENT_SERVICE_WORKER_USERNAME
+        can "retire" the user's data from the comments service, which will remove
+        personal information and blank all posts / comments the user has made.
+
+    **Example Requests**:
+        POST /api/discussion/v1/retire_user/
+        {
+            "username": "an_original_user_name"
+        }
+
+    **Example Response**:
+        Empty string
+    """
+
+    authentication_classes = (JwtAuthentication,)
+    permission_classes = (permissions.IsAuthenticated, CanRetireUser)
+
+    def post(self, request):
+        """
+        Implements the retirement endpoint.
+        """
+        username = request.data['username']
+
+        try:
+            retirement = UserRetirementStatus.get_retirement_for_retirement_action(username)
+            cc_user = comment_client.User.from_django_user(retirement.user)
+
+            # Send the retired username to the forums service, as the service cannot generate
+            # the retired username itself. Forums users are referenced by Django auth_user id.
+            cc_user.retire(retirement.retired_username)
+        except UserRetirementStatus.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        except comment_client.CommentClientRequestError as exc:
+            # 404s from client service for users that don't exist there are expected
+            # we can just pass those up.
+            if exc.status_code == 404:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            raise
+        except Exception as exc:  # pylint: disable=broad-except
+            return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)

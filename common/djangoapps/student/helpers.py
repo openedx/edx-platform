@@ -10,10 +10,10 @@ from datetime import datetime
 
 import django
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import NoReverseMatch, reverse
-from django.core.validators import ValidationError, validate_email
-from django.contrib.auth import authenticate, load_backend, login, logout
+from django.core.validators import ValidationError
+from django.contrib.auth import load_backend
 from django.contrib.auth.models import User
 from django.db import IntegrityError, transaction
 from django.utils import http
@@ -26,28 +26,30 @@ from pytz import UTC
 from six import iteritems, text_type
 import third_party_auth
 from course_modes.models import CourseMode
-from lms.djangoapps.certificates.api import (  # pylint: disable=import-error
+from lms.djangoapps.certificates.api import (
     get_certificate_url,
     has_html_certificates_enabled
 )
-from lms.djangoapps.certificates.models import (  # pylint: disable=import-error
+from lms.djangoapps.certificates.models import (
     CertificateStatuses,
     certificate_status_for_student
 )
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
+from lms.djangoapps.verify_student.models import VerificationDeadline
+from lms.djangoapps.verify_student.services import IDVerificationService
+from lms.djangoapps.verify_student.utils import is_verification_expiring_soon, verification_for_datetime
 from openedx.core.djangoapps.certificates.api import certificates_viewable_for_course
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.theming.helpers import get_themes
 from student.models import (
-    CourseEnrollment,
     LinkedInAddToProfileConfiguration,
     PasswordHistory,
     Registration,
     UserAttribute,
     UserProfile,
-    unique_id_for_user
+    unique_id_for_user,
+    email_exists_or_retired
 )
 
 
@@ -64,6 +66,7 @@ DISABLE_UNENROLL_CERT_STATES = [
     'generating',
     'downloadable',
 ]
+USERNAME_EXISTS_MSG_FMT = _("An account with the Public Username '{username}' already exists.")
 
 
 log = logging.getLogger(__name__)
@@ -111,18 +114,14 @@ def check_verify_status_by_course(user, course_enrollments):
 
     # Retrieve all verifications for the user, sorted in descending
     # order by submission datetime
-    verifications = SoftwareSecurePhotoVerification.objects.filter(user=user)
+    verifications = IDVerificationService.verifications_for_user(user)
 
     # Check whether the user has an active or pending verification attempt
-    # To avoid another database hit, we re-use the queryset we have already retrieved.
-    has_active_or_pending = SoftwareSecurePhotoVerification.user_has_valid_or_pending(
-        user, queryset=verifications
-    )
+    has_active_or_pending = IDVerificationService.user_has_valid_or_pending(user)
 
     # Retrieve expiration_datetime of most recent approved verification
-    # To avoid another database hit, we re-use the queryset we have already retrieved.
-    expiration_datetime = SoftwareSecurePhotoVerification.get_expiration_datetime(user, verifications)
-    verification_expiring_soon = SoftwareSecurePhotoVerification.is_verification_expiring_soon(expiration_datetime)
+    expiration_datetime = IDVerificationService.get_expiration_datetime(user, ['approved'])
+    verification_expiring_soon = is_verification_expiring_soon(expiration_datetime)
 
     # Retrieve verification deadlines for the enrolled courses
     enrolled_course_keys = [enrollment.course_id for enrollment in course_enrollments]
@@ -140,7 +139,7 @@ def check_verify_status_by_course(user, course_enrollments):
             # This could be None if the course doesn't have a deadline.
             deadline = course_deadlines.get(enrollment.course_id)
 
-            relevant_verification = SoftwareSecurePhotoVerification.verification_for_datetime(deadline, verifications)
+            relevant_verification = verification_for_datetime(deadline, verifications)
 
             # Picking the max verification datetime on each iteration only with approved status
             if relevant_verification is not None and relevant_verification.status == "approved":
@@ -152,9 +151,12 @@ def check_verify_status_by_course(user, course_enrollments):
 
             # By default, don't show any status related to verification
             status = None
+            should_display = True
 
             # Check whether the user was approved or is awaiting approval
             if relevant_verification is not None:
+                should_display = relevant_verification.should_display_status_to_user()
+
                 if relevant_verification.status == "approved":
                     if verification_expiring_soon:
                         status = VERIFY_STATUS_NEED_TO_REVERIFY
@@ -177,13 +179,12 @@ def check_verify_status_by_course(user, course_enrollments):
             )
             if status is None and not submitted:
                 if deadline is None or deadline > datetime.now(UTC):
-                    if SoftwareSecurePhotoVerification.user_is_verified(user):
-                        if verification_expiring_soon:
-                            # The user has an active verification, but the verification
-                            # is set to expire within "EXPIRING_SOON_WINDOW" days (default is 4 weeks).
-                            # Tell the student to reverify.
-                            status = VERIFY_STATUS_NEED_TO_REVERIFY
-                    else:
+                    if IDVerificationService.user_is_verified(user) and verification_expiring_soon:
+                        # The user has an active verification, but the verification
+                        # is set to expire within "EXPIRING_SOON_WINDOW" days (default is 4 weeks).
+                        # Tell the student to reverify.
+                        status = VERIFY_STATUS_NEED_TO_REVERIFY
+                    elif not IDVerificationService.user_is_verified(user):
                         status = VERIFY_STATUS_NEED_TO_VERIFY
                 else:
                     # If a user currently has an active or pending verification,
@@ -213,7 +214,8 @@ def check_verify_status_by_course(user, course_enrollments):
 
                 status_by_course[enrollment.course_id] = {
                     'status': status,
-                    'days_until_deadline': days_until_deadline
+                    'days_until_deadline': days_until_deadline,
+                    'should_display': should_display,
                 }
 
     if recent_verification_datetime:
@@ -402,9 +404,12 @@ def generate_activation_email_context(user, registration):
 def create_or_set_user_attribute_created_on_site(user, site):
     """
     Create or Set UserAttribute indicating the microsite site the user account was created on.
-    User maybe created on 'courses.edx.org', or a white-label site
+    User maybe created on 'courses.edx.org', or a white-label site. Due to the very high
+    traffic on this table we now ignore the default site (eg. 'courses.edx.org') and
+    code which comsumes this attribute should assume a 'created_on_site' which doesn't exist
+    belongs to the default site.
     """
-    if site:
+    if site and site.id != settings.SITE_ID:
         UserAttribute.set_user_attribute(user, 'created_on_site', site.domain)
 
 
@@ -522,7 +527,7 @@ def _cert_info(user, course_overview, cert_status):
         'can_unenroll': status not in DISABLE_UNENROLL_CERT_STATES,
     }
 
-    if not status == default_status and course_overview.end_of_course_survey_url is not None:
+    if status != default_status and course_overview.end_of_course_survey_url is not None:
         status_dict.update({
             'show_survey_button': True,
             'survey_url': process_survey_link(course_overview.end_of_course_survey_url, user)})
@@ -618,8 +623,9 @@ def do_create_account(form, custom_form=None):
     if errors:
         raise ValidationError(errors)
 
+    proposed_username = form.cleaned_data["username"]
     user = User(
-        username=form.cleaned_data["username"],
+        username=proposed_username,
         email=form.cleaned_data["email"],
         is_active=False
     )
@@ -642,12 +648,12 @@ def do_create_account(form, custom_form=None):
         # AccountValidationError and a consistent user message returned (i.e. both should
         # return "It looks like {username} belongs to an existing account. Try again with a
         # different username.")
-        if len(User.objects.filter(username=user.username)) > 0:
+        if User.objects.filter(username=user.username):
             raise AccountValidationError(
-                _("An account with the Public Username '{username}' already exists.").format(username=user.username),
+                USERNAME_EXISTS_MSG_FMT.format(username=proposed_username),
                 field="username"
             )
-        elif len(User.objects.filter(email=user.email)) > 0:
+        elif email_exists_or_retired(user.email):
             raise AccountValidationError(
                 _("An account with the Email '{email}' already exists.").format(email=user.email),
                 field="email"
@@ -675,7 +681,7 @@ def do_create_account(form, custom_form=None):
         profile.meta = json.dumps(extended_profile)
     try:
         profile.save()
-    except Exception:  # pylint: disable=broad-except
+    except Exception:
         log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
         raise
 

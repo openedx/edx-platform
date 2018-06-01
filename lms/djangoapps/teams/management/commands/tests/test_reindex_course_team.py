@@ -21,6 +21,7 @@ class ReindexCourseTeamTest(SharedModuleStoreTestCase):
     """
     Tests for the ReindexCourseTeam command
     """
+    shard = 4
 
     def setUp(self):
         """

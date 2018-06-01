@@ -20,6 +20,7 @@ from fs.path import combine
 from edxval.api import (
     ValCannotCreateError,
     ValVideoNotFoundError,
+    create_video_transcript,
     create_or_update_video_transcript,
     create_profile,
     create_video,
@@ -27,6 +28,7 @@ from edxval.api import (
     get_video_transcript,
     get_video_transcript_data
 )
+from edxval.utils import create_file_in_fs
 from lxml import etree
 from mock import MagicMock, Mock, patch
 from nose.plugins.attrib import attr
@@ -40,8 +42,8 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE, 
 from xmodule.tests.test_import import DummySystem
 from xmodule.tests.test_video import VideoDescriptorTestBase, instantiate_descriptor
 from xmodule.video_module import VideoDescriptor, bumper_utils, rewrite_video_url, video_utils
-from xmodule.video_module.transcripts_utils import Transcript, save_to_store
-from xmodule.video_module.video_module import EXPORT_STATIC_DIR
+from xmodule.video_module.transcripts_utils import Transcript, save_to_store, subs_filename
+from xmodule.video_module.video_module import EXPORT_IMPORT_STATIC_DIR, EXPORT_IMPORT_COURSE_DIR
 from xmodule.x_module import STUDENT_VIEW
 
 from .helpers import BaseTestXmodule
@@ -53,7 +55,7 @@ MODULESTORES = {
     ModuleStoreEnum.Type.split: TEST_DATA_SPLIT_MODULESTORE,
 }
 
-TRANSCRIPT_FILE_DATA = """
+TRANSCRIPT_FILE_SRT_DATA = u"""
 1
 00:00:14,370 --> 00:00:16,530
 I am overwatch.
@@ -63,8 +65,10 @@ I am overwatch.
 可以用“我不太懂艺术 但我知道我喜欢什么”做比喻.
 """
 
+TRANSCRIPT_FILE_SJSON_DATA = """{\n   "start": [10],\n   "end": [100],\n   "text": ["Hi, welcome to edxval."]\n}"""
 
-@attr(shard=1)
+
+@attr(shard=7)
 class TestVideoYouTube(TestVideo):
     METADATA = {}
 
@@ -89,7 +93,6 @@ class TestVideoYouTube(TestVideo):
                 'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'autoplay': False,
                 'streams': '0.75:jNCf2gIqpeE,1.00:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg',
-                'sub': 'a_sub_file.srt.sjson',
                 'sources': sources,
                 'duration': None,
                 'poster': None,
@@ -129,7 +132,7 @@ class TestVideoYouTube(TestVideo):
         )
 
 
-@attr(shard=1)
+@attr(shard=7)
 class TestVideoNonYouTube(TestVideo):
     """Integration tests: web client + mongo."""
     DATA = """
@@ -171,7 +174,6 @@ class TestVideoNonYouTube(TestVideo):
                 'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'autoplay': False,
                 'streams': '1.00:3_yD_cEKoCk',
-                'sub': 'a_sub_file.srt.sjson',
                 'sources': sources,
                 'duration': None,
                 'poster': None,
@@ -211,7 +213,7 @@ class TestVideoNonYouTube(TestVideo):
         )
 
 
-@attr(shard=1)
+@attr(shard=7)
 @ddt.ddt
 class TestGetHtmlMethod(BaseTestXmodule):
     '''
@@ -229,7 +231,6 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'saveStateUrl': '',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
             'streams': '1.00:3_yD_cEKoCk',
-            'sub': 'a_sub_file.srt.sjson',
             'sources': '[]',
             'duration': 111.0,
             'poster': None,
@@ -360,7 +361,6 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 'transcriptAvailableTranslationsUrl': self.get_handler_url('transcript', 'available_translations'),
                 'publishCompletionUrl': self.get_handler_url('publish_completion', ''),
                 'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
-                'sub': data['sub'],
             })
             expected_context.update({
                 'transcript_download_format': (
@@ -987,7 +987,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         self.assertIn("\'poster\': \'null\'", context)
 
 
-@attr(shard=1)
+@attr(shard=7)
 class TestVideoCDNRewriting(BaseTestXmodule):
     """
     Tests for Video CDN.
@@ -1044,7 +1044,7 @@ class TestVideoCDNRewriting(BaseTestXmodule):
         self.assertIsNone(rewrite_video_url("", ""))
 
 
-@attr(shard=1)
+@attr(shard=7)
 @ddt.ddt
 class TestVideoDescriptorInitialization(BaseTestXmodule):
     """
@@ -1203,7 +1203,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         self.assertEqual(context['transcripts_basic_tab_metadata']['video_url']['value'], video_url)
 
 
-@attr(shard=1)
+@attr(shard=7)
 @ddt.ddt
 class TestEditorSavedMethod(BaseTestXmodule):
     """
@@ -1246,7 +1246,6 @@ class TestEditorSavedMethod(BaseTestXmodule):
         # calling editor_saved will generate new file subs_video.srt.sjson for html5_sources
         item.editor_saved(self.user, old_metadata, None)
         self.assertIsInstance(Transcript.get_asset(item.location, 'subs_3_yD_cEKoCk.srt.sjson'), StaticContent)
-        self.assertIsInstance(Transcript.get_asset(item.location, 'subs_video.srt.sjson'), StaticContent)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_editor_saved_when_youtube_and_html5_subs_exist(self, default_store):
@@ -1491,7 +1490,6 @@ class TestVideoDescriptorStudentViewJson(TestCase):
         ({'uk': 1, 'de': 1}, 'en-subs', ['de', 'en'], ['en', 'uk', 'de']),
     )
     @ddt.unpack
-    @patch('openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled', Mock(return_value=True))
     @patch('xmodule.video_module.transcripts_utils.edxval_api.get_available_transcript_languages')
     def test_student_view_with_val_transcripts_enabled(self, transcripts, english_sub, val_transcripts,
                                                        expected_transcripts, mock_get_transcript_languages):
@@ -1504,23 +1502,9 @@ class TestVideoDescriptorStudentViewJson(TestCase):
         student_view_response = self.get_result()
         self.assertItemsEqual(student_view_response['transcripts'].keys(), expected_transcripts)
 
-    @patch(
-        'openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled',
-        Mock(return_value=False),
-    )
-    @patch(
-        'xmodule.video_module.transcripts_utils.edxval_api.get_available_transcript_languages',
-        Mock(return_value=['ro', 'es']),
-    )
-    def test_student_view_with_val_transcripts_disabled(self):
-        """
-        Test `student_view_data` with edx-val transcripts disabled.
-        """
-        student_view_response = self.get_result()
-        self.assertDictEqual(student_view_response['transcripts'], {self.TEST_LANGUAGE: self.transcript_url})
 
-
-@attr(shard=1)
+@attr(shard=7)
+@ddt.ddt
 class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
     """
     Tests for video descriptor that requires access to django settings.
@@ -1530,16 +1514,16 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         self.descriptor.runtime.handler_url = MagicMock()
         self.descriptor.runtime.course_id = MagicMock()
         self.temp_dir = mkdtemp()
-        self.file_system = OSFS(self.temp_dir)
+        file_system = OSFS(self.temp_dir)
+        self.file_system = file_system.makedir(EXPORT_IMPORT_COURSE_DIR, recreate=True)
         self.addCleanup(shutil.rmtree, self.temp_dir)
 
-    def get_video_transcript_data(self, video_id):
+    def get_video_transcript_data(self, video_id, language_code='en', file_format='srt', provider='Custom'):
         return dict(
             video_id=video_id,
-            language_code='ar',
-            url='{media_url}ext101.srt'.format(media_url=settings.MEDIA_URL),   # MEDIA_URL is /static/uploads/
-            provider='Cielo24',
-            file_format='srt',
+            language_code=language_code,
+            provider=provider,
+            file_format=file_format,
         )
 
     def test_get_context(self):
@@ -1575,7 +1559,10 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         """
         language_code = 'ar'
         transcript_file_name = 'test_edx_video_id-ar.srt'
-        expected_transcript_path = combine(self.temp_dir, combine(EXPORT_STATIC_DIR, transcript_file_name))
+        expected_transcript_path = combine(
+            combine(self.temp_dir, EXPORT_IMPORT_COURSE_DIR),
+            combine(EXPORT_IMPORT_STATIC_DIR, transcript_file_name)
+        )
         self.descriptor.edx_video_id = 'test_edx_video_id'
 
         create_profile('mobile')
@@ -1591,41 +1578,103 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
                 'bitrate': 333,
             }],
         })
-        transcript_url = create_or_update_video_transcript(
+        create_or_update_video_transcript(
             video_id=self.descriptor.edx_video_id,
             language_code=language_code,
             metadata={
                 'provider': 'Cielo24',
                 'file_format': 'srt'
             },
-            file_data=ContentFile(TRANSCRIPT_FILE_DATA)
+            file_data=ContentFile(TRANSCRIPT_FILE_SRT_DATA)
         )
 
         actual = self.descriptor.definition_to_xml(resource_fs=self.file_system)
         expected_str = """
-            <video download_video="false" url_name="SampleProblem">
+            <video download_video="false" url_name="SampleProblem" transcripts='{transcripts}'>
                 <video_asset client_video_id="test_client_video_id" duration="111.0" image="">
                     <encoded_video profile="mobile" url="http://example.com/video" file_size="222" bitrate="333"/>
                     <transcripts>
-                        <transcript file_format="srt" file_name='video-transcripts/{transcript_name}' language_code="{language_code}" provider="Cielo24"/>
+                        <transcript file_format="srt" language_code="{language_code}" provider="Cielo24"/>
                     </transcripts>
                 </video_asset>
+                <transcript language="{language_code}" src="{transcript_file}"/>
             </video>
         """.format(
-            transcript_name=transcript_url.split('/')[-1],
-            language_code=language_code
+            language_code=language_code,
+            transcript_file=transcript_file_name,
+            transcripts=json.dumps({language_code: transcript_file_name})
         )
         parser = etree.XMLParser(remove_blank_text=True)
         expected = etree.XML(expected_str, parser=parser)
         self.assertXmlEqual(expected, actual)
 
         # Verify transcript file is created.
-        self.assertEqual([transcript_file_name], self.file_system.listdir(EXPORT_STATIC_DIR))
+        self.assertEqual([transcript_file_name], self.file_system.listdir(EXPORT_IMPORT_STATIC_DIR))
 
         # Also verify the content of created transcript file.
         expected_transcript_content = File(open(expected_transcript_path)).read()
         transcript = get_video_transcript_data(video_id=self.descriptor.edx_video_id, language_code=language_code)
         self.assertEqual(transcript['content'], expected_transcript_content)
+
+    @ddt.data(
+        (['en', 'da'], 'test_sub', ''),
+        (['da'], 'test_sub', 'test_sub')
+    )
+    @ddt.unpack
+    def test_export_val_transcripts_backward_compatibility(self, languages, sub, expected_sub):
+        """
+        Tests new transcripts export for backward compatibility.
+        """
+        self.descriptor.edx_video_id = 'test_video_id'
+        self.descriptor.sub = sub
+
+        # Setup VAL encode profile, video and transcripts
+        create_profile('mobile')
+        create_video({
+            'edx_video_id': self.descriptor.edx_video_id,
+            'client_video_id': 'test_client_video_id',
+            'duration': 111.0,
+            'status': 'dummy',
+            'encoded_videos': [{
+                'profile': 'mobile',
+                'url': 'http://example.com/video',
+                'file_size': 222,
+                'bitrate': 333,
+            }],
+        })
+
+        for language in languages:
+            create_video_transcript(
+                video_id=self.descriptor.edx_video_id,
+                language_code=language,
+                file_format=Transcript.SRT,
+                content=ContentFile(TRANSCRIPT_FILE_SRT_DATA)
+            )
+
+        # Export the video module into xml
+        video_xml = self.descriptor.definition_to_xml(resource_fs=self.file_system)
+
+        # Assert `sub` and `transcripts` attribute in the xml
+        self.assertEqual(video_xml.get('sub'), expected_sub)
+
+        expected_transcripts = {
+            language: "{edx_video_id}-{language}.srt".format(
+                edx_video_id=self.descriptor.edx_video_id,
+                language=language
+            )
+            for language in languages
+        }
+        self.assertDictEqual(json.loads(video_xml.get('transcripts')), expected_transcripts)
+
+        # Assert transcript content from course OLX
+        for language in languages:
+            expected_transcript_path = combine(
+                combine(self.temp_dir, EXPORT_IMPORT_COURSE_DIR),
+                combine(EXPORT_IMPORT_STATIC_DIR, expected_transcripts[language])
+            )
+            expected_transcript_content = File(open(expected_transcript_path)).read()
+            transcript = get_video_transcript_data(video_id=self.descriptor.edx_video_id, language_code=language)
+            self.assertEqual(transcript['content'], expected_transcript_content)
 
     def test_export_val_data_not_found(self):
         """
@@ -1653,22 +1702,67 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         self.assertXmlEqual(expected, actual)
 
     def test_import_val_data_internal(self):
+        """
+        Test that import val data internal works as expected.
+        """
         create_profile('mobile')
         module_system = DummySystem(load_error_modules=True)
 
+        edx_video_id = 'test_edx_video_id'
+        sub_id = '0CzPOIIdUsA'
+        external_transcript_name = 'The_Flash.srt'
+        external_transcript_language_code = 'ur'
+        val_transcript_language_code = 'ar'
+        val_transcript_provider = 'Cielo24'
+        external_transcripts = {
+            external_transcript_language_code: external_transcript_name
+        }
+
+        # Create static directory in import file system and place transcript files inside it.
+        module_system.resources_fs.makedirs(EXPORT_IMPORT_STATIC_DIR, recreate=True)
+
+        # Create VAL transcript.
+        create_file_in_fs(
+            TRANSCRIPT_FILE_SRT_DATA,
+            'test_edx_video_id-ar.srt',
+            module_system.resources_fs,
+            EXPORT_IMPORT_STATIC_DIR
+        )
+
+        # Create self.sub and self.transcripts transcript.
+        create_file_in_fs(
+            TRANSCRIPT_FILE_SRT_DATA,
+            subs_filename(sub_id, self.descriptor.transcript_language),
+            module_system.resources_fs,
+            EXPORT_IMPORT_STATIC_DIR
+        )
+        create_file_in_fs(
+            TRANSCRIPT_FILE_SRT_DATA,
+            external_transcript_name,
+            module_system.resources_fs,
+            EXPORT_IMPORT_STATIC_DIR
+        )
+
         xml_data = """
-            <video edx_video_id="test_edx_video_id">
+            <video edx_video_id='{edx_video_id}' sub='{sub_id}' transcripts='{transcripts}'>
                 <video_asset client_video_id="test_client_video_id" duration="111.0">
                     <encoded_video profile="mobile" url="http://example.com/video" file_size="222" bitrate="333"/>
                     <transcripts>
-                        <transcript file_format="srt" file_name="ext101.srt" language_code="ar" provider="Cielo24"  video_id="test_edx_video_id"/>
+                        <transcript file_format="srt" language_code="{val_transcript_language_code}" provider="{val_transcript_provider}"/>
                     </transcripts>
                 </video_asset>
             </video>
-        """
+        """.format(
+            edx_video_id=edx_video_id,
+            sub_id=sub_id,
+            transcripts=json.dumps(external_transcripts),
+            val_transcript_language_code=val_transcript_language_code,
+            val_transcript_provider=val_transcript_provider
+        )
         id_generator = Mock()
         id_generator.target_course_id = "test_course_id"
         video = self.descriptor.from_xml(xml_data, module_system, id_generator)
+
         self.assertEqual(video.edx_video_id, 'test_edx_video_id')
         video_data = get_video_info(video.edx_video_id)
         self.assertEqual(video_data['client_video_id'], 'test_client_video_id')
@@ -1679,10 +1773,246 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         self.assertEqual(video_data['encoded_videos'][0]['url'], 'http://example.com/video')
         self.assertEqual(video_data['encoded_videos'][0]['file_size'], 222)
         self.assertEqual(video_data['encoded_videos'][0]['bitrate'], 333)
-        # verify transcript data
-        self.assertDictEqual(
-            get_video_transcript(video.edx_video_id, 'ar'),
-            self.get_video_transcript_data('test_edx_video_id')
+
+        # Verify that VAL transcript is imported.
+        self.assertDictContainsSubset(
+            self.get_video_transcript_data(
+                edx_video_id,
+                language_code=val_transcript_language_code,
+                provider=val_transcript_provider
+            ),
+            get_video_transcript(video.edx_video_id, val_transcript_language_code)
+        )
+
+        # Verify that transcript from sub field is imported.
+        self.assertDictContainsSubset(
+            self.get_video_transcript_data(
+                edx_video_id,
+                language_code=self.descriptor.transcript_language
+            ),
+            get_video_transcript(video.edx_video_id, self.descriptor.transcript_language)
+        )
+
+        # Verify that transcript from transcript field is imported.
+        self.assertDictContainsSubset(
+            self.get_video_transcript_data(
+                edx_video_id,
+                language_code=external_transcript_language_code
+            ),
+            get_video_transcript(video.edx_video_id, external_transcript_language_code)
+        )
+
+    def test_import_no_video_id(self):
+        """
+        Test that importing a video with no video id, creates a new external video.
+        """
+        xml_data = """<video><video_asset></video_asset></video>"""
+        module_system = DummySystem(load_error_modules=True)
+        id_generator = Mock()
+
+        # Verify edx_video_id is empty before.
+        self.assertEqual(self.descriptor.edx_video_id, u'')
+
+        video = self.descriptor.from_xml(xml_data, module_system, id_generator)
+
+        # Verify edx_video_id is populated after the import.
+        self.assertNotEqual(video.edx_video_id, u'')
+
+        video_data = get_video_info(video.edx_video_id)
+        self.assertEqual(video_data['client_video_id'], 'External Video')
+        self.assertEqual(video_data['duration'], 0.0)
+        self.assertEqual(video_data['status'], 'external')
+
+    def test_import_val_transcript(self):
+        """
+        Test that importing a video with val transcript, creates a new transcript record.
+        """
+        edx_video_id = 'test_edx_video_id'
+        val_transcript_language_code = 'es'
+        val_transcript_provider = 'Cielo24'
+        xml_data = """
+        <video edx_video_id='{edx_video_id}'>
+            <video_asset client_video_id="test_client_video_id" duration="111.0">
+                <transcripts>
+                    <transcript file_format="srt" language_code="{val_transcript_language_code}" provider="{val_transcript_provider}"/>
+                </transcripts>
+            </video_asset>
+        </video>
+        """.format(
+            edx_video_id=edx_video_id,
+            val_transcript_language_code=val_transcript_language_code,
+            val_transcript_provider=val_transcript_provider
+        )
+        module_system = DummySystem(load_error_modules=True)
+        id_generator = Mock()
+
+        # Create static directory in import file system and place transcript files inside it.
+        module_system.resources_fs.makedirs(EXPORT_IMPORT_STATIC_DIR, recreate=True)
+
+        # Create VAL transcript.
+        create_file_in_fs(
+            TRANSCRIPT_FILE_SRT_DATA,
+            'test_edx_video_id-es.srt',
+            module_system.resources_fs,
+            EXPORT_IMPORT_STATIC_DIR
+        )
+
+        # Verify edx_video_id is empty before.
+        self.assertEqual(self.descriptor.edx_video_id, u'')
+
+        video = self.descriptor.from_xml(xml_data, module_system, id_generator)
+
+        # Verify edx_video_id is populated after the import.
+        self.assertNotEqual(video.edx_video_id, u'')
+
+        video_data = get_video_info(video.edx_video_id)
+        self.assertEqual(video_data['status'], 'imported')
+
+        # Verify that VAL transcript is imported.
+        self.assertDictContainsSubset(
+            self.get_video_transcript_data(
+                edx_video_id,
+                language_code=val_transcript_language_code,
+                provider=val_transcript_provider
+            ),
+            get_video_transcript(video.edx_video_id, val_transcript_language_code)
+        )
+
+    @ddt.data(
+        (
+            'test_sub_id',
+            {'en': 'The_Flash.srt'},
+            '<transcripts><transcript file_format="srt" language_code="en" provider="Cielo24"/></transcripts>',
+            # VAL transcript takes priority
+            {
+                'video_id': u'test_edx_video_id',
+                'language_code': u'en',
+                'file_format': 'srt',
+                'provider': 'Cielo24'
+            }
+        ),
+        (
+            '',
+            {'en': 'The_Flash.srt'},
+            '<transcripts><transcript file_format="srt" language_code="en" provider="Cielo24"/></transcripts>',
+            # VAL transcript takes priority
+            {
+                'video_id': u'test_edx_video_id',
+                'language_code': u'en',
+                'file_format': 'srt',
+                'provider': 'Cielo24'
+            }
+        ),
+        (
+            'test_sub_id',
+            {},
+            '<transcripts><transcript file_format="srt" language_code="en" provider="Cielo24"/></transcripts>',
+            # VAL transcript takes priority
+            {
+                'video_id': u'test_edx_video_id',
+                'language_code': u'en',
+                'file_format': 'srt',
+                'provider': 'Cielo24'
+            }
+        ),
+        (
+            'test_sub_id',
+            {'en': 'The_Flash.srt'},
+            '',
+            # self.sub transcript takes priority
+            {
+                'video_id': u'test_edx_video_id',
+                'language_code': u'en',
+                'file_format': 'sjson',
+                'provider': 'Custom'
+            }
+        ),
+        (
+            '',
+            {'en': 'The_Flash.srt'},
+            '',
+            # self.transcripts would be saved.
+            {
+                'video_id': u'test_edx_video_id',
+                'language_code': u'en',
+                'file_format': 'srt',
+                'provider': 'Custom'
+            }
+        )
+    )
+    @ddt.unpack
+    def test_import_val_transcript_priority(self, sub_id, external_transcripts, val_transcripts, expected_transcript):
+        """
+        Test that importing a video with different type of transcripts for same language,
+        creates expected transcript record.
+        """
+        edx_video_id = 'test_edx_video_id'
+        language_code = 'en'
+
+        module_system = DummySystem(load_error_modules=True)
+        id_generator = Mock()
+
+        # Create static directory in import file system and place transcript files inside it.
+        module_system.resources_fs.makedirs(EXPORT_IMPORT_STATIC_DIR, recreate=True)
+
+        xml_data = "<video edx_video_id='test_edx_video_id'"
+
+        # Prepare self.sub transcript data.
+        if sub_id:
+            create_file_in_fs(
+                TRANSCRIPT_FILE_SJSON_DATA,
+                subs_filename(sub_id, language_code),
+                module_system.resources_fs,
+                EXPORT_IMPORT_STATIC_DIR
+            )
+            xml_data += " sub='{sub_id}'".format(
+                sub_id=sub_id
+            )
+
+        # Prepare self.transcripts transcripts data.
+        if external_transcripts:
+            create_file_in_fs(
+                TRANSCRIPT_FILE_SRT_DATA,
+                external_transcripts['en'],
+                module_system.resources_fs,
+                EXPORT_IMPORT_STATIC_DIR
+            )
+            xml_data += " transcripts='{transcripts}'".format(
+                transcripts=json.dumps(external_transcripts),
+            )
+
+        xml_data += '><video_asset client_video_id="test_client_video_id" duration="111.0">'
+
+        # Prepare VAL transcripts data.
+        if val_transcripts:
+            create_file_in_fs(
+                TRANSCRIPT_FILE_SRT_DATA,
+                '{edx_video_id}-{language_code}.srt'.format(
+                    edx_video_id=edx_video_id,
+                    language_code=language_code
+                ),
+                module_system.resources_fs,
+                EXPORT_IMPORT_STATIC_DIR
+            )
+            xml_data += val_transcripts
+
+        xml_data += '</video_asset></video>'
+
+        # Verify edx_video_id is empty before import.
+        self.assertEqual(self.descriptor.edx_video_id, u'')
+
+        video = self.descriptor.from_xml(xml_data, module_system, id_generator)
+
+        # Verify edx_video_id is not empty after import.
+        self.assertNotEqual(video.edx_video_id, u'')
+
+        video_data = get_video_info(video.edx_video_id)
+        self.assertEqual(video_data['status'], 'imported')
+
+        # Verify that correct transcripts are imported.
+        self.assertDictContainsSubset(
+            expected_transcript,
+            get_video_transcript(video.edx_video_id, language_code)
         )
 
     def test_import_val_data_invalid(self):
@@ -1789,7 +2119,6 @@ class TestVideoWithBumper(TestVideo):
                 'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'autoplay': False,
                 'streams': '0.75:jNCf2gIqpeE,1.00:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg',
-                'sub': 'a_sub_file.srt.sjson',
                 'sources': sources,
                 'poster': None,
                 'duration': None,
@@ -1861,7 +2190,6 @@ class TestAutoAdvanceVideo(TestVideo):
                 'saveStateUrl': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'autoplay': False,
                 'streams': '0.75:jNCf2gIqpeE,1.00:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg',
-                'sub': 'a_sub_file.srt.sjson',
                 'sources': [u'example.mp4', u'example.webm'],
                 'duration': None,
                 'poster': None,

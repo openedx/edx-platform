@@ -12,6 +12,7 @@ class MobileContextProcessorTests(TestCase):
     """
     Tests for the configuration context processor.
     """
+    shard = 4
 
     def test_is_from_mobile_app(self):
         """

@@ -152,7 +152,7 @@ class TestSAMLCommand(TestCase):
             saml_provider_config={
                 "site__domain": "second.testserver.fake",
                 "site__name": "testserver.fake",
-                "idp_slug": "second-test-shib",
+                "slug": "second-test-shib",
                 "entity_id": "https://idp.testshib.org/idp/another-shibboleth",
                 "metadata_source": "https://www.testshib.org/metadata/another-testshib-providers.xml",
             }
@@ -167,7 +167,7 @@ class TestSAMLCommand(TestCase):
             saml_provider_config={
                 "site__domain": "third.testserver.fake",
                 "site__name": "testserver.fake",
-                "idp_slug": "third-test-shib",
+                "slug": "third-test-shib",
                 # Note: This entity id will not be present in returned response and will cause failed update.
                 "entity_id": "https://idp.testshib.org/idp/non-existent-shibboleth",
                 "metadata_source": "https://www.testshib.org/metadata/third/testshib-providers.xml",
@@ -188,7 +188,7 @@ class TestSAMLCommand(TestCase):
             saml_provider_config={
                 "site__domain": "fourth.testserver.fake",
                 "site__name": "testserver.fake",
-                "idp_slug": "fourth-test-shib",
+                "slug": "fourth-test-shib",
                 "automatic_refresh_enabled": False,
                 # Note: This invalid entity id will not be present in the refresh set
                 "entity_id": "https://idp.testshib.org/idp/fourth-shibboleth",
@@ -242,7 +242,7 @@ class TestSAMLCommand(TestCase):
             },
             saml_provider_config={
                 "site__domain": "third.testserver.fake",
-                "idp_slug": "third-test-shib",
+                "slug": "third-test-shib",
                 # Note: This entity id will not be present in returned response and will cause failed update.
                 "entity_id": "https://idp.testshib.org/idp/non-existent-shibboleth",
                 "metadata_source": "https://www.testshib.org/metadata/third/testshib-providers.xml",
