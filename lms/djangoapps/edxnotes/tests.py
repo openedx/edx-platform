@@ -532,23 +532,26 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
 
     @override_settings(EDXNOTES_PUBLIC_API="http://example.com")
     @override_settings(EDXNOTES_INTERNAL_API="http://example.com")
+    @patch("edxnotes.helpers.anonymous_id_for_user", autospec=True)
+    @patch("edxnotes.helpers.get_edxnotes_id_token", autospec=True)
     @patch("edxnotes.helpers.requests.delete")
-    def test_delete_all_notes_for_user(self, mock_delete):
+    def test_delete_all_notes_for_user(self, mock_delete, mock_get_id_token, mock_anonymous_id_for_user):
         """
         Test GDPR data deletion for Notes user_id
         """
-        with mock.patch('edxnotes.helpers.get_edxnotes_id_token', return_value="test_token"):
-            helpers.delete_all_notes_for_user(user=self.user, user_id="anonymous_id")
-            mock_delete.assert_called_with(
-                url='http://example.com/',
-                headers={
-                    'x-annotator-auth-token': 'test_token'
-                },
-                data={
-                    'user_id': 'anonymous_id'
-                },
-                timeout=(settings.EDXNOTES_CONNECT_TIMEOUT, settings.EDXNOTES_READ_TIMEOUT)
-            )
+        mock_anonymous_id_for_user.return_value = "anonymous_id"
+        mock_get_id_token.return_value = "test_token"
+        helpers.delete_all_notes_for_user(self.user)
+        mock_delete.assert_called_with(
+            url='http://example.com/',
+            headers={
+                'x-annotator-auth-token': 'test_token'
+            },
+            data={
+                'user_id': 'anonymous_id'
+            },
+            timeout=(settings.EDXNOTES_CONNECT_TIMEOUT, settings.EDXNOTES_READ_TIMEOUT)
+        )
 
     def test_preprocess_collection_no_item(self):
         """
