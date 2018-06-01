@@ -2094,7 +2094,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=454 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=456 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2596,7 +2596,7 @@ CREATE TABLE `enterprise_enterprisecustomercatalog` (
   `uuid` char(32) NOT NULL,
   `enterprise_customer_id` char(32) NOT NULL,
   `content_filter` longtext,
-  `title` varchar(20) NOT NULL,
+  `title` varchar(255) NOT NULL,
   `enabled_course_modes` longtext NOT NULL,
   `publish_audit_enrollment_urls` tinyint(1) NOT NULL,
   PRIMARY KEY (`uuid`),
@@ -2762,7 +2762,7 @@ CREATE TABLE `enterprise_historicalenterprisecustomercatalog` (
   `enterprise_customer_id` char(32) DEFAULT NULL,
   `history_user_id` int(11) DEFAULT NULL,
   `content_filter` longtext,
-  `title` varchar(20) NOT NULL,
+  `title` varchar(255) NOT NULL,
   `enabled_course_modes` longtext NOT NULL,
   `history_change_reason` varchar(100) DEFAULT NULL,
   `publish_audit_enrollment_urls` tinyint(1) NOT NULL,
