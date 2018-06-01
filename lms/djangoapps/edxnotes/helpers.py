@@ -121,11 +121,11 @@ def send_request(user, course_id, page, page_size, path="", text=None):
     return response
 
 
-def delete_all_notes_for_user(user, user_id):
+def delete_all_notes_for_user(user):
     """
-    helper method to delete all notes for a user_id, as part of GDPR compliance
+    helper method to delete all notes for a user, as part of GDPR compliance
 
-    :param user_id: The user object associated with the deleted notes
+    :param user: The user object associated with the deleted notes
     :return: response (requests) object
 
     Raises:
@@ -136,7 +136,7 @@ def delete_all_notes_for_user(user, user_id):
         "x-annotator-auth-token": get_edxnotes_id_token(user),
     }
     data = {
-        "user_id": user_id
+        "user_id": anonymous_id_for_user(user, None)
     }
     try:
         response = requests.delete(

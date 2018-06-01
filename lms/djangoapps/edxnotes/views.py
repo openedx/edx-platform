@@ -256,7 +256,7 @@ class RetireUserView(APIView):
         username = request.data['username']
         try:
             retirement = UserRetirementStatus.get_retirement_for_retirement_action(username)
-            delete_all_notes_for_user(retirement.user, retirement.user.id)
+            delete_all_notes_for_user(retirement.user)
         except UserRetirementStatus.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         except RetirementStateError as exc:
