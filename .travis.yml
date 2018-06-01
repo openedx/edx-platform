@@ -18,6 +18,11 @@ env:
   - TEST_SUITE="commonlib-unit"
   - TEST_SUITE="js-unit"
 
+matrix:
+  fast_finish: true
+  allow_failures:
+    - env: TEST_SUITE="js-unit"
+
 branches:
   only:
   - master
