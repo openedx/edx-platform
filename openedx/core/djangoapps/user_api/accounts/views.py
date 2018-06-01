@@ -11,9 +11,12 @@ from functools import wraps
 import pytz
 from consent.models import DataSharingConsent
 from django.contrib.auth import authenticate, get_user_model, logout
+from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.db import transaction
 from django.utils.translation import ugettext as _
+from edx_ace import ace
+from edx_ace.recipient import Recipient
 from edx_rest_framework_extensions.authentication import JwtAuthentication
 from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomerUser, PendingEnterpriseCustomerUser
 from integrated_channels.degreed.models import DegreedLearnerDataTransmissionAudit
@@ -31,6 +34,7 @@ from wiki.models.pluginbase import RevisionPluginRevision
 
 from entitlements.models import CourseEntitlement
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
 from openedx.core.djangoapps.credit.models import CreditRequirementStatus, CreditRequest
 from openedx.core.djangoapps.course_groups.models import UnregisteredLearnerCohortAssignments
@@ -67,6 +71,7 @@ from .api import get_account_settings, update_account_settings
 from .permissions import CanDeactivateUser, CanRetireUser
 from .serializers import UserRetirementStatusSerializer
 from .signals import USER_RETIRE_MAILINGS
+from ..message_types import DeletionNotificationMessage
 
 log = logging.getLogger(__name__)
 
@@ -421,6 +426,7 @@ class DeactivateLogoutView(APIView):
                 # Unlink LMS social auth accounts
                 UserSocialAuth.objects.filter(user_id=request.user.id).delete()
                 # Change LMS password & email
+                user_email = request.user.email
                 request.user.email = get_retired_email_by_email(request.user.email)
                 request.user.save()
                 _set_unusable_password(request.user)
@@ -431,6 +437,22 @@ class DeactivateLogoutView(APIView):
                 # Delete OAuth tokens associated with the user.
                 retire_dop_oauth2_models(request.user)
                 retire_dot_oauth2_models(request.user)
+
+                try:
+                    # Send notification email to user
+                    site = Site.objects.get_current()
+                    notification_context = get_base_template_context(site)
+                    notification_context.update({'full_name': request.user.profile.name})
+                    notification = DeletionNotificationMessage().personalize(
+                        recipient=Recipient(username='', email_address=user_email),
+                        language=request.user.profile.language,
+                        user_context=notification_context,
+                    )
+                    ace.send(notification)
+                except Exception as exc:
+                    log.exception('Error sending out deletion notification email')
+                    raise
+
                 # Log the user out.
                 logout(request)
             return Response(status=status.HTTP_204_NO_CONTENT)
