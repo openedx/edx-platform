@@ -54,6 +54,7 @@ set -e
 # or else no tests will be executed.
 SHARD=${SHARD:="all"}
 NUMBER_OF_BOKCHOY_THREADS=${NUMBER_OF_BOKCHOY_THREADS:=1}
+TARGET_BRANCH=${TARGET_BRANCH:="origin/master"}
 
 # Clean up previous builds
 git clean -qxfd
@@ -90,7 +91,7 @@ case "$TEST_SUITE" in
         paver run_xsscommitlint > xsscommitlint.log || { cat xsscommitlint.log; EXIT=1; }
         # Run quality task. Pass in the 'fail-under' percentage to diff-quality
         echo "Running diff quality."
-        paver run_quality -p 100 || EXIT=1
+        paver run_quality -p 100 -b $TARGET_BRANCH || EXIT=1
 
         # Need to create an empty test result so the post-build
         # action doesn't fail the build.
@@ -131,7 +132,7 @@ case "$TEST_SUITE" in
 
     "js-unit")
         paver test_js --coverage
-        paver diff_coverage
+        paver diff_coverage -b $TARGET_BRANCH
         ;;
 
     "commonlib-js-unit")

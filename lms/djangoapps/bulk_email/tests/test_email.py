@@ -139,7 +139,6 @@ class SendEmailWithMockedUgettextMixin(object):
     Mock uggetext for EmailSendFromDashboardTestCase.
     """
 
-
     def send_email(self):
         """
         Sends a dummy email to check the `from_addr` translation.
@@ -164,10 +163,8 @@ class SendEmailWithMockedUgettextMixin(object):
                 text=text,
             )
 
-
         with patch('bulk_email.tasks._', side_effect=mock_ugettext):
             self.client.post(self.send_mail_url, test_email)
-
 
         return mail.outbox[0]
 
@@ -223,7 +220,6 @@ class LocalizedFromAddressCourseLangTestCase(SendEmailWithMockedUgettextMixin, E
             language='ar',
             default_store=ModuleStoreEnum.Type.split
         )
-
 
     def test_esperanto_platform_arabic_course(self):
         """
