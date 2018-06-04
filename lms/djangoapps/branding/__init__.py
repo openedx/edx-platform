@@ -16,7 +16,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
-def get_visible_courses(org=None, filter_=None):
+def get_visible_courses(org=None, filter_=None, exclude_=None):
     """
     Return the set of CourseOverviews that should be visible in this branded
     instance.
@@ -26,6 +26,8 @@ def get_visible_courses(org=None, filter_=None):
             filtering by organization.
         filter_ (dict): Optional parameter that allows custom filtering by
             fields on the course.
+        exclude_ (dict): Optional parameter that allows custom excludes by
+            fields on the course.
     """
     current_site_org = configuration_helpers.get_value('course_org_filter')
 
@@ -34,13 +36,14 @@ def get_visible_courses(org=None, filter_=None):
         courses = CourseOverview.get_all_courses(
             org=org,
             filter_=filter_,
+            exclude_=exclude_,
         ) if org == current_site_org else []
     else:
         # We only make it to this point if one of org or current_site_org is defined.
         # If both org and current_site_org were defined, the code would have fallen into the
         # first branch of the conditional above, wherein an equality check is performed.
         target_org = org or current_site_org
-        courses = CourseOverview.get_all_courses(org=target_org, filter_=filter_)
+        courses = CourseOverview.get_all_courses(org=target_org, filter_=filter_, exclude_=exclude_)
 
     courses = sorted(courses, key=lambda course: course.number)
 
