@@ -48,7 +48,7 @@ class DjangoXBlockUserService(UserService):
             return None
 
         try:
-            user = get_user_by_username_or_email(username_or_email=username)
+            user = User.objects.get(username=username)
         except User.DoesNotExist:
             return None
 

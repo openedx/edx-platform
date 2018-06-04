@@ -593,7 +593,7 @@ def get_user_group_ids(course_id, content, user=None):
     if course_id is not None:
         if content.get('username'):
             try:
-                content_user = get_user_by_username_or_email(content.get('username'))
+                content_user = User.objects.get(username=content.get('username'))
                 content_user_group_id = get_group_id_for_user_from_cache(content_user, course_id)
             except User.DoesNotExist:
                 content_user_group_id = None
