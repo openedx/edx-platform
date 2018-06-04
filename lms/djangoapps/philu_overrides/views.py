@@ -179,10 +179,8 @@ def courses_custom(request):
     programs_list = []
     course_discovery_meanings = getattr(settings, 'COURSE_DISCOVERY_MEANINGS', {})
     if not settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
-        current_date = datetime.now(utc)
-        courses_list = get_courses(request.user, filter_={
-            'end__gte': current_date.date() - timedelta(days=1)
-        })
+        current_date = datetime.utcnow()
+        courses_list = get_courses(request.user, filter_={'end__isnull': False}, exclude_={'end__lte': current_date})
 
         if configuration_helpers.get_value("ENABLE_COURSE_SORTING_BY_START_DATE",
                                            settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"]):
@@ -201,7 +199,7 @@ def courses_custom(request):
     if request.user.is_authenticated():
         add_tag_to_enrolled_courses(request.user, courses_list)
 
-    for course in  courses_list:
+    for course in courses_list:
         course_key = SlashSeparatedCourseKey.from_deprecated_string(
                 course.id.to_deprecated_string())
         with modulestore().bulk_operations(course_key):
