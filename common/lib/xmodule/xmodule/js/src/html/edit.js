@@ -1289,8 +1289,9 @@
 
     HTMLEditingDescriptor.prototype.editImageSubmit = function(event) {
       if (event.detail) {
-        return this.saveImageFromModal(event.detail);
+        this.saveImageFromModal(event.detail);
       }
+      return this.closeImageModal();
     };
 
     HTMLEditingDescriptor.prototype.editLink = function(data) {
