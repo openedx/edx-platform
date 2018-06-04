@@ -446,7 +446,7 @@ class CourseOverview(TimeStampedModel):
         return course_overviews
 
     @classmethod
-    def get_all_courses(cls, org=None, filter_=None):
+    def get_all_courses(cls, org=None, filter_=None, exclude_=None):
         """
         Returns all CourseOverview objects in the database.
 
@@ -454,6 +454,7 @@ class CourseOverview(TimeStampedModel):
             org (string): Optional parameter that allows case-insensitive
                 filtering by organization.
             filter_ (dict): Optional parameter that allows custom filtering.
+            exclude_ (dict): Optional parameter that allows custom excludes.
         """
         # Note: If a newly created course is not returned in this QueryList,
         # make sure the "publish" signal was emitted when the course was
@@ -468,6 +469,9 @@ class CourseOverview(TimeStampedModel):
 
         if filter_:
             course_overviews = course_overviews.filter(**filter_)
+
+        if exclude_:
+            course_overviews = course_overviews.exclude(**exclude_)
 
         return course_overviews
 
