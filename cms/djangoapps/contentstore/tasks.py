@@ -38,6 +38,7 @@ import dogstats_wrapper as dog_stats_api
 from contentstore.courseware_index import CoursewareSearchIndexer, LibrarySearchIndexer, SearchIndexingError
 from contentstore.storage import course_import_export_storage
 from contentstore.utils import initialize_permissions, reverse_usage_url
+from contentstore.qti_converter import convert_to_olx
 from course_action_state.models import CourseRerunState
 from models.settings.course_metadata import CourseMetadata
 from openedx.core.djangoapps.embargo.models import CountryAccessRule, RestrictedCourse
@@ -698,6 +699,9 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
         finally:
             tar_file.close()
 
+		if os.path.isfile(course_dir + u'/imsmanifest.xml'):
+			convert_to_olx(course_dir + u'/')
+		
         LOGGER.info(u'Course import %s: Uploaded file extracted', courselike_key)
         self.status.set_state(u'Verifying')
         self.status.increment_completed_steps()
