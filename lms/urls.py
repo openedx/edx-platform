@@ -101,6 +101,8 @@ urlpatterns = (
     # URLs for managing dark launches of languages
     url(r'^update_lang/', include('openedx.core.djangoapps.dark_lang.urls', namespace='dark_lang')),
 
+    url(r'^embed_player/', include('azure_media_services.urls')),
+
     # URLs for API access management
     url(r'^api-admin/', include('openedx.core.djangoapps.api_admin.urls', namespace='api_admin')),
 )

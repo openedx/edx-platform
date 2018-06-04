@@ -61,6 +61,8 @@ urlpatterns = patterns(
         name='session_language'
     ),
 
+    url(r'^embed_player/', include('azure_media_services.urls')),
+
     # Darklang View to change the preview language (or dark language)
     url(r'^update_lang/', include('openedx.core.djangoapps.dark_lang.urls', namespace='dark_lang')),
 )
