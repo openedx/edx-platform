@@ -366,6 +366,18 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
                       a_link_end=HTML("</a>")
                     )}</span>
                 </li>
+                  % if sidebar_html_enabled:
+                  <li class="field text" id="field-course-about-sidebar-html">
+                      <label for="course-about-sidebar-html">${_("Course About Sidebar HTML")}
+                          <textarea class="tinymce text-editor" id="course-about-sidebar-html" aria-describedby="tip-course-about-sidebar-html"></textarea>
+                      </label>
+                      <span class="tip tip-stacked" id="tip-course-about-sidebar-html">${
+                      Text(_("Custom sidebar content for {a_link_start}your course summary page{a_link_end} (formatted in HTML)")).format(
+                        a_link_start=HTML("<a class='link-courseURL' rel='external' href='{lms_link_for_about_page}'>").format(lms_link_for_about_page=lms_link_for_about_page),
+                        a_link_end=HTML("</a>")
+                      )}</span>
+                  </li>
+                  % endif
                 % endif
 
                 <li class="field image" id="field-course-image">

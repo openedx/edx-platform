@@ -27,6 +27,7 @@ ABOUT_ATTRIBUTES = [
     'entrance_exam_enabled',
     'entrance_exam_id',
     'entrance_exam_minimum_score_pct',
+    'about_sidebar_html',
 ]
 
 
@@ -52,6 +53,7 @@ class CourseDetails(object):
         self.description = ""
         self.short_description = ""
         self.overview = ""  # html to render as the overview
+        self.about_sidebar_html = ""
         self.intro_video = None  # a video pointer
         self.effort = None  # hours/week
         self.license = "all-rights-reserved"  # default course license is all rights reserved

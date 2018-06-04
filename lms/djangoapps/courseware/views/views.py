@@ -90,6 +90,8 @@ from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, course_home_url_name
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from openedx.features.course_experience.views.course_dates import CourseDatesFragmentView
+from openedx.features.course_experience.waffle import waffle as course_experience_waffle
+from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 from shoppingcart.utils import is_shopping_cart_enabled
 from student.models import CourseEnrollment, UserTestGroup
@@ -835,6 +837,8 @@ def course_about(request, course_id):
         # Overview
         overview = CourseOverview.get_from_id(course.id)
 
+        sidebar_html_enabled = course_experience_waffle().is_enabled(ENABLE_COURSE_ABOUT_SIDEBAR_HTML)
+
         # This local import is due to the circularity of lms and openedx references.
         # This may be resolved by using stevedore to allow web fragments to be used
         # as plugins, and to avoid the direct import.
@@ -872,6 +876,7 @@ def course_about(request, course_id):
             'pre_requisite_courses': pre_requisite_courses,
             'course_image_urls': overview.image_urls,
             'reviews_fragment_view': reviews_fragment_view,
+            'sidebar_html_enabled': sidebar_html_enabled,
         }
 
         return render_to_response('courseware/course_about.html', context)

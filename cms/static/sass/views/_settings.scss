@@ -507,8 +507,10 @@
     }
 
     // specific fields - overview
-    #field-course-overview {
-      #course-overview {
+    #field-course-overview,
+    #field-course-about-sidebar-html {
+      #course-overview,
+      #course-about-sidebar-html {
         height: ($baseline*20);
       }
 

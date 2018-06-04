@@ -224,6 +224,7 @@ def get_course_about_section(request, course, section_key):
 
     Valid keys:
     - overview
+    - about_sidebar_html
     - short_description
     - description
     - key_dates (includes start, end, exams, etc)
@@ -259,6 +260,7 @@ def get_course_about_section(request, course, section_key):
         'effort',
         'end_date',
         'prerequisites',
+        'about_sidebar_html',
         'ocw_links'
     }
 
