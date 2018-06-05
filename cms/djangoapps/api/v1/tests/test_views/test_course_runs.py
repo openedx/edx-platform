@@ -3,7 +3,7 @@ import datetime
 import ddt
 import pytz
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import RequestFactory
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.lib.courses import course_image_url

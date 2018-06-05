@@ -10,7 +10,7 @@ from uuid import uuid4
 import mock
 from bs4 import BeautifulSoup
 from django.conf import settings
-from django.core.urlresolvers import reverse, reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.test import override_settings
 
 from lms.envs.test import CREDENTIALS_PUBLIC_SERVICE_URL

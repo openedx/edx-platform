@@ -9,7 +9,7 @@ import urllib
 import waffle
 from babel.dates import format_datetime
 from django.contrib.auth.decorators import login_required
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import transaction
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect

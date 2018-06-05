@@ -4,7 +4,7 @@ import json
 
 import ddt
 import mock
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from nose.plugins.attrib import attr
 
 from course_modes.models import CourseMode

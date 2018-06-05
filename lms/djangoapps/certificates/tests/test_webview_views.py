@@ -8,7 +8,7 @@ from urllib import urlencode
 from uuid import uuid4
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
 from django.utils import translation

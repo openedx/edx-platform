@@ -5,7 +5,7 @@ from datetime import datetime
 from urllib import urlencode
 
 import ddt
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
 from mock import patch
 from opaque_keys import InvalidKeyError

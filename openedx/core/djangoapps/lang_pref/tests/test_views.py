@@ -4,7 +4,7 @@ Tests: lang pref views
 import json
 from django.test import TestCase
 from django.test.client import RequestFactory
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from student.tests.factories import UserFactory
 from django.utils.translation import LANGUAGE_SESSION_KEY
 from django.contrib.sessions.middleware import SessionMiddleware

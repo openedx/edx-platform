@@ -9,7 +9,7 @@ import time
 import six
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.urlresolvers import NoReverseMatch, reverse
+from django.urls import NoReverseMatch, reverse
 from django.dispatch import Signal
 from django.utils.http import cookie_date
 

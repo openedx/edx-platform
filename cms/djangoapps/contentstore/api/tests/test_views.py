@@ -8,7 +8,7 @@ import tempfile
 from datetime import datetime
 from urllib import urlencode
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from path import Path as path
 from mock import patch
 from rest_framework import status

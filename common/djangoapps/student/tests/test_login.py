@@ -8,7 +8,7 @@ import httpretty
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
-from django.core.urlresolvers import NoReverseMatch, reverse
+from django.urls import NoReverseMatch, reverse
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.test import TestCase
 from django.test.client import Client

@@ -17,7 +17,7 @@ from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME, authenticate, login
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.validators import validate_email
 from django.db import transaction
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect

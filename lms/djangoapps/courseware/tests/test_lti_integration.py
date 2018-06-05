@@ -7,7 +7,7 @@ from collections import OrderedDict
 import mock
 import pytest
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 import oauthlib
 from courseware.tests.helpers import BaseTestXmodule

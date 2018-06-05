@@ -10,7 +10,7 @@ import textwrap
 from uuid import uuid4
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test.utils import override_settings
 from edxval.api import create_video
 from opaque_keys.edx.keys import UsageKey

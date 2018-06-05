@@ -5,7 +5,7 @@ import datetime
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.test.client import RequestFactory
 from django.test.utils import override_settings

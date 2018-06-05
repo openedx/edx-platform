@@ -11,7 +11,7 @@ import unittest
 
 import ddt
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase
 import httpretty
 import provider.constants

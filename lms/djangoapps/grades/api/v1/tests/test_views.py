@@ -4,7 +4,7 @@ Tests for v1 views
 from datetime import datetime
 import ddt
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from mock import MagicMock, patch
 from opaque_keys import InvalidKeyError
 from pytz import UTC

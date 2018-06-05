@@ -14,7 +14,7 @@ Test utilities for mobile API tests:
 import ddt
 import datetime
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils import timezone
 from mock import patch
 from opaque_keys.edx.keys import CourseKey

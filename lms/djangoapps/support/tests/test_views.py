@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 import ddt
 import pytest
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db.models import signals
 from nose.plugins.attrib import attr
 from pytz import UTC

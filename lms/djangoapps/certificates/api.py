@@ -7,7 +7,7 @@ rather than importing Django models directly.
 import logging
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db.models import Q
 from opaque_keys.edx.django.models import CourseKeyField
 from opaque_keys.edx.keys import CourseKey

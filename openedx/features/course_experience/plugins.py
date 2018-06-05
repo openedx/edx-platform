@@ -3,7 +3,7 @@ Platform plugins to support the course experience.
 
 This includes any locally defined CourseTools.
 """
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from courseware.courses import get_course_by_id

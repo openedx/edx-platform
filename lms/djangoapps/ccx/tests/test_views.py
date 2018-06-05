@@ -9,7 +9,7 @@ import urlparse
 import ddt
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
-from django.core.urlresolvers import resolve, reverse
+from django.urls import resolve, reverse
 from django.test import RequestFactory
 from django.test.utils import override_settings
 from pytz import UTC

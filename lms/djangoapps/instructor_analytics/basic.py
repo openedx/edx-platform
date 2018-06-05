@@ -10,7 +10,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers.json import DjangoJSONEncoder
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db.models import Count, Q
 from edx_proctoring.api import get_exam_violation_report
 from opaque_keys.edx.keys import UsageKey

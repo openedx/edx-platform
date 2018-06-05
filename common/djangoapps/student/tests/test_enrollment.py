@@ -5,7 +5,7 @@ import unittest
 
 import ddt
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from mock import patch
 from nose.plugins.attrib import attr
 

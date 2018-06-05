@@ -11,7 +11,7 @@ import uuid
 
 import ddt
 import mock
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from web_fragments.fragment import Fragment
 from xblock.field_data import DictFieldData
 

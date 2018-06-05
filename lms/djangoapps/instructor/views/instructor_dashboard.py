@@ -9,7 +9,7 @@ import uuid
 import pytz
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import Http404, HttpResponseServerError
 from django.utils.html import escape
 from django.utils.translation import ugettext as _

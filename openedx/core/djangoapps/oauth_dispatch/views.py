@@ -10,7 +10,7 @@ import json
 
 from Cryptodome.PublicKey import RSA
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import JsonResponse
 from django.views.generic import View
 from edx_oauth2_provider import views as dop_views  # django-oauth2-provider views

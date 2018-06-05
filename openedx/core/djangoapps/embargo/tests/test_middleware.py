@@ -6,7 +6,7 @@ from mock import patch
 from nose.plugins.attrib import attr
 import ddt
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.conf import settings
 from django.core.cache import cache as django_cache
 

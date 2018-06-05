@@ -20,7 +20,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AnonymousUser, User
 from django.contrib.auth.views import password_reset_confirm
 from django.core import mail
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.validators import ValidationError, validate_email
 from django.db import transaction
 from django.db.models.signals import post_save

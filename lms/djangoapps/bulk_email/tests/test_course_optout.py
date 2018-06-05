@@ -6,7 +6,7 @@ import json
 
 from django.core import mail
 from django.core.management import call_command
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from mock import Mock, patch
 from nose.plugins.attrib import attr
 from six import text_type

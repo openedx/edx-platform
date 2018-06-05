@@ -6,7 +6,7 @@ from uuid import uuid4
 
 import lxml.html
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test.client import RequestFactory
 from lxml.etree import ParserError, XMLSyntaxError
 from requests.auth import HTTPBasicAuth

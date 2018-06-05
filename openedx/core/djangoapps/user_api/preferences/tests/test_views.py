@@ -7,7 +7,7 @@ import ddt
 import json
 from mock import patch
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test.testcases import TransactionTestCase
 from rest_framework.test import APIClient
 from student.tests.factories import UserFactory, TEST_PASSWORD

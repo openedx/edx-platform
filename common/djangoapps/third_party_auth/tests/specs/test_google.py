@@ -3,7 +3,7 @@ import base64
 import hashlib
 import hmac
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 import json
 from mock import patch
 from openedx.tests.util import expected_redirect_url

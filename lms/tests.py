@@ -3,7 +3,7 @@
 import logging
 import mimetypes
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase
 from mock import patch
 from six import text_type

@@ -8,7 +8,7 @@ import mock
 from config_models.models import cache
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase
 
 from branding.models import BrandingApiConfig

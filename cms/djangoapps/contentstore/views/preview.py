@@ -5,7 +5,7 @@ from functools import partial
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import Http404, HttpResponseBadRequest
 from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import UsageKey

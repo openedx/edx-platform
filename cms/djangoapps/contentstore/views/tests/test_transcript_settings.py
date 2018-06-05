@@ -5,7 +5,7 @@ from io import BytesIO
 from mock import Mock, patch, ANY
 
 from django.test.testcases import TestCase
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from edxval import api
 
 from contentstore.tests.utils import CourseTestCase

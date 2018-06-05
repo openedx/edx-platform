@@ -12,7 +12,7 @@ import json
 import ddt
 import pytz
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase, Client
 from django.test.utils import override_settings
 from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory

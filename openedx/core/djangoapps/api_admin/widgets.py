@@ -2,7 +2,7 @@
 
 import django
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.forms.utils import flatatt
 from django.forms.widgets import CheckboxInput
 from django.utils.encoding import force_text

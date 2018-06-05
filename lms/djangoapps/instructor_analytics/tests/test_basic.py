@@ -6,7 +6,7 @@ import datetime
 import json
 
 import pytz
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db.models import Q
 from edx_proctoring.api import create_exam
 from edx_proctoring.models import ProctoredExamStudentAttempt

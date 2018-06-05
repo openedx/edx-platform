@@ -1,7 +1,7 @@
 """
 Test for split test XModule
 """
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from mock import MagicMock
 from nose.plugins.attrib import attr
 from six import text_type

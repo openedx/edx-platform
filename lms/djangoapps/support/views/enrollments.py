@@ -2,7 +2,7 @@
 Support tool for changing course enrollments.
 """
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponseBadRequest

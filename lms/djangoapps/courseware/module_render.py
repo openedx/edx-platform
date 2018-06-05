@@ -15,7 +15,7 @@ from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.template.context_processors import csrf
 from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 from edx_proctoring.services import ProctoringService

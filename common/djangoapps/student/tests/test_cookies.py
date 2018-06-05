@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 import six
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import RequestFactory
 
 from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewide_block_completed

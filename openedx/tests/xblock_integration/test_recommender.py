@@ -10,7 +10,7 @@ import unittest
 from copy import deepcopy
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from ddt import data, ddt
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory

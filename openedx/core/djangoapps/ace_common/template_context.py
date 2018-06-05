@@ -2,7 +2,7 @@
 Context dictionary for templates that use the ace_common base template.
 """
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.theming.helpers import get_config_value_from_site_or_settings

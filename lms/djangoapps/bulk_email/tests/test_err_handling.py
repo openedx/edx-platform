@@ -10,7 +10,7 @@ import ddt
 from celery.states import RETRY, SUCCESS  # pylint: disable=no-name-in-module, import-error
 from django.conf import settings
 from django.core.management import call_command
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import DatabaseError
 from mock import Mock, patch
 from nose.plugins.attrib import attr

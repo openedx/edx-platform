@@ -9,7 +9,7 @@ import datetime
 from babel.dates import format_timedelta
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.formats import date_format
 from django.utils.functional import cached_property
 from django.utils.translation import get_language, to_locale, ugettext_lazy

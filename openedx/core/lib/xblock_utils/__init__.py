@@ -14,7 +14,7 @@ from contracts import contract
 
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from pytz import UTC
 from django.utils.html import escape
 from django.contrib.auth.models import User

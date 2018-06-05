@@ -11,7 +11,7 @@ from django.conf import settings
 from django.contrib.auth import SESSION_KEY
 from django.contrib.auth.models import AnonymousUser, User
 from django.contrib.sessions.middleware import SessionMiddleware
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test.client import Client
 from django.test.client import RequestFactory
 from django.test.utils import override_settings

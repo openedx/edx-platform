@@ -6,7 +6,7 @@ import attr
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.staticfiles.templatetags.staticfiles import static
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db.models import F, Q
 
 from edx_ace.recipient_resolver import RecipientResolver

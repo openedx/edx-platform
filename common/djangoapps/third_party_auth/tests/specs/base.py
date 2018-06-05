@@ -14,7 +14,7 @@ from django.contrib import auth
 from django.contrib.auth import models as auth_models
 from django.contrib.messages.storage import fallback
 from django.contrib.sessions.backends import cache
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import utils as django_utils
 from django.conf import settings as django_settings
 from social_core import actions, exceptions

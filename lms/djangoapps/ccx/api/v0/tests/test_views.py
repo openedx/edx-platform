@@ -14,7 +14,7 @@ import mock
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.urlresolvers import Resolver404, resolve, reverse
+from django.urls import Resolver404, resolve, reverse
 from django.utils.timezone import now
 from nose.plugins.attrib import attr
 from oauth2_provider import models as dot_models

@@ -4,7 +4,7 @@ Test view handler for rerun (and eventually create)
 from datetime import datetime
 
 import ddt
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test.client import RequestFactory
 from mock import patch
 from opaque_keys.edx.keys import CourseKey

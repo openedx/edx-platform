@@ -18,7 +18,7 @@ import requests
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.core import mail
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings

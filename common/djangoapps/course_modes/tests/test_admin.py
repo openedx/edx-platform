@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 import ddt
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from pytz import UTC, timezone
 
 from course_modes.admin import CourseModeForm

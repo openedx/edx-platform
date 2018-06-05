@@ -6,7 +6,7 @@ import ddt
 import mock
 import pytest
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import RequestFactory, TestCase
 from mock import Mock, patch
 from nose.plugins.attrib import attr

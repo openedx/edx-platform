@@ -2,7 +2,7 @@ import json
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import models
 from django.utils.html import strip_tags
 from opaque_keys.edx.django.models import CourseKeyField

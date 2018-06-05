@@ -6,7 +6,7 @@ import textwrap
 
 import mock
 import requests
-from django.core.urlresolvers import NoReverseMatch, reverse
+from django.urls import NoReverseMatch, reverse
 from six import text_type
 
 from student.tests.factories import CourseEnrollmentFactory, UserFactory

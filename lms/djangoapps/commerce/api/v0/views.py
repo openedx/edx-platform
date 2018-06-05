@@ -2,7 +2,7 @@
 import logging
 
 from courseware import courses
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from edx_rest_api_client import exceptions
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey

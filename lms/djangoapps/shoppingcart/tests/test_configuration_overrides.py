@@ -2,7 +2,7 @@
 """
 Dashboard with Shopping Cart History tests with configuration overrides.
 """
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from mock import patch
 
 from course_modes.models import CourseMode

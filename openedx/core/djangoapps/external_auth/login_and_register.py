@@ -5,7 +5,7 @@ This module contains legacy code originally from `student.views`.
 import re
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.shortcuts import redirect
 from opaque_keys.edx.keys import CourseKey
 from six import text_type

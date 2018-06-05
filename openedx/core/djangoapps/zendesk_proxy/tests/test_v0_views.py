@@ -3,7 +3,7 @@ import json
 from copy import deepcopy
 
 import ddt
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test.utils import override_settings
 from mock import MagicMock, patch
 

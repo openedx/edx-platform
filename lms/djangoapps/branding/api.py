@@ -17,7 +17,7 @@ import urlparse
 
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from branding.models import BrandingApiConfig

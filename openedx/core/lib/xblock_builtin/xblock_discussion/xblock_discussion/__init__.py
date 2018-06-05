@@ -6,7 +6,7 @@ import logging
 import urllib
 
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import get_language_bidi
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock

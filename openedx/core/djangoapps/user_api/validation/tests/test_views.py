@@ -8,7 +8,7 @@ import unittest
 import ddt
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from six import text_type
 
 from openedx.core.djangoapps.user_api import accounts

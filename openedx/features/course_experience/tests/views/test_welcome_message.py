@@ -2,7 +2,7 @@
 Tests for course welcome messages.
 """
 import ddt
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory

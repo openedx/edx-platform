@@ -13,7 +13,7 @@ from uuid import uuid4
 import ddt
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.core.urlresolvers import reverse, reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.http import Http404, HttpResponseBadRequest
 from django.test import TestCase
 from django.test.client import Client, RequestFactory

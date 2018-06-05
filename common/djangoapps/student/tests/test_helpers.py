@@ -5,7 +5,7 @@ import logging
 import ddt
 from django.conf import settings
 from django.contrib.sessions.middleware import SessionMiddleware
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings

@@ -12,7 +12,7 @@ from uuid import uuid4
 import unicodecsv
 from celery.states import FAILURE, SUCCESS
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from mock import Mock, patch
 from opaque_keys.edx.locations import Location
 from opaque_keys.edx.keys import CourseKey

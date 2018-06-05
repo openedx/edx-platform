@@ -2,7 +2,7 @@
 Extra views required for SSO
 """
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import Http404, HttpResponse, HttpResponseNotAllowed, HttpResponseServerError
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt

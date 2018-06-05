@@ -4,7 +4,7 @@ import ddt
 import mock
 import pygeoip
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.conf import settings
 from mock import patch
 

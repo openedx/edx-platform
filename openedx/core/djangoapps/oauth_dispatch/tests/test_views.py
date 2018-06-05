@@ -9,7 +9,7 @@ import ddt
 import httpretty
 from Cryptodome.PublicKey import RSA
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import RequestFactory, TestCase, override_settings
 from oauth2_provider import models as dot_models
 

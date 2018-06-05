@@ -7,7 +7,7 @@ import ddt
 import pytz
 from django.conf import settings
 from django.contrib.auth.models import Permission
-from django.core.urlresolvers import reverse, reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.test import TestCase
 from django.test.utils import override_settings
 from edx_rest_api_client import exceptions

@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 import ddt
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import Http404
 from django.test import TestCase
 from django.test.client import RequestFactory

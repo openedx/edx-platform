@@ -20,7 +20,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
 from django.core.mail.message import EmailMessage
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import models, transaction
 from django.db.models import Count, F, Q, Sum
 from django.db.models.signals import post_delete, post_save
