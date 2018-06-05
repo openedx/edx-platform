@@ -203,4 +203,3 @@ py2neo==3.1.2
 
 # for calculating coverage
 -r coverage.txt
-git+https://github.com/Microsoft/xblock-azure-media-services.git@cb13e9fc33f8b44503f5593a1717ed1d7c1f7ea9#egg=azure-media-services

@@ -67,6 +67,14 @@ urlpatterns = patterns(
     url(r'^update_lang/', include('openedx.core.djangoapps.dark_lang.urls', namespace='dark_lang')),
 )
 
+try:
+    import azure_media_services
+    urlpatterns += (
+        url(r'^embed_player/', include('azure_media_services.urls')),
+    )
+except ImportError:
+    pass
+
 # restful api
 urlpatterns += patterns(
     'contentstore.views',
