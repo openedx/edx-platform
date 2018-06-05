@@ -66,10 +66,16 @@ from student.models import (
 from student.views.login import AuthFailedError, LoginFailures
 
 from ..errors import AccountUpdateError, AccountValidationError, UserNotAuthorized, UserNotFound
-from ..models import RetirementState, RetirementStateError, UserOrgTag, UserRetirementStatus
+from ..models import (
+    RetirementState,
+    RetirementStateError,
+    UserOrgTag,
+    UserRetirementPartnerReportingStatus,
+    UserRetirementStatus
+)
 from .api import get_account_settings, update_account_settings
 from .permissions import CanDeactivateUser, CanRetireUser
-from .serializers import UserRetirementStatusSerializer
+from .serializers import UserRetirementPartnerReportSerializer, UserRetirementStatusSerializer
 from .signals import USER_RETIRE_MAILINGS
 from ..message_types import DeletionNotificationMessage
 
@@ -513,6 +519,87 @@ def _set_unusable_password(user):
     """
     user.set_unusable_password()
     user.save()
+
+
+class AccountRetirementPartnerReportView(ViewSet):
+    """
+    Provides API endpoints for managing partner reporting of retired
+    users.
+    """
+    authentication_classes = (JwtAuthentication,)
+    permission_classes = (permissions.IsAuthenticated, CanRetireUser,)
+    parser_classes = (JSONParser,)
+    serializer_class = UserRetirementStatusSerializer
+
+    def _get_orgs_for_user(self, user):
+        """
+        Returns a set of orgs that the user has enrollments with
+        """
+        orgs = set()
+        for enrollment in user.courseenrollment_set.all():
+            org = enrollment.course.org
+
+            # Org can concievably be blank or this bogus default value
+            if org and org != 'outdated_entry':
+                orgs.add(enrollment.course.org)
+        return orgs
+
+    def retirement_partner_report(self, request):  # pylint: disable=unused-argument
+        """
+        POST /api/user/v1/accounts/retirement_partner_report/
+
+        Returns the list of UserRetirementPartnerReportingStatus users
+        that are not already being processed and updates their status
+        to indicate they are currently being processed.
+        """
+        retirement_statuses = UserRetirementPartnerReportingStatus.objects.filter(
+            is_being_processed=False
+        ).order_by('id')
+
+        retirements = [
+            {
+                'original_username': retirement.original_username,
+                'original_email': retirement.original_email,
+                'original_name': retirement.original_name,
+                'orgs': self._get_orgs_for_user(retirement.user)
+            }
+            for retirement in retirement_statuses
+        ]
+
+        serializer = UserRetirementPartnerReportSerializer(retirements, many=True)
+
+        retirement_statuses.update(is_being_processed=True)
+
+        return Response(serializer.data)
+
+    def retirement_partner_cleanup(self, request):
+        """
+        DELETE /api/user/v1/accounts/retirement_partner_report/
+
+        [{'original_username': 'user1'}, {'original_username': 'user2'}, ...]
+
+        Deletes UserRetirementPartnerReportingStatus objects for a list of users
+        that have been reported on.
+        """
+        usernames = [u['original_username'] for u in request.data]
+
+        if not usernames:
+            return Response('No original_usernames given.', status=status.HTTP_400_BAD_REQUEST)
+
+        retirement_statuses = UserRetirementPartnerReportingStatus.objects.filter(
+            is_being_processed=True,
+            original_username__in=usernames
+        )
+
+        if len(usernames) != len(retirement_statuses):
+            return Response(
+                '{} original_usernames given, only {} found!'.format(len(usernames), len(retirement_statuses)),
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        retirement_statuses.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class AccountRetirementStatusView(ViewSet):
