@@ -6,7 +6,7 @@ import pytest
 from bs4 import BeautifulSoup
 from contextlib import contextmanager
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test.utils import override_settings
 from mock import patch
 from nose.plugins.attrib import attr

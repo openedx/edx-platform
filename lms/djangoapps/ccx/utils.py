@@ -11,7 +11,7 @@ from smtplib import SMTPException
 import pytz
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.validators import validate_email
 from django.utils.translation import ugettext as _
 

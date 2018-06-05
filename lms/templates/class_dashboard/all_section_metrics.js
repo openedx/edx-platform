@@ -1,7 +1,7 @@
 <%page args="id_opened_prefix, id_grade_prefix, id_attempt_prefix, id_tooltip_prefix, course_id, allSubsectionTooltipArr, allProblemTooltipArr, **kwargs"/>
 <%!
   import json
-  from django.core.urlresolvers import reverse
+  from django.urls import reverse
   from six import text_type
 %>
 

@@ -7,7 +7,7 @@ import time
 from logging import getLogger
 
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from lettuce import step, world
 from lettuce.django import django_url
 

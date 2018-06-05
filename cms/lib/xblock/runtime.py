@@ -2,7 +2,7 @@
 XBlock runtime implementations for edX Studio
 """
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 
 def handler_url(block, handler_name, suffix='', query='', thirdparty=False):

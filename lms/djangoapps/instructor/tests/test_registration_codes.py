@@ -3,7 +3,7 @@ Test for the registration code status information.
 """
 import json
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test.utils import override_settings
 from django.utils.translation import ugettext as _
 from nose.plugins.attrib import attr

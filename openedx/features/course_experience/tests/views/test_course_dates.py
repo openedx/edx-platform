@@ -2,7 +2,7 @@
 Tests for course dates fragment.
 """
 from datetime import timedelta, datetime
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum

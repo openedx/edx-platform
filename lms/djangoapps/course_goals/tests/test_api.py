@@ -4,7 +4,7 @@ Unit tests for course_goals.api methods.
 import mock
 
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test.utils import override_settings
 from lms.djangoapps.course_goals.models import CourseGoal
 from rest_framework.test import APIClient

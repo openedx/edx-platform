@@ -9,7 +9,7 @@ from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFact
 from lms.envs.test import CREDENTIALS_PUBLIC_SERVICE_URL
 from course_modes.models import CourseMode
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test.client import RequestFactory
 from lms.djangoapps.certificates.api import is_passing_status
 from opaque_keys.edx.locator import CourseLocator

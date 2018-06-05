@@ -3,7 +3,7 @@ E-commerce Tab Instructor Dashboard Query Registration Code Status.
 """
 import logging
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_GET, require_POST

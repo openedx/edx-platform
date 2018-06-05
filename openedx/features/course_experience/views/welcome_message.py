@@ -2,7 +2,7 @@
 View logic for handling course welcome messages.
 """
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.template.loader import render_to_string
 from django.views.decorators.csrf import ensure_csrf_cookie

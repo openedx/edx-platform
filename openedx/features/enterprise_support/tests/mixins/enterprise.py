@@ -7,7 +7,7 @@ import mock
 import httpretty
 from django.conf import settings
 from django.core.cache import cache
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import SimpleTestCase
 
 from openedx.features.enterprise_support.tests import FAKE_ENTERPRISE_CUSTOMER

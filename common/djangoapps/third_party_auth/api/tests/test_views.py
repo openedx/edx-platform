@@ -5,7 +5,7 @@ Tests for the Third Party Auth REST API
 import unittest
 
 import ddt
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import QueryDict
 from mock import patch
 from provider.constants import CONFIDENTIAL

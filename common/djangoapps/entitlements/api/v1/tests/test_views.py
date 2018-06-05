@@ -8,7 +8,7 @@ from courseware.models import (
     DynamicUpgradeDeadlineConfiguration
 )
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.timezone import now
 from mock import patch
 from opaque_keys.edx.locator import CourseKey

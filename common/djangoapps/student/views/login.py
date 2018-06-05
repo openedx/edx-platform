@@ -18,7 +18,7 @@ from django.contrib.auth import authenticate, load_backend, login as django_logi
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AnonymousUser, User
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
-from django.core.urlresolvers import NoReverseMatch, reverse, reverse_lazy
+from django.urls import NoReverseMatch, reverse, reverse_lazy
 from django.core.validators import ValidationError, validate_email
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import redirect

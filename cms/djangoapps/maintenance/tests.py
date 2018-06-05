@@ -5,7 +5,7 @@ import json
 
 import ddt
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from contentstore.management.commands.utils import get_course_versions
 from student.tests.factories import AdminFactory, UserFactory

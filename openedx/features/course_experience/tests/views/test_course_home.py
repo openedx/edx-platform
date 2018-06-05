@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 import ddt
 import mock
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import QueryDict
 from django.utils.http import urlquote_plus
 from django.utils.timezone import now

@@ -12,7 +12,7 @@ from django.conf import settings
 from django.test import TestCase, LiveServerTestCase
 from django.core.cache import cache
 from django.test.utils import override_settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test.client import RequestFactory
 from unittest import skipUnless
 

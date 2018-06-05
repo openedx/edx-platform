@@ -2,7 +2,7 @@
 <%inherit file="base.html" />
 <%namespace name='static' file='../static_content.html'/>
 <%!
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from openedx.core.djangolib.js_utils import js_escaped_string
 %>
 <%block name="title">${view['name']}</%block>

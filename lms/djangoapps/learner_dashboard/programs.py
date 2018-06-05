@@ -6,7 +6,7 @@ import json
 from django.http import Http404
 from django.template.loader import render_to_string
 from django.utils.translation import get_language_bidi
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from web_fragments.fragment import Fragment
 

@@ -30,7 +30,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives, get_connection
 from django.core.mail.message import forbid_multi_line_headers
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import override as override_language
 from django.utils.translation import ugettext as _
 from markupsafe import escape

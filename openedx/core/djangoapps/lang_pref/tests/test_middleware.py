@@ -8,7 +8,7 @@ import mock
 import ddt
 from django.conf import settings
 from django.test import TestCase
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test.client import RequestFactory
 from django.http import HttpResponse
 from django.contrib.sessions.middleware import SessionMiddleware

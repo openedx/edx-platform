@@ -4,7 +4,7 @@ Tests for class dashboard (Metrics tab in instructor dashboard)
 
 import json
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test.client import RequestFactory
 from mock import patch
 from nose.plugins.attrib import attr

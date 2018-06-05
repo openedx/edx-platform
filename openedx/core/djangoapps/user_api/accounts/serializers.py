@@ -8,7 +8,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from six import text_type
 
 from lms.djangoapps.badges.utils import badges_enabled

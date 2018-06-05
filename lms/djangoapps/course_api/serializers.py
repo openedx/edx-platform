@@ -4,7 +4,7 @@ Course API Serializers.  Representing course catalog data
 
 import urllib
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from rest_framework import serializers
 
 from openedx.core.djangoapps.models.course_details import CourseDetails

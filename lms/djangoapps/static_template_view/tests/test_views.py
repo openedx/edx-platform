@@ -2,7 +2,7 @@
 Tests for static templates
 """
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase
 
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context

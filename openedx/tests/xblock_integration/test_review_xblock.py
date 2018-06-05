@@ -6,7 +6,7 @@ import unittest
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from nose.plugins.attrib import attr
 
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory

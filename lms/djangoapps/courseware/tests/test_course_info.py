@@ -5,7 +5,7 @@ Test the course_info xblock
 import ddt
 import mock
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import QueryDict
 from django.test.utils import override_settings
 

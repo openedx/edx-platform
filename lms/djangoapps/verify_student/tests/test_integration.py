@@ -2,7 +2,7 @@
 Integration tests of the payment flow, including course mode selection.
 """
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from course_modes.tests.factories import CourseModeFactory
 from student.models import CourseEnrollment

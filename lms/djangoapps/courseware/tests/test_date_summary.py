@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 import ddt
 import waffle
 from django.contrib.messages.middleware import MessageMiddleware
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import RequestFactory
 from freezegun import freeze_time
 from mock import patch

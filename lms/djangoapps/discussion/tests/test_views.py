@@ -3,7 +3,7 @@ import logging
 from datetime import datetime
 
 import ddt
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import Http404
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings

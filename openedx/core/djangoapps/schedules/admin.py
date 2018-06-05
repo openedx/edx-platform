@@ -3,7 +3,7 @@ import functools
 from django.contrib import admin
 from django import forms
 from django.db.models import F
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from openedx.core.djangolib.markup import HTML
 

@@ -2,7 +2,7 @@ import unittest
 
 import ddt
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponse
 from django.test import TestCase
 from django.test.client import RequestFactory

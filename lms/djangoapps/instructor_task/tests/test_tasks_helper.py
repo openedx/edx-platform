@@ -22,7 +22,7 @@ from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.tests.factories import InstructorFactory
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test.utils import override_settings
 from freezegun import freeze_time
 from instructor_analytics.basic import UNAVAILABLE, list_problem_responses

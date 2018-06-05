@@ -4,7 +4,7 @@ This test file will run through some LMS test scenarios regarding access and nav
 import time
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test.utils import override_settings
 from mock import patch
 from nose.plugins.attrib import attr

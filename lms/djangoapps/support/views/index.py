@@ -1,7 +1,7 @@
 """
 Index view for the support app.
 """
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
 from edxmako.shortcuts import render_to_response

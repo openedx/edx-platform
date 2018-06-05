@@ -5,7 +5,7 @@ import json
 import unittest
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from nose.plugins.attrib import attr
 from six import text_type
 

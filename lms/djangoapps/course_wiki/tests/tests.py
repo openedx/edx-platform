@@ -2,7 +2,7 @@
 Tests for course wiki
 """
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from mock import patch
 from nose.plugins.attrib import attr
 from six import text_type

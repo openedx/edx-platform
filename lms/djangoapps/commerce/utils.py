@@ -8,7 +8,7 @@ import requests
 import waffle
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client, is_commerce_service_configured

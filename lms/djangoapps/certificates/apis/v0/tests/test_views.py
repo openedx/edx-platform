@@ -3,7 +3,7 @@ Tests for the Certificate REST APIs.
 """
 from datetime import datetime, timedelta
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
 from oauth2_provider import models as dot_models

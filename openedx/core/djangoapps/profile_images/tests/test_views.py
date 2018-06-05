@@ -6,7 +6,7 @@ import datetime
 from nose.plugins.attrib import attr
 from pytz import UTC
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponse
 
 import ddt

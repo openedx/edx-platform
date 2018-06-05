@@ -5,7 +5,7 @@ Python tests for the Survey views
 import json
 from collections import OrderedDict
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test.client import Client
 
 from student.tests.factories import UserFactory

@@ -8,7 +8,7 @@ from uuid import uuid4
 import ddt
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test.utils import override_settings
 from django.utils import timezone
 from django.utils.http import int_to_base36

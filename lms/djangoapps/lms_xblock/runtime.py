@@ -3,7 +3,7 @@ Module implementing `xblock.runtime.Runtime` functionality for the LMS
 """
 from completion.services import CompletionService
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 import xblock.reference.plugins
 
 from badges.service import BadgingService

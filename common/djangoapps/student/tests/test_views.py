@@ -10,7 +10,7 @@ from datetime import timedelta
 import ddt
 from completion.test_utils import submit_completions_for_testing, CompletionWaffleTestMixin
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
 from django.utils.timezone import now

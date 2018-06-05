@@ -16,7 +16,7 @@ from django.http import HttpResponseRedirect
 from django.test import TestCase
 from django.test.client import RequestFactory, Client as DjangoTestClient
 from django.test.utils import override_settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib.auth.models import AnonymousUser, User
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangoapps.external_auth.views import (

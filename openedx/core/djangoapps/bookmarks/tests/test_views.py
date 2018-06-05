@@ -7,7 +7,7 @@ import urllib
 import ddt
 import pytest
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from mock import patch
 from nose.plugins.attrib import attr
 from rest_framework.test import APIClient

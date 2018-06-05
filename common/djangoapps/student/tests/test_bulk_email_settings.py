@@ -7,7 +7,7 @@ Course Auth is turned on.
 import unittest
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 # This import is for an lms djangoapp.
 # Its testcases are only run under lms.

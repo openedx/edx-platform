@@ -5,7 +5,7 @@ from textwrap import dedent
 from unittest import TestCase
 
 import mock
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 from six import text_type

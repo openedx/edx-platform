@@ -3,7 +3,7 @@ import unittest
 
 from django.conf import settings
 from django.core.handlers.wsgi import WSGIRequest
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test.utils import override_settings
 from mock import patch
 from rest_framework.test import APITestCase

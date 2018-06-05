@@ -30,7 +30,7 @@ import re
 
 from django.conf import settings
 from django.core.exceptions import MiddlewareNotUsed
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.shortcuts import redirect
 from ipware.ip import get_ip
 

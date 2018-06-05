@@ -6,7 +6,7 @@ from string import join
 from urllib import urlencode
 from urlparse import urlunparse
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from opaque_keys.edx.locator import CourseLocator
 
 from student.models import CourseEnrollment

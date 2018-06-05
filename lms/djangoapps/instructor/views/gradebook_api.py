@@ -5,7 +5,7 @@ which is currently use by ccx and instructor apps.
 import math
 
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import transaction
 from django.views.decorators.cache import cache_control
 from opaque_keys.edx.keys import CourseKey

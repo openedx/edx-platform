@@ -5,7 +5,7 @@ Test models, managers, and validators.
 from completion import waffle
 from completion.test_utils import CompletionWaffleTestMixin
 import ddt
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from rest_framework.test import APIClient
 
 from student.tests.factories import UserFactory, CourseEnrollmentFactory

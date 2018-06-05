@@ -7,7 +7,7 @@ from abc import ABCMeta, abstractmethod
 from datetime import timedelta
 
 from django.conf import settings
-from django.core.urlresolvers import resolve
+from django.urls import resolve
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 from search.search_engine_base import SearchEngine

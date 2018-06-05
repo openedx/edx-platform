@@ -4,7 +4,7 @@ Views to show a course's bookmarks.
 
 from django.contrib.auth.decorators import login_required
 from django.template.context_processors import csrf
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.shortcuts import render_to_response
 from django.template.loader import render_to_string
 from django.utils.decorators import method_decorator

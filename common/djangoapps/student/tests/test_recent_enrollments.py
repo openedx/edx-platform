@@ -6,7 +6,7 @@ import unittest
 
 import ddt
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.timezone import now
 from nose.plugins.attrib import attr
 from opaque_keys.edx import locator

@@ -6,7 +6,7 @@ import sys
 from importlib import import_module
 
 from django.conf import settings
-from django.core.urlresolvers import set_urlconf
+from django.urls import set_urlconf
 
 
 def reload_django_url_config():

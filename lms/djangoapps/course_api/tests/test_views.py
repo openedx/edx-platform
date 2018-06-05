@@ -3,7 +3,7 @@ Tests for Course API views.
 """
 from hashlib import md5
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import RequestFactory
 from django.test.utils import override_settings
 from nose.plugins.attrib import attr

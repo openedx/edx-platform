@@ -3,7 +3,7 @@ import logging
 
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.urlresolvers import reverse, reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.http.response import JsonResponse
 from django.shortcuts import redirect
 from django.views.generic import View

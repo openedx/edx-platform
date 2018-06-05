@@ -6,7 +6,7 @@ import ddt
 import pytz
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test.utils import override_settings
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import patch
