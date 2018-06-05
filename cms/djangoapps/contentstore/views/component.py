@@ -105,6 +105,10 @@ def container_handler(request, usage_key_string):
 
         try:
             usage_key = UsageKey.from_string(usage_key_string)
+#            if usage_key.course_key.run is None:
+#                new_course_key = usage_key.course_key.replace(run='2018')
+#                usage_key = usage_key.map_into_course(new_course_key)
+
         except InvalidKeyError:  # Raise Http404 on invalid 'usage_key_string'
             raise Http404
         with modulestore().bulk_operations(usage_key.course_key):

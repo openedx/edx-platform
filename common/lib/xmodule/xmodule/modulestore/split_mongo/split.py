@@ -203,6 +203,8 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         if course_key is None:
             return self._bulk_ops_record_type()
 
+        course_key = self.fill_in_run(course_key)
+
         if not isinstance(course_key, (CourseLocator, LibraryLocator)):
             raise TypeError(u'{!r} is not a CourseLocator or LibraryLocator'.format(course_key))
         # handle version_guid based retrieval locally
@@ -223,6 +225,8 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         if not isinstance(course_key, (CourseLocator, LibraryLocator)):
             raise TypeError('{!r} is not a CourseLocator or LibraryLocator'.format(course_key))
 
+        course_key = self.fill_in_run(course_key)
+
         if course_key.org and course_key.course and course_key.run:
             del self._active_bulk_ops.records[course_key.replace(branch=None, version_guid=None)]
         else:
@@ -234,6 +238,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         """
         Begin a bulk write operation on course_key.
         """
+        course_key = self.fill_in_run(course_key)
         bulk_write_record.initial_index = self.db_connection.get_course_index(course_key, ignore_case=ignore_case)
         # Ensure that any edits to the index don't pollute the initial_index
         bulk_write_record.index = copy.deepcopy(bulk_write_record.initial_index)
@@ -287,6 +292,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         """
         Return the index for course_key.
         """
+        course_key = self.fill_in_run(course_key)
         if self._is_in_bulk_operation(course_key, ignore_case):
             return self._get_bulk_ops_record(course_key, ignore_case).index
         else:
@@ -296,12 +302,14 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         """
         Delete the course index from cache and the db
         """
+        course_key = self.fill_in_run(course_key)
         if self._is_in_bulk_operation(course_key, False):
             self._clear_bulk_ops_record(course_key)
 
         self.db_connection.delete_course_index(course_key)
 
     def insert_course_index(self, course_key, index_entry):
+        course_key = self.fill_in_run(course_key)
         bulk_write_record = self._get_bulk_ops_record(course_key)
         if bulk_write_record.active:
             bulk_write_record.index = index_entry
@@ -316,6 +324,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
 
         Does not return anything useful.
         """
+        course_key = self.fill_in_run(course_key)
         bulk_write_record = self._get_bulk_ops_record(course_key)
         if bulk_write_record.active:
             bulk_write_record.index = updated_index_entry
@@ -345,6 +354,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         Update a course structure, respecting the current bulk operation status
         (no data will be written to the database if a bulk operation is active.)
         """
+        course_key = self.fill_in_run(course_key)
         self._clear_cache(structure['_id'])
         bulk_write_record = self._get_bulk_ops_record(course_key)
         if bulk_write_record.active:
@@ -730,6 +740,29 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
         self.signal_handler = signal_handler
 
+    def add_old_mongo_mapping(self, course_key):
+        self.db_connection.add_old_mongo_mapping(course_key)
+
+    def delete_old_mongo_mapping(self, course_key):
+        self.db_connection.delete_old_mongo_mapping(course_key)
+
+    def fill_in_run(self, course_key):
+        """We try to fill in the run, but if we return without a run, it means
+        we don't have it in the old mongo mapping."""
+        if course_key.run is not None:
+            return course_key
+
+        course_key_with_run = self.db_connection.fill_in_run_from_old_mongo_mapping(course_key)
+        if course_key_with_run:
+            return course_key_with_run
+
+        # We can't fill in the run info. This is probably an error, but just
+        # pass it back for now.
+        return course_key
+
+        # This was our stub
+        return course_key.replace(run='2018')
+
     def close_connections(self):
         """
         Closes any open connections to the underlying databases
@@ -879,6 +912,10 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
         :param course_key: any subclass of CourseLocator
         """
+        # Maybe need this?
+        # if course_key.run is None:
+        #     course_key = self.db_connection.get_course_key_with_run(course_key)
+
         if not course_key.version_guid:
             head_validation = True
         if head_validation and course_key.org and course_key.course and course_key.run:
@@ -1138,9 +1175,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         Gets the course descriptor for the course identified by the locator
         """
-        if not isinstance(course_id, CourseLocator) or course_id.deprecated:
-            # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
-            raise ItemNotFoundError(course_id)
+        # if not isinstance(course_id, CourseLocator) or course_id.deprecated:
+        #     # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
+        #     raise ItemNotFoundError(course_id)
         return self._get_structure(course_id, depth, **kwargs)
 
     def get_library(self, library_id, depth=0, head_validation=True, **kwargs):
@@ -1152,21 +1189,41 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             raise ItemNotFoundError(library_id)
         return self._get_structure(library_id, depth, head_validation=head_validation, **kwargs)
 
-    def has_course(self, course_id, ignore_case=False, **kwargs):
+    def has_course(self, course_key, ignore_case=False, **kwargs):
         """
         Does this course exist in this modulestore. This method does not verify that the branch &/or
-        version in the course_id exists. Use get_course_index_info to check that.
+        version in the course_key exists. Use get_course_index_info to check that.
 
-        Returns the course_id of the course if it was found, else None
-        Note: we return the course_id instead of a boolean here since the found course may have
-           a different id than the given course_id when ignore_case is True.
+        Returns the course_key of the course if it was found, else None
+        Note: we return the course_key instead of a boolean here since the found course may have
+           a different id than the given course_key when ignore_case is True.
         """
-        if not isinstance(course_id, CourseLocator) or course_id.deprecated:
-            # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
-            return False
+        # if not isinstance(course_key, CourseLocator) or course_key.deprecated:
+        #     # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
+        #     return False
 
-        course_index = self.get_course_index(course_id, ignore_case)
-        return CourseLocator(course_index['org'], course_index['course'], course_index['run'], course_id.branch) if course_index else None
+        # if course_key.run is None:
+        #     # Check to see if it exists -- return None if it doesn't
+        #     course_key = self.db_connection.get_course_key_with_run(course_key)
+        if course_key.run is None:
+            course_key = self.fill_in_run(course_key)
+
+        # If we've gotten a course_key without a run and we don't know how to
+        # fill in the value, then we don't have the mapping for it, and it
+        # doesn't exist in this modulestore.
+        if course_key.run is None:
+            return None
+
+        course_index = self.get_course_index(course_key, ignore_case)
+        if not course_index:
+            return None
+
+        # This replace is so that the right casing gets put in the event
+        # ignore_case was True and we need to return a slightly different key.
+        return course_key.replace(
+            org=course_index['org'], course=course_index['course'], run=course_index['run'],
+        )
+
 
     def has_library(self, library_id, ignore_case=False, **kwargs):
         """
@@ -1189,9 +1246,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         the course or the block w/in the course do not exist for the given version.
         raises InsufficientSpecificationError if the usage_key does not id a block
         """
-        if not isinstance(usage_key, BlockUsageLocator) or usage_key.deprecated:
-            # The supplied UsageKey is of the wrong type, so it can't possibly be stored in this modulestore.
-            return False
+        #if not isinstance(usage_key, BlockUsageLocator) or usage_key.deprecated:
+        #    # The supplied UsageKey is of the wrong type, so it can't possibly be stored in this modulestore.
+        #    return False
 
         if usage_key.block_id is None:
             raise InsufficientSpecificationError(usage_key)
@@ -1213,9 +1270,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             descendants.
         raises InsufficientSpecificationError or ItemNotFoundError
         """
-        if not isinstance(usage_key, BlockUsageLocator) or usage_key.deprecated:
-            # The supplied UsageKey is of the wrong type, so it can't possibly be stored in this modulestore.
-            raise ItemNotFoundError(usage_key)
+#        if not isinstance(usage_key, BlockUsageLocator) or usage_key.deprecated:
+#            # The supplied UsageKey is of the wrong type, so it can't possibly be stored in this modulestore.
+#            raise ItemNotFoundError(usage_key)
 
         with self.bulk_operations(usage_key.course_key):
             course = self._lookup_course(usage_key.course_key)
@@ -1252,9 +1309,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 False - if we want only those items which are in the course tree. This would ensure no orphans are
                 fetched.
         """
-        if not isinstance(course_locator, CourseKey) or course_locator.deprecated:
-            # The supplied courselike key is of the wrong type, so it can't possibly be stored in this modulestore.
-            return []
+        #if not isinstance(course_locator, CourseKey) or course_locator.deprecated:
+        #    # The supplied courselike key is of the wrong type, so it can't possibly be stored in this modulestore.
+        #    return []
 
         course = self._lookup_course(course_locator)
         items = []
@@ -1391,9 +1448,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
         :param locator: BlockUsageLocator restricting search scope
         """
-        if not isinstance(locator, BlockUsageLocator) or locator.deprecated:
-            # The supplied locator is of the wrong type, so it can't possibly be stored in this modulestore.
-            raise ItemNotFoundError(locator)
+        #if not isinstance(locator, BlockUsageLocator) or locator.deprecated:
+        #    # The supplied locator is of the wrong type, so it can't possibly be stored in this modulestore.
+        #    raise ItemNotFoundError(locator)
 
         course = self._lookup_course(locator.course_key)
         all_parent_ids = self._get_parents_from_structure(BlockKey.from_usage_key(locator), course.structure)
@@ -1453,10 +1510,10 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             'edited_on': when the course was originally created
         }
         """
-        if not isinstance(course_key, CourseLocator) or course_key.deprecated:
-            # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
-            raise ItemNotFoundError(course_key)
-
+        #if not isinstance(course_key, CourseLocator) or course_key.deprecated:
+        #    # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
+        #    raise ItemNotFoundError(course_key)
+        course_key = self.fill_in_run(course_key)
         if not (course_key.course and course_key.run and course_key.org):
             return None
         index = self.get_course_index(course_key)
@@ -1474,9 +1531,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             'edited_on': when the change was made
         }
         """
-        if not isinstance(course_key, CourseLocator) or course_key.deprecated:
-            # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
-            raise ItemNotFoundError(course_key)
+        #if not isinstance(course_key, CourseLocator) or course_key.deprecated:
+        #    # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
+        #    raise ItemNotFoundError(course_key)
 
         course = self._lookup_course(course_key).structure
         return {
@@ -1496,9 +1553,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             'edited_on': when the change was made
         }
         """
-        if not isinstance(definition_locator, DefinitionLocator) or definition_locator.deprecated:
-            # The supplied locator is of the wrong type, so it can't possibly be stored in this modulestore.
-            raise ItemNotFoundError(definition_locator)
+        #if not isinstance(definition_locator, DefinitionLocator) or definition_locator.deprecated:
+        #    # The supplied locator is of the wrong type, so it can't possibly be stored in this modulestore.
+        #    raise ItemNotFoundError(definition_locator)
 
         definition = self.db_connection.get_definition(definition_locator.definition_id, course_context)
         if definition is None:
@@ -1512,9 +1569,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         next versions, these do include those created for other courses.
         :param course_locator:
         """
-        if not isinstance(course_locator, CourseLocator) or course_locator.deprecated:
-            # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
-            raise ItemNotFoundError(course_locator)
+        #if not isinstance(course_locator, CourseLocator) or course_locator.deprecated:
+        #    # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
+        #    raise ItemNotFoundError(course_locator)
 
         if version_history_depth < 1:
             return None
@@ -1963,14 +2020,27 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             search_targets, root_category, root_block_id, **kwargs
         )
 
+    def create_course_with_key(self, course_key, user_id, fields, master_branch, extra_branches, skip_auto_publish):
+        courselike = self._create_courselike(
+            course_key,
+            user_id,
+            master_branch,
+            extra_branches=extra_branches,
+            fields=fields,
+            skip_auto_publish=skip_auto_publish
+        )
+        return courselike
+
     def _create_courselike(
         self, locator, user_id, master_branch, fields=None,
         versions_dict=None, search_targets=None, root_category='course',
-        root_block_id=None, **kwargs
+        root_block_id=None, extra_branches=tuple(), **kwargs
     ):
         """
         Internal code for creating a course or library
         """
+        # import pudb; pu.db;
+
         index = self.get_course_index(locator, ignore_case=True)
         if index is not None:
             raise DuplicateCourseError(locator, index)
@@ -2002,6 +2072,10 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 versions_dict = {master_branch: new_id}
             else:
                 versions_dict[master_branch] = new_id
+
+            # Extra branches to set to also point at the new structure
+            for extra_branch in extra_branches:
+                versions_dict[extra_branch] = new_id
 
         elif block_fields or definition_fields:  # pointing to existing course w/ some overrides
             # just get the draft_version structure
@@ -2653,9 +2727,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         change to this item, it raises a VersionConflictError unless force is True. In the force case, it forks
         the course but leaves the head pointer where it is (this change will not be in the course head).
         """
-        if not isinstance(usage_locator, BlockUsageLocator) or usage_locator.deprecated:
-            # The supplied UsageKey is of the wrong type, so it can't possibly be stored in this modulestore.
-            raise ItemNotFoundError(usage_locator)
+        #if not isinstance(usage_locator, BlockUsageLocator) or usage_locator.deprecated:
+        #    # The supplied UsageKey is of the wrong type, so it can't possibly be stored in this modulestore.
+        #    raise ItemNotFoundError(usage_locator)
 
         with self.bulk_operations(usage_locator.course_key):
             original_structure = self._lookup_course(usage_locator.course_key).structure
@@ -2743,12 +2817,15 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         # this is the only real delete in the system. should it do something else?
         log.info(u"deleting course from split-mongo: %s", course_key)
+
+        # import pudb; pu.db
         self.delete_course_index(course_key)
+        if course_key.deprecated:
+            self.delete_old_mongo_mapping(course_key)
 
         # We do NOT call the super class here since we need to keep the assets
         # in case the course is later restored.
         # super(SplitMongoModuleStore, self).delete_course(course_key, user_id)
-
         self._emit_course_deleted_signal(course_key)
 
     @contract(block_map="dict(BlockKey: dict)", block_key=BlockKey)

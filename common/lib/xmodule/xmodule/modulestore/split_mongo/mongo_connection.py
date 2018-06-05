@@ -304,6 +304,50 @@ class MongoConnection(object):
         self.structures = self.database[collection + '.structures']
         self.definitions = self.database[collection + '.definitions']
 
+        # We'll sometimes receive requests for courses without a run because
+        # we're handling courses that have been migrated from the old
+        # modulestore. We use this collection to fill in the run info since in
+        # Split it's otherwise ambiguous.
+        self.old_mongo_mapping = self.database[collection + '.old_mongo_mapping']
+
+    def add_old_mongo_mapping(self, course_key):
+        """This course_key needs to have run information"""
+        self.old_mongo_mapping.insert(
+            {
+                'org': course_key.org,
+                'course': course_key.course,
+                'run': course_key.run,
+            }
+        )
+
+    def delete_old_mongo_mapping(self, course_key):
+        query = {
+            'org': course_key.org,
+            'course': course_key.course,
+        }
+        self.old_mongo_mapping.remove(query)
+
+    def fill_in_run_from_old_mongo_mapping(self, course_key_without_run):
+        """Returns CourseKey with run info if it's possible to do, otherwise return None"""
+        if course_key_without_run.run is not None:
+            course_key = course_key_without_run
+            return course_key
+
+        query = {
+            'org': course_key_without_run.org,
+            'course': course_key_without_run.course,
+        }
+        mapping_doc = self.old_mongo_mapping.find_one(query)
+        if mapping_doc is None:
+            return None  # No mapping exists
+
+        return course_key_without_run.replace(run=mapping_doc['run'])
+
+        # Old stub
+        #return course_key_without_run.replace(run='2018')
+
+
+
     def heartbeat(self):
         """
         Check that the db is reachable.
@@ -595,6 +639,15 @@ class MongoConnection(object):
             ],
             unique=True,
             background=True
+        )
+        create_collection_index(
+            self.old_mongo_mapping,
+            [
+                ('org', pymongo.ASCENDING),
+                ('course', pymongo.ASCENDING),
+            ],
+            unique=True,
+            background=True,
         )
 
     def close_connections(self):
