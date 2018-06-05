@@ -2,6 +2,10 @@
 import logging
 
 from edx_rest_framework_extensions.authentication import JwtAuthentication
+from edx_rest_framework_extensions.permissions import (
+    JwtHasContentOrgFilterForRequestedCourse,
+    JwtHasScope,
+)
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.generics import GenericAPIView
@@ -76,8 +80,11 @@ class CertificatesDetailView(GenericAPIView):
     )
     permission_classes = (
         IsAuthenticated,
-        permissions.IsUserInUrlOrStaff
+        JwtHasContentOrgFilterForRequestedCourse,
+        JwtHasScope,
+        permissions.IsUserInUrlOrStaff,
     )
+    required_scopes = ['certificates:read']
 
     def get(self, request, username, course_id):
         """

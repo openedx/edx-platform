@@ -27,12 +27,14 @@ class JwtBuilder(object):
     Keyword Arguments:
         asymmetric (Boolean): Whether the JWT should be signed with this app's private key.
         secret (string): Overrides configured JWT secret (signing) key. Unused if an asymmetric signature is requested.
+        issuer (string): Overrides configured JWT issuer.
     """
 
-    def __init__(self, user, asymmetric=False, secret=None):
+    def __init__(self, user, asymmetric=False, secret=None, issuer=None):
         self.user = user
         self.asymmetric = asymmetric
         self.secret = secret
+        self.issuer = issuer
         self.jwt_auth = configuration_helpers.get_value('JWT_AUTH', settings.JWT_AUTH)
 
     def build_token(self, scopes, expires_in=None, aud=None, additional_claims=None):
@@ -56,9 +58,10 @@ class JwtBuilder(object):
             'aud': aud if aud else self.jwt_auth['JWT_AUDIENCE'],
             'exp': now + expires_in,
             'iat': now,
-            'iss': self.jwt_auth['JWT_ISSUER'],
+            'iss': self.issuer if self.issuer else self.jwt_auth['JWT_ISSUER'],
             'preferred_username': self.user.username,
             'scopes': scopes,
+            'version': self.jwt_auth['JWT_SUPPORTED_VERSION'],
             'sub': anonymous_id_for_user(self.user, None),
         }
 
