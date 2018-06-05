@@ -179,7 +179,7 @@ def courses_custom(request):
     programs_list = []
     course_discovery_meanings = getattr(settings, 'COURSE_DISCOVERY_MEANINGS', {})
     if not settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
-        current_date = datetime.utcnow()
+        current_date = datetime.now(utc)
         courses_list = get_courses(request.user, filter_={'end__isnull': False}, exclude_={'end__lte': current_date})
 
         if configuration_helpers.get_value("ENABLE_COURSE_SORTING_BY_START_DATE",
