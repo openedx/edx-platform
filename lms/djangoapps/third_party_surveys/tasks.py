@@ -32,12 +32,12 @@ def save_responses(survey_responses):
             continue
 
         date = datetime.strptime(response['datesubmitted'], "%Y-%m-%d %H:%M:%S")
-        date = pytz.utc.localize(date)
 
         third_party_survey = ThirdPartySurvey(
             response=response,
             user_id=response['[url("edx_uid")]'],
-            request_date=date
+            request_date=date,
+            survey_type=response['[url("app")]']
         )
 
         # Pass the exception if the user=sguid doesn't exist in the Database
