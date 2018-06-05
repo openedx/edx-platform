@@ -2,7 +2,11 @@
 Adapter to isolate django-oauth-toolkit dependencies
 """
 
-from oauth2_provider import models
+from oauth2_provider.models import AccessToken, get_application_model
+
+from openedx.core.djangoapps.oauth_dispatch.models import RestrictedApplication
+
+Application = get_application_model()
 
 
 class DOTAdapter(object):
@@ -17,15 +21,15 @@ class DOTAdapter(object):
                                    user,
                                    redirect_uri,
                                    client_id=None,
-                                   authorization_grant_type=models.Application.GRANT_AUTHORIZATION_CODE):
+                                   authorization_grant_type=Application.GRANT_AUTHORIZATION_CODE):
         """
         Create an oauth client application that is confidential.
         """
-        return models.Application.objects.create(
+        return Application.objects.create(
             name=name,
             user=user,
             client_id=client_id,
-            client_type=models.Application.CLIENT_CONFIDENTIAL,
+            client_type=Application.CLIENT_CONFIDENTIAL,
             authorization_grant_type=authorization_grant_type,
             redirect_uris=redirect_uri,
         )
@@ -34,12 +38,12 @@ class DOTAdapter(object):
         """
         Create an oauth client application that is public.
         """
-        return models.Application.objects.create(
+        return Application.objects.create(
             name=name,
             user=user,
             client_id=client_id,
-            client_type=models.Application.CLIENT_PUBLIC,
-            authorization_grant_type=models.Application.GRANT_PASSWORD,
+            client_type=Application.CLIENT_PUBLIC,
+            authorization_grant_type=Application.GRANT_PASSWORD,
             redirect_uris=redirect_uri,
         )
 
@@ -49,7 +53,7 @@ class DOTAdapter(object):
 
         Wraps django's queryset.get() method.
         """
-        return models.Application.objects.get(**filters)
+        return Application.objects.get(**filters)
 
     def get_client_for_token(self, token):
         """
@@ -61,7 +65,7 @@ class DOTAdapter(object):
         """
         Given a token string, return the matching AccessToken object.
         """
-        return models.AccessToken.objects.get(token=token_string)
+        return AccessToken.objects.get(token=token_string)
 
     def normalize_scopes(self, scopes):
         """
@@ -76,3 +80,17 @@ class DOTAdapter(object):
         Given an access token object, return its scopes.
         """
         return list(token.scopes)
+
+    def is_client_restricted(self, client_id):
+        """
+        Returns true if the client is set up as a RestrictedApplication.
+        """
+        application = self.get_client(client_id=client_id)
+        return RestrictedApplication.objects.filter(application=application).exists()
+
+    def get_authorization_filters(self, client_id):
+        """
+        Get the authorization filters for the given client application.
+        """
+        application = self.get_client(client_id=client_id)
+        return getattr(application, 'authorization_filters', [])

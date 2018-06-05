@@ -23,6 +23,9 @@ class RestrictedApplication(models.Model):
 
     application = models.ForeignKey(oauth2_settings.APPLICATION_MODEL, null=False, on_delete=models.CASCADE)
 
+    class Meta:
+        app_label = 'oauth_dispatch'
+
     def __unicode__(self):
         """
         Return a unicode representation of this object
@@ -32,12 +35,11 @@ class RestrictedApplication(models.Model):
         )
 
     @classmethod
-    def set_access_token_as_expired(cls, access_token):
-        """
-        For access_tokens for RestrictedApplications, put the expire timestamp into the beginning of the epoch
-        which is Jan. 1, 1970
-        """
-        access_token.expires = datetime(1970, 1, 1, tzinfo=utc)
+    def expire_access_token(cls, application):
+        set_token_expired = not OAUTH2_SWITCHES.is_enabled(UNEXPIRED_RESTRICTED_APPLICATIONS)
+        jwt_not_requested = get_request_or_stub().POST.get('token_type', '').lower() != 'jwt'
+        restricted_application = cls.objects.filter(application=application).exists()
+        return restricted_application and (jwt_not_requested or set_token_expired)
 
     @classmethod
     def verify_access_token_as_expired(cls, access_token):

@@ -502,22 +502,29 @@ OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS = 30
 
 ################################## DJANGO OAUTH TOOLKIT #######################################
 
+OAUTH2_DEFAULT_SCOPES = {
+    'read': 'Read access',
+    'write': 'Write access',
+    'email': 'Know your email address',
+    # conform profile scope message that is presented to end-user
+    # to lms/templates/provider/authorize.html. This may be revised later.
+    'profile': 'Know your name and username',
+}
+
 OAUTH2_PROVIDER = {
     'OAUTH2_VALIDATOR_CLASS': 'openedx.core.djangoapps.oauth_dispatch.dot_overrides.validators.EdxOAuth2Validator',
     'REFRESH_TOKEN_EXPIRE_SECONDS': 20160,
-    'SCOPES': {
-        'read': 'Read access',
-        'write': 'Write access',
-        'email': 'Know your email address',
-        # conform profile scope message that is presented to end-user
-        # to lms/templates/provider/authorize.html. This may be revised later.
-        'profile': 'Know your name and username',
-    },
+    'SCOPES_BACKEND_CLASS': 'openedx.core.djangoapps.oauth_dispatch.scopes.ApplicationModelScopes',
+    'SCOPES': dict(OAUTH2_DEFAULT_SCOPES, **{
+        'grades:read': 'Retrieve your grades for your enrolled courses',
+        'certificates:read': 'Retrieve your course certificates'
+    }),
+    'DEFAULT_SCOPES': OAUTH2_DEFAULT_SCOPES,
     'REQUEST_APPROVAL_PROMPT': 'auto_even_if_expired',
+    'ERROR_RESPONSE_WITH_SCOPES': True,
 }
-# This is required for the migrations in oauth_dispatch.models
-# otherwise it fails saying this attribute is not present in Settings
-OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
+
+OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth_dispatch.ScopedApplication'
 
 ################################## TEMPLATE CONFIGURATION #####################################
 # Mako templating
@@ -2403,19 +2410,38 @@ SOCIAL_MEDIA_FOOTER_NAMES = [
 ]
 
 # JWT Settings
+DEFAULT_JWT_ISSUER_URI = 'change-me'
+DEFAULT_JWT_SECRET_KEY = 'change-me'
+DEFAULT_JWT_AUDIENCE = 'change-me'
+DEFAULT_JWT_ISSUER = {
+    'ISSUER': DEFAULT_JWT_ISSUER_URI,
+    'SECRET_KEY': DEFAULT_JWT_SECRET_KEY,
+    'AUDIENCE': DEFAULT_JWT_AUDIENCE,
+}
+RESTRICTED_APPLICATION_JWT_ISSUER = {
+    'ISSUER': 'change-me',
+    'SECRET_KEY': 'change-me',
+    'AUDIENCE': None,
+}
+
 JWT_AUTH = {
     # TODO Set JWT_SECRET_KEY to a secure value. By default, SECRET_KEY will be used.
     # 'JWT_SECRET_KEY': '',
     'JWT_ALGORITHM': 'HS256',
     'JWT_VERIFY_EXPIRATION': True,
     # TODO Set JWT_ISSUER and JWT_AUDIENCE to values specific to your service/organization.
-    'JWT_ISSUER': 'change-me',
-    'JWT_AUDIENCE': None,
+    'JWT_ISSUER': DEFAULT_JWT_ISSUER_URI,
+    'JWT_AUDIENCE': DEFAULT_JWT_AUDIENCE,
     'JWT_PAYLOAD_GET_USERNAME_HANDLER': lambda d: d.get('username'),
     'JWT_LEEWAY': 1,
     'JWT_DECODE_HANDLER': 'edx_rest_framework_extensions.utils.jwt_decode_handler',
     # Number of seconds before JWT tokens expire
     'JWT_EXPIRATION': 30,
+    'JWT_SUPPORTED_VERSION': '1.0.0',
+    'JWT_ISSUERS': [
+        DEFAULT_JWT_ISSUER,
+        RESTRICTED_APPLICATION_JWT_ISSUER,
+    ],
 }
 
 # The footer URLs dictionary maps social footer names
