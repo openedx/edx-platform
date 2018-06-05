@@ -226,7 +226,6 @@ def courses_custom(request):
         "courseware/courses.html",
         {
             'courses': courses_list,
-            'current_date': current_date,
             'course_discovery_meanings': course_discovery_meanings,
             'programs_list': programs_list
         }
