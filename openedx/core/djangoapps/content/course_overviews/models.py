@@ -708,7 +708,7 @@ class CourseOverviewTab(models.Model):
     Model for storing and caching tabs information of a course.
     """
     tab_id = models.CharField(max_length=50)
-    course_overview = models.ForeignKey(CourseOverview, db_index=True, related_name="tabs")
+    course_overview = models.ForeignKey(CourseOverview, db_index=True, related_name="tabs", on_delete=models.CASCADE)
 
 
 class CourseOverviewImageSet(TimeStampedModel):
@@ -779,7 +779,8 @@ class CourseOverviewImageSet(TimeStampedModel):
        interested in extending this functionality.
 
     """
-    course_overview = models.OneToOneField(CourseOverview, db_index=True, related_name="image_set")
+    course_overview = models.OneToOneField(CourseOverview, db_index=True, related_name="image_set",
+                                           on_delete=models.CASCADE)
     small_url = models.TextField(blank=True, default="")
     large_url = models.TextField(blank=True, default="")
 

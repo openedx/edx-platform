@@ -39,8 +39,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('lti_user_id', models.CharField(max_length=255)),
-                ('edx_user', models.OneToOneField(to=settings.AUTH_USER_MODEL)),
-                ('lti_consumer', models.ForeignKey(to='lti_provider.LtiConsumer')),
+                ('edx_user', models.OneToOneField(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
+                ('lti_consumer', models.ForeignKey(to='lti_provider.LtiConsumer', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -48,18 +48,18 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('lis_outcome_service_url', models.CharField(unique=True, max_length=255)),
-                ('lti_consumer', models.ForeignKey(to='lti_provider.LtiConsumer')),
+                ('lti_consumer', models.ForeignKey(to='lti_provider.LtiConsumer', on_delete=models.CASCADE)),
             ],
         ),
         migrations.AddField(
             model_name='gradedassignment',
             name='outcome_service',
-            field=models.ForeignKey(to='lti_provider.OutcomeService'),
+            field=models.ForeignKey(to='lti_provider.OutcomeService', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='gradedassignment',
             name='user',
-            field=models.ForeignKey(to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE),
         ),
         migrations.AlterUniqueTogether(
             name='ltiuser',

@@ -46,6 +46,7 @@ class CourseMode(models.Model):
         db_constraint=False,
         db_index=True,
         related_name='modes',
+        on_delete=models.CASCADE,
     )
 
     # Django sets the `course_id` property in __init__ with the value from the database

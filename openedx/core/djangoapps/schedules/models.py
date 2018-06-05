@@ -8,7 +8,7 @@ from config_models.models import ConfigurationModel
 
 
 class Schedule(TimeStampedModel):
-    enrollment = models.OneToOneField('student.CourseEnrollment', null=False)
+    enrollment = models.OneToOneField('student.CourseEnrollment', null=False, on_delete=models.CASCADE)
     active = models.BooleanField(
         default=True,
         help_text=_('Indicates if this schedule is actively used')
@@ -38,7 +38,7 @@ class Schedule(TimeStampedModel):
 class ScheduleConfig(ConfigurationModel):
     KEY_FIELDS = ('site',)
 
-    site = models.ForeignKey(Site)
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
     create_schedules = models.BooleanField(default=False)
     enqueue_recurring_nudge = models.BooleanField(default=False)
     deliver_recurring_nudge = models.BooleanField(default=False)
@@ -55,5 +55,5 @@ class ScheduleExperience(models.Model):
         (1, 'course_updates', 'Course Updates')
     )
 
-    schedule = models.OneToOneField(Schedule, related_name='experience')
+    schedule = models.OneToOneField(Schedule, related_name='experience', on_delete=models.CASCADE)
     experience_type = models.PositiveSmallIntegerField(choices=EXPERIENCES, default=EXPERIENCES.default)

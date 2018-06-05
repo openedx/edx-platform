@@ -70,8 +70,8 @@ class CourseUserGroup(models.Model):
 class CohortMembership(models.Model):
     """Used internally to enforce our particular definition of uniqueness"""
 
-    course_user_group = models.ForeignKey(CourseUserGroup)
-    user = models.ForeignKey(User)
+    course_user_group = models.ForeignKey(CourseUserGroup, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     course_id = CourseKeyField(max_length=255)
 
     previous_cohort = None
@@ -155,7 +155,7 @@ class CourseUserGroupPartitionGroup(models.Model):
     """
     Create User Partition Info.
     """
-    course_user_group = models.OneToOneField(CourseUserGroup)
+    course_user_group = models.OneToOneField(CourseUserGroup, on_delete=models.CASCADE)
     partition_id = models.IntegerField(
         help_text="contains the id of a cohorted partition in this course"
     )
@@ -209,7 +209,8 @@ class CourseCohort(models.Model):
     """
     This model represents cohort related info.
     """
-    course_user_group = models.OneToOneField(CourseUserGroup, unique=True, related_name='cohort')
+    course_user_group = models.OneToOneField(CourseUserGroup, unique=True, related_name='cohort',
+                                             on_delete=models.CASCADE)
 
     RANDOM = 'random'
     MANUAL = 'manual'
@@ -246,6 +247,6 @@ class UnregisteredLearnerCohortAssignments(DeletableByUserValue, models.Model):
     class Meta(object):
         unique_together = (('course_id', 'email'), )
 
-    course_user_group = models.ForeignKey(CourseUserGroup)
+    course_user_group = models.ForeignKey(CourseUserGroup, on_delete=models.CASCADE)
     email = models.CharField(blank=True, max_length=255, db_index=True)
     course_id = CourseKeyField(max_length=255)

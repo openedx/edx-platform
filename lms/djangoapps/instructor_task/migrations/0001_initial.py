@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
                 ('created', models.DateTimeField(auto_now_add=True, null=True)),
                 ('updated', models.DateTimeField(auto_now=True)),
                 ('subtasks', models.TextField(blank=True)),
-                ('requester', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('requester', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
     ]

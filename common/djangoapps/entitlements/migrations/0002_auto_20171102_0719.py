@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='courseentitlement',
             name='enrollment_course_run',
-            field=models.ForeignKey(to='student.CourseEnrollment', help_text=b'The current Course enrollment for this entitlement. If NULL the Learner has not enrolled.', null=True),
+            field=models.ForeignKey(to='student.CourseEnrollment', help_text=b'The current Course enrollment for this entitlement. If NULL the Learner has not enrolled.', null=True, on_delete=models.CASCADE),
         ),
         migrations.AlterField(
             model_name='courseentitlement',

@@ -45,11 +45,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='surveyanswer',
             name='form',
-            field=models.ForeignKey(to='survey.SurveyForm'),
+            field=models.ForeignKey(to='survey.SurveyForm', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='surveyanswer',
             name='user',
-            field=models.ForeignKey(to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE),
         ),
     ]

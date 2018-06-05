@@ -98,7 +98,7 @@ class IDVerificationAttempt(StatusModel):
     including PhotoVerification and SSOVerification.
     """
     STATUS = Choices('created', 'ready', 'submitted', 'must_retry', 'approved', 'denied')
-    user = models.ForeignKey(User, db_index=True)
+    user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
 
     # They can change their name later on, so we want to copy the value here so
     # we always preserve what it was at the time they requested. We only copy
@@ -259,7 +259,8 @@ class PhotoVerification(IDVerificationAttempt):
         db_index=True,
         default=None,
         null=True,
-        related_name="photo_verifications_reviewed"
+        related_name="photo_verifications_reviewed",
+        on_delete=models.CASCADE,
     )
 
     # Mark the name of the service used to evaluate this attempt (e.g
@@ -506,7 +507,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
     photo_id_key = models.TextField(max_length=1024)
 
     IMAGE_LINK_DURATION = 5 * 60 * 60 * 24  # 5 days in seconds
-    copy_id_photo_from = models.ForeignKey("self", null=True, blank=True)
+    copy_id_photo_from = models.ForeignKey("self", null=True, blank=True, on_delete=models.CASCADE)
 
     @classmethod
     def get_initial_verification(cls, user, earliest_allowed_date=None):

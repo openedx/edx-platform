@@ -56,7 +56,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('key', models.CharField(unique=True, max_length=63, db_index=True)),
                 ('values', jsonfield.fields.JSONField(blank=True)),
-                ('site', models.OneToOneField(related_name='microsite', to='sites.Site')),
+                ('site', models.OneToOneField(related_name='microsite', to='sites.Site', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -67,7 +67,7 @@ class Migration(migrations.Migration):
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
                 ('key', models.CharField(unique=True, max_length=63, db_index=True)),
                 ('values', jsonfield.fields.JSONField(blank=True)),
-                ('site', models.OneToOneField(related_name='microsite_history', to='sites.Site')),
+                ('site', models.OneToOneField(related_name='microsite_history', to='sites.Site', on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name_plural': 'Microsite histories',
@@ -78,7 +78,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('organization', models.CharField(unique=True, max_length=63, db_index=True)),
-                ('microsite', models.ForeignKey(to='microsite_configuration.Microsite')),
+                ('microsite', models.ForeignKey(to='microsite_configuration.Microsite', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -87,7 +87,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('template_uri', models.CharField(max_length=255, db_index=True)),
                 ('template', models.TextField()),
-                ('microsite', models.ForeignKey(to='microsite_configuration.Microsite')),
+                ('microsite', models.ForeignKey(to='microsite_configuration.Microsite', on_delete=models.CASCADE)),
             ],
         ),
         migrations.AddField(

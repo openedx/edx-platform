@@ -129,7 +129,7 @@ class AnonymousUserId(models.Model):
 
     objects = NoneToEmptyManager()
 
-    user = models.ForeignKey(User, db_index=True)
+    user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     anonymous_user_id = models.CharField(unique=True, max_length=32)
     course_id = CourseKeyField(db_index=True, max_length=255, blank=True)
 
@@ -328,11 +328,11 @@ class UserStanding(models.Model):
         (ACCOUNT_ENABLED, u"Account Enabled"),
     )
 
-    user = models.OneToOneField(User, db_index=True, related_name='standing')
+    user = models.OneToOneField(User, db_index=True, related_name='standing', on_delete=models.CASCADE)
     account_status = models.CharField(
         blank=True, max_length=31, choices=USER_STANDING_CHOICES
     )
-    changed_by = models.ForeignKey(User, blank=True)
+    changed_by = models.ForeignKey(User, blank=True, on_delete=models.CASCADE)
     standing_last_changed_at = models.DateTimeField(auto_now=True)
 
 
@@ -364,7 +364,7 @@ class UserProfile(models.Model):
     # CRITICAL TODO/SECURITY
     # Sanitize all fields.
     # This is not visible to other users, but could introduce holes later
-    user = models.OneToOneField(User, unique=True, db_index=True, related_name='profile')
+    user = models.OneToOneField(User, unique=True, db_index=True, related_name='profile', on_delete=models.CASCADE)
     name = models.CharField(blank=True, max_length=255, db_index=True)
 
     meta = models.TextField(blank=True)  # JSON dictionary for future expansion
@@ -640,7 +640,7 @@ class UserSignupSource(models.Model):
     This table contains information about users registering
     via Micro-Sites
     """
-    user = models.ForeignKey(User, db_index=True)
+    user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     site = models.CharField(max_length=255, db_index=True)
 
 
@@ -674,7 +674,7 @@ class Registration(models.Model):
     class Meta(object):
         db_table = "auth_registration"
 
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     activation_key = models.CharField(('activation key'), max_length=32, unique=True, db_index=True)
 
     def register(self, user):
@@ -711,7 +711,7 @@ class Registration(models.Model):
 
 
 class PendingNameChange(DeletableByUserValue, models.Model):
-    user = models.OneToOneField(User, unique=True, db_index=True)
+    user = models.OneToOneField(User, unique=True, db_index=True, on_delete=models.CASCADE)
     new_name = models.CharField(blank=True, max_length=255)
     rationale = models.CharField(blank=True, max_length=1024)
 
@@ -720,7 +720,7 @@ class PendingEmailChange(DeletableByUserValue, models.Model):
     """
     This model keeps track of pending requested changes to a user's email address.
     """
-    user = models.OneToOneField(User, unique=True, db_index=True)
+    user = models.OneToOneField(User, unique=True, db_index=True, on_delete=models.CASCADE)
     new_email = models.CharField(blank=True, max_length=255, db_index=True)
     activation_key = models.CharField(('activation key'), max_length=32, unique=True, db_index=True)
 
@@ -752,7 +752,7 @@ class PasswordHistory(models.Model):
     This model will keep track of past passwords that a user has used
     as well as providing contraints (e.g. can't reuse passwords)
     """
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     password = models.CharField(max_length=128)
     time_set = models.DateTimeField(default=timezone.now)
 
@@ -952,7 +952,7 @@ class LoginFailures(models.Model):
     """
     This model will keep track of failed login attempts
     """
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     failure_count = models.IntegerField(default=0)
     lockout_until = models.DateTimeField(null=True)
 
@@ -1157,11 +1157,12 @@ class CourseEnrollment(models.Model):
     """
     MODEL_TAGS = ['course', 'is_active', 'mode']
 
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     course = models.ForeignKey(
         CourseOverview,
         db_constraint=False,
+        on_delete=models.CASCADE,
     )
 
     @property
@@ -2093,8 +2094,8 @@ class ManualEnrollmentAudit(models.Model):
     """
     Table for tracking which enrollments were performed through manual enrollment.
     """
-    enrollment = models.ForeignKey(CourseEnrollment, null=True)
-    enrolled_by = models.ForeignKey(User, null=True)
+    enrollment = models.ForeignKey(CourseEnrollment, null=True, on_delete=models.CASCADE)
+    enrolled_by = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
     enrolled_email = models.CharField(max_length=255, db_index=True)
     time_stamp = models.DateTimeField(auto_now_add=True, null=True)
     state_transition = models.CharField(max_length=255, choices=TRANSITION_STATES)
@@ -2162,7 +2163,8 @@ class CourseEnrollmentAllowed(DeletableByUserValue, models.Model):
         null=True,
         blank=True,
         help_text="First user which enrolled in the specified course through the specified e-mail. "
-                  "Once set, it won't change."
+                  "Once set, it won't change.",
+        on_delete=models.CASCADE,
     )
 
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
@@ -2212,7 +2214,7 @@ class CourseAccessRole(models.Model):
 
     objects = NoneToEmptyManager()
 
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     # blank org is for global group based roles such as course creator (may be deprecated)
     org = models.CharField(max_length=64, db_index=True, blank=True)
     # blank course_id implies org wide role
@@ -2575,7 +2577,7 @@ class EntranceExamConfiguration(models.Model):
     Represents a Student's entrance exam specific data for a single Course
     """
 
-    user = models.ForeignKey(User, db_index=True)
+    user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     course_id = CourseKeyField(max_length=255, db_index=True)
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
     updated = models.DateTimeField(auto_now=True, db_index=True)
@@ -2644,7 +2646,8 @@ class LanguageProficiency(models.Model):
     class Meta(object):
         unique_together = (('code', 'user_profile'),)
 
-    user_profile = models.ForeignKey(UserProfile, db_index=True, related_name='language_proficiencies')
+    user_profile = models.ForeignKey(UserProfile, db_index=True, related_name='language_proficiencies',
+                                     on_delete=models.CASCADE)
     code = models.CharField(
         max_length=16,
         blank=False,
@@ -2663,7 +2666,7 @@ class SocialLink(models.Model):  # pylint: disable=model-missing-unicode
 
     The stored social_link value must adhere to the form 'https://www.[url_stub][username]'.
     """
-    user_profile = models.ForeignKey(UserProfile, db_index=True, related_name='social_links')
+    user_profile = models.ForeignKey(UserProfile, db_index=True, related_name='social_links', on_delete=models.CASCADE)
     platform = models.CharField(max_length=30)
     social_link = models.CharField(max_length=100, blank=True)
 
@@ -2672,7 +2675,7 @@ class CourseEnrollmentAttribute(models.Model):
     """
     Provide additional information about the user's enrollment.
     """
-    enrollment = models.ForeignKey(CourseEnrollment, related_name="attributes")
+    enrollment = models.ForeignKey(CourseEnrollment, related_name="attributes", on_delete=models.CASCADE)
     namespace = models.CharField(
         max_length=255,
         help_text=_("Namespace of enrollment attribute")
@@ -2801,7 +2804,7 @@ class UserAttribute(TimeStampedModel):
         # Ensure that at most one value exists for a given user/name.
         unique_together = (('user', 'name',), )
 
-    user = models.ForeignKey(User, related_name='attributes')
+    user = models.ForeignKey(User, related_name='attributes', on_delete=models.CASCADE)
     name = models.CharField(max_length=255, help_text=_("Name of this user attribute."), db_index=True)
     value = models.CharField(max_length=255, help_text=_("Value of this user attribute."))
 

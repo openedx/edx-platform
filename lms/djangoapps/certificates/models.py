@@ -136,7 +136,7 @@ class CertificateWhitelist(models.Model):
 
     objects = NoneToEmptyManager()
 
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     course_id = CourseKeyField(max_length=255, blank=True, default=None)
     whitelist = models.BooleanField(default=0)
     created = AutoCreatedField(_('created'))
@@ -231,7 +231,7 @@ class GeneratedCertificate(models.Model):
 
     VERIFIED_CERTS_MODES = [CourseMode.VERIFIED, CourseMode.CREDIT_MODE]
 
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     course_id = CourseKeyField(max_length=255, blank=True, default=None)
     verify_uuid = models.CharField(max_length=32, blank=True, default='', db_index=True)
     download_uuid = models.CharField(max_length=32, blank=True, default='')
@@ -358,8 +358,8 @@ class CertificateGenerationHistory(TimeStampedModel):
     """
 
     course_id = CourseKeyField(max_length=255)
-    generated_by = models.ForeignKey(User)
-    instructor_task = models.ForeignKey(InstructorTask)
+    generated_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    instructor_task = models.ForeignKey(InstructorTask, on_delete=models.CASCADE)
     is_regeneration = models.BooleanField(default=False)
 
     def get_task_name(self):
@@ -418,8 +418,8 @@ class CertificateInvalidation(TimeStampedModel):
     """
     Model for storing Certificate Invalidation.
     """
-    generated_certificate = models.ForeignKey(GeneratedCertificate)
-    invalidated_by = models.ForeignKey(User)
+    generated_certificate = models.ForeignKey(GeneratedCertificate, on_delete=models.CASCADE)
+    invalidated_by = models.ForeignKey(User, on_delete=models.CASCADE)
     notes = models.TextField(default=None, null=True)
     active = models.BooleanField(default=True)
 
@@ -710,7 +710,7 @@ class ExampleCertificate(TimeStampedModel):
     # Dummy full name for the generated certificate
     EXAMPLE_FULL_NAME = u'John Doë'
 
-    example_cert_set = models.ForeignKey(ExampleCertificateSet)
+    example_cert_set = models.ForeignKey(ExampleCertificateSet, on_delete=models.CASCADE)
 
     description = models.CharField(
         max_length=255,

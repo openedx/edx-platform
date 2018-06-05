@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('email', models.CharField(db_index=True, max_length=255, blank=True)),
                 ('course_id', CourseKeyField(max_length=255)),
-                ('course_user_group', models.ForeignKey(to='course_groups.CourseUserGroup')),
+                ('course_user_group', models.ForeignKey(to='course_groups.CourseUserGroup', on_delete=models.CASCADE)),
             ],
         ),
         migrations.AlterUniqueTogether(

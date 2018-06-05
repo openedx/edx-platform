@@ -19,6 +19,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='micrositehistory',
             name='site',
-            field=models.ForeignKey(related_name='microsite_history', to='sites.Site'),
+            field=models.ForeignKey(related_name='microsite_history', to='sites.Site', on_delete=models.CASCADE),
         ),
     ]

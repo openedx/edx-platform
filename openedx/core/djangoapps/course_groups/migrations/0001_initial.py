@@ -55,23 +55,23 @@ class Migration(migrations.Migration):
                 ('group_id', models.IntegerField(help_text=b'contains the id of a specific group within the cohorted partition')),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
-                ('course_user_group', models.OneToOneField(to='course_groups.CourseUserGroup')),
+                ('course_user_group', models.OneToOneField(to='course_groups.CourseUserGroup', on_delete=models.CASCADE)),
             ],
         ),
         migrations.AddField(
             model_name='coursecohort',
             name='course_user_group',
-            field=models.OneToOneField(related_name='cohort', to='course_groups.CourseUserGroup'),
+            field=models.OneToOneField(related_name='cohort', to='course_groups.CourseUserGroup', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='cohortmembership',
             name='course_user_group',
-            field=models.ForeignKey(to='course_groups.CourseUserGroup'),
+            field=models.ForeignKey(to='course_groups.CourseUserGroup', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='cohortmembership',
             name='user',
-            field=models.ForeignKey(to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE),
         ),
         migrations.AlterUniqueTogether(
             name='courseusergroup',

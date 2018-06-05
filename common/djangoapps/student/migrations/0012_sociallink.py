@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('platform', models.CharField(max_length=30)),
                 ('social_link', models.CharField(max_length=100, blank=True)),
-                ('user_profile', models.ForeignKey(related_name='social_links', to='student.UserProfile')),
+                ('user_profile', models.ForeignKey(related_name='social_links', to='student.UserProfile', on_delete=models.CASCADE)),
             ],
         ),
     ]

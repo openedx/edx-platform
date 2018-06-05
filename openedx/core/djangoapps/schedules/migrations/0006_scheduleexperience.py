@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('experience_type', models.PositiveSmallIntegerField(default=0, choices=[(0, b'Recurring Nudge and Upgrade Reminder'), (1, b'Course Updates')])),
-                ('schedule', models.OneToOneField(related_name='experience', to='schedules.Schedule')),
+                ('schedule', models.OneToOneField(related_name='experience', to='schedules.Schedule', on_delete=models.CASCADE)),
             ],
         ),
     ]

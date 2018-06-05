@@ -131,6 +131,7 @@ class ProviderConfig(ConfigurationModel):
         help_text=_(
             'The Site that this provider configuration belongs to.'
         ),
+        on_delete=models.CASCADE,
     )
     skip_hinted_login_dialog = models.BooleanField(
         default=False,
@@ -390,6 +391,7 @@ class SAMLConfiguration(ConfigurationModel):
         help_text=_(
             'The Site that this SAML configuration belongs to.'
         ),
+        on_delete=models.CASCADE,
     )
     slug = models.SlugField(
         max_length=30,
@@ -812,7 +814,7 @@ class ProviderApiPermissions(models.Model):
 
     It gives permission for a OAuth2 client to access the information under certain IdPs.
     """
-    client = models.ForeignKey(Client)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
     provider_id = models.CharField(
         max_length=255,
         help_text=(

@@ -16,6 +16,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='courseenrollmentallowed',
             name='user',
-            field=models.ForeignKey(blank=True, to=settings.AUTH_USER_MODEL, help_text="First user which enrolled in the specified course through the specified e-mail. Once set, it won't change.", null=True),
+            field=models.ForeignKey(blank=True, to=settings.AUTH_USER_MODEL, help_text="First user which enrolled in the specified course through the specified e-mail. Once set, it won't change.", null=True, on_delete=models.CASCADE),
         ),
     ]

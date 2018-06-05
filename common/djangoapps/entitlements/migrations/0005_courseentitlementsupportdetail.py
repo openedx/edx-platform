@@ -24,9 +24,9 @@ class Migration(migrations.Migration):
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
                 ('reason', models.CharField(max_length=15, choices=[(b'LEAVE', 'Learner requested leave session for expired entitlement'), (b'CHANGE', 'Learner requested session change for expired entitlement'), (b'LEARNER_NEW', 'Learner requested new entitlement'), (b'COURSE_TEAM_NEW', 'Course team requested entitlement for learnerg'), (b'OTHER', 'Other')])),
                 ('comments', models.TextField(null=True)),
-                ('entitlement', models.ForeignKey(to='entitlements.CourseEntitlement')),
-                ('support_user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
-                ('unenrolled_run', models.ForeignKey(db_constraint=False, blank=True, to='course_overviews.CourseOverview', null=True)),
+                ('entitlement', models.ForeignKey(to='entitlements.CourseEntitlement', on_delete=models.CASCADE)),
+                ('support_user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
+                ('unenrolled_run', models.ForeignKey(db_constraint=False, blank=True, to='course_overviews.CourseOverview', null=True, on_delete=models.CASCADE)),
             ],
             options={
                 'abstract': False,

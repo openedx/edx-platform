@@ -26,7 +26,7 @@ class CourseGoal(models.Model):
     """
     Represents a course goal set by a user on the course home page.
     """
-    user = models.ForeignKey(User, blank=False)
+    user = models.ForeignKey(User, blank=False, on_delete=models.CASCADE)
     course_key = CourseKeyField(max_length=255, db_index=True)
     goal_key = models.CharField(max_length=100, choices=GOAL_KEY_CHOICES, default=GOAL_KEY_CHOICES.unsure)
 

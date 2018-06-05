@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('anonymous_user_id', models.CharField(unique=True, max_length=32)),
                 ('course_id', CourseKeyField(db_index=True, max_length=255, blank=True)),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
                 ('org', models.CharField(db_index=True, max_length=64, blank=True)),
                 ('course_id', CourseKeyField(db_index=True, max_length=255, blank=True)),
                 ('role', models.CharField(max_length=64, db_index=True)),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -43,7 +43,7 @@ class Migration(migrations.Migration):
                 ('created', models.DateTimeField(db_index=True, auto_now_add=True, null=True)),
                 ('is_active', models.BooleanField(default=True)),
                 ('mode', models.CharField(default=b'honor', max_length=100)),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ('user', 'course_id'),
@@ -66,7 +66,7 @@ class Migration(migrations.Migration):
                 ('namespace', models.CharField(help_text='Namespace of enrollment attribute', max_length=255)),
                 ('name', models.CharField(help_text='Name of the enrollment attribute', max_length=255)),
                 ('value', models.CharField(help_text='Value of the enrollment attribute', max_length=255)),
-                ('enrollment', models.ForeignKey(related_name='attributes', to='student.CourseEnrollment')),
+                ('enrollment', models.ForeignKey(related_name='attributes', to='student.CourseEnrollment', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -105,7 +105,7 @@ class Migration(migrations.Migration):
                 ('created', models.DateTimeField(db_index=True, auto_now_add=True, null=True)),
                 ('updated', models.DateTimeField(auto_now=True, db_index=True)),
                 ('skip_entrance_exam', models.BooleanField(default=True)),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -157,7 +157,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('failure_count', models.IntegerField(default=0)),
                 ('lockout_until', models.DateTimeField(null=True)),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -168,8 +168,8 @@ class Migration(migrations.Migration):
                 ('time_stamp', models.DateTimeField(auto_now_add=True, null=True)),
                 ('state_transition', models.CharField(max_length=255, choices=[(b'from unenrolled to allowed to enroll', b'from unenrolled to allowed to enroll'), (b'from allowed to enroll to enrolled', b'from allowed to enroll to enrolled'), (b'from enrolled to enrolled', b'from enrolled to enrolled'), (b'from enrolled to unenrolled', b'from enrolled to unenrolled'), (b'from unenrolled to enrolled', b'from unenrolled to enrolled'), (b'from allowed to enroll to enrolled', b'from allowed to enroll to enrolled'), (b'from unenrolled to unenrolled', b'from unenrolled to unenrolled'), (b'N/A', b'N/A')])),
                 ('reason', models.TextField(null=True)),
-                ('enrolled_by', models.ForeignKey(to=settings.AUTH_USER_MODEL, null=True)),
-                ('enrollment', models.ForeignKey(to='student.CourseEnrollment', null=True)),
+                ('enrolled_by', models.ForeignKey(to=settings.AUTH_USER_MODEL, null=True, on_delete=models.CASCADE)),
+                ('enrollment', models.ForeignKey(to='student.CourseEnrollment', null=True, on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -178,7 +178,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('password', models.CharField(max_length=128)),
                 ('time_set', models.DateTimeField(default=django.utils.timezone.now)),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -187,7 +187,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('new_email', models.CharField(db_index=True, max_length=255, blank=True)),
                 ('activation_key', models.CharField(unique=True, max_length=32, verbose_name=b'activation key', db_index=True)),
-                ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL)),
+                ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -196,7 +196,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('new_name', models.CharField(max_length=255, blank=True)),
                 ('rationale', models.CharField(max_length=1024, blank=True)),
-                ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL)),
+                ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -204,7 +204,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('activation_key', models.CharField(unique=True, max_length=32, verbose_name=b'activation key', db_index=True)),
-                ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL)),
+                ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
                 'db_table': 'auth_registration',
@@ -229,7 +229,7 @@ class Migration(migrations.Migration):
                 ('allow_certificate', models.BooleanField(default=1)),
                 ('bio', models.CharField(max_length=3000, null=True, blank=True)),
                 ('profile_image_uploaded_at', models.DateTimeField(null=True)),
-                ('user', models.OneToOneField(related_name='profile', to=settings.AUTH_USER_MODEL)),
+                ('user', models.OneToOneField(related_name='profile', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
                 'db_table': 'auth_userprofile',
@@ -240,7 +240,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('site', models.CharField(max_length=255, db_index=True)),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -249,8 +249,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('account_status', models.CharField(blank=True, max_length=31, choices=[(b'disabled', 'Account Disabled'), (b'enabled', 'Account Enabled')])),
                 ('standing_last_changed_at', models.DateTimeField(auto_now=True)),
-                ('changed_by', models.ForeignKey(to=settings.AUTH_USER_MODEL, blank=True)),
-                ('user', models.OneToOneField(related_name='standing', to=settings.AUTH_USER_MODEL)),
+                ('changed_by', models.ForeignKey(to=settings.AUTH_USER_MODEL, blank=True, on_delete=models.CASCADE)),
+                ('user', models.OneToOneField(related_name='standing', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -265,7 +265,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='languageproficiency',
             name='user_profile',
-            field=models.ForeignKey(related_name='language_proficiencies', to='student.UserProfile'),
+            field=models.ForeignKey(related_name='language_proficiencies', to='student.UserProfile', on_delete=models.CASCADE),
         ),
         migrations.AlterUniqueTogether(
             name='courseenrollmentallowed',

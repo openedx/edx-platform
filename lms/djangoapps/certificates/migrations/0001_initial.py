@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
                 ('course_id', CourseKeyField(default=None, max_length=255, blank=True)),
                 ('mode', models.CharField(max_length=100)),
                 ('data', jsonfield.fields.JSONField()),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -117,7 +117,7 @@ class Migration(migrations.Migration):
                 ('whitelist', models.BooleanField(default=0)),
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, verbose_name='created', editable=False)),
                 ('notes', models.TextField(default=None, null=True)),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -165,13 +165,13 @@ class Migration(migrations.Migration):
                 ('created_date', models.DateTimeField(auto_now_add=True)),
                 ('modified_date', models.DateTimeField(auto_now=True)),
                 ('error_reason', models.CharField(default=b'', max_length=512, blank=True)),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
         migrations.AddField(
             model_name='examplecertificate',
             name='example_cert_set',
-            field=models.ForeignKey(to='certificates.ExampleCertificateSet'),
+            field=models.ForeignKey(to='certificates.ExampleCertificateSet', on_delete=models.CASCADE),
         ),
         migrations.AlterUniqueTogether(
             name='certificatetemplate',

@@ -164,8 +164,8 @@ class SurveyAnswer(TimeStampedModel):
     """
     Model for the answers that a user gives for a particular form in a course
     """
-    user = models.ForeignKey(User, db_index=True)
-    form = models.ForeignKey(SurveyForm, db_index=True)
+    user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
+    form = models.ForeignKey(SurveyForm, db_index=True, on_delete=models.CASCADE)
     field_name = models.CharField(max_length=255, db_index=True)
     field_value = models.CharField(max_length=1024)
 

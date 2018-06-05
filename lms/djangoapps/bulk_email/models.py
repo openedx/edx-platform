@@ -28,7 +28,7 @@ class Email(models.Model):
     """
     Abstract base class for common information for an email.
     """
-    sender = models.ForeignKey(User, default=1, blank=True, null=True)
+    sender = models.ForeignKey(User, default=1, blank=True, null=True, on_delete=models.CASCADE)
     slug = models.CharField(max_length=128, db_index=True)
     subject = models.CharField(max_length=128, blank=True)
     html_message = models.TextField(null=True, blank=True)
@@ -139,7 +139,7 @@ class CohortTarget(Target):
     """
     Subclass of Target, specifically referring to a cohort.
     """
-    cohort = models.ForeignKey('course_groups.CourseUserGroup')
+    cohort = models.ForeignKey('course_groups.CourseUserGroup', on_delete=models.CASCADE)
 
     class Meta:
         app_label = "bulk_email"
@@ -182,7 +182,7 @@ class CourseModeTarget(Target):
     """
     Subclass of Target, specifically for course modes.
     """
-    track = models.ForeignKey('course_modes.CourseMode')
+    track = models.ForeignKey('course_modes.CourseMode', on_delete=models.CASCADE)
 
     class Meta:
         app_label = "bulk_email"
@@ -306,7 +306,7 @@ class Optout(models.Model):
     # Allowing null=True to support data migration from email->user.
     # We need to first create the 'user' column with some sort of default in order to run the data migration,
     # and given the unique index, 'null' is the best default value.
-    user = models.ForeignKey(User, db_index=True, null=True)
+    user = models.ForeignKey(User, db_index=True, null=True, on_delete=models.CASCADE)
     course_id = CourseKeyField(max_length=255, db_index=True)
 
     class Meta(object):

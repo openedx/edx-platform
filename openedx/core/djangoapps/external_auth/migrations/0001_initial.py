@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
                 ('internal_password', models.CharField(max_length=31, blank=True)),
                 ('dtcreated', models.DateTimeField(auto_now_add=True, verbose_name=b'creation date')),
                 ('dtsignup', models.DateTimeField(null=True, verbose_name=b'signup date')),
-                ('user', models.OneToOneField(null=True, to=settings.AUTH_USER_MODEL)),
+                ('user', models.OneToOneField(null=True, to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
         migrations.AlterUniqueTogether(

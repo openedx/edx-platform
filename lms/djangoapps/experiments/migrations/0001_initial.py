@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
                 ('experiment_id', models.PositiveSmallIntegerField(verbose_name=b'Experiment ID', db_index=True)),
                 ('key', models.CharField(max_length=255)),
                 ('value', models.TextField()),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'Experiment Data',

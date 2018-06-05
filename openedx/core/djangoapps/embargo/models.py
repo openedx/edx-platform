@@ -428,12 +428,14 @@ class CountryAccessRule(models.Model):
 
     restricted_course = models.ForeignKey(
         "RestrictedCourse",
-        help_text=ugettext_lazy(u"The course to which this rule applies.")
+        help_text=ugettext_lazy(u"The course to which this rule applies."),
+        on_delete=models.CASCADE,
     )
 
     country = models.ForeignKey(
         "Country",
-        help_text=ugettext_lazy(u"The country to which this rule applies.")
+        help_text=ugettext_lazy(u"The country to which this rule applies."),
+        on_delete=models.CASCADE,
     )
 
     CACHE_KEY = u"embargo.allowed_countries.{course_key}"

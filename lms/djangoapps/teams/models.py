@@ -171,8 +171,8 @@ class CourseTeamMembership(models.Model):
         app_label = "teams"
         unique_together = (('user', 'team'),)
 
-    user = models.ForeignKey(User)
-    team = models.ForeignKey(CourseTeam, related_name='membership')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    team = models.ForeignKey(CourseTeam, related_name='membership', on_delete=models.CASCADE)
     date_joined = models.DateTimeField(auto_now_add=True)
     last_activity_at = models.DateTimeField()
 

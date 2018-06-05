@@ -113,7 +113,7 @@ class Order(models.Model):
     class Meta(object):
         app_label = "shoppingcart"
 
-    user = models.ForeignKey(User, db_index=True)
+    user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     currency = models.CharField(default="usd", max_length=8)  # lower case ISO currency codes
     status = models.CharField(max_length=32, default='cart', choices=ORDER_STATUSES)
     purchase_time = models.DateTimeField(null=True, blank=True)
@@ -648,9 +648,9 @@ class OrderItem(TimeStampedModel):
         base_manager_name = 'objects'
 
     objects = InheritanceManager()
-    order = models.ForeignKey(Order, db_index=True)
+    order = models.ForeignKey(Order, db_index=True, on_delete=models.CASCADE)
     # this is denormalized, but convenient for SQL queries for reports, etc. user should always be = order.user
-    user = models.ForeignKey(User, db_index=True)
+    user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     # this is denormalized, but convenient for SQL queries for reports, etc. status should always be = order.status
     status = models.CharField(max_length=32, default='cart', choices=ORDER_STATUSES, db_index=True)
     qty = models.IntegerField(default=1)
@@ -1003,7 +1003,7 @@ class InvoiceTransaction(TimeStampedModel):
     class Meta(object):
         app_label = "shoppingcart"
 
-    invoice = models.ForeignKey(Invoice)
+    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
     amount = models.DecimalField(
         default=0.0, decimal_places=2, max_digits=30,
         help_text=ugettext_lazy(
@@ -1032,8 +1032,8 @@ class InvoiceTransaction(TimeStampedModel):
             "'cancelled' means that payment or refund was expected, but was cancelled before money was transferred. "
         )
     )
-    created_by = models.ForeignKey(User)
-    last_modified_by = models.ForeignKey(User, related_name='last_modified_by_user')
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    last_modified_by = models.ForeignKey(User, related_name='last_modified_by_user', on_delete=models.CASCADE)
 
     @classmethod
     def get_invoice_transaction(cls, invoice_id):
@@ -1095,7 +1095,7 @@ class InvoiceItem(TimeStampedModel):
         base_manager_name = 'objects'
 
     objects = InheritanceManager()
-    invoice = models.ForeignKey(Invoice, db_index=True)
+    invoice = models.ForeignKey(Invoice, db_index=True, on_delete=models.CASCADE)
     qty = models.IntegerField(
         default=1,
         help_text=ugettext_lazy("The number of items sold.")
@@ -1171,7 +1171,7 @@ class InvoiceHistory(models.Model):
 
     """
     timestamp = models.DateTimeField(auto_now_add=True, db_index=True)
-    invoice = models.ForeignKey(Invoice)
+    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
 
     # JSON-serialized representation of the current state
     # of the invoice, including its line items and
@@ -1234,17 +1234,17 @@ class CourseRegistrationCode(models.Model):
 
     code = models.CharField(max_length=32, db_index=True, unique=True)
     course_id = CourseKeyField(max_length=255, db_index=True)
-    created_by = models.ForeignKey(User, related_name='created_by_user')
+    created_by = models.ForeignKey(User, related_name='created_by_user', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
-    order = models.ForeignKey(Order, db_index=True, null=True, related_name="purchase_order")
+    order = models.ForeignKey(Order, db_index=True, null=True, related_name="purchase_order", on_delete=models.CASCADE)
     mode_slug = models.CharField(max_length=100, null=True)
     is_valid = models.BooleanField(default=True)
 
     # For backwards compatibility, we maintain the FK to "invoice"
     # In the future, we will remove this in favor of the FK
     # to "invoice_item" (which can be used to look up the invoice).
-    invoice = models.ForeignKey(Invoice, null=True)
-    invoice_item = models.ForeignKey(CourseRegistrationCodeInvoiceItem, null=True)
+    invoice = models.ForeignKey(Invoice, null=True, on_delete=models.CASCADE)
+    invoice_item = models.ForeignKey(CourseRegistrationCodeInvoiceItem, null=True, on_delete=models.CASCADE)
 
     @classmethod
     def order_generated_registration_codes(cls, course_id):
@@ -1270,11 +1270,11 @@ class RegistrationCodeRedemption(models.Model):
     class Meta(object):
         app_label = "shoppingcart"
 
-    order = models.ForeignKey(Order, db_index=True, null=True)
-    registration_code = models.ForeignKey(CourseRegistrationCode, db_index=True)
-    redeemed_by = models.ForeignKey(User, db_index=True)
+    order = models.ForeignKey(Order, db_index=True, null=True, on_delete=models.CASCADE)
+    registration_code = models.ForeignKey(CourseRegistrationCode, db_index=True, on_delete=models.CASCADE)
+    redeemed_by = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     redeemed_at = models.DateTimeField(auto_now_add=True, null=True)
-    course_enrollment = models.ForeignKey(CourseEnrollment, null=True)
+    course_enrollment = models.ForeignKey(CourseEnrollment, null=True, on_delete=models.CASCADE)
 
     @classmethod
     def registration_code_used_for_enrollment(cls, course_enrollment):
@@ -1334,7 +1334,7 @@ class Coupon(models.Model):
     description = models.CharField(max_length=255, null=True, blank=True)
     course_id = CourseKeyField(max_length=255)
     percentage_discount = models.IntegerField(default=0)
-    created_by = models.ForeignKey(User)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
     expiration_date = models.DateTimeField(null=True, blank=True)
@@ -1357,9 +1357,9 @@ class CouponRedemption(models.Model):
     class Meta(object):
         app_label = "shoppingcart"
 
-    order = models.ForeignKey(Order, db_index=True)
-    user = models.ForeignKey(User, db_index=True)
-    coupon = models.ForeignKey(Coupon, db_index=True)
+    order = models.ForeignKey(Order, db_index=True, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
+    coupon = models.ForeignKey(Coupon, db_index=True, on_delete=models.CASCADE)
 
     @classmethod
     def remove_code_redemption_from_item(cls, item, user):
@@ -1475,7 +1475,7 @@ class PaidCourseRegistration(OrderItem):
 
     course_id = CourseKeyField(max_length=128, db_index=True)
     mode = models.SlugField(default=CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG)
-    course_enrollment = models.ForeignKey(CourseEnrollment, null=True)
+    course_enrollment = models.ForeignKey(CourseEnrollment, null=True, on_delete=models.CASCADE)
 
     @classmethod
     def get_self_purchased_seat_count(cls, course_key, status='purchased'):
@@ -1868,7 +1868,7 @@ class CertificateItem(OrderItem):
         app_label = "shoppingcart"
 
     course_id = CourseKeyField(max_length=128, db_index=True)
-    course_enrollment = models.ForeignKey(CourseEnrollment)
+    course_enrollment = models.ForeignKey(CourseEnrollment, on_delete=models.CASCADE)
     mode = models.SlugField()
 
     @receiver(UNENROLL_DONE)
