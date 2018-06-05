@@ -2,12 +2,10 @@
 Integration tests for third_party_auth LTI auth providers
 """
 import unittest
-import django
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.urls import reverse
 from oauthlib.oauth1.rfc5849 import Client, SIGNATURE_TYPE_BODY
-from openedx.tests.util import expected_redirect_url
 from third_party_auth.tests import testutil
 
 FORM_ENCODED = 'application/x-www-form-urlencoded'
@@ -94,7 +92,7 @@ class IntegrationTestLTI(testutil.TestCase):
         self.assertEqual(continue_response.status_code, 302)
         self.assertEqual(
             continue_response['Location'],
-            expected_redirect_url('/account/finish_auth/?course_id=my_course_id&enrollment_action=enroll')
+            '/account/finish_auth/?course_id=my_course_id&enrollment_action=enroll'
         )
 
         # Now check that we can login again
@@ -108,12 +106,7 @@ class IntegrationTestLTI(testutil.TestCase):
         login_2_response = self.client.post(path=uri, content_type=FORM_ENCODED, data=body)
         # The user should be redirected to the dashboard
         self.assertEqual(login_2_response.status_code, 302)
-        expected_url = expected_redirect_url(LTI_TPA_COMPLETE_URL)
-        # TODO: Remove Django 1.11 upgrade shim
-        # SHIM: Get rid of this logic post-upgrade
-        if django.VERSION >= (1, 9):
-            expected_url = "{}?".format(expected_url)
-        self.assertEqual(login_2_response['Location'], expected_url)
+        self.assertEqual(login_2_response['Location'], LTI_TPA_COMPLETE_URL + "?")
         continue_2_response = self.client.get(login_2_response['Location'])
         self.assertEqual(continue_2_response.status_code, 302)
         self.assertTrue(continue_2_response['Location'].endswith(reverse('dashboard')))

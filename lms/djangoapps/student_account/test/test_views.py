@@ -47,7 +47,6 @@ from openedx.core.djangoapps.user_api.accounts.api import activate_account, crea
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from openedx.tests.util import expected_redirect_url
 from student.tests.factories import UserFactory
 from student_account.views import account_settings_context, get_user_orders
 from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
@@ -605,9 +604,11 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         self.google_provider.save()
         params = [("next", "/courses/something/?tpa_hint=oa2-google-oauth2")]
         response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
+        expected_url = '/auth/login/google-oauth2/?auth_entry={}&next=%2Fcourses'\
+                       '%2Fsomething%2F%3Ftpa_hint%3Doa2-google-oauth2'.format(auth_entry)
         self.assertRedirects(
             response,
-            expected_redirect_url('auth/login/google-oauth2/?auth_entry={}&next=%2Fcourses%2Fsomething%2F%3Ftpa_hint%3Doa2-google-oauth2'.format(auth_entry)),
+            expected_url,
             target_status_code=302
         )
 
@@ -649,9 +650,11 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         self.google_provider.save()
         params = [("next", "/courses/something/")]
         response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
+        expected_url = '/auth/login/google-oauth2/?auth_entry={}&next=%2Fcourses'\
+                       '%2Fsomething%2F%3Ftpa_hint%3Doa2-google-oauth2'.format(auth_entry)
         self.assertRedirects(
             response,
-            expected_redirect_url('auth/login/google-oauth2/?auth_entry={}&next=%2Fcourses%2Fsomething%2F%3Ftpa_hint%3Doa2-google-oauth2'.format(auth_entry)),
+            expected_url,
             target_status_code=302
         )
 

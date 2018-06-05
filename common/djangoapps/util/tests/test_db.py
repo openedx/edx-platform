@@ -5,7 +5,6 @@ import time
 import unittest
 
 import ddt
-import django
 import pytest
 from django.contrib.auth.models import User
 from django.core.management import call_command
@@ -217,7 +216,6 @@ class GenerateIntIdTestCase(TestCase):
             self.assertIn(int_id, list(set(range(minimum, maximum + 1)) - used_ids))
 
 
-@pytest.mark.django111_expected_failure
 class MigrationTests(TestCase):
     """
     Tests for migrations.
@@ -235,11 +233,6 @@ class MigrationTests(TestCase):
         make a migrationless release that'll require a separate migration
         release afterwards, this test doesn't fail.
         """
-        # TODO: Remove Django 1.11 upgrade shim
-        # SHIM: Migrations are known to be needed when actually bumping the Django version number.
-        if django.VERSION >= (1, 9):
-            pytest.skip("Migrations are known to be needed for Django 1.9+!")
-
         out = StringIO()
         call_command('makemigrations', dry_run=True, verbosity=3, stdout=out)
         output = out.getvalue()

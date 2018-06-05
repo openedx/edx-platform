@@ -33,7 +33,6 @@ import imp
 import sys
 import os
 
-import django
 from path import Path as path
 from django.utils.translation import ugettext_lazy as _
 
@@ -1216,13 +1215,6 @@ CREDIT_NOTIFICATION_CACHE_TIMEOUT = 5 * 60 * 60
 
 ################################# Middleware ###################################
 
-# TODO: Remove Django 1.11 upgrade shim
-# SHIM: Remove birdcage references post-1.11 upgrade as it is only in place to help during that deployment
-if django.VERSION < (1, 9):
-    _csrf_middleware = 'birdcage.v1_11.csrf.CsrfViewMiddleware'
-else:
-    _csrf_middleware = 'django.middleware.csrf.CsrfViewMiddleware'
-
 MIDDLEWARE_CLASSES = [
     'crum.CurrentRequestUserMiddleware',
 
@@ -1264,7 +1256,7 @@ MIDDLEWARE_CLASSES = [
     'corsheaders.middleware.CorsMiddleware',
     'openedx.core.djangoapps.cors_csrf.middleware.CorsCSRFMiddleware',
     'openedx.core.djangoapps.cors_csrf.middleware.CsrfCrossDomainCookieMiddleware',
-    _csrf_middleware,
+    'django.middleware.csrf.CsrfViewMiddleware',
 
     'splash.middleware.SplashMiddleware',
 

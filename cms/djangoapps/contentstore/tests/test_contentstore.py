@@ -12,11 +12,11 @@ from unittest import SkipTest
 from uuid import uuid4
 
 import ddt
-import django
 import lxml.html
 import mock
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.middleware.csrf import _compare_salted_tokens
 from django.test import TestCase
 from django.test.utils import override_settings
 from edxval.api import create_video, get_videos_for_course
@@ -2235,13 +2235,7 @@ class SigninPageTestCase(TestCase):
         self.assertIsNotNone(csrf_token.value)
         self.assertIsNotNone(csrf_input_field)
 
-        # TODO: Remove Django 1.11 upgrade shim
-        # SHIM: _compare_salted_tokens was introduced in 1.10. Move the import and use only that branch post-upgrade.
-        if django.VERSION < (1, 10):
-            self.assertEqual(csrf_token.value, csrf_input_field.attrib["value"])
-        else:
-            from django.middleware.csrf import _compare_salted_tokens
-            self.assertTrue(_compare_salted_tokens(csrf_token.value, csrf_input_field.attrib["value"]))
+        self.assertTrue(_compare_salted_tokens(csrf_token.value, csrf_input_field.attrib["value"]))
 
 
 def _create_course(test, course_key, course_data):

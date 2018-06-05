@@ -10,7 +10,6 @@ from datetime import datetime, timedelta
 import ddt
 import pytz
 import six
-import django
 from django.conf import settings
 from django.db.utils import IntegrityError
 from mock import MagicMock, patch
@@ -111,28 +110,6 @@ class HasCourseWithProblemsMixin(object):
         # pylint: enable=attribute-defined-outside-init,no-member
 
 
-# TODO: Remove Django 1.11 upgrade shim
-# SHIM: Django 1.11 results in a few more SAVEPOINTs due to:
-# https://github.com/django/django/commit/d44afd88#diff-5b0dda5eb9a242c15879dc9cd2121379L485
-# Get rid of this logic post-upgrade.
-def _recalc_expected_query_counts():
-    if django.VERSION >= (1, 11):
-        return 27
-    else:
-        return 23
-
-
-# TODO: Remove Django 1.11 upgrade shim
-# SHIM: Django 1.11 results in a few more SAVEPOINTs due to:
-# https://github.com/django/django/commit/d44afd88#diff-5b0dda5eb9a242c15879dc9cd2121379L485
-# Get rid of this logic post-upgrade.
-def _recalc_persistent_expected_query_counts():
-    if django.VERSION >= (1, 11):
-        return 28
-    else:
-        return 24
-
-
 @patch.dict(settings.FEATURES, {'PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS': False})
 @ddt.ddt
 class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTestCase):
@@ -191,10 +168,10 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             self.assertEquals(mock_block_structure_create.call_count, 1)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, _recalc_expected_query_counts(), True),
-        (ModuleStoreEnum.Type.mongo, 1, _recalc_expected_query_counts(), False),
-        (ModuleStoreEnum.Type.split, 3, _recalc_expected_query_counts(), True),
-        (ModuleStoreEnum.Type.split, 3, _recalc_expected_query_counts(), False),
+        (ModuleStoreEnum.Type.mongo, 1, 27, True),
+        (ModuleStoreEnum.Type.mongo, 1, 27, False),
+        (ModuleStoreEnum.Type.split, 3, 27, True),
+        (ModuleStoreEnum.Type.split, 3, 27, False),
     )
     @ddt.unpack
     def test_query_counts(self, default_store, num_mongo_calls, num_sql_calls, create_multiple_subsections):
@@ -206,8 +183,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
                     self._apply_recalculate_subsection_grade()
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, _recalc_expected_query_counts()),
-        (ModuleStoreEnum.Type.split, 3, _recalc_expected_query_counts()),
+        (ModuleStoreEnum.Type.mongo, 1, 27),
+        (ModuleStoreEnum.Type.split, 3, 27),
     )
     @ddt.unpack
     def test_query_counts_dont_change_with_more_content(self, default_store, num_mongo_calls, num_sql_calls):
@@ -267,8 +244,8 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
             self.assertEqual(len(PersistentSubsectionGrade.bulk_read_grades(self.user.id, self.course.id)), 0)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1, _recalc_persistent_expected_query_counts()),
-        (ModuleStoreEnum.Type.split, 3, _recalc_persistent_expected_query_counts()),
+        (ModuleStoreEnum.Type.mongo, 1, 28),
+        (ModuleStoreEnum.Type.split, 3, 28),
     )
     @ddt.unpack
     def test_persistent_grades_enabled_on_course(self, default_store, num_mongo_queries, num_sql_queries):

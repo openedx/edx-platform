@@ -63,7 +63,6 @@ from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.gating import api as gating_api
 from openedx.features.course_experience import COURSE_OUTLINE_PAGE_FLAG, UNIFIED_COURSE_TAB_FLAG
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
-from openedx.tests.util import expected_redirect_url
 from student.models import CourseEnrollment
 from student.tests.factories import TEST_PASSWORD, AdminFactory, CourseEnrollmentFactory, UserFactory
 from util.tests.test_date_utils import fake_pgettext, fake_ugettext
@@ -106,7 +105,7 @@ class TestJumpTo(ModuleStoreTestCase):
         course = CourseFactory.create()
         chapter = ItemFactory.create(category='chapter', parent_location=course.location)
         section = ItemFactory.create(category='sequential', parent_location=chapter.location)
-        expected = 'courses/{course_id}/courseware/{chapter_id}/{section_id}/?{activate_block_id}'.format(
+        expected = '/courses/{course_id}/courseware/{chapter_id}/{section_id}/?{activate_block_id}'.format(
             course_id=unicode(course.id),
             chapter_id=chapter.url_name,
             section_id=section.url_name,
@@ -118,7 +117,7 @@ class TestJumpTo(ModuleStoreTestCase):
             unicode(section.location),
         )
         response = self.client.get(jumpto_url)
-        self.assertRedirects(response, expected_redirect_url(expected), status_code=302, target_status_code=302)
+        self.assertRedirects(response, expected, status_code=302, target_status_code=302)
 
     def test_jumpto_from_module(self):
         course = CourseFactory.create()
@@ -129,7 +128,7 @@ class TestJumpTo(ModuleStoreTestCase):
         module1 = ItemFactory.create(category='html', parent_location=vertical1.location)
         module2 = ItemFactory.create(category='html', parent_location=vertical2.location)
 
-        expected = 'courses/{course_id}/courseware/{chapter_id}/{section_id}/1?{activate_block_id}'.format(
+        expected = '/courses/{course_id}/courseware/{chapter_id}/{section_id}/1?{activate_block_id}'.format(
             course_id=unicode(course.id),
             chapter_id=chapter.url_name,
             section_id=section.url_name,
@@ -141,9 +140,9 @@ class TestJumpTo(ModuleStoreTestCase):
             unicode(module1.location),
         )
         response = self.client.get(jumpto_url)
-        self.assertRedirects(response, expected_redirect_url(expected), status_code=302, target_status_code=302)
+        self.assertRedirects(response, expected, status_code=302, target_status_code=302)
 
-        expected = 'courses/{course_id}/courseware/{chapter_id}/{section_id}/2?{activate_block_id}'.format(
+        expected = '/courses/{course_id}/courseware/{chapter_id}/{section_id}/2?{activate_block_id}'.format(
             course_id=unicode(course.id),
             chapter_id=chapter.url_name,
             section_id=section.url_name,
@@ -155,7 +154,7 @@ class TestJumpTo(ModuleStoreTestCase):
             unicode(module2.location),
         )
         response = self.client.get(jumpto_url)
-        self.assertRedirects(response, expected_redirect_url(expected), status_code=302, target_status_code=302)
+        self.assertRedirects(response, expected, status_code=302, target_status_code=302)
 
     def test_jumpto_from_nested_module(self):
         course = CourseFactory.create()
@@ -171,7 +170,7 @@ class TestJumpTo(ModuleStoreTestCase):
 
         # internal position of module2 will be 1_2 (2nd item withing 1st item)
 
-        expected = 'courses/{course_id}/courseware/{chapter_id}/{section_id}/1?{activate_block_id}'.format(
+        expected = '/courses/{course_id}/courseware/{chapter_id}/{section_id}/1?{activate_block_id}'.format(
             course_id=unicode(course.id),
             chapter_id=chapter.url_name,
             section_id=section.url_name,
@@ -183,7 +182,7 @@ class TestJumpTo(ModuleStoreTestCase):
             unicode(module2.location),
         )
         response = self.client.get(jumpto_url)
-        self.assertRedirects(response, expected_redirect_url(expected), status_code=302, target_status_code=302)
+        self.assertRedirects(response, expected, status_code=302, target_status_code=302)
 
     def test_jumpto_id_invalid_location(self):
         location = BlockUsageLocator(CourseLocator('edX', 'toy', 'NoSuchPlace', deprecated=True),

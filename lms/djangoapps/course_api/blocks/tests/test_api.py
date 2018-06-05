@@ -5,7 +5,6 @@ Tests for Blocks api.py
 from itertools import product
 
 import ddt
-import django
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 
@@ -180,13 +179,7 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
             clear_course_from_cache(course.id)
 
             if with_storage_backing:
-                # TODO: Remove Django 1.11 upgrade shim
-                # SHIM: Django 1.11 results in a few more SAVEPOINTs due to:
-                # https://github.com/django/django/commit/d44afd88#diff-5b0dda5eb9a242c15879dc9cd2121379L485
-                if django.VERSION >= (1, 11):
-                    num_sql_queries = 16
-                else:
-                    num_sql_queries = 14
+                num_sql_queries = 16
             else:
                 num_sql_queries = 6
 
@@ -235,13 +228,7 @@ class TestQueryCountsWithIndividualOverrideProvider(TestGetBlocksQueryCountsBase
             clear_course_from_cache(course.id)
 
             if with_storage_backing:
-                # TODO: Remove Django 1.11 upgrade shim
-                # SHIM: Django 1.11 results in a few more SAVEPOINTs due to:
-                # https://github.com/django/django/commit/d44afd88#diff-5b0dda5eb9a242c15879dc9cd2121379L485
-                if django.VERSION >= (1, 11):
-                    num_sql_queries = 17
-                else:
-                    num_sql_queries = 15
+                num_sql_queries = 17
             else:
                 num_sql_queries = 7
 

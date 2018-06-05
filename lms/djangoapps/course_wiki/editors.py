@@ -2,7 +2,6 @@
 Support for using the CodeMirror code editor as a wiki content editor.
 """
 
-import django
 from django import forms
 from django.forms.utils import flatatt
 from django.template.loader import render_to_string
@@ -33,14 +32,9 @@ class CodeMirrorWidget(forms.Widget):
         if value is None:
             value = ''
 
-        # TODO: Remove Django 1.11 upgrade shim
-        # SHIM: Compensate for build_attrs() implementation change in 1.11
-        if django.VERSION < (1, 11):
-            final_attrs = self.build_attrs(attrs, name=name)
-        else:
-            extra_attrs = attrs.copy()
-            extra_attrs['name'] = name
-            final_attrs = self.build_attrs(self.attrs, extra_attrs=extra_attrs)  # pylint: disable=redundant-keyword-arg
+        extra_attrs = attrs.copy()
+        extra_attrs['name'] = name
+        final_attrs = self.build_attrs(self.attrs, extra_attrs=extra_attrs)
 
         # TODO use the help_text field of edit form instead of rendering a template
 

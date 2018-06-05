@@ -24,11 +24,8 @@ class SessionAuthenticationCrossDomainCsrf(authentication.SessionAuthentication)
     Since this subclass overrides only the `enforce_csrf()` method,
     it can be mixed in with other `SessionAuthentication` subclasses.
     """
-    # TODO: Remove Django 1.11 upgrade shim
-    # SHIM: Call new process_request in Django 1.11 to process CSRF token in cookie.
     def _process_enforce_csrf(self, request):
-        if django.VERSION >= (1, 11):
-            CsrfViewMiddleware().process_request(request)
+        CsrfViewMiddleware().process_request(request)
         return super(SessionAuthenticationCrossDomainCsrf, self).enforce_csrf(request)
 
     def enforce_csrf(self, request):

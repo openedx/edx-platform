@@ -1,7 +1,6 @@
 """
 Pages object for the Django's /admin/ views.
 """
-import django
 from bok_choy.page_object import PageObject
 from common.test.acceptance.pages.lms import BASE_URL
 
@@ -30,12 +29,7 @@ class ChangeUserAdminPage(PageObject):
         """
         Reads the read-only username.
         """
-        # TODO: Remove Django 1.11 upgrade shim
-        # SHIM: Get rid of this logic post-upgrade
-        if django.VERSION < (1, 11):
-            return self.q(css='.field-username p').text[0]
-        else:
-            return self.q(css='.field-username .readonly').text[0]
+        return self.q(css='.field-username .readonly').text[0]
 
     @property
     def first_name_element(self):
