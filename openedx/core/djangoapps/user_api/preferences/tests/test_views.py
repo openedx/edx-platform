@@ -506,6 +506,7 @@ class TestPreferencesDetailAPI(UserAPITestCase):
         Test that a client cannot create preferences with bad keys
         """
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
+        self.maxDiff = None
 
         too_long_preference_key = "x" * 256
         new_value = "new value"
