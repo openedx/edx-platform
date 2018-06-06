@@ -51,6 +51,9 @@ def sync_user_info_with_nodebb(sender, instance, created, **kwargs):  # pylint: 
 
     send_user_profile_info_to_mailchimp(sender, instance, kwargs)
 
+    if 'logout' in request.path:
+        return
+
     if sender == UserProfile:
         data_to_sync = {
             "city_of_residence": instance.city,
@@ -83,6 +86,11 @@ def update_user_profile_on_nodebb(sender, instance, created, **kwargs):
         Create user account at nodeBB when user created at edx Platform
     """
     send_user_info_to_mailchimp(sender, instance, created, kwargs)
+
+    request = get_current_request()
+    if 'login_session' in request.path:
+        return
+
     if created:
         data_to_sync = {
             'edx_user_id': instance.id,
