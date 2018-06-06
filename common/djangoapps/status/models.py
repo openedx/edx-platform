@@ -55,7 +55,7 @@ class CourseMessage(models.Model):
     This is not a ConfigurationModel because using it's not designed to support multiple configurations at once,
     which would be problematic if separate courses need separate error messages.
     """
-    global_message = models.ForeignKey(GlobalStatusMessage)
+    global_message = models.ForeignKey(GlobalStatusMessage, on_delete=models.CASCADE)
     course_key = CourseKeyField(max_length=255, blank=True, db_index=True)
     message = models.TextField(blank=True, null=True)
 

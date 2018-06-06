@@ -35,7 +35,7 @@ class RetirementStateError(Exception):
 class UserPreference(models.Model):
     """A user's preference, stored as generic text to be processed by client"""
     KEY_REGEX = r"[-_a-zA-Z0-9]+"
-    user = models.ForeignKey(User, db_index=True, related_name="preferences")
+    user = models.ForeignKey(User, db_index=True, related_name="preferences", on_delete=models.CASCADE)
     key = models.CharField(max_length=255, db_index=True, validators=[RegexValidator(KEY_REGEX)])
     value = models.TextField()
 
@@ -113,7 +113,7 @@ class UserCourseTag(models.Model):
     Per-course user tags, to be used by various things that want to store tags about
     the user.  Added initially to store assignment to experimental groups.
     """
-    user = models.ForeignKey(User, db_index=True, related_name="+")
+    user = models.ForeignKey(User, db_index=True, related_name="+", on_delete=models.CASCADE)
     key = models.CharField(max_length=255, db_index=True)
     course_id = CourseKeyField(max_length=255, db_index=True)
     value = models.TextField()
@@ -129,7 +129,7 @@ class UserOrgTag(TimeStampedModel, DeletableByUserValue):  # pylint: disable=mod
     Allows settings to be configured at an organization level.
 
     """
-    user = models.ForeignKey(User, db_index=True, related_name="+")
+    user = models.ForeignKey(User, db_index=True, related_name="+", on_delete=models.CASCADE)
     key = models.CharField(max_length=255, db_index=True)
     org = models.CharField(max_length=255, db_index=True)
     value = models.TextField()
@@ -173,7 +173,7 @@ class UserRetirementRequest(TimeStampedModel):
     Users that have requested to cancel their retirement before retirement begins can be removed.
     All other retired users persist in this table forever.
     """
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     class Meta(object):
         verbose_name = 'User Retirement Request'
@@ -203,14 +203,14 @@ class UserRetirementStatus(TimeStampedModel):
     """
     Tracks the progress of a user's retirement request
     """
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     original_username = models.CharField(max_length=150, db_index=True)
     original_email = models.EmailField(db_index=True)
     original_name = models.CharField(max_length=255, blank=True, db_index=True)
     retired_username = models.CharField(max_length=150, db_index=True)
     retired_email = models.EmailField(db_index=True)
-    current_state = models.ForeignKey(RetirementState, related_name='current_state')
-    last_state = models.ForeignKey(RetirementState, blank=True, related_name='last_state')
+    current_state = models.ForeignKey(RetirementState, related_name='current_state', on_delete=models.CASCADE)
+    last_state = models.ForeignKey(RetirementState, blank=True, related_name='last_state', on_delete=models.CASCADE)
     responses = models.TextField()
 
     class Meta(object):

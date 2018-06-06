@@ -54,7 +54,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('tab_id', models.CharField(max_length=50)),
-                ('course_overview', models.ForeignKey(related_name='tabs', to='course_overviews.CourseOverview')),
+                ('course_overview', models.ForeignKey(related_name='tabs', to='course_overviews.CourseOverview', on_delete=models.CASCADE)),
             ],
         ),
     ]

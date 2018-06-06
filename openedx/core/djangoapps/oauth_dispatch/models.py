@@ -18,7 +18,7 @@ class RestrictedApplication(models.Model):
     so that they cannot be used to call into APIs.
     """
 
-    application = models.ForeignKey(oauth2_settings.APPLICATION_MODEL, null=False)
+    application = models.ForeignKey(oauth2_settings.APPLICATION_MODEL, null=False, on_delete=models.CASCADE)
 
     def __unicode__(self):
         """

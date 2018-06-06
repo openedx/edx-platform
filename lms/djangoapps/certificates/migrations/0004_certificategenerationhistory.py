@@ -25,8 +25,8 @@ class Migration(migrations.Migration):
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
                 ('course_id', CourseKeyField(max_length=255)),
                 ('is_regeneration', models.BooleanField(default=False)),
-                ('generated_by', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
-                ('instructor_task', models.ForeignKey(to='instructor_task.InstructorTask')),
+                ('generated_by', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
+                ('instructor_task', models.ForeignKey(to='instructor_task.InstructorTask', on_delete=models.CASCADE)),
             ],
         ),
     ]

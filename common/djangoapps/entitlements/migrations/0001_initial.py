@@ -27,8 +27,8 @@ class Migration(migrations.Migration):
                 ('expired_at', models.DateTimeField(null=True)),
                 ('mode', models.CharField(default=b'audit', max_length=100)),
                 ('order_number', models.CharField(max_length=128, null=True)),
-                ('enrollment_course_run', models.ForeignKey(to='student.CourseEnrollment', null=True)),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('enrollment_course_run', models.ForeignKey(to='student.CourseEnrollment', null=True, on_delete=models.CASCADE)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
                 'abstract': False,

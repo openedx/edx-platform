@@ -54,7 +54,7 @@ class Migration(migrations.Migration):
         NoSqlAlterField(
             model_name='courseenrollment',
             name='course',
-            field=models.ForeignKey(db_constraint=False, to='course_overviews.CourseOverview'),
+            field=models.ForeignKey(db_constraint=False, to='course_overviews.CourseOverview', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         NoSqlAlterField(

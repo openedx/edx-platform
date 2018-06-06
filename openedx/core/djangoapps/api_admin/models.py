@@ -32,7 +32,7 @@ class ApiAccessRequest(TimeStampedModel):
         (DENIED, _('Denied')),
         (APPROVED, _('Approved')),
     )
-    user = models.OneToOneField(User, related_name='api_access_request')
+    user = models.OneToOneField(User, related_name='api_access_request', on_delete=models.CASCADE)
     status = models.CharField(
         max_length=255,
         choices=STATUS_CHOICES,
@@ -44,7 +44,7 @@ class ApiAccessRequest(TimeStampedModel):
     reason = models.TextField(help_text=_('The reason this user wants to access the API.'))
     company_name = models.CharField(max_length=255, default='')
     company_address = models.CharField(max_length=255, default='')
-    site = models.ForeignKey(Site)
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
     contacted = models.BooleanField(default=False)
 
     class Meta:

@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
                 ('status', models.CharField(default=b'pending', help_text='Status of this API access request', max_length=255, db_index=True, choices=[(b'pending', 'Pending'), (b'denied', 'Denied'), (b'approved', 'Approved')])),
                 ('website', models.URLField(help_text='The URL of the website associated with this API user.')),
                 ('reason', models.TextField(help_text='The reason this user wants to access the API.')),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ('-modified', '-created'),

@@ -4,7 +4,7 @@ from model_utils.models import TimeStampedModel
 
 
 class ExperimentData(TimeStampedModel):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     experiment_id = models.PositiveSmallIntegerField(
         null=False, blank=False, db_index=True, verbose_name='Experiment ID'
     )

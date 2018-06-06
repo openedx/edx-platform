@@ -41,7 +41,8 @@ class Migration(migrations.Migration):
                 related_name='ltiproviderconfigs',
                 default=settings.SITE_ID,
                 to='sites.Site',
-                help_text='The Site that this provider configuration belongs to.'
+                help_text='The Site that this provider configuration belongs to.',
+                on_delete=models.CASCADE,
             ),
         ),
         migrations.AddField(
@@ -51,7 +52,8 @@ class Migration(migrations.Migration):
                 related_name='oauth2providerconfigs',
                 default=settings.SITE_ID,
                 to='sites.Site',
-                help_text='The Site that this provider configuration belongs to.'
+                help_text='The Site that this provider configuration belongs to.',
+                on_delete=models.CASCADE,
             ),
         ),
         migrations.AddField(
@@ -61,7 +63,8 @@ class Migration(migrations.Migration):
                 related_name='samlproviderconfigs',
                 default=settings.SITE_ID,
                 to='sites.Site',
-                help_text='The Site that this provider configuration belongs to.'
+                help_text='The Site that this provider configuration belongs to.',
+                on_delete=models.CASCADE,
             ),
         ),
         migrations.AddField(
@@ -71,7 +74,8 @@ class Migration(migrations.Migration):
                 related_name='samlconfigurations',
                 default=settings.SITE_ID,
                 to='sites.Site',
-                help_text='The Site that this SAML configuration belongs to.'
+                help_text='The Site that this SAML configuration belongs to.',
+                on_delete=models.CASCADE,
             ),
         ),
     ]

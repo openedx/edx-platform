@@ -29,7 +29,7 @@ class Microsite(models.Model):
         - The values field must be validated on save to prevent the platform from crashing
         badly in the case the string is not able to be loaded as json.
     """
-    site = models.OneToOneField(Site, related_name='microsite')
+    site = models.OneToOneField(Site, related_name='microsite', on_delete=models.CASCADE)
     key = models.CharField(max_length=63, db_index=True, unique=True)
     values = JSONField(null=False, blank=True, load_kwargs={'object_pairs_hook': collections.OrderedDict})
 
@@ -61,7 +61,7 @@ class MicrositeHistory(TimeStampedModel):
     This is an archive table for Microsites model, so that we can maintain a history of changes. Note that the
     key field is no longer unique
     """
-    site = models.ForeignKey(Site, related_name='microsite_history')
+    site = models.ForeignKey(Site, related_name='microsite_history', on_delete=models.CASCADE)
     key = models.CharField(max_length=63, db_index=True)
     values = JSONField(null=False, blank=True, load_kwargs={'object_pairs_hook': collections.OrderedDict})
 
@@ -112,7 +112,7 @@ class MicrositeOrganizationMapping(models.Model):
     """
 
     organization = models.CharField(max_length=63, db_index=True, unique=True)
-    microsite = models.ForeignKey(Microsite, db_index=True)
+    microsite = models.ForeignKey(Microsite, db_index=True, on_delete=models.CASCADE)
 
     def __unicode__(self):
         """String conversion"""
@@ -147,7 +147,7 @@ class MicrositeTemplate(models.Model):
     A HTML template that a microsite can use
     """
 
-    microsite = models.ForeignKey(Microsite, db_index=True)
+    microsite = models.ForeignKey(Microsite, db_index=True, on_delete=models.CASCADE)
     template_uri = models.CharField(max_length=255, db_index=True)
     template = models.TextField()
 

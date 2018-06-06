@@ -10,7 +10,7 @@ from six import text_type
 
 
 class Note(models.Model):
-    user = models.ForeignKey(User, db_index=True)
+    user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     course_id = CourseKeyField(max_length=255, db_index=True)
     uri = models.CharField(max_length=255, db_index=True)
     text = models.TextField(default="")

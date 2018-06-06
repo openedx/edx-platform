@@ -31,7 +31,7 @@ class TagAvailableValues(models.Model):
     """
     This model represents available values for tags.
     """
-    category = models.ForeignKey(TagCategories, db_index=True)
+    category = models.ForeignKey(TagCategories, db_index=True, on_delete=models.CASCADE)
     value = models.CharField(max_length=255)
 
     class Meta(object):

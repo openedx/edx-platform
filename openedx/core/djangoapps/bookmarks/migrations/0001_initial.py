@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
                 ('course_key', CourseKeyField(max_length=255, db_index=True)),
                 ('usage_key', UsageKeyField(max_length=255, db_index=True)),
                 ('_path', jsonfield.fields.JSONField(help_text=b'Path in course tree to the block', db_column=b'path')),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -46,7 +46,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='bookmark',
             name='xblock_cache',
-            field=models.ForeignKey(to='bookmarks.XBlockCache'),
+            field=models.ForeignKey(to='bookmarks.XBlockCache', on_delete=models.CASCADE),
         ),
         migrations.AlterUniqueTogether(
             name='bookmark',

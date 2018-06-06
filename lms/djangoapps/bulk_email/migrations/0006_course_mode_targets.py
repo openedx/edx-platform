@@ -15,8 +15,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='CourseModeTarget',
             fields=[
-                ('target_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='bulk_email.Target')),
-                ('track', models.ForeignKey(to='course_modes.CourseMode')),
+                ('target_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='bulk_email.Target', on_delete=models.CASCADE)),
+                ('track', models.ForeignKey(to='course_modes.CourseMode', on_delete=models.CASCADE)),
             ],
             bases=('bulk_email.target',),
         ),

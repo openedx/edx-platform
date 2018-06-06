@@ -42,7 +42,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='persistentsubsectiongrade',
             name='visible_blocks',
-            field=models.ForeignKey(to='grades.VisibleBlocks', db_column=b'visible_blocks_hash', to_field=b'hashed'),
+            field=models.ForeignKey(to='grades.VisibleBlocks', db_column=b'visible_blocks_hash', to_field=b'hashed', on_delete=models.CASCADE),
         ),
         migrations.AlterUniqueTogether(
             name='persistentsubsectiongrade',

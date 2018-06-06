@@ -45,7 +45,7 @@ class Migration(migrations.Migration):
         NoSqlAlterField(
             model_name='coursemode',
             name='course',
-            field=models.ForeignKey(related_name='modes', db_constraint=False, default=None, to='course_overviews.CourseOverview'),
+            field=models.ForeignKey(related_name='modes', db_constraint=False, default=None, to='course_overviews.CourseOverview', on_delete=models.CASCADE),
             preserve_default=False,
         ),
         # Change the Django unique-together constraint (this is Django-level only

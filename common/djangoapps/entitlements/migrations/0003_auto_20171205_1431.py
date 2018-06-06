@@ -20,13 +20,13 @@ class Migration(migrations.Migration):
                 ('expiration_period', models.DurationField(default=datetime.timedelta(450), help_text=b'Duration in days from when an entitlement is created until when it is expired.')),
                 ('refund_period', models.DurationField(default=datetime.timedelta(60), help_text=b'Duration in days from when an entitlement is created until when it is no longer refundable')),
                 ('regain_period', models.DurationField(default=datetime.timedelta(14), help_text=b'Duration in days from when an entitlement is redeemed for a course run until it is no longer able to be regained by a user.')),
-                ('site', models.ForeignKey(to='sites.Site')),
+                ('site', models.ForeignKey(to='sites.Site', on_delete=models.CASCADE)),
             ],
         ),
         migrations.AlterField(
             model_name='courseentitlement',
             name='enrollment_course_run',
-            field=models.ForeignKey(blank=True, to='student.CourseEnrollment', help_text=b'The current Course enrollment for this entitlement. If NULL the Learner has not enrolled.', null=True),
+            field=models.ForeignKey(blank=True, to='student.CourseEnrollment', help_text=b'The current Course enrollment for this entitlement. If NULL the Learner has not enrolled.', null=True, on_delete=models.CASCADE),
         ),
         migrations.AlterField(
             model_name='courseentitlement',
@@ -36,6 +36,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='courseentitlement',
             name='_policy',
-            field=models.ForeignKey(blank=True, to='entitlements.CourseEntitlementPolicy', null=True),
+            field=models.ForeignKey(blank=True, to='entitlements.CourseEntitlementPolicy', null=True, on_delete=models.CASCADE),
         ),
     ]

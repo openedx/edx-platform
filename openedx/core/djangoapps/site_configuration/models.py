@@ -23,7 +23,7 @@ class SiteConfiguration(models.Model):
         site (OneToOneField): one to one field relating each configuration to a single site
         values (JSONField):  json field to store configurations for a site
     """
-    site = models.OneToOneField(Site, related_name='configuration')
+    site = models.OneToOneField(Site, related_name='configuration', on_delete=models.CASCADE)
     enabled = models.BooleanField(default=False, verbose_name="Enabled")
     values = JSONField(
         null=False,
@@ -122,7 +122,7 @@ class SiteConfigurationHistory(TimeStampedModel):
         site (ForeignKey): foreign-key to django Site
         values (JSONField): json field to store configurations for a site
     """
-    site = models.ForeignKey(Site, related_name='configuration_histories')
+    site = models.ForeignKey(Site, related_name='configuration_histories', on_delete=models.CASCADE)
     enabled = models.BooleanField(default=False, verbose_name="Enabled")
     values = JSONField(
         null=False,

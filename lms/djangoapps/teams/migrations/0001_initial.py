@@ -38,8 +38,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('date_joined', models.DateTimeField(auto_now_add=True)),
                 ('last_activity_at', models.DateTimeField()),
-                ('team', models.ForeignKey(related_name='membership', to='teams.CourseTeam')),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('team', models.ForeignKey(related_name='membership', to='teams.CourseTeam', on_delete=models.CASCADE)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
         migrations.AddField(

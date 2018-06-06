@@ -49,7 +49,7 @@ class CourseEntitlementPolicy(models.Model):
                    "it is no longer able to be regained by a user."),
         null=False
     )
-    site = models.ForeignKey(Site, null=True)
+    site = models.ForeignKey(Site, null=True, on_delete=models.CASCADE)
     mode = models.CharField(max_length=32, choices=MODES, null=True)
 
     def get_days_until_expiration(self, entitlement):
@@ -146,7 +146,7 @@ class CourseEntitlement(TimeStampedModel):
     """
     Represents a Student's Entitlement to a Course Run for a given Course.
     """
-    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     uuid = models.UUIDField(default=uuid_tools.uuid4, editable=False, unique=True)
     course_uuid = models.UUIDField(help_text='UUID for the Course, not the Course Run')
     expired_at = models.DateTimeField(
@@ -159,11 +159,12 @@ class CourseEntitlement(TimeStampedModel):
         'student.CourseEnrollment',
         null=True,
         help_text='The current Course enrollment for this entitlement. If NULL the Learner has not enrolled.',
-        blank=True
+        blank=True,
+        on_delete=models.CASCADE,
     )
     order_number = models.CharField(max_length=128, null=True)
     refund_locked = models.BooleanField(default=False)
-    _policy = models.ForeignKey(CourseEntitlementPolicy, null=True, blank=True)
+    _policy = models.ForeignKey(CourseEntitlementPolicy, null=True, blank=True, on_delete=models.CASCADE)
 
     @property
     def expired_at_datetime(self):
@@ -429,8 +430,8 @@ class CourseEntitlementSupportDetail(TimeStampedModel):
         (CREATE, 'Create new entitlement'),
     )
 
-    entitlement = models.ForeignKey('entitlements.CourseEntitlement')
-    support_user = models.ForeignKey(settings.AUTH_USER_MODEL)
+    entitlement = models.ForeignKey('entitlements.CourseEntitlement', on_delete=models.CASCADE)
+    support_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     #Deprecated: use action instead.
     reason = models.CharField(max_length=15, choices=ENTITLEMENT_SUPPORT_REASONS)
@@ -443,6 +444,7 @@ class CourseEntitlementSupportDetail(TimeStampedModel):
         null=True,
         blank=True,
         db_constraint=False,
+        on_delete=models.CASCADE,
     )
 
     def __unicode__(self):

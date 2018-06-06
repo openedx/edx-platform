@@ -40,6 +40,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='coursemessage',
             name='global_message',
-            field=models.ForeignKey(to='status.GlobalStatusMessage'),
+            field=models.ForeignKey(to='status.GlobalStatusMessage', on_delete=models.CASCADE),
         ),
     ]

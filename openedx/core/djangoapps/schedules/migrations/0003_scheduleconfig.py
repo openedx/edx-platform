@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
                 ('enqueue_recurring_nudge', models.BooleanField(default=False)),
                 ('deliver_recurring_nudge', models.BooleanField(default=False)),
                 ('changed_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, editable=False, to=settings.AUTH_USER_MODEL, null=True, verbose_name='Changed by')),
-                ('site', models.ForeignKey(to='sites.Site')),
+                ('site', models.ForeignKey(to='sites.Site', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ('-change_date',),

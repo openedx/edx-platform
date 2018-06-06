@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
                 ('created', models.DateTimeField(db_index=True, auto_now_add=True, null=True)),
                 ('updated', models.DateTimeField(auto_now=True, db_index=True)),
                 ('gradeset', models.TextField(null=True, blank=True)),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -52,7 +52,7 @@ class Migration(migrations.Migration):
                 ('location', UsageKeyField(max_length=255, db_index=True)),
                 ('field', models.CharField(max_length=255)),
                 ('value', models.TextField(default=b'null')),
-                ('student', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('student', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -68,7 +68,7 @@ class Migration(migrations.Migration):
                 ('done', models.CharField(default=b'na', max_length=8, db_index=True, choices=[(b'na', b'NOT_APPLICABLE'), (b'f', b'FINISHED'), (b'i', b'INCOMPLETE')])),
                 ('created', models.DateTimeField(auto_now_add=True, db_index=True)),
                 ('modified', models.DateTimeField(auto_now=True, db_index=True)),
-                ('student', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('student', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -80,7 +80,7 @@ class Migration(migrations.Migration):
                 ('state', models.TextField(null=True, blank=True)),
                 ('grade', models.FloatField(null=True, blank=True)),
                 ('max_grade', models.FloatField(null=True, blank=True)),
-                ('student_module', models.ForeignKey(to='courseware.StudentModule')),
+                ('student_module', models.ForeignKey(to='courseware.StudentModule', on_delete=models.CASCADE)),
             ],
             options={
                 'get_latest_by': 'created',
@@ -94,7 +94,7 @@ class Migration(migrations.Migration):
                 ('value', models.TextField(default=b'null')),
                 ('created', models.DateTimeField(auto_now_add=True, db_index=True)),
                 ('modified', models.DateTimeField(auto_now=True, db_index=True)),
-                ('student', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('student', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -106,7 +106,7 @@ class Migration(migrations.Migration):
                 ('created', models.DateTimeField(auto_now_add=True, db_index=True)),
                 ('modified', models.DateTimeField(auto_now=True, db_index=True)),
                 ('module_type', BlockTypeKeyField(max_length=64, db_index=True)),
-                ('student', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('student', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(

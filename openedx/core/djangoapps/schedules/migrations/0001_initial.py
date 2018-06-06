@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
                 ('active', models.BooleanField(default=True, help_text='Indicates if this schedule is actively used')),
                 ('start', models.DateTimeField(help_text='Date this schedule went into effect')),
                 ('upgrade_deadline', models.DateTimeField(help_text='Deadline by which the learner must upgrade to a verified seat', null=True, blank=True)),
-                ('enrollment', models.OneToOneField(to='student.CourseEnrollment')),
+                ('enrollment', models.OneToOneField(to='student.CourseEnrollment', on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'Schedule',

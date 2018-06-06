@@ -284,7 +284,7 @@ class CreditRequirement(TimeStampedModel):
     may need to determine whether a user has satisfied the requirement.
     """
 
-    course = models.ForeignKey(CreditCourse, related_name="credit_requirements")
+    course = models.ForeignKey(CreditCourse, related_name="credit_requirements", on_delete=models.CASCADE)
     namespace = models.CharField(max_length=255)
     name = models.CharField(max_length=255)
     display_name = models.CharField(max_length=255, default="")
@@ -427,7 +427,7 @@ class CreditRequirementStatus(TimeStampedModel):
     )
 
     username = models.CharField(max_length=255, db_index=True)
-    requirement = models.ForeignKey(CreditRequirement, related_name="statuses")
+    requirement = models.ForeignKey(CreditRequirement, related_name="statuses", on_delete=models.CASCADE)
     status = models.CharField(max_length=32, choices=REQUIREMENT_STATUS_CHOICES)
 
     # Include additional information about why the user satisfied or failed
@@ -543,7 +543,7 @@ def default_deadline_for_credit_eligibility():  # pylint: disable=invalid-name
 class CreditEligibility(TimeStampedModel):
     """ A record of a user's eligibility for credit for a specific course. """
     username = models.CharField(max_length=255, db_index=True)
-    course = models.ForeignKey(CreditCourse, related_name="eligibilities")
+    course = models.ForeignKey(CreditCourse, related_name="eligibilities", on_delete=models.CASCADE)
 
     # Deadline for when credit eligibility will expire.
     # Once eligibility expires, users will no longer be able to purchase
@@ -656,8 +656,8 @@ class CreditRequest(TimeStampedModel):
 
     uuid = models.CharField(max_length=32, unique=True, db_index=True)
     username = models.CharField(max_length=255, db_index=True)
-    course = models.ForeignKey(CreditCourse, related_name="credit_requests")
-    provider = models.ForeignKey(CreditProvider, related_name="credit_requests")
+    course = models.ForeignKey(CreditCourse, related_name="credit_requests", on_delete=models.CASCADE)
+    provider = models.ForeignKey(CreditProvider, related_name="credit_requests", on_delete=models.CASCADE)
     parameters = JSONField()
 
     REQUEST_STATUS_PENDING = "pending"
