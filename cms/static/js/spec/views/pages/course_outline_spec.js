@@ -1032,7 +1032,7 @@ describe('CourseOutlinePage', function() {
         selectLastPrerequisiteSubsection = function(minScore, minCompletion) {
             $('#prereq option:last').prop('selected', true).trigger('change');
             $('#prereq_min_score').val(minScore).trigger('keyup');
-            this.$('#prereq_min_completion').val(minCompletion).trigger('keyup');
+            $('#prereq_min_completion').val(minCompletion).trigger('keyup');
         };
 
         // Helper to validate oft-checked additional option fields' visibility
