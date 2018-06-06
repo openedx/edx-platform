@@ -6,7 +6,6 @@ from django.conf import settings
 from django.urls import reverse
 import json
 from mock import patch
-from openedx.tests.util import expected_redirect_url
 from social_core.exceptions import AuthException
 from student.tests.factories import UserFactory
 from third_party_auth import pipeline
@@ -73,7 +72,7 @@ class GoogleOauth2IntegrationTest(base.Oauth2IntegrationTest):
             response = self.client.get(complete_url)
         # This should redirect to the custom login/register form:
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['Location'], expected_redirect_url('/auth/custom_auth_entry', hostname='example.none'))
+        self.assertEqual(response['Location'], '/auth/custom_auth_entry')
 
         response = self.client.get(response['Location'])
         self.assertEqual(response.status_code, 200)
@@ -107,7 +106,7 @@ class GoogleOauth2IntegrationTest(base.Oauth2IntegrationTest):
         # Now our custom login/registration page must resume the pipeline:
         response = self.client.get(complete_url)
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['Location'], expected_redirect_url('/misc/final-destination', hostname='example.none'))
+        self.assertEqual(response['Location'], '/misc/final-destination')
 
         _, strategy = self.get_request_and_strategy()
         self.assert_social_auth_exists_for_user(created_user, strategy)
@@ -134,4 +133,4 @@ class GoogleOauth2IntegrationTest(base.Oauth2IntegrationTest):
             response = self.client.get(complete_url)
         # This should redirect to the custom error URL
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['Location'], expected_redirect_url('/misc/my-custom-sso-error-page', hostname='example.none'))
+        self.assertEqual(response['Location'], '/misc/my-custom-sso-error-page')

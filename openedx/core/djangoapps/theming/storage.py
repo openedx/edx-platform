@@ -6,7 +6,6 @@ import os.path
 import posixpath
 import re
 
-import django
 from django.conf import settings
 from django.contrib.staticfiles.finders import find
 from django.contrib.staticfiles.storage import CachedFilesMixin, StaticFilesStorage
@@ -171,24 +170,6 @@ class ThemeCachedFilesMixin(CachedFilesMixin):
 
         return asset_name
 
-    # TODO: Remove Django 1.11 upgrade shim
-    # SHIM: This override method modifies the name argument to contain a theme
-    # prefix when Django < 1.11.  In Django >= 1.11, asset name processing is
-    # done in the _url function, so this method becomes a no-op passthrough.
-    # After the 1.11 upgrade, delete this method.
-    def url(self, name, force=False):
-        """
-        This override method serves a similar function to _url, but this is
-        needed for Django < 1.11.
-        """
-        if django.VERSION < (1, 11):
-            processed_asset_name = self._processed_asset_name(name)
-            return super(ThemeCachedFilesMixin, self).url(processed_asset_name, force)
-        else:
-            # Passthrough directly to the function we are overriding.  _url in
-            # Django 1.11+ will take care of processing the asset name.
-            return super(ThemeCachedFilesMixin, self).url(name, force)
-
     def _url(self, hashed_name_func, name, force=False, hashed_files=None):
         """
         This override method swaps out `name` with a processed version.
@@ -197,153 +178,6 @@ class ThemeCachedFilesMixin(CachedFilesMixin):
         """
         processed_asset_name = self._processed_asset_name(name)
         return super(ThemeCachedFilesMixin, self)._url(hashed_name_func, processed_asset_name, force, hashed_files)
-
-    # TODO: Remove Django 1.11 upgrade shim
-    # SHIM: This method implements url_converter for Django < 1.11.
-    # After the 1.11 upgrade, delete this method.
-    def _url_converter__lt_111(self, name, template=None):
-        """
-        This is an override of url_converter from CachedFilesMixin.
-
-        There are two lines commented out in order to make the converter method
-        return absolute urls instead of relative urls. This behavior is
-        necessary for theme overrides, as we get 404 on assets with relative
-        urls on a themed site.
-        """
-        if template is None:
-            template = self.default_template
-
-        def converter(matchobj):
-            """
-            Converts the matched URL depending on the parent level (`..`)
-            and returns the normalized and hashed URL using the url method
-            of the storage.
-            """
-            matched, url = matchobj.groups()
-            # Completely ignore http(s) prefixed URLs,
-            # fragments and data-uri URLs
-            if url.startswith(('#', 'http:', 'https:', 'data:', '//')):
-                return matched
-            name_parts = name.split(os.sep)
-            # Using posix normpath here to remove duplicates
-            url = posixpath.normpath(url)
-            url_parts = url.split('/')
-            parent_level, sub_level = url.count('..'), url.count('/')
-            if url.startswith('/'):
-                sub_level -= 1
-                url_parts = url_parts[1:]
-            if parent_level or not url.startswith('/'):
-                start, end = parent_level + 1, parent_level
-            else:
-                if sub_level:
-                    if sub_level == 1:
-                        parent_level -= 1
-                    start, end = parent_level, 1
-                else:
-                    start, end = 1, sub_level - 1
-            joined_result = '/'.join(name_parts[:-start] + url_parts[end:])
-            hashed_url = self.url(unquote(joined_result), force=True)
-
-            # NOTE:
-            # following two lines are commented out so that absolute urls are used instead of relative urls
-            # to make themed assets work correctly.
-            #
-            # The lines are commented and not removed to make future django upgrade easier and
-            # show exactly what is changed in this method override
-            #
-            # file_name = hashed_url.split('/')[-1:]
-            # relative_url = '/'.join(url.split('/')[:-1] + file_name)
-
-            # Return the hashed version to the file
-            return template % unquote(hashed_url)
-
-        return converter
-
-    # TODO: Remove Django 1.11 upgrade shim
-    # SHIM: This method implements url_converter for Django >= 1.11.
-    # After the 1.11 upgrade, rename this method to url_converter.
-    def _url_converter__gte_111(self, name, hashed_files, template=None):
-        """
-        This is an override of url_converter from CachedFilesMixin.
-
-        It changes one line near the end of the method (see the NOTE) in order
-        to return absolute urls instead of relative urls.  This behavior is
-        necessary for theme overrides, as we get 404 on assets with relative
-        urls on a themed site.
-        """
-        if template is None:
-            template = self.default_template
-
-        def converter(matchobj):
-            """
-            Convert the matched URL to a normalized and hashed URL.
-            This requires figuring out which files the matched URL resolves
-            to and calling the url() method of the storage.
-            """
-            matched, url = matchobj.groups()
-
-            # Ignore absolute/protocol-relative and data-uri URLs.
-            if re.match(r'^[a-z]+:', url):
-                return matched
-
-            # Ignore absolute URLs that don't point to a static file (dynamic
-            # CSS / JS?). Note that STATIC_URL cannot be empty.
-            if url.startswith('/') and not url.startswith(settings.STATIC_URL):
-                return matched
-
-            # Strip off the fragment so a path-like fragment won't interfere.
-            url_path, fragment = urldefrag(url)
-
-            if url_path.startswith('/'):
-                # Otherwise the condition above would have returned prematurely.
-                assert url_path.startswith(settings.STATIC_URL)
-                target_name = url_path[len(settings.STATIC_URL):]
-            else:
-                # We're using the posixpath module to mix paths and URLs conveniently.
-                source_name = name if os.sep == '/' else name.replace(os.sep, '/')
-                target_name = posixpath.join(posixpath.dirname(source_name), url_path)
-
-            # Determine the hashed name of the target file with the storage backend.
-            hashed_url = self._url(
-                self._stored_name, unquote(target_name),
-                force=True, hashed_files=hashed_files,
-            )
-
-            # NOTE:
-            # The line below was commented out so that absolute urls are used instead of relative urls to make themed
-            # assets work correctly.
-            #
-            # The line is commented and not removed to make future django upgrade easier and show exactly what is
-            # changed in this method override
-            #
-            #transformed_url = '/'.join(url_path.split('/')[:-1] + hashed_url.split('/')[-1:])
-            transformed_url = hashed_url  # This line was added.
-
-            # Restore the fragment that was stripped off earlier.
-            if fragment:
-                transformed_url += ('?#' if '?#' in url else '#') + fragment
-
-            # Return the hashed version to the file
-            return template % unquote(transformed_url)
-
-        return converter
-
-    # TODO: Remove Django 1.11 upgrade shim
-    # SHIM: This method switches the implementation of url_converter according
-    # to the Django version.  After the 1.11 upgrade, do these things:
-    #
-    # 1. delete _url_converter__lt_111.
-    # 2. delete url_converter (below).
-    # 3. rename _url_converter__gte_111 to url_converter.
-    def url_converter(self, *args, **kwargs):
-        """
-        An implementation selector for the url_converter method.  This is in
-        place only for the Django 1.11 upgrade.
-        """
-        if django.VERSION < (1, 11):
-            return self._url_converter__lt_111(*args, **kwargs)
-        else:
-            return self._url_converter__gte_111(*args, **kwargs)
 
 
 class ThemePipelineMixin(PipelineMixin):

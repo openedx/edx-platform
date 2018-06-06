@@ -24,7 +24,6 @@ from openedx.core.djangoapps.password_policy.compliance import (
     NonCompliantPasswordWarning
 )
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from openedx.tests.util import expected_redirect_url
 from student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
 from student.views import login_oauth_token
 from third_party_auth.tests.utils import (
@@ -597,7 +596,7 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
         """
         response = self.client.get(reverse('dashboard'))
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['Location'], expected_redirect_url('/login?next=/dashboard'))
+        self.assertEqual(response['Location'], '/login?next=/dashboard')
 
     @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     def test_externalauth_login_required_course_context(self):
@@ -608,7 +607,7 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
         target_url = reverse('courseware', args=[text_type(self.course.id)])
         noshib_response = self.client.get(target_url, follow=True, HTTP_ACCEPT="text/html")
         self.assertEqual(noshib_response.redirect_chain[-1],
-                         (expected_redirect_url('/login?next={url}'.format(url=target_url)), 302))
+                         ('/login?next={url}'.format(url=target_url), 302))
         self.assertContains(noshib_response, (u"Sign in or Register | {platform_name}"
                                               .format(platform_name=settings.PLATFORM_NAME)))
         self.assertEqual(noshib_response.status_code, 200)
@@ -623,9 +622,9 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
         # The 'courseware' page actually causes a redirect itself, so it's not the end of the chain and we
         # won't test its contents
         self.assertEqual(shib_response.redirect_chain[-3],
-                         (expected_redirect_url('/shib-login/?next={url}'.format(url=target_url_shib)), 302))
+                         ('/shib-login/?next={url}'.format(url=target_url_shib), 302))
         self.assertEqual(shib_response.redirect_chain[-2],
-                         (expected_redirect_url(target_url_shib), 302))
+                         (target_url_shib, 302))
         self.assertEqual(shib_response.status_code, 200)
 
 

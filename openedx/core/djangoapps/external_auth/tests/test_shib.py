@@ -8,7 +8,6 @@ import unittest
 from importlib import import_module
 from urllib import urlencode
 
-import django
 import pytest
 from ddt import ddt, data
 from django.conf import settings
@@ -23,7 +22,6 @@ from openedx.core.djangoapps.external_auth.views import (
     shib_login, course_specific_login, course_specific_register, _flatten_to_ascii
 )
 from openedx.core.djangoapps.user_api import accounts as accounts_settings
-from openedx.tests.util import expected_redirect_url
 from mock import patch
 from nose.plugins.attrib import attr
 from six import text_type
@@ -369,12 +367,7 @@ class ShibSPTest(CacheIsolationTestCase):
             if len(external_name.strip()) < accounts_settings.NAME_MIN_LENGTH:
                 self.assertEqual(profile.name, postvars['name'])
             else:
-                expected_name = external_name
-                # TODO: Remove Django 1.11 upgrade shim
-                # SHIM: form character fields strip leading and trailing whitespace by default in Django 1.9+
-                if django.VERSION >= (1, 9):
-                    expected_name = expected_name.strip()
-                self.assertEqual(profile.name, expected_name)
+                self.assertEqual(profile.name, external_name.strip())
                 self.assertNotIn(u';', profile.name)
         else:
             self.assertEqual(profile.name, self.client.session['ExternalAuthMap'].external_name)
@@ -586,7 +579,7 @@ class ShibSPTestModifiedCourseware(ModuleStoreTestCase):
         # successful login is a redirect to the URL that handles auto-enrollment
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['location'],
-                         expected_redirect_url('/account/finish_auth?{}'.format(urlencode(params))))
+                         '/account/finish_auth?{}'.format(urlencode(params)))
 
 
 class ShibUtilFnTest(TestCase):

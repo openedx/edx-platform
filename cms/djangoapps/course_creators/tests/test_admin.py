@@ -3,7 +3,6 @@ Tests course_creators.admin.py.
 """
 
 import mock
-import django
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User
 from django.core import mail
@@ -106,12 +105,7 @@ class CourseCreatorAdminTest(TestCase):
             # message sent. Admin message will follow.
             base_num_emails = 1 if expect_sent_to_user else 0
             if expect_sent_to_admin:
-                # TODO: Remove Django 1.11 upgrade shim
-                # SHIM: Usernames come back as unicode in 1.10+, remove this shim post-upgrade
-                if django.VERSION < (1, 10):
-                    context = {'user_name': 'test_user', 'user_email': u'test_user+courses@edx.org'}
-                else:
-                    context = {'user_name': u'test_user', 'user_email': u'test_user+courses@edx.org'}
+                context = {'user_name': u'test_user', 'user_email': u'test_user+courses@edx.org'}
 
                 self.assertEquals(base_num_emails + 1, len(mail.outbox), 'Expected admin message to be sent')
                 sent_mail = mail.outbox[base_num_emails]

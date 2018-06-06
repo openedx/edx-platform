@@ -246,12 +246,7 @@ class Command(BaseCommand):
             user_id, username, email, full_name, course_id, is_opted_in, pref_set_datetime = row
 
             if pref_set_datetime:
-                # TODO: Remove Django 1.11 upgrade shim
-                # SHIM: pref_set_datetime.tzinfo should always be None here after the 1.11 upgrade
-                # As of Django 1.9 datetimes returned from raw sql queries are no longer coerced to being tz aware
-                # so we correct for that here.
-                if pref_set_datetime.tzinfo is None or pref_set_datetime.tzinfo.utcoffset(pref_set_datetime) is None:
-                    pref_set_datetime = timezone.make_aware(pref_set_datetime, timezone.utc)
+                pref_set_datetime = timezone.make_aware(pref_set_datetime, timezone.utc)
             else:
                 pref_set_datetime = self.DEFAULT_DATETIME_STR
 

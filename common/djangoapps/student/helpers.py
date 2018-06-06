@@ -8,7 +8,6 @@ import urllib
 import urlparse
 from datetime import datetime
 
-import django
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.urls import NoReverseMatch, reverse
@@ -413,13 +412,8 @@ def create_or_set_user_attribute_created_on_site(user, site):
         UserAttribute.set_user_attribute(user, 'created_on_site', site.domain)
 
 
-# TODO: Remove Django 1.11 upgrade shim
-# SHIM: Compensate for behavior change of default authentication backend in 1.10
-if django.VERSION < (1, 10):
-    NEW_USER_AUTH_BACKEND = 'django.contrib.auth.backends.ModelBackend'
-else:
-    # We want to allow inactive users to log in only when their account is first created
-    NEW_USER_AUTH_BACKEND = 'django.contrib.auth.backends.AllowAllUsersModelBackend'
+# We want to allow inactive users to log in only when their account is first created
+NEW_USER_AUTH_BACKEND = 'django.contrib.auth.backends.AllowAllUsersModelBackend'
 
 # Disable this warning because it doesn't make sense to completely refactor tests to appease Pylint
 # pylint: disable=logging-format-interpolation
