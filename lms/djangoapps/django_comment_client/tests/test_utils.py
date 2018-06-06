@@ -68,7 +68,6 @@ class DictionaryTestCase(TestCase):
 
 
 @attr(shard=1)
-@pytest.mark.django111_expected_failure
 class AccessUtilsTestCase(ModuleStoreTestCase):
     """
     Base testcase class for access and roles for the

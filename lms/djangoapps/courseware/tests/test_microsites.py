@@ -136,7 +136,6 @@ class TestSites(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertNotContains(resp, 'This is a Test Site footer')
 
     @override_settings(SITE_NAME=settings.MICROSITE_TEST_HOSTNAME)
-    @pytest.mark.django111_expected_failure
     def test_site_homepage_course_max(self):
         """
         Verify that the number of courses displayed on the homepage honors

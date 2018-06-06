@@ -182,7 +182,6 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
 
 
 @attr(shard=3)
-@pytest.mark.django111_expected_failure
 class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCase):
     """
     Tests for the rendering returned by lti_launch view.

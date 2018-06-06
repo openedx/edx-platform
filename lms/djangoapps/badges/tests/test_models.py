@@ -43,7 +43,6 @@ class BadgeImageConfigurationTest(TestCase):
         tmp_path = Path(TEST_DATA_ROOT / 'course_complete_badges')
         Path.rmtree_p(tmp_path)
 
-    @pytest.mark.django111_expected_failure
     def test_no_double_default(self):
         """
         Verify that creating two configurations as default is not permitted.

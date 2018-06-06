@@ -693,7 +693,6 @@ class CourseTabListTestCase(TabListTestCase):
             # get tab by id
             self.assertEquals(xmodule_tabs.CourseTabList.get_tab_by_id(self.course.tabs, tab.tab_id), tab)
 
-    @pytest.mark.django111_expected_failure
     def test_course_tabs_staff_only(self):
         """
         Tests the static tabs that available only for instructor
@@ -725,7 +724,6 @@ class CourseTabListTestCase(TabListTestCase):
 
 
 @attr(shard=1)
-@pytest.mark.django111_expected_failure
 class ProgressTestCase(TabTestCase):
     """Test cases for Progress Tab."""
 
@@ -756,7 +754,6 @@ class ProgressTestCase(TabTestCase):
 
 
 @attr(shard=1)
-@pytest.mark.django111_expected_failure
 class StaticTabTestCase(TabTestCase):
     """Test cases for Static Tab."""
 
@@ -776,7 +773,6 @@ class StaticTabTestCase(TabTestCase):
 
 
 @attr(shard=1)
-@pytest.mark.django111_expected_failure
 class CourseInfoTabTestCase(TabTestCase):
     """Test cases for the course info tab."""
     def setUp(self):
@@ -805,7 +801,6 @@ class CourseInfoTabTestCase(TabTestCase):
 
 
 @attr(shard=1)
-@pytest.mark.django111_expected_failure
 class DiscussionLinkTestCase(TabTestCase):
     """Test cases for discussion link tab."""
 

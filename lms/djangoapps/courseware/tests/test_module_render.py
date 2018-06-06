@@ -249,7 +249,6 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         # note if the URL mapping changes then this assertion will break
         self.assertIn('/courses/' + text_type(self.course_key) + '/jump_to_id/vertical_test', html)
 
-    @pytest.mark.django111_expected_failure
     def test_xqueue_callback_success(self):
         """
         Test for happy-path xqueue_callback

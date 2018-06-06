@@ -190,7 +190,6 @@ class TestLTIModuleListing(SharedModuleStoreTestCase):
             response = self.client.get(lti_rest_endpoints_url)
             self.assertEqual(404, response.status_code)
 
-    @pytest.mark.django111_expected_failure
     def test_lti_rest_listing(self):
         """tests that the draft lti module is part of the endpoint response"""
         request = mock.Mock()

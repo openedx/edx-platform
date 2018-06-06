@@ -6,7 +6,6 @@ from contextlib import contextmanager
 
 import ddt
 import mock
-import pytest
 import pytz
 from freezegun import freeze_time
 from nose.plugins.attrib import attr
@@ -265,7 +264,6 @@ class BookmarkModelTests(BookmarksTestsBase):
         (ModuleStoreEnum.Type.split, 'html_1', ['chapter_1', 'sequential_2', 'vertical_2'], 2),
     )
     @ddt.unpack
-    @pytest.mark.django111_expected_failure
     def test_path_and_queries_on_create(self, store_type, block_to_bookmark, ancestors_attrs, expected_mongo_calls):
         """
         In case of mongo, 1 query is used to fetch the block, and 2
@@ -289,7 +287,6 @@ class BookmarkModelTests(BookmarksTestsBase):
         self.assertIsNotNone(bookmark.xblock_cache)
         self.assertEqual(bookmark.xblock_cache.paths, [])
 
-    @pytest.mark.django111_expected_failure
     def test_create_bookmark_success(self):
         """
         Tests creation of bookmark.
@@ -312,7 +309,6 @@ class BookmarkModelTests(BookmarksTestsBase):
         self.assertNotEqual(bookmark, bookmark3)
         self.assert_bookmark_model_is_valid(bookmark3, bookmark_data_different_user)
 
-    @pytest.mark.django111_expected_failure
     def test_create_bookmark_successfully_with_display_name_none(self):
         """
         Tests creation of bookmark with display_name None.
@@ -331,7 +327,6 @@ class BookmarkModelTests(BookmarksTestsBase):
     )
     @ddt.unpack
     @mock.patch('openedx.core.djangoapps.bookmarks.models.Bookmark.get_path')
-    @pytest.mark.django111_expected_failure
     def test_path(self, seconds_delta, paths, get_path_call_count, mock_get_path):
 
         block_path = [PathItem(UsageKey.from_string(EXAMPLE_USAGE_KEY_1), '1')]
@@ -369,7 +364,6 @@ class BookmarkModelTests(BookmarksTestsBase):
         (ModuleStoreEnum.Type.split, 2, 4, 2),
     )
     @ddt.unpack
-    @pytest.mark.django111_expected_failure
     def test_get_path_queries(self, store_type, children_per_block, depth, expected_mongo_calls):
         """
         In case of mongo, 2 queries are used by path_to_location(), and then
@@ -388,7 +382,6 @@ class BookmarkModelTests(BookmarksTestsBase):
             path = Bookmark.get_path(block.location)
             self.assertEqual(len(path), depth - 2)
 
-    @pytest.mark.django111_expected_failure
     def test_get_path_in_case_of_exceptions(self):
 
         user = UserFactory.create()

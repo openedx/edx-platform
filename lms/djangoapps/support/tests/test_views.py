@@ -115,7 +115,6 @@ class SupportViewAccessTests(SupportViewTestCase):
         ))
     ))
     @ddt.unpack
-    @pytest.mark.django111_expected_failure
     def test_access(self, url_name, role, has_access):
         if role is not None:
             role().add_users(self.user)

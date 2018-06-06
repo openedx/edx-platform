@@ -139,7 +139,6 @@ class ResubmitErrorCertificatesTest(CertificateManagementTest):
         with self.assertRaisesRegexp(CommandError, invalid_key):
             call_command(self.command, course_key_list=[invalid_key])
 
-    @pytest.mark.django111_expected_failure
     def test_course_does_not_exist(self):
         phantom_course = CourseLocator(org='phantom', course='phantom', run='phantom')
         self._create_cert(phantom_course, self.user, 'error')

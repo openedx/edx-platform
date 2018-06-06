@@ -7,7 +7,6 @@ import json
 import ddt
 import httpretty
 import mock
-import pytest
 import pytz
 from django.contrib.auth.models import User
 from django.core import mail
@@ -206,7 +205,6 @@ class CreditApiTestBase(ModuleStoreTestCase):
 @attr(shard=2)
 @skip_unless_lms
 @ddt.ddt
-@pytest.mark.django111_expected_failure
 class CreditRequirementApiTests(CreditApiTestBase):
     """
     Test Python API for credit requirements and eligibility.
