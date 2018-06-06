@@ -109,13 +109,10 @@ urlpatterns += (
     url(r'^dashboard/', include('learner_dashboard.urls')),
 )
 
-try:
-    import azure_media_services
+if configuration_helpers.get_value("ENABLE_AZURE_MEDIA_SERVICES_XBLOCK"):
     urlpatterns += (
         url(r'^embed_player/', include('azure_media_services.urls')),
     )
-except ImportError:
-    pass
 
 # TODO: This needs to move to a separate urls.py once the student_account and
 # student views below find a home together

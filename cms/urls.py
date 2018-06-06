@@ -5,6 +5,7 @@ from ratelimitbackend import admin
 
 from cms.djangoapps.contentstore.views.program import ProgramAuthoringView, ProgramsIdTokenView
 from cms.djangoapps.contentstore.views.organization import OrganizationListView
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 admin.autodiscover()
 
@@ -61,19 +62,14 @@ urlpatterns = patterns(
         name='session_language'
     ),
 
-    url(r'^embed_player/', include('azure_media_services.urls')),
-
     # Darklang View to change the preview language (or dark language)
     url(r'^update_lang/', include('openedx.core.djangoapps.dark_lang.urls', namespace='dark_lang')),
 )
 
-try:
-    import azure_media_services
+if configuration_helpers.get_value("ENABLE_AZURE_MEDIA_SERVICES_XBLOCK"):
     urlpatterns += (
         url(r'^embed_player/', include('azure_media_services.urls')),
     )
-except ImportError:
-    pass
 
 # restful api
 urlpatterns += patterns(
