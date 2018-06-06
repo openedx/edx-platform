@@ -9,11 +9,13 @@ import ddt
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.urls import reverse
+from django.test.utils import override_settings
 from six import text_type
 
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.accounts.tests import testutils
 from openedx.core.lib.api import test_utils
+from openedx.core.djangoapps.user_api.validation.views import RegistrationValidationThrottle
 from util.password_policy_validators import password_max_length, password_min_length
 
 
@@ -199,3 +201,24 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
             {"username": "somephrase", "password": "somephrase"},
             {"username": "", "password": u"Password cannot be the same as the username."}
         )
+
+    @override_settings(
+        CACHES={
+            'default': {
+                'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+                'LOCATION': 'registration_proxy',
+            }
+        }
+    )
+    def test_rate_limiting_registration_view(self):
+        """
+        Confirm rate limits work as expected for registration
+        end point /api/user/v1/validation/registration/. Note
+        that drf's rate limiting makes use of the default cache
+        to enforce limits; that's why this test needs a "real"
+        default cache (as opposed to the usual-for-tests DummyCache)
+        """
+        for _ in range(RegistrationValidationThrottle().num_requests):
+            self.request_without_auth('post', self.path)
+        response = self.request_without_auth('post', self.path)
+        self.assertEqual(response.status_code, 429)
