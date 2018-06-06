@@ -556,7 +556,7 @@ def _safe_postlogin_redirect(redirect_to, safehost, default_redirect='/'):
     @param safehost: which host is safe to redirect to
     @return: an HttpResponseRedirect
     """
-    if is_safe_url(url=redirect_to, allowed_hosts={safehost}):
+    if is_safe_url(url=redirect_to, allowed_hosts={safehost}, require_https=True):
         return redirect(redirect_to)
     return redirect(default_redirect)
 

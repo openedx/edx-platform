@@ -747,7 +747,7 @@ class LogoutView(TemplateView):
         """
         target_url = self.request.GET.get('redirect_url')
 
-        if target_url and is_safe_url(target_url, allowed_hosts={self.request.META.get('HTTP_HOST')}):
+        if target_url and is_safe_url(target_url, allowed_hosts={self.request.META.get('HTTP_HOST')}, require_https=True):
             return target_url
         else:
             return self.default_target
