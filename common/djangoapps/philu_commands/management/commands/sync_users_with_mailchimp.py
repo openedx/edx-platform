@@ -77,7 +77,7 @@ class Command(BaseCommand):
         batch_size = 500
         client = ChimpClient()
 
-        users = list(User.objects.all())[0:49]
+        users = list(User.objects.all())
         for i in xrange(0, len(users), batch_size):
             users_json = self.get_users_data_to_send(users[i:i + batch_size])
             self.send_user_to_mailchimp(client, users_json)

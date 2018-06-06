@@ -38,7 +38,7 @@ def update_org_details_at_mailchimp(org_label, org_type, work_area, list_id):
 def update_enrollments_completions_at_mailchimp(list_id):
     """Task to send user enrollments & course completions details to MailChimp"""
     log.info("starting enrollments & completions sync")
-    users = User.objects.all()[0:49]
+    users = User.objects.all()
 
     for user in users:
         profile = user.profile
