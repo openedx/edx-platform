@@ -32,7 +32,7 @@ class ContentStoreTestCase(ModuleStoreTestCase):
         returned json
         """
         resp = self.client.post(
-            reverse('login_post'),
+            reverse('user_api_login_session'),
             {'email': email, 'password': password}
         )
         self.assertEqual(resp.status_code, 200)
@@ -47,7 +47,8 @@ class ContentStoreTestCase(ModuleStoreTestCase):
 
     def _create_account(self, username, email, password):
         """Try to create an account.  No error checking"""
-        resp = self.client.post('/create_account', {
+        url = reverse('user_api_registration')
+        resp = self.client.post('url', {
             'username': username,
             'email': email,
             'password': password,
@@ -141,19 +142,12 @@ class AuthTestCase(ContentStoreTestCase):
     def test_public_pages_load(self):
         """Make sure pages that don't require login load without error."""
         pages = (
-            reverse('login'),
+            reverse('signin'),
             reverse('signup'),
         )
         for page in pages:
             print("Checking '{0}'".format(page))
             self.check_page_get(page, 200)
-
-    def test_create_account_errors(self):
-        # No post data -- should fail
-        resp = self.client.post('/create_account', {})
-        self.assertEqual(resp.status_code, 400)
-        data = parse_json(resp)
-        self.assertEqual(data['success'], False)
 
     def test_create_account(self):
         self.create_account(self.username, self.email, self.pw)

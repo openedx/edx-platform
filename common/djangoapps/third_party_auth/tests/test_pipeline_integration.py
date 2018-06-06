@@ -309,8 +309,8 @@ class EnsureUserInformationTestCase(testutil.TestCase, test.TestCase):
     """Tests ensuring that we have the necessary user information to proceed with the pipeline."""
 
     @ddt.data(
-        (True, '/register'),
-        (False, '/login')
+        (True, '/account/register'),
+        (False, '/account/login')
     )
     @ddt.unpack
     def test_provider_settings_redirect_to_registration(self, send_to_registration_first, expected_redirect_url):

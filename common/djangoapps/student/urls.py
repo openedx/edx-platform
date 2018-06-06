@@ -11,17 +11,8 @@ from . import views
 urlpatterns = [
     url(r'^logout$', views.LogoutView.as_view(), name='logout'),
 
-    # TODO: standardize login
-
-    # login endpoint used by cms.
-    url(r'^login_post$', views.login_user, name='login_post'),
-    # login endpoints used by lms.
-    url(r'^login_ajax$', views.login_user, name="login"),
-    url(r'^login_ajax/(?P<error>[^/]*)$', views.login_user),
-
     url(r'^email_confirm/(?P<key>[^/]*)$', views.confirm_email_change, name='confirm_email_change'),
 
-    url(r'^create_account$', views.create_account, name='create_account'),
     url(r'^activate/(?P<key>[^/]*)$', views.activate_account, name="activate"),
 
     url(r'^accounts/disable_account_ajax$', views.disable_account_ajax, name="disable_account_ajax"),

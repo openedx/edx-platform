@@ -242,7 +242,6 @@ MICROSITE_CONFIGURATION = {
         "email_from_address": "test_site@edx.org",
         "payment_support_email": "test_site@edx.org",
         "ENABLE_MKTG_SITE": False,
-        "ENABLE_COMBINED_LOGIN_REGISTRATION": True,
         "SITE_NAME": "test_site.localhost",
         "course_org_filter": "LogistrationX",
         "course_about_show_social_links": False,

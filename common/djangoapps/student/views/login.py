@@ -522,41 +522,6 @@ def login_oauth_token(request, backend):
     raise Http404
 
 
-@ensure_csrf_cookie
-def signin_user(request):
-    """Deprecated. To be replaced by :class:`student_account.views.login_and_registration_form`."""
-    external_auth_response = external_auth_login(request)
-    if external_auth_response is not None:
-        return external_auth_response
-    # Determine the URL to redirect to following login:
-    redirect_to = get_next_url_for_login_page(request)
-    if request.user.is_authenticated:
-        return redirect(redirect_to)
-
-    third_party_auth_error = None
-    for msg in messages.get_messages(request):
-        if msg.extra_tags.split()[0] == "social-auth":
-            # msg may or may not be translated. Try translating [again] in case we are able to:
-            third_party_auth_error = _(text_type(msg))  # pylint: disable=translation-of-non-string
-            break
-
-    context = {
-        'login_redirect_url': redirect_to,  # This gets added to the query string of the "Sign In" button in the header
-        # Bool injected into JS to submit form if we're inside a running third-
-        # party auth pipeline; distinct from the actual instance of the running
-        # pipeline, if any.
-        'pipeline_running': 'true' if pipeline.running(request) else 'false',
-        'pipeline_url': auth_pipeline_urls(pipeline.AUTH_ENTRY_LOGIN, redirect_url=redirect_to),
-        'platform_name': configuration_helpers.get_value(
-            'platform_name',
-            settings.PLATFORM_NAME
-        ),
-        'third_party_auth_error': third_party_auth_error
-    }
-
-    return render_to_response('login.html', context)
-
-
 def str2bool(s):
     s = str(s)
     return s.lower() in ('yes', 'true', 't', '1')

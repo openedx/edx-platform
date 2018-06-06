@@ -98,7 +98,7 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         response = self.client.get(self.url)
         self.assertRedirects(
             response,
-            '{}?next={}'.format(reverse('signin_user'), self.url)
+            '{}?next={}'.format('/login', self.url)
         )
 
         self.client.login(username=self.user.username, password=self.password)

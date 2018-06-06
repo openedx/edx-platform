@@ -924,55 +924,6 @@ def record_registration_attributions(request, user):
     record_utm_registration_attribution(request, user)
 
 
-@csrf_exempt
-@transaction.non_atomic_requests
-def create_account(request, post_override=None):
-    """
-    JSON call to create new edX account.
-    Used by form in signup_modal.html, which is included into header.html
-    """
-    # Check if ALLOW_PUBLIC_ACCOUNT_CREATION flag turned off to restrict user account creation
-    if not configuration_helpers.get_value(
-            'ALLOW_PUBLIC_ACCOUNT_CREATION',
-            settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION', True)
-    ):
-        return HttpResponseForbidden(_("Account creation not allowed."))
-
-    if waffle().is_enabled(PREVENT_AUTH_USER_WRITES):
-        return HttpResponseForbidden(SYSTEM_MAINTENANCE_MSG)
-
-    warnings.warn("Please use RegistrationView instead.", DeprecationWarning)
-
-    try:
-        user = create_account_with_params(request, post_override or request.POST)
-    except AccountValidationError as exc:
-        return JsonResponse({'success': False, 'value': text_type(exc), 'field': exc.field}, status=400)
-    except ValidationError as exc:
-        field, error_list = next(iteritems(exc.message_dict))
-        return JsonResponse(
-            {
-                "success": False,
-                "field": field,
-                "value": error_list[0],
-            },
-            status=400
-        )
-
-    redirect_url = None  # The AJAX method calling should know the default destination upon success
-
-    # Resume the third-party-auth pipeline if necessary.
-    if third_party_auth.is_enabled() and pipeline.running(request):
-        running_pipeline = pipeline.get(request)
-        redirect_url = pipeline.get_complete_url(running_pipeline['backend'])
-
-    response = JsonResponse({
-        'success': True,
-        'redirect_url': redirect_url,
-    })
-    set_logged_in_cookies(request, response, user)
-    return response
-
-
 @ensure_csrf_cookie
 def activate_account(request, key):
     """

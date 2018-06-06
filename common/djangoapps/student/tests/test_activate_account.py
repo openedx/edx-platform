@@ -151,7 +151,7 @@ class TestActivateAccount(TestCase):
         about account activation.
         """
         login_page_url = "{login_url}?next={redirect_url}".format(
-            login_url=reverse('signin_user'),
+            login_url=reverse('signin_user_legacy'),
             redirect_url=reverse('dashboard'),
         )
         # Access activation link, message should say that account has been activated.
@@ -172,7 +172,7 @@ class TestActivateAccount(TestCase):
 
     def test_account_activation_prevent_auth_user_writes(self):
         login_page_url = "{login_url}?next={redirect_url}".format(
-            login_url=reverse('signin_user'),
+            login_url=reverse('signin_user_legacy'),
             redirect_url=reverse('dashboard'),
         )
         with waffle().override(PREVENT_AUTH_USER_WRITES, True):

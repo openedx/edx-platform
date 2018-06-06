@@ -183,24 +183,14 @@ class TestUserPreferenceMiddleware(TestCase):
 
         # Use an actual call to the login endpoint, to validate that the middleware
         # stack does the right thing
-        if settings.FEATURES.get('ENABLE_COMBINED_LOGIN_REGISTRATION'):
-            response = self.client.post(
-                reverse('user_api_login_session'),
-                data={
-                    'email': self.user.email,
-                    'password': UserFactory._DEFAULT_PASSWORD,
-                    'remember': True,
-                }
-            )
-        else:
-            response = self.client.post(
-                reverse('login_post'),
-                data={
-                    'email': self.user.email,
-                    'password': UserFactory._DEFAULT_PASSWORD,
-                    'honor_code': True,
-                }
-            )
+        response = self.client.post(
+            reverse('user_api_login_session'),
+            data={
+                'email': self.user.email,
+                'password': UserFactory._DEFAULT_PASSWORD,  # pylint: disable=protected-access
+                'remember': True,
+            }
+        )
 
         self.assertEqual(response.status_code, 200)
 

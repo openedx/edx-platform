@@ -52,7 +52,6 @@ from openedx.features.enterprise_support.utils import (
 from student.helpers import destroy_oauth_tokens, get_next_url_for_login_page
 from student.message_types import PasswordReset
 from student.models import UserProfile
-from student.views import register_user as old_register_view, signin_user as old_login_view
 from third_party_auth import pipeline
 from third_party_auth.decorators import xframe_allow_whitelisted
 from util.bad_request_rate_limiter import BadRequestRateLimiter
@@ -109,17 +108,6 @@ def login_and_registration_form(request, initial_mode="login"):
                 initial_mode = "hinted_login"
         except (KeyError, ValueError, IndexError) as ex:
             log.error("Unknown tpa_hint provider: %s", ex)
-
-    # If this is a themed site, revert to the old login/registration pages.
-    # We need to do this for now to support existing themes.
-    # Themed sites can use the new logistration page by setting
-    # 'ENABLE_COMBINED_LOGIN_REGISTRATION' in their
-    # configuration settings.
-    if is_request_in_themed_site() and not configuration_helpers.get_value('ENABLE_COMBINED_LOGIN_REGISTRATION', False):
-        if initial_mode == "login":
-            return old_login_view(request)
-        elif initial_mode == "register":
-            return old_register_view(request)
 
     # Allow external auth to intercept and handle the request
     ext_auth_response = _external_auth_intercept(request, initial_mode)

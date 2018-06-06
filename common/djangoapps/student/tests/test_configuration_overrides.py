@@ -53,7 +53,7 @@ class TestSite(TestCase):
     def setUp(self):
         super(TestSite, self).setUp()
         self.username = "test_user"
-        self.url = reverse("create_account")
+        self.url = reverse("user_api_registration")
         self.params = {
             "username": self.username,
             "email": "test@example.org",

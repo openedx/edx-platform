@@ -74,8 +74,6 @@ FEATURES['ENABLE_VERIFIED_CERTIFICATES'] = True
 # Toggles embargo on for testing
 FEATURES['EMBARGO'] = True
 
-FEATURES['ENABLE_COMBINED_LOGIN_REGISTRATION'] = True
-
 # Enable the milestones app in tests to be consistent with it being enabled in production
 FEATURES['MILESTONES_APP'] = True
 
@@ -462,7 +460,6 @@ MICROSITE_CONFIGURATION = {
         "ACTIVATION_EMAIL_FROM_ADDRESS": "test_activate@edx.org",
         "payment_support_email": "test_site@edx.org",
         "ENABLE_MKTG_SITE": False,
-        "ENABLE_COMBINED_LOGIN_REGISTRATION": True,
         "SITE_NAME": "test_site.localhost",
         "course_org_filter": "LogistrationX",
         "course_about_show_social_links": False,

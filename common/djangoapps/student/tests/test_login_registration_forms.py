@@ -47,7 +47,6 @@ class LoginFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, SharedModuleStoreTes
         super(LoginFormTest, cls).setUpClass()
         cls.course = CourseFactory.create()
 
-    @patch.dict(settings.FEATURES, {"ENABLE_COMBINED_LOGIN_REGISTRATION": False})
     def setUp(self):
         super(LoginFormTest, self).setUp()
 
@@ -164,7 +163,6 @@ class RegisterFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, SharedModuleStore
         super(RegisterFormTest, cls).setUpClass()
         cls.course = CourseFactory.create()
 
-    @patch.dict(settings.FEATURES, {"ENABLE_COMBINED_LOGIN_REGISTRATION": False})
     def setUp(self):
         super(RegisterFormTest, self).setUp()
 

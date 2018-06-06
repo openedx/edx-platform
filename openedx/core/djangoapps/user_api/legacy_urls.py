@@ -33,14 +33,10 @@ urlpatterns = [
         r'^v1/preferences/time_zones/$',
         user_api_views.CountryTimeZoneListView.as_view(),
     ),
+    url(r'^v1/account/login_session/$', user_api_views.LoginSessionView.as_view(),
+        name="user_api_login_session"),
+    url(r'^v1/account/registration/$', user_api_views.RegistrationView.as_view(),
+        name="user_api_registration"),
+    url(r'^v1/account/password_reset/$', user_api_views.PasswordResetView.as_view(),
+        name="user_api_password_reset"),
 ]
-
-if settings.FEATURES.get('ENABLE_COMBINED_LOGIN_REGISTRATION'):
-    urlpatterns += [
-        url(r'^v1/account/login_session/$', user_api_views.LoginSessionView.as_view(),
-            name="user_api_login_session"),
-        url(r'^v1/account/registration/$', user_api_views.RegistrationView.as_view(),
-            name="user_api_registration"),
-        url(r'^v1/account/password_reset/$', user_api_views.PasswordResetView.as_view(),
-            name="user_api_password_reset"),
-    ]

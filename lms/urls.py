@@ -140,24 +140,11 @@ urlpatterns = [
 
     url(r'^dashboard/', include('learner_dashboard.urls')),
     url(r'^api/experiments/', include('experiments.urls', namespace='api_experiments')),
+    url(r'^login$', student_account_views.login_and_registration_form,
+        {'initial_mode': 'login'}, name='signin_user_legacy'),
+    url(r'^register$', student_account_views.login_and_registration_form,
+        {'initial_mode': 'register'}, name='register_user_legacy'),
 ]
-
-# TODO: This needs to move to a separate urls.py once the student_account and
-# student views below find a home together
-if settings.FEATURES.get('ENABLE_COMBINED_LOGIN_REGISTRATION'):
-    # Backwards compatibility with old URL structure, but serve the new views
-    urlpatterns += [
-        url(r'^login$', student_account_views.login_and_registration_form,
-            {'initial_mode': 'login'}, name='signin_user'),
-        url(r'^register$', student_account_views.login_and_registration_form,
-            {'initial_mode': 'register'}, name='register_user'),
-    ]
-else:
-    # Serve the old views
-    urlpatterns += [
-        url(r'^login$', student_views.signin_user, name='signin_user'),
-        url(r'^register$', student_views.register_user, name='register_user'),
-    ]
 
 if settings.FEATURES.get('ENABLE_MOBILE_REST_API'):
     urlpatterns += [

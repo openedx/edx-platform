@@ -33,7 +33,7 @@ export default function LoginFactory(homepageURL) {
         ViewUtils.disableElementWhileRunning($submitButton, function () { return promise; });
         var submit_data = $('#login_form').serialize();
 
-        postJSON('/login_post', submit_data, function (json) {
+        postJSON('/user_api/account/login_session', submit_data, function (json) {
             if (json.success) {
                 var next = /next=([^&]*)/g.exec(decodeURIComponent(window.location.search));
                 if (next && next.length > 1 && !isExternal(next[1])) {

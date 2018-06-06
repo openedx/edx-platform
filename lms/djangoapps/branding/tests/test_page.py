@@ -105,8 +105,8 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
 
         # Response should be instance of HttpResponseRedirect.
         self.assertIsInstance(response, HttpResponseRedirect)
-        # Location should be "/login".
-        self.assertEqual(response._headers.get("location")[1], "/login")  # pylint: disable=protected-access
+        # Location should be "/account/login".
+        self.assertEqual(response._headers.get("location")[1], "/account/login")  # pylint: disable=protected-access
 
 
 @attr(shard=1)

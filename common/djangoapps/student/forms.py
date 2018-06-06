@@ -336,8 +336,6 @@ def get_registration_extension_form(*args, **kwargs):
 
     An example form app for this can be found at http://github.com/open-craft/custom-form-app
     """
-    if not settings.FEATURES.get("ENABLE_COMBINED_LOGIN_REGISTRATION"):
-        return None
     if not getattr(settings, 'REGISTRATION_EXTENSION_FORM', None):
         return None
     module, klass = settings.REGISTRATION_EXTENSION_FORM.rsplit('.', 1)

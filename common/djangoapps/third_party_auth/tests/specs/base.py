@@ -596,7 +596,6 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         actions.do_complete(request.backend, social_views._do_login,  # pylint: disable=protected-access
                             request=request)
 
-        student_views.signin_user(strategy.request)
         student_views.login_user(strategy.request)
         actions.do_complete(request.backend, social_views._do_login,  # pylint: disable=protected-access
                             request=request)

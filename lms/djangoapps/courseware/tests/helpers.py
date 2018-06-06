@@ -194,11 +194,9 @@ class LoginEnrollmentTestCase(TestCase):
         """
         Login, check that the corresponding view's response has a 200 status code.
         """
-        resp = self.client.post(reverse('login'),
+        resp = self.client.post(reverse('user_api_login_session'),
                                 {'email': email, 'password': password})
         self.assertEqual(resp.status_code, 200)
-        data = json.loads(resp.content)
-        self.assertTrue(data['success'])
 
     def logout(self):
         """
@@ -212,7 +210,7 @@ class LoginEnrollmentTestCase(TestCase):
         """
         Create the account and check that it worked.
         """
-        url = reverse('create_account')
+        url = reverse('user_api_registration')
         request_data = {
             'username': username,
             'email': email,
