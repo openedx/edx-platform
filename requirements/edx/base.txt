@@ -54,7 +54,7 @@ edx-django-oauth2-provider==1.1.4
 edx-django-sites-extensions==2.1.1
 edx-enterprise==0.36.5
 edx-oauth2-provider==1.2.0
-edx-opaque-keys==0.4.0
+edx-opaque-keys==0.4.4
 edx-organizations==0.4.4
 edx-rest-api-client==1.7.1
 edx-search==1.0.1
@@ -210,10 +210,13 @@ py2neo==3.1.2
 
 # Support for plugins
 web-fragments==0.2.2
-xblock==1.0.0
+xblock==1.2.0
 
 # Third Party XBlocks
 edx-sga==0.6.2
 
 # Redis version
 redis==2.10.6
+
+# Completion
+edx-completion==0.1.6

@@ -2258,6 +2258,9 @@ INSTALLED_APPS = (
     'openedx.features.enterprise_support',
 
     'experiments',
+
+    # Completion
+    'completion',
 )
 
 ######################### CSRF #########################################

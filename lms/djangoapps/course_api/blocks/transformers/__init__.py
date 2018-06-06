@@ -5,6 +5,7 @@ Course API Block Transformers
 from lms.djangoapps.course_blocks.transformers.visibility import VisibilityTransformer
 from lms.djangoapps.course_blocks.transformers.start_date import StartDateFieldTransformer
 from .student_view import StudentViewTransformer
+from .block_completion import BlockCompletionTransformer
 from .block_counts import BlockCountsTransformer
 from .navigation import BlockNavigationTransformer
 from .milestones import MilestonesAndSpecialExamsTransformer
@@ -65,5 +66,10 @@ SUPPORTED_FIELDS = [
         'merged_visible_to_staff_only',
         VisibilityTransformer,
         requested_field_name='visible_to_staff_only',
+    ),
+    SupportedFieldType(
+        BlockCompletionTransformer.COMPLETION,
+        BlockCompletionTransformer,
+        'completion'
     )
 ]
