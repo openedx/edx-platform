@@ -9,7 +9,10 @@ from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.generics import GenericAPIView, ListAPIView
 from rest_framework.response import Response
-
+from rest_framework.permissions import IsAuthenticated
+from edx_rest_framework_extensions.permissions import JWTRestrictedApplicationPermission
+from edx_rest_framework_extensions.authentication import JwtAuthentication
+from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from courseware.access import has_access
 from lms.djangoapps.courseware import courses
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
@@ -160,6 +163,18 @@ class UserGradeView(GradeViewMixin, GenericAPIView):
         }]
 
     """
+    authentication_classes = (
+        JwtAuthentication,
+        OAuth2AuthenticationAllowInactiveUser,
+    )
+    permission_classes = (IsAuthenticated, JWTRestrictedApplicationPermission,)
+
+    # needed for passing JWTRestrictedApplicationPermission checks
+    # for RestrictedApplications (only). A RestrictedApplication can
+    # only call this method if it is allowed to receive a 'grades:read'
+    # scope
+    required_scopes = ['grades:read']
+
     def get(self, request, course_id):
         """
         Gets a course progress status.
@@ -171,6 +186,18 @@ class UserGradeView(GradeViewMixin, GenericAPIView):
         Return:
             A JSON serialized representation of the requesting user's current grade status.
         """
+        # See if the request has an explicit sattr(request, 'allowed_organizations'))
+        # which limits which OAuth2 clients can see the courses
+        # based on the association with a RestrictedApplication
+        if hasattr(request, 'auth') and hasattr(request, 'oauth_scopes_filters'):
+            course_key = CourseKey.from_string(course_id)
+            if 'content_org' in request.oauth_scopes_filters.keys():
+                if course_key.org not in request.oauth_scopes_filters['content_org']:
+                    return self.make_error_response(
+                        status_code=status.HTTP_403_FORBIDDEN,
+                        developer_message='The OAuth2 RestrictedApplication is not associated with org.',
+                        error_code='course_org_not_associated_with_calling_application'
+                    )
 
         course = self._get_course(course_id, request.user, 'load')
         if isinstance(course, Response):
