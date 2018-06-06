@@ -2,12 +2,8 @@
 Account constants
 """
 
+from django.utils.text import format_lazy
 from django.utils.translation import ugettext_lazy as _
-
-# In Django 1.11, there's django.utils.text.format_lazy.
-from django.utils.functional import allow_lazy
-
-format_lazy = allow_lazy(lambda s, *a, **kw: s.format(*a, **kw), unicode)
 
 
 # The minimum and maximum length for the name ("full name") account field
