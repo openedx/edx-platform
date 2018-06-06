@@ -2,9 +2,11 @@ from django.test import TestCase
 import mock
 
 from django_comment_common import signals, models
+from lms.djangoapps.discussion.config import PROFANITY_CHECKER_FLAG
 from lms.djangoapps.discussion.signals.handlers import ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY
 import openedx.core.djangoapps.request_cache as request_cache
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory, SiteConfigurationFactory
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -13,10 +15,11 @@ class SendMessageHandlerTestCase(TestCase):
     shard = 4
 
     def setUp(self):
+        course_id = 'course-v1:edX+DemoX+Demo_Course'
         self.sender = mock.Mock()
         self.user = mock.Mock()
-        self.post = mock.Mock()
-        self.post.thread.course_id = 'course-v1:edX+DemoX+Demo_Course'
+        self.post = mock.Mock(course_id=course_id)
+        self.post.thread.course_id = course_id
 
         self.site = SiteFactory.create()
 
@@ -94,3 +97,47 @@ class CoursePublishHandlerTestCase(ModuleStoreTestCase):
         """
         discussion_settings = models.CourseDiscussionSettings.objects.get(course_id=course_key)
         self.assertDictEqual(discussion_settings.discussions_id_map, expected_map)
+
+
+class ProfanityCheckerHandlerTestCase(ModuleStoreTestCase):
+    """
+    Tests for handling of possibly profane posts.
+    """
+    def setUp(self):
+        self.sender = mock.Mock()
+        self.user = mock.Mock(id=123)
+        self.post = mock.Mock(
+            id='abc',
+            title='the title',
+            body='the body',
+            type='thread or comment',
+            course_id='course-v1:edX+DemoX+Demo_Course',
+            user_id=123,
+        )
+
+    @mock.patch('lms.djangoapps.discussion.profanity_checker.check_for_profanity_and_report')
+    @override_waffle_flag(PROFANITY_CHECKER_FLAG, active=False)
+    def test_no_profanity_checking_without_course_waffle_flag(self, mock_check_for_profanity):
+        signals.thread_created.send(sender=self.sender, user=self.user, post=self.post)
+        signals.thread_edited.send(sender=self.sender, user=self.user, post=self.post)
+        signals.comment_created.send(sender=self.sender, user=self.user, post=self.post)
+        signals.comment_edited.send(sender=self.sender, user=self.user, post=self.post)
+
+        self.assertFalse(mock_check_for_profanity.called)
+
+    @mock.patch('lms.djangoapps.discussion.profanity_checker.check_for_profanity_and_report')
+    @override_waffle_flag(PROFANITY_CHECKER_FLAG, active=True)
+    def test_profanity_checking_occurs_with_course_waffle_flag(self, mock_check_for_profanity):
+        signals.thread_created.send(sender=self.sender, user=self.user, post=self.post)
+        signals.thread_edited.send(sender=self.sender, user=self.user, post=self.post)
+        signals.comment_created.send(sender=self.sender, user=self.user, post=self.post)
+        signals.comment_edited.send(sender=self.sender, user=self.user, post=self.post)
+
+        expected_context = {
+            'post_id': self.post.id,
+            'post_title': self.post.title,
+            'post_body': self.post.body,
+            'post_type': self.post.type,
+            'course_id': self.post.course_id,
+        }
+        mock_check_for_profanity.assert_has_calls([mock.call(**expected_context)] * 4)
