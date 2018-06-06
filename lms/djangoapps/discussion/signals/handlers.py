@@ -5,9 +5,11 @@ import logging
 
 from django.conf import settings
 from django.dispatch import receiver
+from six import text_type
 
 from django_comment_common import signals
-from lms.djangoapps.discussion import tasks
+from lms.djangoapps.discussion import config, tasks
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.theming.helpers import get_current_site
@@ -31,7 +33,7 @@ def update_discussions_on_course_publish(sender, course_key, **kwargs):  # pylin
         return
 
     context = {
-        'course_id': unicode(course_key),
+        'course_id': text_type(course_key),
     }
     tasks.update_discussions_map.apply_async(
         args=[context],
@@ -62,7 +64,7 @@ def send_discussion_email_notification(sender, user, post, **kwargs):
 def send_message(comment, site):
     thread = comment.thread
     context = {
-        'course_id': unicode(thread.course_id),
+        'course_id': text_type(thread.course_id),
         'comment_id': comment.id,
         'comment_body': comment.body,
         'comment_author_id': comment.user_id,
@@ -82,4 +84,14 @@ def send_message(comment, site):
 @receiver(signals.comment_created)
 @receiver(signals.comment_edited)
 def handle_possibly_profane_post(sender, user, post, **kwargs):  # pylint: disable=unused-argument
-    tasks.check_for_profanity.apply_async(args=[post.id, post.title, post.body, post.type])
+    if not config.PROFANITY_CHECKER_FLAG.is_enabled(CourseKey.from_string(post.course_id)):
+        return
+
+    context = {
+        'post_id': post.id,
+        'post_title': post.title,
+        'post_body': post.body,
+        'post_type': post.type,
+        'course_id': post.course_id,
+    }
+    tasks.check_for_profanity.apply_async(args=[context])

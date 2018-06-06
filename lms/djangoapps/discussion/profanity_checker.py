@@ -3,12 +3,14 @@ Deals with auto-reporting of discussion posts that contain
 profanity or otherwise naughty words or phrases.
 """
 
+from collections import Counter
 import json
 import logging
 import os
 import re
 
 from django.contrib.auth.models import User
+from opaque_keys.edx.keys import CourseKey
 
 import lms.lib.comment_client as cc
 
@@ -47,19 +49,24 @@ BADWORDS_REGEX = {w: re.compile(r'\b{}\b'.format(w), re.IGNORECASE) for w in BAD
 REPORTING_THRESHOLD = 4
 
 
-def check_for_profanity_and_report(post_id, post_title, post_body, post_type):
+def check_for_profanity_and_report(**kwargs):
     """
     Given a post_id, post_title, and post_body, checks if the post should
     be flagged, and if so, reports the post using the post_id.
     """
+    post_id = kwargs['post_id']
+    post_title = kwargs['post_title']
+    post_body = kwargs['post_body']
+    post_type = kwargs['post_type']
+
     score = 0
     auto_flag = False
-    violations = []
+    violations = Counter()
     for content in (post_title, post_body):
         content_score, content_flag, content_violations = check_string(content)
         score += content_score
         auto_flag = max(auto_flag, content_flag)
-        violations.extend(content_violations)
+        violations.update(content_violations)
 
     if auto_flag or (score >= REPORTING_THRESHOLD):
         report_post(post_id, post_type, violations)
@@ -88,11 +95,11 @@ def check_string(string):
     """
     score = 0
     auto_flag = False
-    violations = []
+    violations = Counter()
     for word in BADWORDS_REGEX:
         pattern = BADWORDS_REGEX[word]
-        if pattern.search(string):
-            violations.append(word)
+        for _ in pattern.findall(string):
+            violations[word] += 1
             score += BADWORDS[word]['score']
             auto_flag = max(auto_flag, BADWORDS[word]['auto_flag'])
     return score, auto_flag, violations

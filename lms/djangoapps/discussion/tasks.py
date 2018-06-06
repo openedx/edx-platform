@@ -53,8 +53,8 @@ def update_discussions_map(context):
 
 
 @task(base=LoggedTask)
-def check_for_profanity(post_id, post_title, post_body, post_type):
-    profanity_checker.check_for_profanity_and_report(post_id, post_title, post_body, post_type)
+def check_for_profanity(context):
+    profanity_checker.check_for_profanity_and_report(**context)
 
 
 class ResponseNotification(BaseMessageType):
