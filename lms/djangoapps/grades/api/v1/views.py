@@ -168,14 +168,14 @@ class CourseGradesView(GradeViewMixin, GenericAPIView):
         try:
             course_key = CourseKey.from_string(course_id)
         except InvalidKeyError:
-            return self.make_error_response(
+            raise self.api_error(
                 status_code=status.HTTP_404_NOT_FOUND,
                 developer_message='The provided course key cannot be parsed.',
                 error_code='invalid_course_key'
             )
 
         if not CourseOverview.get_from_id_if_exists(course_key):
-            return self.make_error_response(
+            raise self.api_error(
                 status_code=status.HTTP_404_NOT_FOUND,
                 developer_message="Requested grade for unknown course {course}".format(course=course_id),
                 error_code='course_does_not_exist'
@@ -186,13 +186,13 @@ class CourseGradesView(GradeViewMixin, GenericAPIView):
             try:
                 return self._get_single_user_grade(request, course_key)
             except USER_MODEL.DoesNotExist:
-                return self.make_error_response(
+                raise self.api_error(
                     status_code=status.HTTP_404_NOT_FOUND,
                     developer_message='The user matching the requested username does not exist.',
                     error_code='user_does_not_exist'
                 )
             except CourseEnrollment.DoesNotExist:
-                return self.make_error_response(
+                raise self.api_error(
                     status_code=status.HTTP_404_NOT_FOUND,
                     developer_message='The user matching the requested username is not enrolled in this course',
                     error_code='user_not_enrolled'

@@ -21,13 +21,30 @@ from openedx.core.lib.api.authentication import (
 from openedx.core.lib.api.permissions import IsUserInUrl
 
 
+class DeveloperErrorResponseException(Exception):
+    """
+    An exception class that wraps a DRF Response object so that
+    it does not need to be recreated when returning a response.
+    Intended to be used with and by DeveloperErrorViewMixin.
+    """
+    def __init__(self, response):
+        super(DeveloperErrorResponseException, self).__init__()
+        self.response = response
+
+
 class DeveloperErrorViewMixin(object):
     """
     A view mixin to handle common error cases other than validation failure
     (auth failure, method not allowed, etc.) by generating an error response
     conforming to our API conventions with a developer message.
     """
-    def make_error_response(self, status_code, developer_message, error_code=None):
+    @classmethod
+    def api_error(cls, status_code, developer_message, error_code=None):
+        response = cls._make_error_response(status_code, developer_message, error_code)
+        return DeveloperErrorResponseException(response)
+
+    @classmethod
+    def _make_error_response(cls, status_code, developer_message, error_code=None):
         """
         Build an error response with the given status code and developer_message
         """
@@ -36,7 +53,8 @@ class DeveloperErrorViewMixin(object):
             error_data['error_code'] = error_code
         return Response(error_data, status=status_code)
 
-    def make_validation_error_response(self, validation_error):
+    @classmethod
+    def _make_validation_error_response(cls, validation_error):
         """
         Build a 400 error response from the given ValidationError
         """
@@ -57,19 +75,20 @@ class DeveloperErrorViewMixin(object):
                 }
             return Response(response_obj, status=400)
         else:
-            return self.make_error_response(400, validation_error.messages[0])
+            return cls._make_error_response(400, validation_error.messages[0])
 
     def handle_exception(self, exc):
         """
         Generalized helper method for managing specific API exception workflows
         """
-
-        if isinstance(exc, APIException):
-            return self.make_error_response(exc.status_code, exc.detail)
+        if isinstance(exc, DeveloperErrorResponseException):
+            return exc.response
+        elif isinstance(exc, APIException):
+            return self._make_error_response(exc.status_code, exc.detail)
         elif isinstance(exc, Http404) or isinstance(exc, ObjectDoesNotExist):
-            return self.make_error_response(404, text_type(exc) or "Not found.")
+            return self._make_error_response(404, text_type(exc) or "Not found.")
         elif isinstance(exc, ValidationError):
-            return self.make_validation_error_response(exc)
+            return self._make_validation_error_response(exc)
         else:
             raise
 

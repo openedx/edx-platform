@@ -2,19 +2,15 @@
 Tests for the course import API views
 """
 import os
-import shutil
 import tarfile
 import tempfile
-from datetime import datetime
-from urllib import urlencode
 
 from django.urls import reverse
 from path import Path as path
-from mock import patch
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory, StaffFactory
+from lms.djangoapps.courseware.tests.factories import StaffFactory
 from student.tests.factories import UserFactory
 from user_tasks.models import UserTaskStatus
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
