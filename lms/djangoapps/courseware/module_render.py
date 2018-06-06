@@ -17,17 +17,11 @@ from django.template.context_processors import csrf
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.http import Http404, HttpResponse, HttpResponseForbidden
-from django.utils.text import slugify
 from django.views.decorators.csrf import csrf_exempt
 from edx_proctoring.services import ProctoringService
-from edx_rest_framework_extensions.authentication import JwtAuthentication
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from requests.auth import HTTPBasicAuth
-from rest_framework.authentication import SessionAuthentication
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from rest_framework.views import APIView
-from rest_framework_oauth.authentication import OAuth2Authentication
 from six import text_type
 from xblock.core import XBlock
 from xblock.django.request import django_to_webob_request, webob_to_django_response
@@ -74,6 +68,7 @@ from student.roles import CourseBetaTesterRole
 from track import contexts
 from util import milestones_helpers
 from util.json_request import JsonResponse
+from django.utils.text import slugify
 from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from xblock_django.user_service import DjangoXBlockUserService
 from xmodule.contentstore.django import contentstore
@@ -932,31 +927,39 @@ def handle_xblock_callback_noauth(request, course_id, usage_id, handler, suffix=
         return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course=course)
 
 
-class XblockCallbackView(APIView):
+def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     """
-    Class-based view for extensions. This is where AJAX calls go.
-    Return 403 error if the user is not logged in. Raises Http404 if
-    the location and course_id do not identify a valid module, the module is
-    not accessible by the user, or the module raises NotFoundError. If the
-    module raises any other error, it will escape this function.
+    Generic view for extensions. This is where AJAX calls go.
+
+    Arguments:
+        request (Request): Django request.
+        course_id (str): Course containing the block
+        usage_id (str)
+        handler (str)
+        suffix (str)
+
+    Raises:
+        Http404: If the course is not found in the modulestore.
     """
-    authentication_classes = (JwtAuthentication, SessionAuthentication, OAuth2Authentication,)
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    # NOTE (CCB): Allow anonymous GET calls (e.g. for transcripts). Modifying this view is simpler than updating
+    # the XBlocks to use `handle_xblock_callback_noauth`...which is practically identical to this view.
+    if request.method != 'GET' and not request.user.is_authenticated:
+        return HttpResponseForbidden()
 
-    def get(self, request, course_id, usage_id, handler, suffix=None):
-        return _get_course_and_invoke_handler(request, course_id, usage_id, handler, suffix)
+    request.user.known = request.user.is_authenticated
 
-    def post(self, request, course_id, usage_id, handler, suffix=None):
-        return _get_course_and_invoke_handler(request, course_id, usage_id, handler, suffix)
+    try:
+        course_key = CourseKey.from_string(course_id)
+    except InvalidKeyError:
+        raise Http404('{} is not a valid course key'.format(course_id))
 
-    def put(self, request, course_id, usage_id, handler, suffix=None):
-        return _get_course_and_invoke_handler(request, course_id, usage_id, handler, suffix)
+    with modulestore().bulk_operations(course_key):
+        try:
+            course = modulestore().get_course(course_key)
+        except ItemNotFoundError:
+            raise Http404('{} does not exist in the modulestore'.format(course_id))
 
-    def patch(self, request, course_id, usage_id, handler, suffix=None):
-        return _get_course_and_invoke_handler(request, course_id, usage_id, handler, suffix)
-
-    def delete(self, request, course_id, usage_id, handler, suffix=None):
-        return _get_course_and_invoke_handler(request, course_id, usage_id, handler, suffix)
+        return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course=course)
 
 
 def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_info=False, course=None):
@@ -1034,11 +1037,10 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
     """
 
     # Check submitted files
-    if request.method == 'POST' and request.META.get('CONTENT_TYPE', '').startswith('multipart/form-data'):
-        files = request.FILES
-        error_msg = _check_files_limits(files)
-        if error_msg:
-            return JsonResponse({'success': error_msg}, status=413)
+    files = request.FILES or {}
+    error_msg = _check_files_limits(files)
+    if error_msg:
+        return JsonResponse({'success': error_msg}, status=413)
 
     # Make a CourseKey from the course_id, raising a 404 upon parse error.
     try:
@@ -1091,27 +1093,6 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
             raise
 
     return webob_to_django_response(resp)
-
-
-def _get_course_and_invoke_handler(request, course_id, usage_id, handler, suffix):
-    """
-    Gets the course object to pass as an additional argument to invoke the xblock handler.
-    """
-
-    request.user.known = request.user.is_authenticated
-
-    try:
-        course_key = CourseKey.from_string(course_id)
-    except InvalidKeyError:
-        raise Http404('{} is not a valid course key'.format(course_id))
-
-    with modulestore().bulk_operations(course_key):
-        try:
-            course = modulestore().get_course(course_key)
-        except ItemNotFoundError:
-            raise Http404('{} does not exist in the modulestore'.format(course_id))
-
-        return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course=course)
 
 
 def hash_resource(resource):
