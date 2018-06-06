@@ -147,7 +147,7 @@
 # Natalia, 2013
 # Natalia, 2013-2014,2016,2018
 # Ned Batchelder <ned@edx.org>, 2016-2017
-# Ned Weitzman <nweitzman@edx.org>, 2017
+# Ned Weitzman <nweitzman@edx.org>, 2017-2018
 # Nestor Alejandro Mendoza Espinoza <name1984@gmail.com>, 2015
 # Nicolas CS <nicolascs23@gmail.com>, 2016
 # Cristian Salamea <ovnicraft@gmail.com>, 2013
@@ -218,9 +218,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-05-24 10:01+0000\n"
-"PO-Revision-Date: 2018-03-23 23:51+0000\n"
-"Last-Translator: Leonardo J. Caballero G. <leonardocaballero@gmail.com>\n"
+"POT-Creation-Date: 2018-06-06 14:53+0000\n"
+"PO-Revision-Date: 2018-06-06 15:12+0000\n"
+"Last-Translator: Muhammad Ayub khan <ayubkhan@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
@@ -283,19 +283,19 @@ msgstr "Vacío"
 #: common/lib/xmodule/xmodule/video_module/video_handlers.py
 #, python-brace-format
 msgid "The following parameters are required: {missing}."
-msgstr ""
+msgstr "Los siguientes parámetros son requeridos: {missing}."
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
 #: common/lib/xmodule/xmodule/video_module/video_handlers.py
 #, python-brace-format
 msgid "A transcript with the \"{language_code}\" language code already exists."
-msgstr ""
+msgstr "Ya existe una transcripción con el código de idioma \"{language_code}\" "
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 #: common/lib/xmodule/xmodule/video_module/video_handlers.py
 msgid "A transcript file is required."
-msgstr ""
+msgstr "Se requiere un archivo de transcripción."
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
@@ -304,6 +304,8 @@ msgid ""
 "There is a problem with this transcript file. Try to upload a different "
 "file."
 msgstr ""
+"Hay un problema con el archivo de transcripción. Intente subir uno "
+"diferente."
 
 #: cms/djangoapps/contentstore/views/videos.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
@@ -937,6 +939,9 @@ msgid ""
 "link from {platform_name}. If you need help, contact "
 "{link_start}{platform_name} Support{link_end}."
 msgstr ""
+"Busque un enlace de activación de cuenta de {platform_name} en su bandeja de"
+" {email_start}{email}{email_end}. Si necesite asistencia, contáctese con "
+"{link_start}Soporte de {platform_name}{link_end}."
 
 #: common/djangoapps/student/views/dashboard.py
 #, python-brace-format
@@ -1038,11 +1043,11 @@ msgstr "No fue posible enviar el correo de reactivación"
 
 #: common/djangoapps/student/views/login.py
 msgid "Superuser creation not allowed"
-msgstr ""
+msgstr "Creación de super usuario no permitida."
 
 #: common/djangoapps/student/views/login.py
 msgid "Account modification not allowed."
-msgstr ""
+msgstr "Modificación de cuenta no permitida."
 
 #: common/djangoapps/student/views/login.py
 #: common/djangoapps/student/views/management.py
@@ -1160,7 +1165,7 @@ msgstr "El cambio de contraseña no ha sido exitoso"
 
 #: common/djangoapps/student/views/management.py
 msgid "Error in resetting your password."
-msgstr ""
+msgstr "Error restableciendo su contraseña."
 
 #: common/djangoapps/student/views/management.py
 msgid "Error in resetting your password. Please try again."
@@ -1195,6 +1200,8 @@ msgstr "Eliminar la configuración seleccionada"
 #: common/djangoapps/third_party_auth/middleware.py
 msgid "Unable to connect with the external provider, please try again"
 msgstr ""
+"No es posible conectarse con el proveedor externo, por favor intente de "
+"nuevo."
 
 #: common/djangoapps/third_party_auth/models.py
 msgid "Authentication with {} is currently unavailable."
@@ -1248,6 +1255,8 @@ msgid ""
 "If this option is selected, users will be sent a welcome email upon "
 "registration."
 msgstr ""
+"Si esta opción es seleccionada, un correo de bienvenida será enviado a los "
+"usuarios una vez se registren."
 
 #: common/djangoapps/third_party_auth/models.py
 msgid ""
@@ -1690,71 +1699,71 @@ msgstr "Sistema de hito definido"
 #, python-brace-format
 msgid "{num} letter"
 msgid_plural "{num} letters"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{num} Letra"
+msgstr[1] "{num} Letras"
 
 #. Translators: This appears in a list of password requirements
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
 msgid "{num} uppercase letter"
 msgid_plural "{num} uppercase letters"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{num} Letra mayúscula"
+msgstr[1] "{num} Letras mayúsculas"
 
 #. Translators: This appears in a list of password requirements
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
 msgid "{num} lowercase letter"
 msgid_plural "{num} lowercase letters"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{num} Letra minúscula"
+msgstr[1] "{num} Letras minúsculas"
 
 #. Translators: This appears in a list of password requirements
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
 msgid "{num} digit"
 msgid_plural "{num} digits"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{num} dígito"
+msgstr[1] "{num} dígitos"
 
 #. Translators: This appears in a list of password requirements
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
 msgid "{num} number"
 msgid_plural "{num} numbers"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{num} numero"
+msgstr[1] "{num} números"
 
 #. Translators: This appears in a list of password requirements
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
 msgid "{num} punctuation mark"
 msgid_plural "{num} punctuation marks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{num} signo de puntuación"
+msgstr[1] "{num} signos de puntuación"
 
 #. Translators: This appears in a list of password requirements
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
 msgid "{num} symbol"
 msgid_plural "{num} symbols"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{num} símbolo"
+msgstr[1] "{num} símbolos"
 
 #. Translators: This appears in a list of password requirements
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
 msgid "{num} word"
 msgid_plural "{num} words"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{num} palabra"
+msgstr[1] "{num} palabras"
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
 msgid "Your password must contain at least {num} character."
 msgid_plural "Your password must contain at least {num} characters."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Su contraseña debe tener al menos {num} caracter."
+msgstr[1] "Su contraseña debe tener al menos {num} caracteres."
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
@@ -1765,16 +1774,19 @@ msgid_plural ""
 "Your password must contain at least {num} characters, including "
 "{requirements}."
 msgstr[0] ""
+"Su contraseña debe tener al menos {num} caracter, incluyendo {requirements}."
 msgstr[1] ""
+"Su contraseña debe tener al menos {num} caracteres. incluyendo "
+"{requirements}."
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "Invalid password."
-msgstr ""
+msgstr "Contraseña inválida."
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
 msgid "Enter a password with at least {requirements}."
-msgstr ""
+msgstr "Ingrese una contraseña con al menos {requirements}."
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
@@ -1812,25 +1824,25 @@ msgstr[1] ""
 #, python-brace-format
 msgid "{num} character"
 msgid_plural "{num} characters"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{num} caracter"
+msgstr[1] "{num} caracteres"
 
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
 msgid "Enter a password with at most {num} character."
 msgid_plural "Enter a password with at most {num} characters."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Ingrese una contraseña con máximo {num} caracter."
+msgstr[1] "Ingrese una contraseña con máximo {num} caracteres."
 
 #. Translators: This message is shown to users who enter a password matching
 #. the username they enter(ed).
 #: common/djangoapps/util/password_policy_validators.py
 msgid "Password cannot be the same as the username."
-msgstr ""
+msgstr "La contraseña no puede ser igual al nombre de usuario."
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "Password is too similar to a dictionary word."
-msgstr ""
+msgstr "La contraseña es muy parecida a una palabra del diccionario."
 
 #: common/djangoapps/xblock_django/admin.py
 msgid ""
@@ -1896,6 +1908,11 @@ msgid "Cannot rescore problems with possible file submissions"
 msgstr ""
 "No se pueden volver a calcular los puntajes de problemas con posibles envíos"
 " de archivos."
+
+#: common/lib/capa/capa/capa_problem.py
+#, python-brace-format
+msgid "Question {0}"
+msgstr "Pregunta {0}"
 
 #: common/lib/capa/capa/capa_problem.py
 #: common/lib/xmodule/xmodule/capa_base.py
@@ -2074,6 +2091,7 @@ msgid "Incorrect:"
 msgstr "Incorrecto:"
 
 #: common/lib/capa/capa/responsetypes.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Answer"
 msgstr "Respuesta"
 
@@ -2797,6 +2815,14 @@ msgid ""
 msgstr ""
 "El estado de este problema ha cambiado desde que usted cargó esta página. "
 "Por favor recargue la página."
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Answer ID"
+msgstr "ID de la respuesta"
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Question"
+msgstr "Pregunta"
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid "Conditional"
@@ -5002,7 +5028,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_handlers.py
 msgid "Language is required."
-msgstr ""
+msgstr "Se requiere el idioma."
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "Basic"
@@ -5396,6 +5422,7 @@ msgstr "Todas las posibles palabras, de todos los estudiantes."
 msgid "Top num_top_words words for word cloud."
 msgstr "Top de num_top_words para la nube de palabras."
 
+#: common/templates/student/edx_ace/passwordreset/email/body.html
 #: lms/templates/forgot_password_modal.html
 msgid "Password Reset"
 msgstr "Restablecer Contraseña"
@@ -5436,7 +5463,7 @@ msgstr ""
 
 #: common/templates/student/edx_ace/passwordreset/email/body.html
 msgid "Change my Password"
-msgstr ""
+msgstr "Cambiar mi contraseña"
 
 #: common/templates/student/edx_ace/passwordreset/email/body.txt
 msgid "Please go to the following page and choose a new password:"
@@ -5670,7 +5697,7 @@ msgstr "Open edX"
 
 #: lms/djangoapps/branding/api.py
 msgid "Trademark Policy"
-msgstr ""
+msgstr "Política de marcas"
 
 #: lms/djangoapps/branding/api.py
 #, python-brace-format
@@ -6206,6 +6233,8 @@ msgstr ""
 #: lms/djangoapps/commerce/models.py
 msgid "Path to course(s) checkout page hosted by the E-Commerce service."
 msgstr ""
+"Camino a la página de compra de curso(s) alojada por el servicio de  "
+"E-Commerce."
 
 #: lms/djangoapps/commerce/models.py openedx/core/djangoapps/catalog/models.py
 #: openedx/core/djangoapps/credentials/models.py
@@ -7188,11 +7217,11 @@ msgstr ""
 
 #: lms/djangoapps/email_marketing/models.py
 msgid "Sailthru send template to use on passed ID verification."
-msgstr ""
+msgstr "Sailthru envía plantilla para usar en el ID de verificación aprobado."
 
 #: lms/djangoapps/email_marketing/models.py
 msgid "Sailthru send template to use on failed ID verification."
-msgstr ""
+msgstr "Sailthru envía plantilla para usar en el fallido ID de verificación."
 
 #: lms/djangoapps/email_marketing/models.py
 msgid "Sailthru send template to use on upgrading a course. Deprecated "
@@ -7316,6 +7345,11 @@ msgstr ""
 #: lms/djangoapps/instructor/views/api.py
 msgid "User does not exist."
 msgstr "El usuario no existe."
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"Found a conflict with given identifier. Please try an alternative identifier"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -9881,11 +9915,11 @@ msgstr "Desactivar Cuenta de Usuario"
 #: lms/djangoapps/support/views/index.py
 #: lms/templates/support/entitlement.html
 msgid "Entitlements"
-msgstr ""
+msgstr "Derechos"
 
 #: lms/djangoapps/support/views/index.py
 msgid "View, create, and reissue learner entitlements"
-msgstr ""
+msgstr "Ver, crear y reexpedir derechos de los estudiantes."
 
 #: lms/djangoapps/support/views/manage_user.py
 msgid "user_support_url"
@@ -10115,17 +10149,17 @@ msgstr "Los datos de imagen no es válida."
 #: lms/djangoapps/verify_student/views.py
 #, python-brace-format
 msgid "{platform_name} ID Verification Photos Received"
-msgstr ""
+msgstr "{platform_name} ID de verificación de las fotos recibidas"
 
 #: lms/djangoapps/verify_student/views.py
 #, python-brace-format
 msgid "Your {platform_name} ID Verification Approved"
-msgstr ""
+msgstr "Su ID de verificación  {platform_name} aprobada"
 
 #: lms/djangoapps/verify_student/views.py
 #, python-brace-format
 msgid "Your {platform_name} Verification Has Been Denied"
-msgstr ""
+msgstr "Su verificación {platform_name} ha sido denegada"
 
 #: lms/envs/common.py
 msgid "Your Platform Name Here"
@@ -10249,6 +10283,13 @@ msgid ""
 "note that {platform_name} has a different {privacy_policy_link_start}Privacy"
 " Policy{privacy_policy_link_end} from {enterprise_name}."
 msgstr ""
+"Ha salido de la página web de  {start_bold}{enterprise_name}{end_bold} y "
+"está ahora en la página de  {platform_name}. {enterprise_name} se ha "
+"asociado con {platform_name} para ofrecerle la más alta calidad, siempre "
+"programas de aprendizaje disponibles para ayudarle a avanzar en su "
+"conocimiento y carrera. {line_break}Por favor note que {platform_name} tiene"
+" una {privacy_policy_link_start}política de privacidad diferente "
+"{privacy_policy_link_end} de {enterprise_name}."
 
 #: lms/templates/logout.html
 msgid "Signed Out"
@@ -10318,39 +10359,48 @@ msgstr "Última modificación:"
 msgid "See all children"
 msgstr "Ver todos los registros hijos"
 
-#: lms/templates/wiki/article.html
+#: lms/templates/wiki/article.html wiki/templates/wiki/article.html
 msgid "This article was last modified:"
 msgstr "Última modificación de este artículo:"
 
-#: lms/templates/wiki/create.html lms/templates/wiki/create.html.py
+#: lms/templates/wiki/create.html wiki/templates/wiki/create.html
 msgid "Add new article"
 msgstr "Añadir nuevo artículo"
 
-#: lms/templates/wiki/create.html
+#: lms/templates/wiki/create.html wiki/templates/wiki/create.html
 msgid "Create article"
 msgstr "Crear artículo"
 
 #: lms/templates/wiki/create.html lms/templates/wiki/delete.html
-#: lms/templates/wiki/delete.html.py
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+#: wiki/plugins/images/templates/wiki/plugins/images/purge.html
+#: wiki/plugins/images/templates/wiki/plugins/images/revision_add.html
+#: wiki/templates/wiki/create.html wiki/templates/wiki/delete.html
 msgid "Go back"
 msgstr "Volver"
 
-#: lms/templates/wiki/delete.html lms/templates/wiki/delete.html.py
-#: lms/templates/wiki/edit.html
+#: lms/templates/wiki/delete.html lms/templates/wiki/edit.html
+#: wiki/templates/wiki/delete.html wiki/templates/wiki/edit.html
 msgid "Delete article"
 msgstr "Borrar artículo"
 
 #: lms/templates/wiki/delete.html
 #: lms/templates/wiki/plugins/attachments/index.html
 #: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
+#: wiki/templates/wiki/delete.html
 msgid "Delete"
 msgstr "Borrar"
 
-#: lms/templates/wiki/delete.html
+#: lms/templates/wiki/delete.html wiki/templates/wiki/delete.html
 msgid "You cannot delete a root article."
 msgstr "No puede borrar un artículo raíz."
 
-#: lms/templates/wiki/delete.html
+#: lms/templates/wiki/delete.html wiki/templates/wiki/delete.html
 msgid ""
 "You cannot delete this article because you do not have permission to delete "
 "articles with children. Try to remove the children manually one-by-one."
@@ -10359,7 +10409,7 @@ msgstr ""
 " que tengan artículos hijos. Intente borrar manualmente los artículos hijos "
 "uno por uno."
 
-#: lms/templates/wiki/delete.html
+#: lms/templates/wiki/delete.html wiki/templates/wiki/delete.html
 msgid ""
 "You are deleting an article. This means that its children will be deleted as"
 " well. If you choose to purge, children will also be purged!"
@@ -10368,31 +10418,33 @@ msgstr ""
 "borrados también. Si elige purgar el artículo, los artículos hijos serán "
 "purgados también."
 
-#: lms/templates/wiki/delete.html
+#: lms/templates/wiki/delete.html wiki/templates/wiki/delete.html
 msgid "Articles that will be deleted"
 msgstr "Artículos que serán borrados"
 
-#: lms/templates/wiki/delete.html
+#: lms/templates/wiki/delete.html wiki/templates/wiki/delete.html
 msgid "...and more!"
 msgstr "--- y más!"
 
-#: lms/templates/wiki/delete.html
+#: lms/templates/wiki/delete.html wiki/templates/wiki/delete.html
 msgid "You are deleting an article. Please confirm."
 msgstr "Está a punto de borrar un artículo. Favor confirmar."
 
 #: lms/templates/wiki/edit.html cms/templates/component.html
 #: cms/templates/container.html cms/templates/studio_xblock_wrapper.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-#: lms/templates/wiki/includes/article_menu.html
+#: lms/templates/wiki/includes/article_menu.html wiki/templates/wiki/edit.html
+#: wiki/templates/wiki/includes/article_menu.html
 msgid "Edit"
 msgstr "Editar"
 
-#: lms/templates/wiki/edit.html lms/templates/wiki/edit.html.py
-#: lms/templates/ccx/schedule.html
+#: lms/templates/wiki/edit.html lms/templates/ccx/schedule.html
+#: wiki/templates/wiki/edit.html wiki/templates/wiki/settings.html
 msgid "Save changes"
 msgstr "Guardar cambios"
 
 #: lms/templates/wiki/edit.html cms/templates/container.html
+#: wiki/templates/wiki/edit.html
 msgid "Preview"
 msgstr "Vista previa"
 
@@ -10432,15 +10484,17 @@ msgstr "Vista previa de la Wiki"
 msgid "window open"
 msgstr "ventana abierta"
 
-#: lms/templates/wiki/edit.html
+#: lms/templates/wiki/edit.html wiki/templates/wiki/edit.html
 msgid "Back to editor"
 msgstr "Volver al editor"
 
 #: lms/templates/wiki/history.html
+#: wiki/plugins/images/templates/wiki/plugins/images/index.html
+#: wiki/templates/wiki/history.html
 msgid "History"
 msgstr "Historial"
 
-#: lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
 msgid ""
 "Click each revision to see a list of edited lines. Click the Preview button "
 "to see how the article looked at this stage. At the bottom of this page, you"
@@ -10456,23 +10510,23 @@ msgstr ""
 msgid "(no log message)"
 msgstr "(sin mensajes de log)"
 
-#: lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
 msgid "Preview this revision"
 msgstr "Previsualizar esta revisión"
 
-#: lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
 msgid "Auto log:"
 msgstr "Auto log:"
 
-#: lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
 msgid "Change"
 msgstr "Cambiar"
 
-#: lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
 msgid "Merge selected with current..."
 msgstr "Fusionar lo seleccionado con el actual..."
 
-#: lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
 msgid "Switch to selected version"
 msgstr "Cambiar a la versión seleccionada"
 
@@ -10480,11 +10534,11 @@ msgstr "Cambiar a la versión seleccionada"
 msgid "Wiki Revision Preview"
 msgstr "Vista previa de revisión de la Wiki"
 
-#: lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
 msgid "Back to history view"
 msgstr "Volver a la vista del historial"
 
-#: lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
 msgid "Switch to this version"
 msgstr "Cambiar a esta versión"
 
@@ -10492,11 +10546,11 @@ msgstr "Cambiar a esta versión"
 msgid "Merge Revision"
 msgstr "Integrar la revisión"
 
-#: lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
 msgid "Merge with current"
 msgstr "Fusionar con el actual"
 
-#: lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
 msgid ""
 "When you merge a revision with the current, all data will be retained from "
 "both versions and merged at its approximate location from each revision."
@@ -10504,11 +10558,11 @@ msgstr ""
 "Cuando usted fusiona una revisión con la actual, todos los datos de las dos "
 "revisiones se conservarán y se fusionarán en su ubicación aproximada."
 
-#: lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
 msgid "After this, it's important to do a manual review."
 msgstr "A continuación, es importante hacer una revisión manual."
 
-#: lms/templates/wiki/history.html
+#: lms/templates/wiki/history.html wiki/templates/wiki/history.html
 msgid "Create new merged version"
 msgstr "Crear una nueva versión fusionada."
 
@@ -10557,6 +10611,7 @@ msgid "Miniature Markdown Guide"
 msgstr "Mini guía de Markdown"
 
 #: lms/templates/wiki/includes/cheatsheet.html
+#: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
 msgid ""
 "To create a new wiki article, create a link to it. Clicking the link gives "
 "you the creation page."
@@ -10650,10 +10705,12 @@ msgid "Attachments"
 msgstr "Adjuntos"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "Upload new file"
 msgstr "Cargar nuevo archivo"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "Search and add file"
 msgstr "Buscar y añadir archivo"
 
@@ -10662,14 +10719,17 @@ msgid "Upload File"
 msgstr "Subir archivo"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "Upload file"
 msgstr "Subir archivo"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
 msgid "Search files and articles"
 msgstr "Buscar archivos y artículos"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid ""
 "You can reuse files from other articles. These files are subject to updates "
 "on other articles which may or may not be a good thing."
@@ -10689,10 +10749,12 @@ msgstr ""
 #: openedx/features/course_search/templates/course_search/course-search-fragment.html
 #: themes/edx.org/lms/templates/dashboard.html
 #: themes/stanford-style/lms/templates/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "Search"
 msgstr "Buscar"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid ""
 "The following files are available for this article. Copy the markdown tag to"
 " directly refer to a file from the article text."
@@ -10702,14 +10764,23 @@ msgstr ""
 "artículo."
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/images/templates/wiki/plugins/images/index.html
 msgid "Markdown tag"
 msgstr "Código de etiquetas"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+#: wiki/plugins/images/templates/wiki/plugins/images/index.html
 msgid "Uploaded by"
 msgstr "Subido por"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+#: wiki/plugins/images/templates/wiki/plugins/images/index.html
 msgid "Size"
 msgstr "Tamaño"
 
@@ -10718,30 +10789,40 @@ msgid "File History"
 msgstr "Historial de archivo"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "Detach"
 msgstr "Desasociar"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
+#: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
 msgid "Replace"
 msgstr "Reemplazar"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
+#: wiki/templates/wiki/deleted.html
 msgid "Restore"
 msgstr "Resturar"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/templates/wiki/includes/revision_info.html
 msgid "anonymous (IP logged)"
 msgstr "anónimo (IP autenticada)"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "File history"
 msgstr "Historial de archivo"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "revisions"
 msgstr "revisiones"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "There are no attachments for this article."
 msgstr "No hay adjuntos para este artículo."
 
@@ -10754,10 +10835,12 @@ msgid "Previewing a merge between two revisions:"
 msgstr "Pre visualizando la fusión de dos revisiones:"
 
 #: lms/templates/wiki/preview_inline.html
+#: wiki/templates/wiki/preview_inline.html
 msgid "This revision has been deleted."
 msgstr "Esta revisión se ha eliminado."
 
 #: lms/templates/wiki/preview_inline.html
+#: wiki/templates/wiki/preview_inline.html
 msgid "Restoring to this revision will mark the article as deleted."
 msgstr "La restauración de esta revisión marcará el artículo como eliminado."
 
@@ -10857,13 +10940,14 @@ msgstr ""
 "Una vez haya aprobado esta solicitud, visite {catalog_admin_url} para "
 "configurar un catálogo para este usuario."
 
+#: openedx/core/djangoapps/api_admin/forms.py
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "Organization Name"
 msgstr "Nombre de la organización"
 
 #: openedx/core/djangoapps/api_admin/forms.py
 msgid "Organization Address"
-msgstr ""
+msgstr "Dirección de la organización"
 
 #: openedx/core/djangoapps/api_admin/forms.py
 msgid "Describe what your application does."
@@ -10871,15 +10955,15 @@ msgstr "Describa lo que hace su aplicación."
 
 #: openedx/core/djangoapps/api_admin/forms.py
 msgid "The URL of your organization's website."
-msgstr ""
+msgstr "La dirección URL del sitio Web de su organización."
 
 #: openedx/core/djangoapps/api_admin/forms.py
 msgid "The name of your organization."
-msgstr ""
+msgstr "El nombre de su organización."
 
 #: openedx/core/djangoapps/api_admin/forms.py
 msgid "The contact address of your organization."
-msgstr ""
+msgstr "La dirección de contacto de su organización."
 
 #: openedx/core/djangoapps/api_admin/forms.py
 #, python-brace-format
@@ -10928,6 +11012,8 @@ msgid ""
 "I, and my organization, accept the {link_start}{platform_name} API Terms of "
 "Service{link_end}."
 msgstr ""
+"Yo, y mi organización, aceptamos la API {link_start}{platform_name} Términos"
+" de servicio {link_end}."
 
 #: openedx/core/djangoapps/bookmarks/apps.py
 #: openedx/features/course_bookmarks/plugins.py
@@ -11053,7 +11139,7 @@ msgstr "Ya existe una cohorte con ese nombre."
 
 #: openedx/core/djangoapps/credentials/apps.py
 msgid "Credentials"
-msgstr ""
+msgstr "Credenciales"
 
 #: openedx/core/djangoapps/credentials/models.py
 msgid "Internal Service URL"
@@ -11329,7 +11415,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/password_policy/apps.py
 msgid "Password Policy"
-msgstr ""
+msgstr "Políticas para la contraseña"
 
 #: openedx/core/djangoapps/password_policy/compliance.py
 #, python-brace-format
@@ -11338,6 +11424,10 @@ msgid ""
 "does not meet the new requirements. Change your password now to continue "
 "using the site. Thank you for helping us keep your data safe."
 msgstr ""
+"{platform_name} ahora requiere contraseñas más complejas. Su contraseña "
+"actual no satisface los nuevos requerimientos. Cambie su contraseña ahora "
+"para continuar usando este sitio. Gracias por ayudarnos a mantener su "
+"información segura,"
 
 #: openedx/core/djangoapps/password_policy/compliance.py
 #, python-brace-format
@@ -11347,6 +11437,10 @@ msgid ""
 "{deadline} to be able to continue using the site. Thank you for helping us "
 "keep your data safe."
 msgstr ""
+"{platform_name} ahora requiere contraseñas más complejas. Su contraseña "
+"actual no satisface los nuevos requerimientos. Debe cambiar su contraseña "
+"antes de {deadline} para poder continuar usando este sitio.Gracias por "
+"ayudarnos a mantener su información segura,"
 
 #: openedx/core/djangoapps/profile_images/images.py
 #, python-brace-format
@@ -11966,6 +12060,11 @@ msgid ""
 "                   and agree to our {privacy_policy_link_start}Privacy "
 "Policy{privacy_policy_link_end}."
 msgstr ""
+"Creando una cuenta de {platform_name}, acepta cumplir con nuestros "
+"{platform_name} "
+"{terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end}"
+"                   y esta de acuerdo con nuestra "
+"{privacy_policy_link_start}política de privacidad{privacy_policy_link_end}."
 
 #. Translators: "Terms of service" is a legal document users must agree to
 #. in order to register a new account.
@@ -11980,7 +12079,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/user_api/config/waffle.py
 msgid "System maintenance in progress. Please try again later."
-msgstr ""
+msgstr "Mantenimiento del sistema en progreso. Por favor intente después."
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
 #, python-brace-format
@@ -12031,6 +12130,47 @@ msgstr ""
 #: openedx/core/djangoapps/user_api/preferences/views.py
 msgid "No data provided for user preference update"
 msgstr "No se suministraron datos para actualizar la preferencia de usuario"
+
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
+#, python-format
+msgid "Hello %(full_name)s,"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
+#, python-format
+msgid ""
+"We received a deletion request for your account on %(platform_name)s. We're "
+"sorry to see you go!"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
+msgid ""
+"Your account will be deleted shortly. Account deletion, including removal "
+"from email lists, may take a few weeks to fully process through our system. "
+"If you want to opt-out of emails before then, please unsubscribe from the "
+"footer of any email."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
+#, python-format
+msgid ""
+"This is an informational email only. If you did not initiate this request, "
+"please contact %(contact_email)s."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
+#, python-format
+msgid "Best, %(platform_name)s"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/subject.txt
+msgid "Your Account Has Been Queued For Deletion"
+msgstr ""
 
 #: openedx/core/djangoapps/util/user_messages.py
 #, python-brace-format
@@ -12207,7 +12347,7 @@ msgstr "Establece el objetivo de: {goal_text}"
 #: openedx/features/enterprise_support/api.py
 #, python-brace-format
 msgid "Enrollment in {course_title} was not complete."
-msgstr ""
+msgstr "Inscripción en {course_title} no fue completa."
 
 #: openedx/features/enterprise_support/api.py
 #, python-brace-format
@@ -12687,19 +12827,19 @@ msgstr "Las transcripciones solo están soportadas para los módulos de video."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Cannot find item by locator."
-msgstr ""
+msgstr "No es posible encontrar el item por su identificador."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Video locator is required."
-msgstr ""
+msgstr "Se requiere identificador del vídeo."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "This transcript file type is not supported."
-msgstr ""
+msgstr "Este archivo de transcripción no está soportado."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Video ID is required."
-msgstr ""
+msgstr "Se requiere ID del vídeo."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Incoming video data is empty."
@@ -12711,25 +12851,27 @@ msgstr "No se puede encontrar el item por su identificador."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "No such transcript."
-msgstr ""
+msgstr "No tal transcripción."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "There is a problem with the chosen transcript file."
-msgstr ""
+msgstr "Hay un problema con el archivo de transcripción seleccionado."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid ""
 "There is a problem with the existing transcript file. Please upload a "
 "different file."
 msgstr ""
+"Hay un problema con el archivo existente de transcripción.Por favor suba uno"
+" diferente."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "YouTube ID is required."
-msgstr ""
+msgstr "Se requiere ID de YouTube."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "There is a problem with the YouTube transcript file."
-msgstr ""
+msgstr "Hay un problema con el archivo de transcripción  de YouTube."
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Insufficient permissions"
@@ -13037,6 +13179,8 @@ msgstr "Contenido"
 #: cms/templates/settings.html cms/templates/settings_advanced.html
 #: cms/templates/settings_graders.html cms/templates/widgets/header.html
 #: lms/templates/wiki/includes/article_menu.html
+#: wiki/templates/wiki/settings.html
+#: wiki/templates/wiki/includes/article_menu.html
 msgid "Settings"
 msgstr "Configuración"
 
@@ -13166,9 +13310,11 @@ msgstr "Requerimientos"
 msgid "Details"
 msgstr "Detalles"
 
+#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a verb describing the action of viewing more details
 #: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/wiki/includes/article_menu.html
+#: wiki/templates/wiki/includes/article_menu.html
 msgid "View"
 msgstr "Ver"
 
@@ -13382,8 +13528,8 @@ msgstr "Contenido Bloqueado"
 
 #: lms/templates/_gated_content.html
 msgid ""
-"You must earn a passing score for '{prereq_section_name}' to access this "
-"content."
+"You must complete the prerequisites for '{prereq_section_name}' to access "
+"this content."
 msgstr ""
 
 #: lms/templates/_gated_content.html
@@ -13536,7 +13682,7 @@ msgstr "Debes registrarte antes de intentar acceder a la unidad"
 #: lms/templates/enroll_staff.html lms/templates/courseware/course_about.html
 msgctxt "self"
 msgid "Enroll"
-msgstr ""
+msgstr "Realizar la inscripción"
 
 #: lms/templates/enroll_staff.html
 msgid "Don't enroll"
@@ -13906,7 +14052,7 @@ msgstr "Acceder a mis cursos"
 msgid "Processing your account information"
 msgstr "Procesando la información de tu cuenta"
 
-#: lms/templates/login.html
+#: lms/templates/login.html wiki/templates/wiki/accounts/login.html
 msgid "Please log in"
 msgstr "Por favor inicia sesión"
 
@@ -14339,6 +14485,8 @@ msgstr "¿Ya estás registrado?"
 
 #: lms/templates/register-sidebar.html
 #: themes/stanford-style/lms/templates/register-sidebar.html
+#: wiki/templates/wiki/base.html wiki/templates/wiki/accounts/login.html
+#: wiki/templates/wiki/accounts/signup.html
 msgid "Log in"
 msgstr "Iniciar sesión"
 
@@ -14729,6 +14877,8 @@ msgstr "Actividad de carga de git reciente para {course_id}"
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/ccx/schedule.html
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
 msgid "Date"
 msgstr "Fecha"
 
@@ -15025,6 +15175,31 @@ msgid ""
 " you do not understand or do not wish to be bound by the Terms, you should "
 "not use the APIs."
 msgstr ""
+"Bienvenido a {platform_name}. Gracias por usar las Course Discovery APIs de "
+"{platform_name}, API Enterprise y/o cualquier API adicional que podamos "
+"ofrecer eventualmente (colectivamente las \"APIs\"). Por favor lea los "
+"Términos de Servicio antes de acceder a o usar las APIs. Estos términos de "
+"servicio, cualquier término adicional dentro de la documentación asociada de"
+" la API, y cualquier política y pauta aplicables que {platform_name} haga "
+"disponibles de vez en cuando y/o actualizaciones son acuerdos "
+"(colectivamente, los\"Términos\") entre usted y {platform_name}. Estos "
+"términos son emitidos bajo el acuerdo empresarial del producto, acuerdo de "
+"participación de los miembros, u otro acuerdo directo que rija la compra de "
+"los productos de  {platform_name}, Si cualquiera (el \"Acuerdo\"), ejecutado"
+" por usted o el grupo en cuya representación usted accede o usa las APIs y "
+"{platform_name}.  En el evento que usted tenga dicho acuerdo que aplica para"
+" el uso de las APIs, el acuerdo controlará en el evento de algún conflicto "
+"entre el acuerdo y esos términos. Accediendo o usando las APIs, usted acepta"
+" y acuerda estar legalmente obligado por los términos, así sea o no un "
+"usuario registrado. Si esta accediendo o usando las APIs en representación "
+"de una compañía, organización o otra entidad legal, está aceptando los "
+"términos en favor de esa compañía y representando y garantizando a "
+"{platform_name} que tiene toda la autoridad para aceptar y estar de acuerdo "
+"con estos términos para esa entidad, en cuyo caso los términos \"usted\", "
+"\"su\" o términos relacionados en este documento deben hacer referencia a "
+"esa entidad en la que usted accede y usa las APIs en representación. Si "
+"usted no tiene tal autoridad o sino entiende o no desea ser obligado por los"
+" términos, no debería usar las APIs."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "API Access"
@@ -15043,6 +15218,17 @@ msgid ""
 "provide you with instructions for obtaining your API shared secret and "
 "client ID."
 msgstr ""
+"Para acceder las APIs, necesitará crear una cuenta de usuario en "
+"{platform_name} para su aplicación (no para uso personal). Esta cuenta le "
+"dará acceso a nuestra página de solicitud de API {request_url}. En esa "
+"página , debe completar el formulario de solicitud de la API incluyendo una "
+"descripción de los usos que propone darle a las APIs. Cualquier información "
+"de cuenta y registro que provea a {platform_name} debe ser precisa y estar "
+"actualizada, y usted acepta informarnos de manera oportuna de haber algún "
+"cambio. {platform_name_capitalized} revisará el formulario de solicitud de "
+"API y una vez aprobado en absoluta discreción de  {platform_name}, esta/este"
+" lo proveerá con las instrucciones para obtener su API shared secret y "
+"client ID."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Permissible Use"
@@ -15064,6 +15250,20 @@ msgid ""
 "credentials anywhere other than on the {platform_name} website at "
 "{platform_url}."
 msgstr ""
+"Usted se compromete a utilizar las API con el único fin de entregar "
+"contenido al que se accede a través de las APIs (el \"contenido de la API\")"
+" a su propio sitio web, sitio móvil, aplicaciones, blogs, listas de "
+"distribución de correo electrónico, o propiedad de redes sociales (\"su "
+"aplicación\")o para otro uso comercial que usted describió en su solicitud "
+"de acceso a la API y que {platform_name} ha aprobado sobre una base caso por"
+" caso. {platform_name_capitalized} puede supervisar su uso de las API para "
+"el cumplimiento de los Términos y podrá denegar el acceso o apagar la "
+"integración si intenta superar o exceder los requisitos y limitaciones "
+"establecidos por {platform_name}. Su aplicación u otro uso aprobado de la "
+"API o el contenido de la API no deben incitar a los usuarios finales a "
+"proporcionar su nombre de usuario o contraseña de {platform_name} o "
+"cualquier otra credencial de usuario de {platform_name} en cualquier lugar "
+"que no sea el sitio web de {platform_name} en {platform_url}."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Prohibited Uses and Activities"
@@ -15077,6 +15277,12 @@ msgid ""
 "at any time, in its sole discretion, does not benefit or serve the best "
 "interests of {platform_name}, its users and its partners."
 msgstr ""
+"{platform_name_capitalized} Debería tener el derecho exclusivo de determinar"
+" si el uso dado a la API es aceptable, y {platform_name} se reserva el "
+"derecho de revocar el acceso a la API para cualquier uso que  "
+"{platform_name} determine, en cualquier momento, si a su propia discreción, "
+"no beneficia o sirve a los mejores intereses de {platform_name}, sus "
+"usuarios y socios."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -15113,9 +15319,9 @@ msgstr ""
 "confidencial y cualquier otro derecho de cualquier tercero;"
 
 #: lms/templates/api_admin/terms_of_service.html
-msgid "altering or editing any content or graphics in the API Content"
+msgid "altering or editing any content or graphics in the API Content;"
 msgstr ""
-"introducir o editar cualquier contenido o gráficos en el contenido de la API"
+"Alterar o editar cualquier contenido de gráficos en el contenido de la API;"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -15161,6 +15367,10 @@ msgid ""
 "calls made by you or Your Application to the APIs. You must not attempt to "
 "circumvent any restrictions or limitations imposed by {platform_name}."
 msgstr ""
+"{platform_name_capitalized} se reserva el derecho, en su discreción, de "
+"imponer restricciones y limitaciones razonables al numero y frecuencia de "
+"llamadas hechas por usted o su aplicación a las APIs. No debe intentar "
+"esquivar ninguna restricción o limitación impuestas por {platform_name}."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Compliance"
@@ -15178,6 +15388,15 @@ msgid ""
 "or mask either your identity or Your Application's identity when using the "
 "APIs."
 msgstr ""
+"Usted se compromete a cumplir con todas las leyes aplicables, regulaciones, "
+"y los derechos de terceros (incluyendo, sin limitación las leyes relativas a"
+" la importación o exportación de datos o software, privacidad, derechos de "
+"autor y las leyes locales). Usted no va a utilizar las APIs para fomentar o "
+"promover actividad ilegal o violación de derechos de terceros. No violará "
+"cualquier otro término de servicio con {platform_name}. Sólo accederá (o "
+"intentará acceder) a una API por los medios descritos en la documentación de"
+" esa API. Usted no va a falsificar o enmascarar su identidad o la identidad "
+"de su Aplicación al utilizar las APIs."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Ownership"
@@ -15226,12 +15445,27 @@ msgid ""
 "revokes access to API Content owned or controlled by that {platform_name} "
 "Participant or third party, including without limitation any Trademarks, you"
 " must ensure that all API Content pertaining to that {platform_name} "
-"Participant or third party is deleted from Your application, networks, "
-"systems and servers as soon as reasonably possible. "
+"Participant or third party is deleted from Your Application and your "
+"networks, systems and servers as soon as reasonably possible. "
 "\"{platform_name_capitalized} Participants\" means MIT, Harvard, and the "
 "other entities providing information, API Content or services for the APIs, "
 "the course instructors and their staffs."
 msgstr ""
+"Todos los nombres, logotipos y sellos (\"Marcas\") que aparecen en la API, "
+"contenido de API, o sobre o a través de los servicios puestos a disposición "
+"en o a través de las API, si los hay, son propiedad de sus respectivos "
+"dueños. No puede eliminar, alterar u ocultar cualquier derecho de autor, "
+"marca registrada, u otros avisos de derechos de propiedad incorporados o que"
+" acompañan el contenido de API. Si cualquier participante de {platform_name}"
+" (como se define más adelante)  revoca el acceso al contenido de API "
+"adquirida, de propiedad o controlada por ese participante de "
+"{platform_name}, incluyendo sin limitación cualquier Marca, debe asegurarse "
+"de que todo el Contenido API perteneciente a {platform_name} se elimina de "
+"sus aplicaciones, redes, sistemas y servidores tan pronto como sea "
+"razonablemente posible. \"participantes de {platform_name_capitalized} \" "
+"significa MIT, Harvard, y las otras entidades que proveen información, el "
+"contenido de la API o servicios para las APIs, los instructores del curso y "
+"sus equipos de curso."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -15268,6 +15502,13 @@ msgid ""
 " collect and how you may use and share such information (including for "
 "advertising) with {platform_name} and other third parties."
 msgstr ""
+"Usted acepta cumplir con todas las leyes y regulaciones de privacidad "
+"aplicables y ser transparente con respecto a cualquier colección y uso de "
+"los datos del usuario final. Usted proporcionará y se adherirá a una "
+"política de privacidad para su aplicación que describe con claridad y "
+"precisión a los usuarios finales que información de usuario usted recoge y "
+"cómo la podría usar y compartir (incluida la publicidad) con {platform_name}"
+" y otros terceros."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Right to Charge"
@@ -15279,15 +15520,8 @@ msgid ""
 "{platform_name} reserves the right to charge fees for future use or access "
 "to the APIs."
 msgstr ""
-
-#: lms/templates/api_admin/terms_of_service.html
-msgid ""
-"{platform_name_capitalized} may also update or modify the APIs from time to "
-"time without advance notice. These changes may affect your use of the APIs "
-"or the way your integration interacts with the API. If we make a change that"
-" is unacceptable to you, you should stop using the APIs. Continued use of "
-"the APIs means you accept the change."
-msgstr ""
+"Cierto acceso a las APIs podría ser libre de costo, pero {platform_name} se "
+"reserva el derecho de cobrar por futuro uso o acceso a las APIs."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -15299,6 +15533,14 @@ msgid ""
 "changes.  Be sure to return to this page periodically to ensure familiarity "
 "with the most current version of the Terms."
 msgstr ""
+"{platform_name_capitalized} se reserva el derecho a modificar los términos "
+"en cualquier momento sin previo aviso. Cualquier cambio en las condiciones "
+"entrará en vigor inmediatamente después de su publicación en esta página, "
+"con fecha efectiva actualizada. Al acceder o usar las APIs después de "
+"cualquier cambio, usted acepta de forma prospectiva a las condiciones "
+"modificadas y todos los cambios. Asegúrese de volver a esta página "
+"periódicamente para asegurarse de estar familiarizado con la versión más "
+"actualizada de los Términos."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -15308,6 +15550,11 @@ msgid ""
 "that is unacceptable to you, you should stop using the APIs. Continued use "
 "of the APIs means you accept the change."
 msgstr ""
+"{platform_name_capitalized} también podría actualizar o modificar las APIs "
+"de vez en cuando sin previo aviso. Estos cambios pueden afectar el uso de "
+"las APIs o la forma en que su integración interactúa con la APIs. Si hacemos"
+" un cambio que no es aceptable para usted, usted debe dejar de usar las "
+"APIs. El uso continuado de las APIs implica la aceptación de los cambios."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Confidentiality"
@@ -15316,14 +15563,14 @@ msgstr "Confidencialidad"
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
 "Your credentials (such as client secret and IDs) are intended to be used "
-"solely by you. You will keep your credentials confidential and discourage "
-"others from using your credentials. Your credentials may not be embedded in "
-"open source projects."
+"solely by you. You will keep your credentials confidential and prevent and "
+"discourage others from using your credentials. Your credentials may not be "
+"embedded in open source projects."
 msgstr ""
 "Sus credenciales (tales como el secreto de cliente y el ID) están destinados"
 " a ser utilizados únicamente por usted. Va a mantener sus credenciales "
-"confidenciales y desalentar a otros del uso de sus credenciales. Sus "
-"credenciales no podrán formar parte de proyectos de código abierto."
+"confidenciales y no motivar a otros a usar sus credenciales. Sus "
+"credenciales no podrían formar parte de proyectos de código abierto."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -15343,6 +15590,22 @@ msgid ""
 "to do so by law if you provide {platform_name} with reasonable prior notice,"
 " unless a court orders that {platform_name} not receive notice."
 msgstr ""
+"En el caso de que {platform_name} le proporcione acceso a la información "
+"específica a {platform_name} y / o las APIs que se hayan marcado como "
+"\"confidencial\" o que una persona razonable asumiría que es confidencial o "
+"propietaria dados los términos de su divulgación ( \"información "
+"confidencial\"), usted se compromete a utilizar esta información sólo para "
+"utilizar y construir con la API. No puede revelar la información "
+"confidencial a cualquier persona sin previo consentimiento por escrito de "
+"{platform_name}, y se compromete a proteger la información confidencial de "
+"un uso no autorizado y la divulgación de la misma manera que lo haría "
+"proteger su propia información confidencial. La información confidencial no "
+"incluye información que ha desarrollado de forma independiente, que se le "
+"dio razón a usted por un tercero sin obligación de confidencialidad, o que "
+"se hace público por causas ajenas a su cuenta. Usted puede revelar "
+"información confidencial cuando sea obligado a hacerlo por ley si "
+"proporciona a {platform_name} la notificación con una antelación razonable, "
+"a menos que un tribunal ordene que {platform_name} no reciba aviso."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Disclaimer of Warranty / Limitation of Liabilities"
@@ -15375,6 +15638,14 @@ msgid ""
 "COMPLETENESS, TIMELINESS, OR QUALITY OF THE APIS OR ANY API CONTENT, OR THAT"
 " ANY PARTICULAR API CONTENT WILL CONTINUE TO BE MADE AVAILABLE."
 msgstr ""
+"{platform_name} Y LOS PARTICIPANTES DE  {platform_name} NO GARANTIZAN QUE "
+"LAS APIS VAN A OPERAR  EN UNA FORMA INTERRUMPIDA Y LIBRE DE ERRORES, QUE LAS"
+" APIS SON LIBRES DE VIRUS O CUALQUIER OTRO COMPONENTE DAÑINO, O QUE LAS APIS"
+" O CONTENIDO DE LA API PROVEÍDA VA A ESTAR DE ACUERDO CON SUS NECESIDADES O "
+"EXPECTATIVAS. {platform_name} Y LOS PARTICIPANTES DE  {platform_name} "
+"TAMPOCO GARANTIZAN LA PRECISIÓN, LO COMPLETO, LA OPORTUNO O LA CUALIDAD DE "
+"LAS APIS O CUALQUIER CONTENIDO DE LA API, O QUE CUALQUIER CONTENIDO "
+"PARTICULAR DE LA API CONTINUARÁ ESTANDO DISPONIBLE."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -15386,6 +15657,13 @@ msgid ""
 "DOWNLOAD OR USE OF SUCH INFORMATION, MATERIALS OR DATA, UNLESS OTHERWISE "
 "EXPRESSLY PROVIDED FOR IN THE {platform_name} PRIVACY POLICY."
 msgstr ""
+"EL USO DE LA APIS, Y EL CONTENIDO DE LA API Y CUALQUIER SERVICIO OBTENIDO DE"
+" O A TRAVÉS DE LAS API, ES REALIZADO A SU PROPIO RIEGO. SU ACCESO O DESCARGA"
+" DE INFORMACIÓN, MATERIALES O DATOS TRAVÉS DE LAS APIS ES REALIZADO A SU "
+"PROPIO RIESGO Y DISCRECIÓN , Y USTED SERÁ EL ÚNICO RESPONSABLE DE CUALQUIER "
+"DAÑO A SU PROPIEDAD (INCLUYENDO SU SISTEMA INFORMÁTICO) O PÉRDIDA DE DATOS "
+"QUE RESULTE DE LA DESCARGA O USO DEL MATERIAL O DATOS, A MENOS QUE SEAN "
+"EXPRESAMENTE PREVISTOS EN LA POLÍTICA DE PRIVACIDAD DE {platform_name}."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -15397,6 +15675,14 @@ msgid ""
 "INFORMATION OBTAINED FROM OR THROUGH THE APIS, WHETHER YOUR CLAIM IS BASED "
 "IN CONTRACT, TORT, STATUTORY OR OTHER LAW."
 msgstr ""
+"EN TODA LA EXTENSIÓN PERMITIDA POR LA LEY, USTED ESTÁ DE ACUERDO QUE NI "
+"{platform_name} NI NINGUNO DE LOS LOS PARTICIPANTES DE {platform_name} SERÁN"
+" RESPONSABLE ANTE USTED POR CUALQUIER PÉRDIDA O DAÑOS, YA SEA ABSOLUTOS O "
+"INDIRECTO, RESULTANTE DE O RELACIONADA CON ESTAS CONDICIONES, O SU USO (O EL"
+" DE CUALQUIER TERCERO) O IMPOSIBILIDAD DE USO. DE LAS APIS O CUALQUIER "
+"CONTENIDO DE API, O LA FIABILIDAD DE INFORMACIÓN OBTENIDA DE O A TRAVÉS DE "
+"LA APIS, TANTO SI SU RECLAMACIÓN SE BASA EN CONTRATO, AGRAVIO, ESTATUTO U "
+"OTRA LEY."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -15440,6 +15726,13 @@ msgid ""
 "that may be offered at these third-party sites. If you decide to access "
 "linked third-party websites, you do so at your own risk."
 msgstr ""
+"Las APIs y el contenido de API puede incluir hipervínculos a sitios "
+"mantenidos o controlados por otros y no afiliados o bajo el control de  "
+"{platform_name}. {platform_name_capitalized} Y los  participantes de "
+"{platform_name} no son responsables y no revisan, aprueban, ni escrutinan el"
+" contenido del o el uso de cualquiera de los productos o servicios que "
+"pueden ser ofrecidos en estos sitios. Si usted decide acceder a sitios web "
+"de terceras partes vinculados, lo hace bajo su propio riesgo."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -15455,6 +15748,18 @@ msgid ""
 "{platform_name} or one of the {platform_name} Participants will provide you "
 "with written notice of such claim, action or demand."
 msgstr ""
+"En la medida máxima permitida por la ley aplicable, usted acepta defender, "
+"mantener indemne e indemnizar a {platform_name} y los participantes de "
+"{platform_name} y sus respectivas subsidiarias, afiliados, funcionarios, "
+"profesores, estudiantes, becarios, que rige miembros de la junta, agentes y "
+"empleados de y contra cualquiera de terceros reclamaciones, acciones o "
+"demandas que surjan de, como consecuencia de o de cualquier manera "
+"relacionada con el uso de las API y cualquier contenido del API, incluyendo "
+"la responsabilidad o gasto que surja de cualquier y todas las reclamaciones,"
+" pérdidas, daños (reales o resultantes), litigios, resoluciones, costas "
+"procesales y honorarios de abogados, de cualquier tipo y naturaleza. En tal "
+"caso, {platform_name} o uno de los participantes de {platform_name} le hará "
+"llegar una notificación escrita de dicha reclamación, litigio o acción."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "General Legal Terms"
@@ -15507,6 +15812,20 @@ msgid ""
 "still be allowed to apply for injunctive remedies (or an equivalent type of "
 "urgent legal relief) in any jurisdiction."
 msgstr ""
+"El usuario acepta que los términos, las API, y cualquier reclamo o disputa "
+"que surja de o esté relacionada con las condiciones o las APIs se rige por "
+"las leyes del Estado de Massachusetts, con exclusión de sus conflictos de "
+"disposiciones legales. El usuario acepta que todas las reclamaciones y "
+"disputas serán escuchadas y resueltas exclusivamente en los tribunales "
+"estatales o federales ubicados en y sirviendo de Cambridge, Massachusetts, "
+"EE.UU. Usted da su consentimiento a la jurisdicción personal de dichos "
+"tribunales más que para este propósito, y el usuario renuncia y está de "
+"acuerdo hacer valer ninguna objeción a dichos procedimientos en los "
+"tribunales (incluyendo cualquier defensa o excepción de falta de "
+"jurisdicción apropiada o el lugar o la inconveniencia del foro). No obstante"
+" lo anterior, el usuario acepta que {platform_name} aún podrá aplicar a "
+"medidas cautelares (o un tipo equivalente de medida legal urgente) en "
+"cualquier jurisdicción."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Termination"
@@ -15519,6 +15838,10 @@ msgid ""
 "any API Content for any reason or no reason, without prior notice or "
 "liability."
 msgstr ""
+"Es posible dejar de utilizar las APIs en cualquier momento. El usuario "
+"acepta que {platform_name}, a su sola discreción y en cualquier momento, "
+"puede interrumpir el uso de las APIs o cualquier Contenido de la API por "
+"cualquier motivo o sin motivo, sin previo aviso o responsabilidad."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -15530,6 +15853,14 @@ msgid ""
 "{platform_name} Participants will have any liability to you for such an "
 "action."
 msgstr ""
+"{platform_name_capitalized} y los participantes de {platform_name} se "
+"reservan el derecho en cualquier momento a su entera discreción, de "
+"cancelar, retrasar, reprogramar o alterar el formato de cualquier API o "
+"contenidos de API ofrecidos a través {platform_name}, o de dejar de prestar "
+"cualquier parte o la totalidad de la API o contenido de la API o servicios "
+"relacionados, y usted acepta que ni {platform_name} ni ninguno de los "
+"participantes de {platform_name} tendrán ninguna responsabilidad hacia usted"
+" por tal acción."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -15546,6 +15877,20 @@ msgid ""
 "you otherwise may have to {platform_name}, including without limitation any "
 "indemnification obligations contained herein."
 msgstr ""
+"Una vez se produzca la terminación de los Términos o la interrupción de su "
+"acceso a una API por cualquier razón, su derecho a utilizar cualquier API y "
+"el contenido de la API cesará inmediatamente. Va a dejar de usar las APIs y "
+"borrar cualquier contenido almacenado en caché de la API o almacenado en "
+"alguna otra parte. de su aplicación de sus redes, sistemas y servidores tan "
+"pronto como sea razonablemente posible. Todas las disposiciones de las "
+"condiciones que por su naturaleza deberían sobrevivir a la terminación "
+"sobrevivirán a la terminación, incluyendo, sin limitación, las disposiciones"
+" de propiedad, renuncias de garantía y limitación de responsabilidad. La "
+"terminación de su acceso y uso de las API y contenido API no le eximirá de "
+"las obligaciones que derivan o surgen antes de dicha terminación o limitar "
+"cualquier responsabilidad que de lo contrario puede que tenga que "
+"{platform_name}, incluyendo, sin limitación alguna las obligaciones de "
+"indemnización contenidas en el presente documento."
 
 #: lms/templates/api_admin/catalogs/edit.html
 msgid "Edit {catalog_name}"
@@ -15867,7 +16212,7 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgctxt "someone"
 msgid "Enroll"
-msgstr ""
+msgstr "Realizar la inscripción"
 
 #: lms/templates/ccx/enrollment.html
 msgid "Student List Management"
@@ -16399,7 +16744,7 @@ msgstr "Recursos Adicionales"
 #: lms/templates/courseware/course_about.html
 msgctxt "self"
 msgid "enroll"
-msgstr ""
+msgstr "Inscribirse"
 
 #: lms/templates/courseware/course_about_sidebar_header.html
 #: themes/stanford-style/lms/templates/courseware/course_about_sidebar_header.html
@@ -16545,11 +16890,11 @@ msgstr ""
 
 #: lms/templates/courseware/info.html
 msgid "Welcome to {org}'s {course_title}!"
-msgstr ""
+msgstr "¡ Bienvenido al curso {org} {course_title}!"
 
 #: lms/templates/courseware/info.html
 msgid "Welcome to {course_title}!"
-msgstr ""
+msgstr "¡ Bienvenido a  {course_title}!"
 
 #: lms/templates/courseware/info.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -18112,6 +18457,10 @@ msgid ""
 "your verification was successful.You can also check the status of the "
 "verification process on your dashboard."
 msgstr ""
+"Hemos recibido su información y el proceso de verificación del ID ha "
+"empezado. Revise si tiene un correo electrónico de nosotros en los próximos "
+"días para confirmar si su verificación fue exitosa. Puede también revisar el"
+" estado del proceso de verificación en su panel de control."
 
 #: lms/templates/emails/photo_submission_confirmation.txt
 #: lms/templates/emails/reverification_processed.txt
@@ -18582,7 +18931,7 @@ msgstr "Instituciones"
 
 #: lms/templates/header/user_dropdown.html
 msgid "Resume your last course"
-msgstr ""
+msgstr "Reanudar su último curso"
 
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -19673,7 +20022,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Role of the users being enrolled."
-msgstr ""
+msgstr "Rol de los usuarios que están siendo inscritos."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -21053,6 +21402,7 @@ msgid "Decrease"
 msgstr "Reducir"
 
 #: lms/templates/shoppingcart/shopping_cart.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid "Remove"
 msgstr "Eliminar"
 
@@ -21465,6 +21815,7 @@ msgid "{span_start}(active){span_end}"
 msgstr "{span_start}(activo){span_end}"
 
 #: lms/templates/wiki/includes/article_menu.html
+#: wiki/templates/wiki/includes/article_menu.html
 msgid "Changes"
 msgstr "Cambios"
 
@@ -21476,7 +21827,7 @@ msgstr "{span_start}activo{span_end}"
 msgid "Course Wiki"
 msgstr "Wiki del curso"
 
-#: lms/templates/wiki/includes/breadcrumbs.html
+#: lms/templates/wiki/includes/breadcrumbs.html wiki/templates/wiki/dir.html
 msgid "Add article"
 msgstr "Añadir artículo"
 
@@ -21548,11 +21899,11 @@ msgstr "Mejora({price})"
 
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "Expand All"
-msgstr ""
+msgstr "Expandir todo"
 
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "Prerequisite: "
-msgstr "Prerequisito:"
+msgstr "Prerrequisito:"
 
 #: openedx/features/course_experience/templates/course_experience/course-outline-fragment.html
 msgid "{subsection_format} due {{date}}"
@@ -21713,7 +22064,7 @@ msgstr "Explorar cursos nuevos"
 
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
 msgid "View My Records"
-msgstr ""
+msgstr "Ver mis registros"
 
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
 msgid "My Profile"
@@ -21763,7 +22114,7 @@ msgstr "© 2012–{year} edX Inc. "
 
 #: themes/edx.org/lms/templates/footer.html
 msgid "EdX, Open edX, and MicroMasters are registered trademarks of edX Inc. "
-msgstr ""
+msgstr "EdX, Open edX, y MicroMasters son marcas registradas de edX Inc. "
 
 #: themes/edx.org/lms/templates/certificates/_about-accomplishments.html
 msgid "About edX Verified Certificates"
@@ -24833,6 +25184,16 @@ msgstr ""
 "HTML)"
 
 #: cms/templates/settings.html
+msgid "Course About Sidebar HTML"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid ""
+"Custom sidebar content for {a_link_start}your course summary "
+"page{a_link_end} (formatted in HTML)"
+msgstr ""
+
+#: cms/templates/settings.html
 msgid "Course Card Image"
 msgstr "Imagen de portada para el curso"
 
@@ -25538,7 +25899,7 @@ msgstr "Solicitud de Acomodación de accesibilidad"
 
 #: cms/templates/widgets/footer.html
 msgid "LMS"
-msgstr ""
+msgstr "LMS"
 
 #. Translators: 'EdX', 'edX', 'Studio', and 'Open edX' are trademarks of 'edX
 #. Inc.'. Please do not translate any of these trademarks and company names.
@@ -26147,10 +26508,13 @@ msgid ""
 "    The file may be referenced on other articles. Deleting it means that they will loose their references to this file. The following articles reference this file:\n"
 "    "
 msgstr ""
+"\n"
+"    El archivo puede ser referenciado en otros artículos. Eliminarlo significa que perderán sus referencias a este archivo. Los siguientes artículos hacen referencia a este archivo:\n"
+"    "
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid "Delete it!"
-msgstr ""
+msgstr "¡Bórralo!"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid ""
@@ -26158,42 +26522,45 @@ msgid ""
 "    You can remove a reference to a file, but it will retain its references on other articles.\n"
 "    "
 msgstr ""
+"\n"
+"    Puede eliminar una referencia a un archivo, pero conservará sus referencias en otros artículos.\n"
+"    "
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid "Remove reference"
-msgstr ""
+msgstr "Remover referencia"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
 msgid "History of"
-msgstr ""
+msgstr "Historia de"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
 msgid "User"
-msgstr ""
+msgstr "Usuario"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
 msgid "File"
-msgstr ""
+msgstr "Archivo"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
 msgid "Action"
-msgstr ""
+msgstr "Acción"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
 msgid "<em>No description</em>"
-msgstr ""
+msgstr "<em>Sin descripción</em>"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
 msgid "Download"
-msgstr ""
+msgstr "Descargar"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
 msgid "Use this!"
-msgstr ""
+msgstr "¡Utilizar esta!"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 #, python-format
@@ -26202,10 +26569,13 @@ msgid ""
 "  Replacing an attachment means adding a new file that will be used in its place. All references to the file will be replaced by the one you upload and the file will be downloaded as <strong>%(filename)s</strong>. Please note that this attachment is in use on other articles, you may distort contents. However, do not hestitate to take advantage of this and make replacements for the listed articles where necessary. This way of working is more efficient....\n"
 "  "
 msgstr ""
+"\n"
+"  Reemplazar un archivo adjunto significa agregar un nuevo archivo que se usará en su lugar. Todas las referencias al archivo se reemplazarán por la que cargue y el archivo se descargará como <strong>%(filename)s</strong>. Tenga en cuenta que este archivo adjunto está en uso en otros artículos, puede distorsionar los contenidos. Sin embargo, no dude en aprovechar esto y hacer reemplazos para los artículos enumerados cuando sea necesario. Esta forma de trabajar es más eficiente....\n"
+"  "
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 msgid "Articles using"
-msgstr ""
+msgstr "Artículos usando"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 #, python-format
@@ -26214,58 +26584,63 @@ msgid ""
 "  Replacing an attachment means adding a new file that will be used in its place. All references to the file will be replaced by the one you upload and the file will be downloaded as <strong>%(filename)s</strong>.\n"
 "  "
 msgstr ""
+"\n"
+"  Reemplazar un archivo adjunto significa agregar un nuevo archivo que se usará en su lugar. Todas las referencias al archivo se reemplazarán por la que cargue y el archivo se descargará como <strong>%(filename)s</strong>.\n"
+"  "
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 #: wiki/plugins/images/templates/wiki/plugins/images/revision_add.html
 msgid "Upload replacement"
-msgstr ""
+msgstr "Subir reemplazo"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
 msgid "Add file to"
-msgstr ""
+msgstr "Añadir archivo a"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
 msgid "Add attachment from other article"
-msgstr ""
+msgstr "Añadir adjunto desde otro articulo"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
 msgid "Main article"
-msgstr ""
+msgstr "Articulo principal"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
 msgid "Add to article"
-msgstr ""
+msgstr "Añadir a artículo"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
 msgid "Your search did not return any results"
-msgstr ""
+msgstr "Su búsqueda no ha obtenido ningún resultado"
 
 #: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
 msgid "Adding new articles"
-msgstr ""
+msgstr "Añadiendo nuevos artículos"
 
 #: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
 #: wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
 msgid "An external link"
-msgstr ""
+msgstr "Un enlace externo"
 
 #: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
 msgid "Headers"
-msgstr ""
+msgstr "Encabezados"
 
 #: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
 msgid ""
 "Use these codes for headers and to automatically generate Tables of "
 "Contents."
 msgstr ""
+"Use estos códigos para los encabezados y para generar automáticamente tablas"
+" de contenido."
 
 #: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
 msgid "Typography"
-msgstr ""
+msgstr "Tipografía"
 
 #: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
 msgid "Lists"
-msgstr ""
+msgstr "Listas"
 
 #: wiki/plugins/images/forms.py
 #, python-format
@@ -26345,96 +26720,101 @@ msgid ""
 "The following images are available for this article. Copy the markdown tag "
 "to directly refer to an image from the article text."
 msgstr ""
+"Las siguientes imágenes están disponibles para este artículo. Copie la "
+"etiqueta de reducción para referirse directamente a una imagen del texto del"
+" artículo."
 
 #: wiki/plugins/images/templates/wiki/plugins/images/index.html
 msgid "Back to edit page"
-msgstr ""
+msgstr "Volver a la página del editor"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/index.html
 msgid "No file"
-msgstr ""
+msgstr "Sin archivo"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/index.html
 msgid "Upload new image"
-msgstr ""
+msgstr "Cargar nueva imagen"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/index.html
 msgid "Restore image"
-msgstr ""
+msgstr "Restaurar imagen"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/index.html
 msgid "Remove image"
-msgstr ""
+msgstr "Remover imagen"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/index.html
 msgid "Completely delete"
-msgstr ""
+msgstr "Eliminar por completo"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/index.html
 msgid "Revert to this version"
-msgstr ""
+msgstr "Revertir a esta versión"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/index.html
 msgid "There are no images for this article."
-msgstr ""
+msgstr "No hay imágenes para este artículo."
 
 #: wiki/plugins/images/templates/wiki/plugins/images/purge.html
 #: wiki/templates/wiki/deleted.html
 msgid "Purge deletion"
-msgstr ""
+msgstr "Supresión de purga"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/purge.html
 msgid "Purge image: Completely remove image file and all revisions."
 msgstr ""
+"Purgar imagen: elimine por completo el archivo de imagen y todas las "
+"revisiones."
 
 #: wiki/plugins/images/templates/wiki/plugins/images/purge.html
 msgid "Remove it completely!"
-msgstr ""
+msgstr "¡Quítalo por completo!"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/render.html
 msgid "Image not found"
-msgstr ""
+msgstr "Imagen no encontrada"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/revision_add.html
 msgid "Replace image"
-msgstr ""
+msgstr "Remplazar imagen"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/revision_add.html
 msgid "Choose an image file to replace current image."
-msgstr ""
+msgstr "Elija un archivo de imagen para reemplazar la imagen actual."
 
 #: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
 msgid "Image id"
-msgstr ""
+msgstr "Id imagen"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
 #: wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
 msgid "Insert"
-msgstr ""
+msgstr "Insertar"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
 msgid "No images found for this article"
-msgstr ""
+msgstr "No se encontraron imágenes para este artículo"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
 msgid "Manage images"
-msgstr ""
+msgstr "Administrar imágenes"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
 msgid "Add new image"
-msgstr ""
+msgstr "Añadir nueva imagen"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
 msgid "Add image"
-msgstr ""
+msgstr "Añadir imagen"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
 msgid "You do not have permissions to add images."
-msgstr ""
+msgstr "No tienes permisos para agregar imágenes."
 
 #: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
 msgid "How to use images"
-msgstr ""
+msgstr "Como usar las imágenes"
 
 #: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
 msgid ""
@@ -26446,6 +26826,14 @@ msgid ""
 "Markdown in the caption. The markdown code syntax for images looks like "
 "this, possible values for align are left/center/right:"
 msgstr ""
+"Después de cargar una imagen, se adjunta a este artículo en particular y "
+"solo se puede usar aquí. Otros usuarios pueden reemplazar la imagen, pero se"
+" mantienen versiones anteriores. Es probable que desee mostrar la imagen con"
+" un buen título. Para lograr esto, presione el botón Insertar y complete los"
+" campos de título y posiblemente elija que su imagen flote a la derecha o a "
+"la izquierda del contenido. Puede usar Markdown en el título. La sintaxis "
+"del código de reducción para las imágenes se ve así, los posibles valores "
+"para alinear son izquierda/centro/derecha:"
 
 #: wiki/plugins/links/wiki_plugin.py
 msgid "Links"
@@ -26453,19 +26841,24 @@ msgstr "Vínculos"
 
 #: wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
 msgid "Link to another wiki page"
-msgstr ""
+msgstr "Enlace a otra página wiki"
 
 #: wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
 msgid ""
 "Type in something from another wiki page's title and auto-complete will help"
 " you create a tag for you wiki link. Tags for links look like this:"
 msgstr ""
+"Escriba algo del título de otra página wiki y el autocompletar le ayudará a "
+"crear una etiqueta para su enlace wiki. Las etiquetas para los enlaces se "
+"ven así:"
 
 #: wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
 msgid ""
 "You can link to another website simply by inserting an address example.com "
 "or http://example.com or by using the markdown syntax:"
 msgstr ""
+"Puede vincular a otro sitio web simplemente insertando una dirección "
+"example.com o http://example.com o usando la sintaxis de reducción:"
 
 #: wiki/plugins/notifications/forms.py
 msgid "Notifications"
@@ -26509,70 +26902,74 @@ msgstr "Nuevo artículo creado: %s"
 
 #: wiki/plugins/notifications/templates/wiki/plugins/notifications/menubaritem.html
 msgid "notifications"
-msgstr ""
+msgstr "notificaciones"
 
 #: wiki/plugins/notifications/templates/wiki/plugins/notifications/menubaritem.html
 msgid "No notifications"
-msgstr ""
+msgstr "Sin notificaciones"
 
 #: wiki/plugins/notifications/templates/wiki/plugins/notifications/menubaritem.html
 msgid "Clear notifications list"
-msgstr ""
+msgstr "Borrar la lista de notificaciones"
 
 #: wiki/templates/wiki/base.html
 msgid "Search..."
-msgstr ""
+msgstr "Buscar..."
 
 #: wiki/templates/wiki/base.html
 msgid "Log out"
-msgstr ""
+msgstr "Cerrar sesión"
 
 #: wiki/templates/wiki/base.html wiki/templates/wiki/accounts/login.html
 #: wiki/templates/wiki/accounts/signup.html
 msgid "Sign up"
-msgstr ""
+msgstr "Registrarse"
 
 #: wiki/templates/wiki/deleted.html
 msgid "Article deleted"
-msgstr ""
+msgstr "Artículo borrado"
 
 #: wiki/templates/wiki/deleted.html
 msgid "Article Deleted"
-msgstr ""
+msgstr "Artículo Borrado"
 
 #: wiki/templates/wiki/deleted.html
 msgid "The article you were looking for has been deleted."
-msgstr ""
+msgstr "El artículo que estabas buscando ha sido eliminado."
 
 #: wiki/templates/wiki/deleted.html
 msgid "You may restore this article and its children by clicking restore."
 msgstr ""
+"Puede restaurar este artículo y sus elementos secundarios haciendo clic en "
+"restaurar."
 
 #: wiki/templates/wiki/deleted.html
 msgid ""
 "You may remove this article and any children permanently and free their "
 "slugs by clicking the below button. This action cannot be undone."
 msgstr ""
+"Puede eliminar este artículo y sus hijos permanentemente y liberar sus slugs"
+" haciendo clic en el botón a continuación. Esta acción no se puede deshacer."
 
 #: wiki/templates/wiki/dir.html
 msgid "Listing articles in"
-msgstr ""
+msgstr "Listado de artículos en"
 
 #: wiki/templates/wiki/dir.html
 msgid "Up one level"
-msgstr ""
+msgstr "Un nivel arriba"
 
 #: wiki/templates/wiki/dir.html
 msgid "clear"
-msgstr ""
+msgstr "limpiar"
 
 #: wiki/templates/wiki/dir.html
 msgid "article,articles"
-msgstr ""
+msgstr "artículo,artículos"
 
 #: wiki/templates/wiki/dir.html
 msgid "matches,match"
-msgstr ""
+msgstr "coincidencias,coincidencia"
 
 #: wiki/templates/wiki/dir.html
 #, python-format
@@ -26581,10 +26978,13 @@ msgid ""
 "        %(cnt)s %(articles_plur)s in this level %(match_plur)s your search.\n"
 "      "
 msgstr ""
+"\n"
+"        %(cnt)s %(articles_plur)s en este nivel %(match_plur)s su búsqueda.\n"
+"      "
 
 #: wiki/templates/wiki/dir.html
 msgid "is,are"
-msgstr ""
+msgstr "es,son"
 
 #: wiki/templates/wiki/dir.html
 #, python-format
@@ -26593,62 +26993,65 @@ msgid ""
 "        There %(articles_plur_verb)s %(cnt)s %(articles_plur)s in this level.\n"
 "      "
 msgstr ""
+"\n"
+"        Hay %(articles_plur_verb)s %(cnt)s %(articles_plur)s en este nivel.\n"
+"      "
 
 #: wiki/templates/wiki/dir.html
 msgid "Last modified"
-msgstr ""
+msgstr "Última modificación"
 
 #: wiki/templates/wiki/history.html
 msgid "no log message"
-msgstr ""
+msgstr "ningún mensaje de registro"
 
 #: wiki/templates/wiki/permission_denied.html
 msgid "Permission Denied"
-msgstr ""
+msgstr "Permiso Denegado"
 
 #: wiki/templates/wiki/permission_denied.html
 msgid "Sorry, you don't have permission to view this page."
-msgstr ""
+msgstr "Lo sentimos, no tienes permiso para ver esta página."
 
 #: wiki/templates/wiki/preview_inline.html
 msgid "Previewing revision"
-msgstr ""
+msgstr "Previsualizando la revisión"
 
 #: wiki/templates/wiki/preview_inline.html
 msgid "Previewing merge between"
-msgstr ""
+msgstr "Previsualizando la fusión entre"
 
 #: wiki/templates/wiki/preview_inline.html
 msgid "and"
-msgstr ""
+msgstr "y"
 
 #: wiki/templates/wiki/source.html
 msgid "Source of"
-msgstr ""
+msgstr "Fuente de"
 
 #: wiki/templates/wiki/source.html
 msgid "This article is currently locked for editing."
-msgstr ""
+msgstr "Este articulo está actualmente bloqueado para su edición."
 
 #: wiki/templates/wiki/accounts/login.html
 msgid "Log me in..."
-msgstr ""
+msgstr "Iniciar sesión en..."
 
 #: wiki/templates/wiki/accounts/login.html
 msgid "Don't have an account?"
-msgstr ""
+msgstr "¿No tienes una cuenta?"
 
 #: wiki/templates/wiki/accounts/signup.html
 msgid "Sign me up..."
-msgstr ""
+msgstr "Inscríbeme..."
 
 #: wiki/templates/wiki/article/create_root.html
 msgid "Create root article"
-msgstr ""
+msgstr "Crear artículo raíz"
 
 #: wiki/templates/wiki/article/create_root.html
 msgid "Congratulations!"
-msgstr ""
+msgstr "¡Felicitaciones!"
 
 #: wiki/templates/wiki/article/create_root.html
 msgid ""
@@ -26656,58 +27059,61 @@ msgid ""
 " create the first one, the root article. In the beginning, it will only be "
 "editable by administrators, but you can define permissions after."
 msgstr ""
+"Tienes django-wiki instalado... pero no hay artículos. Entonces es hora de "
+"crear el primero, el artículo raíz. Al principio, solo será editable por los"
+" administradores, pero puede definir permisos después."
 
 #: wiki/templates/wiki/article/create_root.html
 msgid "Root article"
-msgstr ""
+msgstr "Artículo raíz"
 
 #: wiki/templates/wiki/article/create_root.html
 msgid "Create root"
-msgstr ""
+msgstr "Crear raíz"
 
 #: wiki/templates/wiki/includes/anonymous_blocked.html
 msgid "You need to log in og sign up to use this function."
-msgstr ""
+msgstr "Debe iniciar sesión y registrarse para usar esta función."
 
 #: wiki/templates/wiki/includes/article_menu.html
 msgid "View Source"
-msgstr ""
+msgstr "Ver Curso"
 
 #: wiki/templates/wiki/includes/breadcrumbs.html
 msgid "Sub-articles for"
-msgstr ""
+msgstr "Sub-artículos para"
 
 #: wiki/templates/wiki/includes/breadcrumbs.html
 msgid "No sub-articles"
-msgstr ""
+msgstr "Sin sub-artículos"
 
 #: wiki/templates/wiki/includes/breadcrumbs.html
 msgid "...and more"
-msgstr ""
+msgstr "...y más"
 
 #: wiki/templates/wiki/includes/breadcrumbs.html
 msgid "Browse articles in this level"
-msgstr ""
+msgstr "Buscar artículos en este nivel"
 
 #: wiki/templates/wiki/includes/breadcrumbs.html
 msgid "New article next to"
-msgstr ""
+msgstr "Nuevo artículo al lado de"
 
 #: wiki/templates/wiki/includes/breadcrumbs.html
 msgid "New article below"
-msgstr ""
+msgstr "Nuevo artículo más abajo"
 
 #: wiki/templates/wiki/includes/revision_info.html
 msgid "by"
-msgstr ""
+msgstr "por"
 
 #: wiki/templates/wiki/includes/revision_info.html
 msgid "restored"
-msgstr ""
+msgstr "restaurado"
 
 #: wiki/templates/wiki/includes/revision_info.html
 msgid "unlocked"
-msgstr ""
+msgstr "desbloqueado"
 
 #: wiki/views/accounts.py
 msgid "You are now sign up... and now you can sign in!"

@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-05-27 20:37+0000\n"
-"PO-Revision-Date: 2018-05-27 20:37:20.299161\n"
+"POT-Creation-Date: 2018-06-06 15:18+0000\n"
+"PO-Revision-Date: 2018-06-06 15:18:54.603953\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -8093,6 +8093,13 @@ msgstr "Ûsér döés nöt éxïst. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт �
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
+"Found a conflict with given identifier. Please try an alternative identifier"
+msgstr ""
+"Föünd ä çönflïçt wïth gïvén ïdéntïfïér. Pléäsé trý än ältérnätïvé ïdéntïfïér"
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
 "Make sure that the file you upload is in CSV format with no extraneous "
 "characters or rows."
 msgstr ""
@@ -12623,34 +12630,35 @@ msgstr "Pässwörd Pölïçý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 #, python-brace-format
 msgid ""
 "{platform_name} now requires more complex passwords. Your current password "
-"does not meet the new requirements. Change your password now to continue "
-"using the site. Thank you for helping us keep your data safe."
+"does not meet the new requirements. Change your password now using the "
+"\"Forgot password?\" link below to continue using the site. Thank you for "
+"helping us keep your data safe."
 msgstr ""
 "{platform_name} nöw réqüïrés möré çömpléx pässwörds. Ýöür çürrént pässwörd "
-"döés nöt méét thé néw réqüïréménts. Çhängé ýöür pässwörd nöw tö çöntïnüé "
-"üsïng thé sïté. Thänk ýöü för hélpïng üs kéép ýöür dätä säfé. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι#"
+"döés nöt méét thé néw réqüïréménts. Çhängé ýöür pässwörd nöw üsïng thé "
+"\"Förgöt pässwörd?\" lïnk ßélöw tö çöntïnüé üsïng thé sïté. Thänk ýöü för "
+"hélpïng üs kéép ýöür dätä säfé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
+" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
+"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
+"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢#"
 
 #: openedx/core/djangoapps/password_policy/compliance.py
 #, python-brace-format
 msgid ""
 "{platform_name} now requires more complex passwords. Your current password "
 "does not meet the new requirements. You must change your password by "
-"{deadline} to be able to continue using the site. Thank you for helping us "
-"keep your data safe."
+"{deadline} to be able to continue using the site. To change your password, "
+"select the dropdown menu icon next to your username, then select "
+"\"Account\". You can reset your password from this page. Thank you for "
+"helping us keep your data safe."
 msgstr ""
 "{platform_name} nöw réqüïrés möré çömpléx pässwörds. Ýöür çürrént pässwörd "
 "döés nöt méét thé néw réqüïréménts. Ýöü müst çhängé ýöür pässwörd ßý "
-"{deadline} tö ßé äßlé tö çöntïnüé üsïng thé sïté. Thänk ýöü för hélpïng üs "
-"kéép ýöür dätä säfé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg "
-"єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт "
-"єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт "
-"αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη "
-"νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ρ#"
+"{deadline} tö ßé äßlé tö çöntïnüé üsïng thé sïté. Tö çhängé ýöür pässwörd, "
+"séléçt thé dröpdöwn ménü ïçön néxt tö ýöür üsérnämé, thén séléçt "
+"\"Àççöünt\". Ýöü çän rését ýöür pässwörd fröm thïs pägé. Thänk ýöü för "
+"hélpïng üs kéép ýöür dätä säfé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: openedx/core/djangoapps/profile_images/images.py
 #, python-brace-format
@@ -13441,6 +13449,61 @@ msgstr ""
 msgid "No data provided for user preference update"
 msgstr ""
 "Nö dätä prövïdéd för üsér préférénçé üpdäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
+#, python-format
+msgid "Hello %(full_name)s,"
+msgstr "Héllö %(full_name)s, Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
+#, python-format
+msgid ""
+"We received a deletion request for your account on %(platform_name)s. We're "
+"sorry to see you go!"
+msgstr ""
+"Wé réçéïvéd ä délétïön réqüést för ýöür äççöünt ön %(platform_name)s. Wé'ré "
+"sörrý tö séé ýöü gö! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
+msgid ""
+"Your account will be deleted shortly. Account deletion, including removal "
+"from email lists, may take a few weeks to fully process through our system. "
+"If you want to opt-out of emails before then, please unsubscribe from the "
+"footer of any email."
+msgstr ""
+"Ýöür äççöünt wïll ßé délétéd shörtlý. Àççöünt délétïön, ïnçlüdïng rémöväl "
+"fröm émäïl lïsts, mäý täké ä féw wééks tö füllý pröçéss thröügh öür sýstém. "
+"Ìf ýöü wänt tö öpt-öüt öf émäïls ßéföré thén, pléäsé ünsüßsçrïßé fröm thé "
+"föötér öf äný émäïl. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg "
+"єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт "
+"єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт "
+"αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη "
+"νσłυρтαтє#"
+
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
+#, python-format
+msgid ""
+"This is an informational email only. If you did not initiate this request, "
+"please contact %(contact_email)s."
+msgstr ""
+"Thïs ïs än ïnförmätïönäl émäïl önlý. Ìf ýöü dïd nöt ïnïtïäté thïs réqüést, "
+"pléäsé çöntäçt %(contact_email)s. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
+#, python-format
+msgid "Best, %(platform_name)s"
+msgstr "Bést, %(platform_name)s Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/subject.txt
+msgid "Your Account Has Been Queued For Deletion"
+msgstr ""
+"Ýöür Àççöünt Häs Béén Qüéüéd För Délétïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
 #: openedx/core/djangoapps/util/user_messages.py
@@ -14922,11 +14985,11 @@ msgstr "Çöntént Löçkéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/templates/_gated_content.html
 msgid ""
-"You must earn a passing score for '{prereq_section_name}' to access this "
-"content."
+"You must complete the prerequisites for '{prereq_section_name}' to access "
+"this content."
 msgstr ""
-"Ýöü müst éärn ä pässïng sçöré för '{prereq_section_name}' tö äççéss thïs "
-"çöntént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+"Ýöü müst çömplété thé préréqüïsïtés för '{prereq_section_name}' tö äççéss "
+"thïs çöntént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/templates/_gated_content.html
 msgid "Go to Prerequisite Section"
@@ -28057,6 +28120,18 @@ msgstr ""
 "Ìntrödüçtïöns, préréqüïsïtés, FÀQs thät äré üséd ön {a_link_start}ýöür "
 "çöürsé sümmärý pägé{a_link_end} (förmättéd ïn HTML) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αм#"
+
+#: cms/templates/settings.html
+msgid "Course About Sidebar HTML"
+msgstr "Çöürsé Àßöüt Sïdéßär HTML Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: cms/templates/settings.html
+msgid ""
+"Custom sidebar content for {a_link_start}your course summary "
+"page{a_link_end} (formatted in HTML)"
+msgstr ""
+"Çüstöm sïdéßär çöntént för {a_link_start}ýöür çöürsé sümmärý "
+"pägé{a_link_end} (förmättéd ïn HTML) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: cms/templates/settings.html
 msgid "Course Card Image"

@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-05-27 20:37+0000\n"
-"PO-Revision-Date: 2018-05-27 20:37:20.299161\n"
+"POT-Creation-Date: 2018-06-06 15:18+0000\n"
+"PO-Revision-Date: 2018-06-06 15:18:54.603953\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -6297,6 +6297,11 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
+"Found a conflict with given identifier. Please try an alternative identifier"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
 "Make sure that the file you upload is in CSV format with no extraneous "
 "characters or rows."
 msgstr ""
@@ -9900,8 +9905,9 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "{platform_name} now requires more complex passwords. Your current password "
-"does not meet the new requirements. Change your password now to continue "
-"using the site. Thank you for helping us keep your data safe."
+"does not meet the new requirements. Change your password now using the "
+"\"Forgot password?\" link below to continue using the site. Thank you for "
+"helping us keep your data safe."
 msgstr ""
 
 #: openedx/core/djangoapps/password_policy/compliance.py
@@ -9909,8 +9915,10 @@ msgstr ""
 msgid ""
 "{platform_name} now requires more complex passwords. Your current password "
 "does not meet the new requirements. You must change your password by "
-"{deadline} to be able to continue using the site. Thank you for helping us "
-"keep your data safe."
+"{deadline} to be able to continue using the site. To change your password, "
+"select the dropdown menu icon next to your username, then select "
+"\"Account\". You can reset your password from this page. Thank you for "
+"helping us keep your data safe."
 msgstr ""
 
 #: openedx/core/djangoapps/profile_images/images.py
@@ -10505,6 +10513,47 @@ msgstr ""
 
 #: openedx/core/djangoapps/user_api/preferences/views.py
 msgid "No data provided for user preference update"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
+#, python-format
+msgid "Hello %(full_name)s,"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
+#, python-format
+msgid ""
+"We received a deletion request for your account on %(platform_name)s. We're "
+"sorry to see you go!"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
+msgid ""
+"Your account will be deleted shortly. Account deletion, including removal "
+"from email lists, may take a few weeks to fully process through our system. "
+"If you want to opt-out of emails before then, please unsubscribe from the "
+"footer of any email."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
+#, python-format
+msgid ""
+"This is an informational email only. If you did not initiate this request, "
+"please contact %(contact_email)s."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
+#, python-format
+msgid "Best, %(platform_name)s"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/subject.txt
+msgid "Your Account Has Been Queued For Deletion"
 msgstr ""
 
 #: openedx/core/djangoapps/util/user_messages.py
@@ -11761,8 +11810,8 @@ msgstr ""
 
 #: lms/templates/_gated_content.html
 msgid ""
-"You must earn a passing score for '{prereq_section_name}' to access this "
-"content."
+"You must complete the prerequisites for '{prereq_section_name}' to access "
+"this content."
 msgstr ""
 
 #: lms/templates/_gated_content.html
@@ -21747,6 +21796,16 @@ msgstr ""
 msgid ""
 "Introductions, prerequisites, FAQs that are used on {a_link_start}your "
 "course summary page{a_link_end} (formatted in HTML)"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "Course About Sidebar HTML"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid ""
+"Custom sidebar content for {a_link_start}your course summary "
+"page{a_link_end} (formatted in HTML)"
 msgstr ""
 
 #: cms/templates/settings.html
