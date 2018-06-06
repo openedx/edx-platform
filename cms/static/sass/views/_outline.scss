@@ -185,12 +185,13 @@
 
     .status-release,
     .status-pacing,
-    .status-highlights-enabled {
+    .status-highlights-enabled,
+    .status-checklist {
       @extend %t-copy-base;
 
       display: inline-block;
       color: $color-copy-base;
-      margin-right: $baseline;
+      margin-right: ($baseline/2);
 
       // STATE: hover
       &:hover {

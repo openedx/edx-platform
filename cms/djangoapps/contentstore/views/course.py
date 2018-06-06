@@ -637,6 +637,7 @@ def course_index(request, course_key):
         deprecated_blocks_info = _deprecated_blocks_info(course_module, deprecated_block_names)
 
         return render_to_response('course_outline.html', {
+            'language_code': request.LANGUAGE_CODE,
             'context_course': course_module,
             'lms_link': lms_link,
             'sections': sections,
