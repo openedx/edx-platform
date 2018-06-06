@@ -35,11 +35,15 @@ from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from user_tasks.tasks import UserTask
 
 import dogstats_wrapper as dog_stats_api
-from contentstore.courseware_index import CoursewareSearchIndexer, LibrarySearchIndexer, SearchIndexingError
-from contentstore.storage import course_import_export_storage
-from contentstore.utils import initialize_permissions, reverse_usage_url
+from cms.djangoapps.contentstore.courseware_index import (
+    CoursewareSearchIndexer,
+    LibrarySearchIndexer,
+    SearchIndexingError,
+)
+from cms.djangoapps.contentstore.storage import course_import_export_storage
+from cms.djangoapps.contentstore.utils import initialize_permissions, reverse_usage_url
 from course_action_state.models import CourseRerunState
-from models.settings.course_metadata import CourseMetadata
+from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from openedx.core.djangoapps.embargo.models import CountryAccessRule, RestrictedCourse
 from openedx.core.lib.extract_tar import safetar_extractall
 from student.auth import has_course_author_access

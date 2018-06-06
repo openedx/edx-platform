@@ -6,7 +6,7 @@ from nose.tools import assert_equal, assert_in, assert_not_equal
 from selenium.common.exceptions import InvalidElementStateException
 
 from common import *
-from contentstore.utils import reverse_course_url
+from cms.djangoapps.contentstore.utils import reverse_course_url
 from terrain.steps import reload_the_page
 
 

@@ -21,8 +21,8 @@ from django.utils.translation import ugettext as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-import contentstore.git_export_utils as git_export_utils
-from contentstore.git_export_utils import GitExportError
+import cms.djangoapps.contentstore.git_export_utils as git_export_utils
+from cms.djangoapps.contentstore.git_export_utils import GitExportError
 
 log = logging.getLogger(__name__)
 

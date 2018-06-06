@@ -6,8 +6,8 @@ from django.core.management import call_command, CommandError
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from contentstore.management.commands.force_publish import Command
-from contentstore.management.commands.utils import get_course_versions
+from cms.djangoapps.contentstore.management.commands.force_publish import Command
+from cms.djangoapps.contentstore.management.commands.utils import get_course_versions
 
 
 class TestForcePublish(SharedModuleStoreTestCase):

@@ -15,7 +15,7 @@ from mock import Mock, patch
 from nose.plugins.skip import SkipTest
 from six import text_type
 
-from contentstore.tests.utils import mock_requests_get
+from cms.djangoapps.contentstore.tests.utils import mock_requests_get
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError

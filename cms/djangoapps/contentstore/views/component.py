@@ -17,9 +17,13 @@ from xblock.exceptions import NoSuchHandlerError
 from xblock.plugin import PluginMissingError
 from xblock.runtime import Mixologist
 
-from contentstore.utils import get_lms_link_for_item, get_xblock_aside_instance, reverse_course_url
-from contentstore.views.helpers import get_parent_xblock, is_unit, xblock_type_display_name
-from contentstore.views.item import StudioEditModuleRuntime, add_container_page_publishing_info, create_xblock_info
+from cms.djangoapps.contentstore.utils import get_lms_link_for_item, get_xblock_aside_instance, reverse_course_url
+from cms.djangoapps.contentstore.views.helpers import get_parent_xblock, is_unit, xblock_type_display_name
+from cms.djangoapps.contentstore.views.item import (
+    StudioEditModuleRuntime,
+    add_container_page_publishing_info,
+    create_xblock_info,
+)
 from edxmako.shortcuts import render_to_response
 from student.auth import has_course_author_access
 from xblock_django.api import authorable_xblocks, disabled_xblocks

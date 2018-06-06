@@ -6,7 +6,7 @@ from django.core.management import BaseCommand, CommandError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
 
-from contentstore.courseware_index import LibrarySearchIndexer
+from cms.djangoapps.contentstore.courseware_index import LibrarySearchIndexer
 from xmodule.modulestore.django import modulestore
 
 from .prompt import query_yes_no

@@ -6,7 +6,7 @@ import logging
 
 from django.utils.translation import ugettext as _
 
-from contentstore.utils import reverse_usage_url
+from cms.djangoapps.contentstore.utils import reverse_usage_url
 from lms.lib.utils import get_parent_unit
 from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition
 from util.db import MYSQL_MAX_INT, generate_int_id

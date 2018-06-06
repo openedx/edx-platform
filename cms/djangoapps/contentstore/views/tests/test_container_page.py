@@ -10,9 +10,9 @@ from django.utils import http
 from mock import Mock, patch
 from pytz import UTC
 
-import contentstore.views.component as views
-from contentstore.tests.test_libraries import LibraryTestCase
-from contentstore.views.tests.utils import StudioPageTestCase
+import cms.djangoapps.contentstore.views.component as views
+from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
+from cms.djangoapps.contentstore.views.tests.utils import StudioPageTestCase
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

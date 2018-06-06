@@ -12,7 +12,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
-from contentstore.management.commands.utils import get_course_versions
+from cms.djangoapps.contentstore.management.commands.utils import get_course_versions
 from edxmako.shortcuts import render_to_response
 from util.json_request import JsonResponse
 from util.views import require_global_staff

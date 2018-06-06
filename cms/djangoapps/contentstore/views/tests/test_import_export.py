@@ -18,10 +18,10 @@ from milestones.tests.utils import MilestonesTestCaseMixin
 from opaque_keys.edx.locator import LibraryLocator
 from path import Path as path
 
-from contentstore.tests.test_libraries import LibraryTestCase
-from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import reverse_course_url
-from models.settings.course_metadata import CourseMetadata
+from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.utils import reverse_course_url
+from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from openedx.core.lib.extract_tar import safetar_extractall
 from student import auth
 from student.roles import CourseInstructorRole, CourseStaffRole

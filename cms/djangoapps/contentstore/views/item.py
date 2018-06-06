@@ -25,7 +25,7 @@ from xblock.fields import Scope
 
 import dogstats_wrapper as dog_stats_api
 from cms.lib.xblock.authoring_mixin import VISIBILITY_VIEW
-from contentstore.utils import (
+from cms.djangoapps.contentstore.utils import (
     ancestor_has_staff_lock,
     find_release_date_source,
     find_staff_lock_source,
@@ -36,7 +36,7 @@ from contentstore.utils import (
     is_currently_visible_to_students,
     is_self_paced
 )
-from contentstore.views.helpers import (
+from cms.djangoapps.contentstore.views.helpers import (
     create_xblock,
     get_parent_xblock,
     is_unit,
@@ -45,10 +45,10 @@ from contentstore.views.helpers import (
     xblock_studio_url,
     xblock_type_display_name
 )
-from contentstore.views.preview import get_preview_fragment
+from cms.djangoapps.contentstore.views.preview import get_preview_fragment
 from edxmako.shortcuts import render_to_string
 from help_tokens.core import HelpUrlExpert
-from models.settings.course_grading import CourseGradingModel
+from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.waffle_utils import WaffleSwitch
 from openedx.core.lib.gating import api as gating_api
@@ -58,7 +58,7 @@ from student.auth import has_studio_read_access, has_studio_write_access
 from util.date_utils import get_default_time_display
 from util.json_request import JsonResponse, expect_json
 from util.milestones_helpers import is_entrance_exams_enabled
-from xblock_config.models import CourseEditLTIFieldsEnabledFlag
+from cms.djangoapps.xblock_config.models import CourseEditLTIFieldsEnabledFlag
 from xblock_django.user_service import DjangoXBlockUserService
 from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.modulestore import EdxJSONEncoder, ModuleStoreEnum

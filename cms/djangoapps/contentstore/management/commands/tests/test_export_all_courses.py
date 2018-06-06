@@ -4,7 +4,7 @@ Test for export all courses.
 import shutil
 from tempfile import mkdtemp
 
-from contentstore.management.commands.export_all_courses import export_courses_to_output_path
+from cms.djangoapps.contentstore.management.commands.export_all_courses import export_courses_to_output_path
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore

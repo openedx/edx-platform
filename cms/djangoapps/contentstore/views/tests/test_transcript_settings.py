@@ -8,9 +8,12 @@ from django.test.testcases import TestCase
 from django.urls import reverse
 from edxval import api
 
-from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import reverse_course_url
-from contentstore.views.transcript_settings import TranscriptionProviderErrorType, validate_transcript_credentials
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.utils import reverse_course_url
+from cms.djangoapps.contentstore.views.transcript_settings import (
+    TranscriptionProviderErrorType,
+    validate_transcript_credentials,
+)
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
 from student.roles import CourseStaffRole
 

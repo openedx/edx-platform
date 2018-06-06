@@ -8,8 +8,8 @@ from django.core.cache import cache
 from django.dispatch import receiver
 from pytz import UTC
 
-from contentstore.courseware_index import CoursewareSearchIndexer, LibrarySearchIndexer
-from contentstore.proctoring import register_special_exams
+from cms.djangoapps.contentstore.courseware_index import CoursewareSearchIndexer, LibrarySearchIndexer
+from cms.djangoapps.contentstore.proctoring import register_special_exams
 from lms.djangoapps.grades.tasks import compute_all_grades_for_course
 from openedx.core.djangoapps.credit.signals import on_course_publish
 from openedx.core.lib.gating import api as gating_api

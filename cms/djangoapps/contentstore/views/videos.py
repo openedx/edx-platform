@@ -38,8 +38,8 @@ from edxval.api import (
 from opaque_keys.edx.keys import CourseKey
 from xmodule.video_module.transcripts_utils import Transcript
 
-from contentstore.models import VideoUploadConfig
-from contentstore.utils import reverse_course_url
+from cms.djangoapps.contentstore.models import VideoUploadConfig
+from cms.djangoapps.contentstore.utils import reverse_course_url
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace

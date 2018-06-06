@@ -2,7 +2,7 @@
 
 import ddt
 from django.core.management import call_command, CommandError
-from contentstore.tests.test_orphan import TestOrphanBase
+from cms.djangoapps.contentstore.tests.test_orphan import TestOrphanBase
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore import ModuleStoreEnum

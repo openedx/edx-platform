@@ -13,9 +13,9 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
-from contentstore.views.helpers import create_xblock, remove_entrance_exam_graders
-from contentstore.views.item import delete_item
-from models.settings.course_metadata import CourseMetadata
+from cms.djangoapps.contentstore.views.helpers import create_xblock, remove_entrance_exam_graders
+from cms.djangoapps.contentstore.views.item import delete_item
+from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from student.auth import has_course_author_access
 from util import milestones_helpers

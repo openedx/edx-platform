@@ -9,8 +9,8 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, LibraryFactory
 
-from contentstore.management.commands.reindex_course import Command as ReindexCommand
-from contentstore.courseware_index import SearchIndexingError
+from cms.djangoapps.contentstore.management.commands.reindex_course import Command as ReindexCommand
+from cms.djangoapps.contentstore.courseware_index import SearchIndexingError
 
 
 @ddt.ddt

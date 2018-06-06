@@ -20,8 +20,8 @@ from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from contentstore.utils import reverse_course_url
-from contentstore.views.exception import AssetNotFoundException, AssetSizeTooLargeException
+from cms.djangoapps.contentstore.utils import reverse_course_url
+from cms.djangoapps.contentstore.views.exception import AssetNotFoundException, AssetSizeTooLargeException
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.contentserver.caching import del_cached_content
 from student.auth import has_course_author_access

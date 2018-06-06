@@ -25,7 +25,7 @@ from openedx.core.djangoapps.video_pipeline.api import update_3rd_party_transcri
 from student.auth import has_studio_write_access
 from util.json_request import JsonResponse, expect_json
 
-from contentstore.views.videos import TranscriptProvider
+from cms.djangoapps.contentstore.views.videos import TranscriptProvider
 from xmodule.video_module.transcripts_utils import Transcript, TranscriptsGenerationException
 
 __all__ = [

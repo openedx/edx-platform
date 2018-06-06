@@ -9,8 +9,8 @@ from django.contrib.auth.models import User
 from django.utils import translation
 from django.utils.translation import get_language
 
-from contentstore.tests.utils import AjaxEnabledTestClient
-from contentstore.views.preview import _preview_module_system
+from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient
+from cms.djangoapps.contentstore.views.preview import _preview_module_system
 from xmodule.modulestore.django import ModuleI18nService
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

@@ -8,8 +8,8 @@ from uuid import uuid4
 from django.conf import settings
 from six import text_type
 
-from contentstore.models import PushNotificationConfig
-from contentstore.tasks import push_course_update_task
+from cms.djangoapps.contentstore.models import PushNotificationConfig
+from cms.djangoapps.contentstore.tasks import push_course_update_task
 from parse_rest.connection import register
 from parse_rest.core import ParseError
 from parse_rest.installation import Push

@@ -6,9 +6,9 @@ import json
 
 from mock import patch
 
-from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import reverse_usage_url
-from contentstore.views.item import VisibilityState
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.utils import reverse_usage_url
+from cms.djangoapps.contentstore.views.item import VisibilityState
 from openedx.core.lib.gating.api import GATING_NAMESPACE_QUALIFIER
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE
 from xmodule.modulestore.tests.factories import ItemFactory

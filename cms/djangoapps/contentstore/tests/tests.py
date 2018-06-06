@@ -18,9 +18,9 @@ from freezegun import freeze_time
 from pytz import UTC
 from six.moves import xrange
 
-from contentstore.models import PushNotificationConfig
-from contentstore.tests.test_course_settings import CourseTestCase
-from contentstore.tests.utils import AjaxEnabledTestClient, parse_json, registration, user
+from cms.djangoapps.contentstore.models import PushNotificationConfig
+from cms.djangoapps.contentstore.tests.test_course_settings import CourseTestCase
+from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, parse_json, registration, user
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

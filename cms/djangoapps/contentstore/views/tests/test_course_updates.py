@@ -7,9 +7,9 @@ from django.test.utils import override_settings
 from mock import patch
 from opaque_keys.edx.keys import UsageKey
 
-from contentstore.models import PushNotificationConfig
-from contentstore.tests.test_course_settings import CourseTestCase
-from contentstore.utils import reverse_course_url, reverse_usage_url
+from cms.djangoapps.contentstore.models import PushNotificationConfig
+from cms.djangoapps.contentstore.tests.test_course_settings import CourseTestCase
+from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
 from xmodule.modulestore.django import modulestore
 
 

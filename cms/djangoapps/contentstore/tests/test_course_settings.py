@@ -14,11 +14,15 @@ from pytz import UTC
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
 
-from contentstore.utils import reverse_course_url, reverse_usage_url
+from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
 from milestones.models import MilestoneRelationshipType
-from models.settings.course_grading import CourseGradingModel, GRADING_POLICY_CHANGED_EVENT_TYPE, hash_grading_policy
-from models.settings.course_metadata import CourseMetadata
-from models.settings.encoder import CourseSettingsEncoder
+from cms.djangoapps.models.settings.course_grading import (
+    CourseGradingModel,
+    GRADING_POLICY_CHANGED_EVENT_TYPE,
+    hash_grading_policy,
+)
+from cms.djangoapps.models.settings.course_metadata import CourseMetadata
+from cms.djangoapps.models.settings.encoder import CourseSettingsEncoder
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import UserFactory

@@ -8,7 +8,7 @@ from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator
 
 from openedx.core.djangoapps.request_cache.middleware import RequestCache
-from xblock_config.models import CourseEditLTIFieldsEnabledFlag
+from cms.djangoapps.xblock_config.models import CourseEditLTIFieldsEnabledFlag
 
 
 @contextmanager

@@ -5,7 +5,7 @@ from django.contrib.admin import autodiscover as django_autodiscover
 from django.utils.translation import ugettext_lazy as _
 from rest_framework_swagger.views import get_swagger_view
 
-import contentstore.views
+import cms.djangoapps.contentstore.views
 from cms.djangoapps.contentstore.views.organization import OrganizationListView
 import openedx.core.djangoapps.common_views.xblock
 import openedx.core.djangoapps.debug.views

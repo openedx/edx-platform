@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from contentstore.utils import delete_course
+from cms.djangoapps.contentstore.utils import delete_course
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore

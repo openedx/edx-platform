@@ -18,8 +18,8 @@ from user_tasks.models import UserTaskStatus
 
 from student.auth import has_course_author_access
 
-from contentstore.storage import course_import_export_storage
-from contentstore.tasks import CourseImportTask, import_olx
+from cms.djangoapps.contentstore.storage import course_import_export_storage
+from cms.djangoapps.contentstore.tasks import CourseImportTask, import_olx
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 
 log = logging.getLogger(__name__)

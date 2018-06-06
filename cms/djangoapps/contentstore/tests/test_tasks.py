@@ -16,9 +16,9 @@ from organizations.models import OrganizationCourse
 from organizations.tests.factories import OrganizationFactory
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 
-from contentstore.tasks import export_olx, rerun_course
-from contentstore.tests.test_libraries import LibraryTestCase
-from contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.tasks import export_olx, rerun_course
+from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from course_action_state.models import CourseRerunState
 from openedx.core.djangoapps.embargo.models import Country, CountryAccessRule, RestrictedCourse
 from xmodule.modulestore.django import modulestore

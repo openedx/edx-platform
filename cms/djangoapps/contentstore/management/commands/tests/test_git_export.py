@@ -15,9 +15,9 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test.utils import override_settings
 
-from contentstore.tests.utils import CourseTestCase
-import contentstore.git_export_utils as git_export_utils
-from contentstore.git_export_utils import GitExportError
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+import cms.djangoapps.contentstore.git_export_utils as git_export_utils
+from cms.djangoapps.contentstore.git_export_utils import GitExportError
 from opaque_keys.edx.locator import CourseLocator
 
 FEATURES_WITH_EXPORT_GIT = settings.FEATURES.copy()

@@ -10,8 +10,8 @@ from django.core import mail
 from django.http import HttpRequest
 from django.test import TestCase
 
-from course_creators.admin import CourseCreatorAdmin
-from course_creators.models import CourseCreator
+from cms.djangoapps.course_creators.admin import CourseCreatorAdmin
+from cms.djangoapps.course_creators.models import CourseCreator
 from student import auth
 from student.roles import CourseCreatorRole
 

@@ -29,18 +29,22 @@ from openedx.features.course_experience.waffle import waffle as course_experienc
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from six import text_type
 
-from contentstore.course_group_config import (
+from cms.djangoapps.contentstore.course_group_config import (
     COHORT_SCHEME,
     ENROLLMENT_SCHEME,
     RANDOM_SCHEME,
     GroupConfiguration,
     GroupConfigurationsValidationError
 )
-from contentstore.course_info_model import delete_course_update, get_course_updates, update_course_updates
-from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
-from contentstore.push_notification import push_notification_enabled
-from contentstore.tasks import rerun_course as rerun_course_task
-from contentstore.utils import (
+from cms.djangoapps.contentstore.course_info_model import (
+    delete_course_update,
+    get_course_updates,
+    update_course_updates,
+)
+from cms.djangoapps.contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
+from cms.djangoapps.contentstore.push_notification import push_notification_enabled
+from cms.djangoapps.contentstore.tasks import rerun_course as rerun_course_task
+from cms.djangoapps.contentstore.utils import (
     add_instructor,
     get_lms_link_for_item,
     initialize_permissions,
@@ -50,15 +54,19 @@ from contentstore.utils import (
     reverse_url,
     reverse_usage_url
 )
-from contentstore.views.entrance_exam import create_entrance_exam, delete_entrance_exam, update_entrance_exam
+from cms.djangoapps.contentstore.views.entrance_exam import (
+    create_entrance_exam,
+    delete_entrance_exam,
+    update_entrance_exam,
+)
 from course_action_state.managers import CourseActionStateItemNotFoundError
 from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
-from course_creators.views import add_user_with_status_unrequested, get_course_creator_status
+from cms.djangoapps.course_creators.views import add_user_with_status_unrequested, get_course_creator_status
 from edxmako.shortcuts import render_to_response
 from milestones import api as milestones_api
-from models.settings.course_grading import CourseGradingModel
-from models.settings.course_metadata import CourseMetadata
-from models.settings.encoder import CourseSettingsEncoder
+from cms.djangoapps.models.settings.course_grading import CourseGradingModel
+from cms.djangoapps.models.settings.course_metadata import CourseMetadata
+from cms.djangoapps.models.settings.encoder import CourseSettingsEncoder
 from openedx.core.djangoapps.credit.api import get_credit_requirements, is_credit_course
 from openedx.core.djangoapps.credit.tasks import update_credit_course_requirements
 from openedx.core.djangoapps.models.course_details import CourseDetails

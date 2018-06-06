@@ -4,8 +4,8 @@ Utilities for view tests.
 
 import json
 
-from contentstore.tests.utils import CourseTestCase
-from contentstore.views.helpers import xblock_studio_url
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.views.helpers import xblock_studio_url
 from xmodule.modulestore.tests.factories import ItemFactory
 
 

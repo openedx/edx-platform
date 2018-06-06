@@ -24,17 +24,21 @@ from edxval.api import (
 )
 from mock import Mock, patch
 
-from contentstore.models import VideoUploadConfig
-from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import reverse_course_url
-from contentstore.views.videos import (
+from cms.djangoapps.contentstore.models import VideoUploadConfig
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.utils import reverse_course_url
+from cms.djangoapps.contentstore.views.videos import (
     _get_default_video_image_url,
     validate_video_image,
     VIDEO_IMAGE_UPLOAD_ENABLED,
     WAFFLE_SWITCHES,
     TranscriptProvider
 )
-from contentstore.views.videos import KEY_EXPIRATION_IN_SECONDS, StatusDisplayStrings, convert_video_status
+from cms.djangoapps.contentstore.views.videos import (
+    KEY_EXPIRATION_IN_SECONDS,
+    StatusDisplayStrings,
+    convert_video_status,
+)
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file

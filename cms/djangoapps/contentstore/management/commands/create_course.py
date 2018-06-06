@@ -7,8 +7,8 @@ from six import text_type
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 
-from contentstore.management.commands.utils import user_from_str
-from contentstore.views.course import create_new_course_in_store
+from cms.djangoapps.contentstore.management.commands.utils import user_from_str
+from cms.djangoapps.contentstore.views.course import create_new_course_in_store
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import DuplicateCourseError
 

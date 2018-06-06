@@ -2,7 +2,7 @@
 Unit tests for the unit page.
 """
 
-from contentstore.views.tests.utils import StudioPageTestCase
+from cms.djangoapps.contentstore.views.tests.utils import StudioPageTestCase
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import ItemFactory
 from xmodule.x_module import STUDENT_VIEW

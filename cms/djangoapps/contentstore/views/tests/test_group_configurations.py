@@ -8,9 +8,9 @@ import ddt
 from mock import patch
 from operator import itemgetter
 
-from contentstore.utils import reverse_course_url, reverse_usage_url
-from contentstore.course_group_config import GroupConfiguration, CONTENT_GROUP_CONFIGURATION_NAME
-from contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
+from cms.djangoapps.contentstore.course_group_config import GroupConfiguration, CONTENT_GROUP_CONFIGURATION_NAME
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from xmodule.partitions.partitions import Group, UserPartition
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.validation import StudioValidation, StudioValidationMessage
