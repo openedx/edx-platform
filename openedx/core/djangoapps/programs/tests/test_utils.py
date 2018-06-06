@@ -8,7 +8,6 @@ from copy import deepcopy
 import ddt
 import httpretty
 import mock
-import pytest
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
@@ -55,7 +54,6 @@ UTILS_MODULE = 'openedx.core.djangoapps.programs.utils'
 @attr(shard=2)
 @skip_unless_lms
 @mock.patch(UTILS_MODULE + '.get_programs')
-@pytest.mark.django111_expected_failure
 class TestProgramProgressMeter(TestCase):
     """Tests of the program progress utility class."""
     def setUp(self):

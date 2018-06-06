@@ -2,7 +2,6 @@
 Tests for bookmark services.
 """
 
-import pytest
 from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import UsageKey
 
@@ -13,7 +12,6 @@ from .test_models import BookmarksTestsBase
 
 @attr(shard=9)
 @skip_unless_lms
-@pytest.mark.django111_expected_failure
 class BookmarksServiceTests(BookmarksTestsBase):
     """
     Tests the Bookmarks service.

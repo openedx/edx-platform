@@ -217,7 +217,6 @@ class GenerateIntIdTestCase(TestCase):
             self.assertIn(int_id, list(set(range(minimum, maximum + 1)) - used_ids))
 
 
-@pytest.mark.django111_expected_failure
 class MigrationTests(TestCase):
     """
     Tests for migrations.

@@ -2,7 +2,6 @@
 Tests for tasks.
 """
 import ddt
-import pytest
 from nose.plugins.attrib import attr
 
 from xmodule.modulestore import ModuleStoreEnum
@@ -14,7 +13,6 @@ from .test_models import BookmarksTestsBase
 
 @attr(shard=9)
 @ddt.ddt
-@pytest.mark.django111_expected_failure
 class XBlockCacheTaskTests(BookmarksTestsBase):
     """
     Test the XBlockCache model.

@@ -31,7 +31,6 @@ from integrated_channels.sap_success_factors.models import (
 import mock
 from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
-import pytest
 import pytz
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
@@ -352,7 +351,6 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
     # This is needed when testing CMS as the patching is still executed even though the
     # suite is skipped.
     @mock.patch.dict(getattr(settings, "ACCOUNT_VISIBILITY_CONFIGURATION", {}), {"default_visibility": "all_users"})
-    @pytest.mark.django111_expected_failure
     def test_get_account_different_user_visible(self):
         """
         Test that a client (logged in) can only get the shareable fields for a different user.
@@ -368,7 +366,6 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
     # This is needed when testing CMS as the patching is still executed even though the
     # suite is skipped.
     @mock.patch.dict(getattr(settings, "ACCOUNT_VISIBILITY_CONFIGURATION", {}), {"default_visibility": "private"})
-    @pytest.mark.django111_expected_failure
     def test_get_account_different_user_private(self):
         """
         Test that a client (logged in) can only get the shareable fields for a different user.
@@ -390,7 +387,6 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         ("staff_client", "staff_user", ALL_USERS_VISIBILITY),
     )
     @ddt.unpack
-    @pytest.mark.django111_expected_failure
     def test_get_account_private_visibility(self, api_client, requesting_username, preference_visibility):
         """
         Test the return from GET based on user visibility setting.
@@ -669,7 +665,6 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         {'full': 50, 'medium': 30, 'small': 10},
         clear=True
     )
-    @pytest.mark.django111_expected_failure
     def test_patch_email(self):
         """
         Test that the user can request an email change through the accounts API.
