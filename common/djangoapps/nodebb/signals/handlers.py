@@ -51,7 +51,7 @@ def sync_user_info_with_nodebb(sender, instance, created, **kwargs):  # pylint: 
 
     send_user_profile_info_to_mailchimp(sender, instance, kwargs)
 
-    if 'logout' in request.path:
+    if 'login' in request.path or 'logout' in request.path:
         return
 
     if sender == UserProfile:
@@ -88,7 +88,7 @@ def update_user_profile_on_nodebb(sender, instance, created, **kwargs):
     send_user_info_to_mailchimp(sender, instance, created, kwargs)
 
     request = get_current_request()
-    if 'login_session' in request.path:
+    if 'login' in request.path:
         return
 
     if created:
