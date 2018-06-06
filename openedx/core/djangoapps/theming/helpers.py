@@ -10,7 +10,7 @@ from logging import getLogger
 
 from django.conf import settings
 
-from microsite_configuration import microsite
+from common.djangoapps.microsite_configuration import microsite
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers_dirs import (
     Theme,

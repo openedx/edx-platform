@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 from opaque_keys.edx.django.models import CourseKeyField
 
 from openedx.core.djangoapps.request_cache import get_cache
-from student.models import CourseAccessRole
+from common.djangoapps.student.models import CourseAccessRole
 
 log = logging.getLogger(__name__)
 
@@ -184,7 +184,7 @@ class RoleBase(AccessRole):
         """
         # silently ignores anonymous and inactive users so that any that are
         # legit get updated.
-        from student.models import CourseAccessRole
+        from common.djangoapps.student.models import CourseAccessRole
         for user in users:
             if user.is_authenticated and user.is_active and not self.has_user(user):
                 entry = CourseAccessRole(user=user, role=self._role_name, course_id=self.course_key, org=self.org)

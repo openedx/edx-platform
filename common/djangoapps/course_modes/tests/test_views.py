@@ -15,16 +15,16 @@ from django.urls import reverse
 from mock import patch
 from nose.plugins.attrib import attr
 
-from course_modes.models import CourseMode, Mode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode, Mode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.commerce.tests import test_utils as ecomm_test_utils
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
-from student.models import CourseEnrollment
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from util.testing import UrlResetMixin
-from util.tests.mixins.discovery import CourseCatalogServiceMockMixin
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.util.testing import UrlResetMixin
+from common.djangoapps.util.tests.mixins.discovery import CourseCatalogServiceMockMixin
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory

@@ -3,7 +3,7 @@ UserPartitionScheme for enrollment tracks.
 """
 import logging
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from courseware.masquerade import (
     get_course_masquerade,
     get_masquerading_user_group,
@@ -12,7 +12,7 @@ from courseware.masquerade import (
 from django.conf import settings
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.verified_track_content.models import VerifiedTrackCohortedCourse
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from xmodule.partitions.partitions import Group, UserPartition
 
 LOGGER = logging.getLogger(__name__)

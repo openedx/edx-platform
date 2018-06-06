@@ -26,9 +26,9 @@ from opaque_keys.edx.keys import CourseKey
 from courseware.access import has_access
 from courseware.courses import get_course_by_id
 from courseware.field_overrides import disable_overrides
-from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, assign_role
-from django_comment_common.utils import seed_permissions_roles
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, assign_role
+from common.djangoapps.django_comment_common.utils import seed_permissions_roles
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import (
     bulk_delete_ccx_override_fields,
@@ -51,8 +51,8 @@ from lms.djangoapps.ccx.utils import (
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params
 from lms.djangoapps.instructor.views.gradebook_api import get_grade_book_page
-from student.models import CourseEnrollment
-from student.roles import CourseCcxCoachRole
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseCcxCoachRole
 from xmodule.modulestore.django import SignalHandler
 
 log = logging.getLogger(__name__)

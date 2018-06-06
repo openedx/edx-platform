@@ -20,7 +20,7 @@ from shoppingcart.processors.exceptions import (
     CCProcessorSignatureException,
     CCProcessorWrongAmountException
 )
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 @ddt.ddt

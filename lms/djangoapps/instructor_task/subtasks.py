@@ -13,7 +13,7 @@ from django.core.cache import cache
 from django.db import DatabaseError, transaction
 
 import dogstats_wrapper as dog_stats_api
-from util.db import outer_atomic
+from common.djangoapps.util.db import outer_atomic
 
 from .exceptions import DuplicateTaskException
 from .models import PROGRESS, QUEUING, InstructorTask

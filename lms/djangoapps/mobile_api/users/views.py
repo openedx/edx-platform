@@ -18,7 +18,7 @@ from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
 from courseware.views.index import save_positions_recursively_up
 from experiments.models import ExperimentData
-from student.models import CourseEnrollment, User
+from common.djangoapps.student.models import CourseEnrollment, User
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 

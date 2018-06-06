@@ -6,7 +6,7 @@ from django.conf import settings
 from django.utils.translation import ugettext_noop
 
 from courseware.access import has_access
-from student.roles import CourseCcxCoachRole
+from common.djangoapps.student.roles import CourseCcxCoachRole
 from xmodule.tabs import CourseTab
 
 

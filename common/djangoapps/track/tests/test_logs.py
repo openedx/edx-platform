@@ -6,8 +6,8 @@ from django.conf import settings
 from django.urls import reverse
 from django.test import TestCase
 
-from track.models import TrackingLog
-from track.views import user_track
+from common.djangoapps.track.models import TrackingLog
+from common.djangoapps.track.views import user_track
 
 
 @unittest.skip("TODO: these tests were not being run before, and now that they are they're failing")

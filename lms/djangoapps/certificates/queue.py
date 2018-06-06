@@ -19,10 +19,10 @@ from lms.djangoapps.certificates.models import (
     GeneratedCertificate,
     certificate_status_for_student
 )
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.verify_student.services import IDVerificationService
-from student.models import CourseEnrollment, UserProfile
+from common.djangoapps.student.models import CourseEnrollment, UserProfile
 from xmodule.modulestore.django import modulestore
 
 LOGGER = logging.getLogger(__name__)

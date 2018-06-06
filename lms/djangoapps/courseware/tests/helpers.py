@@ -12,12 +12,12 @@ from six import text_type
 
 from courseware.access import has_access
 from courseware.masquerade import handle_ajax, setup_masquerade
-from edxmako.shortcuts import render_to_string
+from common.djangoapps.edxmako.shortcuts import render_to_string
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.url_utils import quote_slashes
-from student.models import Registration
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.models import Registration
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xblock.field_data import DictFieldData
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE, ModuleStoreTestCase

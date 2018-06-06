@@ -11,8 +11,8 @@ from django.test import RequestFactory
 from mock import MagicMock
 
 from six.moves.urllib.parse import urlencode
-from third_party_auth.decorators import xframe_allow_whitelisted
-from third_party_auth.tests.testutil import TestCase
+from common.djangoapps.third_party_auth.decorators import xframe_allow_whitelisted
+from common.djangoapps.third_party_auth.tests.testutil import TestCase
 
 
 @xframe_allow_whitelisted

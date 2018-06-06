@@ -10,7 +10,7 @@ from django.utils import http
 from lettuce import step, world
 from nose.tools import assert_in, assert_regexp_matches
 
-from terrain.steps import reload_the_page
+from common.djangoapps.terrain.steps import reload_the_page
 
 
 @step(u'I see a table of student profiles')

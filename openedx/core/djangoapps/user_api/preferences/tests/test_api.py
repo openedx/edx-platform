@@ -14,8 +14,8 @@ from dateutil.parser import parse as parse_datetime
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.time_zone_utils import get_display_time_zone
-from student.models import UserProfile
-from student.tests.factories import UserFactory
+from common.djangoapps.student.models import UserProfile
+from common.djangoapps.student.tests.factories import UserFactory
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory

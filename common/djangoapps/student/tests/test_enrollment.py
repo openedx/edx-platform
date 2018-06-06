@@ -9,13 +9,18 @@ from django.urls import reverse
 from mock import patch
 from nose.plugins.attrib import attr
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
-from student.models import CourseEnrollment, CourseEnrollmentAllowed, CourseFullError, EnrollmentClosedError
-from student.roles import CourseInstructorRole, CourseStaffRole
-from student.tests.factories import CourseEnrollmentAllowedFactory, UserFactory
-from util.testing import UrlResetMixin
+from common.djangoapps.student.models import (
+    CourseEnrollment,
+    CourseEnrollmentAllowed,
+    CourseFullError,
+    EnrollmentClosedError,
+)
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
+from common.djangoapps.student.tests.factories import CourseEnrollmentAllowedFactory, UserFactory
+from common.djangoapps.util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

@@ -6,7 +6,7 @@ from django.utils.translation import ugettext as _
 from six import text_type
 from xblock.fields import Scope
 
-from xblock_django.models import XBlockStudioConfigurationFlag
+from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
 from xmodule.modulestore.django import modulestore
 
 

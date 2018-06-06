@@ -15,8 +15,8 @@ from mock import patch
 from PIL import Image
 from rest_framework.test import APITestCase, APIClient
 
-from student.tests.factories import UserFactory
-from student.tests.tests import UserSettingsEventTestMixin
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.tests.tests import UserSettingsEventTestMixin
 from openedx.core.djangoapps.user_api.accounts.image_helpers import (
     set_has_profile_image,
     get_profile_image_names,

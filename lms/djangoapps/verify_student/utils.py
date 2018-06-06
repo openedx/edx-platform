@@ -11,7 +11,7 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.utils.translation import ugettext as _
 
-from edxmako.shortcuts import render_to_string
+from common.djangoapps.edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from sailthru import SailthruClient
 

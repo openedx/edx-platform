@@ -8,7 +8,7 @@ from django.shortcuts import redirect
 from django.views.decorators.clickjacking import xframe_options_deny
 from django.views.decorators.csrf import ensure_csrf_cookie
 
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.external_auth.views import redirect_with_get, ssl_get_cert_from_request, ssl_login_shortcut
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from waffle.decorators import waffle_switch

@@ -14,7 +14,7 @@ from nose.tools import assert_equals, assert_false, assert_true  # pylint: disab
 from opaque_keys.edx.keys import CourseKey
 from PIL import Image
 
-from static_replace import (
+from common.djangoapps.static_replace import (
     _url_replace_regex,
     make_static_urls_absolute,
     process_static_urls,

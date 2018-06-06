@@ -9,7 +9,7 @@ from django.test.utils import override_settings
 from mock import patch, sentinel
 
 from eventtracking import tracker
-from track.middleware import TrackMiddleware
+from common.djangoapps.track.middleware import TrackMiddleware
 
 
 @ddt.ddt

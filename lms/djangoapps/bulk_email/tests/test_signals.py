@@ -12,7 +12,7 @@ from six import text_type
 
 from bulk_email.models import BulkEmailFlag, Optout
 from bulk_email.signals import force_optout_all
-from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

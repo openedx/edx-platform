@@ -7,9 +7,9 @@ import logging
 from django.conf import settings
 from django.test import TestCase
 
-from microsite_configuration import microsite
-from microsite_configuration.backends.base import BaseMicrositeBackend
-from microsite_configuration.backends.database import DatabaseMicrositeBackend
+from common.djangoapps.microsite_configuration import microsite
+from common.djangoapps.microsite_configuration.backends.base import BaseMicrositeBackend
+from common.djangoapps.microsite_configuration.backends.database import DatabaseMicrositeBackend
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.templatetags import configuration as configuration_tags
 

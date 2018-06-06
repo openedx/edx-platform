@@ -14,7 +14,7 @@ from courseware.models import (
     XModuleStudentPrefsField,
     XModuleUserStateSummaryField
 )
-from student.roles import (
+from common.djangoapps.student.roles import (
     CourseBetaTesterRole,
     CourseInstructorRole,
     CourseStaffRole,
@@ -22,9 +22,9 @@ from student.roles import (
     OrgInstructorRole,
     OrgStaffRole
 )
-from student.tests.factories import UserProfileFactory as StudentUserProfileFactory
+from common.djangoapps.student.tests.factories import UserProfileFactory as StudentUserProfileFactory
 # Imported to re-export
-from student.tests.factories import UserFactory  # Imported to re-export
+from common.djangoapps.student.tests.factories import UserFactory  # Imported to re-export
 
 # TODO fix this (course_id and location are invalid names as constants, and course_id should really be COURSE_KEY)
 # pylint: disable=invalid-name

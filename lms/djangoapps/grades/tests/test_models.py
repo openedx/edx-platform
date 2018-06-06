@@ -25,7 +25,7 @@ from lms.djangoapps.grades.models import (
     PersistentSubsectionGradeOverride,
     VisibleBlocks
 )
-from track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
+from common.djangoapps.track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
 
 
 class BlockRecordListTestCase(TestCase):

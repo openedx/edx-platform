@@ -7,9 +7,9 @@ from mock import Mock
 
 from rest_framework.test import APITestCase
 from django.conf import settings
-from third_party_auth.api.permissions import ThirdPartyAuthProviderApiPermission
+from common.djangoapps.third_party_auth.api.permissions import ThirdPartyAuthProviderApiPermission
 
-from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin
+from common.djangoapps.third_party_auth.tests.testutil import ThirdPartyAuthTestMixin
 
 IDP_SLUG_TESTSHIB = 'testshib'
 PROVIDER_ID_TESTSHIB = 'saml-' + IDP_SLUG_TESTSHIB

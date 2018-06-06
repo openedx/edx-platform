@@ -12,7 +12,7 @@ from django.core.management import call_command, CommandError
 from provider.oauth2.models import Client
 from edx_oauth2_provider.models import TrustedClient
 from openedx.core.djangoapps.theming.models import SiteTheme
-from student.models import UserProfile
+from common.djangoapps.student.models import UserProfile
 
 SITES = ["site_a", "site_b"]
 MANAGEMENT_COMMAND_PATH = "openedx.core.djangoapps.theming.management.commands.create_sites_and_configurations."

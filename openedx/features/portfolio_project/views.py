@@ -8,7 +8,7 @@ from django.views.decorators.cache import cache_control
 
 from lms.djangoapps.courseware.views.views import CourseTabView
 
-from util.views import ensure_valid_course_key
+from common.djangoapps.util.views import ensure_valid_course_key
 
 from web_fragments.fragment import Fragment
 

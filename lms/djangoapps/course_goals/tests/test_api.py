@@ -8,8 +8,8 @@ from django.urls import reverse
 from django.test.utils import override_settings
 from lms.djangoapps.course_goals.models import CourseGoal
 from rest_framework.test import APIClient
-from student.models import CourseEnrollment
-from track.tests import EventTrackingTestCase
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.track.tests import EventTrackingTestCase
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

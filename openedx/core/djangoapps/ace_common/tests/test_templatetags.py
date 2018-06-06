@@ -16,7 +16,7 @@ from openedx.core.djangoapps.ace_common.templatetags.ace import (
 from openedx.core.djangoapps.ace_common.tests.mixins import QueryStringAssertionMixin
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 @skip_unless_lms

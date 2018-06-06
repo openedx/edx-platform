@@ -14,11 +14,11 @@ from xblock.django.request import django_to_webob_request, webob_to_django_respo
 from xblock.exceptions import NoSuchHandlerError
 from xblock.runtime import KvsFieldData
 
-import static_replace
+import common.djangoapps.static_replace
 from cms.lib.xblock.field_data import CmsFieldData
 from cms.djangoapps.contentstore.utils import get_visibility_partition_info
 from cms.djangoapps.contentstore.views.access import get_user_role
-from edxmako.shortcuts import render_to_string
+from common.djangoapps.edxmako.shortcuts import render_to_string
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.lib.license import wrap_with_license
 from openedx.core.lib.xblock_utils import (
@@ -29,9 +29,9 @@ from openedx.core.lib.xblock_utils import (
     wrap_xblock_aside,
     xblock_local_resource_url
 )
-from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
+from common.djangoapps.util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from cms.djangoapps.xblock_config.models import StudioConfig
-from xblock_django.user_service import DjangoXBlockUserService
+from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError

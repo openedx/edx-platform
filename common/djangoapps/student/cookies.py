@@ -14,7 +14,7 @@ from django.dispatch import Signal
 from django.utils.http import cookie_date
 
 from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewide_block_completed
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 
 CREATE_LOGON_COOKIE = Signal(providing_args=['user', 'response'])
 

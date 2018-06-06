@@ -19,9 +19,9 @@ from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from pyquery import PyQuery as pq
 from six import text_type
-from student.models import CourseEnrollment
-from student.tests.factories import AdminFactory
-from util.date_utils import strftime_localized
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import AdminFactory
+from common.djangoapps.util.date_utils import strftime_localized
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MIXED_MODULESTORE,
     TEST_DATA_SPLIT_MODULESTORE,

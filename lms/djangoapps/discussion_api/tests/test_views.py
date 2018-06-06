@@ -30,9 +30,9 @@ from django_comment_client.tests.utils import ForumsEnableMixin
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_storage
 from openedx.core.djangoapps.user_api.models import RetirementState, UserRetirementStatus
 from openedx.core.lib.token_utils import JwtBuilder
-from student.models import get_retired_username_by_username
-from student.tests.factories import CourseEnrollmentFactory, UserFactory, SuperuserFactory
-from util.testing import PatchMediaTypeMixin, UrlResetMixin
+from common.djangoapps.student.models import get_retired_username_by_username
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory, SuperuserFactory
+from common.djangoapps.util.testing import PatchMediaTypeMixin, UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

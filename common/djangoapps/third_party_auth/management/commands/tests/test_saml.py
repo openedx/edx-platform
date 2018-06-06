@@ -15,7 +15,7 @@ from django.utils.six import StringIO
 from requests import exceptions
 from requests.models import Response
 
-from third_party_auth.tests.factories import SAMLConfigurationFactory, SAMLProviderConfigFactory
+from common.djangoapps.third_party_auth.tests.factories import SAMLConfigurationFactory, SAMLProviderConfigFactory
 
 
 def mock_get(status_code=200):

@@ -27,7 +27,7 @@ from lms.djangoapps.certificates.models import (
 from lms.djangoapps.certificates.queue import XQueueCertInterface
 from eventtracking import tracker
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from util.organizations_helpers import get_course_organization_id
+from common.djangoapps.util.organizations_helpers import get_course_organization_id
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.certificate")

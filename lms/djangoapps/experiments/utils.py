@@ -1,6 +1,6 @@
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from courseware.access import has_staff_access_to_preview_mode
-from course_modes.models import (
+from common.djangoapps.course_modes.models import (
     get_cosmetic_verified_display_price
 )
 from courseware.date_summary import (

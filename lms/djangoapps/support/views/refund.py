@@ -23,7 +23,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.lib.courses import clean_course_id
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from support.decorators import require_support_permission
 
 log = logging.getLogger(__name__)

@@ -5,7 +5,7 @@ Unit tests for stub HTTP server base class.
 import unittest
 import requests
 import json
-from terrain.stubs.http import StubHttpService, StubHttpRequestHandler, require_params
+from common.djangoapps.terrain.stubs.http import StubHttpService, StubHttpRequestHandler, require_params
 
 
 class StubHttpServiceTest(unittest.TestCase):

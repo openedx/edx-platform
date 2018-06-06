@@ -5,7 +5,7 @@ import os
 
 from django.core.management.base import BaseCommand, CommandError
 
-from student.models import UserProfile
+from common.djangoapps.student.models import UserProfile
 
 
 class Command(BaseCommand):

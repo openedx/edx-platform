@@ -5,7 +5,7 @@ import json
 
 from cms.djangoapps.contentstore.signals.signals import GRADING_POLICY_CHANGED
 from eventtracking import tracker
-from track.event_transaction_utils import create_new_event_transaction_id
+from common.djangoapps.track.event_transaction_utils import create_new_event_transaction_id
 from xmodule.modulestore.django import modulestore
 
 GRADING_POLICY_CHANGED_EVENT_TYPE = 'edx.grades.grading_policy_changed'

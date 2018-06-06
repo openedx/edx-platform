@@ -9,10 +9,10 @@ from django.test.utils import override_settings
 from mock import Mock, patch
 from nose.tools import raises
 
-from course_modes.models import CourseMode
-from enrollment import api
-from enrollment.errors import CourseModeNotFoundError, EnrollmentApiLoadError, EnrollmentNotFoundError
-from enrollment.tests import fake_data_api
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.enrollment import api
+from common.djangoapps.enrollment.errors import CourseModeNotFoundError, EnrollmentApiLoadError, EnrollmentNotFoundError
+from common.djangoapps.enrollment.tests import fake_data_api
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 
 

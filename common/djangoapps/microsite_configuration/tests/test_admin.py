@@ -4,9 +4,9 @@ Tests for microsite admin
 from django.contrib.admin.sites import AdminSite
 from django.http import HttpRequest
 
-from microsite_configuration.admin import MicrositeAdmin
-from microsite_configuration.models import Microsite
-from microsite_configuration.tests.tests import DatabaseMicrositeTestCase
+from common.djangoapps.microsite_configuration.admin import MicrositeAdmin
+from common.djangoapps.microsite_configuration.models import Microsite
+from common.djangoapps.microsite_configuration.tests.tests import DatabaseMicrositeTestCase
 
 
 class MicrositeAdminTests(DatabaseMicrositeTestCase):

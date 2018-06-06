@@ -12,12 +12,12 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from pytz import UTC
 from six import text_type
 
-from django_comment_common.models import assign_default_role
-from django_comment_common.utils import seed_permissions_roles
+from common.djangoapps.django_comment_common.models import assign_default_role
+from common.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
-from student import auth
-from student.models import CourseEnrollment
-from student.roles import CourseInstructorRole, CourseStaffRole
+from common.djangoapps.student import auth
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError

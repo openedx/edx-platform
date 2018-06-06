@@ -34,8 +34,8 @@ import lms.djangoapps.instructor_task.api
 from bulk_email.models import BulkEmailFlag, CourseEmail, CourseEmailTemplate
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from courseware.models import StudentFieldOverride, StudentModule
 from courseware.tests.factories import (
     BetaTesterFactory,
@@ -45,8 +45,8 @@ from courseware.tests.factories import (
     UserProfileFactory
 )
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from django_comment_common.models import FORUM_ROLE_COMMUNITY_TA
-from django_comment_common.utils import seed_permissions_roles
+from common.djangoapps.django_comment_common.models import FORUM_ROLE_COMMUNITY_TA
+from common.djangoapps.django_comment_common.utils import seed_permissions_roles
 from lms.djangoapps.instructor.tests.utils import FakeContentTask, FakeEmail, FakeEmailInfo
 from lms.djangoapps.instructor.views.api import (
     _split_input_list,
@@ -75,7 +75,7 @@ from shoppingcart.models import (
     RegistrationCodeRedemption
 )
 from shoppingcart.pdf import PDFInvoice
-from student.models import (
+from common.djangoapps.student.models import (
     ALLOWEDTOENROLL_TO_ENROLLED,
     ALLOWEDTOENROLL_TO_UNENROLLED,
     ENROLLED_TO_ENROLLED,
@@ -90,8 +90,13 @@ from student.models import (
     get_retired_email_by_email,
     get_retired_username_by_username
 )
-from student.roles import CourseBetaTesterRole, CourseFinanceAdminRole, CourseInstructorRole, CourseSalesAdminRole
-from student.tests.factories import AdminFactory, UserFactory
+from common.djangoapps.student.roles import (
+    CourseBetaTesterRole,
+    CourseFinanceAdminRole,
+    CourseInstructorRole,
+    CourseSalesAdminRole,
+)
+from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
 from xmodule.fields import Date
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase

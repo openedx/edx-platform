@@ -26,10 +26,10 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.user_api.models import UserRetirementRequest
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from student.tests.factories import UserFactory
-from student.tests.test_email import mock_render_to_string
-from student.views import SETTING_CHANGE_INITIATED, password_reset, password_reset_confirm_wrapper
-from util.testing import EventTestMixin
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.tests.test_email import mock_render_to_string
+from common.djangoapps.student.views import SETTING_CHANGE_INITIATED, password_reset, password_reset_confirm_wrapper
+from common.djangoapps.util.testing import EventTestMixin
 
 from .test_configuration_overrides import fake_get_value
 

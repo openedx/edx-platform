@@ -26,7 +26,7 @@ from lms.djangoapps.course_goals.models import GOAL_KEY_CHOICES
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_experience import CourseHomeMessages
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 
 
 class CourseHomeMessageFragmentView(EdxFragmentView):

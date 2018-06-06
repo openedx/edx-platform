@@ -40,10 +40,10 @@ from xmodule.video_module.transcripts_utils import Transcript
 
 from cms.djangoapps.contentstore.models import VideoUploadConfig
 from cms.djangoapps.contentstore.utils import reverse_course_url
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
-from util.json_request import JsonResponse, expect_json
+from common.djangoapps.util.json_request import JsonResponse, expect_json
 
 from .course import get_course_and_check_access
 

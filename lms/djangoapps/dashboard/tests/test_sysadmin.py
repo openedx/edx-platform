@@ -21,9 +21,9 @@ from six import text_type
 
 from dashboard.git_import import GitImportErrorNoDir
 from dashboard.models import CourseImportLog
-from student.roles import CourseStaffRole, GlobalStaff
-from student.tests.factories import UserFactory
-from util.date_utils import DEFAULT_DATE_TIME_FORMAT, get_time_display
+from common.djangoapps.student.roles import CourseStaffRole, GlobalStaff
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.util.date_utils import DEFAULT_DATE_TIME_FORMAT, get_time_display
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM

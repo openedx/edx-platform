@@ -4,7 +4,7 @@ Django admin page for microsite models
 from django import forms
 from django.contrib import admin
 
-from util.organizations_helpers import get_organizations
+from common.djangoapps.util.organizations_helpers import get_organizations
 
 from .models import Microsite, MicrositeHistory, MicrositeOrganizationMapping, MicrositeTemplate
 

@@ -21,9 +21,9 @@ import openedx.core.djangoapps.external_auth.views as external_auth_views
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import skip_unless_cms, skip_unless_lms
 from openedx.tests.util import expected_redirect_url
-from student.models import CourseEnrollment
-from student.roles import CourseStaffRole
-from student.tests.factories import UserFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseStaffRole
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

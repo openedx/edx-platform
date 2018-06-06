@@ -16,10 +16,10 @@ from django.conf import settings
 from django.test.utils import override_settings
 from social_django.models import UserSocialAuth
 
-from student.tests.factories import UserFactory
-from third_party_auth.api.permissions import ThirdPartyAuthProviderApiPermission
-from third_party_auth.models import ProviderApiPermissions
-from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.third_party_auth.api.permissions import ThirdPartyAuthProviderApiPermission
+from common.djangoapps.third_party_auth.models import ProviderApiPermissions
+from common.djangoapps.third_party_auth.tests.testutil import ThirdPartyAuthTestMixin
 
 
 VALID_API_KEY = "i am a key"

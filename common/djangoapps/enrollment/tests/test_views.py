@@ -23,11 +23,11 @@ from rest_framework.test import APITestCase
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls_range
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
-from enrollment import api
-from enrollment.errors import CourseEnrollmentError
-from enrollment.views import EnrollmentUserThrottle
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.enrollment import api
+from common.djangoapps.enrollment.errors import CourseEnrollmentError
+from common.djangoapps.enrollment.views import EnrollmentUserThrottle
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.embargo.models import Country, CountryAccessRule, RestrictedCourse
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
@@ -36,11 +36,11 @@ from openedx.core.lib.django_test_client_utils import get_absolute_url
 from openedx.core.lib.token_utils import JwtBuilder
 from openedx.features.enterprise_support.tests import FAKE_ENTERPRISE_CUSTOMER
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
-from student.models import CourseEnrollment
-from student.roles import CourseStaffRole
-from student.tests.factories import AdminFactory, UserFactory, SuperuserFactory
-from util.models import RateLimitConfiguration
-from util.testing import UrlResetMixin
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseStaffRole
+from common.djangoapps.student.tests.factories import AdminFactory, UserFactory, SuperuserFactory
+from common.djangoapps.util.models import RateLimitConfiguration
+from common.djangoapps.util.testing import UrlResetMixin
 
 
 class EnrollmentTestMixin(object):

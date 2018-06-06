@@ -15,7 +15,7 @@ from mock import patch
 
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
-from student.views import create_account
+from common.djangoapps.student.views import create_account
 
 
 @patch.dict("django.conf.settings.FEATURES", {'ENFORCE_PASSWORD_POLICY': True})

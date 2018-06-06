@@ -29,7 +29,7 @@ from shoppingcart.models import (
     PaidCourseRegistration,
     RegistrationCodeRedemption
 )
-from student.models import CourseEnrollment, CourseEnrollmentAllowed
+from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed
 
 STUDENT_FEATURES = ('id', 'username', 'first_name', 'last_name', 'is_staff', 'email')
 PROFILE_FEATURES = ('name', 'language', 'location', 'year_of_birth', 'gender',

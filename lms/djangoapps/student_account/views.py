@@ -17,11 +17,11 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from django_countries import countries
-import third_party_auth
+import common.djangoapps.third_party_auth
 
 from edx_ace import ace
 from edx_ace.recipient import Recipient
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
@@ -50,14 +50,14 @@ from openedx.features.enterprise_support.utils import (
     update_logistration_context_for_enterprise,
     update_account_settings_context_for_enterprise,
 )
-from student.helpers import destroy_oauth_tokens, get_next_url_for_login_page
-from student.message_types import PasswordReset
-from student.models import UserProfile
-from student.views import register_user as old_register_view, signin_user as old_login_view
-from third_party_auth import pipeline
-from third_party_auth.decorators import xframe_allow_whitelisted
-from util.bad_request_rate_limiter import BadRequestRateLimiter
-from util.date_utils import strftime_localized
+from common.djangoapps.student.helpers import destroy_oauth_tokens, get_next_url_for_login_page
+from common.djangoapps.student.message_types import PasswordReset
+from common.djangoapps.student.models import UserProfile
+from common.djangoapps.student.views import register_user as old_register_view, signin_user as old_login_view
+from common.djangoapps.third_party_auth import pipeline
+from common.djangoapps.third_party_auth.decorators import xframe_allow_whitelisted
+from common.djangoapps.util.bad_request_rate_limiter import BadRequestRateLimiter
+from common.djangoapps.util.date_utils import strftime_localized
 
 
 AUDIT_LOG = logging.getLogger("audit")

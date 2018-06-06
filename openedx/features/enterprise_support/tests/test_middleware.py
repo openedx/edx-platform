@@ -13,7 +13,7 @@ from openedx.features.enterprise_support.tests import (
     FAKE_ENTERPRISE_CUSTOMER, FEATURES_WITH_ENTERPRISE_ENABLED,
     factories
 )
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 @override_settings(FEATURES=FEATURES_WITH_ENTERPRISE_ENABLED)

@@ -33,9 +33,9 @@ from email_marketing.tasks import (
     update_course_enrollment,
 )
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
-from student.models import Registration
-from student.tests.factories import UserFactory, UserProfileFactory, CourseEnrollmentFactory
-from util.json_request import JsonResponse
+from common.djangoapps.student.models import Registration
+from common.djangoapps.student.tests.factories import UserFactory, UserProfileFactory, CourseEnrollmentFactory
+from common.djangoapps.util.json_request import JsonResponse
 
 log = logging.getLogger(__name__)
 

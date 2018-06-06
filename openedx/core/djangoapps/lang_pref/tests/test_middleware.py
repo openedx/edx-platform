@@ -18,8 +18,8 @@ from django.utils.translation.trans_real import parse_accept_lang_header
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY, COOKIE_DURATION
 from openedx.core.djangoapps.lang_pref.middleware import LanguagePreferenceMiddleware
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference, get_user_preference, delete_user_preference
-from student.tests.factories import UserFactory
-from student.tests.factories import AnonymousUserFactory
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import AnonymousUserFactory
 
 
 @ddt.ddt

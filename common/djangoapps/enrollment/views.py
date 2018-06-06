@@ -5,14 +5,18 @@ consist primarily of authentication, request validation, and serialization.
 """
 import logging
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.decorators import method_decorator
 from edx_rest_framework_extensions.authentication import JwtAuthentication
-from enrollment import api
-from enrollment.errors import CourseEnrollmentError, CourseEnrollmentExistsError, CourseModeNotFoundError
-from enrollment import (
+from common.djangoapps.enrollment import api
+from common.djangoapps.enrollment.errors import (
+    CourseEnrollmentError,
+    CourseEnrollmentExistsError,
+    CourseModeNotFoundError,
+)
+from common.djangoapps.enrollment import (
     USE_RATE_LIMIT_100_FOR_STAFF_FOR_ENROLLMENT_API,
     USE_RATE_LIMIT_40_FOR_ENROLLMENT_API,
     USE_RATE_LIMIT_400_FOR_STAFF_FOR_ENROLLMENT_API,
@@ -43,10 +47,10 @@ from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
 from six import text_type
-from student.auth import user_has_role
-from student.models import User
-from student.roles import CourseStaffRole, GlobalStaff
-from util.disable_rate_limit import can_disable_rate_limit
+from common.djangoapps.student.auth import user_has_role
+from common.djangoapps.student.models import User
+from common.djangoapps.student.roles import CourseStaffRole, GlobalStaff
+from common.djangoapps.util.disable_rate_limit import can_disable_rate_limit
 
 log = logging.getLogger(__name__)
 REQUIRED_ATTRIBUTES = {

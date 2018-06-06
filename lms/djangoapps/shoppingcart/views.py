@@ -27,9 +27,9 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from courseware.courses import get_course_by_id
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from shoppingcart.reports import (
@@ -38,10 +38,15 @@ from shoppingcart.reports import (
     RefundReport,
     UniversityRevenueShareReport
 )
-from student.models import AlreadyEnrolledError, CourseEnrollment, CourseFullError, EnrollmentClosedError
-from util.bad_request_rate_limiter import BadRequestRateLimiter
-from util.date_utils import get_default_time_display
-from util.json_request import JsonResponse
+from common.djangoapps.student.models import (
+    AlreadyEnrolledError,
+    CourseEnrollment,
+    CourseFullError,
+    EnrollmentClosedError,
+)
+from common.djangoapps.util.bad_request_rate_limiter import BadRequestRateLimiter
+from common.djangoapps.util.date_utils import get_default_time_display
+from common.djangoapps.util.json_request import JsonResponse
 
 from .decorators import enforce_shopping_cart_enabled
 from .exceptions import (

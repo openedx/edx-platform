@@ -8,10 +8,10 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.forms import models
 
-from student.tests.factories import UserFactory
-from third_party_auth.admin import OAuth2ProviderConfigAdmin
-from third_party_auth.models import OAuth2ProviderConfig
-from third_party_auth.tests import testutil
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.third_party_auth.admin import OAuth2ProviderConfigAdmin
+from common.djangoapps.third_party_auth.models import OAuth2ProviderConfig
+from common.djangoapps.third_party_auth.tests import testutil
 
 
 # This is necessary because cms does not implement third party auth

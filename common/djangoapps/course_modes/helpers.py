@@ -1,8 +1,12 @@
 """ Helper methods for CourseModes. """
 from django.utils.translation import ugettext_lazy as _
 
-from course_modes.models import CourseMode
-from student.helpers import VERIFY_STATUS_APPROVED, VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.helpers import (
+    VERIFY_STATUS_APPROVED,
+    VERIFY_STATUS_NEED_TO_VERIFY,
+    VERIFY_STATUS_SUBMITTED,
+)
 
 DISPLAY_VERIFIED = "verified"
 DISPLAY_HONOR = "honor"

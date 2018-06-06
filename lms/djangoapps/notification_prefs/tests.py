@@ -12,8 +12,8 @@ from mock import Mock, patch
 from notification_prefs import NOTIFICATION_PREF_KEY
 from notification_prefs.views import UsernameCipher, ajax_disable, ajax_enable, ajax_status, set_subscription
 from openedx.core.djangoapps.user_api.models import UserPreference
-from student.tests.factories import UserFactory
-from util.testing import UrlResetMixin
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.util.testing import UrlResetMixin
 
 
 @override_settings(SECRET_KEY="test secret key")

@@ -7,8 +7,8 @@ from rest_framework.reverse import reverse
 
 from lms.djangoapps.certificates.api import certificate_downloadable_status
 from courseware.access import has_access
-from student.models import CourseEnrollment, User
-from util.course import get_encoded_course_sharing_utm_params, get_link_for_about_page
+from common.djangoapps.student.models import CourseEnrollment, User
+from common.djangoapps.util.course import get_encoded_course_sharing_utm_params, get_link_for_about_page
 
 
 class CourseOverviewField(serializers.RelatedField):

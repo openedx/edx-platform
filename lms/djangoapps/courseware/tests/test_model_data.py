@@ -27,7 +27,7 @@ from courseware.tests.factories import (
     course_id,
     location
 )
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 def mock_field(scope, name):

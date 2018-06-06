@@ -16,7 +16,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.user_api import errors
 from openedx.core.djangoapps.user_api.models import RetirementState, UserRetirementStatus, UserPreference
 from openedx.core.djangoapps.user_api.serializers import ReadOnlyFieldsSerializerMixin
-from student.models import UserProfile, LanguageProficiency, SocialLink
+from common.djangoapps.student.models import UserProfile, LanguageProficiency, SocialLink
 
 from . import (
     NAME_MIN_LENGTH, ACCOUNT_VISIBILITY_PREF_KEY, PRIVATE_VISIBILITY,

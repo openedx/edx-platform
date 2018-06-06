@@ -17,7 +17,7 @@ from mock import patch
 from nose.plugins.attrib import attr
 
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from student.models import PasswordHistory
+from common.djangoapps.student.models import PasswordHistory
 
 
 @attr(shard=1)

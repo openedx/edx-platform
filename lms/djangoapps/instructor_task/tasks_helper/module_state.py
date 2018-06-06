@@ -16,9 +16,9 @@ from courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from courseware.models import StudentModule
 from courseware.module_render import get_module_for_descriptor_internal
 from lms.djangoapps.grades.events import GRADES_OVERRIDE_EVENT_TYPE, GRADES_RESCORE_EVENT_TYPE
-from track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
-from track.views import task_track
-from util.db import outer_atomic
+from common.djangoapps.track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
+from common.djangoapps.track.views import task_track
+from common.djangoapps.util.db import outer_atomic
 
 from xblock.runtime import KvsFieldData
 from xblock.scorable import Score

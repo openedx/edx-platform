@@ -9,11 +9,11 @@ from lettuce import step, world
 from nose.tools import assert_in, assert_true
 from selenium.webdriver.common.keys import Keys
 
-from student import auth
-from student.models import get_user
-from student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
-from student.tests.factories import AdminFactory
-from terrain.browser import reset_data
+from common.djangoapps.student import auth
+from common.djangoapps.student.models import get_user
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
+from common.djangoapps.student.tests.factories import AdminFactory
+from common.djangoapps.terrain.browser import reset_data
 
 logger = getLogger(__name__)
 

@@ -51,25 +51,25 @@ from user_util import user_util
 
 import dogstats_wrapper as dog_stats_api
 import lms.lib.comment_client as cc
-from student.signals import UNENROLL_DONE, ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED
+from common.djangoapps.student.signals import UNENROLL_DONE, ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED
 from lms.djangoapps.certificates.models import GeneratedCertificate
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from courseware.models import (
     CourseDynamicUpgradeDeadlineConfiguration,
     DynamicUpgradeDeadlineConfiguration,
     OrgDynamicUpgradeDeadlineConfiguration
 )
-from enrollment.api import _default_course_mode
+from common.djangoapps.enrollment.api import _default_course_mode
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.request_cache import clear_cache, get_cache
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
-from track import contexts
-from util.milestones_helpers import is_entrance_exams_enabled
-from util.model_utils import emit_field_changed_events, get_changed_fields_dict
-from util.query import use_read_replica_if_available
+from common.djangoapps.track import contexts
+from common.djangoapps.util.milestones_helpers import is_entrance_exams_enabled
+from common.djangoapps.util.model_utils import emit_field_changed_events, get_changed_fields_dict
+from common.djangoapps.util.query import use_read_replica_if_available
 
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
@@ -1074,7 +1074,7 @@ class CourseEnrollmentManager(models.Manager):
 
         """
         # To avoid circular imports.
-        from student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
+        from common.djangoapps.student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
         course_locator = course_id
 
         if getattr(course_id, 'ccx', None):

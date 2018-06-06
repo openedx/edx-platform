@@ -7,8 +7,8 @@ import logging
 
 from django.conf import settings
 
-from track.backends import BaseBackend
-from track.utils import DateTimeJSONEncoder
+from common.djangoapps.track.backends import BaseBackend
+from common.djangoapps.track.utils import DateTimeJSONEncoder
 
 log = logging.getLogger('track.backends.logger')
 application_log = logging.getLogger('track.backends.application_log')  # pylint: disable=invalid-name

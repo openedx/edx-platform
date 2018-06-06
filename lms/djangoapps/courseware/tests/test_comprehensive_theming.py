@@ -5,7 +5,7 @@ from django.contrib import staticfiles
 from django.test import TestCase
 from path import Path
 
-import edxmako
+import common.djangoapps.edxmako
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.core.lib.tempdir import create_symlink, delete_symlink, mkdtemp_clean
 

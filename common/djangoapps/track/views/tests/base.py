@@ -8,8 +8,8 @@ from mock import sentinel
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 
-from track.views import segmentio
-from track.tests import EventTrackingTestCase
+from common.djangoapps.track.views import segmentio
+from common.djangoapps.track.tests import EventTrackingTestCase
 
 
 SEGMENTIO_TEST_SECRET = 'anything'

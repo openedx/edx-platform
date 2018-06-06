@@ -34,12 +34,12 @@ from lms.djangoapps.certificates.models import (
     GeneratedCertificate
 )
 from class_dashboard.dashboard_data import get_array_section_has_problem, get_section_display_name
-from course_modes.models import CourseMode, CourseModesArchive
+from common.djangoapps.course_modes.models import CourseMode, CourseModesArchive
 from courseware.access import has_access
 from courseware.courses import get_course_by_id, get_studio_url
 from django_comment_client.utils import available_division_schemes, has_forum_access
-from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, CourseDiscussionSettings
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, CourseDiscussionSettings
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
 from openedx.core.djangoapps.course_groups.cohorts import DEFAULT_COHORT_NAME, get_course_cohorts, is_course_cohorted
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -48,9 +48,14 @@ from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.url_utils import quote_slashes
 from openedx.core.lib.xblock_utils import wrap_xblock
 from shoppingcart.models import Coupon, CourseRegCodeItem, PaidCourseRegistration
-from student.models import CourseEnrollment
-from student.roles import CourseFinanceAdminRole, CourseSalesAdminRole, CourseStaffRole, CourseInstructorRole
-from util.json_request import JsonResponse
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import (
+    CourseFinanceAdminRole,
+    CourseSalesAdminRole,
+    CourseStaffRole,
+    CourseInstructorRole,
+)
+from common.djangoapps.util.json_request import JsonResponse
 from xmodule.html_module import HtmlDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTab

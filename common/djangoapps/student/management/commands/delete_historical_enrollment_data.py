@@ -3,7 +3,7 @@ Command to delete all rows from the student_historicalcourseenrollment table.
 """
 
 import logging
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.util.row_delete import delete_rows, BaseDeletionCommand
 log = logging.getLogger(__name__)
 

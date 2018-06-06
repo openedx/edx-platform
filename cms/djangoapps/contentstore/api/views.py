@@ -16,7 +16,7 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from user_tasks.models import UserTaskStatus
 
-from student.auth import has_course_author_access
+from common.djangoapps.student.auth import has_course_author_access
 
 from cms.djangoapps.contentstore.storage import course_import_export_storage
 from cms.djangoapps.contentstore.tasks import CourseImportTask, import_olx

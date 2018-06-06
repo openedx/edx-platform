@@ -7,7 +7,7 @@ from django.core.management import call_command
 from django.test import TestCase
 from oauth2_provider.models import get_application_model
 
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 from ..create_dot_application import Command
 

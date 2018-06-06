@@ -10,7 +10,7 @@ from django.dispatch import receiver
 
 from openedx.core.djangoapps.commerce.utils import is_commerce_service_configured
 from openedx.core.djangoapps.request_cache.middleware import RequestCache
-from student.signals import REFUND_ORDER
+from common.djangoapps.student.signals import REFUND_ORDER
 from .utils import refund_seat
 
 log = logging.getLogger(__name__)

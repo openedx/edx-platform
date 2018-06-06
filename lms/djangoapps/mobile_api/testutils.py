@@ -25,8 +25,8 @@ from courseware.access_response import MobileAvailabilityError, StartDateError, 
 from courseware.tests.factories import UserFactory
 from mobile_api.models import IgnoreMobileAvailableFlagConfig
 from mobile_api.tests.test_milestones import MobileAPIMilestonesMixin
-from student import auth
-from student.models import CourseEnrollment
+from common.djangoapps.student import auth
+from common.djangoapps.student.models import CourseEnrollment
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

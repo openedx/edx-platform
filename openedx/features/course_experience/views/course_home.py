@@ -11,7 +11,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from web_fragments.fragment import Fragment
 
-from course_modes.models import get_cosmetic_verified_display_price
+from common.djangoapps.course_modes.models import get_cosmetic_verified_display_price
 from courseware.access import has_access
 from courseware.courses import can_self_enroll_in_course, get_course_info_section, get_course_with_access
 from lms.djangoapps.commerce.utils import EcommerceService
@@ -26,8 +26,8 @@ from lms.djangoapps.courseware.views.views import CourseTabView
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.util.maintenance_banner import add_maintenance_banner
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
-from student.models import CourseEnrollment
-from util.views import ensure_valid_course_key
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.util.views import ensure_valid_course_key
 
 from .. import LATEST_UPDATE_FLAG, SHOW_UPGRADE_MSG_ON_COURSE_HOME, USE_BOOTSTRAP_FLAG
 from ..utils import get_course_outline_block_tree, get_resume_block

@@ -1,6 +1,6 @@
 from cms.djangoapps.contentstore.course_group_config import GroupConfiguration
 from django.conf import settings
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from django.core.management.base import BaseCommand, CommandError
 
 from openedx.core.djangoapps.course_groups.cohorts import CourseCohort

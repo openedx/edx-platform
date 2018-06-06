@@ -7,7 +7,7 @@ from provider.oauth2.models import Client
 from social_core.backends.facebook import FacebookOAuth2, API_VERSION as FACEBOOK_API_VERSION
 from social_django.models import UserSocialAuth, Partial
 
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 from .testutil import ThirdPartyAuthTestMixin
 

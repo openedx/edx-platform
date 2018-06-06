@@ -10,7 +10,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.lib.courses import clean_course_id
-from student.models import (
+from common.djangoapps.student.models import (
     CourseAccessRole,
     CourseEnrollment,
     CourseEnrollmentAllowed,
@@ -23,7 +23,7 @@ from student.models import (
     UserProfile,
     UserTestGroup
 )
-from student.roles import REGISTERED_ACCESS_ROLES
+from common.djangoapps.student.roles import REGISTERED_ACCESS_ROLES
 from xmodule.modulestore.django import modulestore
 
 User = get_user_model()  # pylint:disable=invalid-name

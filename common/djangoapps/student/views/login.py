@@ -38,9 +38,9 @@ from social_core.exceptions import AuthAlreadyAssociated, AuthException
 from social_django import utils as social_utils
 
 import openedx.core.djangoapps.external_auth.views
-import third_party_auth
-from django_comment_common.models import assign_role
-from edxmako.shortcuts import render_to_response, render_to_string
+import common.djangoapps.third_party_auth
+from common.djangoapps.django_comment_common.models import assign_role
+from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_string
 from eventtracking import tracker
 from openedx.core.djangoapps.external_auth.login_and_register import login as external_auth_login
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
@@ -49,16 +49,16 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.user_api.accounts.utils import generate_password
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.features.course_experience import course_home_url_name
-from student.cookies import delete_logged_in_cookies, set_logged_in_cookies
-from student.forms import AccountCreationForm
-from student.helpers import (
+from common.djangoapps.student.cookies import delete_logged_in_cookies, set_logged_in_cookies
+from common.djangoapps.student.forms import AccountCreationForm
+from common.djangoapps.student.helpers import (
     AccountValidationError,
     auth_pipeline_urls,
     create_or_set_user_attribute_created_on_site,
     generate_activation_email_context,
     get_next_url_for_login_page
 )
-from student.models import (
+from common.djangoapps.student.models import (
     CourseAccessRole,
     CourseEnrollment,
     LoginFailures,
@@ -68,9 +68,9 @@ from student.models import (
     anonymous_id_for_user,
     create_comments_service_user
 )
-from student.helpers import authenticate_new_user, do_create_account
-from third_party_auth import pipeline, provider
-from util.json_request import JsonResponse
+from common.djangoapps.student.helpers import authenticate_new_user, do_create_account
+from common.djangoapps.third_party_auth import pipeline, provider
+from common.djangoapps.util.json_request import JsonResponse
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")

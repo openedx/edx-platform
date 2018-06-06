@@ -6,12 +6,12 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from mako.template import Template
 
-from microsite_configuration.backends.base import BaseMicrositeBackend, BaseMicrositeTemplateBackend
-from microsite_configuration.microsite import get_value as microsite_get_value
-from microsite_configuration.models import Microsite, MicrositeOrganizationMapping, MicrositeTemplate
-from util.cache import cache
-from util.memcache import fasthash
-from util.url import strip_port_from_host
+from common.djangoapps.microsite_configuration.backends.base import BaseMicrositeBackend, BaseMicrositeTemplateBackend
+from common.djangoapps.microsite_configuration.microsite import get_value as microsite_get_value
+from common.djangoapps.microsite_configuration.models import Microsite, MicrositeOrganizationMapping, MicrositeTemplate
+from common.djangoapps.util.cache import cache
+from common.djangoapps.util.memcache import fasthash
+from common.djangoapps.util.url import strip_port_from_host
 
 
 class DatabaseMicrositeBackend(BaseMicrositeBackend):

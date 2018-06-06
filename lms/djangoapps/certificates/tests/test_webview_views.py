@@ -30,7 +30,7 @@ from lms.djangoapps.certificates.tests.factories import (
     GeneratedCertificateFactory,
     LinkedInAddToProfileConfigurationFactory
 )
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.badges.events.course_complete import get_completion_badge
 from lms.djangoapps.badges.tests.factories import (
     BadgeAssertionFactory,
@@ -43,11 +43,11 @@ from openedx.core.djangoapps.certificates.config import waffle
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.lib.tests.assertions.events import assert_event_matches
 from openedx.core.djangolib.js_utils import js_escaped_string
-from student.roles import CourseStaffRole
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from track.tests import EventTrackingTestCase
-from util import organizations_helpers as organizations_api
-from util.date_utils import strftime_localized
+from common.djangoapps.student.roles import CourseStaffRole
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.track.tests import EventTrackingTestCase
+from common.djangoapps.util import organizations_helpers as organizations_api
+from common.djangoapps.util.date_utils import strftime_localized
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

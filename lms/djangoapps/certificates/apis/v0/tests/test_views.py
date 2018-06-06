@@ -12,8 +12,8 @@ from rest_framework.test import APITestCase
 
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
-from course_modes.models import CourseMode
-from student.tests.factories import UserFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

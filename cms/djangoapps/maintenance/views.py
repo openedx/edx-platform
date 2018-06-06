@@ -13,9 +13,9 @@ from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
 from cms.djangoapps.contentstore.management.commands.utils import get_course_versions
-from edxmako.shortcuts import render_to_response
-from util.json_request import JsonResponse
-from util.views import require_global_staff
+from common.djangoapps.edxmako.shortcuts import render_to_response
+from common.djangoapps.util.json_request import JsonResponse
+from common.djangoapps.util.views import require_global_staff
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError

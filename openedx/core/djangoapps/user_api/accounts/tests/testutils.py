@@ -7,7 +7,7 @@ from openedx.core.djangoapps.user_api.accounts import (
     USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH,
     EMAIL_MAX_LENGTH,
 )
-from util.password_policy_validators import password_max_length, password_min_length
+from common.djangoapps.util.password_policy_validators import password_max_length, password_min_length
 
 
 INVALID_NAMES = [

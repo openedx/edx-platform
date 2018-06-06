@@ -14,7 +14,7 @@ from six import text_type
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.accounts.tests import testutils
 from openedx.core.lib.api import test_utils
-from util.password_policy_validators import password_max_length, password_min_length
+from common.djangoapps.util.password_policy_validators import password_max_length, password_min_length
 
 
 @ddt.ddt

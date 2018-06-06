@@ -8,8 +8,8 @@ import ddt
 from mock import patch
 from pytz import UTC
 
-from course_modes.models import CourseMode
-from course_modes.signals import _listen_for_course_publish
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.signals import _listen_for_course_publish
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

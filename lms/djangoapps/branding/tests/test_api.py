@@ -9,7 +9,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 
 from branding.api import get_footer, get_home_url, get_logo_url
-from edxmako.shortcuts import marketing_link
+from common.djangoapps.edxmako.shortcuts import marketing_link
 
 
 class TestHeader(TestCase):

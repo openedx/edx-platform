@@ -1,6 +1,6 @@
 from factory.django import DjangoModelFactory
 
-from django_comment_common.models import Permission, Role
+from common.djangoapps.django_comment_common.models import Permission, Role
 
 
 class RoleFactory(DjangoModelFactory):

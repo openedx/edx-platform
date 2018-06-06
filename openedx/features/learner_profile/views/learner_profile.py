@@ -11,7 +11,7 @@ from django.shortcuts import render_to_response
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
 from django_countries import countries
-from edxmako.shortcuts import marketing_link
+from common.djangoapps.edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.credentials.utils import get_credentials_records_url
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -20,7 +20,7 @@ from openedx.core.djangoapps.user_api.errors import UserNotAuthorized, UserNotFo
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangolib.markup import HTML, Text
-from student.models import User
+from common.djangoapps.student.models import User
 
 from .. import SHOW_PROFILE_MESSAGE
 

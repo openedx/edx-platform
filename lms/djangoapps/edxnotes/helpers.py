@@ -25,8 +25,8 @@ from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 from edxnotes.plugins import EdxNotesTab
 from lms.lib.utils import get_parent_unit
 from openedx.core.lib.token_utils import JwtBuilder
-from student.models import anonymous_id_for_user
-from util.date_utils import get_default_time_display
+from common.djangoapps.student.models import anonymous_id_for_user
+from common.djangoapps.util.date_utils import get_default_time_display
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 

@@ -18,8 +18,8 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import utc
 from requests.exceptions import ConnectionError, Timeout
 
-from course_modes.models import CourseMode
-from entitlements.models import CourseEntitlement
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.entitlements.models import CourseEntitlement
 from lms.djangoapps.certificates import api as certificate_api
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import has_access
@@ -29,8 +29,8 @@ from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credentials.utils import get_credentials
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from student.models import CourseEnrollment
-from util.date_utils import strftime_localized
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.util.date_utils import strftime_localized
 from xmodule.modulestore.django import modulestore
 
 # The datetime module's strftime() methods require a year >= 1900.

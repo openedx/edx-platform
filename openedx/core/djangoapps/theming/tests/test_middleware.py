@@ -6,7 +6,7 @@ from django.contrib.messages.middleware import MessageMiddleware
 from django.test import RequestFactory, TestCase, override_settings
 from django.contrib.sites.models import Site
 from openedx.core.djangoapps.theming.middleware import CurrentSiteThemeMiddleware
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 from ..views import set_user_preview_site_theme
 

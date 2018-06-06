@@ -2,7 +2,7 @@
 Common comment client utility functions.
 """
 
-from django_comment_common.models import (
+from common.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_GROUP_MODERATOR,

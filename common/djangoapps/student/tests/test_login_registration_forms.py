@@ -7,8 +7,8 @@ from django.conf import settings
 from django.urls import reverse
 from mock import patch
 
-from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin
-from util.testing import UrlResetMixin
+from common.djangoapps.third_party_auth.tests.testutil import ThirdPartyAuthTestMixin
+from common.djangoapps.util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

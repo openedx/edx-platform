@@ -38,7 +38,7 @@ from xblock.fields import ScopeIds
 from xblock.runtime import Runtime
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from courseware import module_render as render
 from courseware.courses import get_course_info_section, get_course_with_access
 from courseware.field_overrides import OverrideFieldData
@@ -60,9 +60,9 @@ from openedx.core.djangoapps.credit.models import CreditCourse
 from openedx.core.lib.courses import course_image_url
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.url_utils import quote_slashes
-from student.models import anonymous_id_for_user
+from common.djangoapps.student.models import anonymous_id_for_user
 from verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
-from xblock_django.models import XBlockConfiguration
+from common.djangoapps.xblock_django.models import XBlockConfiguration
 from xmodule.lti_module import LTIDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore

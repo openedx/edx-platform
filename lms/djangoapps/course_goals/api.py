@@ -8,7 +8,7 @@ from opaque_keys.edx.keys import CourseKey
 from django.conf import settings
 from rest_framework.reverse import reverse
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from openedx.features.course_experience import ENABLE_COURSE_GOALS
 
 

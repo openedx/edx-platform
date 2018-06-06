@@ -42,8 +42,8 @@ from wiki.models.pluginbase import RevisionPluginRevision, RevisionPlugin
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
-from entitlements.models import CourseEntitlementSupportDetail
-from entitlements.tests.factories import CourseEntitlementFactory
+from common.djangoapps.entitlements.models import CourseEntitlementSupportDetail
+from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
 from openedx.core.djangoapps.credit.models import (
@@ -58,7 +58,7 @@ from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.token_utils import JwtBuilder
 from survey.models import SurveyAnswer
-from student.models import (
+from common.djangoapps.student.models import (
     CourseEnrollment,
     CourseEnrollmentAllowed,
     ManualEnrollmentAudit,
@@ -71,7 +71,7 @@ from student.models import (
     get_retired_username_by_username,
     get_retired_email_by_email,
 )
-from student.tests.factories import (
+from common.djangoapps.student.tests.factories import (
     TEST_PASSWORD,
     ContentTypeFactory,
     CourseEnrollmentAllowedFactory,

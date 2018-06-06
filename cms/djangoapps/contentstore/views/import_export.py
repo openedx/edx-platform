@@ -29,10 +29,10 @@ from wsgiref.util import FileWrapper
 from cms.djangoapps.contentstore.storage import course_import_export_storage
 from cms.djangoapps.contentstore.tasks import CourseExportTask, CourseImportTask, export_olx, import_olx
 from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_library_url
-from edxmako.shortcuts import render_to_response
-from student.auth import has_course_author_access
-from util.json_request import JsonResponse
-from util.views import ensure_valid_course_key
+from common.djangoapps.edxmako.shortcuts import render_to_response
+from common.djangoapps.student.auth import has_course_author_access
+from common.djangoapps.util.json_request import JsonResponse
+from common.djangoapps.util.views import ensure_valid_course_key
 from xmodule.modulestore.django import modulestore
 
 __all__ = [

@@ -3,7 +3,7 @@ Serializers for use in the support app.
 """
 from rest_framework import serializers
 
-from student.models import ManualEnrollmentAudit
+from common.djangoapps.student.models import ManualEnrollmentAudit
 
 
 class ManualEnrollmentSerializer(serializers.ModelSerializer):

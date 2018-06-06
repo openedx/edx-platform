@@ -25,9 +25,9 @@ from courseware.tests.factories import StudentModuleFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.testutils import FieldOverrideTestMixin
 from django_comment_client.utils import has_forum_access
-from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
-from django_comment_common.utils import are_permissions_roles_seeded
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
+from common.djangoapps.django_comment_common.utils import are_permissions_roles_seeded
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import get_override_for_ccx, override_field_for_ccx
 from lms.djangoapps.ccx.tests.factories import CcxFactory
@@ -38,9 +38,9 @@ from lms.djangoapps.grades.tasks import compute_all_grades_for_course
 from lms.djangoapps.instructor.access import allow_access, list_with_level
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.request_cache.middleware import RequestCache
-from student.models import CourseEnrollment, CourseEnrollmentAllowed
-from student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
-from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed
+from common.djangoapps.student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
+from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (

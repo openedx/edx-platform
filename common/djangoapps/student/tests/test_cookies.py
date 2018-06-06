@@ -7,9 +7,9 @@ from django.urls import reverse
 from django.test import RequestFactory
 
 from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewide_block_completed
-from student.cookies import get_user_info_cookie_data
-from student.models import CourseEnrollment
-from student.tests.factories import UserFactory
+from common.djangoapps.student.cookies import get_user_info_cookie_data
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

@@ -12,7 +12,7 @@ from pytz import UTC
 from courseware.access_response import AccessResponse, StartDateError
 from courseware.masquerade import is_masquerading_as_student
 from openedx.features.course_experience import COURSE_PRE_START_ACCESS_FLAG
-from student.roles import CourseBetaTesterRole
+from common.djangoapps.student.roles import CourseBetaTesterRole
 from xmodule.util.django import get_current_request_hostname
 
 DEBUG_ACCESS = False

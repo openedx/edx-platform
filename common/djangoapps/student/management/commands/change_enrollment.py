@@ -8,7 +8,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
-from student.models import CourseEnrollment, User
+from common.djangoapps.student.models import CourseEnrollment, User
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 

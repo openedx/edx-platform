@@ -12,7 +12,7 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import AssetLocation
 
 from cms.djangoapps.contentstore.utils import reverse_url
-from student.models import Registration
+from common.djangoapps.student.models import Registration
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.inheritance import own_metadata

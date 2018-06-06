@@ -29,8 +29,8 @@ from openedx.core.djangoapps.credit.tests.factories import (
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.core.lib.token_utils import JwtBuilder
-from student.tests.factories import UserFactory, AdminFactory
-from util.date_utils import to_timestamp
+from common.djangoapps.student.tests.factories import UserFactory, AdminFactory
+from common.djangoapps.util.date_utils import to_timestamp
 
 JSON = 'application/json'
 

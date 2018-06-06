@@ -12,9 +12,9 @@ from django.test.client import RequestFactory
 from django.utils.timezone import now
 from opaque_keys.edx.keys import CourseKey
 
-from course_modes.helpers import CourseMode
-from course_modes.tests.factories import CourseModeFactory
-from entitlements.tests.factories import CourseEntitlementFactory
+from common.djangoapps.course_modes.helpers import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
 from openedx.core.constants import COURSE_UNPUBLISHED
 from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL, SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
@@ -38,7 +38,7 @@ from openedx.core.djangoapps.catalog.utils import (
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 UTILS_MODULE = 'openedx.core.djangoapps.catalog.utils'
 User = get_user_model()  # pylint: disable=invalid-name

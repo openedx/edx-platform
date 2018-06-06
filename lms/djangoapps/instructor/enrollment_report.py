@@ -8,7 +8,7 @@ import json
 
 from django.contrib.auth.models import User
 
-from student.models import UserProfile
+from common.djangoapps.student.models import UserProfile
 
 
 class AbstractEnrollmentReportProvider(object):

@@ -10,7 +10,7 @@ from lxml import etree
 from onelogin.saml2.errors import OneLogin_Saml2_Error
 
 # Define some XML namespaces:
-from third_party_auth.tasks import SAML_XML_NS
+from common.djangoapps.third_party_auth.tasks import SAML_XML_NS
 
 from .testutil import AUTH_FEATURE_ENABLED, AUTH_FEATURES_KEY, SAMLTestCase
 

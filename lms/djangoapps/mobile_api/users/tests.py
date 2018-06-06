@@ -17,7 +17,7 @@ from nose.plugins.attrib import attr
 from lms.djangoapps.certificates.api import generate_user_certificates
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from courseware.access_response import MilestoneAccessError, StartDateError, VisibilityError
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from mobile_api.testutils import (
@@ -27,9 +27,9 @@ from mobile_api.testutils import (
     MobileCourseAccessTestMixin
 )
 from openedx.core.lib.courses import course_image_url
-from student.models import CourseEnrollment
-from util.milestones_helpers import set_prerequisite_courses
-from util.testing import UrlResetMixin
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.util.milestones_helpers import set_prerequisite_courses
+from common.djangoapps.util.testing import UrlResetMixin
 from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 

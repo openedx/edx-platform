@@ -16,7 +16,7 @@ from mock import MagicMock, Mock, patch
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import i4xEncoder
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from courseware.models import StudentModule
 from courseware.tests.factories import StudentModuleFactory
 from lms.djangoapps.instructor_task.exceptions import UpdateProblemModuleStateError

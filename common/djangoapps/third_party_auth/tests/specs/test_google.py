@@ -8,9 +8,9 @@ import json
 from mock import patch
 from openedx.tests.util import expected_redirect_url
 from social_core.exceptions import AuthException
-from student.tests.factories import UserFactory
-from third_party_auth import pipeline
-from third_party_auth.tests.specs import base
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.third_party_auth import pipeline
+from common.djangoapps.third_party_auth.tests.specs import base
 
 
 class GoogleOauth2IntegrationTest(base.Oauth2IntegrationTest):

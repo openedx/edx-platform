@@ -5,10 +5,10 @@ Dashboard with Shopping Cart History tests with configuration overrides.
 from django.urls import reverse
 from mock import patch
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from shoppingcart.models import CertificateItem, Donation, Order, PaidCourseRegistration
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

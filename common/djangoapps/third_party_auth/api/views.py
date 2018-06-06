@@ -16,10 +16,10 @@ from openedx.core.lib.api.authentication import (
     SessionAuthenticationAllowInactiveUser
 )
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
-from third_party_auth import pipeline
-from third_party_auth.api import serializers
-from third_party_auth.api.permissions import ThirdPartyAuthProviderApiPermission
-from third_party_auth.provider import Registry
+from common.djangoapps.third_party_auth import pipeline
+from common.djangoapps.third_party_auth.api import serializers
+from common.djangoapps.third_party_auth.api.permissions import ThirdPartyAuthProviderApiPermission
+from common.djangoapps.third_party_auth.provider import Registry
 
 
 class UserView(APIView):

@@ -24,13 +24,13 @@ from social_django import views as social_views
 from lms.djangoapps.commerce.tests import TEST_API_URL
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.tests.util import expected_redirect_url
-from student import models as student_models
-from student import views as student_views
-from student.tests.factories import UserFactory
+from common.djangoapps.student import models as student_models
+from common.djangoapps.student import views as student_views
+from common.djangoapps.student.tests.factories import UserFactory
 from student_account.views import account_settings_context
 
-from third_party_auth import middleware, pipeline
-from third_party_auth.tests import testutil
+from common.djangoapps.third_party_auth import middleware, pipeline
+from common.djangoapps.third_party_auth.tests import testutil
 
 
 class IntegrationTestMixin(object):

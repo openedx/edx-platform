@@ -9,7 +9,7 @@ from jwkest.jwk import KEYS, RSAKey
 from jwkest.jws import JWS
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from student.models import UserProfile, anonymous_id_for_user
+from common.djangoapps.student.models import UserProfile, anonymous_id_for_user
 
 
 class JwtBuilder(object):

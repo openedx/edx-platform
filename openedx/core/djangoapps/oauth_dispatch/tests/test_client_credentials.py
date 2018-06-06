@@ -10,7 +10,7 @@ from django.test import TestCase
 from edx_oauth2_provider.tests.factories import ClientFactory
 from oauth2_provider.models import Application
 from provider.oauth2.models import AccessToken
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 from . import mixins
 from .constants import DUMMY_REDIRECT_URL

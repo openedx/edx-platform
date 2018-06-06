@@ -30,8 +30,8 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
-from course_modes.models import CourseMode
-from edxmako.shortcuts import render_to_response, render_to_string
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_string
 from email_marketing.models import EmailMarketingConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService, is_account_activation_requirement_disabled
 from lms.djangoapps.verify_student.image import InvalidImageData, decode_image_data
@@ -48,9 +48,9 @@ from openedx.core.djangoapps.user_api.errors import AccountValidationError, User
 from openedx.core.lib.log_utils import audit_log
 from shoppingcart.models import CertificateItem, Order
 from shoppingcart.processors import get_purchase_endpoint, get_signed_purchase_params
-from student.models import CourseEnrollment
-from util.db import outer_atomic
-from util.json_request import JsonResponse
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.util.db import outer_atomic
+from common.djangoapps.util.json_request import JsonResponse
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)

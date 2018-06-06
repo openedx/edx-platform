@@ -35,7 +35,7 @@ from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
 from xblock.reference.plugins import FSService
 from xblock.runtime import KvsFieldData
 
-import static_replace
+import common.djangoapps.static_replace
 from capa.xqueue_interface import XQueueInterface
 from courseware.access import get_user_role, has_access
 from courseware.entrance_exams import user_can_skip_entrance_exam, user_has_passed_entrance_exam
@@ -46,7 +46,7 @@ from courseware.masquerade import (
     setup_masquerade
 )
 from courseware.model_data import DjangoKeyValueStore, FieldDataCache
-from edxmako.shortcuts import render_to_string
+from common.djangoapps.edxmako.shortcuts import render_to_string
 from eventtracking import tracker
 from lms.djangoapps.grades.signals.signals import SCORE_PUBLISHED
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
@@ -69,13 +69,13 @@ from openedx.core.lib.xblock_utils import (
     replace_static_urls,
     wrap_xblock
 )
-from student.models import anonymous_id_for_user, user_by_anonymous_id
-from student.roles import CourseBetaTesterRole
-from track import contexts
-from util import milestones_helpers
-from util.json_request import JsonResponse
-from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
-from xblock_django.user_service import DjangoXBlockUserService
+from common.djangoapps.student.models import anonymous_id_for_user, user_by_anonymous_id
+from common.djangoapps.student.roles import CourseBetaTesterRole
+from common.djangoapps.track import contexts
+from common.djangoapps.util import milestones_helpers
+from common.djangoapps.util.json_request import JsonResponse
+from common.djangoapps.util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
+from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
@@ -116,7 +116,7 @@ def make_track_function(request):
     Make a tracking function that logs what happened.
     For use in ModuleSystem.
     '''
-    import track.views
+    import common.djangoapps.track.views
 
     def function(event_type, event):
         return track.views.server_track(request, event_type, event, page='x_module')

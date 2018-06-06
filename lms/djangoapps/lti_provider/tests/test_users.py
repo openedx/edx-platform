@@ -12,7 +12,7 @@ from mock import MagicMock, patch, PropertyMock
 
 import lti_provider.users as users
 from lti_provider.models import LtiConsumer, LtiUser
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 class UserManagementHelperTest(TestCase):

@@ -11,9 +11,9 @@ from django.contrib.auth.models import User
 from django.test.utils import override_settings
 
 from openedx.core.lib.tests.assertions.events import assert_event_matches
-from track.middleware import TrackMiddleware
-from track.views import segmentio
-from track.views.tests.base import (
+from common.djangoapps.track.middleware import TrackMiddleware
+from common.djangoapps.track.views import segmentio
+from common.djangoapps.track.views.tests.base import (
     SegmentIOTrackingTestCaseBase,
     SEGMENTIO_TEST_ENDPOINT,
     SEGMENTIO_TEST_USER_ID

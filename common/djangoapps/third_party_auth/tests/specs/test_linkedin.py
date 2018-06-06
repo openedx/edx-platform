@@ -1,6 +1,6 @@
 """Integration tests for LinkedIn providers."""
 
-from third_party_auth.tests.specs import base
+from common.djangoapps.third_party_auth.tests.specs import base
 
 
 class LinkedInOauth2IntegrationTest(base.Oauth2IntegrationTest):

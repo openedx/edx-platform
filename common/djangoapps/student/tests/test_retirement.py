@@ -11,7 +11,7 @@ from django.urls import reverse
 from django.test import TestCase
 import pytest
 
-from student.models import (
+from common.djangoapps.student.models import (
     get_all_retired_emails_by_email,
     get_all_retired_usernames_by_username,
     get_potentially_retired_user_by_username_and_hash,
@@ -20,7 +20,7 @@ from student.models import (
     is_username_retired,
     is_email_retired
 )
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 # Tell pytest it's ok to user the Django db

@@ -15,7 +15,7 @@ from django.test import TestCase, TransactionTestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 
-from django_comment_common.models import ForumsConfig
+from common.djangoapps.django_comment_common.models import ForumsConfig
 from notification_prefs import NOTIFICATION_PREF_KEY
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
@@ -25,11 +25,16 @@ from openedx.core.djangoapps.user_api.accounts import (
 )
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, waffle
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
-from student.models import UserAttribute
-from student.views import REGISTRATION_AFFILIATE_ID, REGISTRATION_UTM_CREATED_AT, REGISTRATION_UTM_PARAMETERS, \
-    create_account, skip_activation_email
-from student.tests.factories import UserFactory
-from third_party_auth.tests import factories as third_party_auth_factory
+from common.djangoapps.student.models import UserAttribute
+from common.djangoapps.student.views import (
+    REGISTRATION_AFFILIATE_ID,
+    REGISTRATION_UTM_CREATED_AT,
+    REGISTRATION_UTM_PARAMETERS,
+    create_account,
+    skip_activation_email,
+)
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.third_party_auth.tests import factories as third_party_auth_factory
 
 TEST_CS_URL = 'https://comments.service.test:123/'
 

@@ -4,8 +4,8 @@ Helper methods for testing cohorts.
 
 import json
 
-from django_comment_common.models import CourseDiscussionSettings
-from django_comment_common.utils import set_course_discussion_settings
+from common.djangoapps.django_comment_common.models import CourseDiscussionSettings
+from common.djangoapps.django_comment_common.utils import set_course_discussion_settings
 from factory import Sequence, post_generation
 from factory.django import DjangoModelFactory
 from opaque_keys.edx.locator import CourseLocator

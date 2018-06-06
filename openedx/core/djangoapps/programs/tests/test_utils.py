@@ -16,8 +16,8 @@ from django.test.utils import override_settings
 from nose.plugins.attrib import attr
 from pytz import utc
 
-from course_modes.models import CourseMode
-from entitlements.tests.factories import CourseEntitlementFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
 from lms.djangoapps.certificates.api import MODES
 from lms.djangoapps.commerce.tests.test_utils import update_commerce_config
 from lms.djangoapps.commerce.utils import EcommerceService
@@ -41,8 +41,8 @@ from openedx.core.djangoapps.programs.utils import (
 )
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.tests.factories import AnonymousUserFactory, CourseEnrollmentFactory, UserFactory
-from util.date_utils import strftime_localized
+from common.djangoapps.student.tests.factories import AnonymousUserFactory, CourseEnrollmentFactory, UserFactory
+from common.djangoapps.util.date_utils import strftime_localized
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory as ModuleStoreCourseFactory
 

@@ -12,8 +12,8 @@ from mock import ANY, Mock, call, patch
 from nose.tools import assert_true
 from six import text_type
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 from django_comment_client.permissions import get_team
 from django_comment_client.tests.group_id import (
@@ -29,12 +29,12 @@ from django_comment_client.tests.utils import (
     topic_name_to_id
 )
 from django_comment_client.utils import strip_none
-from django_comment_common.models import (
+from common.djangoapps.django_comment_common.models import (
     CourseDiscussionSettings,
     ForumsConfig,
     FORUM_ROLE_STUDENT,
 )
-from django_comment_common.utils import ThreadContext, seed_permissions_roles
+from common.djangoapps.django_comment_common.utils import ThreadContext, seed_permissions_roles
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.discussion import views
 from lms.djangoapps.discussion.views import _get_discussion_default_topic_id
@@ -48,9 +48,9 @@ from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
-from student.roles import CourseStaffRole, UserBasedRole
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from util.testing import EventTestMixin, UrlResetMixin
+from common.djangoapps.student.roles import CourseStaffRole, UserBasedRole
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.util.testing import EventTestMixin, UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (

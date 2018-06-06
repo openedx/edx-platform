@@ -7,9 +7,15 @@ from edx_oauth2_provider.tests import IDTokenTestCase, UserInfoTestCase
 
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
-from student.models import UserProfile, anonymous_id_for_user
-from student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff, OrgInstructorRole, OrgStaffRole
-from student.tests.factories import UserFactory, UserProfileFactory
+from common.djangoapps.student.models import UserProfile, anonymous_id_for_user
+from common.djangoapps.student.roles import (
+    CourseInstructorRole,
+    CourseStaffRole,
+    GlobalStaff,
+    OrgInstructorRole,
+    OrgStaffRole,
+)
+from common.djangoapps.student.tests.factories import UserFactory, UserProfileFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 

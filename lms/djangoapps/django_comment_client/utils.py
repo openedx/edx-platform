@@ -18,13 +18,13 @@ from courseware.access import has_access
 from django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 from django_comment_client.permissions import check_permissions_by_view, get_team, has_permission
 from django_comment_client.settings import MAX_COMMENT_DEPTH
-from django_comment_common.models import FORUM_ROLE_STUDENT, CourseDiscussionSettings, Role
-from django_comment_common.utils import get_course_discussion_settings
+from common.djangoapps.django_comment_common.models import FORUM_ROLE_STUDENT, CourseDiscussionSettings, Role
+from common.djangoapps.django_comment_common.utils import get_course_discussion_settings
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id, get_cohort_names, is_course_cohorted
 from openedx.core.djangoapps.request_cache.middleware import request_cached
-from student.models import get_user_by_username_or_email
-from student.roles import GlobalStaff
+from common.djangoapps.student.models import get_user_by_username_or_email
+from common.djangoapps.student.roles import GlobalStaff
 from xmodule.modulestore.django import modulestore
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 from xmodule.partitions.partitions_service import PartitionService

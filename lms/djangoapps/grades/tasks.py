@@ -17,10 +17,10 @@ from lms.djangoapps.grades.config.models import ComputeGradesSetting
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import CourseLocator
 from openedx.core.djangoapps.monitoring_utils import set_custom_metric, set_custom_metrics_for_course_key
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from submissions import api as sub_api
-from track.event_transaction_utils import set_event_transaction_id, set_event_transaction_type
-from util.date_utils import from_timestamp
+from common.djangoapps.track.event_transaction_utils import set_event_transaction_id, set_event_transaction_type
+from common.djangoapps.util.date_utils import from_timestamp
 from xmodule.modulestore.django import modulestore
 
 from .config.waffle import DISABLE_REGRADE_ON_POLICY_CHANGE, waffle

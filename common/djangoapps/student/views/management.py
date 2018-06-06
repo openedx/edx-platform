@@ -49,11 +49,11 @@ from social_django import utils as social_utils
 from xmodule.modulestore.django import modulestore
 
 import openedx.core.djangoapps.external_auth.views
-import third_party_auth
-import track.views
-from course_modes.models import CourseMode
-from edxmako.shortcuts import render_to_response, render_to_string
-from entitlements.models import CourseEntitlement
+import common.djangoapps.third_party_auth
+import common.djangoapps.track.views
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_string
+from common.djangoapps.entitlements.models import CourseEntitlement
 from openedx.core.djangoapps import monitoring_utils
 from openedx.core.djangoapps.catalog.utils import (
     get_programs_with_type,
@@ -70,9 +70,13 @@ from openedx.core.djangoapps.user_api.models import UserRetirementRequest
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangolib.markup import HTML, Text
-from student.cookies import set_logged_in_cookies
-from student.forms import AccountCreationForm, PasswordResetFormNoActive, get_registration_extension_form
-from student.helpers import (
+from common.djangoapps.student.cookies import set_logged_in_cookies
+from common.djangoapps.student.forms import (
+    AccountCreationForm,
+    PasswordResetFormNoActive,
+    get_registration_extension_form,
+)
+from common.djangoapps.student.helpers import (
     DISABLE_UNENROLL_CERT_STATES,
     AccountValidationError,
     auth_pipeline_urls,
@@ -84,7 +88,7 @@ from student.helpers import (
     generate_activation_email_context,
     get_next_url_for_login_page
 )
-from student.models import (
+from common.djangoapps.student.models import (
     CourseEnrollment,
     PasswordHistory,
     PendingEmailChange,
@@ -97,15 +101,15 @@ from student.models import (
     create_comments_service_user,
     email_exists_or_retired,
 )
-from student.signals import REFUND_ORDER
-from student.tasks import send_activation_email
-from student.text_me_the_app import TextMeTheAppFragmentView
-from third_party_auth import pipeline, provider
-from third_party_auth.saml import SAP_SUCCESSFACTORS_SAML_KEY
-from util.bad_request_rate_limiter import BadRequestRateLimiter
-from util.db import outer_atomic
-from util.json_request import JsonResponse
-from util.password_policy_validators import SecurityPolicyError, validate_password
+from common.djangoapps.student.signals import REFUND_ORDER
+from common.djangoapps.student.tasks import send_activation_email
+from common.djangoapps.student.text_me_the_app import TextMeTheAppFragmentView
+from common.djangoapps.third_party_auth import pipeline, provider
+from common.djangoapps.third_party_auth.saml import SAP_SUCCESSFACTORS_SAML_KEY
+from common.djangoapps.util.bad_request_rate_limiter import BadRequestRateLimiter
+from common.djangoapps.util.db import outer_atomic
+from common.djangoapps.util.json_request import JsonResponse
+from common.djangoapps.util.password_policy_validators import SecurityPolicyError, validate_password
 
 log = logging.getLogger("edx.student")
 

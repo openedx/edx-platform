@@ -32,15 +32,15 @@ from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 from six import text_type
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from courseware.courses import get_course_by_id
-from edxmako.shortcuts import render_to_string
+from common.djangoapps.edxmako.shortcuts import render_to_string
 from eventtracking import tracker
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from shoppingcart.pdf import PDFInvoice
-from student.models import CourseEnrollment, EnrollStatusChange
-from student.signals import UNENROLL_DONE
-from util.query import use_read_replica_if_available
+from common.djangoapps.student.models import CourseEnrollment, EnrollStatusChange
+from common.djangoapps.student.signals import UNENROLL_DONE
+from common.djangoapps.util.query import use_read_replica_if_available
 from xmodule.modulestore.django import modulestore
 
 from .exceptions import (

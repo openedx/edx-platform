@@ -4,9 +4,9 @@ Integration tests of the payment flow, including course mode selection.
 
 from django.urls import reverse
 
-from course_modes.tests.factories import CourseModeFactory
-from student.models import CourseEnrollment
-from student.tests.factories import UserFactory
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

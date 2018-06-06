@@ -26,10 +26,10 @@ from pytz import UTC
 from six import text_type
 
 from common.test.utils import XssTestMixin
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from courseware.tests.factories import InstructorFactory
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from shoppingcart.admin import SoftDeleteCouponAdmin
 from shoppingcart.models import (
@@ -47,11 +47,11 @@ from shoppingcart.processors import render_purchase_form_html
 from shoppingcart.processors.CyberSource2 import sign
 from shoppingcart.tests.payment_fake import PaymentFakeView
 from shoppingcart.views import _can_download_report, _get_date_from_str, initialize_report
-from student.models import CourseEnrollment
-from student.roles import CourseSalesAdminRole
-from student.tests.factories import AdminFactory, UserFactory
-from util.date_utils import get_default_time_display
-from util.testing import UrlResetMixin
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseSalesAdminRole
+from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
+from common.djangoapps.util.date_utils import get_default_time_display
+from common.djangoapps.util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

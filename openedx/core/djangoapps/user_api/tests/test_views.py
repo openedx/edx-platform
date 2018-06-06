@@ -19,7 +19,7 @@ from pytz import common_timezones_set, UTC
 from six import text_type
 from social_django.models import UserSocialAuth, Partial
 
-from django_comment_common import models
+from common.djangoapps.django_comment_common import models
 from openedx.core.djangoapps.user_api.accounts.tests.test_views import RetirementTestCase
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from openedx.core.djangoapps.site_configuration.helpers import get_value
@@ -27,13 +27,13 @@ from openedx.core.lib.api.test_utils import ApiTestCase, TEST_API_KEY
 from openedx.core.lib.time_zone_utils import get_display_time_zone
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
-from student.tests.factories import UserFactory
-from student.models import get_retired_email_by_email
-from third_party_auth.tests.testutil import simulate_running_pipeline, ThirdPartyAuthTestMixin
-from third_party_auth.tests.utils import (
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.models import get_retired_email_by_email
+from common.djangoapps.third_party_auth.tests.testutil import simulate_running_pipeline, ThirdPartyAuthTestMixin
+from common.djangoapps.third_party_auth.tests.utils import (
     ThirdPartyOAuthTestMixin, ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
 )
-from util.password_policy_validators import password_max_length, password_min_length
+from common.djangoapps.util.password_policy_validators import password_max_length, password_min_length
 from .test_helpers import TestCaseForm
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory

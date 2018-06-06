@@ -1,7 +1,7 @@
 # pylint:disable=missing-docstring
 import factory
 
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from survey.models import SurveyAnswer, SurveyForm
 
 

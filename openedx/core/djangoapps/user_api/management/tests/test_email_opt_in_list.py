@@ -15,8 +15,8 @@ from six import text_type
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory, CourseEnrollmentFactory
+from common.djangoapps.student.models import CourseEnrollment
 
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 from openedx.core.djangoapps.user_api.models import UserOrgTag

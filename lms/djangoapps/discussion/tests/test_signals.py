@@ -1,7 +1,7 @@
 from django.test import TestCase
 import mock
 
-from django_comment_common import signals, models
+from common.djangoapps.django_comment_common import signals, models
 from lms.djangoapps.discussion.signals.handlers import ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY
 import openedx.core.djangoapps.request_cache as request_cache
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory, SiteConfigurationFactory

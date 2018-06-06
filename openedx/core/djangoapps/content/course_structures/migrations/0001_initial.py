@@ -5,7 +5,7 @@ from django.db import migrations, models
 import django.utils.timezone
 import model_utils.fields
 from opaque_keys.edx.django.models import CourseKeyField
-import util.models
+import common.djangoapps.util.models
 
 
 class Migration(migrations.Migration):

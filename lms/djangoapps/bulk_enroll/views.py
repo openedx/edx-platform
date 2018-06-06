@@ -8,11 +8,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from bulk_enroll.serializers import BulkEnrollmentSerializer
-from enrollment.views import EnrollmentUserThrottle
+from common.djangoapps.enrollment.views import EnrollmentUserThrottle
 from instructor.views.api import students_update_enrollment
 from openedx.core.lib.api.authentication import OAuth2Authentication
 from openedx.core.lib.api.permissions import IsStaff
-from util.disable_rate_limit import can_disable_rate_limit
+from common.djangoapps.util.disable_rate_limit import can_disable_rate_limit
 
 
 @can_disable_rate_limit

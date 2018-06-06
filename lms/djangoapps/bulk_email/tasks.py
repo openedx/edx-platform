@@ -48,7 +48,7 @@ from lms.djangoapps.instructor_task.subtasks import (
 )
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.courses import course_image_url
-from util.date_utils import get_default_time_display
+from common.djangoapps.util.date_utils import get_default_time_display
 
 log = logging.getLogger('edx.celery.task')
 

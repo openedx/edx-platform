@@ -7,7 +7,7 @@ from django.db import reset_queries
 
 import dogstats_wrapper as dog_stats_api
 from lms.djangoapps.instructor_task.models import PROGRESS, InstructorTask
-from util.db import outer_atomic
+from common.djangoapps.util.db import outer_atomic
 
 TASK_LOG = logging.getLogger('edx.celery.task')
 

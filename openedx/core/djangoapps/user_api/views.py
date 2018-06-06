@@ -19,7 +19,7 @@ from rest_framework.permissions import IsAuthenticated
 from six import text_type
 
 import accounts
-from django_comment_common.models import Role
+from common.djangoapps.django_comment_common.models import Role
 from openedx.core.djangoapps.user_api.accounts.api import check_account_exists
 from openedx.core.djangoapps.user_api.api import (
     RegistrationFormFactory,
@@ -32,9 +32,9 @@ from openedx.core.djangoapps.user_api.preferences.api import get_country_time_zo
 from openedx.core.djangoapps.user_api.serializers import CountryTimeZoneSerializer, UserPreferenceSerializer, UserSerializer
 from openedx.core.lib.api.authentication import SessionAuthenticationAllowInactiveUser
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
-from student.cookies import set_logged_in_cookies
-from student.views import AccountValidationError, create_account_with_params
-from util.json_request import JsonResponse
+from common.djangoapps.student.cookies import set_logged_in_cookies
+from common.djangoapps.student.views import AccountValidationError, create_account_with_params
+from common.djangoapps.util.json_request import JsonResponse
 
 
 class LoginSessionView(APIView):
@@ -82,7 +82,7 @@ class LoginSessionView(APIView):
         """
         # For the initial implementation, shim the existing login view
         # from the student Django app.
-        from student.views import login_user
+        from common.djangoapps.student.views import login_user
         return shim_student_view(login_user, check_logged_in=True)(request)
 
     @method_decorator(sensitive_post_parameters("password"))

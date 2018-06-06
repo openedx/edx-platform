@@ -12,8 +12,13 @@ from rest_framework import serializers
 from discussion_api.permissions import NON_UPDATABLE_COMMENT_FIELDS, NON_UPDATABLE_THREAD_FIELDS, get_editable_fields
 from discussion_api.render import render_body
 from django_comment_client.utils import is_comment_too_deep
-from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_MODERATOR, Role
-from django_comment_common.utils import get_course_discussion_settings
+from common.djangoapps.django_comment_common.models import (
+    FORUM_ROLE_ADMINISTRATOR,
+    FORUM_ROLE_COMMUNITY_TA,
+    FORUM_ROLE_MODERATOR,
+    Role,
+)
+from common.djangoapps.django_comment_common.utils import get_course_discussion_settings
 from lms.djangoapps.django_comment_client.utils import course_discussion_division_enabled, get_group_names_by_id
 from lms.lib.comment_client.comment import Comment
 from lms.lib.comment_client.thread import Thread

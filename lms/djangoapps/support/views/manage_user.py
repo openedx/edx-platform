@@ -10,10 +10,10 @@ from django.views.generic import View
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from lms.djangoapps.support.decorators import require_support_permission
 from openedx.core.djangoapps.user_api.accounts.serializers import AccountUserSerializer
-from util.json_request import JsonResponse
+from common.djangoapps.util.json_request import JsonResponse
 
 
 class ManageUserSupportView(View):

@@ -14,9 +14,9 @@ from testfixtures import LogCapture
 from unittest import skip
 
 from openedx.tests.util import expected_redirect_url
-from third_party_auth.saml import log as saml_log, SapSuccessFactorsIdentityProvider
-from third_party_auth.tasks import fetch_saml_metadata
-from third_party_auth.tests import testutil
+from common.djangoapps.third_party_auth.saml import log as saml_log, SapSuccessFactorsIdentityProvider
+from common.djangoapps.third_party_auth.tasks import fetch_saml_metadata
+from common.djangoapps.third_party_auth.tests import testutil
 
 from .base import IntegrationTestMixin
 

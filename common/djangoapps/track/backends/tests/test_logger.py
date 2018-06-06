@@ -6,7 +6,7 @@ import json
 import logging
 import datetime
 
-from track.backends.logger import LoggerBackend
+from common.djangoapps.track.backends.logger import LoggerBackend
 
 
 def test_logger_backend(caplog):

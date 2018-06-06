@@ -7,7 +7,7 @@ import json
 import logging
 import markupsafe
 import re
-import static_replace
+import common.djangoapps.static_replace
 import uuid
 from lxml import html, etree
 from contracts import contract
@@ -18,7 +18,7 @@ from django.urls import reverse
 from pytz import UTC
 from django.utils.html import escape
 from django.contrib.auth.models import User
-from edxmako.shortcuts import render_to_string
+from common.djangoapps.edxmako.shortcuts import render_to_string
 from six import text_type
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock

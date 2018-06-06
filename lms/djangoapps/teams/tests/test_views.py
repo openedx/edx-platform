@@ -20,11 +20,11 @@ from search.search_engine_base import SearchEngine
 
 from common.test.utils import skip_signal
 from courseware.tests.factories import StaffFactory
-from django_comment_common.models import FORUM_ROLE_COMMUNITY_TA, Role
-from django_comment_common.utils import seed_permissions_roles
-from student.models import CourseEnrollment
-from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
-from util.testing import EventTestMixin
+from common.djangoapps.django_comment_common.models import FORUM_ROLE_COMMUNITY_TA, Role
+from common.djangoapps.django_comment_common.utils import seed_permissions_roles
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+from common.djangoapps.util.testing import EventTestMixin
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

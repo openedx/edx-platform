@@ -28,7 +28,7 @@ from shoppingcart.processors.exceptions import (
     CCProcessorWrongAmountException
 )
 from shoppingcart.processors.helpers import get_processor_config
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 TEST_CC_PROCESSOR_NAME = "CyberSource"
 TEST_CC_PROCESSOR = {

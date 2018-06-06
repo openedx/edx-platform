@@ -16,9 +16,9 @@ from django.urls import reverse
 from django.utils.translation import override as override_language
 from six import text_type
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from courseware.models import StudentModule
-from edxmako.shortcuts import render_to_string
+from common.djangoapps.edxmako.shortcuts import render_to_string
 from eventtracking import tracker
 from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
 from lms.djangoapps.grades.events import STATE_DELETED_EVENT_TYPE
@@ -27,7 +27,7 @@ from lms.djangoapps.grades.signals.signals import PROBLEM_RAW_SCORE_CHANGED
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.models import UserPreference
-from student.models import (
+from common.djangoapps.student.models import (
     CourseEnrollment,
     CourseEnrollmentAllowed,
     anonymous_id_for_user,
@@ -35,7 +35,7 @@ from student.models import (
 )
 from submissions import api as sub_api  # installed from the edx-submissions repository
 from submissions.models import score_set
-from track.event_transaction_utils import (
+from common.djangoapps.track.event_transaction_utils import (
     create_new_event_transaction_id,
     get_event_transaction_id,
     set_event_transaction_type

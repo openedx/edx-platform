@@ -12,9 +12,9 @@ from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.certificates.models import CertificateInvalidation, CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory
-from student.models import CourseEnrollment
-from student.roles import GlobalStaff, SupportStaffRole
-from student.tests.factories import UserFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import GlobalStaff, SupportStaffRole
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

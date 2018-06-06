@@ -25,9 +25,13 @@ from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts as accounts_settings
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
-from student.message_types import PasswordReset
-from student.models import CourseEnrollmentAllowed, email_exists_or_retired
-from util.password_policy_validators import password_max_length, password_min_length, validate_password
+from common.djangoapps.student.message_types import PasswordReset
+from common.djangoapps.student.models import CourseEnrollmentAllowed, email_exists_or_retired
+from common.djangoapps.util.password_policy_validators import (
+    password_max_length,
+    password_min_length,
+    validate_password,
+)
 
 
 class PasswordResetFormNoActive(PasswordResetForm):

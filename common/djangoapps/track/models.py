@@ -1,2 +1,2 @@
 # pylint: disable=unused-import, missing-docstring
-from track.backends.django import TrackingLog
+from common.djangoapps.track.backends.django import TrackingLog

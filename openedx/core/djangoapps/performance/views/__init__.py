@@ -7,7 +7,7 @@ import logging
 
 from django.http import HttpResponse
 
-from track.utils import DateTimeJSONEncoder
+from common.djangoapps.track.utils import DateTimeJSONEncoder
 
 
 log = logging.getLogger("perflog")

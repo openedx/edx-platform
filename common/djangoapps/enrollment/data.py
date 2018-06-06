@@ -9,17 +9,17 @@ from django.db import transaction
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
-from enrollment.errors import (
+from common.djangoapps.enrollment.errors import (
     CourseEnrollmentClosedError,
     CourseEnrollmentExistsError,
     CourseEnrollmentFullError,
     InvalidEnrollmentAttribute,
     UserNotFoundError
 )
-from enrollment.serializers import CourseEnrollmentSerializer, CourseSerializer
+from common.djangoapps.enrollment.serializers import CourseEnrollmentSerializer, CourseSerializer
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.exceptions import CourseNotFoundError
-from student.models import (
+from common.djangoapps.student.models import (
     AlreadyEnrolledError,
     CourseEnrollment,
     CourseEnrollmentAttribute,

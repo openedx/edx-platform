@@ -9,7 +9,7 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework import permissions
 
 from openedx.core.lib.log_utils import audit_log
-from student.roles import CourseInstructorRole, CourseStaffRole
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 
 
 class ApiKeyHeaderPermission(permissions.BasePermission):

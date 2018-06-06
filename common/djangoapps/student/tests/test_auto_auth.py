@@ -8,12 +8,12 @@ from django.test.client import Client
 from mock import patch, Mock
 from opaque_keys.edx.locator import CourseLocator
 
-from django_comment_common.models import (
+from common.djangoapps.django_comment_common.models import (
     Role, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_STUDENT
 )
-from django_comment_common.utils import seed_permissions_roles
-from student.models import anonymous_id_for_user, CourseAccessRole, CourseEnrollment, UserProfile
-from util.testing import UrlResetMixin
+from common.djangoapps.django_comment_common.utils import seed_permissions_roles
+from common.djangoapps.student.models import anonymous_id_for_user, CourseAccessRole, CourseEnrollment, UserProfile
+from common.djangoapps.util.testing import UrlResetMixin
 
 
 class AutoAuthTestCase(UrlResetMixin, TestCase):

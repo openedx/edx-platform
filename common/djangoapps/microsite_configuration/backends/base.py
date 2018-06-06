@@ -16,7 +16,7 @@ import threading
 
 from django.conf import settings
 
-from util.url import strip_port_from_host
+from common.djangoapps.util.url import strip_port_from_host
 
 
 # pylint: disable=unused-argument
@@ -295,7 +295,7 @@ class BaseMicrositeTemplateBackend(object):
         an override or will just return what is passed in which is expected to be a string
         """
 
-        from microsite_configuration.microsite import get_value as microsite_get_value
+        from common.djangoapps.microsite_configuration.microsite import get_value as microsite_get_value
 
         microsite_template_path = microsite_get_value('template_dir', None)
         if not microsite_template_path:

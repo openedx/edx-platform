@@ -11,19 +11,19 @@ from mock import patch
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.certificates.api import MODES
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from student.models import CourseEnrollment
-from student.tests.factories import (TEST_PASSWORD, CourseEnrollmentFactory, UserFactory)
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import (TEST_PASSWORD, CourseEnrollmentFactory, UserFactory)
 
 # Entitlements is not in CMS' INSTALLED_APPS so these imports will error during test collection
 if settings.ROOT_URLCONF == 'lms.urls':
-    from entitlements.tests.factories import CourseEntitlementFactory
-    from entitlements.models import CourseEntitlement
+    from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
+    from common.djangoapps.entitlements.models import CourseEntitlement
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

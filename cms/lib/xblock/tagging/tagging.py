@@ -9,7 +9,7 @@ from webob import Response
 from xblock.core import XBlock, XBlockAside
 from xblock.fields import Dict, Scope
 
-from edxmako.shortcuts import render_to_string
+from common.djangoapps.edxmako.shortcuts import render_to_string
 from xmodule.capa_module import CapaModule
 from xmodule.x_module import AUTHOR_VIEW
 

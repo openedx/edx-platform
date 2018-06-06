@@ -11,7 +11,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 FROZEN_TIME = '2015-01-01'
 VERIFY_STUDENT = {'DAYS_GOOD_FOR': 365}

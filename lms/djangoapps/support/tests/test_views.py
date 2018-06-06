@@ -17,12 +17,12 @@ from nose.plugins.attrib import attr
 from pytz import UTC
 
 from common.test.utils import disable_signal
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.verify_student.models import VerificationDeadline
-from student.models import ENROLLED_TO_ENROLLED, CourseEnrollment, ManualEnrollmentAudit
-from student.roles import GlobalStaff, SupportStaffRole
-from student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.models import ENROLLED_TO_ENROLLED, CourseEnrollment, ManualEnrollmentAudit
+from common.djangoapps.student.roles import GlobalStaff, SupportStaffRole
+from common.djangoapps.student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

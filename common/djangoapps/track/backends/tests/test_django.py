@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 from django.test import TestCase
 
-from track.backends.django import DjangoBackend, TrackingLog
+from common.djangoapps.track.backends.django import DjangoBackend, TrackingLog
 
 
 class TestDjangoBackend(TestCase):

@@ -4,7 +4,7 @@ Tests for course dates fragment.
 from datetime import timedelta, datetime
 from django.urls import reverse
 
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory

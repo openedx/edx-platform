@@ -21,7 +21,7 @@ from lms.djangoapps import django_comment_client
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.lang_pref.api import get_closest_released_language
 from openedx.core.djangoapps.models.course_details import CourseDetails
-from static_replace.models import AssetBaseUrlConfig
+from common.djangoapps.static_replace.models import AssetBaseUrlConfig
 from xmodule import course_metadata_utils, block_metadata_utils
 from xmodule.course_module import CourseDescriptor, DEFAULT_START_DATE
 from xmodule.error_module import ErrorDescriptor

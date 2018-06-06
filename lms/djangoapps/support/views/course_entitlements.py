@@ -11,8 +11,8 @@ from edx_rest_framework_extensions.authentication import JwtAuthentication
 from rest_framework import permissions, status, viewsets
 from rest_framework.response import Response
 
-from edxmako.shortcuts import render_to_response
-from entitlements.models import CourseEntitlement, CourseEntitlementSupportDetail
+from common.djangoapps.edxmako.shortcuts import render_to_response
+from common.djangoapps.entitlements.models import CourseEntitlement, CourseEntitlementSupportDetail
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.support.decorators import require_support_permission
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf

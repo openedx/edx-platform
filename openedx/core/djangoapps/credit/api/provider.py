@@ -24,13 +24,13 @@ from openedx.core.djangoapps.credit.models import (
     CreditEligibility,
 )
 
-from student.models import (
+from common.djangoapps.student.models import (
     User,
     CourseEnrollment,
 )
 from openedx.core.djangoapps.credit.signature import signature, get_shared_secret_key
-from util.date_utils import to_timestamp
-from util.json_request import JsonResponse
+from common.djangoapps.util.date_utils import to_timestamp
+from common.djangoapps.util.json_request import JsonResponse
 
 
 # TODO: Cleanup this mess! ECOM-2908

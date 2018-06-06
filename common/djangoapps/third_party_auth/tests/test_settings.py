@@ -2,8 +2,8 @@
 
 import unittest
 
-from third_party_auth import provider, settings
-from third_party_auth.tests import testutil
+from common.djangoapps.third_party_auth import provider, settings
+from common.djangoapps.third_party_auth.tests import testutil
 
 
 _ORIGINAL_AUTHENTICATION_BACKENDS = ['first_authentication_backend']

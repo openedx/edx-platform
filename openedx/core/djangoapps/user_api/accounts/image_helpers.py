@@ -8,7 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.storage import get_storage_class
 from django.contrib.staticfiles.storage import staticfiles_storage
 
-from student.models import UserProfile
+from common.djangoapps.student.models import UserProfile
 from ..errors import UserNotFound
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 

@@ -18,14 +18,14 @@ from openedx.core.djangolib.model_mixins import DeletableByUserValue
 # create an alias in "user_api".
 
 # pylint: disable=unused-import
-from student.models import (
+from common.djangoapps.student.models import (
     PendingEmailChange,
     Registration,
     UserProfile,
     get_retired_email_by_email,
     get_retired_username_by_username
 )
-from util.model_utils import emit_setting_changed_event, get_changed_fields_dict
+from common.djangoapps.util.model_utils import emit_setting_changed_event, get_changed_fields_dict
 
 
 class RetirementStateError(Exception):

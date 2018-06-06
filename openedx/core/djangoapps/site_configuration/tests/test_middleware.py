@@ -10,12 +10,12 @@ from django.test import TestCase
 from django.test.client import Client
 from django.test.utils import override_settings
 
-from student.tests.factories import UserFactory
-from microsite_configuration.microsite import (
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.microsite_configuration.microsite import (
     get_backend,
 )
-from microsite_configuration.backends.base import BaseMicrositeBackend
-from microsite_configuration.tests.tests import (
+from common.djangoapps.microsite_configuration.backends.base import BaseMicrositeBackend
+from common.djangoapps.microsite_configuration.tests.tests import (
     DatabaseMicrositeTestCase,
     side_effect_for_get_value,
     MICROSITE_BACKENDS,

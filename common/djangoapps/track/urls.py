@@ -5,8 +5,8 @@ URLs for track app
 from django.conf import settings
 from django.conf.urls import url
 
-import track.views
-import track.views.segmentio
+import common.djangoapps.track.views
+import common.djangoapps.track.views.segmentio
 
 urlpatterns = [
     url(r'^event$', track.views.user_track),

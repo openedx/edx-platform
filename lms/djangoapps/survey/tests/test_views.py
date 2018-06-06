@@ -8,7 +8,7 @@ from collections import OrderedDict
 from django.urls import reverse
 from django.test.client import Client
 
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from survey.models import SurveyAnswer, SurveyForm
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory

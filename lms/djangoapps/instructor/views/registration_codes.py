@@ -13,8 +13,8 @@ from courseware.courses import get_course_by_id
 from lms.djangoapps.instructor.enrollment import get_email_params, send_mail_to_student
 from lms.djangoapps.instructor.views.api import require_level
 from shoppingcart.models import CourseRegistrationCode, RegistrationCodeRedemption
-from student.models import CourseEnrollment
-from util.json_request import JsonResponse
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.util.json_request import JsonResponse
 
 log = logging.getLogger(__name__)
 

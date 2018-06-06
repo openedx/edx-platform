@@ -11,19 +11,24 @@ from mock import patch
 from nose.tools import raises
 from pytz import UTC
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
-from enrollment import data
-from enrollment.errors import (
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.enrollment import data
+from common.djangoapps.enrollment.errors import (
     CourseEnrollmentClosedError,
     CourseEnrollmentExistsError,
     CourseEnrollmentFullError,
     UserNotFoundError
 )
-from enrollment.serializers import CourseEnrollmentSerializer
+from common.djangoapps.enrollment.serializers import CourseEnrollmentSerializer
 from openedx.core.lib.exceptions import CourseNotFoundError
-from student.models import AlreadyEnrolledError, CourseEnrollment, CourseFullError, EnrollmentClosedError
-from student.tests.factories import UserFactory
+from common.djangoapps.student.models import (
+    AlreadyEnrolledError,
+    CourseEnrollment,
+    CourseFullError,
+    EnrollmentClosedError,
+)
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

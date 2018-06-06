@@ -14,7 +14,7 @@ from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError, transaction
 
 from lti_provider.models import LtiUser
-from student.models import UserProfile
+from common.djangoapps.student.models import UserProfile
 
 
 def authenticate_lti_user(request, lti_user_id, lti_consumer):

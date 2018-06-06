@@ -7,8 +7,8 @@ from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from student.tests.factories import UserFactory
-from student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.models import CourseEnrollment
 
 
 @skip_unless_lms

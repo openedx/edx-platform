@@ -12,7 +12,7 @@ from mock import patch
 from nose.plugins.attrib import attr
 from six import text_type
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from xmodule.course_module import CATALOG_VISIBILITY_CATALOG_AND_ABOUT, CATALOG_VISIBILITY_NONE
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase

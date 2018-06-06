@@ -9,13 +9,13 @@ from django.shortcuts import redirect
 
 from django.views.decorators.csrf import ensure_csrf_cookie
 
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from ipware.ip import get_ip
 
-from track import tracker
-from track import contexts
-from track import shim
-from track.models import TrackingLog
+from common.djangoapps.track import tracker
+from common.djangoapps.track import contexts
+from common.djangoapps.track import shim
+from common.djangoapps.track.models import TrackingLog
 from eventtracking import tracker as eventtracker
 
 

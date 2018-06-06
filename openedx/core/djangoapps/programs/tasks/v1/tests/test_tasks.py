@@ -18,7 +18,7 @@ from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfi
 from openedx.core.djangoapps.programs.tasks.v1 import tasks
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 CREDENTIALS_INTERNAL_SERVICE_URL = 'https://credentials.example.com'
 TASKS_MODULE = 'openedx.core.djangoapps.programs.tasks.v1.tasks'

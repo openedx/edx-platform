@@ -16,7 +16,7 @@ from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.grades.api.serializers import GradingPolicySerializer
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
-from student.roles import CourseStaffRole
+from common.djangoapps.student.roles import CourseStaffRole
 
 log = logging.getLogger(__name__)
 USER_MODEL = get_user_model()

@@ -13,14 +13,14 @@ from rest_framework.test import APIRequestFactory, APITestCase, force_authentica
 from bulk_enroll.serializers import BulkEnrollmentSerializer
 from bulk_enroll.views import BulkEnrollView
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from microsite_configuration import microsite
-from student.models import (
+from common.djangoapps.microsite_configuration import microsite
+from common.djangoapps.student.models import (
     CourseEnrollment,
     ManualEnrollmentAudit,
     ENROLLED_TO_UNENROLLED,
     UNENROLLED_TO_ENROLLED,
 )
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

@@ -48,9 +48,9 @@ from openedx.core.djangoapps.user_api.errors import (
     UserNotFound
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.models import PendingEmailChange
-from student.tests.factories import UserFactory
-from student.tests.tests import UserSettingsEventTestMixin
+from common.djangoapps.student.models import PendingEmailChange
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.tests.tests import UserSettingsEventTestMixin
 
 
 def mock_render_to_string(template_name, context):

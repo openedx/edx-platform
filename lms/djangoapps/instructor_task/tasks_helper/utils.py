@@ -1,6 +1,6 @@
 from eventtracking import tracker
 from lms.djangoapps.instructor_task.models import ReportStore
-from util.file import course_filename_prefix_generator
+from common.djangoapps.util.file import course_filename_prefix_generator
 
 REPORT_REQUESTED_EVENT_NAME = u'edx.instructor.report.requested'
 

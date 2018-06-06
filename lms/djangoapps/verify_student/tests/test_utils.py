@@ -13,7 +13,7 @@ from pytest import mark
 from django.conf import settings
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, SSOVerification
 from lms.djangoapps.verify_student.utils import verification_for_datetime, most_recent_verification
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 FAKE_SETTINGS = {
     "DAYS_GOOD_FOR": 10,

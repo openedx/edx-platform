@@ -22,7 +22,7 @@ from .common import *
 import os
 from path import Path as path
 from uuid import uuid4
-from util.db import NoOpMigrationModules
+from common.djangoapps.util.db import NoOpMigrationModules
 from openedx.core.lib.derived import derive_settings
 
 # import settings from LMS for consistent behavior with CMS

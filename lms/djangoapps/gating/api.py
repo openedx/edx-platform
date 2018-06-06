@@ -9,7 +9,7 @@ from opaque_keys.edx.keys import UsageKey
 
 from lms.djangoapps.courseware.entrance_exams import get_entrance_exam_content
 from openedx.core.lib.gating import api as gating_api
-from util import milestones_helpers
+from common.djangoapps.util import milestones_helpers
 
 log = logging.getLogger(__name__)
 

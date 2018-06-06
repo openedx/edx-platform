@@ -6,9 +6,9 @@ import six
 from django.conf import settings
 from django.utils.translation import ugettext as _
 
-import third_party_auth
-from third_party_auth import pipeline
-from student.cookies import set_experiments_is_enterprise_cookie
+import common.djangoapps.third_party_auth
+from common.djangoapps.third_party_auth import pipeline
+from common.djangoapps.student.cookies import set_experiments_is_enterprise_cookie
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.markup import HTML, Text

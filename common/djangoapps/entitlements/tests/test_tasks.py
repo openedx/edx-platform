@@ -8,9 +8,9 @@ import pytz
 
 from django.test import TestCase
 
-from entitlements import tasks
-from entitlements.models import CourseEntitlementPolicy
-from entitlements.tests.factories import CourseEntitlementFactory
+from common.djangoapps.entitlements import tasks
+from common.djangoapps.entitlements.models import CourseEntitlementPolicy
+from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 

@@ -29,9 +29,9 @@ from nose.plugins.attrib import attr
 from six import text_type
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from student.views import change_enrollment
-from student.models import UserProfile, CourseEnrollment
-from student.tests.factories import UserFactory
+from common.djangoapps.student.views import change_enrollment
+from common.djangoapps.student.models import UserProfile, CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore import ModuleStoreEnum

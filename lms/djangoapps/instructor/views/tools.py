@@ -11,7 +11,7 @@ from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import UsageKey
 from six import text_type, string_types
 
-from student.models import get_user_by_username_or_email
+from common.djangoapps.student.models import get_user_by_username_or_email
 from courseware.field_overrides import disable_overrides
 from courseware.models import StudentFieldOverride
 from courseware.student_field_overrides import clear_override_for_user, get_override_for_user, override_field_for_user

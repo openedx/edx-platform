@@ -10,7 +10,7 @@ from lms.djangoapps.grades.management.commands import recalculate_learner_grades
 from lms.djangoapps.grades.tests.test_tasks import HasCourseWithProblemsMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from common.djangoapps.student.tests.factories import UserFactory, CourseEnrollmentFactory
 
 DATE_FORMAT = "%Y-%m-%d %H:%M"
 

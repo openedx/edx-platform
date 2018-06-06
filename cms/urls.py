@@ -205,7 +205,7 @@ if settings.FEATURES.get('ENTRANCE_EXAMS'):
 
 # Enable Web/HTML Certificates
 if settings.FEATURES.get('CERTIFICATES_HTML_VIEW'):
-    from contentstore.views.certificates import (
+    from cms.djangoapps.contentstore.views.certificates import (
         certificate_activation_handler,
         signatory_detail_handler,
         certificates_detail_handler,

@@ -20,12 +20,12 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from six import text_type, iteritems
 
-import track.views
+import common.djangoapps.track.views
 from bulk_email.models import BulkEmailFlag, Optout  # pylint: disable=import-error
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from courseware.access import has_access
-from edxmako.shortcuts import render_to_response, render_to_string
-from entitlements.models import CourseEntitlement
+from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_string
+from common.djangoapps.entitlements.models import CourseEntitlement
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps import monitoring_utils
@@ -44,15 +44,15 @@ from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.enterprise_support.api import get_dashboard_consent_notification
 from shoppingcart.api import order_history
 from shoppingcart.models import CourseRegistrationCode, DonationConfiguration
-from student.cookies import set_user_info_cookie
-from student.helpers import cert_info, check_verify_status_by_course
-from student.models import (
+from common.djangoapps.student.cookies import set_user_info_cookie
+from common.djangoapps.student.helpers import cert_info, check_verify_status_by_course
+from common.djangoapps.student.models import (
     CourseEnrollment,
     CourseEnrollmentAttribute,
     DashboardConfiguration,
     UserProfile
 )
-from util.milestones_helpers import get_pre_requisite_courses_not_completed
+from common.djangoapps.util.milestones_helpers import get_pre_requisite_courses_not_completed
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.student")

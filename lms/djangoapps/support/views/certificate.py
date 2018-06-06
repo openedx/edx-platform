@@ -6,7 +6,7 @@ import urllib
 from django.utils.decorators import method_decorator
 from django.views.generic import View
 
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from support.decorators import require_support_permission
 
 

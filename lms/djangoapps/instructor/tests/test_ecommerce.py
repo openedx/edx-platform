@@ -9,11 +9,11 @@ from django.urls import reverse
 from nose.plugins.attrib import attr
 from six import text_type
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from shoppingcart.models import Coupon, CourseRegistrationCode
-from student.roles import CourseFinanceAdminRole
-from student.tests.factories import AdminFactory
+from common.djangoapps.student.roles import CourseFinanceAdminRole
+from common.djangoapps.student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

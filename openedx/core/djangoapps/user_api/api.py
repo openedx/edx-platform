@@ -8,16 +8,16 @@ from django.utils.translation import ugettext as _
 from django_countries import countries
 
 import accounts
-import third_party_auth
-from edxmako.shortcuts import marketing_link
+import common.djangoapps.third_party_auth
+from common.djangoapps.edxmako.shortcuts import marketing_link
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.helpers import FormDescription
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
-from student.forms import get_registration_extension_form
-from student.models import UserProfile
-from util.password_policy_validators import (
+from common.djangoapps.student.forms import get_registration_extension_form
+from common.djangoapps.student.models import UserProfile
+from common.djangoapps.util.password_policy_validators import (
     password_complexity, password_instructions, password_max_length, password_min_length
 )
 

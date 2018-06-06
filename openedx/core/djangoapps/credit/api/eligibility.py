@@ -13,8 +13,8 @@ from openedx.core.djangoapps.credit.models import (
     CreditCourse, CreditRequirement, CreditRequirementStatus, CreditEligibility, CreditRequest
 )
 
-from course_modes.models import CourseMode
-from student.models import CourseEnrollment
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.models import CourseEnrollment
 
 # TODO: Cleanup this mess! ECOM-2908
 

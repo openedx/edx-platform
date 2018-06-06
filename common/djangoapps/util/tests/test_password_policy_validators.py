@@ -9,7 +9,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.test.utils import override_settings
 
-from util.password_policy_validators import (
+from common.djangoapps.util.password_policy_validators import (
     password_instructions, password_min_length, validate_password, _validate_password_dictionary
 )
 

@@ -18,7 +18,7 @@ from django.utils.translation import ungettext_lazy as ungettext
 from Levenshtein import distance
 from six import text_type
 
-from student.models import PasswordHistory
+from common.djangoapps.student.models import PasswordHistory
 
 
 log = logging.getLogger(__name__)

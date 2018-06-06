@@ -18,26 +18,26 @@ from mock import patch
 from opaque_keys import InvalidKeyError
 
 from bulk_email.models import BulkEmailFlag
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from edx_oauth2_provider.constants import AUTHORIZED_CLIENTS_SESSION_KEY
 from edx_oauth2_provider.tests.factories import (ClientFactory,
                                                  TrustedClientFactory)
-from entitlements.tests.factories import CourseEntitlementFactory
+from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
 from milestones.tests.utils import MilestonesTestCaseMixin
 from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 from pyquery import PyQuery as pq
-from student.cookies import get_user_info_cookie_data
-from student.helpers import DISABLE_UNENROLL_CERT_STATES
-from student.models import CourseEnrollment, UserProfile
-from student.signals import REFUND_ORDER
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from util.milestones_helpers import (get_course_milestones,
+from common.djangoapps.student.cookies import get_user_info_cookie_data
+from common.djangoapps.student.helpers import DISABLE_UNENROLL_CERT_STATES
+from common.djangoapps.student.models import CourseEnrollment, UserProfile
+from common.djangoapps.student.signals import REFUND_ORDER
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.util.milestones_helpers import (get_course_milestones,
                                      remove_prerequisite_course,
                                      set_prerequisite_courses)
-from util.testing import UrlResetMixin
+from common.djangoapps.util.testing import UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

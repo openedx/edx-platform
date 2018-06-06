@@ -18,7 +18,7 @@ from django.core.management.base import BaseCommand
 from pytz import UTC
 
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
-from student.models import Registration, UserProfile, email_exists_or_retired
+from common.djangoapps.student.models import Registration, UserProfile, email_exists_or_retired
 
 
 class MyCompleter(object):  # Custom completer

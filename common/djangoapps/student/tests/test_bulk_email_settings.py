@@ -12,7 +12,7 @@ from django.urls import reverse
 # This import is for an lms djangoapp.
 # Its testcases are only run under lms.
 from bulk_email.models import BulkEmailFlag, CourseAuthorization  # pylint: disable=import-error
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

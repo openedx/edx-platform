@@ -15,9 +15,9 @@ from zendesk import ZendeskError
 
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from student.tests.test_configuration_overrides import fake_get_value
-from util import views
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.test_configuration_overrides import fake_get_value
+from common.djangoapps.util import views
 
 TEST_SUPPORT_EMAIL = "support@example.com"
 TEST_ZENDESK_CUSTOM_FIELD_CONFIG = {

@@ -8,12 +8,12 @@ from django.test import TestCase
 from django.conf import settings
 from django.urls import reverse
 
-from microsite_configuration.backends.base import (
+from common.djangoapps.microsite_configuration.backends.base import (
     BaseMicrositeBackend,
     BaseMicrositeTemplateBackend,
 )
-from microsite_configuration import microsite
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.microsite_configuration import microsite
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 

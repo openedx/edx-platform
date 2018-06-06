@@ -23,7 +23,7 @@ from mock import Mock, MagicMock, patch
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from shoppingcart.exceptions import (
     AlreadyEnrolledInCourseException,
     CourseDoesNotExistException,
@@ -50,8 +50,8 @@ from shoppingcart.models import (
     PaidCourseRegistration,
     RegistrationCodeRedemption
 )
-from student.models import CourseEnrollment
-from student.tests.factories import UserFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

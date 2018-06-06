@@ -18,8 +18,8 @@ from datetime import datetime, timedelta
 import ddt
 import unicodecsv
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from courseware.tests.factories import InstructorFactory
 from django.conf import settings
 from django.urls import reverse
@@ -39,8 +39,13 @@ from shoppingcart.models import (
     PaidCourseRegistration
 )
 from six import text_type
-from student.models import ALLOWEDTOENROLL_TO_ENROLLED, CourseEnrollment, CourseEnrollmentAllowed, ManualEnrollmentAudit
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.models import (
+    ALLOWEDTOENROLL_TO_ENROLLED,
+    CourseEnrollment,
+    CourseEnrollmentAllowed,
+    ManualEnrollmentAudit,
+)
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from survey.models import SurveyAnswer, SurveyForm
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase

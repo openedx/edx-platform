@@ -23,7 +23,7 @@ from lms.djangoapps.certificates.models import (
 )
 from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
-from student.tests.factories import AdminFactory, UserFactory
+from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

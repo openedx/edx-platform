@@ -3,8 +3,8 @@ Encapsulates permissions checks for Course Blocks API
 """
 
 from courseware.access import has_access
-from student.models import CourseEnrollment
-from student.roles import CourseStaffRole
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseStaffRole
 
 
 def can_access_all_blocks(requesting_user, course_key):

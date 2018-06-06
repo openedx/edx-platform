@@ -31,15 +31,15 @@ from courseware.tests.helpers import LoginEnrollmentTestCase, masquerade_as_grou
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
-from student.models import CourseEnrollment
-from student.roles import CourseCcxCoachRole, CourseStaffRole
-from student.tests.factories import (
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseCcxCoachRole, CourseStaffRole
+from common.djangoapps.student.tests.factories import (
     AdminFactory,
     AnonymousUserFactory,
     CourseEnrollmentAllowedFactory,
     CourseEnrollmentFactory
 )
-from util.milestones_helpers import fulfill_course_milestone, set_prerequisite_courses
+from common.djangoapps.util.milestones_helpers import fulfill_course_milestone, set_prerequisite_courses
 from xmodule.course_module import (
     CATALOG_VISIBILITY_ABOUT,
     CATALOG_VISIBILITY_CATALOG_AND_ABOUT,

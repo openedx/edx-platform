@@ -10,7 +10,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from courseware.courses import get_course_with_access
 from courseware.tabs import EnrolledTab
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from notes.models import Note
 from notes.utils import notes_enabled_for_course
 from xmodule.annotator_token import retrieve_token

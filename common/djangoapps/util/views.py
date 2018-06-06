@@ -19,12 +19,12 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 
 import calc
 import dogstats_wrapper as dog_stats_api
-import track.views
-from edxmako.shortcuts import render_to_response, render_to_string
+import common.djangoapps.track.views
+from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.features.enterprise_support import api as enterprise_api
-from student.models import CourseEnrollment
-from student.roles import GlobalStaff
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import GlobalStaff
 
 log = logging.getLogger(__name__)
 

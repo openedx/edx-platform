@@ -17,7 +17,7 @@ from courseware.views import views as courseware_views
 from courseware.views.index import CoursewareIndex
 from courseware.views.views import CourseTabView, EnrollStaffView, StaticCourseTabView
 from debug import views as debug_views
-from django_comment_common.models import ForumsConfig
+from common.djangoapps.django_comment_common.models import ForumsConfig
 from django_openid_auth import views as django_openid_auth_views
 from lms.djangoapps.certificates import views as certificates_views
 from lms.djangoapps.discussion import views as discussion_views
@@ -48,10 +48,10 @@ from openedx.features.enterprise_support.api import enterprise_enabled
 from ratelimitbackend import admin
 from static_template_view import views as static_template_view_views
 from staticbook import views as staticbook_views
-from student import views as student_views
+from common.djangoapps.student import views as student_views
 from student_account import views as student_account_views
-from track import views as track_views
-from util import views as util_views
+from common.djangoapps.track import views as track_views
+from common.djangoapps.util import views as util_views
 
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     django_autodiscover()

@@ -5,10 +5,10 @@ from __future__ import print_function
 import uuid
 
 from django.core.management.base import BaseCommand
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from opaque_keys.edx.keys import CourseKey
-from student.forms import AccountCreationForm
-from student.helpers import do_create_account
+from common.djangoapps.student.forms import AccountCreationForm
+from common.djangoapps.student.helpers import do_create_account
 
 
 def make_random_form():

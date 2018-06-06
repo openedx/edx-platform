@@ -18,8 +18,8 @@ from slumber.exceptions import HttpClientError, HttpNotFoundError, HttpServerErr
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.token_utils import JwtBuilder
 from openedx.features.enterprise_support.utils import get_cache_key
-from third_party_auth.pipeline import get as get_partial_pipeline
-from third_party_auth.provider import Registry
+from common.djangoapps.third_party_auth.pipeline import get as get_partial_pipeline
+from common.djangoapps.third_party_auth.provider import Registry
 
 try:
     from enterprise.models import EnterpriseCustomer, EnterpriseCustomerUser

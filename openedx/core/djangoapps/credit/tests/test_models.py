@@ -9,8 +9,8 @@ from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditRequirement, CreditRequirementStatus
-from student.models import get_retired_username_by_username
-from student.tests.factories import UserFactory
+from common.djangoapps.student.models import get_retired_username_by_username
+from common.djangoapps.student.tests.factories import UserFactory
 
 from ..models import CreditRequest, CreditProvider, CreditCourse
 

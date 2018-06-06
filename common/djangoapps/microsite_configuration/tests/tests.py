@@ -4,7 +4,10 @@ Holds base classes for microsite tests
 from django.test import TestCase
 from mock import DEFAULT
 
-from microsite_configuration.tests.factories import MicrositeFactory, MicrositeOrganizationMappingFactory
+from common.djangoapps.microsite_configuration.tests.factories import (
+    MicrositeFactory,
+    MicrositeOrganizationMappingFactory,
+)
 
 MICROSITE_BACKENDS = (
     'microsite_configuration.backends.filebased.FilebasedMicrositeBackend',

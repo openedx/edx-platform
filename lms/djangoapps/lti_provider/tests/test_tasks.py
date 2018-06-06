@@ -9,7 +9,7 @@ from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
 import lti_provider.tasks as tasks
 from lti_provider.models import GradedAssignment, LtiConsumer, OutcomeService
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 class BaseOutcomeTest(TestCase):

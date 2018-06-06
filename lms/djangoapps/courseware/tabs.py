@@ -9,7 +9,7 @@ from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, default_course_url_name
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from xmodule.tabs import CourseTab, CourseTabList, course_reverse_func_from_name_func, key_checker
 
 

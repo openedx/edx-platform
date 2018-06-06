@@ -23,7 +23,7 @@ from crum import get_current_request
 from django.template import RequestContext
 
 from openedx.core.djangoapps.request_cache import get_cache
-from util.request import safe_get_host
+from common.djangoapps.util.request import safe_get_host
 
 
 def get_template_request_context(request=None):

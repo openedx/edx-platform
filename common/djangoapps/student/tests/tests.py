@@ -27,16 +27,16 @@ import shoppingcart  # pylint: disable=import-error
 from bulk_email.models import Optout  # pylint: disable=import-error
 from lms.djangoapps.certificates.models import CertificateStatuses  # pylint: disable=import-error
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
 from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory, ProgramFactory, generate_course_run_key
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
-from student.helpers import _cert_info, process_survey_link
-from student.models import (
+from common.djangoapps.student.helpers import _cert_info, process_survey_link
+from common.djangoapps.student.models import (
     CourseEnrollment,
     LinkedInAddToProfileConfiguration,
     UserAttribute,
@@ -44,10 +44,10 @@ from student.models import (
     unique_id_for_user,
     user_by_anonymous_id
 )
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from student.views import complete_course_mode_info
-from util.model_utils import USER_SETTINGS_CHANGED_EVENT_NAME
-from util.testing import EventTestMixin
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.views import complete_course_mode_info
+from common.djangoapps.util.model_utils import USER_SETTINGS_CHANGED_EVENT_NAME
+from common.djangoapps.util.testing import EventTestMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreEnum, ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 

@@ -37,9 +37,13 @@ from cms.djangoapps.contentstore.views.item import (
     highlights_setting,
 )
 from lms_xblock.mixin import NONSENSICAL_ACCESS_RESTRICTION
-from student.tests.factories import UserFactory
-from xblock_django.models import XBlockConfiguration, XBlockStudioConfiguration, XBlockStudioConfigurationFlag
-from xblock_django.user_service import DjangoXBlockUserService
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.xblock_django.models import (
+    XBlockConfiguration,
+    XBlockStudioConfiguration,
+    XBlockStudioConfigurationFlag,
+)
+from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from xmodule.capa_module import CapaDescriptor
 from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.modulestore import ModuleStoreEnum

@@ -7,7 +7,7 @@ from selenium.common.exceptions import InvalidElementStateException
 
 from common import *
 from cms.djangoapps.contentstore.utils import reverse_course_url
-from terrain.steps import reload_the_page
+from common.djangoapps.terrain.steps import reload_the_page
 
 
 @step(u'I am viewing the grading settings')

@@ -7,8 +7,8 @@ from courseware.access import has_access
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.models import UserPreference
-from student.models import UserProfile, anonymous_id_for_user
-from student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
+from common.djangoapps.student.models import UserProfile, anonymous_id_for_user
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
 
 
 class OpenIDHandler(object):

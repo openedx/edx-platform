@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from django.test import TestCase
 
-from student.models import UserSignupSource
+from common.djangoapps.student.models import UserSignupSource
 
 FAKE_SITE = {
     "SITE_NAME": "openedx.localhost",

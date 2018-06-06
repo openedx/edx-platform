@@ -16,7 +16,7 @@ from django.test.utils import override_settings
 from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.commerce.tests import TEST_API_URL
 from openedx.core.djangoapps.credit import api
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_display_names, make_providers_strings
@@ -38,9 +38,9 @@ from openedx.core.djangoapps.credit.models import (
     CreditRequirementStatus
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.models import CourseEnrollment
-from student.tests.factories import UserFactory
-from util.date_utils import from_timestamp
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.util.date_utils import from_timestamp
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

@@ -5,7 +5,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
-from util.request import COURSE_REGEX
+from common.djangoapps.util.request import COURSE_REGEX
 
 log = logging.getLogger(__name__)
 

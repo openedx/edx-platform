@@ -5,7 +5,7 @@ from mock import Mock, patch
 import unittest
 import urllib2
 import requests
-from terrain.stubs.lti import StubLtiService
+from common.djangoapps.terrain.stubs.lti import StubLtiService
 
 
 class StubLtiServiceTest(unittest.TestCase):

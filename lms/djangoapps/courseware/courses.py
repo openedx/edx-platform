@@ -23,8 +23,8 @@ from courseware.module_render import get_module
 from django.conf import settings
 from django.urls import reverse
 from django.http import Http404, QueryDict
-from enrollment.api import get_course_enrollment_details
-from edxmako.shortcuts import render_to_string
+from common.djangoapps.enrollment.api import get_course_enrollment_details
+from common.djangoapps.edxmako.shortcuts import render_to_string
 from fs.errors import ResourceNotFound
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
@@ -33,10 +33,10 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from path import Path as path
 from six import text_type
-from static_replace import replace_static_urls
-from student.models import CourseEnrollment
+from common.djangoapps.static_replace import replace_static_urls
+from common.djangoapps.student.models import CourseEnrollment
 from survey.utils import is_survey_required_and_unanswered
-from util.date_utils import strftime_localized
+from common.djangoapps.util.date_utils import strftime_localized
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.x_module import STUDENT_VIEW

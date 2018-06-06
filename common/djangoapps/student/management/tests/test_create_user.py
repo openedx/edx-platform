@@ -9,8 +9,8 @@ from django.core.management import call_command
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
-from course_modes.models import CourseMode
-from student.models import CourseEnrollment, UserProfile
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.models import CourseEnrollment, UserProfile
 
 
 class CreateUserMgmtTests(SharedModuleStoreTestCase):

@@ -32,7 +32,7 @@ from social_django.models import UserSocialAuth
 from wiki.models import ArticleRevision
 from wiki.models.pluginbase import RevisionPluginRevision
 
-from entitlements.models import CourseEntitlement
+from common.djangoapps.entitlements.models import CourseEntitlement
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
@@ -48,7 +48,7 @@ from openedx.core.lib.api.authentication import (
 )
 from openedx.core.lib.api.parsers import MergePatchParser
 from survey.models import SurveyAnswer
-from student.models import (
+from common.djangoapps.student.models import (
     CourseEnrollment,
     ManualEnrollmentAudit,
     PasswordHistory,
@@ -63,7 +63,7 @@ from student.models import (
     get_retired_username_by_username,
     is_username_retired
 )
-from student.views.login import AuthFailedError, LoginFailures
+from common.djangoapps.student.views.login import AuthFailedError, LoginFailures
 
 from ..errors import AccountUpdateError, AccountValidationError, UserNotAuthorized, UserNotFound
 from ..models import RetirementState, RetirementStateError, UserOrgTag, UserRetirementStatus

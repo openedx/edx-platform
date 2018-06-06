@@ -24,7 +24,7 @@ from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 
 from openedx.core.djangoapps.request_cache.middleware import RequestCache, ns_request_cached
-from student.models import get_retired_username_by_username
+from common.djangoapps.student.models import get_retired_username_by_username
 
 CREDIT_PROVIDER_ID_REGEX = r"[a-z,A-Z,0-9,\-]+"
 log = logging.getLogger(__name__)

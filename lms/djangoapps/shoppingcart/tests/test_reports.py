@@ -12,7 +12,7 @@ from django.conf import settings
 from mock import patch
 from six import text_type
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from shoppingcart.models import (
     CertificateItem,
     CourseRegCodeItemAnnotation,
@@ -21,8 +21,8 @@ from shoppingcart.models import (
     PaidCourseRegistrationAnnotation
 )
 from shoppingcart.views import initialize_report
-from student.models import CourseEnrollment
-from student.tests.factories import UserFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

@@ -10,8 +10,8 @@ from django.utils import timezone
 from freezegun import freeze_time
 from mock import patch
 
-from student.models import PasswordHistory
-from student.tests.factories import AdminFactory, UserFactory
+from common.djangoapps.student.models import PasswordHistory
+from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
 
 
 @patch.dict("django.conf.settings.FEATURES", {'ADVANCED_SECURITY': True})

@@ -19,7 +19,7 @@ from openedx.core.djangoapps.course_groups.cohorts import (
 )
 from openedx.core.djangoapps.verified_track_content.tasks import sync_cohort_with_mode
 from openedx.core.djangoapps.request_cache.middleware import RequestCache, ns_request_cached
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 
 log = logging.getLogger(__name__)
 

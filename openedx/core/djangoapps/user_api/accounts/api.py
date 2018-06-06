@@ -14,11 +14,11 @@ from django.http import HttpResponseForbidden
 from openedx.core.djangoapps.theming.helpers import get_current_request
 from six import text_type
 
-from student.models import User, UserProfile, Registration, email_exists_or_retired
-from student import forms as student_forms
-from student import views as student_views
-from util.model_utils import emit_setting_changed_event
-from util.password_policy_validators import validate_password
+from common.djangoapps.student.models import User, UserProfile, Registration, email_exists_or_retired
+from common.djangoapps.student import forms as student_forms
+from common.djangoapps.student import views as student_views
+from common.djangoapps.util.model_utils import emit_setting_changed_event
+from common.djangoapps.util.password_policy_validators import validate_password
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import errors, accounts, forms, helpers

@@ -33,15 +33,15 @@ from openid.server.server import ProtocolError, Server, UntrustedReturnURL
 from openid.server.trustroot import TrustRoot
 from ratelimitbackend.exceptions import RateLimitException
 
-import student.views
-from edxmako.shortcuts import render_to_response, render_to_string
+import common.djangoapps.student.views
+from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_string
 from openedx.core.djangoapps.external_auth.djangostore import DjangoOpenIDStore
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangoapps.site_configuration.helpers import get_value
 from openedx.core.djangoapps.user_api.accounts.utils import generate_password
-from student.helpers import get_next_url_for_login_page
-from student.models import UserProfile
-from util.db import outer_atomic
+from common.djangoapps.student.helpers import get_next_url_for_login_page
+from common.djangoapps.student.models import UserProfile
+from common.djangoapps.util.db import outer_atomic
 from xmodule.modulestore.django import modulestore
 
 if settings.FEATURES.get('AUTH_USE_CAS'):

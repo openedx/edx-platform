@@ -13,11 +13,11 @@ import pytz
 from django.test.client import Client
 from mock import patch
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from shoppingcart.models import CertificateItem, Order
-from student.models import CourseEnrollment
-from student.roles import SupportStaffRole
-from student.tests.factories import UserFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import SupportStaffRole
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

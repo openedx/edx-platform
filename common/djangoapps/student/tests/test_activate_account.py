@@ -7,11 +7,11 @@ from django.urls import reverse
 from django.test import TestCase, override_settings
 from mock import patch
 
-from edxmako.shortcuts import render_to_string
+from common.djangoapps.edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
-from student.models import Registration
-from student.tests.factories import UserFactory
+from common.djangoapps.student.models import Registration
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

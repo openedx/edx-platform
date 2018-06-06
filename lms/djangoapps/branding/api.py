@@ -21,7 +21,7 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from branding.models import BrandingApiConfig
-from edxmako.shortcuts import marketing_link
+from common.djangoapps.edxmako.shortcuts import marketing_link
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 

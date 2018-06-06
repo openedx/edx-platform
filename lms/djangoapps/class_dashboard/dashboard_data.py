@@ -11,7 +11,7 @@ from six import text_type
 
 from courseware import models
 from instructor_analytics.csvs import create_csv_response
-from util.json_request import JsonResponse
+from common.djangoapps.util.json_request import JsonResponse
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.inheritance import own_metadata
 

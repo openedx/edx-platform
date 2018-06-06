@@ -8,7 +8,7 @@ import ddt
 from django.urls import reverse
 from rest_framework.test import APIClient
 
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from common.djangoapps.student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms

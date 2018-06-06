@@ -25,8 +25,8 @@ from lms.djangoapps.instructor.views.api import _split_input_list
 from lms.djangoapps.instructor.views.tools import get_student_from_identifier
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
-from student.models import CourseEnrollment, CourseEnrollmentException
-from student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
+from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentException
+from common.djangoapps.student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
 
 
 log = logging.getLogger("edx.ccx")

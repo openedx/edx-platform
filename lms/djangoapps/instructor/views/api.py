@@ -58,14 +58,14 @@ from django_comment_client.utils import (
     get_group_name,
     get_group_id_for_user
 )
-from django_comment_common.models import (
+from common.djangoapps.django_comment_common.models import (
     Role,
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_MODERATOR,
     FORUM_ROLE_GROUP_MODERATOR,
     FORUM_ROLE_COMMUNITY_TA,
 )
-from edxmako.shortcuts import render_to_string
+from common.djangoapps.edxmako.shortcuts import render_to_string
 from lms.djangoapps.instructor.access import ROLES, allow_access, list_with_level, revoke_access, update_forum_role
 from lms.djangoapps.instructor.enrollment import (
     enroll_email,
@@ -93,8 +93,8 @@ from shoppingcart.models import (
     Invoice,
     RegistrationCodeRedemption
 )
-from student import auth
-from student.models import (
+from common.djangoapps.student import auth
+from common.djangoapps.student.models import (
     ALLOWEDTOENROLL_TO_ENROLLED,
     ALLOWEDTOENROLL_TO_UNENROLLED,
     DEFAULT_TRANSITION_STATE,
@@ -113,16 +113,16 @@ from student.models import (
     unique_id_for_user,
     is_email_retired
 )
-from student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
+from common.djangoapps.student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
 from submissions import api as sub_api  # installed from the edx-submissions repository
-from util.file import (
+from common.djangoapps.util.file import (
     FileValidationException,
     UniversalNewlineIterator,
     course_and_time_based_filename_generator,
     store_uploaded_file
 )
-from util.json_request import JsonResponse, JsonResponseBadRequest
-from util.views import require_global_staff
+from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest
+from common.djangoapps.util.views import require_global_staff
 from xmodule.modulestore.django import modulestore
 
 from .tools import (

@@ -18,7 +18,7 @@ from shoppingcart.models import (
     PaidCourseRegistration,
     RegistrationCodeRedemption
 )
-from student.models import CourseEnrollment, ManualEnrollmentAudit
+from common.djangoapps.student.models import CourseEnrollment, ManualEnrollmentAudit
 
 
 class PaidCourseEnrollmentReportProvider(BaseAbstractEnrollmentReportProvider):

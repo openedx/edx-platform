@@ -5,7 +5,7 @@ Command used for testing TrackedCommands
 import json
 
 from eventtracking import tracker as eventtracker
-from track.management.tracked_command import TrackedCommand
+from common.djangoapps.track.management.tracked_command import TrackedCommand
 
 
 class Command(TrackedCommand):

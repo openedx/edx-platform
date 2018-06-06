@@ -11,9 +11,9 @@ from django.contrib.auth import models
 from django.core import mail
 from social_django import models as social_models
 
-from student.tests.factories import UserFactory
-from third_party_auth import pipeline, provider
-from third_party_auth.tests import testutil
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.third_party_auth import pipeline, provider
+from common.djangoapps.third_party_auth.tests import testutil
 from lms.djangoapps.verify_student.models import SSOVerification
 
 # Get Django User model by reference from python-social-auth. Not a type

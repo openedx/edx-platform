@@ -38,13 +38,13 @@ from six import text_type
 from cms.djangoapps.contentstore.utils import get_lms_link_for_certificate_web_view, reverse_course_url
 from cms.djangoapps.contentstore.views.assets import delete_asset
 from cms.djangoapps.contentstore.views.exception import AssetNotFoundException
-from course_modes.models import CourseMode
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from eventtracking import tracker
-from student.auth import has_studio_write_access
-from student.roles import GlobalStaff
-from util.db import MYSQL_MAX_INT, generate_int_id
-from util.json_request import JsonResponse
+from common.djangoapps.student.auth import has_studio_write_access
+from common.djangoapps.student.roles import GlobalStaff
+from common.djangoapps.util.db import MYSQL_MAX_INT, generate_int_id
+from common.djangoapps.util.json_request import JsonResponse
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.django import modulestore
 

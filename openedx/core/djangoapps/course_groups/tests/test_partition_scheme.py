@@ -7,7 +7,7 @@ from mock import patch
 from nose.plugins.attrib import attr
 
 from courseware.tests.test_masquerade import StaffMasqueradeTestCase
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.partitions.partitions import Group, UserPartition, UserPartitionError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MIXED_MODULESTORE

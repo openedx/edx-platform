@@ -19,8 +19,8 @@ from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
 from courseware.courses import get_course_with_access
-from edxmako.shortcuts import render_to_response
-from util.json_request import JsonResponse, expect_json
+from common.djangoapps.edxmako.shortcuts import render_to_response
+from common.djangoapps.util.json_request import JsonResponse, expect_json
 
 from . import cohorts
 from .models import CohortMembership, CourseUserGroup, CourseUserGroupPartitionGroup

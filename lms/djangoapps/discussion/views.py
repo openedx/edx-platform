@@ -41,12 +41,16 @@ from django_comment_client.utils import (
     is_commentable_divided,
     strip_none
 )
-from django_comment_common.models import CourseDiscussionSettings
-from django_comment_common.utils import ThreadContext, get_course_discussion_settings, set_course_discussion_settings
+from common.djangoapps.django_comment_common.models import CourseDiscussionSettings
+from common.djangoapps.django_comment_common.utils import (
+    ThreadContext,
+    get_course_discussion_settings,
+    set_course_discussion_settings,
+)
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.monitoring_utils import function_trace
-from student.models import CourseEnrollment
-from util.json_request import JsonResponse, expect_json
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.util.json_request import JsonResponse, expect_json
 from xmodule.modulestore.django import modulestore
 
 from .config import USE_BOOTSTRAP_FLAG

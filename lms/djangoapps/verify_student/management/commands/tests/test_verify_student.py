@@ -17,7 +17,7 @@ from lms.djangoapps.verify_student.tests.test_models import (
     mock_software_secure_post,
     mock_software_secure_post_error
 )
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 # Lots of patching to stub in our own settings, and HTTP posting

@@ -7,7 +7,7 @@ import mock
 
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
 from lms.envs.test import CREDENTIALS_PUBLIC_SERVICE_URL
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from django.conf import settings
 from django.urls import reverse
 from django.test.client import RequestFactory
@@ -16,8 +16,8 @@ from opaque_keys.edx.locator import CourseLocator
 from openedx.core.djangoapps.credentials import STUDENT_RECORDS_FLAG
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.learner_profile.views.learner_profile import learner_profile_context
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from util.testing import UrlResetMixin
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

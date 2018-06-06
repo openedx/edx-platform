@@ -15,8 +15,8 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ToyCourseFactory
 
-from student.models import CourseAccessRole
-from student.tests.factories import AdminFactory, TEST_PASSWORD, UserFactory
+from common.djangoapps.student.models import CourseAccessRole
+from common.djangoapps.student.tests.factories import AdminFactory, TEST_PASSWORD, UserFactory
 from ..utils import serialize_datetime
 from ...serializers.course_runs import CourseRunSerializer
 

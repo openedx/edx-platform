@@ -15,7 +15,7 @@ from lms.djangoapps.courseware.views.views import CourseTabView
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_experience import default_course_url_name
-from util.views import ensure_valid_course_key
+from common.djangoapps.util.views import ensure_valid_course_key
 from web_fragments.fragment import Fragment
 
 

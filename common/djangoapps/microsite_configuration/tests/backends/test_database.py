@@ -6,20 +6,20 @@ from mock import patch
 
 from django.conf import settings
 
-from microsite_configuration.backends.base import (
+from common.djangoapps.microsite_configuration.backends.base import (
     BaseMicrositeBackend,
     BaseMicrositeTemplateBackend,
 )
-from microsite_configuration import microsite
-from microsite_configuration.models import (
+from common.djangoapps.microsite_configuration import microsite
+from common.djangoapps.microsite_configuration.models import (
     Microsite,
     MicrositeHistory,
     MicrositeTemplate,
 )
-from microsite_configuration.tests.tests import (
+from common.djangoapps.microsite_configuration.tests.tests import (
     DatabaseMicrositeTestCase,
 )
-from microsite_configuration.tests.factories import (
+from common.djangoapps.microsite_configuration.tests.factories import (
     SiteFactory,
     MicrositeFactory,
     MicrositeTemplateFactory,

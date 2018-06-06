@@ -9,7 +9,7 @@ import pytz
 
 from oauth2_provider.models import Application, AccessToken, RefreshToken
 
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 class ApplicationFactory(DjangoModelFactory):

@@ -42,11 +42,11 @@ from cms.djangoapps.contentstore.courseware_index import (
 )
 from cms.djangoapps.contentstore.storage import course_import_export_storage
 from cms.djangoapps.contentstore.utils import initialize_permissions, reverse_usage_url
-from course_action_state.models import CourseRerunState
+from common.djangoapps.course_action_state.models import CourseRerunState
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from openedx.core.djangoapps.embargo.models import CountryAccessRule, RestrictedCourse
 from openedx.core.lib.extract_tar import safetar_extractall
-from student.auth import has_course_author_access
+from common.djangoapps.student.auth import has_course_author_access
 from xmodule.contentstore.django import contentstore
 from xmodule.course_module import CourseFields
 from xmodule.exceptions import SerializationError
@@ -672,7 +672,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
             if courselike_module.entrance_exam_enabled:
                 fake_request = RequestFactory().get(u'/')
                 fake_request.user = user
-                from contentstore.views.entrance_exam import remove_entrance_exam_milestone_reference
+                from cms.djangoapps.contentstore.views.entrance_exam import remove_entrance_exam_milestone_reference
                 # TODO: Is this really ok?  Seems dangerous for a live course
                 remove_entrance_exam_milestone_reference(fake_request, courselike_key)
                 LOGGER.info(
@@ -776,6 +776,6 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
 
                 metadata = {u'entrance_exam_id': text_type(entrance_exam_chapter.location)}
                 CourseMetadata.update_from_dict(metadata, course, user)
-                from contentstore.views.entrance_exam import add_entrance_exam_milestone
+                from cms.djangoapps.contentstore.views.entrance_exam import add_entrance_exam_milestone
                 add_entrance_exam_milestone(course.id, entrance_exam_chapter)
                 LOGGER.info(u'Course %s Entrance exam imported', course.id)

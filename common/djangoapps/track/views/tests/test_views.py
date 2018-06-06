@@ -6,9 +6,9 @@ from django.contrib.auth.models import User
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 
-from track import views
-from track.middleware import TrackMiddleware
-from track.tests import EventTrackingTestCase, FROZEN_TIME
+from common.djangoapps.track import views
+from common.djangoapps.track.middleware import TrackMiddleware
+from common.djangoapps.track.tests import EventTrackingTestCase, FROZEN_TIME
 from openedx.core.lib.tests.assertions.events import assert_event_matches
 
 

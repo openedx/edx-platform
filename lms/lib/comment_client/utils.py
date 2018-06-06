@@ -52,7 +52,7 @@ def request_timer(request_id, method, url, tags=None):
 def perform_request(method, url, data_or_params=None, raw=False,
                     metric_action=None, metric_tags=None, paged_results=False):
     # To avoid dependency conflict
-    from django_comment_common.models import ForumsConfig
+    from common.djangoapps.django_comment_common.models import ForumsConfig
     config = ForumsConfig.current()
 
     if not config.enabled:
@@ -174,7 +174,7 @@ def check_forum_heartbeat():
     This function can be connected to the LMS heartbeat checker through the HEARTBEAT_CHECKS variable.
     """
     # To avoid dependency conflict
-    from django_comment_common.models import ForumsConfig
+    from common.djangoapps.django_comment_common.models import ForumsConfig
     config = ForumsConfig.current()
 
     if not config.enabled:

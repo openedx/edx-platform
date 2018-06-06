@@ -17,8 +17,8 @@ from django.test.utils import override_settings
 from mock import patch
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin, CacheIsolationTestCase, FilteredQueryCountMixin
 from openedx.core.lib.tempdir import mkdtemp_clean
-from student.models import CourseEnrollment
-from student.tests.factories import UserFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.contentstore.django import _CONTENTSTORE
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import SignalHandler, clear_existing_modulestores, modulestore
@@ -365,7 +365,7 @@ class SharedModuleStoreTestCase(
     How to use::
 
         from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-        from student.tests.factories import CourseEnrollmentFactory, UserFactory
+        from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 
         class MyModuleStoreTestCase(SharedModuleStoreTestCase):
             @classmethod

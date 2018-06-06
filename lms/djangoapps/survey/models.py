@@ -11,7 +11,7 @@ from lxml import etree
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 
-from student.models import User
+from common.djangoapps.student.models import User
 from survey.exceptions import SurveyFormNameAlreadyExists, SurveyFormNotFound
 
 log = logging.getLogger("edx.survey")

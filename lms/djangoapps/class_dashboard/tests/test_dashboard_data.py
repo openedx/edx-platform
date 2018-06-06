@@ -25,7 +25,7 @@ from class_dashboard.dashboard_data import (
 )
 from class_dashboard.views import has_instructor_access_for_class
 from courseware.tests.factories import StudentModuleFactory
-from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 

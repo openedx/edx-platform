@@ -7,8 +7,8 @@ from django.urls import reverse
 from django.test import TestCase
 from mock import Mock
 
-from student.admin import UserAdmin
-from student.tests.factories import UserFactory
+from common.djangoapps.student.admin import UserAdmin
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

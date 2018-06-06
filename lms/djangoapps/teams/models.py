@@ -13,7 +13,7 @@ from django_countries.fields import CountryField
 from model_utils import FieldTracker
 from opaque_keys.edx.django.models import CourseKeyField
 
-from django_comment_common.signals import (
+from common.djangoapps.django_comment_common.signals import (
     comment_created,
     comment_deleted,
     comment_edited,
@@ -28,7 +28,7 @@ from django_comment_common.signals import (
 )
 from lms.djangoapps.teams import TEAM_DISCUSSION_CONTEXT
 from lms.djangoapps.teams.utils import emit_team_event
-from student.models import CourseEnrollment, LanguageField
+from common.djangoapps.student.models import CourseEnrollment, LanguageField
 from django.utils.text import slugify
 
 from .errors import AlreadyOnTeamInCourse, ImmutableMembershipFieldException, NotEnrolledInCourseForTeam

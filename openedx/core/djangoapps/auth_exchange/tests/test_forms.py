@@ -12,7 +12,10 @@ from provider import scope
 from social_django.models import Partial
 import social_django.utils as social_utils
 
-from third_party_auth.tests.utils import ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
+from common.djangoapps.third_party_auth.tests.utils import (
+    ThirdPartyOAuthTestMixinFacebook,
+    ThirdPartyOAuthTestMixinGoogle,
+)
 
 from ..forms import AccessTokenExchangeForm
 from .utils import AccessTokenExchangeTestMixin, TPA_FEATURE_ENABLED, TPA_FEATURES_KEY

@@ -7,8 +7,8 @@ from types import NoneType
 
 from opaque_keys.edx.keys import CourseKey
 
-from django_comment_common.models import CourseDiscussionSettings, all_permissions_for_user_in_course
-from django_comment_common.utils import get_course_discussion_settings
+from common.djangoapps.django_comment_common.models import CourseDiscussionSettings, all_permissions_for_user_in_course
+from common.djangoapps.django_comment_common.utils import get_course_discussion_settings
 from lms.djangoapps.teams.models import CourseTeam
 from lms.lib.comment_client import Thread
 from openedx.core.djangoapps.request_cache.middleware import RequestCache, request_cached

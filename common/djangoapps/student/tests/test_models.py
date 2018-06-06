@@ -12,15 +12,15 @@ from django.db.models import signals
 from django.db.models.functions import Lower
 from django.test import TestCase
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from courseware.models import DynamicUpgradeDeadlineConfiguration
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.models import (
+from common.djangoapps.student.models import (
     CourseEnrollment,
     CourseEnrollmentAllowed,
     PendingEmailChange,
@@ -28,7 +28,7 @@ from student.models import (
     ALLOWEDTOENROLL_TO_ENROLLED,
     PendingNameChange
 )
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

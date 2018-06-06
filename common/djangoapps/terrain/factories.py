@@ -10,8 +10,8 @@ def absorb_factories():
     """
     Absorb the factories and return the resulting ``world`` object.
     """
-    import course_modes.tests.factories as cmf
-    import student.tests.factories as sf
+    import common.djangoapps.course_modes.tests.factories as cmf
+    import common.djangoapps.student.tests.factories as sf
     import xmodule.modulestore.tests.factories as xf
 
     # Unlock XBlock factories, because we're randomizing the collection

@@ -18,9 +18,9 @@ from django.test.utils import override_settings
 from opaque_keys.edx.keys import CourseKey
 from requests import Timeout
 
-from course_modes.models import CourseMode
-from student.signals import REFUND_ORDER
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.signals import REFUND_ORDER
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from . import JSON
 from .mocks import mock_create_refund, mock_process_refund
 from ..models import CommerceConfiguration

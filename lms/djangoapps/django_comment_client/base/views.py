@@ -33,7 +33,7 @@ from django_comment_client.utils import (
     is_comment_too_deep,
     prepare_content
 )
-from django_comment_common.signals import (
+from common.djangoapps.django_comment_common.signals import (
     comment_created,
     comment_deleted,
     comment_edited,
@@ -46,10 +46,10 @@ from django_comment_common.signals import (
     thread_followed,
     thread_unfollowed,
 )
-from django_comment_common.utils import ThreadContext
+from common.djangoapps.django_comment_common.utils import ThreadContext
 import eventtracking
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
-from util.file import store_uploaded_file
+from common.djangoapps.util.file import store_uploaded_file
 
 log = logging.getLogger(__name__)
 

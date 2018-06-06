@@ -11,7 +11,7 @@ from importlib import import_module
 
 from django.conf import settings
 
-from microsite_configuration.backends.base import BaseMicrositeBackend, BaseMicrositeTemplateBackend
+from common.djangoapps.microsite_configuration.backends.base import BaseMicrositeBackend, BaseMicrositeTemplateBackend
 
 __all__ = [
     'is_request_in_microsite', 'get_value', 'has_override_value',

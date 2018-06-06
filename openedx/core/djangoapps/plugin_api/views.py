@@ -8,7 +8,7 @@ from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
-from edxmako.shortcuts import is_any_marketing_link_set, is_marketing_link_set, marketing_link
+from common.djangoapps.edxmako.shortcuts import is_any_marketing_link_set, is_marketing_link_set, marketing_link
 from web_fragments.views import FragmentView
 
 log = logging.getLogger('plugin_api')

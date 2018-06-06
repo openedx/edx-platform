@@ -37,17 +37,17 @@ from lms.djangoapps.certificates.models import (
 )
 from courseware.access import has_access
 from courseware.courses import get_course_by_id
-from edxmako.shortcuts import render_to_response
-from edxmako.template import Template
+from common.djangoapps.edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.template import Template
 from openedx.core.djangoapps.catalog.utils import get_course_run_details
 from openedx.core.djangoapps.lang_pref.api import get_closest_released_language
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.courses import course_image_url
 from openedx.core.djangoapps.certificates.api import display_date_for_certificate, certificates_viewable_for_course
-from student.models import LinkedInAddToProfileConfiguration
-from util import organizations_helpers as organization_api
-from util.date_utils import strftime_localized
-from util.views import handle_500
+from common.djangoapps.student.models import LinkedInAddToProfileConfiguration
+from common.djangoapps.util import organizations_helpers as organization_api
+from common.djangoapps.util.date_utils import strftime_localized
+from common.djangoapps.util.views import handle_500
 
 
 log = logging.getLogger(__name__)

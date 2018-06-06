@@ -9,7 +9,7 @@ import urlparse
 from nose.plugins.attrib import attr
 
 from opaque_keys.edx.keys import CourseKey
-from student.tests.factories import AdminFactory
+from common.djangoapps.student.tests.factories import AdminFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
     SharedModuleStoreTestCase,

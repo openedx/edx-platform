@@ -9,7 +9,7 @@ from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactor
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.partitions.partitions import UserPartition, Group
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 
 class ContentGroupTestCase(ModuleStoreTestCase):

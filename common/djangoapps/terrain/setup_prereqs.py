@@ -13,10 +13,10 @@ from django.conf import settings
 from lettuce import after, before, world
 from selenium.common.exceptions import NoAlertPresentException
 
-from terrain.stubs.lti import StubLtiService
-from terrain.stubs.video_source import VideoSourceHttpService
-from terrain.stubs.xqueue import StubXQueueService
-from terrain.stubs.youtube import StubYouTubeService
+from common.djangoapps.terrain.stubs.lti import StubLtiService
+from common.djangoapps.terrain.stubs.video_source import VideoSourceHttpService
+from common.djangoapps.terrain.stubs.xqueue import StubXQueueService
+from common.djangoapps.terrain.stubs.youtube import StubYouTubeService
 
 LOGGER = getLogger(__name__)
 

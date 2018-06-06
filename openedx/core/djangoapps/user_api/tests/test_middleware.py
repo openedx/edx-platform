@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.test import TestCase
 from django.test.client import RequestFactory
 
-from student.tests.factories import UserFactory, AnonymousUserFactory
+from common.djangoapps.student.tests.factories import UserFactory, AnonymousUserFactory
 
 from ..tests.factories import UserCourseTagFactory
 from ..middleware import UserTagsEventContextMiddleware

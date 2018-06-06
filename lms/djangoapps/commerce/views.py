@@ -10,14 +10,14 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from opaque_keys.edx.locator import CourseLocator
 
-from course_modes.models import CourseMode
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
 from shoppingcart.processors.CyberSource2 import is_user_payment_error
-from student.models import CourseEnrollment
-from util.json_request import JsonResponse
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.util.json_request import JsonResponse
 
 from .models import CommerceConfiguration
 

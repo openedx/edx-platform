@@ -24,10 +24,10 @@ from cms.djangoapps.contentstore.views.item import (
     add_container_page_publishing_info,
     create_xblock_info,
 )
-from edxmako.shortcuts import render_to_response
-from student.auth import has_course_author_access
-from xblock_django.api import authorable_xblocks, disabled_xblocks
-from xblock_django.models import XBlockStudioConfigurationFlag
+from common.djangoapps.edxmako.shortcuts import render_to_response
+from common.djangoapps.student.auth import has_course_author_access
+from common.djangoapps.xblock_django.api import authorable_xblocks, disabled_xblocks
+from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 

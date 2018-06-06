@@ -15,7 +15,7 @@ from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_librar
 from cms.djangoapps.contentstore.views.component import get_component_templates
 from cms.djangoapps.contentstore.views.library import get_library_creator_status
 from cms.djangoapps.course_creators.views import add_user_with_status_granted as grant_course_creator_status
-from student.roles import LibraryUserRole
+from common.djangoapps.student.roles import LibraryUserRole
 from xmodule.modulestore.tests.factories import LibraryFactory
 
 LIBRARY_REST_URL = '/library/'  # URL for GET/POST requests involving libraries

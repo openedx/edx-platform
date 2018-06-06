@@ -32,7 +32,7 @@ from openedx.features.enterprise_support.tests import FEATURES_WITH_ENTERPRISE_E
 from openedx.features.enterprise_support.tests.factories import EnterpriseCustomerUserFactory
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
 from openedx.features.enterprise_support.utils import get_cache_key
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 class MockEnrollment(mock.MagicMock):

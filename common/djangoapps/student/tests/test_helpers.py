@@ -13,7 +13,7 @@ from django.utils import http
 from mock import patch
 from testfixtures import LogCapture
 
-from student.helpers import get_next_url_for_login_page
+from common.djangoapps.student.helpers import get_next_url_for_login_page
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 
 LOGGER_NAME = "student.helpers"

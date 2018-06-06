@@ -13,7 +13,7 @@ from opaque_keys.edx.locator import CourseKey
 from six import text_type
 
 from shoppingcart.models import Coupon, CourseRegistrationCode
-from util.json_request import JsonResponse
+from common.djangoapps.util.json_request import JsonResponse
 
 log = logging.getLogger(__name__)
 

@@ -7,8 +7,8 @@ from django.contrib.auth.models import User
 
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient
 from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_url
-from student import auth
-from student.roles import CourseInstructorRole, CourseStaffRole, OrgInstructorRole, OrgStaffRole
+from common.djangoapps.student import auth
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, OrgInstructorRole, OrgStaffRole
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 

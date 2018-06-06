@@ -13,7 +13,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 from eventtracking import tracker
-from util.json_request import expect_json
+from common.djangoapps.util.json_request import expect_json
 
 log = logging.getLogger(__name__)
 

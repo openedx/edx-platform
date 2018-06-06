@@ -25,9 +25,9 @@ from openedx.core.djangoapps.password_policy.compliance import (
 )
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.tests.util import expected_redirect_url
-from student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
-from student.views import login_oauth_token
-from third_party_auth.tests.utils import (
+from common.djangoapps.student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
+from common.djangoapps.student.views import login_oauth_token
+from common.djangoapps.third_party_auth.tests.utils import (
     ThirdPartyOAuthTestMixin,
     ThirdPartyOAuthTestMixinFacebook,
     ThirdPartyOAuthTestMixinGoogle

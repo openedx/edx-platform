@@ -11,7 +11,7 @@ from opaque_keys import InvalidKeyError
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 
 
 class CreateRandomUserTests(SharedModuleStoreTestCase):

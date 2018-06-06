@@ -11,7 +11,12 @@ from mock import patch
 from nose.tools import assert_equals, assert_false  # pylint: disable=no-name-in-module
 from pytz import utc
 
-from util.date_utils import almost_same_datetime, get_default_time_display, get_time_display, strftime_localized
+from common.djangoapps.util.date_utils import (
+    almost_same_datetime,
+    get_default_time_display,
+    get_time_display,
+    strftime_localized,
+)
 
 
 def test_get_default_time_display():

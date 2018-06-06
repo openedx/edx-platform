@@ -9,9 +9,9 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from student.models import User
+from common.djangoapps.student.models import User
 
 from .models import SoftwareSecurePhotoVerification, SSOVerification
 from .utils import earliest_allowed_verification_date, most_recent_verification

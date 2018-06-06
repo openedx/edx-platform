@@ -17,7 +17,7 @@ from six import text_type
 from courseware.courses import get_problems_in_section
 from courseware.module_render import get_xqueue_callback_url_prefix
 from lms.djangoapps.instructor_task.models import PROGRESS, InstructorTask
-from util.db import outer_atomic
+from common.djangoapps.util.db import outer_atomic
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)

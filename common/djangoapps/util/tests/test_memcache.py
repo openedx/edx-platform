@@ -5,7 +5,7 @@ Tests for memcache in util app
 from django.core.cache import caches
 from django.test import TestCase
 
-from util.memcache import safe_key
+from common.djangoapps.util.memcache import safe_key
 
 
 class MemcacheTest(TestCase):

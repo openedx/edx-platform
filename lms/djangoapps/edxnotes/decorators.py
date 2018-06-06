@@ -6,7 +6,7 @@ import json
 
 from django.conf import settings
 
-from edxmako.shortcuts import render_to_string
+from common.djangoapps.edxmako.shortcuts import render_to_string
 
 
 def edxnotes(cls):

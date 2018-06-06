@@ -6,7 +6,7 @@ from nose.plugins.attrib import attr
 
 from openedx.core.djangoapps.oauth_dispatch.tests import mixins
 from openedx.core.lib.token_utils import JwtBuilder
-from student.tests.factories import UserFactory, UserProfileFactory
+from common.djangoapps.student.tests.factories import UserFactory, UserProfileFactory
 
 
 @attr(shard=2)

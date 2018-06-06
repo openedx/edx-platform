@@ -12,7 +12,7 @@ from mock import Mock
 
 from openedx.core.djangoapps.dark_lang.middleware import DarkLangMiddleware
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 UNSET = object()
 

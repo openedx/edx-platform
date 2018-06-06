@@ -6,7 +6,7 @@ from django.test import TestCase
 from nose.plugins.attrib import attr
 import mock
 
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED
 from openedx.core.djangoapps.programs.signals import handle_course_cert_awarded

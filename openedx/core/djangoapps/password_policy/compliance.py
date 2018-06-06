@@ -7,8 +7,8 @@ import pytz
 from django.conf import settings
 from django.utils.translation import ugettext as _
 
-from util.date_utils import DEFAULT_SHORT_DATE_FORMAT, strftime_localized
-from util.password_policy_validators import validate_password
+from common.djangoapps.util.date_utils import DEFAULT_SHORT_DATE_FORMAT, strftime_localized
+from common.djangoapps.util.password_policy_validators import validate_password
 
 
 class NonCompliantPasswordException(Exception):

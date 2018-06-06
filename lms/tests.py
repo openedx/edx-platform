@@ -8,8 +8,8 @@ from django.test import TestCase
 from mock import patch
 from six import text_type
 
-from edxmako import LOOKUP, add_lookup
-from microsite_configuration import microsite
+from common.djangoapps.edxmako import LOOKUP, add_lookup
+from common.djangoapps.microsite_configuration import microsite
 from openedx.features.course_experience import course_home_url_name
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory

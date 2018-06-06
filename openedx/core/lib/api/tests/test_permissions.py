@@ -7,13 +7,13 @@ from django.test import TestCase, RequestFactory
 from nose.plugins.attrib import attr
 from rest_framework.generics import GenericAPIView
 
-from student.roles import CourseStaffRole, CourseInstructorRole
+from common.djangoapps.student.roles import CourseStaffRole, CourseInstructorRole
 from openedx.core.lib.api.permissions import (
     IsStaffOrOwner,
     IsCourseStaffInstructor,
     IsMasterCourseStaffInstructor,
 )
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from opaque_keys.edx.keys import CourseKey
 
 

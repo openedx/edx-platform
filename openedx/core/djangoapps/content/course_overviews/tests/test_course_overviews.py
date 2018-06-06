@@ -21,7 +21,7 @@ from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.lib.courses import course_image_url
-from static_replace.models import AssetBaseUrlConfig
+from common.djangoapps.static_replace.models import AssetBaseUrlConfig
 from xmodule.assetstore.assetmgr import AssetManager
 from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent

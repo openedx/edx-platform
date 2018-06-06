@@ -12,14 +12,14 @@ from edx_rest_api_client.client import EdxRestApiClient
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
-from entitlements.utils import is_course_run_entitlement_fulfillable
+from common.djangoapps.entitlements.utils import is_course_run_entitlement_fulfillable
 from openedx.core.constants import COURSE_PUBLISHED
 from openedx.core.djangoapps.catalog.cache import (PROGRAM_CACHE_KEY_TPL,
                                                    SITE_PROGRAM_UUIDS_CACHE_KEY_TPL)
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from openedx.core.lib.token_utils import JwtBuilder
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 
 logger = logging.getLogger(__name__)
 

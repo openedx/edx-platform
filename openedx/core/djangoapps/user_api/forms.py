@@ -3,4 +3,4 @@
 """
 Django Administration forms module
 """
-from student.forms import PasswordResetFormNoActive
+from common.djangoapps.student.forms import PasswordResetFormNoActive

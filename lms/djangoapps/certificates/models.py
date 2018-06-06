@@ -65,12 +65,12 @@ from opaque_keys.edx.django.models import CourseKeyField
 
 from badges.events.course_complete import course_badge_check
 from badges.events.course_meta import completion_check, course_group_check
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.instructor_task.models import InstructorTask
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
-from util.milestones_helpers import fulfill_course_milestone, is_prerequisite_courses_enabled
+from common.djangoapps.util.milestones_helpers import fulfill_course_milestone, is_prerequisite_courses_enabled
 
 LOGGER = logging.getLogger(__name__)
 
@@ -216,7 +216,7 @@ class GeneratedCertificate(models.Model):
     """
     # Import here instead of top of file since this module gets imported before
     # the course_modes app is loaded, resulting in a Django deprecation warning.
-    from course_modes.models import CourseMode
+    from common.djangoapps.course_modes.models import CourseMode
 
     # Only returns eligible certificates. This should be used in
     # preference to the default `objects` manager in most cases.
@@ -538,7 +538,7 @@ def certificate_status(generated_certificate):
     '''
     # Import here instead of top of file since this module gets imported before
     # the course_modes app is loaded, resulting in a Django deprecation warning.
-    from course_modes.models import CourseMode
+    from common.djangoapps.course_modes.models import CourseMode
 
     if generated_certificate:
         cert_status = {
@@ -569,7 +569,7 @@ def certificate_info_for_user(user, course_id, grade, user_is_whitelisted, user_
     """
     Returns the certificate info for a user for grade report.
     """
-    from student.models import CourseEnrollment
+    from common.djangoapps.student.models import CourseEnrollment
 
     certificate_is_delivered = 'N'
     certificate_type = 'N/A'
@@ -621,7 +621,7 @@ class ExampleCertificateSet(TimeStampedModel):
         """
         # Import here instead of top of file since this module gets imported before
         # the course_modes app is loaded, resulting in a Django deprecation warning.
-        from course_modes.models import CourseMode
+        from common.djangoapps.course_modes.models import CourseMode
         cert_set = cls.objects.create(course_key=course_key)
 
         ExampleCertificate.objects.bulk_create([

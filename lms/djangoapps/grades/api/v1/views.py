@@ -9,8 +9,8 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
-from enrollment import data as enrollment_data
-from student.models import CourseEnrollment
+from common.djangoapps.enrollment import data as enrollment_data
+from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.permissions import IsUserInUrlOrStaff

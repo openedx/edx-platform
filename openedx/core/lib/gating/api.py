@@ -15,7 +15,7 @@ from lms.djangoapps.grades.subsection_grade_factory import SubsectionGradeFactor
 from milestones import api as milestones_api
 from opaque_keys.edx.keys import UsageKey
 from openedx.core.lib.gating.exceptions import GatingValidationError
-from util import milestones_helpers
+from common.djangoapps.util import milestones_helpers
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 

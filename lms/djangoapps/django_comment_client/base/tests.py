@@ -19,8 +19,8 @@ from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
 from common.test.utils import MockSignalHandlerMixin, disable_signal
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from django_comment_client.base import views
 from django_comment_client.tests.group_id import (
     CohortedTopicGroupIdTestMixin,
@@ -29,28 +29,32 @@ from django_comment_client.tests.group_id import (
 )
 from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_client.tests.utils import CohortedTestCase, ForumsEnableMixin
-from django_comment_common.models import (
+from common.djangoapps.django_comment_common.models import (
     assign_role,
     CourseDiscussionSettings,
     FORUM_ROLE_STUDENT,
     Role
 )
-from django_comment_common.utils import ThreadContext, seed_permissions_roles, set_course_discussion_settings
+from common.djangoapps.django_comment_common.utils import (
+    ThreadContext,
+    seed_permissions_roles,
+    set_course_discussion_settings,
+)
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
 from lms.lib.comment_client import Thread
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
-from student.roles import CourseStaffRole, UserBasedRole
-from student.tests.factories import CourseAccessRoleFactory, CourseEnrollmentFactory, UserFactory
-from util.testing import UrlResetMixin
+from common.djangoapps.student.roles import CourseStaffRole, UserBasedRole
+from common.djangoapps.student.tests.factories import CourseAccessRoleFactory, CourseEnrollmentFactory, UserFactory
+from common.djangoapps.util.testing import UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
-from track.middleware import TrackMiddleware
-from track.views import segmentio
-from track.views.tests.base import (
+from common.djangoapps.track.middleware import TrackMiddleware
+from common.djangoapps.track.views import segmentio
+from common.djangoapps.track.views.tests.base import (
     SegmentIOTrackingTestCaseBase,
     SEGMENTIO_TEST_USER_ID
 )

@@ -10,7 +10,7 @@ from django.conf import settings
 from django.http import HttpResponse
 from six import text_type
 
-import track.views
+import common.djangoapps.track.views
 import xmodule.modulestore.django as xmodule_django
 from xmodule.modulestore.django import modulestore
 

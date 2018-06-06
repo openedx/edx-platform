@@ -33,8 +33,8 @@ from xblock.fields import Scope, String
 import courseware.views.views as views
 import shoppingcart
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from courseware.access_utils import check_course_open_for_learner
 from courseware.model_data import FieldDataCache, set_score
 from courseware.module_render import get_module
@@ -64,11 +64,11 @@ from openedx.core.lib.gating import api as gating_api
 from openedx.features.course_experience import COURSE_OUTLINE_PAGE_FLAG, UNIFIED_COURSE_TAB_FLAG
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from openedx.tests.util import expected_redirect_url
-from student.models import CourseEnrollment
-from student.tests.factories import TEST_PASSWORD, AdminFactory, CourseEnrollmentFactory, UserFactory
-from util.tests.test_date_utils import fake_pgettext, fake_ugettext
-from util.url import reload_django_url_config
-from util.views import ensure_valid_course_key
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import TEST_PASSWORD, AdminFactory, CourseEnrollmentFactory, UserFactory
+from common.djangoapps.util.tests.test_date_utils import fake_pgettext, fake_ugettext
+from common.djangoapps.util.url import reload_django_url_config
+from common.djangoapps.util.views import ensure_valid_course_key
 from xmodule.graders import ShowCorrectness
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore

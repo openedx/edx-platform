@@ -10,8 +10,8 @@ from social_django.utils import load_strategy, load_backend, psa
 from social_django.views import complete
 from social_core.utils import setting_name
 
-from student.models import UserProfile
-from student.views import compose_and_send_activation_email
+from common.djangoapps.student.models import UserProfile
+from common.djangoapps.student.views import compose_and_send_activation_email
 
 from .models import SAMLConfiguration, SAMLProviderConfig
 

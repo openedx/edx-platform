@@ -22,7 +22,7 @@ from django.views.generic import View
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 
-from edxmako.shortcuts import render_to_response, render_to_string
+from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_string
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.gating.api import get_entrance_exam_score_ratio, get_entrance_exam_usage_key
@@ -38,8 +38,8 @@ from openedx.features.course_experience import COURSE_OUTLINE_PAGE_FLAG, default
 from openedx.features.course_experience.views.course_sock import CourseSockFragmentView
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 from shoppingcart.models import CourseRegistrationCode
-from student.views import is_course_blocked
-from util.views import ensure_valid_course_key
+from common.djangoapps.student.views import is_course_blocked
+from common.djangoapps.util.views import ensure_valid_course_key
 from xmodule.modulestore.django import modulestore
 from xmodule.x_module import STUDENT_VIEW
 from .views import CourseTabView

@@ -8,7 +8,7 @@ from django.conf import settings
 from django.test import TestCase
 
 from lms.djangoapps.courseware.tests.factories import UserFactory
-from student.tasks import send_activation_email
+from common.djangoapps.student.tasks import send_activation_email
 
 
 class SendActivationEmailTestCase(TestCase):

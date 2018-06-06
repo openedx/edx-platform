@@ -5,7 +5,7 @@ import json
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from django.utils.translation import LANGUAGE_SESSION_KEY
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.utils.translation import get_language

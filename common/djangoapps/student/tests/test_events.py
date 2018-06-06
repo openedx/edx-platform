@@ -7,9 +7,9 @@ from django.db.utils import IntegrityError
 from django.test import TestCase
 from django_countries.fields import Country
 
-from student.models import CourseEnrollmentAllowed, PasswordHistory
-from student.tests.factories import UserFactory, CourseEnrollmentAllowedFactory
-from student.tests.tests import UserSettingsEventTestMixin
+from common.djangoapps.student.models import CourseEnrollmentAllowed, PasswordHistory
+from common.djangoapps.student.tests.factories import UserFactory, CourseEnrollmentAllowedFactory
+from common.djangoapps.student.tests.tests import UserSettingsEventTestMixin
 
 
 class TestUserProfileEvents(UserSettingsEventTestMixin, TestCase):

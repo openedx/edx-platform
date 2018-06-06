@@ -15,18 +15,18 @@ from pytz import UTC
 from six import text_type
 
 from common.test.utils import XssTestMixin
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from courseware.tabs import get_course_tab_list
 from courseware.tests.factories import StaffFactory, StudentModuleFactory, UserFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from lms.djangoapps.instructor.views.gradebook_api import calculate_page_info
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from pyquery import PyQuery as pq
 from shoppingcart.models import CourseRegCodeItem, Order, PaidCourseRegistration
-from student.models import CourseEnrollment
-from student.roles import CourseFinanceAdminRole
-from student.tests.factories import AdminFactory, CourseEnrollmentFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseFinanceAdminRole
+from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls

@@ -1,10 +1,10 @@
 import json
 import re
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
-from django_comment_common.models import CourseDiscussionSettings
-from django_comment_common.utils import set_course_discussion_settings
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.django_comment_common.models import CourseDiscussionSettings
+from common.djangoapps.django_comment_common.utils import set_course_discussion_settings
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 
 

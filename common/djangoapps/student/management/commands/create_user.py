@@ -7,11 +7,11 @@ from django.utils import translation
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
-from student.forms import AccountCreationForm
-from student.helpers import do_create_account
-from student.models import CourseEnrollment, create_comments_service_user
-from student.views import AccountValidationError
-from track.management.tracked_command import TrackedCommand
+from common.djangoapps.student.forms import AccountCreationForm
+from common.djangoapps.student.helpers import do_create_account
+from common.djangoapps.student.models import CourseEnrollment, create_comments_service_user
+from common.djangoapps.student.views import AccountValidationError
+from common.djangoapps.track.management.tracked_command import TrackedCommand
 
 
 class Command(TrackedCommand):

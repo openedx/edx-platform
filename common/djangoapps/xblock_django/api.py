@@ -2,7 +2,7 @@
 API methods related to xblock state.
 """
 
-from xblock_django.models import XBlockConfiguration, XBlockStudioConfiguration
+from common.djangoapps.xblock_django.models import XBlockConfiguration, XBlockStudioConfiguration
 
 
 def deprecated_xblocks():

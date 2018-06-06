@@ -10,7 +10,7 @@ from mock import patch
 from django.urls import reverse
 from django.test.testcases import TransactionTestCase
 from rest_framework.test import APIClient
-from student.tests.factories import UserFactory, TEST_PASSWORD
+from common.djangoapps.student.tests.factories import UserFactory, TEST_PASSWORD
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from ...accounts.tests.test_views import UserAPITestCase

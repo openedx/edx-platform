@@ -9,8 +9,8 @@ from opaque_keys.edx.django.models import CourseKeyField
 from model_utils import Choices
 
 from .api import add_course_goal, remove_course_goal
-from course_modes.models import CourseMode
-from student.models import CourseEnrollment
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.models import CourseEnrollment
 
 
 # Each goal is represented by a goal key and a string description.

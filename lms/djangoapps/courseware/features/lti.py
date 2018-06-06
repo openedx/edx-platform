@@ -14,7 +14,7 @@ from splinter.exceptions import ElementDoesNotExist
 from common import visit_scenario_item
 from courseware.access import has_access
 from courseware.tests.factories import BetaTesterFactory, InstructorFactory
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 TEST_COURSE_NAME = "test_course_a"
 

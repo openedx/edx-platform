@@ -37,7 +37,7 @@ from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
 from six import text_type
 
-from edxmako.shortcuts import render_to_string
+from common.djangoapps.edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from shoppingcart.models import Order
 from shoppingcart.processors.exceptions import *

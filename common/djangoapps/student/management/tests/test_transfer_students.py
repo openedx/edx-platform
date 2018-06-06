@@ -7,19 +7,19 @@ from mock import call, patch
 from six import text_type
 
 import ddt
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from django.conf import settings
 from django.core.management import call_command
 from opaque_keys.edx import locator
 from shoppingcart.models import CertificateItem, Order  # pylint: disable=import-error
-from student.models import (
+from common.djangoapps.student.models import (
     EVENT_NAME_ENROLLMENT_ACTIVATED,
     EVENT_NAME_ENROLLMENT_DEACTIVATED,
     EVENT_NAME_ENROLLMENT_MODE_CHANGED,
     CourseEnrollment
 )
-from student.signals import UNENROLL_DONE
-from student.tests.factories import UserFactory
+from common.djangoapps.student.signals import UNENROLL_DONE
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

@@ -10,8 +10,8 @@ from lms.djangoapps.ccx.tasks import send_ccx_course_published
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
-from student.roles import CourseCcxCoachRole
-from student.tests.factories import AdminFactory
+from common.djangoapps.student.roles import CourseCcxCoachRole
+from common.djangoapps.student.tests.factories import AdminFactory
 from xmodule.modulestore.django import SignalHandler
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory

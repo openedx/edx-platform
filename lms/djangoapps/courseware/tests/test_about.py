@@ -14,15 +14,15 @@ from nose.plugins.attrib import attr
 from six import text_type
 from waffle.testutils import override_switch
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 from openedx.features.course_experience.waffle import WAFFLE_NAMESPACE as COURSE_EXPERIENCE_WAFFLE_NAMESPACE
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from shoppingcart.models import Order, PaidCourseRegistration
-from student.models import CourseEnrollment
-from student.tests.factories import AdminFactory, CourseEnrollmentAllowedFactory, UserFactory
-from track.tests import EventTrackingTestCase
-from util.milestones_helpers import get_prerequisite_courses_display, set_prerequisite_courses
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentAllowedFactory, UserFactory
+from common.djangoapps.track.tests import EventTrackingTestCase
+from common.djangoapps.util.milestones_helpers import get_prerequisite_courses_display, set_prerequisite_courses
 from xmodule.course_module import CATALOG_VISIBILITY_ABOUT, CATALOG_VISIBILITY_NONE
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MIXED_MODULESTORE,

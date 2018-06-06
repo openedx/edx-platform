@@ -16,7 +16,7 @@ from openedx.core.lib.time_zone_utils import get_display_time_zone
 from pytz import common_timezones, common_timezones_set, country_timezones
 from six import text_type
 
-from student.models import User, UserProfile
+from common.djangoapps.student.models import User, UserProfile
 from ..errors import (
     UserAPIInternalError, UserAPIRequestError, UserNotFound, UserNotAuthorized,
     PreferenceValidationError, PreferenceUpdateError, CountryCodeError

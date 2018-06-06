@@ -12,7 +12,7 @@ from lettuce import step, world
 from lettuce.django import django_url
 
 from courseware.courses import get_course_by_id
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from xmodule import seq_module, vertical_block
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore

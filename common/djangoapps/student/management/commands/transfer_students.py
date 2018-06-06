@@ -11,8 +11,8 @@ from django.contrib.auth.models import User
 from django.db import transaction
 from opaque_keys.edx.keys import CourseKey
 from shoppingcart.models import CertificateItem
-from student.models import CourseEnrollment
-from track.management.tracked_command import TrackedCommand
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.track.management.tracked_command import TrackedCommand
 
 
 class TransferStudentError(Exception):

@@ -18,8 +18,8 @@ from django.core.mail import EmailMessage, SafeMIMEText
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 
-from edxmako.shortcuts import render_to_string
-from edxmako.template import Template
+from common.djangoapps.edxmako.shortcuts import render_to_string
+from common.djangoapps.edxmako.template import Template
 from eventtracking import tracker
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.credit.models import CreditConfig, CreditProvider

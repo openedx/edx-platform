@@ -17,8 +17,8 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import CourseLocator
 from six import text_type
 
-import util.file
-from util.file import (
+import common.djangoapps.util.file
+from common.djangoapps.util.file import (
     FileValidationException,
     UniversalNewlineIterator,
     course_and_time_based_filename_generator,

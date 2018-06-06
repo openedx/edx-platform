@@ -13,7 +13,7 @@ from django.http import (
     HttpResponse, HttpResponseNotModified, HttpResponseForbidden,
     HttpResponseBadRequest, HttpResponseNotFound, HttpResponsePermanentRedirect)
 from six import text_type
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 
 from xmodule.assetstore.assetmgr import AssetManager
 from xmodule.contentstore.content import StaticContent, XASSET_LOCATION_TAG

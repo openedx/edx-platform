@@ -6,7 +6,7 @@ from django.conf import settings
 
 with:
 
-from microsite_configuration import settings
+from common.djangoapps.microsite_configuration import settings
 """
 from django.conf import settings as base_settings
 

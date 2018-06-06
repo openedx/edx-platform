@@ -13,7 +13,7 @@ from mock import patch
 from lms.djangoapps.courseware.field_overrides import OverrideModulestoreFieldData
 from lms.djangoapps.courseware.url_helpers import get_redirect_url
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls

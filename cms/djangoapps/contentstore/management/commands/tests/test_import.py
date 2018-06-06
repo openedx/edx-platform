@@ -9,7 +9,7 @@ import tempfile
 
 from django.core.management import call_command
 
-from django_comment_common.utils import are_permissions_roles_seeded
+from common.djangoapps.django_comment_common.utils import are_permissions_roles_seeded
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

@@ -18,7 +18,7 @@ from django.utils.translation import ugettext as _
 from eventtracking import tracker
 from openedx.core.djangoapps.request_cache import clear_cache, get_cache
 from openedx.core.djangoapps.request_cache.middleware import request_cached
-from student.models import get_user_by_username_or_email
+from common.djangoapps.student.models import get_user_by_username_or_email
 
 from .models import (
     CohortMembership,

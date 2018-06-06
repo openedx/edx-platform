@@ -13,7 +13,7 @@ import csv
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 
-from student.models import anonymous_id_for_user
+from common.djangoapps.student.models import anonymous_id_for_user
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 

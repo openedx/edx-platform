@@ -12,8 +12,8 @@ from django.test import TestCase
 
 from cms.djangoapps.course_creators.admin import CourseCreatorAdmin
 from cms.djangoapps.course_creators.models import CourseCreator
-from student import auth
-from student.roles import CourseCreatorRole
+from common.djangoapps.student import auth
+from common.djangoapps.student.roles import CourseCreatorRole
 
 
 def mock_render_to_string(template_name, context):

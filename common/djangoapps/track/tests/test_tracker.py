@@ -2,8 +2,8 @@ from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
 
-import track.tracker as tracker
-from track.backends import BaseBackend
+import common.djangoapps.track.tracker as tracker
+from common.djangoapps.track.backends import BaseBackend
 
 SIMPLE_SETTINGS = {
     'default': {

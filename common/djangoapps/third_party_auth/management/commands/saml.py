@@ -4,7 +4,7 @@ Management commands for third_party_auth
 """
 from django.core.management.base import BaseCommand, CommandError
 import logging
-from third_party_auth.tasks import fetch_saml_metadata
+from common.djangoapps.third_party_auth.tasks import fetch_saml_metadata
 
 
 class Command(BaseCommand):

@@ -13,17 +13,17 @@ from sailthru.sailthru_client import SailthruClient
 from sailthru.sailthru_error import SailthruClientError
 from six import text_type
 
-import third_party_auth
-from course_modes.models import CourseMode
+import common.djangoapps.third_party_auth
+from common.djangoapps.course_modes.models import CourseMode
 from email_marketing.models import EmailMarketingConfiguration
 from openedx.core.djangoapps.user_api.accounts.signals import USER_RETIRE_MAILINGS
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 from lms.djangoapps.email_marketing.tasks import update_user, update_user_email, get_email_cookies_via_sailthru
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
-from student.cookies import CREATE_LOGON_COOKIE
-from student.signals import ENROLL_STATUS_CHANGE
-from student.views import REGISTER_USER
-from util.model_utils import USER_FIELD_CHANGED
+from common.djangoapps.student.cookies import CREATE_LOGON_COOKIE
+from common.djangoapps.student.signals import ENROLL_STATUS_CHANGE
+from common.djangoapps.student.views import REGISTER_USER
+from common.djangoapps.util.model_utils import USER_FIELD_CHANGED
 from .tasks import update_course_enrollment
 
 log = logging.getLogger(__name__)

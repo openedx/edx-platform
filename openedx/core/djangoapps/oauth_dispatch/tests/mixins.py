@@ -7,7 +7,7 @@ from django.conf import settings
 import jwt
 from jwt.exceptions import ExpiredSignatureError
 
-from student.models import UserProfile, anonymous_id_for_user
+from common.djangoapps.student.models import UserProfile, anonymous_id_for_user
 
 
 class AccessTokenMixin(object):

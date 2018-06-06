@@ -6,7 +6,7 @@ import datetime
 
 from django.test import TestCase
 from openedx.core.djangoapps.oauth_dispatch.tests import factories
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from oauth2_provider.models import (
     AccessToken as DOTAccessToken,
     Application as DOTApplication,

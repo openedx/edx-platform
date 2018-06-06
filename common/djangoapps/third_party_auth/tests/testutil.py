@@ -17,15 +17,15 @@ from provider import constants
 from provider.oauth2.models import Client as OAuth2Client
 from storages.backends.overwrite import OverwriteStorage
 
-from third_party_auth.models import cache as config_cache
-from third_party_auth.models import (
+from common.djangoapps.third_party_auth.models import cache as config_cache
+from common.djangoapps.third_party_auth.models import (
     LTIProviderConfig,
     OAuth2ProviderConfig,
     ProviderApiPermissions,
     SAMLConfiguration,
     SAMLProviderConfig
 )
-from third_party_auth.saml import EdXSAMLIdentityProvider, get_saml_idp_class
+from common.djangoapps.third_party_auth.saml import EdXSAMLIdentityProvider, get_saml_idp_class
 
 AUTH_FEATURES_KEY = 'ENABLE_THIRD_PARTY_AUTH'
 AUTH_FEATURE_ENABLED = AUTH_FEATURES_KEY in settings.FEATURES

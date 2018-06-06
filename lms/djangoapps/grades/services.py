@@ -7,7 +7,7 @@ import pytz
 
 from lms.djangoapps.utils import _get_key
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
+from common.djangoapps.track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
 
 from .config.waffle import waffle_flags, REJECTED_EXAM_OVERRIDES_GRADE
 from .constants import ScoreDatabaseTableEnum

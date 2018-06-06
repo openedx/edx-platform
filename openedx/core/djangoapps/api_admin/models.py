@@ -14,7 +14,7 @@ from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.utils.translation import ugettext as _
 
-from edxmako.shortcuts import render_to_string
+from common.djangoapps.edxmako.shortcuts import render_to_string
 from model_utils.models import TimeStampedModel
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 

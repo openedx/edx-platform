@@ -19,14 +19,14 @@ from enterprise.models import (
     EnterpriseCustomerUser,
     PendingEnterpriseCustomerUser,
 )
-from entitlements.models import CourseEntitlement, CourseEntitlementSupportDetail
+from common.djangoapps.entitlements.models import CourseEntitlement, CourseEntitlementSupportDetail
 from integrated_channels.sap_success_factors.models import SapSuccessFactorsLearnerDataTransmissionAudit
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.course_groups.models import UnregisteredLearnerCohortAssignments, CourseUserGroup
 from openedx.core.djangoapps.profile_images.images import create_profile_images
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
-from student.models import (
+from common.djangoapps.student.models import (
     CourseEnrollment,
     PendingEmailChange,
     UserProfile,

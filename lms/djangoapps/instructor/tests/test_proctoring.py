@@ -9,8 +9,8 @@ from mock import patch
 from nose.plugins.attrib import attr
 from six import text_type
 
-from student.roles import CourseStaffRole, CourseInstructorRole
-from student.tests.factories import AdminFactory
+from common.djangoapps.student.roles import CourseStaffRole, CourseInstructorRole
+from common.djangoapps.student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

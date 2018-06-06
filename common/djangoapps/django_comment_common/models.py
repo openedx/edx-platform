@@ -13,7 +13,7 @@ from opaque_keys.edx.django.models import CourseKeyField
 from six import text_type
 
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 

@@ -3,7 +3,7 @@ Helpers methods for site configuration.
 """
 from django.conf import settings
 
-from microsite_configuration import microsite
+from common.djangoapps.microsite_configuration import microsite
 
 
 def get_current_site_configuration():

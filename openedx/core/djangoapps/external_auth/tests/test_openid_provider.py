@@ -16,7 +16,7 @@ from django.urls import reverse
 from django.test.client import RequestFactory
 from unittest import skipUnless
 
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.external_auth.views import provider_login
 
 

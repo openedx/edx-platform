@@ -6,7 +6,7 @@ from django.core.management import call_command
 from django.test import TestCase
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from entitlements.tests.factories import CourseEntitlementFactory
+from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
 
 
 @skip_unless_lms

@@ -5,7 +5,7 @@ import logging
 
 from django.test import TestCase
 
-from microsite_configuration.backends.base import AbstractBaseMicrositeBackend
+from common.djangoapps.microsite_configuration.backends.base import AbstractBaseMicrositeBackend
 
 log = logging.getLogger(__name__)
 

@@ -24,14 +24,14 @@ from provider.oauth2.models import Client
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
 from courseware.tabs import get_course_tab_list
-from edxmako.shortcuts import render_to_string
+from common.djangoapps.edxmako.shortcuts import render_to_string
 from edxnotes import helpers
 from edxnotes.decorators import edxnotes
 from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 from edxnotes.plugins import EdxNotesTab
 from openedx.core.djangoapps.user_api.models import RetirementState, UserRetirementStatus
 from openedx.core.lib.token_utils import JwtBuilder
-from student.tests.factories import CourseEnrollmentFactory, SuperuserFactory, UserFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, SuperuserFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

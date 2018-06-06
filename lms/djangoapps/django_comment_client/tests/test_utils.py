@@ -14,20 +14,20 @@ from pytz import UTC
 from six import text_type
 
 import django_comment_client.utils as utils
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from courseware.tabs import get_course_tab_list
 from courseware.tests.factories import InstructorFactory
 from django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 from django_comment_client.tests.factories import RoleFactory
 from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_client.tests.utils import config_course_discussions, topic_name_to_id
-from django_comment_common.models import (
+from common.djangoapps.django_comment_common.models import (
     CourseDiscussionSettings,
     ForumsConfig,
     assign_role
 )
-from django_comment_common.utils import (
+from common.djangoapps.django_comment_common.utils import (
     get_course_discussion_settings,
     seed_permissions_roles,
     set_course_discussion_settings
@@ -40,8 +40,8 @@ from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory, config_course_cohorts
 from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
-from student.roles import CourseStaffRole
-from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.roles import CourseStaffRole
+from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase

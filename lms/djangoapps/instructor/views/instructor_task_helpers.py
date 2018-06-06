@@ -10,7 +10,7 @@ from django.utils.translation import ungettext
 
 from bulk_email.models import CourseEmail
 from lms.djangoapps.instructor_task.views import get_task_completion_info
-from util.date_utils import get_default_time_display
+from common.djangoapps.util.date_utils import get_default_time_display
 
 log = logging.getLogger(__name__)
 

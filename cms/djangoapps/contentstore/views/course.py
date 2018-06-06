@@ -59,10 +59,10 @@ from cms.djangoapps.contentstore.views.entrance_exam import (
     delete_entrance_exam,
     update_entrance_exam,
 )
-from course_action_state.managers import CourseActionStateItemNotFoundError
-from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
+from common.djangoapps.course_action_state.managers import CourseActionStateItemNotFoundError
+from common.djangoapps.course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 from cms.djangoapps.course_creators.views import add_user_with_status_unrequested, get_course_creator_status
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from milestones import api as milestones_api
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
@@ -74,22 +74,32 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from openedx.core.lib.courses import course_image_url
-from student import auth
-from student.auth import has_course_author_access, has_studio_read_access, has_studio_write_access
-from student.roles import CourseCreatorRole, CourseInstructorRole, CourseStaffRole, GlobalStaff, UserBasedRole
-from util.course import get_link_for_about_page
-from util.date_utils import get_default_time_display
-from util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
-from util.milestones_helpers import (
+from common.djangoapps.student import auth
+from common.djangoapps.student.auth import has_course_author_access, has_studio_read_access, has_studio_write_access
+from common.djangoapps.student.roles import (
+    CourseCreatorRole,
+    CourseInstructorRole,
+    CourseStaffRole,
+    GlobalStaff,
+    UserBasedRole,
+)
+from common.djangoapps.util.course import get_link_for_about_page
+from common.djangoapps.util.date_utils import get_default_time_display
+from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
+from common.djangoapps.util.milestones_helpers import (
     is_entrance_exams_enabled,
     is_prerequisite_courses_enabled,
     is_valid_course_key,
     remove_prerequisite_course,
     set_prerequisite_courses
 )
-from util.organizations_helpers import add_organization_course, get_organization_by_short_name, organizations_enabled
-from util.string_utils import _has_non_ascii_characters
-from xblock_django.api import deprecated_xblocks
+from common.djangoapps.util.organizations_helpers import (
+    add_organization_course,
+    get_organization_by_short_name,
+    organizations_enabled,
+)
+from common.djangoapps.util.string_utils import _has_non_ascii_characters
+from common.djangoapps.xblock_django.api import deprecated_xblocks
 from xmodule.contentstore.content import StaticContent
 from xmodule.course_module import DEFAULT_START_DATE, CourseFields
 from xmodule.error_module import ErrorDescriptor

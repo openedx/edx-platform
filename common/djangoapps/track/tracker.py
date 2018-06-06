@@ -24,7 +24,7 @@ from importlib import import_module
 from django.conf import settings
 from dogapi import dog_stats_api
 
-from track.backends import BaseBackend
+from common.djangoapps.track.backends import BaseBackend
 
 __all__ = ['send']
 

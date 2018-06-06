@@ -31,15 +31,15 @@ from path import Path as path
 from six import text_type
 
 import dashboard.git_import as git_import
-import track.views
+import common.djangoapps.track.views
 from courseware.courses import get_course_by_id
 from dashboard.git_import import GitImportError
 from dashboard.models import CourseImportLog
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangoapps.user_api.accounts.utils import generate_password
-from student.models import CourseEnrollment, Registration, UserProfile
-from student.roles import CourseInstructorRole, CourseStaffRole
+from common.djangoapps.student.models import CourseEnrollment, Registration, UserProfile
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)

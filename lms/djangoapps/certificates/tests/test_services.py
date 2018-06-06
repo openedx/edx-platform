@@ -4,7 +4,7 @@ Unit Tests for the Certificate service
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.certificates.services import CertificateService
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

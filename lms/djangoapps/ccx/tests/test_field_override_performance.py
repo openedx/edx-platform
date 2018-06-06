@@ -23,8 +23,8 @@ from openedx.core.djangoapps.content.block_structure.api import get_course_in_ca
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from pytz import UTC
 from openedx.core.djangoapps.request_cache.middleware import RequestCache
-from student.models import CourseEnrollment
-from student.tests.factories import UserFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
 from xblock.core import XBlock
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MONGO_MODULESTORE,

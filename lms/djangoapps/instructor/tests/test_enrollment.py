@@ -32,9 +32,9 @@ from lms.djangoapps.instructor.enrollment import (
     unenroll_email
 )
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, get_mock_request
-from student.models import CourseEnrollment, CourseEnrollmentAllowed, anonymous_id_for_user
-from student.roles import CourseCcxCoachRole
-from student.tests.factories import AdminFactory, UserFactory
+from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed, anonymous_id_for_user
+from common.djangoapps.student.roles import CourseCcxCoachRole
+from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
 from submissions import api as sub_api
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

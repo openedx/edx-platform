@@ -5,7 +5,7 @@ import factory
 from django.contrib.sites.models import Site
 from factory.django import DjangoModelFactory
 
-from microsite_configuration.models import Microsite, MicrositeOrganizationMapping, MicrositeTemplate
+from common.djangoapps.microsite_configuration.models import Microsite, MicrositeOrganizationMapping, MicrositeTemplate
 
 
 class SiteFactory(DjangoModelFactory):

@@ -8,7 +8,7 @@ from django.contrib.messages.middleware import MessageMiddleware
 from django.test import TestCase
 from django.contrib.sites.models import Site
 from openedx.core.djangoapps.theming.middleware import CurrentSiteThemeMiddleware
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 THEMING_ADMIN_URL = '/theming/admin'
 TEST_THEME_NAME = 'test-theme'

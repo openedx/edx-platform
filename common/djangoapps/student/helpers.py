@@ -24,8 +24,8 @@ from provider.oauth2.models import AccessToken as dop_access_token
 from provider.oauth2.models import RefreshToken as dop_refresh_token
 from pytz import UTC
 from six import iteritems, text_type
-import third_party_auth
-from course_modes.models import CourseMode
+import common.djangoapps.third_party_auth
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import (
     get_certificate_url,
     has_html_certificates_enabled
@@ -42,7 +42,7 @@ from openedx.core.djangoapps.certificates.api import certificates_viewable_for_c
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.theming.helpers import get_themes
-from student.models import (
+from common.djangoapps.student.models import (
     LinkedInAddToProfileConfiguration,
     PasswordHistory,
     Registration,

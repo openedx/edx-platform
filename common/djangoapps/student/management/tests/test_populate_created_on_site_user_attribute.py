@@ -7,8 +7,8 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from django.core.management import call_command, CommandError
 
-from student.models import Registration, UserAttribute
-from student.tests.factories import UserFactory
+from common.djangoapps.student.models import Registration, UserAttribute
+from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 CREATED_ON_SITE = 'created_on_site'
 

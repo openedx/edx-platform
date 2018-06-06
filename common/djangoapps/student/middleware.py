@@ -6,7 +6,7 @@ from django.conf import settings
 from django.http import HttpResponseForbidden
 from django.utils.translation import ugettext as _
 
-from student.models import UserStanding
+from common.djangoapps.student.models import UserStanding
 
 
 class UserStandingMiddleware(object):

@@ -10,7 +10,7 @@ from django.utils.timezone import now
 from provider.oauth2 import models
 from provider import constants
 
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 from ..adapters import DOPAdapter
 from .constants import DUMMY_REDIRECT_URL

@@ -6,7 +6,7 @@ from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 
 from courseware.tests.factories import InstructorFactory, StaffFactory, UserFactory
-from student.roles import (
+from common.djangoapps.student.roles import (
     CourseBetaTesterRole,
     CourseInstructorRole,
     CourseRole,
@@ -16,7 +16,7 @@ from student.roles import (
     OrgStaffRole,
     RoleCache
 )
-from student.tests.factories import AnonymousUserFactory
+from common.djangoapps.student.tests.factories import AnonymousUserFactory
 
 
 class RolesTestCase(TestCase):

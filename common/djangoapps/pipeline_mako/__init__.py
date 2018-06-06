@@ -1,9 +1,9 @@
-from edxmako.shortcuts import render_to_string
+from common.djangoapps.edxmako.shortcuts import render_to_string
 
 from pipeline.conf import settings
 from pipeline.packager import Packager
 from pipeline.utils import guess_type
-from static_replace import try_staticfiles_lookup
+from common.djangoapps.static_replace import try_staticfiles_lookup
 
 from django.conf import settings as django_settings
 from django.contrib.staticfiles.storage import staticfiles_storage

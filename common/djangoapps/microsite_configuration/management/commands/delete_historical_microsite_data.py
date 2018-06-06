@@ -5,7 +5,7 @@ microsite_configuration_historicalmicrositetemplate
 """
 
 import logging
-from microsite_configuration.models import MicrositeOrganizationMapping, MicrositeTemplate
+from common.djangoapps.microsite_configuration.models import MicrositeOrganizationMapping, MicrositeTemplate
 from openedx.core.djangoapps.util.row_delete import delete_rows, BaseDeletionCommand
 log = logging.getLogger(__name__)
 

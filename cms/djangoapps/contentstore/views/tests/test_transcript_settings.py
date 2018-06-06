@@ -15,7 +15,7 @@ from cms.djangoapps.contentstore.views.transcript_settings import (
     validate_transcript_credentials,
 )
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
-from student.roles import CourseStaffRole
+from common.djangoapps.student.roles import CourseStaffRole
 
 
 @ddt.ddt

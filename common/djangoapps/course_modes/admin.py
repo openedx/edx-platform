@@ -7,7 +7,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC, timezone
 
-from course_modes.models import CourseMode, CourseModeExpirationConfig
+from common.djangoapps.course_modes.models import CourseMode, CourseModeExpirationConfig
 # Technically, we shouldn't be doing this, since verify_student is defined
 # in LMS, and course_modes is defined in common.
 #
@@ -20,7 +20,7 @@ from course_modes.models import CourseMode, CourseModeExpirationConfig
 # the verification deadline table won't exist.
 from lms.djangoapps.verify_student import models as verification_models
 from openedx.core.lib.courses import clean_course_id
-from util.date_utils import get_time_display
+from common.djangoapps.util.date_utils import get_time_display
 from xmodule.modulestore.django import modulestore
 
 COURSE_MODE_SLUG_CHOICES = [(mode_slug, mode_slug) for mode_slug in settings.COURSE_ENROLLMENT_MODES]

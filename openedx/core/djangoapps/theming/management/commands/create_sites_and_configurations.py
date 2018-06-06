@@ -17,7 +17,7 @@ from django.core.management.base import BaseCommand
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from openedx.core.djangoapps.theming.models import SiteTheme
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
-from student.models import UserProfile
+from common.djangoapps.student.models import UserProfile
 
 LOG = logging.getLogger(__name__)
 

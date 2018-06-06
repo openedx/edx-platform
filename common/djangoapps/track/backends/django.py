@@ -13,7 +13,7 @@ import logging
 
 from django.db import models
 
-from track.backends import BaseBackend
+from common.djangoapps.track.backends import BaseBackend
 
 log = logging.getLogger('track.backends.django')
 

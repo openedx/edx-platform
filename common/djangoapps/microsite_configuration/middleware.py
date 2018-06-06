@@ -7,7 +7,7 @@ A microsite enables the following features:
 3) Ability to swap out some branding elements in the website
 """
 
-from microsite_configuration import microsite
+from common.djangoapps.microsite_configuration import microsite
 
 
 class MicrositeMiddleware(object):

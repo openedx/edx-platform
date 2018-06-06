@@ -5,7 +5,7 @@ from datetime import timedelta
 
 from django.utils.timezone import now
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 
 TEST_COURSE_PRICE = 50
 

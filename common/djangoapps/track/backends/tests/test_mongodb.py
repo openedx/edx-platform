@@ -4,7 +4,7 @@ from mock import patch
 
 from django.test import TestCase
 
-from track.backends.mongodb import MongoBackend
+from common.djangoapps.track.backends.mongodb import MongoBackend
 
 
 class TestMongoBackend(TestCase):

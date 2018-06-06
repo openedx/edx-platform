@@ -15,7 +15,7 @@ from nose.plugins.attrib import attr
 
 from openedx.core.djangolib.testing.utils import get_mock_request
 
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 from ..middleware import SafeSessionMiddleware, SafeCookieData
 from .test_utils import TestSafeSessionsLogMixin

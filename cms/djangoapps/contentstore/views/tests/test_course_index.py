@@ -25,13 +25,13 @@ from cms.djangoapps.contentstore.views.course import (
 )
 from cms.djangoapps.contentstore.views.course import WAFFLE_NAMESPACE as COURSE_WAFFLE_NAMESPACE
 from cms.djangoapps.contentstore.views.item import VisibilityState, create_xblock_info
-from course_action_state.managers import CourseRerunUIStateManager
-from course_action_state.models import CourseRerunState
+from common.djangoapps.course_action_state.managers import CourseRerunUIStateManager
+from common.djangoapps.course_action_state.models import CourseRerunState
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
-from student.auth import has_course_author_access
-from student.roles import CourseStaffRole, GlobalStaff, LibraryUserRole
-from student.tests.factories import UserFactory
-from util.date_utils import get_default_time_display
+from common.djangoapps.student.auth import has_course_author_access
+from common.djangoapps.student.roles import CourseStaffRole, GlobalStaff, LibraryUserRole
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.util.date_utils import get_default_time_display
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError

@@ -16,7 +16,7 @@ from onelogin.saml2.utils import OneLogin_Saml2_Utils
 from requests import exceptions
 from six import text_type
 
-from third_party_auth.models import SAMLConfiguration, SAMLProviderConfig, SAMLProviderData
+from common.djangoapps.third_party_auth.models import SAMLConfiguration, SAMLProviderConfig, SAMLProviderData
 
 log = logging.getLogger(__name__)
 

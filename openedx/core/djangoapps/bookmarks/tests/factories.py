@@ -6,7 +6,7 @@ import factory
 from factory.django import DjangoModelFactory
 from functools import partial
 
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from opaque_keys.edx.locator import CourseLocator
 from ..models import Bookmark, XBlockCache
 

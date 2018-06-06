@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.db import DatabaseError, transaction
 from django.utils.translation import ugettext_lazy as _
 
-from third_party_auth.provider import Registry
+from common.djangoapps.third_party_auth.provider import Registry
 
 from .models import (
     _PSA_OAUTH2_BACKENDS,
