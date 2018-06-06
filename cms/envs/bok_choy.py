@@ -49,6 +49,9 @@ update_module_store_settings(
 # Needed to enable licensing on video modules
 XBLOCK_SETTINGS.update({'VideoDescriptor': {'licensing_enabled': True}})
 
+# Capture the console log via template includes, until webdriver supports log capture again
+CAPTURE_CONSOLE_LOG = True
+
 ############################ STATIC FILES #############################
 
 # Enable debug so that static assets are served by Django
