@@ -267,7 +267,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-05-24 10:01+0000\n"
+"POT-Creation-Date: 2018-06-06 14:53+0000\n"
 "PO-Revision-Date: 2018-03-13 13:51+0000\n"
 "Last-Translator: javiercencig <javier@jecnet.com.br>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
@@ -1875,6 +1875,11 @@ msgstr ""
 "Não foi possível reavaliar os problemas com os possíveis envios de arquivos"
 
 #: common/lib/capa/capa/capa_problem.py
+#, python-brace-format
+msgid "Question {0}"
+msgstr ""
+
+#: common/lib/capa/capa/capa_problem.py
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Incorrect"
 msgstr "Incorreto"
@@ -2047,6 +2052,7 @@ msgid "Incorrect:"
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Answer"
 msgstr ""
 
@@ -2756,6 +2762,14 @@ msgid ""
 msgstr ""
 "O status deste problema mudou desde que esta página foi carregada. Por "
 "favor, atualize a página."
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Answer ID"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Question"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid "Conditional"
@@ -7053,6 +7067,11 @@ msgstr "O usuário não existe."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
+"Found a conflict with given identifier. Please try an alternative identifier"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
 "Make sure that the file you upload is in CSV format with no extraneous "
 "characters or rows."
 msgstr ""
@@ -10008,7 +10027,7 @@ msgstr "Ver todos os artigos subordinados"
 msgid "This article was last modified:"
 msgstr "Este artigo foi modificado pela última vez em:"
 
-#: lms/templates/wiki/create.html lms/templates/wiki/create.html.py
+#: lms/templates/wiki/create.html
 msgid "Add new article"
 msgstr "Adicionar um novo artigo"
 
@@ -10017,12 +10036,10 @@ msgid "Create article"
 msgstr "Criar artigo"
 
 #: lms/templates/wiki/create.html lms/templates/wiki/delete.html
-#: lms/templates/wiki/delete.html.py
 msgid "Go back"
 msgstr "Voltar"
 
-#: lms/templates/wiki/delete.html lms/templates/wiki/delete.html.py
-#: lms/templates/wiki/edit.html
+#: lms/templates/wiki/delete.html lms/templates/wiki/edit.html
 msgid "Delete article"
 msgstr "Excluir artigo"
 
@@ -10073,8 +10090,7 @@ msgstr "Você está excluindo um artigo. Por favor, confirme a exclusão."
 msgid "Edit"
 msgstr "Editar"
 
-#: lms/templates/wiki/edit.html lms/templates/wiki/edit.html.py
-#: lms/templates/ccx/schedule.html
+#: lms/templates/wiki/edit.html lms/templates/ccx/schedule.html
 msgid "Save changes"
 msgstr "Salvar alterações"
 
@@ -11607,6 +11623,47 @@ msgstr ""
 msgid "No data provided for user preference update"
 msgstr "Nenhum dado fornecido para atualizar as preferências de usuário."
 
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
+#, python-format
+msgid "Hello %(full_name)s,"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
+#, python-format
+msgid ""
+"We received a deletion request for your account on %(platform_name)s. We're "
+"sorry to see you go!"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
+msgid ""
+"Your account will be deleted shortly. Account deletion, including removal "
+"from email lists, may take a few weeks to fully process through our system. "
+"If you want to opt-out of emails before then, please unsubscribe from the "
+"footer of any email."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
+#, python-format
+msgid ""
+"This is an informational email only. If you did not initiate this request, "
+"please contact %(contact_email)s."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
+#, python-format
+msgid "Best, %(platform_name)s"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/subject.txt
+msgid "Your Account Has Been Queued For Deletion"
+msgstr ""
+
 #: openedx/core/djangoapps/util/user_messages.py
 #, python-brace-format
 msgid "{header_open}{title}{header_close}{body}"
@@ -12899,8 +12956,8 @@ msgstr ""
 
 #: lms/templates/_gated_content.html
 msgid ""
-"You must earn a passing score for '{prereq_section_name}' to access this "
-"content."
+"You must complete the prerequisites for '{prereq_section_name}' to access "
+"this content."
 msgstr ""
 
 #: lms/templates/_gated_content.html
@@ -14563,7 +14620,7 @@ msgid ""
 msgstr ""
 
 #: lms/templates/api_admin/terms_of_service.html
-msgid "altering or editing any content or graphics in the API Content"
+msgid "altering or editing any content or graphics in the API Content;"
 msgstr ""
 
 #: lms/templates/api_admin/terms_of_service.html
@@ -14651,8 +14708,8 @@ msgid ""
 "revokes access to API Content owned or controlled by that {platform_name} "
 "Participant or third party, including without limitation any Trademarks, you"
 " must ensure that all API Content pertaining to that {platform_name} "
-"Participant or third party is deleted from Your application, networks, "
-"systems and servers as soon as reasonably possible. "
+"Participant or third party is deleted from Your Application and your "
+"networks, systems and servers as soon as reasonably possible. "
 "\"{platform_name_capitalized} Participants\" means MIT, Harvard, and the "
 "other entities providing information, API Content or services for the APIs, "
 "the course instructors and their staffs."
@@ -14697,15 +14754,6 @@ msgstr ""
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
-"{platform_name_capitalized} may also update or modify the APIs from time to "
-"time without advance notice. These changes may affect your use of the APIs "
-"or the way your integration interacts with the API. If we make a change that"
-" is unacceptable to you, you should stop using the APIs. Continued use of "
-"the APIs means you accept the change."
-msgstr ""
-
-#: lms/templates/api_admin/terms_of_service.html
-msgid ""
 "{platform_name_capitalized} reserves the right to modify the Terms at any "
 "time without advance notice.  Any changes to the Terms will be effective "
 "immediately upon posting on this page, with an updated effective date.  By "
@@ -14731,9 +14779,9 @@ msgstr ""
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
 "Your credentials (such as client secret and IDs) are intended to be used "
-"solely by you. You will keep your credentials confidential and discourage "
-"others from using your credentials. Your credentials may not be embedded in "
-"open source projects."
+"solely by you. You will keep your credentials confidential and prevent and "
+"discourage others from using your credentials. Your credentials may not be "
+"embedded in open source projects."
 msgstr ""
 
 #: lms/templates/api_admin/terms_of_service.html
@@ -23811,6 +23859,16 @@ msgstr ""
 msgid ""
 "Introductions, prerequisites, FAQs that are used on {a_link_start}your "
 "course summary page{a_link_end} (formatted in HTML)"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "Course About Sidebar HTML"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid ""
+"Custom sidebar content for {a_link_start}your course summary "
+"page{a_link_end} (formatted in HTML)"
 msgstr ""
 
 #: cms/templates/settings.html

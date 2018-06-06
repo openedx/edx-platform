@@ -85,7 +85,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-05-24 10:01+0000\n"
+"POT-Creation-Date: 2018-06-06 14:53+0000\n"
 "PO-Revision-Date: 2018-05-02 07:51+0000\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
@@ -1749,6 +1749,11 @@ msgid "Cannot rescore problems with possible file submissions"
 msgstr "לא ניתן לתת מחדש ציון עבור תשובות להגשות קובץ אפשריות. "
 
 #: common/lib/capa/capa/capa_problem.py
+#, python-brace-format
+msgid "Question {0}"
+msgstr ""
+
+#: common/lib/capa/capa/capa_problem.py
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Incorrect"
 msgstr "לא נכון"
@@ -1913,6 +1918,7 @@ msgid "Incorrect:"
 msgstr "לא נכון:"
 
 #: common/lib/capa/capa/responsetypes.py
+#: common/lib/xmodule/xmodule/capa_module.py
 msgid "Answer"
 msgstr "תשובה"
 
@@ -2610,6 +2616,14 @@ msgid ""
 "The state of this problem has changed since you loaded this page. Please "
 "refresh your page."
 msgstr "מצב הבעיה השתנה מאז שטענת עמוד זה. נא רענן את העמוד שלך. "
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Answer ID"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py
+msgid "Question"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid "Conditional"
@@ -6834,6 +6848,11 @@ msgstr "משתמש אינו קיים."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
+"Found a conflict with given identifier. Please try an alternative identifier"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
 "Make sure that the file you upload is in CSV format with no extraneous "
 "characters or rows."
 msgstr "ודא כי הקובץ הועלה בפורמט CSV ללא תווים ושורות מיותרות."
@@ -9683,7 +9702,7 @@ msgstr "הראה את כל מאמרי המשנה"
 msgid "This article was last modified:"
 msgstr "מאמר זה שונה לאחרונה:"
 
-#: lms/templates/wiki/create.html lms/templates/wiki/create.html.py
+#: lms/templates/wiki/create.html
 msgid "Add new article"
 msgstr "הוסף מאמר חדש"
 
@@ -9692,12 +9711,10 @@ msgid "Create article"
 msgstr "צור מאמר"
 
 #: lms/templates/wiki/create.html lms/templates/wiki/delete.html
-#: lms/templates/wiki/delete.html.py
 msgid "Go back"
 msgstr "חזור"
 
-#: lms/templates/wiki/delete.html lms/templates/wiki/delete.html.py
-#: lms/templates/wiki/edit.html
+#: lms/templates/wiki/delete.html lms/templates/wiki/edit.html
 msgid "Delete article"
 msgstr "מחק מאמר"
 
@@ -9746,8 +9763,7 @@ msgstr "אתה עומד למחוק את המאמר. נא אשר."
 msgid "Edit"
 msgstr "עריכה"
 
-#: lms/templates/wiki/edit.html lms/templates/wiki/edit.html.py
-#: lms/templates/ccx/schedule.html
+#: lms/templates/wiki/edit.html lms/templates/ccx/schedule.html
 msgid "Save changes"
 msgstr "שמור שינויים"
 
@@ -11269,6 +11285,47 @@ msgstr "השמירה נכשלה עבור העדפת משתמש '{key}' בערך 
 msgid "No data provided for user preference update"
 msgstr "אין נתונים הניתנים לעדכון העדפות משתמש"
 
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
+#, python-format
+msgid "Hello %(full_name)s,"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
+#, python-format
+msgid ""
+"We received a deletion request for your account on %(platform_name)s. We're "
+"sorry to see you go!"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
+msgid ""
+"Your account will be deleted shortly. Account deletion, including removal "
+"from email lists, may take a few weeks to fully process through our system. "
+"If you want to opt-out of emails before then, please unsubscribe from the "
+"footer of any email."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
+#, python-format
+msgid ""
+"This is an informational email only. If you did not initiate this request, "
+"please contact %(contact_email)s."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.html
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/body.txt
+#, python-format
+msgid "Best, %(platform_name)s"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/templates/user_api/edx_ace/deletionnotificationmessage/email/subject.txt
+msgid "Your Account Has Been Queued For Deletion"
+msgstr ""
+
 #: openedx/core/djangoapps/util/user_messages.py
 #, python-brace-format
 msgid "{header_open}{title}{header_close}{body}"
@@ -12552,8 +12609,8 @@ msgstr ""
 
 #: lms/templates/_gated_content.html
 msgid ""
-"You must earn a passing score for '{prereq_section_name}' to access this "
-"content."
+"You must complete the prerequisites for '{prereq_section_name}' to access "
+"this content."
 msgstr ""
 
 #: lms/templates/_gated_content.html
@@ -14238,8 +14295,8 @@ msgstr ""
 "לפרטיות או לפרסום, מידע סודי או כל זכות אחרת של צד שלישי כלשהו;"
 
 #: lms/templates/api_admin/terms_of_service.html
-msgid "altering or editing any content or graphics in the API Content"
-msgstr "שינוי או עריכת תוכן או גרפיקה בתוכן API"
+msgid "altering or editing any content or graphics in the API Content;"
+msgstr ""
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -14345,8 +14402,8 @@ msgid ""
 "revokes access to API Content owned or controlled by that {platform_name} "
 "Participant or third party, including without limitation any Trademarks, you"
 " must ensure that all API Content pertaining to that {platform_name} "
-"Participant or third party is deleted from Your application, networks, "
-"systems and servers as soon as reasonably possible. "
+"Participant or third party is deleted from Your Application and your "
+"networks, systems and servers as soon as reasonably possible. "
 "\"{platform_name_capitalized} Participants\" means MIT, Harvard, and the "
 "other entities providing information, API Content or services for the APIs, "
 "the course instructors and their staffs."
@@ -14398,15 +14455,6 @@ msgstr ""
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
-"{platform_name_capitalized} may also update or modify the APIs from time to "
-"time without advance notice. These changes may affect your use of the APIs "
-"or the way your integration interacts with the API. If we make a change that"
-" is unacceptable to you, you should stop using the APIs. Continued use of "
-"the APIs means you accept the change."
-msgstr ""
-
-#: lms/templates/api_admin/terms_of_service.html
-msgid ""
 "{platform_name_capitalized} reserves the right to modify the Terms at any "
 "time without advance notice.  Any changes to the Terms will be effective "
 "immediately upon posting on this page, with an updated effective date.  By "
@@ -14432,13 +14480,10 @@ msgstr "סודיות"
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
 "Your credentials (such as client secret and IDs) are intended to be used "
-"solely by you. You will keep your credentials confidential and discourage "
-"others from using your credentials. Your credentials may not be embedded in "
-"open source projects."
+"solely by you. You will keep your credentials confidential and prevent and "
+"discourage others from using your credentials. Your credentials may not be "
+"embedded in open source projects."
 msgstr ""
-"הרשאותיך (כגון לקוח נסתר ומזהים) נועדו לשימושך הבלעדי. תוכל לשמור על "
-"הרשאותיך בסודיות ולמנוע מאחרים שימוש בהן. ייתכן שהרשאותיך אינן מוטבעות "
-"בפרויקטים של מקור פתוח."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -23349,6 +23394,16 @@ msgid ""
 msgstr ""
 "הקדמות ומבואות, דרישות קדם ושאלות נפוצות בהם נעשה שימוש ב{a_link_start}עמוד "
 "סיכום הקורס שלךe{a_link_end} (מפורמט ב-HTML)"
+
+#: cms/templates/settings.html
+msgid "Course About Sidebar HTML"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid ""
+"Custom sidebar content for {a_link_start}your course summary "
+"page{a_link_end} (formatted in HTML)"
+msgstr ""
 
 #: cms/templates/settings.html
 msgid "Course Card Image"

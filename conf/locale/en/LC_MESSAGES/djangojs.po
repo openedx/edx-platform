@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-05-27 20:37+0000\n"
-"PO-Revision-Date: 2018-05-27 20:37:19.685821\n"
+"POT-Creation-Date: 2018-06-06 15:18+0000\n"
+"PO-Revision-Date: 2018-06-06 15:18:54.257502\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -8760,8 +8760,9 @@ msgstr ""
 
 #: cms/templates/js/access-editor.underscore
 msgid ""
-"Select a prerequisite subsection and enter a minimum score percentage to "
-"limit access to this subsection."
+"Select a prerequisite subsection and enter a minimum score percentage and "
+"minimum completion percentage to limit access to this subsection. Allowed "
+"values are 0-100"
 msgstr ""
 
 #: cms/templates/js/access-editor.underscore
@@ -8777,7 +8778,16 @@ msgid "Minimum Score:"
 msgstr ""
 
 #: cms/templates/js/access-editor.underscore
+msgid "Minimum Completion:"
+msgstr ""
+
+#: cms/templates/js/access-editor.underscore
 msgid "The minimum score percentage must be a whole number between 0 and 100."
+msgstr ""
+
+#: cms/templates/js/access-editor.underscore
+msgid ""
+"The minimum completion percentage must be a whole number between 0 and 100."
 msgstr ""
 
 #: cms/templates/js/access-editor.underscore

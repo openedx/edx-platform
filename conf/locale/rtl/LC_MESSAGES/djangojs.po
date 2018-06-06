@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-05-27 20:37+0000\n"
-"PO-Revision-Date: 2018-05-27 20:37:19.685821\n"
+"POT-Creation-Date: 2018-06-06 15:18+0000\n"
+"PO-Revision-Date: 2018-06-06 15:18:54.257502\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -9308,11 +9308,13 @@ msgstr "مهوهف شذذثسس"
 
 #: cms/templates/js/access-editor.underscore
 msgid ""
-"Select a prerequisite subsection and enter a minimum score percentage to "
-"limit access to this subsection."
+"Select a prerequisite subsection and enter a minimum score percentage and "
+"minimum completion percentage to limit access to this subsection. Allowed "
+"values are 0-100"
 msgstr ""
-"سثمثذف ش حقثقثضعهسهفث سعزسثذفهخر شري ثرفثق ش وهرهوعو سذخقث حثقذثرفشلث فخ "
-"مهوهف شذذثسس فخ فاهس سعزسثذفهخر."
+"سثمثذف ش حقثقثضعهسهفث سعزسثذفهخر شري ثرفثق ش وهرهوعو سذخقث حثقذثرفشلث شري "
+"وهرهوعو ذخوحمثفهخر حثقذثرفشلث فخ مهوهف شذذثسس فخ فاهس سعزسثذفهخر. شممخصثي "
+"دشمعثس شقث 0-100"
 
 #: cms/templates/js/access-editor.underscore
 msgid "Prerequisite:"
@@ -9327,9 +9329,19 @@ msgid "Minimum Score:"
 msgstr "وهرهوعو سذخقث:"
 
 #: cms/templates/js/access-editor.underscore
+msgid "Minimum Completion:"
+msgstr "وهرهوعو ذخوحمثفهخر:"
+
+#: cms/templates/js/access-editor.underscore
 msgid "The minimum score percentage must be a whole number between 0 and 100."
 msgstr ""
 "فاث وهرهوعو سذخقث حثقذثرفشلث وعسف زث ش صاخمث رعوزثق زثفصثثر 0 شري 100."
+
+#: cms/templates/js/access-editor.underscore
+msgid ""
+"The minimum completion percentage must be a whole number between 0 and 100."
+msgstr ""
+"فاث وهرهوعو ذخوحمثفهخر حثقذثرفشلث وعسف زث ش صاخمث رعوزثق زثفصثثر 0 شري 100."
 
 #: cms/templates/js/access-editor.underscore
 msgid "Use as a Prerequisite"
