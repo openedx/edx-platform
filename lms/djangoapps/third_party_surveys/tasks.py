@@ -37,7 +37,7 @@ def save_responses(survey_responses):
             response=response,
             user_id=response['[url("edx_uid")]'],
             request_date=date,
-            survey_type=response['[url("app")]']
+            survey_type=response['[url("surveyTitle")]']
         )
 
         # Pass the exception if the user=sguid doesn't exist in the Database
