@@ -183,7 +183,7 @@ def async_migrate_transcript(self, course_key, **kwargs):   # pylint: disable=un
     chord(sub_tasks)(callback)
 
     LOGGER.info(
-        "[%s] transcripts migration process for course %s ended.",
+        "[%s] task submission for course %s ended.",
         MIGRATION_LOGS_PREFIX, course_key
     )
 
@@ -240,8 +240,6 @@ def async_migrate_transcript_subtask(self, *args, **kwargs):  # pylint: disable=
         )
 
     # Start transcript's migration
-    message = None
-    # Clean `edx_video_id`
     edx_video_id = clean_video_id(video.edx_video_id)
 
     LOGGER.info(
@@ -289,14 +287,9 @@ def async_migrate_transcript_subtask(self, *args, **kwargs):  # pylint: disable=
     else:
         message = (
             'Success: transcript (language: {language_code}, edx_video_id: {edx_video_id}) has been migrated '
-            'for video [location].'
+            'for video [{location}].'
         ).format(edx_video_id=edx_video_id, language_code=language_code, location=unicode(video.location))
 
-    # Log to indicate that Migration has been ended.
-    LOGGER.info(
-        "[Transcript migration] migration process is ended for video [%s] language [%s].",
-        edx_video_id, language_code
-    )
     return message
 
 
