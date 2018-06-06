@@ -75,3 +75,11 @@ def send_message(comment, site):
         'site_id': site.id
     }
     tasks.send_ace_message.apply_async(args=[context])
+
+
+@receiver(signals.thread_created)
+@receiver(signals.thread_edited)
+@receiver(signals.comment_created)
+@receiver(signals.comment_edited)
+def handle_possibly_profane_post(sender, user, post, **kwargs):  # pylint: disable=unused-argument
+    tasks.check_for_profanity.apply_async(args=[post.id, post.title, post.body, post.type])

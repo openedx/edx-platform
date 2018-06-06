@@ -17,6 +17,7 @@ from edx_ace import ace
 from edx_ace.utils import date
 from edx_ace.recipient import Recipient
 from opaque_keys.edx.keys import CourseKey
+from lms.djangoapps.discussion import profanity_checker
 from lms.djangoapps.django_comment_client.utils import permalink, get_accessible_discussion_xblocks_by_course_id
 import lms.lib.comment_client as cc
 
@@ -49,6 +50,11 @@ def update_discussions_map(context):
         for discussion_block in discussion_blocks
     }
     set_course_discussion_settings(course_key, discussions_id_map=discussions_id_map)
+
+
+@task(base=LoggedTask)
+def check_for_profanity(post_id, post_title, post_body, post_type):
+    profanity_checker.check_for_profanity_and_report(post_id, post_title, post_body, post_type)
 
 
 class ResponseNotification(BaseMessageType):
