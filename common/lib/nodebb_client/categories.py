@@ -25,3 +25,10 @@ class ForumCategory(Category):
         """
         payload = {'username': username}
         return self.client.post('/api/v2/category/recommended', **payload)
+
+    def joined(self, username, **kwargs):
+        """
+        Get joined categories for a specific user
+        """
+        payload = {'username': username}
+        return self.client.post('/api/v2/category/joined', **payload)

@@ -29,17 +29,18 @@ def get_third_party_surveys():
 def save_responses(survey_responses):
     surveys_to_create = []
     for response in survey_responses:
-        if not response.get('[url("sguid")]'):
+        if not response.get('[url("edx_uid")]'):
             continue
 
         date = datetime.strptime(response['datesubmitted'], "%Y-%m-%d %H:%M:%S")
-        date = pytz.utc.localize(date)
 
         surveys_to_create.append(ThirdPartySurvey(
             response=response,
-            user_id=response['[url("sguid")]'],
-            request_date=date
-        ))
+            user_id=response['[url("edx_uid")]'],
+            request_date=date,
+            survey_type=response['[url("app")]']
+        )
+
 
     # Pass the exception if the user=sguid doesn't exist in the Database
     try:
