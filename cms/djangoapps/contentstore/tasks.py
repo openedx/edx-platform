@@ -699,9 +699,9 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
         finally:
             tar_file.close()
 
-		if os.path.isfile(course_dir + u'/imsmanifest.xml'):
-			convert_to_olx(course_dir + u'/')
-		
+        if os.path.isfile(course_dir + u'/imsmanifest.xml'):
+            convert_to_olx(course_dir + u'/')
+
         LOGGER.info(u'Course import %s: Uploaded file extracted', courselike_key)
         self.status.set_state(u'Verifying')
         self.status.increment_completed_steps()
