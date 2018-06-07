@@ -9,7 +9,7 @@ beautifulsoup==3.2.1
 bleach==1.4
 html5lib==0.999
 boto==2.39.0
-celery==3.1.18
+celery>=3.1.18,<4
 cryptography==1.5.3
 cssselect==0.9.1
 dealer==2.0.4
