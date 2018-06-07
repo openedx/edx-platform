@@ -36,8 +36,6 @@ def save_responses(survey_responses):
 
         date = datetime.strptime(response['datesubmitted'], "%Y-%m-%d %H:%M:%S")
         try:
-            # print(response['[url("edx_uid")]'])
-            # print(response.get('[url("app")]', ''))
             surveys_to_create.append(ThirdPartySurvey(
                 response=response,
                 user_id=int(response['[url("edx_uid")]']),
