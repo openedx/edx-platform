@@ -33,16 +33,18 @@ def save_responses(survey_responses):
             continue
 
         date = datetime.strptime(response['datesubmitted'], "%Y-%m-%d %H:%M:%S")
+        try:
+            surveys_to_create.append(ThirdPartySurvey(
+                response=response,
+                user_id=int(response['[url("edx_uid")]']),
+                request_date=date,
+                survey_type=response['[url("app")]']
+                )
+            )
+        except (IntegrityError, ValueError) as exc:
+            log.error(exc)
 
-        surveys_to_create.append(ThirdPartySurvey(
-            response=response,
-            user_id=response['[url("edx_uid")]'],
-            request_date=date,
-            survey_type=response['[url("app")]']
-        )
-
-
-    # Pass the exception if the user=sguid doesn't exist in the Database
+    # Pass the exception if the user=edx_uid doesn't exist in the Database
     try:
         ThirdPartySurvey.objects.bulk_create(surveys_to_create)
     except (IntegrityError, ValueError) as exc:
