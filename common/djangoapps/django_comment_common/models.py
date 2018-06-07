@@ -174,6 +174,45 @@ class ForumsConfig(ConfigurationModel):
         return u"ForumsConfig: timeout={}".format(self.connection_timeout)
 
 
+class CourseForumsProfanityCheckerConfig(ConfigurationModel):
+    """
+    Per-course configuration for profanity checking.  If not enabled,
+    no profanity checking will occur within a course.
+    """
+    KEY_FIELDS = ('course_id',)
+
+    course_id = CourseKeyField(
+        unique=True,
+        max_length=255,
+        db_index=True,
+        help_text="Which course are these settings associated with?",
+    )
+    extra_bad_words = JSONField(
+        null=True,
+        blank=True,
+        help_text="""
+        JSON document defining additional patterns (regular expressions) scanned by the profanity checker. e.g.:
+        {
+            "crud": {
+                "score": 1,
+                "auto_flag": False
+            }
+        }
+        """
+    )
+    bad_word_patterns_to_ignore = JSONField(
+        null=True,
+        blank=True,
+        help_text="""
+        JSON document specify patterns (regular expressions) that should be ignored by the profanity checker. e.g.:
+        [
+            "fiddle\S*",
+            "clusternuts"
+        ]
+        """
+    )
+
+
 class CourseDiscussionSettings(models.Model):
     course_id = CourseKeyField(
         unique=True,

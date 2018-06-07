@@ -8,6 +8,7 @@ from django.dispatch import receiver
 from six import text_type
 
 from django_comment_common import signals
+from django_comment_common.models import CourseForumsProfanityCheckerConfig
 from lms.djangoapps.discussion import config, tasks
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
@@ -84,7 +85,11 @@ def send_message(comment, site):
 @receiver(signals.comment_created)
 @receiver(signals.comment_edited)
 def handle_possibly_profane_post(sender, user, post, **kwargs):  # pylint: disable=unused-argument
-    if not config.PROFANITY_CHECKER_FLAG.is_enabled(CourseKey.from_string(post.course_id)):
+    course_key = CourseKey.from_string(post.course_id)
+    if not config.PROFANITY_CHECKER_FLAG.is_enabled(course_key):
+        return
+
+    if not CourseForumsProfanityCheckerConfig.is_enabled(course_key):
         return
 
     context = {
