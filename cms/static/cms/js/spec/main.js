@@ -4,6 +4,7 @@
 (function(requirejs, requireSerial) {
     'use strict';
 
+    var i, specHelpers, testFiles;
     if (window) {
         define('add-a11y-deps',
             [
@@ -19,8 +20,6 @@
                 window.edx.StringUtils = StringUtils;
             });
     }
-
-    var i, specHelpers, testFiles;
 
     requirejs.config({
         baseUrl: '/base/',
@@ -230,7 +229,6 @@
 
     testFiles = [
         'cms/js/spec/main_spec',
-        'cms/js/spec/xblock/cms.runtime.v1_spec',
         'js/spec/models/course_spec',
         'js/spec/models/metadata_spec',
         'js/spec/models/section_spec',
@@ -263,32 +261,21 @@
         'js/spec/views/previous_video_upload_list_spec',
         'js/spec/views/assets_spec',
         'js/spec/views/baseview_spec',
-        'js/spec/views/container_spec',
-        'js/spec/views/module_edit_spec',
         'js/spec/views/paged_container_spec',
         'js/spec/views/group_configuration_spec',
         'js/spec/views/unit_outline_spec',
         'js/spec/views/xblock_spec',
-        'js/spec/views/xblock_editor_spec',
-        'js/spec/views/xblock_string_field_editor_spec',
         'js/spec/views/xblock_validation_spec',
         'js/spec/views/license_spec',
         'js/spec/views/paging_spec',
-        'js/spec/views/login_studio_spec',
-        'js/spec/views/pages/container_spec',
-        'js/spec/views/pages/container_subviews_spec',
         'js/spec/views/pages/group_configurations_spec',
-        'js/spec/views/pages/course_outline_spec',
         'js/spec/views/pages/course_rerun_spec',
         'js/spec/views/pages/index_spec',
         'js/spec/views/pages/library_users_spec',
         'js/spec/views/modals/base_modal_spec',
-        'js/spec/views/modals/edit_xblock_spec',
         'js/spec/views/modals/move_xblock_modal_spec',
         'js/spec/views/modals/validation_error_modal_spec',
-        'js/spec/views/move_xblock_spec',
         'js/spec/views/settings/main_spec',
-        'js/spec/factories/xblock_validation_spec',
         'js/certificates/spec/models/certificate_spec',
         'js/certificates/spec/views/certificate_details_spec',
         'js/certificates/spec/views/certificate_editor_spec',

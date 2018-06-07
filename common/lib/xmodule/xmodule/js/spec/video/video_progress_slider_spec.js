@@ -24,7 +24,7 @@
                 });
 
                 it('build the slider', function() {
-                    expect($('.slider')).toContain(state.videoProgressSlider.slider);
+                    expect($('.slider').toArray()).toContain(state.videoProgressSlider.slider);
                     expect($.fn.slider).toHaveBeenCalledWith({
                         range: 'min',
                         min: 0,
@@ -35,7 +35,7 @@
                 });
 
                 it('build the seek handle', function() {
-                    expect($('.ui-slider-handle'))
+                    expect($('.ui-slider-handle').toArray())
                         .toContain(state.videoProgressSlider.handle);
                 });
 
