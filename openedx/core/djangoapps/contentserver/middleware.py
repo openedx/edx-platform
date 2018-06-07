@@ -12,6 +12,7 @@ except ImportError:
 from django.http import (
     HttpResponse, HttpResponseNotModified, HttpResponseForbidden,
     HttpResponseBadRequest, HttpResponseNotFound, HttpResponsePermanentRedirect)
+from django.utils.deprecation import MiddlewareMixin
 from six import text_type
 from student.models import CourseEnrollment
 
@@ -33,7 +34,7 @@ from .models import CourseAssetCacheTtlConfig, CdnUserAgentsConfig
 HTTP_DATE_FORMAT = "%a, %d %b %Y %H:%M:%S GMT"
 
 
-class StaticContentServer(object):
+class StaticContentServer(MiddlewareMixin):
     """
     Serves course assets to end users.  Colloquially referred to as "contentserver."
     """

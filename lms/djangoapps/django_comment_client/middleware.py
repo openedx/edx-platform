@@ -1,6 +1,7 @@
 import json
 import logging
 
+from django.utils.deprecation import MiddlewareMixin
 from six import text_type
 
 from django_comment_client.utils import JsonError
@@ -9,7 +10,7 @@ from lms.lib.comment_client import CommentClientRequestError
 log = logging.getLogger(__name__)
 
 
-class AjaxExceptionMiddleware(object):
+class AjaxExceptionMiddleware(MiddlewareMixin):
     """
     Middleware that captures CommentClientRequestErrors during ajax requests
     and tranforms them into json responses

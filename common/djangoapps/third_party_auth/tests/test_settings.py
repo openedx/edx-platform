@@ -13,7 +13,7 @@ _ORIGINAL_TEMPLATE_CONTEXT_PROCESSORS = ['first_template_context_preprocessor']
 _SETTINGS_MAP = {
     'AUTHENTICATION_BACKENDS': _ORIGINAL_AUTHENTICATION_BACKENDS,
     'INSTALLED_APPS': _ORIGINAL_INSTALLED_APPS,
-    'MIDDLEWARE_CLASSES': _ORIGINAL_MIDDLEWARE_CLASSES,
+    'MIDDLEWARE': _ORIGINAL_MIDDLEWARE_CLASSES,
     'TEMPLATES': [{
         'OPTIONS': {
             'context_processors': _ORIGINAL_TEMPLATE_CONTEXT_PROCESSORS
@@ -39,7 +39,7 @@ class SettingsUnitTest(testutil.TestCase):
     def test_apply_settings_adds_exception_middleware(self):
         settings.apply_settings(self.settings)
         for middleware_name in settings._MIDDLEWARE_CLASSES:
-            self.assertIn(middleware_name, self.settings.MIDDLEWARE_CLASSES)
+            self.assertIn(middleware_name, self.settings.MIDDLEWARE)
 
     def test_apply_settings_adds_fields_stored_in_session(self):
         settings.apply_settings(self.settings)

@@ -134,7 +134,7 @@ class TestCreateAccount(SiteMixin, TestCase):
         self.assertIn(settings.EDXMKTG_USER_INFO_COOKIE_NAME, self.client.cookies)
 
     @unittest.skipUnless(
-        "microsite_configuration.middleware.MicrositeMiddleware" in settings.MIDDLEWARE_CLASSES,
+        "microsite_configuration.middleware.MicrositeMiddleware" in settings.MIDDLEWARE,
         "Microsites not implemented in this environment"
     )
     def test_profile_saved_no_optional_fields(self):
@@ -156,7 +156,7 @@ class TestCreateAccount(SiteMixin, TestCase):
         self.assertIsNone(profile.year_of_birth)
 
     @unittest.skipUnless(
-        "microsite_configuration.middleware.MicrositeMiddleware" in settings.MIDDLEWARE_CLASSES,
+        "microsite_configuration.middleware.MicrositeMiddleware" in settings.MIDDLEWARE,
         "Microsites not implemented in this environment"
     )
     @override_settings(LMS_SEGMENT_KEY="testkey")
@@ -194,7 +194,7 @@ class TestCreateAccount(SiteMixin, TestCase):
         mock_segment_identify.assert_called_with(profile.user.id, expected_payload)
 
     @unittest.skipUnless(
-        "microsite_configuration.middleware.MicrositeMiddleware" in settings.MIDDLEWARE_CLASSES,
+        "microsite_configuration.middleware.MicrositeMiddleware" in settings.MIDDLEWARE,
         "Microsites not implemented in this environment"
     )
     def test_profile_saved_all_optional_fields(self):
@@ -226,7 +226,7 @@ class TestCreateAccount(SiteMixin, TestCase):
         self.assertEqual(profile.year_of_birth, 2015)
 
     @unittest.skipUnless(
-        "microsite_configuration.middleware.MicrositeMiddleware" in settings.MIDDLEWARE_CLASSES,
+        "microsite_configuration.middleware.MicrositeMiddleware" in settings.MIDDLEWARE,
         "Microsites not implemented in this environment"
     )
     def test_profile_saved_empty_optional_fields(self):

@@ -3,12 +3,13 @@ Middleware for the courseware app
 """
 
 from django.shortcuts import redirect
+from django.utils.deprecation import MiddlewareMixin
 
 from lms.djangoapps.courseware.exceptions import Redirect
 from util.request import COURSE_REGEX
 
 
-class RedirectMiddleware(object):
+class RedirectMiddleware(MiddlewareMixin):
     """
     Catch Redirect exceptions and redirect the user to the expected URL.
     """
@@ -20,7 +21,7 @@ class RedirectMiddleware(object):
             return redirect(exception.url)
 
 
-class CacheCourseIdMiddleware(object):
+class CacheCourseIdMiddleware(MiddlewareMixin):
     """Middleware that adds course_id to user request session."""
 
     def process_request(self, request):

@@ -3,6 +3,7 @@ Middleware for Language Preferences
 """
 
 from django.conf import settings
+from django.utils.deprecation import MiddlewareMixin
 from django.utils.translation import LANGUAGE_SESSION_KEY
 from django.utils.translation.trans_real import parse_accept_lang_header
 
@@ -14,7 +15,7 @@ from openedx.core.djangoapps.user_api.preferences.api import (
 )
 
 
-class LanguagePreferenceMiddleware(object):
+class LanguagePreferenceMiddleware(MiddlewareMixin):
     """
     Middleware for user preferences.
 

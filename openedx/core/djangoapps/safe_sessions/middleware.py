@@ -67,6 +67,7 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.core import signing
 from django.http import HttpResponse
 from django.utils.crypto import get_random_string
+from django.utils.deprecation import MiddlewareMixin
 from six import text_type
 
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
@@ -232,7 +233,7 @@ class SafeCookieData(object):
             )
 
 
-class SafeSessionMiddleware(SessionMiddleware):
+class SafeSessionMiddleware(SessionMiddleware, MiddlewareMixin):
     """
     A safer middleware implementation that uses SafeCookieData instead
     of just the session id to lookup and verify a user's session.

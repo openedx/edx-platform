@@ -5,6 +5,7 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.shortcuts import redirect
+from django.utils.deprecation import MiddlewareMixin
 from six import text_type
 from wiki.models import reverse
 
@@ -15,7 +16,7 @@ from student.models import CourseEnrollment
 from util.request import course_id_from_url
 
 
-class WikiAccessMiddleware(object):
+class WikiAccessMiddleware(MiddlewareMixin):
     """
     This middleware wraps calls to django-wiki in order to handle authentication and redirection
     between the root wiki and the course wikis.

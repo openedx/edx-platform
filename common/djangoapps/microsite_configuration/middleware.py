@@ -7,10 +7,11 @@ A microsite enables the following features:
 3) Ability to swap out some branding elements in the website
 """
 
+from django.utils.deprecation import MiddlewareMixin
 from microsite_configuration import microsite
 
 
-class MicrositeMiddleware(object):
+class MicrositeMiddleware(MiddlewareMixin):
     """
     Middleware class which will bind configuration information regarding 'microsites' on a per request basis.
     The actual configuration information is taken from Django settings information

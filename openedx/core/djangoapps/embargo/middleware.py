@@ -31,6 +31,7 @@ import re
 from django.conf import settings
 from django.core.exceptions import MiddlewareNotUsed
 from django.urls import reverse
+from django.utils.deprecation import MiddlewareMixin
 from django.shortcuts import redirect
 from ipware.ip import get_ip
 
@@ -42,7 +43,7 @@ from .models import IPFilter
 log = logging.getLogger(__name__)
 
 
-class EmbargoMiddleware(object):
+class EmbargoMiddleware(MiddlewareMixin):
     """Middleware for embargoing site and courses. """
 
     ALLOW_URL_PATTERNS = [

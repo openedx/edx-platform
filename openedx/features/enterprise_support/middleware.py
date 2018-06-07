@@ -5,11 +5,12 @@ The Enterprise feature must be turned on for this middleware to have any effect.
 """
 
 from django.core.exceptions import MiddlewareNotUsed
+from django.utils.deprecation import MiddlewareMixin
 
 from openedx.features.enterprise_support import api
 
 
-class EnterpriseMiddleware(object):
+class EnterpriseMiddleware(MiddlewareMixin):
     """
     Middleware that adds Enterprise-related content to the request.
     """

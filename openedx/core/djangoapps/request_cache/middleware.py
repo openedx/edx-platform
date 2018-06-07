@@ -5,6 +5,7 @@ and end of every request.
 import threading
 
 import crum
+from django.utils.deprecation import MiddlewareMixin
 from django.utils.encoding import force_text
 
 
@@ -20,7 +21,7 @@ class _RequestCache(threading.local):
 REQUEST_CACHE = _RequestCache()
 
 
-class RequestCache(object):
+class RequestCache(MiddlewareMixin):
     @classmethod
     def get_request_cache(cls, name=None):
         """

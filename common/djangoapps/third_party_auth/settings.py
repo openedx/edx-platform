@@ -28,7 +28,7 @@ def apply_settings(django_settings):
     django_settings.FIELDS_STORED_IN_SESSION = _FIELDS_STORED_IN_SESSION
 
     # Inject exception middleware to make redirects fire.
-    django_settings.MIDDLEWARE_CLASSES.extend(_MIDDLEWARE_CLASSES)
+    django_settings.MIDDLEWARE.extend(_MIDDLEWARE_CLASSES)
 
     # Where to send the user if there's an error during social authentication
     # and we cannot send them to a more specific URL

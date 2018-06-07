@@ -1215,7 +1215,7 @@ CREDIT_NOTIFICATION_CACHE_TIMEOUT = 5 * 60 * 60
 
 ################################# Middleware ###################################
 
-MIDDLEWARE_CLASSES = [
+MIDDLEWARE = [
     'crum.CurrentRequestUserMiddleware',
 
     'openedx.core.djangoapps.request_cache.middleware.RequestCache',
@@ -2526,7 +2526,7 @@ if FEATURES.get('AUTH_USE_CAS'):
 
     INSTALLED_APPS.append('django_cas')
 
-    MIDDLEWARE_CLASSES.append('django_cas.middleware.CASMiddleware')
+    MIDDLEWARE.append('django_cas.middleware.CASMiddleware')
 
 ############# Cross-domain requests #################
 

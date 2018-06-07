@@ -47,6 +47,7 @@ import logging
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, MiddlewareNotUsed
 from django.middleware.csrf import CsrfViewMiddleware
+from django.utils.deprecation import MiddlewareMixin
 
 from .helpers import is_cross_domain_request_allowed, skip_cross_domain_referer_check
 
@@ -54,7 +55,7 @@ from .helpers import is_cross_domain_request_allowed, skip_cross_domain_referer_
 log = logging.getLogger(__name__)
 
 
-class CorsCSRFMiddleware(CsrfViewMiddleware):
+class CorsCSRFMiddleware(CsrfViewMiddleware, MiddlewareMixin):
     """
     Middleware for handling CSRF checks with CORS requests
     """
@@ -73,7 +74,7 @@ class CorsCSRFMiddleware(CsrfViewMiddleware):
             return super(CorsCSRFMiddleware, self).process_view(request, callback, callback_args, callback_kwargs)
 
 
-class CsrfCrossDomainCookieMiddleware(object):
+class CsrfCrossDomainCookieMiddleware(MiddlewareMixin):
     """Set an additional "cross-domain" CSRF cookie.
 
     Usage:

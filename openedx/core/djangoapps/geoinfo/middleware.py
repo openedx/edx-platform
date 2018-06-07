@@ -13,6 +13,7 @@ decorator `django.utils.decorators.decorator_from_middleware(middleware_class)`
 import logging
 
 from django.conf import settings
+from django.utils.deprecation import MiddlewareMixin
 from ipware.ip import get_real_ip
 
 import pygeoip
@@ -20,7 +21,7 @@ import pygeoip
 log = logging.getLogger(__name__)
 
 
-class CountryMiddleware(object):
+class CountryMiddleware(MiddlewareMixin):
     """
     Identify the country by IP address.
     """

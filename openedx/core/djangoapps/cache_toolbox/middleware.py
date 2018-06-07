@@ -55,9 +55,9 @@ However, this has two main disadvantages:
 Usage
 ~~~~~
 
-To use, find ``MIDDLEWARE_CLASSES`` in your ``settings.py`` and replace::
+To use, find ``MIDDLEWARE`` in your ``settings.py`` and replace::
 
-    MIDDLEWARE_CLASSES = [
+    MIDDLEWARE = [
         ...
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         ...
@@ -65,7 +65,7 @@ To use, find ``MIDDLEWARE_CLASSES`` in your ``settings.py`` and replace::
 
 with::
 
-    MIDDLEWARE_CLASSES = [
+    MIDDLEWARE = [
         ...
         'openedx.core.djangoapps.cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
         ...
@@ -85,6 +85,7 @@ from django.contrib.auth import HASH_SESSION_KEY
 from django.contrib.auth.middleware import AuthenticationMiddleware
 from django.contrib.auth.models import AnonymousUser, User
 from django.utils.crypto import constant_time_compare
+from django.utils.deprecation import MiddlewareMixin
 
 from openedx.core.djangoapps.safe_sessions.middleware import SafeSessionMiddleware
 
@@ -93,7 +94,7 @@ from .model import cache_model
 log = getLogger(__name__)
 
 
-class CacheBackedAuthenticationMiddleware(AuthenticationMiddleware):
+class CacheBackedAuthenticationMiddleware(AuthenticationMiddleware, MiddlewareMixin):
     """
     See documentation above.
     """

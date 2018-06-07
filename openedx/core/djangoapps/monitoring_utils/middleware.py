@@ -7,11 +7,11 @@ At this time, the custom metrics can only be reported to New Relic.
 This middleware will only call on the newrelic agent if there are any metrics
 to report for this request, so it will not incur any processing overhead for
 request handlers which do not record custom metrics.
-
 """
 import logging
 from uuid import uuid4
 
+from django.utils.deprecation import MiddlewareMixin
 import psutil
 
 from openedx.core.djangoapps.request_cache import get_cache
@@ -29,10 +29,10 @@ REQUEST_CACHE_KEY = 'monitoring_custom_metrics'
 WAFFLE_NAMESPACE = 'monitoring_utils'
 
 
-class MonitoringCustomMetrics(object):
+class MonitoringCustomMetrics(MiddlewareMixin):
     """
     The middleware class.  Make sure to add below the request cache in
-    MIDDLEWARE_CLASSES.
+    MIDDLEWARE.
     """
 
     @classmethod
@@ -81,7 +81,7 @@ class MonitoringCustomMetrics(object):
         return None
 
 
-class MonitoringMemoryMiddleware(object):
+class MonitoringMemoryMiddleware(MiddlewareMixin):
     """
     Middleware for monitoring memory usage.
     """

@@ -8,6 +8,7 @@ This middleware must be placed before the LocaleMiddleware, but after
 the SessionMiddleware.
 """
 from django.conf import settings
+from django.utils.deprecation import MiddlewareMixin
 from django.utils.translation import LANGUAGE_SESSION_KEY
 from django.utils.translation.trans_real import parse_accept_lang_header
 
@@ -52,7 +53,7 @@ def _dark_parse_accept_lang_header(accept):
     return django_langs
 
 
-class DarkLangMiddleware(object):
+class DarkLangMiddleware(MiddlewareMixin):
     """
     Middleware for dark-launching languages.
 

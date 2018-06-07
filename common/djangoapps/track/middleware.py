@@ -14,6 +14,7 @@ import re
 import sys
 
 from django.conf import settings
+from django.utils.deprecation import MiddlewareMixin
 from ipware.ip import get_ip
 
 from eventtracking import tracker
@@ -33,7 +34,7 @@ META_KEY_TO_CONTEXT_KEY = {
 }
 
 
-class TrackMiddleware(object):
+class TrackMiddleware(MiddlewareMixin):
     """
     Tracks all requests made, as well as setting up context for other server
     emitted events.

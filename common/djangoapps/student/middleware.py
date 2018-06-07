@@ -4,12 +4,13 @@ disabled accounts from accessing the site.
 """
 from django.conf import settings
 from django.http import HttpResponseForbidden
+from django.utils.deprecation import MiddlewareMixin
 from django.utils.translation import ugettext as _
 
 from student.models import UserStanding
 
 
-class UserStandingMiddleware(object):
+class UserStandingMiddleware(MiddlewareMixin):
     """
     Checks a user's standing on request. Returns a 403 if the user's
     status is 'disabled'.
