@@ -7,6 +7,7 @@ from celery.result import AsyncResult
 from datetime import datetime
 from django.http import JsonResponse
 from django.conf import settings
+from lms.djangoapps.third_party_surveys.tasks import get_third_party_surveys
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
@@ -42,6 +43,24 @@ class MailChimpDataSyncAPI(APIView):
         return JsonResponse({
             'state': "STARTED",
             'task_id': x.task_id
+        }, status=status.HTTP_200_OK)
+
+
+class ThirdPartyResultDataSyncAPI(APIView):
+
+    def get(self, request):
+        """ Get data shared between platform & community """
+        #
+        if request.GET.get('task_id'):
+
+            return JsonResponse({
+                'state': 'done',
+            }, status=status.HTTP_200_OK)
+
+        get_third_party_surveys()
+
+        return JsonResponse({
+            'state': "started",
         }, status=status.HTTP_200_OK)
 
 
