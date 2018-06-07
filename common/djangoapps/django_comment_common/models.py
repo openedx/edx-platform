@@ -182,7 +182,6 @@ class CourseForumsProfanityCheckerConfig(ConfigurationModel):
     KEY_FIELDS = ('course_id',)
 
     course_id = CourseKeyField(
-        unique=True,
         max_length=255,
         db_index=True,
         help_text="Which course are these settings associated with?",
