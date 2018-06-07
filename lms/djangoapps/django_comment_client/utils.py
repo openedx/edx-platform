@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from django.db import connection
 from django.http import HttpResponse
+from django.utils.deprecation import MiddlewareMixin
 from pytz import UTC
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import i4xEncoder
@@ -495,7 +496,7 @@ class HtmlResponse(HttpResponse):
         super(HtmlResponse, self).__init__(html, content_type='text/plain')
 
 
-class ViewNameMiddleware(object):
+class ViewNameMiddleware(MiddlewareMixin):
     """
     Django middleware object to inject view name into request context
     """
@@ -506,7 +507,7 @@ class ViewNameMiddleware(object):
         request.view_name = view_func.__name__
 
 
-class QueryCountDebugMiddleware(object):
+class QueryCountDebugMiddleware(MiddlewareMixin):
     """
     This middleware will log the number of queries run
     and the total time taken for each request (with a

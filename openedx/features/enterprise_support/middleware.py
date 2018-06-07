@@ -15,12 +15,13 @@ class EnterpriseMiddleware(MiddlewareMixin):
     Middleware that adds Enterprise-related content to the request.
     """
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
         We don't need to use this middleware if the Enterprise feature isn't enabled.
         """
         if not api.enterprise_enabled():
             raise MiddlewareNotUsed()
+        super(EnterpriseMiddleware, self).__init__(*args, **kwargs)
 
     def process_request(self, request):
         """

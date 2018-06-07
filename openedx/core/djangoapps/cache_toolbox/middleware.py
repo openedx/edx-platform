@@ -98,8 +98,9 @@ class CacheBackedAuthenticationMiddleware(AuthenticationMiddleware, MiddlewareMi
     """
     See documentation above.
     """
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         cache_model(User)
+        super(CacheBackedAuthenticationMiddleware, self).__init__(*args, **kwargs)
 
     def process_request(self, request):
         try:

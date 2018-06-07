@@ -57,10 +57,11 @@ class EmbargoMiddleware(MiddlewareMixin):
         re.compile(r'^/admin/'),
     ]
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         # If embargoing is turned off, make this middleware do nothing
         if not settings.FEATURES.get('EMBARGO'):
             raise MiddlewareNotUsed()
+        super(EmbargoMiddleware, self).__init__(*args, **kwargs)
 
     def process_request(self, request):
         """Block requests based on embargo rules.
