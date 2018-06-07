@@ -141,6 +141,36 @@ class IDVerificationAttempt(StatusModel):
         )
 
 
+class ManualVerification(IDVerificationAttempt):
+    """
+    Each ManualVerification represents a user's verification that bypasses the need for
+    any other verification.
+    """
+
+    reason = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text=(
+            'Specifies the reason for manual verification of the user.'
+        )
+    )
+
+    class Meta(object):
+        app_label = 'verify_student'
+
+    def __unicode__(self):
+        return 'ManualIDVerification for {name}, status: {status}'.format(
+            name=self.name,
+            status=self.status,
+        )
+
+    def should_display_status_to_user(self):
+        """
+        Whether or not the status should be displayed to the user.
+        """
+        return False
+
+
 class SSOVerification(IDVerificationAttempt):
     """
     Each SSOVerification represents a Student's attempt to establish their identity

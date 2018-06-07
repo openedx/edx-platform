@@ -13,7 +13,7 @@ from course_modes.models import CourseMode
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from student.models import User
 
-from .models import SoftwareSecurePhotoVerification, SSOVerification
+from .models import SoftwareSecurePhotoVerification, SSOVerification, ManualVerification
 from .utils import earliest_allowed_verification_date, most_recent_verification
 
 log = logging.getLogger(__name__)
@@ -69,7 +69,8 @@ class IDVerificationService(object):
         }
 
         return (SoftwareSecurePhotoVerification.objects.filter(**filter_kwargs).exists() or
-                SSOVerification.objects.filter(**filter_kwargs).exists())
+                SSOVerification.objects.filter(**filter_kwargs).exists() or
+                ManualVerification.objects.filter(**filter_kwargs).exists())
 
     @classmethod
     def verifications_for_user(cls, user):
@@ -78,7 +79,8 @@ class IDVerificationService(object):
         """
         verifications = []
         for verification in chain(SoftwareSecurePhotoVerification.objects.filter(user=user),
-                                  SSOVerification.objects.filter(user=user)):
+                                  SSOVerification.objects.filter(user=user),
+                                  ManualVerification.objects.filter(user=user)):
             verifications.append(verification)
         return verifications
 
@@ -95,7 +97,8 @@ class IDVerificationService(object):
         }
         return chain(
             SoftwareSecurePhotoVerification.objects.filter(**filter_kwargs).select_related('user'),
-            SSOVerification.objects.filter(**filter_kwargs).select_related('user')
+            SSOVerification.objects.filter(**filter_kwargs).select_related('user'),
+            ManualVerification.objects.filter(**filter_kwargs).select_related('user')
         )
 
     @classmethod
@@ -120,8 +123,14 @@ class IDVerificationService(object):
 
         photo_id_verifications = SoftwareSecurePhotoVerification.objects.filter(**filter_kwargs)
         sso_id_verifications = SSOVerification.objects.filter(**filter_kwargs)
+        manual_id_verifications = ManualVerification.objects.filter(**filter_kwargs)
 
-        attempt = most_recent_verification(photo_id_verifications, sso_id_verifications, 'updated_at')
+        attempt = most_recent_verification(
+            photo_id_verifications,
+            sso_id_verifications,
+            manual_id_verifications,
+            'updated_at'
+        )
         return attempt and attempt.expiration_datetime
 
     @classmethod
@@ -139,7 +148,8 @@ class IDVerificationService(object):
         }
 
         return (SoftwareSecurePhotoVerification.objects.filter(**filter_kwargs).exists() or
-                SSOVerification.objects.filter(**filter_kwargs).exists())
+                SSOVerification.objects.filter(**filter_kwargs).exists() or
+                ManualVerification.objects.filter(**filter_kwargs).exists())
 
     @classmethod
     def user_status(cls, user):
@@ -166,8 +176,14 @@ class IDVerificationService(object):
         try:
             photo_id_verifications = SoftwareSecurePhotoVerification.objects.filter(user=user).order_by('-updated_at')
             sso_id_verifications = SSOVerification.objects.filter(user=user).order_by('-updated_at')
+            manual_id_verifications = ManualVerification.objects.filter(user=user).order_by('-updated_at')
 
-            attempt = most_recent_verification(photo_id_verifications, sso_id_verifications, 'updated_at')
+            attempt = most_recent_verification(
+                photo_id_verifications,
+                sso_id_verifications,
+                manual_id_verifications,
+                'updated_at'
+            )
         except IndexError:
             # The user has no verification attempts, return the default set of data.
             return user_status

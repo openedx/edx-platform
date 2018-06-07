@@ -16,7 +16,7 @@ from nose.tools import (
 )
 
 from common.test.utils import MockS3Mixin
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, SSOVerification
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, SSOVerification, ManualVerification
 from lms.djangoapps.verify_student.services import IDVerificationService
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -78,12 +78,12 @@ class TestIDVerificationService(MockS3Mixin, ModuleStoreTestCase):
         # test for correct status when no error returned
         user = UserFactory.create()
         status = IDVerificationService.user_status(user)
-        self.assertEquals(status, {'status': 'none', 'error': '', 'should_display': True})
+        self.assertDictEqual(status, {'status': 'none', 'error': '', 'should_display': True})
 
         # test for when photo verification has been created
         SoftwareSecurePhotoVerification.objects.create(user=user, status='approved')
         status = IDVerificationService.user_status(user)
-        self.assertEquals(status, {'status': 'approved', 'error': '', 'should_display': True})
+        self.assertDictEqual(status, {'status': 'approved', 'error': '', 'should_display': True})
 
         # create another photo verification for the same user, make sure the denial
         # is handled properly
@@ -91,18 +91,23 @@ class TestIDVerificationService(MockS3Mixin, ModuleStoreTestCase):
             user=user, status='denied', error_msg='[{"photoIdReasons": ["Not provided"]}]'
         )
         status = IDVerificationService.user_status(user)
-        self.assertEquals(status, {'status': 'must_reverify', 'error': ['id_image_missing'], 'should_display': True})
+        self.assertDictEqual(status, {'status': 'must_reverify', 'error': ['id_image_missing'], 'should_display': True})
 
         # test for when sso verification has been created
         SSOVerification.objects.create(user=user, status='approved')
         status = IDVerificationService.user_status(user)
-        self.assertEquals(status, {'status': 'approved', 'error': '', 'should_display': False})
+        self.assertDictEqual(status, {'status': 'approved', 'error': '', 'should_display': False})
 
         # create another sso verification for the same user, make sure the denial
         # is handled properly
         SSOVerification.objects.create(user=user, status='denied')
         status = IDVerificationService.user_status(user)
-        self.assertEquals(status, {'status': 'must_reverify', 'error': '', 'should_display': False})
+        self.assertDictEqual(status, {'status': 'must_reverify', 'error': '', 'should_display': False})
+
+        # test for when manual verification has been created
+        ManualVerification.objects.create(user=user, status='approved')
+        status = IDVerificationService.user_status(user)
+        self.assertDictEqual(status, {'status': 'approved', 'error': '', 'should_display': False})
 
     @ddt.unpack
     @ddt.data(

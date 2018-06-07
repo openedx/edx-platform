@@ -23,6 +23,7 @@ from common.test.utils import MockS3Mixin
 from lms.djangoapps.verify_student.models import (
     SoftwareSecurePhotoVerification,
     SSOVerification,
+    ManualVerification,
     VerificationDeadline,
     VerificationException
 )
@@ -385,6 +386,16 @@ class SSOVerificationTest(TestVerification):
         user = UserFactory.create()
         attempt = SSOVerification.objects.create(user=user)
         self.verification_active_at_datetime(attempt)
+
+
+class ManualVerificationTest(TestVerification):
+    """
+    Tests for the ManualVerification model
+    """
+    def test_active_at_datetime(self):
+        user = UserFactory.create()
+        verification = ManualVerification.objects.create(user=user)
+        self.verification_active_at_datetime(verification)
 
 
 class VerificationDeadlineTest(CacheIsolationTestCase):
