@@ -141,9 +141,9 @@ urlpatterns = [
     url(r'^dashboard/', include('learner_dashboard.urls')),
     url(r'^api/experiments/', include('experiments.urls', namespace='api_experiments')),
     url(r'^login$', student_account_views.login_and_registration_form,
-        {'initial_mode': 'login'}, name='signin_user_legacy'),
+        {'initial_mode': 'login'}, name='signin_user'),
     url(r'^register$', student_account_views.login_and_registration_form,
-        {'initial_mode': 'register'}, name='register_user_legacy'),
+        {'initial_mode': 'register'}, name='register_user'),
 ]
 
 if settings.FEATURES.get('ENABLE_MOBILE_REST_API'):
