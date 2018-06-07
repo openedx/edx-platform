@@ -320,7 +320,8 @@ class ShibSPTest(CacheIsolationTestCase):
                     'honor_code': u'true'}
 
         with patch('student.views.management.AUDIT_LOG') as mock_audit_log:
-            self.client.post('/create_account', data=postvars)
+            url = reverse('user_api_registration')
+            self.client.post(url, data=postvars)
 
         mail = identity.get('mail')
 

@@ -14,7 +14,7 @@ define(['jquery', 'jquery.cookie'], function($) {
             var submit_data = $('#register_form').serialize();
 
             $.ajax({
-                url: '/create_account',
+                url: '/account/registration',
                 type: 'POST',
                 dataType: 'json',
                 headers: {'X-CSRFToken': $.cookie('csrftoken')},

@@ -38,7 +38,7 @@ class ShortcutsTests(UrlResetMixin, TestCase):
             self.assertEquals(link, expected_link)
 
     @override_settings(MKTG_URLS={'ROOT': 'https://dummy-root', 'ABOUT': '/about-us'})
-    @override_settings(MKTG_URL_LINK_MAP={'ABOUT': 'login'})
+    @override_settings(MKTG_URL_LINK_MAP={'ABOUT': 'signin_user'})
     def test_is_marketing_link_set(self):
         # test marketing site on
         with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
@@ -50,7 +50,7 @@ class ShortcutsTests(UrlResetMixin, TestCase):
             self.assertFalse(is_marketing_link_set('NOT_CONFIGURED'))
 
     @override_settings(MKTG_URLS={'ROOT': 'https://dummy-root', 'ABOUT': '/about-us'})
-    @override_settings(MKTG_URL_LINK_MAP={'ABOUT': 'login'})
+    @override_settings(MKTG_URL_LINK_MAP={'ABOUT': 'signin_user'})
     def test_is_any_marketing_link_set(self):
         # test marketing site on
         with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):

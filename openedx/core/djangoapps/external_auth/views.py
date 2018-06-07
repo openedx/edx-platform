@@ -294,7 +294,7 @@ def _signup(request, eamap, retfun=None):
                          honor_code=u'true',
                          terms_of_service=u'true')
         log.info(u'doing immediate signup for %s, params=%s', username, post_vars)
-        student.views.create_account(request, post_vars)
+        student.views.create_account_with_params(request, post_vars)
         # should check return content for successful completion before
         if retfun is not None:
             return retfun()

@@ -250,7 +250,7 @@ class TestRegisterRetiredUsername(TestCase):
     """
     def setUp(self):
         super(TestRegisterRetiredUsername, self).setUp()
-        self.url = reverse('create_account')
+        self.url = reverse('user_api_registration')
         self.url_params = {
             'username': 'username',
             'email': 'foo_bar' + '@bar.com',

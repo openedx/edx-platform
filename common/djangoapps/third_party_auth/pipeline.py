@@ -135,8 +135,8 @@ def is_api(auth_entry):
 # We don't use "reverse" here because doing so may cause modules
 # to load that depend on this module.
 AUTH_DISPATCH_URLS = {
-    AUTH_ENTRY_LOGIN: '/account/login',
-    AUTH_ENTRY_REGISTER: '/account/register',
+    AUTH_ENTRY_LOGIN: '/login',
+    AUTH_ENTRY_REGISTER: '/register',
     AUTH_ENTRY_ACCOUNT_SETTINGS: '/account/settings',
 }
 

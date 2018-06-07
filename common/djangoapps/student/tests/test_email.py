@@ -122,7 +122,7 @@ class ActivationEmailTests(CacheIsolationTestCase):
         """
         Create an account, triggering the activation email.
         """
-        url = reverse('create_account')
+        url = reverse('user_api_registration')
         params = {
             'username': 'test_user',
             'email': 'test_user@example.com',

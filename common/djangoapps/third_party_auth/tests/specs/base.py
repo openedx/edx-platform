@@ -652,7 +652,6 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
                             request=request)
 
         with self._patch_edxmako_current_request(strategy.request):
-            student_views.signin_user(strategy.request)
             student_views.login_user(strategy.request)
             actions.do_complete(request.backend, social_views._do_login, user=user,  # pylint: disable=protected-access
                                 request=request)
@@ -719,7 +718,6 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
                             request=request)
 
         with self._patch_edxmako_current_request(strategy.request):
-            student_views.signin_user(strategy.request)
             student_views.login_user(strategy.request)
             actions.do_complete(request.backend, social_views._do_login,  # pylint: disable=protected-access
                                 user=user, request=request)
@@ -764,7 +762,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # At this point we know the pipeline has resumed correctly. Next we
         # fire off the view that displays the login form and posts it via JS.
         with self._patch_edxmako_current_request(strategy.request):
-            self.assert_login_response_in_pipeline_looks_correct(student_views.signin_user(strategy.request))
+            self.assert_login_response_in_pipeline_looks_correct(student_views.login_user(strategy.request))
 
         # Next, we invoke the view that handles the POST, and expect it
         # redirects to /auth/complete. In the browser ajax handlers will
