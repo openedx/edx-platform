@@ -87,3 +87,11 @@ def get_recommended_communities(user):
     """
     status, categories = NodeBBClient().categories.recommended(user)
     return categories if status == 200 else []
+
+
+def get_joined_communities(user):
+    """
+    Helper function to get joined communities from NodeBB API
+    """
+    status, categories = NodeBBClient().categories.joined(user)
+    return categories if status == 200 else []

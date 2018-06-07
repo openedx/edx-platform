@@ -79,6 +79,8 @@ def get_user_demographic_data(profile):
                              headers=headers)
 
     user_community_data = json.loads(response._content)['payload']
+    reputation = user_community_data.get('reputation', 0)
+    postcount = user_community_data.get('postcount', 0)
 
     return {
         'student_id': profile.user.id,
@@ -93,8 +95,8 @@ def get_user_demographic_data(profile):
         'english_proficiency': profile.user.extended_profile.english_proficiency,
         'organization_label': profile.user.extended_profile.organization.label if
         profile.user.extended_profile.organization else '',
-        'reputation': user_community_data['reputation'],
-        'postcount': user_community_data['postcount'],
+        'reputation': reputation,
+        'postcount': postcount,
     }
 
 

@@ -228,7 +228,7 @@ class UserInfoModelForm(BaseOnboardingModelForm):
         }
 
     def save(self, request, commit=True):
-        user_info_survey = super(UserInfoModelForm, self).save()
+        user_info_survey = super(UserInfoModelForm, self).save(commit=False)
 
         userprofile = user_info_survey.user.profile
         userprofile.year_of_birth = self.cleaned_data['year_of_birth']
@@ -241,8 +241,7 @@ class UserInfoModelForm(BaseOnboardingModelForm):
             userprofile.gender = self.cleaned_data['gender']
         userprofile.save()
 
-        if request.POST.get('country_of_employment'):
-            user_info_survey.country_of_employment = get_country_iso(request.POST.get('country_of_employment'))
+        user_info_survey.country_of_employment = get_country_iso(request.POST.get('country_of_employment'))
         user_info_survey.city_of_employment = self.cleaned_data['city_of_employment']
 
         selected_function_areas = get_actual_field_names(request.POST.getlist('function_areas'))
