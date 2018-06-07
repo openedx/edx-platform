@@ -2334,6 +2334,7 @@ class TestIndexView(ModuleStoreTestCase):
         with self.store.bulk_operations(course.id):
             chapter = ItemFactory(parent=course, category='chapter')
             section = ItemFactory(parent=chapter, category='sequential')
+            ItemFactory.create(parent=section, category='vertical', display_name="Vertical")
 
         url = reverse(
             'courseware_section',
@@ -2350,6 +2351,16 @@ class TestIndexView(ModuleStoreTestCase):
         with override_waffle_flag(waffle_flag, active=True):
             response = self.client.get(url, follow=False)
             assert response.status_code == 200
+            self.assertIn('data-save-position="false"', response.content)
+            self.assertIn('data-show-completion="false"', response.content)
+
+        user = UserFactory()
+        CourseEnrollmentFactory(user=user, course_id=course.id)
+        self.assertTrue(self.client.login(username=user.username, password='test'))
+        response = self.client.get(url, follow=False)
+        assert response.status_code == 200
+        self.assertIn('data-save-position="true"', response.content)
+        self.assertIn('data-show-completion="true"', response.content)
 
 
 @attr(shard=5)
