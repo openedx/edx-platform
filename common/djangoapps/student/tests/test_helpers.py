@@ -66,7 +66,6 @@ class TestLoginHelper(TestCase):
 
     @ddt.data(
         ('/dashboard', 'testserver', '/dashboard'),
-        ('http://testserver/courses', 'testserver', 'http://testserver/courses'),
         ('https://edx.org/courses', 'edx.org', 'https://edx.org/courses'),
     )
     @ddt.unpack
