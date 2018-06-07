@@ -50,18 +50,9 @@ class ThirdPartyResultDataSyncAPI(APIView):
 
     def get(self, request):
         """ Get data shared between platform & community """
-        #
-        if request.GET.get('task_id'):
-
-            return JsonResponse({
-                'state': 'done',
-            }, status=status.HTTP_200_OK)
-
         get_third_party_surveys()
 
-        return JsonResponse({
-            'state': "started",
-        }, status=status.HTTP_200_OK)
+        return JsonResponse({'state': 200}, status=status.HTTP_200_OK)
 
 
 class PlatformSyncService(APIView):

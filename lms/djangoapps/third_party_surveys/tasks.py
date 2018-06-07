@@ -29,11 +29,12 @@ def get_third_party_surveys():
 def save_responses(survey_responses):
     surveys_to_create = []
     for response in survey_responses:
-        if not response.get('[url("edx_uid")]'):
+        if not response.get('[url("edx_uid")]') or response.get('[url("edx_uid")]') == 'undefined':
             continue
 
         date = datetime.strptime(response['datesubmitted'], "%Y-%m-%d %H:%M:%S")
         try:
+            print(response['[url("edx_uid")]'])
             surveys_to_create.append(ThirdPartySurvey(
                 response=response,
                 user_id=int(response['[url("edx_uid")]']),
