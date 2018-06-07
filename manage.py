@@ -24,6 +24,7 @@ import importlib
 import os
 import sys
 from argparse import ArgumentParser
+import django
 
 import contracts
 
@@ -58,7 +59,6 @@ def parse_args():
         help_string=lms.format_help(),
         settings_base='lms/envs',
         default_settings='lms.envs.devstack_docker',
-        startup='lms.startup',
     )
 
     cms = subparsers.add_parser(
@@ -82,7 +82,6 @@ def parse_args():
         settings_base='cms/envs',
         default_settings='cms.envs.devstack_docker',
         service_variant='cms',
-        startup='cms.startup',
     )
 
     edx_args, django_args = parser.parse_known_args()
@@ -114,8 +113,7 @@ if __name__ == "__main__":
         # This will trigger django-admin.py to print out its help
         django_args.append('--help')
 
-    startup = importlib.import_module(edx_args.startup)
-    startup.run()
+    django.setup()
 
     from django.core.management import execute_from_command_line
     execute_from_command_line([sys.argv[0]] + django_args)
