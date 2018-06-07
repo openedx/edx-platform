@@ -152,7 +152,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         body = bodies[body_type]
 
         self.assertIn("Password reset", sent_message.subject)
-        self.assertIn("You're receiving this e-mail because you requested a password reset", body)
+        self.assertIn("has received a request to reset the password for this account", body)
         self.assertEquals(sent_message.from_email, from_email)
         self.assertEquals(len(sent_message.to), 1)
         self.assertIn(self.user.email, sent_message.to)
@@ -184,7 +184,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         req.user = self.user
         password_reset(req)
         _, msg, _, _ = send_email.call_args[0]
-        expected_msg = "Please go to the following page and choose a new password:\n\n" + protocol
+        expected_msg = "paste the URL in your browser's address bar.\n\n" + protocol
 
         self.assertIn(expected_msg, msg)
 
@@ -211,12 +211,12 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
                 password_reset(req)
                 _, msg, _, _ = send_email.call_args[0]
 
-                reset_msg = "you requested a password reset for your user account at {}"
+                reset_msg = "{} has received a request to reset the password for this account."
                 reset_msg = reset_msg.format(site_name)
 
                 self.assertIn(reset_msg, msg)
 
-                sign_off = "The {} Team".format(platform_name)
+                sign_off = "The {} team".format(platform_name)
                 self.assertIn(sign_off, msg)
 
                 self.assert_event_emitted(
@@ -249,7 +249,7 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
 
         body = bodies[body_type]
 
-        reset_msg = "you requested a password reset for your user account at {}".format(fake_get_value('PLATFORM_NAME'))
+        reset_msg = "{} has received a request to reset the password for this account.".format(fake_get_value('PLATFORM_NAME'))
 
         self.assertIn(reset_msg, body)
 

@@ -235,10 +235,13 @@ def password_change_request_handler(request):
                     'failed': True,
                     'request': request,  # Used by google_analytics_tracking_pixel
                     'email_address': email,
+                    'help_link': configuration_helpers.get_value(
+                        'PASSWORD_RESET_SUPPORT_LINK', settings.PASSWORD_RESET_SUPPORT_LINK
+                    ) or settings.SUPPORT_SITE_LINK,
                 })
 
                 msg = PasswordReset().personalize(
-                    recipient=Recipient(username='', email_address=email),
+                    recipient=Recipient(username='learner', email_address=email),
                     language=settings.LANGUAGE_CODE,
                     user_context=message_context,
                 )

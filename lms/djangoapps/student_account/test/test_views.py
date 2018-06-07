@@ -168,11 +168,11 @@ class StudentAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
         html_body = sent_message.alternatives[0][0]
 
         for email_body in [text_body, html_body]:
-            msg = 'However, there is currently no user account associated with your email address: {email}'.format(
-                email=bad_email
+            msg = u'This email address is not associated with an account on {platform_name}'.format(
+                platform_name=settings.PLATFORM_NAME
             )
 
-            assert u'reset for your user account at {}'.format(settings.PLATFORM_NAME) in email_body
+            assert u'go to the {} sign-in page, click the'.format(settings.PLATFORM_NAME) in email_body
             assert 'password_reset_confirm' not in email_body, 'The link should not be added if user was not found'
             assert msg in email_body
 
