@@ -64,4 +64,4 @@ function(Sjson) {
         });
     });
 });
-}(require));
+}(RequireJS.require));

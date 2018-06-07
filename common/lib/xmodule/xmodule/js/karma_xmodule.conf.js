@@ -41,6 +41,7 @@ var options = {
         {pattern: 'common_static/js/test/i18n.js', included: true},
         {pattern: 'common_static/common/js/vendor/hls.js', included: true},
         {pattern: 'public/js/split_test_staff.js', included: true},
+        {pattern: 'public/js/vertical_student_view.js', included: true},
         {pattern: 'src/word_cloud/d3.min.js', included: true},
 
         // Load test utilities
@@ -68,18 +69,13 @@ var options = {
     // Make sure the patterns in sourceFiles and specFiles do not match the same file.
     // Otherwise Istanbul which is used for coverage tracking will cause tests to not run.
     sourceFiles: [
-        { pattern: 'src/xmodule.js', included: true, ignoreCoverage: true }, // To prevent getting instrumented twice.
-        // Load these before the xmodules that use them
-        { pattern: 'src/javascript_loader.js', included: true },
-        { pattern: 'src/collapsible.js', included: true },
-        // Load everything else
-        {pattern: 'src/**/!(video)/!(poll|time).js', included: true}
+        {pattern: 'src/xmodule.js', included: true, ignoreCoverage: true}, // To prevent getting instrumented twice.
+        {pattern: 'src/**/*.js', included: true}
     ],
 
     specFiles: [
         {pattern: 'spec/helper.js', included: true, ignoreCoverage: true}, // Helper which depends on source files.
-        { pattern: 'spec/**/!(video)/*.js', included: true },
-        { pattern: 'spec/!(time_spec|video_helper).js', included: true }
+        {pattern: 'spec/**/*.js', included: true}
     ],
 
     fixtureFiles: [
@@ -92,8 +88,6 @@ var options = {
     ]
 };
 
-
 module.exports = function(config) {
     configModule.configure(config, options);
 };
-

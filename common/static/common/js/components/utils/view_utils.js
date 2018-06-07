@@ -4,17 +4,9 @@
 (function(define, require) {
     'use strict';
 
-    /* RequireJS */
     define(['jquery', 'underscore', 'gettext', 'common/js/components/views/feedback_notification',
         'common/js/components/views/feedback_prompt'],
         function($, _, gettext, NotificationView, PromptView) {
-    /* End RequireJS */
-    /* Webpack
-    define(['jquery', 'underscore', 'gettext', 'common/js/components/views/feedback_notification',
-        'common/js/components/views/feedback_prompt', 'scriptjs'],
-        function($, _, gettext, NotificationView, PromptView, $script) {
-    /* End Webpack */
-
             var toggleExpandCollapse, showLoadingIndicator, hideLoadingIndicator, confirmThenRunOperation,
                 runOperationShowingMessage, withDisabledElement, disableElementWhileRunning,
                 getScrollOffset, setScrollOffset, setScrollTop, redirect, reload, hasChangedAttributes,
@@ -29,9 +21,11 @@
              */
             toggleExpandCollapse = function(target, collapsedClass) {
                 // Support the old 'collapsed' option until fully switched over to is-collapsed
-                var collapsed = collapsedClass || 'collapsed';
+                if (!collapsedClass) {
+                    collapsedClass = 'collapsed';
+                }
                 target.closest('.expand-collapse').toggleClass('expand collapse');
-                target.closest('.is-collapsible, .window').toggleClass(collapsed);
+                target.closest('.is-collapsible, .window').toggleClass(collapsedClass);
                 target.closest('.is-collapsible').children('article').slideToggle();
             };
 
@@ -237,20 +231,20 @@
             };
 
             // Ensure that sum length of key field values <= ${MAX_SUM_KEY_LENGTH} chars.
-            validateTotalKeyLength = function(keyFieldSelectors) {
+            validateTotalKeyLength = function(key_field_selectors) {
                 var totalLength = _.reduce(
-                    keyFieldSelectors,
+                    key_field_selectors,
                     function(sum, ele) { return sum + $(ele).val().length; },
                     0
                 );
                 return totalLength <= MAX_SUM_KEY_LENGTH;
             };
 
-            checkTotalKeyLengthViolations = function(selectors, classes, keyFieldSelectors, messageTpl) {
-                if (!validateTotalKeyLength(keyFieldSelectors)) {
+            checkTotalKeyLengthViolations = function(selectors, classes, key_field_selectors, message_tpl) {
+                if (!validateTotalKeyLength(key_field_selectors)) {
                     $(selectors.errorWrapper).addClass(classes.shown).removeClass(classes.hiding);
                     $(selectors.errorMessage).html(
-                        '<p>' + _.template(messageTpl)({limit: MAX_SUM_KEY_LENGTH}) + '</p>'
+                        '<p>' + _.template(message_tpl)({limit: MAX_SUM_KEY_LENGTH}) + '</p>'
                     );
                     $(selectors.save).addClass(classes.disabled);
                 } else {
@@ -265,7 +259,6 @@
              */
             loadJavaScript = function(url) {
                 var deferred = $.Deferred();
-                /* RequireJS */
                 require([url],
                     function() {
                         deferred.resolve();
@@ -273,12 +266,6 @@
                     function() {
                         deferred.reject();
                     });
-                /* End RequireJS */
-                /* Webpack
-                $script(url, url, function () {
-                    deferred.resolve();
-                });
-                /* End Webpack */
                 return deferred.promise();
             };
 

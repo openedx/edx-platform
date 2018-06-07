@@ -1,4 +1,4 @@
-(function(require, define, undefined) {
+(function(requirejs, require, define, undefined) {
     'use strict';
 
     require(
@@ -320,4 +320,4 @@ function(Initialize) {
         });
     });
 });
-}(require, define));
+}(RequireJS.requirejs, RequireJS.require, RequireJS.define));
