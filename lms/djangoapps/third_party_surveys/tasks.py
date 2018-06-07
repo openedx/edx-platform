@@ -27,6 +27,7 @@ def get_third_party_surveys():
 
 
 def save_responses(survey_responses):
+    surveys_to_create = []
     for response in survey_responses:
         if not response.get('[url("sguid")]'):
             continue
@@ -34,14 +35,14 @@ def save_responses(survey_responses):
         date = datetime.strptime(response['datesubmitted'], "%Y-%m-%d %H:%M:%S")
         date = pytz.utc.localize(date)
 
-        third_party_survey = ThirdPartySurvey(
+        surveys_to_create.append(ThirdPartySurvey(
             response=response,
             user_id=response['[url("sguid")]'],
             request_date=date
-        )
+        ))
 
-        # Pass the exception if the user=sguid doesn't exist in the Database
-        try:
-            third_party_survey.save()
-        except (IntegrityError, ValueError) as exc:
-            log.error(exc)
+    # Pass the exception if the user=sguid doesn't exist in the Database
+    try:
+        ThirdPartySurvey.objects.bulk_create(surveys_to_create)
+    except (IntegrityError, ValueError) as exc:
+        log.error(exc)
