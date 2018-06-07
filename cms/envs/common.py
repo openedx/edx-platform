@@ -335,8 +335,6 @@ ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /edx-platform is in
 GITHUB_REPO_ROOT = ENV_ROOT / "data"
 
 sys.path.append(REPO_ROOT)
-sys.path.append(PROJECT_ROOT / 'djangoapps')
-sys.path.append(COMMON_ROOT / 'djangoapps')
 
 # For geolocation ip database
 GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoIP.dat"
@@ -382,8 +380,8 @@ TEMPLATES = [
                 # We have to use mako-aware template loaders to be able to include
                 # mako templates inside django templates (such as main_django.html).
                 'openedx.core.djangoapps.theming.template_loaders.ThemeTemplateLoader',
-                'edxmako.makoloader.MakoFilesystemLoader',
-                'edxmako.makoloader.MakoAppDirectoriesLoader',
+                'common.djangoapps.edxmako.makoloader.MakoFilesystemLoader',
+                'common.djangoapps.edxmako.makoloader.MakoAppDirectoriesLoader',
             ),
             'context_processors': CONTEXT_PROCESSORS,
             # Change 'debug' in your environment settings files - not here.
@@ -392,7 +390,7 @@ TEMPLATES = [
     },
     {
         'NAME': 'mako',
-        'BACKEND': 'edxmako.backend.Mako',
+        'BACKEND': 'common.djangoapps.edxmako.backend.Mako',
         'APP_DIRS': False,
         'DIRS': _make_mako_template_dirs,
         'OPTIONS': {
@@ -403,7 +401,7 @@ TEMPLATES = [
     {
         # This separate copy of the Mako backend is used to render previews using the LMS templates
         'NAME': 'preview',
-        'BACKEND': 'edxmako.backend.Mako',
+        'BACKEND': 'common.djangoapps.edxmako.backend.Mako',
         'APP_DIRS': False,
         'DIRS': lms.envs.common.MAKO_TEMPLATE_DIRS_BASE,
         'OPTIONS': {
@@ -495,11 +493,11 @@ MIDDLEWARE_CLASSES = [
     # user sessions after a password change.
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
 
-    'student.middleware.UserStandingMiddleware',
+    'common.djangoapps.student.middleware.UserStandingMiddleware',
     'openedx.core.djangoapps.contentserver.middleware.StaticContentServer',
 
     'django.contrib.messages.middleware.MessageMiddleware',
-    'track.middleware.TrackMiddleware',
+    'common.djangoapps.track.middleware.TrackMiddleware',
 
     # This is used to set or update the user language preferences.
     'openedx.core.djangoapps.lang_pref.middleware.LanguagePreferenceMiddleware',
@@ -576,7 +574,7 @@ MODULESTORE = {
                     'OPTIONS': {
                         'default_class': 'xmodule.hidden_module.HiddenDescriptor',
                         'fs_root': DATA_DIR,
-                        'render_template': 'edxmako.shortcuts.render_to_string',
+                        'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
                     }
                 },
                 {
@@ -586,7 +584,7 @@ MODULESTORE = {
                     'OPTIONS': {
                         'default_class': 'xmodule.hidden_module.HiddenDescriptor',
                         'fs_root': DATA_DIR,
-                        'render_template': 'edxmako.shortcuts.render_to_string',
+                        'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
                     }
                 }
             ]
@@ -1001,30 +999,30 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.video_pipeline',
 
     # For CMS
-    'contentstore.apps.ContentstoreConfig',
+    'cms.djangoapps.contentstore.apps.ContentstoreConfig',
 
     'openedx.core.djangoapps.contentserver',
-    'course_creators',
+    'cms.djangoapps.course_creators',
     'openedx.core.djangoapps.external_auth',
-    'student.apps.StudentConfig',  # misleading name due to sharing with lms
+    'common.djangoapps.student.apps.StudentConfig',  # misleading name due to sharing with lms
     'openedx.core.djangoapps.course_groups',  # not used in cms (yet), but tests run
-    'xblock_config.apps.XBlockConfig',
+    'cms.djangoapps.xblock_config.apps.XBlockConfig',
 
     # Maintenance tools
-    'maintenance',
+    'cms.djangoapps.maintenance',
     'openedx.core.djangoapps.util.apps.UtilConfig',
 
     # Tracking
-    'track',
+    'common.djangoapps.track',
     'eventtracking.django.apps.EventTrackingConfig',
 
     # Monitoring
     'openedx.core.djangoapps.datadog.apps.DatadogConfig',
 
     # For asset pipelining
-    'edxmako.apps.EdxMakoConfig',
+    'common.djangoapps.edxmako.apps.EdxMakoConfig',
     'pipeline',
-    'static_replace',
+    'common.djangoapps.static_replace',
     'require',
     'webpack_loader',
 
@@ -1035,13 +1033,13 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.crawlers',
 
     # comment common
-    'django_comment_common',
+    'common.djangoapps.django_comment_common',
 
     # for course creator table
     'django.contrib.admin',
 
     # for managing course modes
-    'course_modes.apps.CourseModesConfig',
+    'common.djangoapps.course_modes.apps.CourseModesConfig',
 
     # Verified Track Content Cohorting (Beta feature that will hopefully be removed)
     'openedx.core.djangoapps.verified_track_content',
@@ -1063,7 +1061,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.embargo',
 
     # Course action state
-    'course_action_state',
+    'common.djangoapps.course_action_state',
 
     # Additional problem types
     'edx_jsme',    # Molecular Structure
@@ -1084,7 +1082,7 @@ INSTALLED_APPS = [
     # Credit courses
     'openedx.core.djangoapps.credit.apps.CreditConfig',
 
-    'xblock_django',
+    'common.djangoapps.xblock_django',
 
     # edX Proctoring
     'edx_proctoring',
@@ -1110,7 +1108,7 @@ INSTALLED_APPS = [
     'completion',
 
     # Microsite configuration application
-    'microsite_configuration',
+    'common.djangoapps.microsite_configuration',
 
     # Static i18n support
     'statici18n',
@@ -1134,7 +1132,7 @@ INSTALLED_APPS = [
     'cms_user_tasks.apps.CmsUserTasksConfig',
 
     # Unusual migrations
-    'database_fixups',
+    'common.djangoapps.database_fixups',
 
     # Customized celery tasks, including persisting failed tasks so they can
     # be retried
@@ -1151,7 +1149,7 @@ INSTALLED_APPS = [
     'entitlements',
 
     # Asset management for mako templates
-    'pipeline_mako',
+    'common.djangoapps.pipeline_mako',
 
     # API Documentation
     'rest_framework_swagger',
@@ -1177,7 +1175,7 @@ TRACK_MAX_EVENT = 50000
 
 TRACKING_BACKENDS = {
     'logger': {
-        'ENGINE': 'track.backends.logger.LoggerBackend',
+        'ENGINE': 'common.djangoapps.track.backends.logger.LoggerBackend',
         'OPTIONS': {
             'name': 'tracking'
         }
@@ -1203,8 +1201,8 @@ EVENT_TRACKING_BACKENDS = {
                 }
             },
             'processors': [
-                {'ENGINE': 'track.shim.LegacyFieldMappingProcessor'},
-                {'ENGINE': 'track.shim.PrefixedEventProcessor'}
+                {'ENGINE': 'common.djangoapps.track.shim.LegacyFieldMappingProcessor'},
+                {'ENGINE': 'common.djangoapps.track.shim.PrefixedEventProcessor'}
             ]
         }
     },
@@ -1222,7 +1220,7 @@ EVENT_TRACKING_BACKENDS = {
                     }
                 },
                 {
-                    'ENGINE': 'track.shim.GoogleAnalyticsProcessor'
+                    'ENGINE': 'common.djangoapps.track.shim.GoogleAnalyticsProcessor'
                 }
             ]
         }
@@ -1417,11 +1415,11 @@ CREDIT_PROVIDER_TIMESTAMP_EXPIRATION = 15 * 60
 # for MICROSITE_BACKEND possible choices are
 # 1. microsite_configuration.backends.filebased.FilebasedMicrositeBackend
 # 2. microsite_configuration.backends.database.DatabaseMicrositeBackend
-MICROSITE_BACKEND = 'microsite_configuration.backends.filebased.FilebasedMicrositeBackend'
+MICROSITE_BACKEND = 'common.djangoapps.microsite_configuration.backends.filebased.FilebasedMicrositeBackend'
 # for MICROSITE_TEMPLATE_BACKEND possible choices are
 # 1. microsite_configuration.backends.filebased.FilebasedMicrositeTemplateBackend
 # 2. microsite_configuration.backends.database.DatabaseMicrositeTemplateBackend
-MICROSITE_TEMPLATE_BACKEND = 'microsite_configuration.backends.filebased.FilebasedMicrositeTemplateBackend'
+MICROSITE_TEMPLATE_BACKEND = 'common.djangoapps.microsite_configuration.backends.filebased.FilebasedMicrositeTemplateBackend'
 # TTL for microsite database template cache
 MICROSITE_DATABASE_TEMPLATE_CACHE_TTL = 5 * 60
 
