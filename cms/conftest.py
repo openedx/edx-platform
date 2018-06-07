@@ -11,6 +11,7 @@ from __future__ import absolute_import, unicode_literals
 import importlib
 import os
 import contracts
+import django
 import pytest
 
 
@@ -29,9 +30,7 @@ def pytest_configure(config):
     if not enable_contracts:
         contracts.disable_all()
     settings_module = os.environ.get('DJANGO_SETTINGS_MODULE')
-    startup_module = 'cms.startup' if settings_module.startswith('cms') else 'lms.startup'
-    startup = importlib.import_module(startup_module)
-    startup.run()
+    django.setup()
 
 
 @pytest.fixture(autouse=True, scope='function')
