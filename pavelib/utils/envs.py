@@ -181,10 +181,8 @@ class Env(object):
     KARMA_CONFIG_FILES = [
         REPO_ROOT / 'cms/static/karma_cms.conf.js',
         REPO_ROOT / 'cms/static/karma_cms_squire.conf.js',
-        REPO_ROOT / 'cms/static/karma_cms_webpack.conf.js',
         REPO_ROOT / 'lms/static/karma_lms.conf.js',
         REPO_ROOT / 'common/lib/xmodule/xmodule/js/karma_xmodule.conf.js',
-        REPO_ROOT / 'common/lib/xmodule/xmodule/js/karma_xmodule_webpack.conf.js',
         REPO_ROOT / 'common/static/karma_common.conf.js',
         REPO_ROOT / 'common/static/karma_common_requirejs.conf.js',
     ]
@@ -192,10 +190,8 @@ class Env(object):
     JS_TEST_ID_KEYS = [
         'cms',
         'cms-squire',
-        'cms-webpack',
         'lms',
         'xmodule',
-        'xmodule-webpack',
         'common',
         'common-requirejs'
     ]

@@ -31,10 +31,7 @@ define(["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
                 });
             });
 
-            afterEach(() => {
-                delete window.course;
-                jasmine.stealth.clearSpies();
-            });
+            afterEach(() => delete window.course);
 
             describe("Basic", function() {
                 it("should render properly", function() {

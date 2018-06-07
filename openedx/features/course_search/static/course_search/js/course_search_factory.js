@@ -56,6 +56,5 @@
                     router.trigger('search', requestedQuery);
                 }
             };
-        }
-    );
-}).call(this, define || RequireJS.define);
+        });
+}(define || RequireJS.define));

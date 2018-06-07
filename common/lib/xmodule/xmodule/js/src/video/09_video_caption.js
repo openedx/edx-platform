@@ -6,9 +6,8 @@
         'video/00_sjson.js',
         'video/00_async_process.js',
         'edx-ui-toolkit/js/utils/html-utils',
-        'draggabilly',
-        'time.js',
-    ], function(Sjson, AsyncProcess, HtmlUtils, Draggabilly, Time) {
+        'draggabilly'
+    ], function(Sjson, AsyncProcess, HtmlUtils, Draggabilly) {
         /**
          * @desc VideoCaption module exports a function.
          *
