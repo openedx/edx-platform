@@ -1,4 +1,5 @@
 from logging import getLogger
+
 from crum import get_current_request
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save, pre_save, post_delete, pre_delete
@@ -6,11 +7,16 @@ from django.dispatch import receiver
 
 from common.lib.nodebb_client.client import NodeBBClient
 from lms.djangoapps.onboarding.helpers import COUNTRIES
+from certificates.models import GeneratedCertificate
 from lms.djangoapps.onboarding.models import UserExtendedProfile, Organization, FocusArea
-from nodebb.models import DiscussionCommunity, TeamGroupChat
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
+from mailchimp_pipeline.signals.handlers import send_user_info_to_mailchimp, send_user_profile_info_to_mailchimp, \
+    send_user_enrollments_to_mailchimp, send_user_course_completions_to_mailchimp
+from nodebb.models import DiscussionCommunity, TeamGroupChat
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from student.models import ENROLL_STATUS_CHANGE, EnrollStatusChange, UserProfile
+from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED
+
+from student.models import ENROLL_STATUS_CHANGE, EnrollStatusChange, UserProfile, CourseEnrollment
 from xmodule.modulestore.django import modulestore
 
 
@@ -24,6 +30,14 @@ def log_action_response(user, status_code, response_body):
         log.info('Success: User(%s) has been updated on nodebb' % user.username)
 
 
+@receiver(post_save, sender=CourseEnrollment)
+def sync_enrolments_to_mailchimp(sender, instance, created, **kwargs):
+    send_user_enrollments_to_mailchimp(sender, instance, created, kwargs)
+
+@receiver(COURSE_CERT_AWARDED, sender=GeneratedCertificate)
+def handle_course_cert_awarded(sender, user, course_key, **kwargs):  # pylint: disable=unused-argument
+    send_user_course_completions_to_mailchimp(sender, user, course_key, kwargs)
+
 @receiver(post_save, sender=UserProfile)
 @receiver(post_save, sender=UserExtendedProfile)
 @receiver(post_save, sender=Organization)
@@ -34,6 +48,8 @@ def sync_user_info_with_nodebb(sender, instance, created, **kwargs):  # pylint: 
 
     request = get_current_request()
     user = request.user
+
+    send_user_profile_info_to_mailchimp(sender, instance, kwargs)
 
     if sender == UserProfile:
         data_to_sync = {
@@ -66,6 +82,7 @@ def update_user_profile_on_nodebb(sender, instance, created, **kwargs):
     """
         Create user account at nodeBB when user created at edx Platform
     """
+    send_user_info_to_mailchimp(sender, instance, created, kwargs)
     if created:
         data_to_sync = {
             'edx_user_id': instance.id,
@@ -88,6 +105,8 @@ def update_user_profile_on_nodebb(sender, instance, created, **kwargs):
         }
         status_code, response_body = NodeBBClient().users.update_profile(instance.username, kwargs=data_to_sync)
         log_action_response(instance, status_code, response_body)
+
+
 
 
 @receiver(post_delete, sender=User)
