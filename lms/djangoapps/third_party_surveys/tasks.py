@@ -21,7 +21,7 @@ def get_third_party_surveys():
         filters = [('datesubmitted', '>', last_survey.request_date)]
     except ThirdPartySurvey.DoesNotExist:
         filters = []
-    filters += [('status', '=', 'Completed')]
+    # filters += [('status', '=', 'Completed')]
     survey_responses = SurveyGizmoClient().get_filtered_survey_responses(survey_filters=filters)
     save_responses(survey_responses)
 
@@ -41,7 +41,7 @@ def save_responses(survey_responses):
         try:
             surveys_to_create.append(ThirdPartySurvey(
                 response=response,
-                user_id=response.get('[url("edx_uid")]'),
+                user_id=1,
                 request_date=date,
                 survey_type=response.get('[url("app")]', '')
                 )
