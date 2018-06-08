@@ -67,9 +67,18 @@ class CredentialsApiConfig(ConfigurationModel):
     @property
     def internal_api_url(self):
         """
-        Internally-accessible API URL root.
+        Internally-accessible API URL root, looked up based on the current request.
         """
         root = helpers.get_value('CREDENTIALS_INTERNAL_SERVICE_URL', settings.CREDENTIALS_INTERNAL_SERVICE_URL)
+        return urljoin(root, '/api/{}/'.format(API_VERSION))
+
+    @staticmethod
+    def get_internal_api_url_for_org(org):
+        """
+        Internally-accessible API URL root, looked up by org rather than the current request.
+        """
+        root = helpers.get_value_for_org(org, 'CREDENTIALS_INTERNAL_SERVICE_URL',
+                                         settings.CREDENTIALS_INTERNAL_SERVICE_URL)
         return urljoin(root, '/api/{}/'.format(API_VERSION))
 
     @property
