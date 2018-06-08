@@ -87,28 +87,28 @@ class EnrollmentUserThrottle(UserRateThrottle, ApiKeyPermissionMixIn):
     # service. These calls are no longer made and the plan is to set the
     # rate limit back to its original state. LEARNER-5148
 
-    if USE_RATE_LIMIT_400_FOR_STAFF_FOR_ENROLLMENT_API.is_enabled():
-        THROTTLE_RATES = {
-            'user': '40/minute',
-            'staff': '400/minute',
-        }
-    elif USE_RATE_LIMIT_100_FOR_STAFF_FOR_ENROLLMENT_API.is_enabled():
-        THROTTLE_RATES = {
-            'user': '40/minute',
-            'staff': '100/minute',
-        }
-    elif USE_RATE_LIMIT_40_FOR_ENROLLMENT_API.is_enabled():
-        THROTTLE_RATES = {
-            'user': '40/minute',
-            'staff': '40/minute',
-        }
-    else:
-        THROTTLE_RATES = {
-            'user': '40/minute',
-            'staff': '2000/minute',
-        }
+    THROTTLE_RATES = {
+        'user': '40/minute',
+        'staff': '2000/minute',
+    }
 
     def allow_request(self, request, view):
+        if USE_RATE_LIMIT_400_FOR_STAFF_FOR_ENROLLMENT_API.is_enabled():
+            self.THROTTLE_RATES = {
+                'user': '40/minute',
+                'staff': '400/minute',
+            }
+        elif USE_RATE_LIMIT_100_FOR_STAFF_FOR_ENROLLMENT_API.is_enabled():
+            self.THROTTLE_RATES = {
+                'user': '40/minute',
+                'staff': '100/minute',
+            }
+        elif USE_RATE_LIMIT_40_FOR_ENROLLMENT_API.is_enabled():
+            self.THROTTLE_RATES = {
+                'user': '40/minute',
+                'staff': '40/minute',
+            }
+
         # Use a special scope for staff to allow for a separate throttle rate
         user = request.user
         if user.is_authenticated and (user.is_staff or user.is_superuser):
