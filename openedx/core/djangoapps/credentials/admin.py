@@ -8,7 +8,7 @@ from django.contrib import admin
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 
 
-class CredentialsApiConfigAdmin(ConfigurationModelAdmin):  # pylint: disable=missing-docstring
+class CredentialsApiConfigAdmin(ConfigurationModelAdmin):
     pass
 
 
