@@ -1,16 +1,21 @@
 from pkg_resources import resource_string
-
-from xmodule.x_module import XModule
-from xmodule.raw_module import RawDescriptor
-from xmodule.editing_module import MetadataOnlyEditingDescriptor
-from xblock.fields import String, Scope, UNIQUE_ID
 from uuid import uuid4
+
+from xblock.completable import XBlockCompletionMode
+from xblock.fields import String, Scope, UNIQUE_ID
+
+from xmodule.editing_module import MetadataOnlyEditingDescriptor
+from xmodule.raw_module import RawDescriptor
+from xmodule.x_module import XModule
 
 # Make '_' a no-op so we can scrape strings
 _ = lambda text: text
 
 
 class DiscussionFields(object):
+
+    completion_mode = XBlockCompletionMode.EXCLUDED
+
     discussion_id = String(
         display_name=_("Discussion Id"),
         help=_("The id is a unique identifier for the discussion. It is non editable."),
