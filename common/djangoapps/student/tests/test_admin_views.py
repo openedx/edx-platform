@@ -175,7 +175,7 @@ class AdminUserPageTest(TestCase):
     def test_username_is_readonly_for_user(self):
         """
         Ensures that the username field is readonly, when admin open user which already exists.
-
+        
         This hook used for skip Django validation in the `auth_user_change` view.
 
         Changing the username is still possible using the database or from the model directly.
