@@ -10,9 +10,9 @@ from datetime import datetime, timedelta
 from django.utils import timezone
 from django.utils.translation import ugettext as _
 from django.template import RequestContext
-from third_party_auth import pipeline
+from common.djangoapps.third_party_auth import pipeline
 from django.urls import reverse
-from util.date_utils import strftime_localized
+from common.djangoapps.util.date_utils import strftime_localized
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.theming import helpers as theming_helpers
@@ -22,8 +22,8 @@ from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.learner_analytics import INCLUDE_UPSELL_MODAL
 from openedx.features.portfolio_project import INCLUDE_PORTFOLIO_UPSELL_MODAL
 
-from entitlements.models import CourseEntitlement
-from student.models import CourseEnrollment
+from common.djangoapps.entitlements.models import CourseEntitlement
+from common.djangoapps.student.models import CourseEnrollment
 %>
 
 <%

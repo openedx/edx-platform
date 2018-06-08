@@ -115,8 +115,8 @@ NOTES_DISABLED_TABS = []
 # Silence noisy logs
 import logging
 LOG_OVERRIDES = [
-    ('track.middleware', logging.CRITICAL),
-    ('edxmako.shortcuts', logging.ERROR),
+    ('common.djangoapps.track.middleware', logging.CRITICAL),
+    ('common.djangoapps.edxmako.shortcuts', logging.ERROR),
     ('dd.dogapi', logging.ERROR),
     ('edx.discussion', logging.CRITICAL),
 ]

@@ -93,7 +93,7 @@ def draft_mongo_store_config(data_dir):
     modulestore_options = {
         'default_class': 'xmodule.raw_module.RawDescriptor',
         'fs_root': data_dir,
-        'render_template': 'edxmako.shortcuts.render_to_string'
+        'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string'
     }
 
     store = {
@@ -120,7 +120,7 @@ def split_mongo_store_config(data_dir):
     modulestore_options = {
         'default_class': 'xmodule.raw_module.RawDescriptor',
         'fs_root': data_dir,
-        'render_template': 'edxmako.shortcuts.render_to_string',
+        'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
     }
 
     store = {

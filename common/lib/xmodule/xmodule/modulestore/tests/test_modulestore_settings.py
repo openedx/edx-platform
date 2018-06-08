@@ -43,7 +43,7 @@ class ModuleStoreSettingsMigration(TestCase):
                 "host": "localhost",
                 "password": "password",
                 "port": 27017,
-                "render_template": "edxmako.shortcuts.render_to_string",
+                "render_template": "common.djangoapps.edxmako.shortcuts.render_to_string",
                 "user": "edxapp"
             },
             "DOC_STORE_CONFIG": {},
@@ -99,7 +99,7 @@ class ModuleStoreSettingsMigration(TestCase):
                         'OPTIONS': {
                             'default_class': 'xmodule.hidden_module.HiddenDescriptor',
                             'fs_root': "fs_root",
-                            'render_template': 'edxmako.shortcuts.render_to_string',
+                            'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
                         }
                     },
                     {
@@ -109,7 +109,7 @@ class ModuleStoreSettingsMigration(TestCase):
                         'OPTIONS': {
                             'default_class': 'xmodule.hidden_module.HiddenDescriptor',
                             'fs_root': "fs_root",
-                            'render_template': 'edxmako.shortcuts.render_to_string',
+                            'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
                         }
                     },
                 ]

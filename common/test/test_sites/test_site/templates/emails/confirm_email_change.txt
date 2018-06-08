@@ -1,6 +1,6 @@
 <%! from django.urls import reverse %>
 <%! from django.conf import settings %>
-<%! from edxmako.shortcuts import render_to_string, marketing_link %>
+<%! from common.djangoapps.edxmako.shortcuts import render_to_string, marketing_link %>
 
 This is to confirm that you changed the e-mail associated with
 Open edX from ${old_email} to ${new_email}. If you

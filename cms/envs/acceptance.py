@@ -28,10 +28,10 @@ def seed():
 
 # Silence noisy logs
 LOG_OVERRIDES = [
-    ('track.middleware', logging.CRITICAL),
+    ('common.djangoapps.track.middleware', logging.CRITICAL),
     ('codejail.safe_exec', logging.ERROR),
     ('edx.courseware', logging.ERROR),
-    ('edxmako.shortcuts', logging.ERROR),
+    ('common.djangoapps.edxmako.shortcuts', logging.ERROR),
     ('audit', logging.ERROR),
     ('contentstore.views.import_export', logging.CRITICAL),
     ('xmodule.x_module', logging.CRITICAL),

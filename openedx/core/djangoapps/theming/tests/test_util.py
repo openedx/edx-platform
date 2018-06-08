@@ -13,7 +13,7 @@ from mock import patch
 from django.conf import settings
 from django.contrib.sites.models import Site
 
-import common.djangoapps.edxmako
+from common.djangoapps import edxmako
 from openedx.core.djangoapps.theming.models import SiteTheme
 
 

@@ -58,7 +58,7 @@
     },
     "TRACKING_BACKENDS": {
         "mongo": {
-            "ENGINE": "track.backends.mongodb.MongoBackend",
+            "ENGINE": "common.djangoapps.track.backends.mongodb.MongoBackend",
             "OPTIONS": {
                 "database": "test",
                 "collection": "events",
@@ -108,7 +108,7 @@
                                 "edx.devstack.mongo"
                             ],
                             "port": 27017,
-                            "render_template": "edxmako.shortcuts.render_to_string"
+                            "render_template": "common.djangoapps.edxmako.shortcuts.render_to_string"
                         }
                     },
                     {
