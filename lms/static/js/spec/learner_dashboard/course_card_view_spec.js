@@ -11,7 +11,7 @@ define([
             courseCardModel,
             course,
             startDate = 'Feb 28, 2017',
-            endDate = 'May 31, 2017',
+            endDate = 'May 30, 2017',
 
             setupView = function(data, isEnrolled) {
                 var programData = $.extend({}, data);

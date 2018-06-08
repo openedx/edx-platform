@@ -24,7 +24,7 @@ from .utils.envs import Env
 from .utils.process import run_background_process
 from .utils.timer import timed
 
-from pwd import getpwnam
+from pwd import getpwnam  
 from django.core.wsgi import get_wsgi_application
 from django.conf import settings as django_settings
 # setup baseline paths
@@ -85,10 +85,6 @@ SASS_LOOKUP_DEPENDENCIES = {
 
 # Collectstatic log directory setting
 COLLECTSTATIC_LOG_DIR_ARG = "collect_log_dir"
-
-
-def get_static_collector_root():
-    return os.environ.get('STATIC_COLLECTOR_ROOT', '/edx/var/edxapp/static_collector')
 
 
 def get_sass_directories(system, theme_dir=None):
@@ -668,6 +664,32 @@ def collect_assets(systems, settings, **kwargs):
         )))
         print("\t\tFinished collecting {} assets.".format(sys))
 
+    print ("Sync static from {static_collector_dir}/* to {platform_static_dir}/".format(
+        static_collector_dir=django_settings.STATIC_ROOT_BASE,
+        platform_static_dir=django_settings.EDX_PLATFORM_STATIC_ROOT_BASE
+    ))
+    os.system("rsync -av {static_collector_dir}/* {platform_static_dir}/ ".format(
+        static_collector_dir=django_settings.STATIC_ROOT_BASE,
+        platform_static_dir=django_settings.EDX_PLATFORM_STATIC_ROOT_BASE
+    ))
+
+    print ("Sync static from {static_collector_dir}/{current_sys}/* to {platform_static_dir}/{current_sys}/ with --delete-after option".format(
+            static_collector_dir=django_settings.STATIC_ROOT_BASE,
+            platform_static_dir=django_settings.EDX_PLATFORM_STATIC_ROOT_BASE,
+            current_sys=sys
+        ))
+    for sys in systems:
+        if (sys == 'lms'):
+            os.system("rsync -av {static_collector_dir}/js/i18n/* {platform_static_dir}/cms/js/i18n/ --delete-after".format(
+                static_collector_dir=django_settings.STATIC_ROOT_BASE,
+                platform_static_dir=django_settings.EDX_PLATFORM_STATIC_ROOT_BASE,
+                current_sys=sys
+            ))
+            os.system("rsync -av {static_collector_dir}/{current_sys}/* {platform_static_dir}/{current_sys}/ --delete-after".format(
+                static_collector_dir=django_settings.STATIC_ROOT_BASE,
+                platform_static_dir=django_settings.EDX_PLATFORM_STATIC_ROOT_BASE,
+                current_sys=sys
+            ))
 
 def _collect_assets_cmd(system, **kwargs):
     """
@@ -817,7 +839,6 @@ def watch_assets(options):
             observer.stop()
         print("\nStopped asset watcher.")
 
-
 @task
 @needs(
     'pavelib.prereqs.install_node_prereqs',
@@ -872,7 +893,7 @@ def update_assets(args):
     if args.system[0] == 'studio':
         current_sys = 'cms'
 
-    os.environ.setdefault("SERVICE_VARIANT", "{sys}".format(sys=current_sys))
+    os.environ.setdefault("SERVICE_VARIANT","{sys}".format(sys=current_sys))
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "{sys}.envs.static_collector".format(sys=current_sys))
 
     application = get_wsgi_application()  # pylint: disable=invalid-name
@@ -880,11 +901,12 @@ def update_assets(args):
     if hasattr(django_settings, 'STATIC_COLLECTOR_ROOT'):
         STATIC_COLLECTOR_ROOT = django_settings.STATIC_COLLECTOR_ROOT
     else:
-        STATIC_COLLECTOR_ROOT = get_static_collector_root()
+        STATIC_COLLECTOR_ROOT=os.environ.get('STATIC_COLLECTOR_ROOT', '/edx/var/edxapp/static_collector')
 
     if not os.path.isdir(STATIC_COLLECTOR_ROOT):
         os.mkdir(STATIC_COLLECTOR_ROOT)
-        print('\t\tDirectory "STATIC_COLLECTOR_ROOT" has been created to store static files.')
+        print('\t\tDirectory "STATIC_COLLECTOR_ROOT" has been created to store '
+                        ' static files.')
 
     process_xmodule_assets()
     process_npm_assets()
@@ -902,26 +924,6 @@ def update_assets(args):
             collect_log_args.update({COLLECTSTATIC_LOG_DIR_ARG: args.collect_log_dir})
 
         collect_assets(args.system, args.settings, **collect_log_args)
-
-        os.system("rsync -av {static_collector_dir}/* {platform_static_dir}/ ".format(
-            static_collector_dir=Env.get_django_setting("STATIC_ROOT_BASE", "lms", settings=args.settings),
-            platform_static_dir=Env.get_django_setting("EDX_PLATFORM_STATIC_ROOT_BASE", "lms", settings=args.settings)
-        ))
-
-        for sys in args.system:
-            if (sys == 'lms'):
-                os.system(
-                    "rsync -av {static_collector_dir}/js/i18n/* {platform_static_dir}/cms/js/i18n/ --delete-after".format(
-                        static_collector_dir=Env.get_django_setting("STATIC_ROOT_BASE", "lms", settings=args.settings),
-                        platform_static_dir=Env.get_django_setting("EDX_PLATFORM_STATIC_ROOT_BASE", "lms", settings=args.settings),
-                        current_sys=sys
-                    ))
-                os.system(
-                    "rsync -av {static_collector_dir}/{current_sys}/* {platform_static_dir}/{current_sys}/ --delete-after".format(
-                        static_collector_dir=Env.get_django_setting("STATIC_ROOT_BASE", "lms", settings=args.settings),
-                        platform_static_dir=Env.get_django_setting("EDX_PLATFORM_STATIC_ROOT_BASE", "lms", settings=args.settings),
-                        current_sys=sys
-                    ))
 
     if args.watch:
         call_task(
