@@ -41,7 +41,7 @@ def save_responses(survey_responses):
         try:
             surveys_to_create.append(ThirdPartySurvey(
                 response=response,
-                user_id=1,
+                user_id=response.get('[url("edx_uid")]'),
                 request_date=date,
                 survey_type=response.get('[url("app")]', '')
                 )
