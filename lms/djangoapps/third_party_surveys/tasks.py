@@ -31,13 +31,12 @@ def save_responses(survey_responses):
 
     log.info("survey logs")
     for response in survey_responses:
+        log.info(response)
         if response.get('[url("edx_uid")]') \
                 or response.get('[url("edx_uid")]') == 'undefined' \
                 or response.get('[url("status")]') == 'Deleted':
-            log.info(response.get('id') + "skipping")
-            continue
 
-        log.info(response.get('[url("app")]', '') + ", " + response.get('[url("edx_uid")]'))
+            continue
         date = datetime.strptime(response['datesubmitted'], "%Y-%m-%d %H:%M:%S")
         try:
             surveys_to_create.append(ThirdPartySurvey(
