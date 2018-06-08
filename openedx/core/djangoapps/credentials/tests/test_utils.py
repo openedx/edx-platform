@@ -21,6 +21,8 @@ UTILS_MODULE = 'openedx.core.djangoapps.credentials.utils'
 @attr(shard=2)
 @mock.patch(UTILS_MODULE + '.get_edx_api_data')
 class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
+    """ Tests for credentials utility functions. """
+
     ENABLED_CACHES = ['default']
 
     def setUp(self):

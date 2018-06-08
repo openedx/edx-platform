@@ -2,7 +2,6 @@
 Models for credentials support for the LMS and Studio.
 """
 
-import waffle
 from urlparse import urljoin
 
 from config_models.models import ConfigurationModel

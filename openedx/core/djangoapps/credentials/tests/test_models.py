@@ -30,6 +30,9 @@ class TestCredentialsApiConfig(CredentialsApiConfigMixin, TestCase):
         expected = '{root}/api/{version}/'.format(root=CREDENTIALS_INTERNAL_SERVICE_URL.strip('/'), version=API_VERSION)
         self.assertEqual(credentials_config.internal_api_url, expected)
 
+        expected = '{root}/api/{version}/'.format(root=CREDENTIALS_INTERNAL_SERVICE_URL.strip('/'), version=API_VERSION)
+        self.assertEqual(credentials_config.get_internal_api_url_for_org('nope'), expected)
+
         expected = '{root}/api/{version}/'.format(root=CREDENTIALS_PUBLIC_SERVICE_URL.strip('/'), version=API_VERSION)
         self.assertEqual(credentials_config.public_api_url, expected)
 
