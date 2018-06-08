@@ -48,6 +48,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 from xmodule.partitions.partitions import Group, UserPartition
+from waffle.testutils import override_switch
 
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
@@ -2747,7 +2748,7 @@ class SensitiveMessageTestCase(TestCase):
         template_name = "instructor/instructor_dashboard_2/sensitive_data_download_msg.txt"
         render_mock.assert_called_once_with(template_name, None)
 
-    @override_settings(FEATURES={"DISPLAY_SENSITIVE_DATA_MSG_FOR_DOWNLOADS":True})
+    @override_switch('display_sensitive_data_msg_for_downloads',active=True)
     @patch("instructor_task.tasks_helper.utils.SensitiveMessageOnReports.process_message")
     def test_build_csv_directly_with_flag(self, process_message_mock):
         """
