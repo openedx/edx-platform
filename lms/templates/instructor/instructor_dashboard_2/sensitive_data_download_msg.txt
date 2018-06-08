@@ -1,0 +1,4 @@
+<%!
+from django.utils.translation import ugettext as _
+%>
+${_("Contains information protected under the Protection of Privacy Law - the wrongful transgressor commits an offense")}

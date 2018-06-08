@@ -1,8 +1,32 @@
+<%namespace name='static' file='/static_content.html'/>
 <%page args="section_data" expression_filter="h"/>
 <%!
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML, Text
+import waffle
 %>
+
+% if waffle.switch_is_active('display_sensitive_data_msg_for_downloads'):
+  
+  <%static:require_module_async module_name="js/vendor/jquery.leanModal" class_name="leanModal">
+  
+    $('[data-section="data_download"]').click(function(){
+        $( 'a[rel*=leanModal]' ).leanModal({ top : 200, closeButton: ".modal_close" });
+        $( "#sensitive-data" ).click();
+    });
+  
+   </%static:require_module_async>
+  
+  <a href="#sensitive-data-modal" id="sensitive-data" style="display:none" rel="leanModal"></a>
+  
+  <div aria-hidden="true" role="dialog" tabindex="-1" class="modal data-disclaimer-modal" id="sensitive-data-modal">
+    <div class="inner-wrapper" style="margin-bottom: 20px;">
+    <%include file="sensitive_data_download_msg.txt"/>
+    </div>
+    <input type="button" class="modal_close" value="${_('OK')}" href="#">
+  </div>
+  
+% endif
 
 <div class="data-download-container action-type-container">
   <div class="request-response-error msg msg-error copy" id="data-request-response-error"></div>

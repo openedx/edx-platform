@@ -15,6 +15,7 @@ import urllib
 from contextlib import contextmanager
 from datetime import datetime, timedelta
 
+import csv
 import ddt
 import unicodecsv
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
@@ -24,6 +25,7 @@ from courseware.tests.factories import InstructorFactory
 from django.conf import settings
 from django.urls import reverse
 from django.test.utils import override_settings
+from django.test import TestCase
 from freezegun import freeze_time
 from instructor_analytics.basic import UNAVAILABLE, list_problem_responses
 from mock import MagicMock, Mock, patch, ANY
@@ -71,6 +73,7 @@ from lms.djangoapps.instructor_task.tasks_helper.misc import (
     upload_course_survey_report,
     upload_ora2_data
 )
+from lms.djangoapps.instructor_task.tasks_helper.utils import SensitiveMessageOnReports
 from lms.djangoapps.instructor_task.tests.test_base import (
     InstructorTaskCourseTestCase,
     InstructorTaskModuleTestCase,
@@ -84,6 +87,7 @@ from openedx.core.djangoapps.credit.tests.factories import CreditCourseFactory
 from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase, TestConditionalContent
+
 from ..models import ReportStore
 from ..tasks_helper.utils import UPDATE_STATUS_FAILED, UPDATE_STATUS_SUCCEEDED
 
@@ -2724,3 +2728,49 @@ class TestInstructorOra2Report(SharedModuleStoreTestCase):
 
                     self.assertEqual(return_val, UPDATE_STATUS_SUCCEEDED)
                     mock_store_rows.assert_called_once_with(self.course.id, filename, [test_header] + test_rows)
+
+
+class SensitiveMessageTestCase(TestCase):
+    """
+    Test SensitiveMessageOnReports class.
+    """
+
+    def setUp(self):
+        self.reports = SensitiveMessageOnReports()
+
+    @patch("instructor_task.tasks_helper.utils.render_to_string")
+    def test_process_message(self, render_mock):
+        """
+        Verify if the template is rendering the content.
+        """
+        self.reports.process_message()
+        template_name = "instructor/instructor_dashboard_2/sensitive_data_download_msg.txt"
+        render_mock.assert_called_once_with(template_name, None)
+
+    @override_settings(FEATURES={"DISPLAY_SENSITIVE_DATA_MSG_FOR_DOWNLOADS":True})
+    @patch("instructor_task.tasks_helper.utils.SensitiveMessageOnReports.process_message")
+    def test_build_csv_directly_with_flag(self, process_message_mock):
+        """
+        Verify if the CSV is built directly with CSV library and the message
+        from template is parsed when flag is True.
+
+        """
+        reports = SensitiveMessageOnReports()
+        writer = MagicMock()
+        rows = MagicMock()
+        writer.return_value.writerow = rows
+
+        reports.csv_direct(writer)
+
+        process_message_mock.assert_called_with()
+        rows.assert_called()
+
+    @patch("instructor_task.tasks_helper.utils.SensitiveMessageOnReports.process_message")
+    def test_build_csv_with_report_store(self, process_message_mock):
+        """
+        Verify if the template is being called when the CSV will be built with
+        report_store method.
+        """
+        msg = MagicMock()
+        process_message_mock.return_value = msg
+        self.assertEquals(self.reports.with_report_store(), [msg])

@@ -315,6 +315,25 @@
   }
 }
 
+.data-disclaimer-modal {
+  color:#555 !important;
+  background-color: #f5f5f5;
+  padding: 60px !important;
+  line-height: 1.9;
+  line-height: 1.9;
+
+  .inner-wrapper {
+    border: none !important;
+    box-shadow: none !important;
+  }
+}
+ 
+.modal_close {
+  position: absolute;
+  display: block;
+  z-index: 2;
+}
+
 // elements - general
 // --------------------
 .idash-section {

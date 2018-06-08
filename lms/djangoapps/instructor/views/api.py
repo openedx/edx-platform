@@ -80,6 +80,7 @@ from lms.djangoapps.instructor.views.instructor_task_helpers import extract_emai
 from lms.djangoapps.instructor_task.api import submit_override_score
 from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError, QueueConnectionError
 from lms.djangoapps.instructor_task.models import ReportStore
+from lms.djangoapps.instructor_task.tasks_helper.utils import SensitiveMessageOnReports
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import is_course_cohorted
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -1851,7 +1852,9 @@ def get_anon_ids(request, course_id):  # pylint: disable=unused-argument
         writer = csv.writer(response, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
         # In practice, there should not be non-ascii data in this query,
         # but trying to do the right thing anyway.
-        encoded = [text_type(s).encode('utf-8') for s in header]
+        encoded = [unicode(s).encode('utf-8') for s in header]
+        disclaimer = SensitiveMessageOnReports()
+        disclaimer.csv_direct(writer)
         writer.writerow(encoded)
         for row in rows:
             encoded = [text_type(s).encode('utf-8') for s in row]
