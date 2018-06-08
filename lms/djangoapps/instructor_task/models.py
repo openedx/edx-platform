@@ -193,7 +193,7 @@ class ReportStore(object):
         storage_type = config.get('STORAGE_TYPE', '').lower()
         if storage_type == 's3':
             if (
-                hasattr(settings, 'S3_HOST') and settings.S3_HOST and hasattr(settings, 'S3_USE_SIGV4') and settings.S3_USE_SIGV4
+                hasattr(settings, 'S3_HOST') and settings.S3_HOST and hasattr(settings,'S3_USE_SIGV4') and settings.S3_USE_SIGV4
             ):
                 return DjangoStorageReportStore(
                     storage_class='openedx.core.storage.S3ReportStorage',
@@ -309,9 +309,9 @@ class DjangoStorageReportStore(ReportStore):
         files = [(filename, os.path.join(course_dir, filename)) for filename in filenames]
         files.sort(key=lambda f: self.storage.modified_time(f[1]), reverse=True)
 
-        if (settings.GRADES_DOWNLOAD['STORAGE_TYPE'] == 'azure' or settings.GRADES_DOWNLOAD['STORAGE_TYPE'] == 's3'):
+        if (settings.GRADES_DOWNLOAD['STORAGE_TYPE']=='azure' or settings.GRADES_DOWNLOAD['STORAGE_TYPE']=='s3'):
             return [
-                (filename, self.storage.url(full_path))
+            (filename, self.storage.url(full_path))
                 for filename, full_path in files
             ]
         else:

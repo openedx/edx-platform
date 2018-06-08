@@ -25,7 +25,7 @@ define(['../dateutil_factory.js'], function(DateUtilIterator) {
                 var testLangs = {
                     en: 'Due Oct 14, 2016 08:00 UTC',
                     ru: 'Due 14 окт. 2016 г. 08:00 UTC',
-                    ar: 'Due ١٤ أكتوبر ٢٠١٦ ٠٨:٠٠ UTC',
+                    ar: 'Due ١٤ تشرين الأول أكتوبر ٢٠١٦ ٠٨:٠٠ UTC',
                     fr: 'Due 14 oct. 2016 08:00 UTC'
                 };
                 $form = $(
