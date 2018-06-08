@@ -7,7 +7,7 @@ from celery.result import AsyncResult
 from datetime import datetime
 from django.http import JsonResponse
 from django.conf import settings
-from lms.djangoapps.third_party_surveys.tasks import get_third_party_surveys
+from lms.djangoapps.third_party_surveys.tasks import get_third_party_surveys_task
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
@@ -50,9 +50,22 @@ class ThirdPartyResultDataSyncAPI(APIView):
 
     def get(self, request):
         """ Get data shared between platform & community """
-        get_third_party_surveys()
 
-        return JsonResponse({'state': 200}, status=status.HTTP_200_OK)
+        if request.GET.get('task_id'):
+
+            res = AsyncResult(request.GET.get('task_id'))
+
+            return JsonResponse({
+                'state': res.state,
+                'task_id': request.GET.get('task_id')
+            }, status=status.HTTP_200_OK)
+
+        x = get_third_party_surveys_task.delay()
+
+        return JsonResponse({
+            'state': "STARTED",
+            'task_id': x.task_id
+        }, status=status.HTTP_200_OK)
 
 
 class PlatformSyncService(APIView):
