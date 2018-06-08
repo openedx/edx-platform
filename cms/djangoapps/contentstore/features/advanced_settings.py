@@ -58,23 +58,6 @@ def create_value_not_in_quotes(step):
     change_display_name_value(step, 'quote me')
 
 
-@step('I see default advanced settings$')
-def i_see_default_advanced_settings(step):
-    # Test only a few of the existing properties (there are around 34 of them)
-    assert_policy_entries(
-        [ADVANCED_MODULES_KEY, DISPLAY_NAME_KEY, "Show Calculator"], ["[]", DISPLAY_NAME_VALUE, "false"])
-
-
-@step('the settings are alphabetized$')
-def they_are_alphabetized(step):
-    key_elements = world.css_find(KEY_CSS)
-    all_keys = []
-    for key in key_elements:
-        all_keys.append(key.value)
-
-    assert_equal(sorted(all_keys), all_keys, "policy keys were not sorted")
-
-
 @step('it is displayed as formatted$')
 def it_is_formatted(step):
     assert_policy_entries(['Discussion Topic Mapping'], ['{\n    "key": "value",\n    "key_2": "value_2"\n}'])

@@ -19,7 +19,7 @@ from common.test.acceptance.pages.studio.overview import CourseOutlinePage
 from common.test.acceptance.pages.studio.settings import SettingsPage
 from common.test.acceptance.pages.studio.settings_advanced import AdvancedSettingsPage
 from common.test.acceptance.pages.studio.settings_group_configurations import GroupConfigurationsPage
-from common.test.acceptance.pages.studio.utils import get_input_value
+from common.test.acceptance.pages.studio.utils import get_input_value, type_in_codemirror
 from common.test.acceptance.tests.helpers import create_user_partition_json, element_has_text
 from xmodule.partitions.partitions import Group
 
@@ -291,6 +291,9 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
     """
     Tests for validation feature in Studio's advanced settings tab
     """
+    course_name_key = 'Course Display Name'
+    course_name_value = 'Test Name'
+
     def setUp(self):
         super(AdvancedSettingsValidationTest, self).setUp()
         self.advanced_settings = AdvancedSettingsPage(
@@ -305,6 +308,81 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
 
         # Before every test, make sure to visit the page first
         self.advanced_settings.visit()
+
+    def test_course_author_sees_default_advanced_settings(self):
+        """
+        Scenario: Test that advanced settings have the default settings
+            Given a staff logs in to studio
+            When this user goes to advanced settings page
+                Then this user sees 'Allow Anonymous Discussion Posts' as true
+                And 'Enable Timed Exams' as false
+                And 'Maximum Attempts' as null
+        """
+        anonymous_discussion_setting = self.advanced_settings.get('Allow Anonymous Discussion Posts')
+        timed_exam_settings = self.advanced_settings.get('Enable Timed Exams')
+        max_attempts = self.advanced_settings.get('Maximum Attempts')
+        page_default_settings = [
+            anonymous_discussion_setting,
+            timed_exam_settings,
+            max_attempts
+        ]
+        default_anonymous_discussion_setting = 'true'
+        default_timed_exam_settings = 'false'
+        default_max_attempts = 'null'
+        expected_default_settings = [
+            default_anonymous_discussion_setting,
+            default_timed_exam_settings,
+            default_max_attempts
+        ]
+        self.assertEqual(
+            page_default_settings,
+            expected_default_settings
+        )
+
+    def test_keys_appear_alphabetically(self):
+        """
+        Scenario: Test that advanced settings have all the keys in alphabetic order
+            Given a staff logs in to studio
+            When this user goes to advanced settings page
+                Then he sees all the advanced setting keys in alphabetic order
+        """
+
+        key_names = self.advanced_settings.key_names
+        self.assertEqual(key_names, sorted(key_names))
+
+    def test_cancel_editing_key_value(self):
+        """
+        Scenario: Test that advanced settings does not save the key value, if cancel
+        is clicked from notification bar
+            Given a staff logs in to studio
+            When this user goes to advanced settings page and enters and new course name
+                Then he clicks 'cancel' buttin when asked to save changes
+            When this user reloads the page
+                And then he does not see any change in the original course name
+        """
+
+        original_course_display_name = self.advanced_settings.get(self.course_name_key)
+        new_course_name = 'New Course Name'
+        type_in_codemirror(self.advanced_settings, 16, new_course_name)
+        self.advanced_settings.cancel()
+        self.advanced_settings.refresh_and_wait_for_load()
+        self.assertNotEqual(
+            original_course_display_name,
+            new_course_name,
+            ('original course name:{} can not not be equal to unsaved course name {}'.format(
+                original_course_display_name,
+                new_course_name
+            )
+            )
+        )
+        self.assertEqual(
+            self.advanced_settings.get(self.course_name_key),
+            original_course_display_name,
+            ('course name from the page should be same as original_course_display_name:{}'.format(
+                original_course_display_name
+            )
+            )
+        )
 
     def test_modal_shows_one_validation_error(self):
         """
