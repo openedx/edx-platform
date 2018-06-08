@@ -2,6 +2,7 @@
 """
 Test for lms courseware app, module render unit
 """
+
 import itertools
 import json
 from datetime import datetime
@@ -10,24 +11,15 @@ from functools import partial
 import ddt
 import pytz
 from bson import ObjectId
-from capa.tests.response_xml_factory import OptionResponseXMLFactory
-from course_modes.models import CourseMode
-from courseware import module_render as render
-from courseware.courses import get_course_info_section, get_course_with_access
-from courseware.field_overrides import OverrideFieldData
-from courseware.model_data import FieldDataCache
-from courseware.models import StudentModule
-from courseware.module_render import XblockCallbackView
-from courseware.module_render import get_module_for_descriptor, hash_resource
-from courseware.tests.factories import GlobalStaffFactory, StudentModuleFactory, UserFactory
-from courseware.tests.test_submitting_problems import TestSubmittingProblems
-from courseware.tests.tests import LoginEnrollmentTestCase
+from completion.models import BlockCompletion
+from completion import waffle as completion_waffle
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponse
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from django.contrib.auth.models import AnonymousUser
 from edx_proctoring.api import create_exam, create_exam_attempt, update_attempt_status
 from edx_proctoring.runtime import set_runtime_service
 from edx_proctoring.tests.test_services import MockCreditService
@@ -37,8 +29,9 @@ from mock import MagicMock, Mock, patch
 from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from progress.models import CourseModuleCompletion
 from pyquery import PyQuery
-from rest_framework.test import APIRequestFactory
+from rest_framework.test import APIRequestFactory, force_authenticate
 from student.models import anonymous_id_for_user
 from verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from xblock.core import XBlock, XBlockAside
@@ -46,6 +39,28 @@ from xblock.field_data import FieldData
 from xblock.fields import ScopeIds
 from xblock.fragment import Fragment
 from xblock.runtime import Runtime
+
+from capa.tests.response_xml_factory import OptionResponseXMLFactory
+from course_modes.models import CourseMode
+from courseware.masquerade import CourseMasquerade
+from courseware import module_render as render
+from courseware.courses import get_course_info_section, get_course_with_access
+from courseware.field_overrides import OverrideFieldData
+from courseware.model_data import FieldDataCache
+from courseware.module_render import hash_resource, get_module_for_descriptor, XblockCallbackView
+from courseware.models import StudentModule
+from courseware.module_render import get_module_for_descriptor, hash_resource
+from courseware.tests.factories import GlobalStaffFactory, StudentModuleFactory, UserFactory
+from courseware.tests.test_submitting_problems import TestSubmittingProblems
+from courseware.tests.tests import LoginEnrollmentTestCase
+from lms.djangoapps.lms_xblock.field_data import LmsFieldData
+from openedx.core.djangoapps.credit.api import set_credit_requirement_status, set_credit_requirements
+from openedx.core.djangoapps.credit.models import CreditCourse
+from openedx.core.lib.courses import course_image_url
+from openedx.core.lib.gating import api as gating_api
+from openedx.core.lib.url_utils import quote_slashes
+from student.models import anonymous_id_for_user
+from verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from xblock_django.models import XBlockConfiguration
 from xmodule.lti_module import LTIDescriptor
 from xmodule.modulestore import ModuleStoreEnum
@@ -58,13 +73,6 @@ from xmodule.modulestore.tests.django_utils import (
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, ToyCourseFactory, check_mongo_calls
 from xmodule.modulestore.tests.test_asides import AsideTestType
 from xmodule.x_module import STUDENT_VIEW, CombinedSystem, XModule, XModuleDescriptor
-
-from lms.djangoapps.lms_xblock.field_data import LmsFieldData
-from openedx.core.djangoapps.credit.api import set_credit_requirement_status, set_credit_requirements
-from openedx.core.djangoapps.credit.models import CreditCourse
-from openedx.core.lib.courses import course_image_url
-from openedx.core.lib.gating import api as gating_api
-from openedx.core.lib.url_utils import quote_slashes
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
@@ -114,6 +122,41 @@ class GradedStatelessXBlock(XBlock):
                 'max_value': 1
             }
         )
+
+
+class StubCompletableXBlock(XBlock):
+    """
+    This XBlock exists to test completion storage.
+    """
+
+    @XBlock.json_handler
+    def grade(self, json_data, suffix):  # pylint: disable=unused-argument
+        """
+        Submit a grade to mark the block complete.
+        """
+        return self.runtime.publish(self, 'grade', {
+            'value': json_data['grade'],
+            'max_value': 1.0,
+        })
+
+    @XBlock.json_handler
+    def complete(self, json_data, suffix):  # pylint: disable=unused-argument
+        """
+        Mark the block's completion value using the completion API.
+        """
+        return self.runtime.publish(
+            self,
+            'completion',
+            {'completion': json_data['completion']},
+        )
+
+    @XBlock.json_handler
+    def progress(self, json_data, suffix):  # pylint: disable=unused-argument
+        """
+        Mark the block as complete using the deprecated progress interface.
+        New code should use the completion event instead.
+        """
+        return self.runtime.publish(self, 'progress', {})
 
 
 @attr(shard=1)
@@ -584,6 +627,168 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         )
         self.assertEquals(student_module.grade, 0.75)
         self.assertEquals(student_module.max_grade, 1)
+
+    @XBlock.register_temp_plugin(StubCompletableXBlock, identifier='comp')
+    def test_grade_event_with_completion_disabled(self):
+        with completion_waffle.waffle().override(completion_waffle.ENABLE_COMPLETION_TRACKING, False):
+            course = CourseFactory.create()
+            block = ItemFactory.create(category='comp', parent=course)
+            request = self.drf_request_factory.post(
+                '/',
+                data=json.dumps({'grade': 0.5}),
+                content_type='application/json',
+            )
+            force_authenticate(request, user=self.mock_user)
+            response = render.XblockCallbackView.as_view()(
+                request,
+                unicode(course.id),
+                quote_slashes(unicode(block.scope_ids.usage_id)),
+                'grade',
+                '',
+            )
+            self.assertEqual(response.status_code, 200)
+            self.assertFalse(BlockCompletion.objects.filter(block_key=block.scope_ids.usage_id).exists())
+
+    @XBlock.register_temp_plugin(StubCompletableXBlock, identifier='comp')
+    def test_grade_event(self):
+        new_features = settings.FEATURES.copy()
+        new_features['MARK_PROGRESS_ON_GRADING_EVENT'] = True
+        with override_settings(FEATURES=new_features):
+            with completion_waffle.waffle().override(completion_waffle.ENABLE_COMPLETION_TRACKING, True):
+                course = CourseFactory.create()
+                block = ItemFactory.create(category='comp', parent=course)
+                request = self.drf_request_factory.post(
+                    '/',
+                    data=json.dumps({'grade': 0.5}),
+                    content_type='application/json',
+                )
+                force_authenticate(request, user=self.mock_user)
+                response = render.XblockCallbackView.as_view()(
+                    request,
+                    unicode(course.id),
+                    quote_slashes(unicode(block.scope_ids.usage_id)),
+                    'grade',
+                    '',
+                )
+        self.assertEqual(response.status_code, 200)
+        completion = BlockCompletion.objects.get(block_key=block.scope_ids.usage_id)
+        self.assertEqual(completion.completion, 1.0)
+
+    @XBlock.register_temp_plugin(StubCompletableXBlock, identifier='comp')
+    def test_completion_event_with_completion_disabled(self):
+        with completion_waffle.waffle().override(completion_waffle.ENABLE_COMPLETION_TRACKING, False):
+            course = CourseFactory.create()
+            block = ItemFactory.create(category='comp', parent=course)
+            request = self.drf_request_factory.post(
+                '/',
+                data=json.dumps({'completion': 0.625}),
+                content_type='application/json',
+            )
+            force_authenticate(request, user=self.mock_user)
+            response = render.XblockCallbackView.as_view()(
+                request,
+                unicode(course.id),
+                quote_slashes(unicode(block.scope_ids.usage_id)),
+                'complete',
+                '',
+            )
+            self.assertEqual(response.status_code, 404)
+
+    @XBlock.register_temp_plugin(StubCompletableXBlock, identifier='comp')
+    def test_completion_event(self):
+        with completion_waffle.waffle().override(completion_waffle.ENABLE_COMPLETION_TRACKING, True):
+            course = CourseFactory.create()
+            block = ItemFactory.create(category='comp', parent=course)
+            request = self.drf_request_factory.post(
+                '/',
+                data=json.dumps({'completion': 0.625}),
+                content_type='application/json',
+            )
+            force_authenticate(request, user=self.mock_user)
+            response = render.XblockCallbackView.as_view()(
+                request,
+                unicode(course.id),
+                quote_slashes(unicode(block.scope_ids.usage_id)),
+                'complete',
+                '',
+            )
+        self.assertEqual(response.status_code, 200)
+        completion = BlockCompletion.objects.get(block_key=block.scope_ids.usage_id)
+        self.assertEqual(completion.completion, 0.625)
+
+    @XBlock.register_temp_plugin(StubCompletableXBlock, identifier='comp')
+    def test_progress_event_with_completion_disabled(self):
+        with completion_waffle.waffle().override(completion_waffle.ENABLE_COMPLETION_TRACKING, False):
+            course = CourseFactory.create()
+            block = ItemFactory.create(category='comp', parent=course)
+            request = self.drf_request_factory.post(
+                '/',
+                data=json.dumps({}),
+                content_type='application/json',
+            )
+            force_authenticate(request, user=self.mock_user)
+            response = render.XblockCallbackView.as_view()(
+                request,
+                unicode(course.id),
+                quote_slashes(unicode(block.scope_ids.usage_id)),
+                'progress',
+                '',
+            )
+            self.assertEqual(response.status_code, 200)
+            self.assertFalse(BlockCompletion.objects.filter(block_key=block.scope_ids.usage_id).exists())
+            self.assertTrue(CourseModuleCompletion.objects.filter(content_id=unicode(block.scope_ids.usage_id)).exists())
+
+    @XBlock.register_temp_plugin(StubCompletableXBlock, identifier='comp')
+    def test_progress_event(self):
+        with completion_waffle.waffle().override(completion_waffle.ENABLE_COMPLETION_TRACKING, True):
+            course = CourseFactory.create()
+            block = ItemFactory.create(category='comp', parent=course)
+            request = self.drf_request_factory.post(
+                '/',
+                data=json.dumps({}),
+                content_type='application/json',
+            )
+            force_authenticate(request, user=self.mock_user)
+            response = render.XblockCallbackView.as_view()(
+                request,
+                unicode(course.id),
+                quote_slashes(unicode(block.scope_ids.usage_id)),
+                'progress',
+                '',
+            )
+        self.assertEqual(response.status_code, 200)
+        completion = BlockCompletion.objects.get(block_key=block.scope_ids.usage_id)
+        self.assertEqual(completion.completion, 1.0)
+
+    @XBlock.register_temp_plugin(StubCompletableXBlock, identifier='comp')
+    def test_skip_handlers_for_masquerading_staff(self):
+        with completion_waffle.waffle().override(completion_waffle.ENABLE_COMPLETION_TRACKING, True):
+            course = CourseFactory.create()
+            block = ItemFactory.create(category='comp', parent=course)
+            request = self.drf_request_factory.post(
+                '/',
+                data=json.dumps({'completion': 0.8}),
+                content_type='application/json',
+            )
+            self.mock_user.real_user = GlobalStaffFactory.create()
+            self.mock_user.real_user.masquerade_settings = CourseMasquerade(course.id, user_name="jem")
+            force_authenticate(request, user=self.mock_user)
+            request.session = {}
+            #request.user.real_user = GlobalStaffFactory.create()
+            #request.user.real_user.masquerade_settings = CourseMasquerade(course.id, user_name="jem")
+            with patch('courseware.module_render.is_masquerading_as_specific_student') as mock_masq:
+                mock_masq.return_value = True
+                response = render.XblockCallbackView.as_view()(
+                    request,
+                    unicode(course.id),
+                    quote_slashes(unicode(block.scope_ids.usage_id)),
+                    'complete',
+                    '',
+                )
+            mock_masq.assert_called()
+        self.assertEqual(response.status_code, 200)
+        with self.assertRaises(BlockCompletion.DoesNotExist):
+            BlockCompletion.objects.get(block_key=block.scope_ids.usage_id)
 
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_XBLOCK_VIEW_ENDPOINT': True})
     def test_xblock_view_handler(self):
