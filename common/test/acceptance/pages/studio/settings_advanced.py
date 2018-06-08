@@ -18,6 +18,9 @@ MODAL_SELECTOR = ".validation-error-modal-content"
 ERROR_ITEM_NAME_SELECTOR = ".error-item-title strong"
 ERROR_ITEM_CONTENT_SELECTOR = ".error-item-message"
 SETTINGS_NAME_SELECTOR = ".is-not-editable"
+CONFIRMATION_MESSAGE_SELECTOR = "#alert-confirmation-title"
+DEPRECATED_SETTINGS_SELECTOR = ".field-group.course-advanced-policy-list-item.is-deprecated"
+DEPRECATED_SETTINGS_BUTTON_SELECTOR = ".deprecated-settings-label"
 
 
 class AdvancedSettingsPage(CoursePage):
@@ -33,6 +36,20 @@ class AdvancedSettingsPage(CoursePage):
 
         EmptyPromise(_is_finished_loading, 'Finished rendering the advanced policy items.').fulfill()
         return self.q(css='body.advanced').present
+
+    @property
+    def key_names(self):
+        """
+            Returns a list of key names of all settings.
+        """
+        return self.q(css=KEY_CSS).text
+
+    @property
+    def deprecated_settings_button_text(self):
+        """
+            Returns text for deprecated settings button
+        """
+        return self.q(css=DEPRECATED_SETTINGS_BUTTON_SELECTOR).text[0]
 
     def wait_for_modal_load(self):
         """
