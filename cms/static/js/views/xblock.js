@@ -125,7 +125,8 @@ define(['jquery', 'underscore', 'common/js/components/utils/view_utils', 'js/vie
              */
             renderXBlockFragment: function(fragment, element) {
                 var html = fragment.html,
-                    resources = fragment.resources;
+                    resources = fragment.resources,
+                    blockView = this;
                 if (!element) {
                     element = this.$el;
                 }
@@ -135,8 +136,9 @@ define(['jquery', 'underscore', 'common/js/components/utils/view_utils', 'js/vie
                 // by included scripts are logged to the console but are then ignored assuming
                 // that at least the rendered HTML will be in place.
                 try {
-                    this.updateHtml(element, html);
-                    return this.addXBlockFragmentResources(resources);
+                    return this.addXBlockFragmentResources(resources).done(function() {
+                        blockView.updateHtml(element, html);
+                    });
                 } catch (e) {
                     console.error(e, e.stack);
                     return $.Deferred().resolve();
