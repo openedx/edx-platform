@@ -34,6 +34,7 @@ def save_responses(survey_responses):
         if response.get('[url("edx_uid")]') \
                 or response.get('[url("edx_uid")]') == 'undefined' \
                 or response.get('[url("status")]') == 'Deleted':
+            log.info(response.get('id') + "skipping")
             continue
 
         log.info(response.get('[url("app")]', '') + ", " + response.get('[url("edx_uid")]'))
