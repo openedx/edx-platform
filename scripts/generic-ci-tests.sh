@@ -54,6 +54,7 @@ set -e
 # or else no tests will be executed.
 SHARD=${SHARD:="all"}
 NUMBER_OF_BOKCHOY_THREADS=${NUMBER_OF_BOKCHOY_THREADS:=1}
+TARGET_BRANCH=${TARGET_BRANCH:="origin/master"}
 
 # Clean up previous builds
 git clean -qxfd
@@ -131,7 +132,7 @@ case "$TEST_SUITE" in
 
     "js-unit")
         paver test_js --coverage
-        paver diff_coverage
+        paver diff_coverage -b $TARGET_BRANCH
         ;;
 
     "commonlib-js-unit")
