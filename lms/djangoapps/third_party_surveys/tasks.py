@@ -16,8 +16,8 @@ def get_third_party_surveys():
     We are scheduling this task through Jenkins instead of celery beat.
     """
     try:
-        last_survey = ThirdPartySurvey.objects.latest('request_date')
-        filters = [('datesubmitted', '>', last_survey.request_date)]
+        last_survey = ThirdPartySurvey.objects.latest('gizmo_survey_id')
+        filters = [('id', '>', last_survey.gizmo_survey_id)]
     except ThirdPartySurvey.DoesNotExist:
         filters = []
     # filters += [('status', '=', 'Completed')]
@@ -43,6 +43,7 @@ def save_responses(survey_responses):
         try:
             ThirdPartySurvey.objects.create(
                 response=response,
+                gizmo_survey_id=response.get('id'),
                 user_id=response.get('[url("edx_uid")]'),
                 request_date=date,
                 survey_type=response.get('[url("app")]', '')
