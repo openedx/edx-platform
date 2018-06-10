@@ -114,9 +114,9 @@ def are_permissions_roles_seeded(course_id):
 
 
 def get_course_discussion_settings(course_key):
-    cache = get_cache('get_course_discussion_settings')
-    if course_key in cache:
-        return cache[course_key]
+    #cache = get_cache('get_course_discussion_settings')
+    #if course_key in cache:
+    #    return cache[course_key]
 
     try:
         course_discussion_settings = CourseDiscussionSettings.objects.get(course_id=course_key)
@@ -132,7 +132,7 @@ def get_course_discussion_settings(course_key):
             }
         )
 
-    cache[course_key] = course_discussion_settings
+    # cache[course_key] = course_discussion_settings
 
     return course_discussion_settings
 
@@ -167,8 +167,8 @@ def set_course_discussion_settings(course_key, **kwargs):
             setattr(course_discussion_settings, field, kwargs[field])
 
     course_discussion_settings.save()
-    cache = get_cache('get_course_discussion_settings')
-    cache.pop(course_key, None)  # Remove settings cache entry
+    #cache = get_cache('get_course_discussion_settings')
+    #cache.pop(course_key, None)  # Remove settings cache entry
 
     return course_discussion_settings
 
