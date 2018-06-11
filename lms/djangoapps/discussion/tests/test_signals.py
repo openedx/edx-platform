@@ -70,9 +70,6 @@ class CoursePublishHandlerTestCase(ModuleStoreTestCase):
         course_key_args = dict(org='org', course='number', run='run')
         course_key = self.store.make_course_key(**course_key_args)
 
-        with self.assertRaises(models.CourseDiscussionSettings.DoesNotExist):
-            models.CourseDiscussionSettings.objects.get(course_id=course_key)
-
         # create course
         course = CourseFactory(emit_signals=True, **course_key_args)
         self.assertEqual(course.id, course_key)
@@ -92,5 +89,5 @@ class CoursePublishHandlerTestCase(ModuleStoreTestCase):
         """
         Verifies the discussion ID map for the given course matches the expected value.
         """
-        discussion_settings = models.CourseDiscussionSettings.objects.get(course_id=course_key)
-        self.assertDictEqual(discussion_settings.discussions_id_map, expected_map)
+        mapping_entry = models.DiscussionsIdMapping.objects.get(course_id=course_key)
+        self.assertDictEqual(mapping_entry.mapping, expected_map)
