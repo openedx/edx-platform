@@ -543,12 +543,12 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         mock_get_id_token.return_value = "test_token"
         helpers.delete_all_notes_for_user(self.user)
         mock_delete.assert_called_with(
-            url='http://example.com/',
+            url='http://example.com/annotations/',
             headers={
                 'x-annotator-auth-token': 'test_token'
             },
             data={
-                'user_id': 'anonymous_id'
+                'user': 'anonymous_id'
             },
             timeout=(settings.EDXNOTES_CONNECT_TIMEOUT, settings.EDXNOTES_READ_TIMEOUT)
         )
