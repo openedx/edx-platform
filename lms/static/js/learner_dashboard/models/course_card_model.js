@@ -38,6 +38,23 @@ class CourseCardModel extends Backbone.Model {
     return desiredCourseRun;
   }
 
+  getCourseRunWithHighestGrade(grades) {
+    const allEnrolledCourseRuns = this.context.course_runs.filter(run => run.is_enrolled);
+    if (allEnrolledCourseRuns.length <= 1) {
+      return null;
+    }
+
+    allEnrolledCourseRuns.sort((a, b) => (grades[a.key] || 0) - (grades[b.key] || 0));
+    return allEnrolledCourseRuns[allEnrolledCourseRuns.length - 1];
+  }
+
+  updateCourseRunWithHighestGrade(grades) {
+    const courseRunWithHighestGrade = this.getCourseRunWithHighestGrade(grades);
+    if (courseRunWithHighestGrade) {
+      this.setActiveCourseRun(courseRunWithHighestGrade, this.context.user_preferences);
+    }
+  }
+
   isEnrolledInSession() {
     // Returns true if the user is currently enrolled in a session of the course
     return this.context.course_runs.find(run => run.is_enrolled) !== undefined;
