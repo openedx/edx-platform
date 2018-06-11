@@ -7,13 +7,14 @@ from django.urls import reverse
 from django.test import RequestFactory
 from django.test.utils import override_settings
 from nose.plugins.attrib import attr
+from rest_framework import status
 from search.tests.test_course_discovery import DemoCourse
 from search.tests.tests import TEST_INDEX_NAME
 from search.tests.utils import SearcherMixin
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 
-from ..views import CourseDetailView
+from ..views import CourseDetailView, CourseListUserThrottle
 from .mixins import TEST_PASSWORD, CourseApiFactoryMixin
 
 
@@ -99,6 +100,15 @@ class CourseListViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
     def test_not_logged_in(self):
         self.client.logout()
         self.verify_response()
+
+    def test_throttle_for_user(self):
+        """Make sure a user requests do not exceed the maximum number of requests"""
+        throttle = CourseListUserThrottle()
+        rate_limit, __ = throttle.parse_rate(throttle.rate)
+        self.setup_user(self.honor_user)
+        for attempt in xrange(rate_limit + 2):
+            expected_status = status.HTTP_429_TOO_MANY_REQUESTS if attempt >= rate_limit else status.HTTP_200_OK
+            self.verify_response(expected_status_code=expected_status, params={'username': self.honor_user.username})
 
 
 @attr(shard=9)
