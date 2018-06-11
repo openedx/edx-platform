@@ -12,7 +12,7 @@ from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType,
 
 class DiscussionConfig(AppConfig):
     """
-    Application Configuration for Grades.
+    Application Configuration for Discussions.
     """
 
     name = u'lms.djangoapps.discussion'
@@ -22,12 +22,12 @@ class DiscussionConfig(AppConfig):
                 PluginURLs.NAMESPACE: u'',
                 PluginURLs.REGEX: r'^courses/{}/discussion/forum/'.format(COURSE_ID_PATTERN),
                 PluginURLs.RELATIVE_PATH: u'urls',
-            }
+            },
         },
         PluginSettings.CONFIG: {
             ProjectType.LMS: {
                 SettingsType.COMMON: {PluginSettings.RELATIVE_PATH: u'settings.common'},
-            }
+            },
         }
     }
 

@@ -3,9 +3,7 @@ import mock
 
 from django_comment_common import signals, models
 from lms.djangoapps.discussion.signals.handlers import ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY
-import openedx.core.djangoapps.request_cache as request_cache
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory, SiteConfigurationFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
@@ -58,39 +56,3 @@ class SendMessageHandlerTestCase(TestCase):
         signals.comment_created.send(sender=self.sender, user=self.user, post=self.post)
 
         self.assertFalse(mock_send_message.called)
-
-
-class CoursePublishHandlerTestCase(ModuleStoreTestCase):
-    """
-    Tests for discussion updates on course publish.
-    """
-    ENABLED_SIGNALS = ['course_published']
-
-    def test_discussion_id_map_updates_on_publish(self):
-        course_key_args = dict(org='org', course='number', run='run')
-        course_key = self.store.make_course_key(**course_key_args)
-
-        with self.assertRaises(models.CourseDiscussionSettings.DoesNotExist):
-            models.CourseDiscussionSettings.objects.get(course_id=course_key)
-
-        # create course
-        course = CourseFactory(emit_signals=True, **course_key_args)
-        self.assertEqual(course.id, course_key)
-        self._assert_discussion_id_map(course_key, {})
-
-        # create discussion block
-        request_cache.clear_cache(name=None)
-        discussion_id = 'discussion1'
-        discussion_block = ItemFactory.create(
-            parent_location=course.location,
-            category="discussion",
-            discussion_id=discussion_id,
-        )
-        self._assert_discussion_id_map(course_key, {discussion_id: str(discussion_block.location)})
-
-    def _assert_discussion_id_map(self, course_key, expected_map):
-        """
-        Verifies the discussion ID map for the given course matches the expected value.
-        """
-        discussion_settings = models.CourseDiscussionSettings.objects.get(course_id=course_key)
-        self.assertDictEqual(discussion_settings.discussions_id_map, expected_map)

@@ -19,7 +19,9 @@ from django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 from django_comment_client.permissions import check_permissions_by_view, get_team, has_permission
 from django_comment_client.settings import MAX_COMMENT_DEPTH
 from django_comment_common.models import FORUM_ROLE_STUDENT, CourseDiscussionSettings, Role
-from django_comment_common.utils import get_course_discussion_settings
+from django_comment_common.utils import (
+    get_discussion_xblocks_by_course_id, get_course_discussion_settings, has_required_keys
+)
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id, get_cohort_names, is_course_cohorted
 from openedx.core.djangoapps.request_cache.middleware import request_cached
@@ -100,42 +102,12 @@ def has_forum_access(uname, course_id, rolename):
     return role.users.filter(username=uname).exists()
 
 
-def has_required_keys(xblock):
-    """
-    Returns True iff xblock has the proper attributes for generating metadata
-    with get_discussion_id_map_entry()
-    """
-    for key in ('discussion_id', 'discussion_category', 'discussion_target'):
-        if getattr(xblock, key, None) is None:
-            log.debug(
-                "Required key '%s' not in discussion %s, leaving out of category map",
-                key,
-                xblock.location
-            )
-            return False
-    return True
-
-
 def get_accessible_discussion_xblocks(course, user, include_all=False):  # pylint: disable=invalid-name
     """
     Return a list of all valid discussion xblocks in this course that
     are accessible to the given user.
     """
     return get_accessible_discussion_xblocks_by_course_id(course.id, user, include_all=include_all)
-
-
-@request_cached
-def get_accessible_discussion_xblocks_by_course_id(course_id, user=None, include_all=False):  # pylint: disable=invalid-name
-    """
-    Return a list of all valid discussion xblocks in this course.
-    Checks for the given user's access if include_all is False.
-    """
-    all_xblocks = modulestore().get_items(course_id, qualifiers={'category': 'discussion'}, include_orphans=False)
-
-    return [
-        xblock for xblock in all_xblocks
-        if has_required_keys(xblock) and (include_all or has_access(user, 'load', xblock, course_id))
-    ]
 
 
 def get_discussion_id_map_entry(xblock):
@@ -149,6 +121,20 @@ def get_discussion_id_map_entry(xblock):
             "title": xblock.discussion_category.split("/")[-1].strip() + (" / " + xblock.discussion_target if xblock.discussion_target else "")
         }
     )
+
+
+@request_cached
+def get_accessible_discussion_xblocks_by_course_id(course_id, user=None, include_all=False):
+    """
+    Return a list of all valid discussion xblocks in this course.
+    Checks for the given user's access if include_all is False.
+    """
+    all_blocks = get_discussion_xblocks_by_course_id(course_id)
+    if include_all:
+        return all_blocks
+    return [
+        block for block in all_blocks if has_access(user, 'load', block, course_id)
+    ]
 
 
 class DiscussionIdMapIsNotCached(Exception):

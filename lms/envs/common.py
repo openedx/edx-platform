@@ -874,6 +874,9 @@ MODULESTORE = {
         }
     }
 }
+# How many seconds should we wait before assuming a course publish has made it
+# to the MongoDB secondaries (and is therefore safe to read).
+MODULESTORE_PUBLISH_SIGNAL_DELAY = 30
 
 #################### Python sandbox ############################################
 

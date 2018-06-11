@@ -48,7 +48,7 @@ def update_discussions_map(context):
         discussion_block.discussion_id: unicode(discussion_block.location)
         for discussion_block in discussion_blocks
     }
-    set_course_discussion_settings(course_key, discussions_id_map=discussions_id_map)
+    # set_course_discussion_settings(course_key, discussions_id_map=discussions_id_map)
 
 
 class ResponseNotification(BaseMessageType):
