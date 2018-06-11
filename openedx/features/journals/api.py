@@ -67,7 +67,7 @@ class DiscoveryApiClient(object):
         '''get_journals from discovery, filter on orgs is supplied'''
         try:
             if orgs:
-                response = self.client.journals.get(orgs=orgs, status='active')
+                response = self.client.journals.get(orgs=','.join(orgs), status='active')
             else:
                 response = self.client.journals.get(status='active')
             LOGGER.debug('response is type=%s', type(response))
