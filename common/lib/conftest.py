@@ -6,6 +6,7 @@ defuse_xml_libs()
 
 import pytest
 
+
 @pytest.fixture(autouse=True)
 def no_webpack_loader(monkeypatch):
     monkeypatch.setattr(
