@@ -1,5 +1,6 @@
+import pytz
 from celery import task
-from datetime import datetime
+from datetime import datetime, timedelta
 from logging import getLogger
 from django.db import IntegrityError
 
@@ -15,14 +16,26 @@ def get_third_party_surveys():
     of all surveys thorough Survey Gizmo APIs
     We are scheduling this task through Jenkins instead of celery beat.
     """
+    filters = []
     try:
-        last_survey = ThirdPartySurvey.objects.latest('gizmo_survey_id')
-        filters = [('id', '>', last_survey.gizmo_survey_id)]
-    except ThirdPartySurvey.DoesNotExist:
-        filters = []
-    # filters += [('status', '=', 'Completed')]
+        surveys_count = ThirdPartySurvey.objects.count()
+        if surveys_count:
+            last_survey = ThirdPartySurvey.objects.all().order_by('-request_date')[0]
+            edt_survey_time = convert_utc_to_edt(last_survey.request_date)
+            filters = [('datesubmitted', '>=', edt_survey_time)]
+    except Exception as ex:
+        log.exception(ex.args)
     survey_responses = SurveyGizmoClient().get_filtered_survey_responses(survey_filters=filters)
     save_responses(survey_responses)
+
+
+def convert_utc_to_edt(utc_dt):
+    utc_dt = utc_dt + timedelta(seconds=1)
+    eastern = pytz.timezone('US/Eastern')
+    fmt = '%Y-%m-%d %H:%M:%S %Z%z'
+    loc_dt = utc_dt.astimezone(eastern)
+    edt_time = eastern.normalize(loc_dt).strftime(fmt)
+    return edt_time
 
 
 @task()
@@ -31,10 +44,8 @@ def get_third_party_surveys_task():
 
 
 def save_responses(survey_responses):
-
-    log.info("survey logs")
     for response in survey_responses:
-        log.info(response)
+
         if response.get('[url("edx_uid")]') in ['', 'undefined', None] \
                 or response.get('[url("status")]') == 'Deleted':
 
@@ -50,5 +61,4 @@ def save_responses(survey_responses):
             )
 
         except (IntegrityError, ValueError) as exc:
-            log.info(str(exc))
             log.error(exc)
