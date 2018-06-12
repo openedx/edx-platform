@@ -109,7 +109,7 @@ urlpatterns += (
     url(r'^dashboard/', include('learner_dashboard.urls')),
 )
 
-if configuration_helpers.get_value("ENABLE_AZURE_MEDIA_SERVICES_XBLOCK"):
+if settings.FEATURES["ENABLE_AZURE_MEDIA_SERVICES_XBLOCK"]:
     urlpatterns += (
         url(r'^embed_player/', include('azure_media_services.urls')),
     )
