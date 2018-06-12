@@ -9,6 +9,7 @@ from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.features.journals.api import get_journal_bundles, get_journals_root_url
 from lms.djangoapps.commerce.utils import EcommerceService
 
+
 def bundle_about(request, bundle_uuid):
     bundle = get_journal_bundles(request.site, bundle_uuid=bundle_uuid)
     if not bundle:
@@ -20,7 +21,6 @@ def bundle_about(request, bundle_uuid):
         'bundle': bundle,
     }
     return render_to_response('journals/bundle_about.html', context)
-
 
 
 def extend_bundle(bundle):

@@ -50,9 +50,10 @@ class DiscoveryApiClient(object):
         url = configuration_helpers.get_value('COURSE_CATALOG_API_URL', settings.COURSE_CATALOG_API_URL)
         self.client = EdxRestApiClient(self.create_journals_url(url), jwt=jwt)
 
-
     def create_journals_url(self, url):
-        '''rewrite the discovery url to point to journals endpoint'''
+        """
+        rewrite the discovery url to point to journals endpoint
+        """
         split_url = urlsplit(url)
         override_url = urlunsplit((
             split_url.scheme,
@@ -64,7 +65,9 @@ class DiscoveryApiClient(object):
         return override_url
 
     def get_journals(self, orgs):
-        '''get_journals from discovery, filter on orgs is supplied'''
+        """
+        get_journals from discovery, filter on orgs is supplied
+        """
         try:
             if orgs:
                 response = self.client.journals.get(orgs=','.join(orgs), status='active')
@@ -218,6 +221,7 @@ def get_journals(site):
 
     return journals
 
+
 def fix_course_images(bundle):
     """
         Set the image for a course. If the course has an image, use that. Otherwise use the first
@@ -232,6 +236,7 @@ def fix_course_images(bundle):
             if course_run['image']:
                 course['image'] = course_run['image']
                 break
+
 
 def get_journal_bundles(site, bundle_uuid=''):
     """Retrieve journal bundles from the discovery service.
@@ -269,9 +274,9 @@ def get_journal_bundles(site, bundle_uuid=''):
 
 
 def get_journals_root_url():
-    '''
+    """
     Return the base url used to display Journals
-    '''
+    """
     if journals_enabled():
         return configuration_helpers.get_configuration_value(
             'JOURNALS_URL_ROOT',
