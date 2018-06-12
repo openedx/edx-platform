@@ -198,56 +198,6 @@ def index(request, extra_context=None, user=AnonymousUser()):
     return render_to_response('index.html', context)
 
 
-@ensure_csrf_cookie
-def register_user(request, extra_context=None):
-    """
-    Deprecated. To be replaced by :class:`student_account.views.login_and_registration_form`.
-    """
-    # Determine the URL to redirect to following login:
-    redirect_to = get_next_url_for_login_page(request)
-    if request.user.is_authenticated:
-        return redirect(redirect_to)
-
-    external_auth_response = external_auth_register(request)
-    if external_auth_response is not None:
-        return external_auth_response
-
-    context = {
-        'login_redirect_url': redirect_to,  # This gets added to the query string of the "Sign In" button in the header
-        'email': '',
-        'name': '',
-        'running_pipeline': None,
-        'pipeline_urls': auth_pipeline_urls(pipeline.AUTH_ENTRY_REGISTER, redirect_url=redirect_to),
-        'platform_name': configuration_helpers.get_value(
-            'platform_name',
-            settings.PLATFORM_NAME
-        ),
-        'selected_provider': '',
-        'username': '',
-    }
-
-    if extra_context is not None:
-        context.update(extra_context)
-
-    if context.get("extauth_domain", '').startswith(
-            openedx.core.djangoapps.external_auth.views.SHIBBOLETH_DOMAIN_PREFIX
-    ):
-        return render_to_response('register-shib.html', context)
-
-    # If third-party auth is enabled, prepopulate the form with data from the
-    # selected provider.
-    if third_party_auth.is_enabled() and pipeline.running(request):
-        running_pipeline = pipeline.get(request)
-        current_provider = provider.Registry.get_from_pipeline(running_pipeline)
-        if current_provider is not None:
-            overrides = current_provider.get_register_form_data(running_pipeline.get('kwargs'))
-            overrides['running_pipeline'] = running_pipeline
-            overrides['selected_provider'] = current_provider.name
-            context.update(overrides)
-
-    return render_to_response('register.html', context)
-
-
 def compose_and_send_activation_email(user, profile, user_registration=None):
     """
     Construct all the required params and send the activation email

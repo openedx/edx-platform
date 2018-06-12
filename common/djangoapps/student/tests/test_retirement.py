@@ -264,7 +264,7 @@ class TestRegisterRetiredUsername(TestCase):
         """
         Validates a response stating that a username already exists.
         """
-        assert response.status_code == 400
+        assert response.status_code == 409
         obj = json.loads(response.content)
         assert obj['value'].startswith('An account with the Public Username')
         assert obj['value'].endswith('already exists.')
