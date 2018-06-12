@@ -36,6 +36,7 @@ def get_mocked_journal_bundle():
         "uuid": "1918b738-979f-42cb-bde0-13335366fa86",
         "title": "dummy-title",
         "partner": "edx",
+        "organization": "edx",
         "journals": [
             {
                 "title": "dummy-title",
@@ -79,14 +80,14 @@ def get_mocked_journals():
             "title": "dummy-title1",
             "card_image_url": "dummy-url1",
             "slug": "dummy-title1",
-            "access_length": "8 weeks",
+            "access_length": 60,
             "organization": "edx"
         },
         {
             "title": "dummy-title2",
             "card_image_url": "dummy-url2",
             "slug": "dummy-title2",
-            "access_length": "8 weeks",
+            "access_length": 60,
             "organization": "edx"
         }
     ]

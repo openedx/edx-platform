@@ -1,5 +1,6 @@
 """Tests of comprehensive theming."""
 
+import mock
 from django.conf import settings
 from django.contrib import staticfiles
 from django.test import TestCase
@@ -21,21 +22,30 @@ class TestComprehensiveTheming(TestCase):
         staticfiles.finders.get_finder.cache_clear()
 
     @with_comprehensive_theme('red-theme')
-    def test_red_footer(self):
+    @mock.patch('student.views.management.get_journals')
+    @mock.patch('student.views.management.get_journal_bundles')
+    def test_red_footer(self, mock_journal_bundles, mock_journals):
         """
         Tests templates from theme are rendered if available.
         `red-theme` has header.html and footer.html so this test
         asserts presence of the content from header.html and footer.html
         """
+        mock_journals.return_value = []
+        mock_journal_bundles.return_value = []
         resp = self.client.get('/')
         self.assertEqual(resp.status_code, 200)
         # This string comes from footer.html
         self.assertContains(resp, "super-ugly")
 
-    def test_theme_outside_repo(self):
+    @mock.patch('student.views.management.get_journals')
+    @mock.patch('student.views.management.get_journal_bundles')
+    def test_theme_outside_repo(self, mock_journal_bundles, mock_journals):
         # Need to create a temporary theme, and defer decorating the function
         # until it is done, which leads to this strange nested-function style
         # of test.
+
+        mock_journals.return_value = []
+        mock_journal_bundles.return_value = []
 
         # Make a temp directory as a theme.
         themes_dir = Path(mkdtemp_clean())
