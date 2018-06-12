@@ -177,8 +177,8 @@ hash-ring==1.3.1
 help-tokens==1.0.3
 html5lib==0.999
 httplib2==0.11.3
-httpretty==0.9.4
-idna==2.6
+httpretty==0.9.5
+idna==2.7
 imagesize==1.0.0          # via sphinx
 incremental==17.5.0
 inflect==0.3.1
@@ -215,7 +215,7 @@ moto==0.3.1
 mysql-python==1.2.5
 needle==0.5.0
 networkx==1.7
-newrelic==3.2.1.93
+newrelic==3.2.2.94
 nltk==3.3.0
 nodeenv==1.1.1
 nose==1.3.7
@@ -316,7 +316,7 @@ sqlparse==0.2.4           # via django-debug-toolbar
 stevedore==1.10.0
 sure==1.4.11
 sympy==0.7.1
-testfixtures==6.0.2
+testfixtures==6.1.0
 testtools==2.3.0
 text-unidecode==1.2
 tox-battery==0.5.1
@@ -334,7 +334,7 @@ urlobject==2.4.3
 user-util==0.1.3
 virtualenv==16.0.0
 voluptuous==0.11.1
-vulture==0.26
+vulture==0.27
 w3lib==1.19.0
 watchdog==0.8.3
 web-fragments==0.2.2
