@@ -6,7 +6,7 @@ import sys
 from paver.easy import cmdopts, needs, task
 
 from pavelib.utils.envs import Env
-from pavelib.utils.test.suites import JsTestSuite
+from pavelib.utils.test.suites import JsTestSuite, JestSnapshotTestSuite
 from pavelib.utils.timer import timed
 
 __test__ = False  # do not collect
@@ -54,8 +54,13 @@ def test_js(options):
         )
         return
 
-    test_suite = JsTestSuite(suite, mode=mode, with_coverage=coverage, port=port, skip_clean=skip_clean)
-    test_suite.run()
+    if suite != 'jest-snapshot':
+        test_suite = JsTestSuite(suite, mode=mode, with_coverage=coverage, port=port, skip_clean=skip_clean)
+        test_suite.run()
+
+    if (suite == 'jest-snapshot') or (suite == 'all'):
+        test_suite = JestSnapshotTestSuite('jest')
+        test_suite.run()
 
 
 @task
