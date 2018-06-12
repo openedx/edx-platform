@@ -194,7 +194,8 @@ class Env(object):
         'lms',
         'xmodule',
         'common',
-        'common-requirejs'
+        'common-requirejs',
+        'jest-snapshot'
     ]
 
     JS_REPORT_DIR = REPORT_DIR / 'javascript'
