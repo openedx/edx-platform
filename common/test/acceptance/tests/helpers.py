@@ -761,7 +761,7 @@ class AcceptanceTest(WebAppTest):
             log_dir /= "shard_{}".format(os.environ["SHARD"])
         log_dir.mkdir_p()
 
-        with (log_dir / '{}.browser.log'.format(self.id())).open('w') as browser_log:
+        with (log_dir / '{}.browser.log'.format(self.id()[:60])).open('w') as browser_log:
             for (message, url, line_no, col_no, stack) in logs:
                 browser_log.write(u"{}:{}:{}: {}\n    {}\n".format(
                     url,
