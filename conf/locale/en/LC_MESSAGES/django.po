@@ -17797,6 +17797,12 @@ msgstr ""
 msgid "Show Email Task History"
 msgstr ""
 
+#: lms/templates/instructor/instructor_dashboard_2/sensitive_data_download_msg.txt
+msgid ""
+"Contains information protected under the Protection of Privacy Law - the "
+"wrongful transgressor commits an offense"
+msgstr ""
+
 #: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
 msgid "Set Course Mode Price"
 msgstr ""
