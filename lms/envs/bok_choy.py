@@ -195,6 +195,8 @@ FEATURES['ENABLE_DISCUSSION_HOME_PANEL'] = True
 # Enable support for OpenBadges accomplishments
 FEATURES['ENABLE_OPENBADGES'] = True
 
+FEATURES['ENABLE_JOURNAL_INTEGRATION'] = False
+
 # Use MockSearchEngine as the search engine for test scenario
 SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
 # Path at which to store the mock index

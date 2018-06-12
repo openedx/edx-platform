@@ -4,7 +4,7 @@ Defines URLs for course bookmarks.
 
 from django.conf.urls import url
 
-from views.marketing import bundle_about
+from openedx.features.journals.views.marketing import bundle_about
 
 urlpatterns = [
     url(
@@ -13,4 +13,3 @@ urlpatterns = [
         name='openedx.journals.bundle_about',
     ),
 ]
-
