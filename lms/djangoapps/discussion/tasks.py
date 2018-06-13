@@ -13,6 +13,7 @@ from django.contrib.sites.models import Site
 
 from celery_utils.logged_task import LoggedTask
 from django_comment_common.utils import set_course_discussion_settings
+from django_comment_common.models import DiscussionsIdMapping
 from edx_ace import ace
 from edx_ace.utils import date
 from edx_ace.recipient import Recipient
@@ -48,7 +49,7 @@ def update_discussions_map(context):
         discussion_block.discussion_id: unicode(discussion_block.location)
         for discussion_block in discussion_blocks
     }
-    set_course_discussion_settings(course_key, discussions_id_map=discussions_id_map)
+    DiscussionsIdMapping.update_mapping(course_key, discussions_id_map)
 
 
 class ResponseNotification(BaseMessageType):

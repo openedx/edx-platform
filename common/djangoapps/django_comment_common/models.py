@@ -204,3 +204,24 @@ class CourseDiscussionSettings(models.Model):
     def divided_discussions(self, value):
         """Un-Jsonify the divided_discussions"""
         self._divided_discussions = json.dumps(value)
+
+
+class DiscussionsIdMapping(models.Model):
+    """This model is a performance optimization, updated on course publish."""
+    course_id = CourseKeyField(db_index=True, primary_key=True, max_length=255)
+    mapping = JSONField(
+        help_text="Key/value store mapping discussion IDs to discussion XBlock usage keys.",
+    )
+
+    @classmethod
+    def update_mapping(cls, course_key, discussions_id_map):
+        """Update the mapping of discussions IDs to XBlock usage key strings."""
+        mapping_entry, created = cls.objects.get_or_create(
+            course_id=course_key,
+            defaults={
+                'mapping': discussions_id_map,
+            },
+        )
+        if not created:
+            mapping_entry.mapping = discussions_id_map
+            mapping_entry.save()

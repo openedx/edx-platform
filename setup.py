@@ -79,6 +79,12 @@ setup(
         ],
         "cms.djangoapp": [
             "ace_common = openedx.core.djangoapps.ace_common.apps:AceCommonConfig",
+            # Importing an LMS app into the Studio process is not a good
+            # practice. We're ignoring this for Discussions here because its
+            # placement in LMS is a historical artifact. The eventual goal is to
+            # consolidate the multiple discussions-related Django apps and
+            # either put them in the openedx/ dir, or in another repo entirely.
+            "discussion = lms.djangoapps.discussion.apps:DiscussionConfig",
             "plugins = openedx.core.djangoapps.plugins.apps:PluginsConfig",
             "schedules = openedx.core.djangoapps.schedules.apps:SchedulesConfig",
             "theming = openedx.core.djangoapps.theming.apps:ThemingConfig",
