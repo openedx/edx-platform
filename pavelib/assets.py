@@ -892,7 +892,6 @@ def update_assets(args):
 
     # Compile sass for themes and system
     execute_compile_sass(args)
-
     if args.collect:
         if args.debug:
             collect_log_args.update({COLLECTSTATIC_LOG_DIR_ARG: None})
@@ -909,9 +908,8 @@ def update_assets(args):
             static_collector_dir=STATIC_ROOT_BASE,
             platform_static_dir=EDX_PLATFORM_STATIC_ROOT_BASE
         ))
-
         for sys in args.system:
-            if (sys == 'lms'):
+            if sys == 'lms':
                 os.system(
                     "rsync -av {static_collector_dir}/js/i18n/* {platform_static_dir}/cms/js/i18n/ --delete-after".format(
                         static_collector_dir=STATIC_ROOT_BASE,

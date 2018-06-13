@@ -105,7 +105,7 @@ class TestPaverServerTasks(PaverTestCase):
         else:
             rsync_output = False
 
-        self.verify_server_task("lms", options, rsync_output=rsync_output)
+        self.verify_server_task("studio", options, rsync_output=rsync_output)
 
     @ddt.data(
         [{}],
@@ -299,11 +299,6 @@ class TestPaverServerTasks(PaverTestCase):
 
             expected_messages.append(first)
             expected_messages.append(second)
-            if system == 'lms':
-                expected_messages.append(first)
-                expected_messages.append(second)
-                expected_messages.append(first)
-                expected_messages.append(second)
 
         if not no_contracts:
             expected_run_server_command += " --contracts"
