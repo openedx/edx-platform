@@ -156,8 +156,9 @@ define([
             var requests = AjaxHelpers.requests(this);
             $('.discovery-input').val('asdfasdf');
             $('.discovery-submit').trigger('click');
-            AjaxHelpers.respondWithError(requests, 404);
+            AjaxHelpers.respondWithError(requests, 404, {'error': 'some-search-error'});
             expect($('#discovery-message')).not.toBeEmpty();
+            expect($('#discovery-message')).toContainHtml('some-search-error');
             expect($('.courses-listing')).toBeEmpty();
         });
 

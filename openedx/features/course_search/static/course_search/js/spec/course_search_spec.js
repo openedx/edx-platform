@@ -299,6 +299,16 @@ define([
                 expect($('.cancel-button')).toBeVisible();
             }
 
+            function showDefaultErrorMessage() {
+                this.form.showErrorMessage();
+                expect(this.form.$message).toContainHtml('There was an error, try searching again.');
+            }
+
+            function showRemoteErrorMessage() {
+                this.form.showErrorMessage('some-error-message');
+                expect(this.form.$message).toContainHtml('some-error-message');
+            }
+
             function triggersSearchEvent() {
                 var term = 'search string';
                 $('.search-field').val(term);
@@ -341,6 +351,8 @@ define([
                 });
                 it('trims input string', trimsInputString);
                 it('handles calls to doSearch', doesSearch);
+                it('displays default message on error', showDefaultErrorMessage);
+                it('displays provided message on error', showRemoteErrorMessage);
                 it('triggers a search event and changes to active state', triggersSearchEvent);
                 it('clears search when clicking on cancel button', clearsSearchOnCancel);
                 it('clears search when search box is empty', clearsSearchOnEmpty);
