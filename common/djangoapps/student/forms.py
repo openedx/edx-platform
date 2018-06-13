@@ -10,7 +10,6 @@ from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
-from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.core.validators import RegexValidator, slug_re
@@ -23,6 +22,7 @@ from edx_ace.recipient import Recipient
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.theming.helpers import get_current_site
 from openedx.core.djangoapps.user_api import accounts as accounts_settings
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from student.message_types import PasswordReset
@@ -64,7 +64,7 @@ class PasswordResetFormNoActive(PasswordResetForm):
         user.
         """
         for user in self.users_cache:
-            site = Site.objects.get_current()
+            site = get_current_site()
             message_context = get_base_template_context(site)
 
             message_context.update({
