@@ -538,10 +538,8 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
 
             return "<olclass=\"outline-itemaccordion-panel" + is_hidden_string + "\"" \
                    "id=\"" + url + "_contents\"" \
-                   "role=\"region\"" \
                    "aria-labelledby=\"" + url + "\"" \
                    ">"
-
         # Course tree
         course = self.course
         chapter = course.children[0]

@@ -170,6 +170,7 @@ class CourseOutlinePage(PageObject):
 
         # Click the subsection's first problem and ensure that the page finishes
         # reloading
+        units[0].location_once_scrolled_into_view  # pylint: disable=W0104
         units[0].click()
 
         self._wait_for_course_section(section_title, subsection_title)
@@ -304,23 +305,17 @@ class CourseOutlinePage(PageObject):
         '''
         Expands all parts of the collapsible outline.
         '''
-        section_button_selector = '.section-name.accordion-trigger'
-        subsection_button_selector = '.subsection-text.accordion-trigger'
-        self._expand_outline_fold(section_button_selector)
-        self._expand_outline_fold(subsection_button_selector)
+        expand_button_search_results = self.q(
+            css='#expand-collapse-outline-all-button'
+        ).results
 
-    def _expand_outline_fold(self, fold_selector):
-        '''
-        Ensures an outline fold is loaded, then clicks it open.
-        '''
-        folds_as_elements = self.q(css=fold_selector)
-        self.wait_for_element_visibility(
-            fold_selector, "'{}' is visible".format(fold_selector)
-        )
+        if not expand_button_search_results:
+            return
 
-        for fold_element in folds_as_elements:
-            if not self._is_html_element_aria_expanded(fold_element):
-                fold_element.click()
+        expand_button = expand_button_search_results[0]
+
+        if not self._is_html_element_aria_expanded(expand_button):
+            expand_button.click()
 
 
 class CourseSearchResultsPage(CoursePage):
