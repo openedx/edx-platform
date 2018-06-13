@@ -61,6 +61,22 @@ from pipeline_mako import render_require_js_path_overrides
     ie11_fix_path = "js/ie11_find_array.js"
   %>
 
+  % if getattr(settings, 'CAPTURE_CONSOLE_LOG', False):
+    <script type="text/javascript">
+      var oldOnError = window.onerror;
+      window.localStorage.setItem('console_log_capture', JSON.stringify([]));
+
+      window.onerror = function (message, url, lineno, colno, error) {
+        if (oldOnError) {
+          oldOnError.apply(this, arguments);
+        }
+
+        var messages = JSON.parse(window.localStorage.getItem('console_log_capture'));
+        messages.push([message, url, lineno, colno, (error || {}).stack]);
+        window.localStorage.setItem('console_log_capture', JSON.stringify(messages));
+      }
+    </script>
+  % endif
   <script type="text/javascript" src="${static.url(jsi18n_path)}"></script>
   <script type="text/javascript" src="${static.url(ie11_fix_path)}"></script>
 
@@ -107,10 +123,6 @@ from pipeline_mako import render_require_js_path_overrides
   <%block name="js_overrides">
     ${render_require_js_path_overrides(settings.REQUIRE_JS_PATH_OVERRIDES) | n, decode.utf8}
   </%block>
-
-  % if not disable_courseware_js:
-    <%static:js group='module-js'/>
-  % endif
 
   <%block name="headextra"/>
   <%block name="head_extra"/>
@@ -171,7 +183,7 @@ from pipeline_mako import render_require_js_path_overrides
     % endif
 
     <%include file="/page_banner.html" />
-    
+
     <div class="marketing-hero"><%block name="marketing_hero"></%block></div>
 
     <div class="content-wrapper main-container" id="content">

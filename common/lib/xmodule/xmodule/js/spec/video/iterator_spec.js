@@ -1,4 +1,6 @@
 (function(require) {
+    'use strict';
+
     require(
 ['video/00_iterator.js'],
 function(Iterator) {
@@ -100,4 +102,4 @@ function(Iterator) {
         });
     });
 });
-}(RequireJS.require));
+}(require));

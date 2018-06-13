@@ -1,4 +1,4 @@
-(function(requirejs, require, define, undefined) {
+(function(require, define, undefined) {
     require(
 ['video/00_video_storage.js'],
 function(VideoStorage) {
@@ -80,4 +80,4 @@ function(VideoStorage) {
         });
     });
 });
-}(RequireJS.requirejs, RequireJS.require, RequireJS.define));
+}(require, define));

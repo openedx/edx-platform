@@ -19,24 +19,19 @@
         modules: getModulesList([
             'js/factories/asset_index',
             'js/factories/base',
-            'js/factories/container',
             'js/factories/course_create_rerun',
             'js/factories/course_info',
-            'js/factories/edit_tabs',
             'js/factories/export',
             'js/factories/group_configurations',
             'js/certificates/factories/certificates_page_factory',
             'js/factories/index',
-            'js/factories/library',
             'js/factories/manage_users',
             'js/factories/outline',
             'js/factories/register',
             'js/factories/settings',
             'js/factories/settings_advanced',
             'js/factories/settings_graders',
-            'js/factories/textbooks',
-            'js/factories/videos_index',
-            'js/factories/xblock_validation'
+            'js/factories/videos_index'
         ]),
         /**
          * By default all the configuration for optimization happens from the command

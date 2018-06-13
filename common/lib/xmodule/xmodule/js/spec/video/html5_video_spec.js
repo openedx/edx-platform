@@ -11,6 +11,8 @@
             oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine
                 .createSpy('onTouchBasedDevice').and.returnValue(null);
+
+            state = jasmine.initializePlayer('video_html5.html');
         });
 
         afterEach(function() {

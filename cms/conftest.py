@@ -47,3 +47,19 @@ def _django_clear_site_cache():
     with what has been working for us so far.
     """
     pass
+
+
+@pytest.fixture(autouse=True)
+def no_webpack_loader(monkeypatch):
+    """
+    Monkeypatch webpack_loader to make sure that webpack assets don't need to be
+    compiled before unit tests are run.
+    """
+    monkeypatch.setattr(
+        "webpack_loader.templatetags.webpack_loader.render_bundle",
+        lambda entry, extension=None, config='DEFAULT', attrs='': ''
+    )
+    monkeypatch.setattr(
+        "webpack_loader.utils.get_as_tags",
+        lambda entry, extension=None, config='DEFAULT', attrs='': []
+    )
