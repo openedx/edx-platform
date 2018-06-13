@@ -9,7 +9,6 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from django.contrib.sites.models import Site
 from django.urls import reverse
 from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import redirect
@@ -31,7 +30,7 @@ from openedx.core.djangoapps.external_auth.login_and_register import register as
 from openedx.core.djangoapps.lang_pref.api import all_languages, released_languages
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
+from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site, get_current_site
 from openedx.core.djangoapps.user_api.accounts.api import request_password_change
 from openedx.core.djangoapps.user_api.api import (
     RegistrationFormFactory,
@@ -228,7 +227,7 @@ def password_change_request_handler(request):
             if configuration_helpers.get_value('ENABLE_PASSWORD_RESET_FAILURE_EMAIL',
                                                settings.FEATURES['ENABLE_PASSWORD_RESET_FAILURE_EMAIL']):
 
-                site = Site.objects.get_current()
+                site = get_current_site()
                 message_context = get_base_template_context(site)
 
                 message_context.update({
