@@ -35,6 +35,7 @@ ACCOUNT_DETAIL = AccountViewSet.as_view({
 
 PARTNER_REPORT = AccountRetirementPartnerReportView.as_view({
     'post': 'retirement_partner_report',
+    'put': 'retirement_partner_status_create',
     'delete': 'retirement_partner_cleanup'
 })
 
