@@ -2103,7 +2103,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=457 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=459 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -4508,9 +4508,11 @@ CREATE TABLE `social_auth_code` (
   `email` varchar(254) NOT NULL,
   `code` varchar(32) NOT NULL,
   `verified` tinyint(1) NOT NULL,
+  `timestamp` datetime(6) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `social_auth_code_email_75f27066d057e3b6_uniq` (`email`,`code`),
-  KEY `social_auth_code_c1336794` (`code`)
+  KEY `social_auth_code_c1336794` (`code`),
+  KEY `social_auth_code_timestamp_176b341f` (`timestamp`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `social_auth_nonce`;
@@ -4534,8 +4536,10 @@ CREATE TABLE `social_auth_partial` (
   `next_step` smallint(5) unsigned NOT NULL,
   `backend` varchar(32) NOT NULL,
   `data` longtext NOT NULL,
+  `timestamp` datetime(6) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `social_auth_partial_94a08da1` (`token`)
+  KEY `social_auth_partial_94a08da1` (`token`),
+  KEY `social_auth_partial_timestamp_50f2119f` (`timestamp`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `social_auth_usersocialauth`;
