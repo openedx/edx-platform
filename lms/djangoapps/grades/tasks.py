@@ -41,7 +41,7 @@ KNOWN_RETRY_ERRORS = (  # Errors we expect occasionally, should be resolved on r
     DatabaseNotReadyError,
 )
 RECALCULATE_GRADE_DELAY_SECONDS = 2  # to prevent excessive _has_db_updated failures. See TNL-6424.
-RETRY_DELAY_SECONDS = 30
+RETRY_DELAY_SECONDS = 40
 SUBSECTION_GRADE_TIMEOUT_SECONDS = 300
 
 
