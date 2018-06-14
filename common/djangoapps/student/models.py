@@ -640,7 +640,7 @@ def user_post_save_callback(sender, **kwargs):
 
     changed_fields = user._changed_fields
 
-    if 'is_active' in changed_fields or 'email' in changed_fields:
+    if 'is_active' in changed_fields or 'email' in changed_fields or 'date_joined' in changed_fields:
         if user.is_active:
             ceas = CourseEnrollmentAllowed.for_user(user).filter(auto_enroll=True)
 
