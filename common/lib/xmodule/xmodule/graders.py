@@ -262,6 +262,13 @@ class WeightedSubsectionsGrader(CourseGrader):
     def __init__(self, subgraders):
         self.subgraders = subgraders
 
+    @property
+    def sum_of_weights(self):
+        sum = 0
+        for _, _, weight in self.subgraders:
+            sum += weight
+        return sum
+
     def grade(self, grade_sheet, generate_random_scores=False):
         total_percent = 0.0
         section_breakdown = []
