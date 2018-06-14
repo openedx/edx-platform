@@ -66,7 +66,7 @@ Glossary
    plan on removing this term from this app's code to avoid confusion.
 
 -  **Section**: From our
-   `documentation <http://edx.readthedocs.io/projects/edx-%20partner-course-staff/en/latest/developing_course/course_sections.html#what-is-a-section>`__,
+   `documentation <https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/developing_course/course_sections.html#what-is-a-section>`__,
    “A section is the topmost category in your course. A section can
    represent a time period in your course, a chapter, or another
    organizing principle. A section contains one or more subsections.”

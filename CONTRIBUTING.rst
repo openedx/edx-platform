@@ -152,8 +152,7 @@ Areas of particular concern with their own detailed guidelines are:
 
 .. _Accessibility: http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/conventions/accessibility.html
 .. _website accessibility policy: https://www.edx.org/accessibility
-.. _Internationalization: http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/conventions/internationalization/index.html
-
+.. _Internationalization: http://edx.readthedocs.io/projects/edx-developer-guide/en/latest/internationalization/index.html
 
 Step 4: Approval by Community Manager and Product Owner
 =======================================================
