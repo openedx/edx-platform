@@ -15,8 +15,8 @@
                 <div class="video-head-col video-col date-col"><%- gettext("Date Added") %></div>
                 <div class="video-head-col video-col video-id-col"><%- gettext("Video ID") %></div>
                 <div class="video-head-col video-col transcripts-col"><%- gettext("Transcripts") %></div>
-                <div class="video-head-col video-col status-col"><%- gettext("Status") %></div>
-                <div  class="video-head-col video-col actions-col"><%- gettext("Action") %></div>
+                <div class="video-head-col video-col status-col"><%- gettext("Video Status") %></div>
+                <div class="video-head-col video-col actions-col"><%- gettext("Action") %></div>
             </div>
         </div>
         <div class="js-table-body"></div>
