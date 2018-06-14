@@ -16,6 +16,7 @@ from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.lang_pref.api import released_languages
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme_context
+from openedx.features.journals.tests.utils import get_mocked_journals, get_mocked_journal_bundle
 from student.tests.factories import UserFactory
 
 
@@ -296,10 +297,23 @@ class TestIndex(SiteMixin, TestCase):
         self.user.set_password("password")
         self.user.save()
 
-    def test_index_does_not_redirect_without_site_override(self):
+    @mock.patch('student.views.management.get_journals')
+    @mock.patch('student.views.management.get_journal_bundles')
+    def test_index_does_not_redirect_without_site_override(self, mock_journal_bundles, mock_journals):
         """ Test index view does not redirect if MKTG_URLS['ROOT'] is not set """
+        journal_bundle = get_mocked_journal_bundle()
+        journals = get_mocked_journals()
+
+        mock_journal_bundles.return_value = [journal_bundle]
+        mock_journals.return_value = journals
         response = self.client.get(reverse("root"))
         self.assertEqual(response.status_code, 200)
+
+        self.assertContains(response, journal_bundle["title"])
+        self.assertContains(response, journal_bundle["organization"])
+        for journal in journals:
+            self.assertContains(response, journal["title"])
+            self.assertContains(response, journal["organization"])
 
     def test_index_redirects_to_marketing_site_with_site_override(self):
         """ Test index view redirects if MKTG_URLS['ROOT'] is set in SiteConfiguration """

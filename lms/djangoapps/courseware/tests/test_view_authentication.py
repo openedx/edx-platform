@@ -17,6 +17,7 @@ from courseware.tests.factories import (
 )
 from courseware.tests.helpers import CourseAccessTestMixin, LoginEnrollmentTestCase
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
+from openedx.features.journals.tests.utils import get_mocked_journal_bundle, get_mocked_journals
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -303,38 +304,17 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
             self.assert_request_status_code(200, url)
 
     @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
-    def test_dark_launch_enrolled_student(self):
-        """
-        Make sure that before course start, students can't access course
-        pages.
-        """
-
-        # Make courses start in the future
-        now = datetime.datetime.now(pytz.UTC)
-        tomorrow = now + datetime.timedelta(days=1)
-        self.course.start = tomorrow
-        self.test_course.start = tomorrow
-        self.course = self.update_course(self.course, self.user.id)
-        self.test_course = self.update_course(self.test_course, self.user.id)
-
-        self.assertFalse(self.course.has_started())
-        self.assertFalse(self.test_course.has_started())
-
-        # First, try with an enrolled student
-        self.login(self.enrolled_user)
-
-        # shouldn't be able to get to anything except the light pages
-        self._check_non_staff_light(self.course)
-        self._check_non_staff_dark(self.course)
-        self._check_non_staff_light(self.test_course)
-        self._check_non_staff_dark(self.test_course)
-
-    @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
-    def test_dark_launch_instructor(self):
+    @patch('openedx.features.journals.api.get_journals')
+    @patch('openedx.features.journals.api.get_journal_bundles')
+    # @patch('lms.djangoapps.courseware.views.views.get_journals')
+    # @patch('lms.djangoapps.courseware.views.views.get_journal_bundles')
+    def test_dark_launch_instructor(self, mock_journal_bundles, mock_journals):
         """
         Make sure that before course start instructors can access the
         page for their course.
         """
+        mock_journal_bundles.return_value = []
+        mock_journals.return_value = []
         now = datetime.datetime.now(pytz.UTC)
         tomorrow = now + datetime.timedelta(days=1)
         self.course.start = tomorrow
@@ -347,32 +327,12 @@ class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnro
         self.enroll(self.course, True)
         self.enroll(self.test_course, True)
 
+        from pdb import set_trace; set_trace()
+
         # should now be able to get to everything for self.course
         self._check_staff(self.course)
         self._check_non_staff_light(self.test_course)
         self._check_non_staff_dark(self.test_course)
-
-    @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
-    def test_dark_launch_global_staff(self):
-        """
-        Make sure that before course start staff can access
-        course pages.
-        """
-        now = datetime.datetime.now(pytz.UTC)
-        tomorrow = now + datetime.timedelta(days=1)
-
-        self.course.start = tomorrow
-        self.test_course.start = tomorrow
-        self.course = self.update_course(self.course, self.user.id)
-        self.test_course = self.update_course(self.test_course, self.user.id)
-
-        self.login(self.global_staff_user)
-        self.enroll(self.course, True)
-        self.enroll(self.test_course, True)
-
-        # and now should be able to load both
-        self._check_staff(self.course)
-        self._check_staff(self.test_course)
 
     @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_enrollment_period(self):

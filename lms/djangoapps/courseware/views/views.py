@@ -227,6 +227,8 @@ def courses(request):
     # Add marketable programs to the context.
     programs_list = get_programs_with_type(request.site, include_hidden=False)
 
+    from pdb import set_trace; set_trace()
+
     journals = get_journals(request.site)
     journals_root_url = get_journals_root_url()
 

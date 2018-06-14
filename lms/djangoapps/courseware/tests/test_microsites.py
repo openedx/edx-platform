@@ -3,6 +3,7 @@ Tests related to the Site Configuration feature
 """
 
 import pytest
+import mock
 from bs4 import BeautifulSoup
 from contextlib import contextmanager
 from django.conf import settings
@@ -73,11 +74,15 @@ class TestSites(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             self.activate_user(email)
 
     @override_settings(SITE_NAME=settings.MICROSITE_TEST_HOSTNAME)
-    def test_site_anonymous_homepage_content(self):
+    @mock.patch('student.views.management.get_journals')
+    @mock.patch('student.views.management.get_journal_bundles')
+    def test_site_anonymous_homepage_content(self, mock_journal_bundles, mock_journals):
         """
         Verify that the homepage, when accessed via a Site domain, returns
         HTML that reflects the Site branding elements
         """
+        mock_journals.return_value = []
+        mock_journal_bundles.return_value = []
 
         resp = self.client.get('/', HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
         self.assertEqual(resp.status_code, 200)
@@ -111,10 +116,14 @@ class TestSites(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         # assert that the edX partners tag line is not in the HTML
         self.assertNotContains(resp, 'Explore free courses from')
 
-    def test_no_configuration_anonymous_homepage_content(self):
+    @mock.patch('student.views.management.get_journals')
+    @mock.patch('student.views.management.get_journal_bundles')
+    def test_no_configuration_anonymous_homepage_content(self, mock_journal_bundles, mock_journals):
         """
         Make sure we see the right content on the homepage if there is no site configuration defined.
         """
+        mock_journals.return_value = []
+        mock_journal_bundles.return_value = []
 
         resp = self.client.get('/')
         self.assertEqual(resp.status_code, 200)
@@ -136,7 +145,9 @@ class TestSites(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertNotContains(resp, 'This is a Test Site footer')
 
     @override_settings(SITE_NAME=settings.MICROSITE_TEST_HOSTNAME)
-    def test_site_homepage_course_max(self):
+    @mock.patch('student.views.management.get_journals')
+    @mock.patch('student.views.management.get_journal_bundles')
+    def test_site_homepage_course_max(self, mock_journal_bundles, mock_journals):
         """
         Verify that the number of courses displayed on the homepage honors
         the HOMEPAGE_COURSE_MAX setting.
@@ -157,6 +168,9 @@ class TestSites(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             soup = BeautifulSoup(response.content, 'html.parser')
             courses = soup.find_all(class_='course')
             self.assertEqual(len(courses), expected_count)
+
+        mock_journals.return_value = []
+        mock_journal_bundles.return_value = []
 
         # By default the number of courses on the homepage is not limited.
         # We should see both courses and no link to all courses.
@@ -221,10 +235,14 @@ class TestSites(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         resp = self.client.get('/copyright')
         self.assertEqual(resp.status_code, 404)
 
-    def test_no_redirect_on_homepage_when_no_enrollments(self):
+    @mock.patch('student.views.management.get_journals')
+    @mock.patch('student.views.management.get_journal_bundles')
+    def test_no_redirect_on_homepage_when_no_enrollments(self, mock_journal_bundles, mock_journals):
         """
         Verify that a user going to homepage will not redirect if he/she has no course enrollments
         """
+        mock_journals.return_value = []
+        mock_journal_bundles.return_value = []
         self.setup_users()
 
         email, password = self.STUDENT_INFO[0]
@@ -232,11 +250,15 @@ class TestSites(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         resp = self.client.get(reverse('root'), HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
         self.assertEquals(resp.status_code, 200)
 
-    def test_no_redirect_on_homepage_when_has_enrollments(self):
+    @mock.patch('student.views.management.get_journals')
+    @mock.patch('student.views.management.get_journal_bundles')
+    def test_no_redirect_on_homepage_when_has_enrollments(self, mock_journal_bundles, mock_journals):
         """
         Verify that a user going to homepage will not redirect to dashboard if he/she has
         a course enrollment
         """
+        mock_journals.return_value = []
+        mock_journal_bundles.return_value = []
         self.setup_users()
 
         email, password = self.STUDENT_INFO[0]

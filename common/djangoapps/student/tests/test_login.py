@@ -260,10 +260,14 @@ class LoginTest(CacheIsolationTestCase):
         EDXMKTG_LOGGED_IN_COOKIE_NAME=u"unicode-logged-in",
         EDXMKTG_USER_INFO_COOKIE_NAME=u"unicode-user-info",
     )
-    def test_unicode_mktg_cookie_names(self):
+    @patch('student.views.management.get_journals')
+    @patch('student.views.management.get_journal_bundles')
+    def test_unicode_mktg_cookie_names(self, mock_journal_bundles, mock_journals):
         # When logged in cookie names are loaded from JSON files, they may
         # have type `unicode` instead of `str`, which can cause errors
         # when calling Django cookie manipulation functions.
+        mock_journal_bundles.return_value = []
+        mock_journals.return_value = []
         response, _ = self._login_response('test@edx.org', 'test_password')
         self._assert_response(response, success=True)
 
