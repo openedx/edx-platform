@@ -37,6 +37,7 @@ class Command(BaseCommand):
     discovery_user = None
     discovery_base_url_fmt = None
     discovery_oidc_url = None
+    journals = False
     journals_user = None
     journals_base_url_fmt = None
     journals_oidc_url = None
@@ -65,6 +66,13 @@ class Command(BaseCommand):
             "--devstack",
             action='store_true',
             help="Use devstack config, otherwise sandbox config is assumed",
+        )
+
+        parser.add_argument(
+            "--enable-journals",
+            dest="journals",
+            action="store_true",
+            help="Enable journal configuration",
         )
 
     def _create_oauth2_client(self, url, site_name, service_name, service_user):
@@ -202,6 +210,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.dns_name = options['dns_name']
         self.theme_path = options['theme_path']
+        self.journals = options['journals']
 
         if options['devstack']:
             configuration_prefix = "devstack"
@@ -223,7 +232,8 @@ class Command(BaseCommand):
         self.configuration_filename = '{}_configuration.json'.format(configuration_prefix)
         self.discovery_user = self.get_or_create_service_user("lms_catalog_service_user")
         self.ecommerce_user = self.get_or_create_service_user("ecommerce_worker")
-        self.journals_user = self.get_or_create_service_user("journals_worker")
+        if self.journals:
+            self.journals_user = self.get_or_create_service_user("journals_worker")
 
         all_sites = self._get_sites_data()
         self._update_default_clients()
@@ -245,7 +255,8 @@ class Command(BaseCommand):
             LOG.info("Creating ecommerce oauth2 client for '{site_name}' site".format(site_name=site_name))
             self._create_oauth2_client(ecommerce_url, site_name, 'ecommerce', self.ecommerce_user)
 
-            LOG.info("Creating journals oauth2 client for '{site_name}' site".format(site_name=site_name))
-            self._create_oauth2_client(journals_url, site_name, 'journals', self.journals_user)
+            if self.journals:
+                LOG.info("Creating journals oauth2 client for '{site_name}' site".format(site_name=site_name))
+                self._create_oauth2_client(journals_url, site_name, 'journals', self.journals_user)
 
         self._enable_commerce_configuration()
