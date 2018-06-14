@@ -500,8 +500,8 @@ class TestCourseEnrollmentSerializer(MobileAPITestCase, MilestonesTestCaseMixin)
 
         # Assert utm parameters
         expected_utm_parameters = {
-            'twitter': 'utm_campaign=social-sharing&utm_medium=social-post&utm_source=twitter',
-            'facebook': 'utm_campaign=social-sharing&utm_medium=social-post&utm_source=facebook'
+            'twitter': 'utm_campaign=social-sharing-db&utm_medium=social&utm_source=twitter',
+            'facebook': 'utm_campaign=social-sharing-db&utm_medium=social&utm_source=facebook'
         }
         self.assertEqual(serialized['course']['course_sharing_utm_parameters'], expected_utm_parameters)
 

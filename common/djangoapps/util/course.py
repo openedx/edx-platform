@@ -12,13 +12,13 @@ log = logging.getLogger(__name__)
 
 COURSE_SHARING_UTM_PARAMETERS = {
     'facebook': {
-        'utm_medium': 'social-post',
-        'utm_campaign': 'social-sharing',
+        'utm_medium': 'social',
+        'utm_campaign': 'social-sharing-db',
         'utm_source': 'facebook',
     },
     'twitter': {
-        'utm_medium': 'social-post',
-        'utm_campaign': 'social-sharing',
+        'utm_medium': 'social',
+        'utm_campaign': 'social-sharing-db',
         'utm_source': 'twitter',
     },
 }

@@ -164,7 +164,7 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         """
         twitter_widget = self.dashboard_page.get_course_social_sharing_widget('twitter')
         twitter_url = ("https://twitter.com/intent/tweet?text=Testing+feature%3A%20http%3A%2F%2Fcustom%2Fcourse%2Furl"
-                       "%3Futm_campaign%3Dsocial-sharing%26utm_medium%3Dsocial-post%26utm_source%3Dtwitter")
+                       "%3Futm_campaign%3Dsocial-sharing-db%26utm_medium%3Dsocial%26utm_source%3Dtwitter")
         self.assertEqual(twitter_widget.attrs('title')[0], 'Share on Twitter')
         self.assertEqual(twitter_widget.attrs('data-tooltip')[0], 'Share on Twitter')
         self.assertEqual(twitter_widget.attrs('target')[0], '_blank')
@@ -173,7 +173,7 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
 
         facebook_widget = self.dashboard_page.get_course_social_sharing_widget('facebook')
         facebook_url = ("https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fcustom%2Fcourse%2Furl%3F"
-                        "utm_campaign%3Dsocial-sharing%26utm_medium%3Dsocial-post%26utm_source%3Dfacebook&"
+                        "utm_campaign%3Dsocial-sharing-db%26utm_medium%3Dsocial%26utm_source%3Dfacebook&"
                         "quote=I%27m+taking+Test")
         self.assertEqual(facebook_widget.attrs('title')[0], 'Share on Facebook')
         self.assertEqual(facebook_widget.attrs('data-tooltip')[0], 'Share on Facebook')
