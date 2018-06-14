@@ -2,12 +2,11 @@
 Base integration test for provider implementations.
 """
 
-import unittest
-
 import json
-import mock
-
+import unittest
 from contextlib import contextmanager
+
+import mock
 from django import test
 from django.contrib import auth
 from django.contrib.auth import models as auth_models
@@ -107,7 +106,7 @@ class IntegrationTestMixin(object):
         self._test_return_login(user_is_activated=True)
 
     def test_login(self):
-        self.user = UserFactory.create()  # pylint: disable=attribute-defined-outside-init
+        self.user = UserFactory.create()
         # The user goes to the login page, and sees a button to login with this provider:
         provider_login_url = self._check_login_page()
         # The user clicks on the provider's button:
@@ -421,7 +420,6 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         self.assertEqual(302, response.status_code)
         # NOTE: Ideally we should use assertRedirects(), however it errors out due to the hostname, testserver,
         # not being properly set. This may be an issue with the call made by PSA, but we are not certain.
-        # pylint: disable=protected-access
         self.assertTrue(response.get('Location').endswith(django_settings.SOCIAL_AUTH_LOGIN_REDIRECT_URL))
 
     def assert_redirect_to_login_looks_correct(self, response):
@@ -595,11 +593,13 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # expected state.
         self.client.get(
             pipeline.get_login_url(self.provider.provider_id, pipeline.AUTH_ENTRY_LOGIN))
-        actions.do_complete(request.backend, social_views._do_login)  # pylint: disable=protected-access
+        actions.do_complete(request.backend, social_views._do_login,  # pylint: disable=protected-access
+                            request=request)
 
         student_views.signin_user(strategy.request)
         student_views.login_user(strategy.request)
-        actions.do_complete(request.backend, social_views._do_login)  # pylint: disable=protected-access
+        actions.do_complete(request.backend, social_views._do_login,  # pylint: disable=protected-access
+                            request=request)
 
         # First we expect that we're in the unlinked state, and that there
         # really is no association in the backend.
@@ -610,20 +610,21 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # the "logged in" cookie for the marketing site.
         self.assert_logged_in_cookie_redirect(actions.do_complete(
             request.backend, social_views._do_login, request.user, None,  # pylint: disable=protected-access
-            redirect_field_name=auth.REDIRECT_FIELD_NAME
+            redirect_field_name=auth.REDIRECT_FIELD_NAME, request=request
         ))
 
         # Set the cookie and try again
         self.set_logged_in_cookies(request)
 
         # Fire off the auth pipeline to link.
-        self.assert_redirect_to_dashboard_looks_correct(  # pylint: disable=protected-access
+        self.assert_redirect_to_dashboard_looks_correct(
             actions.do_complete(
                 request.backend,
-                social_views._do_login,
+                social_views._do_login,  # pylint: disable=protected-access
                 request.user,
                 None,
-                redirect_field_name=auth.REDIRECT_FIELD_NAME
+                redirect_field_name=auth.REDIRECT_FIELD_NAME,
+                request=request
             )
         )
 
@@ -648,12 +649,14 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # expected state.
         self.client.get(
             pipeline.get_login_url(self.provider.provider_id, pipeline.AUTH_ENTRY_LOGIN))
-        actions.do_complete(request.backend, social_views._do_login)  # pylint: disable=protected-access
+        actions.do_complete(request.backend, social_views._do_login,  # pylint: disable=protected-access
+                            request=request)
 
         with self._patch_edxmako_current_request(strategy.request):
             student_views.signin_user(strategy.request)
             student_views.login_user(strategy.request)
-            actions.do_complete(request.backend, social_views._do_login, user=user)  # pylint: disable=protected-access
+            actions.do_complete(request.backend, social_views._do_login, user=user,  # pylint: disable=protected-access
+                                request=request)
 
         # First we expect that we're in the linked state, with a backend entry.
         self.assert_account_settings_context_looks_correct(account_settings_context(request), linked=True)
@@ -694,7 +697,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
 
         with self.assertRaises(exceptions.AuthAlreadyAssociated):
             # pylint: disable=protected-access
-            actions.do_complete(backend, social_views._do_login, user=unlinked_user)
+            actions.do_complete(backend, social_views._do_login, user=unlinked_user, request=strategy.request)
 
     def test_already_associated_exception_populates_dashboard_with_error(self):
         # Instrument the pipeline with an exception. We test that the
@@ -713,12 +716,14 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
 
         self.client.get('/login')
         self.client.get(pipeline.get_login_url(self.provider.provider_id, pipeline.AUTH_ENTRY_LOGIN))
-        actions.do_complete(request.backend, social_views._do_login)  # pylint: disable=protected-access
+        actions.do_complete(request.backend, social_views._do_login,  # pylint: disable=protected-access
+                            request=request)
 
         with self._patch_edxmako_current_request(strategy.request):
             student_views.signin_user(strategy.request)
             student_views.login_user(strategy.request)
-            actions.do_complete(request.backend, social_views._do_login, user=user)  # pylint: disable=protected-access
+            actions.do_complete(request.backend, social_views._do_login,  # pylint: disable=protected-access
+                                user=user, request=request)
 
         # Monkey-patch storage for messaging; pylint: disable=protected-access
         request._messages = fallback.FallbackStorage(request)
@@ -754,7 +759,8 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # Next, the provider makes a request against /auth/complete/<provider>
         # to resume the pipeline.
         # pylint: disable=protected-access
-        self.assert_redirect_to_login_looks_correct(actions.do_complete(request.backend, social_views._do_login))
+        self.assert_redirect_to_login_looks_correct(actions.do_complete(request.backend, social_views._do_login,
+                                                                        request=request))
 
         # At this point we know the pipeline has resumed correctly. Next we
         # fire off the view that displays the login form and posts it via JS.
@@ -770,21 +776,22 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # the "logged in" cookie for the marketing site.
         self.assert_logged_in_cookie_redirect(actions.do_complete(
             request.backend, social_views._do_login, request.user, None,  # pylint: disable=protected-access
-            redirect_field_name=auth.REDIRECT_FIELD_NAME
+            redirect_field_name=auth.REDIRECT_FIELD_NAME, request=request
         ))
 
         # Set the cookie and try again
         self.set_logged_in_cookies(request)
 
         self.assert_redirect_to_dashboard_looks_correct(
-            actions.do_complete(request.backend, social_views._do_login, user=user))
+            actions.do_complete(request.backend, social_views._do_login, user=user, request=request))
         self.assert_account_settings_context_looks_correct(account_settings_context(request))
 
     def test_signin_fails_if_account_not_active(self):
         _, strategy = self.get_request_and_strategy(
             auth_entry=pipeline.AUTH_ENTRY_LOGIN, redirect_uri='social:complete')
         strategy.request.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
-        user = self.create_user_models_for_existing_account(strategy, 'user@example.com', 'password', self.get_username())
+        user = self.create_user_models_for_existing_account(strategy, 'user@example.com', 'password',
+                                                            self.get_username())
 
         user.is_active = False
         user.save()
@@ -833,7 +840,8 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
 
         # Next, the provider makes a request against /auth/complete/<provider>.
         # pylint: disable=protected-access
-        self.assert_redirect_to_register_looks_correct(actions.do_complete(request.backend, social_views._do_login))
+        self.assert_redirect_to_register_looks_correct(actions.do_complete(request.backend, social_views._do_login,
+                                                                           request=request))
 
         # At this point we know the pipeline has resumed correctly. Next we
         # fire off the view that displays the registration form.
@@ -875,13 +883,13 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # the "logged in" cookie for the marketing site.
         self.assert_logged_in_cookie_redirect(actions.do_complete(
             request.backend, social_views._do_login, request.user, None,  # pylint: disable=protected-access
-            redirect_field_name=auth.REDIRECT_FIELD_NAME
+            redirect_field_name=auth.REDIRECT_FIELD_NAME, request=request
         ))
 
         # Set the cookie and try again
         self.set_logged_in_cookies(request)
         self.assert_redirect_to_dashboard_looks_correct(
-            actions.do_complete(strategy.request.backend, social_views._do_login, user=created_user))
+            actions.do_complete(strategy.request.backend, social_views._do_login, user=created_user, request=request))
         # Now the user has been redirected to the dashboard. Their third party account should now be linked.
         self.assert_social_auth_exists_for_user(created_user, strategy)
         self.assert_account_settings_context_looks_correct(account_settings_context(request), linked=True)
@@ -898,7 +906,8 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
         # If learner already has an account then make sure login page is served instead of registration.
         # pylint: disable=protected-access
-        self.assert_redirect_to_login_looks_correct(actions.do_complete(backend, social_views._do_login))
+        self.assert_redirect_to_login_looks_correct(actions.do_complete(backend, social_views._do_login,
+                                                                        request=request))
         distinct_username = pipeline.get(request)['kwargs']['username']
         self.assertNotEqual(original_username, distinct_username)
 
@@ -908,7 +917,8 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         backend = strategy.request.backend
         backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
         # pylint: disable=protected-access
-        self.assert_redirect_to_register_looks_correct(actions.do_complete(backend, social_views._do_login))
+        self.assert_redirect_to_register_looks_correct(actions.do_complete(backend, social_views._do_login,
+                                                                           request=request))
 
         with self._patch_edxmako_current_request(request):
             self.assert_register_response_in_pipeline_looks_correct(
@@ -938,7 +948,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         self.assertEqual(response.url, reverse('signin_user'))
 
 
-# pylint: disable=test-inherits-tests, abstract-method
+# pylint: disable=abstract-method
 @django_utils.override_settings(ECOMMERCE_API_URL=TEST_API_URL)
 class Oauth2IntegrationTest(IntegrationTest):
     """Base test case for integration tests of Oauth2 providers."""
