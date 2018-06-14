@@ -69,15 +69,12 @@ END
 
 }
 
-if [[ $DJANGO_VERSION == '1.11' ]]; then
-    TOX="tox -r -e py27-django111 --"
-elif [[ $DJANGO_VERSION == '1.10' ]]; then
-    TOX="tox -r -e py27-django110 --"
-elif [[ $DJANGO_VERSION == '1.9' ]]; then
-    TOX="tox -r -e py27-django19 --"
+if [ -n "${TOX_ENV}" ]; then
+    TOX="tox -r -e ${TOX_ENV} --"
 else
     TOX=""
 fi
+
 PAVER_ARGS="-v"
 PARALLEL="--processes=-1"
 export SUBSET_JOB=$JOB_NAME
