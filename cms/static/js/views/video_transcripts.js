@@ -22,6 +22,7 @@ define(
                 this.transcripts = options.transcripts;
                 this.edxVideoID = options.edxVideoID;
                 this.clientVideoID = options.clientVideoID;
+                this.transcriptionStatus = options.transcriptionStatus;
                 this.transcriptAvailableLanguages = options.transcriptAvailableLanguages;
                 this.videoSupportedFileFormats = options.videoSupportedFileFormats;
                 this.videoTranscriptSettings = options.videoTranscriptSettings;
@@ -337,6 +338,7 @@ define(
                     this.$el,
                     this.template({
                         transcripts: this.transcripts,
+                        transcription_status: this.transcriptionStatus,
                         transcriptAvailableLanguages: this.transcriptAvailableLanguages,
                         edxVideoID: this.edxVideoID,
                         transcriptClientTitle: this.getTranscriptClientTitle(),

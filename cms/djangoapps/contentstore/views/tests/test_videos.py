@@ -236,7 +236,8 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
                     'duration',
                     'status',
                     'course_video_image_url',
-                    'transcripts'
+                    'transcripts',
+                    'transcription_status'
                 ])
             )
             dateutil.parser.parse(response_video['created'])
@@ -249,8 +250,10 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
 
     @ddt.data(
         (
-            ['edx_video_id', 'client_video_id', 'created', 'duration', 'status', 'course_video_image_url',
-                'transcripts'],
+            [
+                'edx_video_id', 'client_video_id', 'created', 'duration',
+                'status', 'course_video_image_url', 'transcripts', 'transcription_status',
+            ],
             [
                 {
                     'video_id': 'test1',
@@ -263,8 +266,10 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
             ['en']
         ),
         (
-            ['edx_video_id', 'client_video_id', 'created', 'duration', 'status', 'course_video_image_url',
-                'transcripts'],
+            [
+                'edx_video_id', 'client_video_id', 'created', 'duration',
+                'status', 'course_video_image_url', 'transcripts', 'transcription_status',
+            ],
             [
                 {
                     'video_id': 'test1',
@@ -583,9 +588,20 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         status = convert_video_status(video)
         self.assertEqual(status, StatusDisplayStrings.get('youtube_duplicate'))
 
+        # `transcript_ready` should be converted to `file_complete`
+        video['status'] = 'transcript_ready'
+        status = convert_video_status(video)
+        self.assertEqual(status, StatusDisplayStrings.get('file_complete'))
+
+        # The encode status should be converted to `file_complete` if video encodes are complete
+        video['status'] = 'transcription_in_progress'
+        status = convert_video_status(video, is_video_encodes_ready=True)
+        self.assertEqual(status, StatusDisplayStrings.get('file_complete'))
+
         # for all other status, there should not be any conversion
         statuses = StatusDisplayStrings._STATUS_MAP.keys()  # pylint: disable=protected-access
         statuses.remove('invalid_token')
+        statuses.remove('transcript_ready')
         for status in statuses:
             video['status'] = status
             new_status = convert_video_status(video)
@@ -634,6 +650,39 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         self.assertEqual(response.status_code, 204)
 
         self.assert_video_status(url, edx_video_id, 'Failed')
+
+    @ddt.data(
+        ('test_video_token', "Transcription in Progress"),
+        ('', "Ready"),
+    )
+    @ddt.unpack
+    def test_video_transcript_status_conversion(self, course_video_upload_token, expected_video_status_text):
+        """
+        Verifies that video status `transcription_in_progress` gets converted
+        correctly into the `file_complete` for the new video workflow and
+        stays as it is, for the old video workflow.
+        """
+        self.course.video_upload_pipeline = {
+            'course_video_upload_token': course_video_upload_token
+        }
+        self.save_course()
+
+        url = self.get_url_for_course_key(self.course.id)
+        edx_video_id = 'test1'
+        self.assert_video_status(url, edx_video_id, 'Uploading')
+
+        response = self.client.post(
+            url,
+            json.dumps([{
+                'edxVideoId': edx_video_id,
+                'status': 'transcription_in_progress',
+                'message': 'Transcription is in progress'
+            }]),
+            content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 204)
+
+        self.assert_video_status(url, edx_video_id, expected_video_status_text)
 
     @ddt.data(True, False)
     @patch('openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled')

@@ -8,6 +8,8 @@
         </span>
         </strong>
     </button>
+<% } else if (transcription_status) { %>
+    <span class='transcripts-empty-text'><%- transcription_status %></span>
 <% } else { %>
     <span class='transcripts-empty-text'><%- gettext('No transcript uploaded.') %></span>
 <% }%>

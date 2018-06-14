@@ -499,7 +499,7 @@ def _get_and_validate_course(course_key_string, user):
         return None
 
 
-def convert_video_status(video):
+def convert_video_status(video, is_video_encodes_ready=False):
     """
     Convert status of a video. Status can be converted to one of the following:
 
@@ -524,6 +524,8 @@ def convert_video_status(video):
         ])
     elif video['status'] == 'invalid_token':
         status = StatusDisplayStrings.get('youtube_duplicate')
+    elif is_video_encodes_ready or video['status'] == 'transcript_ready':
+        status = StatusDisplayStrings.get('file_complete')
     else:
         status = StatusDisplayStrings.get(video['status'])
 
@@ -536,10 +538,26 @@ def _get_videos(course):
     """
     videos = list(get_videos_for_course(unicode(course.id), VideoSortField.created, SortDirection.desc))
 
+    # This is required to see if edx video pipeline is enabled while converting the video status.
+    course_video_upload_token = course.video_upload_pipeline.get('course_video_upload_token')
+
     # convert VAL's status to studio's Video Upload feature status.
     for video in videos:
-        video["status"] = convert_video_status(video)
+        # If we are using "new video workflow" and status is `transcription_in_progress` then video encodes are ready.
+        # This is because Transcription starts once all the encodes are complete except for YT, but according to
+        # "new video workflow" YT is disabled as well as deprecated. So, Its precise to say that the Transcription
+        # starts once all the encodings are complete *for the new video workflow*.
+        is_video_encodes_ready = not course_video_upload_token and video['status'] == 'transcription_in_progress'
+        # Update with transcript languages
         video['transcripts'] = get_available_transcript_languages(video_id=video['edx_video_id'])
+        # Transcription status should only be visible if 3rd party transcripts are pending.
+        video['transcription_status'] = (
+            StatusDisplayStrings.get(video['status'])
+            if not video['transcripts'] and is_video_encodes_ready else
+            ''
+        )
+        # Convert the video status.
+        video['status'] = convert_video_status(video, is_video_encodes_ready)
 
     return videos
 
@@ -556,7 +574,10 @@ def _get_index_videos(course):
     Returns the information about each video upload required for the video list
     """
     course_id = unicode(course.id)
-    attrs = ['edx_video_id', 'client_video_id', 'created', 'duration', 'status', 'courses', 'transcripts']
+    attrs = [
+        'edx_video_id', 'client_video_id', 'created', 'duration',
+        'status', 'courses', 'transcripts', 'transcription_status',
+    ]
 
     def _get_values(video):
         """

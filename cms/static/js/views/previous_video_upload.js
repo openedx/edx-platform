@@ -33,6 +33,7 @@ define(
                     transcripts: this.model.get('transcripts'),
                     edxVideoID: this.model.get('edx_video_id'),
                     clientVideoID: this.model.get('client_video_id'),
+                    transcriptionStatus: this.model.get('transcription_status'),
                     transcriptAvailableLanguages: options.transcriptAvailableLanguages,
                     videoSupportedFileFormats: options.videoSupportedFileFormats,
                     videoTranscriptSettings: options.videoTranscriptSettings
