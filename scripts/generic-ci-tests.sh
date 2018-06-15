@@ -69,10 +69,16 @@ END
 
 }
 
-if [ -n "${TOX_ENV}" ]; then
+# if specified tox environment is supported, prepend paver commands
+# with tox env invocation
+if [ -z ${TOX_ENV+x} ] || [[ ${TOX_ENV} == 'null' ]]; then
+    TOX=""
+elif tox -l |grep -q "${TOX_ENV}"; then
     TOX="tox -r -e ${TOX_ENV} --"
 else
-    TOX=""
+    echo "${TOX_ENV} is not currently supported. Please review the"
+    echo "tox.ini file to see which environments are supported"
+    exit 1
 fi
 
 PAVER_ARGS="-v"
