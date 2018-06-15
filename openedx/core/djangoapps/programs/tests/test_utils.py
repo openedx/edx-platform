@@ -17,6 +17,8 @@ from pytz import utc
 
 from course_modes.models import CourseMode
 from entitlements.tests.factories import CourseEntitlementFactory
+from waffle.testutils import override_switch
+
 from lms.djangoapps.certificates.api import MODES
 from lms.djangoapps.commerce.tests.test_utils import update_commerce_config
 from lms.djangoapps.commerce.utils import EcommerceService
@@ -28,6 +30,10 @@ from openedx.core.djangoapps.catalog.tests.factories import (
     ProgramFactory,
     SeatFactory,
     generate_course_run_key
+)
+from openedx.core.djangoapps.programs import (
+    PROGRAMS_WAFFLE_SWITCH_NAMESPACE,
+    ALWAYS_CALCULATE_PROGRAM_PRICE_AS_ANONYMOUS_USER
 )
 from openedx.core.djangoapps.programs.tests.factories import ProgressFactory
 from openedx.core.djangoapps.programs.utils import (
@@ -1534,6 +1540,31 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
             [course['course_runs'][0]['seats'][0]['sku'] for course in self.program['courses']]
         )
         self.assertEqual(data['discount_data'], mock_discount_data)
+
+    @httpretty.activate
+    @override_switch("{}.{}".format(
+        PROGRAMS_WAFFLE_SWITCH_NAMESPACE.name,
+        ALWAYS_CALCULATE_PROGRAM_PRICE_AS_ANONYMOUS_USER.switch_name
+    ), active=True)
+    def test_fetching_program_price_when_forced_as_anonymous_user(self):
+        """
+        When all users are forced as anonymous, all requests to calculate the program
+        price should have the query parameter is_anonymous=True
+        """
+        self._prepare_program_for_discounted_price_calculation_endpoint()
+        mock_discount_data = {
+            'total_incl_tax_excl_discounts': 200.0,
+            'currency': 'USD',
+            'total_incl_tax': 50.0
+        }
+        httpretty.register_uri(
+            httpretty.GET,
+            self.ECOMMERCE_CALCULATE_DISCOUNT_ENDPOINT,
+            body=json.dumps(mock_discount_data),
+            content_type='application/json'
+        )
+        ProgramMarketingDataExtender(self.program, self.user).extend()
+        self.assertEqual(httpretty.last_request().querystring.get('is_anonymous')[0], u'True')
 
     @httpretty.activate
     def test_fetching_program_discounted_price_as_anonymous_user(self):

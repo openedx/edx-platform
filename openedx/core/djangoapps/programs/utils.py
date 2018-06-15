@@ -28,6 +28,7 @@ from openedx.core.djangoapps.catalog.utils import get_programs, get_fulfillable_
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credentials.utils import get_credentials
+from openedx.core.djangoapps.programs import ALWAYS_CALCULATE_PROGRAM_PRICE_AS_ANONYMOUS_USER
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from student.models import CourseEnrollment
 from util.date_utils import strftime_localized
@@ -614,8 +615,9 @@ class ProgramDataExtender(object):
 
                 api = ecommerce_api_client(api_user)
 
-                # Make an API call to calculate the discounted price
-                if is_anonymous:
+                # The user specific program price is slow to calculate, so use switch to force the
+                # anonymous price for all users. See LEARNER-5555 for more details.
+                if is_anonymous or ALWAYS_CALCULATE_PROGRAM_PRICE_AS_ANONYMOUS_USER.is_enabled():
                     discount_data = api.baskets.calculate.get(sku=skus, is_anonymous=True)
                 else:
                     discount_data = api.baskets.calculate.get(sku=skus, username=self.user.username)
