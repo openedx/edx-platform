@@ -1,8 +1,6 @@
 /* globals _ */
-/* RequireJS */
 (function(require, $) {
     'use strict';
-
     // In the case when the Video constructor will be called before RequireJS finishes loading all of the Video
     // dependencies, we will have a mock function that will collect all the elements that must be initialized as
     // Video elements.
@@ -23,7 +21,7 @@
                     window.Video(el);
                 });
 
-                return null;
+                return;
             }
 
             // If normal call to `window.Video` constructor, store the element for later initializing.
@@ -36,10 +34,6 @@
 
     // Main module.
     require(
-/* End RequireJS */
-    /* Webpack
-    define(
-    /* End Webpack */
         [
             'video/00_video_storage.js',
             'video/01_initialize.js',
@@ -73,13 +67,8 @@
             VideoBumper, VideoSaveStatePlugin, VideoEventsPlugin, VideoEventsBumperPlugin, VideoPoster,
             VideoCompletionHandler, VideoCommands, VideoContextMenu
         ) {
-            /* RequireJS */
             var youtubeXhr = null,
                 oldVideo = window.Video;
-            /* End RequireJS */
-            /* Webpack
-            var youtubeXhr = null;
-            /* End Webpack */
 
             window.Video = function(element) {
                 var el = $(element).find('.video'),
@@ -128,15 +117,14 @@
                         initialize(innerState, element);
                     };
                 };
-                var onSequenceChange;
 
-                VideoAccessibleMenu(el, {
+                new VideoAccessibleMenu(el, {
                     storage: storage,
                     saveStateUrl: state.metadata.saveStateUrl
                 });
 
                 if (bumperMetadata) {
-                    VideoPoster(el, {
+                    new VideoPoster(el, {
                         poster: el.data('poster'),
                         onClick: _.once(function() {
                             var mainVideoPlayer = player(state);
@@ -163,7 +151,7 @@
                 }
 
                 el.data('video-player-state', state);
-                onSequenceChange = function() {
+                var onSequenceChange = function onSequenceChange() {
                     if (state && state.videoPlayer) {
                         state.videoPlayer.destroy();
                     }
@@ -182,13 +170,9 @@
 
             window.Video.loadYouTubeIFrameAPI = initialize.prototype.loadYouTubeIFrameAPI;
 
-            /* RequireJS */
             // Invoke the mock Video constructor so that the elements stored within it can be processed by the real
             // `window.Video` constructor.
             oldVideo(null, true);
-            /* End RequireJS */
         }
     );
-/* RequireJS */
 }(window.RequireJS.require, window.jQuery));
-/* End RequireJS */

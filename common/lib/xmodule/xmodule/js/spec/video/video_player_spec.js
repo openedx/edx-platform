@@ -1,11 +1,9 @@
-/* global YT */
-
-(function(require, define, undefined) {
+(function(requirejs, require, define, undefined) {
     'use strict';
 
     require(
-['video/03_video_player.js', 'hls', 'underscore'],
-function(VideoPlayer, HLS, _) {
+['video/03_video_player.js', 'hls'],
+function(VideoPlayer, HLS) {
     describe('VideoPlayer', function() {
         var STATUS = window.STATUS,
             state,
@@ -1067,4 +1065,4 @@ function(VideoPlayer, HLS, _) {
         });
     });
 });
-}(require, define));
+}(RequireJS.requirejs, RequireJS.require, RequireJS.define));
