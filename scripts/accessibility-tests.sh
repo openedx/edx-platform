@@ -7,23 +7,25 @@ set -e
 #
 #   Execute the accessibility tests for edx-platform.
 #
-#   If the optional `DJANGO_VERSION` environment variable is defined, it
-#   specifies which version of Django should be installed when running the
-#   tests inside a `tox` virtualenv.  If undefined, the tests are run using
-#   the currently active Python environment.
+#   If the optional `TOX_ENV` environment variable is defined, it
+#   specifies which version of Python and Django should be installed when
+#   running the tests inside a `tox` virtualenv.  If undefined, the tests are
+#   run using the currently active Python environment. For more information
+#   on what versions are supported, check the tox.ini file.
 #
 ###############################################################################
 
-if [[ $DJANGO_VERSION == '1.11' ]]; then
-    TOX="tox -r -e py27-django111 --"
-elif [[ $DJANGO_VERSION == '1.10' ]]; then
-    TOX="tox -r -e py27-django110 --"
-elif [[ $DJANGO_VERSION == '1.9' ]]; then
-    TOX="tox -r -e py27-django19 --"
-else
+# if specified tox environment is supported, prepend paver commands
+# with tox env invocation
+if [ -z ${TOX_ENV+x} ] || [[ ${TOX_ENV} == 'null' ]]; then
     TOX=""
+elif tox -l |grep -q "${TOX_ENV}"; then
+    TOX="tox -r -e ${TOX_ENV} --"
+else
+    echo "${TOX_ENV} is not currently supported. Please review the"
+    echo "tox.ini file to see which environments are supported"
+    exit 1
 fi
-
 
 echo "Setting up for accessibility tests..."
 source scripts/jenkins-common.sh
