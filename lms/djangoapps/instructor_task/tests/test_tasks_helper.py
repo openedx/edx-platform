@@ -414,7 +414,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
 
         RequestCache.clear_request_cache()
 
-        expected_query_count = 43
+        expected_query_count = 44
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
             with check_mongo_calls(mongo_count):
                 with self.assertNumQueries(expected_query_count):
@@ -2739,17 +2739,17 @@ class SensitiveMessageTestCase(TestCase):
     def setUp(self):
         self.reports = SensitiveMessageOnReports()
 
-    @patch("instructor_task.tasks_helper.utils.render_to_string")
+    @patch('lms.djangoapps.instructor_task.tasks_helper.utils.render_to_string')
     def test_process_message(self, render_mock):
         """
         Verify if the template is rendering the content.
         """
         self.reports.process_message()
-        template_name = "instructor/instructor_dashboard_2/sensitive_data_download_msg.txt"
+        template_name = 'instructor/instructor_dashboard_2/sensitive_data_download_msg.txt'
         render_mock.assert_called_once_with(template_name, None)
 
-    @override_switch('display_sensitive_data_msg_for_downloads',active=True)
-    @patch("instructor_task.tasks_helper.utils.SensitiveMessageOnReports.process_message")
+    @override_switch('display_sensitive_data_msg_for_downloads', active=True)
+    @patch('lms.djangoapps.instructor_task.tasks_helper.utils.SensitiveMessageOnReports.process_message')
     def test_build_csv_directly_with_flag(self, process_message_mock):
         """
         Verify if the CSV is built directly with CSV library and the message
@@ -2766,7 +2766,7 @@ class SensitiveMessageTestCase(TestCase):
         process_message_mock.assert_called_with()
         rows.assert_called()
 
-    @patch("instructor_task.tasks_helper.utils.SensitiveMessageOnReports.process_message")
+    @patch('lms.djangoapps.instructor_task.tasks_helper.utils.SensitiveMessageOnReports.process_message')
     def test_build_csv_with_report_store(self, process_message_mock):
         """
         Verify if the template is being called when the CSV will be built with

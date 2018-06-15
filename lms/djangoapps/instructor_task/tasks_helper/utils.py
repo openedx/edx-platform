@@ -39,6 +39,7 @@ def upload_csv_to_report_store(rows, csv_name, course_id, timestamp, config_name
         course_prefix=course_filename_prefix_generator(course_id),
         csv_name=csv_name,
         timestamp_str=timestamp.strftime("%Y-%m-%d-%H%M")
+    )
 
     disclaimer = SensitiveMessageOnReports()
     if disclaimer.should_msg_be_displayed:
@@ -60,8 +61,8 @@ def tracker_emit(report_name):
 
 class SensitiveMessageOnReports(object):
     """
-    Adds a sensitive data message to the reports if the flag
-    DISPLAY_SENSITIVE_DATA_MSG_FOR_DOWNLOADS is enabled.
+    Adds a sensitive data message to the reports if the waffle switch
+    display_sensitive_data_msg_for_downloads is enabled.
 
     Due to reports being generated in different ways, each one handles their own way:
         1. Using the CSV library directly.
@@ -70,8 +71,8 @@ class SensitiveMessageOnReports(object):
     """
 
     def __init__(self):
-            self.should_msg_be_displayed = waffle.switch_is_active('display_sensitive_data_msg_for_downloads')
-        
+        self.should_msg_be_displayed = waffle.switch_is_active('display_sensitive_data_msg_for_downloads')
+
     def csv_direct(self, writer):
         """
         Writes the row immediately in the CSV.
