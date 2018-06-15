@@ -23,7 +23,6 @@ from xmodule.studio_editable import StudioEditableBlock
 from xmodule.x_module import STUDENT_VIEW, XModuleFields
 from xmodule.xml_module import XmlParserMixin
 
-import webpack_loader.utils
 
 log = logging.getLogger(__name__)
 
@@ -134,8 +133,7 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
             'completion_delay_ms': self.get_completion_delay_ms(completion_service),
         }))
 
-        for tag in webpack_loader.utils.get_as_tags('VerticalStudentView'):
-            fragment.add_resource(tag, mimetype='text/html', placement='head')
+        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/vertical_student_view.js'))
         fragment.initialize_js('VerticalStudentView')
 
         return fragment

@@ -60,7 +60,7 @@ django-statici18n==1.4.0
 django-storages==1.4.1
 django-user-tasks
 django-waffle==0.12.0
-django-webpack-loader               # Used to wire webpack bundles into the django asset pipeline
+django-webpack-loader==0.4.1
 djangorestframework-jwt
 dogapi==1.2.1                       # Python bindings to Datadog's API, for metrics gathering
 edx-ace==0.1.8
