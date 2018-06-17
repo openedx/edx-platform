@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-06-12 10:20+0000\n"
-"PO-Revision-Date: 2018-06-12 10:20:47.199482\n"
+"POT-Creation-Date: 2018-06-17 20:37+0000\n"
+"PO-Revision-Date: 2018-06-17 20:37:17.443299\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -22716,18 +22716,46 @@ msgid "What content is exported?"
 msgstr "صاشف ذخرفثرف هس ثطحخقفثي?"
 
 #: cms/templates/export.html
+msgid "The following content is exported."
+msgstr "فاث بخممخصهرل ذخرفثرف هس ثطحخقفثي."
+
+#: cms/templates/export.html cms/templates/import.html
+msgid "Course content and structure"
+msgstr "ذخعقسث ذخرفثرف شري سفقعذفعقث"
+
+#: cms/templates/export.html cms/templates/import.html
+msgid "Course dates"
+msgstr "ذخعقسث يشفثس"
+
+#: cms/templates/export.html cms/templates/import.html
+msgid "Grading policy"
+msgstr "لقشيهرل حخمهذغ"
+
+#: cms/templates/export.html cms/templates/import.html
+msgid "Any group configurations"
+msgstr "شرغ لقخعح ذخربهلعقشفهخرس"
+
+#: cms/templates/export.html cms/templates/import.html
 msgid ""
-"The course content and structure (including sections, subsections, and "
-"units) are exported. Values from Advanced Settings, including MATLAB API "
-"keys and LTI passports, are also exported. Other data, including student "
-"data, grading information, discussion forum data, course settings, and "
-"course team information, is not exported."
+"Settings on the Advanced Settings page, including MATLAB API keys and LTI "
+"passports"
 msgstr ""
-"فاث ذخعقسث ذخرفثرف شري سفقعذفعقث (هرذمعيهرل سثذفهخرس, سعزسثذفهخرس, شري "
-"عرهفس) شقث ثطحخقفثي. دشمعثس بقخو شيدشرذثي سثففهرلس, هرذمعيهرل وشفمشز شحه "
-"نثغس شري مفه حشسسحخقفس, شقث شمسخ ثطحخقفثي. خفاثق يشفش, هرذمعيهرل سفعيثرف "
-"يشفش, لقشيهرل هربخقوشفهخر, يهسذعسسهخر بخقعو يشفش, ذخعقسث سثففهرلس, شري "
-"ذخعقسث فثشو هربخقوشفهخر, هس رخف ثطحخقفثي."
+"سثففهرلس خر فاث شيدشرذثي سثففهرلس حشلث, هرذمعيهرل وشفمشز شحه نثغس شري مفه "
+"حشسسحخقفس"
+
+#: cms/templates/export.html
+msgid "The following content is not exported."
+msgstr "فاث بخممخصهرل ذخرفثرف هس رخف ثطحخقفثي."
+
+#: cms/templates/export.html cms/templates/import.html
+msgid ""
+"Learner-specific content, such as learner grades and discussion forum data"
+msgstr ""
+"مثشقرثق-سحثذهبهذ ذخرفثرف, سعذا شس مثشقرثق لقشيثس شري يهسذعسسهخر بخقعو يشفش"
+
+#: cms/templates/export.html cms/templates/import.html
+msgid "The course team"
+msgstr "فاث ذخعقسث فثشو"
 
 #. Translators: ".tar.gz" is a file extension, and should not be translated
 #: cms/templates/export.html
@@ -23390,38 +23418,8 @@ msgid "The following content is imported."
 msgstr "فاث بخممخصهرل ذخرفثرف هس هوحخقفثي."
 
 #: cms/templates/import.html
-msgid "Course content and structure"
-msgstr "ذخعقسث ذخرفثرف شري سفقعذفعقث"
-
-#: cms/templates/import.html
-msgid "Course dates"
-msgstr "ذخعقسث يشفثس"
-
-#: cms/templates/import.html
-msgid "Grading policy"
-msgstr "لقشيهرل حخمهذغ"
-
-#: cms/templates/import.html
-msgid "Any group configurations"
-msgstr "شرغ لقخعح ذخربهلعقشفهخرس"
-
-#: cms/templates/import.html
-msgid "Settings on the Advanced Settings page"
-msgstr "سثففهرلس خر فاث شيدشرذثي سثففهرلس حشلث"
-
-#: cms/templates/import.html
 msgid "The following content is not imported."
 msgstr "فاث بخممخصهرل ذخرفثرف هس رخف هوحخقفثي."
-
-#: cms/templates/import.html
-msgid ""
-"Learner-specific content, such as learner grades and discussion forum data"
-msgstr ""
-"مثشقرثق-سحثذهبهذ ذخرفثرف, سعذا شس مثشقرثق لقشيثس شري يهسذعسسهخر بخقعو يشفش"
-
-#: cms/templates/import.html
-msgid "The course team"
-msgstr "فاث ذخعقسث فثشو"
 
 #: cms/templates/import.html
 msgid "Warning: Importing while a course is running"

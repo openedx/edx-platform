@@ -142,8 +142,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-06-11 13:10+0000\n"
-"PO-Revision-Date: 2018-06-06 14:55+0000\n"
+"POT-Creation-Date: 2018-06-13 13:56+0000\n"
+"PO-Revision-Date: 2018-06-13 13:57+0000\n"
 "Last-Translator: Muhammad Ayub khan <ayubkhan@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "Language: es_419\n"
@@ -2739,7 +2739,7 @@ msgstr "No específico para un curso"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 msgid "What can we help you with, {username}?"
-msgstr "¿En qué podemos ayudarte, {username}?"
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
 #: lms/static/js/instructor_dashboard/util.js
@@ -2777,8 +2777,6 @@ msgstr "Ingrese a  {platform} para que podamos ayudarle mejor."
 msgid ""
 "If you are unable to access your account contact us via email using {email}."
 msgstr ""
-"Si no puedes acceder a tu cuenta, contáctanos por correo electrónico al "
-"{email}."
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid ""
@@ -2808,7 +2806,7 @@ msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid "Search the {platform} Help Center"
-msgstr "Busca en el Centro de Ayuda de {platform} "
+msgstr ""
 
 #: lms/djangoapps/support/static/support/jsx/success.jsx
 msgid "Go to my Dashboard"
@@ -4904,7 +4902,7 @@ msgstr ""
 
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 msgid "Passwords do not match."
-msgstr "Las contraseñas no son iguales."
+msgstr ""
 
 #: lms/static/js/student_account/components/PasswordResetConfirmation.jsx
 msgid "Reset My Password"
@@ -4950,8 +4948,6 @@ msgid ""
 "cannot be undone. EdX will not be able to recover your account or the data "
 "that is deleted."
 msgstr ""
-"Cuidado: la eliminación de tu cuenta y datos personales es permanente e "
-"irreversible. EdX no podrá recuperar ni tu cuenta ni los datos eliminados."
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
@@ -5014,11 +5010,6 @@ msgid ""
 " sites offered by MIT Open Learning, Wharton Executive Education, and "
 "Harvard Medical School."
 msgstr ""
-"Si procedes, no será posible usar esta cuenta para tomar cursos ni en la "
-"aplicación móvil de edX, ni en edx.org, ni en cualquier otro sitio hospedado"
-" por edX. Esto incluye el acceso a edx.org desde el sistema de tu empleador "
-"o universidad, y el acceso a sitios privados ofrecidos por MIT Open "
-"Learning, Wharton Executive Education, y Harvard Medical School."
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid ""
@@ -5030,7 +5021,7 @@ msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "Yes, Delete"
-msgstr "Si, Eliminar"
+msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 msgid "We're sorry to see you go! Your account will be deleted shortly."
