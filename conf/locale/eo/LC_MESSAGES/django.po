@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-06-12 10:20+0000\n"
-"PO-Revision-Date: 2018-06-12 10:20:47.199482\n"
+"POT-Creation-Date: 2018-06-17 20:37+0000\n"
+"PO-Revision-Date: 2018-06-17 20:37:17.443299\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -26070,20 +26070,50 @@ msgid "What content is exported?"
 msgstr "Whät çöntént ïs éxpörtéd? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: cms/templates/export.html
-msgid ""
-"The course content and structure (including sections, subsections, and "
-"units) are exported. Values from Advanced Settings, including MATLAB API "
-"keys and LTI passports, are also exported. Other data, including student "
-"data, grading information, discussion forum data, course settings, and "
-"course team information, is not exported."
+msgid "The following content is exported."
 msgstr ""
-"Thé çöürsé çöntént änd strüçtüré (ïnçlüdïng séçtïöns, süßséçtïöns, änd "
-"ünïts) äré éxpörtéd. Välüés fröm Àdvänçéd Séttïngs, ïnçlüdïng MÀTLÀB ÀPÌ "
-"kéýs änd LTÌ pässpörts, äré älsö éxpörtéd. Öthér dätä, ïnçlüdïng stüdént "
-"dätä, grädïng ïnförmätïön, dïsçüssïön förüm dätä, çöürsé séttïngs, änd "
-"çöürsé téäm ïnförmätïön, ïs nöt éxpörtéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
-"∂σł#"
+"Thé föllöwïng çöntént ïs éxpörtéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: cms/templates/export.html cms/templates/import.html
+msgid "Course content and structure"
+msgstr "Çöürsé çöntént änd strüçtüré Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: cms/templates/export.html cms/templates/import.html
+msgid "Course dates"
+msgstr "Çöürsé dätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: cms/templates/export.html cms/templates/import.html
+msgid "Grading policy"
+msgstr "Grädïng pölïçý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: cms/templates/export.html cms/templates/import.html
+msgid "Any group configurations"
+msgstr "Àný gröüp çönfïgürätïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: cms/templates/export.html cms/templates/import.html
+msgid ""
+"Settings on the Advanced Settings page, including MATLAB API keys and LTI "
+"passports"
+msgstr ""
+"Séttïngs ön thé Àdvänçéd Séttïngs pägé, ïnçlüdïng MÀTLÀB ÀPÌ kéýs änd LTÌ "
+"pässpörts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: cms/templates/export.html
+msgid "The following content is not exported."
+msgstr ""
+"Thé föllöwïng çöntént ïs nöt éxpörtéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: cms/templates/export.html cms/templates/import.html
+msgid ""
+"Learner-specific content, such as learner grades and discussion forum data"
+msgstr ""
+"Léärnér-spéçïfïç çöntént, süçh äs léärnér grädés änd dïsçüssïön förüm dätä "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
+
+#: cms/templates/export.html cms/templates/import.html
+msgid "The course team"
+msgstr "Thé çöürsé téäm Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #. Translators: ".tar.gz" is a file extension, and should not be translated
 #: cms/templates/export.html
@@ -26880,43 +26910,10 @@ msgstr ""
 "Thé föllöwïng çöntént ïs ïmpörtéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: cms/templates/import.html
-msgid "Course content and structure"
-msgstr "Çöürsé çöntént änd strüçtüré Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#: cms/templates/import.html
-msgid "Course dates"
-msgstr "Çöürsé dätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: cms/templates/import.html
-msgid "Grading policy"
-msgstr "Grädïng pölïçý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
-
-#: cms/templates/import.html
-msgid "Any group configurations"
-msgstr "Àný gröüp çönfïgürätïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
-
-#: cms/templates/import.html
-msgid "Settings on the Advanced Settings page"
-msgstr ""
-"Séttïngs ön thé Àdvänçéd Séttïngs pägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
-
-#: cms/templates/import.html
 msgid "The following content is not imported."
 msgstr ""
 "Thé föllöwïng çöntént ïs nöt ïmpörtéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
-
-#: cms/templates/import.html
-msgid ""
-"Learner-specific content, such as learner grades and discussion forum data"
-msgstr ""
-"Léärnér-spéçïfïç çöntént, süçh äs léärnér grädés änd dïsçüssïön förüm dätä "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
-
-#: cms/templates/import.html
-msgid "The course team"
-msgstr "Thé çöürsé téäm Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: cms/templates/import.html
 msgid "Warning: Importing while a course is running"
