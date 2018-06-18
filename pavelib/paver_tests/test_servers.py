@@ -123,7 +123,7 @@ class TestPaverServerTasks(PaverTestCase):
         Test the "devstack" task.
         """
         options = server_options.copy()
-        if 'settings' in options or('optimized' in options and 'fast' not in options):
+        if 'settings' in options or ('optimized' in options and 'fast' not in options):
             rsync_output = True
         else:
             rsync_output = False
@@ -299,16 +299,10 @@ class TestPaverServerTasks(PaverTestCase):
 
             expected_messages.append(first)
             expected_messages.append(second)
-            if system == 'lms':
-                expected_messages.append(first)
-                expected_messages.append(second)
-                expected_messages.append(first)
-                expected_messages.append(second)
 
         if not no_contracts:
             expected_run_server_command += " --contracts"
         expected_messages.append(expected_run_server_command)
-
         self.assertEquals(self.task_messages, expected_messages)
 
     def verify_run_all_servers_task(self, options):

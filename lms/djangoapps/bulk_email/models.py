@@ -230,10 +230,9 @@ class CourseEmail(Email):
     class Meta(object):
         app_label = "bulk_email"
 
-    DEFAULT_FROM_EMAIL = (
-        settings.FEATURES.get('BULK_EMAIL_FROM_DIFFERENT_ADDRESSES') and None
-        or getattr(settings, 'BULK_EMAIL_DEFAULT_FROM_EMAIL', None)
-    )
+    DEFAULT_FROM_EMAIL = (settings.FEATURES.get('BULK_EMAIL_FROM_DIFFERENT_ADDRESSES')
+                    and None
+                    or getattr(settings, 'BULK_EMAIL_DEFAULT_FROM_EMAIL', None))
 
     course_id = CourseKeyField(max_length=255, db_index=True)
     # to_option is deprecated and unused, but dropping db columns is hard so it's still here for legacy reasons
@@ -473,4 +472,4 @@ class BulkEmailFlag(ConfigurationModel):
         return u"BulkEmailFlag: enabled {}, require_course_email_auth: {}".format(
             current_model.is_enabled(),
             current_model.require_course_email_auth
-        )
+)

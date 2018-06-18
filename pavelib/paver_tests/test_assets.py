@@ -313,6 +313,7 @@ class TestUpdateAssetsTask(PaverTestCase):
         """
         Scoped test that only looks at what is passed to the collecstatic options
         """
+
         with patch('django.conf.settings', settings):
             with patch('os.environ.setdefault', MagicMock()) as magic_mock:
                 with patch('pavelib.assets.get_static_collector_root', Mock()) as mock:
