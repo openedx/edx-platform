@@ -14,6 +14,7 @@ from django.utils.timezone import UTC
 from django.test.utils import override_settings
 
 from contentstore.utils import reverse_course_url, reverse_usage_url
+from milestones.models import MilestoneRelationshipType
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
 from models.settings.encoder import CourseSettingsEncoder
@@ -21,6 +22,7 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import UserFactory
+from util import milestones_helpers
 from xblock_django.models import XBlockStudioConfigurationFlag
 from xmodule.fields import Date
 from xmodule.modulestore import ModuleStoreEnum
@@ -103,6 +105,9 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         resp = self.client.ajax_post(url, payload)
         self.compare_details_with_encoding(json.loads(resp.content), details.__dict__, field + str(val))
 
+        MilestoneRelationshipType.objects.get_or_create(name='requires')
+        MilestoneRelationshipType.objects.get_or_create(name='fulfills')
+
     @staticmethod
     def convert_datetime_to_iso(datetime_obj):
         """
@@ -175,6 +180,9 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
     def test_pre_requisite_course_update_and_fetch(self):
+        self.assertFalse(milestones_helpers.any_unfulfilled_milestones(self.course.id, self.user.id),
+                         msg='The initial empty state should be: no prerequisite courses')
+
         url = get_url(self.course.id)
         resp = self.client.get_json(url)
         course_detail_json = json.loads(resp.content)
@@ -193,12 +201,18 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         course_detail_json = json.loads(resp.content)
         self.assertEqual(pre_requisite_course_keys, course_detail_json['pre_requisite_courses'])
 
+        self.assertTrue(milestones_helpers.any_unfulfilled_milestones(self.course.id, self.user.id),
+                        msg='Should have prerequisite courses')
+
         # remove pre requisite course
         course_detail_json['pre_requisite_courses'] = []
         self.client.ajax_post(url, course_detail_json)
         resp = self.client.get_json(url)
         course_detail_json = json.loads(resp.content)
         self.assertEqual([], course_detail_json['pre_requisite_courses'])
+
+        self.assertFalse(milestones_helpers.any_unfulfilled_milestones(self.course.id, self.user.id),
+                         msg='Should not have prerequisite courses anymore')
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
     def test_invalid_pre_requisite_course(self):
@@ -271,6 +285,14 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
 
     @unittest.skipUnless(settings.FEATURES.get('ENTRANCE_EXAMS', False), True)
     def test_entrance_exam_created_updated_and_deleted_successfully(self):
+        """
+        This tests both of the entrance exam settings and the `any_unfulfilled_milestones` helper.
+
+        Splitting the test requires significant refactoring `settings_handler()` view.
+        """
+        self.assertFalse(milestones_helpers.any_unfulfilled_milestones(self.course.id, self.user.id),
+                         msg='The initial empty state should be: no entrance exam')
+
         settings_details_url = get_url(self.course.id)
         data = {
             'entrance_exam_enabled': 'true',
@@ -302,6 +324,9 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         self.assertTrue(course.entrance_exam_enabled)
         self.assertEquals(course.entrance_exam_minimum_score_pct, .80)
 
+        self.assertTrue(milestones_helpers.any_unfulfilled_milestones(self.course.id, self.user.id),
+                        msg='The entrance exam should be required.')
+
         # Delete the entrance exam
         data['entrance_exam_enabled'] = "false"
         response = self.client.post(
@@ -314,6 +339,9 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         self.assertEquals(response.status_code, 200)
         self.assertFalse(course.entrance_exam_enabled)
         self.assertEquals(course.entrance_exam_minimum_score_pct, None)
+
+        self.assertFalse(milestones_helpers.any_unfulfilled_milestones(self.course.id, self.user.id),
+                         msg='The entrance exam should not be required anymore')
 
     @unittest.skipUnless(settings.FEATURES.get('ENTRANCE_EXAMS', False), True)
     def test_entrance_exam_store_default_min_score(self):
