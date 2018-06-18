@@ -137,19 +137,6 @@ def fetch_journal_access(site, user):   # pylint: disable=unused-argument
         Timeout: raised if API is talking to long to respond
     """
     # TODO: WL-1560: (see jira for more info)
-
-    # api_resourse = 'journal_access'
-    # cache_key = get_cache_key(
-    #     site_domain=site.domain,
-    #     resourse=api_resourse,
-    #     user=user
-    # )
-    #
-    # journal_access_records = cache.get(cache_key)
-    # if not journal_access_records:
-    #     journal_access_records = JournalsApiClient().client.journalaccess.get(user=user)
-    #     cache.set(cache_key, journal_access_records, JOURNALS_CACHE_TIMEOUT)
-
     journal_access_records = JournalsApiClient().client.journalaccess.get(
         user=user,
         get_latest=True

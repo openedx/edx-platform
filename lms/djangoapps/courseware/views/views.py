@@ -229,7 +229,6 @@ def courses(request):
 
     journals = get_journals(request.site)
     journals_root_url = get_journals_root_url()
-
     journal_bundles = get_journal_bundles(request.site)
 
     return render_to_response(
