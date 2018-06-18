@@ -384,6 +384,69 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
             )
         )
 
+    def test_editing_key_value(self):
+        """
+        Scenario: Test that advanced settings saves the key value, if save button
+        is clicked from notification bar after the editing
+            Given a staff logs in to studio
+            When this user goes to advanced settings page and enters and new course name
+                Then he clicks 'save' button when asked to save changes
+            When this user reloads the page
+                And then he is able to see the change in the course name
+        """
+
+        original_course_display_name = self.advanced_settings.get(self.course_name_key)
+        new_course_name = 'New Course Name'
+        self.advanced_settings.set(self.course_name_key, self.course_name_value)
+        self.assertEqual(
+            original_course_display_name,
+            new_course_name,
+            ('original course name:{} is not equal to new saved course name {}'.format(
+                original_course_display_name,
+                new_course_name
+            )
+            )
+        )
+        self.assertEqual(
+            self.advanced_settings.get(self.course_name_key),
+            new_course_name,
+            ('course name from the page should be same as new_course_name:{}'.format(
+                new_course_name
+            )
+            )
+        )
+
+    def test_confirmation_is_shown_on_save(self):
+        """
+        Scenario: Test that advanced settings shows confirmation after editing a field successfully
+            Given a staff logs in to studio
+            When this user goes to advanced settings page and enters and edits any value
+                Then he clicks 'save' button when asked to save changes
+            When this user reloads the page
+                And then he is able to see the confirmation message
+        """
+
+        self.advanced_settings.set('Maximum Attempts', 5)
+        confirmation_message = self.advanced_settings.confirmation_message
+        self.assertEqual(
+            confirmation_message,
+            'Your policy changes have been saved.',
+            'Settings must be saved successfully in order to have confirmation message'
+        )
+
+    def test_deprecated_settings_invisible_by_default(self):
+        """
+        Scenario: Test that advanced settings does not have deprecated settings by default
+            Given a staff logs in to studio
+            When this user goes to advanced settings page
+                Then the user does not see the deprecated settings
+                And sees 'Show Deprecated Settings' button
+        """
+
+        button_text = self.advanced_settings.deprecated_settings_button_text
+        self.assertEqual(button_text, 'Show Deprecated Settings')
+        self.assertFalse(self.advanced_settings.check_deprecated_settings_presence())
+
     def test_modal_shows_one_validation_error(self):
         """
         Test that advanced settings don't save if there's a single wrong input,

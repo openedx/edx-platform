@@ -61,6 +61,26 @@ class AdvancedSettingsPage(CoursePage):
         else:
             self.wait_for_element_absence(DEPRECATED_SETTINGS_SELECTOR, 'Deprecated Settings are present')
 
+    @property
+    def deprecated_settings_button_text(self):
+        """
+            Returns text for deprecated settings button
+        """
+        return self.q(css=DEPRECATED_SETTINGS_BUTTON_SELECTOR).text[0]
+
+    def check_deprecated_settings_presence(self):
+        """
+            Returns true if deprecated settings are visible
+        """
+        return self.q(css=DEPRECATED_SETTINGS_SELECTOR).visible
+
+    @property
+    def confirmation_message(self):
+        """
+            Returns the text of confirmation message which appears after saving the settings
+        """
+        return self.q(css=CONFIRMATION_MESSAGE_SELECTOR).text[0]
+
     def wait_for_modal_load(self):
         """
         Wait for validation response from the server, and make sure that
