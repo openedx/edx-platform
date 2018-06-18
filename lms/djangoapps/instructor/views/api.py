@@ -996,7 +996,7 @@ def get_problem_responses(request, course_id):
     to a given problem.
 
     Responds with JSON
-        {"status": "... status message ..."}
+        {"status": "... status message ...", "task_id": created_task_UUID}
 
     if initiation is successful (or generation task is already running).
 
@@ -1017,10 +1017,12 @@ def get_problem_responses(request, course_id):
     except InvalidKeyError:
         return JsonResponseBadRequest(_("Could not find problem with this location."))
 
-    lms.djangoapps.instructor_task.api.submit_calculate_problem_responses_csv(request, course_key, problem_location)
+    task = lms.djangoapps.instructor_task.api.submit_calculate_problem_responses_csv(
+        request, course_key, problem_location
+    )
     success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
 
-    return JsonResponse({"status": success_status})
+    return JsonResponse({"status": success_status, "task_id": task.task_id})
 
 
 @require_POST
@@ -2380,17 +2382,21 @@ def list_entrance_exam_instructor_tasks(request, course_id):  # pylint: disable=
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def list_report_downloads(_request, course_id):
+def list_report_downloads(request, course_id):
     """
     List grade CSV files that are available for download for this course.
+
+    Takes the following query parameters:
+    - (optional) report_name - name of the report
     """
     course_id = CourseKey.from_string(course_id)
     report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
+    report_name = request.POST.get("report_name", None)
 
     response_payload = {
         'downloads': [
             dict(name=name, url=url, link=HTML('<a href="{}">{}</a>').format(HTML(url), Text(name)))
-            for name, url in report_store.links_for(course_id)
+            for name, url in report_store.links_for(course_id) if report_name is None or name == report_name
         ]
     }
     return JsonResponse(response_payload)
