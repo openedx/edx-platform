@@ -43,11 +43,6 @@ def edit_the_value_of_a_policy_key(step):
     type_in_codemirror(get_index_of(DISPLAY_NAME_KEY), 'X')
 
 
-@step(u'I edit the value of a policy key and save$')
-def edit_the_value_of_a_policy_key_and_save(step):
-    change_display_name_value(step, '"foo"')
-
-
 @step('I create a JSON object as a value for "(.*)"$')
 def create_JSON_object(step, key):
     change_value(step, key, '{"key": "value", "key_2": "value_2"}')
@@ -70,7 +65,6 @@ def error_on_save(step):
         "Value stored in a .* must be .*, found .*"
     )
 
-
 @step('it is displayed as a string')
 def it_is_displayed_as_string(step):
     assert_policy_entries([DISPLAY_NAME_KEY], ['"quote me"'])
@@ -79,11 +73,6 @@ def it_is_displayed_as_string(step):
 @step(u'the policy key value is unchanged$')
 def the_policy_key_value_is_unchanged(step):
     assert_equal(get_display_name_value(), DISPLAY_NAME_VALUE)
-
-
-@step(u'the policy key value is changed$')
-def the_policy_key_value_is_changed(step):
-    assert_equal(get_display_name_value(), '"foo"')
 
 
 @step(u'deprecated settings are (then|not) shown$')
