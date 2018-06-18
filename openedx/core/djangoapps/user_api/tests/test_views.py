@@ -20,7 +20,7 @@ from six import text_type
 from social_django.models import UserSocialAuth, Partial
 
 from django_comment_common import models
-from openedx.core.djangoapps.user_api.accounts.tests.test_views import RetirementTestCase
+from openedx.core.djangoapps.user_api.accounts.tests.test_retirement_views import RetirementTestCase
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from openedx.core.djangoapps.site_configuration.helpers import get_value
 from openedx.core.lib.api.test_utils import ApiTestCase, TEST_API_KEY

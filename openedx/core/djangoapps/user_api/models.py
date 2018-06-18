@@ -167,6 +167,31 @@ class RetirementState(models.Model):
         return cls.objects.all().values_list('state_name', flat=True)
 
 
+class UserRetirementPartnerReportingStatus(TimeStampedModel):
+    """
+    When a user has been retired from LMS it will still need to be reported out to
+    partners so they can forget the user also. This process happens on a very different,
+    and asynchronous, timeline than LMS retirement and only impacts a subset of learners
+    so it maintains a queue. This queue is populated as part of the LMS retirement
+    process.
+    """
+    user = models.OneToOneField(User)
+    original_username = models.CharField(max_length=150, db_index=True)
+    original_email = models.EmailField(db_index=True)
+    original_name = models.CharField(max_length=255, blank=True, db_index=True)
+    is_being_processed = models.BooleanField(default=False)
+
+    class Meta(object):
+        verbose_name = 'User Retirement Reporting Status'
+        verbose_name_plural = 'User Retirement Reporting Statuses'
+
+    def __unicode__(self):
+        return u'UserRetirementPartnerReportingStatus: {} is being processed: {}'.format(
+            self.user,
+            self.is_being_processed
+        )
+
+
 class UserRetirementRequest(TimeStampedModel):
     """
     Records and perists every user retirement request.

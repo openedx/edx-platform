@@ -14,7 +14,11 @@ from six import text_type
 from lms.djangoapps.badges.utils import badges_enabled
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import errors
-from openedx.core.djangoapps.user_api.models import RetirementState, UserRetirementStatus, UserPreference
+from openedx.core.djangoapps.user_api.models import (
+    RetirementState,
+    UserPreference,
+    UserRetirementStatus
+)
 from openedx.core.djangoapps.user_api.serializers import ReadOnlyFieldsSerializerMixin
 from student.models import UserProfile, LanguageProficiency, SocialLink
 
@@ -209,7 +213,9 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
         return new_name
 
     def validate_language_proficiencies(self, value):
-        """ Enforce all languages are unique. """
+        """
+        Enforce all languages are unique.
+        """
         language_proficiencies = [language for language in value]
         unique_language_proficiencies = set(language["code"] for language in language_proficiencies)
         if len(language_proficiencies) != len(unique_language_proficiencies):
@@ -217,7 +223,9 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
         return value
 
     def validate_social_links(self, value):
-        """ Enforce only one entry for a particular social platform. """
+        """
+        Enforce only one entry for a particular social platform.
+        """
         social_links = [social_link for social_link in value]
         unique_social_links = set(social_link["platform"] for social_link in social_links)
         if len(social_links) != len(unique_social_links):
@@ -225,29 +233,41 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
         return value
 
     def transform_gender(self, user_profile, value):  # pylint: disable=unused-argument
-        """ Converts empty string to None, to indicate not set. Replaced by to_representation in version 3. """
+        """
+        Converts empty string to None, to indicate not set. Replaced by to_representation in version 3.
+        """
         return AccountLegacyProfileSerializer.convert_empty_to_None(value)
 
     def transform_country(self, user_profile, value):  # pylint: disable=unused-argument
-        """ Converts empty string to None, to indicate not set. Replaced by to_representation in version 3. """
+        """
+        Converts empty string to None, to indicate not set. Replaced by to_representation in version 3.
+        """
         return AccountLegacyProfileSerializer.convert_empty_to_None(value)
 
     def transform_level_of_education(self, user_profile, value):  # pylint: disable=unused-argument
-        """ Converts empty string to None, to indicate not set. Replaced by to_representation in version 3. """
+        """
+        Converts empty string to None, to indicate not set. Replaced by to_representation in version 3.
+        """
         return AccountLegacyProfileSerializer.convert_empty_to_None(value)
 
     def transform_bio(self, user_profile, value):  # pylint: disable=unused-argument
-        """ Converts empty string to None, to indicate not set. Replaced by to_representation in version 3. """
+        """
+        Converts empty string to None, to indicate not set. Replaced by to_representation in version 3.
+        """
         return AccountLegacyProfileSerializer.convert_empty_to_None(value)
 
     @staticmethod
     def convert_empty_to_None(value):
-        """ Helper method to convert empty string to None (other values pass through). """
+        """
+        Helper method to convert empty string to None (other values pass through).
+        """
         return None if value == "" else value
 
     @staticmethod
     def get_profile_image(user_profile, user, request=None):
-        """ Returns metadata about a user's profile image. """
+        """
+        Returns metadata about a user's profile image.
+        """
         data = {'has_image': user_profile.has_profile_image}
         urls = get_profile_image_urls_for_user(user, request)
         data.update({
@@ -257,7 +277,9 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
         return data
 
     def get_requires_parental_consent(self, user_profile):
-        """ Returns a boolean representing whether the user requires parental controls.  """
+        """
+        Returns a boolean representing whether the user requires parental controls.
+        """
         return user_profile.requires_parental_consent()
 
     def _get_profile_image(self, user_profile):
@@ -374,8 +396,27 @@ class UserRetirementStatusSerializer(serializers.ModelSerializer):
         exclude = ['responses', ]
 
 
+class UserRetirementPartnerReportSerializer(serializers.Serializer):
+    """
+    Perform serialization for the UserRetirementPartnerReportingStatus model
+    """
+    original_username = serializers.CharField()
+    original_email = serializers.EmailField()
+    original_name = serializers.CharField()
+    orgs = serializers.ListField(child=serializers.CharField())
+
+    # Required overrides of abstract base class methods, but we don't use them
+    def create(self, validated_data):
+        pass
+
+    def update(self, instance, validated_data):
+        pass
+
+
 def get_extended_profile(user_profile):
-    """Returns the extended user profile fields stored in user_profile.meta"""
+    """
+    Returns the extended user profile fields stored in user_profile.meta
+    """
 
     # pick the keys from the site configuration
     extended_profile_field_names = configuration_helpers.get_value('extended_profile_fields', [])
@@ -395,7 +436,9 @@ def get_extended_profile(user_profile):
 
 
 def get_profile_visibility(user_profile, user, configuration=None):
-    """Returns the visibility level for the specified user profile."""
+    """
+    Returns the visibility level for the specified user profile.
+    """
     if user_profile.requires_parental_consent():
         return PRIVATE_VISIBILITY
 
