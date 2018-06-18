@@ -1542,10 +1542,7 @@ class TestProgramMarketingDataExtender(ModuleStoreTestCase):
         self.assertEqual(data['discount_data'], mock_discount_data)
 
     @httpretty.activate
-    @override_switch("{}.{}".format(
-        PROGRAMS_WAFFLE_SWITCH_NAMESPACE.name,
-        ALWAYS_CALCULATE_PROGRAM_PRICE_AS_ANONYMOUS_USER.switch_name
-    ), active=True)
+    @override_switch(ALWAYS_CALCULATE_PROGRAM_PRICE_AS_ANONYMOUS_USER.namespaced_switch_name, active=True)
     def test_fetching_program_price_when_forced_as_anonymous_user(self):
         """
         When all users are forced as anonymous, all requests to calculate the program

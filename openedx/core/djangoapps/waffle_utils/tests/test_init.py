@@ -10,7 +10,7 @@ from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from waffle.testutils import override_flag
 
-from .. import CourseWaffleFlag, WaffleFlagNamespace
+from .. import CourseWaffleFlag, WaffleFlagNamespace, WaffleSwitchNamespace, WaffleSwitch
 from ..models import WaffleFlagCourseOverrideModel
 
 
@@ -112,3 +112,22 @@ class TestCourseWaffleFlag(TestCase):
             flag_undefined_default=data['flag_undefined_default']
         )
         self.assertEqual(test_course_flag.is_enabled(self.TEST_COURSE_KEY), data['result'])
+
+
+class TestWaffleSwitch(TestCase):
+    """
+    Tests the WaffleSwitch.
+    """
+
+    NAMESPACE_NAME = "test_namespace"
+    WAFFLE_SWITCH_NAME = "test_switch_name"
+    TEST_NAMESPACE = WaffleSwitchNamespace(NAMESPACE_NAME)
+    WAFFLE_SWITCH = WaffleSwitch(TEST_NAMESPACE, WAFFLE_SWITCH_NAME)
+
+    def test_namespaced_switch_name(self):
+        """
+        Verify namespaced_switch_name returns the correct namespace switch name
+        """
+        expected = self.NAMESPACE_NAME + "." + self.WAFFLE_SWITCH_NAME
+        actual = self.WAFFLE_SWITCH.namespaced_switch_name
+        self.assertEqual(actual, expected)
