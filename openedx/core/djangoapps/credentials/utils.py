@@ -22,13 +22,25 @@ def get_credentials_records_url(program_uuid=None):
     return base_url
 
 
-def get_credentials_api_client(user):
-    """ Returns an authenticated Credentials API client. """
+def get_credentials_api_client(user, org=None):
+    """
+    Returns an authenticated Credentials API client.
+
+    Arguments:
+        user (User): The user to authenticate as when requesting credentials.
+        org (str): Optional organization to look up the site config for, rather than the current request
+
+    """
 
     scopes = ['email', 'profile']
     expires_in = settings.OAUTH_ID_TOKEN_EXPIRATION
     jwt = JwtBuilder(user).build_token(scopes, expires_in)
-    return EdxRestApiClient(CredentialsApiConfig.current().internal_api_url, jwt=jwt)
+
+    if org is None:
+        url = CredentialsApiConfig.current().internal_api_url  # by current request
+    else:
+        url = CredentialsApiConfig.get_internal_api_url_for_org(org)  # by org
+    return EdxRestApiClient(url, jwt=jwt)
 
 
 def get_credentials(user, program_uuid=None, credential_type=None):
