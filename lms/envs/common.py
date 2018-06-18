@@ -3423,26 +3423,20 @@ RETIREMENT_STATES = [
     'LOCKING_ACCOUNT',
     'LOCKING_COMPLETE',
 
-    'RETIRING_CREDENTIALS',
-    'CREDENTIALS_COMPLETE',
-
-    'RETIRING_ECOM',
-    'ECOM_COMPLETE',
-
+    # Use these states only when ENABLE_DISCUSSION_SERVICE is True.
     'RETIRING_FORUMS',
     'FORUMS_COMPLETE',
 
+    # TODO - Change these states to be the LMS-only email opt-out - PLAT-2189
     'RETIRING_EMAIL_LISTS',
     'EMAIL_LISTS_COMPLETE',
 
     'RETIRING_ENROLLMENTS',
     'ENROLLMENTS_COMPLETE',
 
+    # Use these states only when ENABLE_STUDENT_NOTES is True.
     'RETIRING_NOTES',
     'NOTES_COMPLETE',
-
-    'NOTIFYING_PARTNERS',
-    'PARTNERS_NOTIFIED',
 
     'RETIRING_LMS',
     'LMS_COMPLETE',
