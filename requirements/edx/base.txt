@@ -4,7 +4,6 @@
 #
 #    make upgrade
 #
-
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
 -e common/lib/calc
 -e common/lib/capa
@@ -93,7 +92,7 @@ django-require==1.0.11
 django-rest-swagger==2.2.0
 django-sekizai==0.10.0
 django-ses==0.8.4
-django-simple-history==2.1.0
+django-simple-history==2.1.1
 django-splash==0.2.2
 django-statici18n==1.4.0
 django-storages==1.4.1
