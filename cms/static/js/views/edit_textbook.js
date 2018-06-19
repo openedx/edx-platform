@@ -63,7 +63,7 @@ define(['js/views/baseview', 'underscore', 'jquery', 'js/views/edit_chapter', 'c
                         title: gettext('Saving')
                     }).show();
                     var that = this;
-                    this.model.customSave({
+                    this.model.save({
                         success: function() {
                             that.model.setOriginalAttributes();
                             that.close();

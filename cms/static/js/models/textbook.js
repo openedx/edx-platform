@@ -20,7 +20,7 @@ define(['backbone', 'underscore', 'gettext', 'js/models/chapter', 'js/collection
                 this.setOriginalAttributes();
                 return this;
             },
-            customSave: function(options) {
+            save: function(options) {
                 var model = this;
                 if (!model.id) {
                     var method = 'POST';
