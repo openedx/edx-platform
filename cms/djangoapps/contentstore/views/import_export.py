@@ -125,7 +125,7 @@ def _write_chunk(request, courselike_key):
         # Use sessions to keep info about import progress
         _save_request_status(request, courselike_string, 0)
 
-        if not filename.endswith('.tar.gz'):
+        if not filename.endswith('.tar.gz') and not filename.endswith('.zip'):
             _save_request_status(request, courselike_string, -1)
             return JsonResponse(
                 {

@@ -35,7 +35,7 @@ define([
                     var filepath = $(this).val(),
                         msg;
 
-                    if (filepath.substr(filepath.length - 6, 6) === 'tar.gz') {
+                    if (filepath.substr(filepath.length - 6, 6) === 'tar.gz' || filepath.substr(filepath.length - 4, 4) === '.zip' {
                         $('.error-block').hide();
                         $('.file-name').text($(this).val().replace('C:\\fakepath\\', ''));
                         $('.file-name-block').show();
@@ -84,7 +84,7 @@ define([
 
                     file = data.files[0];
 
-                    if (file.name.match(/tar\.gz$/)) {
+                    if (file.name.match(/(tar\.gz|\.zip)$/)) {
                         $submitBtn.click(function(event) {
                             event.preventDefault();
 

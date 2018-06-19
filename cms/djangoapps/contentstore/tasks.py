@@ -8,6 +8,7 @@ import json
 import os
 import shutil
 import tarfile
+import zipfile
 from datetime import datetime
 from tempfile import NamedTemporaryFile, mkdtemp
 
@@ -688,16 +689,21 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
 
     # try-finally block for proper clean up after receiving file.
     try:
-        tar_file = tarfile.open(temp_filepath)
-        try:
-            safetar_extractall(tar_file, (course_dir + u'/').encode(u'utf-8'))
-        except SuspiciousOperation as exc:
-            LOGGER.info(u'Course import %s: Unsafe tar file - %s', courselike_key, exc.args[0])
-            with respect_language(language):
-                self.status.fail(_(u'Unsafe tar file. Aborting import.'))
-            return
-        finally:
-            tar_file.close()
+        if temp_filepath.endswith(u'.tar.gz'):
+            tar_file = tarfile.open(temp_filepath)
+            try:
+                safetar_extractall(tar_file, (course_dir + u'/').encode(u'utf-8'))
+            except SuspiciousOperation as exc:
+                LOGGER.info(u'Course import %s: Unsafe tar file - %s', courselike_key, exc.args[0])
+                with respect_language(language):
+                    self.status.fail(_(u'Unsafe tar file. Aborting import.'))
+                return
+            finally:
+                tar_file.close()
+        else:
+            zip_file = zipfile.ZipFile(temp_filepath)
+            zip_file.extractall(course_dir + u'/')
+            zip_file.close()
 
         if os.path.isfile(course_dir + u'/imsmanifest.xml'):
             convert_to_olx(course_dir + u'/')
