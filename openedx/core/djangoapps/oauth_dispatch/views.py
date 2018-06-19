@@ -21,6 +21,7 @@ from ratelimit import ALL
 from ratelimit.mixins import RatelimitMixin
 
 from openedx.core.djangoapps.auth_exchange import views as auth_exchange_views
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.token_utils import JwtBuilder
 
 from . import adapters
@@ -42,7 +43,7 @@ class _DispatchingView(View):
         """
         Returns the appropriate adapter based on the OAuth client linked to the request.
         """
-        if dot_models.Application.objects.filter(client_id=self._get_client_id(request)).exists():
+        if dot_models.get_application_model().objects.filter(client_id=self._get_client_id(request)).exists():
             return self.dot_adapter
         else:
             return self.dop_adapter
@@ -101,10 +102,24 @@ class AccessTokenView(RatelimitMixin, _DispatchingView):
         response = super(AccessTokenView, self).dispatch(request, *args, **kwargs)
 
         if response.status_code == 200 and request.POST.get('token_type', '').lower() == 'jwt':
-            expires_in, scopes, user = self._decompose_access_token_response(request, response)
+            client_id = self._get_client_id(request)
+            adapter = self.get_adapter(request)
+            expires_in, scopes, user = self._decompose_access_token_response(adapter, response)
+            issuer, secret, audience, filters = self._get_client_specific_claims(client_id, adapter)
 
             content = {
-                'access_token': JwtBuilder(user).build_token(scopes, expires_in),
+                'access_token': JwtBuilder(
+                    user,
+                    secret=secret,
+                    issuer=issuer,
+                ).build_token(
+                    scopes,
+                    expires_in,
+                    aud=audience,
+                    additional_claims={
+                        'filters': filters,
+                    },
+                ),
                 'expires_in': expires_in,
                 'token_type': 'JWT',
                 'scope': ' '.join(scopes),
@@ -113,16 +128,32 @@ class AccessTokenView(RatelimitMixin, _DispatchingView):
 
         return response
 
-    def _decompose_access_token_response(self, request, response):
+    def _decompose_access_token_response(self, adapter, response):
         """ Decomposes the access token in the request to an expiration date, scopes, and User. """
         content = json.loads(response.content)
         access_token = content['access_token']
         scope = content['scope']
-        access_token_obj = self.get_adapter(request).get_access_token(access_token)
-        user = access_token_obj.user
         scopes = scope.split(' ')
+        user = adapter.get_access_token(access_token).user
         expires_in = content['expires_in']
         return expires_in, scopes, user
+
+    def _get_client_specific_claims(self, client_id, adapter):
+        """ Get claims that are specific to the client. """
+        if adapter.is_client_restricted(client_id):
+            jwt_issuer = configuration_helpers.get_value(
+                'RESTRICTED_APPLICATION_JWT_ISSUER',
+                settings.RESTRICTED_APPLICATION_JWT_ISSUER
+            )
+            issuer = jwt_issuer['ISSUER']
+            secret = jwt_issuer['SECRET_KEY']
+            audience = jwt_issuer['AUDIENCE']
+        else:
+            issuer = configuration_helpers.get_value('DEFAULT_JWT_ISSUER_URI', settings.DEFAULT_JWT_ISSUER_URI)
+            secret = configuration_helpers.get_value('DEFAULT_JWT_SECRET_KEY', settings.DEFAULT_JWT_SECRET_KEY)
+            audience = configuration_helpers.get_value('DEFAULT_JWT_AUDIENCE', settings.DEFAULT_JWT_AUDIENCE)
+        filters = adapter.get_authorization_filters(client_id)
+        return issuer, secret, audience, filters
 
 
 class AuthorizationView(_DispatchingView):
