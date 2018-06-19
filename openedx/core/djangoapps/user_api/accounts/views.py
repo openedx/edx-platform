@@ -33,21 +33,18 @@ from wiki.models import ArticleRevision
 from wiki.models.pluginbase import RevisionPluginRevision
 
 from entitlements.models import CourseEntitlement
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
 from openedx.core.djangoapps.credit.models import CreditRequirementStatus, CreditRequest
 from openedx.core.djangoapps.course_groups.models import UnregisteredLearnerCohortAssignments
 from openedx.core.djangoapps.profile_images.images import remove_profile_images
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
-from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 from openedx.core.djangolib.oauth2_retirement_utils import retire_dot_oauth2_models, retire_dop_oauth2_models
 from openedx.core.lib.api.authentication import (
     OAuth2AuthenticationAllowInactiveUser,
     SessionAuthenticationAllowInactiveUser
 )
 from openedx.core.lib.api.parsers import MergePatchParser
-from survey.models import SurveyAnswer
 from student.models import (
     CourseEnrollment,
     ManualEnrollmentAudit,
@@ -70,7 +67,12 @@ from ..models import RetirementState, RetirementStateError, UserOrgTag, UserReti
 from .api import get_account_settings, update_account_settings
 from .permissions import CanDeactivateUser, CanRetireUser
 from .serializers import UserRetirementStatusSerializer
-from .signals import USER_RETIRE_MAILINGS
+from .signals import (
+    USER_RETIRE_LMS_CRITICAL,
+    USER_RETIRE_LMS_MISC,
+    USER_RETIRE_MAILINGS,
+    USER_RETIRE_THIRD_PARTY_MAILINGS
+)
 from ..message_types import DeletionNotificationMessage
 
 log = logging.getLogger(__name__)
@@ -332,7 +334,8 @@ class AccountDeactivationView(APIView):
 class AccountRetireMailingsView(APIView):
     """
     Part of the retirement API, accepts POSTs to unsubscribe a user
-    from all email lists.
+    from all EXTERNAL email lists (ex: Sailthru). LMS email subscriptions
+    are handled in the LMS retirement endpoints.
     """
     authentication_classes = (JwtAuthentication, )
     permission_classes = (permissions.IsAuthenticated, CanRetireUser)
@@ -341,10 +344,9 @@ class AccountRetireMailingsView(APIView):
         """
         POST /api/user/v1/accounts/{username}/retire_mailings/
 
-        Allows an administrative user to take the following actions
-        on behalf of an LMS user:
-        -  Update UserOrgTags to opt the user out of org emails
-        -  Call Sailthru API to force opt-out the user from all email lists
+        Fires the USER_RETIRE_EXTERNAL_MAILINGS signal, currently the
+        only receiver is email_marketing to force opt-out the user from
+        externally managed email lists.
         """
         username = request.data['username']
 
@@ -352,13 +354,9 @@ class AccountRetireMailingsView(APIView):
             retirement = UserRetirementStatus.get_retirement_for_retirement_action(username)
 
             with transaction.atomic():
-                # Take care of org emails first, using the existing API for consistency
-                for preference in UserOrgTag.objects.filter(user=retirement.user, key='email-optin'):
-                    update_email_opt_in(retirement.user, preference.org, False)
-
                 # This signal allows lms' email_marketing and other 3rd party email
-                # providers to unsubscribe the user as well
-                USER_RETIRE_MAILINGS.send(
+                # providers to unsubscribe the user
+                USER_RETIRE_THIRD_PARTY_MAILINGS.send(
                     sender=self.__class__,
                     email=retirement.original_email,
                     new_email=retirement.retired_email,
@@ -649,8 +647,18 @@ class LMSAccountRetirementView(ViewSet):
             CreditRequest.retire_user(retirement.original_username, retirement.retired_username)
             ApiAccessRequest.retire_user(retirement.user)
             CreditRequirementStatus.retire_user(retirement.user.username)
-            SurveyAnswer.retire_user(retirement.user.id)
 
+            # This signal allows code in higher points of LMS to retire the user as necessary
+            USER_RETIRE_LMS_MISC.send(sender=self.__class__, user=retirement.user)
+
+            # This signal allows code in higher points of LMS to unsubscribe the user
+            # from various types of mailings.
+            USER_RETIRE_MAILINGS.send(
+                sender=self.__class__,
+                email=retirement.original_email,
+                new_email=retirement.retired_email,
+                user=retirement.user
+            )
         except UserRetirementStatus.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         except RetirementStateError as exc:
@@ -679,7 +687,7 @@ class AccountRetirementView(ViewSet):
         }
 
         Retires the user with the given username.  This includes
-        retiring this username, the associates email address, and
+        retiring this username, the associated email address, and
         any other PII associated with this user.
         """
         username = request.data['username']
@@ -706,13 +714,15 @@ class AccountRetirementView(ViewSet):
             self.retire_entitlement_support_detail(user)
 
             # Retire misc. models that may contain PII of this user
-            SoftwareSecurePhotoVerification.retire_user(user.id)
             PendingEmailChange.delete_by_user_value(user, field='user')
             UserOrgTag.delete_by_user_value(user, field='user')
 
             # Retire any objects linked to the user via their original email
             CourseEnrollmentAllowed.delete_by_user_value(original_email, field='email')
             UnregisteredLearnerCohortAssignments.delete_by_user_value(original_email, field='email')
+
+            # This signal allows code in higher points of LMS to retire the user as necessary
+            USER_RETIRE_LMS_CRITICAL.send(sender=self.__class__, user=user)
 
             # TODO: Password Reset links - https://openedx.atlassian.net/browse/PLAT-2104
             # TODO: Delete OAuth2 records - https://openedx.atlassian.net/browse/EDUCATOR-2703
