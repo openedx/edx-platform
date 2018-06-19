@@ -200,6 +200,13 @@ class WaffleSwitch(object):
         self.waffle_namespace = waffle_namespace
         self.switch_name = switch_name
 
+    @property
+    def namespaced_switch_name(self):
+        """
+        Returns the fully namespaced switch name.
+        """
+        return self.waffle_namespace._namespaced_name(self.switch_name)  # pylint: disable=protected-access
+
     def is_enabled(self):
         return self.waffle_namespace.is_enabled(self.switch_name)
 
