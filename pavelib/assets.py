@@ -646,6 +646,11 @@ def process_npm_assets():
         copy_vendor_library(library, skip_if_missing=True)
 
 
+@task
+@needs(
+    'pavelib.prereqs.install_python_prereqs',
+)
+@no_help
 def process_xmodule_assets():
     """
     Process XModule static assets.

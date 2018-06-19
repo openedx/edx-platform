@@ -52,7 +52,6 @@ urlpatterns = [
 
     # noop to squelch ajax errors
     url(r'^event$', contentstore.views.event, name='event'),
-    url(r'^xmodule/', include('pipeline_js.urls')),
     url(r'^heartbeat', include('openedx.core.djangoapps.heartbeat.urls')),
     url(r'^user_api/', include('openedx.core.djangoapps.user_api.legacy_urls')),
     url(r'^i18n/', include('django.conf.urls.i18n')),

@@ -29,6 +29,8 @@ from xmodule.seq_module import SequenceModule
 from xmodule.vertical_block import VerticalBlock
 from xmodule.x_module import shim_xmodule_js, XModuleDescriptor, XModule, PREVIEW_VIEWS, STUDIO_VIEW
 
+import webpack_loader.utils
+
 log = logging.getLogger(__name__)
 
 
@@ -144,6 +146,11 @@ def wrap_xblock(
         template_context['js_init_parameters'] = json.dumps(frag.json_init_args).replace("/", r"\/")
     else:
         template_context['js_init_parameters'] = ""
+
+    if isinstance(block, (XModule, XModuleDescriptor)):
+        # Add the webpackified asset tags
+        for tag in webpack_loader.utils.get_as_tags(class_name):
+            frag.add_resource(tag, mimetype='text/html', placement='head')
 
     return wrap_fragment(frag, render_to_string('xblock_wrapper.html', template_context))
 
