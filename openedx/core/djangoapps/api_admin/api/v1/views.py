@@ -50,7 +50,7 @@ class ApiAccessRequestView(ListAPIView):
         }
     """
     authentication_classes = (JwtAuthentication, OAuth2Authentication, SessionAuthentication,)
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, )
     serializer_class = api_access_serializers.ApiAccessRequestSerializer
     filter_backends = (IsOwnerOrStaffFilterBackend, DjangoFilterBackend)
 
