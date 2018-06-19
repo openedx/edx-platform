@@ -79,6 +79,7 @@ class AdvancedSettingsPage(CoursePage):
         """
             Returns the text of confirmation message which appears after saving the settings
         """
+        self.wait_for_element_visibility(CONFIRMATION_MESSAGE_SELECTOR, 'Confirmation message is not present')
         return self.q(css=CONFIRMATION_MESSAGE_SELECTOR).text[0]
 
     def wait_for_modal_load(self):
