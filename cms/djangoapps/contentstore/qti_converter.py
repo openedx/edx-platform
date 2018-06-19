@@ -1,17 +1,23 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-This module provides funcitonality for converting qti tests into edx courses
+This module provides functionality for converting QTI tests into edx courses.
+Code is written for QTI 1.2 (https://www.imsglobal.org/question/qtiv1p2/imsqti_asi_bindv1p2.html)
+Supported types of problems are: essay_question, multiple_answers_question,
+multiple_choice_question, matching_question and fill_in_multiple_blanks_question.
+Other problem types will be ignored during conversion.
+Converter looks for imsmanifest.xml in root directory of archive and parses all the resources (xml
+files) listed in there. As a result it creates a .tar.gz archive suitable for import in existing
+course.
 """
 
+from shutil import copyfile
+import datetime
 import xml.etree.ElementTree as ET
+from collections import OrderedDict
 import os
 import re
 import uuid
-from shutil import copyfile
-import ntpath
-import datetime
-from collections import OrderedDict
 
 NS = {'qti': 'http://www.imsglobal.org/xsd/ims_qtiasiv1p2',
       'xsi': 'http://www.w3.org/2001/XMLSchema-instance',
@@ -20,7 +26,7 @@ NS = {'qti': 'http://www.imsglobal.org/xsd/ims_qtiasiv1p2',
       'meta': 'http://canvas.instructure.com/xsd/cccv1p0'}
 
 
-class Quiz(object):
+class Course(object):
     """
     Class representing one course
     """
@@ -51,6 +57,7 @@ class Assessment(object):
     """
 
     def __init__(self):
+        self.ident = ''
         self.title = ''
         self.items = []
         self.description = ''
@@ -81,14 +88,16 @@ def get_mattext(element):
     material = element.find('qti:material', NS)
     if material is not None:
         temp_str = material.find('qti:mattext', NS).text
+        # Update img tag to match new location of images
         temp_str = re.sub(r'src="(?:[^"/]*/)*([^"]+)"', r'src="/static/\1"', temp_str)
+        # Add closing tag for br and img elements
         temp_str = re.sub(r'(<img("[^"]*"|[^/">])*)>', r'\1/>', temp_str)
         temp_str = re.sub('<br.*?>', '<br/>', temp_str)
-        return temp_str.encode('utf-8')
+        return temp_str
     return ''
 
 
-def text_from_htlm(temp_str):
+def text_from_html(temp_str):
     """
     Remove tags from string.
     """
@@ -102,15 +111,15 @@ def parse_assessment(tree, new_assessment):
     Parse one QTI assessment file.
     """
     root = tree.getroot()
-    i = 1
-    for assessment in root.findall('qti:assessment', NS):
-        new_assessment.title = assessment.get('title').replace('&', 'and')
-        for item in tree.findall('.//qti:section[' + str(i) + ']//qti:item', NS):
+    for assessment_el in root.findall('qti:assessment', NS):
+        new_assessment.title = assessment_el.get('title').replace('&', 'and')
+        new_assessment.ident = assessment_el.get('ident')
+        for item_el in tree.findall('.//qti:section[1]//qti:item', NS):
             new_item = Item()
-            new_item.title = item.get('title').replace('&', 'and')
-            parse_meta(item.find('qti:itemmetadata', NS), new_item)
+            new_item.title = item_el.get('title').replace('&', 'and')
+            parse_meta(item_el.find('qti:itemmetadata', NS), new_item)
 
-            presentation = item.find('qti:presentation', NS)
+            presentation = item_el.find('qti:presentation', NS)
             new_item.mattext = get_mattext(presentation)
             for response_element in presentation.findall('qti:response_lid', NS):
                 match_text = get_mattext(response_element)
@@ -122,10 +131,10 @@ def parse_assessment(tree, new_assessment):
                     value = get_mattext(response)
                     new_item.responses.update({response_id: value})
 
-            resprocessing = item.find('qti:resprocessing', NS)
-            for respcondition in resprocessing.findall('qti:respcondition', NS):
-                if respcondition.find('qti:setvar', NS) is not None:
-                    conditionvar = respcondition.find('qti:conditionvar', NS)
+            resprocessing = item_el.find('qti:resprocessing', NS)
+            for respcondition_el in resprocessing.findall('qti:respcondition', NS):
+                if respcondition_el.find('qti:setvar', NS) is not None:
+                    conditionvar = respcondition_el.find('qti:conditionvar', NS)
                     condition = conditionvar.find('qti:and', NS)
                     if condition is None:
                         condition = conditionvar
@@ -133,7 +142,7 @@ def parse_assessment(tree, new_assessment):
                         new_item.correct.extend([answer.text])
                         new_item.match_correct.update({answer.get('respident'): answer.text})
 
-            for feedback_element in item.findall('qti:itemfeedback', NS):
+            for feedback_element in item_el.findall('qti:itemfeedback', NS):
                 flowmat = feedback_element.find('qti:flow_mat', NS)
                 value = get_mattext(flowmat)
                 new_item.feedback.update({feedback_element.get('ident'): value})
@@ -141,94 +150,148 @@ def parse_assessment(tree, new_assessment):
             new_assessment.items.extend([new_item])
 
 
-def write_problem(item, vertical_f, chapter, problem_dir):
+def write_essay_question(item, vertical_root, chapter):
+    """
+    Write essay question to file.
+    """
+    open_ass_el = ET.SubElement(vertical_root, 'openassessment')
+    open_ass_el.set("url_name", uuid.uuid3(uuid.NAMESPACE_DNS, item.mattext.encode('utf-8')).hex)
+    open_ass_el.set("submission_start", chapter.start)
+    open_ass_el.set("submission_due", chapter.end)
+    open_ass_el.set("text_response", "required")
+    open_ass_el.set("allow_latext", "False")
+    title_el = ET.SubElement(open_ass_el, 'title')
+    title_el.text = item.title
+    asss_el = ET.SubElement(open_ass_el, 'assessments')
+    ass_el = ET.SubElement(asss_el, 'assessment')
+    ass_el.set("name", "staff-assessment")
+    ass_el.set("required", "True")
+    prompts_el = ET.SubElement(open_ass_el, 'prompts')
+    prompt_el = ET.SubElement(prompts_el, 'prompt')
+    desc_el = ET.SubElement(prompt_el, 'description')
+    desc_el.text = text_from_html(item.mattext)
+    rubric_el = ET.SubElement(open_ass_el, 'rubric')
+    criterion_el = ET.SubElement(rubric_el, 'criterion')
+    criterion_el.set("feedback", "required")
+    name_el = ET.SubElement(criterion_el, 'name')
+    name_el.text = "0"
+    lab_el = ET.SubElement(criterion_el, 'label')
+    lab_el.text = "Criteria"
+    prom_el = ET.SubElement(criterion_el, 'prompt')
+    prom_el.text = "Is the answer correct?"
+    feedback_prom_el = ET.SubElement(rubric_el, 'feedbackprompt')
+    feedback_prom_el.text = 'What aspects of this response stood out to you? What did it do well? '\
+                            'How could it be improved? '
+    feedback_def_el = ET.SubElement(rubric_el, 'feedback_default_text')
+    feedback_def_el.text = 'I think that this response...'
+
+
+def write_multiple_answers_question(item, problem_root):
+    """
+    Write multiple answers question to file.
+    """
+    choice_resp_el = ET.SubElement(problem_root, 'choiceresponse')
+    p_el = ET.SubElement(choice_resp_el, 'p')
+    p_el.text = item.mattext
+    label = ET.SubElement(choice_resp_el, 'label')
+    choice_group_el = ET.SubElement(choice_resp_el, 'checkboxgroup')
+    for number, answer in item.responses.items():
+        choice_el = ET.SubElement(choice_group_el, 'choice')
+        choice_el.set("correct", str(number in item.correct))
+        choice_el.text = answer
+
+
+def write_multiple_choice_question(item, problem_root):
+    """
+    Write multiple choice question to file.
+    """
+    multi_choice_el = ET.SubElement(problem_root, 'multiplechoiceresponse')
+    p_el = ET.SubElement(multi_choice_el, 'p')
+    p_el.text = item.mattext
+    choice_group_el = ET.SubElement(multi_choice_el, 'choicegroup')
+    choice_group_el.set("type", "MultipleChoice")
+    for number, answer in item.responses.items():
+        choice_el = ET.SubElement(choice_group_el, 'choice')
+        choice_el.set("correct", str(number in item.correct))
+        choice_el.text = answer
+        feedback_name = 'general_incorrect_fb'
+        if number in item.correct:
+            feedback_name = 'correct_fb'
+        if feedback_name in item.feedback:
+            choice_hint_el = ET.SubElement(choice_el, 'choicehint')
+            choice_hint_el.text = item.feedback[feedback_name]
+
+
+def write_fill_in_multiple_blanks_question(item, problem_root):
+    """
+    Write fill in multiple blanks question to file.
+    """
+    num_resp_el = ET.SubElement(problem_root, 'numericalresponse')
+    num_resp_el.set("answer", item.responses[item.correct[0]])
+    p_el = ET.SubElement(num_resp_el, 'p')
+    p_el.text = item.mattext
+    label = ET.SubElement(num_resp_el, 'label')
+    f_eq_el = ET.SubElement(num_resp_el, 'formulaequationinput')
+
+
+def write_matching_question(item, problem_root):
+    """
+    Write matching question to file.
+    """
+    option_response_el = ET.SubElement(problem_root, 'optionresponse')
+    p_el = ET.SubElement(option_response_el, 'p')
+    p_el.text = item.mattext
+    for match_text, match_id in item.match.items():
+        desc_el = ET.SubElement(option_response_el, 'description')
+        desc_el.text = match_text
+        option_input_el = ET.SubElement(option_response_el, 'optioninput')
+        for number, answer in item.responses.items():
+            is_correct = number == item.match_correct[match_id]
+            option_el = ET.SubElement(option_input_el, 'option')
+            option_el.set("correct", str(is_correct))
+            option_el.text = answer
+
+
+def write_problem(item, vertical_root, chapter, problem_dir):
     """
     Write one problem to disk.
     """
     if item.metafields['question_type'] == 'essay_question':
-        vertical_f.write(
-            '<openassessment url_name="{0}" submission_start="{1}" submission_due="{2}" '
-            'text_response="required" allow_latext="False">'.
-            format(uuid.uuid4().hex, chapter.start.replace('&quot;', ''),
-                   chapter.end.replace('&quot;', '')))
-        vertical_f.write(
-            '<title>{0}</title><assessments><assessment name="staff-assessment" '
-            'required="True"/></assessments>'.format(item.title))
-        vertical_f.write(
-            '<prompts><prompt><description>{0}</description></prompt></prompts>'.
-            format(text_from_htlm(item.mattext)))
-        vertical_f.write(
-            '<rubric><criterion feedback="required"><name>0</name><label>Criteria</label>'
-            '<prompt>Is the answer correct?</prompt></criterion>'
-            '<feedbackprompt>What aspects of this response stood out to you? What did it '
-            'do well? How could it be '
-            'improved?</feedbackprompt><feedback_default_text>I think that this '
-            'response...</feedback_default_text></rubric></openassessment>')
+        write_essay_question(item, vertical_root, chapter)
         return
 
     item_id = item.metafields['assessment_question_identifierref']
-    problem_f = open('{0}/{1}.xml'.format(problem_dir, item_id), "w+")
-    if item.metafields['question_type'] == 'multiple_answers_question':
-        problem_f.write('<problem max_attempts="{0}" display_name="{1}"><choiceresponse>'
-                        .format(chapter.allowedAttempts, item.title))
-        problem_f.write('<p>{0}</p><label></label><checkboxgroup>'.format(item.mattext))
-        for number, answer in item.responses.items():
-            problem_f.write(
-                '<choice correct="{0}">{1}</choice>'.format(str(number in item.correct),
-                                                            answer))
-        problem_f.write('</checkboxgroup>')
-        problem_f.write('<solution></solution></choiceresponse></problem>')
-    elif item.metafields['question_type'] == 'multiple_choice_question':
-        problem_f.write('<problem max_attempts="{0}" display_name="{1}">'
-                        '<multiplechoiceresponse>'.
-                        format(chapter.allowedAttempts, item.title))
-        problem_f.write('<p>{0}</p><label></label><choicegroup type="MultipleChoice">'.
-                        format(item.mattext))
-        for number, answer in item.responses.items():
-            correct = number in item.correct
-            problem_f.write('<choice correct="{0}">{1}'.format(str(correct), answer))
-            feedback_name = 'general_incorrect_fb'
-            if correct:
-                feedback_name = 'correct_fb'
-            if feedback_name in item.feedback:
-                problem_f.write(
-                    '<choicehint>{0}</choicehint>'.format(item.feedback[feedback_name]))
-            problem_f.write('</choice>')
-        problem_f.write('</choicegroup>')
-        problem_f.write('<solution></solution></multiplechoiceresponse></problem>')
-    elif item.metafields['question_type'] == 'fill_in_multiple_blanks_question':
-        problem_f.write('<problem max_attempts="{0}" display_name="{1}">'
-                        '<numericalresponse answer="{2}"> '
-                        .format(chapter.allowedAttempts, item.title,
-                                item.responses[item.correct[0]]))
-        problem_f.write('<p>{0}</p><label></label><formulaequationinput/>'
-                        '</numericalresponse></problem>'.format(item.mattext))
-    elif item.metafields['question_type'] == 'matching_question':
-        problem_f.write('<problem max_attempts="{0}" display_name="{1}" weight="1.0">'.
-                        format(chapter.allowedAttempts, item.title))
-        problem_f.write('<optionresponse><p>{0}</p>'.format(item.mattext))
-        for match_text, match_id in item.match.items():
-            problem_f.write(
-                '<description>{0}</description><optioninput>'.format(match_text))
-            for number, answer in item.responses.items():
-                is_correct = number == item.matchCorrect[match_id]
-                problem_f.write(
-                    '<option correct="{0}">{1}</option>'.format(str(is_correct), answer))
-            problem_f.write('</optioninput>')
-        problem_f.write('</optionresponse></problem>')
 
-    vertical_f.write('<problem url_name="{0}"/>'.format(item_id))
+    problem_root = ET.Element('problem')
+    problem_root.set("max_attempts", chapter.allowedAttempts)
+    problem_root.set("display_name", item.title)
+    problem_root.set("weight", "1.0")
+    if item.metafields['question_type'] == 'multiple_answers_question':
+        write_multiple_answers_question(item, problem_root)
+    elif item.metafields['question_type'] == 'multiple_choice_question':
+        write_multiple_choice_question(item, problem_root)
+    elif item.metafields['question_type'] == 'fill_in_multiple_blanks_question':
+        write_fill_in_multiple_blanks_question(item, problem_root)
+    elif item.metafields['question_type'] == 'matching_question':
+        write_matching_question(item, problem_root)
+
+    problem_el = ET.SubElement(vertical_root, 'problem')
+    problem_el.set("url_name", item_id)
+
+    problem_f = open('{0}/{1}.xml'.format(problem_dir, item_id), "w+")
+    problem_f.write(ET.tostring(problem_root).replace('&amp;', '&').replace('&gt;', '>')
+                    .replace('&lt;', '<'))
     problem_f.close()
 
 
-def write_chapter(chapter, html_dir, course_xml, chapter_dir, seq_dir, vertical_dir, problem_dir):
+def write_chapter(chapter, html_dir, course_root, chapter_dir, seq_dir, vertical_dir, problem_dir):
     """
     Write one chapter to disk.
     """
     if not chapter.items:
         return
 
-    html_id = uuid.uuid4().hex
+    html_id = uuid.uuid3(uuid.NAMESPACE_DNS, chapter.description).hex
     if chapter.description:
         html_f = open('{0}/{1}.html'.format(html_dir, html_id), 'w+')
         html_xml = open('{0}/{1}.xml'.format(html_dir, html_id), 'w+')
@@ -237,54 +300,58 @@ def write_chapter(chapter, html_dir, course_xml, chapter_dir, seq_dir, vertical_
         html_f.close()
         html_xml.close()
 
-    chapter_id = uuid.uuid4().hex
-    course_xml.write('<chapter url_name="{0}"/>'.format(chapter_id))
-    chapter_f = open('{0}/{1}.xml'.format(chapter_dir, chapter_id), 'w+')
-    chapter_f.write('<chapter display_name="{0}">'.format(chapter.title))
-    seq_id = uuid.uuid4().hex
-    chapter_f.write('<sequential url_name="{0}"/>'.format(seq_id))
-    seq_f = open('{0}/{1}.xml'.format(seq_dir, seq_id), 'w+')
+    chapter_el = ET.SubElement(course_root, 'chapter')
+    chapter_el.set("url_name", chapter.ident)
 
-    show_correct = 'never'
-    if chapter.showCorrect == 'true':
-        show_correct = 'always'
-    elif chapter.showCorrectAtEnd == 'true':
-        show_correct = 'past_due'
-    show_correct = 'always'
-    # COMMENT OUT UPPER LINE IF YOU WANT TO USE SETTINGS FROM ASSESSMENT_META
-
-    seq_f.write(
-        '<sequential display_name="Subsection" due="{0}" start="{1}" show_correctness="{2}" '.
-        format(chapter.end, chapter.start, show_correct))
-    if chapter.timeLimit:
-        seq_f.write('is_time_limited="true" is_proctored_enabled="false" '
-                    'is_practice_exam="false" default_time_limit_minutes="{0}"'.
-                    format(chapter.timeLimit))
-    seq_f.write('>')
-
-    vertical_id = uuid.uuid4().hex
-    vertical_f = open('{0}/{1}.xml'.format(vertical_dir, vertical_id), "w+")
-    vertical_f.write('<vertical display_name="{0}">'.format(chapter.title))
-    if chapter.description:
-        vertical_f.write('<html url_name="{0}"/>'.format(html_id))
-    for item in chapter.items:
-        write_problem(item, vertical_f, chapter, problem_dir)
-
-    vertical_f.write('</vertical>')
-    vertical_f.close()
-    seq_f.write('<vertical url_name="{0}"/>'.format(vertical_id))
-    seq_f.write('</sequential>')
-    seq_f.close()
-    chapter_f.write('</chapter>')
+    chapter_root = ET.Element('chapter')
+    chapter_root.set("display_name", chapter.title)
+    sequential_el = ET.SubElement(chapter_root, 'sequential')
+    sequential_el.set("url_name", chapter.ident)
+    chapter_f = open('{0}/{1}.xml'.format(chapter_dir, chapter.ident), 'w+')
+    chapter_f.write(ET.tostring(chapter_root))
     chapter_f.close()
+
+    sequential_root = ET.Element('sequential')
+    sequential_root.set("display_name", "Subsection")
+    sequential_root.set("due", chapter.end)
+    sequential_root.set("start", chapter.start)
+    sequential_root.set("show_correctness", "always")
+    if chapter.time_limit:
+        sequential_root.set("is_time_limited", "true")
+        sequential_root.set("is_proctored_enabled", "false")
+        sequential_root.set("is_practice_exam", "false")
+        sequential_root.set("default_time_limit_minutes", chapter.time_limit)
+    vertical_el = ET.SubElement(sequential_root, 'vertical')
+    vertical_el.set("url_name", chapter.ident)
+    seq_f = open('{0}/{1}.xml'.format(seq_dir, chapter.ident), 'w+')
+    seq_f.write(ET.tostring(sequential_root))
+    seq_f.close()
+
+    vertical_root = ET.Element('vertical')
+    vertical_root.set("display_name", chapter.title)
+
+    if chapter.description:
+        html_el = ET.SubElement(vertical_root, 'html')
+        html_el.set("url_name", html_id)
+    for item in chapter.items:
+        write_problem(item, vertical_root, chapter, problem_dir)
+
+    vertical_f = open('{0}/{1}.xml'.format(vertical_dir, chapter.ident), "w+")
+    vertical_f.write(ET.tostring(vertical_root).replace('&amp;', '&').replace('&gt;', '>')
+                     .replace('&lt;', '<'))
+    vertical_f.close()
 
 
 def write_olx(course_directory, course):
     """
     Write parsed OLX file data to file system.
     """
+    course_el = ET.Element('course')
+    course_el.set("url_name", "course")
+    course_el.set("org", "credo")
+    course_el.set("course", "csl")
     course_f = open('{0}/course.xml'.format(course_directory), 'w+')
-    course_f.write("<course url_name=\"course\" org=\"credo\" course=\"cs1\"/>")
+    course_f.write(ET.tostring(course_el))
     course_f.close()
 
     chapter_dir = '{0}/chapter'.format(course_directory)
@@ -300,15 +367,18 @@ def write_olx(course_directory, course):
     html_dir = '{0}/html'.format(course_directory)
     os.makedirs(html_dir)
 
-    course_xml = open('{0}/course.xml'.format(course_dir), "w+")
-    course_xml.write('<course display_name="Course" show_chat="false" enable_timed_exams="true" '
-                     'enable_proctored_exams="false">')
+    course_root = ET.Element('course')
+    course_root.set("display_name", "Course")
+    course_root.set("show_chat", "false")
+    course_root.set("enable_timed_exams", "true")
+    course_root.set("enable_proctored_exams", "false")
 
     for chapter in course.assessments:
-        write_chapter(chapter, html_dir, course_xml, chapter_dir, seq_dir, vertical_dir,
+        write_chapter(chapter, html_dir, course_root, chapter_dir, seq_dir, vertical_dir,
                       problem_dir)
 
-    course_xml.write('</course>')
+    course_xml = open('{0}/course.xml'.format(course_dir), "w+")
+    course_xml.write(ET.tostring(course_root))
     course_xml.close()
 
 
@@ -323,27 +393,25 @@ def parse_assessment_meta(assessment_meta_xml, new_assessment):
 
     end_time = meta_root.find('meta:due_at', NS)
     if end_time is not None:
-        new_assessment.end = '&quot;{0}&quot;'.format(end_time.text)
+        new_assessment.end = end_time.text
     else:
         end_time = meta_root.find('meta:lock_at', NS)
         if end_time is not None:
-            new_assessment.end = '&quot;{0}&quot;'.format(end_time.text)
+            new_assessment.end = end_time.text
     start_time = meta_root.find('meta:unlock_at', NS)
     if start_time is not None:
-        new_assessment.start = '&quot;{0}&quot;'.format(start_time.text)
+        new_assessment.start = start_time.text
     else:
-        new_assessment.start = '&quot;{0}&quot;'.format(
-            datetime.datetime.now().replace(microsecond=0).isoformat())
-        new_assessment.end = '&quot;{0}&quot;'.format(
-            (datetime.datetime.now() +
-             datetime.timedelta(days=7)).replace(microsecond=0).isoformat())
+        new_assessment.start = datetime.datetime.now().replace(microsecond=0).isoformat()
+        new_assessment.end = (datetime.datetime.now() +
+                              datetime.timedelta(days=7)).replace(microsecond=0).isoformat()
 
     max_attempts = meta_root.find('meta:allowed_attempts', NS)
     if max_attempts is not None:
         new_assessment.allowedAttempts = max_attempts.text
     time_limit = meta_root.find('meta:time_limit', NS)
     if time_limit is not None:
-        new_assessment.timeLimit = time_limit.text
+        new_assessment.time_limit = time_limit.text
     new_assessment.showCorrect = meta_root.find('meta:show_correct_answers', NS).text
     new_assessment.showCorrectAtEnd = meta_root.find('meta:show_correct_answers_last_attempt',
                                                      NS).text
@@ -354,7 +422,7 @@ def convert_to_olx(path_to_ims):
     Convert folder with qti course into a folder with edx course.
     """
     manifest = '{0}imsmanifest.xml'.format(path_to_ims)
-    quiz = Quiz()
+    quiz = Course()
     manifest_xml = ET.parse(manifest)
     root_manifest = manifest_xml.getroot()
 
@@ -369,7 +437,7 @@ def convert_to_olx(path_to_ims):
                 os.makedirs(static_directory)
             image_file = '{0}{1}'.format(path_to_ims, resource.get('href'))
             new_image_file = '{0}/{1}'.format(static_directory,
-                                              ntpath.basename(resource.get('href')))
+                                              os.path.basename(resource.get('href')))
             copyfile(image_file, new_image_file)
 
         if resource.get('type') == "imsqti_xmlv1p2":
