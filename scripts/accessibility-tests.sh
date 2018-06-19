@@ -15,6 +15,9 @@ set -e
 #
 ###############################################################################
 
+echo "Setting up for accessibility tests..."
+source scripts/jenkins-common.sh
+
 # if specified tox environment is supported, prepend paver commands
 # with tox env invocation
 if [ -z ${TOX_ENV+x} ] || [[ ${TOX_ENV} == 'null' ]]; then
@@ -26,9 +29,6 @@ else
     echo "tox.ini file to see which environments are supported"
     exit 1
 fi
-
-echo "Setting up for accessibility tests..."
-source scripts/jenkins-common.sh
 
 echo "Running explicit accessibility tests..."
 SELENIUM_BROWSER=phantomjs $TOX paver test_a11y
