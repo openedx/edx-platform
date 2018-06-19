@@ -14,7 +14,7 @@ class EnsureJWTAuthSettingsMiddleware(object):
     Django middleware object that ensures the proper Permission classes
     are set on all endpoints that use JWTAuthentication.
     """
-    required_permission_classes = ()
+    _required_permission_classes = ()
 
     def _includes_base_class(self, iter_classes, base_class):
         """
@@ -32,7 +32,7 @@ class EnsureJWTAuthSettingsMiddleware(object):
 
             view_permission_classes = getattr(view_class, 'permission_classes', tuple())
 
-            for perm_class in self.required_permission_classes:
+            for perm_class in self._required_permission_classes:
 
                 if not self._includes_base_class(view_permission_classes, perm_class):
                     log.warning(
@@ -42,4 +42,4 @@ class EnsureJWTAuthSettingsMiddleware(object):
                     )
 
             view_class.permission_classes = view_class.permission_classes or tuple()
-            view_class.permission_classes += self.required_permission_classes
+            view_class.permission_classes += self._required_permission_classes

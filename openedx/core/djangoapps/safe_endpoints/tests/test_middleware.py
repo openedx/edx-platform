@@ -2,6 +2,7 @@
 Unit tests for safe_endpoints Middleware.
 """
 import ddt
+from itertools import product
 
 from django.test import TestCase
 from rest_framework.authentication import SessionAuthentication
@@ -14,38 +15,24 @@ from openedx.core.djangolib.testing.utils import get_mock_request
 from ..middleware import EnsureJWTAuthSettingsMiddleware
 
 
-class MockIncludedPermissionClass(object): pass
-class MockRequiredPermissionClass(object): pass
+class MockIncludedPermissionClass(object):
+    pass
 
 
-def mock_auth_decorator(include_jwt_auth=True):
+class MockRequiredPermissionClass(object):
+    pass
+
+
+def mock_auth_decorator(include_jwt_auth=True, include_required_perm=True):
     def _decorator(f):
         f.permission_classes = (MockIncludedPermissionClass,)
         f.authentication_classes = (SessionAuthentication,)
         if include_jwt_auth:
             f.authentication_classes += (JSONWebTokenAuthentication,)
+        if include_required_perm:
+            f.permission_classes += (MockRequiredPermissionClass,)
         return f
     return _decorator
-
-
-@api_view(["GET"])
-@mock_auth_decorator(include_jwt_auth=False)
-def mock_function_view(request): pass
-
-
-@api_view(["GET"])
-@mock_auth_decorator(include_jwt_auth=True)
-def mock_function_view_with_jwt(request): pass
-
-
-@mock_auth_decorator(include_jwt_auth=False)
-class MockClassAPIView(APIView):
-    pass
-
-
-@mock_auth_decorator(include_jwt_auth=True)
-class MockClassAPIViewWithJwt(APIView):
-    pass
 
 
 @ddt.ddt
@@ -53,25 +40,46 @@ class TestEnsureJWTAuthSettingsMiddleware(TestCase):
     def setUp(self):
         super(TestEnsureJWTAuthSettingsMiddleware, self).setUp()
         self.request = get_mock_request()
+        self.middleware = EnsureJWTAuthSettingsMiddleware()
+        self.middleware._required_permission_classes = (MockRequiredPermissionClass,)
+
+    def _assert_included(self, item, iterator, should_be_included):
+        if should_be_included:
+            self.assertIn(item, iterator)
+        else:
+            self.assertNotIn(item, iterator)
 
     @ddt.data(
-        (mock_function_view, False),
-        (mock_function_view_with_jwt, True),
-        (MockClassAPIView, False),
-        (MockClassAPIViewWithJwt, True),
+        *product(
+            (True, False),
+            (True, False),
+            (True, False),
+        )
     )
     @ddt.unpack
-    def test_views(self, view, includes_required_permission):
-        middleware = EnsureJWTAuthSettingsMiddleware()
-        middleware.required_permission_classes = (MockRequiredPermissionClass,)
+    def test_class_views(self, use_function_view, include_jwt_auth, include_required_perm):
+        @mock_auth_decorator(include_jwt_auth=include_jwt_auth, include_required_perm=include_required_perm)
+        class MockClassView(APIView):
+            pass
 
-        view_class = getattr(view, 'view_class', view)
+        @api_view(["GET"])
+        @mock_auth_decorator(include_jwt_auth=include_jwt_auth, include_required_perm=include_required_perm)
+        def mock_function_view(request):
+            pass
 
-        self.assertNotIn(MockRequiredPermissionClass, view_class.permission_classes)
+        view = mock_function_view if use_function_view else MockClassView    
+        view_class = view.view_class if use_function_view else view
 
-        middleware.process_view(self.request, view, None, None)
+        self._assert_included(
+            JSONWebTokenAuthentication,
+            view_class.authentication_classes,
+            should_be_included=include_jwt_auth,
+        )
 
-        if includes_required_permission:
-            self.assertIn(MockRequiredPermissionClass, view_class.permission_classes)
-        else:
-            self.assertNotIn(MockRequiredPermissionClass, view_class.permission_classes)
+        self.middleware.process_view(self.request, view, None, None)
+
+        self._assert_included(
+            MockRequiredPermissionClass,
+            view_class.permission_classes,
+            should_be_included=include_required_perm or include_jwt_auth,
+        )
