@@ -705,6 +705,8 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
             'third_party_auth.lti.LTIAuthBackend',
         ]) + list(AUTHENTICATION_BACKENDS)
     )
+    if FEATURES.get('ENABLE_CUSTOM_OAUTH_BACKEND'):
+        AUTHENTICATION_BACKENDS += ['edx_oauth_client.backends.generic_oauth_client.GenericOAuthBackend']
 
     # The reduced session expiry time during the third party login pipeline. (Value in seconds)
     SOCIAL_AUTH_PIPELINE_TIMEOUT = ENV_TOKENS.get('SOCIAL_AUTH_PIPELINE_TIMEOUT', 600)
