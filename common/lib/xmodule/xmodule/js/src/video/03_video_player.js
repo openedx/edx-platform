@@ -3,8 +3,8 @@
 // VideoPlayer module.
     define(
 'video/03_video_player.js',
-['video/02_html5_video.js', 'video/02_html5_hls_video.js', 'video/00_resizer.js', 'hls', 'underscore'],
-function(HTML5Video, HTML5HLSVideo, Resizer, HLS, _) {
+['video/02_html5_video.js', 'video/02_html5_hls_video.js', 'video/00_resizer.js', 'hls', 'underscore', '../time.js'],
+function(HTML5Video, HTML5HLSVideo, Resizer, HLS, _, Time) {
     var dfd = $.Deferred(),
         VideoPlayer = function(state) {
             state.videoPlayer = {};

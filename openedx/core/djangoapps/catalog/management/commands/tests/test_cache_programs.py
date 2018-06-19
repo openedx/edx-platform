@@ -137,7 +137,7 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
 
         with self.assertRaises(SystemExit) as context:
             call_command('cache_programs')
-            self.assertEqual(context.exception.code, 1)
+        self.assertEqual(context.exception.code, 1)
 
         cached_uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=self.site_domain))
         self.assertEqual(cached_uuids, [])
@@ -166,7 +166,7 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
         with self.assertRaises(SystemExit) as context:
             call_command('cache_programs')
 
-            self.assertEqual(context.exception.code, 1)
+        self.assertEqual(context.exception.code, 1)
 
         cached_uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=self.site_domain))
         self.assertEqual(

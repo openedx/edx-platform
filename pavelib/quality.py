@@ -368,7 +368,8 @@ def run_eslint(options):
     violations_limit = int(getattr(options, 'limit', -1))
 
     sh(
-        "eslint --ext .js --ext .jsx --format=compact . | tee {eslint_report}".format(
+        "nodejs --max_old_space_size=4096 node_modules/.bin/eslint "
+        "--ext .js --ext .jsx --format=compact . | tee {eslint_report}".format(
             eslint_report=eslint_report
         ),
         ignore_error=True

@@ -63,7 +63,7 @@ var requireCompatConfig = Merge.smart(optimizedConfig, {
 // overwrite those because it means that we'll be serving assets with shorter
 // cache times. RequireJS never looks at the webpack-stats.json file.
 requireCompatConfig.plugins = requireCompatConfig.plugins.filter(
-    plugin => !plugin.options || (plugin.options && plugin.options.filename != 'webpack-stats.json')
+    function(plugin) { return !plugin.options || (plugin.options && plugin.options.filename !== 'webpack-stats.json'); }
 );
 
 module.exports = [optimizedConfig, requireCompatConfig];
