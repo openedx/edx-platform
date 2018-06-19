@@ -1,3 +1,6 @@
+"""
+Middleware to ensure safe endpoints.
+"""
 import logging
 
 from rest_framework_jwt.authentication import BaseJSONWebTokenAuthentication
@@ -21,7 +24,7 @@ class EnsureJWTAuthSettingsMiddleware(object):
             issubclass(auth_class, base_class) for auth_class in iter_classes,
         )
 
-    def process_view(self, request, view_func, view_args, view_kwargs):
+    def process_view(self, request, view_func, view_args, view_kwargs):  # pylint: disable=unused-argument
         view_class = getattr(view_func, 'view_class', view_func)
 
         view_authentication_classes = getattr(view_class, 'authentication_classes', tuple())
