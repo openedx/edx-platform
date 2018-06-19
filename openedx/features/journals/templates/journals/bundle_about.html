@@ -135,7 +135,7 @@ from openedx.core.djangolib.markup import HTML, Text
       </div>
       <div class="row course">
         <div class="col-3 col-lg-2 course-image">
-          % if course_img:
+          % if journal.get('card_image_url'):
             <img alt="" src="${journal['card_image_url']}" alt=""/>
           % endif
         </div>
