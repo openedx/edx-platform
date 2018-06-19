@@ -19,6 +19,7 @@ from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticati
 from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.user_api.accounts.permissions import CanRetireUser
+from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 from openedx.core.lib.api.authentication import (
     OAuth2AuthenticationAllowInactiveUser,
@@ -316,21 +317,23 @@ class UnenrollmentView(APIView):
                 "username": "username12345"
             }
 
-            **POST Parameters**
+        **POST Parameters**
 
-              A POST request must include the following parameter.
+            A POST request must include the following parameter.
 
-              * username: The username of the user being unenrolled.
-              This will never match the username from the request,
-              since the request is issued as a privileged service user.
+            * username: The username of the user being unenrolled.
+            This will never match the username from the request,
+            since the request is issued as a privileged service user.
 
         **POST Response Values**
 
-             If the user does not exist, or the user is already unenrolled
-             from all courses, the request returns an HTTP 404 "Does Not Exist"
-             response.
+            If the user has not requested retirement and does not have a retirement
+            request status, the request returns an HTTP 404 "Does Not Exist" response.
 
-             If an unexpected error occurs, the request returns an HTTP 500 response.
+            If the user is already unenrolled from all courses, the request returns
+            an HTTP 204 "No Content" response.
+
+            If an unexpected error occurs, the request returns an HTTP 500 response.
 
             If the request is successful, an HTTP 200 "OK" response is
             returned along with a list of all courses from which the user was unenrolled.
@@ -342,23 +345,20 @@ class UnenrollmentView(APIView):
         """
         Unenrolls the specified user from all courses.
         """
-        username = None
-        user_model = get_user_model()
-
         try:
-            # Get the username from the request and check that it exists
+            # Get the username from the request.
             username = request.data['username']
-            user_model.objects.get(username=username)
-
+            # Ensure that a retirement request status row exists for this username.
+            UserRetirementStatus.get_retirement_for_retirement_action(username)
             enrollments = api.get_enrollments(username)
             active_enrollments = [enrollment for enrollment in enrollments if enrollment['is_active']]
             if len(active_enrollments) < 1:
-                return Response(status=status.HTTP_200_OK)
+                return Response(status=status.HTTP_204_NO_CONTENT)
             return Response(api.unenroll_user_from_all_courses(username))
         except KeyError:
             return Response(u'Username not specified.', status=status.HTTP_404_NOT_FOUND)
-        except user_model.DoesNotExist:
-            return Response(u'The user "{}" does not exist.'.format(username), status=status.HTTP_404_NOT_FOUND)
+        except UserRetirementStatus.DoesNotExist:
+            return Response(u'No retirement request status for username.', status=status.HTTP_404_NOT_FOUND)
         except Exception as exc:  # pylint: disable=broad-except
             return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

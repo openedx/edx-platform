@@ -1177,14 +1177,6 @@ class TestAccountRetirementPost(RetirementTestCase):
         }
         self.assertEqual(expected_user_profile_pii, USER_PROFILE_PII)
 
-    def test_retire_user_where_user_does_not_exist(self):
-        path = 'openedx.core.djangoapps.user_api.accounts.views.is_username_retired'
-        with mock.patch(path, return_value=False) as mock_retired_username:
-            data = {'username': 'not_a_user'}
-            response = self.post_and_assert_status(data, status.HTTP_404_NOT_FOUND)
-            self.assertFalse(response.content)
-            mock_retired_username.assert_called_once_with('not_a_user')
-
     def test_retire_user_server_error_is_raised(self):
         path = 'openedx.core.djangoapps.user_api.models.UserRetirementStatus.get_retirement_for_retirement_action'
         with mock.patch(path, side_effect=Exception('Unexpected Exception')) as mock_get_retirement:
@@ -1197,9 +1189,9 @@ class TestAccountRetirementPost(RetirementTestCase):
         path = 'openedx.core.djangoapps.user_api.accounts.views.is_username_retired'
         with mock.patch(path, return_value=True) as mock_is_username_retired:
             data = {'username': self.test_user.username}
-            response = self.post_and_assert_status(data, status.HTTP_404_NOT_FOUND)
+            response = self.post_and_assert_status(data, status.HTTP_204_NO_CONTENT)
             self.assertFalse(response.content)
-            mock_is_username_retired.assert_called_once_with(self.original_username)
+            mock_is_username_retired.assert_not_called()
 
     def test_retire_user_where_username_not_provided(self):
         response = self.post_and_assert_status({}, status.HTTP_404_NOT_FOUND)
@@ -1250,6 +1242,11 @@ class TestAccountRetirementPost(RetirementTestCase):
 
         self.assertFalse(CourseEnrollmentAllowed.objects.filter(email=self.original_email).exists())
         self.assertFalse(UnregisteredLearnerCohortAssignments.objects.filter(email=self.original_email).exists())
+
+    def test_retire_user_twice_idempotent(self):
+        data = {'username': self.original_username}
+        self.post_and_assert_status(data)
+        self.post_and_assert_status(data)
 
     def test_deletes_pii_from_user_profile(self):
         for model_field, value_to_assign in USER_PROFILE_PII.iteritems():
@@ -1476,3 +1473,10 @@ class TestLMSAccountRetirementPost(RetirementTestCase, ModuleStoreTestCase):
         self.assertEqual(retired_api_access_request.company_name, '')
         self.assertEqual(retired_api_access_request.reason, '')
         self.assertEqual(SurveyAnswer.objects.get(user=self.test_user).field_value, '')
+
+    def test_retire_user_twice_idempotent(self):
+        # check that a second call to the retire_misc endpoint will work
+        UserRetirementStatus.get_retirement_for_retirement_action(self.test_user.username)
+        data = {'username': self.original_username}
+        self.post_and_assert_status(data)
+        self.post_and_assert_status(data)

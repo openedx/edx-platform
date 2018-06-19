@@ -721,8 +721,6 @@ class LMSAccountRetirementView(ViewSet):
         """
 
         username = request.data['username']
-        if is_username_retired(username):
-            return Response(status=status.HTTP_404_NOT_FOUND)
 
         try:
             retirement = UserRetirementStatus.get_retirement_for_retirement_action(username)
@@ -770,8 +768,6 @@ class AccountRetirementView(ViewSet):
         any other PII associated with this user.
         """
         username = request.data['username']
-        if is_username_retired(username):
-            return Response(status=status.HTTP_404_NOT_FOUND)
 
         try:
             retirement_status = UserRetirementStatus.get_retirement_for_retirement_action(username)
@@ -800,9 +796,6 @@ class AccountRetirementView(ViewSet):
             # Retire any objects linked to the user via their original email
             CourseEnrollmentAllowed.delete_by_user_value(original_email, field='email')
             UnregisteredLearnerCohortAssignments.delete_by_user_value(original_email, field='email')
-
-            # TODO: Password Reset links - https://openedx.atlassian.net/browse/PLAT-2104
-            # TODO: Delete OAuth2 records - https://openedx.atlassian.net/browse/EDUCATOR-2703
 
             user.first_name = ''
             user.last_name = ''
