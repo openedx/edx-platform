@@ -54,6 +54,7 @@ class Env(object):
     # Reports Directory
     REPORT_DIR = REPO_ROOT / 'reports'
     METRICS_DIR = REPORT_DIR / 'metrics'
+    QUALITY_DIR = REPORT_DIR / 'quality_junitxml'
 
     # Generic log dir
     GEN_LOG_DIR = REPO_ROOT / "test_root" / "log"
