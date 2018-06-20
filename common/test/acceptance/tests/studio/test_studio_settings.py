@@ -396,7 +396,7 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
         """
 
         original_course_display_name = self.advanced_settings.get(self.course_name_key)
-        new_course_name = "New Course Name"
+        new_course_name = '"New Course Name"'
         self.advanced_settings.set(self.course_name_key, new_course_name)
         self.assertNotEqual(
             original_course_display_name,
