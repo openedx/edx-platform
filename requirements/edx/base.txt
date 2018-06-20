@@ -4,7 +4,6 @@
 #
 #    make upgrade
 #
-
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
 -e common/lib/calc
 -e common/lib/capa
@@ -84,6 +83,7 @@ django-method-override==0.1.0
 django-model-utils==3.0.0
 django-mptt==0.8.7
 django-multi-email-field==0.5.1  # via edx-enterprise
+django-mysql==2.3.0
 django-oauth-toolkit==0.12.0
 django-object-actions==0.10.0  # via edx-enterprise
 django-pyfs==2.0
@@ -93,7 +93,7 @@ django-require==1.0.11
 django-rest-swagger==2.2.0
 django-sekizai==0.10.0
 django-ses==0.8.4
-django-simple-history==2.1.0
+django-simple-history==2.1.1
 django-splash==0.2.2
 django-statici18n==1.4.0
 django-storages==1.4.1
