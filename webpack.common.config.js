@@ -130,7 +130,7 @@ module.exports = Merge.smart({
             // https://github.com/webpack/webpack/issues/304#issuecomment-272150177
             // (I've tried every other suggestion solution on that page, this
             // was the only one that worked.)
-            /\/sinon\.js|codemirror-compressed\.js|hls\.js/
+            /\/sinon\.js|codemirror-compressed\.js|hls\.js|tinymce\.full\.min\.js/
         ],
         rules: [
             {
@@ -312,13 +312,14 @@ module.exports = Merge.smart({
             jquery: 'jquery/src/jquery',  // Use the non-diqst form of jQuery for better debugging + optimization
             'jquery.flot': 'flot/jquery.flot.min',
             'jquery.ui': 'jquery-ui.min',
-            'jquery.tinymce': 'tinymce/jquery.tinymce.min',
+            'jquery.tinymce': 'jquery.tinymce.min',
             'jquery.inputnumber': 'html5-input-polyfills/number-polyfill',
             'jquery.qtip': 'jquery.qtip.min',
             'jquery.smoothScroll': 'jquery.smooth-scroll.min',
             'jquery.timepicker': 'timepicker/jquery.timepicker',
             'backbone.associations': 'backbone-associations/backbone-associations-min',
             squire: 'Squire',
+            tinymce: 'tinymce.full.min',
 
             // See sinon/webpack interaction weirdness:
             // https://github.com/webpack/webpack/issues/304#issuecomment-272150177
