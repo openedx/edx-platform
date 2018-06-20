@@ -65,6 +65,7 @@ def error_on_save(step):
         "Value stored in a .* must be .*, found .*"
     )
 
+
 @step('it is displayed as a string')
 def it_is_displayed_as_string(step):
     assert_policy_entries([DISPLAY_NAME_KEY], ['"quote me"'])
