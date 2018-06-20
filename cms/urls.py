@@ -92,6 +92,11 @@ urlpatterns = [
         name='course_search_index_handler'
         ),
     url(r'^course/{}?$'.format(settings.COURSE_KEY_PATTERN), contentstore.views.course_handler, name='course_handler'),
+
+    url(r'^checklists/{}?$'.format(settings.COURSE_KEY_PATTERN),
+        contentstore.views.checklists_handler,
+        name='checklists_handler'),
+
     url(r'^course_notifications/{}/(?P<action_state_id>\d+)?$'.format(settings.COURSE_KEY_PATTERN),
         contentstore.views.course_notifications_handler,
         name='course_notifications_handler'),

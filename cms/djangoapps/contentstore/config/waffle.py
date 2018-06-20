@@ -9,6 +9,7 @@ WAFFLE_NAMESPACE = u'studio'
 
 # Switches
 ENABLE_ACCESSIBILITY_POLICY_PAGE = u'enable_policy_page'
+ENABLE_CHECKLISTS_PAGE = u'enable_checklists_page'
 
 
 def waffle():
@@ -29,5 +30,11 @@ def waffle_flags():
 ENABLE_IN_CONTEXT_IMAGE_SELECTION = CourseWaffleFlag(
     waffle_namespace=waffle_flags(),
     flag_name=u'enable_in_context_image_selection',
+    flag_undefined_default=False
+)
+
+ENABLE_CHECKLISTS_QUALITY = CourseWaffleFlag(
+    waffle_namespace=waffle_flags(),
+    flag_name=u'enable_checklists_quality',
     flag_undefined_default=False
 )
