@@ -1,35 +1,94 @@
 
 
-(function (globals) {
+(function(globals) {
 
   var django = globals.django || (globals.django = {});
 
   
-  django.pluralidx = function (count) { return (count == 1) ? 0 : 1; };
-  
-
-  
-  /* gettext identity library */
-
-  django.gettext = function (msgid) { return msgid; };
-  django.ngettext = function (singular, plural, count) { return (count == 1) ? singular : plural; };
-  django.gettext_noop = function (msgid) { return msgid; };
-  django.pgettext = function (context, msgid) { return msgid; };
-  django.npgettext = function (context, singular, plural, count) { return (count == 1) ? singular : plural; };
-  
-
-  django.interpolate = function (fmt, obj, named) {
-    if (named) {
-      return fmt.replace(/%\(\w+\)s/g, function(match){return String(obj[match.slice(2,-2)])});
+  django.pluralidx = function(n) {
+    var v=0;
+    if (typeof(v) == 'boolean') {
+      return v ? 1 : 0;
     } else {
-      return fmt.replace(/%s/g, function(match){return String(obj.shift())});
+      return v;
     }
   };
+  
+
+  /* gettext library */
+
+  django.catalog = django.catalog || {};
+  
+  var newcatalog = {
+    "6 a.m.": "\u1798\u17c9\u17c4\u1784\u00a0\u17e6\u00a0\u1796\u17d2\u179a\u17b9\u1780", 
+    "Available %s": "%s \u178a\u17c2\u179b\u17a2\u17b6\u1785\u200b\u1787\u17d2\u179a\u17be\u179f\u179a\u17be\u179f\u1794\u17b6\u1793", 
+    "Cancel": "\u179b\u1794\u17cb\u1785\u17c4\u179b", 
+    "Choose a time": "\u1787\u17d2\u179a\u17be\u179f\u179a\u17be\u179f\u1798\u17c9\u17c4\u1784", 
+    "Choose all": "\u1787\u17d2\u179a\u17be\u179f\u179a\u17be\u179f\u1791\u17b6\u17c6\u1784\u17a2\u179f\u17cb", 
+    "Chosen %s": "%s \u178a\u17c2\u179b\u1794\u17b6\u1793\u1787\u17d2\u179a\u17be\u179f\u179a\u17be\u179f", 
+    "Filter": "\u179f\u17d2\u179c\u17c2\u1784\u179a\u1780\u1787\u17b6\u1798\u17bd\u1799", 
+    "Midnight": "\u17a2\u1792\u17d2\u179a\u17b6\u178f\u17d2\u179a", 
+    "Noon": "\u1796\u17c1\u179b\u1790\u17d2\u1784\u17c2\u178f\u17d2\u179a\u1784\u17cb", 
+    "Now": "\u17a5\u17a1\u17bc\u179c\u1793\u17c1\u17c7", 
+    "Remove": "\u179b\u1794\u17cb\u1785\u17c1\u1789", 
+    "Today": "\u1790\u17d2\u1784\u17c3\u1793\u17c1\u17c7", 
+    "Tomorrow": "\u1790\u17d2\u1784\u17c3\u179f\u17d2\u17a2\u17c2\u1780", 
+    "Yesterday": "\u1798\u17d2\u179f\u17b7\u179b\u1798\u17b7\u1789"
+  };
+  for (var key in newcatalog) {
+    django.catalog[key] = newcatalog[key];
+  }
+  
+
+  if (!django.jsi18n_initialized) {
+    django.gettext = function(msgid) {
+      var value = django.catalog[msgid];
+      if (typeof(value) == 'undefined') {
+        return msgid;
+      } else {
+        return (typeof(value) == 'string') ? value : value[0];
+      }
+    };
+
+    django.ngettext = function(singular, plural, count) {
+      var value = django.catalog[singular];
+      if (typeof(value) == 'undefined') {
+        return (count == 1) ? singular : plural;
+      } else {
+        return value[django.pluralidx(count)];
+      }
+    };
+
+    django.gettext_noop = function(msgid) { return msgid; };
+
+    django.pgettext = function(context, msgid) {
+      var value = django.gettext(context + '\x04' + msgid);
+      if (value.indexOf('\x04') != -1) {
+        value = msgid;
+      }
+      return value;
+    };
+
+    django.npgettext = function(context, singular, plural, count) {
+      var value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
+      if (value.indexOf('\x04') != -1) {
+        value = django.ngettext(singular, plural, count);
+      }
+      return value;
+    };
+
+    django.interpolate = function(fmt, obj, named) {
+      if (named) {
+        return fmt.replace(/%\(\w+\)s/g, function(match){return String(obj[match.slice(2,-2)])});
+      } else {
+        return fmt.replace(/%s/g, function(match){return String(obj.shift())});
+      }
+    };
 
 
-  /* formatting library */
+    /* formatting library */
 
-  django.formats = {
+    django.formats = {
     "DATETIME_FORMAT": "j \u1781\u17c2 F \u1786\u17d2\u1793\u17b6\u17c6 Y, G:i", 
     "DATETIME_INPUT_FORMATS": [
       "%Y-%m-%d %H:%M:%S", 
@@ -75,24 +134,27 @@
     "YEAR_MONTH_FORMAT": "F Y"
   };
 
-  django.get_format = function (format_type) {
-    var value = django.formats[format_type];
-    if (typeof(value) == 'undefined') {
-      return format_type;
-    } else {
-      return value;
-    }
-  };
+    django.get_format = function(format_type) {
+      var value = django.formats[format_type];
+      if (typeof(value) == 'undefined') {
+        return format_type;
+      } else {
+        return value;
+      }
+    };
 
-  /* add to global namespace */
-  globals.pluralidx = django.pluralidx;
-  globals.gettext = django.gettext;
-  globals.ngettext = django.ngettext;
-  globals.gettext_noop = django.gettext_noop;
-  globals.pgettext = django.pgettext;
-  globals.npgettext = django.npgettext;
-  globals.interpolate = django.interpolate;
-  globals.get_format = django.get_format;
+    /* add to global namespace */
+    globals.pluralidx = django.pluralidx;
+    globals.gettext = django.gettext;
+    globals.ngettext = django.ngettext;
+    globals.gettext_noop = django.gettext_noop;
+    globals.pgettext = django.pgettext;
+    globals.npgettext = django.npgettext;
+    globals.interpolate = django.interpolate;
+    globals.get_format = django.get_format;
+
+    django.jsi18n_initialized = true;
+  }
 
 }(this));
 
