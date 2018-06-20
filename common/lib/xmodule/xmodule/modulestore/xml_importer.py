@@ -20,37 +20,38 @@ Modulestore virtual   |          XML physical (draft, published)
              (a, a)   |  (a, a) | (x, a) | (x, x) | (x, y) | (a, x)
              (a, b)   |  (a, b) | (x, b) | (x, x) | (x, y) | (a, x)
 """
-import logging
-from abc import abstractmethod
-from opaque_keys.edx.locator import LibraryLocator
-import os
-import mimetypes
-from path import Path as path
 import json
+import logging
+import mimetypes
+import os
 import re
-from lxml import etree
+from abc import abstractmethod
 
-from xblock.fields import XBlockMixin
-from xmodule.library_tools import LibraryToolsService
-from xmodule.modulestore.xml import XMLModuleStore, LibraryXMLModuleStore, ImportSystem
-from xblock.runtime import KvsFieldData, DictKeyValueStore
-from xmodule.x_module import XModuleDescriptor, XModuleMixin
-from opaque_keys.edx.keys import UsageKey
-from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
-from xmodule.contentstore.content import StaticContent
-from .inheritance import own_metadata
-from xmodule.errortracker import make_error_tracker
-from .store_utilities import rewrite_nonportable_content_links
 import xblock
-from xmodule.tabs import CourseTabList
+from lxml import etree
+from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.locator import LibraryLocator
+from path import Path as path
+from xblock.core import XBlockMixin
+from xblock.fields import Reference, ReferenceList, ReferenceValueDict, Scope
+from xblock.runtime import DictKeyValueStore, KvsFieldData
+
 from xmodule.assetstore import AssetMetadata
+from xmodule.contentstore.content import StaticContent
+from xmodule.errortracker import make_error_tracker
+from xmodule.library_tools import LibraryToolsService
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import ASSET_IGNORE_REGEX
 from xmodule.modulestore.exceptions import DuplicateCourseError
 from xmodule.modulestore.mongo.base import MongoRevisionKey
-from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.store_utilities import draft_node_constructor, get_draft_subtree_roots
+from xmodule.modulestore.xml import ImportSystem, LibraryXMLModuleStore, XMLModuleStore
+from xmodule.tabs import CourseTabList
 from xmodule.util.misc import escape_invalid_characters
+from xmodule.x_module import XModuleDescriptor, XModuleMixin
 
+from .inheritance import own_metadata
+from .store_utilities import rewrite_nonportable_content_links
 
 log = logging.getLogger(__name__)
 
