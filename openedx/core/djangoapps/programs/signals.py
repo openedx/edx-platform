@@ -94,4 +94,4 @@ def handle_course_cert_changed(sender, user, course_key, mode, status, **kwargs)
     )
     # import here, because signal is registered at startup, but items in tasks are not yet able to be loaded
     from openedx.core.djangoapps.programs.tasks.v1.tasks import award_course_certificate
-    award_course_certificate.delay(user.username, course_key)
+    award_course_certificate.delay(user.username, str(course_key))
