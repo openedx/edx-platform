@@ -38,17 +38,18 @@ pull_translations: ## pull translations from Transifex
 requirements: ## install development environment requirements
 	pip install -qr requirements/edx/development.txt --exists-action w
 
+upgrade: export CUSTOM_COMPILE_COMMAND=make upgrade
 upgrade: ## update the pip requirements files to use the latest releases satisfying our constraints
 	pip install -qr requirements/edx/pip-tools.txt
 	# Make sure to compile files after any other files they include!
-	pip-compile --upgrade -o requirements/edx/pip-tools.txt requirements/edx/pip-tools.in
-	pip-compile --upgrade -o requirements/edx/coverage.txt requirements/edx/coverage.in
-	pip-compile --upgrade -o requirements/edx/paver.txt requirements/edx/paver.in
-	pip-compile --upgrade -o requirements/edx-sandbox/shared.txt requirements/edx-sandbox/shared.in
-	pip-compile --upgrade -o requirements/edx-sandbox/base.txt requirements/edx-sandbox/base.in
-	pip-compile --upgrade -o requirements/edx/base.txt requirements/edx/base.in
-	pip-compile --upgrade -o requirements/edx/testing.txt requirements/edx/testing.in
-	pip-compile --upgrade -o requirements/edx/development.txt requirements/edx/development.in
+	pip-compile --no-emit-trusted-host --no-index --upgrade -o requirements/edx/pip-tools.txt requirements/edx/pip-tools.in
+	pip-compile --no-emit-trusted-host --no-index --upgrade -o requirements/edx/coverage.txt requirements/edx/coverage.in
+	pip-compile --no-emit-trusted-host --no-index --upgrade -o requirements/edx/paver.txt requirements/edx/paver.in
+	pip-compile --no-emit-trusted-host --no-index --upgrade -o requirements/edx-sandbox/shared.txt requirements/edx-sandbox/shared.in
+	pip-compile --no-emit-trusted-host --no-index --upgrade -o requirements/edx-sandbox/base.txt requirements/edx-sandbox/base.in
+	pip-compile --no-emit-trusted-host --no-index --upgrade -o requirements/edx/base.txt requirements/edx/base.in
+	pip-compile --no-emit-trusted-host --no-index --upgrade -o requirements/edx/testing.txt requirements/edx/testing.in
+	pip-compile --no-emit-trusted-host --no-index --upgrade -o requirements/edx/development.txt requirements/edx/development.in
 	# Post process all of the files generated above to work around open pip-tools issues
 	scripts/post-pip-compile.sh \
         requirements/edx/pip-tools.txt \
