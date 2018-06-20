@@ -10,6 +10,32 @@ from oauth2_provider.scopes import get_scopes_backend
 from oauth2_provider.settings import oauth2_settings
 from oauth2_provider.views import AuthorizationView
 
+from oauth2_provider import models as dot_models
+from openedx.core.djangoapps.oauth_dispatch.models import ScopedOrganization
+
+def is_org_associated_with_appication(request):
+    dot_id = dot_models.get_application_model().objects.get(client_id = request.GET.get('client_id')).id
+    if ScopedOrganization.objects.filter(application_id=dot_id).exists():
+        return True
+    else:
+        return False
+
+def get_associated_application_orgs(request):
+    if is_org_associated_with_appication(request):
+        orgs = ScopedOrganization.objects.get(application_id=dot_id).org_associations
+        return orgs
+    else:
+        return None
+
+def associate_org_with_scope_description(scopes,all_scopes,org):
+    org_scopes = ['grades:read','certificates:read']
+    scope_descriptions = []
+    for scope in scopes:
+        if scope in org_scopes:
+            scope_descriptions.append(all_scopes[scope] + ' with '+ org[0] )
+        else:
+            scope_descriptions.append(all_scopes[scope])
+    return scope_descriptions
 
 # TODO (ARCH-83) remove once we have full support of OAuth Scopes
 class EdxOAuth2AuthorizationView(AuthorizationView):
@@ -38,7 +64,12 @@ class EdxOAuth2AuthorizationView(AuthorizationView):
 
             scopes, credentials = self.validate_authorization_request(request)
             all_scopes = get_scopes_backend().get_all_scopes()
-            kwargs["scopes_descriptions"] = [all_scopes[scope] for scope in scopes]
+            if is_org_associated_with_appication:
+			    org = get_associated_application_orgs(request)
+                kwargs["scopes_descriptions"] = associate_org_with_scope_description(scopes,all_scopes,org)
+            else:
+               kwargs["scopes_descriptions"] = [all_scopes[scope] for scope in scopes]
+
             kwargs['scopes'] = scopes
 
             # at this point we know an Application instance with such client_id exists in the database

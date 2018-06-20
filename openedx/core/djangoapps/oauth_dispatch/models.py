@@ -54,7 +54,7 @@ class RestrictedApplication(models.Model):
         return access_token.expires == datetime(1970, 1, 1, tzinfo=utc)
 
 
-class OauthRestrictedApplication(AbstractApplication):
+class ScopedApplication(AbstractApplication):
     """
     Application model for use with Django OAuth Toolkit that allows the scopes
     available to an application to be restricted on a per-application basis.
@@ -99,7 +99,7 @@ class OauthRestrictedApplication(AbstractApplication):
         return app_scopes.intersection(all_scopes)
 
 
-class OauthRestrictOrganization(models.Model):
+class ScopedOrganization(models.Model):
 
     CONTENT_PROVIDER = 'content_provider'
     USER_PROVIDER = 'user_provider'
