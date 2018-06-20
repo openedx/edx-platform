@@ -9,7 +9,7 @@
   from openedx.core.djangolib.js_utils import js_escaped_string, dump_js_escaped_json
 %>
 <%block name="title">${_("Checklists")}</%block>
-<%block name="bodyclass">is-signedin course uploads view-uploads</%block>
+<%block name="bodyclass">is-signedin course</%block>
 
 <%namespace name='static' file='static_content.html'/>
 
@@ -21,10 +21,10 @@
 
 <div class="wrapper-mast wrapper">
     <header class="mast has-actions has-subtitle">
-        <h3 class="page-header">
-            <small class="subtitle">${_("Content")}</small>
+        <h2 class="page-header">
+            <small class="subtitle">${_("Tools")}</small>
             <span class="sr">- </span>${_("Checklists")}
-        </h3>
+        </h2>
     </header>
 </div>
 
