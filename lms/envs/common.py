@@ -2871,6 +2871,7 @@ OPTIONAL_APPS = [
     ('integrated_channels.integrated_channel', None),
     ('integrated_channels.degreed', None),
     ('integrated_channels.sap_success_factors', None),
+    ('integrated_channels.xapi', None),
 
     # Required by the Enterprise App
     ('django_object_actions', None),  # https://github.com/crccheck/django-object-actions
