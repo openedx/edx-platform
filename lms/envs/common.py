@@ -2204,7 +2204,7 @@ INSTALLED_APPS = [
     'social_django',
 
     # Surveys
-    'survey',
+    'survey.apps.SurveyConfig',
 
     'lms.djangoapps.lms_xblock.apps.LMSXBlockConfig',
 

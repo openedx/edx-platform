@@ -29,7 +29,7 @@ import mock
 from opaque_keys.edx.keys import CourseKey
 import pytz
 from rest_framework import status
-from six import text_type
+from six import iteritems, text_type
 from social_django.models import UserSocialAuth
 from wiki.models import ArticleRevision, Article
 from wiki.models.pluginbase import RevisionPluginRevision, RevisionPlugin
@@ -38,14 +38,13 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from entitlements.models import CourseEntitlementSupportDetail
 from entitlements.tests.factories import CourseEntitlementFactory
-from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
 from openedx.core.djangoapps.credit.models import (
     CreditRequirementStatus, CreditRequest, CreditCourse, CreditProvider, CreditRequirement
 )
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup, UnregisteredLearnerCohortAssignments
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
-from openedx.core.djangoapps.user_api.accounts.signals import USER_RETIRE_MAILINGS
+from openedx.core.djangoapps.user_api.accounts.signals import USER_RETIRE_THIRD_PARTY_MAILINGS
 from openedx.core.djangoapps.user_api.models import (
     RetirementState,
     UserRetirementStatus,
@@ -74,10 +73,10 @@ from student.tests.factories import (
     SuperuserFactory,
     UserFactory
 )
-from survey.models import SurveyAnswer
 
 from ..views import AccountRetirementView, USER_PROFILE_PII
 from ...tests.factories import UserOrgTagFactory
+from .retirement_helpers import RetirementTestCase, fake_retirement
 
 
 def build_jwt_headers(user):
@@ -161,125 +160,6 @@ class TestAccountDeactivation(TestCase):
             expected_status=status.HTTP_401_UNAUTHORIZED,
             expected_activation_status=True
         )
-
-
-class RetirementTestCase(TestCase):
-    """
-    Test case with a helper methods for retirement
-    """
-    @classmethod
-    def setUpClass(cls):
-        super(RetirementTestCase, cls).setUpClass()
-        cls.setup_states()
-
-    @staticmethod
-    def setup_states():
-        """
-        Create basic states that mimic our current understanding of the retirement process
-        """
-        default_states = [
-            ('PENDING', 1, False, True),
-            ('LOCKING_ACCOUNT', 20, False, False),
-            ('LOCKING_COMPLETE', 30, False, False),
-            ('RETIRING_CREDENTIALS', 40, False, False),
-            ('CREDENTIALS_COMPLETE', 50, False, False),
-            ('RETIRING_ECOM', 60, False, False),
-            ('ECOM_COMPLETE', 70, False, False),
-            ('RETIRING_FORUMS', 80, False, False),
-            ('FORUMS_COMPLETE', 90, False, False),
-            ('RETIRING_EMAIL_LISTS', 100, False, False),
-            ('EMAIL_LISTS_COMPLETE', 110, False, False),
-            ('RETIRING_ENROLLMENTS', 120, False, False),
-            ('ENROLLMENTS_COMPLETE', 130, False, False),
-            ('RETIRING_NOTES', 140, False, False),
-            ('NOTES_COMPLETE', 150, False, False),
-            ('RETIRING_LMS', 160, False, False),
-            ('LMS_COMPLETE', 170, False, False),
-            ('ADDING_TO_PARTNER_QUEUE', 180, False, False),
-            ('PARTNER_QUEUE_COMPLETE', 190, False, False),
-            ('ERRORED', 200, True, True),
-            ('ABORTED', 210, True, True),
-            ('COMPLETE', 220, True, True),
-        ]
-
-        for name, ex, dead, req in default_states:
-            RetirementState.objects.create(
-                state_name=name,
-                state_execution_order=ex,
-                is_dead_end_state=dead,
-                required=req
-            )
-
-    def _create_retirement(self, state, create_datetime=None):
-        """
-        Helper method to create a RetirementStatus with useful defaults
-        """
-        if create_datetime is None:
-            create_datetime = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=8)
-
-        user = UserFactory()
-        return UserRetirementStatus.objects.create(
-            user=user,
-            original_username=user.username,
-            original_email=user.email,
-            original_name=user.profile.name,
-            retired_username=get_retired_username_by_username(user.username),
-            retired_email=get_retired_email_by_email(user.email),
-            current_state=state,
-            last_state=state,
-            responses="",
-            created=create_datetime,
-            modified=create_datetime
-        )
-
-    def _retirement_to_dict(self, retirement, all_fields=False):
-        """
-        Return a dict format of this model to a consistent format for serialization, removing the long text field
-        `responses` for performance reasons.
-        """
-        retirement_dict = {
-            u'id': retirement.id,
-            u'user': {
-                u'id': retirement.user.id,
-                u'username': retirement.user.username,
-                u'email': retirement.user.email,
-                u'profile': {
-                    u'id': retirement.user.profile.id,
-                    u'name': retirement.user.profile.name
-                },
-            },
-            u'original_username': retirement.original_username,
-            u'original_email': retirement.original_email,
-            u'original_name': retirement.original_name,
-            u'retired_username': retirement.retired_username,
-            u'retired_email': retirement.retired_email,
-            u'current_state': {
-                u'id': retirement.current_state.id,
-                u'state_name': retirement.current_state.state_name,
-                u'state_execution_order': retirement.current_state.state_execution_order,
-            },
-            u'last_state': {
-                u'id': retirement.last_state.id,
-                u'state_name': retirement.last_state.state_name,
-                u'state_execution_order': retirement.last_state.state_execution_order,
-            },
-            u'created': retirement.created,
-            u'modified': retirement.modified
-        }
-
-        if all_fields:
-            retirement_dict['responses'] = retirement.responses
-
-        return retirement_dict
-
-    def _create_users_all_states(self):
-        return [self._create_retirement(state) for state in RetirementState.objects.all()]
-
-    def _get_non_dead_end_states(self):
-        return [state for state in RetirementState.objects.filter(is_dead_end_state=False)]
-
-    def _get_dead_end_states(self):
-        return [state for state in RetirementState.objects.filter(is_dead_end_state=True)]
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
@@ -377,26 +257,18 @@ class TestAccountRetireMailings(RetirementTestCase):
         self.retirement = self._create_retirement(retiring_email_lists)
         self.test_user = self.retirement.user
 
-        UserOrgTag.objects.create(user=self.test_user, key='email-optin', org="foo", value="True")
-        UserOrgTag.objects.create(user=self.test_user, key='email-optin', org="bar", value="True")
-
         self.url = reverse('accounts_retire_mailings')
 
     def build_post(self, user):
         return {'username': user.username}
 
-    def assert_status_and_tag_count(self, headers, expected_status=status.HTTP_204_NO_CONTENT, expected_tag_count=2,
-                                    expected_tag_value="False", expected_content=None):
+    def assert_status(self, headers, expected_status=status.HTTP_204_NO_CONTENT, expected_content=None):
         """
         Helper function for making a request to the retire subscriptions endpoint, and asserting the status.
         """
         response = self.client.post(self.url, self.build_post(self.test_user), **headers)
 
         self.assertEqual(response.status_code, expected_status)
-
-        # Check that the expected number of tags with the correct value exist
-        tag_count = UserOrgTag.objects.filter(user=self.test_user, value=expected_tag_value).count()
-        self.assertEqual(tag_count, expected_tag_count)
 
         if expected_content:
             self.assertEqual(response.content.strip('"'), expected_content)
@@ -406,15 +278,7 @@ class TestAccountRetireMailings(RetirementTestCase):
         Verify a user's subscriptions are retired when a superuser posts to the retire subscriptions endpoint.
         """
         headers = build_jwt_headers(self.test_superuser)
-        self.assert_status_and_tag_count(headers)
-
-    def test_superuser_retires_user_subscriptions_no_orgtags(self):
-        """
-        Verify the call succeeds when the user doesn't have any org tags.
-        """
-        UserOrgTag.objects.all().delete()
-        headers = build_jwt_headers(self.test_superuser)
-        self.assert_status_and_tag_count(headers, expected_tag_count=0)
+        self.assert_status(headers)
 
     def test_unauthorized_rejection(self):
         """
@@ -423,7 +287,7 @@ class TestAccountRetireMailings(RetirementTestCase):
         headers = build_jwt_headers(self.test_user)
 
         # User should still have 2 "True" subscriptions.
-        self.assert_status_and_tag_count(headers, expected_status=status.HTTP_403_FORBIDDEN, expected_tag_value="True")
+        self.assert_status(headers, expected_status=status.HTTP_403_FORBIDDEN)
 
     def test_signal_failure(self):
         """
@@ -435,17 +299,16 @@ class TestAccountRetireMailings(RetirementTestCase):
         mock_handler.side_effect = Exception("Tango")
 
         try:
-            USER_RETIRE_MAILINGS.connect(mock_handler)
+            USER_RETIRE_THIRD_PARTY_MAILINGS.connect(mock_handler)
 
             # User should still have 2 "True" subscriptions.
-            self.assert_status_and_tag_count(
+            self.assert_status(
                 headers,
                 expected_status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                expected_tag_value="True",
                 expected_content="Tango"
             )
         finally:
-            USER_RETIRE_MAILINGS.disconnect(mock_handler)
+            USER_RETIRE_THIRD_PARTY_MAILINGS.disconnect(mock_handler)
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
@@ -1193,7 +1056,6 @@ class TestAccountRetirementPost(RetirementTestCase):
         )
 
         # Misc. setup
-        self.photo_verification = SoftwareSecurePhotoVerificationFactory.create(user=self.test_user)
         PendingEmailChangeFactory.create(user=self.test_user)
         UserOrgTagFactory.create(user=self.test_user, key='foo', value='bar')
         UserOrgTagFactory.create(user=self.test_user, key='cat', value='dog')
@@ -1275,10 +1137,10 @@ class TestAccountRetirementPost(RetirementTestCase):
             'is_active': False,
             'username': self.retired_username,
         }
-        for field, expected_value in expected_user_values.iteritems():
+        for field, expected_value in iteritems(expected_user_values):
             self.assertEqual(expected_value, getattr(self.test_user, field))
 
-        for field, expected_value in USER_PROFILE_PII.iteritems():
+        for field, expected_value in iteritems(USER_PROFILE_PII):
             self.assertEqual(expected_value, getattr(self.test_user.profile, field))
 
         self.assertIsNone(self.test_user.profile.profile_image_uploaded_at)
@@ -1298,7 +1160,6 @@ class TestAccountRetirementPost(RetirementTestCase):
         self._pending_enterprise_customer_user_assertions()
         self._entitlement_support_detail_assertions()
 
-        self._photo_verification_assertions()
         self.assertFalse(PendingEmailChange.objects.filter(user=self.test_user).exists())
         self.assertFalse(UserOrgTag.objects.filter(user=self.test_user).exists())
 
@@ -1308,10 +1169,11 @@ class TestAccountRetirementPost(RetirementTestCase):
     def test_retire_user_twice_idempotent(self):
         data = {'username': self.original_username}
         self.post_and_assert_status(data)
+        fake_retirement(self.test_user)
         self.post_and_assert_status(data)
 
     def test_deletes_pii_from_user_profile(self):
-        for model_field, value_to_assign in USER_PROFILE_PII.iteritems():
+        for model_field, value_to_assign in iteritems(USER_PROFILE_PII):
             if value_to_assign == '':
                 value = 'foo'
             else:
@@ -1320,7 +1182,7 @@ class TestAccountRetirementPost(RetirementTestCase):
 
         AccountRetirementView.clear_pii_from_userprofile(self.test_user)
 
-        for model_field, value_to_assign in USER_PROFILE_PII.iteritems():
+        for model_field, value_to_assign in iteritems(USER_PROFILE_PII):
             self.assertEqual(value_to_assign, getattr(self.test_user.profile, model_field))
 
         social_links = SocialLink.objects.filter(
@@ -1406,15 +1268,6 @@ class TestAccountRetirementPost(RetirementTestCase):
         self.entitlement_support_detail.refresh_from_db()
         self.assertEqual('', self.entitlement_support_detail.comments)
 
-    def _photo_verification_assertions(self):
-        """
-        Helper method for asserting that ``SoftwareSecurePhotoVerification`` objects are retired.
-        """
-        self.photo_verification.refresh_from_db()
-        self.assertEqual(self.test_user, self.photo_verification.user)
-        for field in ('name', 'face_image_url', 'photo_id_image_url', 'photo_id_key'):
-            self.assertEqual('', getattr(self.photo_verification, field))
-
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
 class TestLMSAccountRetirementPost(RetirementTestCase, ModuleStoreTestCase):
@@ -1478,9 +1331,6 @@ class TestLMSAccountRetirementPost(RetirementTestCase, ModuleStoreTestCase):
             reason=self.pii_standin,
         )
 
-        # SurveyAnswer setup
-        SurveyAnswer.objects.create(user=self.test_user, field_value=self.pii_standin, form_id=0)
-
         # other setup
         PendingNameChange.objects.create(user=self.test_user, new_name=self.pii_standin, rationale=self.pii_standin)
         PasswordHistory.objects.create(user=self.test_user, password=self.pii_standin)
@@ -1534,11 +1384,10 @@ class TestLMSAccountRetirementPost(RetirementTestCase, ModuleStoreTestCase):
         self.assertEqual(retired_api_access_request.company_address, '')
         self.assertEqual(retired_api_access_request.company_name, '')
         self.assertEqual(retired_api_access_request.reason, '')
-        self.assertEqual(SurveyAnswer.objects.get(user=self.test_user).field_value, '')
 
     def test_retire_user_twice_idempotent(self):
         # check that a second call to the retire_misc endpoint will work
-        UserRetirementStatus.get_retirement_for_retirement_action(self.test_user.username)
         data = {'username': self.original_username}
         self.post_and_assert_status(data)
+        fake_retirement(self.test_user)
         self.post_and_assert_status(data)
