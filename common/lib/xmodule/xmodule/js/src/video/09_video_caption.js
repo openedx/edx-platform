@@ -1222,7 +1222,8 @@
             },
 
             listenForDragDrop: function() {
-                var captions = document.querySelector('.closed-captions'),
+                //var captions = document.querySelector('.closed-captions'),
+                var captions = this.captionDisplayEl['0'],
                     draggable;
 
                 if (typeof Draggabilly === 'function') {
