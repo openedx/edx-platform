@@ -1,11 +1,11 @@
 
 
-(function (globals) {
+(function(globals) {
 
   var django = globals.django || (globals.django = {});
 
   
-  django.pluralidx = function (n) {
+  django.pluralidx = function(n) {
     var v=0;
     if (typeof(v) == 'boolean') {
       return v ? 1 : 0;
@@ -15,10 +15,11 @@
   };
   
 
-  
   /* gettext library */
 
-  django.catalog = {
+  django.catalog = django.catalog || {};
+  
+  var newcatalog = {
     " learner does not exist in LMS and not added to the exception list": "\u5b66\u4e60\u8005\u4e0d\u5b58\u5728\u7cfb\u7edf\u4e2d\uff0c\u5c06\u4e0d\u52a0\u5230\u4f8b\u5916\u5217\u8868\u4e2d", 
     " learner is successfully added to the exception list": "\u5b66\u4e60\u8005\u5df2\u7ecf\u6210\u529f\u5730\u52a0\u5165\u5230\u4f8b\u5916\u5217\u8868", 
     " learners are successfully added to exception list": "\u5b66\u4e60\u8005\u5df2\u7ecf\u6210\u529f\u5730\u52a0\u5165\u5230\u4f8b\u5916\u5217\u8868", 
@@ -149,7 +150,6 @@
     "Are you sure you want to restrict {email} access to \u201c{container}\u201d?": "\u60a8\u786e\u5b9a\u8981\u9650\u5236{email}\u5bf9\u201c{container}\u201d\u7684\u8bbf\u95ee\uff1f", 
     "Are you sure you want to revert to the last published version of the unit? You cannot undo this action.": "\u60a8\u786e\u5b9a\u8981\u6062\u590d\u5230\u8be5\u5355\u5143\u7684\u4e0a\u6b21\u53d1\u5e03\u7248\u672c\uff1f\u60a8\u65e0\u6cd5\u64a4\u6d88\u6b64\u64cd\u4f5c\u3002", 
     "Are you sure you wish to delete this item. It cannot be reversed!\n\nAlso any content that links/refers to this item will no longer work (e.g. broken images and/or links)": "\u5220\u9664\u7684\u9879\u76ee\u4e0d\u80fd\u6062\u590d\uff01\u60a8\u786e\u5b9a\u8981\u5220\u9664\u8fd9\u4e2a\u9879\u76ee\u5417?\n\n\n\u4e0e\u8fd9\u4e2a\u9879\u76ee\u76f8\u5173\u7684\u4e00\u5207\u4fe1\u606f\uff08\u5982\u76f8\u5e94\u7684\u56fe\u7247\u548c\u94fe\u63a5\uff09\u90fd\u4f1a\u4e22\u5931\u3002", 
-    "Are you sure?": "\u60a8\u786e\u5b9a\u5417\uff1f", 
     "As part of the verification process, you take a photo of both your face and a government-issued photo ID. Our authorization service confirms your identity by comparing the photo you take with the photo on your ID.": "\u4f5c\u4e3a\u8ba4\u8bc1\u8fc7\u7a0b\u4e2d\u4e00\u90e8\u5206\uff0c\u60a8\u9700\u8981\u62cd\u6444\u4e24\u5f20\u7167\u7247\uff1a\u60a8\u7684\u9762\u90e8\u4ee5\u53ca\u60a8\u7684\u8eab\u4efd\u8bc1\u4ef6\uff08\u8be5\u8bc1\u4ef6\u987b\u7531\u653f\u5e9c\u7b7e\u53d1\u4e14\u6709\u60a8\u7684\u7167\u7247\uff09\u3002\u6211\u4eec\u7684\u6388\u6743\u670d\u52a1\u90e8\u5c06\u901a\u8fc7\u5bf9\u6bd4\u60a8\u7684\u9762\u90e8\u7167\u7247\u548c\u60a8\u7684\u8bc1\u4ef6\u4e0a\u7684\u7167\u7247\u6765\u786e\u8ba4\u60a8\u7684\u8eab\u4efd\u3002", 
     "Assign students to cohorts by uploading a CSV file.": "\u4e0a\u4f20\u4e00\u4e2a CSV \u6587\u4ef6\u4ee5\u5c06\u5b66\u751f\u5206\u914d\u5230\u7fa4\u7ec4\u4e2d\u3002", 
     "Associated Content Group": "\u5df2\u52a0\u5165\u7684\u5185\u5bb9\u7ec4", 
@@ -183,6 +183,7 @@
     "Change Manually": "\u624b\u52a8\u66f4\u6539", 
     "Change My Email Address": "\u66f4\u6539\u6211\u7684\u7535\u5b50\u90ae\u4ef6", 
     "Change image": "\u4fee\u6539\u56fe\u7247", 
+    "Changes to steps that are not selected as part of the assignment will not be saved.": "\u672a\u4f5c\u4e3a\u4f5c\u4e1a\u90e8\u5206\u7684\u6b65\u9aa4\u53d8\u66f4\u5c06\u4e0d\u4f1a\u88ab\u4fdd\u5b58\u3002", 
     "Check Your Email": "\u68c0\u67e5\u4f60\u7684\u7535\u5b50\u90ae\u4ef6", 
     "Check the box to remove %(count)s flag.": [
       "\u9009\u4e2d\u6b64\u9009\u6846\u4ee5\u79fb\u9664 %(count)s \u4e2a\u6807\u8bb0\u3002"
@@ -233,9 +234,12 @@
     "Could not find Certificate Exception in white list. Please refresh the page and try again": "\u5728\u8bb8\u53ef\u540d\u5355\u4e2d\u627e\u4e0d\u5230\u8bc1\u4e66\u7279\u4f8b\u7684\u4eba\u3002\u8bf7\u91cd\u65b0\u8f7d\u5165\u9875\u9762\u6216\u518d\u8bd5\u4e00\u6b21\u3002", 
     "Could not find Certificate Invalidation in the list. Please refresh the page and try again": "\u65e0\u6cd5\u5728\u8fd9\u4efd\u5217\u8868\u4e2d\u627e\u5230\u8bc1\u4e66\u5931\u6548\u8bc1\u660e\u3002\u8bf7\u91cd\u65b0\u8f7d\u5165\u9875\u9762\u6216\u518d\u8bd5\u4e00\u6b21\u3002", 
     "Could not find users associated with the following identifiers:": "\u672a\u80fd\u627e\u5230\u4e0e\u4ee5\u4e0b\u8bc6\u522b\u7801\u5173\u8054\u7684\u7528\u6237\uff1a", 
+    "Could not retrieve download url.": "\u4e0d\u80fd\u8bfb\u53d6\u4e0b\u8f7d\u94fe\u63a5\u5730\u5740", 
     "Could not retrieve payment information": "\u65e0\u6cd5\u8bfb\u53d6\u652f\u4ed8\u4fe1\u606f", 
+    "Could not retrieve upload url.": "\u4e0d\u80fd\u8bfb\u53d6\u4e0a\u4f20\u94fe\u63a5\u5730\u5740", 
     "Could not submit order": "\u8ba2\u5355\u63d0\u4ea4\u5931\u8d25", 
     "Could not submit photos": "\u7167\u7247\u63d0\u4ea4\u5931\u8d25", 
+    "Couldn't Save This Assignment": "\u4fdd\u5b58\u4f5c\u4e1a\u5931\u8d25", 
     "Country": "\u56fd\u5bb6\uff0f\u5730\u533a", 
     "Country of residence": "\u5c45\u4f4f\u56fd\u5bb6", 
     "Course End": "\u8bfe\u7a0b\u7ed3\u675f", 
@@ -255,6 +259,8 @@
     "Create an account using": "\u4f7f\u7528\u4ee5\u4e0b\u65b9\u5f0f\u521b\u5efa\u8d26\u6237", 
     "Create team.": "\u521b\u5efa\u56e2\u961f\u3002", 
     "Creating missing groups": "\u6b63\u5728\u521b\u5efa\u7f3a\u5931\u7684\u7ec4\u3002", 
+    "Criterion Added": "\u6807\u51c6\u5df2\u6dfb\u52a0", 
+    "Criterion Deleted": "\u89c4\u8303\u5df2\u5220\u9664", 
     "Crossed out items have been refunded.": "\u5212\u6389\u7684\u9879\u76ee\u5df2\u9000\u6b3e\u3002", 
     "Current conversation": "\u5f53\u524d\u5bf9\u8bdd", 
     "Current enrollment mode:": "\u5f53\u524d\u9009\u8bfe\u6a21\u5f0f\uff1a", 
@@ -269,11 +275,8 @@
     "Delete Team": "\u5220\u9664\u56e2\u961f", 
     "Delete this %(item_display_name)s?": "\u8981\u5220\u9664\u8be5%(item_display_name)s\u5417\uff1f", 
     "Delete this team?": "\u5220\u9664\u6b64\u56e2\u961f?", 
-    "Delete \u201c<%= name %>\u201d?": "\u5220\u9664\u201c<%= name %>\u201d\uff1f", 
     "Deleted Content Group": "\u5220\u9664\u5185\u5bb9\u7ec4", 
-    "Deleting": "\u5220\u9664\u4e2d", 
     "Deleting a team is permanent and cannot be undone. All members are removed from the team, and team discussions can no longer be accessed.": "\u5220\u9664\u56e2\u961f\u662f\u6c38\u4e45\u6027\u7684\uff0c\u65e0\u6cd5\u633d\u56de\u3002\u6240\u6709\u6210\u5458\u4f1a\u4ece\u56e2\u961f\u79fb\u9664\uff0c\u56e2\u961f\u8ba8\u8bba\u5c06\u65e0\u6cd5\u518d\u88ab\u9020\u8bbf\u3002", 
-    "Deleting a textbook cannot be undone and once deleted any reference to it in your courseware's navigation will also be removed.": "\u5220\u9664\u6559\u6750\u7684\u64cd\u4f5c\u65e0\u6cd5\u64a4\u9500\uff0c\u540c\u65f6\u8bfe\u4ef6\u5bfc\u822a\u4e2d\u5bf9\u8be5\u6559\u6750\u7684\u5f15\u7528\u4e5f\u5c06\u88ab\u79fb\u9664\u3002", 
     "Deleting this %(item_display_name)s is permanent and cannot be undone.": "\u5c06\u6c38\u4e45\u5220\u9664\u8be5%(item_display_name)s\uff0c\u65e0\u6cd5\u64a4\u9500\u3002", 
     "Description": "\u63cf\u8ff0", 
     "Discard Changes": "\u653e\u5f03\u66f4\u6539", 
@@ -282,6 +285,7 @@
     "Discussion Home": "\u8ba8\u8bba\u533a", 
     "Do not show again": "\u4e0d\u518d\u663e\u793a", 
     "Do you want to allow this student ('{student_id}') to skip the entrance exam?": "\u60a8\u662f\u5426\u5141\u8bb8\u8be5\u5b66\u751f('{student_id}')\u8df3\u8fc7\u5165\u5b66\u8003\u8bd5\uff1f", 
+    "Do you want to upload your file before submitting?": "\u4f60\u786e\u5b9a\u5728\u63d0\u4ea4\u4e4b\u524d\u4e0a\u4f20\u4f60\u7684\u6587\u4ef6\u5417\uff1f", 
     "Does the name on your ID match your account name: %(fullName)s?": "\u4f60\u8eab\u4efd\u8bc1\u4ef6\u4e0a\u7684\u59d3\u540d\u548c\u4f60\u5728\u8d26\u6237\u4e2d\u586b\u5199\u7684\u59d3\u540d\u201c%(fullName)s\u201d\u76f8\u7b26\u5417\uff1f", 
     "Does the photo of you match your ID photo?": "\u8fd9\u5f20\u7167\u7247\u548c\u4f60\u8eab\u4efd\u8bc1\u4ef6\u4e0a\u7684\u7167\u7247\u76f8\u5339\u914d\u5417\uff1f", 
     "Does the photo of you show your whole face?": "\u8fd9\u5f20\u7167\u7247\u4e2d\u6709\u4f60\u7684\u6574\u5f20\u8138\u5417\uff1f", 
@@ -351,6 +355,7 @@
     "Error getting entrance exam task history for student '{student_id}'. Make sure student identifier is correct.": "\u83b7\u53d6\u5b66\u751f'{student_id}'\u7684\u5165\u5b66\u8003\u8bd5\u4efb\u52a1\u5386\u53f2\u65f6\u51fa\u9519\u4e86\uff0c\u8bf7\u786e\u8ba4\u5b66\u751f\u7f16\u53f7\u65e0\u8bef\u3002", 
     "Error getting issued certificates list.": "\u83b7\u53d6\u5df2\u9881\u53d1\u8bc1\u4e66\u7684\u5217\u8868\u65f6\u53d1\u751f\u9519\u8bef", 
     "Error getting student list.": "\u83b7\u53d6\u5b66\u751f\u5217\u8868\u65f6\u53d1\u751f\u9519\u8bef", 
+    "Error getting the number of ungraded responses": "\u83b7\u53d6\u672a\u8bc4\u5206\u56de\u590d\u6570\u91cf\u51fa\u73b0\u9519\u8bef", 
     "Error listing task history for this student and problem.": "\u663e\u793a\u6b64\u5b66\u751f\u4e0e\u95ee\u9898\u7684\u4efb\u52a1\u5386\u53f2\u65f6\u53d1\u751f\u9519\u8bef\u3002", 
     "Error removing user": "\u5220\u9664\u7528\u6237\u8fc7\u7a0b\u4e2d\u51fa\u73b0\u9519\u8bef", 
     "Error resetting entrance exam attempts for student '{student_id}'. Make sure student identifier is correct.": "\u91cd\u7f6e\u5b66\u751f'{student_id}'\u7684\u5165\u5b66\u8003\u8bd5\u5c1d\u8bd5\u6b21\u6570\u65f6\u51fa\u9519\u4e86\uff0c\u8bf7\u786e\u8ba4\u5b66\u751f\u7f16\u53f7\u65e0\u8bef\u3002", 
@@ -375,6 +380,8 @@
     "Explicitly Hiding from Students": "\u660e\u786e\u5bf9\u5b66\u751f\u9690\u85cf", 
     "Explore your course!": "\u63a2\u7d22\u4f60\u7684\u8bfe\u7a0b\uff01", 
     "File Name": "\u6587\u4ef6\u540d", 
+    "File type is not allowed.": "\u6587\u4ef6\u7c7b\u578b\u4e0d\u53ef\u7528\u3002", 
+    "File types can not be empty.": "\u6587\u4ef6\u7c7b\u578b\u4e0d\u80fd\u4e3a\u7a7a\u3002", 
     "File {filename} exceeds maximum size of {maxFileSizeInMBs} MB": "\u6587\u4ef6 {filename} \u7684\u5927\u5c0f\u8d85\u8fc7\u4e86 {maxFileSizeInMBs} MB \u7684\u9650\u5236", 
     "Files must be in JPEG or PNG format.": "\u6587\u4ef6\u5fc5\u987b\u662fJPEG\u6216\u8005PNG\u683c\u5f0f\u3002", 
     "Fill browser": "\u5168\u5c4f", 
@@ -426,6 +433,10 @@
     "If the unit was previously published and released to students, any changes you made to the unit when it was hidden will now be visible to students. Do you want to proceed?": "\u5982\u679c\u6b64\u5355\u5143\u5148\u524d\u5df2\u88ab\u53d1\u5e03\u4e14\u5411\u5b66\u751f\u516c\u5f00\uff0c\u4efb\u4f55\u5728\u8be5\u5355\u5143\u5904\u4e8e\u9690\u85cf\u65f6\u7684\u6539\u52a8\u90fd\u5c06\u5bf9\u5b66\u751f\u53ef\u89c1\u3002\u60a8\u8981\u7ee7\u7eed\u5417\uff1f", 
     "If you do not yet have an account, use the button below to register.": "\u5982\u679c\u60a8\u5c1a\u65e0\u5e10\u6237\uff0c\u8bf7\u4f7f\u7528\u4ee5\u4e0b\u6309\u94ae\u8fdb\u884c\u6ce8\u518c\u3002", 
     "If you don't verify your identity now, you can still explore your course from your dashboard. You will receive periodic reminders from %(platformName)s to verify your identity.": "\u5982\u679c\u4f60\u73b0\u5728\u4e0d\u9a8c\u8bc1\u4f60\u7684\u8eab\u4efd\uff0c\u4f60\u4ecd\u53ef\u4ee5\u901a\u8fc7\u63a7\u5236\u9762\u677f\u6d4f\u89c8\u8bfe\u7a0b\u3002\u4f46\u4f60\u4f1a\u5b9a\u671f\u4ece%(platformName)s\u6536\u5230\u8eab\u4efd\u9a8c\u8bc1\u63d0\u9192\u3002", 
+    "If you leave this page without saving or submitting your response, you will lose any work you have done on the response.": "\u5982\u679c\u4f60\u4e0d\u4fdd\u5b58\u6216\u8005\u63d0\u4ea4\u7b54\u6848\u5c31\u79bb\u5f00\uff0c\u4f60\u53ef\u80fd\u4f1a\u4e22\u5931\u6389\u5199\u5b8c\u7684\u4e00\u5207\u3002", 
+    "If you leave this page without submitting your peer assessment, you will lose any work you have done.": "\u5982\u679c\u4f60\u79bb\u5f00\u672c\u9875\u65f6\u6ca1\u6709\u63d0\u4ea4\u4f60\u7684\u540c\u5b66\u4e92\u8bc4\uff0c\u4f60\u5c06\u4e22\u5931\u4f60\u6240\u505a\u7684\u4e00\u5207\u3002", 
+    "If you leave this page without submitting your self assessment, you will lose any work you have done.": "\u5982\u679c\u4f60\u672a\u63d0\u4ea4\u4f60\u7684\u81ea\u6211\u8bc4\u4f30\u5c31\u79bb\u5f00\u6b64\u9875\u9762\uff0c\u4f60\u5c06\u4e22\u5931\u6240\u505a\u7684\u4e00\u5207\u3002", 
+    "If you leave this page without submitting your staff assessment, you will lose any work you have done.": "\u5982\u679c\u4f60\u672a\u63d0\u4ea4\u4f60\u7684\u5458\u5de5\u8bc4\u4f30\u5c31\u79bb\u5f00\u6b64\u9875\u9762\uff0c\u4f60\u5c06\u4e22\u5931\u6240\u505a\u7684\u4e00\u5207\u3002", 
     "If you leave, you can no longer post in this team's discussions. Your place will be available to another learner.": "\u5982\u679c\u4f60\u79bb\u5f00\u4e86\uff0c\u4f60\u4e0d\u80fd\u5728\u672c\u56e2\u961f\u7684\u8ba8\u8bba\u533a\u4e0a\u53d1\u8a00\u3002\u60a8\u7684\u4f4d\u7f6e\u5c06\u63d0\u4f9b\u7ed9\u5176\u5b83\u7684\u5b66\u4e60\u8005\u3002", 
     "If you make significant changes, make sure you notify members of the team before making these changes.": "\u5982\u679c\u4f60\u505a\u8f83\u5927\u66f4\u6539\uff0c\u8bf7\u786e\u4fdd\u60a8\u5728\u8fdb\u884c\u8fd9\u4e9b\u66f4\u6539\u4e4b\u524d\u901a\u77e5\u56e2\u961f\u6210\u5458\u3002", 
     "If you use the Advanced Editor, this problem will be converted to XML and you will not be able to return to the Simple Editor Interface.\n\nProceed to the Advanced Editor and convert this problem to XML?": "\u5982\u679c\u4f60\u4f7f\u7528\u9ad8\u7ea7\u7f16\u8f91\u5668\uff0c\u8be5\u95ee\u9898\u5c06\u8f6c\u4e3aXML\uff0c\u540c\u65f6\u60a8\u4e5f\u65e0\u6cd5\u518d\u56de\u5230\u7b80\u6613\u7f16\u8f91\u5668\u754c\u9762\u3002\n\n\u8981\u7ee7\u7eed\u4f7f\u7528\u9ad8\u7ea7\u7f16\u8f91\u5668\u5e76\u5c06\u8be5\u95ee\u9898\u8f6c\u4e3aXML\u5417\uff1f", 
@@ -521,8 +532,8 @@
     "No receipt available": "\u6ca1\u6709\u53ef\u63d0\u4f9b\u7684\u6536\u636e\u3002", 
     "No results": "\u6ca1\u6709\u7ed3\u679c", 
     "No results found for \"%(query_string)s\". Please try searching again.": "\u672a\u627e\u5230\u6709\u5173\"%(query_string)s\"\u7684\u4efb\u4f55\u7ed3\u679c\u3002\u8bf7\u91cd\u65b0\u641c\u7d22\u3002", 
-    "No sources": "\u6ca1\u6709\u6e90", 
     "No tasks currently running.": "\u6ca1\u6709\u6b63\u5728\u6267\u884c\u7684\u4efb\u52a1", 
+    "Not Selected": "\u672a\u9009\u4e2d", 
     "Not available": "\u64cd\u4f5c\u6761\u4ef6\u4e0d\u6ee1\u8db3", 
     "Not in Use": "\u672a\u4f7f\u7528", 
     "Not selected": "\u672a\u9009\u62e9", 
@@ -537,11 +548,12 @@
     "OK": "\u662f\u7684", 
     "Once in position, use the camera button {icon} to capture your ID": "\u4e00\u65e6\u5c31\u4f4d\uff0c\u8bf7\u4f7f\u7528\u6444\u50cf\u5934\u6309\u94ae {icon} \u62cd\u6444\u60a8\u7684\u8eab\u4efd\u8bc1\u4ef6", 
     "Once in position, use the camera button {icon} to capture your photo": "\u4e00\u65e6\u5c31\u4f4d\uff0c\u8bf7\u4f7f\u7528\u6444\u50cf\u5934\u6309\u94ae {icon} \u62cd\u6444\u60a8\u7684\u7167\u7247", 
-    "Only <%= fileTypes %> files can be uploaded. Please select a file ending in <%= fileExtensions %> to upload.": "\u53ea\u6709 <%= fileTypes %> \u683c\u5f0f\u7684\u6587\u4ef6\u53ef\u4ee5\u4e0a\u4f20\u3002\u8bf7\u9009\u62e9\u4e00\u4e2a\u4ee5 <%= fileExtensions %> \u7ed3\u5c3e\u7684\u6587\u4ef6\u4e0a\u4f20\u3002", 
+    "One or more rescheduling tasks failed.": "\u4e00\u9879\u6216\u51e0\u9879\u6539\u671f\u4efb\u52a1\u5931\u8d25\u4e86\u3002", 
     "Only properly formatted .csv files will be accepted.": "\u53ea\u6709\u6807\u51c6\u7684CSV\u683c\u5f0f\u6587\u4ef6\u4f1a\u88ab\u63a5\u53d7\u3002", 
     "Open": "\u6253\u5f00", 
     "Open language menu": "\u5f00\u542f\u8bed\u8a00\u529f\u80fd\u83dc\u5355", 
     "OpenAssessment Save Error": "\u5f00\u653e\u5f0f\u8bc4\u4f30\u4fdd\u5b58\u9519\u8bef", 
+    "Option Deleted": "\u9009\u9879\u5df2\u5220\u9664", 
     "Optional Characteristics": "\u53ef\u9009\u7279\u70b9", 
     "Order Details": "\u8ba2\u5355\u7ec6\u8282", 
     "Order History": "\u8ba2\u5355\u8bb0\u5f55", 
@@ -550,7 +562,6 @@
     "Pagination": "\u9875\u7801", 
     "Password": "\u5bc6\u7801", 
     "Password assistance": "\u5bc6\u7801\u5e2e\u52a9", 
-    "Password reset email sent. Follow the link in the email to change your password.": "\u5bc6\u7801\u91cd\u7f6e\u90ae\u4ef6\u5df2\u7ecf\u53d1\u9001\u3002\u8bf7\u901a\u8fc7\u70b9\u51fb\u90ae\u4ef6\u4e2d\u7684\u94fe\u63a5\u66f4\u6539\u4f60\u7684\u5bc6\u7801\u3002", 
     "Pause": "\u6682\u505c", 
     "Photo Captured successfully.": "\u7167\u7247\u83b7\u53d6\u6210\u529f\uff01", 
     "Photo ID": "\u6709\u7167\u7247\u7684\u8eab\u4efd\u8bc1\u4ef6", 
@@ -566,7 +577,7 @@
     "Play video": "\u64ad\u653e\u89c6\u9891", 
     "Please Note": "\u8bf7\u6ce8\u610f", 
     "Please address the errors on this page first, and then save your progress.": "\u8bf7\u5148\u89e3\u51b3\u672c\u9875\u5b58\u5728\u7684\u9519\u8bef\uff0c\u7136\u540e\u4fdd\u5b58\u3002", 
-    "Please check your email to confirm the change": "\u8bf7\u68c0\u67e5\u60a8\u7684\u90ae\u4ef6\u4ee5\u786e\u8ba4\u4fee\u6539", 
+    "Please correct the outlined fields.": "\u8bf7\u6539\u6b63\u753b\u51fa\u533a\u57df", 
     "Please describe this image or agree that it has no contextual value by checking the checkbox.": "\u8bf7\u63cf\u8ff0\u672c\u56fe\u7247\u6216\u52fe\u9009\u590d\u9009\u6846\u8868\u793a\u56fe\u7247\u4e0d\u542b\u4e0e\u5185\u5bb9\u76f8\u5173\u7684\u4ef7\u503c\u3002", 
     "Please do not use any spaces in this field.": "\u6b64\u5b57\u6bb5\u7684\u5185\u5bb9\u4e0d\u80fd\u5305\u542b\u7a7a\u683c\u3002", 
     "Please do not use any spaces or special characters in this field.": "\u6b64\u5b57\u6bb5\u7684\u5185\u5bb9\u4e0d\u80fd\u5305\u542b\u7a7a\u683c\u6216\u7279\u6b8a\u5b57\u7b26\u3002", 
@@ -574,8 +585,6 @@
     "Please enter a student email address or username.": "\u8bf7\u8f93\u5165\u5b66\u751f\u7684\u90ae\u4ef6\u5730\u5740\u6216\u7528\u6237\u540d\u3002", 
     "Please enter a username or email.": "\u8bf7\u8f93\u5165\u4e00\u4e2a\u7528\u6237\u540d\u6216\u8005\u7535\u5b50\u90ae\u4ef6\u3002", 
     "Please enter a valid donation amount.": "\u8bf7\u8f93\u5165\u4e00\u4e2a\u6709\u6548\u7684\u6350\u52a9\u91d1\u989d\u3002", 
-    "Please enter a valid email address": "\u8bf7\u8f93\u5165\u4e00\u4e2a\u6709\u6548\u7684\u7535\u5b50\u90ae\u4ef6\u5730\u5740\u3002", 
-    "Please enter a valid password": "\u8bf7\u8f93\u5165\u4e00\u4e2a\u6709\u6548\u7684\u5bc6\u7801\u3002", 
     "Please enter an integer between %(min)s and %(max)s.": "\u8bf7\u8f93\u5165\u4e00\u4e2a %(min)s \u5230 %(max)s \u4e4b\u95f4\u7684\u6574\u6570\u3002", 
     "Please enter an integer between 0 and 100.": "\u8bf7\u8f93\u5165\u4e00\u4e2a0\u5230100\u4e4b\u95f4\u7684\u6574\u6570\u3002", 
     "Please enter an integer greater than 0.": "\u8bf7\u8f93\u5165\u4e00\u4e2a\u5927\u4e8e0\u7684\u6574\u6570\u3002", 
@@ -587,7 +596,6 @@
     "Please print this page for your records; it serves as your receipt. You will also receive an email with the same information.": "\u8bf7\u6253\u5370\u6b64\u9875\u7559\u4f5c\u7eaa\u5f55\uff0c\u8fd9\u5c31\u662f\u4f60\u7684\u6536\u636e\uff1b\u4f60\u4e5f\u4f1a\u6536\u5230\u4e00\u5c01\u6709\u76f8\u540c\u4fe1\u606f\u7684\u7535\u5b50\u90ae\u4ef6\u3002", 
     "Please provide a description of the link destination.": "\u8bf7\u63d0\u4f9b\u94fe\u63a5\u7684\u63cf\u8ff0\u3002", 
     "Please provide a valid URL.": "\u8bf7\u63d0\u4f9b\u4e00\u4e2a\u6709\u6548\u7684\u7f51\u5740\u3002", 
-    "Please select a PDF file to upload.": "\u8bf7\u9009\u62e9\u4e0a\u4f20\u4e00\u4e2aPDF\u6587\u4ef6\u3002", 
     "Please select a file in .srt format.": "\u8bf7\u9009\u62e9\u4e00\u4e2a .srt \u683c\u5f0f\u7684\u6587\u4ef6\u3002", 
     "Please specify a reason.": "\u8bf7\u8bf4\u660e\u539f\u56e0\u3002", 
     "Please verify that you have uploaded a valid image (PNG and JPEG).": "\u8bf7\u9a8c\u8bc1\u60a8\u5df2\u4e0a\u4f20\u4e86\u4e00\u5f20\u6709\u6548\u7684\u56fe\u7247(PNG\u6216JPEG\u683c\u5f0f)\u3002", 
@@ -656,6 +664,7 @@
     "Saved cohort": "\u5df2\u4fdd\u5b58\u7684\u7fa4\u7ec4", 
     "Saving": "\u6b63\u5728\u4fdd\u5b58", 
     "Saving your email preference": "\u6b63\u5728\u4fdd\u5b58\u60a8\u7684\u7535\u5b50\u90ae\u4ef6\u504f\u597d", 
+    "Saving...": "\u6b63\u5728\u4fdd\u5b58\u2026", 
     "Search": "\u641c\u7d22", 
     "Search Results": "\u641c\u7d22\u7ed3\u679c", 
     "Search all posts": "\u641c\u7d22\u6240\u6709\u5e16\u5b50", 
@@ -710,6 +719,7 @@
     "Starts: %(start_date)s": "\u5f00\u59cb\u4e8e\uff1a%(start_date)s", 
     "State": "\u72b6\u6001", 
     "Status": "\u72b6\u6001", 
+    "Status of Your Response": "\u4f60\u7684\u7b54\u6848\u7684\u72b6\u6001", 
     "Student": "\u5b66\u751f", 
     "Student Removed from certificate white list successfully.": "\u5b66\u751f\u5df2\u4ece\u8bc1\u4e66\u8bb8\u53ef\u540d\u5355\u4e2d\u79fb\u9664\u6210\u529f\u3002", 
     "Subject": "\u6807\u9898", 
@@ -766,7 +776,7 @@
     "The combined length of the organization, course number, and course run fields cannot be more than <%=limit%> characters.": "\u673a\u6784\u3001\u8bfe\u7a0b\u7f16\u53f7\u548c\u5f00\u8bfe\u65f6\u95f4\u5b57\u6bb5\u5408\u5728\u4e00\u8d77\u4e0d\u80fd\u8d85\u8fc7 <%=limit%> \u4e2a\u5b57\u7b26\u3002", 
     "The country that team members primarily identify with.": "\u591a\u6570\u56e2\u961f\u6210\u5458\u6765\u81ea\u7684\u56fd\u5bb6", 
     "The course must have an assigned start date.": "\u8bfe\u7a0b\u5fc5\u987b\u6307\u5b9a\u5f00\u59cb\u65e5\u671f\u3002", 
-    "The data could not be saved.": "\u8be5\u6570\u636e\u65e0\u6cd5\u4fdd\u5b58\u3002", 
+    "The display of ungraded and checked out responses could not be loaded.": "\u672a\u6253\u5206\u53ca\u5df2\u901a\u8fc7\u56de\u7b54\u7684\u7a97\u53e3\u65e0\u6cd5\u52a0\u8f7d\u3002", 
     "The email address you've provided isn't formatted correctly.": "\u60a8\u6240\u63d0\u4f9b\u7684\u7535\u5b50\u90ae\u4ef6\u5730\u5740\u7684\u683c\u5f0f\u4e0d\u6b63\u786e\u3002", 
     "The enrollment end date cannot be after the course end date.": "\u9009\u8bfe\u622a\u6b62\u65e5\u671f\u5e94\u5728\u8bfe\u7a0b\u7ed3\u675f\u65e5\u671f\u4e4b\u524d\u3002", 
     "The enrollment start date cannot be after the enrollment end date.": "\u9009\u8bfe\u5f00\u59cb\u65e5\u671f\u5e94\u8be5\u65e9\u4e8e\u9009\u8bfe\u622a\u6b62\u65e5\u671f\u3002", 
@@ -774,6 +784,7 @@
     "The file must be smaller than {size} in size.": "\u6587\u4ef6\u5fc5\u987b\u5c0f\u4e8e {size} ", 
     "The following email addresses and/or usernames are invalid:": "\u4ee5\u4e0b\u7535\u5b50\u90ae\u4ef6\u5730\u5740\uff0f\u7528\u6237\u540d\u65e0\u6548\uff1a", 
     "The following errors were generated:": "\u51fa\u73b0\u4ee5\u4e0b\u9519\u8bef\uff1a", 
+    "The following file types are not allowed: ": "\u4e0b\u5217\u6587\u4ef6\u7c7b\u578b\u4e0d\u53ef\u7528\uff1a", 
     "The following information is already a part of your {platform} profile. We\\'ve included it here for your application.": "\u4ee5\u4e0b\u4fe1\u606f\u5df2\u7ecf\u662f\u60a8\u7684 {platform} \u7b80\u8ff0\u7684\u4e00\u90e8\u5206\u3002\u6211\u4eec\u5df2\u5c06\u5176\u5217\u5165\u60a8\u7684\u7533\u8bf7\u4e2d\u3002", 
     "The following users are no longer enrolled in the course:": "\u4ee5\u4e0b\u7528\u6237\u5df2\u4e0d\u518d\u9009\u4fee\u672c\u8bfe\u7a0b\uff1a", 
     "The following warnings were generated:": "\u51fa\u73b0\u4ee5\u4e0b\u8b66\u544a\uff1a", 
@@ -782,6 +793,9 @@
     "The photo of your face matches the photo on your ID.": "\u60a8\u7684\u9762\u90e8\u7167\u7247\u4e0e\u60a8\u8eab\u4efd\u8bc1\u4ef6\u4e0a\u7684\u7167\u7247\u76f8\u7b26\u3002", 
     "The raw error message is:": "\u539f\u59cb\u7684\u9519\u8bef\u4fe1\u606f\u662f\uff1a", 
     "The selected content group does not exist": "\u9009\u53d6\u7684\u5185\u5bb9\u7ec4\u4e0d\u5b58\u5728\u3002", 
+    "The server could not be contacted.": "\u65e0\u6cd5\u8054\u7cfb\u670d\u52a1\u5668\u3002", 
+    "The staff assessment form could not be loaded.": "\u5de5\u4f5c\u4eba\u5458\u8bc4\u6d4b\u8868\u683c\u65e0\u6cd5\u52a0\u8f7d\u3002", 
+    "The submission could not be removed from the grading pool.": "\u8be5\u63d0\u4ea4\u65e0\u6cd5\u4ece\u8bc4\u5206\u6c60\u4e2d\u5220\u9664\u3002", 
     "The {cohortGroupName} cohort has been created. You can manually add students to this cohort below.": "{cohortGroupName}\u7fa4\u7ec4\u5df2\u7ecf\u521b\u5efa\uff0c\u60a8\u53ef\u4ee5\u624b\u52a8\u6dfb\u52a0\u5b66\u751f\u5230\u8fd9\u4e2a\u7fa4\u7ec4\u3002", 
     "There has been an error processing your survey.": "\u5728\u5904\u7406\u60a8\u7684\u8c03\u67e5\u65f6\u51fa\u73b0\u4e86\u4e00\u4e2a\u9519\u8bef\u3002", 
     "There has been an error while exporting.": "\u5bfc\u51fa\u65f6\u51fa\u9519\u4e86\u3002", 
@@ -808,19 +822,27 @@
     "This annotation has %(count)s flag.": [
       "\u6b64\u6ce8\u91ca\u5e26\u6709 %(count)s \u4e2a\u6807\u8bb0\u3002"
     ], 
+    "This assessment could not be submitted.": "\u8fd9\u4efd\u8bc4\u6d4b\u65e0\u6cd5\u63d0\u4ea4\u3002", 
     "This browser cannot play .mp4, .ogg, or .webm files.": "\u5f53\u524d\u6d4f\u89c8\u5668\u4e0d\u652f\u6301\u64ad\u653e MP4\u3001OGG \u6216 WEBM \u683c\u5f0f\u7684\u6587\u4ef6\u3002", 
     "This catalog's courses:": "\u6b64\u76ee\u5f55\u4e0b\u7684\u8bfe\u7a0b\uff1a", 
     "This component has validation issues.": "\u8be5\u7ec4\u4ef6\u5b58\u5728\u9a8c\u8bc1\u95ee\u9898\u3002", 
     "This course has automatic cohorting enabled for verified track learners, but cohorts are disabled. You must enable cohorts for the feature to work.": "\u8fd9\u95e8\u8bfe\u7a0b\u4e3a\u8981\u83b7\u53d6\u8ba4\u8bc1\u8bc1\u4e66\u7684\u5b66\u751f\u81ea\u52a8\u5206\u7ec4\uff0c\u4f46\u662f\u7fa4\u7ec4\u529f\u80fd\u88ab\u7981\u6b62\u3002\u4e3a\u4e86\u4f7f\u8be5\u529f\u80fd\u6b63\u5e38\u8fd0\u884c\uff0c\u60a8\u5fc5\u987b\u542f\u7528\u7fa4\u7ec4\u529f\u80fd\uff0c", 
     "This course has automatic cohorting enabled for verified track learners, but the required cohort does not exist. You must create a manually-assigned cohort named '{verifiedCohortName}' for the feature to work.": "\u8fd9\u95e8\u8bfe\u7a0b\u4e3a\u8981\u83b7\u53d6\u8ba4\u8bc1\u8bc1\u4e66\u7684\u5b66\u751f\u81ea\u52a8\u5206\u7ec4\uff0c\u4f46\u8981\u6c42\u7684\u7fa4\u7ec4\u4e0d\u5b58\u5728\u3002\u4e3a\u4e86\u4f7f\u8be5\u529f\u80fd\u6b63\u5e38\u8fd0\u884c\uff0c\u60a8\u5fc5\u987b\u624b\u52a8\u8bbe\u7f6e\u4e00\u4e2a\u7fa4\u7ec4\uff0c\u540d\u4e3a'{verifiedCohortName}'\u3002", 
     "This course uses automatic cohorting for verified track learners. You cannot disable cohorts, and you cannot rename the manual cohort named '{verifiedCohortName}'. To change the configuration for verified track cohorts, contact your edX partner manager.": "\u8fd9\u95e8\u8bfe\u7a0b\u4e3a\u8981\u83b7\u53d6\u8ba4\u8bc1\u8bc1\u4e66\u7684\u5b66\u751f\u81ea\u52a8\u5206\u7ec4\u3002\u60a8\u65e0\u6cd5\u53d6\u6d88\u5206\u7ec4\uff0c\u4e5f\u65e0\u6cd5\u91cd\u65b0\u547d\u540d\u624b\u52a8\u8bbe\u7f6e\u7684\u7fa4\u7ec4'{verifiedCohortName}'\u3002\u5982\u8981\u6539\u53d8\u8ba4\u8bc1\u7ec4\u7684\u5206\u7ec4\u8bbe\u7f6e\uff0c\u8bf7\u8054\u7cfb\u60a8\u7684edX \u5408\u4f5c\u7ecf\u7406\u3002", 
+    "This feedback could not be submitted.": "\u8fd9\u6761\u53cd\u9988\u65e0\u6cd5\u63d0\u4ea4\u3002", 
     "This image is for decorative purposes only and does not require a description.": "\u6b64\u56fe\u7247\u4ec5\u4f5c\u88c5\u9970\u7528\uff0c\u65e0\u9700\u63cf\u8ff0\u3002", 
     "This learner is currently sharing a limited profile.": "\u8be5\u5b66\u751f\u5f53\u524d\u516c\u5f00\u90e8\u5206\u4e2a\u4eba\u4fe1\u606f\u3002", 
     "This learner will be removed from the team, allowing another learner to take the available spot.": "\u6b64\u6210\u5458\u5c06\u88ab\u79fb\u9664\uff0c\u91ca\u51fa\u540d\u989d\u540e\u5176\u4ed6\u6210\u5458\u53ef\u52a0\u5165\u3002", 
-    "This link will open in a modal window": "\u8be5\u94fe\u63a5\u5c06\u5728\u4e00\u4e2a\u6a21\u5f0f\u7a97\u53e3\u4e2d\u6253\u5f00", 
     "This post is visible only to %(group_name)s.": "\u6b64\u5e16\u53ea\u5bf9%(group_name)s\u7ec4\u53ef\u89c1\u3002", 
     "This post is visible to everyone.": "\u6b64\u5e16\u5bf9\u6240\u6709\u4eba\u53ef\u89c1\u3002", 
+    "This problem could not be saved.": "\u8be5\u95ee\u9898\u65e0\u6cd5\u4fdd\u5b58\u3002", 
+    "This problem has already been released. Any changes will apply only to future assessments.": "\u6b64\u95ee\u9898\u5df2\u53d1\u5e03\u3002\u4efb\u4f55\u66f4\u6539\u90fd\u53ea\u9002\u7528\u4e8e\u672a\u6765\u7684\u8bc4\u4f30\u3002", 
     "This problem has been reset.": "\u6b64\u95ee\u9898\u5df2\u91cd\u7f6e\u3002", 
+    "This response could not be saved.": "\u8be5\u7b54\u6848\u65e0\u6cd5\u4fdd\u5b58\u3002", 
+    "This response could not be submitted.": "\u8be5\u7b54\u6848\u65e0\u6cd5\u63d0\u4ea4\u3002", 
+    "This response has been saved but not submitted.": "\u8be5\u7b54\u6848\u5df2\u7ecf\u4fdd\u5b58\u4e86\uff0c\u4f46\u4ecd\u672a\u63d0\u4ea4\u3002", 
+    "This response has not been saved.": "\u8be5\u7b54\u6848\u8fd8\u6ca1\u6709\u88ab\u4fdd\u5b58\u3002", 
+    "This section could not be loaded.": "\u8fd9\u4e2a\u90e8\u5206\u65e0\u6cd5\u52a0\u8f7d\u3002", 
     "This team does not have any members.": "\u672c\u56e2\u961f\u6ca1\u6709\u6210\u5458\u3002", 
     "This team is full.": "\u8fd9\u4e2a\u56e2\u961f\u5df2\u7ecf\u6ee1\u4e86\u3002", 
     "This thread is closed.": "\u8fd9\u4e2a\u5e16\u5b50\u5df2\u7ecf\u5173\u95ed\u3002", 
@@ -847,9 +869,11 @@
     "Type": "\u7c7b\u578b", 
     "Type in a URL or use the \"Choose File\" button to upload a file from your machine. (e.g. 'http://example.com/img/clouds.jpg')": "\u8f93\u5165\u4e00\u4e2a\u7f51\u5740\uff0c\u6216\u6309\u4e0b\u201c\u9009\u62e9\u6587\u4ef6\u201d\u6309\u94ae\u6765\u4e0a\u4f20\u6587\u4ef6\u3002(\u4f8b\u5982'http://example.com/img/clouds.jpg')", 
     "URL": "URL", 
+    "Unable to load": "\u4e0d\u80fd\u52a0\u8f7d", 
     "Undo (Ctrl+Z)": "\u64a4\u9500(Ctrl+Z)", 
     "Undo Changes": "\u64a4\u9500\u66f4\u6539", 
     "Unendorse": "\u53d6\u6d88\u652f\u6301", 
+    "Unexpected server error.": "\u670d\u52a1\u5668\u5f02\u5e38\u9519\u8bef\u3002", 
     "Unfollow": "\u53d6\u6d88\u5173\u6ce8", 
     "Unit": "\u5355\u5143", 
     "Unknown": "\u672a\u77e5", 
@@ -858,6 +882,7 @@
     "Unlinking": "\u89e3\u7ed1\u4e2d", 
     "Unmark as Answer": "\u53d6\u6d88\u6807\u8bb0\u4f5c\u4e3a\u7b54\u6848", 
     "Unmute": "\u53d6\u6d88\u9759\u97f3", 
+    "Unnamed Option": "\u672a\u547d\u540d\u9009\u9879", 
     "Unpin": "\u4e0d\u505a\u5904\u7406", 
     "Unreport": "\u53d6\u6d88\u62a5\u544a", 
     "Unscheduled": "\u5c1a\u672a\u8ba1\u5212", 
@@ -869,12 +894,10 @@
     "Updating with latest library content": "\u66f4\u65b0\u6700\u65b0\u7684\u5e93\u5185\u5bb9", 
     "Upgrade Deadline": "\u5347\u7ea7\u7684\u622a\u6b62\u65e5\u671f", 
     "Upgrade to a Verified Certificate for {courseName}": "\u5347\u7ea7\u5230 {courseName} \u7684\u9a8c\u8bc1\u8bc1\u4e66", 
-    "Upload": "\u4e0a\u4f20", 
     "Upload File": "\u4e0a\u4f20\u6587\u4ef6", 
     "Upload File and Assign Students": "\u4e0a\u4f20\u6587\u4ef6\u5e76\u4e3a\u5b66\u751f\u5206\u7ec4", 
     "Upload New File": "\u4e0a\u4f20\u65b0\u6587\u4ef6", 
     "Upload a comma separated values (.csv) file that contains the usernames or email addresses of learners who have been given exceptions. Include the username or email address in the first comma separated field. You can include an optional note describing the reason for the exception in the second comma separated field.": "\u4e0a\u4f20\u4e00\u4e2a\u7528\u9017\u53f7\u9694\u5f00\u7684\u503c (.csv) \u6587\u4ef6\uff0c\u6587\u4ef6\u8981\u5305\u542b\u83b7\u5f97\u7279\u4f8b\u7684\u5b66\u5458\u7684\u7528\u6237\u540d\u6216\u7535\u5b50\u90ae\u7bb1\u5730\u5740\u3002\u5c06\u7528\u6237\u540d\u6216\u7535\u5b50\u90ae\u7bb1\u5730\u5740\u5217\u5165\u7b2c\u4e00\u4e2a\u9017\u53f7\u9694\u5f00\u7684\u5b57\u6bb5\u4e2d\u3002\u4f60\u53ef\u4ee5\u5728\u7b2c\u4e8c\u4e2a\u7528\u9017\u53f7\u9694\u5f00\u7684\u5b57\u6bb5\u4e2d\u5217\u5165\u63cf\u8ff0\u7279\u6b8a\u5904\u7406\u539f\u56e0\u7684\u53ef\u9009\u5907\u6ce8\u3002", 
-    "Upload a new PDF to \u201c<%= name %>\u201d": "\u4e0a\u4f20\u4e00\u4e2a\u65b0\u7684PDF\u6587\u4ef6\u81f3\u201c<%= name %>\u201d", 
     "Upload an image": "\u4e0a\u4f20\u56fe\u7247", 
     "Upload an image or capture one with your web or phone camera.": "\u4e0a\u4f20\u7167\u7247\u6216\u901a\u8fc7\u4f7f\u7528\u60a8\u7684\u7f51\u7edc\uff0f\u624b\u673a\u6444\u50cf\u5934\u62cd\u7167\u4e0a\u4f20\u3002", 
     "Upload completed": "\u4e0a\u4f20\u5b8c\u6210", 
@@ -934,8 +957,6 @@
     "We couldn't find any results for \"%s\".": "\u6211\u4eec\u627e\u4e0d\u5230\u6709\u5173\u201c%s\u201d\u7684\u4efb\u4f55\u7ed3\u679c\u3002", 
     "We have received your information and are verifying your identity. You will see a message on your dashboard when the verification process is complete (usually within 1-2 days). In the meantime, you can still access all available course content.": "\u6211\u4eec\u5df2\u7ecf\u6536\u5230\u4f60\u7684\u4fe1\u606f\u5e76\u6b63\u5728\u9a8c\u8bc1\u4f60\u7684\u8eab\u4efd\u3002\u9a8c\u8bc1\u6d41\u7a0b\u7ed3\u675f\u540e(\u4e00\u822c\u5728 1-2 \u5929\u5185)\uff0c\u4f60\u5c06\u5728\u4f60\u7684\u63a7\u5236\u9762\u677f\u4e0a\u6536\u5230\u4e00\u6761\u6d88\u606f\u3002\u4e0e\u6b64\u540c\u65f6\uff0c\u4f60\u4ecd\u7136\u53ef\u4ee5\u8bbf\u95ee\u6240\u6709\u7684\u8bfe\u7a0b\u5185\u5bb9\u3002", 
     "We use the highest levels of security available to encrypt your photo and send it to our authorization service for review. Your photo and information are not saved or visible anywhere on %(platformName)s after the verification process is complete.": "\u6211\u4eec\u4f1a\u91c7\u7528\u6700\u9ad8\u7ea7\u522b\u7684\u5b89\u5168\u6280\u672f\u6765\u52a0\u5bc6\u4f60\u7684\u7167\u7247\u5e76\u53d1\u9001\u5230\u6211\u4eec\u7684\u6388\u6743\u670d\u52a1\u7528\u4e8e\u5ba1\u6838\u76ee\u7684\uff1b\u4e00\u65e6\u5b8c\u6210\u4e86\u8ba4\u8bc1\u8fc7\u7a0b\uff0c%(platformName)s\u4e0d\u4f1a\u7ee7\u7eed\u4fdd\u5b58\u8fd9\u4e9b\u7167\u7247\u548c\u4fe1\u606f\u3002", 
-    "We weren't able to send you a password reset email.": "\u5bc6\u7801\u91cd\u7f6e\u90ae\u4ef6\u53d1\u9001\u5931\u8d25\u3002", 
-    "We're sorry, there was an error": "\u5f88\u62b1\u6b49\uff0c\u51fa\u73b0\u9519\u8bef", 
     "We've encountered an error. Refresh your browser and then try again.": "\u6211\u4eec\u9047\u5230\u4e86\u4e00\u4e2a\u9519\u8bef\u3002\u8bf7\u5237\u65b0\u60a8\u7684\u6d4f\u89c8\u5668\u5e76\u91cd\u8bd5\u3002", 
     "We've sent a confirmation message to {new_email_address}. Click the link in the message to update your email address.": "\u6211\u4eec\u5df2\u4f1a\u53d1\u9001\u4e00\u4e2a\u9a8c\u8bc1\u8baf\u606f\u81f3 {new_email_address}\u3002\u70b9\u51fb\u8baf\u606f\u4e2d\u7684\u94fe\u63a5\u4ee5\u66f4\u65b0\u60a8\u7684\u7535\u5b50\u90ae\u4ef6\u4fe1\u7bb1\u3002", 
     "Webcam": "\u6444\u50cf\u5934", 
@@ -958,6 +979,7 @@
     "You can now enter your payment information and complete your enrollment.": "\u4f60\u53ef\u4ee5\u73b0\u5728\u5c31\u8f93\u5165\u652f\u4ed8\u4fe1\u606f\u5e76\u5b8c\u6210\u9009\u8bfe\u3002", 
     "You can pay now even if you don't have the following items available, but you will need to have these to qualify to earn a Verified Certificate.": "\u5373\u4f7f\u4f60\u6ca1\u6709\u6ee1\u8db3\u4e0b\u9762\u8fd9\u4e9b\u8981\u6c42\uff0c\u4f60\u4e5f\u53ef\u4ee5\u73b0\u5728\u5c31\u4ed8\u6b3e\uff1b\u4f46\u662f\u4f60\u53ea\u6709\u6ee1\u8db3\u4e86\u8fd9\u4e9b\u8981\u6c42\u624d\u6709\u8d44\u683c\u83b7\u5f97\u8ba4\u8bc1\u8bc1\u4e66\u3002", 
     "You can remove members from this team, especially if they have not participated in the team's activity.": "\u60a8\u53ef\u4ee5\u4ece\u6b64\u7ec4\u4e2d\u5220\u9664\u6210\u5458\uff0c\u5c24\u5176\u662f\u8fd8\u6ca1\u6709\u53c2\u52a0\u56e2\u961f\u6d3b\u52a8\u7684\u6210\u5458\u3002", 
+    "You can upload files with these file types: ": "\u4f60\u53ef\u4ee5\u4e0a\u4f20\u7684\u6587\u4ef6\u7c7b\u578b\uff1a", 
     "You cannot view the course as a student or beta tester before the course release date.": "\u5728\u6b64\u8bfe\u7a0b\u516c\u5f00\u4e4b\u524d\uff0c\u60a8\u65e0\u6cd5\u4ee5\u5b66\u751f\u6216\u6d4b\u8bd5\u8005\u8eab\u4efd\u67e5\u770b\u8be5\u8bfe\u7a0b\u3002", 
     "You commented...": "\u4f60\u8bc4\u8bba\u7684\u2026", 
     "You currently have no cohorts configured": "\u60a8\u76ee\u524d\u6ca1\u6709\u5df2\u914d\u7f6e\u7684\u7fa4\u7ec4", 
@@ -965,14 +987,17 @@
     "You did not select any files to submit.": "\u60a8\u672a\u9009\u62e9\u4efb\u4f55\u8981\u4e0a\u4f20\u7684\u6587\u4ef6\u3002", 
     "You don't seem to have Flash installed. Get Flash to continue your verification.": "\u60a8\u4f3c\u4e4e\u5e76\u672a\u5b89\u88c5Flash\u8f6f\u4ef6\u3002\u4e3a\u80fd\u7ee7\u7eed\u8fdb\u884c\u8ba4\u8bc1\uff0c\u8bf7\u5b89\u88c5Flash\u3002", 
     "You don't seem to have a webcam connected.": "\u60a8\u4f3c\u4e4e\u6ca1\u6709\u8fde\u63a5\u4e00\u4e2a\u6444\u50cf\u5934\u3002", 
+    "You have added a criterion. You will need to select an option for the criterion in the Learner Training step. To do this, click the Settings tab.": "\u4f60\u5df2\u7ecf\u6dfb\u52a0\u4e86\u4e00\u4e2a\u6807\u51c6\u3002\u4f60\u5c06\u9700\u8981\u4e3a\u201c\u5b66\u5458\u8bad\u7ec3\u201d\u6b65\u9aa4\u4e2d\u7684\u6807\u51c6\u9009\u62e9\u4e00\u4e2a\u9009\u9879\u3002\u8981\u6267\u884c\u6b64\u64cd\u4f5c\uff0c\u8bf7\u5355\u51fb\u201c\u8bbe\u7f6e\u201d\u9009\u9879\u5361\u3002", 
     "You have already reported this annotation.": "\u60a8\u5df2\u7ecf\u62a5\u544a\u8fc7\u4e86\u6b64\u6279\u6ce8\u3002", 
     "You have already verified your ID!": "\u60a8\u5df2\u7ecf\u6210\u529f\u9a8c\u8bc1\u4e86\u60a8\u7684\u8eab\u4efd\u8bc1\u4ef6\uff01", 
+    "You have deleted a criterion. The criterion has been removed from the example responses in the Learner Training step.": "\u4f60\u5df2\u5220\u9664\u4e86\u4e00\u4e2a\u6807\u51c6\u3002\u6b64\u6807\u51c6\u5df2\u4ece\u201c\u5b66\u5458\u8bad\u7ec3\u201d\u6b65\u9aa4\u7684\u56de\u590d\u793a\u4f8b\u4e2d\u64a4\u9500\u3002", 
+    "You have deleted all the options for this criterion. The criterion has been removed from the sample responses in the Learner Training step.": "\u4f60\u5df2\u5220\u9664\u6b64\u6807\u51c6\u7684\u6240\u6709\u9009\u9879\u3002\u6b64\u6807\u51c6\u5df2\u4ece\u201c\u5b66\u5458\u8bad\u7ec3\u201d\u6b65\u9aa4\u7684\u56de\u590d\u793a\u4f8b\u4e2d\u5220\u9664\u3002", 
+    "You have deleted an option. That option has been removed from its criterion in the sample responses in the Learner Training step. You might have to select a new option for the criterion.": "\u4f60\u5df2\u5220\u9664\u4e00\u4e2a\u9009\u9879\u3002\u6b64\u9009\u9879\u5df2\u4ece\u201c\u5b66\u5458\u8bad\u7ec3\u201d\u6b65\u9aa4\u4e2d\u7684\u56de\u590d\u793a\u4f8b\u6807\u51c6\u4e2d\u5220\u9664\u3002\u4f60\u53ef\u80fd\u5fc5\u987b\u4e3a\u6b64\u6807\u51c6\u9009\u62e9\u4e00\u4e2a\u65b0\u9009\u9879\u3002", 
     "You have not created any content groups yet.": "\u60a8\u8fd8\u6ca1\u6709\u521b\u5efa\u4efb\u4f55\u5185\u5bb9\u7ec4\u3002", 
     "You have not created any group configurations yet.": "\u60a8\u8fd8\u6ca1\u6709\u521b\u5efa\u4efb\u4f55\u7ec4\u914d\u7f6e\u3002", 
-    "You have unsaved changes. Do you really want to leave this page?": "\u60a8\u5c1a\u6709\u672a\u4fdd\u5b58\u7684\u4fee\u6539\uff0c\u786e\u5b9a\u8981\u79bb\u6b64\u9875\u9762\u5417\uff1f", 
     "You must enter a valid email address in order to add a new team member": "\u60a8\u5fc5\u987b\u8f93\u5165\u4e00\u4e2a\u6709\u6548\u7684\u7535\u5b50\u90ae\u4ef6\u5730\u5740\u4ee5\u4fbf\u6dfb\u52a0\u4e00\u4e2a\u65b0\u7684\u56e2\u961f\u6210\u5458", 
+    "You must provide a learner name.": "\u4f60\u5fc5\u987b\u63d0\u4f9b\u4e00\u4e2a\u5b66\u751f\u59d3\u540d\u3002", 
     "You must sign out and sign back in before your language changes take effect.": "\u8bed\u8a00\u8bbe\u7f6e\u5c06\u5728\u60a8\u91cd\u65b0\u767b\u5f55\u540e\u751f\u6548", 
-    "You must specify a name": "\u60a8\u5fc5\u987b\u6307\u5b9a\u4e00\u4e2a\u540d\u79f0", 
     "You must specify a name for the cohort": "\u60a8\u5fc5\u987b\u4e3a\u8be5\u7fa4\u7ec4\u547d\u540d\u3002", 
     "You need a computer that has a webcam. When you receive a browser prompt, make sure that you allow access to the camera.": "\u60a8\u9700\u8981\u4e00\u4e2a\u5177\u6709\u6444\u50cf\u5934\u7684\u7535\u8111\u3002\u5f53\u60a8\u6536\u5230\u6d4f\u89c8\u5668\u5f39\u7a97\u65f6\uff0c\u786e\u4fdd\u5b83\u6709\u6743\u9650\u4f7f\u7528\u6444\u50cf\u5934\u3002", 
     "You need a driver's license, passport, or other government-issued ID that has your name and photo.": "\u60a8\u9700\u8981\u9a7e\u7167\u3001\u62a4\u7167\u6216\u8005\u5176\u4ed6\u7531\u653f\u5e9c\u7b7e\u53d1\u7684\u5e26\u6709\u60a8\u59d3\u540d\u548c\u7167\u7247\u7684\u8eab\u4efd\u8bc1\u4ef6\u3002", 
@@ -983,6 +1008,7 @@
     "You submitted {filename}; only {allowedFiles} are allowed.": "\u60a8\u63d0\u4ea4\u4e86 {filename}\uff1b\u4ec5\u652f\u6301\u63d0\u4ea4 {allowedFiles} \u683c\u5f0f\u7684\u6587\u4ef6\u3002", 
     "You will not receive notification for emails that bounce, so double-check your spelling.": "\u60a8\u4e0d\u4f1a\u6536\u5230\u90ae\u4ef6\u672a\u9001\u8fbe\u7684\u901a\u77e5\uff0c\u56e0\u6b64\u8bf7\u4ed4\u7ec6\u68c0\u67e5\u4ee5\u786e\u4fdd\u62fc\u5199\u65e0\u8bef\u3002", 
     "You will use your webcam to take a picture of your face and of your government-issued photo ID.": "\u4f60\u5c06\u4f7f\u7528\u4f60\u7684\u7f51\u7edc\u6444\u50cf\u5934\u62cd\u6444\u4e00\u5f20\u540c\u65f6\u663e\u793a\u4f60\u7684\u8138\u90e8\u548c\u653f\u5e9c\u7b7e\u53d1\u7684\u6709\u7167\u7247\u7684\u8eab\u4efd\u8bc1\u4ef6\u7684\u7167\u7247\u3002", 
+    "You're about to submit your response for this assignment. After you submit this response, you can't change it or submit a new response.": "\u4f60\u5c06\u4f1a\u63d0\u4ea4\u5bf9\u672c\u6b21\u4f5c\u4e1a\u7684\u7b54\u6848\u3002\u63d0\u4ea4\u540e\uff0c\u4f60\u5c06\u65e0\u6cd5\u4fee\u6539\u6216\u8005\u63d0\u4ea4\u65b0\u7684\u7b54\u6848\u3002", 
     "You've made some changes": "\u60a8\u5df2\u66f4\u6539", 
     "You've made some changes, but there are some errors": "\u60a8\u6240\u4f5c\u53d8\u66f4\u5b58\u5728\u9519\u8bef", 
     "Your ID must be a government-issued photo ID that clearly shows your face.": "\u4f60\u7684\u8eab\u4efd\u8bc1\u4ef6\u5fc5\u987b\u662f\u653f\u5e9c\u7b7e\u53d1\u7684\u6709\u7167\u7247\u7684\u8eab\u4efd\u8bc1\u4ef6\uff0c\u5e76\u53ef\u4ee5\u6e05\u6670\u663e\u793a\u4f60\u7684\u8138\u90e8\u3002", 
@@ -1074,109 +1100,126 @@
     "{screen_reader_start}Warning:{screen_reader_end} The previously selected content group was deleted. Select another content group.": "{screen_reader_start}\u8b66\u544a\uff1a{screen_reader_end}\u4e4b\u524d\u9009\u62e9\u7684\u5185\u5bb9\u7ec4\u5df2\u88ab\u5220\u9664\u3002\u8bf7\u9009\u62e9\u53e6\u4e00\u4e2a\u5185\u5bb9\u7ec4\u3002", 
     "\u2026": "\u2026"
   };
-
-  django.gettext = function (msgid) {
-    var value = django.catalog[msgid];
-    if (typeof(value) == 'undefined') {
-      return msgid;
-    } else {
-      return (typeof(value) == 'string') ? value : value[0];
-    }
-  };
-
-  django.ngettext = function (singular, plural, count) {
-    var value = django.catalog[singular];
-    if (typeof(value) == 'undefined') {
-      return (count == 1) ? singular : plural;
-    } else {
-      return value[django.pluralidx(count)];
-    }
-  };
-
-  django.gettext_noop = function (msgid) { return msgid; };
-
-  django.pgettext = function (context, msgid) {
-    var value = django.gettext(context + '\x04' + msgid);
-    if (value.indexOf('\x04') != -1) {
-      value = msgid;
-    }
-    return value;
-  };
-
-  django.npgettext = function (context, singular, plural, count) {
-    var value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
-    if (value.indexOf('\x04') != -1) {
-      value = django.ngettext(singular, plural, count);
-    }
-    return value;
-  };
+  for (var key in newcatalog) {
+    django.catalog[key] = newcatalog[key];
+  }
   
 
-  django.interpolate = function (fmt, obj, named) {
-    if (named) {
-      return fmt.replace(/%\(\w+\)s/g, function(match){return String(obj[match.slice(2,-2)])});
-    } else {
-      return fmt.replace(/%s/g, function(match){return String(obj.shift())});
-    }
-  };
+  if (!django.jsi18n_initialized) {
+    django.gettext = function(msgid) {
+      var value = django.catalog[msgid];
+      if (typeof(value) == 'undefined') {
+        return msgid;
+      } else {
+        return (typeof(value) == 'string') ? value : value[0];
+      }
+    };
+
+    django.ngettext = function(singular, plural, count) {
+      var value = django.catalog[singular];
+      if (typeof(value) == 'undefined') {
+        return (count == 1) ? singular : plural;
+      } else {
+        return value[django.pluralidx(count)];
+      }
+    };
+
+    django.gettext_noop = function(msgid) { return msgid; };
+
+    django.pgettext = function(context, msgid) {
+      var value = django.gettext(context + '\x04' + msgid);
+      if (value.indexOf('\x04') != -1) {
+        value = msgid;
+      }
+      return value;
+    };
+
+    django.npgettext = function(context, singular, plural, count) {
+      var value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
+      if (value.indexOf('\x04') != -1) {
+        value = django.ngettext(singular, plural, count);
+      }
+      return value;
+    };
+
+    django.interpolate = function(fmt, obj, named) {
+      if (named) {
+        return fmt.replace(/%\(\w+\)s/g, function(match){return String(obj[match.slice(2,-2)])});
+      } else {
+        return fmt.replace(/%s/g, function(match){return String(obj.shift())});
+      }
+    };
 
 
-  /* formatting library */
+    /* formatting library */
 
-  django.formats = {
-    "DATETIME_FORMAT": "Y\u5e74n\u6708j\u65e5 H:i", 
+    django.formats = {
+    "DATETIME_FORMAT": "N j, Y, P", 
     "DATETIME_INPUT_FORMATS": [
-      "%Y/%m/%d %H:%M", 
-      "%Y-%m-%d %H:%M", 
-      "%Y\u5e74%n\u6708%j\u65e5 %H:%M", 
-      "%Y/%m/%d %H:%M:%S", 
       "%Y-%m-%d %H:%M:%S", 
-      "%Y\u5e74%n\u6708%j\u65e5 %H:%M:%S", 
-      "%Y/%m/%d %H:%M:%S.%f", 
       "%Y-%m-%d %H:%M:%S.%f", 
-      "%Y\u5e74%n\u6708%j\u65e5 %H:%n:%S.%f", 
-      "%Y-%m-%d"
-    ], 
-    "DATE_FORMAT": "Y\u5e74n\u6708j\u65e5", 
-    "DATE_INPUT_FORMATS": [
-      "%Y/%m/%d", 
+      "%Y-%m-%d %H:%M", 
       "%Y-%m-%d", 
-      "%Y\u5e74%n\u6708%j\u65e5"
+      "%m/%d/%Y %H:%M:%S", 
+      "%m/%d/%Y %H:%M:%S.%f", 
+      "%m/%d/%Y %H:%M", 
+      "%m/%d/%Y", 
+      "%m/%d/%y %H:%M:%S", 
+      "%m/%d/%y %H:%M:%S.%f", 
+      "%m/%d/%y %H:%M", 
+      "%m/%d/%y"
+    ], 
+    "DATE_FORMAT": "N j, Y", 
+    "DATE_INPUT_FORMATS": [
+      "%Y-%m-%d", 
+      "%m/%d/%Y", 
+      "%m/%d/%y", 
+      "%b %d %Y", 
+      "%b %d, %Y", 
+      "%d %b %Y", 
+      "%d %b, %Y", 
+      "%B %d %Y", 
+      "%B %d, %Y", 
+      "%d %B %Y", 
+      "%d %B, %Y"
     ], 
     "DECIMAL_SEPARATOR": ".", 
-    "FIRST_DAY_OF_WEEK": "1", 
-    "MONTH_DAY_FORMAT": "m\u6708j\u65e5", 
-    "NUMBER_GROUPING": "4", 
-    "SHORT_DATETIME_FORMAT": "Y\u5e74n\u6708j\u65e5 H:i", 
-    "SHORT_DATE_FORMAT": "Y\u5e74n\u6708j\u65e5", 
-    "THOUSAND_SEPARATOR": "", 
-    "TIME_FORMAT": "H:i", 
+    "FIRST_DAY_OF_WEEK": "0", 
+    "MONTH_DAY_FORMAT": "F j", 
+    "NUMBER_GROUPING": "0", 
+    "SHORT_DATETIME_FORMAT": "m/d/Y P", 
+    "SHORT_DATE_FORMAT": "m/d/Y", 
+    "THOUSAND_SEPARATOR": ",", 
+    "TIME_FORMAT": "P", 
     "TIME_INPUT_FORMATS": [
-      "%H:%M", 
       "%H:%M:%S", 
-      "%H:%M:%S.%f"
+      "%H:%M:%S.%f", 
+      "%H:%M"
     ], 
-    "YEAR_MONTH_FORMAT": "Y\u5e74n\u6708"
+    "YEAR_MONTH_FORMAT": "F Y"
   };
 
-  django.get_format = function (format_type) {
-    var value = django.formats[format_type];
-    if (typeof(value) == 'undefined') {
-      return format_type;
-    } else {
-      return value;
-    }
-  };
+    django.get_format = function(format_type) {
+      var value = django.formats[format_type];
+      if (typeof(value) == 'undefined') {
+        return format_type;
+      } else {
+        return value;
+      }
+    };
 
-  /* add to global namespace */
-  globals.pluralidx = django.pluralidx;
-  globals.gettext = django.gettext;
-  globals.ngettext = django.ngettext;
-  globals.gettext_noop = django.gettext_noop;
-  globals.pgettext = django.pgettext;
-  globals.npgettext = django.npgettext;
-  globals.interpolate = django.interpolate;
-  globals.get_format = django.get_format;
+    /* add to global namespace */
+    globals.pluralidx = django.pluralidx;
+    globals.gettext = django.gettext;
+    globals.ngettext = django.ngettext;
+    globals.gettext_noop = django.gettext_noop;
+    globals.pgettext = django.pgettext;
+    globals.npgettext = django.npgettext;
+    globals.interpolate = django.interpolate;
+    globals.get_format = django.get_format;
+
+    django.jsi18n_initialized = true;
+  }
 
 }(this));
 

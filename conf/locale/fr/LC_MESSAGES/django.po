@@ -265,7 +265,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-06-13 13:56+0000\n"
+"POT-Creation-Date: 2018-06-20 10:23+0000\n"
 "PO-Revision-Date: 2018-04-11 14:18+0000\n"
 "Last-Translator: Mireille Cabuay\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
@@ -3001,13 +3001,13 @@ msgstr "Mise en correspondance des sujets de discussions"
 msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
-"example, one discussion category may be \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each "
-"category must be unique. In \"id\" values, the only special characters that "
-"are supported are underscore, hyphen, and period. You can also specify a "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each category "
+"must be unique. In \"id\" values, the only special characters that are "
+"supported are underscore, hyphen, and period. You can also specify a "
 "category as the default for new posts in the Discussion page by setting its "
-"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -21599,18 +21599,43 @@ msgid "What content is exported?"
 msgstr "Quelles sont les données exportées ?"
 
 #: cms/templates/export.html
-msgid ""
-"The course content and structure (including sections, subsections, and "
-"units) are exported. Values from Advanced Settings, including MATLAB API "
-"keys and LTI passports, are also exported. Other data, including student "
-"data, grading information, discussion forum data, course settings, and "
-"course team information, is not exported."
+msgid "The following content is exported."
 msgstr ""
-"Le contenu du cours et sa structure (sections, sous-sections et unités) sont"
-" exportés. Les valeurs des paramètres avancés, y compris les clés d'API "
-"MATLAB et les passeports LTI, sont aussi exportés. Les autres données, "
-"étudiants, information d'évaluation, forum de discussion, paramètres du "
-"cours et de l'équipe ne sont pas exportées."
+
+#: cms/templates/export.html cms/templates/import.html
+msgid "Course content and structure"
+msgstr ""
+
+#: cms/templates/export.html cms/templates/import.html
+msgid "Course dates"
+msgstr ""
+
+#: cms/templates/export.html cms/templates/import.html
+msgid "Grading policy"
+msgstr ""
+
+#: cms/templates/export.html cms/templates/import.html
+msgid "Any group configurations"
+msgstr ""
+
+#: cms/templates/export.html cms/templates/import.html
+msgid ""
+"Settings on the Advanced Settings page, including MATLAB API keys and LTI "
+"passports"
+msgstr ""
+
+#: cms/templates/export.html
+msgid "The following content is not exported."
+msgstr ""
+
+#: cms/templates/export.html cms/templates/import.html
+msgid ""
+"Learner-specific content, such as learner grades and discussion forum data"
+msgstr ""
+
+#: cms/templates/export.html cms/templates/import.html
+msgid "The course team"
+msgstr ""
 
 #. Translators: ".tar.gz" is a file extension, and should not be translated
 #: cms/templates/export.html
@@ -22209,36 +22234,7 @@ msgid "The following content is imported."
 msgstr ""
 
 #: cms/templates/import.html
-msgid "Course content and structure"
-msgstr ""
-
-#: cms/templates/import.html
-msgid "Course dates"
-msgstr ""
-
-#: cms/templates/import.html
-msgid "Grading policy"
-msgstr ""
-
-#: cms/templates/import.html
-msgid "Any group configurations"
-msgstr ""
-
-#: cms/templates/import.html
-msgid "Settings on the Advanced Settings page"
-msgstr ""
-
-#: cms/templates/import.html
 msgid "The following content is not imported."
-msgstr ""
-
-#: cms/templates/import.html
-msgid ""
-"Learner-specific content, such as learner grades and discussion forum data"
-msgstr ""
-
-#: cms/templates/import.html
-msgid "The course team"
 msgstr ""
 
 #: cms/templates/import.html

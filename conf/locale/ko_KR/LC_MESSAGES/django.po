@@ -90,7 +90,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-06-13 13:56+0000\n"
+"POT-Creation-Date: 2018-06-20 10:23+0000\n"
 "PO-Revision-Date: 2018-03-13 13:51+0000\n"
 "Last-Translator: kmooc <shevious@gmail.com>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
@@ -2609,13 +2609,13 @@ msgstr ""
 msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
-"example, one discussion category may be \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each "
-"category must be unique. In \"id\" values, the only special characters that "
-"are supported are underscore, hyphen, and period. You can also specify a "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each category "
+"must be unique. In \"id\" values, the only special characters that are "
+"supported are underscore, hyphen, and period. You can also specify a "
 "category as the default for new posts in the Discussion page by setting its "
-"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -20328,15 +20328,43 @@ msgid "What content is exported?"
 msgstr "어떤 콘텐츠가 내보내지는가?"
 
 #: cms/templates/export.html
-msgid ""
-"The course content and structure (including sections, subsections, and "
-"units) are exported. Values from Advanced Settings, including MATLAB API "
-"keys and LTI passports, are also exported. Other data, including student "
-"data, grading information, discussion forum data, course settings, and "
-"course team information, is not exported."
+msgid "The following content is exported."
 msgstr ""
-"강좌 콘텐츠와 구조 (주제, 소주제, 학습활동 포함)가 내보내기 됩니다. MATLAB API 키와 LTI Passport 포함 고급 설정"
-" 값 또한 내보내집니다. 학습자 데이터, 채점 정보, 게시판 데이터 등의 다른 자료들은 내보내기 되지 않습니다. "
+
+#: cms/templates/export.html cms/templates/import.html
+msgid "Course content and structure"
+msgstr ""
+
+#: cms/templates/export.html cms/templates/import.html
+msgid "Course dates"
+msgstr ""
+
+#: cms/templates/export.html cms/templates/import.html
+msgid "Grading policy"
+msgstr ""
+
+#: cms/templates/export.html cms/templates/import.html
+msgid "Any group configurations"
+msgstr ""
+
+#: cms/templates/export.html cms/templates/import.html
+msgid ""
+"Settings on the Advanced Settings page, including MATLAB API keys and LTI "
+"passports"
+msgstr ""
+
+#: cms/templates/export.html
+msgid "The following content is not exported."
+msgstr ""
+
+#: cms/templates/export.html cms/templates/import.html
+msgid ""
+"Learner-specific content, such as learner grades and discussion forum data"
+msgstr ""
+
+#: cms/templates/export.html cms/templates/import.html
+msgid "The course team"
+msgstr ""
 
 #. Translators: ".tar.gz" is a file extension, and should not be translated
 #: cms/templates/export.html
@@ -20910,36 +20938,7 @@ msgid "The following content is imported."
 msgstr ""
 
 #: cms/templates/import.html
-msgid "Course content and structure"
-msgstr ""
-
-#: cms/templates/import.html
-msgid "Course dates"
-msgstr ""
-
-#: cms/templates/import.html
-msgid "Grading policy"
-msgstr ""
-
-#: cms/templates/import.html
-msgid "Any group configurations"
-msgstr ""
-
-#: cms/templates/import.html
-msgid "Settings on the Advanced Settings page"
-msgstr ""
-
-#: cms/templates/import.html
 msgid "The following content is not imported."
-msgstr ""
-
-#: cms/templates/import.html
-msgid ""
-"Learner-specific content, such as learner grades and discussion forum data"
-msgstr ""
-
-#: cms/templates/import.html
-msgid "The course team"
 msgstr ""
 
 #: cms/templates/import.html

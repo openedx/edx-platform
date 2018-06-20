@@ -1,11 +1,11 @@
 
 
-(function (globals) {
+(function(globals) {
 
   var django = globals.django || (globals.django = {});
 
   
-  django.pluralidx = function (n) {
+  django.pluralidx = function(n) {
     var v=0;
     if (typeof(v) == 'boolean') {
       return v ? 1 : 0;
@@ -15,10 +15,11 @@
   };
   
 
-  
   /* gettext library */
 
-  django.catalog = {
+  django.catalog = django.catalog || {};
+  
+  var newcatalog = {
     "#Replies": "#\ub2f5\uae00\ub4e4", 
     "%(num_questions)s question": [
       "%(num_questions)s\uac1c"
@@ -28,6 +29,9 @@
     ], 
     "%(num_students)s student opened Subsection": [
       "\uc18c\uc8fc\uc81c\ub97c \uc5f4\uc5b4\ubcf8 \ud559\uc2b5\uc790\ub4e4 : %(num_students)s"
+    ], 
+    "%(sel)s of %(cnt)s selected": [
+      "%(sel)s\uac1c\uac00 %(cnt)s\uac1c \uc911\uc5d0 \uc120\ud0dd\ub428."
     ], 
     "%(team_count)s Team": [
       "%(team_count)s \ud300"
@@ -55,6 +59,8 @@
     ], 
     "%s ago": "%s \uc804", 
     "%s from now": "\uc9c0\uae08\uc73c\ub85c \ubd80\ud130 %s \uc774\ud6c4", 
+    "6 a.m.": "\uc624\uc804 6\uc2dc", 
+    "6 p.m.": "\uc624\ud6c4 6\uc2dc", 
     "Account Settings": "\uacc4\uc815 \uc124\uc815", 
     "Add Cohort": "\ud559\uc2b5\uc9d1\ub2e8 \ucd94\uac00\ud558\uae30", 
     "Add a New Cohort": "\uc2e0\uaddc \ud559\uc2b5 \uc9d1\ub2e8 \ucd94\uac00", 
@@ -74,10 +80,13 @@
     "An error occurred. Please try again.": "\uc624\ub958\uac00 \ubc1c\uc0dd\ud588\uc2b5\ub2c8\ub2e4. \uc7a0\uc2dc \ud6c4\uc5d0 \ub2e4\uc2dc \uc2dc\ub3c4\ud558\uc138\uc694.", 
     "Annotation": "\uc8fc\uc11d", 
     "Annotation Text": "\uc8fc\uc11d \ud14d\uc2a4\ud2b8", 
+    "April": "4\uc6d4", 
     "Are you sure you want to delete this comment?": "\uc774 \ub313\uae00\uc744 \uc0ad\uc81c\ud558\uc2dc\uaca0\uc2b5\ub2c8\uae4c?", 
     "Are you sure you want to delete this post?": "\uc774 \uac8c\uc2dc\ubb3c\uc744 \uc0ad\uc81c\ud558\uc2dc\uaca0\uc2b5\ub2c8\uae4c?", 
     "Are you sure you want to delete this response?": "\uc774 \ub2f5\ubcc0\uc744 \uc0ad\uc81c\ud558\uc2dc\uaca0\uc2b5\ub2c8\uae4c?", 
     "Assign students to cohorts by uploading a CSV file.": "CSV \ud30c\uc77c\uc744 \uc5c5\ub85c\ub4dc\ud558\uc5ec \ud559\uc2b5 \uc9d1\ub2e8\uc5d0 \ud559\uc2b5\uc790\ub97c \ucd94\uac00\ud558\uc138\uc694.", 
+    "August": "8\uc6d4", 
+    "Available %s": "\uc774\uc6a9 \uac00\ub2a5\ud55c %s", 
     "Average": "\ubcf4\ud1b5", 
     "Blockquote": "\ube14\ub85d \uc778\uc6a9", 
     "Blockquote (Ctrl+Q)": "\ube14\ub85d\uc778\uc6a9 (Ctrl+Q)", 
@@ -97,11 +106,19 @@
     "Checkout": "\uacb0\uc81c\ud558\uae30", 
     "Checkout with PayPal": "PayPal\ub85c \uacb0\uc81c\ud558\uae30", 
     "Checkout with {processor}": "{processor}\ub85c \uacb0\uc81c\ud558\uae30", 
+    "Choose": "\uc120\ud0dd", 
     "Choose a .csv file": ".csv \ud30c\uc77c\uc744 \uc120\ud0dd\ud558\uc2ed\uc2dc\uc624. ", 
+    "Choose a Date": "\uc2dc\uac04 \uc120\ud0dd", 
+    "Choose a Time": "\uc2dc\uac04 \uc120\ud0dd", 
+    "Choose a time": "\uc2dc\uac04 \uc120\ud0dd", 
+    "Choose all": "\ubaa8\ub450 \uc120\ud0dd", 
+    "Chosen %s": "\uc120\ud0dd\ub41c %s", 
     "Clear": "\uc9c0\uc6b0\uae30", 
     "Click OK to have your e-mail address sent to a 3rd party application.\n\nClick Cancel to return to this page without sending your information.": "\uc774\uba54\uc77c \uc8fc\uc18c\ub97c \ud0c0\uc0ac \uc751\uc6a9\ud504\ub85c\uadf8\ub7a8\uc5d0 \ubcf4\ub0b4\ub294 \uac83\uc5d0 \ub3d9\uc758\ud558\uba74 OK\ub97c \ud074\ub9ad\ud558\uc138\uc694.\n\uadc0\ud558\uc758 \uc815\ubcf4\ub97c \ubcf4\ub0b4\uc9c0 \uc54a\uace0, \uc774 \ud398\uc774\uc9c0\ub97c \ub2e4\uc2dc \ubcf4\ub824\uba74 Cancel\uc744 \ud074\ub9ad\ud558\uc138\uc694.", 
     "Click OK to have your username and e-mail address sent to a 3rd party application.\n\nClick Cancel to return to this page without sending your information.": "\uadc0\ud558\uc758 \uc544\uc774\ub514\uc640 \uc774\uba54\uc77c \uc8fc\uc18c\ub97c \ud0c0\uc0ac \uc751\uc6a9\ud504\ub85c\uadf8\ub7a8\uc5d0 \ubcf4\ub0b4\ub294 \uac83\uc5d0 \ub3d9\uc758\ud558\uba74 OK\ub97c \ud074\ub9ad\ud558\uc138\uc694.\n\uadc0\ud558\uc758 \uc815\ubcf4\ub97c \ubcf4\ub0b4\uc9c0 \uc54a\uace0, \uc774 \ud398\uc774\uc9c0\ub97c \ub2e4\uc2dc \ubcf4\ub824\uba74 Cancel\uc744 \ud074\ub9ad\ud558\uc138\uc694.", 
     "Click OK to have your username sent to a 3rd party application.\n\nClick Cancel to return to this page without sending your information.": "\uadc0\ud558\uc758\uc544\uc774\ub514\ub97c \ud0c0\uc0ac \uc751\uc6a9\ud504\ub85c\uadf8\ub7a8\uc5d0 \ubcf4\ub0b4\ub294 \uac83\uc5d0 \ub3d9\uc758\ud558\uba74 OK\ub97c \ud074\ub9ad\ud558\uc138\uc694.\n\n\n\uadc0\ud558\uc758 \uc815\ubcf4\ub97c \ubcf4\ub0b4\uc9c0 \uc54a\uace0, \uc774 \ud398\uc774\uc9c0\ub97c \ub2e4\uc2dc \ubcf4\ub824\uba74 Cancel\uc744 \ud074\ub9ad\ud558\uc138\uc694.", 
+    "Click to choose all %s at once.": "\ud55c\ubc88\uc5d0 \ubaa8\ub4e0 %s \ub97c \uc120\ud0dd\ud558\ub824\uba74 \ud074\ub9ad\ud558\uc138\uc694.", 
+    "Click to remove all chosen %s at once.": "\ud55c\ubc88\uc5d0 \uc120\ud0dd\ub41c \ubaa8\ub4e0 %s \ub97c \uc81c\uac70\ud558\ub824\uba74 \ud074\ub9ad\ud558\uc138\uc694.", 
     "Close": "\ub2eb\uae30", 
     "Code Sample (Ctrl+K)": "\ucf54\ub4dc \uc0d8\ud50c (Ctrl+K)", 
     "Cohort Name": "\ud559\uc2b5\uc9d1\ub2e8\uba85", 
@@ -120,9 +137,9 @@
     "Current tab": "\ud604\uc7ac \ud0ed", 
     "Date": "\ub0a0\uc9dc", 
     "Date posted": "\uac8c\uc2dc\ub41c \ub0a0\uc9dc", 
+    "December": "12\uc6d4", 
     "Delete": "\uc0ad\uc81c", 
     "Deleted Content Group": "\ucee8\ud150\uce20 \uadf8\ub8f9 \uc0ad\uc81c", 
-    "Deleting a textbook cannot be undone and once deleted any reference to it in your courseware's navigation will also be removed.": "\uad50\uc7ac\ub97c \uc0ad\uc81c\ud558\uba74 \ub418\ub3cc\ub9b4 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4. \uc0ad\uc81c \ud6c4 \uac15\uc88c \ub0b4\uc6a9 \ud0d0\uc0c9\uc5d0 \ub4e4\uc5b4\uc788\ub294 \ubaa8\ub4e0 \ucc38\uc870\ub3c4 \ud568\uaed8 \uc0ad\uc81c\ub420 \uac83\uc785\ub2c8\ub2e4.", 
     "Description": "\uc124\uba85", 
     "Do not show again": "\ub2e4\uc2dc \uc7ac\uc0dd\ud558\uc9c0 \ub9d0\uae30", 
     "Do you want to allow this student ('{student_id}') to skip the entrance exam?": "\ud559\uc2b5\uc790 ('{student_id}')\uc758 \uc0ac\uc804 \ud3c9\uac00 \uba74\uc81c\ub97c \ud5c8\uc6a9\ud558\uc2dc\uaca0\uc2b5\ub2c8\uae4c?", 
@@ -165,13 +182,16 @@
     "Error: You cannot remove yourself from the Instructor group!": "\uc624\ub958: \uc790\uc2e0\uc744 \uad50\uc218\uc790 \uadf8\ub8f9\uc5d0\uc11c \uc81c\uac70\ud560 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4. ", 
     "Errors": "\uc624\ub958", 
     "Exit full browser": "\uc804\uccb4\ud654\uba74\uc5d0\uc11c \ub098\uc624\uae30", 
+    "February": "2\uc6d4", 
     "File Name": "\ud30c\uc77c\uc774\ub984", 
     "Fill browser": "\ube0c\ub77c\uc6b0\uc800 \ucc44\uc6b0\uae30", 
+    "Filter": "\ud544\ud130", 
     "Full Name": "\uc2e4\uba85", 
     "Gender": "\uc131 ", 
     "Header": "\uba38\ub9bf\uae00", 
     "Heading": "\uc81c\ubaa9", 
     "Heading (Ctrl+H)": "\uc81c\ubaa9 (Ctrl+H)", 
+    "Hide": "\uac10\ucd94\uae30", 
     "Hide Discussion": "\uac8c\uc2dc\ud310 \uac10\ucd94\uae30", 
     "Hide notes": "\ub178\ud2b8 \uac10\ucd94\uae30", 
     "Horizontal Rule (Ctrl+R)": "\uac00\ub85c\uc120 (Ctrl+R)", 
@@ -186,6 +206,9 @@
     "Insert Hyperlink": "\ud558\uc774\ud37c\ub9c1\ud06c \uc0bd\uc785", 
     "Instructor": "\uad50\uc218\uc790", 
     "Italic (Ctrl+I)": "\uae30\uc6b8\uc784 (Ctrl+I)", 
+    "January": "1\uc6d4", 
+    "July": "7\uc6d4", 
+    "June": "6\uc6d4", 
     "KB": "KB", 
     "Language": "\uc5b8\uc5b4", 
     "Less": "\uc801\uac8c", 
@@ -201,10 +224,13 @@
     "Loud": "\ud06c\uac8c", 
     "Low": "\ub0ae\uac8c", 
     "MB": "MB", 
+    "March": "3\uc6d4", 
     "Mark enrollment code as unused": "\uc0ac\uc6a9\ub418\uc9c0 \uc54a\uc740 \uc218\uac15 \uc2e0\uccad \ucf54\ub4dc\ub97c \ud45c\uc2dc\ud558\uc138\uc694.", 
     "Markdown Editing Help": "Markdow \ud3b8\uc9d1 \ub3c4\uc6c0\ub9d0", 
     "Maximum": "\ucd5c\ub300", 
+    "May": "5\uc6d4", 
     "Message:": "\ubcf8\ubb38: ", 
+    "Midnight": "\uc790\uc815", 
     "Module state successfully deleted.": "\ubaa8\ub4c8 \uc0c1\ud0dc\uac00 \uc131\uacf5\uc801\uc73c\ub85c \uc0ad\uc81c\ub418\uc5c8\uc2b5\ub2c8\ub2e4.", 
     "More": "\ub354\ubcf4\uae30", 
     "Mute": "\uc74c\uc18c\uac70", 
@@ -216,29 +242,34 @@
     "No Webcam Detected": "\uc6f9\ucea0 \ubbf8\uac10\uc9c0", 
     "No results found for \"%(query_string)s\". Please try searching again.": "\"%(query_string)s\"\ub85c \uac80\uc0c9\ub41c \uacb0\uacfc\uac00 \uc5c6\uc2b5\ub2c8\ub2e4. \ub2e4\uc2dc \uac80\uc0c9\ud558\uc138\uc694.", 
     "No tasks currently running.": "\uc791\uc5c5\uc774 \uc5c6\uc2b5\ub2c8\ub2e4.", 
+    "Noon": "\uc815\uc624", 
+    "Note: You are %s hour ahead of server time.": [
+      "Note: \uc11c\ubc84 \uc2dc\uac04\ubcf4\ub2e4 %s \uc2dc\uac04 \ube60\ub985\ub2c8\ub2e4."
+    ], 
+    "Note: You are %s hour behind server time.": [
+      "Note: \uc11c\ubc84 \uc2dc\uac04\ubcf4\ub2e4 %s \uc2dc\uac04 \ub2a6\uc740 \uc2dc\uac04\uc785\ub2c8\ub2e4."
+    ], 
     "Notes hidden": "\uac10\ucdb0\uc9c4 \ub178\ud2b8", 
     "Notes visible": "\ubcfc \uc218 \uc788\ub294 \ub178\ud2b8", 
+    "November": "11\uc6d4", 
+    "Now": "\ud604\uc7ac", 
     "Number Sent": "\ubcf4\ub0b8 \ud69f\uc218", 
     "Number of Students": "\ud559\uc2b5\uc790 \uc218 ", 
     "Numbered List (Ctrl+O)": "\ubb38\ub2e8 \ubc88\ud638 (Ctrl+O)", 
     "OK": "\ud655\uc778", 
+    "October": "10\uc6d4", 
     "Only properly formatted .csv files will be accepted.": "\uc801\ud569\ud55c .csv \ud30c\uc77c\ub9cc \uc62c\ub9b4 \uc218 \uc788\uc2b5\ub2c8\ub2e4. ", 
     "Order No.": "\uc8fc\ubb38 \ubc88\ud638", 
     "Password": "\ube44\ubc00\ubc88\ud638", 
-    "Password reset email sent. Follow the link in the email to change your password.": "\ube44\ubc00\ubc88\ud638\ub97c \uc7ac\uc124\uc815\ud558\uae30 \uc704\ud55c \uc774\uba54\uc77c\uc744 \ubcf4\ub0c8\uc2b5\ub2c8\ub2e4.  \ube44\ubc00\ubc88\ud638\ub97c \ubcc0\uacbd\ud558\uae30 \uc704\ud574 \uc774\uba54\uc77c\uc5d0 \uc788\ub294 \ub9c1\ud06c\ub97c \ud074\ub9ad\ud558\uc138\uc694.", 
     "Pause": "\uc77c\uc2dc\uc815\uc9c0", 
     "Photo Captured successfully.": "\uc0ac\uc9c4\uc774 \uc131\uacf5\uc801\uc73c\ub85c \ucea1\uccd0\ub418\uc5c8\uc2b5\ub2c8\ub2e4.", 
     "Placeholder": "\ud50c\ub808\uc774\uc2a4\ud640\ub354", 
     "Play": "\uc7ac\uc0dd", 
     "Play video": "\ub3d9\uc601\uc0c1 \uc7ac\uc0dd\ud558\uae30", 
-    "Please check your email to confirm the change": "\ubcc0\uacbd\uc744 \ud655\uc778\ud558\uae30 \uc704\ud574 \uc774\uba54\uc77c\uc744 \ud655\uc778\ud558\uc138\uc694.", 
     "Please enter a problem location.": "\ubb38\uc81c \uc704\uce58\ub97c \uc785\ub825\ud558\uc138\uc694.", 
     "Please enter a student email address or username.": "\ud559\uc2b5\uc790\uc758 \uc774\uba54\uc77c \uc8fc\uc18c\ub098 \uc544\uc774\ub514\ub97c \uc785\ub825\ud558\uc138\uc694.", 
     "Please enter a username or email.": "\uc544\uc774\ub514 \ub610\ub294 \uc774\uba54\uc77c\uc744 \uc785\ub825\ud558\uc138\uc694", 
     "Please enter a valid donation amount.": "\uc720\ud6a8\ud55c \uae30\ubd80 \uae08\uc561\uc744 \uc785\ub825\ud558\uc2ed\uc2dc\uc624.", 
-    "Please enter a valid email address": "\uc720\ud6a8\ud55c \uc774\uba54\uc77c \uc8fc\uc18c\ub97c \uc785\ub825\ud558\uc138\uc694.", 
-    "Please enter a valid password": "\uc720\ud6a8\ud55c \ube44\ubc00\ubc88\ud638\ub97c \uc785\ub825\ud558\uc138\uc694.", 
-    "Please select a PDF file to upload.": "\uc5c5\ub85c\ub4dc\ud560 PDF \ud30c\uc77c\uc744 \uc120\ud0dd\ud558\uc138\uc694.", 
     "Please select a file in .srt format.": ".srt \ud30c\uc77c\uc744 \uc120\ud0dd\ud574 \uc8fc\uc138\uc694.", 
     "Please verify that you have uploaded a valid image (PNG and JPEG).": "\uc801\ud569\ud55c \uc774\ubbf8\uc9c0 \ud615\uc2dd(PNG \ubc0f JPEG)\uc778\uc9c0 \ud655\uc778\ud574 \uc8fc\uc2ed\uc2dc\uc624.", 
     "Please verify that your webcam is connected and that you have allowed your browser to access it.": "\uc6f9\ucea0\uc774 \uc5f0\uacb0\ub418\uc5b4 \uc788\ub294\uc9c0, \ube0c\ub77c\uc6b0\uc800\uac00 \uc561\uc138\uc2a4\ub97c \ud5c8\uc6a9\ud558\ub294\uc9c0 \ud655\uc778\ud558\uc138\uc694.", 
@@ -253,6 +284,7 @@
     "Redo (Ctrl+Y)": "\ub2e4\uc2dc\uc2e4\ud589 (Ctrl+Y)", 
     "Removal is in progress. To avoid errors, stay on this page until the process is complete.": "\uc0ad\uc81c\uac00 \uc9c4\ud589 \uc911\uc785\ub2c8\ub2e4. \uc624\ub958 \ubc1c\uc0dd\uc744 \ubc29\uc9c0\ud558\uae30 \uc704\ud574 \uc644\ub8cc\ub420 \ub54c\uae4c\uc9c0 \ubcf8 \ud398\uc774\uc9c0\uc5d0 \uba38\ubb3c\ub7ec \uc8fc\uc2ed\uc2dc\uc624. ", 
     "Remove": "\uc81c\uac70", 
+    "Remove all": "\ubaa8\ub450 \uc81c\uac70", 
     "Removing": "\uc81c\uac70\ud558\uae30", 
     "Reply": "\ub2f5\uae00", 
     "Report annotation as inappropriate or offensive.": "\ubd80\uc801\uc808\ud55c \uc8fc\uc11d\uc73c\ub85c \uc2e0\uace0\ud569\ub2c8\ub2e4.", 
@@ -275,9 +307,11 @@
     "Sent By": "\ubcf4\ub0b8 \uc0ac\ub78c", 
     "Sent By:": "\ubcf4\ub0b4\ub294 \uc0ac\ub78c:", 
     "Sent To:": "\ubc1b\ub294\uc0ac\ub78c:", 
+    "September": "9\uc6d4", 
     "Sequence error! Cannot navigate to %(tab_name)s in the current SequenceModule. Please contact the course staff.": "Sequence error!  \ud604\uc7ac\uc758 SequenceModule\uc5d0\uc11c\ub294 %(tab_name)s \uc744 \ud0d0\uc0c9\ud560 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4. \uad00\ub9ac\uc790\uc5d0\uac8c \ubb38\uc758\ud558\uc138\uc694.", 
     "Settings": "\uc124\uc815", 
     "Short explanation": "\uc9e7\uc740 \uc124\uba85", 
+    "Show": "\ubcf4\uae30", 
     "Show Discussion": "\uac8c\uc2dc\ud310  \ubcf4\uae30", 
     "Show notes": "\ub178\ud2b8 \ubcf4\uc774\uae30", 
     "Showing all responses": "\ubaa8\ub4e0 \ub2f5\ubcc0 \ubcf4\uc5ec\uc8fc\uae30", 
@@ -315,7 +349,6 @@
     "Text": "Text", 
     "The cohort cannot be added": "\ud559\uc2b5 \uc9d1\ub2e8\uc774 \ucd94\uac00\ub420 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4.", 
     "The cohort cannot be saved": "\ud559\uc2b5 \uc9d1\ub2e8\uc774 \uc800\uc7a5\ub420 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4.", 
-    "The data could not be saved.": "\uc790\ub8cc\uac00 \uc800\uc7a5\ub418\uc9c0 \uc54a\uc558\uc2b5\ub2c8\ub2e4.", 
     "The file must be at least {size} in size.": "\ud30c\uc77c\uc758 \ud06c\uae30\uac00 \uc801\uc5b4\ub3c4 {size} \uc5ec\uc57c \ud569\ub2c8\ub2e4. ", 
     "The file must be smaller than {size} in size.": "\ud30c\uc77c\uc758 \ud06c\uae30\uac00 {size} \ubcf4\ub2e4 \uc791\uc544\uc57c \ud569\ub2c8\ub2e4. ", 
     "The following email addresses and/or usernames are invalid:": "\ub2e4\uc74c\uc758 \uc774\uba54\uc77c \uc8fc\uc18c  \ub610\ub294 \uc544\uc774\ub514\ub294 \uc720\ud6a8\ud558\uc9c0 \uc54a\uc2b5\ub2c8\ub2e4. ", 
@@ -342,9 +375,14 @@
       "\uc774 \uc8fc\uc11d\uc740 %(count)s \ud50c\ub798\uadf8\uac00 \uc788\uc2b5\ub2c8\ub2e4."
     ], 
     "This browser cannot play .mp4, .ogg, or .webm files.": "\uc774 \ube0c\ub77c\uc6b0\uc800\ub294 .mp4, .ogg, \ub610\ub294 .webm file\uc744 \uc7ac\uc0dd\ud560 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4.", 
+    "This is the list of available %s. You may choose some by selecting them in the box below and then clicking the \"Choose\" arrow between the two boxes.": "\uc0ac\uc6a9 \uac00\ub2a5\ud55c %s \uc758 \ub9ac\uc2a4\ud2b8 \uc785\ub2c8\ub2e4.  \uc544\ub798\uc758 \uc0c1\uc790\uc5d0\uc11c \uc120\ud0dd\ud558\uace0 \ub450 \uc0c1\uc790 \uc0ac\uc774\uc758 \"\uc120\ud0dd\" \ud654\uc0b4\ud45c\ub97c \ud074\ub9ad\ud558\uc5ec \uba87 \uac00\uc9c0\ub97c \uc120\ud0dd\ud560 \uc218 \uc788\uc2b5\ub2c8\ub2e4.", 
+    "This is the list of chosen %s. You may remove some by selecting them in the box below and then clicking the \"Remove\" arrow between the two boxes.": "\uc120\ud0dd\ub41c %s \ub9ac\uc2a4\ud2b8 \uc785\ub2c8\ub2e4.  \uc544\ub798\uc758 \uc0c1\uc790\uc5d0\uc11c \uc120\ud0dd\ud558\uace0 \ub450 \uc0c1\uc790 \uc0ac\uc774\uc758 \"\uc81c\uac70\" \ud654\uc0b4\ud45c\ub97c \ud074\ub9ad\ud558\uc5ec \uc77c\ubd80\ub97c \uc81c\uac70 \ud560 \uc218 \uc788\uc2b5\ub2c8\ub2e4.", 
     "Time Sent": "\ubcf4\ub0b8 \uc2dc\uac04", 
     "Time Sent:": "\ubcf4\ub0b8 \uc2dc\uac04:", 
+    "Today": "\uc624\ub298", 
+    "Tomorrow": "\ub0b4\uc77c", 
     "Try using a different browser, such as Google Chrome.": "\uad6c\uae00 Chrome \ub4f1 \ub2e4\ub978 \ube0c\ub77c\uc6b0\uc800\ub97c \uc0ac\uc6a9\ud558\uc138\uc694.", 
+    "Type into this box to filter down the list of available %s.": "\uc0ac\uc6a9 \uac00\ub2a5\ud55c %s \ub9ac\uc2a4\ud2b8\ub97c \ud544\ud130\ub9c1\ud558\ub824\uba74 \uc774 \uc0c1\uc790\uc5d0 \uc785\ub825\ud558\uc138\uc694.", 
     "Undo (Ctrl+Z)": "\ub418\ub3cc\ub9ac\uae30 (Ctrl+Z)", 
     "Unknown": "\uc54c \uc218 \uc5c6\uc74c", 
     "Unlinking": "\uc5f0\uacb0 \ud574\uc81c\ud558\uae30", 
@@ -380,17 +418,19 @@
     "Volume": "\ubcfc\ub968", 
     "Warnings": "\uacbd\uace0!", 
     "We couldn't find any results for \"%s\".": "\"%s\"\ub97c \ucc3e\uc744 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4. ", 
-    "We weren't able to send you a password reset email.": "\uadc0\ud558\uc5d0\uac8c \ube44\ubc00\ubc88\ud638 \uc7ac\uc124\uc815 \uc774\uba54\uc77c\uc744 \ubcf4\ub0bc \uc218 \uc5c6\uc5c8\uc2b5\ub2c8\ub2e4.", 
     "We've encountered an error. Refresh your browser and then try again.": "\uc624\ub958\uac00 \ubc1c\uc0dd\ud588\uc2b5\ub2c8\ub2e4. \ud398\uc774\uc9c0\ub97c \uc0c8\ub85c\uace0\uce68\ud55c \ud6c4, \ub2e4\uc2dc \uc2dc\ub3c4\ud558\uc138\uc694. ", 
     "Webcam": "\uc6f9\ucea0", 
     "Year of Birth": "\ucd9c\uc0dd\uc5f0\ub3c4", 
+    "Yesterday": "\uc5b4\uc81c", 
     "You currently have no cohorts configured": "\uc124\uc815\ub41c \ud559\uc2b5 \uc9d1\ub2e8\uc774 \ud604\uc7ac \uc5c6\uc2b5\ub2c8\ub2e4.", 
     "You did not select a content group": "\ucf58\ud150\uce20 \uadf8\ub8f9\uc744 \uc120\ud0dd\ud558\uc9c0 \uc54a\uc558\uc2b5\ub2c8\ub2e4. ", 
     "You don't seem to have Flash installed. Get Flash to continue your verification.": "Flash\uac00 \uc124\uce58\ub418\uc5b4 \uc788\uc9c0 \uc54a\uc740 \uac83 \uac19\uc2b5\ub2c8\ub2e4. Flash \uc124\uce58 \ud6c4 \uacc4\uc18d \uc9c4\ud589\ud558\uc138\uc694.", 
     "You don't seem to have a webcam connected.": "\uc6f9\ucea0\uc774 \uc5f0\uacb0\ub418\uc9c0 \uc54a\uc740 \uac83 \uac19\uc2b5\ub2c8\ub2e4.", 
     "You have already reported this annotation.": "\uc774 \uc8fc\uc11d\uc740 \uc774\ubbf8 \uc2e0\uace0\ub418\uc5c8\uc2b5\ub2c8\ub2e4.", 
+    "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.": "\uac1c\ubcc4 \ud544\ub4dc\uc5d0 \uc544\ubb34\ub7f0 \ubcc0\uacbd\uc774 \uc5c6\ub294 \uc0c1\ud0dc\ub85c \uc561\uc158\uc744 \uc120\ud0dd\ud588\uc2b5\ub2c8\ub2e4. \uc800\uc7a5 \ubc84\ud2bc\uc774 \uc544\ub2c8\ub77c \uc9c4\ud589 \ubc84\ud2bc\uc744 \ucc3e\uc544\ubcf4\uc138\uc694.", 
+    "You have selected an action, but you haven't saved your changes to individual fields yet. Please click OK to save. You'll need to re-run the action.": "\uac1c\ubcc4 \ud544\ub4dc\uc758 \uac12\ub4e4\uc744 \uc800\uc7a5\ud558\uc9c0 \uc54a\uace0 \uc561\uc158\uc744 \uc120\ud0dd\ud588\uc2b5\ub2c8\ub2e4. OK\ub97c \ub204\ub974\uba74 \uc800\uc7a5\ub418\uba70, \uc561\uc158\uc744 \ud55c \ubc88 \ub354 \uc2e4\ud589\ud574\uc57c \ud569\ub2c8\ub2e4.", 
+    "You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost.": "\uac1c\ubcc4 \ud3b8\uc9d1 \uac00\ub2a5\ud55c \ud544\ub4dc\uc5d0 \uc800\uc7a5\ub418\uc9c0 \uc54a\uc740 \uac12\uc774 \uc788\uc2b5\ub2c8\ub2e4. \uc561\uc158\uc744 \uc218\ud589\ud558\uba74 \uc800\uc7a5\ub418\uc9c0 \uc54a\uc740 \uac12\ub4e4\uc744 \uc783\uc5b4\ubc84\ub9ac\uac8c \ub429\ub2c8\ub2e4.", 
     "You must sign out and sign back in before your language changes take effect.": "\uc5b8\uc5b4\uac00 \ubc14\ub00c\uc5b4\uc84c\ub294\uc9c0 \ud655\uc778\ud558\uae30 \uc704\ud574 \ub85c\uadf8\uc544\uc6c3 \ud558\uace0 \ub2e4\uc2dc \ub85c\uadf8\uc778 \ud558\uc138\uc694.", 
-    "You must specify a name": "\uc774\ub984\uc744 \uba85\uc2dc\ud574\uc57c \ud569\ub2c8\ub2e4.", 
     "You must specify a name for the cohort": "\ud559\uc2b5 \uc9d1\ub2e8\uc758 \uc774\ub984\uc744 \uc785\ub825\ud574\uc57c \ud569\ub2c8\ub2e4.", 
     "You've made some changes": "\uc218\uc815 \uc644\ub8cc", 
     "Your changes have been saved.": "\ubcc0\uacbd\uc0ac\ud56d\uc774 \uc800\uc7a5\ub418\uc5c8\uc2b5\ub2c8\ub2e4.", 
@@ -425,60 +465,71 @@
     "incorrect": "\uc624\ub2f5\uc744 \uc785\ub825\ud558\uc138\uc694.", 
     "less than a minute": "\uc77c\ubd84 \uc774\ub0b4", 
     "name": "\uc774\ub984", 
+    "one letter Friday\u0004F": "\uae08", 
+    "one letter Monday\u0004M": "\uc6d4", 
+    "one letter Saturday\u0004S": "\ud1a0", 
+    "one letter Sunday\u0004S": "\uc77c", 
+    "one letter Thursday\u0004T": "\ubaa9", 
+    "one letter Tuesday\u0004T": "\ud654", 
+    "one letter Wednesday\u0004W": "\uc218", 
     "strong text": "\uac15\ud558\uac8c", 
     "team count": "\ud300 \uc778\uc6d0 \uc218", 
     "\u2026": "\u2026"
   };
-
-  django.gettext = function (msgid) {
-    var value = django.catalog[msgid];
-    if (typeof(value) == 'undefined') {
-      return msgid;
-    } else {
-      return (typeof(value) == 'string') ? value : value[0];
-    }
-  };
-
-  django.ngettext = function (singular, plural, count) {
-    var value = django.catalog[singular];
-    if (typeof(value) == 'undefined') {
-      return (count == 1) ? singular : plural;
-    } else {
-      return value[django.pluralidx(count)];
-    }
-  };
-
-  django.gettext_noop = function (msgid) { return msgid; };
-
-  django.pgettext = function (context, msgid) {
-    var value = django.gettext(context + '\x04' + msgid);
-    if (value.indexOf('\x04') != -1) {
-      value = msgid;
-    }
-    return value;
-  };
-
-  django.npgettext = function (context, singular, plural, count) {
-    var value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
-    if (value.indexOf('\x04') != -1) {
-      value = django.ngettext(singular, plural, count);
-    }
-    return value;
-  };
+  for (var key in newcatalog) {
+    django.catalog[key] = newcatalog[key];
+  }
   
 
-  django.interpolate = function (fmt, obj, named) {
-    if (named) {
-      return fmt.replace(/%\(\w+\)s/g, function(match){return String(obj[match.slice(2,-2)])});
-    } else {
-      return fmt.replace(/%s/g, function(match){return String(obj.shift())});
-    }
-  };
+  if (!django.jsi18n_initialized) {
+    django.gettext = function(msgid) {
+      var value = django.catalog[msgid];
+      if (typeof(value) == 'undefined') {
+        return msgid;
+      } else {
+        return (typeof(value) == 'string') ? value : value[0];
+      }
+    };
+
+    django.ngettext = function(singular, plural, count) {
+      var value = django.catalog[singular];
+      if (typeof(value) == 'undefined') {
+        return (count == 1) ? singular : plural;
+      } else {
+        return value[django.pluralidx(count)];
+      }
+    };
+
+    django.gettext_noop = function(msgid) { return msgid; };
+
+    django.pgettext = function(context, msgid) {
+      var value = django.gettext(context + '\x04' + msgid);
+      if (value.indexOf('\x04') != -1) {
+        value = msgid;
+      }
+      return value;
+    };
+
+    django.npgettext = function(context, singular, plural, count) {
+      var value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
+      if (value.indexOf('\x04') != -1) {
+        value = django.ngettext(singular, plural, count);
+      }
+      return value;
+    };
+
+    django.interpolate = function(fmt, obj, named) {
+      if (named) {
+        return fmt.replace(/%\(\w+\)s/g, function(match){return String(obj[match.slice(2,-2)])});
+      } else {
+        return fmt.replace(/%s/g, function(match){return String(obj.shift())});
+      }
+    };
 
 
-  /* formatting library */
+    /* formatting library */
 
-  django.formats = {
+    django.formats = {
     "DATETIME_FORMAT": "Y\ub144 n\uc6d4 j\uc77c g:i A", 
     "DATETIME_INPUT_FORMATS": [
       "%Y-%m-%d %H:%M:%S", 
@@ -505,7 +556,7 @@
     ], 
     "DECIMAL_SEPARATOR": ".", 
     "FIRST_DAY_OF_WEEK": "0", 
-    "MONTH_DAY_FORMAT": "F\uc6d4 j\uc77c", 
+    "MONTH_DAY_FORMAT": "n\uc6d4 j\uc77c", 
     "NUMBER_GROUPING": "3", 
     "SHORT_DATETIME_FORMAT": "Y-n-j H:i", 
     "SHORT_DATE_FORMAT": "Y-n-j.", 
@@ -518,27 +569,30 @@
       "%H\uc2dc %M\ubd84 %S\ucd08", 
       "%H\uc2dc %M\ubd84"
     ], 
-    "YEAR_MONTH_FORMAT": "Y\ub144 F\uc6d4"
+    "YEAR_MONTH_FORMAT": "Y\ub144 n\uc6d4"
   };
 
-  django.get_format = function (format_type) {
-    var value = django.formats[format_type];
-    if (typeof(value) == 'undefined') {
-      return format_type;
-    } else {
-      return value;
-    }
-  };
+    django.get_format = function(format_type) {
+      var value = django.formats[format_type];
+      if (typeof(value) == 'undefined') {
+        return format_type;
+      } else {
+        return value;
+      }
+    };
 
-  /* add to global namespace */
-  globals.pluralidx = django.pluralidx;
-  globals.gettext = django.gettext;
-  globals.ngettext = django.ngettext;
-  globals.gettext_noop = django.gettext_noop;
-  globals.pgettext = django.pgettext;
-  globals.npgettext = django.npgettext;
-  globals.interpolate = django.interpolate;
-  globals.get_format = django.get_format;
+    /* add to global namespace */
+    globals.pluralidx = django.pluralidx;
+    globals.gettext = django.gettext;
+    globals.ngettext = django.ngettext;
+    globals.gettext_noop = django.gettext_noop;
+    globals.pgettext = django.pgettext;
+    globals.npgettext = django.npgettext;
+    globals.interpolate = django.interpolate;
+    globals.get_format = django.get_format;
+
+    django.jsi18n_initialized = true;
+  }
 
 }(this));
 
