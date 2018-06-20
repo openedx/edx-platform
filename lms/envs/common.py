@@ -517,7 +517,7 @@ OAUTH2_PROVIDER = {
 }
 # This is required for the migrations in oauth_dispatch.models
 # otherwise it fails saying this attribute is not present in Settings
-OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
+OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth_dispatch.ScopedApplication'
 
 ################################## TEMPLATE CONFIGURATION #####################################
 # Mako templating
