@@ -906,7 +906,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             # unless the problem explicitly prevents it
             return True
         elif self.showanswer == SHOWANSWER.ATTEMPTED:
-            return self.attempts > 0
+            return self.attempts > 0 or self.is_past_due()
         elif self.showanswer == SHOWANSWER.ANSWERED:
             # NOTE: this is slightly different from 'attempted' -- resetting the problems
             # makes lcp.done False, but leaves attempts unchanged.

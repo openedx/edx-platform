@@ -276,39 +276,39 @@ class CapaModuleTest(unittest.TestCase):
             'showanswer': 'attempted',
             'max_attempts': '1',
             'show_correctness': 'always',
-        }, True),
+        }, False, True),
         # If show_correctness=never, Answer is never visible
         ({
             'showanswer': 'attempted',
             'max_attempts': '1',
             'show_correctness': 'never',
-        }, False),
+        }, False, False),
         # If show_correctness=past_due, answer is not visible before due date
         ({
             'showanswer': 'attempted',
             'show_correctness': 'past_due',
             'max_attempts': '1',
             'due': 'tomorrow_str',
-        }, False),
+        }, False, False),
         # If show_correctness=past_due, answer is visible after due date
         ({
             'showanswer': 'attempted',
             'show_correctness': 'past_due',
             'max_attempts': '1',
             'due': 'yesterday_str',
-        }, True),
+        }, True, True),
     )
     @ddt.unpack
-    def test_showanswer_hide_correctness(self, problem_data, answer_available):
+    def test_showanswer_hide_correctness(self, problem_data, answer_available_no_attempt, answer_available_after_attempt):
         """
         Ensure that the answer will not be shown when correctness is being hidden.
         """
         if 'due' in problem_data:
             problem_data['due'] = getattr(self, problem_data['due'])
         problem = CapaFactory.create(**problem_data)
-        self.assertFalse(problem.answer_available())
+        self.assertEqual(problem.answer_available(), answer_available_no_attempt)
         problem.attempts = 1
-        self.assertEqual(problem.answer_available(), answer_available)
+        self.assertEqual(problem.answer_available(), answer_available_after_attempt)
 
     def test_showanswer_closed(self):
 
