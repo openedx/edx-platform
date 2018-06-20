@@ -360,7 +360,6 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
             When this user reloads the page
                 And then he does not see any change in the original course name
         """
-
         original_course_display_name = self.advanced_settings.get(self.course_name_key)
         new_course_name = '"New Course Name"'
         type_in_codemirror(self.advanced_settings, 16, new_course_name)
@@ -394,7 +393,6 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
             When this user reloads the page
                 And then he is able to see the change in the course name
         """
-
         original_course_display_name = self.advanced_settings.get(self.course_name_key)
         new_course_name = '"New Course Name"'
         self.advanced_settings.set(self.course_name_key, new_course_name)
@@ -425,7 +423,6 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
             When this user reloads the page
                 And then he is able to see the confirmation message
         """
-
         self.advanced_settings.set('Maximum Attempts', 5)
         confirmation_message = self.advanced_settings.confirmation_message
         self.assertEqual(
@@ -442,7 +439,6 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
                 Then the user does not see the deprecated settings
                 And sees 'Show Deprecated Settings' button
         """
-
         button_text = self.advanced_settings.deprecated_settings_button_text
         self.assertEqual(button_text, 'Show Deprecated Settings')
         self.assertFalse(self.advanced_settings.check_deprecated_settings_presence())

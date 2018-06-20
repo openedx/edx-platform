@@ -61,13 +61,6 @@ class AdvancedSettingsPage(CoursePage):
         else:
             self.wait_for_element_absence(DEPRECATED_SETTINGS_SELECTOR, 'Deprecated Settings are present')
 
-    @property
-    def deprecated_settings_button_text(self):
-        """
-            Returns text for deprecated settings button
-        """
-        return self.q(css=DEPRECATED_SETTINGS_BUTTON_SELECTOR).text[0]
-
     def check_deprecated_settings_presence(self):
         """
             Returns true if deprecated settings are visible
