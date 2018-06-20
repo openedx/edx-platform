@@ -295,8 +295,11 @@ endorser_org = endorser_position.get('organization_name') or corporate_endorseme
     </div>
     % for course in courses:
       <%
-        ## Sort course runs by start date, reverse so newest is first, then take newest run
-        course_run = sorted(course['course_runs'], key=lambda run: run['start'], reverse=True)[0]
+        ## The goal here is to get the `oldest course run that still has open enrollment`.
+        ## We fall back on the newest course if none are available for enrollment.
+        sorted_course_runs = sorted(course['course_runs'], key=lambda run: run['start'])
+        open_course_runs = [run for run in sorted_course_runs if run['is_enrollment_open']]
+        course_run = open_course_runs[0] if open_course_runs else sorted_course_runs[-1]
         course_img = course_run.get('image')
         course_about_url = reverse('about_course', args=[course_run['key']])
         course_purchase_url = course_run['upgrade_url'] if course_run['upgrade_url'] else course_about_url
