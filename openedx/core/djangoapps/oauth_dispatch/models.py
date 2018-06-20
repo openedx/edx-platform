@@ -75,9 +75,7 @@ class ScopedApplication(AbstractApplication):
         """
         Return a unicode representation of this object.
         """
-        return u"<ScopedApplication '{name}'>".format(
-            name=self.name
-        )
+        return self.name
 
     @property
     def authorization_filters(self):
