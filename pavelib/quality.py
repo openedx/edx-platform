@@ -6,6 +6,7 @@ Check code quality using pycodestyle, pylint, and diff_quality.
 import json
 import os
 import re
+import sys
 from datetime import datetime
 from xml.sax.saxutils import quoteattr
 
@@ -347,6 +348,7 @@ def run_complexity():
         print "FAILURE: Unable to calculate python-only code-complexity."
 
 
+
 @task
 @needs(
     'pavelib.prereqs.install_node_prereqs',
@@ -362,7 +364,7 @@ def run_eslint(options):
     If limit option is passed, fails build if more violations than the limit are found.
     """
 
-    eslint_report_dir = (Env.REPORT_DIR / "eslint")
+    eslint_report_dir = (Env.REPORT_DIR /  "eslint")
     eslint_report = eslint_report_dir / "eslint.report"
     _prepare_report_dir(eslint_report_dir)
     violations_limit = int(getattr(options, 'limit', -1))
