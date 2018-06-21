@@ -77,9 +77,7 @@ class ScopedApplication(AbstractApplication):
         """
         Return a unicode representation of this object.
         """
-        return u"<ScopedApplication '{name}'>".format(
-            name=self.name
-        )
+        return self.name
 
     @property
     def authorization_filters(self):
@@ -129,7 +127,7 @@ class ScopedApplicationOrganization(models.Model):
         """
         Return a unicode representation of this object.
         """
-        return u"<ScopedApplicationOrganization '{application_name}':'{org}'>".format(
+        return u"{application_name}:{org}".format(
             application_name=self.application.name,
             org=self.short_name,
         )
