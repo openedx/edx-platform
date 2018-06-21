@@ -11,6 +11,7 @@ from timeit import default_timer
 import pytz
 from completion.models import BlockCompletion
 from django.core.management.base import BaseCommand, CommandError
+from django.db import connection, reset_queries
 import numpy
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore import ModuleStoreEnum
@@ -63,6 +64,7 @@ class Command(BaseCommand):
         self.learners_count = options['learners']
         self.completions_count = options['completions']
 
+        self.executed_queries = []
         self.timer = default_timer
         self.store = modulestore()
         self.blocks = []
@@ -108,14 +110,30 @@ class Command(BaseCommand):
         print u"----- Completion Aggregator Performance Test Results -----"
         print u"Test: {}".format(test_name)
         print u"Course: {}".format(self.course.id)
-        print u"Course Breadth: {}".format(self.course_breadth)
+
+        chapter_count = self.course_breadth[0]
+        sequential_count = chapter_count * self.course_breadth[1]
+        vertical_count = sequential_count * self.course_breadth[2]
+
+        print u"Course Breadth: {} | Chapters: {} | Sequentials: {} | Verticals: {}".format(
+            self.course_breadth, chapter_count, sequential_count, vertical_count
+        )
         print u"Learners: {}".format(self.learners_count)
         if time_taken:
             print u"Time Taken: {:.3f}s".format(time_taken)
 
+        query_counts = {}
+        for query in self.executed_queries:
+            query_type = query['sql'].split()[0]
+            query_counts[query_type] = query_counts.get(query_type, 0) + 1
+        print u"SQL Queries | Total: {} | By Type: {}".format(len(self.executed_queries), query_counts)
+
     def _print_results_footer(self):
         """ Print footer. """
         print u"----------------------------------------------------------"
+
+    def _copy_executed_queries(self):
+        self.executed_queries = list(connection.queries_log)
 
     def _update_aggregators(self, username, course_key, block_keys=(), force=False):
         from completion_aggregator.tasks import update_aggregators
@@ -160,7 +178,11 @@ class Command(BaseCommand):
             with self.store.bulk_operations(self.course.id):
                 self._create_block(parent=vertical, category='html')
                 self.store.publish(vertical.location, ModuleStoreEnum.UserID.test)
+
+        reset_queries()
         time_taken = self._time_handler(course_published_handler, course_key=self.course.id)
+        self._copy_executed_queries()
+
         self._print_results_header(u"test_course_published_handler_when_block_is_added", time_taken=time_taken)
         self._assert_vertical_completion_for_all_users(
             vertical, self.course_breadth[3] / (self.course_breadth[3] + 1.0)
@@ -181,7 +203,11 @@ class Command(BaseCommand):
         block = vertical.get_children()[0]
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.course.id):
             self.store.delete_item(block.location, ModuleStoreEnum.UserID.test)
+
+        reset_queries()
         time_taken = self._time_handler(item_deleted_handler, usage_key=block.location, user_id=None)
+        self._copy_executed_queries()
+
         self._print_results_header(u"test_item_deleted_handler_when_block_is_deleted", time_taken=time_taken)
         self._assert_vertical_completion_for_all_users(vertical, 1.0)
         self._print_results_footer()
@@ -197,6 +223,8 @@ class Command(BaseCommand):
 
         users = list(self.users)
 
+        reset_queries()
+
         for __ in range(self.completions_count):
             random_user = random.choice(users)
             next_block = self.blocks[random_user.next_block_index_to_complete]
@@ -209,6 +237,8 @@ class Command(BaseCommand):
             timer_end = self.timer()
             elapsed_milliseconds = (timer_end - timer_start)
             times_taken.append(elapsed_milliseconds)
+
+        self._copy_executed_queries()
 
         for user in self.users:
             expected_verticals_completed = math.floor(user.next_block_index_to_complete / self.course_breadth[3])
