@@ -1,4 +1,5 @@
 from student.models import CourseEnrollment
+from django_comment_common.models import Role
 from courseware.access import has_staff_access_to_preview_mode
 from course_modes.models import (
     get_cosmetic_verified_display_price
@@ -60,6 +61,9 @@ def get_experiment_user_metadata_context(course, user):
 
     upgrade_link, upgrade_date = check_and_get_upgrade_link_and_date(user, enrollment, course)
     has_staff_access = has_staff_access_to_preview_mode(user, course)
+    forum_roles = []
+    if user.is_authenticated:
+        forum_roles = list(Role.objects.filter(users=user, course_id=course.id).values_list('name').distinct())
 
     return {
         'upgrade_link': upgrade_link,
@@ -72,4 +76,5 @@ def get_experiment_user_metadata_context(course, user):
         'course_start': course.start,
         'course_end': course.end,
         'has_staff_access': has_staff_access,
+        'forum_roles': forum_roles
     }
