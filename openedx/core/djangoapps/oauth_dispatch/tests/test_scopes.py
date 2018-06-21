@@ -7,11 +7,13 @@ from django.test import TestCase
 
 from openedx.core.djangoapps.oauth_dispatch.scopes import ApplicationModelScopes
 from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
 DEFAULT_SCOPES = settings.OAUTH2_DEFAULT_SCOPES.keys()
 
 
+@skip_unless_lms
 @ddt.ddt
 class ApplicationModelScopesTestCase(TestCase):
     """
