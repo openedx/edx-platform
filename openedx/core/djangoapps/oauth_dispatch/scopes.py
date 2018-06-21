@@ -17,4 +17,4 @@ class ApplicationModelScopes(SettingsScopes):
             all_scopes = self.get_all_scopes().keys()
             return set(application_scopes + default_scopes).intersection(all_scopes)
         else:
-            return super(ApplicationModelScopes, self).get_available_scopes(application, request, *args, **kwargs)
+            return super(ApplicationModelScopes, self).get_default_scopes(application, request, *args, **kwargs)
