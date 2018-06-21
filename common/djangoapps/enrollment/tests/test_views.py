@@ -31,12 +31,20 @@ from enrollment.views import EnrollmentUserThrottle
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.embargo.models import Country, CountryAccessRule, RestrictedCourse
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
-from openedx.core.djangoapps.user_api.models import UserOrgTag
+from openedx.core.djangoapps.user_api.models import (
+    RetirementState,
+    UserRetirementStatus,
+    UserOrgTag
+)
 from openedx.core.lib.django_test_client_utils import get_absolute_url
 from openedx.core.lib.token_utils import JwtBuilder
 from openedx.features.enterprise_support.tests import FAKE_ENTERPRISE_CUSTOMER
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
-from student.models import CourseEnrollment
+from student.models import (
+    CourseEnrollment,
+    get_retired_username_by_username,
+    get_retired_email_by_email,
+)
 from student.roles import CourseStaffRole
 from student.tests.factories import AdminFactory, UserFactory, SuperuserFactory
 from util.models import RateLimitConfiguration
@@ -1288,6 +1296,20 @@ class UnenrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase):
         for course in self.courses:
             self.assert_enrollment_status(course_id=str(course.id), username=self.USERNAME, is_active=True)
 
+    def _create_test_retirement(self, user=None):
+        """
+        Helper method to create a RetirementStatus with useful defaults
+        """
+        pending_state = RetirementState.objects.create(
+            state_name='PENDING',
+            state_execution_order=1,
+            is_dead_end_state=False,
+            required=False
+        )
+        if user is None:
+            user = UserFactory()
+        return UserRetirementStatus.create_retirement(user)
+
     def build_jwt_headers(self, user):
         """
         Helper function for creating headers for the JWT authentication.
@@ -1299,12 +1321,18 @@ class UnenrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase):
 
     def test_deactivate_enrollments(self):
         self._assert_active()
+        self._create_test_retirement(self.user)
         response = self._submit_unenroll(self.superuser, self.user.username)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = json.loads(response.content)
         # order doesn't matter so compare sets
         self.assertEqual(set(data), self.orgs)
         self._assert_inactive()
+
+    def test_deactivate_enrollments_no_retirement_status(self):
+        self._assert_active()
+        response = self._submit_unenroll(self.superuser, self.user.username)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_deactivate_enrollments_unauthorized(self):
         self._assert_active()
@@ -1322,26 +1350,25 @@ class UnenrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase):
 
     def test_deactivate_enrollments_empty_username(self):
         self._assert_active()
+        self._create_test_retirement(self.user)
         response = self._submit_unenroll(self.superuser, "")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        data = json.loads(response.content)
-        self.assertEqual(data, u'The user "" does not exist.')
         self._assert_active()
 
     def test_deactivate_enrollments_invalid_username(self):
         self._assert_active()
+        self._create_test_retirement(self.user)
         response = self._submit_unenroll(self.superuser, "a made up username")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        data = json.loads(response.content)
-        self.assertEqual(data, u'The user "a made up username" does not exist.')
         self._assert_active()
 
     def test_deactivate_enrollments_called_twice(self):
         self._assert_active()
+        self._create_test_retirement(self.user)
         response = self._submit_unenroll(self.superuser, self.user.username)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         response = self._submit_unenroll(self.superuser, self.user.username)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(response.content, "")
         self._assert_inactive()
 
