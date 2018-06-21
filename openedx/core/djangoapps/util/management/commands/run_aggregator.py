@@ -3,10 +3,12 @@
 Performance tests for completion aggregator.
 """
 
+import datetime
 import math
 import random
 from timeit import default_timer
 
+import pytz
 from completion.models import BlockCompletion
 from django.core.management.base import BaseCommand, CommandError
 import numpy
@@ -47,44 +49,50 @@ class Command(BaseCommand):
         self.blocks = []
 
         with self.store.default_store(ModuleStoreEnum.Type.split):
+            fields = {'display_name': 'Course', 'start': datetime.datetime(2015, 1, 1, 1, tzinfo=pytz.utc)}
             self.course = modulestore().create_course(
                 'completion',
                 '101',
                 unicode(random.randint(1, 9999)),
                 ModuleStoreEnum.UserID.test,
+                fields=fields
             )
 
-            with self.store.bulk_operations(self.course.id):
-                for __ in range(COURSE_TREE_BREADTH[0]):
-                    chapter = self._create_block(parent=self.course, category='chapter')
-                    for __ in range(COURSE_TREE_BREADTH[1]):
-                        sequence = self._create_block(parent=chapter, category='sequential')
-                        for __ in range(COURSE_TREE_BREADTH[2]):
-                            vertical = self._create_block(parent=sequence, category='vertical')
-                            self.blocks += [
-                                self._create_block(
-                                    parent=vertical, category='html'
-                                ) for __ in range(COURSE_TREE_BREADTH[3])
-                            ]
+            with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
+                with self.store.bulk_operations(self.course.id):
+                    for __ in range(COURSE_TREE_BREADTH[0]):
+                        chapter = self._create_block(parent=self.course, category='chapter')
+                        for __ in range(COURSE_TREE_BREADTH[1]):
+                            sequence = self._create_block(parent=chapter, category='sequential')
+                            for __ in range(COURSE_TREE_BREADTH[2]):
+                                vertical = self._create_block(parent=sequence, category='vertical')
+                                self.blocks += [
+                                    self._create_block(
+                                        parent=vertical, category='html'
+                                    ) for __ in range(COURSE_TREE_BREADTH[3])
+                                ]
+                                self.store.publish(vertical.location, ModuleStoreEnum.UserID.test)
 
-        self.course = self.store.get_course(self.course.id)
+            self.course = self.store.get_course(self.course.id)
 
         self.users = [UserFactory.create() for __ in range(STUDENTS_COUNT)]
         for user in self.users:
             CourseEnrollmentFactory(user=user, course_id=self.course.id)
 
     def _create_block(self, parent, category):
-        return self.store.create_child(ModuleStoreEnum.UserID.test, parent.location, category)
+        fields = {'display_name': category, 'start': datetime.datetime(2015, 1, 1, 1, tzinfo=pytz.utc)}
+        return self.store.create_child(ModuleStoreEnum.UserID.test, parent.location, category, fields=fields)
 
-    def _print_results_header(self, test_name):
+    def _print_results_header(self, test_name, time_taken=None):
         """ Print header. """
         print u"\n"
         print u"----- Completion Aggregator Performance Test Results -----"
         print u"Test: {}".format(test_name)
-        print u"Chapters: {} Sequentials per Chapter: {} Verticals per Sequential : {} Blocks per Vertical: {}".format(
-            *COURSE_TREE_BREADTH
-        )
+        print u"Course: {}".format(self.course.id)
+        print u"Course Breadth: {}".format(COURSE_TREE_BREADTH)
         print u"Students: {}".format(STUDENTS_COUNT)
+        if time_taken:
+            print u"Total task time: {:.2f}ms".format(time_taken)
 
     def _print_results_footer(self):
         """ Print footer. """
@@ -111,15 +119,14 @@ class Command(BaseCommand):
             vertical_completion = Aggregator.objects.get(
                 user=user, course_key=self.course.id, block_key=vertical.location
             ).percent
-            assert vertical_completion == expected_completion
+            assert abs(vertical_completion - expected_completion) < 0.01
 
     def _time_handler(self, handler, **kwargs):
         """ Time how long it takes to run handler. """
         timer_start = self.timer()
         handler(**kwargs)
         timer_end = self.timer()
-        elapsed_milliseconds = (timer_end - timer_start) * 1000
-        print u"Total task time: {:.2f}ms".format(elapsed_milliseconds)
+        return (timer_end - timer_start) * 1000
 
     def test_course_published_handler_when_block_is_added(self):
 
@@ -127,13 +134,15 @@ class Command(BaseCommand):
         from completion_aggregator.signals import course_published_handler
         SignalHandler.course_published.disconnect(course_published_handler)
 
-        self._print_results_header(u"test_course_published_handler_when_block_is_added")
-
         vertical = self.course.get_children()[-1].get_children()[-1].get_children()[-1]
         self._complete_blocks_for_users(vertical.get_children(), self.users)
         self._assert_vertical_completion_for_all_users(vertical, 1.0)
-        self._create_block(parent=vertical, category='html')
-        self._time_handler(course_published_handler, course_key=self.course.id)
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.course.id):
+            with self.store.bulk_operations(self.course.id):
+                self._create_block(parent=vertical, category='html')
+                self.store.publish(vertical.location, ModuleStoreEnum.UserID.test)
+        time_taken = self._time_handler(course_published_handler, course_key=self.course.id)
+        self._print_results_header(u"test_course_published_handler_when_block_is_added", time_taken=time_taken)
         self._assert_vertical_completion_for_all_users(
             vertical, COURSE_TREE_BREADTH[3] / (COURSE_TREE_BREADTH[3] + 1.0)
         )
@@ -145,8 +154,6 @@ class Command(BaseCommand):
         from completion_aggregator.signals import item_deleted_handler
         SignalHandler.course_published.disconnect(item_deleted_handler)
 
-        self._print_results_header(u"test_item_deleted_handler_when_block_is_deleted")
-
         vertical = self.course.get_children()[-1].get_children()[-1].get_children()[-1]
         self._complete_blocks_for_users(vertical.get_children()[1:], self.users)
         self._assert_vertical_completion_for_all_users(
@@ -155,15 +162,14 @@ class Command(BaseCommand):
         block = vertical.get_children()[0]
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.course.id):
             self.store.delete_item(block.location, ModuleStoreEnum.UserID.test)
-        self._time_handler(item_deleted_handler, usage_key=block.location, user_id=None)
+        time_taken = self._time_handler(item_deleted_handler, usage_key=block.location, user_id=None)
+        self._print_results_header(u"test_item_deleted_handler_when_block_is_deleted", time_taken=time_taken)
         self._assert_vertical_completion_for_all_users(vertical, 1.0)
         self._print_results_footer()
 
     def test_individual_block_completions(self):
 
         from completion_aggregator.models import Aggregator
-
-        self._print_results_header(u"test_individual_block_completions")
 
         times_taken = []
 
@@ -200,6 +206,7 @@ class Command(BaseCommand):
              ]
         )
 
+        self._print_results_header(u"test_individual_block_completions")
         print u"Block Completions: {}".format(BLOCK_COMPLETIONS_COUNT)
         print u"Total time: {:.2f}ms".format(time_sum)
         print u"Average time: {:.2f}ms".format(time_average)
