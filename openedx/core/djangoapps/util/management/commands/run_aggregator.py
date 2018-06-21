@@ -111,7 +111,7 @@ class Command(BaseCommand):
         print u"Course Breadth: {}".format(self.course_breadth)
         print u"Learners: {}".format(self.learners_count)
         if time_taken:
-            print u"Total task time: {:.2f}ms".format(time_taken)
+            print u"Time Taken: {:.3f}s".format(time_taken)
 
     def _print_results_footer(self):
         """ Print footer. """
@@ -145,7 +145,7 @@ class Command(BaseCommand):
         timer_start = self.timer()
         handler(**kwargs)
         timer_end = self.timer()
-        return (timer_end - timer_start) * 1000
+        return timer_end - timer_start
 
     def test_course_published_handler_when_block_is_added(self):
 
@@ -207,7 +207,7 @@ class Command(BaseCommand):
             timer_start = self.timer()
             self._complete_blocks_for_users([next_block], [random_user])
             timer_end = self.timer()
-            elapsed_milliseconds = (timer_end - timer_start) * 1000
+            elapsed_milliseconds = (timer_end - timer_start)
             times_taken.append(elapsed_milliseconds)
 
         for user in self.users:
@@ -220,14 +220,13 @@ class Command(BaseCommand):
         time_sum = numpy.sum(times_taken)
         time_average = (time_sum / self.completions_count)
         time_percentiles = " | ".join(
-            [u"{}%: {:.2f}ms".format(p, numpy.percentile(times_taken, p)) for p in [
+            [u"{}%: {:.3f}s".format(p, numpy.percentile(times_taken, p)) for p in [
                 50, 66, 75, 80, 90, 95, 98, 99, 100]
              ]
         )
 
-        self._print_results_header(u"test_individual_block_completions")
+        self._print_results_header(u"test_individual_block_completions", time_taken=time_sum)
         print u"Completions: {}".format(self.completions_count)
-        print u"Total time: {:.2f}ms".format(time_sum)
-        print u"Average time: {:.2f}ms".format(time_average)
+        print u"Average time: {:.3f}s".format(time_average)
         print u"Time Percentiles: {}".format(time_percentiles)
         self._print_results_footer()
