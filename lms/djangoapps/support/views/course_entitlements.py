@@ -1,21 +1,13 @@
 """
 Support tool for changing and granting course entitlements
 """
-from django.contrib.auth.models import User
-from django.db import DatabaseError, transaction
-from django.db.models import Q
-from django.http import HttpResponseBadRequest
 from django.utils.decorators import method_decorator
 from django.views.generic import View
-from edx_rest_framework_extensions.authentication import JwtAuthentication
-from rest_framework import permissions, status, viewsets
-from rest_framework.response import Response
 
 from edxmako.shortcuts import render_to_response
 from entitlements.models import CourseEntitlement, CourseEntitlementSupportDetail
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.support.decorators import require_support_permission
-from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 
 REQUIRED_CREATION_FIELDS = ['course_uuid', 'reason', 'mode']
 
