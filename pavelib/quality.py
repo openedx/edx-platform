@@ -902,7 +902,7 @@ def is_percentage_failure(error_message):
         return True
 
 
-def get_violations_reports(violations_type):
+def get_violations_reports(violations_type, unused=None):
     """
     Finds violations reports files by naming convention (e.g., all "pep8.report" files)
     """
