@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('scopes', django_mysql.models.ListCharField(models.CharField(max_length=32), help_text='Comma-separated list of scopes that this application will be allowed to request.', max_length=825, size=25)),
-                ('application', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='scopes', to=settings.OAUTH2_PROVIDER_APPLICATION_MODEL)),
+                ('application', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='access', to=settings.OAUTH2_PROVIDER_APPLICATION_MODEL)),
             ],
         ),
         migrations.CreateModel(

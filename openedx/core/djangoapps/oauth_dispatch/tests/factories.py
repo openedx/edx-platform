@@ -9,6 +9,7 @@ import pytz
 
 from oauth2_provider.models import get_application_model, AccessToken, RefreshToken
 
+from openedx.core.djangoapps.oauth_dispatch.models import ApplicationAccess
 from student.tests.factories import UserFactory
 
 
@@ -24,6 +25,14 @@ class ApplicationFactory(DjangoModelFactory):
     client_secret = 'some_secret'
     client_type = 'confidential'
     authorization_grant_type = 'Client credentials'
+
+
+class ApplicationAccessFactory(DjangoModelFactory):
+    class Meta(object):
+        model = ApplicationAccess
+
+    application=factory.SubFactory(ApplicationFactory)
+    scopes=['grades:read']
 
 
 class AccessTokenFactory(DjangoModelFactory):

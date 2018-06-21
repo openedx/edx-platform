@@ -6,7 +6,7 @@ from django.conf import settings
 from django.test import TestCase
 
 from openedx.core.djangoapps.oauth_dispatch.scopes import ApplicationModelScopes
-from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory
+from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory, ApplicationAccessFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
@@ -29,6 +29,6 @@ class ApplicationModelScopesTestCase(TestCase):
     @ddt.unpack
     def test_get_available_scopes(self, expected_result, application_scopes):
         """ Verify the settings backend returns the expected available scopes. """
-        application = ApplicationFactory(scopes=application_scopes)
+        application_access = ApplicationAccessFactory(scopes=application_scopes)
         scopes = ApplicationModelScopes()
-        assert set(scopes.get_available_scopes(application)) == set(expected_result)
+        assert set(scopes.get_available_scopes(application_access.application)) == set(expected_result)
