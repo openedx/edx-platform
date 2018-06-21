@@ -3,10 +3,6 @@ import logging
 
 from django.contrib.auth import get_user_model
 from django.http import Http404
-from edx_rest_framework_extensions.permissions import (
-    JwtHasContentOrgFilterForRequestedCourse,
-    JwtHasScope,
-)
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
@@ -165,12 +161,6 @@ class UserGradeView(GradeViewMixin, GenericAPIView):
         }]
 
     """
-    permission_classes = GradeViewMixin.permission_classes + (
-        JwtHasContentOrgFilterForRequestedCourse,
-        JwtHasScope,
-    )
-    required_scopes = ['grades:read']
-
     def get(self, request, course_id):
         """
         Gets a course progress status.

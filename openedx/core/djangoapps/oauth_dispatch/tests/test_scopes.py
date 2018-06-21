@@ -10,15 +10,13 @@ from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFa
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
-DEFAULT_SCOPES = settings.OAUTH2_DEFAULT_SCOPES.keys()
-
-
 @skip_unless_lms
 @ddt.ddt
 class ApplicationModelScopesTestCase(TestCase):
     """
     Tests for the ApplicationModelScopes custom DOT scopes backend.
     """
+    DEFAULT_SCOPES = settings.OAUTH2_DEFAULT_SCOPES.keys()
 
     @ddt.data(
         (DEFAULT_SCOPES, []),
