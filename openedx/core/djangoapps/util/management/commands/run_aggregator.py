@@ -119,18 +119,34 @@ class Command(BaseCommand):
             self.course_breadth, chapter_count, sequential_count, vertical_count
         )
         print u"Learners: {}".format(self.learners_count)
-        if time_taken:
-            print u"Time Taken: {:.3f}s".format(time_taken)
+        print u"Completions: {}".format(self.completions_count)
 
-        query_counts = {}
+        query_data = {}
         for query in self.executed_queries:
             query_type = query['sql'].split()[0]
-            query_counts[query_type] = query_counts.get(query_type, 0) + 1
-        print u"SQL Queries | Total: {} | By Type: {}".format(len(self.executed_queries), query_counts)
+            query_data.setdefault(query_type, {'count': 0, 'times': []})
+            query_data[query_type]['count'] = query_data[query_type]['count'] + 1
+            query_data[query_type]['times'].append(float(query['time']))
+
+        print u"SQL Queries | All Count: {}".format(len(self.executed_queries))
+        for query_type, data in query_data.items():
+            print u"SQL Queries | {} Count: {} Time: {} Percentiles: {}".format(
+                query_type, data['count'], sum(data['times']), self._get_percentiles(data['times'])
+            )
+
+        if time_taken:
+            print u"Total Time: {:.3f}s".format(time_taken)
 
     def _print_results_footer(self):
         """ Print footer. """
         print u"----------------------------------------------------------"
+
+    def _get_percentiles(self, items):
+        return " | ".join(
+            [u"{}%: {:.3f}s".format(p, numpy.percentile(items, p)) for p in [
+                50, 66, 75, 80, 90, 95, 98, 99, 100]
+             ]
+        )
 
     def _copy_executed_queries(self):
         self.executed_queries = list(connection.queries_log)
@@ -249,14 +265,8 @@ class Command(BaseCommand):
 
         time_sum = numpy.sum(times_taken)
         time_average = (time_sum / self.completions_count)
-        time_percentiles = " | ".join(
-            [u"{}%: {:.3f}s".format(p, numpy.percentile(times_taken, p)) for p in [
-                50, 66, 75, 80, 90, 95, 98, 99, 100]
-             ]
-        )
 
         self._print_results_header(u"test_individual_block_completions", time_taken=time_sum)
-        print u"Completions: {}".format(self.completions_count)
-        print u"Average time: {:.3f}s".format(time_average)
-        print u"Time Percentiles: {}".format(time_percentiles)
+        print u"Average Time: {:.3f}s".format(time_average)
+        print u"Time Percentiles: {}".format(self._get_percentiles(times_taken))
         self._print_results_footer()
