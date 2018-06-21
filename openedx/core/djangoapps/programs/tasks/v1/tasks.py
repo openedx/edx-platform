@@ -7,6 +7,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from edx_rest_api_client import exceptions
+from opaque_keys.edx.keys import CourseKey
 
 from course_modes.models import CourseMode
 from lms.djangoapps.certificates.models import GeneratedCertificate
@@ -15,7 +16,6 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.credentials.utils import get_credentials, get_credentials_api_client
 from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
-
 
 LOGGER = get_task_logger(__name__)
 # Under cms the following setting is not defined, leading to errors during tests.
@@ -221,7 +221,6 @@ def award_course_certificate(self, username, course_run_key):
     This task is designed to be called whenever a student GeneratedCertificate is updated.
     It can be called independently for a username and a course_run, but is invoked on each GeneratedCertificate.save.
     """
-
     LOGGER.info('Running task award_course_certificate for username %s', username)
 
     countdown = 2 ** self.request.retries
@@ -238,6 +237,7 @@ def award_course_certificate(self, username, course_run_key):
         raise self.retry(countdown=countdown, max_retries=MAX_RETRIES)
 
     try:
+        course_key = CourseKey.from_string(course_run_key)
         try:
             user = User.objects.get(username=username)
         except User.DoesNotExist:
@@ -248,27 +248,27 @@ def award_course_certificate(self, username, course_run_key):
         try:
             certificate = GeneratedCertificate.eligible_certificates.get(
                 user=user.id,
-                course_id=course_run_key
+                course_id=course_key
             )
         except GeneratedCertificate.DoesNotExist:
             LOGGER.exception(
                 'Task award_course_certificate was called without Certificate found for %s to user %s',
-                course_run_key,
+                course_key,
                 username
             )
             return
         if certificate.mode in CourseMode.VERIFIED_MODES + CourseMode.CREDIT_MODES:
             try:
-                course_overview = CourseOverview.get_from_id(course_run_key)
+                course_overview = CourseOverview.get_from_id(course_key)
             except (CourseOverview.DoesNotExist, IOError):
                 LOGGER.exception(
                     'Task award_course_certificate was called without course overview data for course %s',
-                    course_run_key
+                    course_key
                 )
                 return
             credentials_client = get_credentials_api_client(User.objects.get(
                 username=settings.CREDENTIALS_SERVICE_USERNAME),
-                org=course_run_key.org,
+                org=course_key.org,
             )
             # FIXME This may result in visible dates that do not update alongside the Course Overview if that changes
             # This is a known limitation of this implementation and was chosen to reduce the amount of replication,
@@ -276,7 +276,7 @@ def award_course_certificate(self, username, course_run_key):
             visible_date = display_date_for_certificate(course_overview, certificate)
             post_course_certificate(credentials_client, username, certificate, visible_date)
 
-            LOGGER.info('Awarded certificate for course %s to user %s', course_run_key, username)
+            LOGGER.info('Awarded certificate for course %s to user %s', course_key, username)
     except Exception as exc:
         LOGGER.exception('Failed to determine course certificates to be awarded for user %s', username)
         raise self.retry(exc=exc, countdown=countdown, max_retries=MAX_RETRIES)

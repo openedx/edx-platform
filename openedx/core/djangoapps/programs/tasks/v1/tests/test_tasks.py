@@ -392,7 +392,7 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
         """
         Tests the API POST method is called with appropriate params when configured properly
         """
-        tasks.award_course_certificate.delay(self.student.username, self.course.id).get()
+        tasks.award_course_certificate.delay(self.student.username, str(self.course.id)).get()
         call_args, _ = mock_post_course_certificate.call_args
         self.assertEqual(call_args[1], self.student.username)
         self.assertEqual(call_args[2], self.certificate)
@@ -404,7 +404,7 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
         self.create_credentials_config(enabled=False)
         with mock.patch(TASKS_MODULE + '.LOGGER.warning') as mock_warning:
             with self.assertRaises(MaxRetriesExceededError):
-                tasks.award_course_certificate.delay(self.student.username, self.course.id).get()
+                tasks.award_course_certificate.delay(self.student.username, str(self.course.id)).get()
         self.assertTrue(mock_warning.called)
         self.assertFalse(mock_post_course_certificate.called)
 
@@ -414,7 +414,7 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
         """
         with mock.patch(TASKS_MODULE + '.LOGGER.exception') as mock_exception:
             # Use a random username here since this user won't be found in the DB
-            tasks.award_course_certificate.delay('random_username', self.course.id).get()
+            tasks.award_course_certificate.delay('random_username', str(self.course.id)).get()
         self.assertTrue(mock_exception.called)
         self.assertFalse(mock_post_course_certificate.called)
 
@@ -424,7 +424,7 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
         """
         self.certificate.delete()
         with mock.patch(TASKS_MODULE + '.LOGGER.exception') as mock_exception:
-            tasks.award_course_certificate.delay(self.student.username, self.course.id).get()
+            tasks.award_course_certificate.delay(self.student.username, str(self.course.id)).get()
         self.assertTrue(mock_exception.called)
         self.assertFalse(mock_post_course_certificate.called)
 
@@ -435,7 +435,7 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
         self.course.delete()
         with mock.patch(TASKS_MODULE + '.LOGGER.exception') as mock_exception:
             # Use the certificate course id here since the course will be deleted
-            tasks.award_course_certificate.delay(self.student.username, self.certificate.course_id).get()
+            tasks.award_course_certificate.delay(self.student.username, str(self.certificate.course_id)).get()
         self.assertTrue(mock_exception.called)
         self.assertFalse(mock_post_course_certificate.called)
 
@@ -449,5 +449,5 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
         self.certificate.save()
         self.create_credentials_config()
 
-        tasks.award_course_certificate.delay(self.student.username, self.certificate.course_id).get()
+        tasks.award_course_certificate.delay(self.student.username, str(self.certificate.course_id)).get()
         self.assertFalse(mock_post_course_certificate.called)
