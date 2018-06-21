@@ -21,12 +21,9 @@ from ..models import RestrictedApplication
 @receiver(pre_save, sender=AccessToken)
 def on_access_token_presave(sender, instance, *args, **kwargs):  # pylint: disable=unused-argument
     """
-    A hook on the AccessToken. Since we do not have protected scopes, we must mark all
-    AccessTokens as expired for 'restricted applications'.
-
-    We do this as a pre-save hook on the ORM
+    Mark AccessTokens as expired for 'restricted applications' if required.
     """
-    if RestrictedApplication.expire_access_token(instance.application):
+    if RestrictedApplication.should_expire_access_token(instance.application):
         instance.expires = datetime(1970, 1, 1, tzinfo=utc)
 
 
@@ -100,7 +97,7 @@ class EdxOAuth2Validator(OAuth2Validator):
 
         super(EdxOAuth2Validator, self).save_bearer_token(token, request, *args, **kwargs)
 
-        if RestrictedApplication.expire_access_token(request.client):
+        if RestrictedApplication.should_expire_access_token(request.client):
             # Since RestrictedApplications will override the DOT defined expiry, so that access_tokens
             # are always expired, we need to re-read the token from the database and then calculate the
             # expires_in (in seconds) from what we stored in the database. This value should be a negative

@@ -39,7 +39,7 @@ class RestrictedApplication(models.Model):
         )
 
     @classmethod
-    def expire_access_token(cls, application):
+    def should_expire_access_token(cls, application):
         set_token_expired = not UNEXPIRED_RESTRICTED_APPLICATIONS.is_enabled()
         jwt_not_requested = get_request_or_stub().POST.get('token_type', '').lower() != 'jwt'
         restricted_application = cls.objects.filter(application=application).exists()
