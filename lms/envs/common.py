@@ -523,8 +523,9 @@ OAUTH2_PROVIDER = {
     'REQUEST_APPROVAL_PROMPT': 'auto_even_if_expired',
     'ERROR_RESPONSE_WITH_SCOPES': True,
 }
-
-OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth_dispatch.ScopedApplication'
+# This is required for the migrations in oauth_dispatch.models
+# otherwise it fails saying this attribute is not present in Settings
+OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
 
 ################################## TEMPLATE CONFIGURATION #####################################
 # Mako templating
