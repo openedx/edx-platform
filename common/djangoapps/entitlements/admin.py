@@ -21,6 +21,7 @@ class CourseEntitlementAdmin(admin.ModelAdmin):
                     'enrollment_course_run',
                     'order_number')
     raw_id_fields = ('enrollment_course_run', 'user',)
+    search_fields = ('user__username', 'uuid', 'course_uuid', 'mode', 'order_number')
 
 
 class CourseEntitlementSupportDetailForm(forms.ModelForm):
