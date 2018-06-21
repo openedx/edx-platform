@@ -74,7 +74,7 @@ class ScopedApplicationAdmin(ModelAdmin):
     raw_id_fields = [u'user']
     search_fields = [u'name', u'user__username', u'client_id']
 
-    
+
 class ScopedApplicationOrganizationAdmin(ModelAdmin):
     """
     ModelAdmin for ScopedApplicationOrganization
