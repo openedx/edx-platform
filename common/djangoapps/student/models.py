@@ -1270,7 +1270,7 @@ class CourseEnrollment(models.Model):
 
         Args:
             user (User): The user associated with the enrollment.
-            course_id (CourseKey): The key of the course associated with the enrollment.
+            course_key (CourseKey): The key of the course associated with the enrollment.
 
         Returns:
             Course enrollment object or None

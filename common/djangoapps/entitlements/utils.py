@@ -8,16 +8,21 @@ from django.utils import timezone
 
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from student.models import CourseEnrollment
 
 log = logging.getLogger("common.entitlements.utils")
 
 
-def is_course_run_entitlement_fulfillable(course_run_key, entitlement, compare_date=timezone.now()):
+def is_course_run_entitlement_fulfillable(
+        course_run_key,
+        entitlement,
+        compare_date=timezone.now(),
+):
     """
     Checks that the current run meets the following criteria for an entitlement
 
     1) Is currently running or start in the future
-    2) A User can enroll in
+    2) A User can enroll in or is currently enrolled
     3) A User can upgrade to the entitlement mode
 
     Arguments:
@@ -50,8 +55,11 @@ def is_course_run_entitlement_fulfillable(course_run_key, entitlement, compare_d
         and (not enrollment_end or enrollment_end > compare_date)
     )
 
+    # Is the user already enrolled in the Course Run
+    is_enrolled = CourseEnrollment.is_enrolled(entitlement.user, course_run_key)
+
     # Ensure the course run is upgradeable and the mode matches the entitlement's mode
     unexpired_paid_modes = [mode.slug for mode in CourseMode.paid_modes_for_course(course_run_key)]
     can_upgrade = unexpired_paid_modes and entitlement.mode in unexpired_paid_modes
 
-    return is_running and can_upgrade and can_enroll
+    return is_running and can_upgrade and (is_enrolled or can_enroll)

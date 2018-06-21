@@ -94,6 +94,7 @@ class EntitlementForm extends React.Component {
             { label: '--', value: '' },
             { label: 'Verified', value: 'verified' },
             { label: 'Professional', value: 'professional' },
+            { label: 'No ID Professional', value: 'no-id-professional' },
           ]}
           onChange={this.handleModeChange}
         />
