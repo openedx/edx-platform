@@ -16,10 +16,6 @@ from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import SignalHandler, modulestore
 
-COURSE_TREE_BREADTH = [3, 3, 3, 3]
-STUDENTS_COUNT = 2
-BLOCK_COMPLETIONS_COUNT = 30
-
 
 class Command(BaseCommand):
     """ Run performance tests for completion aggregator. """
@@ -31,6 +27,25 @@ class Command(BaseCommand):
             'test',
             help='Test to run.'
         )
+        parser.add_argument(
+            '--course-breadth',
+            nargs=4,
+            type=int,
+            default=(3, 3, 3, 3),
+            help='Number of blocks at the first four levels in course.'
+        )
+        parser.add_argument(
+            '--learners',
+            type=int,
+            default=2,
+            help='Number of learners.'
+        )
+        parser.add_argument(
+            '--completions',
+            type=int,
+            default=30,
+            help='Number of completions to perform.'
+        )
 
     def handle(self, *args, **options):
         test = options.get('test')
@@ -38,11 +53,15 @@ class Command(BaseCommand):
         if not hasattr(self, test):
             raise CommandError('%s not found.' % test)
 
-        self.setUp()
+        self.setUp(**options)
         getattr(self, test)()
 
-    def setUp(self):
+    def setUp(self, **options):
         """ Set up the course and users. """
+
+        self.course_breadth = options['course_breadth']
+        self.learners_count = options['learners']
+        self.completions_count = options['completions']
 
         self.timer = default_timer
         self.store = modulestore()
@@ -60,22 +79,22 @@ class Command(BaseCommand):
 
             with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
                 with self.store.bulk_operations(self.course.id):
-                    for __ in range(COURSE_TREE_BREADTH[0]):
+                    for __ in range(self.course_breadth[0]):
                         chapter = self._create_block(parent=self.course, category='chapter')
-                        for __ in range(COURSE_TREE_BREADTH[1]):
+                        for __ in range(self.course_breadth[1]):
                             sequence = self._create_block(parent=chapter, category='sequential')
-                            for __ in range(COURSE_TREE_BREADTH[2]):
+                            for __ in range(self.course_breadth[2]):
                                 vertical = self._create_block(parent=sequence, category='vertical')
                                 self.blocks += [
                                     self._create_block(
                                         parent=vertical, category='html'
-                                    ) for __ in range(COURSE_TREE_BREADTH[3])
+                                    ) for __ in range(self.course_breadth[3])
                                 ]
                                 self.store.publish(vertical.location, ModuleStoreEnum.UserID.test)
 
             self.course = self.store.get_course(self.course.id)
 
-        self.users = [UserFactory.create() for __ in range(STUDENTS_COUNT)]
+        self.users = [UserFactory.create() for __ in range(self.learners_count)]
         for user in self.users:
             CourseEnrollmentFactory(user=user, course_id=self.course.id)
 
@@ -89,8 +108,8 @@ class Command(BaseCommand):
         print u"----- Completion Aggregator Performance Test Results -----"
         print u"Test: {}".format(test_name)
         print u"Course: {}".format(self.course.id)
-        print u"Course Breadth: {}".format(COURSE_TREE_BREADTH)
-        print u"Students: {}".format(STUDENTS_COUNT)
+        print u"Course Breadth: {}".format(self.course_breadth)
+        print u"Learners: {}".format(self.learners_count)
         if time_taken:
             print u"Total task time: {:.2f}ms".format(time_taken)
 
@@ -144,7 +163,7 @@ class Command(BaseCommand):
         time_taken = self._time_handler(course_published_handler, course_key=self.course.id)
         self._print_results_header(u"test_course_published_handler_when_block_is_added", time_taken=time_taken)
         self._assert_vertical_completion_for_all_users(
-            vertical, COURSE_TREE_BREADTH[3] / (COURSE_TREE_BREADTH[3] + 1.0)
+            vertical, self.course_breadth[3] / (self.course_breadth[3] + 1.0)
         )
         self._print_results_footer()
 
@@ -157,7 +176,7 @@ class Command(BaseCommand):
         vertical = self.course.get_children()[-1].get_children()[-1].get_children()[-1]
         self._complete_blocks_for_users(vertical.get_children()[1:], self.users)
         self._assert_vertical_completion_for_all_users(
-            vertical, (COURSE_TREE_BREADTH[3] - 1.0) / COURSE_TREE_BREADTH[3]
+            vertical, (self.course_breadth[3] - 1.0) / self.course_breadth[3]
         )
         block = vertical.get_children()[0]
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.course.id):
@@ -178,7 +197,7 @@ class Command(BaseCommand):
 
         users = list(self.users)
 
-        for __ in range(BLOCK_COMPLETIONS_COUNT):
+        for __ in range(self.completions_count):
             random_user = random.choice(users)
             next_block = self.blocks[random_user.next_block_index_to_complete]
             random_user.next_block_index_to_complete += 1
@@ -192,14 +211,14 @@ class Command(BaseCommand):
             times_taken.append(elapsed_milliseconds)
 
         for user in self.users:
-            expected_verticals_completed = math.floor(user.next_block_index_to_complete / COURSE_TREE_BREADTH[3])
+            expected_verticals_completed = math.floor(user.next_block_index_to_complete / self.course_breadth[3])
             verticals_completed = Aggregator.objects.filter(
                 user=user, course_key=self.course.id, aggregation_name='vertical', percent=1.0
             ).count()
             assert expected_verticals_completed == verticals_completed
 
         time_sum = numpy.sum(times_taken)
-        time_average = (time_sum / BLOCK_COMPLETIONS_COUNT)
+        time_average = (time_sum / self.completions_count)
         time_percentiles = " | ".join(
             [u"{}%: {:.2f}ms".format(p, numpy.percentile(times_taken, p)) for p in [
                 50, 66, 75, 80, 90, 95, 98, 99, 100]
@@ -207,7 +226,7 @@ class Command(BaseCommand):
         )
 
         self._print_results_header(u"test_individual_block_completions")
-        print u"Block Completions: {}".format(BLOCK_COMPLETIONS_COUNT)
+        print u"Completions: {}".format(self.completions_count)
         print u"Total time: {:.2f}ms".format(time_sum)
         print u"Average time: {:.2f}ms".format(time_average)
         print u"Time Percentiles: {}".format(time_percentiles)
