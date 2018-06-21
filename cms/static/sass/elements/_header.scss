@@ -386,7 +386,9 @@ body.course.view-import .nav-course-tools-import,
 body.course.view-export .nav-course-tools-export,
 body.course.view-export-git .nav-course-tools-export-git,
 body.course.view-team .nav-library-settings .title,
-body.course.view-team .nav-library-settings-team {
+body.course.view-team .nav-library-settings-team,
+body.course.view-checklists .nav-course-tools .title,
+body.course.view-checklists .nav-course-tools-checklists {
   color: theme-color("primary");
 
   a {

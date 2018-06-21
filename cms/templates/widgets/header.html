@@ -5,6 +5,7 @@
   from django.urls import reverse
   from django.utils.translation import ugettext as _
   from openedx.core.djangoapps.lang_pref.api import header_language_selector_is_enabled, released_languages
+  from cms.djangoapps.contentstore.config.waffle_utils import should_show_checklists_page
 %>
 <div class="wrapper-header wrapper" id="view-top">
   <header class="primary" role="banner">
@@ -34,6 +35,8 @@
             certificates_url = ''
             if settings.FEATURES.get("CERTIFICATES_HTML_VIEW") and context_course.cert_html_view_enabled:
                 certificates_url = reverse('certificates_list_handler', kwargs={'course_key_string': unicode(course_key)})
+            checklists_url = reverse('checklists_handler', kwargs={'course_key_string': unicode(course_key)})
+
       %>
       <h2 class="info-course">
         <span class="sr">${_("Current Course:")}</span>
@@ -124,6 +127,11 @@
                     <a href="${reverse('export_git', kwargs=dict(course_key_string=unicode(course_key)))}">${_("Export to Git")}</a>
                   </li>
                   % endif
+                  % if should_show_checklists_page(request.user):
+                  <li class="nav-item nav-course-tools-checklists">
+                    <a href="${checklists_url}">${_("Checklists")}</a>
+                  </li>
+                  %endif
                 </ul>
               </div>
             </div>
