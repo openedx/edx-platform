@@ -49,7 +49,6 @@ from six import text_type
 from slumber.exceptions import HttpClientError, HttpServerError
 from user_util import user_util
 
-import dogstats_wrapper as dog_stats_api
 import lms.lib.comment_client as cc
 from student.signals import UNENROLL_DONE, ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED
 from lms.djangoapps.certificates.models import GeneratedCertificate
@@ -1334,26 +1333,11 @@ class CourseEnrollment(models.Model):
         if activation_changed:
             if self.is_active:
                 self.emit_event(EVENT_NAME_ENROLLMENT_ACTIVATED)
-
-                dog_stats_api.increment(
-                    "common.student.enrollment",
-                    tags=[u"org:{}".format(self.course_id.org),
-                          u"offering:{}".format(self.course_id.offering),
-                          u"mode:{}".format(self.mode)]
-                )
-
             else:
                 UNENROLL_DONE.send(sender=None, course_enrollment=self, skip_refund=skip_refund)
-
                 self.emit_event(EVENT_NAME_ENROLLMENT_DEACTIVATED)
                 self.send_signal(EnrollStatusChange.unenroll)
 
-                dog_stats_api.increment(
-                    "common.student.unenrollment",
-                    tags=[u"org:{}".format(self.course_id.org),
-                          u"offering:{}".format(self.course_id.offering),
-                          u"mode:{}".format(self.mode)]
-                )
         if mode_changed:
             # Only emit mode change events when the user's enrollment
             # mode has changed from its previous setting

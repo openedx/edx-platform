@@ -1,7 +1,8 @@
 """
 License mixin for XBlocks and XModules
 """
-from xblock.fields import Scope, String, XBlockMixin
+from xblock.core import XBlockMixin
+from xblock.fields import Scope, String
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
