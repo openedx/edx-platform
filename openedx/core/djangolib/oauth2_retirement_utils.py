@@ -4,7 +4,7 @@ Removes user PII from OAuth2 models.
 
 from oauth2_provider.models import (
     AccessToken as DOTAccessToken,
-    Application as DOTApplication,
+    get_application_model,
     Grant as DOTGrant,
     RefreshToken as DOTRefreshToken,
 )
@@ -12,7 +12,11 @@ from provider.oauth2.models import (
     AccessToken as DOPAccessToken,
     RefreshToken as DOPRefreshToken,
     Grant as DOPGrant,
+    Client as DOPClient,
 )
+
+
+DOTApplication = get_application_model()
 
 
 class ModelRetirer(object):
@@ -48,5 +52,5 @@ def retire_dot_oauth2_models(user):
 
 
 def retire_dop_oauth2_models(user):
-    dop_models = [DOPAccessToken, DOPGrant, DOPRefreshToken]
+    dop_models = [DOPAccessToken, DOPGrant, DOPRefreshToken, DOPClient]
     ModelRetirer(dop_models).retire_user_by_id(user.id)

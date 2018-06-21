@@ -117,7 +117,7 @@ class CcxRestApiTest(CcxTestCase, APITestCase):
         )
 
         # create an oauth2 provider client app entry
-        app_client_oauth2_provider = dot_models.Application.objects.create(
+        app_client_oauth2_provider = dot_models.get_application_model().objects.create(
             name='test client 2',
             user=user,
             client_type='confidential',

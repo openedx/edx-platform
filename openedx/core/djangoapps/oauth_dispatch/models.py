@@ -11,6 +11,10 @@ from oauth2_provider.models import AbstractApplication
 from oauth2_provider.settings import oauth2_settings
 from pytz import utc
 
+from openedx.core.djangoapps.request_cache import get_request_or_stub
+
+from .toggles import UNEXPIRED_RESTRICTED_APPLICATIONS
+
 
 class RestrictedApplication(models.Model):
     """
@@ -36,7 +40,7 @@ class RestrictedApplication(models.Model):
 
     @classmethod
     def expire_access_token(cls, application):
-        set_token_expired = not OAUTH2_SWITCHES.is_enabled(UNEXPIRED_RESTRICTED_APPLICATIONS)
+        set_token_expired = not UNEXPIRED_RESTRICTED_APPLICATIONS.is_enabled()
         jwt_not_requested = get_request_or_stub().POST.get('token_type', '').lower() != 'jwt'
         restricted_application = cls.objects.filter(application=application).exists()
         return restricted_application and (jwt_not_requested or set_token_expired)
@@ -57,12 +61,6 @@ class ScopedApplication(AbstractApplication):
     """
     FILTER_USER_ME = 'user:me'
 
-    # TODO: Remove the id field once we perform the inital migrations for this model.
-    # We need to copy data over from the oauth2_provider.models.Application model to
-    # this new model with the intial migration and the model IDs will need to match
-    # so that existing AccessTokens will still work when switching over to the new model.
-    # Once we have the data copied over we can move back to an auto-increment primary key.
-    id = models.IntegerField(primary_key=True)
     scopes = ListCharField(
         base_field=models.CharField(max_length=32),
         size=25,

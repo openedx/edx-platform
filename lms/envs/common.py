@@ -2409,41 +2409,6 @@ SOCIAL_MEDIA_FOOTER_NAMES = [
     "reddit",
 ]
 
-# JWT Settings
-DEFAULT_JWT_ISSUER_URI = 'change-me'
-DEFAULT_JWT_SECRET_KEY = 'change-me'
-DEFAULT_JWT_AUDIENCE = 'change-me'
-DEFAULT_JWT_ISSUER = {
-    'ISSUER': DEFAULT_JWT_ISSUER_URI,
-    'SECRET_KEY': DEFAULT_JWT_SECRET_KEY,
-    'AUDIENCE': DEFAULT_JWT_AUDIENCE,
-}
-RESTRICTED_APPLICATION_JWT_ISSUER = {
-    'ISSUER': 'change-me',
-    'SECRET_KEY': 'change-me',
-    'AUDIENCE': None,
-}
-
-JWT_AUTH = {
-    # TODO Set JWT_SECRET_KEY to a secure value. By default, SECRET_KEY will be used.
-    # 'JWT_SECRET_KEY': '',
-    'JWT_ALGORITHM': 'HS256',
-    'JWT_VERIFY_EXPIRATION': True,
-    # TODO Set JWT_ISSUER and JWT_AUDIENCE to values specific to your service/organization.
-    'JWT_ISSUER': DEFAULT_JWT_ISSUER_URI,
-    'JWT_AUDIENCE': DEFAULT_JWT_AUDIENCE,
-    'JWT_PAYLOAD_GET_USERNAME_HANDLER': lambda d: d.get('username'),
-    'JWT_LEEWAY': 1,
-    'JWT_DECODE_HANDLER': 'edx_rest_framework_extensions.utils.jwt_decode_handler',
-    # Number of seconds before JWT tokens expire
-    'JWT_EXPIRATION': 30,
-    'JWT_SUPPORTED_VERSION': '1.0.0',
-    'JWT_ISSUERS': [
-        DEFAULT_JWT_ISSUER,
-        RESTRICTED_APPLICATION_JWT_ISSUER,
-    ],
-}
-
 # The footer URLs dictionary maps social footer names
 # to URLs defined in configuration.
 SOCIAL_MEDIA_FOOTER_URLS = {}
@@ -3222,6 +3187,41 @@ JWT_EXPIRED_PRIVATE_SIGNING_KEYS = []
 NOTIFICATION_EMAIL_CSS = "templates/credit_notifications/credit_notification.css"
 NOTIFICATION_EMAIL_EDX_LOGO = "templates/credit_notifications/edx-logo-header.png"
 
+
+################################ Settings for JWTs ################################
+
+DEFAULT_JWT_ISSUER = {
+    'ISSUER': 'change-me',
+    'SECRET_KEY': SECRET_KEY,
+    'AUDIENCE': 'change-me',
+}
+
+RESTRICTED_APPLICATION_JWT_ISSUER = {
+    'ISSUER': 'change-me',
+    'SECRET_KEY': SECRET_KEY,
+    'AUDIENCE': None,
+}
+
+JWT_AUTH = {
+    'JWT_ALGORITHM': 'HS256',
+    'JWT_VERIFY_EXPIRATION': True,
+
+    'JWT_PAYLOAD_GET_USERNAME_HANDLER': lambda d: d.get('username'),
+    'JWT_LEEWAY': 1,
+    'JWT_DECODE_HANDLER': 'edx_rest_framework_extensions.utils.jwt_decode_handler',
+
+    # Number of seconds before JWT tokens expire
+    'JWT_EXPIRATION': 30,
+    'JWT_SUPPORTED_VERSION': '1.0.0',
+
+    'JWT_SECRET_KEY': DEFAULT_JWT_ISSUER['SECRET_KEY'],
+    'JWT_ISSUER': DEFAULT_JWT_ISSUER['ISSUER'],
+    'JWT_AUDIENCE': DEFAULT_JWT_ISSUER['AUDIENCE'],
+    'JWT_ISSUERS': [
+        DEFAULT_JWT_ISSUER,
+        RESTRICTED_APPLICATION_JWT_ISSUER,
+    ],
+}
 
 ################################ Settings for Microsites ################################
 

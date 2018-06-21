@@ -60,7 +60,7 @@ class CertificatesRestApiTest(SharedModuleStoreTestCase, APITestCase):
 
         # create a configuration for django-oauth-toolkit (DOT)
         dot_app_user = UserFactory.create(password=USER_PASSWORD)
-        dot_app = dot_models.Application.objects.create(
+        dot_app = dot_models.get_application_model().objects.create(
             name='test app',
             user=dot_app_user,
             client_type='confidential',

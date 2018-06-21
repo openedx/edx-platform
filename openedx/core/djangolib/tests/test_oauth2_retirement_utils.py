@@ -9,7 +9,7 @@ from openedx.core.djangoapps.oauth_dispatch.tests import factories
 from student.tests.factories import UserFactory
 from oauth2_provider.models import (
     AccessToken as DOTAccessToken,
-    Application as DOTApplication,
+    get_application_model,
     RefreshToken as DOTRefreshToken,
     Grant as DOTGrant,
 )
@@ -24,6 +24,9 @@ from ..oauth2_retirement_utils import (
     retire_dop_oauth2_models,
     retire_dot_oauth2_models,
 )
+
+
+DOTApplication = get_application_model()
 
 
 class RetireDOTModelsTest(TestCase):

@@ -8,7 +8,6 @@ from django.utils.functional import cached_property
 from jwkest.jwk import KEYS, RSAKey
 from jwkest.jws import JWS
 
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from student.models import UserProfile, anonymous_id_for_user
 
 
@@ -35,7 +34,7 @@ class JwtBuilder(object):
         self.asymmetric = asymmetric
         self.secret = secret
         self.issuer = issuer
-        self.jwt_auth = configuration_helpers.get_value('JWT_AUTH', settings.JWT_AUTH)
+        self.jwt_auth = settings.JWT_AUTH
 
     def build_token(self, scopes, expires_in=None, aud=None, additional_claims=None):
         """Returns a JWT access token.

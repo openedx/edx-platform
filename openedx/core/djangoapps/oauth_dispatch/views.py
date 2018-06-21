@@ -21,7 +21,6 @@ from ratelimit import ALL
 from ratelimit.mixins import RatelimitMixin
 
 from openedx.core.djangoapps.auth_exchange import views as auth_exchange_views
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.token_utils import JwtBuilder
 
 from . import adapters
@@ -141,19 +140,13 @@ class AccessTokenView(RatelimitMixin, _DispatchingView):
     def _get_client_specific_claims(self, client_id, adapter):
         """ Get claims that are specific to the client. """
         if adapter.is_client_restricted(client_id):
-            jwt_issuer = configuration_helpers.get_value(
-                'RESTRICTED_APPLICATION_JWT_ISSUER',
-                settings.RESTRICTED_APPLICATION_JWT_ISSUER
-            )
-            issuer = jwt_issuer['ISSUER']
-            secret = jwt_issuer['SECRET_KEY']
-            audience = jwt_issuer['AUDIENCE']
+            issuer_setting = 'RESTRICTED_APPLICATION_JWT_ISSUER'
         else:
-            issuer = configuration_helpers.get_value('DEFAULT_JWT_ISSUER_URI', settings.DEFAULT_JWT_ISSUER_URI)
-            secret = configuration_helpers.get_value('DEFAULT_JWT_SECRET_KEY', settings.DEFAULT_JWT_SECRET_KEY)
-            audience = configuration_helpers.get_value('DEFAULT_JWT_AUDIENCE', settings.DEFAULT_JWT_AUDIENCE)
+            issuer_setting = 'DEFAULT_JWT_ISSUER'
+
+        jwt_issuer = getattr(settings, issuer_setting)
         filters = adapter.get_authorization_filters(client_id)
-        return issuer, secret, audience, filters
+        return jwt_issuer['ISSUER'], jwt_issuer['SECRET_KEY'], jwt_issuer['AUDIENCE'], filters
 
 
 class AuthorizationView(_DispatchingView):
