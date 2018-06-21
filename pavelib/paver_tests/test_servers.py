@@ -247,7 +247,7 @@ class TestPaverServerTasks(PaverTestCase):
                 [c.format(settings=expected_asset_settings) for c in EXPECTED_PRINT_SETTINGS_COMMAND]
             )
             expected_messages.append(EXPECTED_WEBPACK_COMMAND.format(
-                node_env="production" if expected_asset_settings != Env.DEVSTACK_SETTINGS else "development",
+                node_env="production",
                 static_root_lms=None,
                 static_root_cms=None,
                 webpack_config_path=None
@@ -292,7 +292,7 @@ class TestPaverServerTasks(PaverTestCase):
                 [c.format(settings=expected_asset_settings) for c in EXPECTED_PRINT_SETTINGS_COMMAND]
             )
             expected_messages.append(EXPECTED_WEBPACK_COMMAND.format(
-                node_env="production" if expected_asset_settings != Env.DEVSTACK_SETTINGS else "development",
+                node_env="production",
                 static_root_lms=None,
                 static_root_cms=None,
                 webpack_config_path=None
