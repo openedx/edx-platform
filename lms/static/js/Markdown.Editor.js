@@ -236,6 +236,19 @@
 
     // end of Chunks
 
+    function findAnEmptyToolbar(toolbarClassName) {
+        var toolbars = doc.getElementsByClassName(toolbarClassName);
+        for (var i=0; i < toolbars.length; ++i)
+        {
+            var aToolbar = toolbars[i];
+            if (aToolbar.children.length == 0) {
+                var anEmptyToolbar = aToolbar;
+                return anEmptyToolbar;
+            }
+        }
+        return null;
+    }
+
     // A collection of the important regions on the page.
     // Cached so we don't have to keep traversing the DOM.
     // Also holds ieCachedRange and ieCachedScrollTop, where necessary; working around
@@ -253,7 +266,7 @@
     // and 8) and ONLY on button clicks.  Keyboard shortcuts work
     // normally since the focus never leaves the textarea.
     function PanelCollection(postfix) {
-        this.buttonBar = doc.getElementById('wmd-button-bar' + postfix);
+        this.buttonBar = findAnEmptyToolbar('wmd-button-bar' + postfix);
         this.preview = doc.getElementById('wmd-preview' + postfix);
         this.input = doc.getElementById('wmd-input' + postfix);
     }
