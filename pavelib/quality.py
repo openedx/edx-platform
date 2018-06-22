@@ -856,9 +856,9 @@ def run_quality(options):
     # If one of the quality runs fails, then paver exits with an error when it is finished
     if not diff_quality_pass:
         msg = "FAILURE: " + " ".join(failure_reasons)
-        fail_quality('quality', msg)
+        fail_quality('diff_quality', msg)
     else:
-        write_junit_xml('quality')
+        write_junit_xml('diff_quality')
 
 
 def run_diff_quality(
