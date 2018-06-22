@@ -193,10 +193,10 @@ class RetirementTestCase(TestCase):
             ('ENROLLMENTS_COMPLETE', 130, False, False),
             ('RETIRING_NOTES', 140, False, False),
             ('NOTES_COMPLETE', 150, False, False),
-            ('NOTIFYING_PARTNERS', 160, False, False),
-            ('PARTNERS_NOTIFIED', 170, False, False),
-            ('RETIRING_LMS', 180, False, False),
-            ('LMS_COMPLETE', 190, False, False),
+            ('RETIRING_LMS', 160, False, False),
+            ('LMS_COMPLETE', 170, False, False),
+            ('ADDING_TO_PARTNER_QUEUE', 180, False, False),
+            ('PARTNER_QUEUE_COMPLETE', 190, False, False),
             ('ERRORED', 200, True, True),
             ('ABORTED', 210, True, True),
             ('COMPLETE', 220, True, True),
@@ -561,6 +561,68 @@ class TestPartnerReportingCleanup(ModuleStoreTestCase):
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
+class TestPartnerReportingPut(RetirementTestCase, ModuleStoreTestCase):
+    """
+    Tests the partner reporting list endpoint
+    """
+
+    def setUp(self):
+        super(TestPartnerReportingPut, self).setUp()
+        self.test_superuser = SuperuserFactory()
+        self.course = CourseFactory()
+        self.course_awesome_org = CourseFactory(org='awesome_org')
+        self.courses = (self.course, self.course_awesome_org)
+        self.headers = build_jwt_headers(self.test_superuser)
+        self.url = reverse('accounts_retirement_partner_report')
+        self.headers['content_type'] = "application/json"
+        self.maxDiff = None
+        self.partner_queue_state = RetirementState.objects.get(state_name='ADDING_TO_PARTNER_QUEUE')
+
+    def post_and_assert_status(self, data, expected_status=status.HTTP_204_NO_CONTENT):
+        """
+        Helper function for making a request to the retire subscriptions endpoint, and asserting the status.
+        """
+        response = self.client.put(self.url, json.dumps(data), **self.headers)
+        self.assertEqual(response.status_code, expected_status)
+        return response
+
+    def test_success(self):
+        """
+        Checks the simple success case of creating a user, enrolling in a course, and doing the partner
+        report PUT. User should then have the appropriate row in UserRetirementPartnerReportingStatus
+        """
+        retirement = self._create_retirement(self.partner_queue_state)
+        for course in self.courses:
+            CourseEnrollment.enroll(user=retirement.user, course_key=course.id)
+
+        self.post_and_assert_status({'username': retirement.original_username})
+        self.assertTrue(UserRetirementPartnerReportingStatus.objects.filter(user=retirement.user).exists())
+
+    def test_idempotent(self):
+        """
+        Runs the success test twice to make sure that re-running the step still succeeds.
+        """
+        retirement = self._create_retirement(self.partner_queue_state)
+        for course in self.courses:
+            CourseEnrollment.enroll(user=retirement.user, course_key=course.id)
+
+        # We really do want this twice.
+        self.post_and_assert_status({'username': retirement.original_username})
+        self.post_and_assert_status({'username': retirement.original_username})
+        self.assertTrue(UserRetirementPartnerReportingStatus.objects.filter(user=retirement.user).exists())
+
+    def test_unknown_user(self):
+        """
+        Checks that a username with no active retirement generates a 404
+        """
+        user = UserFactory()
+        for course in self.courses:
+            CourseEnrollment.enroll(user=user, course_key=course.id)
+
+        self.post_and_assert_status({'username': user.username}, status.HTTP_404_NOT_FOUND)
+
+
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
 class TestPartnerReportingList(ModuleStoreTestCase):
     """
     Tests the partner reporting list endpoint
@@ -624,7 +686,7 @@ class TestPartnerReportingList(ModuleStoreTestCase):
 
     def assert_status_and_user_list(self, expected_users, expected_status=status.HTTP_200_OK):
         """
-        Makes the partner reporting list GET and asserts that the given users are
+        Makes the partner reporting list POST and asserts that the given users are
         in the returned list, as well as asserting the expected HTTP status code
         is returned.
         """
