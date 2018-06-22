@@ -44,6 +44,7 @@ class EdxOAuth2AuthorizationView(AuthorizationView):
             # at this point we know an Application instance with such client_id exists in the database
             application = get_application_model().objects.get(client_id=credentials['client_id'])
             kwargs['application'] = application
+            kwargs['organization_list'] = [org.short_name for org in application.organizations.all()]
             kwargs['client_id'] = credentials['client_id']
             kwargs['redirect_uri'] = credentials['redirect_uri']
             kwargs['response_type'] = credentials['response_type']
