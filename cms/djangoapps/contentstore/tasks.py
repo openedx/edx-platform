@@ -11,6 +11,7 @@ import tarfile
 from datetime import datetime
 from tempfile import NamedTemporaryFile, mkdtemp
 
+from celery import group
 from celery.task import task
 from celery.utils.log import get_task_logger
 from celery_utils.chordable_django_backend import chord, chord_task
@@ -82,16 +83,17 @@ COURSE_LEVEL_TIMEOUT_SECONDS = 1200
 VIDEO_LEVEL_TIMEOUT_SECONDS = 300
 
 
-@chord_task
-def task_status_callback(results):
+@chord_task(bind=True)
+def task_status_callback(self, results, course_id, video_location):  # pylint: disable=unused-argument
     """
     Callback for collating the results of chord.
     """
-    try:
-        for result in results:
-            LOGGER.info("[%s] Result: %s", MIGRATION_LOGS_PREFIX, result)
-    except TypeError:
-        pass
+    transcript_tasks_count = len(list(results()))
+
+    LOGGER.info(
+        "[%s] [video-transcripts-migration-complete-for-a-video] [tasks_count=%s] [course_id=%s] [video=%s]",
+        MIGRATION_LOGS_PREFIX, transcript_tasks_count, course_id, video_location
+    )
 
 
 def enqueue_async_migrate_transcripts_tasks(course_keys, force_update=DEFAULT_FORCE_UPDATE, commit=DEFAULT_COMMIT):
@@ -107,15 +109,10 @@ def enqueue_async_migrate_transcripts_tasks(course_keys, force_update=DEFAULT_FO
         'force_update': force_update,
         'commit': commit
     }
-
-    tasks = [
-        async_migrate_transcript.s(
-            unicode(course_key),
-            **kwargs
-        ) for course_key in course_keys
-    ]
-    callback = task_status_callback.s()
-    chord(tasks)(callback)
+    group([
+        async_migrate_transcript.s(unicode(course_key), **kwargs)
+        for course_key in course_keys
+    ])()
 
 
 def get_course_videos(course_key):
@@ -158,12 +155,12 @@ def async_migrate_transcript(self, course_key, **kwargs):   # pylint: disable=un
     """
     Migrates the transcripts of all videos in a course as a new celery task.
     """
-    sub_tasks, force_update = [], kwargs['force_update']
+    force_update = kwargs['force_update']
     course_videos = get_course_videos(CourseKey.from_string(course_key))
 
     LOGGER.info(
-        "[%s] process for course %s started. Migrating transcripts from %s videos.",
-        MIGRATION_LOGS_PREFIX, course_key, len(course_videos)
+        "[%s] [video-transcripts-migration-process-started-for-course] [course=%s]",
+        MIGRATION_LOGS_PREFIX, course_key
     )
 
     for video in course_videos:
@@ -172,20 +169,24 @@ def async_migrate_transcript(self, course_key, **kwargs):   # pylint: disable=un
         if english_transcript:
             all_transcripts.update({'en': video.sub})
 
+        sub_tasks = []
+        video_location = unicode(video.location)
         for lang in all_transcripts.keys():
-            sub_tasks.append(async_migrate_transcript_subtask.s(unicode(video.location), lang, force_update, **kwargs))
+            sub_tasks.append(async_migrate_transcript_subtask.s(video_location, lang, force_update, **kwargs))
 
-    LOGGER.info(
-        "[%s] Migrating %s transcripts for course %s.",
-        MIGRATION_LOGS_PREFIX, len(sub_tasks), course_key
-    )
-    callback = task_status_callback.s()
-    chord(sub_tasks)(callback)
+        if sub_tasks:
+            callback = task_status_callback.s(course_id=course_key, video_location=video_location)
+            chord(sub_tasks)(callback)
 
-    LOGGER.info(
-        "[%s] task submission for course %s ended.",
-        MIGRATION_LOGS_PREFIX, course_key
-    )
+            LOGGER.info(
+                "[%s] [transcripts-migration-tasks-submitted] [transcripts_count=%s] [course=%s] [video=%s]",
+                MIGRATION_LOGS_PREFIX, len(sub_tasks), course_key, video_location
+            )
+        else:
+            LOGGER.info(
+                "[%s] [no-video-transcripts] [course=%s] [video=%s]",
+                MIGRATION_LOGS_PREFIX, course_key, video_location
+            )
 
 
 def save_transcript_to_storage(edx_video_id, language_code, transcript_content, file_format, force_update):
@@ -215,6 +216,11 @@ def save_transcript_to_storage(edx_video_id, language_code, transcript_content, 
             file_format,
             ContentFile(transcript_content)
         )
+    else:
+        LOGGER.info(
+            "[%s] [do-not-override-existing-transcript] [edx_video_id=%s] [language_code=%s]",
+            MIGRATION_LOGS_PREFIX, edx_video_id, language_code
+        )
 
 
 @chord_task(
@@ -228,23 +234,23 @@ def async_migrate_transcript_subtask(self, *args, **kwargs):  # pylint: disable=
     """
     Migrates a transcript of a given video in a course as a new celery task.
     """
+    success, failure = 'Success', 'Failure'
     video_location, language_code, force_update = args
     store = modulestore()
     video = store.get_item(usage_key=BlockUsageLocator.from_string(video_location))
-    commit = kwargs['commit']
-
-    if not commit:
-        return 'Language {language_code} transcript of video {edx_video_id} will be migrated'.format(
-            language_code=language_code,
-            edx_video_id=video.edx_video_id
-        )
-
-    # Start transcript's migration
     edx_video_id = clean_video_id(video.edx_video_id)
 
+    if not kwargs['commit']:
+        LOGGER.info(
+            '[%s] [video-transcript-will-be-migrated] [video=%s] [edx_video_id=%s] [language_code=%s]',
+            MIGRATION_LOGS_PREFIX, video_location, edx_video_id, language_code
+        )
+        return success
+
     LOGGER.info(
-        "[Transcript migration] migration process is started for video [%s] language [%s].",
-        edx_video_id, language_code
+        ('[%s] [transcripts-migration-process-started-for-video-transcript] '
+         '[video=%s] [edx_video_id=%s] [language_code=%s]'),
+        MIGRATION_LOGS_PREFIX, video_location, edx_video_id, language_code
     )
 
     try:
@@ -261,6 +267,11 @@ def async_migrate_transcript_subtask(self, *args, **kwargs):  # pylint: disable=
             video.edx_video_id = edx_video_id
             store.update_item(video, ModuleStoreEnum.UserID.mgmt_command)
 
+            LOGGER.info(
+                '[%s] [generated-edx-video-id] [video=%s] [edx_video_id=%s] [language_code=%s]',
+                MIGRATION_LOGS_PREFIX, video_location, edx_video_id, language_code
+            )
+
         save_transcript_to_storage(
             edx_video_id=edx_video_id,
             language_code=language_code,
@@ -270,27 +281,25 @@ def async_migrate_transcript_subtask(self, *args, **kwargs):  # pylint: disable=
         )
     except (NotFoundError, TranscriptsGenerationException, ValCannotCreateError) as exc:
         LOGGER.exception(
-            '[Transcript migration] transcript migration failed for video [%s] and language [%s].',
-            edx_video_id, language_code
+            ('[%s] [video-transcript-migration-failed-with-known-exc] [video=%s] '
+             '[edx_video_id=%s] [language_code=%s]'),
+            MIGRATION_LOGS_PREFIX, video_location, edx_video_id, language_code
         )
-        message = 'Failed: language {language} of video {video} with exception {exception}'.format(
-            language=language_code,
-            video=video.edx_video_id,
-            exception=text_type(exc)
-        )
+        return failure
     except Exception:
         LOGGER.exception(
-            '[Transcript migration] transcript migration failed for video [%s] and language [%s].',
-            edx_video_id, language_code
+            ('[%s] [video-transcript-migration-failed-with-unknown-exc] '
+             '[video=%s] [edx_video_id=%s] [language_code=%s]'),
+            MIGRATION_LOGS_PREFIX, video_location, edx_video_id, language_code
         )
         raise
-    else:
-        message = (
-            'Success: transcript (language: {language_code}, edx_video_id: {edx_video_id}) has been migrated '
-            'for video [{location}].'
-        ).format(edx_video_id=edx_video_id, language_code=language_code, location=unicode(video.location))
 
-    return message
+    LOGGER.info(
+        ('[%s] [video-transcript-migration-succeeded-for-a-video] '
+         '[video=%s] [edx_video_id=%s] [language_code=%s]'),
+        MIGRATION_LOGS_PREFIX, video_location, edx_video_id, language_code
+    )
+    return success
 
 
 def clone_instance(instance, field_values):
