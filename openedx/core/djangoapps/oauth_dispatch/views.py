@@ -42,7 +42,7 @@ class _DispatchingView(View):
         """
         Returns the appropriate adapter based on the OAuth client linked to the request.
         """
-        if dot_models.get_application_model().objects.filter(client_id=self._get_client_id(request)).exists():
+        if dot_models.Application.objects.filter(client_id=self._get_client_id(request)).exists():
             return self.dot_adapter
         else:
             return self.dop_adapter

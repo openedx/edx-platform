@@ -397,28 +397,15 @@ class BookmarksDetailViewTests(BookmarksViewsTestsBase):
 
     def test_get_bookmark_that_belongs_to_other_user(self):
         """
-        Test that requesting bookmark that belongs to other user returns 403 status code.
+        Test that requesting bookmark that belongs to other user returns 404 status code.
         """
         self.send_get(
             client=self.client,
             url=reverse(
                 'bookmarks_detail',
-                kwargs={'username': self.other_user.username, 'usage_id': unicode(self.vertical_1.location)}
+                kwargs={'username': 'other', 'usage_id': unicode(self.vertical_1.location)}
             ),
-            expected_status=403
-        )
-
-    def test_get_bookmark_that_belongs_to_nonexistent_user(self):
-        """
-        Test that requesting bookmark that belongs to a non-existent user also returns 403 status code.
-        """
-        self.send_get(
-            client=self.client,
-            url=reverse(
-                'bookmarks_detail',
-                kwargs={'username': 'non-existent', 'usage_id': unicode(self.vertical_1.location)}
-            ),
-            expected_status=403
+            expected_status=404
         )
 
     def test_get_bookmark_that_does_not_exist(self):
@@ -495,7 +482,7 @@ class BookmarksDetailViewTests(BookmarksViewsTestsBase):
 
     def test_delete_bookmark_that_belongs_to_other_user(self):
         """
-        Test that delete bookmark that belongs to other user returns 403.
+        Test that delete bookmark that belongs to other user returns 404.
         """
         self.send_delete(
             client=self.client,
@@ -503,7 +490,7 @@ class BookmarksDetailViewTests(BookmarksViewsTestsBase):
                 'bookmarks_detail',
                 kwargs={'username': 'other', 'usage_id': unicode(self.vertical_1.location)}
             ),
-            expected_status=403
+            expected_status=404
         )
 
     def test_delete_bookmark_that_does_not_exist(self):

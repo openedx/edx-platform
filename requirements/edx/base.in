@@ -70,7 +70,7 @@ edx-ccx-keys
 edx-celeryutils
 edx-completion
 edx-django-release-util             # Release utils for the edx release pipeline
-# edx-drf-extensions # TODO - DO NOT MERGE: Update once DRF-Extensions PR merges and is tagged
+edx-drf-extensions
 edx-django-oauth2-provider==1.2.5
 edx-django-sites-extensions==2.3.1
 edx-enterprise
@@ -125,7 +125,6 @@ python-openid
 python-saml==2.4.0
 pyuca==1.1                          # For more accurate sorting of translated country names in django-countries
 reportlab==3.1.44                   # Used for shopping cart's pdf invoice/receipt generation
-rest_condition                      # DRF's recommendation for supporting complex permissions.
 rfc6266-parser                      # Used to generate Content-Disposition headers.
 social-auth-app-django
 social-auth-core

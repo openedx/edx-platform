@@ -60,7 +60,7 @@ class CertificatesRestApiTest(SharedModuleStoreTestCase, APITestCase):
 
         # create a configuration for django-oauth-toolkit (DOT)
         dot_app_user = UserFactory.create(password=USER_PASSWORD)
-        dot_app = dot_models.get_application_model().objects.create(
+        dot_app = dot_models.Application.objects.create(
             name='test app',
             user=dot_app_user,
             client_type='confidential',
@@ -107,7 +107,8 @@ class CertificatesRestApiTest(SharedModuleStoreTestCase, APITestCase):
         # another student
         self.client.login(username=self.student_no_cert.username, password=USER_PASSWORD)
         resp = self.client.get(self.get_url(self.student.username))
-        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+        # gets 404 instead of 403 for security reasons
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(resp.data, {u'detail': u'Not found.'})
         self.client.logout()
 
