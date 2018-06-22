@@ -13,7 +13,6 @@ import ddt
 from oauth2_provider import models
 from student.tests.factories import UserFactory
 
-
 # oauth_dispatch is not in CMS' INSTALLED_APPS so these imports will error during test collection
 if settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"):
     from ..adapters import DOTAdapter
