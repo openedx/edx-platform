@@ -3,7 +3,7 @@ Tests for custom DOT scopes backend.
 """
 import ddt
 from django.conf import settings
-from django.test import TestCase, override_settings
+from django.test import TestCase
 
 from openedx.core.djangoapps.oauth_dispatch.scopes import ApplicationModelScopes
 from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationAccessFactory
