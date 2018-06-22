@@ -19,8 +19,10 @@ from student.tests.factories import UserFactory
 from user_tasks.models import UserTaskStatus
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+import ddt
+from mock import Mock, MagicMock, patch
 
-
+@ddt.ddt
 class CourseImportViewTest(SharedModuleStoreTestCase, APITestCase):
     """
     Test importing courses via a RESTful API (POST method only)
@@ -186,3 +188,25 @@ class CourseImportViewTest(SharedModuleStoreTestCase, APITestCase):
             format='multipart'
         )
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+
+    @ddt.data(
+        [{'courses_ids': ['1'], 'rerun_courses_keys': ['0'], 'has_studio_read_access': True, 'is_reload': '{"is_reload": true}'}],
+        [{'courses_ids': ['2'], 'rerun_courses_keys': ['1', '2'], 'has_studio_read_access': True, 'is_reload': '{"is_reload": false}'}],
+        [{'courses_ids': ['3'], 'rerun_courses_keys': [], 'has_studio_read_access': False, 'is_reload': '{"is_reload": true}'}],
+    )
+    @ddt.unpack
+    def test_check_rerun_courses(self, options):
+        self.client.login(username=self.staff.username, password=self.password)
+        #course_action_state.models.CourseRerunState
+        #student.auth.has_studio_read_access
+        find_all = []
+        for course_id in options['rerun_courses_keys']:
+            mock = Mock()
+            mock.course_key = course_id
+            find_all.append(mock)
+        with patch('student.auth.has_studio_read_access',
+                   Mock(side_effect=lambda user,course_key: options['has_studio_read_access'])) as has_access_mock:
+            with patch('course_action_state.models.CourseRerunState.objects.find_all',
+                       Mock(side_effect=lambda exclude_args,should_display: find_all )) as course_rerun_mock:
+                resp = self.client.post('/api/courses/v0/check_rerun_courses/', {'courses': options['courses_ids']})
+                self.assertEqual(resp.content, '{}'.format(options['is_reload']))

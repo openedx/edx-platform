@@ -28,7 +28,7 @@ from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_c
 
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-from student.auth import  has_studio_read_access
+import student
 from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 from django.http import JsonResponse
 
@@ -207,9 +207,8 @@ def check_rerun_courses(request):
             exclude_args={'state': CourseRerunUIStateManager.State.SUCCEEDED},
             should_display=True,
         )
-        if has_studio_read_access(request.user, course.course_key)
+        if student.auth.has_studio_read_access(request.user, course.course_key)
     ]
-
     if rerun_courses_keys and courses_ids:
         for id in courses_ids:
             if id not in rerun_courses_keys:
