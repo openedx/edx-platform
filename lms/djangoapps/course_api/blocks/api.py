@@ -8,6 +8,7 @@ from openedx.core.djangoapps.content.block_structure.transformers import BlockSt
 
 from .serializers import BlockDictSerializer, BlockSerializer
 from .transformers.blocks_api import BlocksAPITransformer
+from .transformers.block_completion import BlockCompletionTransformer
 from .transformers.milestones import MilestonesAndSpecialExamsTransformer
 
 
@@ -51,9 +52,11 @@ def get_blocks(
     """
     # create ordered list of transformers, adding BlocksAPITransformer at end.
     transformers = BlockStructureTransformers()
-    include_special_exams = False
-    if requested_fields is not None and 'special_exam_info' in requested_fields:
-        include_special_exams = True
+    if requested_fields is None:
+        requested_fields = []
+    include_completion = 'completion' in requested_fields
+    include_special_exams = 'special_exam_info' in requested_fields
+
     if user is not None:
         transformers += COURSE_BLOCK_ACCESS_TRANSFORMERS
         transformers += [MilestonesAndSpecialExamsTransformer(include_special_exams), HiddenContentTransformer()]
@@ -65,6 +68,9 @@ def get_blocks(
             nav_depth
         )
     ]
+
+    if include_completion:
+        transformers += [BlockCompletionTransformer()]
 
     # transform
     blocks = get_course_blocks(user, usage_key, transformers)

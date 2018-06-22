@@ -2258,6 +2258,10 @@ INSTALLED_APPS = (
     'openedx.features.enterprise_support',
 
     'experiments',
+
+    # Completion
+    'completion',
+    'completion_aggregator',
 )
 
 ######################### CSRF #########################################
@@ -3365,3 +3369,16 @@ COURSES_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 
 ############## Settings for CourseGraph ############################
 COURSEGRAPH_JOB_QUEUE = LOW_PRIORITY_QUEUE
+
+############### Settings for Completion ############################
+COMPLETION_BY_VIEWING_DELAY_MS = 5000
+# Once a user has watched this percentage of a video, mark it as complete:
+# (0.0 = 0%, 1.0 = 100%)
+COMPLETION_VIDEO_COMPLETE_PERCENTAGE = 0.95
+
+COMPLETION_AGGREGATOR_BLOCK_TYPES = {
+    'course',
+    'chapter',
+    'sequential',
+    'vertical',
+}

@@ -198,7 +198,7 @@ FEATURES = {
     'ENABLE_CONTENT_LIBRARIES': True,
 
     # Solutions apps flag
-    'EDX_SOLUTIONS_API': False,
+    'EDX_SOLUTIONS_API': True,
 
     # Milestones application flag
     'MILESTONES_APP': False,
@@ -1051,6 +1051,10 @@ INSTALLED_APPS = (
 
     # Waffle related utilities
     'openedx.core.djangoapps.waffle_utils',
+
+    # Completion
+    'completion',
+    'completion_aggregator',
 )
 
 
