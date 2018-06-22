@@ -60,7 +60,7 @@ class ApplicationAccess(models.Model):
     Specifies access control information for the associated Application.
     """
 
-    application = models.ForeignKey(oauth2_settings.APPLICATION_MODEL, related_name='access',)
+    application = models.ForeignKey(oauth2_settings.APPLICATION_MODEL, unique=True, related_name='access')
     scopes = ListCharField(
         base_field=models.CharField(max_length=32),
         size=25,
@@ -99,21 +99,20 @@ class ApplicationOrganization(models.Model):
         (CONTENT_PROVIDER_TYPE, _('Content Provider')),
     )
 
-    # In practice, short_name should match the short_name of an Organization model.
-    # This is not a foreign key because the organizations app is not installed by default.
+    application = models.ForeignKey(
+        oauth2_settings.APPLICATION_MODEL,
+        related_name='organizations',
+    )
     organization = models.ForeignKey(Organization)
     provider_type = models.CharField(
         max_length=32,
         choices=ORGANIZATION_PROVIDER_TYPES,
         default=CONTENT_PROVIDER_TYPE,
     )
-    application = models.ForeignKey(
-        oauth2_settings.APPLICATION_MODEL,
-        related_name='organizations',
-    )
 
     class Meta:
         app_label = 'oauth_dispatch'
+        unique_together = ('application', 'organization', 'provider_type')
 
     def __unicode__(self):
         """
