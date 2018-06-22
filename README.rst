@@ -15,7 +15,7 @@ install edX:
    existing Ubuntu 16.04 server.
 
 .. _configuration repo: https://github.com/edx/configuration
-.. _edX Developer Stack: https://openedx.atlassian.net/wiki/display/OpenOPS/Running+Devstack
+.. _edX Developer Stack: https://github.com/edx/devstack
 .. _edX Full Stack: https://openedx.atlassian.net/wiki/display/OpenOPS/Running+Fullstack
 .. _edX Ubuntu 16.04 64-bit Installation: https://openedx.atlassian.net/wiki/display/OpenOPS/Native+Open+edX+Ubuntu+16.04+64+bit+Installation
 

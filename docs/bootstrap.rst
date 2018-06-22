@@ -11,7 +11,7 @@ master branch and to the forthcoming Hawthorn release.
 
 If you are interested in the rationale for edX choosing Bootstrap, you can
 read about the decision in `OEP-16: Adopting Bootstrap
-<https://open-edx-proposals.readthedocs.io/en/latest/oep-0016.html>`_.
+<https://open-edx-proposals.readthedocs.io/en/latest/oep-0016-bp-adopt-bootstrap.html>`_.
 
 .. highlight:: none
 
