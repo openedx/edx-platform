@@ -115,4 +115,4 @@ class ApplicationOrganizationFilter(models.Model):
         """
         Return a unicode representation of this object.
         """
-        return unicode(':'.join([self.provider_type, self.organization.short_name])
+        return unicode(':'.join([self.provider_type, self.organization.short_name]))
