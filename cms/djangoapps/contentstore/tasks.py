@@ -84,15 +84,16 @@ VIDEO_LEVEL_TIMEOUT_SECONDS = 300
 
 
 @chord_task(bind=True)
-def task_status_callback(self, results, course_id, video_location):  # pylint: disable=unused-argument
+def task_status_callback(self, results, revision, course_id, video_location):  # pylint: disable=unused-argument
     """
     Callback for collating the results of chord.
     """
     transcript_tasks_count = len(list(results()))
 
     LOGGER.info(
-        "[%s] [video-transcripts-migration-complete-for-a-video] [tasks_count=%s] [course_id=%s] [video=%s]",
-        MIGRATION_LOGS_PREFIX, transcript_tasks_count, course_id, video_location
+        ("[%s] [video-transcripts-migration-complete-for-a-video] [tasks_count=%s] [course_id=%s] "
+         "[revision=%s] [video=%s]"),
+        MIGRATION_LOGS_PREFIX, transcript_tasks_count, course_id, revision, video_location
     )
 
 
@@ -122,11 +123,11 @@ def get_course_videos(course_key):
     Arguments:
         course_key: CourseKey object
     """
-    all_videos = []
+    all_videos = {}
     store = modulestore()
 
     # include published videos of the course.
-    all_videos += store.get_items(
+    all_videos[ModuleStoreEnum.RevisionOption.published_only] = store.get_items(
         course_key,
         qualifiers={'category': 'video'},
         revision=ModuleStoreEnum.RevisionOption.published_only,
@@ -134,7 +135,7 @@ def get_course_videos(course_key):
     )
 
     # include draft videos of the course.
-    all_videos += store.get_items(
+    all_videos[ModuleStoreEnum.RevisionOption.draft_only] = store.get_items(
         course_key,
         qualifiers={'category': 'video'},
         revision=ModuleStoreEnum.RevisionOption.draft_only,
@@ -163,30 +164,38 @@ def async_migrate_transcript(self, course_key, **kwargs):   # pylint: disable=un
         MIGRATION_LOGS_PREFIX, course_key
     )
 
-    for video in course_videos:
-        all_transcripts = video.transcripts
-        english_transcript = video.sub
-        if english_transcript:
-            all_transcripts.update({'en': video.sub})
+    for revision, videos in course_videos.items():
+        for video in videos:
+            all_transcripts = video.transcripts
+            english_transcript = video.sub
+            if english_transcript:
+                all_transcripts.update({'en': video.sub})
 
-        sub_tasks = []
-        video_location = unicode(video.location)
-        for lang in all_transcripts.keys():
-            sub_tasks.append(async_migrate_transcript_subtask.s(video_location, lang, force_update, **kwargs))
+            sub_tasks = []
+            video_location = unicode(video.location)
+            for lang in all_transcripts.keys():
+                sub_tasks.append(async_migrate_transcript_subtask.s(
+                    video_location, revision, lang, force_update, **kwargs
+                ))
 
-        if sub_tasks:
-            callback = task_status_callback.s(course_id=course_key, video_location=video_location)
-            chord(sub_tasks)(callback)
+            if sub_tasks:
+                callback = task_status_callback.s(
+                    revision=revision,
+                    course_id=course_key,
+                    video_location=video_location
+                )
+                chord(sub_tasks)(callback)
 
-            LOGGER.info(
-                "[%s] [transcripts-migration-tasks-submitted] [transcripts_count=%s] [course=%s] [video=%s]",
-                MIGRATION_LOGS_PREFIX, len(sub_tasks), course_key, video_location
-            )
-        else:
-            LOGGER.info(
-                "[%s] [no-video-transcripts] [course=%s] [video=%s]",
-                MIGRATION_LOGS_PREFIX, course_key, video_location
-            )
+                LOGGER.info(
+                    ("[%s] [transcripts-migration-tasks-submitted] "
+                     "[transcripts_count=%s] [course=%s] [revision=%s] [video=%s]"),
+                    MIGRATION_LOGS_PREFIX, len(sub_tasks), course_key, revision, video_location
+                )
+            else:
+                LOGGER.info(
+                    "[%s] [no-video-transcripts] [course=%s] [revision=%s] [video=%s]",
+                    MIGRATION_LOGS_PREFIX, course_key, revision, video_location
+                )
 
 
 def save_transcript_to_storage(edx_video_id, language_code, transcript_content, file_format, force_update):
@@ -235,22 +244,22 @@ def async_migrate_transcript_subtask(self, *args, **kwargs):  # pylint: disable=
     Migrates a transcript of a given video in a course as a new celery task.
     """
     success, failure = 'Success', 'Failure'
-    video_location, language_code, force_update = args
+    video_location, revision, language_code, force_update = args
     store = modulestore()
-    video = store.get_item(usage_key=BlockUsageLocator.from_string(video_location))
+    video = store.get_item(usage_key=BlockUsageLocator.from_string(video_location), revision=revision)
     edx_video_id = clean_video_id(video.edx_video_id)
 
     if not kwargs['commit']:
         LOGGER.info(
-            '[%s] [video-transcript-will-be-migrated] [video=%s] [edx_video_id=%s] [language_code=%s]',
-            MIGRATION_LOGS_PREFIX, video_location, edx_video_id, language_code
+            '[%s] [video-transcript-will-be-migrated] [revision=%s] [video=%s] [edx_video_id=%s] [language_code=%s]',
+            MIGRATION_LOGS_PREFIX, revision, video_location, edx_video_id, language_code
         )
         return success
 
     LOGGER.info(
-        ('[%s] [transcripts-migration-process-started-for-video-transcript] '
+        ('[%s] [transcripts-migration-process-started-for-video-transcript] [revision=%s] '
          '[video=%s] [edx_video_id=%s] [language_code=%s]'),
-        MIGRATION_LOGS_PREFIX, video_location, edx_video_id, language_code
+        MIGRATION_LOGS_PREFIX, revision, video_location, edx_video_id, language_code
     )
 
     try:
@@ -265,11 +274,19 @@ def async_migrate_transcript_subtask(self, *args, **kwargs):  # pylint: disable=
         if not edx_video_id:
             edx_video_id = create_external_video('external-video')
             video.edx_video_id = edx_video_id
-            store.update_item(video, ModuleStoreEnum.UserID.mgmt_command)
+
+            # determine branch published/draft
+            branch_setting = (
+                ModuleStoreEnum.Branch.published_only
+                if revision == ModuleStoreEnum.RevisionOption.published_only else
+                ModuleStoreEnum.Branch.draft_preferred
+            )
+            with store.branch_setting(branch_setting):
+                store.update_item(video, ModuleStoreEnum.UserID.mgmt_command)
 
             LOGGER.info(
-                '[%s] [generated-edx-video-id] [video=%s] [edx_video_id=%s] [language_code=%s]',
-                MIGRATION_LOGS_PREFIX, video_location, edx_video_id, language_code
+                '[%s] [generated-edx-video-id] [revision=%s] [video=%s] [edx_video_id=%s] [language_code=%s]',
+                MIGRATION_LOGS_PREFIX, revision, video_location, edx_video_id, language_code
             )
 
         save_transcript_to_storage(
@@ -279,25 +296,25 @@ def async_migrate_transcript_subtask(self, *args, **kwargs):  # pylint: disable=
             file_format=Transcript.SJSON,
             force_update=force_update,
         )
-    except (NotFoundError, TranscriptsGenerationException, ValCannotCreateError) as exc:
+    except (NotFoundError, TranscriptsGenerationException, ValCannotCreateError):
         LOGGER.exception(
-            ('[%s] [video-transcript-migration-failed-with-known-exc] [video=%s] '
+            ('[%s] [video-transcript-migration-failed-with-known-exc] [revision=%s] [video=%s] '
              '[edx_video_id=%s] [language_code=%s]'),
-            MIGRATION_LOGS_PREFIX, video_location, edx_video_id, language_code
+            MIGRATION_LOGS_PREFIX, revision, video_location, edx_video_id, language_code
         )
         return failure
     except Exception:
         LOGGER.exception(
-            ('[%s] [video-transcript-migration-failed-with-unknown-exc] '
+            ('[%s] [video-transcript-migration-failed-with-unknown-exc] [revision=%s] '
              '[video=%s] [edx_video_id=%s] [language_code=%s]'),
-            MIGRATION_LOGS_PREFIX, video_location, edx_video_id, language_code
+            MIGRATION_LOGS_PREFIX, revision, video_location, edx_video_id, language_code
         )
         raise
 
     LOGGER.info(
-        ('[%s] [video-transcript-migration-succeeded-for-a-video] '
+        ('[%s] [video-transcript-migration-succeeded-for-a-video] [revision=%s] '
          '[video=%s] [edx_video_id=%s] [language_code=%s]'),
-        MIGRATION_LOGS_PREFIX, video_location, edx_video_id, language_code
+        MIGRATION_LOGS_PREFIX, revision, video_location, edx_video_id, language_code
     )
     return success
 
