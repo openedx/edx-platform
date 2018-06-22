@@ -227,20 +227,20 @@ class TestMigrateTranscripts(ModuleStoreTestCase):
             (
                 'cms.djangoapps.contentstore.tasks', 'INFO',
                 (u'[Transcript Migration] [video-transcript-will-be-migrated] '
-                 u'[video={}] [edx_video_id=test_edx_video_id] '
+                 u'[revision=rev-opt-published-only] [video={}] [edx_video_id=test_edx_video_id] '
                  u'[language_code=hr]'.format(self.video_descriptor.location))
             ),
             (
                 'cms.djangoapps.contentstore.tasks', 'INFO',
                 (u'[Transcript Migration] [video-transcript-will-be-migrated] '
-                 u'[video={}] [edx_video_id=test_edx_video_id] '
+                 u'[revision=rev-opt-published-only] [video={}] [edx_video_id=test_edx_video_id] '
                  u'[language_code=ge]'.format(self.video_descriptor.location))
             ),
             (
                 'cms.djangoapps.contentstore.tasks', 'INFO',
                 (u'[Transcript Migration] [transcripts-migration-tasks-submitted] '
                  u'[transcripts_count=2] [course={}] '
-                 u'[video={}]'.format(course_id, self.video_descriptor.location))
+                 u'[revision=rev-opt-published-only] [video={}]'.format(course_id, self.video_descriptor.location))
             )
         )
 
@@ -264,20 +264,20 @@ class TestMigrateTranscripts(ModuleStoreTestCase):
             (
                 'cms.djangoapps.contentstore.tasks', 'INFO',
                 (u'[Transcript Migration] [transcripts-migration-process-started-for-video-transcript] '
-                 u'[video={}] [edx_video_id=test_edx_video_id_2] '
+                 u'[revision=rev-opt-published-only] [video={}] [edx_video_id=test_edx_video_id_2] '
                  u'[language_code=ge]'.format(self.video_descriptor_2.location))
             ),
             (
                 'cms.djangoapps.contentstore.tasks', 'ERROR',
                 (u'[Transcript Migration] [video-transcript-migration-failed-with-known-exc] '
-                 u'[video={}] [edx_video_id=test_edx_video_id_2] '
+                 u'[revision=rev-opt-published-only] [video={}] [edx_video_id=test_edx_video_id_2] '
                  u'[language_code=ge]'.format(self.video_descriptor_2.location))
             ),
             (
                 'cms.djangoapps.contentstore.tasks', 'INFO',
                 (u'[Transcript Migration] [transcripts-migration-tasks-submitted] '
                  u'[transcripts_count=1] [course={}] '
-                 u'[video={}]'.format(course_id, self.video_descriptor_2.location))
+                 u'[revision=rev-opt-published-only] [video={}]'.format(course_id, self.video_descriptor_2.location))
             )
         )
 
