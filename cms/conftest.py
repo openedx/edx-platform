@@ -25,7 +25,7 @@ def pytest_configure(config):
     """
     if config.getoption('help'):
         return
-    enable_contracts = os.environ.get('ENABLE_CONTRACTS', False)
+    enable_contracts = True #os.environ.get('ENABLE_CONTRACTS', False)
     if not enable_contracts:
         contracts.disable_all()
     settings_module = os.environ.get('DJANGO_SETTINGS_MODULE')

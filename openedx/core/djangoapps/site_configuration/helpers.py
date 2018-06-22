@@ -96,7 +96,7 @@ def get_configuration_dict(name, default=None):
     return output
 
 
-@contract(default=str)
+#@contract(default=str)
 def get_value(val_name, default=None, **kwargs):
     """
     Return configuration value for the key specified as name argument.
