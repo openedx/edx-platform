@@ -343,7 +343,7 @@ CREATE TABLE `auth_permission` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `content_type_id` (`content_type_id`,`codename`),
   CONSTRAINT `auth__content_type_id_508cf46651277a81_fk_django_content_type_id` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1083 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1086 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `auth_registration`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2092,7 +2092,7 @@ CREATE TABLE `django_content_type` (
   `model` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `django_content_type_app_label_45f3b1d93ec8c61c_uniq` (`app_label`,`model`)
-) ENGINE=InnoDB AUTO_INCREMENT=360 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=361 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_migrations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2103,7 +2103,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=457 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=460 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -4508,9 +4508,11 @@ CREATE TABLE `social_auth_code` (
   `email` varchar(254) NOT NULL,
   `code` varchar(32) NOT NULL,
   `verified` tinyint(1) NOT NULL,
+  `timestamp` datetime(6) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `social_auth_code_email_75f27066d057e3b6_uniq` (`email`,`code`),
-  KEY `social_auth_code_c1336794` (`code`)
+  KEY `social_auth_code_c1336794` (`code`),
+  KEY `social_auth_code_timestamp_176b341f` (`timestamp`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `social_auth_nonce`;
@@ -4534,8 +4536,10 @@ CREATE TABLE `social_auth_partial` (
   `next_step` smallint(5) unsigned NOT NULL,
   `backend` varchar(32) NOT NULL,
   `data` longtext NOT NULL,
+  `timestamp` datetime(6) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `social_auth_partial_94a08da1` (`token`)
+  KEY `social_auth_partial_94a08da1` (`token`),
+  KEY `social_auth_partial_timestamp_50f2119f` (`timestamp`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `social_auth_usersocialauth`;
@@ -5424,6 +5428,26 @@ CREATE TABLE `user_api_userpreference` (
   UNIQUE KEY `user_api_userpreference_user_id_4e4942d73f760072_uniq` (`user_id`,`key`),
   KEY `user_api_userpreference_3c6e0b8a` (`key`),
   CONSTRAINT `user_api_userpreference_user_id_68f8a34b_fk` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `user_api_userretirementpartnerreportingstatus`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `user_api_userretirementpartnerreportingstatus` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `created` datetime(6) NOT NULL,
+  `modified` datetime(6) NOT NULL,
+  `original_username` varchar(150) NOT NULL,
+  `original_email` varchar(254) NOT NULL,
+  `original_name` varchar(255) NOT NULL,
+  `is_being_processed` tinyint(1) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_id` (`user_id`),
+  KEY `user_api_userretirementpart_original_username_6bf5d3d1` (`original_username`),
+  KEY `user_api_userretirementpart_original_email_aaab0bc9` (`original_email`),
+  KEY `user_api_userretirementpart_original_name_9aedd7f0` (`original_name`),
+  CONSTRAINT `user_api_userretirem_user_id_272c8f78_fk_auth_user` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `user_api_userretirementrequest`;
