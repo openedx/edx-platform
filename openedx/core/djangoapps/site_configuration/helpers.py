@@ -1,6 +1,7 @@
 """
 Helpers methods for site configuration.
 """
+from contracts import contract
 from django.conf import settings
 
 from microsite_configuration import microsite
@@ -95,6 +96,7 @@ def get_configuration_dict(name, default=None):
     return output
 
 
+@contract(default=str)
 def get_value(val_name, default=None, **kwargs):
     """
     Return configuration value for the key specified as name argument.
