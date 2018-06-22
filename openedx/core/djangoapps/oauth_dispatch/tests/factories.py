@@ -31,8 +31,8 @@ class ApplicationAccessFactory(DjangoModelFactory):
     class Meta(object):
         model = ApplicationAccess
 
-    application=factory.SubFactory(ApplicationFactory)
-    scopes=['grades:read']
+    application = factory.SubFactory(ApplicationFactory)
+    scopes = ['grades:read']
 
 
 class AccessTokenFactory(DjangoModelFactory):

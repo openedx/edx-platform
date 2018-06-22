@@ -16,18 +16,18 @@ class ApplicationModelScopesTestCase(TestCase):
     """
     Tests for the ApplicationModelScopes custom DOT scopes backend.
     """
-    DEFAULT_SCOPES = ['scope1', 'scope2']
-
     @ddt.data(
-        (DEFAULT_SCOPES, []),
-        (DEFAULT_SCOPES, ['unsupported_scope:read']),
-        (DEFAULT_SCOPES + ['grades:read'], ['grades:read']),
-        (DEFAULT_SCOPES + ['grades:read','certificates:read'], ['grades:read', 'certificates:read']),
+        ([], []),
+        (['unsupported_scope:read'], []),
+        (['grades:read'], ['grades:read']),
+        (['grades:read', 'certificates:read'], ['grades:read', 'certificates:read']),
     )
     @ddt.unpack
-    @override_settings(OAUTH2_DEFAULT_SCOPES={'scope1': 'S1', 'scope2': 'S2'})
-    def test_get_available_scopes(self, expected_result, application_scopes):
+    def test_get_available_scopes(self, application_scopes, expected_additional_scopes):
         """ Verify the settings backend returns the expected available scopes. """
         application_access = ApplicationAccessFactory(scopes=application_scopes)
         scopes = ApplicationModelScopes()
-        assert set(scopes.get_available_scopes(application_access.application)) == set(expected_result)
+        self.assertEqual(
+            set(scopes.get_available_scopes(application_access.application)),
+            set(settings.OAUTH2_DEFAULT_SCOPES.keys() + expected_additional_scopes),
+        )

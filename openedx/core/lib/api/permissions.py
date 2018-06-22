@@ -52,7 +52,6 @@ class ApiKeyHeaderPermissionIsAuthenticated(ApiKeyHeaderPermission, permissions.
         return api_permissions or is_authenticated_permissions
 
 
-
 class IsCourseStaffInstructor(permissions.BasePermission):
     """
     Permission to check that user is a course instructor or staff of

@@ -316,7 +316,7 @@ def _get_authorized_user(requesting_user, username=None, allow_staff=False):
             username = requesting_user.username
 
     _check_authorized(requesting_user, username, allow_staff)
-    
+
     try:
         existing_user = User.objects.get(username=username)
     except ObjectDoesNotExist:
