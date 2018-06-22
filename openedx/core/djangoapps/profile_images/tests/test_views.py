@@ -243,7 +243,6 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
         self.assertFalse(mock_log.info.called)
         self.assert_no_events_were_emitted()
 
-
     def test_upload_other(self, mock_log):
         """
         Test that an authenticated user cannot POST to another user's upload
