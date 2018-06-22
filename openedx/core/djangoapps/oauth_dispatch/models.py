@@ -85,7 +85,7 @@ class ApplicationAccess(models.Model):
         )
 
 
-class ApplicationOrganization(models.Model):
+class ApplicationOrganizationFilter(models.Model):
     """
     Associates an organization to a given ScopedApplication including the
     provider type of the organization so that organization-based filters
@@ -99,10 +99,7 @@ class ApplicationOrganization(models.Model):
         (CONTENT_PROVIDER_TYPE, _('Content Provider')),
     )
 
-    application = models.ForeignKey(
-        oauth2_settings.APPLICATION_MODEL,
-        related_name='organizations',
-    )
+    application = models.ForeignKey(oauth2_settings.APPLICATION_MODEL, related_name='org_filters')
     organization = models.ForeignKey(Organization)
     provider_type = models.CharField(
         max_length=32,
@@ -118,7 +115,4 @@ class ApplicationOrganization(models.Model):
         """
         Return a unicode representation of this object.
         """
-        return u"{application_name}:{org}".format(
-            application_name=self.application.name,
-            org=self.organization.short_name,
-        )
+        return unicode(':'.join([self.provider_type, self.organization.short_name])

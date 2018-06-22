@@ -13,7 +13,7 @@ class DOTAdapter(object):
     """
 
     backend = object()
-    FILTER_USER_ME = 'user:me'
+    FILTER_USER_ME = u'user:me'
 
     def create_confidential_client(self,
                                    name,
@@ -92,7 +92,7 @@ class DOTAdapter(object):
         Get the authorization filters for the given client application.
         """
         application = self.get_client(client_id=client_id)
-        filters = [':'.join([org.provider_type, org.short_name]) for org in application.organizations.all()]
+        filters = [unicode(f) for f in application.org_filters.all()]
         if application.authorization_grant_type == application.GRANT_CLIENT_CREDENTIALS:
             filters.append(self.FILTER_USER_ME)
         return filters
