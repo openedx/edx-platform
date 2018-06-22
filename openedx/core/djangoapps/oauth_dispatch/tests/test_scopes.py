@@ -3,10 +3,10 @@ Tests for custom DOT scopes backend.
 """
 import ddt
 from django.conf import settings
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from openedx.core.djangoapps.oauth_dispatch.scopes import ApplicationModelScopes
-from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory, ApplicationAccessFactory
+from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationAccessFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
@@ -16,7 +16,7 @@ class ApplicationModelScopesTestCase(TestCase):
     """
     Tests for the ApplicationModelScopes custom DOT scopes backend.
     """
-    DEFAULT_SCOPES = settings.OAUTH2_DEFAULT_SCOPES.keys()
+    DEFAULT_SCOPES = ['scope1', 'scope2']
 
     @ddt.data(
         (DEFAULT_SCOPES, []),
@@ -25,6 +25,7 @@ class ApplicationModelScopesTestCase(TestCase):
         (DEFAULT_SCOPES + ['grades:read','certificates:read'], ['grades:read', 'certificates:read']),
     )
     @ddt.unpack
+    @override_settings(OAUTH2_DEFAULT_SCOPES={'scope1': 'S1', 'scope2': 'S2'})
     def test_get_available_scopes(self, expected_result, application_scopes):
         """ Verify the settings backend returns the expected available scopes. """
         application_access = ApplicationAccessFactory(scopes=application_scopes)

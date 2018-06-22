@@ -107,8 +107,7 @@ class CertificatesRestApiTest(SharedModuleStoreTestCase, APITestCase):
         # another student
         self.client.login(username=self.student_no_cert.username, password=USER_PASSWORD)
         resp = self.client.get(self.get_url(self.student.username))
-        # gets 404 instead of 403 for security reasons
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(resp.data, {u'detail': u'Not found.'})
         self.client.logout()
 

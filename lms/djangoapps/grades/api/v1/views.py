@@ -151,7 +151,7 @@ class CourseGradesView(GradeViewMixin, GenericAPIView):
     permission_classes = (
         permissions.JwtHasContentOrgFilterForRequestedCourse,
         permissions.JwtHasScope,
-        C(permissions.IsStaff) | permissions.IsJwtAuthenticated | permissions.IsUserInUrl,
+        C(permissions.IsJwtAuthenticated) | permissions.IsStaff | permissions.IsUserInUrl,
     )
     required_scopes = ['grades:read']
 

@@ -71,6 +71,10 @@ class ApplicationAccess(models.Model):
     class Meta:
         app_label = 'oauth_dispatch'
 
+    @classmethod
+    def get_scopes(cls, application):
+        return cls.objects.get(application=application).scopes
+
     def __unicode__(self):
         """
         Return a unicode representation of this object.
