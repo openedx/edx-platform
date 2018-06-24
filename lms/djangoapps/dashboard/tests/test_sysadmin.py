@@ -2,30 +2,32 @@
 Provide tests for sysadmin dashboard feature in sysadmin.py
 """
 import glob
-import os
-import re
 import shutil
 import unittest
 from datetime import datetime
 from uuid import uuid4
 
 import mongoengine
+import os
+import re
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.utils.timezone import utc as UTC
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-
-from dashboard.git_import import GitImportErrorNoDir
-from dashboard.models import CourseImportLog
-from student.roles import CourseStaffRole, GlobalStaff
-from student.tests.factories import UserFactory
-from util.date_utils import DEFAULT_DATE_TIME_FORMAT, get_time_display
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
+
+from dashboard.git_import import GitImportErrorNoDir
+from dashboard.models import CourseImportLog
+from dashboard.sysadmin import Users
+from student.roles import CourseStaffRole, GlobalStaff
+from student.tests.factories import UserFactory
+from util.date_utils import DEFAULT_DATE_TIME_FORMAT, get_time_display
 
 TEST_MONGODB_LOG = {
     'host': MONGO_HOST,
@@ -363,3 +365,75 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
                       response.content)
 
         self._rm_edx4edx()
+
+
+@unittest.skipUnless(
+    settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'),
+    "ENABLE_SYSADMIN_DASHBOARD not set"
+)
+class TestUserCreation(SysadminBaseTestCase):
+    """
+    Test creating user with sysadmin dashboard.
+    """
+
+    def test_user_creation_throw_request(self):
+        """
+        Test user creation through the post request.
+        """
+        self._setstaff_login()
+        data = {
+            'student_uname': 'test_user_creation_throw_request@example.com',
+            'student_fullname': 'testser throwrequest',
+            'student_password': 'edx',
+            'action': 'create_user',
+        }
+
+        self.client.post(reverse('sysadmin'), data=data)
+
+        result = self.client.post(reverse('sysadmin'), data=data)
+        self.assertEqual(
+            result.status_code,
+            200,
+            'Creating user with same username must return code 200 and message with error description'
+        )
+
+        self.assertContains(
+            result,
+            text='This username already taken'
+        )
+
+    def test_user_create_message(self):
+        """
+        Test user creation through the post request.
+        """
+        self._setstaff_login()
+        data = {
+            'uname': 'test_user_create_message@example.com',
+            'name': 'test_user create_message',
+            'password': 'edx',
+        }
+        users_api = Users()
+
+        creation_result = users_api.create_user(**data)
+        self.assertEqual(
+            'User {user} created successfully!'.format(user=User.objects.get(username=data['uname'])),
+            creation_result
+        )
+
+        self.assertEqual(
+            'This username already taken',
+            users_api.create_user(**data)
+        )
+
+        # Creates situation, when email is already taken.
+        taken_email = 'taken_email@example.com'
+        User.objects.create_user(
+            username='one_more_user',
+            email=taken_email,
+        )
+        # Sysadmin dashboard uses field uname as username and email.
+        data['uname'] = taken_email
+        self.assertEqual(
+            'This email already taken',
+            users_api.create_user(**data)
+        )

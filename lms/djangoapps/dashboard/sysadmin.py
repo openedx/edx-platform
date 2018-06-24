@@ -192,6 +192,12 @@ class Users(SysadminDashboardView):
                 return msg
             new_password = password
 
+        if User.objects.filter(username=uname).exists():
+            return _('This username already taken')
+
+        if User.objects.filter(email=email).exists():
+            return _('This email already taken')
+
         user = User(username=uname, email=email, is_active=True)
         user.set_password(new_password)
         try:
