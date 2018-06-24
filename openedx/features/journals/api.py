@@ -142,7 +142,7 @@ def fetch_journal_access(site, user):   # pylint: disable=unused-argument
         get_latest=True
     )
 
-    return journal_access_records
+    return journal_access_records.get('results', [])
 
 
 def get_cache_key(**kwargs):
