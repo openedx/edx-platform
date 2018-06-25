@@ -114,12 +114,23 @@ define(['js/views/validation',
                 var self = this;
                 this.model.save({}, {
                     success: function() {
-                        var title = gettext('Your policy changes have been saved.');
-                        var message = gettext('No validation is performed on policy keys or value pairs. If you are having difficulties, check your formatting.');  // eslint-disable-line max-len
-                        self.render();
-                        self.showSavedBar(title, message);
-                        analytics.track('Saved Advanced Settings', {
-                            'course': course_location_analytics
+                        $.ajax({
+                            url: '/course/'+course_location_analytics+'/search_reindex',
+                            success: function(response) {
+                                console.log(response);
+                                var title = gettext('Your policy changes have been saved.');
+                                var message = gettext('No validation is performed on policy keys or value pairs. If you are having difficulties, check your formatting.');
+                                self.render();
+                                self.showSavedBar(title, message);
+                                analytics.track('Saved Advanced Settings', {
+                                    'course': course_location_analytics
+                                });
+                                if (response.status != 200) {
+                                    err_modal = new ValidationErrorModal();
+                                    err_modal.setContent(response);
+                                    err_modal.show();
+                                }
+                            }
                         });
                     },
                     silent: true,

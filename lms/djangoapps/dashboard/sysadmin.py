@@ -41,6 +41,8 @@ from student.models import CourseEnrollment, Registration, UserProfile
 from student.roles import CourseInstructorRole, CourseStaffRole
 from xmodule.modulestore.django import modulestore
 from search.search_engine_base import SearchEngine
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 log = logging.getLogger(__name__)
 
@@ -189,6 +191,12 @@ class Users(SysadminDashboardView):
                 msg += _('email address required (not username)')
                 return msg
             new_password = password
+
+        if User.objects.filter(username=uname).exists():
+            return _('This username already taken')
+
+        if User.objects.filter(email=email).exists():
+            return _('This email already taken')
 
         user = User(username=uname, email=email, is_active=True)
         user.set_password(new_password)
@@ -495,10 +503,16 @@ class Courses(SysadminDashboardView):
                 # delete course that is stored with mongodb backend
                 self.def_ms.delete_course(course.id, request.user.id)
 
-                response = self._searcher.search(doc_type="courseware_content", field_dictionary={'course': course_id})
-                result_ids = [result["data"]["id"] for result in response["results"]]
-                self._searcher.remove('courseware_content', result_ids)
-                self._searcher.remove('course_info', [course_id])
+                # delete search index
+                try:
+                    response = self._searcher.search(doc_type="courseware_content", field_dictionary={'course': course_id})
+                    result_ids = [result["data"]["id"] for result in response["results"]]
+                    self._searcher.remove('courseware_content', result_ids)
+                    self._searcher.remove('course_info', [course_id])
+                except Exception as e: # pragma: no cover
+                    log.error(e.message)
+
+                CourseOverview.objects.filter(id=course.id).delete()
 
                 # don't delete user permission groups, though
                 self.msg += \
