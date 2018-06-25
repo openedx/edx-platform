@@ -113,4 +113,7 @@ class Command(BaseCommand):
         Invokes the migrate transcripts enqueue function.
         """
         course_keys, force_update, commit = self._get_migration_options(options)
-        enqueue_async_migrate_transcripts_tasks(course_keys, force_update=force_update, commit=commit)
+        command_run = self._latest_settings().increment_run() if commit else -1
+        enqueue_async_migrate_transcripts_tasks(
+            course_keys=course_keys, commit=commit, command_run=command_run, force_update=force_update
+        )
