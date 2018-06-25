@@ -182,8 +182,27 @@ Mostly adapted from math.stackexchange.com: http://cdn.sstatic.net/js/mathjax-ed
         $elem.empty();
         _append = appended_id || "";
         wmdInputId = "wmd-input" + _append;
-        $wmdPreviewContainer = $("<div>").addClass("wmd-preview-container").attr("role", "region").attr("aria-label", gettext("HTML preview of post")).append($("<div>").addClass("wmd-preview-label").text(gettext("Preview"))).append($("<div>").attr("id", "wmd-preview" + _append).addClass("wmd-panel wmd-preview"));
-        $wmdPanel = $("<div>").addClass("wmd-panel").append($("<div>").attr("id", "wmd-button-bar" + _append)).append($("<label>").addClass("sr").attr("for", wmdInputId).text(gettext("Your question or idea (required)"))).append($("<textarea>").addClass("wmd-input").attr("id", wmdInputId).html(initialText)).append($wmdPreviewContainer); // xss-lint: disable=javascript-jquery-html
+        $wmdPreviewContainer = $("<div>").addClass("wmd-preview-container")
+                                         .attr("role", "region")
+                                         .attr("aria-label", gettext("HTML preview of post"))
+                                         .append($("<div>")
+                                         .addClass("wmd-preview-label")
+                                         .text(gettext("Preview")))
+                                         .append($("<div>")
+                                         .attr("id", "wmd-preview" + _append)
+                                         .addClass("wmd-panel wmd-preview"));
+        $wmdPanel = $("<div>").addClass("wmd-panel")
+                              .append($("<div>")
+                              .addClass("wmd-button-bar" + _append))
+                              .append($("<label>")
+                              .addClass("sr")
+                              .attr("for", wmdInputId)
+                              .text(gettext("Your question or idea (required)")))
+                              .append($("<textarea>")
+                              .addClass("wmd-input")
+                              .attr("id", wmdInputId)
+                              .html(initialText))
+                              .append($wmdPreviewContainer); // xss-lint: disable=javascript-jquery-html
         $elem.append($wmdPanel);
       }
       converter = Markdown.getMathCompatibleConverter(postProcessor);
