@@ -108,7 +108,7 @@ class CertificatesRestApiTest(SharedModuleStoreTestCase, APITestCase):
         self.client.login(username=self.student_no_cert.username, password=USER_PASSWORD)
         resp = self.client.get(self.get_url(self.student.username))
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertEqual(resp.data, {u'detail': u'Not found.'})
+        self.assertEqual(resp.data, {u'detail': u'You do not have permission to perform this action.'})
         self.client.logout()
 
         # same student of the certificate
