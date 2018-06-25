@@ -19,6 +19,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from six import text_type, iteritems
+import waffle
 
 import track.views
 from bulk_email.models import BulkEmailFlag, Optout  # pylint: disable=import-error
@@ -27,6 +28,7 @@ from courseware.access import has_access
 from edxmako.shortcuts import render_to_response, render_to_string
 from entitlements.models import CourseEntitlement
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
+from lms.djangoapps.learner_dashboard.utils import display_incomplete_profile_notification
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps import monitoring_utils
 from openedx.core.djangoapps.catalog.utils import (
@@ -627,6 +629,16 @@ def student_dashboard(request):
             link_end=HTML("</a>"),
         )
 
+    # Incomplete profile message
+    incomplete_profile_message = Text(_(
+        "Please {link_start}complete your profile{link_end}."
+    )).format(
+        link_start=HTML("<a href='{account_settings_link}'>").format(
+            account_settings_link=reverse('account_settings')
+        ),
+        link_end=HTML("</a>"),
+    )
+
     enterprise_message = get_dashboard_consent_notification(request, user, course_enrollments)
 
     # Disable lookup of Enterprise consent_required_course due to ENT-727
@@ -791,6 +803,7 @@ def student_dashboard(request):
         'redirect_message': redirect_message,
         'account_activation_messages': account_activation_messages,
         'activate_account_message': activate_account_message,
+        'incomplete_profile_message': incomplete_profile_message,
         'course_enrollments': course_enrollments,
         'course_entitlements': course_entitlements,
         'course_entitlement_available_sessions': course_entitlement_available_sessions,
@@ -826,6 +839,10 @@ def student_dashboard(request):
         'display_course_modes_on_dashboard': enable_verified_certificates and display_course_modes_on_dashboard,
         'display_sidebar_on_dashboard': display_sidebar_on_dashboard,
         'display_sidebar_account_activation_message': not(user.is_active or hide_dashboard_courses_until_activated),
+        'display_incomplete_profile_message': (
+            waffle.switch_is_active('enable_incomplete_profile_notification') and
+            display_incomplete_profile_notification(request)
+        ),
         'display_dashboard_courses': (user.is_active or not hide_dashboard_courses_until_activated),
         'empty_dashboard_message': empty_dashboard_message,
     }

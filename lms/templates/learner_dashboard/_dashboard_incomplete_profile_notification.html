@@ -1,0 +1,19 @@
+<%page expression_filter="h"/>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
+<div class="profile-sidebar" role="region" aria-labelledby="account-activation-title">
+  <div class="user-info">
+    <ul>
+      <li class="status status-verification warning" aria-labelledby="status-title" tabindex="-1">
+        <span id="status-title" class="title status-title">
+          <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+          <span class="sr">${_("Your profile has missing fields!")}</span>
+          ${_("Your profile has missing fields!")}
+        </span>
+        <p class="status-note">${ incomplete_profile_message | n, decode.utf8 }</p>
+      </li>
+    </ul>
+  </div>
+</div>

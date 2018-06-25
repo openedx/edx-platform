@@ -238,6 +238,12 @@ from student.models import CourseEnrollment
           </div>
         %endif
 
+        %if display_incomplete_profile_message:
+          <div class="sidebar-notification">
+            <%include file="${static.get_template_path('learner_dashboard/_dashboard_incomplete_profile_notification.html')}" />
+          </div>
+        %endif
+
         % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
           <div id="dashboard-search-bar" class="search-bar dashboard-search-bar" role="search" aria-label="Dashboard">
             <form class="search-form">
