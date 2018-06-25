@@ -221,24 +221,24 @@ class TestMigrateTranscripts(ModuleStoreTestCase):
         expected_log = (
             (
                 'cms.djangoapps.contentstore.tasks', 'INFO',
-                (u'[Transcript Migration] [video-transcripts-migration-process-started-for-course] '
+                (u'[Transcript Migration] [run=-1] [video-transcripts-migration-process-started-for-course] '
                  u'[course={}]'.format(course_id))
             ),
             (
                 'cms.djangoapps.contentstore.tasks', 'INFO',
-                (u'[Transcript Migration] [video-transcript-will-be-migrated] '
+                (u'[Transcript Migration] [run=-1] [video-transcript-will-be-migrated] '
                  u'[revision=rev-opt-published-only] [video={}] [edx_video_id=test_edx_video_id] '
                  u'[language_code=hr]'.format(self.video_descriptor.location))
             ),
             (
                 'cms.djangoapps.contentstore.tasks', 'INFO',
-                (u'[Transcript Migration] [video-transcript-will-be-migrated] '
+                (u'[Transcript Migration] [run=-1] [video-transcript-will-be-migrated] '
                  u'[revision=rev-opt-published-only] [video={}] [edx_video_id=test_edx_video_id] '
                  u'[language_code=ge]'.format(self.video_descriptor.location))
             ),
             (
                 'cms.djangoapps.contentstore.tasks', 'INFO',
-                (u'[Transcript Migration] [transcripts-migration-tasks-submitted] '
+                (u'[Transcript Migration] [run=-1] [transcripts-migration-tasks-submitted] '
                  u'[transcripts_count=2] [course={}] '
                  u'[revision=rev-opt-published-only] [video={}]'.format(course_id, self.video_descriptor.location))
             )
@@ -258,24 +258,24 @@ class TestMigrateTranscripts(ModuleStoreTestCase):
         expected_log = (
             (
                 'cms.djangoapps.contentstore.tasks', 'INFO',
-                (u'[Transcript Migration] [video-transcripts-migration-process-started-for-course] '
+                (u'[Transcript Migration] [run=1] [video-transcripts-migration-process-started-for-course] '
                  u'[course={}]'.format(course_id))
             ),
             (
                 'cms.djangoapps.contentstore.tasks', 'INFO',
-                (u'[Transcript Migration] [transcripts-migration-process-started-for-video-transcript] '
+                (u'[Transcript Migration] [run=1] [transcripts-migration-process-started-for-video-transcript] '
                  u'[revision=rev-opt-published-only] [video={}] [edx_video_id=test_edx_video_id_2] '
                  u'[language_code=ge]'.format(self.video_descriptor_2.location))
             ),
             (
                 'cms.djangoapps.contentstore.tasks', 'ERROR',
-                (u'[Transcript Migration] [video-transcript-migration-failed-with-known-exc] '
+                (u'[Transcript Migration] [run=1] [video-transcript-migration-failed-with-known-exc] '
                  u'[revision=rev-opt-published-only] [video={}] [edx_video_id=test_edx_video_id_2] '
                  u'[language_code=ge]'.format(self.video_descriptor_2.location))
             ),
             (
                 'cms.djangoapps.contentstore.tasks', 'INFO',
-                (u'[Transcript Migration] [transcripts-migration-tasks-submitted] '
+                (u'[Transcript Migration] [run=1] [transcripts-migration-tasks-submitted] '
                  u'[transcripts_count=1] [course={}] '
                  u'[revision=rev-opt-published-only] [video={}]'.format(course_id, self.video_descriptor_2.location))
             )

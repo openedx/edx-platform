@@ -2,7 +2,7 @@
 Configuration models for Video XModule
 """
 from config_models.models import ConfigurationModel
-from django.db.models import BooleanField, TextField
+from django.db.models import BooleanField, TextField, PositiveIntegerField
 from opaque_keys.edx.django.models import CourseKeyField
 
 
@@ -149,6 +149,7 @@ class TranscriptMigrationSetting(ConfigurationModel):
         default=False,
         help_text="Flag to force migrate transcripts for the requested courses, overwrite if already present."
     )
+    command_run = PositiveIntegerField(default=0)
     commit = BooleanField(
         default=False,
         help_text="Dry-run or commit."
@@ -161,3 +162,11 @@ class TranscriptMigrationSetting(ConfigurationModel):
         blank=False,
         help_text="Whitespace-separated list of course keys for which to migrate transcripts."
     )
+
+    def increment_run(self):
+        """
+        Increments the run which indicates how many time the mgmt. command has run.
+        """
+        self.command_run += 1
+        self.save()
+        return self.command_run
