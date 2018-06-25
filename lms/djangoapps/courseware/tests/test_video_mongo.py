@@ -988,63 +988,6 @@ class TestGetHtmlMethod(BaseTestXmodule):
 
 
 @attr(shard=7)
-class TestVideoCDNRewriting(BaseTestXmodule):
-    """
-    Tests for Video CDN.
-    """
-
-    def setUp(self, *args, **kwargs):
-        super(TestVideoCDNRewriting, self).setUp(*args, **kwargs)
-        self.original_video_file = "original_video.mp4"
-        self.original_video_url = "http://www.originalvideo.com/" + self.original_video_file
-
-    @patch.dict("django.conf.settings.CDN_VIDEO_URLS",
-                {"CN": "https://chinacdn.cn/"})
-    def test_rewrite_video_url_success(self):
-        """
-        Test successful CDN request.
-        """
-        cdn_response_video_url = settings.CDN_VIDEO_URLS["CN"] + self.original_video_file
-
-        self.assertEqual(
-            rewrite_video_url(settings.CDN_VIDEO_URLS["CN"], self.original_video_url),
-            cdn_response_video_url
-        )
-
-    @patch.dict("django.conf.settings.CDN_VIDEO_URLS",
-                {"CN": "https://chinacdn.cn/"})
-    def test_rewrite_url_concat(self):
-        """
-        Test that written URLs are returned clean despite input
-        """
-        cdn_response_video_url = settings.CDN_VIDEO_URLS["CN"] + "original_video.mp4"
-
-        self.assertEqual(
-            rewrite_video_url(settings.CDN_VIDEO_URLS["CN"] + "///", self.original_video_url),
-            cdn_response_video_url
-        )
-
-    def test_rewrite_video_url_invalid_url(self):
-        """
-        Test if no alternative video in CDN exists.
-        """
-        invalid_cdn_url = 'http://http://fakecdn.com/'
-        self.assertIsNone(rewrite_video_url(invalid_cdn_url, self.original_video_url))
-
-    def test_none_args(self):
-        """
-        Ensure None args return None
-        """
-        self.assertIsNone(rewrite_video_url(None, None))
-
-    def test_emptystring_args(self):
-        """
-        Ensure emptyrstring args return None
-        """
-        self.assertIsNone(rewrite_video_url("", ""))
-
-
-@attr(shard=7)
 @ddt.ddt
 class TestVideoDescriptorInitialization(BaseTestXmodule):
     """
