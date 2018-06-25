@@ -185,7 +185,7 @@ class SingleUserGradesTests(GradeViewTestMixin, APITestCase):
         self.client.logout()
         self.client.login(username=self.other_student.username, password=self.password)
         resp = self.client.get(self.get_url(self.student.username))
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_self_get_grade_not_enrolled(self):
         """
@@ -337,7 +337,7 @@ class CourseGradesViewTest(GradeViewTestMixin, APITestCase):
 
     def test_student(self):
         resp = self.client.get(self.get_url())
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_course_does_not_exist(self):
         self.client.logout()

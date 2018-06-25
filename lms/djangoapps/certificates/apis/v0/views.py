@@ -1,15 +1,20 @@
 """ API v0 views. """
 import logging
 
-from edx_rest_framework_extensions.authentication import JwtAuthentication
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
+from rest_condition import C
 from rest_framework.generics import GenericAPIView
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from edx_rest_framework_extensions import permissions
+from edx_rest_framework_extensions.authentication import JwtAuthentication
 
 from lms.djangoapps.certificates.api import get_certificate_for_user
-from openedx.core.lib.api import authentication, permissions
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+from openedx.core.lib.api.view_utils import view_auth_classes
+from openedx.core.lib.api.authentication import (
+    OAuth2AuthenticationAllowInactiveUser,
+    SessionAuthenticationAllowInactiveUser
+)
 
 log = logging.getLogger(__name__)
 
@@ -68,16 +73,21 @@ class CertificatesDetailView(GenericAPIView):
                 "grade": "0.98"
             }
     """
-
     authentication_classes = (
-        authentication.OAuth2AuthenticationAllowInactiveUser,
-        authentication.SessionAuthenticationAllowInactiveUser,
         JwtAuthentication,
+        OAuth2AuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
     )
-    permission_classes = (
-        IsAuthenticated,
-        permissions.IsUserInUrlOrStaff
+
+    jwt_auth_permission = (
+        C(permissions.IsJwtAuthenticated) &
+        permissions.JwtHasContentOrgFilterForRequestedCourse &
+        permissions.JwtHasScope
     )
+    session_auth_permission = C(permissions.IsStaff) | permissions.IsUserInUrl
+    permission_classes = (jwt_auth_permission | session_auth_permission,)
+
+    required_scopes = ['certificates:read']
 
     def get(self, request, username, course_id):
         """

@@ -4,16 +4,17 @@ import logging
 from django.contrib.auth import get_user_model
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from rest_condition import C
 from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
+from edx_rest_framework_extensions import permissions
 from enrollment import data as enrollment_data
 from student.models import CourseEnrollment
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.lib.api.permissions import IsUserInUrlOrStaff
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 
 log = logging.getLogger(__name__)
@@ -147,7 +148,12 @@ class CourseGradesView(GradeViewMixin, GenericAPIView):
             "letter_grade": null,
         }]
     """
-    permission_classes = (IsUserInUrlOrStaff,)
+    permission_classes = (
+        permissions.JwtHasContentOrgFilterForRequestedCourse,
+        permissions.JwtHasScope,
+        C(permissions.IsJwtAuthenticated) | permissions.IsStaff | permissions.IsUserInUrl,
+    )
+    required_scopes = ['grades:read']
 
     def get(self, request, course_id=None):
         """

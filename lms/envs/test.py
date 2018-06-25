@@ -553,12 +553,6 @@ FEATURES['ORGANIZATIONS_APP'] = True
 # Financial assistance page
 FEATURES['ENABLE_FINANCIAL_ASSISTANCE_FORM'] = True
 
-JWT_AUTH.update({
-    'JWT_SECRET_KEY': 'test-secret',
-    'JWT_ISSUER': 'https://test-provider/oauth2',
-    'JWT_AUDIENCE': 'test-key',
-})
-
 COURSE_CATALOG_API_URL = 'https://catalog.example.com/api/v1'
 
 COMPREHENSIVE_THEME_DIRS = [REPO_ROOT / "themes", REPO_ROOT / "common/test"]

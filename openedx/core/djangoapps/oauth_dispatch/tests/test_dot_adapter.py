@@ -13,6 +13,10 @@ import ddt
 from oauth2_provider import models
 from student.tests.factories import UserFactory
 
+
+Application = models.get_application_model()
+
+
 # oauth_dispatch is not in CMS' INSTALLED_APPS so these imports will error during test collection
 if settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"):
     from ..adapters import DOTAdapter
@@ -59,13 +63,13 @@ class DOTAdapterTestCase(TestCase):
         ))
 
     @ddt.data(
-        ('confidential', models.Application.CLIENT_CONFIDENTIAL),
-        ('public', models.Application.CLIENT_PUBLIC),
+        ('confidential', Application.CLIENT_CONFIDENTIAL),
+        ('public', Application.CLIENT_PUBLIC),
     )
     @ddt.unpack
     def test_create_client(self, client_name, client_type):
         client = getattr(self, '{}_client'.format(client_name))
-        self.assertIsInstance(client, models.Application)
+        self.assertIsInstance(client, Application)
         self.assertEqual(client.client_id, '{}-client-id'.format(client_name))
         self.assertEqual(client.client_type, client_type)
 
@@ -76,13 +80,13 @@ class DOTAdapterTestCase(TestCase):
         """
         client = self.adapter.get_client(
             redirect_uris=DUMMY_REDIRECT_URL,
-            client_type=models.Application.CLIENT_CONFIDENTIAL
+            client_type=Application.CLIENT_CONFIDENTIAL
         )
-        self.assertIsInstance(client, models.Application)
-        self.assertEqual(client.client_type, models.Application.CLIENT_CONFIDENTIAL)
+        self.assertIsInstance(client, Application)
+        self.assertEqual(client.client_type, Application.CLIENT_CONFIDENTIAL)
 
     def test_get_client_not_found(self):
-        with self.assertRaises(models.Application.DoesNotExist):
+        with self.assertRaises(Application.DoesNotExist):
             self.adapter.get_client(client_id='not-found')
 
     def test_get_client_for_token(self):

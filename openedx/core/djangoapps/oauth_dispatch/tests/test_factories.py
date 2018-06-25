@@ -2,11 +2,14 @@
 
 from django.conf import settings
 from django.test import TestCase
-from oauth2_provider.models import Application, AccessToken, RefreshToken
+from oauth2_provider.models import get_application_model, AccessToken, RefreshToken
 import unittest
 
 from openedx.core.djangoapps.oauth_dispatch.tests import factories
 from student.tests.factories import UserFactory
+
+
+Application = get_application_model()
 
 
 @unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")

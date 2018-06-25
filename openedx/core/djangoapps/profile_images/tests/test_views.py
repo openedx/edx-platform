@@ -243,6 +243,16 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
         self.assertFalse(mock_log.info.called)
         self.assert_no_events_were_emitted()
 
+    def test_upload_nonexistent_user(self, mock_log):
+        """
+        Test that an authenticated user who POSTs to a non-existent user's upload
+        endpoint gets an indistinguishable 403.
+        """
+        nonexistent_user_url = reverse(self._view_name, kwargs={'username': 'nonexistent'})
+        with make_image_file() as image_file:
+            response = self.client.post(nonexistent_user_url, {'file': image_file}, format='multipart')
+            self.check_response(response, 403)
+
     def test_upload_other(self, mock_log):
         """
         Test that an authenticated user cannot POST to another user's upload
@@ -255,7 +265,7 @@ class ProfileImageViewPostTestCase(ProfileImageEndpointMixin, APITestCase):
         different_client.login(username=different_user.username, password=TEST_PASSWORD)
         with make_image_file() as image_file:
             response = different_client.post(self.url, {'file': image_file}, format='multipart')
-            self.check_response(response, 404)
+            self.check_response(response, 403)
             self.check_images(False)
             self.check_has_profile_image(False)
         self.assertFalse(mock_log.info.called)
@@ -407,7 +417,7 @@ class ProfileImageViewDeleteTestCase(ProfileImageEndpointMixin, APITestCase):
         different_client = APIClient()
         different_client.login(username=different_user.username, password=TEST_PASSWORD)
         response = different_client.delete(self.url)
-        self.check_response(response, 404)
+        self.check_response(response, 403)
         self.check_images(True)  # thumbnails should remain intact.
         self.check_has_profile_image(True)
         self.assertFalse(mock_log.info.called)

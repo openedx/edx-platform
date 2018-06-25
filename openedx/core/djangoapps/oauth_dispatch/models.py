@@ -9,7 +9,12 @@ from django.utils.translation import ugettext_lazy as _
 from django_mysql.models import ListCharField
 from oauth2_provider.models import AbstractApplication
 from oauth2_provider.settings import oauth2_settings
+from organizations.models import Organization
 from pytz import utc
+
+from openedx.core.djangoapps.request_cache import get_request_or_stub
+
+from .toggles import UNEXPIRED_RESTRICTED_APPLICATIONS
 
 
 class RestrictedApplication(models.Model):
@@ -23,6 +28,9 @@ class RestrictedApplication(models.Model):
 
     application = models.ForeignKey(oauth2_settings.APPLICATION_MODEL, null=False, on_delete=models.CASCADE)
 
+    class Meta:
+        app_label = 'oauth_dispatch'
+
     def __unicode__(self):
         """
         Return a unicode representation of this object
@@ -32,12 +40,11 @@ class RestrictedApplication(models.Model):
         )
 
     @classmethod
-    def set_access_token_as_expired(cls, access_token):
-        """
-        For access_tokens for RestrictedApplications, put the expire timestamp into the beginning of the epoch
-        which is Jan. 1, 1970
-        """
-        access_token.expires = datetime(1970, 1, 1, tzinfo=utc)
+    def should_expire_access_token(cls, application):
+        set_token_expired = not UNEXPIRED_RESTRICTED_APPLICATIONS.is_enabled()
+        jwt_not_requested = get_request_or_stub().POST.get('token_type', '').lower() != 'jwt'
+        restricted_application = cls.objects.filter(application=application).exists()
+        return restricted_application and (jwt_not_requested or set_token_expired)
 
     @classmethod
     def verify_access_token_as_expired(cls, access_token):
@@ -48,19 +55,12 @@ class RestrictedApplication(models.Model):
         return access_token.expires == datetime(1970, 1, 1, tzinfo=utc)
 
 
-class ScopedApplication(AbstractApplication):
+class ApplicationAccess(models.Model):
     """
-    Custom Django OAuth Toolkit Application model that enables the definition
-    of scopes that are authorized for the given Application.
+    Specifies access control information for the associated Application.
     """
-    FILTER_USER_ME = 'user:me'
 
-    # TODO: Remove the id field once we perform the inital migrations for this model.
-    # We need to copy data over from the oauth2_provider.models.Application model to
-    # this new model with the intial migration and the model IDs will need to match
-    # so that existing AccessTokens will still work when switching over to the new model.
-    # Once we have the data copied over we can move back to an auto-increment primary key.
-    id = models.IntegerField(primary_key=True)
+    application = models.ForeignKey(oauth2_settings.APPLICATION_MODEL, related_name='access',)
     scopes = ListCharField(
         base_field=models.CharField(max_length=32),
         size=25,
@@ -71,26 +71,21 @@ class ScopedApplication(AbstractApplication):
     class Meta:
         app_label = 'oauth_dispatch'
 
+    @classmethod
+    def get_scopes(cls, application):
+        return cls.objects.get(application=application).scopes
+
     def __unicode__(self):
         """
         Return a unicode representation of this object.
         """
-        return u"<ScopedApplication '{name}'>".format(
-            name=self.name
+        return u"{application_name}:{scopes}".format(
+            application_name=self.application.name,
+            scopes=self.scopes,
         )
 
-    @property
-    def authorization_filters(self):
-        """
-        Return the list of authorization filters for this application.
-        """
-        filters = [':'.join([org.provider_type, org.short_name]) for org in self.organizations.all()]
-        if self.authorization_grant_type == self.GRANT_CLIENT_CREDENTIALS:
-            filters.append(self.FILTER_USER_ME)
-        return filters
 
-
-class ScopedApplicationOrganization(models.Model):
+class ApplicationOrganization(models.Model):
     """
     Associates an organization to a given ScopedApplication including the
     provider type of the organization so that organization-based filters
@@ -106,10 +101,7 @@ class ScopedApplicationOrganization(models.Model):
 
     # In practice, short_name should match the short_name of an Organization model.
     # This is not a foreign key because the organizations app is not installed by default.
-    short_name = models.CharField(
-        max_length=255,
-        help_text=_('The short_name of an existing Organization.'),
-    )
+    organization = models.ForeignKey(Organization)
     provider_type = models.CharField(
         max_length=32,
         choices=ORGANIZATION_PROVIDER_TYPES,
@@ -127,7 +119,7 @@ class ScopedApplicationOrganization(models.Model):
         """
         Return a unicode representation of this object.
         """
-        return u"<ScopedApplicationOrganization '{application_name}':'{org}'>".format(
+        return u"{application_name}:{org}".format(
             application_name=self.application.name,
-            org=self.short_name,
+            org=self.organization.short_name,
         )

@@ -5,7 +5,7 @@ import provider.constants
 from django.contrib.auth.models import User
 from django.forms import CharField
 from edx_oauth2_provider.constants import SCOPE_NAMES
-from oauth2_provider.models import Application
+from oauth2_provider.models import get_application_model
 from provider.forms import OAuthForm, OAuthValidationError
 from provider.oauth2.forms import ScopeChoiceField, ScopeMixin
 from provider.oauth2.models import Client
@@ -14,6 +14,9 @@ from social_core.backends import oauth as social_oauth
 from social_core.exceptions import AuthException
 
 from third_party_auth import pipeline
+
+
+Application = get_application_model()
 
 
 class AccessTokenExchangeForm(ScopeMixin, OAuthForm):

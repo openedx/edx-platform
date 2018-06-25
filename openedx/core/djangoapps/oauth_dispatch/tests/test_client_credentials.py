@@ -8,13 +8,16 @@ from django.conf import settings
 from django.urls import reverse
 from django.test import TestCase
 from edx_oauth2_provider.tests.factories import ClientFactory
-from oauth2_provider.models import Application
+from oauth2_provider.models import get_application_model
 from provider.oauth2.models import AccessToken
 from student.tests.factories import UserFactory
 
 from . import mixins
 from .constants import DUMMY_REDIRECT_URL
 from ..adapters import DOTAdapter
+
+
+Application = get_application_model()
 
 
 @unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")

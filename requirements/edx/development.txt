@@ -22,6 +22,7 @@ git+https://github.com/edx/django-rest-framework-oauth.git@0a43e8525f1e3048efe4b
 git+https://github.com/edx/django-rest-framework.git@1ceda7c086fddffd1c440cc86856441bbf0bd9cb#egg=djangorestframework==3.6.3
 -e common/lib/dogstats
 -e git+https://github.com/edx/DoneXBlock.git@01a14f3bd80ae47dd08cdbbe2f88f3eb88d00fba#egg=done-xblock
+-e git+https://github.com/edx/edx-drf-extensions.git@40c4e0a1723c42fa4e75aa36a3995ca182009101#egg=edx-drf-extensions==1.5.0
 -e git+https://github.com/jazkarta/edx-jsme.git@690dbf75441fa91c7c4899df0b83d77f7deb5458#egg=edx-jsme
 git+https://github.com/mitodl/edx-sga.git@6b2f7aa2a18206023c8407e2c46f86d4b4c3ac96#egg=edx-sga==0.8.0
 git+https://github.com/edx/lettuce.git@7a04591c78ac56dac3eb3e91ca94b15cce844133#egg=lettuce==0.2.23+edx.1
@@ -135,7 +136,6 @@ edx-completion==0.1.7
 edx-django-oauth2-provider==1.2.5
 edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
-edx-drf-extensions==1.4.0
 edx-enterprise==0.69.4
 edx-i18n-tools==0.4.5
 edx-lint==0.5.5
@@ -289,6 +289,7 @@ redis==2.10.6
 reportlab==3.1.44
 requests-oauthlib==0.6.1
 requests==2.9.1
+rest-condition==1.0.3
 rfc6266-parser==0.0.5.post2
 rules==1.3
 s3transfer==0.1.13
