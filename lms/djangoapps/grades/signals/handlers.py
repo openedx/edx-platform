@@ -241,12 +241,13 @@ def recalculate_course_grade_only(sender, course, course_structure, user, **kwar
 
 @receiver(ENROLLMENT_TRACK_UPDATED)
 @receiver(COHORT_MEMBERSHIP_UPDATED)
-def recalculate_course_and_subsection_grades(sender, user, course_key, **kwargs):
+def recalculate_course_and_subsection_grades(sender, user, course_key, countdown=None, **kwargs):  # pylint: disable=unused-argument
     """
     Updates a saved course grade, forcing the subsection grades
     from which it is calculated to update along the way.
     """
     recalculate_course_and_subsection_grades_for_user.apply_async(
+        countdown=countdown,
         kwargs=dict(
             user_id=user.id,
             course_key=six.text_type(course_key)
