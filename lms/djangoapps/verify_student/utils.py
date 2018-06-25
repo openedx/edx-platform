@@ -93,28 +93,32 @@ def send_verification_status_email(context):
         ))
 
 
-def most_recent_verification(photo_id_verifications, sso_id_verifications, most_recent_key):
+def most_recent_verification(photo_id_verifications, sso_id_verifications, manual_id_verifications, most_recent_key):
     """
-    Return the most recent verification given querysets for both photo and sso verifications.
+    Return the most recent verification given querysets for photo, sso and manual verifications.
+
+    This function creates a map of the latest verification of all types and then returns the earliest
+    verification using the max of the map values.
 
     Arguments:
-            photo_id_verifications: Queryset containing photo verifications
-            sso_id_verifications: Queryset containing sso verifications
-            most_recent_key: Either 'updated_at' or 'created_at'
+        photo_id_verifications: Queryset containing photo verifications
+        sso_id_verifications: Queryset containing sso verifications
+        manual_id_verifications: Queryset containing manual verifications
+        most_recent_key: Either 'updated_at' or 'created_at'
 
     Returns:
         The most recent verification.
     """
     photo_id_verification = photo_id_verifications and photo_id_verifications.first()
     sso_id_verification = sso_id_verifications and sso_id_verifications.first()
+    manual_id_verification = manual_id_verifications and manual_id_verifications.first()
 
-    if not photo_id_verification and not sso_id_verification:
-        return None
-    elif photo_id_verification and not sso_id_verification:
-        return photo_id_verification
-    elif sso_id_verification and not photo_id_verification:
-        return sso_id_verification
-    elif getattr(photo_id_verification, most_recent_key) > getattr(sso_id_verification, most_recent_key):
-        return photo_id_verification
-    else:
-        return sso_id_verification
+    verifications = [photo_id_verification, sso_id_verification, manual_id_verification]
+
+    verifications_map = {
+        verification: getattr(verification, most_recent_key)
+        for verification in verifications
+        if getattr(verification, most_recent_key, False)
+    }
+
+    return max(verifications_map, key=lambda k: verifications_map[k]) if verifications_map else None

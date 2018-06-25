@@ -409,7 +409,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
 
         RequestCache.clear_request_cache()
 
-        expected_query_count = 42
+        expected_query_count = 43
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
             with check_mongo_calls(mongo_count):
                 with self.assertNumQueries(expected_query_count):
@@ -2151,7 +2151,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'failed': 3,
             'skipped': 2
         }
-        with self.assertNumQueries(114):
+        with self.assertNumQueries(122):
             self.assertCertificatesGenerated(task_input, expected_results)
 
         expected_results = {

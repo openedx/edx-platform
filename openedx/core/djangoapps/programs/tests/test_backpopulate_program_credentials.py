@@ -162,7 +162,7 @@ class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsAp
         call_command('backpopulate_program_credentials', commit=True)
 
         # The task should be called for both users since professional and no-id-professional are equivalent.
-        mock_task.assert_has_calls([mock.call(self.alice.username), mock.call(self.bob.username)])
+        mock_task.assert_has_calls([mock.call(self.alice.username), mock.call(self.bob.username)], any_order=True)
 
     @ddt.data(SEPARATE_PROGRAMS, SEPARATE_COURSES, SAME_COURSE)
     def test_handle_flatten(self, hierarchy_type, mock_task, mock_get_programs):

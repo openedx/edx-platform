@@ -11,7 +11,7 @@ import pytz
 from mock import patch
 from pytest import mark
 from django.conf import settings
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, SSOVerification
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, SSOVerification, ManualVerification
 from lms.djangoapps.verify_student.utils import verification_for_datetime, most_recent_verification
 from student.tests.factories import UserFactory
 
@@ -88,38 +88,49 @@ class TestVerifyStudentUtils(unittest.TestCase):
         self.assertEqual(result, second_attempt)
 
     @ddt.data(
-        (False, False, None, None),
-        (True, False, None, 'photo'),
-        (False, True, None, 'sso'),
-        (True, True, 'photo', 'sso'),
-        (True, True, 'sso', 'photo'),
+        (False, False, False, None, None),
+        (True, False, False, None, 'photo'),
+        (False, True, False, None, 'sso'),
+        (False, False, True, None, 'manual'),
+        (True, True, True, 'photo', 'sso'),
+        (True, True, True, 'sso', 'photo'),
+        (True, True, True, 'manual', 'photo')
     )
     @ddt.unpack
     def test_most_recent_verification(
             self,
             create_photo_verification,
             create_sso_verification,
+            create_manual_verification,
             first_verification,
             expected_verification):
+
         user = UserFactory.create()
         photo_verification = None
         sso_verification = None
+        manual_verification = None
 
         if not first_verification:
             if create_photo_verification:
                 photo_verification = SoftwareSecurePhotoVerification.objects.create(user=user)
             if create_sso_verification:
                 sso_verification = SSOVerification.objects.create(user=user)
+            if create_manual_verification:
+                manual_verification = ManualVerification.objects.create(user=user)
         elif first_verification == 'photo':
             photo_verification = SoftwareSecurePhotoVerification.objects.create(user=user)
             sso_verification = SSOVerification.objects.create(user=user)
-        else:
+        elif first_verification == 'sso':
             sso_verification = SSOVerification.objects.create(user=user)
+            photo_verification = SoftwareSecurePhotoVerification.objects.create(user=user)
+        else:
+            manual_verification = ManualVerification.objects.create(user=user)
             photo_verification = SoftwareSecurePhotoVerification.objects.create(user=user)
 
         most_recent = most_recent_verification(
             SoftwareSecurePhotoVerification.objects.all(),
             SSOVerification.objects.all(),
+            ManualVerification.objects.all(),
             'created_at'
         )
 
@@ -127,5 +138,7 @@ class TestVerifyStudentUtils(unittest.TestCase):
             self.assertEqual(most_recent, None)
         elif expected_verification == 'photo':
             self.assertEqual(most_recent, photo_verification)
-        else:
+        elif expected_verification == 'sso':
             self.assertEqual(most_recent, sso_verification)
+        else:
+            self.assertEqual(most_recent, manual_verification)

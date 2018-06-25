@@ -5,7 +5,7 @@ Admin site configurations for verify_student.
 
 from django.contrib import admin
 
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, SSOVerification
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, SSOVerification, ManualVerification
 
 
 @admin.register(SoftwareSecurePhotoVerification)
@@ -27,3 +27,13 @@ class SSOVerificationAdmin(admin.ModelAdmin):
     readonly_fields = ('user', 'identity_provider_slug', 'identity_provider_type',)
     raw_id_fields = ('user',)
     search_fields = ('user__username', 'identity_provider_slug',)
+
+
+@admin.register(ManualVerification)
+class ManualVerificationAdmin(admin.ModelAdmin):
+    """
+    Admin for the ManualVerification table.
+    """
+    list_display = ('id', 'user', 'status', 'reason', 'created_at', 'updated_at',)
+    raw_id_fields = ('user',)
+    search_fields = ('user__username', 'reason',)

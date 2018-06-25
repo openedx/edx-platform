@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.utils.timezone import now
 from rest_framework import serializers
 
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, SSOVerification
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, SSOVerification, ManualVerification
 
 from .models import UserPreference
 
@@ -119,3 +119,10 @@ class SSOVerificationSerializer(IDVerificationSerializer):
     class Meta(object):
         fields = ('status', 'expiration_datetime', 'is_verified')
         model = SSOVerification
+
+
+class ManualVerificationSerializer(IDVerificationSerializer):
+
+    class Meta(object):
+        fields = ('status', 'expiration_datetime', 'is_verified')
+        model = ManualVerification
