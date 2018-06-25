@@ -135,6 +135,7 @@ lms/lib/comment_client/python
 autodeploy.properties
 .ws_migrations_complete
 dist
+*.bak
 
 # Visual Studio Code
 .vscode
