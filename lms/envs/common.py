@@ -301,12 +301,6 @@ FEATURES = {
     # log all information from cybersource callbacks
     'LOG_POSTPAY_CALLBACKS': True,
 
-    # enable beacons for video timing statistics
-    'ENABLE_VIDEO_BEACON': False,
-
-    # enable beacons for lms onload event statistics
-    'ENABLE_ONLOAD_BEACON': False,
-
     # Toggle platform-wide course licensing
     'LICENSING': False,
 
@@ -2997,13 +2991,6 @@ SEARCH_RESULT_PROCESSOR = "lms.lib.courseware_search.lms_result_processor.LmsSea
 SEARCH_FILTER_GENERATOR = "lms.lib.courseware_search.lms_filter_generator.LmsSearchFilterGenerator"
 # Override to skip enrollment start date filtering in course search
 SEARCH_SKIP_ENROLLMENT_START_DATE_FILTERING = False
-
-### PERFORMANCE EXPERIMENT SETTINGS ###
-# CDN experiment/monitoring flags
-CDN_VIDEO_URLS = {}
-
-# Page onload event sampling rate (min 0.0, max 1.0)
-ONLOAD_BEACON_SAMPLE_RATE = 0.0
 
 # The configuration visibility of account fields.
 ACCOUNT_VISIBILITY_CONFIGURATION = {

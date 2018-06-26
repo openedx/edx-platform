@@ -306,20 +306,8 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         transcripts = self.get_transcripts_info()
         track_url, transcript_language, sorted_languages = self.get_transcripts_for_student(transcripts=transcripts)
 
-        # CDN_VIDEO_URLS is only to be used here and will be deleted
-        # TODO(ali@edx.org): Delete this after the CDN experiment has completed.
-        html_id = self.location.html_id()
-        if self.system.user_location == 'CN' and \
-                settings.FEATURES.get('ENABLE_VIDEO_BEACON', False) and \
-                html_id in getattr(settings, 'CDN_VIDEO_URLS', {}).keys():
-            cdn_urls = getattr(settings, 'CDN_VIDEO_URLS', {})[html_id]
-            cdn_exp_group, new_source = random.choice(zip(range(len(cdn_urls)), cdn_urls))
-            if cdn_exp_group > 0:
-                sources[0] = new_source
-            cdn_eval = True
-        else:
-            cdn_eval = False
-            cdn_exp_group = None
+        cdn_eval = False
+        cdn_exp_group = None
 
         self.youtube_streams = youtube_streams or create_youtube_string(self)  # pylint: disable=W0201
 
