@@ -2,6 +2,7 @@
 This module creates a sysadmin dashboard for managing and viewing
 courses.
 """
+from __future__ import absolute_import
 import unicodecsv as csv
 import json
 import logging
@@ -127,7 +128,7 @@ class Users(SysadminDashboardView):
                 continue
             try:
                 testuser = authenticate(username=euser.username, password=epass)
-            except (TypeError, PermissionDenied, AttributeError), err:
+            except (TypeError, PermissionDenied, AttributeError) as err:
                 # Translators: This message means that the user could not be authenticated (that is, we could
                 # not log them in for some reason - maybe they don't have permission, or their password was wrong)
                 msg += _('Failed in authenticating {username}, error {error}\n').format(
@@ -235,13 +236,13 @@ class Users(SysadminDashboardView):
         if '@' in uname:
             try:
                 user = User.objects.get(email=uname)
-            except User.DoesNotExist, err:
+            except User.DoesNotExist as err:
                 msg = _('Cannot find user with email address {email_addr}').format(email_addr=uname)
                 return msg
         else:
             try:
                 user = User.objects.get(username=uname)
-            except User.DoesNotExist, err:
+            except User.DoesNotExist as err:
                 msg = _('Cannot find user with username {username} - {error}').format(
                     username=uname,
                     error=str(err)
@@ -482,7 +483,7 @@ class Courses(SysadminDashboardView):
                 try:
                     course = get_course_by_id(course_key)
                     course_found = True
-                except Exception, err:   # pylint: disable=broad-except
+                except Exception as err:   # pylint: disable=broad-except
                     self.msg += _(
                         'Error - cannot get course with ID {0}<br/><pre>{1}</pre>'
                     ).format(

@@ -1,6 +1,7 @@
 """
 Course Goals Views - includes REST API
 """
+from __future__ import absolute_import
 import analytics
 
 from django.contrib.auth import get_user_model
