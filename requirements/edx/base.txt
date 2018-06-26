@@ -237,5 +237,5 @@ web-fragments==0.2.2
 webob==1.8.2              # via xblock
 wrapt==1.10.5
 xblock-review==1.1.5
-xblock==1.1.1
+xblock==1.2.1
 zendesk==1.1.1
