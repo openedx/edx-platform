@@ -69,6 +69,11 @@ __test__ = False  # do not collect
         dest='disable_migrations',
         help="Create tables by applying migrations."
     ),
+    make_option(
+        '--xdist_ip_addresses',
+        dest='xdist_ip_addresses',
+        help="Space separated string of ip addresses to shard tests to via xdist."
+    )
 ], share_with=['pavelib.utils.test.utils.clean_reports_dir'])
 @PassthroughTask
 @timed
@@ -152,6 +157,11 @@ def test_system(options, passthrough_options):
         "--disable-coverage", action="store_false", dest="with_coverage",
         help="Run the unit tests directly through pytest, NOT coverage"
     ),
+    make_option(
+        '--xdist_ip_addresses',
+        dest='xdist_ip_addresses',
+        help="Space separated string of ip addresses to shard tests to via xdist."
+    )
 ], share_with=['pavelib.utils.test.utils.clean_reports_dir'])
 @PassthroughTask
 @timed
