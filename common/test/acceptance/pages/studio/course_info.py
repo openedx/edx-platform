@@ -58,6 +58,12 @@ class CourseUpdatesPage(CoursePage):
         type_in_codemirror(self, 0, message)
         self.click_new_update_save_button()
 
+    def get_new_handout_link(self):
+        """
+            Gets href for handout link.
+        """
+        return self.q(css='.handouts-content>p>a').attrs('href')[0]
+
     def set_date(self, date):
         """
         Sets the updates date input to the provided value.
@@ -78,6 +84,18 @@ class CourseUpdatesPage(CoursePage):
              bool: True if the date is in the first update and False otherwise.
         """
         return search_date == self.q(css='.date-display').html[0]
+
+    def is_first_handout(self, message):
+        """
+            Looks for the message in the first course handout posted.
+
+            Arguments:
+                message (str): String containing the message that is to be searched for
+
+            Returns:
+                bool: True if the first handout is the message, false otherwise.
+            """
+        return message == self.q(css='.handouts-content').html[0]
 
     def is_new_update_save_button_present(self):
         """
@@ -110,6 +128,63 @@ class CourseUpdatesPage(CoursePage):
         """
         return self.q(css='.post-preview .delete-button').present
 
+    def is_edit_handout_button_present(self):
+        """
+        Checks for the presence of the edit handout button.
+        """
+        return self.q(css='.edit-button').present
+
+    def click_edit_handout_button(self):
+        """
+            Clicks the edit handout button.
+        """
+
+        def is_edit_handout_enabled():
+            """
+            Checks if the edit handout button is enabled
+            """
+            return self.q(css='.edit-button').attrs('disabled')[0] is None
+
+        self.wait_for(promise_check_func=is_edit_handout_enabled,
+                      description='Waiting for the New update button to be enabled.')
+        click_css(self, '.edit-button', require_notification=False)
+        self.wait_for_element_visibility('.CodeMirror', 'Waiting for .CodeMirror')
+
+    def submit_handout(self, message):
+        """
+            Adds handout text to the new update CodeMirror form and submits that text.
+
+            Arguments:
+                message (str): The message to be added and saved.
+        """
+        type_in_codemirror(self, 0, message)
+        self.click_new_handout_save_button()
+
+    def click_save_handout_button(self):
+        """
+            Clicks Handout save button.
+        """
+        self.q(css='.save-button').click()
+
+    def get_handout_error_text(self):
+        """
+            Gets error text for handout with bad html
+        """
+        return self.q(css='#handout_error').text[0]
+
+    def check_save_handout_button_enabled(self):
+        """
+           Checks if the save handout button is enabled
+        """
+        if self.q(css='.save-button').attrs('aria-disabled')[0] == 'true':
+            return True
+
+    def click_new_handout_save_button(self):
+        """
+            Clicks the CodeMirror Handout save button.
+        """
+        click_css(self, '.save-button')
+
     def click_delete_update_button(self):
         """
         Clicks the delete update post button and confirms the delete notification.
@@ -141,3 +216,16 @@ class CourseUpdatesPage(CoursePage):
         """
         update = self.q(css='.update-contents').html
         return value in update[0]
+
+    def refresh_and_wait_for_load(self):
+        """
+        Refresh the page and wait for all resources to load.
+        """
+        self.browser.refresh()
+        self.wait_for_page()
+
+    def get_image_src(self):
+        """
+            Gets source for handout image.
+        """
+        return self.q(css='.handouts-content img').attrs('src')[0]
