@@ -196,9 +196,12 @@ def index(request, extra_context=None, user=AnonymousUser()):
     # Add marketable programs to the context.
     context['programs_list'] = get_programs_with_type(request.site, include_hidden=False)
 
-    context['journals'] = get_journals(request.site)
-    context['journals_root_url'] = get_journals_root_url()
-    context['journal_bundles'] = get_journal_bundles(request.site)
+    journal_info = {}
+    journal_info['journals'] = get_journals(request.site)
+    journal_info['journals_root_url'] = get_journals_root_url()
+    journal_info['journal_bundles'] = get_journal_bundles(request.site)
+
+    context['journal_info'] = journal_info
 
     return render_to_response('index.html', context)
 

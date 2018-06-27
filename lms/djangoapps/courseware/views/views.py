@@ -227,9 +227,10 @@ def courses(request):
     # Add marketable programs to the context.
     programs_list = get_programs_with_type(request.site, include_hidden=False)
 
-    journals = get_journals(request.site)
-    journals_root_url = get_journals_root_url()
-    journal_bundles = get_journal_bundles(request.site)
+    journal_info = {}
+    journal_info['journals'] = get_journals(request.site)
+    journal_info['journals_root_url'] = get_journals_root_url()
+    journal_info['journal_bundles'] = get_journal_bundles(request.site)
 
     return render_to_response(
         "courseware/courses.html",
@@ -237,9 +238,7 @@ def courses(request):
             'courses': courses_list,
             'course_discovery_meanings': course_discovery_meanings,
             'programs_list': programs_list,
-            'journals': journals,
-            'journals_root_url': journals_root_url,
-            'bundles': journal_bundles,
+            'journal_info': journal_info,
         }
     )
 
