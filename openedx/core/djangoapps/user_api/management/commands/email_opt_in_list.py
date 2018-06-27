@@ -111,22 +111,18 @@ class Command(BaseCommand):
         if os.path.exists(file_path):
             raise CommandError("File already exists at '{path}'".format(path=file_path))
 
-        # Retrieve all the courses for the org.
-        # If we were given a specific list of courses to include,
-        # filter out anything not in that list.
-        courses = self._get_courses_for_org(org_list)
         only_courses = options.get("courses")
 
-        if only_courses is not None:
-            only_courses = [
-                CourseKey.from_string(course_key.strip())
-                for course_key in only_courses.split(",")
-            ]
-            courses = list(set(courses) & set(only_courses))
+        if only_courses is None:
+            # Retrieve all the courses for the org.
+            # If we were given a specific list of courses to include,
+            # filter out anything not in that list.
+            courses = self._get_courses_for_org(org_list)
 
-        # Add in organizations from the course keys, to ensure
-        # we're including orgs with different capitalizations
-        org_list = list(set(org_list) | set(course.org for course in courses))
+            # Add in organizations from the course keys, to ensure we're including orgs with different capitalizations
+            org_list = list(set(org_list) | set(course.org for course in courses))
+        else:
+            courses = list(set(only_courses.split(",")))
 
         # If no courses are found, abort
         if not courses:
@@ -270,7 +266,7 @@ class Command(BaseCommand):
             row_count += 1
 
         # Log the number of rows we processed
-        LOGGER.info("Retrieved {num_rows} records.".format(num_rows=row_count))
+        LOGGER.info("Retrieved {num_rows} records for orgs {org}.".format(num_rows=row_count, org=org_aliases))
 
     def _iterate_results(self, cursor):
         """
