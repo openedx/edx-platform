@@ -4,9 +4,10 @@ Signal handler for setting default course verification dates
 from django.core.exceptions import ObjectDoesNotExist
 from django.dispatch.dispatcher import receiver
 
+from openedx.core.djangoapps.user_api.accounts.signals import USER_RETIRE_LMS_CRITICAL
 from xmodule.modulestore.django import SignalHandler, modulestore
 
-from .models import VerificationDeadline
+from .models import SoftwareSecurePhotoVerification, VerificationDeadline
 
 
 @receiver(SignalHandler.course_published)
@@ -23,3 +24,9 @@ def _listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable
                 VerificationDeadline.set_deadline(course_key, course.end)
         except ObjectDoesNotExist:
             VerificationDeadline.set_deadline(course_key, course.end)
+
+
+@receiver(USER_RETIRE_LMS_CRITICAL)
+def _listen_for_lms_retire(sender, **kwargs):  # pylint: disable=unused-argument
+    user = kwargs.get('user')
+    SoftwareSecurePhotoVerification.retire_user(user.id)

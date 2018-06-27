@@ -16,7 +16,7 @@ from six import text_type
 import third_party_auth
 from course_modes.models import CourseMode
 from email_marketing.models import EmailMarketingConfiguration
-from openedx.core.djangoapps.user_api.accounts.signals import USER_RETIRE_MAILINGS
+from openedx.core.djangoapps.user_api.accounts.signals import USER_RETIRE_THIRD_PARTY_MAILINGS
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 from lms.djangoapps.email_marketing.tasks import update_user, update_user_email, get_email_cookies_via_sailthru
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
@@ -263,7 +263,7 @@ def _log_sailthru_api_call_time(time_before_call):
              delta_sailthru_api_call_time.microseconds / 1000)
 
 
-@receiver(USER_RETIRE_MAILINGS)
+@receiver(USER_RETIRE_THIRD_PARTY_MAILINGS)
 def force_unsubscribe_all(sender, **kwargs):  # pylint: disable=unused-argument
     """
     Synchronously(!) unsubscribes the given user from all Sailthru email lists.

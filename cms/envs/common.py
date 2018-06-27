@@ -1098,7 +1098,7 @@ INSTALLED_APPS = [
     # by installed apps.
     'oauth_provider',
     'courseware',
-    'survey',
+    'survey.apps.SurveyConfig',
     'lms.djangoapps.verify_student.apps.VerifyStudentConfig',
     'completion',
 
