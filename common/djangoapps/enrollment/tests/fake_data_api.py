@@ -24,7 +24,7 @@ _VERIFIED_MODE_EXPIRED = []
 
 
 # pylint: disable=unused-argument
-def get_course_enrollments(student_id):
+def get_course_enrollments(student_id, include_inactive=False):
     """Stubbed out Enrollment data request."""
     return _ENROLLMENTS
 
