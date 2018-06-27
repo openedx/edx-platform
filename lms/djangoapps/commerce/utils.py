@@ -10,7 +10,9 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.utils.translation import ugettext as _
+from opaque_keys.edx.keys import CourseKey
 
+from course_modes.models import CourseMode
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client, is_commerce_service_configured
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
@@ -208,13 +210,14 @@ def refund_entitlement(course_entitlement):
         return False
 
 
-def refund_seat(course_enrollment):
+def refund_seat(course_enrollment, change_mode=False):
     """
     Attempt to initiate a refund for any orders associated with the seat being unenrolled,
     using the commerce service.
 
     Arguments:
         course_enrollment (CourseEnrollment): a student enrollment
+        change_mode (Boolean): change the course mode to free mode or not
 
     Returns:
         A list of the external service's IDs for any refunds that were initiated
@@ -244,6 +247,10 @@ def refund_seat(course_enrollment):
             mode=course_enrollment.mode,
             user=enrollee,
         )
+        if change_mode and CourseMode.can_auto_enroll(course_id=CourseKey.from_string(course_key_str)):
+            course_enrollment.update_enrollment(mode=CourseMode.auto_enroll_mode(course_id=course_key_str),
+                                                is_active=False, skip_refund=True)
+            course_enrollment.save()
     else:
         log.info('No refund opened for user [%s], course [%s]', enrollee.id, course_key_str)
 
