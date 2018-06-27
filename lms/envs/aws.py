@@ -1094,4 +1094,8 @@ plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_c
 
 ########################## Derive Any Derived Settings  #######################
 
+# In a janky, hotfix branch, never to merge, disable comprehensive theming for
+# the analytics exporter.  See PLAT-1786
+ENABLE_COMPREHENSIVE_THEMING = False
+
 derive_settings(__name__)
