@@ -143,6 +143,6 @@ stevedore                           # Support for runtime plugins, used for XBlo
 unicodecsv                          # Easier support for CSV files with unicode text
 user-util                           # Functionality for retiring users (GDPR compliance)
 web-fragments                       # Provides the ability to render fragments of web pages
-XBlock==1.1.1                       # Courseware component architecture
+XBlock                              # Courseware component architecture
 xblock-review                       # XBlock which displays problems from earlier in the course for ungraded retries
 zendesk                             # Python API for the Zendesk customer support system
