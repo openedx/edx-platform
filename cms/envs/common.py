@@ -94,6 +94,14 @@ from lms.envs.common import (
     REDIRECT_CACHE_TIMEOUT,
     REDIRECT_CACHE_KEY_PREFIX,
 
+    # This is required for the migrations in oauth_dispatch.models
+    # otherwise it fails saying this attribute is not present in Settings
+    # Although Studio does not enable OAuth2 Provider capability, the new approach
+    # to generating test databases will discover and try to create all tables
+    # and this setting needs to be present
+    OAUTH2_PROVIDER_APPLICATION_MODEL,
+    DEFAULT_JWT_ISSUER,
+    RESTRICTED_APPLICATION_JWT_ISSUER,
     JWT_AUTH,
 
     USERNAME_REGEX_PARTIAL,
@@ -1451,13 +1459,6 @@ HELP_TOKENS_INI_FILE = REPO_ROOT / "cms" / "envs" / "help_tokens.ini"
 HELP_TOKENS_LANGUAGE_CODE = lambda settings: settings.LANGUAGE_CODE
 HELP_TOKENS_VERSION = lambda settings: doc_version()
 derived('HELP_TOKENS_LANGUAGE_CODE', 'HELP_TOKENS_VERSION')
-
-# This is required for the migrations in oauth_dispatch.models
-# otherwise it fails saying this attribute is not present in Settings
-# Although Studio does not exable OAuth2 Provider capability, the new approach
-# to generating test databases will discover and try to create all tables
-# and this setting needs to be present
-OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
 
 # Used with Email sending
 RETRY_ACTIVATION_EMAIL_MAX_ATTEMPTS = 5

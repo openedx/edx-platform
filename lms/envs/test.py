@@ -274,6 +274,19 @@ FEATURES['ENABLE_OAUTH2_PROVIDER'] = True
 # don't cache courses for testing
 OIDC_COURSE_HANDLER_CACHE_TIMEOUT = 0
 
+########################### Settings for JWTs ##################################
+RESTRICTED_APPLICATION_JWT_ISSUER = {
+    'ISSUER': 'restricted-app',
+    'SECRET_KEY': 'restricted-secret',
+    'AUDIENCE': 'restricted-app',
+}
+JWT_AUTH.update({
+    'JWT_ISSUERS': [
+        DEFAULT_JWT_ISSUER,
+        RESTRICTED_APPLICATION_JWT_ISSUER,
+    ],
+})
+
 ########################### External REST APIs #################################
 FEATURES['ENABLE_MOBILE_REST_API'] = True
 FEATURES['ENABLE_VIDEO_ABSTRACTION_LAYER_API'] = True
@@ -552,12 +565,6 @@ FEATURES['ORGANIZATIONS_APP'] = True
 
 # Financial assistance page
 FEATURES['ENABLE_FINANCIAL_ASSISTANCE_FORM'] = True
-
-JWT_AUTH.update({
-    'JWT_SECRET_KEY': 'test-secret',
-    'JWT_ISSUER': 'https://test-provider/oauth2',
-    'JWT_AUDIENCE': 'test-key',
-})
 
 COURSE_CATALOG_API_URL = 'https://catalog.example.com/api/v1'
 

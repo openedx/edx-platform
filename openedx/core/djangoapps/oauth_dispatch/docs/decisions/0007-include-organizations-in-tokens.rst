@@ -100,7 +100,8 @@ organization information to the granting end-user.
 
     "content_org:Microsoft"
 
-* For a token created via a *Client Credentials grant type*, the token
+* For a token created on behalf of a user (*not* created via a 
+  *Client Credentials grant type*), the token
   is further restricted specifically for the granting user.  And so, a
   "user" filter with the value "me" would be added for this grant type.
   For example:

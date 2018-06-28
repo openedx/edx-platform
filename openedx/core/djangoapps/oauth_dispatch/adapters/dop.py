@@ -68,3 +68,15 @@ class DOPAdapter(object):
         Given an access token object, return its scopes.
         """
         return scope.to_names(token.scope)
+
+    def is_client_restricted(self, client_id):  # pylint: disable=unused-argument
+        """
+        Returns true if the client is set up as a RestrictedApplication.
+        """
+        return False
+
+    def get_authorization_filters(self, client_id):  # pylint: disable=unused-argument
+        """
+        Get the authorization filters for the given client application.
+        """
+        return []
