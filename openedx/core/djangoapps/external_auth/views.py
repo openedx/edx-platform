@@ -336,7 +336,7 @@ def _signup(request, eamap, retfun=None):
     log.info(u'EXTAUTH: Doing signup for %s', eamap.external_id)
 
     from openedx.core.djangoapps.user_api.views import RegistrationView
-    return RegistrationView().dispatch(request, extra_context=context)
+    return RegistrationView().dispatch(request)
 
 
 # -----------------------------------------------------------------------------
