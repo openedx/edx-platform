@@ -77,7 +77,7 @@ class TestPreferenceAPI(CacheIsolationTestCase):
         """
         Verifies that get_user_preference returns appropriate errors.
         """
-        with self.assertRaises(UserNotFound):
+        with self.assertRaises(UserNotAuthorized):
             get_user_preference(self.user, self.test_preference_key, username="no_such_user")
 
         with self.assertRaises(UserNotFound):
@@ -100,7 +100,7 @@ class TestPreferenceAPI(CacheIsolationTestCase):
         """
         Verifies that get_user_preferences returns appropriate errors.
         """
-        with self.assertRaises(UserNotFound):
+        with self.assertRaises(UserNotAuthorized):
             get_user_preferences(self.user, username="no_such_user")
 
         with self.assertRaises(UserNotFound):
@@ -125,7 +125,7 @@ class TestPreferenceAPI(CacheIsolationTestCase):
         """
         Verifies that set_user_preference returns appropriate errors.
         """
-        with self.assertRaises(UserNotFound):
+        with self.assertRaises(UserNotAuthorized):
             set_user_preference(self.user, self.test_preference_key, "new_value", username="no_such_user")
 
         with self.assertRaises(UserNotFound):
@@ -227,7 +227,7 @@ class TestPreferenceAPI(CacheIsolationTestCase):
         update_data = {
             self.test_preference_key: "new_value"
         }
-        with self.assertRaises(UserNotFound):
+        with self.assertRaises(UserNotAuthorized):
             update_user_preferences(self.user, update_data, user="no_such_user")
 
         with self.assertRaises(UserNotFound):
@@ -303,7 +303,7 @@ class TestPreferenceAPI(CacheIsolationTestCase):
         """
         Verifies that delete_user_preference returns appropriate errors.
         """
-        with self.assertRaises(UserNotFound):
+        with self.assertRaises(UserNotAuthorized):
             delete_user_preference(self.user, self.test_preference_key, username="no_such_user")
 
         with self.assertRaises(UserNotFound):
