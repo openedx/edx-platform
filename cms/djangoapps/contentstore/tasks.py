@@ -63,6 +63,7 @@ from xmodule.exceptions import NotFoundError
 from edxval.api import (
     ValCannotCreateError,
     create_video_transcript,
+    is_video_available,
     is_transcript_available,
     create_or_update_video_transcript,
     create_external_video,
@@ -173,7 +174,11 @@ def async_migrate_transcript(self, course_key, **kwargs):   # pylint: disable=un
 
     for revision, videos in course_videos.items():
         for video in videos:
-            all_transcripts = video.transcripts
+            # Gather transcripts from a video block.
+            all_transcripts = {}
+            if video.transcripts is not None:
+                all_transcripts.update(video.transcripts)
+
             english_transcript = video.sub
             if english_transcript:
                 all_transcripts.update({'en': video.sub})
@@ -282,7 +287,8 @@ def async_migrate_transcript_subtask(self, *args, **kwargs):  # pylint: disable=
             transcripts_info=transcripts_info,
         )
 
-        if not edx_video_id:
+        is_video_valid = edx_video_id and is_video_available(edx_video_id)
+        if not is_video_valid:
             edx_video_id = create_external_video('external-video')
             video.edx_video_id = edx_video_id
 
