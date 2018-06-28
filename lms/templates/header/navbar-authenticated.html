@@ -14,6 +14,16 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
   show_explore_courses = settings.FEATURES.get('COURSES_ARE_BROWSABLE') and not show_program_listing
   show_sysadmin_dashboard = settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD','') and user.is_staff
   self.real_user = getattr(user, 'real_user', user)
+
+  support_link = configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK)
+  doc_link = get_online_help_info(online_help_token)['doc_url']
+
+  if online_help_token == "instructor":
+    help_link = doc_link
+  elif support_link:
+    help_link = support_link
+  else:
+    help_link = doc_link
 %>
 
 <div class="nav-links">
@@ -58,11 +68,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
       </div>
     % endif
     <div class="mobile-nav-item hidden-mobile nav-item">
-      % if online_help_token == "instructor":
-        <a class="help-link" href="${get_online_help_info(online_help_token)['doc_url']}" target="_blank">${_("Help")}</a>
-      % else:
-        <a class="help-link" href="${configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK)}" target="_blank">${_("Help")}</a>
-      % endif
+      <a class="help-link" href="${help_link}" target="_blank">${_("Help")}</a>
     </div>
     <%include file="user_dropdown.html"/>
   </div>
