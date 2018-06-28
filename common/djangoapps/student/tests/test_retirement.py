@@ -23,7 +23,7 @@ from student.models import (
 from student.tests.factories import UserFactory
 
 
-# Tell pytest it's ok to user the Django db
+# Tell pytest it's ok to use the Django db
 pytestmark = pytest.mark.django_db
 
 # Make sure our settings are sane
@@ -266,11 +266,11 @@ class TestRegisterRetiredUsername(TestCase):
         """
         assert response.status_code == 409
         obj = json.loads(response.content)
-        assert obj['value'].startswith('An account with the Public Username')
-        assert obj['value'].endswith('already exists.')
-        assert orig_username in obj['value']
-        assert obj['field'] == 'username'
-        assert not obj['success']
+        username_msg = obj['username'][0]['user_message']
+
+        assert username_msg.startswith('An account with the Public Username')
+        assert username_msg.endswith('already exists.')
+        assert orig_username in username_msg
 
     def test_retired_username(self):
         """
