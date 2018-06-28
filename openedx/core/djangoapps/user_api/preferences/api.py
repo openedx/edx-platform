@@ -315,12 +315,13 @@ def _get_authorized_user(requesting_user, username=None, allow_staff=False):
             # Otherwise, treat this as a request against a separate user
             username = requesting_user.username
 
+    _check_authorized(requesting_user, username, allow_staff)
+
     try:
         existing_user = User.objects.get(username=username)
     except ObjectDoesNotExist:
         raise UserNotFound()
 
-    _check_authorized(requesting_user, username, allow_staff)
     return existing_user
 
 

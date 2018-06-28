@@ -145,6 +145,38 @@ class EcommerceServiceTests(TestCase):
             )
         self.assertEqual(url, expected_url)
 
+    @override_settings(ECOMMERCE_PUBLIC_URL_ROOT='http://ecommerce_url')
+    @ddt.data(
+        {
+            'skus': ['TESTSKU'],
+            'enterprise_catalog_uuid': None
+        },
+        {
+            'skus': ['TESTSKU'],
+            'enterprise_catalog_uuid': '6eca3efb-f3a0-4c08-806f-c6e6b65d61cb'
+        },
+    )
+    @ddt.unpack
+    def test_get_checkout_page_url_with_enterprise_catalog_uuid(self, skus, enterprise_catalog_uuid):
+        """ Verify the checkout page URL is properly constructed and returned. """
+        url = EcommerceService().get_checkout_page_url(
+            *skus,
+            enterprise_customer_catalog_uuid=enterprise_catalog_uuid
+        )
+        config = CommerceConfiguration.current()
+
+        query = {'sku': skus}
+        if enterprise_catalog_uuid:
+            query.update({'enterprise_customer_catalog_uuid': enterprise_catalog_uuid})
+
+        expected_url = '{root}{basket_url}?{skus}'.format(
+            basket_url=config.basket_checkout_page,
+            root=settings.ECOMMERCE_PUBLIC_URL_ROOT,
+            skus=urlencode(query, doseq=True),
+        )
+
+        self.assertEqual(url, expected_url)
+
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class RefundUtilMethodTests(ModuleStoreTestCase):

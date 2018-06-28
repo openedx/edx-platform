@@ -6,8 +6,10 @@ from django.conf import settings
 from django.http import Http404
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from rest_condition import C
 from rest_framework import permissions
 
+from edx_rest_framework_extensions.permissions import IsStaff, IsUserInUrl
 from openedx.core.lib.log_utils import audit_log
 from student.roles import CourseInstructorRole, CourseStaffRole
 
@@ -20,7 +22,6 @@ class ApiKeyHeaderPermission(permissions.BasePermission):
     def has_permission(self, request, view):
         """
         Check for permissions by matching the configured API key and header
-
         Allow the request if and only if settings.EDX_API_KEY is set and
         the X-Edx-Api-Key HTTP header is present in the request and
         matches the setting.
@@ -39,7 +40,6 @@ class ApiKeyHeaderPermission(permissions.BasePermission):
 class ApiKeyHeaderPermissionIsAuthenticated(ApiKeyHeaderPermission, permissions.IsAuthenticated):
     """
     Allow someone to access the view if they have the API key OR they are authenticated.
-
     See ApiKeyHeaderPermission for more information how the API key portion is implemented.
     """
 
@@ -48,29 +48,6 @@ class ApiKeyHeaderPermissionIsAuthenticated(ApiKeyHeaderPermission, permissions.
         api_permissions = ApiKeyHeaderPermission.has_permission(self, request, view)
         is_authenticated_permissions = permissions.IsAuthenticated.has_permission(self, request, view)
         return api_permissions or is_authenticated_permissions
-
-
-class IsUserInUrl(permissions.BasePermission):
-    """
-    Permission that checks to see if the request user matches the user in the URL.
-    """
-
-    def has_permission(self, request, view):
-        """
-        Returns true if the current request is by the user themselves.
-
-        Note: a 404 is returned for non-staff instead of a 403. This is to prevent
-        users from being able to detect the existence of accounts.
-        """
-        url_username = (
-            request.parser_context.get('kwargs', {}).get('username') or
-            request.GET.get('username', '')
-        )
-        if request.user.username.lower() != url_username.lower():
-            if request.user.is_staff:
-                return False  # staff gets 403
-            raise Http404()
-        return True
 
 
 class IsCourseStaffInstructor(permissions.BasePermission):
@@ -118,26 +95,9 @@ class IsMasterCourseStaffInstructor(permissions.BasePermission):
         return False
 
 
-class IsStaff(permissions.BasePermission):
-    """
-    Permission that checks to see if the request user has is_staff access.
-    """
-
+class IsUserInUrlOrStaff(permissions.BasePermission):
     def has_permission(self, request, view):
-        if request.user.is_staff:
-            return True
-
-
-class IsUserInUrlOrStaff(IsUserInUrl):
-    """
-    Permission that checks to see if the request user matches the user in the URL or has is_staff access.
-    """
-
-    def has_permission(self, request, view):
-        if request.user.is_staff:
-            return True
-
-        return super(IsUserInUrlOrStaff, self).has_permission(request, view)
+        return C(IsStaff) | IsUserInUrl
 
 
 class IsStaffOrReadOnly(permissions.BasePermission):

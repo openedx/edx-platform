@@ -305,7 +305,8 @@ def install_prereqs():
         print NO_PREREQ_MESSAGE
         return
 
-    install_node_prereqs()
+    if not str2bool(os.environ.get('SKIP_NPM_INSTALL', 'False')):
+        install_node_prereqs()
     install_python_prereqs()
     log_installed_python_prereqs()
 
