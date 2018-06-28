@@ -15,7 +15,6 @@ import urllib
 from contextlib import contextmanager
 from datetime import datetime, timedelta
 
-import csv
 import ddt
 import unicodecsv
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
