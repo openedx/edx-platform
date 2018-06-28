@@ -215,3 +215,13 @@ class CorrectMapTest(unittest.TestCase):
         for invalid in invalid_list:
             with self.assertRaises(Exception):
                 self.cmap.update(invalid)
+
+    def test_set_none_state(self):
+        """
+        Test that if an invalid state is set to correct map, the state does not
+        update at all.
+        """
+        invalid_list = [None, "", False, 0]
+        for invalid in invalid_list:
+            self.cmap.set_dict(invalid)
+            self.assertEqual(self.cmap.get_dict(), {})
