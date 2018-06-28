@@ -704,6 +704,7 @@ class SailthruTests(TestCase):
             m.return_value = self.course_url
             update_course_enrollment(TEST_EMAIL, self.course_id, 'audit')
         item = [{
+            'vars': {'course_run_id': u'edX/toy/2012_Fall', 'mode': 'audit'},
             'url': self.course_url,
             'price': 0,
             'qty': 1,
