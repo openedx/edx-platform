@@ -404,6 +404,7 @@ FEATURES = {
 
     # Whether to display the account deletion section the account settings page
     'ENABLE_ACCOUNT_DELETION': True,
+
     # Set to enable Journal integration
     'ENABLE_JOURNAL_INTEGRATION': True,
 }
