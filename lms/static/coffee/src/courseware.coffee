@@ -10,6 +10,13 @@ class @Courseware
 
   render: ->
     XBlock.initializeBlocks($('.course-content'))
+    
+    courseContentElement = $('.course-content')[0]
+    blocks = XBlock.initializeBlocks(courseContentElement)
+
+    if (courseContentElement.dataset.enableCompletionOnViewService == 'true')
+      markBlocksCompletedOnViewIfNeeded(blocks[0].runtime, courseContentElement)
+
     $('.course-content .histogram').each ->
       id = $(this).attr('id').replace(/histogram_/, '')
       try
