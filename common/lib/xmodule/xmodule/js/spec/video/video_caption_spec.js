@@ -1,8 +1,12 @@
-(function(undefined) {
+/* global _, WAIT_TIMEOUT */
+
+(function() {
+    'use strict';
+
     describe('VideoCaption', function() {
         var state, oldOTBD;
         var parseIntAttribute = function(element, attrName) {
-            return parseInt(element.attr(attrName));
+            return parseInt(element.attr(attrName), 10);
         };
 
         beforeEach(function() {
@@ -55,8 +59,9 @@
                 });
 
                 it('add ARIA attributes to transcript control', function() {
+                    var $captionControl;
                     state = jasmine.initializePlayer();
-                    var $captionControl = $('.toggle-transcript');
+                    $captionControl = $('.toggle-transcript');
                     expect($captionControl).toHaveAttrs({
                         'aria-disabled': 'false'
                     });
@@ -149,9 +154,10 @@
             });
 
             it('can destroy itself', function() {
+                var plugin;
                 spyOn($, 'ajaxWithPrefix');
                 state = jasmine.initializePlayer();
-                var plugin = state.videoCaption;
+                plugin = state.videoCaption;
 
                 spyOn($.fn, 'off').and.callThrough();
                 state.videoCaption.destroy();
@@ -224,16 +230,17 @@
                         };
 
                     it('if languages more than 1', function() {
+                        var transcripts, langCodes, langLabels;
                         state = jasmine.initializePlayer();
-                        var transcripts = state.config.transcriptLanguages,
-                            langCodes = _.keys(transcripts),
-                            langLabels = _.values(transcripts);
+                        transcripts = state.config.transcriptLanguages;
+                        langCodes = _.keys(transcripts);
+                        langLabels = _.values(transcripts);
 
                         expect($('.langs-list')).toExist();
                         expect($('.langs-list')).toHandle('click');
 
 
-                        $('.langs-list li').each(function(index) {
+                        $('.langs-list li').each(function() {
                             var code = $(this).data('lang-code'),
                                 link = $(this).find('.control'),
                                 label = link.text();
@@ -244,9 +251,10 @@
                     });
 
                     it('when clicking on link with new language', function() {
+                        var Caption, $link;
                         state = jasmine.initializePlayer();
-                        var Caption = state.videoCaption,
-                            $link = $('.langs-list li[data-lang-code="de"] .control-lang');
+                        Caption = state.videoCaption;
+                        $link = $('.langs-list li[data-lang-code="de"] .control-lang');
 
                         spyOn(Caption, 'fetchCaption');
                         spyOn(state.storage, 'setItem');
@@ -269,9 +277,11 @@
                     });
 
                     it('when clicking on link with current language', function() {
+                        var Caption, $link;
+
                         state = jasmine.initializePlayer();
-                        var Caption = state.videoCaption,
-                            $link = $('.langs-list li[data-lang-code="en"] .control-lang');
+                        Caption = state.videoCaption;
+                        $link = $('.langs-list li[data-lang-code="en"] .control-lang');
 
                         spyOn(Caption, 'fetchCaption');
                         spyOn(state.storage, 'setItem');
@@ -300,7 +310,11 @@
                         $('.language-menu').focus();
                         $('.language-menu').trigger(keyPressEvent(KEY.UP));
                         expect($('.lang')).toHaveClass('is-opened');
-                        expect($('.langs-list').find('li').last().find('.control-lang')).toBeFocused();
+                        expect($('.langs-list')
+                            .find('li')
+                            .last()
+                            .find('.control-lang'))
+                            .toBeFocused();
                     });
 
                     it('closes the language menu on ESC', function() {
@@ -456,9 +470,10 @@
             });
         });
 
-        var originalClearTimeout;
 
         describe('mouse movement', function() {
+            var originalClearTimeout;
+
             beforeEach(function(done) {
                 jasmine.clock().install();
                 state = jasmine.initializePlayer();
@@ -587,7 +602,7 @@
                     'loaded yet';
             it(msg, function() {
                 Caption.loaded = false;
-                state.hide_captions = false;
+                state.hideCaptions = false;
                 Caption.fetchCaption();
 
                 expect($.ajaxWithPrefix).toHaveBeenCalled();
@@ -595,7 +610,7 @@
 
                 Caption.loaded = false;
                 Caption.hideCaptions.calls.reset();
-                state.hide_captions = true;
+                state.hideCaptions = true;
                 Caption.fetchCaption();
 
                 expect($.ajaxWithPrefix).toHaveBeenCalled();
@@ -957,7 +972,6 @@
                 jasmine.waitUntil(function() {
                     return state.videoCaption.rendered;
                 }).then(function() {
-                    videoControl = state.videoControl;
                     $('.subtitles li span[data-index=1]').addClass('current');
                     state.videoCaption.onResize();
                 }).always(done);

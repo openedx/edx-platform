@@ -1,9 +1,11 @@
-(function(requirejs, require, define, undefined) {
+/* global YT */
+
+(function(require, define, undefined) {
     'use strict';
 
     require(
-['video/03_video_player.js', 'hls'],
-function(VideoPlayer, HLS) {
+['video/03_video_player.js', 'hls', 'underscore'],
+function(VideoPlayer, HLS, _) {
     describe('VideoPlayer', function() {
         var STATUS = window.STATUS,
             state,
@@ -1065,4 +1067,4 @@ function(VideoPlayer, HLS) {
         });
     });
 });
-}(RequireJS.requirejs, RequireJS.require, RequireJS.define));
+}(require, define));

@@ -267,7 +267,9 @@
                 XBlock.initializeBlocks(this.content_container, this.requestToken);
 
                 // For embedded circuit simulator exercises in 6.002x
-                window.update_schematics();
+                if (window.hasOwnProperty('update_schematics')) {
+                    window.update_schematics();
+                }
                 this.position = newPosition;
                 this.toggleArrows();
                 this.hookUpContentStateChangeEvent();

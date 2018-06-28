@@ -1366,17 +1366,15 @@ class MakoTemplateLinter(BaseLinter):
         """
         contexts_re = re.compile(
             r"""
-                <script.*?> |  # script tag start
+                <script.*?(?<!/)> |  # script tag start
                 </script> |  # script tag end
-                <%static:require_module(_async)?.*?> |  # require js script tag start (optionally the _async version)
+                <%static:require_module(_async)?.*?(?<!/)> |  # require js script tag start (optionally the _async version)
                 </%static:require_module(_async)?> | # require js script tag end (optionally the _async version)
-                <%static:invoke_page_bundle.*?> |  # require js script tag start
-                </%static:invoke_page_bundle> |  # require js script tag end
-                <%static:webpack.*?> |  # webpack script tag start
+                <%static:webpack.*(?<!/)> |  # webpack script tag start
                 </%static:webpack> | # webpack script tag end
-                <%static:studiofrontend.*?> | # studiofrontend script tag start
+                <%static:studiofrontend.*?(?<!/)> | # studiofrontend script tag start
                 </%static:studiofrontend> | # studiofrontend script tag end
-                <%block[ ]*name=['"]requirejs['"]\w*> |  # require js tag start
+                <%block[ ]*name=['"]requirejs['"]\w*(?<!/)> |  # require js tag start
                 </%block>  # require js tag end
             """,
             re.VERBOSE | re.IGNORECASE

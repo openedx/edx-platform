@@ -247,7 +247,6 @@ def create_unit_from_course_outline():
         world.css_click(selector)
 
     world.wait_for_mathjax()
-    world.wait_for_xmodule()
     world.wait_for_loading()
 
     assert world.is_css_present('ul.new-component-type')

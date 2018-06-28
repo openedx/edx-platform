@@ -1,7 +1,8 @@
-(function(requirejs, require, define, undefined) {
+(function(require) {
+    'use strict';
     require(
-['video/00_resizer.js'],
-function(Resizer) {
+['video/00_resizer.js', 'underscore'],
+function(Resizer, _) {
     describe('Resizer', function() {
         var html = [
                 '<div ' +
@@ -58,7 +59,8 @@ function(Resizer) {
             var resizer = new Resizer(config).align(),
                 expectedHeight = $container.height(),
                 realHeight = $element.height(),
-                expectedWidth = 50;
+                expectedWidth = 50,
+                realWidth;
 
             // containerRatio >= elementRatio
             expect(realHeight).toBe(expectedHeight);
@@ -75,7 +77,8 @@ function(Resizer) {
             var resizer = new Resizer(config).setMode('height'),
                 expectedHeight = $container.height(),
                 realHeight = $element.height(),
-                expectedWidth = 50;
+                expectedWidth = 50,
+                realWidth;
 
             // containerRatio >= elementRatio
             expect(realHeight).toBe(expectedHeight);
@@ -89,13 +92,15 @@ function(Resizer) {
         });
 
         it('`setElement` works correctly', function() {
+            var $newElement,
+                expectedHeight;
+
             $container.append('<div ' +
                 'id="Another-el" ' +
                 'style="width:100px; height: 150px;"' +
             '>');
-
-            var $newElement = $('#Another-el'),
-                expectedHeight = $container.height();
+            $newElement = $('#Another-el');
+            expectedHeight = $container.height();
 
             new Resizer(config).setElement($newElement).alignByHeightOnly();
             expect($element.height()).not.toBe(expectedHeight);
@@ -261,4 +266,4 @@ function(Resizer) {
         });
     });
 });
-}(RequireJS.requirejs, RequireJS.require, RequireJS.define));
+}(require));

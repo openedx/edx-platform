@@ -49,6 +49,9 @@ update_module_store_settings(
     default_store=os.environ.get('DEFAULT_STORE', 'draft'),
 )
 
+# Capture the console log via template includes, until webdriver supports log capture again
+CAPTURE_CONSOLE_LOG = True
+
 ############################ STATIC FILES #############################
 
 # Enable debug so that static assets are served by Django

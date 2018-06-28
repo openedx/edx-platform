@@ -44,7 +44,8 @@ define(['jquery', 'underscore', 'common/js/components/utils/view_utils', 'js/vie
                     successCallback = options ? options.success || options.done : null,
                     errorCallback = options ? options.error || options.done : null,
                     xblock,
-                    fragmentsRendered;
+                    fragmentsRendered,
+                    aside;
 
                 fragmentsRendered = this.renderXBlockFragment(fragment, wrapper);
                 fragmentsRendered.always(function() {
@@ -55,7 +56,7 @@ define(['jquery', 'underscore', 'common/js/components/utils/view_utils', 'js/vie
                         self.xblockReady(self.xblock);
                         self.$('.xblock_asides-v1').each(function() {
                             if (!$(this).hasClass('xblock-initialized')) {
-                                var aside = XBlock.initializeBlock($(this));
+                                aside = XBlock.initializeBlock($(this));
                                 self.initRuntimeData(aside, options);
                             }
                         });
@@ -63,7 +64,7 @@ define(['jquery', 'underscore', 'common/js/components/utils/view_utils', 'js/vie
                             successCallback(xblock);
                         }
                     } catch (e) {
-                        console.error(e.stack);
+                        console.error(e, e.stack);
                         // Add 'xblock-initialization-failed' class to every xblock
                         self.$('.xblock').addClass('xblock-initialization-failed');
 
@@ -86,13 +87,15 @@ define(['jquery', 'underscore', 'common/js/components/utils/view_utils', 'js/vie
              * @param data The data to be passed to any listener's of the event.
              */
             notifyRuntime: function(eventName, data) {
-                var runtime = this.xblock && this.xblock.runtime;
+                var runtime = this.xblock && this.xblock.runtime,
+                    xblockChildren;
+
                 if (runtime) {
                     runtime.notify(eventName, data);
                 } else if (this.xblock) {
-                    var xblock_children = this.xblock.element && $(this.xblock.element).prop('xblock_children');
-                    if (xblock_children) {
-                        $(xblock_children).each(function() {
+                    xblockChildren = this.xblock.element && $(this.xblock.element).prop('xblock_children');
+                    if (xblockChildren) {
+                        $(xblockChildren).each(function() {
                             if (this.runtime) {
                                 this.runtime.notify(eventName, data);
                             }
@@ -122,7 +125,8 @@ define(['jquery', 'underscore', 'common/js/components/utils/view_utils', 'js/vie
              */
             renderXBlockFragment: function(fragment, element) {
                 var html = fragment.html,
-                    resources = fragment.resources;
+                    resources = fragment.resources,
+                    blockView = this;
                 if (!element) {
                     element = this.$el;
                 }
@@ -132,10 +136,11 @@ define(['jquery', 'underscore', 'common/js/components/utils/view_utils', 'js/vie
                 // by included scripts are logged to the console but are then ignored assuming
                 // that at least the rendered HTML will be in place.
                 try {
-                    this.updateHtml(element, html);
-                    return this.addXBlockFragmentResources(resources);
+                    return this.addXBlockFragmentResources(resources).done(function() {
+                        blockView.updateHtml(element, html);
+                    });
                 } catch (e) {
-                    console.error(e.stack);
+                    console.error(e, e.stack);
                     return $.Deferred().resolve();
                 }
             },

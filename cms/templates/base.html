@@ -41,6 +41,23 @@ from openedx.core.release import RELEASE_LINE
       jsi18n_path = "js/i18n/{language}/djangojs.js".format(language=LANGUAGE_CODE)
     %>
 
+    % if getattr(settings, 'CAPTURE_CONSOLE_LOG', False):
+        <script type="text/javascript">
+            var oldOnError = window.onerror;
+            window.localStorage.setItem('console_log_capture', JSON.stringify([]));
+
+            window.onerror = function (message, url, lineno, colno, error) {
+                if (oldOnError) {
+                    oldOnError.apply(this, arguments);
+                }
+
+                var messages = JSON.parse(window.localStorage.getItem('console_log_capture'));
+                messages.push([message, url, lineno, colno, (error || {}).stack]);
+                window.localStorage.setItem('console_log_capture', JSON.stringify(messages));
+            }
+        </script>
+    % endif
+
     <script type="text/javascript" src="${static.url(jsi18n_path)}"></script>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="path_prefix" content="${EDX_ROOT_URL}">
@@ -125,12 +142,9 @@ from openedx.core.release import RELEASE_LINE
     <%block name="jsextra"></%block>
 
     % if context_course:
+      <%static:webpack entry="js/factories/context_course"/>
       <script type="text/javascript">
-        if (typeof window.pageFactoryArguments == "undefined") {
-            window.pageFactoryArguments = {};
-        }
-
-        window.pageFactoryArguments['ContextCourse'] = {
+        window.course = new ContextCourse({
           id: "${context_course.id | n, js_escaped_string}",
           name: "${context_course.display_name_with_default | n, js_escaped_string}",
           url_name: "${context_course.location.block_id | n, js_escaped_string}",
@@ -139,21 +153,16 @@ from openedx.core.release import RELEASE_LINE
           display_course_number: "${context_course.display_coursenumber | n, js_escaped_string}",
           revision: "${context_course.location.branch | n, js_escaped_string}",
           self_paced: ${ context_course.self_paced | n, dump_js_escaped_json }
-        }
+        });
       </script>
     % endif
     % if user.is_authenticated:
-      <%static:invoke_page_bundle page_name='js/sock'/>
+      <%static:webpack entry='js/sock'/>
     % endif
     <%block name='page_bundle'>
       <script type="text/javascript">
       require(['js/factories/base'], function () {
-          require(['js/models/course'], function(Course) {
-              % if context_course:
-                  window.course = new Course(window.pageFactoryArguments['ContextCourse']);
-              % endif
-              <%block name='requirejs'></%block>
-          });
+        <%block name='requirejs'></%block>
       });
       </script>
     </%block>

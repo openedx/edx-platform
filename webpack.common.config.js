@@ -6,21 +6,40 @@ var path = require('path');
 var webpack = require('webpack');
 var BundleTracker = require('webpack-bundle-tracker');
 var StringReplace = require('string-replace-webpack-plugin');
+var Merge = require('webpack-merge');
 
 var files = require('./webpack-config/file-lists.js');
+var xmoduleJS = require('./common/static/xmodule/webpack.xmodule.config.js');
 
-var defineHeader = /\(function ?\(define(, require)?\) ?\{/;
-var defineFooter = /\}\)\.call\(this, define \|\| RequireJS\.define(, require \|\| RequireJS\.require)?\);/;
+var filesWithRequireJSBlocks = [
+    path.resolve(__dirname, 'common/static/common/js/components/utils/view_utils.js'),
+    /descriptors\/js/,
+    /modules\/js/,
+    /common\/lib\/xmodule\/xmodule\/js\/src\//
+];
 
-module.exports = {
+var defineHeader = /\(function ?\(((define|require|requirejs|\$)(, )?)+\) ?\{/;
+var defineCallFooter = /\}\)\.call\(this, ((define|require)( \|\| RequireJS\.(define|require))?(, )?)+?\);/;
+var defineDirectFooter = /\}\(((window\.)?(RequireJS\.)?(requirejs|define|require|jQuery)(, )?)+\)\);/;
+var defineFancyFooter = /\}\).call\(\s*this(\s|.)*define(\s|.)*\);/;
+var defineFooter = new RegExp('(' + defineCallFooter.source + ')|('
+                             + defineDirectFooter.source + ')|('
+                             + defineFancyFooter.source + ')', 'm');
+
+module.exports = Merge.smart({
     context: __dirname,
 
     entry: {
         // Studio
         Import: './cms/static/js/features/import/factories/import.js',
         CourseOrLibraryListing: './cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx',
-        'js/pages/login': './cms/static/js/pages/login.js',
-        'js/pages/textbooks': './cms/static/js/pages/textbooks.js',
+        'js/factories/login': './cms/static/js/factories/login.js',
+        'js/factories/textbooks': './cms/static/js/factories/textbooks.js',
+        'js/factories/container': './cms/static/js/factories/container.js',
+        'js/factories/context_course': './cms/static/js/factories/context_course.js',
+        'js/factories/library': './cms/static/js/factories/library.js',
+        'js/factories/xblock_validation': './cms/static/js/factories/xblock_validation.js',
+        'js/factories/edit_tabs': './cms/static/js/factories/edit_tabs.js',
         'js/sock': './cms/static/js/sock.js',
 
         // LMS
@@ -56,7 +75,10 @@ module.exports = {
         CookiePolicyBanner: './common/static/js/src/CookiePolicyBanner.jsx',
 
         // Common
-        ReactRenderer: './common/static/js/src/ReactRenderer.jsx'
+        ReactRenderer: './common/static/js/src/ReactRenderer.jsx',
+        XModuleShim: 'xmodule/js/src/xmodule.js',
+
+        VerticalStudentView: './common/lib/xmodule/xmodule/assets/vertical/public/js/vertical_student_view.js'
     },
 
     output: {
@@ -80,7 +102,10 @@ module.exports = {
             $: 'jquery',
             jQuery: 'jquery',
             'window.jQuery': 'jquery',
-            Popper: 'popper.js' // used by bootstrap
+            Popper: 'popper.js', // used by bootstrap
+            CodeMirror: 'codemirror',
+            'edx.HtmlUtils': 'edx-ui-toolkit/js/utils/html-utils',
+            AjaxPrefix: 'ajax_prefix'
         }),
 
         // Note: Until karma-webpack releases v3, it doesn't play well with
@@ -105,11 +130,11 @@ module.exports = {
             // https://github.com/webpack/webpack/issues/304#issuecomment-272150177
             // (I've tried every other suggestion solution on that page, this
             // was the only one that worked.)
-            /\/sinon\.js/
+            /\/sinon\.js|codemirror-compressed\.js|hls\.js|tinymce\.full\.min\.js/
         ],
         rules: [
             {
-                test: files.namespacedRequire,
+                test: files.namespacedRequire.concat(files.textBangUnderscore, filesWithRequireJSBlocks),
                 loader: StringReplace.replace(
                     ['babel-loader'],
                     {
@@ -121,20 +146,24 @@ module.exports = {
                             {
                                 pattern: defineFooter,
                                 replacement: function() { return ''; }
-                            }
-                        ]
-                    }
-                )
-            },
-            {
-                test: files.textBangUnderscore,
-                loader: StringReplace.replace(
-                    ['babel-loader'],
-                    {
-                        replacements: [
+                            },
                             {
-                                pattern: /text!(.*\.underscore)/,
+                                pattern: /(\/\* RequireJS) \*\//g,
                                 replacement: function(match, p1) { return p1; }
+                            },
+                            {
+                                pattern: /\/\* Webpack/g,
+                                replacement: function(match) { return match + ' */'; }
+                            },
+                            {
+                                pattern: /text!(.*?\.underscore)/g,
+                                replacement: function(match, p1) { return p1; }
+                            },
+                            {
+                                pattern: /RequireJS.require/g,
+                                replacement: function() {
+                                    return 'require';
+                                }
                             }
                         ]
                     }
@@ -145,7 +174,8 @@ module.exports = {
                 exclude: [
                     /node_modules/,
                     files.namespacedRequire,
-                    files.textBangUnderscore
+                    files.textBangUnderscore,
+                    filesWithRequireJSBlocks
                 ],
                 use: 'babel-loader'
             },
@@ -200,6 +230,12 @@ module.exports = {
                             {
                                 pattern: /}\).call\(this, AjaxPrefix\);/,
                                 replacement: function() { return ''; }
+                            },
+                            {
+                                pattern: /'..\/..\/common\/js\/components\/views\/feedback_notification',/,
+                                replacement: function() {
+                                    return "'../../common/js/components/views/feedback_notification', 'AjaxPrefix',";
+                                }
                             }
                         ]
                     }
@@ -212,6 +248,54 @@ module.exports = {
             {
                 test: /\.svg$/,
                 loader: 'svg-inline-loader'
+            },
+            {
+                test: /xblock\/core/,
+                loader: 'exports-loader?window.XBlock!imports-loader?jquery,jquery.immediateDescendents,this=>window'
+            },
+            {
+                test: /xblock\/runtime.v1/,
+                loader: 'exports-loader?window.XBlock!imports-loader?XBlock=xblock/core,this=>window'
+            },
+            {
+                test: /descriptors\/js/,
+                loader: 'imports-loader?this=>window'
+            },
+            {
+                test: /modules\/js/,
+                loader: 'imports-loader?this=>window'
+            },
+            {
+                test: /codemirror/,
+                loader: 'exports-loader?window.CodeMirror'
+            },
+            {
+                test: /tinymce/,
+                loader: 'imports-loader?this=>window'
+            },
+            {
+                test: /xmodule\/js\/src\/xmodule/,
+                loader: 'exports-loader?window.XModule!imports-loader?this=>window'
+            },
+            {
+                test: /mock-ajax/,
+                loader: 'imports-loader?exports=>false'
+            },
+            {
+                test: /d3.min/,
+                use: [
+                    'babel-loader',
+                    {
+                        loader: 'exports-loader',
+                        options: {
+                            d3: true
+                        }
+                    }
+                ]
+            },
+            {
+                test: /logger/,
+                loader: 'imports-loader?this=>window'
             }
         ]
     },
@@ -220,29 +304,49 @@ module.exports = {
         extensions: ['.js', '.jsx', '.json'],
         alias: {
             AjaxPrefix: 'ajax_prefix',
+            accessibility: 'accessibility_tools',
+            codemirror: 'codemirror-compressed',
+            datepair: 'timepicker/datepair',
             'edx-ui-toolkit': 'edx-ui-toolkit/src/',  // @TODO: some paths in toolkit are not valid relative paths
-            'jquery.ui': 'jQuery-File-Upload/js/vendor/jquery.ui.widget.js',
-            jquery: 'jquery/src/jquery',  // Use the non-dist form of jQuery for better debugging + optimization
+            ieshim: 'ie_shim',
+            jquery: 'jquery/src/jquery',  // Use the non-diqst form of jQuery for better debugging + optimization
+            'jquery.flot': 'flot/jquery.flot.min',
+            'jquery.ui': 'jquery-ui.min',
+            'jquery.tinymce': 'jquery.tinymce.min',
+            'jquery.inputnumber': 'html5-input-polyfills/number-polyfill',
+            'jquery.qtip': 'jquery.qtip.min',
+            'jquery.smoothScroll': 'jquery.smooth-scroll.min',
+            'jquery.timepicker': 'timepicker/jquery.timepicker',
             'backbone.associations': 'backbone-associations/backbone-associations-min',
+            squire: 'Squire',
+            tinymce: 'tinymce.full.min',
 
             // See sinon/webpack interaction weirdness:
             // https://github.com/webpack/webpack/issues/304#issuecomment-272150177
             // (I've tried every other suggestion solution on that page, this
             // was the only one that worked.)
             sinon: __dirname + '/node_modules/sinon/pkg/sinon.js',
-            'jquery.smoothScroll': 'jquery.smooth-scroll.min',
-            'jquery.timepicker': 'timepicker/jquery.timepicker',
-            datepair: 'timepicker/datepair',
-            accessibility: 'accessibility_tools',
-            ieshim: 'ie_shim'
+            hls: 'hls.js/dist/hls.js'
         },
         modules: [
-            'node_modules',
+            'cms/djangoapps/pipeline_js/js',
             'cms/static',
+            'cms/static/cms/js',
+            'cms/templates/js',
+            'lms/static',
+            'common/lib/xmodule',
+            'common/lib/xmodule/xmodule/js/src',
+            'common/lib/xmodule/xmodule/assets/word_cloud/src/js',
             'common/static',
+            'common/static/coffee/src',
+            'common/static/common/js',
+            'common/static/common/js/vendor/',
             'common/static/js/src',
             'common/static/js/vendor/',
-            'common/static/js/vendor/jQuery-File-Upload/js/'
+            'common/static/js/vendor/jQuery-File-Upload/js/',
+            'common/static/js/vendor/tinymce/js/tinymce',
+            'node_modules',
+            'common/static/xmodule'
         ]
     },
 
@@ -253,16 +357,25 @@ module.exports = {
     },
 
     externals: {
+        $: 'jQuery',
         backbone: 'Backbone',
+        canvas: 'canvas',
         coursetalk: 'CourseTalk',
         gettext: 'gettext',
         jquery: 'jQuery',
         logger: 'Logger',
         underscore: '_',
-        URI: 'URI'
+        URI: 'URI',
+        XBlockToXModuleShim: 'XBlockToXModuleShim',
+        XModule: 'XModule'
     },
 
     watchOptions: {
         poll: true
+    },
+
+    node: {
+        fs: 'empty'
     }
-};
+
+}, xmoduleJS);
