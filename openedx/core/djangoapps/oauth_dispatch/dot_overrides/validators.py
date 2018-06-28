@@ -11,7 +11,6 @@ from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from oauth2_provider.models import AccessToken
 from oauth2_provider.oauth2_validators import OAuth2Validator
-from oauth2_provider.scopes import get_scopes_backend
 from pytz import utc
 from ratelimitbackend.backends import RateLimitMixin
 
@@ -21,10 +20,15 @@ from ..models import RestrictedApplication
 @receiver(pre_save, sender=AccessToken)
 def on_access_token_presave(sender, instance, *args, **kwargs):  # pylint: disable=unused-argument
     """
-    Mark AccessTokens as expired for 'restricted applications' if required.
+    A hook on the AccessToken. Since we do not have protected scopes, we must mark all
+    AccessTokens as expired for 'restricted applications'.
+
+    We do this as a pre-save hook on the ORM
     """
-    if RestrictedApplication.should_expire_access_token(instance.application):
-        instance.expires = datetime(1970, 1, 1, tzinfo=utc)
+
+    is_application_restricted = RestrictedApplication.objects.filter(application=instance.application).exists()
+    if is_application_restricted:
+        RestrictedApplication.set_access_token_as_expired(instance)
 
 
 class EdxRateLimitedAllowAllUsersModelBackend(RateLimitMixin, UserModelBackend):
@@ -97,7 +101,8 @@ class EdxOAuth2Validator(OAuth2Validator):
 
         super(EdxOAuth2Validator, self).save_bearer_token(token, request, *args, **kwargs)
 
-        if RestrictedApplication.should_expire_access_token(request.client):
+        is_application_restricted = RestrictedApplication.objects.filter(application=request.client).exists()
+        if is_application_restricted:
             # Since RestrictedApplications will override the DOT defined expiry, so that access_tokens
             # are always expired, we need to re-read the token from the database and then calculate the
             # expires_in (in seconds) from what we stored in the database. This value should be a negative
@@ -116,10 +121,3 @@ class EdxOAuth2Validator(OAuth2Validator):
         # Restore the original request attributes
         request.grant_type = grant_type
         request.user = user
-
-    def validate_scopes(self, client_id, scopes, client, request, *args, **kwargs):
-        """
-        Ensure required scopes are permitted (as specified in the settings file)
-        """
-        available_scopes = get_scopes_backend().get_available_scopes(application=client, request=request)
-        return set(scopes).issubset(set(available_scopes))
