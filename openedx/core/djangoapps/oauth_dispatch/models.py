@@ -58,7 +58,7 @@ class ApplicationAccess(models.Model):
     Specifies access control information for the associated Application.
     """
 
-    application = models.ForeignKey(oauth2_settings.APPLICATION_MODEL, unique=True, related_name='access')
+    application = models.OneToOneField(oauth2_settings.APPLICATION_MODEL, related_name='access')
     scopes = ListCharField(
         base_field=models.CharField(max_length=32),
         size=25,
