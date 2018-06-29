@@ -13,8 +13,7 @@ from student.models import UserProfile, anonymous_id_for_user
 class AccessTokenMixin(object):
     """ Mixin for tests dealing with OAuth 2 access tokens. """
 
-    def assert_valid_jwt_access_token(self, access_token, user, scopes=None, should_be_expired=False, filters=None,
-                                      jwt_issuer=settings.DEFAULT_JWT_ISSUER, should_be_restricted=None):
+    def assert_valid_jwt_access_token(self, access_token, user, scopes=None, should_be_expired=False):
         """
         Verify the specified JWT access token is valid, and belongs to the specified user.
 
@@ -27,9 +26,8 @@ class AccessTokenMixin(object):
             dict: Decoded JWT payload
         """
         scopes = scopes or []
-        audience = jwt_issuer['AUDIENCE']
-        issuer = jwt_issuer['ISSUER']
-        secret_key = jwt_issuer['SECRET_KEY']
+        audience = settings.JWT_AUTH['JWT_AUDIENCE']
+        issuer = settings.JWT_AUTH['JWT_ISSUER']
 
         def _decode_jwt(verify_expiration):
             """
@@ -38,7 +36,7 @@ class AccessTokenMixin(object):
             """
             return jwt.decode(
                 access_token,
-                secret_key,
+                settings.JWT_AUTH['JWT_SECRET_KEY'],
                 algorithms=[settings.JWT_AUTH['JWT_ALGORITHM']],
                 audience=audience,
                 issuer=issuer,
@@ -57,7 +55,6 @@ class AccessTokenMixin(object):
             'iss': issuer,
             'preferred_username': user.username,
             'scopes': scopes,
-            'version': settings.JWT_AUTH['JWT_SUPPORTED_VERSION'],
             'sub': anonymous_id_for_user(user, None),
         }
 
@@ -76,12 +73,6 @@ class AccessTokenMixin(object):
                 'family_name': user.last_name,
                 'given_name': user.first_name,
             })
-
-        if filters:
-            expected['filters'] = filters
-
-        if should_be_restricted is not None:
-            expected['is_restricted'] = should_be_restricted
 
         self.assertDictContainsSubset(expected, payload)
 
