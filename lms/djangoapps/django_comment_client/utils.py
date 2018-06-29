@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.db import connection
 from django.http import HttpResponse
 from pytz import UTC
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locations import i4xEncoder
 from six import text_type
 
@@ -18,9 +18,8 @@ from courseware.access import has_access
 from django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 from django_comment_client.permissions import check_permissions_by_view, get_team, has_permission
 from django_comment_client.settings import MAX_COMMENT_DEPTH
-from django_comment_common.models import FORUM_ROLE_STUDENT, CourseDiscussionSettings, Role
+from django_comment_common.models import FORUM_ROLE_STUDENT, CourseDiscussionSettings, DiscussionsIdMapping, Role
 from django_comment_common.utils import get_course_discussion_settings
-from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id, get_cohort_names, is_course_cohorted
 from openedx.core.djangoapps.request_cache.middleware import request_cached
 from student.models import get_user_by_username_or_email
@@ -164,12 +163,16 @@ def get_cached_discussion_key(course_id, discussion_id):
     raises a DiscussionIdMapIsNotCached exception.
     """
     try:
-        mapping = CourseStructure.objects.get(course_id=course_id).discussion_id_map
+        mapping = DiscussionsIdMapping.objects.get(course_id=course_id).mapping
         if not mapping:
             raise DiscussionIdMapIsNotCached()
 
-        return mapping.get(discussion_id)
-    except CourseStructure.DoesNotExist:
+        usage_key_string = mapping.get(discussion_id)
+        if usage_key_string:
+            return UsageKey.from_string(usage_key_string).map_into_course(course_id)
+        else:
+            return None
+    except DiscussionsIdMapping.DoesNotExist:
         raise DiscussionIdMapIsNotCached()
 
 
