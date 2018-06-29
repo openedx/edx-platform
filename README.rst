@@ -95,6 +95,7 @@ reports`_. Thanks!
 .. _We use JIRA for our issue tracker: https://openedx.atlassian.net/
 .. _our guidelines for filing high-quality, actionable bug reports: https://openedx.atlassian.net/wiki/display/SUST/How+to+File+a+Quality+Bug+Report
 
+I am doing testing.
 
 How to Contribute
 -----------------
