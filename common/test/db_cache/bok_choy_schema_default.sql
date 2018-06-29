@@ -343,7 +343,7 @@ CREATE TABLE `auth_permission` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `content_type_id` (`content_type_id`,`codename`),
   CONSTRAINT `auth__content_type_id_508cf46651277a81_fk_django_content_type_id` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1095 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1101 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `auth_registration`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2092,7 +2092,7 @@ CREATE TABLE `django_content_type` (
   `model` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `django_content_type_app_label_45f3b1d93ec8c61c_uniq` (`app_label`,`model`)
-) ENGINE=InnoDB AUTO_INCREMENT=364 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=366 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_migrations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2103,7 +2103,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=465 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=469 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2577,7 +2577,9 @@ CREATE TABLE `enterprise_enterprisecustomer` (
   `enable_audit_data_reporting` tinyint(1) NOT NULL,
   `replace_sensitive_sso_username` tinyint(1) NOT NULL,
   `hide_course_original_price` tinyint(1) NOT NULL,
+  `slug` varchar(30) NOT NULL,
   PRIMARY KEY (`uuid`),
+  UNIQUE KEY `enterprise_enterprisecustomer_slug_80411f46_uniq` (`slug`),
   KEY `enterprise_enterprisecustomer_9365d6e7` (`site_id`),
   CONSTRAINT `enterprise_enterprise_site_id_41ce54c2601930cd_fk_django_site_id` FOREIGN KEY (`site_id`) REFERENCES `django_site` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -2751,10 +2753,12 @@ CREATE TABLE `enterprise_historicalenterprisecustomer` (
   `history_change_reason` varchar(100) DEFAULT NULL,
   `replace_sensitive_sso_username` tinyint(1) NOT NULL,
   `hide_course_original_price` tinyint(1) NOT NULL,
+  `slug` varchar(30) NOT NULL,
   PRIMARY KEY (`history_id`),
   KEY `enterprise_hist_history_user_id_2938dabbace21ece_fk_auth_user_id` (`history_user_id`),
   KEY `enterprise_historicalenterprisecustomer_ef7c876f` (`uuid`),
   KEY `enterprise_historicalenterprisecustomer_9365d6e7` (`site_id`),
+  KEY `enterprise_historicalenterprisecustomer_slug_04622dd4` (`slug`),
   CONSTRAINT `enterprise_hist_history_user_id_2938dabbace21ece_fk_auth_user_id` FOREIGN KEY (`history_user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -3602,6 +3606,33 @@ CREATE TABLE `oauth2_refreshtoken` (
   CONSTRAINT `oauth2_refreshtoken_user_id_3d206436_fk` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `oauth_dispatch_applicationaccess`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `oauth_dispatch_applicationaccess` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `scopes` varchar(825) NOT NULL,
+  `application_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `application_id` (`application_id`),
+  CONSTRAINT `oauth_dispatch_appli_application_id_dcddee6e_fk_oauth2_pr` FOREIGN KEY (`application_id`) REFERENCES `oauth2_provider_application` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `oauth_dispatch_applicationorganization`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `oauth_dispatch_applicationorganization` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `relation_type` varchar(32) NOT NULL,
+  `application_id` int(11) NOT NULL,
+  `organization_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `oauth_dispatch_applicati_application_id_relation__1b4017f2_uniq` (`application_id`,`relation_type`,`organization_id`),
+  KEY `oauth_dispatch_appli_organization_id_fe63a7f2_fk_organizat` (`organization_id`),
+  CONSTRAINT `oauth_dispatch_appli_application_id_dea619c6_fk_oauth2_pr` FOREIGN KEY (`application_id`) REFERENCES `oauth2_provider_application` (`id`),
+  CONSTRAINT `oauth_dispatch_appli_organization_id_fe63a7f2_fk_organizat` FOREIGN KEY (`organization_id`) REFERENCES `organizations_organization` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `oauth_dispatch_restrictedapplication`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -3611,40 +3642,6 @@ CREATE TABLE `oauth_dispatch_restrictedapplication` (
   PRIMARY KEY (`id`),
   KEY `d0faf25b802e0044a322123f797a61c7` (`application_id`),
   CONSTRAINT `d0faf25b802e0044a322123f797a61c7` FOREIGN KEY (`application_id`) REFERENCES `oauth2_provider_application` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `oauth_dispatch_scopedapplication`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `oauth_dispatch_scopedapplication` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `client_id` varchar(100) NOT NULL,
-  `redirect_uris` longtext NOT NULL,
-  `client_type` varchar(32) NOT NULL,
-  `authorization_grant_type` varchar(32) NOT NULL,
-  `client_secret` varchar(255) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `skip_authorization` tinyint(1) NOT NULL,
-  `scopes` varchar(825) NOT NULL,
-  `user_id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `client_id` (`client_id`),
-  KEY `oauth_dispatch_scope_user_id_e5ed920f_fk_auth_user` (`user_id`),
-  KEY `oauth_dispatch_scopedapplication_client_secret_64e96dfc` (`client_secret`),
-  CONSTRAINT `oauth_dispatch_scope_user_id_e5ed920f_fk_auth_user` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `oauth_dispatch_scopedapplicationorganization`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `oauth_dispatch_scopedapplicationorganization` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `short_name` varchar(255) NOT NULL,
-  `provider_type` varchar(32) NOT NULL,
-  `application_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `oauth_dispatch_scope_application_id_46b4a255_fk_oauth2_pr` (`application_id`),
-  CONSTRAINT `oauth_dispatch_scope_application_id_46b4a255_fk_oauth2_pr` FOREIGN KEY (`application_id`) REFERENCES `oauth2_provider_application` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `oauth_provider_consumer`;
