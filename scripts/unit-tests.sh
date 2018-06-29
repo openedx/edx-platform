@@ -31,6 +31,7 @@ set -e
 
 PAVER_ARGS="-v"
 PARALLEL="--processes=-1"
+export SKIP_NPM_INSTALL="True"
 
 # Skip re-installation of Python prerequisites inside a tox execution.
 if [[ -n "$TOXENV" ]]; then
