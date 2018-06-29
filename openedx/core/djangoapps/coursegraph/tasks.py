@@ -125,7 +125,7 @@ def get_command_last_run(course_key, graph):
 
 def get_course_last_published(course_key):
     """
-    We use the CourseStructure table to get when this course was last
+    We use the BlockStructureModel table to get when this course was last
     published.
     Args:
         course_key: a CourseKey
