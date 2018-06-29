@@ -2236,6 +2236,9 @@ INSTALLED_APPS = (
 
     # Data extraction App
     'openedx.features.data_extract',
+
+    # Course cards app
+    'openedx.features.course_card'
 )
 
 ######################### CSRF #########################################
