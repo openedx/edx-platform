@@ -130,7 +130,7 @@ edx-completion==0.1.7
 edx-django-oauth2-provider==1.2.5
 edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
-edx-drf-extensions==1.5.1
+edx-drf-extensions==1.5.2
 edx-enterprise==0.70.1
 edx-i18n-tools==0.4.5
 edx-lint==0.5.5
@@ -228,8 +228,8 @@ pluggy==0.6.0             # via pytest, tox
 polib==1.1.0
 psutil==1.2.1
 py2neo==3.1.2
-py==1.5.3                 # via pytest, tox
-pyasn1-modules==0.2.1     # via service-identity
+py==1.5.4                 # via pytest, tox
+pyasn1-modules==0.2.2     # via service-identity
 pyasn1==0.4.3             # via pyasn1-modules, service-identity
 pycodestyle==2.3.1
 pycontracts==1.7.1

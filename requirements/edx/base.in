@@ -125,6 +125,7 @@ python-openid
 python-saml==2.4.0
 pyuca==1.1                          # For more accurate sorting of translated country names in django-countries
 reportlab==3.1.44                   # Used for shopping cart's pdf invoice/receipt generation
+rest-condition                      # DRF's recommendation for supporting complex permissions
 rfc6266-parser                      # Used to generate Content-Disposition headers.
 social-auth-app-django
 social-auth-core

@@ -135,7 +135,7 @@ edx-completion==0.1.7
 edx-django-oauth2-provider==1.2.5
 edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
-edx-drf-extensions==1.5.1
+edx-drf-extensions==1.5.2
 edx-enterprise==0.70.1
 edx-i18n-tools==0.4.5
 edx-lint==0.5.5
