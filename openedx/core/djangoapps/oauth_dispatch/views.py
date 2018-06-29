@@ -21,6 +21,7 @@ from ratelimit import ALL
 from ratelimit.mixins import RatelimitMixin
 
 from openedx.core.djangoapps.auth_exchange import views as auth_exchange_views
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.token_utils import JwtBuilder
 
 from . import adapters
@@ -144,24 +145,39 @@ class AccessTokenView(RatelimitMixin, _DispatchingView):
 
     def _get_client_specific_claims(self, client_id, adapter):
         """ Get claims that are specific to the client. """
-        # If JWT scope enforcement is enabled, we need to sign tokens
-        # given to restricted application with a separate secret which
-        # other IDAs do not have access to. This prevents restricted
-        # applications from getting access to API endpoints available
-        # on other IDAs which have not yet been protected with the
-        # scope-related DRF permission classes. Once all endpoints have
-        # been protected we can remove this if/else and go back to using
-        # a single secret.
-        # TODO: ARCH-162
         is_client_restricted = adapter.is_client_restricted(client_id)
-        if ENFORCE_JWT_SCOPES.is_enabled() and is_client_restricted:
-            issuer_setting = 'RESTRICTED_APPLICATION_JWT_ISSUER'
-        else:
-            issuer_setting = 'DEFAULT_JWT_ISSUER'
-
-        jwt_issuer = getattr(settings, issuer_setting)
         filters = adapter.get_authorization_filters(client_id)
-        return jwt_issuer['ISSUER'], jwt_issuer['SECRET_KEY'], jwt_issuer['AUDIENCE'], filters, is_client_restricted
+        if ENFORCE_JWT_SCOPES.is_enabled() and is_client_restricted:
+            # If JWT scope enforcement is enabled, we need to sign tokens
+            # given to restricted applications with a separate secret which
+            # other IDAs do not have access to. This prevents restricted
+            # applications from getting access to API endpoints available
+            # on other IDAs which have not yet been protected with the
+            # scope-related DRF permission classes. Once all endpoints have
+            # been protected we can remove this if/else and go back to using
+            # a single secret.
+            # TODO: ARCH-162
+            jwt_issuer = configuration_helpers.get_value(
+                'RESTRICTED_APPLICATION_JWT_ISSUER',
+                settings.RESTRICTED_APPLICATION_JWT_ISSUER
+            )
+            return (
+                jwt_issuer['ISSUER'],
+                jwt_issuer['SECRET_KEY'],
+                jwt_issuer['AUDIENCE'],
+                filters,
+                is_client_restricted
+            )
+        else:
+            # Otherwise we use the default issuer to sign the token.
+            jwt_auth = configuration_helpers.get_value('JWT_AUTH', settings.JWT_AUTH)
+            return (
+                jwt_auth['JWT_ISSUER'],
+                jwt_auth['JWT_SECRET_KEY'],
+                jwt_auth['JWT_AUDIENCE'],
+                filters,
+                is_client_restricted
+            )
 
 
 class AuthorizationView(_DispatchingView):
