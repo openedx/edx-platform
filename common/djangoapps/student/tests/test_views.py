@@ -642,6 +642,32 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         response = self.client.get(reverse('dashboard'))
         self.assertNotIn('You are not enrolled in any courses yet.', response.content)
 
+    @patch('student.views.dashboard.waffle.switch_is_active')
+    def test_show_incomplete_profile_alert(self, mock_switch_is_active):
+        """
+        Verify that when the enable_incomplete_profile_notification switch is enabled,
+        users can see the incomplete profile alert.
+        """
+        mock_switch_is_active.return_value = True
+        with with_site_configuration_context(configuration={
+            "DAYS_PASSED_TO_ALERT_PROFILE_INCOMPLETION": 0,
+            "FIELDS_TO_CHECK_PROFILE_COMPLETION": ['gender', 'city', 'year_of_birth'],
+        }):
+            self.assertTrue(self.user.is_active)
+            response = self.client.get(reverse('dashboard'))
+            self.assertIn('Your profile has missing fields!', response.content)
+
+    @patch('student.views.dashboard.waffle.switch_is_active')
+    def test_hide_incomplete_profile_alert(self, mock_switch_is_active):
+        """
+        Verify that when the enable_incomplete_profile_notification switch is disabled,
+        users don't see the incomplete profile alert.
+        """
+        mock_switch_is_active.return_value = False
+        self.assertTrue(self.user.is_active)
+        response = self.client.get(reverse('dashboard'))
+        self.assertNotIn('Your profile has missing fields!', response.content)
+
     def test_show_empty_dashboard_message(self):
         """
         Verify that when the EMPTY_DASHBOARD_MESSAGE feature is set,
