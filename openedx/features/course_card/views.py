@@ -12,6 +12,10 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 
 @csrf_exempt
 def get_course_cards(request):
+    """
+    :param request:
+    :return: list of active cards
+    """
 
     user = request.user
 
@@ -51,6 +55,8 @@ def get_course_cards(request):
         course.start_date = None if not start_date else start_date.strftime('%b %-d, %Y')
         is_enrolled = CourseEnrollment.is_enrolled(request.user, current_course.id)
         course.is_enrolled = is_enrolled
+
+        # todo: we need to decide if user has enrolled then he will be taken to course directly or to about page
         # first_chapter_url, first_section = get_course_related_keys(request, current_course)
         # course_target = reverse('courseware_section', args=[current_course.id, first_chapter_url, first_section])
         course.course_target = ''

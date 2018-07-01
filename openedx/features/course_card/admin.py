@@ -7,6 +7,11 @@ from openedx.features.course_card.models import CourseCard
 
 class CardModel(ModelForm):
     def __init__(self, *args, **kwargs):
+        """
+        Only show parent courses in admin site to create cards
+        :param args:
+        :param kwargs:
+        """
         super(CardModel, self).__init__(*args, **kwargs)
         course_rerun_states = CourseRerunState.objects.all()
         course_rerun_ids = [rerun.course_key for rerun in course_rerun_states]
