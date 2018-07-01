@@ -1,7 +1,7 @@
 <%page expression_filter="h"/>
-<%inherit file="../main.html" />
+<%inherit file="/main.html" />
 <%def name="online_help_token()"><% return "learnerdashboard" %></%def>
-<%namespace name='static' file='../static_content.html'/>
+<%namespace name='static' file='/static_content.html'/>
 <%!
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
@@ -51,7 +51,7 @@ banner.showMessage(${redirect_message | n, dump_js_escaped_json})
   <div class="dashboard" id="dashboard-main">
     <div class="main-container">
       <div class="my-courses" id="my-courses">
-        <%include file="_dashboard_navigation_journals.html"/>
+        <%include file="/learner_dashboard/_dashboard_navigation_journals.html"/>
 
         % if len(journals) > 0:
         <ul class="listing-courses">
