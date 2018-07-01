@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-06-24 20:36+0000\n"
-"PO-Revision-Date: 2018-06-24 20:37:01.734188\n"
+"POT-Creation-Date: 2018-07-01 20:37+0000\n"
+"PO-Revision-Date: 2018-07-01 20:37:12.616727\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -11231,6 +11231,33 @@ msgid "Your Platform Description Here"
 msgstr "Ýöür Plätförm Désçrïptïön Héré Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/envs/common.py
+msgid "Read access"
+msgstr "Réäd äççéss Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: lms/envs/common.py
+msgid "Write access"
+msgstr "Wrïté äççéss Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: lms/envs/common.py
+msgid "Know your email address"
+msgstr "Knöw ýöür émäïl äddréss Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: lms/envs/common.py
+msgid "Know your name and username"
+msgstr "Knöw ýöür nämé änd üsérnämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
+#: lms/envs/common.py
+msgid "Retrieve your grades for your enrolled courses"
+msgstr ""
+"Rétrïévé ýöür grädés för ýöür énrölléd çöürsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α#"
+
+#: lms/envs/common.py
+msgid "Retrieve your course certificates"
+msgstr ""
+"Rétrïévé ýöür çöürsé çértïfïçätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/envs/common.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Audit"
 msgstr "Àüdït Ⱡ'σяєм ιρѕ#"
@@ -11392,6 +11419,14 @@ msgid ""
 msgstr ""
 "Thé äßövé äpplïçätïön réqüésts thé föllöwïng pérmïssïöns fröm ýöür äççöünt: "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
+
+#: lms/templates/oauth2_provider/authorize.html
+msgid ""
+"These permissions will be granted for data from your courses associated with"
+" the following content providers:"
+msgstr ""
+"Thésé pérmïssïöns wïll ßé gräntéd för dätä fröm ýöür çöürsés ässöçïätéd wïth"
+" thé föllöwïng çöntént prövïdérs: Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/oauth2_provider/authorize.html
 msgid ""
@@ -12633,12 +12668,6 @@ msgstr ""
 #: openedx/core/djangoapps/oauth_dispatch/models.py
 msgid "Content Provider"
 msgstr "Çöntént Prövïdér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: openedx/core/djangoapps/oauth_dispatch/models.py
-msgid "The short_name of an existing Organization."
-msgstr ""
-"Thé shört_nämé öf än éxïstïng Örgänïzätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
 
 #: openedx/core/djangoapps/password_policy/apps.py
 msgid "Password Policy"

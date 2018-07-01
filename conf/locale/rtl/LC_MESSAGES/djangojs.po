@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-06-24 20:36+0000\n"
-"PO-Revision-Date: 2018-06-24 20:37:02.062080\n"
+"POT-Creation-Date: 2018-07-01 20:36+0000\n"
+"PO-Revision-Date: 2018-07-01 20:37:12.587792\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -277,19 +277,19 @@ msgstr "عحيشفهرل صهفا مشفثسف مهزقشقغ ذخرفثرف"
 msgid "Creating missing groups"
 msgstr "ذقثشفهرل وهسسهرل لقخعحس"
 
-#: common/lib/xmodule/xmodule/assets/word_cloud/public/js/word_cloud_main.js
+#: common/lib/xmodule/xmodule/assets/word_cloud/src/js/word_cloud_main.js
 msgid "{start_strong}{total}{end_strong} words submitted in total."
 msgstr "{start_strong}{total}{end_strong} صخقيس سعزوهففثي هر فخفشم."
 
-#: common/lib/xmodule/xmodule/assets/word_cloud/public/js/word_cloud_main.js
+#: common/lib/xmodule/xmodule/assets/word_cloud/src/js/word_cloud_main.js
 msgid "text_word_{uniqueId} title_word_{uniqueId}"
 msgstr "فثطف_صخقي_{uniqueId} فهفمث_صخقي_{uniqueId}"
 
-#: common/lib/xmodule/xmodule/assets/word_cloud/public/js/word_cloud_main.js
+#: common/lib/xmodule/xmodule/assets/word_cloud/src/js/word_cloud_main.js
 msgid "title_word_{uniqueId}"
 msgstr "فهفمث_صخقي_{uniqueId}"
 
-#: common/lib/xmodule/xmodule/assets/word_cloud/public/js/word_cloud_main.js
+#: common/lib/xmodule/xmodule/assets/word_cloud/src/js/word_cloud_main.js
 msgid "text_word_{uniqueId}"
 msgstr "فثطف_صخقي_{uniqueId}"
 
@@ -6973,11 +6973,6 @@ msgid "Previous"
 msgstr "حقثدهخعس"
 
 #: cms/templates/js/previous-video-upload-list.underscore
-#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
-msgid "Status"
-msgstr "سفشفعس"
-
-#: cms/templates/js/previous-video-upload-list.underscore
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
@@ -7394,6 +7389,10 @@ msgstr "رخ قثسعمفس"
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
 msgid "Course Key"
 msgstr "ذخعقسث نثغ"
+
+#: lms/djangoapps/support/static/support/templates/certificates_results.underscore
+msgid "Status"
+msgstr "سفشفعس"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
 msgid "Download URL"
@@ -10328,6 +10327,10 @@ msgstr "دهيثخ هي"
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Transcripts"
 msgstr "فقشرسذقهحفس"
+
+#: cms/templates/js/previous-video-upload-list.underscore
+msgid "Video Status"
+msgstr "دهيثخ سفشفعس"
 
 #: cms/templates/js/previous-video-upload.underscore
 msgid "Remove this video"

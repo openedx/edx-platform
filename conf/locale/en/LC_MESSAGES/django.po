@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-06-24 20:36+0000\n"
-"PO-Revision-Date: 2018-06-24 20:37:01.734188\n"
+"POT-Creation-Date: 2018-07-01 20:37+0000\n"
+"PO-Revision-Date: 2018-07-01 20:37:12.616727\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -8757,6 +8757,30 @@ msgid "Your Platform Description Here"
 msgstr ""
 
 #: lms/envs/common.py
+msgid "Read access"
+msgstr ""
+
+#: lms/envs/common.py
+msgid "Write access"
+msgstr ""
+
+#: lms/envs/common.py
+msgid "Know your email address"
+msgstr ""
+
+#: lms/envs/common.py
+msgid "Know your name and username"
+msgstr ""
+
+#: lms/envs/common.py
+msgid "Retrieve your grades for your enrolled courses"
+msgstr ""
+
+#: lms/envs/common.py
+msgid "Retrieve your course certificates"
+msgstr ""
+
+#: lms/envs/common.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Audit"
 msgstr ""
@@ -8899,6 +8923,12 @@ msgstr ""
 #: lms/templates/oauth2_provider/authorize.html
 msgid ""
 "The above application requests the following permissions from your account:"
+msgstr ""
+
+#: lms/templates/oauth2_provider/authorize.html
+msgid ""
+"These permissions will be granted for data from your courses associated with"
+" the following content providers:"
 msgstr ""
 
 #: lms/templates/oauth2_provider/authorize.html
@@ -9905,10 +9935,6 @@ msgstr ""
 
 #: openedx/core/djangoapps/oauth_dispatch/models.py
 msgid "Content Provider"
-msgstr ""
-
-#: openedx/core/djangoapps/oauth_dispatch/models.py
-msgid "The short_name of an existing Organization."
 msgstr ""
 
 #: openedx/core/djangoapps/password_policy/apps.py
