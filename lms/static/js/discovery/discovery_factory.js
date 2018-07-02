@@ -72,7 +72,7 @@
                 });
 
                 dispatcher.listenTo(search, 'error', function() {
-                    form.showErrorMessage();
+                    form.showErrorMessage(search.errorMessage);
                     form.hideLoadingIndicator();
                 });
 

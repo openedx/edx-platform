@@ -19,11 +19,22 @@
             fetchXhr: null,
 
             initialize: function(models, options) {
-            // call super constructor
+                // call super constructor
                 Backbone.Collection.prototype.initialize.apply(this, arguments);
                 if (options && options.courseId) {
                     this.url += options.courseId;
                 }
+            },
+
+            extractErrorMessage: function(response) {
+                var errorMessage;
+                if (response.responseJSON && response.responseJSON.error) {
+                    // eslint-disable-next-line no-param-reassign
+                    errorMessage = response.responseJSON.error || '';
+                } else {
+                    errorMessage = '';  // eslint-disable-line no-param-reassign
+                }
+                return errorMessage;
             },
 
             performSearch: function(searchTerm) {
@@ -40,9 +51,11 @@
                     },
                     type: 'POST',
                     success: function(self) {
+                        self.errorMessage = '';  // eslint-disable-line no-param-reassign
                         self.trigger('search');
                     },
-                    error: function(self) {
+                    error: function(self, response) {
+                        self.errorMessage = self.extractErrorMessage(response);
                         self.trigger('error');
                     }
                 });
@@ -60,10 +73,12 @@
                     },
                     type: 'POST',
                     success: function(self) {
+                        self.errorMessage = '';  // eslint-disable-line no-param-reassign
                         self.page += 1;  // eslint-disable-line no-param-reassign
                         self.trigger('next');
                     },
-                    error: function(self) {
+                    error: function(self, response) {
+                        self.errorMessage = self.extractErrorMessage(response);
                         self.trigger('error');
                     },
                     add: true,
@@ -94,7 +109,7 @@
                 this.totalCount = 0;
                 this.latestModelsCount = 0;
                 this.accessDeniedCount = 0;
-            // empty the entire collection
+                // empty the entire collection
                 this.reset();
             },
 

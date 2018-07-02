@@ -72,10 +72,12 @@
             reset: function() {
                 this.discovery.reset();
                 this.page = 0;
+                this.errorMessage = '';
             },
 
             onError: function(collection, response, options) {
                 if (response.statusText !== 'abort') {
+                    this.errorMessage = response.responseJSON.error;
                     this.trigger('error');
                 }
             },

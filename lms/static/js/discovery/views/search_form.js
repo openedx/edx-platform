@@ -60,8 +60,8 @@
                 this.clearSearch();
             },
 
-            showErrorMessage: function() {
-                this.$message.html(gettext('There was an error, try searching again.'));
+            showErrorMessage: function (error) {
+                this.$message.text(gettext(error || 'There was an error, try searching again.'));
             }
 
         });
