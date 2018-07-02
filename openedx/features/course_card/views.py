@@ -71,6 +71,12 @@ def get_course_cards(request):
 
 
 def get_course_link(course, request):
+    """
+    create course link for students for the rerun he/she has enrolled for
+    :param course:
+    :param request:
+    :return:
+    """
     course_target = ''
     course_key = SlashSeparatedCourseKey.from_deprecated_string(
         course.id.to_deprecated_string())
