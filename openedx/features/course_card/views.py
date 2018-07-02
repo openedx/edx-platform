@@ -3,11 +3,16 @@ from datetime import datetime
 import pytz
 from common.djangoapps.student.views import get_course_related_keys
 from django.core.urlresolvers import reverse
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.courses import get_course_by_id
+from lms.djangoapps.courseware.views.views import get_last_accessed_courseware
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from student.models import CourseEnrollment
 from edxmako.shortcuts import render_to_response
 from openedx.features.course_card.models import CourseCard
 from django.views.decorators.csrf import csrf_exempt
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from xmodule.modulestore.django import modulestore
 
 
 @csrf_exempt
@@ -55,14 +60,37 @@ def get_course_cards(request):
         course.start_date = None if not start_date else start_date.strftime('%b %-d, %Y')
         is_enrolled = CourseEnrollment.is_enrolled(request.user, current_course.id)
         course.is_enrolled = is_enrolled
-
-        # todo: we need to decide if user has enrolled then he will be taken to course directly or to about page
-        # first_chapter_url, first_section = get_course_related_keys(request, current_course)
-        # course_target = reverse('courseware_section', args=[current_course.id, first_chapter_url, first_section])
-        course.course_target = ''
+        course_target = get_course_link(current_course, request)
+        course.course_target = course_target
     return render_to_response(
         "course_card/courses.html",
         {
             'courses': courses_list
         }
     )
+
+
+def get_course_link(course, request):
+    course_target = ''
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(
+        course.id.to_deprecated_string())
+    with modulestore().bulk_operations(course_key):
+        if has_access(request.user, 'load', course):
+            access_link = get_last_accessed_courseware(
+                get_course_by_id(course_key, 0),
+                request,
+                request.user
+            )
+
+            first_chapter_url, first_section = get_course_related_keys(
+                request, get_course_by_id(course_key, 0))
+            first_target = reverse('courseware_section', args=[
+                course.id.to_deprecated_string(),
+                first_chapter_url,
+                first_section
+            ])
+
+            course_target = access_link if access_link != None else first_target
+        else:
+            course_target = '/courses/' + course.id.to_deprecated_string()
+    return course_target
