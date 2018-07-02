@@ -10,6 +10,8 @@ from six import text_type
 
 from student.models import CourseEnrollment, User
 
+from student.models import CourseEnrollmentAttribute
+
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 
@@ -96,7 +98,7 @@ class Command(BaseCommand):
 
         self.report(error_users, success_users)
 
-    def update_enrollments(self, identifier, enrollment_args, options, error_users, success_users):
+    def update_enrollments(self, identifier, enrollment_args, options, error_users, success_users, enrollment_attrs=None):
         """ Update enrollments for a specific user identifier (email or username). """
         users = options[identifier].split(",")
 
@@ -111,10 +113,19 @@ class Command(BaseCommand):
                 enrollment_args['user'] = User.objects.get(**user_args)
                 enrollments = CourseEnrollment.objects.filter(**enrollment_args)
 
+                enrollment_attrs = []
                 with transaction.atomic():
                     for enrollment in enrollments:
                         enrollment.update_enrollment(mode=options['to_mode'])
                         enrollment.save()
+                        if options['to_mode'] == 'credit':
+                            enrollment_attrs.append({
+                                'namespace': 'credit',
+                                'name': 'provider_id',
+                                'value': enrollment_args['course_id'].org,
+                            })
+                            CourseEnrollmentAttribute.add_enrollment_attr(enrollment=enrollment,
+                                                                          data_list=enrollment_attrs)
 
                     if options['noop']:
                         raise RollbackException('Forced rollback.')
