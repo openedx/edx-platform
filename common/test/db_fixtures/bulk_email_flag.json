@@ -5,7 +5,7 @@
         "fields": {
             "enabled": true,
             "require_course_email_auth": false,
-            "change_date": "2016-05-01"
+            "change_date": "2016-05-01T00:00:00Z"
         }
     }
 ]
