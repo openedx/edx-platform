@@ -35,6 +35,7 @@
 # Laura Silva <lingison@edx.org>, 2015-2018
 # Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013
 # Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013
+# Marcos Buccella <marcosfiore07@gmail.com>, 2018
 # Marina Pastor <mpastor@edx.org>, 2017-2018
 # Matías Olivera <MatiasOlivera@outlook.com>, 2015
 # MarnyLopez, 2014
@@ -218,7 +219,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-06-21 12:32+0000\n"
+"POT-Creation-Date: 2018-06-25 13:22+0000\n"
 "PO-Revision-Date: 2018-06-06 15:12+0000\n"
 "Last-Translator: Muhammad Ayub khan <ayubkhan@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -3068,13 +3069,13 @@ msgstr "Trama para los temas de discusión"
 msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
-"example, one discussion category may be \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each "
-"category must be unique. In \"id\" values, the only special characters that "
-"are supported are underscore, hyphen, and period. You can also specify a "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each category "
+"must be unique. In \"id\" values, the only special characters that are "
+"supported are underscore, hyphen, and period. You can also specify a "
 "category as the default for new posts in the Discussion page by setting its "
-"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 msgstr ""
 "Ingrese las categorías de discusión en el siguiente formato: "
 "\"CategoryName\": {\"id\": \"i4x-InstitutionName-CourseNumber-course-"
@@ -10363,8 +10364,7 @@ msgstr "Ver todos los registros hijos"
 msgid "This article was last modified:"
 msgstr "Última modificación de este artículo:"
 
-#: lms/templates/wiki/create.html lms/templates/wiki/create.html.py
-#: wiki/templates/wiki/create.html
+#: lms/templates/wiki/create.html wiki/templates/wiki/create.html
 msgid "Add new article"
 msgstr "Añadir nuevo artículo"
 
@@ -10373,7 +10373,6 @@ msgid "Create article"
 msgstr "Crear artículo"
 
 #: lms/templates/wiki/create.html lms/templates/wiki/delete.html
-#: lms/templates/wiki/delete.html.py
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
@@ -10384,9 +10383,8 @@ msgstr "Crear artículo"
 msgid "Go back"
 msgstr "Volver"
 
-#: lms/templates/wiki/delete.html lms/templates/wiki/delete.html.py
-#: lms/templates/wiki/edit.html wiki/templates/wiki/delete.html
-#: wiki/templates/wiki/edit.html
+#: lms/templates/wiki/delete.html lms/templates/wiki/edit.html
+#: wiki/templates/wiki/delete.html wiki/templates/wiki/edit.html
 msgid "Delete article"
 msgstr "Borrar artículo"
 
@@ -10441,9 +10439,8 @@ msgstr "Está a punto de borrar un artículo. Favor confirmar."
 msgid "Edit"
 msgstr "Editar"
 
-#: lms/templates/wiki/edit.html lms/templates/wiki/edit.html.py
-#: lms/templates/ccx/schedule.html wiki/templates/wiki/edit.html
-#: wiki/templates/wiki/settings.html
+#: lms/templates/wiki/edit.html lms/templates/ccx/schedule.html
+#: wiki/templates/wiki/edit.html wiki/templates/wiki/settings.html
 msgid "Save changes"
 msgstr "Guardar cambios"
 
@@ -13179,12 +13176,11 @@ msgstr "Página no encontrada"
 msgid "Page not found"
 msgstr "Página no encontrada"
 
-#: cms/templates/asset_index.html cms/templates/checklists.html
-#: cms/templates/course_info.html cms/templates/course_outline.html
-#: cms/templates/edit-tabs.html cms/templates/textbooks.html
-#: cms/templates/videos_index.html cms/templates/widgets/header.html
-#: lms/templates/static_htmlbook.html lms/templates/static_pdfbook.html
-#: lms/templates/staticbook.html
+#: cms/templates/asset_index.html cms/templates/course_info.html
+#: cms/templates/course_outline.html cms/templates/edit-tabs.html
+#: cms/templates/textbooks.html cms/templates/videos_index.html
+#: cms/templates/widgets/header.html lms/templates/static_htmlbook.html
+#: lms/templates/static_pdfbook.html lms/templates/staticbook.html
 msgid "Content"
 msgstr "Contenido"
 
@@ -22559,9 +22555,15 @@ msgstr "Equipo del curso"
 msgid "Advanced Settings"
 msgstr "Configuración avanzada"
 
-#: cms/templates/checklists.html
+#: cms/templates/checklists.html cms/templates/widgets/header.html
 msgid "Checklists"
 msgstr ""
+
+#: cms/templates/checklists.html cms/templates/export.html
+#: cms/templates/export_git.html cms/templates/import.html
+#: cms/templates/widgets/header.html
+msgid "Tools"
+msgstr "Herramientas"
 
 #: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
 msgid "Duplicate"
@@ -23219,11 +23221,6 @@ msgstr "Exportar Librería"
 #: cms/templates/export.html
 msgid "Course Export"
 msgstr "Exportación del Curso"
-
-#: cms/templates/export.html cms/templates/export_git.html
-#: cms/templates/import.html cms/templates/widgets/header.html
-msgid "Tools"
-msgstr "Herramientas"
 
 #: cms/templates/export.html
 msgid "About Exporting Libraries"

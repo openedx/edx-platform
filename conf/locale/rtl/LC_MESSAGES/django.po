@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-06-24 20:36+0000\n"
-"PO-Revision-Date: 2018-06-24 20:37:01.734188\n"
+"POT-Creation-Date: 2018-07-02 05:55+0000\n"
+"PO-Revision-Date: 2018-07-02 05:55:39.490020\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -2820,23 +2820,23 @@ msgstr "يهسذعسسهخر فخحهذ وشححهرل"
 msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
-"example, one discussion category may be \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each "
-"category must be unique. In \"id\" values, the only special characters that "
-"are supported are underscore, hyphen, and period. You can also specify a "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each category "
+"must be unique. In \"id\" values, the only special characters that are "
+"supported are underscore, hyphen, and period. You can also specify a "
 "category as the default for new posts in the Discussion page by setting its "
-"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 msgstr ""
 "ثرفثق يهسذعسسهخر ذشفثلخقهثس هر فاث بخممخصهرل بخقوشف: \"ذشفثلخقغرشوث\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. بخق "
-"ثطشوحمث, خرث يهسذعسسهخر ذشفثلخقغ وشغ زث \"مغيهشر وخيث\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\"}. فاث \"هي\" دشمعث بخق ثشذا "
-"ذشفثلخقغ وعسف زث عرهضعث. هر \"هي\" دشمعثس, فاث خرمغ سحثذهشم ذاشقشذفثقس فاشف "
-"شقث سعححخقفثي شقث عريثقسذخقث, اغحاثر, شري حثقهخي. غخع ذشر شمسخ سحثذهبغ ش "
+"ثطشوحمث, خرث يهسذعسسهخر ذشفثلخقغ وشغ زث \"مغيهشر وخيث\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\"}. فاث \"هي\" دشمعث بخق ثشذا ذشفثلخقغ "
+"وعسف زث عرهضعث. هر \"هي\" دشمعثس, فاث خرمغ سحثذهشم ذاشقشذفثقس فاشف شقث "
+"سعححخقفثي شقث عريثقسذخقث, اغحاثر, شري حثقهخي. غخع ذشر شمسخ سحثذهبغ ش "
 "ذشفثلخقغ شس فاث يثبشعمف بخق رثص حخسفس هر فاث يهسذعسسهخر حشلث زغ سثففهرل هفس "
-"\"يثبشعمف\" شففقهزعفث فخ فقعث. بخق ثطشوحمث, \"مغيهشر وخيث\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"يثبشعمف\" شففقهزعفث فخ فقعث. بخق ثطشوحمث, \"مغيهشر وخيث\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Discussion Sorting Alphabetical"
@@ -9736,6 +9736,30 @@ msgid "Your Platform Description Here"
 msgstr "غخعق حمشفبخقو يثسذقهحفهخر اثقث"
 
 #: lms/envs/common.py
+msgid "Read access"
+msgstr "قثشي شذذثسس"
+
+#: lms/envs/common.py
+msgid "Write access"
+msgstr "صقهفث شذذثسس"
+
+#: lms/envs/common.py
+msgid "Know your email address"
+msgstr "نرخص غخعق ثوشهم شييقثسس"
+
+#: lms/envs/common.py
+msgid "Know your name and username"
+msgstr "نرخص غخعق رشوث شري عسثقرشوث"
+
+#: lms/envs/common.py
+msgid "Retrieve your grades for your enrolled courses"
+msgstr "قثفقهثدث غخعق لقشيثس بخق غخعق ثرقخممثي ذخعقسثس"
+
+#: lms/envs/common.py
+msgid "Retrieve your course certificates"
+msgstr "قثفقهثدث غخعق ذخعقسث ذثقفهبهذشفثس"
+
+#: lms/envs/common.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Audit"
 msgstr "شعيهف"
@@ -9892,6 +9916,14 @@ msgstr ""
 
 #: lms/templates/oauth2_provider/authorize.html
 msgid ""
+"These permissions will be granted for data from your courses associated with"
+" the following content providers:"
+msgstr ""
+"فاثسث حثقوهسسهخرس صهمم زث لقشرفثي بخق يشفش بقخو غخعق ذخعقسثس شسسخذهشفثي صهفا"
+" فاث بخممخصهرل ذخرفثرف حقخدهيثقس:"
+
+#: lms/templates/oauth2_provider/authorize.html
+msgid ""
 "Please click the 'Allow' button to grant these permissions to the above "
 "application. Otherwise, to withhold these permissions, please click the "
 "'Cancel' button."
@@ -9928,8 +9960,7 @@ msgstr "سثث شمم ذاهميقثر"
 msgid "This article was last modified:"
 msgstr "فاهس شقفهذمث صشس مشسف وخيهبهثي:"
 
-#: lms/templates/wiki/create.html lms/templates/wiki/create.html.py
-#: wiki/templates/wiki/create.html
+#: lms/templates/wiki/create.html wiki/templates/wiki/create.html
 msgid "Add new article"
 msgstr "شيي رثص شقفهذمث"
 
@@ -9938,7 +9969,6 @@ msgid "Create article"
 msgstr "ذقثشفث شقفهذمث"
 
 #: lms/templates/wiki/create.html lms/templates/wiki/delete.html
-#: lms/templates/wiki/delete.html.py
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
@@ -9949,9 +9979,8 @@ msgstr "ذقثشفث شقفهذمث"
 msgid "Go back"
 msgstr "لخ زشذن"
 
-#: lms/templates/wiki/delete.html lms/templates/wiki/delete.html.py
-#: lms/templates/wiki/edit.html wiki/templates/wiki/delete.html
-#: wiki/templates/wiki/edit.html
+#: lms/templates/wiki/delete.html lms/templates/wiki/edit.html
+#: wiki/templates/wiki/delete.html wiki/templates/wiki/edit.html
 msgid "Delete article"
 msgstr "يثمثفث شقفهذمث"
 
@@ -10004,9 +10033,8 @@ msgstr "غخع شقث يثمثفهرل شر شقفهذمث. حمثشسث ذخر�
 msgid "Edit"
 msgstr "ثيهف"
 
-#: lms/templates/wiki/edit.html lms/templates/wiki/edit.html.py
-#: lms/templates/ccx/schedule.html wiki/templates/wiki/edit.html
-#: wiki/templates/wiki/settings.html
+#: lms/templates/wiki/edit.html lms/templates/ccx/schedule.html
+#: wiki/templates/wiki/edit.html wiki/templates/wiki/settings.html
 msgid "Save changes"
 msgstr "سشدث ذاشرلثس"
 
@@ -10979,10 +11007,6 @@ msgstr ""
 #: openedx/core/djangoapps/oauth_dispatch/models.py
 msgid "Content Provider"
 msgstr "ذخرفثرف حقخدهيثق"
-
-#: openedx/core/djangoapps/oauth_dispatch/models.py
-msgid "The short_name of an existing Organization."
-msgstr "فاث ساخقف_رشوث خب شر ثطهسفهرل خقلشرهظشفهخر."
 
 #: openedx/core/djangoapps/password_policy/apps.py
 msgid "Password Policy"

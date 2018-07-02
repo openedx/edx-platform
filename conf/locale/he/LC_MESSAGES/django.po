@@ -85,7 +85,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-06-21 12:32+0000\n"
+"POT-Creation-Date: 2018-06-25 13:22+0000\n"
 "PO-Revision-Date: 2018-05-02 07:51+0000\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
@@ -2852,22 +2852,22 @@ msgstr "מיפוי נושאי דיון"
 msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
-"example, one discussion category may be \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each "
-"category must be unique. In \"id\" values, the only special characters that "
-"are supported are underscore, hyphen, and period. You can also specify a "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each category "
+"must be unique. In \"id\" values, the only special characters that are "
+"supported are underscore, hyphen, and period. You can also specify a "
 "category as the default for new posts in the Discussion page by setting its "
-"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 msgstr ""
-"הכנס/י קטגוריות דיון בתבנית הבאה:  \"שם הקטגוריה\": {\"id\": "
-"\"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. לדוגמא אחת קטגוריות "
-"דיון יכולה להיות \"Lydian Mode\": {\"id\": \"i4x-UniversityX-"
-"MUS101-course-2015_T1\"}. ערך ה \"id\" עבור כל קטגוריה חייב להיות יחודי. "
-"בערך ה \"id\", התווים היחודים  שניתן להשתמש בהם הם קו תחתון, מקף ונקודה. "
-"ניתן גם לציין קטגוריה כברירת מחדל עבור הודעות חדשות בדף הדיון על ידי הגדרת "
-"התכונה \"ברירת מחדל\" לאמת. לדוגמה,  \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"הכנס/י קטגוריות דיון בתבנית הבאה:  \"שם הקטגוריה\": {\"id\": \"i4x-"
+"InstitutionName-CourseNumber-course-CourseRun\"}. לדוגמא אחת קטגוריות דיון "
+"יכולה להיות \"Lydian Mode\": {\"id\": \"i4x-UniversityX-MUS101-course-"
+"2015_T1\"}. ערך ה \"id\" עבור כל קטגוריה חייב להיות יחודי. בערך ה \"id\", "
+"התווים היחודים  שניתן להשתמש בהם הם קו תחתון, מקף ונקודה. ניתן גם לציין "
+"קטגוריה כברירת מחדל עבור הודעות חדשות בדף הדיון על ידי הגדרת התכונה \"ברירת "
+"מחדל\" לאמת. לדוגמה,  \"Lydian Mode\": {\"id\": \"i4x-UniversityX-MUS101"
+"-course-2015_T1\", \"default\": true}."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Discussion Sorting Alphabetical"
@@ -9702,7 +9702,7 @@ msgstr "הראה את כל מאמרי המשנה"
 msgid "This article was last modified:"
 msgstr "מאמר זה שונה לאחרונה:"
 
-#: lms/templates/wiki/create.html lms/templates/wiki/create.html.py
+#: lms/templates/wiki/create.html
 msgid "Add new article"
 msgstr "הוסף מאמר חדש"
 
@@ -9711,12 +9711,10 @@ msgid "Create article"
 msgstr "צור מאמר"
 
 #: lms/templates/wiki/create.html lms/templates/wiki/delete.html
-#: lms/templates/wiki/delete.html.py
 msgid "Go back"
 msgstr "חזור"
 
-#: lms/templates/wiki/delete.html lms/templates/wiki/delete.html.py
-#: lms/templates/wiki/edit.html
+#: lms/templates/wiki/delete.html lms/templates/wiki/edit.html
 msgid "Delete article"
 msgstr "מחק מאמר"
 
@@ -9765,8 +9763,7 @@ msgstr "אתה עומד למחוק את המאמר. נא אשר."
 msgid "Edit"
 msgstr "עריכה"
 
-#: lms/templates/wiki/edit.html lms/templates/wiki/edit.html.py
-#: lms/templates/ccx/schedule.html
+#: lms/templates/wiki/edit.html lms/templates/ccx/schedule.html
 msgid "Save changes"
 msgstr "שמור שינויים"
 
@@ -12274,12 +12271,11 @@ msgstr "העמוד לא נמצא"
 msgid "Page not found"
 msgstr "העמוד לא נמצא"
 
-#: cms/templates/asset_index.html cms/templates/checklists.html
-#: cms/templates/course_info.html cms/templates/course_outline.html
-#: cms/templates/edit-tabs.html cms/templates/textbooks.html
-#: cms/templates/videos_index.html cms/templates/widgets/header.html
-#: lms/templates/static_htmlbook.html lms/templates/static_pdfbook.html
-#: lms/templates/staticbook.html
+#: cms/templates/asset_index.html cms/templates/course_info.html
+#: cms/templates/course_outline.html cms/templates/edit-tabs.html
+#: cms/templates/textbooks.html cms/templates/videos_index.html
+#: cms/templates/widgets/header.html lms/templates/static_htmlbook.html
+#: lms/templates/static_pdfbook.html lms/templates/staticbook.html
 msgid "Content"
 msgstr "תוכן"
 
@@ -20956,9 +20952,15 @@ msgstr "צוות הקורס"
 msgid "Advanced Settings"
 msgstr "הגדרות מתקדמות"
 
-#: cms/templates/checklists.html
+#: cms/templates/checklists.html cms/templates/widgets/header.html
 msgid "Checklists"
 msgstr ""
+
+#: cms/templates/checklists.html cms/templates/export.html
+#: cms/templates/export_git.html cms/templates/import.html
+#: cms/templates/widgets/header.html
+msgid "Tools"
+msgstr "כלים"
 
 #: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
 msgid "Duplicate"
@@ -21579,11 +21581,6 @@ msgstr "יצֵא ספריה"
 #: cms/templates/export.html
 msgid "Course Export"
 msgstr "יצא קורס"
-
-#: cms/templates/export.html cms/templates/export_git.html
-#: cms/templates/import.html cms/templates/widgets/header.html
-msgid "Tools"
-msgstr "כלים"
 
 #: cms/templates/export.html
 msgid "About Exporting Libraries"
