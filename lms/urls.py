@@ -291,7 +291,7 @@ urlpatterns += (
         r'^courses/{}/about$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.views.course_about',
+        'lms.djangoapps.philu_overrides.views.course_about',
         name='about_course',
     ),
 
