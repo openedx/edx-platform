@@ -32,14 +32,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-06-24 20:36+0000\n"
-"PO-Revision-Date: 2018-06-24 20:37:01.734188\n"
+"POT-Creation-Date: 2018-07-02 05:55+0000\n"
+"PO-Revision-Date: 2018-07-02 05:55:39.490020\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 1.3\n"
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
@@ -2625,13 +2626,13 @@ msgstr ""
 msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
-"example, one discussion category may be \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each "
-"category must be unique. In \"id\" values, the only special characters that "
-"are supported are underscore, hyphen, and period. You can also specify a "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each category "
+"must be unique. In \"id\" values, the only special characters that are "
+"supported are underscore, hyphen, and period. You can also specify a "
 "category as the default for new posts in the Discussion page by setting its "
-"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -8757,6 +8758,30 @@ msgid "Your Platform Description Here"
 msgstr ""
 
 #: lms/envs/common.py
+msgid "Read access"
+msgstr ""
+
+#: lms/envs/common.py
+msgid "Write access"
+msgstr ""
+
+#: lms/envs/common.py
+msgid "Know your email address"
+msgstr ""
+
+#: lms/envs/common.py
+msgid "Know your name and username"
+msgstr ""
+
+#: lms/envs/common.py
+msgid "Retrieve your grades for your enrolled courses"
+msgstr ""
+
+#: lms/envs/common.py
+msgid "Retrieve your course certificates"
+msgstr ""
+
+#: lms/envs/common.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Audit"
 msgstr ""
@@ -8903,6 +8928,12 @@ msgstr ""
 
 #: lms/templates/oauth2_provider/authorize.html
 msgid ""
+"These permissions will be granted for data from your courses associated with"
+" the following content providers:"
+msgstr ""
+
+#: lms/templates/oauth2_provider/authorize.html
+msgid ""
 "Please click the 'Allow' button to grant these permissions to the above "
 "application. Otherwise, to withhold these permissions, please click the "
 "'Cancel' button."
@@ -8936,8 +8967,7 @@ msgstr ""
 msgid "This article was last modified:"
 msgstr ""
 
-#: lms/templates/wiki/create.html lms/templates/wiki/create.html.py
-#: wiki/templates/wiki/create.html
+#: lms/templates/wiki/create.html wiki/templates/wiki/create.html
 msgid "Add new article"
 msgstr ""
 
@@ -8946,7 +8976,6 @@ msgid "Create article"
 msgstr ""
 
 #: lms/templates/wiki/create.html lms/templates/wiki/delete.html
-#: lms/templates/wiki/delete.html.py
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
@@ -8957,9 +8986,8 @@ msgstr ""
 msgid "Go back"
 msgstr ""
 
-#: lms/templates/wiki/delete.html lms/templates/wiki/delete.html.py
-#: lms/templates/wiki/edit.html wiki/templates/wiki/delete.html
-#: wiki/templates/wiki/edit.html
+#: lms/templates/wiki/delete.html lms/templates/wiki/edit.html
+#: wiki/templates/wiki/delete.html wiki/templates/wiki/edit.html
 msgid "Delete article"
 msgstr ""
 
@@ -9008,9 +9036,8 @@ msgstr ""
 msgid "Edit"
 msgstr ""
 
-#: lms/templates/wiki/edit.html lms/templates/wiki/edit.html.py
-#: lms/templates/ccx/schedule.html wiki/templates/wiki/edit.html
-#: wiki/templates/wiki/settings.html
+#: lms/templates/wiki/edit.html lms/templates/ccx/schedule.html
+#: wiki/templates/wiki/edit.html wiki/templates/wiki/settings.html
 msgid "Save changes"
 msgstr ""
 
@@ -9905,10 +9932,6 @@ msgstr ""
 
 #: openedx/core/djangoapps/oauth_dispatch/models.py
 msgid "Content Provider"
-msgstr ""
-
-#: openedx/core/djangoapps/oauth_dispatch/models.py
-msgid "The short_name of an existing Organization."
 msgstr ""
 
 #: openedx/core/djangoapps/password_policy/apps.py

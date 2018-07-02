@@ -267,7 +267,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-06-21 12:32+0000\n"
+"POT-Creation-Date: 2018-06-25 13:22+0000\n"
 "PO-Revision-Date: 2018-03-13 13:51+0000\n"
 "Last-Translator: javiercencig <javier@jecnet.com.br>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
@@ -2995,13 +2995,13 @@ msgstr "Mapeamento do Tópico de Discussão"
 msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
-"example, one discussion category may be \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each "
-"category must be unique. In \"id\" values, the only special characters that "
-"are supported are underscore, hyphen, and period. You can also specify a "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each category "
+"must be unique. In \"id\" values, the only special characters that are "
+"supported are underscore, hyphen, and period. You can also specify a "
 "category as the default for new posts in the Discussion page by setting its "
-"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -10027,7 +10027,7 @@ msgstr "Ver todos os artigos subordinados"
 msgid "This article was last modified:"
 msgstr "Este artigo foi modificado pela última vez em:"
 
-#: lms/templates/wiki/create.html lms/templates/wiki/create.html.py
+#: lms/templates/wiki/create.html
 msgid "Add new article"
 msgstr "Adicionar um novo artigo"
 
@@ -10036,12 +10036,10 @@ msgid "Create article"
 msgstr "Criar artigo"
 
 #: lms/templates/wiki/create.html lms/templates/wiki/delete.html
-#: lms/templates/wiki/delete.html.py
 msgid "Go back"
 msgstr "Voltar"
 
-#: lms/templates/wiki/delete.html lms/templates/wiki/delete.html.py
-#: lms/templates/wiki/edit.html
+#: lms/templates/wiki/delete.html lms/templates/wiki/edit.html
 msgid "Delete article"
 msgstr "Excluir artigo"
 
@@ -10092,8 +10090,7 @@ msgstr "Você está excluindo um artigo. Por favor, confirme a exclusão."
 msgid "Edit"
 msgstr "Editar"
 
-#: lms/templates/wiki/edit.html lms/templates/wiki/edit.html.py
-#: lms/templates/ccx/schedule.html
+#: lms/templates/wiki/edit.html lms/templates/ccx/schedule.html
 msgid "Save changes"
 msgstr "Salvar alterações"
 
@@ -12625,12 +12622,11 @@ msgstr "Página não encontrada"
 msgid "Page not found"
 msgstr "Página não encontrada"
 
-#: cms/templates/asset_index.html cms/templates/checklists.html
-#: cms/templates/course_info.html cms/templates/course_outline.html
-#: cms/templates/edit-tabs.html cms/templates/textbooks.html
-#: cms/templates/videos_index.html cms/templates/widgets/header.html
-#: lms/templates/static_htmlbook.html lms/templates/static_pdfbook.html
-#: lms/templates/staticbook.html
+#: cms/templates/asset_index.html cms/templates/course_info.html
+#: cms/templates/course_outline.html cms/templates/edit-tabs.html
+#: cms/templates/textbooks.html cms/templates/videos_index.html
+#: cms/templates/widgets/header.html lms/templates/static_htmlbook.html
+#: lms/templates/static_pdfbook.html lms/templates/staticbook.html
 msgid "Content"
 msgstr ""
 
@@ -21362,9 +21358,15 @@ msgstr "Equipe do Curso"
 msgid "Advanced Settings"
 msgstr "Configurações avançadas"
 
-#: cms/templates/checklists.html
+#: cms/templates/checklists.html cms/templates/widgets/header.html
 msgid "Checklists"
 msgstr ""
+
+#: cms/templates/checklists.html cms/templates/export.html
+#: cms/templates/export_git.html cms/templates/import.html
+#: cms/templates/widgets/header.html
+msgid "Tools"
+msgstr "Ferramentas"
 
 #: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
 msgid "Duplicate"
@@ -21991,11 +21993,6 @@ msgstr "Exportação de Biblioteca"
 #: cms/templates/export.html
 msgid "Course Export"
 msgstr "Exportação de curso"
-
-#: cms/templates/export.html cms/templates/export_git.html
-#: cms/templates/import.html cms/templates/widgets/header.html
-msgid "Tools"
-msgstr "Ferramentas"
 
 #: cms/templates/export.html
 msgid "About Exporting Libraries"

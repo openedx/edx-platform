@@ -82,6 +82,7 @@
 # Z_Razer <1105054123@st.nuc.edu.cn>, 2016
 # 沈世奇 <vicapple22@gmail.com>, 2013
 # 熊冬升 <xdsnet@gmail.com>, 2013
+# 百杰 陈 <bj.chen@eliteu.com.cn>, 2018
 # 竹轩 <fmyzjs@gmail.com>, 2014
 # 肖寒 <bookman@vip.163.com>, 2013
 # 赵宏鑫 <zhaohongxinxin@aol.com>, 2015
@@ -352,7 +353,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-06-21 12:32+0000\n"
+"POT-Creation-Date: 2018-06-25 13:22+0000\n"
 "PO-Revision-Date: 2018-03-13 13:51+0000\n"
 "Last-Translator: zhaojina <zhaojianwei187@126.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -2927,13 +2928,13 @@ msgstr "讨论主题映射"
 msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
-"example, one discussion category may be \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each "
-"category must be unique. In \"id\" values, the only special characters that "
-"are supported are underscore, hyphen, and period. You can also specify a "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each category "
+"must be unique. In \"id\" values, the only special characters that are "
+"supported are underscore, hyphen, and period. You can also specify a "
 "category as the default for new posts in the Discussion page by setting its "
-"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -3446,8 +3447,8 @@ msgid ""
 "sites can link to. URLs must be fully qualified. For example: "
 "http://www.edx.org/course/Introduction-to-MOOCs-ITM001"
 msgstr ""
-"若启动了课程面板的社交分享和自定义课程的URL功能，您则可以提供一个可链接社交媒体的URL(例如课程“关于此页”的URL)。所用的URL是完全规范合法的，例如：http://www.edx.org/course/Introduction-"
-"to-MOOCs-ITM001"
+"若启动了课程面板的社交分享和自定义课程的URL功能，您则可以提供一个可链接社交媒体的URL(例如课程“关于此页”的URL)。所用的URL是完全规范合法的，例如：http://www.edx.org/course"
+"/Introduction-to-MOOCs-ITM001"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Language"
@@ -9421,7 +9422,7 @@ msgstr "查看所有子文章"
 msgid "This article was last modified:"
 msgstr "这篇文章最后修改："
 
-#: lms/templates/wiki/create.html lms/templates/wiki/create.html.py
+#: lms/templates/wiki/create.html
 msgid "Add new article"
 msgstr "增加新文章"
 
@@ -9430,12 +9431,10 @@ msgid "Create article"
 msgstr "创建文章"
 
 #: lms/templates/wiki/create.html lms/templates/wiki/delete.html
-#: lms/templates/wiki/delete.html.py
 msgid "Go back"
 msgstr "返回"
 
-#: lms/templates/wiki/delete.html lms/templates/wiki/delete.html.py
-#: lms/templates/wiki/edit.html
+#: lms/templates/wiki/delete.html lms/templates/wiki/edit.html
 msgid "Delete article"
 msgstr "删除文章"
 
@@ -9479,8 +9478,7 @@ msgstr "您正试图删除文章。请确认！"
 msgid "Edit"
 msgstr "编辑"
 
-#: lms/templates/wiki/edit.html lms/templates/wiki/edit.html.py
-#: lms/templates/ccx/schedule.html
+#: lms/templates/wiki/edit.html lms/templates/ccx/schedule.html
 msgid "Save changes"
 msgstr "保存修改"
 
@@ -11910,12 +11908,11 @@ msgstr "页面无法找到"
 msgid "Page not found"
 msgstr "页面无法找到"
 
-#: cms/templates/asset_index.html cms/templates/checklists.html
-#: cms/templates/course_info.html cms/templates/course_outline.html
-#: cms/templates/edit-tabs.html cms/templates/textbooks.html
-#: cms/templates/videos_index.html cms/templates/widgets/header.html
-#: lms/templates/static_htmlbook.html lms/templates/static_pdfbook.html
-#: lms/templates/staticbook.html
+#: cms/templates/asset_index.html cms/templates/course_info.html
+#: cms/templates/course_outline.html cms/templates/edit-tabs.html
+#: cms/templates/textbooks.html cms/templates/videos_index.html
+#: cms/templates/widgets/header.html lms/templates/static_htmlbook.html
+#: lms/templates/static_pdfbook.html lms/templates/staticbook.html
 msgid "Content"
 msgstr "内容"
 
@@ -20151,9 +20148,15 @@ msgstr "课程团队"
 msgid "Advanced Settings"
 msgstr "高级设置"
 
-#: cms/templates/checklists.html
+#: cms/templates/checklists.html cms/templates/widgets/header.html
 msgid "Checklists"
 msgstr ""
+
+#: cms/templates/checklists.html cms/templates/export.html
+#: cms/templates/export_git.html cms/templates/import.html
+#: cms/templates/widgets/header.html
+msgid "Tools"
+msgstr "工具"
 
 #: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
 msgid "Duplicate"
@@ -20716,11 +20719,6 @@ msgstr "知识库导出"
 #: cms/templates/export.html
 msgid "Course Export"
 msgstr "导出课程"
-
-#: cms/templates/export.html cms/templates/export_git.html
-#: cms/templates/import.html cms/templates/widgets/header.html
-msgid "Tools"
-msgstr "工具"
 
 #: cms/templates/export.html
 msgid "About Exporting Libraries"

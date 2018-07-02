@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-06-24 20:36+0000\n"
-"PO-Revision-Date: 2018-06-24 20:37:01.734188\n"
+"POT-Creation-Date: 2018-07-02 05:55+0000\n"
+"PO-Revision-Date: 2018-07-02 05:55:39.490020\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -3218,23 +3218,23 @@ msgstr "Dïsçüssïön Töpïç Mäppïng Ⱡ'σяєм ιρѕυм ∂σłσя �
 msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
-"example, one discussion category may be \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each "
-"category must be unique. In \"id\" values, the only special characters that "
-"are supported are underscore, hyphen, and period. You can also specify a "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each category "
+"must be unique. In \"id\" values, the only special characters that are "
+"supported are underscore, hyphen, and period. You can also specify a "
 "category as the default for new posts in the Discussion page by setting its "
-"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 msgstr ""
 "Éntér dïsçüssïön çätégörïés ïn thé föllöwïng förmät: \"ÇätégörýNämé\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. För "
-"éxämplé, öné dïsçüssïön çätégörý mäý ßé \"Lýdïän Mödé\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\"}. Thé \"ïd\" välüé för éäçh "
-"çätégörý müst ßé ünïqüé. Ìn \"ïd\" välüés, thé önlý spéçïäl çhäräçtérs thät "
-"äré süppörtéd äré ündérsçöré, hýphén, änd pérïöd. Ýöü çän älsö spéçïfý ä "
+"éxämplé, öné dïsçüssïön çätégörý mäý ßé \"Lýdïän Mödé\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\"}. Thé \"ïd\" välüé för éäçh çätégörý "
+"müst ßé ünïqüé. Ìn \"ïd\" välüés, thé önlý spéçïäl çhäräçtérs thät äré "
+"süppörtéd äré ündérsçöré, hýphén, änd pérïöd. Ýöü çän älsö spéçïfý ä "
 "çätégörý äs thé défäült för néw pösts ïn thé Dïsçüssïön pägé ßý séttïng ïts "
-"\"défäült\" ättrïßüté tö trüé. För éxämplé, \"Lýdïän Mödé\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}.#"
+"\"défäült\" ättrïßüté tö trüé. För éxämplé, \"Lýdïän Mödé\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\", \"default\": true}.#"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Discussion Sorting Alphabetical"
@@ -11231,6 +11231,33 @@ msgid "Your Platform Description Here"
 msgstr "Ýöür Plätförm Désçrïptïön Héré Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/envs/common.py
+msgid "Read access"
+msgstr "Réäd äççéss Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: lms/envs/common.py
+msgid "Write access"
+msgstr "Wrïté äççéss Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: lms/envs/common.py
+msgid "Know your email address"
+msgstr "Knöw ýöür émäïl äddréss Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: lms/envs/common.py
+msgid "Know your name and username"
+msgstr "Knöw ýöür nämé änd üsérnämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
+#: lms/envs/common.py
+msgid "Retrieve your grades for your enrolled courses"
+msgstr ""
+"Rétrïévé ýöür grädés för ýöür énrölléd çöürsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α#"
+
+#: lms/envs/common.py
+msgid "Retrieve your course certificates"
+msgstr ""
+"Rétrïévé ýöür çöürsé çértïfïçätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/envs/common.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Audit"
 msgstr "Àüdït Ⱡ'σяєм ιρѕ#"
@@ -11395,6 +11422,14 @@ msgstr ""
 
 #: lms/templates/oauth2_provider/authorize.html
 msgid ""
+"These permissions will be granted for data from your courses associated with"
+" the following content providers:"
+msgstr ""
+"Thésé pérmïssïöns wïll ßé gräntéd för dätä fröm ýöür çöürsés ässöçïätéd wïth"
+" thé föllöwïng çöntént prövïdérs: Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: lms/templates/oauth2_provider/authorize.html
+msgid ""
 "Please click the 'Allow' button to grant these permissions to the above "
 "application. Otherwise, to withhold these permissions, please click the "
 "'Cancel' button."
@@ -11436,8 +11471,7 @@ msgstr "Séé äll çhïldrén Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 msgid "This article was last modified:"
 msgstr "Thïs ärtïçlé wäs läst mödïfïéd: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
-#: lms/templates/wiki/create.html lms/templates/wiki/create.html.py
-#: wiki/templates/wiki/create.html
+#: lms/templates/wiki/create.html wiki/templates/wiki/create.html
 msgid "Add new article"
 msgstr "Àdd néw ärtïçlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
@@ -11446,7 +11480,6 @@ msgid "Create article"
 msgstr "Çréäté ärtïçlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/templates/wiki/create.html lms/templates/wiki/delete.html
-#: lms/templates/wiki/delete.html.py
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
@@ -11457,9 +11490,8 @@ msgstr "Çréäté ärtïçlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 msgid "Go back"
 msgstr "Gö ßäçk Ⱡ'σяєм ιρѕυм #"
 
-#: lms/templates/wiki/delete.html lms/templates/wiki/delete.html.py
-#: lms/templates/wiki/edit.html wiki/templates/wiki/delete.html
-#: wiki/templates/wiki/edit.html
+#: lms/templates/wiki/delete.html lms/templates/wiki/edit.html
+#: wiki/templates/wiki/delete.html wiki/templates/wiki/edit.html
 msgid "Delete article"
 msgstr "Délété ärtïçlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
@@ -11527,9 +11559,8 @@ msgstr ""
 msgid "Edit"
 msgstr "Édït Ⱡ'σяєм ι#"
 
-#: lms/templates/wiki/edit.html lms/templates/wiki/edit.html.py
-#: lms/templates/ccx/schedule.html wiki/templates/wiki/edit.html
-#: wiki/templates/wiki/settings.html
+#: lms/templates/wiki/edit.html lms/templates/ccx/schedule.html
+#: wiki/templates/wiki/edit.html wiki/templates/wiki/settings.html
 msgid "Save changes"
 msgstr "Sävé çhängés Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
@@ -12633,12 +12664,6 @@ msgstr ""
 #: openedx/core/djangoapps/oauth_dispatch/models.py
 msgid "Content Provider"
 msgstr "Çöntént Prövïdér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: openedx/core/djangoapps/oauth_dispatch/models.py
-msgid "The short_name of an existing Organization."
-msgstr ""
-"Thé shört_nämé öf än éxïstïng Örgänïzätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
 
 #: openedx/core/djangoapps/password_policy/apps.py
 msgid "Password Policy"

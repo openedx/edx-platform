@@ -1950,6 +1950,7 @@
     "Video Capture Error": "V\u1d09d\u01dd\u00f8 \u023b\u0250d\u0287n\u0279\u01dd \u0246\u0279\u0279\u00f8\u0279", 
     "Video ID": "V\u1d09d\u01dd\u00f8 \u0197\u0110", 
     "Video Source Language": "V\u1d09d\u01dd\u00f8 S\u00f8n\u0279\u0254\u01dd \u0141\u0250n\u0183n\u0250\u0183\u01dd", 
+    "Video Status": "V\u1d09d\u01dd\u00f8 S\u0287\u0250\u0287ns", 
     "Video duration is {humanizeDuration}": "V\u1d09d\u01dd\u00f8 dn\u0279\u0250\u0287\u1d09\u00f8n \u1d09s {humanizeDuration}", 
     "Video ended": "V\u1d09d\u01dd\u00f8 \u01ddnd\u01ddd", 
     "Video image upload completed": "V\u1d09d\u01dd\u00f8 \u1d09\u026f\u0250\u0183\u01dd ndl\u00f8\u0250d \u0254\u00f8\u026fdl\u01dd\u0287\u01ddd", 
