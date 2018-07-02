@@ -2,26 +2,6 @@
 Feature: CMS.Course Grading
     As a course author, I want to be able to configure how my course is graded
 
-    Scenario: Users can add grading ranges
-        Given I have opened a new course in Studio
-        And I am viewing the grading settings
-        When I add "1" new grade
-        Then I see I now have "3" grades
-
-    Scenario: Users can only have up to 5 grading ranges
-        Given I have opened a new course in Studio
-        And I am viewing the grading settings
-        When I add "6" new grades
-        Then I see I now have "5" grades
-
-    Scenario: When user removes a grade the remaining grades should be consistent
-      Given I have opened a new course in Studio
-      And I am viewing the grading settings
-      When I add "2" new grade
-      Then Grade list has "ABCF" grades
-      And I delete a grade
-      Then Grade list has "ABF" grades
-
     # Cannot reliably make the delete button appear so using javascript instead
     Scenario: Users can delete grading ranges
         Given I have opened a new course in Studio
