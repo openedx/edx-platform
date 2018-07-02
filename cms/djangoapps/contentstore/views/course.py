@@ -2,10 +2,12 @@
 Views related to operations on course objects
 """
 import copy
+import datetime
 import json
 import logging
 import random
 import string  # pylint: disable=deprecated-module
+import time
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -72,6 +74,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from openedx.core.lib.courses import course_image_url
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
+from pytz import UTC
 from student import auth
 from student.auth import has_course_author_access, has_studio_write_access, has_studio_read_access
 from student.roles import (
@@ -970,12 +973,34 @@ def settings_handler(request, course_key_string):
     PUT
         json: update the Course and About xblocks through the CourseDetails model
     """
+    perflog = {
+        'start': time.time(),
+        # human readable timestamp is purely for convenience when looking through the logs
+        'timestamp': datetime.datetime.now(UTC),
+        # timestamps for each checkpoint execution passes
+        'checkpoints': [],
+        # keep track of which branches were executed
+        'branches': {},
+    }
     course_key = CourseKey.from_string(course_key_string)
+    perflog['checkpoints'].append({
+        'time': time.time(),
+        'name': 'got CourseKey'})
     credit_eligibility_enabled = settings.FEATURES.get('ENABLE_CREDIT_ELIGIBILITY', False)
     with modulestore().bulk_operations(course_key):
+        perflog['checkpoints'].append({
+            'time': time.time(),
+            'name': 'modulestore.bulk_operations()'})
         course_module = get_course_and_check_access(course_key, request.user)
+        perflog['checkpoints'].append({
+            'time': time.time(),
+            'name': 'get_course_and_check_access()'})
         if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
+            perflog['branches']['text_html_GET'] = True
             upload_asset_url = reverse_course_url('assets_handler', course_key)
+            perflog['checkpoints'].append({
+                'time': time.time(),
+                'name': 'reverse_course_url'})
 
             # see if the ORG of this course can be attributed to a defined configuration . In that case, the
             # course about page should be editable in Studio
@@ -992,12 +1017,18 @@ def settings_handler(request, course_key_string):
 
             about_page_editable = not marketing_site_enabled
             enrollment_end_editable = GlobalStaff().has_user(request.user) or not marketing_site_enabled
+            perflog['checkpoints'].append({
+                'time': time.time(),
+                'name': 'GlobalStaff.has_user()'})
             short_description_editable = configuration_helpers.get_value_for_org(
                 course_module.location.org,
                 'EDITABLE_SHORT_DESCRIPTION',
                 settings.FEATURES.get('EDITABLE_SHORT_DESCRIPTION', True)
             )
             self_paced_enabled = SelfPacedConfiguration.current().enabled
+            perflog['checkpoints'].append({
+                'time': time.time(),
+                'name': 'SelfPacedConfiguration.current()'})
 
             settings_context = {
                 'context_course': course_module,
@@ -1021,18 +1052,40 @@ def settings_handler(request, course_key_string):
                 'self_paced_enabled': self_paced_enabled,
                 'enable_extended_course_details': enable_extended_course_details
             }
+            perflog['checkpoints'].append({
+                'time': time.time(),
+                'name': 'made context'})
             if is_prerequisite_courses_enabled():
+                perflog['branches']['is_prerequisite_courses_enabled'] = True
+                perflog['checkpoints'].append({
+                    'time': time.time(),
+                    'name': 'is_prerequisite_courses_enabled()'})
                 courses, in_process_course_actions = get_courses_accessible_to_user(request)
+                perflog['checkpoints'].append({
+                    'time': time.time(),
+                    'name': 'get_courses_accessible_to_user()'})
                 # exclude current course from the list of available courses
                 courses = [course for course in courses if course.id != course_key]
                 if courses:
+                    perflog['branches']['courses'] = True
                     courses = _remove_in_process_courses(courses, in_process_course_actions)
+                    perflog['checkpoints'].append({
+                        'time': time.time(),
+                        'name': '_remove_in_process_courses()'})
                 settings_context.update({'possible_pre_requisite_courses': courses})
 
             if credit_eligibility_enabled:
+                perflog['branches']['credit_eligibility_enabled'] = True
                 if is_credit_course(course_key):
+                    perflog['branches']['is_credit_course'] = True
+                    perflog['checkpoints'].append({
+                        'time': time.time(),
+                        'name': 'is_credit_course()'})
                     # get and all credit eligibility requirements
                     credit_requirements = get_credit_requirements(course_key)
+                    perflog['checkpoints'].append({
+                        'time': time.time(),
+                        'name': 'get_credit_requirements()'})
                     # pair together requirements with same 'namespace' values
                     paired_requirements = {}
                     for requirement in credit_requirements:
@@ -1049,11 +1102,24 @@ def settings_handler(request, course_key_string):
                             'show_min_grade_warning': show_min_grade_warning,
                         }
                     )
-
+            perflog['checkpoints'].append({
+                'time': time.time(),
+                'name': 'returning response'})
+            perflog['end'] = time.time()
+            perflog['total_duration'] = perflog['end'] - perflog['start']
+            log.info("PERFLOG %s" % json.dumps(perflog))
             return render_to_response('settings.html', settings_context)
         elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
+            perflog['branches']['application_json'] = True
             if request.method == 'GET':
+                perflog['branches']['GET'] = True
                 course_details = CourseDetails.fetch(course_key)
+                perflog['checkpoints'].append({
+                    'time': time.time(),
+                    'name': 'CourseDetails.fetch()'})
+                perflog['end'] = time.time()
+                perflog['total_duration'] = perflog['end'] - perflog['start']
+                log.info("PERFLOG %s" % json.dumps(perflog))
                 return JsonResponse(
                     course_details,
                     # encoder serializes dates, old locations, and instances
@@ -1061,52 +1127,95 @@ def settings_handler(request, course_key_string):
                 )
             # For every other possible method type submitted by the caller...
             else:
+                perflog['branches']['not_GET'] = True
                 # if pre-requisite course feature is enabled set pre-requisite course
                 if is_prerequisite_courses_enabled():
+                    perflog['branches']['is_prerequisite_courses_enabled()'] = True
+                    perflog['checkpoints'].append({
+                        'time': time.time(),
+                        'name': 'is_prerequisite_courses_enabled()'})
                     prerequisite_course_keys = request.json.get('pre_requisite_courses', [])
                     if prerequisite_course_keys:
+                        perflog['branches']['prerequisite_course_keys'] = True
                         if not all(is_valid_course_key(course_key) for course_key in prerequisite_course_keys):
+                            perflog['branches']['invalid_course_key'] = True
+                            perflog['end'] = time.time()
+                            perflog['total_duration'] = perflog['end'] - perflog['start']
+                            log.info("PERFLOG %s" % json.dumps(perflog))
                             return JsonResponseBadRequest({"error": _("Invalid prerequisite course key")})
                         set_prerequisite_courses(course_key, prerequisite_course_keys)
+                        perflog['checkpoints'].append({
+                            'time': time.time(),
+                            'name': 'set_prerequisite_courses()'})
                     else:
                         # None is chosen, so remove the course prerequisites
+                        perflog['branches']['remove_course_prerequisites'] = True
                         course_milestones = milestones_api.get_course_milestones(course_key=course_key, relationship="requires")
+                        perflog['checkpoints'].append({
+                            'time': time.time(),
+                            'name': 'milestones_api.get_course_milestones()'})
                         for milestone in course_milestones:
                             remove_prerequisite_course(course_key, milestone)
+                            perflog['checkpoints'].append({
+                                'time': time.time(),
+                                'name': 'remove_prerequisite_course()'})
 
                 # If the entrance exams feature has been enabled, we'll need to check for some
                 # feature-specific settings and handle them accordingly
                 # We have to be careful that we're only executing the following logic if we actually
                 # need to create or delete an entrance exam from the specified course
                 if is_entrance_exams_enabled():
+                    perflog['branches']['is_entrance_exams_enabled'] = True
+                    perflog['checkpoints'].append({
+                        'time': time.time(),
+                        'name': 'is_entrance_exams_enabled()'})
                     course_entrance_exam_present = course_module.entrance_exam_enabled
                     entrance_exam_enabled = request.json.get('entrance_exam_enabled', '') == 'true'
                     ee_min_score_pct = request.json.get('entrance_exam_minimum_score_pct', None)
                     # If the entrance exam box on the settings screen has been checked...
                     if entrance_exam_enabled:
+                        perflog['branches']['entrance_exam_enabled'] = True
                         # Load the default minimum score threshold from settings, then try to override it
                         entrance_exam_minimum_score_pct = float(settings.ENTRANCE_EXAM_MIN_SCORE_PCT)
                         if ee_min_score_pct:
+                            perflog['branches']['ee_min_score_pct'] = True
                             entrance_exam_minimum_score_pct = float(ee_min_score_pct)
                         if entrance_exam_minimum_score_pct.is_integer():
+                            perflog['branches']['entrance_exam_minimum_score_pct'] = True
                             entrance_exam_minimum_score_pct = entrance_exam_minimum_score_pct / 100
                         entrance_exam_minimum_score_pct = unicode(entrance_exam_minimum_score_pct)
                         # If there's already an entrance exam defined, we'll update the existing one
                         if course_entrance_exam_present:
+                            perflog['branches']['course_entrance_exam_present'] = True
                             exam_data = {
                                 'entrance_exam_minimum_score_pct': entrance_exam_minimum_score_pct
                             }
                             update_entrance_exam(request, course_key, exam_data)
+                            perflog['checkpoints'].append({
+                                'time': time.time(),
+                                'name': 'update_entrance_exam()'})
+
                         # If there's no entrance exam defined, we'll create a new one
                         else:
+                            perflog['branches']['create_new_entrance_exam'] = True
                             create_entrance_exam(request, course_key, entrance_exam_minimum_score_pct)
+                            perflog['checkpoints'].append({
+                                'time': time.time(),
+                                'name': 'create_entrance_exam()'})
 
                     # If the entrance exam box on the settings screen has been unchecked,
                     # and the course has an entrance exam attached...
                     elif not entrance_exam_enabled and course_entrance_exam_present:
+                        perflog['branches']['remove_entrance_exam'] = True
                         delete_entrance_exam(request, course_key)
+                        perflog['checkpoints'].append({
+                            'time': time.time(),
+                            'name': 'delete_entrance_exam()'})
 
                 # Perform the normal update workflow for the CourseDetails model
+                perflog['end'] = time.time()
+                perflog['total_duration'] = perflog['end'] - perflog['start']
+                log.info("PERFLOG %s" % json.dumps(perflog))
                 return JsonResponse(
                     CourseDetails.update_from_json(course_key, request.json, request.user),
                     encoder=CourseSettingsEncoder
