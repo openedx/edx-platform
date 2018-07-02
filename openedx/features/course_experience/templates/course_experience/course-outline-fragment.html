@@ -26,13 +26,12 @@ course_sections = blocks.get('children')
         </button>
         <ol class="block-tree accordion"
             id="course-outline-block-tree"
-            role="presentation"
             aria-labelledby="expand-collapse-outline-all-button">
         % for section in course_sections:
-            <% 
-            section_is_auto_opened = section.get('resume_block') is True 
+            <%
+            section_is_auto_opened = section.get('resume_block') is True
             %>
-                <li class="outline-item section" role="heading">
+                <li class="outline-item section">
                     <button class="section-name accordion-trigger"
                             aria-expanded="${ 'true' if section_is_auto_opened else 'false' }"
                             aria-controls="${ section['id'] }_contents"
@@ -45,7 +44,6 @@ course_sections = blocks.get('children')
                     </button>
                     <ol class="outline-item accordion-panel ${ '' if section_is_auto_opened else 'is-hidden' }"
                         id="${ section['id'] }_contents"
-                        role="region"
                         aria-labelledby="${ section['id'] }">
             % for subsection in section.get('children', []):
                 <%
@@ -53,7 +51,7 @@ course_sections = blocks.get('children')
                 completed_prereqs = gated_content[subsection['id']]['completed_prereqs'] if gated_subsection else False
                 subsection_is_auto_opened = subsection.get('resume_block') is True
                 %>
-                            <li class="subsection accordion ${ 'current' if subsection['resume_block'] else '' }" role="heading">
+                      <li class="subsection accordion ${ 'current' if subsection['resume_block'] else '' }">
                 % if gated_subsection and not completed_prereqs:
                                 <a href="${ subsection['lms_web_url'] }">
                                     <button class="subsection-text prerequisite-button"
@@ -61,9 +59,9 @@ course_sections = blocks.get('children')
                                     <span class="menu-icon icon fa fa-lock"
                                             aria-hidden="true">
                                     </span>
-                                    <span class="subsection-title">
+                                    <h4 class="subsection-title">
                                         ${ subsection['display_name'] }
-                                    </span>
+                                    </h4>
                                     <div class="details prerequisite">
                                         ${ _("Prerequisite: ") }
                                             <%
@@ -79,9 +77,9 @@ course_sections = blocks.get('children')
                                             aria-controls="${ subsection['id'] }_contents">
                                         <span class="fa fa-chevron-right ${ 'fa-rotate-90' if subsection_is_auto_opened else '' }"
                                               aria-hidden="true"></span>
-                                        <span class="subsection-title">
+                                        <h4 class="subsection-title">
                                             ${ subsection['display_name'] }
-                                        </span>
+                                        </h4>
                     % if subsection.get('complete'):
                                         <span class="complete-checkmark fa fa-check"></span>
                     % endif
@@ -150,7 +148,6 @@ course_sections = blocks.get('children')
                 % if not gated_subsection or (gated_subsection and completed_prereqs):
                                 <ol class="outline-item accordion-panel ${ '' if subsection_is_auto_opened else 'is-hidden' }"
                                     id="${ subsection['id'] }_contents"
-                                    role="region"
                                     aria-labelledby="${ subsection['id'] }"
                                 >
                     % for vertical in subsection.get('children', []):
@@ -159,9 +156,9 @@ course_sections = blocks.get('children')
                                             href="${ vertical['lms_web_url'] }"
                                             id="${ vertical['id'] }">
                                             <div class="vertical-details">
-                                                <span class="vertical-title">
-                                                    ${ vertical['display_name'] }
-                                                </span>
+                                              <div class="vertical-title">
+                                                ${ vertical['display_name'] }
+                                              </div>
                                             </div>
                         % if vertical.get('complete'):
                                                 <span class="complete-checkmark fa fa-check"></span>
