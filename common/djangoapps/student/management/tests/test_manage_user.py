@@ -41,7 +41,7 @@ class TestManageUserCommand(TestCase):
         Ensures that users are removed if they exist and exit cleanly otherwise.
         """
         # pylint: disable=no-member
-        with patch('lms.lib.comment_client.user.User', MagicMock()) as magic_mock:
+        with patch('lms.lib.comment_client.user.User.save', MagicMock()) as magic_mock:
             User.objects.create(username=TEST_USERNAME, email=TEST_EMAIL)
             self.assertEqual([(TEST_USERNAME, TEST_EMAIL)], [(u.username, u.email) for u in User.objects.all()])
             call_command('manage_user', TEST_USERNAME, TEST_EMAIL, '--remove')
