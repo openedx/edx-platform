@@ -9,7 +9,6 @@ from ccx_keys.locator import CCXLocator
 from lms.djangoapps.ccx.tasks import send_ccx_course_published
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from student.roles import CourseCcxCoachRole
 from student.tests.factories import AdminFactory
 from xmodule.modulestore.django import SignalHandler
@@ -73,34 +72,6 @@ class TestSendCCXCoursePublished(ModuleStoreTestCase):
         with mock_signal_receiver(SignalHandler.course_published) as receiver:
             self.call_fut(self.course.id)
             self.assertEqual(receiver.call_count, 3)
-
-    def test_course_structure_generated(self):
-        """
-        Check that course structure is generated after course published signal is sent
-        """
-        ccx_structure = {
-            u"blocks": {
-                u"ccx-block-v1:edX+999+Run_666+ccx@1+type@course+block@course": {
-                    u"block_type": u"course",
-                    u"graded": False,
-                    u"format": None,
-                    u"usage_key": u"ccx-block-v1:edX+999+Run_666+ccx@1+type@course+block@course",
-                    u"children": [
-                    ],
-                    u"display_name": u"Run 666"
-                }
-            },
-            u"root": u"ccx-block-v1:edX+999+Run_666+ccx@1+type@course+block@course"
-        }
-        course_key = CCXLocator.from_course_locator(self.course.id, self.ccx.id)
-        structure = CourseStructure.objects.filter(course_id=course_key)
-        # no structure exists before signal is called
-        self.assertEqual(len(structure), 0)
-        with mock_signal_receiver(SignalHandler.course_published) as receiver:
-            self.call_fut(self.course.id)
-            self.assertEqual(receiver.call_count, 3)
-            structure = CourseStructure.objects.get(course_id=course_key)
-            self.assertEqual(structure.structure, ccx_structure)
 
     def test_course_overview_cached(self):
         """
