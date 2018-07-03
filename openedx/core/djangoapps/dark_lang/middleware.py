@@ -120,7 +120,9 @@ class DarkLangMiddleware(object):
         preview_lang = None
         if auth_user:
             # Get the request user's dark lang preference
-            preview_lang = get_user_preference(request.user, DARK_LANGUAGE_KEY)
+            # Here 'course_lang' param would take priority to get things like xblock translated in specific lang
+            # This change is specifically for translating xblocks in course language
+            preview_lang = request.GET.get("course_lang", get_user_preference(request.user, DARK_LANGUAGE_KEY))
 
         # User doesn't have a dark lang preference, so just return
         if not preview_lang:
