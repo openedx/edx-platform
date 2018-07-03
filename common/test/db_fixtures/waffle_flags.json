@@ -1,9 +1,0 @@
-[
-    {
-        "pk": 2,
-        "fields": {
-            "name": "completion.enable_completion_tracking",
-            "active": true
-        }
-    }
-]
