@@ -5,7 +5,7 @@ import logging
 import urllib
 import urlparse
 
-from datetime import datetime, timedelta
+from datetime import datetime
 from django.http import HttpResponseNotFound, HttpResponse, Http404, HttpResponseServerError
 
 import third_party_auth
@@ -19,7 +19,7 @@ from edxmako.shortcuts import render_to_response, render_to_string
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from openedx.core.djangoapps.catalog.utils import get_programs_data
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from philu_overrides.helpers import reactivation_email_for_user_custom
+from philu_overrides.helpers import reactivation_email_for_user_custom, get_course_next_classes
 from util.milestones_helpers import get_prerequisite_courses_display
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from commerce.utils import EcommerceService
@@ -630,27 +630,30 @@ def course_about(request, course_id):
         # Overview
         overview = CourseOverview.get_from_id(course.id)
 
+        course_next_classes = get_course_next_classes(request, course)
+
         context = {
             'course': course,
             'course_details': course_details,
+            'course_next_classes': course_next_classes,
             'staff_access': staff_access,
             'studio_url': studio_url,
-            'registered': registered,
-            'course_target': course_target,
+            # 'registered': registered,
+            # 'course_target': course_target,
             'is_cosmetic_price_enabled': settings.FEATURES.get('ENABLE_COSMETIC_DISPLAY_PRICE'),
             'course_price': course_price,
-            'in_cart': in_cart,
-            'ecommerce_checkout': ecommerce_checkout,
-            'ecommerce_checkout_link': ecommerce_checkout_link,
-            'ecommerce_bulk_checkout_link': ecommerce_bulk_checkout_link,
-            'professional_mode': professional_mode,
+            # 'in_cart': in_cart,
+            # 'ecommerce_checkout': ecommerce_checkout,
+            # 'ecommerce_checkout_link': ecommerce_checkout_link,
+            # 'ecommerce_bulk_checkout_link': ecommerce_bulk_checkout_link,
+            # 'professional_mode': professional_mode,
             'reg_then_add_to_cart_link': reg_then_add_to_cart_link,
-            'show_courseware_link': show_courseware_link,
-            'is_course_full': is_course_full,
+            # 'show_courseware_link': show_courseware_link,
+            # 'is_course_full': is_course_full,
             'can_enroll': can_enroll,
             'invitation_only': invitation_only,
-            'active_reg_button': active_reg_button,
-            'is_shib_course': is_shib_course,
+            # 'active_reg_button': active_reg_button,
+            # 'is_shib_course': is_shib_course,
             # We do not want to display the internal courseware header, which is used when the course is found in the
             # context. This value is therefor explicitly set to render the appropriate header.
             'disable_courseware_header': True,
