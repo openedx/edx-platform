@@ -150,6 +150,42 @@ class EnrollmentDataTest(ModuleStoreTestCase):
         updated_results = data.get_course_enrollments(self.user.username)
         self.assertEqual(results, updated_results)
 
+    def test_get_enrollments_including_inactive(self):
+        """ Verify that if 'include_inactive' is True, all enrollments
+        are returned including inactive.
+        """
+        course_modes, course_numbers = ['honor', 'verified', 'audit'], ['1', '2', '3']
+        created_courses = []
+        for course_number in course_numbers:
+            created_courses.append(CourseFactory.create(number=course_number))
+
+        created_enrollments = []
+        for course in created_courses:
+            self._create_course_modes(course_modes, course=course)
+            # Create the original enrollment.
+            created_enrollments.append(data.create_course_enrollment(
+                self.user.username,
+                unicode(course.id),
+                'honor',
+                True
+            ))
+
+        # deactivate one enrollment
+        data.update_course_enrollment(
+            self.user.username,
+            unicode(created_courses[0].id),
+            'honor',
+            False
+        )
+
+        # by default in-active enrollment will be excluded.
+        results = data.get_course_enrollments(self.user.username)
+        self.assertNotEqual(len(results), len(created_enrollments))
+
+        # we can get all enrollments including inactive by passing "include_inactive"
+        results = data.get_course_enrollments(self.user.username, include_inactive=True)
+        self.assertEqual(len(results), len(created_enrollments))
+
     @ddt.data(
         # Default (no course modes in the database)
         # Expect that users are automatically enrolled as "honor".

@@ -62,7 +62,7 @@ class EnrollmentSupportListView(GenericAPIView):
         except User.DoesNotExist:
             return JsonResponse([])
 
-        enrollments = get_enrollments(user.username)
+        enrollments = get_enrollments(user.username, include_inactive=True)
         for enrollment in enrollments:
             # Folds the course_details field up into the main JSON object.
             enrollment.update(**enrollment.pop('course_details'))
