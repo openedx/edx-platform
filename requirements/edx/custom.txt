@@ -24,7 +24,7 @@
 git+https://github.com/edx-solutions/api-integration.git@v1.8.4#egg=api-integration==1.8.4
 git+https://github.com/edx-solutions/organizations-edx-platform-extensions.git@v1.2.1#egg=organizations-edx-platform-extensions==1.2.1
 git+https://github.com/edx-solutions/gradebook-edx-platform-extensions.git@1.1.9#egg=gradebook-edx-platform-extensions==1.1.9
-git+https://github.com/edx-solutions/projects-edx-platform-extensions.git@v1.1.5#egg=projects-edx-platform-extensions==1.1.5
+git+https://github.com/edx-solutions/projects-edx-platform-extensions.git@v1.1.6#egg=projects-edx-platform-extensions==1.1.6
 git+https://github.com/edx-solutions/discussion-edx-platform-extensions.git@v1.1.9#egg=discussion-edx-platform-extensions==1.1.9
 git+https://github.com/edx-solutions/course-edx-platform-extensions.git@v1.1.1#egg=course-edx-platform-extensions==1.1.1
 git+https://github.com/edx-solutions/mobileapps-edx-platform-extensions.git@v1.2.2#egg=mobileapps-edx-platform-extensions==1.2.2
