@@ -115,7 +115,7 @@ class TestPaverDatabaseTasks(MockS3Mixin, TestCase):
             self.assertFalse(_mock_get_file.called)
         calls = [
             call('{}/scripts/reset-test-db.sh --calculate_migrations'.format(Env.REPO_ROOT)),
-            call('{}/scripts/reset-test-db.sh'.format(Env.REPO_ROOT))
+            call('{}/scripts/reset-test-db.sh --use-existing-db'.format(Env.REPO_ROOT))
         ]
         _mock_sh.assert_has_calls(calls)
 
@@ -156,7 +156,7 @@ class TestPaverDatabaseTasks(MockS3Mixin, TestCase):
             )
         calls = [
             call('{}/scripts/reset-test-db.sh --calculate_migrations'.format(Env.REPO_ROOT)),
-            call('{}/scripts/reset-test-db.sh'.format(Env.REPO_ROOT))
+            call('{}/scripts/reset-test-db.sh --use-existing-db'.format(Env.REPO_ROOT))
         ]
         _mock_sh.assert_has_calls(calls)
 
@@ -184,7 +184,7 @@ class TestPaverDatabaseTasks(MockS3Mixin, TestCase):
         database.update_local_bokchoy_db_from_s3()  # pylint: disable=no-value-for-parameter
         calls = [
             call('{}/scripts/reset-test-db.sh --calculate_migrations'.format(Env.REPO_ROOT)),
-            call('{}/scripts/reset-test-db.sh --rebuild_cache'.format(Env.REPO_ROOT))
+            call('{}/scripts/reset-test-db.sh --rebuild_cache --use-existing-db'.format(Env.REPO_ROOT))
         ]
         _mock_sh.assert_has_calls(calls)
 

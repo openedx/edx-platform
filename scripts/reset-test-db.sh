@@ -46,6 +46,9 @@ for i in "$@"; do
         -c|--calculate_migrations)
             CALCULATE_MIGRATIONS=true
             ;;
+        -u|--use-existing-db)
+            USE_EXISTING_DB=true
+            ;;
     esac
 done
 
@@ -94,24 +97,28 @@ rebuild_cache_for_db() {
 }
 
 for db in "${database_order[@]}"; do
-    echo "CREATE DATABASE IF NOT EXISTS ${databases[$db]};" | mysql $MYSQL_HOST -u root
+    if ! [[ $USE_EXISTING_DB ]]; then
+        echo "CREATE DATABASE IF NOT EXISTS ${databases[$db]};" | mysql $MYSQL_HOST -u root
 
-    # Clear out the test database
-    #
-    # We are using the reset_db command which uses "DROP DATABASE" and
-    # "CREATE DATABASE" in case the tests are being run in an environment (e.g. devstack
-    # or a jenkins worker environment) that already ran tests on another commit that had
-    # different migrations that created, dropped, or altered tables.
-    echo "Issuing a reset_db command to the $db bok_choy MySQL database."
-    ./manage.py lms --settings $SETTINGS reset_db --traceback --router $db
+        # Clear out the test database
+        #
+        # We are using the reset_db command which uses "DROP DATABASE" and
+        # "CREATE DATABASE" in case the tests are being run in an environment (e.g. devstack
+        # or a jenkins worker environment) that already ran tests on another commit that had
+        # different migrations that created, dropped, or altered tables.
+        echo "Issuing a reset_db command to the $db bok_choy MySQL database."
+        ./manage.py lms --settings $SETTINGS reset_db --traceback --router $db
+    fi
 
-    # If there are cached database schemas/data, then load them.
-    # If they are missing, then we will want to build new cache files even if
-    # not explicitly directed to do so via arguments passed to this script.
-    if [[ ! -f $DB_CACHE_DIR/bok_choy_schema_$db.sql || ! -f $DB_CACHE_DIR/bok_choy_data_$db.json || ! -f $DB_CACHE_DIR/bok_choy_migrations_data_$db.sql ]]; then
-        REBUILD_CACHE=true
-    else
-        load_cache_into_db
+    if ! [[ $CALCULATE_MIGRATIONS ]]; then
+        # If there are cached database schemas/data, then load them.
+        # If they are missing, then we will want to build new cache files even if
+        # not explicitly directed to do so via arguments passed to this script.
+        if [[ ! -f $DB_CACHE_DIR/bok_choy_schema_$db.sql || ! -f $DB_CACHE_DIR/bok_choy_data_$db.json || ! -f $DB_CACHE_DIR/bok_choy_migrations_data_$db.sql ]]; then
+            REBUILD_CACHE=true
+        else
+            load_cache_into_db
+        fi
     fi
 done
 
