@@ -161,13 +161,13 @@ class EcommerceServiceTests(TestCase):
         """ Verify the checkout page URL is properly constructed and returned. """
         url = EcommerceService().get_checkout_page_url(
             *skus,
-            enterprise_customer_catalog_uuid=enterprise_catalog_uuid
+            catalog=enterprise_catalog_uuid
         )
         config = CommerceConfiguration.current()
 
         query = {'sku': skus}
         if enterprise_catalog_uuid:
-            query.update({'enterprise_customer_catalog_uuid': enterprise_catalog_uuid})
+            query.update({'catalog': enterprise_catalog_uuid})
 
         expected_url = '{root}{basket_url}?{skus}'.format(
             basket_url=config.basket_checkout_page,
