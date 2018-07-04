@@ -3,6 +3,7 @@ from datetime import datetime
 import pytz
 from course_action_state.models import CourseRerunState
 from openedx.core.djangoapps.timed_notification.core import get_course_first_chapter_link
+from philu_overrides.helpers import get_user_current_enrolled_class
 from student.models import CourseEnrollment
 from edxmako.shortcuts import render_to_response
 from openedx.features.course_card.models import CourseCard
@@ -71,11 +72,10 @@ def get_course_cards(request):
             course.start_date = rerun_start_time.strftime(date_time_format)
             current_course = course_rerun_object
 
-        if current_course:
-            is_enrolled = CourseEnrollment.is_enrolled(request.user, current_course.id)
-            course.is_enrolled = is_enrolled
-            course_target = get_course_first_chapter_link(current_course, request)
-            course.course_target = course_target
+        user_current_enrolled_class, current_enrolled_class_target = get_user_current_enrolled_class(request, course)
+        if user_current_enrolled_class:
+            course.is_enrolled = True
+            course.course_target = current_enrolled_class_target
 
     return render_to_response(
         "course_card/courses.html",
