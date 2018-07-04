@@ -5,15 +5,6 @@ Feature: CMS.Advanced (manual) course policy
 
   # Sauce labs does not play nicely with CodeMirror
   @skip_sauce
-  Scenario: Test editing key value
-    Given I am on the Advanced Course Settings page in Studio
-    When I edit the value of a policy key and save
-    Then the policy key value is changed
-    And I reload the page
-    Then the policy key value is changed
-
-  # Sauce labs does not play nicely with CodeMirror
-  @skip_sauce
   Scenario: Test how multi-line input appears
     Given I am on the Advanced Course Settings page in Studio
     When I create a JSON object as a value for "Discussion Topic Mapping"
@@ -39,18 +30,6 @@ Feature: CMS.Advanced (manual) course policy
     Then it is displayed as a string
     And I reload the page
     Then it is displayed as a string
-
-  # Sauce labs does not play nicely with CodeMirror
-  @skip_sauce
-  Scenario: Confirmation is shown on save
-    Given I am on the Advanced Course Settings page in Studio
-    When I edit the value of a policy key
-    And I press the "Save" notification button
-    Then I see a confirmation that my changes have been saved
-
-  Scenario: Deprecated Settings are not shown by default
-    Given I am on the Advanced Course Settings page in Studio
-    Then deprecated settings are not shown
 
   Scenario: Deprecated Settings can be toggled
     Given I am on the Advanced Course Settings page in Studio
