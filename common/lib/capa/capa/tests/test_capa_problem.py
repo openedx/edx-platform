@@ -659,6 +659,44 @@ class CAPAProblemReportHelpersTest(unittest.TestCase):
         )
         self.assertEquals(problem.find_answer_text(answer_id, choice_id), answer_text)
 
+    @ddt.data(
+        # Test for ChoiceResponse
+        ('1_2_1', 'over-suspicious'),
+        # Test for MultipleChoiceResponse
+        ('1_3_1', 'The iPad, Napster'),
+        # Test for OptionResponse
+        ('1_4_1', 'blue'),
+    )
+    @ddt.unpack
+    def test_find_correct_answer_text_choices(self, answer_id, answer_text):
+        """
+        Verify that ``find_correct_answer_text`` can find the correct answer for
+        ChoiceResponse, MultipleChoiceResponse and OptionResponse problems.
+        """
+        problem = new_loncapa_problem(
+            """
+            <problem>
+                <choiceresponse>
+                    <checkboxgroup label="Select the correct synonym of paranoid?">
+                        <choice correct="true">over-suspicious</choice>
+                        <choice correct="false">funny</choice>
+                    </checkboxgroup>
+                </choiceresponse>
+                <multiplechoiceresponse>
+                    <choicegroup type="MultipleChoice">
+                        <choice correct="true">The iPad</choice>
+                        <choice correct="true">Napster</choice>
+                        <choice correct="false">The iPod</choice>
+                    </choicegroup>
+                </multiplechoiceresponse>
+                <optionresponse>
+                    <optioninput options="('yellow','blue','green')" correct="blue" label="Color_1"/>
+                </optionresponse>
+            </problem>
+            """
+        )
+        self.assertEquals(problem.find_correct_answer_text(answer_id), answer_text)
+
     def test_find_answer_text_textinput(self):
         problem = new_loncapa_problem(
             """
