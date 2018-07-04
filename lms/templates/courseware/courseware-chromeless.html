@@ -54,15 +54,11 @@ ${static.get_page_title_breadcrumbs(course_name())}
   ## codemirror
   <script type="text/javascript" src="${static.url('js/vendor/codemirror-compressed.js')}"></script>
 
-  % if enable_completion_on_view_service:
-    <script type="text/javascript" src="${static.url('bundles/commons.js')}" ></script>
-    <script type="text/javascript" src="${static.url('bundles/CompletionOnViewService.js')}"></script>
-  % endif
   <%static:js group='courseware'/>
 
   <%include file="/mathjax_include.html" args="disable_fast_preview=True"/>
   % if staff_access:
-    <%include file="xqa_interface.html"/>
+  	<%include file="xqa_interface.html"/>
   % endif
 
   <script type="text/javascript">
@@ -74,13 +70,7 @@ ${HTML(fragment.foot_html())}
 </%block>
 
 <div class="course-wrapper chromeless">
-        <section class="course-content" id="course-content" \
-        % if enable_completion_on_view_service:
-          data-enable-completion-on-view-service="true" \
-        % else:
-          data-enable-completion-on-view-service="false" \
-        % endif
-        >
+  <section class="course-content" id="course-content">
       <main id="main" tabindex="-1" aria-label="Content">
         ${HTML(fragment.body_html())}
       </main>
