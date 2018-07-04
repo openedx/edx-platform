@@ -591,7 +591,7 @@ def dashboard(request):
     perflog = {
         'start': time.time(),
         # human readable timestamp is purely for convenience when looking through the logs
-        'timestamp': datetime.datetime.now(UTC),
+        'timestamp': str(datetime.datetime.now(UTC)),
         # timestamps for each checkpoint execution passes
         'checkpoints': [],
         # keep track of which branches were executed
