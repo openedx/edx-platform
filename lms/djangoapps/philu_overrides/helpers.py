@@ -49,16 +49,12 @@ def get_course_next_classes(request, course):
         get_permission_for_course_about,
         get_course_with_access
     )
-    from django.conf import settings
     from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
     from lms.djangoapps.courseware.access import has_access
     from lms.djangoapps.courseware.views.views import registered_for_course
-    from lms.djangoapps.instructor.enrollment import uses_shib
     from student.models import CourseEnrollment
     from opaque_keys.edx.locations import SlashSeparatedCourseKey
-    from django.core.urlresolvers import reverse
     from course_action_state.models import CourseRerunState
-    from common.djangoapps.student.views import get_course_related_keys
     from datetime import datetime
 
     utc = pytz.UTC
@@ -76,25 +72,10 @@ def get_course_next_classes(request, course):
         course = get_course_with_access(request.user, permission, course_key)
         registered = registered_for_course(course, request.user)
 
-        if has_access(request.user, 'load', course):
-            first_chapter_url, first_section = get_course_related_keys(request, course)
-            course_target = reverse('courseware_section', args=[course.id.to_deprecated_string(), first_chapter_url,
-                                                                first_section])
-        else:
-            course_target = reverse('about_course', args=[course.id.to_deprecated_string()])
-
-        show_courseware_link = bool(
-            (
-                    has_access(request.user, 'load', course) and
-                    has_access(request.user, 'view_courseware_with_prerequisites', course)
-            ) or settings.FEATURES.get('ENABLE_LMS_MIGRATION')
-        )
-
         # Used to provide context to message to student if enrollment not allowed
         can_enroll = bool(has_access(request.user, 'enroll', course))
         invitation_only = course.invitation_only
         is_course_full = CourseEnrollment.objects.is_course_full(course)
-        is_shib_course = uses_shib(course)
 
         # Register button should be disabled if one of the following is true:
         # - Student is already registered for course
@@ -105,11 +86,8 @@ def get_course_next_classes(request, course):
         course_next_classes.append({
             'user': request.user,
             'registered': registered,
-            'show_courseware_link': show_courseware_link,
-            'course_target': course_target,
             'is_course_full': is_course_full,
             'can_enroll': can_enroll,
-            'is_shib_course': is_shib_course,
             'invitation_only': invitation_only,
             'course': course,
             'active_reg_button': active_reg_button

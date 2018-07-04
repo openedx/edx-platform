@@ -523,9 +523,7 @@ def course_about(request, course_id):
     from openedx.core.djangoapps.models.course_details import CourseDetails
     from commerce.utils import EcommerceService
     from course_modes.models import CourseMode
-    from student.models import CourseEnrollment
     from lms.djangoapps.courseware.views.views import registered_for_course, get_cosmetic_display_price
-    from lms.djangoapps.instructor.enrollment import uses_shib
     from lms.djangoapps.courseware.courses import (
         get_courses,
         get_permission_for_course_about,
@@ -558,24 +556,8 @@ def course_about(request, course_id):
         if configuration_helpers.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
             return redirect(reverse('info', args=[course.id.to_deprecated_string()]))
 
-        # registered = registered_for_course(course, request.user)
-
         staff_access = bool(has_access(request.user, 'staff', course))
         studio_url = get_studio_url(course, 'settings/details')
-
-        # if has_access(request.user, 'load', course):
-        #     first_chapter_url, first_section = get_course_related_keys(request, course)
-        #     course_target = reverse('courseware_section', args=[course.id.to_deprecated_string(), first_chapter_url,
-        #                                                         first_section])
-        # else:
-        #     course_target = reverse('about_course', args=[course.id.to_deprecated_string()])
-        #
-        # show_courseware_link = bool(
-        #     (
-        #         has_access(request.user, 'load', course) and
-        #         has_access(request.user, 'view_courseware_with_prerequisites', course)
-        #     ) or settings.FEATURES.get('ENABLE_LMS_MIGRATION')
-        # )
 
         # Note: this is a flow for payment for course registration, not the Verified Certificate flow.
         # in_cart = False
@@ -622,15 +604,6 @@ def course_about(request, course_id):
         # Used to provide context to message to student if enrollment not allowed
         can_enroll = bool(has_access(request.user, 'enroll', course))
         invitation_only = course.invitation_only
-        # is_course_full = CourseEnrollment.objects.is_course_full(course)
-
-        # Register button should be disabled if one of the following is true:
-        # - Student is already registered for course
-        # - Course is already full
-        # - Student cannot enroll in course
-        # active_reg_button = not(registered or is_course_full or not can_enroll)
-
-        # is_shib_course = uses_shib(course)
 
         # get prerequisite courses display names
         pre_requisite_courses = get_prerequisite_courses_display(course)
@@ -649,22 +622,11 @@ def course_about(request, course_id):
             'current_enrolled_class_target': current_enrolled_class_target,
             'staff_access': staff_access,
             'studio_url': studio_url,
-            # 'registered': registered,
-            # 'course_target': course_target,
             'is_cosmetic_price_enabled': settings.FEATURES.get('ENABLE_COSMETIC_DISPLAY_PRICE'),
             'course_price': course_price,
-            # 'in_cart': in_cart,
-            # 'ecommerce_checkout': ecommerce_checkout,
-            # 'ecommerce_checkout_link': ecommerce_checkout_link,
-            # 'ecommerce_bulk_checkout_link': ecommerce_bulk_checkout_link,
-            # 'professional_mode': professional_mode,
             'reg_then_add_to_cart_link': reg_then_add_to_cart_link,
-            # 'show_courseware_link': show_courseware_link,
-            # 'is_course_full': is_course_full,
             'can_enroll': can_enroll,
             'invitation_only': invitation_only,
-            # 'active_reg_button': active_reg_button,
-            # 'is_shib_course': is_shib_course,
             # We do not want to display the internal courseware header, which is used when the course is found in the
             # context. This value is therefor explicitly set to render the appropriate header.
             'disable_courseware_header': True,
