@@ -598,6 +598,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             'title': 'Problem1',
             'Answer ID': 'i4x-edx-1_23x-problem-Problem1_2_1',
             'Answer': 'Option 1',
+            'Correct Answer': u'Option 1',
             'Question': u'The correct answer is Option 1',
         }, student_data[0])
         self.assertIn('state', student_data[0])
