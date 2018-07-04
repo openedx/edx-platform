@@ -51,6 +51,12 @@ class AdvancedSettingsPage(CoursePage):
         """
         return self.q(css=DEPRECATED_SETTINGS_BUTTON_SELECTOR).text[0]
 
+    def check_deprecated_settings_visibility(self):
+        """
+            Returns true if deprecated settings are visible
+        """
+        return self.q(css=DEPRECATED_SETTINGS_SELECTOR).visible
+
     def wait_for_modal_load(self):
         """
         Wait for validation response from the server, and make sure that
@@ -68,6 +74,14 @@ class AdvancedSettingsPage(CoursePage):
         """
         self.browser.refresh()
         self.wait_for_page()
+
+    @property
+    def confirmation_message(self):
+        """
+            Returns the text of confirmation message which appears after saving the settings
+        """
+        self.wait_for_element_visibility(CONFIRMATION_MESSAGE_SELECTOR, 'Confirmation message is visible')
+        return self.q(css=CONFIRMATION_MESSAGE_SELECTOR).text[0]
 
     def coordinates_for_scrolling(self, coordinates_for):
         """
