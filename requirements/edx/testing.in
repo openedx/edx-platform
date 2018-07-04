@@ -20,7 +20,7 @@ before_after              # Syntactic sugar for mock, only used in one test case
 bok-choy                  # Framework for browser automation tests, based on selenium
 cssselect                 # Used to extract HTML fragments via CSS selectors in 2 test cases and pyquery
 ddt                       # Run a test case multiple times with different input; used in many, many of our tests
-edx-i18n-tools>=0.4.5     # Commands for developers and translators to extract, compile and validate translations
+edx-i18n-tools>=0.4.6     # Commands for developers and translators to extract, compile and validate translations
 edx-lint                  # pylint extensions for Open edX repositories
 pylint-plugin-utils==0.3  # required by edx-lint and pinned explicitly here because newer versions don't guarantee python 2 support.
                           # can be removed when we get to python 3
