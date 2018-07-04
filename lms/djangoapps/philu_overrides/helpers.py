@@ -38,6 +38,10 @@ def reactivation_email_for_user_custom(request, user):
 
 
 def get_course_next_classes(request, course):
+    """
+    Method to get all upcoming reruns of a course
+    """
+
     # imports to avoid circular dependencies
     import pytz
     from lms.djangoapps.courseware.courses import (
@@ -114,6 +118,13 @@ def get_course_next_classes(request, course):
 
 
 def get_user_current_enrolled_class(request, course):
+    """
+    Method to get an ongoing user enrolled course. A course that meets the following criteria
+    => start date < today
+    => end date > today
+    => user is enrolled
+    """
+
     import pytz
     from lms.djangoapps.courseware.courses import (
         get_permission_for_course_about,
