@@ -124,7 +124,10 @@ def get_user_current_enrolled_class(request, course):
         id__in=all_course_reruns, start__lte=datetime.utcnow().replace(tzinfo=utc),
         end__gt=datetime.utcnow().replace(tzinfo=utc)).order_by('-start').first()
 
-    current_enrolled_class = CourseEnrollment.is_enrolled(request.user, current_class.id)
+    current_enrolled_class = False
+    if current_class:
+        current_enrolled_class = CourseEnrollment.is_enrolled(request.user, current_class.id)
+
     current_enrolled_class_target = ''
     if current_enrolled_class:
         course_key = SlashSeparatedCourseKey.from_deprecated_string(current_class.id.__str__())
