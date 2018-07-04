@@ -31,7 +31,6 @@ urlpatterns = (
     url(r'', include('homepage.urls', namespace='homepage')),
 
     url(r'', include('lms.djangoapps.onboarding.urls')),
-    url(r'', include('openedx.features.course_card.urls')),
     url(r'^oef/', include('lms.djangoapps.oef.urls')),
     url(r'', include('edx_notifications.server.urls')),
     url(r'^$', 'branding.views.index', name="root"),   # Main marketing page, or redirect to courseware
@@ -284,7 +283,7 @@ urlpatterns += (
     # TODO: These views need to be updated before they work
     url(r'^calculate$', 'util.views.calculate'),
 
-    url(r'^courses/?$', 'lms.djangoapps.philu_overrides.views.courses', name="courses"),
+    url(r'^courses/?$', 'openedx.features.course_card.views.get_course_cards', name="courses"),
 
     #About the course
     url(

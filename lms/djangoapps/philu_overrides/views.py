@@ -1,53 +1,43 @@
 """ Views for a student's account information. """
 import base64
+from datetime import datetime
 import json
+import third_party_auth
 import logging
 import urlparse
+from pytz import utc
 
-from datetime import datetime
 from django.http import HttpResponseNotFound, HttpResponse, Http404, HttpResponseServerError
-
-import third_party_auth
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
+from django.utils.translation import ugettext as _
 from edxmako.shortcuts import render_to_response, render_to_string
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from openedx.core.djangoapps.catalog.utils import get_programs_data
-
 from philu_overrides.helpers import reactivation_email_for_user_custom, get_course_next_classes, \
     get_user_current_enrolled_class
-
-from pytz import utc
-from student.helpers import get_next_url_for_login_page
-
-from django.utils.translation import ugettext as _
 from lms.djangoapps.courseware.views.views import add_tag_to_enrolled_courses
 from student.views import (
     signin_user as old_login_view,
     register_user as old_register_view
 )
-
+from student.helpers import get_next_url_for_login_page
 from third_party_auth.decorators import xframe_allow_whitelisted
 from util.cache import cache_if_anonymous
 from util.enterprise_helpers import set_enterprise_branding_filter_param
 from xmodule.modulestore.django import modulestore
-
 from common.djangoapps.student.views import get_course_related_keys
 from lms.djangoapps.courseware.access import has_access
-
 from lms.djangoapps.courseware.views.views import get_last_accessed_courseware
 from lms.djangoapps.onboarding.helpers import reorder_registration_form_fields
 from lms.djangoapps.student_account.views import _local_server_get, _get_form_descriptions, _external_auth_intercept, \
     _third_party_auth_context
-
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
-
-
 from third_party_auth import pipeline, provider
 from util.json_request import JsonResponse
 from edxmako.shortcuts import marketing_link
@@ -58,7 +48,6 @@ from django.contrib.auth import authenticate, login
 import analytics
 from eventtracking import tracker
 from student.cookies import set_logged_in_cookies
-
 
 AUDIT_LOG = logging.getLogger("audit")
 log = logging.getLogger(__name__)
