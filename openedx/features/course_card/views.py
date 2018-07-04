@@ -46,6 +46,7 @@ def get_course_cards(request):
     date_time_format = '%b %-d, %Y'
 
     for course in courses_list:
+        course.start_date = None
         course_rerun_states = [crs.course_key for crs in CourseRerunState.objects.filter(
             source_course_key=course.id, action="rerun", state="succeeded")]
 
@@ -75,8 +76,7 @@ def get_course_cards(request):
             course.is_enrolled = is_enrolled
             course_target = get_course_first_chapter_link(current_course, request)
             course.course_target = course_target
-        else:
-            course.start_date = None
+
     return render_to_response(
         "course_card/courses.html",
         {
