@@ -98,7 +98,7 @@ def get_course_next_classes(request, course):
 def get_user_current_enrolled_class(request, course):
     """
     Method to get an ongoing user enrolled course. A course that meets the following criteria
-    => start date < today
+    => start date <= today
     => end date > today
     => user is enrolled
     """
