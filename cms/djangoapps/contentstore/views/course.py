@@ -976,7 +976,7 @@ def settings_handler(request, course_key_string):
     perflog = {
         'start': time.time(),
         # human readable timestamp is purely for convenience when looking through the logs
-        'timestamp': datetime.datetime.now(UTC),
+        'timestamp': str(datetime.datetime.now(UTC)),
         # timestamps for each checkpoint execution passes
         'checkpoints': [],
         # keep track of which branches were executed
