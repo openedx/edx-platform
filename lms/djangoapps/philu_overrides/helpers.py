@@ -1,14 +1,9 @@
-from django.conf import settings
 from openedx.core.djangoapps.models.course_details import CourseDetails
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from lms.djangoapps.courseware.courses import get_course_by_id
-from lms.djangoapps.courseware.access import has_access
-from lms.djangoapps.courseware.views.views import registered_for_course
-from student.models import Registration, CourseEnrollment
+from student.models import Registration
 from util.json_request import JsonResponse
 from util.request import safe_get_host
 from common.lib.mandrill_client.client import MandrillClient
-
 
 
 def get_course_details(course_id):
@@ -43,21 +38,38 @@ def reactivation_email_for_user_custom(request, user):
 
 
 def get_course_next_classes(request, course):
+    # imports to avoid circular dependencies
+    import pytz
+    from lms.djangoapps.courseware.courses import (
+        get_course_by_id,
+        get_permission_for_course_about,
+        get_course_with_access
+    )
+    from django.conf import settings
+    from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+    from lms.djangoapps.courseware.access import has_access
+    from lms.djangoapps.courseware.views.views import registered_for_course
+    from lms.djangoapps.instructor.enrollment import uses_shib
+    from student.models import CourseEnrollment
+    from opaque_keys.edx.locations import SlashSeparatedCourseKey
     from django.core.urlresolvers import reverse
     from course_action_state.models import CourseRerunState
     from common.djangoapps.student.views import get_course_related_keys
     from datetime import datetime
-    import pytz
+
     utc = pytz.UTC
 
     course_rerun_states = [crs.course_key for crs in CourseRerunState.objects.filter(
-        source_course_key=course.id, action="rerun", state="succeeded")]
+        source_course_key=course.id, action="rerun", state="succeeded")] + [course.id]
     course_rerun_objects = CourseOverview.objects.select_related('image_set').filter(
         id__in=course_rerun_states, start__gte=datetime.utcnow().replace(tzinfo=utc)).order_by('start')
 
     course_next_classes = []
 
     for course in course_rerun_objects:
+        course_key = SlashSeparatedCourseKey.from_deprecated_string(course.id.__str__())
+        permission = get_permission_for_course_about()
+        course = get_course_with_access(request.user, permission, course_key)
         registered = registered_for_course(course, request.user)
 
         if has_access(request.user, 'load', course):
@@ -78,6 +90,7 @@ def get_course_next_classes(request, course):
         can_enroll = bool(has_access(request.user, 'enroll', course))
         invitation_only = course.invitation_only
         is_course_full = CourseEnrollment.objects.is_course_full(course)
+        is_shib_course = uses_shib(course)
 
         # Register button should be disabled if one of the following is true:
         # - Student is already registered for course
@@ -92,8 +105,35 @@ def get_course_next_classes(request, course):
             'course_target': course_target,
             'is_course_full': is_course_full,
             'can_enroll': can_enroll,
+            'is_shib_course': is_shib_course,
             'invitation_only': invitation_only,
             'course': course,
             'active_reg_button': active_reg_button
         })
     return course_next_classes
+
+
+def get_user_current_enrolled_class(request, course):
+    import pytz
+    from datetime import datetime
+    from django.core.urlresolvers import reverse
+    from common.djangoapps.student.views import get_course_related_keys
+    from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+    from student.models import CourseEnrollment
+    from course_action_state.models import CourseRerunState
+    utc = pytz.UTC
+
+    all_course_reruns = [crs.course_key for crs in CourseRerunState.objects.filter(
+        source_course_key=course.id, action="rerun", state="succeeded")] + [course.id]
+
+    current_class = CourseOverview.objects.select_related('image_set').filter(
+        id__in=all_course_reruns, start__lte=datetime.utcnow().replace(tzinfo=utc),
+        end__gt=datetime.utcnow().replace(tzinfo=utc)).order_by('-start').first()
+
+    current_enrolled_class = CourseEnrollment.is_enrolled(request.user, current_class.id)
+
+    first_chapter_url, first_section = get_course_related_keys(request, course)
+    current_enrolled_class_target = reverse('courseware_section', args=[course.id.to_deprecated_string(), first_chapter_url,
+                                                            first_section])
+
+    return current_enrolled_class, current_enrolled_class_target

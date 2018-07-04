@@ -2,7 +2,6 @@
 import base64
 import json
 import logging
-import urllib
 import urlparse
 
 from datetime import datetime
@@ -18,18 +17,15 @@ from django.views.decorators.http import require_http_methods
 from edxmako.shortcuts import render_to_response, render_to_string
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from openedx.core.djangoapps.catalog.utils import get_programs_data
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from philu_overrides.helpers import reactivation_email_for_user_custom, get_course_next_classes
-from util.milestones_helpers import get_prerequisite_courses_display
-from openedx.core.djangoapps.models.course_details import CourseDetails
-from commerce.utils import EcommerceService
-from course_modes.models import CourseMode
+
+from philu_overrides.helpers import reactivation_email_for_user_custom, get_course_next_classes, \
+    get_user_current_enrolled_class
+
 from pytz import utc
 from student.helpers import get_next_url_for_login_page
-from student.models import CourseEnrollment
+
 from django.utils.translation import ugettext as _
-from lms.djangoapps.courseware.views.views import add_tag_to_enrolled_courses, registered_for_course, \
-    get_cosmetic_display_price
+from lms.djangoapps.courseware.views.views import add_tag_to_enrolled_courses
 from student.views import (
     signin_user as old_login_view,
     register_user as old_register_view
@@ -42,26 +38,15 @@ from xmodule.modulestore.django import modulestore
 
 from common.djangoapps.student.views import get_course_related_keys
 from lms.djangoapps.courseware.access import has_access
-from lms.djangoapps.instructor.enrollment import uses_shib
-from lms.djangoapps.courseware.courses import (
-    get_courses,
-    get_permission_for_course_about,
-    get_course_overview_with_access,
-    get_course_with_access,
-    get_studio_url,
-    sort_by_start_date,
-    get_course_by_id,
-    sort_by_announcement
-)
+
 from lms.djangoapps.courseware.views.views import get_last_accessed_courseware
 from lms.djangoapps.onboarding.helpers import reorder_registration_form_fields
 from lms.djangoapps.student_account.views import _local_server_get, _get_form_descriptions, _external_auth_intercept, \
     _third_party_auth_context
-import shoppingcart
-from shoppingcart.utils import is_shopping_cart_enabled
+
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
-from openedx.core.djangoapps.coursetalk.helpers import inject_coursetalk_keys_into_context
+
 
 from third_party_auth import pipeline, provider
 from util.json_request import JsonResponse
@@ -532,6 +517,29 @@ def course_about(request, course_id):
     Assumes the course_id is in a valid format.
     """
 
+    import urllib
+    from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+    from util.milestones_helpers import get_prerequisite_courses_display
+    from openedx.core.djangoapps.models.course_details import CourseDetails
+    from commerce.utils import EcommerceService
+    from course_modes.models import CourseMode
+    from student.models import CourseEnrollment
+    from lms.djangoapps.courseware.views.views import registered_for_course, get_cosmetic_display_price
+    from lms.djangoapps.instructor.enrollment import uses_shib
+    from lms.djangoapps.courseware.courses import (
+        get_courses,
+        get_permission_for_course_about,
+        get_course_overview_with_access,
+        get_course_with_access,
+        get_studio_url,
+        sort_by_start_date,
+        get_course_by_id,
+        sort_by_announcement
+    )
+    import shoppingcart
+    from shoppingcart.utils import is_shopping_cart_enabled
+    from openedx.core.djangoapps.coursetalk.helpers import inject_coursetalk_keys_into_context
+
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     if hasattr(course_key, 'ccx'):
@@ -550,27 +558,27 @@ def course_about(request, course_id):
         if configuration_helpers.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
             return redirect(reverse('info', args=[course.id.to_deprecated_string()]))
 
-        registered = registered_for_course(course, request.user)
+        # registered = registered_for_course(course, request.user)
 
         staff_access = bool(has_access(request.user, 'staff', course))
         studio_url = get_studio_url(course, 'settings/details')
 
-        if has_access(request.user, 'load', course):
-            first_chapter_url, first_section = get_course_related_keys(request, course)
-            course_target = reverse('courseware_section', args=[course.id.to_deprecated_string(), first_chapter_url,
-                                                                first_section])
-        else:
-            course_target = reverse('about_course', args=[course.id.to_deprecated_string()])
-
-        show_courseware_link = bool(
-            (
-                has_access(request.user, 'load', course) and
-                has_access(request.user, 'view_courseware_with_prerequisites', course)
-            ) or settings.FEATURES.get('ENABLE_LMS_MIGRATION')
-        )
+        # if has_access(request.user, 'load', course):
+        #     first_chapter_url, first_section = get_course_related_keys(request, course)
+        #     course_target = reverse('courseware_section', args=[course.id.to_deprecated_string(), first_chapter_url,
+        #                                                         first_section])
+        # else:
+        #     course_target = reverse('about_course', args=[course.id.to_deprecated_string()])
+        #
+        # show_courseware_link = bool(
+        #     (
+        #         has_access(request.user, 'load', course) and
+        #         has_access(request.user, 'view_courseware_with_prerequisites', course)
+        #     ) or settings.FEATURES.get('ENABLE_LMS_MIGRATION')
+        # )
 
         # Note: this is a flow for payment for course registration, not the Verified Certificate flow.
-        in_cart = False
+        # in_cart = False
         reg_then_add_to_cart_link = ""
 
         _is_shopping_cart_enabled = is_shopping_cart_enabled()
@@ -590,8 +598,8 @@ def course_about(request, course_id):
         ecomm_service = EcommerceService()
         ecommerce_checkout = ecomm_service.is_enabled(request.user)
         ecommerce_checkout_link = ''
-        ecommerce_bulk_checkout_link = ''
-        professional_mode = None
+        # ecommerce_bulk_checkout_link = ''
+        # professional_mode = None
         is_professional_mode = CourseMode.PROFESSIONAL in modes or CourseMode.NO_ID_PROFESSIONAL_MODE in modes
         if ecommerce_checkout and is_professional_mode:
             professional_mode = modes.get(CourseMode.PROFESSIONAL, '') or \
@@ -614,15 +622,15 @@ def course_about(request, course_id):
         # Used to provide context to message to student if enrollment not allowed
         can_enroll = bool(has_access(request.user, 'enroll', course))
         invitation_only = course.invitation_only
-        is_course_full = CourseEnrollment.objects.is_course_full(course)
+        # is_course_full = CourseEnrollment.objects.is_course_full(course)
 
         # Register button should be disabled if one of the following is true:
         # - Student is already registered for course
         # - Course is already full
         # - Student cannot enroll in course
-        active_reg_button = not(registered or is_course_full or not can_enroll)
+        # active_reg_button = not(registered or is_course_full or not can_enroll)
 
-        is_shib_course = uses_shib(course)
+        # is_shib_course = uses_shib(course)
 
         # get prerequisite courses display names
         pre_requisite_courses = get_prerequisite_courses_display(course)
@@ -631,11 +639,14 @@ def course_about(request, course_id):
         overview = CourseOverview.get_from_id(course.id)
 
         course_next_classes = get_course_next_classes(request, course)
+        user_current_enrolled_class, current_enrolled_class_target = get_user_current_enrolled_class(request, course)
 
         context = {
             'course': course,
             'course_details': course_details,
             'course_next_classes': course_next_classes,
+            'user_current_enrolled_class': user_current_enrolled_class,
+            'current_enrolled_class_target': current_enrolled_class_target,
             'staff_access': staff_access,
             'studio_url': studio_url,
             # 'registered': registered,
