@@ -135,10 +135,11 @@ def get_course_outline_block_tree(request, course_id):
         'poll',
         'word_cloud'
     ]
+    user = request.user if request.user and request.user.is_authenticated else None
     all_blocks = get_blocks(
         request,
         course_usage_key,
-        user=request.user,
+        user=user,
         nav_depth=3,
         requested_fields=[
             'children',
@@ -156,13 +157,14 @@ def get_course_outline_block_tree(request, course_id):
     course_outline_root_block = all_blocks['blocks'].get(all_blocks['root'], None)
     if course_outline_root_block:
         populate_children(course_outline_root_block, all_blocks['blocks'])
-        set_last_accessed_default(course_outline_root_block)
 
-        mark_blocks_completed(
-            block=course_outline_root_block,
-            user=request.user,
-            course_key=course_key
-        )
+        if request.user.is_authenticated:
+            set_last_accessed_default(course_outline_root_block)
+            mark_blocks_completed(
+                block=course_outline_root_block,
+                user=request.user,
+                course_key=course_key
+            )
     return course_outline_root_block
 
 
