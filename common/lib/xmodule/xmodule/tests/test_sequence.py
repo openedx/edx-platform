@@ -5,6 +5,7 @@ Tests for sequence module.
 import json
 
 from datetime import timedelta
+import ddt
 from django.utils.timezone import now
 from freezegun import freeze_time
 from mock import Mock, patch
@@ -12,7 +13,7 @@ from xmodule.seq_module import SequenceModule
 from xmodule.tests import get_test_system
 from xmodule.tests.helpers import StubUserService
 from xmodule.tests.xml import factories as xml, XModuleXmlImportTest
-from xmodule.x_module import STUDENT_VIEW
+from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 
 TODAY = now()
 DUE_DATE = TODAY + timedelta(days=7)
@@ -20,6 +21,7 @@ PAST_DUE_BEFORE_END_DATE = TODAY + timedelta(days=14)
 COURSE_END_DATE = TODAY + timedelta(days=21)
 
 
+@ddt.ddt
 class SequenceBlockTestCase(XModuleXmlImportTest):
     """
     Base class for tests of Sequence Module.
@@ -92,7 +94,12 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         module_system.descriptor_runtime = block._runtime  # pylint: disable=protected-access
         block.xmodule_runtime = module_system
 
-    def _get_rendered_student_view(self, sequence, requested_child=None, extra_context=None, self_paced=False):
+    def _get_rendered_view(self,
+                           sequence,
+                           requested_child=None,
+                           extra_context=None,
+                           self_paced=False,
+                           view=STUDENT_VIEW):
         """
         Returns the rendered student view for the given sequence and the
         requested_child parameter.
@@ -106,7 +113,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         with patch.object(SequenceModule, '_get_course') as mock_course:
             self.course.self_paced = self_paced
             mock_course.return_value = self.course
-            return sequence.xmodule_runtime.render(sequence, STUDENT_VIEW, context).content
+            return sequence.xmodule_runtime.render(sequence, view, context).content
 
     def _assert_view_at_position(self, rendered_html, expected_position):
         """
@@ -118,10 +125,16 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         seq_module = SequenceModule(runtime=Mock(position=2), descriptor=Mock(), scope_ids=Mock())
         self.assertEquals(seq_module.position, 2)  # matches position set in the runtime
 
-    def test_render_student_view(self):
-        html = self._get_rendered_student_view(
+    @ddt.unpack
+    @ddt.data(
+        {'view': STUDENT_VIEW},
+        {'view': PUBLIC_VIEW},
+    )
+    def test_render_student_view(self, view):
+        html = self._get_rendered_view(
             self.sequence_3_1,
             extra_context=dict(next_url='NextSequential', prev_url='PrevSequential'),
+            view=view
         )
         self._assert_view_at_position(html, expected_position=1)
         self.assertIn(unicode(self.sequence_3_1.location), html)
@@ -130,28 +143,40 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         self.assertIn("'prev_url': 'PrevSequential'", html)
         self.assertNotIn("fa fa-check-circle check-circle is-hidden", html)
 
-    def test_student_view_first_child(self):
-        html = self._get_rendered_student_view(self.sequence_3_1, requested_child='first')
+    @ddt.unpack
+    @ddt.data(
+        {'view': STUDENT_VIEW},
+        {'view': PUBLIC_VIEW},
+    )
+    def test_student_view_first_child(self, view):
+        html = self._get_rendered_view(
+            self.sequence_3_1, requested_child='first', view=view
+        )
         self._assert_view_at_position(html, expected_position=1)
 
-    def test_student_view_last_child(self):
-        html = self._get_rendered_student_view(self.sequence_3_1, requested_child='last')
+    @ddt.unpack
+    @ddt.data(
+        {'view': STUDENT_VIEW},
+        {'view': PUBLIC_VIEW},
+    )
+    def test_student_view_last_child(self, view):
+        html = self._get_rendered_view(self.sequence_3_1, requested_child='last', view=view)
         self._assert_view_at_position(html, expected_position=3)
 
     def test_tooltip(self):
-        html = self._get_rendered_student_view(self.sequence_3_1, requested_child=None)
+        html = self._get_rendered_view(self.sequence_3_1, requested_child=None)
         for child in self.sequence_3_1.children:
             self.assertIn("'page_title': '{}'".format(child.block_id), html)
 
     def test_hidden_content_before_due(self):
-        html = self._get_rendered_student_view(self.sequence_4_1)
+        html = self._get_rendered_view(self.sequence_4_1)
         self.assertIn("seq_module.html", html)
         self.assertIn("'banner_text': None", html)
 
     def test_hidden_content_past_due(self):
         with freeze_time(COURSE_END_DATE):
             progress_url = 'http://test_progress_link'
-            html = self._get_rendered_student_view(
+            html = self._get_rendered_view(
                 self.sequence_4_1,
                 extra_context=dict(progress_url=progress_url),
             )
@@ -160,7 +185,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
 
     def test_masquerade_hidden_content_past_due(self):
         with freeze_time(COURSE_END_DATE):
-            html = self._get_rendered_student_view(
+            html = self._get_rendered_view(
                 self.sequence_4_1,
                 extra_context=dict(specific_masquerade=True),
             )
@@ -173,14 +198,14 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
 
     def test_hidden_content_self_paced_past_due_before_end(self):
         with freeze_time(PAST_DUE_BEFORE_END_DATE):
-            html = self._get_rendered_student_view(self.sequence_4_1, self_paced=True)
+            html = self._get_rendered_view(self.sequence_4_1, self_paced=True)
             self.assertIn("seq_module.html", html)
             self.assertIn("'banner_text': None", html)
 
     def test_hidden_content_self_paced_past_end(self):
         with freeze_time(COURSE_END_DATE + timedelta(days=7)):
             progress_url = 'http://test_progress_link'
-            html = self._get_rendered_student_view(
+            html = self._get_rendered_view(
                 self.sequence_4_1,
                 extra_context=dict(progress_url=progress_url),
                 self_paced=True,
@@ -248,7 +273,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         self.sequence_1_2.xmodule_runtime._services['gating'] = gating_mock_1_2  # pylint: disable=protected-access
         self.sequence_1_2.display_name = 'sequence_1_2'
 
-        html = self._get_rendered_student_view(
+        html = self._get_rendered_view(
             self.sequence_1_2,
             extra_context=dict(next_url='NextSequential', prev_url='PrevSequential'),
         )
@@ -261,7 +286,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         gating_mock_1_2.return_value.required_prereq.return_value = True
         gating_mock_1_2.return_value.compute_is_prereq_met.return_value = [True, {}]
 
-        html = self._get_rendered_student_view(
+        html = self._get_rendered_view(
             self.sequence_1_2,
             extra_context=dict(next_url='NextSequential', prev_url='PrevSequential'),
         )
@@ -274,7 +299,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         gating_mock_1_2.return_value.required_prereq.return_value = True
         gating_mock_1_2.return_value.compute_is_prereq_met.return_value = [True, {}]
 
-        html = self._get_rendered_student_view(
+        html = self._get_rendered_view(
             self.sequence_1_2,
             extra_context=dict(next_url='NextSequential', prev_url='PrevSequential'),
         )

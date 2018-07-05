@@ -44,6 +44,10 @@ DEFAULT_COURSE_VISIBILITY_IN_CATALOG = getattr(
 
 DEFAULT_MOBILE_AVAILABLE = getattr(settings, 'DEFAULT_MOBILE_AVAILABLE', False)
 
+COURSE_VISIBILITY_PRIVATE = 'private'
+COURSE_VISIBILITY_PUBLIC_OUTLINE = 'public_outline'
+COURSE_VISIBILITY_PUBLIC = 'public'
+
 
 class StringOrDate(Date):
     def from_json(self, value):
@@ -812,6 +816,21 @@ class CourseFields(object):
         help=_("Specify what student can learn from the course."),
         default=[],
         scope=Scope.settings
+    )
+
+    course_visibility = String(
+        display_name=_("Course Visibility For Unenrolled Learners"),
+        help=_(
+            "Defines the access permissions for unenrolled learners. This can be set to one of three values: "
+            "'private' (default visibility, only allowed for enrolled students), 'public_outline' "
+            "(allow access to course outline) and 'public' (allow access to both outline and course content)."
+        ),
+        default=COURSE_VISIBILITY_PRIVATE,
+        scope=Scope.settings,
+        values=[
+            {"display_name": _("private"), "value": COURSE_VISIBILITY_PRIVATE},
+            {"display_name": _("public_outline"), "value": COURSE_VISIBILITY_PUBLIC_OUTLINE},
+            {"display_name": _("public"), "value": COURSE_VISIBILITY_PUBLIC}]
     )
 
     """
