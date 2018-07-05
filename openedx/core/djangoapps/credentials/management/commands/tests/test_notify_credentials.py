@@ -8,7 +8,8 @@ import mock
 
 from django.core.management import call_command
 from django.core.management.base import CommandError
-from django.test import TestCase
+from django.db import connection, reset_queries
+from django.test import TestCase, override_settings
 from freezegun import freeze_time
 
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
@@ -107,3 +108,16 @@ class TestNotifyCredentials(TestCase):
         call_command(Command(), '--start-date', '2017-02-01', '--delay', '0.2')
         self.assertEqual(mock_time.sleep.call_count, 4)  # After each cert and each grade (2 each)
         self.assertEqual(mock_time.sleep.call_args[0][0], 0.2)
+
+    @override_settings(DEBUG=True)
+    def test_page_size(self):
+        call_command(Command(), '--start-date', '2017-01-01')
+        baseline = len(connection.queries)
+
+        reset_queries()
+        call_command(Command(), '--start-date', '2017-01-01', '--page-size=1')
+        self.assertEqual(len(connection.queries), baseline + 4)  # two extra page queries each for certs & grades
+
+        reset_queries()
+        call_command(Command(), '--start-date', '2017-01-01', '--page-size=2')
+        self.assertEqual(len(connection.queries), baseline + 2)  # one extra page query each for certs & grades
