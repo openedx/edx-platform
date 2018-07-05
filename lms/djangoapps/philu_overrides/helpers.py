@@ -1,9 +1,12 @@
+import pytz
+from datetime import datetime
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from lms.djangoapps.courseware.courses import get_course_by_id
 from student.models import Registration
 from util.json_request import JsonResponse
 from util.request import safe_get_host
 from common.lib.mandrill_client.client import MandrillClient
+utc = pytz.UTC
 
 
 def get_course_details(course_id):
@@ -37,27 +40,31 @@ def reactivation_email_for_user_custom(request, user):
         })  # TODO: this should be status code 400  # pylint: disable=fixme
 
 
+def has_access_custom(course):
+    """ User can enroll if current time is between enrollment start and end date """
+    current_time = datetime.utcnow().replace(tzinfo=utc)
+    if not course.enrollment_start or not course.enrollment_end:
+        return False
+
+    if course.enrollment_end > current_time >= course.enrollment_start:
+        return True
+    else:
+        return False
+
+
 def get_course_next_classes(request, course):
     """
     Method to get all upcoming reruns of a course
     """
 
     # imports to avoid circular dependencies
-    import pytz
-    from lms.djangoapps.courseware.courses import (
-        get_course_by_id,
-        get_permission_for_course_about,
-        get_course_with_access
-    )
     from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
     from lms.djangoapps.courseware.access import has_access
     from lms.djangoapps.courseware.views.views import registered_for_course
     from student.models import CourseEnrollment
     from opaque_keys.edx.locations import SlashSeparatedCourseKey
     from course_action_state.models import CourseRerunState
-    from datetime import datetime
 
-    utc = pytz.UTC
 
     course_rerun_states = [crs.course_key for crs in CourseRerunState.objects.filter(
         source_course_key=course.id, action="rerun", state="succeeded")] + [course.id]
@@ -66,14 +73,13 @@ def get_course_next_classes(request, course):
 
     course_next_classes = []
 
-    for course in course_rerun_objects:
-        course_key = SlashSeparatedCourseKey.from_deprecated_string(course.id.__str__())
-        permission = get_permission_for_course_about()
-        course = get_course_with_access(request.user, permission, course_key)
+    for _course in course_rerun_objects:
+        course_key = SlashSeparatedCourseKey.from_deprecated_string(_course.id.__str__())
+        course = get_course_by_id(course_key)
         registered = registered_for_course(course, request.user)
 
         # Used to provide context to message to student if enrollment not allowed
-        can_enroll = bool(has_access(request.user, 'enroll', course))
+        can_enroll = has_access_custom(course)
         invitation_only = course.invitation_only
         is_course_full = CourseEnrollment.objects.is_course_full(course)
 
@@ -131,11 +137,10 @@ def get_user_current_enrolled_class(request, course):
     current_enrolled_class_target = ''
     if current_enrolled_class:
         course_key = SlashSeparatedCourseKey.from_deprecated_string(current_class.id.__str__())
-        permission = get_permission_for_course_about()
-        current_class = get_course_with_access(request.user, permission, course_key)
+        current_class = get_course_by_id(course_key)
         first_chapter_url, first_section = get_course_related_keys(request, current_class)
         current_enrolled_class_target = reverse('courseware_section',
                                                 args=[current_class.id.to_deprecated_string(),
                                                       first_chapter_url, first_section])
 
-    return current_enrolled_class, current_enrolled_class_target
+    return current_class, current_enrolled_class, current_enrolled_class_target

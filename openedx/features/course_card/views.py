@@ -43,7 +43,6 @@ def get_course_cards(request):
     courses_list = CourseOverview.objects.select_related('image_set').filter(id__in=course_card_ids)
     current_time = datetime.now()
 
-    current_course = None
     date_time_format = '%b %-d, %Y'
 
     for course in courses_list:
@@ -60,19 +59,21 @@ def get_course_cards(request):
         if course_start_time and rerun_start_time:
             if course_start_time < rerun_start_time:
                 course.start_date = course_start_time.strftime(date_time_format)
-                current_course = course
             else:
                 course.start_date = rerun_start_time.strftime(date_time_format)
-                current_course = course_rerun_object
 
         elif course_start_time:
             course.start_date = course_start_time.strftime(date_time_format)
-            current_course = course
+
         elif rerun_start_time:
             course.start_date = rerun_start_time.strftime(date_time_format)
-            current_course = course_rerun_object
 
-        user_current_enrolled_class, current_enrolled_class_target = get_user_current_enrolled_class(request, course)
+        current_class, user_current_enrolled_class, current_enrolled_class_target = get_user_current_enrolled_class(
+            request, course)
+
+        if current_class:
+            course.start_date = current_class.start.strftime(date_time_format)
+
         if user_current_enrolled_class:
             course.is_enrolled = True
             course.course_target = current_enrolled_class_target

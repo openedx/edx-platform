@@ -537,8 +537,7 @@ def course_about(request, course_id):
         return redirect(reverse('dashboard'))
 
     with modulestore().bulk_operations(course_key):
-        permission = get_permission_for_course_about()
-        course = get_course_with_access(request.user, permission, course_key)
+        course = get_course_by_id(course_key)
         course_details = CourseDetails.populate(course)
         modes = CourseMode.modes_for_course_dict(course_key)
 
@@ -590,8 +589,6 @@ def course_about(request, course_id):
         # Determine which checkout workflow to use -- LMS shoppingcart or Otto basket
         can_add_course_to_cart = _is_shopping_cart_enabled and registration_price and not ecommerce_checkout_link
 
-        # Used to provide context to message to student if enrollment not allowed
-        can_enroll = bool(has_access(request.user, 'enroll', course))
         invitation_only = course.invitation_only
 
         # get prerequisite courses display names
@@ -601,12 +598,13 @@ def course_about(request, course_id):
         overview = CourseOverview.get_from_id(course.id)
 
         course_next_classes = get_course_next_classes(request, course)
-        user_current_enrolled_class, current_enrolled_class_target = get_user_current_enrolled_class(request, course)
+        current_class, user_current_enrolled_class, current_enrolled_class_target = get_user_current_enrolled_class(request, course)
 
         context = {
             'course': course,
             'course_details': course_details,
             'course_next_classes': course_next_classes,
+            'current_class': current_class,
             'user_current_enrolled_class': user_current_enrolled_class,
             'current_enrolled_class_target': current_enrolled_class_target,
             'staff_access': staff_access,
@@ -614,7 +612,6 @@ def course_about(request, course_id):
             'is_cosmetic_price_enabled': settings.FEATURES.get('ENABLE_COSMETIC_DISPLAY_PRICE'),
             'course_price': course_price,
             'reg_then_add_to_cart_link': reg_then_add_to_cart_link,
-            'can_enroll': can_enroll,
             'invitation_only': invitation_only,
             # We do not want to display the internal courseware header, which is used when the course is found in the
             # context. This value is therefor explicitly set to render the appropriate header.
