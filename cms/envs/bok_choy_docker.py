@@ -11,6 +11,7 @@ LMS_BASE = '{}:{}'.format(os.environ['BOK_CHOY_HOSTNAME'], os.environ['BOK_CHOY_
 LMS_ROOT_URL = 'http://{}'.format(LMS_BASE)
 
 COMMENTS_SERVICE_URL = 'http://{}:4567'.format(os.environ['BOK_CHOY_HOSTNAME'])
+EDXNOTES_PUBLIC_API = 'http://{}:8042/api/v1'.format(os.environ['BOK_CHOY_HOSTNAME'])
 
 # Docker does not support the syslog socket at /dev/log. Rely on the console.
 LOGGING['handlers']['local'] = LOGGING['handlers']['tracking'] = {
