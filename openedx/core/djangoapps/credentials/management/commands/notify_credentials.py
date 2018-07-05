@@ -145,8 +145,8 @@ class Command(BaseCommand):
         # First, do certs
         for i, cert in enumerate(certs, start=1):
             log.info(
-                "Handling credential changes (%d of %d) for certificate %s",
-                i, len(certs), certstr(cert),
+                "Handling credential changes %d for certificate %s",
+                i, certstr(cert),
             )
             if delay:
                 time.sleep(delay)
@@ -165,8 +165,8 @@ class Command(BaseCommand):
         # Then do grades
         for i, grade in enumerate(grades, start=1):
             log.info(
-                "Handling grade changes (%d of %d) for grade %s",
-                i, len(grades), gradestr(grade),
+                "Handling grade changes %d for grade %s",
+                i, gradestr(grade),
             )
             if delay:
                 time.sleep(delay)
