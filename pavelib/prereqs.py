@@ -318,7 +318,7 @@ def log_installed_python_prereqs():
     return
 
 
-def print_devstack_warning():  # pylint: disable=missing-docstring
+def print_devstack_warning():
     if Env.USING_DOCKER:  # pragma: no cover
         print "********************************************************************************"
         print "* WARNING: Mac users should run this from both the lms and studio shells"
