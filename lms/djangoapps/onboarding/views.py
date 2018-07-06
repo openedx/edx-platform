@@ -533,7 +533,7 @@ def recommendations(request):
     Display recommended courses and communities based on the survey
 
     """
-    recommended_courses = get_recommended_xmodule_courses(request.user)
+    recommended_courses = get_recommended_xmodule_courses(request)
     joined_communities = get_joined_communities(request.user)
     user_extended_profile = request.user.extended_profile
 
