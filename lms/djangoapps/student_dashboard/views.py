@@ -67,11 +67,14 @@ def get_recommended_xmodule_courses(request):
     course_card_ids = [cc.course_id for cc in CourseCard.objects.filter(is_enabled=True)]
     courses_list = CourseOverview.objects.select_related('image_set').filter(id__in=course_card_ids)
 
+    current_time = datetime.utcnow().replace(tzinfo=utc)
+
     for course in courses_list:
         course_rerun_states = [crs.course_key for crs in CourseRerunState.objects.filter(
             source_course_key=course.id, action="rerun", state="succeeded")] + [course.id]
         course_rerun_object = CourseOverview.objects.select_related('image_set').filter(
-            id__in=course_rerun_states, start__gte=datetime.utcnow().replace(tzinfo=utc)).order_by('start').first()
+            id__in=course_rerun_states, enrollment_start__lte=current_time, enrollment_end__gte=current_time
+        ).order_by('start').first()
 
         if course_rerun_object:
             all_courses.append(course_rerun_object)
