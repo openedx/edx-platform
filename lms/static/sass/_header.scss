@@ -120,6 +120,7 @@
             &.active,
             &:hover {
               border-bottom-style: solid;
+              border-bottom-color: theme-color("primary");
             }
 
             &:hover {
