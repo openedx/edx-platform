@@ -27,7 +27,7 @@
     position: absolute;
     text-shadow: 0 -1px 0 $black;
 
-    @include transition(all .1s $ease-in-out-quart 0s);
+    @include transition(all 0.1s $ease-in-out-quart 0s);
 
     white-space: pre;
     visibility: hidden;

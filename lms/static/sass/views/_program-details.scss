@@ -319,7 +319,7 @@
       background: palette(primary, dark);
       border-color: palette(primary, dark);
       height: 37px;
-      padding: 7px 18.5px 0 18.5px;
+      padding: 7px 18.5px 0;
       width: auto;
       border-radius: 0;
       text-align: center;
@@ -372,7 +372,7 @@
       }
 
       .enroll-course-button {
-        padding: 7px 18.5px 0 18.5px;
+        padding: 7px 18.5px 0;
       }
     }
 
@@ -528,10 +528,11 @@
         color: palette(grayscale, base);
         font-weight: bold;
       }
+
       .grade-display {
-          padding-right: 15px;
-          font-size: 1.5em;
-          color: palette(primary, accent);
+        padding-right: 15px;
+        font-size: 1.5em;
+        color: palette(primary, accent);
       }
     }
 

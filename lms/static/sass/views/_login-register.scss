@@ -25,7 +25,7 @@
 
 @include media-breakpoint-down(md) {
   .enterprise-content {
-    margin: auto auto;
+    margin: auto;
     display: block;
     padding-left: ($baseline/2);
     padding-right: ($baseline/2);
@@ -636,7 +636,7 @@
   .status {
     @include box-sizing(border-box);
 
-    margin: 0 0 25px 0;
+    margin: 0 0 25px;
     border-bottom: 3px solid shade($yellow, 10%);
     padding: 25px;
     background: tint($yellow,20%);

@@ -194,14 +194,14 @@
   padding: 0;
   margin-bottom: $baseline;
 
-  @include transition(all .25s linear 0s);
+  @include transition(all 0.25s linear 0s);
 
   p {
     margin-bottom: 0;
   }
 
   .discussion-article {
-    @include transition(all .2s linear 0s);
+    @include transition(all 0.2s linear 0s);
 
     border: 1px solid $forum-color-border;
     border-radius: $forum-border-radius;
@@ -209,7 +209,7 @@
     background: $forum-color-background;
     box-shadow: 0 1px 0 $shadow;
 
-    @include transition(all .2s linear 0s);
+    @include transition(all 0.2s linear 0s);
 
     .thread-wrapper {
       @include border-radius($forum-border-radius, $forum-border-radius, 0, 0);

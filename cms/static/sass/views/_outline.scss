@@ -228,6 +228,7 @@
     .status-pacing-value,
     .status-highlights-enabled-value {
       @extend %t-strong;
+
       font-size: smaller;
     }
 
@@ -239,6 +240,7 @@
     .status-highlights-enabled-value.button {
       @extend %btn-primary-blue;
       @extend %sizing;
+
       padding: 5px 8px;
       margin-top: 2px;
     }

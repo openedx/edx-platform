@@ -160,7 +160,7 @@ div.gradebook-wrapper {
         border-left: 1px solid $gray-l3;
 
         &:first-child {
-          border-radius: 5px 0 0 0;
+          border-radius: 5px 0 0;
           box-shadow: 1px 1px 0 $table-border-color inset, 1px 2px 0 rgba(255, 255, 255, 0.7) inset;
           border-left: none;
         }

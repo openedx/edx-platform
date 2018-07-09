@@ -47,7 +47,7 @@ div.book-wrapper {
         color: #9a9a9a;
         opacity: 0;
 
-        @include transition(opacity .15s linear 0s);
+        @include transition(opacity 0.15s linear 0s);
       }
 
       li {
@@ -84,8 +84,8 @@ div.book-wrapper {
 
         ul {
           background: none;
-          margin-top: lh(.25);
-          padding-top: lh(.25);
+          margin-top: lh(0.25);
+          padding-top: lh(0.25);
 
           li {
             padding-bottom: ($baseline/2);
@@ -125,7 +125,7 @@ div.book-wrapper {
           z-index: 1;
 
           a {
-            background-color: rgba(#000, .7);
+            background-color: rgba(#000, 0.7);
             background-position: center;
             background-repeat: no-repeat;
 
@@ -206,7 +206,7 @@ div.book-wrapper {
 
   &.closed {
     section.book-sidebar {
-      width: flex-grid(.6);
+      width: flex-grid(0.6);
 
       header#open_close_accordion {
         padding: 0;

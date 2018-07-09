@@ -194,7 +194,7 @@ a.light-button, // only used in askbot as classes
 }
 
 .tran {
-  @include transition(all .2s $ease-in-out-quad 0s);
+  @include transition(all 0.2s $ease-in-out-quad 0s);
 }
 
 // FontAwesome rtl chevron next

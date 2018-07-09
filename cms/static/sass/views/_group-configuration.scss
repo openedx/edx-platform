@@ -81,7 +81,7 @@
             }
 
             .ui-toggle-expansion {
-              @include transition(rotate .15s ease-in-out .25s);
+              @include transition(rotate 0.15s ease-in-out 0.25s);
 
               @extend %t-action1;
 
@@ -204,7 +204,7 @@
 
       .collection-details {
         .actions {
-          @include transition(opacity .15s .25s ease-in-out);
+          @include transition(opacity 0.15s 0.25s ease-in-out);
           @include right($baseline);
 
           position: absolute;

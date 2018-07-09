@@ -179,7 +179,7 @@
     }
 
     .wmd-input {
-      @include transition(all .2s linear 0s);
+      @include transition(all 0.2s linear 0s);
 
       height: 40px;
     }

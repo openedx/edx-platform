@@ -154,13 +154,13 @@
 }
 
 .manage-user-results {
-
   .manage-user-table {
     display: inline-block;
   }
 
   th {
     @extend %t-title7;
+
     text-align: center;
   }
 
@@ -171,6 +171,7 @@
   .disable-account-btn,
   .disable-account-btn:hover {
     @extend %t-action4;
+
     letter-spacing: normal;
     text-transform: none;
     background-image: none;

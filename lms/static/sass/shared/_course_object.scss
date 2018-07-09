@@ -207,7 +207,7 @@
 
           height: 120px;
           overflow: hidden;
-          padding: 10px 10px 12px 10px;
+          padding: 10px 10px 12px;
           position: relative;
           width: 100%;
 
@@ -224,7 +224,7 @@
         .bottom {
           @include box-sizing(border-box);
 
-          padding: 0 10px 10px 10px;
+          padding: 0 10px 10px;
           width: 100%;
 
           .university {
