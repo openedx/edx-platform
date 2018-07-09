@@ -657,6 +657,14 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             response = self.client.get(reverse('dashboard'))
             self.assertIn('Your profile has missing fields!', response.content)
 
+            # Now run the case when the user has filled the required fields
+            self.user.profile.gender = 'm'
+            self.user.profile.city = 'Test City'
+            self.user.profile.year_of_birth = 1111
+            self.user.profile.save()
+            response = self.client.get(reverse('dashboard'))
+            self.assertNotIn('Your profile has missing fields!', response.content)
+
     @patch('student.views.dashboard.waffle.switch_is_active')
     def test_hide_incomplete_profile_alert(self, mock_switch_is_active):
         """
