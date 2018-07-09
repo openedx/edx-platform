@@ -8,7 +8,7 @@ and through Journal modules added to Discovery and Ecommerce services.
 
 **Journal**:
 
-The Journal is a new product type that will be offered for purchase in the LMS. It is indepedent from a course, and contains a collection of resources/content-types (documents, videos, rich text, etc) that can be updated easily through the Journal service. A Journals is linked to an organization and you can purchase/receive access to it. One notable difference is that a Journal will have an access_length, which determines the amount of time the learner will have access to it post-purchase. This is our first stage towards a subscription model. The Discovery Service is the source-of-truth for all Journal related marketing information that is displayed in the LMS.
+The Journal is a new product type that will be offered for purchase in the LMS. It is indepedent from a course, and contains a collection of resources/content-types (documents, videos, rich text, etc) that can be updated easily through the Journal service. A Journal is linked to an organization and you can purchase/receive access to it. One notable difference is that a Journal will have an access_length, which determines the amount of time the learner will have access to it post-purchase. This is our first stage towards a subscription model. The Discovery Service is the source-of-truth for all Journal related marketing information that is displayed in the LMS.
 
 **JournalBundle**:
 

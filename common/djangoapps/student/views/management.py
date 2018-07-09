@@ -70,7 +70,7 @@ from openedx.core.djangoapps.user_api.models import UserRetirementRequest
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangolib.markup import HTML, Text
-from openedx.features.journals.api import get_journal_bundles, get_journals, get_journals_root_url
+from openedx.features.journals.api import get_journals_context
 from student.cookies import set_logged_in_cookies
 from student.forms import AccountCreationForm, PasswordResetFormNoActive, get_registration_extension_form
 from student.helpers import (
@@ -196,12 +196,7 @@ def index(request, extra_context=None, user=AnonymousUser()):
     # Add marketable programs to the context.
     context['programs_list'] = get_programs_with_type(request.site, include_hidden=False)
 
-    journal_info = {}
-    journal_info['journals'] = get_journals(request.site)
-    journal_info['journals_root_url'] = get_journals_root_url()
-    journal_info['journal_bundles'] = get_journal_bundles(request.site)
-
-    context['journal_info'] = journal_info
+    context['journal_info'] = get_journals_context(request)
 
     return render_to_response('index.html', context)
 

@@ -18,7 +18,6 @@ from branding.views import index
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
-from openedx.features.journals.tests.utils import get_mocked_journals, get_mocked_journal_bundle
 from util.milestones_helpers import set_prerequisite_courses
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -306,54 +305,3 @@ class IndexPageProgramsTests(SiteMixin, ModuleStoreTestCase):
                 response = self.client.get(url)
                 self.assertEqual(response.status_code, 200)
                 mock_get_programs_with_type.assert_called_once()
-
-
-@attr(shard=1)
-@patch.dict(settings.FEATURES, {"ENABLE_JOURNAL_INTEGRATION": True})
-class MarketingPageJournalsTests(SiteMixin, ModuleStoreTestCase):
-    """
-    Tests for Journals Listing in Marketing Pages.
-    """
-
-    def setUp(self):
-        super(MarketingPageJournalsTests, self).setUp()
-        self.journal_bundle = get_mocked_journal_bundle()
-        self.journals = get_mocked_journals()
-
-    def assert_journal_data(self, response):
-        """
-        Checks the journal data in given response
-        """
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Bundle")
-        self.assertContains(response, self.journal_bundle["uuid"])
-        self.assertContains(response, self.journal_bundle["title"])
-        self.assertContains(response, self.journal_bundle["organization"])
-        for journal in self.journals:
-            self.assertContains(response, "Journal")
-            self.assertContains(response, journal["title"])
-            self.assertContains(response, journal["organization"])
-
-    @patch('student.views.management.get_journals')
-    @patch('student.views.management.get_journal_bundles')
-    def test_journals_index_page(self, mock_journal_bundles, mock_journals):
-        """
-        Test the journal data on index page.
-        """
-        mock_journal_bundles.return_value = [self.journal_bundle]
-        mock_journals.return_value = self.journals
-
-        response = self.client.get(reverse('root'))
-        self.assert_journal_data(response)
-
-    @patch('openedx.features.journals.api.DiscoveryApiClient.get_journals')
-    @patch('openedx.features.journals.api.DiscoveryApiClient.get_journal_bundles')
-    def test_journals_courses_page(self, mock_journal_bundles, mock_journals):
-        """
-        Test the journal data on courses page.
-        """
-        mock_journal_bundles.return_value = [self.journal_bundle]
-        mock_journals.return_value = self.journals
-
-        response = self.client.get(reverse('courses'))
-        self.assert_journal_data(response)

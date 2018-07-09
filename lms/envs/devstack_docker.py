@@ -22,9 +22,6 @@ COMMENTS_SERVICE_URL = 'http://edx.devstack.forum:4567'
 
 ENTERPRISE_API_URL = '{}/enterprise/api/v1/'.format(LMS_INTERNAL_ROOT_URL)
 
-JOURNALS_URL_ROOT = 'http://localhost:18606'
-JOURNALS_API_URL = 'http://journals.app:18606/api/v1/'
-
 CREDENTIALS_INTERNAL_SERVICE_URL = 'http://edx.devstack.credentials:18150'
 CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'
 
@@ -44,7 +41,6 @@ FEATURES.update({
     'ENABLE_DISCUSSION_SERVICE': True,
     'SHOW_HEADER_LANGUAGE_SELECTOR': True,
     'ENABLE_ENTERPRISE_INTEGRATION': False,
-    'ENABLE_JOURNAL_INTEGRATION': True,
 })
 
 ENABLE_MKTG_SITE = os.environ.get('ENABLE_MARKETING_SITE', False)
@@ -79,3 +75,4 @@ MKTG_URLS = {
 CREDENTIALS_SERVICE_USERNAME = 'credentials_worker'
 
 COURSE_CATALOG_API_URL = 'http://edx.devstack.discovery:18381/api/v1/'
+COURSE_CATALOG_URL_BASE = 'http://edx.devstack.discovery:18381'
