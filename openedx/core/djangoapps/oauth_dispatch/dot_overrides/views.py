@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 
 from oauth2_provider.exceptions import OAuthToolkitError
 from oauth2_provider.http import HttpResponseUriRedirect
-from oauth2_provider.models import get_application_model
+from oauth2_provider.models import get_access_token_model, get_application_model
 from oauth2_provider.scopes import get_scopes_backend
 from oauth2_provider.settings import oauth2_settings
 from oauth2_provider.views import AuthorizationView
@@ -73,7 +73,8 @@ class EdxOAuth2AuthorizationView(AuthorizationView):
 
             # *** Changed the if statement that checked for require_approval to an assert.
             assert require_approval == 'auto_even_if_expired'
-            tokens = request.user.accesstoken_set.filter(
+            tokens = get_access_token_model().objects.filter(
+                user=request.user,
                 application=kwargs['application'],
                 # *** Purposefully keeping this commented out code to highlight that
                 # our version of the implementation does NOT filter by expiration date.
