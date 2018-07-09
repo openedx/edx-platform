@@ -69,7 +69,7 @@ class EdxOAuth2AuthorizationView(AuthorizationView):
                 uri, headers, body, status = self.create_authorization_response(
                     request=self.request, scopes=" ".join(scopes),
                     credentials=credentials, allow=True)
-                return HttpResponseUriRedirect(uri)
+                return HttpResponseUriRedirect(uri, application.get_allowed_schemes())
 
             # *** Changed the if statement that checked for require_approval to an assert.
             assert require_approval == 'auto_even_if_expired'
@@ -87,7 +87,7 @@ class EdxOAuth2AuthorizationView(AuthorizationView):
                     uri, headers, body, status = self.create_authorization_response(
                         request=self.request, scopes=" ".join(scopes),
                         credentials=credentials, allow=True)
-                    return HttpResponseUriRedirect(uri)
+                    return HttpResponseUriRedirect(uri, application.get_allowed_schemes())
 
             # render an authorization prompt so the user can approve
             # the application's requested scopes
