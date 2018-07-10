@@ -11,6 +11,8 @@ from functools import partial
 from datetime import datetime
 from django.utils.timezone import UTC
 
+from completion.models import BlockCompletion
+from completion import waffle as completion_waffle
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
@@ -394,12 +396,23 @@ def get_module_for_descriptor(user, request, descriptor, field_data_cache, cours
     )
 
 
-def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=too-many-statements
-                               # Arguments preceding this comment have user binding, those following don't
-                               descriptor, course_id, track_function, xqueue_callback_url_prefix,
-                               request_token, position=None, wrap_xmodule_display=True, grade_bucket_type=None,
-                               static_asset_path='', user_location=None, disable_staff_debug_info=False,
-                               course=None):
+def get_module_system_for_user(
+        user,
+        student_data,  # TODO  # pylint: disable=too-many-statements
+        # Arguments preceding this comment have user binding, those following don't
+        descriptor,
+        course_id,
+        track_function,
+        xqueue_callback_url_prefix,
+        request_token,
+        position=None,
+        wrap_xmodule_display=True,
+        grade_bucket_type=None,
+        static_asset_path='',
+        user_location=None,
+        disable_staff_debug_info=False,
+        course=None
+):
     """
     Helper function that returns a module system and student_data bound to a user and a descriptor.
 
@@ -471,29 +484,40 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
             course=course
         )
 
-    def handle_progress_event(block, event_type, event):
+    def get_event_handler(event_type):
         """
-        tie into the CourseCompletions datamodels that are exposed in the edx_solutions_api_integration djangoapp
+        Return an appropriate function to handle the event.
+
+        Returns None if no special processing is required.
         """
+        handlers = {
+            'completion': handle_completion_event,
+            'grade': handle_grade_event,
+            'progress': handle_deprecated_progress_event,
+        }
+        return handlers.get(event_type)
 
-        if not settings.FEATURES.get("ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE", True):
-            # if a course has ended, don't register progress events
-            course = modulestore().get_course(course_id, depth=0)
-            now = datetime.now(UTC())
-            if course.end is not None and now > course.end:
-                return
+    def publish(block, event_type, event):
+        """
+        A function that allows XModules to publish events.
+        """
+        handle_event = get_event_handler(event_type)
+        if handle_event and not is_masquerading_as_specific_student(user, course_id):
+            handle_event(block, event)
+        else:
+            context = contexts.course_context_from_course_id(course_id)
+            if block.runtime.user_id:
+                context['user_id'] = block.runtime.user_id
+            context['asides'] = {}
+            for aside in block.runtime.get_asides(block):
+                if hasattr(aside, 'get_event_context'):
+                    aside_event_info = aside.get_event_context(event_type, event)
+                    if aside_event_info is not None:
+                        context['asides'][aside.scope_ids.block_type] = aside_event_info
+            with tracker.get_tracker().context(event_type, context):
+                track_function(event_type, event)
 
-        user_id = event.get('user_id', user.id)
-        if not user_id:
-            return
-
-        CourseModuleCompletion.objects.get_or_create(
-            user_id=user_id,
-            course_id=course_id,
-            content_id=unicode(descriptor.location)
-        )
-
-    def handle_grade_event(block, event_type, event):  # pylint: disable=unused-argument
+    def handle_grade_event(block, event):  # pylint: disable=unused-argument
         """
         Manages the workflow for recording and updating of student module grade state
         """
@@ -517,28 +541,64 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
         # we can treat a grading event as a indication that a user
         # "completed" an xBlock
         if settings.FEATURES.get('MARK_PROGRESS_ON_GRADING_EVENT', False):
-            handle_progress_event(block, event_type, event)
+            handle_deprecated_progress_event(block, event)
 
-    def publish(block, event_type, event):
-        """A function that allows XModules to publish events."""
-        if event_type == 'grade':
-            handle_grade_event(block, event_type, event)
-        elif event_type == 'progress':
-            # expose another special case event type which gets sent
-            # into the CourseCompletions models
-            handle_progress_event(block, event_type, event)
+    def handle_completion_event(block, event):
+        """
+        Submit a completion object for the block.
+        """
+        if not completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
+            raise NoSuchHandlerError
+        elif not settings.FEATURES.get("ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE", True):
+            # if a course has ended, don't register progress events
+            course = modulestore().get_course(course_id, depth=0)
+            now = datetime.now(UTC())
+            if course.end is not None and now > course.end:
+                return
+
+        BlockCompletion.objects.submit_completion(
+            user=user,
+            course_key=course_id,
+            block_key=block.scope_ids.usage_id,
+            completion=event['completion'],
+        )
+
+    def handle_deprecated_progress_event(block, event):
+        """
+        DEPRECATED: Submit a completion for the block represented by the
+        progress event.
+
+        This exists to support the legacy progress extension used by
+        edx-solutions.  New XBlocks should not emit these events, but instead
+        emit completion events directly.
+        """
+        if not settings.FEATURES.get("ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE", True):
+            # if a course has ended, don't register progress events
+            course = modulestore().get_course(course_id, depth=0)
+            now = datetime.now(UTC())
+            if course.end is not None and now > course.end:
+                return
+
+        user_id = event.get('user_id', user.id)
+        if not user_id:
+            return
+
+        if not completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
+            CourseModuleCompletion.objects.get_or_create(
+                user_id=user_id,
+                course_id=course_id,
+                content_id=unicode(descriptor.location)
+            )
         else:
-            context = contexts.course_context_from_course_id(course_id)
-            if block.runtime.user_id:
-                context['user_id'] = block.runtime.user_id
-            context['asides'] = {}
-            for aside in block.runtime.get_asides(block):
-                if hasattr(aside, 'get_event_context'):
-                    aside_event_info = aside.get_event_context(event_type, event)
-                    if aside_event_info is not None:
-                        context['asides'][aside.scope_ids.block_type] = aside_event_info
-            with tracker.get_tracker().context(event_type, context):
-                track_function(event_type, event)
+            if user_id != user.id:
+                log.warning("{} tried to submit a completion on behalf of {}".format(user, requested_user_id))
+                return
+            BlockCompletion.objects.submit_completion(
+                user=user,
+                course_key=course_id,
+                block_key=block.scope_ids.usage_id,
+                completion=1.0,
+            )
 
     def rebind_noauth_module_to_user(module, real_user):
         """
@@ -1047,14 +1107,18 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
                     ee_data = {'entrance_exam_passed': user_has_passed_entrance_exam(request.user, course)}
                     resp = append_data_to_webob_response(resp, ee_data)
 
-        except NoSuchHandlerError:
+        except NoSuchHandlerError as err:
             log.exception("XBlock %s attempted to access missing handler %r", instance, handler)
-            raise Http404
+            return JsonResponse({'success': "Handler not found"}, status=404)
 
         # If we can't find the module, respond with a 404
-        except NotFoundError:
+        except (NotFoundError, Http404) as err:
             log.exception("Module indicating to user that request doesn't exist")
-            raise Http404
+            if err.args:
+                msg = err.args[0]
+            else:
+                msg = "Not found"
+            return JsonResponse({'success': msg}, status=404)
 
         # For XModule-specific errors, we log the error and respond with an error message
         except ProcessingError as err:
@@ -1081,9 +1145,8 @@ def _get_course_and_invoke_handler(request, course_id, usage_id, handler, suffix
         try:
             course = modulestore().get_course(course_key)
         except ItemNotFoundError:
-            raise Http404("invalid location")
-
-        return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course=course)
+            raise Http404("Invalid location")
+    return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course=course)
 
 
 def hash_resource(resource):

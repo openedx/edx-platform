@@ -19,6 +19,16 @@ COURSE_BLOCK_ACCESS_TRANSFORMERS = [
 ]
 
 
+def get_course_block_access_transformers():
+    """
+    Functional access to COURSE_BLOCK_ACCESS_TRANSFORMERS.
+
+    This is for compatibility with code written for post ginkgo versions of
+    edx-platform.
+    """
+    return COURSE_BLOCK_ACCESS_TRANSFORMERS
+
+
 def get_course_blocks(
         user,
         starting_block_usage_key,

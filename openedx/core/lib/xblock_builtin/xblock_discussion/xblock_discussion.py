@@ -11,6 +11,7 @@ from xblockutils.resources import ResourceLoader
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 from xmodule.raw_module import RawDescriptor
 
+from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
 from xblock.fields import Scope, String, UNIQUE_ID
 from xblock.fragment import Fragment
@@ -36,6 +37,9 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):
     """
     Provides a discussion forum that is inline with other content in the courseware.
     """
+
+    completion_mode = XBlockCompletionMode.EXCLUDED
+
     discussion_id = String(scope=Scope.settings, default=UNIQUE_ID)
     display_name = String(
         display_name=_("Display Name"),

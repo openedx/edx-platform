@@ -11,6 +11,7 @@ import logging
 from pkg_resources import resource_string
 
 from lxml import etree
+from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
 from xblock.fields import Integer, Scope, Boolean, String
 from xblock.fragment import Fragment
@@ -40,6 +41,8 @@ _ = lambda text: text
 
 class SequenceFields(object):
     has_children = True
+
+    completion_mode = XBlockCompletionMode.AGGREGATOR
 
     # NOTE: Position is 1-indexed.  This is silly, but there are now student
     # positions saved on prod, so it's not easy to fix.

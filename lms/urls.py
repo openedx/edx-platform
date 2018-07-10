@@ -137,6 +137,13 @@ if settings.FEATURES.get('EDX_SOLUTIONS_API'):
         url(r'^api/completion/v0/', include('lms.djangoapps.completion_api.urls')),
     )
 
+# COMPLETION
+
+urlpatterns += (
+    url(r'^api/completion/', include('completion.api.urls', namespace='completion')),
+    url(r'^api/completion-aggregator/', include('completion_aggregator.urls')),
+)
+
 # OPEN EDX USER API
 # mattdrayer: Please note that the user_api declaration must follow
 # the server api declaration.  When declared ahead of the server api

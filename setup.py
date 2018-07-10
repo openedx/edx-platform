@@ -58,6 +58,7 @@ setup(
             "course_blocks_api = lms.djangoapps.course_api.blocks.transformers.blocks_api:BlocksAPITransformer",
             "milestones = lms.djangoapps.course_api.blocks.transformers.milestones:MilestonesAndSpecialExamsTransformer",
             "grades = lms.djangoapps.grades.transformer:GradesTransformer",
+            "completion = lms.djangoapps.course_api.blocks.transformers.block_completion:BlockCompletionTransformer"
         ],
     }
 )
