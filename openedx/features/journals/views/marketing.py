@@ -17,11 +17,13 @@ def bundle_about(request, bundle_uuid):
     bundle = get_journal_bundles(request.site, bundle_uuid=bundle_uuid)
     if not bundle:
         raise Http404
+    bundle = bundle[0]  # get_journal_bundles always returns list of bundles
     bundle = extend_bundle(bundle)
     context = {
         'journals_root_url': get_journals_root_url(),
         'discovery_root_url': CatalogIntegration.current().get_internal_api_url(),
         'bundle': bundle,
+        'uses_bootstrap': True,
     }
     return render_to_response('journals/bundle_about.html', context)
 

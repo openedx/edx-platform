@@ -35,11 +35,11 @@ def get_mocked_journal_access():
     ]
 
 
-def get_mocked_journal_bundle():
+def get_mocked_journal_bundles():
     """
     Returns the dummy data of journal bundle.
     """
-    return {
+    return [{
         "uuid": "1918b738-979f-42cb-bde0-13335366fa86",
         "title": "dummy-title",
         "partner": "edx",
@@ -78,7 +78,7 @@ def get_mocked_journal_bundle():
             }
         ],
         "applicable_seat_types": ["credit", "honor", "verified"]
-    }
+    }]
 
 
 def get_mocked_journals():

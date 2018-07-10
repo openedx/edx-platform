@@ -404,9 +404,6 @@ FEATURES = {
 
     # Whether to display the account deletion section the account settings page
     'ENABLE_ACCOUNT_DELETION': True,
-
-    # Set to enable Journal integration
-    'ENABLE_JOURNAL_INTEGRATION': True,
 }
 
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews
@@ -535,7 +532,6 @@ MAKO_TEMPLATE_DIRS_BASE = [
     OPENEDX_ROOT / 'core' / 'djangoapps' / 'dark_lang' / 'templates',
     OPENEDX_ROOT / 'core' / 'lib' / 'license' / 'templates',
     OPENEDX_ROOT / 'features' / 'course_experience' / 'templates',
-    OPENEDX_ROOT / 'features' / 'journals' / 'templates',
 ]
 
 
@@ -2309,7 +2305,6 @@ INSTALLED_APPS = [
     'openedx.features.learner_profile',
     'openedx.features.learner_analytics',
     'openedx.features.portfolio_project',
-    'openedx.features.journals.apps.JournalsConfig',
 
     'experiments',
 
@@ -2915,8 +2910,6 @@ OPTIONAL_APPS = [
     # Required by the Enterprise App
     ('django_object_actions', None),  # https://github.com/crccheck/django-object-actions
 
-    # Journals
-    ('journals', None)
 ]
 
 for app_name, insert_before in OPTIONAL_APPS:
@@ -3098,6 +3091,7 @@ ECOMMERCE_API_TIMEOUT = 5
 ECOMMERCE_SERVICE_WORKER_USERNAME = 'ecommerce_worker'
 
 COURSE_CATALOG_API_URL = None
+COURSE_CATALOG_URL_BASE = None
 
 CREDENTIALS_INTERNAL_SERVICE_URL = None
 CREDENTIALS_PUBLIC_SERVICE_URL = None
@@ -3464,10 +3458,6 @@ FERNET_KEYS = [
 ############### Settings for user-state-client ##################
 # Maximum number of rows to fetch in XBlockUserStateClient calls. Adjust for performance
 USER_STATE_BATCH_SIZE = 5000
-
-############## Settings for Journals ######################
-JOURNALS_URL_ROOT = None
-JOURNALS_API_URL = None
 
 ############## Plugin Django Apps #########################
 

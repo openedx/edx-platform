@@ -37,32 +37,21 @@ class DiscoveryApiClient(object):
 
         # Client can't be used if there is no catalog integration
         if not (catalog_integration and catalog_integration.enabled):
-            LOGGER.info("Unable to create DiscoveryApiClient because catalog integration not set up or enabled")
+            LOGGER.error("Unable to create DiscoveryApiClient because catalog integration not set up or enabled")
             return None
 
         try:
             user = catalog_integration.get_service_user()
         except ObjectDoesNotExist:
-            LOGGER.info("Unable to retrieve catalog integration service user")
+            LOGGER.error("Unable to retrieve catalog integration service user")
             return None
 
         jwt = JwtBuilder(user).build_token([])
-        url = configuration_helpers.get_value('COURSE_CATALOG_API_URL', settings.COURSE_CATALOG_API_URL)
-        self.client = EdxRestApiClient(self.create_journals_url(url), jwt=jwt)
-
-    def create_journals_url(self, url):
-        """
-        rewrite the discovery url to point to journals endpoint
-        """
-        split_url = urlsplit(url)
-        override_url = urlunsplit((
-            split_url.scheme,
-            split_url.netloc,
-            JOURNALS_API_PATH,
-            split_url.query,
-            split_url.fragment,
-        ))
-        return override_url
+        base_url = configuration_helpers.get_value('COURSE_CATALOG_URL_BASE', settings.COURSE_CATALOG_URL_BASE)
+        self.client = EdxRestApiClient(
+            '{base_url}{journals_path}'.format(base_url=base_url, journals_path=JOURNALS_API_PATH),
+            jwt=jwt
+        )
 
     def get_journals(self, orgs):
         """
@@ -94,7 +83,7 @@ class DiscoveryApiClient(object):
                 err.content
             )
             return []
-        return response if uuid else response.get('results')
+        return [response] if uuid else response.get('results')
 
 
 class JournalsApiClient(object):
@@ -106,7 +95,13 @@ class JournalsApiClient(object):
         Initialize an authenticated Journals service API client by using the
         provided user.
         """
-        self.user = self.get_journals_worker()
+        try:
+            self.user = self.get_journals_worker()
+        except ObjectDoesNotExist:
+            error = 'Unable to retrieve {} service user'.format(JOURNAL_WORKER_USERNAME)
+            LOGGER.error(error)
+            raise ValueError(error)
+
         jwt = JwtBuilder(self.user).build_token(['email', 'profile'], 16000)
         self.client = EdxRestApiClient(
             configuration_helpers.get_value('JOURNALS_API_URL', settings.JOURNALS_API_URL),
@@ -136,13 +131,17 @@ def fetch_journal_access(site, user):   # pylint: disable=unused-argument
         SlumberBaseException: raised if API response contains http error status like 4xx, 5xx etc...
         Timeout: raised if API is talking to long to respond
     """
-    # TODO: WL-1560: (see jira for more info)
-    journal_access_records = JournalsApiClient().client.journalaccess.get(
-        user=user,
-        get_latest=True
-    )
-
-    return journal_access_records.get('results', [])
+    try:
+        # TODO: WL-1560:
+        # LMS should cache responses from Journal Access API
+        # Need strategy for updating cache when new purchase happens
+        journal_access_records = JournalsApiClient().client.journalaccess.get(
+            user=user,
+            get_latest=True
+        )
+        return journal_access_records.get('results', [])
+    except ValueError:
+        return []
 
 
 def get_cache_key(**kwargs):
@@ -245,20 +244,18 @@ def get_journal_bundles(site, bundle_uuid=''):
         bundle_uuid=bundle_uuid
     )
 
-    journal_bundles = cache.get(cache_key)
+    _CACHE_MISS = object()
+    journal_bundles = cache.get(cache_key, _CACHE_MISS)
 
-    if not journal_bundles:
+    if journal_bundles is _CACHE_MISS:
         api_client = DiscoveryApiClient()
         if not api_client:
             return []
         journal_bundles = api_client.get_journal_bundles(uuid=bundle_uuid)
         cache.set(cache_key, journal_bundles, JOURNALS_CACHE_TIMEOUT)
 
-    if isinstance(journal_bundles, dict):
-        fix_course_images(journal_bundles)
-    else:
-        for bundle in journal_bundles:
-            fix_course_images(bundle)
+    for bundle in journal_bundles:
+        fix_course_images(bundle)
 
     return journal_bundles
 
@@ -268,9 +265,33 @@ def get_journals_root_url():
     Return the base url used to display Journals
     """
     if journals_enabled():
-        return configuration_helpers.get_configuration_value(
-            'JOURNALS_URL_ROOT',
-            settings.JOURNALS_URL_ROOT
-        ) if configuration_helpers.is_site_configuration_enabled() else settings.JOURNALS_URL_ROOT
+        if configuration_helpers.is_site_configuration_enabled():
+            return configuration_helpers.get_configuration_value(
+                'JOURNALS_URL_ROOT',
+                settings.JOURNALS_URL_ROOT
+            )
+        else:
+            return settings.JOURNALS_URL_ROOT
     else:
         return None
+
+
+def get_journals_context(request):
+    """
+    Return dict of Journal context information for a given request
+
+    Args:
+        request: The request to process
+
+    Returns:
+        dict containing the following information:
+        dict['journals'] - list of Journals available for purchase
+        dict['journals_root_url'] - root url for Journals service
+        dict['journal_bundles'] - list of JournalBundles available for purchase
+    """
+    journal_info = {}
+    journal_info['journals'] = get_journals(request.site)
+    journal_info['journals_root_url'] = get_journals_root_url()
+    journal_info['journal_bundles'] = get_journal_bundles(request.site)
+
+    return journal_info

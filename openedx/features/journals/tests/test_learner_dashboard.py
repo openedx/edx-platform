@@ -16,7 +16,7 @@ class JournalLearnerDashboardTest(LoginEnrollmentTestCase):
     def setUp(self):
         super(JournalLearnerDashboardTest, self).setUp()
         self.setup_user()
-        self.path = reverse('journal_listing_view')
+        self.path = reverse('openedx.journals.dashboard')
 
     def test_without_authenticated_user(self):
         """

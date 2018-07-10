@@ -48,22 +48,24 @@ from openedx.core.djangolib.markup import HTML, Text
               <span>${_('Purchase the Bundle (')}</span
               % if bundle['pricing_data']['is_discounted']:
                 ><span aria-label="${_('Original Price')}" class="original-price"
-                >${Text(_('${oldPrice}')).format(
+                >${Text('${oldPrice}').format(
                     oldPrice=price_format.format(bundle['pricing_data']['total_incl_tax_excl_discounts'])
                   )}</span
                 ><span aria-label="${_('Discounted Price')}" class="discount">
-                    ${Text(_('${newPrice}')).format(
+                    ${Text('${newPrice}').format(
                       newPrice=price_format.format(bundle['pricing_data']['total_incl_tax']),
                     )}
                 </span
                 ><span class="savings">
-                  ${Text(_('{currency})')).format(
+                  ${Text('{discount_value} {currency})').format(
                     discount_value=price_format.format(bundle['pricing_data']['discount_value']),
                     currency=bundle['pricing_data']['currency']
                   )}
                 </span>
               % else:
-              ><span>${"${price})".format(price=bundle['pricing_data']['total_incl_tax'])}
+              ><span>${Text('${price})').format(
+                      price=price_format.format(bundle['pricing_data']['total_incl_tax']),
+                  )}
                 </span>
               % endif
               </a>
@@ -141,7 +143,7 @@ from openedx.core.djangolib.markup import HTML, Text
         </div>
         <div class="col-9 col-lg-6">
           <div>
-            <a href="${course_about_url}">${journal['title']}</a>
+            <a href="${urljoin(journals_root_url, journal['slug'])}">${journal['title']}</a>
           </div>
           <div>${journal['short_description'] or ''}</div>
         </div>

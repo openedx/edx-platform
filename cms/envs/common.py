@@ -1479,6 +1479,7 @@ ENTERPRISE_REPORTING_SECRET = '0000000000000000'
 ############## Settings for the Discovery App ######################
 
 COURSE_CATALOG_API_URL = None
+COURSE_CATALOG_URL_BASE = None
 
 ############################# Persistent Grades ####################################
 
