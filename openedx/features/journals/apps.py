@@ -2,7 +2,6 @@
 Journals Application Configuration
 """
 from django.apps import AppConfig
-from django.conf import settings
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType, PluginURLs, PluginSettings
 
 

@@ -3,7 +3,6 @@ APIs providing support for Journals functionality.
 """
 import logging
 import hashlib
-from urlparse import urlsplit, urlunsplit
 import six
 
 from django.conf import settings
