@@ -185,22 +185,3 @@ class RevokeTokenView(_DispatchingView):
     Dispatch to the RevokeTokenView of django-oauth-toolkit
     """
     dot_view = dot_views.RevokeTokenView
-
-
-class ProviderInfoView(View):
-    def get(self, request, *args, **kwargs):
-        data = {
-            'issuer': settings.JWT_AUTH['JWT_ISSUER'],
-            'authorization_endpoint': request.build_absolute_uri(reverse('authorize')),
-            'token_endpoint': request.build_absolute_uri(reverse('access_token')),
-            'end_session_endpoint': request.build_absolute_uri(reverse('logout')),
-            'token_endpoint_auth_methods_supported': ['client_secret_post'],
-            # NOTE (CCB): This is not part of the OpenID Connect standard. It is added here since we
-            # use JWS for our access tokens.
-            'access_token_signing_alg_values_supported': ['RS512', 'HS256'],
-            'scopes_supported': ['openid', 'profile', 'email'],
-            'claims_supported': ['sub', 'iss', 'name', 'given_name', 'family_name', 'email'],
-            'jwks_uri': request.build_absolute_uri(reverse('jwks')),
-        }
-        response = JsonResponse(data)
-        return response

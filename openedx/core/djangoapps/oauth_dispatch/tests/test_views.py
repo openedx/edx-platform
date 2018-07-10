@@ -646,34 +646,3 @@ class TestRevokeTokenView(AccessTokenLoginMixin, _DispatchingViewTestCase):  # p
         Tests invalidation/revoke of user access token for django-oauth-toolkit
         """
         self.verify_revoke_token(self.access_token)
-
-
-@unittest.skipUnless(OAUTH_PROVIDER_ENABLED, 'OAuth2 not enabled')
-class ProviderInfoViewTests(TestCase):
-    DOMAIN = 'testserver.fake'
-
-    def build_url(self, path):
-        return 'http://{domain}{path}'.format(domain=self.DOMAIN, path=path)
-
-    def test_get(self):
-        issuer = 'test-issuer'
-        self.client = self.client_class(SERVER_NAME=self.DOMAIN)
-
-        expected = {
-            'issuer': issuer,
-            'authorization_endpoint': self.build_url(reverse('authorize')),
-            'token_endpoint': self.build_url(reverse('access_token')),
-            'end_session_endpoint': self.build_url(reverse('logout')),
-            'token_endpoint_auth_methods_supported': ['client_secret_post'],
-            'access_token_signing_alg_values_supported': ['RS512', 'HS256'],
-            'scopes_supported': ['openid', 'profile', 'email'],
-            'claims_supported': ['sub', 'iss', 'name', 'given_name', 'family_name', 'email'],
-            'jwks_uri': self.build_url(reverse('jwks')),
-        }
-
-        with override_settings(JWT_AUTH={'JWT_ISSUER': issuer}):
-            response = self.client.get(reverse('openid-config'))
-
-        self.assertEqual(response.status_code, 200)
-        actual = json.loads(response.content)
-        self.assertEqual(actual, expected)
