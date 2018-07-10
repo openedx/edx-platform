@@ -8,11 +8,16 @@ from django.test import TestCase
 from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 
-from openedx.core.djangoapps.credit.models import CreditCourse, CreditRequirement, CreditRequirementStatus
-from student.models import get_retired_username_by_username
+from openedx.core.djangoapps.credit.models import (
+    CreditCourse,
+    CreditProvider,
+    CreditRequest,
+    CreditRequirement,
+    CreditRequirementStatus
+)
+from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import RetirementTestCase
+from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from student.tests.factories import UserFactory
-
-from ..models import CreditRequest, CreditProvider, CreditCourse
 
 
 def add_credit_course(course_key):
@@ -100,8 +105,10 @@ class CreditRequirementStatusTests(TestCase):
     def setUp(self):
         super(CreditRequirementStatusTests, self).setUp()
         self.course_key = CourseKey.from_string("edX/DemoX/Demo_Course")
+        RetirementTestCase.setup_states()
         self.old_username = "username"
-        self.retired_username = get_retired_username_by_username(self.old_username)
+        self.user = UserFactory(username=self.old_username)
+        self.retirement = UserRetirementStatus.create_retirement(self.user)
         self.credit_course = add_credit_course(self.course_key)
 
     def add_course_requirements(self):
@@ -145,7 +152,7 @@ class CreditRequirementStatusTests(TestCase):
     def test_retire_user(self):
         self.add_course_requirements()
 
-        retirement_succeeded = CreditRequirementStatus.retire_user(self.old_username)
+        retirement_succeeded = CreditRequirementStatus.retire_user(self.retirement)
         self.assertTrue(retirement_succeeded)
 
         old_username_records_exist = CreditRequirementStatus.objects.filter(
@@ -153,11 +160,13 @@ class CreditRequirementStatusTests(TestCase):
         ).exists()
         self.assertFalse(old_username_records_exist)
 
-        new_username_records_exist = CreditRequirementStatus.objects.filter(username=self.retired_username).exists()
+        new_username_records_exist = CreditRequirementStatus.objects.filter(
+            username=self.retirement.retired_username
+        ).exists()
         self.assertTrue(new_username_records_exist)
 
-    def test_retire_user_with_data(self):
-        retirement_succeeded = CreditRequirementStatus.retire_user(self.retired_username)
+    def test_retire_user_without_data(self):
+        retirement_succeeded = CreditRequirementStatus.retire_user(self.retirement)
         self.assertFalse(retirement_succeeded)
 
 
@@ -168,7 +177,9 @@ class CreditRequestTest(TestCase):
 
     def setUp(self):
         super(CreditRequestTest, self).setUp()
+        RetirementTestCase.setup_states()
         self.user = UserFactory.create()
+        self.retirement = UserRetirementStatus.create_retirement(self.user)
         self.credit_course = CreditCourse.objects.create()
         self.provider = CreditProvider.objects.create()
 
@@ -187,13 +198,10 @@ class CreditRequestTest(TestCase):
 
         self.assertEqual(credit_request_before_retire.parameters, test_parameters)
 
-        user_was_retired = CreditRequest.retire_user(
-            original_username=self.user.username,
-            retired_username=get_retired_username_by_username(self.user.username)
-        )
+        user_was_retired = CreditRequest.retire_user(self.retirement)
         credit_request_before_retire.refresh_from_db()
         credit_requests_after_retire = CreditRequest.objects.filter(
-            username=self.user.username
+            username=self.retirement.original_username
         )
 
         self.assertTrue(user_was_retired)
@@ -209,15 +217,13 @@ class CreditRequestTest(TestCase):
             parameters=test_parameters,
         )
         another_user = UserFactory.create()
+        another_retirement = UserRetirementStatus.create_retirement(another_user)
 
         credit_request_before_retire = CreditRequest.objects.filter(
-            username=self.user.username
+            username=self.retirement.original_username
         )[0]
 
-        was_retired = CreditRequest.retire_user(
-            original_username=another_user.username,
-            retired_username=get_retired_username_by_username(another_user.username)
-        )
+        was_retired = CreditRequest.retire_user(another_retirement)
         credit_request_before_retire.refresh_from_db()
 
         self.assertFalse(was_retired)

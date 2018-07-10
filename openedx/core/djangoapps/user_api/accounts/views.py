@@ -529,17 +529,18 @@ class AccountRetirementPartnerReportView(ViewSet):
     parser_classes = (JSONParser,)
     serializer_class = UserRetirementStatusSerializer
 
-    def _get_orgs_for_user(self, user):
+    @staticmethod
+    def _get_orgs_for_user(user):
         """
         Returns a set of orgs that the user has enrollments with
         """
         orgs = set()
         for enrollment in user.courseenrollment_set.all():
-            org = enrollment.course.org
+            org = enrollment.course_id.org
 
             # Org can concievably be blank or this bogus default value
             if org and org != 'outdated_entry':
-                orgs.add(enrollment.course.org)
+                orgs.add(org)
         return orgs
 
     def retirement_partner_report(self, request):  # pylint: disable=unused-argument
@@ -761,9 +762,9 @@ class LMSAccountRetirementView(ViewSet):
             course_enrollments = CourseEnrollment.objects.filter(user=retirement.user)
             ManualEnrollmentAudit.retire_manual_enrollments(course_enrollments, retirement.retired_email)
 
-            CreditRequest.retire_user(retirement.original_username, retirement.retired_username)
+            CreditRequest.retire_user(retirement)
             ApiAccessRequest.retire_user(retirement.user)
-            CreditRequirementStatus.retire_user(retirement.user.username)
+            CreditRequirementStatus.retire_user(retirement)
 
             # This signal allows code in higher points of LMS to retire the user as necessary
             USER_RETIRE_LMS_MISC.send(sender=self.__class__, user=retirement.user)
