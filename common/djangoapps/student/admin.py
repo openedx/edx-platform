@@ -18,7 +18,8 @@ from student.roles import REGISTERED_ACCESS_ROLES
 
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django import forms
-
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 User = get_user_model()  # pylint:disable=invalid-name
 
 

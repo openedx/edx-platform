@@ -14,7 +14,8 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase, TransactionTestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from mock import patch
+from mock import patch, Mock, MagicMock
+
 
 import student
 from django_comment_common.models import ForumsConfig
@@ -26,6 +27,7 @@ from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from student.forms import USERNAME_INVALID_CHARS_ASCII, USERNAME_INVALID_CHARS_UNICODE
 from student.models import UserAttribute
 from student.views import REGISTRATION_AFFILIATE_ID, REGISTRATION_UTM_CREATED_AT, REGISTRATION_UTM_PARAMETERS
+from student.admin import UserCreationFormExtended, UserChangeFormExtended
 
 TEST_CS_URL = 'https://comments.service.test:123/'
 
@@ -558,6 +560,35 @@ class TestCreateAccountValidation(TestCase):
             self.assert_success(params)
         else:
             self.assert_error(params, "email", "Unauthorized email address.")
+
+    ## Note andrey.lykhoman:  fix this test
+    @ddt.data(
+        ('false.result@sorry.bad', True, False),
+        ('true.result@its.good', False, True),
+    )
+    @ddt.unpack
+    def test_email_uniqueness(self, email, is_avaliable, expect_success):
+
+
+        returning = MagicMock()
+        returning.exists = MagicMock(return_value=is_avaliable)
+        returning2 = MagicMock()
+        returning3 = MagicMock()
+        returning3.filter.return_value = returning
+        returning3.exclude.return_value = returning2
+        #returning.get.return_value = returning
+
+
+        with patch('django.contrib.auth.models.User.objects.exists', return_value=is_avaliable):
+            z = UserCreationFormExtended({'email': email})
+            errors = z.errors.as_data()
+            result = True
+            if 'email' in errors:
+                result = False
+            self.assertEqual(result, expect_success)
+            #UserCreationFormExtended, UserChangeFormExtended
+
+    ## Note andrey.lykhoman:  write test for testing UserChangeFormExtended
 
     def test_password(self):
         params = dict(self.minimal_params)
