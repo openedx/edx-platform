@@ -409,20 +409,6 @@ class CourseEntitlementSupportDetail(TimeStampedModel):
     """
     Table recording support interactions with an entitlement
     """
-    # Reasons deprecated
-    LEAVE_SESSION = 'LEAVE'
-    CHANGE_SESSION = 'CHANGE'
-    LEARNER_REQUEST_NEW = 'LEARNER_NEW'
-    COURSE_TEAM_REQUEST_NEW = 'COURSE_TEAM_NEW'
-    OTHER = 'OTHER'
-    ENTITLEMENT_SUPPORT_REASONS = (
-        (LEAVE_SESSION, u'Learner requested leave session for expired entitlement'),
-        (CHANGE_SESSION, u'Learner requested session change for expired entitlement'),
-        (LEARNER_REQUEST_NEW, u'Learner requested new entitlement'),
-        (COURSE_TEAM_REQUEST_NEW, u'Course team requested entitlement for learnerg'),
-        (OTHER, u'Other'),
-    )
-
     REISSUE = 'REISSUE'
     CREATE = 'CREATE'
     ENTITLEMENT_SUPPORT_ACTIONS = (
@@ -433,10 +419,7 @@ class CourseEntitlementSupportDetail(TimeStampedModel):
     entitlement = models.ForeignKey('entitlements.CourseEntitlement', on_delete=models.CASCADE)
     support_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
-    #Deprecated: use action instead.
-    reason = models.CharField(max_length=15, choices=ENTITLEMENT_SUPPORT_REASONS)
     action = models.CharField(max_length=15, choices=ENTITLEMENT_SUPPORT_ACTIONS)
-
     comments = models.TextField(null=True)
 
     unenrolled_run = models.ForeignKey(
@@ -449,10 +432,10 @@ class CourseEntitlementSupportDetail(TimeStampedModel):
 
     def __unicode__(self):
         """Unicode representation of an Entitlement"""
-        return u'Course Entitlement Support Detail: entitlement: {}, support_user: {}, reason: {}'.format(
+        return u'Course Entitlement Support Detail: entitlement: {}, support_user: {}, action: {}'.format(
             self.entitlement,
             self.support_user,
-            self.reason,
+            self.action
         )
 
     @classmethod
