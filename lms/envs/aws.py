@@ -984,6 +984,12 @@ ENTERPRISE_REPORTING_SECRET = AUTH_TOKENS.get(
     ENTERPRISE_REPORTING_SECRET
 )
 
+# A default dictionary to be used for filtering out enterprise customer catalog.
+ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER = ENV_TOKENS.get(
+    'ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER',
+    ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER
+)
+
 ############## ENTERPRISE SERVICE API CLIENT CONFIGURATION ######################
 # The LMS communicates with the Enterprise service via the EdxRestApiClient class
 # The below environmental settings are utilized by the LMS when interacting with
