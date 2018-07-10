@@ -233,7 +233,7 @@ def courses(request):
             'courses': courses_list,
             'course_discovery_meanings': course_discovery_meanings,
             'programs_list': programs_list,
-            'journal_info': get_journals_context(request),
+            'journal_info': get_journals_context(request),  # TODO: Course Listing Plugin required
         }
     )
 

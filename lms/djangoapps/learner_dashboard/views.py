@@ -22,7 +22,7 @@ def program_listing(request):
         'nav_hidden': True,
         'show_dashboard_tabs': True,
         'show_program_listing': programs_config.enabled,
-        'show_journal_listing': journals_enabled(),
+        'show_journal_listing': journals_enabled(),  # TODO: Dashboard Plugin required
         'uses_pattern_library': True,
     }
 

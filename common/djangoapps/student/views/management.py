@@ -196,6 +196,7 @@ def index(request, extra_context=None, user=AnonymousUser()):
     # Add marketable programs to the context.
     context['programs_list'] = get_programs_with_type(request.site, include_hidden=False)
 
+    # TODO: Course Listing Plugin required
     context['journal_info'] = get_journals_context(request)
 
     return render_to_response('index.html', context)
