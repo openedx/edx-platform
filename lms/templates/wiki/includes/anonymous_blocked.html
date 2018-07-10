@@ -3,7 +3,7 @@
 {% url 'wiki:signup' as signup_url %}
 {% url 'wiki:login' as login_url %}
 {% if login_url and signup_url %}
-  {% blocktrans %}
+  {% blocktrans trimmed %}
   You need to <a href="{{ login_url }}">log in</a> or <a href="{{ signup_url }}">sign up</a> to use this function.
   {% endblocktrans %}
 {% else %}
