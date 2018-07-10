@@ -1494,6 +1494,9 @@ POLICY_CHANGE_TASK_RATE_LIMIT = '300/h'
 ############## Settings for CourseGraph ############################
 COURSEGRAPH_JOB_QUEUE = LOW_PRIORITY_QUEUE
 
+########## Settings for video transcript migration tasks ############
+VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE = LOW_PRIORITY_QUEUE
+
 ###################### VIDEO IMAGE STORAGE ######################
 
 VIDEO_IMAGE_DEFAULT_FILENAME = 'images/video-images/default_video_image.png'

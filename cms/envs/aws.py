@@ -546,6 +546,9 @@ HELP_TOKENS_BOOKS = ENV_TOKENS.get('HELP_TOKENS_BOOKS', HELP_TOKENS_BOOKS)
 ############## Settings for CourseGraph ############################
 COURSEGRAPH_JOB_QUEUE = ENV_TOKENS.get('COURSEGRAPH_JOB_QUEUE', LOW_PRIORITY_QUEUE)
 
+########## Settings for video transcript migration tasks ############
+VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE = ENV_TOKENS.get('VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE', LOW_PRIORITY_QUEUE)
+
 ########################## Parental controls config  #######################
 
 # The age at which a learner no longer requires parental consent, or None
