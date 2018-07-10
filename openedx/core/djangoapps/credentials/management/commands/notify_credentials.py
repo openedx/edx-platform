@@ -25,7 +25,7 @@ from pytz import UTC
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.grades.models import PersistentCourseGrade
 from openedx.core.djangoapps.credentials.signals import handle_cert_change, send_grade_if_interesting
-from openedx.core.djangoapps.programs.signals import handle_course_cert_awarded, handle_course_cert_changed
+from openedx.core.djangoapps.programs.signals import handle_course_cert_changed
 
 
 log = logging.getLogger(__name__)
@@ -182,7 +182,6 @@ class Command(BaseCommand):
                 'mode': cert.mode,
                 'status': cert.status,
             }
-            handle_course_cert_awarded(**signal_args)
             handle_course_cert_changed(**signal_args)
             handle_cert_change(**signal_args)
 
