@@ -204,26 +204,3 @@ class ProviderInfoView(View):
         }
         response = JsonResponse(data)
         return response
-
-
-class JwksView(View):
-    @staticmethod
-    def serialize_rsa_key(key):
-        kid = hashlib.md5(key.encode('utf-8')).hexdigest()
-        key = RSAKey(kid=kid, key=RSA.importKey(key), use='sig', alg='RS512')
-        return key.serialize(private=False)
-
-    def get(self, request, *args, **kwargs):
-        secret_keys = []
-
-        if settings.JWT_PRIVATE_SIGNING_KEY:
-            secret_keys.append(settings.JWT_PRIVATE_SIGNING_KEY)
-
-        # NOTE: We provide the expired keys in case there are unexpired access tokens
-        # that need to have their signatures verified.
-        if settings.JWT_EXPIRED_PRIVATE_SIGNING_KEYS:
-            secret_keys += settings.JWT_EXPIRED_PRIVATE_SIGNING_KEYS
-
-        return JsonResponse({
-            'keys': [self.serialize_rsa_key(key) for key in secret_keys if key],
-        })
