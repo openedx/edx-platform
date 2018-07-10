@@ -51,6 +51,8 @@ from openedx.core.djangoapps.user_api.models import (
     UserRetirementPartnerReportingStatus,
     UserOrgTag
 )
+from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import fake_retirement
+from openedx.core.djangoapps.user_api.accounts.views import AccountRetirementPartnerReportView
 from openedx.core.lib.token_utils import JwtBuilder
 from student.models import (
     CourseEnrollment,
@@ -441,7 +443,7 @@ class TestPartnerReportingPut(RetirementTestCase, ModuleStoreTestCase):
         self.maxDiff = None
         self.partner_queue_state = RetirementState.objects.get(state_name='ADDING_TO_PARTNER_QUEUE')
 
-    def post_and_assert_status(self, data, expected_status=status.HTTP_204_NO_CONTENT):
+    def put_and_assert_status(self, data, expected_status=status.HTTP_204_NO_CONTENT):
         """
         Helper function for making a request to the retire subscriptions endpoint, and asserting the status.
         """
@@ -458,7 +460,7 @@ class TestPartnerReportingPut(RetirementTestCase, ModuleStoreTestCase):
         for course in self.courses:
             CourseEnrollment.enroll(user=retirement.user, course_key=course.id)
 
-        self.post_and_assert_status({'username': retirement.original_username})
+        self.put_and_assert_status({'username': retirement.original_username})
         self.assertTrue(UserRetirementPartnerReportingStatus.objects.filter(user=retirement.user).exists())
 
     def test_idempotent(self):
@@ -469,9 +471,14 @@ class TestPartnerReportingPut(RetirementTestCase, ModuleStoreTestCase):
         for course in self.courses:
             CourseEnrollment.enroll(user=retirement.user, course_key=course.id)
 
-        # We really do want this twice.
-        self.post_and_assert_status({'username': retirement.original_username})
-        self.post_and_assert_status({'username': retirement.original_username})
+        # Do our step
+        self.put_and_assert_status({'username': retirement.original_username})
+
+        # Do our basic other retirement step fakery
+        fake_retirement(retirement.user)
+
+        # Try running our step again
+        self.put_and_assert_status({'username': retirement.original_username})
         self.assertTrue(UserRetirementPartnerReportingStatus.objects.filter(user=retirement.user).exists())
 
     def test_unknown_user(self):
@@ -482,7 +489,36 @@ class TestPartnerReportingPut(RetirementTestCase, ModuleStoreTestCase):
         for course in self.courses:
             CourseEnrollment.enroll(user=user, course_key=course.id)
 
-        self.post_and_assert_status({'username': user.username}, status.HTTP_404_NOT_FOUND)
+        self.put_and_assert_status({'username': user.username}, status.HTTP_404_NOT_FOUND)
+
+    def test_nonexistent_course(self):
+        """
+        Checks that if a user has been enrolled in a course that does not exist
+        (we allow this!) we can still get their orgs for partner reporting. This
+        prevents regressions of a bug we found in prod where users in this state
+        were throwing 500 errors when _get_orgs_for_user hit the database to find
+        the enrollment.course.org. We now just use the enrollment.course_id.org
+        since for this purpose we don't care if the course exists.
+        """
+        retirement = self._create_retirement(self.partner_queue_state)
+        user = retirement.user
+        enrollment = CourseEnrollment.enroll(user=user, course_key=CourseKey.from_string('edX/Test201/2018_Fall'))
+
+        # Make sure the enrollment was created
+        self.assertTrue(enrollment.is_active)
+
+        # Make sure the correct org is found and returned from the low-level call. We don't get back
+        # the orgs from our PUT operation, so this is the best way to make sure it's doing the right
+        # thing.
+        orgs = AccountRetirementPartnerReportView._get_orgs_for_user(user)  # pylint: disable=protected-access
+        self.assertTrue(len(orgs) == 1)
+        self.assertTrue('edX' in orgs)
+
+        # PUT should succeed
+        self.put_and_assert_status({'username': user.username})
+
+        # Row should exist
+        self.assertTrue(UserRetirementPartnerReportingStatus.objects.filter(user=retirement.user).exists())
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
