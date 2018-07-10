@@ -508,7 +508,8 @@ OAUTH2_DEFAULT_SCOPES = {
 
 OAUTH2_PROVIDER = {
     'OAUTH2_VALIDATOR_CLASS': 'openedx.core.djangoapps.oauth_dispatch.dot_overrides.validators.EdxOAuth2Validator',
-    'REFRESH_TOKEN_EXPIRE_SECONDS': 20160,
+    # 6 months and then we expire refresh tokens using edx_clear_expired_tokens (length is mobile app driven)
+    'REFRESH_TOKEN_EXPIRE_SECONDS': 15552000,
     'SCOPES_BACKEND_CLASS': 'openedx.core.djangoapps.oauth_dispatch.scopes.ApplicationModelScopes',
     'SCOPES': dict(OAUTH2_DEFAULT_SCOPES, **{
         'grades:read': _('Retrieve your grades for your enrolled courses'),
