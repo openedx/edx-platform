@@ -384,7 +384,7 @@ class GetItemTest(ItemTest):
                 "scheme": "enrollment_track",
                 "groups": [
                     {
-                        "id": settings.COURSE_ENROLLMENT_MODES["audit"],
+                        "id": settings.COURSE_ENROLLMENT_MODES["audit"]["id"],
                         "name": "Audit",
                         "selected": False,
                         "deleted": False,
