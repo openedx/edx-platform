@@ -18,7 +18,7 @@ class PytestContainerManager():
         self.ecs = boto3.client('ecs', region)
         self.cluster_name = cluster
 
-    def spin_up_containers(self, number_of_containers, task_name, subnets, security_groups, public_ip_enabled, launch_type):
+    def spin_up_containers(self, number_of_containers, task_name, subnets, security_groups, public_ip, launch_type):
         """
         Spins up containers and generates two .txt files, one containing the IP
         addresses of the new containers, the other containing their task_arns.
@@ -51,7 +51,7 @@ class PytestContainerManager():
                             'awsvpcConfiguration': {
                                 'subnets': subnets,
                                 'securityGroups': security_groups,
-                                'assignPublicIp': public_ip_enabled
+                                'assignPublicIp': public_ip
                             }
                         },
                         taskDefinition=task_definition
@@ -156,7 +156,7 @@ if __name__ == "__main__":
     parser.add_argument('--security_groups', '-sg', nargs='+', default=None,
                         help="List of security groups to apply to the containers")
 
-    parser.add_argument('--public_ip_enabled', choices=['ENABLED', 'DISABLED'],
+    parser.add_argument('--public_ip', choices=['ENABLED', 'DISABLED'],
                         default='DISABLED', help="Whether the containers should have a public IP")
 
     parser.add_argument('--launch_type', default='FARGATE', choices=['EC2', 'FARGATE'],
@@ -178,7 +178,7 @@ if __name__ == "__main__":
             args.task_name,
             args.subnets,
             args.security_groups,
-            args.public_ip_enabled,
+            args.public_ip,
             args.launch_type
         )
     elif args.action == 'down':
