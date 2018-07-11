@@ -69,18 +69,18 @@ from openedx.core.lib.courses import course_image_url
 from student import auth
 from student.auth import has_course_author_access, has_studio_read_access, has_studio_write_access
 from student.roles import CourseCreatorRole, CourseInstructorRole, CourseStaffRole, GlobalStaff, UserBasedRole
-from util.course import get_link_for_about_page
-from util.date_utils import get_default_time_display
-from util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
-from util.milestones_helpers import (
+from common_utils.course import get_link_for_about_page
+from common_utils.date_utils import get_default_time_display
+from common_utils.json_request import JsonResponse, JsonResponseBadRequest, expect_json
+from common_utils.milestones_helpers import (
     is_entrance_exams_enabled,
     is_prerequisite_courses_enabled,
     is_valid_course_key,
     remove_prerequisite_course,
     set_prerequisite_courses
 )
-from util.organizations_helpers import add_organization_course, get_organization_by_short_name, organizations_enabled
-from util.string_utils import _has_non_ascii_characters
+from common_utils.organizations_helpers import add_organization_course, get_organization_by_short_name, organizations_enabled
+from common_utils.string_utils import _has_non_ascii_characters
 from xblock_django.api import deprecated_xblocks
 from xmodule.contentstore.content import StaticContent
 from xmodule.course_module import DEFAULT_START_DATE, CourseFields

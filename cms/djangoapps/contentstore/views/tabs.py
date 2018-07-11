@@ -10,7 +10,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from edxmako.shortcuts import render_to_response
 from student.auth import has_course_author_access
-from util.json_request import JsonResponse, expect_json
+from common_utils.json_request import JsonResponse, expect_json
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTab, CourseTabList, InvalidTabsException, StaticTab

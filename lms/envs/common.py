@@ -2093,7 +2093,7 @@ INSTALLED_APPS = [
     'staticbook',
     'track',
     'eventtracking.django.apps.EventTrackingConfig',
-    'util',
+    'common_utils',
     'lms.djangoapps.certificates.apps.CertificatesConfig',
     'dashboard',
     'lms.djangoapps.instructor_task',

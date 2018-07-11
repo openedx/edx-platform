@@ -14,7 +14,7 @@ from student import auth
 from student.auth import STUDIO_EDIT_ROLES, STUDIO_VIEW_USERS, get_user_permissions
 from student.models import CourseEnrollment
 from student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
-from util.json_request import JsonResponse, expect_json
+from common_utils.json_request import JsonResponse, expect_json
 from xmodule.modulestore.django import modulestore
 
 __all__ = ['request_course_creator', 'course_team_handler']

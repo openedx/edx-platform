@@ -41,7 +41,7 @@ from lms.djangoapps.instructor_task.tasks import (
     reset_problem_attempts,
     send_bulk_course_email
 )
-from util import milestones_helpers
+from common_utils import milestones_helpers
 from xmodule.modulestore.django import modulestore
 
 

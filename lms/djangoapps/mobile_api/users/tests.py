@@ -28,8 +28,8 @@ from mobile_api.testutils import (
 )
 from openedx.core.lib.courses import course_image_url
 from student.models import CourseEnrollment
-from util.milestones_helpers import set_prerequisite_courses
-from util.testing import UrlResetMixin
+from common_utils.milestones_helpers import set_prerequisite_courses
+from common_utils.testing import UrlResetMixin
 from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 

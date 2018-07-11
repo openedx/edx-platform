@@ -9,10 +9,12 @@ from pkg_resources import resource_string
 
 import dogstats_wrapper as dog_stats_api
 from capa import responsetypes
+from common_utils.sandboxing import get_python_lib_zip
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.raw_module import RawDescriptor
-from xmodule.util.misc import escape_html_characters
+from xmodule.utils.misc import escape_html_characters
 from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT, XModule, module_attr
+from xmodule.contentstore.django import contentstore
 
 from .capa_base import CapaFields, CapaMixin, ComplexEncoder
 
@@ -341,7 +343,7 @@ class CapaDescriptor(CapaFields, RawDescriptor):
             anonymous_student_id=None,
             cache=None,
             can_execute_unsafe_code=lambda: None,
-            get_python_lib_zip=lambda: None,
+            get_python_lib_zip=(lambda: get_python_lib_zip(contentstore, self.runtime.course_id)),
             DEBUG=None,
             filestore=self.runtime.resources_fs,
             i18n=self.runtime.service(self, "i18n"),

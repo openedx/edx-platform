@@ -22,7 +22,7 @@ from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from student.models import CourseEnrollment
 from student.signals import SAILTHRU_AUDIT_PURCHASE
-from util.json_request import JsonResponse
+from common_utils.json_request import JsonResponse
 
 from ...constants import Messages
 from ...http import DetailResponse

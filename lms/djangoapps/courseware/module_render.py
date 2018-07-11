@@ -66,10 +66,10 @@ from openedx.core.lib.xblock_utils import (
 from student.models import anonymous_id_for_user, user_by_anonymous_id
 from student.roles import CourseBetaTesterRole
 from track import contexts
-from util import milestones_helpers
-from util.json_request import JsonResponse
+from common_utils import milestones_helpers
+from common_utils.json_request import JsonResponse
 from django.utils.text import slugify
-from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
+from common_utils.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from xblock_django.user_service import DjangoXBlockUserService
 from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor

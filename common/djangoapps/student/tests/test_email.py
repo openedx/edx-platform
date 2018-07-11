@@ -33,8 +33,8 @@ from student.views import (
 )
 from student.views import generate_activation_email_context, send_reactivation_email_for_user
 from third_party_auth.views import inactive_user_view
-from util.request import safe_get_host
-from util.testing import EventTestMixin
+from common_utils.request import safe_get_host
+from common_utils.testing import EventTestMixin
 
 
 class TestException(Exception):

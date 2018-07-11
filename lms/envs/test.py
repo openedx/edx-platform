@@ -23,13 +23,13 @@ import os
 from path import Path as path
 from uuid import uuid4
 
-from util.db import NoOpMigrationModules
+from common_utils.db import NoOpMigrationModules
 from openedx.core.lib.derived import derive_settings
 from openedx.core.lib.tempdir import mkdtemp_clean
 
 # This patch disables the commit_on_success decorator during tests
 # in TestCase subclasses.
-from util.testing import patch_testcase, patch_sessions
+from common_utils.testing import patch_testcase, patch_sessions
 patch_testcase()
 patch_sessions()
 

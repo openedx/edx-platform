@@ -35,7 +35,7 @@ from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from microsite_configuration import microsite
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
-from util.testing import EventTestMixin
+from common_utils.testing import EventTestMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

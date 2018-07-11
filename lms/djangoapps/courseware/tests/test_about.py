@@ -22,7 +22,7 @@ from shoppingcart.models import Order, PaidCourseRegistration
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, CourseEnrollmentAllowedFactory, UserFactory
 from track.tests import EventTrackingTestCase
-from util.milestones_helpers import get_prerequisite_courses_display, set_prerequisite_courses
+from common_utils.milestones_helpers import get_prerequisite_courses_display, set_prerequisite_courses
 from xmodule.course_module import CATALOG_VISIBILITY_ABOUT, CATALOG_VISIBILITY_NONE
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MIXED_MODULESTORE,

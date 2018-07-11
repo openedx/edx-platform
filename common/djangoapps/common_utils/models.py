@@ -22,7 +22,7 @@ class RateLimitConfiguration(ConfigurationModel):
     with the `can_disable_rate_limit` class decorator.
     """
     class Meta(ConfigurationModel.Meta):
-        app_label = "util"
+        app_label = "common_utils"
 
 
 def decompress_string(value):

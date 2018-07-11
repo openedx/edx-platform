@@ -7,7 +7,7 @@ from django_comment_common.models import Role
 from models import CourseDiscussionSettings
 from openedx.core.djangoapps.course_groups.cohorts import CourseCohortsSettings
 from student.models import CourseEnrollment, User
-from utils import get_course_discussion_settings, set_course_discussion_settings
+from common_utilss import get_course_discussion_settings, set_course_discussion_settings
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

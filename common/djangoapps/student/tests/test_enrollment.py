@@ -21,7 +21,7 @@ from student.models import (
 )
 from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import CourseEnrollmentAllowedFactory, UserFactory
-from util.testing import UrlResetMixin
+from common_utils.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

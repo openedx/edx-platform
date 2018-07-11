@@ -34,7 +34,7 @@ from openedx.core.lib.api.authentication import SessionAuthenticationAllowInacti
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 from student.cookies import set_logged_in_cookies
 from student.views import AccountValidationError, create_account_with_params
-from util.json_request import JsonResponse
+from common_utils.json_request import JsonResponse
 
 
 class LoginSessionView(APIView):

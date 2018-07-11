@@ -31,7 +31,7 @@ from openedx.core.djangoapps.credentials.utils import get_credentials
 from openedx.core.djangoapps.programs import ALWAYS_CALCULATE_PROGRAM_PRICE_AS_ANONYMOUS_USER
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from student.models import CourseEnrollment
-from util.date_utils import strftime_localized
+from common_utils.date_utils import strftime_localized
 from xmodule.modulestore.django import modulestore
 
 # The datetime module's strftime() methods require a year >= 1900.

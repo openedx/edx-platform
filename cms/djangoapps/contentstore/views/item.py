@@ -55,9 +55,9 @@ from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.xblock_utils import request_token, wrap_xblock
 from static_replace import replace_static_urls
 from student.auth import has_studio_read_access, has_studio_write_access
-from util.date_utils import get_default_time_display
-from util.json_request import JsonResponse, expect_json
-from util.milestones_helpers import is_entrance_exams_enabled
+from common_utils.date_utils import get_default_time_display
+from common_utils.json_request import JsonResponse, expect_json
+from common_utils.milestones_helpers import is_entrance_exams_enabled
 from xblock_config.models import CourseEditLTIFieldsEnabledFlag
 from xblock_django.user_service import DjangoXBlockUserService
 from xmodule.course_module import DEFAULT_START_DATE

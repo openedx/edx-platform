@@ -17,8 +17,8 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import CourseLocator
 from six import text_type
 
-import util.file
-from util.file import (
+import common_utils.file
+from common_utils.file import (
     FileValidationException,
     UniversalNewlineIterator,
     course_and_time_based_filename_generator,
@@ -51,7 +51,7 @@ class FilenameGeneratorTestCase(TestCase):
     def setUp(self):
         super(FilenameGeneratorTestCase, self).setUp()
         datetime_patcher = patch.object(
-            util.file, 'datetime',
+            common_utils.file, 'datetime',
             Mock(wraps=datetime)
         )
         mocked_datetime = datetime_patcher.start()

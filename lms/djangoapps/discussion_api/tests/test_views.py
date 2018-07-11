@@ -32,7 +32,7 @@ from openedx.core.djangoapps.user_api.models import RetirementState, UserRetirem
 from openedx.core.lib.token_utils import JwtBuilder
 from student.models import get_retired_username_by_username
 from student.tests.factories import CourseEnrollmentFactory, UserFactory, SuperuserFactory
-from util.testing import PatchMediaTypeMixin, UrlResetMixin
+from common_utils.testing import PatchMediaTypeMixin, UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

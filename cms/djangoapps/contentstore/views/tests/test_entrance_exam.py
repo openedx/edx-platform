@@ -23,7 +23,7 @@ from contentstore.views.helpers import GRADER_TYPES, create_xblock
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
 from student.tests.factories import UserFactory
-from util import milestones_helpers
+from common_utils import milestones_helpers
 from xmodule.modulestore.django import modulestore
 
 

@@ -39,7 +39,7 @@ from student.tests.factories import (
     CourseEnrollmentAllowedFactory,
     CourseEnrollmentFactory
 )
-from util.milestones_helpers import fulfill_course_milestone, set_prerequisite_courses
+from common_utils.milestones_helpers import fulfill_course_milestone, set_prerequisite_courses
 from xmodule.course_module import (
     CATALOG_VISIBILITY_ABOUT,
     CATALOG_VISIBILITY_CATALOG_AND_ABOUT,

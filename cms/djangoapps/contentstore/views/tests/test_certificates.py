@@ -19,7 +19,7 @@ from course_modes.tests.factories import CourseModeFactory
 from student.models import CourseEnrollment
 from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import UserFactory
-from util.testing import EventTestMixin, UrlResetMixin
+from common_utils.testing import EventTestMixin, UrlResetMixin
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError

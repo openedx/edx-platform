@@ -20,7 +20,7 @@ from openedx.core.djangoapps.monitoring_utils import set_custom_metric, set_cust
 from student.models import CourseEnrollment
 from submissions import api as sub_api
 from track.event_transaction_utils import set_event_transaction_id, set_event_transaction_type
-from util.date_utils import from_timestamp
+from common_utils.date_utils import from_timestamp
 from xmodule.modulestore.django import modulestore
 
 from .config.waffle import DISABLE_REGRADE_ON_POLICY_CHANGE, waffle

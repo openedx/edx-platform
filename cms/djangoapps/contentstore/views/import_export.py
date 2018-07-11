@@ -33,8 +33,8 @@ from contentstore.tasks import CourseExportTask, CourseImportTask, export_olx, i
 from contentstore.utils import reverse_course_url, reverse_library_url
 from edxmako.shortcuts import render_to_response
 from student.auth import has_course_author_access
-from util.json_request import JsonResponse
-from util.views import ensure_valid_course_key
+from common_utils.json_request import JsonResponse
+from common_utils.views import ensure_valid_course_key
 from xmodule.modulestore.django import modulestore
 
 __all__ = [

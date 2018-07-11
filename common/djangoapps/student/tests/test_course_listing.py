@@ -14,7 +14,7 @@ from student.models import CourseEnrollment
 from student.roles import GlobalStaff
 from student.tests.factories import UserFactory
 from student.views import get_course_enrollments
-from util.milestones_helpers import get_pre_requisite_courses_not_completed, set_prerequisite_courses
+from common_utils.milestones_helpers import get_pre_requisite_courses_not_completed, set_prerequisite_courses
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore

@@ -13,7 +13,7 @@ from django_comment_common.models import (
 )
 from django_comment_common.utils import seed_permissions_roles
 from student.models import anonymous_id_for_user, CourseAccessRole, CourseEnrollment, UserProfile
-from util.testing import UrlResetMixin
+from common_utils.testing import UrlResetMixin
 
 
 class AutoAuthTestCase(UrlResetMixin, TestCase):

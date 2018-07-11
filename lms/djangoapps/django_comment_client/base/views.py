@@ -49,7 +49,7 @@ from django_comment_common.signals import (
 from django_comment_common.utils import ThreadContext
 import eventtracking
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
-from util.file import store_uploaded_file
+from common_utils.file import store_uploaded_file
 
 log = logging.getLogger(__name__)
 

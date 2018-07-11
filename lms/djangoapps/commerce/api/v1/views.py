@@ -13,7 +13,7 @@ from rest_framework_oauth.authentication import OAuth2Authentication
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.lib.api.mixins import PutAsCreateMixin
-from util.json_request import JsonResponse
+from common_utils.json_request import JsonResponse
 
 from ...utils import is_account_activation_requirement_disabled
 from .models import Course

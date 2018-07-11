@@ -16,7 +16,7 @@ from web_fragments.fragment import Fragment
 from xblock.runtime import KeyValueStore
 
 from student.models import CourseEnrollment
-from util.json_request import JsonResponse, expect_json
+from common_utils.json_request import JsonResponse, expect_json
 from xmodule.partitions.partitions import NoSuchUserPartitionGroupError
 
 log = logging.getLogger(__name__)

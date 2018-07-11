@@ -52,7 +52,7 @@ from student.models import (
     DashboardConfiguration,
     UserProfile
 )
-from util.milestones_helpers import get_pre_requisite_courses_not_completed
+from common_utils.milestones_helpers import get_pre_requisite_courses_not_completed
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.student")

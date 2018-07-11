@@ -47,7 +47,7 @@ from xmodule.modulestore.mongo.base import MongoRevisionKey
 from xmodule.modulestore.store_utilities import draft_node_constructor, get_draft_subtree_roots
 from xmodule.modulestore.xml import ImportSystem, LibraryXMLModuleStore, XMLModuleStore
 from xmodule.tabs import CourseTabList
-from xmodule.util.misc import escape_invalid_characters
+from xmodule.utils.misc import escape_invalid_characters
 from xmodule.x_module import XModuleDescriptor, XModuleMixin
 
 from .inheritance import own_metadata

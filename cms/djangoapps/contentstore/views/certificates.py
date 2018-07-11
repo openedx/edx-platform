@@ -43,8 +43,8 @@ from edxmako.shortcuts import render_to_response
 from eventtracking import tracker
 from student.auth import has_studio_write_access
 from student.roles import GlobalStaff
-from util.db import MYSQL_MAX_INT, generate_int_id
-from util.json_request import JsonResponse
+from common_utils.db import MYSQL_MAX_INT, generate_int_id
+from common_utils.json_request import JsonResponse
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.django import modulestore
 
