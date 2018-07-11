@@ -7,7 +7,6 @@ from pavelib.utils.test import utils as test_utils
 from pavelib.utils.test.suites.suite import TestSuite
 from pavelib.utils.envs import Env
 
-
 __test__ = False  # do not collect
 
 
@@ -112,6 +111,7 @@ class SystemTestSuite(PytestSuite):
         self.processes = kwargs.get('processes', None)
         self.randomize = kwargs.get('randomize', None)
         self.settings = kwargs.get('settings', Env.TEST_SETTINGS)
+        self.xdist_ip_addresses = kwargs.get('xdist_ip_addresses', None)
 
         if self.processes is None:
             # Don't use multiprocessing by default
@@ -142,12 +142,25 @@ class SystemTestSuite(PytestSuite):
         if self.disable_capture:
             cmd.append("-s")
 
-        if self.processes == -1:
-            cmd.append('-n auto')
+        if self.xdist_ip_addresses:
             cmd.append('--dist=loadscope')
-        elif self.processes != 0:
-            cmd.append('-n {}'.format(self.processes))
-            cmd.append('--dist=loadscope')
+            for ip in self.xdist_ip_addresses.split(' '):
+                xdist_string = '--tx ssh=ubuntu@{}//python="source /edx/app/edxapp/edxapp_env; ' \
+                               'python"//chdir="/edx/app/edxapp/edx-platform"'.format(ip)
+                cmd.append(xdist_string)
+            already_synced_dirs = set()
+            for test_path in self.test_id.split():
+                test_root_dir = test_path.split('/')[0]
+                if test_root_dir not in already_synced_dirs:
+                    cmd.append('--rsyncdir {}'.format(test_root_dir))
+                    already_synced_dirs.add(test_root_dir)
+        else:
+            if self.processes == -1:
+                cmd.append('-n auto')
+                cmd.append('--dist=loadscope')
+            elif self.processes != 0:
+                cmd.append('-n {}'.format(self.processes))
+                cmd.append('--dist=loadscope')
 
         if not self.randomize:
             cmd.append('-p no:randomly')
@@ -212,6 +225,7 @@ class LibTestSuite(PytestSuite):
         self.append_coverage = kwargs.get('append_coverage', False)
         self.test_id = kwargs.get('test_id', self.root)
         self.eval_attr = kwargs.get('eval_attr', None)
+        self.xdist_ip_addresses = kwargs.get('xdist_ip_addresses', None)
 
     @property
     def cmd(self):
@@ -235,8 +249,23 @@ class LibTestSuite(PytestSuite):
             cmd.append("--verbose")
         if self.disable_capture:
             cmd.append("-s")
+
+        if self.xdist_ip_addresses:
+            cmd.append('--dist=loadscope')
+            for ip in self.xdist_ip_addresses.split(' '):
+                xdist_string = '--tx ssh=ubuntu@{}//python="source /edx/app/edxapp/edxapp_env; ' \
+                               'python"//chdir="/edx/app/edxapp/edx-platform"'.format(ip)
+                cmd.append(xdist_string)
+            already_synced_dirs = set()
+            for test_path in self.test_id.split():
+                test_root_dir = test_path.split('/')[0]
+                if test_root_dir not in already_synced_dirs:
+                    cmd.append('--rsyncdir {}'.format(test_root_dir))
+                    already_synced_dirs.add(test_root_dir)
+
         if self.eval_attr:
             cmd.append("-a '{}'".format(self.eval_attr))
+
         cmd.append(self.test_id)
 
         return self._under_coverage_cmd(cmd)
