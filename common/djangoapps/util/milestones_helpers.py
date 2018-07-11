@@ -385,9 +385,12 @@ def any_unfulfilled_milestones(course_id, user_id):
     """ Returns a boolean if user has any unfulfilled milestones """
     if not settings.FEATURES.get('MILESTONES_APP'):
         return False
-    return bool(
-        get_course_milestones_fulfillment_paths(course_id, {"id": user_id})
-    )
+
+    fulfillment_paths = milestones_api.get_course_milestones_fulfillment_paths(course_id, {'id': user_id})
+
+    # Returns True if any of the milestones is unfulfilled. False if
+    # values is empty or all values are.
+    return any(fulfillment_paths.values())
 
 
 def get_course_milestones_fulfillment_paths(course_id, user_id):
