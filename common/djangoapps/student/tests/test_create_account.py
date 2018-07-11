@@ -28,7 +28,7 @@ from student.forms import USERNAME_INVALID_CHARS_ASCII, USERNAME_INVALID_CHARS_U
 from student.models import UserAttribute
 from student.views import REGISTRATION_AFFILIATE_ID, REGISTRATION_UTM_CREATED_AT, REGISTRATION_UTM_PARAMETERS
 from student.admin import UserCreationFormExtended, UserChangeFormExtended
-
+from django.core.exceptions import ValidationError
 TEST_CS_URL = 'https://comments.service.test:123/'
 
 
@@ -561,34 +561,66 @@ class TestCreateAccountValidation(TestCase):
         else:
             self.assert_error(params, "email", "Unauthorized email address.")
 
-    ## Note andrey.lykhoman:  fix this test
     @ddt.data(
         ('false.result@sorry.bad', True, False),
         ('true.result@its.good', False, True),
     )
     @ddt.unpack
-    def test_email_uniqueness(self, email, is_avaliable, expect_success):
+    def test_email_uniqueness_create_form(self, email, is_avaliable, expect_success):
+        """
+        Testing uniqueness email in creation user in admin page.
+        You can't create user with certain email address if another user has this email address.
+        If you will try that you must have validation error.
 
-
-        returning = MagicMock()
-        returning.exists = MagicMock(return_value=is_avaliable)
-        returning2 = MagicMock()
-        returning3 = MagicMock()
-        returning3.filter.return_value = returning
-        returning3.exclude.return_value = returning2
-        #returning.get.return_value = returning
-
-
-        with patch('django.contrib.auth.models.User.objects.exists', return_value=is_avaliable):
-            z = UserCreationFormExtended({'email': email})
-            errors = z.errors.as_data()
-            result = True
+        :param email:
+        :param is_avaliable:
+        :param expect_success:
+        :return:
+        """
+        mockObject = MagicMock()
+        mockObject.exists.return_value = is_avaliable
+        mockObject.filter.return_value = mockObject
+        mockObject.exclude.return_value = mockObject
+        with patch('student.admin.User.objects', mockObject):
+            # Testing email uniqueness in creation user
+            creation_form = UserCreationFormExtended({'email': email})
+            errors = creation_form.errors.as_data()
+            result_creation_form = True
             if 'email' in errors:
-                result = False
-            self.assertEqual(result, expect_success)
-            #UserCreationFormExtended, UserChangeFormExtended
+                result_creation_form = False
+            self.assertEqual(result_creation_form, expect_success)
 
-    ## Note andrey.lykhoman:  write test for testing UserChangeFormExtended
+    @ddt.data(
+        ('false.result@sorry.bad', True, False),
+        ('true.result@its.good', False, True),
+    )
+    @ddt.unpack
+    def test_email_uniqueness_change_form(self, email, is_avaliable, expect_success):
+        """
+        Testing uniqueness email in change user in admin page.
+        You can't change user's email write certain email address if another user has this email address.
+        If you will try that you must have validation error.
+
+        :param email:
+        :param is_avaliable:
+        :param expect_success:
+        :return:
+        """
+        mockObject = MagicMock()
+        mockObject.exists.return_value = is_avaliable
+        mockObject.filter.return_value = mockObject
+        mockObject.exclude.return_value = mockObject
+        with patch('student.admin.User.objects', mockObject):
+            # Testing email uniqueness in creation user
+            change_form = UserChangeFormExtended()
+            change_form.initial = {'password': 'testpass'}
+            change_form.cleaned_data = {'email': email}
+            try:
+                change_form.clean_email()
+                self.assertEqual(True, expect_success)
+            except ValidationError:
+                self.assertEqual(False, expect_success)
+
 
     def test_password(self):
         params = dict(self.minimal_params)
