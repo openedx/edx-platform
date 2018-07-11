@@ -14,7 +14,6 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.features.course_card.models import CourseCard
 from xmodule.modulestore.django import modulestore
 from student.models import CourseEnrollment
-from philu_overrides.helpers import get_user_current_enrolled_class
 
 
 def get_recommended_courses(user):
@@ -55,7 +54,7 @@ def get_enrolled_past_courses(course_enrollments):
     return enrolled, past
 
 
-def get_recommended_xmodule_courses(request):
+def get_recommended_xmodule_courses(request, _from='onboarding'):
     """
     Helper function to get recommended courses based on the user interests and add details from xmodule to
     the recommended courses
@@ -63,10 +62,11 @@ def get_recommended_xmodule_courses(request):
     user = request.user
     recommended_courses = []
     all_courses = []
+
     utc = pytz.UTC
     course_card_ids = [cc.course_id for cc in CourseCard.objects.filter(is_enabled=True)]
     courses_list = CourseOverview.objects.select_related('image_set').filter(id__in=course_card_ids)
-
+    course_list_ids = []
     current_time = datetime.utcnow().replace(tzinfo=utc)
 
     for course in courses_list:
@@ -77,20 +77,22 @@ def get_recommended_xmodule_courses(request):
         ).order_by('start').first()
 
         if course_rerun_object:
-            all_courses.append(course_rerun_object)
 
-    # all_courses = get_courses(user)
+            course_list_ids.append(course.id)
+            _settings = CustomSettings.objects.filter(id=course_rerun_object.id).first()
+            course.settings_attrs = _settings
+            all_courses.append(course)
 
     user_interests = user.extended_profile.get_user_selected_interests()
     if not user_interests:
         return []
 
     for course in all_courses:
-        settings = CustomSettings.objects.filter(id=course.id).first()
-        if not settings:
+        _settings = course.settings_attrs
+        if not _settings:
             continue
 
-        tags = settings.tags
+        tags = _settings.tags
         if not tags:
             continue
 
@@ -98,10 +100,13 @@ def get_recommended_xmodule_courses(request):
         tags = [tag.strip() for tag in tags]
         matched_interests = set(user_interests) & set(tags)
         if matched_interests and not CourseEnrollment.is_enrolled(user, course.id):
-            detailed_course = modulestore().get_course(course.id)
-            detailed_course.short_description = course.short_description
-            detailed_course.interests = '/ '.join(list(matched_interests))
-            recommended_courses.append(detailed_course)
+            if _from == 'onboarding':
+                detailed_course = modulestore().get_course(course.id)
+                detailed_course.short_description = course.short_description
+                detailed_course.interests = '/ '.join(list(matched_interests))
+                recommended_courses.append(detailed_course)
+            else:
+                recommended_courses.append(course)
 
     return recommended_courses
 
