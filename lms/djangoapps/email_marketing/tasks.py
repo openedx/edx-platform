@@ -1,6 +1,7 @@
 """
 This file contains celery tasks for email marketing signal handler.
 """
+
 import logging
 import time
 from datetime import datetime, timedelta
@@ -320,7 +321,7 @@ def update_course_enrollment(self, email, course_key, mode):
 
     course_data = _get_course_content(course_key, course_url, sailthru_client, config)
 
-    item = _build_purchase_item(course_key, course_url, cost_in_cents, mode, course_data, None)
+    item = _build_purchase_item(course_key, course_url, cost_in_cents, mode, course_data)
     options = {}
 
     if send_template:
@@ -433,7 +434,7 @@ def _get_course_content(course_id, course_url, sailthru_client, config):
     return response
 
 
-def _build_purchase_item(course_id, course_url, cost_in_cents, mode, course_data, sku):
+def _build_purchase_item(course_id, course_url, cost_in_cents, mode, course_data):
     """Build and return Sailthru purchase item object"""
 
     # build item description
@@ -453,6 +454,9 @@ def _build_purchase_item(course_id, course_url, cost_in_cents, mode, course_data
 
     if 'tags' in course_data:
         item['tags'] = course_data['tags']
+
+    # add vars to item
+    item['vars'] = dict(course_data.get('vars', {}), mode=mode, course_run_id=unicode(course_id))
 
     return item
 
