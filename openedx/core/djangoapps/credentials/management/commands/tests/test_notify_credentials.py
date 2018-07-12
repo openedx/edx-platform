@@ -99,12 +99,12 @@ class TestNotifyCredentials(TestCase):
 
     @mock.patch(COMMAND_MODULE + '.time')
     def test_delay(self, mock_time):
-        call_command(Command(), '--start-date', '2017-02-01')
+        call_command(Command(), '--start-date', '2017-01-01', '--page-size=2')
         self.assertEqual(mock_time.sleep.call_count, 0)
         mock_time.sleep.reset_mock()
 
-        call_command(Command(), '--start-date', '2017-02-01', '--delay', '0.2')
-        self.assertEqual(mock_time.sleep.call_count, 4)  # After each cert and each grade (2 each)
+        call_command(Command(), '--start-date', '2017-01-01', '--page-size=2', '--delay', '0.2')
+        self.assertEqual(mock_time.sleep.call_count, 2)  # Between each page, twice (2 pages, for certs and grades)
         self.assertEqual(mock_time.sleep.call_args[0][0], 0.2)
 
     @override_settings(DEBUG=True)
