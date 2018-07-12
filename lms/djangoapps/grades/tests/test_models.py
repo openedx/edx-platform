@@ -9,6 +9,7 @@ from hashlib import sha1
 
 import ddt
 import pytz
+from django.conf import settings
 from django.db.utils import IntegrityError
 from django.test import TestCase
 from django.utils.timezone import now
@@ -136,6 +137,10 @@ class VisibleBlocksTest(GradesModelTestCase):
         super(VisibleBlocksTest, self).setUp()
         self.user_id = 12345
 
+    def tearDown(self):
+        super(VisibleBlocksTest, self).tearDown()
+        VisibleBlocks.objects.all().delete()
+
     def _create_block_record_list(self, blocks, user_id=None):
         """
         Creates and returns a BlockRecordList for the given blocks.
@@ -143,29 +148,41 @@ class VisibleBlocksTest(GradesModelTestCase):
         block_record_list = BlockRecordList.from_list(blocks, self.course_key)
         return VisibleBlocks.cached_get_or_create(user_id or self.user_id, block_record_list)
 
-    def test_creation(self):
+    def _visible_block_assertions(self, visible_blocks, record):
         """
-        Happy path test to ensure basic create functionality works as expected.
+        Given a VisibleBlocks object and a BlockRecord, makes assertions that
+        the visible blocks contain the expected data, based on the block record.
         """
-        vblocks = self._create_block_record_list([self.record_a])
-        list_of_block_dicts = [self.record_a._asdict()]
-        for block_dict in list_of_block_dicts:
-            block_dict['locator'] = unicode(block_dict['locator'])  # BlockUsageLocator is not json-serializable
         expected_data = {
             'blocks': [{
-                'locator': unicode(self.record_a.locator),
+                'locator': unicode(record.locator),
                 'raw_possible': 10,
                 'weight': 1,
-                'graded': self.record_a.graded,
+                'graded': record.graded,
             }],
-            'course_key': unicode(self.record_a.locator.course_key),
+            'course_key': unicode(record.locator.course_key),
             'version': BLOCK_RECORD_LIST_VERSION,
         }
         expected_json = json.dumps(expected_data, separators=(',', ':'), sort_keys=True)
         expected_hash = b64encode(sha1(expected_json).digest())
-        self.assertEqual(expected_data, json.loads(vblocks.blocks_json))
-        self.assertEqual(expected_json, vblocks.blocks_json)
-        self.assertEqual(expected_hash, vblocks.hashed)
+        self.assertEqual(expected_data, json.loads(visible_blocks.blocks_json))
+        self.assertEqual(expected_json, visible_blocks.blocks_json)
+        self.assertEqual(expected_hash, visible_blocks.hashed)
+
+    def test_creation(self):
+        """
+        Happy path test to ensure basic create functionality works as expected.
+        """
+        visible_blocks = self._create_block_record_list([self.record_a])
+        self._visible_block_assertions(visible_blocks, self.record_a)
+
+    def test_bulk_get_or_create(self):
+        """
+        Happy path test to ensure basic bulk creation works as expected.
+        """
+        block_record_list = BlockRecordList.from_list([self.record_a], self.course_key)
+        visible_blocks_list = VisibleBlocks.bulk_get_or_create(self.user_id, self.course_key, [block_record_list])
+        self._visible_block_assertions(visible_blocks_list[0], self.record_a)
 
     def test_ordering_matters(self):
         """
@@ -250,22 +267,24 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
 
     @ddt.data(True, False)
     def test_update_or_create_grade(self, already_created):
-        created_grade = PersistentSubsectionGrade.update_or_create_grade(**self.params) if already_created else None
+        with patch.dict(settings.FEATURES, PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS=True):
+            settings.FEATURES['PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS'] = True
+            created_grade = PersistentSubsectionGrade.update_or_create_grade(**self.params) if already_created else None
 
-        self.params["earned_all"] = 7
-        updated_grade = PersistentSubsectionGrade.update_or_create_grade(**self.params)
-        self.assertEqual(updated_grade.earned_all, 7)
-        if already_created:
-            self.assertEqual(created_grade.id, updated_grade.id)
-            self.assertEqual(created_grade.earned_all, 6)
+            self.params["earned_all"] = 7
+            updated_grade = PersistentSubsectionGrade.update_or_create_grade(**self.params)
+            self.assertEqual(updated_grade.earned_all, 7)
+            if already_created:
+                self.assertEqual(created_grade.id, updated_grade.id)
+                self.assertEqual(created_grade.earned_all, 6)
 
-        with self.assertNumQueries(1):
-            read_grade = PersistentSubsectionGrade.read_grade(
-                user_id=self.params["user_id"],
-                usage_key=self.params["usage_key"],
-            )
-            self.assertEqual(updated_grade, read_grade)
-            self.assertEqual(read_grade.visible_blocks.blocks, self.block_records)
+            with self.assertNumQueries(1):
+                read_grade = PersistentSubsectionGrade.read_grade(
+                    user_id=self.params["user_id"],
+                    usage_key=self.params["usage_key"],
+                )
+                self.assertEqual(updated_grade, read_grade)
+                self.assertEqual(read_grade.visible_blocks.blocks, self.block_records)
 
     def test_unattempted(self):
         self.params['first_attempted'] = None
