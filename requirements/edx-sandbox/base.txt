@@ -29,4 +29,4 @@ scipy==0.14.0
 singledispatch==3.4.0.3   # via tornado
 six==1.11.0
 sympy==0.7.1
-tornado==5.0.2            # via matplotlib
+tornado==5.1              # via matplotlib
