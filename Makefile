@@ -19,7 +19,7 @@ clean: ## archive and delete most git-ignored files
 	rm $(PRIVATE_FILES)
 
 extract_translations: ## extract localizable strings from sources
-	i18n_tool extract -vv
+	i18n_tool extract -v
 
 push_translations: ## push source strings to Transifex for translation
 	i18n_tool transifex push
