@@ -30,7 +30,6 @@ pull_translations: ## pull translations from Transifex
 	i18n_tool extract
 	i18n_tool dummy
 	i18n_tool generate
-	i18n_tool generate --strict
 	git clean -fdX conf/locale/rtl
 	git clean -fdX conf/locale/eo
 	i18n_tool validate
