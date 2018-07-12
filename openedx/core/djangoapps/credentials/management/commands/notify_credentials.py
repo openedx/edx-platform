@@ -59,9 +59,10 @@ def paged_query(queryset, delay, page_size):
         page_end = page_start + page_size
         subquery = queryset[page_start:page_end]
 
+        if delay and page:
+            time.sleep(delay)
+
         for i, item in enumerate(subquery, start=1):
-            if delay:
-                time.sleep(delay)
             yield page_start + i, item
 
 
@@ -119,7 +120,7 @@ class Command(BaseCommand):
             '--delay',
             type=float,
             default=0,
-            help="Number of seconds to sleep between processing certificates, so that we don't flood our queues.",
+            help="Number of seconds to sleep between processing queries, so that we don't flood our queues.",
         )
         parser.add_argument(
             '--page-size',
