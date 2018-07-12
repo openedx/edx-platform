@@ -12,7 +12,7 @@ from capa import responsetypes
 from common_utils.sandboxing import get_python_lib_zip
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.raw_module import RawDescriptor
-from xmodule.utils.misc import escape_html_characters
+from xmodule.util.misc import escape_html_characters
 from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT, XModule, module_attr
 from xmodule.contentstore.django import contentstore
 

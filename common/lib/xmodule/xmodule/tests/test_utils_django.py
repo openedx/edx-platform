@@ -1,5 +1,5 @@
 """Tests for methods defined in util/django.py"""
-from xmodule.utils.django import get_current_request, get_current_request_hostname
+from xmodule.util.django import get_current_request, get_current_request_hostname
 from nose.tools import assert_is_none
 from unittest import TestCase
 

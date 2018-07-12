@@ -14,7 +14,7 @@ from opaque_keys.edx.keys import AssetKey
 from xmodule.contentstore.content import XASSET_LOCATION_TAG
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import ASSET_IGNORE_REGEX
-from xmodule.utils.misc import escape_invalid_characters
+from xmodule.util.misc import escape_invalid_characters
 from xmodule.mongo_utils import connect_to_mongodb, create_collection_index
 from .content import StaticContent, ContentStore, StaticContentStream
 

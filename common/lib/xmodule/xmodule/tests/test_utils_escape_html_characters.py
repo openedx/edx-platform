@@ -1,5 +1,5 @@
 """Tests for methods defined in util/misc.py"""
-from xmodule.utils.misc import escape_html_characters
+from xmodule.util.misc import escape_html_characters
 from unittest import TestCase
 
 
