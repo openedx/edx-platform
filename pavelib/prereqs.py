@@ -309,9 +309,20 @@ def install_prereqs():
         install_node_prereqs()
     install_python_prereqs()
     log_installed_python_prereqs()
+    print_devstack_warning()
 
 
 def log_installed_python_prereqs():
     """  Logs output of pip freeze for debugging. """
     sh("pip freeze > {}".format(Env.GEN_LOG_DIR + "/pip_freeze.log"))
     return
+
+
+def print_devstack_warning():
+    if Env.USING_DOCKER:  # pragma: no cover
+        print "********************************************************************************"
+        print "* WARNING: Mac users should run this from both the lms and studio shells"
+        print "* in docker devstack to avoid startup errors that kill your CPU."
+        print "* For more details, see:"
+        print "* https://github.com/edx/devstack#docker-is-using-lots-of-cpu-time-when-it-should-be-idle"
+        print "********************************************************************************"
