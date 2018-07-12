@@ -4,7 +4,7 @@ Tests for extended due date utilities.
 import mock
 import unittest
 
-from ..utils import duedate
+from ..util import duedate
 
 
 class TestGetExtendedDueDate(unittest.TestCase):

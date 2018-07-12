@@ -23,6 +23,7 @@ class RateLimitConfiguration(ConfigurationModel):
     """
     class Meta(ConfigurationModel.Meta):
         app_label = "common_utils"
+        db_table = "common_utils_ratelimitconfiguration"
 
 
 def decompress_string(value):
