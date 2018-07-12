@@ -31,7 +31,7 @@ from student.admin import UserCreationFormExtended, UserChangeFormExtended
 from django.core.exceptions import ValidationError
 TEST_CS_URL = 'https://comments.service.test:123/'
 
-def create_mock_object_for_test_email_uniqueness(is_avaliable):
+def create_mock_object_for_email_uniqueness(is_avaliable=False):
     """
     This method build Mock object. Object has three methods:
     filter and exlude: return self (Mock object)
@@ -591,7 +591,7 @@ class TestCreateAccountValidation(TestCase):
         """
         with patch(
                 'student.admin.User.objects',
-                create_mock_object_for_test_email_uniqueness(is_avaliable)
+                create_mock_object_for_email_uniqueness(is_avaliable)
         ):
             # Testing email uniqueness in creation user
             creation_form = UserCreationFormExtended({'email': email})
@@ -614,7 +614,7 @@ class TestCreateAccountValidation(TestCase):
         """
         with patch(
                 'student.admin.User.objects',
-                create_mock_object_for_test_email_uniqueness(is_avaliable)
+                create_mock_object_for_email_uniqueness(is_avaliable)
         ):
             # Testing email uniqueness in creation user
             change_form = UserChangeFormExtended()
