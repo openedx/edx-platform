@@ -26,6 +26,7 @@ from openedx.core.djangoapps.user_api.models import UserPreference
 from submissions import api as sub_api  # installed from the edx-submissions repository
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from openedx.features.course_card.helpers import get_related_card_id
 
 from course_modes.models import CourseMode
 from courseware.models import StudentModule
@@ -353,7 +354,7 @@ def get_email_params(course, auto_enroll, secure=True, course_key=None, display_
     """
 
     protocol = 'https' if secure else 'http'
-    course_key = course_key or course.id.to_deprecated_string()
+    course_key = get_related_card_id(course.id)
     display_name = display_name or course.display_name_with_default_escaped
 
     stripped_site_name = configuration_helpers.get_value(
