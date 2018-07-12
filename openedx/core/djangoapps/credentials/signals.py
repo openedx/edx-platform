@@ -67,7 +67,7 @@ def send_grade_if_interesting(user, course_run_key, mode, status, letter_grade, 
     # Grab grades if we don't have them in hand
     if letter_grade is None or percent_grade is None:
         grade = CourseGradeFactory().read(user, course_key=course_run_key, create_if_needed=False)
-        if grade is None:
+        if grade is None or grade.letter_grade is None:
             return
         letter_grade = grade.letter_grade
         percent_grade = grade.percent
