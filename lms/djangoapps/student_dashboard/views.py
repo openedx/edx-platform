@@ -81,6 +81,7 @@ def get_recommended_xmodule_courses(request, _from='onboarding'):
             course_list_ids.append(course.id)
             _settings = CustomSettings.objects.filter(id=course_rerun_object.id).first()
             course.settings_attrs = _settings
+            course.start = course_rerun_object.start
             all_courses.append(course)
 
     user_interests = user.extended_profile.get_user_selected_interests()
@@ -101,7 +102,9 @@ def get_recommended_xmodule_courses(request, _from='onboarding'):
         matched_interests = set(user_interests) & set(tags)
         if matched_interests and not CourseEnrollment.is_enrolled(user, course.id):
             if _from == 'onboarding':
+                start_date = course.start
                 detailed_course = modulestore().get_course(course.id)
+                detailed_course.start = start_date
                 detailed_course.short_description = course.short_description
                 detailed_course.interests = '/ '.join(list(matched_interests))
                 recommended_courses.append(detailed_course)

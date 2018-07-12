@@ -1,14 +1,13 @@
 """ Views for a student's account information. """
 import base64
+from datetime import datetime
 import json
+import third_party_auth
 import logging
 import urlparse
 from pytz import utc
 
-from datetime import datetime
 from django.http import HttpResponseNotFound, HttpResponse, Http404, HttpResponseServerError
-
-import third_party_auth
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse
