@@ -1186,7 +1186,7 @@ def change_enrollment(request, check_access=True):
             first_chapter_url, first_section = get_course_related_keys(request, current_course)
             course_target = reverse('courseware_section', args=[course_id, first_chapter_url, first_section])
 
-        return HttpResponse(course_target)
+        return JsonResponse({'course_target': course_target})
     elif action == "unenroll":
         enrollment = CourseEnrollment.get_enrollment(user, course_id)
         if not enrollment:
