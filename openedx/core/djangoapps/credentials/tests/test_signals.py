@@ -88,6 +88,18 @@ class TestCredentialsSignalsSendGrade(TestCase):
         send_grade_if_interesting(self.user, self.key, 'verified', 'downloadable', None, None)
         self.assertFalse(mock_send_grade_to_credentials.delay.called)
 
+    @mock.patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
+    def test_send_grade_without_letter_grade(self, mock_is_course_run_in_a_program, mock_send_grade_to_credentials):
+        """
+        Verify that when letter grade is None it wouldn'y send grade data
+        """
+        mock_is_course_run_in_a_program.return_value = True
+        with mock.patch(
+                'lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read',
+                return_value=mock.Mock(percent=0, letter_grade=None)):
+            send_grade_if_interesting(self.user, self.key, 'verified', 'downloadable', None, None)
+            self.assertFalse(mock_send_grade_to_credentials.delay.called)
+
 
 @skip_unless_lms
 @mock.patch(SIGNALS_MODULE + '.get_programs')
