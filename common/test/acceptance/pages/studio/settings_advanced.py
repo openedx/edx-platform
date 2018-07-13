@@ -68,6 +68,16 @@ class AdvancedSettingsPage(CoursePage):
         self.wait_for_ajax()
         self.wait_for_element_presence(MODAL_SELECTOR, 'Validation Modal is present')
 
+    def toggle_deprecated_settings(self):
+        """
+        Show deprecated Settings
+        """
+        self.q(css=DEPRECATED_SETTINGS_BUTTON_SELECTOR).click()
+        if self.deprecated_settings_button_text == 'Show Deprecated Settings':
+            self.wait_for_element_absence(DEPRECATED_SETTINGS_SELECTOR, 'Deprecated Settings are not present')
+        else:
+            self.wait_for_element_presence(DEPRECATED_SETTINGS_SELECTOR, 'Deprecated Settings are present')
+
     def refresh_and_wait_for_load(self):
         """
         Refresh the page and wait for all resources to load.
