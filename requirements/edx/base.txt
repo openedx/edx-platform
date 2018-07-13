@@ -71,7 +71,7 @@ django-babel-underscore==0.5.2
 django-babel==0.6.2       # via django-babel-underscore
 django-braces==1.13.0     # via django-oauth-toolkit
 django-classy-tags==0.8.0  # via django-sekizai
-django-config-models==0.1.8
+django-config-models==0.2.0
 django-cors-headers==2.1.0
 django-countries==4.6.1
 django-crum==0.7.2
@@ -123,7 +123,7 @@ edx-oauth2-provider==1.2.2
 edx-opaque-keys[django]==0.4.4
 edx-organizations==0.4.10
 edx-proctoring==1.4.0
-edx-rest-api-client==1.7.1
+edx-rest-api-client==1.7.2
 edx-search==1.2.1
 edx-submissions==2.0.12
 edx-user-state-client==1.0.4
@@ -167,7 +167,7 @@ mock==1.0.1
 mongoengine==0.10.0
 mysql-python==1.2.5
 networkx==1.7
-newrelic==3.2.2.94
+newrelic==3.4.0.95
 nltk==3.3.0
 nodeenv==1.1.1
 numpy==1.6.2
