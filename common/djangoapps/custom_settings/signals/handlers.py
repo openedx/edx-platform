@@ -1,11 +1,10 @@
 from logging import getLogger
-
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
 from course_modes.models import CourseMode
 from custom_settings.models import CustomSettings
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.features.course_card.helpers import is_course_rereun
 
 log = getLogger(__name__)
 
@@ -20,7 +19,14 @@ def initialize_course_settings(sender, instance, created, **kwargs):
 
     if created:
         course_key = instance.id
-        CustomSettings.objects.get_or_create(id=course_key)
+
+        source_course_key = is_course_rereun(course_key)
+        tags = ""
+        if source_course_key:
+            _settings = CustomSettings.objects.filter(id=source_course_key).first()
+            tags = _settings.tags
+
+        CustomSettings.objects.get_or_create(id=course_key, tags=tags)
 
         CourseMode.objects.get_or_create(
             course_id=course_key,
