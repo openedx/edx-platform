@@ -46,7 +46,7 @@ django-method-override==0.1.0
 django-model-utils==3.0.0
 django-mptt>=0.8.6,<0.9
 django-mysql
-django-oauth-toolkit==0.12.0
+django-oauth-toolkit<1.2            # Provides oAuth2 capabilities for Django. 1.2+ requires Django 2 and Python 3.5
 django-pyfs
 django-ratelimit
 django-ratelimit-backend==1.1.1
@@ -104,7 +104,7 @@ MySQL-python                        # Driver for the default production relation
 newrelic                            # New Relic agent for performance monitoring
 nodeenv==1.1.1                      # Utility for managing Node.js environments; we use this for deployments and testing
 numpy==1.6.2                        # Fast numeric array computation, used in some problem types
-oauthlib==2.0.1                     # OAuth specification support for authenticating via LTI or other Open edX services
+oauthlib                            # OAuth specification support for authenticating via LTI or other Open edX services
 pdfminer                            # Used in shoppingcart for extracting/parsing pdf text
 piexif==1.0.2                       # Exif image metadata manipulation, used in the profile_images app
 Pillow                              # Image manipulation library; used for course assets, profile images, invoice PDFs, etc.
@@ -133,7 +133,7 @@ pysrt==0.4.7                        # Support for SubRip subtitle files, used in
 pytz==2016.10                       # Time zone information database
 PyYAML                              # Used to parse XModule resource templates
 redis==2.10.6                       # celery task broker
-requests-oauthlib==0.6.1            # Simplifies use of OAuth via the requests library, used for CCX and LTI
+requests-oauthlib                   # Simplifies use of OAuth via the requests library, used for CCX and LTI
 rules                               # Django extension for rules-based authorization checks
 sailthru-client==2.2.3              # For Sailthru integration
 Shapely==1.2.16                     # Geometry library, used for image click regions in capa
