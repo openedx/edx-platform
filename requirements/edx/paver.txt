@@ -6,7 +6,10 @@
 #
 argh==0.26.2              # via watchdog
 argparse==1.4.0           # via stevedore
+certifi==2018.4.16        # via requests
+chardet==3.0.4            # via requests
 edx-opaque-keys==0.4.4
+idna==2.7                 # via requests
 lazy==1.1
 libsass==0.10.0
 markupsafe==1.0
@@ -19,8 +22,9 @@ psutil==1.2.1
 pymongo==2.9.1
 python-memcached==1.48
 pyyaml==3.13              # via watchdog
-requests==2.9.1
+requests==2.19.1
 six==1.11.0               # via edx-opaque-keys, libsass, paver, stevedore
 stevedore==1.10.0
+urllib3==1.23             # via requests
 watchdog==0.8.3
 wrapt==1.10.5
