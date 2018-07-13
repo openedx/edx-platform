@@ -264,13 +264,15 @@ class UserRetirementStatus(TimeStampedModel):
         Confirm that the data passed in is properly formatted
         """
         required_keys = ('username', 'new_state', 'response')
+        optional_keys = ('force', )
+        known_keys = required_keys + optional_keys
 
         for required_key in required_keys:
             if required_key not in data:
                 raise RetirementStateError('RetirementStatus: Required key {} missing from update'.format(required_key))
 
         for key in data:
-            if key not in required_keys:
+            if key not in known_keys:
                 raise RetirementStateError('RetirementStatus: Unknown key {} in update'.format(key))
 
     @classmethod
@@ -310,7 +312,10 @@ class UserRetirementStatus(TimeStampedModel):
         or throw a RetirementStateError with a useful error message
         """
         self._validate_update_data(update)
-        self._validate_state_update(update['new_state'])
+
+        force = update.get('force', False)
+        if not force:
+            self._validate_state_update(update['new_state'])
 
         old_state = self.current_state
         self.current_state = RetirementState.objects.get(state_name=update['new_state'])

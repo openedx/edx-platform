@@ -8,6 +8,9 @@ import datetime
 import json
 import unittest
 
+import ddt
+import pytz
+import mock
 from consent.models import DataSharingConsent
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -25,9 +28,7 @@ from enterprise.models import (
 from integrated_channels.sap_success_factors.models import (
     SapSuccessFactorsLearnerDataTransmissionAudit
 )
-import mock
 from opaque_keys.edx.keys import CourseKey
-import pytz
 from rest_framework import status
 from six import iteritems, text_type
 from social_django.models import UserSocialAuth
@@ -51,7 +52,6 @@ from openedx.core.djangoapps.user_api.models import (
     UserRetirementPartnerReportingStatus,
     UserOrgTag
 )
-from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import fake_retirement
 from openedx.core.djangoapps.user_api.accounts.views import AccountRetirementPartnerReportView
 from openedx.core.lib.token_utils import JwtBuilder
 from student.models import (
@@ -881,6 +881,7 @@ class TestAccountRetirementRetrieve(RetirementTestCase):
         self.assert_status_and_user_data(values, username_to_find=original_username)
 
 
+@ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
 class TestAccountRetirementUpdate(RetirementTestCase):
     """
@@ -994,35 +995,31 @@ class TestAccountRetirementUpdate(RetirementTestCase):
         data = {'new_state': 'LOCKING_ACCOUNT', 'response': 'this should fail', 'username': 'does not exist'}
         self.update_and_assert_status(data, status.HTTP_404_NOT_FOUND)
 
-    def test_move_from_dead_end(self):
-        """
-        Confirm that trying to move from a dead end state to any other state fails
-        """
+    @ddt.data(
+        # Test moving backward from intermediate state
+        ('LOCKING_ACCOUNT', 'PENDING', False, status.HTTP_400_BAD_REQUEST),
+        ('LOCKING_ACCOUNT', 'PENDING', True, status.HTTP_204_NO_CONTENT),
+
+        # Test moving backward from dead end state
+        ('COMPLETE', 'PENDING', False, status.HTTP_400_BAD_REQUEST),
+        ('COMPLETE', 'PENDING', True, status.HTTP_204_NO_CONTENT),
+
+        # Test moving to the same state
+        ('LOCKING_ACCOUNT', 'LOCKING_ACCOUNT', False, status.HTTP_400_BAD_REQUEST),
+        ('LOCKING_ACCOUNT', 'LOCKING_ACCOUNT', True, status.HTTP_204_NO_CONTENT),
+    )
+    @ddt.unpack
+    def test_moves(self, start_state, move_to_state, force, expected_response_code):
         retirement = UserRetirementStatus.objects.get(id=self.retirement.id)
-        retirement.current_state = RetirementState.objects.filter(is_dead_end_state=True)[0]
+        retirement.current_state = RetirementState.objects.get(state_name=start_state)
         retirement.save()
 
-        data = {'new_state': 'LOCKING_ACCOUNT', 'response': 'this should fail'}
-        self.update_and_assert_status(data, status.HTTP_400_BAD_REQUEST)
+        data = {'new_state': move_to_state, 'response': 'foo'}
 
-    def test_move_backward(self):
-        """
-        Confirm that trying to move to an earlier step in the process fails
-        """
-        retirement = UserRetirementStatus.objects.get(id=self.retirement.id)
-        retirement.current_state = RetirementState.objects.get(state_name='COMPLETE')
-        retirement.save()
+        if force:
+            data['force'] = True
 
-        data = {'new_state': 'PENDING', 'response': 'this should fail'}
-        self.update_and_assert_status(data, status.HTTP_400_BAD_REQUEST)
-
-    def test_move_same(self):
-        """
-        Confirm that trying to move to the same step in the process fails
-        """
-        # Should already be in 'PENDING'
-        data = {'new_state': 'PENDING', 'response': 'this should fail'}
-        self.update_and_assert_status(data, status.HTTP_400_BAD_REQUEST)
+        self.update_and_assert_status(data, expected_response_code)
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
