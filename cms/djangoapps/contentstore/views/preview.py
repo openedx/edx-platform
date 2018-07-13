@@ -29,7 +29,7 @@ from openedx.core.lib.xblock_utils import (
     wrap_xblock_aside,
     xblock_local_resource_url
 )
-from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
+from xmodule.util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from xblock_config.models import StudioConfig
 from xblock_django.user_service import DjangoXBlockUserService
 from xmodule.contentstore.django import contentstore

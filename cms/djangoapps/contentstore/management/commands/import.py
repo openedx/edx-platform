@@ -3,10 +3,10 @@ Script for importing courseware from XML format
 """
 from django.core.management.base import BaseCommand
 from django_comment_common.utils import are_permissions_roles_seeded, seed_permissions_roles
-from lms.djangoapps.dashboard.git_import import DEFAULT_PYTHON_LIB_FILENAME
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
+from xmodule.util.sandboxing import DEFAULT_PYTHON_LIB_FILENAME
 from xmodule.modulestore.xml_importer import import_course_from_xml
 
 
