@@ -36,7 +36,7 @@ def handle_refund_order(sender, course_enrollment=None, **kwargs):
                 # the client does not work anonymously, and furthermore,
                 # there's certainly no need to inform Otto about this request.
                 return
-            refund_seat(course_enrollment)
+            refund_seat(course_enrollment, change_mode=True)
         except Exception:  # pylint: disable=broad-except
             # don't assume the signal was fired with `send_robust`.
             # avoid blowing up other signal handlers by gracefully
