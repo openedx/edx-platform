@@ -1475,6 +1475,7 @@ ENTERPRISE_SERVICE_WORKER_USERNAME = 'enterprise_worker'
 ENTERPRISE_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 # The default value of this needs to be a 16 character string
 ENTERPRISE_REPORTING_SECRET = '0000000000000000'
+ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER = {}
 
 ############## Settings for the Discovery App ######################
 
