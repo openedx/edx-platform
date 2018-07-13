@@ -139,15 +139,23 @@ class CourseValidationView(DeveloperErrorViewMixin, GenericAPIView):
                 if a.due and a.graded
             ]
 
-            assignments_with_dates_before_start = [
-                {'id': unicode(a.location), 'display_name': a.display_name}
-                for a in assignments_with_dates if a.due < course.start
-            ]
+            assignments_with_dates_before_start = (
+                [
+                    {'id': unicode(a.location), 'display_name': a.display_name}
+                    for a in assignments_with_dates if a.due < course.start
+                ]
+                if self._has_start_date(course)
+                else []
+            )
 
-            assignments_with_dates_after_end = [
-                {'id': unicode(a.location), 'display_name': a.display_name}
-                for a in assignments_with_dates if a.due > course.end
-            ]
+            assignments_with_dates_after_end = (
+                [
+                    {'id': unicode(a.location), 'display_name': a.display_name}
+                    for a in assignments_with_dates if a.due > course.end
+                ]
+                if course.end
+                else []
+            )
 
         return dict(
             total_number=len(assignments),
