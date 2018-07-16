@@ -354,7 +354,12 @@ def get_email_params(course, auto_enroll, secure=True, course_key=None, display_
     """
 
     protocol = 'https' if secure else 'http'
-    course_key = get_related_card_id(course.id)
+    course_key = course_key or course.id.to_deprecated_string()
+    if course.invitation_only:
+        course_about_key = get_related_card_id(course.id)
+    else:
+        course_about_key = course_key
+
     display_name = display_name or course.display_name_with_default_escaped
 
     stripped_site_name = configuration_helpers.get_value(
@@ -380,7 +385,7 @@ def get_email_params(course, auto_enroll, secure=True, course_key=None, display_
         course_about_url = u'{proto}://{site}{path}'.format(
             proto=protocol,
             site=stripped_site_name,
-            path=reverse('about_course', kwargs={'course_id': course_key})
+            path=reverse('about_course', kwargs={'course_id': course_about_key})
         )
 
     is_shib_course = uses_shib(course)
