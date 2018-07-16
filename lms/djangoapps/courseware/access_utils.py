@@ -91,6 +91,6 @@ def check_course_open_for_learner(user, course):
     Returns:
         AccessResponse: Either ACCESS_GRANTED or StartDateError.
     """
-    if COURSE_PRE_START_ACCESS_FLAG.is_enabled(course.id):
+    if COURSE_PRE_START_ACCESS_FLAG.is_enabled():
         return ACCESS_GRANTED
     return check_start_date(user, course.days_early_for_beta, course.start, course.id)
