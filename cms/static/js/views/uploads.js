@@ -76,7 +76,6 @@ define(['jquery', 'underscore', 'gettext', 'js/views/modals/base_modal', 'jquery
             },
 
             upload: function(e) {
-
                 var uploadAjaxData = _.extend({}, this.uploadData);
                 // don't show the generic error notification; we're in a modal,
                 // and we're better off modifying it instead.

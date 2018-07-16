@@ -52,7 +52,7 @@ describe('Program Progress View', () => {
     model: programModel,
     courseModel: courseData,
     certificateCollection,
-    programRecordUrl: '/foo/bar'
+    programRecordUrl: '/foo/bar',
   });
 
   beforeEach(() => {
