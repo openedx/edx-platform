@@ -5,21 +5,17 @@ django-oauth-toolkit as appropriate.
 
 from __future__ import unicode_literals
 
-import hashlib
 import json
 
-from Cryptodome.PublicKey import RSA
 from django.conf import settings
-from django.urls import reverse
-from django.http import JsonResponse
 from django.views.generic import View
 from edx_oauth2_provider import views as dop_views  # django-oauth2-provider views
-from jwkest.jwk import RSAKey
 from oauth2_provider import models as dot_models  # django-oauth-toolkit
 from oauth2_provider import views as dot_views
 from ratelimit import ALL
 from ratelimit.mixins import RatelimitMixin
 
+from openedx.core.djangoapps import monitoring_utils
 from openedx.core.djangoapps.auth_exchange import views as auth_exchange_views
 from openedx.core.lib.token_utils import JwtBuilder
 
@@ -43,9 +39,14 @@ class _DispatchingView(View):
         """
         Returns the appropriate adapter based on the OAuth client linked to the request.
         """
-        if dot_models.Application.objects.filter(client_id=self._get_client_id(request)).exists():
+        client_id = self._get_client_id(request)
+        monitoring_utils.set_custom_metric('oauth_client_id', client_id)
+
+        if dot_models.Application.objects.filter(client_id=client_id).exists():
+            monitoring_utils.set_custom_metric('oauth_adapter', 'dot')
             return self.dot_adapter
         else:
+            monitoring_utils.set_custom_metric('oauth_adapter', 'dop')
             return self.dop_adapter
 
     def dispatch(self, request, *args, **kwargs):
@@ -101,36 +102,46 @@ class AccessTokenView(RatelimitMixin, _DispatchingView):
     def dispatch(self, request, *args, **kwargs):
         response = super(AccessTokenView, self).dispatch(request, *args, **kwargs)
 
-        if response.status_code == 200 and request.POST.get('token_type', '').lower() == 'jwt':
-            client_id = self._get_client_id(request)
-            adapter = self.get_adapter(request)
-            expires_in, scopes, user = self._decompose_access_token_response(adapter, response)
-            issuer, secret, audience, filters, is_client_restricted = self._get_client_specific_claims(
-                client_id,
-                adapter
-            )
+        if response.status_code == 200:
+            monitoring_utils.set_custom_metric('oauth_grant_type', request.POST.get('grant_type', ''))
 
-            content = {
-                'access_token': JwtBuilder(
-                    user,
-                    secret=secret,
-                    issuer=issuer,
-                ).build_token(
-                    scopes,
-                    expires_in,
-                    aud=audience,
-                    additional_claims={
-                        'filters': filters,
-                        'is_restricted': is_client_restricted,
-                    },
-                ),
-                'expires_in': expires_in,
-                'token_type': 'JWT',
-                'scope': ' '.join(scopes),
-            }
-            response.content = json.dumps(content)
+            if request.POST.get('token_type', '').lower() == 'jwt':
+                response.content = self._build_jwt_response_from_access_token_response(request, response)
+
+                monitoring_utils.set_custom_metric('oauth_token_type', 'jwt')
+            else:
+                monitoring_utils.set_custom_metric('oauth_token_type', 'oauth')
 
         return response
+
+    def _build_jwt_response_from_access_token_response(self, request, response):
+        """ Builds the content of the response, including the JWT token. """
+        client_id = self._get_client_id(request)
+        adapter = self.get_adapter(request)
+        expires_in, scopes, user = self._decompose_access_token_response(adapter, response)
+        issuer, secret, audience, filters, is_client_restricted = self._get_client_specific_claims(
+            client_id,
+            adapter
+        )
+        content = {
+            'access_token': JwtBuilder(
+                user,
+                secret=secret,
+                issuer=issuer,
+            ).build_token(
+                scopes,
+                expires_in,
+                aud=audience,
+                additional_claims={
+                    'filters': filters,
+                    'is_restricted': is_client_restricted,
+                },
+            ),
+            'expires_in': expires_in,
+            'token_type': 'JWT',
+            'scope': ' '.join(scopes),
+        }
+        return json.dumps(content)
 
     def _decompose_access_token_response(self, adapter, response):
         """ Decomposes the access token in the request to an expiration date, scopes, and User. """
