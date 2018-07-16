@@ -102,15 +102,12 @@ class AccessTokenView(RatelimitMixin, _DispatchingView):
     def dispatch(self, request, *args, **kwargs):
         response = super(AccessTokenView, self).dispatch(request, *args, **kwargs)
 
-        if response.status_code == 200:
-            monitoring_utils.set_custom_metric('oauth_grant_type', request.POST.get('grant_type', ''))
+        token_type = request.POST.get('token_type', 'no_token_type_supplied').lower()
+        monitoring_utils.set_custom_metric('oauth_token_type', token_type)
+        monitoring_utils.set_custom_metric('oauth_grant_type', request.POST.get('grant_type', ''))
 
-            if request.POST.get('token_type', '').lower() == 'jwt':
-                response.content = self._build_jwt_response_from_access_token_response(request, response)
-
-                monitoring_utils.set_custom_metric('oauth_token_type', 'jwt')
-            else:
-                monitoring_utils.set_custom_metric('oauth_token_type', 'oauth')
+        if response.status_code == 200 and token_type == 'jwt':
+            response.content = self._build_jwt_response_from_access_token_response(request, response)
 
         return response
 
