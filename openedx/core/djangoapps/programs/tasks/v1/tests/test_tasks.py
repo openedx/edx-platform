@@ -301,7 +301,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         mock_get_completed_programs.return_value = [1, 2]
         mock_get_certified_programs.side_effect = [[], [2]]
         mock_award_program_certificate.side_effect = self._make_side_effect(
-            [exceptions.HttpNotFoundError(), None]
+            [exceptions.HttpClientError(), None]
         )
 
         tasks.award_program_certificates.delay(self.student.username).get()
