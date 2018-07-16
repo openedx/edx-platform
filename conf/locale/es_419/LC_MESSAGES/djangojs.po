@@ -65,7 +65,7 @@
 # Fernando Abramowitz <ferabra@gmail.com>, 2014
 # Francisco Palm <francisco.palm@gmail.com>, 2017
 # gildardo lasso bañol <gildardolasso@hotmail.com>, 2016
-# Jonathan Amaya <jonathan.amaya88@yahoo.com>, 2014
+# 1673e3cf8bd85685e54576636ae7f409, 2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013-2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2017
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2014
@@ -94,7 +94,7 @@
 # Diego Rojas <diego.rojas@edunext.co>, 2017
 # Eduardo Zambrano <ezambrano@edx.org>, 2018
 # Giancarlo  De  Agostini <giancarlo.deagostini@iaen.edu.ec>, 2015
-# Jonathan Amaya <jonathan.amaya88@yahoo.com>, 2014
+# 1673e3cf8bd85685e54576636ae7f409, 2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2018
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2014
 # Juan Fernando Villa <elite.linux@gmail.com>, 2015
