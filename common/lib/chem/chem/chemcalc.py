@@ -2,9 +2,11 @@ from __future__ import division
 
 from fractions import Fraction
 
+import markupsafe
 import nltk
 from nltk.tree import Tree
 from pyparsing import Literal, OneOrMore, ParseException, StringEnd
+
 
 ARROWS = ('<->', '->')
 
@@ -26,6 +28,13 @@ phases = ["(s)", "(l)", "(g)", "(aq)"]
 tokens = reduce(lambda a, b: a ^ b, map(Literal, elements + digits + symbols + phases))
 tokenizer = OneOrMore(tokens) + StringEnd()
 
+# HTML, Text are temporarily copied from openedx.core.djangolib.markup
+# These libraries need to be moved out of edx-platform to be used by
+# other applications.
+# See LEARNER-5853 for more details.
+Text = markupsafe.escape                        # pylint: disable=invalid-name
+def HTML(html):                                 # pylint: disable=invalid-name
+    return markupsafe.Markup(html)
 
 def _orjoin(l):
     return "'" + "' | '".join(l) + "'"
@@ -162,20 +171,20 @@ def _render_to_html(tree):
             return tree[0][0]
         # If a fraction, return the fraction
         if len(tree) == 3:
-            return " <sup>{num}</sup>&frasl;<sub>{den}</sub> ".format(num=tree[0][0], den=tree[2][0])
+            return HTML(" <sup>{num}</sup>&frasl;<sub>{den}</sub> ").format(num=tree[0][0], den=tree[2][0])
         return "Error"
 
     def subscript(tree, children):
-        return "<sub>{sub}</sub>".format(sub=children)
+        return HTML("<sub>{sub}</sub>").format(sub=children)
 
     def superscript(tree, children):
-        return "<sup>{sup}</sup>".format(sup=children)
+        return HTML("<sup>{sup}</sup>").format(sup=children)
 
     def round_brackets(tree, children):
-        return "({insider})".format(insider=children)
+        return HTML("({insider})").format(insider=children)
 
     def square_brackets(tree, children):
-        return "[{insider}]".format(insider=children)
+        return HTML("[{insider}]").format(insider=children)
 
     dispatch = {'count': molecule_count,
                 'number_suffix': subscript,
@@ -186,7 +195,7 @@ def _render_to_html(tree):
     if isinstance(tree, str):
         return tree
     else:
-        children = "".join(map(_render_to_html, tree))
+        children = HTML("").join(map(_render_to_html, tree))
         if tree.node in dispatch:
             return dispatch[tree.node](tree, children)
         else:
@@ -201,18 +210,18 @@ def render_to_html(eq):
     '''
     def err(s):
         "Render as an error span"
-        return '<span class="inline-error inline">{0}</span>'.format(s)
+        return HTML('<span class="inline-error inline">{0}</span>').format(s)
 
     def render_arrow(arrow):
         """Turn text arrows into pretty ones"""
         if arrow == '->':
-            return u'\u2192'
+            return HTML(u'\u2192')
         if arrow == '<->':
-            return u'\u2194'
+            return HTML(u'\u2194')
 
         # this won't be reached unless we add more arrow types, but keep it to avoid explosions when
-        # that happens.
-        return arrow
+        # that happens. HTML-escape this unknown arrow just in case.
+        return Text(arrow)
 
     def render_expression(ex):
         """
@@ -224,7 +233,7 @@ def render_to_html(eq):
             return err(ex)
 
     def spanify(s):
-        return u'<span class="math">{0}</span>'.format(s)
+        return HTML(u'<span class="math">{0}</span>').format(s)
 
     left, arrow, right = split_on_arrow(eq)
     if arrow == '':
