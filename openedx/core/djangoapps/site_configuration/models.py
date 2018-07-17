@@ -103,7 +103,7 @@ class SiteConfiguration(models.Model):
         Returns:
             Configuration value for the given key.
         """
-        for configuration in cls.objects.filter(values__contains=org, enabled=True).all():
+        for configuration in cls.objects.filter(values__contains=org, enabled=True).defer('page_elements', 'sass_variables').all():
             org_filter = configuration.get_value('course_org_filter', None)
             if org_filter == org:
                 return configuration.get_value(name, default)
@@ -120,7 +120,7 @@ class SiteConfiguration(models.Model):
         """
         org_filter_set = set()
 
-        for configuration in cls.objects.filter(values__contains='course_org_filter', enabled=True).all():
+        for configuration in cls.objects.filter(values__contains='course_org_filter', enabled=True).defer('page_elements', 'sass_variables').all():
             org_filter = configuration.get_value('course_org_filter', None)
             if org_filter:
                 org_filter_set.add(org_filter)
