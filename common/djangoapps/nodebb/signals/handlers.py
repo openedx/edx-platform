@@ -8,7 +8,7 @@ from django.dispatch import receiver
 from common.lib.nodebb_client.client import NodeBBClient
 from lms.djangoapps.onboarding.helpers import COUNTRIES
 from certificates.models import GeneratedCertificate
-from lms.djangoapps.onboarding.models import UserExtendedProfile, Organization, FocusArea
+from lms.djangoapps.onboarding.models import (UserExtendedProfile, Organization, FocusArea, EmailPreference, )
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from mailchimp_pipeline.signals.handlers import send_user_info_to_mailchimp, send_user_profile_info_to_mailchimp, \
     send_user_enrollments_to_mailchimp, send_user_course_completions_to_mailchimp
@@ -34,12 +34,15 @@ def log_action_response(user, status_code, response_body):
 def sync_enrolments_to_mailchimp(sender, instance, created, **kwargs):
     send_user_enrollments_to_mailchimp(sender, instance, created, kwargs)
 
+
 @receiver(COURSE_CERT_AWARDED, sender=GeneratedCertificate)
 def handle_course_cert_awarded(sender, user, course_key, **kwargs):  # pylint: disable=unused-argument
     send_user_course_completions_to_mailchimp(sender, user, course_key, kwargs)
 
+
 @receiver(post_save, sender=UserProfile)
 @receiver(post_save, sender=UserExtendedProfile)
+@receiver(post_save, sender=EmailPreference)
 @receiver(post_save, sender=Organization)
 def sync_user_info_with_nodebb(sender, instance, created, **kwargs):  # pylint: disable=unused-argument, invalid-name
     """
@@ -51,7 +54,7 @@ def sync_user_info_with_nodebb(sender, instance, created, **kwargs):  # pylint: 
 
     send_user_profile_info_to_mailchimp(sender, instance, kwargs)
 
-    if 'login' in request.path or 'logout' in request.path:
+    if 'login' in request.path or 'logout' in request.path or sender == EmailPreference:
         return
 
     if sender == UserProfile:
@@ -75,6 +78,8 @@ def sync_user_info_with_nodebb(sender, instance, created, **kwargs):  # pylint: 
         data_to_sync = {
             "focus_area": FocusArea.objects.get(code=instance.focus_area).label if instance.focus_area else ""
         }
+    else:
+        pass
 
     status_code, response_body = NodeBBClient().users.update_profile(user.username, kwargs=data_to_sync)
     log_action_response(user, status_code, response_body)

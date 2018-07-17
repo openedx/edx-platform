@@ -2,7 +2,7 @@ from enrollment.api import get_enrollments
 from mailchimp_pipeline.client import ChimpClient, MailChimpException
 from mailchimp_pipeline.helpers import get_org_data_for_mandrill, is_active_enrollment
 from mailchimp_pipeline.tasks import update_org_details_at_mailchimp
-from lms.djangoapps.onboarding.models import (UserExtendedProfile, Organization,)
+from lms.djangoapps.onboarding.models import (UserExtendedProfile, Organization, EmailPreference,)
 from lms.djangoapps.certificates import api as certificate_api
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import (UserProfile, CourseEnrollment, )
@@ -34,6 +34,14 @@ def send_user_profile_info_to_mailchimp(sender, instance, kwargs):  # pylint: di
                 "WORKAREA": work_area
             }
         }
+    elif sender == EmailPreference:
+        email_preferences = instance
+        user_json = {
+            "merge_fields": {
+                "OPT_IN": email_preferences.opt_in
+            }
+        }
+
     elif sender == Organization:
         org_label, org_type, work_area = get_org_data_for_mandrill(instance)
         update_org_details_at_mailchimp.delay(org_label, org_type, work_area, settings.MAILCHIMP_LEARNERS_LIST_ID)
