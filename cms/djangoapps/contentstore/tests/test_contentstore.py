@@ -695,8 +695,7 @@ class MiscCourseTests(ContentStoreTestCase):
         # page response HTML
         self.check_components_on_page(
             ADVANCED_COMPONENT_TYPES,
-            ['Word cloud', 'Annotation', 'Text Annotation', 'Video Annotation', 'Image Annotation',
-             'split_test'],
+            ['Word cloud', 'Annotation', 'split_test'],
         )
 
     @ddt.data('/Fake/asset/displayname', '\\Fake\\asset\\displayname')

@@ -1292,12 +1292,3 @@ class EdxNotesPluginTest(ModuleStoreTestCase):
         FEATURES['ENABLE_EDXNOTES'] = enabled
         with override_settings(FEATURES=FEATURES):
             assert EdxNotesTab.is_enabled(self.course, self.user) == enabled
-
-    @ddt.data(True, False)
-    def test_edxnotes_tab_with_harvard_notes(self, harvard_notes_enabled):
-        """
-        Verify EdxNotesTab visibility when harvard notes feature is enabled/disabled.
-        """
-        with patch("edxnotes.plugins.is_harvard_notes_enabled") as mock_harvard_notes_enabled:
-            mock_harvard_notes_enabled.return_value = harvard_notes_enabled
-            assert EdxNotesTab.is_enabled(self.course, self.user) == (not harvard_notes_enabled)
