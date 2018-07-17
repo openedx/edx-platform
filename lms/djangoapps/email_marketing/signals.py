@@ -41,7 +41,7 @@ SAILTHRU_AUDIT_PURCHASE_ENABLED = 'audit_purchase_enabled'
 
 
 @receiver(SAILTHRU_AUDIT_PURCHASE)
-def update_sailthru(sender, event, user, mode, course_id, **kwargs):
+def update_sailthru(sender, user, mode, course_id, **kwargs):  # pylint: disable=unused-argument
     """
     Receives signal and calls a celery task to update the
     enrollment track
@@ -52,9 +52,8 @@ def update_sailthru(sender, event, user, mode, course_id, **kwargs):
         None
     """
     if WAFFLE_SWITCHES.is_enabled(SAILTHRU_AUDIT_PURCHASE_ENABLED) and mode in CourseMode.AUDIT_MODES:
-        course_key = course_id
         email = str(user.email)
-        update_course_enrollment.delay(email, course_key, mode)
+        update_course_enrollment.delay(email, course_id, mode)
 
 
 @receiver(CREATE_LOGON_COOKIE)
