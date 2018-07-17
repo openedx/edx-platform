@@ -83,9 +83,9 @@ function LoggedInUser({ userInformation, setErrorState, zendeskApiHost, submitFo
 
     {/* TODO file uploading will be done after initial release */}
     {/* <FileUpload */}
-      {/* setErrorState={setErrorState} */}
-      {/* zendeskApiHost={zendeskApiHost} */}
-      {/* accessToken={accessToken} */}
+    {/* setErrorState={setErrorState} */}
+    {/* zendeskApiHost={zendeskApiHost} */}
+    {/* accessToken={accessToken} */}
     {/* /> */}
 
     <div className="row">

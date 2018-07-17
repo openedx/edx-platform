@@ -1,0 +1,706 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`BlockBrowser component render with basic parameters 1`] = `
+<div
+  className="block-browser"
+>
+  <div
+    className="header"
+  >
+    <button
+      className="btn"
+      disabled={true}
+      onBlur={[Function]}
+      onClick={[Function]}
+      onKeyDown={[Function]}
+      type="button"
+    >
+      <div>
+        <span
+          aria-hidden={true}
+          className="fa fa-arrow-up"
+          id="Icon2"
+        />
+        <span
+          className="sr-only"
+        >
+          Navigate up
+        </span>
+      </div>
+    </button>
+    <span
+      className="title"
+    >
+      Browsing
+       
+      Course
+       "
+      <a
+        href="#_"
+        onClick={[Function]}
+        title="Select Course"
+      >
+        edX Demonstration Course
+      </a>
+      ":
+    </span>
+  </div>
+  <ul
+    className="block-list"
+  >
+    <li
+      className="block-type-chapter"
+    >
+      <button
+        className="block-name btn"
+        onBlur={[Function]}
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        type="button"
+      >
+        Introduction
+      </button>
+      <button
+        className="btn"
+        onBlur={[Function]}
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        type="button"
+      >
+        <div>
+          <span
+            aria-hidden={true}
+            className="fa fa-arrow-right"
+            id="Icon2"
+          />
+          <span
+            className="sr-only"
+          >
+            View child items
+          </span>
+        </div>
+      </button>
+    </li>
+    <li
+      className="block-type-chapter"
+    >
+      <button
+        className="block-name btn"
+        onBlur={[Function]}
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        type="button"
+      >
+        Example Week 1: Getting Started
+      </button>
+      <button
+        className="btn"
+        onBlur={[Function]}
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        type="button"
+      >
+        <div>
+          <span
+            aria-hidden={true}
+            className="fa fa-arrow-right"
+            id="Icon2"
+          />
+          <span
+            className="sr-only"
+          >
+            View child items
+          </span>
+        </div>
+      </button>
+    </li>
+    <li
+      className="block-type-chapter"
+    >
+      <button
+        className="block-name btn"
+        onBlur={[Function]}
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        type="button"
+      >
+        Example Week 2: Get Interactive
+      </button>
+      <button
+        className="btn"
+        onBlur={[Function]}
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        type="button"
+      >
+        <div>
+          <span
+            aria-hidden={true}
+            className="fa fa-arrow-right"
+            id="Icon2"
+          />
+          <span
+            className="sr-only"
+          >
+            View child items
+          </span>
+        </div>
+      </button>
+    </li>
+    <li
+      className="block-type-chapter"
+    >
+      <button
+        className="block-name btn"
+        onBlur={[Function]}
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        type="button"
+      >
+        Example Week 3: Be Social
+      </button>
+      <button
+        className="btn"
+        onBlur={[Function]}
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        type="button"
+      >
+        <div>
+          <span
+            aria-hidden={true}
+            className="fa fa-arrow-right"
+            id="Icon2"
+          />
+          <span
+            className="sr-only"
+          >
+            View child items
+          </span>
+        </div>
+      </button>
+    </li>
+    <li
+      className="block-type-chapter"
+    >
+      <button
+        className="block-name btn"
+        onBlur={[Function]}
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        type="button"
+      >
+        About Exams and Certificates
+      </button>
+      <button
+        className="btn"
+        onBlur={[Function]}
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        type="button"
+      >
+        <div>
+          <span
+            aria-hidden={true}
+            className="fa fa-arrow-right"
+            id="Icon2"
+          />
+          <span
+            className="sr-only"
+          >
+            View child items
+          </span>
+        </div>
+      </button>
+    </li>
+    <li
+      className="block-type-chapter"
+    >
+      <button
+        className="block-name btn"
+        onBlur={[Function]}
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        type="button"
+      >
+        holding section
+      </button>
+      <button
+        className="btn"
+        onBlur={[Function]}
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        type="button"
+      >
+        <div>
+          <span
+            aria-hidden={true}
+            className="fa fa-arrow-right"
+            id="Icon2"
+          />
+          <span
+            className="sr-only"
+          >
+            View child items
+          </span>
+        </div>
+      </button>
+    </li>
+  </ul>
+</div>
+`;
+
+exports[`BlockBrowser component render with custom classname 1`] = `
+<div
+  className="block-browser some-class"
+>
+  <div
+    className="header"
+  >
+    <button
+      className="btn"
+      disabled={true}
+      onBlur={[Function]}
+      onClick={[Function]}
+      onKeyDown={[Function]}
+      type="button"
+    >
+      <div>
+        <span
+          aria-hidden={true}
+          className="fa fa-arrow-up"
+          id="Icon2"
+        />
+        <span
+          className="sr-only"
+        >
+          Navigate up
+        </span>
+      </div>
+    </button>
+    <span
+      className="title"
+    >
+      Browsing
+       
+      Course
+       "
+      <a
+        href="#_"
+        onClick={[Function]}
+        title="Select Course"
+      >
+        edX Demonstration Course
+      </a>
+      ":
+    </span>
+  </div>
+  <ul
+    className="block-list"
+  >
+    <li
+      className="block-type-chapter"
+    >
+      <button
+        className="block-name btn"
+        onBlur={[Function]}
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        type="button"
+      >
+        Introduction
+      </button>
+      <button
+        className="btn"
+        onBlur={[Function]}
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        type="button"
+      >
+        <div>
+          <span
+            aria-hidden={true}
+            className="fa fa-arrow-right"
+            id="Icon2"
+          />
+          <span
+            className="sr-only"
+          >
+            View child items
+          </span>
+        </div>
+      </button>
+    </li>
+    <li
+      className="block-type-chapter"
+    >
+      <button
+        className="block-name btn"
+        onBlur={[Function]}
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        type="button"
+      >
+        Example Week 1: Getting Started
+      </button>
+      <button
+        className="btn"
+        onBlur={[Function]}
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        type="button"
+      >
+        <div>
+          <span
+            aria-hidden={true}
+            className="fa fa-arrow-right"
+            id="Icon2"
+          />
+          <span
+            className="sr-only"
+          >
+            View child items
+          </span>
+        </div>
+      </button>
+    </li>
+    <li
+      className="block-type-chapter"
+    >
+      <button
+        className="block-name btn"
+        onBlur={[Function]}
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        type="button"
+      >
+        Example Week 2: Get Interactive
+      </button>
+      <button
+        className="btn"
+        onBlur={[Function]}
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        type="button"
+      >
+        <div>
+          <span
+            aria-hidden={true}
+            className="fa fa-arrow-right"
+            id="Icon2"
+          />
+          <span
+            className="sr-only"
+          >
+            View child items
+          </span>
+        </div>
+      </button>
+    </li>
+    <li
+      className="block-type-chapter"
+    >
+      <button
+        className="block-name btn"
+        onBlur={[Function]}
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        type="button"
+      >
+        Example Week 3: Be Social
+      </button>
+      <button
+        className="btn"
+        onBlur={[Function]}
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        type="button"
+      >
+        <div>
+          <span
+            aria-hidden={true}
+            className="fa fa-arrow-right"
+            id="Icon2"
+          />
+          <span
+            className="sr-only"
+          >
+            View child items
+          </span>
+        </div>
+      </button>
+    </li>
+    <li
+      className="block-type-chapter"
+    >
+      <button
+        className="block-name btn"
+        onBlur={[Function]}
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        type="button"
+      >
+        About Exams and Certificates
+      </button>
+      <button
+        className="btn"
+        onBlur={[Function]}
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        type="button"
+      >
+        <div>
+          <span
+            aria-hidden={true}
+            className="fa fa-arrow-right"
+            id="Icon2"
+          />
+          <span
+            className="sr-only"
+          >
+            View child items
+          </span>
+        </div>
+      </button>
+    </li>
+    <li
+      className="block-type-chapter"
+    >
+      <button
+        className="block-name btn"
+        onBlur={[Function]}
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        type="button"
+      >
+        holding section
+      </button>
+      <button
+        className="btn"
+        onBlur={[Function]}
+        onClick={[Function]}
+        onKeyDown={[Function]}
+        type="button"
+      >
+        <div>
+          <span
+            aria-hidden={true}
+            className="fa fa-arrow-right"
+            id="Icon2"
+          />
+          <span
+            className="sr-only"
+          >
+            View child items
+          </span>
+        </div>
+      </button>
+    </li>
+  </ul>
+</div>
+`;
+
+exports[`BlockList component render with basic parameters 1`] = `
+<ul
+  className="block-list"
+>
+  <li
+    className="block-type-chapter"
+  >
+    <button
+      className="block-name btn"
+      onBlur={[Function]}
+      onClick={[Function]}
+      onKeyDown={[Function]}
+      type="button"
+    >
+      Introduction
+    </button>
+    <button
+      className="btn"
+      onBlur={[Function]}
+      onClick={[Function]}
+      onKeyDown={[Function]}
+      type="button"
+    >
+      <div>
+        <span
+          aria-hidden={true}
+          className="fa fa-arrow-right"
+          id="Icon2"
+        />
+        <span
+          className="sr-only"
+        >
+          View child items
+        </span>
+      </div>
+    </button>
+  </li>
+  <li
+    className="block-type-chapter"
+  >
+    <button
+      className="block-name btn"
+      onBlur={[Function]}
+      onClick={[Function]}
+      onKeyDown={[Function]}
+      type="button"
+    >
+      Example Week 1: Getting Started
+    </button>
+    <button
+      className="btn"
+      onBlur={[Function]}
+      onClick={[Function]}
+      onKeyDown={[Function]}
+      type="button"
+    >
+      <div>
+        <span
+          aria-hidden={true}
+          className="fa fa-arrow-right"
+          id="Icon2"
+        />
+        <span
+          className="sr-only"
+        >
+          View child items
+        </span>
+      </div>
+    </button>
+  </li>
+  <li
+    className="block-type-chapter"
+  >
+    <button
+      className="block-name btn"
+      onBlur={[Function]}
+      onClick={[Function]}
+      onKeyDown={[Function]}
+      type="button"
+    >
+      Example Week 2: Get Interactive
+    </button>
+    <button
+      className="btn"
+      onBlur={[Function]}
+      onClick={[Function]}
+      onKeyDown={[Function]}
+      type="button"
+    >
+      <div>
+        <span
+          aria-hidden={true}
+          className="fa fa-arrow-right"
+          id="Icon2"
+        />
+        <span
+          className="sr-only"
+        >
+          View child items
+        </span>
+      </div>
+    </button>
+  </li>
+  <li
+    className="block-type-chapter"
+  >
+    <button
+      className="block-name btn"
+      onBlur={[Function]}
+      onClick={[Function]}
+      onKeyDown={[Function]}
+      type="button"
+    >
+      Example Week 3: Be Social
+    </button>
+    <button
+      className="btn"
+      onBlur={[Function]}
+      onClick={[Function]}
+      onKeyDown={[Function]}
+      type="button"
+    >
+      <div>
+        <span
+          aria-hidden={true}
+          className="fa fa-arrow-right"
+          id="Icon2"
+        />
+        <span
+          className="sr-only"
+        >
+          View child items
+        </span>
+      </div>
+    </button>
+  </li>
+  <li
+    className="block-type-chapter"
+  >
+    <button
+      className="block-name btn"
+      onBlur={[Function]}
+      onClick={[Function]}
+      onKeyDown={[Function]}
+      type="button"
+    >
+      About Exams and Certificates
+    </button>
+    <button
+      className="btn"
+      onBlur={[Function]}
+      onClick={[Function]}
+      onKeyDown={[Function]}
+      type="button"
+    >
+      <div>
+        <span
+          aria-hidden={true}
+          className="fa fa-arrow-right"
+          id="Icon2"
+        />
+        <span
+          className="sr-only"
+        >
+          View child items
+        </span>
+      </div>
+    </button>
+  </li>
+  <li
+    className="block-type-chapter"
+  >
+    <button
+      className="block-name btn"
+      onBlur={[Function]}
+      onClick={[Function]}
+      onKeyDown={[Function]}
+      type="button"
+    >
+      holding section
+    </button>
+    <button
+      className="btn"
+      onBlur={[Function]}
+      onClick={[Function]}
+      onKeyDown={[Function]}
+      type="button"
+    >
+      <div>
+        <span
+          aria-hidden={true}
+          className="fa fa-arrow-right"
+          id="Icon2"
+        />
+        <span
+          className="sr-only"
+        >
+          View child items
+        </span>
+      </div>
+    </button>
+  </li>
+</ul>
+`;

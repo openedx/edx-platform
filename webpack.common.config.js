@@ -52,6 +52,7 @@ module.exports = Merge.smart({
         PasswordResetConfirmation: './lms/static/js/student_account/components/PasswordResetConfirmation.jsx',
         StudentAccountDeletion: './lms/static/js/student_account/components/StudentAccountDeletion.jsx',
         StudentAccountDeletionInitializer: './lms/static/js/student_account/StudentAccountDeletionInitializer.js',
+        ProblemBrowser: './lms/djangoapps/instructor/static/instructor/ProblemBrowser/index.jsx',
 
         // Learner Dashboard
         EntitlementFactory: './lms/static/js/learner_dashboard/course_entitlement_factory.js',
@@ -341,6 +342,7 @@ module.exports = Merge.smart({
             'common/static/coffee/src',
             'common/static/common/js',
             'common/static/common/js/vendor/',
+            'common/static/common/js/components',
             'common/static/js/src',
             'common/static/js/vendor/',
             'common/static/js/vendor/jQuery-File-Upload/js/',
