@@ -716,7 +716,7 @@ class SailthruTests(TestCase):
     @patch('sailthru.sailthru_client.SailthruClient.purchase')
     def test_switch_is_disabled(self, mock_sailthru_purchase):
         """Make sure sailthru purchase is not called when waffle switch is disabled"""
-        update_sailthru(None, None, self.user, 'verified', self.course_id)
+        update_sailthru(None, self.user, 'verified', self.course_id)
         self.assertFalse(mock_sailthru_purchase.called)
 
     @patch('openedx.core.djangoapps.waffle_utils.WaffleSwitchNamespace.is_enabled')
@@ -726,5 +726,5 @@ class SailthruTests(TestCase):
             i: waffle switch is True and mode is verified
         """
         switch.return_value = True
-        update_sailthru(None, None, self.user, 'verified', self.course_id)
+        update_sailthru(None, self.user, 'verified', self.course_id)
         self.assertFalse(mock_sailthru_purchase.called)

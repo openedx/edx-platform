@@ -143,7 +143,7 @@ class BasketsView(APIView):
             self._enroll(course_key, user, default_enrollment_mode.slug)
             mode = CourseMode.AUDIT if audit_mode else CourseMode.HONOR
             SAILTHRU_AUDIT_PURCHASE.send(
-                sender=None, event='enroll', user=user, mode=mode, course_id=course_key
+                sender=None, user=user, mode=mode, course_id=course_id
             )
             self._handle_marketing_opt_in(request, course_key, user)
             return DetailResponse(msg)
