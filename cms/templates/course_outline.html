@@ -180,7 +180,7 @@ from openedx.core.djangolib.markup import HTML, Text
                     % endif
                 </div>
                 <div class="status-highlights-enabled"></div>
-                % if should_show_checklists_page(request.user):
+                % if should_show_checklists_page():
                 <div class="status-checklist">
                     <%static:studiofrontend entry="courseOutlineHealthCheck">
                         {

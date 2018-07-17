@@ -127,7 +127,7 @@
                     <a href="${reverse('export_git', kwargs=dict(course_key_string=unicode(course_key)))}">${_("Export to Git")}</a>
                   </li>
                   % endif
-                  % if should_show_checklists_page(request.user):
+                  % if should_show_checklists_page():
                   <li class="nav-item nav-course-tools-checklists">
                     <a href="${checklists_url}">${_("Checklists")}</a>
                   </li>
