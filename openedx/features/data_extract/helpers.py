@@ -179,6 +179,8 @@ def get_user_progress_data(course_key, profile, anonymous_user_id):
 
         'course_submission_data': {
             'student_items': [{
+                'id': item.id,
+                'student_id': item.student_id,
                 'course_id': item.course_id,
                 'item_id': item.item_id,
                 'item_type': item.item_type,
@@ -188,6 +190,7 @@ def get_user_progress_data(course_key, profile, anonymous_user_id):
             )],
 
             'submissions': [{
+                'id': submission.id,
                 'uuid': submission.uuid,
                 'attempt_number': submission.attempt_number,
                 'submitted_at': submission.submitted_at.__str__(),
@@ -202,6 +205,7 @@ def get_user_progress_data(course_key, profile, anonymous_user_id):
             )],
 
             'student_scores': [{
+                'id': score.id,
                 'points_earned': score.points_earned,
                 'points_possible': score.points_possible,
                 'created_at': score.created_at.__str__(),
