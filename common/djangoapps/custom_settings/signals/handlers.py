@@ -25,8 +25,9 @@ def initialize_course_settings(sender, instance, created, **kwargs):
         if source_course_key:
             _settings = CustomSettings.objects.filter(id=source_course_key).first()
             tags = _settings.tags
-
-        CustomSettings.objects.get_or_create(id=course_key, tags=tags)
+            CustomSettings.objects.get_or_create(id=course_key, tags=tags)
+        else:
+            CustomSettings.objects.get_or_create(id=course_key)
 
         CourseMode.objects.get_or_create(
             course_id=course_key,
