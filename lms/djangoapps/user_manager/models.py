@@ -12,12 +12,17 @@ class UserManagerRole(models.Model):
         their email will be linked instead, and auto-upgraded to a foreign key
         when they register an account.
     """
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='+',
+    )
     manager_user = models.ForeignKey(
         User,
         null=True,
         blank=True,
         on_delete=models.CASCADE,
+        related_name='+',
     )
     # This will get upgraded to a foreign key to the manager's user account
     # when they register.
@@ -26,7 +31,8 @@ class UserManagerRole(models.Model):
                   "registered for an account."
     )
 
-    class Meta:
+    class Meta(object):
+        app_label = 'user_manager'
         unique_together = (
             ('user', 'manager_user'),
             ('user', 'unregistered_manager_email'),

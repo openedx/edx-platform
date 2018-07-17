@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 
 from student.roles import AccessRole
-from user_manager.models import UserManagerRole
+from .models import UserManagerRole
 
 
 class ManagerRole(AccessRole):
@@ -49,6 +49,17 @@ class ManagerRole(AccessRole):
                 manager_user=manager,
             )
 
+    add_manager = add_users
+
+    def add_direct_report(self, *users):
+        if self.managed_user is None:
+            return
+        for user in users:
+            UserManagerRole.objects.create(
+                user=user,
+                manager_user=self.managed_user,
+            )
+
     def remove_users(self, *users):
         """
         Remove the supplied users as managers for ``managed_user``.
@@ -68,6 +79,9 @@ class ManagerRole(AccessRole):
         """
         manager_ids = self._filter_by_managed_user(
             UserManagerRole.objects.all()
+        ).filter(
+            manager_user__isnull=False,
         ).values_list('manager_user', flat=True)
         return User.objects.filter(ids__in=manager_ids)
 
+    get_managers = users_with_role
