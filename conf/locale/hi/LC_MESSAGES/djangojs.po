@@ -5108,6 +5108,8 @@ msgid ""
 "This may be happening because of an error with our server or your internet "
 "connection. Try refreshing the page or making sure you are online."
 msgstr ""
+"हमारे सर्वर पर त्रुटि के वजह से या आपके इंटरनेट कनेक्शन के साथ किसी त्रुटि "
+"के कारण यह हो सकता है| पृष्ठ फिर से खोले या सुनिश्चित करें कि आप ऑनलाइन हैं|"
 
 #: cms/static/cms/js/main.js
 msgid "Studio's having trouble saving your work"
@@ -5119,7 +5121,7 @@ msgstr "खुले मूल्‍यांकन को जमा करन�
 
 #: cms/static/js/base.js
 msgid "This link will open in a new browser window/tab"
-msgstr ""
+msgstr "यह लिंक एक नए ब्राउज़र विंडो / टैब में खुलेगी"
 
 #: cms/static/js/base.js
 msgid "This link will open in a modal window"
@@ -5182,7 +5184,7 @@ msgstr "इस क्रिया को पूर्ववत नहीं क�
 #: cms/static/js/views/show_textbook.js cms/static/js/views/tabs.js
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Deleting"
-msgstr ""
+msgstr "नष्ट हो रहा है"
 
 #: cms/static/js/certificates/views/signatory_editor.js
 msgid "Upload signature image."
@@ -5297,15 +5299,15 @@ msgstr ""
 
 #: cms/static/js/features/import/views/import.js
 msgid "There was an error with the upload"
-msgstr ""
+msgstr "अपलोड करने में त्रुटि हुई"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Organization:"
-msgstr ""
+msgstr "संगठन:"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Course Number:"
-msgstr ""
+msgstr "पाठ्यक्रम संख्या:"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Course Run:"
@@ -5359,7 +5361,7 @@ msgstr ""
 
 #: cms/static/js/models/course.js cms/static/js/models/section.js
 msgid "You must specify a name"
-msgstr ""
+msgstr "नाम देना आवश्यक है"
 
 #: cms/static/js/models/course_update.js
 msgid "Action required: Enter a valid date."
@@ -5480,11 +5482,8 @@ msgid ""
 msgstr ""
 
 #: cms/static/js/models/uploads.js
-#: lms/templates/student_account/hinted_login.underscore
-#: lms/templates/student_account/institution_login.underscore
-#: lms/templates/student_account/institution_register.underscore
 msgid "or"
-msgstr ""
+msgstr "या"
 
 #: cms/static/js/models/xblock_validation.js
 msgid "This unit has validation issues."
@@ -5640,7 +5639,7 @@ msgstr ""
 
 #: cms/static/js/views/course_video_settings.js
 msgid "Required"
-msgstr ""
+msgstr "आवश्यक"
 
 #: cms/static/js/views/course_video_settings.js
 msgid "Automatic transcripts are disabled."
@@ -5921,9 +5920,8 @@ msgid "Editing: %(title)s"
 msgstr "संशोधन करना:  %(title)s"
 
 #: cms/static/js/views/modals/edit_xblock.js
-#: lms/templates/ccx/schedule.underscore
 msgid "Unit"
-msgstr ""
+msgstr "यूनिट"
 
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Component"
@@ -5979,10 +5977,8 @@ msgid "This {parentCategory} has no {childCategory}"
 msgstr ""
 
 #: cms/static/js/views/move_xblock_list.js
-#: cms/templates/js/group-configuration-details.underscore
-#: cms/templates/js/partition-group-details.underscore
 msgid "Course Outline"
-msgstr ""
+msgstr "पाठ्यक्रम की रूपरेखा"
 
 #: cms/static/js/views/paged_container.js
 msgid "Date added"
@@ -6203,7 +6199,7 @@ msgstr ""
 
 #: cms/static/js/views/uploads.js
 msgid "We're sorry, there was an error"
-msgstr ""
+msgstr "त्रुटि के लिए हमें खेद है"
 
 #: cms/static/js/views/utils/create_course_utils.js
 msgid ""
@@ -6446,7 +6442,7 @@ msgstr ""
 #. `13 minutes and 45 seconds`
 #: cms/static/js/views/video_thumbnail.js
 msgid " and "
-msgstr ""
+msgstr "और"
 
 #: cms/static/js/views/video_thumbnail.js
 msgid "Video image upload started"
