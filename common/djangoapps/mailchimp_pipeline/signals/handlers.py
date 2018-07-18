@@ -36,9 +36,16 @@ def send_user_profile_info_to_mailchimp(sender, instance, kwargs):  # pylint: di
         }
     elif sender == EmailPreference:
         email_preferences = instance
+
+        if email_preferences.opt_in == 'yes':
+            opt_in = 'TRUE'
+        elif email_preferences.opt_in == 'no':
+            opt_in = 'FALSE'
+        else:
+            opt_in = 'NULL'
         user_json = {
             "merge_fields": {
-                "OPT_IN": email_preferences.opt_in
+                "OPTIN": opt_in
             }
         }
 

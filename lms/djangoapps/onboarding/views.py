@@ -399,13 +399,15 @@ def update_account_settings(request):
             return redirect(reverse('update_account_settings'))
 
     else:
+        email_preferences = request.user.email_preferences
         form = forms.UpdateRegModelForm(
             instance=user_extended_profile,
             initial={
                 'organization_name': user_extended_profile.organization.label if user_extended_profile.organization else "",
                 'is_poc': "1" if user_extended_profile.is_organization_admin else "0",
                 'first_name': user_extended_profile.user.first_name,
-                'last_name': user_extended_profile.user.last_name
+                'last_name': user_extended_profile.user.last_name,
+                'opt_in': email_preferences.opt_in if email_preferences else ''
             }
         )
 

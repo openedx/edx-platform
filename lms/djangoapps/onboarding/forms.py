@@ -590,7 +590,7 @@ class RegModelForm(BaseOnboardingModelForm):
                                                     'University with details about <strong>unique funding opportunities'
                                                     ', free regional events and new course and community programming!'
                                                     '</strong> If you decide later you are no longer interested, you '
-                                                    'can unsubscribe from these at anytime.'))
+                                                    'can unsubscribe from these at anytime.'), required=False)
 
     def __init__(self, *args, **kwargs):
         super(RegModelForm, self).__init__(*args, **kwargs)
@@ -706,9 +706,11 @@ class RegModelForm(BaseOnboardingModelForm):
         if commit:
             extended_profile.save()
 
-        user_email_preferences = EmailPreference.objects.get_or_create(user=user)
-        if (not user_email_preferences.opt_in and opt_in) or (user_email_preferences.opt_in in ['yes', 'no']):
-            user_email_preferences.opt_in = 'yes' if opt_in else 'no'
+        user_email_preferences, created = EmailPreference.objects.get_or_create(user=user)
+        opt_in = "yes" if opt_in else "no"
+        if (not user_email_preferences.opt_in and opt_in in ['yes', 'no']) or \
+                (user_email_preferences.opt_in in ['yes', 'no']):
+            user_email_preferences.opt_in = opt_in
             user_email_preferences.save()
 
         return extended_profile
@@ -793,8 +795,8 @@ class UpdateRegModelForm(RegModelForm):
             if extended_profile.organization:
                 extended_profile.organization.save()
 
-        user_email_preferences = EmailPreference.objects.get_or_create(user=user)
-        if (not user_email_preferences.opt_in and opt_in) or (user_email_preferences.opt_in in ['yes', 'no']):
+        user_email_preferences, created = EmailPreference.objects.get_or_create(user=user)
+        if (not user_email_preferences.opt_in and opt_in in ['yes', 'no']) or (user_email_preferences.opt_in in ['yes', 'no']):
             user_email_preferences.opt_in = opt_in
             user_email_preferences.save()
 
