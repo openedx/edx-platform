@@ -3,9 +3,8 @@ from django.db.models import Q
 from rest_framework.exceptions import NotFound
 from rest_framework.generics import ListAPIView, ListCreateAPIView
 
-from lms.djangoapps.user_manager.api.v1.serializers import UserManagerSerializer
 from openedx.core.lib.api.view_utils import view_auth_classes
-from .serializers import ManagerListSerializer, ManagerReportsSerializer
+from .serializers import ManagerListSerializer, ManagerReportsSerializer, UserManagerSerializer
 from ...models import UserManagerRole
 
 

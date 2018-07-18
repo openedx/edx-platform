@@ -1,6 +1,6 @@
 from rest_framework import fields, serializers
 
-from lms.djangoapps.user_manager.models import UserManagerRole
+from ...models import UserManagerRole
 
 
 class UserManagerSerializerBase(serializers.Serializer):
