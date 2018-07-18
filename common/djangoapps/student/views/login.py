@@ -70,7 +70,7 @@ from student.models import (
 )
 from student.helpers import authenticate_new_user, do_create_account
 from third_party_auth import pipeline, provider
-from util.json_request import JsonResponse
+from common_utils.json_request import JsonResponse
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")

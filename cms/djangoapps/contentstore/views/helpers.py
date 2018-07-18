@@ -17,7 +17,7 @@ import dogstats_wrapper as dog_stats_api
 from contentstore.utils import reverse_course_url, reverse_library_url, reverse_usage_url
 from edxmako.shortcuts import render_to_string
 from models.settings.course_grading import CourseGradingModel
-from util.milestones_helpers import is_entrance_exams_enabled
+from common_utils.milestones_helpers import is_entrance_exams_enabled
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import StaticTab
 from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT

@@ -16,7 +16,7 @@ from lms.djangoapps.certificates.models import (
     CertificateTemplateAsset,
     GeneratedCertificate
 )
-from util.organizations_helpers import get_organizations
+from common_utils.organizations_helpers import get_organizations
 
 
 class CertificateTemplateForm(forms.ModelForm):

@@ -22,7 +22,7 @@ from lms.djangoapps.support.decorators import require_support_permission
 from lms.djangoapps.support.serializers import ManualEnrollmentSerializer
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from student.models import ENROLLED_TO_ENROLLED, CourseEnrollment, ManualEnrollmentAudit
-from util.json_request import JsonResponse
+from common_utils.json_request import JsonResponse
 
 
 class EnrollmentSupportView(View):

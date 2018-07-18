@@ -17,8 +17,8 @@ from six import text_type
 from student.models import User, UserProfile, Registration, email_exists_or_retired
 from student import forms as student_forms
 from student import views as student_views
-from util.model_utils import emit_setting_changed_event
-from util.password_policy_validators import validate_password
+from common_utils.model_utils import emit_setting_changed_event
+from common_utils.password_policy_validators import validate_password
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import errors, accounts, forms, helpers

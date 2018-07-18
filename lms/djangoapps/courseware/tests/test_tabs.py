@@ -28,7 +28,7 @@ from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
-from util.milestones_helpers import (
+from common_utils.milestones_helpers import (
     add_course_content_milestone,
     add_course_milestone,
     add_milestone,

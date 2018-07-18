@@ -47,8 +47,8 @@ from student.models import (
 )
 from student.roles import CourseStaffRole
 from student.tests.factories import AdminFactory, UserFactory, SuperuserFactory
-from util.models import RateLimitConfiguration
-from util.testing import UrlResetMixin
+from common_utils.models import RateLimitConfiguration
+from common_utils.testing import UrlResetMixin
 
 
 class EnrollmentTestMixin(object):

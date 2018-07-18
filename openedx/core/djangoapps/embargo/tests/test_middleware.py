@@ -12,7 +12,7 @@ from django.core.cache import cache as django_cache
 
 from config_models.models import cache as config_cache
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from util.testing import UrlResetMixin
+from common_utils.testing import UrlResetMixin
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

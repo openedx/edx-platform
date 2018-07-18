@@ -12,7 +12,7 @@ from openedx.core.djangoapps.content.block_structure.transformer import (
     BlockStructureTransformer,
 )
 from student.models import EntranceExamConfiguration
-from util import milestones_helpers
+from common_utils import milestones_helpers
 
 log = logging.getLogger(__name__)
 

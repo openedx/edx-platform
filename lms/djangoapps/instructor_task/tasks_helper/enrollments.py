@@ -26,7 +26,7 @@ from shoppingcart.models import (
     RegistrationCodeRedemption
 )
 from student.models import CourseAccessRole, CourseEnrollment
-from util.file import course_filename_prefix_generator
+from common_utils.file import course_filename_prefix_generator
 
 from .runner import TaskProgress
 from .utils import tracker_emit, upload_csv_to_report_store

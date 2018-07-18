@@ -45,9 +45,9 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.lib.courses import course_image_url
 from openedx.core.djangoapps.certificates.api import display_date_for_certificate, certificates_viewable_for_course
 from student.models import LinkedInAddToProfileConfiguration
-from util import organizations_helpers as organization_api
-from util.date_utils import strftime_localized
-from util.views import handle_500
+from common_utils import organizations_helpers as organization_api
+from common_utils.date_utils import strftime_localized
+from common_utils.views import handle_500
 
 
 log = logging.getLogger(__name__)

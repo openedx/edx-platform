@@ -11,7 +11,7 @@ from mock import patch
 from nose.tools import assert_equals, assert_false  # pylint: disable=no-name-in-module
 from pytz import utc
 
-from util.date_utils import almost_same_datetime, get_default_time_display, get_time_display, strftime_localized
+from common_utils.date_utils import almost_same_datetime, get_default_time_display, get_time_display, strftime_localized
 
 
 def test_get_default_time_display():
@@ -162,7 +162,7 @@ class StrftimeLocalizedTest(unittest.TestCase):
         dtime = datetime(2013, 02, 14, 16, 41, 17)
         self.assertEqual(expected, strftime_localized(dtime, fmt))
 
-    @patch('util.date_utils.pgettext', fake_pgettext(translations={
+    @patch('common_utils.date_utils.pgettext', fake_pgettext(translations={
         ("abbreviated month name", "Feb"): "XXfebXX",
         ("month name", "February"): "XXfebruaryXX",
         ("abbreviated weekday name", "Thu"): "XXthuXX",
@@ -180,7 +180,7 @@ class StrftimeLocalizedTest(unittest.TestCase):
         dtime = datetime(2013, 02, 14, 16, 41, 17)
         self.assertEqual(expected, strftime_localized(dtime, fmt))
 
-    @patch('util.date_utils.ugettext', fake_ugettext(translations={
+    @patch('common_utils.date_utils.ugettext', fake_ugettext(translations={
         "SHORT_DATE_FORMAT": "date(%Y.%m.%d)",
         "LONG_DATE_FORMAT": "date(%A.%Y.%B.%d)",
         "DATE_TIME_FORMAT": "date(%Y.%m.%d@%H.%M)",
@@ -199,7 +199,7 @@ class StrftimeLocalizedTest(unittest.TestCase):
         dtime = datetime(2013, 02, 14, 16, 41, 17)
         self.assertEqual(expected, strftime_localized(dtime, fmt))
 
-    @patch('util.date_utils.ugettext', fake_ugettext(translations={
+    @patch('common_utils.date_utils.ugettext', fake_ugettext(translations={
         "SHORT_DATE_FORMAT": "oops date(%Y.%x.%d)",
         "TIME_FORMAT": "oops %Hh.%Xm.%Ss",
     }))

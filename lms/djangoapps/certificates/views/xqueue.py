@@ -20,8 +20,8 @@ from lms.djangoapps.certificates.models import (
     GeneratedCertificate,
     certificate_status_for_student
 )
-from util.bad_request_rate_limiter import BadRequestRateLimiter
-from util.json_request import JsonResponse, JsonResponseBadRequest
+from common_utils.bad_request_rate_limiter import BadRequestRateLimiter
+from common_utils.json_request import JsonResponse, JsonResponseBadRequest
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)

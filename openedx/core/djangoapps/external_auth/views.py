@@ -41,7 +41,7 @@ from openedx.core.djangoapps.site_configuration.helpers import get_value
 from openedx.core.djangoapps.user_api.accounts.utils import generate_password
 from student.helpers import get_next_url_for_login_page
 from student.models import UserProfile
-from util.db import outer_atomic
+from common_utils.db import outer_atomic
 from xmodule.modulestore.django import modulestore
 
 if settings.FEATURES.get('AUTH_USE_CAS'):

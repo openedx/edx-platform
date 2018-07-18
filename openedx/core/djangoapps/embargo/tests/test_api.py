@@ -29,7 +29,7 @@ from ..models import (
     RestrictedCourse, Country, CountryAccessRule,
 )
 
-from util.testing import UrlResetMixin
+from common_utils.testing import UrlResetMixin
 from .. import api as embargo_api
 from ..exceptions import InvalidAccessPoint
 from mock import patch

@@ -19,7 +19,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 # Once the course admin tool is deployed, we can remove this dependency.
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from student.tests.factories import UserFactory
-from util.date_utils import get_time_display
+from common_utils.date_utils import get_time_display
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

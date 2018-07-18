@@ -17,7 +17,7 @@ from openedx.core.djangoapps.site_configuration.tests.factories import SiteFacto
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from student.tests.test_configuration_overrides import fake_get_value
-from util import views
+from common_utils import views
 
 TEST_SUPPORT_EMAIL = "support@example.com"
 TEST_ZENDESK_CUSTOM_FIELD_CONFIG = {
@@ -53,8 +53,8 @@ def fake_support_backend_values(name, default=None):  # pylint: disable=unused-a
     ZENDESK_API_KEY="dummy",
     ZENDESK_CUSTOM_FIELDS={},
 )
-@mock.patch("util.views.dog_stats_api")
-@mock.patch("util.views._ZendeskApi", autospec=True)
+@mock.patch("common_utils.views.dog_stats_api")
+@mock.patch("common_utils.views._ZendeskApi", autospec=True)
 class SubmitFeedbackTest(EnterpriseServiceMockMixin, TestCase):
     """
     Class to test the submit_feedback function in views.
@@ -633,7 +633,7 @@ class SubmitFeedbackTest(EnterpriseServiceMockMixin, TestCase):
 
     @mock.patch("openedx.core.djangoapps.site_configuration.helpers.get_value", fake_support_backend_values)
     def test_valid_request_over_email(self, zendesk_mock_class, datadog_mock):  # pylint: disable=unused-argument
-        with mock.patch("util.views.send_mail") as patched_send_email:
+        with mock.patch("common_utils.views.send_mail") as patched_send_email:
             resp = self._build_and_run_request(self._anon_user, self._anon_fields)
             self.assertEqual(patched_send_email.call_count, 1)
             self.assertIn(self._anon_fields["email"], str(patched_send_email.call_args))
@@ -641,7 +641,7 @@ class SubmitFeedbackTest(EnterpriseServiceMockMixin, TestCase):
 
     @mock.patch("openedx.core.djangoapps.site_configuration.helpers.get_value", fake_support_backend_values)
     def test_exception_request_over_email(self, zendesk_mock_class, datadog_mock):  # pylint: disable=unused-argument
-        with mock.patch("util.views.send_mail", side_effect=SMTPException) as patched_send_email:
+        with mock.patch("common_utils.views.send_mail", side_effect=SMTPException) as patched_send_email:
             resp = self._build_and_run_request(self._anon_user, self._anon_fields)
             self.assertEqual(patched_send_email.call_count, 1)
             self.assertIn(self._anon_fields["email"], str(patched_send_email.call_args))

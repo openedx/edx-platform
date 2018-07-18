@@ -102,10 +102,10 @@ from student.tasks import send_activation_email
 from student.text_me_the_app import TextMeTheAppFragmentView
 from third_party_auth import pipeline, provider
 from third_party_auth.saml import SAP_SUCCESSFACTORS_SAML_KEY
-from util.bad_request_rate_limiter import BadRequestRateLimiter
-from util.db import outer_atomic
-from util.json_request import JsonResponse
-from util.password_policy_validators import SecurityPolicyError, validate_password
+from common_utils.bad_request_rate_limiter import BadRequestRateLimiter
+from common_utils.db import outer_atomic
+from common_utils.json_request import JsonResponse
+from common_utils.password_policy_validators import SecurityPolicyError, validate_password
 
 log = logging.getLogger("edx.student")
 

@@ -18,7 +18,7 @@ from contentstore.views.item import delete_item
 from models.settings.course_metadata import CourseMetadata
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from student.auth import has_course_author_access
-from util import milestones_helpers
+from common_utils import milestones_helpers
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 

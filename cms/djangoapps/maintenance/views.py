@@ -14,8 +14,8 @@ from six import text_type
 
 from contentstore.management.commands.utils import get_course_versions
 from edxmako.shortcuts import render_to_response
-from util.json_request import JsonResponse
-from util.views import require_global_staff
+from common_utils.json_request import JsonResponse
+from common_utils.views import require_global_staff
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError

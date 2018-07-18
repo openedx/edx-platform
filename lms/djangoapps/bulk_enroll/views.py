@@ -12,7 +12,7 @@ from enrollment.views import EnrollmentUserThrottle
 from instructor.views.api import students_update_enrollment
 from openedx.core.lib.api.authentication import OAuth2Authentication
 from openedx.core.lib.api.permissions import IsStaff
-from util.disable_rate_limit import can_disable_rate_limit
+from common_utils.disable_rate_limit import can_disable_rate_limit
 
 
 @can_disable_rate_limit

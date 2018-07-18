@@ -39,7 +39,7 @@ from openedx.features.course_experience.views.course_sock import CourseSockFragm
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 from shoppingcart.models import CourseRegistrationCode
 from student.views import is_course_blocked
-from util.views import ensure_valid_course_key
+from common_utils.views import ensure_valid_course_key
 from xmodule.modulestore.django import modulestore
 from xmodule.x_module import STUDENT_VIEW
 from .views import CourseTabView

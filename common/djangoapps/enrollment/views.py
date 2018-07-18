@@ -42,7 +42,7 @@ from six import text_type
 from student.auth import user_has_role
 from student.models import User
 from student.roles import CourseStaffRole, GlobalStaff
-from util.disable_rate_limit import can_disable_rate_limit
+from common_utils.disable_rate_limit import can_disable_rate_limit
 
 log = logging.getLogger(__name__)
 REQUIRED_ATTRIBUTES = {

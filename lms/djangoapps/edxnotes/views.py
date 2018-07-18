@@ -35,7 +35,7 @@ from edxnotes.helpers import (
 )
 from openedx.core.djangoapps.user_api.accounts.permissions import CanRetireUser
 from openedx.core.djangoapps.user_api.models import RetirementStateError, UserRetirementStatus
-from util.json_request import JsonResponse, JsonResponseBadRequest
+from common_utils.json_request import JsonResponse, JsonResponseBadRequest
 
 
 log = logging.getLogger(__name__)

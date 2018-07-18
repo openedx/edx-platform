@@ -46,7 +46,7 @@ from django_comment_common.utils import ThreadContext, get_course_discussion_set
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.monitoring_utils import function_trace
 from student.models import CourseEnrollment
-from util.json_request import JsonResponse, expect_json
+from common_utils.json_request import JsonResponse, expect_json
 from xmodule.modulestore.django import modulestore
 
 from .config import USE_BOOTSTRAP_FLAG

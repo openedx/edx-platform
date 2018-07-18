@@ -50,8 +50,8 @@ from shoppingcart.views import _can_download_report, _get_date_from_str, initial
 from student.models import CourseEnrollment
 from student.roles import CourseSalesAdminRole
 from student.tests.factories import AdminFactory, UserFactory
-from util.date_utils import get_default_time_display
-from util.testing import UrlResetMixin
+from common_utils.date_utils import get_default_time_display
+from common_utils.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

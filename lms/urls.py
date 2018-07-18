@@ -52,7 +52,7 @@ from staticbook import views as staticbook_views
 from student import views as student_views
 from student_account import views as student_account_views
 from track import views as track_views
-from util import views as util_views
+from common_utils import views as util_views
 
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     django_autodiscover()

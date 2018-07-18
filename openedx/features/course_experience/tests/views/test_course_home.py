@@ -28,7 +28,7 @@ from openedx.features.course_experience import (
 )
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
-from util.date_utils import strftime_localized
+from common_utils.date_utils import strftime_localized
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import CourseUserType, ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
@@ -320,7 +320,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         self.assertRedirects(response, expected_url)
 
     @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
-    @mock.patch("util.date_utils.strftime_localized")
+    @mock.patch("common_utils.date_utils.strftime_localized")
     def test_non_live_course_other_language(self, mock_strftime_localized):
         """
         Ensure that a user accessing a non-live course sees a redirect to

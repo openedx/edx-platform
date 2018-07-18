@@ -115,14 +115,14 @@ from student.models import (
 )
 from student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
 from submissions import api as sub_api  # installed from the edx-submissions repository
-from util.file import (
+from common_utils.file import (
     FileValidationException,
     UniversalNewlineIterator,
     course_and_time_based_filename_generator,
     store_uploaded_file
 )
-from util.json_request import JsonResponse, JsonResponseBadRequest
-from util.views import require_global_staff
+from common_utils.json_request import JsonResponse, JsonResponseBadRequest
+from common_utils.views import require_global_staff
 from xmodule.modulestore.django import modulestore
 
 from .tools import (

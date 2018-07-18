@@ -35,7 +35,7 @@ from openedx.core.lib.api.view_utils import (
 )
 from student.models import CourseAccessRole, CourseEnrollment
 from student.roles import CourseStaffRole
-from util.model_utils import truncate_fields
+from common_utils.model_utils import truncate_fields
 from xmodule.modulestore.django import modulestore
 
 from . import is_feature_enabled

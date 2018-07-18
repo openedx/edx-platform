@@ -17,7 +17,7 @@ from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 from openedx.features.enterprise_support.api import enterprise_customer_for_request
 from student.forms import get_registration_extension_form
 from student.models import UserProfile
-from util.password_policy_validators import (
+from common_utils.password_policy_validators import (
     password_complexity, password_instructions, password_max_length, password_min_length
 )
 

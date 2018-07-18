@@ -25,8 +25,8 @@ from contentstore.views.exception import AssetNotFoundException, AssetSizeTooLar
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.contentserver.caching import del_cached_content
 from student.auth import has_course_author_access
-from util.date_utils import get_default_time_display
-from util.json_request import JsonResponse
+from common_utils.date_utils import get_default_time_display
+from common_utils.json_request import JsonResponse
 
 __all__ = ['assets_handler']
 

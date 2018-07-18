@@ -10,7 +10,7 @@ from django.db import migrations, models
 
 def forwards(apps, schema_editor):
     """Ensure that rate limiting is enabled by default. """
-    RateLimitConfiguration = apps.get_model("util", "RateLimitConfiguration")
+    RateLimitConfiguration = apps.get_model("common_utils", "RateLimitConfiguration")
     objects = RateLimitConfiguration.objects
     if not objects.exists():
         objects.create(enabled=True)
@@ -19,7 +19,7 @@ def forwards(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('util', '0001_initial'),
+        ('common_utils', '0001_initial'),
     ]
 
     operations = [

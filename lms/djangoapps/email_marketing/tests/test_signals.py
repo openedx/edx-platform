@@ -35,7 +35,7 @@ from email_marketing.tasks import (
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from student.models import Registration
 from student.tests.factories import UserFactory, UserProfileFactory, CourseEnrollmentFactory
-from util.json_request import JsonResponse
+from common_utils.json_request import JsonResponse
 
 log = logging.getLogger(__name__)
 

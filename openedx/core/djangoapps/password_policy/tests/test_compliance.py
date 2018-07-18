@@ -16,7 +16,7 @@ from openedx.core.djangoapps.password_policy.compliance import (NonCompliantPass
                                                                 should_enforce_compliance_on_login)
 from student.tests.factories import (CourseAccessRoleFactory,
                                      UserFactory)
-from util.password_policy_validators import SecurityPolicyError, ValidationError, validate_password
+from common_utils.password_policy_validators import SecurityPolicyError, ValidationError, validate_password
 
 
 date1 = parse_date('2018-01-01 00:00:00+00:00')

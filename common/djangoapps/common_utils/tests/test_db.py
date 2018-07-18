@@ -14,7 +14,7 @@ from django.test import TestCase, TransactionTestCase
 from django.test.utils import override_settings
 from django.utils.six import StringIO
 
-from util.db import commit_on_success, enable_named_outer_atomic, generate_int_id, outer_atomic
+from common_utils.db import commit_on_success, enable_named_outer_atomic, generate_int_id, outer_atomic
 
 
 def do_nothing():

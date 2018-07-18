@@ -6,7 +6,7 @@ from django.test import TestCase
 from mock import patch
 
 from student.tests.factories import UserFactory
-from util.organizations_helpers import add_organization
+from common_utils.organizations_helpers import add_organization
 
 
 @patch.dict('django.conf.settings.FEATURES', {'ORGANIZATIONS_APP': True})

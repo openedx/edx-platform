@@ -20,7 +20,7 @@ from django.views.decorators.cache import cache_control
 from django.views.generic import View
 from opaque_keys.edx.keys import CourseKey
 from student.models import CourseEnrollment
-from util.views import ensure_valid_course_key
+from common_utils.views import ensure_valid_course_key
 from xmodule.modulestore.django import modulestore
 
 from course_modes.models import get_cosmetic_verified_display_price

@@ -39,9 +39,9 @@ from shoppingcart.reports import (
     UniversityRevenueShareReport
 )
 from student.models import AlreadyEnrolledError, CourseEnrollment, CourseFullError, EnrollmentClosedError
-from util.bad_request_rate_limiter import BadRequestRateLimiter
-from util.date_utils import get_default_time_display
-from util.json_request import JsonResponse
+from common_utils.bad_request_rate_limiter import BadRequestRateLimiter
+from common_utils.date_utils import get_default_time_display
+from common_utils.json_request import JsonResponse
 
 from .decorators import enforce_shopping_cart_enabled
 from .exceptions import (

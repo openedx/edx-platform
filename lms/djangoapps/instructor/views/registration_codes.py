@@ -14,7 +14,7 @@ from lms.djangoapps.instructor.enrollment import get_email_params, send_mail_to_
 from lms.djangoapps.instructor.views.api import require_level
 from shoppingcart.models import CourseRegistrationCode, RegistrationCodeRedemption
 from student.models import CourseEnrollment
-from util.json_request import JsonResponse
+from common_utils.json_request import JsonResponse
 
 log = logging.getLogger(__name__)
 

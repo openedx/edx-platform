@@ -23,7 +23,7 @@ from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 from student.cookies import CREATE_LOGON_COOKIE
 from student.signals import SAILTHRU_AUDIT_PURCHASE
 from student.views import REGISTER_USER
-from util.model_utils import USER_FIELD_CHANGED
+from common_utils.model_utils import USER_FIELD_CHANGED
 
 from .tasks import update_course_enrollment
 

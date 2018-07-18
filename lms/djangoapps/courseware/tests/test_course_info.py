@@ -21,7 +21,7 @@ from pyquery import PyQuery as pq
 from six import text_type
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory
-from util.date_utils import strftime_localized
+from common_utils.date_utils import strftime_localized
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MIXED_MODULESTORE,
     TEST_DATA_SPLIT_MODULESTORE,
@@ -124,7 +124,7 @@ class CourseInfoTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCase,
         self.assertRedirects(response, expected_url)
 
     @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
-    @mock.patch("util.date_utils.strftime_localized")
+    @mock.patch("common_utils.date_utils.strftime_localized")
     def test_non_live_course_other_language(self, mock_strftime_localized):
         """Ensure that a user accessing a non-live course sees a redirect to
         the student dashboard, not a 404, even if the localized date is unicode

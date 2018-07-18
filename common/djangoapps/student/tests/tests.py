@@ -46,8 +46,8 @@ from student.models import (
 )
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from student.views import complete_course_mode_info
-from util.model_utils import USER_SETTINGS_CHANGED_EVENT_NAME
-from util.testing import EventTestMixin
+from common_utils.model_utils import USER_SETTINGS_CHANGED_EVENT_NAME
+from common_utils.testing import EventTestMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreEnum, ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 
@@ -682,7 +682,7 @@ class UserSettingsEventTestMixin(EventTestMixin):
     Mixin for verifying that user setting events were emitted during a test.
     """
     def setUp(self):
-        super(UserSettingsEventTestMixin, self).setUp('util.model_utils.tracker')
+        super(UserSettingsEventTestMixin, self).setUp('common_utils.model_utils.tracker')
 
     def assert_user_setting_event_emitted(self, **kwargs):
         """

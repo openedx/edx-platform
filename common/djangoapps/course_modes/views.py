@@ -29,7 +29,7 @@ from lms.djangoapps.experiments.utils import get_experiment_user_metadata_contex
 from openedx.core.djangoapps.catalog.utils import get_currency_data
 from openedx.core.djangoapps.embargo import api as embargo_api
 from student.models import CourseEnrollment
-from util.db import outer_atomic
+from common_utils.db import outer_atomic
 from xmodule.modulestore.django import modulestore
 
 

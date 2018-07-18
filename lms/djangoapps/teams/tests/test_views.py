@@ -23,7 +23,7 @@ from django_comment_common.models import FORUM_ROLE_COMMUNITY_TA, Role
 from django_comment_common.utils import seed_permissions_roles
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
-from util.testing import EventTestMixin
+from common_utils.testing import EventTestMixin
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
