@@ -4,15 +4,13 @@ from cms.djangoapps.contentstore.config.waffle import waffle, ENABLE_CHECKLISTS_
 from student.roles import GlobalStaff
 
 
-def should_show_checklists_page(requesting_user):
+def should_show_checklists_page():
     """
         Determine if the ENABLE_CHECKLISTS_PAGE waffle switch is set
-        and if the user is able to see it
     """
 
     if waffle().is_enabled(ENABLE_CHECKLISTS_PAGE):
-        if GlobalStaff().has_user(requesting_user):
-            return True
+        return True
 
     return False
 
