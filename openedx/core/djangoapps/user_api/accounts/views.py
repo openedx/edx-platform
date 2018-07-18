@@ -697,6 +697,49 @@ class AccountRetirementStatusView(ViewSet):
         except RetirementStateError as exc:
             return Response(text_type(exc), status=status.HTTP_400_BAD_REQUEST)
 
+    def retirements_by_status_and_date(self, request):
+        """
+        GET /api/user/v1/accounts/retirements_by_status_and_date/
+        ?start_date=2018-09-05&end_date=2018-09-07&state=COMPLETE
+
+        Returns a list of UserRetirementStatusSerializer serialized
+        RetirementStatus rows in the given state that were created in the
+        retirement queue between the dates given. Date range is inclusive,
+        so to get one day you would set both dates to that day.
+        """
+        try:
+            start_date = datetime.datetime.strptime(request.GET['start_date'], '%Y-%m-%d')
+            end_date = datetime.datetime.strptime(request.GET['end_date'], '%Y-%m-%d')
+            now = datetime.datetime.now()
+            if start_date > now or end_date > now or start_date > end_date:
+                raise RetirementStateError('Dates must be today or earlier, and start must be earlier than end.')
+
+            # Add a day to make sure we get all the way to 23:59:59.999, this is compared "lt" in the query
+            # not "lte".
+            end_date += datetime.timedelta(days=1)
+            state = request.GET['state']
+
+            state_obj = RetirementState.objects.get(state_name=state)
+
+            retirements = UserRetirementStatus.objects.select_related(
+                'user', 'current_state', 'last_state'
+            ).filter(
+                current_state=state_obj, created__lt=end_date, created__gte=start_date
+            ).order_by(
+                'id'
+            )
+            serializer = UserRetirementStatusSerializer(retirements, many=True)
+            return Response(serializer.data)
+        # This should only occur on the datetime conversion of the start / end dates.
+        except ValueError as exc:
+            return Response('Invalid start or end date: {}'.format(text_type(exc)), status=status.HTTP_400_BAD_REQUEST)
+        except KeyError as exc:
+            return Response('Missing required parameter: {}'.format(text_type(exc)), status=status.HTTP_400_BAD_REQUEST)
+        except RetirementState.DoesNotExist:
+            return Response('Unknown retirement state.', status=status.HTTP_400_BAD_REQUEST)
+        except RetirementStateError as exc:
+            return Response(text_type(exc), status=status.HTTP_400_BAD_REQUEST)
+
     def retrieve(self, request, username):  # pylint: disable=unused-argument
         """
         GET /api/user/v1/accounts/{username}/retirement_status/
