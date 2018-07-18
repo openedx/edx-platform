@@ -11,7 +11,7 @@ from common.lib.nodebb_client.client import NodeBBClient
 from courseware.courses import get_courses
 from custom_settings.models import CustomSettings
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.features.course_card.models import CourseCard
+from openedx.features.course_card.helpers import get_course_cards_list, get_related_card
 from xmodule.modulestore.django import modulestore
 from student.models import CourseEnrollment
 
@@ -42,14 +42,17 @@ def get_enrolled_past_courses(course_enrollments):
     """
     Helper function to separate past courses from all enrolled courses
     """
-    #TODO move this function out of core code
+    # TODO move this function out of core code
     enrolled, past = [], []
 
+    card_list = get_course_cards_list()
     for course in course_enrollments:
-        if course.course_overview.has_ended():
-            past.append(course)
-        else:
-            enrolled.append(course)
+        course_card = get_related_card(course.course_overview)
+        if course_card in card_list:
+            if course.course_overview.has_ended():
+                past.append(course)
+            else:
+                enrolled.append(course)
 
     return enrolled, past
 
@@ -64,8 +67,7 @@ def get_recommended_xmodule_courses(request, _from='onboarding'):
     all_courses = []
 
     utc = pytz.UTC
-    course_card_ids = [cc.course_id for cc in CourseCard.objects.filter(is_enabled=True)]
-    courses_list = CourseOverview.objects.select_related('image_set').filter(id__in=course_card_ids)
+    courses_list = get_course_cards_list()
     course_list_ids = []
 
     current_time = datetime.utcnow().replace(tzinfo=utc)
