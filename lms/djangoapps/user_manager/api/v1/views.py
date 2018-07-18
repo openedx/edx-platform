@@ -1,8 +1,11 @@
+from django.contrib.auth.models import User
 from django.db.models import Q
+from rest_framework.exceptions import NotFound
 from rest_framework.generics import ListAPIView, ListCreateAPIView
 
+from lms.djangoapps.user_manager.api.v1.serializers import UserManagerSerializer
 from openedx.core.lib.api.view_utils import view_auth_classes
-from .serializers import UserManagerSerializer, UserManagerReportsSerializer
+from .serializers import ManagerListSerializer, ManagerReportsSerializer
 from ...models import UserManagerRole
 
 
@@ -13,7 +16,7 @@ class ManagerListView(ListAPIView):
 
 
     """
-    serializer_class = UserManagerSerializer
+    serializer_class = ManagerListSerializer
     queryset = UserManagerRole.objects.values(
         'manager_user',
         'manager_user__email',
@@ -26,7 +29,7 @@ class ManagerReportsListView(ListCreateAPIView):
     """
     See a list of all direct reports for a manager. Lists their id and email.
     """
-    serializer_class = UserManagerReportsSerializer
+    serializer_class = ManagerReportsSerializer
 
     def get_queryset(self):
         username = self.kwargs['username']
@@ -40,9 +43,28 @@ class ManagerReportsListView(ListCreateAPIView):
                 manager_user__username=username,
             )
 
+    def perform_create(self, serializer):
+        manager_id = self.kwargs['username']
+        email = serializer.validated_data.get('user', {}).get('email')
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise NotFound(detail='No user with that email')
+
+        if '@' in manager_id:
+            try:
+                manager_user = User.objects.get(email=manager_id)
+            except User.DoesNotExist:
+                return serializer.save(unregistered_manager_email=manager_id)
+        else:
+            manager_user = User.objects.get(username=manager_id)
+
+        serializer.save(manager_user=manager_user, user=user)
+
 
 @view_auth_classes(is_authenticated=True)
-class UserManagerListView(ListAPIView):
+class UserManagerListView(ListCreateAPIView):
     """
     See a list of all managers for a particular user. Lists their id (if any) and email.
 
@@ -50,14 +72,30 @@ class UserManagerListView(ListAPIView):
     """
     serializer_class = UserManagerSerializer
 
+    @staticmethod
+    def _get_user_by_username_or_email(userid):
+        if '@' in userid:
+            return User.objects.get(email=userid)
+        else:
+            return User.objects.get(username=userid)
+
     def get_queryset(self):
         username = self.kwargs['username']
         if '@' in username:
-            queryset = UserManagerRole.objects.filter(user__email=username)
+            return UserManagerRole.objects.filter(user__email=username)
         else:
-            queryset = UserManagerRole.objects.filter(user__username=username)
-        return queryset.values(
-            'manager_user',
-            'manager_user__email',
-            'unregistered_manager_email',
-        )
+            return UserManagerRole.objects.filter(user__username=username)
+
+    def perform_create(self, serializer):
+        try:
+            user = self._get_user_by_username_or_email(self.kwargs['username'])
+        except User.DoesNotExist:
+            raise NotFound(detail='No user with that email')
+
+        manager_email = serializer.validated_data.get('user', {}).get('email')
+
+        try:
+            manager = User.objects.get(email=manager_email)
+            serializer.save(manager_user=manager, user=user)
+        except User.DoesNotExist:
+            serializer.save(unregistered_manager_email=manager_email, user=user)

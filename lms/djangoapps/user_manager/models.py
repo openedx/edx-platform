@@ -33,8 +33,14 @@ class UserManagerRole(models.Model):
 
     class Meta(object):
         app_label = 'user_manager'
+        ordering = ['manager_user']
         unique_together = (
             ('user', 'manager_user'),
             ('user', 'unregistered_manager_email'),
         )
 
+    def get_manager_email(self):
+        if self.manager_user:
+            return self.manager_user.email
+        else:
+            return self.unregistered_manager_email
