@@ -634,6 +634,13 @@ class RegModelForm(BaseOnboardingModelForm):
             'org_admin_email': {'field_type': 'email'}
         }
 
+    def save_email_preferences(self, user, opt_in):
+        user_email_preferences, created = EmailPreference.objects.get_or_create(user=user)
+        if (not user_email_preferences.opt_in and opt_in in ['yes', 'no']) or (
+                user_email_preferences.opt_in in ['yes', 'no']):
+            user_email_preferences.opt_in = opt_in
+            user_email_preferences.save()
+
     def clean_organization_name(self):
         organization_name = self.cleaned_data['organization_name']
 
@@ -706,12 +713,8 @@ class RegModelForm(BaseOnboardingModelForm):
         if commit:
             extended_profile.save()
 
-        user_email_preferences, created = EmailPreference.objects.get_or_create(user=user)
         opt_in = "yes" if opt_in else "no"
-        if (not user_email_preferences.opt_in and opt_in in ['yes', 'no']) or \
-                (user_email_preferences.opt_in in ['yes', 'no']):
-            user_email_preferences.opt_in = opt_in
-            user_email_preferences.save()
+        self.save_email_preferences(user, opt_in)
 
         return extended_profile
 
@@ -795,10 +798,7 @@ class UpdateRegModelForm(RegModelForm):
             if extended_profile.organization:
                 extended_profile.organization.save()
 
-        user_email_preferences, created = EmailPreference.objects.get_or_create(user=user)
-        if (not user_email_preferences.opt_in and opt_in in ['yes', 'no']) or (user_email_preferences.opt_in in ['yes', 'no']):
-            user_email_preferences.opt_in = opt_in
-            user_email_preferences.save()
+        self.save_email_preferences(user, opt_in)
 
         return extended_profile
 
