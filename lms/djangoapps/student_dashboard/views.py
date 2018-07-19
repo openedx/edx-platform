@@ -64,10 +64,9 @@ def get_enrolled_past_courses(course_enrollments):
             else:
                 enrolled.append(course)
 
-    if past_course_cards:
-        for card, courses in past_course_cards.items():
-            sorted_courses = sorted(courses, key=lambda co: co.course_overview.start)
-            past.append(sorted_courses[-1])
+    for card, courses in past_course_cards.items():
+        sorted_courses = sorted(courses, key=lambda co: co.course_overview.start)
+        past.append(sorted_courses[-1])
 
     return enrolled, past
 
