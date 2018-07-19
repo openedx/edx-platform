@@ -12,6 +12,7 @@ from lms.djangoapps.onboarding.models import (
     EnglishProficiency,
     Organization,
     UserExtendedProfile,
+    EmailPreference,
     FunctionArea,
     OrganizationPartner,
     OrganizationMetric
@@ -92,6 +93,7 @@ admin.site.register(EducationLevel, EnglishProficiencyAdmin)
 admin.site.register(EnglishProficiency, EnglishProficiencyAdmin)
 admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(UserExtendedProfile, UserExtendedProfileAdmin)
+admin.site.register(EmailPreference)
 admin.site.register(FunctionArea, FunctionAreaAdmin)
 admin.site.register(OrganizationPartner, OrganizationPartnerAdmin)
 admin.site.register(OrganizationMetric, OrganizationMetricAdmin)

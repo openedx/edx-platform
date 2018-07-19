@@ -393,13 +393,13 @@ def update_account_settings(request):
             unattended_surveys = user_extended_profile.unattended_surveys(_type='list')
             are_forms_complete = not (bool(unattended_surveys))
 
-            if not are_forms_complete :
+            if not are_forms_complete:
                 return redirect(reverse(unattended_surveys[0]))
 
             return redirect(reverse('update_account_settings'))
 
     else:
-        email_preferences = request.user.email_preferences
+        email_preferences = getattr(request.user, 'email_preferences', None)
         form = forms.UpdateRegModelForm(
             instance=user_extended_profile,
             initial={

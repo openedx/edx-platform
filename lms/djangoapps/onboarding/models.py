@@ -651,6 +651,9 @@ class EmailPreference(TimeStampedModel):
     user = models.OneToOneField(User, related_name="email_preferences")
     opt_in = models.CharField(max_length=5, default=None, null=True, blank=True)
 
+    def __str__(self):
+        return "%s %s" % (self.user.email, self.opt_in)
+
 
 class OrganizationMetric(TimeStampedModel):
     """
