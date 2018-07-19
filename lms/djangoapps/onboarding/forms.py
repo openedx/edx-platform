@@ -588,9 +588,9 @@ class RegModelForm(BaseOnboardingModelForm):
 
     opt_in = forms.BooleanField(label=ugettext_noop('Check here if you agree to receive emails from Philanthropy '
                                                     'University with details about <strong>unique funding opportunities'
-                                                    ', free regional events and new course and community programming!'
-                                                    '</strong> If you decide later you are no longer interested, you '
-                                                    'can unsubscribe from these at anytime.'), required=False)
+                                                    ', free regional events and new course and community programming'
+                                                    '</strong>! If you decide later you are no longer interested, you '
+                                                    'can unsubscribe from these at anytime'), required=False)
 
     def __init__(self, *args, **kwargs):
         super(RegModelForm, self).__init__(*args, **kwargs)
