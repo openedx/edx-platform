@@ -26,7 +26,7 @@ from capa.tests.response_xml_factory import (
     SchematicResponseXMLFactory
 )
 from course_modes.models import CourseMode
-from courseware.models import BaseStudentModuleHistory, StudentModule
+from courseware.models import BaseStudentModuleHistory, StudentModule, StudentModuleHistory
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
 from openedx.core.djangoapps.credit.api import get_credit_requirement_status, set_credit_requirements
@@ -1282,3 +1282,19 @@ class TestConditionalContent(TestSubmittingProblems):
         homework_1_score = 1.0 / 2
         homework_2_score = 1.0 / 1
         self.check_grade_percent(round((homework_1_score + homework_2_score) / 2, 2))
+
+
+class TestCourseModuleHistory(TestSubmittingProblems):
+
+    def setUp(self):
+        super(TestCourseModuleHistory, self).setUp()
+
+        # add some activity
+        self.add_dropdown_to_section(self.add_graded_section_to_course('homework').location, 'p1', 1)
+        self.submit_question_answer('p1', {'2_1': 'Correct'})
+
+    def test_str_if_module_history(self):
+        student_module = StudentModule.objects.first()
+        history = StudentModuleHistory(student_module=student_module)
+
+        self.assertEqual(unicode(history), unicode('StudentModuleHistory<{}>'.format(unicode(repr(student_module)))))
