@@ -12,7 +12,7 @@ from openedx.core.djangoapps.video_config.forms import (
 from openedx.core.djangoapps.video_config.models import (
     CourseHLSPlaybackEnabledFlag, HLSPlaybackEnabledFlag,
     CourseVideoTranscriptEnabledFlag, VideoTranscriptEnabledFlag,
-    TranscriptMigrationSetting,
+    TranscriptMigrationSetting, MigrationEnqueuedCourse,
 )
 
 
@@ -49,9 +49,23 @@ class CourseVideoTranscriptEnabledFlagAdmin(CourseSpecificEnabledFlagBaseAdmin):
     """
     form = CourseVideoTranscriptFlagAdminForm
 
+
+class MigrationEnqueuedCourseAdmin(admin.ModelAdmin):
+    """
+    Simple, read-only list/search view of the Courses whose transcripts have been migrated to S3.
+    """
+    list_display = [
+        'course_id',
+        'command_run',
+    ]
+
+    search_fields = ['course_id', 'command_run']
+
+
 admin.site.register(HLSPlaybackEnabledFlag, ConfigurationModelAdmin)
 admin.site.register(CourseHLSPlaybackEnabledFlag, CourseHLSPlaybackEnabledFlagAdmin)
 
 admin.site.register(VideoTranscriptEnabledFlag, ConfigurationModelAdmin)
 admin.site.register(CourseVideoTranscriptEnabledFlag, CourseVideoTranscriptEnabledFlagAdmin)
 admin.site.register(TranscriptMigrationSetting, ConfigurationModelAdmin)
+admin.site.register(MigrationEnqueuedCourse, MigrationEnqueuedCourseAdmin)
