@@ -16,6 +16,9 @@ from lms.djangoapps.onboarding.forms import RegModelForm
 from lms.djangoapps.onboarding.helpers import get_country_iso
 from mailchimp_pipeline.tasks import update_enrollments_completions_at_mailchimp
 from student.models import User
+import urllib
+from django.http import HttpResponse, Http404
+from wsgiref.util import FileWrapper
 
 from lms.djangoapps.onboarding.models import Organization, UserExtendedProfile
 from lms.djangoapps.oef.decorators import eligible_for_oef
@@ -164,6 +167,7 @@ def mark_user_chat_read(request):
         headers=headers)
     return JsonResponse(response.json())
 
+
 def get_user_data(request):
     """ Get the user profile data from NodeBB for current user """
     data_endpoint = settings.NODEBB_ENDPOINT + '/api/v2/users/data'
@@ -173,3 +177,17 @@ def get_user_data(request):
         data={'_uid': 1, 'username': username},
         headers=headers)
     return JsonResponse(response.json())
+
+
+def download_pdf_file(request):
+    """ Download pdf file (Worksheet) instead of opening in the browser """
+    page_url = request.GET.get("page_url", None)
+    if page_url:
+        filename = page_url[int(page_url.rfind("/"))+1:]
+        result = urllib.urlopen(page_url)
+        response = HttpResponse(FileWrapper(result.fp), content_type='application/pdf')
+        response['Content-Disposition'] = "attachment; filename='somefile.pdf'"
+        response['filename'] = filename
+        return response
+    else:
+        raise Http404

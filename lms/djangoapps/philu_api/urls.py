@@ -4,7 +4,8 @@
 from django.conf.urls import url, patterns
 
 from lms.djangoapps.philu_api.views import PlatformSyncService, \
-    get_user_chat, mark_user_chat_read, get_user_data, MailChimpDataSyncAPI, ThirdPartyResultDataSyncAPI
+    get_user_chat, mark_user_chat_read, get_user_data, MailChimpDataSyncAPI, \
+    ThirdPartyResultDataSyncAPI, download_pdf_file
 
 urlpatterns = patterns(
     'philu_api.views',
@@ -15,4 +16,5 @@ urlpatterns = patterns(
     url(r'profile/chats/?$', get_user_chat, name='get_user_chat'),
     url(r'profile/data/?$', get_user_data, name='get_user_data'),
     url(r'profile/chats/mark/?$', mark_user_chat_read, name='mark_user_chat_read'),
+    url(r'download_pdf_file/$', download_pdf_file, name='download_pdf_file'),
 )
