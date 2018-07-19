@@ -15,6 +15,7 @@ from django.core import management
 from django.core.management.base import CommandError
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+from xmodule.util.sandboxing import DEFAULT_PYTHON_LIB_FILENAME
 from opaque_keys.edx.keys import CourseKey
 
 from dashboard.models import CourseImportLog
@@ -22,7 +23,6 @@ from dashboard.models import CourseImportLog
 log = logging.getLogger(__name__)
 
 DEFAULT_GIT_REPO_DIR = '/edx/var/app/edxapp/course_repos'
-DEFAULT_PYTHON_LIB_FILENAME = 'python_lib.zip'
 
 
 class GitImportError(Exception):

@@ -28,7 +28,7 @@ from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.draft_and_published import BranchSettingMixin
 from xmodule.modulestore.mixed import MixedModuleStore
-from xmodule.util.django import get_current_request_hostname
+from xmodule.util.xmodule_django import get_current_request_hostname
 
 # We also may not always have the current request user (crum) module available
 try:

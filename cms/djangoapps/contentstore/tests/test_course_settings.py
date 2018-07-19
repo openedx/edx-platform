@@ -1149,7 +1149,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertEqual(tab_list, course.tabs)
 
     @patch.dict(settings.FEATURES, {'ENABLE_EDXNOTES': True})
-    @patch('xmodule.util.django.get_current_request')
+    @patch('xmodule.util.xmodule_django.get_current_request')
     def test_post_settings_with_staff_not_enrolled(self, mock_request):
         """
         Tests that we can post advance settings when course staff is not enrolled.
