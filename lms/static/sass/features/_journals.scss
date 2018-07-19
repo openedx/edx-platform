@@ -64,7 +64,7 @@
   .banner {
     background: #065784;
     color: white;
-    padding-right: 15px;
+    @include padding-right(15px);
     line-height: 18px;
     font-weight: bold;
     font-size: 0.7em;
@@ -140,13 +140,13 @@
   }
 
   &::before {
-    left: -5px;
+    @include left(-5px);
     top: -5px;
     z-index: -1;
   }
 
   &::after {
-    left: -10px;
+    @include left(-10px);
     top: -10px;
     z-index: -2;
   }
