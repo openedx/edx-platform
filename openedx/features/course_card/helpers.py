@@ -1,3 +1,6 @@
+from datetime import datetime
+
+import pytz
 from course_action_state.models import CourseRerunState
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.course_card.models import CourseCard
@@ -28,6 +31,26 @@ def get_related_card(course):
         return CourseOverview.objects.get(id=course_rerun.source_course_key)
 
     return course
+
+
+def get_future_courses(card_id):
+    """
+        Get future courses for a course
+        :param card_id:
+        :return:
+        """
+    utc = pytz.UTC
+
+    other_children_ids = [
+        crs.id for crs in CourseRerunState.objects.filter(
+            source_course_key=card_id
+        )
+    ]
+    future_courses = CourseOverview.objects.filter(
+        id__in=other_children_ids,
+        end__gt=datetime.utcnow().replace(tzinfo=utc))
+
+    return future_courses
 
 
 def is_course_rereun(course_id):

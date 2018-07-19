@@ -17,6 +17,26 @@ from xmodule.modulestore.django import modulestore
 from student.models import CourseEnrollment
 
 
+def get_future_courses(card_id):
+    """
+        Get future courses for a course
+        :param card_id:
+        :return:
+        """
+    utc = pytz.UTC
+
+    other_children_ids = [
+        crs.course_key for crs in CourseRerunState.objects.filter(
+            source_course_key=card_id
+        )
+    ]
+    future_courses = CourseOverview.objects.filter(
+        id__in=other_children_ids,
+        end__gt=datetime.utcnow().replace(tzinfo=utc))
+
+    return future_courses
+
+
 def get_recommended_courses(user):
     """
     Helper function to get recommended courses for a user based on his interests
@@ -48,12 +68,18 @@ def get_enrolled_past_courses(course_enrollments):
     past_course_cards = {}
 
     card_list = get_course_cards_list()
+
     for course in course_enrollments:
         course_card = get_related_card(course.course_overview)
         if course_card in card_list:
             if course.course_overview.has_ended():
                 if course_card.id not in past_course_cards:
                     past_course_cards[course_card.id] = []
+
+                have_future_course = get_future_courses(course_card.id)
+                if not have_future_course:
+                    course.course_overview.message = "No classes scheduled at the moment"
+
                 past_course_cards[course_card.id].append(course)
             else:
                 enrolled.append(course)
