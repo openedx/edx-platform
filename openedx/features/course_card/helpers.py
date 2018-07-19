@@ -25,7 +25,7 @@ def get_related_card(course):
 
     course_rerun = CourseRerunState.objects.filter(course_key=course.id).first()
     if course_rerun:
-        return course_rerun
+        return CourseOverview.objects.get(id=course_rerun.source_course_key)
 
     return course
 
