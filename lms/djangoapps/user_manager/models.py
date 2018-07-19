@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.db import models
 
 
@@ -44,3 +45,10 @@ class UserManagerRole(models.Model):
             return self.manager_user.email
         else:
             return self.unregistered_manager_email
+
+    def clean(self):
+        if (
+                self.user == self.manager_user or
+                self.user.email == self.unregistered_manager_email
+        ):
+            raise ValidationError('User and manager cannot be the same')
