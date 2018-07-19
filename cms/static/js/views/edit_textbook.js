@@ -63,13 +63,16 @@ define(['js/views/baseview', 'underscore', 'jquery', 'js/views/edit_chapter', 'c
                         title: gettext('Saving')
                     }).show();
                     var that = this;
-                    this.model.save({}, {
+                    this.model.save({
                         success: function() {
                             that.model.setOriginalAttributes();
                             that.close();
                         },
-                        complete: function() {
+                        complete: function(model, object, method) {
                             saving.hide();
+                            if (method == 'POST') {
+                                  that.model.trigger('add_textbook', model);
+                            }
                         }
                     });
                 },

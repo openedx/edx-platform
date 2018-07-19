@@ -20,6 +20,29 @@ define(['backbone', 'underscore', 'gettext', 'js/models/chapter', 'js/collection
                 this.setOriginalAttributes();
                 return this;
             },
+            save: function(options) {
+                var model = this;
+                if (!model.id) {
+                    var method = 'POST';
+                    var url = model.urlRoot();
+                } else {
+                    var method = 'PUT';
+                    var url = model.urlRoot()+'/'+model.id;
+                }
+                $.ajax({
+                    url: url,
+                    type: method,
+                    dataType: 'json',
+                    data: JSON.stringify(model.toJSON()),
+                    success: function(object, status) {
+                        if (options.success) options.success(model, object, method);
+                        if (options.complete) options.complete(model, object, method);
+                    },
+                    error: function(xhr, status, error) {
+                        if (options.error) options.error(model, object.content);
+                    }
+                });
+            },
             setOriginalAttributes: function() {
                 this._originalAttributes = this.parse(this.toJSON());
             },

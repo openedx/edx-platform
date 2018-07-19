@@ -1,8 +1,9 @@
 <%page expression_filter="h"/>
 <%!
 from django.utils.translation import ugettext as _
-
+from django.core.urlresolvers import reverse
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 %>
 
 <%inherit file="base.html" />
@@ -311,6 +312,28 @@ from openedx.core.djangolib.markup import HTML, Text
             %endfor
           </ul>
       </div>
+
+      <%
+         courses_processing = [course['course_key'] for course in in_process_course_actions]
+      %>
+
+      <script>
+        var rerun_courses_for_post = ${courses_processing | n, dump_js_escaped_json};
+        var intervalID = setInterval(function(){
+            $.ajax({
+                 url: "${reverse('courses_api:check_rerun_courses')}",
+                 type: "POST",
+                 data: {
+                      courses: JSON.stringify(rerun_courses_for_post)
+                 },
+                 success: function(res){
+                    if(res['is_reload'] == true) location.reload();
+                 }
+            })
+        }, 60000);
+
+      </script>
+
       %endif
 
       % if libraries_enabled:

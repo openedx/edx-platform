@@ -94,7 +94,7 @@ class CourseOverview(TimeStampedModel):
 
     # Catalog information
     catalog_visibility = TextField(null=True)
-    short_description = TextField(null=True)
+    short_description = TextField(null=True, max_length=150)
     course_video_url = TextField(null=True)
     effort = TextField(null=True)
     self_paced = BooleanField(default=False)
@@ -473,7 +473,7 @@ class CourseOverview(TimeStampedModel):
         Returns whether it is acceptable to show the student a certificate
         download link.
         """
-        return course_metadata_utils.may_certify_for_course(
+        return self.has_any_active_web_certificate or course_metadata_utils.may_certify_for_course(
             self.certificates_display_behavior,
             self.certificates_show_before_end,
             self.has_ended()

@@ -324,7 +324,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
                 % if short_description_editable:
                 <li class="field text" id="field-course-short-description">
                   <label for="course-short-description">${_("Course Short Description")}</label>
-                  <textarea class="text" id="course-short-description"></textarea>
+                  <textarea class="text" id="course-short-description" maxlength="150"></textarea>
                   <span class="tip tip-stacked">${_("Appears on the course catalog page when students roll over the course name. Limit to ~150 characters")}</span>
                 </li>
                 % endif

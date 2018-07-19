@@ -2,6 +2,7 @@
 import base64
 import logging
 import os
+import json
 
 from path import Path as path
 from six import text_type
@@ -24,6 +25,12 @@ from student.auth import has_course_author_access
 from contentstore.storage import course_import_export_storage
 from contentstore.tasks import CourseImportTask, import_olx
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
+
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+import student
+from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
+from django.http import JsonResponse
 
 log = logging.getLogger(__name__)
 
@@ -188,3 +195,25 @@ class CourseImportView(CourseImportExportViewMixin, GenericAPIView):
                 developer_message=str(e),
                 error_code='internal_error'
             )
+
+
+@login_required
+@require_POST
+def check_rerun_courses(request):
+    courses_ids = request.POST.get('courses', [])
+    rerun_courses_keys = [
+        course.course_key for course in
+        CourseRerunState.objects.find_all(
+            exclude_args={'state': CourseRerunUIStateManager.State.SUCCEEDED},
+            should_display=True,
+        )
+        if student.auth.has_studio_read_access(request.user, course.course_key)
+    ]
+    if rerun_courses_keys and courses_ids:
+        for id in courses_ids:
+            if id not in rerun_courses_keys:
+                break;
+        else:
+            return JsonResponse({'is_reload': False})
+
+    return JsonResponse({'is_reload': True})

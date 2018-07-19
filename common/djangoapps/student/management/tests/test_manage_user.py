@@ -8,9 +8,10 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import Group, User
 from django.core.management import call_command, CommandError
 from django.test import TestCase
-
+from mock import MagicMock, patch
 TEST_EMAIL = 'test@example.com'
 TEST_USERNAME = 'test-user'
+
 
 
 @ddt.ddt
@@ -40,14 +41,15 @@ class TestManageUserCommand(TestCase):
         Ensures that users are removed if they exist and exit cleanly otherwise.
         """
         # pylint: disable=no-member
-        User.objects.create(username=TEST_USERNAME, email=TEST_EMAIL)
-        self.assertEqual([(TEST_USERNAME, TEST_EMAIL)], [(u.username, u.email) for u in User.objects.all()])
-        call_command('manage_user', TEST_USERNAME, TEST_EMAIL, '--remove')
-        self.assertEqual([], list(User.objects.all()))
+        with patch('lms.lib.comment_client.user.User.save', MagicMock()) as magic_mock:
+            User.objects.create(username=TEST_USERNAME, email=TEST_EMAIL)
+            self.assertEqual([(TEST_USERNAME, TEST_EMAIL)], [(u.username, u.email) for u in User.objects.all()])
+            call_command('manage_user', TEST_USERNAME, TEST_EMAIL, '--remove')
+            self.assertEqual([], list(User.objects.all()))
 
-        # check idempotency
-        call_command('manage_user', TEST_USERNAME, TEST_EMAIL, '--remove')
-        self.assertEqual([], list(User.objects.all()))
+            # check idempotency
+            call_command('manage_user', TEST_USERNAME, TEST_EMAIL, '--remove')
+            self.assertEqual([], list(User.objects.all()))
 
     def test_unusable_password(self):
         """
