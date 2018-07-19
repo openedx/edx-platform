@@ -1,8 +1,10 @@
 """
 Configuration models for Video XModule
 """
-from config_models.models import ConfigurationModel
 from django.db.models import BooleanField, TextField, PositiveIntegerField
+
+from config_models.models import ConfigurationModel
+from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 
 
@@ -150,6 +152,7 @@ class TranscriptMigrationSetting(ConfigurationModel):
         help_text="Flag to force migrate transcripts for the requested courses, overwrite if already present."
     )
     command_run = PositiveIntegerField(default=0)
+    batch_size = PositiveIntegerField(default=0)
     commit = BooleanField(
         default=False,
         help_text="Dry-run or commit."
@@ -170,3 +173,16 @@ class TranscriptMigrationSetting(ConfigurationModel):
         self.command_run += 1
         self.save()
         return self.command_run
+
+
+class MigrationEnqueuedCourse(TimeStampedModel):
+    """
+    Temporary model to persist the course IDs who has been enqueued for transcripts migration to S3.
+    """
+    course_id = CourseKeyField(db_index=True, primary_key=True, max_length=255)
+    command_run = PositiveIntegerField(default=0)
+
+    def __unicode__(self):
+        return u'MigrationEnqueuedCourse: ID={course_id}, Run={command_run}'.format(
+            course_id=self.course_id, command_run=self.command_run
+        )
