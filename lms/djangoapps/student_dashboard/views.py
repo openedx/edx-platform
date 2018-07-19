@@ -12,29 +12,9 @@ from common.lib.nodebb_client.client import NodeBBClient
 from courseware.courses import get_courses
 from custom_settings.models import CustomSettings
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.features.course_card.helpers import get_course_cards_list, get_related_card
+from openedx.features.course_card.helpers import get_course_cards_list, get_related_card, get_future_courses
 from xmodule.modulestore.django import modulestore
 from student.models import CourseEnrollment
-
-
-def get_future_courses(card_id):
-    """
-        Get future courses for a course
-        :param card_id:
-        :return:
-        """
-    utc = pytz.UTC
-
-    other_children_ids = [
-        crs.course_key for crs in CourseRerunState.objects.filter(
-            source_course_key=card_id
-        )
-    ]
-    future_courses = CourseOverview.objects.filter(
-        id__in=other_children_ids,
-        end__gt=datetime.utcnow().replace(tzinfo=utc))
-
-    return future_courses
 
 
 def get_recommended_courses(user):
@@ -84,9 +64,10 @@ def get_enrolled_past_courses(course_enrollments):
             else:
                 enrolled.append(course)
 
-    for card, courses in past_course_cards.items():
-        sorted_courses = sorted(courses, key=lambda course: course.course_overview.start)
-        past.append(sorted_courses[-1])
+    if past_course_cards:
+        for card, courses in past_course_cards.items():
+            sorted_courses = sorted(courses, key=lambda co: co.course_overview.start)
+            past.append(sorted_courses[-1])
 
     return enrolled, past
 

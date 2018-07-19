@@ -42,13 +42,13 @@ def get_future_courses(card_id):
     utc = pytz.UTC
 
     other_children_ids = [
-        crs.id for crs in CourseRerunState.objects.filter(
-            source_course_key=card_id
+        crs.course_key for crs in CourseRerunState.objects.filter(
+            source_course_key=card_id, action="rerun", state="succeeded"
         )
     ]
     future_courses = CourseOverview.objects.filter(
         id__in=other_children_ids,
-        end__gt=datetime.utcnow().replace(tzinfo=utc))
+        end__gt=datetime.utcnow().replace(tzinfo=utc)).first()
 
     return future_courses
 
