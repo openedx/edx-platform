@@ -700,6 +700,21 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             course_run=course_run_string
         )
 
+    @staticmethod
+    def _get_html_for_entitlement_button(course_key_string):
+        return'''
+            <div class="course-info">
+            <span class="info-university">{org} - </span>
+            <span class="info-course-id">{course}</span>
+            <span class="info-date-block-container">
+            <button class="change-session btn-link ">Change or Leave Session</button>
+            </span>
+            </div>
+        '''.format(
+            org=course_key_string.split('/')[0],
+            course=course_key_string.split('/')[1]
+        )
+
     def test_view_course_appears_on_dashboard(self):
         """
         When a course doesn't have completion data, its course card should
@@ -813,8 +828,10 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
 
         html_for_view_buttons = []
         html_for_resume_buttons = []
+        html_for_entitlement = []
 
         for i in range(num_course_cards):
+
             course = CourseFactory.create()
             course_enrollment = CourseEnrollmentFactory(
                 user=self.user,
@@ -823,9 +840,14 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
 
             course_key = course_enrollment.course_id
             course_key_string = str(course_key)
-            last_completed_block_string = ''
-            course_run_string = self._pull_course_run_from_course_key(
-                course_key_string)
+
+            if i == 1:
+                CourseEntitlementFactory.create(user=self.user, enrollment_course_run=course_enrollment)
+
+            else:
+                last_completed_block_string = ''
+                course_run_string = self._pull_course_run_from_course_key(
+                    course_key_string)
 
             # Submit completed course blocks in even-numbered courses.
             if isEven(i):
@@ -854,6 +876,11 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
                     course_run_string
                 )
             )
+            html_for_entitlement.append(
+                self._get_html_for_entitlement_button(
+                    course_key_string
+                )
+            )
 
         response = self.client.get(reverse('dashboard'))
 
@@ -865,18 +892,27 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             self._remove_whitespace_from_html_string(button)
             for button in html_for_resume_buttons
         ]
+        html_for_entitlement = [
+            self._remove_whitespace_from_html_string(button)
+            for button in html_for_entitlement
+        ]
+
         dashboard_html = self._remove_whitespace_from_html_string(response.content)
 
         for i in range(num_course_cards):
             expected_button = None
             unexpected_button = None
 
-            if isEven(i):
+            if i == 1:
+                expected_button = html_for_entitlement[i]
+                unexpected_button = html_for_view_buttons[i] + html_for_resume_buttons[i]
+
+            elif isEven(i):
                 expected_button = html_for_resume_buttons[i]
-                unexpected_button = html_for_view_buttons[i]
+                unexpected_button = html_for_view_buttons[i] + html_for_entitlement[i]
             else:
                 expected_button = html_for_view_buttons[i]
-                unexpected_button = html_for_resume_buttons[i]
+                unexpected_button = html_for_resume_buttons[i] + html_for_entitlement[i]
 
             self.assertIn(
                 expected_button,
