@@ -2,9 +2,7 @@ from datetime import datetime
 
 import pytz
 from course_action_state.models import CourseRerunState
-from openedx.core.djangoapps.timed_notification.core import get_course_first_chapter_link
 from philu_overrides.helpers import get_user_current_enrolled_class
-from student.models import CourseEnrollment
 from edxmako.shortcuts import render_to_response
 from openedx.features.course_card.models import CourseCard
 from django.views.decorators.csrf import csrf_exempt
