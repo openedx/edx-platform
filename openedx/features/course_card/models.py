@@ -1,5 +1,6 @@
 from django.db import models
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 
 class CourseCard(models.Model):
@@ -10,9 +11,13 @@ class CourseCard(models.Model):
     is_enabled: whether to publish the course or not
     """
     course_id = CourseKeyField(db_index=True, max_length=255, null=False)
-    organization_domain = models.CharField(max_length=255, blank=True, null=True)
+    course_name = models.CharField(max_length=255, blank=True, null=True)
     is_enabled = models.BooleanField(default=False, null=False)
 
     def __unicode__(self):
-        return '{}'.format(self.course_id)
+        return '{}--{}'.format(self.course_name, unicode(self.course_id))
 
+    def save(self, *args, **kwargs):
+        course_overview = CourseOverview.objects.get(id=self.course_id)
+        self.course_name = course_overview.display_name
+        super(CourseCard, self).save(*args, **kwargs)

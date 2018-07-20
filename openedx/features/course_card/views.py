@@ -3,6 +3,7 @@ from datetime import datetime
 import pytz
 from course_action_state.models import CourseRerunState
 from openedx.core.djangoapps.timed_notification.core import get_course_first_chapter_link
+from philu_overrides.helpers import get_user_current_enrolled_class
 from student.models import CourseEnrollment
 from edxmako.shortcuts import render_to_response
 from openedx.features.course_card.models import CourseCard
@@ -23,7 +24,7 @@ def get_course_start_date(course):
     current_time = datetime.utcnow().replace(tzinfo=utc)
     course_start_time = None
 
-    if course and course.start and course.end:
+    if course and course.start:
         _start_time = course.start.replace(tzinfo=utc)
         if _start_time >= current_time:
             course_start_time = course.start
@@ -40,9 +41,9 @@ def get_course_cards(request):
 
     course_card_ids = [cc.course_id for cc in CourseCard.objects.filter(is_enabled=True)]
     courses_list = CourseOverview.objects.select_related('image_set').filter(id__in=course_card_ids)
+    courses_list = sorted(courses_list, key=lambda _course: _course.number)
     current_time = datetime.now()
 
-    current_course = None
     date_time_format = '%b %-d, %Y'
 
     for course in courses_list:
@@ -59,23 +60,24 @@ def get_course_cards(request):
         if course_start_time and rerun_start_time:
             if course_start_time < rerun_start_time:
                 course.start_date = course_start_time.strftime(date_time_format)
-                current_course = course
             else:
                 course.start_date = rerun_start_time.strftime(date_time_format)
-                current_course = course_rerun_object
 
         elif course_start_time:
             course.start_date = course_start_time.strftime(date_time_format)
-            current_course = course
+
         elif rerun_start_time:
             course.start_date = rerun_start_time.strftime(date_time_format)
-            current_course = course_rerun_object
 
-        if current_course:
-            is_enrolled = CourseEnrollment.is_enrolled(request.user, current_course.id)
-            course.is_enrolled = is_enrolled
-            course_target = get_course_first_chapter_link(current_course, request)
-            course.course_target = course_target
+        current_class, user_current_enrolled_class, current_enrolled_class_target = get_user_current_enrolled_class(
+            request, course)
+
+        if current_class:
+            course.start_date = current_class.start.strftime(date_time_format)
+
+        if user_current_enrolled_class:
+            course.is_enrolled = True
+            course.course_target = current_enrolled_class_target
 
     return render_to_response(
         "course_card/courses.html",
