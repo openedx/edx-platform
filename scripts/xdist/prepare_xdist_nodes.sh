@@ -1,12 +1,12 @@
 #!/bin/bash
 set -e
 
-python scripts/xdist/pytest_container_manager.py -a up -n ${XDIST_NUM_CONTAINERS} \
+python scripts/xdist/pytest_container_manager.py -a up -n ${XDIST_NUM_TASKS} \
 -t ${XDIST_CONTAINER_TASK_NAME} \
 -s ${XDIST_CONTAINER_SUBNET} \
 -sg ${XDIST_CONTAINER_SECURITY_GROUP}
 
-ip_list=$(<pytest_container_ip_list.txt)
+ip_list=$(<pytest_task_ips.txt)
 
 for ip in $ip_list
 do
