@@ -314,5 +314,7 @@ NOTIFICATION_CHANNEL_PROVIDER_TYPE_MAPS = {
     '*': 'durable',  # default global mapping
 }
 
+LMS_BASE = "local.philanthropyu.org:8000"
+
 # NodeBB settings
 NODEBB_ENDPOINT = ENV_TOKENS.get('NODEBB_ENDPOINT', None)
