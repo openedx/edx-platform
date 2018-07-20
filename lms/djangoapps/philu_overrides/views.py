@@ -19,7 +19,7 @@ from edxmako.shortcuts import render_to_response, render_to_string
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from openedx.core.djangoapps.catalog.utils import get_programs_data
 from philu_overrides.helpers import reactivation_email_for_user_custom, get_course_next_classes, \
-    get_user_current_enrolled_class, has_access_custom
+    get_user_current_enrolled_class
 from lms.djangoapps.courseware.views.views import add_tag_to_enrolled_courses
 from student.views import (
     signin_user as old_login_view,
