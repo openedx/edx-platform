@@ -58,9 +58,6 @@ def get_enrolled_past_courses(course_enrollments):
 
                 past_course_cards[course_card.id].append(course)
             else:
-                course.course_overview.is_started = False
-                if course.course_overview.has_started():
-                    course.course_overview.is_started = True
                 enrolled.append(course)
 
     for card, courses in past_course_cards.items():
