@@ -186,8 +186,7 @@ def download_pdf_file(request):
         filename = page_url[int(page_url.rfind("/"))+1:]
         result = urllib.urlopen(page_url)
         response = HttpResponse(FileWrapper(result.fp), content_type='application/pdf')
-        response['Content-Disposition'] = "attachment; filename='somefile.pdf'"
-        response['filename'] = filename
+        response['Content-Disposition'] = "attachment; filename={}".format(filename)
         return response
     else:
         raise Http404
