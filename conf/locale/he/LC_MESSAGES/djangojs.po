@@ -66,7 +66,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-07-10 06:58+0000\n"
+"POT-Creation-Date: 2018-07-20 09:00+0000\n"
 "PO-Revision-Date: 2018-07-10 07:01+0000\n"
 "Last-Translator: e2f_HE c1 <e2f_HE_c1@outlook.com>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
@@ -95,7 +95,6 @@ msgstr "שומר"
 #: cms/static/js/views/asset.js cms/static/js/views/list_item.js
 #: cms/static/js/views/manage_users_and_roles.js
 #: cms/static/js/views/show_textbook.js
-#: common/static/js/vendor/ova/catch/js/catch.js
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 #: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/certificate-editor.underscore
@@ -796,7 +795,6 @@ msgstr ""
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/js/vendor/ova/catch/js/catch.js
 #: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/course_info_handouts.underscore
 #: cms/templates/js/course_info_update.underscore
@@ -1944,6 +1942,23 @@ msgstr "הפעל תמלילים"
 msgid "Turn off transcripts"
 msgstr "כבה תמלילים"
 
+#: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
+#: cms/templates/js/move-xblock-list.underscore
+msgid "View child items"
+msgstr ""
+
+#: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
+msgid "Navigate up"
+msgstr ""
+
+#: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
+msgid "Browsing"
+msgstr ""
+
+#: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
+msgid "Select"
+msgstr ""
+
 #: common/static/common/js/components/utils/view_utils.js
 msgid "Required field."
 msgstr "שדה חובה"
@@ -2317,156 +2332,9 @@ msgstr[1] "%d שנים"
 msgstr[2] "%d שנים"
 msgstr[3] "%d שנים"
 
-#: common/static/js/vendor/ova/catch/js/catch.js
-msgid "User"
-msgstr "משתמש"
-
-#: common/static/js/vendor/ova/catch/js/catch.js
-msgid "Annotation"
-msgstr "הסבר"
-
-#: common/static/js/vendor/ova/catch/js/catch.js
-msgid "Start"
-msgstr "התחלה"
-
-#: common/static/js/vendor/ova/catch/js/catch.js
-msgid "End"
-msgstr "סוף"
-
-#: common/static/js/vendor/ova/catch/js/catch.js
-msgid "#Replies"
-msgstr "#תשובות"
-
-#: common/static/js/vendor/ova/catch/js/catch.js
-msgid "Date posted"
-msgstr "תאריך פרסום"
-
-#: common/static/js/vendor/ova/catch/js/catch.js
-#: lms/static/js/courseware/credit_progress.js
-#: common/static/common/templates/discussion/forum-actions.underscore
-#: lms/templates/discovery/facet.underscore
-#: lms/templates/edxnotes/note-item.underscore
-msgid "More"
-msgstr "עוד"
-
-#: common/static/js/vendor/ova/catch/js/catch.js
-msgid "My Notes"
-msgstr "הרשומות שלי"
-
-#: common/static/js/vendor/ova/catch/js/catch.js
-msgid "Instructor"
-msgstr "מדריך"
-
-#: common/static/js/vendor/ova/catch/js/catch.js
-msgid "Public"
-msgstr "ציבורי"
-
-#: common/static/js/vendor/ova/catch/js/catch.js
-#: common/static/common/templates/components/search-field.underscore
-#: lms/djangoapps/discussion/static/discussion/templates/search.underscore
-#: lms/djangoapps/support/static/support/templates/certificates.underscore
-#: lms/djangoapps/support/static/support/templates/enrollment.underscore
-#: lms/djangoapps/support/static/support/templates/manage_user.underscore
-msgid "Search"
-msgstr "חיפוש"
-
-#: common/static/js/vendor/ova/catch/js/catch.js
-msgid "Users"
-msgstr "משתמשים"
-
-#. Translators: 'Tags' is the name of the view (noun) within the Student Notes
-#. page that shows all
-#. notes organized by the tags the student has associated with them (if any).
-#. When defining a
-#. note in the courseware, the student can choose to associate 1 or more tags
-#. with the note
-#. in order to group similar notes together and help with search.
-#: common/static/js/vendor/ova/catch/js/catch.js
-#: lms/static/js/edxnotes/views/tabs/tags.js
-msgid "Tags"
-msgstr "תגיות"
-
-#: common/static/js/vendor/ova/catch/js/catch.js
-msgid "Annotation Text"
-msgstr "טקסט ההסבר"
-
-#: common/static/js/vendor/ova/catch/js/catch.js
-#: cms/templates/js/metadata-dict-entry.underscore
-#: cms/templates/js/metadata-file-uploader-entry.underscore
-#: cms/templates/js/metadata-list-entry.underscore
-#: cms/templates/js/metadata-number-entry.underscore
-#: cms/templates/js/metadata-option-entry.underscore
-#: cms/templates/js/metadata-string-entry.underscore
-msgid "Clear"
-msgstr "נקה"
-
-#: common/static/js/vendor/ova/catch/js/catch.js
-msgid "Text"
-msgstr "טקסט"
-
-#: common/static/js/vendor/ova/catch/js/catch.js
-msgid "Video"
-msgstr "וידאו"
-
-#: common/static/js/vendor/ova/catch/js/catch.js
-#: lms/static/js/views/image_field.js
-msgid "Image"
-msgstr "תמונה"
-
-#: common/static/js/vendor/ova/catch/js/catch.js
-msgid "Reply"
-msgstr "השב"
-
-#: common/static/js/vendor/ova/catch/js/catch.js
-#: lms/templates/edxnotes/note-item.underscore
-msgid "Tags:"
-msgstr "תגיות:"
-
-#. Translators: please note that this is not a literal flag, but rather a
-#. report
-#: common/static/js/vendor/ova/flagging-annotator.js
-msgid "Check the box to remove all flags."
-msgstr "סמן בתיבה כדי למחוק את כל הדגלים."
-
-#. Translators: 'totalFlags' is the number of flags solely for that annotation
-#: common/static/js/vendor/ova/flagging-annotator.js
-msgid "Check the box to remove %(totalFlags)s flag."
-msgid_plural "Check the box to remove %(totalFlags)s flags."
-msgstr[0] "סמן את התיבה כדי להסיר דגל %(totalFlags)s."
-msgstr[1] "סמן את התיבה כדי להסיר %(totalFlags)s דגלים."
-msgstr[2] "סמן את התיבה כדי להסיר %(totalFlags)s דגלים."
-msgstr[3] "סמן את התיבה כדי להסיר %(totalFlags)s דגלים."
-
-#. Translators: 'count' is the number of flags solely for that annotation that
-#. will be removed
-#: common/static/js/vendor/ova/flagging-annotator.js
-msgid "Check the box to remove %(count)s flag."
-msgid_plural "Check the box to remove %(count)s flags."
-msgstr[0] "סמן את התיבה כדי להסיר דגל %(count)s."
-msgstr[1] "סמן את התיבה כדי להסיר %(count)s דגלים."
-msgstr[2] "סמן את התיבה כדי להסיר %(count)s דגלים."
-msgstr[3] "סמן את התיבה כדי להסיר %(count)s דגלים."
-
-#: common/static/js/vendor/ova/flagging-annotator.js
-msgid "All flags have been removed. To undo, uncheck the box."
-msgstr "כל הדגלים הוסרו. כדי לבטל את הפעולה, בטל את הסימון בתיבה."
-
-#: common/static/js/vendor/ova/flagging-annotator.js
-msgid "You have already reported this annotation."
-msgstr "כבר דיווחת על ההערה הזו."
-
-#: common/static/js/vendor/ova/flagging-annotator.js
-msgid "Report annotation as inappropriate or offensive."
-msgstr "דווח על ההערה כבלתי הולמת או פוגענית"
-
-#. Translators: 'count' is the number of flags solely for that annotation
-#: common/static/js/vendor/ova/flagging-annotator.js
-msgid "This annotation has %(count)s flag."
-msgid_plural "This annotation has %(count)s flags."
-msgstr[0] "להערה זו יש דגל %(count)s."
-msgstr[1] "להסבר זה יש %(count)s דגלים."
-msgstr[2] "להסבר זה יש %(count)s דגלים."
-msgstr[3] "להסבר זה יש %(count)s דגלים."
+#: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/Main/Main.jsx
+msgid "Select a section or problem"
+msgstr ""
 
 #: lms/djangoapps/support/static/support/js/views/certificates.js
 msgid "An unexpected error occurred.  Please try again."
@@ -3291,6 +3159,13 @@ msgid "There has been an error processing your survey."
 msgstr "אירעה שגיאה בעיבוד הסקר שלך."
 
 #: lms/static/js/courseware/credit_progress.js
+#: common/static/common/templates/discussion/forum-actions.underscore
+#: lms/templates/discovery/facet.underscore
+#: lms/templates/edxnotes/note-item.underscore
+msgid "More"
+msgstr "עוד"
+
+#: lms/static/js/courseware/credit_progress.js
 #: lms/templates/discovery/facet.underscore
 #: lms/templates/edxnotes/note-item.underscore
 msgid "Less"
@@ -3492,6 +3367,17 @@ msgstr "תוצאות חיפוש"
 #: lms/static/js/edxnotes/views/tabs/tags.js
 msgid "[no tags]"
 msgstr "[no tags]"
+
+#. Translators: 'Tags' is the name of the view (noun) within the Student Notes
+#. page that shows all
+#. notes organized by the tags the student has associated with them (if any).
+#. When defining a
+#. note in the courseware, the student can choose to associate 1 or more tags
+#. with the note
+#. in order to group similar notes together and help with search.
+#: lms/static/js/edxnotes/views/tabs/tags.js
+msgid "Tags"
+msgstr "תגיות"
 
 #: lms/static/js/financial-assistance/views/financial_assistance_form_view.js
 msgid "Unable to submit application"
@@ -5122,6 +5008,10 @@ msgstr "העלה תמונה"
 #: lms/static/js/views/image_field.js
 msgid "Change image"
 msgstr "שנה תמונה"
+
+#: lms/static/js/views/image_field.js
+msgid "Image"
+msgstr "תמונה"
 
 #: lms/static/js/views/image_field.js
 msgid "An error has occurred. Refresh the page, and then try again."
@@ -6839,6 +6729,14 @@ msgstr "מויין בידי"
 msgid "Clear search"
 msgstr "נקה חיפוש"
 
+#: common/static/common/templates/components/search-field.underscore
+#: lms/djangoapps/discussion/static/discussion/templates/search.underscore
+#: lms/djangoapps/support/static/support/templates/certificates.underscore
+#: lms/djangoapps/support/static/support/templates/enrollment.underscore
+#: lms/djangoapps/support/static/support/templates/manage_user.underscore
+msgid "Search"
+msgstr "חיפוש"
+
 #: common/static/common/templates/discussion/forum-action-answer.underscore
 msgid "Mark as Answer"
 msgstr "סמן כתשובה"
@@ -7671,6 +7569,10 @@ msgstr "צויין ב:"
 #: lms/templates/edxnotes/note-item.underscore
 msgid "Last Edited:"
 msgstr "נערך לאחרונה:"
+
+#: lms/templates/edxnotes/note-item.underscore
+msgid "Tags:"
+msgstr "תגיות:"
 
 #: lms/templates/edxnotes/tab-item.underscore
 msgid "Clear search results"
@@ -10030,6 +9932,15 @@ msgstr "חדש %(item_type)s"
 #: cms/templates/js/metadata-number-entry.underscore
 #: cms/templates/js/metadata-option-entry.underscore
 #: cms/templates/js/metadata-string-entry.underscore
+msgid "Clear"
+msgstr "נקה"
+
+#: cms/templates/js/metadata-dict-entry.underscore
+#: cms/templates/js/metadata-file-uploader-entry.underscore
+#: cms/templates/js/metadata-list-entry.underscore
+#: cms/templates/js/metadata-number-entry.underscore
+#: cms/templates/js/metadata-option-entry.underscore
+#: cms/templates/js/metadata-string-entry.underscore
 msgid "Clear Value"
 msgstr "נקה ערך"
 
@@ -10049,10 +9960,6 @@ msgstr ""
 
 #: cms/templates/js/move-xblock-list.underscore
 msgid "Current location"
-msgstr ""
-
-#: cms/templates/js/move-xblock-list.underscore
-msgid "View child items"
 msgstr ""
 
 #: cms/templates/js/move-xblock-list.underscore
