@@ -12,7 +12,7 @@ from common.lib.nodebb_client.client import NodeBBClient
 from courseware.courses import get_courses
 from custom_settings.models import CustomSettings
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.features.course_card.helpers import get_course_cards_list, get_related_card, get_future_courses
+from openedx.features.course_card.helpers import get_course_cards_list, get_related_card
 from xmodule.modulestore.django import modulestore
 from student.models import CourseEnrollment
 
@@ -55,10 +55,6 @@ def get_enrolled_past_courses(course_enrollments):
             if course.course_overview.has_ended():
                 if course_card.id not in past_course_cards:
                     past_course_cards[course_card.id] = []
-
-                have_future_course = get_future_courses(course_card.id)
-                if not have_future_course:
-                    course.course_overview.message = "No classes scheduled at the moment"
 
                 past_course_cards[course_card.id].append(course)
             else:
