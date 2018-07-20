@@ -81,6 +81,8 @@ class CourseValidationViewTest(SharedModuleStoreTestCase, APITestCase):
                 'total_visible': 1,
                 'assignments_with_dates_before_start': [],
                 'assignments_with_dates_after_end': [],
+                'assignments_with_ora_dates_after_end': [],
+                'assignments_with_ora_dates_before_start': [],
             },
             'dates': {
                 'has_start_date': True,
