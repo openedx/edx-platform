@@ -1,4 +1,4 @@
-from user_manager.models import UserManagerRole
+from .models import UserManagerRole
 
 
 def create_user_manager_role(user, manager_user=None, manager_email=None):

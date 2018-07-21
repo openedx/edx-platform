@@ -1,6 +1,6 @@
 from rest_framework import fields, serializers
 
-from user_manager.utils import create_user_manager_role
+from ...utils import create_user_manager_role
 
 
 class ManagerListSerializer(serializers.Serializer):  # pylint: disable=abstract-method
