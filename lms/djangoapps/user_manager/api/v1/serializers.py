@@ -1,30 +1,9 @@
 from rest_framework import fields, serializers
 
-from ...models import UserManagerRole
+from user_manager.utils import create_user_manager_role
 
 
-class UserManagerSerializerBase(serializers.Serializer):
-    class Meta(object):
-        fields = ('email', 'id')
-
-    def create(self, validated_data):
-        user = validated_data.get('user')
-        manager_user = validated_data.get('manager_user')
-        unregistered_manager_email = validated_data.get('unregistered_manager_email')
-
-        if unregistered_manager_email is not None:
-            return UserManagerRole.objects.create(
-                unregistered_manager_email=unregistered_manager_email,
-                user=user,
-            )
-
-        return UserManagerRole.objects.create(
-            manager_user=manager_user,
-            user=user
-        )
-
-
-class ManagerListSerializer(UserManagerSerializerBase):  # pylint: disable=abstract-method
+class ManagerListSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """ Serializer for User manager """
 
     email = fields.SerializerMethodField()
@@ -43,15 +22,27 @@ class ManagerListSerializer(UserManagerSerializerBase):  # pylint: disable=abstr
         return obj["manager_user"]
 
 
-class ManagerReportsSerializer(UserManagerSerializerBase):  # pylint: disable=abstract-method
+class ManagerReportsSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """ Serializer for User manager reports """
 
-    email = fields.CharField(source='user.email')
+    email = fields.EmailField(source='user.email')
     id = fields.IntegerField(source='user.id', required=False)
 
+    def create(self, validated_data):
+        user = validated_data.get('user')
+        manager_user = validated_data.get('manager_user')
+        unregistered_manager_email = validated_data.get('unregistered_manager_email')
+        return create_user_manager_role(user, manager_user, unregistered_manager_email)
 
-class UserManagerSerializer(UserManagerSerializerBase):  # pylint: disable=abstract-method
+
+class UserManagerSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """ Serializer for User manager reports """
 
-    email = fields.CharField(source='get_manager_email')
+    email = fields.EmailField(source='manager_email')
     id = fields.IntegerField(source='user_manager.id', required=False)
+
+    def create(self, validated_data):
+        user = validated_data.get('user')
+        manager_user = validated_data.get('manager_user')
+        unregistered_manager_email = validated_data.get('unregistered_manager_email')
+        return create_user_manager_role(user, manager_user, unregistered_manager_email)

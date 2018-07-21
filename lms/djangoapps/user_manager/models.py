@@ -40,7 +40,8 @@ class UserManagerRole(models.Model):
             ('user', 'unregistered_manager_email'),
         )
 
-    def get_manager_email(self):
+    @property
+    def manager_email(self):
         if self.manager_user:
             return self.manager_user.email
         else:

@@ -1,7 +1,9 @@
 from django.contrib.auth.models import User
 from django.db.models import Q
+from rest_framework import status
 from rest_framework.exceptions import NotFound
 from rest_framework.generics import ListAPIView, ListCreateAPIView
+from rest_framework.response import Response
 
 from openedx.core.lib.api.view_utils import view_auth_classes
 from .serializers import ManagerListSerializer, ManagerReportsSerializer, UserManagerSerializer
@@ -12,8 +14,6 @@ from ...models import UserManagerRole
 class ManagerListView(ListAPIView):
     """
     See a list of all managers. Lists their id (if any) and email.
-
-
     """
     serializer_class = ManagerListSerializer
     queryset = UserManagerRole.objects.values(
@@ -55,19 +55,23 @@ class ManagerReportsListView(ListCreateAPIView):
             try:
                 manager_user = User.objects.get(email=manager_id)
             except User.DoesNotExist:
-                return serializer.save(unregistered_manager_email=manager_id)
+                serializer.save(user=user, unregistered_manager_email=manager_id)
+                return
         else:
             manager_user = User.objects.get(username=manager_id)
 
         serializer.save(manager_user=manager_user, user=user)
+
+    def delete(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        queryset.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @view_auth_classes(is_authenticated=True)
 class UserManagerListView(ListCreateAPIView):
     """
     See a list of all managers for a particular user. Lists their id (if any) and email.
-
-
     """
     serializer_class = UserManagerSerializer
 
@@ -91,10 +95,15 @@ class UserManagerListView(ListCreateAPIView):
         except User.DoesNotExist:
             raise NotFound(detail='No user with that email')
 
-        manager_email = serializer.validated_data.get('user', {}).get('email')
+        manager_email = serializer.validated_data.get('manager_email')
 
         try:
             manager = User.objects.get(email=manager_email)
             serializer.save(manager_user=manager, user=user)
         except User.DoesNotExist:
             serializer.save(unregistered_manager_email=manager_email, user=user)
+
+    def delete(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        queryset.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
