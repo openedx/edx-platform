@@ -46,6 +46,7 @@ git+https://github.com/edx/xblock-utils.git@v1.1.1#egg=xblock-utils==1.1.1
 alabaster==0.7.11         # via sphinx
 amqp==1.4.9
 analytics-python==1.1.0
+aniso8601==3.0.2
 anyjson==0.3.3
 apipkg==1.5
 appdirs==1.4.3
@@ -62,7 +63,7 @@ beautifulsoup==3.2.1
 before-after==1.0.1
 billiard==3.3.0.23
 bleach==1.4
-bok-choy==0.7.3
+bok-choy==0.8.0
 boto3==1.4.8
 boto==2.39.0
 botocore==1.8.17
@@ -77,7 +78,7 @@ constantly==15.1.0
 coreapi==2.3.3
 coreschema==0.0.4
 coverage==4.2
-cryptography==2.2.2
+cryptography==2.3
 cssselect==1.0.3
 cssutils==1.0.2
 ddt==0.8.0
@@ -103,7 +104,7 @@ django-method-override==0.1.0
 django-model-utils==3.0.0
 django-mptt==0.8.7
 django-multi-email-field==0.5.1
-django-mysql==2.3.0
+django-mysql==2.3.1
 django-oauth-toolkit==0.12.0
 django-object-actions==0.10.0
 django-pyfs==2.0
@@ -113,7 +114,7 @@ django-require==1.0.11
 django-rest-swagger==2.2.0
 django-sekizai==0.10.0
 django-ses==0.8.4
-django-simple-history==2.2.0
+django-simple-history==2.3.0
 django-splash==0.2.2
 django-statici18n==1.4.0
 django-storages==1.4.1
@@ -231,7 +232,7 @@ parsel==1.5.0
 path.py==8.2.1
 pathtools==0.1.2
 paver==1.3.4
-pbr==4.1.0
+pbr==4.1.1
 pdfminer==20140328
 piexif==1.0.2
 pillow==3.4.0
@@ -293,7 +294,7 @@ requests-oauthlib==0.6.1
 requests==2.9.1
 rest-condition==1.0.3
 rfc6266-parser==0.0.5.post2
-rules==1.3
+rules==2.0
 s3transfer==0.1.13
 sailthru-client==2.2.3
 scipy==0.14.0
@@ -313,7 +314,7 @@ social-auth-app-django==2.1.0
 social-auth-core==1.7.0
 sorl-thumbnail==12.3
 sortedcontainers==0.9.2
-sphinx==1.7.5
+sphinx==1.7.6
 sphinxcontrib-websupport==1.1.0  # via sphinx
 splinter==0.8.0
 sqlparse==0.2.4           # via django-debug-toolbar
@@ -323,6 +324,7 @@ sympy==0.7.1
 testfixtures==6.2.0
 testtools==2.3.0
 text-unidecode==1.2
+tincan==0.0.5
 tox-battery==0.5.1
 tox==3.1.2
 traceback2==1.4.0
