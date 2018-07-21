@@ -11,7 +11,7 @@ urlpatterns = [
     url(
         r'^managers/$',
         views.ManagerListView.as_view(),
-        name='manager-list',
+        name='managers-list',
     ),
     # List managers for a specified user
     url(
@@ -23,6 +23,6 @@ urlpatterns = [
     url(
         r'^reports/{}/$'.format(settings.USERNAME_PATTERN),
         views.ManagerReportsListView.as_view(),
-        name='manager-direct-reports-list',
+        name='manager-reports-list',
     ),
 ]
