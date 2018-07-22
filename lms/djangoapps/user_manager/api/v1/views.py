@@ -10,6 +10,29 @@ from .serializers import ManagerListSerializer, ManagerReportsSerializer, UserMa
 from ...models import UserManagerRole
 
 
+def _filter_by_manager_id(queryset, manager_id):
+    if manager_id is None:
+        return queryset
+    elif '@' in manager_id:
+        return queryset.filter(
+            Q(manager_user__email=manager_id) |
+            Q(unregistered_manager_email=manager_id),
+        )
+    else:
+        return queryset.filter(
+            manager_user__username=manager_id,
+        )
+
+
+def _filter_by_user_id(queryset, user_id):
+    if user_id is None:
+        return queryset
+    elif '@' in user_id:
+        return queryset.filter(user__email=user_id)
+    else:
+        return queryset.filter(user__username=user_id)
+
+
 @view_auth_classes(is_authenticated=True)
 class ManagerListView(ListAPIView):
     """
@@ -32,15 +55,7 @@ class ManagerReportsListView(ListCreateAPIView):
 
     def get_queryset(self):
         username = self.kwargs['username']
-        if '@' in username:
-            return UserManagerRole.objects.filter(
-                Q(manager_user__email=username) |
-                Q(unregistered_manager_email=username),
-            )
-        else:
-            return UserManagerRole.objects.filter(
-                manager_user__username=username,
-            )
+        return _filter_by_manager_id(UserManagerRole.objects, username)
 
     def perform_create(self, serializer):
         manager_id = self.kwargs['username']
@@ -62,8 +77,9 @@ class ManagerReportsListView(ListCreateAPIView):
 
         serializer.save(manager_user=manager_user, user=user)
 
-    def delete(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
+    def delete(self, request, *args, **kwargs):  # pylint: disable=unused-argument
+        user = request.query_params.get('user')
+        queryset = _filter_by_user_id(self.get_queryset(), user)
         queryset.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -84,10 +100,7 @@ class UserManagerListView(ListCreateAPIView):
 
     def get_queryset(self):
         username = self.kwargs['username']
-        if '@' in username:
-            return UserManagerRole.objects.filter(user__email=username)
-        else:
-            return UserManagerRole.objects.filter(user__username=username)
+        return _filter_by_user_id(UserManagerRole.objects, username)
 
     def perform_create(self, serializer):
         try:
@@ -103,7 +116,8 @@ class UserManagerListView(ListCreateAPIView):
         except User.DoesNotExist:
             serializer.save(unregistered_manager_email=manager_email, user=user)
 
-    def delete(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
+    def delete(self, request, *args, **kwargs):  # pylint: disable=unused-argument
+        manager = request.query_params.get('manager')
+        queryset = _filter_by_manager_id(self.get_queryset(), manager)
         queryset.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

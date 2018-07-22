@@ -71,7 +71,7 @@ class UserManagerRoleViewsTest(TestCase):
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.content, '{"detail":"No user with that email"}')
 
-    def test_manager_reports_list_delete(self):
+    def test_manager_reports_list_delete_all(self):
         url = reverse(
             'user_manager_api:v1:manager-reports-list',
             kwargs={'username': self.managers[0].email},
@@ -79,6 +79,29 @@ class UserManagerRoleViewsTest(TestCase):
         self.client.delete(url)
         query = UserManagerRole.objects.filter(manager_user=self.managers[0])
         self.assertEqual(query.count(), 0)
+
+    def test_manager_reports_list_delete_single(self):
+        url = reverse(
+            'user_manager_api:v1:manager-reports-list',
+            kwargs={'username': self.managers[0].email},
+        )
+        self.client.delete(
+            '{url}?user={email}'.format(url=url, email=self.users[0].email)
+        )
+        query = UserManagerRole.objects.filter(manager_user=self.managers[0])
+        self.assertEqual(query.count(), 4)
+        self.assertNotIn(self.users[0].email, query.values_list('user__email', flat=True))
+
+    def test_manager_reports_list_delete_nonexistent(self):
+        url = reverse(
+            'user_manager_api:v1:manager-reports-list',
+            kwargs={'username': self.managers[0].email},
+        )
+        self.client.delete(
+            '{url}?user={email}'.format(url=url, email='non@existent.com')
+        )
+        query = UserManagerRole.objects.filter(manager_user=self.managers[0])
+        self.assertEqual(query.count(), 5)
 
     @ddt.data('username', 'email')
     def test_user_managers_list_get(self, attr):
@@ -113,7 +136,7 @@ class UserManagerRoleViewsTest(TestCase):
             query.values_list('unregistered_manager_email', flat=True),
         )
 
-    def test_user_managers_list_delete(self):
+    def test_user_managers_list_delete_all(self):
         url = reverse(
             'user_manager_api:v1:user-managers-list',
             kwargs={'username': self.users[0].email},
@@ -121,3 +144,33 @@ class UserManagerRoleViewsTest(TestCase):
         self.client.delete(url)
         query = UserManagerRole.objects.filter(user=self.users[0])
         self.assertEqual(query.count(), 0)
+
+    def test_user_managers_list_delete_single(self):
+        query = UserManagerRole.objects.filter(user=self.users[0])
+        self.assertEqual(query.count(), 2)
+        url = reverse(
+            'user_manager_api:v1:user-managers-list',
+            kwargs={'username': self.users[0].email},
+        )
+        self.client.delete(
+            '{url}?manager={email}'.format(url=url, email=self.managers[0].email)
+        )
+        query = UserManagerRole.objects.filter(user=self.users[0])
+        self.assertEqual(query.count(), 1)
+        self.assertNotIn(
+            self.managers[0].email,
+            query.values_list('manager_user__email', flat=True),
+        )
+
+    def test_user_managers_list_delete_nonexistent(self):
+        query = UserManagerRole.objects.filter(user=self.users[0])
+        self.assertEqual(query.count(), 2)
+        url = reverse(
+            'user_manager_api:v1:user-managers-list',
+            kwargs={'username': self.users[0].email},
+        )
+        self.client.delete(
+            '{url}?manager={email}'.format(url=url, email='non@existent.com')
+        )
+        query = UserManagerRole.objects.filter(user=self.users[0])
+        self.assertEqual(query.count(), 2)

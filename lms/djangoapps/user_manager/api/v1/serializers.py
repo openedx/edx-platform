@@ -1,3 +1,4 @@
+from django.core.validators import EmailValidator
 from rest_framework import fields, serializers
 
 from ...utils import create_user_manager_role
@@ -6,7 +7,7 @@ from ...utils import create_user_manager_role
 class ManagerListSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """ Serializer for User manager """
 
-    email = fields.SerializerMethodField()
+    email = fields.SerializerMethodField(validators=(EmailValidator,))
     id = fields.SerializerMethodField()
 
     class Meta(object):
