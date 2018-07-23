@@ -27,6 +27,7 @@ import third_party_auth
 from course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import (
     get_certificate_url,
+    has_any_active_web_certificate,
     has_html_certificates_enabled
 )
 from lms.djangoapps.certificates.models import (
@@ -459,11 +460,12 @@ def cert_info(user, course_overview):
             'grade': if status is not 'processing'
             'can_unenroll': if status allows for unenrollment
     """
-    return _cert_info(
-        user,
-        course_overview,
-        certificate_status_for_student(user, course_overview.id)
-    )
+    if has_any_active_web_certificate(course_overview):
+        return _cert_info(
+            user,
+            course_overview,
+            certificate_status_for_student(user, course_overview.id)
+        )
 
 
 def _cert_info(user, course_overview, cert_status):

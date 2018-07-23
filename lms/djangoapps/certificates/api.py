@@ -455,6 +455,13 @@ def get_certificate_url(user_id=None, course_id=None, uuid=None):
     return url
 
 
+def has_any_active_web_certificate(course):
+    if hasattr(course, 'has_any_active_web_certificate'):
+        return course.has_any_active_web_certificate
+
+    return get_active_web_certificate(course)
+
+
 def get_active_web_certificate(course, is_preview_mode=None):
     """
     Retrieves the active web certificate configuration for the specified course
