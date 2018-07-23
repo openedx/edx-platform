@@ -119,6 +119,8 @@ ignore_dirs:
     # Directories full of auto-generated JS
     - lms/static/js/i18n
     - cms/static/js/i18n
+    # Directories with 3rd party apps.
+    - src
 
 
 # Third-party installed apps that we also extract strings from.  When adding a
