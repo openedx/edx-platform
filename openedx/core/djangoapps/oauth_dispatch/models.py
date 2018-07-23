@@ -24,9 +24,7 @@ class RestrictedApplication(models.Model):
     so that they cannot be used to call into APIs.
     """
 
-    application = models.ForeignKey(
-        oauth2_settings.APPLICATION_MODEL, db_constraint=False, null=False, on_delete=models.CASCADE
-    )
+    application = models.ForeignKey(oauth2_settings.APPLICATION_MODEL, null=False, on_delete=models.CASCADE)
 
     class Meta:
         app_label = 'oauth_dispatch'
@@ -60,7 +58,7 @@ class ApplicationAccess(models.Model):
     Specifies access control information for the associated Application.
     """
 
-    application = models.OneToOneField(oauth2_settings.APPLICATION_MODEL, db_constraint=False, related_name='access')
+    application = models.OneToOneField(oauth2_settings.APPLICATION_MODEL, related_name='access')
     scopes = ListCharField(
         base_field=models.CharField(max_length=32),
         size=25,
@@ -97,9 +95,7 @@ class ApplicationOrganization(models.Model):
         (RELATION_TYPE_CONTENT_ORG, _('Content Provider')),
     )
 
-    application = models.ForeignKey(
-        oauth2_settings.APPLICATION_MODEL, db_constraint=False, related_name='organizations'
-    )
+    application = models.ForeignKey(oauth2_settings.APPLICATION_MODEL, related_name='organizations')
     organization = models.ForeignKey(Organization)
     relation_type = models.CharField(
         max_length=32,
