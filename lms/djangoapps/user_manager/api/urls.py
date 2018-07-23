@@ -1,5 +1,5 @@
 """
-user manager API URLs
+User APIs for User Manager Application
 """
 from django.conf.urls import include, url
 

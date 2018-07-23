@@ -1,3 +1,6 @@
+"""
+Serializers for User Manager Application
+"""
 from django.core.validators import EmailValidator
 from rest_framework import fields, serializers
 

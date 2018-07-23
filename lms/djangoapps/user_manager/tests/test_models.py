@@ -1,3 +1,6 @@
+"""
+Tests for User Manager Application models
+"""
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
@@ -6,6 +9,9 @@ from student.tests.factories import UserFactory
 
 
 class UserManagerRoleModelTest(TestCase):
+    """
+    Tests for UserManagerRole model
+    """
 
     def test_manager_email_property(self):
         user = UserFactory()

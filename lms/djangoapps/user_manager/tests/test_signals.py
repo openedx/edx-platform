@@ -1,4 +1,6 @@
-from django.core.exceptions import ValidationError
+"""
+Tests for User Manager Application signals
+"""
 from django.test import TestCase
 import mock
 
@@ -7,6 +9,9 @@ from student.tests.factories import UserFactory
 
 
 class UserManagerRoleSignalsTest(TestCase):
+    """
+    Tests for User Manager Application signals
+    """
 
     def setUp(self):
         self.user = UserFactory()

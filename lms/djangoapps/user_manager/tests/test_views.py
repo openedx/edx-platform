@@ -1,3 +1,6 @@
+"""
+Tests for User Manager Application views
+"""
 import json
 
 import ddt
@@ -10,14 +13,19 @@ from student.tests.factories import UserFactory
 
 @ddt.ddt
 class UserManagerRoleViewsTest(TestCase):
+    """
+    Tests for User Manager Application views
+    """
 
-    def _create_users(self):
+    @staticmethod
+    def _create_users():
         for idx in range(10):
             username = 'report{}'.format(idx)
             email = '{username}@somecorp.com'.format(username=username)
             yield UserFactory(username=username, email=email)
 
-    def _create_managers(self):
+    @staticmethod
+    def _create_managers():
         for idx in range(2):
             username = 'manager{}'.format(idx)
             email = '{username}@somecorp.com'.format(username=username)

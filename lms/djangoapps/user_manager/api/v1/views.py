@@ -1,3 +1,6 @@
+"""
+Views for User Manager Application
+"""
 from django.contrib.auth.models import User
 from django.db.models import Q
 from rest_framework import status
