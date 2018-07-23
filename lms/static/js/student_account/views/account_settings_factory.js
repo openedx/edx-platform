@@ -60,7 +60,7 @@
                     })
                 };
             }
-            var tabSection = {};
+            var tabSections = {};
             aboutSectionsData = [
                 {
                     title: gettext('Basic Account Information'),
@@ -189,7 +189,7 @@
                     ]
                 }
             ];
-            tabSection['aboutTabSections'] = aboutSectionsData;
+            tabSections['aboutTabSections'] = aboutSectionsData;
 
             // set TimeZoneField to listen to CountryField
             getUserField = function(list, search) {
@@ -228,7 +228,7 @@
                         })
                     }
                 ];
-                tabSection['accountsTabSections'] = accountsSectionData;
+                tabSections['accountsTabSections'] = accountsSectionData;
             }
             if(ordersHistoryData.length > 0){
                 ordersHistoryData.unshift(
@@ -265,13 +265,13 @@
                         })
                     }
                 ];
-                tabSection['ordersTabSections'] = ordersSectionData;
+                tabSections['ordersTabSections'] = ordersSectionData;
             }
             accountSettingsView = new AccountSettingsView({
                 model: userAccountModel,
                 accountUserId: accountUserId,
                 el: accountSettingsElement,
-                tabSections: tabSection,
+                tabSections: tabSections,
                 userPreferencesModel: userPreferencesModel
             });
 
