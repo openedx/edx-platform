@@ -46,6 +46,13 @@ from django.utils.translation import ugettext as _
           </a>
         </li>
       % endif
+      % if show_journal_listing:
+        <li class="nav-item mt-2 nav-item-open-collapsed">
+          <a class="nav-link active" href="${reverse('openedx.journals.dashboard')}">
+            ${_("Journals")}
+          </a>
+        </li>
+      % endif
       <%
         self.real_user = getattr(user, 'real_user', user)
         is_on_profile_page = data and data.get('profile_user_id') is not None

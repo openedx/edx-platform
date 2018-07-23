@@ -37,6 +37,11 @@ class Command(BaseCommand):
     discovery_user = None
     discovery_base_url_fmt = None
     discovery_oidc_url = None
+    journals = False
+    journals_user = None
+    journals_base_url_fmt = None
+    journals_oidc_url = None
+
     configuration_filename = None
 
     def add_arguments(self, parser):
@@ -61,6 +66,13 @@ class Command(BaseCommand):
             "--devstack",
             action='store_true',
             help="Use devstack config, otherwise sandbox config is assumed",
+        )
+
+        parser.add_argument(
+            "--enable-journals",
+            dest="journals",
+            action="store_true",
+            help="Enable journal configuration",
         )
 
     def _create_oauth2_client(self, url, site_name, service_name, service_user):
@@ -178,7 +190,7 @@ class Command(BaseCommand):
 
     def get_or_create_service_user(self, username):
         """
-        Creates the service user for ecommerce and discovery.
+        Creates the service user for ecommerce, discovery and journals.
         """
         service_user, _ = User.objects.get_or_create(username=username)
         service_user.is_active = True
@@ -198,6 +210,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.dns_name = options['dns_name']
         self.theme_path = options['theme_path']
+        self.journals = options['journals']
 
         if options['devstack']:
             configuration_prefix = "devstack"
@@ -205,16 +218,22 @@ class Command(BaseCommand):
             self.discovery_base_url_fmt = "http://discovery-{site_domain}:18381/"
             self.ecommerce_oidc_url = "http://ecommerce-{}.e2e.devstack:18130/complete/edx-oidc/".format(self.dns_name)
             self.ecommerce_base_url_fmt = "http://ecommerce-{site_domain}:18130/"
+            self.journals_oidc_url = "http://journals-{}.e2e.devstack:18606/complete/edx-oidc/".format(self.dns_name)
+            self.journals_base_url_fmt = "http://journals-{site_domain}:18606/"
         else:
             configuration_prefix = "sandbox"
             self.discovery_oidc_url = "https://discovery-{}.sandbox.edx.org/complete/edx-oidc/".format(self.dns_name)
             self.discovery_base_url_fmt = "https://discovery-{site_domain}/"
             self.ecommerce_oidc_url = "https://ecommerce-{}.sandbox.edx.org/complete/edx-oidc/".format(self.dns_name)
             self.ecommerce_base_url_fmt = "https://ecommerce-{site_domain}/"
+            self.journals_oidc_url = "https://journals-{}.sandbox.edx.org/complete/edx-oidc/".format(self.dns_name)
+            self.journals_base_url_fmt = "https://journals-{site_domain}/"
 
         self.configuration_filename = '{}_configuration.json'.format(configuration_prefix)
         self.discovery_user = self.get_or_create_service_user("lms_catalog_service_user")
         self.ecommerce_user = self.get_or_create_service_user("ecommerce_worker")
+        if self.journals:
+            self.journals_user = self.get_or_create_service_user("journals_worker")
 
         all_sites = self._get_sites_data()
         self._update_default_clients()
@@ -225,6 +244,7 @@ class Command(BaseCommand):
 
             discovery_url = self.discovery_base_url_fmt.format(site_domain=site_domain)
             ecommerce_url = self.ecommerce_base_url_fmt.format(site_domain=site_domain)
+            journals_url = self.journals_base_url_fmt.format(site_domain=site_domain)
 
             LOG.info("Creating '{site_name}' Site".format(site_name=site_name))
             self._create_sites(site_domain, site_data['theme_dir_name'], site_data['configuration'])
@@ -234,5 +254,9 @@ class Command(BaseCommand):
 
             LOG.info("Creating ecommerce oauth2 client for '{site_name}' site".format(site_name=site_name))
             self._create_oauth2_client(ecommerce_url, site_name, 'ecommerce', self.ecommerce_user)
+
+            if self.journals:
+                LOG.info("Creating journals oauth2 client for '{site_name}' site".format(site_name=site_name))
+                self._create_oauth2_client(journals_url, site_name, 'journals', self.journals_user)
 
         self._enable_commerce_configuration()

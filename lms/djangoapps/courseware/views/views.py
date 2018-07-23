@@ -93,6 +93,7 @@ from openedx.features.course_experience.views.course_dates import CourseDatesFra
 from openedx.features.course_experience.waffle import waffle as course_experience_waffle
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from openedx.features.enterprise_support.api import data_sharing_consent_required
+from openedx.features.journals.api import get_journals_context
 from shoppingcart.utils import is_shopping_cart_enabled
 from student.models import CourseEnrollment, UserTestGroup
 from util.cache import cache, cache_if_anonymous
@@ -231,7 +232,8 @@ def courses(request):
         {
             'courses': courses_list,
             'course_discovery_meanings': course_discovery_meanings,
-            'programs_list': programs_list
+            'programs_list': programs_list,
+            'journal_info': get_journals_context(request),  # TODO: Course Listing Plugin required
         }
     )
 
