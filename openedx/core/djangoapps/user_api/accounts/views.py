@@ -605,7 +605,7 @@ class AccountRetirementPartnerReportView(ViewSet):
 
     def retirement_partner_cleanup(self, request):
         """
-        DELETE /api/user/v1/accounts/retirement_partner_report/
+        POST /api/user/v1/accounts/retirement_partner_report_cleanup/
 
         [{'original_username': 'user1'}, {'original_username': 'user2'}, ...]
 

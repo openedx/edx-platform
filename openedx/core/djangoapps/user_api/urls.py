@@ -35,8 +35,11 @@ ACCOUNT_DETAIL = AccountViewSet.as_view({
 
 PARTNER_REPORT = AccountRetirementPartnerReportView.as_view({
     'post': 'retirement_partner_report',
-    'put': 'retirement_partner_status_create',
-    'delete': 'retirement_partner_cleanup'
+    'put': 'retirement_partner_status_create'
+})
+
+PARTNER_REPORT_CLEANUP = AccountRetirementPartnerReportView.as_view({
+    'post': 'retirement_partner_cleanup'
 })
 
 RETIREMENT_QUEUE = AccountRetirementStatusView.as_view({
@@ -113,6 +116,11 @@ urlpatterns = [
         r'^v1/accounts/retirement_partner_report/$',
         PARTNER_REPORT,
         name='accounts_retirement_partner_report'
+    ),
+    url(
+        r'^v1/accounts/retirement_partner_report_cleanup/$',
+        PARTNER_REPORT_CLEANUP,
+        name='accounts_retirement_partner_report_cleanup'
     ),
     url(
         r'^v1/accounts/retirement_queue/$',
