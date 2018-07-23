@@ -51,6 +51,7 @@ setup(
         ],
         "openedx.block_structure_transformer": [
             "library_content = lms.djangoapps.course_blocks.transformers.library_content:ContentLibraryTransformer",
+            "library_content_randomize = lms.djangoapps.course_blocks.transformers.library_content:ContentLibraryOrderTransformer",
             "split_test = lms.djangoapps.course_blocks.transformers.split_test:SplitTestTransformer",
             "start_date = lms.djangoapps.course_blocks.transformers.start_date:StartDateTransformer",
             "user_partitions = lms.djangoapps.course_blocks.transformers.user_partitions:UserPartitionTransformer",
