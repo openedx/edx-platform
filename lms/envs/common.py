@@ -2163,7 +2163,7 @@ INSTALLED_APPS = [
     'enrollment',
 
     # Entitlement API
-    'entitlements',
+    'entitlements.apps.EntitlementsConfig',
 
     # Bulk Enrollment API
     'bulk_enroll',
