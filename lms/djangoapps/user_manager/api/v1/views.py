@@ -11,6 +11,15 @@ from ...models import UserManagerRole
 
 
 def _filter_by_manager_id(queryset, manager_id):
+    """
+    Filters provided ``queryset`` by ``manager_id`` where ``manager_id``
+    can be a username or email address.
+    Args:
+        queryset(QuerySet): UserManagerRole queryset
+        manager_id(str): username or email address of manager
+    Returns:
+        queryset filtered by manager
+    """
     if manager_id is None:
         return queryset
     elif '@' in manager_id:
@@ -25,6 +34,15 @@ def _filter_by_manager_id(queryset, manager_id):
 
 
 def _filter_by_user_id(queryset, user_id):
+    """
+    Filters provided ``queryset`` by ``user_id`` where ``user_id`` can
+    be a username or email address.
+    Args:
+        queryset(QuerySet): UserManagerRole queryset
+        user_id(str): username or email address of user
+    Returns:
+        queryset filtered by user
+    """
     if user_id is None:
         return queryset
     elif '@' in user_id:
@@ -36,7 +54,54 @@ def _filter_by_user_id(queryset, user_id):
 @view_auth_classes(is_authenticated=True)
 class ManagerListView(ListAPIView):
     """
-    See a list of all managers. Lists their id (if any) and email.
+        **Use Case**
+
+            * Get a list of all users that are managers for other users
+
+        **Example Request**
+
+            GET /api/user_manager/v1/managers/
+
+        **GET Parameters**
+
+            None
+
+        **GET Response Values**
+
+            If the request for information about the managers is successful, an HTTP 200 "OK"
+            response is returned with a collection of managers.
+
+            The HTTP 200 response has the following values.
+
+            * count: The number of managers in a course.
+
+            * next: The URI to the next page of results.
+
+            * previous: The URI to the previous page of results.
+
+            * num_pages: The number of pages.
+
+            * results: a list of manager users:
+
+                * id: The user id for a manager user, or null if manager doesn't have an
+                    account yet.
+
+                * email: Email address of manager.
+
+        **Example GET Response**
+
+            {
+                "count": 99,
+                "next": "https://courses.org/api/user_manager/v1/managers/?page=2",
+                "previous": null,
+                "results": {
+                    {
+                        "email": "staff@example.com",
+                        "id": 9
+                    },
+                    { ... }
+                }
+            }
     """
     serializer_class = ManagerListSerializer
     queryset = UserManagerRole.objects.values(
@@ -49,7 +114,95 @@ class ManagerListView(ListAPIView):
 @view_auth_classes(is_authenticated=True)
 class ManagerReportsListView(ListCreateAPIView):
     """
-    See a list of all direct reports for a manager. Lists their id and email.
+        **Use Case**
+
+            * Get a list of all users that are reports for the provided manager.
+
+            * Add a user as a report under a manger.
+
+            * Remove a user or all users under a manager.
+
+        **Example Request**
+
+            GET /api/user_manager/v1/reports/{user_id}/
+
+            POST /api/user_manager/v1/reports/{user_id}/ {
+                "email": "{email}"
+            }
+
+            DELETE /api/user_manager/v1/reports/{user_id}/
+
+            DELETE /api/user_manager/v1/reports/{user_id}/?user={user_id}
+
+        **GET Parameters**
+
+            * user_id: username or email address for user whose reports you want fetch
+
+        **POST Parameters**
+
+            * user_id: username or email address for user for whom you want to add a manger
+
+            * email: Email address for a user
+
+        **DELETE Parameters**
+
+            * user_id: username or email address for user
+
+        **GET Response Values**
+
+            If the request for information about the managers is successful, an HTTP 200 "OK"
+            response is returned with a collection of managers.
+
+            The HTTP 200 response has the following values.
+
+            * count: The number of managers in a course.
+
+            * next: The URI to the next page of results.
+
+            * previous: The URI to the previous page of results.
+
+            * num_pages: The number of pages.
+
+            * results: a list of manager users:
+
+                * id: The user id for a user.
+
+                * email: Email address of user.
+
+        **Example GET Response**
+
+            GET /api/user_manager/v1/reports/edx@example.com/
+
+            {
+                "count": 99,
+                "next": "https://courses.org/api/user_manager/v1/managers/?page=2",
+                "previous": null,
+                "results": {
+                    {
+                        "email": "staff@example.com",
+                        "id": 9
+                    },
+                    { ... }
+                }
+            }
+
+        **Example POST Response**
+
+            POST /api/user_manager/v1/reports/edx@example.com/ {
+                "email": "user@email.com"
+            }
+
+            {
+                "email": "user@email.com"
+                "id": 11
+            }
+
+        **Example DELETE Response**
+
+            DELETE /api/user_manager/v1/reports/edx@exmaple.com/
+
+            DELETE /api/user_manager/v1/reports/edx@exmaple.com/?report=some@user.com
+
     """
     serializer_class = ManagerReportsSerializer
 
