@@ -1882,7 +1882,7 @@ class CertificateItem(OrderItem):
         """
 
         # Only refund verified cert unenrollments that are within bounds of the expiration date
-        if (not course_enrollment.refundable()) or skip_refund:
+        if skip_refund or (not course_enrollment.refundable()):
             return
 
         target_certs = CertificateItem.objects.filter(course_id=course_enrollment.course_id, user_id=course_enrollment.user, status='purchased', mode='verified')
