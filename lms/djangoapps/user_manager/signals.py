@@ -11,6 +11,8 @@ from lms.djangoapps.user_manager.models import UserManagerRole
 @receiver(post_save, sender=User)
 def upgrade_manager_role_entry(sender, **kwargs):  # pylint: disable=unused-argument
     """
+    Upgrade an unregistered_manager_email link to a proper link to a
+    manager user account, when a manager registers.
     """
     created = kwargs.get('created')
     user = kwargs.get('instance')
@@ -22,4 +24,3 @@ def upgrade_manager_role_entry(sender, **kwargs):  # pylint: disable=unused-argu
             unregistered_manager_email=None,
             manager_user=user,
         )
-

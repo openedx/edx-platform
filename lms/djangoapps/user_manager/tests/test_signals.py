@@ -38,4 +38,3 @@ class UserManagerRoleSignalsTest(TestCase):
         self.assertEqual(user_manager_role.manager_user, manager)
 
         mock_upgrade_manager_role_entry.assert_called()
-

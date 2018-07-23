@@ -1,3 +1,6 @@
+"""
+Models for User Manager Application.
+"""
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -40,6 +43,12 @@ class UserManagerRole(models.Model):
         unique_together = (
             ('user', 'manager_user'),
             ('user', 'unregistered_manager_email'),
+        )
+
+    def __unicode__(self):
+        return '{user} reports to {manager}'.format(
+            user=self.user.email,
+            manager=self.manager_email,
         )
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
