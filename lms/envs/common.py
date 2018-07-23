@@ -3146,11 +3146,6 @@ LTI_USER_EMAIL_DOMAIN = 'lti.example.com'
 # The time value is in seconds.
 LTI_AGGREGATE_SCORE_PASSBACK_DELAY = 15 * 60
 
-
-# For help generating a key pair import and run `openedx.core.lib.rsa_key_utils.generate_rsa_key_pair()`
-JWT_PRIVATE_SIGNING_KEY = None
-JWT_EXPIRED_PRIVATE_SIGNING_KEYS = []
-
 # Credit notifications settings
 NOTIFICATION_EMAIL_CSS = "templates/credit_notifications/credit_notification.css"
 NOTIFICATION_EMAIL_EDX_LOGO = "templates/credit_notifications/edx-logo-header.png"
@@ -3158,20 +3153,7 @@ NOTIFICATION_EMAIL_EDX_LOGO = "templates/credit_notifications/edx-logo-header.pn
 
 ################################ Settings for JWTs ################################
 
-DEFAULT_JWT_ISSUER = {
-    'ISSUER': 'change-me',
-    'SECRET_KEY': SECRET_KEY,
-    'AUDIENCE': 'change-me',
-}
-
-RESTRICTED_APPLICATION_JWT_ISSUER = {
-    'ISSUER': 'change-me',
-    'SECRET_KEY': SECRET_KEY,
-    'AUDIENCE': 'change-me',
-}
-
 JWT_AUTH = {
-    'JWT_ALGORITHM': 'HS256',
     'JWT_VERIFY_EXPIRATION': True,
 
     'JWT_PAYLOAD_GET_USERNAME_HANDLER': lambda d: d.get('username'),
@@ -3182,13 +3164,15 @@ JWT_AUTH = {
     'JWT_EXPIRATION': 30,
     'JWT_SUPPORTED_VERSION': '1.1.0',
 
-    'JWT_SECRET_KEY': DEFAULT_JWT_ISSUER['SECRET_KEY'],
-    'JWT_ISSUER': DEFAULT_JWT_ISSUER['ISSUER'],
-    'JWT_AUDIENCE': DEFAULT_JWT_ISSUER['AUDIENCE'],
-    'JWT_ISSUERS': [
-        DEFAULT_JWT_ISSUER,
-        RESTRICTED_APPLICATION_JWT_ISSUER,
-    ],
+    'JWT_ALGORITHM': 'HS256',
+    'JWT_SECRET_KEY': SECRET_KEY,
+
+    'JWT_SIGNING_ALGORITHM': 'RS512',
+    'JWT_PRIVATE_SIGNING_JWK': None,
+    'JWT_PUBLIC_SIGNING_JWK_SET': None,
+
+    'JWT_ISSUER': 'change-me',
+    'JWT_AUDIENCE': 'change-me',
 }
 
 ################################ Settings for Microsites ################################

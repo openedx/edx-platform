@@ -2,10 +2,9 @@
 import json
 from time import time
 
-from Cryptodome.PublicKey import RSA
 from django.conf import settings
 from django.utils.functional import cached_property
-from jwkest.jwk import KEYS, RSAKey
+from jwkest import jwk
 from jwkest.jws import JWS
 
 from student.models import UserProfile, anonymous_id_for_user
@@ -105,11 +104,12 @@ class JwtBuilder(object):
 
     def encode(self, payload):
         """Encode the provided payload."""
-        keys = KEYS()
+        keys = jwk.KEYS()
 
         if self.asymmetric:
-            keys.add(RSAKey(key=RSA.importKey(settings.JWT_PRIVATE_SIGNING_KEY)))
-            algorithm = 'RS512'
+            serialized_keypair = json.loads(self.jwt_auth['JWT_PRIVATE_SIGNING_JWK'])
+            keys.add(serialized_keypair)
+            algorithm = self.jwt_auth['JWT_SIGNING_ALGORITHM']
         else:
             key = self.secret if self.secret else self.jwt_auth['JWT_SECRET_KEY']
             keys.add({'key': key, 'kty': 'oct'})

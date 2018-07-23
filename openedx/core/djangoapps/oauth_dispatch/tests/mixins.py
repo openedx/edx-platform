@@ -1,9 +1,10 @@
 """
 OAuth Dispatch test mixins
 """
-
 from django.conf import settings
 
+from jwkest.jwk import KEYS
+from jwkest.jws import JWS
 import jwt
 from jwt.exceptions import ExpiredSignatureError
 
@@ -14,7 +15,7 @@ class AccessTokenMixin(object):
     """ Mixin for tests dealing with OAuth 2 access tokens. """
 
     def assert_valid_jwt_access_token(self, access_token, user, scopes=None, should_be_expired=False, filters=None,
-                                      jwt_issuer=settings.DEFAULT_JWT_ISSUER, should_be_restricted=None):
+                                      should_be_asymmetric_key=False, should_be_restricted=None):
         """
         Verify the specified JWT access token is valid, and belongs to the specified user.
 
@@ -22,27 +23,38 @@ class AccessTokenMixin(object):
             access_token (str): JWT
             user (User): User whose information is contained in the JWT payload.
             (optional) should_be_expired: indicates if the passed in JWT token is expected to be expired
+            (optional) should_be_asymmetric_key: indicates if the JWT token should be signed with an
+                asymmetric key.
 
         Returns:
             dict: Decoded JWT payload
         """
         scopes = scopes or []
-        audience = jwt_issuer['AUDIENCE']
-        issuer = jwt_issuer['ISSUER']
-        secret_key = jwt_issuer['SECRET_KEY']
+        audience = settings.JWT_AUTH['JWT_AUDIENCE']
+        issuer = settings.JWT_AUTH['JWT_ISSUER']
+        secret_key = settings.JWT_AUTH['JWT_SECRET_KEY']
 
         def _decode_jwt(verify_expiration):
             """
             Helper method to decode a JWT with the ability to
             verify the expiration of said token
             """
+            keys = KEYS()
+            if should_be_asymmetric_key:
+                keys.load_jwks(settings.JWT_AUTH['JWT_PUBLIC_SIGNING_JWK_SET'])
+            else:
+                keys.add({'key': secret_key, 'kty': 'oct'})
+
+            _ = JWS().verify_compact(access_token.encode('utf-8'), keys)
+
             return jwt.decode(
                 access_token,
                 secret_key,
                 algorithms=[settings.JWT_AUTH['JWT_ALGORITHM']],
                 audience=audience,
                 issuer=issuer,
-                verify_expiration=verify_expiration
+                verify_expiration=verify_expiration,
+                options={'verify_signature': False},
             )
 
         # Note that if we expect the claims to have expired
