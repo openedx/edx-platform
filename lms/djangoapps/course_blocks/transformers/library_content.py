@@ -4,6 +4,7 @@ Content Library Transformer.
 
 
 import json
+import random
 
 import six
 from eventtracking import tracker
@@ -102,7 +103,8 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
                 # Save back any changes
                 if any(block_keys[changed] for changed in ('invalid', 'overlimit', 'added')):
                     state_dict['selected'] = list(selected)
-                    StudentModule.save_state(
+                    random.shuffle(state_dict['selected'])
+                    StudentModule.save_state(  # pylint: disable=no-value-for-parameter
                         student=usage_info.user,
                         course_id=usage_info.course_key,
                         module_state_key=block_key,
