@@ -837,10 +837,11 @@ def student_dashboard(request):
         })
 
     # Gather urls for course card resume buttons.
-    resume_button_urls = _get_urls_for_resume_buttons(user, course_enrollments)
+    resume_button_urls = ['' for entitlement in course_entitlements]
+    for url in _get_urls_for_resume_buttons(user, course_enrollments):
+        resume_button_urls.append(url)
     # There must be enough urls for dashboard.html. Template creates course
     # cards for "enrollments + entitlements".
-    resume_button_urls += ['' for entitlement in course_entitlements]
     context.update({
         'resume_button_urls': resume_button_urls
     })
