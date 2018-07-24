@@ -21,6 +21,7 @@ class MandrillClient(object):
     COURSE_EARLY_WELCOME_TEMPLATE = 'course-early-welcome'
     COURSE_START_REMINDER_TEMPLATE = 'course-start-reminder'
     COURSE_COMPLETION_TEMPLATE = 'course-completion'
+    REMIND_LEARNERS_TEMPLATE = 'remind-learners'
 
     def __init__(self):
         self.mandrill_client = mandrill.Mandrill(settings.MANDRILL_API_KEY)
