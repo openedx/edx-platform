@@ -326,7 +326,7 @@ class TestPartnerReportingCleanup(ModuleStoreTestCase):
         self.course_awesome_org = CourseFactory(org='awesome_org')
         self.headers = build_jwt_headers(self.test_superuser)
         self.headers['content_type'] = "application/json"
-        self.url = reverse('accounts_retirement_partner_report')
+        self.url = reverse('accounts_retirement_partner_report_cleanup')
         self.maxDiff = None
 
     def create_partner_reporting_statuses(self, is_being_processed=True, num=2):
@@ -351,7 +351,7 @@ class TestPartnerReportingCleanup(ModuleStoreTestCase):
 
     def assert_status_and_count(self, statuses, remaining_count, expected_status=status.HTTP_204_NO_CONTENT):
         """
-        Performs a test client DELETE against the retirement reporting cleanup endpoint. It generates
+        Performs a test client POST against the retirement reporting cleanup endpoint. It generates
         the JSON of usernames to clean up based on the given list of UserRetirementPartnerReportingStatuses,
         asserts that the given number of UserRetirementPartnerReportingStatus rows are still in the database
         after the operation, and asserts that the given expected_status HTTP status code is returned.
@@ -359,7 +359,7 @@ class TestPartnerReportingCleanup(ModuleStoreTestCase):
         usernames = [{'original_username': u.original_username} for u in statuses]
 
         data = json.dumps(usernames)
-        response = self.client.delete(self.url, data=data, **self.headers)
+        response = self.client.post(self.url, data=data, **self.headers)
         print(response)
         print(response.content)
 
