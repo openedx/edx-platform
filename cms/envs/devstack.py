@@ -14,6 +14,7 @@ USER_TASKS_ARTIFACT_STORAGE = COURSE_IMPORT_EXPORT_STORAGE
 DEBUG = True
 USE_I18N = True
 DEFAULT_TEMPLATE_ENGINE['OPTIONS']['debug'] = DEBUG
+SITE_NAME = 'localhost:8001'
 HTTPS = 'off'
 
 ################################ LOGGERS ######################################
