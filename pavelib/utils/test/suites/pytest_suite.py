@@ -119,6 +119,23 @@ class SystemTestSuite(PytestSuite):
 
         self.processes = int(self.processes)
 
+    def _under_coverage_cmd(self, cmd):
+        """
+        If self.run_under_coverage is True, it returns the arg 'cmd'
+        altered to be run under coverage. It returns the command
+        unaltered otherwise.
+        """
+        if self.run_under_coverage:
+            if self.xdist_ip_addresses:
+                for module in Env.covered_modules():
+                    cmd.append('--cov')
+                    cmd.append(module)
+            else:
+                cmd.append('--cov')
+            cmd.append('--cov-report=')
+
+        return cmd
+
     @property
     def cmd(self):
         if self.django_toxenv:
@@ -148,12 +165,8 @@ class SystemTestSuite(PytestSuite):
                 xdist_string = '--tx ssh=ubuntu@{}//python="source /edx/app/edxapp/edxapp_env; ' \
                                'python"//chdir="/edx/app/edxapp/edx-platform"'.format(ip)
                 cmd.append(xdist_string)
-            already_synced_dirs = set()
-            for test_path in self.test_id.split():
-                test_root_dir = test_path.split('/')[0]
-                if test_root_dir not in already_synced_dirs:
-                    cmd.append('--rsyncdir {}'.format(test_root_dir))
-                    already_synced_dirs.add(test_root_dir)
+            for rsync_dir in Env.rsync_dirs():
+                cmd.append('--rsyncdir {}'.format(rsync_dir))
         else:
             if self.processes == -1:
                 cmd.append('-n auto')
@@ -256,12 +269,8 @@ class LibTestSuite(PytestSuite):
                 xdist_string = '--tx ssh=ubuntu@{}//python="source /edx/app/edxapp/edxapp_env; ' \
                                'python"//chdir="/edx/app/edxapp/edx-platform"'.format(ip)
                 cmd.append(xdist_string)
-            already_synced_dirs = set()
-            for test_path in self.test_id.split():
-                test_root_dir = test_path.split('/')[0]
-                if test_root_dir not in already_synced_dirs:
-                    cmd.append('--rsyncdir {}'.format(test_root_dir))
-                    already_synced_dirs.add(test_root_dir)
+            for rsync_dir in Env.rsync_dirs():
+                cmd.append('--rsyncdir {}'.format(rsync_dir))
 
         if self.eval_attr:
             cmd.append("-a '{}'".format(self.eval_attr))
@@ -277,7 +286,12 @@ class LibTestSuite(PytestSuite):
         unaltered otherwise.
         """
         if self.run_under_coverage:
-            cmd.append('--cov')
+            if self.xdist_ip_addresses:
+                for module in Env.covered_modules():
+                    cmd.append('--cov')
+                    cmd.append(module)
+            else:
+                cmd.append('--cov')
             if self.append_coverage:
                 cmd.append('--cov-append')
             cmd.append('--cov-report=')
