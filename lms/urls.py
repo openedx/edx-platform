@@ -1082,4 +1082,13 @@ if settings.FEATURES.get('ENABLE_API_DOCS'):
         url(r'^api-docs/$', get_swagger_view(title='LMS API')),
     ]
 
+# User Manager APIs
+
+urlpatterns += [
+    url(
+        r'^api/user_manager/',
+        include('lms.djangoapps.user_manager.api.urls', namespace='user_manager_api')
+    ),
+]
+
 urlpatterns.extend(plugin_urls.get_patterns(plugin_constants.ProjectType.LMS))

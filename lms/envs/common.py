@@ -2299,6 +2299,9 @@ INSTALLED_APPS = [
 
     # API Documentation
     'rest_framework_swagger',
+
+    # User Manager API
+    'user_manager.apps.UserManagerConfig',
 ]
 
 ######################### CSRF #########################################
