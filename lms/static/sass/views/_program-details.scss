@@ -1,3 +1,11 @@
+// +notes:
+// ---------------------
+// * Styling for the program details main view and sidebar view
+
+// +local variables/utilities:
+// ----------------------
+$btn-color-primary: palette(primary, dark);
+
 .program-details {
   .content-wrapper {
     max-width: 100%;
@@ -316,8 +324,8 @@
 
   .course-enroll-view {
     .view-course-button {
-      background: palette(primary, dark);
-      border-color: palette(primary, dark);
+      background: $btn-color-primary;
+      border-color: $btn-color-primary;
       height: 37px;
       padding: 7px 18.5px 0 18.5px;
       width: auto;
@@ -352,7 +360,7 @@
       }
 
       button, .enroll-course-button {
-        background-color: palette(primary, dark);
+        background-color: $btn-color-primary;
         height: 37px;
         width: 128px;
         padding: 0;
@@ -361,7 +369,7 @@
         font-size: 0.9375em;
 
         &:hover {
-          color: palette(primary, dark);
+          color: $btn-color-primary;
           background-color: theme-color("inverse");
         }
 
@@ -626,27 +634,80 @@
   }
 }
 
+// CSS for the program sidebar
 .program-sidebar {
-  padding: 30px 10px;
+  padding: $baseline*1.5 $baseline*0.5;
 
   .program-record {
-    text-align: center;
+    text-align: left;
     padding-bottom: 2em;
+  }
+
+  .motivating-section {
+    @include margin-left($baseline*0.75);
+
+    font-size: 0.9375em;
+    width: $baseline*15.5;
+
+    @media (min-width: $bp-screen-sm) {
+      width: auto;
+    }
+
+    .motivating-message {
+      color: #414141;
+    }
+  }
+
+  .record-heading {
+    font-family: $font-family-sans-serif;
+    font-weight: bold;
+    color: palette(primary, dark);
+    font-size: 0.9375em;
+    line-height: normal;
+    padding-bottom: $baseline*0.25;
+    border-bottom: $baseline*0.15 solid $divider-color;
+    margin: $baseline*0.5 0 $baseline 0;
+  }
+
+  .view-record-wrapper {
+    text-align: right;
+
+    .view-record-button {
+      background: $btn-color-primary;
+      border-color: $btn-color-primary;
+      height: $baseline*1.85;
+      padding: $baseline*0.35 $baseline*0.925 $baseline*0.35 $baseline*0.925;
+      width: auto;
+      border-radius: 0;
+      text-align: center;
+      font-size: 0.9375em;
+      //margin-top: 5px;
+      margin-top: $baseline*0.25;
+
+      /* IE11 CSS styles */
+      @media (min-width: $bp-screen-md) and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+        @include float(right);
+      }
+
+      @media (min-width: $bp-screen-lg) {
+        margin-top: 0;
+      }
+    }
   }
 
   @media (min-width: $bp-screen-md) {
     @include float(right);
 
-    width: 300px;
-    padding-right: 30px;
+    width: $baseline*15;
+    padding-right: $baseline*1.5;
     position: relative;
   }
 
   @media (min-width: $bp-screen-lg) {
-    width: 450px;
+    width: $baseline*22.5;
 
     .program-progress {
-      @include margin-left(50px);
+      @include margin-left($baseline*2.5);
     }
   }
 
