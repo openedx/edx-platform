@@ -64,7 +64,10 @@ class CurrencyAdmin(admin.ModelAdmin):
 
 
 class EmailPreferenceAdmin(admin.ModelAdmin):
-    list_display = ('user', 'opt_in', 'created', 'modified', )
+    list_display = ('user', 'opt_in', 'modified_time', )
+
+    def modified_time(self, obj):
+        return "{}".format(obj.modified.strftime("%B %d, %Y %H:%M:%S"))
 
 
 class OrganizationMetricAdmin(admin.ModelAdmin):
