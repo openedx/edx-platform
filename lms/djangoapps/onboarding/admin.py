@@ -63,6 +63,10 @@ class CurrencyAdmin(admin.ModelAdmin):
     list_display = ('country', 'name', 'alphabetic_code', )
 
 
+class EmailPreferenceAdmin(admin.ModelAdmin):
+    list_display = ('user', 'opt_in', 'created', 'modified', )
+
+
 class OrganizationMetricAdmin(admin.ModelAdmin):
     list_display = ('org', 'user', 'submission_date', 'actual_data', 'effective_date', 'total_clients',
                     'total_employees', 'local_currency', 'total_revenue', 'total_donations', 'total_expenses',
@@ -93,7 +97,7 @@ admin.site.register(EducationLevel, EnglishProficiencyAdmin)
 admin.site.register(EnglishProficiency, EnglishProficiencyAdmin)
 admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(UserExtendedProfile, UserExtendedProfileAdmin)
-admin.site.register(EmailPreference)
+admin.site.register(EmailPreference, EmailPreferenceAdmin)
 admin.site.register(FunctionArea, FunctionAreaAdmin)
 admin.site.register(OrganizationPartner, OrganizationPartnerAdmin)
 admin.site.register(OrganizationMetric, OrganizationMetricAdmin)

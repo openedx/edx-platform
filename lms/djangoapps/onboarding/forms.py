@@ -729,7 +729,7 @@ class UpdateRegModelForm(RegModelForm):
     )
 
     opt_in = forms.ChoiceField(label=ugettext_noop('Do you want to hear from us about *unique funding opportunities, '
-                                                   'free regional events. and new course and community programming?* '
+                                                   'free regional events, and new course and community programming?* '
                                                    'If so, please check "Yes". If not, please check "No"'),
                                required=False, label_suffix="*", choices=OPT_IN_CHOICES, widget=forms.RadioSelect)
 
