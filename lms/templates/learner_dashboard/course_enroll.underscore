@@ -4,7 +4,7 @@
         <div class="grade-display"><%- grade %>%</div>
     </div>
 <% } else if (is_enrolled && (typeof expired === 'undefined' || expired === false)) { %>
-    <a href="<%- course_url %>" class="view-course-button btn-brand btn cta-primary">
+    <a href="<%- course_url %>" class="view-course-button btn-view-detail btn-brand btn cta-primary">
         <% if (is_course_ended) { %>
             <%- gettext('View Archived Course') %>
         <% } else { %>

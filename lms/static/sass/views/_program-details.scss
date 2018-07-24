@@ -251,18 +251,7 @@
   }
 
   .course-list-heading {
-    font-family: $font-family-sans-serif;
     font-weight: bold;
-    color: palette(primary, dark);
-    font-size: 0.9375em;
-    line-height: normal;
-    padding-bottom: 5px;
-    border-bottom: 3px solid $divider-color;
-    margin: {
-      top: 10px;
-      bottom: 20px;
-    }
-
     .status {
       @include margin-right(7px);
     }
@@ -273,25 +262,7 @@
   }
 
   .course-list-headings {
-    .motivating-section {
-      @include margin-left(15px);
 
-      font-size: 0.9375em;
-      width: 310px;
-
-      @media (min-width: $bp-screen-sm) {
-        width: auto;
-      }
-
-      .motivating-heading {
-        margin-bottom: 0;
-        font-weight: 600;
-      }
-
-      .motivating-message {
-        color: #414141;
-      }
-    }
   }
 
   .program-heading {
@@ -316,24 +287,7 @@
 
   .course-enroll-view {
     .view-course-button {
-      background: palette(primary, dark);
-      border-color: palette(primary, dark);
-      height: 37px;
       padding: 7px 18.5px 0 18.5px;
-      width: auto;
-      border-radius: 0;
-      text-align: center;
-      font-size: 0.9375em;
-      margin-top: 5px;
-
-      /* IE11 CSS styles */
-      @media (min-width: $bp-screen-md) and (-ms-high-contrast: none), (-ms-high-contrast: active) {
-        @include float(right);
-      }
-
-      @media (min-width: $bp-screen-lg) {
-        margin-top: 0;
-      }
     }
 
     .enroll-button {
@@ -630,8 +584,16 @@
   padding: 30px 10px;
 
   .program-record {
-    text-align: center;
+    text-align: left;
     padding-bottom: 2em;
+  }
+
+  .view-record-wrapper {
+    text-align: right;
+
+    .view-record-button {
+      padding: 7px 18.5px 7px 18.5px;
+    }
   }
 
   @media (min-width: $bp-screen-md) {
@@ -655,6 +617,62 @@
   }
 }
 
+
+// CSS used in both the main program detail and the program detail sidebar
+.btn-view-detail {
+  background: palette(primary, dark);
+  border-color: palette(primary, dark);
+  height: 37px;
+  width: auto;
+  border-radius: 0;
+  text-align: center;
+  font-size: 0.9375em;
+  margin-top: 5px;
+
+  /* IE11 CSS styles */
+  @media (min-width: $bp-screen-md) and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+    @include float(right);
+  }
+
+  @media (min-width: $bp-screen-lg) {
+    margin-top: 0;
+  }
+}
+
+.detail-heading {
+  font-family: $font-family-sans-serif;
+  color: palette(primary, dark);
+  font-size: 0.9375em;
+  line-height: normal;
+  padding-bottom: 5px;
+  border-bottom: 3px solid $divider-color;
+  margin: {
+    top: 10px;
+    bottom: 20px;
+  }
+}
+
+.motivating-section {
+  @include margin-left(15px);
+
+  font-size: 0.9375em;
+  width: 310px;
+
+  @media (min-width: $bp-screen-sm) {
+    width: auto;
+  }
+
+  .motivating-heading {
+    margin-bottom: 0;
+    font-weight: 600;
+  }
+
+  .motivating-message {
+    color: #414141;
+  }
+}
+
+// Certificate CSS
 .certificate-heading {
   margin-bottom: 10px;
 

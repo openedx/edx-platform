@@ -43,7 +43,7 @@
     <div class="course-list-headings">
         <% if (inProgressCount) { %>
             <div class="in-progress-group">
-                <h4 class="course-list-heading">
+                <h4 class="course-list-heading detail-heading">
                     <span class="status"><%- gettext('COURSES IN PROGRESS') %></span>
                     <span class="count"><%- inProgressCount %></span>
                 </h4>
@@ -52,7 +52,7 @@
         <% } %>
         <% if (remainingCount) { %>
             <div class="remaining-group">
-                <h4 class="course-list-heading">
+                <h4 class="course-list-heading detail-heading">
                     <span class="status"><%- gettext('REMAINING COURSES') %></span>
                     <span class="count"><%- remainingCount %></span>
                 </h4>
@@ -60,7 +60,7 @@
             </div>
         <% } %>
         <div class="completed-group">
-            <h4 class="course-list-heading">
+            <h4 class="course-list-heading detail-heading">
                 <span class="status"><%- gettext('COMPLETED COURSES') %></span>
                 <span class="count"><%- completedCount %></span>
             </h4>
