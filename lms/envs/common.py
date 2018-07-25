@@ -72,7 +72,6 @@ FEATURES = {
     'DISPLAY_HISTOGRAMS_TO_STAFF': False,  # For large courses this slows down courseware access for staff.
 
     'REROUTE_ACTIVATION_EMAIL': False,  # nonempty string = address for all activation emails
-    'DEBUG_LEVEL': 0,  # 0 = lowest level, least verbose, 255 = max level, most verbose
 
     ## DO NOT SET TO True IN THIS FILE
     ## Doing so will cause all courses to be released on production
@@ -98,7 +97,6 @@ FEATURES = {
     'ENABLE_DJANGO_ADMIN_SITE': True,  # set true to enable django's admin site, even on prod (e.g. for course ops)
     'ENABLE_SQL_TRACKING_LOGS': False,
     'ENABLE_LMS_MIGRATION': False,
-    'ENABLE_MANUAL_GIT_RELOAD': False,
 
     'ENABLE_MASQUERADE': True,  # allow course staff to change to student view of courseware
 
@@ -143,9 +141,6 @@ FEATURES = {
     # LMS OPERATION. See analytics.py for details about what
     # this does.
     'RUN_AS_ANALYTICS_SERVER_ENABLED': False,
-
-    # Flip to True when the YouTube iframe API breaks (again)
-    'USE_YOUTUBE_OBJECT_API': False,
 
     # Give a UI to show a student's submission history in a problem by the
     # Staff Debug tool.
