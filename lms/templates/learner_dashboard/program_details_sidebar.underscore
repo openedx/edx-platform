@@ -15,3 +15,6 @@
     </aside>
 <% } %>
 <aside class="aside js-course-certificates"></aside>
+<%
+// TODO: Move program record button to new section, add program pathways data in additional section
+%>
