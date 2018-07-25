@@ -11,6 +11,7 @@ from common.test.acceptance.tests.helpers import UniqueCourseTest
 from openedx.core.djangoapps.catalog.tests.factories import (
     CourseFactory,
     CourseRunFactory,
+    CreditPathwayFactory,
     ProgramFactory,
     ProgramTypeFactory
 )
@@ -24,6 +25,14 @@ class ProgramPageBase(ProgramsConfigMixin, CatalogIntegrationMixin, UniqueCourse
         self.set_programs_api_configuration(is_enabled=True)
 
         self.programs = ProgramFactory.create_batch(3)
+        self.credit_pathways = CreditPathwayFactory.create_batch(3)
+        for pathway in self.credit_pathways:
+            self.programs += pathway['programs']
+
+        # add some of the previously created programs to some pathways
+        self.credit_pathways[0]['programs'].extend([self.programs[0], self.programs[1]])
+        self.credit_pathways[1]['programs'].append(self.programs[0])
+
         self.username = None
 
     def auth(self, enroll=True):
@@ -44,15 +53,18 @@ class ProgramPageBase(ProgramsConfigMixin, CatalogIntegrationMixin, UniqueCourse
         program_type = ProgramTypeFactory()
         return ProgramFactory(courses=[course], type=program_type['name'])
 
-    def stub_catalog_api(self, programs):
+    def stub_catalog_api(self, programs, credit_pathways):
         """
-        Stub the discovery service's program list and detail API endpoints.
+        Stub the discovery service's program list and detail API endpoints, as well as
+        the credit pathway list endpoint.
         """
         self.set_catalog_integration(is_enabled=True, service_username=self.username)
         CatalogFixture().install_programs(programs)
 
         program_types = [program['type'] for program in programs]
         CatalogFixture().install_program_types(program_types)
+
+        CatalogFixture().install_credit_pathways(credit_pathways)
 
     def cache_programs(self):
         """
@@ -73,7 +85,7 @@ class ProgramListingPageTest(ProgramPageBase):
     def test_no_enrollments(self):
         """Verify that no cards appear when the user has no enrollments."""
         self.auth(enroll=False)
-        self.stub_catalog_api(self.programs)
+        self.stub_catalog_api(self.programs, self.credit_pathways)
         self.cache_programs()
 
         self.listing_page.visit()
@@ -87,7 +99,7 @@ class ProgramListingPageTest(ProgramPageBase):
         but none are included in an active program.
         """
         self.auth()
-        self.stub_catalog_api(self.programs)
+        self.stub_catalog_api(self.programs, self.credit_pathways)
         self.cache_programs()
 
         self.listing_page.visit()
@@ -109,7 +121,7 @@ class ProgramListingPageA11yTest(ProgramPageBase):
     def test_empty_a11y(self):
         """Test a11y of the page's empty state."""
         self.auth(enroll=False)
-        self.stub_catalog_api(programs=[self.program])
+        self.stub_catalog_api(programs=[self.program], credit_pathways=[])
         self.cache_programs()
 
         self.listing_page.visit()
@@ -121,7 +133,7 @@ class ProgramListingPageA11yTest(ProgramPageBase):
     def test_cards_a11y(self):
         """Test a11y when program cards are present."""
         self.auth()
-        self.stub_catalog_api(programs=[self.program])
+        self.stub_catalog_api(programs=[self.program], credit_pathways=[])
         self.cache_programs()
 
         self.listing_page.visit()
@@ -145,7 +157,7 @@ class ProgramDetailsPageA11yTest(ProgramPageBase):
     def test_a11y(self):
         """Test the page's a11y compliance."""
         self.auth()
-        self.stub_catalog_api(programs=[self.program])
+        self.stub_catalog_api(programs=[self.program], credit_pathways=[])
         self.cache_programs()
 
         self.details_page.visit()

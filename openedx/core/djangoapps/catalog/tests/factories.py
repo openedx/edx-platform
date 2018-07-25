@@ -211,3 +211,13 @@ class ProgramFactory(DictFactoryBase):
 class ProgramTypeFactory(DictFactoryBase):
     name = factory.Faker('word')
     logo_image = factory.LazyFunction(generate_sized_stdimage)
+
+
+class CreditPathwayFactory(DictFactoryBase):
+    id = factory.Sequence(lambda x: x)
+    description = factory.Faker('sentence')
+    destination_url = factory.Faker('url')
+    email = factory.Faker('email')
+    name = factory.Faker('sentence')
+    org_name = factory.Faker('company')
+    programs = factory.LazyFunction(partial(generate_instances, ProgramFactory))

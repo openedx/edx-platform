@@ -15,6 +15,7 @@ class StubCatalogServiceHandler(StubHttpRequestHandler):
             r'/api/v1/programs/$': self.program_list,
             r'/api/v1/programs/([0-9a-f-]+)/$': self.program_detail,
             r'/api/v1/program_types/$': self.program_types,
+            r'/api/v1/credit_pathways/$': self.credit_pathways
         }
 
         if self.match_pattern(pattern_handlers):
@@ -46,6 +47,10 @@ class StubCatalogServiceHandler(StubHttpRequestHandler):
     def program_types(self):
         program_types = self.server.config.get('catalog.programs_types', [])
         self.send_json_response(program_types)
+
+    def credit_pathways(self):
+        credit_pathways = self.server.config.get('catalog.credit_pathways', [])
+        self.send_json_response(credit_pathways)
 
 
 class StubCatalogService(StubHttpService):

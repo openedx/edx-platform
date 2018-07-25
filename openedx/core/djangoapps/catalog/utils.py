@@ -14,7 +14,8 @@ from pytz import UTC
 
 from entitlements.utils import is_course_run_entitlement_fulfillable
 from openedx.core.constants import COURSE_PUBLISHED
-from openedx.core.djangoapps.catalog.cache import (PROGRAM_CACHE_KEY_TPL,
+from openedx.core.djangoapps.catalog.cache import (CREDIT_PATHWAY_CACHE_KEY_TPL, PROGRAM_CACHE_KEY_TPL,
+                                                   SITE_CREDIT_PATHWAY_IDS_CACHE_KEY_TPL,
                                                    SITE_PROGRAM_UUIDS_CACHE_KEY_TPL)
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.lib.edx_api_utils import get_edx_api_data
@@ -122,6 +123,62 @@ def get_program_types(name=None):
         return data
     else:
         return []
+
+
+def get_credit_pathways(site, pathway_id=None):
+    """
+    Read pathways from the cache.
+    The cache is populated by a management command, cache_programs.
+
+    Arguments:
+        site (Site): django.contrib.sites.models object
+
+    Keyword Arguments:
+        pathway_id (string): id identifying a specific pathway to read from the cache.
+
+    Returns:
+        list of dict, representing pathways.
+        dict, if a specific pathway is requested.
+    """
+    missing_details_msg_tpl = 'Failed to get details for credit pathway {id} from the cache.'
+
+    if pathway_id:
+        pathway = cache.get(CREDIT_PATHWAY_CACHE_KEY_TPL.format(id=pathway_id))
+        if not pathway:
+            logger.warning(missing_details_msg_tpl.format(id=pathway_id))
+
+        return pathway
+    pathway_ids = cache.get(SITE_CREDIT_PATHWAY_IDS_CACHE_KEY_TPL.format(domain=site.domain), [])
+    if not pathway_ids:
+        logger.warning('Failed to get credit pathway ids from the cache.')
+
+    pathways = cache.get_many([CREDIT_PATHWAY_CACHE_KEY_TPL.format(id=pathway_id) for pathway_id in pathway_ids])
+    pathways = pathways.values()
+
+    # The get_many above sometimes fails to bring back details cached on one or
+    # more Memcached nodes. It doesn't look like these keys are being evicted.
+    # 99% of the time all keys come back, but 1% of the time all the keys stored
+    # on one or more nodes are missing from the result of the get_many. One
+    # get_many may fail to bring these keys back, but a get_many occurring
+    # immediately afterwards will succeed in bringing back all the keys. This
+    # behavior can be mitigated by trying again for the missing keys, which is
+    # what we do here. Splitting the get_many into smaller chunks may also help.
+    missing_ids = set(pathway_ids) - set(pathway['id'] for pathway in pathways)
+    if missing_ids:
+        logger.info(
+            'Failed to get details for {count} pathways. Retrying.'.format(count=len(missing_ids))
+        )
+
+        retried_pathways = cache.get_many(
+            [CREDIT_PATHWAY_CACHE_KEY_TPL.format(id=pathway_id) for pathway_id in missing_ids]
+        )
+        pathways += retried_pathways.values()
+
+        still_missing_ids = set(pathway_ids) - set(pathway['id'] for pathway in pathways)
+        for missing_id in still_missing_ids:
+            logger.warning(missing_details_msg_tpl.format(id=missing_id))
+
+    return pathways
 
 
 def get_currency_data():

@@ -40,6 +40,18 @@ class CatalogFixture(object):
             data={key: json.dumps(uuids)},
         )
 
+    def install_credit_pathways(self, credit_pathways):
+        """
+        Stub the discovery service's credit pathways API endpoint
+
+        Arguments:
+             credit_pathways (list): A list of credit pathways. List endpoint will be stubbed using data from this list.
+        """
+        requests.put(
+            '{}/set_config'.format(CATALOG_STUB_URL),
+            data={'catalog.credit_pathways': json.dumps({'results': credit_pathways})}
+        )
+
     def install_program_types(self, program_types):
         """
         Stub the discovery service's program type list API endpoints.
