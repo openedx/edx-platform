@@ -1,42 +1,46 @@
 def runPythonTests() {
-    ansiColor('gnome-terminal') {
-        sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
-            checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '${sha1}']],
-                doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [],
-                userRemoteConfigs: [[credentialsId: 'jenkins-worker',
-                refspec: '+refs/heads/*:refs/remotes/origin/* +refs/pull/*:refs/remotes/origin/pr/*',
-                url: 'git@github.com:edx/edx-platform.git']]]
-            console_output = sh(returnStdout: true, script: 'bash scripts/all-tests.sh').trim()
-            dir('stdout') {
-                writeFile file: "${TEST_SUITE}-${SHARD}-stdout.log", text: console_output
-            }
-            stash includes: 'reports/**/*coverage*', name: "${TEST_SUITE}-${SHARD}-reports"
+    sshagent(credentials: ['jenkins-worker', 'jenkins-worker-pem'], ignoreMissing: true) {
+        checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '${ghprbActualCommit}']],
+            doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [],
+            userRemoteConfigs: [[credentialsId: 'jenkins-worker',
+            refspec: '+refs/heads/*:refs/remotes/origin/* +refs/pull/*:refs/remotes/origin/pr/*',
+            url: 'git@github.com:edx/edx-platform.git']]]
+        console_output = sh(returnStdout: true, script: 'bash scripts/all-tests.sh').trim()
+        dir('stdout') {
+            writeFile file: "${TEST_SUITE}-stdout.log", text: console_output
         }
+        stash includes: 'reports/**/*coverage*', name: "${TEST_SUITE}-reports"
     }
 }
 
-def savePythonTestArtifacts() {
+def pythonTestCleanup() {
     archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/**/*,test_root/log/**/*.log,**/nosetests.xml,stdout/*.log,*.log'
     junit '**/nosetests.xml'
+    sh '''source $HOME/edx-venv/bin/activate
+    bash scripts/xdist/terminate_xdist_nodes.sh'''
 }
 
 pipeline {
-
     agent { label "coverage-worker" }
-
     options {
         timestamps()
-        timeout(75)
+        timeout(60)
     }
-
+    environment {
+        XDIST_CONTAINER_SUBNET = credentials('XDIST_CONTAINER_SUBNET')
+        XDIST_CONTAINER_SECURITY_GROUP = credentials('XDIST_CONTAINER_SECURITY_GROUP')
+        XDIST_CONTAINER_TASK_NAME = "jenkins-worker-task"
+        XDIST_GIT_BRANCH = "${ghprbActualCommit}"
+    }
     stages {
         stage('Run Tests') {
             parallel {
-                stage('lms-unit-1') {
+                stage("lms-unit") {
                     agent { label "jenkins-worker" }
                     environment {
-                        SHARD = 1
-                        TEST_SUITE = 'lms-unit'
+                        TEST_SUITE = "lms-unit"
+                        XDIST_NUM_TASKS = 10
+                        XDIST_REMOTE_NUM_PROCESSES = 2
                     }
                     steps {
                         script {
@@ -46,35 +50,17 @@ pipeline {
                     post {
                         always {
                             script {
-                                savePythonTestArtifacts()
+                                pythonTestCleanup()
                             }
                         }
                     }
                 }
-                stage('lms-unit-2') {
+                stage("cms-unit") {
                     agent { label "jenkins-worker" }
                     environment {
-                        SHARD = 2
-                        TEST_SUITE = 'lms-unit'
-                    }
-                    steps{
-                        script {
-                            runPythonTests()
-                        }
-                    }
-                    post {
-                        always {
-                            script {
-                                savePythonTestArtifacts()
-                            }
-                        }
-                    }
-                }
-                stage('lms-unit-3') {
-                    agent { label "jenkins-worker" }
-                    environment {
-                        SHARD = 3
-                        TEST_SUITE = 'lms-unit'
+                        TEST_SUITE = "cms-unit"
+                        XDIST_NUM_TASKS = 4
+                        XDIST_REMOTE_NUM_PROCESSES = 2
                     }
                     steps {
                         script {
@@ -84,16 +70,17 @@ pipeline {
                     post {
                         always {
                             script {
-                                savePythonTestArtifacts()
+                                pythonTestCleanup()
                             }
                         }
                     }
                 }
-                stage('lms-unit-4') {
+                stage("commonlib-unit") {
                     agent { label "jenkins-worker" }
                     environment {
-                        SHARD = 4
-                        TEST_SUITE = 'lms-unit'
+                        TEST_SUITE = "commonlib-unit"
+                        XDIST_NUM_TASKS = 3
+                        XDIST_REMOTE_NUM_PROCESSES = 2
                     }
                     steps {
                         script {
@@ -103,216 +90,7 @@ pipeline {
                     post {
                         always {
                             script {
-                                savePythonTestArtifacts()
-                            }
-                        }
-                    }
-                }
-                stage('lms-unit-5') {
-                    agent { label "jenkins-worker" }
-                    environment {
-                        SHARD = 5
-                        TEST_SUITE = 'lms-unit'
-                    }
-                    steps {
-                        script {
-                            runPythonTests()
-                        }
-                    }
-                    post {
-                        always {
-                            script {
-                                savePythonTestArtifacts()
-                            }
-                        }
-                    }
-                }
-                stage('lms-unit-6') {
-                    agent { label "jenkins-worker" }
-                    environment {
-                        SHARD = 6
-                        TEST_SUITE = 'lms-unit'
-                    }
-                    steps {
-                        script {
-                            runPythonTests()
-                        }
-                    }
-                    post {
-                        always {
-                            script {
-                                savePythonTestArtifacts()
-                            }
-                        }
-                    }
-                }
-                stage('lms-unit-7') {
-                    agent { label "jenkins-worker" }
-                    environment {
-                        SHARD = 7
-                        TEST_SUITE = 'lms-unit'
-                    }
-                    steps {
-                        script {
-                            runPythonTests()
-                        }
-                    }
-                    post {
-                        always {
-                            script {
-                                savePythonTestArtifacts()
-                            }
-                        }
-                    }
-                }
-                stage('lms-unit-8') {
-                    agent { label "jenkins-worker" }
-                    environment {
-                        SHARD = 8
-                        TEST_SUITE = 'lms-unit'
-                    }
-                    steps {
-                        script {
-                            runPythonTests()
-                        }
-                    }
-                    post {
-                        always {
-                            script {
-                                savePythonTestArtifacts()
-                            }
-                        }
-                    }
-                }
-                stage('lms-unit-9') {
-                    agent { label "jenkins-worker" }
-                    environment {
-                        SHARD = 9
-                        TEST_SUITE = 'lms-unit'
-                    }
-                    steps {
-                        script {
-                            runPythonTests()
-                        }
-                    }
-                    post {
-                        always {
-                            script {
-                                savePythonTestArtifacts()
-                            }
-                        }
-                    }
-                }
-                stage('lms-unit-10') {
-                    agent { label "jenkins-worker" }
-                    environment {
-                        SHARD = 10
-                        TEST_SUITE = 'lms-unit'
-                    }
-                    steps {
-                        script {
-                            runPythonTests()
-                        }
-                    }
-                    post {
-                        always {
-                            script {
-                                savePythonTestArtifacts()
-                            }
-                        }
-                    }
-                }
-                stage('cms-unit-1') {
-                    agent { label "jenkins-worker" }
-                    environment {
-                        SHARD = 1
-                        TEST_SUITE = 'cms-unit'
-                    }
-                    steps {
-                        script {
-                            runPythonTests()
-                        }
-                    }
-                    post {
-                        always {
-                            script {
-                                savePythonTestArtifacts()
-                            }
-                        }
-                    }
-                }
-                stage('cms-unit-2') {
-                    agent { label "jenkins-worker" }
-                    environment {
-                        SHARD = 2
-                        TEST_SUITE = 'cms-unit'
-                    }
-                    steps {
-                        script {
-                            runPythonTests()
-                        }
-                    }
-                    post {
-                        always {
-                            script {
-                                savePythonTestArtifacts()
-                            }
-                        }
-                    }
-                }
-                stage('commonlib-unit-1') {
-                    agent { label "jenkins-worker" }
-                    environment {
-                        SHARD = 1
-                        TEST_SUITE = 'commonlib-unit'
-                    }
-                    steps {
-                        script {
-                            runPythonTests()
-                        }
-                    }
-                    post {
-                        always {
-                            script {
-                                savePythonTestArtifacts()
-                            }
-                        }
-                    }
-                }
-                stage('commonlib-unit-2') {
-                    agent { label "jenkins-worker" }
-                    environment {
-                        SHARD = 2
-                        TEST_SUITE = 'commonlib-unit'
-                    }
-                    steps {
-                        script {
-                            runPythonTests()
-                        }
-                    }
-                    post {
-                        always {
-                            script {
-                                savePythonTestArtifacts()
-                            }
-                        }
-                    }
-                }
-                stage('commonlib-unit-3') {
-                    agent { label "jenkins-worker" }
-                    environment {
-                        SHARD = 3
-                        TEST_SUITE = 'commonlib-unit'
-                    }
-                    steps {
-                        script {
-                            runPythonTests()
-                        }
-                    }
-                    post {
-                        always {
-                            script {
-                                savePythonTestArtifacts()
+                                pythonTestCleanup()
                             }
                         }
                     }
@@ -327,30 +105,16 @@ pipeline {
                 SUBSET_JOB = "null" // Keep this variable until we can remove the $SUBSET_JOB path from .coveragerc
             }
             steps {
-                ansiColor('gnome-terminal') {
-                    sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
-                        checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '${sha1}']],
-                            doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [],
-                            userRemoteConfigs: [[credentialsId: 'jenkins-worker',
-                            refspec: '+refs/heads/*:refs/remotes/origin/* +refs/pull/*:refs/remotes/origin/pr/*',
-                            url: 'git@github.com:edx/edx-platform.git']]]
-                        unstash 'lms-unit-1-reports'
-                        unstash 'lms-unit-2-reports'
-                        unstash 'lms-unit-3-reports'
-                        unstash 'lms-unit-4-reports'
-                        unstash 'lms-unit-5-reports'
-                        unstash 'lms-unit-6-reports'
-                        unstash 'lms-unit-7-reports'
-                        unstash 'lms-unit-8-reports'
-                        unstash 'lms-unit-9-reports'
-                        unstash 'lms-unit-10-reports'
-                        unstash 'cms-unit-1-reports'
-                        unstash 'cms-unit-2-reports'
-                        unstash 'commonlib-unit-1-reports'
-                        unstash 'commonlib-unit-2-reports'
-                        unstash 'commonlib-unit-3-reports'
-                        sh "./scripts/jenkins-report.sh"
-                    }
+                sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
+                    checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '${ghprbActualCommit}']],
+                        doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [],
+                        userRemoteConfigs: [[credentialsId: 'jenkins-worker',
+                        refspec: '+refs/heads/*:refs/remotes/origin/* +refs/pull/*:refs/remotes/origin/pr/*',
+                        url: 'git@github.com:edx/edx-platform.git']]]
+                    unstash 'lms-unit-reports'
+                    unstash 'cms-unit-reports'
+                    unstash 'commonlib-unit-reports'
+                    sh "./scripts/jenkins-report.sh"
                 }
             }
             post {
