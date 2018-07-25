@@ -16,10 +16,33 @@ define(
 
         window.$ = $;
         window._ = _;
+
         $script(
             '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js' +
             '?config=TeX-MML-AM_SVG&delayStartupUntil=configured',
-            'mathjax'
+            'mathjax',
+            function() {
+                window.MathJax.Hub.Config({
+                    tex2jax: {
+                        inlineMath: [
+                            ['\\(', '\\)'],
+                            ['[mathjaxinline]', '[/mathjaxinline]']
+                        ],
+                        displayMath: [
+                            ['\\[', '\\]'],
+                            ['[mathjax]', '[/mathjax]']
+                        ]
+                    }
+                });
+
+                // In order to eliminate all flashing during interactive
+                // preview, it is necessary to set processSectionDelay to 0
+                // (remove delay between input and output phases). This
+                // effectively disables fast preview, regardless of
+                // the fast preview setting as shown in the context menu.
+                window.MathJax.Hub.processSectionDelay = 0;
+                window.MathJax.Hub.Configured();
+            }
         );
         window.CodeMirror = CodeMirror;
         window.RequireJS = {
