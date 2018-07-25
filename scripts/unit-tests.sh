@@ -29,13 +29,25 @@ set -e
 #
 ###############################################################################
 
-PAVER_ARGS="-v"
-PARALLEL="--processes=-1"
 export SKIP_NPM_INSTALL="True"
 
 # Skip re-installation of Python prerequisites inside a tox execution.
 if [[ -n "$TOXENV" ]]; then
     export NO_PREREQ_INSTALL="True"
+fi
+
+if [[ -n "$XDIST_NUM_TASKS" ]]; then
+    bash scripts/xdist/prepare_xdist_nodes.sh
+    PAVER_ARGS="-v --xdist_ip_addresses="$(<pytest_task_ips.txt)""
+    export SHARD="all"
+    if [[ -n "$XDIST_REMOTE_NUM_PROCESSES" ]]; then
+        PARALLEL="--processes=$XDIST_REMOTE_NUM_PROCESSES"
+    else
+        PARALLEL="--processes=1"
+    fi
+else
+    PAVER_ARGS="-v"
+    PARALLEL="--processes=-1"
 fi
 
 case "${TEST_SUITE}" in
@@ -65,7 +77,7 @@ case "${TEST_SUITE}" in
     "cms-unit")
         case "$SHARD" in
             "all")
-                paver test_system -s cms --disable_capture ${PAVER_ARGS} 2> cms-tests.log
+                paver test_system -s cms --disable_capture ${PAVER_ARGS} ${PARALLEL} 2> cms-tests.log
                 ;;
             1)
                 paver test_system -s cms --disable_capture --eval-attr="shard==$SHARD" ${PAVER_ARGS} 2> cms-tests.${SHARD}.log
@@ -87,7 +99,7 @@ case "${TEST_SUITE}" in
     "commonlib-unit")
         case "$SHARD" in
             "all")
-                paver test_lib --disable_capture ${PAVER_ARGS} 2> common-tests.log
+                paver test_lib --disable_capture ${PAVER_ARGS} ${PARALLEL} 2> common-tests.log
                 ;;
             [1-2])
                 paver test_lib -l common/lib/xmodule --disable_capture --eval-attr="shard==$SHARD" ${PAVER_ARGS} 2> common-tests.${SHARD}.log
