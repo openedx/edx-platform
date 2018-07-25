@@ -171,7 +171,6 @@
     margin-right: ($baseline*1.5);
   }
 
-
   // UI: general action list styles (section and subsection)
   // --------------------
   .expand-collapse {
@@ -184,9 +183,8 @@
     margin-bottom: $baseline;
 
     .status-release,
-    .status-pacing,
     .status-highlights-enabled,
-    .status-checklist {
+    .status-studio-frontend {
       @extend %t-copy-base;
 
       display: inline-block;
@@ -202,13 +200,11 @@
     }
 
     .status-highlights-enabled {
-      margin-left: $baseline * 1.6;
+      vertical-align: top;
     }
 
     .status-release-label,
     .status-release-value,
-    .status-pacing-label,
-    .status-pacing-value,
     .status-highlights-enabled-label,
     .status-highlights-enabled-value,
     .status-highlights-enabled-info,
@@ -218,14 +214,7 @@
       margin-bottom: 0;
     }
 
-    .status-release-label,
-    .status-pacing-label,
-    .status-highlights-enabled-label {
-      margin-right: ($baseline/4);
-    }
-
     .status-release-value,
-    .status-pacing-value,
     .status-highlights-enabled-value {
       @extend %t-strong;
       font-size: smaller;
@@ -234,6 +223,11 @@
     .status-highlights-enabled-info {
       font-size: smaller;
       margin-left: $baseline / 2;
+    }
+
+    .status-release-label,	
+    .status-highlights-enabled-label {	
+      margin-right: ($baseline/4);	
     }
 
     .status-highlights-enabled-value.button {

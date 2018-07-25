@@ -625,7 +625,13 @@ def course_index(request, course_key):
         sections = course_module.get_children()
         course_structure = _course_outline_json(request, course_module)
         locator_to_show = request.GET.get('show', None)
-        course_release_date = get_default_time_display(course_module.start) if course_module.start != DEFAULT_START_DATE else _("Unscheduled")
+
+        course_release_date = (
+            get_default_time_display(course_module.start)
+            if course_module.start != DEFAULT_START_DATE
+            else _("Set Date")
+        )
+
         settings_url = reverse_course_url('settings_handler', course_key)
 
         try:
