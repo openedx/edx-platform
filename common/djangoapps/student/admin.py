@@ -1,5 +1,6 @@
 """ Django admin pages for student app """
 from config_models.admin import ConfigurationModelAdmin
+import waffle
 from django import forms
 from django.contrib import admin
 from django.contrib.admin.sites import NotRegistered
@@ -165,13 +166,7 @@ class CourseEnrollmentForm(forms.ModelForm):
         fields = '__all__'
 
 
-# Page disabled because it makes DB quries that impact performance enough to
-# cause a site outage. It may be re-enabled when it is updated to make more
-# efficent DB queries
-# https://openedx.atlassian.net/browse/OPS-2943
-# Learner ticket to add functionality to /support
-# https://openedx.atlassian.net/browse/LEARNER-4744
-#@admin.register(CourseEnrollment)
+@admin.register(CourseEnrollment)
 class CourseEnrollmentAdmin(admin.ModelAdmin):
     """ Admin interface for the CourseEnrollment model. """
     list_display = ('id', 'course_id', 'mode', 'user', 'is_active',)
@@ -182,6 +177,43 @@ class CourseEnrollmentAdmin(admin.ModelAdmin):
 
     def queryset(self, request):
         return super(CourseEnrollmentAdmin, self).queryset(request).select_related('user')
+
+    def has_permission(self, request, method):
+        """
+        Returns True if the given method is allowed.
+
+        Access to these admin views is restricted because it makes DB quries that impact performance enough to cause a
+        site outage, cf https://openedx.atlassian.net/browse/OPS-2943
+
+        Enable these views using the waffle switch: `student.coursenrollment.admin`
+        """
+        if waffle.switch_is_active('student.coursenrollment.admin'):
+            return getattr(super(CourseEnrollmentAdmin, self), method)(request)
+        return False
+
+    def has_add_permission(self, request):
+        """
+        Returns True if CourseEnrollment objects can be added via the admin view.
+        """
+        return self.has_permission(request, 'has_add_permission')
+
+    def has_change_permission(self, request, obj=None):
+        """
+        Returns True if CourseEnrollment objects can be modified via the admin view.
+        """
+        return self.has_permission(request, 'has_change_permission')
+
+    def has_delete_permission(self, request, obj=None):
+        """
+        Returns True if CourseEnrollment objects can be deleted via the admin view.
+        """
+        return self.has_permission(request, 'has_delete_permission')
+
+    def has_module_permission(self, request):
+        """
+        Returns True if links to the CourseEnrollment admin view can be displayed.
+        """
+        return self.has_permission(request, 'has_module_permission')
 
 
 class UserProfileInline(admin.StackedInline):
