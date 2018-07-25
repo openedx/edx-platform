@@ -33,8 +33,11 @@ tokenizer = OneOrMore(tokens) + StringEnd()
 # other applications.
 # See LEARNER-5853 for more details.
 Text = markupsafe.escape                        # pylint: disable=invalid-name
+
+
 def HTML(html):                                 # pylint: disable=invalid-name
     return markupsafe.Markup(html)
+
 
 def _orjoin(l):
     return "'" + "' | '".join(l) + "'"
