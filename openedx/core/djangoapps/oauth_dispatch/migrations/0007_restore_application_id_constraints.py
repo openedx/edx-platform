@@ -11,6 +11,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('oauth_dispatch', '0006_drop_application_id_constraints'),
+        ('oauth2_provider', '0006_auto_20171214_2232'),
     ]
 
     operations = [

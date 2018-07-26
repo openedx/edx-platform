@@ -13,6 +13,10 @@ class Migration(migrations.Migration):
         ('oauth_dispatch', '0005_applicationaccess_type'),
     ]
 
+    run_before = [
+        ('oauth2_provider', '0005_auto_20170514_1141'),
+    ]
+
     operations = [
         migrations.AlterField(
             model_name='applicationaccess',
