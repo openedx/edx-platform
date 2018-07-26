@@ -111,7 +111,6 @@ def instructor_dashboard_2(request, course_id):
         'staff': bool(has_access(request.user, 'staff', course)),
         'forum_admin': has_forum_access(request.user, course_key, FORUM_ROLE_ADMINISTRATOR),
     }
-
     if not access['staff']:
         raise Http404()
 
@@ -187,7 +186,7 @@ def instructor_dashboard_2(request, course_id):
     # and enable self-generated certificates for a course.
     # Note: This is hidden for all CCXs
     certs_enabled = CertificateGenerationConfiguration.current().enabled and not hasattr(course_key, 'ccx')
-    if certs_enabled and access['admin']:
+    if certs_enabled and (access['admin'] or access['staff']):
         sections.append(_section_certificates(course))
 
     disable_buttons = not _is_small_course(course_key)
