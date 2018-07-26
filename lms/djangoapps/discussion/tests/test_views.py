@@ -177,6 +177,33 @@ def make_mock_thread_data(
     return thread_data
 
 
+def make_mock_collection_data(
+    course,
+    text,
+    thread_id,
+    num_children=None,
+    group_id=None,
+    commentable_id=None,
+    thread_list=None
+):
+    if thread_list:
+        return [
+            make_mock_thread_data(course=course, text=text, num_children=num_children, **thread)
+            for thread in thread_list
+        ]
+    else:
+        return [
+            make_mock_thread_data(
+                course=course,
+                text=text,
+                thread_id=thread_id,
+                num_children=num_children,
+                group_id=group_id,
+                commentable_id=commentable_id,
+            )
+        ]
+
+
 def make_mock_perform_request_impl(
         course,
         text,
@@ -184,21 +211,15 @@ def make_mock_perform_request_impl(
         group_id=None,
         commentable_id=None,
         num_thread_responses=1,
+        thread_list=None
 ):
     def mock_perform_request_impl(*args, **kwargs):
         url = args[1]
         if url.endswith("threads") or url.endswith("user_profile"):
             return {
-                "collection": [
-                    make_mock_thread_data(
-                        course=course,
-                        text=text,
-                        thread_id=thread_id,
-                        num_children=None,
-                        group_id=group_id,
-                        commentable_id=commentable_id,
-                    )
-                ]
+                "collection": make_mock_collection_data(
+                    course, text, thread_id, None, group_id, commentable_id, thread_list
+                )
             }
         elif thread_id and url.endswith(thread_id):
             return make_mock_thread_data(
@@ -235,6 +256,7 @@ def make_mock_request_impl(
         group_id=None,
         commentable_id=None,
         num_thread_responses=1,
+        thread_list=None,
 ):
     impl = make_mock_perform_request_impl(
         course,
@@ -242,7 +264,8 @@ def make_mock_request_impl(
         thread_id=thread_id,
         group_id=group_id,
         commentable_id=commentable_id,
-        num_thread_responses=num_thread_responses
+        num_thread_responses=num_thread_responses,
+        thread_list=thread_list
     )
 
     def mock_request_impl(*args, **kwargs):
@@ -407,18 +430,18 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         # course is outside the context manager that is verifying the number of queries,
         # and with split mongo, that method ends up querying disabled_xblocks (which is then
         # cached and hence not queried as part of call_single_thread).
-        (ModuleStoreEnum.Type.mongo, False, 1, 5, 2, 16, 4),
-        (ModuleStoreEnum.Type.mongo, False, 50, 5, 2, 16, 4),
+        (ModuleStoreEnum.Type.mongo, False, 1, 5, 2, 17, 5),
+        (ModuleStoreEnum.Type.mongo, False, 50, 5, 2, 17, 5),
         # split mongo: 3 queries, regardless of thread response size.
-        (ModuleStoreEnum.Type.split, False, 1, 3, 3, 16, 4),
-        (ModuleStoreEnum.Type.split, False, 50, 3, 3, 16, 4),
+        (ModuleStoreEnum.Type.split, False, 1, 3, 3, 17, 5),
+        (ModuleStoreEnum.Type.split, False, 50, 3, 3, 17, 5),
 
         # Enabling Enterprise integration should have no effect on the number of mongo queries made.
-        (ModuleStoreEnum.Type.mongo, True, 1, 5, 2, 16, 4),
-        (ModuleStoreEnum.Type.mongo, True, 50, 5, 2, 16, 4),
+        (ModuleStoreEnum.Type.mongo, True, 1, 5, 2, 17, 5),
+        (ModuleStoreEnum.Type.mongo, True, 50, 5, 2, 17, 5),
         # split mongo: 3 queries, regardless of thread response size.
-        (ModuleStoreEnum.Type.split, True, 1, 3, 3, 16, 4),
-        (ModuleStoreEnum.Type.split, True, 50, 3, 3, 16, 4),
+        (ModuleStoreEnum.Type.split, True, 1, 3, 3, 17, 5),
+        (ModuleStoreEnum.Type.split, True, 50, 3, 3, 17, 5),
     )
     @ddt.unpack
     def test_number_of_mongo_queries(
@@ -673,6 +696,80 @@ class SingleThreadGroupIdTestCase(CohortedTestCase, GroupIdAssertionMixin):
         self._assert_json_response_contains_group_info(
             response, lambda d: d['content']
         )
+
+
+@patch('requests.request', autospec=True)
+class ForumFormDiscussionContentGroupTestCase(ForumsEnableMixin, ContentGroupTestCase):
+    """
+    Tests `forum_form_discussion api` works with different content groups.
+    Discussion modules are setup in ContentGroupTestCase class i.e
+    alpha_module => alpha_group_discussion => alpha_cohort => alpha_user/community_ta
+    beta_module => beta_group_discussion => beta_cohort => beta_user
+    """
+    shard = 4
+
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self):
+        super(ForumFormDiscussionContentGroupTestCase, self).setUp()
+        self.thread_list = [
+            {"thread_id": "test_general_thread_id"},
+            {"thread_id": "test_global_group_thread_id", "commentable_id": self.global_module.discussion_id},
+            {"thread_id": "test_alpha_group_thread_id", "group_id": self.alpha_module.group_access[0][0], "commentable_id": self.alpha_module.discussion_id},  # pylint: disable=line-too-long
+            {"thread_id": "test_beta_group_thread_id", "group_id": self.beta_module.group_access[0][0], "commentable_id": self.beta_module.discussion_id}  # pylint: disable=line-too-long
+        ]
+
+    def assert_has_access(self, response, expected_discussion_threads):
+        """
+        Verify that a users have access to the threads in their assigned
+        cohorts and non-cohorted modules.
+        """
+        discussion_data = json.loads(response.content)['discussion_data']
+        self.assertEqual(len(discussion_data), expected_discussion_threads)
+
+    def call_view(self, mock_request, user):
+        mock_request.side_effect = make_mock_request_impl(
+            course=self.course,
+            text="dummy content",
+            thread_list=self.thread_list
+        )
+        self.client.login(username=user.username, password='test')
+        return self.client.get(
+            reverse("forum_form_discussion", args=[unicode(self.course.id)]),
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+
+    def test_community_ta_user(self, mock_request):
+        """
+        Verify that community_ta user has access to all threads regardless
+        of cohort.
+        """
+        response = self.call_view(
+            mock_request,
+            self.community_ta
+        )
+        self.assert_has_access(response, 4)
+
+    def test_alpha_cohort_user(self, mock_request):
+        """
+        Verify that alpha_user has access to alpha_cohort and non-cohorted
+        threads.
+        """
+        response = self.call_view(
+            mock_request,
+            self.alpha_user
+        )
+        self.assert_has_access(response, 3)
+
+    def test_beta_cohort_user(self, mock_request):
+        """
+        Verify that beta_user has access to beta_cohort and non-cohorted
+        threads.
+        """
+        response = self.call_view(
+            mock_request,
+            self.beta_user
+        )
+        self.assert_has_access(response, 3)
 
 
 @patch('requests.request', autospec=True)

@@ -149,7 +149,6 @@ def get_threads(request, course, user_info, discussion_id=None, per_page=THREADS
             )
         )
     )
-
     paginated_results = cc.Thread.search(query_params)
     threads = paginated_results.collection
 
@@ -248,6 +247,7 @@ def forum_form_discussion(request, course_key):
     Renders the main Discussion page, potentially filtered by a search query
     """
     course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
+    request.user.is_community_ta = utils.is_user_community_ta(request.user, course.id)
     if request.is_ajax():
         user = cc.User.from_django_user(request.user)
         user_info = user.to_dict()
@@ -292,7 +292,7 @@ def single_thread(request, course_key, discussion_id, thread_id):
     Depending on the HTTP headers, we'll adjust our response accordingly.
     """
     course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
-
+    request.user.is_community_ta = utils.is_user_community_ta(request.user, course.id)
     if request.is_ajax():
         cc_user = cc.User.from_django_user(request.user)
         user_info = cc_user.to_dict()
@@ -350,7 +350,6 @@ def _find_thread(request, course, discussion_id, thread_id):
         )
     except cc.utils.CommentClientRequestError:
         return None
-
     # Verify that the student has access to this thread if belongs to a course discussion module
     thread_context = getattr(thread, "context", "course")
     if thread_context == "course" and not utils.discussion_category_id_access(course, request.user, discussion_id):
