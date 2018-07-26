@@ -3,3 +3,4 @@ SurveyGizmo==1.2.3
 mandrill==1.0.57
 pyminizip==0.2.1
 -e git+https://github.com/philanthropy-u/xblock-poll#egg=xblock-poll
+-e git+https://github.com/philanthropy-u/edx-notifications.git#egg=edx-notifications

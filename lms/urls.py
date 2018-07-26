@@ -679,6 +679,10 @@ if settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
             include('nodebb.urls')
         ),
         url(
+            r'^courses/discussion/nodebb/?',
+            'nodebb.views.nodebb_embedded_topic'
+        ),
+        url(
             r'^notification_prefs/enable/',
             'notification_prefs.views.ajax_enable'
         ),
