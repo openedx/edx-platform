@@ -457,21 +457,6 @@ class CertificateGetTests(SharedModuleStoreTestCase):
         """
         Test the get_certificate_url with a web cert course
         """
-        certificates = [
-            {
-                'id': 1,
-                'name': 'Test Certificate Name',
-                'description': 'Test Certificate Description',
-                'course_title': 'tes_course_title',
-                'signatories': [],
-                'version': 1,
-                'is_active': True
-            }
-        ]
-        self.web_cert_course.certificates = {'certificates': certificates}
-        self.web_cert_course.save()
-        self.store.update_item(self.web_cert_course, self.student.id)
-
         expected_url = reverse(
             'certificates:render_cert_by_uuid',
             kwargs=dict(certificate_uuid=self.uuid)
@@ -570,6 +555,7 @@ class GenerateUserCertificatesTest(EventTestMixin, WebCertificateTestMixin, Modu
         will trigger an update to the certificate if the user has since
         verified.
         """
+        self._setup_course_certificate()
         # generate certificate with unverified status.
         GeneratedCertificateFactory.create(
             user=self.student,

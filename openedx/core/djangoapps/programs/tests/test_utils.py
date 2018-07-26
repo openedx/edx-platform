@@ -1006,20 +1006,6 @@ class TestProgramDataExtender(ModuleStoreTestCase):
         Verify that the student's run mode certificate is included,
         when available.
         """
-        certificates = [
-            {
-                'id': 1,
-                'name': 'Test Certificate Name',
-                'description': 'Test Certificate Description',
-                'course_title': 'tes_course_title',
-                'signatories': [],
-                'version': 1,
-                'is_active': True
-            }
-        ]
-        self.course.certificates = {'certificates': certificates}
-        self.course = self.update_course(self.course, self.user.id)
-
         test_uuid = uuid.uuid4().hex
         mock_get_cert_data.return_value = {'uuid': test_uuid} if is_uuid_available else {}
         mock_html_certs_enabled.return_value = True

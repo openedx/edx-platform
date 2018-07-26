@@ -296,18 +296,6 @@ class TestUserEnrollmentCertificates(UrlResetMixin, MobileAPITestCase, Milestone
             mode_slug=CourseMode.HONOR,
         )
         self.login_and_enroll()
-        certificates = [
-            {
-                'id': 1,
-                'name': 'Test Certificate Name',
-                'description': 'Test Certificate Description',
-                'course_title': 'tes_course_title',
-                'signatories': [],
-                'version': 1,
-                'is_active': True
-            }
-        ]
-        self.course.certificates = {'certificates': certificates}
         self.course.cert_html_view_enabled = True
         self.store.update_item(self.course, self.user.id)
 
