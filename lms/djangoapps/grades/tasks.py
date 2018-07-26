@@ -77,12 +77,16 @@ def recalculate_subsection_grade_v2(**kwargs):
     """
     try:
         course_key = CourseLocator.from_string(kwargs['course_id'])
+        log.info("1")
+        log.info(str(kwargs))
         if not PersistentGradesEnabledFlag.feature_enabled(course_key):
             return
-
+        log.info("2")
         score_deleted = kwargs['score_deleted']
         scored_block_usage_key = UsageKey.from_string(kwargs['usage_id']).replace(course_key=course_key)
         expected_modified_time = from_timestamp(kwargs['expected_modified_time'])
+
+        log.info(str(scored_block_usage_key))
 
         # The request cache is not maintained on celery workers,
         # where this code runs. So we take the values from the
@@ -99,6 +103,7 @@ def recalculate_subsection_grade_v2(**kwargs):
         if not _has_database_updated_with_new_score(
                 kwargs['user_id'], scored_block_usage_key, expected_modified_time, score_deleted,
         ):
+            log.info("user is not updated with new score")
             raise _retry_recalculate_subsection_grade(**kwargs)
 
         _update_subsection_grades(
@@ -111,6 +116,12 @@ def recalculate_subsection_grade_v2(**kwargs):
     except Exception as exc:   # pylint: disable=broad-except
         if not isinstance(exc, KNOWN_RETRY_ERRORS):
             log.info("tnl-6244 grades unexpected failure: {}. kwargs={}".format(
+                repr(exc),
+                kwargs
+            ))
+
+        log.info("regrading failure: {} - {}. kwargs={}".format(
+                str(exc),
                 repr(exc),
                 kwargs
             ))
