@@ -2,14 +2,13 @@
 Tests student admin.py
 """
 import ddt
-from waffle.testutils import override_switch
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.test import TestCase
 from mock import Mock
 
-from student.admin import UserAdmin
+from student.admin import COURSE_ENROLLMENT_ADMIN_SWITCH, UserAdmin
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -224,13 +223,12 @@ class CourseEnrollmentAdminTest(SharedModuleStoreTestCase):
         response = getattr(self.client, method)(url)
         self.assertEqual(response.status_code, 403)
 
-    @override_switch('student.coursenrollment.admin', active=True)
     @ddt.data(*ADMIN_URLS)
     @ddt.unpack
     def test_view_enabled(self, method, url):
         """
-        Ensure CourseEnrollmentAdmin views can be enabled with the waffle flag.
+        Ensure CourseEnrollmentAdmin views can be enabled with the waffle switch.
         """
-        self.client.login(username=self.user.username, password='test')
-        response = getattr(self.client, method)(url)
+        with COURSE_ENROLLMENT_ADMIN_SWITCH.override(active=True):
+            response = getattr(self.client, method)(url)
         self.assertEqual(response.status_code, 200)

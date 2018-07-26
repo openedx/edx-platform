@@ -1,6 +1,5 @@
 """ Django admin pages for student app """
 from config_models.admin import ConfigurationModelAdmin
-import waffle
 from django import forms
 from django.contrib import admin
 from django.contrib.admin.sites import NotRegistered
@@ -10,7 +9,9 @@ from django.utils.translation import ugettext_lazy as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
+from openedx.core.djangoapps.waffle_utils import WaffleSwitch
 from openedx.core.lib.courses import clean_course_id
+from student import STUDENT_WAFFLE_NAMESPACE
 from student.models import (
     CourseAccessRole,
     CourseEnrollment,
@@ -28,6 +29,11 @@ from student.roles import REGISTERED_ACCESS_ROLES
 from xmodule.modulestore.django import modulestore
 
 User = get_user_model()  # pylint:disable=invalid-name
+
+# This switch exists because the CourseEnrollment admin views make DB queries that impact performance.
+# In a large enough deployment of Open edX, this is enough to cause a site outage.
+# See https://openedx.atlassian.net/browse/OPS-2943
+COURSE_ENROLLMENT_ADMIN_SWITCH = WaffleSwitch(STUDENT_WAFFLE_NAMESPACE, 'courseenrollment_admin')
 
 
 class CourseAccessRoleForm(forms.ModelForm):
@@ -180,14 +186,9 @@ class CourseEnrollmentAdmin(admin.ModelAdmin):
 
     def has_permission(self, request, method):
         """
-        Returns True if the given method is allowed.
-
-        Access to these admin views is restricted because it makes DB quries that impact performance enough to cause a
-        site outage, cf https://openedx.atlassian.net/browse/OPS-2943
-
-        Enable these views using the waffle switch: `student.coursenrollment.admin`
+        Returns True if the given admin method is allowed.
         """
-        if waffle.switch_is_active('student.coursenrollment.admin'):
+        if COURSE_ENROLLMENT_ADMIN_SWITCH.is_enabled():
             return getattr(super(CourseEnrollmentAdmin, self), method)(request)
         return False
 
