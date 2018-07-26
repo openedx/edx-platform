@@ -540,7 +540,6 @@ def course_about(request, course_id):
 
     with modulestore().bulk_operations(course_key):
         course = get_course_by_id(course_key)
-        course_details = CourseDetails.populate(course)
         modes = CourseMode.modes_for_course_dict(course_key)
 
         if configuration_helpers.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
@@ -603,8 +602,17 @@ def course_about(request, course_id):
         current_class, user_current_enrolled_class, current_enrolled_class_target = get_user_current_enrolled_class(request, course)
         can_enroll = _can_enroll_courselike(request.user, current_class) if current_class else ACCESS_DENIED
 
+        course_details = {}
+        if current_class:
+            course_details = CourseDetails.populate(current_class)
+            banner_image_asset_path = course_details.banner_image_asset_path
+        else:
+            parent_course_details = CourseDetails.populate(course)
+            banner_image_asset_path = parent_course_details.banner_image_asset_path
+
         context = {
             'course': course,
+            'banner_image_asset_path': banner_image_asset_path,
             'course_details': course_details,
             'course_next_classes': course_next_classes,
             'current_class': current_class,
