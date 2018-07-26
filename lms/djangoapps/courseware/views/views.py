@@ -1016,7 +1016,7 @@ def _downloadable_certificate_message(course, cert_downloadable_status):
                     course_id=course.id, uuid=cert_downloadable_status['uuid']
                 )
             )
-        elif not cert_downloadable_status['download_url']:
+        else:
             return GENERATING_CERT_DATA
 
     return _downloadable_cert_data(download_url=cert_downloadable_status['download_url'])

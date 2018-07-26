@@ -295,11 +295,11 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
 
         config = self._certificate_html_view_configuration(configuration_string=test_configuration_string)
         self.assertEquals(config.configuration, test_configuration_string)
-        self._add_course_certificates(count=1, signatory_count=2)
         test_url = get_certificate_url(
             user_id=self.user.id,
             course_id=unicode(self.course.id)
         )
+        self._add_course_certificates(count=1, signatory_count=2)
         response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
         self.assertIn('platform_microsite', response.content)
 
@@ -329,11 +329,11 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
         }"""
         config = self._certificate_html_view_configuration(configuration_string=test_configuration_string)
         self.assertEquals(config.configuration, test_configuration_string)
-        self._add_course_certificates(count=1, signatory_count=2)
         test_url = get_certificate_url(
             user_id=self.user.id,
             course_id=unicode(self.course.id)
         )
+        self._add_course_certificates(count=1, signatory_count=2)
         response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
         self.assertIn('edX', response.content)
         self.assertNotIn('platform_microsite', response.content)

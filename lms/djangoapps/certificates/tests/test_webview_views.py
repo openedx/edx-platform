@@ -984,6 +984,19 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         self.assertIn(date, response.content)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_render_html_view_invalid_certificate_configuration(self):
+        self.course.cert_html_view_enabled = True
+        self.course.save()
+        self.store.update_item(self.course, self.user.id)
+
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=unicode(self.course.id)
+        )
+        response = self.client.get(test_url)
+        self.assertIn("Invalid Certificate", response.content)
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_500_view_invalid_certificate_configuration(self):
         self._add_course_certificates(count=1, signatory_count=2)
         CertificateHtmlViewConfiguration.objects.all().update(enabled=False)
