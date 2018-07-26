@@ -218,3 +218,6 @@ xblock==1.0.0
 
 # Third Party XBlocks
 edx-sga==0.6.2
+
+# Elastic APM
+elastic-apm==2.2.1
