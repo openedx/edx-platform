@@ -33,14 +33,6 @@ def delete_grade(step):
     world.browser.execute_script('document.getElementsByClassName("remove-button")[0].click()')
 
 
-@step(u'Grade list has "([^"]*)" grades$')
-def check_grade_values(step, grade_list):  # pylint: disable=unused-argument
-    visible_list = ''.join(
-        [grade.text for grade in world.css_find('.letter-grade')]
-    )
-    assert_equal(visible_list, grade_list, 'Grade lists should be equal')
-
-
 @step(u'I see I now have "([^"]*)" grades$')
 def view_grade_slider(step, how_many):
     grade_slider_css = '.grade-specific-bar'
