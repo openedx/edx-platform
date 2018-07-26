@@ -7,11 +7,18 @@
         </a>
     <% } %>
 </aside>
+<aside class="aside js-course-certificates"></aside>
 <% if (programRecordUrl) { %>
     <aside class="aside js-program-record program-record">
-        <a href="<%- programRecordUrl %>" class="program-record-link">
-            <button class="btn program-record-button"><%- gettext('View Program Record') %></button>
-        </a>
+        <h2 class="record-heading"><%- gettext('Program Record') %></h2>
+        
+        <div class="motivating-section">
+            <p class="motivating-message"><%- gettext('Once you complete one of the program requirements you have a program record. This record is marked complete once you meet all program requirements. A program record can be used to continue your learning journey and demonstrate your learning to others.') %></p>
+        </div>
+        <div class="view-record-wrapper">
+            <a href="<%- programRecordUrl %>" class="program-record-link">
+                <button class="btn view-record-button btn-brand btn cta-primary"><%- gettext('View Program Record') %></button>
+            </a>
+        </div>
     </aside>
 <% } %>
-<aside class="aside js-course-certificates"></aside>
