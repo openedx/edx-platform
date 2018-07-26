@@ -116,18 +116,16 @@ class TextbookUploadPage(CoursePage):
         """
         return self.q(css='.textbook-title').text[0]
 
-    def get_chapter_name(self, ordinal):
+    def get_chapter_name(self, index):
         """
         Gets the name of chapter by taking an ordinal.
         """
-        index = ["first", "second", "third"].index(ordinal)
         return self.q(css='.chapter-name').text[index]
 
-    def get_asset_name(self, ordinal):
+    def get_asset_name(self, index):
         """
         Gets the name of chapter asset by taking an ordinal.
         """
-        index = ["first", "second", "third"].index(ordinal)
         return self.q(css='.chapter-asset-path').text[index]
 
     def toggle_chapters(self):

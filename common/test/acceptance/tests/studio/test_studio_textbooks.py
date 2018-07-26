@@ -29,6 +29,21 @@ class TextbooksTest(StudioCourseTest):
 
         self.textbook_view_page = TextbookViewPage(self.browser, self.course_id)
 
+    def _assert_textbook_data(self, textbook_data):
+        textbook_name = self.textbook_upload_page.textbook_name
+        self.assertEqual(textbook_data['textbook_name'], textbook_name)
+        self.textbook_upload_page.toggle_chapters()
+        number_of_chapters = self.textbook_upload_page.number_of_chapters
+        self.assertEqual(2, number_of_chapters)
+        first_chapter_name = self.textbook_upload_page.get_chapter_name(0)
+        second_chapter_name = self.textbook_upload_page.get_chapter_name(1)
+        self.assertEqual(textbook_data['first_chapter'], first_chapter_name)
+        self.assertEqual(textbook_data['second_chapter'], second_chapter_name)
+        first_asset_name = self.textbook_upload_page.get_asset_name(0)
+        second_asset_name = self.textbook_upload_page.get_asset_name(1)
+        self.assertEqual(textbook_data['first_asset'], first_asset_name)
+        self.assertEqual(textbook_data['second_asset'], second_asset_name)
+
     @attr(shard=9)
     def test_create_first_book_message(self):
         """
@@ -94,7 +109,6 @@ class TextbooksTest(StudioCourseTest):
         Scenario: Create a textbook with multiple chapters
             Given I have opened a new course in Studio
             And I go to the textbooks page
-            When I click on the New Textbook button
             And I name my textbook "History"
             And I name the first chapter "Britain"
             And I type in "britain.pdf" for the first chapter asset
@@ -132,30 +146,7 @@ class TextbooksTest(StudioCourseTest):
         self.textbook_upload_page.fill_chapter_name('second', textbook_data['second_chapter'])
         self.textbook_upload_page.fill_chapter_asset('second', textbook_data['second_asset'])
         self.textbook_upload_page.click_textbook_submit_button()
-        textbook_name = self.textbook_upload_page.textbook_name
-        self.assertEqual(textbook_data['textbook_name'], textbook_name)
-        self.textbook_upload_page.toggle_chapters()
-        number_of_chapters = self.textbook_upload_page.number_of_chapters
-        self.assertEqual(2, number_of_chapters)
-        first_chapter_name = self.textbook_upload_page.get_chapter_name('first')
-        second_chapter_name = self.textbook_upload_page.get_chapter_name('second')
-        self.assertEqual(textbook_data['first_chapter'], first_chapter_name)
-        self.assertEqual(textbook_data['second_chapter'], second_chapter_name)
-        first_asset_name = self.textbook_upload_page.get_asset_name('first')
-        second_asset_name = self.textbook_upload_page.get_asset_name('second')
-        self.assertEqual(textbook_data['first_asset'], first_asset_name)
-        self.assertEqual(textbook_data['second_asset'], second_asset_name)
+        self._assert_textbook_data(textbook_data)
         self.textbook_upload_page.refresh_and_wait_for_load()
         self.textbook_upload_page.toggle_chapters()
-        textbook_name = self.textbook_upload_page.textbook_name
-        self.assertEqual(textbook_data['textbook_name'], textbook_name)
-        number_of_chapters = self.textbook_upload_page.number_of_chapters
-        self.assertEqual(2, number_of_chapters)
-        first_chapter_name = self.textbook_upload_page.get_chapter_name('first')
-        second_chapter_name = self.textbook_upload_page.get_chapter_name('second')
-        self.assertEqual(textbook_data['first_chapter'], first_chapter_name)
-        self.assertEqual(textbook_data['second_chapter'], second_chapter_name)
-        first_asset_name = self.textbook_upload_page.get_asset_name('first')
-        second_asset_name = self.textbook_upload_page.get_asset_name('second')
-        self.assertEqual(textbook_data['first_asset'], first_asset_name)
-        self.assertEqual(textbook_data['second_asset'], second_asset_name)
+        self._assert_textbook_data(textbook_data)
