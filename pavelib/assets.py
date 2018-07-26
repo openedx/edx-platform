@@ -766,7 +766,7 @@ def webpack(options):
     static_root_cms = Env.get_django_setting("STATIC_ROOT", "cms", settings=settings)
     config_path = Env.get_django_setting("WEBPACK_CONFIG_PATH", "lms", settings=settings)
     environment = 'NODE_ENV={node_env} STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms}'.format(
-        node_env="production" if settings != Env.DEVSTACK_SETTINGS else "development",
+        node_env="development" if config_path == 'webpack.dev.config.js' else "production",
         static_root_lms=static_root_lms,
         static_root_cms=static_root_cms
     )
@@ -833,6 +833,7 @@ def listfy(data):
 @task
 @cmdopts([
     ('background', 'b', 'Background mode'),
+    ('settings=', 's', "Django settings (defaults to devstack)"),
     ('theme-dirs=', '-td', 'The themes dir containing all themes (defaults to None)'),
     ('themes=', '-t', 'The themes to add sass watchers for (defaults to None)'),
     ('wait=', '-w', 'How long to pause between filesystem scans.')
@@ -845,6 +846,8 @@ def watch_assets(options):
     # Don't watch assets when performing a dry run
     if tasks.environment.dry_run:
         return
+
+    settings = getattr(options, 'settings', Env.DEVSTACK_SETTINGS)
 
     themes = get_parsed_option(options, 'themes')
     theme_dirs = get_parsed_option(options, 'theme_dirs', [])
@@ -869,7 +872,7 @@ def watch_assets(options):
     observer.start()
 
     # Run the Webpack file system watcher too
-    execute_webpack_watch(settings=Env.DEVSTACK_SETTINGS)
+    execute_webpack_watch(settings=settings)
 
     if not getattr(options, 'background', False):
         # when running as a separate process, the main thread needs to loop
@@ -955,6 +958,7 @@ def update_assets(args):
             'pavelib.assets.watch_assets',
             options={
                 'background': not args.debug,
+                'settings': args.settings,
                 'theme_dirs': args.theme_dirs,
                 'themes': args.themes,
                 'wait': [float(args.wait)]
