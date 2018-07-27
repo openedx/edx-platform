@@ -233,16 +233,15 @@ class CourseEnrollmentTests(SharedModuleStoreTestCase):
             course=course_overview,
         )
 
-        # Re-fetch the CourseOverview record, which as a side effect,
-        # will recreate the record to update the version.
+        # Re-fetch the CourseOverview record.
+        # As a side effect, this will recreate the record, and update the version.
         course_overview_new = CourseOverview.get_from_id(course.id)
-        assert(course_overview_new.version == CourseOverview.VERSION)
-        assert(course_overview_new.id != course_overview.id)
+        self.assertEqual(course_overview_new.version, CourseOverview.VERSION)
 
-        # Ensure that the enrollment record was not deleted during this re-creation
+        # Ensure that the enrollment record was unchanged during this re-creation
         enrollment_refetched = CourseEnrollment.objects.filter(id=enrollment.id)
-        assert(enrollment_refetched.exists())
-        assert(enrollment_refetched.all()[0] == enrollment)
+        self.assertTrue(enrollment_refetched.exists())
+        self.assertEqual(enrollment_refetched.all()[0], enrollment)
 
 
 class PendingNameChangeTests(SharedModuleStoreTestCase):
