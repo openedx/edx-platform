@@ -2,7 +2,6 @@ from datetime import datetime
 
 import pytz
 from logging import getLogger
-from course_modes.models import CourseMode
 from custom_settings.models import CustomSettings
 from course_action_state.models import CourseRerunState
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
