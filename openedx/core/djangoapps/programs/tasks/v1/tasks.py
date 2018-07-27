@@ -2,6 +2,7 @@
 This file contains celery tasks for programs-related functionality.
 """
 from celery import task
+from celery.exceptions import MaxRetriesExceededError
 from celery.utils.log import get_task_logger  # pylint: disable=no-name-in-module, import-error
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -168,7 +169,7 @@ def award_program_certificates(self, username):
             # Retry because a misconfiguration could be fixed
             raise self.retry(exc=exc, countdown=countdown, max_retries=MAX_RETRIES)
 
-        retry = False
+        failed_program_certificate_award_attempts = []
         for program_uuid in new_program_uuids:
             try:
                 award_program_certificate(credentials_client, username, program_uuid)
@@ -182,12 +183,21 @@ def award_program_certificates(self, username):
                 # keep trying to award other certs, but retry the whole task to fix any missing entries
                 LOGGER.warning('Failed to award certificate for program {uuid} to user {username}.'.format(
                     uuid=program_uuid, username=username))
-                retry = True
+                failed_program_certificate_award_attempts.append(program_uuid)
 
-        if retry:
+        if failed_program_certificate_award_attempts:
             # N.B. This logic assumes that this task is idempotent
             LOGGER.info('Retrying task to award failed certificates to user %s', username)
-            raise self.retry(countdown=countdown, max_retries=MAX_RETRIES)
+            # The error message may change on each reattempt but will never be raised until
+            # the max number of retries have been exceeded. It is unlikely that this list
+            # will change by the time it reaches its maximimum number of attempts.
+            exception = MaxRetriesExceededError(
+                "Failed to award certificate for user {} for programs {}".format(
+                    username, failed_program_certificate_award_attempts))
+            raise self.retry(
+                exc=exception,
+                countdown=countdown,
+                max_retries=MAX_RETRIES)
     else:
         LOGGER.info('User %s is not eligible for any new program certificates', username)
 
