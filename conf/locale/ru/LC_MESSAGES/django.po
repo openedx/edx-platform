@@ -250,8 +250,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-07-20 09:01+0000\n"
-"PO-Revision-Date: 2018-07-20 09:02+0000\n"
+"POT-Creation-Date: 2018-07-26 11:27+0000\n"
+"PO-Revision-Date: 2018-07-23 07:15+0000\n"
 "Last-Translator: Muhammad Ayub khan <ayubkhan@edx.org>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
 "Language: ru\n"
@@ -444,8 +444,6 @@ msgstr "Профессиональная подготовка"
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 #: common/lib/xmodule/xmodule/x_module.py
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
-#: src/xblock-google-drive/google_drive/templates/html/google_calendar_edit.html
-#: src/xblock-google-drive/google_drive/templates/html/google_docs_edit.html
 #: cms/templates/container.html cms/templates/library.html
 msgid "Display Name"
 msgstr "Отображаемое название"
@@ -5489,8 +5487,7 @@ msgstr ""
 "Невозможно создать индивидуальный курс на основе курса с устаревшим "
 "идентификатором. Перезапустите курс в edX Studio."
 
-#: lms/djangoapps/certificates/models.py src/django-wiki/wiki/admin.py
-#: src/django-wiki/wiki/models/article.py wiki/admin.py wiki/models/article.py
+#: lms/djangoapps/certificates/models.py wiki/admin.py wiki/models/article.py
 msgid "created"
 msgstr "создано"
 
@@ -6834,7 +6831,6 @@ msgstr ""
 "Спасибо."
 
 #: lms/djangoapps/django_comment_client/base/views.py
-#: src/rate-xblock/rate/rate.py
 msgid "Good"
 msgstr "Хорошо"
 
@@ -7258,8 +7254,6 @@ msgstr "% скидка"
 
 #: lms/djangoapps/instructor/views/api.py lms/djangoapps/shoppingcart/pdf.py
 #: lms/djangoapps/shoppingcart/reports.py
-#: src/django-wiki/wiki/plugins/attachments/forms.py
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
@@ -7863,13 +7857,7 @@ msgstr "сброшено"
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
-#: lms/templates/wiki/plugins/attachments/index.html
-#: src/django-wiki/wiki/models/article.py
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
-#: src/django-wiki/wiki/templates/wiki/includes/revision_info.html
-#: wiki/models/article.py
+#: lms/templates/wiki/plugins/attachments/index.html wiki/models/article.py
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
@@ -7941,8 +7929,7 @@ msgstr "Наименование организации"
 #. which allows the user to input the Title
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
 #: lms/djangoapps/student_account/views.py
-#: openedx/core/djangoapps/user_api/api.py src/django-wiki/wiki/forms.py
-#: src/django-wiki/wiki/templates/wiki/dir.html wiki/forms.py
+#: openedx/core/djangoapps/user_api/api.py wiki/forms.py
 #: wiki/templates/wiki/dir.html
 msgid "Title"
 msgstr "Заголовок"
@@ -9303,8 +9290,7 @@ msgstr "Организация"
 msgid "Course Announce Date"
 msgstr "Дата объявления курса"
 
-#: lms/djangoapps/shoppingcart/reports.py cms/templates/course_outline.html
-#: cms/templates/settings.html
+#: lms/djangoapps/shoppingcart/reports.py cms/templates/settings.html
 #: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
 msgid "Course Start Date"
 msgstr "Дата начала курса"
@@ -9973,8 +9959,6 @@ msgid ""
 msgstr ""
 
 #: lms/templates/oauth2_provider/authorize.html
-#: src/xblock-google-drive/google_drive/templates/html/google_calendar_edit.html
-#: src/xblock-google-drive/google_drive/templates/html/google_docs_edit.html
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 msgid "Cancel"
@@ -9998,52 +9982,36 @@ msgid "See all children"
 msgstr "Просмотреть всех потомков"
 
 #: lms/templates/wiki/article.html
-#: src/django-wiki/wiki/templates/wiki/article.html
 msgid "This article was last modified:"
 msgstr "Последние изменения были внесены в эту статью:"
 
 #: lms/templates/wiki/create.html
-#: src/django-wiki/wiki/templates/wiki/create.html
 msgid "Add new article"
 msgstr "Добавить новую статью"
 
 #: lms/templates/wiki/create.html
-#: src/django-wiki/wiki/templates/wiki/create.html
 msgid "Create article"
 msgstr "Создать статью"
 
 #: lms/templates/wiki/create.html lms/templates/wiki/delete.html
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
-#: src/django-wiki/wiki/templates/wiki/create.html
-#: src/django-wiki/wiki/templates/wiki/delete.html
 msgid "Go back"
 msgstr "Назад"
 
 #: lms/templates/wiki/delete.html lms/templates/wiki/edit.html
-#: src/django-wiki/wiki/templates/wiki/delete.html
-#: src/django-wiki/wiki/templates/wiki/edit.html
 msgid "Delete article"
 msgstr "Удалить статью"
 
 #: lms/templates/wiki/delete.html
 #: lms/templates/wiki/plugins/attachments/index.html
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
-#: src/django-wiki/wiki/templates/wiki/delete.html
 #: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
 msgid "Delete"
 msgstr "Удалить"
 
 #: lms/templates/wiki/delete.html
-#: src/django-wiki/wiki/templates/wiki/delete.html
 msgid "You cannot delete a root article."
 msgstr "Вы не можете удалить корневую статью."
 
 #: lms/templates/wiki/delete.html
-#: src/django-wiki/wiki/templates/wiki/delete.html
 msgid ""
 "You cannot delete this article because you do not have permission to delete "
 "articles with children. Try to remove the children manually one-by-one."
@@ -10053,7 +10021,6 @@ msgstr ""
 "статьи."
 
 #: lms/templates/wiki/delete.html
-#: src/django-wiki/wiki/templates/wiki/delete.html
 msgid ""
 "You are deleting an article. This means that its children will be deleted as"
 " well. If you choose to purge, children will also be purged!"
@@ -10062,37 +10029,29 @@ msgstr ""
 "Если вы выберите очистку, дочерние статьи также будут очищены!"
 
 #: lms/templates/wiki/delete.html
-#: src/django-wiki/wiki/templates/wiki/delete.html
 msgid "Articles that will be deleted"
 msgstr "Статьи, которые будут удалены:"
 
 #: lms/templates/wiki/delete.html
-#: src/django-wiki/wiki/templates/wiki/delete.html
 msgid "...and more!"
 msgstr "...и многое другое!"
 
 #: lms/templates/wiki/delete.html
-#: src/django-wiki/wiki/templates/wiki/delete.html
 msgid "You are deleting an article. Please confirm."
 msgstr "Вы собираетесь удалить статью. Пожалуйста, подтвердите."
 
-#: lms/templates/wiki/edit.html src/django-wiki/wiki/templates/wiki/edit.html
-#: src/django-wiki/wiki/templates/wiki/includes/article_menu.html
-#: cms/templates/component.html cms/templates/container.html
-#: cms/templates/studio_xblock_wrapper.html
+#: lms/templates/wiki/edit.html cms/templates/component.html
+#: cms/templates/container.html cms/templates/studio_xblock_wrapper.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 #: lms/templates/wiki/includes/article_menu.html
 msgid "Edit"
 msgstr "Редактировать"
 
-#: lms/templates/wiki/edit.html src/django-wiki/wiki/templates/wiki/edit.html
-#: src/django-wiki/wiki/templates/wiki/settings.html
-#: lms/templates/ccx/schedule.html
+#: lms/templates/wiki/edit.html lms/templates/ccx/schedule.html
 msgid "Save changes"
 msgstr "Сохранить изменения"
 
-#: lms/templates/wiki/edit.html src/django-wiki/wiki/templates/wiki/edit.html
-#: cms/templates/container.html
+#: lms/templates/wiki/edit.html cms/templates/container.html
 msgid "Preview"
 msgstr "Предварительный просмотр"
 
@@ -10132,17 +10091,15 @@ msgstr "Предварительный просмотр вики"
 msgid "window open"
 msgstr "окно открыто"
 
-#: lms/templates/wiki/edit.html src/django-wiki/wiki/templates/wiki/edit.html
+#: lms/templates/wiki/edit.html
 msgid "Back to editor"
 msgstr "Вернуться к редактору"
 
 #: lms/templates/wiki/history.html
-#: src/django-wiki/wiki/templates/wiki/history.html
 msgid "History"
 msgstr "История"
 
 #: lms/templates/wiki/history.html
-#: src/django-wiki/wiki/templates/wiki/history.html
 msgid ""
 "Click each revision to see a list of edited lines. Click the Preview button "
 "to see how the article looked at this stage. At the bottom of this page, you"
@@ -10159,27 +10116,22 @@ msgid "(no log message)"
 msgstr "(нет описания)"
 
 #: lms/templates/wiki/history.html
-#: src/django-wiki/wiki/templates/wiki/history.html
 msgid "Preview this revision"
 msgstr "Предварительный просмотр версии"
 
 #: lms/templates/wiki/history.html
-#: src/django-wiki/wiki/templates/wiki/history.html
 msgid "Auto log:"
 msgstr "Автоматический журнал:"
 
 #: lms/templates/wiki/history.html
-#: src/django-wiki/wiki/templates/wiki/history.html
 msgid "Change"
 msgstr "Изменение"
 
 #: lms/templates/wiki/history.html
-#: src/django-wiki/wiki/templates/wiki/history.html
 msgid "Merge selected with current..."
 msgstr "Слить выбранное с текущим..."
 
 #: lms/templates/wiki/history.html
-#: src/django-wiki/wiki/templates/wiki/history.html
 msgid "Switch to selected version"
 msgstr "Переключиться на выбранную версию"
 
@@ -10188,12 +10140,10 @@ msgid "Wiki Revision Preview"
 msgstr "Предварительный просмотр вики"
 
 #: lms/templates/wiki/history.html
-#: src/django-wiki/wiki/templates/wiki/history.html
 msgid "Back to history view"
 msgstr "Вернуться к истории просмотра"
 
 #: lms/templates/wiki/history.html
-#: src/django-wiki/wiki/templates/wiki/history.html
 msgid "Switch to this version"
 msgstr "Переключиться на эту версию"
 
@@ -10202,12 +10152,10 @@ msgid "Merge Revision"
 msgstr "Объединить версии"
 
 #: lms/templates/wiki/history.html
-#: src/django-wiki/wiki/templates/wiki/history.html
 msgid "Merge with current"
 msgstr "Слить с текущей версией"
 
 #: lms/templates/wiki/history.html
-#: src/django-wiki/wiki/templates/wiki/history.html
 msgid ""
 "When you merge a revision with the current, all data will be retained from "
 "both versions and merged at its approximate location from each revision."
@@ -10216,17 +10164,14 @@ msgstr ""
 "объединены на приблизительном местоположении."
 
 #: lms/templates/wiki/history.html
-#: src/django-wiki/wiki/templates/wiki/history.html
 msgid "After this, it's important to do a manual review."
 msgstr "После этого важно сделать ручную проверку."
 
 #: lms/templates/wiki/history.html
-#: src/django-wiki/wiki/templates/wiki/history.html
 msgid "Create new merged version"
 msgstr "Создать новую объединённую версию"
 
 #: lms/templates/wiki/includes/anonymous_blocked.html
-#: src/django-wiki/wiki/templates/wiki/includes/anonymous_blocked.html
 #: wiki/templates/wiki/includes/anonymous_blocked.html
 #, python-format
 msgid ""
@@ -10269,7 +10214,6 @@ msgid "Miniature Markdown Guide"
 msgstr "Мини-руководство по Markdown"
 
 #: lms/templates/wiki/includes/cheatsheet.html
-#: src/django-wiki/wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
 msgid ""
 "To create a new wiki article, create a link to it. Clicking the link gives "
 "you the creation page."
@@ -10353,20 +10297,16 @@ msgid ""
 msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
-#: src/django-wiki/wiki/plugins/attachments/wiki_plugin.py
 #: wiki/plugins/attachments/wiki_plugin.py
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "Attachments"
 msgstr "Вложения"
 
 #: lms/templates/wiki/plugins/attachments/index.html
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "Upload new file"
 msgstr "Загрузить новый файл"
 
 #: lms/templates/wiki/plugins/attachments/index.html
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "Search and add file"
 msgstr "Поиск и добавление файла"
 
@@ -10375,17 +10315,14 @@ msgid "Upload File"
 msgstr "Загрузить файл"
 
 #: lms/templates/wiki/plugins/attachments/index.html
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "Upload file"
 msgstr "Загрузить файл"
 
 #: lms/templates/wiki/plugins/attachments/index.html
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
 msgid "Search files and articles"
 msgstr "Поиск по файлам и статьям"
 
 #: lms/templates/wiki/plugins/attachments/index.html
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid ""
 "You can reuse files from other articles. These files are subject to updates "
 "on other articles which may or may not be a good thing."
@@ -10395,7 +10332,6 @@ msgstr ""
 "новостью."
 
 #: lms/templates/wiki/plugins/attachments/index.html
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 #: lms/templates/dashboard.html lms/templates/index.html
 #: lms/templates/api_admin/catalogs/search.html
 #: lms/templates/courseware/courses.html
@@ -10410,7 +10346,6 @@ msgid "Search"
 msgstr "Поиск"
 
 #: lms/templates/wiki/plugins/attachments/index.html
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid ""
 "The following files are available for this article. Copy the markdown tag to"
 " directly refer to a file from the article text."
@@ -10419,20 +10354,14 @@ msgstr ""
 "непосредственной ссылки на файл из текста статьи"
 
 #: lms/templates/wiki/plugins/attachments/index.html
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "Markdown tag"
 msgstr "Markdown-тег"
 
 #: lms/templates/wiki/plugins/attachments/index.html
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
 msgid "Uploaded by"
 msgstr "Загружено "
 
 #: lms/templates/wiki/plugins/attachments/index.html
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
 msgid "Size"
 msgstr "Размер"
 
@@ -10441,39 +10370,30 @@ msgid "File History"
 msgstr "История файла"
 
 #: lms/templates/wiki/plugins/attachments/index.html
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "Detach"
 msgstr "Отделить"
 
 #: lms/templates/wiki/plugins/attachments/index.html
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 msgid "Replace"
 msgstr "Заменить"
 
 #: lms/templates/wiki/plugins/attachments/index.html
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
-#: src/django-wiki/wiki/templates/wiki/deleted.html
 msgid "Restore"
 msgstr "Восстановить"
 
 #: lms/templates/wiki/plugins/attachments/index.html
-#: src/django-wiki/wiki/templates/wiki/includes/revision_info.html
 msgid "anonymous (IP logged)"
 msgstr "аноним (IP-адрес скрыт)"
 
 #: lms/templates/wiki/plugins/attachments/index.html
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "File history"
 msgstr "История файла"
 
 #: lms/templates/wiki/plugins/attachments/index.html
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "revisions"
 msgstr "исправления"
 
 #: lms/templates/wiki/plugins/attachments/index.html
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "There are no attachments for this article."
 msgstr "Нет приложений для этой статьи."
 
@@ -10486,12 +10406,10 @@ msgid "Previewing a merge between two revisions:"
 msgstr "Предварительный просмотр двух слитых версий:"
 
 #: lms/templates/wiki/preview_inline.html
-#: src/django-wiki/wiki/templates/wiki/preview_inline.html
 msgid "This revision has been deleted."
 msgstr "Эта версия была удалена."
 
 #: lms/templates/wiki/preview_inline.html
-#: src/django-wiki/wiki/templates/wiki/preview_inline.html
 msgid "Restoring to this revision will mark the article as deleted."
 msgstr "Если восстановить эту версию, статья будет помечена как удалённая."
 
@@ -11905,1267 +11823,6 @@ msgid ""
 "profile. {learn_more_link_start}Learn more{learn_more_link_end}"
 msgstr ""
 
-#: src/django-wiki/django_notify/models.py
-msgid "unique key"
-msgstr ""
-
-#: src/django-wiki/django_notify/models.py
-msgid "verbose name"
-msgstr ""
-
-#: lms/templates/tracking_log.html
-msgid "type"
-msgstr "type"
-
-#: src/django-wiki/django_notify/models.py
-msgid "types"
-msgstr ""
-
-#: src/django-wiki/django_notify/models.py
-msgid "interval"
-msgstr ""
-
-#: src/django-wiki/django_notify/models.py
-#, python-format
-msgid "Settings for %s"
-msgstr ""
-
-#: src/django-wiki/django_notify/models.py
-msgid "settings"
-msgstr ""
-
-#: src/django-wiki/django_notify/models.py
-msgid "Leave this blank to subscribe to any kind of object"
-msgstr ""
-
-#: src/django-wiki/django_notify/models.py
-#, python-format
-msgid "Subscription for: %s"
-msgstr ""
-
-#: src/django-wiki/django_notify/models.py
-msgid "subscription"
-msgstr ""
-
-#: src/django-wiki/django_notify/models.py
-msgid "subscriptions"
-msgstr ""
-
-#: src/django-wiki/django_notify/models.py
-msgid "link for notification"
-msgstr ""
-
-#: src/django-wiki/django_notify/models.py
-msgid "notification"
-msgstr ""
-
-#: src/django-wiki/django_notify/models.py
-#: src/django-wiki/wiki/plugins/notifications/templates/wiki/plugins/notifications/menubaritem.html
-#: wiki/plugins/notifications/templates/wiki/plugins/notifications/menubaritem.html
-msgid "notifications"
-msgstr ""
-
-#: src/django-wiki/django_notify/models.py
-msgid "You supplied a target_object that's not an instance of a django Model."
-msgstr ""
-
-#: src/django-wiki/django_notify/settings.py
-msgid "instantly"
-msgstr ""
-
-#: src/django-wiki/django_notify/settings.py
-msgid "daily"
-msgstr ""
-
-#: src/django-wiki/django_notify/settings.py
-msgid "weekly"
-msgstr ""
-
-#: src/django-wiki/wiki/apps.py wiki/apps.py
-msgid "Wiki notifications"
-msgstr ""
-
-#: src/django-wiki/wiki/apps.py wiki/apps.py
-msgid "Wiki images"
-msgstr ""
-
-#: src/django-wiki/wiki/apps.py wiki/apps.py
-msgid "Wiki attachments"
-msgstr ""
-
-#: wiki/core/plugins/base.py
-msgid "Settings for plugin"
-msgstr "Настройки плагина"
-
-#: wiki/forms.py
-msgid "Only localhost... muahahaha"
-msgstr "Только локальный компьютер... муахахаха"
-
-#: wiki/forms.py
-msgid "Initial title of the article. May be overridden with revision titles."
-msgstr ""
-"Исходное название статьи. Может быть заменено заголовками других версий."
-
-#: wiki/forms.py
-msgid "Type in some contents"
-msgstr "Введите что-либо в качестве содержания"
-
-#: wiki/forms.py
-msgid ""
-"This is just the initial contents of your article. After creating it, you "
-"can use more complex features like adding plugins, meta data, related "
-"articles etc..."
-msgstr ""
-"Это лишь начальное содержание вашей статьи. После её создания вы сможете "
-"использовать более сложные функции, такие как добавление плагинов, "
-"метаданных, связанных статей и т.д."
-
-#: wiki/forms.py
-msgid "Contents"
-msgstr "Содержание"
-
-#: wiki/forms.py
-msgid "Summary"
-msgstr "Кратко"
-
-#: wiki/forms.py
-msgid ""
-"Give a short reason for your edit, which will be stated in the revision log."
-msgstr ""
-"Коротко опишите причину редактирования, которая будет записана в журнал "
-"исправлений."
-
-#: wiki/forms.py
-msgid ""
-"While you were editing, someone else changed the revision. Your contents "
-"have been automatically merged with the new contents. Please review the text"
-" below."
-msgstr ""
-"Пока вы редактировали материал, кто-то уже внёс изменения в текущую версию. "
-"Ваше содержание было автоматически объединено с новым содержанием. "
-"Пожалуйста, проверьте текст внизу."
-
-#: wiki/forms.py
-msgid "No changes made. Nothing to save."
-msgstr "Изменений не было. Нечего сохранять."
-
-#: wiki/forms.py wiki/templates/wiki/dir.html
-msgid "Slug"
-msgstr "Slug-строка"
-
-#: wiki/forms.py
-msgid ""
-"This will be the address where your article can be found. Use only "
-"alphanumeric characters and - or _. Note that you cannot change the slug "
-"after creating the article."
-msgstr ""
-"Это адрес, по которому будет находиться ваша статья. Используйте только "
-"алфавитно-цифровые символы, тире и нижнее подчёркивание. Помните, что вы не "
-"сможете изменить ссылку после создания статьи."
-
-#: wiki/forms.py
-msgid "Write a brief message for the article's history log."
-msgstr "Напишите короткое описание для журнала истории."
-
-#: wiki/forms.py
-msgid "A slug may not begin with an underscore."
-msgstr "Slug-строка не может начинаться с символа подчёркивания"
-
-#: wiki/forms.py
-#, python-format
-msgid "A deleted article with slug \"%s\" already exists."
-msgstr "Удалённая статья со slug-строкой «%s» уже существует."
-
-#: wiki/forms.py
-#, python-format
-msgid "A slug named \"%s\" already exists."
-msgstr "Статья со slug-строкой «%s» уже существует."
-
-#: wiki/forms.py
-msgid "Yes, I am sure"
-msgstr "Да, я уверен"
-
-#: wiki/forms.py wiki/templates/wiki/deleted.html
-msgid "Purge"
-msgstr "Очистка"
-
-#: wiki/forms.py
-msgid ""
-"Purge the article: Completely remove it (and all its contents) with no undo."
-" Purging is a good idea if you want to free the slug such that users can "
-"create new articles in its place."
-msgstr ""
-"Очистка статьи: производится её полное удаление (включая всё содержимое) без"
-" возможности восстановления. Очистка подходит, если вы хотите высвободить "
-"краткое название, чтобы пользователи могли создать новую статью по той же "
-"ссылке."
-
-#: wiki/forms.py wiki/plugins/attachments/forms.py
-#: wiki/plugins/images/forms.py
-msgid "You are not sure enough!"
-msgstr "Вы уверены?!"
-
-#: wiki/forms.py
-msgid "While you tried to delete this article, it was modified. TAKE CARE!"
-msgstr ""
-"Пока вы пытались удалить эту статью, она была изменена. БУДЬТЕ ОСТОРОЖНЫ!"
-
-#: wiki/forms.py
-msgid "Lock article"
-msgstr "Запретить редактирование"
-
-#: wiki/forms.py
-msgid "Deny all users access to edit this article."
-msgstr "Запретить всем пользователям редактировать эту статью."
-
-#: wiki/forms.py
-msgid "Permissions"
-msgstr "Права доступа"
-
-#: wiki/forms.py
-msgid "Owner"
-msgstr "Владелец"
-
-#: wiki/forms.py
-msgid "Enter the username of the owner."
-msgstr "Введите имя пользователя владельца."
-
-#: wiki/forms.py
-msgid "(none)"
-msgstr "(нет)"
-
-#: wiki/forms.py
-msgid "Inherit permissions"
-msgstr "Наследовать права доступа"
-
-#: wiki/forms.py
-msgid ""
-"Check here to apply the above permissions recursively to articles under this"
-" one."
-msgstr ""
-"Отметьте, чтобы последовательно применить вышеуказанные права доступа к "
-"статьям, находящимся под данной."
-
-#: wiki/forms.py
-msgid "Permission settings for the article were updated."
-msgstr "Настройки прав доступа для этой статьи были обновлены."
-
-#: wiki/forms.py
-msgid "Your permission settings were unchanged, so nothing saved."
-msgstr "Ваши настройки прав доступа не были изменены, нечего сохранять."
-
-#: wiki/forms.py
-msgid "No user with that username"
-msgstr "Нет пользователей с таким именем пользователя"
-
-#: wiki/forms.py
-msgid "Article locked for editing"
-msgstr "Статья заблокирована для редактирования"
-
-#: wiki/forms.py
-msgid "Article unlocked for editing"
-msgstr "Статья разблокирована для редактирования"
-
-#: src/django-wiki/wiki/forms.py wiki/forms.py
-msgid "Filter"
-msgstr ""
-
-#: wiki/models/article.py wiki/models/pluginbase.py
-#: wiki/plugins/attachments/models.py
-msgid "current revision"
-msgstr "текущая версия"
-
-#: wiki/models/article.py
-msgid ""
-"The revision being displayed for this article. If you need to do a roll-"
-"back, simply change the value of this field."
-msgstr ""
-"Текущая версия данной статьи. Если вам необходимо вернуться к одной из "
-"предыдущих версий, просто измените значение этого поля."
-
-#: wiki/models/article.py
-msgid "modified"
-msgstr "изменено"
-
-#: wiki/models/article.py
-msgid "Article properties last modified"
-msgstr "Свойства статьи в последний раз были изменены"
-
-#: wiki/models/article.py
-msgid "owner"
-msgstr "владелец"
-
-#: wiki/models/article.py
-msgid ""
-"The owner of the article, usually the creator. The owner always has both "
-"read and write access."
-msgstr ""
-"Владелец статьи, обычно создатель. Владелец всегда имеет права на чтение и "
-"запись."
-
-#: wiki/models/article.py
-msgid "group"
-msgstr "группа"
-
-#: wiki/models/article.py
-msgid ""
-"Like in a UNIX file system, permissions can be given to a user according to "
-"group membership. Groups are handled through the Django auth system."
-msgstr ""
-"Как и в файловой системе UNIX, пользователю предоставляются те же права "
-"доступа к файлу, что и пользовательской группе, к которой он принадлежит. "
-"Управление группами организовано через систему авторизации Django."
-
-#: wiki/models/article.py
-msgid "group read access"
-msgstr "право на чтение для группы"
-
-#: wiki/models/article.py
-msgid "group write access"
-msgstr "право на запись для группы"
-
-#: wiki/models/article.py
-msgid "others read access"
-msgstr "право на чтение для других пользователей"
-
-#: wiki/models/article.py
-msgid "others write access"
-msgstr "право на запись для других пользователей"
-
-#: wiki/models/article.py
-#, python-format
-msgid "Article without content (%(id)d)"
-msgstr "Статья без содержания (%(id)d)"
-
-#: wiki/models/article.py
-msgid "content type"
-msgstr "Тип содержимого"
-
-#: wiki/models/article.py
-msgid "object ID"
-msgstr "ID объекта"
-
-#: wiki/models/article.py
-msgid "Article for object"
-msgstr "Статья для объекта"
-
-#: wiki/models/article.py
-msgid "Articles for object"
-msgstr "Статьи для объекта"
-
-#: wiki/models/article.py
-msgid "revision number"
-msgstr "номер версии"
-
-#: wiki/models/article.py
-msgid "IP address"
-msgstr "IP адрес"
-
-#: wiki/models/article.py
-msgid "user"
-msgstr "пользователь"
-
-#: wiki/models/article.py wiki/templates/wiki/article.html
-#: wiki/templates/wiki/includes/revision_info.html
-msgid "locked"
-msgstr "заблокировано"
-
-#: wiki/models/article.py wiki/models/pluginbase.py
-msgid "article"
-msgstr "статья"
-
-#: wiki/models/article.py
-msgid "article contents"
-msgstr "содержание статьи"
-
-#: wiki/models/article.py
-msgid "article title"
-msgstr "заголовок статьи"
-
-#: wiki/models/article.py
-msgid ""
-"Each revision contains a title field that must be filled out, even if the "
-"title has not changed"
-msgstr ""
-"Каждая версия содержит поле заголовка, которое необходимо заполнить, даже "
-"если заголовок не изменился"
-
-#: wiki/models/pluginbase.py
-msgid "original article"
-msgstr "исходный текст статьи"
-
-#: wiki/models/pluginbase.py
-msgid "Permissions are inherited from this article"
-msgstr "Права доступа унаследованы от данной статьи"
-
-#: wiki/models/pluginbase.py
-msgid "A plugin was changed"
-msgstr "Плагин был изменён"
-
-#: wiki/models/pluginbase.py
-msgid ""
-"The revision being displayed for this plugin.If you need to do a roll-back, "
-"simply change the value of this field."
-msgstr ""
-"Показана версия для данного плагина. Если вам необходимо сделать откат, "
-"просто измените значение этого поля."
-
-#: wiki/models/urlpath.py
-msgid "Cache lookup value for articles"
-msgstr "Поиск по значению кеша для статей"
-
-#: wiki/models/urlpath.py
-msgid "slug"
-msgstr "краткое название"
-
-#: wiki/models/urlpath.py
-msgid "(root)"
-msgstr "(корень)"
-
-#: wiki/models/urlpath.py
-msgid "URL path"
-msgstr "URL-путь"
-
-#: wiki/models/urlpath.py
-msgid "URL paths"
-msgstr "URL пути"
-
-#: wiki/models/urlpath.py
-msgid "Sorry but you cannot have a root article with a slug."
-msgstr ""
-"К сожалению, краткое наименование для корневой статьи не может быть задано."
-
-#: wiki/models/urlpath.py
-msgid "A non-root note must always have a slug."
-msgstr "Некорневая заметка должна всегда иметь краткое название."
-
-#: wiki/models/urlpath.py
-#, python-format
-msgid "There is already a root node on %s"
-msgstr "Уже существует корневой узел на %s"
-
-#: wiki/models/urlpath.py
-msgid ""
-"Articles who lost their parents\n"
-"===============================\n"
-"\n"
-"The children of this article have had their parents deleted. You should probably find a new home for them."
-msgstr ""
-"Статьи, которые потеряли своих родителей\n"
-"===============================\n"
-"\n"
-"\n"
-"У потомков этой статьи были удалены родители. Наверное, вам следует найти им новый дом."
-
-#: wiki/models/urlpath.py
-msgid "Lost and found"
-msgstr "Бюро находок"
-
-#: wiki/plugins/attachments/forms.py
-msgid "A short summary of what the file contains"
-msgstr "Кратко о содержании файла"
-
-#: wiki/plugins/attachments/forms.py
-msgid "Yes I am sure..."
-msgstr "Да, я уверен..."
-
-#: wiki/plugins/attachments/markdown_extensions.py
-msgid "Click to download file"
-msgstr "Нажмите, чтобы скачать файл"
-
-#: wiki/plugins/attachments/models.py
-msgid ""
-"The revision of this attachment currently in use (on all articles using the "
-"attachment)"
-msgstr ""
-"Версия этого приложения в настоящий момент используется (во всех статьях, "
-"использующих это приложение)"
-
-#: wiki/plugins/attachments/models.py
-msgid "original filename"
-msgstr "исходное имя файла"
-
-#: wiki/plugins/attachments/models.py
-msgid "attachment"
-msgstr "вложение"
-
-#: wiki/plugins/attachments/models.py
-msgid "attachments"
-msgstr "вложения"
-
-#: wiki/plugins/attachments/models.py
-msgid "file"
-msgstr "файл"
-
-#: wiki/plugins/attachments/models.py
-msgid "attachment revision"
-msgstr "версия вложения"
-
-#: wiki/plugins/attachments/models.py
-msgid "attachment revisions"
-msgstr "версии вложений"
-
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
-#: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
-msgid ""
-"The file may be referenced on other articles. Deleting it means that they "
-"will loose their references to this file. The following articles reference "
-"this file:"
-msgstr ""
-
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
-#: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
-msgid "Delete it!"
-msgstr ""
-
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "Remove"
-msgstr "Удалить"
-
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
-#: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
-msgid ""
-"You can remove a reference to a file, but it will retain its references on "
-"other articles."
-msgstr ""
-
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
-#: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
-msgid "Remove reference"
-msgstr ""
-
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
-#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
-msgid "History of"
-msgstr ""
-
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-#: lms/templates/ccx/schedule.html
-#: lms/templates/instructor/instructor_dashboard_2/certificates.html
-msgid "Date"
-msgstr "Дата"
-
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
-#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
-msgid "User"
-msgstr ""
-
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
-#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
-#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
-msgid "File"
-msgstr ""
-
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
-#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
-#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
-msgid "Action"
-msgstr ""
-
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
-#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
-#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
-msgid "<em>No description</em>"
-msgstr ""
-
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
-#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
-#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
-msgid "Download"
-msgstr ""
-
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
-#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
-msgid "Use this!"
-msgstr ""
-
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
-#: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
-#, python-format
-msgid ""
-"Replacing an attachment means adding a new file that will be used in its "
-"place. All references to the file will be replaced by the one you upload and"
-" the file will be downloaded as <strong>%(filename)s</strong>. Please note "
-"that this attachment is in use on other articles, you may distort contents. "
-"However, do not hestitate to take advantage of this and make replacements "
-"for the listed articles where necessary. This way of working is more "
-"efficient...."
-msgstr ""
-
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
-#: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
-msgid "Articles using"
-msgstr ""
-
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
-#: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
-#, python-format
-msgid ""
-"Replacing an attachment means adding a new file that will be used in its "
-"place. All references to the file will be replaced by the one you upload and"
-" the file will be downloaded as <strong>%(filename)s</strong>."
-msgstr ""
-
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
-#: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
-#: wiki/plugins/images/templates/wiki/plugins/images/revision_add.html
-msgid "Upload replacement"
-msgstr ""
-
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
-#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
-msgid "Add file to"
-msgstr ""
-
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
-#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
-msgid "Add attachment from other article"
-msgstr ""
-
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
-#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
-msgid "Main article"
-msgstr ""
-
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
-#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
-msgid "Add to article"
-msgstr ""
-
-#: src/django-wiki/wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
-#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
-msgid "Your search did not return any results"
-msgstr ""
-
-#: wiki/plugins/attachments/views.py
-#, python-format
-msgid "%s was successfully added."
-msgstr "%s успешно добавлено."
-
-#: wiki/plugins/attachments/views.py
-#, python-format
-msgid "Your file could not be saved: %s"
-msgstr "Ваш файл не может быть сохранён: %s"
-
-#: wiki/plugins/attachments/views.py
-msgid ""
-"Your file could not be saved, probably because of a permission error on the "
-"web server."
-msgstr ""
-"Ваш файл не может быть сохранён, вероятно, из-за ошибки прав доступа на веб-"
-"сервере."
-
-#: wiki/plugins/attachments/views.py
-#, python-format
-msgid "%s uploaded and replaces old attachment."
-msgstr "%s загружено и заменило старую версию вложения"
-
-#: wiki/plugins/attachments/views.py
-msgid ""
-"Your new file will automatically be renamed to match the file already "
-"present. Files with different extensions are not allowed."
-msgstr ""
-"Ваш новый файл будет автоматически переименован в соответствии с уже "
-"имеющимся файлом. Файлы с разными расширениями не допускаются."
-
-#: wiki/plugins/attachments/views.py
-#, python-format
-msgid "Current revision changed for %s."
-msgstr "Текущая версия изменена на %s."
-
-#: wiki/plugins/attachments/views.py
-#, python-format
-msgid "Added a reference to \"%(att)s\" from \"%(art)s\"."
-msgstr "Добавлена cсылка на «%(att)s» из «%(art)s»."
-
-#: wiki/plugins/attachments/views.py
-#, python-format
-msgid "The file %s was deleted."
-msgstr "Файл %s удалён."
-
-#: wiki/plugins/attachments/views.py
-#, python-format
-msgid "This article is no longer related to the file %s."
-msgstr "Эта статья больше не связана с файлом %s."
-
-#: wiki/plugins/attachments/wiki_plugin.py
-#, python-format
-msgid "A file was changed: %s"
-msgstr "Файл изменён: %s"
-
-#: wiki/plugins/attachments/wiki_plugin.py
-#, python-format
-msgid "A file was deleted: %s"
-msgstr "Файл удалён: %s"
-
-#: src/django-wiki/wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
-#: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
-msgid "Adding new articles"
-msgstr ""
-
-#: src/django-wiki/wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
-#: src/django-wiki/wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
-#: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
-#: wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
-msgid "An external link"
-msgstr ""
-
-#: src/django-wiki/wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
-#: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
-msgid "Headers"
-msgstr ""
-
-#: src/django-wiki/wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
-#: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
-msgid ""
-"Use these codes for headers and to automatically generate Tables of "
-"Contents."
-msgstr ""
-
-#: src/django-wiki/wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
-#: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
-msgid "Typography"
-msgstr ""
-
-#: src/django-wiki/wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
-#: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
-msgid "Lists"
-msgstr ""
-
-#: cms/templates/widgets/header.html
-#: lms/templates/header/navbar-authenticated.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: lms/templates/static_templates/help.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-#: wiki/plugins/help/wiki_plugin.py
-msgid "Help"
-msgstr "Помощь"
-
-#: src/django-wiki/wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
-#: wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
-msgid "Link to another wiki page"
-msgstr ""
-
-#: src/django-wiki/wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
-#: wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
-msgid ""
-"Type in something from another wiki page's title and auto-complete will help"
-" you create a tag for you wiki link. Tags for links look like this:"
-msgstr ""
-
-#: src/django-wiki/wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
-#: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
-#: wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
-msgid "Insert"
-msgstr ""
-
-#: src/django-wiki/wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
-#: wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
-msgid ""
-"You can link to another website simply by inserting an address example.com "
-"or http://example.com or by using the markdown syntax:"
-msgstr ""
-
-#: wiki/plugins/links/wiki_plugin.py
-msgid "Links"
-msgstr "Ссылки"
-
-#: wiki/plugins/notifications/forms.py
-msgid "Notifications"
-msgstr "Уведомления"
-
-#: wiki/plugins/notifications/forms.py
-msgid "When this article is edited"
-msgstr "Когда эта статья отредактирована"
-
-#: wiki/plugins/notifications/forms.py
-msgid "Also receive emails about article edits"
-msgstr "Также сообщать о правках статьи по электронной почте"
-
-#: wiki/plugins/notifications/forms.py
-msgid "Your notification settings were updated."
-msgstr "Ваши настройки уведомлений были обновлены."
-
-#: wiki/plugins/notifications/forms.py
-msgid "Your notification settings were unchanged, so nothing saved."
-msgstr "Ваши настройки уведомлений не были изменены, не сохранено."
-
-#: wiki/plugins/notifications/models.py
-#, python-format
-msgid "%(user)s subscribing to %(article)s (%(type)s)"
-msgstr "%(user)s подписывается на %(article)s (%(type)s)"
-
-#: wiki/plugins/notifications/models.py
-#, python-format
-msgid "Article deleted: %s"
-msgstr "Статья удалена: %s"
-
-#: wiki/plugins/notifications/models.py
-#, python-format
-msgid "Article modified: %s"
-msgstr "Статья изменена: %s"
-
-#: wiki/plugins/notifications/models.py
-#, python-format
-msgid "New article created: %s"
-msgstr "Создана новая статья: %s"
-
-#: src/django-wiki/wiki/plugins/notifications/templates/wiki/plugins/notifications/menubaritem.html
-#: wiki/plugins/notifications/templates/wiki/plugins/notifications/menubaritem.html
-msgid "No notifications"
-msgstr ""
-
-#: src/django-wiki/wiki/plugins/notifications/templates/wiki/plugins/notifications/menubaritem.html
-#: wiki/plugins/notifications/templates/wiki/plugins/notifications/menubaritem.html
-msgid "Clear notifications list"
-msgstr ""
-
-#: lms/templates/register-sidebar.html
-#: themes/stanford-style/lms/templates/register-sidebar.html
-msgid "Log in"
-msgstr "Войти"
-
-#: lms/templates/login.html
-msgid "Please log in"
-msgstr "Пожалуйста, войдите в систему"
-
-#: src/django-wiki/wiki/templates/wiki/accounts/login.html
-#: wiki/templates/wiki/accounts/login.html
-msgid "Log me in..."
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/accounts/login.html
-#: wiki/templates/wiki/accounts/login.html
-msgid "Don't have an account?"
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/accounts/login.html
-#: src/django-wiki/wiki/templates/wiki/accounts/signup.html
-#: src/django-wiki/wiki/templates/wiki/base.html wiki/templates/wiki/base.html
-#: wiki/templates/wiki/accounts/login.html
-#: wiki/templates/wiki/accounts/signup.html
-msgid "Sign up"
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/accounts/signup.html
-#: wiki/templates/wiki/accounts/signup.html
-msgid "Sign me up..."
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/article/create_root.html
-#: wiki/templates/wiki/article/create_root.html
-msgid "Create root article"
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/article/create_root.html
-#: wiki/templates/wiki/article/create_root.html
-msgid "Congratulations!"
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/article/create_root.html
-#: wiki/templates/wiki/article/create_root.html
-msgid ""
-"You have django-wiki installed... but there are no articles. So it's time to"
-" create the first one, the root article. In the beginning, it will only be "
-"editable by administrators, but you can define permissions after."
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/article/create_root.html
-#: wiki/templates/wiki/article/create_root.html
-msgid "Root article"
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/article/create_root.html
-#: wiki/templates/wiki/article/create_root.html
-msgid "Create root"
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/base.html wiki/templates/wiki/base.html
-msgid "Search..."
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/base.html wiki/templates/wiki/base.html
-msgid "Log out"
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/deleted.html
-#: wiki/templates/wiki/deleted.html
-msgid "Article deleted"
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/deleted.html
-#: wiki/templates/wiki/deleted.html
-msgid "Article Deleted"
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/deleted.html
-#: wiki/templates/wiki/deleted.html
-msgid "The article you were looking for has been deleted."
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/deleted.html
-#: wiki/templates/wiki/deleted.html
-msgid "You may restore this article and its children by clicking restore."
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/deleted.html
-#: wiki/plugins/images/templates/wiki/plugins/images/purge.html
-#: wiki/templates/wiki/deleted.html
-msgid "Purge deletion"
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/deleted.html
-#: wiki/templates/wiki/deleted.html
-msgid ""
-"You may remove this article and any children permanently and free their "
-"slugs by clicking the below button. This action cannot be undone."
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/dir.html wiki/templates/wiki/dir.html
-msgid "Listing articles in"
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/dir.html wiki/templates/wiki/dir.html
-msgid "Up one level"
-msgstr ""
-
-#: lms/templates/wiki/includes/breadcrumbs.html
-msgid "Add article"
-msgstr "Добавить статью"
-
-#: src/django-wiki/wiki/templates/wiki/dir.html wiki/templates/wiki/dir.html
-msgid "clear"
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/dir.html wiki/templates/wiki/dir.html
-msgid "article,articles"
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/dir.html wiki/templates/wiki/dir.html
-msgid "matches,match"
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/dir.html wiki/templates/wiki/dir.html
-#, python-format
-msgid "%(cnt)s %(articles_plur)s in this level %(match_plur)s your search."
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/dir.html wiki/templates/wiki/dir.html
-msgid "is,are"
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/dir.html wiki/templates/wiki/dir.html
-#, python-format
-msgid "There %(articles_plur_verb)s %(cnt)s %(articles_plur)s in this level."
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/dir.html wiki/templates/wiki/dir.html
-msgid "Last modified"
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/history.html
-#: wiki/templates/wiki/history.html
-msgid "no log message"
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/includes/anonymous_blocked.html
-#: wiki/templates/wiki/includes/anonymous_blocked.html
-msgid "You need to log in og sign up to use this function."
-msgstr ""
-
-#: cms/templates/certificates.html cms/templates/group_configurations.html
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-#: cms/templates/settings.html cms/templates/settings_advanced.html
-#: cms/templates/settings_graders.html cms/templates/widgets/header.html
-#: lms/templates/wiki/includes/article_menu.html
-msgid "Settings"
-msgstr "Настройки"
-
-#: lms/templates/wiki/includes/article_menu.html
-msgid "Changes"
-msgstr "Версии"
-
-#: src/django-wiki/wiki/templates/wiki/includes/article_menu.html
-#: wiki/templates/wiki/includes/article_menu.html
-msgid "View Source"
-msgstr ""
-
-#. Translators: this is a verb describing the action of viewing more details
-#: cms/templates/studio_xblock_wrapper.html
-#: lms/templates/wiki/includes/article_menu.html
-msgid "View"
-msgstr "Просмотр"
-
-#: src/django-wiki/wiki/templates/wiki/includes/breadcrumbs.html
-#: wiki/templates/wiki/includes/breadcrumbs.html
-msgid "Sub-articles for"
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/includes/breadcrumbs.html
-#: wiki/templates/wiki/includes/breadcrumbs.html
-msgid "No sub-articles"
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/includes/breadcrumbs.html
-#: wiki/templates/wiki/includes/breadcrumbs.html
-msgid "...and more"
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/includes/breadcrumbs.html
-#: wiki/templates/wiki/includes/breadcrumbs.html
-msgid "Browse articles in this level"
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/includes/breadcrumbs.html
-#: wiki/templates/wiki/includes/breadcrumbs.html
-msgid "New article next to"
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/includes/breadcrumbs.html
-#: wiki/templates/wiki/includes/breadcrumbs.html
-msgid "New article below"
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/includes/revision_info.html
-#: wiki/templates/wiki/includes/revision_info.html
-msgid "by"
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/includes/revision_info.html
-#: wiki/templates/wiki/includes/revision_info.html
-msgid "restored"
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/includes/revision_info.html
-#: wiki/templates/wiki/includes/revision_info.html
-msgid "unlocked"
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/permission_denied.html
-#: wiki/templates/wiki/permission_denied.html
-msgid "Permission Denied"
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/permission_denied.html
-#: wiki/templates/wiki/permission_denied.html
-msgid "Sorry, you don't have permission to view this page."
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/preview_inline.html
-#: wiki/templates/wiki/preview_inline.html
-msgid "Previewing revision"
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/preview_inline.html
-#: wiki/templates/wiki/preview_inline.html
-msgid "Previewing merge between"
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/preview_inline.html
-#: wiki/templates/wiki/preview_inline.html
-msgid "and"
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/source.html
-#: wiki/templates/wiki/source.html
-msgid "Source of"
-msgstr ""
-
-#: src/django-wiki/wiki/templates/wiki/source.html
-#: wiki/templates/wiki/source.html
-msgid "This article is currently locked for editing."
-msgstr ""
-
-#: wiki/views/accounts.py
-msgid "You are now sign up... and now you can sign in!"
-msgstr "Вы зарегестрировались... и теперь можете войти!"
-
-#: wiki/views/accounts.py
-msgid "You are no longer logged in. Bye bye!"
-msgstr "Вы вышли из системы. До свидания!"
-
-#: wiki/views/accounts.py
-msgid "You are now logged in! Have fun!"
-msgstr "Вы вошли! Развлекайтесь!"
-
-#: wiki/views/article.py
-#, python-format
-msgid "New article '%s' created."
-msgstr "Новая статья '%s' создана."
-
-#: wiki/views/article.py
-#, python-format
-msgid "There was an error creating this article: %s"
-msgstr "При создании статьи %s произошла ошибка"
-
-#: wiki/views/article.py
-msgid "There was an error creating this article."
-msgstr "При создании статьи произошла ошибка."
-
-#: wiki/views/article.py
-msgid ""
-"This article cannot be deleted because it has children or is a root article."
-msgstr ""
-"Эта статья является корневой или имеет дочерние статьи, поэтому не может "
-"быть удалена."
-
-#: wiki/views/article.py
-msgid ""
-"This article together with all its contents are now completely gone! Thanks!"
-msgstr "Эта статья вместе со всем содержимым полностью удалена! Спасибо!"
-
-#: wiki/views/article.py
-#, python-format
-msgid ""
-"The article \"%s\" is now marked as deleted! Thanks for keeping the site "
-"free from unwanted material!"
-msgstr ""
-"Статья «%s» помечена как удалённая! Спасибо за очистку  сайта от "
-"нежелательного материала!"
-
-#: wiki/views/article.py
-msgid "Your changes were saved."
-msgstr "Ваши изменения сохранены."
-
-#: src/django-wiki/wiki/views/article.py wiki/views/article.py
-msgid "A new revision of the article was successfully added."
-msgstr ""
-
-#: wiki/views/article.py
-msgid "Restoring article"
-msgstr "Восстановление статьи"
-
-#: wiki/views/article.py
-#, python-format
-msgid "The article \"%s\" and its children are now restored."
-msgstr "Статья «%s» и её дочерние статьи были восстановлены."
-
-#: wiki/views/article.py
-#, python-format
-msgid ""
-"The article %(title)s is now set to display revision #%(revision_number)d"
-msgstr "Статья %(title)s редакции #%(revision_number)d"
-
-#: wiki/views/article.py
-msgid "New title"
-msgstr "Новый заголовок"
-
-#: wiki/views/article.py
-#, python-format
-msgid "Merge between Revision #%(r1)d and Revision #%(r2)d"
-msgstr "Слияние версий #%(r1)d и #%(r2)d"
-
-#: wiki/views/article.py
-#, python-format
-msgid ""
-"A new revision was created: Merge between Revision #%(r1)d and Revision "
-"#%(r2)d"
-msgstr "Создана новая версия: слияние версий #%(r1)d и #%(r2)d"
-
-#: src/edx-jsme/edx_jsme/__init__.py
-msgid "Must provide an answer."
-msgstr ""
-
-#: src/rate-xblock/rate/rate.py
-msgid "Please provide us feedback on this section."
-msgstr ""
-
-#: src/rate-xblock/rate/rate.py
-msgid "Please rate your overall experience with this section."
-msgstr ""
-
-#: src/rate-xblock/rate/rate.py
-msgid "Excellent"
-msgstr ""
-
-#: src/rate-xblock/rate/rate.py
-msgid "Average"
-msgstr ""
-
-#: src/rate-xblock/rate/rate.py
-msgid "Fair"
-msgstr ""
-
-#: src/rate-xblock/rate/rate.py
-msgid "Poor"
-msgstr ""
-
-#: src/rate-xblock/rate/rate.py
-msgid "Thank you for voting!"
-msgstr ""
-
-#: src/rate-xblock/rate/rate.py
-msgid "Thank you!"
-msgstr ""
-
-#: src/xblock-google-drive/google_drive/templates/html/google_calendar_edit.html
-msgid "Invalid Google Calendar"
-msgstr ""
-
-#: src/xblock-google-drive/google_drive/templates/html/google_calendar_edit.html
-#: src/xblock-google-drive/google_drive/templates/html/google_docs_edit.html
-msgid "Please correct the outlined fields."
-msgstr ""
-
-#: src/xblock-google-drive/google_drive/templates/html/google_calendar_edit.html
-#: src/xblock-google-drive/google_drive/templates/html/google_docs_edit.html
-msgid "This name appears in the horizontal navigation at the top of the page."
-msgstr ""
-
-#: src/xblock-google-drive/google_drive/templates/html/google_calendar_edit.html
-msgid "Public Calendar ID"
-msgstr ""
-
-#: src/xblock-google-drive/google_drive/templates/html/google_calendar_edit.html
-msgid ""
-"Google provides an ID for publicly available calendars. In the Google "
-"Calendar, open Settings and copy the ID from the Calendar Address section "
-"into this field. You can "
-msgstr ""
-
-#: src/xblock-google-drive/google_drive/templates/html/google_calendar_edit.html
-msgid "Default View"
-msgstr ""
-
-#: src/xblock-google-drive/google_drive/templates/html/google_calendar_edit.html
-msgid ""
-"The calendar view that students see by default. A student can change this "
-"view."
-msgstr ""
-
-#: lms/templates/problem.html lms/templates/word_cloud.html
-msgid "Save"
-msgstr "Сохранить"
-
-#: src/xblock-google-drive/google_drive/templates/html/google_docs_edit.html
-msgid "Invalid Google Document"
-msgstr ""
-
-#: src/xblock-google-drive/google_drive/templates/html/google_docs_edit.html
-msgid "Embed Code"
-msgstr ""
-
-#: src/xblock-google-drive/google_drive/templates/html/google_docs_edit.html
-msgid ""
-"Google provides an embed code for Drive documents. In the Google Drive "
-"document, from the File menu, select Publish to the Web. Modify settings as "
-"needed, click Publish, and copy the embed code into this field."
-msgstr ""
-
-#: src/xblock-google-drive/google_drive/templates/html/google_docs_edit.html
-msgid "Alternative text"
-msgstr ""
-
-#: src/xblock-google-drive/google_drive/templates/html/google_docs_edit.html
-msgid ""
-"Alternative text describes an image and appears if the image is unavailable."
-msgstr ""
-
 #: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
 msgid ""
@@ -13387,8 +12044,8 @@ msgid "Course has been successfully reindexed."
 msgstr "Поисковый индекс курса успешно обновлён."
 
 #: cms/djangoapps/contentstore/views/course.py
-msgid "Unscheduled"
-msgstr "Дата выпуска не задана"
+msgid "Set Date"
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
@@ -13924,6 +12581,14 @@ msgstr "Страница не найдена"
 msgid "Content"
 msgstr "Содержание"
 
+#: cms/templates/certificates.html cms/templates/group_configurations.html
+#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
+#: cms/templates/settings.html cms/templates/settings_advanced.html
+#: cms/templates/settings_graders.html cms/templates/widgets/header.html
+#: lms/templates/wiki/includes/article_menu.html
+msgid "Settings"
+msgstr "Настройки"
+
 #: cms/templates/certificates.html cms/templates/container.html
 #: cms/templates/course_outline.html cms/templates/group_configurations.html
 #: cms/templates/library.html cms/templates/manage_users.html
@@ -14050,6 +12715,12 @@ msgstr "Требования"
 msgid "Details"
 msgstr "Подробности"
 
+#. Translators: this is a verb describing the action of viewing more details
+#: cms/templates/studio_xblock_wrapper.html
+#: lms/templates/wiki/includes/article_menu.html
+msgid "View"
+msgstr "Просмотр"
+
 #: cms/templates/maintenance/_force_publish_course.html
 #: lms/templates/problem.html lms/templates/shoppingcart/shopping_cart.html
 #: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
@@ -14072,6 +12743,16 @@ msgstr "Выберите язык"
 #: lms/templates/header/user_dropdown.html
 msgid "Account"
 msgstr "Учётная запись"
+
+#: cms/templates/widgets/header.html
+#: lms/templates/header/navbar-authenticated.html
+#: lms/templates/navigation/navbar-authenticated.html
+#: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: lms/templates/static_templates/help.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+#: wiki/plugins/help/wiki_plugin.py
+msgid "Help"
+msgstr "Помощь"
 
 #: cms/templates/widgets/sock.html
 #: themes/edx.org/cms/templates/widgets/sock.html
@@ -14282,6 +12963,8 @@ msgid "You do not have access to this dependency module."
 msgstr ""
 
 #: lms/templates/course.html
+#: openedx/features/journals/templates/journals/bundle_card.html
+#: openedx/features/journals/templates/journals/journal_card.html
 msgid "LEARN MORE"
 msgstr "ПОДРОБНЕЕ"
 
@@ -14761,6 +13444,10 @@ msgid "Processing your account information"
 msgstr "Обработка данных вашей учётной записи…"
 
 #: lms/templates/login.html
+msgid "Please log in"
+msgstr "Пожалуйста, войдите в систему"
+
+#: lms/templates/login.html
 msgid "to access your account and courses"
 msgstr "чтобы получить доступ к своей учётной записи и курсам"
 
@@ -14962,6 +13649,10 @@ msgstr ""
 #: lms/templates/problem.html
 msgid "Hint"
 msgstr "Подсказка"
+
+#: lms/templates/problem.html lms/templates/word_cloud.html
+msgid "Save"
+msgstr "Сохранить"
 
 #: lms/templates/problem.html
 msgid "Save your answer"
@@ -15181,6 +13872,11 @@ msgstr "Помощь с регистрацией"
 #: themes/stanford-style/lms/templates/register-sidebar.html
 msgid "Already registered?"
 msgstr "Уже зарегистрированы?"
+
+#: lms/templates/register-sidebar.html
+#: themes/stanford-style/lms/templates/register-sidebar.html
+msgid "Log in"
+msgstr "Войти"
 
 #: lms/templates/register-sidebar.html
 msgid "Welcome to {platform_name}"
@@ -15563,6 +14259,12 @@ msgstr "следующий"
 msgid "Recent git load activity for {course_id}"
 msgstr "Последние загрузки git для {course_id}"
 
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+#: lms/templates/ccx/schedule.html
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Date"
+msgstr "Дата"
+
 #. Translators: Git is a version-control system; see http://git-scm.com/about
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Git Action"
@@ -15597,6 +14299,10 @@ msgstr "ipaddr"
 #: lms/templates/tracking_log.html
 msgid "source"
 msgstr "source"
+
+#: lms/templates/tracking_log.html
+msgid "type"
+msgstr "type"
 
 #: lms/templates/unsubscribe.html
 msgid "Unsubscribe Successful!"
@@ -17092,6 +15798,7 @@ msgstr "Вы записаны на этот курс"
 #: lms/templates/courseware/course_about.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/shoppingcart/registration_code_receipt.html
+#: openedx/features/journals/templates/journals/bundle_about.html
 msgid "View Course"
 msgstr "Посмотреть курс"
 
@@ -17337,6 +16044,7 @@ msgid "Purchase the Program ("
 msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
+#: openedx/features/journals/templates/journals/bundle_about.html
 msgid "Original Price"
 msgstr ""
 
@@ -17345,6 +16053,7 @@ msgid "${oldPrice}"
 msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
+#: openedx/features/journals/templates/journals/bundle_about.html
 msgid "Discounted Price"
 msgstr ""
 
@@ -17441,6 +16150,7 @@ msgid "Courses in the {}"
 msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
+#: openedx/features/journals/templates/journals/bundle_about.html
 msgid "Starts on {}"
 msgstr ""
 
@@ -19236,6 +17946,13 @@ msgid "Programs"
 msgstr "Программы"
 
 #: lms/templates/header/navbar-authenticated.html
+#: lms/templates/navigation/navbar-authenticated.html
+#: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+msgid "Journals"
+msgstr ""
+
+#: lms/templates/header/navbar-authenticated.html
 #: lms/templates/header/user_dropdown.html
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
@@ -21001,6 +19718,10 @@ msgstr ""
 msgid "My Courses"
 msgstr "Мои курсы"
 
+#: lms/templates/learner_dashboard/_dashboard_navigation_journals.html
+msgid "My Journals"
+msgstr ""
+
 #: lms/templates/learner_dashboard/program_details.html
 msgid "Program Details"
 msgstr "Информация о программе"
@@ -21671,6 +20392,10 @@ msgid "Decrease"
 msgstr "Уменьшить"
 
 #: lms/templates/shoppingcart/shopping_cart.html
+msgid "Remove"
+msgstr "Удалить"
+
+#: lms/templates/shoppingcart/shopping_cart.html
 msgid "Discount or activation code"
 msgstr "Скидочный или активационный код"
 
@@ -22065,12 +20790,20 @@ msgid "{span_start}(active){span_end}"
 msgstr "{span_start}(active){span_end}"
 
 #: lms/templates/wiki/includes/article_menu.html
+msgid "Changes"
+msgstr "Версии"
+
+#: lms/templates/wiki/includes/article_menu.html
 msgid "{span_start}active{span_end}"
 msgstr "{span_start}активный{span_end}"
 
 #: lms/templates/wiki/includes/breadcrumbs.html
 msgid "Course Wiki"
 msgstr ""
+
+#: lms/templates/wiki/includes/breadcrumbs.html
+msgid "Add article"
+msgstr "Добавить статью"
 
 #: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
 msgid "Preview Language Setting"
@@ -22238,6 +20971,79 @@ msgstr ""
 
 #: openedx/features/course_search/templates/course_search/course-search-fragment.html
 msgid "Search Results"
+msgstr ""
+
+#: openedx/features/journals/templates/journals/bundle_about.html
+msgid "Purchase the Bundle ("
+msgstr ""
+
+#: openedx/features/journals/templates/journals/bundle_about.html
+msgid "Courses included"
+msgstr ""
+
+#: openedx/features/journals/templates/journals/bundle_about.html
+msgid "Journals included"
+msgstr ""
+
+#: openedx/features/journals/templates/journals/bundle_about.html
+msgid "{access_length} Day Access"
+msgstr ""
+
+#: openedx/features/journals/templates/journals/bundle_about.html
+#: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
+msgid "View Journal"
+msgstr ""
+
+#: openedx/features/journals/templates/journals/bundle_card.html
+msgid "Bundle"
+msgstr ""
+
+#: openedx/features/journals/templates/journals/journal_card.html
+msgid "Journal"
+msgstr ""
+
+#: openedx/features/journals/templates/journals/journal_card.html
+msgid "{num_months} month"
+msgid_plural "{num_months} months"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: openedx/features/journals/templates/journals/journal_card.html
+msgid "unlimited"
+msgstr ""
+
+#: openedx/features/journals/templates/journals/journal_card.html
+msgid "Access Length"
+msgstr ""
+
+#: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
+msgid "Journal Dashboard"
+msgstr ""
+
+#: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
+msgid "{journal_title} Cover Image"
+msgstr ""
+
+#: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
+msgid "Access Expired: {date}"
+msgstr ""
+
+#: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
+msgid "Access Expires: {date}"
+msgstr ""
+
+#: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
+msgid "Renew Access"
+msgstr ""
+
+#: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
+msgid "You have not purchased access to any journals yet."
+msgstr ""
+
+#: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
+msgid "Explore journals and courses"
 msgstr ""
 
 #: openedx/features/learner_analytics/templates/learner_analytics/dashboard.html
@@ -23131,22 +21937,6 @@ msgstr "Кликните, чтобы открыть содержание кур�
 #: cms/templates/course_outline.html cms/templates/edit-tabs.html
 msgid "View Live"
 msgstr "Просмотр курса"
-
-#: cms/templates/course_outline.html
-msgid "Edit Start Date"
-msgstr "Изменить дату начала"
-
-#: cms/templates/course_outline.html cms/templates/settings.html
-msgid "Course Pacing"
-msgstr "Обучение на курсе"
-
-#: cms/templates/course_outline.html cms/templates/settings.html
-msgid "Self-Paced"
-msgstr "Свободное расписание"
-
-#: cms/templates/course_outline.html cms/templates/settings.html
-msgid "Instructor-Paced"
-msgstr "По определённому расписанию"
 
 #: cms/templates/course_outline.html
 msgid "Creating your course organization"
@@ -25134,8 +23924,16 @@ msgid "In-Course Reverification {number}"
 msgstr "Повторное подтверждение личности {number}"
 
 #: cms/templates/settings.html
+msgid "Course Pacing"
+msgstr "Обучение на курсе"
+
+#: cms/templates/settings.html
 msgid "Set the pacing for this course"
 msgstr "Задать порядок обучения на курсе"
+
+#: cms/templates/settings.html
+msgid "Instructor-Paced"
+msgstr "По определённому расписанию"
 
 #: cms/templates/settings.html
 msgid ""
@@ -25146,6 +23944,10 @@ msgstr ""
 "Курсы с определённым расписанием проходят по расписанию, заданному автором "
 "курса. Вы можете задать даты выпуска для материалов курса и сроки сдачи "
 "заданий."
+
+#: cms/templates/settings.html
+msgid "Self-Paced"
+msgstr "Свободное расписание"
 
 #: cms/templates/settings.html
 msgid ""
@@ -26101,6 +24903,620 @@ msgstr "Вы зашли как:"
 msgid "Maintenance"
 msgstr "Техническое обслуживание"
 
+#: wiki/apps.py
+msgid "Wiki notifications"
+msgstr ""
+
+#: wiki/apps.py
+msgid "Wiki images"
+msgstr ""
+
+#: wiki/apps.py
+msgid "Wiki attachments"
+msgstr ""
+
+#: wiki/forms.py
+msgid "Only localhost... muahahaha"
+msgstr "Только локальный компьютер... муахахаха"
+
+#: wiki/forms.py
+msgid "Initial title of the article. May be overridden with revision titles."
+msgstr ""
+"Исходное название статьи. Может быть заменено заголовками других версий."
+
+#: wiki/forms.py
+msgid "Type in some contents"
+msgstr "Введите что-либо в качестве содержания"
+
+#: wiki/forms.py
+msgid ""
+"This is just the initial contents of your article. After creating it, you "
+"can use more complex features like adding plugins, meta data, related "
+"articles etc..."
+msgstr ""
+"Это лишь начальное содержание вашей статьи. После её создания вы сможете "
+"использовать более сложные функции, такие как добавление плагинов, "
+"метаданных, связанных статей и т.д."
+
+#: wiki/forms.py
+msgid "Contents"
+msgstr "Содержание"
+
+#: wiki/forms.py
+msgid "Summary"
+msgstr "Кратко"
+
+#: wiki/forms.py
+msgid ""
+"Give a short reason for your edit, which will be stated in the revision log."
+msgstr ""
+"Коротко опишите причину редактирования, которая будет записана в журнал "
+"исправлений."
+
+#: wiki/forms.py
+msgid ""
+"While you were editing, someone else changed the revision. Your contents "
+"have been automatically merged with the new contents. Please review the text"
+" below."
+msgstr ""
+"Пока вы редактировали материал, кто-то уже внёс изменения в текущую версию. "
+"Ваше содержание было автоматически объединено с новым содержанием. "
+"Пожалуйста, проверьте текст внизу."
+
+#: wiki/forms.py
+msgid "No changes made. Nothing to save."
+msgstr "Изменений не было. Нечего сохранять."
+
+#: wiki/forms.py wiki/templates/wiki/dir.html
+msgid "Slug"
+msgstr "Slug-строка"
+
+#: wiki/forms.py
+msgid ""
+"This will be the address where your article can be found. Use only "
+"alphanumeric characters and - or _. Note that you cannot change the slug "
+"after creating the article."
+msgstr ""
+"Это адрес, по которому будет находиться ваша статья. Используйте только "
+"алфавитно-цифровые символы, тире и нижнее подчёркивание. Помните, что вы не "
+"сможете изменить ссылку после создания статьи."
+
+#: wiki/forms.py
+msgid "Write a brief message for the article's history log."
+msgstr "Напишите короткое описание для журнала истории."
+
+#: wiki/forms.py
+msgid "A slug may not begin with an underscore."
+msgstr "Slug-строка не может начинаться с символа подчёркивания"
+
+#: wiki/forms.py
+#, python-format
+msgid "A deleted article with slug \"%s\" already exists."
+msgstr "Удалённая статья со slug-строкой «%s» уже существует."
+
+#: wiki/forms.py
+#, python-format
+msgid "A slug named \"%s\" already exists."
+msgstr "Статья со slug-строкой «%s» уже существует."
+
+#: wiki/forms.py
+msgid "Yes, I am sure"
+msgstr "Да, я уверен"
+
+#: wiki/forms.py wiki/templates/wiki/deleted.html
+msgid "Purge"
+msgstr "Очистка"
+
+#: wiki/forms.py
+msgid ""
+"Purge the article: Completely remove it (and all its contents) with no undo."
+" Purging is a good idea if you want to free the slug such that users can "
+"create new articles in its place."
+msgstr ""
+"Очистка статьи: производится её полное удаление (включая всё содержимое) без"
+" возможности восстановления. Очистка подходит, если вы хотите высвободить "
+"краткое название, чтобы пользователи могли создать новую статью по той же "
+"ссылке."
+
+#: wiki/forms.py wiki/plugins/attachments/forms.py
+#: wiki/plugins/images/forms.py
+msgid "You are not sure enough!"
+msgstr "Вы уверены?!"
+
+#: wiki/forms.py
+msgid "While you tried to delete this article, it was modified. TAKE CARE!"
+msgstr ""
+"Пока вы пытались удалить эту статью, она была изменена. БУДЬТЕ ОСТОРОЖНЫ!"
+
+#: wiki/forms.py
+msgid "Lock article"
+msgstr "Запретить редактирование"
+
+#: wiki/forms.py
+msgid "Deny all users access to edit this article."
+msgstr "Запретить всем пользователям редактировать эту статью."
+
+#: wiki/forms.py
+msgid "Permissions"
+msgstr "Права доступа"
+
+#: wiki/forms.py
+msgid "Owner"
+msgstr "Владелец"
+
+#: wiki/forms.py
+msgid "Enter the username of the owner."
+msgstr "Введите имя пользователя владельца."
+
+#: wiki/forms.py
+msgid "(none)"
+msgstr "(нет)"
+
+#: wiki/forms.py
+msgid "Inherit permissions"
+msgstr "Наследовать права доступа"
+
+#: wiki/forms.py
+msgid ""
+"Check here to apply the above permissions recursively to articles under this"
+" one."
+msgstr ""
+"Отметьте, чтобы последовательно применить вышеуказанные права доступа к "
+"статьям, находящимся под данной."
+
+#: wiki/forms.py
+msgid "Permission settings for the article were updated."
+msgstr "Настройки прав доступа для этой статьи были обновлены."
+
+#: wiki/forms.py
+msgid "Your permission settings were unchanged, so nothing saved."
+msgstr "Ваши настройки прав доступа не были изменены, нечего сохранять."
+
+#: wiki/forms.py
+msgid "No user with that username"
+msgstr "Нет пользователей с таким именем пользователя"
+
+#: wiki/forms.py
+msgid "Article locked for editing"
+msgstr "Статья заблокирована для редактирования"
+
+#: wiki/forms.py
+msgid "Article unlocked for editing"
+msgstr "Статья разблокирована для редактирования"
+
+#: wiki/forms.py
+msgid "Filter"
+msgstr ""
+
+#: wiki/core/plugins/base.py
+msgid "Settings for plugin"
+msgstr "Настройки плагина"
+
+#: wiki/models/article.py wiki/models/pluginbase.py
+#: wiki/plugins/attachments/models.py
+msgid "current revision"
+msgstr "текущая версия"
+
+#: wiki/models/article.py
+msgid ""
+"The revision being displayed for this article. If you need to do a roll-"
+"back, simply change the value of this field."
+msgstr ""
+"Текущая версия данной статьи. Если вам необходимо вернуться к одной из "
+"предыдущих версий, просто измените значение этого поля."
+
+#: wiki/models/article.py
+msgid "modified"
+msgstr "изменено"
+
+#: wiki/models/article.py
+msgid "Article properties last modified"
+msgstr "Свойства статьи в последний раз были изменены"
+
+#: wiki/models/article.py
+msgid "owner"
+msgstr "владелец"
+
+#: wiki/models/article.py
+msgid ""
+"The owner of the article, usually the creator. The owner always has both "
+"read and write access."
+msgstr ""
+"Владелец статьи, обычно создатель. Владелец всегда имеет права на чтение и "
+"запись."
+
+#: wiki/models/article.py
+msgid "group"
+msgstr "группа"
+
+#: wiki/models/article.py
+msgid ""
+"Like in a UNIX file system, permissions can be given to a user according to "
+"group membership. Groups are handled through the Django auth system."
+msgstr ""
+"Как и в файловой системе UNIX, пользователю предоставляются те же права "
+"доступа к файлу, что и пользовательской группе, к которой он принадлежит. "
+"Управление группами организовано через систему авторизации Django."
+
+#: wiki/models/article.py
+msgid "group read access"
+msgstr "право на чтение для группы"
+
+#: wiki/models/article.py
+msgid "group write access"
+msgstr "право на запись для группы"
+
+#: wiki/models/article.py
+msgid "others read access"
+msgstr "право на чтение для других пользователей"
+
+#: wiki/models/article.py
+msgid "others write access"
+msgstr "право на запись для других пользователей"
+
+#: wiki/models/article.py
+#, python-format
+msgid "Article without content (%(id)d)"
+msgstr "Статья без содержания (%(id)d)"
+
+#: wiki/models/article.py
+msgid "content type"
+msgstr "Тип содержимого"
+
+#: wiki/models/article.py
+msgid "object ID"
+msgstr "ID объекта"
+
+#: wiki/models/article.py
+msgid "Article for object"
+msgstr "Статья для объекта"
+
+#: wiki/models/article.py
+msgid "Articles for object"
+msgstr "Статьи для объекта"
+
+#: wiki/models/article.py
+msgid "revision number"
+msgstr "номер версии"
+
+#: wiki/models/article.py
+msgid "IP address"
+msgstr "IP адрес"
+
+#: wiki/models/article.py
+msgid "user"
+msgstr "пользователь"
+
+#: wiki/models/article.py wiki/templates/wiki/article.html
+#: wiki/templates/wiki/includes/revision_info.html
+msgid "locked"
+msgstr "заблокировано"
+
+#: wiki/models/article.py wiki/models/pluginbase.py
+msgid "article"
+msgstr "статья"
+
+#: wiki/models/article.py
+msgid "article contents"
+msgstr "содержание статьи"
+
+#: wiki/models/article.py
+msgid "article title"
+msgstr "заголовок статьи"
+
+#: wiki/models/article.py
+msgid ""
+"Each revision contains a title field that must be filled out, even if the "
+"title has not changed"
+msgstr ""
+"Каждая версия содержит поле заголовка, которое необходимо заполнить, даже "
+"если заголовок не изменился"
+
+#: wiki/models/pluginbase.py
+msgid "original article"
+msgstr "исходный текст статьи"
+
+#: wiki/models/pluginbase.py
+msgid "Permissions are inherited from this article"
+msgstr "Права доступа унаследованы от данной статьи"
+
+#: wiki/models/pluginbase.py
+msgid "A plugin was changed"
+msgstr "Плагин был изменён"
+
+#: wiki/models/pluginbase.py
+msgid ""
+"The revision being displayed for this plugin.If you need to do a roll-back, "
+"simply change the value of this field."
+msgstr ""
+"Показана версия для данного плагина. Если вам необходимо сделать откат, "
+"просто измените значение этого поля."
+
+#: wiki/models/urlpath.py
+msgid "Cache lookup value for articles"
+msgstr "Поиск по значению кеша для статей"
+
+#: wiki/models/urlpath.py
+msgid "slug"
+msgstr "краткое название"
+
+#: wiki/models/urlpath.py
+msgid "(root)"
+msgstr "(корень)"
+
+#: wiki/models/urlpath.py
+msgid "URL path"
+msgstr "URL-путь"
+
+#: wiki/models/urlpath.py
+msgid "URL paths"
+msgstr "URL пути"
+
+#: wiki/models/urlpath.py
+msgid "Sorry but you cannot have a root article with a slug."
+msgstr ""
+"К сожалению, краткое наименование для корневой статьи не может быть задано."
+
+#: wiki/models/urlpath.py
+msgid "A non-root note must always have a slug."
+msgstr "Некорневая заметка должна всегда иметь краткое название."
+
+#: wiki/models/urlpath.py
+#, python-format
+msgid "There is already a root node on %s"
+msgstr "Уже существует корневой узел на %s"
+
+#: wiki/models/urlpath.py
+msgid ""
+"Articles who lost their parents\n"
+"===============================\n"
+"\n"
+"The children of this article have had their parents deleted. You should probably find a new home for them."
+msgstr ""
+"Статьи, которые потеряли своих родителей\n"
+"===============================\n"
+"\n"
+"\n"
+"У потомков этой статьи были удалены родители. Наверное, вам следует найти им новый дом."
+
+#: wiki/models/urlpath.py
+msgid "Lost and found"
+msgstr "Бюро находок"
+
+#: wiki/plugins/attachments/forms.py
+msgid "A short summary of what the file contains"
+msgstr "Кратко о содержании файла"
+
+#: wiki/plugins/attachments/forms.py
+msgid "Yes I am sure..."
+msgstr "Да, я уверен..."
+
+#: wiki/plugins/attachments/markdown_extensions.py
+msgid "Click to download file"
+msgstr "Нажмите, чтобы скачать файл"
+
+#: wiki/plugins/attachments/models.py
+msgid ""
+"The revision of this attachment currently in use (on all articles using the "
+"attachment)"
+msgstr ""
+"Версия этого приложения в настоящий момент используется (во всех статьях, "
+"использующих это приложение)"
+
+#: wiki/plugins/attachments/models.py
+msgid "original filename"
+msgstr "исходное имя файла"
+
+#: wiki/plugins/attachments/models.py
+msgid "attachment"
+msgstr "вложение"
+
+#: wiki/plugins/attachments/models.py
+msgid "attachments"
+msgstr "вложения"
+
+#: wiki/plugins/attachments/models.py
+msgid "file"
+msgstr "файл"
+
+#: wiki/plugins/attachments/models.py
+msgid "attachment revision"
+msgstr "версия вложения"
+
+#: wiki/plugins/attachments/models.py
+msgid "attachment revisions"
+msgstr "версии вложений"
+
+#: wiki/plugins/attachments/views.py
+#, python-format
+msgid "%s was successfully added."
+msgstr "%s успешно добавлено."
+
+#: wiki/plugins/attachments/views.py
+#, python-format
+msgid "Your file could not be saved: %s"
+msgstr "Ваш файл не может быть сохранён: %s"
+
+#: wiki/plugins/attachments/views.py
+msgid ""
+"Your file could not be saved, probably because of a permission error on the "
+"web server."
+msgstr ""
+"Ваш файл не может быть сохранён, вероятно, из-за ошибки прав доступа на веб-"
+"сервере."
+
+#: wiki/plugins/attachments/views.py
+#, python-format
+msgid "%s uploaded and replaces old attachment."
+msgstr "%s загружено и заменило старую версию вложения"
+
+#: wiki/plugins/attachments/views.py
+msgid ""
+"Your new file will automatically be renamed to match the file already "
+"present. Files with different extensions are not allowed."
+msgstr ""
+"Ваш новый файл будет автоматически переименован в соответствии с уже "
+"имеющимся файлом. Файлы с разными расширениями не допускаются."
+
+#: wiki/plugins/attachments/views.py
+#, python-format
+msgid "Current revision changed for %s."
+msgstr "Текущая версия изменена на %s."
+
+#: wiki/plugins/attachments/views.py
+#, python-format
+msgid "Added a reference to \"%(att)s\" from \"%(art)s\"."
+msgstr "Добавлена cсылка на «%(att)s» из «%(art)s»."
+
+#: wiki/plugins/attachments/views.py
+#, python-format
+msgid "The file %s was deleted."
+msgstr "Файл %s удалён."
+
+#: wiki/plugins/attachments/views.py
+#, python-format
+msgid "This article is no longer related to the file %s."
+msgstr "Эта статья больше не связана с файлом %s."
+
+#: wiki/plugins/attachments/wiki_plugin.py
+#, python-format
+msgid "A file was changed: %s"
+msgstr "Файл изменён: %s"
+
+#: wiki/plugins/attachments/wiki_plugin.py
+#, python-format
+msgid "A file was deleted: %s"
+msgstr "Файл удалён: %s"
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
+msgid ""
+"The file may be referenced on other articles. Deleting it means that they "
+"will loose their references to this file. The following articles reference "
+"this file:"
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
+msgid "Delete it!"
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
+msgid ""
+"You can remove a reference to a file, but it will retain its references on "
+"other articles."
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
+msgid "Remove reference"
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+msgid "History of"
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+msgid "User"
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+msgid "File"
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+msgid "Action"
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+msgid "<em>No description</em>"
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+msgid "Download"
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/history.html
+msgid "Use this!"
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
+#, python-format
+msgid ""
+"Replacing an attachment means adding a new file that will be used in its "
+"place. All references to the file will be replaced by the one you upload and"
+" the file will be downloaded as <strong>%(filename)s</strong>. Please note "
+"that this attachment is in use on other articles, you may distort contents. "
+"However, do not hestitate to take advantage of this and make replacements "
+"for the listed articles where necessary. This way of working is more "
+"efficient...."
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
+msgid "Articles using"
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
+#, python-format
+msgid ""
+"Replacing an attachment means adding a new file that will be used in its "
+"place. All references to the file will be replaced by the one you upload and"
+" the file will be downloaded as <strong>%(filename)s</strong>."
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
+#: wiki/plugins/images/templates/wiki/plugins/images/revision_add.html
+msgid "Upload replacement"
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+msgid "Add file to"
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+msgid "Add attachment from other article"
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+msgid "Main article"
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+msgid "Add to article"
+msgstr ""
+
+#: wiki/plugins/attachments/templates/wiki/plugins/attachments/search.html
+msgid "Your search did not return any results"
+msgstr ""
+
+#: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
+msgid "Adding new articles"
+msgstr ""
+
+#: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
+#: wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
+msgid "An external link"
+msgstr ""
+
+#: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
+msgid "Headers"
+msgstr ""
+
+#: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
+msgid ""
+"Use these codes for headers and to automatically generate Tables of "
+"Contents."
+msgstr ""
+
+#: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
+msgid "Typography"
+msgstr ""
+
+#: wiki/plugins/help/templates/wiki/plugins/help/sidebar.html
+msgid "Lists"
+msgstr ""
+
 #: wiki/plugins/images/forms.py
 #, python-format
 msgid ""
@@ -26213,6 +25629,11 @@ msgid "There are no images for this article."
 msgstr ""
 
 #: wiki/plugins/images/templates/wiki/plugins/images/purge.html
+#: wiki/templates/wiki/deleted.html
+msgid "Purge deletion"
+msgstr ""
+
+#: wiki/plugins/images/templates/wiki/plugins/images/purge.html
 msgid "Purge image: Completely remove image file and all revisions."
 msgstr ""
 
@@ -26234,6 +25655,11 @@ msgstr ""
 
 #: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
 msgid "Image id"
+msgstr ""
+
+#: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
+#: wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
+msgid "Insert"
 msgstr ""
 
 #: wiki/plugins/images/templates/wiki/plugins/images/sidebar.html
@@ -26270,3 +25696,345 @@ msgid ""
 "Markdown in the caption. The markdown code syntax for images looks like "
 "this, possible values for align are left/center/right:"
 msgstr ""
+
+#: wiki/plugins/links/wiki_plugin.py
+msgid "Links"
+msgstr "Ссылки"
+
+#: wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
+msgid "Link to another wiki page"
+msgstr ""
+
+#: wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
+msgid ""
+"Type in something from another wiki page's title and auto-complete will help"
+" you create a tag for you wiki link. Tags for links look like this:"
+msgstr ""
+
+#: wiki/plugins/links/templates/wiki/plugins/links/sidebar.html
+msgid ""
+"You can link to another website simply by inserting an address example.com "
+"or http://example.com or by using the markdown syntax:"
+msgstr ""
+
+#: wiki/plugins/notifications/forms.py
+msgid "Notifications"
+msgstr "Уведомления"
+
+#: wiki/plugins/notifications/forms.py
+msgid "When this article is edited"
+msgstr "Когда эта статья отредактирована"
+
+#: wiki/plugins/notifications/forms.py
+msgid "Also receive emails about article edits"
+msgstr "Также сообщать о правках статьи по электронной почте"
+
+#: wiki/plugins/notifications/forms.py
+msgid "Your notification settings were updated."
+msgstr "Ваши настройки уведомлений были обновлены."
+
+#: wiki/plugins/notifications/forms.py
+msgid "Your notification settings were unchanged, so nothing saved."
+msgstr "Ваши настройки уведомлений не были изменены, не сохранено."
+
+#: wiki/plugins/notifications/models.py
+#, python-format
+msgid "%(user)s subscribing to %(article)s (%(type)s)"
+msgstr "%(user)s подписывается на %(article)s (%(type)s)"
+
+#: wiki/plugins/notifications/models.py
+#, python-format
+msgid "Article deleted: %s"
+msgstr "Статья удалена: %s"
+
+#: wiki/plugins/notifications/models.py
+#, python-format
+msgid "Article modified: %s"
+msgstr "Статья изменена: %s"
+
+#: wiki/plugins/notifications/models.py
+#, python-format
+msgid "New article created: %s"
+msgstr "Создана новая статья: %s"
+
+#: wiki/plugins/notifications/templates/wiki/plugins/notifications/menubaritem.html
+msgid "notifications"
+msgstr ""
+
+#: wiki/plugins/notifications/templates/wiki/plugins/notifications/menubaritem.html
+msgid "No notifications"
+msgstr ""
+
+#: wiki/plugins/notifications/templates/wiki/plugins/notifications/menubaritem.html
+msgid "Clear notifications list"
+msgstr ""
+
+#: wiki/templates/wiki/base.html
+msgid "Search..."
+msgstr ""
+
+#: wiki/templates/wiki/base.html
+msgid "Log out"
+msgstr ""
+
+#: wiki/templates/wiki/base.html wiki/templates/wiki/accounts/login.html
+#: wiki/templates/wiki/accounts/signup.html
+msgid "Sign up"
+msgstr ""
+
+#: wiki/templates/wiki/deleted.html
+msgid "Article deleted"
+msgstr ""
+
+#: wiki/templates/wiki/deleted.html
+msgid "Article Deleted"
+msgstr ""
+
+#: wiki/templates/wiki/deleted.html
+msgid "The article you were looking for has been deleted."
+msgstr ""
+
+#: wiki/templates/wiki/deleted.html
+msgid "You may restore this article and its children by clicking restore."
+msgstr ""
+
+#: wiki/templates/wiki/deleted.html
+msgid ""
+"You may remove this article and any children permanently and free their "
+"slugs by clicking the below button. This action cannot be undone."
+msgstr ""
+
+#: wiki/templates/wiki/dir.html
+msgid "Listing articles in"
+msgstr ""
+
+#: wiki/templates/wiki/dir.html
+msgid "Up one level"
+msgstr ""
+
+#: wiki/templates/wiki/dir.html
+msgid "clear"
+msgstr ""
+
+#: wiki/templates/wiki/dir.html
+msgid "article,articles"
+msgstr ""
+
+#: wiki/templates/wiki/dir.html
+msgid "matches,match"
+msgstr ""
+
+#: wiki/templates/wiki/dir.html
+#, python-format
+msgid "%(cnt)s %(articles_plur)s in this level %(match_plur)s your search."
+msgstr ""
+
+#: wiki/templates/wiki/dir.html
+msgid "is,are"
+msgstr ""
+
+#: wiki/templates/wiki/dir.html
+#, python-format
+msgid "There %(articles_plur_verb)s %(cnt)s %(articles_plur)s in this level."
+msgstr ""
+
+#: wiki/templates/wiki/dir.html
+msgid "Last modified"
+msgstr ""
+
+#: wiki/templates/wiki/history.html
+msgid "no log message"
+msgstr ""
+
+#: wiki/templates/wiki/permission_denied.html
+msgid "Permission Denied"
+msgstr ""
+
+#: wiki/templates/wiki/permission_denied.html
+msgid "Sorry, you don't have permission to view this page."
+msgstr ""
+
+#: wiki/templates/wiki/preview_inline.html
+msgid "Previewing revision"
+msgstr ""
+
+#: wiki/templates/wiki/preview_inline.html
+msgid "Previewing merge between"
+msgstr ""
+
+#: wiki/templates/wiki/preview_inline.html
+msgid "and"
+msgstr ""
+
+#: wiki/templates/wiki/source.html
+msgid "Source of"
+msgstr ""
+
+#: wiki/templates/wiki/source.html
+msgid "This article is currently locked for editing."
+msgstr ""
+
+#: wiki/templates/wiki/accounts/login.html
+msgid "Log me in..."
+msgstr ""
+
+#: wiki/templates/wiki/accounts/login.html
+msgid "Don't have an account?"
+msgstr ""
+
+#: wiki/templates/wiki/accounts/signup.html
+msgid "Sign me up..."
+msgstr ""
+
+#: wiki/templates/wiki/article/create_root.html
+msgid "Create root article"
+msgstr ""
+
+#: wiki/templates/wiki/article/create_root.html
+msgid "Congratulations!"
+msgstr ""
+
+#: wiki/templates/wiki/article/create_root.html
+msgid ""
+"You have django-wiki installed... but there are no articles. So it's time to"
+" create the first one, the root article. In the beginning, it will only be "
+"editable by administrators, but you can define permissions after."
+msgstr ""
+
+#: wiki/templates/wiki/article/create_root.html
+msgid "Root article"
+msgstr ""
+
+#: wiki/templates/wiki/article/create_root.html
+msgid "Create root"
+msgstr ""
+
+#: wiki/templates/wiki/includes/anonymous_blocked.html
+msgid "You need to log in og sign up to use this function."
+msgstr ""
+
+#: wiki/templates/wiki/includes/article_menu.html
+msgid "View Source"
+msgstr ""
+
+#: wiki/templates/wiki/includes/breadcrumbs.html
+msgid "Sub-articles for"
+msgstr ""
+
+#: wiki/templates/wiki/includes/breadcrumbs.html
+msgid "No sub-articles"
+msgstr ""
+
+#: wiki/templates/wiki/includes/breadcrumbs.html
+msgid "...and more"
+msgstr ""
+
+#: wiki/templates/wiki/includes/breadcrumbs.html
+msgid "Browse articles in this level"
+msgstr ""
+
+#: wiki/templates/wiki/includes/breadcrumbs.html
+msgid "New article next to"
+msgstr ""
+
+#: wiki/templates/wiki/includes/breadcrumbs.html
+msgid "New article below"
+msgstr ""
+
+#: wiki/templates/wiki/includes/revision_info.html
+msgid "by"
+msgstr ""
+
+#: wiki/templates/wiki/includes/revision_info.html
+msgid "restored"
+msgstr ""
+
+#: wiki/templates/wiki/includes/revision_info.html
+msgid "unlocked"
+msgstr ""
+
+#: wiki/views/accounts.py
+msgid "You are now sign up... and now you can sign in!"
+msgstr "Вы зарегестрировались... и теперь можете войти!"
+
+#: wiki/views/accounts.py
+msgid "You are no longer logged in. Bye bye!"
+msgstr "Вы вышли из системы. До свидания!"
+
+#: wiki/views/accounts.py
+msgid "You are now logged in! Have fun!"
+msgstr "Вы вошли! Развлекайтесь!"
+
+#: wiki/views/article.py
+#, python-format
+msgid "New article '%s' created."
+msgstr "Новая статья '%s' создана."
+
+#: wiki/views/article.py
+#, python-format
+msgid "There was an error creating this article: %s"
+msgstr "При создании статьи %s произошла ошибка"
+
+#: wiki/views/article.py
+msgid "There was an error creating this article."
+msgstr "При создании статьи произошла ошибка."
+
+#: wiki/views/article.py
+msgid ""
+"This article cannot be deleted because it has children or is a root article."
+msgstr ""
+"Эта статья является корневой или имеет дочерние статьи, поэтому не может "
+"быть удалена."
+
+#: wiki/views/article.py
+msgid ""
+"This article together with all its contents are now completely gone! Thanks!"
+msgstr "Эта статья вместе со всем содержимым полностью удалена! Спасибо!"
+
+#: wiki/views/article.py
+#, python-format
+msgid ""
+"The article \"%s\" is now marked as deleted! Thanks for keeping the site "
+"free from unwanted material!"
+msgstr ""
+"Статья «%s» помечена как удалённая! Спасибо за очистку  сайта от "
+"нежелательного материала!"
+
+#: wiki/views/article.py
+msgid "Your changes were saved."
+msgstr "Ваши изменения сохранены."
+
+#: wiki/views/article.py
+msgid "A new revision of the article was successfully added."
+msgstr ""
+
+#: wiki/views/article.py
+msgid "Restoring article"
+msgstr "Восстановление статьи"
+
+#: wiki/views/article.py
+#, python-format
+msgid "The article \"%s\" and its children are now restored."
+msgstr "Статья «%s» и её дочерние статьи были восстановлены."
+
+#: wiki/views/article.py
+#, python-format
+msgid ""
+"The article %(title)s is now set to display revision #%(revision_number)d"
+msgstr "Статья %(title)s редакции #%(revision_number)d"
+
+#: wiki/views/article.py
+msgid "New title"
+msgstr "Новый заголовок"
+
+#: wiki/views/article.py
+#, python-format
+msgid "Merge between Revision #%(r1)d and Revision #%(r2)d"
+msgstr "Слияние версий #%(r1)d и #%(r2)d"
+
+#: wiki/views/article.py
+#, python-format
+msgid ""
+"A new revision was created: Merge between Revision #%(r1)d and Revision "
+"#%(r2)d"
+msgstr "Создана новая версия: слияние версий #%(r1)d и #%(r2)d"
