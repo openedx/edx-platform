@@ -17,7 +17,7 @@
         </div>
         <div class="view-record-wrapper">
             <a href="<%- programRecordUrl %>" class="program-record-link">
-                <button class="btn view-record-button btn-brand btn cta-primary"><%- gettext('View Program Record') %></button>
+                <button class="btn view-record-button"><%- gettext('View Program Record') %></button>
             </a>
         </div>
     </aside>
