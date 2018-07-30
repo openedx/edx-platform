@@ -202,7 +202,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-07-20 09:00+0000\n"
+"POT-Creation-Date: 2018-07-30 04:58+0000\n"
 "PO-Revision-Date: 2018-07-10 07:01+0000\n"
 "Last-Translator: Mariana Jó de Souza <mariana.jsouza@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
@@ -520,8 +520,6 @@ msgstr[1] ""
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "The grading process is still running. Refresh the page to see updates."
 msgstr ""
-"O processo de correção ainda está em execução. Atualize a página para ver as"
-" atualizações."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Could not grade your answer. The submission was aborted."
@@ -912,10 +910,6 @@ msgstr ""
 msgid "Edit HTML"
 msgstr ""
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/course_info_handouts.underscore
 #: cms/templates/js/course_info_update.underscore
@@ -1075,7 +1069,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid "Header"
-msgstr "Cabeçalho"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1768,9 +1762,6 @@ msgid ""
 "\n"
 "Click Cancel to return to this page without sending your information."
 msgstr ""
-"Clique em OK para ter o seu nome de usuário e endereço de e-mail enviados a um aplicativo de terceiros.\n"
-"\n"
-"Clique em Cancelar para retornar a esta página sem enviar suas informações."
 
 #: common/lib/xmodule/xmodule/js/src/lti/lti.js
 msgid ""
@@ -1778,9 +1769,6 @@ msgid ""
 "\n"
 "Click Cancel to return to this page without sending your information."
 msgstr ""
-"Clique em OK para ter o seu nome de usuário enviado a um aplicativo de terceiros.\n"
-"\n"
-"Clique em Cancelar para retornar a esta página sem enviar suas informações."
 
 #: common/lib/xmodule/xmodule/js/src/lti/lti.js
 msgid ""
@@ -1788,25 +1776,22 @@ msgid ""
 "\n"
 "Click Cancel to return to this page without sending your information."
 msgstr ""
-"Clique em OK para ter o seu e-mail enviado a um aplicativo de terceiros.\n"
-"\n"
-"Clique em Cancelar para retornar a esta página sem enviar suas informações."
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid "incorrect"
-msgstr "incorreta"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid "correct"
-msgstr "correta"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid "answer"
-msgstr "resposta"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid "Short explanation"
-msgstr "Explicação resumida"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid ""
@@ -1814,9 +1799,6 @@ msgid ""
 "\n"
 "Proceed to the Advanced Editor and convert this problem to XML?"
 msgstr ""
-"Se você usar o Editor Avançado, esse problema não será convertido em XML e você não será capaz de retornar para a interface do Editor Simples\n"
-"\n"
-"Mude para o Editor Avançado e converta esse problema em XML?"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid "Explanation"
@@ -1827,8 +1809,6 @@ msgid ""
 "Sequence error! Cannot navigate to %(tab_name)s in the current "
 "SequenceModule. Please contact the course staff."
 msgstr ""
-"Erro de sequência! Não é possível navegar para a %(tab_name)s no "
-"SequenceModule atual. Por favor, entre em contato com a equipe do curso."
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
 #: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js
@@ -1839,35 +1819,35 @@ msgstr "Adicionado a favoritos"
 #: common/lib/xmodule/xmodule/js/src/video/09_play_pause_control.js
 #: common/lib/xmodule/xmodule/js/src/video/09_play_skip_control.js
 msgid "Play"
-msgstr "Reproduzir"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/09_play_pause_control.js
 msgid "Pause"
-msgstr "Pausar"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Mute"
-msgstr "Silenciar"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Unmute"
-msgstr "Reativar som"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/04_video_full_screen.js
 msgid "Exit full browser"
-msgstr "Sair da tela cheia do navegador"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/04_video_full_screen.js
 msgid "Fill browser"
-msgstr "Tela cheia"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
 msgid "Speed"
-msgstr "Velocidade"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/08_video_auto_advance_control.js
@@ -1877,63 +1857,62 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid "Volume"
-msgstr "Volume"
+msgstr ""
 
 #. Translators: Volume level equals 0%.
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Muted"
-msgstr "Mudo"
+msgstr ""
 
 #. Translators: Volume level in range ]0,20]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Very low"
-msgstr "Muito baixo"
+msgstr ""
 
 #. Translators: Volume level in range ]20,40]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Low"
-msgstr "Baixo"
+msgstr ""
 
 #. Translators: Volume level in range ]40,60]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Average"
-msgstr "Médio"
+msgstr ""
 
 #. Translators: Volume level in range ]60,80]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Loud"
-msgstr "Alto"
+msgstr ""
 
 #. Translators: Volume level in range ]80,99]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Very loud"
-msgstr "Muito alto"
+msgstr ""
 
 #. Translators: Volume level equals 100%.
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Maximum"
-msgstr "Máximo"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
 msgid "This browser cannot play .mp4, .ogg, or .webm files."
 msgstr ""
-"Não é possível reproduzir arquivos .mp4, .ogg ou .webm com este navegador."
 
 #: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
 msgid "Try using a different browser, such as Google Chrome."
-msgstr "Tente usar um navegador diferente, como o Google Chrome."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "High Definition"
-msgstr "Alta definição"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "off"
-msgstr "Desligado"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "on"
-msgstr "Ligado"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "Video position. Press space to toggle playback"
@@ -1941,29 +1920,29 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "Video ended"
-msgstr "Vídeo concluído"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "Video position"
-msgstr "Posição do vídeo"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s hour"
 msgid_plural "%(value)s hours"
-msgstr[0] "%(value)s hora"
-msgstr[1] "%(value)s horas"
+msgstr[0] ""
+msgstr[1] ""
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s minute"
 msgid_plural "%(value)s minutes"
-msgstr[0] "%(value)s minuto"
-msgstr[1] "%(value)s minutos"
+msgstr[0] ""
+msgstr[1] ""
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s second"
 msgid_plural "%(value)s seconds"
-msgstr[0] "%(value)s segundo"
-msgstr[1] "%(value)s segundos"
+msgstr[0] ""
+msgstr[1] ""
 
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid ""
@@ -1992,15 +1971,15 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_play_skip_control.js
 msgid "Skip"
-msgstr "Pular"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_poster.js
 msgid "Play video"
-msgstr "Reproduzir vídeo"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_skip_control.js
 msgid "Do not show again"
-msgstr "Não exibir novamente."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Open language menu"
@@ -2037,23 +2016,23 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Hide closed captions"
-msgstr "Ocultar legendas ocultas"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "(Caption will be displayed when you start playing the video.)"
-msgstr "(A legenda aparecerá quando você reproduzir o vídeo.)"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn on closed captioning"
-msgstr "Ativar as legendas ocultas"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn on transcripts"
-msgstr "Ativar legendas"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn off transcripts"
-msgstr "Desligar legendas"
+msgstr ""
 
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 #: cms/templates/js/move-xblock-list.underscore
@@ -2355,72 +2334,72 @@ msgstr "solta no destino"
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "%s ago"
-msgstr "%s atrás"
+msgstr ""
 
 #. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "%s from now"
-msgstr "%s a partir de agora"
+msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "less than a minute"
-msgstr "menos de um minuto"
+msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a minute"
-msgstr "aproximadamente um minuto"
+msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] "%d minuto"
-msgstr[1] "%d minutos"
+msgstr[0] ""
+msgstr[1] ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about an hour"
-msgstr "aproximadamente uma hora"
+msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "about %d hour"
 msgid_plural "about %d hours"
-msgstr[0] "aproximadamente %d hora"
-msgstr[1] "aproximadamente %d horas"
+msgstr[0] ""
+msgstr[1] ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "a day"
-msgstr "um dia"
+msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] "%d dia"
-msgstr[1] "%d dias"
+msgstr[0] ""
+msgstr[1] ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a month"
-msgstr "aproximadamente um mês"
+msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "%d month"
 msgid_plural "%d months"
-msgstr[0] "%d mês"
-msgstr[1] "%d meses"
+msgstr[0] ""
+msgstr[1] ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a year"
-msgstr "aproximadamente um ano"
+msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "%d year"
 msgid_plural "%d years"
-msgstr[0] "%d ano"
-msgstr[1] "%d anos"
+msgstr[0] ""
+msgstr[1] ""
 
 #: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/Main/Main.jsx
 msgid "Select a section or problem"
@@ -8147,6 +8126,18 @@ msgstr ""
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 #, python-format
 msgid "Open the certificate you earned for the %(title)s program."
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid "Program Record"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid ""
+"Once you complete one of the program requirements you have a program record."
+" This record is marked complete once you meet all program requirements. A "
+"program record can be used to continue your learning journey and demonstrate"
+" your learning to others."
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
