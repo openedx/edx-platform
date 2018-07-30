@@ -585,7 +585,8 @@ function(VideoPlayer, i18n, moment, _) {
 
         _setConfigurations(this);
 
-        if (!(_parseYouTubeIDs(this))) {
+        // If `prioritizeHls` is set to true than `hls` is the primary playback
+        if (this.config.prioritizeHls || !(_parseYouTubeIDs(this))) {
             // If we do not have YouTube ID's, try parsing HTML5 video sources.
             if (!_prepareHTML5Video(this)) {
                 __dfd__.reject();
