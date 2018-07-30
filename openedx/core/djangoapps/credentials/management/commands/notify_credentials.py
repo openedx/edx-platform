@@ -26,6 +26,7 @@ from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.grades.models import PersistentCourseGrade
 from openedx.core.djangoapps.credentials.signals import handle_cert_change, send_grade_if_interesting
 from openedx.core.djangoapps.programs.signals import handle_course_cert_changed
+from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 
 
 log = logging.getLogger(__name__)
@@ -102,6 +103,11 @@ class Command(BaseCommand):
             help='Just show a preview of what would happen.',
         )
         parser.add_argument(
+            '--site',
+            default=None,
+            help="Site domain to notify for (if not specified, all sites are notified). Uses course_org_filter.",
+        )
+        parser.add_argument(
             '--courses',
             nargs='+',
             help='Send information only for specific courses.',
@@ -131,13 +137,19 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         log.info(
-            "notify_credentials starting, dry-run=%s, delay=%d seconds",
+            "notify_credentials starting, dry-run=%s, site=%s, delay=%d seconds",
             options['dry_run'],
+            options['site'],
             options['delay']
         )
 
         cert_filter_args = {}
         grade_filter_args = {}
+
+        try:
+            site_config = SiteConfiguration.objects.get(site__domain=options['site']) if options['site'] else None
+        except SiteConfiguration.DoesNotExist:
+            log.error('No site configuration found for site %s', options['site'])
 
         if options['courses']:
             course_keys = self.get_course_keys(options['courses'])
@@ -162,15 +174,22 @@ class Command(BaseCommand):
         if options['dry_run']:
             self.print_dry_run(certs, grades)
         else:
-            self.send_notifications(certs, grades, delay=options['delay'], page_size=options['page_size'])
+            self.send_notifications(certs, grades,
+                                    site_config=site_config,
+                                    delay=options['delay'],
+                                    page_size=options['page_size'])
 
         log.info('notify_credentials finished')
 
-    def send_notifications(self, certs, grades, delay=0, page_size=0):
+    def send_notifications(self, certs, grades, site_config=None, delay=0, page_size=0):
         """ Run actual handler commands for the provided certs and grades. """
 
         # First, do certs
         for i, cert in paged_query(certs, delay, page_size):
+            if site_config and not site_config.has_org(cert.course_id.org):
+                log.info("Skipping credential changes %d for certificate %s", i, certstr(cert))
+                continue
+
             log.info(
                 "Handling credential changes %d for certificate %s",
                 i, certstr(cert),
@@ -188,6 +207,10 @@ class Command(BaseCommand):
 
         # Then do grades
         for i, grade in paged_query(grades, delay, page_size):
+            if site_config and not site_config.has_org(grade.course_id.org):
+                log.info("Skipping grade changes %d for grade %s", i, gradestr(grade))
+                continue
+
             log.info(
                 "Handling grade changes %d for grade %s",
                 i, gradestr(grade),

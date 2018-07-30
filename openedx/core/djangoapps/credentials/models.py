@@ -96,6 +96,9 @@ class CredentialsApiConfig(ConfigurationModel):
         # Temporarily disable this feature while we work on it
         if not STUDENT_RECORDS_FLAG.is_enabled():
             return None
+        # Not every site wants the Learner Records feature, so we allow opting out.
+        if not helpers.get_value('ENABLE_LEARNER_RECORDS', True):
+            return None
         root = helpers.get_value('CREDENTIALS_PUBLIC_SERVICE_URL', settings.CREDENTIALS_PUBLIC_SERVICE_URL)
         return urljoin(root, '/records/')
 

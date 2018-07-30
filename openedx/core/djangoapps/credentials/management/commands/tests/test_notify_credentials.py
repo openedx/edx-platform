@@ -14,6 +14,7 @@ from freezegun import freeze_time
 
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.grades.models import PersistentCourseGrade
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
 
@@ -36,7 +37,7 @@ class TestNotifyCredentials(TestCase):
         with freeze_time(datetime(2017, 2, 1)):
             self.cert2 = GeneratedCertificateFactory(user=self.user, course_id='course-v1:edX+Test+2')
         with freeze_time(datetime(2017, 3, 1)):
-            self.cert3 = GeneratedCertificateFactory(user=self.user, course_id='course-v1:edX+Test+3')
+            self.cert3 = GeneratedCertificateFactory(user=self.user, course_id='course-v1:testX+Test+3')
         print('self.cert1.modified_date', self.cert1.modified_date)
 
         # No factory for these
@@ -47,7 +48,7 @@ class TestNotifyCredentials(TestCase):
             self.grade2 = PersistentCourseGrade.objects.create(user_id=self.user.id, course_id='course-v1:edX+Test+2',
                                                                percent_grade=1)
         with freeze_time(datetime(2017, 3, 1)):
-            self.grade3 = PersistentCourseGrade.objects.create(user_id=self.user.id, course_id='course-v1:edX+Test+3',
+            self.grade3 = PersistentCourseGrade.objects.create(user_id=self.user.id, course_id='course-v1:testX+Test+3',
                                                                percent_grade=1)
         print('self.grade1.modified', self.grade1.modified)
 
@@ -119,3 +120,14 @@ class TestNotifyCredentials(TestCase):
         reset_queries()
         call_command(Command(), '--start-date', '2017-01-01', '--page-size=2')
         self.assertEqual(len(connection.queries), baseline + 2)  # one extra page query each for certs & grades
+
+    @mock.patch(COMMAND_MODULE + '.send_grade_if_interesting')
+    @mock.patch(COMMAND_MODULE + '.handle_cert_change')
+    def test_site(self, mock_grade_interesting, mock_cert_change):
+        site_config = SiteConfigurationFactory.create(
+            values={'course_org_filter': ['testX']},
+        )
+
+        call_command(Command(), '--site', site_config.site.domain, '--start-date', '2017-01-01')
+        self.assertEqual(mock_grade_interesting.call_count, 1)
+        self.assertEqual(mock_cert_change.call_count, 1)
