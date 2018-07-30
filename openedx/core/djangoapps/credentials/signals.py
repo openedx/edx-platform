@@ -8,6 +8,8 @@ from django.contrib.sites.models import Site
 from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from openedx.core.djangoapps.catalog.utils import get_programs
+from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
+from openedx.core.djangoapps.site_configuration import helpers
 
 from .tasks.v1.tasks import send_grade_to_credentials
 
@@ -42,6 +44,14 @@ def is_course_run_in_a_program(course_run_key):
 
 def send_grade_if_interesting(user, course_run_key, mode, status, letter_grade, percent_grade):
     """ Checks if grade is interesting to Credentials and schedules a Celery task if so. """
+
+    # Avoid scheduling new tasks if certification is disabled. (Grades are a part of the records/cert story)
+    if not CredentialsApiConfig.current().is_learner_issuance_enabled:
+        return
+
+    # Avoid scheduling new tasks if learner records are disabled for this site.
+    if not helpers.get_value_for_org(course_run_key.org, 'ENABLE_LEARNER_RECORDS', True):
+        return
 
     # Grab mode/status if we don't have them in hand
     if mode is None or status is None:

@@ -6,14 +6,16 @@ from django.test import TestCase
 from nose.plugins.attrib import attr
 import mock
 
+from opaque_keys.edx.keys import CourseKey
 from student.tests.factories import UserFactory
 
 from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED, COURSE_CERT_CHANGED
 from openedx.core.djangoapps.programs.signals import handle_course_cert_awarded, handle_course_cert_changed
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 TEST_USERNAME = 'test-user'
-TEST_COURSE_KEY = 'test-course'
+TEST_COURSE_KEY = CourseKey.from_string('course-v1:edX+test_course+1')
 
 
 @attr(shard=2)
@@ -92,6 +94,10 @@ class CertChangedReceiverTest(TestCase):
     Tests for the `handle_course_cert_changed` signal handler function.
     """
 
+    def setUp(self):
+        super(CertChangedReceiverTest, self).setUp()
+        self.user = UserFactory.create(username=TEST_USERNAME)
+
     @property
     def signal_kwargs(self):
         """
@@ -99,8 +105,8 @@ class CertChangedReceiverTest(TestCase):
         """
         return dict(
             sender=self.__class__,
-            user=UserFactory.create(username=TEST_USERNAME),
-            course_key='test-course',
+            user=self.user,
+            course_key=TEST_COURSE_KEY,
             mode='test-mode',
             status='test-status',
         )
@@ -115,7 +121,7 @@ class CertChangedReceiverTest(TestCase):
         known to take place inside the function.
         """
         COURSE_CERT_CHANGED.send(**self.signal_kwargs)
-        self.assertEqual(mock_is_learner_issuance_enabled.call_count, 1)
+        self.assertEqual(mock_is_learner_issuance_enabled.call_count, 2)
 
     def test_credentials_disabled(self, mock_is_learner_issuance_enabled, mock_task):
         """
@@ -137,4 +143,22 @@ class CertChangedReceiverTest(TestCase):
 
         self.assertEqual(mock_is_learner_issuance_enabled.call_count, 1)
         self.assertEqual(mock_task.call_count, 1)
-        self.assertEqual(mock_task.call_args[0], (TEST_USERNAME, TEST_COURSE_KEY))
+        self.assertEqual(mock_task.call_args[0], (TEST_USERNAME, str(TEST_COURSE_KEY)))
+
+    def test_records_enabled(self, mock_is_learner_issuance_enabled, mock_task):
+        mock_is_learner_issuance_enabled.return_value = True
+
+        site_config = SiteConfigurationFactory.create(
+            values={'course_org_filter': ['edX']},
+        )
+
+        # Correctly sent
+        handle_course_cert_changed(**self.signal_kwargs)
+        self.assertTrue(mock_task.called)
+        mock_task.reset_mock()
+
+        # Correctly not sent
+        site_config.values['ENABLE_LEARNER_RECORDS'] = False
+        site_config.save()
+        handle_course_cert_changed(**self.signal_kwargs)
+        self.assertFalse(mock_task.called)
