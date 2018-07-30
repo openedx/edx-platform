@@ -41,6 +41,7 @@ from ..accounts import (
     NAME_MAX_LENGTH, EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH,
     USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH, USERNAME_BAD_LENGTH_MSG
 )
+from ..accounts.tests.retirement_helpers import setup_retirement_states  # pylint: disable=unused-import
 from ..accounts.api import get_account_settings
 from ..models import UserOrgTag
 from ..tests.factories import UserPreferenceFactory

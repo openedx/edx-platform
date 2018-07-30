@@ -9,7 +9,7 @@ from pytz import UTC
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
 from lms.djangoapps.verify_student.signals import _listen_for_course_publish, _listen_for_lms_retire
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
-from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import fake_retirement
+from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import fake_completed_retirement
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -95,7 +95,7 @@ class RetirementSignalTest(ModuleStoreTestCase):
 
         # Run this twice to make sure there are no errors raised 2nd time through
         _listen_for_lms_retire(sender=self.__class__, user=verification.user)
-        fake_retirement(verification.user)
+        fake_completed_retirement(verification.user)
         _listen_for_lms_retire(sender=self.__class__, user=verification.user)
 
         ver_obj = SoftwareSecurePhotoVerification.objects.get(user=verification.user)
