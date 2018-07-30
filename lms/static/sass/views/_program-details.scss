@@ -673,25 +673,7 @@ $btn-color-primary: palette(primary, dark);
     text-align: right;
 
     .view-record-button {
-      background: $btn-color-primary;
-      border-color: $btn-color-primary;
-      height: $baseline*1.85;
-      padding: $baseline*0.35 $baseline*0.925 $baseline*0.35 $baseline*0.925;
-      width: auto;
-      border-radius: 0;
-      text-align: center;
       font-size: 0.9375em;
-      //margin-top: 5px;
-      margin-top: $baseline*0.25;
-
-      /* IE11 CSS styles */
-      @media (min-width: $bp-screen-md) and (-ms-high-contrast: none), (-ms-high-contrast: active) {
-        @include float(right);
-      }
-
-      @media (min-width: $bp-screen-lg) {
-        margin-top: 0;
-      }
     }
   }
 
