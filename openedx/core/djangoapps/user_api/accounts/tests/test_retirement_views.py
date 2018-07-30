@@ -536,9 +536,9 @@ class TestPartnerReportingList(ModuleStoreTestCase):
         self.headers = build_jwt_headers(self.test_superuser)
         self.url = reverse('accounts_retirement_partner_report')
         self.maxDiff = None
+        self.test_created_datetime = datetime.datetime(2018, 1, 1, tzinfo=pytz.UTC)
 
-    @staticmethod
-    def get_user_dict(user, enrollments):
+    def get_user_dict(self, user, enrollments):
         """
         Emulate the DRF serialization to create a dict we can compare against the partner
         reporting list endpoint results. If this breaks in testing the serialization will
@@ -548,7 +548,9 @@ class TestPartnerReportingList(ModuleStoreTestCase):
             'original_username': user.username,
             'original_email': user.email,
             'original_name': user.first_name + ' ' + user.last_name,
-            'orgs': [enrollment.course.org for enrollment in enrollments]
+            'orgs': [enrollment.course.org for enrollment in enrollments],
+            # using ISO format with "Z" is the way DRF serializes datetimes by default
+            'created': self.test_created_datetime.isoformat().replace('+00:00', 'Z'),
         }
 
     def create_partner_reporting_statuses(self, is_being_processed=False, num=2, courses=None):
@@ -570,7 +572,8 @@ class TestPartnerReportingList(ModuleStoreTestCase):
                 original_username=user.username,
                 original_email=user.email,
                 original_name=user.first_name + ' ' + user.last_name,
-                is_being_processed=is_being_processed
+                is_being_processed=is_being_processed,
+                created=self.test_created_datetime,
             )
 
             enrollments = []

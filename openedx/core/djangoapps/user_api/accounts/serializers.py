@@ -404,6 +404,7 @@ class UserRetirementPartnerReportSerializer(serializers.Serializer):
     original_email = serializers.EmailField()
     original_name = serializers.CharField()
     orgs = serializers.ListField(child=serializers.CharField())
+    created = serializers.DateTimeField()
 
     # Required overrides of abstract base class methods, but we don't use them
     def create(self, validated_data):

@@ -560,7 +560,8 @@ class AccountRetirementPartnerReportView(ViewSet):
                 'original_username': retirement.original_username,
                 'original_email': retirement.original_email,
                 'original_name': retirement.original_name,
-                'orgs': self._get_orgs_for_user(retirement.user)
+                'orgs': self._get_orgs_for_user(retirement.user),
+                'created': retirement.created,
             }
             for retirement in retirement_statuses
         ]
