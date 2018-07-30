@@ -36,3 +36,6 @@ class CardModelAdmin(admin.ModelAdmin):
 
 admin.site.register(CourseCard, CardModelAdmin)
 
+admin.site.register(CourseRerunState)
+
+

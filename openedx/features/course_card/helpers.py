@@ -1,9 +1,12 @@
 from datetime import datetime
 
 import pytz
+from logging import getLogger
+from custom_settings.models import CustomSettings
 from course_action_state.models import CourseRerunState
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.course_card.models import CourseCard
+log = getLogger(__name__)
 
 
 def get_related_card_id(course_id):
@@ -70,3 +73,17 @@ def get_course_cards_list():
     course_card_ids = [cc.course_id for cc in CourseCard.objects.filter(is_enabled=True)]
     courses_list = CourseOverview.objects.select_related('image_set').filter(id__in=course_card_ids)
     return courses_list
+
+
+def initialize_course_settings(source_course_key, destination_course_key):
+    """
+    When ever a new course is created
+    1: We add a default entry for the given course in the CustomSettings Model
+    2: We add a an honor mode for the given course so students can view certificates on their dashboard and progress page
+    """
+
+    if source_course_key:
+        _settings = CustomSettings.objects.filter(id=source_course_key).first()
+        tags = _settings.tags
+        CustomSettings.objects.filter(id=destination_course_key).update(tags=tags)
+
