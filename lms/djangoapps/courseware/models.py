@@ -116,7 +116,7 @@ class StudentModule(models.Model):
     created = models.DateTimeField(auto_now_add=True, db_index=True)
     modified = models.DateTimeField(auto_now=True, db_index=True)
 
-    test_field_nullable = models.IntegerField(null=True);
+    test_field_nullable = models.IntegerField(null=True)
 
     @classmethod
     def all_submitted_problems_read_only(cls, course_id):
