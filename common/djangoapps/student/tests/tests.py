@@ -17,7 +17,6 @@ from django.test import TestCase, override_settings
 from django.test.client import Client
 from markupsafe import escape
 from mock import Mock, patch
-from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import CourseLocator
 from pyquery import PyQuery as pq
@@ -1063,11 +1062,11 @@ class AnonymousLookupTable(ModuleStoreTestCase):
             self.assertEqual(self.user, user_by_anonymous_id(new_anonymous_id))
 
 
-@attr(shard=3)
 @skip_unless_lms
 @patch('openedx.core.djangoapps.programs.utils.get_programs')
 class RelatedProgramsTests(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
     """Tests verifying that related programs appear on the course dashboard."""
+    shard = 3
     maxDiff = None
     password = 'test'
     related_programs_preface = 'Related Programs'

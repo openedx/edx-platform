@@ -17,7 +17,6 @@ from django.urls import reverse
 from django.test import Client
 from django.test.utils import override_settings
 from mock import patch
-from nose.plugins.attrib import attr
 from rest_framework import status
 from rest_framework.test import APITestCase
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -149,7 +148,6 @@ class EnrollmentTestMixin(object):
         return json.loads(resp.content)
 
 
-@attr(shard=3)
 @override_settings(EDX_API_KEY="i am a key")
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -157,6 +155,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
     """
     Test user enrollment, especially with different course modes.
     """
+    shard = 3
     USERNAME = "Bob"
     EMAIL = "bob@example.com"
     PASSWORD = "edx"

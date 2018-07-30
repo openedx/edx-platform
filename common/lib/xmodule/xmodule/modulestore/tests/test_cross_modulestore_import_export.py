@@ -19,9 +19,9 @@ from shutil import rmtree
 from tempfile import mkdtemp
 
 import ddt
-from nose.plugins.attrib import attr
 from mock import patch
 
+from openedx.core.lib.tests import attr
 from xmodule.tests import CourseComparisonTest
 from xmodule.modulestore.xml_importer import import_course_from_xml
 from xmodule.modulestore.xml_exporter import export_course_to_xml

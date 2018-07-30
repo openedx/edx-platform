@@ -5,12 +5,13 @@ too.
 from datetime import datetime, timedelta
 import ddt
 from django.test import TestCase
-from nose.plugins.attrib import attr
 import pytz
 import unittest
 
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
+
+from openedx.core.lib.tests import attr
 from xmodule.assetstore import AssetMetadata
 from xmodule.modulestore import ModuleStoreEnum, SortedAssetList, IncorrectlySortedList
 from xmodule.modulestore.exceptions import ItemNotFoundError

@@ -7,7 +7,6 @@ from django.conf import settings
 from django.urls import reverse
 from django.test import override_settings
 from mock import patch
-from nose.plugins.attrib import attr
 from pytz import UTC
 
 from course_modes.tests.factories import CourseModeFactory
@@ -26,13 +25,13 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=3)
 @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
 class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
     """Tests for per-course verification status on the dashboard. """
 
+    shard = 3
     PAST = 'past'
     FUTURE = 'future'
     DATES = {

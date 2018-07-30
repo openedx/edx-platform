@@ -9,7 +9,6 @@ from abc import ABCMeta, abstractmethod
 
 import ddt
 from nose import SkipTest
-from nose.plugins.attrib import attr
 from selenium.webdriver import ActionChains
 
 from capa.tests.response_xml_factory import (
@@ -31,6 +30,7 @@ from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.lms.problem import ProblemPage
 from common.test.acceptance.tests.helpers import EventsTestMixin, select_option_by_text
 from common.test.acceptance.tests.lms.test_lms_problems import ProblemsTest
+from openedx.core.lib.tests import attr
 
 
 class ProblemTypeTestBaseMeta(ABCMeta):

@@ -9,9 +9,8 @@ from shutil import rmtree
 from bson.code import Code
 import datetime
 import ddt
-#from nose.plugins.attrib import attr
+import pytest
 
-from nose.plugins.skip import SkipTest
 from xmodule.assetstore import AssetMetadata
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.xml_importer import import_course_from_xml
@@ -60,9 +59,6 @@ ASSET_XSD_PATH = PLATFORM_ROOT / "common" / "lib" / "xmodule" / "xmodule" / "ass
 
 
 @ddt.ddt
-# Eventually, exclude this attribute from regular unittests while running *only* tests
-# with this attribute during regular performance tests.
-# @attr("perf_test")
 @unittest.skip
 class CrossStoreXMLRoundtrip(unittest.TestCase):
     """
@@ -89,7 +85,7 @@ class CrossStoreXMLRoundtrip(unittest.TestCase):
         Generate timings for different amounts of asset metadata and different modulestores.
         """
         if CodeBlockTimer is None:
-            raise SkipTest("CodeBlockTimer undefined.")
+            pytest.skip("CodeBlockTimer undefined.")
 
         desc = "XMLRoundTrip:{}->{}:{}".format(
             SHORT_NAME_MAP[source_ms],
@@ -144,9 +140,6 @@ class CrossStoreXMLRoundtrip(unittest.TestCase):
 
 
 @ddt.ddt
-# Eventually, exclude this attribute from regular unittests while running *only* tests
-# with this attribute during regular performance tests.
-# @attr("perf_test")
 @unittest.skip
 class FindAssetTest(unittest.TestCase):
     """
@@ -172,7 +165,7 @@ class FindAssetTest(unittest.TestCase):
         Generate timings for different amounts of asset metadata and different modulestores.
         """
         if CodeBlockTimer is None:
-            raise SkipTest("CodeBlockTimer undefined.")
+            pytest.skip("CodeBlockTimer undefined.")
 
         desc = "FindAssetTest:{}:{}".format(
             SHORT_NAME_MAP[source_ms],
@@ -227,9 +220,6 @@ class FindAssetTest(unittest.TestCase):
 
 
 @ddt.ddt
-# Eventually, exclude this attribute from regular unittests while running *only* tests
-# with this attribute during regular performance tests.
-# @attr("perf_test")
 @unittest.skip
 class TestModulestoreAssetSize(unittest.TestCase):
     """

@@ -6,7 +6,6 @@ import datetime
 from unittest import skip
 from uuid import uuid4
 
-from nose.plugins.attrib import attr
 from nose.tools import nottest
 from pytz import UTC
 
@@ -33,6 +32,7 @@ from common.test.acceptance.pages.lms.learner_profile import LearnerProfilePage
 from common.test.acceptance.pages.lms.tab_nav import TabNavPage
 from common.test.acceptance.tests.discussion.helpers import BaseDiscussionMixin, BaseDiscussionTestCase
 from common.test.acceptance.tests.helpers import UniqueCourseTest, get_modal_alert, skip_if_browser
+from openedx.core.lib.tests import attr
 
 
 THREAD_CONTENT_WITH_LATEX = """Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
