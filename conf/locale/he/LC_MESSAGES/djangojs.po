@@ -66,7 +66,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-07-26 11:27+0000\n"
+"POT-Creation-Date: 2018-07-20 09:00+0000\n"
 "PO-Revision-Date: 2018-07-10 07:01+0000\n"
 "Last-Translator: e2f_HE c1 <e2f_HE_c1@outlook.com>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
@@ -294,19 +294,19 @@ msgstr "יצירה של קבוצות חסרות"
 
 #: common/lib/xmodule/xmodule/assets/word_cloud/src/js/word_cloud_main.js
 msgid "{start_strong}{total}{end_strong} words submitted in total."
-msgstr ""
+msgstr "{start_strong}{total}{end_strong} סך כל המילים שנשלחו."
 
 #: common/lib/xmodule/xmodule/assets/word_cloud/src/js/word_cloud_main.js
 msgid "text_word_{uniqueId} title_word_{uniqueId}"
-msgstr ""
+msgstr "text_word_{uniqueId} title_word_{uniqueId}"
 
 #: common/lib/xmodule/xmodule/assets/word_cloud/src/js/word_cloud_main.js
 msgid "title_word_{uniqueId}"
-msgstr ""
+msgstr "title_word_{uniqueId}"
 
 #: common/lib/xmodule/xmodule/assets/word_cloud/src/js/word_cloud_main.js
 msgid "text_word_{uniqueId}"
-msgstr ""
+msgstr "text_word_{uniqueId}"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Show Annotations"
@@ -357,20 +357,20 @@ msgstr[3] ""
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "%(num_points)s point possible (graded)"
 msgid_plural "%(num_points)s points possible (graded)"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "נקודה %(num_points)s אפשרית (שדורגה)"
+msgstr[1] "%(num_points)s נקודות אפשריות (שדורגו)"
+msgstr[2] "%(num_points)s נקודות אפשריות (שדורגו)"
+msgstr[3] "%(num_points)s נקודות אפשריות (שדורגו)"
 
 #. Translators: %(num_points)s is the number of points possible (examples: 1,
 #. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "%(num_points)s point possible (ungraded)"
 msgid_plural "%(num_points)s points possible (ungraded)"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "נקודה %(num_points)s אפשרית (שלא דורגה)"
+msgstr[1] "%(num_points)s נקודות אפשריות (שלא דורגו)"
+msgstr[2] "%(num_points)s נקודות אפשריות (שלא דורגו)"
+msgstr[3] "%(num_points)s נקודות אפשריות (שלא דורגו)"
 
 #. Translators: %(earned)s is the number of points earned. %(possible)s is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
@@ -379,10 +379,10 @@ msgstr[3] ""
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "%(earned)s/%(possible)s point (graded)"
 msgid_plural "%(earned)s/%(possible)s points (graded)"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "נקודה %(earned)s/%(possible)s (שדורגה)"
+msgstr[1] "%(earned)s/%(possible)s נקודות (שדורגו)"
+msgstr[2] "%(earned)s/%(possible)s נקודות (שדורגו)"
+msgstr[3] "%(earned)s/%(possible)s נקודות (שדורגו)"
 
 #. Translators: %(earned)s is the number of points earned. %(possible)s is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
@@ -391,18 +391,18 @@ msgstr[3] ""
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "%(earned)s/%(possible)s point (ungraded)"
 msgid_plural "%(earned)s/%(possible)s points (ungraded)"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "נקודה %(earned)s/%(possible)s (שלא דורגה)"
+msgstr[1] "%(earned)s/%(possible)s נקודות (שלא דורגו)"
+msgstr[2] "%(earned)s/%(possible)s נקודות (שלא דורגו)"
+msgstr[3] "%(earned)s/%(possible)s נקודות (שלא דורגו)"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "The grading process is still running. Refresh the page to see updates."
-msgstr ""
+msgstr "תהליך הדירוג ממשיך לפעול. רענן את הדף כדי לראות עדכונים."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Could not grade your answer. The submission was aborted."
-msgstr ""
+msgstr "לא ניתן לדרג את התשובה. ההגשה בוטלה."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid ""
@@ -410,36 +410,38 @@ msgid ""
 "you can, please use Chrome or Safari which have been verified to support "
 "file uploads."
 msgstr ""
+"ההגשה בוטלה! מצטערים, הדפדפן שלך אינו תומך בהעלאות קבצים. אם ניתן, השתמש "
+"בדפדפן Chrome או Safari שניתן בוודאות להעלות דרכם קבצים."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "You submitted {filename}; only {allowedFiles} are allowed."
-msgstr ""
+msgstr "הגשת את {filename}; מותרים רק {allowedFiles}."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Your file {filename} is too large (max size: {maxSize}MB)."
-msgstr ""
+msgstr "הקובץ {filename} גדול מדי (גודל מרבי: {maxSize}MB)."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "You did not submit the required files: {requiredFiles}."
-msgstr ""
+msgstr "לא הגשת את הקבצים הדרושים: {requiredFiles}."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "You did not select any files to submit."
-msgstr ""
+msgstr "לא בחרת אף קובץ להגשה."
 
 #. Translators: This is only translated to allow for reordering of label and
 #. associated status.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "{label}: {status}"
-msgstr ""
+msgstr "{label}: {status}"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "This problem has been reset."
-msgstr ""
+msgstr "הבעיה לא אותחלה."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "unsubmitted"
-msgstr ""
+msgstr "לא הוגש"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -789,6 +791,10 @@ msgstr ""
 msgid "Edit HTML"
 msgstr ""
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/course_info_handouts.underscore
 #: cms/templates/js/course_info_update.underscore
@@ -799,7 +805,7 @@ msgstr ""
 #: cms/templates/js/xblock-string-field-editor.underscore
 #: common/static/common/templates/discussion/forum-action-edit.underscore
 msgid "Edit"
-msgstr "ערוך"
+msgstr "עריכה"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -948,7 +954,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid "Header"
-msgstr ""
+msgstr "כותרת"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1637,6 +1643,9 @@ msgid ""
 "\n"
 "Click Cancel to return to this page without sending your information."
 msgstr ""
+"לחץ 'אישור' כדי לאשר ששם המשתמש שלך וכתובת הדואר האלקטרונית שלך יועברו לאפליקציה צד 3.\n"
+"\n"
+"לחץ על 'ביטול' כדי לחזור לעמוד זה מבלי שהמידע האישי שלך ישלח. "
 
 #: common/lib/xmodule/xmodule/js/src/lti/lti.js
 msgid ""
@@ -1644,6 +1653,9 @@ msgid ""
 "\n"
 "Click Cancel to return to this page without sending your information."
 msgstr ""
+"לחץ 'אישור' כדי לאשר ששם המשתמש שלך יועבר לאפליקציה צד 3. \n"
+"\n"
+"לחץ על 'ביטול' כדי לחזור לעמוד זה מבלי שהמידע האישי שלך ישלח. "
 
 #: common/lib/xmodule/xmodule/js/src/lti/lti.js
 msgid ""
@@ -1651,22 +1663,25 @@ msgid ""
 "\n"
 "Click Cancel to return to this page without sending your information."
 msgstr ""
+"לחץ 'אישור' כדי לאשר שכתובת הדואר האלקטרוני שלך תועבר לאפליקציה צד 3. \n"
+"\n"
+"לחץ על 'ביטול' כדי לחזור לעמוד זה מבלי שהמידע האישי שלך ישלח. "
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid "incorrect"
-msgstr ""
+msgstr "לא נכון"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid "correct"
-msgstr ""
+msgstr "נכון"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid "answer"
-msgstr ""
+msgstr "תשובה"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid "Short explanation"
-msgstr ""
+msgstr "הסבר קצר"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid ""
@@ -1674,16 +1689,21 @@ msgid ""
 "\n"
 "Proceed to the Advanced Editor and convert this problem to XML?"
 msgstr ""
+"במידה ואתה משתמש בעורך מתקדם, בעיה זו תומר לפורמט XML ולא תוכל לחזור לממשק של עורך פשוט.\n"
+"\n"
+"האם להמשיך לעורך מתקדם ולהמיר את הבעיה ל-XML?"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid "Explanation"
-msgstr ""
+msgstr "הסבר"
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
 msgid ""
 "Sequence error! Cannot navigate to %(tab_name)s in the current "
 "SequenceModule. Please contact the course staff."
 msgstr ""
+"שגיאת המשכיות! אינו יכול לעבור ל-%(tab_name)s במודול נוכחי. אנא צור קשר עם "
+"צוות הקורס."
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
 #: openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js
@@ -1694,35 +1714,35 @@ msgstr "מסומן בסימניה"
 #: common/lib/xmodule/xmodule/js/src/video/09_play_pause_control.js
 #: common/lib/xmodule/xmodule/js/src/video/09_play_skip_control.js
 msgid "Play"
-msgstr ""
+msgstr "נגן"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/09_play_pause_control.js
 msgid "Pause"
-msgstr ""
+msgstr "השהה"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Mute"
-msgstr ""
+msgstr "השתק"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Unmute"
-msgstr ""
+msgstr "בטל השתקה"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/04_video_full_screen.js
 msgid "Exit full browser"
-msgstr ""
+msgstr "צא מדפדפן מלא"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/04_video_full_screen.js
 msgid "Fill browser"
-msgstr ""
+msgstr "מלא דפדפן"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
 msgid "Speed"
-msgstr ""
+msgstr "מהירות"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/08_video_auto_advance_control.js
@@ -1732,62 +1752,62 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid "Volume"
-msgstr ""
+msgstr "עוצמת הקול"
 
 #. Translators: Volume level equals 0%.
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Muted"
-msgstr ""
+msgstr "מושתק"
 
 #. Translators: Volume level in range ]0,20]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Very low"
-msgstr ""
+msgstr "נמוך מאד"
 
 #. Translators: Volume level in range ]20,40]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Low"
-msgstr ""
+msgstr "נמוך"
 
 #. Translators: Volume level in range ]40,60]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Average"
-msgstr ""
+msgstr "ממוצע"
 
 #. Translators: Volume level in range ]60,80]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Loud"
-msgstr ""
+msgstr "רועש"
 
 #. Translators: Volume level in range ]80,99]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Very loud"
-msgstr ""
+msgstr "רועש מאד"
 
 #. Translators: Volume level equals 100%.
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Maximum"
-msgstr ""
+msgstr "מקסימום"
 
 #: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
 msgid "This browser cannot play .mp4, .ogg, or .webm files."
-msgstr ""
+msgstr "דפדפן זה אינו יכול לנגן קבצי  ogg  .webm ,.mp4."
 
 #: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
 msgid "Try using a different browser, such as Google Chrome."
-msgstr ""
+msgstr "נסה להשתמש בדפדפן אחר כגון גוגל כרום."
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "High Definition"
-msgstr ""
+msgstr "איכות גבוהה"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "off"
-msgstr ""
+msgstr "כבוי"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "on"
-msgstr ""
+msgstr "פועל"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "Video position. Press space to toggle playback"
@@ -1795,45 +1815,47 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "Video ended"
-msgstr ""
+msgstr "סרטון הווידאו הסתיים"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "Video position"
-msgstr ""
+msgstr "מיקום סרטון הווידאו"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s hour"
 msgid_plural "%(value)s hours"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "%(value)s שעה"
+msgstr[1] "%(value)s שעות"
+msgstr[2] "%(value)s שעות"
+msgstr[3] "%(value)s שעות"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s minute"
 msgid_plural "%(value)s minutes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "%(value)s דקה"
+msgstr[1] "%(value)s דקות"
+msgstr[2] "%(value)s דקות"
+msgstr[3] "%(value)s דקות"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s second"
 msgid_plural "%(value)s seconds"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "%(value)s שניה"
+msgstr[1] "%(value)s שניות"
+msgstr[2] "%(value)s שניות"
+msgstr[3] "%(value)s שניות"
 
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid ""
 "Click on this button to mute or unmute this video or press UP or DOWN "
 "buttons to increase or decrease volume level."
 msgstr ""
+"לחץ על לחצן זה כדי להשתיק או לבטל השתקה של סרטון וידאו זה או לחץ על המקשים "
+"למעלה או למטה כדי להגביר או להנמיך את רמת הקול. "
 
 #: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
 msgid "Adjust video volume"
-msgstr ""
+msgstr "התאם את עוצמת הקול של סרטון הווידאו"
 
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
 msgid ""
@@ -1841,52 +1863,55 @@ msgid ""
 "navigate the different speeds, then press ENTER to change to the selected "
 "speed."
 msgstr ""
+"לחץ על מקש החץ 'למעלה' כדי להיכנס לתפריט המהירות, ולאחר מכן השתמש במקשי "
+"החצים למעלה ולמטה כדי לנווט בין המהירויות השונות. לחץ על ENTER כדי לשנות "
+"למהירות שנבחרה."
 
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
 msgid "Adjust video speed"
-msgstr ""
+msgstr "התאם את מהירות סרטון הווידאו"
 
 #: common/lib/xmodule/xmodule/js/src/video/08_video_speed_control.js
 msgid "Video speed: "
-msgstr ""
+msgstr "מהירות סרטון הווידאו:"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_play_skip_control.js
 msgid "Skip"
-msgstr ""
+msgstr "דלג"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_poster.js
 msgid "Play video"
-msgstr ""
+msgstr "הפעל את סרטון הווידאו"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_skip_control.js
 msgid "Do not show again"
-msgstr ""
+msgstr "אל תציג שוב"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Open language menu"
-msgstr ""
+msgstr "פתח תפריט שפה"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Transcript will be displayed when you start playing the video."
-msgstr ""
+msgstr "תמלול יוצג כאשר תתחיל בהפעלת סרטון הווידאו."
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid ""
 "Activating a link in this group will skip to the corresponding point in the "
 "video."
-msgstr ""
+msgstr "הפעלת קישור בקבוצה הזו תוביל ישירות לנקודה המקבילה בסרטון הווידאו."
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Video transcript"
-msgstr ""
+msgstr "תמלול סרטון וידאו"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Start of transcript. Skip to the end."
-msgstr ""
+msgstr "התחלת התמלול. דלג לסוף."
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "End of transcript. Skip to the start."
-msgstr ""
+msgstr "סוף התמלול. דלג להתחלה."
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid ""
@@ -1894,26 +1919,28 @@ msgid ""
 " keys to navigate language options. Press ENTER to change to the selected "
 "language."
 msgstr ""
+"לחץ על מקש החץ למעלה כדי להיכנס לתפריט השפה ולאחר מכן השתמש במקשי החצים "
+"למעלה ולמטה כדי לנווט בין אפשרויות השפה. לחץ על ENTER כדי לשנות לשפה שנבחרה."
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Hide closed captions"
-msgstr ""
+msgstr "הסתר כתוביות"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "(Caption will be displayed when you start playing the video.)"
-msgstr ""
+msgstr "(כתוביות יוצגו כאשר תפעיל את סרטון הווידאו)."
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn on closed captioning"
-msgstr ""
+msgstr "הפעל כתוביות"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn on transcripts"
-msgstr ""
+msgstr "הפעל תמלילים"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn off transcripts"
-msgstr ""
+msgstr "כבה תמלילים"
 
 #: common/static/common/js/components/BlockBrowser/components/BlockBrowser/BlockBrowser.jsx
 #: cms/templates/js/move-xblock-list.underscore
@@ -2228,82 +2255,82 @@ msgstr "שוחרר על המטרה"
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "%s ago"
-msgstr ""
+msgstr "לפני %s"
 
 #. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "%s from now"
-msgstr ""
+msgstr "%s מעכשיו"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "less than a minute"
-msgstr ""
+msgstr "פחות מדקה"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a minute"
-msgstr ""
+msgstr "בערך דקה"
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "דקה %d"
+msgstr[1] "%d דקות"
+msgstr[2] "%d דקות"
+msgstr[3] "%d דקות"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about an hour"
-msgstr ""
+msgstr "בערך שעה"
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "about %d hour"
 msgid_plural "about %d hours"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "כשעה %d"
+msgstr[1] "כ-%d שעות"
+msgstr[2] "כ-%d שעות"
+msgstr[3] "כ-%d שעות"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "a day"
-msgstr ""
+msgstr "יום"
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "יום %d"
+msgstr[1] "%d ימים"
+msgstr[2] "%d ימים"
+msgstr[3] "%d ימים"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a month"
-msgstr ""
+msgstr "בערך חודש אחד"
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "%d month"
 msgid_plural "%d months"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "חודש %d"
+msgstr[1] "%d חודשים"
+msgstr[2] "%d חודשים"
+msgstr[3] "%d חודשים"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a year"
-msgstr ""
+msgstr "כשנה"
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "%d year"
 msgid_plural "%d years"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "שנה %d"
+msgstr[1] "%d שנים"
+msgstr[2] "%d שנים"
+msgstr[3] "%d שנים"
 
 #: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/Main/Main.jsx
 msgid "Select a section or problem"
