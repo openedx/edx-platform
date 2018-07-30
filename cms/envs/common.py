@@ -100,8 +100,6 @@ from lms.envs.common import (
     # to generating test databases will discover and try to create all tables
     # and this setting needs to be present
     OAUTH2_PROVIDER_APPLICATION_MODEL,
-    DEFAULT_JWT_ISSUER,
-    RESTRICTED_APPLICATION_JWT_ISSUER,
     JWT_AUTH,
 
     USERNAME_REGEX_PARTIAL,

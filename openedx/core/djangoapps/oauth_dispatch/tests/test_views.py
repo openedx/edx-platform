@@ -9,8 +9,12 @@ import ddt
 import httpretty
 from django.conf import settings
 from django.urls import reverse
-from django.test import RequestFactory, TestCase
+from django.test import RequestFactory, TestCase, override_settings
 from mock import call, patch
+
+from Cryptodome.PublicKey import RSA
+from jwkest import jwk
+
 from oauth2_provider import models as dot_models
 from organizations.tests.factories import OrganizationFactory
 
@@ -167,6 +171,20 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
 
         return body
 
+    def _generate_key_pair(self):
+        """ Generates an asymmetric key pair and returns the JWK of its public keys and keypair. """
+        rsa_key = RSA.generate(2048)
+        rsa_jwk = jwk.RSAKey(kid="key_id", key=rsa_key)
+
+        public_keys = jwk.KEYS()
+        public_keys.append(rsa_jwk)
+        serialized_public_keys_json = public_keys.dump_jwks()
+
+        serialized_keypair = rsa_jwk.serialize(private=True)
+        serialized_keypair_json = json.dumps(serialized_keypair)
+
+        return serialized_public_keys_json, serialized_keypair_json
+
     @ddt.data('dop_app', 'dot_app')
     def test_access_token_fields(self, client_attr):
         client = getattr(self, client_attr)
@@ -242,33 +260,41 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         mock_set_custom_metric.assert_has_calls(expected_calls, any_order=True)
 
     @ddt.data(
-        (False, True, settings.DEFAULT_JWT_ISSUER),
-        (True, False, settings.RESTRICTED_APPLICATION_JWT_ISSUER),
+        (False, True),
+        (True, False),
     )
     @ddt.unpack
-    def test_restricted_jwt_access_token(self, enforce_jwt_scopes_enabled, expiration_expected,
-                                         jwt_issuer_expected):
+    def test_restricted_jwt_access_token(self, enforce_jwt_scopes_enabled, expiration_expected):
         """
         Verify that when requesting a JWT token from a restricted Application
         within the DOT subsystem, that our claims is marked as already expired
         (i.e. expiry set to Jan 1, 1970)
         """
         with ENFORCE_JWT_SCOPES.override(enforce_jwt_scopes_enabled):
-            response = self._post_request(self.user, self.restricted_dot_app, token_type='jwt')
-            self.assertEqual(response.status_code, 200)
-            data = json.loads(response.content)
 
-            self.assertIn('expires_in', data)
-            self.assertEqual(data['expires_in'] < 0, expiration_expected)
-            self.assertEqual(data['token_type'], 'JWT')
-            self.assert_valid_jwt_access_token(
-                data['access_token'],
-                self.user,
-                data['scope'].split(' '),
-                should_be_expired=expiration_expected,
-                jwt_issuer=jwt_issuer_expected,
-                should_be_restricted=True,
-            )
+            public_jwk_set, private_jwk = self._generate_key_pair()
+            jwt_auth_settings = settings.JWT_AUTH
+            jwt_auth_settings.update({
+                'JWT_PRIVATE_SIGNING_JWK': private_jwk,
+                'JWT_PUBLIC_SIGNING_JWK_SET': public_jwk_set,
+            })
+            with override_settings(JWT_AUTH=jwt_auth_settings):
+
+                response = self._post_request(self.user, self.restricted_dot_app, token_type='jwt')
+                self.assertEqual(response.status_code, 200)
+                data = json.loads(response.content)
+
+                self.assertIn('expires_in', data)
+                self.assertEqual(data['expires_in'] < 0, expiration_expected)
+                self.assertEqual(data['token_type'], 'JWT')
+                self.assert_valid_jwt_access_token(
+                    data['access_token'],
+                    self.user,
+                    data['scope'].split(' '),
+                    should_be_expired=expiration_expected,
+                    should_be_asymmetric_key=enforce_jwt_scopes_enabled,
+                    should_be_restricted=True,
+                )
 
     def test_restricted_access_token(self):
         """
