@@ -216,12 +216,6 @@
     border: 1px solid $blue;
     border-radius: 3px;
     color: $blue;
-
-    &:hover,
-    &:focus {
-      color: $blue;
-      background-color: $mediumGrey !important;
-    }
   }
 
   .label-course {
