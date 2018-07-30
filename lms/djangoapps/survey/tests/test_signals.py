@@ -2,7 +2,7 @@
 Test signal handlers for the survey app
 """
 
-from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import fake_retirement
+from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import fake_completed_retirement
 from student.tests.factories import UserFactory
 from survey.models import SurveyAnswer
 from survey.tests.factories import SurveyAnswerFactory
@@ -43,7 +43,7 @@ class SurveyRetireSignalTests(ModuleStoreTestCase):
 
         # Run twice to make sure no errors are raised
         _listen_for_lms_retire(sender=self.__class__, user=answer.user)
-        fake_retirement(answer.user)
+        fake_completed_retirement(answer.user)
         _listen_for_lms_retire(sender=self.__class__, user=answer.user)
 
         # All values for this user should still be here and just be an empty string
