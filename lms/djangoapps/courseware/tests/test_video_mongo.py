@@ -1809,7 +1809,7 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         self.assertNotEqual(video.edx_video_id, u'')
 
         video_data = get_video_info(video.edx_video_id)
-        self.assertEqual(video_data['status'], 'imported')
+        self.assertEqual(video_data['status'], 'external')
 
         # Verify that VAL transcript is imported.
         self.assertDictContainsSubset(
@@ -1950,7 +1950,7 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         self.assertNotEqual(video.edx_video_id, u'')
 
         video_data = get_video_info(video.edx_video_id)
-        self.assertEqual(video_data['status'], 'imported')
+        self.assertEqual(video_data['status'], 'external')
 
         # Verify that correct transcripts are imported.
         self.assertDictContainsSubset(
