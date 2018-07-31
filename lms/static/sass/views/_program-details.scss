@@ -658,7 +658,7 @@ $btn-color-primary: palette(primary, dark);
     }
   }
 
-  .record-heading {
+  .divider-heading {
     font-family: $font-family-sans-serif;
     font-weight: bold;
     color: palette(primary, dark);
@@ -669,11 +669,32 @@ $btn-color-primary: palette(primary, dark);
     margin: $baseline*0.5 0 $baseline 0;
   }
 
-  .view-record-wrapper {
+  .sidebar-button-wrapper {
     text-align: right;
 
-    .view-record-button {
+    .sidebar-button {
       font-size: 0.9375em;
+    }
+  }
+
+  .pathway-wrapper {
+    @include margin-left($baseline*0.75);
+
+    width: $baseline*15.5;
+    border-bottom: 1px solid $gray-l4;
+
+    @media (min-width: $bp-screen-sm) {
+        width: auto;
+    }
+    .pathway-info {
+      margin: 15px 0;
+      font-size: 0.9375em;
+      color: #414141;
+
+      .pathway-heading {
+        font-weight: bold;
+        margin-bottom: 3px;
+      }
     }
   }
 
