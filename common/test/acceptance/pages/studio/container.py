@@ -198,7 +198,7 @@ class ContainerPage(PageObject, HelpMixin):
         self.wait_for_ajax()
 
     @property
-    def xblock_name(self):
+    def xblock_titles(self):
         """
         Get titles of  x-block present on the page.
         Returns:

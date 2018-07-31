@@ -6,7 +6,6 @@ from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.studio.container import ContainerPage
 from common.test.acceptance.pages.studio.utils import add_component
 from common.test.acceptance.pages.studio.discussion_component_editor import DiscussionComponentEditor
-from unittest import skip
 
 
 class DiscussionComponentTest(ContainerBase):
