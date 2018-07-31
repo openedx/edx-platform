@@ -99,6 +99,9 @@ class StudentModule(models.Model):
     class Meta(object):
         app_label = "courseware"
         unique_together = (('student', 'module_state_key', 'course_id'),)
+        indexes = [
+            models.Index(fields=['module_id', 'test_field_nullable']),
+        ]
 
     # Internal state of the object
     state = models.TextField(null=True, blank=True)
