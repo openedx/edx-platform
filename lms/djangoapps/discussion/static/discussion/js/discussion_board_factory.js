@@ -32,6 +32,9 @@
                     routerEvents;
 
                 // TODO: eliminate usage of global variables when possible
+                if (options.roles === undefined) {
+                    options.roles = {};
+                }
                 DiscussionUtil.loadRoles(options.roles);
                 window.$$course_id = options.courseId;
                 window.courseName = options.courseName;
