@@ -2,7 +2,6 @@
 restAPI Views
 """
 import logging
-import mimetypes
 
 import requests
 from celery.result import AsyncResult
