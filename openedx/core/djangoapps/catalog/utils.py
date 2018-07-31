@@ -63,7 +63,7 @@ def get_programs(site, uuid=None):
         return program
     uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=site.domain), [])
     if not uuids:
-        logger.warning('Failed to get program UUIDs from the cache.')
+        logger.warning('Failed to get program UUIDs from the cache for site {}.'.format(site.domain))
 
     programs = cache.get_many([PROGRAM_CACHE_KEY_TPL.format(uuid=uuid) for uuid in uuids])
     programs = list(programs.values())
