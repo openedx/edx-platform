@@ -414,8 +414,10 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
     def setUp(self):
         super(AwardCourseCertificatesTestCase, self).setUp()
 
+        self.available_date = datetime.datetime.max
         self.course = CourseOverviewFactory.create(
-            self_paced=True  # Any option to allow the certificate to be viewable for the course
+            self_paced=True,  # Any option to allow the certificate to be viewable for the course
+            certificate_available_date=self.available_date,
         )
         self.student = UserFactory.create(username='test-student')
         # Instantiate the Certificate first so that the config doesn't execute issuance
@@ -440,6 +442,7 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
         call_args, _ = mock_post_course_certificate.call_args
         self.assertEqual(call_args[1], self.student.username)
         self.assertEqual(call_args[2], self.certificate)
+        self.assertEqual(call_args[3], self.available_date)
 
     def test_award_course_cert_not_called_if_disabled(self, mock_post_course_certificate):
         """
