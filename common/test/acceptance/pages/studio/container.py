@@ -198,6 +198,15 @@ class ContainerPage(PageObject, HelpMixin):
         self.wait_for_ajax()
 
     @property
+    def xblock_titles(self):
+        """
+        Get titles of  x-block present on the page.
+        Returns:
+            list: A list of X-block titles
+        """
+        return self.q(css='.wrapper-xblock .level-element .header-details').text
+
+    @property
     def is_staff_locked(self):
         """ Returns True if staff lock is currently enabled, False otherwise """
         for attr in self.q(css='a.action-staff-lock>.fa').attrs('class'):
