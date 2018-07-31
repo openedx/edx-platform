@@ -174,11 +174,32 @@ def award_program_certificates(self, username):
             try:
                 award_program_certificate(credentials_client, username, program_uuid)
                 LOGGER.info('Awarded certificate for program %s to user %s', program_uuid, username)
-            except exceptions.HttpClientError:
+            except exceptions.HttpNotFoundError:
                 LOGGER.exception(
-                    'Certificate for program %s not configured, unable to award certificate to %s',
-                    program_uuid, username
+                    """Certificate for program {uuid} could not be found. Unable to award certificate to user
+                    {username}. The program might not be configured.""".format(uuid=program_uuid, username=username)
                 )
+            except exceptions.HttpClientError as exc:
+                # Grab the status code from the client error, because our API
+                # client handles all 4XX errors the same way. In the future,
+                # we may want to fork slumber, add 429 handling, and use that
+                # in edx_rest_api_client.
+                # A status code looks like:
+                #   "Client Error 429: http://example-endpoint/"
+                status_code = int(str(exc).split(':')[0][-3:])
+                if status_code == 429:
+                    rate_limit_countdown = 60
+                    LOGGER.info(
+                        """Rate limited. Retrying task to award certificates to user {username} in {countdown}
+                        seconds""".format(username=username, countdown=rate_limit_countdown)
+                    )
+                    # Retry after 60 seconds, when we should be in a new throttling window
+                    raise self.retry(exc=exc, countdown=rate_limit_countdown, max_retries=MAX_RETRIES)
+                else:
+                    LOGGER.exception(
+                        """Unable to award certificate to user {username} for program {uuid}. The program might not be
+                        configured.""".format(username=username, uuid=program_uuid)
+                    )
             except Exception:  # pylint: disable=broad-except
                 # keep trying to award other certs, but retry the whole task to fix any missing entries
                 LOGGER.warning('Failed to award certificate for program {uuid} to user {username}.'.format(
