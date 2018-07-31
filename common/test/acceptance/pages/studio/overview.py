@@ -498,6 +498,12 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
             self.q(css='div.ui-loading.is-hidden').present
         ])
 
+    def click_course_status_section_start_date_link(self):
+        self.course_start_date_link.click()
+
+    def click_course_status_section_checklists_link(self):
+        self.course_checklists_link.click()
+
     def view_live(self):
         """
         Clicks the "View Live" link and switches to the new tab
@@ -761,6 +767,20 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
 
         # The Prerequisites dropdown is visible
         return self.q(css="#prereq_min_score").visible
+
+    @property
+    def has_course_status_section(self):
+        # SFE and SFE-wrapper classes come from studio-frontend and
+        # wrap content provided by the studio-frontend package
+        return self.q(css='.course-status .SFE .SFE-wrapper').is_present()
+
+    @property
+    def course_start_date_link(self):
+        return self.q(css='.status-link').first
+
+    @property
+    def course_checklists_link(self):
+        return self.q(css='.status-link').nth(1)
 
     @property
     def bottom_add_section_button(self):
