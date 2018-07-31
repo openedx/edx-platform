@@ -7,13 +7,14 @@ from __future__ import unicode_literals
 import os
 import random
 import string
+import json
 from textwrap import dedent
 
 from bok_choy.promise import EmptyPromise
 from mock import patch
 from nose.plugins.attrib import attr
 
-from base_studio_test import StudioCourseTest
+from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.common.utils import add_enrollment_course_modes
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
@@ -435,7 +436,93 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
         """
         button_text = self.advanced_settings.deprecated_settings_button_text
         self.assertEqual(button_text, 'Show Deprecated Settings')
-        self.assertFalse(self.advanced_settings.check_deprecated_settings_visibility())
+        self.assertFalse(self.advanced_settings.is_deprecated_setting_visible())
+
+    def test_deprecated_settings_can_be_toggled(self):
+        """
+        Scenario: Test that advanced settings can toggle deprecated settings
+            Given I am on the Advanced Course Settings page in Studio
+            When I toggle the display of deprecated settings
+                Then deprecated settings are then shown
+            And I toggle the display of deprecated settings
+                Then deprecated settings are not shown
+        """
+
+        self.advanced_settings.toggle_deprecated_settings()
+        button_text = self.advanced_settings.deprecated_settings_button_text
+        self.assertEqual(
+            button_text,
+            'Hide Deprecated Settings',
+            "Button text should change to 'Hide Deprecated Settings' after the click"
+        )
+        self.assertTrue(self.advanced_settings.is_deprecated_setting_visible())
+        self.advanced_settings.toggle_deprecated_settings()
+        self.assertFalse(self.advanced_settings.is_deprecated_setting_visible())
+        self.assertEqual(
+            self.advanced_settings.deprecated_settings_button_text,
+            'Show Deprecated Settings',
+            "Button text should change to 'Show Deprecated Settings' after the click"
+        )
+
+    def test_multi_line_input(self):
+        """
+        Scenario: Test that advanced settings correctly shows the multi-line input
+            Given I am on the Advanced Course Settings page in Studio
+            When I create a JSON object as a value for "Discussion Topic Mapping"
+                Then it is displayed as formatted
+        """
+
+        inputs = {
+            "key": "value",
+            "key_2": "value_2"
+        }
+        json_input = json.dumps(inputs)
+        self.advanced_settings.set('Discussion Topic Mapping', json_input)
+        self.assertEqual(
+            self.advanced_settings.get('Discussion Topic Mapping'),
+            '{\n    "key": "value",\n    "key_2": "value_2"\n}'
+        )
+
+    def test_automatic_quoting_of_non_json_value(self):
+        """
+        Scenario: Test that advanced settings automatically quotes the field input
+        upon saving
+            Given I am on the Advanced Course Settings page in Studio
+            When I create a non-JSON value not in quotes
+                Then it is displayed as a string
+        """
+
+        self.advanced_settings.set(self.course_name_key, self.course_name_value)
+        self.assertEqual(
+            self.advanced_settings.get(self.course_name_key),
+            '"Test Name"'
+        )
+
+    def test_validation_error_for_wrong_input_type(self):
+        """
+        Scenario: Test error if value supplied is of the wrong type
+            Given I am on the Advanced Course Settings page in Studio
+            When I create a JSON object as a value for "Course Display Name"
+                Then I get an error on save
+             And I reload the page
+             Then the policy key value is unchanged
+        """
+
+        course_display_name = self.advanced_settings.get('Course Display Name')
+        inputs = {
+            "key": "value",
+            "key_2": "value_2"
+        }
+        json_input = json.dumps(inputs)
+        self.advanced_settings.set('Course Display Name', json_input)
+        self.advanced_settings.wait_for_modal_load()
+        self.check_modal_shows_correct_contents(['Course Display Name'])
+        self.advanced_settings.refresh_and_wait_for_load()
+        self.assertEquals(
+            self.advanced_settings.get('Course Display Name'),
+            course_display_name,
+            'Wrong input for Course Display Name must not change its value'
+        )
 
     def test_modal_shows_one_validation_error(self):
         """
