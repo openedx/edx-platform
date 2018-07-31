@@ -400,6 +400,7 @@ class UserRetirementPartnerReportSerializer(serializers.Serializer):
     """
     Perform serialization for the UserRetirementPartnerReportingStatus model
     """
+    user_id = serializers.IntegerField()
     original_username = serializers.CharField()
     original_email = serializers.EmailField()
     original_name = serializers.CharField()
