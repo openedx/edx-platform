@@ -9,6 +9,7 @@ import os
 import shutil
 import tarfile
 from datetime import datetime
+from math import ceil
 from tempfile import NamedTemporaryFile, mkdtemp
 
 from celery import group
@@ -39,6 +40,7 @@ import dogstats_wrapper as dog_stats_api
 from contentstore.courseware_index import CoursewareSearchIndexer, LibrarySearchIndexer, SearchIndexingError
 from contentstore.storage import course_import_export_storage
 from contentstore.utils import initialize_permissions, reverse_usage_url
+from contentstore.video_utils import scrape_youtube_thumbnail
 from course_action_state.models import CourseRerunState
 from models.settings.course_metadata import CourseMetadata
 from openedx.core.djangoapps.embargo.models import CountryAccessRule, RestrictedCourse
@@ -82,6 +84,83 @@ MIGRATION_LOGS_PREFIX = 'Transcript Migration'
 RETRY_DELAY_SECONDS = 30
 COURSE_LEVEL_TIMEOUT_SECONDS = 1200
 VIDEO_LEVEL_TIMEOUT_SECONDS = 300
+
+
+def enqueue_update_thumbnail_tasks(course_videos, videos_per_task, run):
+    """
+    Enqueue tasks to update video thumbnails from youtube.
+
+    Arguments:
+        course_videos: A list of tuples, each containing course ID, video ID and youtube ID.
+        videos_per_task: Number of course videos that can be processed by a single celery task.
+        run: This tracks the YT thumbnail scraping job runs.
+    """
+    tasks = []
+    batch_size = len(course_videos)
+    # Further slice the course-videos batch into chunks on the
+    # basis of number of course-videos per task.
+    start = 0
+    end = videos_per_task
+    chunks_count = int(ceil(batch_size / float(videos_per_task)))
+    for __ in xrange(0, chunks_count):
+        course_videos_chunk = course_videos[start:end]
+        tasks.append(task_scrape_youtube_thumbnail.s(
+            course_videos_chunk, run
+        ))
+        start = end
+        end += videos_per_task
+
+    # Kick off a chord of scraping tasks
+    callback = task_scrape_youtube_thumbnail_callback.s(
+        run=run,
+        batch_size=batch_size,
+        videos_per_task=videos_per_task,
+    )
+    chord(tasks)(callback)
+
+
+@chord_task(bind=True, routing_key=settings.VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE)
+def task_scrape_youtube_thumbnail_callback(self, results, run, batch_size, videos_per_task):
+    """
+    Callback for collating the results of yt thumbnails scraping tasks chord.
+    """
+    yt_thumbnails_scraping_tasks_count = len(list(results()))
+    LOGGER.info(
+        ("[video thumbnails] [run=%s] [video-thumbnails-scraping-complete-for-a-batch] [tasks_count=%s] "
+         "[batch_size=%s] [videos_per_task=%s]"),
+        run, yt_thumbnails_scraping_tasks_count, batch_size, videos_per_task
+    )
+
+
+@chord_task(
+    bind=True,
+    base=LoggedPersistOnFailureTask,
+    default_retry_delay=RETRY_DELAY_SECONDS,
+    max_retries=1,
+    time_limit=COURSE_LEVEL_TIMEOUT_SECONDS,
+    routing_key=settings.SCRAPE_YOUTUBE_THUMBNAILS_JOB_QUEUE
+)
+def task_scrape_youtube_thumbnail(self, course_videos, run):
+    """
+    Task to scrape youtube thumbnails and update them in edxval for the given course-videos.
+
+    Arguments:
+        course_videos: A list of tuples, each containing course ID, video ID and youtube ID.
+        run: This tracks the YT thumbnail scraping job runs.
+    """
+    for course_id, edx_video_id, youtube_id in course_videos:
+        try:
+            scrape_youtube_thumbnail(course_id, edx_video_id, youtube_id)
+        except Exception:  # pylint: disable=broad-except
+            LOGGER.exception(
+                ("[video thumbnails] [run=%s] [video-thumbnails-scraping-failed-with-unknown-exc] "
+                 "[edx_video_id=%s] [youtube_id=%s] [course=%s]"),
+                run,
+                edx_video_id,
+                youtube_id,
+                course_id
+            )
+            continue
 
 
 @chord_task(bind=True, routing_key=settings.VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE)

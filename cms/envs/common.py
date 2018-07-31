@@ -1501,6 +1501,9 @@ COURSEGRAPH_JOB_QUEUE = LOW_PRIORITY_QUEUE
 ########## Settings for video transcript migration tasks ############
 VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE = LOW_PRIORITY_QUEUE
 
+########## Settings youtube thumbnails scraper tasks ############
+SCRAPE_YOUTUBE_THUMBNAILS_JOB_QUEUE = LOW_PRIORITY_QUEUE
+
 ###################### VIDEO IMAGE STORAGE ######################
 
 VIDEO_IMAGE_DEFAULT_FILENAME = 'images/video-images/default_video_image.png'

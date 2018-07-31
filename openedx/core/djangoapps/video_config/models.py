@@ -1,11 +1,15 @@
 """
 Configuration models for Video XModule
 """
+from django.db import models
 from django.db.models import BooleanField, TextField, PositiveIntegerField
-
+from django.core.validators import RegexValidator
 from config_models.models import ConfigurationModel
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
+
+
+URL_REGEX = r'^[a-zA-Z0-9\-_]*$'
 
 
 class HLSPlaybackEnabledFlag(ConfigurationModel):
@@ -185,4 +189,56 @@ class MigrationEnqueuedCourse(TimeStampedModel):
     def __unicode__(self):
         return u'MigrationEnqueuedCourse: ID={course_id}, Run={command_run}'.format(
             course_id=self.course_id, command_run=self.command_run
+        )
+
+
+class VideoThumbnailSetting(ConfigurationModel):
+    """
+    Arguments for the Video Thumbnail management command
+    """
+    command_run = PositiveIntegerField(default=0)
+    batch_size = PositiveIntegerField(default=0)
+    videos_per_task = PositiveIntegerField(default=0)
+    commit = BooleanField(
+        default=False,
+        help_text="Dry-run or commit."
+    )
+    all_course_videos = BooleanField(
+        default=False,
+        help_text="Process all videos."
+    )
+    course_ids = TextField(
+        blank=True,
+        help_text="Whitespace-separated list of course ids for which to update videos."
+    )
+
+    def increment_run(self):
+        """
+        Increments the run which indicates the management command run count.
+        """
+        self.command_run += 1
+        self.save()
+        return self.command_run
+
+    def __unicode__(self):
+        return "[VideoThumbnailSetting] update for {courses} courses if commit as {commit}".format(
+            courses='ALL' if self.all_course_videos else self.course_ids,
+            commit=self.commit,
+        )
+
+
+class UpdatedCourseVideos(TimeStampedModel):
+    """
+    Temporary model to persist the course videos which have been enqueued to update video thumbnails.
+    """
+    course_id = CourseKeyField(db_index=True, max_length=255)
+    edx_video_id = models.CharField(max_length=100)
+    command_run = PositiveIntegerField(default=0)
+
+    class Meta:
+        unique_together = ('course_id', 'edx_video_id')
+
+    def __unicode__(self):
+        return u'UpdatedCourseVideos: CourseID={course_id}, VideoID={video_id}, Run={command_run}'.format(
+            course_id=self.course_id, video_id=self.edx_video_id, command_run=self.command_run
         )

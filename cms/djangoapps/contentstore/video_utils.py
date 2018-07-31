@@ -85,7 +85,7 @@ def download_youtube_video_thumbnail(youtube_id):
     Download highest resoultion video thumbnail available from youtube.
     """
     thumbnail_content = thumbnail_content_type = None
-    # Download highest resoultion thumbnail available.
+    # Download highest resolution thumbnail available.
     for thumbnail_quality in YOUTUBE_THUMBNAIL_SIZES:
         thumbnail_url = urljoin('https://img.youtube.com', '/vi/{youtube_id}/{thumbnail_quality}.jpg'.format(
             youtube_id=youtube_id, thumbnail_quality=thumbnail_quality
@@ -94,7 +94,7 @@ def download_youtube_video_thumbnail(youtube_id):
         if response.status_code == requests.codes.ok:   # pylint: disable=no-member
             thumbnail_content = response.content
             thumbnail_content_type = response.headers['content-type']
-            # If best available resolution is found, skip looking for lower resolutions.
+            # If best available resolution is found, don't look for lower resolutions.
             break
     return thumbnail_content, thumbnail_content_type
 
