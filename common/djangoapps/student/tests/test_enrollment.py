@@ -7,7 +7,6 @@ import ddt
 from django.conf import settings
 from django.urls import reverse
 from mock import patch
-from nose.plugins.attrib import attr
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
@@ -26,7 +25,6 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=3)
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
@@ -34,6 +32,7 @@ class EnrollmentTest(UrlResetMixin, SharedModuleStoreTestCase):
     Test student enrollment, especially with different course modes.
     """
 
+    shard = 3
     USERNAME = "Bob"
     EMAIL = "bob@example.com"
     PASSWORD = "edx"

@@ -15,8 +15,6 @@ from mock import patch, Mock, call
 # before importing the module
 # TODO remove this import and the configuration -- xmodule should not depend on django!
 from django.conf import settings
-# This import breaks this test file when run separately. Needs to be fixed! (PLAT-449)
-from nose.plugins.attrib import attr
 from nose import SkipTest
 import pymongo
 from pytz import UTC
@@ -42,6 +40,7 @@ if not settings.configured:
 
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator, LibraryLocator
+from openedx.core.lib.tests import attr
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.draft_and_published import UnsupportedRevisionError, DIRECT_ONLY_CATEGORIES

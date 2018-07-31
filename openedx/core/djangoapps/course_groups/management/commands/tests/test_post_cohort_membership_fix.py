@@ -3,7 +3,6 @@ Test for the post-migration fix commands that are included with this djangoapp
 """
 from django.core.management import call_command
 from django.test.client import RequestFactory
-from nose.plugins.attrib import attr
 
 from openedx.core.djangoapps.course_groups.views import cohort_handler
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_name
@@ -14,11 +13,12 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=2)
 class TestPostMigrationFix(ModuleStoreTestCase):
     """
     Base class for testing post-migration fix commands
     """
+    shard = 2
+
     def setUp(self):
         """
         setup course, user and request for tests

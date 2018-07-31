@@ -12,10 +12,10 @@ import uuid
 
 import ddt
 from contracts import contract
-from nose.plugins.attrib import attr
 from django.core.cache import caches, InvalidCacheBackendError
 
 from openedx.core.lib import tempdir
+from openedx.core.lib.tests import attr
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import ModuleStoreEnum

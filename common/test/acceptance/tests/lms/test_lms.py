@@ -7,7 +7,6 @@ from datetime import datetime, timedelta
 from textwrap import dedent
 
 import pytz
-from nose.plugins.attrib import attr
 
 from common.test.acceptance.fixtures.course import CourseFixture, CourseUpdateDesc, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
@@ -40,6 +39,7 @@ from common.test.acceptance.tests.helpers import (
     load_data_str,
     select_option_by_text,
 )
+from openedx.core.lib.tests import attr
 
 
 @attr(shard=19)
