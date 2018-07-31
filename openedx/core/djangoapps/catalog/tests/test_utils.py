@@ -66,7 +66,9 @@ class TestGetPrograms(CacheIsolationTestCase):
         # When called before UUIDs are cached, the function should return an
         # empty list and log a warning.
         self.assertEqual(get_programs(self.site), [])
-        mock_warning.assert_called_once_with('Failed to get program UUIDs from the cache.')
+        mock_warning.assert_called_once_with(
+            'Failed to get program UUIDs from the cache for site {}.'.format(self.site.domain)
+        )
         mock_warning.reset_mock()
 
         # Cache UUIDs for all 3 programs.
