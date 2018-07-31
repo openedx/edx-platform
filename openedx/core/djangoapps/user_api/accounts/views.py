@@ -695,9 +695,9 @@ class AccountRetirementStatusView(ViewSet):
         so to get one day you would set both dates to that day.
         """
         try:
-            start_date = datetime.datetime.strptime(request.GET['start_date'], '%Y-%m-%d')
-            end_date = datetime.datetime.strptime(request.GET['end_date'], '%Y-%m-%d')
-            now = datetime.datetime.now()
+            start_date = datetime.datetime.strptime(request.GET['start_date'], '%Y-%m-%d').replace(tzinfo=pytz.UTC)
+            end_date = datetime.datetime.strptime(request.GET['end_date'], '%Y-%m-%d').replace(tzinfo=pytz.UTC)
+            now = datetime.datetime.now(pytz.UTC)
             if start_date > now or end_date > now or start_date > end_date:
                 raise RetirementStateError('Dates must be today or earlier, and start must be earlier than end.')
 
