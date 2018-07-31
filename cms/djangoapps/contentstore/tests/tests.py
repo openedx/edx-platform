@@ -354,19 +354,39 @@ class ForumTestCase(CourseTestCase):
         super(ForumTestCase, self).setUp()
         self.course = CourseFactory.create(org='testX', number='727', display_name='Forum Course')
 
+    def set_blackout_dates(self, blackout_dates):
+        """Helper method to set blackout dates in course."""
+        self.course.discussion_blackouts = [
+            [start_date.isoformat(), end_date.isoformat()] for start_date, end_date in blackout_dates
+        ]
+
     def test_blackouts(self):
         now = datetime.datetime.now(UTC)
         times1 = [
             (now - datetime.timedelta(days=14), now - datetime.timedelta(days=11)),
             (now + datetime.timedelta(days=24), now + datetime.timedelta(days=30))
         ]
-        self.course.discussion_blackouts = [(t.isoformat(), t2.isoformat()) for t, t2 in times1]
+        self.set_blackout_dates(times1)
         self.assertTrue(self.course.forum_posts_allowed)
         times2 = [
             (now - datetime.timedelta(days=14), now + datetime.timedelta(days=2)),
             (now + datetime.timedelta(days=24), now + datetime.timedelta(days=30))
         ]
-        self.course.discussion_blackouts = [(t.isoformat(), t2.isoformat()) for t, t2 in times2]
+        self.set_blackout_dates(times2)
+        self.assertFalse(self.course.forum_posts_allowed)
+
+        # Single date set for allowed forum posts.
+        self.course.discussion_blackouts = [
+            now + datetime.timedelta(days=24),
+            now + datetime.timedelta(days=30)
+        ]
+        self.assertTrue(self.course.forum_posts_allowed)
+
+        # Single date set for restricted forum posts.
+        self.course.discussion_blackouts = [
+            now - datetime.timedelta(days=24),
+            now + datetime.timedelta(days=30)
+        ]
         self.assertFalse(self.course.forum_posts_allowed)
 
         # test if user gives empty blackout date it should return true for forum_posts_allowed
