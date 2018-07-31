@@ -2,6 +2,8 @@
 restAPI Views
 """
 import logging
+import mimetypes
+
 import requests
 from celery.result import AsyncResult
 from datetime import datetime
@@ -184,8 +186,10 @@ def download_pdf_file(request):
     page_url = request.GET.get("page_url", None)
     if page_url:
         filename = page_url.split("/")[-1]
+        filename = filename.replace(" ", "_")
         result = urllib.urlopen(page_url)
         response = HttpResponse(FileWrapper(result.fp), content_type='application/pdf')
+        response['Content-Length'] = result.headers['content-length']
         response['Content-Disposition'] = "attachment; filename={}".format(filename)
         return response
     else:
