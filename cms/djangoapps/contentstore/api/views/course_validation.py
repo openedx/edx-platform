@@ -9,6 +9,7 @@ from pytz import UTC
 from contentstore.course_info_model import get_course_updates
 from contentstore.views.certificates import CertificateManager
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
+from xmodule.course_metadata_utils import DEFAULT_GRADING_POLICY
 from xmodule.modulestore.django import modulestore
 
 from .utils import get_bool_param, course_author_access_required
@@ -195,8 +196,10 @@ class CourseValidationView(DeveloperErrorViewMixin, GenericAPIView):
         )
 
     def _grades_validation(self, course):
+        has_grading_policy = self._has_grading_policy(course)
         sum_of_weights = course.grader.sum_of_weights
         return dict(
+            has_grading_policy=has_grading_policy,
             sum_of_weights=sum_of_weights,
         )
 
@@ -276,3 +279,48 @@ class CourseValidationView(DeveloperErrorViewMixin, GenericAPIView):
 
     def _has_start_date(self, course):
         return not course.start_date_is_still_default
+
+    def _has_grading_policy(self, course):
+        grading_policy_formatted = {}
+        default_grading_policy_formatted = {}
+
+        for grader, assignment_type, weight in course.grader.subgraders:
+            grading_policy_formatted[assignment_type] = {
+                'type': assignment_type,
+                'short_label': grader.short_label,
+                'min_count': grader.min_count,
+                'drop_count': grader.drop_count,
+                'weight': weight,
+            }
+
+        # the default grading policy Lab assignment type does not have a short-label,
+        # but courses with the default grading policy do return a short-label for Lab
+        # assignments, so we ignore the Lab short-label
+        if 'Lab' in grading_policy_formatted:
+            grading_policy_formatted['Lab'].pop('short_label')
+
+        for assignment in DEFAULT_GRADING_POLICY['GRADER']:
+            default_assignment_grading_policy_formatted = {
+                'type': assignment['type'],
+                'min_count': assignment['min_count'],
+                'drop_count': assignment['drop_count'],
+                'weight': assignment['weight'],
+            }
+
+            # the default grading policy Lab assignment type does not have a short-label, so only
+            # add short_label to dictionary when the assignment has one
+            if 'short_label' in assignment:
+                default_assignment_grading_policy_formatted['short_label'] = assignment['short_label']
+
+            default_grading_policy_formatted[assignment['type']] = default_assignment_grading_policy_formatted
+
+        # check for equality
+        if len(grading_policy_formatted) != len(default_grading_policy_formatted):
+            return True
+        else:
+            for assignment_type in grading_policy_formatted:
+                if (assignment_type not in default_grading_policy_formatted or
+                        grading_policy_formatted[assignment_type] != default_grading_policy_formatted[assignment_type]):
+                    return True
+
+        return False

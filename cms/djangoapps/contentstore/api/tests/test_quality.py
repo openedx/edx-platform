@@ -13,7 +13,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 class CourseQualityViewTest(SharedModuleStoreTestCase, APITestCase):
     """
-    Test importing courses via a RESTful API (POST method only)
+    Test course quality view via a RESTful API
     """
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
