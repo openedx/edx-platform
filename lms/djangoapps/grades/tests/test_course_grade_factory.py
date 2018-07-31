@@ -1,8 +1,6 @@
 import itertools
-from nose.plugins.attrib import attr
 
 import ddt
-import django
 from courseware.access import has_access
 from django.conf import settings
 from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
@@ -240,13 +238,13 @@ class TestCourseGradeFactory(GradeTestBase):
         self.assertEqual(expected_summary, actual_summary)
 
 
-@attr(shard=1)
 class TestGradeIteration(SharedModuleStoreTestCase):
     """
     Test iteration through student course grades.
     """
     COURSE_NUM = "1000"
     COURSE_NAME = "grading_test_course"
+    shard = 1
 
     @classmethod
     def setUpClass(cls):

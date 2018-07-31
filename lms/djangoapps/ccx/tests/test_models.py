@@ -5,7 +5,6 @@ import json
 from datetime import datetime, timedelta
 
 import ddt
-from nose.plugins.attrib import attr
 from pytz import utc
 
 from student.roles import CourseCcxCoachRole
@@ -18,12 +17,12 @@ from .factories import CcxFactory
 
 
 @ddt.ddt
-@attr(shard=7)
 class TestCCX(ModuleStoreTestCase):
     """Unit tests for the CustomCourseForEdX model
     """
 
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+    shard = 7
 
     def setUp(self):
         """common setup for all tests"""

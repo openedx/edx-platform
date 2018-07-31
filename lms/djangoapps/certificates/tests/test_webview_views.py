@@ -11,7 +11,6 @@ from django.conf import settings
 from django.urls import reverse
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
-from django.utils import translation
 from mock import patch
 
 import ddt
@@ -38,7 +37,6 @@ from lms.djangoapps.badges.tests.factories import (
     CourseCompleteImageConfigurationFactory
 )
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
-from nose.plugins.attrib import attr
 from openedx.core.djangoapps.certificates.config import waffle
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.lib.tests.assertions.events import assert_event_matches
@@ -242,12 +240,12 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
         template.save()
 
 
-@attr(shard=1)
 @ddt.ddt
 class CertificatesViewsTests(CommonCertificatesTestCase):
     """
     Tests for the certificates web/html views
     """
+    shard = 1
 
     def setUp(self):
         super(CertificatesViewsTests, self).setUp()
@@ -1711,11 +1709,12 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         )
 
 
-@attr(shard=1)
 class CertificateEventTests(CommonCertificatesTestCase, EventTrackingTestCase):
     """
     Test events emitted by certificate handling.
     """
+    shard = 1
+
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_certificate_evidence_event_emitted(self):
         self.client.logout()

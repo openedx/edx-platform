@@ -5,7 +5,6 @@ import ddt
 from completion import waffle as completion_waffle
 from milestones import api as milestones_api
 from milestones.tests.utils import MilestonesTestCaseMixin
-from nose.plugins.attrib import attr
 
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
@@ -19,13 +18,14 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
-@attr(shard=3)
 @ddt.ddt
 class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
     """
     Base TestCase class for setting up a basic course structure
     and testing the gating feature
     """
+    shard = 3
+
     @classmethod
     def setUpClass(cls):
         super(TestGatedContent, cls).setUpClass()

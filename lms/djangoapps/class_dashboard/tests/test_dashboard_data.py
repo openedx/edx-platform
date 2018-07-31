@@ -7,7 +7,6 @@ import json
 from django.urls import reverse
 from django.test.client import RequestFactory
 from mock import patch
-from nose.plugins.attrib import attr
 from six import text_type
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
@@ -32,11 +31,12 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 USER_COUNT = 11
 
 
-@attr(shard=6)
 class TestGetProblemGradeDistribution(SharedModuleStoreTestCase):
     """
     Tests related to class_dashboard/dashboard_data.py
     """
+    shard = 6
+
     @classmethod
     def setUpClass(cls):
         super(TestGetProblemGradeDistribution, cls).setUpClass()

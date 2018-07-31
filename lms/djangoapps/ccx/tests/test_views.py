@@ -15,7 +15,6 @@ from django.test.utils import override_settings
 from pytz import UTC
 from django.utils.translation import ugettext as _
 from mock import MagicMock, patch
-from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
@@ -38,6 +37,7 @@ from lms.djangoapps.grades.tasks import compute_all_grades_for_course
 from lms.djangoapps.instructor.access import allow_access, list_with_level
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.request_cache.middleware import RequestCache
+from openedx.core.lib.tests import attr
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory

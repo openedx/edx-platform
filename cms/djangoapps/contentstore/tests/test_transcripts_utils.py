@@ -8,11 +8,11 @@ import textwrap
 import unittest
 from uuid import uuid4
 
+import pytest
 from django.conf import settings
 from django.test.utils import override_settings
 from django.utils import translation
 from mock import Mock, patch
-from nose.plugins.skip import SkipTest
 from six import text_type
 
 from contentstore.tests.utils import mock_requests_get
@@ -267,9 +267,9 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
     def test_success_downloading_chinese_transcripts(self):
 
         # Disabled 11/14/13
-        # This test is flakey because it performs an HTTP request on an external service
+        # This test is flaky because it performs an HTTP request on an external service
         # Re-enable when `requests.get` is patched using `mock.patch`
-        raise SkipTest
+        pytest.skip()
 
         good_youtube_sub = 'j_jEn79vS3g'  # Chinese, utf-8
         self.clear_sub_content(good_youtube_sub)

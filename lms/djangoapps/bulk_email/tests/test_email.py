@@ -16,7 +16,6 @@ from django.test.utils import override_settings
 from django.utils.translation import get_language
 from markupsafe import escape
 from mock import Mock, patch
-from nose.plugins.attrib import attr
 
 from bulk_email.models import BulkEmailFlag, Optout
 from bulk_email.tasks import _get_course_email_context, _get_source_address
@@ -26,6 +25,7 @@ from enrollment.api import update_enrollment
 from lms.djangoapps.instructor_task.subtasks import update_subtask_status
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
 from openedx.core.djangoapps.course_groups.models import CourseCohort
+from openedx.core.lib.tests import attr
 from student.models import CourseEnrollment
 from student.roles import CourseStaffRole
 from student.tests.factories import CourseEnrollmentFactory, UserFactory

@@ -4,12 +4,10 @@ import json
 
 import ddt
 import mock
-import pytest
 
 from django.urls import reverse
 from django.test import RequestFactory, TestCase
 from mock import Mock, patch
-from nose.plugins.attrib import attr
 from pytz import UTC
 from six import text_type
 
@@ -40,6 +38,7 @@ from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory, config_course_cohorts
 from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
+from openedx.core.lib.tests import attr
 from student.roles import CourseStaffRole
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum

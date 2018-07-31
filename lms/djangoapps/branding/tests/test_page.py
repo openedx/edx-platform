@@ -11,13 +11,13 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
-from nose.plugins.attrib import attr
 from pytz import UTC
 
 from branding.views import index
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
+from openedx.core.lib.tests import attr
 from util.milestones_helpers import set_prerequisite_courses
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory

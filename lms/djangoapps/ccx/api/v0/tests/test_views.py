@@ -16,7 +16,6 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.urls import Resolver404, resolve, reverse
 from django.utils.timezone import now
-from nose.plugins.attrib import attr
 from oauth2_provider import models as dot_models
 from opaque_keys.edx.keys import CourseKey
 from provider.constants import CONFIDENTIAL
@@ -161,13 +160,13 @@ class CcxRestApiTest(CcxTestCase, APITestCase):
         self.assertEqual(expected_field_errors, resp_dict_error)
 
 
-@attr(shard=9)
 @ddt.ddt
 class CcxListTest(CcxRestApiTest):
     """
     Test for the CCX REST APIs
     """
     ENABLED_SIGNALS = ['course_published']
+    shard = 9
 
     @classmethod
     def setUpClass(cls):
@@ -872,13 +871,13 @@ class CcxListTest(CcxRestApiTest):
             self.assertEqual(course_user, ccx_user)
 
 
-@attr(shard=9)
 @ddt.ddt
 class CcxDetailTest(CcxRestApiTest):
     """
     Test for the CCX REST APIs
     """
     ENABLED_SIGNALS = ['course_published']
+    shard = 9
 
     def setUp(self):
         """

@@ -5,7 +5,6 @@ import json
 import ddt
 import mock
 from django.urls import reverse
-from nose.plugins.attrib import attr
 
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
@@ -27,10 +26,10 @@ class UserMixin(object):
         self.client.login(username=self.user.username, password='test')
 
 
-@attr(shard=1)
 @ddt.ddt
 class ReceiptViewTests(UserMixin, ModuleStoreTestCase):
     """ Tests for the receipt view. """
+    shard = 1
 
     def setUp(self):
         """

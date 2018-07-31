@@ -7,7 +7,6 @@ from pytz import UTC
 from django.conf import settings
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import patch
-from nose.plugins.attrib import attr
 
 from badges.tests.factories import CourseCompleteImageConfigurationFactory
 from lms.djangoapps.certificates.models import (
@@ -24,12 +23,12 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=1)
 @ddt
 class CertificatesModelTest(ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
     Tests for the GeneratedCertificate model
     """
+    shard = 1
 
     def setUp(self):
         super(CertificatesModelTest, self).setUp()

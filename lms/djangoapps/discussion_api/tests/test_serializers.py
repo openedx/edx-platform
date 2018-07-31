@@ -8,7 +8,6 @@ import ddt
 import httpretty
 import mock
 from django.test.client import RequestFactory
-from nose.plugins.attrib import attr
 
 from discussion_api.serializers import CommentSerializer, ThreadSerializer, get_context
 from discussion_api.tests.utils import CommentsServiceMockMixin, make_minimal_cs_comment, make_minimal_cs_thread
@@ -23,6 +22,7 @@ from django_comment_common.models import (
 from lms.lib.comment_client.comment import Comment
 from lms.lib.comment_client.thread import Thread
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
+from openedx.core.lib.tests import attr
 from student.tests.factories import UserFactory
 from util.testing import UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum

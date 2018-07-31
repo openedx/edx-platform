@@ -6,7 +6,6 @@ import urlparse
 from contextlib import contextmanager
 from datetime import datetime
 from unittest import skipUnless
-import mock
 
 import ddt
 import jwt
@@ -18,7 +17,6 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from edx_oauth2_provider.tests.factories import ClientFactory
 from mock import MagicMock, patch
-from nose.plugins.attrib import attr
 from provider.oauth2.models import Client
 
 from courseware.model_data import FieldDataCache
@@ -30,6 +28,7 @@ from edxnotes.decorators import edxnotes
 from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 from edxnotes.plugins import EdxNotesTab
 from openedx.core.djangoapps.user_api.models import RetirementState, UserRetirementStatus
+from openedx.core.lib.tests import attr
 from openedx.core.lib.token_utils import JwtBuilder
 from student.tests.factories import CourseEnrollmentFactory, SuperuserFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum

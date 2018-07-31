@@ -4,7 +4,6 @@ Tests for the badges API views.
 from ddt import data, ddt, unpack
 from django.conf import settings
 from django.test.utils import override_settings
-from nose.plugins.attrib import attr
 
 from badges.tests.factories import BadgeAssertionFactory, BadgeClassFactory, RandomBadgeClassFactory
 from openedx.core.lib.api.test_utils import ApiTestCase
@@ -152,12 +151,12 @@ class TestUserCourseBadgeAssertions(UserAssertionTestCase):
         self.check_assertion_structure(assertion, response['results'][0])
 
 
-@attr(shard=3)
 @ddt
 class TestUserBadgeAssertionsByClass(UserAssertionTestCase):
     """
     Test the Badge Assertions view with the badge class filter.
     """
+    shard = 3
 
     @unpack
     @data((False, False), (True, False), (True, True))

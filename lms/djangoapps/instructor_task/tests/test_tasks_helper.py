@@ -27,7 +27,6 @@ from django.test.utils import override_settings
 from freezegun import freeze_time
 from instructor_analytics.basic import UNAVAILABLE, list_problem_responses
 from mock import MagicMock, Mock, patch, ANY
-from nose.plugins.attrib import attr
 from pytz import UTC
 from shoppingcart.models import (
     Coupon,
@@ -1004,12 +1003,11 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         ])
 
 
-@attr(shard=3)
 class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent, InstructorTaskModuleTestCase):
     """
     Test the problem report on a course that has split tests.
     """
-
+    shard = 3
     OPTION_1 = 'Option 1'
     OPTION_2 = 'Option 2'
 
@@ -2122,13 +2120,13 @@ class TestGradeReportEnrollmentAndCertificateInfo(TestReportMixin, InstructorTas
         self._verify_csv_data(user.username, expected_output)
 
 
-@attr(shard=3)
 @ddt.ddt
 @override_settings(CERT_QUEUE='test-queue')
 class TestCertificateGeneration(InstructorTaskModuleTestCase):
     """
     Test certificate generation task works.
     """
+    shard = 3
 
     ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
 

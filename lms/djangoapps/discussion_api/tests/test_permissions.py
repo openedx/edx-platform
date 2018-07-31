@@ -4,7 +4,6 @@ Tests for discussion API permission logic
 import itertools
 
 import ddt
-from nose.plugins.attrib import attr
 
 from discussion_api.permissions import (
     can_delete,
@@ -15,6 +14,7 @@ from discussion_api.permissions import (
 from lms.lib.comment_client.comment import Comment
 from lms.lib.comment_client.thread import Thread
 from lms.lib.comment_client.user import User
+from openedx.core.lib.tests import attr
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
