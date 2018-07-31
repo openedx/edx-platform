@@ -2,7 +2,6 @@
 restAPI Views
 """
 import logging
-
 import requests
 from celery.result import AsyncResult
 from datetime import datetime
