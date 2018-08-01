@@ -35,7 +35,7 @@ pycodestyle               # Checker for compliance with the Python style guide (
 polib                     # Library for manipulating gettext translation files, used to test paver i18n commands
 pyquery                   # jQuery-like API for retrieving fragments of HTML and XML files in tests
 pysqlite                  # DB-API 2.0 interface for SQLite 3.x (used as the relational database for most tests)
-pytest                    # Testing framework
+pytest==3.6.3             # Testing framework # Pinned due to https://github.com/pytest-dev/pytest/issues/3749
 pytest-attrib             # Select tests based on attributes
 pytest-cov                # pytest plugin for measuring code coverage
 pytest-django==3.1.2      # Django support for pytest

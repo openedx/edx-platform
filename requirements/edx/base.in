@@ -70,7 +70,7 @@ edx-ccx-keys
 edx-celeryutils
 edx-completion
 edx-django-release-util             # Release utils for the edx release pipeline
-edx-drf-extensions
+edx-drf-extensions==1.5.2          # Pinning as this is causing various test failures due to query count and content changes.
 edx-django-oauth2-provider==1.3.4
 edx-django-sites-extensions==2.3.1
 edx-enterprise
@@ -82,7 +82,7 @@ edx-rest-api-client
 edx-search
 edx-submissions
 edx-user-state-client
-edxval
+edxval==0.1.17                      # Pin because the newer version causes test failures.
 enum34==1.1.6                       # Backport of Enum from Python 3.4+
 event-tracking
 feedparser==5.1.3
