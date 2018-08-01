@@ -531,8 +531,8 @@ MIDDLEWARE_CLASSES = [
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
 ]
 
-# Clickjacking protection can be enabled by setting this to 'DENY'
-X_FRAME_OPTIONS = 'ALLOW'
+# Clickjacking protection can be disabled by setting this to 'ALLOW'
+X_FRAME_OPTIONS = 'DENY'
 
 # Platform for Privacy Preferences header
 P3P_HEADER = 'CP="Open EdX does not have a P3P policy."'
