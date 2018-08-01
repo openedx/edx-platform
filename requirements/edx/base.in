@@ -33,7 +33,7 @@ botocore==1.8.17                    # via boto3, s3transfer
 celery==3.1.25                      # Asynchronous task execution library
 ddt==0.8.0                          # via xblock-drag-and-drop-v2 (which probably shouldn't require it)
 defusedxml==0.4.1                   # XML bomb protection for common XML parsers
-Django==1.11.14                     # Web application framework
+Django==1.11.15                     # Web application framework
 django-babel-underscore             # underscore template extractor for django-babel (internationalization utilities)
 django-config-models                # Configuration models for Django allowing config management with auditing
 django-cors-headers==2.1.0          # Used to allow to configure CORS headers for cross-domain requests
@@ -70,7 +70,7 @@ edx-ccx-keys
 edx-celeryutils
 edx-completion
 edx-django-release-util             # Release utils for the edx release pipeline
-edx-drf-extensions
+edx-drf-extensions==1.5.2          # Pinning as this is causing various test failures due to query count and content changes.
 edx-django-oauth2-provider==1.3.4
 edx-django-sites-extensions==2.3.1
 edx-enterprise
@@ -82,7 +82,7 @@ edx-rest-api-client
 edx-search
 edx-submissions
 edx-user-state-client
-edxval
+edxval==0.1.17                      # Pin because the newer version causes test failures.
 enum34==1.1.6                       # Backport of Enum from Python 3.4+
 event-tracking
 feedparser==5.1.3
