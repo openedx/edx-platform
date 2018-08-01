@@ -13,7 +13,6 @@ import ddt
 from celery.states import FAILURE, SUCCESS
 from django.utils.translation import ugettext_noop
 from mock import MagicMock, Mock, patch
-from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import i4xEncoder
 
 from course_modes.models import CourseMode
@@ -32,6 +31,7 @@ from lms.djangoapps.instructor_task.tasks import (
 from lms.djangoapps.instructor_task.tasks_helper.misc import upload_ora2_data
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from lms.djangoapps.instructor_task.tests.test_base import InstructorTaskModuleTestCase
+from openedx.core.lib.tests import attr
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 PROBLEM_URL_NAME = "test_urlname"

@@ -27,7 +27,6 @@ from celery.states import FAILURE, SUCCESS  # pylint: disable=no-name-in-module,
 from django.conf import settings
 from django.core.management import call_command
 from mock import Mock, patch
-from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
 
 from bulk_email.models import SEND_TO_LEARNERS, SEND_TO_MYSELF, SEND_TO_STAFF, CourseEmail, Optout
@@ -73,10 +72,10 @@ def my_update_subtask_status(entry_id, current_task_id, new_subtask_status):
         update_subtask_status(entry_id, current_task_id, new_subtask_status)
 
 
-@attr(shard=5)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
     """Tests instructor task that send bulk email."""
+    shard = 5
 
     def setUp(self):
         super(TestBulkEmailInstructorTask, self).setUp()

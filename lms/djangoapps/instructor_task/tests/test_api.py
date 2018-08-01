@@ -3,7 +3,6 @@ Test for LMS instructor background task queue management
 """
 import ddt
 from mock import MagicMock, Mock, patch
-from nose.plugins.attrib import attr
 
 from bulk_email.models import SEND_TO_LEARNERS, SEND_TO_MYSELF, SEND_TO_STAFF, CourseEmail
 from lms.djangoapps.certificates.models import CertificateGenerationHistory, CertificateStatuses
@@ -89,10 +88,10 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
         self.assertEquals(set(task_ids), set())
 
 
-@attr(shard=3)
 @ddt.ddt
 class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
     """Tests API methods that involve the submission of module-based background tasks."""
+    shard = 3
 
     def setUp(self):
         super(InstructorTaskModuleSubmitTest, self).setUp()
@@ -211,10 +210,10 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
             task_function(self.create_task_request(self.instructor), location, **params)
 
 
-@attr(shard=3)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCase):
     """Tests API methods that involve the submission of course-based background tasks."""
+    shard = 3
 
     def setUp(self):
         super(InstructorTaskCourseSubmitTest, self).setUp()

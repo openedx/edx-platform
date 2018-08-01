@@ -2,7 +2,6 @@
 Tests for the django comment client integration models
 """
 from django.test.testcases import TestCase
-from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 
 import django_comment_common.models as models
@@ -10,12 +9,12 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, 
 from xmodule.modulestore.tests.factories import ToyCourseFactory
 
 
-@attr(shard=1)
 class RoleClassTestCase(ModuleStoreTestCase):
     """
     Tests for roles of the comment client service integration
     """
     MODULESTORE = TEST_DATA_MIXED_MODULESTORE
+    shard = 1
 
     def setUp(self):
         super(RoleClassTestCase, self).setUp()
@@ -52,11 +51,12 @@ class RoleClassTestCase(ModuleStoreTestCase):
         self.TA_role_2.inherit_permissions(self.TA_role)
 
 
-@attr(shard=1)
 class PermissionClassTestCase(TestCase):
     """
     Tests for permissions of the comment client service integration
     """
+    shard = 1
+
     def setUp(self):
         super(PermissionClassTestCase, self).setUp()
         self.permission = models.Permission.objects.get_or_create(name="test")[0]

@@ -11,7 +11,6 @@ import httpretty
 import mock
 from django.core.exceptions import ValidationError
 from django.test.client import RequestFactory
-from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
 from pytz import UTC
 from rest_framework.exceptions import PermissionDenied
@@ -50,6 +49,7 @@ from django_comment_common.models import (
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.lib.exceptions import CourseNotFoundError, PageNotFoundError
+from openedx.core.lib.tests import attr
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum

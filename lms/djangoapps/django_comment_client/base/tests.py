@@ -6,14 +6,12 @@ import mock
 from contextlib import contextmanager
 
 import ddt
-import pytest
 from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.urls import reverse
 from django.test.client import RequestFactory
 from eventtracking.processors.exceptions import EventEmissionExit
 from mock import ANY, Mock, patch
-from nose.plugins.attrib import attr
 from nose.tools import assert_equal, assert_true
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
@@ -41,6 +39,7 @@ from lms.lib.comment_client import Thread
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
+from openedx.core.lib.tests import attr
 from student.roles import CourseStaffRole, UserBasedRole
 from student.tests.factories import CourseAccessRoleFactory, CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin

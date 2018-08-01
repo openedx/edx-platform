@@ -14,7 +14,6 @@ from django.test.utils import override_settings
 from django.utils import timezone
 from freezegun import freeze_time
 from mock import patch
-from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
 import pytz
 
@@ -33,6 +32,7 @@ from course_modes.tests.factories import CourseModeFactory
 from courseware.tests.factories import GlobalStaffFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from microsite_configuration import microsite
+from openedx.core.lib.tests import attr
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from util.testing import EventTestMixin

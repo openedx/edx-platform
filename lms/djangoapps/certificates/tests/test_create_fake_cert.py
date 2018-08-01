@@ -3,7 +3,6 @@
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase
-from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
 from six import text_type
 
@@ -11,10 +10,9 @@ from lms.djangoapps.certificates.models import GeneratedCertificate
 from student.tests.factories import UserFactory
 
 
-@attr(shard=1)
 class CreateFakeCertTest(TestCase):
     """Tests for the create_fake_certs management command. """
-
+    shard = 1
     USERNAME = "test"
     COURSE_KEY = CourseLocator(org='edX', course='DemoX', run='Demo_Course')
 

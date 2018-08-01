@@ -7,7 +7,6 @@ from django.core import mail
 from django.core.management import call_command
 from django.urls import reverse
 from mock import Mock, patch
-from nose.plugins.attrib import attr
 from six import text_type
 
 from bulk_email.models import BulkEmailFlag, Optout
@@ -17,12 +16,13 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=1)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class TestOptoutCourseEmailsBySignal(ModuleStoreTestCase):
     """
     Tests that the force_optout_all signal receiver opts the user out of course emails
     """
+    shard = 1
+
     def setUp(self):
         super(TestOptoutCourseEmailsBySignal, self).setUp()
         self.course = CourseFactory.create(run='testcourse1', display_name="Test Course Title")

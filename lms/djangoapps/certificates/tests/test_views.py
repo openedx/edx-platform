@@ -10,7 +10,6 @@ from django.core.cache import cache
 from django.urls import reverse
 from django.test.client import Client
 from django.test.utils import override_settings
-from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
 
 from lms.djangoapps.certificates.api import get_certificate_url
@@ -37,10 +36,10 @@ FEATURES_WITH_CUSTOM_CERTS_ENABLED = {
 FEATURES_WITH_CUSTOM_CERTS_ENABLED.update(FEATURES_WITH_CERTS_ENABLED)
 
 
-@attr(shard=1)
 @ddt.ddt
 class UpdateExampleCertificateViewTest(CacheIsolationTestCase):
     """Tests for the XQueue callback that updates example certificates. """
+    shard = 1
 
     COURSE_KEY = CourseLocator(org='test', course='test', run='test')
 
@@ -181,11 +180,12 @@ class UpdateExampleCertificateViewTest(CacheIsolationTestCase):
         self.assertEqual(content['return_code'], 0)
 
 
-@attr(shard=1)
 class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
     """
     Tests for the microsite certificates web/html views
     """
+    shard = 1
+
     def setUp(self):
         super(MicrositeCertificatesViewsTests, self).setUp()
         self.client = Client()

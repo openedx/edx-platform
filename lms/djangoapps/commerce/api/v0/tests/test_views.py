@@ -11,8 +11,6 @@ from django.conf import settings
 from django.urls import reverse, reverse_lazy
 from django.test import TestCase
 from django.test.utils import override_settings
-from edx_rest_api_client import exceptions
-from nose.plugins.attrib import attr
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
@@ -36,12 +34,13 @@ UTM_COOKIE_CONTENTS = {
 }
 
 
-@attr(shard=1)
 @ddt.ddt
 class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase):
     """
     Tests for the commerce Baskets view.
     """
+    shard = 1
+
     def _post_to_view(self, course_id=None, marketing_email_opt_in=False, include_utm_cookie=False):
         """
         POST to the view being tested.
@@ -280,12 +279,12 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         self.assertEqual(self._post_to_view().status_code, 406)
 
 
-@attr(shard=1)
 class BasketOrderViewTests(UserMixin, TestCase):
     """ Tests for the basket order view. """
     view_name = 'commerce_api:v0:baskets:retrieve_order'
     MOCK_ORDER = {'number': 1}
     path = reverse_lazy(view_name, kwargs={'basket_id': 1})
+    shard = 1
 
     def setUp(self):
         super(BasketOrderViewTests, self).setUp()

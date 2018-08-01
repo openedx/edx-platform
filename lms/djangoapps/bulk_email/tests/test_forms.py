@@ -3,7 +3,6 @@
 Unit tests for bulk-email-related forms.
 """
 
-from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
 from six import text_type
 
@@ -13,9 +12,9 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=1)
 class CourseAuthorizationFormTest(ModuleStoreTestCase):
     """Test the CourseAuthorizationAdminForm form for Mongo-backed courses."""
+    shard = 1
 
     def setUp(self):
         super(CourseAuthorizationFormTest, self).setUp()

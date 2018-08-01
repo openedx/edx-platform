@@ -10,7 +10,6 @@ import pytz
 from django.test import TestCase
 from django.test.utils import override_settings
 from mock import Mock, patch
-from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
 
 # It is really unfortunate that we are using the XQueue client
@@ -31,10 +30,10 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @ddt.ddt
-@attr(shard=1)
 @override_settings(CERT_QUEUE='certificates')
 class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
     """Test the "add to queue" operation of the XQueue interface. """
+    shard = 1
 
     def setUp(self):
         super(XQueueCertInterfaceAddCertificateTest, self).setUp()
@@ -279,10 +278,10 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
         )
 
 
-@attr(shard=1)
 @override_settings(CERT_QUEUE='certificates')
 class XQueueCertInterfaceExampleCertificateTest(TestCase):
     """Tests for the XQueue interface for certificate generation. """
+    shard = 1
 
     COURSE_KEY = CourseLocator(org='test', course='test', run='test')
 

@@ -11,7 +11,6 @@ import ddt
 import httpretty
 import mock
 from django.urls import reverse
-from nose.plugins.attrib import attr
 from pytz import UTC
 from rest_framework.parsers import JSONParser
 from rest_framework.test import APIClient
@@ -29,6 +28,7 @@ from discussion_api.tests.utils import (
 from django_comment_client.tests.utils import ForumsEnableMixin
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_storage
 from openedx.core.djangoapps.user_api.models import RetirementState, UserRetirementStatus
+from openedx.core.lib.tests import attr
 from openedx.core.lib.token_utils import JwtBuilder
 from student.models import get_retired_username_by_username
 from student.tests.factories import CourseEnrollmentFactory, UserFactory, SuperuserFactory
