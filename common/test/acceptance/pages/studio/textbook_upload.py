@@ -81,3 +81,69 @@ class TextbookUploadPage(CoursePage):
         self.set_input_field_value('.edit-textbook #textbook-name-input', 'book_1')
         self.set_input_field_value('.edit-textbook #chapter1-name', 'chap_1')
         self.click_textbook_submit_button()
+
+    def set_textbook_name(self, textbook_name):
+        """
+        Set the name of textbook.
+        """
+        self.open_add_textbook_form()
+        self.set_input_field_value('.edit-textbook #textbook-name-input', textbook_name)
+
+    def fill_chapter_name(self, ordinal, chapter_name):
+        """
+        Adds chapter name by taking the ordinal of the chapter.
+        """
+        index = ["first", "second", "third"].index(ordinal)
+        self.set_input_field_value('.textbook .chapter{i} input.chapter-name'.format(i=index + 1), chapter_name)
+
+    def fill_chapter_asset(self, ordinal, chapter_asset):
+        """
+        Adds chapter asset by taking the ordinal of the chapter.
+        """
+        index = ["first", "second", "third"].index(ordinal)
+        self.set_input_field_value('.textbook .chapter{i} input.chapter-asset-path'.format(i=index + 1), chapter_asset)
+
+    def submit_chapter(self):
+        """
+        Click on Add Chapter button.
+        """
+        self.q(css='.action.action-add-chapter').first.click()
+
+    @property
+    def textbook_name(self):
+        """
+        Gets the name of a saved textbook.
+        """
+        return self.q(css='.textbook-title').text[0]
+
+    def get_chapter_name(self, index):
+        """
+        Gets the name of chapter by taking an ordinal.
+        """
+        return self.q(css='.chapter-name').text[index]
+
+    def get_asset_name(self, index):
+        """
+        Gets the name of chapter asset by taking an ordinal.
+        """
+        return self.q(css='.chapter-asset-path').text[index]
+
+    def toggle_chapters(self):
+        """
+        Toggle saved chapters.
+        """
+        self.q(css='.chapter-toggle.show-chapters').click()
+
+    @property
+    def number_of_chapters(self):
+        """
+        Gets the total number of saved chapters.
+        """
+        return len(self.q(css='.chapter').results)
+
+    def refresh_and_wait_for_load(self):
+        """
+        Refresh the page and wait for all resources to load.
+        """
+        self.browser.refresh()
+        self.wait_for_page()
