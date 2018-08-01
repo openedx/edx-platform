@@ -557,6 +557,7 @@ class AccountRetirementPartnerReportView(ViewSet):
 
         retirements = [
             {
+                'user_id': retirement.user.pk,
                 'original_username': retirement.original_username,
                 'original_email': retirement.original_email,
                 'original_name': retirement.original_name,

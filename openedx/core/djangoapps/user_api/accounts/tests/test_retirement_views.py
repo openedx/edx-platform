@@ -545,6 +545,7 @@ class TestPartnerReportingList(ModuleStoreTestCase):
         have changed and clients of this endpoint will need to be updates as well.
         """
         return {
+            'user_id': user.pk,
             'original_username': user.username,
             'original_email': user.email,
             'original_name': user.first_name + ' ' + user.last_name,
