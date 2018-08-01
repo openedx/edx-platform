@@ -4,7 +4,10 @@ from crum import get_current_request
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save, pre_save, post_delete, pre_delete
 from django.dispatch import receiver
+from requests.exceptions import ConnectionError
 
+from common.djangoapps.nodebb.tasks import (task_create_user_on_nodebb, task_update_user_profile_on_nodebb,
+    task_delete_user_on_nodebb)
 from common.lib.nodebb_client.client import NodeBBClient
 from lms.djangoapps.onboarding.helpers import COUNTRIES
 from certificates.models import GeneratedCertificate
@@ -18,6 +21,7 @@ from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED
 
 from student.models import ENROLL_STATUS_CHANGE, EnrollStatusChange, UserProfile, CourseEnrollment
 from xmodule.modulestore.django import modulestore
+
 
 
 log = getLogger(__name__)
@@ -75,15 +79,16 @@ def sync_user_info_with_nodebb(sender, instance, created, **kwargs):  # pylint: 
         data_to_sync = {
             "focus_area": FocusArea.objects.get(code=instance.focus_area).label if instance.focus_area else ""
         }
-
-    status_code, response_body = NodeBBClient().users.update_profile(user.username, kwargs=data_to_sync)
-    log_action_response(user, status_code, response_body)
-
+    try:
+        status_code, response_body = NodeBBClient().users.update_profile(user.username, kwargs=data_to_sync)
+        log_action_response(user, status_code, response_body)
+    except ConnectionError:
+        task_update_user_profile_on_nodebb(username=user.username, kwargs=data_to_sync)
 
 @receiver(post_save, sender=User, dispatch_uid='update_user_profile_on_nodebb')
 def update_user_profile_on_nodebb(sender, instance, created, **kwargs):
     """
-        Create user account at nodeBB when user created at edx Platform
+    Create/update user account at nodeBB when user created/updated at edx Platform
     """
     send_user_info_to_mailchimp(sender, instance, created, kwargs)
 
@@ -101,21 +106,22 @@ def update_user_profile_on_nodebb(sender, instance, created, **kwargs):
             'date_joined': instance.date_joined.strftime('%d/%m/%Y'),
         }
 
-        status_code, response_body = NodeBBClient().users.create(username=instance.username, kwargs=data_to_sync)
-        log_action_response(instance, status_code, response_body)
-
-        return status_code
-
+        try:
+            status_code, response_body = NodeBBClient().users.create(username=instance.username, kwargs=data_to_sync)
+            log_action_response(instance, status_code, response_body)
+            return status_code
+        except ConnectionError:
+            task_create_user_on_nodebb(username=instance.username, kwargs=data_to_sync)
     else:
         data_to_sync = {
             'first_name': instance.first_name,
             'last_name': instance.last_name
         }
-        status_code, response_body = NodeBBClient().users.update_profile(instance.username, kwargs=data_to_sync)
-        log_action_response(instance, status_code, response_body)
-
-
-
+        try:
+            status_code, response_body = NodeBBClient().users.update_profile(instance.username, kwargs=data_to_sync)
+            log_action_response(instance, status_code, response_body)
+        except ConnectionError:
+            task_update_user_profile_on_nodebb(username=instance.username, kwargs=data_to_sync)
 
 @receiver(post_delete, sender=User)
 def delete_user_from_nodebb(sender, **kwargs):
@@ -123,10 +129,11 @@ def delete_user_from_nodebb(sender, **kwargs):
     Delete User from NodeBB when deleted at edx (either deleted via admin-panel OR user is under age)
     """
     instance = kwargs['instance']
-
-    status_code, response_body = NodeBBClient().users.delete_user(instance.username, kwargs={})
-    log_action_response(instance, status_code, response_body)
-
+    try:
+        status_code, response_body = NodeBBClient().users.delete_user(instance.username, kwargs={})
+        log_action_response(instance, status_code, response_body)
+    except:
+        task_delete_user_on_nodebb(username=instance.username, kwargs={})
 
 @receiver(pre_save, sender=User, dispatch_uid='activate_deactivate_user_on_nodebb')
 def activate_deactivate_user_on_nodebb(sender, instance, **kwargs):

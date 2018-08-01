@@ -2214,6 +2214,9 @@ INSTALLED_APPS = (
     # Dynamic FAQ page
     'lms.djangoapps.faq',
 
+    # User Sync App
+    'openedx.features.user_sync_service',
+
     # NodeBB
     'nodebb',
 

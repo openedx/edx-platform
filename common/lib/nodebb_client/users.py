@@ -1,3 +1,5 @@
+from requests.exceptions import ConnectionError
+
 from pynodebb.api.users import User
 
 
