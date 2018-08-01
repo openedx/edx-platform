@@ -1,5 +1,6 @@
 """Utilities for working with ID tokens."""
 import json
+import logging
 from time import time
 
 from django.conf import settings
@@ -7,7 +8,11 @@ from django.utils.functional import cached_property
 from jwkest import jwk
 from jwkest.jws import JWS
 
+from openedx.core.djangoapps import monitoring_utils
 from student.models import UserProfile, anonymous_id_for_user
+
+
+log = logging.getLogger(__name__)
 
 
 class JwtBuilder(object):
@@ -51,6 +56,8 @@ class JwtBuilder(object):
         """
         now = int(time())
         expires_in = expires_in or self.jwt_auth['JWT_EXPIRATION']
+        monitoring_utils.set_custom_metric('jwt_expires_in', expires_in)
+
         payload = {
             # TODO Consider getting rid of this claim since we don't use it.
             'aud': aud if aud else self.jwt_auth['JWT_AUDIENCE'],
@@ -105,6 +112,9 @@ class JwtBuilder(object):
     def encode(self, payload):
         """Encode the provided payload."""
         keys = jwk.KEYS()
+
+        monitoring_utils.set_custom_metric('jwt_asymmetric', self.asymmetric)
+        log.info("Using Asymmetric JWT: %s", self.asymmetric)
 
         if self.asymmetric:
             serialized_keypair = json.loads(self.jwt_auth['JWT_PRIVATE_SIGNING_JWK'])

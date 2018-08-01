@@ -562,6 +562,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         request.COOKIES[django_settings.EDXMKTG_USER_INFO_COOKIE_NAME] = json.dumps({
             'version': django_settings.EDXMKTG_USER_INFO_COOKIE_VERSION,
         })
+        request.COOKIES[django_settings.JWT_AUTH['JWT_AUTH_COOKIE']] = mock.MagicMock()
 
     # Actual tests, executed once per child.
 
