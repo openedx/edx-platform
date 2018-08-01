@@ -23,6 +23,7 @@ from django.utils.http import urlquote_plus
 from django.utils.text import slugify
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import cache_control
+from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from django.views.generic import View
@@ -1445,6 +1446,7 @@ def _track_successful_certificate_generation(user_id, course_id):  # pylint: dis
 
 @require_http_methods(["GET", "POST"])
 @ensure_valid_usage_key
+@xframe_options_exempt
 def render_xblock(request, usage_key_string, check_if_enrolled=True):
     """
     Returns an HttpResponse with HTML content for the xBlock with the given usage_key.
