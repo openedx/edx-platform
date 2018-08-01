@@ -3182,6 +3182,9 @@ JWT_AUTH = {
 
     'JWT_ISSUER': 'change-me',
     'JWT_AUDIENCE': 'change-me',
+
+    'JWT_AUTH_COOKIE': 'edx-jwt-cookie',
+    'JWT_AUTH_COOKIE_EXPIRATION': 300,  # in seconds
 }
 
 ################################ Settings for Microsites ################################
