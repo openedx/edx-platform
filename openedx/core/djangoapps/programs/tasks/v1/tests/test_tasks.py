@@ -301,16 +301,18 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         """
         Verify that a 429 error causes the task to fail and then retry.
         """
+        exception = exceptions.HttpClientError()
+        exception.response = mock.Mock(status_code=429)
         mock_get_completed_programs.return_value = [1, 2]
         mock_award_program_certificate.side_effect = self._make_side_effect(
-            [exceptions.HttpClientError('Client Error 429: http://example-endpoint/'), None]
+            [exception, None]
         )
 
         tasks.award_program_certificates.delay(self.student.username).get()
 
         self.assertEqual(mock_award_program_certificate.call_count, 3)
 
-    def test_no_retry_oncredentials_api_404_error(
+    def test_no_retry_on_credentials_api_404_error(
         self,
         mock_get_completed_programs,
         mock_get_certified_programs,  # pylint: disable=unused-argument
@@ -319,25 +321,31 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         """
         Verify that a 404 error causes the task to fail but there is no retry.
         """
+        exception = exceptions.HttpNotFoundError()
+        exception.response = mock.Mock(status_code=404)
         mock_get_completed_programs.return_value = [1, 2]
         mock_award_program_certificate.side_effect = self._make_side_effect(
-            [exceptions.HttpNotFoundError(), None]
+            [exception, None]
         )
 
         tasks.award_program_certificates.delay(self.student.username).get()
 
         self.assertEqual(mock_award_program_certificate.call_count, 2)
 
-    def test_no_retry_on_credentials_api_not_found_errors(
+    def test_no_retry_on_credentials_api_4XX_error(
         self,
         mock_get_completed_programs,
-        mock_get_certified_programs,
+        mock_get_certified_programs,  # pylint: disable=unused-argument
         mock_award_program_certificate,
     ):
+        """
+        Verify that other 4XX errors cause task to fail but there is no retry.
+        """
+        exception = exceptions.HttpClientError()
+        exception.response = mock.Mock(status_code=418)
         mock_get_completed_programs.return_value = [1, 2]
-        mock_get_certified_programs.side_effect = [[], [2]]
         mock_award_program_certificate.side_effect = self._make_side_effect(
-            [exceptions.HttpClientError('Client Error 418: http://example-endpoint/'), None]
+            [exception, None]
         )
 
         tasks.award_program_certificates.delay(self.student.username).get()
