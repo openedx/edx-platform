@@ -29,7 +29,6 @@ from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url
 from contentstore.views.videos import (
     _get_default_video_image_url,
-    validate_video_image,
     VIDEO_IMAGE_UPLOAD_ENABLED,
     WAFFLE_SWITCHES,
     TranscriptProvider
@@ -783,26 +782,6 @@ class VideoImageTestCase(VideoUploadTestBase, CourseTestCase):
         video_image_upload_url = self.get_url_for_course_key(self.course.id, {'edx_video_id': 'test1'})
         response = self.client.post(video_image_upload_url, {})
         self.verify_error_message(response, 'An image file is required.')
-
-    def test_invalid_image_file_info(self):
-        """
-        Test that when no file information is provided to validate_video_image, it gives proper error message.
-        """
-        error = validate_video_image({})
-        self.assertEquals(error, 'The image must have name, content type, and size information.')
-
-    def test_corrupt_image_file(self):
-        """
-        Test that when corrupt file is provided to validate_video_image, it gives proper error message.
-        """
-        with open(settings.MEDIA_ROOT + '/test-corrupt-image.png', 'w+') as file:
-            image_file = UploadedFile(
-                file,
-                content_type='image/png',
-                size=settings.VIDEO_IMAGE_SETTINGS['VIDEO_IMAGE_MIN_BYTES']
-            )
-            error = validate_video_image(image_file)
-            self.assertEquals(error, 'There is a problem with this image file. Try to upload a different file.')
 
     @override_switch(VIDEO_IMAGE_UPLOAD_ENABLED, True)
     def test_no_video_image(self):
