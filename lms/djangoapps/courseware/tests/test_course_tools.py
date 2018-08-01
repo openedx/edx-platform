@@ -6,7 +6,6 @@ import crum
 import datetime
 
 from mock import patch
-from nose.plugins.attrib import attr
 import pytz
 from django.test import RequestFactory
 
@@ -23,8 +22,8 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=3)
 class VerifiedUpgradeToolTest(SharedModuleStoreTestCase):
+    shard = 3
 
     @classmethod
     def setUpClass(cls):

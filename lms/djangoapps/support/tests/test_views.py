@@ -9,11 +9,9 @@ import re
 from datetime import datetime, timedelta
 
 import ddt
-import pytest
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.db.models import signals
-from nose.plugins.attrib import attr
 from pytz import UTC
 
 from common.test.utils import disable_signal
@@ -90,12 +88,12 @@ class SupportViewManageUserTests(SupportViewTestCase):
         self.assertEqual(test_user.has_usable_password(), False)
 
 
-@attr(shard=3)
 @ddt.ddt
 class SupportViewAccessTests(SupportViewTestCase):
     """
     Tests for access control of support views.
     """
+    shard = 3
 
     @ddt.data(*(
         (url_name, role, has_access)

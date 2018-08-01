@@ -7,7 +7,6 @@ from functools import partial
 from django.db import DatabaseError
 from django.test import TestCase
 from mock import Mock, patch
-from nose.plugins.attrib import attr
 from xblock.core import XBlock
 from xblock.exceptions import KeyValueMultiSaveError
 from xblock.fields import BlockScope, Scope, ScopeIds
@@ -27,6 +26,7 @@ from courseware.tests.factories import (
     course_id,
     location
 )
+from openedx.core.lib.tests import attr
 from student.tests.factories import UserFactory
 
 

@@ -3,7 +3,6 @@ Tests for wiki middleware.
 """
 
 from django.test.client import Client
-from nose.plugins.attrib import attr
 from wiki.models import URLPath
 
 from course_wiki.views import get_or_create_root
@@ -12,9 +11,9 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=1)
 class TestWikiAccessMiddleware(ModuleStoreTestCase):
     """Tests for WikiAccessMiddleware."""
+    shard = 1
 
     def setUp(self):
         """Test setup."""

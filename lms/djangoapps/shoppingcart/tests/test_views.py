@@ -21,7 +21,6 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from freezegun import freeze_time
 from mock import Mock, patch
-from nose.plugins.attrib import attr
 from pytz import UTC
 from six import text_type
 
@@ -70,13 +69,13 @@ render_mock = Mock(side_effect=mock_render_to_response)
 postpay_mock = Mock()
 
 
-@attr(shard=3)
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
 @ddt.ddt
 class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
     """
     Test shopping cart view under various states
     """
+    shard = 3
 
     @classmethod
     def setUpClass(cls):

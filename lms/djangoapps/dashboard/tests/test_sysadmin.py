@@ -15,7 +15,6 @@ from django.urls import reverse
 from django.test.client import Client
 from django.test.utils import override_settings
 from pytz import UTC
-from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
@@ -109,7 +108,6 @@ class SysadminBaseTestCase(SharedModuleStoreTestCase):
         self.addCleanup(shutil.rmtree, path)
 
 
-@attr(shard=1)
 @override_settings(
     MONGODB_LOG=TEST_MONGODB_LOG,
     GIT_REPO_DIR=settings.TEST_ROOT / "course_repos_{}".format(uuid4().hex)
@@ -120,6 +118,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
     """
     Check that importing into the mongo module store works
     """
+    shard = 1
 
     @classmethod
     def tearDownClass(cls):

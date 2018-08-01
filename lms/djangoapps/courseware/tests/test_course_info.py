@@ -11,10 +11,10 @@ from django.test.utils import override_settings
 
 from ccx_keys.locator import CCXLocator
 from lms.djangoapps.ccx.tests.factories import CcxFactory
-from nose.plugins.attrib import attr
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
+from openedx.core.lib.tests import attr
 from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from pyquery import PyQuery as pq

@@ -23,7 +23,6 @@ from django.test.utils import override_settings
 from pytz import UTC
 from django.utils.translation import ugettext as _
 from mock import Mock, NonCallableMock, patch
-from nose.plugins.attrib import attr
 from nose.tools import raises
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import UsageKey
@@ -62,6 +61,7 @@ from lms.djangoapps.instructor_task.api_helper import (
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
+from openedx.core.lib.tests import attr
 from openedx.core.lib.xblock_utils import grade_histogram
 from shoppingcart.models import (
     Coupon,

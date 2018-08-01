@@ -22,7 +22,6 @@ from django.test.utils import override_settings
 from freezegun import freeze_time
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import MagicMock, PropertyMock, create_autospec, patch
-from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pytz import UTC
@@ -62,6 +61,7 @@ from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNam
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.gating import api as gating_api
+from openedx.core.lib.tests import attr
 from openedx.core.lib.url_utils import quote_slashes
 from openedx.features.course_experience import COURSE_OUTLINE_PAGE_FLAG, UNIFIED_COURSE_TAB_FLAG
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired

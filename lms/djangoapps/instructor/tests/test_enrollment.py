@@ -12,7 +12,6 @@ from django.conf import settings
 from django.utils.translation import override as override_language
 from django.utils.translation import get_language
 from mock import patch
-from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
 from six import text_type
 
@@ -32,6 +31,7 @@ from lms.djangoapps.instructor.enrollment import (
     unenroll_email
 )
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, get_mock_request
+from openedx.core.lib.tests import attr
 from student.models import CourseEnrollment, CourseEnrollmentAllowed, anonymous_id_for_user
 from student.roles import CourseCcxCoachRole
 from student.tests.factories import AdminFactory, UserFactory

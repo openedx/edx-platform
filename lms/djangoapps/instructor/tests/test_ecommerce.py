@@ -6,7 +6,6 @@ import datetime
 
 import pytz
 from django.urls import reverse
-from nose.plugins.attrib import attr
 from six import text_type
 
 from course_modes.models import CourseMode
@@ -18,11 +17,12 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=1)
 class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
     """
     Check for E-commerce view on the new instructor dashboard
     """
+    shard = 1
+
     @classmethod
     def setUpClass(cls):
         super(TestECommerceDashboardViews, cls).setUpClass()

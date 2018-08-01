@@ -7,7 +7,6 @@ from __future__ import unicode_literals
 from datetime import datetime
 
 import ddt
-from nose.plugins.attrib import attr
 from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 from xblock.core import XBlock
@@ -22,7 +21,6 @@ from ..serializers import CourseDetailSerializer, CourseSerializer
 from .mixins import CourseApiFactoryMixin
 
 
-@attr(shard=3)
 @ddt.ddt
 class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
     """
@@ -31,6 +29,7 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
     expected_mongo_calls = 0
     maxDiff = 5000  # long enough to show mismatched dicts, in case of error
     serializer_class = CourseSerializer
+    shard = 3
 
     ENABLED_SIGNALS = ['course_published']
 

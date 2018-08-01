@@ -5,7 +5,6 @@ Tests for course_info
 import ddt
 from django.conf import settings
 from milestones.tests.utils import MilestonesTestCaseMixin
-from nose.plugins.attrib import attr
 
 from xmodule.html_module import CourseInfoModule
 from xmodule.modulestore import ModuleStoreEnum
@@ -15,13 +14,13 @@ from xmodule.modulestore.xml_importer import import_course_from_xml
 from ..testutils import MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin
 
 
-@attr(shard=3)
 @ddt.ddt
 class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
     """
     Tests for /api/mobile/v0.5/course_info/{course_id}/updates
     """
     REVERSE_INFO = {'name': 'course-updates-list', 'params': ['course_id']}
+    shard = 3
 
     def verify_success(self, response):
         super(TestUpdates, self).verify_success(response)
@@ -83,13 +82,13 @@ class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTest
             self.assertIn("Update" + str(num), update_data['content'])
 
 
-@attr(shard=3)
 @ddt.ddt
 class TestHandouts(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
     """
     Tests for /api/mobile/v0.5/course_info/{course_id}/handouts
     """
     REVERSE_INFO = {'name': 'course-handouts-list', 'params': ['course_id']}
+    shard = 3
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_handouts(self, default_ms):

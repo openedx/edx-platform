@@ -24,7 +24,6 @@ from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
 from django.utils.translation import ugettext as _
 from mock import Mock, patch
-from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 from waffle.testutils import override_switch
@@ -45,6 +44,7 @@ from lms.djangoapps.verify_student.views import (
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
+from openedx.core.lib.tests import attr
 from shoppingcart.models import CertificateItem, Order
 from student.models import CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory, UserFactory

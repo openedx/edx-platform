@@ -8,17 +8,16 @@ import unittest
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
-from nose.plugins.attrib import attr
 
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-@attr(shard=1)
 class TestFooter(TestCase):
     """
     Tests for edx and OpenEdX footer
     """
+    shard = 1
 
     SOCIAL_MEDIA_NAMES = [
         "facebook",
