@@ -184,10 +184,7 @@ def award_program_certificates(self, username):
                 # client handles all 4XX errors the same way. In the future,
                 # we may want to fork slumber, add 429 handling, and use that
                 # in edx_rest_api_client.
-                # A status code looks like:
-                #   "Client Error 429: http://example-endpoint/"
-                status_code = int(str(exc).split(':')[0][-3:])
-                if status_code == 429:
+                if exc.response.status_code == 429:  # pylint: disable=no-member
                     rate_limit_countdown = 60
                     LOGGER.info(
                         """Rate limited. Retrying task to award certificates to user {username} in {countdown}
