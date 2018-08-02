@@ -17,6 +17,7 @@ from django.template.context_processors import csrf
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.http import Http404, HttpResponse, HttpResponseForbidden
+from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
 from edx_proctoring.services import ProctoringService
 from opaque_keys import InvalidKeyError
@@ -915,6 +916,7 @@ def xqueue_callback(request, course_id, userid, mod_id, dispatch):
 
 
 @csrf_exempt
+@xframe_options_exempt
 def handle_xblock_callback_noauth(request, course_id, usage_id, handler, suffix=None):
     """
     Entry point for unauthenticated XBlock handlers.
@@ -927,6 +929,7 @@ def handle_xblock_callback_noauth(request, course_id, usage_id, handler, suffix=
         return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course=course)
 
 
+@xframe_options_exempt
 def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     """
     Generic view for extensions. This is where AJAX calls go.
