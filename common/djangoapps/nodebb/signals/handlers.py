@@ -7,7 +7,8 @@ from django.dispatch import receiver
 from requests.exceptions import ConnectionError
 
 from common.djangoapps.nodebb.tasks import (task_create_user_on_nodebb, task_update_user_profile_on_nodebb,
-    task_delete_user_on_nodebb)
+                                            task_delete_user_on_nodebb, task_activate_user_on_nodebb,
+                                            task_join_group_on_nodebb)
 from common.lib.nodebb_client.client import NodeBBClient
 from lms.djangoapps.onboarding.helpers import COUNTRIES
 from certificates.models import GeneratedCertificate
@@ -132,8 +133,8 @@ def delete_user_from_nodebb(sender, **kwargs):
     try:
         status_code, response_body = NodeBBClient().users.delete_user(instance.username, kwargs={})
         log_action_response(instance, status_code, response_body)
-    except:
-        task_delete_user_on_nodebb(username=instance.username, kwargs={})
+    except ConnectionError:
+        task_delete_user_on_nodebb(username=instance.username)
 
 @receiver(pre_save, sender=User, dispatch_uid='activate_deactivate_user_on_nodebb')
 def activate_deactivate_user_on_nodebb(sender, instance, **kwargs):
@@ -143,11 +144,12 @@ def activate_deactivate_user_on_nodebb(sender, instance, **kwargs):
     current_user_obj = User.objects.filter(pk=instance.pk)
 
     if current_user_obj.first() and current_user_obj[0].is_active != instance.is_active:
-        status_code, response_body = NodeBBClient().users.activate(username=instance.username,
-                                                                   active=instance.is_active)
-
-        log_action_response(instance, status_code, response_body)
-
+        try:
+            status_code, response_body = NodeBBClient().users.activate(username=instance.username,
+                                                                       active=instance.is_active)
+            log_action_response(instance, status_code, response_body)
+        except ConnectionError:
+            task_activate_user_on_nodebb.apply_async(username=instance.username, active=instance.is_active)
 
 @receiver(post_save, sender=CourseOverview, dispatch_uid="nodebb.signals.handlers.create_category_on_nodebb")
 def create_category_on_nodebb(sender, instance, created, **kwargs):
@@ -178,21 +180,23 @@ def join_group_on_nodebb(sender, event=None, user=None, **kwargs):  # pylint: di
     Automatically join a group on NodeBB [related to that course] on student enrollment
     """
     if event == EnrollStatusChange.enroll:
-        user_name = user.username
+        username = user.username
         course = modulestore().get_course(kwargs.get('course_id'))
 
         community_name = '%s-%s-%s-%s' % (course.display_name, course.id.org, course.id.course, course.id.run)
-        status_code, response_body = NodeBBClient().users.join(group_name=community_name, user_name=user_name)
+        try:
+            status_code, response_body = NodeBBClient().users.join(group_name=community_name, username=username)
 
-        if status_code != 200:
-            log.error(
-                'Error: Can not join the group, user (%s, %s) due to %s' % (
-                    course.display_name, user_name, response_body
-                )
-            )
-        else:
-            log.info('Success: User have joined the group %s successfully' % course.display_name)
-
+            if status_code != 200:
+                log.error(
+                    'Error: Can not join the group, user (%s, %s) due to %s' % (
+                        course.display_name, username, response_body
+                        )
+                    )
+            else:
+                log.info('Success: User have joined the group %s successfully' % course.display_name)
+        except ConnectionError:
+            task_join_group_on_nodebb(group_name=community_name, username=username)
 
 @receiver(post_save, sender=CourseTeam, dispatch_uid="nodebb.signals.handlers.create_update_groupchat_on_nodebb")
 def create_update_groupchat_on_nodebb(sender, instance, created, **kwargs):

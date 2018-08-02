@@ -5,9 +5,10 @@ import time
 from logging import getLogger
 
 from django.core.management.base import BaseCommand
+from requests.exceptions import ConnectionError
 
 from common.lib.nodebb_client.client import NodeBBClient
-from nodebb.signals.handlers import create_user_on_nodebb
+# from nodebb.signals.handlers import create_user_on_nodebb
 from lms.djangoapps.onboarding.models import UserExtendedProfile
 from philu_commands.models import CreationFailedUsers
 
@@ -82,17 +83,25 @@ class Command(BaseCommand):
     """
     def handle(self, *args, **options):
         user_extended_profiles = UserExtendedProfile.objects.all()
+        try:
+            nodebb_users = NodeBBClient().users.all()
+            from pprint import pprint
+            pprint(nodebb_users)
+        except ConnectionError:
+            log.error('Error: failed to connect to NodeBB. aborting command')
+            return
 
         for extended_profile in user_extended_profiles:
-            is_created = create_user(sender=UserExtendedProfile, instance=extended_profile)
-            is_activated = False
-            if is_created:
-                is_activated = activate_user(sender=UserExtendedProfile, instance=extended_profile.user)
 
-            # If user creation or activation(or both) is failed then we make sure to record the instance
-            # in the database for future reference.
-            if not (is_created and is_activated):
-                failed_user = CreationFailedUsers(
-                    email=extended_profile.user.email, is_created=is_created, is_activated=is_activated
-                )
-                failed_user.save()
+        #     is_created = create_user(sender=UserExtendedProfile, instance=extended_profile)
+        #     is_activated = False
+        #     if is_created:
+        #         is_activated = activate_user(sender=UserExtendedProfile, instance=extended_profile.user)
+
+        #     # If user creation or activation(or both) is failed then we make sure to record the instance
+        #     # in the database for future reference.
+        #     if not (is_created and is_activated):
+        #         failed_user = CreationFailedUsers(
+        #             email=extended_profile.user.email, is_created=is_created, is_activated=is_activated
+        #         )
+        #         failed_user.save()
