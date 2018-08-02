@@ -14,7 +14,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 class CourseValidationViewTest(SharedModuleStoreTestCase, APITestCase):
     """
-    Test importing courses via a RESTful API (POST method only)
+    Test course validation view via a RESTful API
     """
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
@@ -96,6 +96,7 @@ class CourseValidationViewTest(SharedModuleStoreTestCase, APITestCase):
                 'has_certificate': False,
             },
             'grades': {
+                'has_grading_policy': False,
                 'sum_of_weights': 1.0,
             },
             'is_self_paced': True,
