@@ -115,10 +115,14 @@ def perform_request(method, url, data_or_params=None, raw=False,
             try:
                 data = response.json()
             except ValueError:
+                #This error message is modified only for debugging purpose and will be revert back in future.
                 raise CommentClientError(
-                    u"Invalid JSON response for request {request_id}; first 100 characters: '{content}'".format(
+                    u"Invalid JSON response for request {request_id} with status code: {status_code}"
+                    u" and response length: {length}; first 100 characters: '{content}'".format(
                         request_id=request_id,
-                        content=response.text[:100]
+                        content=response.text[:100],
+                        length=len(response.text),
+                        status_code=response.status_code
                     )
                 )
             if paged_results:
