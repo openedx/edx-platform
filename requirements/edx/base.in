@@ -70,7 +70,7 @@ edx-ccx-keys
 edx-celeryutils
 edx-completion
 edx-django-release-util             # Release utils for the edx release pipeline
-edx-drf-extensions==1.5.2          # Pinning as this is causing various test failures due to query count and content changes.
+edx-drf-extensions
 edx-django-oauth2-provider==1.3.4
 edx-django-sites-extensions==2.3.1
 edx-enterprise
