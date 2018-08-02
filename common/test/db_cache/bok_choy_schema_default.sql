@@ -343,7 +343,7 @@ CREATE TABLE `auth_permission` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `content_type_id` (`content_type_id`,`codename`),
   CONSTRAINT `auth__content_type_id_508cf46651277a81_fk_django_content_type_id` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1104 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1101 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `auth_registration`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2092,7 +2092,7 @@ CREATE TABLE `django_content_type` (
   `model` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `django_content_type_app_label_45f3b1d93ec8c61c_uniq` (`app_label`,`model`)
-) ENGINE=InnoDB AUTO_INCREMENT=367 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=366 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_migrations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2103,7 +2103,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=472 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=471 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -5758,17 +5758,6 @@ CREATE TABLE `video_config_hlsplaybackenabledflag` (
   CONSTRAINT `video_config_hlsplaybackenabledflag_changed_by_id_d93f2234_fk` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `video_config_migrationenqueuedcourse`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `video_config_migrationenqueuedcourse` (
-  `created` datetime(6) NOT NULL,
-  `modified` datetime(6) NOT NULL,
-  `course_id` varchar(255) NOT NULL,
-  `command_run` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`course_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `video_config_transcriptmigrationsetting`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -5782,7 +5771,6 @@ CREATE TABLE `video_config_transcriptmigrationsetting` (
   `course_ids` longtext NOT NULL,
   `changed_by_id` int(11) DEFAULT NULL,
   `command_run` int(10) unsigned NOT NULL,
-  `batch_size` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   KEY `video_config_transcr_changed_by_id_4c7817bd_fk_auth_user` (`changed_by_id`),
   CONSTRAINT `video_config_transcr_changed_by_id_4c7817bd_fk_auth_user` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`)
