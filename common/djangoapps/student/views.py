@@ -222,6 +222,7 @@ def index(request, extra_context=None, user=AnonymousUser()):
 
     return render_to_response('index.html', context)
 
+
 def get_course_related_keys(request, course):
     """
         Get course first chapter & first section keys
@@ -240,9 +241,11 @@ def get_course_related_keys(request, course):
     if chapters:
         first_chapter = chapters[0]
         first_chapter_url = first_chapter.url_name
-        first_section = first_chapter.get_display_items()[0].url_name
+        subsections = first_chapter.get_display_items()
+        first_section = subsections[0].url_name if subsections else ""
 
     return first_chapter_url, first_section
+
 
 def process_survey_link(survey_link, user):
     """
