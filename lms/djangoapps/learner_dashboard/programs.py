@@ -12,6 +12,7 @@ from web_fragments.fragment import Fragment
 
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.learner_dashboard.utils import FAKE_COURSE_KEY, strip_course_id
+from openedx.core.djangoapps.catalog.utils import get_credit_pathways
 from openedx.core.djangoapps.credentials.utils import get_credentials_records_url
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
@@ -106,6 +107,16 @@ class ProgramDetailsFragmentView(EdxFragmentView):
         if not certificate_data:
             program_record_url = None
 
+        credit_pathways = []
+        try:
+            for pathway_id in program_data['pathway_ids']:
+                pathway = get_credit_pathways(request.site, pathway_id)
+                if pathway and pathway['email']:
+                    credit_pathways.append(pathway)
+        # if pathway caching did not complete fully (no pathway_ids)
+        except KeyError:
+            pass
+
         urls = {
             'program_listing_url': reverse('program_listing_view'),
             'track_selection_url': strip_course_id(
@@ -121,7 +132,8 @@ class ProgramDetailsFragmentView(EdxFragmentView):
             'user_preferences': get_user_preferences(request.user),
             'program_data': program_data,
             'course_data': course_data,
-            'certificate_data': certificate_data
+            'certificate_data': certificate_data,
+            'credit_pathways': credit_pathways,
         }
 
         html = render_to_string('learner_dashboard/program_details_fragment.html', context)

@@ -17,6 +17,7 @@ class ProgramDetailsSidebarView extends Backbone.View {
     this.certificateCollection = options.certificateCollection || [];
     this.programCertificate = this.getProgramCertificate();
     this.programRecordUrl = options.programRecordUrl;
+    this.creditPathways = options.creditPathways;
     this.render();
   }
 
@@ -25,6 +26,7 @@ class ProgramDetailsSidebarView extends Backbone.View {
       programCertificate: this.programCertificate ?
         this.programCertificate.toJSON() : {},
       programRecordUrl: this.programRecordUrl,
+      creditPathways: this.creditPathways,
     });
 
     HtmlUtils.setHtml(this.$el, this.tpl(data));
