@@ -6,7 +6,6 @@ from datetime import timedelta
 import ddt
 from django.utils.timezone import now
 from mock import patch
-from nose.plugins.attrib import attr
 
 from courseware.tests.factories import BetaTesterFactory
 
@@ -14,7 +13,6 @@ from ..start_date import DEFAULT_START_DATE, StartDateTransformer
 from .helpers import BlockParentsMapTestCase, update_block
 
 
-@attr(shard=3)
 @ddt.ddt
 class StartDateTransformerTestCase(BlockParentsMapTestCase):
     """
@@ -23,6 +21,7 @@ class StartDateTransformerTestCase(BlockParentsMapTestCase):
     STUDENT = 1
     BETA_USER = 2
     TRANSFORMER_CLASS_TO_TEST = StartDateTransformer
+    shard = 3
 
     class StartDateType(object):
         """

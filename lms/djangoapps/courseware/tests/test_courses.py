@@ -12,7 +12,6 @@ from django.conf import settings
 from django.urls import reverse
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
@@ -34,6 +33,7 @@ from courseware.module_render import get_module_for_descriptor
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.courses import course_image_url
+from openedx.core.lib.tests import attr
 from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import _get_modulestore_branch_setting, modulestore

@@ -6,7 +6,6 @@ import ddt
 from django.conf import settings
 from django.urls import reverse
 from mock import patch
-from nose.plugins.attrib import attr
 from six import text_type
 
 from student.roles import CourseStaffRole, CourseInstructorRole
@@ -15,13 +14,14 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=1)
 @patch.dict(settings.FEATURES, {'ENABLE_SPECIAL_EXAMS': True})
 @ddt.ddt
 class TestProctoringDashboardViews(SharedModuleStoreTestCase):
     """
     Check for Proctoring view on the new instructor dashboard
     """
+    shard = 1
+
     @classmethod
     def setUpClass(cls):
         super(TestProctoringDashboardViews, cls).setUpClass()

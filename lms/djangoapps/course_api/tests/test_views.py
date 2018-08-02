@@ -8,11 +8,11 @@ from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse
 from django.test import RequestFactory
 from django.test.utils import override_settings
-from nose.plugins.attrib import attr
 from search.tests.test_course_discovery import DemoCourse
 from search.tests.tests import TEST_INDEX_NAME
 from search.tests.utils import SearcherMixin
 
+from openedx.core.lib.tests import attr
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from waffle.testutils import override_switch
 

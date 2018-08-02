@@ -4,7 +4,6 @@ Tests for wiki middleware.
 from unittest import skip
 
 from django.test.client import Client
-from nose.plugins.attrib import attr
 from wiki.models import URLPath
 
 from course_wiki.views import get_or_create_root
@@ -14,9 +13,9 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=1)
 class TestComprehensiveTheming(ModuleStoreTestCase):
     """Tests for comprehensive theming of wiki pages."""
+    shard = 1
 
     def setUp(self):
         """Test setup."""

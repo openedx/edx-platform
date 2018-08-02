@@ -14,13 +14,13 @@ from django.conf import settings
 from edxval import api
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import patch
-from nose.plugins.attrib import attr
 
 from mobile_api.models import MobileApiConfig
 from mobile_api.testutils import MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, remove_user_from_cohort
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
+from openedx.core.lib.tests import attr
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition

@@ -8,7 +8,6 @@ from datetime import datetime
 from functools import partial
 
 import ddt
-import pytest
 import pytz
 from bson import ObjectId
 from completion.models import BlockCompletion
@@ -25,7 +24,6 @@ from edx_proctoring.tests.test_services import MockCreditService, MockGradesServ
 from freezegun import freeze_time
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import MagicMock, Mock, patch
-from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from pyquery import PyQuery
 from six import text_type
@@ -53,6 +51,7 @@ from openedx.core.djangoapps.credit.api import set_credit_requirement_status, se
 from openedx.core.djangoapps.credit.models import CreditCourse
 from openedx.core.lib.courses import course_image_url
 from openedx.core.lib.gating import api as gating_api
+from openedx.core.lib.tests import attr
 from openedx.core.lib.url_utils import quote_slashes
 from student.models import anonymous_id_for_user
 from verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory

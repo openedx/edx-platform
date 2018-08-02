@@ -8,7 +8,6 @@ from urllib import urlencode
 
 import ddt
 import mock
-import pytest
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
@@ -26,7 +25,6 @@ from django.utils.translation import ugettext as _
 from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory, RefreshTokenFactory
 from edx_rest_api_client import exceptions
 from http.cookies import SimpleCookie
-from nose.plugins.attrib import attr
 from oauth2_provider.models import AccessToken as dot_access_token
 from oauth2_provider.models import RefreshToken as dot_refresh_token
 from provider.oauth2.models import AccessToken as dop_access_token
@@ -295,11 +293,10 @@ class StudentAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
         self.assertFalse(dop_refresh_token.objects.filter(user=user).exists())
 
 
-@attr(shard=7)
 @ddt.ddt
 class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleStoreTestCase):
     """ Tests for the student account views that update the user's account information. """
-
+    shard = 7
     USERNAME = "bob"
     EMAIL = "bob@example.com"
     PASSWORD = "password"

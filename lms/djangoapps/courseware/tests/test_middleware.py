@@ -4,7 +4,6 @@ Tests for courseware middleware
 
 from django.http import Http404
 from django.test.client import RequestFactory
-from nose.plugins.attrib import attr
 
 from lms.djangoapps.courseware.exceptions import Redirect
 from lms.djangoapps.courseware.middleware import RedirectMiddleware
@@ -12,9 +11,9 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=1)
 class CoursewareMiddlewareTestCase(SharedModuleStoreTestCase):
     """Tests that courseware middleware is correctly redirected"""
+    shard = 1
 
     @classmethod
     def setUpClass(cls):

@@ -4,7 +4,6 @@ Tests for course wiki
 
 from django.urls import reverse
 from mock import patch
-from nose.plugins.attrib import attr
 from six import text_type
 
 from courseware.tests.tests import LoginEnrollmentTestCase
@@ -13,11 +12,11 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=1)
 class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests for wiki course redirection.
     """
+    shard = 1
 
     def setUp(self):
         super(WikiRedirectTestCase, self).setUp()

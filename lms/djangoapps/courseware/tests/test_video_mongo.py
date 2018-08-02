@@ -31,9 +31,9 @@ from edxval.api import (
 from edxval.utils import create_file_in_fs
 from lxml import etree
 from mock import MagicMock, Mock, patch
-from nose.plugins.attrib import attr
 from path import Path as path
 
+from openedx.core.lib.tests import attr
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore import ModuleStoreEnum

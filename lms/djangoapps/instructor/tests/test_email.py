@@ -6,7 +6,6 @@ that the view is conditionally available when Course Auth is turned on.
 """
 
 from django.urls import reverse
-from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
@@ -16,12 +15,13 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, 
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=1)
 class TestNewInstructorDashboardEmailViewMongoBacked(SharedModuleStoreTestCase):
     """
     Check for email view on the new instructor dashboard
     for Mongo-backed courses
     """
+    shard = 1
+
     @classmethod
     def setUpClass(cls):
         super(TestNewInstructorDashboardEmailViewMongoBacked, cls).setUpClass()
@@ -109,13 +109,13 @@ class TestNewInstructorDashboardEmailViewMongoBacked(SharedModuleStoreTestCase):
         self.assertNotIn(self.email_link, response.content)
 
 
-@attr(shard=1)
 class TestNewInstructorDashboardEmailViewXMLBacked(SharedModuleStoreTestCase):
     """
     Check for email view on the new instructor dashboard
     """
 
     MODULESTORE = TEST_DATA_MIXED_MODULESTORE
+    shard = 1
 
     @classmethod
     def setUpClass(cls):

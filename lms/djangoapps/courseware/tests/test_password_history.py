@@ -14,19 +14,18 @@ from django.utils import timezone
 from django.utils.http import int_to_base36
 from freezegun import freeze_time
 from mock import patch
-from nose.plugins.attrib import attr
 
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from student.models import PasswordHistory
 
 
-@attr(shard=1)
 @patch.dict("django.conf.settings.FEATURES", {'ADVANCED_SECURITY': True})
 @ddt.ddt
 class TestPasswordHistory(LoginEnrollmentTestCase):
     """
     Go through some of the PasswordHistory use cases
     """
+    shard = 1
 
     def _login(self, email, password, should_succeed=True, err_msg_check=None):
         """

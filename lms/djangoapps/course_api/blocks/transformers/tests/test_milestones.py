@@ -4,7 +4,6 @@ Tests for ProctoredExamTransformer.
 import ddt
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
-from nose.plugins.attrib import attr
 
 from gating import api as lms_gating_api
 from lms.djangoapps.course_blocks.api import get_course_blocks
@@ -16,7 +15,6 @@ from student.tests.factories import CourseEnrollmentFactory
 from ..milestones import MilestonesAndSpecialExamsTransformer
 
 
-@attr(shard=3)
 @ddt.ddt
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
 class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseMixin):
@@ -24,6 +22,7 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
     Test behavior of ProctoredExamTransformer
     """
     TRANSFORMER_CLASS_TO_TEST = MilestonesAndSpecialExamsTransformer
+    shard = 3
 
     def setUp(self):
         """

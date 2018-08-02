@@ -14,7 +14,6 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
-from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
 
 import courseware.access as access
@@ -31,6 +30,7 @@ from courseware.tests.helpers import LoginEnrollmentTestCase, masquerade_as_grou
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
+from openedx.core.lib.tests import attr
 from student.models import CourseEnrollment
 from student.roles import CourseCcxCoachRole, CourseStaffRole
 from student.tests.factories import (

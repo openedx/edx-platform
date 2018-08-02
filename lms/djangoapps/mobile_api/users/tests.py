@@ -12,7 +12,6 @@ from django.test import RequestFactory, override_settings
 from django.utils import timezone
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import patch
-from nose.plugins.attrib import attr
 
 from lms.djangoapps.certificates.api import generate_user_certificates
 from lms.djangoapps.certificates.models import CertificateStatuses
@@ -27,6 +26,7 @@ from mobile_api.testutils import (
     MobileCourseAccessTestMixin
 )
 from openedx.core.lib.courses import course_image_url
+from openedx.core.lib.tests import attr
 from student.models import CourseEnrollment
 from util.milestones_helpers import set_prerequisite_courses
 from util.testing import UrlResetMixin

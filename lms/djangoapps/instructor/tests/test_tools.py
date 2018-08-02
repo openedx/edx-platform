@@ -13,12 +13,12 @@ from django.core.exceptions import MultipleObjectsReturned
 from django.test import TestCase
 from django.test.utils import override_settings
 from pytz import UTC
-from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
 from courseware.field_overrides import OverrideFieldData
 from lms.djangoapps.ccx.tests.test_overrides import inject_field_overrides
+from openedx.core.lib.tests import attr
 from student.tests.factories import UserFactory
 from xmodule.fields import Date
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase

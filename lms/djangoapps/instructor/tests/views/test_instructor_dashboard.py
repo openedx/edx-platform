@@ -10,7 +10,6 @@ from django.urls import reverse
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from mock import patch
-from nose.plugins.attrib import attr
 from pytz import UTC
 from six import text_type
 
@@ -46,12 +45,12 @@ def intercept_renderer(path, context):
     return response
 
 
-@attr(shard=3)
 @ddt.ddt
 class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssTestMixin):
     """
     Tests for the instructor dashboard (not legacy).
     """
+    shard = 3
 
     def setUp(self):
         """

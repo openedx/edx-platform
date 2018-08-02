@@ -11,10 +11,10 @@ from django.urls import reverse, reverse_lazy
 from django.test import TestCase
 from django.test.client import Client
 from django.utils import translation
-from nose.plugins.attrib import attr
 
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
+from openedx.core.lib.tests import attr
 from student.tests.factories import UserFactory
 
 

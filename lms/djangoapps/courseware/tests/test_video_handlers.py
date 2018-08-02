@@ -12,11 +12,11 @@ import freezegun
 from django.core.files.base import ContentFile
 from django.utils.timezone import now
 from mock import MagicMock, Mock, patch
-from nose.plugins.attrib import attr
 from webob import Request, Response
 
 from common.test.utils import normalize_repr
 from openedx.core.djangoapps.contentserver.caching import del_cached_content
+from openedx.core.lib.tests import attr
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError

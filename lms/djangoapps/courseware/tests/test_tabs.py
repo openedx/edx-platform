@@ -2,13 +2,11 @@
 Test cases for tabs.
 """
 
-import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse
 from django.http import Http404
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import MagicMock, Mock, patch
-from nose.plugins.attrib import attr
 from six import text_type
 
 from courseware.courses import get_course_by_id
@@ -25,6 +23,7 @@ from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.views.views import StaticCourseTabView, get_static_tab_fragment
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import get_mock_request
+from openedx.core.lib.tests import attr
 from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
