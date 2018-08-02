@@ -2,14 +2,12 @@
 import ddt
 import jwt
 from django.test import TestCase
-from nose.plugins.attrib import attr
 
 from openedx.core.djangoapps.oauth_dispatch.tests import mixins
 from openedx.core.lib.token_utils import JwtBuilder
 from student.tests.factories import UserFactory, UserProfileFactory
 
 
-@attr(shard=2)
 @ddt.ddt
 class TestJwtBuilder(mixins.AccessTokenMixin, TestCase):
     """
@@ -17,6 +15,7 @@ class TestJwtBuilder(mixins.AccessTokenMixin, TestCase):
     """
 
     expires_in = 10
+    shard = 2
 
     def setUp(self):
         super(TestJwtBuilder, self).setUp()

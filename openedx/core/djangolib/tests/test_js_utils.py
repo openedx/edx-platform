@@ -7,16 +7,15 @@ import json
 from unittest import TestCase
 
 from mako.template import Template
-from nose.plugins.attrib import attr
 
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 
 
-@attr(shard=2)
 class TestJSUtils(TestCase):
     """
     Test JS utils
     """
+    shard = 2
 
     class NoDefaultEncoding(object):
         """

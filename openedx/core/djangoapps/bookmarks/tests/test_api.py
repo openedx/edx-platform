@@ -3,7 +3,6 @@ Tests for bookmarks api.
 """
 import ddt
 from mock import patch
-from nose.plugins.attrib import attr
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
@@ -36,13 +35,14 @@ class BookmarkApiEventTestMixin(object):
         self.assertFalse(mock_tracker.called)  # pylint: disable=maybe-no-member
 
 
-@attr(shard=9)
 @ddt.ddt
 @skip_unless_lms
 class BookmarksAPITests(BookmarkApiEventTestMixin, BookmarksTestsBase):
     """
     These tests cover the parts of the API methods.
     """
+    shard = 9
+
     def test_get_bookmark(self):
         """
         Verifies that get_bookmark returns data as expected.

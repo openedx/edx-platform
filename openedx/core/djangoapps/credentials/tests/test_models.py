@@ -1,7 +1,6 @@
 """Tests for models supporting Credentials-related functionality."""
 
 from django.test import TestCase, override_settings
-from nose.plugins.attrib import attr
 
 from openedx.core.djangoapps.credentials.models import API_VERSION
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
@@ -12,9 +11,9 @@ CREDENTIALS_PUBLIC_SERVICE_URL = 'https://credentials.example.com'
 
 
 @skip_unless_lms
-@attr(shard=2)
 class TestCredentialsApiConfig(CredentialsApiConfigMixin, TestCase):
     """Tests covering the CredentialsApiConfig model."""
+    shard = 2
 
     @override_settings(
         CREDENTIALS_INTERNAL_SERVICE_URL=CREDENTIALS_INTERNAL_SERVICE_URL,

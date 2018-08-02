@@ -3,7 +3,6 @@ Tests for credit course tasks.
 """
 
 import mock
-from nose.plugins.attrib import attr
 from datetime import datetime
 
 from openedx.core.djangoapps.credit.api import get_credit_requirements
@@ -16,7 +15,6 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from edx_proctoring.api import create_exam
 
 
-@attr(shard=2)
 class TestTaskExecution(ModuleStoreTestCase):
     """Set of tests to ensure that the task code will do the right thing when
     executed directly.
@@ -25,6 +23,7 @@ class TestTaskExecution(ModuleStoreTestCase):
     allows us to ensure that when the listener is executed, it is done as
     expected.
     """
+    shard = 2
 
     def mocked_set_credit_requirements(course_key, requirements):  # pylint: disable=no-self-argument, unused-argument
         """Used as a side effect when mocking method credit api method

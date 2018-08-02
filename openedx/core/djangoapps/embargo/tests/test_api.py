@@ -4,7 +4,6 @@ Tests for EmbargoMiddleware
 
 from contextlib import contextmanager
 import mock
-from nose.plugins.attrib import attr
 import pygeoip
 import ddt
 
@@ -38,14 +37,13 @@ from mock import patch
 MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {})
 
 
-@attr(shard=3)
 @ddt.ddt
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @skip_unless_lms
 @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
 class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
     """Test the embargo API calls to determine whether a user has access. """
-
+    shard = 3
     ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
 
     def setUp(self):

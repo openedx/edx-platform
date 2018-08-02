@@ -6,14 +6,13 @@ Tests for course group views
 import json
 from collections import namedtuple
 
-from nose.plugins.attrib import attr
-
 from django.contrib.auth.models import User
 from django.http import Http404
 from django.test.client import RequestFactory
 from django_comment_common.models import CourseDiscussionSettings
 from django_comment_common.utils import get_course_discussion_settings
 from opaque_keys.edx.locator import CourseLocator
+from openedx.core.lib.tests import attr
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

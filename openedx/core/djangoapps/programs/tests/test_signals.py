@@ -3,7 +3,6 @@ This module contains tests for programs-related signals and signal handlers.
 """
 
 from django.test import TestCase
-from nose.plugins.attrib import attr
 import mock
 
 from opaque_keys.edx.keys import CourseKey
@@ -18,7 +17,6 @@ TEST_USERNAME = 'test-user'
 TEST_COURSE_KEY = CourseKey.from_string('course-v1:edX+test_course+1')
 
 
-@attr(shard=2)
 # The credentials app isn't installed for the CMS.
 @skip_unless_lms
 @mock.patch('openedx.core.djangoapps.programs.tasks.v1.tasks.award_program_certificates.delay')
@@ -31,6 +29,7 @@ class CertAwardedReceiverTest(TestCase):
     """
     Tests for the `handle_course_cert_awarded` signal handler function.
     """
+    shard = 2
 
     @property
     def signal_kwargs(self):
@@ -80,7 +79,6 @@ class CertAwardedReceiverTest(TestCase):
         self.assertEqual(mock_task.call_args[0], (TEST_USERNAME,))
 
 
-@attr(shard=2)
 # The credentials app isn't installed for the CMS.
 @skip_unless_lms
 @mock.patch('openedx.core.djangoapps.programs.tasks.v1.tasks.award_course_certificate.delay')
@@ -93,6 +91,7 @@ class CertChangedReceiverTest(TestCase):
     """
     Tests for the `handle_course_cert_changed` signal handler function.
     """
+    shard = 2
 
     def setUp(self):
         super(CertChangedReceiverTest, self).setUp()

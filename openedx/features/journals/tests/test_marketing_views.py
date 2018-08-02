@@ -2,7 +2,6 @@
 
 import uuid
 import mock
-from nose.plugins.attrib import attr
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -60,12 +59,12 @@ class JournalBundleViewTest(CacheIsolationTestCase, SiteMixin):
         self.assertContains(response, journal_bundle["courses"][0]["course_runs"][0]["title"])
 
 
-@attr(shard=1)
 @mock.patch.dict(settings.FEATURES, {"JOURNALS_ENABLED": True})
 class JournalIndexViewTest(SiteMixin, ModuleStoreTestCase):
     """
     Tests for Journals Listing in Marketing Pages.
     """
+    shard = 1
 
     def setUp(self):
         super(JournalIndexViewTest, self).setUp()

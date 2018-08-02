@@ -5,7 +5,6 @@ Unit tests for preference APIs.
 import datetime
 import ddt
 from mock import patch
-from nose.plugins.attrib import attr
 from pytz import common_timezones, utc
 
 from django.contrib.auth.models import User
@@ -40,7 +39,6 @@ from ...preferences.api import (
 )
 
 
-@attr(shard=2)
 @skip_unless_lms
 class TestPreferenceAPI(CacheIsolationTestCase):
     """
@@ -49,6 +47,7 @@ class TestPreferenceAPI(CacheIsolationTestCase):
     are not specified.
     """
     password = "test"
+    shard = 2
 
     def setUp(self):
         super(TestPreferenceAPI, self).setUp()
@@ -328,7 +327,6 @@ class TestPreferenceAPI(CacheIsolationTestCase):
         )
 
 
-@attr(shard=2)
 @ddt.ddt
 class UpdateEmailOptInTests(ModuleStoreTestCase):
     """
@@ -337,6 +335,7 @@ class UpdateEmailOptInTests(ModuleStoreTestCase):
     USERNAME = u'frank-underwood'
     PASSWORD = u'ṕáśśẃőŕd'
     EMAIL = u'frank+underwood@example.com'
+    shard = 2
 
     @ddt.data(
         # Check that a 27 year old can opt-in

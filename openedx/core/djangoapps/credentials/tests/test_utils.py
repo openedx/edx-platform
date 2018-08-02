@@ -3,7 +3,6 @@ import uuid
 
 from edx_oauth2_provider.tests.factories import ClientFactory
 import mock
-from nose.plugins.attrib import attr
 from provider.constants import CONFIDENTIAL
 
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
@@ -18,10 +17,10 @@ UTILS_MODULE = 'openedx.core.djangoapps.credentials.utils'
 
 
 @skip_unless_lms
-@attr(shard=2)
 @mock.patch(UTILS_MODULE + '.get_edx_api_data')
 class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
     """ Tests for credentials utility functions. """
+    shard = 2
 
     ENABLED_CACHES = ['default']
 

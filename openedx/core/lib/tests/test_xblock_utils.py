@@ -7,7 +7,6 @@ import uuid
 
 import ddt
 from django.test.client import RequestFactory
-from nose.plugins.attrib import attr
 from web_fragments.fragment import Fragment
 
 from openedx.core.lib.url_utils import quote_slashes
@@ -26,12 +25,12 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@attr(shard=2)
 @ddt.ddt
 class TestXblockUtils(SharedModuleStoreTestCase):
     """
     Tests for xblock utility functions.
     """
+    shard = 2
 
     @classmethod
     def setUpClass(cls):

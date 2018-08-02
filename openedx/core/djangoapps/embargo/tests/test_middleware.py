@@ -3,7 +3,6 @@ Tests for EmbargoMiddleware with CountryAccessRules
 """
 
 from mock import patch
-from nose.plugins.attrib import attr
 import ddt
 
 from django.urls import reverse
@@ -21,7 +20,6 @@ from ..models import RestrictedCourse, IPFilter
 from ..test_utils import restrict_course
 
 
-@attr(shard=3)
 @ddt.ddt
 @skip_unless_lms
 class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
@@ -36,6 +34,7 @@ class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
     PASSWORD = 'secret'
 
     URLCONF_MODULES = ['openedx.core.djangoapps.embargo']
+    shard = 3
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):

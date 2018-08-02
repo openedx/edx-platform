@@ -20,7 +20,6 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.http import urlencode
 from django.utils.timezone import now
-from nose.plugins.attrib import attr
 from oauth2_provider import models as dot_models
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -73,12 +72,13 @@ urlpatterns = [
 ]
 
 
-@attr(shard=2)
 @ddt.ddt
 @unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
 @override_settings(ROOT_URLCONF=__name__)
 class OAuth2Tests(TestCase):
     """OAuth 2.0 authentication"""
+    shard = 2
+
     def setUp(self):
         super(OAuth2Tests, self).setUp()
         self.dop_adapter = adapters.DOPAdapter()
