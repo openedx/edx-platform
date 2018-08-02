@@ -277,6 +277,8 @@
         button {
           @extend %btn-secondary-blue-outline;
           margin-top: 1em;
+          background: $blue;
+          color: #fff;
         }
       }
 
