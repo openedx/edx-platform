@@ -853,6 +853,15 @@ class CourseFields(object):
         ),
         scope=Scope.settings, default=False
     )
+    other_course_settings = Dict(
+        display_name=_("Other Course Settings"),
+        help=_(
+            "Any additional information about the course that the platform needs or that allows integration with "
+            "external systems such as CRM software. Enter a dictionary of values in JSON format, such as "
+            "{ \"my_custom_setting\": \"value\", \"other_setting\": \"value\" }"
+        ),
+        scope=Scope.settings
+    )
 
 
 class CourseModule(CourseFields, SequenceModule):  # pylint: disable=abstract-method
