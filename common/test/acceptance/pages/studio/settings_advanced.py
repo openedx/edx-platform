@@ -51,11 +51,22 @@ class AdvancedSettingsPage(CoursePage):
         """
         return self.q(css=DEPRECATED_SETTINGS_BUTTON_SELECTOR).text[0]
 
-    def check_deprecated_settings_visibility(self):
+    def is_deprecated_setting_visible(self):
         """
             Returns true if deprecated settings are visible
         """
         return self.q(css=DEPRECATED_SETTINGS_SELECTOR).visible
+
+    def toggle_deprecated_settings(self):
+        """
+        Show deprecated Settings
+        """
+        button_text = self.deprecated_settings_button_text
+        self.q(css=DEPRECATED_SETTINGS_BUTTON_SELECTOR).click()
+        if button_text == 'Show Deprecated Settings':
+            self.wait_for_element_presence(DEPRECATED_SETTINGS_SELECTOR, 'Deprecated Settings are present')
+        else:
+            self.wait_for_element_absence(DEPRECATED_SETTINGS_SELECTOR, 'Deprecated Settings are not present')
 
     def wait_for_modal_load(self):
         """
@@ -134,6 +145,9 @@ class AdvancedSettingsPage(CoursePage):
         return self.q(css=ERROR_ITEM_CONTENT_SELECTOR).text
 
     def _get_index_of(self, expected_key):
+        """
+        Returns the index of expected key
+        """
         for i, element in enumerate(self.q(css=KEY_CSS)):
             # Sometimes get stale reference if I hold on to the array of elements
             key = self.q(css=KEY_CSS).nth(i).text[0]
