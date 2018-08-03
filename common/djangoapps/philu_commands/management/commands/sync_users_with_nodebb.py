@@ -42,16 +42,16 @@ class Command(BaseCommand):
             profile = user.profile
 
             edx_data = {
-                'edx_user_id': user.id,
+                'edx_user_id': unicode(user.id),
                 'username': user.username,
                 'email': user.email,
                 'first_name': user.first_name,
                 'last_name': user.last_name,
-                'country_of_employment': extended_profile.country_of_employment,
+                'country_of_employment': extended_profile.country_of_employment or "",
                 'city_of_employment': extended_profile.city_of_employment,
                 'country_of_residence': COUNTRIES.get(profile.country.code),
                 'city_of_residence': profile.city,
-                'birthday': '01/01/%s' % profile.year_of_birth,
+                'birthday': profile.year_of_birth,
                 'language': profile.language,
                 'interests': extended_profile.get_user_selected_interests(),
                 'self_prioritize_areas': extended_profile.get_user_selected_functions()
@@ -65,11 +65,32 @@ class Command(BaseCommand):
                     nodebb_client.users.activate(username=user.username, active=user.is_active)
                     continue
                 except ConnectionError:
-                    task_create_user_on_nodebb.apply_async(user.username, kwargs=edx_data)
+                    task_create_user_on_nodebb.apply_async(username=user.username, kwargs=edx_data)
                     task_activate_user_on_nodebb.apply_async(username=user.username, active=user.is_active)
 
+            print edx_data.viewitems() <= nodebb_data.viewitems()
+            print [edx_data[key] == nodebb_data.get(key) for key in edx_data.keys()]
+            # print type(edx_data['edx_user_id'])
+            # print type(nodebb_data['edx_user_id'])
 
+
+            # print
+            # print
+            # for key in edx_data.keys():
+            #     print '{}: {} is {}'.format(key, edx_data[key], nodebb_data[key])
+            # print
+            # print
+
+
+            # if all([edx_data[key] == nodebb_data[key] for key in edx_data.keys()]):
             if not edx_data.viewitems() <= nodebb_data.viewitems():
+                print
+                print
+                print
+                for key in edx_data.keys():
+                    print '{}: {} is {}'.format(key, edx_data[key], nodebb_data.get(key))
+                print
+                print
                 try:
                     nodebb_client.users.update_profile(username=user.username, kwargs=edx_data)
                 except ConnectionError:
