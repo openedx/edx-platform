@@ -16,6 +16,7 @@ from milestones import api as milestones_api
 from opaque_keys.edx.keys import UsageKey
 from openedx.core.lib.gating.exceptions import GatingValidationError
 from util import milestones_helpers
+from xblock.completable import XBlockCompletionMode as CompletionMode
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -463,10 +464,15 @@ def get_subsection_completion_percentage(subsection_usage_key, user):
     try:
         subsection_structure = get_course_blocks(user, subsection_usage_key)
         if any(subsection_structure):
-            completable_blocks = [
-                block for block in subsection_structure
-                if block.block_type not in ['chapter', 'sequential', 'vertical']
-            ]
+            completable_blocks = []
+            for block in subsection_structure:
+                completion_mode = subsection_structure.get_xblock_field(
+                    block, 'completion_mode'
+                )
+
+                if completion_mode not in (CompletionMode.AGGREGATOR, CompletionMode.EXCLUDED):
+                    completable_blocks.append(block)
+
             if not completable_blocks:
                 return 0
             subsection_completion_total = 0
