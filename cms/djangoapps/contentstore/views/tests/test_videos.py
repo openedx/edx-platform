@@ -8,6 +8,7 @@ import re
 from datetime import datetime
 from functools import wraps
 from StringIO import StringIO
+from contextlib import contextmanager
 
 import dateutil.parser
 import ddt
@@ -36,8 +37,12 @@ from contentstore.views.videos import (
 from contentstore.views.videos import KEY_EXPIRATION_IN_SECONDS, StatusDisplayStrings, convert_video_status
 from xmodule.modulestore.tests.factories import CourseFactory
 
+from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
+from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
+
 from edxval.api import create_or_update_transcript_preferences, get_transcript_preferences
+from waffle.testutils import override_flag
 
 
 def override_switch(switch, active):
@@ -496,10 +501,12 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
             self.assertIsNotNone(path_match)
             video_id = path_match.group(1)
             mock_key_instance = mock_key_instances[i]
+
             mock_key_instance.set_metadata.assert_any_call(
                 'course_video_upload_token',
                 self.test_token
             )
+
             mock_key_instance.set_metadata.assert_any_call(
                 'client_video_id',
                 file_info['file_name']
@@ -523,6 +530,73 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
             response_file = response_obj['files'][i]
             self.assertEqual(response_file['file_name'], file_info['file_name'])
             self.assertEqual(response_file['upload_url'], mock_key_instance.generate_url())
+
+    @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
+    @patch('boto.s3.key.Key')
+    @patch('boto.s3.connection.S3Connection')
+    @ddt.data(
+        {
+            'global_waffle': True,
+            'course_override': WaffleFlagCourseOverrideModel.ALL_CHOICES.off,
+            'expect_token': True
+        },
+        {
+            'global_waffle': False,
+            'course_override': WaffleFlagCourseOverrideModel.ALL_CHOICES.on,
+            'expect_token': False
+        },
+        {
+            'global_waffle': False,
+            'course_override': WaffleFlagCourseOverrideModel.ALL_CHOICES.off,
+            'expect_token': True
+        }
+    )
+    def test_video_upload_token_in_meta(self, data, mock_conn, mock_key):
+        """
+        Test video upload token in s3 metadata.
+        """
+        @contextmanager
+        def proxy_manager(manager, ignore_manager):
+            """
+            This acts as proxy to the original manager in the arguments given
+            the original manager is not set to be ignored.
+            """
+            if ignore_manager:
+                yield
+            else:
+                with manager:
+                    yield
+
+        file_data = {
+            'file_name': 'first.mp4',
+            'content_type': 'video/mp4',
+        }
+        mock_conn.return_value = Mock(get_bucket=Mock(return_value=Mock()))
+        mock_key_instance = Mock(
+            generate_url=Mock(
+                return_value='http://example.com/url_{}'.format(file_data['file_name'])
+            )
+        )
+        # If extra calls are made, return a dummy
+        mock_key.side_effect = [mock_key_instance]
+
+        # expected args to be passed to `set_metadata`.
+        expected_args = ('course_video_upload_token', self.test_token)
+
+        with patch.object(WaffleFlagCourseOverrideModel, 'override_value', return_value=data['course_override']):
+            with override_flag(DEPRECATE_YOUTUBE, active=data['global_waffle']):
+                response = self.client.post(
+                    self.url,
+                    json.dumps({'files': [file_data]}),
+                    content_type='application/json'
+                )
+                self.assertEqual(response.status_code, 200)
+
+                with proxy_manager(self.assertRaises(AssertionError), data['expect_token']):
+                    # if we're not expecting token then following should raise assertion error and
+                    # if we're expecting token then we will be able to find the call to set the token
+                    # in s3 metadata.
+                    mock_key_instance.set_metadata.assert_any_call(*expected_args)
 
     def _assert_video_removal(self, url, edx_video_id, deleted_videos):
         """

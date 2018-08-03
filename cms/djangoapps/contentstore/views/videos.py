@@ -42,6 +42,7 @@ from contentstore.utils import reverse_course_url
 from contentstore.video_utils import validate_video_image
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
+from openedx.core.djangoapps.video_pipeline.config.waffle import waffle_flags, DEPRECATE_YOUTUBE
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 from util.json_request import JsonResponse, expect_json
 
@@ -699,10 +700,12 @@ def videos_post(course, request):
             ('course_key', unicode(course.id)),
         ]
 
-        # Only include `course_video_upload_token` if its set, as it won't be required if video uploads
-        # are enabled by default.
+        deprecate_youtube = waffle_flags()[DEPRECATE_YOUTUBE]
         course_video_upload_token = course.video_upload_pipeline.get('course_video_upload_token')
-        if course_video_upload_token:
+
+        # Only include `course_video_upload_token` if youtube has not been deprecated
+        # for this course.
+        if not deprecate_youtube.is_enabled(course.id) and course_video_upload_token:
             metadata_list.append(('course_video_upload_token', course_video_upload_token))
 
         is_video_transcript_enabled = VideoTranscriptEnabledFlag.feature_enabled(course.id)
