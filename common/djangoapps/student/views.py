@@ -5,7 +5,6 @@ import datetime
 import logging
 import uuid
 import json
-import time
 import warnings
 from collections import defaultdict
 from urlparse import urljoin, urlsplit, parse_qs, urlunsplit
@@ -588,15 +587,6 @@ def dashboard(request):
         The dashboard response.
 
     """
-    perflog = {
-        'start': time.time(),
-        # human readable timestamp is purely for convenience when looking through the logs
-        'timestamp': str(datetime.datetime.now(UTC)),
-        # timestamps for each checkpoint execution passes
-        'checkpoints': [],
-        # keep track of which branches were executed
-        'branches': {},
-    }
     user = request.user
 
     platform_name = configuration_helpers.get_value("platform_name", settings.PLATFORM_NAME)
@@ -619,20 +609,12 @@ def dashboard(request):
 
     # remove our current org from the "filter out" list, if applicable
     if course_org_filter:
-        perflog['branches']['course_org_filter'] = True
         org_filter_out_set.remove(course_org_filter)
 
-    perflog['checkpoints'].append({
-        'time': time.time(),
-        'name': 'finished config'})
     # Build our (course, enrollment) list for the user, but ignore any courses that no
     # longer exist (because the course IDs have changed). Still, we don't delete those
     # enrollments, because it could have been a data push snafu.
     course_enrollments = list(get_course_enrollments(user, course_org_filter, org_filter_out_set))
-
-    perflog['checkpoints'].append({
-        'time': time.time(),
-        'name': 'got course enrollments'})
 
     # sort the enrollment pairs by the enrollment date
     course_enrollments.sort(key=lambda x: x.created, reverse=True)
@@ -648,27 +630,16 @@ def dashboard(request):
         for course_id, modes in unexpired_course_modes.iteritems()
     }
 
-    perflog['checkpoints'].append({
-        'time': time.time(),
-        'name': 'retrieved course modes for each course'})
-
     # Check to see if the student has recently enrolled in a course.
     # If so, display a notification message confirming the enrollment.
     enrollment_message = _create_recent_enrollment_message(
         course_enrollments, course_modes_by_course
     )
 
-    perflog['checkpoints'].append({
-        'time': time.time(),
-        'name': 'created enrollment message'})
     course_optouts = Optout.objects.filter(user=user).values_list('course_id', flat=True)
 
-    perflog['checkpoints'].append({
-        'time': time.time(),
-        'name': 'got course_optouts'})
     message = ""
     if not user.is_active:
-        perflog['branches']['user_not_active'] = True
         message = render_to_string(
             'registration/activate_account_notice.html',
             {'email': user.email, 'platform_name': platform_name}
@@ -678,7 +649,6 @@ def dashboard(request):
     staff_access = False
     errored_courses = {}
     if has_access(user, 'staff', 'global'):
-        perflog['branches']['has_global_staff_access'] = True
         # Show any courses that errored on load
         staff_access = True
         errored_courses = modulestore().get_errored_courses()
@@ -689,21 +659,11 @@ def dashboard(request):
         and has_access(request.user, 'view_courseware_with_prerequisites', enrollment.course_overview)
     )
 
-    perflog['checkpoints'].append({
-        'time': time.time(),
-        'name': 'global staff view'})
-
     # Find programs associated with courses being displayed. This information
     # is passed in the template context to allow rendering of program-related
     # information on the dashboard.
     meter = programs_utils.ProgramProgressMeter(user, enrollments=course_enrollments)
-    perflog['checkpoints'].append({
-        'time': time.time(),
-        'name': 'program_utils.ProgramProgressMeter'})
     programs_by_run = meter.engaged_programs(by_run=True)
-    perflog['checkpoints'].append({
-        'time': time.time(),
-        'name': 'meter.engaged_programs'})
 
     # Construct a dictionary of course mode information
     # used to render the course list.  We re-use the course modes dict
@@ -715,9 +675,6 @@ def dashboard(request):
         )
         for enrollment in course_enrollments
     }
-    perflog['checkpoints'].append({
-        'time': time.time(),
-        'name': 'course_mode_info constructed'})
 
     # Determine the per-course verification status
     # This is a dictionary in which the keys are course locators
@@ -734,17 +691,11 @@ def dashboard(request):
     # If a course is not included in this dictionary,
     # there is no verification messaging to display.
     verify_status_by_course = check_verify_status_by_course(user, course_enrollments)
-    perflog['checkpoints'].append({
-        'time': time.time(),
-        'name': 'check_verify_status_by_course'})
 
     cert_statuses = {
         enrollment.course_id: cert_info(request.user, enrollment.course_overview, enrollment.mode)
         for enrollment in course_enrollments
     }
-    perflog['checkpoints'].append({
-        'time': time.time(),
-        'name': 'cert_statuses'})
 
     # only show email settings for Mongo course and when bulk email is turned on
     show_email_settings_for = frozenset(
@@ -752,31 +703,19 @@ def dashboard(request):
             BulkEmailFlag.feature_enabled(enrollment.course_id)
         )
     )
-    perflog['checkpoints'].append({
-        'time': time.time(),
-        'name': 'show_email_settings_for'})
 
     # Verification Attempts
     # Used to generate the "you must reverify for course x" banner
     verification_status, verification_msg = SoftwareSecurePhotoVerification.user_status(user)
-    perflog['checkpoints'].append({
-        'time': time.time(),
-        'name': 'SoftwareSecurePhotoVerification.user_status'})
 
     # Gets data for midcourse reverifications, if any are necessary or have failed
     statuses = ["approved", "denied", "pending", "must_reverify"]
     reverifications = reverification_info(statuses)
-    perflog['checkpoints'].append({
-        'time': time.time(),
-        'name': 'reverification_info'})
 
     show_refund_option_for = frozenset(
         enrollment.course_id for enrollment in course_enrollments
         if enrollment.refundable()
     )
-    perflog['checkpoints'].append({
-        'time': time.time(),
-        'name': 'show_refund_options_for'})
 
     block_courses = frozenset(
         enrollment.course_id for enrollment in course_enrollments
@@ -789,17 +728,11 @@ def dashboard(request):
             enrollment.course_id
         )
     )
-    perflog['checkpoints'].append({
-        'time': time.time(),
-        'name': 'block_courses'})
 
     enrolled_courses_either_paid = frozenset(
         enrollment.course_id for enrollment in course_enrollments
         if enrollment.is_paid_course()
     )
-    perflog['checkpoints'].append({
-        'time': time.time(),
-        'name': 'enrolled_courses_either_paid'})
 
     # If there are *any* denied reverifications that have not been toggled off,
     # we'll display the banner
@@ -807,9 +740,6 @@ def dashboard(request):
 
     # Populate the Order History for the side-bar.
     order_history_list = order_history(user, course_org_filter=course_org_filter, org_filter_out_set=org_filter_out_set)
-    perflog['checkpoints'].append({
-        'time': time.time(),
-        'name': 'order_history'})
 
     # get list of courses having pre-requisites yet to be completed
     courses_having_prerequisites = frozenset(
@@ -817,22 +747,16 @@ def dashboard(request):
         if enrollment.course_overview.pre_requisite_courses
     )
     courses_requirements_not_met = get_pre_requisite_courses_not_completed(user, courses_having_prerequisites)
-    perflog['checkpoints'].append({
-        'time': time.time(),
-        'name': 'get_pre_requisite_courses_not_completed'})
 
     if 'notlive' in request.GET:
-        perflog['branches']['notlive'] = True
         redirect_message = _("The course you are looking for does not start until {date}.").format(
             date=request.GET['notlive']
         )
     elif 'course_closed' in request.GET:
-        perflog['branches']['courses_closed'] = True
         redirect_message = _("The course you are looking for is closed for enrollment as of {date}.").format(
             date=request.GET['course_closed']
         )
     else:
-        perflog['branches']['no_message'] = True
         redirect_message = ''
 
     context = {
@@ -872,24 +796,13 @@ def dashboard(request):
 
     ecommerce_service = EcommerceService()
     if ecommerce_service.is_enabled(request.user):
-        perflog['branches']['ecommerse_service.is_enabled'] = True
         context.update({
             'use_ecommerce_payment_flow': True,
             'ecommerce_payment_page': ecommerce_service.payment_page_url(),
         })
 
-    perflog['checkpoints'].append({
-        'time': time.time(),
-        'name': 'created context'})
     response = render_to_response('dashboard.html', context)
     set_user_info_cookie(response, request)
-    perflog['checkpoints'].append({
-        'time': time.time(),
-        'name': 'generated response'})
-    # slightly redundant, but simplifies analysis later
-    perflog['end'] = time.time()
-    perflog['total_duration'] = perflog['end'] - perflog['start']
-    log.info("PERFLOG %s" % json.dumps(perflog))
     return response
 
 
