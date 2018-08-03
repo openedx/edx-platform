@@ -93,3 +93,40 @@ class GradingPageTest(StudioCourseTest):
         self.grading_page.save()
         grades_alphabets = self.grading_page.grade_letters
         self.assertEqual(grades_alphabets, ['A', 'B', 'F'])
+
+    def test_staff_can_delete_grade_range(self):
+        """
+        Scenario: Users can delete grading ranges
+            Given I have opened a new course in Studio
+            And I am viewing the grading settings
+            When I add "1" new grade
+            And I delete a grade
+            Then I see I now have "2" grades
+        """
+        length = self.grading_page.total_number_of_grades
+        self.grading_page.click_add_grade()
+        self.assertTrue(self.grading_page.is_grade_added(length))
+        self.grading_page.save()
+        total_number_of_grades = self.grading_page.total_number_of_grades
+        self.assertEqual(total_number_of_grades, 3)
+        self.grading_page.remove_grades(1)
+        total_number_of_grades = self.grading_page.total_number_of_grades
+        self.assertEqual(total_number_of_grades, 2)
+
+    def test_staff_can_move_grading_ranges(self):
+        """
+        Scenario: Users can move grading ranges
+            Given I have opened a new course in Studio
+            And I am viewing the grading settings
+            When I move a grading section
+            Then I see that the grade range has changed
+        """
+        grade_ranges = self.grading_page.grades_range
+        self.assertIn('0-50', grade_ranges)
+        self.grading_page.drag_and_drop_grade()
+        grade_ranges = self.grading_page.grades_range
+        self.assertIn(
+            '0-3',
+            grade_ranges,
+            'expected range: 0-3, not found in grade ranges:{}'.format(grade_ranges)
+        )
