@@ -7,70 +7,15 @@ from logging import getLogger
 from django.core.management.base import BaseCommand
 from requests.exceptions import ConnectionError
 
+from common.djangoapps.nodebb.tasks import (task_create_user_on_nodebb, task_activate_user_on_nodebb,
+                                            task_update_user_profile_on_nodebb)
 from common.lib.nodebb_client.client import NodeBBClient
 # from nodebb.signals.handlers import create_user_on_nodebb
+from lms.djangoapps.onboarding.helpers import COUNTRIES
 from lms.djangoapps.onboarding.models import UserExtendedProfile
 from philu_commands.models import CreationFailedUsers
 
 log = getLogger(__name__)
-
-
-def retry(func):
-    """
-    A decorator which keeps on calling a function until 200 success code is returned.
-
-    It retries the function for at most 3 times.
-
-    Arguments:
-        func(Python function): The function to retry again and again.
-
-    returns:
-        bool: True if 200 code is returned in 3 tries otherwise False.
-    """
-    def retry_decorator(sender, instance):
-        max_retry = 3
-        while max_retry >= 1:
-            status_code = func(sender=sender, instance=instance)
-            if not status_code:
-                return False
-            if status_code != 200:
-                max_retry -= 1
-                time.sleep(2)
-                continue
-            break
-        if max_retry == 0:
-            return False
-        return True
-
-    return retry_decorator
-
-
-@retry
-def create_user(sender, instance):
-    """
-    Creates a user on the nodeBB. We are calling a signal handler to do so.
-    """
-    return create_user_on_nodebb(sender=sender, instance=instance, created=True)
-
-
-@retry
-def activate_user(instance, **kwargs):
-    """
-    Activates a user on nodeBB.
-
-    We are not using already existing signal handler here because of the mismatch
-    in condition in the handler. In our case,we only need to check whether
-    user is active in the edx-platform or not. If its active then activate it in
-    nodeBB too.
-    """
-    if instance.is_active:
-        status_code, response_body = NodeBBClient().users.activate(username=instance.username)
-        if status_code != 200:
-            log.error("Error: Can not activate user(%s) on nodebb due to %s" % (instance.username, response_body))
-        else:
-            log.info('Success: User(%s) has been activated on nodebb' % instance.username)
-
-        return status_code
 
 
 class Command(BaseCommand):
@@ -81,27 +26,51 @@ class Command(BaseCommand):
     example:
         manage.py ... create_nodebb_users
     """
+
     def handle(self, *args, **options):
         user_extended_profiles = UserExtendedProfile.objects.all()
+        nodebb_client = NodeBBClient()
         try:
-            nodebb_users = NodeBBClient().users.all()
-            from pprint import pprint
-            pprint(nodebb_users)
+            nodebb_users = nodebb_client.users.all()[1] # returns tuple of (status_code, response_body)
+            nodebb_users = { user['username'] : user for user in nodebb_users }
         except ConnectionError:
-            log.error('Error: failed to connect to NodeBB. aborting command')
+            log.error('Error: failed to connect to NodeBB. aborting command "{}"'.format('sync_users_with_nodebb'))
             return
 
         for extended_profile in user_extended_profiles:
+            user = extended_profile.user
+            profile = user.profile
 
-        #     is_created = create_user(sender=UserExtendedProfile, instance=extended_profile)
-        #     is_activated = False
-        #     if is_created:
-        #         is_activated = activate_user(sender=UserExtendedProfile, instance=extended_profile.user)
+            edx_data = {
+                'edx_user_id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'country_of_employment': extended_profile.country_of_employment,
+                'city_of_employment': extended_profile.city_of_employment,
+                'country_of_residence': COUNTRIES.get(profile.country.code),
+                'city_of_residence': profile.city,
+                'birthday': '01/01/%s' % profile.year_of_birth,
+                'language': profile.language,
+                'interests': extended_profile.get_user_selected_interests(),
+                'self_prioritize_areas': extended_profile.get_user_selected_functions()
+            }
 
-        #     # If user creation or activation(or both) is failed then we make sure to record the instance
-        #     # in the database for future reference.
-        #     if not (is_created and is_activated):
-        #         failed_user = CreationFailedUsers(
-        #             email=extended_profile.user.email, is_created=is_created, is_activated=is_activated
-        #         )
-        #         failed_user.save()
+            nodebb_data = nodebb_users.get(user.username)
+
+            if not nodebb_data:
+                try:
+                    nodebb_client.users.create(username=user.username, kwargs=edx_data)
+                    nodebb_client.users.activate(username=user.username, active=user.is_active)
+                    continue
+                except ConnectionError:
+                    task_create_user_on_nodebb.apply_async(user.username, kwargs=edx_data)
+                    task_activate_user_on_nodebb.apply_async(username=user.username, active=user.is_active)
+
+
+            if not edx_data.viewitems() <= nodebb_data.viewitems():
+                try:
+                    nodebb_client.users.update_profile(username=user.username, kwargs=edx_data)
+                except ConnectionError:
+                    task_update_user_profile_on_nodebb(username=user.username, kwargs=edx_data)
