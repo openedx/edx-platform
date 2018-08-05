@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-07-31 08:31+0000\n"
-"PO-Revision-Date: 2018-07-31 08:31:32.664334\n"
+"POT-Creation-Date: 2018-08-05 20:37+0000\n"
+"PO-Revision-Date: 2018-08-05 20:37:07.256116\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -4178,6 +4178,29 @@ msgstr ""
 "¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
 "¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
 "ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łαвσя#"
+
+#: common/lib/xmodule/xmodule/course_module.py cms/templates/certificates.html
+#: cms/templates/group_configurations.html cms/templates/settings.html
+#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
+msgid "Other Course Settings"
+msgstr "Öthér Çöürsé Séttïngs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Any additional information about the course that the platform needs or that "
+"allows integration with external systems such as CRM software. Enter a "
+"dictionary of values in JSON format, such as { \"my_custom_setting\": "
+"\"value\", \"other_setting\": \"value\" }"
+msgstr ""
+"Àný äddïtïönäl ïnförmätïön äßöüt thé çöürsé thät thé plätförm nééds ör thät "
+"ällöws ïntégrätïön wïth éxtérnäl sýstéms süçh äs ÇRM söftwäré. Éntér ä "
+"dïçtïönärý öf välüés ïn JSÖN förmät, süçh äs { \"my_custom_setting\": "
+"\"value\", \"other_setting\": \"value\" } Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
+"∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
+"υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє "
+"∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα"
+" ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αт#"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
@@ -11501,7 +11524,6 @@ msgid "Create new merged version"
 msgstr "Çréäté néw mérgéd vérsïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/templates/wiki/includes/anonymous_blocked.html
-#: wiki/templates/wiki/includes/anonymous_blocked.html
 #, python-format
 msgid ""
 "You need to <a href=\"%(login_url)s\">log in</a> or <a "
@@ -14751,6 +14773,31 @@ msgstr "Àddïtïönäl Ìnfö: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#
 #: common/templates/emails/contact_us_feedback_email_subject.txt
 msgid "Feedback from user"
 msgstr "Féédßäçk fröm üsér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: common/templates/emails/new_enrollment_email_body.txt
+msgid "Enrollment received for:"
+msgstr "Énröllmént réçéïvéd för: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: common/templates/emails/new_enrollment_email_body.txt
+msgid "Learner: {username} ({full_name})"
+msgstr "Léärnér: {username} ({full_name}) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: common/templates/emails/new_enrollment_email_body.txt
+msgid "Learner: {username}"
+msgstr "Léärnér: {username} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: common/templates/emails/new_enrollment_email_body.txt
+msgid "Course: {url}"
+msgstr "Çöürsé: {url} Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: common/templates/emails/new_enrollment_email_body.txt
+msgid "More learner data in admin: {url}"
+msgstr ""
+"Möré léärnér dätä ïn ädmïn: {url} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: common/templates/emails/new_enrollment_email_subject.txt
+msgid "New student enrollment"
+msgstr "Néw stüdént énröllmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: common/templates/emails/sync_learner_profile_data_email_change_body.txt
 msgid ""
@@ -24950,12 +24997,6 @@ msgstr ""
 msgid "Learn more about certificates"
 msgstr "Léärn möré äßöüt çértïfïçätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
-#: cms/templates/certificates.html cms/templates/group_configurations.html
-#: cms/templates/settings.html cms/templates/settings_advanced.html
-#: cms/templates/settings_graders.html
-msgid "Other Course Settings"
-msgstr "Öthér Çöürsé Séttïngs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
 #: cms/templates/certificates.html cms/templates/settings_graders.html
 msgid "Details &amp; Schedule"
 msgstr "Détäïls &amp; Sçhédülé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
@@ -29543,18 +29584,13 @@ msgstr "À fïlé wäs délétéd: %s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid ""
-"The file may be referenced on other articles. Deleting it means that they "
-"will loose their references to this file. The following articles reference "
-"this file:"
+"\n"
+"    The file may be referenced on other articles. Deleting it means that they will loose their references to this file. The following articles reference this file:\n"
+"    "
 msgstr ""
-"Thé fïlé mäý ßé référénçéd ön öthér ärtïçlés. Délétïng ït méäns thät théý "
-"wïll löösé théïr référénçés tö thïs fïlé. Thé föllöwïng ärtïçlés référénçé "
-"thïs fïlé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ"
-" єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ "
-"мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ "
-"єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє "
-"νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
-"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυη#"
+"\n"
+"    Thé fïlé mäý ßé référénçéd ön öthér ärtïçlés. Délétïng ït méäns thät théý wïll löösé théïr référénçés tö thïs fïlé. Thé föllöwïng ärtïçlés référénçé thïs fïlé:\n"
+"     Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒ#"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid "Delete it!"
@@ -29562,11 +29598,13 @@ msgstr "Délété ït! Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid ""
-"You can remove a reference to a file, but it will retain its references on "
-"other articles."
+"\n"
+"    You can remove a reference to a file, but it will retain its references on other articles.\n"
+"    "
 msgstr ""
-"Ýöü çän rémövé ä référénçé tö ä fïlé, ßüt ït wïll rétäïn ïts référénçés ön "
-"öthér ärtïçlés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+"\n"
+"    Ýöü çän rémövé ä référénçé tö ä fïlé, ßüt ït wïll rétäïn ïts référénçés ön öthér ärtïçlés.\n"
+"     Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid "Remove reference"
@@ -29607,21 +29645,13 @@ msgstr "Ûsé thïs! Ⱡ'σяєм ιρѕυм ∂σł#"
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 #, python-format
 msgid ""
-"Replacing an attachment means adding a new file that will be used in its "
-"place. All references to the file will be replaced by the one you upload and"
-" the file will be downloaded as <strong>%(filename)s</strong>. Please note "
-"that this attachment is in use on other articles, you may distort contents. "
-"However, do not hestitate to take advantage of this and make replacements "
-"for the listed articles where necessary. This way of working is more "
-"efficient...."
+"\n"
+"  Replacing an attachment means adding a new file that will be used in its place. All references to the file will be replaced by the one you upload and the file will be downloaded as <strong>%(filename)s</strong>. Please note that this attachment is in use on other articles, you may distort contents. However, do not hestitate to take advantage of this and make replacements for the listed articles where necessary. This way of working is more efficient....\n"
+"  "
 msgstr ""
-"Répläçïng än ättäçhmént méäns äddïng ä néw fïlé thät wïll ßé üséd ïn ïts "
-"pläçé. Àll référénçés tö thé fïlé wïll ßé répläçéd ßý thé öné ýöü üplöäd änd"
-" thé fïlé wïll ßé döwnlöädéd äs <strong>%(filename)s</strong>. Pléäsé nöté "
-"thät thïs ättäçhmént ïs ïn üsé ön öthér ärtïçlés, ýöü mäý dïstört çönténts. "
-"Höwévér, dö nöt héstïtäté tö täké ädväntägé öf thïs änd mäké répläçéménts "
-"för thé lïstéd ärtïçlés whéré néçéssärý. Thïs wäý öf wörkïng ïs möré "
-"éffïçïént....#"
+"\n"
+"  Répläçïng än ättäçhmént méäns äddïng ä néw fïlé thät wïll ßé üséd ïn ïts pläçé. Àll référénçés tö thé fïlé wïll ßé répläçéd ßý thé öné ýöü üplöäd änd thé fïlé wïll ßé döwnlöädéd äs <strong>%(filename)s</strong>. Pléäsé nöté thät thïs ättäçhmént ïs ïn üsé ön öthér ärtïçlés, ýöü mäý dïstört çönténts. Höwévér, dö nöt héstïtäté tö täké ädväntägé öf thïs änd mäké répläçéménts för thé lïstéd ärtïçlés whéré néçéssärý. Thïs wäý öf wörkïng ïs möré éffïçïént....\n"
+"  #"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 msgid "Articles using"
@@ -29630,19 +29660,13 @@ msgstr "Àrtïçlés üsïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 #, python-format
 msgid ""
-"Replacing an attachment means adding a new file that will be used in its "
-"place. All references to the file will be replaced by the one you upload and"
-" the file will be downloaded as <strong>%(filename)s</strong>."
+"\n"
+"  Replacing an attachment means adding a new file that will be used in its place. All references to the file will be replaced by the one you upload and the file will be downloaded as <strong>%(filename)s</strong>.\n"
+"  "
 msgstr ""
-"Répläçïng än ättäçhmént méäns äddïng ä néw fïlé thät wïll ßé üséd ïn ïts "
-"pläçé. Àll référénçés tö thé fïlé wïll ßé répläçéd ßý thé öné ýöü üplöäd änd"
-" thé fïlé wïll ßé döwnlöädéd äs <strong>%(filename)s</strong>. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
-"ηση#"
+"\n"
+"  Répläçïng än ättäçhmént méäns äddïng ä néw fïlé thät wïll ßé üséd ïn ïts pläçé. Àll référénçés tö thé fïlé wïll ßé répläçéd ßý thé öné ýöü üplöäd änd thé fïlé wïll ßé döwnlöädéd äs <strong>%(filename)s</strong>.\n"
+"   Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι#"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 #: wiki/plugins/images/templates/wiki/plugins/images/revision_add.html
@@ -30060,10 +30084,14 @@ msgstr "mätçhés,mätçh Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: wiki/templates/wiki/dir.html
 #, python-format
-msgid "%(cnt)s %(articles_plur)s in this level %(match_plur)s your search."
+msgid ""
+"\n"
+"        %(cnt)s %(articles_plur)s in this level %(match_plur)s your search.\n"
+"      "
 msgstr ""
-"%(cnt)s %(articles_plur)s ïn thïs lévél %(match_plur)s ýöür séärçh. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+"\n"
+"        %(cnt)s %(articles_plur)s ïn thïs lévél %(match_plur)s ýöür séärçh.\n"
+"       Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: wiki/templates/wiki/dir.html
 msgid "is,are"
@@ -30071,10 +30099,14 @@ msgstr "ïs,äré Ⱡ'σяєм ιρѕυ#"
 
 #: wiki/templates/wiki/dir.html
 #, python-format
-msgid "There %(articles_plur_verb)s %(cnt)s %(articles_plur)s in this level."
+msgid ""
+"\n"
+"        There %(articles_plur_verb)s %(cnt)s %(articles_plur)s in this level.\n"
+"      "
 msgstr ""
-"Théré %(articles_plur_verb)s %(cnt)s %(articles_plur)s ïn thïs lévél. Ⱡ'σяєм"
-" ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+"\n"
+"        Théré %(articles_plur_verb)s %(cnt)s %(articles_plur)s ïn thïs lévél.\n"
+"       Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: wiki/templates/wiki/dir.html
 msgid "Last modified"
@@ -30158,6 +30190,17 @@ msgstr "Rööt ärtïçlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 #: wiki/templates/wiki/article/create_root.html
 msgid "Create root"
 msgstr "Çréäté rööt Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: wiki/templates/wiki/includes/anonymous_blocked.html
+#, python-format
+msgid ""
+"\n"
+"  You need to <a href=\"%(login_url)s\">log in</a> or <a href=\"%(signup_url)s\">sign up</a> to use this function.\n"
+"  "
+msgstr ""
+"\n"
+"  Ýöü nééd tö <a href=\"%(login_url)s\">lög ïn</a> ör <a href=\"%(signup_url)s\">sïgn üp</a> tö üsé thïs fünçtïön.\n"
+"   Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: wiki/templates/wiki/includes/anonymous_blocked.html
 msgid "You need to log in og sign up to use this function."

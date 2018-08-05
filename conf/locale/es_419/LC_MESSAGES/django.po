@@ -55,7 +55,7 @@
 # xocoyotzin, 2014
 # Valeria Freire <valtodopds@hotmail.com>, 2014-2015
 # wjmendez <walterj.mendez@gmail.com>, 2014
-# José Luis <alagunajs@gmail.com>, 2016
+# José Luis Sandoval Alaguna <alagunajs@gmail.com>, 2016
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/).
 # Copyright (C) 2018 EdX
@@ -163,7 +163,7 @@
 # UAbierta Universidad de Chile <uabierta@u.uchile.cl>, 2015
 # Valeria Freire <valtodopds@hotmail.com>, 2014-2015
 # Yleana Munoz <yleana.munoz@gmail.com>, 2015
-# José Luis <alagunajs@gmail.com>, 2016
+# José Luis Sandoval Alaguna <alagunajs@gmail.com>, 2016
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)
 # Copyright (C) 2018 edX
@@ -210,6 +210,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
+# Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018
 # Cristian Salamea <ovnicraft@gmail.com>, 2015
 # Diego Rojas <diego.rojas@edunext.co>, 2017
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2014,2018
@@ -221,8 +222,8 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2018-07-30 04:58+0000\n"
-"PO-Revision-Date: 2018-07-23 07:15+0000\n"
-"Last-Translator: Muhammad Ayub khan <ayubkhan@edx.org>\n"
+"PO-Revision-Date: 2018-08-02 21:25+0000\n"
+"Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
@@ -6425,6 +6426,8 @@ msgid ""
 "There is no user with the username or email address \"{user_identifier}\" "
 "enrolled in this course."
 msgstr ""
+"No hay un usuario con el nombre de usuario o correo electrónico "
+"\"{user_identifier}\" inscrito en este curso."
 
 #: lms/djangoapps/courseware/masquerade.py
 msgid ""
@@ -10157,6 +10160,8 @@ msgid ""
 "If you are not redirected within 5 seconds, <a href=\"%(target)s\">click "
 "here to go to the home page</a>."
 msgstr ""
+"Si no es redirigido en 5 segundos, <a href=\"%(target)s\">de click aquí para"
+" ser redirigido a la página de inicio</a>."
 
 #: lms/templates/main_django.html cms/templates/base.html
 #: lms/templates/main.html
@@ -10429,6 +10434,8 @@ msgid ""
 "You need to <a href=\"%(login_url)s\">log in</a> or <a "
 "href=\"%(signup_url)s\">sign up</a> to use this function."
 msgstr ""
+"  Debe <a href=\"%(login_url)s\">iniciar sesión</a> o <a "
+"href=\"%(signup_url)s\">registrarse</a> para usar esta función.  "
 
 #: lms/templates/wiki/includes/anonymous_blocked.html
 msgid "You need to log in or sign up to use this function."
@@ -10546,6 +10553,8 @@ msgid ""
 "Markdown syntax is allowed. See the %(start_link)scheatsheet%(end_link)s for"
 " help."
 msgstr ""
+"Se permite la sintaxis de marcadores Markdown. Vea el %(start_link)sresumen "
+"de wiki%(end_link)s para más información."
 
 #: lms/templates/wiki/plugins/attachments/index.html
 #: wiki/plugins/attachments/wiki_plugin.py
@@ -11447,7 +11456,7 @@ msgstr ""
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/courseupdate/email/subject.txt
 #, python-format
 msgid "Welcome to week %(week_num)s"
-msgstr ""
+msgstr "Bienvenido/a a la semana %(week_num)s"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.txt
@@ -12493,7 +12502,7 @@ msgstr "El curso ha sido reindexado correctamente."
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "Set Date"
-msgstr ""
+msgstr "Establecer Fecha"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
@@ -15016,7 +15025,7 @@ msgstr "Términos del servicio para las APIs de {platform_name}"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Effective Date: May 24th, 2018"
-msgstr ""
+msgstr "Fecha efectiva: Mayo 24 de 2018"
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid ""
@@ -18766,7 +18775,7 @@ msgstr "Programas"
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Journals"
-msgstr ""
+msgstr "Registros diario"
 
 #: lms/templates/header/navbar-authenticated.html
 #: lms/templates/header/user_dropdown.html
@@ -19176,10 +19185,14 @@ msgid ""
 "the problem. You also select a section or chapter to include results of all "
 "problems in that section or chapter."
 msgstr ""
+"Seleccione un problema para generar un archivo CSV que contenga una lista de"
+" todas las respuestas de los estudiantes al problema. También seleccione una"
+" sección o capitulo para incluir los resultados de todos los problemas en "
+"esa sección o capitulo."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "NOTE"
-msgstr ""
+msgstr "NOTA"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -19188,6 +19201,10 @@ msgid ""
 "by-chapter, or problem-by-problem basis, or contact your site administrator "
 "to increase the limit."
 msgstr ""
+"El reporte generado es limitado a  {max_entries} respuestas. Si espera más "
+"de {max_entries} respuestas, intente generando el reporte en una base de "
+"capítulo por capítulo o problema por problema, o contacte el administrador "
+"del sitio para incrementar el límite."
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Download a CSV of problem responses"
@@ -20622,7 +20639,7 @@ msgstr "Mis cursos"
 
 #: lms/templates/learner_dashboard/_dashboard_navigation_journals.html
 msgid "My Journals"
-msgstr ""
+msgstr "Mis registros diarios"
 
 #: lms/templates/learner_dashboard/program_details.html
 msgid "Program Details"
@@ -21904,74 +21921,74 @@ msgstr "Resultados de búsqueda"
 
 #: openedx/features/journals/templates/journals/bundle_about.html
 msgid "Purchase the Bundle ("
-msgstr ""
+msgstr "Compre el paquete ("
 
 #: openedx/features/journals/templates/journals/bundle_about.html
 msgid "Courses included"
-msgstr ""
+msgstr "cursos incluidos"
 
 #: openedx/features/journals/templates/journals/bundle_about.html
 msgid "Journals included"
-msgstr ""
+msgstr "Registros diarios incluidos"
 
 #: openedx/features/journals/templates/journals/bundle_about.html
 msgid "{access_length} Day Access"
-msgstr ""
+msgstr "{access_length} Acceso diario"
 
 #: openedx/features/journals/templates/journals/bundle_about.html
 #: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
 msgid "View Journal"
-msgstr ""
+msgstr "Ver registros diarios"
 
 #: openedx/features/journals/templates/journals/bundle_card.html
 msgid "Bundle"
-msgstr ""
+msgstr "Paquete"
 
 #: openedx/features/journals/templates/journals/journal_card.html
 msgid "Journal"
-msgstr ""
+msgstr "Registro diario"
 
 #: openedx/features/journals/templates/journals/journal_card.html
 msgid "{num_months} month"
 msgid_plural "{num_months} months"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{num_months} mes"
+msgstr[1] "{num_months} meses"
 
 #: openedx/features/journals/templates/journals/journal_card.html
 msgid "unlimited"
-msgstr ""
+msgstr "ilimitado"
 
 #: openedx/features/journals/templates/journals/journal_card.html
 msgid "Access Length"
-msgstr ""
+msgstr "Duración de acceso"
 
 #: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
 msgid "Journal Dashboard"
-msgstr ""
+msgstr "Panel de control del registro diario"
 
 #: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
 msgid "{journal_title} Cover Image"
-msgstr ""
+msgstr "{journal_title} Imagen de portada"
 
 #: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
 msgid "Access Expired: {date}"
-msgstr ""
+msgstr "Acceso expirado: {date}"
 
 #: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
 msgid "Access Expires: {date}"
-msgstr ""
+msgstr "Acceso expira en: {date}"
 
 #: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
 msgid "Renew Access"
-msgstr ""
+msgstr "Renovar acceso"
 
 #: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
 msgid "You have not purchased access to any journals yet."
-msgstr ""
+msgstr "No ha comprado acceso a ningún registro diario aún."
 
 #: openedx/features/journals/templates/journals/learner_dashboard/journal_dashboard.html
 msgid "Explore journals and courses"
-msgstr ""
+msgstr "Explore registros diarios y cursos"
 
 #: openedx/features/learner_analytics/templates/learner_analytics/dashboard.html
 msgid "My Stats (Beta)"
@@ -26470,6 +26487,9 @@ msgid ""
 "will loose their references to this file. The following articles reference "
 "this file:"
 msgstr ""
+"El archivo puede tener referencias en otros artículos. Borrarlo significa "
+"que no habrá referencia del archivo en los otros artículos. Los siguientes "
+"artículos hacen referencia a este archivo."
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid "Delete it!"
@@ -26480,6 +26500,8 @@ msgid ""
 "You can remove a reference to a file, but it will retain its references on "
 "other articles."
 msgstr ""
+"Puede remover una referencia a un archivo, pero el archivo va a mantener sus"
+" referencias en otros artículos."
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid "Remove reference"
@@ -26528,6 +26550,13 @@ msgid ""
 "for the listed articles where necessary. This way of working is more "
 "efficient...."
 msgstr ""
+"Reemplazar un archivo adjunto significa añadir un nuevo archivo que será "
+"usado en su lugar. Todas las referencias hacia el archivo serán reemplazadas"
+" con el archivo que usted suba y el archivo será descargado como "
+"<strong>%(filename)s</strong>. Por favor note que este archivo adjunto es "
+"usado en otros artículos, podría distorsionar los contenidos. Sin embargo, "
+"no dude en aprovechar esto y hacer los reemplazos para la lista de artículos"
+" donde sea necesario. Esta forma de trabajo es más eficiente...."
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 msgid "Articles using"
@@ -26540,6 +26569,10 @@ msgid ""
 "place. All references to the file will be replaced by the one you upload and"
 " the file will be downloaded as <strong>%(filename)s</strong>."
 msgstr ""
+"Reemplazar un archivo adjunto significa añadir un nuevo archivo que será "
+"usado en su lugar. Todas las referencias hacia el archivo serán reemplazadas"
+" con el archivo que usted suba y el archivo será descargado como "
+"<strong>%(filename)s</strong>."
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 #: wiki/plugins/images/templates/wiki/plugins/images/revision_add.html
@@ -26927,7 +26960,7 @@ msgstr "coincidencias,coincidencia"
 #: wiki/templates/wiki/dir.html
 #, python-format
 msgid "%(cnt)s %(articles_plur)s in this level %(match_plur)s your search."
-msgstr ""
+msgstr "%(cnt)s %(articles_plur)s en este nivel %(match_plur)s su búsqueda."
 
 #: wiki/templates/wiki/dir.html
 msgid "is,are"
@@ -26936,7 +26969,7 @@ msgstr "es,son"
 #: wiki/templates/wiki/dir.html
 #, python-format
 msgid "There %(articles_plur_verb)s %(cnt)s %(articles_plur)s in this level."
-msgstr ""
+msgstr "There %(articles_plur_verb)s %(cnt)s %(articles_plur)s en este nivel."
 
 #: wiki/templates/wiki/dir.html
 msgid "Last modified"
