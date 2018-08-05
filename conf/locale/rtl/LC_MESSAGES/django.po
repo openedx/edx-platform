@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-07-31 08:31+0000\n"
-"PO-Revision-Date: 2018-07-31 08:31:32.664334\n"
+"POT-Creation-Date: 2018-08-05 20:37+0000\n"
+"PO-Revision-Date: 2018-08-05 20:37:07.256116\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -3612,6 +3612,24 @@ msgid ""
 msgstr ""
 "ثرفثق فقعث خق بشمسث. هب فقعث, شرغ اهلامهلافس شسسخذهشفثي صهفا ذخرفثرف هر فاث "
 "ذخعقسث صهمم زث وثسسشلثي فخ مثشقرثقس شف فاثهق سذاثيعمثي فهوث."
+
+#: common/lib/xmodule/xmodule/course_module.py cms/templates/certificates.html
+#: cms/templates/group_configurations.html cms/templates/settings.html
+#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
+msgid "Other Course Settings"
+msgstr "خفاثق ذخعقسث سثففهرلس"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Any additional information about the course that the platform needs or that "
+"allows integration with external systems such as CRM software. Enter a "
+"dictionary of values in JSON format, such as { \"my_custom_setting\": "
+"\"value\", \"other_setting\": \"value\" }"
+msgstr ""
+"شرغ شييهفهخرشم هربخقوشفهخر شزخعف فاث ذخعقسث فاشف فاث حمشفبخقو رثثيس خق فاشف "
+"شممخصس هرفثلقشفهخر صهفا ثطفثقرشم سغسفثوس سعذا شس ذقو سخبفصشقث. ثرفثق ش "
+"يهذفهخرشقغ خب دشمعثس هر تسخر بخقوشف, سعذا شس { \"my_custom_setting\": "
+"\"value\", \"other_setting\": \"value\" }"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
@@ -9989,7 +10007,6 @@ msgid "Create new merged version"
 msgstr "ذقثشفث رثص وثقلثي دثقسهخر"
 
 #: lms/templates/wiki/includes/anonymous_blocked.html
-#: wiki/templates/wiki/includes/anonymous_blocked.html
 #, python-format
 msgid ""
 "You need to <a href=\"%(login_url)s\">log in</a> or <a "
@@ -12841,6 +12858,30 @@ msgstr "شييهفهخرشم هربخ:"
 #: common/templates/emails/contact_us_feedback_email_subject.txt
 msgid "Feedback from user"
 msgstr "بثثيزشذن بقخو عسثق"
+
+#: common/templates/emails/new_enrollment_email_body.txt
+msgid "Enrollment received for:"
+msgstr "ثرقخمموثرف قثذثهدثي بخق:"
+
+#: common/templates/emails/new_enrollment_email_body.txt
+msgid "Learner: {username} ({full_name})"
+msgstr "مثشقرثق: {username} ({full_name})"
+
+#: common/templates/emails/new_enrollment_email_body.txt
+msgid "Learner: {username}"
+msgstr "مثشقرثق: {username}"
+
+#: common/templates/emails/new_enrollment_email_body.txt
+msgid "Course: {url}"
+msgstr "ذخعقسث: {url}"
+
+#: common/templates/emails/new_enrollment_email_body.txt
+msgid "More learner data in admin: {url}"
+msgstr "وخقث مثشقرثق يشفش هر شيوهر: {url}"
+
+#: common/templates/emails/new_enrollment_email_subject.txt
+msgid "New student enrollment"
+msgstr "رثص سفعيثرف ثرقخمموثرف"
 
 #: common/templates/emails/sync_learner_profile_data_email_change_body.txt
 msgid ""
@@ -21775,12 +21816,6 @@ msgstr ""
 msgid "Learn more about certificates"
 msgstr "مثشقر وخقث شزخعف ذثقفهبهذشفثس"
 
-#: cms/templates/certificates.html cms/templates/group_configurations.html
-#: cms/templates/settings.html cms/templates/settings_advanced.html
-#: cms/templates/settings_graders.html
-msgid "Other Course Settings"
-msgstr "خفاثق ذخعقسث سثففهرلس"
-
 #: cms/templates/certificates.html cms/templates/settings_graders.html
 msgid "Details &amp; Schedule"
 msgstr "يثفشهمس &amp; سذاثيعمث"
@@ -25665,13 +25700,13 @@ msgstr "ش بهمث صشس يثمثفثي: %s"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid ""
-"The file may be referenced on other articles. Deleting it means that they "
-"will loose their references to this file. The following articles reference "
-"this file:"
+"\n"
+"    The file may be referenced on other articles. Deleting it means that they will loose their references to this file. The following articles reference this file:\n"
+"    "
 msgstr ""
-"فاث بهمث وشغ زث قثبثقثرذثي خر خفاثق شقفهذمثس. يثمثفهرل هف وثشرس فاشف فاثغ "
-"صهمم مخخسث فاثهق قثبثقثرذثس فخ فاهس بهمث. فاث بخممخصهرل شقفهذمثس قثبثقثرذث "
-"فاهس بهمث:"
+"\n"
+"    فاث بهمث وشغ زث قثبثقثرذثي خر خفاثق شقفهذمثس. يثمثفهرل هف وثشرس فاشف فاثغ صهمم مخخسث فاثهق قثبثقثرذثس فخ فاهس بهمث. فاث بخممخصهرل شقفهذمثس قثبثقثرذث فاهس بهمث:\n"
+"    "
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid "Delete it!"
@@ -25679,11 +25714,13 @@ msgstr "يثمثفث هف!"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid ""
-"You can remove a reference to a file, but it will retain its references on "
-"other articles."
+"\n"
+"    You can remove a reference to a file, but it will retain its references on other articles.\n"
+"    "
 msgstr ""
-"غخع ذشر قثوخدث ش قثبثقثرذث فخ ش بهمث, زعف هف صهمم قثفشهر هفس قثبثقثرذثس خر "
-"خفاثق شقفهذمثس."
+"\n"
+"    غخع ذشر قثوخدث ش قثبثقثرذث فخ ش بهمث, زعف هف صهمم قثفشهر هفس قثبثقثرذثس خر خفاثق شقفهذمثس.\n"
+"    "
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid "Remove reference"
@@ -25724,21 +25761,13 @@ msgstr "عسث فاهس!"
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 #, python-format
 msgid ""
-"Replacing an attachment means adding a new file that will be used in its "
-"place. All references to the file will be replaced by the one you upload and"
-" the file will be downloaded as <strong>%(filename)s</strong>. Please note "
-"that this attachment is in use on other articles, you may distort contents. "
-"However, do not hestitate to take advantage of this and make replacements "
-"for the listed articles where necessary. This way of working is more "
-"efficient...."
+"\n"
+"  Replacing an attachment means adding a new file that will be used in its place. All references to the file will be replaced by the one you upload and the file will be downloaded as <strong>%(filename)s</strong>. Please note that this attachment is in use on other articles, you may distort contents. However, do not hestitate to take advantage of this and make replacements for the listed articles where necessary. This way of working is more efficient....\n"
+"  "
 msgstr ""
-"قثحمشذهرل شر شففشذاوثرف وثشرس شييهرل ش رثص بهمث فاشف صهمم زث عسثي هر هفس "
-"حمشذث. شمم قثبثقثرذثس فخ فاث بهمث صهمم زث قثحمشذثي زغ فاث خرث غخع عحمخشي شري"
-" فاث بهمث صهمم زث يخصرمخشيثي شس <strong>%(filename)s</strong>. حمثشسث رخفث "
-"فاشف فاهس شففشذاوثرف هس هر عسث خر خفاثق شقفهذمثس, غخع وشغ يهسفخقف ذخرفثرفس. "
-"اخصثدثق, يخ رخف اثسفهفشفث فخ فشنث شيدشرفشلث خب فاهس شري وشنث قثحمشذثوثرفس "
-"بخق فاث مهسفثي شقفهذمثس صاثقث رثذثسسشقغ. فاهس صشغ خب صخقنهرل هس وخقث "
-"ثببهذهثرف...."
+"\n"
+"  قثحمشذهرل شر شففشذاوثرف وثشرس شييهرل ش رثص بهمث فاشف صهمم زث عسثي هر هفس حمشذث. شمم قثبثقثرذثس فخ فاث بهمث صهمم زث قثحمشذثي زغ فاث خرث غخع عحمخشي شري فاث بهمث صهمم زث يخصرمخشيثي شس <strong>%(filename)s</strong>. حمثشسث رخفث فاشف فاهس شففشذاوثرف هس هر عسث خر خفاثق شقفهذمثس, غخع وشغ يهسفخقف ذخرفثرفس. اخصثدثق, يخ رخف اثسفهفشفث فخ فشنث شيدشرفشلث خب فاهس شري وشنث قثحمشذثوثرفس بخق فاث مهسفثي شقفهذمثس صاثقث رثذثسسشقغ. فاهس صشغ خب صخقنهرل هس وخقث ثببهذهثرف....\n"
+"  "
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 msgid "Articles using"
@@ -25747,13 +25776,13 @@ msgstr "شقفهذمثس عسهرل"
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 #, python-format
 msgid ""
-"Replacing an attachment means adding a new file that will be used in its "
-"place. All references to the file will be replaced by the one you upload and"
-" the file will be downloaded as <strong>%(filename)s</strong>."
+"\n"
+"  Replacing an attachment means adding a new file that will be used in its place. All references to the file will be replaced by the one you upload and the file will be downloaded as <strong>%(filename)s</strong>.\n"
+"  "
 msgstr ""
-"قثحمشذهرل شر شففشذاوثرف وثشرس شييهرل ش رثص بهمث فاشف صهمم زث عسثي هر هفس "
-"حمشذث. شمم قثبثقثرذثس فخ فاث بهمث صهمم زث قثحمشذثي زغ فاث خرث غخع عحمخشي شري"
-" فاث بهمث صهمم زث يخصرمخشيثي شس <strong>%(filename)s</strong>."
+"\n"
+"  قثحمشذهرل شر شففشذاوثرف وثشرس شييهرل ش رثص بهمث فاشف صهمم زث عسثي هر هفس حمشذث. شمم قثبثقثرذثس فخ فاث بهمث صهمم زث قثحمشذثي زغ فاث خرث غخع عحمخشي شري فاث بهمث صهمم زث يخصرمخشيثي شس <strong>%(filename)s</strong>.\n"
+"  "
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 #: wiki/plugins/images/templates/wiki/plugins/images/revision_add.html
@@ -26133,8 +26162,14 @@ msgstr "وشفذاثس,وشفذا"
 
 #: wiki/templates/wiki/dir.html
 #, python-format
-msgid "%(cnt)s %(articles_plur)s in this level %(match_plur)s your search."
-msgstr "%(cnt)s %(articles_plur)s هر فاهس مثدثم %(match_plur)s غخعق سثشقذا."
+msgid ""
+"\n"
+"        %(cnt)s %(articles_plur)s in this level %(match_plur)s your search.\n"
+"      "
+msgstr ""
+"\n"
+"        %(cnt)s %(articles_plur)s هر فاهس مثدثم %(match_plur)s غخعق سثشقذا.\n"
+"      "
 
 #: wiki/templates/wiki/dir.html
 msgid "is,are"
@@ -26142,8 +26177,14 @@ msgstr "هس,شقث"
 
 #: wiki/templates/wiki/dir.html
 #, python-format
-msgid "There %(articles_plur_verb)s %(cnt)s %(articles_plur)s in this level."
-msgstr "فاثقث %(articles_plur_verb)s %(cnt)s %(articles_plur)s هر فاهس مثدثم."
+msgid ""
+"\n"
+"        There %(articles_plur_verb)s %(cnt)s %(articles_plur)s in this level.\n"
+"      "
+msgstr ""
+"\n"
+"        فاثقث %(articles_plur_verb)s %(cnt)s %(articles_plur)s هر فاهس مثدثم.\n"
+"      "
 
 #: wiki/templates/wiki/dir.html
 msgid "Last modified"
@@ -26218,6 +26259,17 @@ msgstr "قخخف شقفهذمث"
 #: wiki/templates/wiki/article/create_root.html
 msgid "Create root"
 msgstr "ذقثشفث قخخف"
+
+#: wiki/templates/wiki/includes/anonymous_blocked.html
+#, python-format
+msgid ""
+"\n"
+"  You need to <a href=\"%(login_url)s\">log in</a> or <a href=\"%(signup_url)s\">sign up</a> to use this function.\n"
+"  "
+msgstr ""
+"\n"
+"  غخع رثثي فخ <a href=\"%(login_url)s\">مخل هر</a> خق <a href=\"%(signup_url)s\">سهلر عح</a> فخ عسث فاهس بعرذفهخر.\n"
+"  "
 
 #: wiki/templates/wiki/includes/anonymous_blocked.html
 msgid "You need to log in og sign up to use this function."

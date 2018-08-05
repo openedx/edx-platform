@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-07-31 08:31+0000\n"
-"PO-Revision-Date: 2018-07-31 08:31:32.664334\n"
+"POT-Creation-Date: 2018-08-05 20:37+0000\n"
+"PO-Revision-Date: 2018-08-05 20:37:07.256116\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -3278,6 +3278,20 @@ msgstr ""
 msgid ""
 "Enter true or false. If true, any highlights associated with content in the "
 "course will be messaged to learners at their scheduled time."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py cms/templates/certificates.html
+#: cms/templates/group_configurations.html cms/templates/settings.html
+#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
+msgid "Other Course Settings"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Any additional information about the course that the platform needs or that "
+"allows integration with external systems such as CRM software. Enter a "
+"dictionary of values in JSON format, such as { \"my_custom_setting\": "
+"\"value\", \"other_setting\": \"value\" }"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -9002,7 +9016,6 @@ msgid "Create new merged version"
 msgstr ""
 
 #: lms/templates/wiki/includes/anonymous_blocked.html
-#: wiki/templates/wiki/includes/anonymous_blocked.html
 #, python-format
 msgid ""
 "You need to <a href=\"%(login_url)s\">log in</a> or <a "
@@ -11622,6 +11635,30 @@ msgstr ""
 
 #: common/templates/emails/contact_us_feedback_email_subject.txt
 msgid "Feedback from user"
+msgstr ""
+
+#: common/templates/emails/new_enrollment_email_body.txt
+msgid "Enrollment received for:"
+msgstr ""
+
+#: common/templates/emails/new_enrollment_email_body.txt
+msgid "Learner: {username} ({full_name})"
+msgstr ""
+
+#: common/templates/emails/new_enrollment_email_body.txt
+msgid "Learner: {username}"
+msgstr ""
+
+#: common/templates/emails/new_enrollment_email_body.txt
+msgid "Course: {url}"
+msgstr ""
+
+#: common/templates/emails/new_enrollment_email_body.txt
+msgid "More learner data in admin: {url}"
+msgstr ""
+
+#: common/templates/emails/new_enrollment_email_subject.txt
+msgid "New student enrollment"
 msgstr ""
 
 #: common/templates/emails/sync_learner_profile_data_email_change_body.txt
@@ -19535,12 +19572,6 @@ msgstr ""
 msgid "Learn more about certificates"
 msgstr ""
 
-#: cms/templates/certificates.html cms/templates/group_configurations.html
-#: cms/templates/settings.html cms/templates/settings_advanced.html
-#: cms/templates/settings_graders.html
-msgid "Other Course Settings"
-msgstr ""
-
 #: cms/templates/certificates.html cms/templates/settings_graders.html
 msgid "Details &amp; Schedule"
 msgstr ""
@@ -22930,9 +22961,9 @@ msgstr ""
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid ""
-"The file may be referenced on other articles. Deleting it means that they "
-"will loose their references to this file. The following articles reference "
-"this file:"
+"\n"
+"    The file may be referenced on other articles. Deleting it means that they will loose their references to this file. The following articles reference this file:\n"
+"    "
 msgstr ""
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
@@ -22941,8 +22972,9 @@ msgstr ""
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid ""
-"You can remove a reference to a file, but it will retain its references on "
-"other articles."
+"\n"
+"    You can remove a reference to a file, but it will retain its references on other articles.\n"
+"    "
 msgstr ""
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
@@ -22984,13 +23016,9 @@ msgstr ""
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 #, python-format
 msgid ""
-"Replacing an attachment means adding a new file that will be used in its "
-"place. All references to the file will be replaced by the one you upload and"
-" the file will be downloaded as <strong>%(filename)s</strong>. Please note "
-"that this attachment is in use on other articles, you may distort contents. "
-"However, do not hestitate to take advantage of this and make replacements "
-"for the listed articles where necessary. This way of working is more "
-"efficient...."
+"\n"
+"  Replacing an attachment means adding a new file that will be used in its place. All references to the file will be replaced by the one you upload and the file will be downloaded as <strong>%(filename)s</strong>. Please note that this attachment is in use on other articles, you may distort contents. However, do not hestitate to take advantage of this and make replacements for the listed articles where necessary. This way of working is more efficient....\n"
+"  "
 msgstr ""
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
@@ -23000,9 +23028,9 @@ msgstr ""
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 #, python-format
 msgid ""
-"Replacing an attachment means adding a new file that will be used in its "
-"place. All references to the file will be replaced by the one you upload and"
-" the file will be downloaded as <strong>%(filename)s</strong>."
+"\n"
+"  Replacing an attachment means adding a new file that will be used in its place. All references to the file will be replaced by the one you upload and the file will be downloaded as <strong>%(filename)s</strong>.\n"
+"  "
 msgstr ""
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
@@ -23364,7 +23392,10 @@ msgstr ""
 
 #: wiki/templates/wiki/dir.html
 #, python-format
-msgid "%(cnt)s %(articles_plur)s in this level %(match_plur)s your search."
+msgid ""
+"\n"
+"        %(cnt)s %(articles_plur)s in this level %(match_plur)s your search.\n"
+"      "
 msgstr ""
 
 #: wiki/templates/wiki/dir.html
@@ -23373,7 +23404,10 @@ msgstr ""
 
 #: wiki/templates/wiki/dir.html
 #, python-format
-msgid "There %(articles_plur_verb)s %(cnt)s %(articles_plur)s in this level."
+msgid ""
+"\n"
+"        There %(articles_plur_verb)s %(cnt)s %(articles_plur)s in this level.\n"
+"      "
 msgstr ""
 
 #: wiki/templates/wiki/dir.html
@@ -23445,6 +23479,14 @@ msgstr ""
 
 #: wiki/templates/wiki/article/create_root.html
 msgid "Create root"
+msgstr ""
+
+#: wiki/templates/wiki/includes/anonymous_blocked.html
+#, python-format
+msgid ""
+"\n"
+"  You need to <a href=\"%(login_url)s\">log in</a> or <a href=\"%(signup_url)s\">sign up</a> to use this function.\n"
+"  "
 msgstr ""
 
 #: wiki/templates/wiki/includes/anonymous_blocked.html
