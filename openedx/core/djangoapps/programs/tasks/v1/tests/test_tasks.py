@@ -2,10 +2,12 @@
 Tests for programs celery tasks.
 """
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 import ddt
 import httpretty
 import mock
+import pytz
+from waffle.testutils import override_switch
 from celery.exceptions import MaxRetriesExceededError
 from django.conf import settings
 from django.test import override_settings, TestCase
@@ -15,6 +17,7 @@ from edx_rest_api_client.client import EdxRestApiClient
 
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
+from openedx.core.djangoapps.certificates.config import waffle
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
 from openedx.core.djangoapps.programs.tasks.v1 import tasks
@@ -406,6 +409,7 @@ class PostCourseCertificateTestCase(TestCase):
 @skip_unless_lms
 @mock.patch(TASKS_MODULE + '.post_course_certificate')
 @override_settings(CREDENTIALS_SERVICE_USERNAME='test-service-username')
+@override_switch(waffle.WAFFLE_NAMESPACE + '.' + waffle.AUTO_CERTIFICATE_GENERATION, True)
 class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
     """
     Test the award_course_certificate celery task
@@ -414,8 +418,10 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
     def setUp(self):
         super(AwardCourseCertificatesTestCase, self).setUp()
 
+        self.available_date = datetime.now(pytz.UTC) + timedelta(days=1)
         self.course = CourseOverviewFactory.create(
-            self_paced=True  # Any option to allow the certificate to be viewable for the course
+            self_paced=True,  # Any option to allow the certificate to be viewable for the course
+            certificate_available_date=self.available_date,
         )
         self.student = UserFactory.create(username='test-student')
         # Instantiate the Certificate first so that the config doesn't execute issuance
@@ -440,6 +446,19 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
         call_args, _ = mock_post_course_certificate.call_args
         self.assertEqual(call_args[1], self.student.username)
         self.assertEqual(call_args[2], self.certificate)
+        self.assertEqual(call_args[3], self.certificate.modified_date)
+
+    def test_award_course_certificates_available_date(self, mock_post_course_certificate):
+        """
+        Tests the API POST method is called with available date when the course is not self paced
+        """
+        self.course.self_paced = False
+        self.course.save()
+        tasks.award_course_certificate.delay(self.student.username, str(self.course.id)).get()
+        call_args, _ = mock_post_course_certificate.call_args
+        self.assertEqual(call_args[1], self.student.username)
+        self.assertEqual(call_args[2], self.certificate)
+        self.assertEqual(call_args[3], self.available_date)
 
     def test_award_course_cert_not_called_if_disabled(self, mock_post_course_certificate):
         """

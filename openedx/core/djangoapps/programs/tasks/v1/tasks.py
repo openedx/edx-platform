@@ -12,7 +12,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from course_modes.models import CourseMode
 from lms.djangoapps.certificates.models import GeneratedCertificate
-from openedx.core.djangoapps.certificates.api import display_date_for_certificate
+from openedx.core.djangoapps.certificates.api import available_date_for_certificate
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.credentials.utils import get_credentials, get_credentials_api_client
@@ -301,7 +301,7 @@ def award_course_certificate(self, username, course_run_key):
             # FIXME This may result in visible dates that do not update alongside the Course Overview if that changes
             # This is a known limitation of this implementation and was chosen to reduce the amount of replication,
             # endpoints, celery tasks, and jenkins jobs that needed to be written for this functionality
-            visible_date = display_date_for_certificate(course_overview, certificate)
+            visible_date = available_date_for_certificate(course_overview, certificate)
             post_course_certificate(credentials_client, username, certificate, visible_date)
 
             LOGGER.info('Awarded certificate for course %s to user %s', course_key, username)
