@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.http import Http404, HttpResponseBadRequest
 from django.utils.translation import ugettext as _
+from django.views.decorators.clickjacking import xframe_options_exempt
 from opaque_keys.edx.keys import UsageKey
 from web_fragments.fragment import Fragment
 from xblock.django.request import django_to_webob_request, webob_to_django_response
@@ -51,6 +52,7 @@ log = logging.getLogger(__name__)
 
 
 @login_required
+@xframe_options_exempt
 def preview_handler(request, usage_key_string, handler, suffix=''):
     """
     Dispatch an AJAX action to an xblock
