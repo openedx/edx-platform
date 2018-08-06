@@ -393,19 +393,21 @@ def update_account_settings(request):
             unattended_surveys = user_extended_profile.unattended_surveys(_type='list')
             are_forms_complete = not (bool(unattended_surveys))
 
-            if not are_forms_complete :
+            if not are_forms_complete:
                 return redirect(reverse(unattended_surveys[0]))
 
             return redirect(reverse('update_account_settings'))
 
     else:
+        email_preferences = getattr(request.user, 'email_preferences', None)
         form = forms.UpdateRegModelForm(
             instance=user_extended_profile,
             initial={
                 'organization_name': user_extended_profile.organization.label if user_extended_profile.organization else "",
                 'is_poc': "1" if user_extended_profile.is_organization_admin else "0",
                 'first_name': user_extended_profile.user.first_name,
-                'last_name': user_extended_profile.user.last_name
+                'last_name': user_extended_profile.user.last_name,
+                'opt_in': email_preferences.opt_in if email_preferences else ''
             }
         )
 
@@ -533,7 +535,7 @@ def recommendations(request):
     Display recommended courses and communities based on the survey
 
     """
-    recommended_courses = get_recommended_xmodule_courses(request.user)
+    recommended_courses = get_recommended_xmodule_courses(request)
     joined_communities = get_joined_communities(request.user)
     user_extended_profile = request.user.extended_profile
 

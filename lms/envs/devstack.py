@@ -19,7 +19,7 @@ PLATFORM_NAME = ENV_TOKENS.get('PLATFORM_NAME', 'Devstack')
 CELERY_ALWAYS_EAGER = True
 HTTPS = 'off'
 
-LMS_ROOT_URL = 'http://localhost:8000:80'
+LMS_ROOT_URL = 'http://local.philanthropyu.org:8000'
 
 ################################ LOGGERS ######################################
 

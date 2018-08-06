@@ -283,14 +283,14 @@ urlpatterns += (
     # TODO: These views need to be updated before they work
     url(r'^calculate$', 'util.views.calculate'),
 
-    url(r'^courses/?$', 'lms.djangoapps.philu_overrides.views.courses', name="courses"),
+    url(r'^courses/?$', 'openedx.features.course_card.views.get_course_cards', name="courses"),
 
     #About the course
     url(
         r'^courses/{}/about$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.views.course_about',
+        'lms.djangoapps.philu_overrides.views.course_about',
         name='about_course',
     ),
 
@@ -677,6 +677,10 @@ if settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
                 settings.COURSE_ID_PATTERN,
             ),
             include('nodebb.urls')
+        ),
+        url(
+            r'^courses/discussion/nodebb/?',
+            'nodebb.views.nodebb_embedded_topic'
         ),
         url(
             r'^notification_prefs/enable/',

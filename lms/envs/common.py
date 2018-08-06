@@ -571,7 +571,10 @@ TEMPLATES = [
 
                 # Online contextual help
                 'context_processors.doc_url',
-                'openedx.core.djangoapps.site_configuration.context_processors.configuration_context'
+                'openedx.core.djangoapps.site_configuration.context_processors.configuration_context',
+
+                # PhilU context processors
+                'lms.djangoapps.philu_overrides.context_processor.add_nodebb_endpoint'
             ],
             # Change 'debug' in your environment settings files - not here.
             'debug': False
@@ -2236,6 +2239,9 @@ INSTALLED_APPS = (
 
     # Data extraction App
     'openedx.features.data_extract',
+
+    # Course cards app
+    'openedx.features.course_card'
 )
 
 ######################### CSRF #########################################

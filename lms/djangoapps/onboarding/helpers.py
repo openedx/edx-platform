@@ -7800,7 +7800,9 @@ def reorder_registration_form_fields(fields):
         'is_currently_employed': 6,
         'organization_name': 7,
         'is_poc': 8,
-        'org_admin_email': 9
+        'org_admin_email': 9,
+        'honor_code': 10,
+        'opt_in': 11,
     }
 
     for idx, field in enumerate(fields):
