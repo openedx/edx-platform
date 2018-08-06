@@ -5,10 +5,10 @@ from datetime import datetime
 # pylint: disable=protected-access
 from collections import namedtuple
 from copy import deepcopy
-import ddt
 import itertools
-from nose.plugins.attrib import attr
 from unittest import TestCase
+
+import ddt
 
 from openedx.core.lib.graph_traversals import traverse_post_order
 
@@ -17,12 +17,13 @@ from ..exceptions import TransformerException
 from .helpers import MockXBlock, MockTransformer, ChildrenMapTestMixin
 
 
-@attr(shard=2)
 @ddt.ddt
 class TestBlockStructure(TestCase, ChildrenMapTestMixin):
     """
     Tests for BlockStructure
     """
+    shard = 2
+
     @ddt.data(
         [],
         ChildrenMapTestMixin.SIMPLE_CHILDREN_MAP,
@@ -46,12 +47,13 @@ class TestBlockStructure(TestCase, ChildrenMapTestMixin):
         self.assertNotIn(len(children_map) + 1, block_structure)
 
 
-@attr(shard=2)
 @ddt.ddt
 class TestBlockStructureData(TestCase, ChildrenMapTestMixin):
     """
     Tests for BlockStructureBlockData and BlockStructureModulestoreData
     """
+    shard = 2
+
     def test_non_versioned_transformer(self):
         class TestNonVersionedTransformer(MockTransformer):
             """

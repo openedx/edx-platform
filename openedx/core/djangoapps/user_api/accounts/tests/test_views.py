@@ -14,7 +14,6 @@ from django.test.testcases import TransactionTestCase
 from django.test.utils import override_settings
 
 import mock
-from nose.plugins.attrib import attr
 import pytz
 from rest_framework.test import APIClient, APITestCase
 
@@ -162,11 +161,11 @@ class UserAPITestCase(APITestCase):
 
 @ddt.ddt
 @skip_unless_lms
-@attr(shard=2)
 class TestOwnUsernameAPI(CacheIsolationTestCase, UserAPITestCase):
     """
     Unit tests for the Accounts API.
     """
+    shard = 2
 
     ENABLED_CACHES = ['default']
 
@@ -221,11 +220,11 @@ class TestOwnUsernameAPI(CacheIsolationTestCase, UserAPITestCase):
     {'full': 50, 'small': 10},
     clear=True
 )
-@attr(shard=2)
 class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
     """
     Unit tests for the Accounts API.
     """
+    shard = 2
 
     ENABLED_CACHES = ['default']
 
@@ -812,12 +811,12 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         )
 
 
-@attr(shard=2)
 @skip_unless_lms
 class TestAccountAPITransactions(TransactionTestCase):
     """
     Tests the transactional behavior of the account API
     """
+    shard = 2
 
     def setUp(self):
         super(TestAccountAPITransactions, self).setUp()

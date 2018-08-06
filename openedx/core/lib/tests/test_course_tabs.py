@@ -3,15 +3,14 @@
 from unittest import TestCase
 
 from mock import Mock, patch
-from nose.plugins.attrib import attr
 
 import xmodule.tabs as xmodule_tabs
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 
 
-@attr(shard=2)
 class CourseTabPluginManagerTestCase(TestCase):
     """Test cases for CourseTabPluginManager class"""
+    shard = 2
 
     @patch('openedx.core.lib.course_tabs.CourseTabPluginManager.get_available_plugins')
     def test_get_tab_types(self, get_available_plugins):
@@ -39,9 +38,9 @@ class CourseTabPluginManagerTestCase(TestCase):
         )
 
 
-@attr(shard=2)
 class KeyCheckerTestCase(TestCase):
     """Test cases for KeyChecker class"""
+    shard = 2
 
     def setUp(self):
         super(KeyCheckerTestCase, self).setUp()
@@ -58,9 +57,9 @@ class KeyCheckerTestCase(TestCase):
             xmodule_tabs.key_checker(self.invalid_keys)(self.dict_value)
 
 
-@attr(shard=2)
 class NeedNameTestCase(TestCase):
     """Test cases for NeedName validator"""
+    shard = 2
 
     def setUp(self):
         super(NeedNameTestCase, self).setUp()

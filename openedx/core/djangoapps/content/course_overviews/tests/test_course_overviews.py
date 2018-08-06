@@ -7,7 +7,6 @@ import ddt
 import itertools
 import math
 import mock
-from nose.plugins.attrib import attr
 import pytz
 
 from django.conf import settings
@@ -41,13 +40,12 @@ from ..models import CourseOverview, CourseOverviewImageSet, CourseOverviewImage
 from .factories import CourseOverviewFactory
 
 
-@attr(shard=3)
 @ddt.ddt
 class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase):
     """
     Tests for CourseOverview model.
     """
-
+    shard = 3
     TODAY = timezone.now()
     LAST_MONTH = 'last_month'
     LAST_WEEK = 'last_week'
@@ -559,13 +557,13 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase):
         self.assertEqual(course_id_to_overview, None)
 
 
-@attr(shard=3)
 @ddt.ddt
 class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
     """
     Course thumbnail generation tests.
     """
     ENABLED_SIGNALS = ['course_published']
+    shard = 3
 
     def setUp(self):
         """Create an active CourseOverviewImageConfig with non-default values."""
@@ -1038,12 +1036,12 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
             return course_overview
 
 
-@attr(shard=3)
 @ddt.ddt
 class CourseOverviewTabTestCase(ModuleStoreTestCase):
     """
     Tests for CourseOverviewTab model.
     """
+    shard = 3
 
     ENABLED_SIGNALS = ['course_published']
 

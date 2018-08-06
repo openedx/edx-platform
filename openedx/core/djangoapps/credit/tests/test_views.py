@@ -16,7 +16,6 @@ from django.urls import reverse
 from django.test import TestCase, Client
 from django.test.utils import override_settings
 from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
-from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.credit.models import (
@@ -28,6 +27,7 @@ from openedx.core.djangoapps.credit.tests.factories import (
     CreditProviderFactory, CreditEligibilityFactory, CreditCourseFactory, CreditRequestFactory,
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
+from openedx.core.lib.tests import attr
 from openedx.core.lib.token_utils import JwtBuilder
 from student.tests.factories import UserFactory, AdminFactory
 from util.date_utils import to_timestamp

@@ -15,7 +15,6 @@ from django.core import mail
 from django.test import TestCase
 from django.test.client import RequestFactory
 from mock import Mock, patch
-from nose.plugins.attrib import attr
 from nose.tools import raises
 from six import iteritems
 
@@ -48,6 +47,7 @@ from openedx.core.djangoapps.user_api.errors import (
     UserNotFound
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
+from openedx.core.lib.tests import attr
 from student.models import PendingEmailChange
 from student.tests.factories import UserFactory
 from student.tests.tests import UserSettingsEventTestMixin

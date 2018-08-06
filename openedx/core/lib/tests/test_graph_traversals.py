@@ -5,16 +5,14 @@ Tests for graph traversal generator functions.
 from collections import defaultdict
 from unittest import TestCase
 
-from nose.plugins.attrib import attr
-
 from ..graph_traversals import traverse_post_order, traverse_pre_order, traverse_topologically
 
 
-@attr(shard=2)
 class TestGraphTraversals(TestCase):
     """
     Test Class for graph traversal generator functions.
     """
+    shard = 2
 
     def setUp(self):
         # Creates a test graph with the following disconnected

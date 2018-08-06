@@ -8,7 +8,6 @@ import ddt
 from django.conf import settings
 from django.urls import reverse
 from mock import patch
-from nose.plugins.attrib import attr
 from rest_framework.test import APIClient
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
@@ -61,7 +60,6 @@ class BookmarksViewsTestsBase(BookmarksTestsBase, BookmarkApiEventTestMixin):
         return response
 
 
-@attr(shard=9)
 @ddt.ddt
 @skip_unless_lms
 class BookmarksListViewTests(BookmarksViewsTestsBase):
@@ -70,6 +68,8 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
     GET /api/bookmarks/v1/bookmarks/?course_id={course_id1}
     POST /api/bookmarks/v1/bookmarks
     """
+    shard = 9
+
     @ddt.data(
         (1, False),
         (10, False),
@@ -366,13 +366,14 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
         )
 
 
-@attr(shard=9)
 @ddt.ddt
 @skip_unless_lms
 class BookmarksDetailViewTests(BookmarksViewsTestsBase):
     """
     This contains the tests for GET & DELETE methods of bookmark.views.BookmarksDetailView class
     """
+    shard = 9
+
     @ddt.data(
         ('', False),
         ('fields=path,display_name', True)

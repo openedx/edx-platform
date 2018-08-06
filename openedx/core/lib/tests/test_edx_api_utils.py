@@ -5,7 +5,6 @@ import json
 import httpretty
 import mock
 from django.core.cache import cache
-from nose.plugins.attrib import attr
 
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
@@ -20,11 +19,11 @@ TEST_API_URL = 'http://www-internal.example.com/api'
 
 
 @skip_unless_lms
-@attr(shard=2)
 @httpretty.activate
 class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, CacheIsolationTestCase):
     """Tests for edX API data retrieval utility."""
     ENABLED_CACHES = ['default']
+    shard = 2
 
     def setUp(self):
         super(TestGetEdxApiData, self).setUp()

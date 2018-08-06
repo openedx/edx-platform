@@ -3,16 +3,12 @@
 Tests for digital signatures used to validate messages to/from credit providers.
 """
 
-from nose.plugins.attrib import attr
-
 from django.test import TestCase
 from django.test.utils import override_settings
-
 
 from openedx.core.djangoapps.credit import signature
 
 
-@attr(shard=2)
 @override_settings(CREDIT_PROVIDER_SECRET_KEYS={
     "asu": u'abcd1234'
 })
@@ -20,6 +16,7 @@ class SignatureTest(TestCase):
     """
     Tests for digital signatures.
     """
+    shard = 2
 
     def test_unicode_secret_key(self):
         # Test a key that has type `unicode` but consists of ASCII characters

@@ -2,7 +2,6 @@
 Tests for bookmark services.
 """
 
-from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import UsageKey
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
@@ -10,12 +9,12 @@ from ..services import BookmarksService
 from .test_models import BookmarksTestsBase
 
 
-@attr(shard=9)
 @skip_unless_lms
 class BookmarksServiceTests(BookmarksTestsBase):
     """
     Tests the Bookmarks service.
     """
+    shard = 9
 
     def setUp(self):
         super(BookmarksServiceTests, self).setUp()

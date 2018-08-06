@@ -12,7 +12,6 @@ from django.conf import settings
 from django.urls import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
-from nose.plugins.attrib import attr
 from pytz import utc
 
 from course_modes.models import CourseMode
@@ -57,11 +56,12 @@ UTILS_MODULE = 'openedx.core.djangoapps.programs.utils'
 
 
 @ddt.ddt
-@attr(shard=2)
 @skip_unless_lms
 @mock.patch(UTILS_MODULE + '.get_programs')
 class TestProgramProgressMeter(TestCase):
     """Tests of the program progress utility class."""
+    shard = 2
+
     def setUp(self):
         super(TestProgramProgressMeter, self).setUp()
 

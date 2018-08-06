@@ -9,15 +9,14 @@ import ddt
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
 from mako.template import Template
-from nose.plugins.attrib import attr
 
 from openedx.core.djangolib.markup import HTML, Text, strip_all_tags_but_br
 
 
-@attr(shard=2)
 @ddt.ddt
 class FormatHtmlTest(unittest.TestCase):
     """Test that we can format plain strings and HTML into them properly."""
+    shard = 2
 
     @ddt.data(
         (u"hello", u"hello"),

@@ -3,7 +3,6 @@ from collections import namedtuple
 import ddt
 import itertools
 import mock
-from nose.plugins.attrib import attr
 import random
 import string
 from unittest import TestCase
@@ -53,13 +52,13 @@ def _make_attribute_test_cases():
         )
 
 
-@attr('shard2')
 @ddt.ddt
 class DiscussionXBlockImportExportTests(TestCase):
     """
     Import and export tests
     """
     DISCUSSION_XBLOCK_LOCATION = "openedx.core.lib.xblock_builtin.xblock_discussion.xblock_discussion.DiscussionXBlock"
+    shard = 2
 
     def setUp(self):
         """

@@ -4,7 +4,6 @@ Tests for the gating API
 import unittest
 
 from mock import patch, Mock
-from nose.plugins.attrib import attr
 from ddt import ddt, data, unpack
 from django.conf import settings
 from lms.djangoapps.gating import api as lms_gating_api
@@ -17,12 +16,12 @@ from openedx.core.lib.gating.exceptions import GatingValidationError
 from student.tests.factories import UserFactory
 
 
-@attr(shard=2)
 @ddt
 class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
     Tests for the gating API
     """
+    shard = 2
 
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
