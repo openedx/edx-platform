@@ -17,6 +17,7 @@ from opaque_keys.edx.keys import CourseKey
 from xmodule.course_module import CourseFields
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundError
+from openedx.features.course_card.helpers import initialize_course_settings
 
 LOGGER = get_task_logger(__name__)
 FULL_COURSE_REINDEX_THRESHOLD = 1
@@ -50,6 +51,9 @@ def rerun_course(source_course_key_string, destination_course_key_string, user_i
 
         # call edxval to attach videos to the rerun
         copy_course_videos(source_course_key, destination_course_key)
+
+        # initialize course settings like tags stc
+        initialize_course_settings(source_course_key, destination_course_key)
 
         return "succeeded"
 

@@ -21,6 +21,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import Location
+from openedx.features.course_card.helpers import get_related_card_id
 
 from .component import (
     ADVANCED_COMPONENT_TYPES,
@@ -852,8 +853,10 @@ def _rerun_course(request, org, number, run, fields):
     # so the user can see the updated status for that course
     add_instructor(destination_course_key, request.user, request.user)
 
+    parent_course_key = get_related_card_id(source_course_key)
+
     # Mark the action as initiated
-    CourseRerunState.objects.initiated(source_course_key, destination_course_key, request.user, fields['display_name'])
+    CourseRerunState.objects.initiated(parent_course_key, destination_course_key, request.user, fields['display_name'])
 
     # Clear the fields that must be reset for the rerun
     fields['advertised_start'] = None
