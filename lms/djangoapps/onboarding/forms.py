@@ -17,6 +17,7 @@ from lms.djangoapps.onboarding.helpers import COUNTRIES, LANGUAGES, get_country_
     get_actual_field_names, admin_not_assigned_or_me
 from lms.djangoapps.onboarding.models import (
     UserExtendedProfile,
+    EmailPreference,
     Organization,
     OrganizationAdminHashKeys, EducationLevel, EnglishProficiency, RoleInsideOrg, OperationLevel,
     FocusArea, TotalEmployee, OrgSector, PartnerNetwork, OrganizationPartner, OrganizationMetric, Currency)
@@ -96,9 +97,15 @@ class UserInfoModelForm(BaseOnboardingModelForm):
     language = forms.CharField(label=ugettext_noop('Native Language'), label_suffix="*", required=True,
                                error_messages={"required": ugettext_noop(EMPTY_FIELD_ERROR.format('Language'))},
                                widget=forms.HiddenInput)
-    country = forms.CharField(label="Country of Residence", label_suffix="*", widget=forms.HiddenInput,
-                              error_messages={"required": ugettext_noop(EMPTY_FIELD_ERROR.format("Country of Residence"))
-    })
+    country = forms.CharField(
+        label="Country of Residence",
+        label_suffix="*",
+        widget=forms.HiddenInput,
+        error_messages={
+          "required": ugettext_noop(EMPTY_FIELD_ERROR.format("Country of Residence"))
+        }
+    )
+
     city = forms.CharField(label=ugettext_noop('City of Residence'), required=False, widget=forms.HiddenInput)
     is_emp_location_different = forms.BooleanField(label=ugettext_noop('Check here if your country and/or city of '
                                                                        'employment is different from your country '
@@ -356,8 +363,8 @@ class OrganizationInfoForm(BaseOnboardingModelForm):
                                                                  "Facebook or WordPress, please answer Yes here and "
                                                                  "give the address for this page."),
                                          error_messages={
-                                            'required': ugettext_noop('Please select an option for "Does your organization have a'
-                                                        ' webpage?"'),
+                                            'required': ugettext_noop('Please select an option for "Does your '
+                                                                      'organization have a webpage?"'),
                                          })
 
     org_type = forms.ChoiceField(label=ugettext_noop('Organization Type'), label_suffix="*",
@@ -579,6 +586,12 @@ class RegModelForm(BaseOnboardingModelForm):
         required=False,
         widget=forms.EmailInput(attrs={'placeholder': 'Organization Admin email'}))
 
+    opt_in = forms.BooleanField(label=ugettext_noop('Check here if you agree to receive emails from Philanthropy '
+                                                    'University with details about <strong>unique funding opportunities'
+                                                    ', free regional events and new course and community programming'
+                                                    '</strong>! If you decide later you are no longer interested, you '
+                                                    'can unsubscribe from these at anytime'), required=False)
+
     def __init__(self, *args, **kwargs):
         super(RegModelForm, self).__init__(*args, **kwargs)
 
@@ -621,6 +634,13 @@ class RegModelForm(BaseOnboardingModelForm):
             'org_admin_email': {'field_type': 'email'}
         }
 
+    def save_email_preferences(self, user, opt_in):
+        user_email_preferences, created = EmailPreference.objects.get_or_create(user=user)
+        if (not user_email_preferences.opt_in and opt_in in ['yes', 'no']) or (
+                user_email_preferences.opt_in in ['yes', 'no']):
+            user_email_preferences.opt_in = opt_in
+            user_email_preferences.save()
+
     def clean_organization_name(self):
         organization_name = self.cleaned_data['organization_name']
 
@@ -649,6 +669,7 @@ class RegModelForm(BaseOnboardingModelForm):
     def save(self, user=None, commit=True):
         organization_name = self.cleaned_data.get('organization_name', '').strip()
         is_poc = self.cleaned_data['is_poc']
+        opt_in = self.cleaned_data['opt_in']
         org_admin_email = self.cleaned_data['org_admin_email']
         first_name = self.cleaned_data['first_name']
         last_name = self.cleaned_data['last_name']
@@ -692,6 +713,9 @@ class RegModelForm(BaseOnboardingModelForm):
         if commit:
             extended_profile.save()
 
+        opt_in = "yes" if opt_in else "no"
+        self.save_email_preferences(user, opt_in)
+
         return extended_profile
 
 
@@ -699,6 +723,17 @@ class UpdateRegModelForm(RegModelForm):
     """
     Model form to update the registration extra fields
     """
+    OPT_IN_CHOICES = (
+        ('yes', ugettext_noop('Yes, send me special offers')),
+        ('no', ugettext_noop("No, don't send me special offers"))
+    )
+
+    opt_in = forms.ChoiceField(label=ugettext_noop('Do you want to hear from us about <strong>*unique funding '
+                                                   'opportunities, free regional events, and new course and community '
+                                                   'programming?*</strong> If so, please check "Yes". If not, please '
+                                                   'check "No".'),
+                               required=False, label_suffix="*", choices=OPT_IN_CHOICES, widget=forms.RadioSelect)
+
     def __init__(self, *args, **kwargs):
         super(UpdateRegModelForm, self).__init__(*args, **kwargs)
         self.fields.pop('confirm_password')
@@ -706,6 +741,7 @@ class UpdateRegModelForm(RegModelForm):
     def save(self, user=None, commit=True):
         organization_name = self.cleaned_data.get('organization_name', '').strip()
         is_poc = self.cleaned_data['is_poc']
+        opt_in = self.cleaned_data['opt_in']
         first_name = self.cleaned_data['first_name']
         last_name = self.cleaned_data['last_name']
         is_currently_unemployed = self.cleaned_data['is_currently_employed']
@@ -762,6 +798,8 @@ class UpdateRegModelForm(RegModelForm):
 
             if extended_profile.organization:
                 extended_profile.organization.save()
+
+        self.save_email_preferences(user, opt_in)
 
         return extended_profile
 

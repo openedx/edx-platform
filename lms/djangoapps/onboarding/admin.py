@@ -12,6 +12,7 @@ from lms.djangoapps.onboarding.models import (
     EnglishProficiency,
     Organization,
     UserExtendedProfile,
+    EmailPreference,
     FunctionArea,
     OrganizationPartner,
     OrganizationMetric
@@ -62,6 +63,13 @@ class CurrencyAdmin(admin.ModelAdmin):
     list_display = ('country', 'name', 'alphabetic_code', )
 
 
+class EmailPreferenceAdmin(admin.ModelAdmin):
+    list_display = ('user', 'opt_in', 'modified_time', )
+
+    def modified_time(self, obj):
+        return "{}".format(obj.modified.strftime("%B %d, %Y %H:%M:%S"))
+
+
 class OrganizationMetricAdmin(admin.ModelAdmin):
     list_display = ('org', 'user', 'submission_date', 'actual_data', 'effective_date', 'total_clients',
                     'total_employees', 'local_currency', 'total_revenue', 'total_donations', 'total_expenses',
@@ -92,6 +100,7 @@ admin.site.register(EducationLevel, EnglishProficiencyAdmin)
 admin.site.register(EnglishProficiency, EnglishProficiencyAdmin)
 admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(UserExtendedProfile, UserExtendedProfileAdmin)
+admin.site.register(EmailPreference, EmailPreferenceAdmin)
 admin.site.register(FunctionArea, FunctionAreaAdmin)
 admin.site.register(OrganizationPartner, OrganizationPartnerAdmin)
 admin.site.register(OrganizationMetric, OrganizationMetricAdmin)
