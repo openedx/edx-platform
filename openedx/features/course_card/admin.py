@@ -34,8 +34,32 @@ class CardModelAdmin(admin.ModelAdmin):
     form = CardModel
 
 
-admin.site.register(CourseCard, CardModelAdmin)
+class CourseRerunStateModel(ModelForm):
+    def __init__(self, *args, **kwargs):
 
-admin.site.register(CourseRerunState)
+        super(CourseRerunStateModel, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = CourseRerunState
+        fields = ['source_course_key']
+
+
+class CourseRerunStateModelAdmin(admin.ModelAdmin):
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def get_actions(self, request):
+        actions = super(CourseRerunStateModelAdmin, self).get_actions(request)
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
+
+    form = CourseRerunStateModel
+    list_display = ['course_key', 'source_course_key']
+
+
+admin.site.register(CourseCard, CardModelAdmin)
+admin.site.register(CourseRerunState, CourseRerunStateModelAdmin)
 
 
