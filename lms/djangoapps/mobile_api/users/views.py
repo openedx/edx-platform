@@ -2,6 +2,7 @@
 Views for user API
 """
 
+import json
 from django.shortcuts import redirect
 from django.utils import dateparse
 from opaque_keys import InvalidKeyError
@@ -17,7 +18,7 @@ from courseware.courses import get_current_child
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
 from courseware.views.index import save_positions_recursively_up
-from experiments.models import ExperimentData
+from experiments.models import ExperimentData, ExperimentKeyValue
 from student.models import CourseEnrollment, User
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -278,6 +279,17 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
         """
         Hide enrolled courses from mobile app as part of REV-73/REV-19
         """
+        try:
+            courses_excluded_from_mobile = ExperimentKeyValue.objects.get(
+                experiment_id=10,
+                key="excluded_from_mobile_app"
+            ).value
+            courses_excluded_from_mobile = json.loads(courses_excluded_from_mobile.replace('\r', '').replace('\n', ''))
+            if str(course_key) in courses_excluded_from_mobile:
+                return True
+        except ExperimentKeyValue.DoesNotExist:
+            pass
+
         try:
             ExperimentData.objects.get(
                 user=user,
