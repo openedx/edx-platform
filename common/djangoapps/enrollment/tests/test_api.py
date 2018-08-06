@@ -4,10 +4,10 @@ Tests for student enrollment.
 import unittest
 
 import ddt
+import pytest
 from django.conf import settings
 from django.test.utils import override_settings
 from mock import Mock, patch
-from nose.tools import raises
 
 from course_modes.models import CourseMode
 from enrollment import api
@@ -84,19 +84,19 @@ class EnrollmentTest(CacheIsolationTestCase):
         ['verified'],
         ['verified', 'professional'],
     )
-    @raises(CourseModeNotFoundError)
     def test_enroll_no_mode_error(self, course_modes):
         # Add a fake course enrollment information to the fake data API
         fake_data_api.add_course(self.COURSE_ID, course_modes=course_modes)
         # Enroll in the course and verify that we raise CourseModeNotFoundError
-        api.add_enrollment(self.USERNAME, self.COURSE_ID)
+        with pytest.raises(CourseModeNotFoundError):
+            api.add_enrollment(self.USERNAME, self.COURSE_ID)
 
-    @raises(CourseModeNotFoundError)
     def test_prof_ed_enroll(self):
         # Add a fake course enrollment information to the fake data API
         fake_data_api.add_course(self.COURSE_ID, course_modes=['professional'])
         # Enroll in the course and verify the URL we get sent to
-        api.add_enrollment(self.USERNAME, self.COURSE_ID, mode='verified')
+        with pytest.raises(CourseModeNotFoundError):
+            api.add_enrollment(self.USERNAME, self.COURSE_ID, mode='verified')
 
     @ddt.data(
         # Default (no course modes in the database)
@@ -131,11 +131,11 @@ class EnrollmentTest(CacheIsolationTestCase):
         self.assertEquals(result['mode'], mode)
         self.assertFalse(result['is_active'])
 
-    @raises(EnrollmentNotFoundError)
     def test_unenroll_not_enrolled_in_course(self):
         # Add a fake course enrollment information to the fake data API
         fake_data_api.add_course(self.COURSE_ID, course_modes=['honor'])
-        api.update_enrollment(self.USERNAME, self.COURSE_ID, mode='honor', is_active=False)
+        with pytest.raises(EnrollmentNotFoundError):
+            api.update_enrollment(self.USERNAME, self.COURSE_ID, mode='honor', is_active=False)
 
     @ddt.data(
         # Simple test of honor and verified.
@@ -209,10 +209,10 @@ class EnrollmentTest(CacheIsolationTestCase):
         self.assertEquals(3, len(result['course_modes']))
 
     @override_settings(ENROLLMENT_DATA_API='foo.bar.biz.baz')
-    @raises(EnrollmentApiLoadError)
     def test_data_api_config_error(self):
         # Enroll in the course and verify the URL we get sent to
-        api.add_enrollment(self.USERNAME, self.COURSE_ID, mode='audit')
+        with pytest.raises(EnrollmentApiLoadError):
+            api.add_enrollment(self.USERNAME, self.COURSE_ID, mode='audit')
 
     def test_caching(self):
         # Add fake course enrollment information to the fake data API

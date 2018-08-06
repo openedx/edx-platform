@@ -12,7 +12,6 @@ from django.urls import reverse
 from django.test.client import RequestFactory
 from eventtracking.processors.exceptions import EventEmissionExit
 from mock import ANY, Mock, patch
-from nose.tools import assert_equal, assert_true
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
@@ -256,7 +255,7 @@ class ViewsTestCaseMixin(object):
             CourseEnrollmentFactory(user=self.moderator, course_id=self.course.id)
             self.moderator.roles.add(Role.objects.get(name="Moderator", course_id=self.course.id))
 
-            assert_true(self.client.login(username='student', password=self.password))
+            assert self.client.login(username='student', password=self.password)
 
     def _setup_mock_request(self, mock_request, include_depth=False):
         """
@@ -321,7 +320,7 @@ class ViewsTestCaseMixin(object):
         url = reverse('create_thread', kwargs={'commentable_id': 'i4x-MITx-999-course-Robot_Super_Course',
                                                'course_id': unicode(self.course_id)})
         response = self.client.post(url, data=thread)
-        assert_true(mock_request.called)
+        assert mock_request.called
         expected_data = {
             'thread_type': 'discussion',
             'body': u'this is a post',
@@ -342,7 +341,7 @@ class ViewsTestCaseMixin(object):
             headers=ANY,
             timeout=5
         )
-        assert_equal(response.status_code, 200)
+        assert response.status_code == 200
 
     def update_thread_helper(self, mock_request):
         """
@@ -483,7 +482,7 @@ class ViewsTestCase(
             CourseEnrollmentFactory(user=self.moderator, course_id=self.course.id)
             self.moderator.roles.add(Role.objects.get(name="Moderator", course_id=self.course.id))
 
-            assert_true(self.client.login(username='student', password=self.password))
+            assert self.client.login(username='student', password=self.password)
 
     @contextmanager
     def assert_discussion_signals(self, signal, user=None):
@@ -779,7 +778,7 @@ class ViewsTestCase(
             'course_id': unicode(self.course_id)
         })
         response = self.client.post(url)
-        assert_true(mock_request.called)
+        assert mock_request.called
 
         call_list = [
             (
@@ -813,7 +812,7 @@ class ViewsTestCase(
 
         assert mock_request.call_args_list == call_list
 
-        assert_equal(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_un_flag_thread_open(self, mock_request):
         self.un_flag_thread(mock_request, False)
@@ -857,7 +856,7 @@ class ViewsTestCase(
             'course_id': unicode(self.course_id)
         })
         response = self.client.post(url)
-        assert_true(mock_request.called)
+        assert mock_request.called
 
         call_list = [
             (
@@ -891,7 +890,7 @@ class ViewsTestCase(
 
         assert mock_request.call_args_list == call_list
 
-        assert_equal(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_flag_comment_open(self, mock_request):
         self.flag_comment(mock_request, False)
@@ -929,7 +928,7 @@ class ViewsTestCase(
             'course_id': unicode(self.course_id)
         })
         response = self.client.post(url)
-        assert_true(mock_request.called)
+        assert mock_request.called
 
         call_list = [
             (
@@ -963,7 +962,7 @@ class ViewsTestCase(
 
         assert mock_request.call_args_list == call_list
 
-        assert_equal(response.status_code, 200)
+        assert response.status_code == 200
 
     def test_un_flag_comment_open(self, mock_request):
         self.un_flag_comment(mock_request, False)
@@ -1001,7 +1000,7 @@ class ViewsTestCase(
             'course_id': unicode(self.course_id)
         })
         response = self.client.post(url)
-        assert_true(mock_request.called)
+        assert mock_request.called
 
         call_list = [
             (
@@ -1035,7 +1034,7 @@ class ViewsTestCase(
 
         assert mock_request.call_args_list == call_list
 
-        assert_equal(response.status_code, 200)
+        assert response.status_code == 200
 
     @ddt.data(
         ('upvote_thread', 'thread_id', 'thread_voted'),

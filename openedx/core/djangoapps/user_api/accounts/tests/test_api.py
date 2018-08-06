@@ -15,7 +15,6 @@ from django.core import mail
 from django.test import TestCase
 from django.test.client import RequestFactory
 from mock import Mock, patch
-from nose.tools import raises
 from six import iteritems
 
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
@@ -391,34 +390,34 @@ class AccountCreationActivationAndPasswordChangeTest(TestCase):
         with self.assertRaises(AccountUsernameInvalid):
             create_account(long_username, self.PASSWORD, self.EMAIL)
 
-    @raises(AccountEmailInvalid)
     @ddt.data(*INVALID_EMAILS)
     def test_create_account_invalid_email(self, invalid_email):
-        create_account(self.USERNAME, self.PASSWORD, invalid_email)
+        with pytest.raises(AccountEmailInvalid):
+            create_account(self.USERNAME, self.PASSWORD, invalid_email)
 
-    @raises(AccountPasswordInvalid)
     @ddt.data(*INVALID_PASSWORDS)
     def test_create_account_invalid_password(self, invalid_password):
-        create_account(self.USERNAME, invalid_password, self.EMAIL)
+        with pytest.raises(AccountPasswordInvalid):
+            create_account(self.USERNAME, invalid_password, self.EMAIL)
 
-    @raises(AccountPasswordInvalid)
     def test_create_account_username_password_equal(self):
         # Username and password cannot be the same
-        create_account(self.USERNAME, self.USERNAME, self.EMAIL)
+        with pytest.raises(AccountPasswordInvalid):
+            create_account(self.USERNAME, self.USERNAME, self.EMAIL)
 
-    @raises(AccountRequestError)
     @ddt.data(*INVALID_USERNAMES)
     def test_create_account_invalid_username(self, invalid_username):
-        create_account(invalid_username, self.PASSWORD, self.EMAIL)
+        with pytest.raises(AccountRequestError):
+            create_account(invalid_username, self.PASSWORD, self.EMAIL)
 
     def test_create_account_prevent_auth_user_writes(self):
         with pytest.raises(UserAPIInternalError, message=SYSTEM_MAINTENANCE_MSG):
             with waffle().override(PREVENT_AUTH_USER_WRITES, True):
                 create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
 
-    @raises(UserNotAuthorized)
     def test_activate_account_invalid_key(self):
-        activate_account(u'invalid')
+        with pytest.raises(UserNotAuthorized):
+            activate_account(u'invalid')
 
     def test_activate_account_prevent_auth_user_writes(self):
         activation_key = create_account(self.USERNAME, self.PASSWORD, self.EMAIL)

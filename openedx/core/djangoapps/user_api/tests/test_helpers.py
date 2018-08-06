@@ -5,10 +5,10 @@ import json
 import re
 import mock
 import ddt
+import pytest
 from django import forms
 from django.http import HttpRequest, HttpResponse
 from django.test import TestCase
-from nose.tools import raises
 from six import text_type
 
 from ..helpers import (
@@ -42,16 +42,16 @@ def intercepted_function(raise_error=None):
 class InterceptErrorsTest(TestCase):
     """Tests for the decorator that intercepts errors."""
 
-    @raises(FakeOutputException)
     def test_intercepts_errors(self):
-        intercepted_function(raise_error=FakeInputException)
+        with pytest.raises(FakeOutputException):
+            intercepted_function(raise_error=FakeInputException)
 
     def test_ignores_no_error(self):
         intercepted_function()
 
-    @raises(ValueError)
     def test_ignores_expected_errors(self):
-        intercepted_function(raise_error=ValueError)
+        with pytest.raises(ValueError):
+            intercepted_function(raise_error=ValueError)
 
     @mock.patch('openedx.core.djangoapps.user_api.helpers.LOGGER')
     def test_logs_errors(self, mock_logger):

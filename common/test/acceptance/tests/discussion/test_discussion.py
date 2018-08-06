@@ -6,7 +6,7 @@ import datetime
 from unittest import skip
 from uuid import uuid4
 
-from nose.tools import nottest
+import pytest
 from pytz import UTC
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
@@ -1052,9 +1052,8 @@ class InlineDiscussionTest(UniqueCourseTest):
         self.discussion_page = InlineDiscussionPage(self.browser, self.discussion_id)
         self.additional_discussion_page = InlineDiscussionPage(self.browser, self.additional_discussion_id)
 
-    # This test is too flaky to run at all. TNL-6215
     @attr('a11y')
-    @nottest
+    @pytest.mark.skip(reason='This test is too flaky to run at all. TNL-6215')
     def test_inline_a11y(self):
         """
         Tests Inline Discussion for accessibility issues.

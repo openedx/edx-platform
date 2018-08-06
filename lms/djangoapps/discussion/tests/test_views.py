@@ -9,7 +9,6 @@ from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
 from django.utils import translation
 from mock import ANY, Mock, call, patch
-from nose.tools import assert_true
 from six import text_type
 
 from course_modes.models import CourseMode
@@ -97,7 +96,7 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
 
             # Log the student in
             self.client = Client()
-            assert_true(self.client.login(username=uname, password=password))
+            assert self.client.login(username=uname, password=password)
 
         config = ForumsConfig.current()
         config.enabled = True
