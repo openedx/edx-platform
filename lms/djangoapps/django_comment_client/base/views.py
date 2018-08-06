@@ -11,6 +11,7 @@ from django.core import exceptions
 from django.http import Http404, HttpResponse, HttpResponseServerError
 from django.utils.translation import ugettext as _
 from django.views.decorators import csrf
+from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.http import require_GET, require_POST
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
@@ -742,6 +743,7 @@ def unfollow_commentable(request, course_id, commentable_id):
 @require_POST
 @login_required
 @csrf.csrf_exempt
+@xframe_options_exempt
 def upload(request, course_id):  # ajax upload file to a question or answer
     """view that handles file upload via Ajax
     """
