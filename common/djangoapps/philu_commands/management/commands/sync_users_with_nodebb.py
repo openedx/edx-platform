@@ -31,8 +31,8 @@ class Command(BaseCommand):
         user_extended_profiles = UserExtendedProfile.objects.all()
         nodebb_client = NodeBBClient()
         try:
-            nodebb_users = nodebb_client.users.all()[1] # returns tuple of (status_code, response_body)
-            nodebb_users = { user['username'] : user for user in nodebb_users }
+            nodebb_users = nodebb_client.users.all()[1]  # returns tuple of (status_code, response_body)
+            nodebb_users = {user['username']: user for user in nodebb_users}
         except ConnectionError:
             log.error('Error: failed to connect to NodeBB. aborting command "{}"'.format('sync_users_with_nodebb'))
             return
@@ -47,7 +47,7 @@ class Command(BaseCommand):
                 'email': user.email,
                 'first_name': user.first_name,
                 'last_name': user.last_name,
-                'country_of_employment': extended_profile.country_of_employment or "",
+                'country_of_employment': extended_profile.country_of_employment,
                 'city_of_employment': extended_profile.city_of_employment,
                 'country_of_residence': COUNTRIES.get(profile.country.code),
                 'city_of_residence': profile.city,
@@ -59,6 +59,13 @@ class Command(BaseCommand):
 
             nodebb_data = nodebb_users.get(user.username)
 
+            # filter nodebb_data to ensure compatibility with edx_data
+            for key in nodebb_data:
+                if nodebb_data[key] in [None, 'None']:
+                    nodebb_data[key] = None
+            if not nodebb_data.get('self_prioritize_areas'):
+                nodebb_data['self_prioritize_areas'] = []
+
             if not nodebb_data:
                 try:
                     nodebb_client.users.create(username=user.username, kwargs=edx_data)
@@ -68,29 +75,7 @@ class Command(BaseCommand):
                     task_create_user_on_nodebb.apply_async(username=user.username, kwargs=edx_data)
                     task_activate_user_on_nodebb.apply_async(username=user.username, active=user.is_active)
 
-            print edx_data.viewitems() <= nodebb_data.viewitems()
-            print [edx_data[key] == nodebb_data.get(key) for key in edx_data.keys()]
-            # print type(edx_data['edx_user_id'])
-            # print type(nodebb_data['edx_user_id'])
-
-
-            # print
-            # print
-            # for key in edx_data.keys():
-            #     print '{}: {} is {}'.format(key, edx_data[key], nodebb_data[key])
-            # print
-            # print
-
-
-            # if all([edx_data[key] == nodebb_data[key] for key in edx_data.keys()]):
             if not edx_data.viewitems() <= nodebb_data.viewitems():
-                print
-                print
-                print
-                for key in edx_data.keys():
-                    print '{}: {} is {}'.format(key, edx_data[key], nodebb_data.get(key))
-                print
-                print
                 try:
                     nodebb_client.users.update_profile(username=user.username, kwargs=edx_data)
                 except ConnectionError:
