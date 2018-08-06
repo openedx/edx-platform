@@ -1,5 +1,5 @@
 """Acceptance tests for LMS-hosted Programs pages"""
-from nose.plugins.attrib import attr
+import pytest
 
 from common.test.acceptance.fixtures.catalog import CatalogFixture, CatalogIntegrationMixin
 from common.test.acceptance.fixtures.course import CourseFixture
@@ -74,9 +74,10 @@ class ProgramPageBase(ProgramsConfigMixin, CatalogIntegrationMixin, UniqueCourse
         cache_programs_page.visit()
 
 
-@attr(shard=21)
 class ProgramListingPageTest(ProgramPageBase):
     """Verify user-facing behavior of the program listing page."""
+    shard = 21
+
     def setUp(self):
         super(ProgramListingPageTest, self).setUp()
 
@@ -108,7 +109,7 @@ class ProgramListingPageTest(ProgramPageBase):
         self.assertFalse(self.listing_page.are_cards_present)
 
 
-@attr('a11y')
+@pytest.mark.a11y
 class ProgramListingPageA11yTest(ProgramPageBase):
     """Test program listing page accessibility."""
     def setUp(self):
@@ -143,7 +144,7 @@ class ProgramListingPageA11yTest(ProgramPageBase):
         self.listing_page.a11y_audit.check_for_accessibility_errors()
 
 
-@attr('a11y')
+@pytest.mark.a11y
 class ProgramDetailsPageA11yTest(ProgramPageBase):
     """Test program details page accessibility."""
     def setUp(self):

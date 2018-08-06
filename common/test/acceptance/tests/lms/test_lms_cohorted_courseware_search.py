@@ -5,8 +5,6 @@ Test courseware search
 import json
 import uuid
 
-from nose.plugins.attrib import attr
-
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.common.logout import LogoutPage
@@ -21,12 +19,11 @@ from common.test.acceptance.tests.helpers import remove_file
 from common.test.acceptance.tests.studio.base_studio_test import ContainerBase
 
 
-@attr(shard=1)
 class CoursewareSearchCohortTest(ContainerBase, CohortTestMixin):
     """
     Test courseware search.
     """
-
+    shard = 1
     TEST_INDEX_FILENAME = "test_root/index_file.dat"
 
     def setUp(self, is_staff=True):

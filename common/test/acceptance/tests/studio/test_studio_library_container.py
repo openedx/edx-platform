@@ -4,7 +4,6 @@ Acceptance tests for Library Content in LMS
 import textwrap
 
 import ddt
-from nose.plugins.attrib import attr
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.studio.library import StudioLibraryContainerXBlockWrapper, StudioLibraryContentEditor
@@ -17,12 +16,13 @@ SUBSECTION_NAME = 'Test Subsection'
 UNIT_NAME = 'Test Unit'
 
 
-@attr(shard=17)
 @ddt.ddt
 class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest, TestWithSearchIndexMixin):
     """
     Test Library Content block in LMS
     """
+    shard = 17
+
     def setUp(self):
         """
         Install library with some content and a course using fixtures

@@ -12,7 +12,6 @@ from textwrap import dedent
 
 from bok_choy.promise import EmptyPromise
 from mock import patch
-from nose.plugins.attrib import attr
 
 from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
@@ -24,6 +23,7 @@ from common.test.acceptance.pages.studio.settings_advanced import AdvancedSettin
 from common.test.acceptance.pages.studio.settings_group_configurations import GroupConfigurationsPage
 from common.test.acceptance.pages.studio.utils import get_input_value, type_in_codemirror
 from common.test.acceptance.tests.helpers import create_user_partition_json, element_has_text
+from openedx.core.lib.tests import attr
 from xmodule.partitions.partitions import Group
 
 

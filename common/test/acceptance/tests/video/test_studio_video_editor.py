@@ -4,17 +4,16 @@
 Acceptance tests for CMS Video Editor.
 """
 import ddt
-from nose.plugins.attrib import attr
 from common.test.acceptance.pages.common.utils import confirm_prompt
 from common.test.acceptance.tests.video.test_studio_video_module import CMSVideoBaseTest
 
 
-@attr(shard=6)
 @ddt.ddt
 class VideoEditorTest(CMSVideoBaseTest):
     """
     CMS Video Editor Test Class
     """
+    shard = 6
 
     def _create_video_component(self, subtitles=False):
         """

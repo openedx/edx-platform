@@ -8,7 +8,6 @@ from uuid import uuid4
 
 import ddt
 from dateutil.parser import parse
-from nose.plugins.attrib import attr
 from selenium.common.exceptions import TimeoutException
 
 from common.test.acceptance.fixtures import LMS_BASE_URL
@@ -29,6 +28,7 @@ from common.test.acceptance.pages.lms.teams import (
     TeamsPage
 )
 from common.test.acceptance.tests.helpers import EventsTestMixin, UniqueCourseTest, get_modal_alert
+from openedx.core.lib.tests import attr
 
 TOPICS_PER_PAGE = 12
 

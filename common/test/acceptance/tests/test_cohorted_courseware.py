@@ -3,7 +3,6 @@ End-to-end test for cohorted courseware. This uses both Studio and LMS.
 """
 
 from bok_choy.page_object import XSS_INJECTION
-from nose.plugins.attrib import attr
 
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
@@ -20,11 +19,11 @@ AUDIT_TRACK = "Audit"
 VERIFIED_TRACK = "Verified"
 
 
-@attr(shard=5)
 class EndToEndCohortedCoursewareTest(ContainerBase, CohortTestMixin):
     """
     End-to-end of cohorted courseware.
     """
+    shard = 5
 
     def setUp(self, is_staff=True):
 

@@ -7,17 +7,14 @@ import json
 from datetime import datetime, timedelta
 from unittest import skip
 
-from nose.plugins.attrib import attr
 from pytz import UTC
 
 from base_studio_test import StudioCourseTest
 from common.test.acceptance.fixtures.config import ConfigModelFixture
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
-from common.test.acceptance.pages.common.utils import add_enrollment_course_modes
 from common.test.acceptance.pages.lms.course_home import CourseHomePage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.progress import ProgressPage
-from common.test.acceptance.pages.lms.staff_view import StaffCoursewarePage
 from common.test.acceptance.pages.studio.overview import ContainerPage, CourseOutlinePage, ExpandCollapseLinkState
 from common.test.acceptance.pages.studio.settings import SettingsPage
 from common.test.acceptance.pages.studio.checklists import CourseChecklistsPage
@@ -25,6 +22,7 @@ from common.test.acceptance.pages.studio.settings_advanced import AdvancedSettin
 from common.test.acceptance.pages.studio.settings_group_configurations import GroupConfigurationsPage
 from common.test.acceptance.pages.studio.utils import add_discussion, drag, verify_ordering
 from common.test.acceptance.tests.helpers import disable_animations, load_data_str
+from openedx.core.lib.tests import attr
 
 SECTION_NAME = 'Test Section'
 SUBSECTION_NAME = 'Test Subsection'

@@ -3,8 +3,6 @@ Acceptance tests for Studio's Setting pages
 """
 import re
 
-from nose.plugins.attrib import attr
-
 from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
 from common.test.acceptance.pages.studio.settings_advanced import AdvancedSettingsPage
 from common.test.acceptance.pages.studio.settings_certificates import CertificatesPage
@@ -12,11 +10,12 @@ from common.test.acceptance.tests.helpers import skip_if_browser
 from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
 
 
-@attr(shard=22)
 class CertificatesTest(StudioCourseTest):
     """
     Tests for settings/certificates Page.
     """
+    shard = 22
+
     def setUp(self):  # pylint: disable=arguments-differ
         super(CertificatesTest, self).setUp(is_staff=True, test_xss=False)
         self.certificates_page = CertificatesPage(

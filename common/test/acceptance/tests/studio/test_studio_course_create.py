@@ -5,19 +5,17 @@ import uuid
 import random
 import string
 
-from nose.plugins.attrib import attr
-
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.studio.index import DashboardPage
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage
 from common.test.acceptance.tests.helpers import AcceptanceTest
 
 
-@attr(shard=19)
 class CreateCourseTest(AcceptanceTest):
     """
     Test that we can create a new course the studio home page.
     """
+    shard = 19
 
     def setUp(self):
         """
