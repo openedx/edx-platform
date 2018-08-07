@@ -15,7 +15,6 @@ from uuid import uuid4
 from factory import Factory, Sequence, lazy_attribute_sequence, lazy_attribute
 from factory.errors import CyclicDefinitionError
 from mock import patch
-from nose.tools import assert_less_equal, assert_greater_equal
 import dogstats_wrapper as dog_stats_api
 
 from opaque_keys.edx.locator import BlockUsageLocator
@@ -596,10 +595,10 @@ def check_sum_of_calls(object_, methods, maximum_calls, minimum_calls=1, include
         print "".join(messages)
 
     # verify the counter actually worked by ensuring we have counted greater than (or equal to) the minimum calls
-    assert_greater_equal(call_count, minimum_calls)
+    assert call_count >= minimum_calls
 
     # now verify the number of actual calls is less than (or equal to) the expected maximum
-    assert_less_equal(call_count, maximum_calls)
+    assert call_count <= maximum_calls
 
 
 def mongo_uses_error_check(store):

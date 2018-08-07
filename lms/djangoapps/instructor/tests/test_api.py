@@ -11,6 +11,7 @@ import shutil
 import tempfile
 
 import ddt
+import pytest
 from boto.exception import BotoServerError
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -23,7 +24,6 @@ from django.test.utils import override_settings
 from pytz import UTC
 from django.utils.translation import ugettext as _
 from mock import Mock, NonCallableMock, patch
-from nose.tools import raises
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import UsageKey
 from six import text_type
@@ -4187,10 +4187,10 @@ class TestInstructorAPIHelpers(TestCase):
         output = 'i4x://MITx/6.002x/problem/L2Node1'
         self.assertEqual(unicode(msk_from_problem_urlname(course_id, name)), output)
 
-    @raises(ValueError)
     def test_msk_from_problem_urlname_error(self):
         args = ('notagoodcourse', 'L2Node1')
-        msk_from_problem_urlname(*args)
+        with pytest.raises(ValueError):
+            msk_from_problem_urlname(*args)
 
 
 def get_extended_due(course, unit, user):

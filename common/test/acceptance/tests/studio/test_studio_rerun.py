@@ -5,7 +5,6 @@ Acceptance tests for Studio related to course reruns.
 import random
 
 from bok_choy.promise import EmptyPromise
-from nose.tools import assert_in
 
 from base_studio_test import StudioCourseTest
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
@@ -85,7 +84,7 @@ class CourseRerunTest(StudioCourseTest):
 
         EmptyPromise(finished_processing, "Rerun finished processing", try_interval=5, timeout=60).fulfill()
 
-        assert_in(course_run, self.dashboard_page.course_runs)
+        assert course_run in self.dashboard_page.course_runs
         self.dashboard_page.click_course_run(course_run)
 
         outline_page = CourseOutlinePage(self.browser, *course_info)

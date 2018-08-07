@@ -3,17 +3,9 @@
 Tests for the service classes in verify_student.
 """
 
-from datetime import timedelta
-
 import ddt
 from django.conf import settings
 from mock import patch
-from nose.tools import (
-    assert_equals,
-    assert_false,
-    assert_is_none,
-    assert_true
-)
 
 from common.test.utils import MockS3Mixin
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, SSOVerification, ManualVerification
@@ -47,11 +39,11 @@ class TestIDVerificationService(MockS3Mixin, ModuleStoreTestCase):
         for status in ["created", "ready", "denied", "submitted", "must_retry"]:
             attempt.status = status
             attempt.save()
-            assert_false(IDVerificationService.user_is_verified(user), status)
+            self.assertFalse(IDVerificationService.user_is_verified(user), status)
 
         attempt.status = "approved"
         attempt.save()
-        assert_true(IDVerificationService.user_is_verified(user), attempt.status)
+        self.assertTrue(IDVerificationService.user_is_verified(user), attempt.status)
 
     def test_user_has_valid_or_pending(self):
         """
@@ -65,14 +57,14 @@ class TestIDVerificationService(MockS3Mixin, ModuleStoreTestCase):
         for status in ["created", "ready", "denied"]:
             attempt.status = status
             attempt.save()
-            assert_false(IDVerificationService.user_has_valid_or_pending(user), status)
+            self.assertFalse(IDVerificationService.user_has_valid_or_pending(user), status)
 
         # Any of these, and we are. Note the benefit of the doubt we're giving
         # -- must_retry, and submitted both count until we hear otherwise
         for status in ["submitted", "must_retry", "approved"]:
             attempt.status = status
             attempt.save()
-            assert_true(IDVerificationService.user_has_valid_or_pending(user), status)
+            self.assertTrue(IDVerificationService.user_has_valid_or_pending(user), status)
 
     def test_user_status(self):
         # test for correct status when no error returned

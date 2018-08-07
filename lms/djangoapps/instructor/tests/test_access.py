@@ -2,7 +2,7 @@
 Test instructor.access
 """
 
-from nose.tools import raises
+import pytest
 
 from django_comment_common.models import FORUM_ROLE_MODERATOR, Role
 from lms.djangoapps.instructor.access import allow_access, list_with_level, revoke_access, update_forum_role
@@ -74,15 +74,15 @@ class TestInstructorAccessAllow(SharedModuleStoreTestCase):
         allow_access(self.course, user, 'beta')
         self.assertTrue(CourseBetaTesterRole(self.course.id).has_user(user))
 
-    @raises(ValueError)
     def test_allow_badlevel(self):
         user = UserFactory()
-        allow_access(self.course, user, 'robot-not-a-level')
+        with pytest.raises(ValueError):
+            allow_access(self.course, user, 'robot-not-a-level')
 
-    @raises(Exception)
     def test_allow_noneuser(self):
         user = None
-        allow_access(self.course, user, 'staff')
+        with pytest.raises(Exception):
+            allow_access(self.course, user, 'staff')
 
 
 @attr(shard=1)
@@ -117,10 +117,10 @@ class TestInstructorAccessRevoke(SharedModuleStoreTestCase):
         revoke_access(self.course, user, 'beta')
         self.assertFalse(CourseBetaTesterRole(self.course.id).has_user(user))
 
-    @raises(ValueError)
     def test_revoke_badrolename(self):
         user = UserFactory()
-        revoke_access(self.course, user, 'robot-not-a-level')
+        with pytest.raises(ValueError):
+            revoke_access(self.course, user, 'robot-not-a-level')
 
 
 @attr(shard=1)
@@ -155,10 +155,10 @@ class TestInstructorAccessForum(SharedModuleStoreTestCase):
         update_forum_role(self.course.id, user, FORUM_ROLE_MODERATOR, 'allow')
         self.assertIn(user, self.mod_role.users.all())
 
-    @raises(Role.DoesNotExist)
     def test_allow_badrole(self):
         user = UserFactory.create()
-        update_forum_role(self.course.id, user, 'robot-not-a-real-role', 'allow')
+        with pytest.raises(Role.DoesNotExist):
+            update_forum_role(self.course.id, user, 'robot-not-a-real-role', 'allow')
 
     def test_revoke(self):
         user = self.moderators[0]
@@ -177,12 +177,12 @@ class TestInstructorAccessForum(SharedModuleStoreTestCase):
         update_forum_role(self.course.id, user, FORUM_ROLE_MODERATOR, 'revoke')
         self.assertNotIn(user, self.mod_role.users.all())
 
-    @raises(Role.DoesNotExist)
     def test_revoke_badrole(self):
         user = self.moderators[0]
-        update_forum_role(self.course.id, user, 'robot-not-a-real-role', 'allow')
+        with pytest.raises(Role.DoesNotExist):
+            update_forum_role(self.course.id, user, 'robot-not-a-real-role', 'allow')
 
-    @raises(ValueError)
     def test_bad_mode(self):
         user = UserFactory()
-        update_forum_role(self.course.id, user, FORUM_ROLE_MODERATOR, 'robot-not-a-mode')
+        with pytest.raises(ValueError):
+            update_forum_role(self.course.id, user, FORUM_ROLE_MODERATOR, 'robot-not-a-mode')
