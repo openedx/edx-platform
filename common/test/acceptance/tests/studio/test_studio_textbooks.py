@@ -1,12 +1,11 @@
 """
 Acceptance tests for Studio related to the textbooks.
 """
-from nose.plugins.attrib import attr
-
 from common.test.acceptance.pages.lms.textbook_view import TextbookViewPage
 from common.test.acceptance.pages.studio.textbook_upload import TextbookUploadPage
 from common.test.acceptance.tests.helpers import disable_animations
 from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
+from openedx.core.lib.tests import attr
 
 
 class TextbooksTest(StudioCourseTest):

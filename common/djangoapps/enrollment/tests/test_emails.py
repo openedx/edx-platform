@@ -6,7 +6,6 @@ import unittest
 from django.conf import settings
 from django.core import mail
 from django.test.utils import override_settings
-from nose.plugins.attrib import attr
 from rest_framework.test import APITestCase
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -18,7 +17,6 @@ from student.tests.factories import UserFactory
 from .test_views import EnrollmentTestMixin
 
 
-@attr(shard=3)
 @override_settings(EDX_API_KEY="i am a key")
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @override_settings(ENROLLMENT_NOTIFICATION_EMAIL="some_admins@example.com")
@@ -35,6 +33,7 @@ class EnrollmentEmailNotificationTest(EnrollmentTestMixin,
 
     ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
     ENABLED_SIGNALS = ['course_published']
+    shard = 3
 
     def setUp(self):
         """ Create a course and user, then log in. Also creates a course mode."""

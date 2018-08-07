@@ -5,8 +5,8 @@ End-to-end tests for the Account Settings page.
 from datetime import datetime
 from unittest import skip
 
+import pytest
 from bok_choy.page_object import XSS_INJECTION
-from nose.plugins.attrib import attr
 from pytz import timezone, utc
 
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage, FULL_NAME
@@ -98,11 +98,12 @@ class AccountSettingsTestMixin(EventsTestMixin, AcceptanceTest):
         self.assert_no_matching_events_were_emitted({'event_type': self.USER_SETTINGS_CHANGED_EVENT_NAME})
 
 
-@attr(shard=8)
 class DashboardMenuTest(AccountSettingsTestMixin, AcceptanceTest):
     """
     Tests that the dashboard menu works correctly with the account settings page.
     """
+    shard = 8
+
     def test_link_on_dashboard_works(self):
         """
         Scenario: Verify that the "Account" link works from the dashboard.
@@ -121,12 +122,12 @@ class DashboardMenuTest(AccountSettingsTestMixin, AcceptanceTest):
         dashboard_page.click_account_settings_link()
 
 
-@attr(shard=8)
 class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
     """
     Tests that verify behaviour of the Account Settings page.
     """
     SUCCESS_MESSAGE = 'Your changes have been saved.'
+    shard = 8
 
     def setUp(self):
         """
@@ -575,7 +576,7 @@ class AccountSettingsDeleteAccountTest(AccountSettingsTestMixin, AcceptanceTest)
         )
 
 
-@attr('a11y')
+@pytest.mark.a11y
 class AccountSettingsA11yTest(AccountSettingsTestMixin, AcceptanceTest):
     """
     Class to test account settings accessibility.

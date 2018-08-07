@@ -6,8 +6,8 @@ Acceptance tests for CMS Video Module.
 import os
 from unittest import skipIf
 
+import pytest
 from mock import patch
-from nose.plugins.attrib import attr
 
 from bok_choy.promise import EmptyPromise
 
@@ -171,11 +171,11 @@ class CMSVideoBaseTest(UniqueCourseTest):
         self.unit_page.xblocks[1].save_settings()
 
 
-@attr(shard=13)
 class CMSVideoTest(CMSVideoBaseTest):
     """
     CMS Video Test Class
     """
+    shard = 13
 
     def test_youtube_stub_proxy(self):
         """
@@ -334,7 +334,7 @@ class CMSVideoTest(CMSVideoBaseTest):
         self.video.click_player_button('play')
 
 
-@attr('a11y')
+@pytest.mark.a11y
 class CMSVideoA11yTest(CMSVideoBaseTest):
     """
     CMS Video Accessibility Test Class

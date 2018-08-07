@@ -5,8 +5,8 @@ End-to-end tests for the courseware unit bookmarks.
 import json
 from unittest import skip
 
+import pytest
 import requests
-from nose.plugins.attrib import attr
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.common import BASE_URL
@@ -127,11 +127,11 @@ class BookmarksTestMixin(EventsTestMixin, UniqueCourseTest):
             self._bookmark_unit(xblocks[index].locator)
 
 
-@attr(shard=8)
 class BookmarksTest(BookmarksTestMixin):
     """
     Tests to verify bookmarks functionality.
     """
+    shard = 8
 
     def _breadcrumb(self, num_units, modified_name=None):
         """
@@ -586,7 +586,7 @@ class BookmarksTest(BookmarksTestMixin):
         )
 
 
-@attr('a11y')
+@pytest.mark.a11y
 class BookmarksA11yTests(BookmarksTestMixin):
     """
     Tests for checking the a11y of the bookmarks page.

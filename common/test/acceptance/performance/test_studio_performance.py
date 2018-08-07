@@ -2,7 +2,6 @@
 Single page performance tests for Studio.
 """
 from bok_choy.web_app_test import with_cache
-from nose.plugins.attrib import attr
 
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage
@@ -10,7 +9,6 @@ from common.test.acceptance.pages.studio.overview import CourseOutlinePage
 from ..tests.helpers import AcceptanceTest
 
 
-@attr(har_mode='explicit')
 class StudioPagePerformanceTest(AcceptanceTest):
     """
     Base class to capture studio performance with HTTP Archives.
@@ -21,6 +19,7 @@ class StudioPagePerformanceTest(AcceptanceTest):
     course_org = 'edX'
     course_num = 'Open_DemoX'
     course_run = 'edx_demo_course'
+    har_mode = 'explicit'
 
     def setUp(self):
         """

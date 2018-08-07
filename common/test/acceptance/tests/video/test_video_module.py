@@ -8,9 +8,6 @@ from unittest import skipIf
 
 from ddt import data, ddt, unpack
 from mock import patch
-from nose.plugins.attrib import attr
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.common.by import By
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
@@ -24,6 +21,7 @@ from common.test.acceptance.tests.helpers import (
     is_youtube_available,
     skip_if_browser
 )
+from openedx.core.lib.tests import attr
 
 VIDEO_SOURCE_PORT = 8777
 VIDEO_HOSTNAME = os.environ.get('BOK_CHOY_HOSTNAME', 'localhost')

@@ -5,7 +5,6 @@ Acceptance tests for Studio related to the split_test module.
 import math
 
 from bok_choy.promise import Promise
-from nose.plugins.attrib import attr
 from selenium.webdriver.support.ui import Select
 
 from base_studio_test import StudioCourseTest
@@ -62,12 +61,12 @@ class SplitTestMixin(object):
         Promise(missing_groups_button_not_present, "Add missing groups button should not be showing.").fulfill()
 
 
-@attr(shard=15)
 class SplitTest(ContainerBase, SplitTestMixin):
     """
     Tests for creating and editing split test instances in Studio.
     """
     __test__ = True
+    shard = 15
 
     def setUp(self):
         super(SplitTest, self).setUp()
@@ -177,11 +176,12 @@ class SplitTest(ContainerBase, SplitTestMixin):
         self.verify_groups(container, ['alpha'], [], verify_missing_groups_not_present=False)
 
 
-@attr(shard=15)
 class GroupConfigurationsNoSplitTest(StudioCourseTest):
     """
     Tests how the Group Configuration page should look when the split_test module is not enabled.
     """
+    shard = 15
+
     def setUp(self):
         super(GroupConfigurationsNoSplitTest, self).setUp()
         self.group_configurations_page = GroupConfigurationsPage(
@@ -202,13 +202,13 @@ class GroupConfigurationsNoSplitTest(StudioCourseTest):
         self.assertFalse(self.group_configurations_page.experiment_group_sections_present)
 
 
-@attr(shard=15)
 class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
     """
     Tests that Group Configurations page works correctly with previously
     added configurations in Studio
     """
     __test__ = True
+    shard = 15
 
     def setUp(self):
         super(GroupConfigurationsTest, self).setUp()

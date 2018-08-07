@@ -7,7 +7,8 @@ import json
 from datetime import datetime, timedelta
 
 import ddt
-from nose.plugins.attrib import attr
+
+from openedx.core.lib.tests import attr
 
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ...pages.common.auto_auth import AutoAuthPage
@@ -19,7 +20,6 @@ from ...pages.lms.dashboard import DashboardPage
 from ...pages.lms.pay_and_verify import FakePaymentPage, FakeSoftwareSecureVerificationPage, PaymentAndVerificationFlow
 from ...pages.lms.problem import ProblemPage
 from ...pages.lms.progress import ProgressPage
-from ...pages.lms.staff_view import StaffCoursewarePage
 from ...pages.lms.track_selection import TrackSelectionPage
 from ...pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
 from ..helpers import EventsTestMixin, UniqueCourseTest, auto_auth, create_multiple_choice_problem

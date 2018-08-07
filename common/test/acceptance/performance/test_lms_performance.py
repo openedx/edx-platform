@@ -2,7 +2,6 @@
 Single page performance tests for LMS.
 """
 from bok_choy.web_app_test import with_cache
-from nose.plugins.attrib import attr
 
 from common.test.acceptance.fixtures.course import CourseFixture, CourseUpdateDesc, XBlockFixtureDesc
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
@@ -15,13 +14,13 @@ from common.test.acceptance.pages.lms.progress import ProgressPage
 from common.test.acceptance.tests.helpers import UniqueCourseTest, load_data_str
 
 
-@attr(har_mode='explicit')
 class LmsPerformanceTest(UniqueCourseTest):
     """
     Base class to capture LMS performance with HTTP Archives.
     """
     username = 'test_student'
     email = 'student101@example.com'
+    har_mode = 'explicit'
 
     def setUp(self):
         """
