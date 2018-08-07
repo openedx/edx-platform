@@ -17,7 +17,7 @@ log = getLogger(__name__)
 
 
 # "interesting" here means "credentials will want to know about it"
-INTERESTING_MODES = CourseMode.VERIFIED_MODES + CourseMode.CREDIT_MODES
+INTERESTING_MODES = CourseMode.CREDIT_ELIGIBLE_MODES + CourseMode.CREDIT_MODES
 INTERESTING_STATUSES = [
     CertificateStatuses.notpassing,
     CertificateStatuses.downloadable,
