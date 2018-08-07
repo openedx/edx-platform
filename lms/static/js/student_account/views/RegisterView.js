@@ -327,8 +327,10 @@
                         error = isCheckbox ? '' : decisions.validation_decisions[name];
 
                     if (hasError && this.negativeValidationEnabled) {
+                        this.addValidationErrorMsgForScreenReader($el);
                         this.renderLiveValidationError($el, $label, $requiredTextLabel, $icon, $errorTip, error);
                     } else if (this.positiveValidationEnabled) {
+                        this.removeValidationErrorMsgForScreenReader($el);
                         this.renderLiveValidationSuccess($el, $label, $requiredTextLabel, $icon, $errorTip);
                     }
                 },
@@ -339,6 +341,16 @@
 
                 getIcon: function($el) {
                     return $('#' + $el.attr('id') + '-validation-icon');
+                },
+
+                addValidationErrorMsgForScreenReader: function($el) {
+                    var $validation_node =  this.$form.find('#' + $el.attr('id') + '-validation-error');
+                    $validation_node.find('.sr-only').text('ERROR:');
+                },
+
+                removeValidationErrorMsgForScreenReader: function($el) {
+                    var $validation_node =  this.$form.find('#' + $el.attr('id') + '-validation-error');
+                    $validation_node.find('.sr-only').text('');
                 },
 
                 getErrorTip: function($el) {
