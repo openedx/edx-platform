@@ -100,6 +100,17 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
                 category='problem',
                 display_name='gating problem 1',
             )
+            # add a discussion block to the prerequisite subsection
+            # this should give us ability to test gating with blocks
+            # which needs to be excluded from completion tracking
+            ItemFactory.create(
+                parent_location=cls.seq1.location,
+                category="discussion",
+                discussion_id="discussion 1",
+                discussion_category="discussion category",
+                discussion_target="discussion target",
+            )
+
             cls.gated_prob2 = ItemFactory.create(
                 parent_location=cls.seq2.location,
                 category='problem',
