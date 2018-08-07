@@ -103,10 +103,10 @@ JWT Cookie Lifetime
 JWT Cookie Content
 ^^^^^^^^^^^^^^^^^^
 
-#. **Minimize JWT size.** By `HTTP Cookie RFC standard`_, session cookies need to be `at least 4096 bytes`_. `Modern 
-   browsers have remained within this minimum limit`_ and hence do not support more than 4096 bytes. Our current JWT
-   size is about 970 bytes (varying with size of user identifiers, like user's name, etc). (Side note: Signing a JWT
-   with a 2048 byte asymmetric key increases the JWT's size by 325 bytes.)
+#. **Minimize JWT size.** According to `HTTP Cookie RFC standard`_, session cookies `up to 4096 bytes`_ should be
+   supported by a browser. `Modern browsers have treated this requirement as a maximum`_ - and hence do not support
+   more than 4096 bytes. Our current JWT size is about 970 bytes (varying with size of user identifiers, like user's
+   name, etc). (Side note: Signing a JWT with a 2048 byte asymmetric key increases the JWT's size by 325 bytes.)
    
    To minimize the JWT's size from the start, we should eliminate any unnecessary data that is `currently embedded
    in the JWT`_. For example:
@@ -117,15 +117,15 @@ JWT Cookie Content
      authorization.
 
 .. _HTTP Cookie RFC standard: https://tools.ietf.org/html/rfc6265
-.. _at least 4096 bytes: https://tools.ietf.org/html/rfc6265#section-6.1
-.. _Modern browsers have remained within this minimum limit: http://browsercookielimits.squawky.net/
+.. _up to 4096 bytes: https://tools.ietf.org/html/rfc6265#section-6.1
+.. _Modern browsers have treated this requirement as a maximum: http://browsercookielimits.squawky.net/
 .. _currently embedded in the JWT: https://github.com/edx/edx-platform/blob/92030ea15216a6641c83dd7bb38a9b65112bf31a/openedx/core/lib/token_utils.py#L13
 
 
 JWT Cookie Security
 ^^^^^^^^^^^^^^^^^^^
 
-#. **Enable CSRF Protection.** Storing JWTs in session cookies will make us potentially vulnerable to CSRF attacks.
+#. **Enable CSRF Protection.** Storing JWTs in session cookies is potentially vulnerable to CSRF attacks.
    See `JWT Cookie Storage Security`_. To protect against this:
    
    * Enable the HttpOnly_ flag on the cookie, so Javascript code cannot access the cookie directly.
@@ -140,8 +140,14 @@ JWT Cookie Security
      * Question:  If we cannot ensure all GET requests will be side-effect free, can/should we include the CSRF
        value as a GET parameter?
 
-#. **CORS.** `Cross-origin resource sharing (CORS)`_ will need to be configured so that all allowed microfrontends
-   can access the necessary backend microservices.
+#. **CORS and withCredentials.** `Cross-origin resource sharing (CORS)`_ will need to be configured so that all allowed
+   microfrontends can access the necessary backend microservices. In addition, microfrontends will need to set the
+   withCredentials_ attribute so that the JWT Cookie gets sent when API calls are made.
+
+   Note: We cannot selectively choose which cookies are sent so all edX-issued cookies will be sent with these API
+   calls. Apparently, we already send all edX cookies on API requests today, so this will not cause a significant
+   performance issue.
+
 
 .. _JWT Cookie Storage Security: https://stormpath.com/blog/where-to-store-your-jwts-cookies-vs-html5-web-storage#so-whats-the-difference
 .. _HttpOnly: https://www.owasp.org/index.php/HttpOnly
@@ -150,14 +156,14 @@ JWT Cookie Security
 .. _Safe Endpoints middleware: https://github.com/edx/edx-platform-private/pull/120
 .. _same-origin policy: https://en.wikipedia.org/wiki/Same-origin_policy
 .. _Cross-origin resource sharing (CORS): https://en.wikipedia.org/wiki/Cross-origin_resource_sharing
+.. _withCredentials: https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials
 
 
 Consequences
 ------------
 
 #. Instead of storing JWTs in cookies, microfrontends could store them in HTML5 Web Storage. However, that is
-   vulnerable to XSS attacks as described in `JWT sessionStorage and localStorage Security`_. Since the open edX 
-   system has a stronger security story for CSRF attacks over XSS attacks, we are rejecting this alternative.
+   vulnerable to XSS attacks as described in `JWT sessionStorage and localStorage Security`_.
 
 #. Since session cookies have a limited size of `at least 4096 bytes`_, we will need to monitor its size increase
    over time and implement a warning before it exceeds the size. Having this hard limit requires us to be judicious
@@ -166,7 +172,17 @@ Consequences
    If the size limitation becomes a concern in the future, we may need to break up the JWTs into multiple. For
    example, separating authentication-related JWTs from authorization-related JWTs.
 
+#. Since the JWT Cookie, which contains user information, will not be accessible to the microfrontend JS code, we
+   will need another option to allow the microfrontend to get user information. Some options are:
+	
+   #. Add an extra round trip to get the user-data from a backend API, and then cache it in HTML5 Storage.
+   #. Continue to use and expand the current `JS-accessible user-info cookie`_, which contain user-data.
+   #. Have the server populate the initial DOM with this data, but this would only work for server-generated HTML.
+
+   Note: we will explore these options and tackle this issue separately.
+
 .. _JWT sessionStorage and localStorage Security: https://stormpath. com/blog/where-to-store-your-jwts-cookies-vs-html5-web-storage#so-whats-the-difference
+.. _JS-accessible user-info cookie: https://github.com/edx/edx-platform/blob/70d1ca474012b89e4c7184d25499eb87b3135409/common/djangoapps/student/cookies.py#L151
 
 References
 ----------
