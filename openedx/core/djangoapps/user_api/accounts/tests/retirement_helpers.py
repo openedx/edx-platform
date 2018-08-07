@@ -3,6 +3,7 @@ Helpers for testing retirement functionality
 """
 import datetime
 
+import pytest
 import pytz
 from django.test import TestCase
 from social_django.models import UserSocialAuth
@@ -21,75 +22,92 @@ from student.tests.factories import UserFactory
 from ..views import AccountRetirementView
 
 
+@pytest.fixture
+def setup_retirement_states(scope="module"):  # pylint: disable=unused-argument
+    """
+    Create basic states that mimic the retirement process.
+    """
+    default_states = [
+        ('PENDING', 1, False, True),
+        ('LOCKING_ACCOUNT', 20, False, False),
+        ('LOCKING_COMPLETE', 30, False, False),
+        ('RETIRING_CREDENTIALS', 40, False, False),
+        ('CREDENTIALS_COMPLETE', 50, False, False),
+        ('RETIRING_ECOM', 60, False, False),
+        ('ECOM_COMPLETE', 70, False, False),
+        ('RETIRING_FORUMS', 80, False, False),
+        ('FORUMS_COMPLETE', 90, False, False),
+        ('RETIRING_EMAIL_LISTS', 100, False, False),
+        ('EMAIL_LISTS_COMPLETE', 110, False, False),
+        ('RETIRING_ENROLLMENTS', 120, False, False),
+        ('ENROLLMENTS_COMPLETE', 130, False, False),
+        ('RETIRING_NOTES', 140, False, False),
+        ('NOTES_COMPLETE', 150, False, False),
+        ('RETIRING_LMS', 160, False, False),
+        ('LMS_COMPLETE', 170, False, False),
+        ('ADDING_TO_PARTNER_QUEUE', 180, False, False),
+        ('PARTNER_QUEUE_COMPLETE', 190, False, False),
+        ('ERRORED', 200, True, True),
+        ('ABORTED', 210, True, True),
+        ('COMPLETE', 220, True, True),
+    ]
+
+    for name, ex, dead, req in default_states:
+        RetirementState.objects.create(
+            state_name=name,
+            state_execution_order=ex,
+            is_dead_end_state=dead,
+            required=req
+        )
+
+    yield
+
+    RetirementState.objects.all().delete()
+
+
+def create_retirement_status(state=None, create_datetime=None):
+    """
+    Helper method to create a RetirementStatus with useful defaults.
+    Assumes that retirement states have been setup before calling.
+    """
+    if create_datetime is None:
+        create_datetime = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=8)
+
+    user = UserFactory()
+    retirement = UserRetirementStatus.create_retirement(user)
+    if state:
+        retirement.current_state = state
+        retirement.last_state = state
+    retirement.created = create_datetime
+    retirement.modified = create_datetime
+    retirement.save()
+    return retirement
+
+
+def _fake_logged_out_user(user):
+    # Simulate the initial logout retirement endpoint.
+    user.username = get_retired_username_by_username(user.username)
+    user.email = get_retired_email_by_email(user.email)
+    user.set_unusable_password()
+    user.save()
+
+
+@pytest.fixture
+def logged_out_retirement_request():
+    """
+    Returns a UserRetirementStatus test fixture object that has been logged out and email-changed,
+    which is the first step which happens to a user being added to the retirement queue.
+    """
+    retirement = create_retirement_status()
+    _fake_logged_out_user(retirement.user)
+    return retirement
+
+
+@pytest.mark.usefixtures("setup_retirement_states")
 class RetirementTestCase(TestCase):
     """
     Test case with a helper methods for retirement
     """
-    @classmethod
-    def setUpClass(cls):
-        super(RetirementTestCase, cls).setUpClass()
-        cls.setup_states()
-
-    @staticmethod
-    def setup_states():
-        """
-        Create basic states that mimic our current understanding of the retirement process
-        """
-        default_states = [
-            ('PENDING', 1, False, True),
-            ('LOCKING_ACCOUNT', 20, False, False),
-            ('LOCKING_COMPLETE', 30, False, False),
-            ('RETIRING_CREDENTIALS', 40, False, False),
-            ('CREDENTIALS_COMPLETE', 50, False, False),
-            ('RETIRING_ECOM', 60, False, False),
-            ('ECOM_COMPLETE', 70, False, False),
-            ('RETIRING_FORUMS', 80, False, False),
-            ('FORUMS_COMPLETE', 90, False, False),
-            ('RETIRING_EMAIL_LISTS', 100, False, False),
-            ('EMAIL_LISTS_COMPLETE', 110, False, False),
-            ('RETIRING_ENROLLMENTS', 120, False, False),
-            ('ENROLLMENTS_COMPLETE', 130, False, False),
-            ('RETIRING_NOTES', 140, False, False),
-            ('NOTES_COMPLETE', 150, False, False),
-            ('RETIRING_LMS', 160, False, False),
-            ('LMS_COMPLETE', 170, False, False),
-            ('ADDING_TO_PARTNER_QUEUE', 180, False, False),
-            ('PARTNER_QUEUE_COMPLETE', 190, False, False),
-            ('ERRORED', 200, True, True),
-            ('ABORTED', 210, True, True),
-            ('COMPLETE', 220, True, True),
-        ]
-
-        for name, ex, dead, req in default_states:
-            RetirementState.objects.create(
-                state_name=name,
-                state_execution_order=ex,
-                is_dead_end_state=dead,
-                required=req
-            )
-
-    def _create_retirement(self, state, create_datetime=None):
-        """
-        Helper method to create a RetirementStatus with useful defaults
-        """
-        if create_datetime is None:
-            create_datetime = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=8)
-
-        user = UserFactory()
-        return UserRetirementStatus.objects.create(
-            user=user,
-            original_username=user.username,
-            original_email=user.email,
-            original_name=user.profile.name,
-            retired_username=get_retired_username_by_username(user.username),
-            retired_email=get_retired_email_by_email(user.email),
-            current_state=state,
-            last_state=state,
-            responses="",
-            created=create_datetime,
-            modified=create_datetime
-        )
-
     def _retirement_to_dict(self, retirement, all_fields=False):
         """
         Return a dict format of this model to a consistent format for serialization, removing the long text field
@@ -131,7 +149,7 @@ class RetirementTestCase(TestCase):
         return retirement_dict
 
     def _create_users_all_states(self):
-        return [self._create_retirement(state) for state in RetirementState.objects.all()]
+        return [create_retirement_status(state) for state in RetirementState.objects.all()]
 
     def _get_non_dead_end_states(self):
         return [state for state in RetirementState.objects.filter(is_dead_end_state=False)]
@@ -140,7 +158,7 @@ class RetirementTestCase(TestCase):
         return [state for state in RetirementState.objects.filter(is_dead_end_state=True)]
 
 
-def fake_retirement(user):
+def fake_completed_retirement(user):
     """
     Makes an attempt to put user for the given user into a "COMPLETED"
     retirement state by faking important parts of retirement.
@@ -151,12 +169,10 @@ def fake_retirement(user):
     """
     # Deactivate / logout and hash username & email
     UserSocialAuth.objects.filter(user_id=user.id).delete()
+    _fake_logged_out_user(user)
     user.first_name = ''
     user.last_name = ''
     user.is_active = False
-    user.username = get_retired_username_by_username(user.username)
-    user.email = get_retired_email_by_email(user.email)
-    user.set_unusable_password()
     user.save()
 
     # Clear profile
