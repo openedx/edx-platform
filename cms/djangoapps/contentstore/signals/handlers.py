@@ -98,8 +98,8 @@ def handle_grading_policy_changed(sender, **kwargs):
     course_key = kwargs.get('course_key')
     result = compute_all_grades_for_course.apply_async(
         course_key=course_key,
-        event_transaction_id=get_event_transaction_id(),
-        event_transaction_type=get_event_transaction_type(),
+        event_transaction_id=unicode(get_event_transaction_id()),
+        event_transaction_type=unicode(get_event_transaction_type()),
     )
     log.info("Grades: Created {task_name}[{task_id}] with arguments {kwargs}".format(
         task_name=compute_all_grades_for_course.name,
