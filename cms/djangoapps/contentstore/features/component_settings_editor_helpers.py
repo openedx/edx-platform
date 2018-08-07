@@ -1,11 +1,12 @@
 # disable missing docstring
 # pylint: disable=missing-docstring
+# pylint: disable=no-member
 
 from lettuce import world
-from nose.tools import assert_equal, assert_in
 from selenium.webdriver.common.keys import Keys
 
 from common import type_in_codemirror
+from openedx.core.lib.tests.tools import assert_equal, assert_in  # pylint: disable=no-name-in-module
 from terrain.steps import reload_the_page
 
 
@@ -121,7 +122,7 @@ def edit_component_and_select_settings():
 def ensure_settings_visible():
     # Select the 'settings' tab if there is one (it isn't displayed if it is the only option)
     settings_button = world.browser.find_by_css('.settings-button')
-    if len(settings_button) > 0:
+    if settings_button:
         world.css_click('.settings-button')
 
 
@@ -146,7 +147,7 @@ def select_editor_tab(tab_name):
     world.wait_for_ajax_complete()
 
 
-def enter_xml_in_advanced_problem(step, text):
+def enter_xml_in_advanced_problem(_step, text):
     """
     Edits an advanced problem (assumes only on page),
     types the provided XML, and saves the component.
