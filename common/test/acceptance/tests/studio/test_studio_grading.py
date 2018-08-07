@@ -112,21 +112,3 @@ class GradingPageTest(StudioCourseTest):
         self.grading_page.remove_grades(1)
         total_number_of_grades = self.grading_page.total_number_of_grades
         self.assertEqual(total_number_of_grades, 2)
-
-    def test_staff_can_move_grading_ranges(self):
-        """
-        Scenario: Users can move grading ranges
-            Given I have opened a new course in Studio
-            And I am viewing the grading settings
-            When I move a grading section
-            Then I see that the grade range has changed
-        """
-        grade_ranges = self.grading_page.grades_range
-        self.assertIn('0-50', grade_ranges)
-        self.grading_page.drag_and_drop_grade()
-        grade_ranges = self.grading_page.grades_range
-        self.assertIn(
-            '0-3',
-            grade_ranges,
-            'expected range: 0-3, not found in grade ranges:{}'.format(grade_ranges)
-        )
