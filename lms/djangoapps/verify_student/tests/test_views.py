@@ -38,8 +38,7 @@ from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from lms.djangoapps.verify_student.views import (
     PayAndVerifyView,
     checkout_with_ecommerce_service,
-    render_to_response,
-    EmailMarketingConfiguration
+    render_to_response
 )
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
@@ -1775,7 +1774,6 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         """
         Test for verification passed.
         """
-        EmailMarketingConfiguration.objects.create(sailthru_verification_passed_template='test_template')
         data = {
             "EdX-ID": self.receipt_id,
             "Result": "PASS",
@@ -1792,8 +1790,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=self.receipt_id)
         self.assertEqual(attempt.status, u'approved')
         self.assertEquals(response.content, 'OK!')
-        self.assertFalse(mock_log_error.called)
-        self.assertTrue(mock_sailthru_send.call_args[1], 'test_template')
+        self.assertEqual(len(mail.outbox), 1)
 
     @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
@@ -1805,11 +1802,10 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         """
         Test for failed verification.
         """
-        EmailMarketingConfiguration.objects.create(sailthru_verification_failed_template='test_template')
         data = {
             "EdX-ID": self.receipt_id,
             "Result": 'FAIL',
-            "Reason": 'Invalid photo',
+            "Reason": [{"photoIdReasons": ["Not provided"]}],
             "MessageType": 'Your photo doesn\'t meet standards.'
         }
         json_data = json.dumps(data)
@@ -1823,10 +1819,9 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=self.receipt_id)
         self.assertEqual(attempt.status, u'denied')
         self.assertEqual(attempt.error_code, u'Your photo doesn\'t meet standards.')
-        self.assertEqual(attempt.error_msg, u'"Invalid photo"')
+        self.assertEqual(attempt.error_msg, u'[{"photoIdReasons": ["Not provided"]}]')
         self.assertEquals(response.content, 'OK!')
-        self.assertFalse(mock_log_error.called)
-        self.assertTrue(mock_sailthru_send.call_args[1], 'test_template')
+        self.assertEqual(len(mail.outbox), 1)
 
     @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
