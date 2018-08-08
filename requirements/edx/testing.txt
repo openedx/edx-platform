@@ -316,7 +316,7 @@ unittest2==1.1.0          # via testtools
 uritemplate==3.0.0
 urllib3==1.23
 urlobject==2.4.3          # via pa11ycrawler
-user-util==0.1.4
+user-util==0.1.5
 virtualenv==16.0.0        # via tox
 voluptuous==0.11.1
 w3lib==1.19.0             # via parsel, scrapy
