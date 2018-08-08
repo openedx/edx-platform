@@ -138,11 +138,16 @@ class Command(BaseCommand):
         """
         Get all pathways for the current client
         """
-        pathways = {}
+        pathways = []
         failure = False
         logger.info('Requesting credit pathways for {domain}.'.format(domain=site.domain))
         try:
-            pathways = client.credit_pathways.get(exclude_utm=1)['results']
+            next_page = 1
+            while next_page:
+                new_pathways = client.credit_pathways.get(exclude_utm=1, page=next_page)
+                pathways.extend(new_pathways['results'])
+                next_page = next_page + 1 if new_pathways['next'] else None
+
         except:  # pylint: disable=bare-except
             logger.error('Failed to retrieve credit pathways for site: {domain}.'.format(domain=site.domain))
             failure = True

@@ -49,7 +49,7 @@ class CatalogFixture(object):
         """
         requests.put(
             '{}/set_config'.format(CATALOG_STUB_URL),
-            data={'catalog.credit_pathways': json.dumps({'results': credit_pathways})}
+            data={'catalog.credit_pathways': json.dumps({'results': credit_pathways, 'next': None})}
         )
 
     def install_program_types(self, program_types):
