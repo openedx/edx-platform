@@ -621,9 +621,23 @@ class AccountRetirementPartnerReportView(ViewSet):
             original_username__in=usernames
         )
 
-        if len(usernames) != len(retirement_statuses):
+        # Need to de-dupe usernames that differ only by case to find the exact right match
+        retirement_statuses_clean = [rs for rs in retirement_statuses if rs.original_username in usernames]
+
+        # During a narrow window learners were able to re-use a username that had been retired if
+        # they altered the capitalization of one or more characters. Therefore we can have more
+        # than one row returned here (due to our MySQL collation being case-insensitive), and need
+        # to disambiguate them in Python, which will respect case in the comparison.
+        if len(usernames) != len(retirement_statuses_clean):
             return Response(
-                '{} original_usernames given, only {} found!'.format(len(usernames), len(retirement_statuses)),
+                '{} original_usernames given, {} found!\n'
+                'Given usernames:\n{}\n'
+                'Found UserRetirementReportingStatuses:\n{}'.format(
+                    len(usernames),
+                    len(retirement_statuses_clean),
+                    usernames,
+                    ', '.join([rs.original_username for rs in retirement_statuses_clean])
+                ),
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -719,7 +733,28 @@ class AccountRetirementStatusView(ViewSet):
         """
         try:
             username = request.data['username']
-            retirement = UserRetirementStatus.objects.get(original_username=username)
+            retirements = UserRetirementStatus.objects.filter(original_username=username)
+
+            # During a narrow window learners were able to re-use a username that had been retired if
+            # they altered the capitalization of one or more characters. Therefore we can have more
+            # than one row returned here (due to our MySQL collation being case-insensitive), and need
+            # to disambiguate them in Python, which will respect case in the comparison.
+            retirement = None
+            if len(retirements) < 1:
+                raise UserRetirementStatus.DoesNotExist()
+            elif len(retirements) > 1:
+                for r in retirements:
+                    if r.original_username == username:
+                        retirement = r
+                        break
+                # UserRetirementStatus was found, but it was the wrong case.
+                if retirement is None:
+                    raise UserRetirementStatus.DoesNotExist()
+            else:
+                if username != retirements[0].original_username:
+                    raise UserRetirementStatus.DoesNotExist()
+                retirement = retirements[0]
+
             retirement.update_state(request.data)
             return Response(status=status.HTTP_204_NO_CONTENT)
         except UserRetirementStatus.DoesNotExist:
