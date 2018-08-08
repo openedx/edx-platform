@@ -39,7 +39,7 @@
             <% }); %>
         </select>
         <span id="<%- form %>-<%- name %>-validation-error" class="tip error" aria-live="assertive">
-            <span class="sr-only">ERROR: </span>
+            <span class="sr-only"></span>
             <span id="<%- form %>-<%- name %>-validation-error-msg"></span>
         </span>
         <% if ( instructions ) { %> <span class="tip tip-input" id="<%- form %>-<%- name %>-desc"><%- instructions %></span><% } %>
@@ -65,7 +65,7 @@
             } %>
             <% if ( required ) { %> aria-required="true" required<% } %>></textarea>
         <span id="<%- form %>-<%- name %>-validation-error" class="tip error" aria-live="assertive">
-            <span class="sr-only">ERROR: </span>
+            <span class="sr-only"></span>
             <span id="<%- form %>-<%- name %>-validation-error-msg"></span>
         </span>
         <% if ( instructions ) { %> <span class="tip tip-input" id="<%- form %>-<%- name %>-desc"><%- instructions %></span><% } %>
@@ -126,7 +126,7 @@
         <% } %>
 
         <span id="<%- form %>-<%- name %>-validation-error" class="tip error" aria-live="assertive">
-            <span class="sr-only">ERROR: </span>
+            <span class="sr-only"></span>
             <span id="<%- form %>-<%- name %>-validation-error-msg"></span>
         </span>
         <% if ( instructions ) { %> <span class="tip tip-input" id="<%- form %>-<%- name %>-desc"><%- instructions %></span><% } %>
