@@ -262,11 +262,6 @@ class CourseOverview(TimeStampedModel):
                     course.error_msg if isinstance(course, ErrorDescriptor) else unicode(course)
                 )
             else:
-                log.exception(
-                    "[Course Loading Error]: course_id: %s, course: %s",
-                    unicode(course_id),
-                    unicode(course),
-                )
                 raise cls.DoesNotExist()
 
     @classmethod
