@@ -11,8 +11,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from openedx.core.djangoapps.site_configuration import helpers
 
-from . import STUDENT_RECORDS_FLAG
-
 API_VERSION = 'v2'
 
 
@@ -93,9 +91,6 @@ class CredentialsApiConfig(ConfigurationModel):
         """
         Publicly-accessible Records URL root.
         """
-        # Temporarily disable this feature while we work on it
-        if not STUDENT_RECORDS_FLAG.is_enabled():
-            return None
         # Not every site wants the Learner Records feature, so we allow opting out.
         if not helpers.get_value('ENABLE_LEARNER_RECORDS', True):
             return None

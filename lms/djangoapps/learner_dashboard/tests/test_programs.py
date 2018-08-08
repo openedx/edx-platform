@@ -21,7 +21,6 @@ from openedx.core.djangoapps.catalog.tests.factories import (
     ProgramFactory
 )
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
-from openedx.core.djangoapps.credentials import STUDENT_RECORDS_FLAG
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import skip_unless_lms
@@ -183,7 +182,6 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
 @skip_unless_lms
 @mock.patch(PROGRAMS_MODULE + '.get_credit_pathways')
 @mock.patch(PROGRAMS_UTILS_MODULE + '.get_programs')
-@override_waffle_flag(STUDENT_RECORDS_FLAG, active=True)
 class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, SharedModuleStoreTestCase):
     """Unit tests for the program details page."""
     shard = 4
