@@ -194,7 +194,7 @@ def validate_video_image(image_file):
     Arguments:
         image_file: The selected image file.
 
-   Returns:
+    Returns:
         error (String or None): If there is error returns error message otherwise None.
     """
     error = None
