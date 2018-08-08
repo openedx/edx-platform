@@ -58,7 +58,7 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
     """
     shard = 2
 
-    @ddt.data('deadbeef1234' * 2, u'deadbeef1234' * 2, ObjectId())
+    @ddt.data('deadbeef1234' * 2, u'deadbeef1234' * 2, SAMPLE_OBJECT_ID)
     def test_no_bulk_read_structure(self, version_guid):
         # Reading a structure when no bulk operation is active should just call
         # through to the db_connection
@@ -77,7 +77,7 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
         self.assertConnCalls(call.insert_structure(self.structure, self.course_key))
         self.clear_cache.assert_called_once_with(self.structure['_id'])
 
-    @ddt.data('deadbeef1234' * 2, u'deadbeef1234' * 2, ObjectId())
+    @ddt.data('deadbeef1234' * 2, u'deadbeef1234' * 2, SAMPLE_OBJECT_ID)
     def test_no_bulk_read_definition(self, version_guid):
         # Reading a definition when no bulk operation is active should just call
         # through to the db_connection
@@ -584,7 +584,7 @@ class TestBulkWriteMixinOpen(TestBulkWriteMixin):
         super(TestBulkWriteMixinOpen, self).setUp()
         self.bulk._begin_bulk_operation(self.course_key)
 
-    @ddt.data('deadbeef1234' * 2, u'deadbeef1234' * 2, ObjectId())
+    @ddt.data('deadbeef1234' * 2, u'deadbeef1234' * 2, SAMPLE_OBJECT_ID)
     def test_read_structure_without_write_from_db(self, version_guid):
         # Reading a structure before it's been written (while in bulk operation mode)
         # returns the structure from the database
@@ -593,7 +593,7 @@ class TestBulkWriteMixinOpen(TestBulkWriteMixin):
         self.assertEqual(result, self.conn.get_structure.return_value)
         self.assertCacheNotCleared()
 
-    @ddt.data('deadbeef1234' * 2, u'deadbeef1234' * 2, ObjectId())
+    @ddt.data('deadbeef1234' * 2, u'deadbeef1234' * 2, SAMPLE_OBJECT_ID)
     def test_read_structure_without_write_only_reads_once(self, version_guid):
         # Reading the same structure multiple times shouldn't hit the database
         # more than once
@@ -603,7 +603,7 @@ class TestBulkWriteMixinOpen(TestBulkWriteMixin):
             self.assertEqual(result, self.conn.get_structure.return_value)
             self.assertCacheNotCleared()
 
-    @ddt.data('deadbeef1234' * 2, u'deadbeef1234' * 2, ObjectId())
+    @ddt.data('deadbeef1234' * 2, u'deadbeef1234' * 2, SAMPLE_OBJECT_ID)
     def test_read_structure_after_write_no_db(self, version_guid):
         # Reading a structure that's already been written shouldn't hit the db at all
         self.structure['_id'] = version_guid
@@ -612,7 +612,7 @@ class TestBulkWriteMixinOpen(TestBulkWriteMixin):
         self.assertEquals(self.conn.get_structure.call_count, 0)
         self.assertEqual(result, self.structure)
 
-    @ddt.data('deadbeef1234' * 2, u'deadbeef1234' * 2, ObjectId())
+    @ddt.data('deadbeef1234' * 2, u'deadbeef1234' * 2, SAMPLE_OBJECT_ID)
     def test_read_structure_after_write_after_read(self, version_guid):
         # Reading a structure that's been updated after being pulled from the db should
         # still get the updated value
@@ -623,7 +623,7 @@ class TestBulkWriteMixinOpen(TestBulkWriteMixin):
         self.assertEquals(self.conn.get_structure.call_count, 1)
         self.assertEqual(result, self.structure)
 
-    @ddt.data('deadbeef1234' * 2, u'deadbeef1234' * 2, ObjectId())
+    @ddt.data('deadbeef1234' * 2, u'deadbeef1234' * 2, SAMPLE_OBJECT_ID)
     def test_read_definition_without_write_from_db(self, version_guid):
         # Reading a definition before it's been written (while in bulk operation mode)
         # returns the definition from the database
@@ -632,7 +632,7 @@ class TestBulkWriteMixinOpen(TestBulkWriteMixin):
         self.assertEqual(result, self.conn.get_definition.return_value)
         self.assertCacheNotCleared()
 
-    @ddt.data('deadbeef1234' * 2, u'deadbeef1234' * 2, ObjectId())
+    @ddt.data('deadbeef1234' * 2, u'deadbeef1234' * 2, SAMPLE_OBJECT_ID)
     def test_read_definition_without_write_only_reads_once(self, version_guid):
         # Reading the same definition multiple times shouldn't hit the database
         # more than once
@@ -642,7 +642,7 @@ class TestBulkWriteMixinOpen(TestBulkWriteMixin):
             self.assertEqual(result, self.conn.get_definition.return_value)
             self.assertCacheNotCleared()
 
-    @ddt.data('deadbeef1234' * 2, u'deadbeef1234' * 2, ObjectId())
+    @ddt.data('deadbeef1234' * 2, u'deadbeef1234' * 2, SAMPLE_OBJECT_ID)
     def test_read_definition_after_write_no_db(self, version_guid):
         # Reading a definition that's already been written shouldn't hit the db at all
         self.definition['_id'] = version_guid
@@ -651,7 +651,7 @@ class TestBulkWriteMixinOpen(TestBulkWriteMixin):
         self.assertEquals(self.conn.get_definition.call_count, 0)
         self.assertEqual(result, self.definition)
 
-    @ddt.data('deadbeef1234' * 2, u'deadbeef1234' * 2, ObjectId())
+    @ddt.data('deadbeef1234' * 2, u'deadbeef1234' * 2, SAMPLE_OBJECT_ID)
     def test_read_definition_after_write_after_read(self, version_guid):
         # Reading a definition that's been updated after being pulled from the db should
         # still get the updated value
