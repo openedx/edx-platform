@@ -45,7 +45,8 @@ class RedirectMiddleware(object):
             attended_surveys = user_extended_profile.attended_surveys()
             unattended_surveys = user_extended_profile.unattended_surveys(_type="list")
 
-            if not unattended_surveys and user.email_preferences and user.email_preferences.opt_in is None:
+            if not unattended_surveys and not request.get_full_path() == '/myaccount/settings/' \
+                    and user.email_preferences and user.email_preferences.opt_in is None:
                 return redirect('/myaccount/settings/')
 
             if not unattended_surveys:
