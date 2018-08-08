@@ -144,7 +144,8 @@ class Command(BaseCommand):
         )
 
         if commit and options.get('from_settings') and migration_settings.all_courses:
-            MigrationEnqueuedCourse.objects.bulk_create([
-                MigrationEnqueuedCourse(course_id=course_key, command_run=command_run)
-                for course_key in course_keys
-            ])
+            for course_key in course_keys:
+                enqueued_course, created = MigrationEnqueuedCourse.objects.get_or_create(course_id=course_key)
+                if created:
+                    enqueued_course.command_run = command_run
+                    enqueued_course.save()
