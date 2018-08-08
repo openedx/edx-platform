@@ -343,7 +343,7 @@ CREATE TABLE `auth_permission` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `content_type_id` (`content_type_id`,`codename`),
   CONSTRAINT `auth__content_type_id_508cf46651277a81_fk_django_content_type_id` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1104 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1107 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `auth_registration`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -1915,6 +1915,10 @@ CREATE TABLE `degreed_degreedenterprisecustomerconfiguration` (
   `degreed_company_id` varchar(255) NOT NULL,
   `enterprise_customer_id` char(32) NOT NULL,
   `transmission_chunk_size` int(11) NOT NULL,
+  `degreed_base_url` varchar(255) NOT NULL,
+  `degreed_user_id` varchar(255) NOT NULL,
+  `degreed_user_password` varchar(255) NOT NULL,
+  `provider_id` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `enterprise_customer_id` (`enterprise_customer_id`),
   CONSTRAINT `D8dff51a65b4ed0c3cf73b425e343929` FOREIGN KEY (`enterprise_customer_id`) REFERENCES `enterprise_enterprisecustomer` (`uuid`)
@@ -1927,13 +1931,9 @@ CREATE TABLE `degreed_degreedglobalconfiguration` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `change_date` datetime(6) NOT NULL,
   `enabled` tinyint(1) NOT NULL,
-  `degreed_base_url` varchar(255) NOT NULL,
   `completion_status_api_path` varchar(255) NOT NULL,
   `course_api_path` varchar(255) NOT NULL,
   `oauth_api_path` varchar(255) NOT NULL,
-  `degreed_user_id` varchar(255) NOT NULL,
-  `degreed_user_password` varchar(255) NOT NULL,
-  `provider_id` varchar(100) NOT NULL,
   `changed_by_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `degreed_degreedgl_changed_by_id_3af82cf8c774e820_fk_auth_user_id` (`changed_by_id`),
@@ -1974,6 +1974,10 @@ CREATE TABLE `degreed_historicaldegreedenterprisecustomerconfiguration` (
   `enterprise_customer_id` char(32) DEFAULT NULL,
   `history_user_id` int(11) DEFAULT NULL,
   `transmission_chunk_size` int(11) NOT NULL,
+  `degreed_base_url` varchar(255) NOT NULL,
+  `degreed_user_id` varchar(255) NOT NULL,
+  `degreed_user_password` varchar(255) NOT NULL,
+  `provider_id` varchar(100) NOT NULL,
   PRIMARY KEY (`history_id`),
   KEY `degreed_histori_history_user_id_20efd88dd0a8765a_fk_auth_user_id` (`history_user_id`),
   KEY `degreed_historicaldegreedenterprisecustomerconfiguration_b803fed` (`id`),
@@ -2092,7 +2096,7 @@ CREATE TABLE `django_content_type` (
   `model` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `django_content_type_app_label_45f3b1d93ec8c61c_uniq` (`app_label`,`model`)
-) ENGINE=InnoDB AUTO_INCREMENT=367 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=368 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_migrations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2103,7 +2107,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=472 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=476 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -6172,6 +6176,24 @@ CREATE TABLE `workflow_assessmentworkflowstep` (
   PRIMARY KEY (`id`),
   KEY `w_workflow_id_4939c36cf6220ba3_fk_workflow_assessmentworkflow_id` (`workflow_id`),
   CONSTRAINT `w_workflow_id_4939c36cf6220ba3_fk_workflow_assessmentworkflow_id` FOREIGN KEY (`workflow_id`) REFERENCES `workflow_assessmentworkflow` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `xapi_xapilrsconfiguration`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `xapi_xapilrsconfiguration` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `created` datetime(6) NOT NULL,
+  `modified` datetime(6) NOT NULL,
+  `version` varchar(16) NOT NULL,
+  `endpoint` varchar(200) NOT NULL,
+  `key` varchar(255) NOT NULL,
+  `secret` varchar(255) NOT NULL,
+  `active` tinyint(1) NOT NULL,
+  `enterprise_customer_id` char(32) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `enterprise_customer_id` (`enterprise_customer_id`),
+  CONSTRAINT `xapi_xapilrsconfigur_enterprise_customer__90c03ad5_fk_enterpris` FOREIGN KEY (`enterprise_customer_id`) REFERENCES `enterprise_enterprisecustomer` (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `xblock_config_courseeditltifieldsenabledflag`;
