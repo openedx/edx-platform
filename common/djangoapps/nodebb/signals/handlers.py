@@ -80,6 +80,9 @@ def sync_user_info_with_nodebb(sender, instance, created, **kwargs):  # pylint: 
         data_to_sync = {
             "focus_area": FocusArea.objects.get(code=instance.focus_area).label if instance.focus_area else ""
         }
+    else:
+        data_to_sync = {}
+
     try:
         status_code, response_body = NodeBBClient().users.update_profile(user.username, kwargs=data_to_sync)
         log_action_response(user, status_code, response_body)
