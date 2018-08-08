@@ -10,7 +10,6 @@ from requests.exceptions import ConnectionError
 from common.djangoapps.nodebb.tasks import (task_create_user_on_nodebb, task_activate_user_on_nodebb,
                                             task_update_user_profile_on_nodebb)
 from common.lib.nodebb_client.client import NodeBBClient
-# from nodebb.signals.handlers import create_user_on_nodebb
 from lms.djangoapps.onboarding.helpers import COUNTRIES
 from lms.djangoapps.onboarding.models import UserExtendedProfile
 from philu_commands.models import CreationFailedUsers
@@ -61,7 +60,7 @@ class Command(BaseCommand):
 
             # filter nodebb_data to ensure compatibility with edx_data
             for key in nodebb_data:
-                if nodebb_data[key] in [None, 'None']:
+                if str(nodebb_data[key]) == 'None':
                     nodebb_data[key] = None
             if not nodebb_data.get('self_prioritize_areas'):
                 nodebb_data['self_prioritize_areas'] = []
