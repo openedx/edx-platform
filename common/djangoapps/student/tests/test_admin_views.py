@@ -208,11 +208,12 @@ class CourseEnrollmentAdminTest(SharedModuleStoreTestCase):
     def setUp(self):
         super(CourseEnrollmentAdminTest, self).setUp()
         self.user = UserFactory.create(is_staff=True, is_superuser=True)
-        self.client.login(username=self.user.username, password='test')
+        self.course = CourseFactory()
         CourseEnrollmentFactory(
             user=self.user,
-            course_id=CourseFactory().id,  # pylint: disable=no-member
+            course_id=self.course.id,  # pylint: disable=no-member
         )
+        self.client.login(username=self.user.username, password='test')
 
     @ddt.data(*ADMIN_URLS)
     @ddt.unpack
@@ -232,3 +233,24 @@ class CourseEnrollmentAdminTest(SharedModuleStoreTestCase):
         with COURSE_ENROLLMENT_ADMIN_SWITCH.override(active=True):
             response = getattr(self.client, method)(url)
         self.assertEqual(response.status_code, 200)
+
+    def test_username_exact_match(self):
+        """
+        Ensure that course enrollment searches return exact matches on username first.
+        """
+        user2 = UserFactory.create(username='aaa_{}'.format(self.user.username))
+        CourseEnrollmentFactory(
+            user=user2,
+            course_id=self.course.id,  # pylint: disable=no-member
+        )
+        search_url = '{}?q={}'.format(reverse('admin:student_courseenrollment_changelist'), self.user.username)
+        with COURSE_ENROLLMENT_ADMIN_SWITCH.override(active=True):
+            response = self.client.get(search_url)
+        self.assertEqual(response.status_code, 200)
+
+        # context['results'] is an array of arrays of HTML <td> elements to be rendered
+        self.assertEqual(len(response.context['results']), 2)
+        for idx, username in enumerate([self.user.username, user2.username]):
+            # Locate the <td> column containing the username
+            user_field = next(col for col in response.context['results'][idx] if "field-user" in col)
+            self.assertIn(username, user_field)
