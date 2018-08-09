@@ -1191,7 +1191,7 @@ class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, In
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
             result = ProblemGradeReport.generate(None, None, self.course.id, None, 'graded')
             self.assertDictContainsSubset(
-                {'action_name': 'graded', 'attempted': 4, 'succeeded': 4, 'failed': 0}, result
+                {'action_name': 'graded', 'attempted': 5, 'succeeded': 5, 'failed': 0}, result
             )
         problem_names = [u'Homework 1: Subsection - Problem0', u'Homework 1: Subsection - Problem1']
         header_row = [u'Student ID', u'Email', u'Username', u'Enrollment Status', u'Grade']
@@ -1218,6 +1218,11 @@ class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, In
                 'user': self.non_cohorted_user,
                 'enrollment_status': ENROLLED_IN_COURSE,
                 'grade': [u'0.0', u'Not Available', u'Not Available', u'Not Available', u'Not Available'],
+            },
+            {
+                'user': self.community_ta,
+                'enrollment_status': ENROLLED_IN_COURSE,
+                'grade': [u'0.0', u'Not Attempted', u'2.0', u'Not Available', u'Not Available'],
             },
         ]
 
