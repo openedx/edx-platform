@@ -48,6 +48,7 @@ class BadgeClassFactory(factory.django.DjangoModelFactory):
         model = BadgeClass
 
     slug = 'test_slug'
+    badgr_server_slug = 'test_badgr_server_slug'
     issuing_component = 'test_component'
     display_name = 'Test Badge'
     description = "Yay! It's a test badge."

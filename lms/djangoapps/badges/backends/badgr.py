@@ -114,6 +114,14 @@ class BadgrBackend(BadgeBackend):
             timeout=settings.BADGR_TIMEOUT
         )
         self._log_if_raised(result, data)
+        try:
+            result_json = result.json()
+            if 'slug' in result_json:
+                badgr_server_slug = result_json['slug']
+                badge_class.badgr_server_slug = badgr_server_slug
+                badge_class.save()
+        except Exception as excep:
+            LOGGER.error('Error on saving Badgr Server Slug of badge_class slug "{0}" with response json "{1}" : {2}'.format(badge_class.slug, result.json(), excep))
 
     def _send_assertion_created_event(self, user, assertion):
         """
@@ -123,6 +131,7 @@ class BadgrBackend(BadgeBackend):
             'edx.badge.assertion.created', {
                 'user_id': user.id,
                 'badge_slug': assertion.badge_class.slug,
+                'badge_badgr_server_slug': assertion.badge_class.badgr_server_slug,
                 'badge_name': assertion.badge_class.display_name,
                 'issuing_component': assertion.badge_class.issuing_component,
                 'course_id': str(assertion.badge_class.course_id),
@@ -143,7 +152,7 @@ class BadgrBackend(BadgeBackend):
             'evidence': evidence_url,
         }
         response = requests.post(
-            self._assertion_url(self._slugify(badge_class)), headers=self._get_headers(), data=data,
+            self._assertion_url(badge_class.badgr_server_slug), headers=self._get_headers(), data=data,
             timeout=settings.BADGR_TIMEOUT
         )
         self._log_if_raised(response, data)
@@ -167,7 +176,7 @@ class BadgrBackend(BadgeBackend):
         """
         Verify a badge has been created for this badge class, and create it if not.
         """
-        slug = self._slugify(badge_class)
+        slug = badge_class.badgr_server_slug
         if slug in BadgrBackend.badges:
             return
         response = requests.get(self._badge_url(slug), headers=self._get_headers(), timeout=settings.BADGR_TIMEOUT)

@@ -28,6 +28,7 @@ BADGR_SETTINGS = {
 
 # Should be the hashed result of test_slug as the slug, and test_component as the component
 EXAMPLE_SLUG = '15bb687e0c59ef2f0a49f6838f511bf4ca6c566dd45da6293cabbd9369390e1a'
+BADGR_SERVER_SLUG = 'test_badgr_server_slug'
 
 
 # pylint: disable=protected-access
@@ -114,7 +115,7 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         """
         Make sure ensure_badge_created doesn't call create_badge if we know the badge is already there.
         """
-        BadgrBackend.badges.append(EXAMPLE_SLUG)
+        BadgrBackend.badges.append(BADGR_SERVER_SLUG)
         self.handler._create_badge = Mock()
         self.handler._ensure_badge_created(self.badge_class)  # lint-amnesty, pylint: disable=no-member
         assert not self.handler._create_badge.called
@@ -139,9 +140,11 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         self.handler._ensure_badge_created(self.badge_class)  # lint-amnesty, pylint: disable=no-member
         assert get.called
         args, kwargs = get.call_args
-        assert args[0] == ('https://example.com/v1/issuer/issuers/test-issuer/badges/' + EXAMPLE_SLUG)
+        assert args[0] == (
+            'https://example.com/v1/issuer/issuers/test-issuer/badges/' +
+            BADGR_SERVER_SLUG)
         self.check_headers(kwargs['headers'])
-        assert EXAMPLE_SLUG in BadgrBackend.badges
+        assert BADGR_SERVER_SLUG in BadgrBackend.badges
         assert not self.handler._create_badge.called
 
     @patch('requests.get')
@@ -149,12 +152,12 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         response = Mock()
         response.status_code = 404
         get.return_value = response
-        assert EXAMPLE_SLUG not in BadgrBackend.badges
+        assert BADGR_SERVER_SLUG not in BadgrBackend.badges
         self.handler._create_badge = Mock()
         self.handler._ensure_badge_created(self.badge_class)  # lint-amnesty, pylint: disable=no-member
         assert self.handler._create_badge.called
         assert self.handler._create_badge.call_args == call(self.badge_class)
-        assert EXAMPLE_SLUG in BadgrBackend.badges
+        assert BADGR_SERVER_SLUG in BadgrBackend.badges
 
     @patch('requests.post')
     def test_badge_creation_event(self, post):
@@ -170,7 +173,10 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
         self.recreate_tracker()
         self.handler._create_assertion(self.badge_class, self.user, 'https://example.com/irrefutable_proof')  # lint-amnesty, pylint: disable=no-member
         args, kwargs = post.call_args
-        assert args[0] == (('https://example.com/v1/issuer/issuers/test-issuer/badges/' + EXAMPLE_SLUG) + '/assertions')
+        assert args[0] == ((
+            'https://example.com/v1/issuer/issuers/test-issuer/badges/' +
+            BADGR_SERVER_SLUG) +
+            '/assertions')
         self.check_headers(kwargs['headers'])
         assertion = BadgeAssertion.objects.get(user=self.user, badge_class__course_id=self.course.location.course_key)
         assert assertion.data == result
@@ -186,6 +192,7 @@ class BadgrBackendTestCase(ModuleStoreTestCase, EventTrackingTestCase):
                 'assertion_id': assertion.id,
                 'badge_name': 'Test Badge',
                 'badge_slug': 'test_slug',
+                'badge_badgr_server_slug': BADGR_SERVER_SLUG,
                 'issuing_component': 'test_component',
                 'assertion_image_url': 'http://www.example.com/example.png',
                 'assertion_json_url': 'http://www.example.com/example',
