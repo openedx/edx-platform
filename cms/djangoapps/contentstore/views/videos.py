@@ -14,7 +14,6 @@ from boto import s3
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.core.files.images import get_image_dimensions
 from django.urls import reverse
 from django.http import HttpResponse, HttpResponseNotFound
 from django.utils.translation import ugettext as _
@@ -40,6 +39,7 @@ from xmodule.video_module.transcripts_utils import Transcript
 
 from contentstore.models import VideoUploadConfig
 from contentstore.utils import reverse_course_url
+from contentstore.video_utils import validate_video_image
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
@@ -185,60 +185,6 @@ def videos_handler(request, course_key_string, edx_video_id=None):
             return send_video_status_update(request.json)
 
         return videos_post(course, request)
-
-
-def validate_video_image(image_file):
-    """
-    Validates video image file.
-
-    Arguments:
-        image_file: The selected image file.
-
-    Returns:
-        error (String or None): If there is error returns error message otherwise None.
-    """
-    error = None
-
-    if not all(hasattr(image_file, attr) for attr in ['name', 'content_type', 'size']):
-        error = _('The image must have name, content type, and size information.')
-    elif image_file.content_type not in settings.VIDEO_IMAGE_SUPPORTED_FILE_FORMATS.values():
-        error = _('This image file type is not supported. Supported file types are {supported_file_formats}.').format(
-            supported_file_formats=settings.VIDEO_IMAGE_SUPPORTED_FILE_FORMATS.keys()
-        )
-    elif image_file.size > settings.VIDEO_IMAGE_SETTINGS['VIDEO_IMAGE_MAX_BYTES']:
-        error = _('This image file must be smaller than {image_max_size}.').format(
-            image_max_size=settings.VIDEO_IMAGE_MAX_FILE_SIZE_MB
-        )
-    elif image_file.size < settings.VIDEO_IMAGE_SETTINGS['VIDEO_IMAGE_MIN_BYTES']:
-        error = _('This image file must be larger than {image_min_size}.').format(
-            image_min_size=settings.VIDEO_IMAGE_MIN_FILE_SIZE_KB
-        )
-    else:
-        try:
-            image_file_width, image_file_height = get_image_dimensions(image_file)
-        except TypeError:
-            return _('There is a problem with this image file. Try to upload a different file.')
-        if image_file_width is None or image_file_height is None:
-            return _('There is a problem with this image file. Try to upload a different file.')
-        image_file_aspect_ratio = abs(image_file_width / float(image_file_height) - settings.VIDEO_IMAGE_ASPECT_RATIO)
-        if image_file_width < settings.VIDEO_IMAGE_MIN_WIDTH or image_file_height < settings.VIDEO_IMAGE_MIN_HEIGHT:
-            error = _('Recommended image resolution is {image_file_max_width}x{image_file_max_height}. '
-                      'The minimum resolution is {image_file_min_width}x{image_file_min_height}.').format(
-                image_file_max_width=settings.VIDEO_IMAGE_MAX_WIDTH,
-                image_file_max_height=settings.VIDEO_IMAGE_MAX_HEIGHT,
-                image_file_min_width=settings.VIDEO_IMAGE_MIN_WIDTH,
-                image_file_min_height=settings.VIDEO_IMAGE_MIN_HEIGHT
-            )
-        elif image_file_aspect_ratio > settings.VIDEO_IMAGE_ASPECT_RATIO_ERROR_MARGIN:
-            error = _('This image file must have an aspect ratio of {video_image_aspect_ratio_text}.').format(
-                video_image_aspect_ratio_text=settings.VIDEO_IMAGE_ASPECT_RATIO_TEXT
-            )
-        else:
-            try:
-                image_file.name.encode('ascii')
-            except UnicodeEncodeError:
-                error = _('The image file name can only contain letters, numbers, hyphens (-), and underscores (_).')
-    return error
 
 
 @expect_json
