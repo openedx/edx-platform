@@ -1,4 +1,5 @@
 # pylint: disable=missing-docstring
+# pylint: disable=no-member
 import datetime
 import os
 
@@ -6,14 +7,13 @@ import pytz
 from django.conf import settings
 from lettuce import step, world
 from mock import patch
-from nose.tools import assert_equal, assert_in, assert_is_none, assert_true
 from pytz import UTC
-from selenium.common.exceptions import NoAlertPresentException
 from splinter.exceptions import ElementDoesNotExist
 
 from common import visit_scenario_item
 from courseware.access import has_access
 from courseware.tests.factories import BetaTesterFactory, InstructorFactory
+from openedx.core.lib.tests.tools import assert_equal, assert_in, assert_true  # pylint: disable=no-name-in-module
 from student.tests.factories import UserFactory
 
 TEST_COURSE_NAME = "test_course_a"

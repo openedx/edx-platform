@@ -2,8 +2,9 @@
 
 from django.conf import settings
 from lettuce import before, step, world
-from nose.tools import assert_equals, assert_in
 from pymongo import MongoClient
+
+from openedx.core.lib.tests.tools import assert_equals, assert_in  # pylint: disable=no-name-in-module
 
 REQUIRED_EVENT_FIELDS = [
     'agent',
@@ -18,25 +19,25 @@ REQUIRED_EVENT_FIELDS = [
 ]
 
 
-@before.all
+@before.all  # pylint: disable=no-member
 def connect_to_mongodb():
     world.mongo_client = MongoClient(host=settings.MONGO_HOST, port=settings.MONGO_PORT_NUM)
     world.event_collection = world.mongo_client['track']['events']
 
 
-@before.each_scenario
+@before.each_scenario  # pylint: disable=no-member
 def reset_captured_events(_scenario):
     world.event_collection.drop()
 
 
-@before.outline
-def reset_between_outline_scenarios(_scenario, order, outline, reasons_to_fail):
+@before.outline  # pylint: disable=no-member
+def reset_between_outline_scenarios(_scenario, _order, _outline, _reasons_to_fail):
     world.event_collection.drop()
 
 
 @step(r'[aA]n? course url "(.*)" event is emitted$')
 def course_url_event_is_emitted(_step, url_regex):
-    event_type = url_regex.format(world.scenario_dict['COURSE'].id)
+    event_type = url_regex.format(world.scenario_dict['COURSE'].id)  # pylint: disable=no-member
     n_events_are_emitted(_step, 1, event_type, "server")
 
 
@@ -71,7 +72,7 @@ def n_events_are_emitted(_step, count, event_type, event_source):
     event = cursor.next()
 
     expected_field_values = {
-        "username": world.scenario_dict['USER'].username,
+        "username": world.scenario_dict['USER'].username,  # pylint: disable=no-member
         "event_type": event_type,
     }
     for key, value in expected_field_values.iteritems():
