@@ -58,12 +58,6 @@ class Command(BaseCommand):
 
             nodebb_data = nodebb_users.get(user.username)
 
-            # filter nodebb_data to ensure compatibility with edx_data
-            for key in nodebb_data:
-                if str(nodebb_data[key]) == 'None':
-                    nodebb_data[key] = None
-            if not nodebb_data.get('self_prioritize_areas'):
-                nodebb_data['self_prioritize_areas'] = []
 
             if not nodebb_data:
                 try:
@@ -73,6 +67,14 @@ class Command(BaseCommand):
                 except ConnectionError:
                     task_create_user_on_nodebb.apply_async(username=user.username, kwargs=edx_data)
                     task_activate_user_on_nodebb.apply_async(username=user.username, active=user.is_active)
+
+            # filter nodebb_data to ensure compatibility with edx_data
+            for key in nodebb_data:
+                if str(nodebb_data[key]) == 'None':
+                    nodebb_data[key] = None
+            if not nodebb_data.get('self_prioritize_areas'):
+                nodebb_data['self_prioritize_areas'] = []
+
 
             if not edx_data.viewitems() <= nodebb_data.viewitems():
                 try:
