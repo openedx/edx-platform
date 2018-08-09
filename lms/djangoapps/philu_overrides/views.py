@@ -43,7 +43,7 @@ from third_party_auth import pipeline, provider
 from util.json_request import JsonResponse
 from edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
-from student.models import (LoginFailures, PasswordHistory)
+from student.models import (LoginFailures, PasswordHistory, CourseEnrollment)
 from ratelimitbackend.exceptions import RateLimitException
 from django.contrib.auth import authenticate, login
 import analytics
@@ -547,6 +547,9 @@ def course_about(request, course_id):
 
         staff_access = bool(has_access(request.user, 'staff', course))
         studio_url = get_studio_url(course, 'settings/details')
+
+        if not staff_access and course.invitation_only and not CourseEnrollment.is_enrolled(request.user, course.id) :
+            raise Http404("Course not accessible: {}.".format(unicode(course.id)))
 
         # Note: this is a flow for payment for course registration, not the Verified Certificate flow.
         # in_cart = False
