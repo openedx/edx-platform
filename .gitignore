@@ -20,6 +20,7 @@ cms/envs/private.py
 *.orig
 /nbproject
 .idea/
+.vscode/
 .redcar/
 codekit-config.json
 .pycharm_helpers/
