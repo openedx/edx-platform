@@ -50,22 +50,22 @@ class TestUtils(unittest.TestCase):
             child_3    child_4
     """
     shard = 2
-
+    MOCK_OBJECT = Mock()
     ONLY_ROOTS = [
-        draft_node_constructor(Mock(), 'url1', 'vertical'),
-        draft_node_constructor(Mock(), 'url2', 'sequential'),
+        draft_node_constructor(MOCK_OBJECT, 'url1', 'vertical'),
+        draft_node_constructor(MOCK_OBJECT, 'url2', 'sequential'),
     ]
     ONLY_ROOTS_URLS = ['url1', 'url2']
 
     SOME_TREES = [
-        draft_node_constructor(Mock(), 'child_1', 'vertical_1'),
-        draft_node_constructor(Mock(), 'child_2', 'vertical_1'),
-        draft_node_constructor(Mock(), 'vertical_1', 'sequential_1'),
+        draft_node_constructor(MOCK_OBJECT, 'child_1', 'vertical_1'),
+        draft_node_constructor(MOCK_OBJECT, 'child_2', 'vertical_1'),
+        draft_node_constructor(MOCK_OBJECT, 'vertical_1', 'sequential_1'),
 
-        draft_node_constructor(Mock(), 'child_3', 'vertical_2'),
-        draft_node_constructor(Mock(), 'child_4', 'vertical_2'),
-        draft_node_constructor(Mock(), 'vertical_2', 'grandparent_vertical'),
-        draft_node_constructor(Mock(), 'grandparent_vertical', 'great_grandparent_vertical'),
+        draft_node_constructor(MOCK_OBJECT, 'child_3', 'vertical_2'),
+        draft_node_constructor(MOCK_OBJECT, 'child_4', 'vertical_2'),
+        draft_node_constructor(MOCK_OBJECT, 'vertical_2', 'grandparent_vertical'),
+        draft_node_constructor(MOCK_OBJECT, 'grandparent_vertical', 'great_grandparent_vertical'),
     ]
 
     SOME_TREES_ROOTS_URLS = ['vertical_1', 'grandparent_vertical']

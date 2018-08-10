@@ -18,7 +18,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.utils import (
     MIXED_MODULESTORE_BOTH_SETUP, MODULESTORE_SETUPS,
-    XmlModulestoreBuilder, MixedModulestoreBuilder
+    XmlModulestoreBuilder, MixedModulestoreBuilder, XML_MODULESTORE_MAP
 )
 
 
@@ -641,11 +641,12 @@ class TestMongoAssetMetadataStorage(TestCase):
             )
             self.assertEquals(len(asset_page), 2)
 
-    @ddt.data(XmlModulestoreBuilder(), MixedModulestoreBuilder([('xml', XmlModulestoreBuilder())]))
-    def test_xml_not_yet_implemented(self, storebuilder):
+    @ddt.data('XML_MODULESTORE_BUILDER', 'MIXED_MODULESTORE_BUILDER')
+    def test_xml_not_yet_implemented(self, storebuilderName):
         """
         Test coverage which shows that for now xml read operations are not implemented
         """
+        storebuilder = XML_MODULESTORE_MAP[storebuilderName]
         with storebuilder.build(contentstore=None) as (__, store):
             course_key = store.make_course_key("org", "course", "run")
             asset_key = course_key.make_asset_key('asset', 'foo.jpg')
