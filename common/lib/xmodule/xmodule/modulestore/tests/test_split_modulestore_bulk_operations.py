@@ -57,6 +57,7 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
     Tests of the bulk write mixin when bulk operations aren't active.
     """
     shard = 2
+    SAMPLE_OBJECT_ID = Mock()
 
     @ddt.data('deadbeef1234' * 2, u'deadbeef1234' * 2, SAMPLE_OBJECT_ID)
     def test_no_bulk_read_structure(self, version_guid):
