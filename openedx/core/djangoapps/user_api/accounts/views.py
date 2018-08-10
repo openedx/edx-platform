@@ -742,7 +742,7 @@ class AccountRetirementStatusView(ViewSet):
             retirement = None
             if len(retirements) < 1:
                 raise UserRetirementStatus.DoesNotExist()
-            elif len(retirements) > 1:
+            elif len(retirements) >= 1:
                 for r in retirements:
                     if r.original_username == username:
                         retirement = r
@@ -750,10 +750,6 @@ class AccountRetirementStatusView(ViewSet):
                 # UserRetirementStatus was found, but it was the wrong case.
                 if retirement is None:
                     raise UserRetirementStatus.DoesNotExist()
-            else:
-                if username != retirements[0].original_username:
-                    raise UserRetirementStatus.DoesNotExist()
-                retirement = retirements[0]
 
             retirement.update_state(request.data)
             return Response(status=status.HTTP_204_NO_CONTENT)
