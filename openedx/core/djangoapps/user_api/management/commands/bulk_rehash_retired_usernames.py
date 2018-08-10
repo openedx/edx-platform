@@ -12,9 +12,13 @@ command likely cannot be re-used in the future because eventually we will need
 to clean out the UserRetirementStatus table.
 """
 from __future__ import print_function
+
 from django.conf import settings
 from django.db import transaction
 from django.core.management.base import BaseCommand
+from six import text_type
+
+from lms.lib import comment_client
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from user_util import user_util
 
@@ -36,6 +40,8 @@ class Command(BaseCommand):
         """
         dry_run = options['dry_run']
         retirements = UserRetirementStatus.objects.all().select_related('user')
+
+        failed_retirements = []
         for retirement in retirements:
             original_username = retirement.original_username
             old_retired_username = retirement.retired_username
@@ -64,7 +70,7 @@ class Command(BaseCommand):
                         retirement.user.id,
                     )
                 )
-            # Found an username to update:
+            # Found an username to update
             else:
                 print(
                     'Updating UserRetirementStatus ID {} / User ID {} '
@@ -76,9 +82,36 @@ class Command(BaseCommand):
                     )
                 )
                 if not dry_run:
-                    # Update and save both the user table and retirement queue table:
-                    with transaction.atomic():
-                        retirement.user.username = new_retired_username
-                        retirement.user.save()
-                        retirement.retired_username = new_retired_username
-                        retirement.save()
+                    try:
+                        # Update the forums first, that way if it fails the user can
+                        # be re-run. It does not need to be in the same transaction,
+                        # as the local db updates and can be slow, so keeping it
+                        # outside to cut down on potential deadlocks.
+                        cc_user = comment_client.User.from_django_user(retirement.user)
+                        cc_user.retire(new_retired_username)
+
+                        # Update and save both the user table and retirement queue table:
+                        with transaction.atomic():
+                            retirement.user.username = new_retired_username
+                            retirement.user.save()
+                            retirement.retired_username = new_retired_username
+                            retirement.save()
+                    except Exception as exc:  # pylint: disable=broad-except
+                        print(
+                            'UserRetirementStatus ID {} User ID {} failed rename'.format(
+                                retirement.id, retirement.user.id
+                            )
+                        )
+                        print(text_type(exc))
+                        failed_retirements.append(retirement)
+
+        if failed_retirements:
+            print('------------------------------------------------------------')
+            print(
+                'FAILED! {} retirements failed to rehash. Retirement IDs:\n{}'.format(
+                    len(failed_retirements),
+                    '\n'.join([text_type(r.id) for r in failed_retirements])
+                )
+            )
+        else:
+            print('Success! {} retirements examined.'.format(len(retirements)))
