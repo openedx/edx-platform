@@ -2,6 +2,10 @@ import ddt
 import itertools
 from xmodule.tests import BulkAssertionTest, BulkAssertionError
 
+ASSERTION_METHODS_DICT = {
+    "GETITEM_SPECIAL_METHOD": {}.__getitem__,
+    "LAMBDA": lambda: None
+}
 
 STATIC_PASSING_ASSERTIONS = (
     ('assertTrue', True),
@@ -36,13 +40,13 @@ STATIC_FAILING_ASSERTIONS = (
 )
 
 CONTEXT_PASSING_ASSERTIONS = (
-    ('assertRaises', KeyError, {}.__getitem__, '1'),
-    ('assertRaisesRegexp', KeyError, "1", {}.__getitem__, '1'),
+    ('assertRaises', KeyError, "GETITEM_SPECIAL_METHOD", '1'),
+    ('assertRaisesRegexp', KeyError, "1", "GETITEM_SPECIAL_METHOD", '1'),
 )
 
 CONTEXT_FAILING_ASSERTIONS = (
-    ('assertRaises', ValueError, lambda: None),
-    ('assertRaisesRegexp', KeyError, "2", {}.__getitem__, '1'),
+    ('assertRaises', ValueError, "LAMBDA"),
+    ('assertRaisesRegexp', KeyError, "2", "GETITEM_SPECIAL_METHOD", '1'),
 )
 
 
@@ -55,11 +59,22 @@ class TestBulkAssertionTestCase(BulkAssertionTest):
 
     # pylint: disable=bad-super-call
 
+    def _is_arg_in_assertion_methods_dict(self, argument):
+        """
+        Takes in an argument, and returns whether
+        """
+        return type(argument) == str and argument in ASSERTION_METHODS_DICT
+
     def _run_assertion(self, assertion_tuple):
         """
         Run the supplied tuple of (assertion, *args) as a method on this class.
         """
         assertion, args = assertion_tuple[0], assertion_tuple[1:]
+        args_list = list(args)
+        for index, argument in enumerate(args_list):
+            if self._is_arg_in_assertion_methods_dict(argument):
+                args_list[index] = ASSERTION_METHODS_DICT[argument]
+        args = tuple(args_list)
         getattr(self, assertion)(*args)
 
     def _raw_assert(self, assertion_name, *args, **kwargs):
@@ -88,10 +103,10 @@ class TestBulkAssertionTestCase(BulkAssertionTest):
 
         exception = args.pop(0)
 
-        while not callable(args[0]):
+        while not self._is_arg_in_assertion_methods_dict(args[0]):
             assertion_args.append(args.pop(0))
 
-        function = args.pop(0)
+        function = ASSERTION_METHODS_DICT[args.pop(0)]
 
         with getattr(self, assertion)(exception, *assertion_args):
             function(*args)
@@ -104,10 +119,10 @@ class TestBulkAssertionTestCase(BulkAssertionTest):
 
         exception = args.pop(0)
 
-        while not callable(args[0]):
+        while not self._is_arg_in_assertion_methods_dict(args[0]):
             assertion_args.append(args.pop(0))
 
-        function = args.pop(0)
+        function = ASSERTION_METHODS_DICT[args.pop(0)]
 
         with self._raw_assert('Raises', AssertionError) as context:
             with getattr(self, assertion)(exception, *assertion_args):
