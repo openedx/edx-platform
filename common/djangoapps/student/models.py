@@ -212,7 +212,14 @@ def is_username_retired(username):
         settings.RETIRED_USERNAME_FMT
     )
 
-    return User.objects.filter(username__in=list(locally_hashed_usernames)).exists()
+    # TODO: Revert to this after username capitalization issues detailed in
+    # PLAT-2276, PLAT-2277, PLAT-2278 are sorted out:
+    # return User.objects.filter(username__in=list(locally_hashed_usernames)).exists()
+
+    # Avoid circular import issues
+    from openedx.core.djangoapps.user_api.models import UserRetirementStatus
+    return User.objects.filter(username__in=list(locally_hashed_usernames)).exists() or \
+        UserRetirementStatus.objects.filter(original_username=username).exists()
 
 
 def is_email_retired(email):
@@ -293,7 +300,27 @@ def get_potentially_retired_user_by_username(username):
     """
     locally_hashed_usernames = list(get_all_retired_usernames_by_username(username))
     locally_hashed_usernames.append(username)
-    return User.objects.get(username__in=locally_hashed_usernames)
+    potential_users = User.objects.filter(username__in=locally_hashed_usernames)
+
+    # Have to disambiguate between several Users here as we could have retirees with
+    # the same username, but for case.
+    # If there's only 1 we're done, this should be the common case
+    if len(potential_users) == 1:
+        return potential_users[0]
+
+    # No user found, throw the usual error
+    if not potential_users:
+        raise User.DoesNotExist()
+
+    # If there are 2, one of two things should be true:
+    # - The user we want is un-retired and has the same case-match username
+    # - Or retired one was the case-match
+    if len(potential_users) == 2:
+        return potential_users[0] if potential_users[0].username == username else potential_users[1]
+
+    # We should have, at most, a retired username and an active one with a username
+    # differing only by case. If there are more we need to disambiguate them by hand.
+    raise Exception('Expected 1 or 2 Users, received {}'.format(text_type(potential_users)))
 
 
 def get_potentially_retired_user_by_username_and_hash(username, hashed_username):
