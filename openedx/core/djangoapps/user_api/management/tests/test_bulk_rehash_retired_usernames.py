@@ -1,14 +1,16 @@
 """
 Test the bulk_rehash_retired_usernames management command
 """
+from mock import call, patch
 import pytest
 
+from django.conf import settings
 from django.core.management import call_command
+from user_util.user_util import get_retired_username
 
 from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import RetirementTestCase, fake_retirement
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.models import get_retired_username_by_username
 from student.tests.factories import UserFactory
 
 pytestmark = pytest.mark.django_db
@@ -56,14 +58,19 @@ def _setup_users():
 
 
 @skip_unless_lms
-def test_successful_rehash(capsys):
+@patch('lms.lib.comment_client.User.retire')
+def test_successful_rehash(retire_user_forums, capsys):
     """
     Run the command with users of all different hash statuses, expect success
     """
     RetirementTestCase.setup_states()
     users_skipped, users_faked, users_needing_rehash, retirements = _setup_users()
+
     call_command('bulk_rehash_retired_usernames')
     output = capsys.readouterr().out
+
+    # Make sure forums was called the correct number of times
+    assert retire_user_forums.call_count == 2
 
     for user in users_skipped:
         assert "User ID {} because the user does not appear to have a retired username:".format(user.id) in output
@@ -71,12 +78,63 @@ def test_successful_rehash(capsys):
     for user in users_faked:
         assert "User ID {} because the hash would not change.".format(user.id) in output
 
+    expected_username_calls = []
     for user in users_needing_rehash:
         retirement = retirements[user.id]
         user.refresh_from_db()
         retirement.refresh_from_db()
-        new_retired_username = get_retired_username_by_username(retirement.original_username)
+        new_retired_username = get_retired_username(
+            retirement.original_username,
+            settings.RETIRED_USER_SALTS,
+            settings.RETIRED_USERNAME_FMT
+        )
+        expected_username_calls.append(call(new_retired_username))
 
         assert "User ID {} to rehash their retired username".format(user.id) in output
         assert new_retired_username == user.username
         assert new_retired_username == retirement.retired_username
+
+    retire_user_forums.assert_has_calls(expected_username_calls)
+
+
+@skip_unless_lms
+@patch('lms.lib.comment_client.User.retire')
+def test_forums_failed(retire_user_forums, capsys):
+    """
+    Run the command with users of all different hash statuses, expect success
+    """
+    RetirementTestCase.setup_states()
+    users_skipped, users_faked, users_needing_rehash, retirements = _setup_users()
+    retire_user_forums.side_effect = Exception('something bad happened with forums')
+
+    call_command('bulk_rehash_retired_usernames')
+    output = capsys.readouterr().out
+
+    # Make sure forums was called the correct number of times
+    assert retire_user_forums.call_count == 2
+
+    for user in users_skipped:
+        assert "User ID {} because the user does not appear to have a retired username:".format(user.id) in output
+
+    for user in users_faked:
+        assert "User ID {} because the hash would not change.".format(user.id) in output
+
+    expected_username_calls = []
+    for user in users_needing_rehash:
+        retirement = retirements[user.id]
+        user.refresh_from_db()
+        retirement.refresh_from_db()
+        new_retired_username = get_retired_username(
+            retirement.original_username,
+            settings.RETIRED_USER_SALTS,
+            settings.RETIRED_USERNAME_FMT
+        )
+        expected_username_calls.append(call(new_retired_username))
+
+        assert "User ID {} to rehash their retired username".format(user.id) in output
+        # Confirm that the usernames are *not* updated, due to the forums error
+        assert new_retired_username != user.username
+        assert new_retired_username != retirement.retired_username
+
+    assert "FAILED! 2 retirements failed to rehash. Retirement IDs:" in output
+    retire_user_forums.assert_has_calls(expected_username_calls)
