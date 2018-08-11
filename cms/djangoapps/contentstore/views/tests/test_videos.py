@@ -14,7 +14,6 @@ import dateutil.parser
 import ddt
 import pytz
 from django.conf import settings
-from django.core.files.uploadedfile import UploadedFile
 from django.test.utils import override_settings
 from edxval.api import (
     create_profile,
@@ -37,7 +36,7 @@ from contentstore.views.videos import (
 from contentstore.views.videos import KEY_EXPIRATION_IN_SECONDS, StatusDisplayStrings, convert_video_status
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE
+from openedx.core.djangoapps.video_pipeline.config.waffle import waffle_flags, DEPRECATE_YOUTUBE
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
 from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
 
@@ -583,8 +582,9 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         # expected args to be passed to `set_metadata`.
         expected_args = ('course_video_upload_token', self.test_token)
 
+        DEPRECATE_YOUTUBE_FLAG = waffle_flags()[DEPRECATE_YOUTUBE]
         with patch.object(WaffleFlagCourseOverrideModel, 'override_value', return_value=data['course_override']):
-            with override_flag(DEPRECATE_YOUTUBE, active=data['global_waffle']):
+            with override_flag(DEPRECATE_YOUTUBE_FLAG.namespaced_flag_name, active=data['global_waffle']):
                 response = self.client.post(
                     self.url,
                     json.dumps({'files': [file_data]}),
