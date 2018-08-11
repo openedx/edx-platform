@@ -35,6 +35,7 @@ from path import Path as path
 
 from openedx.core.lib.tests import attr
 from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
+from openedx.core.djangoapps.video_pipeline.config.waffle import waffle_flags, DEPRECATE_YOUTUBE
 from waffle.testutils import override_flag
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
@@ -48,8 +49,6 @@ from xmodule.video_module.transcripts_utils import Transcript, save_to_store, su
 from xmodule.video_module.video_module import (
     EXPORT_IMPORT_COURSE_DIR,
     EXPORT_IMPORT_STATIC_DIR,
-    DEPRECATE_YOUTUBE,
-    WAFFLE_VIDEOS_NAMESPACE,
 )
 from xmodule.x_module import STUDENT_VIEW
 
@@ -61,8 +60,6 @@ MODULESTORES = {
     ModuleStoreEnum.Type.mongo: TEST_DATA_MONGO_MODULESTORE,
     ModuleStoreEnum.Type.split: TEST_DATA_SPLIT_MODULESTORE,
 }
-
-DEPRECATE_YOUTUBE_FLAG = '{}.{}'.format(WAFFLE_VIDEOS_NAMESPACE, DEPRECATE_YOUTUBE)
 
 TRANSCRIPT_FILE_SRT_DATA = u"""
 1
@@ -1057,8 +1054,9 @@ class TestGetHtmlMethod(BaseTestXmodule):
         video_xml = '<video display_name="Video" edx_video_id="12345-67890" youtube_id_1_0="{}">[]</video>'.format(
             data['youtube']
         )
+        DEPRECATE_YOUTUBE_FLAG = waffle_flags()[DEPRECATE_YOUTUBE]
         with patch.object(WaffleFlagCourseOverrideModel, 'override_value', return_value=data['course_override']):
-            with override_flag(DEPRECATE_YOUTUBE_FLAG, active=data['waffle_enabled']):
+            with override_flag(DEPRECATE_YOUTUBE_FLAG.namespaced_flag_name, active=data['waffle_enabled']):
                 self.initialize_module(data=video_xml, metadata=metadata)
                 context = self.item_descriptor.render(STUDENT_VIEW).content
                 self.assertIn('"prioritizeHls": {}'.format(data['result']), context)
