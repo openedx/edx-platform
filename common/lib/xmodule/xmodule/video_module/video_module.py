@@ -15,18 +15,16 @@ Examples of html5 videos for manual testing:
 import copy
 import json
 import logging
-import random
 from collections import defaultdict, OrderedDict
 from operator import itemgetter
 
 from pkg_resources import resource_string
 
 from django.conf import settings
-from django.utils.functional import cached_property
 from lxml import etree
 from opaque_keys.edx.locator import AssetLocator
 from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag
-from openedx.core.djangoapps.waffle_utils import WaffleFlagNamespace, CourseWaffleFlag
+from openedx.core.djangoapps.video_pipeline.config.waffle import waffle_flags, DEPRECATE_YOUTUBE
 from openedx.core.lib.cache_utils import memoize_in_request_cache
 from openedx.core.lib.license import LicenseMixin
 from xblock.completable import XBlockCompletionMode
@@ -46,7 +44,6 @@ from xmodule.xml_module import deserialize_field, is_pointer_tag, name_to_pathna
 from .bumper_utils import bumperize
 from .transcripts_utils import (
     get_html5_ids,
-    get_video_ids_info,
     Transcript,
     VideoTranscriptsMixin,
     clean_video_id,
@@ -99,12 +96,6 @@ log = logging.getLogger(__name__)
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
-
-# Waffle flags namespace for videos
-WAFFLE_VIDEOS_NAMESPACE = 'videos'
-
-# Waffle flag to enable/disable hls as primary playback
-DEPRECATE_YOUTUBE = 'deprecate_youtube'
 
 EXPORT_IMPORT_COURSE_DIR = u'course'
 EXPORT_IMPORT_STATIC_DIR = u'static'
@@ -189,7 +180,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         sorted_languages = OrderedDict(sorted_languages)
         return track_url, transcript_language, sorted_languages
 
-    @cached_property
+    @property
     def youtube_deprecated(self):
         """
         Return True if youtube is deprecated and hls as primary playback is enabled else False
@@ -198,11 +189,9 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         if not HLSPlaybackEnabledFlag.feature_enabled(self.location.course_key):
             return False
 
-        # check if hls as primary playback is enabled for this course
-        return CourseWaffleFlag(
-            WaffleFlagNamespace(name=WAFFLE_VIDEOS_NAMESPACE),
-            DEPRECATE_YOUTUBE
-        ).is_enabled(self.location.course_key)
+        # check if youtube has been deprecated and hls as primary playback
+        # is enabled for this course
+        return waffle_flags()[DEPRECATE_YOUTUBE].is_enabled(self.location.course_key)
 
     def prioritize_hls(self, youtube_streams, html5_sources):
         """
