@@ -25,7 +25,7 @@ def override_switch(switch, active):
     return decorate
 
 
-def get_mocked_journal_access():
+def get_mocked_journal_access(journal_uuid=None):
     """
     Returns the dummy data of journal access
     """
@@ -35,6 +35,7 @@ def get_mocked_journal_access():
             "uuid": uuid.uuid4(),
             "journal": {
                 "name": "dummy-name1",
+                "uuid": journal_uuid if journal_uuid else str(uuid.uuid4()),
                 "organization": "edx",
                 "journalaboutpage": {
                     "id": "5",
@@ -47,6 +48,7 @@ def get_mocked_journal_access():
             "uuid": uuid.uuid4(),
             "journal": {
                 "name": "dummy-name2",
+                "uuid": str(uuid.uuid4()),
                 "organization": "edx",
                 "journalaboutpage": {
                     "id": "5",

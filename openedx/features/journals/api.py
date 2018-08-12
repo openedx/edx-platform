@@ -121,7 +121,7 @@ class JournalsApiClient(object):
         return User.objects.get(username=JOURNAL_WORKER_USERNAME)
 
 
-def fetch_journal_access(site, user):   # pylint: disable=unused-argument
+def fetch_journal_access(site, user, block_id=None):   # pylint: disable=unused-argument
     """
     Retrieve journal access record for given user.
     Retrieve if from the cache if present, otherwise send GET request to the journal access api
@@ -143,10 +143,13 @@ def fetch_journal_access(site, user):   # pylint: disable=unused-argument
         # TODO: WL-1560:
         # LMS should cache responses from Journal Access API
         # Need strategy for updating cache when new purchase happens
-        journal_access_records = JournalsApiClient().client.journalaccess.get(
-            user=user,
-            get_latest=True
-        )
+        endpoint_params = {
+            "user": user,
+            "get_latest": True,
+        }
+        if block_id:
+            endpoint_params['block_id'] = block_id
+        journal_access_records = JournalsApiClient().client.journalaccess.get(**endpoint_params)
         return journal_access_records.get('results', [])
     except ValueError:
         return []
