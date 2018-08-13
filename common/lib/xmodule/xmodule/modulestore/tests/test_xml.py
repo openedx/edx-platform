@@ -15,6 +15,9 @@ from xmodule.tests import DATA_DIR
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 from xmodule.modulestore.tests.test_modulestore import check_has_course_method
+from xmodule.modulestore.tests.utils import (
+    add_temp_files_from_dict, remove_temp_files_from_list, TILDA_FILES_DICT
+)
 
 
 def glob_tildes_at_end(path):
@@ -56,16 +59,6 @@ class TestXMLModuleStore(TestCase):
         # Look up the errors during load. There should be none.
         errors = modulestore.get_course_errors(CourseKey.from_string("edX/toy/2012_Fall"))
         assert errors == []
-
-    @patch("xmodule.modulestore.xml.glob.glob", side_effect=glob_tildes_at_end)
-    def test_tilde_files_ignored(self, _fake_glob):
-        modulestore = XMLModuleStore(DATA_DIR, source_dirs=['tilde'], load_error_modules=False)
-        about_location = CourseKey.from_string('edX/tilde/2012_Fall').make_usage_key(
-            'about', 'index',
-        )
-        about_module = modulestore.get_item(about_location)
-        self.assertIn("GREEN", about_module.data)
-        self.assertNotIn("RED", about_module.data)
 
     def test_get_courses_for_wiki(self):
         """
@@ -147,3 +140,23 @@ class TestXMLModuleStore(TestCase):
         other_parent = store.get_item(other_parent_loc)
         # children rather than get_children b/c the instance returned by get_children != shared_item
         self.assertIn(shared_item_loc, other_parent.children)
+
+
+class TestModuleStoreIgnore(TestXMLModuleStore):
+    shard = 2
+    course_dir = DATA_DIR / "course_ignore"
+
+    def setUp(self):
+        super(TestModuleStoreIgnore, self).setUp()
+        self.addCleanup(remove_temp_files_from_list, TILDA_FILES_DICT.keys(), self.course_dir / "static")
+        add_temp_files_from_dict(TILDA_FILES_DICT, self.course_dir / "static")
+
+    @patch("xmodule.modulestore.xml.glob.glob", side_effect=glob_tildes_at_end)
+    def test_tilde_files_ignored(self, _fake_glob):
+        modulestore = XMLModuleStore(DATA_DIR, source_dirs=['course_ignore'], load_error_modules=False)
+        about_location = CourseKey.from_string('edX/course_ignore/2014_Fall').make_usage_key(
+            'about', 'index',
+        )
+        about_module = modulestore.get_item(about_location)
+        self.assertIn("GREEN", about_module.data)
+        self.assertNotIn("RED", about_module.data)
