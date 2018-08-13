@@ -275,19 +275,22 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
         """
         return check_org is None or (check_org.lower() == course_org.lower())
 
-    def hide_course_for_enrollment_fee_experiment(self, user, course_key, experiment_id=9):
+    def hide_course_for_enrollment_fee_experiment(self, user, enrollment, experiment_id=9):
         """
         Hide enrolled courses from mobile app as part of REV-73/REV-19
         """
+        course_key = enrollment.course_overview.id
         try:
             courses_excluded_from_mobile = ExperimentKeyValue.objects.get(
                 experiment_id=10,
-                key="excluded_from_mobile_app"
+                key="mobile_app_exclusion"
             ).value
             courses_excluded_from_mobile = json.loads(courses_excluded_from_mobile.replace('\r', '').replace('\n', ''))
-            if str(course_key) in courses_excluded_from_mobile:
-                return True
-        except ExperimentKeyValue.DoesNotExist:
+            if enrollment.mode == 'audit' and str(course_key) in courses_excluded_from_mobile.keys():
+                activationTime = dateparse.parse_datetime(courses_excluded_from_mobile[str(course_key)])
+                if enrollment.created > activationTime:
+                    return True
+        except (ExperimentKeyValue.DoesNotExist, AttributeError):
             pass
 
         try:
@@ -320,7 +323,7 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
             enrollment for enrollment in enrollments
             if enrollment.course_overview and self.is_org(org, enrollment.course_overview.org) and
             is_mobile_available_for_user(self.request.user, enrollment.course_overview) and
-            not self.hide_course_for_enrollment_fee_experiment(self.request.user, enrollment.course_overview.id)
+            not self.hide_course_for_enrollment_fee_experiment(self.request.user, enrollment)
         ]
 
 
