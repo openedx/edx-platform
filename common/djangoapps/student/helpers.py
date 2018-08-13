@@ -329,7 +329,7 @@ def get_redirect_to(request):
     # get information about a user on edx.org. In any such case drop the parameter.
     if redirect_to:
         mime_type, _ = mimetypes.guess_type(redirect_to, strict=False)
-        if not http.is_safe_url(redirect_to, allowed_hosts={request.get_host()}, require_https=True):
+        if not is_safe_redirect(request, redirect_to):
             log.warning(
                 u'Unsafe redirect parameter detected after login page: %(redirect_to)r',
                 {"redirect_to": redirect_to}
@@ -370,6 +370,20 @@ def get_redirect_to(request):
                     break
 
     return redirect_to
+
+
+def is_safe_redirect(request, redirect_to):
+    """
+    Determine if the given redirect URL/path is safe for redirection.
+
+    Allows for redirects to other subdomains of the request host TLD.
+    """
+    request_host = request.get_host()
+    request_host_tld = '.'.join(request_host.split('.')[-2:])
+    return (
+        http.is_same_domain(urlparse.urlsplit(redirect_to).netloc, '.' + request_host_tld) or
+        http.is_safe_url(redirect_to, allowed_hosts={request_host}, require_https=True)
+    )
 
 
 def destroy_oauth_tokens(user):

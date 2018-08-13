@@ -57,9 +57,9 @@
 
                     if (options.login_redirect_url) {
                     // Ensure that the next URL is internal for security reasons
-                        if (! window.isExternal(options.login_redirect_url)) {
+                        //if (! window.isExternal(options.login_redirect_url)) {
                             this.nextUrl = options.login_redirect_url;
-                        }
+                        //}
                     }
 
                     this.formDescriptions = {
