@@ -407,6 +407,7 @@ class PostCourseCertificateTestCase(TestCase):
 
 
 @skip_unless_lms
+@ddt.ddt
 @mock.patch(TASKS_MODULE + '.post_course_certificate')
 @override_settings(CREDENTIALS_SERVICE_USERNAME='test-service-username')
 @override_switch(waffle.WAFFLE_NAMESPACE + '.' + waffle.AUTO_CERTIFICATE_GENERATION, True)
@@ -438,10 +439,16 @@ class AwardCourseCertificatesTestCase(CredentialsApiConfigMixin, TestCase):
         ClientFactory.create(name='credentials')
         UserFactory.create(username=settings.CREDENTIALS_SERVICE_USERNAME)
 
-    def test_award_course_certificates(self, mock_post_course_certificate):
+    @ddt.data(
+        'verified',
+        'no-id-professional',
+    )
+    def test_award_course_certificates(self, mode, mock_post_course_certificate):
         """
         Tests the API POST method is called with appropriate params when configured properly
         """
+        self.certificate.mode = mode
+        self.certificate.save()
         tasks.award_course_certificate.delay(self.student.username, str(self.course.id)).get()
         call_args, _ = mock_post_course_certificate.call_args
         self.assertEqual(call_args[1], self.student.username)
