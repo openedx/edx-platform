@@ -471,6 +471,10 @@ XQUEUE_INTERFACE = {
 
 MIDDLEWARE_CLASSES = [
     'crum.CurrentRequestUserMiddleware',
+
+    # Clears request cache. This is a safer request cache.
+    'edx_django_utils.cache.middleware.RequestCacheMiddleware',
+
     'openedx.core.djangoapps.request_cache.middleware.RequestCache',
 
     'openedx.core.djangoapps.monitoring_utils.middleware.MonitoringMemoryMiddleware',
@@ -524,6 +528,12 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     'waffle.middleware.WaffleMiddleware',
+
+    # Enables force_django_cache_miss functionality for TieredCache.
+    'edx_django_utils.cache.middleware.TieredCacheMiddleware',
+
+    # Outputs monitoring metrics for a request.
+    'edx_rest_framework_extensions.middleware.RequestMetricsMiddleware',
 
     'edx_rest_framework_extensions.middleware.EnsureJWTAuthSettingsMiddleware',
 

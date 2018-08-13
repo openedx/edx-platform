@@ -69,10 +69,11 @@ edx-analytics-data-api-client
 edx-ccx-keys
 edx-celeryutils
 edx-completion
-edx-django-release-util             # Release utils for the edx release pipeline
-edx-drf-extensions
 edx-django-oauth2-provider==1.3.4
+edx-django-release-util             # Release utils for the edx release pipeline
 edx-django-sites-extensions==2.3.1
+edx-django-utils
+edx-drf-extensions
 edx-enterprise
 edx-milestones
 edx-oauth2-provider
