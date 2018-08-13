@@ -419,7 +419,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
             "Topic C": {"id": "Topic_C"}
         }
 
-        def check_cohorted_topics(expected_ids):  # pylint: disable=missing-docstring
+        def check_cohorted_topics(expected_ids):
             self.assert_category_map_equals(
                 {
                     "entries": {
@@ -1327,7 +1327,7 @@ class IsCommentableDividedTestCase(ModuleStoreTestCase):
         course = modulestore().get_course(self.toy_course_key)
         self.assertFalse(cohorts.is_course_cohorted(course.id))
 
-        def to_id(name):  # pylint: disable=missing-docstring
+        def to_id(name):
             return topic_name_to_id(course, name)
 
         config_course_cohorts(

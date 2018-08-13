@@ -197,13 +197,13 @@ def user_groups(user):
     cache_expiration = 60 * 60  # one hour
 
     # Kill caching on dev machines -- we switch groups a lot
-    group_names = cache.get(key)  # pylint: disable=no-member
+    group_names = cache.get(key)
     if settings.DEBUG:
         group_names = None
 
     if group_names is None:
         group_names = [u.name for u in UserTestGroup.objects.filter(users=user)]
-        cache.set(key, group_names, cache_expiration)  # pylint: disable=no-member
+        cache.set(key, group_names, cache_expiration)
 
     return group_names
 
@@ -1413,7 +1413,7 @@ def generate_user_cert(request, course_id):
         return HttpResponse()
 
 
-def _track_successful_certificate_generation(user_id, course_id):  # pylint: disable=invalid-name
+def _track_successful_certificate_generation(user_id, course_id):
     """
     Track a successful certificate generation event.
 
@@ -1616,7 +1616,7 @@ def financial_assistance_form(request):
     enrolled_courses = get_financial_aid_courses(user)
     incomes = ['Less than $5,000', '$5,000 - $10,000', '$10,000 - $15,000', '$15,000 - $20,000', '$20,000 - $25,000']
     annual_incomes = [
-        {'name': _(income), 'value': income} for income in incomes  # pylint: disable=translation-of-non-string
+        {'name': _(income), 'value': income} for income in incomes
     ]
     return render_to_response('financial-assistance/apply.html', {
         'header_text': FINANCIAL_ASSISTANCE_HEADER,

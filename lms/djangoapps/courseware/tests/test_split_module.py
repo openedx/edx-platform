@@ -167,7 +167,6 @@ class TestSplitTestVert(SplitTestBase):
 
     def setUp(self):
         # We define problem compenents that we need but don't explicitly call elsewhere.
-        # pylint: disable=unused-variable
         super(TestSplitTestVert, self).setUp()
 
         c0_url = self.course.id.make_usage_key("vertical", "split_test_cond0")
@@ -236,7 +235,6 @@ class TestVertSplitTestVert(SplitTestBase):
 
     def setUp(self):
         # We define problem compenents that we need but don't explicitly call elsewhere.
-        # pylint: disable=unused-variable
         super(TestVertSplitTestVert, self).setUp()
 
         vert1 = ItemFactory.create(

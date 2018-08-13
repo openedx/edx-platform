@@ -393,7 +393,7 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         )
 
         # grab what _field_data was originally set to
-        original_field_data = descriptor._field_data  # pylint: disable=protected-access, no-member
+        original_field_data = descriptor._field_data  # pylint: disable=protected-access
 
         render.get_module_for_descriptor(
             self.mock_user, request, descriptor, field_data_cache, course.id, course=course
@@ -401,7 +401,7 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
         # check that _unwrapped_field_data is the same as the original
         # _field_data, but now _field_data as been reset.
-        # pylint: disable=protected-access, no-member
+        # pylint: disable=protected-access
         self.assertIs(descriptor._unwrapped_field_data, original_field_data)
         self.assertIsNot(descriptor._unwrapped_field_data, descriptor._field_data)
 
@@ -417,19 +417,19 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             )
 
         # _field_data should now be wrapped by LmsFieldData
-        # pylint: disable=protected-access, no-member
+        # pylint: disable=protected-access
         self.assertIsInstance(descriptor._field_data, LmsFieldData)
 
         # the LmsFieldData should now wrap OverrideFieldData
         self.assertIsInstance(
-            # pylint: disable=protected-access, no-member
+            # pylint: disable=protected-access
             descriptor._field_data._authored_data._source,
             OverrideFieldData
         )
 
         # the OverrideFieldData should point to the original unwrapped field_data
         self.assertIs(
-            # pylint: disable=protected-access, no-member
+            # pylint: disable=protected-access
             descriptor._field_data._authored_data._source.fallback,
             descriptor._unwrapped_field_data
         )
@@ -1476,13 +1476,13 @@ class JsonInitDataTest(ModuleStoreTestCase):
         mock_request.user = mock_user
         course = CourseFactory()
         descriptor = ItemFactory(category='withjson', parent=course)
-        field_data_cache = FieldDataCache([course, descriptor], course.id, mock_user)   # pylint: disable=no-member
+        field_data_cache = FieldDataCache([course, descriptor], course.id, mock_user)
         module = render.get_module_for_descriptor(
             mock_user,
             mock_request,
             descriptor,
             field_data_cache,
-            course.id,                          # pylint: disable=no-member
+            course.id,
             course=course
         )
         html = module.render(STUDENT_VIEW).content
@@ -2125,7 +2125,7 @@ class TestEventPublishing(ModuleStoreTestCase, LoginEnrollmentTestCase):
         request.user = self.mock_user
         course = CourseFactory()
         descriptor = ItemFactory(category=block_type, parent=course)
-        field_data_cache = FieldDataCache([course, descriptor], course.id, self.mock_user)  # pylint: disable=no-member
+        field_data_cache = FieldDataCache([course, descriptor], course.id, self.mock_user)
         block = render.get_module(self.mock_user, request, descriptor.location, field_data_cache)
 
         event_type = 'event_type'
@@ -2242,7 +2242,7 @@ class TestFilteredChildren(SharedModuleStoreTestCase):
         super(TestFilteredChildren, cls).setUpClass()
         cls.course = CourseFactory.create()
 
-    # pylint: disable=attribute-defined-outside-init, no-member
+    # pylint: disable=attribute-defined-outside-init
     def setUp(self):
         super(TestFilteredChildren, self).setUp()
         self.users = {number: UserFactory() for number in USER_NUMBERS}
@@ -2391,7 +2391,6 @@ class TestDisabledXBlockTypes(ModuleStoreTestCase):
     """
     Tests that verify disabled XBlock types are not loaded.
     """
-    # pylint: disable=no-member
     def setUp(self):
         super(TestDisabledXBlockTypes, self).setUp()
         XBlockConfiguration(name='video', enabled=False).save()

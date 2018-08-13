@@ -43,7 +43,7 @@ def resolve_attrs(test_method):
     replaces them with the resolved values of those attributes in the method
     call.
     """
-    def _wrapper(self, *args):  # pylint: disable=missing-docstring
+    def _wrapper(self, *args):
         new_args = [getattr(self, arg) for arg in args]
         return test_method(self, *new_args)
     return _wrapper

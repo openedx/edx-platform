@@ -48,7 +48,7 @@ from lms.djangoapps.certificates.models import (
 )
 from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
 from lms.djangoapps.commerce.models import CommerceConfiguration
-from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
+from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.grades.config.waffle import waffle as grades_waffle
 from lms.djangoapps.grades.config.waffle import ASSUME_ZERO_GRADE_IF_ABSENT
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
@@ -317,7 +317,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         url = reverse('courseware', kwargs={'course_id': unicode(self.course_key)})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
-        response = self.client.get(response.url)  # pylint: disable=no-member
+        response = self.client.get(response.url)
         self.assertNotIn(unicode(self.problem.location), response.content.decode("utf-8"))
         self.assertIn(unicode(self.problem2.location), response.content.decode("utf-8"))
 
@@ -920,7 +920,7 @@ class ViewsTestCase(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
 
         self.course.bypass_home = True
-        self.store.update_item(self.course, self.user.id)  # pylint: disable=no-member
+        self.store.update_item(self.course, self.user.id)
         self.assertTrue(self.course.bypass_home)
 
         response = self.client.get(reverse('info', args=[course_id]), HTTP_REFERER=reverse('dashboard'))
@@ -965,7 +965,7 @@ class TestProgramMarketingView(SharedModuleStoreTestCase):
         super(TestProgramMarketingView, cls).setUpClass()
 
         modulestore_course = CourseFactory()
-        course_run = CourseRunFactory(key=unicode(modulestore_course.id))  # pylint: disable=no-member
+        course_run = CourseRunFactory(key=unicode(modulestore_course.id))
         course = CatalogCourseFactory(course_runs=[course_run])
 
         cls.data = ProgramFactory(
@@ -1167,7 +1167,6 @@ class StartDateTests(ModuleStoreTestCase):
         self.assertContains(response, "2013-09-16T07:17:28+0000")
 
 
-# pylint: disable=protected-access, no-member
 @attr(shard=5)
 class ProgressPageBaseTests(ModuleStoreTestCase):
     """
@@ -1225,7 +1224,7 @@ class ProgressPageBaseTests(ModuleStoreTestCase):
         return resp
 
 
-# pylint: disable=protected-access, no-member
+# pylint: disable=protected-access
 @attr(shard=5)
 @ddt.ddt
 class ProgressPageTests(ProgressPageBaseTests):
@@ -1783,7 +1782,6 @@ class ProgressPageTests(ProgressPageBaseTests):
         }
 
 
-# pylint: disable=protected-access, no-member
 @attr(shard=5)
 @ddt.ddt
 class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
@@ -2135,8 +2133,8 @@ class GenerateUserCertTests(ModuleStoreTestCase):
             self.assertEqual(resp.status_code, 200)
 
             # Verify Google Analytics event fired after generating certificate
-            mock_tracker.track.assert_called_once_with(  # pylint: disable=no-member
-                self.student.id,  # pylint: disable=no-member
+            mock_tracker.track.assert_called_once_with(
+                self.student.id,
                 'edx.bi.user.certificate.generate',
                 {
                     'category': 'certificates',
@@ -2716,7 +2714,6 @@ class TestIndexViewCrawlerStudentStateWrites(SharedModuleStoreTestCase):
     def setUpClass(cls):
         """Set up the simplest course possible."""
         # setUpClassAndTestData() already calls setUpClass on SharedModuleStoreTestCase
-        # pylint: disable=super-method-not-called
         with super(TestIndexViewCrawlerStudentStateWrites, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
             with cls.store.bulk_operations(cls.course.id):

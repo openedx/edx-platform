@@ -128,7 +128,7 @@ def has_required_keys(xblock):
     return True
 
 
-def get_accessible_discussion_xblocks(course, user, include_all=False):  # pylint: disable=invalid-name
+def get_accessible_discussion_xblocks(course, user, include_all=False):
     """
     Return a list of all valid discussion xblocks in this course that
     are accessible to the given user.
@@ -198,7 +198,7 @@ def get_cached_discussion_id_map(course, discussion_ids, user):
     return get_cached_discussion_id_map_by_course_id(course.id, discussion_ids, user)
 
 
-def get_cached_discussion_id_map_by_course_id(course_id, discussion_ids, user):  # pylint: disable=invalid-name
+def get_cached_discussion_id_map_by_course_id(course_id, discussion_ids, user):
     """
     Returns a dict mapping discussion_ids to respective discussion xblock metadata if it is cached and visible to the
     user. If not, returns the result of get_discussion_id_map
@@ -227,7 +227,7 @@ def get_discussion_id_map(course, user):
     return get_discussion_id_map_by_course_id(course.id, user)
 
 
-def get_discussion_id_map_by_course_id(course_id, user):  # pylint: disable=invalid-name
+def get_discussion_id_map_by_course_id(course_id, user):
     """
     Transform the list of this course's discussion xblocks (visible to a given user) into a dictionary of metadata keyed
     by discussion_id.
@@ -397,7 +397,7 @@ def get_discussion_category_map(course, user, divided_only_if_explicit=False, ex
             if node[level]["start_date"] > category_start_date:
                 node[level]["start_date"] = category_start_date
 
-        divide_all_inline_discussions = (  # pylint: disable=invalid-name
+        divide_all_inline_discussions = (
             not divided_only_if_explicit and discussion_settings.always_divide_inline_discussions
         )
         dupe_counters = defaultdict(lambda: 0)  # counts the number of times we see each title
