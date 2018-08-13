@@ -60,7 +60,7 @@ def get_experiment_user_metadata_context(course, user):
         pass  # Not enrolled, used the default None values
 
     upgrade_link, upgrade_date = check_and_get_upgrade_link_and_date(user, enrollment, course)
-    has_staff_access = has_staff_access_to_preview_mode(user, course)
+    has_staff_access = has_staff_access_to_preview_mode(user, course.id)
     forum_roles = []
     if user.is_authenticated:
         forum_roles = list(Role.objects.filter(users=user, course_id=course.id).values_list('name').distinct())
