@@ -40,10 +40,12 @@ class TestCredentialsSignalsSendGrade(TestCase):
     @ddt.data(
         [True, 'verified', 'downloadable'],
         [True, 'professional', 'downloadable'],
+        [True, 'no-id-professional', 'downloadable'],
         [True, 'credit', 'downloadable'],
         [True, 'verified', 'notpassing'],
         [False, 'audit', 'downloadable'],
         [False, 'professional', 'generating'],
+        [False, 'no-id-professional', 'generating'],
     )
     @ddt.unpack
     def test_send_grade_if_right_cert(self, called, mode, status, mock_is_course_run_in_a_program,
