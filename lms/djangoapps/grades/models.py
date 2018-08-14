@@ -314,7 +314,7 @@ class PersistentSubsectionGrade(TimeStampedModel):
         """
         Returns the "correct" usage key value with the run filled in.
         """
-        if self.usage_key.run is None:  # pylint: disable=no-member
+        if self.usage_key.run is None:
             return self.usage_key.replace(course_key=self.course_id)
         else:
             return self.usage_key

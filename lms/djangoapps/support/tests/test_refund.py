@@ -122,7 +122,7 @@ class RefundTests(ModuleStoreTestCase):
         pars['confirmed'] = 'true'
         response = self.client.post('/support/refund/', pars)
         self.assertTrue(response.status_code, 302)
-        response = self.client.get(response.get('location'))  # pylint: disable=maybe-no-member
+        response = self.client.get(response.get('location'))
 
         self.assertContains(response, "Unenrolled %s from" % self.student)
         self.assertContains(response, "Refunded 1.00 for order id")

@@ -71,7 +71,6 @@ class CoursePersistentGradesFlag(ConfigurationModel):
         not_en = "Not "
         if self.enabled:
             not_en = ""
-        # pylint: disable=no-member
         return u"Course '{}': Persistent Grades {}Enabled".format(text_type(self.course_id), not_en)
 
 

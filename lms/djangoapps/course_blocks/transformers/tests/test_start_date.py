@@ -101,7 +101,6 @@ class StartDateTransformerTestCase(BlockParentsMapTestCase):
         (BETA_USER, {0: StartDateType.released, 4: StartDateType.default}, {0, 1, 2, 3, 5, 6}, {6}),
     )
     @ddt.unpack
-    # pylint: disable=invalid-name
     def test_block_start_date(
             self,
             user_type,

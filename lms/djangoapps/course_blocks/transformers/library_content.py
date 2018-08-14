@@ -98,7 +98,7 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
                 # Save back any changes
                 if any(block_keys[changed] for changed in ('invalid', 'overlimit', 'added')):
                     state_dict['selected'] = list(selected)
-                    StudentModule.objects.update_or_create(  # pylint: disable=no-member
+                    StudentModule.objects.update_or_create(
                         student=usage_info.user,
                         course_id=usage_info.course_key,
                         module_state_key=block_key,

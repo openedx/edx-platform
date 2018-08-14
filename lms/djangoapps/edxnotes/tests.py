@@ -913,7 +913,6 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         Verify that `construct_url` works correctly.
         """
         # make absolute url
-        # pylint: disable=no-member
         if self.request.is_secure():
             host = 'https://' + self.request.get_host()
         else:

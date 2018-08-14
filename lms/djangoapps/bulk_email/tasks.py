@@ -23,9 +23,9 @@ from boto.ses.exceptions import (
     SESLocalAddressCharacterError,
     SESMaxSendingRateExceededError
 )
-from celery import current_task, task  # pylint: disable=no-name-in-module
-from celery.exceptions import RetryTaskError  # pylint: disable=no-name-in-module, import-error
-from celery.states import FAILURE, RETRY, SUCCESS  # pylint: disable=no-name-in-module, import-error
+from celery import current_task, task
+from celery.exceptions import RetryTaskError
+from celery.states import FAILURE, RETRY, SUCCESS
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives, get_connection

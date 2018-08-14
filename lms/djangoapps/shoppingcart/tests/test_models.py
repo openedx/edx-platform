@@ -270,7 +270,7 @@ class OrderTest(ModuleStoreTestCase):
         self.assertIn(item.additional_instruction_text(), mail.outbox[0].body)
 
         # Verify Google Analytics event fired for purchase
-        self.mock_tracker.track.assert_called_once_with(  # pylint: disable=maybe-no-member
+        self.mock_tracker.track.assert_called_once_with(
             self.user.id,
             'Completed Order',
             {
@@ -870,7 +870,7 @@ class CertificateItemTest(ModuleStoreTestCase):
         """
         Assert that we fired a refund event.
         """
-        self.mock_analytics_tracker.track.assert_called_with(  # pylint: disable=maybe-no-member
+        self.mock_analytics_tracker.track.assert_called_with(
             self.user.id,
             'Refunded Order',
             {

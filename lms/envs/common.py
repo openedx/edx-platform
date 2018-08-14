@@ -20,9 +20,8 @@ Longer TODO:
    multiple sites, but we do need a way to map their data assets.
 """
 
-# We intentionally define lots of variables that aren't used, and
-# want to import all variables from base settings files
-# pylint: disable=wildcard-import, unused-import, unused-wildcard-import
+# We intentionally define lots of variables that aren't used
+# pylint: disable=unused-import
 
 # Pylint gets confused by path.py instances, which report themselves as class
 # objects. As a result, pylint applies the wrong regex in validating names,

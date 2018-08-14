@@ -83,7 +83,7 @@ class BadgeClassTest(ModuleStoreTestCase):
         """
         Remove all files uploaded as badges.
         """
-        upload_to = BadgeClass._meta.get_field('image').upload_to  # pylint: disable=protected-access
+        upload_to = BadgeClass._meta.get_field('image').upload_to
         if default_storage.exists(upload_to):
             (_, files) = default_storage.listdir(upload_to)
             for uploaded_file in files:

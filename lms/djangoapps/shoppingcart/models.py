@@ -352,7 +352,7 @@ class Order(models.Model):
         """
         send confirmation e-mail
         """
-        recipient_list = [(self.user.username, self.user.email, 'user')]  # pylint: disable=no-member
+        recipient_list = [(self.user.username, self.user.email, 'user')]
         if self.company_contact_email:
             recipient_list.append((self.company_contact_name, self.company_contact_email, 'company_contact'))
         joined_course_names = ""
@@ -443,7 +443,7 @@ class Order(models.Model):
         """
         if self.status == 'purchased':
             log.error(
-                u"`purchase` method called on order {}, but order is already purchased.".format(self.id)  # pylint: disable=no-member
+                u"`purchase` method called on order {}, but order is already purchased.".format(self.id)
             )
             return
         self.status = 'purchased'
@@ -1528,7 +1528,7 @@ class PaidCourseRegistration(OrderItem):
     @classmethod
     @transaction.atomic
     def add_to_order(cls, order, course_id, mode_slug=CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG,
-                     cost=None, currency=None):  # pylint: disable=arguments-differ
+                     cost=None, currency=None):
         """
         A standardized way to create these objects, with sensible defaults filled in.
         Will update the cost if called on an order that already carries the course.
@@ -1715,7 +1715,7 @@ class CourseRegCodeItem(OrderItem):
     @classmethod
     @transaction.atomic
     def add_to_order(cls, order, course_id, qty, mode_slug=CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG,
-                     cost=None, currency=None):  # pylint: disable=arguments-differ
+                     cost=None, currency=None):
         """
         A standardized way to create these objects, with sensible defaults filled in.
         Will update the cost if called on an order that already carries the course.
@@ -1838,7 +1838,6 @@ class CourseRegCodeItemAnnotation(models.Model):
     annotation = models.TextField(null=True)
 
     def __unicode__(self):
-        # pylint: disable=no-member
         return u"{} : {}".format(text_type(self.course_id), self.annotation)
 
 
@@ -1856,7 +1855,6 @@ class PaidCourseRegistrationAnnotation(models.Model):
     annotation = models.TextField(null=True)
 
     def __unicode__(self):
-        # pylint: disable=no-member
         return u"{} : {}".format(text_type(self.course_id), self.annotation)
 
 

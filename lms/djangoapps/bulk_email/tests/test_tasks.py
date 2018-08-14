@@ -23,7 +23,7 @@ from boto.ses.exceptions import (
     SESLocalAddressCharacterError,
     SESMaxSendingRateExceededError
 )
-from celery.states import FAILURE, SUCCESS  # pylint: disable=no-name-in-module, import-error
+from celery.states import FAILURE, SUCCESS
 from django.conf import settings
 from django.core.management import call_command
 from mock import Mock, patch

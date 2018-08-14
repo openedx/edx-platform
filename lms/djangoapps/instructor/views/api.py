@@ -226,7 +226,7 @@ def require_level(level):
         raise ValueError("unrecognized level '{}'".format(level))
 
     def decorator(func):  # pylint: disable=missing-docstring
-        def wrapped(*args, **kwargs):  # pylint: disable=missing-docstring
+        def wrapped(*args, **kwargs):
             request = args[0]
             course = get_course_by_id(CourseKey.from_string(kwargs['course_id']))
 
@@ -1826,7 +1826,7 @@ def spent_registration_codes(request, course_id):
 
         company_name = request.POST['spent_company_name']
         if company_name:
-            spent_codes_list = spent_codes_list.filter(invoice_item__invoice__company_name=company_name)  # pylint: disable=maybe-no-member
+            spent_codes_list = spent_codes_list.filter(invoice_item__invoice__company_name=company_name)
 
     csv_type = 'spent'
     return registration_codes_csv("Spent_Registration_Codes.csv", spent_codes_list, csv_type)
@@ -1989,7 +1989,7 @@ def reset_student_attempts(request, course_id):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @common_exceptions_400
-def reset_student_attempts_for_entrance_exam(request, course_id):  # pylint: disable=invalid-name
+def reset_student_attempts_for_entrance_exam(request, course_id):
     """
 
     Resets a students attempts counter or starts a task to reset all students
@@ -2340,7 +2340,7 @@ def list_instructor_tasks(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def list_entrance_exam_instructor_tasks(request, course_id):  # pylint: disable=invalid-name
+def list_entrance_exam_instructor_tasks(request, course_id):
     """
     List entrance exam related instructor tasks.
 
@@ -2878,7 +2878,7 @@ def enable_certificate_generation(request, course_id=None):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_POST
-def mark_student_can_skip_entrance_exam(request, course_id):  # pylint: disable=invalid-name
+def mark_student_can_skip_entrance_exam(request, course_id):
     """
     Mark a student to skip entrance exam.
     Takes `unique_student_identifier` as required POST parameter.
@@ -3184,7 +3184,7 @@ def generate_certificate_exceptions(request, course_id, generate_for=None):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_global_staff
 @require_POST
-def generate_bulk_certificate_exceptions(request, course_id):  # pylint: disable=invalid-name
+def generate_bulk_certificate_exceptions(request, course_id):
     """
     Add Students to certificate white list from the uploaded csv file.
     :return response in dict format.

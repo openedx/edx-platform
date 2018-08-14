@@ -313,7 +313,6 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
             org='course',
             run='id',
         )
-        # pylint: disable=no-member
         cls.course_key = cls.course.location.course_key
         with cls.store.bulk_operations(cls.course.id, emit_signals=False):
             cls.parent = ItemFactory(

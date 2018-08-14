@@ -207,11 +207,11 @@ def instructor_dashboard_2(request, course_id):
     disable_buttons = not _is_small_course(course_key)
 
     certificate_white_list = CertificateWhitelist.get_certificate_white_list(course_key)
-    generate_certificate_exceptions_url = reverse(  # pylint: disable=invalid-name
+    generate_certificate_exceptions_url = reverse(
         'generate_certificate_exceptions',
         kwargs={'course_id': unicode(course_key), 'generate_for': ''}
     )
-    generate_bulk_certificate_exceptions_url = reverse(  # pylint: disable=invalid-name
+    generate_bulk_certificate_exceptions_url = reverse(
         'generate_bulk_certificate_exceptions',
         kwargs={'course_id': unicode(course_key)}
     )
@@ -220,7 +220,7 @@ def instructor_dashboard_2(request, course_id):
         kwargs={'course_id': unicode(course_key)}
     )
 
-    certificate_invalidation_view_url = reverse(  # pylint: disable=invalid-name
+    certificate_invalidation_view_url = reverse(
         'certificate_invalidation_view',
         kwargs={'course_id': unicode(course_key)}
     )

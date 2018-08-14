@@ -318,14 +318,12 @@ class GradingPolicyTestMixin(object):
         self.create_user_and_access_token()
 
     def create_user_and_access_token(self):
-        # pylint: disable=missing-docstring
         self.user = GlobalStaffFactory.create()
         self.oauth_client = ClientFactory.create()
         self.access_token = AccessTokenFactory.create(user=self.user, client=self.oauth_client).token
 
     @classmethod
     def create_course_data(cls):
-        # pylint: disable=missing-docstring
         cls.invalid_course_id = 'foo/bar/baz'
         cls.course = CourseFactory.create(display_name='An Introduction to API Testing', raw_grader=cls.raw_grader)
         cls.course_id = unicode(cls.course.id)

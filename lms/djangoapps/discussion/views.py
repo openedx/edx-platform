@@ -180,7 +180,7 @@ def use_bulk_ops(view_func):
     the request uri to a CourseKey before passing to the view.
     """
     @wraps(view_func)
-    def wrapped_view(request, course_id, *args, **kwargs):  # pylint: disable=missing-docstring
+    def wrapped_view(request, course_id, *args, **kwargs):
         course_key = CourseKey.from_string(course_id)
         with modulestore().bulk_operations(course_key):
             return view_func(request, course_key, *args, **kwargs)

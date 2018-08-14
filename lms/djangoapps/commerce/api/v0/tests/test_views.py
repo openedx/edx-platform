@@ -135,7 +135,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         """
         # Set user's active flag
         self.user.is_active = user_is_active
-        self.user.save()  # pylint: disable=no-member
+        self.user.save()
         response = self._post_to_view()
 
         # Validate the response content
@@ -275,7 +275,7 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         Verifies that the view returns HTTP 406 when a course is closed.
         """
         self.course.enrollment_end = datetime.now(pytz.UTC) - timedelta(days=1)
-        modulestore().update_item(self.course, self.user.id)  # pylint:disable=no-member
+        modulestore().update_item(self.course, self.user.id)
         self.assertEqual(self._post_to_view().status_code, 406)
 
 

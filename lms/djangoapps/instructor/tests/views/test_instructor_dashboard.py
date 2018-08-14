@@ -406,7 +406,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         # Max number of student per page is one.  Patched setting MAX_STUDENTS_PER_PAGE_GRADE_BOOK = 1
-        self.assertEqual(len(response.mako_context['students']), 1)  # pylint: disable=no-member
+        self.assertEqual(len(response.mako_context['students']), 1)
 
     def test_open_response_assessment_page(self):
         """
