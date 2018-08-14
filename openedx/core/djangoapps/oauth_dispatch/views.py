@@ -6,7 +6,6 @@ django-oauth-toolkit as appropriate.
 from __future__ import unicode_literals
 
 import json
-import logging
 
 from django.conf import settings
 from django.views.generic import View
@@ -23,8 +22,6 @@ from openedx.core.lib.token_utils import JwtBuilder
 from . import adapters
 from .dot_overrides import views as dot_overrides_views
 from .toggles import ENFORCE_JWT_SCOPES
-
-log = logging.getLogger(__name__)
 
 
 class _DispatchingView(View):
@@ -160,10 +157,6 @@ class AccessTokenView(RatelimitMixin, _DispatchingView):
         # (asymmetric) key.
         # TODO: ARCH-162
         use_asymmetric_key = ENFORCE_JWT_SCOPES.is_enabled() and is_client_restricted
-        monitoring_utils.set_custom_metric('oauth_asymmetric_jwt', use_asymmetric_key)
-
-        log.info("Using Asymmetric JWT: %s", use_asymmetric_key)
-
         return JwtBuilder(
             user,
             asymmetric=use_asymmetric_key,

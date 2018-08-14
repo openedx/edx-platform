@@ -112,7 +112,7 @@ class CsrfCrossDomainCookieMiddleware(object):
 
         # Check whether this is a secure request from a domain on our whitelist.
         if not is_cross_domain_request_allowed(request):
-            log.debug("Could not set cross-domain CSRF cookie.")
+            log.info("Could not set cross-domain CSRF cookie.")
             return response
 
         # Check whether (a) the CSRF middleware has already set a cookie, and

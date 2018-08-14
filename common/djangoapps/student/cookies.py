@@ -8,15 +8,26 @@ import time
 
 import six
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
 from django.urls import NoReverseMatch, reverse
 from django.dispatch import Signal
 from django.utils.http import cookie_date
+from oauth2_provider.models import Application
 
+from openedx.core.djangoapps.oauth_dispatch.adapters.dot import DOTAdapter
 from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewide_block_completed
+from openedx.core.lib.token_utils import JwtBuilder
 from student.models import CourseEnrollment
 
 CREATE_LOGON_COOKIE = Signal(providing_args=['user', 'response'])
+
+LOGGED_IN_COOKIE_NAMES = (
+    settings.EDXMKTG_LOGGED_IN_COOKIE_NAME,
+    settings.EDXMKTG_USER_INFO_COOKIE_NAME,
+    settings.JWT_AUTH['JWT_AUTH_COOKIE_HEADER_PAYLOAD'],
+    settings.JWT_AUTH['JWT_AUTH_COOKIE_SIGNATURE'],
+    settings.JWT_AUTH['JWT_AUTH_COOKIE_REFRESH_TOKEN'],
+)
 
 
 def standard_cookie_settings(request):
@@ -27,8 +38,7 @@ def standard_cookie_settings(request):
         expires = None
     else:
         max_age = request.session.get_expiry_age()
-        expires_time = time.time() + max_age
-        expires = cookie_date(expires_time)
+        expires = _cookie_expires_from_max_age(max_age)
 
     cookie_settings = {
         'max_age': max_age,
@@ -38,7 +48,23 @@ def standard_cookie_settings(request):
         'httponly': None,
     }
 
+    # In production, TLS should be enabled so that this cookie is encrypted
+    # when we send it.  We also need to set "secure" to True so that the browser
+    # will transmit it only over secure connections.
+    #
+    # In non-production environments (acceptance tests, devstack, and sandboxes),
+    # we still want to set this cookie.  However, we do NOT want to set it to "secure"
+    # because the browser won't send it back to us.  This can cause an infinite redirect
+    # loop in the third-party auth flow, which calls `is_logged_in_cookie_set` to determine
+    # whether it needs to set the cookie or continue to the next pipeline stage.
+    cookie_settings['secure'] = request.is_secure()
+
     return cookie_settings
+
+
+def _cookie_expires_from_max_age(max_age):
+    expires_time = time.time() + max_age
+    return cookie_date(expires_time)
 
 
 def set_logged_in_cookies(request, response, user):
@@ -49,10 +75,11 @@ def set_logged_in_cookies(request, response, user):
     that displays a different UI when the user is logged in
     (e.g. a link to the student dashboard instead of to the login page)
 
-    Currently, two cookies are set:
+    Currently, three cookies are set:
 
     * EDXMKTG_LOGGED_IN_COOKIE_NAME: Set to 'true' if the user is logged in.
     * EDXMKTG_USER_INFO_COOKIE_VERSION: JSON-encoded dictionary with user information (see below).
+    * JWT_AUTH_COOKIE: JSON Web Token with user information and can be used as an access token.
 
     The user info cookie has the following format:
     {
@@ -77,49 +104,85 @@ def set_logged_in_cookies(request, response, user):
         HttpResponse
 
     """
-    cookie_settings = standard_cookie_settings(request)
+    # Note: The user may not yet be set on the request object by this time,
+    # especially during third party authentication.  So use the user object
+    # that is passed in when needed.
+
+    if user.is_authenticated and not user.is_anonymous:
+        _set_deprecated_logged_in_cookie(response, request)
+        _set_user_info_cookie(response, request, user)
+        _set_jwt_cookies(response, request, user)
+
+        # give signal receivers a chance to add cookies
+        CREATE_LOGON_COOKIE.send(sender=None, user=user, response=response)
+
+    return response
+
+
+def _set_deprecated_logged_in_cookie(response, request):
+    """ Sets the logged in cookie on the response. """
 
     # Backwards compatibility: set the cookie indicating that the user
     # is logged in.  This is just a boolean value, so it's not very useful.
     # In the future, we should be able to replace this with the "user info"
     # cookie set below.
+    cookie_settings = standard_cookie_settings(request)
+
     response.set_cookie(
         settings.EDXMKTG_LOGGED_IN_COOKIE_NAME.encode('utf-8'),
         'true',
-        secure=None,
         **cookie_settings
     )
 
-    set_user_info_cookie(response, request)
 
-    # give signal receivers a chance to add cookies
-    CREATE_LOGON_COOKIE.send(sender=None, user=user, response=response)
-
-    return response
-
-
-def set_user_info_cookie(response, request):
+def _set_user_info_cookie(response, request, user):
     """ Sets the user info cookie on the response. """
     cookie_settings = standard_cookie_settings(request)
 
-    # In production, TLS should be enabled so that this cookie is encrypted
-    # when we send it.  We also need to set "secure" to True so that the browser
-    # will transmit it only over secure connections.
-    #
-    # In non-production environments (acceptance tests, devstack, and sandboxes),
-    # we still want to set this cookie.  However, we do NOT want to set it to "secure"
-    # because the browser won't send it back to us.  This can cause an infinite redirect
-    # loop in the third-party auth flow, which calls `is_logged_in_cookie_set` to determine
-    # whether it needs to set the cookie or continue to the next pipeline stage.
-    user_info_cookie_is_secure = request.is_secure()
-    user_info = get_user_info_cookie_data(request)
-
+    user_info = _get_user_info_cookie_data(request, user)
     response.set_cookie(
         settings.EDXMKTG_USER_INFO_COOKIE_NAME.encode('utf-8'),
         json.dumps(user_info),
-        secure=user_info_cookie_is_secure,
         **cookie_settings
     )
+
+
+def _set_jwt_cookies(response, request, user):
+    """ Sets a cookie containing a JWT on the response. """
+    cookie_settings = standard_cookie_settings(request)
+
+    oauth_application = Application.objects.get(client_id='doug-id')
+    access_token = DOTAdapter().create_access_token(request, request.user, 0, oauth_application)
+
+    jwt_parts = _build_jwt(user).split('.')
+    response.set_cookie(
+        settings.JWT_AUTH['JWT_AUTH_COOKIE_HEADER_PAYLOAD'].encode('utf-8'),
+        '.'.join(jwt_parts[0:2]),
+        **cookie_settings
+    )
+
+    cookie_settings['httponly'] = True
+    response.set_cookie(
+        settings.JWT_AUTH['JWT_AUTH_COOKIE_REFRESH_TOKEN'].encode('utf-8'),
+        access_token['refresh_token'],
+        **cookie_settings
+    )
+    response.set_cookie(
+        settings.JWT_AUTH['JWT_AUTH_COOKIE_SIGNATURE'].encode('utf-8'),
+        jwt_parts[2],
+        **cookie_settings
+    )
+
+
+def _build_jwt(user):
+    """ Builds and returns a JWT. """
+    jwt_builder = JwtBuilder(user, asymmetric=True)
+    scopes = ['email', 'profile']
+    additional_claims = {
+        'filters': [],
+        'is_restricted': False,
+    }
+    return jwt_builder.build_token(scopes, additional_claims=additional_claims)
 
 
 def set_experiments_is_enterprise_cookie(request, response, experiments_is_enterprise):
@@ -129,28 +192,15 @@ def set_experiments_is_enterprise_cookie(request, response, experiments_is_enter
     since users can edit their cookies
     """
     cookie_settings = standard_cookie_settings(request)
-    # In production, TLS should be enabled so that this cookie is encrypted
-    # when we send it.  We also need to set "secure" to True so that the browser
-    # will transmit it only over secure connections.
-    #
-    # In non-production environments (acceptance tests, devstack, and sandboxes),
-    # we still want to set this cookie.  However, we do NOT want to set it to "secure"
-    # because the browser won't send it back to us.  This can cause an infinite redirect
-    # loop in the third-party auth flow, which calls `is_logged_in_cookie_set` to determine
-    # whether it needs to set the cookie or continue to the next pipeline stage.
-    cookie_is_secure = request.is_secure()
-
     response.set_cookie(
         'experiments_is_enterprise',
         json.dumps(experiments_is_enterprise),
-        secure=cookie_is_secure,
         **cookie_settings
     )
 
 
-def get_user_info_cookie_data(request):
+def _get_user_info_cookie_data(request, user):
     """ Returns information that wil populate the user info cookie. """
-    user = request.user
 
     # Set a cookie with user info.  This can be used by external sites
     # to customize content based on user information.  Currently,
@@ -200,7 +250,7 @@ def delete_logged_in_cookies(response):
         HttpResponse
 
     """
-    for cookie_name in [settings.EDXMKTG_LOGGED_IN_COOKIE_NAME, settings.EDXMKTG_USER_INFO_COOKIE_NAME]:
+    for cookie_name in LOGGED_IN_COOKIE_NAMES:
         response.delete_cookie(
             cookie_name.encode('utf-8'),
             path='/',
@@ -212,7 +262,7 @@ def delete_logged_in_cookies(response):
 
 def is_logged_in_cookie_set(request):
     """Check whether the request has logged in cookies set. """
-    return (
-        settings.EDXMKTG_LOGGED_IN_COOKIE_NAME in request.COOKIES and
-        settings.EDXMKTG_USER_INFO_COOKIE_NAME in request.COOKIES
+    return all(
+        cookie_name in request.COOKIES
+        for cookie_name in LOGGED_IN_COOKIE_NAMES
     )

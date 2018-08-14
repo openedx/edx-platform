@@ -42,6 +42,7 @@ import third_party_auth
 from django_comment_common.models import assign_role
 from edxmako.shortcuts import render_to_response, render_to_string
 from eventtracking import tracker
+from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
 from openedx.core.djangoapps.external_auth.login_and_register import login as external_auth_login
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
@@ -427,7 +428,8 @@ def verify_user_password(request):
         return HttpResponseBadRequest()
 
 
-@ensure_csrf_cookie
+@ensure_csrf_cookie_cross_domain
+@require_POST
 def login_user(request):
     """
     AJAX request to log in the user.

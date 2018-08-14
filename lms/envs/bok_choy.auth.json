@@ -74,6 +74,9 @@
             }
         }
     },
+    "JWT_AUTH": {
+        "JWT_SECRET_KEY": "super-secret-key"
+    },
     "MODULESTORE": {
         "default": {
             "ENGINE": "xmodule.modulestore.mixed.MixedModuleStore",

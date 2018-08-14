@@ -29,7 +29,6 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 from pyquery import PyQuery as pq
-from student.cookies import get_user_info_cookie_data
 from student.helpers import DISABLE_UNENROLL_CERT_STATES
 from student.models import CourseEnrollment, UserProfile
 from student.signals import REFUND_ORDER
@@ -292,19 +291,6 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             course_overview.social_sharing_url = 'http://www.testurl.com/social/url/'
 
         course_overview.save()
-
-    def test_user_info_cookie(self):
-        """
-        Verify visiting the learner dashboard sets the user info cookie.
-        """
-        self.assertNotIn(settings.EDXMKTG_USER_INFO_COOKIE_NAME, self.client.cookies)
-
-        request = RequestFactory().get(self.path)
-        request.user = self.user
-        expected = json.dumps(get_user_info_cookie_data(request))
-        self.client.get(self.path)
-        actual = self.client.cookies[settings.EDXMKTG_USER_INFO_COOKIE_NAME].value
-        self.assertEqual(actual, expected)
 
     def test_redirect_account_settings(self):
         """

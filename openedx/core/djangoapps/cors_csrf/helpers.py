@@ -54,7 +54,7 @@ def is_cross_domain_request_allowed(request):
         if referer_hostname is None:
             # If no referer is specified, we can't check if it's a cross-domain
             # request or not.
-            log.debug(u"Referrer hostname is `None`, so it is not on the whitelist.")
+            log.info(u"Referrer hostname is `None`, so it is not on the whitelist.")
         elif referer_hostname != request.get_host():
             log.info(
                 (
@@ -64,7 +64,7 @@ def is_cross_domain_request_allowed(request):
                 ), referer_hostname
             )
         else:
-            log.debug(
+            log.info(
                 (
                     u"Domain '%s' is the same as the hostname in the request, "
                     u"so we are not going to treat it as a cross-domain request."
