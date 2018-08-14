@@ -141,7 +141,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
 
         self.anonymous_user = AnonymousUserFactory()
         self.request = get_mock_request(UserFactory())
-        modulestore().update_item(self.course, self.request.user.id)  # pylint: disable=no-member
+        modulestore().update_item(self.course, self.request.user.id)
 
         self.client.login(username=self.request.user.username, password="test")
         CourseEnrollment.enroll(self.request.user, self.course.id)
@@ -311,7 +311,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         """
         minimum_score_pct = 29
         self.course.entrance_exam_minimum_score_pct = float(minimum_score_pct) / 100
-        modulestore().update_item(self.course, self.request.user.id)  # pylint: disable=no-member
+        modulestore().update_item(self.course, self.request.user.id)
 
         # answer the problem so it results in only 20% correct.
         answer_entrance_exam_problem(self.course, self.request, self.problem_1, value=1, max_value=5)

@@ -1,2 +1,2 @@
 # This import registers the ForumThreadViewedEventTransformer
-import event_transformers  # pylint: disable=unused-import
+import event_transformers  # pylint: disable=relative-import

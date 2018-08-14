@@ -195,7 +195,7 @@ def clear_override_for_ccx(ccx, block, name):
         pass
 
 
-def clear_ccx_field_info_from_ccx_map(ccx, block, name):  # pylint: disable=invalid-name
+def clear_ccx_field_info_from_ccx_map(ccx, block, name):
     """
     Remove field information from ccx overrides mapping dictionary
     """

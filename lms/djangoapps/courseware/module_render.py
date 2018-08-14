@@ -391,7 +391,7 @@ def get_module_for_descriptor(user, request, descriptor, field_data_cache, cours
 
 def get_module_system_for_user(
         user,
-        student_data,  # TODO  # pylint: disable=too-many-statements
+        student_data,  # TODO
         # Arguments preceding this comment have user binding, those following don't
         descriptor,
         course_id,
@@ -797,7 +797,7 @@ def get_module_system_for_user(
 
 # TODO: Find all the places that this method is called and figure out how to
 # get a loaded course passed into it
-def get_module_for_descriptor_internal(user, descriptor, student_data, course_id,  # pylint: disable=invalid-name
+def get_module_for_descriptor_internal(user, descriptor, student_data, course_id,
                                        track_function, xqueue_callback_url_prefix, request_token,
                                        position=None, wrap_xmodule_display=True, grade_bucket_type=None,
                                        static_asset_path='', user_location=None, disable_staff_debug_info=False,

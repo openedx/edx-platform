@@ -162,7 +162,7 @@ def is_masquerading_as_student(user, course_key):
     return get_masquerade_role(user, course_key) == 'student'
 
 
-def is_masquerading_as_specific_student(user, course_key):  # pylint: disable=invalid-name
+def is_masquerading_as_specific_student(user, course_key):
     """
     Returns whether the user is a staff member masquerading as a specific student.
     """

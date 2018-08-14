@@ -157,7 +157,7 @@ class ProgressPageCreditRequirementsTest(SharedModuleStoreTestCase):
     def test_credit_requirements_on_progress_page(self, enrollment_mode, is_requirement_displayed):
         """Test the progress table is only displayed to the verified and credit students."""
         self.enrollment.mode = enrollment_mode
-        self.enrollment.save()  # pylint: disable=no-member
+        self.enrollment.save()
 
         response = self._get_progress_page()
         # Verify the requirements are shown only if the user is in a credit-eligible mode.

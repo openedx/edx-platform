@@ -237,15 +237,15 @@ class ViewsTestCaseMixin(object):
         with patch('student.models.cc.User.save'):
             uname = 'student'
             email = 'student@edx.org'
-            self.password = 'test'  # pylint: disable=attribute-defined-outside-init
+            self.password = 'test'
 
             # Create the user and make them active so we can log them in.
-            self.student = User.objects.create_user(uname, email, self.password)  # pylint: disable=attribute-defined-outside-init
+            self.student = User.objects.create_user(uname, email, self.password)
             self.student.is_active = True
             self.student.save()
 
             # Add a discussion moderator
-            self.moderator = UserFactory.create(password=self.password)  # pylint: disable=attribute-defined-outside-init
+            self.moderator = UserFactory.create(password=self.password)
 
             # Enroll the student in the course
             CourseEnrollmentFactory(user=self.student,
@@ -435,7 +435,6 @@ class ViewsTestCase(
 
     @classmethod
     def setUpClass(cls):
-        # pylint: disable=super-method-not-called
         with super(ViewsTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create(
                 org='MITx', course='999',
@@ -464,15 +463,15 @@ class ViewsTestCase(
         with patch('student.models.cc.User.save'):
             uname = 'student'
             email = 'student@edx.org'
-            self.password = 'test'  # pylint: disable=attribute-defined-outside-init
+            self.password = 'test'
 
             # Create the user and make them active so we can log them in.
-            self.student = User.objects.create_user(uname, email, self.password)  # pylint: disable=attribute-defined-outside-init
+            self.student = User.objects.create_user(uname, email, self.password)
             self.student.is_active = True
             self.student.save()
 
             # Add a discussion moderator
-            self.moderator = UserFactory.create(password=self.password)  # pylint: disable=attribute-defined-outside-init
+            self.moderator = UserFactory.create(password=self.password)
 
             # Enroll the student in the course
             CourseEnrollmentFactory(user=self.student,
@@ -1074,7 +1073,6 @@ class ViewPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStor
 
     @classmethod
     def setUpClass(cls):
-        # pylint: disable=super-method-not-called
         with super(ViewPermissionsTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
 
@@ -1186,7 +1184,6 @@ class CreateThreadUnicodeTestCase(
 
     @classmethod
     def setUpClass(cls):
-        # pylint: disable=super-method-not-called
         with super(CreateThreadUnicodeTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
 
@@ -1229,7 +1226,6 @@ class UpdateThreadUnicodeTestCase(
 
     @classmethod
     def setUpClass(cls):
-        # pylint: disable=super-method-not-called
         with super(UpdateThreadUnicodeTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
 
@@ -1272,7 +1268,6 @@ class CreateCommentUnicodeTestCase(
 
     @classmethod
     def setUpClass(cls):
-        # pylint: disable=super-method-not-called
         with super(CreateCommentUnicodeTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
 
@@ -1320,7 +1315,6 @@ class UpdateCommentUnicodeTestCase(
 
     @classmethod
     def setUpClass(cls):
-        # pylint: disable=super-method-not-called
         with super(UpdateCommentUnicodeTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
 
@@ -1361,7 +1355,6 @@ class CreateSubCommentUnicodeTestCase(
     """
     @classmethod
     def setUpClass(cls):
-        # pylint: disable=super-method-not-called
         with super(CreateSubCommentUnicodeTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
 
@@ -1443,7 +1436,6 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
 
     @classmethod
     def setUpClass(cls):
-        # pylint: disable=super-method-not-called
         with super(TeamsPermissionsTestCase, cls).setUpClassAndTestData():
             teams_configuration = {
                 'topics': [{'id': "topic_id", 'name': 'Solar Power', 'description': 'Solar power is hot'}]
@@ -1754,7 +1746,6 @@ class ForumEventTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockReque
     """
     @classmethod
     def setUpClass(cls):
-        # pylint: disable=super-method-not-called
         with super(ForumEventTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
 
@@ -1936,7 +1927,6 @@ class UsersEndpointTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockRe
 
     @classmethod
     def setUpClass(cls):
-        # pylint: disable=super-method-not-called
         with super(UsersEndpointTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
 

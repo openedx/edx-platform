@@ -1425,14 +1425,14 @@ class TestCourseSurveyReport(TestReportMixin, InstructorTaskCourseTestCase):
         report_store = ReportStore.from_config(config_name='GRADES_DOWNLOAD')
         header_row = ",".join(['User ID', 'User Name', 'Email', self.question1, self.question2, self.question3])
         student1_row = ",".join([
-            str(self.student1.id),  # pylint: disable=no-member
+            str(self.student1.id),
             self.student1.username,
             self.student1.email,
             self.answer1,
             self.answer2
         ])
         student2_row = ",".join([
-            str(self.student2.id),  # pylint: disable=no-member
+            str(self.student2.id),
             self.student2.username,
             self.student2.email,
             self.answer3,
@@ -2734,7 +2734,6 @@ class TestInstructorOra2Report(SharedModuleStoreTestCase):
                 ) as mock_store_rows:
                     return_val = upload_ora2_data(None, None, self.course.id, None, 'generated')
 
-                    # pylint: disable=maybe-no-member
                     timestamp_str = datetime.now(UTC).strftime('%Y-%m-%d-%H%M')
                     course_id_string = urllib.quote(text_type(self.course.id).replace('/', '_'))
                     filename = u'{}_ORA_data_{}.csv'.format(course_id_string, timestamp_str)

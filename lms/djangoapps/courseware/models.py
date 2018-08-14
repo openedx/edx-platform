@@ -270,7 +270,6 @@ class XBlockFieldBase(models.Model):
     modified = models.DateTimeField(auto_now=True, db_index=True)
 
     def __unicode__(self):
-        # pylint: disable=protected-access
         keys = [field.name for field in self._meta.get_fields() if field.name not in ('created', 'modified')]
         return u'{}<{!r}'.format(self.__class__.__name__, {key: getattr(self, key) for key in keys})
 
@@ -352,7 +351,7 @@ class OfflineComputedGradeLog(models.Model):
     nstudents = models.IntegerField(default=0)
 
     def __unicode__(self):
-        return "[OCGLog] %s: %s" % (text_type(self.course_id), self.created)  # pylint: disable=no-member
+        return "[OCGLog] %s: %s" % (text_type(self.course_id), self.created)
 
 
 class StudentFieldOverride(TimeStampedModel):
