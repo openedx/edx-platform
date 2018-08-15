@@ -33,6 +33,7 @@ from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.db import IntegrityError, models, transaction
 from django.db.models import Count, Q
 from django.db.models.signals import post_save, pre_save
+from django.db.utils import ProgrammingError
 from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -218,8 +219,18 @@ def is_username_retired(username):
 
     # Avoid circular import issues
     from openedx.core.djangoapps.user_api.models import UserRetirementStatus
-    return User.objects.filter(username__in=list(locally_hashed_usernames)).exists() or \
-        UserRetirementStatus.objects.filter(original_username=username).exists()
+
+    # Sandbox clean builds attempt to create users during migrations, before the database
+    # is stable so UserRetirementStatus may not exist yet. This workaround can also go
+    # when we are done with the username updates.
+    try:
+        return User.objects.filter(username__in=list(locally_hashed_usernames)).exists() or \
+            UserRetirementStatus.objects.filter(original_username=username).exists()
+    except ProgrammingError as exc:
+        # Check the error message to make sure it's what we expect
+        if "user_api_userretirementstatus" in text_type(exc):
+            return User.objects.filter(username__in=list(locally_hashed_usernames)).exists()
+        raise
 
 
 def is_email_retired(email):
