@@ -54,7 +54,7 @@ This is surprising but important behavior, since it allows a single function in
 the pipeline to consolidate all the operations needed to establish invariants
 rather than spreading them across two functions in the pipeline.
 
-See http://python-social-auth.readthedocs.io/en/latest/pipeline.html for more docs.
+See https://python-social-auth.readthedocs.io/en/latest/pipeline.html for more docs.
 """
 
 import base64

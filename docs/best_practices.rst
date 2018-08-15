@@ -52,6 +52,6 @@ data`_ in the course outline feature.
 .. _Course Overviews: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/content/course_overviews/__init__.py
 .. _example use of course overviews: https://github.com/edx/edx-platform/blob/f81c21902eb0e8d026612b052557142ce1527153/openedx/features/course_experience/views/course_outline.py#L26
 .. _Course Blocks: https://openedx.atlassian.net/wiki/display/EDUCATOR/Course+Blocks
-.. _modulestore: http://edx.readthedocs.io/projects/edx-developer-guide/en/latest/modulestores/index.html
+.. _modulestore: https://edx.readthedocs.io/projects/edx-developer-guide/en/latest/modulestores/index.html
 .. _example of using course blocks: https://github.com/edx/edx-platform/blob/f81c21902eb0e8d026612b052557142ce1527153/openedx/features/course_experience/utils.py#L65-L72
 .. _example loading the student module data: https://github.com/edx/edx-platform/blob/f81c21902eb0e8d026612b052557142ce1527153/openedx/features/course_experience/utils.py#L49

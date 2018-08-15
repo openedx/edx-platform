@@ -1,7 +1,7 @@
 """
 Custom routers used by both lms and cms when routing tasks to worker queues.
 
-For more, see http://celery.readthedocs.io/en/latest/userguide/routing.html#routers
+For more, see https://celery.readthedocs.io/en/latest/userguide/routing.html#routers
 """
 import logging
 from abc import ABCMeta, abstractproperty
