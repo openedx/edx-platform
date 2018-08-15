@@ -454,7 +454,7 @@ def url_for_help(book_slug, path_component):
     """
     # Emulate the switch between books that happens in envs/bokchoy.py
     books = EDX_BOOKS if RELEASE_LINE == "master" else OPEN_BOOKS
-    url = 'http://edx.readthedocs.io/projects/{}/en/{}{}'.format(books[book_slug], doc_version(), path_component)
+    url = 'https://edx.readthedocs.io/projects/{}/en/{}{}'.format(books[book_slug], doc_version(), path_component)
     return url
 
 

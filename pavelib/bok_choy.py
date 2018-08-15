@@ -1,6 +1,6 @@
 """
 Run acceptance tests that use the bok-choy framework
-http://bok-choy.readthedocs.org/en/latest/
+https://bok-choy.readthedocs.org/en/latest/
 """
 
 import os

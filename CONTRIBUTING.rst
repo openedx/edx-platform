@@ -6,7 +6,7 @@ Contributions to Open edX are very welcome, and strongly encouraged! We've
 put together `some documentation that describes our contribution process`_,
 but here's a step-by-step guide that should help you get started.
 
-.. _some documentation that describes our contribution process: http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/process/index.html
+.. _some documentation that describes our contribution process: https://edx.readthedocs.org/projects/edx-developer-guide/en/latest/process/index.html
 
 Step 0: Join the Conversation
 =============================
@@ -138,7 +138,7 @@ requests must meet in order to be reviewed by a core committer. These requiremen
 include things like documentation and passing tests: see the
 `contributor documentation`_ page for the full list.
 
-.. _contributor documentation: http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/process/contributor.html
+.. _contributor documentation: https://edx.readthedocs.org/projects/edx-developer-guide/en/latest/process/contributor.html
 
 
 Areas of particular concern with their own detailed guidelines are:
@@ -150,9 +150,9 @@ Areas of particular concern with their own detailed guidelines are:
   around the world.
 
 
-.. _Accessibility: http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/conventions/accessibility.html
+.. _Accessibility: https://edx.readthedocs.org/projects/edx-developer-guide/en/latest/conventions/accessibility.html
 .. _website accessibility policy: https://www.edx.org/accessibility
-.. _Internationalization: http://edx.readthedocs.io/projects/edx-developer-guide/en/latest/internationalization/index.html
+.. _Internationalization: https://edx.readthedocs.io/projects/edx-developer-guide/en/latest/internationalization/index.html
 
 Step 4: Approval by Community Manager and Product Owner
 =======================================================
