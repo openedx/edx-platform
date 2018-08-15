@@ -42,7 +42,7 @@ class CourseGoal(models.Model):
 
 
 @receiver(models.signals.post_save, sender=CourseEnrollment, dispatch_uid="update_course_goal_on_enroll_change")
-def update_course_goal_on_enroll_change(sender, instance, **kwargs):  # pylint: disable=unused-argument, invalid-name
+def update_course_goal_on_enroll_change(sender, instance, **kwargs):  # pylint: disable=unused-argument
     """
     Updates goals as follows on enrollment changes:
     1) Set the course goal to 'certify' when the user enrolls as a verified user.

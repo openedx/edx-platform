@@ -168,7 +168,7 @@ class BadgeAssertion(TimeStampedModel):
 
 
 # Abstract model doesn't index this, so we have to.
-BadgeAssertion._meta.get_field('created').db_index = True  # pylint: disable=protected-access
+BadgeAssertion._meta.get_field('created').db_index = True
 
 
 class CourseCompleteImageConfiguration(models.Model):
@@ -206,7 +206,6 @@ class CourseCompleteImageConfiguration(models.Model):
         """
         Make sure there's not more than one default.
         """
-        # pylint: disable=no-member
         if self.default and CourseCompleteImageConfiguration.objects.filter(default=True).exclude(id=self.id):
             raise ValidationError(_(u"There can be only one default image."))
 

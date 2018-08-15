@@ -77,7 +77,7 @@ def collect_merged_boolean_field(
     for block_key in block_structure.topological_traversal():
         # compute merged value of the boolean field from all parents
         parents = block_structure.get_parents(block_key)
-        all_parents_merged_value = all(  # pylint: disable=invalid-name
+        all_parents_merged_value = all(
             block_structure.get_transformer_block_field(
                 parent_key, transformer, merged_field_name, False,
             )

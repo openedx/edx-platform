@@ -59,7 +59,6 @@ def get_email_cookies_via_sailthru(self, user_email, post_parms):
     return None
 
 
-# pylint: disable=not-callable
 @task(bind=True, default_retry_delay=3600, max_retries=24, routing_key=ACE_ROUTING_KEY)
 def update_user(self, sailthru_vars, email, site=None, new_user=False, activation=False):
     """
@@ -135,7 +134,6 @@ def is_default_site(site):
     return not site or site.get('id') == settings.SITE_ID
 
 
-# pylint: disable=not-callable
 @task(bind=True, default_retry_delay=3600, max_retries=24, routing_key=ACE_ROUTING_KEY)
 def update_user_email(self, new_email, old_email):
     """

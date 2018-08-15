@@ -1026,7 +1026,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         # Remove white label course price
         self.white_label_course_mode.min_price = 0
         self.white_label_course_mode.suggested_prices = ''
-        self.white_label_course_mode.save()  # pylint: disable=no-member
+        self.white_label_course_mode.save()
 
         # Login Audit Course instructor
         self.client.login(username=self.white_label_course_instructor.username, password='test')
@@ -2258,7 +2258,7 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
 
     def test_modify_access_with_inactive_user(self):
         self.other_user.is_active = False
-        self.other_user.save()  # pylint: disable=no-member
+        self.other_user.save()
         url = reverse('modify_access', kwargs={'course_id': text_type(self.course.id)})
         response = self.client.post(url, {
             'unique_student_identifier': self.other_user.username,

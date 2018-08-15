@@ -216,7 +216,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         resp = self.client.get(billing_url)
         self.assertEqual(resp.status_code, 200)
 
-        ((template, context), _) = render_mock.call_args  # pylint: disable=redefined-outer-name
+        ((template, context), _) = render_mock.call_args  # pylint: disable=unpacking-non-sequence
         self.assertEqual(template, 'shoppingcart/billing_details.html')
         # check for the default currency in the context
         self.assertEqual(context['currency'], 'usd')
@@ -244,7 +244,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         resp = self.client.get(billing_url)
         self.assertEqual(resp.status_code, 200)
 
-        ((template, context), __) = render_mock.call_args  # pylint: disable=redefined-outer-name
+        ((template, context), __) = render_mock.call_args  # pylint: disable=unpacking-non-sequence
 
         self.assertEqual(template, 'shoppingcart/billing_details.html')
         # check for the override currency settings in the context
@@ -804,7 +804,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         resp = self.client.get(reverse('shoppingcart.views.show_cart', args=[]))
         self.assertEqual(resp.status_code, 200)
 
-        ((purchase_form_arg_cart,), _) = form_mock.call_args  # pylint: disable=redefined-outer-name
+        ((purchase_form_arg_cart,), _) = form_mock.call_args  # pylint: disable=unpacking-non-sequence
         purchase_form_arg_cart_items = purchase_form_arg_cart.orderitem_set.all().select_subclasses()
         self.assertIn(reg_item, purchase_form_arg_cart_items)
         self.assertIn(cert_item, purchase_form_arg_cart_items)
@@ -828,7 +828,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         resp = self.client.get(reverse('shoppingcart.views.show_cart', args=[]))
         self.assertEqual(resp.status_code, 200)
 
-        ((purchase_form_arg_cart,), _) = form_mock.call_args  # pylint: disable=redefined-outer-name
+        ((purchase_form_arg_cart,), _) = form_mock.call_args  # pylint: disable=unpacking-non-sequence
         purchase_form_arg_cart_items = purchase_form_arg_cart.orderitem_set.all().select_subclasses()
         self.assertIn(reg_item, purchase_form_arg_cart_items)
 
@@ -1140,7 +1140,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         resp = self.client.get(reverse('shoppingcart.views.show_receipt', args=[self.cart.id]))
         self.assertEqual(resp.status_code, 200)
 
-        ((template, context), _) = render_mock.call_args  # pylint: disable=redefined-outer-name
+        ((template, context), _) = render_mock.call_args  # pylint: disable=unpacking-non-sequence
         self.assertEqual(template, 'shoppingcart/receipt.html')
         self.assertEqual(context['order'], self.cart)
         self.assertEqual(context['order'].total_cost, self.testing_cost)
@@ -1185,7 +1185,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.assertIn('FirstNameTesting123', resp.content)
         self.assertIn('80.00', resp.content)
 
-        ((template, context), _) = render_mock.call_args  # pylint: disable=redefined-outer-name
+        ((template, context), _) = render_mock.call_args  # pylint: disable=unpacking-non-sequence
         self.assertEqual(template, 'shoppingcart/receipt.html')
         self.assertEqual(context['order'], self.cart)
         self.assertIn(reg_item, context['shoppingcart_items'][0])
@@ -1206,7 +1206,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         resp = self.client.get(reverse('shoppingcart.views.show_receipt', args=[self.cart.id]))
         self.assertEqual(resp.status_code, 200)
 
-        ((template, context), _) = render_mock.call_args  # pylint: disable=redefined-outer-name
+        ((template, context), _) = render_mock.call_args  # pylint: disable=unpacking-non-sequence
         self.assertEqual(template, 'shoppingcart/receipt.html')
         self.assertIn(reg_item, context['shoppingcart_items'][0])
         self.assertIn(cert_item, context['shoppingcart_items'][1])
@@ -1255,7 +1255,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         # fetch the newly generated registration codes
         course_registration_codes = CourseRegistrationCode.objects.filter(order=self.cart)
 
-        ((template, context), _) = render_mock.call_args  # pylint: disable=redefined-outer-name
+        ((template, context), _) = render_mock.call_args  # pylint: disable=unpacking-non-sequence
         self.assertEqual(template, 'shoppingcart/receipt.html')
         self.assertEqual(context['order'], self.cart)
         self.assertIn(reg_item, context['shoppingcart_items'][0])
@@ -1287,7 +1287,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         # has been expired or not
         resp = self.client.get(reverse('shoppingcart.views.show_receipt', args=[self.cart.id]))
         self.assertEqual(resp.status_code, 200)
-        ((template, context), _) = render_mock.call_args  # pylint: disable=redefined-outer-name
+        ((template, context), _) = render_mock.call_args  # pylint: disable=unpacking-non-sequence
         self.assertEqual(template, 'shoppingcart/receipt.html')
         # now check for all the registration codes in the receipt
         # and one of code should be used at this point
@@ -1307,7 +1307,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
 
         self.login_user()
 
-        self.mock_tracker.emit.reset_mock()  # pylint: disable=maybe-no-member
+        self.mock_tracker.emit.reset_mock()
         resp = self.client.get(reverse('shoppingcart.views.show_receipt', args=[self.cart.id]))
 
         self.assertEqual(resp.status_code, 200)
@@ -1431,7 +1431,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.client.post(url, resp_params, follow=True)
         self.assertFalse(self.client.session.get('attempting_upgrade'))
 
-        self.mock_tracker.emit.assert_any_call(  # pylint: disable=maybe-no-member
+        self.mock_tracker.emit.assert_any_call(
             'edx.course.enrollment.upgrade.succeeded',
             {
                 'user_id': self.user.id,

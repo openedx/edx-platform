@@ -79,9 +79,9 @@ class Target(models.Model):
         Returns a short display name
         """
         if self.target_type == SEND_TO_COHORT:
-            return self.cohorttarget.short_display()  # pylint: disable=no-member
+            return self.cohorttarget.short_display()
         elif self.target_type == SEND_TO_TRACK:
-            return self.coursemodetarget.short_display()  # pylint: disable=no-member
+            return self.coursemodetarget.short_display()
         else:
             return self.target_type
 
@@ -90,9 +90,9 @@ class Target(models.Model):
         Returns a long display name
         """
         if self.target_type == SEND_TO_COHORT:
-            return self.cohorttarget.long_display()  # pylint: disable=no-member
+            return self.cohorttarget.long_display()
         elif self.target_type == SEND_TO_TRACK:
-            return self.coursemodetarget.long_display()  # pylint: disable=no-member
+            return self.coursemodetarget.long_display()
         else:
             return self.get_target_type_display()
 
@@ -123,7 +123,7 @@ class Target(models.Model):
                 enrollment_qset.exclude(id__in=staff_instructor_qset)
             )
         elif self.target_type == SEND_TO_COHORT:
-            return self.cohorttarget.cohort.users.filter(id__in=enrollment_qset)  # pylint: disable=no-member
+            return self.cohorttarget.cohort.users.filter(id__in=enrollment_qset)
         elif self.target_type == SEND_TO_TRACK:
             return use_read_replica_if_available(
                 User.objects.filter(
@@ -432,7 +432,6 @@ class CourseAuthorization(models.Model):
         not_en = "Not "
         if self.email_enabled:
             not_en = ""
-        # pylint: disable=no-member
         return u"Course '{}': Instructor Email {}Enabled".format(text_type(self.course_id), not_en)
 
 

@@ -249,6 +249,6 @@ COMPLETION_BY_VIEWING_DELAY_MS = 1000
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:
-    from .private import *      # pylint: disable=import-error
+    from .private import *      # pylint: disable=wildcard-import
 except ImportError:
     pass

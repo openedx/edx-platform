@@ -247,7 +247,7 @@ class TestBlocksView(SharedModuleStoreTestCase):
         self.verify_response_with_requested_fields(response)
 
 
-class TestBlocksInCourseView(TestBlocksView):  # pylint: disable=test-inherits-tests
+class TestBlocksInCourseView(TestBlocksView):
     """
     Test class for BlocksInCourseView
     """

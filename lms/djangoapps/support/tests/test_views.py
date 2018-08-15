@@ -216,15 +216,15 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
                 CourseMode.AUDIT, CourseMode.PROFESSIONAL, CourseMode.CREDIT_MODE,
                 CourseMode.NO_ID_PROFESSIONAL_MODE, CourseMode.VERIFIED, CourseMode.HONOR
         ):
-            CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)  # pylint: disable=no-member
+            CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
 
         self.verification_deadline = VerificationDeadline(
-            course_key=self.course.id,  # pylint: disable=no-member
+            course_key=self.course.id,
             deadline=datetime.now(UTC) + timedelta(days=365)
         )
         self.verification_deadline.save()
 
-        CourseEnrollmentFactory.create(mode=CourseMode.AUDIT, user=self.student, course_id=self.course.id)  # pylint: disable=no-member
+        CourseEnrollmentFactory.create(mode=CourseMode.AUDIT, user=self.student, course_id=self.course.id)
 
         self.url = reverse('support:enrollment_list', kwargs={'username_or_email': self.student.username})
 
@@ -232,7 +232,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         """
         Assert that the student's enrollment has the correct mode.
         """
-        enrollment = CourseEnrollment.get_enrollment(self.student, self.course.id)  # pylint: disable=no-member
+        enrollment = CourseEnrollment.get_enrollment(self.student, self.course.id)
         self.assertEqual(enrollment.mode, mode)
 
     @ddt.data('username', 'email')
@@ -249,7 +249,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             'mode': CourseMode.AUDIT,
             'manual_enrollment': {},
             'user': self.student.username,
-            'course_id': unicode(self.course.id),  # pylint: disable=no-member
+            'course_id': unicode(self.course.id),
             'is_active': True,
             'verified_upgrade_deadline': None,
         }, data[0])
@@ -265,7 +265,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             self.student.email,
             ENROLLED_TO_ENROLLED,
             'Financial Assistance',
-            CourseEnrollment.objects.get(course_id=self.course.id, user=self.student)  # pylint: disable=no-member
+            CourseEnrollment.objects.get(course_id=self.course.id, user=self.student)
         )
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
@@ -283,7 +283,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             kwargs={'username_or_email': getattr(self.student, search_string_type)}
         )
         response = self.client.post(url, data={
-            'course_id': unicode(self.course.id),  # pylint: disable=no-member
+            'course_id': unicode(self.course.id),
             'old_mode': CourseMode.AUDIT,
             'new_mode': CourseMode.VERIFIED,
             'reason': 'Financial Assistance'
@@ -319,7 +319,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
         # `self` isn't available from within the DDT declaration, so
         # assign the course ID here
         if 'course_id' in data and data['course_id'] is None:
-            data['course_id'] = unicode(self.course.id)  # pylint: disable=no-member
+            data['course_id'] = unicode(self.course.id)
         response = self.client.post(self.url, data)
         self.assertEqual(response.status_code, 400)
         self.assertIsNotNone(re.match(error_message, response.content))
@@ -365,7 +365,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
 
     def _assert_generated_modes(self, response):
         """Dry method to generate course modes dict and test with response data."""
-        modes = CourseMode.modes_for_course(self.course.id, include_expired=True)  # pylint: disable=no-member
+        modes = CourseMode.modes_for_course(self.course.id, include_expired=True)
         modes_data = []
         for mode in modes:
             expiry = mode.expiration_datetime.strftime('%Y-%m-%dT%H:%M:%SZ') if mode.expiration_datetime else None
@@ -404,7 +404,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             kwargs={'username_or_email': getattr(self.student, search_string_type)}
         )
         response = self.client.post(url, data={
-            'course_id': unicode(self.course.id),  # pylint: disable=no-member
+            'course_id': unicode(self.course.id),
             'old_mode': CourseMode.AUDIT,
             'new_mode': new_mode,
             'reason': 'Financial Assistance'
@@ -424,7 +424,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
 
         # change verified mode expiry.
         verified_mode = CourseMode.objects.get(
-            course_id=self.course.id,   # pylint: disable=no-member
+            course_id=self.course.id,
             mode_slug=CourseMode.VERIFIED
         )
         verified_mode.expiration_datetime = datetime(year=1970, month=1, day=9, tzinfo=UTC)

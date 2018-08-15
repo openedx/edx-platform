@@ -1,7 +1,6 @@
 """
 Test grading events across apps.
 """
-# pylint: disable=protected-access
 
 from mock import call as mock_call, patch
 

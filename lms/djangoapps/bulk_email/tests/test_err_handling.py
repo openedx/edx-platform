@@ -7,7 +7,7 @@ from itertools import cycle
 from smtplib import SMTPConnectError, SMTPDataError, SMTPServerDisconnected
 
 import ddt
-from celery.states import RETRY, SUCCESS  # pylint: disable=no-name-in-module, import-error
+from celery.states import RETRY, SUCCESS
 from django.conf import settings
 from django.core.management import call_command
 from django.urls import reverse

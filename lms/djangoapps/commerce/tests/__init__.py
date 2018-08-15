@@ -57,7 +57,7 @@ class EdxRestApiClientTest(TestCase):
 
             claims = {
                 'tracking_context': {
-                    'lms_user_id': self.user.id,  # pylint: disable=no-member
+                    'lms_user_id': self.user.id,
                     'lms_client_id': self.TEST_CLIENT_ID,
                     'lms_ip': '127.0.0.1',
                 }
