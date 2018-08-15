@@ -317,7 +317,7 @@ def run_pep8(options):  # pylint: disable=unused-argument
 def run_complexity():
     """
     Uses radon to examine cyclomatic complexity.
-    For additional details on radon, see http://radon.readthedocs.org/
+    For additional details on radon, see https://radon.readthedocs.org/
     """
     system_string = '/ '.join(ALL_SYSTEMS.split(',')) + '/'
     complexity_report_dir = (Env.REPORT_DIR / "complexity")

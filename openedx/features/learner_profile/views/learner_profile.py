@@ -60,7 +60,7 @@ def learner_profile(request, username):
                 'profile. {learn_more_link_start}Learn more{learn_more_link_end}'
             )).format(
                 learn_more_link_start=HTML(
-                    '<a href="http://edx.readthedocs.io/projects/open-edx-learner-guide/en/'
+                    '<a href="https://edx.readthedocs.io/projects/open-edx-learner-guide/en/'
                     'latest/SFD_dashboard_profile_SectionHead.html#adding-profile-information">'
                 ),
                 learn_more_link_end=HTML('</a>')
