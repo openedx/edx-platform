@@ -6,8 +6,8 @@ from openedx.features.journals.views.learner_dashboard import get_journal_about_
 from six import text_type
 from urlparse import urljoin
 %>
+<%page args="journal, journals_root_url" expression_filter="h"/>
 <%
-  page args = "journal, journals_root_url" expression_filter="h"
   about_page_url = get_journal_about_page_url(slug=journal.get('slug'))
 %>
 <article class="journal" id="${journal.get('slug')}" role="region" aria-label="${journal.get('title')}">
