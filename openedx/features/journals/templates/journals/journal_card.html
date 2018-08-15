@@ -8,7 +8,10 @@ from urlparse import urljoin
 %>
 <%page args="journal, journals_root_url" expression_filter="h"/>
 <%
-  about_page_url = get_journal_about_page_url(slug=journal.get('slug'))
+  if user.is_authenticated:
+    about_page_url = get_journal_about_page_url(slug=journal.get('slug'))
+  else:
+    about_page_url = urljoin(journals_root_url, journal.get('slug'))
 %>
 <article class="journal" id="${journal.get('slug')}" role="region" aria-label="${journal.get('title')}">
   <a class="journals-listing-item" href="${about_page_url}">
