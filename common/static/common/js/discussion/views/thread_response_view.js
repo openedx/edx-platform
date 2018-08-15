@@ -177,6 +177,7 @@
                 });
                 this.commentViews.push(view);
                 this.focusToTheCommentResponse(view.$el.closest('.forum-response'));
+                DiscussionUtil.typesetMathJax(view.$el.find('.response-body'));
                 return view;
             };
 
