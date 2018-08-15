@@ -131,7 +131,6 @@ def get_lms_link_for_item(location, preview=False):
     )
 
 
-# pylint: disable=invalid-name
 def get_lms_link_for_certificate_web_view(user_id, course_key, mode):
     """
     Returns the url to the certificate web view.

@@ -6,7 +6,7 @@ import json
 import logging
 import random
 import re
-import string  # pylint: disable=deprecated-module
+import string
 
 import django.utils
 import six
@@ -221,7 +221,6 @@ def _dismiss_notification(request, course_action_state_id):  # pylint: disable=u
     return JsonResponse({'success': True})
 
 
-# pylint: disable=unused-argument
 @login_required
 def course_handler(request, course_key_string=None):
     """
@@ -935,7 +934,6 @@ def rerun_course(user, source_course_key, org, number, run, fields, async=True):
     return destination_course_key
 
 
-# pylint: disable=unused-argument
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(["GET"])
@@ -968,7 +966,6 @@ def course_info_handler(request, course_key_string):
             return HttpResponseBadRequest("Only supports html requests")
 
 
-# pylint: disable=unused-argument
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT", "DELETE"))

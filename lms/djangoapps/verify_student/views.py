@@ -453,8 +453,8 @@ class PayAndVerifyView(View):
         return url
 
     def _redirect_if_necessary(
-            self, message, already_verified, already_paid, is_enrolled, course_key,  # pylint: disable=bad-continuation
-            user_is_trying_to_pay, user, sku  # pylint: disable=bad-continuation
+            self, message, already_verified, already_paid, is_enrolled, course_key,
+            user_is_trying_to_pay, user, sku
     ):
         """Redirect the user to a more appropriate page if necessary.
 
@@ -859,8 +859,8 @@ class SubmitPhotosView(View):
     """
 
     @method_decorator(transaction.non_atomic_requests)
-    def dispatch(self, *args, **kwargs):    # pylint: disable=missing-docstring
-        return super(SubmitPhotosView, self).dispatch(*args, **kwargs)
+    def dispatch(self, request, *args, **kwargs):
+        return super(SubmitPhotosView, self).dispatch(request, *args, **kwargs)
 
     @method_decorator(login_required)
     @method_decorator(outer_atomic(read_committed=True))

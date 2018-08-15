@@ -143,7 +143,7 @@ class TestForcePublish(MaintenanceViewTestCase):
         # Add some changes to course
         chapter = ItemFactory.create(category='chapter', parent_location=course.location)
         self.store.create_child(
-            self.user.id,  # pylint: disable=no-member
+            self.user.id,
             chapter.location,
             'html',
             block_id='html_component'
@@ -204,7 +204,7 @@ class TestForcePublish(MaintenanceViewTestCase):
 
         # publish the course
         source_store = modulestore()._get_modulestore_for_courselike(course.id)  # pylint: disable=protected-access
-        source_store.force_publish_course(course.id, self.user.id, commit=True)  # pylint: disable=no-member
+        source_store.force_publish_course(course.id, self.user.id, commit=True)
 
         # now course is published, we should get `already published course` error.
         self.verify_error_message(

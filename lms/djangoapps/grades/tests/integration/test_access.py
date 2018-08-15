@@ -1,7 +1,6 @@
 """
 Test grading with access changes.
 """
-# pylint: disable=protected-access
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin

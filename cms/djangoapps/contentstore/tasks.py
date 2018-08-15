@@ -687,7 +687,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
                 return
 
         temp_filepath = course_dir / get_valid_filename(archive_name)
-        if not course_dir.isdir():  # pylint: disable=no-value-for-parameter
+        if not course_dir.isdir():
             os.mkdir(course_dir)
 
         LOGGER.debug(u'importing course to {0}'.format(temp_filepath))
@@ -726,7 +726,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
                 )
     # Send errors to client with stage at which error occurred.
     except Exception as exception:  # pylint: disable=broad-except
-        if course_dir.isdir():  # pylint: disable=no-value-for-parameter
+        if course_dir.isdir():
             shutil.rmtree(course_dir)
             LOGGER.info(u'Course import %s: Temp data cleared', courselike_key)
 
@@ -805,7 +805,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
         LOGGER.exception(u'error importing course', exc_info=True)
         self.status.fail(text_type(exception))
     finally:
-        if course_dir.isdir():  # pylint: disable=no-value-for-parameter
+        if course_dir.isdir():
             shutil.rmtree(course_dir)
             LOGGER.info(u'Course import %s: Temp data cleared', courselike_key)
 

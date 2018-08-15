@@ -143,14 +143,14 @@ class CourseMetadata(object):
             if field.scope != Scope.settings:
                 continue
 
-            field_help = _(field.help)                  # pylint: disable=translation-of-non-string
+            field_help = _(field.help)
             help_args = field.runtime_options.get('help_format_args')
             if help_args is not None:
                 field_help = field_help.format(**help_args)
 
             result[field.name] = {
                 'value': field.read_json(descriptor),
-                'display_name': _(field.display_name),    # pylint: disable=translation-of-non-string
+                'display_name': _(field.display_name),
                 'help': field_help,
                 'deprecated': field.runtime_options.get('deprecated', False)
             }

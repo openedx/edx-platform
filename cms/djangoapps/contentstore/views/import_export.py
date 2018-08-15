@@ -138,7 +138,7 @@ def _write_chunk(request, courselike_key):
             )
 
         temp_filepath = course_dir / filename
-        if not course_dir.isdir():  # pylint: disable=no-value-for-parameter
+        if not course_dir.isdir():
             os.mkdir(course_dir)
 
         logging.debug('importing course to {0}'.format(temp_filepath))
@@ -208,7 +208,7 @@ def _write_chunk(request, courselike_key):
     # Send errors to client with stage at which error occurred.
     except Exception as exception:  # pylint: disable=broad-except
         _save_request_status(request, courselike_string, -1)
-        if course_dir.isdir():  # pylint: disable=no-value-for-parameter
+        if course_dir.isdir():
             shutil.rmtree(course_dir)
             log.info("Course import %s: Temp data cleared", courselike_key)
 

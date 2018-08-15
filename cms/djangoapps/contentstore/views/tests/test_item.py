@@ -1364,7 +1364,7 @@ class TestDuplicateItemWithAsides(ItemTest, DuplicateHelper):
 
             key_store = DictKeyValueStore()
             field_data = KvsFieldData(key_store)
-            runtime = TestRuntime(services={'field-data': field_data})  # pylint: disable=abstract-class-instantiated
+            runtime = TestRuntime(services={'field-data': field_data})
 
             def_id = runtime.id_generator.create_definition(block_type)
             usage_id = runtime.id_generator.create_usage(def_id)

@@ -162,6 +162,6 @@ VIDEO_TRANSCRIPTS_SETTINGS = dict(
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:
-    from .private import *      # pylint: disable=import-error
+    from .private import *      # pylint: disable=wildcard-import
 except ImportError:
     pass

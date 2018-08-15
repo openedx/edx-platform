@@ -836,7 +836,7 @@ class TestCourseExportImport(LibraryTestCase):
         ItemFactory.create(
             category="problem",
             parent_location=self.library.location,
-            user_id=self.user.id,   # pylint: disable=no-member
+            user_id=self.user.id,
             publish_item=False,
             display_name='Test Problem',
             data="<problem><multiplechoiceresponse></multiplechoiceresponse></problem>",
@@ -927,7 +927,7 @@ class TestCourseExportImport(LibraryTestCase):
         # Now, import it back to dest_course.
         import_course_from_xml(
             self.store,
-            self.user.id,   # pylint: disable=no-member
+            self.user.id,
             self.export_dir,
             ['exported_source_course'],
             static_content_store=contentstore(),
