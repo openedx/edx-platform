@@ -8,7 +8,7 @@ from django.http import Http404
 
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
-from openedx.features.journals.api import fetch_journal_access, journals_enabled
+from openedx.features.journals.api import fetch_journal_access, get_journals_root_url, journals_enabled
 
 
 logger = logging.getLogger(__name__)
@@ -49,9 +49,9 @@ def get_journal_about_page_url(slug=''):
     Returns:
         url (str): url points to Journals Service login, w/ a redirect to journal about page
     """
-    login_url = urljoin(settings.JOURNALS_URL_ROOT, 'login')
+    login_url = urljoin(get_journals_root_url(), 'login')
 
-    about_page_url = urljoin(settings.JOURNALS_URL_ROOT, slug)
+    about_page_url = urljoin(get_journals_root_url(), slug)
     query = 'next={next_url}'.format(next_url=about_page_url)
 
     split_url = urlsplit(login_url)
