@@ -1,3 +1,4 @@
+/* globals _ */
 (function() {
     'use strict';
     describe('Video Context Menu', function() {
