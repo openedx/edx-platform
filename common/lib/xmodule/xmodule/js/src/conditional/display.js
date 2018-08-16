@@ -21,11 +21,11 @@
     Conditional.prototype.render = function(element) {
       return $.postWithPrefix(this.url + "/conditional_get", (function(_this) {
         return function(response) {
-          var i, len, parentEl, parentId, ref;
+          var i, len, parentEl, parentId, ref, renderedFragments=[];
           _this.el.html('');
           fragments = response.fragments;
           for (i = 0, len = fragments.length; i < len; i++) {
-            _this.renderXBlockFragment(fragments[i]);
+            renderedFragments.push(_this.renderXBlockFragment(fragments[i]));
           }
           parentEl = $(element).parent();
           parentId = parentEl.attr('id');
@@ -47,7 +47,9 @@
           The children are rendered with a new request, so they have a different request-token.
           Use that token instead of @requestToken by simply not passing a token into initializeBlocks.
           */
-          return XBlock.initializeBlocks(_this.el);
+          $.when.apply(null, renderedFragments).done(function() {
+              XBlock.initializeBlocks(_this.el);
+          });
         };
       })(this));
     };
@@ -65,7 +67,6 @@
     Conditional.prototype.renderXBlockFragment = function(fragment) {
       var html = fragment.content,
       resources = fragment.resources || [],
-      blockView = this,
       element = this.el;
       // Render the HTML first as the scripts might depend upon it, and then
       // asynchronously add the resources to the page. Any errors that are thrown
@@ -91,12 +92,13 @@
     * @returns {Promise} A promise representing the rendering process
     */
     Conditional.prototype.addXBlockFragmentResources = function(resources) {
-      var self = this,
-          applyResource,
-          numResources,
-          deferred;
-          numResources = resources.length;
-          deferred = $.Deferred();
+      var self = this;
+      var applyResource;
+      var numResources;
+      var deferred;
+      var numResources = resources.length;
+      var deferred = $.Deferred();
+
       applyResource = function (index) {
         var hash, resource, value, promise;
         if (index >= numResources) {
@@ -104,12 +106,10 @@
           return;
         }
         resource = resources[index];
-        if (!window.loadedXBlockResources) {
-          window.loadedXBlockResources = [];
-        }
-        if (_.indexOf(window.loadedXBlockResources, resource) < 0) {
+        window.loadedXBlockResources = window.loadedXBlockResources || [];
+        if (_.indexOf(loadedXBlockResources, resource) < 0) {
           promise = self.loadResource(resource);
-          window.loadedXBlockResources.push(resource);
+          loadedXBlockResources.push(resource);
           promise.done(function () {
             applyResource(index + 1);
           }).fail(function () {
@@ -146,8 +146,7 @@
         }
       } else if (mimetype === 'application/javascript') {
         if (kind === 'text') {
-          // xss-lint: disable=javascript-jquery-append,javascript-concat-html
-          $head.append('<script>' + data + '</script>');
+          eval.call(window, data);
         } else if (kind === 'url') {
           // This is a dependency loaded from the LMS (not ideal)
           return ViewUtils.loadJavaScript(data);
