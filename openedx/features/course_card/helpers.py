@@ -2,6 +2,8 @@ from datetime import datetime
 
 import pytz
 from logging import getLogger
+
+from crum import get_current_request
 from custom_settings.models import CustomSettings
 from course_action_state.models import CourseRerunState
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -69,7 +71,8 @@ def is_course_rereun(course_id):
     return None
 
 
-def get_course_cards_list(request):
+def get_course_cards_list():
+    request = get_current_request()
     cards_query_set = CourseCard.objects.all() if request.user.is_staff else CourseCard.objects.filter(is_enabled=True)
     course_card_ids = [cc.course_id for cc in cards_query_set]
     courses_list = CourseOverview.objects.select_related('image_set').filter(id__in=course_card_ids)
