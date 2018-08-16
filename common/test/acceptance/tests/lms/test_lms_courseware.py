@@ -509,22 +509,6 @@ class CoursewareMultipleVerticalsTest(CoursewareMultipleVerticalsTestBase):
             sequence_ui_events
         )
 
-    # TODO: Delete as part of TNL-6546 / LEARNER-71
-    def test_link_clicked_events(self):
-        """
-        Given that I am a user in the courseware
-        When I navigate via the left-hand nav
-        Then a link clicked event is logged
-        """
-        self.courseware_page.visit()
-
-        self.courseware_page.nav.go_to_section('Test Section 1', 'Test Subsection 1,2')
-        self.courseware_page.nav.go_to_section('Test Section 2', 'Test Subsection 2,1')
-
-        filter_link_clicked = lambda event: event.get('name', '') == 'edx.ui.lms.link_clicked'
-        link_clicked_events = self.wait_for_events(event_filter=filter_link_clicked, timeout=2)
-        self.assertEqual(len(link_clicked_events), 2)
-
     def assert_navigation_state(
             self, section_title, subsection_title, subsection_position, next_enabled, prev_enabled
     ):
