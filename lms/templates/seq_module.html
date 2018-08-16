@@ -1,7 +1,12 @@
 <%page expression_filter="h"/>
 <%! from django.utils.translation import ugettext as _ %>
 
-<div id="sequence_${element_id}" class="sequence" data-id="${item_id}" data-position="${position}" data-ajax-url="${ajax_url}" data-next-url="${next_url}" data-prev-url="${prev_url}">
+<div id="sequence_${element_id}" class="sequence" data-id="${item_id}"
+     data-position="${position}" data-ajax-url="${ajax_url}"
+     data-next-url="${next_url}" data-prev-url="${prev_url}"
+     data-save-position="${'true' if save_position else 'false'}"
+     data-show-completion="${'true' if show_completion else 'false'}"
+>
   % if banner_text:
     <div class="pattern-library-shim alert alert-information subsection-header" tabindex="-1">
       <span class="pattern-library-shim icon alert-icon fa fa-info-circle" aria-hidden="true"></span>
@@ -46,8 +51,7 @@
             data-page-title="${item['page_title']}"
             data-path="${item['path']}"
             data-graded="${item['graded']}"
-            id="tab_${idx}"
-            ${"disabled=disabled" if disable_navigation else ""}>
+            id="tab_${idx}">
             <span class="icon fa seq_${item['type']}" aria-hidden="true"></span>
             % if 'complete' in item:
               <span 

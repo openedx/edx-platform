@@ -330,7 +330,8 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             'next_url': context.get('next_url'),
             'prev_url': context.get('prev_url'),
             'banner_text': banner_text,
-            'disable_navigation': not self.is_user_authenticated(context),
+            'save_position': self.is_user_authenticated(context),
+            'show_completion': self.is_user_authenticated(context),
             'gated_content': self._get_gated_content_info(prereq_met, prereq_meta_info)
         }
         fragment.add_content(self.system.render_template("seq_module.html", params))
