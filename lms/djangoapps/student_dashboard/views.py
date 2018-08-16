@@ -39,7 +39,7 @@ def get_recommended_courses(user):
     return recommended_courses
 
 
-def get_enrolled_past_courses(course_enrollments):
+def get_enrolled_past_courses(request, course_enrollments):
     """
     Helper function to separate past courses from all enrolled courses
     """
@@ -47,7 +47,7 @@ def get_enrolled_past_courses(course_enrollments):
     enrolled, past = [], []
     past_course_cards = {}
 
-    card_list = get_course_cards_list()
+    card_list = get_course_cards_list(request)
 
     for course in course_enrollments:
         course_card = get_related_card(course.course_overview)
@@ -77,7 +77,7 @@ def get_recommended_xmodule_courses(request, _from='onboarding'):
     all_courses = []
 
     utc = pytz.UTC
-    courses_list = get_course_cards_list()
+    courses_list = get_course_cards_list(request)
     course_list_ids = []
 
     current_time = datetime.utcnow().replace(tzinfo=utc)
