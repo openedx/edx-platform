@@ -13,10 +13,10 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.mail import send_mail
-from django.urls import reverse
 from django.db import transaction
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
@@ -32,13 +32,13 @@ from pytz import UTC
 
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response, render_to_string
-from email_marketing.models import EmailMarketingConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService, is_account_activation_requirement_disabled
 from lms.djangoapps.verify_student.image import InvalidImageData, decode_image_data
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.ssencrypt import has_valid_signature
-from lms.djangoapps.verify_student.utils import is_verification_expiring_soon, send_verification_status_email
+from lms.djangoapps.verify_student.tasks import send_verification_status_email
+from lms.djangoapps.verify_student.utils import is_verification_expiring_soon
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -1162,48 +1162,47 @@ def results_callback(request):
         return HttpResponseBadRequest("edX ID {} not found".format(receipt_id))
 
     user = attempt.user
-    email_config = EmailMarketingConfiguration.current()
     verification_status_email_vars = {
         'platform_name': settings.PLATFORM_NAME,
-    }
-    email_context = {
-        'email_config': email_config,
-        'email': user.email
     }
     if result == "PASS":
         log.debug("Approving verification for %s", receipt_id)
         attempt.approve()
         status = "approved"
-        if email_config.sailthru_verification_passed_template:
-            expiry_date = datetime.date.today() + datetime.timedelta(
-                days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
-            )
-            verification_status_email_vars['expiry_date'] = expiry_date.strftime("%m/%d/%Y")
-            verification_status_email_vars['subject'] = _("Your {platform_name} ID Verification Approved").format(
-                platform_name=settings.PLATFORM_NAME
-            )
-            verification_status_email_vars['full_name'] = user.profile.name
-            email_context['template'] = email_config.sailthru_verification_passed_template
-            email_context['template_vars'] = verification_status_email_vars
-            send_verification_status_email(email_context)
+        expiry_date = datetime.date.today() + datetime.timedelta(
+            days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
+        )
+        verification_status_email_vars['expiry_date'] = expiry_date.strftime("%m/%d/%Y")
+        verification_status_email_vars['full_name'] = user.profile.name
+        subject = _("Your {platform_name} ID Verification Approved").format(
+            platform_name=settings.PLATFORM_NAME
+        )
+        context = {
+            'subject': subject,
+            'template': 'emails/passed_verification_email.txt',
+            'email': user.email,
+            'email_vars': verification_status_email_vars
+        }
+        send_verification_status_email.delay(context)
 
     elif result == "FAIL":
         log.debug("Denying verification for %s", receipt_id)
         attempt.deny(json.dumps(reason), error_code=error_code)
         status = "denied"
-        if email_config.sailthru_verification_failed_template:
-            verification_status_email_vars['reason'] = reason
-            verification_status_email_vars['reverify_url'] = reverse("verify_student_reverify")
-            verification_status_email_vars['faq_url'] = configuration_helpers.get_value(
-                'ID_VERIFICATION_SUPPORT_LINK',
-                settings.SUPPORT_SITE_LINK
-            )
-            verification_status_email_vars['subject'] = _("Your {platform_name} Verification Has Been Denied").format(
-                platform_name=settings.PLATFORM_NAME
-            )
-            email_context['template'] = email_config.sailthru_verification_failed_template
-            email_context['template_vars'] = verification_status_email_vars
-            send_verification_status_email(email_context)
+        reverify_url = '{}{}'.format(settings.LMS_ROOT_URL, reverse("verify_student_reverify"))
+        verification_status_email_vars['reasons'] = reason
+        verification_status_email_vars['reverify_url'] = reverify_url
+        verification_status_email_vars['faq_url'] = settings.ID_VERIFICATION_SUPPORT_LINK
+        subject = _("Your {platform_name} Verification Has Been Denied").format(
+            platform_name=settings.PLATFORM_NAME
+        )
+        context = {
+            'subject': subject,
+            'template': 'emails/failed_verification_email.txt',
+            'email': user.email,
+            'email_vars': verification_status_email_vars
+        }
+        send_verification_status_email.delay(context)
 
     elif result == "SYSTEM FAIL":
         log.debug("System failure for %s -- resetting to must_retry", receipt_id)
