@@ -90,10 +90,10 @@ update_module_store_settings(
         'fs_root': TEST_ROOT / "data",
     },
     doc_store_settings={
-        'db': 'test_xmodule',
+        'db': 'test_xmodule_{}'.format(THIS_UUID),
         'host': MONGO_HOST,
         'port': MONGO_PORT_NUM,
-        'collection': 'test_modulestore{0}'.format(THIS_UUID),
+        'collection': 'test_modulestore',
     },
 )
 

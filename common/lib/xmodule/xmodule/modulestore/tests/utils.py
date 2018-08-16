@@ -9,6 +9,7 @@ from path import Path as path
 from shutil import rmtree
 from tempfile import mkdtemp
 from unittest import TestCase
+import os
 
 from xmodule.x_module import XModuleMixin
 from xmodule.contentstore.mongo import MongoContentStore
@@ -87,7 +88,7 @@ class MixedSplitTestCase(TestCase):
     DOC_STORE_CONFIG = {
         'host': MONGO_HOST,
         'port': MONGO_PORT_NUM,
-        'db': 'test_mongo_libs',
+        'db': 'test_mongo_libs_{0}'.format(os.getpid()),
         'collection': 'modulestore',
         'asset_collection': 'assetstore',
     }
