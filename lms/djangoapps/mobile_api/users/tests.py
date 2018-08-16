@@ -1,7 +1,6 @@
 """
 Tests for users API
 """
-# pylint: disable=no-member
 import datetime
 
 import ddt

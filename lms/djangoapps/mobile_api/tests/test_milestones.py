@@ -22,7 +22,7 @@ class MobileAPIMilestonesMixin(object):
     """
     shard = 4
 
-    ALLOW_ACCESS_TO_MILESTONE_COURSE = False  # pylint: disable=invalid-name
+    ALLOW_ACCESS_TO_MILESTONE_COURSE = False
 
     @patch.dict(settings.FEATURES, {
         'ENABLE_PREREQUISITE_COURSES': True,
@@ -85,21 +85,21 @@ class MobileAPIMilestonesMixin(object):
         with self.store.bulk_operations(self.course.id):
             self.course.entrance_exam_enabled = True
 
-            self.entrance_exam = ItemFactory.create(  # pylint: disable=attribute-defined-outside-init
+            self.entrance_exam = ItemFactory.create(
                 parent=self.course,
                 category="chapter",
                 display_name="Entrance Exam Chapter",
                 is_entrance_exam=True,
                 in_entrance_exam=True,
             )
-            self.subsection_1 = ItemFactory.create(  # pylint: disable=attribute-defined-outside-init
+            self.subsection_1 = ItemFactory.create(
                 parent=self.entrance_exam,
                 category='sequential',
                 display_name="The Only Exam Sequential",
                 graded=True,
                 in_entrance_exam=True,
             )
-            self.problem_1 = ItemFactory.create(  # pylint: disable=attribute-defined-outside-init
+            self.problem_1 = ItemFactory.create(
                 parent=self.subsection_1,
                 category='problem',
                 display_name="The Only Exam Problem",
@@ -115,7 +115,7 @@ class MobileAPIMilestonesMixin(object):
 
     def _add_prerequisite_course(self):
         """ Helper method to set up the prerequisite course """
-        self.prereq_course = CourseFactory.create()  # pylint: disable=attribute-defined-outside-init
+        self.prereq_course = CourseFactory.create()
         add_prerequisite_course(self.course.id, self.prereq_course.id)
 
     def _pass_entrance_exam(self):

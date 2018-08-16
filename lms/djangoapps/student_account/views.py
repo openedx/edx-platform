@@ -319,7 +319,7 @@ def _third_party_auth_context(request, redirect_to, tpa_hint=None):
         for msg in messages.get_messages(request):
             if msg.extra_tags.split()[0] == "social-auth":
                 # msg may or may not be translated. Try translating [again] in case we are able to:
-                context['errorMessage'] = _(unicode(msg))  # pylint: disable=translation-of-non-string
+                context['errorMessage'] = _(unicode(msg))
                 break
 
     return context
@@ -379,7 +379,7 @@ def _get_extended_profile_fields():
     extended_profile_field_names = configuration_helpers.get_value('extended_profile_fields', [])
     for field_to_exclude in fields_already_showing:
         if field_to_exclude in extended_profile_field_names:
-            extended_profile_field_names.remove(field_to_exclude)  # pylint: disable=no-member
+            extended_profile_field_names.remove(field_to_exclude)
 
     extended_profile_field_options = configuration_helpers.get_value('EXTRA_FIELD_OPTIONS', [])
     extended_profile_field_option_tuples = {}
@@ -542,11 +542,11 @@ def account_settings_context(request):
             'country': {
                 'options': list(countries),
             }, 'gender': {
-                'options': [(choice[0], _(choice[1])) for choice in UserProfile.GENDER_CHOICES],  # pylint: disable=translation-of-non-string
+                'options': [(choice[0], _(choice[1])) for choice in UserProfile.GENDER_CHOICES],
             }, 'language': {
                 'options': released_languages(),
             }, 'level_of_education': {
-                'options': [(choice[0], _(choice[1])) for choice in UserProfile.LEVEL_OF_EDUCATION_CHOICES],  # pylint: disable=translation-of-non-string
+                'options': [(choice[0], _(choice[1])) for choice in UserProfile.LEVEL_OF_EDUCATION_CHOICES],
             }, 'password': {
                 'url': reverse('password_reset'),
             }, 'year_of_birth': {

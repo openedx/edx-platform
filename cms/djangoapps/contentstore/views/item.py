@@ -1052,7 +1052,7 @@ def _get_gating_info(course, xblock):
         if not hasattr(course, 'gating_prerequisites'):
             # Cache gating prerequisites on course module so that we are not
             # hitting the database for every xblock in the course
-            setattr(course, 'gating_prerequisites', gating_api.get_prerequisites(course.id))  # pylint: disable=literal-used-as-attribute
+            setattr(course, 'gating_prerequisites', gating_api.get_prerequisites(course.id))
         info["is_prereq"] = gating_api.is_prerequisite(course.id, xblock.location)
         info["prereqs"] = [
             p for p in course.gating_prerequisites if unicode(xblock.location) not in p['namespace']
@@ -1271,7 +1271,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     return xblock_info
 
 
-def add_container_page_publishing_info(xblock, xblock_info):  # pylint: disable=invalid-name
+def add_container_page_publishing_info(xblock, xblock_info):
     """
     Adds information about the xblock's publish state to the supplied
     xblock_info for the container page.
@@ -1405,7 +1405,7 @@ def _create_xblock_ancestor_info(xblock, course_outline=False, include_child_inf
 
 
 def _create_xblock_child_info(xblock, course_outline, graders, include_children_predicate=NEVER, user=None,
-                              course=None, is_concise=False):  # pylint: disable=line-too-long
+                              course=None, is_concise=False):
     """
     Returns information about the children of an xblock, as well as about the primary category
     of xblock expected as children.

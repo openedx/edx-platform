@@ -711,8 +711,8 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         cookies[settings.ENTERPRISE_CUSTOMER_COOKIE_NAME] = 'test-enterprise-customer'
         response = self.client.get(reverse('signin_user'), HTTP_ACCEPT="text/html", cookies=cookies)
 
-        self.assertIn(settings.ENTERPRISE_CUSTOMER_COOKIE_NAME, response.cookies)  # pylint:disable=no-member
-        enterprise_cookie = response.cookies[settings.ENTERPRISE_CUSTOMER_COOKIE_NAME]  # pylint:disable=no-member
+        self.assertIn(settings.ENTERPRISE_CUSTOMER_COOKIE_NAME, response.cookies)
+        enterprise_cookie = response.cookies[settings.ENTERPRISE_CUSTOMER_COOKIE_NAME]
 
         self.assertEqual(enterprise_cookie['domain'], settings.BASE_COOKIE_DOMAIN)
         self.assertEqual(enterprise_cookie.value, '')

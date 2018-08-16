@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=no-member
 """Tests for the teams API at the HTTP request level."""
 import itertools
 from contextlib import contextmanager
@@ -163,8 +162,8 @@ class TeamSignalsTest(EventTestMixin, SharedModuleStoreTestCase):
         team_membership_last_activity = self.team_membership.last_activity_at
         yield
         # Reload team and team membership from the database in order to pick up changes
-        team = CourseTeam.objects.get(id=self.team.id)  # pylint: disable=maybe-no-member
-        team_membership = CourseTeamMembership.objects.get(id=self.team_membership.id)  # pylint: disable=maybe-no-member
+        team = CourseTeam.objects.get(id=self.team.id)
+        team_membership = CourseTeamMembership.objects.get(id=self.team_membership.id)
         if should_update:
             self.assertGreater(team.last_activity_at, team_last_activity)
             self.assertGreater(team_membership.last_activity_at, team_membership_last_activity)

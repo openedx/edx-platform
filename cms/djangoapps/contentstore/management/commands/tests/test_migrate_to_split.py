@@ -50,7 +50,7 @@ class TestArgParsing(TestCase):
             call_command("migrate_to_split", "org/course/name", "fake@example.com")
 
 
-# pylint: disable=no-member, protected-access
+# pylint: disable=protected-access
 class TestMigrateToSplit(ModuleStoreTestCase):
     """
     Unit tests for migrating a course from old mongo to split mongo

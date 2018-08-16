@@ -47,7 +47,7 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         super(TestProgramListing, cls).setUpClass()
 
         cls.course = ModuleStoreCourseFactory()
-        course_run = CourseRunFactory(key=unicode(cls.course.id))  # pylint: disable=no-member
+        course_run = CourseRunFactory(key=unicode(cls.course.id))
         course = CourseFactory(course_runs=[course_run])
 
         cls.first_program = ProgramFactory(courses=[course])
@@ -137,7 +137,7 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         self.create_programs_config()
         mock_get_programs.return_value = self.data
 
-        CourseEnrollmentFactory(user=self.user, course_id=self.course.id)  # pylint: disable=no-member
+        CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
 
         response = self.client.get(self.url)
         actual = self.load_serialized_data(response, 'programsData')
@@ -166,7 +166,7 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         self.create_programs_config()
         mock_get_programs.return_value = self.data
 
-        CourseEnrollmentFactory(user=self.user, course_id=self.course.id)  # pylint: disable=no-member
+        CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
 
         response = self.client.get(self.url)
         actual = self.load_serialized_data(response, 'programsData')

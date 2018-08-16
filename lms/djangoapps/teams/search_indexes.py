@@ -143,7 +143,7 @@ def course_team_post_save_callback(**kwargs):
 
 
 @receiver(post_delete, sender=CourseTeam, dispatch_uid='teams.signals.course_team_post_delete_callback')
-def course_team_post_delete_callback(**kwargs):  # pylint: disable=invalid-name
+def course_team_post_delete_callback(**kwargs):
     """
     Reindex object after delete.
     """

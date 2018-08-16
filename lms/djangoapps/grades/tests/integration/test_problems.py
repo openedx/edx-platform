@@ -250,7 +250,6 @@ class TestWeightedProblems(SharedModuleStoreTestCase):
         Verifies the computed grades are as expected.
         """
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
-            # pylint: disable=no-member
             for problem in self.problems:
                 problem.weight = weight
                 self.store.update_item(problem, self.user.id)

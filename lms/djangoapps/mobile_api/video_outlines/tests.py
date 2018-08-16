@@ -161,7 +161,7 @@ class TestVideoAPIMixin(object):
 
     def _setup_course_partitions(self, scheme_id='random', is_cohorted=False):
         """Helper method to configure the user partitions in the course."""
-        self.partition_id = 0  # pylint: disable=attribute-defined-outside-init
+        self.partition_id = 0
         self.course.user_partitions = [
             UserPartition(
                 self.partition_id, 'first_partition', 'First Partition',
@@ -180,7 +180,7 @@ class TestVideoAPIMixin(object):
     def _setup_split_module(self, sub_block_category):
         """Helper method to configure a split_test unit with children of type sub_block_category."""
         self._setup_course_partitions()
-        self.split_test = ItemFactory.create(  # pylint: disable=attribute-defined-outside-init
+        self.split_test = ItemFactory.create(
             parent=self.unit,
             category="split_test",
             display_name=u"split test unit",
