@@ -1326,6 +1326,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         resp = self._get_progress_page()
         self.assertNotContains(resp, 'Request Certificate')
 
+    @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
     def test_view_certificate_link(self):
         """
@@ -1389,9 +1390,10 @@ class ProgressPageTests(ProgressPageBaseTests):
                 resp = self._get_progress_page()
                 self.assertNotContains(resp, u"View Your Certificate")
                 self.assertNotContains(resp, u"You can now view your certificate")
-                self.assertContains(resp, "working on it...")
-                self.assertContains(resp, "creating your certificate")
+                self.assertContains(resp, "Your certificate is available")
+                self.assertContains(resp, "earned a certificate for this course.")
 
+    @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
     def test_view_certificate_link_hidden(self):
         """
@@ -1458,6 +1460,7 @@ class ProgressPageTests(ProgressPageBaseTests):
                 ), check_mongo_calls(1):
                     self._get_progress_page()
 
+    @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
     @ddt.data(
         *itertools.product(
             (
@@ -1589,6 +1592,7 @@ class ProgressPageTests(ProgressPageBaseTests):
                 self.assertContains(resp, u"View Certificate")
                 self.assert_invalidate_certificate(generated_certificate)
 
+    @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
     def test_page_with_invalidated_certificate_with_pdf(self):
         """
         Verify that for pdf certs if certificate is marked as invalidated than
@@ -1613,6 +1617,7 @@ class ProgressPageTests(ProgressPageBaseTests):
                 self.assert_invalidate_certificate(generated_certificate)
 
     @patch('courseware.views.views.is_course_passed', PropertyMock(return_value=True))
+    @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
     def test_message_for_audit_mode(self):
         """ Verify that message appears on progress page, if learner is enrolled
          in audit mode.
@@ -1634,6 +1639,7 @@ class ProgressPageTests(ProgressPageBaseTests):
             )
 
     @patch('courseware.views.views.is_course_passed', PropertyMock(return_value=True))
+    @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
     def test_message_for_honor_mode(self):
         """ Verify that message appears on progress page, if learner is enrolled
          in honor mode.

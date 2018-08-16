@@ -26,6 +26,7 @@ from django.http import Http404, QueryDict
 from enrollment.api import get_course_enrollment_details
 from edxmako.shortcuts import render_to_string
 from fs.errors import ResourceNotFound
+from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from opaque_keys.edx.keys import UsageKey
@@ -370,14 +371,15 @@ def get_course_date_blocks(course, user):
     Return the list of blocks to display on the course info page,
     sorted by date.
     """
-    block_classes = (
-        CertificateAvailableDate,
+    block_classes = [
         CourseEndDate,
         CourseStartDate,
         TodaysDate,
         VerificationDeadlineDate,
         VerifiedUpgradeDeadlineDate,
-    )
+    ]
+    if certs_api.get_active_web_certificate(course):
+        block_classes.insert(0, CertificateAvailableDate)
 
     blocks = (cls(course, user) for cls in block_classes)
 
