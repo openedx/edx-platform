@@ -120,7 +120,8 @@ def enqueue_update_thumbnail_tasks(course_videos, videos_per_task, run):
 
 
 @chord_task(bind=True, routing_key=settings.VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE)
-def task_scrape_youtube_thumbnail_callback(self, results, run, batch_size, videos_per_task):
+def task_scrape_youtube_thumbnail_callback(self, results, run,  # pylint: disable=unused-argument
+                                           batch_size, videos_per_task):
     """
     Callback for collating the results of yt thumbnails scraping tasks chord.
     """
@@ -140,7 +141,7 @@ def task_scrape_youtube_thumbnail_callback(self, results, run, batch_size, video
     time_limit=COURSE_LEVEL_TIMEOUT_SECONDS,
     routing_key=settings.SCRAPE_YOUTUBE_THUMBNAILS_JOB_QUEUE
 )
-def task_scrape_youtube_thumbnail(self, course_videos, run):
+def task_scrape_youtube_thumbnail(self, course_videos, run):   # pylint: disable=unused-argument
     """
     Task to scrape youtube thumbnails and update them in edxval for the given course-videos.
 

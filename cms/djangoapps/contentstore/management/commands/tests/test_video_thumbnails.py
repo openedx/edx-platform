@@ -8,7 +8,7 @@ from django.core.management import call_command, CommandError
 from django.test import TestCase
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from openedx.core.djangoapps.video_config.models import VideoThumbnailSetting, UpdatedCourseVideos
+from openedx.core.djangoapps.video_config.models import VideoThumbnailSetting
 from six import text_type
 from testfixtures import LogCapture
 

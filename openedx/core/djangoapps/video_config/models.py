@@ -3,7 +3,6 @@ Configuration models for Video XModule
 """
 from django.db import models
 from django.db.models import BooleanField, TextField, PositiveIntegerField
-from django.core.validators import RegexValidator
 from config_models.models import ConfigurationModel
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
