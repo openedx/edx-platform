@@ -574,23 +574,6 @@ class TestGetCourseUserPartitions(PartitionServiceBaseClass):
         self.assertEqual(unicode(self.course.id), enrollment_track_partition.parameters['course_id'])
         self.assertEqual(ENROLLMENT_TRACK_PARTITION_ID, enrollment_track_partition.id)
 
-    def test_enrollment_track_partition_not_added_if_conflict(self):
-        """
-        Test that the dynamic enrollment track scheme is NOT added if a UserPartition exists with that ID.
-        """
-        self.user_partition = UserPartition(
-            ENROLLMENT_TRACK_PARTITION_ID,
-            self.TEST_NAME,
-            self.TEST_DESCRIPTION,
-            self.TEST_GROUPS,
-            self.non_random_scheme,
-            self.TEST_PARAMETERS,
-        )
-        self.course.user_partitions = [self.user_partition]
-        all_partitions = get_all_partitions_for_course(self.course)
-        self.assertEqual(1, len(all_partitions))
-        self.assertEqual(self.TEST_SCHEME_NAME, all_partitions[0].scheme.name)
-
     def test_enrollment_track_partition_not_added_if_disabled(self):
         """
         Test that the dynamic enrollment track scheme is NOT added if the settings FEATURE flag is disabled.
