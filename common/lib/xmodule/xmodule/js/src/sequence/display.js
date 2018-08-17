@@ -233,13 +233,13 @@
                 if (this.position) {
                     this.mark_visited(this.position);
                     if (this.showCompletion) {
-                      this.update_completion(this.position);
+                        this.update_completion(this.position);
                     }
                     if (this.savePosition) {
-                      modxFullUrl = '' + this.ajaxUrl + '/goto_position';
-                      $.postWithPrefix(modxFullUrl, {
-                          position: newPosition
-                      });
+                        modxFullUrl = '' + this.ajaxUrl + '/goto_position';
+                        $.postWithPrefix(modxFullUrl, {
+                            position: newPosition
+                        });
                     }
                 }
 
