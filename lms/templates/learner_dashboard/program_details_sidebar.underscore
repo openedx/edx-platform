@@ -8,20 +8,19 @@
     <% } %>
 </aside>
 <aside class="aside js-course-certificates"></aside>
-<% if (programRecordUrl) { %>
-    <aside class="aside js-program-record program-record">
-        <h2 class="divider-heading"><%- gettext('Program Record') %></h2>
-
-        <div class="motivating-section">
-            <p class="motivating-message"><%- gettext('Once you complete one of the program requirements you have a program record. This record is marked complete once you meet all program requirements. A program record can be used to continue your learning journey and demonstrate your learning to others.') %></p>
-        </div>
+<aside class="aside js-program-record program-record">
+    <h2 class="divider-heading"><%- gettext('Program Record') %></h2>
+    <div class="motivating-section">
+        <p class="motivating-message"><%- gettext('Once you complete one of the program requirements you have a program record. This record is marked complete once you meet all program requirements. A program record can be used to continue your learning journey and demonstrate your learning to others.') %></p>
+    </div>
+    <% if (programRecordUrl) { %>
         <div class="sidebar-button-wrapper">
             <a href="<%- programRecordUrl %>" class="program-record-link">
                 <button class="btn sidebar-button"><%- gettext('View Program Record') %></button>
             </a>
         </div>
-    </aside>
-<% } %>
+    <% } %>
+</aside>
 <% if (creditPathways.length > 0) { %>
     <aside class="aside js-program-pathways program-pathways">
         <h2 class = "divider-heading"><%- gettext('Additional Learning Opportunities') %></h2>
@@ -38,7 +37,7 @@
                     <% if (pathway.destination_url) { %>
                         <div class="sidebar-button-wrapper">
                             <a href="<%- pathway.destination_url %>" class="pathway-link">
-                                <button class="btn sidebar-button"><%- gettext('Learn More') %></button>
+                                <button class="btn sidebar-button" data-pathway-id="<%- pathway.id %>" data-pathway-name="<%- pathway.name %>"><%- gettext('Learn More') %></button>
                             </a>
                         </div>
                     <% } %>
