@@ -155,7 +155,6 @@ def enroll_email(course_id, student_email, auto_enroll=False, email_students=Fal
                 'site_name': email_params['site_name'],
                 'registration_url': email_params['registration_url'],
                 'email_address': student_email,
-
             }
 
             MandrillClient().send_mail(
