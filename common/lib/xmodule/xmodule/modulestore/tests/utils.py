@@ -1,6 +1,8 @@
 """
 Helper classes and methods for running modulestore tests without Django.
 """
+import io
+import os
 import random
 
 from contextlib import contextmanager, nested
@@ -9,7 +11,6 @@ from path import Path as path
 from shutil import rmtree
 from tempfile import mkdtemp
 from unittest import TestCase
-import os
 
 from xmodule.x_module import XModuleMixin
 from xmodule.contentstore.mongo import MongoContentStore
@@ -71,6 +72,27 @@ def mock_tab_from_json(tab_dict):
     with plugin errors.
     """
     return tab_dict
+
+
+def add_temp_files_from_dict(file_dict, dir):
+    """
+    Takes in a dict formatted as: { file_name: content }, and adds files to directory
+    """
+    for file_name in file_dict:
+        with io.open("{}/{}".format(dir, file_name), "w") as opened_file:
+            content = file_dict[file_name]
+            if content:
+                opened_file.write(unicode(content))
+
+
+def remove_temp_files_from_list(file_list, dir):
+    """
+    Takes in a list of file names and removes them from dir if they exist
+    """
+    for file_name in file_list:
+        file_path = "{}/{}".format(dir, file_name)
+        if os.path.exists(file_path):
+            os.remove(file_path)
 
 
 class MixedSplitTestCase(TestCase):
@@ -470,6 +492,14 @@ MODULESTORE_SHORTNAMES = DIRECT_MS_SETUPS_SHORT + MIXED_MS_SETUPS_SHORT
 SHORT_NAME_MAP = dict(zip(MODULESTORE_SETUPS, MODULESTORE_SHORTNAMES))
 
 CONTENTSTORE_SETUPS = (MongoContentstoreBuilder(),)
+
+DOT_FILES_DICT = {
+    ".DS_Store": None,
+    ".example.txt": "BLUE",
+}
+TILDA_FILES_DICT = {
+    "example.txt~": "RED"
+}
 
 
 class PureModulestoreTestCase(TestCase):
