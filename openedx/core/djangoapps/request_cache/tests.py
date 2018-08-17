@@ -6,7 +6,7 @@ from celery.task import task
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
-from mock import Mock
+from mock import patch, Mock
 
 from openedx.core.djangoapps.request_cache import get_request_or_stub
 from openedx.core.djangoapps.request_cache.middleware import RequestCache, request_cached
@@ -18,7 +18,8 @@ class TestRequestCache(TestCase):
     Tests for the request cache.
     """
 
-    def test_get_request_or_stub(self):
+    @patch('crum.get_current_request', side_effect=lambda: None)
+    def test_get_request_or_stub(self, empty_request):  # pylint: disable=unused-argument
         """
         Outside the context of the request, we should still get a request
         that allows us to build an absolute URI.
