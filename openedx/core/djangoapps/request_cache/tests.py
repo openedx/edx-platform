@@ -18,8 +18,7 @@ class TestRequestCache(TestCase):
     Tests for the request cache.
     """
 
-    @patch('crum.get_current_request', side_effect=lambda: None)
-    def test_get_request_or_stub(self, empty_request):  # pylint: disable=unused-argument
+    def test_get_request_or_stub(self):
         """
         Outside the context of the request, we should still get a request
         that allows us to build an absolute URI.
