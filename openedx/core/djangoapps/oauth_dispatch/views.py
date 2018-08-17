@@ -10,13 +10,13 @@ import logging
 
 from django.conf import settings
 from django.views.generic import View
+from edx_django_utils import monitoring as monitoring_utils
 from edx_oauth2_provider import views as dop_views  # django-oauth2-provider views
 from oauth2_provider import models as dot_models  # django-oauth-toolkit
 from oauth2_provider import views as dot_views
 from ratelimit import ALL
 from ratelimit.mixins import RatelimitMixin
 
-from openedx.core.djangoapps import monitoring_utils
 from openedx.core.djangoapps.auth_exchange import views as auth_exchange_views
 from openedx.core.lib.token_utils import JwtBuilder
 

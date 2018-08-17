@@ -13,12 +13,12 @@ from django.core.paginator import Paginator
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.db.utils import IntegrityError
+from edx_django_utils import monitoring as monitoring_utils
 from edx_user_state_client.interface import XBlockUserState, XBlockUserStateClient
 from xblock.fields import Scope
 
 import dogstats_wrapper as dog_stats_api
 from courseware.models import BaseStudentModuleHistory, StudentModule
-from openedx.core.djangoapps import monitoring_utils
 
 try:
     import simplejson as json
