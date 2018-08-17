@@ -24,6 +24,7 @@ from pytz import UTC
 
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.grades.models import PersistentCourseGrade
+from openedx.core.djangoapps.credentials.models import NotifyCredentialsConfig
 from openedx.core.djangoapps.credentials.signals import handle_cert_change, send_grade_if_interesting
 from openedx.core.djangoapps.programs.signals import handle_course_cert_changed
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
@@ -134,8 +135,28 @@ class Command(BaseCommand):
             default=100,
             help="Number of items to query at once.",
         )
+        parser.add_argument(
+            '--args-from-database',
+            action='store_true',
+            help='Use arguments from the NotifyCredentialsConfig model instead of the command line.',
+        )
+
+    def get_args_from_database(self):
+        """ Returns an options dictionary from the current NotifyCredentialsConfig model. """
+        config = NotifyCredentialsConfig.current()
+        if not config.enabled:
+            raise CommandError('NotifyCredentialsConfig is disabled, but --args-from-database was requested.')
+
+        # We don't need fancy shell-style whitespace/quote handling - none of our arguments are complicated
+        argv = config.arguments.split()
+
+        parser = self.create_parser('manage.py', 'notify_credentials')
+        return parser.parse_args(argv).__dict__   # we want a dictionary, not a non-iterable Namespace object
 
     def handle(self, *args, **options):
+        if options['args_from_database']:
+            options = self.get_args_from_database()
+
         log.info(
             "notify_credentials starting, dry-run=%s, site=%s, delay=%d seconds",
             options['dry_run'],

@@ -14,6 +14,7 @@ from freezegun import freeze_time
 
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.grades.models import PersistentCourseGrade
+from openedx.core.djangoapps.credentials.models import NotifyCredentialsConfig
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
@@ -131,3 +132,30 @@ class TestNotifyCredentials(TestCase):
         call_command(Command(), '--site', site_config.site.domain, '--start-date', '2017-01-01')
         self.assertEqual(mock_grade_interesting.call_count, 1)
         self.assertEqual(mock_cert_change.call_count, 1)
+
+    @mock.patch(COMMAND_MODULE + '.Command.send_notifications')
+    def test_args_from_database(self, mock_send):
+        # Nothing in the database, should default to disabled
+        with self.assertRaisesRegex(CommandError, 'NotifyCredentialsConfig is disabled.*'):
+            call_command(Command(), '--start-date', '2017-01-01', '--args-from-database')
+
+        # Add a config
+        config = NotifyCredentialsConfig.current()
+        config.arguments = '--start-date 2017-03-01'
+        config.enabled = True
+        config.save()
+
+        # Not told to use config, should ignore it
+        call_command(Command(), '--start-date', '2017-01-01')
+        self.assertEqual(len(mock_send.call_args[0][0]), 3)
+
+        # Told to use it, and enabled. Should use config in preference of command line
+        call_command(Command(), '--start-date', '2017-01-01', '--args-from-database')
+        self.assertEqual(len(mock_send.call_args[0][0]), 1)
+
+        config.enabled = False
+        config.save()
+
+        # Explicitly disabled
+        with self.assertRaisesRegex(CommandError, 'NotifyCredentialsConfig is disabled.*'):
+            call_command(Command(), '--start-date', '2017-01-01', '--args-from-database')
