@@ -15,9 +15,9 @@ from celery_utils.persist_on_failure import LoggedPersistOnFailureTask
 from edx_ace import ace
 from edx_ace.message import Message
 from edx_ace.utils.date import deserialize, serialize
+from edx_django_utils.monitoring import set_custom_metric
 from opaque_keys.edx.keys import CourseKey
 
-from openedx.core.djangoapps.monitoring_utils import set_custom_metric
 from openedx.core.djangoapps.schedules import message_types
 from openedx.core.djangoapps.schedules.models import Schedule, ScheduleConfig
 from openedx.core.djangoapps.schedules import resolvers

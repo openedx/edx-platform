@@ -235,7 +235,7 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         (None, 'no_token_type_supplied'),
     )
     @ddt.unpack
-    @patch('openedx.core.djangoapps.monitoring_utils.set_custom_metric')
+    @patch('edx_django_utils.monitoring.set_custom_metric')
     def test_access_token_metrics(self, token_type, expected_token_type, mock_set_custom_metric):
         response = self._post_request(self.user, self.dot_app, token_type=token_type)
         self.assertEqual(response.status_code, 200)
@@ -245,7 +245,7 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         ]
         mock_set_custom_metric.assert_has_calls(expected_calls, any_order=True)
 
-    @patch('openedx.core.djangoapps.monitoring_utils.set_custom_metric')
+    @patch('edx_django_utils.monitoring.set_custom_metric')
     def test_access_token_metrics_for_bad_request(self, mock_set_custom_metric):
         grant_type = dot_models.Application.GRANT_PASSWORD
         invalid_body = {
@@ -596,13 +596,13 @@ class TestViewDispatch(TestCase):
         ]
         mock_set_custom_metric.assert_has_calls(expected_calls, any_order=True)
 
-    @patch('openedx.core.djangoapps.monitoring_utils.set_custom_metric')
+    @patch('edx_django_utils.monitoring.set_custom_metric')
     def test_dispatching_post_to_dot(self, mock_set_custom_metric):
         request = self._post_request('dot-id')
         self.assertEqual(self.view.select_backend(request), self.dot_adapter.backend)
         self._verify_oauth_metrics_calls(mock_set_custom_metric, 'dot')
 
-    @patch('openedx.core.djangoapps.monitoring_utils.set_custom_metric')
+    @patch('edx_django_utils.monitoring.set_custom_metric')
     def test_dispatching_post_to_dop(self, mock_set_custom_metric):
         request = self._post_request('dop-id')
         self.assertEqual(self.view.select_backend(request), self.dop_adapter.backend)

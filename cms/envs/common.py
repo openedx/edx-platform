@@ -472,12 +472,12 @@ XQUEUE_INTERFACE = {
 MIDDLEWARE_CLASSES = [
     'crum.CurrentRequestUserMiddleware',
 
-    # Clears request cache. This is a safer request cache.
-    'edx_django_utils.cache.middleware.RequestCacheMiddleware',
-
+    # Deprecated, but well entrenched RequestCache
     'openedx.core.djangoapps.request_cache.middleware.RequestCache',
 
-    'openedx.core.djangoapps.monitoring_utils.middleware.MonitoringMemoryMiddleware',
+    # A newer and safer request cache.
+    'edx_django_utils.cache.middleware.RequestCacheMiddleware',
+    'edx_django_utils.monitoring.middleware.MonitoringMemoryMiddleware',
 
     'openedx.core.djangoapps.header_control.middleware.HeaderControlMiddleware',
     'django.middleware.cache.UpdateCacheMiddleware',

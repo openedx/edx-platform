@@ -8,12 +8,11 @@ from django.contrib.auth.models import User
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.urls import reverse
 from django.db.models import F, Q
-
 from edx_ace.recipient_resolver import RecipientResolver
 from edx_ace.recipient import Recipient
+from edx_django_utils.monitoring import function_trace, set_custom_metric
 
 from courseware.date_summary import verified_upgrade_deadline_link, verified_upgrade_link_is_valid
-from openedx.core.djangoapps.monitoring_utils import function_trace, set_custom_metric
 from openedx.core.djangoapps.schedules.content_highlights import get_week_highlights
 from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExist
 from openedx.core.djangoapps.schedules.models import Schedule, ScheduleExperience
