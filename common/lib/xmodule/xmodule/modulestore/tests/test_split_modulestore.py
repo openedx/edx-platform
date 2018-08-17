@@ -8,6 +8,7 @@ from path import Path as path
 import random
 import re
 import unittest
+import os
 import uuid
 
 import ddt
@@ -53,9 +54,9 @@ class SplitModuleTest(unittest.TestCase):
     # Snippets of what would be in the django settings envs file
     DOC_STORE_CONFIG = {
         'host': MONGO_HOST,
-        'db': 'test_xmodule',
+        'db': 'test_xmodule_{0}'.format(os.getpid()),
         'port': MONGO_PORT_NUM,
-        'collection': 'modulestore{0}'.format(uuid.uuid4().hex[:5]),
+        'collection': 'modulestore',
     }
     modulestore_options = {
         'default_class': 'xmodule.raw_module.RawDescriptor',

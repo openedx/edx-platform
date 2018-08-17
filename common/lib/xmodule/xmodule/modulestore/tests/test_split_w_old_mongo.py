@@ -2,7 +2,7 @@ import datetime
 import random
 import unittest
 import uuid
-
+import os
 import mock
 import pytest
 
@@ -35,7 +35,8 @@ class SplitWMongoCourseBootstrapper(unittest.TestCase):
     db_config = {
         'host': MONGO_HOST,
         'port': MONGO_PORT_NUM,
-        'db': 'test_xmodule',
+        'db': 'test_xmodule_{}'.format(os.getpid()),
+        'collection': 'modulestore'
     }
 
     modulestore_options = {
@@ -48,8 +49,6 @@ class SplitWMongoCourseBootstrapper(unittest.TestCase):
     split_course_key = CourseLocator('test_org', 'test_course', 'runid', branch=ModuleStoreEnum.BranchName.draft)
 
     def setUp(self):
-        self.db_config['collection'] = 'modulestore{0}'.format(uuid.uuid4().hex[:5])
-
         self.user_id = random.getrandbits(32)
         super(SplitWMongoCourseBootstrapper, self).setUp()
         self.split_mongo = SplitMongoModuleStore(
