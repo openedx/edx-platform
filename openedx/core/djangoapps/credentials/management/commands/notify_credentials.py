@@ -236,8 +236,7 @@ class Command(BaseCommand):
             try:
                 course_keys.append(CourseKey.from_string(course_id))
             except InvalidKeyError:
-                log.fatal("%s is not a parseable CourseKey", course_id)
-                sys.exit(1)
+                log.error("%s is not a parseable CourseKey", course_id)
 
         return course_keys
 
