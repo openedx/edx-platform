@@ -37,6 +37,8 @@ from track.event_transaction_utils import (
     get_event_transaction_id
 )
 
+from common.lib.mandrill_client.client import MandrillClient
+
 log = logging.getLogger(__name__)
 
 
@@ -147,7 +149,20 @@ def enroll_email(course_id, student_email, auto_enroll=False, email_students=Fal
         if email_students:
             email_params['message'] = 'allowed_enroll'
             email_params['email_address'] = student_email
-            send_mail_to_student(student_email, email_params, language=language)
+
+            email_context = {
+                'course_name': email_params['display_name'],
+                'site_name': email_params['site_name'],
+                'registration_url': email_params['registration_url'],
+                'email_address': student_email,
+
+            }
+
+            MandrillClient().send_mail(
+                MandrillClient.COURSE_INVITATION_ONLY_REGISTER_TEMPLATE,
+                student_email,
+                email_context
+            )
 
     after_state = EmailEnrollmentState(course_id, student_email)
 
