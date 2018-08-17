@@ -108,3 +108,22 @@ class CredentialsApiConfig(ConfigurationModel):
     def is_cache_enabled(self):
         """Whether responses from the Credentials API will be cached."""
         return self.cache_ttl > 0
+
+
+class NotifyCredentialsConfig(ConfigurationModel):
+    """
+    Manages configuration for a run of the notify_credentials management command.
+    """
+
+    class Meta(object):
+        app_label = 'credentials'
+        verbose_name = 'notify_credentials argument'
+
+    arguments = models.TextField(
+        blank=True,
+        help_text='Useful for manually running a Jenkins job. Specify like "--start-date=2018 --courses A B".',
+        default='',
+    )
+
+    def __unicode__(self):
+        return unicode(self.arguments)
