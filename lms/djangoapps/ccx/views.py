@@ -199,6 +199,8 @@ def create_ccx(request, course, ccx=None):
 
     # Enforce a static limit for the maximum amount of students that can be enrolled
     override_field_for_ccx(ccx, course, 'max_student_enrollments_allowed', settings.CCX_MAX_STUDENTS_ALLOWED)
+    # Save display name explicitly
+    override_field_for_ccx(ccx, course, 'display_name', name)
 
     # Hide anything that can show up in the schedule
     hidden = 'visible_to_staff_only'
