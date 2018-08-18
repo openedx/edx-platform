@@ -142,7 +142,7 @@ def enroll_email(course_id, student_email, auto_enroll=False, email_students=Fal
             email_params['message'] = 'enrolled_enroll'
             email_params['email_address'] = student_email
             email_params['full_name'] = previous_state.full_name
-            send_mail_to_student(student_email, email_params, language=language)
+            # send_mail_to_student(student_email, email_params, language=language)
     else:
         cea, _ = CourseEnrollmentAllowed.objects.get_or_create(course_id=course_id, email=student_email)
         cea.auto_enroll = auto_enroll
