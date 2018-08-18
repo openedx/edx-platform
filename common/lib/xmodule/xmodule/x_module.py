@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import sys
@@ -876,6 +877,24 @@ class XModule(HTMLSnippet, XModuleMixin):
                 request_post[key] = map(FileObjForWebobFiles, request.POST.getall(key))
 
         response_data = self.handle_ajax(suffix, request_post)
+        log.info('}}}}}}')
+        log.info(response_data)
+        log.info(type(response_data))
+
+        from lms.djangoapps.philu_api.helpers import get_course_custom_settings
+        course_custom_settings = get_course_custom_settings(self.runtime.course_id)
+        current_user_role = self.runtime.get_user_role()
+
+        if not course_custom_settings.show_grades and current_user_role not in ["staff", 'instructor']:
+            response_data = json.loads(response_data)
+            response_data['total_possible'] = 0
+            response_data['current_score'] = 0
+            response_data['progress_changed'] = True
+            response_data = json.dumps(response_data)
+
+        log.info('}}}}{{{}}')
+        log.info(response_data)
+
         return Response(response_data, content_type='application/json')
 
     def get_child(self, usage_id):

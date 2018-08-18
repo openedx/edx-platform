@@ -121,6 +121,16 @@ class CapaModule(CapaMixin, XModule):
         after_attempts = self.attempts
         progress_changed = (after != before) or (after_attempts != before_attempts)
         curr_score, total_possible = (after.frac() if after else (0, 0))
+
+        from lms.djangoapps.philu_api.helpers import get_course_custom_settings
+        course_custom_settings = get_course_custom_settings(self.runtime.course_id)
+        current_user_role = self.runtime.get_user_role()
+
+        if not course_custom_settings.show_grades and current_user_role not in ["staff", 'instructor']:
+            total_possible = 0
+            curr_score = 0
+            progress_changed = True
+
         result.update({
             'progress_changed': progress_changed,
             'current_score': curr_score,
