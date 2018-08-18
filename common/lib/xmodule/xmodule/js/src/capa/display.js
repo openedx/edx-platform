@@ -216,6 +216,8 @@
             attemptsUsed = this.el.data('attempts-used');
             graded = this.el.data('graded');
 
+            var showGrades = $('.show-grades-el-hidden').length;
+
             if (curScore === undefined || totalScore === undefined) {
                 progress = '';
             } else if (attemptsUsed === 0 || totalScore === 0) {
@@ -258,7 +260,13 @@
                     }, true
                 );
             }
-            return this.$('.problem-progress').text(progress);
+
+            if (showGrades) {
+                return this.$('.problem-progress').text(progress);
+            } else {
+                return this.$('.problem-progress').text("");
+            }
+
         };
 
         Problem.prototype.updateProgress = function(response) {
