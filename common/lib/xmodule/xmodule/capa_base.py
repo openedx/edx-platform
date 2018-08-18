@@ -754,32 +754,44 @@ class CapaMixin(CapaFields):
 
             # Build the notification message based on the notification type and translate it.
             ungettext = self.runtime.service(self, "i18n").ungettext
-            if answer_notification_type == 'incorrect':
-                if progress is not None:
-                    answer_notification_message = ungettext(
-                        "Incorrect ({progress} point)",
-                        "Incorrect ({progress} points)",
-                        progress.frac()[1]
-                    ).format(progress=str(progress))
-                else:
+
+            from lms.djangoapps.philu_api.helpers import get_course_custom_settings
+            course_custom_settings = get_course_custom_settings(self.runtime.course_id)
+            current_user_role = self.runtime.get_user_role()
+            if course_custom_settings.show_grades or current_user_role in ["staff", 'instructor']:
+                if answer_notification_type == 'incorrect':
+                    if progress is not None:
+                        answer_notification_message = ungettext(
+                            "Incorrect ({progress} point)",
+                            "Incorrect ({progress} points)",
+                            progress.frac()[1]
+                        ).format(progress=str(progress))
+                    else:
+                        answer_notification_message = _('Incorrect')
+                elif answer_notification_type == 'correct':
+                    if progress is not None:
+                        answer_notification_message = ungettext(
+                            "Correct ({progress} point)",
+                            "Correct ({progress} points)",
+                            progress.frac()[1]
+                        ).format(progress=str(progress))
+                    else:
+                        answer_notification_message = _('Correct')
+                elif answer_notification_type == 'partially-correct':
+                    if progress is not None:
+                        answer_notification_message = ungettext(
+                            "Partially correct ({progress} point)",
+                            "Partially correct ({progress} points)",
+                            progress.frac()[1]
+                        ).format(progress=str(progress))
+                    else:
+                        answer_notification_message = _('Partially Correct')
+            elif answer_notification_type in ['correct', 'incorrect', 'partially-correct']:
+                if answer_notification_type == 'incorrect':
                     answer_notification_message = _('Incorrect')
-            elif answer_notification_type == 'correct':
-                if progress is not None:
-                    answer_notification_message = ungettext(
-                        "Correct ({progress} point)",
-                        "Correct ({progress} points)",
-                        progress.frac()[1]
-                    ).format(progress=str(progress))
-                else:
+                elif answer_notification_type == 'correct':
                     answer_notification_message = _('Correct')
-            elif answer_notification_type == 'partially-correct':
-                if progress is not None:
-                    answer_notification_message = ungettext(
-                        "Partially correct ({progress} point)",
-                        "Partially correct ({progress} points)",
-                        progress.frac()[1]
-                    ).format(progress=str(progress))
-                else:
+                elif answer_notification_type == 'partially-correct':
                     answer_notification_message = _('Partially Correct')
 
         return answer_notification_type, answer_notification_message
