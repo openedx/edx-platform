@@ -7,6 +7,7 @@ from edxmako.shortcuts import render_to_response
 from openedx.features.course_card.models import CourseCard
 from django.views.decorators.csrf import csrf_exempt
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from student.models import CourseEnrollment
 
 utc = pytz.UTC
 
@@ -44,7 +45,13 @@ def get_course_cards(request):
 
     date_time_format = '%b %-d, %Y'
 
+    filtered_courses = []
+
     for course in courses_list:
+
+        if course.invitation_only and not CourseEnrollment.is_enrolled(request.user, course.id) :
+            continue
+
         course.start_date = None
         course_rerun_states = [crs.course_key for crs in CourseRerunState.objects.filter(
             source_course_key=course.id, action="rerun", state="succeeded")]
@@ -76,11 +83,13 @@ def get_course_cards(request):
         if user_current_enrolled_class:
             course.is_enrolled = True
             course.course_target = current_enrolled_class_target
+        
+        filtered_courses.append(course)
 
     return render_to_response(
         "course_card/courses.html",
         {
-            'courses': courses_list
+            'courses': filtered_courses
         }
     )
 
