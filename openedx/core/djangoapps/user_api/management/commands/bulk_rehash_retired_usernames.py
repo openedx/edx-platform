@@ -50,20 +50,10 @@ class Command(BaseCommand):
                 settings.RETIRED_USER_SALTS,
                 settings.RETIRED_USERNAME_FMT
             )
-            # Sanity check:
-            if retirement.user.username != old_retired_username:
-                print(
-                    'WARNING: Skipping UserRetirementStatus ID {} / User ID {} because the user does not appear to '
-                    'have a retired username: {} != {}.'.format(
-                        retirement.id,
-                        retirement.user.id,
-                        retirement.user.username,
-                        old_retired_username
-                    )
-                )
+
             # If the original username was already normalized (or all lowercase), the old and new hashes would
             # match:
-            elif old_retired_username == new_retired_username:
+            if old_retired_username == new_retired_username:
                 print(
                     'Skipping UserRetirementStatus ID {} / User ID {} because the hash would not change.'.format(
                         retirement.id,
@@ -88,12 +78,26 @@ class Command(BaseCommand):
                         # as the local db updates and can be slow, so keeping it
                         # outside to cut down on potential deadlocks.
                         cc_user = comment_client.User.from_django_user(retirement.user)
-                        cc_user.retire(new_retired_username)
+
+                        # The user may not exist in forums, if it doesn't that's not
+                        # an error.
+                        try:
+                            cc_user.retire(new_retired_username)
+                        except comment_client.utils.CommentClientRequestError as e:
+                            if e.status_code != 404:
+                                print(
+                                    'UserRetirementStatus ID {} User ID {} failed to rename in forums: {}'.format(
+                                        retirement.id, retirement.user.id, text_type(e)
+                                    )
+                                )
+                                raise
 
                         # Update and save both the user table and retirement queue table:
                         with transaction.atomic():
-                            retirement.user.username = new_retired_username
-                            retirement.user.save()
+                            # Only rename them in auth_user if they've already been retired
+                            if retirement.user.username == old_retired_username:
+                                retirement.user.username = new_retired_username
+                                retirement.user.save()
                             retirement.retired_username = new_retired_username
                             retirement.save()
                     except Exception as exc:  # pylint: disable=broad-except
