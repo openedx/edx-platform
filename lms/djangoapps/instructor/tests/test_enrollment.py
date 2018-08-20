@@ -14,6 +14,7 @@ from django.utils.translation import get_language
 from mock import patch
 from opaque_keys.edx.locator import CourseLocator
 from six import text_type
+from crum import set_current_request
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from courseware.models import StudentModule
@@ -540,6 +541,11 @@ class TestStudentModuleGrading(SharedModuleStoreTestCase):
         cls.request = get_mock_request(UserFactory())
         cls.user = cls.request.user
         cls.instructor = UserFactory(username='staff', is_staff=True)
+
+    @classmethod
+    def tearDownClass(cls):
+        super(TestStudentModuleGrading, cls).tearDownClass()
+        set_current_request(None)
 
     def _get_subsection_grade_and_verify(self, all_earned, all_possible, graded_earned, graded_possible):
         """

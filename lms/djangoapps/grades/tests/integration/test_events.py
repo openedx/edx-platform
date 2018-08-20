@@ -3,6 +3,7 @@ Test grading events across apps.
 """
 
 from mock import call as mock_call, patch
+from crum import set_current_request
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
@@ -66,6 +67,7 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
     def setUp(self):
         self.reset_course()
         super(GradesEventIntegrationTest, self).setUp()
+        self.addCleanup(set_current_request, None)
         self.request = get_mock_request(UserFactory())
         self.student = self.request.user
         self.client.login(username=self.student.username, password="test")

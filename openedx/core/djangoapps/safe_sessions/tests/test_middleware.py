@@ -9,6 +9,7 @@ from django.http import HttpResponse, HttpResponseRedirect, SimpleCookie
 from django.test import TestCase
 from django.test.utils import override_settings
 from mock import patch
+from crum import set_current_request
 
 from openedx.core.djangolib.testing.utils import get_mock_request
 
@@ -27,6 +28,7 @@ class TestSafeSessionProcessRequest(TestSafeSessionsLogMixin, TestCase):
     def setUp(self):
         super(TestSafeSessionProcessRequest, self).setUp()
         self.user = UserFactory.create()
+        self.addCleanup(set_current_request, None)
         self.request = get_mock_request()
 
     def assert_response(self, safe_cookie_data=None, success=True):
@@ -130,6 +132,7 @@ class TestSafeSessionProcessResponse(TestSafeSessionsLogMixin, TestCase):
     def setUp(self):
         super(TestSafeSessionProcessResponse, self).setUp()
         self.user = UserFactory.create()
+        self.addCleanup(set_current_request, None)
         self.request = get_mock_request()
         self.request.session = {}
         self.client.response = HttpResponse()
@@ -235,6 +238,7 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
     def setUp(self):
         super(TestSafeSessionMiddleware, self).setUp()
         self.user = UserFactory.create()
+        self.addCleanup(set_current_request, None)
         self.request = get_mock_request()
         self.client.response = HttpResponse()
         self.client.response.cookies = SimpleCookie()

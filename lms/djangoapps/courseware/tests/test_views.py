@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 from HTMLParser import HTMLParser
 from urllib import quote, urlencode
 from uuid import uuid4
+from crum import set_current_request
 
 from completion.test_utils import CompletionWaffleTestMixin
 import ddt
@@ -1875,6 +1876,7 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
             self.course,
             depth=2
         )
+        self.addCleanup(set_current_request, None)
         # pylint: disable=protected-access
         module = get_module(
             self.user,

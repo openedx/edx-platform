@@ -3,6 +3,7 @@ Milestone related tests for the mobile_api
 """
 from django.conf import settings
 from mock import patch
+from crum import set_current_request
 
 from courseware.access_response import MilestoneAccessError
 from courseware.tests.test_entrance_exam import add_entrance_exam_milestone, answer_entrance_exam_problem
@@ -75,6 +76,7 @@ class MobileAPIMilestonesMixin(object):
         """
         Tests access when user has passed the entrance exam
         """
+        self.addCleanup(set_current_request, None)
         self._add_entrance_exam()
         self._pass_entrance_exam()
         self.init_course_access()
