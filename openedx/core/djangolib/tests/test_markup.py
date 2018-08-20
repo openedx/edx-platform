@@ -27,7 +27,7 @@ class FormatHtmlTest(unittest.TestCase):
         (u"<a>нтмℓ-єѕ¢αρє∂</a>", u"&lt;a&gt;нтмℓ-єѕ¢αρє∂&lt;/a&gt;"),
     )
     def test_simple(self, (before, after)):
-        self.assertEqual(unicode(Text(_(before))), after)  # pylint: disable=translation-of-non-string
+        self.assertEqual(unicode(Text(_(before))), after)
         self.assertEqual(unicode(Text(before)), after)
 
     def test_formatting(self):

@@ -180,7 +180,7 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
         self.assertEqual(gating_api.get_gated_content(self.course, staff), [])
         self.assertEqual(gating_api.get_gated_content(self.course, student), [unicode(self.seq2.location)])
 
-        milestones_api.add_user_milestone({'id': student.id}, milestone)  # pylint: disable=no-member
+        milestones_api.add_user_milestone({'id': student.id}, milestone)
 
         self.assertEqual(gating_api.get_gated_content(self.course, student), [])
 

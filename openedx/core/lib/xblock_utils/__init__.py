@@ -62,7 +62,7 @@ def wrap_xblock(
         block,
         view,
         frag,
-        context,                        # pylint: disable=unused-argument
+        context,
         usage_id_serializer,
         request_token,                  # pylint: disable=redefined-outer-name
         display_name_only=False,

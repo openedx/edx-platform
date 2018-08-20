@@ -34,7 +34,7 @@ class StaffViewTest(UniqueCourseTest):
             self.course_info['run'], self.course_info['display_name']
         )
 
-        self.populate_course_fixture(self.course_fixture)  # pylint: disable=no-member
+        self.populate_course_fixture(self.course_fixture)
 
         self.course_fixture.install()
 

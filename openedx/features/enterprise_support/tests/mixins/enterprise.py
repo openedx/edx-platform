@@ -264,7 +264,7 @@ class EnterpriseTestConsentRequired(SimpleTestCase):
         while(response.status_code == 302 and 'grant_data_sharing_permissions' not in response.url):
             response = client.get(response.url)
         self.assertEqual(response.status_code, 302)
-        self.assertIn('grant_data_sharing_permissions', response.url)  # pylint: disable=no-member
+        self.assertIn('grant_data_sharing_permissions', response.url)
 
         # Ensure that when consent is not necessary, the user continues through to the requested page.
         mock_consent_necessary.return_value = False
@@ -273,5 +273,5 @@ class EnterpriseTestConsentRequired(SimpleTestCase):
 
         # If we were expecting a redirect, ensure it's not to the data sharing permission page
         if status_code == 302:
-            self.assertNotIn('grant_data_sharing_permissions', response.url)  # pylint: disable=no-member
+            self.assertNotIn('grant_data_sharing_permissions', response.url)
         return response

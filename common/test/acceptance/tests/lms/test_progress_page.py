@@ -42,7 +42,7 @@ class ProgressPageBaseTest(UniqueCourseTest):
     def setUp(self):
         super(ProgressPageBaseTest, self).setUp()
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
-        self.problem_page = ProblemPage(self.browser)  # pylint: disable=attribute-defined-outside-init
+        self.problem_page = ProblemPage(self.browser)
         self.progress_page = ProgressPage(self.browser, self.course_id)
         self.logout_page = LogoutPage(self.browser)
 

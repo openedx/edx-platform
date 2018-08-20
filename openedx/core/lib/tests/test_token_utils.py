@@ -40,7 +40,7 @@ class TestJwtBuilder(mixins.AccessTokenMixin, TestCase):
         """
         Verify that token construction succeeds if the UserProfile is missing.
         """
-        self.profile.delete()  # pylint: disable=no-member
+        self.profile.delete()
 
         scopes = ['profile']
         token = JwtBuilder(self.user).build_token(scopes, self.expires_in)

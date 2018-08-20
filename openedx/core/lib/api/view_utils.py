@@ -151,7 +151,7 @@ def build_api_error(message, **kwargs):
     """
     return {
         'developer_message': message.format(**kwargs),
-        'user_message': _(message).format(**kwargs),  # pylint: disable=translation-of-non-string
+        'user_message': _(message).format(**kwargs),
     }
 
 

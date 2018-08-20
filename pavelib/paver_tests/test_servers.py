@@ -199,7 +199,6 @@ class TestPaverServerTasks(PaverTestCase):
             ]
         )
 
-    # pylint: disable=too-many-statements
     def verify_server_task(self, task_name, options, contracts_default=False):
         """
         Verify the output of a server task.

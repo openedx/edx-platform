@@ -146,7 +146,7 @@ class EnterpriseApiClient(object):
             'course_id': course_id,
             'consent_granted': consent_granted,
         }
-        endpoint = getattr(self.client, 'enterprise-course-enrollment')  # pylint: disable=literal-used-as-attribute
+        endpoint = getattr(self.client, 'enterprise-course-enrollment')
         try:
             endpoint.post(data=data)
         except (HttpClientError, HttpServerError):

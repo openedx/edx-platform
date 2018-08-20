@@ -29,7 +29,6 @@ class AccountSettingsTestMixin(EventsTestMixin, AcceptanceTest):
         Visit the account settings page for the current user, and store the page instance
         as self.account_settings_page.
         """
-        # pylint: disable=attribute-defined-outside-init
         self.account_settings_page = AccountSettingsPage(self.browser)
         self.account_settings_page.visit()
         self.account_settings_page.wait_for_ajax()
