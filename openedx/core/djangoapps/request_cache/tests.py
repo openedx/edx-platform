@@ -6,7 +6,7 @@ from celery.task import task
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
-from mock import Mock
+from mock import patch, Mock
 
 from openedx.core.djangoapps.request_cache import get_request_or_stub
 from openedx.core.djangoapps.request_cache.middleware import RequestCache, request_cached
