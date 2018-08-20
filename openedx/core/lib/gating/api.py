@@ -91,7 +91,7 @@ def gating_enabled(default=None):
         otherwise the result of the decorated function
     """
     def wrap(f):  # pylint: disable=missing-docstring
-        def function_wrapper(course, *args):  # pylint: disable=missing-docstring
+        def function_wrapper(course, *args):
             if not course.enable_subsection_gating:
                 return default
             return f(course, *args)

@@ -5,7 +5,7 @@ import datetime
 import ddt
 import mock
 
-from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
+from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.certificates.api import is_passing_status
 from lms.envs.test import CREDENTIALS_PUBLIC_SERVICE_URL
 from course_modes.models import CourseMode

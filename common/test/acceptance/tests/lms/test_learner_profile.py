@@ -79,7 +79,7 @@ class LearnerProfileTestMixin(EventsTestMixin):
 
         # Reset event tracking so that the tests only see events from
         # loading the profile page.
-        self.start_time = datetime.now()  # pylint: disable=attribute-defined-outside-init
+        self.start_time = datetime.now()
 
         # Load the page
         profile_page.visit()

@@ -54,7 +54,6 @@ class TestDone(XBlockTestCase):
         """
         resp = self.ajax('toggle_button', block, data)
         self.assertEqual(resp.status_code, 200)
-        # pylint: disable=no-member
         self.assertEqual(resp.data, {"state": desired_state})
 
     # pylint: disable=unused-argument

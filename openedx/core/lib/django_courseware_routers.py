@@ -15,7 +15,7 @@ class StudentModuleHistoryExtendedRouter(object):
         Return True if ``model`` is courseware.StudentModuleHistoryExtended.
         """
         return (
-            model._meta.app_label == 'coursewarehistoryextended' and  # pylint: disable=protected-access
+            model._meta.app_label == 'coursewarehistoryextended' and
             model.__name__ == 'StudentModuleHistoryExtended'
         )
 

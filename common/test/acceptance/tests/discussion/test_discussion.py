@@ -414,7 +414,7 @@ class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePa
             Response(id="response1"),
             [Comment(id="comment1")])
         thread_fixture.push()
-        self.setup_thread_page(thread.get("id"))  # pylint: disable=no-member
+        self.setup_thread_page(thread.get("id"))
 
         # Verify that `Add a Post` is not visible on course tab nav.
         self.assertFalse(self.tab_nav.has_new_post_button_visible_on_tab())

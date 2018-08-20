@@ -38,7 +38,7 @@ class CourseOutlineItem(object):
         # Check for the existence of a locator so that errors when navigating to the course outline page don't show up
         # as errors in the repr method instead.
         try:
-            return "{}(<browser>, {!r})".format(self.__class__.__name__, self.locator)  # pylint: disable=no-member
+            return "{}(<browser>, {!r})".format(self.__class__.__name__, self.locator)
         except AttributeError:
             return "{}(<browser>)".format(self.__class__.__name__)
 
@@ -1179,7 +1179,7 @@ class SubsectionOutlineModal(CourseOutlineModal):
         return self.find_css('input[name=content-visibility]:checked').first.attrs('value')[0]
 
     @is_explicitly_locked.setter
-    def is_explicitly_locked(self, value):  # pylint: disable=arguments-differ
+    def is_explicitly_locked(self, value):
         """
         Override - sets visibility to staff_only if True, else 'visible'.
 

@@ -67,7 +67,7 @@ class BookmarksTestMixin(EventsTestMixin, UniqueCourseTest):
         Arguments:
             num_chapters: number of chapters to create
         """
-        self.course_fixture = CourseFixture(  # pylint: disable=attribute-defined-outside-init
+        self.course_fixture = CourseFixture(
             self.course_info['org'], self.course_info['number'],
             self.course_info['run'], self.course_info['display_name']
         )

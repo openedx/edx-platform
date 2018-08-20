@@ -921,7 +921,6 @@ class TeamFormActions(TeamsTabBase):
 
     def verify_and_navigate_to_edit_team_page(self):
         """Navigates to the edit team page and verifies."""
-        # pylint: disable=no-member
         self.assertEqual(self.team_page.team_name, self.team['name'])
         self.assertTrue(self.team_page.edit_team_button_present)
 
@@ -942,7 +941,6 @@ class TeamFormActions(TeamsTabBase):
 
     def verify_team_info(self, name, description, location, language):
         """Verify the team information on team page."""
-        # pylint: disable=no-member
         self.assertEqual(self.team_page.team_name, name)
         self.assertEqual(self.team_page.team_description, description)
         self.assertEqual(self.team_page.team_location, location)

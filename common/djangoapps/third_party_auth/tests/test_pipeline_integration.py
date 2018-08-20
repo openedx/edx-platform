@@ -345,7 +345,6 @@ class UserDetailsForceSyncTestCase(testutil.TestCase, test.TestCase):
 
     def setUp(self):
         super(UserDetailsForceSyncTestCase, self).setUp()
-        # pylint: disable=attribute-defined-outside-init
         self.user = UserFactory.create()
         self.old_email = self.user.email
         self.old_username = self.user.username

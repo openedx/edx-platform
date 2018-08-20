@@ -1,4 +1,3 @@
-# pylint: disable=no-member
 """
 Tests for the Third Party Auth REST API
 """
