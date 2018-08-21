@@ -62,7 +62,7 @@ class XBlockCacheTaskTests(BookmarksTestsBase):
             ],
         }
 
-        self.other_course_expected_cache_data = {  # pylint: disable=invalid-name
+        self.other_course_expected_cache_data = {
             self.other_course.location: [
                 [],
             ], self.other_chapter_1.location: [

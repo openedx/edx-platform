@@ -1,7 +1,7 @@
-# pylint:disable=missing-docstring,no-member
+# pylint:disable=missing-docstring
 import datetime
 import json
-import uuid  # pylint:disable=unused-import
+import uuid
 
 from django.contrib.auth.models import User
 import factory
@@ -76,7 +76,6 @@ class CreditRequestFactory(factory.DjangoModelFactory):
             user = User.objects.get(username=obj.username)
             user_profile = user.profile
 
-            # pylint:disable=access-member-before-definition
             obj.parameters = json.dumps({
                 "request_uuid": obj.uuid,
                 "timestamp": to_timestamp(datetime.datetime.now(pytz.UTC)),

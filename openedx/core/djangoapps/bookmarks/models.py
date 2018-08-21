@@ -100,7 +100,7 @@ class Bookmark(TimeStampedModel):
         """
         Return the resource id: {username,usage_id}.
         """
-        return u"{0},{1}".format(self.user.username, self.usage_key)  # pylint: disable=no-member
+        return u"{0},{1}".format(self.user.username, self.usage_key)
 
     @property
     def display_name(self):
@@ -174,7 +174,7 @@ class Bookmark(TimeStampedModel):
 
             path_data = []
             for ancestor_usage_key in path:
-                if ancestor_usage_key != usage_key and ancestor_usage_key.block_type != 'course':  # pylint: disable=no-member
+                if ancestor_usage_key != usage_key and ancestor_usage_key.block_type != 'course':
                     try:
                         block = modulestore().get_item(ancestor_usage_key)
                     except ItemNotFoundError:

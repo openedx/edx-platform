@@ -42,7 +42,7 @@ def _directory_name(data_usage_key):
     )
 
 
-def _path_name(bs_model, filename):  # pylint:disable=unused-argument
+def _path_name(bs_model, _filename):
     """
     Returns path name to use for the given
     BlockStructureModel instance.

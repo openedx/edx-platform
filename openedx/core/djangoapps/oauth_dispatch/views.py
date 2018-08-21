@@ -33,7 +33,6 @@ class _DispatchingView(View):
     behavior routes based on client_id, but this can be overridden by redefining
     `select_backend()` if particular views need different behavior.
     """
-    # pylint: disable=no-member
 
     dot_adapter = adapters.DOTAdapter()
     dop_adapter = adapters.DOPAdapter()

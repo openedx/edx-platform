@@ -32,7 +32,7 @@ class BookmarkApiEventTestMixin(object):
         """
         Assert no events were emitted.
         """
-        self.assertFalse(mock_tracker.called)  # pylint: disable=maybe-no-member
+        self.assertFalse(mock_tracker.called)
 
 
 @ddt.ddt
@@ -110,7 +110,7 @@ class BookmarksAPITests(BookmarkApiEventTestMixin, BookmarksTestsBase):
         with self.assertNumQueries(1):
             bookmarks = api.get_bookmarks(user=self.user, course_key=course.id, serialized=False)
             self.assertEqual(len(bookmarks), count)
-        self.assertIs(bookmarks.model, Bookmark)  # pylint: disable=no-member
+        self.assertIs(bookmarks.model, Bookmark)
 
     @patch('openedx.core.djangoapps.bookmarks.api.tracker.emit')
     def test_create_bookmark(self, mock_tracker):

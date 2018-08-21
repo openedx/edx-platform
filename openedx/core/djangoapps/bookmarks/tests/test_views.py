@@ -174,7 +174,7 @@ class BookmarksListViewTests(BookmarksViewsTestsBase):
         bookmarks_data = response.data['results']
 
         self.assertEqual(len(bookmarks_data), 0)
-        self.assertFalse(mock_tracker.emit.called)  # pylint: disable=maybe-no-member
+        self.assertFalse(mock_tracker.emit.called)
 
     @patch('eventtracking.tracker.emit')
     def test_get_all_bookmarks_when_course_id_not_given(self, mock_tracker):

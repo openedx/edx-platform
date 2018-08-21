@@ -145,7 +145,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         self.client.logout()
         resp = self.client.get(url_unlocked_versioned_old)
         self.assertEqual(resp.status_code, 301)
-        self.assertTrue(resp.url.endswith(self.url_unlocked_versioned))  # pylint: disable=no-member
+        self.assertTrue(resp.url.endswith(self.url_unlocked_versioned))
 
     def test_locked_versioned_asset(self):
         """

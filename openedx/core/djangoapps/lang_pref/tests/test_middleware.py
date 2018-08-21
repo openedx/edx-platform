@@ -36,7 +36,7 @@ class TestUserPreferenceMiddleware(TestCase):
         self.anonymous_user = AnonymousUserFactory()
         self.request = RequestFactory().get('/somewhere')
         self.request.user = self.user
-        self.request.META['HTTP_ACCEPT_LANGUAGE'] = 'ar;q=1.0'  # pylint: disable=no-member
+        self.request.META['HTTP_ACCEPT_LANGUAGE'] = 'ar;q=1.0'
         self.session_middleware.process_request(self.request)
 
     def test_logout_shouldnt_remove_cookie(self):

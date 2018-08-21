@@ -43,19 +43,19 @@ class AccessTokenExchangeBase(APIView):
     def dispatch(self, *args, **kwargs):
         return super(AccessTokenExchangeBase, self).dispatch(*args, **kwargs)
 
-    def get(self, request, _backend):  # pylint: disable=arguments-differ
+    def get(self, request, _backend):
         """
         Pass through GET requests without the _backend
         """
         return super(AccessTokenExchangeBase, self).get(request)
 
-    def post(self, request, _backend):  # pylint: disable=arguments-differ
+    def post(self, request, _backend):
         """
         Handle POST requests to get a first-party access token.
         """
-        form = AccessTokenExchangeForm(request=request, oauth2_adapter=self.oauth2_adapter, data=request.POST)  # pylint: disable=no-member
+        form = AccessTokenExchangeForm(request=request, oauth2_adapter=self.oauth2_adapter, data=request.POST)
         if not form.is_valid():
-            return self.error_response(form.errors)  # pylint: disable=no-member
+            return self.error_response(form.errors)
 
         user = form.cleaned_data["user"]
         scope = form.cleaned_data["scope"]
@@ -69,10 +69,10 @@ class AccessTokenExchangeBase(APIView):
         serialized access token response.
         """
         if constants.SINGLE_ACCESS_TOKEN:
-            edx_access_token = self.get_access_token(request, user, scope, client)  # pylint: disable=no-member
+            edx_access_token = self.get_access_token(request, user, scope, client)
         else:
             edx_access_token = self.create_access_token(request, user, scope, client)
-        return self.access_token_response(edx_access_token)  # pylint: disable=no-member
+        return self.access_token_response(edx_access_token)
 
 
 class DOPAccessTokenExchangeView(AccessTokenExchangeBase, DOPAccessTokenView):
