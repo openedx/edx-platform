@@ -3,7 +3,7 @@ Provides a UserPartition driver for cohorts.
 """
 import logging
 
-from courseware.masquerade import (  # pylint: disable=import-error
+from courseware.masquerade import (
     get_course_masquerade,
     get_masquerading_user_group,
     is_masquerading_as_specific_student
@@ -23,7 +23,6 @@ class CohortPartitionScheme(object):
     Groups.
     """
 
-    # pylint: disable=unused-argument
     @classmethod
     def get_group_for_user(cls, course_key, user, user_partition, use_cached=True):
         """

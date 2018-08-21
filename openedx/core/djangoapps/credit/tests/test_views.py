@@ -2,8 +2,6 @@
 Tests for credit app views.
 """
 
-# pylint: disable=no-member
-
 from __future__ import unicode_literals
 
 import datetime
@@ -141,7 +139,7 @@ class CreditCourseViewSetTests(AuthMixin, UserMixin, TestCase):
 
         # Staff users should have access to the API
         user.is_staff = True
-        user.save()  # pylint: disable=no-member
+        user.save()
         response = self.client.get(self.path)
         self.assertEqual(response.status_code, 200)
 
@@ -163,7 +161,7 @@ class CreditCourseViewSetTests(AuthMixin, UserMixin, TestCase):
 
         # Retrieve a CSRF token
         response = client.get('/')
-        csrf_token = response.cookies[settings.CSRF_COOKIE_NAME].value  # pylint: disable=no-member
+        csrf_token = response.cookies[settings.CSRF_COOKIE_NAME].value
         self.assertGreater(len(csrf_token), 0)
 
         # Ensure POSTs made with the token succeed.
@@ -185,7 +183,7 @@ class CreditCourseViewSetTests(AuthMixin, UserMixin, TestCase):
 
         # Staff users should have access to the API
         user.is_staff = True
-        user.save()  # pylint: disable=no-member
+        user.save()
         response = self.client.get(self.path, **headers)
         self.assertEqual(response.status_code, 200)
 

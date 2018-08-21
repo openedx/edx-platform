@@ -59,7 +59,6 @@ class CourseCohortSettingsFactory(DjangoModelFactory):
     is_cohorted = False
     course_id = CourseLocator("dummy", "dummy", "dummy")
     cohorted_discussions = json.dumps([])
-    # pylint: disable=invalid-name
     always_cohort_inline_discussions = False
 
 

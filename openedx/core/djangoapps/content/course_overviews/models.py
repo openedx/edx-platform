@@ -247,7 +247,7 @@ class CourseOverview(TimeStampedModel):
                     # to save a duplicate.
                     # (see: https://openedx.atlassian.net/browse/TNL-2854).
                     pass
-                except Exception:  # pylint: disable=broad-except
+                except Exception:
                     log.exception(
                         "CourseOverview for course %s failed!",
                         course_id,

@@ -346,7 +346,7 @@ class TestMasqueradedGroup(StaffMasqueradeTestCase):
         """
         Verify that the masquerade works for the specified group id.
         """
-        self.ensure_masquerade_as_group_member(  # pylint: disable=no-member
+        self.ensure_masquerade_as_group_member(
             self.user_partition.id,
             group.id if group is not None else None
         )
@@ -383,7 +383,7 @@ class TestMasqueradedGroup(StaffMasqueradeTestCase):
         group.
         """
         self.course.cohort_config = {'cohorted': True}
-        modulestore().update_item(self.course, self.test_user.id)  # pylint: disable=no-member
+        modulestore().update_item(self.course, self.test_user.id)
         cohort = CohortFactory.create(course_id=self.course.id, users=[self.test_user])
         CourseUserGroupPartitionGroup(
             course_user_group=cohort,

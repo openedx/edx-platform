@@ -1,4 +1,4 @@
-# pylint: disable=missing-docstring,no-member
+# pylint: disable=missing-docstring
 import uuid
 
 from django.http import HttpRequest

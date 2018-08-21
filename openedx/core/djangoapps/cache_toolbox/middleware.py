@@ -104,7 +104,7 @@ class CacheBackedAuthenticationMiddleware(AuthenticationMiddleware):
         try:
             # Try and construct a User instance from data stored in the cache
             session_user_id = SafeSessionMiddleware.get_user_id_from_session(request)
-            request.user = User.get_cached(session_user_id)  # pylint: disable=no-member
+            request.user = User.get_cached(session_user_id)
             if request.user.id != session_user_id:
                 log.error(
                     "CacheBackedAuthenticationMiddleware cached user '%s' does not match requested user '%s'.",

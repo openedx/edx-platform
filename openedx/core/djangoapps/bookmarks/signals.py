@@ -9,7 +9,7 @@ from xmodule.modulestore.django import SignalHandler
 
 
 @receiver(SignalHandler.course_published)
-def trigger_update_xblocks_cache_task(sender, course_key, **kwargs):  # pylint: disable=invalid-name,unused-argument
+def trigger_update_xblocks_cache_task(sender, course_key, **kwargs):  # pylint: disable=unused-argument
     """
     Trigger update_xblocks_cache() when course_published signal is fired.
     """

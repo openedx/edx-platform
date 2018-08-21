@@ -1,4 +1,4 @@
-# pylint: disable=missing-docstring,no-member
+# pylint: disable=missing-docstring
 from unittest import TestCase
 
 from django.test import override_settings

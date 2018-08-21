@@ -131,7 +131,7 @@ class BookmarksTestsBase(ModuleStoreTestCase):
 
             # self.other_vertical_1 has two parents
             self.other_sequential_2.children.append(self.other_vertical_1.location)
-            modulestore().update_item(self.other_sequential_2, self.admin.id)  # pylint: disable=no-member
+            modulestore().update_item(self.other_sequential_2, self.admin.id)
 
         self.other_bookmark_1 = BookmarkFactory.create(
             user=self.user,
@@ -393,7 +393,7 @@ class BookmarkModelTests(BookmarksTestsBase):
 
         # Block is an orphan
         self.other_sequential_1.children = []
-        modulestore().update_item(self.other_sequential_1, self.admin.id)  # pylint: disable=no-member
+        modulestore().update_item(self.other_sequential_1, self.admin.id)
 
         bookmark_data = self.get_bookmark_data(self.other_vertical_2, user=user)
         bookmark, __ = Bookmark.create(bookmark_data)

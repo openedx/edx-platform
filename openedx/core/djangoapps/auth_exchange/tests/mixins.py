@@ -3,8 +3,6 @@ Mixins to facilitate testing OAuth connections to Django-OAuth-Toolkit or
 Django-OAuth2-Provider.
 """
 
-# pylint: disable=protected-access
-
 from unittest import skip, expectedFailure
 from django.test.client import RequestFactory
 
