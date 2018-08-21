@@ -269,7 +269,7 @@ class EmailOptInListTest(ModuleStoreTestCase):
     def test_file_already_exists(self):
         temp_file = tempfile.NamedTemporaryFile(delete=True)
 
-        def _cleanup():  # pylint: disable=missing-docstring
+        def _cleanup():
             temp_file.close()
 
         with self.assertRaisesRegexp(CommandError, "^File already exists"):

@@ -367,7 +367,7 @@ class SafeSessionMiddleware(SessionMiddleware):
                 # conditionally set the log level.
                 log_func = log.debug if request.user.id is None else log.warning
                 log_func(
-                    "SafeCookieData user at request '{0}' does not match user at response: '{1}'".format(  # pylint: disable=logging-format-interpolation
+                    "SafeCookieData user at request '{0}' does not match user at response: '{1}'".format(
                         request.safe_cookie_verified_user_id,
                         request.user.id,
                     ),
@@ -409,7 +409,7 @@ class SafeSessionMiddleware(SessionMiddleware):
         # django 1.8, replace the implementation of this method
         # with:
         # request.session[SESSION_KEY] = user.id
-        request.session[SESSION_KEY] = user._meta.pk.value_to_string(user)  # pylint: disable=protected-access
+        request.session[SESSION_KEY] = user._meta.pk.value_to_string(user)
 
     @staticmethod
     def update_with_safe_session_cookie(cookies, user_id):

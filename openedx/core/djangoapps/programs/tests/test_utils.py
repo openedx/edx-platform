@@ -1,5 +1,4 @@
 """Tests covering Programs utilities."""
-# pylint: disable=no-member
 import datetime
 import json
 import uuid

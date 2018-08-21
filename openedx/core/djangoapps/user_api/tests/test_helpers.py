@@ -268,8 +268,8 @@ class StudentViewShimTest(TestCase):
         response = view(HttpRequest())
         self.assertEqual(response.status_code, 403)
 
-    def _shimmed_view(self, response, check_logged_in=False):  # pylint: disable=missing-docstring
-        def stub_view(request):  # pylint: disable=missing-docstring
+    def _shimmed_view(self, response, check_logged_in=False):
+        def stub_view(request):
             self.captured_request = request
             return response
         return shim_student_view(stub_view, check_logged_in=check_logged_in)

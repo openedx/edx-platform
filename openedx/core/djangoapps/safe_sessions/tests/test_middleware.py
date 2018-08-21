@@ -1,5 +1,3 @@
-# pylint: disable=no-member
-# pylint: disable=protected-access
 """
 Unit tests for SafeSessionMiddleware
 """

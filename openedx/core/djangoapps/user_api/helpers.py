@@ -100,7 +100,7 @@ def require_post_params(required_params):
     """
     def _decorator(func):  # pylint: disable=missing-docstring
         @wraps(func)
-        def _wrapped(*args, **_kwargs):  # pylint: disable=missing-docstring
+        def _wrapped(*args, **_kwargs):
             request = args[0]
             missing_params = set(required_params) - set(request.POST.keys())
             if len(missing_params) > 0:

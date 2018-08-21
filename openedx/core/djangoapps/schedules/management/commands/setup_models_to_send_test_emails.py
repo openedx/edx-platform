@@ -61,7 +61,7 @@ class Command(BaseCommand):
         max_org_sequence_id = max(int(course.org[4:]) for course in courses if course.org.startswith('org.'))
 
         XMODULE_FACTORY_LOCK.enable()
-        CourseFactory.reset_sequence(max_org_sequence_id + 1, force=True)  # pylint: disable=no-member
+        CourseFactory.reset_sequence(max_org_sequence_id + 1, force=True)
         course = CourseFactory.create(
             start=datetime.datetime.today() - datetime.timedelta(days=30),
             end=datetime.datetime.today() + datetime.timedelta(days=30),

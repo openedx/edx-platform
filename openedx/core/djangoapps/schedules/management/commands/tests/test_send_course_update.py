@@ -1,7 +1,6 @@
 """
 Tests for send_course_update management command.
 """
-# pylint: disable=no-member
 import ddt
 from mock import patch, _is_started
 from unittest import skipUnless
@@ -88,7 +87,7 @@ class TestSendCourseUpdate(ScheduleUpsellTestMixin, ScheduleSendEmailTestMixin, 
         enrollment.schedule.save()
 
         with patch.object(tasks, 'ace') as mock_ace:
-            self.task().apply(kwargs=dict(  # pylint: disable=no-value-for-parameter
+            self.task().apply(kwargs=dict(
                 site_id=self.site_config.site.id,
                 target_day_str=serialize(target_day),
                 day_offset=offset,

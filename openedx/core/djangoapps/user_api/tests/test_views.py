@@ -1805,7 +1805,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 "type": "checkbox",
                 "required": True,
                 "errorMessages": {
-                    "required": u"You must agree to the {platform_name} Terms of Service".format(  # pylint: disable=line-too-long
+                    "required": u"You must agree to the {platform_name} Terms of Service".format(
                         platform_name=settings.PLATFORM_NAME
                     )
                 }

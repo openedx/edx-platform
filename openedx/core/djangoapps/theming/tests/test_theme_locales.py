@@ -18,7 +18,7 @@ class TestComprehensiveThemeLocale(TestCase):
         """
         test comprehensive theming paths in settings.
         """
-        self.assertIn(settings.REPO_ROOT / 'themes/conf/locale', settings.LOCALE_PATHS)  # pylint: disable=no-member
+        self.assertIn(settings.REPO_ROOT / 'themes/conf/locale', settings.LOCALE_PATHS)
 
     def test_theme_locale_path_exist(self):
         """

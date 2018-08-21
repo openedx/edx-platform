@@ -45,7 +45,7 @@ class TagsMiddlewareTest(TestCase):
 
     def assertContextSetTo(self, context):
         """Asserts UserTagsEventContextMiddleware.CONTEXT_NAME matches ``context``"""
-        self.tracker.get_tracker.return_value.enter_context.assert_called_with(  # pylint: disable=maybe-no-member
+        self.tracker.get_tracker.return_value.enter_context.assert_called_with(
             UserTagsEventContextMiddleware.CONTEXT_NAME,
             context
         )
@@ -109,7 +109,7 @@ class TagsMiddlewareTest(TestCase):
         self.assertContextSetTo({'course_id': self.course_id, 'course_user_tags': {}})
 
     def test_remove_context(self):
-        get_tracker = self.tracker.get_tracker  # pylint: disable=maybe-no-member
+        get_tracker = self.tracker.get_tracker
         exit_context = get_tracker.return_value.exit_context
 
         # The middleware should clean up the context when the request is done

@@ -451,7 +451,7 @@ class RegistrationFormFactory(object):
         error_msg = accounts.REQUIRED_FIELD_LEVEL_OF_EDUCATION_MSG
 
         # The labels are marked for translation in UserProfile model definition.
-        options = [(name, _(label)) for name, label in UserProfile.LEVEL_OF_EDUCATION_CHOICES]  # pylint: disable=translation-of-non-string
+        options = [(name, _(label)) for name, label in UserProfile.LEVEL_OF_EDUCATION_CHOICES]
         form_desc.add_field(
             "level_of_education",
             label=education_level_label,
@@ -476,7 +476,7 @@ class RegistrationFormFactory(object):
         gender_label = _(u"Gender")
 
         # The labels are marked for translation in UserProfile model definition.
-        options = [(name, _(label)) for name, label in UserProfile.GENDER_CHOICES]  # pylint: disable=translation-of-non-string
+        options = [(name, _(label)) for name, label in UserProfile.GENDER_CHOICES]
         form_desc.add_field(
             "gender",
             label=gender_label,

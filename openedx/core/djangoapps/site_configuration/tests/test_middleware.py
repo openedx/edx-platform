@@ -26,7 +26,6 @@ from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 # NOTE: We set SESSION_SAVE_EVERY_REQUEST to True in order to make sure
 # Sessions are always started on every request
-# pylint: disable=no-member, protected-access
 @ddt.ddt
 @override_settings(SESSION_SAVE_EVERY_REQUEST=True)
 @skip_unless_lms
@@ -95,7 +94,6 @@ class SessionCookieDomainMicrositeOverrideTests(DatabaseMicrositeTestCase):
 
 # NOTE: We set SESSION_SAVE_EVERY_REQUEST to True in order to make sure
 # Sessions are always started on every request
-# pylint: disable=no-member, protected-access
 @override_settings(SESSION_SAVE_EVERY_REQUEST=True)
 class SessionCookieDomainSiteConfigurationOverrideTests(TestCase):
     """

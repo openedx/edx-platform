@@ -49,7 +49,7 @@ def update_course_schedules(self, **kwargs):
             start=new_start_date,
             upgrade_deadline=new_upgrade_deadline
         )
-    except Exception as exc:  # pylint: disable=broad-except
+    except Exception as exc:
         if not isinstance(exc, KNOWN_RETRY_ERRORS):
             LOG.exception("Unexpected failure: task id: %s, kwargs=%s".format(self.request.id, kwargs))
         raise self.retry(kwargs=kwargs, exc=exc)

@@ -96,7 +96,7 @@ class CourseIdFilter(admin.SimpleListFilter):
         else:
             return queryset.filter(enrollment__course_id=value)
 
-    def choices(self, changelist):  # pylint: disable=unused-argument
+    def choices(self, changelist):
         yield {
             'selected': self.value() is None,
             'value': None,
