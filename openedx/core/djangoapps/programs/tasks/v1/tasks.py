@@ -3,7 +3,7 @@ This file contains celery tasks for programs-related functionality.
 """
 from celery import task
 from celery.exceptions import MaxRetriesExceededError
-from celery.utils.log import get_task_logger  # pylint: disable=no-name-in-module, import-error
+from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
@@ -148,7 +148,7 @@ def award_program_certificates(self, username):
         # Determine which program certificates the user has already been awarded, if any.
         existing_program_uuids = get_certified_programs(student)
 
-    except Exception as exc:  # pylint: disable=broad-except
+    except Exception as exc:
         LOGGER.exception('Failed to determine program certificates to be awarded for user %s', username)
         raise self.retry(exc=exc, countdown=countdown, max_retries=MAX_RETRIES)
 
@@ -164,7 +164,7 @@ def award_program_certificates(self, username):
             credentials_client = get_credentials_api_client(
                 User.objects.get(username=settings.CREDENTIALS_SERVICE_USERNAME),
             )
-        except Exception as exc:  # pylint: disable=broad-except
+        except Exception as exc:
             LOGGER.exception('Failed to create a credentials API client to award program certificates')
             # Retry because a misconfiguration could be fixed
             raise self.retry(exc=exc, countdown=countdown, max_retries=MAX_RETRIES)

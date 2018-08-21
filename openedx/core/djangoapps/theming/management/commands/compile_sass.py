@@ -131,7 +131,7 @@ class Command(BaseCommand):
         if options.get("themes", None) and not is_comprehensive_theming_enabled():
             # log a warning message to let the user know that asset compilation for themes is skipped
             self.stdout.write(
-                self.style.WARNING(  # pylint: disable=no-member
+                self.style.WARNING(
                     "Skipping theme asset compilation: enable theming to process themed assets"
                 ),
             )

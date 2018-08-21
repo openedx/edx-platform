@@ -52,7 +52,7 @@ class SiteConfiguration(models.Model):
         """
         if self.enabled:
             try:
-                return self.values.get(name, default)  # pylint: disable=no-member
+                return self.values.get(name, default)
             except AttributeError as error:
                 logger.exception('Invalid JSON data. \n [%s]', error)
         else:

@@ -49,7 +49,7 @@ def _get_profile_image_urls(name, storage, file_extension=PROFILE_IMAGE_FILE_EXT
     Returns a dict containing the urls for a complete set of profile images,
     keyed by "friendly" name (e.g. "full", "large", "medium", "small").
     """
-    def _make_url(size):  # pylint: disable=missing-docstring
+    def _make_url(size):
         url = storage.url(
             _get_profile_image_filename(name, size, file_extension=file_extension)
         )

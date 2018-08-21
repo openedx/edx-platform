@@ -21,7 +21,7 @@ class VerifiedTrackCourseForm(forms.ModelForm):
     error message instead.
 
     """
-    class Meta(object):  # pylint:disable=missing-docstring
+    class Meta(object):
         model = VerifiedTrackCohortedCourse
         fields = '__all__'
 

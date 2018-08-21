@@ -121,7 +121,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
 
         self.catalog_integration = self.create_catalog_integration()
         ClientFactory.create(name='credentials')
-        UserFactory.create(username=settings.CREDENTIALS_SERVICE_USERNAME)  # pylint: disable=no-member
+        UserFactory.create(username=settings.CREDENTIALS_SERVICE_USERNAME)
 
     def test_completion_check(
         self,
@@ -264,7 +264,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
     def test_retry_on_programs_api_errors(
         self,
         mock_get_completed_programs,
-        *_mock_helpers  # pylint: disable=unused-argument
+        *_mock_helpers
     ):
         """
         Ensures that any otherwise-unhandled errors that arise while trying
