@@ -14,14 +14,18 @@ ORA2_FILEUPLOAD_BACKEND = 'django'
 DEBUG = True
 USE_I18N = True
 DEFAULT_TEMPLATE_ENGINE['OPTIONS']['debug'] = True
-SITE_NAME = 'localhost:8000'
+
+LMS_BASE = 'edx.devstack.lms:18000'
+CMS_BASE = 'edx.devstack.studio:18010'
+SITE_NAME = LMS_BASE
+
 # By default don't use a worker, execute tasks as if they were local functions
 CELERY_ALWAYS_EAGER = True
 HTTPS = 'off'
 
-LMS_ROOT_URL = 'http://localhost:8000'
+LMS_ROOT_URL = 'http://{}'.format(LMS_BASE)
 LMS_INTERNAL_ROOT_URL = LMS_ROOT_URL
-ENTERPRISE_API_URL = LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/'
+ENTERPRISE_API_URL = '{}/enterprise/api/v1/'.format(LMS_INTERNAL_ROOT_URL)
 
 ################################ LOGGERS ######################################
 
@@ -132,7 +136,7 @@ CC_PROCESSOR = {
 
 ########################### External REST APIs #################################
 FEATURES['ENABLE_OAUTH2_PROVIDER'] = True
-OAUTH_OIDC_ISSUER = 'http://127.0.0.1:8000/oauth2'
+OAUTH_OIDC_ISSUER = '{}/oauth2'.format(LMS_ROOT_URL)
 FEATURES['ENABLE_MOBILE_REST_API'] = True
 FEATURES['ENABLE_VIDEO_ABSTRACTION_LAYER_API'] = True
 
@@ -220,7 +224,7 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and 'third_party_auth.dummy.DummyBack
     AUTHENTICATION_BACKENDS = ['third_party_auth.dummy.DummyBackend'] + list(AUTHENTICATION_BACKENDS)
 
 ############## ECOMMERCE API CONFIGURATION SETTINGS ###############
-ECOMMERCE_PUBLIC_URL_ROOT = "http://localhost:8002"
+ECOMMERCE_PUBLIC_URL_ROOT = 'http://localhost:18130'
 
 ###################### Cross-domain requests ######################
 FEATURES['ENABLE_CORS_HEADERS'] = True
@@ -278,27 +282,14 @@ LOGGING['handlers']['local'] = LOGGING['handlers']['tracking'] = {
 
 LOGGING['loggers']['tracking']['handlers'] = ['console']
 
-LMS_BASE = 'edx.devstack.lms:18000'
-CMS_BASE = 'edx.devstack.studio:18010'
-SITE_NAME = LMS_BASE
-LMS_ROOT_URL = 'http://{}'.format(LMS_BASE)
-LMS_INTERNAL_ROOT_URL = LMS_ROOT_URL
 
-ECOMMERCE_PUBLIC_URL_ROOT = 'http://localhost:18130'
 ECOMMERCE_API_URL = 'http://edx.devstack.ecommerce:18130/api/v2'
 
 COMMENTS_SERVICE_URL = 'http://edx.devstack.forum:4567'
 
-ENTERPRISE_API_URL = '{}/enterprise/api/v1/'.format(LMS_INTERNAL_ROOT_URL)
-
 CREDENTIALS_INTERNAL_SERVICE_URL = 'http://edx.devstack.credentials:18150'
 CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'
 
-OAUTH_OIDC_ISSUER = '{}/oauth2'.format(LMS_ROOT_URL)
-
-JWT_AUTH.update({
-    'JWT_ISSUER': OAUTH_OIDC_ISSUER,
-})
 
 FEATURES.update({
     'AUTOMATIC_AUTH_FOR_TESTING': True,
