@@ -56,4 +56,4 @@ class Command(BaseCommand):
         # No need to delete the accompanying "permanent" retirement request record - it gets done via Django signal.
         retirement_status.delete()
 
-        print("Successfully cancelled retirement request for user with email address '{}'.")
+        print("Successfully cancelled retirement request for user with email address '{}'.".format(email_address))

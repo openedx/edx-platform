@@ -15,11 +15,12 @@ from student.tests.factories import UserFactory
 pytestmark = pytest.mark.django_db
 
 
-def test_successful_cancellation(setup_retirement_states, logged_out_retirement_request):  # pylint: disable=redefined-outer-name, unused-argument
+def test_successful_cancellation(setup_retirement_states, logged_out_retirement_request, capsys):  # pylint: disable=redefined-outer-name, unused-argument
     """
     Test a successfully cancelled retirement request.
     """
     call_command('cancel_user_retirement_request', logged_out_retirement_request.original_email)
+    output = capsys.readouterr().out
     # Confirm that no retirement status exists for the user.
     with pytest.raises(UserRetirementStatus.DoesNotExist):
         UserRetirementStatus.objects.get(original_email=logged_out_retirement_request.user.email)
@@ -28,6 +29,8 @@ def test_successful_cancellation(setup_retirement_states, logged_out_retirement_
         UserRetirementRequest.objects.get(user=logged_out_retirement_request.user)
     # Ensure user can be retrieved using the original email address.
     User.objects.get(email=logged_out_retirement_request.original_email)
+    assert "Successfully cancelled retirement request for user with email address" in output
+    assert logged_out_retirement_request.original_email in output
 
 
 def test_cancellation_in_unrecoverable_state(setup_retirement_states, logged_out_retirement_request):  # pylint: disable=redefined-outer-name, unused-argument
