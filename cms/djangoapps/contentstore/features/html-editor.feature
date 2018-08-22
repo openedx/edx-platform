@@ -15,13 +15,6 @@ Feature: CMS.HTML Editor
     Then I can modify the display name
     And my display name change is persisted on save
 
-  Scenario: TinyMCE image plugin sets urls correctly
-    Given I have created a Blank HTML Page
-    When I edit the page
-    And I add an image with static link "/static/image.jpg" via the Image Plugin Icon
-    Then the src link is rewritten to the asset link "image.jpg"
-    And the link is shown as "/static/image.jpg" in the Image Plugin
-
   Scenario: TinyMCE link plugin sets urls correctly
     Given I have created a Blank HTML Page
     When I edit the page
