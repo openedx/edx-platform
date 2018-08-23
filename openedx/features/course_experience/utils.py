@@ -135,11 +135,10 @@ def get_course_outline_block_tree(request, course_id):
         'poll',
         'word_cloud'
     ]
-    user = request.user if request.user and request.user.is_authenticated else None
     all_blocks = get_blocks(
         request,
         course_usage_key,
-        user=user,
+        user=request.user,
         nav_depth=3,
         requested_fields=[
             'children',
