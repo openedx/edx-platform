@@ -2,6 +2,7 @@
 Adapter to isolate django-oauth-toolkit dependencies
 """
 
+from edx_django_utils import monitoring as monitoring_utils
 from oauth2_provider import models
 
 from openedx.core.djangoapps.oauth_dispatch.models import RestrictedApplication
@@ -53,7 +54,9 @@ class DOTAdapter(object):
 
         Wraps django's queryset.get() method.
         """
-        return models.Application.objects.get(**filters)
+        client = models.Application.objects.get(**filters)
+        monitoring_utils.set_custom_metric('oauth_client_name', client.name)
+        return client
 
     def get_client_for_token(self, token):
         """

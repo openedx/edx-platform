@@ -2,6 +2,7 @@
 Adapter to isolate django-oauth2-provider dependencies
 """
 
+from edx_django_utils import monitoring as monitoring_utils
 from provider.oauth2 import models
 from provider import constants, scope
 
@@ -43,7 +44,9 @@ class DOPAdapter(object):
 
         Wraps django's queryset.get() method.
         """
-        return models.Client.objects.get(**filters)
+        client = models.Client.objects.get(**filters)
+        monitoring_utils.set_custom_metric('oauth_client_name', client.name)
+        return client
 
     def get_client_for_token(self, token):
         """

@@ -9,6 +9,7 @@ from django.test import TestCase
 from django.utils.timezone import now
 from provider.oauth2 import models
 from provider import constants
+from mock import call, patch
 
 from student.tests.factories import UserFactory
 
@@ -59,6 +60,14 @@ class DOPAdapterTestCase(TestCase):
     def test_get_client_not_found(self):
         with self.assertRaises(models.Client.DoesNotExist):
             self.adapter.get_client(client_id='not-found')
+
+    @patch('edx_django_utils.monitoring.set_custom_metric')
+    def test_get_client_metrics(self, mock_set_custom_metric):
+        client = self.adapter.get_client(client_type=constants.CONFIDENTIAL)
+        expected_calls = [
+            call('oauth_client_name', client.name),
+        ]
+        mock_set_custom_metric.assert_has_calls(expected_calls, any_order=True)
 
     def test_get_client_for_token(self):
         token = models.AccessToken(
