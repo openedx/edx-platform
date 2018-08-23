@@ -19,23 +19,26 @@ from pavelib.utils import db_utils
 from pavelib import database
 
 
+BUCKET_NAME = 'moto_test_bucket_{}'.format(os.getpid())
+
+
 class TestPaverDbS3Utils(MockS3Mixin, TestCase):
     """ Tests for paver bokchoy database utils related to s3 """
     def setUp(self):
         super(TestPaverDbS3Utils, self).setUp()
         conn = boto.connect_s3()
-        conn.create_bucket('moto_test_bucket')
-        self.bucket = conn.get_bucket('moto_test_bucket')
+        conn.create_bucket(BUCKET_NAME)
+        self.bucket = conn.get_bucket(BUCKET_NAME)
 
     def test_fingerprint_in_bucket(self):
         key = boto.s3.key.Key(bucket=self.bucket, name='testfile.tar.gz')
         key.set_contents_from_string('this is a test')
-        self.assertTrue(is_fingerprint_in_bucket('testfile', 'moto_test_bucket'))
+        self.assertTrue(is_fingerprint_in_bucket('testfile', BUCKET_NAME))
 
     def test_fingerprint_not_in_bucket(self):
         key = boto.s3.key.Key(bucket=self.bucket, name='testfile.tar.gz')
         key.set_contents_from_string('this is a test')
-        self.assertFalse(is_fingerprint_in_bucket('otherfile', 'moto_test_bucket'))
+        self.assertFalse(is_fingerprint_in_bucket('otherfile', BUCKET_NAME))
 
 
 class TestPaverDbUtils(TestCase):
@@ -85,8 +88,8 @@ class TestPaverDatabaseTasks(MockS3Mixin, TestCase):
     def setUp(self):
         super(TestPaverDatabaseTasks, self).setUp()
         conn = boto.connect_s3()
-        conn.create_bucket('moto_test_bucket')
-        self.bucket = conn.get_bucket('moto_test_bucket')
+        conn.create_bucket(BUCKET_NAME)
+        self.bucket = conn.get_bucket(BUCKET_NAME)
         # This value is the actual sha1 fingerprint calculated for the dummy
         # files used in these tests
         self.expected_fingerprint = 'ccaa8d8dcc7d030cd6a6768db81f90d0ef976c3d'
@@ -119,7 +122,7 @@ class TestPaverDatabaseTasks(MockS3Mixin, TestCase):
         ]
         _mock_sh.assert_has_calls(calls)
 
-    @patch.object(database, 'CACHE_BUCKET_NAME', 'moto_test_bucket')
+    @patch.object(database, 'CACHE_BUCKET_NAME', BUCKET_NAME)
     @patch.object(db_utils, 'CACHE_FOLDER', mkdtemp())
     @patch.object(db_utils, 'FINGERPRINT_FILEPATH', os.path.join(mkdtemp(), 'fingerprint'))
     @patch.object(db_utils, 'sh')
@@ -152,7 +155,7 @@ class TestPaverDatabaseTasks(MockS3Mixin, TestCase):
             database.update_local_bokchoy_db_from_s3()  # pylint: disable=no-value-for-parameter
             # Make sure that the fingerprint file is downloaded from s3
             _mock_get_file.assert_called_once_with(
-                'moto_test_bucket', self.fingerprint_filename, db_utils.CACHE_FOLDER
+                BUCKET_NAME, self.fingerprint_filename, db_utils.CACHE_FOLDER
             )
         calls = [
             call('{}/scripts/reset-test-db.sh --calculate_migrations'.format(Env.REPO_ROOT)),
@@ -160,7 +163,7 @@ class TestPaverDatabaseTasks(MockS3Mixin, TestCase):
         ]
         _mock_sh.assert_has_calls(calls)
 
-    @patch.object(database, 'CACHE_BUCKET_NAME', 'moto_test_bucket')
+    @patch.object(database, 'CACHE_BUCKET_NAME', BUCKET_NAME)
     @patch.object(db_utils, 'CACHE_FOLDER', mkdtemp())
     @patch.object(db_utils, 'FINGERPRINT_FILEPATH', os.path.join(mkdtemp(), 'fingerprint'))
     @patch.object(db_utils, 'sh')
@@ -188,7 +191,7 @@ class TestPaverDatabaseTasks(MockS3Mixin, TestCase):
         ]
         _mock_sh.assert_has_calls(calls)
 
-    @patch.object(database, 'CACHE_BUCKET_NAME', 'moto_test_bucket')
+    @patch.object(database, 'CACHE_BUCKET_NAME', BUCKET_NAME)
     @patch.object(db_utils, 'CACHE_FOLDER', mkdtemp())
     @patch.object(db_utils, 'FINGERPRINT_FILEPATH', os.path.join(mkdtemp(), 'fingerprint'))
     @patch.object(db_utils, 'sh')
