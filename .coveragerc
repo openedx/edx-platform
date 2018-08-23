@@ -1,4 +1,4 @@
-# .coveragerc for edx-platform
+# .coveragerc for edx-platform!
 [run]
 data_file = reports/.coverage
 source =
