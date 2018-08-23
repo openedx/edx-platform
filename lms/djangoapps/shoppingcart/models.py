@@ -40,7 +40,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from shoppingcart.pdf import PDFInvoice
 from student.models import CourseEnrollment, EnrollStatusChange
 from student.signals import UNENROLL_DONE
-from util.query import use_read_replica_if_available
+from db_utils.utils import use_read_replica_if_available
 from xmodule.modulestore.django import modulestore
 
 from .exceptions import (
