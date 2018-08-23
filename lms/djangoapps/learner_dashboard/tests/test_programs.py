@@ -15,7 +15,7 @@ from django.test import override_settings
 
 from lms.envs.test import CREDENTIALS_PUBLIC_SERVICE_URL
 from openedx.core.djangoapps.catalog.tests.factories import (
-    CreditPathwayFactory,
+    PathwayFactory,
     CourseFactory,
     CourseRunFactory,
     ProgramFactory
@@ -180,7 +180,7 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
 
 
 @skip_unless_lms
-@mock.patch(PROGRAMS_MODULE + '.get_credit_pathways')
+@mock.patch(PROGRAMS_MODULE + '.get_pathways')
 @mock.patch(PROGRAMS_UTILS_MODULE + '.get_programs')
 class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, SharedModuleStoreTestCase):
     """Unit tests for the program details page."""
@@ -198,7 +198,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
         course = CourseFactory(course_runs=[course_run])
 
         cls.program_data = ProgramFactory(uuid=cls.program_uuid, courses=[course])
-        cls.pathway_data = CreditPathwayFactory()
+        cls.pathway_data = PathwayFactory()
         cls.program_data['pathway_ids'] = [cls.pathway_data['id']]
         cls.pathway_data['program_uuids'] = [cls.program_data['uuid']]
         del cls.pathway_data['programs']
@@ -230,7 +230,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
         self.assertContains(response, 'creditPathways')
         self.assertContains(response, self.pathway_data['name'])
 
-    def test_login_required(self, mock_get_programs, mock_get_credit_pathways):
+    def test_login_required(self, mock_get_programs, mock_get_pathways):
         """
         Verify that login is required to access the page.
         """
@@ -240,7 +240,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
         UserFactory(username=catalog_integration.service_username)
 
         mock_get_programs.return_value = self.program_data
-        mock_get_credit_pathways.return_value = self.pathway_data
+        mock_get_pathways.return_value = self.pathway_data
 
         self.client.logout()
 
@@ -259,7 +259,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
         self.assert_program_data_present(response)
         self.assert_pathway_data_present(response)
 
-    def test_404_if_disabled(self, _mock_get_programs, _mock_get_credit_pathways):
+    def test_404_if_disabled(self, _mock_get_programs, _mock_get_pathways):
         """
         Verify that the page 404s if disabled.
         """
@@ -268,7 +268,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 404)
 
-    def test_404_if_no_data(self, mock_get_programs, _mock_get_credit_pathways):
+    def test_404_if_no_data(self, mock_get_programs, _mock_get_pathways):
         """Verify that the page 404s if no program data is found."""
         self.create_programs_config()
 

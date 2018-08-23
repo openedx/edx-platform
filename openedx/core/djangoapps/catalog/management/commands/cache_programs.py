@@ -7,9 +7,9 @@ from django.core.cache import cache
 from django.core.management import BaseCommand
 
 from openedx.core.djangoapps.catalog.cache import (
-    CREDIT_PATHWAY_CACHE_KEY_TPL,
+    PATHWAY_CACHE_KEY_TPL,
     PROGRAM_CACHE_KEY_TPL,
-    SITE_CREDIT_PATHWAY_IDS_CACHE_KEY_TPL,
+    SITE_PATHWAY_IDS_CACHE_KEY_TPL,
     SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
 )
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
@@ -51,7 +51,7 @@ class Command(BaseCommand):
             if site_config is None or not site_config.get_value('COURSE_CATALOG_API_URL'):
                 logger.info('Skipping site {domain}. No configuration.'.format(domain=site.domain))
                 cache.set(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=site.domain), [], None)
-                cache.set(SITE_CREDIT_PATHWAY_IDS_CACHE_KEY_TPL.format(domain=site.domain), [], None)
+                cache.set(SITE_PATHWAY_IDS_CACHE_KEY_TPL.format(domain=site.domain), [], None)
                 continue
 
             client = create_catalog_api_client(user, site=site)
@@ -78,7 +78,7 @@ class Command(BaseCommand):
                 total=len(pathway_ids),
                 site_name=site.domain,
             ))
-            cache.set(SITE_CREDIT_PATHWAY_IDS_CACHE_KEY_TPL.format(domain=site.domain), pathway_ids, None)
+            cache.set(SITE_PATHWAY_IDS_CACHE_KEY_TPL.format(domain=site.domain), pathway_ids, None)
 
         successful_programs = len(programs)
         logger.info('Caching details for {successful_programs} programs.'.format(
@@ -140,11 +140,11 @@ class Command(BaseCommand):
         """
         pathways = []
         failure = False
-        logger.info('Requesting credit pathways for {domain}.'.format(domain=site.domain))
+        logger.info('Requesting pathways for {domain}.'.format(domain=site.domain))
         try:
             next_page = 1
             while next_page:
-                new_pathways = client.credit_pathways.get(exclude_utm=1, page=next_page)
+                new_pathways = client.pathways.get(exclude_utm=1, page=next_page)
                 pathways.extend(new_pathways['results'])
                 next_page = next_page + 1 if new_pathways['next'] else None
 
@@ -152,7 +152,7 @@ class Command(BaseCommand):
             logger.error('Failed to retrieve credit pathways for site: {domain}.'.format(domain=site.domain))
             failure = True
 
-        logger.info('Received {total} credit pathways for site {domain}'.format(
+        logger.info('Received {total} pathways for site {domain}'.format(
             total=len(pathways),
             domain=site.domain
         ))
@@ -170,7 +170,7 @@ class Command(BaseCommand):
         for pathway in pathways:
             try:
                 pathway_id = pathway['id']
-                pathway_cache_key = CREDIT_PATHWAY_CACHE_KEY_TPL.format(id=pathway_id)
+                pathway_cache_key = PATHWAY_CACHE_KEY_TPL.format(id=pathway_id)
                 processed_pathways[pathway_cache_key] = pathway
                 uuids = []
 
