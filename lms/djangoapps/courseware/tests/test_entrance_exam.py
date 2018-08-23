@@ -4,6 +4,7 @@ Tests use cases related to LMS Entrance Exam behavior, such as gated content acc
 from django.urls import reverse
 from django.test.client import RequestFactory
 from mock import Mock, patch
+from crum import set_current_request
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from courseware.entrance_exams import (
@@ -140,6 +141,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         self.course.entrance_exam_id = unicode(self.entrance_exam.scope_ids.usage_id)
 
         self.anonymous_user = AnonymousUserFactory()
+        self.addCleanup(set_current_request, None)
         self.request = get_mock_request(UserFactory())
         modulestore().update_item(self.course, self.request.user.id)
 

@@ -2,6 +2,7 @@
 Integration tests for gated content.
 """
 import ddt
+from crum import set_current_request
 from completion import waffle as completion_waffle
 from milestones import api as milestones_api
 from milestones.tests.utils import MilestonesTestCaseMixin
@@ -36,6 +37,7 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
         self.setup_gating_milestone(50, 100)
         self.non_staff_user = UserFactory()
         self.staff_user = UserFactory(is_staff=True, is_superuser=True)
+        self.addCleanup(set_current_request, None)
         self.request = get_mock_request(self.non_staff_user)
 
     @classmethod

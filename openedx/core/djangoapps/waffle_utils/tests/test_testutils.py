@@ -28,6 +28,7 @@ class OverrideWaffleFlagTests(TestCase):
     def setUp(self):
         super(OverrideWaffleFlagTests, self).setUp()
         request = RequestFactory().request()
+        self.addCleanup(crum.set_current_request, None)
         crum.set_current_request(request)
         RequestCache.clear_request_cache()
 

@@ -14,6 +14,7 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
+from crum import set_current_request
 
 from courseware.courses import (
     course_open_for_self_enrollment,
@@ -307,6 +308,7 @@ class CoursesRenderTest(ModuleStoreTestCase):
         course_items = import_course_from_xml(store, self.user.id, TEST_DATA_DIR, ['toy'])
         course_key = course_items[0].id
         self.course = get_course_by_id(course_key)
+        self.addCleanup(set_current_request, None)
         self.request = get_mock_request(UserFactory.create())
 
     def test_get_course_info_section_render(self):
