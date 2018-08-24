@@ -213,7 +213,7 @@ class ProgramTypeFactory(DictFactoryBase):
     logo_image = factory.LazyFunction(generate_sized_stdimage)
 
 
-class CreditPathwayFactory(DictFactoryBase):
+class PathwayFactory(DictFactoryBase):
     id = factory.Sequence(lambda x: x)
     description = factory.Faker('sentence')
     destination_url = factory.Faker('url')

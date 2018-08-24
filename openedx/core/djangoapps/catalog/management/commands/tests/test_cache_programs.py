@@ -5,12 +5,12 @@ from django.core.cache import cache
 from django.core.management import call_command
 
 from openedx.core.djangoapps.catalog.cache import (
-    CREDIT_PATHWAY_CACHE_KEY_TPL,
+    PATHWAY_CACHE_KEY_TPL,
     PROGRAM_CACHE_KEY_TPL,
-    SITE_CREDIT_PATHWAY_IDS_CACHE_KEY_TPL,
+    SITE_PATHWAY_IDS_CACHE_KEY_TPL,
     SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
 )
-from openedx.core.djangoapps.catalog.tests.factories import CreditPathwayFactory, ProgramFactory
+from openedx.core.djangoapps.catalog.tests.factories import PathwayFactory, ProgramFactory
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
@@ -38,10 +38,10 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
 
         self.list_url = self.catalog_integration.get_internal_api_url().rstrip('/') + '/programs/'
         self.detail_tpl = self.list_url.rstrip('/') + '/{uuid}/'
-        self.pathway_url = self.catalog_integration.get_internal_api_url().rstrip('/') + '/credit_pathways/'
+        self.pathway_url = self.catalog_integration.get_internal_api_url().rstrip('/') + '/pathways/'
 
         self.programs = ProgramFactory.create_batch(3)
-        self.pathways = CreditPathwayFactory.create_batch(3)
+        self.pathways = PathwayFactory.create_batch(3)
 
         for pathway in self.pathways:
             self.programs += pathway['programs']
@@ -179,7 +179,7 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
         }
 
         pathways = {
-            CREDIT_PATHWAY_CACHE_KEY_TPL.format(id=pathway['id']): pathway for pathway in self.pathways
+            PATHWAY_CACHE_KEY_TPL.format(id=pathway['id']): pathway for pathway in self.pathways
         }
 
         self.mock_list()
@@ -191,7 +191,7 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
 
         call_command('cache_programs')
 
-        cached_pathway_keys = cache.get(SITE_CREDIT_PATHWAY_IDS_CACHE_KEY_TPL.format(domain=self.site_domain))
+        cached_pathway_keys = cache.get(SITE_PATHWAY_IDS_CACHE_KEY_TPL.format(domain=self.site_domain))
         pathway_keys = pathways.keys()
         self.assertEqual(
             set(cached_pathway_keys),
@@ -220,7 +220,7 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
         Verify that the command properly caches credit pathways when multiple pages are returned from its endpoint
         """
         UserFactory(username=self.catalog_integration.service_username)
-        new_pathways = CreditPathwayFactory.create_batch(40)
+        new_pathways = PathwayFactory.create_batch(40)
         for new_pathway in new_pathways:
             new_pathway['programs'] = []
         pathways = self.pathways + new_pathways
@@ -242,11 +242,11 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
         call_command('cache_programs')
 
         pathways_dict = {
-            CREDIT_PATHWAY_CACHE_KEY_TPL.format(id=pathway['id']): pathway for pathway in pathways
+            PATHWAY_CACHE_KEY_TPL.format(id=pathway['id']): pathway for pathway in pathways
         }
         pathway_keys = pathways_dict.keys()
 
-        cached_pathway_keys = cache.get(SITE_CREDIT_PATHWAY_IDS_CACHE_KEY_TPL.format(domain=self.site_domain))
+        cached_pathway_keys = cache.get(SITE_PATHWAY_IDS_CACHE_KEY_TPL.format(domain=self.site_domain))
         self.assertEqual(
             set(cached_pathway_keys),
             set(pathway_keys)
@@ -314,7 +314,7 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
             call_command('cache_programs')
         self.assertEqual(context.exception.code, 1)
 
-        cached_pathways = cache.get(SITE_CREDIT_PATHWAY_IDS_CACHE_KEY_TPL.format(domain=self.site_domain))
+        cached_pathways = cache.get(SITE_PATHWAY_IDS_CACHE_KEY_TPL.format(domain=self.site_domain))
         self.assertEqual(cached_pathways, [])
 
     def test_handle_missing_programs(self):

@@ -14,8 +14,8 @@ from pytz import UTC
 
 from entitlements.utils import is_course_run_entitlement_fulfillable
 from openedx.core.constants import COURSE_PUBLISHED
-from openedx.core.djangoapps.catalog.cache import (CREDIT_PATHWAY_CACHE_KEY_TPL, PROGRAM_CACHE_KEY_TPL,
-                                                   SITE_CREDIT_PATHWAY_IDS_CACHE_KEY_TPL,
+from openedx.core.djangoapps.catalog.cache import (PATHWAY_CACHE_KEY_TPL, PROGRAM_CACHE_KEY_TPL,
+                                                   SITE_PATHWAY_IDS_CACHE_KEY_TPL,
                                                    SITE_PROGRAM_UUIDS_CACHE_KEY_TPL)
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.lib.edx_api_utils import get_edx_api_data
@@ -125,7 +125,7 @@ def get_program_types(name=None):
         return []
 
 
-def get_credit_pathways(site, pathway_id=None):
+def get_pathways(site, pathway_id=None):
     """
     Read pathways from the cache.
     The cache is populated by a management command, cache_programs.
@@ -143,16 +143,16 @@ def get_credit_pathways(site, pathway_id=None):
     missing_details_msg_tpl = 'Failed to get details for credit pathway {id} from the cache.'
 
     if pathway_id:
-        pathway = cache.get(CREDIT_PATHWAY_CACHE_KEY_TPL.format(id=pathway_id))
+        pathway = cache.get(PATHWAY_CACHE_KEY_TPL.format(id=pathway_id))
         if not pathway:
             logger.warning(missing_details_msg_tpl.format(id=pathway_id))
 
         return pathway
-    pathway_ids = cache.get(SITE_CREDIT_PATHWAY_IDS_CACHE_KEY_TPL.format(domain=site.domain), [])
+    pathway_ids = cache.get(SITE_PATHWAY_IDS_CACHE_KEY_TPL.format(domain=site.domain), [])
     if not pathway_ids:
         logger.warning('Failed to get credit pathway ids from the cache.')
 
-    pathways = cache.get_many([CREDIT_PATHWAY_CACHE_KEY_TPL.format(id=pathway_id) for pathway_id in pathway_ids])
+    pathways = cache.get_many([PATHWAY_CACHE_KEY_TPL.format(id=pathway_id) for pathway_id in pathway_ids])
     pathways = pathways.values()
 
     # The get_many above sometimes fails to bring back details cached on one or
@@ -170,7 +170,7 @@ def get_credit_pathways(site, pathway_id=None):
         )
 
         retried_pathways = cache.get_many(
-            [CREDIT_PATHWAY_CACHE_KEY_TPL.format(id=pathway_id) for pathway_id in missing_ids]
+            [PATHWAY_CACHE_KEY_TPL.format(id=pathway_id) for pathway_id in missing_ids]
         )
         pathways += retried_pathways.values()
 

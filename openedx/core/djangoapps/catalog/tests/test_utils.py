@@ -17,16 +17,16 @@ from course_modes.tests.factories import CourseModeFactory
 from entitlements.tests.factories import CourseEntitlementFactory
 from openedx.core.constants import COURSE_UNPUBLISHED
 from openedx.core.djangoapps.catalog.cache import (
-    CREDIT_PATHWAY_CACHE_KEY_TPL,
+    PATHWAY_CACHE_KEY_TPL,
     PROGRAM_CACHE_KEY_TPL,
-    SITE_CREDIT_PATHWAY_IDS_CACHE_KEY_TPL,
+    SITE_PATHWAY_IDS_CACHE_KEY_TPL,
     SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
 )
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.catalog.tests.factories import (
     CourseFactory,
     CourseRunFactory,
-    CreditPathwayFactory,
+    PathwayFactory,
     ProgramFactory,
     ProgramTypeFactory
 )
@@ -35,7 +35,7 @@ from openedx.core.djangoapps.catalog.utils import (
     get_course_runs,
     get_course_runs_for_course,
     get_course_run_details,
-    get_credit_pathways,
+    get_pathways,
     get_currency_data,
     get_localized_price_text,
     get_program_types,
@@ -187,36 +187,36 @@ class TestGetPrograms(CacheIsolationTestCase):
 @skip_unless_lms
 @mock.patch(UTILS_MODULE + '.logger.info')
 @mock.patch(UTILS_MODULE + '.logger.warning')
-class TestGetCreditPathways(CacheIsolationTestCase):
+class TestGetPathways(CacheIsolationTestCase):
     ENABLED_CACHES = ['default']
 
     def setUp(self):
-        super(TestGetCreditPathways, self).setUp()
+        super(TestGetPathways, self).setUp()
         self.site = SiteFactory()
 
     def test_get_many(self, mock_warning, mock_info):
-        pathways = CreditPathwayFactory.create_batch(3)
+        pathways = PathwayFactory.create_batch(3)
 
         # Cache details for 2 of 3 programs.
         partial_pathways = {
-            CREDIT_PATHWAY_CACHE_KEY_TPL.format(id=pathway['id']): pathway for pathway in pathways[:2]
+            PATHWAY_CACHE_KEY_TPL.format(id=pathway['id']): pathway for pathway in pathways[:2]
         }
         cache.set_many(partial_pathways, None)
 
         # When called before pathways are cached, the function should return an
         # empty list and log a warning.
-        self.assertEqual(get_credit_pathways(self.site), [])
+        self.assertEqual(get_pathways(self.site), [])
         mock_warning.assert_called_once_with('Failed to get credit pathway ids from the cache.')
         mock_warning.reset_mock()
 
         # Cache all 3 pathways
         cache.set(
-            SITE_CREDIT_PATHWAY_IDS_CACHE_KEY_TPL.format(domain=self.site.domain),
+            SITE_PATHWAY_IDS_CACHE_KEY_TPL.format(domain=self.site.domain),
             [pathway['id'] for pathway in pathways],
             None
         )
 
-        actual_pathways = get_credit_pathways(self.site)
+        actual_pathways = get_pathways(self.site)
 
         # The 2 cached pathways should be returned while info and warning
         # messages should be logged for the missing one.
@@ -235,16 +235,16 @@ class TestGetCreditPathways(CacheIsolationTestCase):
         # of the cache above, so all we need to do here is verify the accuracy of
         # the data itself.
         for pathway in actual_pathways:
-            key = CREDIT_PATHWAY_CACHE_KEY_TPL.format(id=pathway['id'])
+            key = PATHWAY_CACHE_KEY_TPL.format(id=pathway['id'])
             self.assertEqual(pathway, partial_pathways[key])
 
         # Cache details for all 3 pathways.
         all_pathways = {
-            CREDIT_PATHWAY_CACHE_KEY_TPL.format(id=pathway['id']): pathway for pathway in pathways
+            PATHWAY_CACHE_KEY_TPL.format(id=pathway['id']): pathway for pathway in pathways
         }
         cache.set_many(all_pathways, None)
 
-        actual_pathways = get_credit_pathways(self.site)
+        actual_pathways = get_pathways(self.site)
 
         # All 3 pathways should be returned.
         self.assertEqual(
@@ -254,31 +254,31 @@ class TestGetCreditPathways(CacheIsolationTestCase):
         self.assertFalse(mock_warning.called)
 
         for pathway in actual_pathways:
-            key = CREDIT_PATHWAY_CACHE_KEY_TPL.format(id=pathway['id'])
+            key = PATHWAY_CACHE_KEY_TPL.format(id=pathway['id'])
             self.assertEqual(pathway, all_pathways[key])
 
     @mock.patch(UTILS_MODULE + '.cache')
     def test_get_many_with_missing(self, mock_cache, mock_warning, mock_info):
-        pathways = CreditPathwayFactory.create_batch(3)
+        pathways = PathwayFactory.create_batch(3)
 
         all_pathways = {
-            CREDIT_PATHWAY_CACHE_KEY_TPL.format(id=pathway['id']): pathway for pathway in pathways
+            PATHWAY_CACHE_KEY_TPL.format(id=pathway['id']): pathway for pathway in pathways
         }
 
         partial_pathways = {
-            CREDIT_PATHWAY_CACHE_KEY_TPL.format(id=pathway['id']): pathway for pathway in pathways[:2]
+            PATHWAY_CACHE_KEY_TPL.format(id=pathway['id']): pathway for pathway in pathways[:2]
         }
 
         def fake_get_many(keys):
             if len(keys) == 1:
-                return {CREDIT_PATHWAY_CACHE_KEY_TPL.format(id=pathways[-1]['id']): pathways[-1]}
+                return {PATHWAY_CACHE_KEY_TPL.format(id=pathways[-1]['id']): pathways[-1]}
             else:
                 return partial_pathways
 
         mock_cache.get.return_value = [pathway['id'] for pathway in pathways]
         mock_cache.get_many.side_effect = fake_get_many
 
-        actual_pathways = get_credit_pathways(self.site)
+        actual_pathways = get_pathways(self.site)
 
         # All 3 cached pathways should be returned. An info message should be
         # logged about the one that was initially missing, but the code should
@@ -291,26 +291,26 @@ class TestGetCreditPathways(CacheIsolationTestCase):
         mock_info.assert_called_with('Failed to get details for 1 pathways. Retrying.')
 
         for pathway in actual_pathways:
-            key = CREDIT_PATHWAY_CACHE_KEY_TPL.format(id=pathway['id'])
+            key = PATHWAY_CACHE_KEY_TPL.format(id=pathway['id'])
             self.assertEqual(pathway, all_pathways[key])
 
     def test_get_one(self, mock_warning, _mock_info):
-        expected_pathway = CreditPathwayFactory()
+        expected_pathway = PathwayFactory()
         expected_id = expected_pathway['id']
 
-        self.assertEqual(get_credit_pathways(self.site, pathway_id=expected_id), None)
+        self.assertEqual(get_pathways(self.site, pathway_id=expected_id), None)
         mock_warning.assert_called_once_with(
             'Failed to get details for credit pathway {id} from the cache.'.format(id=expected_id)
         )
         mock_warning.reset_mock()
 
         cache.set(
-            CREDIT_PATHWAY_CACHE_KEY_TPL.format(id=expected_id),
+            PATHWAY_CACHE_KEY_TPL.format(id=expected_id),
             expected_pathway,
             None
         )
 
-        actual_pathway = get_credit_pathways(self.site, pathway_id=expected_id)
+        actual_pathway = get_pathways(self.site, pathway_id=expected_id)
         self.assertEqual(actual_pathway, expected_pathway)
         self.assertFalse(mock_warning.called)
 
