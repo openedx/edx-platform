@@ -119,7 +119,7 @@ pyjwkest==1.3.2
 # TODO Replace PyJWT usage with pyjwkest
 PyJWT==1.5.2
 pymongo                             # MongoDB driver
-pynliner==0.5.2                     # Inlines CSS styles into HTML for email notifications
+pynliner                            # Inlines CSS styles into HTML for email notifications
 python-dateutil==2.4
 python-Levenshtein
 python-openid
