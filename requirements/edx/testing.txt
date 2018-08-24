@@ -73,7 +73,7 @@ configparser==3.5.0       # via flake8, pylint
 constantly==15.1.0        # via twisted
 coreapi==2.3.3
 coreschema==0.0.4
-coverage==4.2
+git+https://github.com/nedbat/coveragepy.git@c4b2392dd51b7f976972afb00f01d4618c523cff#egg=coverage==0.0
 cryptography==2.3
 cssselect==1.0.3
 cssutils==1.0.2
