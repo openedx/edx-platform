@@ -140,6 +140,11 @@ class Command(BaseCommand):
             action='store_true',
             help='Use arguments from the NotifyCredentialsConfig model instead of the command line.',
         )
+        parser.add_argument(
+            '--verbose',
+            action='store_true',
+            help='Run grade/cert change signal in verbose mode',
+        )
 
     def get_args_from_database(self):
         """ Returns an options dictionary from the current NotifyCredentialsConfig model. """
@@ -198,11 +203,12 @@ class Command(BaseCommand):
             self.send_notifications(certs, grades,
                                     site_config=site_config,
                                     delay=options['delay'],
-                                    page_size=options['page_size'])
+                                    page_size=options['page_size'],
+                                    verbose=options['verbose'])
 
         log.info('notify_credentials finished')
 
-    def send_notifications(self, certs, grades, site_config=None, delay=0, page_size=0):
+    def send_notifications(self, certs, grades, site_config=None, delay=0, page_size=0, verbose=False):
         """ Run actual handler commands for the provided certs and grades. """
 
         # First, do certs
@@ -222,6 +228,7 @@ class Command(BaseCommand):
                 'course_key': cert.course_id,
                 'mode': cert.mode,
                 'status': cert.status,
+                'verbose': verbose,
             }
             handle_course_cert_changed(**signal_args)
             handle_cert_change(**signal_args)
@@ -238,7 +245,15 @@ class Command(BaseCommand):
             )
 
             user = User.objects.get(id=grade.user_id)
-            send_grade_if_interesting(user, grade.course_id, None, None, grade.letter_grade, grade.percent_grade)
+            send_grade_if_interesting(
+                user,
+                grade.course_id,
+                None,
+                None,
+                grade.letter_grade,
+                grade.percent_grade,
+                verbose=verbose
+            )
 
     def get_course_keys(self, courses):
         """
