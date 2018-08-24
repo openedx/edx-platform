@@ -58,6 +58,11 @@ NUMBER_OF_BOKCHOY_THREADS=${NUMBER_OF_BOKCHOY_THREADS:=1}
 # Clean up previous builds
 git clean -qxfd
 
+export COVERAGE_DEBUG=sys,config
+export COVERAGE_DEBUG_FILE=reports/covdebug.txt
+echo "Reports contents before:"
+ls -al reports || true
+
 function emptyxunit {
 
     cat > reports/$1.xml <<END
@@ -218,3 +223,6 @@ case "$TEST_SUITE" in
         esac
         ;;
 esac
+
+echo "Reports contents after:"
+ls -al reports || true
