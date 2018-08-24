@@ -539,6 +539,7 @@ def get_module_system_for_user(
             raw_possible=event['max_value'],
             only_if_higher=event.get('only_if_higher'),
             score_deleted=event.get('score_deleted'),
+            grader_response=event.get('grader_response')
         )
 
     def handle_deprecated_progress_event(block, event):

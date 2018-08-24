@@ -952,7 +952,7 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         self.lcp.update_score(score_msg, queuekey)
         self.set_state_from_lcp()
         self.set_score(self.score_from_lcp())
-        self.publish_grade()
+        self.publish_grade(grader_response=True)
 
         return dict()  # No AJAX return is needed
 
@@ -1131,21 +1131,21 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
 
         return answers
 
-    def publish_grade(self, score=None, only_if_higher=None):
+    def publish_grade(self, score=None, only_if_higher=None, **kwargs):
         """
         Publishes the student's current grade to the system as an event
         """
         if not score:
             score = self.score
-        self.runtime.publish(
-            self,
-            'grade',
-            {
-                'value': score.raw_earned,
-                'max_value': score.raw_possible,
-                'only_if_higher': only_if_higher,
-            }
-        )
+        event = {
+            'value': score.raw_earned,
+            'max_value': score.raw_possible,
+            'only_if_higher': only_if_higher,
+        }
+        if kwargs.get('grader_response'):
+            event['grader_response'] = kwargs['grader_response']
+
+        self.runtime.publish(self, 'grade', event)
 
         return {'grade': self.score.raw_earned, 'max_grade': self.score.raw_possible}
 
