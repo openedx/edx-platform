@@ -120,16 +120,6 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
         course_names = self.dashboard_page.wait_for_page().available_courses
         self.assertIn(self.course_info["display_name"], course_names)
 
-    def test_login_failure(self):
-        # Navigate to the login page
-        self.login_page.visit()
-
-        # User account does not exist
-        self.login_page.login(email="nobody@nowhere.com", password="password")
-
-        # Verify that an error is displayed
-        self.assertIn("Email or password is incorrect.", self.login_page.wait_for_errors())
-
     def test_toggle_to_register_form(self):
         self.login_page.visit().toggle_form()
         self.assertEqual(self.login_page.current_form, "register")
