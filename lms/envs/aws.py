@@ -529,7 +529,7 @@ FILE_UPLOAD_STORAGE_BUCKET_NAME = ENV_TOKENS.get('FILE_UPLOAD_STORAGE_BUCKET_NAM
 FILE_UPLOAD_STORAGE_PREFIX = ENV_TOKENS.get('FILE_UPLOAD_STORAGE_PREFIX', FILE_UPLOAD_STORAGE_PREFIX)
 
 # If there is a database called 'read_replica', you can use the use_read_replica_if_available
-# function in util/query.py, which is useful for very large database reads
+# function in db_utils.utils, which is useful for very large database reads
 DATABASES = AUTH_TOKENS['DATABASES']
 
 # The normal database user does not have enough permissions to run migrations.
