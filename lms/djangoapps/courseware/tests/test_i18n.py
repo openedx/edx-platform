@@ -8,7 +8,6 @@ import re
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.urls import reverse, reverse_lazy
-from django.test import TestCase
 from django.test.client import Client
 from django.utils import translation
 

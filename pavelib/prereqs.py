@@ -6,12 +6,15 @@ import hashlib
 import os
 import re
 import sys
+import subprocess
+import io
 from distutils import sysconfig
 
 from paver.easy import BuildFailure, sh, task
 
 from .utils.envs import Env
 from .utils.timer import timed
+from .utils.decorators import timeout, TimeoutException
 
 PREREQS_STATE_DIR = os.getenv('PREREQ_CACHE_DIR', Env.REPO_ROOT / '.prereqs_cache')
 NO_PREREQ_MESSAGE = "NO_PREREQ_INSTALL is set, not installing prereqs"
@@ -79,7 +82,7 @@ def compute_fingerprint(path_list):
 
         # For files, hash the contents of the file
         if os.path.isfile(path_item):
-            with open(path_item, "rb") as file_handle:
+            with io.open(path_item, "rb") as file_handle:
                 hasher.update(file_handle.read())
 
     return hasher.hexdigest()
@@ -98,7 +101,7 @@ def prereq_cache(cache_name, paths, install_func):
     cache_file_path = os.path.join(PREREQS_STATE_DIR, "{}.sha1".format(cache_filename))
     old_hash = None
     if os.path.isfile(cache_file_path):
-        with open(cache_file_path) as cache_file:
+        with io.open(cache_file_path, "rb") as cache_file:
             old_hash = cache_file.read()
 
     # Compare the old hash to the new hash
@@ -112,7 +115,7 @@ def prereq_cache(cache_name, paths, install_func):
         # If the code executed within the context fails (throws an exception),
         # then this step won't get executed.
         create_prereqs_cache_dir()
-        with open(cache_file_path, "w") as cache_file:
+        with io.open(cache_file_path, "wb") as cache_file:
             # Since the pip requirement files are modified during the install
             # process, we need to store the hash generated AFTER the installation
             post_install_hash = compute_fingerprint(paths)
@@ -125,19 +128,48 @@ def node_prereqs_installation():
     """
     Configures npm and installs Node prerequisites
     """
+
+    @timeout(limit=300)
+    def _run_npm_command(npm_command, npm_log_file):
+        """
+        helper function for running the npm installation with a timeout.
+        The implementation of Paver's `sh` function returns before the forked
+        actually returns. Using a Popen object so that we can ensure that
+        the forked process has returned
+        """
+        proc = subprocess.Popen(npm_command, stderr=npm_log_file)
+        proc.wait()
+
+    # NPM installs hang sporadically. Log the installation process so that we
+    # determine if any packages are chronic offenders.
+    shard_str = os.getenv('SHARD', None)
+    if shard_str:
+        npm_log_file_path = '{}/npm-install.{}.log'.format(Env.GEN_LOG_DIR, shard_str)
+    else:
+        npm_log_file_path = '{}/npm-install.log'.format(Env.GEN_LOG_DIR)
+    npm_log_file = io.open(npm_log_file_path, 'wb')
+    npm_command = 'npm install --verbose'.split()
+
     cb_error_text = "Subprocess return code: 1"
 
     # Error handling around a race condition that produces "cb() never called" error. This
     # evinces itself as `cb_error_text` and it ought to disappear when we upgrade
     # npm to 3 or higher. TODO: clean this up when we do that.
     try:
-        sh('npm install')
+        _run_npm_command(npm_command, npm_log_file)
+    except TimeoutException:
+        print "NPM installation took too long. Exiting..."
+        print "Check {} for more information".format(npm_log_file_path)
+        sys.exit(1)
     except BuildFailure, error_text:
         if cb_error_text in error_text:
             print "npm install error detected. Retrying..."
-            sh('npm install')
+            _run_npm_command(npm_command, npm_log_file)
         else:
             raise BuildFailure(error_text)
+    print "Successfully installed NPM packages. Log found at {}".format(
+        npm_log_file_path
+    )
 
 
 def python_prereqs_installation():
@@ -192,7 +224,7 @@ def uninstall_python_packages():
     """
 
     if no_python_uninstall():
-        print(NO_PYTHON_UNINSTALL_MESSAGE)
+        print NO_PYTHON_UNINSTALL_MESSAGE
         return
 
     # So that we don't constantly uninstall things, use a hash of the packages
@@ -204,7 +236,7 @@ def uninstall_python_packages():
     create_prereqs_cache_dir()
 
     if os.path.isfile(state_file_path):
-        with open(state_file_path) as state_file:
+        with io.open(state_file_path) as state_file:
             version = state_file.read()
         if version == expected_version:
             print 'Python uninstalls unchanged, skipping...'
@@ -230,7 +262,7 @@ def uninstall_python_packages():
         return
 
     # Write our version.
-    with open(state_file_path, "w") as state_file:
+    with io.open(state_file_path, "wb") as state_file:
         state_file.write(expected_version)
 
 
