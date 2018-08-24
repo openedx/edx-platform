@@ -1008,6 +1008,7 @@ INSTALLED_APPS = [
 
     # For CMS
     'contentstore.apps.ContentstoreConfig',
+    'cms.djangoapps.bundles.apps.BundlesConfig',
 
     'openedx.core.djangoapps.contentserver',
     'course_creators',
