@@ -31,4 +31,4 @@ git+https://github.com/edx-solutions/course-edx-platform-extensions.git@v1.1.1#e
 git+https://github.com/edx-solutions/mobileapps-edx-platform-extensions.git@v1.2.2#egg=mobileapps-edx-platform-extensions==1.2.2
 git+https://github.com/edx-solutions/progress-edx-platform-extensions.git@1.0.8#egg=progress-edx-platform-extensions==1.0.8
 openedx-completion-aggregator==1.2
-git+https://github.com/mckinseyacademy/openedx-user-manager-api@v1.0.0#egg=openedx-user-manager-api==1.0.0
+git+https://github.com/mckinseyacademy/openedx-user-manager-api@v1.0.1#egg=openedx-user-manager-api==1.0.1
