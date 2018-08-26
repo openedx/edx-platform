@@ -31,7 +31,6 @@ boto==2.39.0                        # Deprecated version of the AWS SDK; we shou
 boto3==1.4.8                        # Amazon Web Services SDK for Python
 botocore==1.8.17                    # via boto3, s3transfer
 celery==3.1.25                      # Asynchronous task execution library
-ddt==0.8.0                          # via xblock-drag-and-drop-v2 (which probably shouldn't require it)
 defusedxml==0.4.1                   # XML bomb protection for common XML parsers
 Django==1.11.15                     # Web application framework
 django-babel-underscore             # underscore template extractor for django-babel (internationalization utilities)

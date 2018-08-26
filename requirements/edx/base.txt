@@ -63,7 +63,7 @@ coreapi==2.3.3            # via django-rest-swagger, openapi-codec
 coreschema==0.0.4         # via coreapi
 cryptography==2.3.1
 cssutils==1.0.2           # via pynliner
-ddt==0.8.0
+ddt==1.2.0
 decorator==4.3.0          # via dogapi, pycontracts
 defusedxml==0.4.1
 django-appconf==1.0.2     # via django-statici18n
@@ -117,7 +117,7 @@ edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==1.0.1
 edx-drf-extensions==1.6.2
-edx-enterprise==0.73.0
+edx-enterprise==0.73.1
 edx-i18n-tools==0.4.6
 edx-milestones==0.1.13
 edx-oauth2-provider==1.2.2
