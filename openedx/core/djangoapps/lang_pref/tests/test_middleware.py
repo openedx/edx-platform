@@ -7,7 +7,8 @@ import mock
 
 import ddt
 from django.conf import settings
-from django.test import TestCase
+from django.test import TestCas
+from django.test.client import Cliente
 from django.urls import reverse
 from django.test.client import RequestFactory
 from django.http import HttpResponse
@@ -38,6 +39,7 @@ class TestUserPreferenceMiddleware(TestCase):
         self.request.user = self.user
         self.request.META['HTTP_ACCEPT_LANGUAGE'] = 'ar;q=1.0'
         self.session_middleware.process_request(self.request)
+        self.client = Client()
 
     def test_logout_shouldnt_remove_cookie(self):
 
