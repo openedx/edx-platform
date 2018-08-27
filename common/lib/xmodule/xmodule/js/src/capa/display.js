@@ -264,6 +264,7 @@
             if (showGrades) {
                 return this.$('.problem-progress').text(progress);
             } else {
+                this.$('.indicator-container, span.message, span.status').remove();
                 return this.$('.problem-progress').text("");
             }
 
@@ -611,10 +612,18 @@
                 switch (response.success) {
                 case 'incorrect':
                 case 'correct':
-                    window.SR.readTexts(that.get_sr_status(response.contents));
-                    that.el.trigger('contentChanged', [that.id, response.contents, response]);
-                    that.render(response.contents, that.focus_on_submit_notification);
-                    that.updateProgress(response);
+                    var showGrades = $('.show-grades-el-hidden').length;
+
+                    if (showGrades) {
+                        window.SR.readTexts(that.get_sr_status(response.contents));
+                        that.el.trigger('contentChanged', [that.id, response.contents, response]);
+                        that.render(response.contents, that.focus_on_submit_notification);
+                        that.updateProgress(response);
+                    } else {
+                        that.saveNotification.hide();
+                        that.gentle_alert("Answer submitted successfully");
+                    }
+
                     break;
                 default:
                     that.saveNotification.hide();

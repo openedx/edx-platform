@@ -786,13 +786,6 @@ class CapaMixin(CapaFields):
                         ).format(progress=str(progress))
                     else:
                         answer_notification_message = _('Partially Correct')
-            elif answer_notification_type in ['correct', 'incorrect', 'partially-correct']:
-                if answer_notification_type == 'incorrect':
-                    answer_notification_message = _('Incorrect')
-                elif answer_notification_type == 'correct':
-                    answer_notification_message = _('Correct')
-                elif answer_notification_type == 'partially-correct':
-                    answer_notification_message = _('Partially Correct')
 
         return answer_notification_type, answer_notification_message
 
