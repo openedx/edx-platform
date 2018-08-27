@@ -19,6 +19,7 @@ from lms.djangoapps.certificates.api import get_active_web_certificate
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.models.course_details import CourseDetails
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.core.lib.courses import course_image_url
 from static_replace.models import AssetBaseUrlConfig
 from xmodule.assetstore.assetmgr import AssetManager
@@ -41,7 +42,7 @@ from .factories import CourseOverviewFactory
 
 
 @ddt.ddt
-class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase):
+class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, CacheIsolationTestCase):
     """
     Tests for CourseOverview model.
     """
