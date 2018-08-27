@@ -22,20 +22,22 @@ $browser-update-ignore-button: $action-primary-disabled-bg;
   width: 100%;
   z-index: 2;
 
-  a {
-    color: #fff;
+  .buorg-buttons {
+    a {
+      color: #fff;
 
-    &:hover {
-      color: #fff !important;
+      &:hover {
+        color: #fff !important;
+      }
     }
-  }
 
-  #buorgul {
-    background-color: $browser-update-ok-button;
-  }
+    #buorgul {
+      background-color: $browser-update-ok-button;
+    }
 
-  #buorgig {
-    background-color: $browser-update-ignore-button;
+    #buorgig {
+      background-color: $browser-update-ignore-button;
+    }
   }
 }
 
