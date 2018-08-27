@@ -5,7 +5,7 @@
     "@edx/cookie-policy-banner": "1.1.10",
     "@edx/edx-bootstrap": "0.4.3",
     "@edx/paragon": "2.6.4",
-    "@edx/studio-frontend": "1.16.5",
+    "@edx/studio-frontend": "edx/studio-frontend#aj/fix-certificate-checklist",
     "babel-core": "6.26.0",
     "babel-loader": "6.4.1",
     "babel-plugin-transform-class-properties": "6.24.1",

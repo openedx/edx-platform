@@ -92,6 +92,7 @@ class CourseValidationViewTest(SharedModuleStoreTestCase, APITestCase):
                 'has_update': True,
             },
             'certificates': {
+                'is_enabled': True,
                 'is_activated': False,
                 'has_certificate': False,
             },
@@ -101,5 +102,4 @@ class CourseValidationViewTest(SharedModuleStoreTestCase, APITestCase):
             },
             'is_self_paced': True,
         }
-
         self.assertDictEqual(resp.data, expected_data)

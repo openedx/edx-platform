@@ -125,6 +125,7 @@ class CourseQualityViewTest(SharedModuleStoreTestCase, APITestCase):
                 'total_visible': 1,
                 'total_number': 1,
                 'highlights_enabled': False,
+                'highlights_active_for_course': False,
             },
             'subsections': {
                 'num_with_one_block_type': 1,
