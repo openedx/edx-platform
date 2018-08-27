@@ -712,9 +712,11 @@ class CourseEnrollmentsApiListView(DeveloperErrorViewMixin, ListAPIView):
     """
         **Use Cases**
 
-            Get a list of all course enrollments given a course ID or list of usernames.
+            Get a list of all course enrollments, optionally filtered by a course ID and/or list of usernames.
 
         **Example Requests**
+
+            GET /api/enrollment/v1/enrollments
 
             GET /api/enrollment/v1/enrollments?course_id={course_id}
 
@@ -725,15 +727,14 @@ class CourseEnrollmentsApiListView(DeveloperErrorViewMixin, ListAPIView):
         **Query Parameters for GET**
 
             * course_id: Filters the result to course enrollments for the course corresponding to the
-              given course ID. The value must be URL encoded. Optional. Required if the 'username' parameter
-              is omitted.
+              given course ID. The value must be URL encoded. Optional.
 
             * username: List of comma-separated usernames. Filters the result to the course enrollments
-              of the given users. Optional. Required if the 'course_id' parameter is omitted.
+              of the given users. Optional.
 
-            * page_size: Number of results to return per page.
+            * page_size: Number of results to return per page. Optional. Default: 10. Maximum: 100.
 
-            * page: Page number to retrieve.
+            * page: Page number to retrieve. Optional. Default: 1.
 
         **Response Values**
 

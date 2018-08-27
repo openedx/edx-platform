@@ -1248,7 +1248,7 @@ class EnrollmentCrossDomainTest(ModuleStoreTestCase):
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class CourseEnrollmentsApiListTest(APITestCase, ModuleStoreTestCase):
     """
-    Test the course enrollments by username or course id endpoint.
+    Test the course enrollments api list endpoint.
     """
     CREATED_DATA = datetime.datetime(2018, 1, 1, 0, 0, 1, tzinfo=pytz.UTC)
 

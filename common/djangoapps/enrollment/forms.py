@@ -9,7 +9,7 @@ from student import forms as student_forms
 
 class CourseEnrollmentsApiListForm(Form):
     """
-    A form that validates the query string parameters for the CourseEnrollmentsByUsernameOrCourseIDListView.
+    A form that validates the query string parameters for the CourseEnrollmentsApiListView.
     """
     username = CharField(required=False)
     course_id = CharField(required=False)
