@@ -207,6 +207,8 @@ class TestUserPreferenceMiddleware(TestCase):
         self.assertEqual(response.status_code, 200)
 
         if lang_cookie:
+            if response['Content-Language'] != expected_lang:
+                self.assertEqual(response.__dict__, 'dummy value')
             self.assertEqual(response['Content-Language'], expected_lang)
             self.assertEqual(get_user_preference(self.user, LANGUAGE_KEY), lang_cookie)
             self.assertEqual(
