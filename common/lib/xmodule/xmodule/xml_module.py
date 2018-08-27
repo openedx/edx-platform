@@ -487,7 +487,11 @@ class XmlParserMixin(object):
         if self.export_to_file():
             # Write the definition to a file
             url_path = name_to_pathname(self.url_name)
-            filepath = self._format_filepath(self.category, url_path)
+            # if folder is course then create file with name {course_run}.xml
+            filepath = self._format_filepath(
+                self.category,
+                self.location.run if self.category == 'course' else url_path,
+            )
             self.runtime.export_fs.makedirs(os.path.dirname(filepath), recreate=True)
             with self.runtime.export_fs.open(filepath, 'wb') as fileobj:
                 ElementTree(xml_object).write(fileobj, pretty_print=True, encoding='utf-8')

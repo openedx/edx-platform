@@ -1116,7 +1116,11 @@ class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XModuleMixin):
         node.tag = exported_node.tag
         node.text = exported_node.text
         node.tail = exported_node.tail
+
         for key, value in exported_node.items():
+            if key == 'url_name' and value == 'course' and key in node.attrib:
+                # if url_name is set in ExportManager then do not override it here.
+                continue
             node.set(key, value)
 
         node.extend(list(exported_node))

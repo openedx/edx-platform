@@ -166,6 +166,7 @@ class ExportManager(object):
                 # change all of the references inside the course to use the xml expected key type w/o version & branch
                 xml_centric_courselike_key = self.get_key()
                 adapt_references(courselike, xml_centric_courselike_key, export_fs)
+                root.set('url_name', self.courselike_key.run)
                 courselike.add_xml_to_node(root)
 
             # Make any needed adjustments to the root node.
@@ -267,10 +268,6 @@ class CourseExportManager(ExportManager):
         )
 
         course_policy_dir_name = courselike.location.run
-        if courselike.url_name != courselike.location.run and courselike.url_name == 'course':
-            # Use url_name for split mongo because course_run is not used when loading policies.
-            course_policy_dir_name = courselike.url_name
-
         course_run_policy_dir = policies_dir.makedir(course_policy_dir_name, recreate=True)
 
         # export the grading policy
@@ -280,7 +277,7 @@ class CourseExportManager(ExportManager):
 
         # export all of the course metadata in policy.json
         with course_run_policy_dir.open(u'policy.json', 'wb') as course_policy:
-            policy = {'course/' + courselike.location.block_id: own_metadata(courselike)}
+            policy = {'course/' + courselike.location.run: own_metadata(courselike)}
             course_policy.write(dumps(policy, cls=EdxJSONEncoder, sort_keys=True, indent=4).encode('utf-8'))
 
         _export_drafts(self.modulestore, self.courselike_key, export_fs, xml_centric_courselike_key)
