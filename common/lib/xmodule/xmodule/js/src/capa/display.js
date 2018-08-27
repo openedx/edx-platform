@@ -621,7 +621,6 @@
                         that.updateProgress(response);
                     } else {
                         that.saveNotification.hide();
-                        that.updateProgress(response);
                         that.gentle_alert("Answer submitted successfully");
                     }
 
