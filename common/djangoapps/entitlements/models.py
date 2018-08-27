@@ -210,8 +210,7 @@ class CourseEntitlement(TimeStampedModel):
         if not self.expired_at:
             if (self.policy.get_days_until_expiration(self) < 0 or
                     (self.enrollment_course_run and not self.is_entitlement_regainable())):
-                self.expired_at = now()
-                self.save()
+                self.expire_entitlement()
 
     def get_days_until_expiration(self):
         """
@@ -267,6 +266,13 @@ class CourseEntitlement(TimeStampedModel):
         Fulfills an entitlement by specifying a session.
         """
         self.enrollment_course_run = enrollment
+        self.save()
+
+    def expire_entitlement(self):
+        """
+        Expire the entitlement.
+        """
+        self.expired_at = now()
         self.save()
 
     @classmethod
@@ -412,10 +418,12 @@ class CourseEntitlement(TimeStampedModel):
         """
         course_uuid = get_course_uuid_for_course(course_enrollment.course_id)
         course_entitlement = cls.get_entitlement_if_active(course_enrollment.user, course_uuid)
-        if course_entitlement:
+        if course_entitlement and course_entitlement.enrollment_course_run == course_enrollment:
             course_entitlement.set_enrollment(None)
             if not skip_refund and course_entitlement.is_entitlement_refundable():
                 course_entitlement.refund()
+
+            course_entitlement.expire_entitlement()
 
     def refund(self):
         """
