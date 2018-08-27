@@ -57,13 +57,12 @@ def _process_revoke_and_unenroll_entitlement(course_entitlement, is_refund=False
         IntegrityError if there is an issue that should reverse the database changes
     """
     if course_entitlement.expired_at is None:
-        course_entitlement.expired_at = timezone.now()
+        course_entitlement.expire_entitlement()
         log.info(
             'Set expired_at to [%s] for course entitlement [%s]',
             course_entitlement.expired_at,
             course_entitlement.uuid
         )
-        course_entitlement.save()
 
     if course_entitlement.enrollment_course_run is not None:
         course_id = course_entitlement.enrollment_course_run.course_id
