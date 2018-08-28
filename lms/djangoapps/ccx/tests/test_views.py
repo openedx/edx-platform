@@ -540,6 +540,25 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         self.assertEqual(policy['GRADER'][3]['min_count'], 0)
 
     @patch('ccx.views.render_to_response', intercept_renderer)
+    def test_update_course_details(self):
+        """
+        Get CCX details, modify it, save it.
+        """
+        self.make_coach()
+        ccx = self.make_ccx()
+        course_id = CCXLocator.from_course_locator(self.course.id, ccx.id)
+        course_details_url = reverse(
+            'ccx_update_course_details', kwargs={'course_id': course_id})
+        previous_display_name = ccx.display_name
+        display_name = 'New CCX Updated'
+        response = self.client.post(
+            course_details_url, {'display_name': display_name })
+        self.assertEqual(response.status_code, 302)
+        ccx = CustomCourseForEdX.objects.get()
+        self.assertEqual(ccx.display_name, display_name)
+        self.assertNotEqual(ccx.display_name, previous_display_name)
+
+    @patch('ccx.views.render_to_response', intercept_renderer)
     def test_save_without_min_count(self):
         """
         POST grading policy without min_count field.
