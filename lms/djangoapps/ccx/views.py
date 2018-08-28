@@ -140,6 +140,11 @@ def dashboard(request, course, ccx=None):
         schedule = get_ccx_schedule(course, ccx)
         grading_policy = get_override_for_ccx(
             ccx, course, 'grading_policy', course.grading_policy)
+        # TODO: this logic will change once child course bug is fixed.
+        # This value will be later retrieved from ccx override.
+        context['course_display_name'] = ccx.display_name
+        context['course_details_url'] = reverse(
+            'ccx_update_course_details', kwargs={'course_id': ccx_locator})
         context['schedule'] = json.dumps(schedule, indent=4)
         context['save_url'] = reverse(
             'save_ccx', kwargs={'course_id': ccx_locator})
@@ -344,6 +349,37 @@ def save_ccx(request, course, ccx=None):
             'grading_policy': json.dumps(policy, indent=4)}),
         content_type='application/json',
     )
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@coach_dashboard
+def update_course_details(request, course, ccx=None):
+    """
+    Update course display name for the CCX.
+    """
+    if not ccx:
+        raise Http404
+
+    # TODO: This should have been saved as a override field. This will
+    # be updated once child course display name bug is fixed.
+    CustomCourseForEdX.objects.filter(
+        course_id=course.id,
+        coach=request.user).update(display_name=request.POST['display_name'])
+
+    # using CCX object as sender here.
+    responses = SignalHandler.course_published.send(
+        sender=ccx,
+        course_key=CCXLocator.from_course_locator(course.id, unicode(ccx.id))
+    )
+    for rec, response in responses:
+        log.info('Signal fired when course is published. Receiver: %s. Response: %s', rec, response)
+
+    url = reverse(
+        'ccx_coach_dashboard',
+        kwargs={'course_id': CCXLocator.from_course_locator(course.id, unicode(ccx.id))}
+    )
+    return redirect(url)
 
 
 @ensure_csrf_cookie

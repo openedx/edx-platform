@@ -9,6 +9,7 @@ urlpatterns = [
     url(r'^ccx_coach$', ccx.views.dashboard, name='ccx_coach_dashboard'),
     url(r'^create_ccx$', ccx.views.create_ccx, name='create_ccx'),
     url(r'^save_ccx$', ccx.views.save_ccx, name='save_ccx'),
+    url(r'^ccx_update_course_details$', ccx.views.update_course_details, name='ccx_update_course_details'),
     url(r'^ccx_schedule$', ccx.views.ccx_schedule, name='ccx_schedule'),
     url(r'^ccx-manage-students$', ccx.views.ccx_students_management, name='ccx-manage-students'),
 

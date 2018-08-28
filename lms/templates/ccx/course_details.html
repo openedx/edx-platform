@@ -1,0 +1,19 @@
+<%page expression_filter="h"/>
+<%!
+from django.utils.translation import ugettext as _
+from django.utils.translation import pgettext
+from openedx.core.djangolib.markup import HTML, Text
+%>
+
+<h2 class="hd hd-2">${_("Course Details")}</h2>
+
+<form action="${course_details_url}" method="POST">
+  <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
+  <div class="field">
+    <label class="sr" for="ccx_display_name">${_('Course Display Name')}</label>
+    <input name="display_name" id="ccx_display_name" placeholder="${_('Enter course name')}" value="${course_display_name}"/><br/>
+  </div>
+  <div class="field">
+    <button id="update-ccx" type="submit">${_('Update')}</button>
+  </div>
+</form>
