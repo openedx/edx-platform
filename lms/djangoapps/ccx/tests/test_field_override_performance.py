@@ -16,12 +16,12 @@ from django.conf import settings
 from django.core.cache import caches
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from edx_django_utils.cache import RequestCache
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from pytz import UTC
-from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xblock.core import XBlock
@@ -176,7 +176,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
             get_course_in_cache(course_key)
 
             # We clear the request cache to simulate a new request in the LMS.
-            RequestCache.clear_request_cache()
+            RequestCache.clear_all_namespaces()
 
             # Reset the list of provider classes, so that our django settings changes
             # can actually take affect.

@@ -4,6 +4,7 @@ Integration tests for gated content.
 import ddt
 from crum import set_current_request
 from completion import waffle as completion_waffle
+from edx_django_utils.cache import RequestCache
 from milestones import api as milestones_api
 from milestones.tests.utils import MilestonesTestCaseMixin
 
@@ -12,7 +13,6 @@ from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.tests.utils import answer_problem
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.gating import api as gating_api
-from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -141,7 +141,7 @@ class TestGatedContent(MilestonesTestCaseMixin, SharedModuleStoreTestCase):
         Verifies access to gated content for the given user is as expected.
         """
         # clear the request cache to flush any cached access results
-        RequestCache.clear_request_cache()
+        RequestCache.clear_all_namespaces()
 
         # access to gating content (seq1) remains constant
         self.assertTrue(bool(has_access(user, 'load', self.seq1, self.course.id)))

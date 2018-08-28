@@ -26,6 +26,7 @@ from courseware.testutils import FieldOverrideTestMixin
 from django_comment_client.utils import has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from django_comment_common.utils import are_permissions_roles_seeded
+from edx_django_utils.cache import RequestCache
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import get_override_for_ccx, override_field_for_ccx
@@ -36,7 +37,6 @@ from lms.djangoapps.ccx.views import get_date
 from lms.djangoapps.grades.tasks import compute_all_grades_for_course
 from lms.djangoapps.instructor.access import allow_access, list_with_level
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from openedx.core.lib.tests import attr
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
@@ -1051,7 +1051,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
         CourseOverview.load_from_module_store(self.course.id)
         setup_students_and_grades(self)
         self.client.login(username=coach.username, password="test")
-        self.addCleanup(RequestCache.clear_request_cache)
+        self.addCleanup(RequestCache.clear_all_namespaces)
         from xmodule.modulestore.django import SignalHandler
 
         # using CCX object as sender here.
@@ -1064,7 +1064,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
     @patch('lms.djangoapps.instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 1)
     def test_gradebook(self):
         self.course.enable_ccx = True
-        RequestCache.clear_request_cache()
+        RequestCache.clear_all_namespaces()
 
         url = reverse(
             'ccx_gradebook',
@@ -1081,7 +1081,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
 
     def test_grades_csv(self):
         self.course.enable_ccx = True
-        RequestCache.clear_request_cache()
+        RequestCache.clear_all_namespaces()
 
         url = reverse(
             'ccx_grades_csv',

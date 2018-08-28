@@ -24,6 +24,7 @@ from courseware.tests.factories import InstructorFactory
 from django.conf import settings
 from django.urls import reverse
 from django.test.utils import override_settings
+from edx_django_utils.cache import RequestCache
 from freezegun import freeze_time
 from instructor_analytics.basic import UNAVAILABLE, list_problem_responses
 from mock import MagicMock, Mock, patch, ANY
@@ -85,7 +86,6 @@ from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVer
 from openedx.core.djangoapps.course_groups.models import CohortMembership, CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.djangoapps.credit.tests.factories import CreditCourseFactory
-from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase, TestConditionalContent
 from ..models import ReportStore
@@ -411,7 +411,7 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
             CourseEnrollment.enroll(user, course.id, mode='verified')
             SoftwareSecurePhotoVerificationFactory.create(user=user, status='approved')
 
-        RequestCache.clear_request_cache()
+        RequestCache.clear_all_namespaces()
 
         expected_query_count = 43
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
