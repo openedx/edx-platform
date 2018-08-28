@@ -552,7 +552,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         previous_display_name = ccx.display_name
         display_name = 'New CCX Updated'
         response = self.client.post(
-            course_details_url, {'display_name': display_name })
+            course_details_url, {'display_name': display_name})
         self.assertEqual(response.status_code, 302)
         ccx = CustomCourseForEdX.objects.get()
         self.assertEqual(ccx.display_name, display_name)
