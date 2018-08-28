@@ -207,8 +207,7 @@ class TestUserPreferenceMiddleware(TestCase):
         if lang_cookie:
             if response['Content-Language'] != expected_lang:
                 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
-                print DarkLangConfig.current().released_languages_list
-                self.assertEqual(settings.LANGUAGES, 'dummy_language')
+                self.assertEqual(DarkLangConfig.current().released_languages_list, 'hey')
             self.assertEqual(response['Content-Language'], expected_lang)
             self.assertEqual(get_user_preference(self.user, LANGUAGE_KEY), lang_cookie)
             self.assertEqual(
