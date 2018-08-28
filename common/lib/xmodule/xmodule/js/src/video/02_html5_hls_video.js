@@ -87,9 +87,6 @@
             Player.prototype.pauseVideo = function() {
                 HTML5Video.Player.prototype.pauseVideo.apply(this);
                 HTML5Video.Player.prototype.updatePlayerLoadingState.apply(this, ['hide']);
-                if (!this.config.browserIsSafari) {
-                    this.hls.stopLoad();
-                }
             };
 
             Player.prototype.onPlaying = function() {
