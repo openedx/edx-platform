@@ -8,7 +8,6 @@ import mock
 import ddt
 from django.conf import settings
 from django.test import TestCase
-from django.test.client import Client
 from django.urls import reverse
 from django.test.client import RequestFactory
 from django.http import HttpResponse
@@ -39,7 +38,6 @@ class TestUserPreferenceMiddleware(TestCase):
         self.request.user = self.user
         self.request.META['HTTP_ACCEPT_LANGUAGE'] = 'ar;q=1.0'
         self.session_middleware.process_request(self.request)
-        self.client = Client()
 
     def test_logout_shouldnt_remove_cookie(self):
 
@@ -208,7 +206,9 @@ class TestUserPreferenceMiddleware(TestCase):
 
         if lang_cookie:
             if response['Content-Language'] != expected_lang:
-                self.assertEqual(response.__dict__, 'dummy value')
+                from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
+                print DarkLangConfig.current().released_languages_list
+                self.assertEqual(settings.LANGUAGES, 'dummy_language')
             self.assertEqual(response['Content-Language'], expected_lang)
             self.assertEqual(get_user_preference(self.user, LANGUAGE_KEY), lang_cookie)
             self.assertEqual(
