@@ -56,7 +56,7 @@ def handle_course_cert_awarded(sender, user, course_key, mode, status, **kwargs)
 
 
 @receiver(COURSE_CERT_CHANGED)
-def handle_course_cert_changed(sender, user, course_key, mode, status, **kwargs):  # pylint: disable=unused-argument
+def handle_course_cert_changed(sender, user, course_key, mode, status, **kwargs):
     """
         If a learner is awarded a course certificate,
         schedule a celery task to process that course certificate
