@@ -26,6 +26,7 @@
           fragments = response.fragments;
           for (i = 0, len = fragments.length; i < len; i++) {
             renderedFragments.push(_this.renderXBlockFragment(fragments[i]));
+            console.log("Started fragment loading", fragments[i])
           }
           parentEl = $(element).parent();
           parentId = parentEl.attr('id');
@@ -48,6 +49,7 @@
           Use that token instead of @requestToken by simply not passing a token into initializeBlocks.
           */
           $.when.apply(null, renderedFragments).done(function() {
+              console.log("All fragments loaded, initializing blocks");
               XBlock.initializeBlocks(_this.el);
           });
         };
@@ -77,6 +79,7 @@
           // We give XBlock fragments free-reign to add javascript and CSS to
           // to the page, so XSS escaping doesn't matter much in this context
           // xss-lint: disable=javascript-jquery-append
+          console.log("Fragment resources loaded, appending HTML");
           element.append(html);
         });
       } catch (e) {
@@ -147,9 +150,12 @@
       } else if (mimetype === 'application/javascript') {
         if (kind === 'text') {
           eval.call(window, data);
+          console.log("JavaScript text resource eval'd", resource);
         } else if (kind === 'url') {
           // This is a dependency loaded from the LMS (not ideal)
-          return ViewUtils.loadJavaScript(data);
+          return ViewUtils.loadJavaScript(data).done(function() {
+              console.log('JavaScript url resource loaded', resource);
+          });
         }
       } else if (mimetype === 'text/html') {
         if (placement === 'head') {
