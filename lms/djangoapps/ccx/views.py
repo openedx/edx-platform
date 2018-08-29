@@ -140,9 +140,6 @@ def dashboard(request, course, ccx=None):
         schedule = get_ccx_schedule(course, ccx)
         grading_policy = get_override_for_ccx(
             ccx, course, 'grading_policy', course.grading_policy)
-        # TODO: this logic will change once child course bug is fixed.
-        # This value will be later retrieved from ccx override.
-        context['course_display_name'] = ccx.display_name
         context['course_details_url'] = reverse(
             'ccx_update_course_details', kwargs={'course_id': ccx_locator})
         context['schedule'] = json.dumps(schedule, indent=4)
