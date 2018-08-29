@@ -2018,6 +2018,7 @@ class TestXmoduleRuntimeEvent(TestSubmittingProblems):
                 'modified': datetime.now().replace(tzinfo=pytz.UTC),
                 'score_db_table': 'csm',
                 'score_deleted': None,
+                'grader_response': None
             }
             send_mock.assert_called_with(**expected_signal_kwargs)
 

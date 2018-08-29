@@ -22,5 +22,5 @@ pyyaml==3.13              # via watchdog
 requests==2.9.1
 six==1.11.0               # via edx-opaque-keys, libsass, paver, stevedore
 stevedore==1.10.0
-watchdog==0.8.3
+watchdog==0.9.0
 wrapt==1.10.5

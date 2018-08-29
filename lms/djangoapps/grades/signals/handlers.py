@@ -172,6 +172,7 @@ def score_published_handler(sender, block, user, raw_earned, raw_possible, only_
             modified=score_modified_time,
             score_db_table=ScoreDatabaseTableEnum.courseware_student_module,
             score_deleted=kwargs.get('score_deleted', False),
+            grader_response=kwargs.get('grader_response', False)
         )
     return update_score
 
@@ -202,6 +203,7 @@ def problem_raw_score_changed_handler(sender, **kwargs):  # pylint: disable=unus
         score_deleted=kwargs.get('score_deleted', False),
         modified=kwargs['modified'],
         score_db_table=kwargs['score_db_table'],
+        grader_response=kwargs.get('grader_response', False)
     )
 
 

@@ -63,6 +63,7 @@ PROBLEM_RAW_SCORE_CHANGED_KWARGS = {
     'score_deleted': True,
     'modified': FROZEN_NOW_TIMESTAMP,
     'score_db_table': ScoreDatabaseTableEnum.courseware_student_module,
+    'grader_response': None
 }
 
 PROBLEM_WEIGHTED_SCORE_CHANGED_KWARGS = {
@@ -76,6 +77,7 @@ PROBLEM_WEIGHTED_SCORE_CHANGED_KWARGS = {
     'score_deleted': True,
     'modified': FROZEN_NOW_TIMESTAMP,
     'score_db_table': ScoreDatabaseTableEnum.courseware_student_module,
+    'grader_response': None
 }
 
 
