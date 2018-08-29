@@ -265,6 +265,10 @@
                 return this.$('.problem-progress').text(progress);
             } else {
                 this.$('.indicator-container, span.message, span.status').remove();
+                this.$('div.correct').removeClass("correct");
+                this.$('div.incorrect').removeClass("incorrect");
+                this.$('label.choicegroup_correct').removeClass("choicegroup_correct");
+                this.$('label.choicegroup_incorrect').removeClass("choicegroup_incorrect");
                 return this.$('.problem-progress').text("");
             }
 
