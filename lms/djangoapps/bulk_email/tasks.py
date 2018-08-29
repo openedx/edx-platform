@@ -23,6 +23,8 @@ from boto.ses.exceptions import (
     SESLocalAddressCharacterError,
     SESMaxSendingRateExceededError
 )
+from util.string_utils import _has_non_ascii_characters
+
 from celery import current_task, task
 from celery.exceptions import RetryTaskError
 from celery.states import FAILURE, RETRY, SUCCESS
@@ -512,6 +514,19 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
             recipient_num += 1
             current_recipient = to_list[-1]
             email = current_recipient['email']
+            if _has_non_ascii_characters(email):
+                to_list.pop()
+                total_recipients_failed += 1
+                log.info(
+                    "BulkEmail ==> Email address %s contains non-ascii characters. Skipping sending "
+                    "email to %s, EmailId: %s ",
+                    email,
+                    current_recipient['profile__name'],
+                    email_id
+                )
+                subtask_status.increment(failed=1)
+                continue
+
             email_context['email'] = email
             email_context['name'] = current_recipient['profile__name']
             email_context['user_id'] = current_recipient['pk']
