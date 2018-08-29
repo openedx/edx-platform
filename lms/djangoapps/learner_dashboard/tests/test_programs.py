@@ -14,6 +14,7 @@ from django.urls import reverse, reverse_lazy
 from django.test import override_settings
 
 from lms.envs.test import CREDENTIALS_PUBLIC_SERVICE_URL
+from openedx.core.djangoapps.catalog.constants import PathwayType
 from openedx.core.djangoapps.catalog.tests.factories import (
     PathwayFactory,
     CourseFactory,
@@ -30,6 +31,17 @@ from xmodule.modulestore.tests.factories import CourseFactory as ModuleStoreCour
 
 PROGRAMS_UTILS_MODULE = 'openedx.core.djangoapps.programs.utils'
 PROGRAMS_MODULE = 'lms.djangoapps.learner_dashboard.programs'
+
+
+def load_serialized_data(response, key):
+    """
+    Extract and deserialize serialized data from the response.
+    """
+    pattern = re.compile(r'{key}: (?P<data>\[.*\])'.format(key=key))
+    match = pattern.search(response.content)
+    serialized = match.group('data')
+
+    return json.loads(serialized)
 
 
 @skip_unless_lms
@@ -67,16 +79,6 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         Helper function used to sort dictionaries representing programs.
         """
         return program['title']
-
-    def load_serialized_data(self, response, key):
-        """
-        Extract and deserialize serialized data from the response.
-        """
-        pattern = re.compile(r'{key}: (?P<data>\[.*\])'.format(key=key))
-        match = pattern.search(response.content)
-        serialized = match.group('data')
-
-        return json.loads(serialized)
 
     def assert_dict_contains_subset(self, superset, subset):
         """
@@ -140,7 +142,7 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
 
         response = self.client.get(self.url)
-        actual = self.load_serialized_data(response, 'programsData')
+        actual = load_serialized_data(response, 'programsData')
         actual = sorted(actual, key=self.program_sort_key)
 
         for index, actual_program in enumerate(actual):
@@ -169,7 +171,7 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
 
         response = self.client.get(self.url)
-        actual = self.load_serialized_data(response, 'programsData')
+        actual = load_serialized_data(response, 'programsData')
         actual = sorted(actual, key=self.program_sort_key)
 
         for index, actual_program in enumerate(actual):
@@ -227,8 +229,20 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
         )
 
     def assert_pathway_data_present(self, response):
+        """ Verify that the correct pathway data is present. """
+        self.assertContains(response, 'industryPathways')
         self.assertContains(response, 'creditPathways')
-        self.assertContains(response, self.pathway_data['name'])
+
+        industry_pathways = load_serialized_data(response, 'industryPathways')
+        credit_pathways = load_serialized_data(response, 'creditPathways')
+        if self.pathway_data['pathway_type'] == PathwayType.CREDIT.value:
+            credit_pathway, = credit_pathways  # Verify that there is only one credit pathway
+            self.assertEqual(self.pathway_data, credit_pathway)
+            self.assertEqual([], industry_pathways)
+        elif self.pathway_data['pathway_type'] == PathwayType.INDUSTRY.value:
+            industry_pathway, = industry_pathways  # Verify that there is only one industry pathway
+            self.assertEqual(self.pathway_data, industry_pathway)
+            self.assertEqual([], credit_pathways)
 
     def test_login_required(self, mock_get_programs, mock_get_pathways):
         """

@@ -22,8 +22,8 @@
     <% } %>
 </aside>
 <% if (creditPathways.length > 0) { %>
-    <aside class="aside js-program-pathways program-pathways">
-        <h2 class = "divider-heading"><%- gettext('Additional Learning Opportunities') %></h2>
+    <aside class="aside js-program-pathways program-credit-pathways">
+        <h2 class = "divider-heading"><%- gettext('Additional Credit Opportunities') %></h2>
 
         <% for (var i = 0; i < creditPathways.length; i++) {
             var pathway = creditPathways[i];
@@ -37,7 +37,7 @@
                     <% if (pathway.destination_url) { %>
                         <div class="sidebar-button-wrapper">
                             <a href="<%- pathway.destination_url %>" class="pathway-link">
-                                <button class="btn sidebar-button" data-pathway-id="<%- pathway.id %>" data-pathway-name="<%- pathway.name %>"><%- gettext('Learn More') %></button>
+                                <button class="btn pathway-button sidebar-button" data-pathway-id="<%- pathway.id %>" data-pathway-name="<%- pathway.name %>"><%- gettext('Learn More') %></button>
                             </a>
                         </div>
                     <% } %>
@@ -47,3 +47,28 @@
     </aside>
 <% } %>
 
+<% if (industryPathways.length > 0) { %>
+    <aside class="aside js-program-pathways program-industry-pathways">
+        <h2 class = "divider-heading"><%- gettext('Additional Professional Opportunities') %></h2>
+
+        <% for (var i = 0; i < industryPathways.length; i++) {
+            var pathway = industryPathways[i];
+        %>
+           <div class="pathway-wrapper">
+               <div class = "pathway-info">
+                    <h2 class="pathway-heading">  <%- pathway.name %> </h2>
+                    <% if (pathway.description) { %>
+                        <p> <%- pathway.description %> </p>
+                    <% } %>
+                    <% if (pathway.destination_url) { %>
+                        <div class="sidebar-button-wrapper">
+                            <a href="<%- pathway.destination_url %>" class="pathway-link">
+                                <button class="btn pathway-button sidebar-button" data-pathway-id="<%- pathway.id %>" data-pathway-name="<%- pathway.name %>"><%- gettext('Learn More') %></button>
+                            </a>
+                        </div>
+                    <% } %>
+               </div>
+           </div>
+       <% } %>
+    </aside>
+<% } %>

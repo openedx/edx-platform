@@ -677,6 +677,10 @@ $btn-color-primary: palette(primary, dark);
     }
   }
 
+  .program-credit-pathways {
+    padding-bottom: 2em;
+  }
+
   .pathway-wrapper {
     @include margin-left($baseline*0.75);
 
@@ -696,6 +700,10 @@ $btn-color-primary: palette(primary, dark);
         margin-bottom: 3px;
       }
     }
+  }
+
+  .pathway-wrapper:last-child {
+    border-bottom: none;
   }
 
   @media (min-width: $bp-screen-md) {

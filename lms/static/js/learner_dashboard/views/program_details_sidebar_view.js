@@ -14,7 +14,7 @@ class ProgramDetailsSidebarView extends Backbone.View {
   constructor(options) {
     const defaults = {
       events: {
-        'click .sidebar-button': 'trackPathwayClicked',
+        'click .pathway-button': 'trackPathwayClicked',
       },
     };
     super(Object.assign({}, defaults, options));
@@ -26,6 +26,7 @@ class ProgramDetailsSidebarView extends Backbone.View {
     this.certificateCollection = options.certificateCollection || [];
     this.programCertificate = this.getProgramCertificate();
     this.programRecordUrl = options.programRecordUrl;
+    this.industryPathways = options.industryPathways;
     this.creditPathways = options.creditPathways;
     this.programModel = options.model;
     this.render();
@@ -36,6 +37,7 @@ class ProgramDetailsSidebarView extends Backbone.View {
       programCertificate: this.programCertificate ?
         this.programCertificate.toJSON() : {},
       programRecordUrl: this.programRecordUrl,
+      industryPathways: this.industryPathways,
       creditPathways: this.creditPathways,
     });
 
@@ -94,6 +96,7 @@ class ProgramDetailsSidebarView extends Backbone.View {
 
   trackPathwayClicked(event) {
     var button = event.currentTarget;
+
     window.analytics.track('edx.bi.dashboard.program.pathway.clicked', {
       category: 'pathways',
       // Credentials uses the uuid without dashes so we are converting here for consistency
