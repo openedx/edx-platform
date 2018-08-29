@@ -677,6 +677,23 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         )
         self.assertEqual("Valid e-mail address required.", field_errors["email"]["user_message"])
 
+    @mock.patch('student.views.management.do_email_change_request')
+    def test_patch_duplicate_email(self, do_email_change_request):
+        """
+        Test that same success response will be sent to user even if the given email already used.
+        """
+        existing_email = "same@example.com"
+        UserFactory.create(email=existing_email)
+
+        client = self.login_client("client", "user")
+
+        # Try changing to an existing email to make sure no error messages returned.
+        response = self.send_patch(client, {"email": existing_email})
+        self.assertEqual(200, response.status_code)
+
+        # Verify that no actual request made for email change
+        self.assertFalse(do_email_change_request.called)
+
     def test_patch_language_proficiencies(self):
         """
         Verify that patching the language_proficiencies field of the user

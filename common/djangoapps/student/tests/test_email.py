@@ -349,24 +349,6 @@ class EmailChangeRequestTests(EventTestMixin, CacheIsolationTestCase):
         """
         self.assertEqual(self.do_email_validation(self.user.email), 'Old email is the same as the new email.')
 
-    def test_duplicate_email(self):
-        """
-        Assert the expected error message from the email validation method for an email address
-        that is already in use by another account.
-        """
-        UserFactory.create(email=self.new_email)
-        self.assertEqual(self.do_email_validation(self.new_email), 'An account with this e-mail already exists.')
-
-    def test_retired_email(self):
-        """
-        Assert the expected error message from the email validation method for an email address
-        that corresponds with an already-retired account.
-        """
-        user = UserFactory.create(email=self.new_email)
-        user.email = get_retired_email_by_email(self.new_email)
-        user.save()
-        self.assertEqual(self.do_email_validation(self.new_email), 'An account with this e-mail already exists.')
-
     @patch('django.core.mail.send_mail')
     @patch('student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_email_failure(self, send_mail):
