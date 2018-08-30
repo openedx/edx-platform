@@ -40,7 +40,7 @@ django-countries==4.6.1             # Country data for Django forms and model fi
 django-crum                         # Middleware that stores the current request and user in thread local storage
 django-fernet-fields                # via edx-enterprise (should be added to its setup.py)
 django-filter==1.0.4                # Allows users to filter Django querysets dynamically
-django-ipware==1.1.0                # Get the client's real IP address
+django-ipware                       # Get the client's real IP address
 django-memcached-hashring
 django-method-override==0.1.0
 django-model-utils==3.0.0
