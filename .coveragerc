@@ -1,5 +1,6 @@
 # .coveragerc for edx-platform
 [run]
+parallel = True
 data_file = reports/.coverage
 source =
     cms
