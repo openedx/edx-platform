@@ -1116,7 +1116,8 @@ class CapaModuleTest(unittest.TestCase):
         self.assertEqual(result['success'], 'incorrect')
         self.assertEqual(module.get_score(), (0, 1))
         self.assertEqual(module.correct_map[answer_id]['correctness'], 'incorrect')
-        # Expect that the number of attempts is incremented, still same attempt
+        
+        # Expect that the number of attempts is not incremented
         self.assertEqual(module.attempts, 1)
         self.assertEqual(module.lcp.context['attempt'], 1)
 
