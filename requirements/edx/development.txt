@@ -76,7 +76,7 @@ configparser==3.5.0
 constantly==15.1.0
 coreapi==2.3.3
 coreschema==0.0.4
-coverage==4.2
+git+https://github.com/nedbat/coveragepy.git@94213347541d8138db07811c496d6db138b23700#egg=coverage==0.0
 cryptography==2.3
 cssselect==1.0.3
 cssutils==1.0.2
