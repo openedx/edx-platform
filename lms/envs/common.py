@@ -3259,6 +3259,8 @@ AUDIT_CERT_CUTOFF_DATE = None
 CREDENTIALS_SERVICE_USERNAME = 'credentials_service_user'
 CREDENTIALS_GENERATION_ROUTING_KEY = HIGH_PRIORITY_QUEUE
 
+WIKI_REQUEST_CACHE_MIDDLEWARE_CLASS = "openedx.core.djangoapps.request_cache.middleware.RequestCache"
+
 # Settings for Comprehensive Theming app
 
 # See https://github.com/edx/edx-django-sites-extensions for more info
