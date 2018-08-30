@@ -28,6 +28,7 @@ from openedx.core.djangoapps.user_api.api import (
     get_login_session_form,
     get_password_reset_form
 )
+from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
 from openedx.core.djangoapps.oauth_dispatch.adapters.dot import DOTAdapter
 from openedx.core.djangoapps.user_api.helpers import require_post_params, shim_student_view
 from openedx.core.djangoapps.user_api.models import UserPreference
@@ -50,7 +51,7 @@ class LoginSessionView(APIView):
     # so do not require authentication.
     authentication_classes = []
 
-    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(ensure_csrf_cookie_cross_domain)
     def get(self, request):
         return HttpResponse(get_login_session_form(request).to_json(), content_type="application/json")
 
