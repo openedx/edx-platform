@@ -264,7 +264,8 @@
             if (showGrades) {
                 return this.$('.problem-progress').text(progress);
             } else {
-                this.$('.indicator-container, span.message, span.status').remove();
+                this.$('.indicator-container, span.message, span.status, div.notification.error, div.notification.success').remove();
+
                 this.$('div.correct').removeClass("correct");
                 this.$('div.incorrect').removeClass("incorrect");
                 this.$('label.choicegroup_correct').removeClass("choicegroup_correct");
@@ -624,6 +625,8 @@
                         that.render(response.contents, that.focus_on_submit_notification);
                         that.updateProgress(response);
                     } else {
+                        window.SR.readTexts(that.get_sr_status(response.contents));
+                        that.el.trigger('contentChanged', [that.id, response.contents, response]);
                         that.saveNotification.hide();
                         that.gentle_alert("Answer submitted successfully");
                     }
