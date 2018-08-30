@@ -1216,10 +1216,12 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
                 }
 
         try:
-        	# expose the attempt number to the python custom grader
-        	# self.lcp.context['attempt'] is 1 based, but the self.attempts is 0 based
-            self.lcp.context['attempt'] = self.attempts + 1 
+            # expose the attempt number to a potential python custom grader
+            # self.lcp.context['attempt'] refers to the attempt number (1-based)
+            self.lcp.context['attempt'] = self.attempts + 1
             correct_map = self.lcp.grade_answers(answers)
+            # self.attempts refers to the number of attempts that did not
+            # raise an error (0-based)
             self.attempts = self.attempts + 1
             self.lcp.done = True
             self.set_state_from_lcp()

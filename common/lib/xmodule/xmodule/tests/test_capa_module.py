@@ -650,6 +650,7 @@ class CapaModuleTest(unittest.TestCase):
 
         # Expect that the number of attempts is incremented by 1
         self.assertEqual(module.attempts, 2)
+        # and that this was considered attempt number 2 for grading purposes
         self.assertEqual(module.lcp.context['attempt'], 2)
 
     def test_submit_problem_incorrect(self):
@@ -669,6 +670,7 @@ class CapaModuleTest(unittest.TestCase):
 
         # Expect that the number of attempts is incremented by 1
         self.assertEqual(module.attempts, 1)
+        # and that this is considered the first attempt
         self.assertEqual(module.lcp.context['attempt'], 1)
 
     def test_submit_problem_closed(self):
@@ -855,8 +857,9 @@ class CapaModuleTest(unittest.TestCase):
 
             self.assertEqual(expected_msg, result['success'])
 
-            # Expect that the number of attempts is NOT incremented, but it is 2nd attempt
+            # Expect that the number of attempts is NOT incremented
             self.assertEqual(module.attempts, 1)
+            # but that this was considered attempt number 2 for grading purposes
             self.assertEqual(module.lcp.context['attempt'], 2)
 
     def test_submit_problem_error_with_codejail_exception(self):
@@ -892,8 +895,9 @@ class CapaModuleTest(unittest.TestCase):
             expected_msg = 'Couldn\'t execute jailed code'
             self.assertEqual(expected_msg, result['success'])
 
-            # Expect that the number of attempts is NOT incremented, but it is 2nd attempt
+            # Expect that the number of attempts is NOT incremented
             self.assertEqual(module.attempts, 1)
+            # but that this was considered the second attempt for grading purposes
             self.assertEqual(module.lcp.context['attempt'], 2)
 
     def test_submit_problem_other_errors(self):
@@ -962,8 +966,9 @@ class CapaModuleTest(unittest.TestCase):
 
             self.assertEqual(expected_msg, result['success'])
 
-            # Expect that the number of attempts is NOT incremented, but it is 2nd attempt
+            # Expect that the number of attempts is NOT incremented
             self.assertEqual(module.attempts, 1)
+            # but that this was considered the second attempt for grading purposes
             self.assertEqual(module.lcp.context['attempt'], 2)
 
     def test_submit_problem_error_with_staff_user(self):
@@ -992,8 +997,9 @@ class CapaModuleTest(unittest.TestCase):
             # We DO include traceback information for staff users
             self.assertIn('Traceback', result['success'])
 
-            # Expect that the number of attempts is NOT incremented, but it is 2nd attempt
+            # Expect that the number of attempts is NOT incremented
             self.assertEqual(module.attempts, 1)
+            # but that it was considered the second attempt for grading purposes
             self.assertEqual(module.lcp.context['attempt'], 2)
 
     @ddt.data(
@@ -1101,6 +1107,7 @@ class CapaModuleTest(unittest.TestCase):
 
         # Expect that the number of attempts is not incremented
         self.assertEqual(module.attempts, 1)
+        # and that this was considered attempt number 1 for grading purposes
         self.assertEqual(module.lcp.context['attempt'], 1)
 
     def test_rescore_problem_additional_correct(self):
@@ -1116,8 +1123,8 @@ class CapaModuleTest(unittest.TestCase):
         self.assertEqual(result['success'], 'incorrect')
         self.assertEqual(module.get_score(), (0, 1))
         self.assertEqual(module.correct_map[answer_id]['correctness'], 'incorrect')
-        
-        # Expect that the number of attempts is not incremented
+
+        # Expect that the number of attempts has incremented to 1
         self.assertEqual(module.attempts, 1)
         self.assertEqual(module.lcp.context['attempt'], 1)
 
@@ -1137,8 +1144,9 @@ class CapaModuleTest(unittest.TestCase):
         # Expect that the problem is marked correct and user earned the score
         self.assertEqual(module.get_score(), (1, 1))
         self.assertEqual(module.correct_map[answer_id]['correctness'], 'correct')
-        # Expect that the number of attempts is not incremented, still same attempt
+        # Expect that the number of attempts is not incremented
         self.assertEqual(module.attempts, 1)
+        # and hence that this was still considered the first attempt for grading purposes
         self.assertEqual(module.lcp.context['attempt'], 1)
 
     def test_rescore_problem_incorrect(self):
@@ -1155,9 +1163,10 @@ class CapaModuleTest(unittest.TestCase):
         # Expect that the problem is marked incorrect
         self.assertEqual(module.is_correct(), False)
 
-        # Expect that the number of attempts is not incremented, still same attempt
+        # Expect that the number of attempts is not incremented
         self.assertEqual(module.attempts, 0)
-        self.assertEqual(module.lcp.context['attempt'], 0)
+        # and that this is treated as the first attempt for grading purposes
+        self.assertEqual(module.lcp.context['attempt'], 1)
 
     def test_rescore_problem_not_done(self):
         # Simulate that the problem is NOT done
@@ -1187,8 +1196,9 @@ class CapaModuleTest(unittest.TestCase):
             with self.assertRaises(exception_class):
                 module.rescore(only_if_higher=False)
 
-        # Expect that the number of attempts is NOT incremented, still same attempt
+        # Expect that the number of attempts is NOT incremented
         self.assertEqual(module.attempts, 1)
+        # and that this was considered the first attempt for grading purposes
         self.assertEqual(module.lcp.context['attempt'], 1)
 
     def test_rescore_problem_student_input_error(self):
