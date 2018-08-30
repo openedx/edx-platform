@@ -21,6 +21,8 @@ from django.test import RequestFactory, TestCase, override_settings
 from django.test.utils import CaptureQueriesContext
 from edx_django_utils.cache import RequestCache
 
+from openedx.core.djangoapps.request_cache.middleware import RequestCache as DeprecatedRequestCache
+
 
 class CacheIsolationMixin(object):
     """
@@ -118,6 +120,7 @@ class CacheIsolationMixin(object):
         # Clear that.
         sites.models.SITE_CACHE.clear()
 
+        DeprecatedRequestCache.clear_request_cache()
         RequestCache.clear_all_namespaces()
 
 
