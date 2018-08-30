@@ -13,11 +13,12 @@ from django.db.models import Q
 from django.dispatch import receiver
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
+from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.django.models import CourseKeyField
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.request_cache.middleware import RequestCache, ns_request_cached
+from openedx.core.djangoapps.request_cache.middleware import ns_request_cached
 
 Mode = namedtuple('Mode',
                   [
@@ -727,7 +728,7 @@ class CourseMode(models.Model):
 @receiver(models.signals.post_delete, sender=CourseMode)
 def invalidate_course_mode_cache(sender, **kwargs):   # pylint: disable=unused-argument
     """Invalidate the cache of course modes. """
-    RequestCache.clear_request_cache(name=CourseMode.CACHE_NAMESPACE)
+    RequestCache(namespace=CourseMode.CACHE_NAMESPACE).clear()
 
 
 def get_cosmetic_verified_display_price(course):

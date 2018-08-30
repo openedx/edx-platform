@@ -8,6 +8,7 @@ import os
 import re
 from logging import getLogger
 
+import crum
 from django.conf import settings
 
 from microsite_configuration import microsite
@@ -19,7 +20,7 @@ from openedx.core.djangoapps.theming.helpers_dirs import (
     get_theme_dirs,
     get_themes_unchecked
 )
-from openedx.core.djangoapps.request_cache.middleware import RequestCache, request_cached
+from openedx.core.djangoapps.request_cache.middleware import request_cached
 
 logger = getLogger(__name__)  # pylint: disable=invalid-name
 
@@ -165,7 +166,7 @@ def get_current_request():
     Returns:
          (HttpRequest): returns current request
     """
-    return RequestCache.get_current_request()
+    return crum.get_current_request()
 
 
 def get_current_site():

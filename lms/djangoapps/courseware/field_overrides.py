@@ -19,9 +19,9 @@ from abc import ABCMeta, abstractmethod
 from contextlib import contextmanager
 
 from django.conf import settings
+from edx_django_utils.cache import DEFAULT_REQUEST_CACHE
 from xblock.field_data import FieldData
 
-from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from xmodule.modulestore.inheritance import InheritanceMixin
 
 NOTSET = object()
@@ -180,7 +180,7 @@ class OverrideFieldData(FieldData):
         Arguments:
             course: The course XBlock
         """
-        request_cache = RequestCache.get_request_cache()
+        request_cache = DEFAULT_REQUEST_CACHE
         if course is None:
             cache_key = ENABLED_OVERRIDE_PROVIDERS_KEY.format(course_id='None')
         else:
@@ -294,7 +294,7 @@ class OverrideModulestoreFieldData(OverrideFieldData):
         course_id = unicode(block.location.course_key)
         cache_key = ENABLED_MODULESTORE_OVERRIDE_PROVIDERS_KEY.format(course_id=course_id)
 
-        request_cache = RequestCache.get_request_cache()
+        request_cache = DEFAULT_REQUEST_CACHE
         enabled_providers = request_cache.data.get(cache_key)
 
         if enabled_providers is None:

@@ -8,6 +8,7 @@ from django.http import Http404
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
 from django.utils import translation
+from edx_django_utils.cache import RequestCache
 from mock import ANY, Mock, call, patch
 from six import text_type
 
@@ -43,7 +44,6 @@ from lms.lib.comment_client.utils import CommentClientPaginatedResult
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts
 from openedx.core.djangoapps.course_groups.tests.test_views import CohortViewsTestCase
-from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
@@ -1968,7 +1968,7 @@ class CourseDiscussionsHandlerTestCase(DividedDiscussionsTestCase):
         expected_response = self.get_expected_response()
         self.assertEqual(response, expected_response)
 
-        RequestCache.clear_request_cache()
+        RequestCache.clear_all_namespaces()
         now = datetime.now()
         # inline discussion
         ItemFactory.create(

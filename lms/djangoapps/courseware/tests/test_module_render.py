@@ -2414,7 +2414,7 @@ class TestDisabledXBlockTypes(ModuleStoreTestCase):
             self._verify_descriptor('problem', course, 'CapaDescriptorWithMixins', item_usage_id)
 
             # Now simulate a new request cache.
-            self.store.request_cache.data = {}
+            self.store.request_cache.data.clear()
             self._verify_descriptor('problem', course, 'RawDescriptorWithMixins', item_usage_id)
 
     def _verify_descriptor(self, category, course, descriptor, item_id=None):
