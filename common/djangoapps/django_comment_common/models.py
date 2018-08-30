@@ -145,25 +145,13 @@ def all_permissions_for_user_in_course(user, course_id):  # pylint: disable=inva
     if course is None:
         raise ItemNotFoundError(course_id)
 
-    all_roles = {role for role in Role.objects.filter(users=user, course_id=course_id)}
-    role_names = {role.name for role in all_roles}
-
-    # TODO: EDUCATOR-3374
-    # The `roles__users__roles__in=all_roles` part of this filter is a hack to get the new
-    # Aurora MySql query planner to properly use the unique index on the roles/users join table.
-    # Without this hack, the planner uses a unique index on (role_id, user_id) to do lookup
-    # by user_id only, which is a completely inefficient way to use that index.
-    permission_queryset = Permission.objects.filter(
-        roles__users=user,
-        roles__course_id=course_id,
-        roles__users__roles__in=all_roles
-    ).distinct()
+    all_roles = {role.name for role in Role.objects.filter(users=user, course_id=course_id)}
 
     permissions = {
         permission.name
         for permission
-        in permission_queryset
-        if not permission_blacked_out(course, role_names, permission.name)
+        in Permission.objects.filter(roles__users=user, roles__course_id=course_id)
+        if not permission_blacked_out(course, all_roles, permission.name)
     }
     return permissions
 

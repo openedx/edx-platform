@@ -402,13 +402,11 @@ class TestXBlockQueryLoad(SharedModuleStoreTestCase):
                 discussion_target='Target Discussion',
             ))
 
-        # 2 queries are required to do first discussion xblock render:
+        # 3 queries are required to do first discussion xblock render:
         # * django_comment_client_role
+        # * django_comment_client_permission
         # * lms_xblock_xblockasidesconfig
-        # If the query for roles returned a non-empty result set, there would be
-        # an additional query against django_comment_client_permission, but there
-        # are no roles associated with this test.
-        num_queries = 2
+        num_queries = 3
         for discussion in discussions:
             discussion_xblock = get_module_for_descriptor_internal(
                 user=user,
