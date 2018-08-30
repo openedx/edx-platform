@@ -2,6 +2,7 @@
 An implementation of a RequestCache. This cache is reset at the beginning
 and end of every request.
 """
+# pylint: disable=unused-argument
 import threading
 
 import crum
@@ -21,6 +22,9 @@ REQUEST_CACHE = _RequestCache()
 
 
 class RequestCache(object):
+    """
+    DEPRECATED Request Cache Middleware. Will be removed very shortly.
+    """
     @classmethod
     def get_request_cache(cls, name=None):
         """
@@ -56,7 +60,7 @@ class RequestCache(object):
         self.clear_request_cache()
         return response
 
-    def process_exception(self, request, exception):  # pylint: disable=unused-argument
+    def process_exception(self, request, exception):
         """
         Clear the RequestCache after a failed request.
         """

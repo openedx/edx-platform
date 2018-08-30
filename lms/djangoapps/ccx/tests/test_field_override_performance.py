@@ -19,9 +19,9 @@ from django.test.utils import override_settings
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
+from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from pytz import UTC
-from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xblock.core import XBlock
