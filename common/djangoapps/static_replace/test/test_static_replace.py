@@ -174,6 +174,31 @@ def test_static_url_with_query(mock_modulestore, mock_storage):
     assert replace_static_urls(pre_text, DATA_DIRECTORY, COURSE_KEY) == post_text
 
 
+@pytest.mark.django_db
+@patch('static_replace.staticfiles_storage', autospec=True)
+@patch('xmodule.modulestore.django.modulestore', autospec=True)
+def test_static_paths_out(mock_modulestore, mock_storage):
+    """
+    Tests the side-effect of passing an array to collect static_paths_out.
+
+    * if a static URL is changed, then its changed URL is returned.
+    * if a static URL is unchanged, then the unchanged URL is returned.
+    * xblock paths are not included in the static_paths_out array.
+    """
+    mock_storage.exists.return_value = False
+    mock_modulestore.return_value = Mock(MongoModuleStore)
+
+    static_url = '/static/LAlec04_controller.swf?csConfigFile=/static/LAlec04_config.xml&name1=value1&name2=value2'
+    static_course_url = '/c4x/org/course/asset/LAlec04_controller.swf?csConfigFile=%2Fc4x%2Forg%2Fcourse%2Fasset%2FLAlec04_config.xml&name1=value1&name2=value2'
+    raw_url = '/static/js/capa/protex/protex.nocache.js?raw'
+    xblock_url = '/static/xblock/resources/babys_first.lil_xblock/public/images/pacifier.png'
+    pre_text = 'EMBED src ="{}" xblock={} text <tag a="{}"/><div class="'.format(static_url, xblock_url, raw_url)
+    post_text = 'EMBED src ="{}" xblock={} text <tag a="{}"/><div class="'.format(static_course_url, xblock_url, raw_url)
+    static_paths = []
+    assert replace_static_urls(pre_text, DATA_DIRECTORY, COURSE_KEY, static_paths_out=static_paths) == post_text
+    assert static_paths == [(static_url, static_course_url), (raw_url, raw_url)]
+
+
 def test_regex():
     yes = ('"/static/foo.png"',
            '"/static/foo.png"',
