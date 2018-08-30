@@ -45,6 +45,7 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
         querystring = {
             'username': self.user.username,
             'status': 'awarded',
+            'only_visible': 'True',
         }
         cache_key = '{}.{}'.format(self.credentials_config.CACHE_KEY, self.user.username)
         self.assertEqual(kwargs['querystring'], querystring)
@@ -66,6 +67,7 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
         querystring = {
             'username': self.user.username,
             'status': 'awarded',
+            'only_visible': 'True',
             'program_uuid': program_uuid,
         }
         cache_key = '{}.{}.{}'.format(self.credentials_config.CACHE_KEY, self.user.username, program_uuid)
@@ -84,6 +86,7 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
         querystring = {
             'username': self.user.username,
             'status': 'awarded',
+            'only_visible': 'True',
             'type': 'program',
         }
         self.assertEqual(kwargs['querystring'], querystring)

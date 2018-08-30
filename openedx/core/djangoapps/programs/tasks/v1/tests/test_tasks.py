@@ -89,7 +89,7 @@ class AwardProgramCertificateTestCase(TestCase):
             'http://test-server/credentials/',
         )
 
-        tasks.award_program_certificate(test_client, test_username, 123)
+        tasks.award_program_certificate(test_client, test_username, 123, datetime(2010, 5, 30))
 
         expected_body = {
             'username': test_username,
@@ -97,7 +97,12 @@ class AwardProgramCertificateTestCase(TestCase):
                 'program_uuid': 123,
                 'type': tasks.PROGRAM_CERTIFICATE,
             },
-            'attributes': []
+            'attributes': [
+                {
+                    'name': 'visible_date',
+                    'value': '2010-05-30T00:00:00Z',
+                }
+            ]
         }
         self.assertEqual(json.loads(httpretty.last_request().body), expected_body)
 
@@ -154,13 +159,16 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         Checks that the Credentials API is used to award certificates for
         the proper programs.
         """
-        mock_get_completed_programs.return_value = [1, 2, 3]
+        mock_get_completed_programs.return_value = {1: 1, 2: 2, 3: 3}
         mock_get_certified_programs.return_value = already_awarded_program_uuids
 
         tasks.award_program_certificates.delay(self.student.username).get()
 
         actual_program_uuids = [call[0][2] for call in mock_award_program_certificate.call_args_list]
         self.assertEqual(actual_program_uuids, expected_awarded_program_uuids)
+
+        actual_visible_dates = [call[0][3] for call in mock_award_program_certificate.call_args_list]
+        self.assertEqual(actual_visible_dates, expected_awarded_program_uuids)  # program uuids are same as mock dates
 
     @ddt.data(
         ('credentials', 'enable_learner_issuance'),
@@ -205,7 +213,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         Checks that the task will be aborted without further action if there
         are no programs for which to award a certificate.
         """
-        mock_get_completed_programs.return_value = []
+        mock_get_completed_programs.return_value = {}
         tasks.award_program_certificates.delay(self.student.username).get()
         self.assertTrue(mock_get_completed_programs.called)
         self.assertFalse(mock_get_certified_programs.called)
@@ -244,7 +252,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         successfully awarded certs are logged as INFO and warning is logged
         for failed requests if there are retries available.
         """
-        mock_get_completed_programs.return_value = [1, 2]
+        mock_get_completed_programs.return_value = {1: 1, 2: 2}
         mock_get_certified_programs.side_effect = [[], [2]]
         mock_award_program_certificate.side_effect = self._make_side_effect([Exception('boom'), None])
 
@@ -288,7 +296,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         transient API errors) will cause the task to be failed and queued for
         retry.
         """
-        mock_get_completed_programs.return_value = [1, 2]
+        mock_get_completed_programs.return_value = {1: 1, 2: 2}
         mock_get_certified_programs.return_value = [1]
         mock_get_certified_programs.side_effect = self._make_side_effect([Exception('boom'), None])
         tasks.award_program_certificates.delay(self.student.username).get()
@@ -306,7 +314,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         """
         exception = exceptions.HttpClientError()
         exception.response = mock.Mock(status_code=429)
-        mock_get_completed_programs.return_value = [1, 2]
+        mock_get_completed_programs.return_value = {1: 1, 2: 2}
         mock_award_program_certificate.side_effect = self._make_side_effect(
             [exception, None]
         )
@@ -326,7 +334,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         """
         exception = exceptions.HttpNotFoundError()
         exception.response = mock.Mock(status_code=404)
-        mock_get_completed_programs.return_value = [1, 2]
+        mock_get_completed_programs.return_value = {1: 1, 2: 2}
         mock_award_program_certificate.side_effect = self._make_side_effect(
             [exception, None]
         )
@@ -346,7 +354,7 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
         """
         exception = exceptions.HttpClientError()
         exception.response = mock.Mock(status_code=418)
-        mock_get_completed_programs.return_value = [1, 2]
+        mock_get_completed_programs.return_value = {1: 1, 2: 2}
         mock_award_program_certificate.side_effect = self._make_side_effect(
             [exception, None]
         )

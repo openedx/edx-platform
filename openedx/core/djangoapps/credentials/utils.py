@@ -64,7 +64,7 @@ def get_credentials(user, program_uuid=None, credential_type=None):
     """
     credential_configuration = CredentialsApiConfig.current()
 
-    querystring = {'username': user.username, 'status': 'awarded'}
+    querystring = {'username': user.username, 'status': 'awarded', 'only_visible': 'True'}
 
     if program_uuid:
         querystring['program_uuid'] = program_uuid
