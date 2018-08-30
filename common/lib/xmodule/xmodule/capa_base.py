@@ -1683,7 +1683,9 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
         Operates by creating a new correctness map based on the current
         state of the LCP, and updating the old correctness map of the LCP.
         """
-        self.lcp.context['attempt'] = self.attempts
+        # Make sure that the attempt number is always at least 1 for grading purposes,
+        # even if the number of attempts have been reset and this problem is regraded.
+        self.lcp.context['attempt'] = max(self.attempts, 1)
         new_correct_map = self.lcp.get_grade_from_current_answers(None)
         self.lcp.correct_map.update(new_correct_map)
 
