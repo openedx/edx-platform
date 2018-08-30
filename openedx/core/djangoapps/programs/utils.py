@@ -21,10 +21,12 @@ from requests.exceptions import ConnectionError, Timeout
 from course_modes.models import CourseMode
 from entitlements.models import CourseEntitlement
 from lms.djangoapps.certificates import api as certificate_api
+from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from openedx.core.djangoapps.catalog.utils import get_programs, get_fulfillable_course_runs_for_entitlement
+from openedx.core.djangoapps.certificates.api import available_date_for_certificate
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credentials.utils import get_credentials
@@ -276,27 +278,81 @@ class ProgramProgressMeter(object):
         return progress
 
     @property
-    def completed_programs(self):
-        """Identify programs completed by the student.
-
-        Returns:
-            list of UUIDs, each identifying a completed program.
+    def completed_programs_with_available_dates(self):
         """
-        return [program['uuid'] for program in self.programs if self._is_program_complete(program)]
+        Calculate the available date for completed programs based on course runs.
 
-    def _is_program_complete(self, program):
-        """Check if a user has completed a program.
-
-        A program is completed if the user has completed all nested courses.
-
-        Arguments:
-            program (dict): Representing the program whose completion to assess.
-
-        Returns:
-            bool, indicating whether the program is complete.
+        Returns a dict of {uuid_string: available_datetime}
         """
-        return all(self._is_course_complete(course) for course in program['courses']) \
-            and len(program['courses']) > 0
+        completed = {}
+        for program in self.programs:
+            available_date = self._available_date_for_program(program)
+            if available_date:
+                completed[program['uuid']] = available_date
+        return completed
+
+    def _available_date_for_program(self, program_data):
+        """
+        Calculate the available date for the program based on the courses within it.
+
+        Returns a datetime object or None if the program is not complete.
+        """
+        program_available_date = None
+        for course in program_data['courses']:
+            earliest_course_run_date = None
+
+            for course_run in course['course_runs']:
+                key = CourseKey.from_string(course_run['key'])
+
+                # Get a certificate if one exists
+                certificate = GeneratedCertificate.eligible_certificates.filter(user=self.user, course_id=key).first()
+                if certificate is None:
+                    continue
+
+                # Modes must match (see _is_course_complete() comments for why)
+                course_run_mode = self._course_run_mode_translation(course_run['type'])
+                certificate_mode = self._certificate_mode_translation(certificate.mode)
+                modes_match = course_run_mode == certificate_mode
+
+                # Grab the available date and keep it if it's the earliest one for this catalog course.
+                if modes_match and certificate_api.is_passing_status(certificate.status):
+                    course_overview = CourseOverview.get_from_id(key)
+                    available_date = available_date_for_certificate(course_overview, certificate)
+                    earliest_course_run_date = min(filter(None, [available_date, earliest_course_run_date]))
+
+            # If we're missing a cert for a course, the program isn't completed and we should just bail now
+            if earliest_course_run_date is None:
+                return None
+
+            # Keep the catalog course date if it's the latest one
+            program_available_date = max(filter(None, [earliest_course_run_date, program_available_date]))
+
+        return program_available_date
+
+    def _course_run_mode_translation(self, course_run_mode):
+        """
+        Returns a canonical mode for a course run (whose data is coming from the program cache).
+        This mode must match the certificate mode to be counted as complete.
+        """
+        mappings = {
+            # Runs of type 'credit' are counted as 'verified' since verified
+            # certificates are earned when credit runs are completed. LEARNER-1274
+            # tracks a cleaner way to do this using the discovery service's
+            # applicable_seat_types field.
+            CourseMode.CREDIT_MODE: CourseMode.VERIFIED,
+        }
+        return mappings.get(course_run_mode, course_run_mode)
+
+    def _certificate_mode_translation(self, certificate_mode):
+        """
+        Returns a canonical mode for a certificate (whose data is coming from the database).
+        This mode must match the course run mode to be counted as complete.
+        """
+        mappings = {
+            # Treat "no-id-professional" certificates as "professional" certificates
+            CourseMode.NO_ID_PROFESSIONAL_MODE: CourseMode.PROFESSIONAL,
+        }
+        return mappings.get(certificate_mode, certificate_mode)
 
     def _is_course_complete(self, course):
         """Check if a user has completed a course.
@@ -325,12 +381,7 @@ class ProgramProgressMeter(object):
                 # count towards completion of a course in a program). This may change
                 # in the future to make use of the more rigid set of "applicable seat
                 # types" associated with each program type in the catalog.
-
-                # Runs of type 'credit' are counted as 'verified' since verified
-                # certificates are earned when credit runs are completed. LEARNER-1274
-                # tracks a cleaner way to do this using the discovery service's
-                # applicable_seat_types field.
-                'type': 'verified' if course_run['type'] == 'credit' else course_run['type'],
+                'type': self._course_run_mode_translation(course_run['type']),
             }
 
         return any(reshape(course_run) in self.completed_course_runs for course_run in course['course_runs'])
@@ -367,15 +418,9 @@ class ProgramProgressMeter(object):
 
         completed_runs, failed_runs = [], []
         for certificate in course_run_certificates:
-            certificate_type = certificate['type']
-
-            # Treat "no-id-professional" certificates as "professional" certificates
-            if certificate_type == CourseMode.NO_ID_PROFESSIONAL_MODE:
-                certificate_type = CourseMode.PROFESSIONAL
-
             course_data = {
                 'course_run_id': unicode(certificate['course_key']),
-                'type': certificate_type,
+                'type': self._certificate_mode_translation(certificate['type']),
             }
 
             if certificate_api.is_passing_status(certificate['status']):

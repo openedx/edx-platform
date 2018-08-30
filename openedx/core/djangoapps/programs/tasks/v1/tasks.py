@@ -29,6 +29,7 @@ MAX_RETRIES = 11
 
 PROGRAM_CERTIFICATE = 'program'
 COURSE_CERTIFICATE = 'course-run'
+VISIBLE_DATE_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 
 
 def get_completed_programs(site, student):
@@ -40,11 +41,11 @@ def get_completed_programs(site, student):
         student (User): Representing the student whose completed programs to check for.
 
     Returns:
-        list of program UUIDs
+        dict of {program_UUIDs: visible_dates}
 
     """
     meter = ProgramProgressMeter(site, student)
-    return meter.completed_programs
+    return meter.completed_programs_with_available_dates
 
 
 def get_certified_programs(student):
@@ -66,7 +67,7 @@ def get_certified_programs(student):
     return certified_programs
 
 
-def award_program_certificate(client, username, program_uuid):
+def award_program_certificate(client, username, program_uuid, visible_date):
     """
     Issue a new certificate of completion to the given student for the given program.
 
@@ -77,6 +78,8 @@ def award_program_certificate(client, username, program_uuid):
             The username of the student
         program_uuid:
             uuid of the completed program
+        visible_date:
+            when the program credential should be visible to user
 
     Returns:
         None
@@ -88,7 +91,12 @@ def award_program_certificate(client, username, program_uuid):
             'type': PROGRAM_CERTIFICATE,
             'program_uuid': program_uuid
         },
-        'attributes': []
+        'attributes': [
+            {
+                'name': 'visible_date',
+                'value': visible_date.strftime(VISIBLE_DATE_FORMAT)
+            }
+        ]
     })
 
 
@@ -136,10 +144,10 @@ def award_program_certificates(self, username):
             LOGGER.exception('Task award_program_certificates was called with invalid username %s', username)
             # Don't retry for this case - just conclude the task.
             return
-        program_uuids = []
+        completed_programs = {}
         for site in Site.objects.all():
-            program_uuids.extend(get_completed_programs(site, student))
-        if not program_uuids:
+            completed_programs.update(get_completed_programs(site, student))
+        if not completed_programs:
             # No reason to continue beyond this point unless/until this
             # task gets updated to support revocation of program certs.
             LOGGER.info('Task award_program_certificates was called for user %s with no completed programs', username)
@@ -158,7 +166,7 @@ def award_program_certificates(self, username):
     # This logic is important, because we will retry the whole task if awarding any particular program cert fails.
     #
     # N.B. the list is sorted to facilitate deterministic ordering, e.g. for tests.
-    new_program_uuids = sorted(list(set(program_uuids) - set(existing_program_uuids)))
+    new_program_uuids = sorted(list(set(completed_programs.keys()) - set(existing_program_uuids)))
     if new_program_uuids:
         try:
             credentials_client = get_credentials_api_client(
@@ -171,8 +179,9 @@ def award_program_certificates(self, username):
 
         failed_program_certificate_award_attempts = []
         for program_uuid in new_program_uuids:
+            visible_date = completed_programs[program_uuid]
             try:
-                award_program_certificate(credentials_client, username, program_uuid)
+                award_program_certificate(credentials_client, username, program_uuid, visible_date)
                 LOGGER.info('Awarded certificate for program %s to user %s', program_uuid, username)
             except exceptions.HttpNotFoundError:
                 LOGGER.exception(
@@ -237,7 +246,7 @@ def post_course_certificate(client, username, certificate, visible_date):
         'attributes': [
             {
                 'name': 'visible_date',
-                'value': visible_date.strftime('%Y-%m-%dT%H:%M:%SZ')
+                'value': visible_date.strftime(VISIBLE_DATE_FORMAT)
             }
         ]
     })
