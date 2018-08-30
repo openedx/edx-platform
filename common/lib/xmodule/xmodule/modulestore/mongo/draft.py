@@ -12,7 +12,8 @@ import logging
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator
 from six import text_type
-from openedx.core.lib.cache_utils import memoize_in_request_cache
+from openedx.core.lib.cache_utils import request_cached
+from xblock.core import XBlock
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import (
@@ -641,13 +642,24 @@ class DraftModuleStore(MongoModuleStore):
             bulk_record.dirty = True
             self.collection.remove({'_id': {'$in': to_be_deleted}}, safe=self.collection.safe)
 
-    @memoize_in_request_cache('request_cache')
     def has_changes(self, xblock):
         """
         Check if the subtree rooted at xblock has any drafts and thus may possibly have changes
         :param xblock: xblock to check
         :return: True if there are any drafts anywhere in the subtree under xblock (a weaker
             condition than for other stores)
+        """
+        return self._cached_has_changes(self.request_cache, xblock)
+
+    @request_cached(
+        # use the XBlock's location value in the cache key
+        arg_map_function=lambda arg: unicode(arg.location if isinstance(arg, XBlock) else arg),
+        # use this store's request_cache
+        request_cache_getter=lambda args, kwargs: args[1],
+    )
+    def _cached_has_changes(self, request_cache, xblock):
+        """
+        Internal has_changes method that caches the result.
         """
         # don't check children if this block has changes (is not public)
         if getattr(xblock, 'is_draft', False):

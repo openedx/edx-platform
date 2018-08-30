@@ -19,7 +19,7 @@ from openedx.core.djangoapps.course_groups.cohorts import (
     is_course_cohorted
 )
 from openedx.core.djangoapps.verified_track_content.tasks import sync_cohort_with_mode
-from openedx.core.djangoapps.request_cache.middleware import ns_request_cached
+from openedx.core.lib.cache_utils import request_cached
 from student.models import CourseEnrollment
 
 log = logging.getLogger(__name__)
@@ -126,7 +126,7 @@ class VerifiedTrackCohortedCourse(models.Model):
             return None
 
     @classmethod
-    @ns_request_cached(CACHE_NAMESPACE)
+    @request_cached(namespace=CACHE_NAMESPACE)
     def is_verified_track_cohort_enabled(cls, course_key):
         """
         Checks whether or not verified track cohort is enabled for the given course.

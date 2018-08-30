@@ -8,7 +8,7 @@ from courseware.module_render import get_module_for_descriptor
 from courseware.model_data import FieldDataCache
 from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExist
-from openedx.core.djangoapps.request_cache import get_request_or_stub
+from openedx.core.lib.request_utils import get_request_or_stub
 
 from xmodule.modulestore.django import modulestore
 

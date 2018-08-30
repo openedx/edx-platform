@@ -25,7 +25,7 @@ from lxml import etree
 from opaque_keys.edx.locator import AssetLocator
 from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag
 from openedx.core.djangoapps.video_pipeline.config.waffle import waffle_flags, DEPRECATE_YOUTUBE
-from openedx.core.lib.cache_utils import memoize_in_request_cache
+from openedx.core.lib.cache_utils import request_cached
 from openedx.core.lib.license import LicenseMixin
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
@@ -1053,8 +1053,11 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         """
         return self.runtime.service(self, "request_cache")
 
-    @memoize_in_request_cache('request_cache')
-    def get_cached_val_data_for_course(self, video_profile_names, course_id):
+    @classmethod
+    @request_cached(
+        request_cache_getter=lambda args, kwargs: args[1],
+    )
+    def get_cached_val_data_for_course(cls, request_cache, video_profile_names, course_id):
         """
         Returns the VAL data for the requested video profiles for the given course.
         """
@@ -1087,7 +1090,11 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                 video_profile_names.append('hls')
 
             # get and cache bulk VAL data for course
-            val_course_data = self.get_cached_val_data_for_course(video_profile_names, self.location.course_key)
+            val_course_data = self.get_cached_val_data_for_course(
+                self.request_cache,
+                video_profile_names,
+                self.location.course_key,
+            )
             val_video_data = val_course_data.get(self.edx_video_id, {})
 
             # Get the encoded videos if data from VAL is found
