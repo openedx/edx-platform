@@ -226,6 +226,7 @@ social-auth-app-django==2.1.0
 social-auth-core==1.7.0
 sorl-thumbnail==12.3
 sortedcontainers==0.9.2
+sqlparse==0.2.4
 stevedore==1.10.0
 sympy==0.7.1
 tincan==0.0.5             # via edx-enterprise
