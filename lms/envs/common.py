@@ -401,7 +401,7 @@ FEATURES = {
 }
 
 # Setting parameters which are required for the custom oauth backend
-CUSTOM_OAUTH_PARAMS = None
+CUSTOM_OAUTH_PARAMS = {}
 
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews
 COURSE_REVIEWS_TOOL_PROVIDER_FRAGMENT_NAME = 'coursetalk-reviews-fragment.html'
