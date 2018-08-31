@@ -2,17 +2,6 @@
 Feature: CMS.Course Grading
     As a course author, I want to be able to configure how my course is graded
 
-    # Note that "7" is a special weight because it revealed rounding errors (STUD-826).
-    Scenario: Users can set weight to Assignment types
-        Given I have opened a new course in Studio
-        And I am viewing the grading settings
-        When I add a new assignment type "New Type"
-        And I set the assignment weight to "7"
-        And I press the "Save" notification button
-        Then the assignment weight is displayed as "7"
-        And I reload the page
-        Then the assignment weight is displayed as "7"
-
     Scenario: Users can delete Assignment types
         Given I have populated a new course in Studio
         And I am viewing the grading settings
@@ -28,6 +17,37 @@ Feature: CMS.Course Grading
         And I press the "Save" notification button
         And I go back to the main course page
         Then I do see the assignment name "New Type"
+
+    # Note that "7" is a special weight because it revealed rounding errors (STUD-826).
+    Scenario: Users can set weight to Assignment types
+        Given I have opened a new course in Studio
+        And I am viewing the grading settings
+        When I add a new assignment type "New Type"
+        And I set the assignment weight to "7"
+        And I press the "Save" notification button
+        Then the assignment weight is displayed as "7"
+        And I reload the page
+        Then the assignment weight is displayed as "7"
+
+    Scenario: Settings are only persisted when saved
+        Given I have populated a new course in Studio
+        And I am viewing the grading settings
+        When I change assignment type "Homework" to "New Type"
+        Then I do not see the changes persisted on refresh
+
+    Scenario: Settings are reset on cancel
+        Given I have populated a new course in Studio
+        And I am viewing the grading settings
+        When I change assignment type "Homework" to "New Type"
+        And I press the "Cancel" notification button
+        Then I see the assignment type "Homework"
+
+    Scenario: Confirmation is shown on save
+        Given I have populated a new course in Studio
+        And I am viewing the grading settings
+        When I change assignment type "Homework" to "New Type"
+        And I press the "Save" notification button
+        Then I see a confirmation that my changes have been saved
 
     Scenario: User cannot save invalid settings
         Given I have populated a new course in Studio
