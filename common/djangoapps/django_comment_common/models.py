@@ -150,10 +150,41 @@ def all_permissions_for_user_in_course(user, course_id):  # pylint: disable=inva
     permissions = {
         permission.name
         for permission
-        in Permission.objects.filter(roles__users=user, roles__course_id=course_id)
+        in _permissions_for_user_and_course(user.id, course_id)
         if not permission_blacked_out(course, all_roles, permission.name)
     }
     return permissions
+
+
+def _permissions_for_user_and_course(user_id, course_id):
+    """
+    Due to EDUCATOR-3374, we have to give a hint to the MySql database to use a specific
+    index.
+    TODO: We're eventually going to have to correct this to not use a hard-coded index name,
+    as the Openedx community will not all have the same index names that we have at edx.org.
+    """
+    index_name = 'django_comment_client_role_users_fbfc09f1'
+    using_mysql = 'mysql' in settings.DATABASES['default']['ENGINE'].lower()
+    use_index_clause = 'USE INDEX (`{}`)'.format(index_name) if using_mysql else ''
+
+    raw_query = """
+    SELECT
+        `django_comment_client_permission`.`name`
+    FROM
+        `django_comment_client_permission`
+    INNER JOIN `django_comment_client_permission_roles`
+            ON (`django_comment_client_permission`.`name` = `django_comment_client_permission_roles`.`permission_id`)
+    INNER JOIN `django_comment_client_role`
+            ON (`django_comment_client_permission_roles`.`role_id` = `django_comment_client_role`.`id`)
+    INNER JOIN `django_comment_client_role_users`
+    {use_index_clause}
+            ON (`django_comment_client_role`.`id` = `django_comment_client_role_users`.`role_id`)
+    WHERE (
+        `django_comment_client_role_users`.`user_id` = %s AND
+        `django_comment_client_role`.`course_id` = %s
+    )
+    """.format(use_index_clause=use_index_clause)
+    return Permission.objects.raw(raw_query, [user_id, text_type(course_id)])
 
 
 class ForumsConfig(ConfigurationModel):
