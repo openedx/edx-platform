@@ -406,7 +406,7 @@ class TestXBlockQueryLoad(SharedModuleStoreTestCase):
         # * django_comment_client_role
         # * django_comment_client_permission
         # * lms_xblock_xblockasidesconfig
-        num_queries = 3
+        num_queries = 2
         for discussion in discussions:
             discussion_xblock = get_module_for_descriptor_internal(
                 user=user,
