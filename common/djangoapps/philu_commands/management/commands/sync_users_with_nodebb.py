@@ -58,7 +58,6 @@ class Command(BaseCommand):
 
             nodebb_data = nodebb_users.get(user.username)
 
-
             if not nodebb_data:
                 try:
                     nodebb_client.users.create(username=user.username, kwargs=edx_data)
@@ -70,11 +69,10 @@ class Command(BaseCommand):
 
             # filter nodebb_data to ensure compatibility with edx_data
             for key in nodebb_data:
-                if str(nodebb_data[key]) == 'None':
+                if unicode(nodebb_data[key]) == u'None':
                     nodebb_data[key] = None
             if not nodebb_data.get('self_prioritize_areas'):
                 nodebb_data['self_prioritize_areas'] = []
-
 
             if not edx_data.viewitems() <= nodebb_data.viewitems():
                 try:
