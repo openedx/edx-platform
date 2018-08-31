@@ -358,11 +358,11 @@ def update_course_details(request, course, ccx=None):
     if not ccx:
         raise Http404
 
-    # TODO: This should have been saved as a override field. This will
-    # be updated once child course display name bug is fixed.
+    name = request.POST['display_name']
     CustomCourseForEdX.objects.filter(
         course_id=course.id,
-        coach=request.user).update(display_name=request.POST['display_name'])
+        coach=request.user).update(display_name=name)
+    override_field_for_ccx(ccx, course, 'display_name', name)
 
     # using CCX object as sender here.
     responses = SignalHandler.course_published.send(
