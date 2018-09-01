@@ -145,15 +145,19 @@ def all_permissions_for_user_in_course(user, course_id):  # pylint: disable=inva
     if course is None:
         raise ItemNotFoundError(course_id)
 
-    all_roles = {role.name for role in Role.objects.filter(users=user, course_id=course_id)}
+    roles = Role.objects.filter(users=user, course_id=course_id)
+    role_names = {role.name for role in roles}
 
-    permissions = {
-        permission.name
-        for permission
-        in Permission.objects.filter(roles__users=user, roles__course_id=course_id)
-        if not permission_blacked_out(course, all_roles, permission.name)
-    }
-    return permissions
+    permission_names = set()
+    for role in roles:
+        # Intentional n+1 query pattern to get permissions for each role because
+        # Aurora's query optimizer can't handle the join proplerly on 30M+ row
+        # tables (EDUCATOR-3374). Fortunately, there are very few forum roles.
+        for permission in role.permissions.all():
+            if not permission_blacked_out(course, role_names, permission.name):
+                permission_names.add(permission.name)
+
+    return permission_names
 
 
 class ForumsConfig(ConfigurationModel):
