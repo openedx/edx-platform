@@ -56,7 +56,7 @@ boto3==1.4.8
 boto==2.39.0
 botocore==1.8.17
 celery==3.1.25
-certifi==2018.8.13
+certifi==2018.8.24
 cffi==1.11.5
 charade==1.0.3            # via pysrt
 chardet==3.0.4
@@ -113,11 +113,11 @@ edx-analytics-data-api-client==0.14.4
 edx-ccx-keys==0.2.1
 edx-celeryutils==0.2.7
 edx-completion==0.1.10
-edx-django-oauth2-provider==1.3.4
+edx-django-oauth2-provider==1.3.5
 edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==1.0.1
-edx-drf-extensions==1.6.2
+edx-drf-extensions==1.7.0
 edx-enterprise==0.73.3
 edx-i18n-tools==0.4.6
 edx-milestones==0.1.13
@@ -188,7 +188,7 @@ psutil==1.2.1
 py2neo==3.1.2
 pycontracts==1.7.1
 pycountry==1.20
-pycparser==2.18
+pycparser==2.19
 pycryptodomex==3.4.7
 pygments==2.2.0
 pygraphviz==1.1

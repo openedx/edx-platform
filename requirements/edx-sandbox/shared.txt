@@ -19,7 +19,7 @@ markupsafe==1.0
 networkx==1.7
 nltk==3.3.0
 numpy==1.6.2
-pycparser==2.18           # via cffi
+pycparser==2.19           # via cffi
 pyparsing==2.2.0
 scipy==0.14.0
 six==1.11.0               # via cryptography, nltk
