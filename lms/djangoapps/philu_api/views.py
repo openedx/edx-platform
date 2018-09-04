@@ -4,25 +4,23 @@ restAPI Views
 import logging
 import requests
 from celery.result import AsyncResult
-from datetime import datetime
+from common.lib.mandrill_client.client import MandrillClient
 from django.http import JsonResponse
 from django.conf import settings
 from lms.djangoapps.third_party_surveys.tasks import get_third_party_surveys_task
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from lms.djangoapps.onboarding.forms import RegModelForm
-from lms.djangoapps.onboarding.helpers import get_country_iso
+
 from mailchimp_pipeline.tasks import update_enrollments_completions_at_mailchimp
 from student.models import User
 import urllib
 from django.http import HttpResponse, Http404
 from wsgiref.util import FileWrapper
 
-from lms.djangoapps.onboarding.models import Organization, UserExtendedProfile
 from lms.djangoapps.oef.decorators import eligible_for_oef
 from lms.djangoapps.philu_api.helpers import get_encoded_token
+
 
 log = logging.getLogger("edx.philu_api")
 
@@ -192,3 +190,11 @@ def download_pdf_file(request):
         return response
     else:
         raise Http404
+
+
+def send_alquity_fake_confirmation_email(request):
+    """ Send fake confirmation to current user as as he submit by fake button in last module of a course  """
+    MandrillClient().send_mail(MandrillClient.ALQUITY_FAKE_SUBMIT_CONFIRMATION_TEMPLATE, request.user.email, {
+        "first_name": request.user.first_name
+    })
+    return JsonResponse({})

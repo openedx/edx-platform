@@ -22,6 +22,7 @@ class MandrillClient(object):
     COURSE_START_REMINDER_TEMPLATE = 'course-start-reminder'
     COURSE_COMPLETION_TEMPLATE = 'course-completion'
     REMIND_LEARNERS_TEMPLATE = 'remind-learners'
+    ALQUITY_FAKE_SUBMIT_CONFIRMATION_TEMPLATE = 'alquity-fake-submit-confirmation'
 
     def __init__(self):
         self.mandrill_client = mandrill.Mandrill(settings.MANDRILL_API_KEY)
