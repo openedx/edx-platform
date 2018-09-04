@@ -60,14 +60,14 @@ class Command(BaseCommand):
 
             if not nodebb_data:
                 try:
-                    nodebb_client.users.create(username=user.username, kwargs=edx_data)
+                    nodebb_client.users.create(username=user.username, user_data=edx_data)
                     nodebb_client.users.update_onboarding_surveys_status(username=user.username)
                     nodebb_client.users.activate(username=user.username, active=user.is_active)
                     continue
                 except ConnectionError:
-                    task_create_user_on_nodebb.apply_async(username=user.username, kwargs=edx_data)
-                    task_update_onboarding_surveys_status.apply_async(username=user.username)
-                    task_activate_user_on_nodebb.apply_async(username=user.username, active=user.is_active)
+                    task_create_user_on_nodebb.delay(username=user.username, user_data=edx_data)
+                    task_update_onboarding_surveys_status.delay(username=user.username)
+                    task_activate_user_on_nodebb.delay(username=user.username, active=user.is_active)
 
             # filter nodebb_data to ensure compatibility with edx_data
             for key in nodebb_data:
@@ -78,6 +78,6 @@ class Command(BaseCommand):
 
             if not edx_data.viewitems() <= nodebb_data.viewitems():
                 try:
-                    nodebb_client.users.update_profile(username=user.username, kwargs=edx_data)
+                    nodebb_client.users.update_profile(username=user.username, profile_data=edx_data)
                 except ConnectionError:
-                    task_update_user_profile_on_nodebb(username=user.username, kwargs=edx_data)
+                    task_update_user_profile_on_nodebb.delay(username=user.username, profile_data=edx_data)

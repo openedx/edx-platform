@@ -96,4 +96,4 @@ def update_nodebb_for_user_status(username):
         else:
             log.info('Surveys completion status sent for %s' % username)
     except ConnectionError:
-        task_update_onboarding_surveys_status.apply_async(username=username)
+        task_update_onboarding_surveys_status.delay(username=username)

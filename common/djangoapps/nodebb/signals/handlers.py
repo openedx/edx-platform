@@ -84,10 +84,10 @@ def sync_user_info_with_nodebb(sender, instance, created, **kwargs):  # pylint: 
         data_to_sync = {}
 
     try:
-        status_code, response_body = NodeBBClient().users.update_profile(user.username, kwargs=data_to_sync)
+        status_code, response_body = NodeBBClient().users.update_profile(user.username, profile_data=data_to_sync)
         log_action_response(user, status_code, response_body)
     except ConnectionError:
-        task_update_user_profile_on_nodebb(username=user.username, kwargs=data_to_sync)
+        task_update_user_profile_on_nodebb.delay(username=user.username, profile_data=data_to_sync)
 
 @receiver(post_save, sender=User, dispatch_uid='update_user_profile_on_nodebb')
 def update_user_profile_on_nodebb(sender, instance, created, **kwargs):
@@ -111,21 +111,21 @@ def update_user_profile_on_nodebb(sender, instance, created, **kwargs):
         }
 
         try:
-            status_code, response_body = NodeBBClient().users.create(username=instance.username, kwargs=data_to_sync)
+            status_code, response_body = NodeBBClient().users.create(username=instance.username, user_data=data_to_sync)
             log_action_response(instance, status_code, response_body)
             return status_code
         except ConnectionError:
-            task_create_user_on_nodebb(username=instance.username, kwargs=data_to_sync)
+            task_create_user_on_nodebb.delay(username=instance.username, user_data=data_to_sync)
     else:
         data_to_sync = {
             'first_name': instance.first_name,
             'last_name': instance.last_name
         }
         try:
-            status_code, response_body = NodeBBClient().users.update_profile(instance.username, kwargs=data_to_sync)
+            status_code, response_body = NodeBBClient().users.update_profile(instance.username, profile_data=data_to_sync)
             log_action_response(instance, status_code, response_body)
         except ConnectionError:
-            task_update_user_profile_on_nodebb(username=instance.username, kwargs=data_to_sync)
+            task_update_user_profile_on_nodebb.delay(username=instance.username, profile_data=data_to_sync)
 
 @receiver(post_delete, sender=User)
 def delete_user_from_nodebb(sender, **kwargs):
@@ -134,7 +134,7 @@ def delete_user_from_nodebb(sender, **kwargs):
     """
     instance = kwargs['instance']
     try:
-        status_code, response_body = NodeBBClient().users.delete_user(instance.username, kwargs={})
+        status_code, response_body = NodeBBClient().users.delete_user(instance.username)
         log_action_response(instance, status_code, response_body)
     except ConnectionError:
         task_delete_user_on_nodebb(username=instance.username)
@@ -152,7 +152,7 @@ def activate_deactivate_user_on_nodebb(sender, instance, **kwargs):
                                                                        active=instance.is_active)
             log_action_response(instance, status_code, response_body)
         except ConnectionError:
-            task_activate_user_on_nodebb.apply_async(username=instance.username, active=instance.is_active)
+            task_activate_user_on_nodebb.delay(username=instance.username, active=instance.is_active)
 
 @receiver(post_save, sender=CourseOverview, dispatch_uid="nodebb.signals.handlers.create_category_on_nodebb")
 def create_category_on_nodebb(sender, instance, created, **kwargs):
@@ -199,7 +199,7 @@ def join_group_on_nodebb(sender, event=None, user=None, **kwargs):  # pylint: di
             else:
                 log.info('Success: User have joined the group %s successfully' % course.display_name)
         except ConnectionError:
-            task_join_group_on_nodebb(group_name=community_name, username=username)
+            task_join_group_on_nodebb.delay(group_name=community_name, username=username)
 
 @receiver(post_save, sender=CourseTeam, dispatch_uid="nodebb.signals.handlers.create_update_groupchat_on_nodebb")
 def create_update_groupchat_on_nodebb(sender, instance, created, **kwargs):
