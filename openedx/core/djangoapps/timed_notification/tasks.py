@@ -5,6 +5,7 @@ from pytz import utc
 
 from openedx.core.djangoapps.timed_notification.core import send_course_notification_email, get_course_link, get_course_first_chapter_link
 from lms.djangoapps.branding import get_visible_courses
+from lms.djangoapps.philu_api.helpers import get_course_custom_settings
 from common.lib.mandrill_client.client import MandrillClient
 
 
@@ -31,6 +32,8 @@ def task_course_notifications():
             'course_url': get_course_link(course_id=course.id)
         }
 
+        custom_settings = get_course_custom_settings(course.id)
+
         # send email when 7 days left to course start
         if course_start_date - timedelta(days=7) == date_now:
             send_course_notification_email(course=course,
@@ -41,8 +44,9 @@ def task_course_notifications():
             send_course_notification_email(course=course,
                                            template_name=MandrillClient.COURSE_START_REMINDER_TEMPLATE,
                                            context=context)
+
         # send email the day the course starts
-        elif course_start_date == date_now:
+        elif custom_settings.welcome_email_allowed and course_start_date == date_now:
             send_course_notification_email(course=course,
                                            template_name=MandrillClient.COURSE_WELCOME_TEMPLATE,
                                            context={'course_name': course.display_name,

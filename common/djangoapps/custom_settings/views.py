@@ -44,13 +44,18 @@ def course_custom_settings(request, course_key_string):
         if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
             return render_to_response('custom_settings.html', {
                 'context_course': course_module,
-                'custom_dict': {'is_featured': settings.is_featured, 'tags': settings.tags},
+                'custom_dict': {
+                    'welcome_email_allowed': settings.welcome_email_allowed,
+                    'is_featured': settings.is_featured,
+                    'tags': settings.tags
+                },
                 'custom_settings_url': reverse('custom_settings', kwargs={'course_key_string': unicode(course_key)}),
             })
 
         elif 'application/json' in request.META.get('HTTP_ACCEPT', '') and request.method in ['POST', 'PUT']:
             body = json.loads(request.body)
             settings.is_featured = body.get('is_featured')
+            settings.welcome_email_allowed = body.get('welcome_email_allowed')
             settings.tags = body.get('tags')
             settings.save()
             return JsonResponse(body)
