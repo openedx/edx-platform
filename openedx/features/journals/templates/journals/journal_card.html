@@ -4,10 +4,15 @@ from django.utils.translation import ungettext, ugettext as _
 from django.core.urlresolvers import reverse
 from six import text_type
 from urlparse import urljoin
+from openedx.features.journals.api import get_journal_about_page_url
 %>
-<%page args="journal, journals_root_url" expression_filter="h"/>
-<article class="journal" id="${journal.get('slug')}" role="region" aria-label="${journal.get('title')}">
-  <a class="journals-listing-item" href="${urljoin(journals_root_url, journal.get('slug'))}">
+<%page args="journal" expression_filter="h"/>
+<%
+  about_page_id = journal.get('about_page_id')
+  about_page_url = get_journal_about_page_url(about_page_id, False)
+%>
+<article class="journal" id="${about_page_id}" role="region" aria-label="${journal.get('title')}">
+  <a class="journals-listing-item" href="${about_page_url}">
     <header class="journal-image">
       <div class="cover-image">
         <img src="${journal.get('card_image_url')}" alt="${journal.get('title')}" />

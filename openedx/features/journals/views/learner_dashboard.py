@@ -1,14 +1,15 @@
 """ Journal Tab of Learner Dashboard views """
 from datetime import datetime, time
 import logging
-from urlparse import urljoin, urlsplit, urlunsplit
 
-from django.conf import settings
 from django.http import Http404
 
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
-from openedx.features.journals.api import fetch_journal_access, journals_enabled
+from openedx.features.journals.api import (
+    fetch_journal_access,
+    journals_enabled,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -35,34 +36,6 @@ def journal_listing(request):
     }
 
     return render_to_response('journals/learner_dashboard/journal_dashboard.html', context)
-
-
-def get_journal_about_page_url(slug=''):
-    """
-    Return url to journal about page.
-    The url will redirect through the journals service log in page.  Otherwise the user may be
-    sent to a page to purchase the book - and that is an awkward user experience.
-
-    Arguments:
-        slug (str): unique string associated with each journal about page
-
-    Returns:
-        url (str): url points to Journals Service login, w/ a redirect to journal about page
-    """
-    login_url = urljoin(settings.JOURNALS_URL_ROOT, 'login')
-
-    about_page_url = urljoin(settings.JOURNALS_URL_ROOT, slug)
-    query = 'next={next_url}'.format(next_url=about_page_url)
-
-    split_url = urlsplit(login_url)
-    url = urlunsplit((
-        split_url.scheme,
-        split_url.netloc,
-        split_url.path,
-        query,
-        split_url.fragment,
-    ))
-    return url
 
 
 def format_expiration_date(expiration_date):

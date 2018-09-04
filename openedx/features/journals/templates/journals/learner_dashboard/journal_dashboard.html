@@ -6,7 +6,8 @@
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
-from openedx.features.journals.views.learner_dashboard import get_journal_about_page_url, format_expiration_date, has_access_expired
+from openedx.features.journals.views.learner_dashboard import format_expiration_date, has_access_expired
+from openedx.features.journals.api import get_journal_about_page_url
 %>
 
 <%block name="pagetitle">${_("Journal Dashboard")}</%block>
@@ -57,7 +58,7 @@ banner.showMessage(${redirect_message | n, dump_js_escaped_json})
         <ul class="listing-courses">
           % for journal in journals:
           <%
-            about_page_url = get_journal_about_page_url(slug=journal['journal']['journalaboutpage']['slug'])
+            about_page_url = get_journal_about_page_url(about_page_id=journal['journal']['journalaboutpage']['id'])
             formatted_expiration_date = format_expiration_date(journal['expiration_date'])
             access_expired = has_access_expired(journal['expiration_date'])
           %>

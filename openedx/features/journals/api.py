@@ -1,6 +1,7 @@
 """
 APIs providing support for Journals functionality.
 """
+from urlparse import urljoin, urlsplit, urlunsplit
 import logging
 import hashlib
 import six
@@ -275,18 +276,65 @@ def get_journal_bundles(site, bundle_uuid=''):
 
 def get_journals_root_url():
     """
-    Return the base url used to display Journals
+    Return the base url for the journals service
     """
     if journals_enabled():
-        if configuration_helpers.is_site_configuration_enabled():
-            return configuration_helpers.get_configuration_value(
-                'JOURNALS_URL_ROOT',
-                settings.JOURNALS_URL_ROOT
-            )
-        else:
-            return settings.JOURNALS_URL_ROOT
+        return configuration_helpers.get_value(
+            'JOURNALS_URL_ROOT',
+            settings.JOURNALS_URL_ROOT
+        )
     else:
         return None
+
+
+def get_journals_frontend_url():
+    """
+    Return the frontend url used to display Journals
+    """
+    if journals_enabled():
+        return configuration_helpers.get_value(
+            'JOURNALS_FRONTEND_URL',
+            settings.JOURNALS_FRONTEND_URL
+        )
+    else:
+        return None
+
+
+def get_journal_about_page_url(about_page_id=0, auth=True):
+    """
+    Return url to journal about page.
+    If auth=True, the url will redirect through the journals service log in page
+    which will prevent the "purchase now" button being shown.
+    If auth=False, the url will point to Journal About Page with purchase button shown
+
+    Arguments:
+        about_page_id (int): id of Journal About Page as found in Discovery
+        auth (boolen): authorization flag, if true will force login to journal service
+        and redirect to last visited page in Journal after login. If false, this method
+        will return direct url to journal about page.
+
+    Returns:
+        url (str): url pointing to Journals Service login, w/ a redirect to last visited journal page
+        or url pointing directly to journal about page.
+    """
+    if not auth:
+        return urljoin(get_journals_frontend_url(), '{id}/about'.format(id=about_page_id))
+
+    # by providing just the about_page_id in the url, the user will be redirected
+    # to the last page viewed after logging in
+    about_page_url = urljoin(get_journals_frontend_url(), '{id}'.format(id=about_page_id))
+    login_url = urljoin(get_journals_root_url(), 'require_auth')
+    query = 'forward={next_url}'.format(next_url=about_page_url)
+
+    split_url = urlsplit(login_url)
+    url = urlunsplit((
+        split_url.scheme,
+        split_url.netloc,
+        split_url.path,
+        query,
+        split_url.fragment,
+    ))
+    return url
 
 
 def get_journals_context(request):
@@ -299,12 +347,10 @@ def get_journals_context(request):
     Returns:
         dict containing the following information:
         dict['journals'] - list of Journals available for purchase
-        dict['journals_root_url'] - root url for Journals service
         dict['journal_bundles'] - list of JournalBundles available for purchase
     """
     journal_info = {}
     journal_info['journals'] = get_journals(request.site)
-    journal_info['journals_root_url'] = get_journals_root_url()
     journal_info['journal_bundles'] = get_journal_bundles(request.site)
 
     return journal_info

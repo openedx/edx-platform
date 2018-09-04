@@ -37,7 +37,7 @@ def get_mocked_journal_access():
                 "name": "dummy-name1",
                 "organization": "edx",
                 "journalaboutpage": {
-                    "slug": "dummy-slug1",
+                    "id": "5",
                     "card_image_absolute_url": "dummy-url"
                 }
             }
@@ -49,7 +49,7 @@ def get_mocked_journal_access():
                 "name": "dummy-name2",
                 "organization": "edx",
                 "journalaboutpage": {
-                    "slug": "dummy-slug2",
+                    "id": "5",
                     "card_image_absolute_url": "dummy-url"
                 }
             }
@@ -71,7 +71,7 @@ def get_mocked_journal_bundles():
                 "title": "dummy-title",
                 "sku": "ASZ1GZ",
                 "card_image_url": "dummy-url",
-                "slug": "dummy-title",
+                "about_page_id": "5",
                 "access_length": "8 weeks",
                 "short_description": "dummy short description"
             }
@@ -111,14 +111,14 @@ def get_mocked_journals():
         {
             "title": "dummy-title1",
             "card_image_url": "dummy-url1",
-            "slug": "dummy-title1",
+            "about_page_id": "5",
             "access_length": 60,
             "organization": "edx"
         },
         {
             "title": "dummy-title2",
             "card_image_url": "dummy-url2",
-            "slug": "dummy-title2",
+            "about_page_id": "5",
             "access_length": 60,
             "organization": "edx"
         }
