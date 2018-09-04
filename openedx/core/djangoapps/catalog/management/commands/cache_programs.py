@@ -74,7 +74,7 @@ class Command(BaseCommand):
             cache.set(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=site.domain), uuids, None)
 
             pathway_ids = new_pathways.keys()
-            logger.info('Caching ids for {total} credit pathways for site {site_name}.'.format(
+            logger.info('Caching ids for {total} pathways for site {site_name}.'.format(
                 total=len(pathway_ids),
                 site_name=site.domain,
             ))
@@ -86,7 +86,7 @@ class Command(BaseCommand):
         cache.set_many(programs, None)
 
         successful_pathways = len(pathways)
-        logger.info('Caching details for {successful_pathways} credit pathways.'.format(
+        logger.info('Caching details for {successful_pathways} pathways.'.format(
             successful_pathways=successful_pathways))
         cache.set_many(pathways, None)
 
@@ -149,7 +149,7 @@ class Command(BaseCommand):
                 next_page = next_page + 1 if new_pathways['next'] else None
 
         except:  # pylint: disable=bare-except
-            logger.error('Failed to retrieve credit pathways for site: {domain}.'.format(domain=site.domain))
+            logger.error('Failed to retrieve pathways for site: {domain}.'.format(domain=site.domain))
             failure = True
 
         logger.info('Received {total} pathways for site {domain}'.format(

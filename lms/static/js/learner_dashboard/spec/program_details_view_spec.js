@@ -485,6 +485,17 @@ describe('Program Details Header View', () => {
         destination_url: 'edx.org',
       },
     ],
+    industryPathways: [
+      {
+        org_name: 'Test Org Name',
+        email: 'test@test.com',
+        name: 'Name of Test Pathway',
+        program_uuids: ['0ffff5d6-0177-4690-9a48-aa2fecf94610'],
+        description: 'Test industry pathway description',
+        id: 3,
+        destination_url: 'industry.com',
+      },
+    ],
   };
   const data = options.programData;
 
