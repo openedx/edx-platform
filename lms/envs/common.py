@@ -1216,9 +1216,6 @@ CREDIT_NOTIFICATION_CACHE_TIMEOUT = 5 * 60 * 60
 MIDDLEWARE_CLASSES = [
     'crum.CurrentRequestUserMiddleware',
 
-    # Deprecated, but well entrenched RequestCache
-    'openedx.core.djangoapps.request_cache.middleware.RequestCache',
-
     # A newer and safer request cache.
     'edx_django_utils.cache.middleware.RequestCacheMiddleware',
     'edx_django_utils.monitoring.middleware.MonitoringCustomMetricsMiddleware',
