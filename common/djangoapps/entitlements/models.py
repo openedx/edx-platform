@@ -414,16 +414,15 @@ class CourseEntitlement(TimeStampedModel):
     @classmethod
     def unenroll_entitlement(cls, course_enrollment, skip_refund):
         """
-        Un-enroll the user from entitlement and refund.
+        Un-enroll the user from entitlement and refund if needed.
         """
         course_uuid = get_course_uuid_for_course(course_enrollment.course_id)
         course_entitlement = cls.get_entitlement_if_active(course_enrollment.user, course_uuid)
         if course_entitlement and course_entitlement.enrollment_course_run == course_enrollment:
             course_entitlement.set_enrollment(None)
             if not skip_refund and course_entitlement.is_entitlement_refundable():
+                course_entitlement.expire_entitlement()
                 course_entitlement.refund()
-
-            course_entitlement.expire_entitlement()
 
     def refund(self):
         """
