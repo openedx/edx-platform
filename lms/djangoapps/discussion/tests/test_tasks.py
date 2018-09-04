@@ -143,7 +143,16 @@ class TaskTestCase(ModuleStoreTestCase):
             'username': cls.comment_author.username,
         }
         cls.thread['children'] = [cls.comment, cls.comment2]
-        cls.comment['child_count'] = 1,
+        cls.comment['child_count'] = 1
+        cls.thread2 = {
+            'id': cls.discussion_id,
+            'course_id': unicode(cls.course.id),
+            'created_at': date.serialize(TWO_HOURS_AGO),
+            'title': 'thread-title',
+            'user_id': cls.thread_author.id,
+            'username': cls.thread_author.username,
+            'commentable_id': 'thread-commentable-id-2',
+        }
 
     def setUp(self):
         super(TaskTestCase, self).setUp()
@@ -229,11 +238,14 @@ class TaskTestCase(ModuleStoreTestCase):
             self.assertTrue(self.mock_permalink in rendered_email.body_html)
             self.assertTrue(message.context['site'].domain in rendered_email.body_html)
 
-    def run_should_not_send_email_test(self, comment_dict):
+    def run_should_not_send_email_test(self, thread, comment_dict):
+        """
+        assert email is not sent
+        """
         self.mock_request.side_effect = make_mock_responder(
             subscribed_thread_ids=[self.discussion_id],
             comment_data=comment_dict,
-            thread_data=self.thread,
+            thread_data=thread,
         )
         user = mock.Mock()
         comment = cc.Comment.find(id=comment_dict['id']).retrieve()
@@ -243,16 +255,23 @@ class TaskTestCase(ModuleStoreTestCase):
             'thread_author_id': self.thread_author.id,
             'course_id': self.course.id,
             'comment_id': comment_dict['id'],
-            'thread_id': self.thread['id'],
+            'thread_id': thread['id'],
         })
         self.assertEqual(actual_result, False)
         self.assertFalse(self.mock_ace_send.called)
 
     def test_subcomment_should_not_send_email(self):
-        self.run_should_not_send_email_test(self.subcomment)
+        self.run_should_not_send_email_test(self.thread, self.subcomment)
 
     def test_second_comment_should_not_send_email(self):
-        self.run_should_not_send_email_test(self.comment2)
+        self.run_should_not_send_email_test(self.thread, self.comment2)
+
+    def test_thread_without_children_should_not_send_email(self):
+        """
+        test that email notification will not be sent for the thread
+        that doesn't have attribute 'children'
+        """
+        self.run_should_not_send_email_test(self.thread2, self.comment)
 
     @ddt.data((
         {
