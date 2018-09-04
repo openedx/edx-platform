@@ -6,16 +6,17 @@ from celery.task import task
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
+from edx_django_utils.cache import RequestCache
 from mock import Mock
 
 from openedx.core.djangoapps.request_cache import get_request_or_stub
-from openedx.core.djangoapps.request_cache.middleware import RequestCache, request_cached
+from openedx.core.djangoapps.request_cache.middleware import request_cached
 from xmodule.modulestore.django import modulestore
 
 
 class TestRequestCache(TestCase):
     """
-    Tests for the request cache.
+    Tests for request cache helpers and decorators.
     """
 
     def test_get_request_or_stub(self):
@@ -43,7 +44,7 @@ class TestRequestCache(TestCase):
         """
         Ensure that after a cache miss, we fill the cache and can hit it.
         """
-        RequestCache.clear_request_cache()
+        RequestCache.clear_all_namespaces()
 
         to_be_wrapped = Mock()
         to_be_wrapped.return_value = 42
@@ -66,7 +67,7 @@ class TestRequestCache(TestCase):
         """
         Ensure that after caching a result, we always send it back, even if the underlying result changes.
         """
-        RequestCache.clear_request_cache()
+        RequestCache.clear_all_namespaces()
 
         to_be_wrapped = Mock()
         to_be_wrapped.side_effect = [1, 2, 3]
@@ -102,7 +103,7 @@ class TestRequestCache(TestCase):
         Ensure that calling a decorated function with different positional arguments
         will not use a cached value invoked by a previous call with different arguments.
         """
-        RequestCache.clear_request_cache()
+        RequestCache.clear_all_namespaces()
 
         to_be_wrapped = Mock()
         to_be_wrapped.side_effect = [1, 2, 3, 4, 5, 6]
@@ -143,7 +144,7 @@ class TestRequestCache(TestCase):
         Ensure that calling a decorated function with different keyword arguments
         will not use a cached value invoked by a previous call with different arguments.
         """
-        RequestCache.clear_request_cache()
+        RequestCache.clear_all_namespaces()
 
         to_be_wrapped = Mock()
         to_be_wrapped.side_effect = [1, 2, 3, 4, 5, 6]
@@ -188,7 +189,7 @@ class TestRequestCache(TestCase):
         """
         Ensure that request_cached can work with mixed str and Unicode parameters.
         """
-        RequestCache.clear_request_cache()
+        RequestCache.clear_all_namespaces()
 
         def dummy_function(arg1, arg2):
             """
@@ -212,7 +213,7 @@ class TestRequestCache(TestCase):
         properly caches the result and doesn't recall the underlying
         function.
         """
-        RequestCache.clear_request_cache()
+        RequestCache.clear_all_namespaces()
 
         to_be_wrapped = Mock()
         to_be_wrapped.side_effect = [None, None, None, 1, 1]

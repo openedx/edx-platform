@@ -5,9 +5,9 @@ from contextlib import contextmanager
 
 import ddt
 from django.test import TestCase
+from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.locator import CourseLocator
 
-from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from xblock_config.models import CourseEditLTIFieldsEnabledFlag
 
 
@@ -20,7 +20,7 @@ def lti_consumer_fields_editing_flag(course_id, enabled_for_course=False):
         course_id (CourseLocator): course locator to control this feature for.
         enabled_for_course (bool): whether feature is enabled for 'course_id'
     """
-    RequestCache.clear_request_cache()
+    RequestCache.clear_all_namespaces()
     CourseEditLTIFieldsEnabledFlag.objects.create(course_id=course_id, enabled=enabled_for_course)
     yield
 

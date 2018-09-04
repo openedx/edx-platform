@@ -8,6 +8,7 @@ from django.db import models
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy
+from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.django.models import CourseKeyField
 
 from lms.djangoapps.courseware.courses import get_course_by_id
@@ -18,7 +19,7 @@ from openedx.core.djangoapps.course_groups.cohorts import (
     is_course_cohorted
 )
 from openedx.core.djangoapps.verified_track_content.tasks import sync_cohort_with_mode
-from openedx.core.djangoapps.request_cache.middleware import RequestCache, ns_request_cached
+from openedx.core.djangoapps.request_cache.middleware import ns_request_cached
 from student.models import CourseEnrollment
 
 log = logging.getLogger(__name__)
@@ -147,7 +148,7 @@ class VerifiedTrackCohortedCourse(models.Model):
 @receiver(models.signals.post_delete, sender=VerifiedTrackCohortedCourse)
 def invalidate_verified_track_cache(sender, **kwargs):   # pylint: disable=unused-argument
     """Invalidate the cache of VerifiedTrackCohortedCourse. """
-    RequestCache.clear_request_cache(name=VerifiedTrackCohortedCourse.CACHE_NAMESPACE)
+    RequestCache(namespace=VerifiedTrackCohortedCourse.CACHE_NAMESPACE).clear()
 
 
 class MigrateVerifiedTrackCohortsSetting(ConfigurationModel):

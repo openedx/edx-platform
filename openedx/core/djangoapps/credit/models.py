@@ -19,12 +19,12 @@ from django.db import IntegrityError, models, transaction
 from django.dispatch import receiver
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
+from edx_django_utils.cache import RequestCache
 from jsonfield.fields import JSONField
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 
-from openedx.core.djangoapps.request_cache.middleware import RequestCache, ns_request_cached
-
+from openedx.core.djangoapps.request_cache.middleware import ns_request_cached
 
 CREDIT_PROVIDER_ID_REGEX = r"[a-z,A-Z,0-9,\-]+"
 log = logging.getLogger(__name__)
@@ -401,7 +401,7 @@ class CreditRequirement(TimeStampedModel):
 @receiver(models.signals.post_delete, sender=CreditRequirement)
 def invalidate_credit_requirement_cache(sender, **kwargs):   # pylint: disable=unused-argument
     """Invalidate the cache of credit requirements. """
-    RequestCache.clear_request_cache(name=CreditRequirement.CACHE_NAMESPACE)
+    RequestCache(namespace=CreditRequirement.CACHE_NAMESPACE).clear()
 
 
 class CreditRequirementStatus(TimeStampedModel):
