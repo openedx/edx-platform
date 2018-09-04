@@ -4,13 +4,13 @@ Platform plugins to support a verified upgrade tool.
 
 import datetime
 import pytz
+from crum import get_current_request
 from django.utils.translation import ugettext as _
 
 from course_modes.models import CourseMode
 from openedx.features.course_experience.course_tools import CourseTool
 from student.models import CourseEnrollment
 from courseware.date_summary import verified_upgrade_deadline_link
-from openedx.core.djangoapps.request_cache import get_request
 
 
 class VerifiedUpgradeTool(CourseTool):
@@ -69,5 +69,5 @@ class VerifiedUpgradeTool(CourseTool):
         """
         Returns the URL for this tool for the specified course key.
         """
-        request = get_request()
+        request = get_current_request()
         return verified_upgrade_deadline_link(request.user, course_id=course_key)
