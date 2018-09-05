@@ -170,3 +170,94 @@ class GradingPageTest(StudioCourseTest):
         self.grading_page.save()
         confirmation_message = self.grading_page.get_confirmation_message()
         self.assertEqual(confirmation_message, 'Your changes have been saved.')
+
+    def staff_can_set_weight_to_assignment(self):
+        """
+        Scenario: Users can set weight to Assignment types
+            Given I have opened a new course in Studio
+            And I am viewing the grading settings
+            When I add a new assignment type "New Type"
+            And I set the assignment weight to "7"
+            And I press the "Save" notification button
+            Then the assignment weight is displayed as "7"
+            And I reload the page
+            Then the assignment weight is displayed as "7"
+        """
+        self.grading_page.add_new_assignment_type()
+        self.grading_page.change_assignment_name('', 'New Type')
+        self.grading_page.set_weight('New Type', '7')
+        self.grading_page.save()
+        assignment_weight = self.grading_page.get_assignment_weight()
+        self.assertEqual(assignment_weight, '7')
+        self.grading_page.refresh_and_wait_for_load()
+        assignment_weight = self.grading_page.get_assignment_weight()
+        self.assertEqual(assignment_weight, '7')
+
+    def test_staff_cannot_save_invalid_settings(self):
+        """
+        Scenario: User cannot save invalid settings
+            Given I have populated a new course in Studio
+            And I am viewing the grading settings
+            When I change assignment type "Homework" to ""
+            Then the save notification button is disabled
+        """
+        self.grading_page.change_assignment_name('Homework', '')
+        self.assertTrue(self.grading_page.is_notification_button_disbaled(), True)
+
+    def test_edit_highest_grade_name(self):
+        """
+        Scenario: User can edit grading range names
+            Given I have populated a new course in Studio
+            And I am viewing the grading settings
+            When I change the highest grade range to "Good"
+            And I press the "Save" notification button
+            And I reload the page
+            Then I see the highest grade range is "Good"
+        """
+        self.grading_page.edit_grade_name('Good')
+        self.grading_page.save()
+        self.grading_page.refresh_and_wait_for_load()
+        grade_name = self.grading_page.get_highest_grade_name()
+        self.assertEqual(grade_name, 'Good')
+
+    def test_staff_cannot_edit_lowest_grade_name(self):
+        """
+        Scenario: User cannot edit failing grade range name
+            Given I have populated a new course in Studio
+            And I am viewing the grading settings
+            Then I cannot edit the "Fail" grade range
+        """
+        self.grading_page.try_edit_fail_grade('Failure')
+        self.assertNotEqual(self.grading_page.get_lowest_grade_name, 'Failure')
+
+    def test_setting_grace_period_greater_than_one_day(self):
+        """
+        Scenario: User can set a grace period greater than one day
+            Given I have populated a new course in Studio
+            And I am viewing the grading settings
+            When I change the grace period to "48:00"
+            And I press the "Save" notification button
+            And I reload the page
+            Then I see the grace period is "48:00"
+        """
+        self.grading_page.set_grace_period_value('48:00')
+        self.grading_page.save()
+        self.grading_page.refresh_and_wait_for_load()
+        grace_time = self.grading_page.get_grace_period_value()
+        self.assertEqual(grace_time, '48:00')
+
+    def test_grace_period_wrapped_to_correct_time(self):
+        """
+        Scenario: Grace periods of more than 59 minutes are wrapped to the correct time
+            Given I have populated a new course in Studio
+            And I am viewing the grading settings
+            When I change the grace period to "01:99"
+            And I press the "Save" notification button
+            And I reload the page
+            Then I see the grace period is "02:39"
+        """
+        self.grading_page.set_grace_period_value('01:99')
+        self.grading_page.save()
+        self.grading_page.refresh_and_wait_for_load()
+        grace_time = self.grading_page.get_grace_period_value()
+        self.assertEqual(grace_time, '02:39')

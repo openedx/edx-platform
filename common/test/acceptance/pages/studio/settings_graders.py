@@ -7,6 +7,8 @@ from common.test.acceptance.pages.studio.utils import press_the_notification_but
 from common.test.acceptance.pages.common.utils import click_css
 from selenium.webdriver import ActionChains
 from bok_choy.promise import BrokenPromise
+from selenium.webdriver.common.keys import Keys
+from nose.tools import assert_not_equal
 
 
 class GradingPage(SettingsPage):
@@ -16,6 +18,7 @@ class GradingPage(SettingsPage):
 
     url_path = "settings/grading"
     grade_ranges = '.grades .grade-specific-bar'
+    grace_period_field = '#course-grading-graceperiod'
     assignments = '.field-group.course-grading-assignment-list-item'
 
     def is_browser_on_page(self):
@@ -97,6 +100,12 @@ class GradingPage(SettingsPage):
         )
         return self.q(css='#course-grading-assignment-name').attrs('value')
 
+    def add_new_assignment_type(self):
+        """
+        Click New Assignment Type button.
+        """
+        self.q(css='.new-button.new-course-grading-item.add-grading-data').click()
+
     def change_assignment_name(self, old_name, new_name):
         """
         Changes the assignment name.
@@ -122,6 +131,91 @@ class GradingPage(SettingsPage):
         Clicks to add a grade
         """
         click_css(self, '.new-grade-button', require_notification=False)
+
+    def set_weight(self, assignment_name, weight):
+        """
+        Set the weight of the assignment type.
+        param: assignment_name: Assignment name for which weight is to be changed.
+        param: weight: New weight
+        """
+        # import pdb; pdb.set_trace()
+        weight_id = '#course-grading-assignment-gradeweight'
+        index = self._get_type_index(assignment_name)
+        f = self.q(css=weight_id).results[index]
+        assert_not_equal(index, -1)
+        for __ in xrange(len(assignment_name)):
+            f.send_keys(Keys.END, Keys.BACK_SPACE)
+        f.send_keys(weight)
+
+    def get_assignment_weight(self, assignment_name):
+        """
+        Gets the weight of assignment
+        Arguments:
+            assignment_name (str): Name of the assignment
+        Returns:
+            string: Weight of the assignment
+        """
+        self.wait_for_element_visibility(
+            '#course-grading-assignment-gradeweight',
+            'Weight fields are present'
+        )
+        weight_id = '#course-grading-assignment-gradeweight'
+        index = self._get_type_index(assignment_name)
+        all_weight_elements = self.q(css=weight_id).results
+        return all_weight_elements[index].get_attribute('value')
+
+    def is_notification_button_disbaled(self):
+        """
+        Check to see if notification button is disabled.
+        Returns: True if button is disabled.
+        """
+        self.wait_for_element_visibility('.nav-actions>ul', 'Notification bar not visible.')
+        return self.q(css='.action-primary.action-save.is-disabled').present
+
+    def edit_grade_name(self, new_grade_name):
+        """
+        Edit name of the highest grade.
+        """
+        self.wait_for_element_visibility(self.grade_ranges, 'Grades not visible')
+        self.q(css='span[contenteditable="true"]').fill(new_grade_name)
+
+    def try_edit_fail_grade(self, field_value):
+        """
+        Try to edit the name of lowest grade.
+        """
+        self.wait_for_element_visibility(self.grade_ranges, 'Grades not visible')
+        try:
+            self.q(css='span[contenteditable="false"]').fill(field_value)
+        except BrokenPromise:
+            pass
+
+    def get_highest_grade_name(self):
+        """
+        Get name of the highest grade.
+        """
+        self.wait_for_element_visibility(self.grade_ranges, 'Grades not visible')
+        return self.q(css='span[contenteditable="true"]').first.text[0]
+
+    def get_lowest_grade_name(self):
+        """
+        Get name of the lowest grade.
+        """
+        self.wait_for_element_visibility(self.grade_ranges, 'Grades not visible')
+
+    def set_grace_period_value(self, grace_time_value):
+        """
+        Set the grace period on deadline.
+        """
+        self.wait_for_element_visibility(self.grace_period_field, "Grace Period field not present.")
+        self.q(css='#course-grading-graceperiod').fill(grace_time_value)
+
+    def get_grace_period_value(self):
+        """
+        Get the grace period field value.
+        """
+        self.wait_for(lambda: self.q(css=self.grace_period_field).attrs('value')[0] != '00:00',
+                      description="Grace period field not updated")
+        return self.q(css='#course-grading-graceperiod').attrs('value')[0]
 
     def is_grade_added(self, length):
         """
