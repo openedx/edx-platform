@@ -156,7 +156,6 @@ firebase-token-generator==1.3.2
 fixtures==3.0.0           # via testtools
 flake8-polyfill==1.0.2    # via radon
 flake8==3.5.0             # via flake8-polyfill
-flaky==3.3.0
 flask==1.0.2              # via moto
 freezegun==0.3.10
 fs-s3fs==0.1.8
