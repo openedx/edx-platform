@@ -37,7 +37,7 @@
                     <% if (pathway.destination_url) { %>
                         <div class="sidebar-button-wrapper">
                             <a href="<%- pathway.destination_url %>" class="pathway-link">
-                                <button class="btn pathway-button sidebar-button" data-pathway-id="<%- pathway.id %>" data-pathway-name="<%- pathway.name %>"><%- gettext('Learn More') %></button>
+                                <button class="btn pathway-button sidebar-button" data-pathway-uuid="<%- pathway.uuid %>" data-pathway-name="<%- pathway.name %>"><%- gettext('Learn More') %></button>
                             </a>
                         </div>
                     <% } %>
@@ -63,7 +63,7 @@
                     <% if (pathway.destination_url) { %>
                         <div class="sidebar-button-wrapper">
                             <a href="<%- pathway.destination_url %>" class="pathway-link">
-                                <button class="btn pathway-button sidebar-button" data-pathway-id="<%- pathway.id %>" data-pathway-name="<%- pathway.name %>"><%- gettext('Learn More') %></button>
+                                <button class="btn pathway-button sidebar-button" data-pathway-uuid="<%- pathway.uuid %>" data-pathway-name="<%- pathway.name %>"><%- gettext('Learn More') %></button>
                             </a>
                         </div>
                     <% } %>
