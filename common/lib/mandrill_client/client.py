@@ -17,11 +17,13 @@ class MandrillClient(object):
     NEW_ADMIN_CLAIM_CONFIRMATION = 'org-admin-update-confirmation'
     NEW_ADMIN_GET_IN_TOUCH = 'new-admin-get-in-touch'
     ENROLLMENT_CONFIRMATION_TEMPLATE = 'enrollment-confirmation'
+    ENROLLMENT_CONFIRMATION_TEST_TEMPLATE = 'test-template'
     COURSE_WELCOME_TEMPLATE = 'course-welcome'
     COURSE_EARLY_WELCOME_TEMPLATE = 'course-early-welcome'
     COURSE_START_REMINDER_TEMPLATE = 'course-start-reminder'
     COURSE_COMPLETION_TEMPLATE = 'course-completion'
     REMIND_LEARNERS_TEMPLATE = 'remind-learners'
+    COURSE_INVITATION_ONLY_REGISTER_TEMPLATE = 'course-invitation-only-register-user'
 
     def __init__(self):
         self.mandrill_client = mandrill.Mandrill(settings.MANDRILL_API_KEY)
