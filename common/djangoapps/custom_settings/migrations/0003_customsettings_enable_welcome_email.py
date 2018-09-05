@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='customsettings',
-            name='welcome_email_allowed',
+            name='enable_welcome_email',
             field=models.BooleanField(default=True),
         ),
     ]

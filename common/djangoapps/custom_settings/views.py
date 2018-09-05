@@ -45,7 +45,7 @@ def course_custom_settings(request, course_key_string):
             return render_to_response('custom_settings.html', {
                 'context_course': course_module,
                 'custom_dict': {
-                    'welcome_email_allowed': settings.welcome_email_allowed,
+                    'enable_welcome_email': settings.enable_welcome_email,
                     'is_featured': settings.is_featured,
                     'tags': settings.tags
                 },
@@ -55,7 +55,7 @@ def course_custom_settings(request, course_key_string):
         elif 'application/json' in request.META.get('HTTP_ACCEPT', '') and request.method in ['POST', 'PUT']:
             body = json.loads(request.body)
             settings.is_featured = body.get('is_featured')
-            settings.welcome_email_allowed = body.get('welcome_email_allowed')
+            settings.enable_welcome_email = body.get('enable_welcome_email')
             settings.tags = body.get('tags')
             settings.save()
             return JsonResponse(body)
