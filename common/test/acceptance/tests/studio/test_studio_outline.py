@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 from unittest import skip
 
 from pytz import UTC
+from flaky import flaky
 
 from base_studio_test import StudioCourseTest
 from common.test.acceptance.fixtures.config import ConfigModelFixture
@@ -1595,6 +1596,8 @@ class PublishSectionTest(CourseOutlineTest):
         self.courseware.go_to_sequential_position(2)
         self.assertEqual(1, self.courseware.num_xblock_components)
 
+    # TODO: Remove flaky decorator before merging to master.
+    @flaky(max_runs=80, min_passes=80)
     def test_section_publishing(self):
         """
         Scenario: Can publish a section and see published content in LMS

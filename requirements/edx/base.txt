@@ -134,6 +134,7 @@ enum34==1.1.6
 event-tracking==0.2.4
 feedparser==5.1.3
 firebase-token-generator==1.3.2
+flaky==3.3.0
 fs-s3fs==0.1.8
 fs==2.0.18
 future==0.16.0            # via pyjwkest
