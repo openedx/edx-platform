@@ -77,7 +77,7 @@ git+https://github.com/edx/XBlock.git@xblock-0.4.13#egg=XBlock==0.4.13
 -e git+https://github.com/edx/event-tracking.git@0.2.1#egg=event-tracking==0.2.1
 -e git+https://github.com/edx/django-splash.git@v0.2#egg=django-splash==0.2
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
--e git+https://github.com/philanthropy-u/edx-ora2.git@ee13a52e1a715e047a8ac3c057010f8a64886c55#egg=ora2==1.1.13.2
+-e git+https://github.com/philanthropy-u/edx-ora2.git@b52f8e53f35ca0b500b37d17c1589283fbc8e641#egg=ora2==1.1.13.2
 
 -e git+https://github.com/edx/edx-submissions.git@1.1.4#egg=edx-submissions==1.1.4
 git+https://github.com/edx/ease.git@release-2015-07-14#egg=ease==0.1.3

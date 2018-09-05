@@ -369,13 +369,29 @@ class CoursewareIndex(View):
         save_child_position(self.course, self.chapter_url_name)
         save_child_position(self.chapter, self.section_url_name)
 
+
+    #TODO move this method in philu app
+    def can_view_score(self):
+        """
+        Check if user is allowed to view score
+        :return: Boolean
+        """
+        from lms.djangoapps.philu_api.helpers import get_course_custom_settings
+        from courseware.access import get_user_role
+        course_custom_settings = get_course_custom_settings(self.course.course_id)
+        current_user_role = get_user_role(self.request.user, self.course.course_id)
+
+        return course_custom_settings.show_grades or current_user_role in ["staff", 'instructor']
+
     def _create_courseware_context(self):
         """
         Returns and creates the rendering context for the courseware.
         Also returns the table of contents for the courseware.
         """
+        show_grades = self.can_view_score()
 
         courseware_context = {
+            'show_grades': show_grades,
             'csrf': csrf(self.request)['csrf_token'],
             'COURSE_TITLE': self.course.display_name_with_default_escaped,
             'course': self.course,

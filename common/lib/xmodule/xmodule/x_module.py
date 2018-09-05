@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import sys
@@ -876,6 +877,7 @@ class XModule(HTMLSnippet, XModuleMixin):
                 request_post[key] = map(FileObjForWebobFiles, request.POST.getall(key))
 
         response_data = self.handle_ajax(suffix, request_post)
+
         return Response(response_data, content_type='application/json')
 
     def get_child(self, usage_id):
