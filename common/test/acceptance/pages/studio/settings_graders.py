@@ -140,6 +140,13 @@ class GradingPage(SettingsPage):
         except BrokenPromise:
             return False
 
+    def add_new_assignment_type(self):
+        """
+        Add New Assignment type
+        """
+        self.q(css='.add-grading-data').click()
+        self.save_changes()
+
     @property
     def grades_range(self):
         """
