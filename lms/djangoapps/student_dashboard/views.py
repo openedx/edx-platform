@@ -39,7 +39,7 @@ def get_recommended_courses(user):
     return recommended_courses
 
 
-def get_enrolled_past_courses(course_enrollments):
+def get_enrolled_past_courses(request, course_enrollments):
     """
     Helper function to separate past courses from all enrolled courses
     """

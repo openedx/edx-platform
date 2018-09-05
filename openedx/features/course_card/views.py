@@ -37,8 +37,8 @@ def get_course_cards(request):
     :param request:
     :return: list of active cards
     """
-
-    course_card_ids = [cc.course_id for cc in CourseCard.objects.filter(is_enabled=True)]
+    cards_query_set = CourseCard.objects.all() if request.user.is_staff else CourseCard.objects.filter(is_enabled=True)
+    course_card_ids = [cc.course_id for cc in cards_query_set]
     courses_list = CourseOverview.objects.select_related('image_set').filter(id__in=course_card_ids)
     courses_list = sorted(courses_list, key=lambda _course: _course.number)
     current_time = datetime.now()
