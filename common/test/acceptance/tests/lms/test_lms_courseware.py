@@ -853,24 +853,3 @@ class CompletionTestCase(UniqueCourseTest, EventsTestMixin):
         # Auto-auth register for the course.
         AutoAuthPage(self.browser, username=self.USERNAME, email=self.EMAIL,
                      course_id=self.course_id, staff=False).visit()
-
-    def test_render_xblock_publish_completion_is_sent_on_view(self):
-        """
-        Test that when viewing a XBlock in render_xblock, it is correctly marked as completed on view.
-        """
-        block_page = RenderXBlockPage(self.browser, self.html_1_block.locator)
-        block_page.visit()
-        block_page.wait_for_page()
-
-        # Initially the block should be marked as needing to be completed on view.
-        self.assertEqual(
-            block_page.xblock_components_mark_completed_on_view_value(), [self.COMPLETION_BY_VIEWING_DELAY_MS]
-        )
-        # Wait and verify that the block is marked as completed on view.
-        block_page.wait_for_xblock_component_to_be_marked_completed_on_view(0)
-        self.assertEqual(block_page.xblock_components_mark_completed_on_view_value(), ['0'])
-
-        # After page refresh, it should not be marked as needing to be completed on view.
-        self.browser.refresh()
-        block_page.wait_for_page()
-        self.assertEqual(block_page.xblock_components_mark_completed_on_view_value(), [None])
