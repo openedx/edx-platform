@@ -564,38 +564,6 @@ class YouTubeVideoTest(VideoBaseTest):
             timeout=5
         )
 
-    def test_video_language_menu_working(self):
-        """
-        Scenario: Language menu works correctly in Video component
-        Given the course has a Video component in "Youtube" mode
-        And I have defined multiple language transcripts for the videos
-        And I make sure captions are closed
-        And I see video menu "language" with correct items
-        And I select language with code "zh"
-        Then I see "好 各位同学" text in the captions
-        And I select language with code "en"
-        Then I see "Welcome to edX." text in the captions
-        """
-        self.assets.extend(['chinese_transcripts.srt', 'subs_3_yD_cEKoCk.srt.sjson'])
-        data = {'transcripts': {"zh": "chinese_transcripts.srt"}, 'sub': '3_yD_cEKoCk'}
-        self.metadata = self.metadata_for_mode('youtube', additional_data=data)
-
-        # go to video
-        self.navigate_to_video()
-
-        self.video.hide_captions()
-
-        correct_languages = {'en': 'English', 'zh': 'Chinese'}
-        self.assertEqual(self.video.caption_languages, correct_languages)
-
-        self.video.select_language('zh')
-
-        unicode_text = "好 各位同学".decode('utf-8')
-        self._verify_caption_text(unicode_text)
-
-        self.video.select_language('en')
-        self._verify_caption_text('Welcome to edX.')
-
     def test_video_language_menu_working_closed_captions(self):
         """
         Scenario: Language menu works correctly in Video component, checks closed captions
