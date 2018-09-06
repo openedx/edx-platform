@@ -93,7 +93,7 @@ def update_user_profile_on_nodebb(sender, instance, created, **kwargs):
     send_user_info_to_mailchimp(sender, instance, created, kwargs)
 
     request = get_current_request()
-    if 'login' in request.path:
+    if not request or 'login' in request.path:
         return
 
     if created:
