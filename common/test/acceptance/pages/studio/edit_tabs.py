@@ -39,6 +39,25 @@ class PagesPage(CoursePage):
         self.wait_for_element_visibility('.tab-list :nth-child({})'.format(total_tabs), 'Static tab is visible')
         self.wait_for_ajax()
 
+    def toggle_tab(self, tab_name):
+        """
+        Toggles the visibility on tab
+        Args:
+            tab_name(string): Name of the tab to be toggled
+        """
+        self.q(css='[data-tab-id="{}"] .action-visible'.format(tab_name)).first.click()
+
+    def check_tab_visibility_status(self, tab_name):
+        """
+        Checks for the tab's visibility
+        Args:
+            tab_name(string): Name of the tab for which visibility is to be checked
+        Returns:
+            bool: True if tab is visible
+            bool: False if tab is not visible
+        """
+        return self.q(css='[data-tab-id="{}"] .toggle-checkbox'.format(tab_name)).selected
+
     def delete_static_tab(self):
         """
         Deletes a static page
@@ -56,15 +75,21 @@ class PagesPage(CoursePage):
             'Wait for the Studio editor to be present'
         ).fulfill()
 
-    def drag_and_drop_first_static_page_to_last(self):
+    def drag_and_drop(self, default_tab=False):
         """
         Drags and drops the first the static page to the last
         """
-        draggable_elements = self.q(css='.component .drag-handle').results
+        if default_tab:
+            draggable_elements = self.q(css='.drag-handle.action').results
+        else:
+            draggable_elements = self.q(css='.component .drag-handle').results
         source_element = draggable_elements[0]
         target_element = self.q(css='.new-component-item').results[0]
         action = ActionChains(self.browser)
         action.drag_and_drop(source_element, target_element).perform()
+        # action.click_and_hold(source_element)
+        # action.move_to_element_with_offset(target_element, 0, 50)
+        # action.release().perform()
         self.wait_for_ajax()
 
     @property
@@ -74,8 +99,16 @@ class PagesPage(CoursePage):
         Returns:
             list: list of all the titles
         """
-        self.wait_for_element_visibility('div.xmodule_StaticTabModule', 'Static tab is visible')
         return self.q(css='div.xmodule_StaticTabModule').text
+
+    @property
+    def default_tab_titles(self):
+        """
+        Gets the default tab title
+        Returns:
+            list: list of all the titles
+        """
+        return self.q(css='.course-nav-list.ui-sortable h3').text
 
     def open_settings_tab(self):
         """
