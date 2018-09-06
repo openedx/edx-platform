@@ -4,6 +4,7 @@ Tasks to synchronize users with NodeBB
 from celery.utils.log import get_task_logger
 
 from django.conf import settings
+from django.contrib.auth.models import User
 from celery.task import task
 
 from common.lib.nodebb_client.client import NodeBBClient
@@ -38,6 +39,13 @@ def task_create_user_on_nodebb(username, user_data):
     """
     status_code, response = NodeBBClient().users.create(username=username, user_data=user_data)
     handle_response(task_create_user_on_nodebb, 'User creation', status_code, response, username)
+    if status_code == 200:
+        user = User.objects.filter(username=username)[0]
+        if user.is_active:
+            task_activate_user_on_nodebb(username=username, active=True)
+        # if user has completed all registration forms then update the status on NodeBB
+        if not bool(user.extended_profile.unattended_surveys(_type='list')):
+            task_update_onboarding_surveys_status(username)
 
 
 @task(default_retry_delay=RETRY_DELAY, max_retries=None)
