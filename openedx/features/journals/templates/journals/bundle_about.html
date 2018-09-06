@@ -12,6 +12,7 @@ from mako import exceptions
 from urlparse import urljoin
 
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.features.journals.api import get_journal_about_page_url
 %>
 <%namespace name='static' file='../static_content.html'/>
 
@@ -128,6 +129,10 @@ from openedx.core.djangolib.markup import HTML, Text
       </div>
     % endfor
     % for journal in bundle.get('journals'):
+      <%
+        about_page_id = journal['about_page_id']
+        about_page_url = get_journal_about_page_url(about_page_id, False)
+      %>
       <div class="row">
         <div class="col-12">
           <h2>
@@ -143,7 +148,7 @@ from openedx.core.djangolib.markup import HTML, Text
         </div>
         <div class="col-9 col-lg-6">
           <div>
-            <a href="${urljoin(journals_root_url, journal['slug'])}">${journal['title']}</a>
+            <a href="${about_page_url}">${journal['title']}</a>
           </div>
           <div>${journal['short_description'] or ''}</div>
         </div>
@@ -154,7 +159,7 @@ from openedx.core.djangolib.markup import HTML, Text
             )}
           </div>
           <div>
-            <a class="btn btn-primary btn-block btn-success" href="${urljoin(journals_root_url, journal['slug'])}">${_("View Journal")}</a>
+            <a class="btn btn-primary btn-block btn-success" href="${about_page_url}">${_("View Journal")}</a>
           </div>
         </div>
       </div>
