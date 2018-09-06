@@ -40,7 +40,11 @@ def task_create_user_on_nodebb(username, user_data):
     status_code, response = NodeBBClient().users.create(username=username, user_data=user_data)
     handle_response(task_create_user_on_nodebb, 'User creation', status_code, response, username)
     if status_code == 200:
-        user = User.objects.filter(username=username)[0]
+        try:
+            user = User.objects.filter(username=username)[0]
+        except IndexError:
+            # if user does not exist then return
+            return
         if user.is_active:
             task_activate_user_on_nodebb(username=username, active=True)
         # if user has completed all registration forms then update the status on NodeBB
