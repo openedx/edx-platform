@@ -88,6 +88,11 @@ def get_course_next_classes(request, course):
         # - Course is already full
         # - Student cannot enroll in course
         active_reg_button = not (registered or is_course_full or not can_enroll)
+        course_first_chapter_link = ""
+        if request.user.is_authenticated() and request.user.is_staff:
+            # imported get_course_first_chapter_link here because importing above was throwing circular exception
+            from openedx.core.djangoapps.timed_notification.core import get_course_first_chapter_link
+            course_first_chapter_link = get_course_first_chapter_link(_course)
 
         course_next_classes.append({
             'user': request.user,
@@ -96,7 +101,8 @@ def get_course_next_classes(request, course):
             'can_enroll': can_enroll.has_access,
             'invitation_only': invitation_only,
             'course': course,
-            'active_reg_button': active_reg_button
+            'active_reg_button': active_reg_button,
+            'course_first_chapter_link': course_first_chapter_link
         })
     return course_next_classes
 
