@@ -64,8 +64,11 @@ def ns_request_cached(namespace=None):
             log = logging.getLogger(__name__)
             log.error('CALL: ns_request_cached inner_wrapper')
             log.error('namespace: {}'.format(namespace))
-            log.error('cache_key: {}'.format(cache_key))
-            log.error('cached_response: {}'.format(cached_response))
+            log.error('cache_key: {}'.format(unicode(cache_key)))
+            try:
+                log.error('cached_response: {}'.format(cached_response))
+            except Exception:
+                log.error('cached_response_found: {}'.format(cached_response.is_found))
 
             if cached_response.is_found:
                 return cached_response.value
