@@ -334,6 +334,12 @@ class CourseMode(models.Model):
             list of `Mode` tuples
 
         """
+        import logging
+        import traceback
+        log = logging.getLogger(__name__)
+        log.error('CALLED modes_for_course:')
+        log.error(traceback.format_stack())
+
         found_course_modes = cls.objects.filter(course_id=course_id)
 
         # Filter out expired course modes if include_expired is not set
