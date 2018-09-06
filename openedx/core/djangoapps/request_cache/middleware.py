@@ -59,6 +59,14 @@ def ns_request_cached(namespace=None):
             cache_key = _func_call_cache_key(f, *args, **kwargs)
 
             cached_response = request_cache.get_cached_response(cache_key)
+
+            import logging
+            log = logging.getLogger(__name__)
+            log.error('CALL: ns_request_cached inner_wrapper')
+            log.error('namespace: {}'.format(namespace))
+            log.error('cache_key: {}'.format(cache_key))
+            log.error('cached_response: {}'.format(cached_response))
+
             if cached_response.is_found:
                 return cached_response.value
 
