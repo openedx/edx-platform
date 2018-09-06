@@ -45,7 +45,7 @@ def course_custom_settings(request, course_key_string):
             return render_to_response('custom_settings.html', {
                 'context_course': course_module,
                 'custom_dict': {
-                    'enable_welcome_email': settings.enable_welcome_email,
+                    'enable_enrollment_email': settings.enable_enrollment_email,
                     'is_featured': settings.is_featured,
                     'show_grades': settings.show_grades,
                     'tags': settings.tags},
@@ -56,8 +56,7 @@ def course_custom_settings(request, course_key_string):
             body = json.loads(request.body)
             settings.is_featured = body.get('is_featured') if isinstance(body.get('is_featured'), bool) else False
             settings.show_grades = body.get('show_grades') if isinstance(body.get('show_grades'), bool) else False
-
-            settings.enable_welcome_email = body.get('enable_welcome_email')
+            settings.enable_enrollment_email = body.get('enable_enrollment_email')
             settings.tags = body.get('tags')
             settings.save()
             return JsonResponse(body)

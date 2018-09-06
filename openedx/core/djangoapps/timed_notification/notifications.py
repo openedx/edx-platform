@@ -13,12 +13,12 @@ def enrollment_confirmation(sender, event=None, user=None, **kwargs):
     if event == EnrollStatusChange.enroll:
         course = modulestore().get_course(kwargs.get('course_id'))
 
-        is_welcome_email_enabled = True
+        is_enrollment_email_enabled = True
         custom_settings = get_course_custom_settings(course.id)
         if custom_settings:
-            is_welcome_email_enabled = custom_settings.enable_welcome_email
+            is_enrollment_email_enabled = custom_settings.enable_enrollment_email
 
-        if is_welcome_email_enabled:
+        if is_enrollment_email_enabled:
             context = {
                 'course_name': course.display_name,
                 # TODO: find a way to move this code to PhilU overrides

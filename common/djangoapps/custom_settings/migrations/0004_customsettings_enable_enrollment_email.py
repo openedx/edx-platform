@@ -7,13 +7,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('custom_settings', '0002_customsettings_tags'),
+        ('custom_settings', '0003_customsettings_show_grades'),
     ]
 
     operations = [
         migrations.AddField(
             model_name='customsettings',
-            name='enable_welcome_email',
+            name='enable_enrollment_email',
             field=models.BooleanField(default=True),
         ),
     ]
