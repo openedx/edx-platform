@@ -174,9 +174,7 @@ class _TeamBulkContext(object):
 class _EnrollmentBulkContext(object):
     def __init__(self, context, users):
         CourseEnrollment.bulk_fetch_enrollment_states(users, context.course_id)
-        self.verified_users = [
-            verified.user.id for verified in IDVerificationService.get_verified_users(users)
-        ]
+        self.verified_users = set(IDVerificationService.get_verified_user_ids(users))
 
 
 class _CourseGradeBulkContext(object):

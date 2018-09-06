@@ -123,3 +123,25 @@ class TestIDVerificationService(MockS3Mixin, ModuleStoreTestCase):
 
             status = IDVerificationService.verification_status_for_user(user, enrollment_mode)
             self.assertEqual(status, output)
+
+    def test_get_verified_user_ids(self):
+        """
+        Tests for getting users that are verified.
+        """
+        user_a = UserFactory.create()
+        user_b = UserFactory.create()
+        user_c = UserFactory.create()
+        user_unverified = UserFactory.create()
+        user_denied = UserFactory.create()
+
+        SoftwareSecurePhotoVerification.objects.create(user=user_a, status='approved')
+        ManualVerification.objects.create(user=user_b, status='approved')
+        SSOVerification.objects.create(user=user_c, status='approved')
+        SSOVerification.objects.create(user=user_denied, status='denied')
+
+        verified_user_ids = set(IDVerificationService.get_verified_user_ids([
+            user_a, user_b, user_c, user_unverified, user_denied
+        ]))
+        expected_user_ids = {user_a.id, user_b.id, user_c.id}
+
+        self.assertEqual(expected_user_ids, verified_user_ids)
