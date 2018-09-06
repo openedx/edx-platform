@@ -13,6 +13,7 @@ import analytics
 import dogstats_wrapper as dog_stats_api
 from bulk_email.models import Optout
 from courseware.courses import get_courses, sort_by_announcement, sort_by_start_date
+from courseware.access import has_access
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login as django_login
@@ -408,6 +409,10 @@ def change_enrollment(request, check_access=True):
         )
         if redirect_url:
             return HttpResponse(redirect_url)
+
+        # Check if user has access to enroll in course
+        if not has_access(request.user, 'enroll', modulestore().get_course(course_id)):
+            return HttpResponseBadRequest(_("Could not enroll"))
 
         if CourseEntitlement.check_for_existing_entitlement_and_enroll(user=user, course_run_key=course_id):
             return HttpResponse(reverse('courseware', args=[unicode(course_id)]))
