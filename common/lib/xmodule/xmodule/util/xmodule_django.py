@@ -18,3 +18,14 @@ def get_current_request_hostname():
         hostname = request.META.get('HTTP_HOST')
 
     return hostname
+
+
+def add_webpack_to_fragment(fragment, bundle_name, extension=None, config='DEFAULT'):
+    """
+    Add all webpack chunks to the supplied fragment as the appropriate resource type.
+    """
+    for chunk in webpack_loader.utils.get_files(bundle_name, extension, config):
+        if chunk['name'].endswith(('.js', '.js.gz')):
+            fragment.add_javascript_url(chunk['url'])
+        elif chunk['name'].endswith(('.css', '.css.gz')):
+            fragment.add_css_url(chunk['url'])
