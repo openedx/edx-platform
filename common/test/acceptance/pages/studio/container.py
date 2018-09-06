@@ -207,6 +207,15 @@ class ContainerPage(PageObject, HelpMixin):
         return self.q(css='.wrapper-xblock .level-element .header-details').text
 
     @property
+    def html_for_htmlmodule(self):
+        """
+        Gets the html of HTML module
+        Returns:
+            list: A list containing inner HTMl
+        """
+        return self.q(css='.xmodule_HtmlModule').html
+
+    @property
     def is_staff_locked(self):
         """ Returns True if staff lock is currently enabled, False otherwise """
         for attr in self.q(css='a.action-staff-lock>.fa').attrs('class'):
