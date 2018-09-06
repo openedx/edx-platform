@@ -27,7 +27,7 @@ from openedx.core.djangoapps.request_cache.middleware import RequestCache as Dep
 class CacheIsolationMixin(object):
     """
     This class can be used to enable specific django caches for
-    specific the TestCase that it's mixed into.
+    the specific TestCase that it's mixed into.
 
     Usage:
 

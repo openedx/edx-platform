@@ -41,6 +41,7 @@ from openedx.core.djangoapps.certificates.config import waffle
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.lib.tests.assertions.events import assert_event_matches
 from openedx.core.djangolib.js_utils import js_escaped_string
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.roles import CourseStaffRole
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from track.tests import EventTrackingTestCase
@@ -241,7 +242,7 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
 
 
 @ddt.ddt
-class CertificatesViewsTests(CommonCertificatesTestCase):
+class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase):
     """
     Tests for the certificates web/html views
     """
