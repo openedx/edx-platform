@@ -119,10 +119,10 @@ def ns_request_cached(namespace=None):
 
             import logging
             log = logging.getLogger(__name__)
-            log.error('CALL: ns_request_cached inner_wrapper')
-            log.error('namespace: {}'.format(namespace))
-            log.error('cache_key: {}'.format(unicode(cache_key)))
-            log.error('is_response_cached: {}'.format(cache_key in rcache))
+            log.error(u'CALL: ns_request_cached inner_wrapper')
+            log.error(u'namespace: {}'.format(namespace))
+            log.error(u'cache_key: {}'.format(unicode(cache_key)))
+            log.error(u'is_response_cached: {}'.format(cache_key in rcache))
 
             if cache_key in rcache:
                 return rcache.get(cache_key)
