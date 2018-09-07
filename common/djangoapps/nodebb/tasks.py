@@ -46,10 +46,10 @@ def task_create_user_on_nodebb(username, user_data):
             # if user does not exist then return
             return
         if user.is_active:
-            task_activate_user_on_nodebb(username=username, active=True)
+            task_activate_user_on_nodebb.delay(username=username, active=True)
         # if user has completed all registration forms then update the status on NodeBB
         if not bool(user.extended_profile.unattended_surveys(_type='list')):
-            task_update_onboarding_surveys_status(username)
+            task_update_onboarding_surveys_status.delay(username)
 
 
 @task(default_retry_delay=RETRY_DELAY, max_retries=None)
