@@ -14,6 +14,6 @@ def no_webpack_loader(monkeypatch):
         lambda entry, extension=None, config='DEFAULT', attrs='': ''
     )
     monkeypatch.setattr(
-        "webpack_loader.utils.get_as_tags",
+        "webpack_loader.utils.get_files",
         lambda entry, extension=None, config='DEFAULT', attrs='': []
     )
