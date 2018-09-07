@@ -253,7 +253,6 @@ def users_in_cohort(request, course_key_string, cohort_id):
                                'users': user_info})
 
 
-@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @require_POST
 def add_users_to_cohort(request, course_key_string, cohort_id):
