@@ -334,6 +334,8 @@ class CourseMode(models.Model):
             list of `Mode` tuples
 
         """
+        if not isinstance(course_id, CourseKey):
+            course_id = CourseKey.from_string(course_id)
         found_course_modes = cls.objects.filter(course_id=course_id)
 
         # Filter out expired course modes if include_expired is not set
