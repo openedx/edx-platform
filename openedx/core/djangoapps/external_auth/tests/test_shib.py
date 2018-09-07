@@ -221,6 +221,8 @@ class ShibSPTest(CacheIsolationTestCase):
         Tests that FEATURES['BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'] means extauth automatically
         linked users, activates them, and logs them in
         """
+        # user id:1
+        # create a dummy user in the db
         inactive_user = UserFactory.create(email='inactive@stanford.edu')
         inactive_user.is_active = False
         inactive_user.save()
