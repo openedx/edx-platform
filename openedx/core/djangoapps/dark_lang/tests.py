@@ -5,7 +5,6 @@ import unittest
 
 import ddt
 from django.http import HttpRequest
-from django.test import TestCase
 from django.test.client import Client
 from django.utils.translation import LANGUAGE_SESSION_KEY
 from mock import Mock

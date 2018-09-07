@@ -2,7 +2,6 @@
 """ Tests for the language API. """
 
 from mock import patch
-from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils import translation
 from django.contrib.auth.models import User
