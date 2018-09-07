@@ -95,14 +95,14 @@ class ProgramDetailsSidebarView extends Backbone.View {
   }
 
   trackPathwayClicked(event) {
-    var button = event.currentTarget;
+    const button = event.currentTarget;
 
     window.analytics.track('edx.bi.dashboard.program.pathway.clicked', {
       category: 'pathways',
       // Credentials uses the uuid without dashes so we are converting here for consistency
       program_uuid: this.programModel.attributes.uuid.replace(/-/g, ''),
       program_name: this.programModel.attributes.title,
-      pathway_link_id: $(button).data('pathwayId'),
+      pathway_link_uuid: $(button).data('pathwayUuid').replace(/-/g, ''),
       pathway_name: $(button).data('pathwayName'),
     });
   }
