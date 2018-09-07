@@ -9,7 +9,9 @@ from django.core.management import call_command
 from user_util.user_util import get_retired_username
 
 from lms.lib import comment_client
-from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import RetirementTestCase, fake_retirement
+from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import (
+    setup_retirement_states, fake_completed_retirement
+)
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
@@ -38,7 +40,7 @@ def _setup_users():
         retirements[user.id] = retirement
 
         if i in user_indexes_to_be_fake_retired:
-            fake_retirement(user)
+            fake_completed_retirement(user)
 
             if i in user_indexes_to_be_rehashed:
                 # In order to need a rehash user.username the new hash must be
@@ -56,12 +58,12 @@ def _setup_users():
 
 
 @skip_unless_lms
+@pytest.mark.usefixtures("setup_retirement_states")
 @patch('lms.lib.comment_client.User.retire')
 def test_successful_rehash(retire_user_forums, capsys):
     """
     Run the command with users of all different hash statuses, expect success
     """
-    RetirementTestCase.setup_states()
     users_skipped, users_needing_rehash, retirements = _setup_users()
 
     call_command('bulk_rehash_retired_usernames')
@@ -93,12 +95,12 @@ def test_successful_rehash(retire_user_forums, capsys):
 
 
 @skip_unless_lms
+@pytest.mark.usefixtures("setup_retirement_states")
 @patch('lms.lib.comment_client.User.retire')
 def test_forums_failed(retire_user_forums, capsys):
     """
     Run the command with users of all different hash statuses, expect success
     """
-    RetirementTestCase.setup_states()
     users_skipped, users_needing_rehash, retirements = _setup_users()
     retire_user_forums.side_effect = Exception('something bad happened with forums')
 
@@ -133,12 +135,12 @@ def test_forums_failed(retire_user_forums, capsys):
 
 
 @skip_unless_lms
+@pytest.mark.usefixtures("setup_retirement_states")
 @patch('lms.lib.comment_client.User.retire')
 def test_forums_404(retire_user_forums, capsys):
     """
     Run the command with users of all different hash statuses, expect success
     """
-    RetirementTestCase.setup_states()
     users_skipped, users_needing_rehash, retirements = _setup_users()
     retire_user_forums.side_effect = comment_client.utils.CommentClientRequestError('not found', status_codes=404)
 

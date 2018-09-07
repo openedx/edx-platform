@@ -8,6 +8,9 @@ import datetime
 import json
 import unittest
 
+import ddt
+import pytz
+import mock
 from consent.models import DataSharingConsent
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -25,9 +28,7 @@ from enterprise.models import (
 from integrated_channels.sap_success_factors.models import (
     SapSuccessFactorsLearnerDataTransmissionAudit
 )
-import mock
 from opaque_keys.edx.keys import CourseKey
-import pytz
 from rest_framework import status
 from six import iteritems, text_type
 from social_django.models import UserSocialAuth
@@ -51,6 +52,7 @@ from openedx.core.djangoapps.user_api.models import (
     UserRetirementPartnerReportingStatus,
     UserOrgTag
 )
+from openedx.core.djangoapps.user_api.accounts.views import AccountRetirementPartnerReportView
 from openedx.core.lib.token_utils import JwtBuilder
 from student.models import (
     CourseEnrollment,
@@ -76,7 +78,12 @@ from student.tests.factories import (
 
 from ..views import AccountRetirementView, USER_PROFILE_PII
 from ...tests.factories import UserOrgTagFactory
-from .retirement_helpers import RetirementTestCase, fake_retirement
+from .retirement_helpers import (  # pylint: disable=unused-import
+    RetirementTestCase,
+    fake_completed_retirement,
+    create_retirement_status,
+    setup_retirement_states
+)
 
 
 def build_jwt_headers(user):
@@ -253,8 +260,7 @@ class TestAccountRetireMailings(RetirementTestCase):
 
         # Should be created in parent setUpClass
         retiring_email_lists = RetirementState.objects.get(state_name='RETIRING_EMAIL_LISTS')
-
-        self.retirement = self._create_retirement(retiring_email_lists)
+        self.retirement = create_retirement_status(retiring_email_lists)
         self.test_user = self.retirement.user
 
         self.url = reverse('accounts_retire_mailings')
@@ -441,7 +447,7 @@ class TestPartnerReportingPut(RetirementTestCase, ModuleStoreTestCase):
         self.maxDiff = None
         self.partner_queue_state = RetirementState.objects.get(state_name='ADDING_TO_PARTNER_QUEUE')
 
-    def post_and_assert_status(self, data, expected_status=status.HTTP_204_NO_CONTENT):
+    def put_and_assert_status(self, data, expected_status=status.HTTP_204_NO_CONTENT):
         """
         Helper function for making a request to the retire subscriptions endpoint, and asserting the status.
         """
@@ -454,24 +460,29 @@ class TestPartnerReportingPut(RetirementTestCase, ModuleStoreTestCase):
         Checks the simple success case of creating a user, enrolling in a course, and doing the partner
         report PUT. User should then have the appropriate row in UserRetirementPartnerReportingStatus
         """
-        retirement = self._create_retirement(self.partner_queue_state)
+        retirement = create_retirement_status(self.partner_queue_state)
         for course in self.courses:
             CourseEnrollment.enroll(user=retirement.user, course_key=course.id)
 
-        self.post_and_assert_status({'username': retirement.original_username})
+        self.put_and_assert_status({'username': retirement.original_username})
         self.assertTrue(UserRetirementPartnerReportingStatus.objects.filter(user=retirement.user).exists())
 
     def test_idempotent(self):
         """
         Runs the success test twice to make sure that re-running the step still succeeds.
         """
-        retirement = self._create_retirement(self.partner_queue_state)
+        retirement = create_retirement_status(self.partner_queue_state)
         for course in self.courses:
             CourseEnrollment.enroll(user=retirement.user, course_key=course.id)
 
-        # We really do want this twice.
-        self.post_and_assert_status({'username': retirement.original_username})
-        self.post_and_assert_status({'username': retirement.original_username})
+        # Do our step
+        self.put_and_assert_status({'username': retirement.original_username})
+
+        # Do our basic other retirement step fakery
+        fake_completed_retirement(retirement.user)
+
+        # Try running our step again
+        self.put_and_assert_status({'username': retirement.original_username})
         self.assertTrue(UserRetirementPartnerReportingStatus.objects.filter(user=retirement.user).exists())
 
     def test_unknown_user(self):
@@ -482,7 +493,36 @@ class TestPartnerReportingPut(RetirementTestCase, ModuleStoreTestCase):
         for course in self.courses:
             CourseEnrollment.enroll(user=user, course_key=course.id)
 
-        self.post_and_assert_status({'username': user.username}, status.HTTP_404_NOT_FOUND)
+        self.put_and_assert_status({'username': user.username}, status.HTTP_404_NOT_FOUND)
+
+    def test_nonexistent_course(self):
+        """
+        Checks that if a user has been enrolled in a course that does not exist
+        (we allow this!) we can still get their orgs for partner reporting. This
+        prevents regressions of a bug we found in prod where users in this state
+        were throwing 500 errors when _get_orgs_for_user hit the database to find
+        the enrollment.course.org. We now just use the enrollment.course_id.org
+        since for this purpose we don't care if the course exists.
+        """
+        retirement = create_retirement_status(self.partner_queue_state)
+        user = retirement.user
+        enrollment = CourseEnrollment.enroll(user=user, course_key=CourseKey.from_string('edX/Test201/2018_Fall'))
+
+        # Make sure the enrollment was created
+        self.assertTrue(enrollment.is_active)
+
+        # Make sure the correct org is found and returned from the low-level call. We don't get back
+        # the orgs from our PUT operation, so this is the best way to make sure it's doing the right
+        # thing.
+        orgs = AccountRetirementPartnerReportView._get_orgs_for_user(user)  # pylint: disable=protected-access
+        self.assertTrue(len(orgs) == 1)
+        self.assertTrue('edX' in orgs)
+
+        # PUT should succeed
+        self.put_and_assert_status({'username': user.username})
+
+        # Row should exist
+        self.assertTrue(UserRetirementPartnerReportingStatus.objects.filter(user=retirement.user).exists())
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
@@ -678,7 +718,7 @@ class TestAccountRetirementList(RetirementTestCase):
         Verify that users in dead end states are not returned
         """
         for state in self._get_dead_end_states():
-            self._create_retirement(state)
+            create_retirement_status(state)
         self.assert_status_and_user_list([], states_to_request=self._get_non_dead_end_states())
 
     def test_users_retrieved_in_multiple_states(self):
@@ -687,7 +727,7 @@ class TestAccountRetirementList(RetirementTestCase):
         """
         multiple_states = ['PENDING', 'FORUMS_COMPLETE']
         for state in multiple_states:
-            self._create_retirement(RetirementState.objects.get(state_name=state))
+            create_retirement_status(RetirementState.objects.get(state_name=state))
         data = {'cool_off_days': 0, 'states': multiple_states}
         response = self.client.get(self.url, data, **self.headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -724,7 +764,7 @@ class TestAccountRetirementList(RetirementTestCase):
         pending_state = RetirementState.objects.get(state_name='PENDING')
         for days_back in range(1, days_back_to_test, -1):
             create_datetime = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=days_back)
-            retirements.append(self._create_retirement(state=pending_state, create_datetime=create_datetime))
+            retirements.append(create_retirement_status(state=pending_state, create_datetime=create_datetime))
 
         # Confirm we get the correct number and data back for each day we add to cool off days
         # For each day we add to `cool_off_days` we expect to get one fewer retirement.
@@ -771,6 +811,155 @@ class TestAccountRetirementList(RetirementTestCase):
 
         RetirementState.objects.get(state_name='PENDING')
         response = self.client.get(self.url, {'states': ['PENDING']}, **self.headers)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+@ddt.ddt
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
+class TestAccountRetirementsByStatusAndDate(RetirementTestCase):
+    """
+    Tests the retirements_by_status_and_date endpoint
+    """
+
+    def setUp(self):
+        super(TestAccountRetirementsByStatusAndDate, self).setUp()
+        self.test_superuser = SuperuserFactory()
+        self.headers = build_jwt_headers(self.test_superuser)
+        self.url = reverse('accounts_retirements_by_status_and_date')
+        self.maxDiff = None
+
+    def assert_status_and_user_list(
+            self,
+            expected_data,
+            expected_status=status.HTTP_200_OK,
+            state_to_request=None,
+            start_date=None,
+            end_date=None
+    ):
+        """
+        Helper function for making a request to the endpoint, asserting the status, and
+        optionally asserting data returned. Will try to convert datetime start and end dates
+        to the correct string formatting.
+        """
+        if state_to_request is None:
+            state_to_request = 'COMPLETE'
+
+        if start_date is None:
+            start_date = datetime.datetime.now().date().strftime('%Y-%m-%d')
+        else:
+            start_date = start_date.date().strftime('%Y-%m-%d')
+
+        if end_date is None:
+            end_date = datetime.datetime.now().date().strftime('%Y-%m-%d')
+        else:
+            end_date = end_date.date().strftime('%Y-%m-%d')
+
+        data = {'start_date': start_date, 'end_date': end_date, 'state': state_to_request}
+        response = self.client.get(self.url, data, **self.headers)
+
+        print(response.status_code)
+        print(response)
+
+        self.assertEqual(response.status_code, expected_status)
+        response_data = response.json()
+
+        if expected_data:
+            # These datetimes won't match up due to serialization, but they're inherited fields tested elsewhere
+            for data in (response_data, expected_data):
+                for retirement in data:
+                    # These may have been deleted in a previous pass
+                    try:
+                        del retirement['created']
+                        del retirement['modified']
+                    except KeyError:
+                        pass
+
+            self.assertItemsEqual(response_data, expected_data)
+
+    def test_empty(self):
+        """
+        Verify that an empty array is returned if no users are awaiting retirement
+        """
+        self.assert_status_and_user_list([])
+
+    def test_users_exist_none_in_correct_state(self):
+        """
+        Verify that users in non-requested states are not returned
+        """
+        state = RetirementState.objects.get(state_name='PENDING')
+        create_retirement_status(state=state)
+        self.assert_status_and_user_list([])
+
+    def test_users_exist(self):
+        """
+        Verify correct user is returned when users in different states exist
+        """
+        # Stores the user we expect to get back
+        retirement_values = None
+        for retirement in self._create_users_all_states():
+            if retirement.current_state == 'COMPLETE':
+                retirement_values.append(self._retirement_to_dict(retirement))
+
+        self.assert_status_and_user_list(retirement_values)
+
+    def test_bad_states(self):
+        """
+        Check some bad inputs to make sure we get back the expected status
+        """
+        self.assert_status_and_user_list(None, expected_status=status.HTTP_400_BAD_REQUEST, state_to_request='TACO')
+
+    def test_date_filter(self):
+        """
+        Verifies the functionality of the start and end date filters
+        """
+        retirements = []
+        complete_state = RetirementState.objects.get(state_name='COMPLETE')
+
+        # Create retirements for the last 10 days
+        for days_back in range(0, 10):
+            create_datetime = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=days_back)
+            ret = create_retirement_status(state=complete_state, create_datetime=create_datetime)
+            retirements.append(self._retirement_to_dict(ret))
+
+        # Go back in time adding days to the query, assert the correct retirements are present
+        end_date = datetime.datetime.now(pytz.UTC)
+        for days_back in range(1, 11):
+            retirement_dicts = retirements[:days_back]
+            start_date = end_date - datetime.timedelta(days=days_back - 1)
+            self.assert_status_and_user_list(
+                retirement_dicts,
+                start_date=start_date,
+                end_date=end_date
+            )
+
+    def test_bad_dates(self):
+        """
+        Check some bad inputs to make sure we get back the expected status
+        """
+        good_date = '2018-01-01'
+        for bad_param, good_param in (('start_date', 'end_date'), ('end_date', 'start_date')):
+            for bad_date in ('10/21/2001', '2118-01-01', '2018-14-25', 'toast', 5):
+                data = {
+                    bad_param: bad_date,
+                    good_param: good_date,
+                    'state': 'COMPLETE'
+                }
+                response = self.client.get(self.url, data, **self.headers)
+                self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    @ddt.data(
+        {},
+        {'start_date': '2018-01-01'},
+        {'end_date': '2018-01-01'},
+        {'state': 'PENDING'},
+        {'start_date': '2018-01-01', 'state': 'PENDING'},
+        {'end_date': '2018-01-01', 'state': 'PENDING'},
+    )
+    def test_missing_params(self, request_data):
+        """
+        All params are required, make sure that is enforced
+        """
+        response = self.client.get(self.url, request_data, **self.headers)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
@@ -822,7 +1011,7 @@ class TestAccountRetirementRetrieve(RetirementTestCase):
         retirements = []
 
         for state in RetirementState.objects.all():
-            retirements.append(self._create_retirement(state))
+            retirements.append(create_retirement_status(state))
 
         for retirement in retirements:
             values = self._retirement_to_dict(retirement)
@@ -833,7 +1022,7 @@ class TestAccountRetirementRetrieve(RetirementTestCase):
         Simulate retrieving a retirement by the old username, after the name has been changed to the hashed one
         """
         pending_state = RetirementState.objects.get(state_name='PENDING')
-        retirement = self._create_retirement(pending_state)
+        retirement = create_retirement_status(pending_state)
         original_username = retirement.user.username
 
         hashed_username = get_retired_username_by_username(original_username)
@@ -845,6 +1034,7 @@ class TestAccountRetirementRetrieve(RetirementTestCase):
         self.assert_status_and_user_data(values, username_to_find=original_username)
 
 
+@ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
 class TestAccountRetirementUpdate(RetirementTestCase):
     """
@@ -855,7 +1045,7 @@ class TestAccountRetirementUpdate(RetirementTestCase):
         self.pending_state = RetirementState.objects.get(state_name='PENDING')
         self.locking_state = RetirementState.objects.get(state_name='LOCKING_ACCOUNT')
 
-        self.retirement = self._create_retirement(self.pending_state)
+        self.retirement = create_retirement_status(self.pending_state)
         self.test_user = self.retirement.user
         self.test_superuser = SuperuserFactory()
         self.headers = build_jwt_headers(self.test_superuser)
@@ -958,35 +1148,31 @@ class TestAccountRetirementUpdate(RetirementTestCase):
         data = {'new_state': 'LOCKING_ACCOUNT', 'response': 'this should fail', 'username': 'does not exist'}
         self.update_and_assert_status(data, status.HTTP_404_NOT_FOUND)
 
-    def test_move_from_dead_end(self):
-        """
-        Confirm that trying to move from a dead end state to any other state fails
-        """
+    @ddt.data(
+        # Test moving backward from intermediate state
+        ('LOCKING_ACCOUNT', 'PENDING', False, status.HTTP_400_BAD_REQUEST),
+        ('LOCKING_ACCOUNT', 'PENDING', True, status.HTTP_204_NO_CONTENT),
+
+        # Test moving backward from dead end state
+        ('COMPLETE', 'PENDING', False, status.HTTP_400_BAD_REQUEST),
+        ('COMPLETE', 'PENDING', True, status.HTTP_204_NO_CONTENT),
+
+        # Test moving to the same state
+        ('LOCKING_ACCOUNT', 'LOCKING_ACCOUNT', False, status.HTTP_400_BAD_REQUEST),
+        ('LOCKING_ACCOUNT', 'LOCKING_ACCOUNT', True, status.HTTP_204_NO_CONTENT),
+    )
+    @ddt.unpack
+    def test_moves(self, start_state, move_to_state, force, expected_response_code):
         retirement = UserRetirementStatus.objects.get(id=self.retirement.id)
-        retirement.current_state = RetirementState.objects.filter(is_dead_end_state=True)[0]
+        retirement.current_state = RetirementState.objects.get(state_name=start_state)
         retirement.save()
 
-        data = {'new_state': 'LOCKING_ACCOUNT', 'response': 'this should fail'}
-        self.update_and_assert_status(data, status.HTTP_400_BAD_REQUEST)
+        data = {'new_state': move_to_state, 'response': 'foo'}
 
-    def test_move_backward(self):
-        """
-        Confirm that trying to move to an earlier step in the process fails
-        """
-        retirement = UserRetirementStatus.objects.get(id=self.retirement.id)
-        retirement.current_state = RetirementState.objects.get(state_name='COMPLETE')
-        retirement.save()
+        if force:
+            data['force'] = True
 
-        data = {'new_state': 'PENDING', 'response': 'this should fail'}
-        self.update_and_assert_status(data, status.HTTP_400_BAD_REQUEST)
-
-    def test_move_same(self):
-        """
-        Confirm that trying to move to the same step in the process fails
-        """
-        # Should already be in 'PENDING'
-        data = {'new_state': 'PENDING', 'response': 'this should fail'}
-        self.update_and_assert_status(data, status.HTTP_400_BAD_REQUEST)
+        self.update_and_assert_status(data, expected_response_code)
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
@@ -1169,7 +1355,7 @@ class TestAccountRetirementPost(RetirementTestCase):
     def test_retire_user_twice_idempotent(self):
         data = {'username': self.original_username}
         self.post_and_assert_status(data)
-        fake_retirement(self.test_user)
+        fake_completed_retirement(self.test_user)
         self.post_and_assert_status(data)
 
     def test_deletes_pii_from_user_profile(self):
@@ -1389,5 +1575,5 @@ class TestLMSAccountRetirementPost(RetirementTestCase, ModuleStoreTestCase):
         # check that a second call to the retire_misc endpoint will work
         data = {'username': self.original_username}
         self.post_and_assert_status(data)
-        fake_retirement(self.test_user)
+        fake_completed_retirement(self.test_user)
         self.post_and_assert_status(data)
