@@ -287,7 +287,7 @@ class TestPaverRunQuality(unittest.TestCase):
         # which path it will chose in the above code block.
         #
         # TODO: Figure out why one test is altering the state to begin with.
-        # paver.tasks.environment = paver.tasks.Environment()
+        paver.tasks.environment = paver.tasks.Environment()
 
         # mock the @needs decorator to skip it
         patcher = patch('pavelib.quality.sh')
@@ -355,12 +355,12 @@ class TestPaverRunQuality(unittest.TestCase):
         # Test that pylint is NOT called by counting calls
         self.assertEqual(self._mock_paver_sh.call_count, 1)
 
-    # @patch('__builtin__.open', mock_open())
-    # def test_no_diff_quality_failures(self):
-    #     # Assert nothing is raised
-    #     pavelib.quality.run_quality("")
-    #     # And assert that sh was called 7 times:
-    #     # 5 for pylint on each of the system directories
-    #     # 1 for diff_quality for pylint
-    #     # 1 for diff_quality for eslint
-    #     self.assertEqual(self._mock_paver_sh.call_count, 7)
+    @patch('__builtin__.open', mock_open())
+    def test_no_diff_quality_failures(self):
+        # Assert nothing is raised
+        pavelib.quality.run_quality("")
+        # And assert that sh was called 7 times:
+        # 5 for pylint on each of the system directories
+        # 1 for diff_quality for pylint
+        # 1 for diff_quality for eslint
+        self.assertEqual(self._mock_paver_sh.call_count, 7)
