@@ -117,6 +117,13 @@ def ns_request_cached(namespace=None):
             rcache = rcache.data if namespace is None else rcache
             cache_key = func_call_cache_key(f, *args, **kwargs)
 
+            import logging
+            log = logging.getLogger(__name__)
+            log.error(u'CALL: ns_request_cached inner_wrapper')
+            log.error(u'namespace: {}'.format(namespace))
+            log.error(u'cache_key: {}'.format(unicode(cache_key)))
+            log.error(u'is_response_cached: {}'.format(cache_key in rcache))
+
             if cache_key in rcache:
                 return rcache.get(cache_key)
             else:
