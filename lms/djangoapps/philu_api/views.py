@@ -194,10 +194,14 @@ def download_pdf_file(request):
 
 def send_alquity_fake_confirmation_email(request):
     """ Send fake confirmation to current user as as he submit by fake button in last module of a course  """
-    ctx = {
-        "full_name": request.user.get_full_name(),
-        "course_name": request.META.get('HTTP_COURSE_NAME', '')
-    }
-    print (ctx)
-    MandrillClient().send_mail(MandrillClient.ALQUITY_FAKE_SUBMIT_CONFIRMATION_TEMPLATE, request.user.email, ctx)
-    return JsonResponse({})
+    success = True
+    try:
+        ctx = {
+            "full_name": request.user.get_full_name(),
+            "course_name": request.META.get('HTTP_COURSE_NAME', '')
+        }
+        MandrillClient().send_mail(MandrillClient.ALQUITY_FAKE_SUBMIT_CONFIRMATION_TEMPLATE, request.user.email, ctx)
+    except Exception as ex:
+        logging.exception(ex)
+        success = False
+    return JsonResponse({'success': success})
