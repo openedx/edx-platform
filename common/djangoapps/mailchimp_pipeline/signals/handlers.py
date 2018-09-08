@@ -1,6 +1,6 @@
-from enrollment.api import get_enrollments
 from mailchimp_pipeline.client import ChimpClient, MailChimpException
-from mailchimp_pipeline.helpers import get_org_data_for_mandrill, is_active_enrollment
+from mailchimp_pipeline.helpers import get_org_data_for_mandrill, get_user_active_enrollements, \
+    get_enrollements_course_short_ids
 from mailchimp_pipeline.tasks import update_org_details_at_mailchimp
 from lms.djangoapps.onboarding.models import (UserExtendedProfile, Organization, EmailPreference,)
 from lms.djangoapps.certificates import api as certificate_api
@@ -87,9 +87,8 @@ def send_user_info_to_mailchimp(sender, user, created, kwargs):
 def send_user_enrollments_to_mailchimp(sender, instance, created, kwargs):
     user_json = {
         "merge_fields": {
-            "ENROLLS": ", ".join([enrollment.get('course_details', {}).get('course_name', '')
-                                  for enrollment in get_enrollments(instance.user.username)
-                                  if is_active_enrollment(enrollment.get('course_details', {}).get('course_end', ''))]),
+            "ENROLLS": get_user_active_enrollements(instance.user.username),
+            "ENROLL_IDS": get_enrollements_course_short_ids(instance.user.username)
         }
     }
     try:
