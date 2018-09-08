@@ -219,4 +219,4 @@ edx-sga==0.6.2
 redis==2.10.6
 
 # Completion
-git+https://github.com/edx/completion@oc-0.1.9-1#egg=edx-completion==0.1.8a1
+edx-completion==0.1.10
