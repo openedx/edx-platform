@@ -1,71 +1,12 @@
 """
-An implementation of a RequestCache. This cache is reset at the beginning
-and end of every request.
+The middleware for the edx-platform version of the RequestCache has been
+removed in favor of the RequestCache found in edx-django-utils.
+
+TODO: This file still contains request cache related decorators that
+should be moved out of this middleware file.
 """
-# pylint: disable=unused-argument
-import threading
-
-import crum
 from django.utils.encoding import force_text
-
-
-class _RequestCache(threading.local):
-    """
-    A thread-local for storing the per-request cache.
-    """
-    def __init__(self):
-        super(_RequestCache, self).__init__()
-        self.data = {}
-
-
-REQUEST_CACHE = _RequestCache()
-
-
-class RequestCache(object):
-    """
-    DEPRECATED Request Cache Middleware. Will be removed very shortly.
-    """
-    @classmethod
-    def get_request_cache(cls, name=None):
-        """
-        This method is deprecated. Please use :func:`request_cache.get_cache`.
-        """
-        if name is None:
-            return REQUEST_CACHE
-        else:
-            return REQUEST_CACHE.data.setdefault(name, {})
-
-    @classmethod
-    def get_current_request(cls):
-        """
-        This method is deprecated. Please use :func:`request_cache.get_request`.
-        """
-        return crum.get_current_request()
-
-    @classmethod
-    def clear_request_cache(cls, name=None):
-        """
-        Empty the request cache.
-        """
-        if name is None:
-            REQUEST_CACHE.data = {}
-        elif REQUEST_CACHE.data.get(name):
-            REQUEST_CACHE.data[name] = {}
-
-    def process_request(self, request):
-        self.clear_request_cache()
-        return None
-
-    def process_response(self, request, response):
-        self.clear_request_cache()
-        return response
-
-    def process_exception(self, request, exception):
-        """
-        Clear the RequestCache after a failed request.
-        """
-        self.clear_request_cache()
-        return None
+from edx_django_utils.cache import RequestCache
 
 
 def request_cached(f):
@@ -98,7 +39,8 @@ def ns_request_cached(namespace=None):
 
     Arguments:
         namespace (string): An optional namespace to use for the cache.  Useful if the caller wants to manage
-            their own sub-cache by, for example, calling RequestCache.clear_request_cache for their own namespace.
+            their own sub-cache by, for example, calling RequestCache(namespace=NAMESPACE).clear() for their own
+            namespace.
     """
     def outer_wrapper(f):
         """
@@ -113,22 +55,22 @@ def ns_request_cached(namespace=None):
             """
             # Check to see if we have a result in cache.  If not, invoke our wrapped
             # function.  Cache and return the result to the caller.
-            rcache = RequestCache.get_request_cache(namespace)
-            rcache = rcache.data if namespace is None else rcache
-            cache_key = func_call_cache_key(f, *args, **kwargs)
+            request_cache = RequestCache(namespace)
+            cache_key = _func_call_cache_key(f, *args, **kwargs)
 
-            if cache_key in rcache:
-                return rcache.get(cache_key)
-            else:
-                result = f(*args, **kwargs)
-                rcache[cache_key] = result
-                return result
+            cached_response = request_cache.get_cached_response(cache_key)
+            if cached_response.is_found:
+                return cached_response.value
+
+            result = f(*args, **kwargs)
+            request_cache.set(cache_key, result)
+            return result
 
         return inner_wrapper
     return outer_wrapper
 
 
-def func_call_cache_key(func, *args, **kwargs):
+def _func_call_cache_key(func, *args, **kwargs):
     """
     Returns a cache key based on the function's module
     the function's name, and a stringified list of arguments

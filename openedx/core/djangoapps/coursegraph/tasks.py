@@ -9,10 +9,10 @@ import logging
 from celery import task
 from django.conf import settings
 from django.utils import six, timezone
+from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.keys import CourseKey
 from py2neo import Graph, Node, Relationship, authenticate, NodeSelector
 from py2neo.compat import integer, string, unicode as neo4j_unicode
-from openedx.core.djangoapps.request_cache.middleware import RequestCache
 
 
 log = logging.getLogger(__name__)
@@ -348,7 +348,7 @@ class ModuleStoreSerializer(object):
 
         for index, course_key in enumerate(self.course_keys):
             # first, clear the request cache to prevent memory leaks
-            RequestCache.clear_request_cache()
+            RequestCache.clear_all_namespaces()
 
             log.info(
                 "Now submitting %s for export to neo4j: course %d of %d total courses",

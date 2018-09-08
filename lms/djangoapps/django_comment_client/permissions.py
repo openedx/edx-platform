@@ -5,18 +5,19 @@ Module for checking permissions with the comment_client backend
 import logging
 from types import NoneType
 
+from edx_django_utils.cache import DEFAULT_REQUEST_CACHE
 from opaque_keys.edx.keys import CourseKey
 
 from django_comment_common.models import CourseDiscussionSettings, all_permissions_for_user_in_course
 from django_comment_common.utils import get_course_discussion_settings
 from lms.djangoapps.teams.models import CourseTeam
 from lms.lib.comment_client import Thread
-from openedx.core.djangoapps.request_cache.middleware import RequestCache, request_cached
+from openedx.core.djangoapps.request_cache.middleware import request_cached
 
 
 def has_permission(user, permission, course_id=None):
     assert isinstance(course_id, (NoneType, CourseKey))
-    request_cache_dict = RequestCache.get_request_cache().data
+    request_cache_dict = DEFAULT_REQUEST_CACHE.data
     cache_key = "django_comment_client.permissions.has_permission.all_permissions.{}.{}".format(
         user.id, course_id
     )
@@ -65,7 +66,7 @@ def _check_condition(user, condition, content):
         if not content:
             return False
         try:
-            request_cache_dict = RequestCache.get_request_cache().data
+            request_cache_dict = DEFAULT_REQUEST_CACHE.data
             if content["type"] == "thread":
                 cache_key = "django_comment_client.permissions._check_condition.check_question_author.{}.{}".format(
                     user.id, content['id']
@@ -98,7 +99,7 @@ def _check_condition(user, condition, content):
             return False
         try:
             commentable_id = content['commentable_id']
-            request_cache_dict = RequestCache.get_request_cache().data
+            request_cache_dict = DEFAULT_REQUEST_CACHE.data
             cache_key = u"django_comment_client.check_team_member.{}.{}".format(user.id, commentable_id)
             if cache_key in request_cache_dict:
                 return request_cache_dict[cache_key]

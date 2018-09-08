@@ -1216,9 +1216,6 @@ CREDIT_NOTIFICATION_CACHE_TIMEOUT = 5 * 60 * 60
 MIDDLEWARE_CLASSES = [
     'crum.CurrentRequestUserMiddleware',
 
-    # Deprecated, but well entrenched RequestCache
-    'openedx.core.djangoapps.request_cache.middleware.RequestCache',
-
     # A newer and safer request cache.
     'edx_django_utils.cache.middleware.RequestCacheMiddleware',
     'edx_django_utils.monitoring.middleware.MonitoringCustomMetricsMiddleware',
@@ -3258,8 +3255,6 @@ AUDIT_CERT_CUTOFF_DATE = None
 
 CREDENTIALS_SERVICE_USERNAME = 'credentials_service_user'
 CREDENTIALS_GENERATION_ROUTING_KEY = HIGH_PRIORITY_QUEUE
-
-WIKI_REQUEST_CACHE_MIDDLEWARE_CLASS = "openedx.core.djangoapps.request_cache.middleware.RequestCache"
 
 # Settings for Comprehensive Theming app
 

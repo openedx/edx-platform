@@ -7,6 +7,7 @@ import mock
 
 from django.urls import reverse
 from django.test import RequestFactory, TestCase
+from edx_django_utils.cache import RequestCache
 from mock import Mock, patch
 from pytz import UTC
 from six import text_type
@@ -36,7 +37,6 @@ from lms.lib.comment_client.utils import CommentClientMaintenanceError, perform_
 from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory, config_course_cohorts
-from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
 from openedx.core.lib.tests import attr
 from student.roles import CourseStaffRole
@@ -217,7 +217,7 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
         self.assertEqual(len(utils.get_accessible_discussion_xblocks(course, self.user)), 1)
 
         # The above call is request cached, so we need to clear it for this test.
-        RequestCache.clear_request_cache()
+        RequestCache.clear_all_namespaces()
         # Add an orphan discussion xblock to that course
         orphan = course.id.make_usage_key('discussion', 'orphan_discussion')
         self.store.create_item(self.user.id, orphan.course_key, orphan.block_type, block_id=orphan.block_id)
@@ -261,7 +261,7 @@ class CachedDiscussionIdMapTestCase(ModuleStoreTestCase):
             discussion_target='Beta Testing',
             visible_to_staff_only=True
         )
-        RequestCache.clear_request_cache()  # clear the cache before the last course publish
+        RequestCache.clear_all_namespaces()  # clear the cache before the last course publish
         self.bad_discussion = ItemFactory.create(
             parent_location=self.course.location,
             category='discussion',
@@ -1780,7 +1780,7 @@ class GroupModeratorPermissionsTestCase(ModuleStoreTestCase):
             'can_vote': True,
             'can_report': True
         })
-        RequestCache.clear_request_cache()
+        RequestCache.clear_all_namespaces()
 
         set_discussion_division_settings(self.course.id, division_scheme=CourseDiscussionSettings.ENROLLMENT_TRACK)
         content = {'user_id': self.verified_user.id, 'type': 'thread', 'username': self.verified_user.username}
