@@ -31,9 +31,20 @@ class CourseOverviewAdmin(admin.ModelAdmin):
         'enrollment_end',
         'created',
         'modified',
+        'course_short_id',
     ]
 
     search_fields = ['id', 'display_name']
+
+    def course_short_id(self, obj):
+
+        from lms.djangoapps.philu_api.helpers import get_course_custom_settings
+        try:
+            setting = get_course_custom_settings(obj.id)
+            return setting.course_short_id
+
+        except Exception as ex:
+            return ""
 
 
 class CourseOverviewImageConfigAdmin(ConfigurationModelAdmin):
