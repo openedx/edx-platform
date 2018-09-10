@@ -40,7 +40,7 @@ from openedx.core.lib.api.authentication import SessionAuthenticationAllowInacti
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 from openedx.core.lib.token_utils import JwtBuilder
 from student.cookies import set_logged_in_cookies, standard_cookie_settings
-from student.views import AccountValidationError, create_account_with_params
+from student.helpers import AccountValidationError
 from util.json_request import JsonResponse
 
 

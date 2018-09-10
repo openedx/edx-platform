@@ -114,9 +114,6 @@ class JwtBuilder(object):
         set_custom_metric('jwt_asymmetric', self.asymmetric)
         keys = jwk.KEYS()
 
-        monitoring_utils.set_custom_metric('jwt_asymmetric', self.asymmetric)
-        log.info("Using Asymmetric JWT: %s", self.asymmetric)
-
         if self.asymmetric:
             serialized_keypair = json.loads(self.jwt_auth['JWT_PRIVATE_SIGNING_JWK'])
             keys.add(serialized_keypair)
