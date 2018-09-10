@@ -96,20 +96,20 @@ class CohortMembership(models.Model):
         """
         with transaction.atomic():
             membership, created = cls.objects.select_for_update().get_or_create(
-                    user__id=user.id,
-                    course_id=cohort.course_id,
-                    defaults={
-                        'course_user_group': cohort,
-                        'user': user
-                    })
+                user__id=user.id,
+                course_id=cohort.course_id,
+                defaults={
+                    'course_user_group': cohort,
+                    'user': user
+                })
 
             if created:
                 membership.course_user_group.users.add(user)
                 previous_cohort = None
             elif membership.course_user_group == cohort:
                 raise ValueError("User {user_name} already present in cohort {cohort_name}".format(
-                        user_name=user.username,
-                        cohort_name=cohort.name))
+                    user_name=user.username,
+                    cohort_name=cohort.name))
             else:
                 previous_cohort = membership.course_user_group
                 previous_cohort.users.remove(user)
@@ -230,7 +230,7 @@ class UnregisteredLearnerCohortAssignments(DeletableByUserValue, models.Model):
     """
     Tracks the assignment of an unregistered learner to a course's cohort.
     """
-    #pylint: disable=model-missing-unicode
+    # pylint: disable=model-missing-unicode
     class Meta(object):
         unique_together = (('course_id', 'email'), )
 

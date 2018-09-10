@@ -341,7 +341,7 @@ def get_cohort_names(course):
     return {cohort.id: cohort.name for cohort in get_course_cohorts(course)}
 
 
-### Helpers for cohort management views
+# Helpers for cohort management views
 
 
 def get_cohort_by_name(course_key, name):
