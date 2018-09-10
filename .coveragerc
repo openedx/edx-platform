@@ -29,6 +29,7 @@ omit =
     openedx/features/*/migrations/*
 
 concurrency=multiprocessing
+parallel = true
 
 [report]
 ignore_errors = True
