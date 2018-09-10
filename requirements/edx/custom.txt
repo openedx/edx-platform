@@ -2,11 +2,9 @@
 
 # When updating a hash of an XBlock that uses xblock-utils, please update its version hash in github.txt.
 -e git+https://github.com/edx-solutions/xblock-mentoring.git@8837eb5d91fed05ec4758dfd9b9e7adc5c906210#egg=xblock-mentoring
-# IEv2 branch pointed to test the ongoing work 
--e git+https://github.com/edx-solutions/xblock-image-explorer.git@image-explorer-v2#egg=xblock-image-explorer-v2
+-e git+https://github.com/edx-solutions/xblock-image-explorer.git@v1.0.1#egg=xblock-image-explorer==1.0.1
 -e git+https://github.com/edx-solutions/xblock-drag-and-drop.git@92ee2055a16899090a073e1df81e35d5293ad767#egg=xblock-drag-and-drop
-# DnDv4 branch pointed to test the ongoing work
--e git+https://github.com/edx-solutions/xblock-drag-and-drop-v2.git@drag-and-drop-v4#egg=xblock-drag-and-drop-v4
+-e git+https://github.com/edx-solutions/xblock-drag-and-drop-v2.git@a35f8bfb1315522c3a9d3786d94673d06ebfff3b#egg=xblock-drag-and-drop-v2==2.2.0
 # This is required for A2E courses that were created with the temporary (xblock-drag-and-drop-v2-new) DnDv2 branch to continue to work.
 # FIXME: bump version to 2.1.6 when https://github.com/edx-solutions/xblock-drag-and-drop-v2/pull/154 merged and tagged
 -e git+https://github.com/open-craft/xblock-drag-and-drop-v2.git@82c9dc5e16d10793e8b79e60661e1a78893fce25#egg=xblock-drag-and-drop-v2-new
