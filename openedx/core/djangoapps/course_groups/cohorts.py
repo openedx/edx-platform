@@ -252,8 +252,10 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
             break
         else:
             course_user_group = get_random_cohort(course_key)
-
         add_user_to_cohort(course_user_group, user)
+        return course_user_group
+    except ValueError:
+        # user already in cohort
         return course_user_group
     except IntegrityError as integrity_error:
         # An IntegrityError is raised when multiple workers attempt to
@@ -264,7 +266,6 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
             course_key, user.id, unicode(integrity_error)
         )
         return get_cohort(user, course_key, assign, use_cached)
-
 
 def get_random_cohort(course_key):
     """
@@ -452,7 +453,6 @@ def add_user_to_cohort(cohort, username_or_email_or_user):
             user = get_user_by_username_or_email(username_or_email_or_user)
 
         membership, previous_cohort = CohortMembership.assign(cohort, user)
-        COHORT_MEMBERSHIP_UPDATED.send(sender=None, user=user, course_key=membership.course_id)
         tracker.emit(
             "edx.cohort.user_add_requested",
             {
@@ -465,7 +465,8 @@ def add_user_to_cohort(cohort, username_or_email_or_user):
         )
         cache = get_cache(COHORT_CACHE_NAMESPACE)
         cache_key = _cohort_cache_key(user.id, membership.course_id)
-
+        cache[cache_key] = membership.course_user_group
+        COHORT_MEMBERSHIP_UPDATED.send(sender=None, user=user, course_key=membership.course_id)
         return user, getattr(previous_cohort, 'name', None), False
     except User.DoesNotExist as ex:
         # If username_or_email is an email address, store in database.
