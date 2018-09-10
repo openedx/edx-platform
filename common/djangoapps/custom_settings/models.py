@@ -18,13 +18,14 @@ class CustomSettings(models.Model):
 
     def save(self, *args, **kwargs):
         # This means that the model isn't saved to the database yet
-        if self._state.adding:
+        if self._state.adding and not self.course_short_id:
             # Get the maximum course_short_id value from the database
             last_id = CustomSettings.objects.all().aggregate(largest=models.Max('course_short_id'))['largest']
 
             # aggregate can return None! Check it first.
             # If it isn't none, just use the last ID specified (which should be the greatest) and add one to it
             if last_id is not None:
-                self.course_short_id = last_id + 1
+                course_short_id = last_id + 1
+                self.course_short_id = course_short_id
 
         super(CustomSettings, self).save(*args, **kwargs)
