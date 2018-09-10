@@ -29,6 +29,20 @@ class UserRetirementStatusAdmin(admin.ModelAdmin):
     raw_id_fields = ('user',)
     search_fields = ('original_username', 'retired_username', 'original_email', 'retired_email', 'original_name')
 
+    def get_actions(self, request):
+        actions = super(UserRetirementStatusAdmin, self).get_actions(request)
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
+
+    # Remove "add" button from admin
+    def has_add_permission(self, request):
+        return False
+
+    # Remove "delete" button from admin
+    def has_delete_permission(self, request, obj=None):
+        return False
+
     class Meta(object):
         model = UserRetirementStatus
 
