@@ -1,4 +1,4 @@
-from common.test.acceptance.pages.studio.utils import type_in_codemirror
+from common.test.acceptance.pages.studio.utils import type_in_codemirror, get_codemirror_value
 from xblock_editor import XBlockEditorView
 from common.test.acceptance.pages.common.utils import click_css
 
@@ -11,6 +11,61 @@ class HtmlXBlockEditorView(XBlockEditorView):
     editor_mode_css = '.edit-xblock-modal .editor-modes .editor-button'
     settings_tab = '.editor-modes .settings-button'
     save_settings_button = '.action-save'
+
+    @property
+    def toolbar_dropdown_titles(self):
+        """
+        Returns the titles of dropdowns present on the toolbar
+        """
+        return self.q(css='.mce-listbox').text
+
+    @property
+    def toolbar_button_titles(self):
+        """
+        Returns the titles of the buttons present on the toolbar
+        Returns:
+
+        """
+        return self.q(css='.mce-ico').attrs('class')
+
+    @property
+    def fonts(self):
+        """
+        Available fonts in the font dropdown
+        Returns:
+            (list): A list of font names
+        """
+        return self.q(css='.mce-text').text
+
+    @property
+    def font_families(self):
+        """
+        Available font families against each font
+        Returns:
+            (list): A list of font families
+        """
+        return self.q(css='.mce-text').attrs('style')
+
+    def open_font_dropdown(self):
+        """
+        Clicks and waits for font dropdown to open
+        """
+        self.q(css='#mce_2-open').first.click()
+        self.wait_for_element_visibility('.mce-floatpanel', 'Dropdown is Visible')
+
+    def font_dict(self):
+        """
+        Creates a dictionary with font labels and font families
+        Returns:
+            font_dict(dict): A dictionary of font labels as keys and font families as values
+        """
+        font_labels = self.fonts
+        font_families = self.font_families
+        for index, font in enumerate(font_families):
+            font = font.replace('font-family: ', "").rstrip(';')
+            font_families[index] = font.split(',')
+        font_dict = dict(zip(font_labels, font_families))
+        return font_dict
 
     def set_content_and_save(self, content, raw=False):
         """Types content into the html component and presses Save.
@@ -62,6 +117,20 @@ class HtmlXBlockEditorView(XBlockEditorView):
 
         self.q(css='.mce-foot .mce-primary').click()
 
+    def open_raw_editor(self):
+        """
+        Clicks and waits for raw editor to open
+        """
+        self.q(css='[aria-label="Edit HTML"]').click()
+        self.wait_for_element_visibility('.mce-title', 'Wait for CodeMirror editor')
+
+    @property
+    def editor_value(self):
+        """
+        Returns codemirror value from raw HTMl editor
+        """
+        return get_codemirror_value(self, 0)
+
     def open_settings_tab(self):
         """
         Clicks settings button on the modal
@@ -99,15 +168,15 @@ class HtmlXBlockEditorView(XBlockEditorView):
         """
         Switches to the editor iframe
         """
-        self.browser.switch_to_frame(self.browser.find_element_by_tag_name('iframe'))
+        self.browser.switch_to_frame(self.browser.find_element_by_tag_name('iframe#mce_0_ifr'))
 
     @property
     def url_from_the_link_plugin(self):
         """
         Clicks the already set link from the editor and then returns the URL from the link plugin
         """
-        # self.q(css='#tinymce>p>a').first.click()
-        # self.browser.switch_to_default_content()
+        self.q(css='#tinymce>p>a').first.click()
+        self.browser.switch_to_default_content()
         self.open_link_plugin()
         return self.browser.execute_script('return $(".mce-textbox").val();')
 
@@ -125,6 +194,30 @@ class HtmlXBlockEditorView(XBlockEditorView):
         Gets setting keys
         """
         return self.q(css='.label.setting-label[for]').text
+
+    @property
+    def xmodule_html(self):
+        """
+        Returns the contents from the xblock
+        """
+        return self.q(css='.xmodule_HtmlModule').html
+
+    def set_text_and_select(self, text):
+        """
+        Sets and selects text from html editor
+        """
+        script = """
+        var editor = tinyMCE.activeEditor;
+        editor.setContent(arguments[0]);
+        editor.selection.select(editor.dom.select('p')[0]);"""
+        self.browser.driver.execute_script(script, str(text))
+        self.wait_for_ajax()
+
+    def click_code_toolbar_button(self):
+        """
+        Clicks on the code plugin on the toolbar
+        """
+        self.q(css='.mce-i-none').first.click()
 
     def set_field_val(self, field_display_name, field_value):
         """

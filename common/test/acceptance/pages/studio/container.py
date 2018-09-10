@@ -4,6 +4,7 @@ Container page in Studio
 
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise, Promise
+from xml.sax import saxutils as su
 
 from common.test.acceptance.pages.common.utils import click_css, confirm_prompt
 from common.test.acceptance.pages.studio import BASE_URL
@@ -196,6 +197,17 @@ class ContainerPage(PageObject, HelpMixin):
         click_css(self, 'a.action-discard', 0, require_notification=False)
         confirm_prompt(self)
         self.wait_for_ajax()
+
+    @property
+    def html_for_htmlmodule(self):
+        """
+        Gets the html of HTML module
+        Returns:
+            list: A list containing inner HTMl
+        """
+        self.wait_for_element_visibility('.xmodule_HtmlModule', 'Xblock content is visible')
+        html = self.q(css='.xmodule_HtmlModule span').html[0]
+        return su.unescape(html).strip().replace("\'", '"')
 
     @property
     def xblock_titles(self):
