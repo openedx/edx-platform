@@ -106,7 +106,9 @@ define(['jquery', 'underscore', 'common/js/components/utils/view_utils', 'js/vie
                                 // Scroll us to the element with a little buffer at the top for context.
                                 ViewUtils.setScrollOffset($target, ($(window).height() * 0.10));
                             }
-                            originalDone();
+                            if (originalDone) {
+                                originalDone();
+                            }
                         }
                         self.handleXBlockFragment(fragment, options);
                     }
