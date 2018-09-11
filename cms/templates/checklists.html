@@ -2,11 +2,13 @@
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "files" %></%def>
 <%!
+  from cms.djangoapps.contentstore import utils
   from cms.djangoapps.contentstore.config.waffle_utils import should_show_checklists_quality
   from django.core.urlresolvers import reverse
   from django.utils.translation import ugettext as _
   from openedx.core.djangolib.markup import HTML, Text
   from openedx.core.djangolib.js_utils import js_escaped_string, dump_js_escaped_json
+  from util.course import has_certificates_enabled
 %>
 <%block name="title">${_("Checklists")}</%block>
 <%block name="bodyclass">is-signedin course view-checklists</%block>
@@ -34,8 +36,12 @@
 <div class="wrapper-content wrapper">
     <div class="content">
         <%static:studiofrontend entry="courseHealthCheck">
-            <% 
-                course_key = context_course.id
+
+            <%
+                course_key = unicode(context_course.id)
+                certificates_url = ''
+                if has_certificates_enabled(context_course):
+                    certificates_url = utils.reverse_course_url('certificates_list_handler', course_key)
             %>
             {
                 "lang": "${language_code | n, js_escaped_string}",
@@ -54,11 +60,11 @@
                 },
                 "enable_quality": ${should_show_checklists_quality(context_course.id) | n, dump_js_escaped_json},
                 "links": {
-                    "certificates": ${reverse('certificates_list_handler', kwargs={'course_key_string': unicode(course_key)})| n, dump_js_escaped_json},
-                    "course_outline": ${reverse('course_handler', kwargs={'course_key_string': unicode(course_key)})| n, dump_js_escaped_json},
-                    "course_updates": ${reverse('course_info_handler', kwargs={'course_key_string': unicode(course_key)})| n, dump_js_escaped_json},
-                    "grading_policy": ${reverse('grading_handler', kwargs={'course_key_string': unicode(course_key)})| n, dump_js_escaped_json},
-                    "settings": ${reverse('settings_handler', kwargs={'course_key_string': unicode(course_key)})| n, dump_js_escaped_json}
+                    "certificates": ${certificates_url | n, dump_js_escaped_json},
+                    "course_outline": ${utils.reverse_course_url('course_handler', course_key) | n, dump_js_escaped_json},
+                    "course_updates": ${utils.reverse_course_url('course_info_handler', course_key) | n, dump_js_escaped_json},
+                    "grading_policy": ${utils.reverse_course_url('grading_handler', course_key) | n, dump_js_escaped_json},
+                    "settings": ${utils.reverse_course_url('settings_handler', course_key) | n, dump_js_escaped_json}
                 }
             }
         </%static:studiofrontend>

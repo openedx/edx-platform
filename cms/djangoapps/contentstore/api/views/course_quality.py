@@ -5,6 +5,7 @@ from scipy import stats
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
+from contentstore.views.item import highlights_setting
 from edxval.api import get_videos_for_course
 from openedx.core.djangoapps.request_cache.middleware import request_cached
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
@@ -122,12 +123,13 @@ class CourseQualityView(DeveloperErrorViewMixin, GenericAPIView):
 
     def _sections_quality(self, course):
         sections, visible_sections = self._get_sections(course)
-        sections_with_highlights = [s for s in visible_sections if s.highlights]
+        sections_with_highlights = [section for section in visible_sections if section.highlights]
         return dict(
             total_number=len(sections),
             total_visible=len(visible_sections),
             number_with_highlights=len(sections_with_highlights),
-            highlights_enabled=course.highlights_enabled_for_messaging,
+            highlights_active_for_course=course.highlights_enabled_for_messaging,
+            highlights_enabled=highlights_setting.is_enabled(),
         )
 
     def _subsections_quality(self, course, request):

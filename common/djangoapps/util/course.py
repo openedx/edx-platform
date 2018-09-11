@@ -57,3 +57,14 @@ def get_link_for_about_page(course):
         )
 
     return course_about_url
+
+
+def has_certificates_enabled(course):
+    """
+    Arguments:
+        course: This can be either a course overview object or a course descriptor.
+    Returns a boolean if the course has enabled certificates
+    """
+    if not settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
+        return False
+    return course.cert_html_view_enabled

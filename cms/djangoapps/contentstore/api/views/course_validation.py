@@ -205,9 +205,11 @@ class CourseValidationView(DeveloperErrorViewMixin, GenericAPIView):
 
     def _certificates_validation(self, course):
         is_activated, certificates = CertificateManager.is_activated(course)
+        certificates_enabled = certificates is not None
         return dict(
             is_activated=is_activated,
-            has_certificate=len(certificates) > 0,
+            has_certificate=certificates_enabled and len(certificates) > 0,
+            is_enabled=certificates_enabled,
         )
 
     def _updates_validation(self, course, request):
