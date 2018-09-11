@@ -294,7 +294,7 @@ class TestPaverRunQuality(PaverTestCase):
         If diff-quality fails on pylint, the paver task should also fail, but
         only after runnning diff-quality with eslint
         """
-
+        paver.tasks.environment.dry_run = False
         # Underlying sh call must fail when it is running the pylint diff-quality task
         _mock_pylint_violations = MagicMock(return_value=(10000, ['some error']))
         with patch('pavelib.quality._get_pylint_violations', _mock_pylint_violations):
@@ -314,7 +314,7 @@ class TestPaverRunQuality(PaverTestCase):
         """
         If diff-quality fails on eslint, the paver task should also fail
         """
-
+        paver.tasks.environment.dry_run = False
         # Underlying sh call must fail when it is running the eslint diff-quality task
         self._mock_paver_sh.side_effect = fail_on_eslint
         _mock_pylint_violations = MagicMock(return_value=(0, []))
