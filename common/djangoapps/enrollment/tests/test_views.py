@@ -30,6 +30,7 @@ from enrollment.views import EnrollmentUserThrottle
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.embargo.models import Country, CountryAccessRule, RestrictedCourse
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
+from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.user_api.models import (
     RetirementState,
     UserRetirementStatus,
@@ -67,6 +68,7 @@ class EnrollmentTestMixin(object):
             min_mongo_calls=0,
             max_mongo_calls=0,
             linked_enterprise_customer=None,
+            cohort=None,
     ):
         """
         Enroll in the course and verify the response's status code. If the expected status is 200, also validates
@@ -95,6 +97,9 @@ class EnrollmentTestMixin(object):
 
         if linked_enterprise_customer is not None:
             data['linked_enterprise_customer'] = linked_enterprise_customer
+
+        if cohort is not None:
+            data['cohort'] = cohort
 
         extra = {}
         if as_server:
@@ -575,6 +580,28 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
             throttle.parse_rate(throttle.get_rate())
         except ImproperlyConfigured:
             self.fail("No throttle rate set for {}".format(user_scope))
+
+    def test_create_enrollment_with_cohort(self):
+        """Enroll in the course, and also add to a cohort."""
+        # Create a cohort
+        cohort_name = 'masters'
+        cohorts.set_course_cohorted(self.course.id, True)
+        cohorts.add_cohort(self.course.id, cohort_name, 'test')
+        # Create an enrollment
+
+        self.assert_enrollment_status(cohort=cohort_name)
+        self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
+        course_mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
+        self.assertTrue(is_active)
+        self.assertEqual(cohorts.get_cohort(self.user, self.course.id, assign=False).name, cohort_name)
+
+    def test_create_enrollment_with_wrong_cohort(self):
+        """Enroll in the course, and also add to a cohort."""
+        # Create a cohort
+        cohorts.set_course_cohorted(self.course.id, True)
+        cohorts.add_cohort(self.course.id, 'masters', 'test')
+        # Create an enrollment
+        self.assert_enrollment_status(cohort='missing', expected_status=status.HTTP_400_BAD_REQUEST)
 
     def test_create_enrollment_with_mode(self):
         """With the right API key, create a new enrollment with a mode set other than the default."""

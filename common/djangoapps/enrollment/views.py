@@ -6,6 +6,7 @@ consist primarily of authentication, request validation, and serialization.
 import logging
 
 from course_modes.models import CourseMode
+from django.db import transaction
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.decorators import method_decorator
@@ -21,6 +22,7 @@ from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.user_api.accounts.permissions import CanRetireUser
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
+from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, get_cohort_by_name, CourseUserGroup
 from openedx.core.lib.api.authentication import (
     OAuth2AuthenticationAllowInactiveUser,
     SessionAuthenticationAllowInactiveUser
@@ -729,6 +731,10 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                     enrollment_attributes=enrollment_attributes
                 )
 
+            cohort_name = request.data.get('cohort')
+            if cohort_name is not None:
+                cohort = get_cohort_by_name(course_id, cohort_name)
+                add_user_to_cohort(cohort, user)
             email_opt_in = request.data.get('email_opt_in', None)
             if email_opt_in is not None:
                 org = course_id.org
@@ -767,6 +773,13 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                     ).format(username=username, course_id=course_id)
                 }
             )
+        except CourseUserGroup.DoesNotExist:
+            log.exception('Missing cohort [%s] in course run [%s]', cohort_name, course_id)
+            return Response(
+                status=status.HTTP_400_BAD_REQUEST,
+                data={
+                    "message": "An error occured while adding to cohort [%s]" % cohort_name
+                })
         finally:
             # Assumes that the ecommerce service uses an API key to authenticate.
             if has_api_key_permissions:
