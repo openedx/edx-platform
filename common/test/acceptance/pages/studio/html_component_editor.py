@@ -95,6 +95,15 @@ class HtmlXBlockEditorView(XBlockEditorView):
 
         self.cancel()
 
+    def set_content_in_editor(self, content):
+        """
+        Types in the codemirror
+        """
+        self.wait_for_element_presence('.tiny-mce', "Editor is present")
+        self.q(css=self.editor_mode_css).click()
+        type_in_codemirror(self, 0, content, find_prefix="$('iframe').contents().find")
+        self.save()
+
     def set_content(self, content):
         """Sets content in the html component, leaving the component open.
 
@@ -210,7 +219,7 @@ class HtmlXBlockEditorView(XBlockEditorView):
         var editor = tinyMCE.activeEditor;
         editor.setContent(arguments[0]);
         editor.selection.select(editor.dom.select('p')[0]);"""
-        self.browser.driver.execute_script(script, str(text))
+        self.browser.execute_script(script, str(text))
         self.wait_for_ajax()
 
     def click_code_toolbar_button(self):

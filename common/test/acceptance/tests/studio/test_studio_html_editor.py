@@ -43,7 +43,7 @@ class HTMLComponentEditor(ContainerBase):
 
     def _content_test(self, content_to_verify):
         content = content_to_verify
-        self.html_editor.set_content_and_save(content)
+        self.html_editor.set_content_in_editor(content)
         self.container_page.wait_for_page()
         xmodule_html = self.container_page.html_for_htmlmodule
         self.assertIn(content, xmodule_html)
@@ -233,7 +233,7 @@ class HTMLComponentEditor(ContainerBase):
 
         for index, button in enumerate(expected_buttons):
             class_name = toolbar_buttons[index]
-            self.assert_equal("mce-ico mce-i-" + button, class_name)
+            self.assertEqual("mce-ico mce-i-" + button, class_name)
 
     def test_static_links_converted(self):
         """
@@ -281,4 +281,4 @@ class HTMLComponentEditor(ContainerBase):
             u"Wingdings": [u""]  # wingdings
         }
         self.html_editor.open_font_dropdown()
-        self.assertDictContainsSubset(self.html_editor.font_dict(), EXPECTED_FONTS)
+        self.assertDictContainsSubset(EXPECTED_FONTS, self.html_editor.font_dict())
