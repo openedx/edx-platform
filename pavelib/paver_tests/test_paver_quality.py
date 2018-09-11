@@ -16,6 +16,7 @@ from paver.easy import BuildFailure  # pylint: disable=ungrouped-imports
 
 import pavelib.quality
 from pavelib.paver_tests.utils import fail_on_eslint
+from .utils import PaverTestCase
 
 
 @ddt
@@ -268,7 +269,7 @@ class TestPrepareReportDir(unittest.TestCase):
         self.assertEqual(os.listdir(path(self.test_dir)), [])
 
 
-class TestPaverRunQuality(unittest.TestCase):
+class TestPaverRunQuality(PaverTestCase):
     """
     For testing the paver run_quality task
     """
@@ -329,15 +330,25 @@ class TestPaverRunQuality(unittest.TestCase):
         # and once for diff quality with eslint
         self.assertEqual(self._mock_paver_sh.call_count, 2)
 
-    # @patch('__builtin__.open', mock_open())
-    # def test_other_exception(self):
-    #     """
-    #     If diff-quality fails for an unknown reason on the first run, then
-    #     pylint should not be run
-    #     """
-    #     self._mock_paver_sh.side_effect = [Exception('unrecognized failure!'), 0]
-    #     with self.assertRaises(SystemExit):
-    #         pavelib.quality.run_quality("")
-    #         self.assertRaises(Exception)
-    #     # Test that pylint is NOT called by counting calls
-    #     self.assertEqual(self._mock_paver_sh.call_count, 1)
+    @patch('__builtin__.open', mock_open())
+    def test_other_exception(self):
+        """
+        If diff-quality fails for an unknown reason on the first run, then
+        pylint should not be run
+        """
+        self._mock_paver_sh.side_effect = [Exception('unrecognized failure!'), 0]
+        with self.assertRaises(SystemExit):
+            pavelib.quality.run_quality("")
+            self.assertRaises(Exception)
+        # Test that pylint is NOT called by counting calls
+        self.assertEqual(self._mock_paver_sh.call_count, 1)
+
+    @patch('__builtin__.open', mock_open())
+    def test_no_diff_quality_failures(self):
+        # Assert nothing is raised
+        pavelib.quality.run_quality("")
+        # And assert that sh was called 7 times:
+        # 5 for pylint on each of the system directories
+        # 1 for diff_quality for pylint
+        # 1 for diff_quality for eslint
+        self.assertEqual(self._mock_paver_sh.call_count, 7)
