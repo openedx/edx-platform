@@ -43,7 +43,7 @@ class HTMLComponentEditor(ContainerBase):
 
     def _content_test(self, content_to_verify):
         content = content_to_verify
-        self.html_editor.set_content_in_editor(content)
+        self.html_editor.set_content_and_save(content, raw=True)
         self.container_page.wait_for_page()
         xmodule_html = self.container_page.html_for_htmlmodule
         self.assertIn(content, xmodule_html)
