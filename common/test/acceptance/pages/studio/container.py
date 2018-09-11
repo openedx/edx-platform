@@ -208,7 +208,7 @@ class ContainerPage(PageObject, HelpMixin):
         self.wait_for_element_visibility('.xmodule_HtmlModule', 'Xblock content is visible')
         # html = self.q(css='.xmodule_HtmlModule').html
         # return su.unescape(html).strip().replace("\'", '"')
-        return self.q(css='.xmodule_HtmlModule').html
+        return self.q(css='.xmodule_HtmlModule')[0].get_attribute('innerHTML')
 
     @property
     def xblock_titles(self):
