@@ -9,8 +9,7 @@ def add_course_short_id_old_records(apps, schema_editor):
 
     short_id = 100
     for setting in settings:
-        course_short_id = int(str(short_id) + str(len(str(short_id))))
-        setting.course_short_id = course_short_id
+        setting.course_short_id = short_id
         short_id += 1
         setting.save()
 
