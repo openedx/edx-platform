@@ -24,6 +24,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
 
 from . import Engines
+from . import signals
 
 log = logging.getLogger(__name__)
 
@@ -151,6 +152,8 @@ def render_to_string(template_name, dictionary, namespace='main', request=None):
         request: The request to use to construct the RequestContext for rendering
             this template. If not supplied, the current request will be used.
     """
+    signals.BEFORE_RENDER_TO_RESPONSE.send(sender=template_name, template_name=template_name, dictionary=dictionary, request=request)
+
     if namespace == 'lms.main':
         engine = engines[Engines.PREVIEW]
     else:
@@ -164,6 +167,5 @@ def render_to_response(template_name, dictionary=None, namespace='main', request
     Returns a HttpResponse whose content is filled with the result of calling
     lookup.get_template(args[0]).render with the passed arguments.
     """
-
     dictionary = dictionary or {}
     return HttpResponse(render_to_string(template_name, dictionary, namespace, request), **kwargs)
