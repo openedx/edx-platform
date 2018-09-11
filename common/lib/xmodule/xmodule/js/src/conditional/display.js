@@ -152,9 +152,8 @@
           eval.call(window, data);
           console.log("JavaScript text resource eval'd", resource);
         } else if (kind === 'url') {
-          // This is a dependency loaded from the LMS (not ideal)
-          return ViewUtils.loadJavaScript(data).done(function() {
-              console.log('JavaScript url resource loaded', resource);
+          $script(data, data, function () {
+            console.log('JavaScript url resource loaded', resource);
           });
         }
       } else if (mimetype === 'text/html') {
