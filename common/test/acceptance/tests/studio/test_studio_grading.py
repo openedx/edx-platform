@@ -130,3 +130,43 @@ class GradingPageTest(StudioCourseTest):
             grade_ranges,
             'expected range: 0-3, not found in grade ranges:{}'.format(grade_ranges)
         )
+
+    def test_settings_are_persisted_on_save_only(self):
+        """
+        Scenario: Settings are only persisted when saved
+            Given I have populated a new course in Studio
+            And I am viewing the grading settings
+            When I change assignment type "Homework" to "New Type"
+            Then I do not see the changes persisted on refresh
+        """
+        self.grading_page.change_assignment_name('Homework', 'New Type')
+        self.grading_page.refresh_and_wait_for_load()
+        self.assertIn('Homework', self.grading_page.get_assignment_names)
+
+    def test_settings_are_reset_on_cancel(self):
+        """
+        Scenario: Settings are reset on cancel
+            Given I have populated a new course in Studio
+            And I am viewing the grading settings
+            When I change assignment type "Homework" to "New Type"
+            And I press the "Cancel" notification button
+            Then I see the assignment type "Homework"
+        """
+        self.grading_page.change_assignment_name('Homework', 'New Type')
+        self.grading_page.cancel()
+        assignment_names = self.grading_page.get_assignment_names
+        self.assertIn('Homework', assignment_names)
+
+    def test_confirmation_is_shown_on_save(self):
+        """
+        Scenario: Confirmation is shown on save
+            Given I have populated a new course in Studio
+            And I am viewing the grading settings
+            When I change assignment type "Homework" to "New Type"
+            And I press the "Save" notification button
+            Then I see a confirmation that my changes have been saved
+        """
+        self.grading_page.change_assignment_name('Homework', 'New Type')
+        self.grading_page.save()
+        confirmation_message = self.grading_page.get_confirmation_message()
+        self.assertEqual(confirmation_message, 'Your changes have been saved.')

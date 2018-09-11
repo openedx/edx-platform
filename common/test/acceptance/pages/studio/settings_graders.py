@@ -16,6 +16,7 @@ class GradingPage(SettingsPage):
 
     url_path = "settings/grading"
     grade_ranges = '.grades .grade-specific-bar'
+    assignments = '.field-group.course-grading-assignment-list-item'
 
     def is_browser_on_page(self):
         return self.q(css='body.grading').present
@@ -32,7 +33,8 @@ class GradingPage(SettingsPage):
     def total_number_of_grades(self):
         """
         Gets total number of grades present in the grades bar
-        returns: Single number length of grades
+        Returns:
+            int: Single number length of grades
         """
         self.wait_for_element_visibility(self.grade_ranges, 'Grades are visible')
         return len(self.q(css=self.grade_ranges))
@@ -83,10 +85,35 @@ class GradingPage(SettingsPage):
         action.drag_and_drop_by_offset(moveable_css, 0, 0).perform()
 
     @property
+    def get_assignment_names(self):
+        """
+        Get name of the all the assignment types.
+        Returns:
+            list: A list containing names of the assignment types.
+        """
+        self.wait_for_element_visibility(
+            '#course-grading-assignment-name',
+            'Grade Names not visible.'
+        )
+        return self.q(css='#course-grading-assignment-name').attrs('value')
+
+    def change_assignment_name(self, old_name, new_name):
+        """
+        Changes the assignment name.
+        Arguments:
+            old_name (str): The assignment type name which is to be changed.
+            new_name (str): New name of the assignment.
+        """
+        self.wait_for_element_visibility('#course-grading-assignment-name', 'Assignment Name field visible')
+        self.q(css='#course-grading-assignment-name').filter(
+            lambda el: el.get_attribute('value') == old_name).fill(new_name)
+
+    @property
     def grade_letters(self):
         """
         Get names of grade ranges.
-        Returns: A list containing names of the grade ranges.
+        Returns:
+            list: A list containing names of the grade ranges.
         """
         return self.q(css='.letter-grade').text
 
@@ -99,8 +126,9 @@ class GradingPage(SettingsPage):
     def is_grade_added(self, length):
         """
         Checks to see if grade is added by comparing number of grades after the addition
-        Returns: True if grade is added
-        Returns: False if grade is not added
+        Returns:
+            bool: True if grade is added
+            bool: False if grade is not added
         """
         try:
             self.wait_for(
@@ -123,7 +151,8 @@ class GradingPage(SettingsPage):
     def grades_range(self):
         """
         Get ranges of all the grades.
-        Returns: A list containing ranges of all the grades
+        Returns:
+            list: A list containing ranges of all the grades
         """
         self.wait_for_element_visibility('.range', 'Ranges are visible')
         return self.q(css='.range').text
@@ -159,7 +188,8 @@ class GradingPage(SettingsPage):
 
     def assignment_name_field_value(self):
         """
-        Returns: Assignment type field value
+        Returns:
+            list: Assignment type field value
         """
         return self.q(css='#course-grading-assignment-name').attrs('value')
 
@@ -177,11 +207,39 @@ class GradingPage(SettingsPage):
         while len(self.q(css='.remove-grading-data')) > 0:
             self.delete_assignment_type()
 
+    def get_confirmation_message(self):
+        """
+        Get confirmation message received after saving settings.
+        """
+        self.wait_for_element_visibility('#alert-confirmation-title', 'Confirmation text present')
+        return self.q(css='#alert-confirmation-title').text[0]
+
+    def _get_type_index(self, name):
+        """
+        Gets the index of assignment type.
+        Arguments:
+            name(str): name of the assignment
+        Returns:
+            int: index of the assignment type
+        """
+        name_id = '#course-grading-assignment-name'
+        all_types = self.q(css=name_id).results
+        for index, element in enumerate(all_types):
+            if element.get_attribute('value') == name:
+                return index
+        return -1
+
     def save(self):
         """
         Click on save settings button.
         """
         press_the_notification_button(self, "Save")
+
+    def cancel(self):
+        """
+        Click on cancel settings button.
+        """
+        press_the_notification_button(self, "Cancel")
 
     def refresh_and_wait_for_load(self):
         """
