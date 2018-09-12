@@ -240,7 +240,7 @@ class HtmlXBlockEditorView(XBlockEditorView):
         """
         Clicks save button.
         """
-        click_css(self, '.save-button')
+        click_css(self, '.action-save')
 
     def _click_button(self, button_name):
         """
