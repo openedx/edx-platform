@@ -123,7 +123,7 @@ class HTMLComponentEditor(ContainerBase):
                   --></style>
                   ""
         """
-        content = "<p class='title'>pages</p><style><!-- .title { color: red; } --></style>"
+        content = '<p class="title">pages</p><style><!-- .title { color: red; } --></style>'
         self._content_test(content)
 
     def test_tinymce_and_codemirror_preserve_span_tags(self):
@@ -169,6 +169,7 @@ class HTMLComponentEditor(ContainerBase):
                 ""
         """
         self.html_editor.set_text_and_select("display as code")
+        self.html_editor.click_code_toolbar_button()
         self.html_editor.save_content()
         html = self.container_page.content_html
         self.assertIn('<p><code>display as code</code></p>', html)
@@ -191,7 +192,8 @@ class HTMLComponentEditor(ContainerBase):
                   ""
         """
         content = "<li>zzzz<ol>"
-        self.html_editor.set_content_and_save(content, raw=True)
+        self.html_editor.set_content(content)
+        self.html_editor.save_content()
         html = self.container_page.content_html
         self.assertIn(content, html)
         self.container_page.edit()

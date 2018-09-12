@@ -62,7 +62,7 @@ class HtmlXBlockEditorView(XBlockEditorView):
         font_labels = self.fonts
         font_families = self.font_families
         for index, font in enumerate(font_families):
-            font = font.replace('font-family: ', "").rstrip(';')
+            font = font.replace('font-family: ', "").replace(';', '')
             font_families[index] = font.split(',')
         font_dict = dict(zip(font_labels, font_families))
         return font_dict
