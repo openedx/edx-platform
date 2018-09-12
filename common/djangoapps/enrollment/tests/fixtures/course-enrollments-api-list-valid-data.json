@@ -1,0 +1,157 @@
+[
+    [
+        {
+            "course_id": "e/d/X"
+        },
+        [
+            {
+                "course_id": "e/d/X",
+                "is_active": true,
+                "mode": "honor",
+                "user": "student1",
+                "created": "2018-01-01T00:00:01Z"
+            },
+            {
+                "course_id": "e/d/X",
+                "is_active": true,
+                "mode": "honor",
+                "user": "student2",
+                "created": "2018-01-01T00:00:01Z"
+            }
+        ]
+    ],
+    [
+        {
+            "course_id": "x/y/Z"
+        },
+        [
+            {
+                "course_id": "x/y/Z",
+                "is_active": true,
+                "mode": "verified",
+                "user": "staff",
+                "created": "2018-01-01T00:00:01Z"
+            },
+            {
+                "course_id": "x/y/Z",
+                "is_active": true,
+                "mode": "honor",
+                "user": "student2",
+                "created": "2018-01-01T00:00:01Z"
+            },
+            {
+                "course_id": "x/y/Z",
+                "is_active": true,
+                "mode": "verified",
+                "user": "student3",
+                "created": "2018-01-01T00:00:01Z"
+            }
+        ]
+    ],
+    [
+        {
+            "course_id": "x/y/Z",
+            "username": "student2,student3"
+        },
+        [
+            {
+                "course_id": "x/y/Z",
+                "is_active": true,
+                "mode": "honor",
+                "user": "student2",
+                "created": "2018-01-01T00:00:01Z"
+            },
+            {
+                "course_id": "x/y/Z",
+                "is_active": true,
+                "mode": "verified",
+                "user": "student3",
+                "created": "2018-01-01T00:00:01Z"
+            }
+        ]
+    ],
+    [
+        {
+            "course_id": "x/y/Z",
+            "username": "student1,student2"
+        },
+        [
+            {
+                "course_id": "x/y/Z",
+                "is_active": true,
+                "mode": "honor",
+                "user": "student2",
+                "created": "2018-01-01T00:00:01Z"
+            }
+        ]
+    ],
+    [
+        {
+            "username": "student2,staff"
+        },
+        [
+            {
+                "course_id": "x/y/Z",
+                "is_active": true,
+                "mode": "verified",
+                "user": "staff",
+                "created": "2018-01-01T00:00:01Z"
+            },
+            {
+                "course_id": "e/d/X",
+                "is_active": true,
+                "mode": "honor",
+                "user": "student2",
+                "created": "2018-01-01T00:00:01Z"
+            },
+            {
+                "course_id": "x/y/Z",
+                "is_active": true,
+                "mode": "honor",
+                "user": "student2",
+                "created": "2018-01-01T00:00:01Z"
+            }
+        ]
+
+    ],
+    [
+        null,
+        [
+            {
+                "course_id": "e/d/X",
+                "is_active": true,
+                "mode": "honor",
+                "user": "student1",
+                "created": "2018-01-01T00:00:01Z"
+            },
+            {
+                "course_id": "e/d/X",
+                "is_active": true,
+                "mode": "honor",
+                "user": "student2",
+                "created": "2018-01-01T00:00:01Z"
+            },
+            {
+                "course_id": "x/y/Z",
+                "is_active": true,
+                "mode": "verified",
+                "user": "student3",
+                "created": "2018-01-01T00:00:01Z"
+            },
+            {
+                "course_id": "x/y/Z",
+                "is_active": true,
+                "mode": "honor",
+                "user": "student2",
+                "created": "2018-01-01T00:00:01Z"
+            },
+            {
+                "course_id": "x/y/Z",
+                "is_active": true,
+                "mode": "verified",
+                "user": "staff",
+                "created": "2018-01-01T00:00:01Z"
+            }
+        ]
+    ]
+]

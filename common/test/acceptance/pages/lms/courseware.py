@@ -8,11 +8,13 @@ from bok_choy.page_object import PageObject, unguarded
 from bok_choy.promise import EmptyPromise
 from selenium.webdriver.common.action_chains import ActionChains
 
+from common.test.acceptance.pages.lms import BASE_URL
 from common.test.acceptance.pages.lms.bookmarks import BookmarksPage
+from common.test.acceptance.pages.lms.completion import CompletionOnViewMixin
 from common.test.acceptance.pages.lms.course_page import CoursePage
 
 
-class CoursewarePage(CoursePage):
+class CoursewarePage(CoursePage, CompletionOnViewMixin):
     """
     Course info.
     """
@@ -587,3 +589,25 @@ class CourseNavPage(PageObject):
         # reload the same page with the course_outline_page flag
         self.browser.get(self.browser.current_url + "&course_experience.course_outline_page=1")
         self.wait_for_page()
+
+
+class RenderXBlockPage(PageObject, CompletionOnViewMixin):
+    """
+    render_xblock page.
+    """
+
+    xblock_component_selector = '.xblock'
+
+    def __init__(self, browser, block_id):
+        super(RenderXBlockPage, self).__init__(browser)
+        self.block_id = block_id
+
+    @property
+    def url(self):
+        """
+        Construct a URL to the page within the course.
+        """
+        return BASE_URL + "/xblock/" + self.block_id
+
+    def is_browser_on_page(self):
+        return self.q(css='.course-content').present
