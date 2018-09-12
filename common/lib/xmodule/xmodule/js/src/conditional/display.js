@@ -149,12 +149,9 @@
         }
       } else if (mimetype === 'application/javascript') {
         if (kind === 'text') {
-          eval.call(window, data);
-          console.log("JavaScript text resource eval'd", resource);
+            $head.append('<script>' + data + '</script>');
         } else if (kind === 'url') {
-          $script(data, data, function () {
-            console.log('JavaScript url resource loaded', resource);
-          });
+          $script(data, data);
         }
       } else if (mimetype === 'text/html') {
         if (placement === 'head') {
