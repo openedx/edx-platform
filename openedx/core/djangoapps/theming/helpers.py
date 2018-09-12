@@ -20,12 +20,12 @@ from openedx.core.djangoapps.theming.helpers_dirs import (
     get_theme_dirs,
     get_themes_unchecked
 )
-from openedx.core.djangoapps.request_cache.middleware import request_cached
+from openedx.core.lib.cache_utils import request_cached
 
 logger = getLogger(__name__)  # pylint: disable=invalid-name
 
 
-@request_cached
+@request_cached()
 def get_template_path(relative_path, **kwargs):
     """
     This is a proxy function to hide microsite_configuration behind comprehensive theming.

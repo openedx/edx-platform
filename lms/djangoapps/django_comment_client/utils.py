@@ -27,7 +27,7 @@ from django_comment_common.models import (
 )
 from django_comment_common.utils import get_course_discussion_settings
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id, get_cohort_names, is_course_cohorted
-from openedx.core.djangoapps.request_cache.middleware import request_cached
+from openedx.core.lib.cache_utils import request_cached
 from student.models import get_user_by_username_or_email
 from student.roles import GlobalStaff
 from xmodule.modulestore.django import modulestore
@@ -137,7 +137,7 @@ def get_accessible_discussion_xblocks(course, user, include_all=False):
     return get_accessible_discussion_xblocks_by_course_id(course.id, user, include_all=include_all)
 
 
-@request_cached
+@request_cached()
 def get_accessible_discussion_xblocks_by_course_id(course_id, user=None, include_all=False):  # pylint: disable=invalid-name
     """
     Return a list of all valid discussion xblocks in this course.
@@ -169,7 +169,7 @@ class DiscussionIdMapIsNotCached(Exception):
     pass
 
 
-@request_cached
+@request_cached()
 def get_cached_discussion_key(course_id, discussion_id):
     """
     Returns the usage key of the discussion xblock associated with discussion_id if it is cached. If the discussion id
@@ -236,7 +236,7 @@ def get_discussion_id_map_by_course_id(course_id, user):
     return dict(map(get_discussion_id_map_entry, xblocks))
 
 
-@request_cached
+@request_cached()
 def _get_item_from_modulestore(key):
     return modulestore().get_item(key)
 
@@ -856,7 +856,7 @@ def get_group_id_for_comments_service(request, course_key, commentable_id=None):
         return None
 
 
-@request_cached
+@request_cached()
 def get_group_id_for_user_from_cache(user, course_id):
     """
     Caches the results of get_group_id_for_user, but serializes the course_id

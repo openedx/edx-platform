@@ -8,7 +8,7 @@ from opaque_keys.edx.django.models import CourseKeyField
 from six import text_type
 
 from config_models.models import ConfigurationModel
-from openedx.core.djangoapps.request_cache.middleware import request_cached
+from openedx.core.lib.cache_utils import request_cached
 
 
 class WaffleFlagCourseOverrideModel(ConfigurationModel):
@@ -26,7 +26,7 @@ class WaffleFlagCourseOverrideModel(ConfigurationModel):
     override_choice = CharField(choices=OVERRIDE_CHOICES, default=OVERRIDE_CHOICES.on, max_length=3)
 
     @classmethod
-    @request_cached
+    @request_cached()
     def override_value(cls, waffle_flag, course_id):
         """
         Returns whether the waffle flag was overridden (on or off) for the

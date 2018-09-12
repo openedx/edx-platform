@@ -5,7 +5,7 @@ from logging import getLogger
 
 from xblock.core import XBlock
 
-from openedx.core.lib.cache_utils import memoized
+from openedx.core.lib.cache_utils import process_cached
 from xmodule.graders import ProblemScore
 from numpy import around
 
@@ -262,7 +262,7 @@ def _get_explicit_graded(block):
     return True if field_value is None else field_value
 
 
-@memoized
+@process_cached
 def _block_types_possibly_scored():
     """
     Returns the block types that could have a score.

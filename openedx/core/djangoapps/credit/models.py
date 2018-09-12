@@ -24,7 +24,7 @@ from jsonfield.fields import JSONField
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 
-from openedx.core.djangoapps.request_cache.middleware import ns_request_cached
+from openedx.core.lib.cache_utils import request_cached
 
 CREDIT_PROVIDER_ID_REGEX = r"[a-z,A-Z,0-9,\-]+"
 log = logging.getLogger(__name__)
@@ -335,7 +335,7 @@ class CreditRequirement(TimeStampedModel):
         return credit_requirement, created
 
     @classmethod
-    @ns_request_cached(CACHE_NAMESPACE)
+    @request_cached(namespace=CACHE_NAMESPACE)
     def get_course_requirements(cls, course_key, namespace=None, name=None):
         """
         Get credit requirements of a given course.

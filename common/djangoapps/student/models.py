@@ -50,6 +50,7 @@ from six import text_type
 from slumber.exceptions import HttpClientError, HttpServerError
 from user_util import user_util
 
+from edx_django_utils.cache import RequestCache
 import lms.lib.comment_client as cc
 from student.signals import UNENROLL_DONE, ENROLL_STATUS_CHANGE, ENROLLMENT_TRACK_UPDATED
 from lms.djangoapps.certificates.models import GeneratedCertificate
@@ -62,7 +63,6 @@ from courseware.models import (
 from enrollment.api import _default_course_mode
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.request_cache import clear_cache, get_cache
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
@@ -2069,7 +2069,7 @@ class CourseEnrollment(models.Model):
         """
         # before populating the cache with another bulk set of data,
         # remove previously cached entries to keep memory usage low.
-        clear_cache(cls.MODE_CACHE_NAMESPACE)
+        RequestCache(cls.MODE_CACHE_NAMESPACE).clear()
 
         records = cls.objects.filter(user__in=users, course_id=course_key).select_related('user')
         cache = cls._get_mode_active_request_cache()
@@ -2080,9 +2080,9 @@ class CourseEnrollment(models.Model):
     @classmethod
     def _get_mode_active_request_cache(cls):
         """
-        Returns the request-specific cache for CourseEnrollment
+        Returns the request-specific cache for CourseEnrollment as dict.
         """
-        return get_cache(cls.MODE_CACHE_NAMESPACE)
+        return RequestCache(cls.MODE_CACHE_NAMESPACE).data
 
     @classmethod
     def _get_enrollment_in_request_cache(cls, user, course_key):

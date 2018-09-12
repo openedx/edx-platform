@@ -18,7 +18,7 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.django.models import CourseKeyField
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.request_cache.middleware import ns_request_cached
+from openedx.core.lib.cache_utils import request_cached
 
 Mode = namedtuple('Mode',
                   [
@@ -311,7 +311,7 @@ class CourseMode(models.Model):
         return [mode.to_tuple() for mode in found_course_modes]
 
     @classmethod
-    @ns_request_cached(CACHE_NAMESPACE)
+    @request_cached(CACHE_NAMESPACE)
     def modes_for_course(cls, course_id, include_expired=False, only_selectable=True):
         """
         Returns a list of the non-expired modes for a given course id

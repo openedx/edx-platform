@@ -5,7 +5,7 @@ Middleware for the courseware app
 from django.shortcuts import redirect
 
 from lms.djangoapps.courseware.exceptions import Redirect
-from util.request import COURSE_REGEX
+from openedx.core.lib.request_utils import COURSE_REGEX
 
 
 class RedirectMiddleware(object):

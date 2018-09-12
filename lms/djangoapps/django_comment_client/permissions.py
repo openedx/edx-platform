@@ -12,7 +12,7 @@ from django_comment_common.models import CourseDiscussionSettings, all_permissio
 from django_comment_common.utils import get_course_discussion_settings
 from lms.djangoapps.teams.models import CourseTeam
 from lms.lib.comment_client import Thread
-from openedx.core.djangoapps.request_cache.middleware import request_cached
+from openedx.core.lib.cache_utils import request_cached
 
 
 def has_permission(user, permission, course_id=None):
@@ -33,7 +33,7 @@ def has_permission(user, permission, course_id=None):
 CONDITIONS = ['is_open', 'is_author', 'is_question_author', 'is_team_member_if_applicable']
 
 
-@request_cached
+@request_cached()
 def get_team(commentable_id):
     """ Returns the team that the commentable_id belongs to if it exists. Returns None otherwise. """
     try:

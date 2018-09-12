@@ -1,4 +1,4 @@
-"""Tests for util.request module."""
+"""Tests for request_utils module."""
 
 import unittest
 
@@ -6,20 +6,31 @@ from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
 from django.test.client import RequestFactory
 
-from util.request import course_id_from_url, safe_get_host
+from openedx.core.lib.request_utils import get_request_or_stub, course_id_from_url, safe_get_host
 
 
-class ResponseTestCase(unittest.TestCase):
-    """ Tests for response-related utility functions """
+class RequestUtilTestCase(unittest.TestCase):
+    """
+    Tests for request_utils module.
+    """
     def setUp(self):
-        super(ResponseTestCase, self).setUp()
+        super(RequestUtilTestCase, self).setUp()
         self.old_site_name = settings.SITE_NAME
         self.old_allowed_hosts = settings.ALLOWED_HOSTS
 
     def tearDown(self):
-        super(ResponseTestCase, self).tearDown()
+        super(RequestUtilTestCase, self).tearDown()
         settings.SITE_NAME = self.old_site_name
         settings.ALLOWED_HOSTS = self.old_allowed_hosts
+
+    def test_get_request_or_stub(self):
+        """
+        Outside the context of the request, we should still get a request
+        that allows us to build an absolute URI.
+        """
+        stub = get_request_or_stub()
+        expected_url = "http://{site_name}/foobar".format(site_name=settings.SITE_NAME)
+        self.assertEqual(stub.build_absolute_uri("foobar"), expected_url)
 
     def test_safe_get_host(self):
         """ Tests that the safe_get_host function returns the desired host """

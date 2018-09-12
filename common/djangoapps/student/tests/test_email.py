@@ -24,6 +24,7 @@ from student.models import (
     UserProfile,
     get_retired_email_by_email
 )
+from openedx.core.lib.request_utils import safe_get_host
 from student.tests.factories import PendingEmailChangeFactory, RegistrationFactory, UserFactory
 from student.views import (
     SETTING_CHANGE_INITIATED,
@@ -33,7 +34,6 @@ from student.views import (
 )
 from student.views import generate_activation_email_context, send_reactivation_email_for_user
 from third_party_auth.views import inactive_user_view
-from util.request import safe_get_host
 from util.testing import EventTestMixin
 
 

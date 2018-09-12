@@ -4,7 +4,7 @@ Adds support for first class plugins that can be added to the edX platform.
 from collections import OrderedDict
 
 from stevedore.extension import ExtensionManager
-from openedx.core.lib.cache_utils import memoized
+from openedx.core.lib.cache_utils import process_cached
 
 
 class PluginError(Exception):
@@ -19,7 +19,7 @@ class PluginManager(object):
     Base class that manages plugins for the edX platform.
     """
     @classmethod
-    @memoized
+    @process_cached
     def get_available_plugins(cls, namespace=None):
         """
         Returns a dict of all the plugins that have been made available through the platform.

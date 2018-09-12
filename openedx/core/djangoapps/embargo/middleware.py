@@ -34,7 +34,7 @@ from django.urls import reverse
 from django.shortcuts import redirect
 from ipware.ip import get_ip
 
-from util.request import course_id_from_url
+from openedx.core.lib.request_utils import course_id_from_url
 
 from . import api as embargo_api
 from .models import IPFilter

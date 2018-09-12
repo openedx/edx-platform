@@ -16,8 +16,8 @@ from django.dispatch import receiver
 from django.http import Http404
 from django.utils.translation import ugettext as _
 from eventtracking import tracker
-from openedx.core.djangoapps.request_cache import clear_cache, get_cache
-from openedx.core.djangoapps.request_cache.middleware import request_cached
+from edx_django_utils.cache import RequestCache
+from openedx.core.lib.cache_utils import request_cached
 from student.models import get_user_by_username_or_email
 
 from .models import (
@@ -175,8 +175,8 @@ def bulk_cache_cohorts(course_key, users):
     """
     # before populating the cache with another bulk set of data,
     # remove previously cached entries to keep memory usage low.
-    clear_cache(COHORT_CACHE_NAMESPACE)
-    cache = get_cache(COHORT_CACHE_NAMESPACE)
+    RequestCache(COHORT_CACHE_NAMESPACE).clear()
+    cache = RequestCache(COHORT_CACHE_NAMESPACE).data
 
     if is_course_cohorted(course_key):
         cohorts_by_user = {
@@ -215,7 +215,7 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
     Raises:
        ValueError if the CourseKey doesn't exist.
     """
-    cache = get_cache(COHORT_CACHE_NAMESPACE)
+    cache = RequestCache(COHORT_CACHE_NAMESPACE).data
     cache_key = _cohort_cache_key(user.id, course_key)
 
     if use_cached and cache_key in cache:
@@ -514,7 +514,7 @@ def get_group_info_for_cohort(cohort, use_cached=False):
     use_cached=True to use the cached value instead of fetching from the
     database.
     """
-    cache = get_cache(u"cohorts.get_group_info_for_cohort")
+    cache = RequestCache(u"cohorts.get_group_info_for_cohort").data
     cache_key = unicode(cohort.id)
 
     if use_cached and cache_key in cache:
@@ -565,7 +565,7 @@ def is_last_random_cohort(user_group):
     return len(random_cohorts) == 1 and random_cohorts[0].name == user_group.name
 
 
-@request_cached
+@request_cached()
 def _get_course_cohort_settings(course_key):
     """
     Return cohort settings for a course. NOTE that the only non-deprecated fields in

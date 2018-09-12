@@ -4,52 +4,119 @@ Utilities related to caching.
 import collections
 import cPickle as pickle
 import functools
+import itertools
 import zlib
 
-from xblock.core import XBlock
+from django.utils.encoding import force_text
+from edx_django_utils.cache import RequestCache
 
 
-def memoize_in_request_cache(request_cache_attr_name=None):
+def request_cached(namespace=None, arg_map_function=None, request_cache_getter=None):
     """
-    Memoize a method call's results in the request_cache if there's one. Creates the cache key by
-    joining the unicode of all the args with &; so, if your arg may use the default &, it may
-    have false hits.
+    A function decorator that automatically handles caching its return value for
+    the duration of the request. It returns the cached value for subsequent
+    calls to the same function, with the same parameters, within a given request.
+
+    Notes:
+        - We convert arguments and keyword arguments to their string form to build the cache key. So if you have
+          args/kwargs that can't be converted to strings, you're gonna have a bad time (don't do it).
+        - Cache key cardinality depends on the args/kwargs. So if you're caching a function that takes five arguments,
+          you might have deceptively low cache efficiency.  Prefer functions with fewer arguments.
+        - WATCH OUT: Don't use this decorator for instance methods that take in a "self" argument that changes each
+          time the method is called. This will result in constant cache misses and not provide the performance benefit
+          you are looking for. Rather, change your instance method to a class method.
+        - Benchmark, benchmark, benchmark! If you never measure, how will you know you've improved? or regressed?
 
     Arguments:
-        request_cache_attr_name - The name of the field or property in this method's containing
-         class that stores the request_cache.
+        namespace (string): An optional namespace to use for the cache. By default, we use the default request cache,
+            not a namespaced request cache. Since the code automatically creates a unique cache key with the module and
+            function's name, storing the cached value in the default cache, you won't usually need to specify a
+            namespace value.
+            But you can specify a namespace value here if you need to use your own namespaced cache - for example,
+            if you want to clear out your own cache by calling RequestCache(namespace=NAMESPACE).clear().
+            NOTE: This argument is ignored if you supply a ``request_cache_getter``.
+        arg_map_function (function: arg->string): Function to use for mapping the wrapped function's arguments to
+            strings to use in the cache key. If not provided, defaults to force_text, which converts the given
+            argument to a string.
+        request_cache_getter (function: args, kwargs->RequestCache): Function that returns the RequestCache to use.
+            If not provided, defaults to edx_django_utils.cache.RequestCache.  If ``request_cache_getter`` returns None,
+            the function's return values are not cached.
+
+    Returns:
+        func: a wrapper function which will call the wrapped function, passing in the same args/kwargs,
+              cache the value it returns, and return that cached value for subsequent calls with the
+              same args/kwargs within a single request.
     """
-    def _decorator(func):
-        """Outer method decorator."""
-        @functools.wraps(func)
-        def _wrapper(self, *args, **kwargs):
+    def decorator(f):
+        """
+        Arguments:
+            f (func): the function to wrap
+        """
+        @functools.wraps(f)
+        def _decorator(*args, **kwargs):
             """
-            Wraps a method to memoize results.
+            Arguments:
+                args, kwargs: values passed into the wrapped function
             """
-            request_cache = getattr(self, request_cache_attr_name, None)
-            if request_cache:
-                cache_key = '&'.join([hashvalue(arg) for arg in args])
-                if cache_key in request_cache.data.setdefault(func.__name__, {}):
-                    return request_cache.data[func.__name__][cache_key]
-
-                result = func(self, *args, **kwargs)
-
-                request_cache.data[func.__name__][cache_key] = result
-                return result
+            # Check to see if we have a result in cache.  If not, invoke our wrapped
+            # function.  Cache and return the result to the caller.
+            if request_cache_getter:
+                request_cache = request_cache_getter(args, kwargs)
             else:
-                return func(self, *args, **kwargs)
-        return _wrapper
-    return _decorator
+                request_cache = RequestCache(namespace)
+
+            if request_cache:
+                cache_key = _func_call_cache_key(f, arg_map_function, *args, **kwargs)
+                cached_response = request_cache.get_cached_response(cache_key)
+                if cached_response.is_found:
+                    return cached_response.value
+
+            result = f(*args, **kwargs)
+
+            if request_cache:
+                request_cache.set(cache_key, result)
+
+            return result
+
+        return _decorator
+    return decorator
 
 
-class memoized(object):  # pylint: disable=invalid-name
+def _func_call_cache_key(func, arg_map_function, *args, **kwargs):
     """
-    Decorator. Caches a function's return value each time it is called.
-    If called later with the same arguments, the cached value is returned
+    Returns a cache key based on the function's module,
+    the function's name, a stringified list of arguments
+    and a stringified list of keyword arguments.
+    """
+    arg_map_function = arg_map_function or force_text
+
+    converted_args = map(arg_map_function, args)
+    converted_kwargs = map(arg_map_function, _sorted_kwargs_list(kwargs))
+
+    cache_keys = [func.__module__, func.func_name] + converted_args + converted_kwargs
+    return u'.'.join(cache_keys)
+
+
+def _sorted_kwargs_list(kwargs):
+    """
+    Returns a unique and deterministic ordered list from the given kwargs.
+    """
+    sorted_kwargs = sorted(kwargs.iteritems())
+    sorted_kwargs_list = list(itertools.chain(*sorted_kwargs))
+    return sorted_kwargs_list
+
+
+class process_cached(object):  # pylint: disable=invalid-name
+    """
+    Decorator to cache the result of a function for the life of a process.
+
+    If the return value of the function for the provided arguments has not
+    yet been cached, the function will be calculated and cached. If called
+    later with the same arguments, the cached value is returned
     (not reevaluated).
     https://wiki.python.org/moin/PythonDecoratorLibrary#Memoize
 
-    WARNING: Only use this memoized decorator for caching data that
+    WARNING: Only use this process_cached decorator for caching data that
     is constant throughout the lifetime of a gunicorn worker process,
     is costly to compute, and is required often.  Otherwise, it can lead to
     unwanted memory leakage.
@@ -84,16 +151,6 @@ class memoized(object):  # pylint: disable=invalid-name
         return functools.partial(self.__call__, obj)
 
 
-def hashvalue(arg):
-    """
-    If arg is an xblock, use its location. otherwise just turn it into a string
-    """
-    if isinstance(arg, XBlock):
-        return unicode(arg.location)
-    else:
-        return unicode(arg)
-
-
 def zpickle(data):
     """Given any data structure, returns a zlib compressed pickled serialization."""
     return zlib.compress(pickle.dumps(data, pickle.HIGHEST_PROTOCOL))
@@ -102,3 +159,16 @@ def zpickle(data):
 def zunpickle(zdata):
     """Given a zlib compressed pickled serialization, returns the deserialized data."""
     return pickle.loads(zlib.decompress(zdata))
+
+
+def get_cache(name):
+    """
+    Return the request cache named ``name``.
+
+    Arguments:
+        name (str): The name of the request cache to load
+
+    Returns: dict
+    """
+    assert name is not None
+    return RequestCache(name).data
