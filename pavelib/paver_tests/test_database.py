@@ -17,6 +17,7 @@ from pavelib.utils.db_utils import (
 )
 from pavelib.utils import db_utils
 from pavelib import database
+from .utils import PaverTestCase
 
 
 class TestPaverDbS3Utils(MockS3Mixin, TestCase):
@@ -77,7 +78,7 @@ def _write_temporary_db_cache_files(path, files):
             cache_file.write(str(index))
 
 
-class TestPaverDatabaseTasks(MockS3Mixin, TestCase):
+class TestPaverDatabaseTasks(MockS3Mixin, PaverTestCase):
     """
     Tests for the high level database tasks
     """
