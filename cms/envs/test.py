@@ -32,6 +32,7 @@ from lms.envs.test import (
     COMPREHENSIVE_THEME_DIRS,
     JWT_AUTH,
     REGISTRATION_EXTRA_FIELDS,
+    ECOMMERCE_API_URL,
 )
 
 # Allow all hosts during tests, we use a lot of different ones all over the codebase.

@@ -40,7 +40,7 @@ def _finish_auth_url(params):
 class LoginFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, SharedModuleStoreTestCase):
     """Test rendering of the login form. """
 
-    URLCONF_MODULES = ['lms.urls']
+    URLCONF_MODULES = ['openedx.core.djangoapps.user_authn.urls']
 
     @classmethod
     def setUpClass(cls):
@@ -48,7 +48,7 @@ class LoginFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, SharedModuleStoreTes
         cls.course = CourseFactory.create()
 
     @patch.dict(settings.FEATURES, {"ENABLE_COMBINED_LOGIN_REGISTRATION": False})
-    def setUp(self):
+    def setUp(self):  # pylint: disable=arguments-differ
         super(LoginFormTest, self).setUp()
 
         self.url = reverse("signin_user")
@@ -157,7 +157,7 @@ class LoginFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, SharedModuleStoreTes
 class RegisterFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, SharedModuleStoreTestCase):
     """Test rendering of the registration form. """
 
-    URLCONF_MODULES = ['lms.urls']
+    URLCONF_MODULES = ['openedx.core.djangoapps.user_authn.urls']
 
     @classmethod
     def setUpClass(cls):
@@ -165,7 +165,7 @@ class RegisterFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, SharedModuleStore
         cls.course = CourseFactory.create()
 
     @patch.dict(settings.FEATURES, {"ENABLE_COMBINED_LOGIN_REGISTRATION": False})
-    def setUp(self):
+    def setUp(self):  # pylint: disable=arguments-differ
         super(RegisterFormTest, self).setUp()
 
         self.url = reverse("register_user")

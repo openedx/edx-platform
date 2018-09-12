@@ -6,7 +6,7 @@ from setuptools import setup
 
 setup(
     name="Open edX",
-    version="0.10",
+    version="0.11",
     install_requires=["setuptools"],
     requires=[],
     # NOTE: These are not the names we should be installing.  This tree should
@@ -77,6 +77,7 @@ setup(
             "zendesk_proxy = openedx.core.djangoapps.zendesk_proxy.apps:ZendeskProxyConfig",
             "instructor = lms.djangoapps.instructor.apps:InstructorConfig",
             "password_policy = openedx.core.djangoapps.password_policy.apps:PasswordPolicyConfig",
+            "user_authn = openedx.core.djangoapps.user_authn.apps:UserAuthnConfig"
         ],
         "cms.djangoapp": [
             "ace_common = openedx.core.djangoapps.ace_common.apps:AceCommonConfig",
@@ -92,6 +93,7 @@ setup(
             "bookmarks = openedx.core.djangoapps.bookmarks.apps:BookmarksConfig",
             "zendesk_proxy = openedx.core.djangoapps.zendesk_proxy.apps:ZendeskProxyConfig",
             "password_policy = openedx.core.djangoapps.password_policy.apps:PasswordPolicyConfig",
+            "user_authn = openedx.core.djangoapps.user_authn.apps:UserAuthnConfig"
         ],
     }
 )

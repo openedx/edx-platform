@@ -29,7 +29,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 from pyquery import PyQuery as pq
-from student.cookies import get_user_info_cookie_data
+from openedx.core.djangoapps.user_authn.cookies import get_user_info_cookie_data
 from student.helpers import DISABLE_UNENROLL_CERT_STATES
 from student.models import CourseEnrollment, UserProfile
 from student.signals import REFUND_ORDER

@@ -316,7 +316,7 @@ class ShibSPTest(CacheIsolationTestCase):
                     'terms_of_service': u'true',
                     'honor_code': u'true'}
 
-        with patch('student.views.management.AUDIT_LOG') as mock_audit_log:
+        with patch('openedx.core.djangoapps.user_authn.views.register.AUDIT_LOG') as mock_audit_log:
             self.client.post('/create_account', data=postvars)
 
         mail = identity.get('mail')
