@@ -69,7 +69,7 @@ class EnrollmentTrackUserPartitionTest(SharedModuleStoreTestCase):
         with group IDs associated with cohort and random user partitions).
         """
         for mode in ENROLLMENT_GROUP_IDS:
-            self.assertLess(ENROLLMENT_GROUP_IDS[mode], MINIMUM_STATIC_PARTITION_ID)
+            self.assertLess(ENROLLMENT_GROUP_IDS[mode]['id'], MINIMUM_STATIC_PARTITION_ID)
 
     @staticmethod
     def get_group_by_name(partition, name):

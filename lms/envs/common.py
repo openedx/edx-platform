@@ -3361,12 +3361,42 @@ BASE_COOKIE_DOMAIN = 'localhost'
 
 ############## Settings for Course Enrollment Modes ######################
 COURSE_ENROLLMENT_MODES = {
-    "audit": 1,
-    "verified": 2,
-    "professional": 3,
-    "no-id-professional": 4,
-    "credit": 5,
-    "honor": 6,
+    "audit": {
+        "id": 1,
+        "slug": "audit",
+        "display_name": _("Audit"),
+        "min_price": 0
+    },
+    "verified": {
+        "id": 2,
+        "slug": "verified",
+        "display_name": _("Verified"),
+        "min_price": 0
+    },
+    "professional": {
+        "id": 3,
+        "slug": "professional",
+        "display_name": _("Professional"),
+        "min_price": 0
+    },
+    "no-id-professional": {
+        "id": 4,
+        "slug": "no-id-professional",
+        "display_name": _("No-Id-Professional"),
+        "min_price": 0
+    },
+    "credit": {
+        "id": 5,
+        "slug": "credit",
+        "display_name": _("Credit"),
+        "min_price": 0
+    },
+    "honor": {
+        "id": 6,
+        "slug": "honor",
+        "display_name": _("Honor"),
+        "min_price": 0
+    },
 }
 
 ############## Settings for the Discovery App ######################

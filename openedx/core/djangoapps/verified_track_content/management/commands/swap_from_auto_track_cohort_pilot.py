@@ -197,9 +197,9 @@ class Command(BaseCommand):
                 # Add the enrollment track ids to a group access array
                 enrollment_track_group_access = []
                 if set_audit_enrollment_track:
-                    enrollment_track_group_access.append(settings.COURSE_ENROLLMENT_MODES['audit'])
+                    enrollment_track_group_access.append(settings.COURSE_ENROLLMENT_MODES['audit']['id'])
                 if set_verified_enrollment_track:
-                    enrollment_track_group_access.append(settings.COURSE_ENROLLMENT_MODES['verified'])
+                    enrollment_track_group_access.append(settings.COURSE_ENROLLMENT_MODES['verified']['id'])
 
                 # If there are no errors, and either the audit track, or verified
                 #  track needed an update, set the access, update and publish
