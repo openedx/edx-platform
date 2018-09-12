@@ -10,9 +10,8 @@ from pavelib.utils.decorators import (
 
 def test_function_under_timeout():
 
-    @timeout(1)
+    @timeout(2)
     def sample_function_1():
-        time.sleep(0.1)
         return "sample text"
 
     value = sample_function_1()
