@@ -611,7 +611,7 @@ def convert_video_transcript(file_name, content, output_format):
     """
     name_and_extension = os.path.splitext(file_name)
     basename, input_format = name_and_extension[0], name_and_extension[1][1:]
-    filename = '{base_name}.{ext}'.format(base_name=basename.encode('utf8'), ext=output_format)
+    filename = u'{base_name}.{ext}'.format(base_name=basename, ext=output_format)
     converted_transcript = Transcript.convert(content, input_format=input_format, output_format=output_format)
 
     return dict(filename=filename, content=converted_transcript)
