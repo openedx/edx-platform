@@ -95,15 +95,6 @@ class HtmlXBlockEditorView(XBlockEditorView):
 
         self.cancel()
 
-    def set_content_in_editor(self, content):
-        """
-        Types in the codemirror
-        """
-        self.wait_for_element_presence('.tiny-mce', "Editor is present")
-        self.q(css=self.editor_mode_css).click()
-        type_in_codemirror(self, 0, content, find_prefix="$('iframe').contents().find")
-        self.save()
-
     def set_content(self, content):
         """Sets content in the html component, leaving the component open.
 
@@ -122,9 +113,15 @@ class HtmlXBlockEditorView(XBlockEditorView):
         self.q(css='[aria-label="Edit HTML"]').click()
         self.wait_for_element_visibility('.mce-title', 'Wait for CodeMirror editor')
         # Set content in the CodeMirror editor.
-        type_in_codemirror(self, 0, content, "$('iframe').contents().find")
+        type_in_codemirror(self, 0, content)
 
         self.q(css='.mce-foot .mce-primary').click()
+
+    def save_content(self):
+        """
+        Click save button
+        """
+        click_css(self, '.action-save')
 
     def open_raw_editor(self):
         """
@@ -240,7 +237,7 @@ class HtmlXBlockEditorView(XBlockEditorView):
         """
         Clicks save button.
         """
-        click_css(self, '.action-save')
+        click_css(self, '.save-button')
 
     def _click_button(self, button_name):
         """

@@ -43,10 +43,11 @@ class HTMLComponentEditor(ContainerBase):
 
     def _content_test(self, content_to_verify):
         content = content_to_verify
-        self.html_editor.set_content_and_save(content, raw=True)
+        self.html_editor.set_raw_content(content)
+        self.html_editor.save_content()
         self.container_page.wait_for_page()
-        xmodule_html = self.container_page.html_for_htmlmodule
-        self.assertIn(content, xmodule_html)
+        html = self.container_page.content_html
+        self.assertIn(content, html)
 
     def test_user_can_view_metadata(self):
         """
@@ -168,9 +169,9 @@ class HTMLComponentEditor(ContainerBase):
                 ""
         """
         self.html_editor.set_text_and_select("display as code")
-        self.html_editor.save_settings()
-        xmodule_html = self.container_page.html_for_htmlmodule
-        self.assertIn('<p><code>display as code</code></p>', xmodule_html)
+        self.html_editor.save_content()
+        html = self.container_page.content_html
+        self.assertIn('<p><code>display as code</code></p>', html)
 
     def test_raw_hmlcomponent_does_not_change_text(self):
         """
@@ -191,10 +192,9 @@ class HTMLComponentEditor(ContainerBase):
         """
         content = "<li>zzzz<ol>"
         self.html_editor.set_content_and_save(content, raw=True)
-        xmodule_html = self.container_page.html_for_htmlmodule
-        self.assertIn("<li>zzzz<ol>", xmodule_html)
+        html = self.container_page.content_html
+        self.assertIn(content, html)
         self.container_page.edit()
-        self.html_editor.open_raw_editor()
         editor_value = self.html_editor.editor_value
         self.assertEqual(content, editor_value)
 
@@ -244,10 +244,15 @@ class HTMLComponentEditor(ContainerBase):
         Then the src link is rewritten to the asset link "image.jpg"
             And the code editor displays "<p><img src="/static/image.jpg" /></p>"
         """
-        self._content_test('<img src="/static/image.jpg">')
-        self.html_editor.set_content_and_save('<img src="/static/image.jpg">')
+        value = '<img src="/static/image.jpg">'
+        self.html_editor.set_raw_content(value)
+        self.html_editor.save_content()
+        html = self.container_page.content_html
+        self.assertIn('image.jpg', html)
         self.container_page.edit()
-        # add jquery function here
+        self.html_editor.open_raw_editor()
+        editor_value = self.html_editor.editor_value
+        self.assertEqual(value, editor_value)
 
     def test_font_selection_dropdown(self):
         """

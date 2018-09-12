@@ -199,17 +199,16 @@ class ContainerPage(PageObject, HelpMixin):
         self.wait_for_ajax()
 
     @property
-    def html_for_htmlmodule(self):
+    def content_html(self):
         """
         Gets the html of HTML module
         Returns:
             list: A list containing inner HTMl
         """
         self.wait_for_element_visibility('.xmodule_HtmlModule', 'Xblock content is visible')
-        # html = self.q(css='.xmodule_HtmlModule').html
-        # return su.unescape(html).strip().replace("\'", '"')
-        # return self.q(css='.xmodule_HtmlModule')[0].get_attribute('innerHTML')
-        return self.q(css='.xmodule_HtmlModule').html
+        html = self.q(css='.xmodule_HtmlModule').html
+        html = html[0].strip()
+        return html
 
     @property
     def xblock_titles(self):
