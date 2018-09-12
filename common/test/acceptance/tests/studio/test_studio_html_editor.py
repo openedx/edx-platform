@@ -42,6 +42,11 @@ class HTMLComponentEditor(ContainerBase):
         )
 
     def _content_test(self, content_to_verify):
+        """
+        Set and save content in editor and assert its presence in container page's html
+        Args:
+            content_to_verify(string): Verifiable content
+        """
         content = content_to_verify
         self.html_editor.set_raw_content(content)
         self.html_editor.save_content()
@@ -192,7 +197,7 @@ class HTMLComponentEditor(ContainerBase):
                   ""
         """
         content = "<li>zzzz<ol>"
-        self.html_editor.set_content(content)
+        self.html_editor.set_content_in_tinymce_editor(content)
         self.html_editor.save_content()
         html = self.container_page.content_html
         self.assertIn(content, html)

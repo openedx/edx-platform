@@ -4,7 +4,6 @@ Container page in Studio
 
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise, Promise
-from xml.sax import saxutils as su
 
 from common.test.acceptance.pages.common.utils import click_css, confirm_prompt
 from common.test.acceptance.pages.studio import BASE_URL

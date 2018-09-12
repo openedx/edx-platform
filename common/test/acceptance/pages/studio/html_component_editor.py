@@ -1,3 +1,6 @@
+"""
+HTML Component editor in studio
+"""
 from common.test.acceptance.pages.studio.utils import type_in_codemirror, get_codemirror_value
 from xblock_editor import XBlockEditorView
 from common.test.acceptance.pages.common.utils import click_css
@@ -103,6 +106,9 @@ class HtmlXBlockEditorView(XBlockEditorView):
         """
         self.q(css=self.editor_mode_css).click()
         self.browser.execute_script("tinyMCE.activeEditor.setContent('%s')" % content)
+
+    def set_content_in_tinymce_editor(self, text):
+        type_in_codemirror(self, 0, text)
 
     def set_raw_content(self, content):
         """Types content in raw html mode, leaving the component open.
