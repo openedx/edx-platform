@@ -122,7 +122,7 @@ class HtmlXBlockEditorView(XBlockEditorView):
         self.q(css='[aria-label="Edit HTML"]').click()
         self.wait_for_element_visibility('.mce-title', 'Wait for CodeMirror editor')
         # Set content in the CodeMirror editor.
-        type_in_codemirror(self, 0, content)
+        type_in_codemirror(self, 0, content, "$('iframe').contents().find")
 
         self.q(css='.mce-foot .mce-primary').click()
 
