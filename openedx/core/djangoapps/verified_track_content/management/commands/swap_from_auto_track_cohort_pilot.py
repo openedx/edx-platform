@@ -2,6 +2,7 @@ from contentstore.course_group_config import GroupConfiguration
 from django.conf import settings
 from course_modes.models import CourseMode
 from django.core.management.base import BaseCommand, CommandError
+from django.db import transaction
 
 from openedx.core.djangoapps.course_groups.cohorts import CourseCohort
 from openedx.core.djangoapps.course_groups.models import (CourseUserGroup, CourseUserGroupPartitionGroup)
@@ -22,14 +23,27 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
+        errors = []
+        for verified_track_cohorts_setting in MigrateVerifiedTrackCohortsSetting.objects.filter(enabled=True):
+            try:
+                with transaction.atomic():
+                    verified_track_cohorted = self.do_migrate(verified_track_cohorts_setting)
+                    verified_track_cohorted.enabled = False
+                    verified_track_cohorts_setting.enabled = False
+                    verified_track_cohorts_setting.save()
+                    verified_track_cohorted.save()
+            except CommandError as e:
+                errors.append(e.message)
+        if errors:
+            raise CommandError(errors)
+
+    def do_migrate(self, verified_track_cohorts_setting):
 
         errors = []
 
         module_store = modulestore()
 
-        print "Starting Swap from Auto Track Cohort Pilot command"
-
-        verified_track_cohorts_setting = self._latest_settings()
+        # print "Starting Swap from Auto Track Cohort Pilot command"
 
         if not verified_track_cohorts_setting:
             raise CommandError("No MigrateVerifiedTrackCohortsSetting found")
@@ -168,8 +182,7 @@ class Command(BaseCommand):
                         audit_course_user_group_partition_group.partition_id,
                         None
                     )
-                    if (audit_partition_group_access
-                            and audit_course_user_group_partition_group.group_id in audit_partition_group_access):
+                    if audit_partition_group_access and audit_course_user_group_partition_group.group_id in audit_partition_group_access:
                         print "Queueing XBlock at location: '%s' for Audit Content Group update " % item.location
                         set_audit_enrollment_track = True
 
@@ -220,47 +233,48 @@ class Command(BaseCommand):
 
         # If there are no errors iterate over and update all of the items that had the access changed
         if not errors:
-            for item in items_to_update:
-                module_store.update_item(item, ModuleStoreEnum.UserID.mgmt_command)
-                module_store.publish(item.location, ModuleStoreEnum.UserID.mgmt_command)
-                print "Updated and published XBlock at location: '%s'" % item.location
+            with module_store.bulk_operations(rerun_course_key):
+                for item in items_to_update:
+                    module_store.update_item(item, ModuleStoreEnum.UserID.mgmt_command)
+                    module_store.publish(item.location, ModuleStoreEnum.UserID.mgmt_command)
+                    print "Updated and published XBlock at location: '%s'" % item.location
 
-        # Check if we should delete any partition groups if there are no errors.
-        # If there are errors, none of the xblock items will have been updated,
-        # so this section will throw errors for each partition in use
-        if partitions_to_delete and not errors:
-            partition_service = PartitionService(rerun_course_key)
-            course = partition_service.get_course()
-            for partition_to_delete in partitions_to_delete:
-                # Get the user partition, and the index of that partition in the course
-                partition = partition_service.get_user_partition(partition_to_delete.partition_id)
-                if partition:
-                    partition_index = course.user_partitions.index(partition)
-                    group_id = int(partition_to_delete.group_id)
+                # Check if we should delete any partition groups if there are no errors.
+                # If there are errors, none of the xblock items will have been updated,
+                # so this section will throw errors for each partition in use
+                if partitions_to_delete and not errors:
+                    partition_service = PartitionService(rerun_course_key)
+                    course = partition_service.get_course()
+                    for partition_to_delete in partitions_to_delete:
+                        # Get the user partition, and the index of that partition in the course
+                        partition = partition_service.get_user_partition(partition_to_delete.partition_id)
+                        if partition:
+                            partition_index = course.user_partitions.index(partition)
+                            group_id = int(partition_to_delete.group_id)
 
-                    # Sanity check to verify that all of the groups being deleted are empty,
-                    # since they should have been converted to use enrollment tracks instead.
-                    # Taken from contentstore/views/course.py.remove_content_or_experiment_group
-                    usages = GroupConfiguration.get_partitions_usage_info(module_store, course)
-                    used = group_id in usages
-                    if used:
-                        errors.append("Content group '%s' is in use and cannot be deleted."
-                                      % partition_to_delete.group_id)
+                            # Sanity check to verify that all of the groups being deleted are empty,
+                            # since they should have been converted to use enrollment tracks instead.
+                            # Taken from contentstore/views/course.py.remove_content_or_experiment_group
+                            usages = GroupConfiguration.get_partitions_usage_info(module_store, course)
+                            used = group_id in usages
+                            if used:
+                                errors.append("Content group '%s' is in use and cannot be deleted."
+                                              % partition_to_delete.group_id)
 
-                    # If there are not errors, proceed to update the course and user_partitions
-                    if not errors:
-                        # Remove the groups that match the group ID of the partition to be deleted
-                        # Else if there are no match groups left, remove the user partition
-                        matching_groups = [group for group in partition.groups if group.id == group_id]
-                        if matching_groups:
-                            group_index = partition.groups.index(matching_groups[0])
-                            partition.groups.pop(group_index)
-                            # Update the course user partition with the updated groups
-                            if partition.groups:
-                                course.user_partitions[partition_index] = partition
-                            else:
-                                course.user_partitions.pop(partition_index)
-                        module_store.update_item(course, ModuleStoreEnum.UserID.mgmt_command)
+                            # If there are not errors, proceed to update the course and user_partitions
+                            if not errors:
+                                # Remove the groups that match the group ID of the partition to be deleted
+                                # Else if there are no match groups left, remove the user partition
+                                matching_groups = [group for group in partition.groups if group.id == group_id]
+                                if matching_groups:
+                                    group_index = partition.groups.index(matching_groups[0])
+                                    partition.groups.pop(group_index)
+                                    # Update the course user partition with the updated groups
+                                    if partition.groups:
+                                        course.user_partitions[partition_index] = partition
+                                    else:
+                                        course.user_partitions.pop(partition_index)
+                                module_store.update_item(course, ModuleStoreEnum.UserID.mgmt_command)
 
         # If there are any errors, join them together and raise the CommandError
         if errors:
@@ -270,9 +284,4 @@ class Command(BaseCommand):
             )
 
         print "Finished for MigrateVerifiedTrackCohortsSetting with ID='%s" % verified_track_cohorts_setting.id
-
-    def _latest_settings(self):
-        """
-        Return the latest version of the MigrateVerifiedTrackCohortsSetting
-        """
-        return MigrateVerifiedTrackCohortsSetting.current()
+        return verified_track_cohorted_course

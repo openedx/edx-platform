@@ -172,7 +172,6 @@ class MigrateVerifiedTrackCohortsSetting(ConfigurationModel):
         help_text="Comma-separated list of audit cohort names"
     )
 
-    @classmethod
-    def get_audit_cohort_names(cls):
+    def get_audit_cohort_names(self):
         """Get the list of audit cohort names for the course"""
-        return [cohort_name for cohort_name in cls.current().audit_cohort_names.split(",") if cohort_name]
+        return [cohort_name for cohort_name in self.audit_cohort_names.split(",") if cohort_name]

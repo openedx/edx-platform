@@ -20,7 +20,7 @@ def journal_listing(request):
 
     user = request.user
 
-    if not journals_enabled() or not user.is_authenticated():
+    if not journals_enabled() or not user.is_authenticated:
         raise Http404
 
     journals = fetch_journal_access(

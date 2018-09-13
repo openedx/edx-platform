@@ -93,7 +93,7 @@ class GradeViewMixin(DeveloperErrorViewMixin):
         Ensures that the user is authenticated (e.g. not an AnonymousUser).
         """
         super(GradeViewMixin, self).perform_authentication(request)
-        if request.user.is_anonymous():
+        if request.user.is_anonymous:
             raise AuthenticationFailed
 
 
