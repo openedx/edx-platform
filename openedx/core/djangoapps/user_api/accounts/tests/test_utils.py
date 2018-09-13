@@ -113,17 +113,16 @@ class CompletionUtilsTestCase(SharedModuleStoreTestCase, CompletionWaffleTestMix
             )
 
     @override_settings(LMS_ROOT_URL='test_url:9999')
-    @ddt.data(True, False)
-    def test_retrieve_last_sitewide_block_completed(self, use_username):
+    def test_retrieve_last_sitewide_block_completed(self):
         """
         Test that the method returns a URL for the "last completed" block
         when sending a user object
         """
         block_url = retrieve_last_sitewide_block_completed(
-            self.engaged_user.username if use_username else self.engaged_user
+            self.engaged_user
         )
         empty_block_url = retrieve_last_sitewide_block_completed(
-            self.cruft_user.username if use_username else self.cruft_user
+            self.cruft_user
         )
         self.assertEqual(
             block_url,

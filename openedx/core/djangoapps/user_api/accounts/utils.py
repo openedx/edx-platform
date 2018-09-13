@@ -102,24 +102,20 @@ def _is_valid_social_username(value):
     return '/' not in value
 
 
-def retrieve_last_sitewide_block_completed(username):
+def retrieve_last_sitewide_block_completed(user):
     """
     Completion utility
     From a string 'username' or object User retrieve
     the last course block marked as 'completed' and construct a URL
 
-    :param username: str(username) or obj(User)
+    :param user: obj(User)
     :return: block_lms_url
 
     """
     if not completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
         return
 
-    if not isinstance(username, User):
-        userobj = User.objects.get(username=username)
-    else:
-        userobj = username
-    latest_completions_by_course = BlockCompletion.latest_blocks_completed_all_courses(userobj)
+    latest_completions_by_course = BlockCompletion.latest_blocks_completed_all_courses(user)
 
     known_site_configs = [
         other_site_config.get_value('course_org_filter') for other_site_config in SiteConfiguration.objects.all()

@@ -27,7 +27,7 @@ class CookieTests(SharedModuleStoreTestCase):
     def _get_expected_header_urls(self, request):
         expected_header_urls = {
             'logout': reverse('logout'),
-            'resume_block': retrieve_last_sitewide_block_completed(self.user.username)
+            'resume_block': retrieve_last_sitewide_block_completed(self.user)
         }
 
         # Studio (CMS) does not have the URLs below
