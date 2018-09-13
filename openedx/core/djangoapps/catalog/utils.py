@@ -316,6 +316,43 @@ def get_course_runs():
 
 
 def get_course_runs_for_course(course_uuid):
+    """
+    Get the course runs for a course based on course uuid
+    Arguments:
+        course_uuid: The UUID for the Course
+    Returns:
+        list: Of Course Run data
+    """
+    data = get_course_data_for_course(course_uuid)
+    return data.get('course_runs', [])
+
+
+def get_canonical_course_run_for_course(course_uuid):
+    """
+    Get the course runs for a course based on course uuid
+    Arguments:
+        course_uuid: The UUID for the Course
+    Returns:
+        str: canonical_course_run_key
+    """
+    data = get_course_data_for_course(course_uuid)
+    canonical_course_run_key = data.get('canonical_course_run_key', None)
+    course_runs = data.get('course_runs', [])
+    if canonical_course_run_key:
+        for course_run_data in course_runs:
+            if course_run_data.get('key', '') == canonical_course_run_key:
+                return course_run_data
+    return {}
+
+
+def get_course_data_for_course(course_uuid):
+    """
+    Calls the Discovery API or looks at the cache to get the Course data based on UUID and then caches that data.
+    Arguments:
+        course_uuid: The UUID for the Course
+    Returns:
+        str: canonical_course_run_key
+    """
     catalog_integration = CatalogIntegration.current()
 
     if catalog_integration.is_enabled():
@@ -323,13 +360,13 @@ def get_course_runs_for_course(course_uuid):
             user = catalog_integration.get_service_user()
         except ObjectDoesNotExist:
             logger.error(
-                'Catalog service user with username [%s] does not exist. Course runs will not be retrieved.',
+                'Catalog service user with username [%s] does not exist. Canonical Course Run will not be retrieved.',
                 catalog_integration.service_username,
             )
             return []
 
         api = create_catalog_api_client(user)
-        cache_key = '{base}.course.{uuid}.course_runs'.format(
+        cache_key = '{base}.course.{uuid}'.format(
             base=catalog_integration.CACHE_KEY,
             uuid=course_uuid
         )
@@ -342,9 +379,9 @@ def get_course_runs_for_course(course_uuid):
             long_term_cache=True,
             many=False
         )
-        return data.get('course_runs', [])
+        return data
     else:
-        return []
+        return None
 
 
 def get_course_uuid_for_course(course_run_key):
@@ -415,14 +452,19 @@ def get_pseudo_session_for_entitlement(entitlement):
     This function is used to pass pseudo-data to the front end, returning a single session, regardless of whether that
     session is currently available.
 
-    First tries to return the first available session, followed by the first session regardless of availability.
+    First tries to return the canonical session from Discovery, then the first available session,
+    followed by the first session regardless of availability.
+
     Returns None if there are no sessions for that course.
     """
-    sessions_for_course = get_course_runs_for_course(entitlement.course_uuid)
+    sessions_for_course = get_course_runs_for_course(course_uuid=entitlement.course_uuid)
     available_sessions = get_fulfillable_course_runs_for_entitlement(entitlement, sessions_for_course)
-    if available_sessions:
+    canonical_course_run_key = get_canonical_course_run_for_course(entitlement.course_uuid)
+    if canonical_course_run_key:
+        return canonical_course_run_key
+    elif available_sessions:
         return available_sessions[0]
-    if sessions_for_course:
+    elif sessions_for_course:
         return sessions_for_course[0]
     return None
 

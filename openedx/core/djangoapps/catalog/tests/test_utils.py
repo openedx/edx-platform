@@ -40,7 +40,8 @@ from openedx.core.djangoapps.catalog.utils import (
     get_localized_price_text,
     get_program_types,
     get_programs,
-    get_visible_sessions_for_entitlement
+    get_visible_sessions_for_entitlement,
+    get_pseudo_session_for_entitlement
 )
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
@@ -517,6 +518,38 @@ class TestSessionEntitlement(CatalogIntegrationMixin, TestCase):
         session_entitlements = get_visible_sessions_for_entitlement(entitlement)
         self.assertEqual(session_entitlements, [])
 
+    def test_unpublished_sessions_use_canonical_session(self, mock_get_edx_api_data):
+        """
+        Test unpublished course runs are part of visible session entitlements when the user
+        is enrolled.
+        """
+        catalog_course_run = CourseRunFactory.create(status=COURSE_UNPUBLISHED)
+        catalog_course_run2 = CourseRunFactory.create(status=COURSE_UNPUBLISHED)
+        catalog_course = CourseFactory(course_runs=[catalog_course_run, catalog_course_run2])
+        catalog_course['canonical_course_run_key'] = catalog_course_run.get('key')
+        mock_get_edx_api_data.return_value = catalog_course
+        course_key = CourseKey.from_string(catalog_course_run.get('key'))
+        course_overview = CourseOverviewFactory.create(id=course_key, start=self.tomorrow)
+        course_key2 = CourseKey.from_string(catalog_course_run2.get('key'))
+        course_overview2 = CourseOverviewFactory.create(id=course_key2, start=self.tomorrow)
+        CourseModeFactory.create(
+            mode_slug=CourseMode.VERIFIED,
+            min_price=100,
+            course_id=course_overview.id,
+        )
+        CourseModeFactory.create(
+            mode_slug=CourseMode.VERIFIED,
+            min_price=100,
+            course_id=course_overview2.id
+        )
+        entitlement = CourseEntitlementFactory(
+            user=self.user, mode=CourseMode.VERIFIED, enrollment_course_run=None
+        )
+
+        session_entitlements = get_visible_sessions_for_entitlement(entitlement)
+        self.assertEqual(session_entitlements, [])
+        pseudo_session = get_pseudo_session_for_entitlement(entitlement)
+        self.assertEqual(pseudo_session, catalog_course_run)
 
 @skip_unless_lms
 @mock.patch(UTILS_MODULE + '.get_edx_api_data')
