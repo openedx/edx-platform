@@ -40,8 +40,8 @@ from openedx.core.djangoapps.user_authn.config.waffle import (
 )
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.api.view_utils import require_post_params
-from student.models import LoginFailures, AllowedAuthUser
-from student.views import send_reactivation_email_for_user
+from student.models import LoginFailures, AllowedAuthUser, UserProfile
+from student.views import compose_and_send_activation_email
 from third_party_auth import pipeline, provider
 import third_party_auth
 from track import segment
@@ -178,7 +178,9 @@ def _log_and_raise_inactive_user_auth_error(unauthenticated_user):
             unauthenticated_user.username)
         )
 
-    send_reactivation_email_for_user(unauthenticated_user)
+    profile = UserProfile.objects.get(user=unauthenticated_user)
+    compose_and_send_activation_email(unauthenticated_user, profile)
+
     raise AuthFailedError(_generate_not_activated_message(unauthenticated_user))
 
 
