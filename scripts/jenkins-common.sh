@@ -57,11 +57,11 @@ echo "done setting up nodeenv"
 echo "node version is `node --version`"
 echo "npm version is `npm --version`"
 echo "PRIOR TO CACHE CLEAN"
-npm cache ls |wc -l
+npm cache verify
 echo "FORCE CLEAR NPM CACHE"
 npm cache clean --force
 echo "AFTER CACHE CLEAN"
-npm cache ls |wc -l
+npm cache verify
 
 # Log any paver or ansible command timing
 TIMESTAMP=$(date +%s)
