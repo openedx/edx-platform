@@ -149,6 +149,7 @@
         }
       } else if (mimetype === 'application/javascript') {
         if (kind === 'text') {
+            // xss-lint: disable=javascript-jquery-append,javascript-concat-html
             $head.append('<script>' + data + '</script>');
         } else if (kind === 'url') {
           $script(data, data);
