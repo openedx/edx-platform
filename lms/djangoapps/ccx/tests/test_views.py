@@ -283,6 +283,10 @@ class TestCCXProgressChanges(CcxTestCase, LoginEnrollmentTestCase):
 
 
 @attr(shard=7)
+@override_settings(
+    XBLOCK_FIELD_DATA_WRAPPERS=['lms.djangoapps.courseware.field_overrides:OverrideModulestoreFieldData.wrap'],
+    MODULESTORE_FIELD_OVERRIDE_PROVIDERS=['ccx.overrides.CustomCoursesForEdxOverrideProvider'],
+)
 @ddt.ddt
 class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
     """
@@ -393,6 +397,13 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         ccx = CustomCourseForEdX.objects.get()
         course_enrollments = get_override_for_ccx(ccx, self.course, 'max_student_enrollments_allowed')
         self.assertEqual(course_enrollments, settings.CCX_MAX_STUDENTS_ALLOWED)
+        # check if the course display name is properly set
+        course_display_name = get_override_for_ccx(ccx, self.course, 'display_name')
+        self.assertEqual(course_display_name, ccx_name)
+
+        # check if the course display name is properly set in modulestore
+        course_display_name = self.mstore.get_course(ccx.locator).display_name
+        self.assertEqual(course_display_name, ccx_name)
 
         # assert ccx creator has role=staff
         role = CourseStaffRole(course_key)
