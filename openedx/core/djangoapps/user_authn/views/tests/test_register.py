@@ -22,6 +22,7 @@ from openedx.core.djangoapps.user_authn.views.register import (
     REGISTRATION_AFFILIATE_ID, REGISTRATION_UTM_CREATED_AT, REGISTRATION_UTM_PARAMETERS,
     _skip_activation_email,
 )
+from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.user_api.accounts import (
@@ -87,7 +88,7 @@ def get_mock_pipeline_data(username=TEST_USERNAME, email=TEST_EMAIL):
         ]
     }
 )
-class TestCreateAccount(SiteMixin, TestCase):
+class TestCreateAccount(EmailTemplateTagMixin, SiteMixin, TestCase):
     """Tests for account creation"""
 
     def setUp(self):
