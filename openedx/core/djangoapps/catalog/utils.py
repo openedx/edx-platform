@@ -460,13 +460,15 @@ def get_fulfillable_course_runs_for_entitlement(entitlement, course_runs):
             course_id=course_id
         )
         is_enrolled_in_mode = is_active and (user_enrollment_mode == entitlement.mode)
-        if (course_run.get('status') == COURSE_PUBLISHED and
-                is_course_run_entitlement_fulfillable(course_id, entitlement, search_time)):
-            if (is_enrolled_in_mode and
-                    entitlement.enrollment_course_run and
-                    course_id == entitlement.enrollment_course_run.course_id):
-                enrollable_sessions.append(course_run)
-            elif not is_enrolled_in_mode:
+        if (is_enrolled_in_mode and
+                entitlement.enrollment_course_run and
+                course_id == entitlement.enrollment_course_run.course_id):
+            # User is enrolled in the course so we should include it in the list of enrollable sessions always
+            # this will ensure it is available for the UI
+            enrollable_sessions.append(course_run)
+        elif (course_run.get('status') == COURSE_PUBLISHED and not
+              is_enrolled_in_mode and
+              is_course_run_entitlement_fulfillable(course_id, entitlement, search_time)):
                 enrollable_sessions.append(course_run)
 
     enrollable_sessions.sort(key=lambda session: session.get('start'))
