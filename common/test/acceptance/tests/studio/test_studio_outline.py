@@ -5,7 +5,6 @@ Acceptance tests for studio related to the outline page.
 import itertools
 import json
 from datetime import datetime, timedelta
-from flaky import flaky
 from unittest import skip
 
 from pytz import UTC
@@ -563,7 +562,6 @@ class UnitAccessTest(CourseOutlineTest):
         unit.toggle_unit_access('Content Groups', [self.content_group_a_id])
         self.assertFalse(unit.has_restricted_warning)
 
-    @flaky(max_runs=15, min_passes=15)
     def test_units_can_be_restricted(self):
         """
         Visit the course outline page, restrict access to a unit.

@@ -1,8 +1,6 @@
 """
 Test the Studio help links.
 """
-
-from flaky import flaky
 from unittest import skip
 
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
@@ -344,7 +342,6 @@ class LibraryHelpTest(StudioLibraryTest):
         self.library_page = LibraryPage(self.browser, self.library_key)
         self.library_user_page = LibraryUsersPage(self.browser, self.library_key)
         
-    @flaky(max_runs=15, min_passes=15)
     def test_library_content_side_bar_help(self):
         """
         Scenario: Help link in sidebar links is working on
