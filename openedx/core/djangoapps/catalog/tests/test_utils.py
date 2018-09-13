@@ -481,10 +481,10 @@ class TestSessionEntitlement(CatalogIntegrationMixin, TestCase):
         """
         Test retrieval of visible session entitlements.
         """
-        catalog_course_runs = CourseRunFactory.create()
-        catalog_course = CourseFactory(course_runs=[catalog_course_runs])
+        catalog_course_run = CourseRunFactory.create()
+        catalog_course = CourseFactory(course_runs=[catalog_course_run])
         mock_get_edx_api_data.return_value = catalog_course
-        course_key = CourseKey.from_string(catalog_course_runs.get('key'))
+        course_key = CourseKey.from_string(catalog_course_run.get('key'))
         course_overview = CourseOverviewFactory.create(id=course_key, start=self.tomorrow)
         CourseModeFactory.create(mode_slug=CourseMode.VERIFIED, min_price=100, course_id=course_overview.id)
         course_enrollment = CourseEnrollmentFactory(
@@ -495,23 +495,72 @@ class TestSessionEntitlement(CatalogIntegrationMixin, TestCase):
         )
 
         session_entitlements = get_visible_sessions_for_entitlement(entitlement)
-        self.assertEqual(session_entitlements, [catalog_course_runs])
+        self.assertEqual(session_entitlements, [catalog_course_run])
 
-    def test_unpublished_sessions_for_entitlement(self, mock_get_edx_api_data):
+    def test_get_visible_sessions_for_entitlement_expired_mode(self, mock_get_edx_api_data):
         """
-        Test unpublished course runs are not part of visible session entitlements.
+        Test retrieval of visible session entitlements.
         """
-        catalog_course_runs = CourseRunFactory.create(status=COURSE_UNPUBLISHED)
-        catalog_course = CourseFactory(course_runs=[catalog_course_runs])
+        catalog_course_run = CourseRunFactory.create()
+        catalog_course = CourseFactory(course_runs=[catalog_course_run])
         mock_get_edx_api_data.return_value = catalog_course
-        course_key = CourseKey.from_string(catalog_course_runs.get('key'))
+        course_key = CourseKey.from_string(catalog_course_run.get('key'))
         course_overview = CourseOverviewFactory.create(id=course_key, start=self.tomorrow)
-        CourseModeFactory.create(mode_slug=CourseMode.VERIFIED, min_price=100, course_id=course_overview.id)
+        CourseModeFactory.create(
+            mode_slug=CourseMode.VERIFIED,
+            min_price=100,
+            course_id=course_overview.id,
+            expiration_datetime=now() - timedelta(days=1)
+        )
         course_enrollment = CourseEnrollmentFactory(
             user=self.user, course_id=unicode(course_overview.id), mode=CourseMode.VERIFIED
         )
         entitlement = CourseEntitlementFactory(
             user=self.user, enrollment_course_run=course_enrollment, mode=CourseMode.VERIFIED
+        )
+
+        session_entitlements = get_visible_sessions_for_entitlement(entitlement)
+        self.assertEqual(session_entitlements, [catalog_course_run])
+
+    def test_unpublished_sessions_for_entitlement_when_enrolled(self, mock_get_edx_api_data):
+        """
+        Test unpublished course runs are part of visible session entitlements when the user
+        is enrolled.
+        """
+        catalog_course_run = CourseRunFactory.create(status=COURSE_UNPUBLISHED)
+        catalog_course = CourseFactory(course_runs=[catalog_course_run])
+        mock_get_edx_api_data.return_value = catalog_course
+        course_key = CourseKey.from_string(catalog_course_run.get('key'))
+        course_overview = CourseOverviewFactory.create(id=course_key, start=self.tomorrow)
+        CourseModeFactory.create(
+            mode_slug=CourseMode.VERIFIED,
+            min_price=100,
+            course_id=course_overview.id,
+            expiration_datetime=now() - timedelta(days=1)
+        )
+        course_enrollment = CourseEnrollmentFactory(
+            user=self.user, course_id=unicode(course_overview.id), mode=CourseMode.VERIFIED
+        )
+        entitlement = CourseEntitlementFactory(
+            user=self.user, enrollment_course_run=course_enrollment, mode=CourseMode.VERIFIED
+        )
+
+        session_entitlements = get_visible_sessions_for_entitlement(entitlement)
+        self.assertEqual(session_entitlements, [catalog_course_run])
+
+    def test_unpublished_sessions_for_entitlement(self, mock_get_edx_api_data):
+        """
+        Test unpublished course runs are not part of visible session entitlements when the user
+        is not enrolled.
+        """
+        catalog_course_run = CourseRunFactory.create(status=COURSE_UNPUBLISHED)
+        catalog_course = CourseFactory(course_runs=[catalog_course_run])
+        mock_get_edx_api_data.return_value = catalog_course
+        course_key = CourseKey.from_string(catalog_course_run.get('key'))
+        course_overview = CourseOverviewFactory.create(id=course_key, start=self.tomorrow)
+        CourseModeFactory.create(mode_slug=CourseMode.VERIFIED, min_price=100, course_id=course_overview.id)
+        entitlement = CourseEntitlementFactory(
+            user=self.user, mode=CourseMode.VERIFIED
         )
 
         session_entitlements = get_visible_sessions_for_entitlement(entitlement)
