@@ -8,7 +8,7 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 
 from util.date_utils import DEFAULT_SHORT_DATE_FORMAT, strftime_localized
-from util.password_policy_validators import validate_password
+from util.password_policy_validators import edX_validate_password
 
 
 class NonCompliantPasswordException(Exception):
@@ -104,7 +104,7 @@ def _check_user_compliance(user, password):
     Returns a boolean indicating whether or not the user is compliant with password policy rules.
     """
     try:
-        validate_password(password, user=user, password_reset=False)
+        edX_validate_password(password, user=user)
         return True
     except Exception:  # pylint: disable=broad-except
         # If anything goes wrong, we should assume the password is not compliant but we don't necessarily
