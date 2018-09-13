@@ -149,13 +149,10 @@
         }
       } else if (mimetype === 'application/javascript') {
         if (kind === 'text') {
-          eval.call(window, data);
-          console.log("JavaScript text resource eval'd", resource);
+            // xss-lint: disable=javascript-jquery-append,javascript-concat-html
+            $head.append('<script>' + data + '</script>');
         } else if (kind === 'url') {
-          // This is a dependency loaded from the LMS (not ideal)
-          return ViewUtils.loadJavaScript(data).done(function() {
-              console.log('JavaScript url resource loaded', resource);
-          });
+          $script(data, data);
         }
       } else if (mimetype === 'text/html') {
         if (placement === 'head') {
