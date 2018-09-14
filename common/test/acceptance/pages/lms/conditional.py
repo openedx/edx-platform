@@ -2,6 +2,7 @@
 Conditional Pages
 """
 from bok_choy.page_object import PageObject
+from bok_choy.promise import EmptyPromise, BrokenPromise
 
 POLL_ANSWER = 'Yes, of course'
 
@@ -17,14 +18,34 @@ class ConditionalPage(PageObject):
         """
         Returns True if the browser is currently on the right page.
         """
-        return self.q(css='.conditional-wrapper').visible
+        # This is all a hack to work around the fact that there's no way to adjust the
+        # timeout parameters for self.q
+        def check_fn():
+            return self.q(css='.conditional-wrapper').visible
+        try:
+            EmptyPromise(
+                check_fn,
+                "On conditional page",
+            ).fulfill()
+            return True
+        except BrokenPromise:
+            return False
 
     def is_content_visible(self):
         """
         Returns True if the conditional's content has been revealed,
         False otherwise
         """
-        return self.q(css='.hidden-contents').visible
+        def check_fn():
+            return self.q(css='.hidden-contents').visible
+        try:
+            EmptyPromise(
+                check_fn,
+                "Conditional is visible",
+            ).fulfill()
+            return True
+        except BrokenPromise:
+            return False
 
     def fill_in_poll(self):
         """
