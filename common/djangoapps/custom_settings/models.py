@@ -25,10 +25,10 @@ class CustomSettings(models.Model):
         title, description, keywords, robots = "", "", "", ""
         if self.seo_tags:
             _json_tags = json.loads(self.seo_tags)
-            title = _json_tags.get("title", "")
-            description = _json_tags.get("description", "")
-            keywords = _json_tags.get("keywords", "")
-            robots = _json_tags.get("robots", "")
+            title = _json_tags.get("title", title)
+            description = _json_tags.get("description", description)
+            keywords = _json_tags.get("keywords", keywords)
+            robots = _json_tags.get("robots", robots)
 
         return {
             "title": title,
