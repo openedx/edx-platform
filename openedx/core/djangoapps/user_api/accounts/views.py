@@ -251,7 +251,7 @@ class AccountViewSet(ViewSet):
             If the update is successful, updated user account data is returned.
     """
     authentication_classes = (
-        OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser, JwtAuthentication
+        JwtAuthentication, OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser
     )
     permission_classes = (permissions.IsAuthenticated,)
     parser_classes = (MergePatchParser,)

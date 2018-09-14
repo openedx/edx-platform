@@ -500,10 +500,18 @@ class IntegrationTestMixin(testutil.TestCase, test.TestCase, HelperMixin):
 @django_utils.override_settings()  # For settings reversion on a method-by-method basis.
 class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
     """Abstract base class for provider integration tests."""
-
+    
     def setUp(self):
         super(IntegrationTest, self).setUp()
         self.request_factory = test.RequestFactory()
+
+    def set_logged_in_cookies(self, request):
+        """Simulate setting the marketing site cookie on the request. """
+        request.COOKIES[django_settings.EDXMKTG_LOGGED_IN_COOKIE_NAME] = 'true'
+        request.COOKIES[django_settings.EDXMKTG_USER_INFO_COOKIE_NAME] = json.dumps({
+            'version': django_settings.EDXMKTG_USER_INFO_COOKIE_VERSION,
+        })
+        request.COOKIES[django_settings.JWT_AUTH['JWT_AUTH_COOKIE']] = mock.MagicMock()
 
     # Actual tests, executed once per child.
 
