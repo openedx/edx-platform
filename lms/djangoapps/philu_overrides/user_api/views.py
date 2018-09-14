@@ -41,7 +41,7 @@ log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
 
 
-def _do_create_account_custom(form, custom_form=None):
+def _do_create_account_custom(form, custom_form=None, is_alquity_user=False):
     """
     Given cleaned post variables, create the User and UserProfile objects, as well as the
     registration for this user.
@@ -71,7 +71,7 @@ def _do_create_account_custom(form, custom_form=None):
     try:
         with transaction.atomic():
             user.save()
-            custom_model = custom_form.save(user=user, commit=True)
+            custom_model = custom_form.save(user=user, commit=True, is_alquity_user=is_alquity_user)
 
         # Fix: recall user.save to avoid transaction management related exception, if we call user.save under atomic block
         # (in custom_from.save )a random transaction exception generated
@@ -121,7 +121,7 @@ def _do_create_account_custom(form, custom_form=None):
     return (user, profile, registration)
 
 
-def create_account_with_params_custom(request, params):
+def create_account_with_params_custom(request, params, is_alquity_user):
     """
     Given a request and a dict of parameters (which may or may not have come
     from the request), create an account for the requesting user, including
@@ -220,7 +220,7 @@ def create_account_with_params_custom(request, params):
     # Perform operations within a transaction that are critical to account creation
     with transaction.atomic():
         # first, create the account
-        (user, profile, registration) = _do_create_account_custom(form, custom_form)
+        (user, profile, registration) = _do_create_account_custom(form, custom_form, is_alquity_user=is_alquity_user)
 
         # next, link the account with social auth, if provided via the API.
         # (If the user is using the normal register page, the social auth pipeline does the linking, not this code)
@@ -408,6 +408,7 @@ class RegistrationViewCustom(RegistrationView):
 
         email = data.get('email')
         username = data.get('username')
+        is_alquity_user = data.get('is_alquity_user') or False
 
         # Handle duplicate email/username
         conflicts = check_account_exists(email=email, username=username)
@@ -442,7 +443,7 @@ class RegistrationViewCustom(RegistrationView):
             data["terms_of_service"] = data["honor_code"]
 
         try:
-            user = create_account_with_params_custom(request, data)
+            user = create_account_with_params_custom(request, data, is_alquity_user)
         except ValidationError as err:
             # Should only get non-field errors from this function
             assert NON_FIELD_ERRORS not in err.message_dict

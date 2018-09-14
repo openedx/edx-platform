@@ -16,6 +16,7 @@ from provider.oauth2.models import (
 )
 
 import third_party_auth
+from lms.djangoapps.onboarding.helpers import  get_alquity_community_url
 from lms.djangoapps.verify_student.models import VerificationDeadline, SoftwareSecurePhotoVerification
 from course_modes.models import CourseMode
 
@@ -244,6 +245,10 @@ def get_next_url_for_login_page(request):
     specified.
     """
     redirect_to = request.GET.get('next', None)
+
+    if redirect_to == 'alquity':
+        return get_alquity_community_url()
+
 
     # if we get a redirect parameter, make sure it's safe. If it's not, drop the
     # parameter.
