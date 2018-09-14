@@ -22,6 +22,7 @@ class CustomSettings(models.Model):
         :return:
             get seo tags for course
         """
+        title, description, keywords, robots = "", "", "", ""
         if self.seo_tags:
             _json_tags = json.loads(self.seo_tags)
             title = _json_tags.get("title", "")
@@ -29,11 +30,9 @@ class CustomSettings(models.Model):
             keywords = _json_tags.get("keywords", "")
             robots = _json_tags.get("robots", "")
 
-            return {
-                "title": title,
-                "description": description,
-                "keywords": keywords,
-                "robots": robots
-            }
-        else:
-            return None
+        return {
+            "title": title,
+            "description": description,
+            "keywords": keywords,
+            "robots": robots
+        }
