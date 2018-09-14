@@ -130,6 +130,8 @@ def wrap_xblock(
     data['block-type'] = block.scope_ids.block_type
     data['usage-id'] = usage_id_serializer(block.scope_ids.usage_id)
     data['request-token'] = request_token
+    data['graded'] = getattr(block, 'graded', False)
+    data['has-score'] = getattr(block, 'has_score', False)
 
     if block.name:
         data['name'] = block.name
