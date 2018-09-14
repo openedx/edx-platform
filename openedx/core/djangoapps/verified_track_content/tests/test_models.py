@@ -228,27 +228,6 @@ class TestMoveToVerified(SharedModuleStoreTestCase):
         self._reenroll()
         self.assertIn(get_cohort(self.user, self.course.id, assign=False).name, ["Random 1", "Random 2"])
 
-    def test_unenrolled(self):
-        """
-        Test that un-enrolling and re-enrolling works correctly. This is important because usually
-        learners maintain their previously assigned cohort on re-enrollment.
-        """
-        # Enable verified track cohorting feature and enroll in the verified track
-        self._enable_cohorting()
-        self._create_verified_cohort()
-        self._enable_verified_track_cohorting()
-        self._enroll_in_course()
-        self._upgrade_enrollment()
-        self.assertEqual(DEFAULT_VERIFIED_COHORT_NAME, get_cohort(self.user, self.course.id, assign=False).name)
-
-        # Un-enroll from the course and then re-enroll
-        self._unenroll()
-        self.assertEqual(DEFAULT_VERIFIED_COHORT_NAME, get_cohort(self.user, self.course.id, assign=False).name)
-        self._reenroll()
-        self.assertEqual(DEFAULT_COHORT_NAME, get_cohort(self.user, self.course.id, assign=False).name)
-        self._upgrade_enrollment()
-        self.assertEqual(DEFAULT_VERIFIED_COHORT_NAME, get_cohort(self.user, self.course.id, assign=False).name)
-
     def test_custom_verified_cohort_name(self):
         """
         Test that enrolling in verified works correctly when the "verified cohort" has a custom name.
@@ -260,33 +239,3 @@ class TestMoveToVerified(SharedModuleStoreTestCase):
         self._enroll_in_course()
         self._upgrade_enrollment()
         self.assertEqual(custom_cohort_name, get_cohort(self.user, self.course.id, assign=False).name)
-
-    def test_custom_default_cohort_name(self):
-        """
-        Test that enrolling and un-enrolling works correctly when the single cohort
-        of type random has a different name from "Default Group".
-        """
-        random_cohort_name = "custom random cohort"
-        self._enable_cohorting()
-        self._create_verified_cohort()
-        default_cohort = self._create_named_random_cohort(random_cohort_name)
-        self._enable_verified_track_cohorting()
-        self._enroll_in_course()
-        self.assertEqual(random_cohort_name, get_cohort(self.user, self.course.id, assign=False).name)
-        self._upgrade_enrollment()
-        self.assertEqual(DEFAULT_VERIFIED_COHORT_NAME, get_cohort(self.user, self.course.id, assign=False).name)
-
-        # Un-enroll from the course. The learner stays in the verified cohort, but is no longer active.
-        self._unenroll()
-        self.assertEqual(DEFAULT_VERIFIED_COHORT_NAME, get_cohort(self.user, self.course.id, assign=False).name)
-
-        # Change the name of the "default" cohort.
-        modified_cohort_name = "renamed random cohort"
-        default_cohort.name = modified_cohort_name
-        default_cohort.save()
-
-        # Re-enroll in the course, which will downgrade the learner to audit.
-        self._reenroll()
-        self.assertEqual(modified_cohort_name, get_cohort(self.user, self.course.id, assign=False).name)
-        self._upgrade_enrollment()
-        self.assertEqual(DEFAULT_VERIFIED_COHORT_NAME, get_cohort(self.user, self.course.id, assign=False).name)

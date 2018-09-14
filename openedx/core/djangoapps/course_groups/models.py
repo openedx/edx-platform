@@ -90,8 +90,8 @@ class CohortMembership(models.Model):
     @classmethod
     def assign(cls, cohort, user):
         """
-        Assign user to cohort, switching them to this cohort if they had previously been assigned to another
-        cohort
+        Assigns user to cohort, switching them to this cohort if they had previously been assigned to another
+        cohort.
         Returns CohortMembership, previous_cohort (if any)
         """
         with transaction.atomic():

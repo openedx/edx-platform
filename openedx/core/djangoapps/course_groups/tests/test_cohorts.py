@@ -716,6 +716,28 @@ class TestCohorts(ModuleStoreTestCase):
         # Note that the following get() will fail with MultipleObjectsReturned if race condition is not handled.
         self.assertEqual(first_cohort.users.get(), course_user)
 
+    def test_unenroll_removes_cohort_membership(self):
+        """
+        Test that unenrollment removes learners from their cohort.
+        """
+        course_user = UserFactory(username="Username", email="a@b.com")
+        UserFactory(username="RandomUsername", email="b@b.com")
+        course = modulestore().get_course(self.toy_course_key)
+        enrollment = CourseEnrollment.enroll(course_user, self.toy_course_key)
+        first_cohort = CohortFactory(course_id=course.id, name="FirstCohort")
+
+        # Success cases
+        # We shouldn't get back a previous cohort, since the user wasn't in one
+        self.assertEqual(
+            cohorts.add_user_to_cohort(first_cohort, "Username"),
+            (course_user, None, False)
+        )
+        found_cohort = cohorts.get_cohort(course_user, enrollment.course_id, assign=False, use_cached=True)
+        self.assertEqual(found_cohort, first_cohort)
+        enrollment.update_enrollment(is_active=False, skip_refund=True)
+        found_cohort = cohorts.get_cohort(course_user, enrollment.course_id, assign=False, use_cached=True)
+        self.assertEqual(found_cohort, None)
+
     def test_set_cohorted_with_invalid_data_type(self):
         """
         Test that cohorts.set_course_cohorted raises exception if argument is not a boolean.

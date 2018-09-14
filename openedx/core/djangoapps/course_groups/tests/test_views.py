@@ -376,7 +376,7 @@ class CohortHandlerTestCase(CohortViewsTestCase):
             }
         )
 
-    ############### Tests of adding a new cohort ###############
+    # Tests of adding a new cohort ###############
 
     def verify_contains_added_cohort(
             self, response_dict, cohort_name, assignment_type=CourseCohort.MANUAL,
@@ -459,7 +459,7 @@ class CohortHandlerTestCase(CohortViewsTestCase):
             "If group_id is specified, user_partition_id must also be specified.", response_dict.get("error")
         )
 
-    ############### Tests of updating an existing cohort ###############
+    # Tests of updating an existing cohort ###############
 
     def test_update_manual_cohort_name(self):
         """

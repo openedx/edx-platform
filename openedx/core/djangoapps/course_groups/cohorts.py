@@ -10,7 +10,7 @@ from courseware import courses
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-from django.db import IntegrityError, transaction
+from django.db import IntegrityError
 from django.db.models.signals import m2m_changed, post_save
 from django.dispatch import receiver
 from django.http import Http404
@@ -19,6 +19,7 @@ from eventtracking import tracker
 from edx_django_utils.cache import RequestCache
 from openedx.core.lib.cache_utils import request_cached
 from student.models import get_user_by_username_or_email
+from student.signals import UNENROLL_DONE
 
 from .models import (
     CohortMembership,
@@ -31,6 +32,29 @@ from .models import (
 from .signals.signals import COHORT_MEMBERSHIP_UPDATED
 
 log = logging.getLogger(__name__)
+
+
+@receiver(UNENROLL_DONE)
+def remove_cohort_on_unenroll(
+        sender,
+        course_enrollment=None,
+        skip_refund=False,
+        **kwargs):  # pylint: disable=unused-argument
+    """
+    When the learner unenrolls, remove them from their cohort.
+    """
+    user = course_enrollment.user
+    course_key = course_enrollment.course_id
+    try:
+        membership = CohortMembership.objects.get(
+            course_id=course_key,
+            user_id=user.id,
+        )
+        cohort = membership.course_user_group
+    except CohortMembership.DoesNotExist:
+        return
+    else:
+        remove_user_from_cohort(cohort, user.username)
 
 
 @receiver(post_save, sender=CourseUserGroup)
@@ -420,11 +444,14 @@ def remove_user_from_cohort(cohort, username_or_email):
 
     try:
         membership = CohortMembership.objects.get(course_user_group=cohort, user=user)
-        course_key = membership.course_id
-        membership.delete()
-        COHORT_MEMBERSHIP_UPDATED.send(sender=None, user=user, course_key=course_key)
     except CohortMembership.DoesNotExist:
         raise ValueError("User {} was not present in cohort {}".format(username_or_email, cohort))
+    else:
+        course_key = membership.course_id
+        membership.delete()
+        cache = RequestCache(COHORT_CACHE_NAMESPACE)
+        cache.delete(_cohort_cache_key(user.id, membership.course_id))
+        COHORT_MEMBERSHIP_UPDATED.send(sender=None, user=user, course_key=course_key)
 
 
 def add_user_to_cohort(cohort, username_or_email_or_user):
