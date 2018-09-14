@@ -188,7 +188,7 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest, PartitionTestCase):
                         self.assertEqual(source_course.url_name, 'course')
 
                         export_dir_path = path(self.export_dir)
-                        policy_dir = export_dir_path / 'exported_source_course' / 'policies' / source_course.url_name
+                        policy_dir = export_dir_path / 'exported_source_course' / 'policies' / source_course_key.run
                         policy_path = policy_dir / 'policy.json'
                         self.assertTrue(os.path.exists(policy_path))
 
