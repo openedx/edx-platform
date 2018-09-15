@@ -49,7 +49,7 @@ def course_custom_settings(request, course_key_string):
                         'is_featured': settings.is_featured,
                         'show_grades': settings.show_grades,
                         'tags': settings.tags,
-                        'seo_tags': json.loads(settings.seo_tags)
+                        'seo_tags': "" if not settings.seo_tags else json.loads(settings.seo_tags),
                     },
                 'custom_settings_url': reverse('custom_settings', kwargs={'course_key_string': unicode(course_key)}),
             })
@@ -59,7 +59,7 @@ def course_custom_settings(request, course_key_string):
             settings.is_featured = body.get('is_featured') if isinstance(body.get('is_featured'), bool) else False
             settings.show_grades = body.get('show_grades') if isinstance(body.get('show_grades'), bool) else False
             settings.tags = body.get('tags')
-            settings.seo_tags = json.dumps(body.get('seo_tags'))
+            settings.seo_tags = None if body.get('seo_tags') == "" else json.dumps(body.get('seo_tags'))
             settings.save()
             return JsonResponse(body)
 
