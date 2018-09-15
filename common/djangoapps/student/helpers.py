@@ -231,6 +231,7 @@ def auth_pipeline_urls(auth_entry, redirect_url=None):
 # things like auto-enrollment.
 POST_AUTH_PARAMS = ('course_id', 'enrollment_action', 'course_mode', 'email_opt_in', 'purchase_workflow')
 
+# TODO: Move this helper to philu_overrides, Just keep edX code here
 
 def get_next_url_for_login_page(request):
     """
@@ -246,7 +247,10 @@ def get_next_url_for_login_page(request):
     """
     redirect_to = request.GET.get('next', None)
 
-    if redirect_to == 'alquity':
+    if redirect_to == 'alquity' and request.path == '/register':
+        return reverse('dashboard')
+
+    if redirect_to == 'alquity' and request.path == '/login':
         return get_alquity_community_url()
 
 
