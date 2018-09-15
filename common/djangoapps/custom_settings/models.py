@@ -11,6 +11,7 @@ class CustomSettings(models.Model):
     is_featured = models.BooleanField(default=False)
     show_grades = models.BooleanField(default=True)
     enable_enrollment_email = models.BooleanField(default=True)
+    auto_enroll = models.BooleanField(default=False)
     tags = models.CharField(max_length=255, null=True, blank=True)
 
     def __unicode__(self):
