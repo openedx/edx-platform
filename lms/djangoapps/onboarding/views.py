@@ -241,7 +241,7 @@ def organization(request):
             else:
                 #update nodebb for user profile completion
                 update_nodebb_for_user_status(request.user.username)
-                if (user_extended_profile.is_alquity_user):
+                if user_extended_profile.is_alquity_user:
                     next_page_url = get_alquity_community_url()
 
             if redirect_to_next:
@@ -344,7 +344,7 @@ def org_detail_survey(request):
 
             if are_forms_complete and redirect_to_next:
                 update_nodebb_for_user_status(request.user.username)
-                if (user_extended_profile.is_alquity_user):
+                if user_extended_profile.is_alquity_user:
                     next_page_url = get_alquity_community_url()
 
                 return redirect(next_page_url)
