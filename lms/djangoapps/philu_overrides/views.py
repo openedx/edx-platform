@@ -656,6 +656,4 @@ def course_auto_enroll(request, course_id):
     if course_custom_settings.auto_enroll:
         CourseEnrollment.enroll(request.user, course_key)
 
-        return redirect('/courses/{}/courseware'.format(course_id))
-
     return redirect('/courses/{}/about'.format(course_id))
