@@ -653,7 +653,9 @@ def course_auto_enroll(request, course_id):
     if request.user.is_anonymous():
         raise Http404
 
-    if course_custom_settings.auto_enroll:
+    user = User.objects.get(username=request.user.username)
+
+    if course_custom_settings.auto_enroll and user.extended_profile.is_alquity_user:
         CourseEnrollment.enroll(request.user, course_key)
 
         return redirect('/courses/{}/courseware'.format(course_id))
