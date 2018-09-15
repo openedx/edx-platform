@@ -1,3 +1,4 @@
+""" Tests for auto auth. """
 import json
 
 import ddt
@@ -20,7 +21,7 @@ class AutoAuthTestCase(UrlResetMixin, TestCase):
     """
     Base class for AutoAuth Tests that properly resets the urls.py
     """
-    URLCONF_MODULES = ['student.urls']
+    URLCONF_MODULES = ['openedx.core.djangoapps.user_authn.urls_common', 'openedx.core.djangoapps.user_authn.urls']
 
 
 @ddt.ddt
@@ -208,7 +209,7 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase):
         else:
             url_pattern = '/course/{}'.format(unicode(course_key))
 
-        self.assertTrue(response.url.endswith(url_pattern))  # pylint: disable=no-member
+        self.assertTrue(response.url.endswith(url_pattern))
 
     def test_redirect_to_main(self):
         # Create user and redirect to 'home' (cms) or 'dashboard' (lms)
@@ -224,7 +225,7 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase):
         else:
             url_pattern = '/home'
 
-        self.assertTrue(response.url.endswith(url_pattern))  # pylint: disable=no-member
+        self.assertTrue(response.url.endswith(url_pattern))
 
     def test_redirect_to_specified(self):
         # Create user and redirect to specified url
@@ -235,7 +236,7 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase):
             'staff': 'true',
         }, status_code=302)
 
-        self.assertTrue(response.url.endswith(url_pattern))  # pylint: disable=no-member
+        self.assertTrue(response.url.endswith(url_pattern))
 
     def _auto_auth(self, params=None, status_code=200, **kwargs):
         """
@@ -257,8 +258,8 @@ class AutoAuthEnabledTestCase(AutoAuthTestCase):
 
         # Check that session and CSRF are set in the response
         for cookie in ['csrftoken', 'sessionid']:
-            self.assertIn(cookie, response.cookies)  # pylint: disable=maybe-no-member
-            self.assertTrue(response.cookies[cookie].value)  # pylint: disable=maybe-no-member
+            self.assertIn(cookie, response.cookies)
+            self.assertTrue(response.cookies[cookie].value)
 
         return response
 

@@ -196,7 +196,7 @@ class ActivationEmailTests(CacheIsolationTestCase):
                 )
 
 
-@patch('student.views.login.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
+@patch('student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
 @patch('django.contrib.auth.models.User.email_user')
 class ReactivationEmailTests(EmailTestMixin, CacheIsolationTestCase):
     """

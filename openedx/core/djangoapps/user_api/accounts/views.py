@@ -33,6 +33,7 @@ from wiki.models import ArticleRevision
 from wiki.models.pluginbase import RevisionPluginRevision
 
 from entitlements.models import CourseEntitlement
+from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
 from openedx.core.djangoapps.credit.models import CreditRequirementStatus, CreditRequest
@@ -51,6 +52,7 @@ from student.models import (
     PasswordHistory,
     PendingNameChange,
     CourseEnrollmentAllowed,
+    LoginFailures,
     PendingEmailChange,
     Registration,
     User,
@@ -60,8 +62,6 @@ from student.models import (
     get_retired_username_by_username,
     is_username_retired
 )
-from student.views.login import AuthFailedError, LoginFailures
-
 from ..errors import AccountUpdateError, AccountValidationError, UserNotAuthorized, UserNotFound
 from ..models import (
     RetirementState,

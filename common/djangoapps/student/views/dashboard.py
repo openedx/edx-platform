@@ -44,7 +44,7 @@ from openedx.features.enterprise_support.api import get_dashboard_consent_notifi
 from openedx.features.journals.api import journals_enabled
 from shoppingcart.api import order_history
 from shoppingcart.models import CourseRegistrationCode, DonationConfiguration
-from student.cookies import set_user_info_cookie
+from openedx.core.djangoapps.user_authn.cookies import set_user_info_cookie
 from student.helpers import cert_info, check_verify_status_by_course
 from student.models import (
     CourseEnrollment,

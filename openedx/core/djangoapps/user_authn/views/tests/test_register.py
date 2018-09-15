@@ -17,6 +17,11 @@ from django.test.utils import override_settings
 
 from django_comment_common.models import ForumsConfig
 from notification_prefs import NOTIFICATION_PREF_KEY
+from openedx.core.djangoapps.user_authn.views.deprecated import create_account
+from openedx.core.djangoapps.user_authn.views.register import (
+    REGISTRATION_AFFILIATE_ID, REGISTRATION_UTM_CREATED_AT, REGISTRATION_UTM_PARAMETERS,
+    _skip_activation_email,
+)
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
@@ -26,8 +31,6 @@ from openedx.core.djangoapps.user_api.accounts import (
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, waffle
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from student.models import UserAttribute
-from student.views import REGISTRATION_AFFILIATE_ID, REGISTRATION_UTM_CREATED_AT, REGISTRATION_UTM_PARAMETERS, \
-    create_account, skip_activation_email
 from student.tests.factories import UserFactory
 from third_party_auth.tests import factories as third_party_auth_factory
 
@@ -160,8 +163,8 @@ class TestCreateAccount(SiteMixin, TestCase):
         "Microsites not implemented in this environment"
     )
     @override_settings(LMS_SEGMENT_KEY="testkey")
-    @mock.patch('student.views.analytics.track')
-    @mock.patch('student.views.analytics.identify')
+    @mock.patch('openedx.core.djangoapps.user_authn.views.register.analytics.track')
+    @mock.patch('openedx.core.djangoapps.user_authn.views.register.analytics.identify')
     def test_segment_tracking(self, mock_segment_identify, _):
         year = datetime.now().year
         year_of_birth = year - 14
@@ -541,7 +544,7 @@ class TestCreateAccount(SiteMixin, TestCase):
         user = UserFactory(username=TEST_USERNAME, email=TEST_EMAIL)
 
         with override_settings(FEATURES=dict(settings.FEATURES, **feature_overrides)):
-            result = skip_activation_email(
+            result = _skip_activation_email(
                 user=user,
                 do_external_auth=do_external_auth,
                 running_pipeline=running_pipeline,
@@ -826,6 +829,7 @@ class TestCreateAccountValidation(TestCase):
 @mock.patch("lms.lib.comment_client.User.base_url", TEST_CS_URL)
 @mock.patch("lms.lib.comment_client.utils.requests.request", return_value=mock.Mock(status_code=200, text='{}'))
 class TestCreateCommentsServiceUser(TransactionTestCase):
+    """ Tests for creating comments service user. """
 
     def setUp(self):
         super(TestCreateCommentsServiceUser, self).setUp()
@@ -859,7 +863,7 @@ class TestCreateCommentsServiceUser(TransactionTestCase):
         "If user account creation fails, we should not create a comments service user"
         try:
             self.client.post(self.url, self.params)
-        except:
+        except:  # pylint: disable=bare-except
             pass
         with self.assertRaises(User.DoesNotExist):
             User.objects.get(username=self.username)

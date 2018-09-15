@@ -10,7 +10,7 @@ from six import text_type
 from student.forms import AccountCreationForm
 from student.helpers import do_create_account
 from student.models import CourseEnrollment, create_comments_service_user
-from student.views import AccountValidationError
+from student.helpers import AccountValidationError
 from track.management.tracked_command import TrackedCommand
 
 
