@@ -248,6 +248,8 @@ def get_next_url_for_login_page(request):
     redirect_to = request.GET.get('next', None)
 
     if redirect_to == 'alquity' and request.path == '/register':
+        if request.user.is_authenticated():
+            return get_alquity_community_url()
         return reverse('dashboard')
 
     if redirect_to == 'alquity' and request.path == '/login':
