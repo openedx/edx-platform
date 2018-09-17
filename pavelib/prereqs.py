@@ -156,7 +156,8 @@ def node_prereqs_installation():
     # evinces itself as `cb_error_text` and it ought to disappear when we upgrade
     # npm to 3 or higher. TODO: clean this up when we do that.
     try:
-        _run_npm_command(npm_command, npm_log_file)
+        # _run_npm_command(npm_command, npm_log_file)
+        sh('npm install')
     except TimeoutException:
         print "NPM installation took too long. Exiting..."
         print "Check {} for more information".format(npm_log_file_path)
@@ -164,7 +165,8 @@ def node_prereqs_installation():
     except BuildFailure, error_text:
         if cb_error_text in error_text:
             print "npm install error detected. Retrying..."
-            _run_npm_command(npm_command, npm_log_file)
+            # _run_npm_command(npm_command, npm_log_file)
+            sh('npm install')
         else:
             raise BuildFailure(error_text)
     print "Successfully installed NPM packages. Log found at {}".format(
