@@ -6,14 +6,12 @@ from __future__ import unicode_literals
 from datetime import datetime
 
 from django.contrib.auth import authenticate, get_user_model
-from django.contrib.auth.backends import AllowAllUsersModelBackend as UserModelBackend
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from oauth2_provider.models import AccessToken
 from oauth2_provider.oauth2_validators import OAuth2Validator
 from oauth2_provider.scopes import get_scopes_backend
 from pytz import utc
-from ratelimitbackend.backends import RateLimitMixin
 
 from ..models import RestrictedApplication
 
@@ -25,19 +23,6 @@ def on_access_token_presave(sender, instance, *args, **kwargs):  # pylint: disab
     """
     if RestrictedApplication.should_expire_access_token(instance.application):
         instance.expires = datetime(1970, 1, 1, tzinfo=utc)
-
-
-class EdxRateLimitedAllowAllUsersModelBackend(RateLimitMixin, UserModelBackend):
-    """
-    Authentication backend needed to incorporate rate limiting of login attempts - but also
-    enabling users with is_active of False in the Django auth_user model to still authenticate.
-    This is necessary for mobile users using 3rd party auth who have not activated their accounts,
-    Inactive users who use 1st party auth (username/password auth) will still fail login attempts,
-    just at a higher layer, in the login_user view.
-
-    See: https://openedx.atlassian.net/browse/TNL-4516
-    """
-    pass
 
 
 class EdxOAuth2Validator(OAuth2Validator):
