@@ -5,6 +5,7 @@ from django.contrib import admin
 from django.contrib.admin.sites import NotRegistered
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.forms import ReadOnlyPasswordHashField, UserChangeForm as BaseUserChangeForm
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from opaque_keys import InvalidKeyError
@@ -240,9 +241,24 @@ class UserProfileInline(admin.StackedInline):
     verbose_name_plural = _('User profile')
 
 
+class UserChangeForm(BaseUserChangeForm):
+    """
+    Override the default UserChangeForm such that the password field
+    does not contain a link to a 'change password' form.
+    """
+    password = ReadOnlyPasswordHashField(
+        label=_("Password"),
+        help_text=_(
+            "Raw passwords are not stored, so there is no way to see this "
+            "user's password."
+        ),
+    )
+
+
 class UserAdmin(BaseUserAdmin):
     """ Admin interface for the User model. """
     inlines = (UserProfileInline,)
+    form = UserChangeForm
 
     def get_readonly_fields(self, request, obj=None):
         """
