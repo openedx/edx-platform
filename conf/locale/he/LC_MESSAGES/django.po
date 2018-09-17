@@ -85,7 +85,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-07-30 04:58+0000\n"
+"POT-Creation-Date: 2018-09-17 08:03+0000\n"
 "PO-Revision-Date: 2018-07-23 07:15+0000\n"
 "Last-Translator: Muhammad Ayub khan <ayubkhan@edx.org>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
@@ -238,7 +238,7 @@ msgstr "ממתין לאימות מזהה"
 msgid "You're enrolled as a verified student"
 msgstr "הינך רשום כסטודנט מאומת"
 
-#: common/djangoapps/course_modes/helpers.py
+#: common/djangoapps/course_modes/helpers.py lms/envs/common.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Verified"
 msgstr "מאומת"
@@ -316,7 +316,7 @@ msgid ""
 msgstr ""
 "זוהי ה-SKU (יחידת אחזקת מלאי) של מצב זה בשירות המסחר האלקטרוני החיצוני."
 
-#: common/djangoapps/course_modes/models.py
+#: common/djangoapps/course_modes/models.py lms/envs/common.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Honor"
 msgstr "קוד אתי"
@@ -492,7 +492,7 @@ msgstr "נראה ש-{email} שייך לחשבון קיים. נסה שוב עם �
 #: common/djangoapps/student/helpers.py
 #, python-brace-format
 msgid "An account with the Public Username '{username}' already exists."
-msgstr "חשבון עם שם משתמש הציבורי '{username}' קיים כבר."
+msgstr "חשבון עם שם משתמש '{username}' קיים כבר."
 
 #: common/djangoapps/student/helpers.py
 #, python-brace-format
@@ -792,102 +792,13 @@ msgstr "הקורס שאתה מחפש לא מתחיל עד {date}."
 msgid "The course you are looking for is closed for enrollment as of {date}."
 msgstr "הקורס שאתה מחפש סגור להרשמה החל מ-{date}."
 
-#: common/djangoapps/student/views/login.py
-#, python-brace-format
-msgid ""
-"You've successfully logged into your {provider_name} account, but this "
-"account isn't linked with an {platform_name} account yet."
-msgstr ""
-"התחברת בהצלחה לחשבונך {provider_name} , אך חשבון זה עדיין אינו מקושר עם "
-"חשבון {platform_name}. "
-
-#: common/djangoapps/student/views/login.py
-#, python-brace-format
-msgid ""
-"Use your {platform_name} username and password to log into {platform_name} "
-"below, and then link your {platform_name} account with {provider_name} from "
-"your dashboard."
-msgstr ""
-"השתמש בשם המשתמש והסיסמה של {platform_name}  על מנת להתחבר ל{platform_name} "
-"להלן. לאחר מכן, קשר את חשבון {platform_name} עם {provider_name} בלוח הבקרה."
-"  "
-
-#: common/djangoapps/student/views/login.py
-#, python-brace-format
-msgid ""
-"If you don't have an {platform_name} account yet, click "
-"<strong>Register</strong> at the top of the page."
-msgstr ""
-"אם אין לך עדיין חשבון {platform_name}לחץ על <strong>הירשם</strong> בחלק "
-"העליון של העמוד."
-
-#: common/djangoapps/student/views/login.py
-msgid "There was an error receiving your login information. Please email us."
-msgstr ""
-"אירעה שגיאה בזמן קבלת מידע התחברות. אנא צרו איתנו קשר באמצעות דואר אלקטרוני."
-
-#: common/djangoapps/student/views/login.py
-#: openedx/core/djangoapps/user_api/accounts/views.py
-msgid ""
-"This account has been temporarily locked due to excessive login failures. "
-"Try again later."
-msgstr "חשבון זה ננעל כתוצאה ממספר רב של נסיונות התחברות. אנא נסה מאוחר יותר."
-
-#: common/djangoapps/student/views/login.py
-msgid ""
-"Your password has expired due to password policy on this account. You must "
-"reset your password before you can log in again. Please click the \"Forgot "
-"Password\" link on this page to reset your password before logging in again."
-msgstr ""
-"בשל מדיניות ניהול סיסמאות בחשבון זה, תוקף סיסמתך פג. עליך לאפס את סיסמתך "
-"בטרם תוכל להתחבר שוב. נא לחץ על קישור  \"שכחתי סיסמה\"  בעמוד זה על מנת לאפס"
-" את סיסמתך בטרם תתחבר שוב למערכת."
-
-#: common/djangoapps/student/views/login.py
-#, python-brace-format
-msgid ""
-"In order to sign in, you need to activate your account.<br /><br />We just "
-"sent an activation link to <strong>{email}</strong>.  If you do not receive "
-"an email, check your spam folders or <a href=\"{support_url}\">contact "
-"{platform} Support</a>."
-msgstr ""
-"בכדי להתחבר, את/ה צריכ/ה להפעיל את החשבון שלך. <br /><br />כרגע שלחנו קישור "
-"להפעלה ל<strong>{email}</strong>. אם אינך קיבלת את הדוא\"ל, בדק/י את תיקיית "
-"דואר הזבל או <a href=\"{support_url}\">צור/י קשר עם התמיכה של "
-"{platform}</a>. "
-
-#: common/djangoapps/student/views/login.py
-msgid "Too many failed login attempts. Try again later."
-msgstr "מספר נסיונות חיבור רב מדי. אנא נסה מאוחר יותר."
-
-#: common/djangoapps/student/views/login.py
-#: openedx/core/djangoapps/user_api/accounts/views.py
-#: lms/templates/provider_login.html
-msgid "Email or password is incorrect."
-msgstr "דואר אלקטרוני או סיסמה שגויים."
-
-#: common/djangoapps/student/views/login.py
+#: common/djangoapps/student/views/management.py
 msgid "No inactive user with this e-mail exists"
 msgstr "לא קיים משתמש לא-פעיל עבור כתובת דואר אלקטרוני זו"
 
-#: common/djangoapps/student/views/login.py
+#: common/djangoapps/student/views/management.py
 msgid "Unable to send reactivation email"
 msgstr "אין אפשרות לשלוח דואר אלקטרוני הפעלה"
-
-#: common/djangoapps/student/views/login.py
-msgid "Superuser creation not allowed"
-msgstr ""
-
-#: common/djangoapps/student/views/login.py
-msgid "Account modification not allowed."
-msgstr ""
-
-#: common/djangoapps/student/views/login.py
-#: common/djangoapps/student/views/management.py
-#: openedx/core/djangoapps/user_api/accounts/api.py
-#: openedx/core/djangoapps/user_api/views.py
-msgid "Account creation not allowed."
-msgstr "לא ניתן ליצור חשבון."
 
 #: common/djangoapps/student/views/management.py
 msgid "Course id not specified"
@@ -943,23 +854,6 @@ msgstr "מצב חשבון לא צפוי"
 
 #: common/djangoapps/student/views/management.py
 #, python-brace-format
-msgid "Registration using {provider} has timed out."
-msgstr "תם פרק הזמן להרשמה באמצעות {provider}."
-
-#: common/djangoapps/student/views/management.py
-msgid "An access_token is required when passing value ({}) for provider."
-msgstr "דרוש access_token כאשר עוברים את ערך ({}) עבור ספק. "
-
-#: common/djangoapps/student/views/management.py
-msgid "The provided access_token is already associated with another user."
-msgstr "ה-access_token שסופק, מקושר כבר עם משתמש אחר."
-
-#: common/djangoapps/student/views/management.py
-msgid "The provided access_token is not valid."
-msgstr "ה-access_token  שסופק אינו חוקי."
-
-#: common/djangoapps/student/views/management.py
-#, python-brace-format
 msgid ""
 "{html_start}Your account could not be activated{html_end}Something went "
 "wrong, please <a href=\"{support_url}\">contact support</a> to resolve this "
@@ -987,6 +881,14 @@ msgid ""
 msgstr ""
 "{html_start}הצלחה! הפעלת את החשבון שלך.{html_end} את/ה תקבל/י מאיתנו עדכונים"
 " והתראות הקשורים לקורסים שאת/ה רשומ/ה אליהם. להמשך התחבר/י."
+
+#: common/djangoapps/student/views/management.py
+msgid "Some error occured during password change. Please try again"
+msgstr ""
+
+#: common/djangoapps/student/views/management.py
+msgid "No email address provided."
+msgstr "לא סופקה כתובת דואר אלקטרוני."
 
 #: common/djangoapps/student/views/management.py
 msgid "Password reset unsuccessful"
@@ -2416,9 +2318,10 @@ msgstr ""
 " בו שימוש לרעה. כדי להשיג מפתח עבור הקורס שלך או כדי לדווח על בעיה, צור קשר "
 "עם moocsupport@mathworks.com"
 
-#: common/lib/xmodule/xmodule/capa_base.py cms/templates/index.html
-#: lms/templates/help_modal.html lms/templates/manage_user_standing.html
-#: lms/templates/register-shib.html
+#: common/lib/xmodule/xmodule/capa_base.py
+#: lms/templates/admin/user_api/accounts/cancel_retirement_action.html
+#: cms/templates/index.html lms/templates/help_modal.html
+#: lms/templates/manage_user_standing.html lms/templates/register-shib.html
 #: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 #: lms/templates/peer_grading/peer_grading_problem.html
@@ -2847,22 +2750,22 @@ msgstr "מיפוי נושאי דיון"
 msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
-"example, one discussion category may be \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each "
-"category must be unique. In \"id\" values, the only special characters that "
-"are supported are underscore, hyphen, and period. You can also specify a "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each category "
+"must be unique. In \"id\" values, the only special characters that are "
+"supported are underscore, hyphen, and period. You can also specify a "
 "category as the default for new posts in the Discussion page by setting its "
-"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 msgstr ""
-"הכנס/י קטגוריות דיון בתבנית הבאה:  \"שם הקטגוריה\": {\"id\": "
-"\"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. לדוגמא אחת קטגוריות "
-"דיון יכולה להיות \"Lydian Mode\": {\"id\": \"i4x-UniversityX-"
-"MUS101-course-2015_T1\"}. ערך ה \"id\" עבור כל קטגוריה חייב להיות יחודי. "
-"בערך ה \"id\", התווים היחודים  שניתן להשתמש בהם הם קו תחתון, מקף ונקודה. "
-"ניתן גם לציין קטגוריה כברירת מחדל עבור הודעות חדשות בדף הדיון על ידי הגדרת "
-"התכונה \"ברירת מחדל\" לאמת. לדוגמה,  \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"הכנס/י קטגוריות דיון בתבנית הבאה:  \"שם הקטגוריה\": {\"id\": \"i4x-"
+"InstitutionName-CourseNumber-course-CourseRun\"}. לדוגמא אחת קטגוריות דיון "
+"יכולה להיות \"Lydian Mode\": {\"id\": \"i4x-UniversityX-MUS101-course-"
+"2015_T1\"}. ערך ה \"id\" עבור כל קטגוריה חייב להיות יחודי. בערך ה \"id\", "
+"התווים היחודים  שניתן להשתמש בהם הם קו תחתון, מקף ונקודה. ניתן גם לציין "
+"קטגוריה כברירת מחדל עבור הודעות חדשות בדף הדיון על ידי הגדרת התכונה \"ברירת "
+"מחדל\" לאמת. לדוגמה,  \"Lydian Mode\": {\"id\": \"i4x-UniversityX-MUS101"
+"-course-2015_T1\", \"default\": true}."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Discussion Sorting Alphabetical"
@@ -3605,6 +3508,20 @@ msgstr ""
 msgid ""
 "Enter true or false. If true, any highlights associated with content in the "
 "course will be messaged to learners at their scheduled time."
+msgstr ""
+
+#: cms/templates/certificates.html cms/templates/group_configurations.html
+#: cms/templates/settings.html cms/templates/settings_advanced.html
+#: cms/templates/settings_graders.html
+msgid "Other Course Settings"
+msgstr "הגדרות קורס נוספות"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Any additional information about the course that the platform needs or that "
+"allows integration with external systems such as CRM software. Enter a "
+"dictionary of values in JSON format, such as { \"my_custom_setting\": "
+"\"value\", \"other_setting\": \"value\" }"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -5948,6 +5865,9 @@ msgid "Upgrade ({upgrade_price})"
 msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
+#: cms/templates/group_configurations.html
+#: lms/templates/courseware/program_marketing.html
+#: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Learn More"
 msgstr "למד עוד"
 
@@ -6870,7 +6790,7 @@ msgstr "צוות"
 #. which allows the user to input the city in which they live.
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
 #: openedx/core/djangoapps/user_api/api.py lms/templates/register-form.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
@@ -7541,7 +7461,7 @@ msgstr "להיאסף כקבוצת לימוד"
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
 #: openedx/core/djangoapps/user_api/api.py
 msgid "First Name"
 msgstr "שם פרטי"
@@ -7549,7 +7469,7 @@ msgstr "שם פרטי"
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
 #: openedx/core/djangoapps/user_api/api.py
 msgid "Last Name"
 msgstr "שם משפחה"
@@ -7563,7 +7483,7 @@ msgstr "שם החברה"
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the Title
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
 #: openedx/core/djangoapps/user_api/api.py wiki/forms.py
 #: wiki/templates/wiki/dir.html
 msgid "Title"
@@ -8995,80 +8915,6 @@ msgstr "הצלחה"
 msgid "You do not have permission to view this page."
 msgstr "אין לך הרשאה לצפות בעמוד זה."
 
-#: lms/djangoapps/student_account/test/test_views.py
-#: openedx/features/enterprise_support/utils.py
-#, python-brace-format
-msgid ""
-"We are sorry, you are not authorized to access {platform_name} via this "
-"channel. Please contact your learning administrator or manager in order to "
-"access {platform_name}.{line_break}{line_break}Error "
-"Details:{line_break}{error_message}"
-msgstr ""
-
-#: lms/djangoapps/student_account/views.py
-msgid "Some error occured during password change. Please try again"
-msgstr ""
-
-#: lms/djangoapps/student_account/views.py
-msgid "No email address provided."
-msgstr "לא סופקה כתובת דואר אלקטרוני."
-
-#: lms/djangoapps/student_account/views.py
-msgid "Create Account"
-msgstr ""
-
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the State/Province/Region in which they
-#. live.
-#: lms/djangoapps/student_account/views.py
-#: openedx/core/djangoapps/user_api/api.py
-msgid "State/Province/Region"
-msgstr "ארץ/מחוז/אזור"
-
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the Company
-#: lms/djangoapps/student_account/views.py
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Company"
-msgstr "חברה"
-
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the Job Title
-#: lms/djangoapps/student_account/views.py
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Job Title"
-msgstr ""
-
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: This label appears above a field on the registration form
-#. meant to hold the user's mailing address.
-#: lms/djangoapps/student_account/views.py
-#: openedx/core/djangoapps/user_api/api.py lms/templates/signup_modal.html
-msgid "Mailing address"
-msgstr "כתובת למשלוח דואר"
-
-#. Translators: This phrase appears above a field on the registration form
-#. meant to hold the user's reasons for registering with edX.
-#: lms/djangoapps/student_account/views.py
-#: openedx/core/djangoapps/user_api/api.py
-#, python-brace-format
-msgid "Tell us why you're interested in {platform_name}"
-msgstr "ספר לנו מדוע אתה מתעניין ב{platform_name}"
-
-#. Translators: This label appears above a dropdown menu on the registration
-#. form used to select the user's profession
-#: lms/djangoapps/student_account/views.py
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Profession"
-msgstr ""
-
-#. Translators: This label appears above a dropdown menu on the registration
-#. form used to select the user's specialty
-#: lms/djangoapps/student_account/views.py
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Specialty"
-msgstr ""
-
 #: lms/djangoapps/support/views/index.py
 msgid "View and regenerate certificates."
 msgstr "הצג תעודות וצור אותן מחדש."
@@ -9487,6 +9333,27 @@ msgid ""
 " Policy{privacy_policy_link_end} from {enterprise_name}."
 msgstr ""
 
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Professional"
+msgstr "מקצועי"
+
+#: lms/envs/common.py
+msgid "No-Id-Professional"
+msgstr ""
+
+#: lms/envs/common.py
+msgid "Credit"
+msgstr ""
+
+#: lms/templates/admin/user_api/accounts/cancel_retirement_action.html
+msgid "Please correct the errors below."
+msgstr ""
+
+#: lms/templates/admin/user_api/accounts/cancel_retirement_action.html
+#, python-format
+msgid "Are you sure you want to cancel retirement for user \"%(username)s\"? "
+msgstr ""
+
 #: lms/templates/logout.html
 msgid "Signed Out"
 msgstr "התנתקת"
@@ -9532,6 +9399,7 @@ msgstr ""
 " את ההרשאות האלה, אנא לחץ על לחצן 'ביטול'."
 
 #: lms/templates/oauth2_provider/authorize.html
+#: openedx/core/djangoapps/user_api/admin.py
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 msgid "Cancel"
@@ -10952,10 +10820,100 @@ msgstr ""
 msgid "The '{field_name}' field cannot be edited."
 msgstr "לא ניתן לערוך שדה '{field_name}'"
 
+#: openedx/core/djangoapps/user_api/accounts/api.py
+#: openedx/core/djangoapps/user_api/views.py
+#: openedx/core/djangoapps/user_authn/views/auto_auth.py
+#: openedx/core/djangoapps/user_authn/views/deprecated.py
+msgid "Account creation not allowed."
+msgstr "לא ניתן ליצור חשבון."
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the State/Province/Region in which they
+#. live.
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_api/api.py
+msgid "State/Province/Region"
+msgstr "ארץ/מחוז/אזור"
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the Company
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Company"
+msgstr "חברה"
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the Job Title
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Job Title"
+msgstr ""
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's mailing address.
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_api/api.py lms/templates/signup_modal.html
+msgid "Mailing address"
+msgstr "כתובת למשלוח דואר"
+
+#. Translators: This phrase appears above a field on the registration form
+#. meant to hold the user's reasons for registering with edX.
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_api/api.py
+#, python-brace-format
+msgid "Tell us why you're interested in {platform_name}"
+msgstr "ספר לנו מדוע אתה מתעניין ב{platform_name}"
+
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the user's profession
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Profession"
+msgstr ""
+
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the user's specialty
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Specialty"
+msgstr ""
+
 #: openedx/core/djangoapps/user_api/accounts/utils.py
 msgid ""
 " Make sure that you are providing a valid username or a URL that contains \""
 msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/views.py
+#: openedx/core/djangoapps/user_authn/views/login.py
+msgid ""
+"This account has been temporarily locked due to excessive login failures. "
+"Try again later."
+msgstr "חשבון זה ננעל כתוצאה ממספר רב של נסיונות התחברות. אנא נסה מאוחר יותר."
+
+#: openedx/core/djangoapps/user_api/accounts/views.py
+#: openedx/core/djangoapps/user_authn/views/login.py
+#: lms/templates/provider_login.html
+msgid "Email or password is incorrect."
+msgstr "דואר אלקטרוני או סיסמה שגויים."
+
+#: openedx/core/djangoapps/user_api/admin.py
+#: wiki/templates/wiki/permission_denied.html
+msgid "Permission Denied"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/admin.py
+msgid "Retirement does not exist!"
+msgstr ""
+
+#: cms/templates/export.html cms/templates/import.html
+msgid "Success"
+msgstr "הצלחה"
+
+#: lms/templates/staff_problem_info.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Actions"
+msgstr "פעולות"
 
 #. Translators: This example email address is used as a placeholder in
 #. a field on the password reset form meant to hold the user's email address.
@@ -11191,6 +11149,96 @@ msgstr ""
 msgid "Your Account Has Been Queued For Deletion"
 msgstr ""
 
+#: openedx/core/djangoapps/user_authn/views/auto_auth.py
+msgid "Superuser creation not allowed"
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/auto_auth.py
+msgid "Account modification not allowed."
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/login.py
+#, python-brace-format
+msgid ""
+"You've successfully logged into your {provider_name} account, but this "
+"account isn't linked with an {platform_name} account yet."
+msgstr ""
+"התחברת בהצלחה לחשבונך {provider_name} , אך חשבון זה עדיין אינו מקושר עם "
+"חשבון {platform_name}. "
+
+#: openedx/core/djangoapps/user_authn/views/login.py
+#, python-brace-format
+msgid ""
+"Use your {platform_name} username and password to log into {platform_name} "
+"below, and then link your {platform_name} account with {provider_name} from "
+"your dashboard."
+msgstr ""
+"השתמש בשם המשתמש והסיסמה של {platform_name}  על מנת להתחבר ל{platform_name} "
+"להלן. לאחר מכן, קשר את חשבון {platform_name} עם {provider_name} בלוח הבקרה."
+"  "
+
+#: openedx/core/djangoapps/user_authn/views/login.py
+#, python-brace-format
+msgid ""
+"If you don't have an {platform_name} account yet, click "
+"<strong>Register</strong> at the top of the page."
+msgstr ""
+"אם אין לך עדיין חשבון {platform_name}לחץ על <strong>הירשם</strong> בחלק "
+"העליון של העמוד."
+
+#: openedx/core/djangoapps/user_authn/views/login.py
+msgid "There was an error receiving your login information. Please email us."
+msgstr ""
+"אירעה שגיאה בזמן קבלת מידע התחברות. אנא צרו איתנו קשר באמצעות דואר אלקטרוני."
+
+#: openedx/core/djangoapps/user_authn/views/login.py
+msgid ""
+"Your password has expired due to password policy on this account. You must "
+"reset your password before you can log in again. Please click the \"Forgot "
+"Password\" link on this page to reset your password before logging in again."
+msgstr ""
+"בשל מדיניות ניהול סיסמאות בחשבון זה, תוקף סיסמתך פג. עליך לאפס את סיסמתך "
+"בטרם תוכל להתחבר שוב. נא לחץ על קישור  \"שכחתי סיסמה\"  בעמוד זה על מנת לאפס"
+" את סיסמתך בטרם תתחבר שוב למערכת."
+
+#: openedx/core/djangoapps/user_authn/views/login.py
+#, python-brace-format
+msgid ""
+"In order to sign in, you need to activate your account.<br /><br />We just "
+"sent an activation link to <strong>{email}</strong>.  If you do not receive "
+"an email, check your spam folders or <a href=\"{support_url}\">contact "
+"{platform} Support</a>."
+msgstr ""
+"בכדי להתחבר, את/ה צריכ/ה להפעיל את החשבון שלך. <br /><br />כרגע שלחנו קישור "
+"להפעלה ל<strong>{email}</strong>. אם אינך קיבלת את הדוא\"ל, בדק/י את תיקיית "
+"דואר הזבל או <a href=\"{support_url}\">צור/י קשר עם התמיכה של "
+"{platform}</a>. "
+
+#: openedx/core/djangoapps/user_authn/views/login.py
+msgid "Too many failed login attempts. Try again later."
+msgstr "מספר נסיונות חיבור רב מדי. אנא נסה מאוחר יותר."
+
+#: openedx/core/djangoapps/user_authn/views/login_form.py
+msgid "Create Account"
+msgstr ""
+
+#: openedx/core/djangoapps/user_authn/views/register.py
+#, python-brace-format
+msgid "Registration using {provider} has timed out."
+msgstr "תם פרק הזמן להרשמה באמצעות {provider}."
+
+#: openedx/core/djangoapps/user_authn/views/register.py
+msgid "An access_token is required when passing value ({}) for provider."
+msgstr "דרוש access_token כאשר עוברים את ערך ({}) עבור ספק. "
+
+#: openedx/core/djangoapps/user_authn/views/register.py
+msgid "The provided access_token is already associated with another user."
+msgstr "ה-access_token שסופק, מקושר כבר עם משתמש אחר."
+
+#: openedx/core/djangoapps/user_authn/views/register.py
+msgid "The provided access_token is not valid."
+msgstr "ה-access_token  שסופק אינו חוקי."
+
 #: openedx/core/djangoapps/util/user_messages.py
 #, python-brace-format
 msgid "{header_open}{title}{header_close}{body}"
@@ -11361,6 +11409,15 @@ msgstr ""
 msgid ""
 "If you have concerns about sharing your data, please contact your "
 "administrator at {enterprise_customer_name}."
+msgstr ""
+
+#: openedx/features/enterprise_support/utils.py
+#, python-brace-format
+msgid ""
+"We are sorry, you are not authorized to access {platform_name} via this "
+"channel. Please contact your learning administrator or manager in order to "
+"access {platform_name}.{line_break}{line_break}Error "
+"Details:{line_break}{error_message}"
 msgstr ""
 
 #: openedx/features/enterprise_support/utils.py
@@ -11551,6 +11608,53 @@ msgstr ""
 #: cms/djangoapps/contentstore/utils.py
 #, python-brace-format
 msgid "{previous_groups}, {current_group}"
+msgstr ""
+
+#: cms/djangoapps/contentstore/video_utils.py
+msgid "The image must have name, content type, and size information."
+msgstr ""
+
+#: cms/djangoapps/contentstore/video_utils.py
+#, python-brace-format
+msgid ""
+"This image file type is not supported. Supported file types are "
+"{supported_file_formats}."
+msgstr ""
+
+#: cms/djangoapps/contentstore/video_utils.py
+#, python-brace-format
+msgid "This image file must be smaller than {image_max_size}."
+msgstr ""
+
+#: cms/djangoapps/contentstore/video_utils.py
+#, python-brace-format
+msgid "This image file must be larger than {image_min_size}."
+msgstr ""
+
+#: cms/djangoapps/contentstore/video_utils.py
+msgid ""
+"There is a problem with this image file. Try to upload a different file."
+msgstr ""
+
+#: cms/djangoapps/contentstore/video_utils.py
+#, python-brace-format
+msgid ""
+"Recommended image resolution is "
+"{image_file_max_width}x{image_file_max_height}. The minimum resolution is "
+"{image_file_min_width}x{image_file_min_height}."
+msgstr ""
+
+#: cms/djangoapps/contentstore/video_utils.py
+#, python-brace-format
+msgid ""
+"This image file must have an aspect ratio of "
+"{video_image_aspect_ratio_text}."
+msgstr ""
+
+#: cms/djangoapps/contentstore/video_utils.py
+msgid ""
+"The image file name can only contain letters, numbers, hyphens (-), and "
+"underscores (_)."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/assets.py
@@ -11942,53 +12046,6 @@ msgstr ""
 #. Translators: This is the status for a video whose transcription is complete
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Transcript Ready"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "The image must have name, content type, and size information."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/videos.py
-#, python-brace-format
-msgid ""
-"This image file type is not supported. Supported file types are "
-"{supported_file_formats}."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/videos.py
-#, python-brace-format
-msgid "This image file must be smaller than {image_max_size}."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/videos.py
-#, python-brace-format
-msgid "This image file must be larger than {image_min_size}."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/videos.py
-msgid ""
-"There is a problem with this image file. Try to upload a different file."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/videos.py
-#, python-brace-format
-msgid ""
-"Recommended image resolution is "
-"{image_file_max_width}x{image_file_max_height}. The minimum resolution is "
-"{image_file_min_width}x{image_file_min_height}."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/videos.py
-#, python-brace-format
-msgid ""
-"This image file must have an aspect ratio of "
-"{video_image_aspect_ratio_text}."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/videos.py
-msgid ""
-"The image file name can only contain letters, numbers, hyphens (-), and "
-"underscores (_)."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/videos.py
@@ -13149,15 +13206,15 @@ msgstr "צפה בקורס כ:"
 
 #: lms/templates/preview_menu.html
 msgid "Learner"
-msgstr ""
+msgstr "לומד"
 
 #: lms/templates/preview_menu.html
 msgid "Specific learner"
-msgstr ""
+msgstr "לומד מסוים"
 
 #: lms/templates/preview_menu.html
 msgid "Learner in {content_group}"
-msgstr ""
+msgstr "לומד ב{content_group}"
 
 #: lms/templates/preview_menu.html
 msgid "Username or email:"
@@ -13388,7 +13445,7 @@ msgstr "ברוכים הבאים {username}! נא הגדר למטה את העדפ
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Enter a public username:"
-msgstr "הכנס שם קמפוס:"
+msgstr "הכנס שם משתמש:"
 
 #: lms/templates/register-shib.html
 #: themes/stanford-style/lms/templates/register-shib.html
@@ -13597,11 +13654,6 @@ msgstr "הוסף הערה"
 #: lms/templates/staff_problem_info.html
 msgid "Staff Debug:"
 msgstr ""
-
-#: lms/templates/staff_problem_info.html
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Actions"
-msgstr "פעולות"
 
 #: lms/templates/staff_problem_info.html
 msgid "Score (for override only)"
@@ -13855,7 +13907,7 @@ msgstr "אפשרויות נוספות"
 #: lms/templates/user_dropdown.html lms/templates/header/header.html
 #: lms/templates/header/user_dropdown.html
 msgid "More Options"
-msgstr ""
+msgstr "אפשרויות נוספות"
 
 #: lms/templates/using.html
 msgid "Using the system"
@@ -15499,11 +15551,11 @@ msgstr ""
 
 #: lms/templates/courseware/info.html
 msgid "Welcome to {org}'s {course_title}!"
-msgstr ""
+msgstr "ברוכים הבאים ל{course_title} של {org}!"
 
 #: lms/templates/courseware/info.html
 msgid "Welcome to {course_title}!"
-msgstr ""
+msgstr "ברוכים הבאים ל{course_title}!"
 
 #: lms/templates/courseware/info.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -15526,7 +15578,7 @@ msgstr "ניווט דפי מידע"
 #: lms/templates/courseware/info.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Course Tools"
-msgstr ""
+msgstr "כלים בקורס"
 
 #: lms/templates/courseware/news.html
 msgid "News - MITx 6.002x"
@@ -15598,7 +15650,7 @@ msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
 msgid "What You'll Learn"
-msgstr "מה תלמד"
+msgstr "מה שתלמדו"
 
 #: lms/templates/courseware/program_marketing.html
 msgid "Average Length"
@@ -16933,6 +16985,50 @@ msgstr "הודעה זו נשלחה באופן אוטומטי מ{site_name} ל{fu
 msgid "You have been enrolled in {course_name}"
 msgstr "נרשמת לקורס {course_name}"
 
+#: lms/templates/emails/failed_verification_email.txt
+msgid ""
+"Sorry! The photos you submitted for ID verification were not accepted, for "
+"the following reason(s):"
+msgstr ""
+
+#: lms/templates/emails/failed_verification_email.txt
+msgid "The photo(s) of you:"
+msgstr ""
+
+#: lms/templates/emails/failed_verification_email.txt
+msgid "The photo of you:"
+msgstr ""
+
+#: lms/templates/emails/failed_verification_email.txt
+msgid "The photo of your ID:"
+msgstr ""
+
+#: lms/templates/emails/failed_verification_email.txt
+msgid "Other Reasons:"
+msgstr ""
+
+#: lms/templates/emails/failed_verification_email.txt
+msgid "Resubmit Verification: {reverify_url}"
+msgstr ""
+
+#: lms/templates/emails/failed_verification_email.txt
+msgid "ID Verification FAQ: {faq_url}"
+msgstr ""
+
+#: lms/templates/emails/failed_verification_email.txt
+#: lms/templates/emails/order_confirmation_email.txt
+#: lms/templates/emails/passed_verification_email.txt
+#: lms/templates/emails/photo_submission_confirmation.txt
+msgid "Thank you,"
+msgstr "תודה רבה,"
+
+#: lms/templates/emails/failed_verification_email.txt
+#: lms/templates/emails/passed_verification_email.txt
+#: lms/templates/emails/photo_submission_confirmation.txt
+#: lms/templates/emails/reverification_processed.txt
+msgid "The {platform_name} team"
+msgstr "צוות {platform_name}"
+
 #: lms/templates/emails/order_confirmation_email.txt
 msgid ""
 "Your payment was successful. You will see the charge below on your next "
@@ -16942,13 +17038,21 @@ msgstr ""
 "{merchant_name}. "
 
 #: lms/templates/emails/order_confirmation_email.txt
-#: lms/templates/emails/photo_submission_confirmation.txt
-msgid "Thank you,"
-msgstr "תודה רבה,"
-
-#: lms/templates/emails/order_confirmation_email.txt
 msgid "Your order number is: {order_number}"
 msgstr "מספר הזמנתך הוא: {order_number}"
+
+#: lms/templates/emails/passed_verification_email.txt
+msgid "Hi {full_name}"
+msgstr ""
+
+#: lms/templates/emails/passed_verification_email.txt
+msgid "Congratulations! Your ID verification process was successful."
+msgstr ""
+
+#: lms/templates/emails/passed_verification_email.txt
+msgid ""
+"Your verification is effective for one year. It will expire on {expiry_date}"
+msgstr ""
 
 #: lms/templates/emails/photo_submission_confirmation.txt
 msgid "Hi {full_name},"
@@ -16965,11 +17069,6 @@ msgid ""
 "your verification was successful.You can also check the status of the "
 "verification process on your dashboard."
 msgstr ""
-
-#: lms/templates/emails/photo_submission_confirmation.txt
-#: lms/templates/emails/reverification_processed.txt
-msgid "The {platform_name} team"
-msgstr "צוות {platform_name}"
 
 #: lms/templates/emails/registration_codes_sale_email.txt
 msgid "Thank you for purchasing enrollments in {course_name}."
@@ -17595,10 +17694,6 @@ msgstr "מידע על רישום"
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Number of enrollees (admins, staff, and students) by track"
 msgstr "מספר הנרשמים (מנהלים, צוות וסטודנטים) לפי מסלול"
-
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Professional"
-msgstr "מקצועי"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Basic Course Information"
@@ -20012,7 +20107,7 @@ msgstr ""
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
 msgid "Start Course"
-msgstr ""
+msgstr "יאללה, להתחיל ללמוד"
 
 #: lms/templates/verify_student/_verification_help.html
 msgid "Have questions?"
@@ -20858,12 +20953,6 @@ msgstr ""
 msgid "Learn more about certificates"
 msgstr "למידע נוסף על תעודות"
 
-#: cms/templates/certificates.html cms/templates/group_configurations.html
-#: cms/templates/settings.html cms/templates/settings_advanced.html
-#: cms/templates/settings_graders.html
-msgid "Other Course Settings"
-msgstr "הגדרות קורס נוספות"
-
 #: cms/templates/certificates.html cms/templates/settings_graders.html
 msgid "Details &amp; Schedule"
 msgstr "פרטי קורס ולוח זמנים"
@@ -21595,10 +21684,6 @@ msgstr ""
 #: cms/templates/export.html
 msgid "Compressing the exported data and preparing it for download"
 msgstr ""
-
-#: cms/templates/export.html cms/templates/import.html
-msgid "Success"
-msgstr "הצלחה"
 
 #: cms/templates/export.html
 msgid "Your exported library can now be downloaded"
@@ -25053,10 +25138,6 @@ msgstr ""
 
 #: wiki/templates/wiki/history.html
 msgid "no log message"
-msgstr ""
-
-#: wiki/templates/wiki/permission_denied.html
-msgid "Permission Denied"
 msgstr ""
 
 #: wiki/templates/wiki/permission_denied.html

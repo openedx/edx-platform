@@ -37,6 +37,7 @@
 # Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013
 # Marco Morales, 2018
 # Marcos Buccella <marcosfiore07@gmail.com>, 2018
+# Marcos Buccella <marcosfiore07@hotmail.com>, 2018
 # Marina Pastor <mpastor@edx.org>, 2017-2018
 # Matías Olivera <MatiasOlivera@outlook.com>, 2015
 # MarnyLopez, 2014
@@ -141,6 +142,7 @@
 # Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013-2014
 # Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013
 # Marco Morales, 2014,2017
+# Marcos Buccella <marcosfiore07@hotmail.com>, 2018
 # Marina Pastor <mpastor@edx.org>, 2017
 # emgl <marsh_melow@hotmail.es>, 2014
 # Matías Olivera <MatiasOlivera@outlook.com>, 2015
@@ -221,7 +223,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-07-30 04:58+0000\n"
+"POT-Creation-Date: 2018-09-17 08:03+0000\n"
 "PO-Revision-Date: 2018-08-02 21:25+0000\n"
 "Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -377,7 +379,7 @@ msgstr "Verificación de ID pendiente"
 msgid "You're enrolled as a verified student"
 msgstr "Usted está inscrito como un estudiante verificado"
 
-#: common/djangoapps/course_modes/helpers.py
+#: common/djangoapps/course_modes/helpers.py lms/envs/common.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Verified"
 msgstr "Verificado"
@@ -458,7 +460,7 @@ msgstr ""
 "Éste es el SKU (número de referencia) de este modo en el sistema de "
 "ecommerce externo. "
 
-#: common/djangoapps/course_modes/models.py
+#: common/djangoapps/course_modes/models.py lms/envs/common.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Honor"
 msgstr "Honor"
@@ -953,108 +955,14 @@ msgstr "El curso que está buscando comienza el {date}."
 msgid "The course you are looking for is closed for enrollment as of {date}."
 msgstr "El curso que busca está cerrado desde {date}."
 
-#: common/djangoapps/student/views/login.py
-#, python-brace-format
-msgid ""
-"You've successfully logged into your {provider_name} account, but this "
-"account isn't linked with an {platform_name} account yet."
-msgstr ""
-"Ha iniciado sesión exitosamente en su cuenta de {provider_name}, pero está "
-"cuenta no está vinculada aún con una cuenta de {platform_name}."
-
-#: common/djangoapps/student/views/login.py
-#, python-brace-format
-msgid ""
-"Use your {platform_name} username and password to log into {platform_name} "
-"below, and then link your {platform_name} account with {provider_name} from "
-"your dashboard."
-msgstr ""
-"Utilice su nombre de usuario y contraseña de {platform_name} para iniciar "
-"sesión en {platform_name} y después vincule su cuenta de  {platform_name} "
-"con la cuenta de {provider_name} desde su panel de control."
-
-#: common/djangoapps/student/views/login.py
-#, python-brace-format
-msgid ""
-"If you don't have an {platform_name} account yet, click "
-"<strong>Register</strong> at the top of the page."
-msgstr ""
-"Si aun no tiene una cuenta en {platform_name}, haga clic en "
-"<strong>Registrarse</strong> en la parte superior de la página."
-
-#: common/djangoapps/student/views/login.py
-msgid "There was an error receiving your login information. Please email us."
-msgstr ""
-"Ocurrió un error en la recepción de su información de ingreso. Por favor "
-"escríbanos al correo electrónico."
-
-#: common/djangoapps/student/views/login.py
-#: openedx/core/djangoapps/user_api/accounts/views.py
-msgid ""
-"This account has been temporarily locked due to excessive login failures. "
-"Try again later."
-msgstr ""
-"Esta cuenta ha sido bloqueada temporalmente debido a un exceso de intentos "
-"fallidos de ingreso. Intente nuevamente más tarde."
-
-#: common/djangoapps/student/views/login.py
-msgid ""
-"Your password has expired due to password policy on this account. You must "
-"reset your password before you can log in again. Please click the \"Forgot "
-"Password\" link on this page to reset your password before logging in again."
-msgstr ""
-"Su contraseña ha expirado de acuerdo con las políticas establecidas al "
-"respecto. Para poder reingresar, elija una nueva contraseña presionando el "
-"vínculo \"Olvidé mi contraseña\" en esta misma página."
-
-#: common/djangoapps/student/views/login.py
-#, python-brace-format
-msgid ""
-"In order to sign in, you need to activate your account.<br /><br />We just "
-"sent an activation link to <strong>{email}</strong>.  If you do not receive "
-"an email, check your spam folders or <a href=\"{support_url}\">contact "
-"{platform} Support</a>."
-msgstr ""
-"Para iniciar sesión, tienes que activar tu cuenta.<br /><br />Acabamos de "
-"enviar un enlace de activación a <strong>{email}</strong>. Si no recibes un "
-"correo electrónico, revise tu bandeja de spam o <a "
-"href=\"{support_url}\">contáctate con {platform} Soporte</a>."
-
-#: common/djangoapps/student/views/login.py
-msgid "Too many failed login attempts. Try again later."
-msgstr ""
-"Demasiados intentos fallidos de inicio de sesión. Inténtelo de nuevo más "
-"tarde."
-
-#: common/djangoapps/student/views/login.py
-#: openedx/core/djangoapps/user_api/accounts/views.py
-#: lms/templates/provider_login.html
-msgid "Email or password is incorrect."
-msgstr "Correo electrónico o contraseña incorrectos."
-
-#: common/djangoapps/student/views/login.py
+#: common/djangoapps/student/views/management.py
 msgid "No inactive user with this e-mail exists"
 msgstr ""
 "No existe un usuario inactivo con esta dirección de correo electrónico"
 
-#: common/djangoapps/student/views/login.py
+#: common/djangoapps/student/views/management.py
 msgid "Unable to send reactivation email"
 msgstr "No fue posible enviar el correo de reactivación"
-
-#: common/djangoapps/student/views/login.py
-msgid "Superuser creation not allowed"
-msgstr "Creación de super usuario no permitida."
-
-#: common/djangoapps/student/views/login.py
-msgid "Account modification not allowed."
-msgstr "Modificación de cuenta no permitida."
-
-#: common/djangoapps/student/views/login.py
-#: common/djangoapps/student/views/management.py
-#: openedx/core/djangoapps/user_api/accounts/api.py
-#: openedx/core/djangoapps/user_api/views.py
-msgid "Account creation not allowed."
-msgstr "Creación de cuenta no permitida."
 
 #: common/djangoapps/student/views/management.py
 msgid "Course id not specified"
@@ -1110,24 +1018,6 @@ msgstr "Estado de cuenta inesperado"
 
 #: common/djangoapps/student/views/management.py
 #, python-brace-format
-msgid "Registration using {provider} has timed out."
-msgstr "Inscripción usando {provider} ha expirado."
-
-#: common/djangoapps/student/views/management.py
-msgid "An access_token is required when passing value ({}) for provider."
-msgstr ""
-"Se requiere un access_token cuando se pasa el valor ({}) al proveedor."
-
-#: common/djangoapps/student/views/management.py
-msgid "The provided access_token is already associated with another user."
-msgstr "El access_token ingresado ya está asociado con otro usuario."
-
-#: common/djangoapps/student/views/management.py
-msgid "The provided access_token is not valid."
-msgstr "El access_token suministrado no es válido."
-
-#: common/djangoapps/student/views/management.py
-#, python-brace-format
 msgid ""
 "{html_start}Your account could not be activated{html_end}Something went "
 "wrong, please <a href=\"{support_url}\">contact support</a> to resolve this "
@@ -1158,6 +1048,16 @@ msgstr ""
 "actualizaciones y notificaciones nuestras por correo electrónico con "
 "relación a los cursos en los cuales está inscrito/a. Inicie Sesión para "
 "continuar."
+
+#: common/djangoapps/student/views/management.py
+msgid "Some error occured during password change. Please try again"
+msgstr ""
+"Hubo algún error durante el cambio de la contraseña. Por favor, inténtalo de"
+" nuevo"
+
+#: common/djangoapps/student/views/management.py
+msgid "No email address provided."
+msgstr "No se especificó una dirección de correo electrónico."
 
 #: common/djangoapps/student/views/management.py
 msgid "Password reset unsuccessful"
@@ -2618,9 +2518,10 @@ msgstr ""
 "para su curso, o reportar algún problema, contacte a "
 "moocsupport@mathworks.com."
 
-#: common/lib/xmodule/xmodule/capa_base.py cms/templates/index.html
-#: lms/templates/help_modal.html lms/templates/manage_user_standing.html
-#: lms/templates/register-shib.html
+#: common/lib/xmodule/xmodule/capa_base.py
+#: lms/templates/admin/user_api/accounts/cancel_retirement_action.html
+#: cms/templates/index.html lms/templates/help_modal.html
+#: lms/templates/manage_user_standing.html lms/templates/register-shib.html
 #: lms/templates/dashboard/_entitlement_reason_survey.html
 #: lms/templates/dashboard/_reason_survey.html
 #: lms/templates/peer_grading/peer_grading_problem.html
@@ -3066,13 +2967,13 @@ msgstr "Trama para los temas de discusión"
 msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
-"example, one discussion category may be \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each "
-"category must be unique. In \"id\" values, the only special characters that "
-"are supported are underscore, hyphen, and period. You can also specify a "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each category "
+"must be unique. In \"id\" values, the only special characters that are "
+"supported are underscore, hyphen, and period. You can also specify a "
 "category as the default for new posts in the Discussion page by setting its "
-"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 msgstr ""
 "Ingrese las categorías de discusión en el siguiente formato: "
 "\"CategoryName\": {\"id\": \"i4x-InstitutionName-CourseNumber-course-"
@@ -3893,6 +3794,20 @@ msgstr ""
 "Ingrese verdadero o falso. Si es verdadero, cualquier destacado asociado con"
 " el contenido en el curso será enviado a los estudiantes de acuerdo a su "
 "horario."
+
+#: cms/templates/certificates.html cms/templates/group_configurations.html
+#: cms/templates/settings.html cms/templates/settings_advanced.html
+#: cms/templates/settings_graders.html
+msgid "Other Course Settings"
+msgstr "Otras configuraciones de curso"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Any additional information about the course that the platform needs or that "
+"allows integration with external systems such as CRM software. Enter a "
+"dictionary of values in JSON format, such as { \"my_custom_setting\": "
+"\"value\", \"other_setting\": \"value\" }"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
@@ -7372,7 +7287,7 @@ msgstr "Equipo"
 #. which allows the user to input the city in which they live.
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
 #: openedx/core/djangoapps/user_api/api.py lms/templates/register-form.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/receipt.html
@@ -8081,7 +7996,7 @@ msgstr "cohortado"
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
 #: openedx/core/djangoapps/user_api/api.py
 msgid "First Name"
 msgstr "Primer Nombre"
@@ -8089,7 +8004,7 @@ msgstr "Primer Nombre"
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the First Name
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
 #: openedx/core/djangoapps/user_api/api.py
 msgid "Last Name"
 msgstr "Apellido"
@@ -8103,7 +8018,7 @@ msgstr "Nombre de la organización"
 #. Translators: This label appears above a field on the registration form
 #. which allows the user to input the Title
 #: lms/djangoapps/instructor_task/tasks_helper/enrollments.py
-#: lms/djangoapps/student_account/views.py
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
 #: openedx/core/djangoapps/user_api/api.py wiki/forms.py
 #: wiki/templates/wiki/dir.html
 msgid "Title"
@@ -9632,86 +9547,6 @@ msgstr "Exito"
 msgid "You do not have permission to view this page."
 msgstr "Usted no tiene permisos para ver esta página"
 
-#: lms/djangoapps/student_account/test/test_views.py
-#: openedx/features/enterprise_support/utils.py
-#, python-brace-format
-msgid ""
-"We are sorry, you are not authorized to access {platform_name} via this "
-"channel. Please contact your learning administrator or manager in order to "
-"access {platform_name}.{line_break}{line_break}Error "
-"Details:{line_break}{error_message}"
-msgstr ""
-"Lo sentimos, usted no está autorizado para acceder a {platform_name} por "
-"medio de este canal. Por favor contacte a su administrador o director de "
-"aprendizaje para acceder a {platform_name}.{line_break}{line_break}Detalles "
-"del error:{line_break}{error_message}"
-
-#: lms/djangoapps/student_account/views.py
-msgid "Some error occured during password change. Please try again"
-msgstr ""
-"Hubo algún error durante el cambio de la contraseña. Por favor, inténtalo de"
-" nuevo"
-
-#: lms/djangoapps/student_account/views.py
-msgid "No email address provided."
-msgstr "No se especificó una dirección de correo electrónico."
-
-#: lms/djangoapps/student_account/views.py
-msgid "Create Account"
-msgstr "Crear cuenta"
-
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the State/Province/Region in which they
-#. live.
-#: lms/djangoapps/student_account/views.py
-#: openedx/core/djangoapps/user_api/api.py
-msgid "State/Province/Region"
-msgstr "Estado/Provincia/Región"
-
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the Company
-#: lms/djangoapps/student_account/views.py
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Company"
-msgstr "Empresa"
-
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the Job Title
-#: lms/djangoapps/student_account/views.py
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Job Title"
-msgstr "Título Profesional"
-
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: This label appears above a field on the registration form
-#. meant to hold the user's mailing address.
-#: lms/djangoapps/student_account/views.py
-#: openedx/core/djangoapps/user_api/api.py lms/templates/signup_modal.html
-msgid "Mailing address"
-msgstr "Dirección de correspondencia"
-
-#. Translators: This phrase appears above a field on the registration form
-#. meant to hold the user's reasons for registering with edX.
-#: lms/djangoapps/student_account/views.py
-#: openedx/core/djangoapps/user_api/api.py
-#, python-brace-format
-msgid "Tell us why you're interested in {platform_name}"
-msgstr "Cuéntenos por qué está interesado en {platform_name}"
-
-#. Translators: This label appears above a dropdown menu on the registration
-#. form used to select the user's profession
-#: lms/djangoapps/student_account/views.py
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Profession"
-msgstr "Profesión"
-
-#. Translators: This label appears above a dropdown menu on the registration
-#. form used to select the user's specialty
-#: lms/djangoapps/student_account/views.py
-#: openedx/core/djangoapps/user_api/api.py
-msgid "Specialty"
-msgstr "Especialidad"
-
 #: lms/djangoapps/support/views/index.py
 msgid "View and regenerate certificates."
 msgstr "Ver y regenerar certificados"
@@ -10146,6 +9981,27 @@ msgstr ""
 " una {privacy_policy_link_start}política de privacidad diferente "
 "{privacy_policy_link_end} de {enterprise_name}."
 
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Professional"
+msgstr "Profesional"
+
+#: lms/envs/common.py
+msgid "No-Id-Professional"
+msgstr ""
+
+#: lms/envs/common.py
+msgid "Credit"
+msgstr ""
+
+#: lms/templates/admin/user_api/accounts/cancel_retirement_action.html
+msgid "Please correct the errors below."
+msgstr ""
+
+#: lms/templates/admin/user_api/accounts/cancel_retirement_action.html
+#, python-format
+msgid "Are you sure you want to cancel retirement for user \"%(username)s\"? "
+msgstr ""
+
 #: lms/templates/logout.html
 msgid "Signed Out"
 msgstr "Sesión cerrada"
@@ -10197,6 +10053,7 @@ msgstr ""
 "clic en el botón 'Cancelar'."
 
 #: lms/templates/oauth2_provider/authorize.html
+#: openedx/core/djangoapps/user_api/admin.py
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 msgid "Cancel"
@@ -11789,12 +11646,103 @@ msgstr "Escribe tu dirección de correo. "
 msgid "The '{field_name}' field cannot be edited."
 msgstr "El campo '{field_name}' no puede ser editado."
 
+#: openedx/core/djangoapps/user_api/accounts/api.py
+#: openedx/core/djangoapps/user_api/views.py
+#: openedx/core/djangoapps/user_authn/views/auto_auth.py
+#: openedx/core/djangoapps/user_authn/views/deprecated.py
+msgid "Account creation not allowed."
+msgstr "Creación de cuenta no permitida."
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the State/Province/Region in which they
+#. live.
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_api/api.py
+msgid "State/Province/Region"
+msgstr "Estado/Provincia/Región"
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the Company
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Company"
+msgstr "Empresa"
+
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the Job Title
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Job Title"
+msgstr "Título Profesional"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's mailing address.
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_api/api.py lms/templates/signup_modal.html
+msgid "Mailing address"
+msgstr "Dirección de correspondencia"
+
+#. Translators: This phrase appears above a field on the registration form
+#. meant to hold the user's reasons for registering with edX.
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_api/api.py
+#, python-brace-format
+msgid "Tell us why you're interested in {platform_name}"
+msgstr "Cuéntenos por qué está interesado en {platform_name}"
+
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the user's profession
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Profession"
+msgstr "Profesión"
+
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the user's specialty
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_api/api.py
+msgid "Specialty"
+msgstr "Especialidad"
+
 #: openedx/core/djangoapps/user_api/accounts/utils.py
 msgid ""
 " Make sure that you are providing a valid username or a URL that contains \""
 msgstr ""
 "Asegúrate de proporcionar un nombre de usuario válido o una URL que contenga"
 " \""
+
+#: openedx/core/djangoapps/user_api/accounts/views.py
+#: openedx/core/djangoapps/user_authn/views/login.py
+msgid ""
+"This account has been temporarily locked due to excessive login failures. "
+"Try again later."
+msgstr ""
+"Esta cuenta ha sido bloqueada temporalmente debido a un exceso de intentos "
+"fallidos de ingreso. Intente nuevamente más tarde."
+
+#: openedx/core/djangoapps/user_api/accounts/views.py
+#: openedx/core/djangoapps/user_authn/views/login.py
+#: lms/templates/provider_login.html
+msgid "Email or password is incorrect."
+msgstr "Correo electrónico o contraseña incorrectos."
+
+#: wiki/templates/wiki/permission_denied.html
+msgid "Permission Denied"
+msgstr "Permiso Denegado"
+
+#: openedx/core/djangoapps/user_api/admin.py
+msgid "Retirement does not exist!"
+msgstr ""
+
+#: cms/templates/export.html cms/templates/import.html
+msgid "Success"
+msgstr "Terminación exitosa"
+
+#: lms/templates/staff_problem_info.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Actions"
+msgstr "Acciones"
 
 #. Translators: This example email address is used as a placeholder in
 #. a field on the password reset form meant to hold the user's email address.
@@ -12057,6 +12005,100 @@ msgstr "El mejor, %(platform_name)s"
 msgid "Your Account Has Been Queued For Deletion"
 msgstr "Su cuenta ha sido marcada para ser borrada"
 
+#: openedx/core/djangoapps/user_authn/views/auto_auth.py
+msgid "Superuser creation not allowed"
+msgstr "Creación de super usuario no permitida."
+
+#: openedx/core/djangoapps/user_authn/views/auto_auth.py
+msgid "Account modification not allowed."
+msgstr "Modificación de cuenta no permitida."
+
+#: openedx/core/djangoapps/user_authn/views/login.py
+#, python-brace-format
+msgid ""
+"You've successfully logged into your {provider_name} account, but this "
+"account isn't linked with an {platform_name} account yet."
+msgstr ""
+"Ha iniciado sesión exitosamente en su cuenta de {provider_name}, pero está "
+"cuenta no está vinculada aún con una cuenta de {platform_name}."
+
+#: openedx/core/djangoapps/user_authn/views/login.py
+#, python-brace-format
+msgid ""
+"Use your {platform_name} username and password to log into {platform_name} "
+"below, and then link your {platform_name} account with {provider_name} from "
+"your dashboard."
+msgstr ""
+"Utilice su nombre de usuario y contraseña de {platform_name} para iniciar "
+"sesión en {platform_name} y después vincule su cuenta de  {platform_name} "
+"con la cuenta de {provider_name} desde su panel de control."
+
+#: openedx/core/djangoapps/user_authn/views/login.py
+#, python-brace-format
+msgid ""
+"If you don't have an {platform_name} account yet, click "
+"<strong>Register</strong> at the top of the page."
+msgstr ""
+"Si aun no tiene una cuenta en {platform_name}, haga clic en "
+"<strong>Registrarse</strong> en la parte superior de la página."
+
+#: openedx/core/djangoapps/user_authn/views/login.py
+msgid "There was an error receiving your login information. Please email us."
+msgstr ""
+"Ocurrió un error en la recepción de su información de ingreso. Por favor "
+"escríbanos al correo electrónico."
+
+#: openedx/core/djangoapps/user_authn/views/login.py
+msgid ""
+"Your password has expired due to password policy on this account. You must "
+"reset your password before you can log in again. Please click the \"Forgot "
+"Password\" link on this page to reset your password before logging in again."
+msgstr ""
+"Su contraseña ha expirado de acuerdo con las políticas establecidas al "
+"respecto. Para poder reingresar, elija una nueva contraseña presionando el "
+"vínculo \"Olvidé mi contraseña\" en esta misma página."
+
+#: openedx/core/djangoapps/user_authn/views/login.py
+#, python-brace-format
+msgid ""
+"In order to sign in, you need to activate your account.<br /><br />We just "
+"sent an activation link to <strong>{email}</strong>.  If you do not receive "
+"an email, check your spam folders or <a href=\"{support_url}\">contact "
+"{platform} Support</a>."
+msgstr ""
+"Para iniciar sesión, tienes que activar tu cuenta.<br /><br />Acabamos de "
+"enviar un enlace de activación a <strong>{email}</strong>. Si no recibes un "
+"correo electrónico, revise tu bandeja de spam o <a "
+"href=\"{support_url}\">contáctate con {platform} Soporte</a>."
+
+#: openedx/core/djangoapps/user_authn/views/login.py
+msgid "Too many failed login attempts. Try again later."
+msgstr ""
+"Demasiados intentos fallidos de inicio de sesión. Inténtelo de nuevo más "
+"tarde."
+
+#: openedx/core/djangoapps/user_authn/views/login_form.py
+msgid "Create Account"
+msgstr "Crear cuenta"
+
+#: openedx/core/djangoapps/user_authn/views/register.py
+#, python-brace-format
+msgid "Registration using {provider} has timed out."
+msgstr "Inscripción usando {provider} ha expirado."
+
+#: openedx/core/djangoapps/user_authn/views/register.py
+msgid "An access_token is required when passing value ({}) for provider."
+msgstr ""
+"Se requiere un access_token cuando se pasa el valor ({}) al proveedor."
+
+#: openedx/core/djangoapps/user_authn/views/register.py
+msgid "The provided access_token is already associated with another user."
+msgstr "El access_token ingresado ya está asociado con otro usuario."
+
+#: openedx/core/djangoapps/user_authn/views/register.py
+msgid "The provided access_token is not valid."
+msgstr "El access_token suministrado no es válido."
+
 #: openedx/core/djangoapps/util/user_messages.py
 #, python-brace-format
 msgid "{header_open}{title}{header_close}{body}"
@@ -12242,6 +12284,19 @@ msgid ""
 msgstr ""
 "Si tiene dudas acerca de compartir sus datos, contacte a su administrador de"
 " {enterprise_customer_name}."
+
+#: openedx/features/enterprise_support/utils.py
+#, python-brace-format
+msgid ""
+"We are sorry, you are not authorized to access {platform_name} via this "
+"channel. Please contact your learning administrator or manager in order to "
+"access {platform_name}.{line_break}{line_break}Error "
+"Details:{line_break}{error_message}"
+msgstr ""
+"Lo sentimos, usted no está autorizado para acceder a {platform_name} por "
+"medio de este canal. Por favor contacte a su administrador o director de "
+"aprendizaje para acceder a {platform_name}.{line_break}{line_break}Detalles "
+"del error:{line_break}{error_message}"
 
 #: openedx/features/enterprise_support/utils.py
 #, python-brace-format
@@ -12452,6 +12507,64 @@ msgstr "Grupo eliminado"
 #, python-brace-format
 msgid "{previous_groups}, {current_group}"
 msgstr "{previous_groups}, {current_group}"
+
+#: cms/djangoapps/contentstore/video_utils.py
+msgid "The image must have name, content type, and size information."
+msgstr "La imagen debe tener nombre, tipo de contenido y tamaño."
+
+#: cms/djangoapps/contentstore/video_utils.py
+#, python-brace-format
+msgid ""
+"This image file type is not supported. Supported file types are "
+"{supported_file_formats}."
+msgstr ""
+"El tipo de archivo de la imagen no es soportado. Los archivos soportados son"
+" {supported_file_formats}."
+
+#: cms/djangoapps/contentstore/video_utils.py
+#, python-brace-format
+msgid "This image file must be smaller than {image_max_size}."
+msgstr "El archivo de la imagen debe ser inferior a {image_max_size}."
+
+#: cms/djangoapps/contentstore/video_utils.py
+#, python-brace-format
+msgid "This image file must be larger than {image_min_size}."
+msgstr "El archivo de la imagen debe ser superior a {image_min_size}."
+
+#: cms/djangoapps/contentstore/video_utils.py
+msgid ""
+"There is a problem with this image file. Try to upload a different file."
+msgstr ""
+"Hay un problema con el archivo de la imagen. Intente subir un archivo "
+"diferente."
+
+#: cms/djangoapps/contentstore/video_utils.py
+#, python-brace-format
+msgid ""
+"Recommended image resolution is "
+"{image_file_max_width}x{image_file_max_height}. The minimum resolution is "
+"{image_file_min_width}x{image_file_min_height}."
+msgstr ""
+"La resolución de la imagen recomendada es "
+"{image_file_max_width}x{image_file_max_height}. La mínima resolución es "
+"{image_file_min_width}x{image_file_min_height}."
+
+#: cms/djangoapps/contentstore/video_utils.py
+#, python-brace-format
+msgid ""
+"This image file must have an aspect ratio of "
+"{video_image_aspect_ratio_text}."
+msgstr ""
+"El archivo de la imagen debe tener una relación de aspecto de "
+"{video_image_aspect_ratio_text}."
+
+#: cms/djangoapps/contentstore/video_utils.py
+msgid ""
+"The image file name can only contain letters, numbers, hyphens (-), and "
+"underscores (_)."
+msgstr ""
+"El nombre del archivo de la imagen solo puede tener letras, número, guiones "
+"(-), y guiones bajos (_)."
 
 #: cms/djangoapps/contentstore/views/assets.py
 msgid "Upload completed"
@@ -12861,64 +12974,6 @@ msgstr "Transcripción en progreso"
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Transcript Ready"
 msgstr "Transcripción lista"
-
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "The image must have name, content type, and size information."
-msgstr "La imagen debe tener nombre, tipo de contenido y tamaño."
-
-#: cms/djangoapps/contentstore/views/videos.py
-#, python-brace-format
-msgid ""
-"This image file type is not supported. Supported file types are "
-"{supported_file_formats}."
-msgstr ""
-"El tipo de archivo de la imagen no es soportado. Los archivos soportados son"
-" {supported_file_formats}."
-
-#: cms/djangoapps/contentstore/views/videos.py
-#, python-brace-format
-msgid "This image file must be smaller than {image_max_size}."
-msgstr "El archivo de la imagen debe ser inferior a {image_max_size}."
-
-#: cms/djangoapps/contentstore/views/videos.py
-#, python-brace-format
-msgid "This image file must be larger than {image_min_size}."
-msgstr "El archivo de la imagen debe ser superior a {image_min_size}."
-
-#: cms/djangoapps/contentstore/views/videos.py
-msgid ""
-"There is a problem with this image file. Try to upload a different file."
-msgstr ""
-"Hay un problema con el archivo de la imagen. Intente subir un archivo "
-"diferente."
-
-#: cms/djangoapps/contentstore/views/videos.py
-#, python-brace-format
-msgid ""
-"Recommended image resolution is "
-"{image_file_max_width}x{image_file_max_height}. The minimum resolution is "
-"{image_file_min_width}x{image_file_min_height}."
-msgstr ""
-"La resolución de la imagen recomendada es "
-"{image_file_max_width}x{image_file_max_height}. La mínima resolución es "
-"{image_file_min_width}x{image_file_min_height}."
-
-#: cms/djangoapps/contentstore/views/videos.py
-#, python-brace-format
-msgid ""
-"This image file must have an aspect ratio of "
-"{video_image_aspect_ratio_text}."
-msgstr ""
-"El archivo de la imagen debe tener una relación de aspecto de "
-"{video_image_aspect_ratio_text}."
-
-#: cms/djangoapps/contentstore/views/videos.py
-msgid ""
-"The image file name can only contain letters, numbers, hyphens (-), and "
-"underscores (_)."
-msgstr ""
-"El nombre del archivo de la imagen solo puede tener letras, número, guiones "
-"(-), y guiones bajos (_)."
 
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "An image file is required."
@@ -14568,11 +14623,6 @@ msgstr "Añadir comentario"
 #: lms/templates/staff_problem_info.html
 msgid "Staff Debug:"
 msgstr "Información para depuración:"
-
-#: lms/templates/staff_problem_info.html
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Actions"
-msgstr "Acciones"
 
 #: lms/templates/staff_problem_info.html
 msgid "Score (for override only)"
@@ -18308,6 +18358,50 @@ msgstr "Este correo fue enviado automáticamente por {site_name} a {full_name}"
 msgid "You have been enrolled in {course_name}"
 msgstr "Usted ha sido inscrito en el curso {course_name}"
 
+#: lms/templates/emails/failed_verification_email.txt
+msgid ""
+"Sorry! The photos you submitted for ID verification were not accepted, for "
+"the following reason(s):"
+msgstr ""
+
+#: lms/templates/emails/failed_verification_email.txt
+msgid "The photo(s) of you:"
+msgstr ""
+
+#: lms/templates/emails/failed_verification_email.txt
+msgid "The photo of you:"
+msgstr ""
+
+#: lms/templates/emails/failed_verification_email.txt
+msgid "The photo of your ID:"
+msgstr ""
+
+#: lms/templates/emails/failed_verification_email.txt
+msgid "Other Reasons:"
+msgstr ""
+
+#: lms/templates/emails/failed_verification_email.txt
+msgid "Resubmit Verification: {reverify_url}"
+msgstr ""
+
+#: lms/templates/emails/failed_verification_email.txt
+msgid "ID Verification FAQ: {faq_url}"
+msgstr ""
+
+#: lms/templates/emails/failed_verification_email.txt
+#: lms/templates/emails/order_confirmation_email.txt
+#: lms/templates/emails/passed_verification_email.txt
+#: lms/templates/emails/photo_submission_confirmation.txt
+msgid "Thank you,"
+msgstr "Gracias."
+
+#: lms/templates/emails/failed_verification_email.txt
+#: lms/templates/emails/passed_verification_email.txt
+#: lms/templates/emails/photo_submission_confirmation.txt
+#: lms/templates/emails/reverification_processed.txt
+msgid "The {platform_name} team"
+msgstr "El equipo de {platform_name}"
+
 #: lms/templates/emails/order_confirmation_email.txt
 msgid ""
 "Your payment was successful. You will see the charge below on your next "
@@ -18317,13 +18411,21 @@ msgstr ""
 "tarjeta de crédito o débito a nombre de la empresa  {merchant_name}."
 
 #: lms/templates/emails/order_confirmation_email.txt
-#: lms/templates/emails/photo_submission_confirmation.txt
-msgid "Thank you,"
-msgstr "Gracias."
-
-#: lms/templates/emails/order_confirmation_email.txt
 msgid "Your order number is: {order_number}"
 msgstr "Su número de orden es: {order_number}"
+
+#: lms/templates/emails/passed_verification_email.txt
+msgid "Hi {full_name}"
+msgstr ""
+
+#: lms/templates/emails/passed_verification_email.txt
+msgid "Congratulations! Your ID verification process was successful."
+msgstr ""
+
+#: lms/templates/emails/passed_verification_email.txt
+msgid ""
+"Your verification is effective for one year. It will expire on {expiry_date}"
+msgstr ""
 
 #: lms/templates/emails/photo_submission_confirmation.txt
 msgid "Hi {full_name},"
@@ -18344,11 +18446,6 @@ msgstr ""
 "empezado. Revise si tiene un correo electrónico de nosotros en los próximos "
 "días para confirmar si su verificación fue exitosa. Puede también revisar el"
 " estado del proceso de verificación en su panel de control."
-
-#: lms/templates/emails/photo_submission_confirmation.txt
-#: lms/templates/emails/reverification_processed.txt
-msgid "The {platform_name} team"
-msgstr "El equipo de {platform_name}"
 
 #: lms/templates/emails/registration_codes_sale_email.txt
 msgid "Thank you for purchasing enrollments in {course_name}."
@@ -19014,10 +19111,6 @@ msgid "Number of enrollees (admins, staff, and students) by track"
 msgstr ""
 "Número total de inscritos (incluye administradores, personal de apoyo y "
 "estudiantes) por ruta"
-
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Professional"
-msgstr "Profesional"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Basic Course Information"
@@ -22495,12 +22588,6 @@ msgstr ""
 msgid "Learn more about certificates"
 msgstr "Aprender más acerca de los certificados"
 
-#: cms/templates/certificates.html cms/templates/group_configurations.html
-#: cms/templates/settings.html cms/templates/settings_advanced.html
-#: cms/templates/settings_graders.html
-msgid "Other Course Settings"
-msgstr "Otras configuraciones de curso"
-
 #: cms/templates/certificates.html cms/templates/settings_graders.html
 msgid "Details &amp; Schedule"
 msgstr "Detalles y Calendario"
@@ -23275,10 +23362,6 @@ msgstr "Comprimiendo"
 #: cms/templates/export.html
 msgid "Compressing the exported data and preparing it for download"
 msgstr "Comprimiendo los datos exportados y preparando para descargarlos"
-
-#: cms/templates/export.html cms/templates/import.html
-msgid "Success"
-msgstr "Terminación exitosa"
 
 #: cms/templates/export.html
 msgid "Your exported library can now be downloaded"
@@ -26978,10 +27061,6 @@ msgstr "Última modificación"
 #: wiki/templates/wiki/history.html
 msgid "no log message"
 msgstr "ningún mensaje de registro"
-
-#: wiki/templates/wiki/permission_denied.html
-msgid "Permission Denied"
-msgstr "Permiso Denegado"
 
 #: wiki/templates/wiki/permission_denied.html
 msgid "Sorry, you don't have permission to view this page."
