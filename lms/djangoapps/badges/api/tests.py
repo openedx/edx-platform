@@ -22,8 +22,8 @@ class UserAssertionTestCase(UrlResetMixin, ModuleStoreTestCase, ApiTestCase):
     Mixin for badge API tests.
     """
 
-    def setUp(self, *args, **kwargs):
-        super(UserAssertionTestCase, self).setUp(*args, **kwargs)
+    def setUp(self):
+        super(UserAssertionTestCase, self).setUp()
         self.course = CourseFactory.create()
         self.user = UserFactory.create()
         # Password defined by factory.
