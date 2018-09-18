@@ -16,7 +16,6 @@ from provider.oauth2.models import (
 )
 
 import third_party_auth
-from lms.djangoapps.onboarding.helpers import  get_alquity_community_url
 from lms.djangoapps.verify_student.models import VerificationDeadline, SoftwareSecurePhotoVerification
 from course_modes.models import CourseMode
 
@@ -231,7 +230,6 @@ def auth_pipeline_urls(auth_entry, redirect_url=None):
 # things like auto-enrollment.
 POST_AUTH_PARAMS = ('course_id', 'enrollment_action', 'course_mode', 'email_opt_in', 'purchase_workflow')
 
-# TODO: Move this helper to philu_overrides, Just keep edX code here
 
 def get_next_url_for_login_page(request):
     """
@@ -246,16 +244,6 @@ def get_next_url_for_login_page(request):
     specified.
     """
     redirect_to = request.GET.get('next', None)
-
-    if redirect_to == 'alquity' and request.path == '/register':
-        if request.user.is_authenticated():
-            return get_alquity_community_url()
-        return reverse('dashboard')
-
-    if redirect_to == 'alquity' and request.path == '/login':
-        return get_alquity_community_url()
-
-
     # if we get a redirect parameter, make sure it's safe. If it's not, drop the
     # parameter.
     if redirect_to and not http.is_safe_url(redirect_to):
