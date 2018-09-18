@@ -840,8 +840,7 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
             {
                 "email": [{
                     "user_message": (
-                        "It looks like {} belongs to an existing account. "
-                        "Try again with a different email address."
+                        "It looks like {} was already registered. Try again with a different email address."
                     ).format(
                         self.EMAIL
                     )
@@ -882,7 +881,7 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
             {
                 "email": [{
                     "user_message": (
-                        "It looks like {} belongs to an existing account. "
+                        "It looks like {} was already registered. "
                         "Try again with a different email address."
                     ).format(
                         self.EMAIL
@@ -924,7 +923,7 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
             {
                 "username": [{
                     "user_message": (
-                        "It looks like {} belongs to an existing account. "
+                        "It looks like {} was already registered. "
                         "Try again with a different username."
                     ).format(
                         self.USERNAME
@@ -961,8 +960,7 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
             {
                 "email": [{
                     "user_message": (
-                        "It looks like {} belongs to an existing account. "
-                        "Try again with a different email address."
+                        "It looks like {} was already registered. Try again with a different email address."
                     ).format(
                         self.EMAIL
                     )
@@ -998,7 +996,7 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
             {
                 u"username": [{
                     u"user_message": (
-                        u"An account with the Public Username '{}' already exists."
+                        u"It looks like '{}' was already registered. Try again with a different username."
                     ).format(
                         self.USERNAME
                     )
@@ -1034,8 +1032,7 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
             {
                 "email": [{
                     "user_message": (
-                        "It looks like {} belongs to an existing account. "
-                        "Try again with a different email address."
+                        "It looks like {} was already registered. Try again with a different email address."
                     ).format(
                         self.EMAIL
                     )
@@ -2195,7 +2192,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             {
                 "email": [{
                     "user_message": (
-                        "It looks like {} belongs to an existing account. "
+                        "It looks like {} was already registered. "
                         "Try again with a different email address."
                     ).format(
                         self.EMAIL
@@ -2230,7 +2227,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             {
                 "username": [{
                     "user_message": (
-                        "It looks like {} belongs to an existing account. "
+                        "It looks like {} was already registered. "
                         "Try again with a different username."
                     ).format(
                         self.USERNAME
@@ -2265,7 +2262,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             {
                 "username": [{
                     "user_message": (
-                        "It looks like {} belongs to an existing account. "
+                        "It looks like {} was already registered. "
                         "Try again with a different username."
                     ).format(
                         self.USERNAME
@@ -2273,8 +2270,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 }],
                 "email": [{
                     "user_message": (
-                        "It looks like {} belongs to an existing account. "
-                        "Try again with a different email address."
+                        "It looks like {} was already registered. Try again with a different email address."
                     ).format(
                         self.EMAIL
                     )
@@ -2456,7 +2452,7 @@ class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTe
         errors = json.loads(response.content)
         for conflict_attribute in ["username", "email"]:
             self.assertIn(conflict_attribute, errors)
-            self.assertIn("belongs to an existing account", errors[conflict_attribute][0]["user_message"])
+            self.assertIn("was already registered", errors[conflict_attribute][0]["user_message"])
 
     def _assert_access_token_error(self, response, expected_error_message):
         """Assert that the given response was an error for the access_token field with the given error message."""

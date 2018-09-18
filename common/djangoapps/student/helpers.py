@@ -64,8 +64,8 @@ DISABLE_UNENROLL_CERT_STATES = [
     'generating',
     'downloadable',
 ]
-USERNAME_EXISTS_MSG_FMT = _("An account with the Public Username '{username}' already exists.")
-
+USERNAME_EXISTS_MSG_FMT = _("It looks like '{username}' was already registered. Try again with a different username.")
+EMAIL_EXISTS_MSG_FMT = _("It looks like {email} was already registered. Try again with a different email address.")
 
 log = logging.getLogger(__name__)
 
@@ -634,7 +634,7 @@ def do_create_account(form, custom_form=None):
         # TODO duplicate email is already handled by form.errors above as a ValidationError.
         # The checks for duplicate email/username should occur in the same place with an
         # AccountValidationError and a consistent user message returned (i.e. both should
-        # return "It looks like {username} belongs to an existing account. Try again with a
+        # return "It looks like {username} was already registered. Try again with a
         # different username.")
         if username_exists_or_retired(user.username):
             raise AccountValidationError(
@@ -643,7 +643,7 @@ def do_create_account(form, custom_form=None):
             )
         elif email_exists_or_retired(user.email):
             raise AccountValidationError(
-                _("An account with the Email '{email}' already exists.").format(email=user.email),
+                EMAIL_EXISTS_MSG_FMT.format(email=user.email),
                 field="email"
             )
         else:

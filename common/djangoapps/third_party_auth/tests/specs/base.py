@@ -129,7 +129,7 @@ class HelperMixin(object):
         self.assertEqual(400, response.status_code)
         payload = json.loads(response.content)
         self.assertFalse(payload.get('success'))
-        self.assertIn('belongs to an existing account', payload.get('value'))
+        self.assertIn('was already registered', payload.get('value'))
 
     def assert_json_success_response_looks_correct(self, response):
         """Asserts the json response indicates success and redirection."""

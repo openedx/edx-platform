@@ -47,11 +47,11 @@ EMAIL_INVALID_MSG = _(u'"{email}" is not a valid email address.')
 # Translators: This message is shown to users who attempt to create a new
 # account using an username/email associated with an existing account.
 EMAIL_CONFLICT_MSG = _(
-    u"It looks like {email_address} belongs to an existing account. "
+    u"It looks like {email_address} was already registered. "
     u"Try again with a different email address."
 )
 USERNAME_CONFLICT_MSG = _(
-    u"It looks like {username} belongs to an existing account. "
+    u"It looks like {username} was already registered. "
     u"Try again with a different username."
 )
 

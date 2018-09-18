@@ -95,13 +95,10 @@ def create_account_with_params(request, params):
       minimum of two characters long" rather than "Please use a username of
       at least two characters").
     * Duplicate email raises a ValidationError (rather than the expected
-      AccountValidationError). Duplicate username returns an inconsistent
-      user message (i.e. "An account with the Public Username '{username}'
-      already exists." rather than "It looks like {username} belongs to an
-      existing account. Try again with a different username.") The two checks
-      occur at different places in the code; as a result, registering with
-      both a duplicate username and email raises only a ValidationError for
-      email only.
+      AccountValidationError).
+    * The two checks occur at different places in the code; as a result,
+      registering with both a duplicate username and email raises only a
+      ValidationError for the email.
     """
     # Copy params so we can modify it; we can't just do dict(params) because if
     # params is request.POST, that results in a dict containing lists of values

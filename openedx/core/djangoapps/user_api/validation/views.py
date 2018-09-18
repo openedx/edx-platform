@@ -90,7 +90,7 @@ class RegistrationValidationView(APIView):
             >>> {
             >>>     "validation_decisions": {
             >>>         "username": "",
-            >>>         "email": "It looks like cto@edx.org belongs to an existing account. Try again with a different email address.",
+            >>>         "email": "It looks like cto@edx.org was already registered.",
             >>>         "password": "Password must be at least 2 characters long",
             >>>     }
             >>> }

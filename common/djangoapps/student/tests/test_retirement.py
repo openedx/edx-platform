@@ -238,10 +238,7 @@ class TestRegisterRetiredUsername(TestCase):
     """
     Tests to ensure that retired usernames can no longer be used in registering new accounts.
     """
-    # The returned message here varies depending on whether a ValidationError -or-
-    # an AccountValidationError occurs.
-    INVALID_ACCT_ERR_MSG = ('An account with the Public Username', 'already exists.')
-    INVALID_ERR_MSG = ('It looks like', 'belongs to an existing account. Try again with a different username.')
+    INVALID_ACCT_ERR_MSG = ('It looks like', 'was already registered. Try again with a different username.')
 
     def setUp(self):
         super(TestRegisterRetiredUsername, self).setUp()
@@ -255,7 +252,13 @@ class TestRegisterRetiredUsername(TestCase):
             'honor_code': 'true',
         }
 
-    def _validate_exiting_username_response(self, orig_username, response, start_msg=INVALID_ACCT_ERR_MSG[0], end_msg=INVALID_ACCT_ERR_MSG[1]):
+    def _validate_exiting_username_response(
+            self,
+            orig_username,
+            response,
+            start_msg=INVALID_ACCT_ERR_MSG[0],
+            end_msg=INVALID_ACCT_ERR_MSG[1]
+    ):
         """
         Validates a response stating that a username already exists -or- is invalid.
         """
@@ -263,6 +266,7 @@ class TestRegisterRetiredUsername(TestCase):
         obj = json.loads(response.content)
 
         username_msg = obj['username'][0]['user_message']
+
         assert username_msg.startswith(start_msg)
         assert username_msg.endswith(end_msg)
         assert orig_username in username_msg
@@ -281,7 +285,7 @@ class TestRegisterRetiredUsername(TestCase):
         # Attempt to create another account with the same username that's been retired.
         self.url_params['username'] = orig_username
         response = self.client.post(self.url, self.url_params)
-        self._validate_exiting_username_response(orig_username, response, self.INVALID_ERR_MSG[0], self.INVALID_ERR_MSG[1])
+        self._validate_exiting_username_response(orig_username, response)
 
     def test_username_close_to_retired_format_active(self):
         """
