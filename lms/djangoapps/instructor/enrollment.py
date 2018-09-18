@@ -12,18 +12,29 @@ import pytz
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
+from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.translation import override as override_language
+from edx_ace import ace
+from edx_ace.recipient import Recipient
 from six import text_type
 
 from course_modes.models import CourseMode
 from courseware.models import StudentModule
-from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
 from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
 from lms.djangoapps.grades.events import STATE_DELETED_EVENT_TYPE
 from lms.djangoapps.grades.signals.handlers import disconnect_submissions_signal_receiver
 from lms.djangoapps.grades.signals.signals import PROBLEM_RAW_SCORE_CHANGED
+from lms.djangoapps.instructor.message_types import (
+    AccountCreationAndEnrollment,
+    AddBetaTester,
+    AllowedEnroll,
+    AllowedUnenroll,
+    EnrollEnrolled,
+    EnrolledUnenroll,
+    RemoveBetaTester,
+)
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.models import UserPreference
@@ -146,16 +157,17 @@ def enroll_email(course_id, student_email, auto_enroll=False, email_students=Fal
 
         enrollment_obj = CourseEnrollment.enroll_by_email(student_email, course_id, course_mode)
         if email_students:
-            email_params['message'] = 'enrolled_enroll'
+            email_params['message_type'] = 'enrolled_enroll'
             email_params['email_address'] = student_email
             email_params['full_name'] = previous_state.full_name
             send_mail_to_student(student_email, email_params, language=language)
+
     elif not is_email_retired(student_email):
         cea, _ = CourseEnrollmentAllowed.objects.get_or_create(course_id=course_id, email=student_email)
         cea.auto_enroll = auto_enroll
         cea.save()
         if email_students:
-            email_params['message'] = 'allowed_enroll'
+            email_params['message_type'] = 'allowed_enroll'
             email_params['email_address'] = student_email
             send_mail_to_student(student_email, email_params, language=language)
 
@@ -180,7 +192,7 @@ def unenroll_email(course_id, student_email, email_students=False, email_params=
     if previous_state.enrollment:
         CourseEnrollment.unenroll_by_email(student_email, course_id)
         if email_students:
-            email_params['message'] = 'enrolled_unenroll'
+            email_params['message_type'] = 'enrolled_unenroll'
             email_params['email_address'] = student_email
             email_params['full_name'] = previous_state.full_name
             send_mail_to_student(student_email, email_params, language=language)
@@ -188,7 +200,7 @@ def unenroll_email(course_id, student_email, email_students=False, email_params=
     if previous_state.allowed:
         CourseEnrollmentAllowed.objects.get(course_id=course_id, email=student_email).delete()
         if email_students:
-            email_params['message'] = 'allowed_unenroll'
+            email_params['message_type'] = 'allowed_unenroll'
             email_params['email_address'] = student_email
             # Since no User object exists for this student there is no "full_name" available.
             send_mail_to_student(student_email, email_params, language=language)
@@ -207,7 +219,7 @@ def send_beta_role_email(action, user, email_params):
     `email_params` parameters used while parsing email templates (a `dict`).
     """
     if action in ('add', 'remove'):
-        email_params['message'] = '%s_beta_tester' % action
+        email_params['message_type'] = '%s_beta_tester' % action
         email_params['email_address'] = user.email
         email_params['full_name'] = user.profile.name
     else:
@@ -422,7 +434,7 @@ def send_mail_to_student(student, param_dict, language=None):
         `course_url`: url of course (a `str`)
         `email_address`: email of student (a `str`)
         `full_name`: student full name (a `str`)
-        `message`: type of email to send and template to use (a `str`)
+        `message_type`: type of email to send and template to use (a `str`)
         `is_shib_course`: (a `boolean`)
     ]
 
@@ -433,71 +445,39 @@ def send_mail_to_student(student, param_dict, language=None):
     Returns a boolean indicating whether the email was sent successfully.
     """
 
-    # add some helpers and microconfig subsitutions
+    # Add some helpers and microconfig subsitutions
     if 'display_name' in param_dict:
         param_dict['course_name'] = param_dict['display_name']
+    elif 'course' in param_dict:
+        param_dict['course_name'] = param_dict['course'].display_name_with_default
 
     param_dict['site_name'] = configuration_helpers.get_value(
         'SITE_NAME',
         param_dict['site_name']
     )
 
-    subject = None
-    message = None
-
     # see if there is an activation email template definition available as configuration,
     # if so, then render that
-    message_type = param_dict['message']
+    message_type = param_dict['message_type']
 
-    email_template_dict = {
-        'allowed_enroll': (
-            'emails/enroll_email_allowedsubject.txt',
-            'emails/enroll_email_allowedmessage.txt'
-        ),
-        'enrolled_enroll': (
-            'emails/enroll_email_enrolledsubject.txt',
-            'emails/enroll_email_enrolledmessage.txt'
-        ),
-        'allowed_unenroll': (
-            'emails/unenroll_email_subject.txt',
-            'emails/unenroll_email_allowedmessage.txt'
-        ),
-        'enrolled_unenroll': (
-            'emails/unenroll_email_subject.txt',
-            'emails/unenroll_email_enrolledmessage.txt'
-        ),
-        'add_beta_tester': (
-            'emails/add_beta_tester_email_subject.txt',
-            'emails/add_beta_tester_email_message.txt'
-        ),
-        'remove_beta_tester': (
-            'emails/remove_beta_tester_email_subject.txt',
-            'emails/remove_beta_tester_email_message.txt'
-        ),
-        'account_creation_and_enrollment': (
-            'emails/enroll_email_enrolledsubject.txt',
-            'emails/account_creation_and_enroll_emailMessage.txt'
-        ),
+    ace_emails_dict = {
+        'account_creation_and_enrollment': AccountCreationAndEnrollment,
+        'add_beta_tester': AddBetaTester,
+        'allowed_enroll': AllowedEnroll,
+        'allowed_unenroll': AllowedUnenroll,
+        'enrolled_enroll': EnrollEnrolled,
+        'enrolled_unenroll': EnrolledUnenroll,
+        'remove_beta_tester': RemoveBetaTester,
     }
 
-    subject_template, message_template = email_template_dict.get(message_type, (None, None))
-    if subject_template is not None and message_template is not None:
-        subject, message = render_message_to_string(
-            subject_template, message_template, param_dict, language=language
-        )
+    message_class = ace_emails_dict[message_type]
+    message = message_class().personalize(
+        recipient=Recipient(username='', email_address=student),
+        language=language,
+        user_context=param_dict,
+    )
 
-    if subject and message:
-        # Remove leading and trailing whitespace from body
-        message = message.strip()
-
-        # Email subject *must not* contain newlines
-        subject = ''.join(subject.splitlines())
-        from_address = configuration_helpers.get_value(
-            'email_from_address',
-            settings.DEFAULT_FROM_EMAIL
-        )
-
-        send_mail(subject, message, from_address, [student], fail_silently=False)
+    ace.send(message)
 
 
 def render_message_to_string(subject_template, message_template, param_dict, language=None):
