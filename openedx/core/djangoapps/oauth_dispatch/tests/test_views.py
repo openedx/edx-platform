@@ -684,36 +684,39 @@ class TestRevokeTokenView(AccessTokenLoginMixin, _DispatchingViewTestCase):  # p
             'token': token,
         }
 
-    def _assert_refresh_token_invalidated(self):
+    def assert_refresh_token_status_code(self, refresh_token, expected_status_code):
         """
-        Asserts that oauth assigned refresh_token is not valid
+        Asserts the status code using oauth assigned refresh_token
         """
         response = self.client.post(
             self.access_token_url,
-            self.access_token_post_body_with_refresh_token(self.refresh_token)
+            self.access_token_post_body_with_refresh_token(refresh_token)
         )
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, expected_status_code)
 
-    def verify_revoke_token(self, token):
+    def revoke_token(self, token):
         """
-        Verifies access of token before and after revoking
+        Revokes the passed access or refresh token
         """
-        self._assert_access_token_is_valid()
-
         response = self.client.post(self.revoke_token_url, self.revoke_token_post_body(token))
         self.assertEqual(response.status_code, 200)
 
-        self._assert_access_token_invalidated()
-        self._assert_refresh_token_invalidated()
-
     def test_revoke_refresh_token_dot(self):
         """
-        Tests invalidation/revoke of user tokens against refresh token for django-oauth-toolkit
+        Tests invalidation/revoke of refresh token for django-oauth-toolkit
         """
-        self.verify_revoke_token(self.refresh_token)
+        self.assert_refresh_token_status_code(self.refresh_token, expected_status_code=200)
+
+        self.revoke_token(self.refresh_token)
+
+        self.assert_refresh_token_status_code(self.refresh_token, expected_status_code=401)
 
     def test_revoke_access_token_dot(self):
         """
         Tests invalidation/revoke of user access token for django-oauth-toolkit
         """
-        self.verify_revoke_token(self.access_token)
+        self._assert_access_token_is_valid(self.access_token)
+
+        self.revoke_token(self.access_token)
+
+        self._assert_access_token_invalidated(self.access_token)
