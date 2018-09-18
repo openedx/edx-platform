@@ -6,7 +6,7 @@ from functools import wraps
 import psutil
 
 
-def timeout(limit=60):
+def timeout(limit=600):
     """
     kill a function if it has not completed within a specified timeframe
     """
