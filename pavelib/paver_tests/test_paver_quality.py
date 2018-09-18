@@ -16,6 +16,7 @@ from paver.easy import BuildFailure  # pylint: disable=ungrouped-imports
 
 import pavelib.quality
 from pavelib.paver_tests.utils import fail_on_eslint
+from .utils import PaverTestCase
 
 
 @ddt
@@ -166,10 +167,8 @@ class TestPaverReportViolationsCounts(unittest.TestCase):
         """
         report = textwrap.dedent("""
             test.html: 30:53: javascript-jquery-append:  $('#test').append(print_tos);
-
             javascript-concat-html: 310 violations
             javascript-escape:      7 violations
-
             2608 violations total
         """)
         with open(self.f.name, 'w') as f:
@@ -205,11 +204,8 @@ class TestPaverReportViolationsCounts(unittest.TestCase):
         """
         report = textwrap.dedent("""
             Linting lms/templates/navigation.html:
-
             2 violations total
-
             Linting scripts/tests/templates/test.underscore:
-
             3 violations total
         """)
         with open(self.f.name, 'w') as f:
