@@ -1,0 +1,25 @@
+{% extends 'ace_common/edx_ace/common/base_body.html' %}
+
+{% load i18n %}
+{% load static %}
+{% block content %}
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+        <td>
+            <h1>
+                {% blocktrans %}You have been unenrolled from {{ course_name }}{% endblocktrans %}
+            </h1>
+
+            <p style="color: rgba(0,0,0,.75);">
+                {% blocktrans %}You have been unenrolled from the course {{ course_name }} by a member of the course staff. Please disregard the invitation previously sent.{% endblocktrans %}
+                <br />
+            </p>
+
+            <p style="color: rgba(0,0,0,.75);">
+                {% blocktrans %}This email was automatically sent from {{ site_name }} to {{ email_address }}{% endblocktrans %}
+                <br />
+            </p>
+        </td>
+    </tr>
+</table>
+{% endblock %}
