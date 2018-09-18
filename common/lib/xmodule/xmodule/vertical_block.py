@@ -2,10 +2,8 @@
 VerticalBlock - an XBlock which renders its children in a column.
 """
 import logging
-import os
 from copy import copy
 
-from django.conf import settings
 from lxml import etree
 from xblock.core import XBlock
 from xblock.fragment import Fragment
@@ -25,7 +23,6 @@ CLASS_PRIORITY = ['video', 'problem']
 
 
 @XBlock.needs('user', 'bookmarks')
-@XBlock.wants('completion')
 class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParserMixin, MakoTemplateBlockBase, XBlock):
     """
     Layout XBlock for rendering subblocks vertically.
@@ -58,24 +55,14 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         if 'username' not in child_context:
             user_service = self.runtime.service(self, 'user')
             child_context['username'] = user_service.get_current_user().opt_attrs['edx-platform.username']
-        child_blocks = self.get_display_items()
-        child_blocks_to_complete_on_view = set()
-        completion_service = self.runtime.service(self, 'completion')
-        if completion_service and completion_service.completion_tracking_enabled():
-            child_blocks_to_complete_on_view = completion_service.blocks_to_mark_complete_on_view(child_blocks)
 
         child_context['child_of_vertical'] = True
 
         is_child_of_vertical = context.get('child_of_vertical', False)
 
         # pylint: disable=no-member
-        for child in child_blocks:
-            child_block_context = copy(child_context)
-            if child in child_blocks_to_complete_on_view:
-                child_block_context['wrap_xblock_data'] = {
-                    'mark-completed-on-view-after-delay': completion_service.get_complete_on_view_delay_ms()
-                }
-            rendered_child = child.render(STUDENT_VIEW, child_block_context)
+        for child in self.get_display_items():
+            rendered_child = child.render(STUDENT_VIEW, child_context)
             fragment.add_frag_resources(rendered_child)
 
             contents.append({
@@ -92,8 +79,6 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
             'bookmark_id': u"{},{}".format(child_context['username'], unicode(self.location))
         }))
 
-        fragment.add_javascript_url(self.runtime.STATIC_URL + 'bundles/commons.js')
-        fragment.add_javascript_url(self.runtime.STATIC_URL + 'bundles/CompletionOnViewService.js')
         fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/vertical_student_view.js'))
         fragment.initialize_js('VerticalStudentView')
 
