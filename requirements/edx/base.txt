@@ -112,7 +112,7 @@ edx-ace==0.1.9
 edx-analytics-data-api-client==0.14.4
 edx-ccx-keys==0.2.1
 edx-celeryutils==0.2.7
-edx-completion==0.1.9
+edx-completion==0.1.10
 edx-django-oauth2-provider==1.3.4
 edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
@@ -169,7 +169,7 @@ mock==1.0.1
 mongoengine==0.10.0
 mysql-python==1.2.5
 networkx==1.7
-newrelic==4.2.0.100
+newrelic==4.4.0.103
 nltk==3.3.0
 nodeenv==1.1.1
 numpy==1.6.2
@@ -242,5 +242,5 @@ webob==1.8.2              # via xblock
 wrapt==1.10.5
 xblock-review==1.1.5
 xblock-utils==1.2.0
-xblock==1.2.1
+xblock==1.2.2
 zendesk==1.1.1
