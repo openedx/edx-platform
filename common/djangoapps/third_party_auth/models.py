@@ -88,7 +88,7 @@ class ProviderConfig(ConfigurationModel):
     """
     Abstract Base Class for configuring a third_party_auth provider
     """
-    KEY_FIELDS = ('slug',)
+    KEY_FIELDS = ('backend_name',)
 
     icon_class = models.CharField(
         max_length=50,
