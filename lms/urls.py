@@ -61,6 +61,11 @@ if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     if password_policy_compliance.should_enforce_compliance_on_login():
         admin.site.login_form = PasswordPolicyAwareAdminAuthForm
 
+# Custom error pages
+# These are used by Django to render these error codes. Do not remove.
+# pylint: disable=invalid-name
+handler404 = static_template_view_views.render_404
+handler500 = static_template_view_views.render_500
 
 urlpatterns = [
     url(r'^$', branding_views.index, name='root'),   # Main marketing page, or redirect to courseware
@@ -779,6 +784,10 @@ if settings.FEATURES.get('CLASS_DASHBOARD'):
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     # Jasmine and admin
     urlpatterns += [
+        # The password pages in the admin tool are disabled so that all password
+        # changes go through our user portal and follow complexity requirements.
+        url(r'^admin/password_change/$', handler404),
+        url(r'^admin/auth/user/\d+/password/$', handler404),
         url(r'^admin/', include(admin.site.urls)),
     ]
 
@@ -1012,13 +1021,6 @@ if 'debug_toolbar' in settings.INSTALLED_APPS:
     urlpatterns += [
         url(r'^__debug__/', include(debug_toolbar.urls)),
     ]
-
-
-# Custom error pages
-# These are used by Django to render these error codes. Do not remove.
-# pylint: disable=invalid-name
-handler404 = static_template_view_views.render_404
-handler500 = static_template_view_views.render_500
 
 # include into our URL patterns the HTTP REST API that comes with edx-proctoring.
 urlpatterns += [
