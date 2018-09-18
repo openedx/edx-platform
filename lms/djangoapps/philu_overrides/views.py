@@ -616,6 +616,10 @@ def course_about(request, course_id):
         else:
             course_details = CourseDetails.populate(course)
 
+
+        # Alquity specific check
+        is_alquity = True if request.GET.get('ref') == 'alquity' else False
+
         context = {
             'course': course,
             'course_details': course_details,
@@ -637,6 +641,7 @@ def course_about(request, course_id):
             'cart_link': reverse('shoppingcart.views.show_cart'),
             'pre_requisite_courses': pre_requisite_courses,
             'course_image_urls': overview.image_urls,
+            'is_alquity': is_alquity
         }
         inject_coursetalk_keys_into_context(context, course_key)
 
@@ -656,4 +661,4 @@ def course_auto_enroll(request, course_id):
     if course_custom_settings.auto_enroll:
         CourseEnrollment.enroll(request.user, course_key)
 
-    return redirect('/courses/{}/about'.format(course_id))
+    return redirect('/courses/{}/about?ref=alquity'.format(course_id))
