@@ -13,9 +13,10 @@ from unittest import TestCase
 from i18n import config, dummy, extract, generate
 from polib import pofile
 from pytz import UTC
+from pavelib.paver_tests.utils import PaverTestCase
 
 
-class TestGenerate(TestCase):
+class TestGenerate(PaverTestCase):
     """
     Tests functionality of i18n/generate.py
     """
