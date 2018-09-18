@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 from django.db import migrations
+from django.http import Http404
 
 import json
 import logging
@@ -28,7 +29,15 @@ def save_display_name(apps, schema_editor):
 
     # Create `display_name` overrides for these CCX courses
     for ccx in ccx_list:
-        course = get_course_by_id(ccx.course_id, depth=None)
+        try:
+            course = get_course_by_id(ccx.course_id, depth=None)
+        except Http404:
+            log.error(
+                "Root course %s not found. Can't create display_name override for %s.",
+                ccx.course_id,
+                ccx.display_name
+            )
+            continue
         display_name = course.fields['display_name']
         display_name_json = display_name.to_json(ccx.display_name)
         serialized_display_name = json.dumps(display_name_json)
