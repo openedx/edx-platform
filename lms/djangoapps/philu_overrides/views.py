@@ -34,7 +34,7 @@ from common.djangoapps.student.views import get_course_related_keys
 from lms.djangoapps.courseware.access import has_access, _can_enroll_courselike
 from lms.djangoapps.courseware.courses import get_courses, sort_by_start_date, get_course_by_id, sort_by_announcement
 from lms.djangoapps.courseware.views.views import get_last_accessed_courseware
-from lms.djangoapps.onboarding.helpers import reorder_registration_form_fields
+from lms.djangoapps.onboarding.helpers import reorder_registration_form_fields, get_alquity_community_url
 from lms.djangoapps.philu_api.helpers import get_course_custom_settings
 from lms.djangoapps.student_account.views import _local_server_get, _get_form_descriptions, _external_auth_intercept, \
     _third_party_auth_context
@@ -656,7 +656,7 @@ def course_auto_enroll(request, course_id):
     course_custom_settings = get_course_custom_settings(course_id)
 
     if request.user.is_anonymous():
-        raise Http404
+        return redirect(get_alquity_community_url())
 
     if course_custom_settings.auto_enroll:
         CourseEnrollment.enroll(request.user, course_key)
