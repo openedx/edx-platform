@@ -1719,7 +1719,7 @@ class RegistrationCodeRedemptionCourseEnrollment(SharedModuleStoreTestCase):
         cls.course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
         cls.course_key = cls.course.id
 
-    def setUp(self, **kwargs):
+    def setUp(self):
         super(RegistrationCodeRedemptionCourseEnrollment, self).setUp()
 
         self.user = UserFactory.create()

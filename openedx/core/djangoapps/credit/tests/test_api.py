@@ -155,7 +155,7 @@ class CreditApiTestBase(ModuleStoreTestCase):
         ]
     }
 
-    def setUp(self, **kwargs):
+    def setUp(self):
         super(CreditApiTestBase, self).setUp()
         self.course = CourseFactory.create(org="edx", course="DemoX", run="Demo_Course")
         self.course_key = self.course.id

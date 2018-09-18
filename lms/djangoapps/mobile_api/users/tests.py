@@ -90,7 +90,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
     }
 
     @patch.dict(settings.FEATURES, {"ENABLE_DISCUSSION_SERVICE": True})
-    def setUp(self, *args, **kwargs):
+    def setUp(self):
         super(TestUserEnrollmentApi, self).setUp()
 
     def verify_success(self, response):

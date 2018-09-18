@@ -15,7 +15,7 @@ class CourseCompleteTestCase(ModuleStoreTestCase):
     """
     shard = 4
 
-    def setUp(self, **kwargs):
+    def setUp(self):
         super(CourseCompleteTestCase, self).setUp()
         # Need key to be deterministic to test slugs.
         self.course = CourseFactory.create(

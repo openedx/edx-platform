@@ -74,7 +74,7 @@ class CourseCompletionBadgeTest(ModuleStoreTestCase):
     """
     shard = 4
 
-    def setUp(self, **kwargs):
+    def setUp(self):
         super(CourseCompletionBadgeTest, self).setUp()
         self.badge_classes = [
             RandomBadgeClassFactory(

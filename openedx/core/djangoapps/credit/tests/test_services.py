@@ -22,7 +22,7 @@ class CreditServiceTests(ModuleStoreTestCase):
     """
     shard = 2
 
-    def setUp(self, **kwargs):
+    def setUp(self):
         super(CreditServiceTests, self).setUp()
 
         self.service = CreditService()
