@@ -27,7 +27,7 @@ from lms.djangoapps.onboarding.decorators import can_save_org_data, can_not_upda
 from lms.djangoapps.onboarding.email_utils import send_admin_activation_email, send_admin_update_confirmation_email, \
     send_admin_update_email
 from lms.djangoapps.onboarding.helpers import calculate_age_years, COUNTRIES, LANGUAGES, oef_eligible_first_learner, \
-    get_close_matching_orgs_with_suggestions
+    get_close_matching_orgs_with_suggestions, get_alquity_community_url
 from lms.djangoapps.onboarding.models import (
     Organization,
     Currency, OrganizationMetric, OrganizationAdminHashKeys, PartnerNetwork)
@@ -174,6 +174,8 @@ def interests(request):
 
         if are_forms_complete and not is_action_update:
             update_nodebb_for_user_status(request.user.username)
+            if user_extended_profile.is_alquity_user:
+                return redirect(get_alquity_community_url())
             return redirect(reverse('recommendations'))
 
     else:
@@ -239,6 +241,8 @@ def organization(request):
             else:
                 #update nodebb for user profile completion
                 update_nodebb_for_user_status(request.user.username)
+                if user_extended_profile.is_alquity_user:
+                    next_page_url = get_alquity_community_url()
 
             if redirect_to_next:
                 return redirect(next_page_url)
@@ -340,6 +344,9 @@ def org_detail_survey(request):
 
             if are_forms_complete and redirect_to_next:
                 update_nodebb_for_user_status(request.user.username)
+                if user_extended_profile.is_alquity_user:
+                    next_page_url = get_alquity_community_url()
+
                 return redirect(next_page_url)
 
     else:

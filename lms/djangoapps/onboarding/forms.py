@@ -666,7 +666,7 @@ class RegModelForm(BaseOnboardingModelForm):
 
         return org_admin_email
 
-    def save(self, user=None, commit=True):
+    def save(self, user=None, commit=True, is_alquity_user=False):
         organization_name = self.cleaned_data.get('organization_name', '').strip()
         is_poc = self.cleaned_data['is_poc']
         opt_in = self.cleaned_data['opt_in']
@@ -676,6 +676,7 @@ class RegModelForm(BaseOnboardingModelForm):
         is_currently_unemployed = self.cleaned_data['is_currently_employed']
 
         extended_profile = UserExtendedProfile.objects.create(user=user)
+        extended_profile.is_alquity_user = is_alquity_user
 
         if not is_currently_unemployed and organization_name:
             organization_to_assign = Organization.objects.filter(label__iexact=organization_name).first()
