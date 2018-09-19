@@ -230,7 +230,7 @@ class UpdatedCourseVideos(TimeStampedModel):
     """
     Temporary model to persist the course videos which have been enqueued to update video thumbnails.
     """
-    course_id = CourseKeyField(db_index=True, max_length=255)
+    course_id = models.CharField(max_length=255)
     edx_video_id = models.CharField(max_length=100)
     command_run = PositiveIntegerField(default=0)
 

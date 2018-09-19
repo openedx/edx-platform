@@ -91,7 +91,7 @@ class Command(BaseCommand):
             if video_thumbnail_settings.all_course_videos:
                 for course_id, edx_video_id, __ in course_videos:
                     UpdatedCourseVideos.objects.get_or_create(
-                        course_id=course_id,
+                        course_id=unicode(course_id),
                         edx_video_id=edx_video_id,
                         command_run=command_run
                     )
