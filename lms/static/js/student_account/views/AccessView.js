@@ -53,10 +53,9 @@
                     this.thirdPartyAuthHint = options.third_party_auth_hint || null;
 
                     if (options.login_redirect_url) {
-                    // Ensure that the next URL is internal for security reasons
-                        if (! window.isExternal(options.login_redirect_url)) {
-                            this.nextUrl = options.login_redirect_url;
-                        }
+                        // TODO: make window.isExternal enough intelligent to mark community urls internal
+                        // Reverter that window.isExternal sanity check for alquity redirection.
+                        this.nextUrl = options.login_redirect_url;
                     }
 
                     this.formDescriptions = {

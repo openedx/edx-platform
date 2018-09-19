@@ -3,6 +3,7 @@ from datetime import date
 from difflib import SequenceMatcher
 from lms.djangoapps.onboarding.models import Organization
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from django.conf import settings
 
 COUNTRIES = {
     'AD': 'Andorra',
@@ -7862,3 +7863,10 @@ def get_close_matching_orgs_with_suggestions(request, query):
             }
 
     return data
+
+
+def get_alquity_community_url():
+    """
+    :return: url of alquity private community
+    """
+    return u'{}{}'.format(settings.NODEBB_ENDPOINT, configuration_helpers.get_value('ALQUITY_PRIVATE_COMMUNITY'))

@@ -410,6 +410,7 @@ class UserExtendedProfile(TimeStampedModel):
     is_interests_data_submitted = models.BooleanField(default=False)
     is_organization_metrics_submitted = models.BooleanField(default=False)
     is_first_learner = models.BooleanField(default=False)
+    is_alquity_user = models.BooleanField(default=False)
 
     history = HistoricalRecords()
 
