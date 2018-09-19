@@ -21,7 +21,7 @@ from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from config_models.models import cache
-from courseware.tests.factories import GlobalStaffFactory, InstructorFactory, UserFactory
+from courseware.tests.factories import StaffFactory, GlobalStaffFactory, InstructorFactory, UserFactory
 from certificates.tests.factories import GeneratedCertificateFactory, CertificateWhitelistFactory, \
     CertificateInvalidationFactory
 from certificates.models import CertificateGenerationConfiguration, CertificateStatuses, CertificateWhitelist, \
@@ -53,6 +53,8 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
         super(CertificatesInstructorDashTest, self).setUp()
         self.global_staff = GlobalStaffFactory()
         self.instructor = InstructorFactory(course_key=self.course.id)
+        self.staff = StaffFactory(course_key=self.course.id)
+        self.user = UserFactory()
 
         # Need to clear the cache for model-based configuration
         cache.clear()
@@ -60,13 +62,17 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
         # Enable the certificate generation feature
         CertificateGenerationConfiguration.objects.create(enabled=True)
 
-    def test_visible_only_to_global_staff(self):
-        # Instructors don't see the certificates section
-        self.client.login(username=self.instructor.username, password="test")
+    def test_visible_only_to_course_staff(self):
+        # Regular users don't see the certificates section
+        self.client.login(username=self.user.username, password="test")
         self._assert_certificates_visible(False)
 
-        # Global staff can see the certificates section
-        self.client.login(username=self.global_staff.username, password="test")
+        # Course Instructors can see the certificates section
+        self.client.login(username=self.instructor.username, password="test")
+        self._assert_certificates_visible(True)
+
+        # Course staff can see the certificates section
+        self.client.login(username=self.staff.username, password="test")
         self._assert_certificates_visible(True)
 
     def test_visible_only_when_feature_flag_enabled(self):
@@ -220,6 +226,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         super(CertificatesInstructorApiTest, self).setUp()
         self.global_staff = GlobalStaffFactory()
         self.instructor = InstructorFactory(course_key=self.course.id)
+        self.staff = StaffFactory(course_key=self.course.id)
         self.user = UserFactory()
         CourseEnrollment.enroll(self.user, self.course.id)
 
@@ -228,16 +235,21 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         CertificateGenerationConfiguration.objects.create(enabled=True)
 
     @ddt.data('generate_example_certificates', 'enable_certificate_generation')
-    def test_allow_only_global_staff(self, url_name):
+    def test_allow_course_staff(self, url_name):
         url = reverse(url_name, kwargs={'course_id': self.course.id})
 
-        # Instructors do not have access
-        self.client.login(username=self.instructor.username, password='test')
+        # Regular users do not have access
+        self.client.login(username=self.user.username, password='test')
         response = self.client.post(url)
         self.assertEqual(response.status_code, 403)
 
-        # Global staff have access
-        self.client.login(username=self.global_staff.username, password='test')
+        # Instructors have access
+        self.client.login(username=self.instructor.username, password='test')
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 302)
+
+        # Course staff have access
+        self.client.login(username=self.staff.username, password='test')
         response = self.client.post(url)
         self.assertEqual(response.status_code, 302)
 
@@ -287,7 +299,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
     def test_certificate_generation_api_without_global_staff(self):
         """
         Test certificates generation api endpoint returns permission denied if
-        user who made the request is not member of global staff.
+        user who made the request is not member of the course staff.
         """
         user = UserFactory.create()
         self.client.login(username=user.username, password='test')
@@ -295,13 +307,11 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
             'start_certificate_generation',
             kwargs={'course_id': unicode(self.course.id)}
         )
-
         response = self.client.post(url)
         self.assertEqual(response.status_code, 403)
-
         self.client.login(username=self.instructor.username, password='test')
         response = self.client.post(url)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 200)
 
     def test_certificate_generation_api_with_global_staff(self):
         """
@@ -776,6 +786,7 @@ class GenerateCertificatesInstructorApiTest(SharedModuleStoreTestCase):
         super(GenerateCertificatesInstructorApiTest, self).setUp()
         self.global_staff = GlobalStaffFactory()
         self.instructor = InstructorFactory(course_key=self.course.id)
+        self.staff = StaffFactory(course_key=self.course.id)
         self.user = UserFactory()
         CourseEnrollment.enroll(self.user, self.course.id)
         certificate_exception = CertificateWhitelistFactory.create(
