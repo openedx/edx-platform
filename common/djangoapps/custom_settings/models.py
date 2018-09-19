@@ -10,6 +10,7 @@ class CustomSettings(models.Model):
     id = CourseKeyField(max_length=255, db_index=True, primary_key=True)
     is_featured = models.BooleanField(default=False)
     show_grades = models.BooleanField(default=True)
+    enable_enrollment_email = models.BooleanField(default=True)
     tags = models.CharField(max_length=255, null=True, blank=True)
     course_short_id = models.IntegerField(null=False, unique=True)
 

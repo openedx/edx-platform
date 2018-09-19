@@ -1,8 +1,6 @@
 import logging
-
 from datetime import datetime, timedelta, date
 from pytz import utc
-
 from openedx.core.djangoapps.timed_notification.core import send_course_notification_email, get_course_link, get_course_first_chapter_link
 from lms.djangoapps.branding import get_visible_courses
 from common.lib.mandrill_client.client import MandrillClient
@@ -41,6 +39,7 @@ def task_course_notifications():
             send_course_notification_email(course=course,
                                            template_name=MandrillClient.COURSE_START_REMINDER_TEMPLATE,
                                            context=context)
+
         # send email the day the course starts
         elif course_start_date == date_now:
             send_course_notification_email(course=course,
