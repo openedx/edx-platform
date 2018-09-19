@@ -1,12 +1,10 @@
 from celery import task
-from enrollment.api import get_enrollments
 from django.contrib.auth.models import User
-from django.contrib.sessions.backends.db import SessionStore
 from lms.djangoapps.certificates import api as certificate_api
 from lms.djangoapps.onboarding.models import (UserExtendedProfile,FocusArea, OrgSector, )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from mailchimp_pipeline.client import ChimpClient, MailChimpException
-from mailchimp_pipeline.helpers import is_active_enrollment
+from mailchimp_pipeline.helpers import get_user_active_enrollements, get_enrollements_course_short_ids
 
 from logging import getLogger
 log = getLogger(__name__)
@@ -70,9 +68,8 @@ def update_enrollments_completions_at_mailchimp(list_id):
                 "CITY": profile.city if profile.city else "",
                 "DATEREGIS": str(user.date_joined.strftime("%m/%d/%Y")),
                 "LSOURCE": "",
-                "ENROLLS": ", ".join([enrollment.get('course_details', {}).get('course_name', '')
-                          for enrollment in get_enrollments(user.username)
-                          if is_active_enrollment(enrollment.get('course_details', {}).get('course_end', ''))]),
+                "ENROLLS": get_user_active_enrollements(user.username),
+                "ENROLL_IDS": get_enrollements_course_short_ids(user.username),
                 "COMPLETES": ", ".join([course.display_name for course in completed_courses]),
                 "ORG": extended_profile.organization.label if extended_profile.organization else "",
                 "ORGTYPE": org_type,

@@ -1,8 +1,6 @@
-import json
-from enrollment.api import get_enrollments
 from django.core.management.base import BaseCommand
 from mailchimp_pipeline.client import ChimpClient
-from mailchimp_pipeline.helpers import is_active_enrollment
+from mailchimp_pipeline.helpers import get_user_active_enrollements, get_enrollements_course_short_ids
 from django.contrib.auth.models import User
 from lms.djangoapps.onboarding.models import FocusArea, OrgSector
 from lms.djangoapps.certificates import api as certificate_api
@@ -58,10 +56,8 @@ class Command(BaseCommand):
                     "DATEREGIS": str(user.date_joined.strftime("%m/%d/%Y")),
                     "LSOURCE": "",
                     "COMPLETES": ", ".join([course.display_name for course in completed_courses]),
-                    "ENROLLS": ", ".join([enrollment.get('course_details', {}).get('course_name', '')
-                                          for enrollment in get_enrollments(user.username)
-                                          if is_active_enrollment(enrollment.get('course_details', {}
-                                                                                 ).get('course_end', ''))]),
+                    "ENROLLS": get_user_active_enrollements(user.username),
+                    "ENROLL_IDS": get_enrollements_course_short_ids(user.username),
                     "ORG": extended_profile.organization.label if extended_profile.organization else "",
                     "ORGTYPE": org_type,
                     "WORKAREA": str(focus_areas.get(extended_profile.organization.focus_area, ""))

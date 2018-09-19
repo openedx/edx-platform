@@ -44,8 +44,12 @@ def course_custom_settings(request, course_key_string):
         if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
             return render_to_response('custom_settings.html', {
                 'context_course': course_module,
-                'custom_dict': {'is_featured': settings.is_featured, 'show_grades': settings.show_grades,
-                                'tags': settings.tags},
+                'course_short_id': settings.course_short_id if settings else "N/A",
+                'custom_dict': {
+                    'is_featured': settings.is_featured,
+                    'show_grades': settings.show_grades,
+                    'tags': settings.tags,
+                },
                 'custom_settings_url': reverse('custom_settings', kwargs={'course_key_string': unicode(course_key)}),
             })
 
