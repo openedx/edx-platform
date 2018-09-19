@@ -49,6 +49,7 @@ from django.contrib.auth import authenticate, login
 import analytics
 from eventtracking import tracker
 from student.cookies import set_logged_in_cookies
+from lms.djangoapps.philu_api.helpers import get_course_custom_settings
 
 AUDIT_LOG = logging.getLogger("audit")
 log = logging.getLogger(__name__)
@@ -614,6 +615,9 @@ def course_about(request, course_id):
         else:
             course_details = CourseDetails.populate(course)
 
+        custom_settings = get_course_custom_settings(course.id)
+        meta_tags = custom_settings.get_course_meta_tags()
+
         context = {
             'course': course,
             'course_details': course_details,
@@ -635,6 +639,7 @@ def course_about(request, course_id):
             'cart_link': reverse('shoppingcart.views.show_cart'),
             'pre_requisite_courses': pre_requisite_courses,
             'course_image_urls': overview.image_urls,
+            'meta_tags': meta_tags
         }
         inject_coursetalk_keys_into_context(context, course_key)
 
