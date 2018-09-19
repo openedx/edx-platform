@@ -13,6 +13,11 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
+SELECT = 1
+UPDATE = 1
+SAVEPOINT = 1
+OTHER = 1
+
 
 @skip_unless_lms
 class PercentValidatorTestCase(TestCase):
@@ -56,7 +61,8 @@ class SubmitCompletionTestCase(CompletionSetUpMixin, TestCase):
         self.set_up_completion()
 
     def test_changed_value(self):
-        with self.assertNumQueries(4):  # Get, update, 2 * savepoints
+        with self.assertNumQueries(SELECT + UPDATE + 2 * SAVEPOINT + 2 * OTHER):
+            # OTHER = user exists, completion exists
             completion, isnew = models.BlockCompletion.objects.submit_completion(
                 user=self.user,
                 course_key=self.block_key.course_key,
@@ -69,7 +75,7 @@ class SubmitCompletionTestCase(CompletionSetUpMixin, TestCase):
         self.assertEqual(models.BlockCompletion.objects.count(), 1)
 
     def test_unchanged_value(self):
-        with self.assertNumQueries(1):  # Get
+        with self.assertNumQueries(SELECT + 2 * SAVEPOINT):
             completion, isnew = models.BlockCompletion.objects.submit_completion(
                 user=self.user,
                 course_key=self.block_key.course_key,
@@ -83,7 +89,7 @@ class SubmitCompletionTestCase(CompletionSetUpMixin, TestCase):
 
     def test_new_user(self):
         newuser = UserFactory()
-        with self.assertNumQueries(4):  # Get, update, 2 * savepoints
+        with self.assertNumQueries(SELECT + UPDATE + 4 * SAVEPOINT):
             _, isnew = models.BlockCompletion.objects.submit_completion(
                 user=newuser,
                 course_key=self.block_key.course_key,
@@ -95,7 +101,7 @@ class SubmitCompletionTestCase(CompletionSetUpMixin, TestCase):
 
     def test_new_block(self):
         newblock = UsageKey.from_string(u'block-v1:edx+test+run+type@video+block@puppers')
-        with self.assertNumQueries(4):  # Get, update, 2 * savepoints
+        with self.assertNumQueries(SELECT + UPDATE + 4 * SAVEPOINT):
             _, isnew = models.BlockCompletion.objects.submit_completion(
                 user=self.user,
                 course_key=newblock.course_key,
