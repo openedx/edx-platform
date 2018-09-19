@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('custom_settings', '0004_customsettings_enable_enrollment_email'),
+        ('custom_settings', '0008_customsettings_seo_tags'),
     ]
 
     operations = [
