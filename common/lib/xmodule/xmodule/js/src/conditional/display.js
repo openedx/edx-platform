@@ -139,6 +139,7 @@
       kind = resource.kind,
       placement = resource.placement,
       data = resource.data;
+      var loaded;
       if (mimetype === 'text/css') {
         if (kind === 'text') {
           // xss-lint: disable=javascript-jquery-append,javascript-concat-html
@@ -152,7 +153,11 @@
             // xss-lint: disable=javascript-jquery-append,javascript-concat-html
             $head.append('<script>' + data + '</script>');
         } else if (kind === 'url') {
-          $script(data, data);
+          loaded = $.Deferred();
+          $script(data, data, function() {
+              loaded.resolve()
+          });
+          return loaded.promise();
         }
       } else if (mimetype === 'text/html') {
         if (placement === 'head') {
