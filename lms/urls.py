@@ -294,6 +294,15 @@ urlpatterns += (
         name='about_course',
     ),
 
+    # Auto enroll course view
+    url(
+        r'^courses/{}/enroll$'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        'lms.djangoapps.philu_overrides.views.course_auto_enroll',
+        name='course_auto_enroll',
+    ),
+
     url(
         r'^courses/{}/enroll_staff$'.format(
             settings.COURSE_ID_PATTERN,

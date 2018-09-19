@@ -34,7 +34,8 @@ from common.djangoapps.student.views import get_course_related_keys
 from lms.djangoapps.courseware.access import has_access, _can_enroll_courselike
 from lms.djangoapps.courseware.courses import get_courses, sort_by_start_date, get_course_by_id, sort_by_announcement
 from lms.djangoapps.courseware.views.views import get_last_accessed_courseware
-from lms.djangoapps.onboarding.helpers import reorder_registration_form_fields
+from lms.djangoapps.onboarding.helpers import reorder_registration_form_fields, get_alquity_community_url
+from lms.djangoapps.philu_api.helpers import get_course_custom_settings
 from lms.djangoapps.student_account.views import _local_server_get, _get_form_descriptions, _external_auth_intercept, \
     _third_party_auth_context
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -49,7 +50,6 @@ from django.contrib.auth import authenticate, login
 import analytics
 from eventtracking import tracker
 from student.cookies import set_logged_in_cookies
-from lms.djangoapps.philu_api.helpers import get_course_custom_settings
 
 AUDIT_LOG = logging.getLogger("audit")
 log = logging.getLogger(__name__)
@@ -168,6 +168,7 @@ def login_and_registration_form(request, initial_mode="login", org_name=None, ad
 
     return render_to_response('student_account/login_and_register.html', context)
 
+
 @ensure_csrf_cookie
 @cache_if_anonymous()
 def courses_custom(request):
@@ -200,22 +201,22 @@ def courses_custom(request):
 
     for course in courses_list:
         course_key = SlashSeparatedCourseKey.from_deprecated_string(
-                course.id.to_deprecated_string())
+            course.id.to_deprecated_string())
         with modulestore().bulk_operations(course_key):
             if has_access(request.user, 'load', course):
                 access_link = get_last_accessed_courseware(
                     get_course_by_id(course_key, 0),
                     request,
                     request.user
-                    )
+                )
 
                 first_chapter_url, first_section = get_course_related_keys(
                     request, get_course_by_id(course_key, 0))
                 first_target = reverse('courseware_section', args=[
-                        course.id.to_deprecated_string(),
-                        first_chapter_url,
-                        first_section
-                    ])
+                    course.id.to_deprecated_string(),
+                    first_chapter_url,
+                    first_section
+                ])
 
                 course.course_target = access_link if access_link != None else first_target
             else:
@@ -549,7 +550,7 @@ def course_about(request, course_id):
         staff_access = bool(has_access(request.user, 'staff', course))
         studio_url = get_studio_url(course, 'settings/details')
 
-        if not staff_access and course.invitation_only and not CourseEnrollment.is_enrolled(request.user, course.id) :
+        if not staff_access and course.invitation_only and not CourseEnrollment.is_enrolled(request.user, course.id):
             raise Http404("Course not accessible: {}.".format(unicode(course.id)))
 
         # Note: this is a flow for payment for course registration, not the Verified Certificate flow.
@@ -615,6 +616,10 @@ def course_about(request, course_id):
         else:
             course_details = CourseDetails.populate(course)
 
+
+        # Alquity specific check
+        is_alquity = True if request.GET.get('ref') == 'alquity' else False
+
         custom_settings = get_course_custom_settings(course.id)
         meta_tags = custom_settings.get_course_meta_tags()
 
@@ -639,8 +644,25 @@ def course_about(request, course_id):
             'cart_link': reverse('shoppingcart.views.show_cart'),
             'pre_requisite_courses': pre_requisite_courses,
             'course_image_urls': overview.image_urls,
-            'meta_tags': meta_tags
+            'meta_tags': meta_tags,
+            'is_alquity': is_alquity
         }
         inject_coursetalk_keys_into_context(context, course_key)
 
         return render_to_response('courseware/course_about.html', context)
+
+
+def course_auto_enroll(request, course_id):
+    """
+    Auto enrolls any authenticated user in the course with course_id
+    """
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_custom_settings = get_course_custom_settings(course_id)
+
+    if request.user.is_anonymous():
+        return redirect(get_alquity_community_url())
+
+    if course_custom_settings.auto_enroll:
+        CourseEnrollment.enroll(request.user, course_key)
+
+    return redirect('/courses/{}/about?ref=alquity'.format(course_id))

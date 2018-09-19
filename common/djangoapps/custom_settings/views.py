@@ -51,6 +51,7 @@ def course_custom_settings(request, course_key_string):
                     'show_grades': settings.show_grades,
                     'tags': settings.tags,
                     'seo_tags': "" if not settings.seo_tags else json.loads(settings.seo_tags),
+                    'auto_enroll': settings.auto_enroll
                 },
                 'custom_settings_url': reverse('custom_settings', kwargs={'course_key_string': unicode(course_key)}),
             })
@@ -59,9 +60,10 @@ def course_custom_settings(request, course_key_string):
             body = json.loads(request.body)
             settings.is_featured = body.get('is_featured') if isinstance(body.get('is_featured'), bool) else False
             settings.show_grades = body.get('show_grades') if isinstance(body.get('show_grades'), bool) else False
-            settings.enable_enrollment_email = body.get('enable_enrollment_email')
             settings.tags = body.get('tags')
             settings.seo_tags = None if body.get('seo_tags') == "" else json.dumps(body.get('seo_tags'))
+            settings.enable_enrollment_email = body.get('enable_enrollment_email')
+            settings.auto_enroll = body.get('auto_enroll')
             settings.save()
             return JsonResponse(body)
 
