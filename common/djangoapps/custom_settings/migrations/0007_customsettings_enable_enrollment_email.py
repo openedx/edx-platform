@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('custom_settings', '0003_customsettings_show_grades'),
+        ('custom_settings', '0006_auto_20180907_0907'),
     ]
 
     operations = [
