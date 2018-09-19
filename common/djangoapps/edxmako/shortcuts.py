@@ -152,7 +152,12 @@ def render_to_string(template_name, dictionary, namespace='main', request=None):
         request: The request to use to construct the RequestContext for rendering
             this template. If not supplied, the current request will be used.
     """
-    signals.BEFORE_RENDER_TO_RESPONSE.send(sender=template_name, template_name=template_name, dictionary=dictionary, request=request)
+    responses = signals.BEFORE_RENDER_TO_RESPONSE.send(sender=template_name, template_name=template_name, dictionary=dictionary, request=request)
+    for receiver, response in responses:
+        if isinstance(list, response):
+            dictionary = response.get('dictionary', dictionary)
+            template_name = response.get('template_name', template_name)
+            request = response.get('request', request)
 
     if namespace == 'lms.main':
         engine = engines[Engines.PREVIEW]
