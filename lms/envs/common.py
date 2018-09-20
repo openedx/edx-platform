@@ -2241,8 +2241,16 @@ INSTALLED_APPS = (
     'openedx.features.data_extract',
 
     # Course cards app
-    'openedx.features.course_card'
+    'openedx.features.course_card',
+    'channels'
 )
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "asgiref.inmemory.ChannelLayer",
+        "ROUTING": "edx_notifications.server.socket.routing.channel_routing",
+    },
+}
 
 ######################### CSRF #########################################
 
