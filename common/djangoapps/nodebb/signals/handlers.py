@@ -32,12 +32,12 @@ def log_action_response(user, status_code, response_body):
 
 @receiver(post_save, sender=CourseEnrollment)
 def sync_enrolments_to_mailchimp(sender, instance, created, **kwargs):
-    send_user_enrollments_to_mailchimp(sender, instance, created, kwargs)
+    send_user_enrollments_to_mailchimp.delay(sender, instance, created, kwargs)
 
 
 @receiver(COURSE_CERT_AWARDED, sender=GeneratedCertificate)
 def handle_course_cert_awarded(sender, user, course_key, **kwargs):  # pylint: disable=unused-argument
-    send_user_course_completions_to_mailchimp(sender, user, course_key, kwargs)
+    send_user_course_completions_to_mailchimp.delay(sender, user, course_key, kwargs)
 
 
 @receiver(post_save, sender=UserProfile)
@@ -52,7 +52,7 @@ def sync_user_info_with_nodebb(sender, instance, created, **kwargs):  # pylint: 
     request = get_current_request()
     user = request.user
 
-    send_user_profile_info_to_mailchimp(sender, instance, kwargs)
+    send_user_profile_info_to_mailchimp.delay(sender, instance, kwargs)
 
     if 'login' in request.path or 'logout' in request.path or sender == EmailPreference:
         return
@@ -90,7 +90,7 @@ def update_user_profile_on_nodebb(sender, instance, created, **kwargs):
     """
         Create user account at nodeBB when user created at edx Platform
     """
-    send_user_info_to_mailchimp(sender, instance, created, kwargs)
+    send_user_info_to_mailchimp.delay(sender, instance, created, kwargs)
 
     request = get_current_request()
     if not request or 'login' in request.path:
@@ -305,3 +305,12 @@ def leave_groupchat_on_nodebb(sender, instance, **kwargs):
             )
         else:
             log.info('Success: User have unjoined the group %s successfully' % instance.team.name)
+
+
+@receiver(post_delete, sender=CourseOverview, dispatch_uid="delete_course_overview")
+def delete_course_overview(sender, instance, **kwargs):
+    """
+    Leave group on NodeBB whenever a member leaves a team
+    """
+
+    log.info('Success: Course Overview object %s deleted successfully' % instance.display_name)
