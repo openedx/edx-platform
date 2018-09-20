@@ -2,6 +2,7 @@
 Test the cancel_user_retirement_request management command
 """
 import pytest
+from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
 from django.contrib.auth.models import User
 from django.core.management import CommandError, call_command
 
@@ -28,7 +29,9 @@ def test_successful_cancellation(setup_retirement_states, logged_out_retirement_
     with pytest.raises(UserRetirementRequest.DoesNotExist):
         UserRetirementRequest.objects.get(user=logged_out_retirement_request.user)
     # Ensure user can be retrieved using the original email address.
-    User.objects.get(email=logged_out_retirement_request.original_email)
+    user = User.objects.get(email=logged_out_retirement_request.original_email)
+    # Ensure the user has a usable password so they can go through the reset flow
+    assert not user.password.startswith(UNUSABLE_PASSWORD_PREFIX)
     assert "Successfully cancelled retirement request for user with email address" in output
     assert logged_out_retirement_request.original_email in output
 
