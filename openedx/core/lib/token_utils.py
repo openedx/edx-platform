@@ -7,6 +7,7 @@ from django.utils.functional import cached_property
 from jwkest import jwk
 from jwkest.jws import JWS
 
+from edx_django_utils.monitoring import set_custom_metric
 from student.models import UserProfile, anonymous_id_for_user
 
 
@@ -51,6 +52,8 @@ class JwtBuilder(object):
         """
         now = int(time())
         expires_in = expires_in or self.jwt_auth['JWT_EXPIRATION']
+        set_custom_metric('jwt_expires_in', expires_in)
+
         payload = {
             # TODO Consider getting rid of this claim since we don't use it.
             'aud': aud if aud else self.jwt_auth['JWT_AUDIENCE'],
@@ -104,6 +107,7 @@ class JwtBuilder(object):
 
     def encode(self, payload):
         """Encode the provided payload."""
+        set_custom_metric('jwt_asymmetric', self.asymmetric)
         keys = jwk.KEYS()
 
         if self.asymmetric:

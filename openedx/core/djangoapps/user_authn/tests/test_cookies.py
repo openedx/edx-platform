@@ -6,7 +6,7 @@ from django.conf import settings
 from django.urls import reverse
 from django.test import RequestFactory
 
-from openedx.core.djangoapps.user_authn.cookies import get_user_info_cookie_data
+from openedx.core.djangoapps.user_authn.cookies import _get_user_info_cookie_data
 from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewide_block_completed
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
@@ -47,7 +47,7 @@ class CookieTests(SharedModuleStoreTestCase):
         request = RequestFactory().get('/')
         request.user = self.user
 
-        actual = get_user_info_cookie_data(request)
+        actual = _get_user_info_cookie_data(request, self.user)
 
         expected = {
             'version': settings.EDXMKTG_USER_INFO_COOKIE_VERSION,
