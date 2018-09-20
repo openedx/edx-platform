@@ -32,7 +32,7 @@
         <td><% print(user_profile.get('status')) %></td>
         <td>
           <button class="disable-account-btn">
-            <%- gettext('Disable Account') %>
+            <%- gettext('Toggle Account Password (Usable/Unusable)') %>
           </button>
         </td>
       </tr>
