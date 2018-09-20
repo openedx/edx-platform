@@ -19,8 +19,8 @@ from course_modes.models import CourseMode
 from lms.djangoapps.certificates.apis.v0.views import CertificatesDetailView
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
+from openedx.core.djangoapps.oauth_dispatch.jwt import _create_jwt
 from openedx.core.djangoapps.oauth_dispatch.toggles import ENFORCE_JWT_SCOPES
-from openedx.core.lib.token_utils import JwtBuilder
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -131,12 +131,11 @@ class CertificatesRestApiTest(SharedModuleStoreTestCase, APITestCase):
         if scopes is None:
             scopes = CertificatesDetailView.required_scopes
 
-        return JwtBuilder(user).build_token(
-            scopes,
-            additional_claims=dict(
-                is_restricted=(auth_type == AuthType.jwt_restricted),
-                filters=filters,
-            ),
+        return _create_jwt(
+            user,
+            scopes=scopes,
+            is_restricted=(auth_type == AuthType.jwt_restricted),
+            filters=filters,
         )
 
     def _get_response(self, requesting_user, auth_type, url=None, token=None):

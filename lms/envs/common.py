@@ -517,6 +517,10 @@ OAUTH2_PROVIDER = {
 # otherwise it fails saying this attribute is not present in Settings
 OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
 
+# Automatically clean up edx-django-oauth2-provider tokens on use
+OAUTH_DELETE_EXPIRED = True
+OAUTH_ID_TOKEN_EXPIRATION = 60 * 60
+
 ################################## TEMPLATE CONFIGURATION #####################################
 # Mako templating
 import tempfile
@@ -2933,10 +2937,6 @@ DEFAULT_MOBILE_AVAILABLE = True
 # Enrollment API Cache Timeout
 ENROLLMENT_COURSE_DETAILS_CACHE_TIMEOUT = 60
 
-# Automatically clean up edx-django-oauth2-provider tokens on use
-OAUTH_DELETE_EXPIRED = True
-OAUTH_ID_TOKEN_EXPIRATION = 60 * 60
-
 # These tabs are currently disabled
 NOTES_DISABLED_TABS = ['course_structure', 'tags']
 
@@ -3161,8 +3161,12 @@ JWT_AUTH = {
     'JWT_LEEWAY': 1,
     'JWT_DECODE_HANDLER': 'edx_rest_framework_extensions.utils.jwt_decode_handler',
 
-    # Number of seconds before JWT tokens expire
+    # Number of seconds before JWTs expire
     'JWT_EXPIRATION': 30,
+    'JWT_COOKIE_EXPIRATION': 60 * 60,
+
+    'JWT_LOGIN_CLIENT_ID': 'login-service-client-id',
+
     'JWT_SUPPORTED_VERSION': '1.1.0',
 
     'JWT_ALGORITHM': 'HS256',

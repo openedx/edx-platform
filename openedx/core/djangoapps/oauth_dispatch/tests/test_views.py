@@ -271,30 +271,21 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         (i.e. expiry set to Jan 1, 1970)
         """
         with ENFORCE_JWT_SCOPES.override(enforce_jwt_scopes_enabled):
+            response = self._post_request(self.user, self.restricted_dot_app, token_type='jwt')
+            self.assertEqual(response.status_code, 200)
+            data = json.loads(response.content)
 
-            public_jwk_set, private_jwk = self._generate_key_pair()
-            jwt_auth_settings = settings.JWT_AUTH
-            jwt_auth_settings.update({
-                'JWT_PRIVATE_SIGNING_JWK': private_jwk,
-                'JWT_PUBLIC_SIGNING_JWK_SET': public_jwk_set,
-            })
-            with override_settings(JWT_AUTH=jwt_auth_settings):
-
-                response = self._post_request(self.user, self.restricted_dot_app, token_type='jwt')
-                self.assertEqual(response.status_code, 200)
-                data = json.loads(response.content)
-
-                self.assertIn('expires_in', data)
-                self.assertEqual(data['expires_in'] < 0, expiration_expected)
-                self.assertEqual(data['token_type'], 'JWT')
-                self.assert_valid_jwt_access_token(
-                    data['access_token'],
-                    self.user,
-                    data['scope'].split(' '),
-                    should_be_expired=expiration_expected,
-                    should_be_asymmetric_key=enforce_jwt_scopes_enabled,
-                    should_be_restricted=True,
-                )
+            self.assertIn('expires_in', data)
+            self.assertEqual(data['expires_in'] < 0, expiration_expected)
+            self.assertEqual(data['token_type'], 'JWT')
+            self.assert_valid_jwt_access_token(
+                data['access_token'],
+                self.user,
+                data['scope'].split(' '),
+                should_be_expired=expiration_expected,
+                should_be_asymmetric_key=enforce_jwt_scopes_enabled,
+                should_be_restricted=True,
+            )
 
     def test_restricted_access_token(self):
         """
@@ -349,7 +340,7 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
             organization=OrganizationFactory()
         )
         scopes = dot_app_access.scopes
-        filters = self.dot_adapter.get_authorization_filters(dot_app.client_id)
+        filters = self.dot_adapter.get_authorization_filters(dot_app)
         response = self._post_request(self.user, dot_app, token_type='jwt', scope=scopes)
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)

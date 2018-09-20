@@ -15,24 +15,16 @@ class AccessTokenMixin(object):
     """ Mixin for tests dealing with OAuth 2 access tokens. """
 
     def assert_valid_jwt_access_token(self, access_token, user, scopes=None, should_be_expired=False, filters=None,
-                                      should_be_asymmetric_key=False, should_be_restricted=None):
+                                      should_be_asymmetric_key=False, should_be_restricted=None, aud=None, secret=None):
         """
         Verify the specified JWT access token is valid, and belongs to the specified user.
-
-        Args:
-            access_token (str): JWT
-            user (User): User whose information is contained in the JWT payload.
-            (optional) should_be_expired: indicates if the passed in JWT token is expected to be expired
-            (optional) should_be_asymmetric_key: indicates if the JWT token should be signed with an
-                asymmetric key.
-
         Returns:
             dict: Decoded JWT payload
         """
         scopes = scopes or []
-        audience = settings.JWT_AUTH['JWT_AUDIENCE']
+        audience = aud or settings.JWT_AUTH['JWT_AUDIENCE']
+        secret_key = secret or settings.JWT_AUTH['JWT_SECRET_KEY']
         issuer = settings.JWT_AUTH['JWT_ISSUER']
-        secret_key = settings.JWT_AUTH['JWT_SECRET_KEY']
 
         def _decode_jwt(verify_expiration):
             """
