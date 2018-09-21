@@ -185,6 +185,7 @@ case "$TEST_SUITE" in
     "bok-choy")
 
         PAVER_ARGS="-n $NUMBER_OF_BOKCHOY_THREADS"
+        export SELENIUM_BROWSER=chrome
         export BOKCHOY_HEADLESS=true
 
         case "$SHARD" in
