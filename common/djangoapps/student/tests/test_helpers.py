@@ -67,6 +67,8 @@ class TestLoginHelper(TestCase):
     @ddt.data(
         ('/dashboard', 'testserver', '/dashboard'),
         ('https://edx.org/courses', 'edx.org', 'https://edx.org/courses'),
+        ('https://test.edx.org/courses', 'edx.org', 'https://test.edx.org/courses'),
+        ('https://test.edx.org/courses', 'courses.edx.org', 'https://test.edx.org/courses'),
     )
     @ddt.unpack
     def test_safe_next(self, url, host, expected_url):

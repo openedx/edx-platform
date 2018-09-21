@@ -273,7 +273,7 @@ def get_next_url_for_login_page(request):
 
     If THIRD_PARTY_AUTH_HINT is set, then `tpa_hint=<hint>` is added as a query parameter.
     """
-    redirect_to = get_redirect_to(request)
+    redirect_to = _get_redirect_to(request)
     if not redirect_to:
         try:
             redirect_to = reverse('dashboard')
@@ -308,7 +308,7 @@ def get_next_url_for_login_page(request):
     return redirect_to
 
 
-def get_redirect_to(request):
+def _get_redirect_to(request):
     """
     Determine the redirect url and return if safe
     :argument
@@ -325,7 +325,7 @@ def get_redirect_to(request):
     # get information about a user on edx.org. In any such case drop the parameter.
     if redirect_to:
         mime_type, _ = mimetypes.guess_type(redirect_to, strict=False)
-        if not http.is_safe_url(redirect_to, allowed_hosts={request.get_host()}, require_https=True):
+        if not _is_safe_redirect(request, redirect_to):
             log.warning(
                 u'Unsafe redirect parameter detected after login page: %(redirect_to)r',
                 {"redirect_to": redirect_to}
@@ -366,6 +366,21 @@ def get_redirect_to(request):
                     break
 
     return redirect_to
+
+
+def _is_safe_redirect(request, redirect_to):
+    """
+    Determine if the given redirect URL/path is safe for redirection.
+    """
+    request_host = request.get_host()  # e.g. 'courses.edx.org'
+    request_host_domain = '.'.join(request_host.split('.')[-2:])  # e.g. 'edx.org'
+    request_host_domain_with_wildcard = '.' + request_host_domain  # e.g. '.edx.org'
+    redirect_to_host_domain = urlparse.urlsplit(redirect_to).netloc or request_host_domain  # e.g. 'test.edx.org'
+
+    is_same_domain_or_subdomain = http.is_same_domain(redirect_to_host_domain, request_host_domain_with_wildcard)
+    is_safe_url = http.is_safe_url(redirect_to, allowed_hosts={redirect_to_host_domain}, require_https=True)
+
+    return is_same_domain_or_subdomain and is_safe_url
 
 
 def generate_activation_email_context(user, registration):
