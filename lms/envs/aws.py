@@ -419,6 +419,9 @@ NOTIFICATION_EMAIL_EDX_LOGO = ENV_TOKENS.get('NOTIFICATION_EMAIL_EDX_LOGO', NOTI
 # by end users.
 CSRF_COOKIE_SECURE = ENV_TOKENS.get('CSRF_COOKIE_SECURE', False)
 
+# Whitelist of domains to which the login/logout pages will redirect.
+LOGIN_REDIRECT_WHITELIST = ENV_TOKENS.get('LOGIN_REDIRECT_WHITELIST', LOGIN_REDIRECT_WHITELIST)
+
 ############# CORS headers for cross-domain requests #################
 
 if FEATURES.get('ENABLE_CORS_HEADERS') or FEATURES.get('ENABLE_CROSS_DOMAIN_CSRF_COOKIE'):

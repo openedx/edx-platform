@@ -67,8 +67,11 @@ class TestLoginHelper(TestCase):
     @ddt.data(
         ('/dashboard', 'testserver', '/dashboard'),
         ('https://edx.org/courses', 'edx.org', 'https://edx.org/courses'),
+        ('https://test.edx.org/courses', 'edx.org', 'https://test.edx.org/courses'),
+        ('https://test2.edx.org/courses', 'edx.org', 'https://test2.edx.org/courses'),
     )
     @ddt.unpack
+    @override_settings(LOGIN_REDIRECT_WHITELIST=['test.edx.org', 'test2.edx.org'])
     def test_safe_next(self, url, host, expected_url):
         """ Test safe next parameter """
         req = self.request.get(reverse("login") + "?next={url}".format(url=url), HTTP_HOST=host)
