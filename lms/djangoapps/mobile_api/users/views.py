@@ -288,7 +288,7 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
             courses_excluded_from_mobile = json.loads(courses_excluded_from_mobile.replace('\r', '').replace('\n', ''))
             if enrollment.mode == 'audit' and str(course_key) in courses_excluded_from_mobile.keys():
                 activationTime = dateparse.parse_datetime(courses_excluded_from_mobile[str(course_key)])
-                if enrollment.created > activationTime:
+                if activationTime and enrollment.created and enrollment.created > activationTime:
                     return True
         except (ExperimentKeyValue.DoesNotExist, AttributeError):
             pass
