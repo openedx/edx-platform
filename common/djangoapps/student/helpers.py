@@ -325,7 +325,7 @@ def _get_redirect_to(request):
     # get information about a user on edx.org. In any such case drop the parameter.
     if redirect_to:
         mime_type, _ = mimetypes.guess_type(redirect_to, strict=False)
-        if not _is_safe_redirect(request, redirect_to):
+        if not is_safe_redirect(request, redirect_to):
             log.warning(
                 u'Unsafe redirect parameter detected after login page: %(redirect_to)r',
                 {"redirect_to": redirect_to}
@@ -368,7 +368,7 @@ def _get_redirect_to(request):
     return redirect_to
 
 
-def _is_safe_redirect(request, redirect_to):
+def is_safe_redirect(request, redirect_to):
     """
     Determine if the given redirect URL/path is safe for redirection.
     """

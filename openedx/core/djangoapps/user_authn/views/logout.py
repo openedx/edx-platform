@@ -6,10 +6,11 @@ from django.conf import settings
 from django.contrib.auth import logout
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
-from django.utils.http import is_safe_url, urlencode
+from django.utils.http import urlencode
 from django.views.generic import TemplateView
 from provider.oauth2.models import Client
 from openedx.core.djangoapps.user_authn.cookies import delete_logged_in_cookies
+from student.helpers import is_safe_redirect
 
 
 class LogoutView(TemplateView):
@@ -34,11 +35,7 @@ class LogoutView(TemplateView):
         """
         target_url = self.request.GET.get('redirect_url')
 
-        if target_url and is_safe_url(
-            target_url,
-            allowed_hosts={self.request.META.get('HTTP_HOST')},
-            require_https=True,
-        ):
+        if target_url and is_safe_redirect(self.request, target_url):
             return target_url
         else:
             return self.default_target
