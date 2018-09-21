@@ -80,7 +80,7 @@
               <div id="alert_stat_bar"></div>
               <script type="text/javascript">
                 new StatusAlertRenderer(
-                  "{{ message }}",
+                  "{{ message|safe }}",
                   "#alert_stat_bar",
                   ".nav nav-tabs"
                 );
