@@ -324,7 +324,7 @@ WIKI_ENABLED = ENV_TOKENS.get('WIKI_ENABLED', WIKI_ENABLED)
 
 local_loglevel = ENV_TOKENS.get('LOCAL_LOGLEVEL', 'INFO')
 LOG_DIR = ENV_TOKENS['LOG_DIR']
-DATA_DIR = ENV_TOKENS.get('DATA_DIR', DATA_DIR)
+DATA_DIR = path(ENV_TOKENS.get('DATA_DIR', DATA_DIR))
 
 LOGGING = get_logger_config(LOG_DIR,
                             logging_env=ENV_TOKENS['LOGGING_ENV'],
