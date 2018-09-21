@@ -1131,15 +1131,8 @@ PAYMENT_SUPPORT_EMAIL = 'payment@example.com'
 
 ##### Using cybersource by default #####
 
-CC_PROCESSOR_NAME = 'CyberSource'
+CC_PROCESSOR_NAME = 'CyberSource2'
 CC_PROCESSOR = {
-    'CyberSource': {
-        'SHARED_SECRET': '',
-        'MERCHANT_ID': '',
-        'SERIAL_NUMBER': '',
-        'ORDERPAGE_VERSION': '7',
-        'PURCHASE_ENDPOINT': '',
-    },
     'CyberSource2': {
         "PURCHASE_ENDPOINT": '',
         "SECRET_KEY": '',
