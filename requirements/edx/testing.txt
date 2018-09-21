@@ -93,7 +93,7 @@ django-countries==4.6.1
 django-crum==0.7.3
 django-fernet-fields==0.5
 django-filter==1.0.4
-django-ipware==1.1.0
+django-ipware==2.1.0
 django-memcached-hashring==0.1.2
 django-method-override==0.1.0
 django-model-utils==3.0.0
@@ -109,7 +109,7 @@ django-require==1.0.11
 django-rest-swagger==2.2.0
 django-sekizai==0.10.0
 django-ses==0.8.4
-django-simple-history==2.3.0
+django-simple-history==2.4.0
 django-splash==0.2.2
 django-statici18n==1.4.0
 django-storages==1.4.1
@@ -285,7 +285,7 @@ s3transfer==0.1.13
 sailthru-client==2.2.3
 scipy==0.14.0
 scrapy==1.1.2             # via pa11ycrawler
-selenium==3.14.0
+selenium==3.14.1
 semantic-version==2.6.0
 service-identity==17.0.0  # via scrapy
 shapely==1.2.16
