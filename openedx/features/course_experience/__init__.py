@@ -45,7 +45,7 @@ USE_BOOTSTRAP_FLAG = CourseWaffleFlag(WAFFLE_FLAG_NAMESPACE, 'use_bootstrap', fl
 
 # Waffle flag to enable anonymous access to a course
 SEO_WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name='seo')
-COURSE_ENABLE_ANONYMOUS_ACCESS_FLAG = CourseWaffleFlag(SEO_WAFFLE_FLAG_NAMESPACE, 'enable_anonymous_courseware_access')
+COURSE_ENABLE_UNENROLLED_ACCESS_FLAG = CourseWaffleFlag(SEO_WAFFLE_FLAG_NAMESPACE, 'enable_unenrolled_courseware_access')
 
 
 def course_home_page_title(course):  # pylint: disable=unused-argument

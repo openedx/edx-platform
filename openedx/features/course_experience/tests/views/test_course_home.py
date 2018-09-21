@@ -25,7 +25,7 @@ from openedx.features.course_experience import (
     SHOW_REVIEWS_TOOL_FLAG,
     SHOW_UPGRADE_MSG_ON_COURSE_HOME,
     UNIFIED_COURSE_TAB_FLAG,
-    COURSE_ENABLE_ANONYMOUS_ACCESS_FLAG)
+    COURSE_ENABLE_UNENROLLED_ACCESS_FLAG)
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from util.date_utils import strftime_localized
@@ -223,8 +223,13 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         [True, 'private', CourseUserType.ANONYMOUS, 'You must be enrolled in the course to see course content.'],
         [True, 'preview', CourseUserType.ANONYMOUS, 'You must be enrolled in the course to see course content.'],
         [True, 'public', CourseUserType.ANONYMOUS, 'You must be enrolled in the course to see course content.'],
-        [False, 'private', CourseUserType.ENROLLED, None],
         [False, 'private', CourseUserType.UNENROLLED, 'You must be enrolled in the course to see course content.'],
+        [False, 'preview', CourseUserType.UNENROLLED, 'You must be enrolled in the course to see course content.'],
+        [False, 'public', CourseUserType.UNENROLLED, 'You must be enrolled in the course to see course content.'],
+        [True, 'private', CourseUserType.UNENROLLED, 'You must be enrolled in the course to see course content.'],
+        [True, 'preview', CourseUserType.UNENROLLED, 'You must be enrolled in the course to see course content.'],
+        [True, 'public', CourseUserType.UNENROLLED, 'You must be enrolled in the course to see course content.'],
+        [False, 'private', CourseUserType.ENROLLED, None],
         [False, 'private', CourseUserType.UNENROLLED_STAFF,
          'You must be enrolled in the course to see course content.'],
     )
@@ -235,7 +240,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         # Render the course home page
         with mock.patch('xmodule.course_module.CourseDescriptor.course_visibility', course_visibility):
             # Test access with anonymous flag and course visibility
-            with override_waffle_flag(COURSE_ENABLE_ANONYMOUS_ACCESS_FLAG, enable_anonymous_access):
+            with override_waffle_flag(COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, enable_anonymous_access):
                 url = course_home_url(self.course)
                 response = self.client.get(url)
 
