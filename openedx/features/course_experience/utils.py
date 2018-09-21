@@ -7,6 +7,7 @@ from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_blocks.utils import get_student_module_as_dict
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.request_cache.middleware import request_cached
+from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 
 
@@ -157,7 +158,7 @@ def get_course_outline_block_tree(request, course_id):
     if course_outline_root_block:
         populate_children(course_outline_root_block, all_blocks['blocks'])
 
-        if request.user.is_authenticated:
+        if CourseEnrollment.is_enrolled(request.user, course_key):
             set_last_accessed_default(course_outline_root_block)
             mark_blocks_completed(
                 block=course_outline_root_block,

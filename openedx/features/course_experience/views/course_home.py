@@ -30,7 +30,7 @@ from student.models import CourseEnrollment
 from util.views import ensure_valid_course_key
 
 from .. import LATEST_UPDATE_FLAG, SHOW_UPGRADE_MSG_ON_COURSE_HOME, USE_BOOTSTRAP_FLAG, \
-    COURSE_ENABLE_ANONYMOUS_ACCESS_FLAG
+    COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from ..utils import get_course_outline_block_tree, get_resume_block
 from .course_dates import CourseDatesFragmentView
 from .course_home_messages import CourseHomeMessageFragmentView
@@ -122,9 +122,9 @@ class CourseHomeFragmentView(EdxFragmentView):
             'is_staff': has_access(request.user, 'staff', course_key),
         }
 
-        allow_anonymous = COURSE_ENABLE_ANONYMOUS_ACCESS_FLAG.is_enabled(course_key)
-        allow_public = allow_anonymous and course.course_visibility == 'public'
-        allow_preview = allow_anonymous and course.course_visibility == 'preview'
+        allow_unenrolled = COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.is_enabled(course_key)
+        allow_public = allow_unenrolled and course.course_visibility == 'public'
+        allow_preview = allow_unenrolled and course.course_visibility == 'preview'
 
         # Set all the fragments
         outline_fragment = None

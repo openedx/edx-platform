@@ -47,7 +47,9 @@ class CourseOutlineFragmentView(EdxFragmentView):
         if not course_block_tree:
             return None
 
-        enable_links = request.user.is_authenticated or (
+        is_enrolled = CourseEnrollment.is_enrolled(request.user, course_key)
+
+        enable_links = is_enrolled or (
             kwargs['enable_anonymous_access'] and course.course_visibility == 'public')
 
         context = {
