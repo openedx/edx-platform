@@ -26,7 +26,6 @@ from lms.djangoapps.instructor.views import coupons as instructor_coupons_views
 from lms.djangoapps.instructor.views import instructor_dashboard as instructor_dashboard_views
 from lms.djangoapps.instructor.views import registration_codes as instructor_registration_codes_views
 from lms.djangoapps.instructor_task import views as instructor_task_views
-from lms_migration import migrate as lms_migrate_views
 from notes import views as notes_views
 from notification_prefs import views as notification_prefs_views
 from openedx.core.djangoapps.auth_exchange.views import LoginWithAccessTokenView
@@ -889,18 +888,6 @@ if settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
         # uses reverse() with the 'oauth2_provider' namespace.  Developers should not access these
         # views directly, but should rather use the wrapped views at /oauth2/
         url(r'^_o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
-    ]
-
-if settings.FEATURES.get('ENABLE_LMS_MIGRATION'):
-    urlpatterns += [
-        url(r'^migrate/modules$', lms_migrate_views.manage_modulestores),
-        url(r'^migrate/reload/(?P<reload_dir>[^/]+)$', lms_migrate_views.manage_modulestores),
-        url(
-            r'^migrate/reload/(?P<reload_dir>[^/]+)/(?P<commit_id>[^/]+)$',
-            lms_migrate_views.manage_modulestores
-        ),
-        url(r'^gitreload$', lms_migrate_views.gitreload),
-        url(r'^gitreload/(?P<reload_dir>[^/]+)$', lms_migrate_views.gitreload),
     ]
 
 if settings.FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
