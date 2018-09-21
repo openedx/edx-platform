@@ -156,13 +156,14 @@ def get_course_outline_block_tree(request, course_id):
     course_outline_root_block = all_blocks['blocks'].get(all_blocks['root'], None)
     if course_outline_root_block:
         populate_children(course_outline_root_block, all_blocks['blocks'])
-        set_last_accessed_default(course_outline_root_block)
 
-        mark_blocks_completed(
-            block=course_outline_root_block,
-            user=request.user,
-            course_key=course_key
-        )
+        if request.user.is_authenticated:
+            set_last_accessed_default(course_outline_root_block)
+            mark_blocks_completed(
+                block=course_outline_root_block,
+                user=request.user,
+                course_key=course_key
+            )
     return course_outline_root_block
 
 

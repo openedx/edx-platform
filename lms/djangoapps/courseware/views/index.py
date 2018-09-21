@@ -32,12 +32,14 @@ from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
-from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace, WaffleFlagNamespace, CourseWaffleFlag
+from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 from openedx.core.djangolib.markup import HTML, Text
-from openedx.features.course_experience import COURSE_OUTLINE_PAGE_FLAG, default_course_url_name
+from openedx.features.course_experience import COURSE_OUTLINE_PAGE_FLAG, default_course_url_name, \
+    COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from openedx.features.course_experience.views.course_sock import CourseSockFragmentView
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 from shoppingcart.models import CourseRegistrationCode
+from student.models import CourseEnrollment
 from student.views import is_course_blocked
 from util.views import ensure_valid_course_key
 from xmodule.modulestore.django import modulestore
@@ -68,9 +70,8 @@ class CoursewareIndex(View):
     """
 
     @cached_property
-    def enable_anonymous_courseware_access(self):
-        waffle_flag = CourseWaffleFlag(WaffleFlagNamespace(name='seo'), 'enable_anonymous_courseware_access')
-        return waffle_flag.is_enabled(self.course_key)
+    def enable_unenrolled_courseware_access(self):
+        return COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.is_enabled(self.course_key)
 
     @method_decorator(ensure_csrf_cookie)
     @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
@@ -96,8 +97,8 @@ class CoursewareIndex(View):
             position (unicode): position in module, eg of <sequential> module
         """
         self.course_key = CourseKey.from_string(course_id)
-
-        if not (request.user.is_authenticated or self.enable_anonymous_courseware_access):
+        is_enrolled = CourseEnrollment.is_enrolled(request.user, self.course_key)
+        if not (is_enrolled or self.enable_unenrolled_courseware_access):
             return redirect_to_login(request.get_full_path())
 
         self.original_chapter_url_name = chapter
@@ -116,8 +117,11 @@ class CoursewareIndex(View):
                 self.course = get_course_with_access(
                     request.user, 'load', self.course_key,
                     depth=CONTENT_DEPTH,
-                    check_if_enrolled=not self.enable_anonymous_courseware_access,
+                    check_if_enrolled=not self.enable_unenrolled_courseware_access,
                 )
+                if not (is_enrolled or self.course.course_visibility == 'public'):
+                    return redirect_to_login(request.get_full_path())
+
                 self.is_staff = has_access(request.user, 'staff', self.course)
                 self._setup_masquerade_for_effective_user()
                 return self.render(request)
