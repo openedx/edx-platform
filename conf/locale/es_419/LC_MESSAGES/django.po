@@ -50,6 +50,7 @@
 # rcelaya <rcelaya@ula.ve>, 2014
 # Sarina Canelake <sarina@edx.org>, 2014-2015
 # Ernesto Sánchez Benitez <sbernesto@gmail.com>, 2016
+# SENATICs Desarrollo <desarrollo.gov.py@gmail.com>, 2018
 # Sergio A. Salazar <sergiosalazar@live.ru>, 2015
 # sebasco <sjduranh@gmail.com>, 2014
 # UAbierta Universidad de Chile <uabierta@u.uchile.cl>, 2015
@@ -2967,13 +2968,13 @@ msgstr "Trama para los temas de discusión"
 msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
-"example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each category "
-"must be unique. In \"id\" values, the only special characters that are "
-"supported are underscore, hyphen, and period. You can also specify a "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each "
+"category must be unique. In \"id\" values, the only special characters that "
+"are supported are underscore, hyphen, and period. You can also specify a "
 "category as the default for new posts in the Discussion page by setting its "
-"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 msgstr ""
 "Ingrese las categorías de discusión en el siguiente formato: "
 "\"CategoryName\": {\"id\": \"i4x-InstitutionName-CourseNumber-course-"

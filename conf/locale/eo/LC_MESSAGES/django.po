@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-09-17 09:53+0000\n"
-"PO-Revision-Date: 2018-09-17 09:53:42.678406\n"
+"POT-Creation-Date: 2018-09-23 20:36+0000\n"
+"PO-Revision-Date: 2018-09-23 20:36:48.455441\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -154,6 +154,27 @@ msgstr "Stätüs Ⱡ'σяєм ιρѕυ#"
 #: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
 msgid "Pending"
 msgstr "Péndïng Ⱡ'σяєм ιρѕυм #"
+
+#: cms/templates/admin/base_site.html lms/templates/admin/base_site.html
+msgid "Django site admin"
+msgstr "Djängö sïté ädmïn Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: cms/templates/admin/base_site.html lms/templates/admin/base_site.html
+msgid "Django administration"
+msgstr "Djängö ädmïnïsträtïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: cms/templates/admin/base_site.html lms/templates/admin/base_site.html
+msgid "View site"
+msgstr "Vïéw sïté Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: cms/templates/admin/base_site.html lms/templates/admin/base_site.html
+msgid "Documentation"
+msgstr "Döçüméntätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: cms/templates/admin/base_site.html lms/templates/admin/base_site.html
+#: wiki/templates/wiki/base.html
+msgid "Log out"
+msgstr "Lög öüt Ⱡ'σяєм ιρѕυм #"
 
 #: common/djangoapps/course_modes/admin.py
 #: common/djangoapps/course_modes/models.py
@@ -390,6 +411,29 @@ msgstr "Stüdént Ⱡ'σяєм ιρѕυм #"
 #: common/djangoapps/student/admin.py
 msgid "User profile"
 msgstr "Ûsér pröfïlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
+#. Translators: This label appears above a field on the login form
+#. meant to hold the user's password.
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's password.
+#: common/djangoapps/student/admin.py openedx/core/djangoapps/user_api/api.py
+#: cms/templates/login.html cms/templates/register.html
+#: lms/templates/login.html lms/templates/provider_login.html
+#: lms/templates/register-form.html lms/templates/signup_modal.html
+#: lms/templates/sysadmin_dashboard.html
+#: themes/red-theme/cms/templates/login.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Password"
+msgstr "Pässwörd Ⱡ'σяєм ιρѕυм ∂#"
+
+#: common/djangoapps/student/admin.py
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user's "
+"password."
+msgstr ""
+"Räw pässwörds äré nöt störéd, sö théré ïs nö wäý tö séé thïs üsér's "
+"pässwörd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: common/djangoapps/student/forms.py
 msgid ""
@@ -2082,13 +2126,6 @@ msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 #, python-brace-format
-msgid "You may not use variables ({bad_variables}) in numerical problems."
-msgstr ""
-"Ýöü mäý nöt üsé värïäßlés ({bad_variables}) ïn nümérïçäl prößléms. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid "Factorial function evaluated outside its domain:'{student_answer}'"
 msgstr ""
 "Fäçtörïäl fünçtïön évälüätéd öütsïdé ïts dömäïn:'{student_answer}' Ⱡ'σяєм "
@@ -2223,13 +2260,6 @@ msgstr "Éxtérnäl Grädér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 #: common/lib/capa/capa/responsetypes.py
 msgid "Math Expression Input"
 msgstr "Mäth Éxpréssïön Ìnpüt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Invalid input: {bad_input} not permitted in answer."
-msgstr ""
-"Ìnvälïd ïnpüt: {bad_input} nöt pérmïttéd ïn änswér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя #"
 
 #: common/lib/capa/capa/responsetypes.py
 #, python-brace-format
@@ -3092,23 +3122,23 @@ msgstr "Dïsçüssïön Töpïç Mäppïng Ⱡ'σяєм ιρѕυм ∂σłσя �
 msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
-"example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each category "
-"must be unique. In \"id\" values, the only special characters that are "
-"supported are underscore, hyphen, and period. You can also specify a "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each "
+"category must be unique. In \"id\" values, the only special characters that "
+"are supported are underscore, hyphen, and period. You can also specify a "
 "category as the default for new posts in the Discussion page by setting its "
-"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 msgstr ""
 "Éntér dïsçüssïön çätégörïés ïn thé föllöwïng förmät: \"ÇätégörýNämé\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. För "
-"éxämplé, öné dïsçüssïön çätégörý mäý ßé \"Lýdïän Mödé\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2015_T1\"}. Thé \"ïd\" välüé för éäçh çätégörý "
-"müst ßé ünïqüé. Ìn \"ïd\" välüés, thé önlý spéçïäl çhäräçtérs thät äré "
-"süppörtéd äré ündérsçöré, hýphén, änd pérïöd. Ýöü çän älsö spéçïfý ä "
+"éxämplé, öné dïsçüssïön çätégörý mäý ßé \"Lýdïän Mödé\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\"}. Thé \"ïd\" välüé för éäçh "
+"çätégörý müst ßé ünïqüé. Ìn \"ïd\" välüés, thé önlý spéçïäl çhäräçtérs thät "
+"äré süppörtéd äré ündérsçöré, hýphén, änd pérïöd. Ýöü çän älsö spéçïfý ä "
 "çätégörý äs thé défäült för néw pösts ïn thé Dïsçüssïön pägé ßý séttïng ïts "
-"\"défäült\" ättrïßüté tö trüé. För éxämplé, \"Lýdïän Mödé\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2015_T1\", \"default\": true}.#"
+"\"défäült\" ättrïßüté tö trüé. För éxämplé, \"Lýdïän Mödé\": {\"id\": "
+"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}.#"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Discussion Sorting Alphabetical"
@@ -9463,391 +9493,6 @@ msgstr "Dïsçläïmér Ⱡ'σяєм ιρѕυм ∂σłσ#"
 msgid "TERMS AND CONDITIONS"
 msgstr "TÉRMS ÀND ÇÖNDÌTÌÖNS Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
-msgid "The payment processor did not return a required parameter: {0}"
-msgstr ""
-"Thé päýmént pröçéssör dïd nöt rétürn ä réqüïréd pärämétér: {0} Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
-msgid "The payment processor returned a badly-typed value {0} for param {1}."
-msgstr ""
-"Thé päýmént pröçéssör rétürnéd ä ßädlý-týpéd välüé {0} för päräm {1}. Ⱡ'σяєм"
-" ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"The payment processor accepted an order whose number is not in our system."
-msgstr ""
-"Thé päýmént pröçéssör äççéptéd än ördér whösé nümßér ïs nöt ïn öür sýstém. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
-msgid ""
-"The amount charged by the processor {0} {1} is different than the total cost"
-" of the order {2} {3}."
-msgstr ""
-"Thé ämöünt çhärgéd ßý thé pröçéssör {0} {1} ïs dïfférént thän thé tötäl çöst"
-" öf thé ördér {2} {3}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
-msgid ""
-"Sorry! Our payment processor did not accept your payment. The decision they "
-"returned was {decision_text}, and the reason was {reason_text}. You were not"
-" charged. Please try a different form of payment. Contact us with payment-"
-"related questions at {email}."
-msgstr ""
-"Sörrý! Öür päýmént pröçéssör dïd nöt äççépt ýöür päýmént. Thé déçïsïön théý "
-"rétürnéd wäs {decision_text}, änd thé réäsön wäs {reason_text}. Ýöü wéré nöt"
-" çhärgéd. Pléäsé trý ä dïfférént förm öf päýmént. Çöntäçt üs wïth päýmént-"
-"rélätéd qüéstïöns ät {email}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
-"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
-" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
-"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
-"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє є#"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
-msgid ""
-"Sorry! Our payment processor sent us back a payment confirmation that had "
-"inconsistent data!We apologize that we cannot verify whether the charge went"
-" through and take further action on your order.The specific error message "
-"is: {error_message}. Your credit card may possibly have been charged. "
-"Contact us with payment-specific questions at {email}."
-msgstr ""
-"Sörrý! Öür päýmént pröçéssör sént üs ßäçk ä päýmént çönfïrmätïön thät häd "
-"ïnçönsïstént dätä!Wé äpölögïzé thät wé çännöt vérïfý whéthér thé çhärgé wént"
-" thröügh änd täké fürthér äçtïön ön ýöür ördér.Thé spéçïfïç érrör méssägé "
-"ïs: {error_message}. Ýöür çrédït çärd mäý pössïßlý hävé ßéén çhärgéd. "
-"Çöntäçt üs wïth päýmént-spéçïfïç qüéstïöns ät {email}. Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт "
-"łαвσяє#"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
-msgid ""
-"Sorry! Due to an error your purchase was charged for a different amount than"
-" the order total! The specific error message is: {error_message}. Your "
-"credit card has probably been charged. Contact us with payment-specific "
-"questions at {email}."
-msgstr ""
-"Sörrý! Düé tö än érrör ýöür pürçhäsé wäs çhärgéd för ä dïfférént ämöünt thän"
-" thé ördér tötäl! Thé spéçïfïç érrör méssägé ïs: {error_message}. Ýöür "
-"çrédït çärd häs prößäßlý ßéén çhärgéd. Çöntäçt üs wïth päýmént-spéçïfïç "
-"qüéstïöns ät {email}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg "
-"єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт "
-"єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт "
-"αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη "
-"νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт #"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
-msgid ""
-"Sorry! Our payment processor sent us back a corrupted message regarding your"
-" charge, so we are unable to validate that the message actually came from "
-"the payment processor. The specific error message is: {error_message}. We "
-"apologize that we cannot verify whether the charge went through and take "
-"further action on your order. Your credit card may possibly have been "
-"charged. Contact us with payment-specific questions at {email}."
-msgstr ""
-"Sörrý! Öür päýmént pröçéssör sént üs ßäçk ä çörrüptéd méssägé régärdïng ýöür"
-" çhärgé, sö wé äré ünäßlé tö välïdäté thät thé méssägé äçtüällý çämé fröm "
-"thé päýmént pröçéssör. Thé spéçïfïç érrör méssägé ïs: {error_message}. Wé "
-"äpölögïzé thät wé çännöt vérïfý whéthér thé çhärgé wént thröügh änd täké "
-"fürthér äçtïön ön ýöür ördér. Ýöür çrédït çärd mäý pössïßlý hävé ßéén "
-"çhärgéd. Çöntäçt üs wïth päýmént-spéçïfïç qüéstïöns ät {email}.#"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "Successful transaction."
-msgstr "Süççéssfül tränsäçtïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "The request is missing one or more required fields."
-msgstr ""
-"Thé réqüést ïs mïssïng öné ör möré réqüïréd fïélds. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "One or more fields in the request contains invalid data."
-msgstr ""
-"Öné ör möré fïélds ïn thé réqüést çöntäïns ïnvälïd dätä. Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"\n"
-"            The merchantReferenceCode sent with this authorization request matches the\n"
-"            merchantReferenceCode of another authorization request that you sent in the last 15 minutes.\n"
-"            Possible fix: retry the payment after 15 minutes.\n"
-"            "
-msgstr ""
-"\n"
-"            Thé mérçhäntRéférénçéÇödé sént wïth thïs äüthörïzätïön réqüést mätçhés thé\n"
-"            mérçhäntRéférénçéÇödé öf änöthér äüthörïzätïön réqüést thät ýöü sént ïn thé läst 15 mïnütés.\n"
-"            Pössïßlé fïx: rétrý thé päýmént äftér 15 mïnütés.\n"
-"             Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυ#"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"Error: General system failure. Possible fix: retry the payment after a few "
-"minutes."
-msgstr ""
-"Érrör: Généräl sýstém fäïlüré. Pössïßlé fïx: rétrý thé päýmént äftér ä féw "
-"mïnütés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"\n"
-"            Error: The request was received but there was a server timeout.\n"
-"            This error does not include timeouts between the client and the server.\n"
-"            Possible fix: retry the payment after some time.\n"
-"            "
-msgstr ""
-"\n"
-"            Érrör: Thé réqüést wäs réçéïvéd ßüt théré wäs ä sérvér tïméöüt.\n"
-"            Thïs érrör döés nöt ïnçlüdé tïméöüts ßétwéén thé çlïént änd thé sérvér.\n"
-"            Pössïßlé fïx: rétrý thé päýmént äftér sömé tïmé.\n"
-"             Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм#"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"\n"
-"            Error: The request was received, but a service did not finish running in time\n"
-"            Possible fix: retry the payment after some time.\n"
-"            "
-msgstr ""
-"\n"
-"            Érrör: Thé réqüést wäs réçéïvéd, ßüt ä sérvïçé dïd nöt fïnïsh rünnïng ïn tïmé\n"
-"            Pössïßlé fïx: rétrý thé päýmént äftér sömé tïmé.\n"
-"             Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂#"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"The issuing bank has questions about the request. Possible fix: retry with "
-"another form of payment"
-msgstr ""
-"Thé ïssüïng ßänk häs qüéstïöns äßöüt thé réqüést. Pössïßlé fïx: rétrý wïth "
-"änöthér förm öf päýmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"\n"
-"            Expired card. You might also receive this if the expiration date you\n"
-"            provided does not match the date the issuing bank has on file.\n"
-"            Possible fix: retry with another form of payment\n"
-"            "
-msgstr ""
-"\n"
-"            Éxpïréd çärd. Ýöü mïght älsö réçéïvé thïs ïf thé éxpïrätïön däté ýöü\n"
-"            prövïdéd döés nöt mätçh thé däté thé ïssüïng ßänk häs ön fïlé.\n"
-"            Pössïßlé fïx: rétrý wïth änöthér förm öf päýmént\n"
-"             Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє#"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"\n"
-"            General decline of the card. No other information provided by the issuing bank.\n"
-"            Possible fix: retry with another form of payment\n"
-"            "
-msgstr ""
-"\n"
-"            Généräl déçlïné öf thé çärd. Nö öthér ïnförmätïön prövïdéd ßý thé ïssüïng ßänk.\n"
-"            Pössïßlé fïx: rétrý wïth änöthér förm öf päýmént\n"
-"             Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ι#"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"Insufficient funds in the account. Possible fix: retry with another form of "
-"payment"
-msgstr ""
-"Ìnsüffïçïént fünds ïn thé äççöünt. Pössïßlé fïx: rétrý wïth änöthér förm öf "
-"päýmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid "Unknown reason"
-msgstr "Ûnknöwn réäsön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"Issuing bank unavailable. Possible fix: retry again after a few minutes"
-msgstr ""
-"Ìssüïng ßänk ünäväïläßlé. Pössïßlé fïx: rétrý ägäïn äftér ä féw mïnütés "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"\n"
-"            Inactive card or card not authorized for card-not-present transactions.\n"
-"            Possible fix: retry with another form of payment\n"
-"            "
-msgstr ""
-"\n"
-"            Ìnäçtïvé çärd ör çärd nöt äüthörïzéd för çärd-nöt-présént tränsäçtïöns.\n"
-"            Pössïßlé fïx: rétrý wïth änöthér förm öf päýmént\n"
-"             Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт#"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"The card has reached the credit limit. Possible fix: retry with another form"
-" of payment"
-msgstr ""
-"Thé çärd häs réäçhéd thé çrédït lïmït. Pössïßlé fïx: rétrý wïth änöthér förm"
-" öf päýmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"Invalid card verification number. Possible fix: retry with another form of "
-"payment"
-msgstr ""
-"Ìnvälïd çärd vérïfïçätïön nümßér. Pössïßlé fïx: rétrý wïth änöthér förm öf "
-"päýmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"Invalid account number. Possible fix: retry with another form of payment"
-msgstr ""
-"Ìnvälïd äççöünt nümßér. Pössïßlé fïx: rétrý wïth änöthér förm öf päýmént "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"\n"
-"            The card type is not accepted by the payment processor.\n"
-"            Possible fix: retry with another form of payment\n"
-"            "
-msgstr ""
-"\n"
-"            Thé çärd týpé ïs nöt äççéptéd ßý thé päýmént pröçéssör.\n"
-"            Pössïßlé fïx: rétrý wïth änöthér förm öf päýmént\n"
-"             Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт#"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"General decline by the processor.  Possible fix: retry with another form of "
-"payment"
-msgstr ""
-"Généräl déçlïné ßý thé pröçéssör.  Pössïßlé fïx: rétrý wïth änöthér förm öf "
-"päýmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
-msgid ""
-"There is a problem with our CyberSource merchant configuration.  Please let "
-"us know at {0}"
-msgstr ""
-"Théré ïs ä prößlém wïth öür ÇýßérSöürçé mérçhänt çönfïgürätïön.  Pléäsé lét "
-"üs knöw ät {0} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid "The requested amount exceeds the originally authorized amount."
-msgstr ""
-"Thé réqüéstéd ämöünt éxçééds thé örïgïnällý äüthörïzéd ämöünt. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid "Processor Failure.  Possible fix: retry the payment"
-msgstr ""
-"Pröçéssör Fäïlüré.  Pössïßlé fïx: rétrý thé päýmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid "The authorization has already been captured"
-msgstr ""
-"Thé äüthörïzätïön häs älréädý ßéén çäptüréd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"The requested transaction amount must match the previous transaction amount."
-msgstr ""
-"Thé réqüéstéd tränsäçtïön ämöünt müst mätçh thé prévïöüs tränsäçtïön ämöünt."
-" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"\n"
-"            The card type sent is invalid or does not correlate with the credit card number.\n"
-"            Possible fix: retry with the same card or another form of payment\n"
-"            "
-msgstr ""
-"\n"
-"            Thé çärd týpé sént ïs ïnvälïd ör döés nöt çörréläté wïth thé çrédït çärd nümßér.\n"
-"            Pössïßlé fïx: rétrý wïth thé sämé çärd ör änöthér förm öf päýmént\n"
-"             Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт,#"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "The request ID is invalid."
-msgstr "Thé réqüést ÌD ïs ïnvälïd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"\n"
-"            You requested a capture through the API, but there is no corresponding, unused authorization record.\n"
-"            "
-msgstr ""
-"\n"
-"            Ýöü réqüéstéd ä çäptüré thröügh thé ÀPÌ, ßüt théré ïs nö çörréspöndïng, ünüséd äüthörïzätïön réçörd.\n"
-"             Ⱡ'σяєм#"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "The transaction has already been settled or reversed."
-msgstr ""
-"Thé tränsäçtïön häs älréädý ßéén séttléd ör révérséd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
-" αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"\n"
-"            The capture or credit is not voidable because the capture or credit information has already been\n"
-"            submitted to your processor. Or, you requested a void for a type of transaction that cannot be voided.\n"
-"            "
-msgstr ""
-"\n"
-"            Thé çäptüré ör çrédït ïs nöt vöïdäßlé ßéçäüsé thé çäptüré ör çrédït ïnförmätïön häs älréädý ßéén\n"
-"            süßmïttéd tö ýöür pröçéssör. Ör, ýöü réqüéstéd ä vöïd för ä týpé öf tränsäçtïön thät çännöt ßé vöïdéd.\n"
-"             Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢#"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid "You requested a credit for a capture that was previously voided"
-msgstr ""
-"Ýöü réqüéstéd ä çrédït för ä çäptüré thät wäs prévïöüslý vöïdéd Ⱡ'σяєм ιρѕυм"
-" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"\n"
-"            Error: The request was received, but there was a timeout at the payment processor.\n"
-"            Possible fix: retry the payment.\n"
-"            "
-msgstr ""
-"\n"
-"            Érrör: Thé réqüést wäs réçéïvéd, ßüt théré wäs ä tïméöüt ät thé päýmént pröçéssör.\n"
-"            Pössïßlé fïx: rétrý thé päýmént.\n"
-"             Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłι#"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"\n"
-"            The authorization request was approved by the issuing bank but declined by CyberSource.'\n"
-"            Possible fix: retry with a different form of payment.\n"
-"            "
-msgstr ""
-"\n"
-"            Thé äüthörïzätïön réqüést wäs äpprövéd ßý thé ïssüïng ßänk ßüt déçlïnéd ßý ÇýßérSöürçé.'\n"
-"            Pössïßlé fïx: rétrý wïth ä dïfférént förm öf päýmént.\n"
-"             Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт #"
-
 #. Translators: this text appears when an unfamiliar error code occurs during
 #. payment,
 #. for which we don't know a user-friendly message to display in advance.
@@ -9870,6 +9515,13 @@ msgid ""
 msgstr ""
 "Thé päýmént pröçéssör rétürnéd ä ßädlý-týpéd välüé {value} för pärämétér "
 "{parameter}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"The payment processor accepted an order whose number is not in our system."
+msgstr ""
+"Thé päýmént pröçéssör äççéptéd än ördér whösé nümßér ïs nöt ïn öür sýstém. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 #, python-brace-format
@@ -9990,6 +9642,22 @@ msgid ""
 msgstr ""
 "Sörrý! Ýöür päýmént çöüld nöt ßé pröçésséd ßéçäüsé än ünéxpéçtéd éxçéptïön "
 "öççürréd. Pléäsé çöntäçt üs ät {email} för ässïstänçé. Ⱡ'σяєм #"
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "Successful transaction."
+msgstr "Süççéssfül tränsäçtïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "The request is missing one or more required fields."
+msgstr ""
+"Thé réqüést ïs mïssïng öné ör möré réqüïréd fïélds. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "One or more fields in the request contains invalid data."
+msgstr ""
+"Öné ör möré fïélds ïn thé réqüést çöntäïns ïnvälïd dätä. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
@@ -10224,6 +9892,13 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
+"The requested transaction amount must match the previous transaction amount."
+msgstr ""
+"Thé réqüéstéd tränsäçtïön ämöünt müst mätçh thé prévïöüs tränsäçtïön ämöünt."
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
 "\n"
 "            The card type sent is invalid or does not correlate with the credit card number.\n"
 "            Possible action: retry with the same card or another form of payment.\n"
@@ -10233,6 +9908,10 @@ msgstr ""
 "            Thé çärd týpé sént ïs ïnvälïd ör döés nöt çörréläté wïth thé çrédït çärd nümßér.\n"
 "            Pössïßlé äçtïön: rétrý wïth thé sämé çärd ör änöthér förm öf päýmént.\n"
 "             Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσ#"
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "The request ID is invalid."
+msgstr "Thé réqüést ÌD ïs ïnvälïd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
@@ -10247,6 +9926,12 @@ msgstr ""
 "            nöt ä prévïöüslý süççéssfül äüthörïzätïön réqüést ör ïf thé prévïöüslý süççéssfül äüthörïzätïön häs älréädý\n"
 "            ßéén üséd ßý änöthér çäptüré réqüést.\n"
 "             Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтα#"
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "The transaction has already been settled or reversed."
+msgstr ""
+"Thé tränsäçtïön häs älréädý ßéén séttléd ör révérséd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
+" αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
@@ -10575,6 +10260,10 @@ msgstr "Ûsäßlé Ⱡ'σяєм ιρѕυ#"
 #: lms/djangoapps/support/views/manage_user.py
 msgid "Unusable"
 msgstr "Ûnüsäßlé Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/djangoapps/support/views/manage_user.py
+msgid "User Enabled Successfully"
+msgstr "Ûsér Énäßléd Süççéssfüllý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/djangoapps/support/views/manage_user.py
 msgid "User Disabled Successfully"
@@ -11342,7 +11031,6 @@ msgid "Create new merged version"
 msgstr "Çréäté néw mérgéd vérsïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/templates/wiki/includes/anonymous_blocked.html
-#: wiki/templates/wiki/includes/anonymous_blocked.html
 #, python-format
 msgid ""
 "You need to <a href=\"%(login_url)s\">log in</a> or <a "
@@ -13011,20 +12699,6 @@ msgid "The email address you used to register with {platform_name}"
 msgstr ""
 "Thé émäïl äddréss ýöü üséd tö régïstér wïth {platform_name} Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
-#. Translators: This label appears above a field on the login form
-#. meant to hold the user's password.
-#. Translators: This label appears above a field on the registration form
-#. meant to hold the user's password.
-#: openedx/core/djangoapps/user_api/api.py cms/templates/login.html
-#: cms/templates/register.html lms/templates/login.html
-#: lms/templates/provider_login.html lms/templates/register-form.html
-#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
-#: themes/red-theme/cms/templates/login.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Password"
-msgstr "Pässwörd Ⱡ'σяєм ιρѕυм ∂#"
 
 #: openedx/core/djangoapps/user_api/api.py lms/templates/login.html
 msgid "Remember me"
@@ -29647,18 +29321,13 @@ msgstr "À fïlé wäs délétéd: %s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid ""
-"The file may be referenced on other articles. Deleting it means that they "
-"will loose their references to this file. The following articles reference "
-"this file:"
+"\n"
+"    The file may be referenced on other articles. Deleting it means that they will loose their references to this file. The following articles reference this file:\n"
+"    "
 msgstr ""
-"Thé fïlé mäý ßé référénçéd ön öthér ärtïçlés. Délétïng ït méäns thät théý "
-"wïll löösé théïr référénçés tö thïs fïlé. Thé föllöwïng ärtïçlés référénçé "
-"thïs fïlé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ"
-" єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ "
-"мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ "
-"єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє "
-"νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
-"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυη#"
+"\n"
+"    Thé fïlé mäý ßé référénçéd ön öthér ärtïçlés. Délétïng ït méäns thät théý wïll löösé théïr référénçés tö thïs fïlé. Thé föllöwïng ärtïçlés référénçé thïs fïlé:\n"
+"     Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒ#"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid "Delete it!"
@@ -29666,11 +29335,13 @@ msgstr "Délété ït! Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid ""
-"You can remove a reference to a file, but it will retain its references on "
-"other articles."
+"\n"
+"    You can remove a reference to a file, but it will retain its references on other articles.\n"
+"    "
 msgstr ""
-"Ýöü çän rémövé ä référénçé tö ä fïlé, ßüt ït wïll rétäïn ïts référénçés ön "
-"öthér ärtïçlés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+"\n"
+"    Ýöü çän rémövé ä référénçé tö ä fïlé, ßüt ït wïll rétäïn ïts référénçés ön öthér ärtïçlés.\n"
+"     Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid "Remove reference"
@@ -29711,21 +29382,13 @@ msgstr "Ûsé thïs! Ⱡ'σяєм ιρѕυм ∂σł#"
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 #, python-format
 msgid ""
-"Replacing an attachment means adding a new file that will be used in its "
-"place. All references to the file will be replaced by the one you upload and"
-" the file will be downloaded as <strong>%(filename)s</strong>. Please note "
-"that this attachment is in use on other articles, you may distort contents. "
-"However, do not hestitate to take advantage of this and make replacements "
-"for the listed articles where necessary. This way of working is more "
-"efficient...."
+"\n"
+"  Replacing an attachment means adding a new file that will be used in its place. All references to the file will be replaced by the one you upload and the file will be downloaded as <strong>%(filename)s</strong>. Please note that this attachment is in use on other articles, you may distort contents. However, do not hestitate to take advantage of this and make replacements for the listed articles where necessary. This way of working is more efficient....\n"
+"  "
 msgstr ""
-"Répläçïng än ättäçhmént méäns äddïng ä néw fïlé thät wïll ßé üséd ïn ïts "
-"pläçé. Àll référénçés tö thé fïlé wïll ßé répläçéd ßý thé öné ýöü üplöäd änd"
-" thé fïlé wïll ßé döwnlöädéd äs <strong>%(filename)s</strong>. Pléäsé nöté "
-"thät thïs ättäçhmént ïs ïn üsé ön öthér ärtïçlés, ýöü mäý dïstört çönténts. "
-"Höwévér, dö nöt héstïtäté tö täké ädväntägé öf thïs änd mäké répläçéménts "
-"för thé lïstéd ärtïçlés whéré néçéssärý. Thïs wäý öf wörkïng ïs möré "
-"éffïçïént....#"
+"\n"
+"  Répläçïng än ättäçhmént méäns äddïng ä néw fïlé thät wïll ßé üséd ïn ïts pläçé. Àll référénçés tö thé fïlé wïll ßé répläçéd ßý thé öné ýöü üplöäd änd thé fïlé wïll ßé döwnlöädéd äs <strong>%(filename)s</strong>. Pléäsé nöté thät thïs ättäçhmént ïs ïn üsé ön öthér ärtïçlés, ýöü mäý dïstört çönténts. Höwévér, dö nöt héstïtäté tö täké ädväntägé öf thïs änd mäké répläçéménts för thé lïstéd ärtïçlés whéré néçéssärý. Thïs wäý öf wörkïng ïs möré éffïçïént....\n"
+"  #"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 msgid "Articles using"
@@ -29734,19 +29397,13 @@ msgstr "Àrtïçlés üsïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 #, python-format
 msgid ""
-"Replacing an attachment means adding a new file that will be used in its "
-"place. All references to the file will be replaced by the one you upload and"
-" the file will be downloaded as <strong>%(filename)s</strong>."
+"\n"
+"  Replacing an attachment means adding a new file that will be used in its place. All references to the file will be replaced by the one you upload and the file will be downloaded as <strong>%(filename)s</strong>.\n"
+"  "
 msgstr ""
-"Répläçïng än ättäçhmént méäns äddïng ä néw fïlé thät wïll ßé üséd ïn ïts "
-"pläçé. Àll référénçés tö thé fïlé wïll ßé répläçéd ßý thé öné ýöü üplöäd änd"
-" thé fïlé wïll ßé döwnlöädéd äs <strong>%(filename)s</strong>. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
-"ηση#"
+"\n"
+"  Répläçïng än ättäçhmént méäns äddïng ä néw fïlé thät wïll ßé üséd ïn ïts pläçé. Àll référénçés tö thé fïlé wïll ßé répläçéd ßý thé öné ýöü üplöäd änd thé fïlé wïll ßé döwnlöädéd äs <strong>%(filename)s</strong>.\n"
+"   Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι#"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 #: wiki/plugins/images/templates/wiki/plugins/images/revision_add.html
@@ -30099,10 +29756,6 @@ msgstr "Çléär nötïfïçätïöns lïst Ⱡ'σяєм ιρѕυм ∂σłσя 
 msgid "Search..."
 msgstr "Séärçh... Ⱡ'σяєм ιρѕυм ∂σł#"
 
-#: wiki/templates/wiki/base.html
-msgid "Log out"
-msgstr "Lög öüt Ⱡ'σяєм ιρѕυм #"
-
 #: wiki/templates/wiki/base.html wiki/templates/wiki/accounts/login.html
 #: wiki/templates/wiki/accounts/signup.html
 msgid "Sign up"
@@ -30164,10 +29817,14 @@ msgstr "mätçhés,mätçh Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: wiki/templates/wiki/dir.html
 #, python-format
-msgid "%(cnt)s %(articles_plur)s in this level %(match_plur)s your search."
+msgid ""
+"\n"
+"        %(cnt)s %(articles_plur)s in this level %(match_plur)s your search.\n"
+"      "
 msgstr ""
-"%(cnt)s %(articles_plur)s ïn thïs lévél %(match_plur)s ýöür séärçh. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+"\n"
+"        %(cnt)s %(articles_plur)s ïn thïs lévél %(match_plur)s ýöür séärçh.\n"
+"       Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: wiki/templates/wiki/dir.html
 msgid "is,are"
@@ -30175,10 +29832,14 @@ msgstr "ïs,äré Ⱡ'σяєм ιρѕυ#"
 
 #: wiki/templates/wiki/dir.html
 #, python-format
-msgid "There %(articles_plur_verb)s %(cnt)s %(articles_plur)s in this level."
+msgid ""
+"\n"
+"        There %(articles_plur_verb)s %(cnt)s %(articles_plur)s in this level.\n"
+"      "
 msgstr ""
-"Théré %(articles_plur_verb)s %(cnt)s %(articles_plur)s ïn thïs lévél. Ⱡ'σяєм"
-" ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+"\n"
+"        Théré %(articles_plur_verb)s %(cnt)s %(articles_plur)s ïn thïs lévél.\n"
+"       Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: wiki/templates/wiki/dir.html
 msgid "Last modified"
@@ -30258,6 +29919,17 @@ msgstr "Rööt ärtïçlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 #: wiki/templates/wiki/article/create_root.html
 msgid "Create root"
 msgstr "Çréäté rööt Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: wiki/templates/wiki/includes/anonymous_blocked.html
+#, python-format
+msgid ""
+"\n"
+"  You need to <a href=\"%(login_url)s\">log in</a> or <a href=\"%(signup_url)s\">sign up</a> to use this function.\n"
+"  "
+msgstr ""
+"\n"
+"  Ýöü nééd tö <a href=\"%(login_url)s\">lög ïn</a> ör <a href=\"%(signup_url)s\">sïgn üp</a> tö üsé thïs fünçtïön.\n"
+"   Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: wiki/templates/wiki/includes/anonymous_blocked.html
 msgid "You need to log in og sign up to use this function."
