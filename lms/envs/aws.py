@@ -1168,13 +1168,3 @@ PARENTAL_CONSENT_AGE_LIMIT = ENV_TOKENS.get(
     'PARENTAL_CONSENT_AGE_LIMIT',
     PARENTAL_CONSENT_AGE_LIMIT
 )
-
-########################## Settings for Completion API #####################
-
-# If using openedx-completion-aggregator, large instances may find that
-# updating the aggregated completion data after each XBlock is completed
-# generates too much database activity. In that case, this should be set
-# to True, and a daily/hourly cron job should be set up to update the
-# completion aggregation data asynchronously using the run_aggregator_service
-# management command.
-COMPLETION_AGGREGATOR_ASYNC_AGGREGATION = ENV_TOKENS.get('COMPLETION_AGGREGATOR_ASYNC_AGGREGATION', False)

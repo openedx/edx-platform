@@ -2262,9 +2262,6 @@ INSTALLED_APPS = (
     # Completion
     'completion',
     'completion_aggregator',
-
-    # User Manager API
-    'user_manager',
 )
 
 ######################### CSRF #########################################

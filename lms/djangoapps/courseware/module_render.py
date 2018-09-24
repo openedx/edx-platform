@@ -562,11 +562,6 @@ def get_module_system_for_user(
             block_key=block.scope_ids.usage_id,
             completion=event['completion'],
         )
-        CourseModuleCompletion.objects.get_or_create(
-            user_id=user.id,
-            course_id=course_id,
-            content_id=unicode(block.scope_ids.usage_id),
-        )
 
     def handle_deprecated_progress_event(block, event):
         """
@@ -588,14 +583,15 @@ def get_module_system_for_user(
         if not user_id:
             return
 
-        CourseModuleCompletion.objects.get_or_create(
-            user_id=user_id,
-            course_id=course_id,
-            content_id=unicode(descriptor.location)
-        )
-        if completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
+        if not completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
+            CourseModuleCompletion.objects.get_or_create(
+                user_id=user_id,
+                course_id=course_id,
+                content_id=unicode(descriptor.location)
+            )
+        else:
             if user_id != user.id:
-                log.warning("{} tried to submit a completion on behalf of {}".format(user, user_id))
+                log.warning("{} tried to submit a completion on behalf of {}".format(user, requested_user_id))
                 return
             BlockCompletion.objects.submit_completion(
                 user=user,
