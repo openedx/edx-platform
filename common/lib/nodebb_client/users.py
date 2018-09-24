@@ -1,4 +1,3 @@
-from celery.task import task
 from pynodebb.api.users import User
 
 
@@ -14,7 +13,6 @@ class ForumUser(User):
         payload = {'name': group_name, 'username': user_name, '_uid': uid}
         return self.client.post('/api/v2/users/join', **payload)
 
-    @task()
     def create(self, username, **kwargs):
         """
         Create a user on Nodebb
@@ -29,7 +27,6 @@ class ForumUser(User):
         payload = {'username': username, 'active': active, "_uid": 1}
         return self.client.post('/api/v2/users/activate', **payload)
 
-    @task()
     def update_profile(self, username, **kwargs):
         """
         Updated user profile by providing fields in kwargs
