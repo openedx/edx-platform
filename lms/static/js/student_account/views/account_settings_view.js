@@ -48,6 +48,13 @@
             initialize: function(options) {
                 this.options = options;
                 _.bindAll(this, 'render', 'switchTab', 'setActiveTab', 'showLoadingError');
+                var accountSettingsTabsEdited = [];
+                _.each(this.accountSettingsTabs, function(tab){
+                    if(tab.name !== undefined && options.tabSections[tab.name] !== undefined ){
+                        accountSettingsTabsEdited.push(tab)
+                    }
+                });
+                this.accountSettingsTabs = accountSettingsTabsEdited;
             },
 
             render: function() {
