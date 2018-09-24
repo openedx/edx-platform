@@ -3,6 +3,7 @@ Serializers for Bulk Enrollment.
 """
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from openedx.core.djangoapps.course_groups.cohorts import is_cohort_exists
 from rest_framework import serializers
 
 
@@ -22,6 +23,7 @@ class BulkEnrollmentSerializer(serializers.Serializer):
     """
     identifiers = serializers.CharField(required=True)
     courses = StringListField(required=True)
+    cohorts = StringListField(required=False)
     action = serializers.ChoiceField(
         choices=(
             ('enroll', 'enroll'),
@@ -43,3 +45,22 @@ class BulkEnrollmentSerializer(serializers.Serializer):
             except InvalidKeyError:
                 raise serializers.ValidationError("Course key not valid: {}".format(course))
         return value
+
+    def validate(self, attrs):
+        """
+        Check that the cohorts list is the same size as the courses list.
+        """
+        if attrs.get('cohorts'):
+            if attrs['action'] != 'enroll':
+                raise serializers.ValidationError("Cohorts can only be used for enrollments.")
+            if len(attrs['cohorts']) != len(attrs['courses']):
+                raise serializers.ValidationError(
+                    "If provided, the cohorts and courses should have equal number of items.")
+
+            for course_id, cohort_name in zip(attrs['courses'], attrs['cohorts']):
+                if not is_cohort_exists(course_key=CourseKey.from_string(course_id), name=cohort_name):
+                    raise serializers.ValidationError("cohort {cohort_name} not found in course {course_id}.".format(
+                        cohort_name=cohort_name, course_id=course_id)
+                    )
+
+        return attrs
