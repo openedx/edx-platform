@@ -2247,7 +2247,10 @@ INSTALLED_APPS = (
 
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "asgiref.inmemory.ChannelLayer",
+        "BACKEND": "asgi_redis.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("localhost", 6379)],
+        },
         "ROUTING": "edx_notifications.server.socket.routing.channel_routing",
     },
 }
