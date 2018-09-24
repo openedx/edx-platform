@@ -1,5 +1,7 @@
 import pytz
 from datetime import datetime
+
+from celery.task import task
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from lms.djangoapps.courseware.courses import get_course_by_id
 from student.models import Registration
@@ -15,6 +17,7 @@ def get_course_details(course_id):
     return course
 
 
+@task()
 def send_account_activation_email(request, registration, user):
     activation_link = '{protocol}://{site}/activate/{key}'.format(
             protocol='https' if request.is_secure() else 'http',
@@ -26,7 +29,7 @@ def send_account_activation_email(request, registration, user):
         'first_name': user.first_name,
         'activation_link': activation_link,
     }
-    MandrillClient().send_mail.delay(MandrillClient.USER_ACCOUNT_ACTIVATION_TEMPLATE, user.email, context)
+    MandrillClient().send_mail(MandrillClient.USER_ACCOUNT_ACTIVATION_TEMPLATE, user.email, context)
 
 
 def reactivation_email_for_user_custom(request, user):

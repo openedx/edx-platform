@@ -344,7 +344,7 @@ def create_account_with_params_custom(request, params, is_alquity_user):
         )
     )
     if send_email:
-        send_account_activation_email(request, registration, user)
+        send_account_activation_email.delay(request, registration, user)
     else:
         registration.activate()
         _enroll_user_in_pending_courses.delay(user)  # Enroll student in any pending courses
