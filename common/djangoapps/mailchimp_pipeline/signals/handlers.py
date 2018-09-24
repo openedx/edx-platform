@@ -13,7 +13,7 @@ from logging import getLogger
 log = getLogger(__name__)
 
 
-@task(bind=True)
+@task()
 def send_user_profile_info_to_mailchimp(sender, instance, kwargs):  # pylint: disable=unused-argument, invalid-name
     """ Create user account at nodeBB when user created at edx Platform """
     user_json = None
@@ -63,7 +63,7 @@ def send_user_profile_info_to_mailchimp(sender, instance, kwargs):  # pylint: di
             log.exception(ex)
 
 
-@task(bind=True)
+@task()
 def send_user_info_to_mailchimp(sender, user, created, kwargs):
     """ Create user account at nodeBB when user created at edx Platform """
 
@@ -87,7 +87,7 @@ def send_user_info_to_mailchimp(sender, user, created, kwargs):
         log.exception(ex)
 
 
-@task(bind=True)
+@task()
 def send_user_enrollments_to_mailchimp(sender, instance, created, kwargs):
     user_json = {
         "merge_fields": {
@@ -103,7 +103,7 @@ def send_user_enrollments_to_mailchimp(sender, instance, created, kwargs):
         log.exception(ex)
 
 
-@task(bind=True)
+@task()
 def send_user_course_completions_to_mailchimp(sender, user, course_key, kwargs):
     all_certs = []
     try:

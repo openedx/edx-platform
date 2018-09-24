@@ -1937,7 +1937,8 @@ def create_account_with_params(request, params):
 
     return new_user
 
-@task(bind=True)
+
+@task()
 def _enroll_user_in_pending_courses(student):
     """
     Enroll student in any pending courses he/she may have.
