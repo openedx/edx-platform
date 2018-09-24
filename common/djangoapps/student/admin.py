@@ -217,11 +217,23 @@ class CourseEnrollmentAdmin(admin.ModelAdmin):
         return self.has_permission(request, 'has_module_permission')
 
 
+class UserProfileForm(forms.ModelForm):
+    year_of_birth = forms.ChoiceField(
+        choices=[(year, year) for year in UserProfile.VALID_YEARS],
+        required=False
+    )
+
+    class Meta:
+        model = UserProfile
+        fields = '__all__'
+
+
 class UserProfileInline(admin.StackedInline):
     """ Inline admin interface for UserProfile model. """
     model = UserProfile
     can_delete = False
     verbose_name_plural = _('User profile')
+    form = UserProfileForm
 
 
 class UserAdmin(BaseUserAdmin):
