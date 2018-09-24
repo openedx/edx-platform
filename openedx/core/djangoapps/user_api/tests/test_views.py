@@ -28,7 +28,7 @@ from openedx.core.lib.time_zone_utils import get_display_time_zone
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from student.tests.factories import UserFactory
-from student.models import get_retired_email_by_email
+from student.models import get_retired_email_by_email, get_retired_username_by_username
 from third_party_auth.tests.testutil import simulate_running_pipeline, ThirdPartyAuthTestMixin
 from third_party_auth.tests.utils import (
     ThirdPartyOAuthTestMixin, ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
@@ -811,6 +811,7 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
         """
         user = User.objects.get(username=self.USERNAME)
         UserRetirementStatus.create_retirement(user)
+        user.username = get_retired_username_by_username(user.username)
         user.email = get_retired_email_by_email(user.email)
         user.set_unusable_password()
         user.save()
@@ -892,6 +893,48 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
                         "Try again with a different email address."
                     ).format(
                         self.EMAIL
+                    )
+                }]
+            }
+        )
+
+    def test_register_duplicate_retired_username_account_validation_error(self):
+        # Register the first user
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "honor_code": "true",
+        })
+        self.assertHttpOK(response)
+
+        # Initiate retirement for the above user.
+        self._retireRequestUser()
+
+        with mock.patch('openedx.core.djangoapps.user_authn.views.register.do_create_account') as dummy_do_create_acct:
+            # do_create_account should *not* be called - the duplicate retired username
+            # should be detected by check_account_exists before account creation is called.
+            dummy_do_create_acct.side_effect = Exception('do_create_account should *not* have been called!')
+            # Try to create a second user with the same username.
+            response = self.client.post(self.url, {
+                "email": "someone+else@example.com",
+                "name": "Someone Else",
+                "username": self.USERNAME,
+                "password": self.PASSWORD,
+                "honor_code": "true",
+            })
+        self.assertEqual(response.status_code, 409)
+        response_json = json.loads(response.content)
+        self.assertEqual(
+            response_json,
+            {
+                "username": [{
+                    "user_message": (
+                        "It looks like {} belongs to an existing account. "
+                        "Try again with a different username."
+                    ).format(
+                        self.USERNAME
                     )
                 }]
             }
