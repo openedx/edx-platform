@@ -5,7 +5,7 @@ from openedx.core.djangolib.markup import HTML, Text
 %>
 
 <div class="data-download-container action-type-container">
-  <div class="request-response-error msg msg-error copy" id="data-request-response-error"></div>
+  <div class="request-response-error msg msg-error copy" id="data-request-response-error" style="display: none;"></div>
 
 
   <br>
@@ -65,7 +65,7 @@ from openedx.core.djangolib.markup import HTML, Text
         <input type="button" name="issued-certificates-csv" value="${_("Download CSV of Certificates Issued")}" data-csv="true" data-endpoint="${ section_data['get_issued_certificates_url'] }">
       </p>
       <div class="data-display-table certificate-data-display-table" id="data-issued-certificates-table"></div>
-      <div class="issued-certificates-error request-response-error msg msg-error copy"></div>
+      <div class="issued-certificates-error request-response-error msg msg-error copy" style="display: none;"></div>
     </div>
 
   % if not disable_buttons:
@@ -84,7 +84,7 @@ from openedx.core.djangolib.markup import HTML, Text
   %endif
 
     <div class="request-response msg msg-confirm copy" id="report-request-response"></div>
-    <div class="request-response-error msg msg-error copy" id="report-request-response-error"></div>
+    <div class="request-response-error msg msg-error copy" id="report-request-response-error" style="display: none;"></div>
     <br>
 
     <h3 class="hd hd-3">${_("Reports Available for Download")}</h3>
