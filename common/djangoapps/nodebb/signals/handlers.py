@@ -306,11 +306,3 @@ def leave_groupchat_on_nodebb(sender, instance, **kwargs):
         else:
             log.info('Success: User have unjoined the group %s successfully' % instance.team.name)
 
-
-@receiver(post_delete, sender=CourseOverview, dispatch_uid="delete_course_overview")
-def delete_course_overview(sender, instance, **kwargs):
-    """
-    Leave group on NodeBB whenever a member leaves a team
-    """
-
-    log.info('Success: Course Overview object %s deleted successfully' % instance.display_name)
