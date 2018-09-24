@@ -110,6 +110,7 @@ def update_user_profile_on_nodebb(sender, instance, created, **kwargs):
             'first_name': instance.first_name,
             'last_name': instance.last_name
         }
+
         task_update_user_profile_on_nodebb.delay(username=instance.username, profile_data=data_to_sync)
 
 @receiver(post_delete, sender=User)

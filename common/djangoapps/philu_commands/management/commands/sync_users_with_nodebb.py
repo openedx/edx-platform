@@ -61,8 +61,11 @@ class Command(BaseCommand):
 
             if not nodebb_data:
                 task_create_user_on_nodebb.delay(username=user.username, user_data=edx_data)
-                task_update_onboarding_surveys_status.delay(username=user.username)
-                task_activate_user_on_nodebb.delay(username=user.username, active=user.is_active)
+                if user.is_active:
+                    task_activate_user_on_nodebb.delay(username=user.username, active=user.is_active)
+                # if user has submitted all onboarding surveys then update status on NodeBB
+                if not bool(extended_profile.unattended_surveys(_type='list')):
+                    task_update_onboarding_surveys_status.delay(username=user.username)
 
             # filter nodebb_data to ensure compatibility with edx_data
             for key in nodebb_data:
