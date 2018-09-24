@@ -2122,7 +2122,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=483 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=485 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2837,6 +2837,7 @@ CREATE TABLE `enterprise_pendingenrollment` (
   `course_id` varchar(255) NOT NULL,
   `course_mode` varchar(25) NOT NULL,
   `user_id` int(11) NOT NULL,
+  `cohort_name` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `enterprise_pendingenrollment_user_id_111d29e0f8aebec5_uniq` (`user_id`,`course_id`),
   CONSTRAINT `a9ce3c7057d5f3b27dc64261037ad37d` FOREIGN KEY (`user_id`) REFERENCES `enterprise_pendingenterprisecustomeruser` (`id`)
