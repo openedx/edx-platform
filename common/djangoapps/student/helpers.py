@@ -44,7 +44,8 @@ from student.models import (
     UserAttribute,
     UserProfile,
     unique_id_for_user,
-    email_exists_or_retired
+    email_exists_or_retired,
+    username_exists_or_retired
 )
 
 
@@ -628,7 +629,7 @@ def do_create_account(form, custom_form=None):
         # AccountValidationError and a consistent user message returned (i.e. both should
         # return "It looks like {username} belongs to an existing account. Try again with a
         # different username.")
-        if User.objects.filter(username=user.username):
+        if username_exists_or_retired(user.username):
             raise AccountValidationError(
                 USERNAME_EXISTS_MSG_FMT.format(username=proposed_username),
                 field="username"
