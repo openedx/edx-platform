@@ -26,7 +26,7 @@ def send_account_activation_email(request, registration, user):
         'first_name': user.first_name,
         'activation_link': activation_link,
     }
-    MandrillClient().send_mail(MandrillClient.USER_ACCOUNT_ACTIVATION_TEMPLATE, user.email, context)
+    MandrillClient().send_mail.delay(MandrillClient.USER_ACCOUNT_ACTIVATION_TEMPLATE, user.email, context)
 
 
 def reactivation_email_for_user_custom(request, user):

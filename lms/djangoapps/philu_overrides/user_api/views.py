@@ -347,7 +347,7 @@ def create_account_with_params_custom(request, params, is_alquity_user):
         send_account_activation_email(request, registration, user)
     else:
         registration.activate()
-        _enroll_user_in_pending_courses(user)  # Enroll student in any pending courses
+        _enroll_user_in_pending_courses.delay(user)  # Enroll student in any pending courses
 
     # Immediately after a user creates an account, we log them in. They are only
     # logged in until they close the browser. They can't log in again until they click

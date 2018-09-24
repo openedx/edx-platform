@@ -1,6 +1,7 @@
 import mandrill
 import logging
 
+from celery.task import task
 from django.conf import settings
 
 log = logging.getLogger(__name__)
@@ -29,6 +30,7 @@ class MandrillClient(object):
     def __init__(self):
         self.mandrill_client = mandrill.Mandrill(settings.MANDRILL_API_KEY)
 
+    @task(bind=True)
     def send_mail(self, template_name, user_email, context, attachments=[]):
         """
         calls the mandrill API for the specific template and email
