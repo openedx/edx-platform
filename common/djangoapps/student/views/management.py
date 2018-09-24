@@ -1256,9 +1256,6 @@ def validate_new_email(user, new_email):
     if new_email == user.email:
         raise ValueError(_('Old email is the same as the new email.'))
 
-    if email_exists_or_retired(new_email):
-        raise ValueError(_('An account with this e-mail already exists.'))
-
 
 def do_email_change_request(user, new_email, activation_key=None):
     """
