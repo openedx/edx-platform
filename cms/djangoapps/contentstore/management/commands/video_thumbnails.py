@@ -10,7 +10,7 @@ from django.core.management.base import CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from openedx.core.djangoapps.video_config.models import VideoThumbnailSetting, UpdatedCourseVideos
+from openedx.core.djangoapps.video_config.models import VideoThumbnailSetting
 from cms.djangoapps.contentstore.tasks import enqueue_update_thumbnail_tasks
 
 log = logging.getLogger(__name__)
@@ -30,24 +30,12 @@ class Command(BaseCommand):
         command_settings = self._latest_settings()
         commit = command_settings.commit
         if command_settings.all_course_videos:
-            all_course_videos = edxval_api.get_course_video_ids_with_youtube_profile()
-            updated_course_videos = UpdatedCourseVideos.objects.all().values_list('course_id', 'edx_video_id')
-            non_updated_course_videos = [
-                course_video
-                for course_video in all_course_videos
-                if (course_video[0], course_video[1]) not in list(updated_course_videos)
-            ]
-            # Course videos for whom video thumbnails need to be updated
-            course_videos = non_updated_course_videos[:command_settings.batch_size]
-
+            course_videos = edxval_api.get_course_video_ids_with_youtube_profile(
+                offset=command_settings.offset, limit=command_settings.batch_size
+            )
             log.info(
-                ('[Video Thumbnails] Videos(total): %s, '
-                 'Videos(updated): %s, Videos(non-updated): %s, '
-                 'Videos(update-in-process): %s'),
-                len(all_course_videos),
-                len(updated_course_videos),
-                len(non_updated_course_videos),
-                len(course_videos),
+                '[Video Thumbnails] Videos(updated): %s, Videos(update-in-process): %s',
+                command_settings.offset, len(course_videos),
             )
         else:
             validated_course_ids = self._validate_course_ids(command_settings.course_ids.split())
@@ -89,12 +77,7 @@ class Command(BaseCommand):
                 run=command_run
             )
             if video_thumbnail_settings.all_course_videos:
-                for course_id, edx_video_id, __ in course_videos:
-                    UpdatedCourseVideos.objects.get_or_create(
-                        course_id=course_id,
-                        edx_video_id=edx_video_id,
-                        command_run=command_run
-                    )
+                video_thumbnail_settings.update_offset()
         else:
             log.info('[video thumbnails] selected course videos: {course_videos} '.format(
                 course_videos=text_type(course_videos)

@@ -196,6 +196,7 @@ class VideoThumbnailSetting(ConfigurationModel):
     Arguments for the Video Thumbnail management command
     """
     command_run = PositiveIntegerField(default=0)
+    offset = PositiveIntegerField(default=0)
     batch_size = PositiveIntegerField(default=0)
     videos_per_task = PositiveIntegerField(default=0)
     commit = BooleanField(
@@ -218,6 +219,10 @@ class VideoThumbnailSetting(ConfigurationModel):
         self.command_run += 1
         self.save()
         return self.command_run
+
+    def update_offset(self):
+        self.offset += self.batch_size
+        self.save()
 
     def __unicode__(self):
         return "[VideoThumbnailSetting] update for {courses} courses if commit as {commit}".format(
