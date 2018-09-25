@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import SuspiciousOperation
 from django.core.management.base import BaseCommand, CommandError
 from lxml import etree
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locator import LibraryLocator
 from path import Path
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import ModuleStoreEnum
@@ -61,7 +61,9 @@ class Command(BaseCommand):
 
         # Gather library metadata from XML file
         xml_root = etree.parse(abs_xml_path / 'library.xml').getroot()
-        assert xml_root.tag == 'library'
+        if xml_root.tag != 'library':
+            raise CommandError(u'Failed to import {0}: Not a library archive'.format(archive_path))
+
         metadata = xml_root.attrib
         org = metadata['org']
         library = metadata['library']
@@ -73,8 +75,9 @@ class Command(BaseCommand):
 
         # Check if data would be overwritten
         ans = ''
-        while not created and ans.lower() not in ['y', 'yes', 'n', 'no']:
-            ans = raw_input(u'Library "{0}" already exists, overwrite it? [y/n] '.format(courselike_key))
+        while not created and ans not in ['y', 'yes', 'n', 'no']:
+            inp = raw_input(u'Library "{0}" already exists, overwrite it? [y/n] '.format(courselike_key))
+            ans = inp.lower()
         if ans.startswith('n'):
             print(u'Aborting import of "{0}"'.format(courselike_key))
             return
@@ -88,9 +91,9 @@ class Command(BaseCommand):
                 static_content_store=contentstore(),
                 target_id=courselike_key
             )
-        except Exception as e:
+        except Exception:
             print(u'\n=== Failed to import library-v1:{0}+{1}'.format(org, library))
-            raise e
+            raise
 
         print(u'Library "{0}" imported to "{1}"'.format(archive_path, courselike_key))
 
@@ -116,4 +119,4 @@ def _get_or_create_library(org, number, display_name, user):
         return library.location.library_key, True
     except DuplicateCourseError:
         # Course exists, return its key
-        return CourseKey.from_string(u'library-v1:{0}+{1}'.format(org, number)), False
+        return LibraryLocator(org=org, library=number), False

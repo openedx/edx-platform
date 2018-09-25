@@ -3,6 +3,7 @@ Script for exporting a content library from Mongo to a tar.gz file
 """
 from __future__ import print_function
 import os
+import shutil
 
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
@@ -31,10 +32,9 @@ class Command(BaseCommand):
         module_store = modulestore()
         try:
             library_key = CourseKey.from_string(options['library_id'])
-            assert isinstance(library_key, LibraryLocator)
         except InvalidKeyError:
             raise CommandError(u'Invalid library ID: "{0}".'.format(options['library_id']))
-        except AssertionError:
+        if not isinstance(library_key, LibraryLocator):
             raise CommandError(u'Argument "{0}" is not a library key'.format(options['library_id']))
 
         library = module_store.get_library(library_key)
@@ -51,14 +51,15 @@ class Command(BaseCommand):
         except Exception as e:
             raise CommandError(u'Failed to export "{0}" with "{1}"'.format(library_key, e))
         else:
-            # Save generated archive with keyed filename
-            prefix, suffix, n = str(library_key).replace(':', '+'), '.tar.gz', 0
-            while os.path.exists(prefix + suffix):
-                n += 1
-                prefix = u'{0}_{1}'.format(prefix.rsplit('_', 1)[0], n) if n > 1 else u'{}_1'.format(prefix)
-            filename = prefix + suffix
-            target = os.path.join(dest_path, filename)
-            tarball.file.seek(0)
-            with open(target, 'w') as f:
-                f.write(tarball.file.read())
-            print(u'Library "{0}" exported to "{1}"'.format(library.location.library_key, target))
+            with tarball:
+                # Save generated archive with keyed filename
+                prefix, suffix, n = str(library_key).replace(':', '+'), '.tar.gz', 0
+                while os.path.exists(prefix + suffix):
+                    n += 1
+                    prefix = u'{0}_{1}'.format(prefix.rsplit('_', 1)[0], n) if n > 1 else u'{}_1'.format(prefix)
+                filename = prefix + suffix
+                target = os.path.join(dest_path, filename)
+                tarball.file.seek(0)
+                with open(target, 'w') as f:
+                    shutil.copyfileobj(tarball.file, f)
+                print(u'Library "{0}" exported to "{1}"'.format(library.location.library_key, target))
