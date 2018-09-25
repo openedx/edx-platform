@@ -2122,7 +2122,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=485 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=486 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -5839,6 +5839,7 @@ CREATE TABLE `video_config_videothumbnailsetting` (
   `all_course_videos` tinyint(1) NOT NULL,
   `course_ids` longtext NOT NULL,
   `changed_by_id` int(11) DEFAULT NULL,
+  `offset` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   KEY `video_config_videoth_changed_by_id_9385a0b2_fk_auth_user` (`changed_by_id`),
   CONSTRAINT `video_config_videoth_changed_by_id_9385a0b2_fk_auth_user` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`)
