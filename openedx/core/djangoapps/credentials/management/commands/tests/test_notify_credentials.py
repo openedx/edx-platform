@@ -111,6 +111,7 @@ class TestNotifyCredentials(TestCase):
 
     @override_settings(DEBUG=True)
     def test_page_size(self):
+        reset_queries()
         call_command(Command(), '--start-date', '2017-01-01')
         baseline = len(connection.queries)
 
