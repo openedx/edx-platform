@@ -15,6 +15,7 @@ from courseware.models import StudentModule
 from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
 from lms.djangoapps.grades.events import PROBLEM_SUBMITTED_EVENT_TYPE
 from lms.djangoapps.grades.tasks import recalculate_subsection_grade_v3
+from lms.djangoapps.grades.signals.handlers import should_override_grade_after_course_end
 from student.models import user_by_anonymous_id
 from submissions.models import Submission
 from track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
@@ -62,6 +63,9 @@ class Command(BaseCommand):
         set_event_transaction_type(PROBLEM_SUBMITTED_EVENT_TYPE)
         kwargs = {'modified__range': (modified_start, modified_end), 'module_type': 'problem'}
         for record in StudentModule.objects.filter(**kwargs):
+            if not should_override_grade_after_course_end(unicode(record.course_id)):
+                continue
+
             task_args = {
                 "user_id": record.student_id,
                 "course_id": unicode(record.course_id),
@@ -77,6 +81,9 @@ class Command(BaseCommand):
 
         kwargs = {'created_at__range': (modified_start, modified_end)}
         for record in Submission.objects.filter(**kwargs):
+            if not should_override_grade_after_course_end(unicode(record.student_item.course_id)):
+                continue
+
             task_args = {
                 "user_id": user_by_anonymous_id(record.student_item.student_id).id,
                 "anonymous_user_id": record.student_item.student_id,

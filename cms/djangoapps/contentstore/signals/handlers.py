@@ -11,6 +11,7 @@ from pytz import UTC
 from contentstore.courseware_index import CoursewareSearchIndexer, LibrarySearchIndexer
 from contentstore.proctoring import register_special_exams
 from lms.djangoapps.grades.tasks import compute_all_grades_for_course
+from lms.djangoapps.grades.signals.handlers import should_override_grade_after_course_end
 from openedx.core.djangoapps.credit.signals import on_course_publish
 from openedx.core.lib.gating import api as gating_api
 from track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
@@ -112,6 +113,9 @@ def handle_grading_policy_changed(sender, **kwargs):
     """
     Receives signal and kicks off celery task to recalculate grades
     """
+    if not should_override_grade_after_course_end(unicode(kwargs.get('course_key'))):
+        return
+
     kwargs = {
         'course_key': unicode(kwargs.get('course_key')),
         'event_transaction_id': unicode(get_event_transaction_id()),

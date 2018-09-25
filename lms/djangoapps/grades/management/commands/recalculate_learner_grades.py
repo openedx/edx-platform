@@ -10,6 +10,7 @@ import csv
 from django.core.management.base import BaseCommand
 
 from lms.djangoapps.grades.tasks import recalculate_course_and_subsection_grades_for_user
+from lms.djangoapps.grades.signals.handlers import should_override_grade_after_course_end
 
 
 class Command(BaseCommand):
@@ -32,6 +33,9 @@ class Command(BaseCommand):
         csv_reader = csv.DictReader(csv_file)
 
         for row in csv_reader:
+            if not should_override_grade_after_course_end(unicode(row['course_id'])):
+                continue
+
             recalculate_course_and_subsection_grades_for_user.apply_async(
                 kwargs={'user_id': row['user_id'], 'course_key': row['course_id']}
             )

@@ -2,16 +2,23 @@
 Grades related signals.
 """
 from contextlib import contextmanager
+from datetime import timedelta
 from logging import getLogger
 
 import six
+from opaque_keys.edx.keys import CourseKey
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+
 from courseware.model_data import get_score, set_score
 from django.dispatch import receiver
+from django.utils import timezone
 from submissions.models import score_reset, score_set
 from xblock.scorable import ScorableXBlockMixin, Score
 
 from openedx.core.djangoapps.course_groups.signals.signals import COHORT_MEMBERSHIP_UPDATED
 from openedx.core.lib.grade_utils import is_score_higher_or_equal
+
+from grades.config.waffle import OVERRIDE_GRADE_AFTER_COURSE_END, waffle_flags
 from student.models import user_by_anonymous_id
 from student.signals import ENROLLMENT_TRACK_UPDATED
 from track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
@@ -214,6 +221,9 @@ def enqueue_subsection_update(sender, **kwargs):  # pylint: disable=unused-argum
     Handles the PROBLEM_WEIGHTED_SCORE_CHANGED or SUBSECTION_OVERRIDE_CHANGED signals by
     enqueueing a subsection update operation to occur asynchronously.
     """
+    if not should_override_grade_after_course_end(unicode(kwargs['course_id'])):
+        return
+
     events.grade_updated(**kwargs)
     recalculate_subsection_grade_v3.apply_async(
         kwargs=dict(
@@ -238,6 +248,9 @@ def recalculate_course_grade_only(sender, course, course_structure, user, **kwar
     Updates a saved course grade, but does not update the subsection
     grades the user has in this course.
     """
+    if not should_override_grade_after_course_end(unicode(course.id)):
+        return
+
     CourseGradeFactory().update(user, course=course, course_structure=course_structure)
 
 
@@ -248,6 +261,9 @@ def recalculate_course_and_subsection_grades(sender, user, course_key, countdown
     Updates a saved course grade, forcing the subsection grades
     from which it is calculated to update along the way.
     """
+    if not should_override_grade_after_course_end(unicode(course_key)):
+        return
+
     recalculate_course_and_subsection_grades_for_user.apply_async(
         countdown=countdown,
         kwargs=dict(
@@ -255,3 +271,28 @@ def recalculate_course_and_subsection_grades(sender, user, course_key, countdown
             course_key=six.text_type(course_key)
         )
     )
+
+
+def should_override_grade_after_course_end(course_id):
+    """
+    Helper function to check if course grade should be updated or not.
+
+    This method checks if the course has an ended date and it has ended 30 days ago.
+    return False if course has passed the 30 days offset to update course grade. This
+    method is behind the course waffle flag so it only applies to the courses which have opted it in.
+    """
+    course_key = CourseKey.from_string(course_id)
+    waffle_switch_enabled = waffle_flags()[OVERRIDE_GRADE_AFTER_COURSE_END].is_enabled(course_key)
+    if not waffle_switch_enabled:
+        return True
+
+    course = CourseOverview.get_from_id(course_key)
+    if not course.end:
+        return True
+
+    grade_update_offset = course.end + timedelta(30)
+    now = timezone.now()
+    if now > grade_update_offset:
+        return False
+
+    return True

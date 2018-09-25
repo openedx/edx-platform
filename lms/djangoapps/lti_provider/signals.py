@@ -41,6 +41,7 @@ def score_changed_handler(sender, **kwargs):  # pylint: disable=unused-argument
     Consume signals that indicate score changes. See the definition of
     PROBLEM_WEIGHTED_SCORE_CHANGED for a description of the signal.
     """
+    # todo -- Check if the change is required here?
     points_possible = kwargs.get('weighted_possible', None)
     points_earned = kwargs.get('weighted_earned', None)
     user_id = kwargs.get('user_id', None)
