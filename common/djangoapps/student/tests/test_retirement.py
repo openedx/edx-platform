@@ -250,7 +250,7 @@ class TestRegisterRetiredUsername(TestCase):
     """
     def setUp(self):
         super(TestRegisterRetiredUsername, self).setUp()
-        self.url = reverse('create_account')
+        self.url = reverse('user_api_registration')
         self.url_params = {
             'username': 'username',
             'email': 'foo_bar' + '@bar.com',
@@ -264,13 +264,13 @@ class TestRegisterRetiredUsername(TestCase):
         """
         Validates a response stating that a username already exists.
         """
-        assert response.status_code == 400
+        assert response.status_code == 409
         obj = json.loads(response.content)
-        assert obj['value'].startswith('An account with the Public Username')
-        assert obj['value'].endswith('already exists.')
-        assert orig_username in obj['value']
-        assert obj['field'] == 'username'
-        assert not obj['success']
+
+        username_msg = obj['username'][0]['user_message']
+        assert username_msg.startswith('An account with the Public Username')
+        assert username_msg.endswith('already exists.')
+        assert orig_username in username_msg
 
     def test_retired_username(self):
         """

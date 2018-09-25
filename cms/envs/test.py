@@ -197,6 +197,8 @@ FEATURES['ENABLE_SERVICE_STATUS'] = True
 # Toggles embargo on for testing
 FEATURES['EMBARGO'] = True
 
+FEATURES['ENABLE_COMBINED_LOGIN_REGISTRATION'] = True
+
 # set up some testing for microsites
 FEATURES['USE_MICROSITES'] = True
 MICROSITE_ROOT_DIR = COMMON_ROOT / 'test' / 'test_sites'
