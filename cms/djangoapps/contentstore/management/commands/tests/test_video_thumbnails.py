@@ -66,9 +66,7 @@ class TestVideoThumbnails(ModuleStoreTestCase):
             logger.check(
                 (
                     LOGGER_NAME, 'INFO',
-                    ('[Video Thumbnails] Videos(total): 2, '
-                     'Videos(updated): 0, Videos(non-updated): 2, '
-                     'Videos(update-in-process): 2')
+                    '[Video Thumbnails] Videos(updated): 0, Videos(update-in-process): 2'
                 ),
                 (
                     LOGGER_NAME, 'INFO',
@@ -98,9 +96,7 @@ class TestVideoThumbnails(ModuleStoreTestCase):
             # Verify that command information correctly logged.
             logger.check((
                 LOGGER_NAME, 'INFO',
-                ('[Video Thumbnails] Videos(total): 2, '
-                 'Videos(updated): 0, Videos(non-updated): 2, '
-                 'Videos(update-in-process): 2')
+                '[Video Thumbnails] Videos(updated): 0, Videos(update-in-process): 2'
             ))
             # Verify that `enqueue_update_thumbnail_tasks` is called.
             self.assertTrue(mock_enqueue_thumbnails.called)
