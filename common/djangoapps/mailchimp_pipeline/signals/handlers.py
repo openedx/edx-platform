@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from mailchimp_pipeline.client import ChimpClient, MailChimpException
 from mailchimp_pipeline.helpers import get_org_data_for_mandrill, get_user_active_enrollements, \
     get_enrollements_course_short_ids
@@ -57,15 +58,45 @@ def send_user_profile_info_to_mailchimp(sender, instance, kwargs):  # pylint: di
 
     if user_json and not sender == Organization:
         try:
-            response = ChimpClient().add_update_member_to_list(settings.MAILCHIMP_LEARNERS_LIST_ID, instance.user.email, user_json)
+            response = ChimpClient().add_update_member_to_list(
+                settings.MAILCHIMP_LEARNERS_LIST_ID,
+                instance.user.email,
+                user_json
+            )
             log.info(response)
         except MailChimpException as ex:
             log.exception(ex)
 
 
-@task()
 def send_user_info_to_mailchimp(sender, user, created, kwargs):
     """ Create user account at nodeBB when user created at edx Platform """
+
+    user_json = {
+        "merge_fields": {
+            "FULLNAME": user.get_full_name(),
+            "USERNAME": user.username
+        }
+    }
+
+    if created:
+        user_json["merge_fields"].update({"DATEREGIS": str(user.date_joined.strftime("%m/%d/%Y"))})
+        user_json.update({
+            "email_address": user.email,
+            "status_if_new": "subscribed"
+        })
+    try:
+        response = ChimpClient().add_update_member_to_list(settings.MAILCHIMP_LEARNERS_LIST_ID, user.email, user_json)
+        log.info(response)
+    except MailChimpException as ex:
+        log.exception(ex)
+
+
+@task()
+def task_send_user_info_to_mailchimp(data):
+    """ Create user account at nodeBB when user created at edx Platform """
+
+    user = User.objects.get(id=data['user_id'])
+    created = data["created"]
 
     user_json = {
         "merge_fields": {
