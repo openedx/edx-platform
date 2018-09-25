@@ -3,6 +3,7 @@
 data_file = reports/openedx/core/lib/.coverage
 source = openedx/core/lib
 parallel = true
+dynamic_context = test_function
 
 [report]
 ignore_errors = True

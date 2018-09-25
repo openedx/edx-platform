@@ -28,6 +28,7 @@ omit =
 
 concurrency = multiprocessing
 parallel = True
+dynamic_context = test_function
 
 [report]
 ignore_errors = True

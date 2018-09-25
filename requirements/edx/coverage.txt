@@ -4,7 +4,9 @@
 #
 #    make upgrade
 #
-coverage==4.4
+
+#coverage==4.4
+git+https://github.com/nedbat/coveragepy.git@nedbat/test#egg=coverage==0.0
 diff-cover==0.9.8
 inflect==1.0.0            # via jinja2-pluralize
 jinja2-pluralize==0.3.0   # via diff-cover
