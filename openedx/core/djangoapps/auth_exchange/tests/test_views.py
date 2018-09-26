@@ -66,7 +66,8 @@ class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
         self.assertEqual(self.oauth2_adapter.get_client_for_token(token), self.oauth_client)
         self.assertEqual(self.oauth2_adapter.get_token_scope_names(token), expected_scopes)
 
-    def test_single_access_token(self):
+    @ddt.data(True, False)
+    def test_single_access_token(self, single_access_token):
         def extract_token(response):
             """
             Returns the access token from the response payload.
@@ -74,19 +75,18 @@ class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
             return json.loads(response.content)["access_token"]
 
         self._setup_provider_response(success=True)
-        for single_access_token in [True, False]:
-            with mock.patch(
-                "openedx.core.djangoapps.auth_exchange.views.constants.SINGLE_ACCESS_TOKEN",
-                single_access_token,
-            ):
-                first_response = self.client.post(self.url, self.data)
-                second_response = self.client.post(self.url, self.data)
-            self.assertEqual(first_response.status_code, 200)
-            self.assertEqual(second_response.status_code, 200)
-            self.assertEqual(
-                extract_token(first_response) == extract_token(second_response),
-                single_access_token
-            )
+        with mock.patch(
+            "openedx.core.djangoapps.auth_exchange.views.constants.SINGLE_ACCESS_TOKEN",
+            single_access_token,
+        ):
+            first_response = self.client.post(self.url, self.data)
+            second_response = self.client.post(self.url, self.data)
+        self.assertEqual(first_response.status_code, 200)
+        self.assertEqual(second_response.status_code, 200)
+        self.assertEqual(
+            extract_token(first_response) == extract_token(second_response),
+            single_access_token
+        )
 
     def test_get_method(self):
         response = self.client.get(self.url, self.data)

@@ -546,9 +546,10 @@ def get_enterprise_learner_data(user):
     """
     Client API operation adapter/wrapper
     """
-    enterprise_learner_data = EnterpriseApiClient(user=user).fetch_enterprise_learner_data(user)
-    if enterprise_learner_data:
-        return enterprise_learner_data['results']
+    if user.is_authenticated:
+        enterprise_learner_data = EnterpriseApiClient(user=user).fetch_enterprise_learner_data(user)
+        if enterprise_learner_data:
+            return enterprise_learner_data['results']
 
 
 @enterprise_is_enabled(otherwise={})

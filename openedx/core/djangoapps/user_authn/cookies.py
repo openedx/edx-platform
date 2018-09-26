@@ -4,6 +4,7 @@ Utility functions for setting "logged in" cookies used by subdomains.
 from __future__ import unicode_literals
 
 import json
+import logging
 import time
 
 import six
@@ -14,9 +15,16 @@ from django.dispatch import Signal
 from django.utils.http import cookie_date
 
 from edx_rest_framework_extensions.auth.jwt import cookies as jwt_cookies
+from edx_rest_framework_extensions.auth.jwt.constants import JWT_DELIMITER
+from oauth2_provider.models import Application
+from openedx.core.djangoapps.oauth_dispatch.api import create_dot_access_token
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_user_login_jwt
 from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewide_block_completed
 from openedx.core.djangoapps.user_authn.waffle import JWT_COOKIES_FLAG
 from student.models import CourseEnrollment
+
+
+log = logging.getLogger(__name__)
 
 
 CREATE_LOGON_COOKIE = Signal(providing_args=['user', 'response'])
@@ -128,7 +136,7 @@ def set_logged_in_cookies(request, response, user):
 
         _set_deprecated_logged_in_cookie(response, request)
         _set_deprecated_user_info_cookie(response, request, user)
-        _set_jwt_cookies(response, request, user)
+        _create_and_set_jwt_cookies(response, request, user)
         CREATE_LOGON_COOKIE.send(sender=None, user=user, response=response)
 
     return response
@@ -178,13 +186,6 @@ def _set_deprecated_user_info_cookie(response, request, user):
     )
 
 
-def _set_jwt_cookies(response, request, user):  # pylint: disable=unused-argument
-    """ Sets a cookie containing a JWT on the response. """
-    if not JWT_COOKIES_FLAG.is_enabled():
-        return
-    # TODO (ARCH-236)
-
-
 def _get_user_info_cookie_data(request, user):
     """ Returns information that will populate the user info cookie. """
 
@@ -223,6 +224,82 @@ def _get_user_info_cookie_data(request, user):
     }
 
     return user_info
+
+
+def _create_and_set_jwt_cookies(response, request, user):
+    """ Sets a cookie containing a JWT on the response. """
+    if not JWT_COOKIES_FLAG.is_enabled():
+        return
+
+    # TODO (ARCH-246) Need to fix configuration of token expiration settings.
+    cookie_settings = standard_cookie_settings(request)
+    _set_jwt_expiration(cookie_settings)
+    expires_in = cookie_settings['max_age']
+
+    try:
+        login_oauth_client_id = settings.JWT_AUTH['LOGIN_CLIENT_ID']
+        oauth_application = Application.objects.get(client_id=login_oauth_client_id)
+    except (Application.DoesNotExist, KeyError):
+        # TODO Consider what we fallback to in this case, while noting the
+        # implementation of is_logged_in_cookie_set.
+        log.exception(u'OAuth Application for Login is not configured.')
+        raise
+
+    access_token = create_dot_access_token(request, user, oauth_application, expires_in=expires_in)
+    jwt = create_user_login_jwt(user, expires_in)
+    jwt_header_and_payload, jwt_signature = _parse_jwt(jwt)
+    _set_jwt_cookies(
+        response,
+        cookie_settings,
+        jwt_header_and_payload,
+        jwt_signature,
+        access_token['refresh_token'],
+    )
+
+
+def _parse_jwt(jwt):
+    """
+    Parses and returns the following parts of the jwt: header_and_payload, signature
+    """
+    jwt_parts = jwt.split(JWT_DELIMITER)
+    header_and_payload = JWT_DELIMITER.join(jwt_parts[0:2])
+    signature = jwt_parts[2]
+    return header_and_payload, signature
+
+
+def _set_jwt_cookies(response, cookie_settings, jwt_header_and_payload, jwt_signature, refresh_token):
+    """
+    Sets the given jwt_header_and_payload, jwt_signature, and refresh token in 3 different cookies.
+    The latter 2 cookies are set as httponly.
+    """
+    cookie_settings['httponly'] = None
+    response.set_cookie(
+        jwt_cookies.jwt_cookie_header_payload_name(),
+        jwt_header_and_payload,
+        **cookie_settings
+    )
+
+    cookie_settings['httponly'] = True
+    response.set_cookie(
+        jwt_cookies.jwt_cookie_signature_name(),
+        jwt_signature,
+        **cookie_settings
+    )
+    response.set_cookie(
+        jwt_cookies.jwt_refresh_cookie_name(),
+        refresh_token,
+        **cookie_settings
+    )
+
+
+def _set_jwt_expiration(cookie_settings):
+    """
+    Updates cookie_settings with the configured expiration values for JWT
+    Cookies.
+    """
+    max_age = settings.JWT_AUTH['JWT_AUTH_COOKIE_EXPIRATION']
+    cookie_settings['max_age'] = max_age
+    cookie_settings['expires'] = _cookie_expiration_based_on_max_age(max_age)
 
 
 def _cookie_expiration_based_on_max_age(max_age):

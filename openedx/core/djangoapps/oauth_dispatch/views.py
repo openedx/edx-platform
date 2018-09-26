@@ -17,11 +17,9 @@ from ratelimit import ALL
 from ratelimit.mixins import RatelimitMixin
 
 from openedx.core.djangoapps.auth_exchange import views as auth_exchange_views
-from openedx.core.lib.token_utils import JwtBuilder
-
-from . import adapters
-from .dot_overrides import views as dot_overrides_views
-from .toggles import ENFORCE_JWT_SCOPES
+from openedx.core.djangoapps.oauth_dispatch import adapters
+from openedx.core.djangoapps.oauth_dispatch.dot_overrides import views as dot_overrides_views
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_app_access_jwt
 
 
 class _DispatchingView(View):
@@ -114,20 +112,12 @@ class AccessTokenView(RatelimitMixin, _DispatchingView):
         """ Builds the content of the response, including the JWT token. """
         client_id = self._get_client_id(request)
         adapter = self.get_adapter(request)
-        is_client_restricted = adapter.is_client_restricted(client_id)
 
-        expires_in, scope, user = self._parse_access_token_response(adapter, response)
-        jwt_builder = self._get_jwt_builder(user, is_client_restricted)
+        user, expires_in, scope = self._parse_access_token_response(adapter, response)
+        jwt = self._build_jwt(user, scope.split(' '), expires_in, client_id, adapter)
 
         content = {
-            'access_token': jwt_builder.build_token(
-                scope.split(' '),
-                expires_in,
-                additional_claims={
-                    'filters': adapter.get_authorization_filters(client_id),
-                    'is_restricted': is_client_restricted,
-                },
-            ),
+            'access_token': jwt,
             'expires_in': expires_in,
             'scope': scope,
             'token_type': 'JWT',
@@ -135,30 +125,20 @@ class AccessTokenView(RatelimitMixin, _DispatchingView):
         return json.dumps(content)
 
     def _parse_access_token_response(self, adapter, response):
-        """ Parses the expires_in, scope, and user values of the response. """
+        """ Parses the user, expires_in, and scope values of the response. """
         content = json.loads(response.content)
         access_token = content['access_token']
-        expires_in = content['expires_in']
-        scope = content['scope']
         user = adapter.get_access_token(access_token).user
-        return expires_in, scope, user
+        return user, content['expires_in'], content['scope']
 
-    def _get_jwt_builder(self, user, is_client_restricted):
-        """ Creates and returns a JWTBuilder object for creating JWTs. """
-
-        # If JWT scope enforcement is enabled, we need to sign tokens
-        # given to restricted applications with a key that
-        # other IDAs do not have access to. This prevents restricted
-        # applications from getting access to API endpoints available
-        # on other IDAs which have not yet been protected with the
-        # scope-related DRF permission classes. Once all endpoints have
-        # been protected, we can enable all IDAs to use the same new
-        # (asymmetric) key.
-        # TODO: ARCH-162
-        use_asymmetric_key = ENFORCE_JWT_SCOPES.is_enabled() and is_client_restricted
-        return JwtBuilder(
+    def _build_jwt(self, user, scopes, expires_in, client_id, adapter):
+        """ Creates and returns a JWT. """
+        return create_app_access_jwt(
             user,
-            asymmetric=use_asymmetric_key,
+            scopes=scopes,
+            expires_in=expires_in,
+            is_restricted=adapter.is_client_restricted(client_id),
+            filters=adapter.get_authorization_filters(client_id),
         )
 
 
