@@ -1,5 +1,7 @@
 from logging import getLogger
 
+from celery.task import task
+from common.djangoapps.mailchimp_pipeline.helpers import get_org_data_for_mandrill
 from crum import get_current_request
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save, pre_save, post_delete, pre_delete
@@ -32,12 +34,14 @@ def log_action_response(user, status_code, response_body):
 
 @receiver(post_save, sender=CourseEnrollment)
 def sync_enrolments_to_mailchimp(sender, instance, created, **kwargs):
-    send_user_enrollments_to_mailchimp.delay(sender, instance, created, kwargs)
+    data = {"user_id": instance.user.id}
+    send_user_enrollments_to_mailchimp.delay(data)
 
 
 @receiver(COURSE_CERT_AWARDED, sender=GeneratedCertificate)
 def handle_course_cert_awarded(sender, user, course_key, **kwargs):  # pylint: disable=unused-argument
-    send_user_course_completions_to_mailchimp.delay(sender, user, course_key, kwargs)
+    data = {"user_id": user.id}
+    send_user_course_completions_to_mailchimp.delay(data)
 
 
 @receiver(post_save, sender=UserProfile)
@@ -48,14 +52,10 @@ def sync_user_info_with_nodebb(sender, instance, created, **kwargs):  # pylint: 
     """
     Sync information b/w NodeBB User Profile and Edx User Profile
     """
-
     request = get_current_request()
     user = request.user
-
-    data = {
-
-    }
-    send_user_profile_info_to_mailchimp.delay(sender, instance, kwargs)
+    data = {'sender': sender, 'instance_id': instance.id, 'email': instance.user.email}
+    send_user_profile_info_to_mailchimp_task.delay(data)
 
     if 'login' in request.path or 'logout' in request.path or sender == EmailPreference:
         return
@@ -87,6 +87,31 @@ def sync_user_info_with_nodebb(sender, instance, created, **kwargs):  # pylint: 
     status_code, response_body = NodeBBClient().users.update_profile(user.username, kwargs=data_to_sync)
     log_action_response(user, status_code, response_body)
 
+
+@task()
+def send_user_profile_info_to_mailchimp_task(data):
+
+    if data['sender'] == 'UserProfile':
+        instance = UserProfile.objects.get(id=data['instance_id'])
+        sender = UserProfile
+
+    elif data['sender'] == 'UserProfile':
+        instance = UserProfile.objects.get(id=data['instance_id'])
+        sender = UserProfile
+
+    elif data['sender'] == 'UserExtendedProfile':
+        instance = UserExtendedProfile.objects.get(id=data['instance_id'])
+        sender = UserExtendedProfile
+
+    elif data['sender'] == 'EmailPreference':
+        instance = EmailPreference.objects.get(id=data['instance_id'])
+        sender = EmailPreference
+
+    elif data['sender'] == 'Organization':
+        instance = Organization.objects.get(id=data['instance_id'])
+        sender = Organization
+
+    send_user_profile_info_to_mailchimp(instance, sender, {})
 
 
 @receiver(post_save, sender=User, dispatch_uid='update_user_profile_on_nodebb')

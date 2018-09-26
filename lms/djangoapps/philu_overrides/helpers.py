@@ -17,7 +17,6 @@ def get_course_details(course_id):
     return course
 
 
-@task()
 def send_account_activation_email(request, registration, user):
     activation_link = '{protocol}://{site}/activate/{key}'.format(
             protocol='https' if request.is_secure() else 'http',
@@ -30,6 +29,17 @@ def send_account_activation_email(request, registration, user):
         'activation_link': activation_link,
     }
     MandrillClient().send_mail(MandrillClient.USER_ACCOUNT_ACTIVATION_TEMPLATE, user.email, context)
+
+
+@task()
+def task_send_account_activation_email(data):
+
+    context = {
+        'first_name': data['first_name'],
+        'activation_link': data['activation_link'],
+    }
+
+    MandrillClient().send_mail(MandrillClient.USER_ACCOUNT_ACTIVATION_TEMPLATE, data['user_email'], context)
 
 
 def reactivation_email_for_user_custom(request, user):

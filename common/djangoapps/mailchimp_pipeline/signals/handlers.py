@@ -14,7 +14,6 @@ from logging import getLogger
 log = getLogger(__name__)
 
 
-@task()
 def send_user_profile_info_to_mailchimp(sender, instance, kwargs):  # pylint: disable=unused-argument, invalid-name
     """ Create user account at nodeBB when user created at edx Platform """
     user_json = None
@@ -119,15 +118,16 @@ def task_send_user_info_to_mailchimp(data):
 
 
 @task()
-def send_user_enrollments_to_mailchimp(sender, instance, created, kwargs):
+def send_user_enrollments_to_mailchimp(data):
+    user = User.objects.get(id=data['user_id'])
     user_json = {
         "merge_fields": {
-            "ENROLLS": get_user_active_enrollements(instance.user.username),
-            "ENROLL_IDS": get_enrollements_course_short_ids(instance.user.username)
+            "ENROLLS": get_user_active_enrollements(user.username),
+            "ENROLL_IDS": get_enrollements_course_short_ids(user.username)
         }
     }
     try:
-        response = ChimpClient().add_update_member_to_list(settings.MAILCHIMP_LEARNERS_LIST_ID, instance.user.email,
+        response = ChimpClient().add_update_member_to_list(settings.MAILCHIMP_LEARNERS_LIST_ID, user.email,
                                                            user_json)
         log.info(response)
     except MailChimpException as ex:
@@ -135,7 +135,9 @@ def send_user_enrollments_to_mailchimp(sender, instance, created, kwargs):
 
 
 @task()
-def send_user_course_completions_to_mailchimp(sender, user, course_key, kwargs):
+def send_user_course_completions_to_mailchimp(data):
+
+    user = User.objects.get(id=data['user_id'])
     all_certs = []
     try:
         all_certs = certificate_api.get_certificates_for_user(user.username)
