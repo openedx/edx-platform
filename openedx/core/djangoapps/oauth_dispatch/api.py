@@ -1,6 +1,7 @@
 """ OAuth related Python apis. """
 from django.conf import settings
 
+from edx_oauth2_provider.constants import SCOPE_VALUE_DICT
 from oauthlib.oauth2.rfc6749.tokens import BearerToken
 from oauth2_provider.models import AccessToken as dot_access_token
 from oauth2_provider.models import RefreshToken as dot_refresh_token
@@ -19,7 +20,7 @@ def destroy_oauth_tokens(user):
     dot_refresh_token.objects.filter(user=user.id).delete()
 
 
-def create_dot_access_token(request, user, client, expires_in=None):
+def create_dot_access_token(request, user, client, expires_in=None, scope=None):
     """
     Create and return a new (persisted) access token, including a refresh token.
     """
@@ -34,18 +35,20 @@ def create_dot_access_token(request, user, client, expires_in=None):
         expires_in=expires_in,
         request_validator=dot_settings.OAUTH2_VALIDATOR_CLASS(),
     )
-    _populate_create_access_token_request(request, user, client)
+    _populate_create_access_token_request(request, user, client, scope)
     return token_generator.create_token(request, refresh_token=True)
 
 
-def _populate_create_access_token_request(request, user, client):
+def _populate_create_access_token_request(request, user, client, scope=None):
     """
     django-oauth-toolkit expects certain non-standard attributes to
     be present on the request object.  This function modifies the
     request object to match these expectations
     """
+    if scope is None:
+        scope = 0
     request.user = user
-    request.scopes = []
+    request.scopes = [SCOPE_VALUE_DICT[scope]]
     request.client = client
     request.state = None
     request.refresh_token = None

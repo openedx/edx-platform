@@ -238,6 +238,7 @@ def _create_and_set_jwt_cookies(response, request, user):
     # TODO (ARCH-246) Need to fix configuration of token expiration settings.
     cookie_settings = standard_cookie_settings(request)
     _set_jwt_expiration(cookie_settings)
+    expires_in = cookie_settings['max_age']
 
     try:
         login_oauth_client_id = settings.JWT_AUTH['LOGIN_CLIENT_ID']
@@ -248,8 +249,8 @@ def _create_and_set_jwt_cookies(response, request, user):
         log.exception(u'OAuth Application for Login is not configured.')
         raise
 
-    access_token = create_dot_access_token(request, user, oauth_application)
-    jwt = create_user_login_jwt(user, cookie_settings['max_age'])
+    access_token = create_dot_access_token(request, user, oauth_application, expires_in=expires_in)
+    jwt = create_user_login_jwt(user, expires_in)
     jwt_header_and_payload, jwt_signature = _parse_jwt(jwt)
     _set_jwt_cookies(
         response,

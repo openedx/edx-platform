@@ -1,6 +1,6 @@
 """
 TODO (ARCH-248)
-Deprecated JwtBuilder class. 
+Deprecated JwtBuilder class.
 Use openedx.core.djangoapps.oauth_dispatch.jwt.JwtBuilder directly.
 This is here for backward compatibility reasons only.
 """

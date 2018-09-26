@@ -166,10 +166,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
 
     @httpretty.activate
     def test_consent_needed_for_course(self):
-        user = mock.MagicMock(
-            username='janedoe',
-            is_authenticated=lambda: True,
-        )
+        user = UserFactory(username='janedoe')
         request = mock.MagicMock(session={}, user=user)
         self.mock_enterprise_learner_api()
         self.mock_consent_missing(user.username, 'fake-course', 'cf246b88-d5f6-4908-a522-fc307e0b0c59')
