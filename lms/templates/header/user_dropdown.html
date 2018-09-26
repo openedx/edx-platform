@@ -16,7 +16,7 @@ from openedx.features.enterprise_support.utils import get_enterprise_learner_gen
 self.real_user = getattr(user, 'real_user', user)
 profile_image_url = get_profile_image_urls_for_user(self.real_user)['medium']
 username = self.real_user.username
-resume_block = retrieve_last_sitewide_block_completed(username)
+resume_block = retrieve_last_sitewide_block_completed(self.real_user)
 displayname = get_enterprise_learner_generic_name(request) or username
 %>
 
