@@ -123,7 +123,7 @@ def update_user_profile_on_nodebb(sender, instance, created, **kwargs):
         'user_id': instance.id,
         'created': created
     }
-    task_send_user_info_to_mailchimp(data)
+    task_send_user_info_to_mailchimp.delay(data)
 
     request = get_current_request()
     if not request or 'login' in request.path:

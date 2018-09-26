@@ -97,24 +97,7 @@ def task_send_user_info_to_mailchimp(data):
     user = User.objects.get(id=data['user_id'])
     created = data["created"]
 
-    user_json = {
-        "merge_fields": {
-            "FULLNAME": user.get_full_name(),
-            "USERNAME": user.username
-        }
-    }
-
-    if created:
-        user_json["merge_fields"].update({"DATEREGIS": str(user.date_joined.strftime("%m/%d/%Y"))})
-        user_json.update({
-            "email_address": user.email,
-            "status_if_new": "subscribed"
-        })
-    try:
-        response = ChimpClient().add_update_member_to_list(settings.MAILCHIMP_LEARNERS_LIST_ID, user.email, user_json)
-        log.info(response)
-    except MailChimpException as ex:
-        log.exception(ex)
+    send_user_info_to_mailchimp(None, user, created, {})
 
 
 @task()
