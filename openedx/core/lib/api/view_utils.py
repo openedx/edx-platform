@@ -4,7 +4,7 @@ Utilities related to API views
 from django.core.exceptions import NON_FIELD_ERRORS, ObjectDoesNotExist, ValidationError
 from django.http import Http404
 from django.utils.translation import ugettext as _
-from edx_rest_framework_extensions.authentication import JwtAuthentication
+from edx_rest_framework_extensions.authentication import JwtAuthentication, SessionAuthenticationAllowInactiveUser
 from rest_framework import status
 from rest_framework.exceptions import APIException
 from rest_framework.generics import GenericAPIView
@@ -14,10 +14,7 @@ from rest_framework.request import clone_request
 from rest_framework.response import Response
 from six import text_type
 
-from openedx.core.lib.api.authentication import (
-    OAuth2AuthenticationAllowInactiveUser,
-    SessionAuthenticationAllowInactiveUser
-)
+from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.permissions import IsUserInUrl
 
 
