@@ -16,6 +16,7 @@ from paver.easy import BuildFailure  # pylint: disable=ungrouped-imports
 
 import pavelib.quality
 from pavelib.paver_tests.utils import fail_on_eslint
+from pavelib.paver_tests.utils import PaverTestCase
 
 
 @ddt
@@ -268,26 +269,13 @@ class TestPrepareReportDir(unittest.TestCase):
         self.assertEqual(os.listdir(path(self.test_dir)), [])
 
 
-class TestPaverRunQuality(unittest.TestCase):
+class TestPaverRunQuality(PaverTestCase):
     """
     For testing the paver run_quality task
     """
 
     def setUp(self):
         super(TestPaverRunQuality, self).setUp()
-
-        # test_no_diff_quality_failures seems to alter the way that paver
-        # executes these lines is subsequent tests.
-        # https://github.com/paver/paver/blob/master/paver/tasks.py#L175-L180
-        #
-        # The other tests don't appear to have the same impact. This was
-        # causing a test order dependency. This line resets that state
-        # of environment._task_in_progress so that the paver commands in the
-        # tests will be considered top level tasks by paver, and we can predict
-        # which path it will chose in the above code block.
-        #
-        # TODO: Figure out why one test is altering the state to begin with.
-        paver.tasks.environment = paver.tasks.Environment()
 
         # mock the @needs decorator to skip it
         patcher = patch('pavelib.quality.sh')
@@ -326,7 +314,6 @@ class TestPaverRunQuality(unittest.TestCase):
         """
         If diff-quality fails on eslint, the paver task should also fail
         """
-
         # Underlying sh call must fail when it is running the eslint diff-quality task
         self._mock_paver_sh.side_effect = fail_on_eslint
         _mock_pylint_violations = MagicMock(return_value=(0, []))
