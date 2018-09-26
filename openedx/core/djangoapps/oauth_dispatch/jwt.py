@@ -33,7 +33,7 @@ def create_api_client_jwt(user, secret=None, aud=None, additional_claims=None):
     )
 
 
-def create_app_access_jwt(user, scopes, expires_in, is_restricted, filters):
+def create_app_access_jwt(user, scopes, expires_in=None, is_restricted=False, filters=None):
     """
     To create JWTs for OAuth applications needing access to various edX services.
 
@@ -41,7 +41,8 @@ def create_app_access_jwt(user, scopes, expires_in, is_restricted, filters):
         user (User): User for which to generate the JWT.
         scopes (list): Scopes that limit access to the token bearer and
             controls which optional claims are included in the token.
-        expires_in (int): Time to token expiry, specified in seconds.
+        expires_in (int): Optional. Time to token expiry, specified in seconds.
+            Defaults to JWT_EXPIRATION.
         is_restricted (Boolean): Whether the client to whom the JWT is issued is restricted.
         filters (list): Optional. Filters to include in the JWT.
     """
@@ -61,7 +62,7 @@ def create_app_access_jwt(user, scopes, expires_in, is_restricted, filters):
         expires_in=expires_in,
         is_restricted=is_restricted,
         filters=filters,
-        asymmetric=use_asymmetric_key,
+        use_asymmetric_key=use_asymmetric_key,
     )
 
 
@@ -76,7 +77,7 @@ def create_user_login_jwt(user, expires_in):
     return _create_token(
         user,
         expires_in=expires_in,
-        asymmetric=True,
+        use_asymmetric_key=True,
     )
 
 
@@ -88,7 +89,7 @@ def _create_token(
     filters=None,
     aud=None,
     additional_claims=None,
-    asymmetric=False,
+    use_asymmetric_key=False,
     secret=None,
 ):
     """
@@ -106,7 +107,7 @@ def _create_token(
     Deprecated Arguments (to be removed):
         aud (string): Optional. Overrides configured JWT audience claim.
         additional_claims (dict): Optional. Additional claims to include in the token.
-        asymmetric (Boolean): Whether the JWT should be signed with this app's private key.
+        use_asymmetric_key (Boolean): Whether the JWT should be signed with this app's private key.
         secret (string): Overrides configured JWT secret (signing) key.
     """
     scopes = scopes or ['email', 'profile']
@@ -138,7 +139,7 @@ def _create_token(
         if handler:
             handler(payload, user)
 
-    return _encode(payload, asymmetric, secret)
+    return _encode(payload, use_asymmetric_key, secret)
 
 
 def _claim_handlers():
@@ -171,12 +172,12 @@ def _attach_profile_claim(payload, user):
     })
 
 
-def _encode(payload, asymmetric, secret):
+def _encode(payload, use_asymmetric_key, secret):
     """Encode the provided payload."""
-    set_custom_metric('jwt_asymmetric', asymmetric)
+    set_custom_metric('jwt_is_asymmetric', use_asymmetric_key)
     keys = jwk.KEYS()
 
-    if asymmetric:
+    if use_asymmetric_key:
         serialized_keypair = json.loads(settings.JWT_AUTH['JWT_PRIVATE_SIGNING_JWK'])
         keys.add(serialized_keypair)
         algorithm = settings.JWT_AUTH['JWT_SIGNING_ALGORITHM']

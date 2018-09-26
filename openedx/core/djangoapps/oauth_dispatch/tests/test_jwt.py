@@ -42,7 +42,7 @@ class TestJwtBuilder(mixins.AccessTokenMixin, TestCase):
 
     def test_override_secret_and_audience(self):
         """
-        Verify that the signing key, audience, and issuer can be overridden.
+        Verify that the signing key and audience can be overridden.
         """
         secret = 'avoid-this'
         audience = 'avoid-this-too'

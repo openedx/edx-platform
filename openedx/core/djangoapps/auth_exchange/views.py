@@ -110,6 +110,8 @@ class DOTAccessTokenExchangeView(AccessTokenExchangeBase, DOTAccessTokenView):
     def create_access_token(self, request, user, scope, client):  # pylint: disable=unused-argument
         """
         Create and return a new access token.
+        Note: 'scope' is part of the base method signature but isn't used by
+               this code path nor the callers of this API (i.e., mobile apps).
         """
         return create_dot_access_token(request, user, client)
 

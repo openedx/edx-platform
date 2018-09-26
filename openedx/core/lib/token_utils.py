@@ -1,12 +1,15 @@
 """
-Deprecated JwtBuilder class for backward compatibility until edx-enterprise is updated.
+TODO (ARCH-248)
+Deprecated JwtBuilder class. 
+Use openedx.core.djangoapps.oauth_dispatch.jwt.JwtBuilder directly.
+This is here for backward compatibility reasons only.
 """
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_api_client_jwt
 
 
 class JwtBuilder(object):
     """
-    Deprecated. Use openedx.core.djangoapps.oauth_dispatch.jwt.JwtBuilder directly.
+    Deprecated. See module docstring above.
     """
     def __init__(self, user, secret=None):
         self.user = user
@@ -20,8 +23,7 @@ class JwtBuilder(object):
         additional_claims=None,
     ):
         """
-        Deprecated. Use openedx.core.djangoapps.oauth_dispatch.jwt.JwtBuilder directly.
-        For backward compatibility reasons only.
+        Deprecated. See module docstring above.
         """
         return create_api_client_jwt(
             self.user,

@@ -139,7 +139,7 @@ def set_logged_in_cookies(request, response, user):
 
         _set_deprecated_logged_in_cookie(response, request)
         _set_deprecated_user_info_cookie(response, request, user)
-        _set_jwt_cookies(response, request, user)
+        _create_and_set_jwt_cookies(response, request, user)
         CREATE_LOGON_COOKIE.send(sender=None, user=user, response=response)
 
     return response
@@ -230,7 +230,7 @@ def _get_user_info_cookie_data(request, user):
     return user_info
 
 
-def _set_jwt_cookies(response, request, user):
+def _create_and_set_jwt_cookies(response, request, user):
     """ Sets a cookie containing a JWT on the response. """
     if not JWT_COOKIES_FLAG.is_enabled():
         return
@@ -250,32 +250,47 @@ def _set_jwt_cookies(response, request, user):
 
     access_token = create_dot_access_token(request, user, oauth_application)
     jwt = create_user_login_jwt(user, cookie_settings['max_age'])
-    _divide_and_set_jwt_cookies(response, jwt, cookie_settings, access_token)
+    jwt_header_and_payload, jwt_signature = _parse_jwt(jwt)
+    _set_jwt_cookies(
+        response,
+        cookie_settings,
+        jwt_header_and_payload,
+        jwt_signature,
+        access_token['refresh_token'],
+    )
 
 
-def _divide_and_set_jwt_cookies(response, jwt, cookie_settings, access_token):
+def _parse_jwt(jwt):
     """
-    Separates the given jwt and the refresh token (from the access token)
-    into parts and sets them in different cookies.
+    Parses and returns the following parts of the jwt: header_and_payload, signature
     """
     jwt_parts = jwt.split(JWT_DELIMITER)
+    header_and_payload = JWT_DELIMITER.join(jwt_parts[0:2])
+    signature = jwt_parts[2]
+    return header_and_payload, signature
 
+
+def _set_jwt_cookies(response, cookie_settings, jwt_header_and_payload, jwt_signature, refresh_token):
+    """
+    Sets the given jwt_header_and_payload, jwt_signature, and refresh token in 3 different cookies.
+    The latter 2 cookies are set as httponly.
+    """
     cookie_settings['httponly'] = None
     response.set_cookie(
         jwt_cookies.jwt_cookie_header_payload_name(),
-        JWT_DELIMITER.join(jwt_parts[0:2]),
+        jwt_header_and_payload,
         **cookie_settings
     )
 
     cookie_settings['httponly'] = True
     response.set_cookie(
         jwt_cookies.jwt_cookie_signature_name(),
-        jwt_parts[2],
+        jwt_signature,
         **cookie_settings
     )
     response.set_cookie(
         jwt_cookies.jwt_refresh_cookie_name(),
-        access_token['refresh_token'],
+        refresh_token,
         **cookie_settings
     )
 
