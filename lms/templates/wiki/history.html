@@ -250,15 +250,15 @@
           {% trans "Back to history view" %}
         </a>
         {% if article|can_write:user %}
-        <button type="button" class="btn btn-large btn-primary merge-revision-commit">
+        <a href="#" type="button" class="btn btn-large btn-primary merge-revision-commit">
           <span class="icon fa fa-file" aria-hidden="true"></span>
           {% trans "Create new merged version" %}
-        </button>
+        </a>
         {% else %}
-          <button type="button" class="btn btn-large btn-primary disabled">
+          <a href="#" type="button" class="btn btn-large btn-primary disabled">
             <span class="icon fa fa-lock" aria-hidden="true"></span>
             {% trans "Create new merged version" %}
-          </button>
+          </a>
         {% endif %}
       </div>
     </div>
