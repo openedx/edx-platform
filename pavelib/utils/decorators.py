@@ -14,6 +14,7 @@ def timeout(limit=60):
     def _handle_function_process(*args, **kwargs):
         """ helper function for running a function and getting its output """
         queue = kwargs['queue']
+        queue.cancel_join_thread()
         function = kwargs['function_to_call']
         function_args = args
         function_kwargs = kwargs['function_kwargs']
@@ -40,8 +41,8 @@ def timeout(limit=60):
             )
             function_proc.start()
             function_proc.join(float(limit))
+            queue.join_thread()
             if function_proc.is_alive():
-                queue.cancel_join_thread()
                 pid = psutil.Process(function_proc.pid)
                 for child in pid.get_children(recursive=True):
                     child.terminate()
