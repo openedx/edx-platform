@@ -1,6 +1,7 @@
 """ a collection of utililty decorators for paver tasks """
 
 import multiprocessing
+from Queue import Empty
 from functools import wraps
 
 import psutil
@@ -14,7 +15,6 @@ def timeout(limit=60):
     def _handle_function_process(*args, **kwargs):
         """ helper function for running a function and getting its output """
         queue = kwargs['queue']
-        queue.cancel_join_thread()
         function = kwargs['function_to_call']
         function_args = args
         function_kwargs = kwargs['function_kwargs']
@@ -41,14 +41,26 @@ def timeout(limit=60):
             )
             function_proc.start()
             function_proc.join(float(limit))
+            # If the process is still alive after attempting to join after
+            # the time limit, it is considered it to have 'timed out'
+            timed_out = function_proc.is_alive()
+            try:
+                function_output = queue.get()
+            except Empty:
+                # 'get' raises an Empty exception if the queue has no value,
+                # however, since this decorator can be applied to functions
+                # with no return value, this exception is not useful and
+                # should be escaped
+                function_output = None
+
+            # Clean up any remnants of lingering processes, without calling
+            # Process.terminate(), as this seems to cause problems with
+            # pytest x-dist
+            queue.close()
+            function_proc.join()
             queue.join_thread()
-            if function_proc.is_alive():
-                pid = psutil.Process(function_proc.pid)
-                for child in pid.get_children(recursive=True):
-                    child.terminate()
-                function_proc.terminate()
+            if timed_out:
                 raise TimeoutException
-            function_output = queue.get()
             return function_output
 
         return wraps(function)(function_wrapper)
