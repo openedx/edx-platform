@@ -1,3 +1,4 @@
+from common.lib.mandrill_client.client import MandrillClient
 from django.contrib.auth.models import User
 from mailchimp_pipeline.client import ChimpClient, MailChimpException
 from mailchimp_pipeline.helpers import get_org_data_for_mandrill, get_user_active_enrollements, \
@@ -88,6 +89,17 @@ def send_user_info_to_mailchimp(sender, user, created, kwargs):
         log.info(response)
     except MailChimpException as ex:
         log.exception(ex)
+
+
+@task()
+def task_send_account_activation_email(data):
+
+    context = {
+        'first_name': data['first_name'],
+        'activation_link': data['activation_link'],
+    }
+
+    MandrillClient().send_mail(MandrillClient.USER_ACCOUNT_ACTIVATION_TEMPLATE, data['user_email'], context)
 
 
 @task()

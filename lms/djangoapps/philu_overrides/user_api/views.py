@@ -22,7 +22,7 @@ from notification_prefs.views import enable_notifications
 from pytz import UTC
 from requests import HTTPError
 from social.exceptions import AuthException, AuthAlreadyAssociated
-from philu_overrides.helpers import task_send_account_activation_email
+from mailchimp_pipeline.signals.handlers import task_send_account_activation_email
 from student.cookies import set_logged_in_cookies
 from openedx.core.djangoapps.user_api.helpers import shim_student_view, require_post_params
 from student.forms import AccountCreationForm, get_registration_extension_form

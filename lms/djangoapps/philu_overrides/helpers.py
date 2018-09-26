@@ -31,17 +31,6 @@ def send_account_activation_email(request, registration, user):
     MandrillClient().send_mail(MandrillClient.USER_ACCOUNT_ACTIVATION_TEMPLATE, user.email, context)
 
 
-@task()
-def task_send_account_activation_email(data):
-
-    context = {
-        'first_name': data['first_name'],
-        'activation_link': data['activation_link'],
-    }
-
-    MandrillClient().send_mail(MandrillClient.USER_ACCOUNT_ACTIVATION_TEMPLATE, data['user_email'], context)
-
-
 def reactivation_email_for_user_custom(request, user):
     try:
         reg = Registration.objects.get(user=user)
