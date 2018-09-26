@@ -66,6 +66,7 @@ class Command(BaseCommand):
                 # if user has submitted all onboarding surveys then update status on NodeBB
                 if not bool(extended_profile.unattended_surveys(_type='list')):
                     task_update_onboarding_surveys_status.delay(username=user.username)
+                continue
 
             # filter nodebb_data to ensure compatibility with edx_data
             for key in nodebb_data:
