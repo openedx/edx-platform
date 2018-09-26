@@ -322,27 +322,6 @@ class TestPaverRunQuality(unittest.TestCase):
         self.assertEqual(self._mock_paver_sh.call_count, 2)
 
     @patch('__builtin__.open', mock_open())
-    def test_failure_on_diffquality_eslint(self):
-        """
-        If diff-quality fails on eslint, the paver task should also fail
-        """
-
-        # Underlying sh call must fail when it is running the eslint diff-quality task
-        self._mock_paver_sh.side_effect = fail_on_eslint
-        _mock_pylint_violations = MagicMock(return_value=(0, []))
-        with patch('pavelib.quality._get_pylint_violations', _mock_pylint_violations):
-            with self.assertRaises(SystemExit):
-                pavelib.quality.run_quality("")
-                self.assertRaises(BuildFailure)
-        print self._mock_paver_sh.mock_calls
-
-        # Test that pylint is called
-        _mock_pylint_violations.assert_called_once_with(clean=False)
-        # Assert that sh was called twice- once for diff quality with pylint
-        # and once for diff quality with eslint
-        self.assertEqual(self._mock_paver_sh.call_count, 2)
-
-    @patch('__builtin__.open', mock_open())
     def test_other_exception(self):
         """
         If diff-quality fails for an unknown reason on the first run, then
