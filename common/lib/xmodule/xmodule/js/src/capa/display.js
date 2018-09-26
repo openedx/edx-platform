@@ -790,8 +790,8 @@
                 edx.HtmlUtils.HTML(msg)
             );
             this.clear_all_notifications();
-            this.gentleAlertNotification.toggleClass('warning success');
-            this.gentleAlertNotification.find('.fa-exclamation-circle').toggleClass('fa-exclamation-circle fa-check-circle');
+            this.gentleAlertNotification.removeClass('warning').addClass('success');
+            this.gentleAlertNotification.find('.fa-exclamation-circle').removeClass('fa-exclamation-circle').addClass('fa-check-circle');
             this.gentleAlertNotification.show();
             this.gentleAlertNotification.focus();
         };
