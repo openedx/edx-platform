@@ -41,6 +41,7 @@ def timeout(limit=60):
             function_proc.start()
             function_proc.join(float(limit))
             if function_proc.is_alive():
+                queue.cancel_join_thread()
                 pid = psutil.Process(function_proc.pid)
                 for child in pid.get_children(recursive=True):
                     child.terminate()
