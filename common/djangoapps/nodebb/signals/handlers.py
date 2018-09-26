@@ -54,7 +54,7 @@ def sync_user_info_with_nodebb(sender, instance, created, **kwargs):  # pylint: 
     """
     request = get_current_request()
     user = request.user
-    data = {'sender': sender, 'instance_id': instance.id, 'email': instance.user.email}
+    data = {'sender': instance.__class__.__name__, 'instance_id': instance.id, 'email': instance.user.email}
     send_user_profile_info_to_mailchimp_task.delay(data)
 
     if 'login' in request.path or 'logout' in request.path or sender == EmailPreference:
@@ -95,10 +95,6 @@ def send_user_profile_info_to_mailchimp_task(data):
         instance = UserProfile.objects.get(id=data['instance_id'])
         sender = UserProfile
 
-    elif data['sender'] == 'UserProfile':
-        instance = UserProfile.objects.get(id=data['instance_id'])
-        sender = UserProfile
-
     elif data['sender'] == 'UserExtendedProfile':
         instance = UserExtendedProfile.objects.get(id=data['instance_id'])
         sender = UserExtendedProfile
@@ -111,7 +107,7 @@ def send_user_profile_info_to_mailchimp_task(data):
         instance = Organization.objects.get(id=data['instance_id'])
         sender = Organization
 
-    send_user_profile_info_to_mailchimp(instance, sender, {})
+    send_user_profile_info_to_mailchimp(sender, instance, {})
 
 
 @receiver(post_save, sender=User, dispatch_uid='update_user_profile_on_nodebb')
