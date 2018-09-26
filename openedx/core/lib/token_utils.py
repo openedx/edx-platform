@@ -7,9 +7,6 @@ This is here for backward compatibility reasons only.
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_api_client_jwt
 
 
-log = logging.getLogger(__name__)
-
-
 class JwtBuilder(object):
     """
     Deprecated. See module docstring above.
