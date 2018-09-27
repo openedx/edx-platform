@@ -3,7 +3,6 @@
 <%def name="online_help_token()"><% return "develop_course" %></%def>
 <%!
 import logging
-from cms.djangoapps.contentstore.config.waffle_utils import should_show_checklists_page, should_show_checklists_quality
 from util.date_utils import get_default_time_display
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.js_utils import js_escaped_string, dump_js_escaped_json
@@ -157,7 +156,6 @@ from django.core.urlresolvers import reverse
     <section class="content">
         <article class="content-primary" role="main">
             <div class="course-status">
-                % if should_show_checklists_page():
                 ## set width dynamically depending upon whether course has a start date to ensure spacing looks good
                 % if course_release_date == 'Set Date':
                     <div style="width: 40%" class="status-studio-frontend">
@@ -184,7 +182,6 @@ from django.core.urlresolvers import reverse
                             "help_tokens": {
                                 "files": "${get_online_help_info(online_help_token())['doc_url'] | n, js_escaped_string}"
                             },
-                            "enable_quality": ${should_show_checklists_quality(context_course.id) | n, dump_js_escaped_json},
                             "links": {
                                 "settings": ${reverse('settings_handler', kwargs={'course_key_string': unicode(course_key)})| n, dump_js_escaped_json}
                             }
@@ -192,7 +189,6 @@ from django.core.urlresolvers import reverse
                     </%static:studiofrontend> 
                 </div>
                 <div class="status-highlights-enabled"></div>
-                % endif
             </div>
             <div class="wrapper-dnd"
               % if getattr(context_course, 'language'):
