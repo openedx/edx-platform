@@ -12,7 +12,7 @@ from lms.djangoapps.onboarding.helpers import COUNTRIES
 from certificates.models import GeneratedCertificate
 from lms.djangoapps.onboarding.models import (UserExtendedProfile, Organization, FocusArea, EmailPreference, )
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
-from mailchimp_pipeline.signals.handlers import task_send_user_info_to_mailchimp, send_user_profile_info_to_mailchimp_task, \
+from mailchimp_pipeline.signals.handlers import send_user_info_to_mailchimp, send_user_profile_info_to_mailchimp, \
     send_user_enrollments_to_mailchimp, send_user_course_completions_to_mailchimp
 from nodebb.models import DiscussionCommunity, TeamGroupChat
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -56,8 +56,7 @@ def sync_user_info_with_nodebb(sender, instance, created, **kwargs):  # pylint: 
     user = request.user
     sender_class = instance.__class__.__name__
     instance_id = instance.id
-    user_email = "" if sender == Organization else instance.user.email
-    data = {'sender': sender_class, 'instance_id': instance_id, 'email': user_email}
+    data = {'sender': sender_class, 'instance_id': instance_id}
     send_user_profile_info_to_mailchimp_task.delay(data)
 
     if 'login' in request.path or 'logout' in request.path or sender == EmailPreference:
@@ -91,16 +90,34 @@ def sync_user_info_with_nodebb(sender, instance, created, **kwargs):  # pylint: 
     log_action_response(user, status_code, response_body)
 
 
+@task()
+def send_user_profile_info_to_mailchimp_task(data):
+
+    if data['sender'] == 'UserProfile':
+        instance = UserProfile.objects.get(id=data['instance_id'])
+        sender = UserProfile
+
+    elif data['sender'] == 'UserExtendedProfile':
+        instance = UserExtendedProfile.objects.get(id=data['instance_id'])
+        sender = UserExtendedProfile
+
+    elif data['sender'] == 'EmailPreference':
+        instance = EmailPreference.objects.get(id=data['instance_id'])
+        sender = EmailPreference
+
+    elif data['sender'] == 'Organization':
+        instance = Organization.objects.get(id=data['instance_id'])
+        sender = Organization
+
+    send_user_profile_info_to_mailchimp(sender, instance, {})
+
+
 @receiver(post_save, sender=User, dispatch_uid='update_user_profile_on_nodebb')
 def update_user_profile_on_nodebb(sender, instance, created, **kwargs):
     """
         Create user account at nodeBB when user created at edx Platform
     """
-    data = {
-        'user_id': instance.id,
-        'created': created
-    }
-    task_send_user_info_to_mailchimp.delay(data)
+    send_user_info_to_mailchimp(sender, instance, created, kwargs)
 
     request = get_current_request()
     if not request or 'login' in request.path:
@@ -128,8 +145,6 @@ def update_user_profile_on_nodebb(sender, instance, created, **kwargs):
         }
         status_code, response_body = NodeBBClient().users.update_profile(instance.username, kwargs=data_to_sync)
         log_action_response(instance, status_code, response_body)
-
-
 
 
 @receiver(post_delete, sender=User)
