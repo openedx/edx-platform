@@ -8,5 +8,5 @@ router.register(r'key-value', views.ExperimentKeyValueViewSet, base_name='key_va
 
 app_name = 'experiments'
 urlpatterns = [
-    url(r'^v0/', include(router.urls, namespace='v0')),
+    url(r'^v0/', include((router.urls, 'experiments'), namespace='v0')),
 ]

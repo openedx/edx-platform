@@ -11,5 +11,5 @@ router.register(r'course_goals', CourseGoalViewSet, base_name='course_goal')
 
 app_name = 'course_goals'
 urlpatterns = [
-    url(r'^v0/', include(router.urls, namespace='v0')),
+    url(r'^v0/', include((router.urls, 'course_goals'), namespace='v0')),
 ]

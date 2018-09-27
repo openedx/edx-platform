@@ -195,7 +195,7 @@ if settings.WIKI_ENABLED:
         url(r'^courses/{}/course_wiki/?$'.format(settings.COURSE_ID_PATTERN),
             course_wiki_views.course_wiki_redirect, name='course_wiki'),
         url(r'^courses/{}/wiki/'.format(settings.COURSE_KEY_REGEX),
-            include(wiki_pattern(app_name='course_wiki_do_not_reverse', namespace='course_wiki_do_not_reverse'))),
+            include(wiki_pattern(app_name='course_wiki_do_not_reverse'))),
     ]
 
 COURSE_URLS = [
