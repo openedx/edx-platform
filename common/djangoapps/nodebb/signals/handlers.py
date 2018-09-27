@@ -12,7 +12,7 @@ from lms.djangoapps.onboarding.helpers import COUNTRIES
 from certificates.models import GeneratedCertificate
 from lms.djangoapps.onboarding.models import (UserExtendedProfile, Organization, FocusArea, EmailPreference, )
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
-from mailchimp_pipeline.signals.handlers import task_send_user_info_to_mailchimp, send_user_profile_info_to_mailchimp, \
+from mailchimp_pipeline.signals.handlers import task_send_user_info_to_mailchimp, send_user_profile_info_to_mailchimp_task, \
     send_user_enrollments_to_mailchimp, send_user_course_completions_to_mailchimp
 from nodebb.models import DiscussionCommunity, TeamGroupChat
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -89,28 +89,6 @@ def sync_user_info_with_nodebb(sender, instance, created, **kwargs):  # pylint: 
 
     status_code, response_body = NodeBBClient().users.update_profile(user.username, kwargs=data_to_sync)
     log_action_response(user, status_code, response_body)
-
-
-@task()
-def send_user_profile_info_to_mailchimp_task(data):
-
-    if data['sender'] == 'UserProfile':
-        instance = UserProfile.objects.get(id=data['instance_id'])
-        sender = UserProfile
-
-    elif data['sender'] == 'UserExtendedProfile':
-        instance = UserExtendedProfile.objects.get(id=data['instance_id'])
-        sender = UserExtendedProfile
-
-    elif data['sender'] == 'EmailPreference':
-        instance = EmailPreference.objects.get(id=data['instance_id'])
-        sender = EmailPreference
-
-    elif data['sender'] == 'Organization':
-        instance = Organization.objects.get(id=data['instance_id'])
-        sender = Organization
-
-    send_user_profile_info_to_mailchimp(sender, instance, {})
 
 
 @receiver(post_save, sender=User, dispatch_uid='update_user_profile_on_nodebb')

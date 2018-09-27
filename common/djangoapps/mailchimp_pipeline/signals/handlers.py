@@ -68,6 +68,28 @@ def send_user_profile_info_to_mailchimp(sender, instance, kwargs):  # pylint: di
             log.exception(ex)
 
 
+@task()
+def send_user_profile_info_to_mailchimp_task(data):
+
+    if data['sender'] == 'UserProfile':
+        instance = UserProfile.objects.get(id=data['instance_id'])
+        sender = UserProfile
+
+    elif data['sender'] == 'UserExtendedProfile':
+        instance = UserExtendedProfile.objects.get(id=data['instance_id'])
+        sender = UserExtendedProfile
+
+    elif data['sender'] == 'EmailPreference':
+        instance = EmailPreference.objects.get(id=data['instance_id'])
+        sender = EmailPreference
+
+    elif data['sender'] == 'Organization':
+        instance = Organization.objects.get(id=data['instance_id'])
+        sender = Organization
+
+    send_user_profile_info_to_mailchimp(sender, instance, {})
+
+
 def send_user_info_to_mailchimp(sender, user, created, kwargs):
     """ Create user account at nodeBB when user created at edx Platform """
 
