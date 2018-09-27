@@ -13,6 +13,12 @@ def runPythonTests() {
     }
 }
 
+def getTotalTests() {
+    def totalResult = build.testResultAction
+    def total = testResult.totalCount
+    return "TOTAL TEST COUNT ${total}"
+}
+
 def pythonTestCleanup() {
     archiveArtifacts allowEmptyArchive: true, artifacts: 'reports/**/*,test_root/log/**/*.log,**/nosetests.xml,stdout/*.log,*.log'
     junit '**/nosetests.xml'
@@ -51,6 +57,7 @@ pipeline {
                         always {
                             script {
                                 pythonTestCleanup()
+                                echo getTotalTests()
                             }
                         }
                     }
@@ -71,6 +78,7 @@ pipeline {
                         always {
                             script {
                                 pythonTestCleanup()
+                                echo getTotalTests()
                             }
                         }
                     }
@@ -91,6 +99,7 @@ pipeline {
                         always {
                             script {
                                 pythonTestCleanup()
+                                echo getTotalTests()
                             }
                         }
                     }
