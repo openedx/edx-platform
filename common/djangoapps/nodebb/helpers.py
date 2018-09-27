@@ -89,11 +89,4 @@ def update_nodebb_for_user_status(username):
     """
     Call nodebb client to update NodeBB for survey status update
     """
-    try:
-        status_code, response_body = NodeBBClient().users.update_onboarding_surveys_status(username)
-        if status_code != 200:
-            log.error('Surveys completion status sending failed')
-        else:
-            log.info('Surveys completion status sent for %s' % username)
-    except ConnectionError:
-        task_update_onboarding_surveys_status.apply_async(username=username)
+    task_update_onboarding_surveys_status.delay(username=username)

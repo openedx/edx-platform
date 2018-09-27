@@ -16,13 +16,13 @@ class NodeBBUserCreationTestCase(TestCase):
             with mock.patch('common.lib.nodebb_client.users.ForumUser.create', side_effect=ConnectionError):
                 NodeBBClient().users.create(
                     username=username,
-                    kwargs={}
+                    user_data={}
                 )
         except ConnectionError:
-            with mock.patch('common.djangoapps.nodebb.tests.task_create_user_on_nodebb.apply_async') as method:
-                task_create_user_on_nodebb.apply_async(username=username, kwargs={})
+            with mock.patch('common.djangoapps.nodebb.tests.task_create_user_on_nodebb.delay') as method:
+                task_create_user_on_nodebb.delay(username=username, user_data={})
 
-                method.assert_called_with(username=username, kwargs={})
+                method.assert_called_with(username=username, user_data={})
 
     def test_user_profile_update(self):
         username = 'testuser'
@@ -35,11 +35,11 @@ class NodeBBUserCreationTestCase(TestCase):
             with mock.patch('common.lib.nodebb_client.users.ForumUser.update_profile', side_effect=ConnectionError):
                 NodeBBClient().users.update_profile(
                     username=username,
-                    kwargs=data_to_sync
+                    profile_data=data_to_sync
                 )
         except ConnectionError:
-            with mock.patch('common.djangoapps.nodebb.tasks.task_update_user_profile_on_nodebb.apply_async') as method:
-                task_update_user_profile_on_nodebb.apply_async(username=username, kwargs=data_to_sync)
+            with mock.patch('common.djangoapps.nodebb.tasks.task_update_user_profile_on_nodebb.delay') as method:
+                task_update_user_profile_on_nodebb.delay(username=username, profile_data=data_to_sync)
 
                 method.assert_called_with(username=username, kwargs=data_to_sync)
 
@@ -53,8 +53,8 @@ class NodeBBUserCreationTestCase(TestCase):
                     kwargs={}
                 )
         except ConnectionError:
-            with mock.patch('common.djangoapps.nodebb.tests.task_delete_user_on_nodebb.apply_async') as method:
-                task_delete_user_on_nodebb.apply_async(username=username, kwargs={})
+            with mock.patch('common.djangoapps.nodebb.tests.task_delete_user_on_nodebb.delay') as method:
+                task_delete_user_on_nodebb.delay(username=username, kwargs={})
 
                 method.assert_called_with(username=username, kwargs={})
 
@@ -69,10 +69,10 @@ class NodeBBUserCreationTestCase(TestCase):
                     kwargs={}
                 )
         except ConnectionError:
-            with mock.patch('common.djangoapps.nodebb.tests.task_activate_user_on_nodebb.apply_async') as method:
-                task_activate_user_on_nodebb.apply_async(username=username, kwargs={})
+            with mock.patch('common.djangoapps.nodebb.tests.task_activate_user_on_nodebb.delay') as method:
+                task_activate_user_on_nodebb.delay(username=username, active=active, kwargs={})
 
-                method.assert_called_with(username=username, kwargs={})
+                method.assert_called_with(username=username, active=active, kwargs={})
 
     def test_user_join_on_nodebb(self):
         username = "testuser"
@@ -86,8 +86,8 @@ class NodeBBUserCreationTestCase(TestCase):
                         kwargs={}
                     )
         except ConnectionError:
-            with mock.patch('common.djangoapps.nodebb.tests.task_join_group_on_nodebb.apply_async') as method:
-                task_join_group_on_nodebb.apply_async(group_name=groupname, username=username, kwargs={})
+            with mock.patch('common.djangoapps.nodebb.tests.task_join_group_on_nodebb.delay') as method:
+                task_join_group_on_nodebb.delay(group_name=groupname, username=username, kwargs={})
 
                 method.assert_called_with(group_name=groupname, username=username, kwargs={})
 
@@ -102,7 +102,7 @@ class NodeBBUserCreationTestCase(TestCase):
                     NodeBBClient().users.update_onboarding_surveys_status(username=username)
         except ConnectionError:
             with mock.patch(
-                'common.djangoapps.nodebb.tests.task_update_onboarding_surveys_status.apply_async') as method:
-                task_update_onboarding_surveys_status.apply_async(username=username)
+                'common.djangoapps.nodebb.tests.task_update_onboarding_surveys_status.delay') as method:
+                task_update_onboarding_surveys_status.delay(username=username)
 
                 method.assert_called_with(username=username)

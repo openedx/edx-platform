@@ -4,7 +4,6 @@ from crum import get_current_request
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save, pre_save, post_delete, pre_delete
 from django.dispatch import receiver
-from requests.exceptions import ConnectionError
 
 from common.djangoapps.nodebb.tasks import (task_create_user_on_nodebb, task_update_user_profile_on_nodebb,
                                             task_delete_user_on_nodebb, task_activate_user_on_nodebb,
@@ -32,7 +31,6 @@ def log_action_response(user, status_code, response_body):
         log.error("Error: Can not update user(%s) on nodebb due to %s" % (user.username, response_body))
     else:
         log.info('Success: User(%s) has been updated on nodebb' % user.username)
-
 
 @receiver(post_save, sender=CourseEnrollment)
 def sync_enrolments_to_mailchimp(sender, instance, created, **kwargs):
@@ -85,11 +83,7 @@ def sync_user_info_with_nodebb(sender, instance, created, **kwargs):  # pylint: 
     else:
         data_to_sync = {}
 
-    try:
-        status_code, response_body = NodeBBClient().users.update_profile(user.username, kwargs=data_to_sync)
-        log_action_response(user, status_code, response_body)
-    except ConnectionError:
-        task_update_user_profile_on_nodebb(username=user.username, kwargs=data_to_sync)
+    task_update_user_profile_on_nodebb.delay(username=user.username, profile_data=data_to_sync)
 
 @receiver(post_save, sender=User, dispatch_uid='update_user_profile_on_nodebb')
 def update_user_profile_on_nodebb(sender, instance, created, **kwargs):
@@ -112,22 +106,14 @@ def update_user_profile_on_nodebb(sender, instance, created, **kwargs):
             'date_joined': instance.date_joined.strftime('%d/%m/%Y'),
         }
 
-        try:
-            status_code, response_body = NodeBBClient().users.create(username=instance.username, kwargs=data_to_sync)
-            log_action_response(instance, status_code, response_body)
-            return status_code
-        except ConnectionError:
-            task_create_user_on_nodebb(username=instance.username, kwargs=data_to_sync)
+        task_create_user_on_nodebb.delay(username=instance.username, user_data=data_to_sync)
     else:
         data_to_sync = {
             'first_name': instance.first_name,
             'last_name': instance.last_name
         }
-        try:
-            status_code, response_body = NodeBBClient().users.update_profile(instance.username, kwargs=data_to_sync)
-            log_action_response(instance, status_code, response_body)
-        except ConnectionError:
-            task_update_user_profile_on_nodebb(username=instance.username, kwargs=data_to_sync)
+
+        task_update_user_profile_on_nodebb.delay(username=instance.username, profile_data=data_to_sync)
 
 @receiver(post_delete, sender=User)
 def delete_user_from_nodebb(sender, **kwargs):
@@ -135,11 +121,8 @@ def delete_user_from_nodebb(sender, **kwargs):
     Delete User from NodeBB when deleted at edx (either deleted via admin-panel OR user is under age)
     """
     instance = kwargs['instance']
-    try:
-        status_code, response_body = NodeBBClient().users.delete_user(instance.username, kwargs={})
-        log_action_response(instance, status_code, response_body)
-    except ConnectionError:
-        task_delete_user_on_nodebb(username=instance.username)
+
+    task_delete_user_on_nodebb.delay(username=instance.username)
 
 @receiver(pre_save, sender=User, dispatch_uid='activate_deactivate_user_on_nodebb')
 def activate_deactivate_user_on_nodebb(sender, instance, **kwargs):
@@ -149,12 +132,7 @@ def activate_deactivate_user_on_nodebb(sender, instance, **kwargs):
     current_user_obj = User.objects.filter(pk=instance.pk)
 
     if current_user_obj.first() and current_user_obj[0].is_active != instance.is_active:
-        try:
-            status_code, response_body = NodeBBClient().users.activate(username=instance.username,
-                                                                       active=instance.is_active)
-            log_action_response(instance, status_code, response_body)
-        except ConnectionError:
-            task_activate_user_on_nodebb.apply_async(username=instance.username, active=instance.is_active)
+        task_activate_user_on_nodebb.delay(username=instance.username, active=instance.is_active)
 
 @receiver(post_save, sender=CourseOverview, dispatch_uid="nodebb.signals.handlers.create_category_on_nodebb")
 def create_category_on_nodebb(sender, instance, created, **kwargs):
@@ -189,19 +167,8 @@ def join_group_on_nodebb(sender, event=None, user=None, **kwargs):  # pylint: di
         course = modulestore().get_course(kwargs.get('course_id'))
 
         community_name = '%s-%s-%s-%s' % (course.display_name, course.id.org, course.id.course, course.id.run)
-        try:
-            status_code, response_body = NodeBBClient().users.join(group_name=community_name, username=username)
 
-            if status_code != 200:
-                log.error(
-                    'Error: Can not join the group, user (%s, %s) due to %s' % (
-                        course.display_name, username, response_body
-                        )
-                    )
-            else:
-                log.info('Success: User have joined the group %s successfully' % course.display_name)
-        except ConnectionError:
-            task_join_group_on_nodebb(group_name=community_name, username=username)
+        task_join_group_on_nodebb.delay(group_name=community_name, username=username)
 
 @receiver(post_save, sender=CourseTeam, dispatch_uid="nodebb.signals.handlers.create_update_groupchat_on_nodebb")
 def create_update_groupchat_on_nodebb(sender, instance, created, **kwargs):

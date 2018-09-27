@@ -1,86 +1,97 @@
 """
 Tasks to synchronize users with NodeBB
 """
-from logging import getLogger
+from celery.utils.log import get_task_logger
 
 from django.conf import settings
-from requests.exceptions import ConnectionError
+from django.contrib.auth.models import User
 from celery.task import task
 
 from common.lib.nodebb_client.client import NodeBBClient
 
-log = getLogger(__name__)
+LOGGER = get_task_logger(__name__)
 
-RETRY_DELAY = settings.NODEBB_RETRY_DELAY # seconds
+RETRY_DELAY = settings.NODEBB_RETRY_DELAY  # seconds
 
-@task(bind=True, default_retry_delay=RETRY_DELAY, max_retries=None)
-def task_create_user_on_nodebb(self, username, **kwargs):
+# TODO: REMOVE THIS BEFORE PUSHING
+# settings.CELERY_ALWAYS_EAGER = False
+# RETRY_DELAY = 20
+
+
+def handle_response(caller, task_name, status_code, response, username):
+    """
+    Logs the response of the specific NodeBB API call
+    """
+    if status_code >= 500:
+        print('Retrying: {} task for user: {}'.format(task_name, username))
+        caller.retry()
+    elif status_code >= 400:
+        print('Failure: {} task for user: {}, status_code: {}, response: {}'
+              .format(task_name, username, status_code, response))
+    elif status_code >= 200 and status_code < 300:
+        print('Success: {} task for user: {}'.format(task_name, username))
+
+
+@task(default_retry_delay=RETRY_DELAY, max_retries=None)
+def task_create_user_on_nodebb(username, user_data):
     """
     Celery task to create user on NodeBB
     """
-    try:
-        NodeBBClient().users.create(username=username, kwargs=kwargs)
-        log.info('Success: User creation task for user: {}'.format(username))
-    except ConnectionError:
-        log.info('Retrying: User creation task for user: {}'.format(username))
-        self.retry()
+    status_code, response = NodeBBClient().users.create(username=username, user_data=user_data)
+    handle_response(task_create_user_on_nodebb, 'User creation', status_code, response, username)
+    if status_code == 200:
+        try:
+            user = User.objects.filter(username=username)[0]
+        except IndexError:
+            # if user does not exist then return
+            return
+        if user.is_active:
+            task_activate_user_on_nodebb.delay(username=username, active=True)
+        # if user has completed all registration forms then update the status on NodeBB
+        if not bool(user.extended_profile.unattended_surveys(_type='list')):
+            task_update_onboarding_surveys_status.delay(username)
 
-@task(bind=True, default_retry_delay=RETRY_DELAY, max_retries=None)
-def task_update_user_profile_on_nodebb(self, username, **kwargs):
+
+@task(default_retry_delay=RETRY_DELAY, max_retries=None)
+def task_update_user_profile_on_nodebb(username, profile_data):
     """
     Celery task to update user profile info on NodeBB
     """
-    try:
-        NodeBBClient().users.update_profile(username=username, kwargs=kwargs)
-        log.info('Success: Update user profile task for user: {}'.format(username))
-    except ConnectionError:
-        log.info('Retrying: Update user profile task for user: {}'.format(username))
-        self.retry()
+    status_code, response = NodeBBClient().users.update_profile(username=username, profile_data=profile_data)
+    handle_response(task_update_user_profile_on_nodebb, 'Update user profile', status_code, response, username)
 
-@task(bind=True, default_retry_delay=RETRY_DELAY, max_retries=None)
-def task_delete_user_on_nodebb(self, username, **kwargs):
+
+@task(default_retry_delay=RETRY_DELAY, max_retries=None)
+def task_delete_user_on_nodebb(username):
     """
     Celery task to delete user on NodeBB
     """
-    try:
-        NodeBBClient().users.delete_user(username, kwargs=kwargs)
-        log.info('Success: Delete user task for user: {}'.format(username))
-    except ConnectionError:
-        log.info('Retrying: Delete user task for user: {}'.format(username))
-        self.retry()
+    status_code, response = NodeBBClient().users.delete_user(username)
+    handle_response(task_delete_user_on_nodebb, 'Delete user', status_code, response, username)
 
-@task(bind=True, default_retry_delay=RETRY_DELAY, max_retries=None)
-def task_activate_user_on_nodebb(self, username, active, **kwargs):
+
+@task(default_retry_delay=RETRY_DELAY, max_retries=None)
+def task_activate_user_on_nodebb(username, active):
     """
     Celery task to activate user on NodeBB
     """
-    try:
-        NodeBBClient().users.activate(username=username, active=active)
-        log.info('Success: Activate user task for user: {}'.format(username))
-    except ConnectionError:
-        log.info('Retrying: Activate user task for user: {}'.format(username))
-        self.retry()
+    status_code, response = NodeBBClient().users.activate(username=username, active=active)
+    handle_response(task_activate_user_on_nodebb, 'Activate user', status_code, response, username)
 
-@task(bind=True, default_retry_delay=RETRY_DELAY, max_retries=None)
-def task_join_group_on_nodebb(self, group_name, username):
+
+@task(default_retry_delay=RETRY_DELAY, max_retries=None)
+def task_join_group_on_nodebb(group_name, username):
     """
     Celery task to join user to a community on NodeBB
     """
-    try:
-        NodeBBClient().users.join(group_name=group_name, username=username)
-        log.info('Success: Join user task for user: {} and community/group: {}'.format(username, group_name))
-    except ConnectionError:
-        log.info('Retrying: Join user task for user: {} and community/group: {}'.format(username, group_name))
-        self.retry()
+    status_code, response = NodeBBClient().users.join(group_name=group_name, username=username)
+    handle_response(task_join_group_on_nodebb, 'Join user in {}'.format(group_name), status_code, response, username)
 
-@task(bind=True, default_retry_delay=RETRY_DELAY, max_retries=None)
-def task_update_onboarding_surveys_status(self, username):
+
+@task(default_retry_delay=RETRY_DELAY, max_retries=None)
+def task_update_onboarding_surveys_status(username):
     """
     Celery task to update survey status for username on NodeBB
     """
-    try:
-        NodeBBClient().users.update_onboarding_surveys_status(username=username)
-        log.info('Success: Update Onboarding Survey task for user: {}'.format(username))
-    except ConnectionError:
-        log.info('Retrying: Update Onboarding Survey task for user: {}'.format(username))
-        self.retry()
+    status_code, response = NodeBBClient().users.update_onboarding_surveys_status(username=username)
+    handle_response(task_update_onboarding_surveys_status, 'Update Onboarding Survery', status_code, response, username)
