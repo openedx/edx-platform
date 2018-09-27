@@ -1,3 +1,4 @@
+## mako
 <%! from django.utils.translation import ugettext as _ %>
 ${_("You're almost there! Use the link to activate your account to access engaging, high-quality "
 "{platform_name} courses. Note that you will not be able to log back into your account until "

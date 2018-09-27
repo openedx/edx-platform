@@ -574,7 +574,7 @@ def create_and_enroll_user(email, username, name, country, password, course_id, 
         try:
             # It's a new user, an email will be sent to each newly created user.
             email_params.update({
-                'message': 'account_creation_and_enrollment',
+                'message_type': 'account_creation_and_enrollment',
                 'email_address': email,
                 'password': password,
                 'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
