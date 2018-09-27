@@ -1,3 +1,5 @@
+import hudson.tasks.test.AbstractTestResultAction
+
 def runPythonTests() {
     sshagent(credentials: ['jenkins-worker', 'jenkins-worker-pem'], ignoreMissing: true) {
         checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '${ghprbActualCommit}']],
@@ -24,6 +26,29 @@ def pythonTestCleanup() {
     junit '**/nosetests.xml'
     sh '''source $HOME/edx-venv/bin/activate
     bash scripts/xdist/terminate_xdist_nodes.sh'''
+}
+
+@NonCPS
+def testStatuses() {
+
+    def testStatus = ""
+    AbstractTestResultAction testResultAction = currentBuild.rawBuild.getAction(AbstractTestResultAction.class)
+
+    if (testResultAction != null) {
+
+        def total = testResultAction.totalCount
+        if (total == 0) {
+            testStatus = "TEST STATUS:: NO TESTS RAN"
+        } else {
+            testStatus = "TEST STATUS:: TESTS RAN SUCCESSFULLY"
+        }
+
+    } else {
+        testStatus = "TEST STATUS:: NO TESTS RAN"
+    }
+
+    return testStatus
+
 }
 
 pipeline {
