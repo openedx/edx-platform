@@ -628,7 +628,7 @@
                         window.SR.readTexts(that.get_sr_status(response.contents));
                         that.el.trigger('contentChanged', [that.id, response.contents, response]);
                         that.saveNotification.hide();
-                        that.gentle_alert("Answer submitted successfully");
+                        that.custom_alert("Answer submitted successfully");
                     }
 
                     break;
@@ -780,6 +780,18 @@
                 edx.HtmlUtils.HTML(msg)
             );
             this.clear_all_notifications();
+            this.gentleAlertNotification.show();
+            this.gentleAlertNotification.focus();
+        };
+
+        Problem.prototype.custom_alert = function(msg) {
+            edx.HtmlUtils.setHtml(
+                this.el.find('.notification-gentle-alert .notification-message'),
+                edx.HtmlUtils.HTML(msg)
+            );
+            this.clear_all_notifications();
+            this.gentleAlertNotification.removeClass('warning').addClass('success');
+            this.gentleAlertNotification.find('.fa-exclamation-circle').removeClass('fa-exclamation-circle').addClass('fa-check-circle');
             this.gentleAlertNotification.show();
             this.gentleAlertNotification.focus();
         };
