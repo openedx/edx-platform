@@ -1,3 +1,5 @@
+from requests.exceptions import ConnectionError
+
 from pynodebb.api.users import User
 
 
@@ -6,11 +8,11 @@ class ForumUser(User):
     Added custom methods to the default User class of pynodebb package
     """
 
-    def join(self, group_name, user_name, uid=1, **kwargs):
+    def join(self, group_name, username, uid=1, **kwargs):
         """
         Make user a participant of specified group
         """
-        payload = {'name': group_name, 'username': user_name, '_uid': uid}
+        payload = {'name': group_name, 'username': username, '_uid': uid}
         return self.client.post('/api/v2/users/join', **payload)
 
     def create(self, username, **kwargs):
@@ -47,3 +49,9 @@ class ForumUser(User):
         Update NodeBB when user successfully completed all required onboarding surveys
         """
         return self.client.get('/api/v2/users/update-visibility-status?username=%s' % username)
+
+    def all(self):
+        """
+        Returns and array of all users present on NodeBB
+        """
+        return self.client.post('/api/v2/users/all')
