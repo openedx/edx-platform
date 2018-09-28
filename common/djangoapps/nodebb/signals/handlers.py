@@ -54,10 +54,6 @@ def sync_user_info_with_nodebb(sender, instance, created, **kwargs):  # pylint: 
     """
     request = get_current_request()
     user = request.user
-    # sender_class = instance.__class__.__name__
-    # instance_id = instance.id
-    # data = {'sender': sender_class, 'instance_id': instance_id}
-    # send_user_profile_info_to_mailchimp_task.delay(data)
 
     send_user_profile_info_to_mailchimp(sender, instance, kwargs)
 
@@ -90,28 +86,6 @@ def sync_user_info_with_nodebb(sender, instance, created, **kwargs):  # pylint: 
 
     status_code, response_body = NodeBBClient().users.update_profile(user.username, kwargs=data_to_sync)
     log_action_response(user, status_code, response_body)
-
-
-@task()
-def send_user_profile_info_to_mailchimp_task(data):
-
-    if data['sender'] == 'UserProfile':
-        instance = UserProfile.objects.get(id=data['instance_id'])
-        sender = UserProfile
-
-    elif data['sender'] == 'UserExtendedProfile':
-        instance = UserExtendedProfile.objects.get(id=data['instance_id'])
-        sender = UserExtendedProfile
-
-    elif data['sender'] == 'EmailPreference':
-        instance = EmailPreference.objects.get(id=data['instance_id'])
-        sender = EmailPreference
-
-    elif data['sender'] == 'Organization':
-        instance = Organization.objects.get(id=data['instance_id'])
-        sender = Organization
-
-    send_user_profile_info_to_mailchimp(sender, instance, {})
 
 
 @receiver(post_save, sender=User, dispatch_uid='update_user_profile_on_nodebb')
