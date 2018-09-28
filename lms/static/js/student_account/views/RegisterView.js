@@ -85,7 +85,10 @@
                 },
 
                 saveSuccess: function() {
-                    this.trigger('auth-complete');
+                    var self = this
+                    $.when($(this.el).trigger('register-complete')).done(function(){
+                        self.trigger('auth-complete');
+                    });
                 },
 
                 saveError: function(error) {
