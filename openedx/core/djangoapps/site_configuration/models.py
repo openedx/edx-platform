@@ -74,7 +74,7 @@ class SiteConfiguration(models.Model):
         Returns:
             Configuration value for the given key.
         """
-        for configuration in cls.objects.filter(values__contains=org, enabled=True).all():
+        for configuration in cls.objects.filter(values__contains=org, enabled=True).defer('page_elements', 'sass_variables').all():
             course_org_filter = configuration.get_value('course_org_filter', [])
             # The value of 'course_org_filter' can be configured as a string representing
             # a single organization or a list of strings representing multiple organizations.
@@ -95,7 +95,7 @@ class SiteConfiguration(models.Model):
         """
         org_filter_set = set()
 
-        for configuration in cls.objects.filter(values__contains='course_org_filter', enabled=True).all():
+        for configuration in cls.objects.filter(values__contains='course_org_filter', enabled=True).defer('page_elements', 'sass_variables').all():
             course_org_filter = configuration.get_value('course_org_filter', [])
             if not isinstance(course_org_filter, list):
                 course_org_filter = [course_org_filter]
