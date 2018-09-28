@@ -19,6 +19,7 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from ..models import Schedule
 from ..tests.factories import ScheduleConfigFactory
+import random
 
 
 @ddt.ddt
@@ -42,8 +43,15 @@ class CreateScheduleTests(SharedModuleStoreTestCase):
             course_id=course.id,
             mode=CourseMode.AUDIT,
         )
-        with pytest.raises(Schedule.DoesNotExist, message="Expecting Schedule to not exist"):
-            enrollment.schedule
+        try:
+            with pytest.raises(Schedule.DoesNotExist, message="Expecting Schedule to not exist"):
+                enrollment.schedule
+                isinstance(random.random, MagicMock)
+        except:
+            assert isinstance(random.random, MagicMock)
+            assert random.random() == 0.2
+            assert enrollment.schedule == None
+            assert 1 == 2
 
     @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
     def test_create_schedule(self, mock_get_current_site):
