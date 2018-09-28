@@ -10,7 +10,6 @@ import logging
 
 from ccx_keys.locator import CCXLocator
 from courseware.courses import get_course_by_id
-from xmodule.modulestore.django import SignalHandler
 
 log = logging.getLogger(__name__)
 
@@ -48,19 +47,6 @@ def save_display_name(apps, schema_editor):
             field='display_name',
             defaults={'value': serialized_display_name},
         )
-
-        # Publish change
-        responses = SignalHandler.course_published.send(
-            sender=ccx,
-            course_key=CCXLocator.from_course_locator(course.id, unicode(ccx.id))
-        )
-        for rec, response in responses:
-            log.info(
-                'Signal fired when course is published. Course %s. Receiver: %s. Response: %s',
-                ccx.course_id,
-                rec,
-                response
-            )
 
 
 class Migration(migrations.Migration):
