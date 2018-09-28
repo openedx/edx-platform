@@ -107,7 +107,6 @@ class CreateScheduleTests(SharedModuleStoreTestCase):
 
     @override_waffle_flag(CREATE_SCHEDULE_WAFFLE_FLAG, True)
     @patch('analytics.track')
-    @patch('random.random')
     @ddt.data(
         (0, True),
         (0.1, True),
