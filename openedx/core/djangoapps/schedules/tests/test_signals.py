@@ -118,20 +118,19 @@ class CreateScheduleTests(SharedModuleStoreTestCase):
         self,
         hold_back_ratio,
         expect_schedule_created,
-        mock_random,
         mock_track,
         mock_get_current_site
     ):
-        mock_random.return_value = 0.2
-        schedule_config = ScheduleConfigFactory.create(enabled=True, hold_back_ratio=hold_back_ratio)
-        mock_get_current_site.return_value = schedule_config.site
-        if expect_schedule_created:
-            self.assert_schedule_created()
-            assert not mock_track.called
-        else:
-            self.assert_schedule_not_created()
-            mock_track.assert_called_once()
-            assert mock_track.call_args[1].get('event') == 'edx.bi.schedule.suppressed'
+        with patch('random.random', return_value=0.2):
+            schedule_config = ScheduleConfigFactory.create(enabled=True, hold_back_ratio=hold_back_ratio)
+            mock_get_current_site.return_value = schedule_config.site
+            if expect_schedule_created:
+                self.assert_schedule_created()
+                assert not mock_track.called
+            else:
+                self.assert_schedule_not_created()
+                mock_track.assert_called_once()
+                assert mock_track.call_args[1].get('event') == 'edx.bi.schedule.suppressed'
 
     @patch('openedx.core.djangoapps.schedules.signals.log.exception')
     @patch('openedx.core.djangoapps.schedules.signals.Schedule.objects.create')
