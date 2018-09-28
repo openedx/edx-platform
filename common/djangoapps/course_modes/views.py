@@ -28,6 +28,8 @@ from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from openedx.core.djangoapps.catalog.utils import get_currency_data
 from openedx.core.djangoapps.embargo import api as embargo_api
+from openedx.core.djangoapps.programs.utils import ProgramDataExtender, ProgramProgressMeter
+from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from student.models import CourseEnrollment
 from util.db import outer_atomic
 from xmodule.modulestore.django import modulestore
@@ -140,7 +142,24 @@ class ChooseModeView(View):
             in CourseMode.modes_for_course(course_key, only_selectable=False)
         )
         course_id = text_type(course_key)
+
+        bundle_data = {}
+        bundles_on_track_selection = WaffleFlag(WaffleFlagNamespace(name=u'experiments'), u'bundles_on_track_selection')
+        if bundles_on_track_selection.is_enabled():
+            meter = ProgramProgressMeter(request.site, request.user, enrollments=[CourseEnrollment])
+            if meter.programs and meter.programs[0]:
+                program_data = meter.programs[0]
+                program_data = ProgramDataExtender(program_data, request.user, mobile_only=False).extend()
+                skus = program_data.get('skus')
+                ecommerce_service = EcommerceService()
+                bundle_data = {
+                    'program_marketing_site_url': program_data.get('marketing_url'),
+                    'program_bundle_url': ecommerce_service.get_checkout_page_url(*skus),
+                    'discount_data': program_data.get('discount_data'),
+                }
+
         context = {
+            "bundle_data": bundle_data,
             "course_modes_choose_url": reverse(
                 "course_modes_choose",
                 kwargs={'course_id': course_id}
