@@ -54,10 +54,12 @@ def sync_user_info_with_nodebb(sender, instance, created, **kwargs):  # pylint: 
     """
     request = get_current_request()
     user = request.user
-    sender_class = instance.__class__.__name__
-    instance_id = instance.id
-    data = {'sender': sender_class, 'instance_id': instance_id}
-    send_user_profile_info_to_mailchimp_task.delay(data)
+    # sender_class = instance.__class__.__name__
+    # instance_id = instance.id
+    # data = {'sender': sender_class, 'instance_id': instance_id}
+    # send_user_profile_info_to_mailchimp_task.delay(data)
+
+    send_user_profile_info_to_mailchimp(sender, instance, kwargs)
 
     if 'login' in request.path or 'logout' in request.path or sender == EmailPreference:
         return
