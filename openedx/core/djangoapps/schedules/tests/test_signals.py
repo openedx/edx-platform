@@ -20,6 +20,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from ..models import Schedule
 from ..tests.factories import ScheduleConfigFactory
 import random
+from mock import MagicMock
 
 
 @ddt.ddt
