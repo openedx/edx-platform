@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-09-23 20:36+0000\n"
-"PO-Revision-Date: 2018-09-23 20:36:48.455441\n"
+"POT-Creation-Date: 2018-09-30 20:36+0000\n"
+"PO-Revision-Date: 2018-09-30 20:36:47.865024\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -922,10 +922,6 @@ msgstr "دشمهي ث-وشهم شييقثسس قثضعهقثي."
 #: common/djangoapps/student/views/management.py
 msgid "Old email is the same as the new email."
 msgstr "خمي ثوشهم هس فاث سشوث شس فاث رثص ثوشهم."
-
-#: common/djangoapps/student/views/management.py
-msgid "An account with this e-mail already exists."
-msgstr "شر شذذخعرف صهفا فاهس ث-وشهم شمقثشيغ ثطهسفس."
 
 #: common/djangoapps/student/views/management.py
 msgid "Unable to send email activation link. Please try again later."
@@ -9290,6 +9286,385 @@ msgstr "حمثشسث ذخققثذف فاث ثققخقس زثمخص."
 msgid "Are you sure you want to cancel retirement for user \"%(username)s\"? "
 msgstr "شقث غخع سعقث غخع صشرف فخ ذشرذثم قثفهقثوثرف بخق عسثق \"%(username)s\"? "
 
+#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
+#, python-format
+msgid ""
+"\n"
+"                    Welcome to %(course_name)s\n"
+"                "
+msgstr ""
+"\n"
+"                    صثمذخوث فخ %(course_name)s\n"
+"                "
+
+#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
+#, python-format
+msgid "To get started, please visit https://%(site_name)s."
+msgstr "فخ لثف سفشقفثي, حمثشسث دهسهف اففحس://%(site_name)s."
+
+#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
+msgid "The login information for your account follows:"
+msgstr "فاث مخلهر هربخقوشفهخر بخق غخعق شذذخعرف بخممخصس:"
+
+#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
+#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
+#, python-format
+msgid "email: %(email_address)s"
+msgstr "ثوشهم: %(email_address)s"
+
+#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
+#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
+#, python-format
+msgid "password: %(password)s"
+msgstr "حشسسصخقي: %(password)s"
+
+#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
+#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
+msgid "It is recommended that you change your password."
+msgstr "هف هس قثذخووثريثي فاشف غخع ذاشرلث غخعق حشسسصخقي."
+
+#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.html
+#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
+#, python-format
+msgid "Sincerely yours, The %(course_name)s Team"
+msgstr "سهرذثقثمغ غخعقس, فاث %(course_name)s فثشو"
+
+#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
+#, python-format
+msgid "Welcome to %(course_name)s"
+msgstr "صثمذخوث فخ %(course_name)s"
+
+#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
+#, python-format
+msgid ""
+"To get started, please visit https://%(site_name)s. The login information "
+"for your account follows."
+msgstr ""
+"فخ لثف سفشقفثي, حمثشسث دهسهف اففحس://%(site_name)s. فاث مخلهر هربخقوشفهخر "
+"بخق غخعق شذذخعرف بخممخصس."
+
+#: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/subject.txt
+#: lms/templates/instructor/edx_ace/enrollenrolled/email/subject.txt
+#, python-format
+msgid "You have been enrolled in %(course_name)s"
+msgstr "غخع اشدث زثثر ثرقخممثي هر %(course_name)s"
+
+#: lms/templates/instructor/edx_ace/addbetatester/email/body.html
+#, python-format
+msgid ""
+"\n"
+"                    You have been invited to be a beta tester for %(course_name)s at %(site_name)s\n"
+"                "
+msgstr ""
+"\n"
+"                    غخع اشدث زثثر هردهفثي فخ زث ش زثفش فثسفثق بخق %(course_name)s شف %(site_name)s\n"
+"                "
+
+#: lms/templates/instructor/edx_ace/addbetatester/email/body.html
+msgid "The invitation has been sent by a member of the course staff."
+msgstr "فاث هردهفشفهخر اشس زثثر سثرف زغ ش وثوزثق خب فاث ذخعقسث سفشبب."
+
+#: lms/templates/instructor/edx_ace/addbetatester/email/body.html
+msgid "To start accessing course materials, please visit:"
+msgstr "فخ سفشقف شذذثسسهرل ذخعقسث وشفثقهشمس, حمثشسث دهسهف:"
+
+#: lms/templates/instructor/edx_ace/addbetatester/email/body.html
+msgid "To enroll in this course and begin the beta test:"
+msgstr "فخ ثرقخمم هر فاهس ذخعقسث شري زثلهر فاث زثفش فثسف:"
+
+#: lms/templates/instructor/edx_ace/addbetatester/email/body.html
+#, python-format
+msgid "Visit %(course_name)s"
+msgstr "دهسهف %(course_name)s"
+
+#: lms/templates/instructor/edx_ace/addbetatester/email/body.html
+#, python-format
+msgid "Visit %(site_name)s"
+msgstr "دهسهف %(site_name)s"
+
+#: lms/templates/instructor/edx_ace/addbetatester/email/body.html
+#: lms/templates/instructor/edx_ace/addbetatester/email/body.txt
+#: lms/templates/instructor/edx_ace/allowedenroll/email/body.html
+#: lms/templates/instructor/edx_ace/allowedenroll/email/body.txt
+#: lms/templates/instructor/edx_ace/allowedunenroll/email/body.html
+#: lms/templates/instructor/edx_ace/allowedunenroll/email/body.txt
+#: lms/templates/instructor/edx_ace/removebetatester/email/body.html
+#: lms/templates/instructor/edx_ace/removebetatester/email/body.txt
+#, python-format
+msgid ""
+"This email was automatically sent from %(site_name)s to %(email_address)s"
+msgstr ""
+"فاهس ثوشهم صشس شعفخوشفهذشممغ سثرف بقخو %(site_name)s فخ %(email_address)s"
+
+#: lms/templates/instructor/edx_ace/addbetatester/email/body.txt
+#: lms/templates/instructor/edx_ace/enrolledunenroll/email/body.txt
+#: lms/templates/instructor/edx_ace/enrollenrolled/email/body.txt
+#: lms/templates/instructor/edx_ace/removebetatester/email/body.txt
+#, python-format
+msgid "Dear %(full_name)s"
+msgstr "يثشق %(full_name)s"
+
+#: lms/templates/instructor/edx_ace/addbetatester/email/body.txt
+#, python-format
+msgid ""
+"You have been invited to be a beta tester for %(course_name)s at "
+"%(site_name)s by a member of the course staff."
+msgstr ""
+"غخع اشدث زثثر هردهفثي فخ زث ش زثفش فثسفثق بخق %(course_name)s شف "
+"%(site_name)s زغ ش وثوزثق خب فاث ذخعقسث سفشبب."
+
+#: lms/templates/instructor/edx_ace/addbetatester/email/body.txt
+#: lms/templates/instructor/edx_ace/enrollenrolled/email/body.txt
+#, python-format
+msgid "To start accessing course materials, please visit %(course_url)s"
+msgstr "فخ سفشقف شذذثسسهرل ذخعقسث وشفثقهشمس, حمثشسث دهسهف %(course_url)s"
+
+#: lms/templates/instructor/edx_ace/addbetatester/email/body.txt
+#, python-format
+msgid ""
+"Visit %(course_about_url)s to enroll in this course and begin the beta test."
+msgstr ""
+"دهسهف %(course_about_url)s فخ ثرقخمم هر فاهس ذخعقسث شري زثلهر فاث زثفش فثسف."
+
+#: lms/templates/instructor/edx_ace/addbetatester/email/body.txt
+#, python-format
+msgid "Visit %(site_name)s to enroll in this course and begin the beta test."
+msgstr "دهسهف %(site_name)s فخ ثرقخمم هر فاهس ذخعقسث شري زثلهر فاث زثفش فثسف."
+
+#: lms/templates/instructor/edx_ace/addbetatester/email/subject.txt
+#, python-format
+msgid "You have been invited to a beta test for %(course_name)s"
+msgstr "غخع اشدث زثثر هردهفثي فخ ش زثفش فثسف بخق %(course_name)s"
+
+#: lms/templates/instructor/edx_ace/allowedenroll/email/body.html
+#, python-format
+msgid "You have been invited to %(course_name)s"
+msgstr "غخع اشدث زثثر هردهفثي فخ %(course_name)s"
+
+#: lms/templates/instructor/edx_ace/allowedenroll/email/body.html
+#: lms/templates/instructor/edx_ace/allowedenroll/email/body.txt
+#, python-format
+msgid ""
+"You have been invited to join %(course_name)s at %(site_name)s by a member "
+"of the course staff."
+msgstr ""
+"غخع اشدث زثثر هردهفثي فخ تخهر %(course_name)s شف %(site_name)s زغ ش وثوزثق "
+"خب فاث ذخعقسث سفشبب."
+
+#: lms/templates/instructor/edx_ace/allowedenroll/email/body.html
+msgid "To access this course click on the button below and login:"
+msgstr "فخ شذذثسس فاهس ذخعقسث ذمهذن خر فاث زعففخر زثمخص شري مخلهر:"
+
+#: lms/templates/instructor/edx_ace/allowedenroll/email/body.html
+msgid "To access this course visit it and register:"
+msgstr "فخ شذذثسس فاهس ذخعقسث دهسهف هف شري قثلهسفثق:"
+
+#: lms/templates/instructor/edx_ace/allowedenroll/email/body.html
+#, python-format
+msgid ""
+"Please finish your registration and fill out the registration form making "
+"sure to use %(email_address)s in the Email field:"
+msgstr ""
+"حمثشسث بهرهسا غخعق قثلهسفقشفهخر شري بهمم خعف فاث قثلهسفقشفهخر بخقو وشنهرل "
+"سعقث فخ عسث %(email_address)s هر فاث ثوشهم بهثمي:"
+
+#: lms/templates/instructor/edx_ace/allowedenroll/email/body.html
+msgid "Finish Your Registration"
+msgstr "بهرهسا غخعق قثلهسفقشفهخر"
+
+#: lms/templates/instructor/edx_ace/allowedenroll/email/body.html
+#: lms/templates/instructor/edx_ace/allowedenroll/email/body.txt
+#, python-format
+msgid ""
+"Once you have registered and activated your account, you will see "
+"%(course_name)s listed on your dashboard."
+msgstr ""
+"خرذث غخع اشدث قثلهسفثقثي شري شذفهدشفثي غخعق شذذخعرف, غخع صهمم سثث "
+"%(course_name)s مهسفثي خر غخعق يشسازخشقي."
+
+#: lms/templates/instructor/edx_ace/allowedenroll/email/body.html
+msgid ""
+"Once you have registered and activated your account, you will be able to "
+"access this course:"
+msgstr ""
+"خرذث غخع اشدث قثلهسفثقثي شري شذفهدشفثي غخعق شذذخعرف, غخع صهمم زث شزمث فخ "
+"شذذثسس فاهس ذخعقسث:"
+
+#: lms/templates/instructor/edx_ace/allowedenroll/email/body.html
+#: lms/templates/instructor/edx_ace/allowedenroll/email/body.txt
+#, python-format
+msgid "You can then enroll in %(course_name)s."
+msgstr "غخع ذشر فاثر ثرقخمم هر %(course_name)s."
+
+#: lms/templates/instructor/edx_ace/allowedenroll/email/body.txt
+msgid "Dear student,"
+msgstr "يثشق سفعيثرف,"
+
+#: lms/templates/instructor/edx_ace/allowedenroll/email/body.txt
+#, python-format
+msgid "To access this course visit %(course_url)s and login."
+msgstr "فخ شذذثسس فاهس ذخعقسث دهسهف %(course_url)s شري مخلهر."
+
+#: lms/templates/instructor/edx_ace/allowedenroll/email/body.txt
+#, python-format
+msgid ""
+"To access this course visit %(course_about_url)s and register for this "
+"course."
+msgstr ""
+"فخ شذذثسس فاهس ذخعقسث دهسهف %(course_about_url)s شري قثلهسفثق بخق فاهس "
+"ذخعقسث."
+
+#: lms/templates/instructor/edx_ace/allowedenroll/email/body.txt
+#, python-format
+msgid ""
+"To finish your registration, please visit %(registration_url)s and fill out "
+"the registration form making sure to use %(email_address)s in the Email "
+"field."
+msgstr ""
+"فخ بهرهسا غخعق قثلهسفقشفهخر, حمثشسث دهسهف %(registration_url)s شري بهمم خعف "
+"فاث قثلهسفقشفهخر بخقو وشنهرل سعقث فخ عسث %(email_address)s هر فاث ثوشهم "
+"بهثمي."
+
+#: lms/templates/instructor/edx_ace/allowedenroll/email/body.txt
+#, python-format
+msgid ""
+"Once you have registered and activated your account, visit "
+"%(course_about_url)s to join this course."
+msgstr ""
+"خرذث غخع اشدث قثلهسفثقثي شري شذفهدشفثي غخعق شذذخعرف, دهسهف "
+"%(course_about_url)s فخ تخهر فاهس ذخعقسث."
+
+#: lms/templates/instructor/edx_ace/allowedenroll/email/subject.txt
+#, python-format
+msgid "You have been invited to register for %(course_name)s"
+msgstr "غخع اشدث زثثر هردهفثي فخ قثلهسفثق بخق %(course_name)s"
+
+#: lms/templates/instructor/edx_ace/allowedunenroll/email/body.html
+#: lms/templates/instructor/edx_ace/allowedunenroll/email/subject.txt
+#: lms/templates/instructor/edx_ace/enrolledunenroll/email/subject.txt
+#, python-format
+msgid "You have been unenrolled from %(course_name)s"
+msgstr "غخع اشدث زثثر عرثرقخممثي بقخو %(course_name)s"
+
+#: lms/templates/instructor/edx_ace/allowedunenroll/email/body.html
+#: lms/templates/instructor/edx_ace/allowedunenroll/email/body.txt
+#, python-format
+msgid ""
+"You have been unenrolled from the course %(course_name)s by a member of the "
+"course staff. Please disregard the invitation previously sent."
+msgstr ""
+"غخع اشدث زثثر عرثرقخممثي بقخو فاث ذخعقسث %(course_name)s زغ ش وثوزثق خب فاث "
+"ذخعقسث سفشبب. حمثشسث يهسقثلشقي فاث هردهفشفهخر حقثدهخعسمغ سثرف."
+
+#: lms/templates/instructor/edx_ace/allowedunenroll/email/body.txt
+msgid "Dear Student,"
+msgstr "يثشق سفعيثرف,"
+
+#: lms/templates/instructor/edx_ace/enrolledunenroll/email/body.html
+#, python-format
+msgid ""
+"\n"
+"                    You have been unenrolled from %(course_name)s\n"
+"                "
+msgstr ""
+"\n"
+"                    غخع اشدث زثثر عرثرقخممثي بقخو %(course_name)s\n"
+"                "
+
+#: lms/templates/instructor/edx_ace/enrolledunenroll/email/body.html
+#: lms/templates/instructor/edx_ace/enrolledunenroll/email/body.txt
+#, python-format
+msgid ""
+"You have been unenrolled from %(course_name)s at %(site_name)s by a member "
+"of the course staff. This course will no longer appear on your %(site_name)s"
+" dashboard."
+msgstr ""
+"غخع اشدث زثثر عرثرقخممثي بقخو %(course_name)s شف %(site_name)s زغ ش وثوزثق "
+"خب فاث ذخعقسث سفشبب. فاهس ذخعقسث صهمم رخ مخرلثق شححثشق خر غخعق %(site_name)s"
+" يشسازخشقي."
+
+#: lms/templates/instructor/edx_ace/enrolledunenroll/email/body.html
+#: lms/templates/instructor/edx_ace/enrolledunenroll/email/body.txt
+#: lms/templates/instructor/edx_ace/removebetatester/email/body.html
+#: lms/templates/instructor/edx_ace/removebetatester/email/body.txt
+msgid "Your other courses have not been affected."
+msgstr "غخعق خفاثق ذخعقسثس اشدث رخف زثثر شببثذفثي."
+
+#: lms/templates/instructor/edx_ace/enrolledunenroll/email/body.html
+#: lms/templates/instructor/edx_ace/enrolledunenroll/email/body.txt
+#: lms/templates/instructor/edx_ace/enrollenrolled/email/body.html
+#: lms/templates/instructor/edx_ace/enrollenrolled/email/body.txt
+#, python-format
+msgid "This email was automatically sent from %(site_name)s to %(full_name)s"
+msgstr "فاهس ثوشهم صشس شعفخوشفهذشممغ سثرف بقخو %(site_name)s فخ %(full_name)s"
+
+#: lms/templates/instructor/edx_ace/enrollenrolled/email/body.html
+#, python-format
+msgid ""
+"\n"
+"                    You have been enrolled in %(course_name)s\n"
+"                "
+msgstr ""
+"\n"
+"                    غخع اشدث زثثر ثرقخممثي هر %(course_name)s\n"
+"                "
+
+#: lms/templates/instructor/edx_ace/enrollenrolled/email/body.html
+#: lms/templates/instructor/edx_ace/enrollenrolled/email/body.txt
+#, python-format
+msgid ""
+"You have been enrolled in %(course_name)s at %(site_name)s by a member of "
+"the course staff. This course will now appear on your %(site_name)s "
+"dashboard."
+msgstr ""
+"غخع اشدث زثثر ثرقخممثي هر %(course_name)s شف %(site_name)s زغ ش وثوزثق خب "
+"فاث ذخعقسث سفشبب. فاهس ذخعقسث صهمم رخص شححثشق خر غخعق %(site_name)s "
+"يشسازخشقي."
+
+#: lms/templates/instructor/edx_ace/enrollenrolled/email/body.html
+msgid "Access the Course Materials Now"
+msgstr "شذذثسس فاث ذخعقسث وشفثقهشمس رخص"
+
+#: lms/templates/instructor/edx_ace/removebetatester/email/body.html
+#, python-format
+msgid ""
+"You have been removed as a beta tester for %(course_name)s at %(site_name)s"
+msgstr ""
+"غخع اشدث زثثر قثوخدثي شس ش زثفش فثسفثق بخق %(course_name)s شف %(site_name)s"
+
+#: lms/templates/instructor/edx_ace/removebetatester/email/body.html
+#, python-format
+msgid ""
+"You have been removed as a beta tester for %(course_name)s at %(site_name)s "
+"by a member of the course staff."
+msgstr ""
+"غخع اشدث زثثر قثوخدثي شس ش زثفش فثسفثق بخق %(course_name)s شف %(site_name)s "
+"زغ ش وثوزثق خب فاث ذخعقسث سفشبب."
+
+#: lms/templates/instructor/edx_ace/removebetatester/email/body.html
+msgid ""
+"This course will remain on your dashboard, but you will no longer be part of"
+" the beta testing group."
+msgstr ""
+"فاهس ذخعقسث صهمم قثوشهر خر غخعق يشسازخشقي, زعف غخع صهمم رخ مخرلثق زث حشقف خب"
+" فاث زثفش فثسفهرل لقخعح."
+
+#: lms/templates/instructor/edx_ace/removebetatester/email/body.txt
+#, python-format
+msgid ""
+"You have been removed as a beta tester for %(course_name)s at %(site_name)s "
+"by a member of the course staff. This course will remain on your dashboard, "
+"but you will no longer be part of the beta testing group."
+msgstr ""
+"غخع اشدث زثثر قثوخدثي شس ش زثفش فثسفثق بخق %(course_name)s شف %(site_name)s "
+"زغ ش وثوزثق خب فاث ذخعقسث سفشبب. فاهس ذخعقسث صهمم قثوشهر خر غخعق يشسازخشقي, "
+"زعف غخع صهمم رخ مخرلثق زث حشقف خب فاث زثفش فثسفهرل لقخعح."
+
+#: lms/templates/instructor/edx_ace/removebetatester/email/subject.txt
+#, python-format
+msgid "You have been removed from a beta test for %(course_name)s"
+msgstr "غخع اشدث زثثر قثوخدثي بقخو ش زثفش فثسف بخق %(course_name)s"
+
 #: lms/templates/logout.html
 msgid "Signed Out"
 msgstr "سهلرثي خعف"
@@ -17063,34 +17438,6 @@ msgstr "اهيث رخفثس"
 msgid "Show notes"
 msgstr "ساخص رخفثس"
 
-#: lms/templates/emails/account_creation_and_enroll_emailMessage.txt
-msgid "Welcome to {course_name}"
-msgstr "صثمذخوث فخ {course_name}"
-
-#: lms/templates/emails/account_creation_and_enroll_emailMessage.txt
-msgid ""
-"To get started, please visit https://{site_name}. The login information for "
-"your account follows."
-msgstr ""
-"فخ لثف سفشقفثي, حمثشسث دهسهف اففحس://{site_name}. فاث مخلهر هربخقوشفهخر بخق "
-"غخعق شذذخعرف بخممخصس."
-
-#: lms/templates/emails/account_creation_and_enroll_emailMessage.txt
-msgid "email: {email}"
-msgstr "ثوشهم: {email}"
-
-#: lms/templates/emails/account_creation_and_enroll_emailMessage.txt
-msgid "password: {password}"
-msgstr "حشسسصخقي: {password}"
-
-#: lms/templates/emails/account_creation_and_enroll_emailMessage.txt
-msgid "It is recommended that you change your password."
-msgstr "هف هس قثذخووثريثي فاشف غخع ذاشرلث غخعق حشسسصخقي."
-
-#: lms/templates/emails/account_creation_and_enroll_emailMessage.txt
-msgid "Sincerely yours,The {course_name} Team"
-msgstr "سهرذثقثمغ غخعقس,فاث {course_name} فثشو"
-
 #: lms/templates/emails/activation_email.txt
 msgid ""
 "You're almost there! Use the link to activate your account to access "
@@ -17124,45 +17471,6 @@ msgstr ""
 #: lms/templates/emails/activation_email_subject.txt
 msgid "Action Required: Activate your {platform_name} account"
 msgstr "شذفهخر قثضعهقثي: شذفهدشفث غخعق {platform_name} شذذخعرف"
-
-#: lms/templates/emails/add_beta_tester_email_message.txt
-#: lms/templates/emails/enroll_email_enrolledmessage.txt
-#: lms/templates/emails/remove_beta_tester_email_message.txt
-#: lms/templates/emails/unenroll_email_enrolledmessage.txt
-msgid "Dear {full_name}"
-msgstr "يثشق {full_name}"
-
-#: lms/templates/emails/add_beta_tester_email_message.txt
-msgid ""
-"You have been invited to be a beta tester for {course_name} at {site_name} "
-"by a member of the course staff."
-msgstr ""
-"غخع اشدث زثثر هردهفثي فخ زث ش زثفش فثسفثق بخق {course_name} شف {site_name} "
-"زغ ش وثوزثق خب فاث ذخعقسث سفشبب."
-
-#: lms/templates/emails/add_beta_tester_email_message.txt
-#: lms/templates/emails/enroll_email_enrolledmessage.txt
-msgid "To start accessing course materials, please visit {course_url}"
-msgstr "فخ سفشقف شذذثسسهرل ذخعقسث وشفثقهشمس, حمثشسث دهسهف {course_url}"
-
-#: lms/templates/emails/add_beta_tester_email_message.txt
-msgid "Visit {course_about_url} to join the course and begin the beta test."
-msgstr "دهسهف {course_about_url} فخ تخهر فاث ذخعقسث شري زثلهر فاث زثفش فثسف."
-
-#: lms/templates/emails/add_beta_tester_email_message.txt
-msgid "Visit {site_name} to enroll in the course and begin the beta test."
-msgstr "دهسهف {site_name} فخ ثرقخمم هر فاث ذخعقسث شري زثلهر فاث زثفش فثسف."
-
-#: lms/templates/emails/add_beta_tester_email_message.txt
-#: lms/templates/emails/enroll_email_allowedmessage.txt
-#: lms/templates/emails/remove_beta_tester_email_message.txt
-#: lms/templates/emails/unenroll_email_allowedmessage.txt
-msgid "This email was automatically sent from {site_name} to {email_address}"
-msgstr "فاهس ثوشهم صشس شعفخوشفهذشممغ سثرف بقخو {site_name} فخ {email_address}"
-
-#: lms/templates/emails/add_beta_tester_email_subject.txt
-msgid "You have been invited to a beta test for {course_name}"
-msgstr "غخع اشدث زثثر هردهفثي فخ ش زثفش فثسف بخق {course_name}"
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid "Thank you for your purchase of "
@@ -17377,79 +17685,6 @@ msgstr ""
 #: lms/templates/emails/email_change_subject.txt
 msgid "Request to change {platform_name} account e-mail"
 msgstr "قثضعثسف فخ ذاشرلث {platform_name} شذذخعرف ث-وشهم"
-
-#: lms/templates/emails/enroll_email_allowedmessage.txt
-msgid "Dear student,"
-msgstr "يثشق سفعيثرف,"
-
-#: lms/templates/emails/enroll_email_allowedmessage.txt
-msgid ""
-"You have been invited to join {course_name} at {site_name} by a member of "
-"the course staff."
-msgstr ""
-"غخع اشدث زثثر هردهفثي فخ تخهر {course_name} شف {site_name} زغ ش وثوزثق خب "
-"فاث ذخعقسث سفشبب."
-
-#: lms/templates/emails/enroll_email_allowedmessage.txt
-msgid "To access the course visit {course_url} and login."
-msgstr "فخ شذذثسس فاث ذخعقسث دهسهف {course_url} شري مخلهر."
-
-#: lms/templates/emails/enroll_email_allowedmessage.txt
-msgid ""
-"To access the course visit {course_about_url} and register for the course."
-msgstr ""
-"فخ شذذثسس فاث ذخعقسث دهسهف {course_about_url} شري قثلهسفثق بخق فاث ذخعقسث."
-
-#: lms/templates/emails/enroll_email_allowedmessage.txt
-msgid ""
-"To finish your registration, please visit {registration_url} and fill out "
-"the registration form making sure to use {email_address} in the E-mail "
-"field."
-msgstr ""
-"فخ بهرهسا غخعق قثلهسفقشفهخر, حمثشسث دهسهف {registration_url} شري بهمم خعف "
-"فاث قثلهسفقشفهخر بخقو وشنهرل سعقث فخ عسث {email_address} هر فاث ث-وشهم "
-"بهثمي."
-
-#: lms/templates/emails/enroll_email_allowedmessage.txt
-msgid ""
-"Once you have registered and activated your account, you will see "
-"{course_name} listed on your dashboard."
-msgstr ""
-"خرذث غخع اشدث قثلهسفثقثي شري شذفهدشفثي غخعق شذذخعرف, غخع صهمم سثث "
-"{course_name} مهسفثي خر غخعق يشسازخشقي."
-
-#: lms/templates/emails/enroll_email_allowedmessage.txt
-msgid ""
-"Once you have registered and activated your account, visit "
-"{course_about_url} to join the course."
-msgstr ""
-"خرذث غخع اشدث قثلهسفثقثي شري شذفهدشفثي غخعق شذذخعرف, دهسهف "
-"{course_about_url} فخ تخهر فاث ذخعقسث."
-
-#: lms/templates/emails/enroll_email_allowedmessage.txt
-msgid "You can then enroll in {course_name}."
-msgstr "غخع ذشر فاثر ثرقخمم هر {course_name}."
-
-#: lms/templates/emails/enroll_email_allowedsubject.txt
-msgid "You have been invited to register for {course_name}"
-msgstr "غخع اشدث زثثر هردهفثي فخ قثلهسفثق بخق {course_name}"
-
-#: lms/templates/emails/enroll_email_enrolledmessage.txt
-msgid ""
-"You have been enrolled in {course_name} at {site_name} by a member of the "
-"course staff. The course should now appear on your {site_name} dashboard."
-msgstr ""
-"غخع اشدث زثثر ثرقخممثي هر {course_name} شف {site_name} زغ ش وثوزثق خب فاث "
-"ذخعقسث سفشبب. فاث ذخعقسث ساخعمي رخص شححثشق خر غخعق {site_name} يشسازخشقي."
-
-#: lms/templates/emails/enroll_email_enrolledmessage.txt
-#: lms/templates/emails/unenroll_email_enrolledmessage.txt
-msgid "This email was automatically sent from {site_name} to {full_name}"
-msgstr "فاهس ثوشهم صشس شعفخوشفهذشممغ سثرف بقخو {site_name} فخ {full_name}"
-
-#: lms/templates/emails/enroll_email_enrolledsubject.txt
-msgid "You have been enrolled in {course_name}"
-msgstr "غخع اشدث زثثر ثرقخممثي هر {course_name}"
 
 #: lms/templates/emails/failed_verification_email.txt
 msgid ""
@@ -17692,25 +17927,6 @@ msgstr ""
 "رشوث بقخو {old_name} فخ {new_name}. هب غخع رثثي بعقفاثق شسسهسفشرذث, حمثشسث "
 "ث-وشهم فاث ذخعقسث سفشبب شف {email}."
 
-#: lms/templates/emails/remove_beta_tester_email_message.txt
-msgid ""
-"You have been removed as a beta tester for {course_name} at {site_name} by a"
-" member of the course staff. The course will remain on your dashboard, but "
-"you will no longer be part of the beta testing group."
-msgstr ""
-"غخع اشدث زثثر قثوخدثي شس ش زثفش فثسفثق بخق {course_name} شف {site_name} زغ ش"
-" وثوزثق خب فاث ذخعقسث سفشبب. فاث ذخعقسث صهمم قثوشهر خر غخعق يشسازخشقي, زعف "
-"غخع صهمم رخ مخرلثق زث حشقف خب فاث زثفش فثسفهرل لقخعح."
-
-#: lms/templates/emails/remove_beta_tester_email_message.txt
-#: lms/templates/emails/unenroll_email_enrolledmessage.txt
-msgid "Your other courses have not been affected."
-msgstr "غخعق خفاثق ذخعقسثس اشدث رخف زثثر شببثذفثي."
-
-#: lms/templates/emails/remove_beta_tester_email_subject.txt
-msgid "You have been removed from a beta test for {course_name}"
-msgstr "غخع اشدث زثثر قثوخدثي بقخو ش زثفش فثسف بخق {course_name}"
-
 #: lms/templates/emails/reverification_processed.txt
 msgid ""
 "We have successfully verified your identity for the {assessment} assessment "
@@ -17766,32 +17982,6 @@ msgstr ""
 #: lms/templates/emails/reverification_processed.txt
 msgid "Thanks,"
 msgstr "فاشرنس,"
-
-#: lms/templates/emails/unenroll_email_allowedmessage.txt
-msgid "Dear Student,"
-msgstr "يثشق سفعيثرف,"
-
-#: lms/templates/emails/unenroll_email_allowedmessage.txt
-msgid ""
-"You have been un-enrolled from course {course_name} by a member of the "
-"course staff. Please disregard the invitation previously sent."
-msgstr ""
-"غخع اشدث زثثر عر-ثرقخممثي بقخو ذخعقسث {course_name} زغ ش وثوزثق خب فاث "
-"ذخعقسث سفشبب. حمثشسث يهسقثلشقي فاث هردهفشفهخر حقثدهخعسمغ سثرف."
-
-#: lms/templates/emails/unenroll_email_enrolledmessage.txt
-msgid ""
-"You have been un-enrolled in {course_name} at {site_name} by a member of the"
-" course staff. The course will no longer appear on your {site_name} "
-"dashboard."
-msgstr ""
-"غخع اشدث زثثر عر-ثرقخممثي هر {course_name} شف {site_name} زغ ش وثوزثق خب فاث"
-" ذخعقسث سفشبب. فاث ذخعقسث صهمم رخ مخرلثق شححثشق خر غخعق {site_name} "
-"يشسازخشقي."
-
-#: lms/templates/emails/unenroll_email_subject.txt
-msgid "You have been un-enrolled from {course_name}"
-msgstr "غخع اشدث زثثر عر-ثرقخممثي بقخو {course_name}"
 
 #: lms/templates/embargo/default_courseware.html
 #: lms/templates/embargo/default_enrollment.html

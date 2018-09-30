@@ -252,7 +252,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-09-17 08:03+0000\n"
+"POT-Creation-Date: 2018-09-23 20:42+0000\n"
 "PO-Revision-Date: 2018-07-23 07:15+0000\n"
 "Last-Translator: Muhammad Ayub khan <ayubkhan@edx.org>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
@@ -368,6 +368,27 @@ msgstr "Состояние"
 #: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
 msgid "Pending"
 msgstr "Ожидание"
+
+#: cms/templates/admin/base_site.html lms/templates/admin/base_site.html
+msgid "Django site admin"
+msgstr ""
+
+#: cms/templates/admin/base_site.html lms/templates/admin/base_site.html
+msgid "Django administration"
+msgstr ""
+
+#: cms/templates/admin/base_site.html lms/templates/admin/base_site.html
+msgid "View site"
+msgstr ""
+
+#: cms/templates/admin/base_site.html lms/templates/admin/base_site.html
+msgid "Documentation"
+msgstr ""
+
+#: cms/templates/admin/base_site.html lms/templates/admin/base_site.html
+#: wiki/templates/wiki/base.html
+msgid "Log out"
+msgstr ""
 
 #: common/djangoapps/course_modes/admin.py
 #: common/djangoapps/course_modes/models.py
@@ -578,6 +599,27 @@ msgstr "Обучающийся"
 #: common/djangoapps/student/admin.py
 msgid "User profile"
 msgstr "Профиль пользователя"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the login form
+#. meant to hold the user's password.
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's password.
+#: common/djangoapps/student/admin.py openedx/core/djangoapps/user_api/api.py
+#: cms/templates/login.html cms/templates/register.html
+#: lms/templates/login.html lms/templates/provider_login.html
+#: lms/templates/register-form.html lms/templates/signup_modal.html
+#: lms/templates/sysadmin_dashboard.html
+#: themes/red-theme/cms/templates/login.html
+#: themes/stanford-style/lms/templates/register-form.html
+msgid "Password"
+msgstr "Пароль"
+
+#: common/djangoapps/student/admin.py
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user's "
+"password."
+msgstr ""
 
 #: common/djangoapps/student/forms.py
 msgid ""
@@ -2062,11 +2104,6 @@ msgstr "Не удалось определить числовое значени
 
 #: common/lib/capa/capa/responsetypes.py
 #, python-brace-format
-msgid "You may not use variables ({bad_variables}) in numerical problems."
-msgstr ""
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid "Factorial function evaluated outside its domain:'{student_answer}'"
 msgstr ""
 
@@ -2190,11 +2227,6 @@ msgstr "Внешнее оценивание"
 #: common/lib/capa/capa/responsetypes.py
 msgid "Math Expression Input"
 msgstr "Ввод математического выражения"
-
-#: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
-msgid "Invalid input: {bad_input} not permitted in answer."
-msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 #, python-brace-format
@@ -8391,359 +8423,6 @@ msgstr "Оговорка об ограничении ответственнос�
 msgid "TERMS AND CONDITIONS"
 msgstr "ПОЛОЖЕНИЯ И УСЛОВИЯ"
 
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
-msgid "The payment processor did not return a required parameter: {0}"
-msgstr "Платёжный сервис не передал нужного параметра: {0}"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
-msgid "The payment processor returned a badly-typed value {0} for param {1}."
-msgstr "Платёжный сервис передал значение {0} для параметра {1} с опечаткой."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"The payment processor accepted an order whose number is not in our system."
-msgstr "Платёжный сервис принял заказ, которого нет в нашей системе."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
-msgid ""
-"The amount charged by the processor {0} {1} is different than the total cost"
-" of the order {2} {3}."
-msgstr ""
-"Сумма, которую запросил платёжный сервис {0} {1}, отличается от итоговой "
-"стоимости заказа {2} {3}."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
-msgid ""
-"Sorry! Our payment processor did not accept your payment. The decision they "
-"returned was {decision_text}, and the reason was {reason_text}. You were not"
-" charged. Please try a different form of payment. Contact us with payment-"
-"related questions at {email}."
-msgstr ""
-"К сожалению, наша система платежей не приняла ваш платёж.  Полученный ответ:"
-" {decision_text}. Причина: {reason_text}.  Денежные средства не были сняты с"
-" вашего счёта. Пожалуйста, попробуйте другой способ оплаты. По вопросам "
-"оплаты свяжитесь с нами по адресу {email}."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
-msgid ""
-"Sorry! Our payment processor sent us back a payment confirmation that had "
-"inconsistent data!We apologize that we cannot verify whether the charge went"
-" through and take further action on your order.The specific error message "
-"is: {error_message}. Your credit card may possibly have been charged. "
-"Contact us with payment-specific questions at {email}."
-msgstr ""
-"К сожалению, наша система платежей прислала подтверждение оплаты с "
-"противоречивыми данными. Примите наши извинения: мы не можем проверить, "
-"прошёл ли платёж и предпринять дальнейшие действия в отношении вашего "
-"заказа. Содержание сообщения об ошибке: {error_message}. Возможно, денежные "
-"средства были сняты с вашей кредитной карты. По вопросам оплаты свяжитесь с "
-"нами по адресу {email}."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
-msgid ""
-"Sorry! Due to an error your purchase was charged for a different amount than"
-" the order total! The specific error message is: {error_message}. Your "
-"credit card has probably been charged. Contact us with payment-specific "
-"questions at {email}."
-msgstr ""
-"К сожалению, произошла ошибка: сумма, снятая за вашу покупку, не совпадает с"
-" итоговой суммой вашего заказа. Содержание сообщения об ошибке: "
-"{error_message}. Скорее всего, денежные средства были сняты с вашей "
-"кредитной карты. По вопросам оплаты свяжитесь с нами по адресу {email}."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
-msgid ""
-"Sorry! Our payment processor sent us back a corrupted message regarding your"
-" charge, so we are unable to validate that the message actually came from "
-"the payment processor. The specific error message is: {error_message}. We "
-"apologize that we cannot verify whether the charge went through and take "
-"further action on your order. Your credit card may possibly have been "
-"charged. Contact us with payment-specific questions at {email}."
-msgstr ""
-"К сожалению, наша система платежей вернула повреждённое сообщение о вашем "
-"платеже, и мы не можем удостовериться в том, что сообщение действительно "
-"пришло от системы платежей.  Содержание сообщения об ошибке: "
-"{error_message}. Приносим свои извинения: мы не можем проверить, прошёл ли "
-"платёж, и предпринять дальнейшие действия в отношении вашего заказа. "
-"Возможно, денежные средства были сняты с вашей кредитной карты. По вопросам "
-"оплаты свяжитесь с нами по адресу {email}."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "Successful transaction."
-msgstr "Транзакция успешна."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "The request is missing one or more required fields."
-msgstr "В запросе не заполнено как минимум одно обязательное поле."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "One or more fields in the request contains invalid data."
-msgstr "Как минимум одно из полей в запросе содержит некорректные данные."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"\n"
-"            The merchantReferenceCode sent with this authorization request matches the\n"
-"            merchantReferenceCode of another authorization request that you sent in the last 15 minutes.\n"
-"            Possible fix: retry the payment after 15 minutes.\n"
-"            "
-msgstr ""
-"\n"
-"            За последние 15 минут вы отправили запрос\n"
-"            на авторизацию с таким же кодом продавца.\n"
-"            Повторите попытку через 15 минут.\n"
-"            "
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"Error: General system failure. Possible fix: retry the payment after a few "
-"minutes."
-msgstr ""
-"Ошибка: общий сбой системы. Вероятное решение: снова попробуйте провести "
-"платёж через несколько минут."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"\n"
-"            Error: The request was received but there was a server timeout.\n"
-"            This error does not include timeouts between the client and the server.\n"
-"            Possible fix: retry the payment after some time.\n"
-"            "
-msgstr ""
-"\n"
-"            Запрос получен, но сервер не успел его обработать.\n"
-"            Истечение срока ожидания соединения между клиентом и сервером не вызывает эту ошибку.\n"
-"            Повторите попытку позже.\n"
-"            "
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"\n"
-"            Error: The request was received, but a service did not finish running in time\n"
-"            Possible fix: retry the payment after some time.\n"
-"            "
-msgstr ""
-"\n"
-"Ошибка: запрос был получен, но сервер не успел обработать его за нужное время.\n"
-"Возможное решение: повторите платёж через какое-то время.\n"
-"            "
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"The issuing bank has questions about the request. Possible fix: retry with "
-"another form of payment"
-msgstr ""
-"Банк, выпустивший карту, пока не может одобрить платёж. Обратитесь к "
-"представителям банка или используйте другой способ оплаты."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"\n"
-"            Expired card. You might also receive this if the expiration date you\n"
-"            provided does not match the date the issuing bank has on file.\n"
-"            Possible fix: retry with another form of payment\n"
-"            "
-msgstr ""
-"\n"
-"            Срок действия карты истёк или\n"
-"            указан неправильно.\n"
-"            Вы можете использовать другой способ оплаты.\n"
-"            "
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"\n"
-"            General decline of the card. No other information provided by the issuing bank.\n"
-"            Possible fix: retry with another form of payment\n"
-"            "
-msgstr ""
-"\n"
-"            Общий отказ в проведении операции по карте. Банк-эмитент не предоставил дополнительной информации.\n"
-"            Возможное решение: попробуйте другой вид платежа\n"
-"            "
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"Insufficient funds in the account. Possible fix: retry with another form of "
-"payment"
-msgstr ""
-"На счету недостаточно средств. Вы можете использовать другой способ оплаты."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid "Unknown reason"
-msgstr "Неизвестная причина"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"Issuing bank unavailable. Possible fix: retry again after a few minutes"
-msgstr ""
-"Банк-эмитент недоступен. Вероятное решение: попробуйте ещё раз через "
-"несколько минут"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"\n"
-"            Inactive card or card not authorized for card-not-present transactions.\n"
-"            Possible fix: retry with another form of payment\n"
-"            "
-msgstr ""
-"\n"
-"Неактивная карта или карта не предназначена для онлайн-платежей.\n"
-"Возможное решение: попробуйте другой вид платежа\n"
-"            "
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"The card has reached the credit limit. Possible fix: retry with another form"
-" of payment"
-msgstr ""
-"Карта достигла кредитного лимита. Вероятное решение: попробуйте другой "
-"способ оплаты."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"Invalid card verification number. Possible fix: retry with another form of "
-"payment"
-msgstr ""
-"Неправильный код CVC/CVV. Вероятное решение: попробуйте другой способ "
-"оплаты."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"Invalid account number. Possible fix: retry with another form of payment"
-msgstr ""
-"Некорректный номер счёта. Возможное решение: попробуйте другой способ оплаты"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"\n"
-"            The card type is not accepted by the payment processor.\n"
-"            Possible fix: retry with another form of payment\n"
-"            "
-msgstr ""
-"\n"
-"            Данный вид карты не принимается системой платежей.\n"
-"            Возможное решение: попробуйте оплатить другим способом\n"
-"            "
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"General decline by the processor.  Possible fix: retry with another form of "
-"payment"
-msgstr ""
-"Общий отказ сервиса. Вероятное решение: попробуйте другой способ оплаты"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
-msgid ""
-"There is a problem with our CyberSource merchant configuration.  Please let "
-"us know at {0}"
-msgstr ""
-"Возникла проблема с настройкой платёжной системы CyberSource. Пожалуйста, дайте нам знать {0}\n"
-"            "
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid "The requested amount exceeds the originally authorized amount."
-msgstr "Запрошенная сумма превышает авторизованную ранее."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid "Processor Failure.  Possible fix: retry the payment"
-msgstr "Ошибка сервиса. Вероятное решение: попробуйте ещё раз"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid "The authorization has already been captured"
-msgstr "Платёж уже принят"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid ""
-"The requested transaction amount must match the previous transaction amount."
-msgstr ""
-"Запрошенная сумма транзакции должна совпадать с прошлой суммой транзакции."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"\n"
-"            The card type sent is invalid or does not correlate with the credit card number.\n"
-"            Possible fix: retry with the same card or another form of payment\n"
-"            "
-msgstr ""
-"\n"
-"Тип карты неверен или не соответствует номеру карты.\n"
-"Возможное решение: попробуйте ещё раз с этой же картой или другим видом платежа\n"
-"            "
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "The request ID is invalid."
-msgstr "Недействительный идентификатор запроса."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"\n"
-"            You requested a capture through the API, but there is no corresponding, unused authorization record.\n"
-"            "
-msgstr ""
-"\n"
-"            Вы запросили захват средств через API, но связи нет, неиспользуемая авторизационная запись.\n"
-"            "
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-msgid "The transaction has already been settled or reversed."
-msgstr "Транзакция уже была проведена или обращена."
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"\n"
-"            The capture or credit is not voidable because the capture or credit information has already been\n"
-"            submitted to your processor. Or, you requested a void for a type of transaction that cannot be voided.\n"
-"            "
-msgstr ""
-"\n"
-"            Платёж не может быть отменён, поскольку сумма или информация о кредите уже отправлена\n"
-"            в платёжный сервис, либо данный тип транзакции отменить невозможно.\n"
-"            "
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid "You requested a credit for a capture that was previously voided"
-msgstr "Вы запросили список участников для записи, которая ранее была удалена"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"\n"
-"            Error: The request was received, but there was a timeout at the payment processor.\n"
-"            Possible fix: retry the payment.\n"
-"            "
-msgstr ""
-"\n"
-"            Запрос получен, но платёжная система не успела его обработать.\n"
-"            Повторите попытку.\n"
-"            "
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"\n"
-"            The authorization request was approved by the issuing bank but declined by CyberSource.'\n"
-"            Possible fix: retry with a different form of payment.\n"
-"            "
-msgstr ""
-"\n"
-"Запрос авторизации был одобрен банком, но отклонён системой CyberSource.'\n"
-"Возможное решение: попробуйте другую форму платежа.\n"
-"            "
-
 #. Translators: this text appears when an unfamiliar error code occurs during
 #. payment,
 #. for which we don't know a user-friendly message to display in advance.
@@ -8764,6 +8443,11 @@ msgid ""
 msgstr ""
 "Платёжный сервис передал значение  {value} для параметра {parameter} с "
 "опечаткой."
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"The payment processor accepted an order whose number is not in our system."
+msgstr "Платёжный сервис принял заказ, которого нет в нашей системе."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 #, python-brace-format
@@ -8867,6 +8551,18 @@ msgstr ""
 "Извините! Ваш платёж не может быть обработан из-за возникновения "
 "непредвиденной ситуации. Пожалуйста, свяжитесь с нами по адресу {email} для "
 "помощи."
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "Successful transaction."
+msgstr "Транзакция успешна."
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "The request is missing one or more required fields."
+msgstr "В запросе не заполнено как минимум одно обязательное поле."
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "One or more fields in the request contains invalid data."
+msgstr "Как минимум одно из полей в запросе содержит некорректные данные."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
@@ -9081,6 +8777,12 @@ msgstr "Платёж уже принят."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
+"The requested transaction amount must match the previous transaction amount."
+msgstr ""
+"Запрошенная сумма транзакции должна совпадать с прошлой суммой транзакции."
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
 "\n"
 "            The card type sent is invalid or does not correlate with the credit card number.\n"
 "            Possible action: retry with the same card or another form of payment.\n"
@@ -9090,6 +8792,10 @@ msgstr ""
 "            Тип карты указан неверно или не соответствует номеру кредитной карты.\n"
 "            Вы можете использовать другой способ оплаты.\n"
 "            "
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "The request ID is invalid."
+msgstr "Недействительный идентификатор запроса."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
@@ -9104,6 +8810,10 @@ msgstr ""
 "            если ранее при авторизации произошёл сбой, либо уже была подтверждена\n"
 "            операция с другой суммой.\n"
 "            "
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "The transaction has already been settled or reversed."
+msgstr "Транзакция уже была проведена или обращена."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
@@ -9391,6 +9101,10 @@ msgstr ""
 
 #: lms/djangoapps/support/views/manage_user.py
 msgid "Unusable"
+msgstr ""
+
+#: lms/djangoapps/support/views/manage_user.py
+msgid "User Enabled Successfully"
 msgstr ""
 
 #: lms/djangoapps/support/views/manage_user.py
@@ -11376,20 +11090,6 @@ msgid "The email address you used to register with {platform_name}"
 msgstr ""
 "Электронный адрес, который вы использовали для регистрации на "
 "{platform_name}"
-
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: This label appears above a field on the login form
-#. meant to hold the user's password.
-#. Translators: This label appears above a field on the registration form
-#. meant to hold the user's password.
-#: openedx/core/djangoapps/user_api/api.py cms/templates/login.html
-#: cms/templates/register.html lms/templates/login.html
-#: lms/templates/provider_login.html lms/templates/register-form.html
-#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
-#: themes/red-theme/cms/templates/login.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Password"
-msgstr "Пароль"
 
 #: openedx/core/djangoapps/user_api/api.py lms/templates/login.html
 msgid "Remember me"
@@ -25855,10 +25555,6 @@ msgstr ""
 
 #: wiki/templates/wiki/base.html
 msgid "Search..."
-msgstr ""
-
-#: wiki/templates/wiki/base.html
-msgid "Log out"
 msgstr ""
 
 #: wiki/templates/wiki/base.html wiki/templates/wiki/accounts/login.html
