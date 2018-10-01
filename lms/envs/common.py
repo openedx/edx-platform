@@ -1245,6 +1245,8 @@ MIDDLEWARE_CLASSES = [
     'openedx.core.djangoapps.cors_csrf.middleware.CsrfCrossDomainCookieMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
 
+    'openedx.core.djangoapps.safe_endpoints.middleware.EnsureJWTAuthSettingsMiddleware',
+
     'splash.middleware.SplashMiddleware',
 
     'openedx.core.djangoapps.geoinfo.middleware.CountryMiddleware',
