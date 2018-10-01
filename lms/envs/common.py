@@ -3166,6 +3166,7 @@ JWT_AUTH = {
     'JWT_COOKIE_EXPIRATION': 60 * 60,
 
     'JWT_LOGIN_CLIENT_ID': 'login-service-client-id',
+    'JWT_LOGIN_SERVICE_USERNAME': 'login_service_user',
 
     'JWT_SUPPORTED_VERSION': '1.1.0',
 
