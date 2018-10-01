@@ -17,6 +17,7 @@ from six import text_type
 
 import accounts
 from django_comment_common.models import Role
+from edx_rest_framework_extensions.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx import locator
 from opaque_keys.edx.keys import CourseKey
@@ -32,7 +33,6 @@ from openedx.core.djangoapps.user_api.preferences.api import get_country_time_zo
 from openedx.core.djangoapps.user_api.serializers import CountryTimeZoneSerializer, UserPreferenceSerializer, UserSerializer
 from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
 from openedx.core.djangoapps.user_authn.views.register import create_account_with_params
-from openedx.core.lib.api.authentication import SessionAuthenticationAllowInactiveUser
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 from student.helpers import AccountValidationError
 from util.json_request import JsonResponse

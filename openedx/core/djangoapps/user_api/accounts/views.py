@@ -17,7 +17,7 @@ from django.db import transaction
 from django.utils.translation import ugettext as _
 from edx_ace import ace
 from edx_ace.recipient import Recipient
-from edx_rest_framework_extensions.authentication import JwtAuthentication
+from edx_rest_framework_extensions.authentication import JwtAuthentication, SessionAuthenticationAllowInactiveUser
 from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomerUser, PendingEnterpriseCustomerUser
 from integrated_channels.degreed.models import DegreedLearnerDataTransmissionAudit
 from integrated_channels.sap_success_factors.models import SapSuccessFactorsLearnerDataTransmissionAudit
@@ -41,10 +41,7 @@ from openedx.core.djangoapps.course_groups.models import UnregisteredLearnerCoho
 from openedx.core.djangoapps.profile_images.images import remove_profile_images
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
 from openedx.core.djangolib.oauth2_retirement_utils import retire_dot_oauth2_models, retire_dop_oauth2_models
-from openedx.core.lib.api.authentication import (
-    OAuth2AuthenticationAllowInactiveUser,
-    SessionAuthenticationAllowInactiveUser
-)
+from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.parsers import MergePatchParser
 from student.models import (
     CourseEnrollment,
