@@ -92,13 +92,10 @@ class TestPaverNodeInstall(PaverTestCase):
         an npm install error ("cb() never called!"). Test that we can handle
         this kind of failure. For more info see TE-1767.
         """
-        with patch('pavelib.utils.decorators.timeout') as _timeout_patch:
-            _timeout_patch.return_value = lambda x: x
-            reload(pavelib.prereqs)
-            with patch('subprocess.Popen') as _mock_popen:
-                _mock_popen.side_effect = fail_on_npm_install
-                with self.assertRaises(BuildFailure):
-                    pavelib.prereqs.node_prereqs_installation()
+        with patch('subprocess.Popen') as _mock_popen:
+            _mock_popen.side_effect = fail_on_npm_install
+            with self.assertRaises(BuildFailure):
+                pavelib.prereqs.node_prereqs_installation()
         # npm install will be called twice
         self.assertEquals(_mock_popen.call_count, 2)
 
@@ -106,11 +103,8 @@ class TestPaverNodeInstall(PaverTestCase):
         """
         Vanilla npm install should only be calling npm install one time
         """
-        with patch('pavelib.utils.decorators.timeout') as _timeout_patch:
-            _timeout_patch.return_value = lambda x: x
-            reload(pavelib.prereqs)
-            with patch('subprocess.Popen') as _mock_popen:
-                pavelib.prereqs.node_prereqs_installation()
+        with patch('subprocess.Popen') as _mock_popen:
+            pavelib.prereqs.node_prereqs_installation()
         # when there's no failure, npm install is only called once
         self.assertEquals(_mock_popen.call_count, 1)
 
@@ -118,11 +112,8 @@ class TestPaverNodeInstall(PaverTestCase):
         """
         If there's some other error, only call npm install once, and raise a failure
         """
-        with patch('pavelib.utils.decorators.timeout') as _timeout_patch:
-            _timeout_patch.return_value = lambda x: x
-            reload(pavelib.prereqs)
-            with patch('subprocess.Popen') as _mock_popen:
-                _mock_popen.side_effect = unexpected_fail_on_npm_install
-                with self.assertRaises(BuildFailure):
-                    pavelib.prereqs.node_prereqs_installation()
+        with patch('subprocess.Popen') as _mock_popen:
+            _mock_popen.side_effect = unexpected_fail_on_npm_install
+            with self.assertRaises(BuildFailure):
+                pavelib.prereqs.node_prereqs_installation()
         self.assertEquals(_mock_popen.call_count, 1)
