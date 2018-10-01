@@ -127,9 +127,9 @@ class CreateScheduleTests(SharedModuleStoreTestCase):
                 self.assert_schedule_created()
                 assert not mock_track.called
             else:
-                self.assert_schedule_not_created()
                 mock_track.assert_called_once()
                 assert mock_track.call_args[1].get('event') == 'edx.bi.schedule.suppressed'
+                self.assert_schedule_not_created()
 
     @patch('openedx.core.djangoapps.schedules.signals.log.exception')
     @patch('openedx.core.djangoapps.schedules.signals.Schedule.objects.create')
