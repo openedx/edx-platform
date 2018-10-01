@@ -1,5 +1,6 @@
 """Utilities for working with ID tokens."""
 import json
+import logging
 from time import time
 
 from django.conf import settings
@@ -9,6 +10,9 @@ from jwkest.jws import JWS
 
 from edx_django_utils.monitoring import set_custom_metric
 from student.models import UserProfile, anonymous_id_for_user
+
+
+log = logging.getLogger(__name__)
 
 
 class JwtBuilder(object):

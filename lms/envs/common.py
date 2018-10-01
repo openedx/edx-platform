@@ -1203,6 +1203,11 @@ CREDIT_NOTIFICATION_CACHE_TIMEOUT = 5 * 60 * 60
 MIDDLEWARE_CLASSES = [
     'crum.CurrentRequestUserMiddleware',
 
+    'edx_rest_framework_extensions.auth.jwt.middleware.JwtAuthCookieMiddleware',
+
+    # Deprecated, but well entrenched RequestCache
+    'openedx.core.djangoapps.request_cache.middleware.RequestCache',
+
     # A newer and safer request cache.
     'edx_django_utils.cache.middleware.RequestCacheMiddleware',
     'edx_django_utils.monitoring.middleware.MonitoringCustomMetricsMiddleware',
@@ -3166,6 +3171,12 @@ JWT_AUTH = {
 
     'JWT_ISSUER': 'change-me',
     'JWT_AUDIENCE': 'change-me',
+
+    'JWT_AUTH_COOKIE': 'edx-jwt-cookie',
+    'JWT_AUTH_COOKIE_HEADER_PAYLOAD': 'edx-jwt-cookie-header-payload',
+    'JWT_AUTH_COOKIE_SIGNATURE': 'edx-jwt-cookie-signature',
+    'JWT_AUTH_COOKIE_REFRESH_TOKEN': 'edx-jwt-cookie-refresh-token',
+    'JWT_AUTH_COOKIE_EXPIRATION': 300,  # in seconds
 }
 
 ################################ Settings for Microsites ################################

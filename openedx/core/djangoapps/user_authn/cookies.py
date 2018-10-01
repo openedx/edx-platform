@@ -113,16 +113,13 @@ def set_logged_in_cookies(request, response, user):
     """
     Set cookies at the time of user login. See ALL_LOGGED_IN_COOKIE_NAMES to see
     which cookies are set.
-
     Arguments:
         request (HttpRequest): The request to the view, used to calculate
             the cookie's expiration date based on the session expiration date.
         response (HttpResponse): The response on which the cookie will be set.
         user (User): The currently logged in user.
-
     Returns:
         HttpResponse
-
     """
     # Note: The user may not yet be set on the request object by this time,
     # especially during third party authentication.  So use the user object
@@ -158,7 +155,6 @@ def _set_deprecated_logged_in_cookie(response, request):
 def _set_deprecated_user_info_cookie(response, request, user):
     """
     Sets the user info cookie on the response.
-
     The user info cookie has the following format:
     {
         "version": 1,

@@ -1,5 +1,6 @@
 """HTTP end-points for the User API. """
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import NON_FIELD_ERRORS, PermissionDenied, ValidationError
 from django.db import transaction
@@ -9,6 +10,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt, csrf_protect, ensure_csrf_cookie
 from django.views.decorators.debug import sensitive_post_parameters
 from django_filters.rest_framework import DjangoFilterBackend
+from oauth2_provider.models import Application, RefreshToken
 from rest_framework import authentication, generics, status, viewsets
 from rest_framework.exceptions import ParseError
 from rest_framework.views import APIView
@@ -27,6 +29,8 @@ from openedx.core.djangoapps.user_api.api import (
     get_login_session_form,
     get_password_reset_form
 )
+from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
+from openedx.core.djangoapps.oauth_dispatch.adapters.dot import DOTAdapter
 from openedx.core.djangoapps.user_api.helpers import require_post_params, shim_student_view
 from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.core.djangoapps.user_api.preferences.api import get_country_time_zones, update_email_opt_in
@@ -34,6 +38,8 @@ from openedx.core.djangoapps.user_api.serializers import CountryTimeZoneSerializ
 from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
 from openedx.core.djangoapps.user_authn.views.register import create_account_with_params
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
+from openedx.core.lib.token_utils import JwtBuilder
+from student.cookies import set_logged_in_cookies, standard_cookie_settings
 from student.helpers import AccountValidationError
 from util.json_request import JsonResponse
 
@@ -45,7 +51,7 @@ class LoginSessionView(APIView):
     # so do not require authentication.
     authentication_classes = []
 
-    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(ensure_csrf_cookie_cross_domain)
     def get(self, request):
         return HttpResponse(get_login_session_form(request).to_json(), content_type="application/json")
 
@@ -89,6 +95,49 @@ class LoginSessionView(APIView):
     @method_decorator(sensitive_post_parameters("password"))
     def dispatch(self, request, *args, **kwargs):
         return super(LoginSessionView, self).dispatch(request, *args, **kwargs)
+
+
+class RefreshAccessTokenView(APIView):
+    """HTTP end-points for refreshing JWT cookies. """
+
+    authentication_classes = []
+
+    @method_decorator(csrf_protect)
+    def post(self, request):
+        response = JsonResponse()
+        refresh_token = request.COOKIES.get(settings.JWT_AUTH['JWT_AUTH_COOKIE_REFRESH_TOKEN'])
+        try:
+            user = RefreshToken.objects.get(token=refresh_token).user
+        except RefreshToken.DoesNotExist:
+            response.status_code = 401
+        else:
+            oauth_application = Application.objects.get(client_id='doug-id')
+            DOTAdapter().create_access_token(request, user, 0, oauth_application, refresh_token)
+            jwt_parts = self._build_jwt(request.user).split('.')
+            cookie_settings = standard_cookie_settings(request)
+            response.set_cookie(
+                settings.JWT_AUTH['JWT_AUTH_COOKIE_HEADER_PAYLOAD'].encode('utf-8'),
+                '.'.join(jwt_parts[0:2]),
+                **cookie_settings
+            )
+            cookie_settings['httponly'] = True
+            response.set_cookie(
+                settings.JWT_AUTH['JWT_AUTH_COOKIE_SIGNATURE'].encode('utf-8'),
+                jwt_parts[2],
+                **cookie_settings
+            )
+
+        return response
+
+    def _build_jwt(self, user):
+        """ Builds and returns a JWT. """
+        jwt_builder = JwtBuilder(user, asymmetric=True)
+        scopes = ['email', 'profile']
+        additional_claims = {
+            'filters': [],
+            'is_restricted': False,
+        }
+        return jwt_builder.build_token(scopes, additional_claims=additional_claims)
 
 
 class RegistrationView(APIView):
