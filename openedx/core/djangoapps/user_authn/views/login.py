@@ -20,7 +20,7 @@ from ratelimitbackend.exceptions import RateLimitException
 
 from edxmako.shortcuts import render_to_response
 from eventtracking import tracker
-from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies
+from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies, refresh_jwt_cookies
 from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
 import openedx.core.djangoapps.external_auth.views
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
@@ -392,4 +392,16 @@ def login_user(request):
         # detect that the user is logged in.
         return set_logged_in_cookies(request, response, possibly_authenticated_user)
     except AuthFailedError as error:
+        log.exception(error.get_response())
         return JsonResponse(error.get_response())
+
+
+@ensure_csrf_cookie
+@require_http_methods(['POST'])
+def login_refresh(request):
+    try:
+        response = JsonResponse({'success': True})
+        return refresh_jwt_cookies(request, response)
+    except AuthFailedError as error:
+        log.exception(error.get_response())
+        return JsonResponse(error.get_response(), status=400)

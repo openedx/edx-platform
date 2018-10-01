@@ -17,6 +17,7 @@ urlpatterns = [
     url(r'^login_post$', login.login_user, name='login_post'),
     url(r'^login_ajax$', login.login_user, name="login"),
     url(r'^login_ajax/(?P<error>[^/]*)$', login.login_user),
+    url(r'^login_refresh$', login.login_refresh, name="login_refresh"),
 
     url(r'^logout$', logout.LogoutView.as_view(), name='logout'),
 ]

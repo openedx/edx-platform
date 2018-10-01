@@ -40,7 +40,10 @@ def _finish_auth_url(params):
 class LoginFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, SharedModuleStoreTestCase):
     """Test rendering of the login form. """
 
-    URLCONF_MODULES = ['openedx.core.djangoapps.user_authn.urls']
+    URLCONF_MODULES = [
+        'openedx.core.djangoapps.user_authn.urls',
+        'openedx.core.djangoapps.user_api.legacy_urls',
+    ]
 
     @classmethod
     def setUpClass(cls):
