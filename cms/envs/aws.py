@@ -7,17 +7,17 @@ This is the default template for our main set of AWS servers.
 # pylint: disable=wildcard-import, unused-wildcard-import
 
 import json
-
-from .common import *
-
-from openedx.core.lib.derived import derive_settings
-from openedx.core.lib.logsettings import get_logger_config
 import os
 import logging
 import logging.config
 
 from path import Path as path
 from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed
+
+from .common import *
+
+from openedx.core.lib.derived import derive_settings  # pylint: disable=wrong-import-order
+from openedx.core.lib.logsettings import get_logger_config  # pylint: disable=wrong-import-order
 
 # SERVICE_VARIANT specifies name of the variant used, which decides what JSON
 # configuration files are read during startup.
@@ -601,7 +601,8 @@ COURSE_ENROLLMENT_MODES = ENV_TOKENS.get('COURSE_ENROLLMENT_MODES', COURSE_ENROL
 
 ####################### Plugin Settings ##########################
 
-from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants
+# This is at the bottom because it is going to load more settings after base settings are loaded
+from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants  # pylint: disable=wrong-import-order, wrong-import-position
 plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.CMS, plugin_constants.SettingsType.AWS)
 
 ########################## Derive Any Derived Settings  #######################
