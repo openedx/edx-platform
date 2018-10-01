@@ -7,6 +7,7 @@ from course_modes.models import (
 from courseware.date_summary import (
     verified_upgrade_deadline_link, verified_upgrade_link_is_valid
 )
+from openedx.core.djangoapps.course_groups.cohorts import get_cohort
 
 
 def check_and_get_upgrade_link_and_date(user, enrollment=None, course=None):
@@ -64,6 +65,9 @@ def get_experiment_user_metadata_context(course, user):
     forum_roles = []
     if user.is_authenticated:
         forum_roles = list(Role.objects.filter(users=user, course_id=course.id).values_list('name').distinct())
+    cohort_name = get_cohort(user, course.id, assign=False, use_cached=True)
+    if cohort_name:
+        cohort_name = cohort_name.name
 
     return {
         'upgrade_link': upgrade_link,
@@ -76,5 +80,6 @@ def get_experiment_user_metadata_context(course, user):
         'course_start': course.start,
         'course_end': course.end,
         'has_staff_access': has_staff_access,
-        'forum_roles': forum_roles
+        'forum_roles': forum_roles,
+        'cohort_name': cohort_name
     }

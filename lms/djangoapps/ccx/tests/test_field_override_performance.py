@@ -218,6 +218,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
             sql_queries, mongo_reads = self.TEST_DATA[
                 (overrides, course_width, enable_ccx, view_as_ccx)
             ]
+
             self.instrument_course_progress_render(
                 course_width, enable_ccx, view_as_ccx, sql_queries, mongo_reads,
             )
@@ -235,18 +236,18 @@ class TestFieldOverrideMongoPerformance(FieldOverridePerformanceTestCase):
         #     # of sql queries to default,
         #     # of mongo queries,
         # )
-        ('no_overrides', 1, True, False): (18, 1),
-        ('no_overrides', 2, True, False): (18, 1),
-        ('no_overrides', 3, True, False): (18, 1),
-        ('ccx', 1, True, False): (18, 1),
-        ('ccx', 2, True, False): (18, 1),
-        ('ccx', 3, True, False): (18, 1),
-        ('no_overrides', 1, False, False): (18, 1),
-        ('no_overrides', 2, False, False): (18, 1),
-        ('no_overrides', 3, False, False): (18, 1),
-        ('ccx', 1, False, False): (18, 1),
-        ('ccx', 2, False, False): (18, 1),
-        ('ccx', 3, False, False): (18, 1),
+        ('no_overrides', 1, True, False): (24, 2),
+        ('no_overrides', 2, True, False): (24, 2),
+        ('no_overrides', 3, True, False): (24, 2),
+        ('ccx', 1, True, False): (24, 2),
+        ('ccx', 2, True, False): (24, 2),
+        ('ccx', 3, True, False): (24, 2),
+        ('no_overrides', 1, False, False): (24, 2),
+        ('no_overrides', 2, False, False): (24, 2),
+        ('no_overrides', 3, False, False): (24, 2),
+        ('ccx', 1, False, False): (24, 2),
+        ('ccx', 2, False, False): (24, 2),
+        ('ccx', 3, False, False): (24, 2),
     }
 
 
@@ -258,19 +259,19 @@ class TestFieldOverrideSplitPerformance(FieldOverridePerformanceTestCase):
     __test__ = True
 
     TEST_DATA = {
-        ('no_overrides', 1, True, False): (18, 3),
-        ('no_overrides', 2, True, False): (18, 3),
-        ('no_overrides', 3, True, False): (18, 3),
-        ('ccx', 1, True, False): (18, 3),
-        ('ccx', 2, True, False): (18, 3),
-        ('ccx', 3, True, False): (18, 3),
-        ('ccx', 1, True, True): (19, 3),
-        ('ccx', 2, True, True): (19, 3),
-        ('ccx', 3, True, True): (19, 3),
-        ('no_overrides', 1, False, False): (18, 3),
-        ('no_overrides', 2, False, False): (18, 3),
-        ('no_overrides', 3, False, False): (18, 3),
-        ('ccx', 1, False, False): (18, 3),
-        ('ccx', 2, False, False): (18, 3),
-        ('ccx', 3, False, False): (18, 3),
+        ('no_overrides', 1, True, False): (24, 3),
+        ('no_overrides', 2, True, False): (24, 3),
+        ('no_overrides', 3, True, False): (24, 3),
+        ('ccx', 1, True, False): (24, 3),
+        ('ccx', 2, True, False): (24, 3),
+        ('ccx', 3, True, False): (24, 3),
+        ('ccx', 1, True, True): (25, 3),
+        ('ccx', 2, True, True): (25, 3),
+        ('ccx', 3, True, True): (25, 3),
+        ('no_overrides', 1, False, False): (24, 3),
+        ('no_overrides', 2, False, False): (24, 3),
+        ('no_overrides', 3, False, False): (24, 3),
+        ('ccx', 1, False, False): (24, 3),
+        ('ccx', 2, False, False): (24, 3),
+        ('ccx', 3, False, False): (24, 3),
     }

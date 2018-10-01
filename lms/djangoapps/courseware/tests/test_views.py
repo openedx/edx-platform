@@ -205,8 +205,8 @@ class IndexQueryTestCase(ModuleStoreTestCase):
     NUM_PROBLEMS = 20
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 10, 147),
-        (ModuleStoreEnum.Type.split, 4, 147),
+        (ModuleStoreEnum.Type.mongo, 11, 153),
+        (ModuleStoreEnum.Type.split, 4, 153),
     )
     @ddt.unpack
     def test_index_query_counts(self, store_type, expected_mongo_query_count, expected_mysql_query_count):
@@ -1430,20 +1430,20 @@ class ProgressPageTests(ProgressPageBaseTests):
                 self.assertContains(resp, u"Download Your Certificate")
 
     @ddt.data(
-        (True, 38),
-        (False, 37)
+        (True, 44),
+        (False, 43)
     )
     @ddt.unpack
     def test_progress_queries_paced_courses(self, self_paced, query_count):
         """Test that query counts remain the same for self-paced and instructor-paced courses."""
         self.setup_course(self_paced=self_paced)
-        with self.assertNumQueries(query_count, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST), check_mongo_calls(1):
+        with self.assertNumQueries(query_count, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST), check_mongo_calls(2):
             self._get_progress_page()
 
     @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
     @ddt.data(
-        (False, 45, 28),
-        (True, 37, 24)
+        (False, 51, 29),
+        (True, 43, 25)
     )
     @ddt.unpack
     def test_progress_queries(self, enable_waffle, initial, subsequent):
@@ -1451,7 +1451,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         with grades_waffle().override(ASSUME_ZERO_GRADE_IF_ABSENT, active=enable_waffle):
             with self.assertNumQueries(
                 initial, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST
-            ), check_mongo_calls(1):
+            ), check_mongo_calls(2):
                 self._get_progress_page()
 
             # subsequent accesses to the progress page require fewer queries.
