@@ -24,6 +24,7 @@ from edx_oauth2_provider.tests.factories import (ClientFactory,
                                                  TrustedClientFactory)
 from entitlements.tests.factories import CourseEntitlementFactory
 from milestones.tests.utils import MilestonesTestCaseMixin
+from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
@@ -377,10 +378,11 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         program = ProgramFactory()
         CourseEntitlementFactory.create(user=self.user, course_uuid=program['courses'][0]['uuid'])
         mock_get_programs.return_value = [program]
-        mock_course_overview.return_value = CourseOverviewFactory.create(start=self.TOMORROW)
+        course_key = CourseKey.from_string('course-v1:FAKE+FA1-MA1.X+3T2017')
+        mock_course_overview.return_value = CourseOverviewFactory.create(start=self.TOMORROW, id=course_key)
         mock_course_runs.return_value = [
             {
-                'key': 'course-v1:FAKE+FA1-MA1.X+3T2017',
+                'key': unicode(course_key),
                 'enrollment_end': str(self.TOMORROW),
                 'pacing_type': 'instructor_paced',
                 'type': 'verified',
@@ -388,7 +390,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             }
         ]
         mock_pseudo_session.return_value = {
-            'key': 'course-v1:FAKE+FA1-MA1.X+3T2017',
+            'key': unicode(course_key),
             'type': 'verified'
         }
         response = self.client.get(self.path)

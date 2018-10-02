@@ -647,10 +647,10 @@ def student_dashboard(request):
         staff_access = True
         errored_courses = modulestore().get_errored_courses()
 
-    show_courseware_links_for = frozenset(
-        enrollment.course_id for enrollment in course_enrollments
-        if has_access(request.user, 'load', enrollment.course_overview)
-    )
+    show_courseware_links_for = {
+        enrollment.course_id: has_access(request.user, 'load', enrollment.course_overview)
+        for enrollment in course_enrollments
+    }
 
     # Find programs associated with course runs being displayed. This information
     # is passed in the template context to allow rendering of program-related
