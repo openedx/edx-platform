@@ -30,7 +30,6 @@ def block_structure_task(**kwargs):
         default_retry_delay=settings.BLOCK_STRUCTURES_SETTINGS['TASK_DEFAULT_RETRY_DELAY'],
         max_retries=settings.BLOCK_STRUCTURES_SETTINGS['TASK_MAX_RETRIES'],
         bind=True,
-        routing_key=settings.DEFAULT_PRIORITY_QUEUE,
         **kwargs
     )
 
