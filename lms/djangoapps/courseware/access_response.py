@@ -165,3 +165,27 @@ class MobileAvailabilityError(AccessError):
         developer_message = "Course is not available on mobile for this user"
         user_message = _("You do not have access to this course on a mobile device")
         super(MobileAvailabilityError, self).__init__(error_code, developer_message, user_message)
+
+
+class IncorrectPartitionGroupError(AccessError):
+    """
+    Access denied because the user is not in the correct user subset.
+    """
+    def __init__(self, partition, user_group, allowed_groups, user_message=None, user_fragment=None):
+        error_code = "incorrect_user_group"
+        developer_message = "In partition {}, user was in group {}, but only {} are allowed access".format(
+            partition.name,
+            user_group.name if user_group is not None else user_group,
+            ", ".join(group.name for group in allowed_groups),
+        )
+        super(IncorrectPartitionGroupError, self).__init__(error_code, developer_message, user_message, user_fragment)
+
+
+class NoAllowedPartitionGroupsError(AccessError):
+    """
+    Access denied because the content is not allowed to any group in a partition.
+    """
+    def __init__(self, partition, user_group=None, allowed_groups=None, user_message=None, user_fragment=None):
+        error_code = "no_allowed_user_groups"
+        developer_message = "Group access for {} excludes all students".format(partition.name)
+        super(NoAllowedPartitionGroupsError, self).__init__(error_code, developer_message, user_message)

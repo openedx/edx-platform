@@ -34,6 +34,10 @@ from courseware.access_utils import (
     in_preview_mode,
     check_course_open_for_learner,
 )
+from courseware.access_response import (
+    NoAllowedPartitionGroupsError,
+    IncorrectPartitionGroupError,
+)
 from courseware.masquerade import get_masquerade_role, is_masquerading_as_student
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.ccx.models import CustomCourseForEdX
@@ -450,11 +454,6 @@ def _has_group_access(descriptor, user, course_key):
     # use merged_group_access which takes group access on the block's
     # parents / ancestors into account
     merged_access = descriptor.merged_group_access
-    # check for False in merged_access, which indicates that at least one
-    # partition's group list excludes all students.
-    if False in merged_access.values():
-        log.warning("Group access check excludes all students, access will be denied.", exc_info=True)
-        return ACCESS_DENIED
 
     # resolve the partition IDs in group_access to actual
     # partition objects, skipping those which contain empty group directives.
@@ -465,6 +464,13 @@ def _has_group_access(descriptor, user, course_key):
     for partition_id, group_ids in merged_access.items():
         try:
             partition = descriptor._get_user_partition(partition_id)  # pylint: disable=protected-access
+
+                # check for False in merged_access, which indicates that at least one
+                # partition's group list excludes all students.
+            if group_ids is False:
+                log.warning("Group access check excludes all students, access will be denied.", exc_info=True)
+                return NoAllowedPartitionGroupsError(partition)
+
             if partition.active:
                 if group_ids is not None:
                     partitions.append(partition)
@@ -491,19 +497,27 @@ def _has_group_access(descriptor, user, course_key):
         log.warning("Error looking up referenced user partition group, access will be denied.", exc_info=True)
         return ACCESS_DENIED
 
-    # look up the user's group for each partition
-    user_groups = {}
+    # finally: check that the user has a satisfactory group assignment
+    # for each partition.
+    missing_groups = []
     for partition, groups in partition_groups:
-        user_groups[partition.id] = partition.scheme.get_group_for_user(
+        user_group = partition.scheme.get_group_for_user(
             course_key,
             user,
             partition,
         )
+        if user_group not in groups:
+            missing_groups.append((partition, user_group, groups))
 
-    # finally: check that the user has a satisfactory group assignment
-    # for each partition.
-    if not all(user_groups.get(partition.id) in groups for partition, groups in partition_groups):
-        return ACCESS_DENIED
+    if missing_groups:
+        partition, user_group, allowed_groups = missing_groups[0]
+        return IncorrectPartitionGroupError(
+            partition,
+            user_group,
+            allowed_groups,
+            partition.access_denied_message(descriptor, user, user_group, allowed_groups),
+            partition.access_denied_fragment(descriptor, user, user_group, allowed_groups),
+        )
 
     # all checks passed.
     return ACCESS_GRANTED
@@ -532,12 +546,14 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
         # access to this content, then deny access. The problem with calling _has_staff_access_to_descriptor
         # before this method is that _has_staff_access_to_descriptor short-circuits and returns True
         # for staff users in preview mode.
-        if not _has_group_access(descriptor, user, course_key):
-            return ACCESS_DENIED
+        group_access_response = _has_group_access(descriptor, user, course_key)
+        if not group_access_response:
+            return group_access_response
 
         # If the user has staff access, they can load the module and checks below are not needed.
-        if _has_staff_access_to_descriptor(user, descriptor, course_key):
-            return ACCESS_GRANTED
+        staff_access_response = _has_staff_access_to_descriptor(user, descriptor, course_key)
+        if staff_access_response:
+            return staff_access_response
 
         return (
             _visible_to_nonstaff_users(descriptor) and
