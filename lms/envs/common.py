@@ -3409,6 +3409,11 @@ COURSE_ENROLLMENT_MODES = {
     },
 }
 
+CONTENT_TYPE_GATE_PARTITION_IDS = {
+    'locked': 1,
+    'unlocked': 2,
+}
+
 ############## Settings for the Discovery App ######################
 
 COURSES_API_CACHE_TIMEOUT = 3600  # Value is in seconds
