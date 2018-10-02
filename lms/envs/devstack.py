@@ -228,6 +228,8 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = ()
 CORS_ORIGIN_ALLOW_ALL = True
 
+LOGIN_REDIRECT_WHITELIST = []
+
 ###################### JWTs ######################
 JWT_AUTH.update({
     'JWT_ISSUER': OAUTH_OIDC_ISSUER,
