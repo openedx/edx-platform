@@ -8,7 +8,15 @@ from django.utils.translation import ugettext_lazy as _
 import logging
 
 from openedx.core.lib.cache_utils import request_cached
-from xmodule.partitions.partitions import UserPartition, UserPartitionError, ENROLLMENT_TRACK_PARTITION_ID
+from openedx.features.content_type_gating.partitions import (
+    CONTENT_GATING_PARTITION_ID,
+    create_content_gating_partition,
+)
+from xmodule.partitions.partitions import (
+    UserPartition,
+    UserPartitionError,
+    ENROLLMENT_TRACK_PARTITION_ID,
+)
 from xmodule.modulestore.django import modulestore
 
 
@@ -42,8 +50,14 @@ def _get_dynamic_partitions(course):
     Return the dynamic user partitions for this course.
     If none exists, returns an empty array.
     """
-    enrollment_partition = _create_enrollment_track_partition(course)
-    return [enrollment_partition] if enrollment_partition else []
+    return [
+        partition
+        for partition in [
+            _create_enrollment_track_partition(course),
+            create_content_gating_partition(course),
+        ]
+        if partition
+    ]
 
 
 def _create_enrollment_track_partition(course):
