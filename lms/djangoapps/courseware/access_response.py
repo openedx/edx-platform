@@ -9,7 +9,7 @@ from xmodule.course_metadata_utils import DEFAULT_START_DATE
 
 class AccessResponse(object):
     """Class that represents a response from a has_access permission check."""
-    def __init__(self, has_access, error_code=None, developer_message=None, user_message=None):
+    def __init__(self, has_access, error_code=None, developer_message=None, user_message=None, user_fragment=None):
         """
         Creates an AccessResponse object.
 
@@ -21,11 +21,14 @@ class AccessResponse(object):
                 to show the developer
             user_message (String): optional - default is None. Message to
                 show the user
+            user_fragment (:py:class:`~web_fragments.fragment.Fragment`): optional -
+                An html fragment to display to the user if their access is denied.
         """
         self.has_access = has_access
         self.error_code = error_code
         self.developer_message = developer_message
         self.user_message = user_message
+        self.user_fragment = user_fragment
         if has_access:
             assert error_code is None
 
@@ -54,15 +57,29 @@ class AccessResponse(object):
             "has_access": self.has_access,
             "error_code": self.error_code,
             "developer_message": self.developer_message,
-            "user_message": self.user_message
+            "user_message": self.user_message,
+            "user_fragment": self.user_fragment,
         }
 
     def __repr__(self):
-        return "AccessResponse({!r}, {!r}, {!r}, {!r})".format(
+        return "AccessResponse({!r}, {!r}, {!r}, {!r}, {!r})".format(
             self.has_access,
             self.error_code,
             self.developer_message,
-            self.user_message
+            self.user_message,
+            self.user_fragment,
+        )
+
+    def __eq__(self, other):
+        if not isinstance(other, AccessResponse):
+            return False
+
+        return (
+            self.has_access == other.has_access and
+            self.error_code == other.error_code and
+            self.developer_message == other.developer_message and
+            self.user_message == other.user_message and
+            self.user_fragment == other.user_fragment
         )
 
 
@@ -72,7 +89,7 @@ class AccessError(AccessResponse):
     denial in has_access. Contains the error code, user and developer
     messages. Subclasses represent specific errors.
     """
-    def __init__(self, error_code, developer_message, user_message):
+    def __init__(self, error_code, developer_message, user_message, user_fragment=None):
         """
         Creates an AccessError object.
 
@@ -83,9 +100,10 @@ class AccessError(AccessResponse):
             error_code (String): unique identifier for the specific type of
             error developer_message (String): message to show the developer
             user_message (String): message to show the user
+            user_fragment (:py:class:`~web_fragments.fragment.Fragment`): HTML to show the user
 
         """
-        super(AccessError, self).__init__(False, error_code, developer_message, user_message)
+        super(AccessError, self).__init__(False, error_code, developer_message, user_message, user_fragment)
 
 
 class StartDateError(AccessError):
