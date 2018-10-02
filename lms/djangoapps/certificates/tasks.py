@@ -7,7 +7,6 @@ from lms.djangoapps.verify_student.services import IDVerificationService
 from opaque_keys.edx.keys import CourseKey
 
 from .api import generate_user_certificates
-from django.conf import settings
 
 logger = getLogger(__name__)
 
