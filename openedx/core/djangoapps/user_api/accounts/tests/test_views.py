@@ -32,7 +32,6 @@ from student.models import (
     SocialLink,
     UserProfile,
     get_retired_username_by_username,
-    get_retired_email_by_email,
 )
 from student.tests.factories import (
     TEST_PASSWORD,

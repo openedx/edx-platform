@@ -32,6 +32,11 @@ from openedx.core.djangoapps.user_api.accounts.tests.testutils import (
     INVALID_USERNAMES,
     VALID_USERNAMES_UNICODE
 )
+from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import (  # pylint: disable=unused-import
+    RetirementTestCase,
+    fake_requested_retirement,
+    setup_retirement_states
+)
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangoapps.user_api.errors import (
     AccountEmailInvalid,
@@ -59,7 +64,7 @@ def mock_render_to_string(template_name, context):
 
 @attr(shard=2)
 @skip_unless_lms
-class TestAccountApi(UserSettingsEventTestMixin, TestCase):
+class TestAccountApi(UserSettingsEventTestMixin, RetirementTestCase):
     """
     These tests specifically cover the parts of the API methods that are not covered by test_views.py.
     This includes the specific types of error raised, and default behavior when optional arguments
@@ -227,6 +232,28 @@ class TestAccountApi(UserSettingsEventTestMixin, TestCase):
         with self.assertRaises(AccountUpdateError) as context_manager:
             update_account_settings(self.user, disabled_update)
         self.assertIn("Email address changes have been disabled", context_manager.exception.developer_message)
+
+    @patch.dict(settings.FEATURES, dict(ALLOW_EMAIL_ADDRESS_CHANGE=True))
+    def test_email_changes_blocked_on_retired_email(self):
+        """
+        Test that email address changes are rejected when an email associated with a *partially* retired account is
+        specified.
+        """
+        # First, record the original email addres of the primary user (the one seeking to update their email).
+        original_email = self.user.email
+
+        # Setup a partially retired user.  This user recently submitted a deletion request, but it has not been
+        # processed yet.
+        partially_retired_email = 'partially_retired@example.com'
+        partially_retired_user = UserFactory(email=partially_retired_email)
+        fake_requested_retirement(partially_retired_user)
+
+        # Attempt to change email to the one of the partially retired user.
+        rejected_update = {'email': partially_retired_email}
+        update_account_settings(self.user, rejected_update)
+
+        # No error should be thrown, and we need to check that the email update was skipped.
+        assert self.user.email == original_email
 
     @patch('openedx.core.djangoapps.user_api.accounts.serializers.AccountUserSerializer.save')
     def test_serializer_save_fails(self, serializer_save):
