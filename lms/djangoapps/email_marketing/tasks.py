@@ -75,6 +75,10 @@ def update_user(self, sailthru_vars, email, site=None, new_user=False, activatio
     if not email_config.enabled:
         return
 
+    # do not add user if registered at a white label site
+    if not is_default_site(site):
+        return
+
     sailthru_client = SailthruClient(email_config.sailthru_key, email_config.sailthru_secret)
     try:
         sailthru_response = sailthru_client.api_post("user",
@@ -96,8 +100,7 @@ def update_user(self, sailthru_vars, email, site=None, new_user=False, activatio
                              max_retries=email_config.sailthru_max_retries)
         return
 
-    if activation and email_config.sailthru_welcome_template and is_default_site(site) and not \
-            sailthru_vars.get('is_enterprise_learner'):
+    if activation and email_config.sailthru_welcome_template and not sailthru_vars.get('is_enterprise_learner'):
 
         scheduled_datetime = datetime.utcnow() + timedelta(seconds=email_config.welcome_email_send_delay)
         try:
@@ -295,14 +298,20 @@ def _retryable_sailthru_error(error):
 
 
 @task(bind=True, routing_key=ACE_ROUTING_KEY)
-def update_course_enrollment(self, email, course_key, mode):
+def update_course_enrollment(self, email, course_key, mode, site=None):
     """Adds/updates Sailthru when a user adds to cart/purchases/upgrades a course
          Args:
-            user: current user
+            email: email address of enrolled user
             course_key: course key of course
+            mode: mode user is enrolled in
+            site: site where user enrolled
         Returns:
             None
     """
+    # do not add user if registered at a white label site
+    if not is_default_site(site):
+        return
+
     course_url = build_course_url(course_key)
     config = EmailMarketingConfiguration.current()
 

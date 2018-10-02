@@ -53,7 +53,7 @@ def update_sailthru(sender, user, mode, course_id, **kwargs):  # pylint: disable
     """
     if WAFFLE_SWITCHES.is_enabled(SAILTHRU_AUDIT_PURCHASE_ENABLED) and mode in CourseMode.AUDIT_MODES:
         email = str(user.email)
-        update_course_enrollment.delay(email, course_id, mode)
+        update_course_enrollment.delay(email, course_id, mode, site=_get_current_site())
 
 
 @receiver(CREATE_LOGON_COOKIE)
