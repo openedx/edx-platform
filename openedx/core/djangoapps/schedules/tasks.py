@@ -8,6 +8,7 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 
 from django.db.utils import DatabaseError
+from django.utils.timezone import now
 
 from celery_utils.logged_task import LoggedTask
 from celery_utils.persist_on_failure import LoggedPersistOnFailureTask
@@ -115,9 +116,21 @@ class ScheduleMessageBaseTask(LoggedTask):
         return False
 
     def run(
-        self, site_id, target_day_str, day_offset, bin_num, override_recipient_email=None,
+        self, site_id, target_day_str, day_offset, bin_num=None, override_recipient_email=None,
     ):
         site = Site.objects.select_related('configuration').get(id=site_id)
+
+        # If no target date was provided, then enqueue tasks from the current date
+        if target_day_str is None:
+            cls.enqueue(
+                site,
+                now(),
+                day_offset,
+                override_recipient_email,
+            )
+            return
+
+        # Otherwise, process the batched tasks
         with emulate_http_request(site=site):
             msg_type = self.make_message_type(day_offset)
             _annotate_for_monitoring(msg_type, site, bin_num, target_day_str, day_offset)
