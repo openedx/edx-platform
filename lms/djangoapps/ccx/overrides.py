@@ -10,7 +10,7 @@ from django.db import transaction
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from openedx.core.lib.cache_utils import get_cache
-from courseware.field_overrides import FieldOverrideProvider
+from lms.djangoapps.courseware.field_overrides import FieldOverrideProvider
 from lms.djangoapps.ccx.models import CcxFieldOverride, CustomCourseForEdX
 
 log = logging.getLogger(__name__)

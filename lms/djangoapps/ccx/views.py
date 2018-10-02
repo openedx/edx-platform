@@ -25,7 +25,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from courseware.access import has_access
 from courseware.courses import get_course_by_id
-from courseware.field_overrides import disable_overrides
+from lms.djangoapps.courseware.field_overrides import disable_overrides
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, assign_role
 from django_comment_common.utils import seed_permissions_roles
 from edxmako.shortcuts import render_to_response

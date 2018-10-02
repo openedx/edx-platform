@@ -5,7 +5,7 @@ import datetime
 
 import ddt
 import pytz
-from courseware.student_field_overrides import get_override_for_user, override_field_for_user
+from lms.djangoapps.courseware.student_field_overrides import get_override_for_user, override_field_for_user
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

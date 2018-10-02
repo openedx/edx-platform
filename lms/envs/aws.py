@@ -463,7 +463,7 @@ if FEATURES.get('ENABLE_CORS_HEADERS') or FEATURES.get('ENABLE_CROSS_DOMAIN_CSRF
 
 
 # Field overrides. To use the IDDE feature, add
-# 'courseware.student_field_overrides.IndividualStudentOverrideProvider'.
+# 'lms.djangoapps.courseware.student_field_overrides.IndividualStudentOverrideProvider'.
 FIELD_OVERRIDE_PROVIDERS = tuple(ENV_TOKENS.get('FIELD_OVERRIDE_PROVIDERS', []))
 
 ############################## SECURE AUTH ITEMS ###############
@@ -830,7 +830,7 @@ CCX_MAX_STUDENTS_ALLOWED = ENV_TOKENS.get('CCX_MAX_STUDENTS_ALLOWED', CCX_MAX_ST
 ##### Individual Due Date Extensions #####
 if FEATURES.get('INDIVIDUAL_DUE_DATES'):
     FIELD_OVERRIDE_PROVIDERS += (
-        'courseware.student_field_overrides.IndividualStudentOverrideProvider',
+        'lms.djangoapps.courseware.student_field_overrides.IndividualStudentOverrideProvider',
     )
 
 ##### Self-Paced Course Due Dates #####

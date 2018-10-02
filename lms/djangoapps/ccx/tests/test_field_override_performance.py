@@ -9,7 +9,7 @@ import ddt
 import mock
 import pytest
 from ccx_keys.locator import CCXLocator
-from courseware.field_overrides import OverrideFieldData
+from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from courseware.testutils import FieldOverrideTestMixin
 from courseware.views.views import progress
 from django.conf import settings

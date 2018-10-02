@@ -357,7 +357,7 @@ class OfflineComputedGradeLog(models.Model):
 class StudentFieldOverride(TimeStampedModel):
     """
     Holds the value of a specific field overriden for a student.  This is used
-    by the code in the `courseware.student_field_overrides` module to provide
+    by the code in the `lms.djangoapps.courseware.student_field_overrides` module to provide
     overrides of xblock fields on a per user basis.
     """
     course_id = CourseKeyField(max_length=255, db_index=True)

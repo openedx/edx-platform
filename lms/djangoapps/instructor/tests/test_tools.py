@@ -16,7 +16,7 @@ from pytz import UTC
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
-from courseware.field_overrides import OverrideFieldData
+from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from lms.djangoapps.ccx.tests.test_overrides import inject_field_overrides
 from openedx.core.lib.tests import attr
 from student.tests.factories import UserFactory
@@ -202,7 +202,7 @@ class TestTitleOrUrl(unittest.TestCase):
 @attr(shard=1)
 @override_settings(
     FIELD_OVERRIDE_PROVIDERS=(
-        'courseware.student_field_overrides.IndividualStudentOverrideProvider',),
+        'lms.djangoapps.courseware.student_field_overrides.IndividualStudentOverrideProvider',),
 )
 class TestSetDueDateExtension(ModuleStoreTestCase):
     """

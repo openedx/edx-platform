@@ -2,7 +2,7 @@
 This module provides a :class:`~xblock.field_data.FieldData` implementation
 which wraps an other `FieldData` object and provides overrides based on the
 user.  The use of providers allows for overrides that are arbitrarily
-extensible.  One provider is found in `courseware.student_field_overrides`
+extensible.  One provider is found in `lms.djangoapps.courseware.student_field_overrides`
 which allows for fields to be overridden for individual students.  One can
 envision other providers being written that allow for fields to be overridden
 base on membership of a student in a cohort, or similar.  The use of an

@@ -8,7 +8,7 @@ import os
 from contextlib import contextmanager
 from enum import Enum
 
-from courseware.field_overrides import OverrideFieldData  # pylint: disable=import-error
+from lms.djangoapps.courseware.field_overrides import OverrideFieldData  # pylint: disable=import-error
 from courseware.tests.factories import StaffFactory
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User
