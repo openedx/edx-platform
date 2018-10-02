@@ -7,11 +7,12 @@ from lms.djangoapps.verify_student.services import IDVerificationService
 from opaque_keys.edx.keys import CourseKey
 
 from .api import generate_user_certificates
+from django.conf import settings
 
 logger = getLogger(__name__)
 
 
-@task(base=LoggedPersistOnFailureTask, bind=True, default_retry_delay=30, max_retries=2)
+@task(base=LoggedPersistOnFailureTask, bind=True, default_retry_delay=30, max_retries=2, routing_key=settings.LOW_PRIORITY_QUEUE)
 def generate_certificate(self, **kwargs):
     """
     Generates a certificate for a single user.

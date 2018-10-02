@@ -12,7 +12,7 @@ from django.core import mail
 log = logging.getLogger('edx.celery.task')
 
 
-@task(bind=True)
+@task(bind=True, routing_key=settings.LOW_PRIORITY_QUEUE)
 def send_activation_email(self, subject, message, from_address, dest_addr):
     """
     Sending an activation email to the user.

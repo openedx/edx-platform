@@ -8,11 +8,12 @@ from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, get_cohort, get_cohort_by_name
 from student.models import CourseEnrollment, CourseMode
+from django.conf import settings
 
 LOGGER = get_task_logger(__name__)
 
 
-@task(bind=True, default_retry_delay=60, max_retries=2)
+@task(bind=True, default_retry_delay=60, max_retries=2, routing_key=settings.LOW_PRIORITY_QUEUE)
 def sync_cohort_with_mode(self, course_id, user_id, verified_cohort_name, default_cohort_name):
     """
     If the learner's mode does not match their assigned cohort, move the learner into the correct cohort.
