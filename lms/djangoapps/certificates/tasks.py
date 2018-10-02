@@ -12,7 +12,7 @@ from django.conf import settings
 logger = getLogger(__name__)
 
 
-@task(base=LoggedPersistOnFailureTask, bind=True, default_retry_delay=30, max_retries=2, routing_key=settings.LOW_PRIORITY_QUEUE)
+@task(base=LoggedPersistOnFailureTask, bind=True, default_retry_delay=30, max_retries=2)
 def generate_certificate(self, **kwargs):
     """
     Generates a certificate for a single user.

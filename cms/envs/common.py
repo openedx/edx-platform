@@ -919,7 +919,6 @@ CELERY_DEFAULT_EXCHANGE_TYPE = 'direct'
 
 HIGH_PRIORITY_QUEUE = 'edx.core.high'
 DEFAULT_PRIORITY_QUEUE = 'edx.core.default'
-LOW_PRIORITY_QUEUE = 'edx.core.low'
 
 CELERY_QUEUE_HA_POLICY = 'all'
 
@@ -930,7 +929,6 @@ CELERY_DEFAULT_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
 
 CELERY_QUEUES = {
     HIGH_PRIORITY_QUEUE: {},
-    LOW_PRIORITY_QUEUE: {},
     DEFAULT_PRIORITY_QUEUE: {}
 }
 
@@ -1495,22 +1493,22 @@ COURSE_CATALOG_API_URL = None
 ############################# Persistent Grades ####################################
 
 # Queue to use for updating persistent grades
-RECALCULATE_GRADES_ROUTING_KEY = LOW_PRIORITY_QUEUE
+RECALCULATE_GRADES_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
 
 # Queue to use for updating grades due to grading policy change
-POLICY_CHANGE_GRADES_ROUTING_KEY = LOW_PRIORITY_QUEUE
+POLICY_CHANGE_GRADES_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
 
 # Rate limit for regrading tasks that a grading policy change can kick off
 POLICY_CHANGE_TASK_RATE_LIMIT = '300/h'
 
 ############## Settings for CourseGraph ############################
-COURSEGRAPH_JOB_QUEUE = LOW_PRIORITY_QUEUE
+COURSEGRAPH_JOB_QUEUE = DEFAULT_PRIORITY_QUEUE
 
 ########## Settings for video transcript migration tasks ############
-VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE = LOW_PRIORITY_QUEUE
+VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE = DEFAULT_PRIORITY_QUEUE
 
 ########## Settings youtube thumbnails scraper tasks ############
-SCRAPE_YOUTUBE_THUMBNAILS_JOB_QUEUE = LOW_PRIORITY_QUEUE
+SCRAPE_YOUTUBE_THUMBNAILS_JOB_QUEUE = DEFAULT_PRIORITY_QUEUE
 
 ###################### VIDEO IMAGE STORAGE ######################
 
