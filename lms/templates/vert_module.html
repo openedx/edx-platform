@@ -10,8 +10,10 @@
 
 <div class="vert-mod">
 % for idx, item in enumerate(items):
-  <div class="vert vert-${idx}" data-id="${item['id']}">
-    ${HTML(item['content'])}
-  </div>
+  % if item['content']:
+    <div class="vert vert-${idx}" data-id="${item['id']}">
+        ${HTML(item['content'])}
+    </div>
+  %endif
 % endfor
 </div>
