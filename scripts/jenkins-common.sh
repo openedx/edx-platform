@@ -13,11 +13,13 @@ NODE_INSTALL_COMMAND="nodeenv --node=$NODE_VERSION --prebuilt $NODE_ENV_DIR --fo
 # Note that this prevents us from running jobs in parallel on a single worker.
 mongo --quiet --eval 'db.getMongo().getDBNames().forEach(function(i){db.getSiblingDB(i).dropDatabase()})'
 
-# Ensure we have fetched origin/master
-# Some of the reporting tools compare the checked out branch to origin/master;
-# depending on how the GitHub plugin refspec is configured, this may
-# not already be fetched.
-git fetch origin master:refs/remotes/origin/master
+# Ensure we have fetched a target branch (origin/master, unless testing
+# a release branc) Some of the reporting tools compare the checked out
+# branch to a target branch; depending on how the GitHub plugin refspec
+# is configured, this may not already be fetched.
+if [ ! -z ${TARGET_BRANCH+x} ]; then
+    git fetch origin $TARGET_BRANCH:refs/remotes/origin/$TARGET_BRANCH
+fi
 
 # Reset the jenkins worker's virtualenv back to the
 # state it was in when the instance was spun up.
