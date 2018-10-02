@@ -1342,7 +1342,7 @@ p.course-block {
 
 .enter-course-blocked {
   @include box-sizing(border-box);
-  @include float(left);
+  @include float(right);
 
   display: block;
   font: normal 15px/1.6rem $font-family-sans-serif;
