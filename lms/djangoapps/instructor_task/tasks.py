@@ -81,7 +81,7 @@ def rescore_problem(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, visit_fcn, action_name)
 
 
-@task(base=BaseInstructorTask, routing_key=settings.DEFAULT_PRIORITY_QUEUE)
+@task(base=BaseInstructorTask)
 def override_problem_score(entry_id, xmodule_instance_args):
     """
     Overrides a specific learner's score on a problem.
