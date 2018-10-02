@@ -11,7 +11,7 @@ Note: The access control logic in this file does NOT check for enrollment in
   It is a wrapper around has_access that additionally checks for enrollment.
 """
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
@@ -40,6 +40,7 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
 from mobile_api.models import IgnoreMobileAvailableFlagConfig
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
+from openedx.features.course_duration_limits.access import check_course_expired
 from student import auth
 from student.models import CourseEnrollmentAllowed
 from student.roles import (
@@ -318,16 +319,52 @@ def _has_access_course(user, action, courselike):
 
         NOTE: this is not checking whether user is actually enrolled in the course.
         """
-        response = (
-            _visible_to_nonstaff_users(courselike) and
-            check_course_open_for_learner(user, courselike) and
-            _can_view_courseware_with_prerequisites(user, courselike)
-        )
+        # N.B. I'd love a better way to handle this pattern, without breaking the
+        # shortcircuiting logic. Maybe AccessResponse needs to grow a
+        # fluent interface?
+        #
+        # return (
+        #     _visible_to_nonstaff_users(courselike).and(
+        #         check_course_open_for_learner, user, courselike
+        #     ).and(
+        #         _can_view_courseware_with_prerequisites, user, courselike
+        #     )
+        # ).or(
+        #     _has_staff_access_to_descriptor, user, courselike, courselike.id
+        # )
+        visible_to_nonstaff = _visible_to_nonstaff_users(courselike)
+        if not visible_to_nonstaff:
+            staff_access = _has_staff_access_to_descriptor(user, courselike, courselike.id)
+            if staff_access:
+                return staff_access
+            else:
+                return visible_to_nonstaff
 
-        return (
-            ACCESS_GRANTED if (response or _has_staff_access_to_descriptor(user, courselike, courselike.id))
-            else response
-        )
+        open_for_learner = check_course_open_for_learner(user, courselike)
+        if not open_for_learner:
+            staff_access = _has_staff_access_to_descriptor(user, courselike, courselike.id)
+            if staff_access:
+                return staff_access
+            else:
+                return open_for_learner
+
+        view_with_prereqs = _can_view_courseware_with_prerequisites(user, courselike)
+        if not view_with_prereqs:
+            staff_access = _has_staff_access_to_descriptor(user, courselike, courselike.id)
+            if staff_access:
+                return staff_access
+            else:
+                return view_with_prereqs
+
+        has_not_expired = check_course_expired(user, courselike)
+        if not has_not_expired:
+            staff_access = _has_staff_access_to_descriptor(user, courselike, courselike.id)
+            if staff_access:
+                return staff_access
+            else:
+                return has_not_expired
+
+        return ACCESS_GRANTED
 
     def can_enroll():
         """
