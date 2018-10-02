@@ -81,7 +81,7 @@ def rescore_problem(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, visit_fcn, action_name)
 
 
-@task(base=BaseInstructorTask)
+@task(base=BaseInstructorTask, routing_key=settings.LOW_PRIORITY_QUEUE)
 def override_problem_score(entry_id, xmodule_instance_args):
     """
     Overrides a specific learner's score on a problem.
@@ -94,7 +94,7 @@ def override_problem_score(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, visit_fcn, action_name)
 
 
-@task(base=BaseInstructorTask)
+@task(base=BaseInstructorTask, routing_key=settings.LOW_PRIORITY_QUEUE)
 def reset_problem_attempts(entry_id, xmodule_instance_args):
     """Resets problem attempts to zero for a particular problem for all students in a course.
 
