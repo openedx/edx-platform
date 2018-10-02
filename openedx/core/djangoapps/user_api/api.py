@@ -18,7 +18,7 @@ from openedx.features.enterprise_support.api import enterprise_customer_for_requ
 from student.forms import get_registration_extension_form
 from student.models import UserProfile
 from util.password_policy_validators import (
-    password_validators_instruction_texts, password_validators_restrictions
+    password_validators_instruction_texts, password_validators_restrictions, DEFAULT_MAX_PASSWORD_LENGTH,
 )
 
 
@@ -118,10 +118,7 @@ def get_login_session_form(request):
         "password",
         label=password_label,
         field_type="password",
-        # The following restriction contains the assumption that the max password length will never exceed 5000
-        # characters. The point of this restriction on the login page is to prevent any sort of attacks
-        # involving sending massive passwords.
-        restrictions={'max_length': 5000}
+        restrictions={'max_length': DEFAULT_MAX_PASSWORD_LENGTH}
     )
 
     form_desc.add_field(

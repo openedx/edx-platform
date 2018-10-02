@@ -200,9 +200,6 @@ FEATURES = {
     # an Open edX admin has added them to the course creator group.
     'ENABLE_CREATOR_GROUP': True,
 
-    # whether to use password policy enforcement or not
-    'ENFORCE_PASSWORD_POLICY': False,
-
     # Turn off account locking if failed login attempts exceeds a limit
     'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': False,
 
@@ -1240,12 +1237,23 @@ EVENT_TRACKING_BACKENDS = {
 EVENT_TRACKING_PROCESSORS = []
 
 #### PASSWORD POLICY SETTINGS #####
-
-PASSWORD_MIN_LENGTH = None
-PASSWORD_MAX_LENGTH = None
-PASSWORD_COMPLEXITY = {}
-PASSWORD_DICTIONARY_EDIT_DISTANCE_THRESHOLD = None
-PASSWORD_DICTIONARY = []
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+    },
+    {
+        "NAME": "util.password_policy_validators.MinimumLengthValidator",
+        "OPTIONS": {
+            "min_length": 2
+        }
+    },
+    {
+        "NAME": "util.password_policy_validators.MaximumLengthValidator",
+        "OPTIONS": {
+            "max_length": 75
+        }
+    },
+]
 
 ##### ACCOUNT LOCKOUT DEFAULT PARAMETERS #####
 MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED = 5

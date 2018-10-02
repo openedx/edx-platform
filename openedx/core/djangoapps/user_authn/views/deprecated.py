@@ -142,7 +142,7 @@ def create_account(request, post_override=None):
             {
                 "success": False,
                 "field": field,
-                "value": error_list[0],
+                "value": ' '.join(error_list),
             },
             status=400
         )

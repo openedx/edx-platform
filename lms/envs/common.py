@@ -202,9 +202,6 @@ FEATURES = {
     # Maximum number of rows to include in the csv file for downloading problem responses.
     'MAX_PROBLEM_RESPONSES_COUNT': 5000,
 
-    # whether to use password policy enforcement or not
-    'ENFORCE_PASSWORD_POLICY': True,
-
     'ENABLED_PAYMENT_REPORTS': [
         "refund_report",
         "itemized_purchase_report",
@@ -2594,11 +2591,23 @@ FINANCIAL_REPORTS = {
 POLICY_CHANGE_TASK_RATE_LIMIT = '300/h'
 
 #### PASSWORD POLICY SETTINGS #####
-PASSWORD_MIN_LENGTH = 8
-PASSWORD_MAX_LENGTH = None
-PASSWORD_COMPLEXITY = {"UPPER": 1, "LOWER": 1, "DIGITS": 1}
-PASSWORD_DICTIONARY_EDIT_DISTANCE_THRESHOLD = None
-PASSWORD_DICTIONARY = []
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+    },
+    {
+        "NAME": "util.password_policy_validators.MinimumLengthValidator",
+        "OPTIONS": {
+            "min_length": 2
+        }
+    },
+    {
+        "NAME": "util.password_policy_validators.MaximumLengthValidator",
+        "OPTIONS": {
+            "max_length": 75
+        }
+    },
+]
 
 ############################ ORA 2 ############################################
 

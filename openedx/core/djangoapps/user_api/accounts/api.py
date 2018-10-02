@@ -18,7 +18,7 @@ from student.models import User, UserProfile, Registration, email_exists_or_reti
 from student import forms as student_forms
 from student import views as student_views
 from util.model_utils import emit_setting_changed_event
-from util.password_policy_validators import edX_validate_password
+from util.password_policy_validators import validate_password
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import errors, accounts, forms, helpers
@@ -287,7 +287,6 @@ def create_account(username, password, email):
 
     * 3rd party auth
     * External auth (shibboleth)
-    * Complex password policies (ENFORCE_PASSWORD_POLICY)
 
     In addition, we assume that some functionality is handled
     at higher layers:
@@ -665,7 +664,7 @@ def _validate_password(password, username=None, email=None):
     try:
         _validate_type(password, basestring, accounts.PASSWORD_BAD_TYPE_MSG)
         temp_user = User(username=username, email=email) if username else None
-        edX_validate_password(password, user=temp_user)
+        validate_password(password, user=temp_user)
     except errors.AccountDataBadType as invalid_password_err:
         raise errors.AccountPasswordInvalid(text_type(invalid_password_err))
     except ValidationError as validation_err:

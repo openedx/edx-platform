@@ -10,16 +10,44 @@ import unicodedata
 from django.conf import settings
 from django.contrib.auth.password_validation import (
     get_default_password_validators,
-    validate_password,
+    validate_password as django_validate_password,
     MinimumLengthValidator as DjangoMinimumLengthValidator,
 )
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _, ungettext
 from six import text_type
 
-from student.models import PasswordHistory
-
 log = logging.getLogger(__name__)
+
+# The following constant contains the assumption that the max password length will never exceed 5000
+# characters. The point of this restriction is to restrict the login page password field to prevent
+# any sort of attacks involving sending massive passwords.
+DEFAULT_MAX_PASSWORD_LENGTH = 5000
+
+
+def create_validator_config(name, options={}):
+    """
+    This function is meant to be used for testing purposes to create validators
+    easily. It returns a validator config of the form:
+        {
+            "NAME": "util.password_policy_validators.SymbolValidator",
+            "OPTIONS": {"min_symbol": 1}
+        }
+
+    Parameters:
+        name (str): the path name to the validator class to instantiate
+        options (dict): The dictionary of options to pass in to the validator.
+            These are used to initialize the validator with parameters.
+            If undefined, the default parameters will be used.
+
+    Returns:
+        Dictionary containing the NAME and OPTIONS for the validator. These will
+            be used to instantiate an instance of the validator using Django.
+    """
+    if options:
+        return {'NAME': name, 'OPTIONS': options}
+
+    return {'NAME': name}
 
 
 def password_validators_instruction_texts():
@@ -61,7 +89,7 @@ def password_validators_restrictions():
     return complexity_restrictions
 
 
-def edX_validate_password(password, user=None):
+def validate_password(password, user=None):
     """
     EdX's custom password validator for passwords. This function performs the
     following functions:
@@ -89,7 +117,7 @@ def edX_validate_password(password, user=None):
             # no reason to get into weeds
             raise ValidationError([_('Invalid password.')])
 
-    validate_password(password, user)
+    django_validate_password(password, user)
 
 
 def _validate_condition(password, fn, min_count):
@@ -177,8 +205,8 @@ class AlphabeticValidator(object):
             return
         raise ValidationError(
             ungettext(
-                'Your password must contain at least %(min_alphabetic)d letter.',
-                'Your password must contain at least %(min_alphabetic)d letters.',
+                'This password must contain at least %(min_alphabetic)d letter.',
+                'This password must contain at least %(min_alphabetic)d letters.',
                 self.min_alphabetic
             ),
             code='too_few_alphabetic_char',
@@ -225,8 +253,8 @@ class NumericValidator(object):
             return
         raise ValidationError(
             ungettext(
-                'Your password must contain at least %(min_numeric)d number.',
-                'Your password must contain at least %(min_numeric)d numbers.',
+                'This password must contain at least %(min_numeric)d number.',
+                'This password must contain at least %(min_numeric)d numbers.',
                 self.min_numeric
             ),
             code='too_few_numeric_char',
@@ -273,8 +301,8 @@ class UppercaseValidator(object):
             return
         raise ValidationError(
             ungettext(
-                'Your password must contain at least %(min_upper)d uppercase letter.',
-                'Your password must contain at least %(min_upper)d uppercase letters.',
+                'This password must contain at least %(min_upper)d uppercase letter.',
+                'This password must contain at least %(min_upper)d uppercase letters.',
                 self.min_upper
             ),
             code='too_few_uppercase_char',
@@ -321,8 +349,8 @@ class LowercaseValidator(object):
             return
         raise ValidationError(
             ungettext(
-                'Your password must contain at least %(min_lower)d lowercase letter.',
-                'Your password must contain at least %(min_lower)d lowercase letters.',
+                'This password must contain at least %(min_lower)d lowercase letter.',
+                'This password must contain at least %(min_lower)d lowercase letters.',
                 self.min_lower
             ),
             code='too_few_lowercase_char',
@@ -355,11 +383,11 @@ class LowercaseValidator(object):
 
 class PunctuationValidator(object):
     """
-    Validate whether the password contains at least min_punctuation punctuation characters
+    Validate whether the password contains at least min_punctuation punctuation marks
     as defined by unicode categories.
 
     Parameters:
-        min_punctuation (int): the minimum number of punctuation characters to require
+        min_punctuation (int): the minimum number of punctuation marks to require
             in the password. Must be >= 0.
     """
     def __init__(self, min_punctuation=0):
@@ -370,8 +398,8 @@ class PunctuationValidator(object):
             return
         raise ValidationError(
             ungettext(
-                'Your password must contain at least %(min_punctuation)d punctuation character.',
-                'Your password must contain at least %(min_punctuation)d punctuation characters.',
+                'This password must contain at least %(min_punctuation)d punctuation mark.',
+                'This password must contain at least %(min_punctuation)d punctuation marks.',
                 self.min_punctuation
             ),
             code='too_few_punctuation_characters',
@@ -380,16 +408,16 @@ class PunctuationValidator(object):
 
     def get_help_text(self):
         return ungettext(
-            "Your password must contain at least %(min_punctuation)d punctuation character.",
-            "Your password must contain at least %(min_punctuation)d punctuation characters.",
+            "Your password must contain at least %(min_punctuation)d punctuation mark.",
+            "Your password must contain at least %(min_punctuation)d punctuation marks.",
             self.min_punctuation
         ) % {'min_punctuation': self.min_punctuation}
 
     def get_instruction_text(self):
         if self.min_punctuation > 0:
             return ungettext(
-                '%(num)d punctuation character',
-                '%(num)d punctuation characters',
+                '%(num)d punctuation mark',
+                '%(num)d punctuation marks',
                 self.min_punctuation
             ) % {'num': self.min_punctuation}
         else:
@@ -418,8 +446,8 @@ class SymbolValidator(object):
             return
         raise ValidationError(
             ungettext(
-                'Your password must contain at least %(min_symbol)d symbol.',
-                'Your password must contain at least %(min_symbol)d symbols.',
+                'This password must contain at least %(min_symbol)d symbol.',
+                'This password must contain at least %(min_symbol)d symbols.',
                 self.min_symbol
             ),
             code='too_few_symbols',

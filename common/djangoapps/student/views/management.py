@@ -94,7 +94,7 @@ from student.text_me_the_app import TextMeTheAppFragmentView
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 from util.db import outer_atomic
 from util.json_request import JsonResponse
-from util.password_policy_validators import edX_validate_password
+from util.password_policy_validators import validate_password
 
 log = logging.getLogger("edx.student")
 
@@ -830,7 +830,7 @@ def password_reset_confirm_wrapper(request, uidb36=None, token=None):
         password = request.POST['new_password1']
 
         try:
-            edX_validate_password(password, user=user)
+            validate_password(password, user=user)
         except ValidationError as err:
             # We have a password reset attempt which violates some security
             # policy, or any other validation. Use the existing Django template to communicate that
@@ -839,7 +839,7 @@ def password_reset_confirm_wrapper(request, uidb36=None, token=None):
                 'validlink': True,
                 'form': None,
                 'title': _('Password reset unsuccessful'),
-                'err_msg': err.message,
+                'err_msg': ' '.join(err.messages),
             }
             context.update(platform_name)
             return TemplateResponse(

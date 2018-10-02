@@ -27,7 +27,7 @@ from openedx.core.djangoapps.user_api import accounts as accounts_settings
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from student.message_types import PasswordReset
 from student.models import CourseEnrollmentAllowed, email_exists_or_retired
-from util.password_policy_validators import edX_validate_password
+from util.password_policy_validators import validate_password
 
 
 def send_password_reset_email_for_user(user, request):
@@ -225,14 +225,14 @@ class AccountCreationForm(forms.Form):
             data=None,
             extra_fields=None,
             extended_profile_fields=None,
-            enforce_password_policy=False,
+            do_third_party_auth=True,
             tos_required=True
     ):
         super(AccountCreationForm, self).__init__(data)
 
         extra_fields = extra_fields or {}
         self.extended_profile_fields = extended_profile_fields or {}
-        self.enforce_password_policy = enforce_password_policy
+        self.do_third_party_auth = do_third_party_auth
         if tos_required:
             self.fields["terms_of_service"] = TrueField(
                 error_messages={"required": _("You must accept the terms of service.")}
@@ -280,13 +280,13 @@ class AccountCreationForm(forms.Form):
     def clean_password(self):
         """Enforce password policies (if applicable)"""
         password = self.cleaned_data["password"]
-        if self.enforce_password_policy:
+        if not self.do_third_party_auth:
             # Creating a temporary user object to test password against username
             # This user should NOT be saved
             username = self.cleaned_data.get('username')
             email = self.cleaned_data.get('email')
             temp_user = User(username=username, email=email) if username else None
-            edX_validate_password(password, temp_user)
+            validate_password(password, temp_user)
         return password
 
     def clean_email(self):

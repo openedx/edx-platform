@@ -29,6 +29,7 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory
 from student.tests.test_email import mock_render_to_string
 from student.views import SETTING_CHANGE_INITIATED, password_reset, password_reset_confirm_wrapper
+from util.password_policy_validators import create_validator_config
 from util.testing import EventTestMixin
 
 from .test_configuration_overrides import fake_get_value
@@ -350,16 +351,18 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
                 self.user.refresh_from_db()
                 assert not self.user.is_active
 
-    @override_settings(PASSWORD_MIN_LENGTH=2)
-    @override_settings(PASSWORD_MAX_LENGTH=10)
+    @override_settings(AUTH_PASSWORD_VALIDATORS=[
+        create_validator_config('util.password_policy_validators.MinimumLengthValidator', {'min_length': 2}),
+        create_validator_config('util.password_policy_validators.MaximumLengthValidator', {'max_length': 10})
+    ])
     @ddt.data(
         {
             'password': '1',
-            'error_message': 'Enter a password with at least 2 characters.',
+            'error_message': 'This password is too short. It must contain at least 2 characters.',
         },
         {
             'password': '01234567891',
-            'error_message': 'Enter a password with at most 10 characters.',
+            'error_message': 'This password is too long. It must contain no more than 10 characters.',
         }
     )
     def test_password_reset_with_invalid_length(self, password_dict):
