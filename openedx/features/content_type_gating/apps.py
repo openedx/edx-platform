@@ -1,3 +1,7 @@
+"""
+Define the content_type_gating Django App.
+"""
+
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
