@@ -470,7 +470,8 @@ def get_subsection_completion_percentage(subsection_usage_key, user):
                     block, 'completion_mode'
                 )
 
-                if completion_mode not in (CompletionMode.AGGREGATOR, CompletionMode.EXCLUDED):
+                if completion_mode not in (CompletionMode.AGGREGATOR, CompletionMode.EXCLUDED) \
+                        and not block.block_type == 'html':
                     completable_blocks.append(block)
 
             if not completable_blocks:
