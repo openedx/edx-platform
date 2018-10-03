@@ -156,6 +156,9 @@ class ChooseModeView(View):
                     'program_marketing_site_url': program_data.get('marketing_url'),
                     'program_bundle_url': ecommerce_service.get_checkout_page_url(*skus),
                     'discount_data': program_data.get('discount_data'),
+                    'program_type': program_data.get('type'),
+                    'program_title': program_data.get('title'),
+                    'program_price': program_data.get('full_program_price'),
                 }
 
         context = {
