@@ -32,6 +32,7 @@ from student.models import (
     PasswordHistory,
 )
 from student.views import send_reactivation_email_for_user
+from student.forms import send_password_reset_email_for_user
 import third_party_auth
 from third_party_auth import pipeline, provider
 from util.json_request import JsonResponse
@@ -146,6 +147,7 @@ def _enforce_password_policy_compliance(request, user):
         # Allow login, but warn the user that they will be required to reset their password soon.
         PageLevelMessages.register_warning_message(request, e.message)
     except password_policy_compliance.NonCompliantPasswordException as e:
+        send_password_reset_email_for_user(user, request)
         # Prevent the login attempt.
         raise AuthFailedError(e.message)
 
