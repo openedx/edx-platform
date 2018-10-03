@@ -2282,6 +2282,8 @@ INSTALLED_APPS = [
     'openedx.features.learner_profile',
     'openedx.features.learner_analytics',
     'openedx.features.portfolio_project',
+    'openedx.features.content_type_gating',
+    'openedx.features.course_duration_limits',
 
     'experiments',
 
