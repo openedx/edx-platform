@@ -55,12 +55,12 @@ def update_enrollments_completions_at_mailchimp(list_id):
             users = list(User.objects.all()[page_start:page_end])
             log.info("Syncing batch from {} to {}".format(page_start, page_end))
 
+            focus_areas = FocusArea.get_map()
+            org_sectors = OrgSector.get_map()
+
             for user in users:
                 profile = user.profile
                 extended_profile = user.extended_profile
-
-                focus_areas = FocusArea.get_map()
-                org_sectors = OrgSector.get_map()
 
                 org_type = ""
                 if extended_profile.organization and extended_profile.organization.org_type:
@@ -97,12 +97,12 @@ def update_enrollments_completions_at_mailchimp(list_id):
 
                 try:
                     response = ChimpClient().add_update_member_to_list(list_id, user.email, user_json)
-                    print (
+                    log.info(
                         "Mailchimp-Sync Method: User with email address {} synced successfully".format(user.email)
                     )
                     log.info(response)
                 except MailChimpException as ex:
-                    print (
+                    log.info(
                         "Mailchimp-Sync Method: "
                         "There was error syncing user with email address {}".format(user.email)
                     )

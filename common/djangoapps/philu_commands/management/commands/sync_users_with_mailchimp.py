@@ -24,12 +24,13 @@ class Command(BaseCommand):
 
     def get_users_data_to_send(self, users):
         users_set = []
+
+        focus_areas = FocusArea.get_map()
+        org_sectors = OrgSector.get_map()
+
         for user in users:
             profile = user.profile
             extended_profile = user.extended_profile
-
-            focus_areas = FocusArea.get_map()
-            org_sectors = OrgSector.get_map()
 
             org_type = ""
             if extended_profile.organization and extended_profile.organization.org_type:
@@ -89,7 +90,7 @@ class Command(BaseCommand):
                 page_start = counter * batch_size
                 page_end = page_start + batch_size
                 users = list(User.objects.all()[page_start:page_end])
-                print(User.objects.all()[page_start:page_end].query)
+                log.info(User.objects.all()[page_start:page_end].query)
                 users_json = self.get_users_data_to_send(users)
                 self.send_user_to_mailchimp(client, users_json)
             except Exception as ex:
