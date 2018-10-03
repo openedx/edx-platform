@@ -7,7 +7,6 @@ from __future__ import unicode_literals
 import logging
 import unicodedata
 
-from django.conf import settings
 from django.contrib.auth.password_validation import (
     get_default_password_validators,
     validate_password as django_validate_password,
@@ -15,6 +14,7 @@ from django.contrib.auth.password_validation import (
 )
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _, ungettext
+from openedx.core.djangoapps.user_api.config.waffle import PASSWORD_UNICODE_NORMALIZE_FLAG
 from six import text_type
 
 log = logging.getLogger(__name__)
@@ -89,6 +89,14 @@ def password_validators_restrictions():
     return complexity_restrictions
 
 
+def normalize_password(password):
+    """
+    Normalize all passwords to 'NFKC' across the platform to prevent mismatched hash strings when comparing entered
+    passwords on login. See LEARNER-4283 for more context.
+    """
+    return unicodedata.normalize('NFKC', password)
+
+
 def validate_password(password, user=None):
     """
     EdX's custom password validator for passwords. This function performs the
@@ -117,6 +125,8 @@ def validate_password(password, user=None):
             # no reason to get into weeds
             raise ValidationError([_('Invalid password.')])
 
+    if PASSWORD_UNICODE_NORMALIZE_FLAG.is_enabled():
+        password = normalize_password(password)
     django_validate_password(password, user)
 
 

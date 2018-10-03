@@ -5,11 +5,13 @@ Most of the functionality is covered in test_views.py.
 """
 
 import re
+import unicodedata
 
 import ddt
 import pytest
 from dateutil.parser import parse as parse_datetime
 from django.conf import settings
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.core import mail
 from django.test import TestCase
@@ -27,18 +29,23 @@ from openedx.core.djangoapps.user_api.accounts.api import (
     request_password_change,
     update_account_settings
 )
+from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import (  # pylint: disable=unused-import
+    RetirementTestCase,
+    fake_requested_retirement,
+    setup_retirement_states
+)
 from openedx.core.djangoapps.user_api.accounts.tests.testutils import (
     INVALID_EMAILS,
     INVALID_PASSWORDS,
     INVALID_USERNAMES,
     VALID_USERNAMES_UNICODE
 )
-from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import (  # pylint: disable=unused-import
-    RetirementTestCase,
-    fake_requested_retirement,
-    setup_retirement_states
+from openedx.core.djangoapps.user_api.config.waffle import (
+    PASSWORD_UNICODE_NORMALIZE_FLAG,
+    PREVENT_AUTH_USER_WRITES,
+    SYSTEM_MAINTENANCE_MSG,
+    waffle
 )
-from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangoapps.user_api.errors import (
     AccountEmailInvalid,
     AccountPasswordInvalid,
@@ -51,6 +58,7 @@ from openedx.core.djangoapps.user_api.errors import (
     UserNotAuthorized,
     UserNotFound
 )
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.core.lib.tests import attr
 from student.models import PendingEmailChange
@@ -317,7 +325,6 @@ class AccountSettingsOnCreationTest(TestCase):
     def test_create_account(self):
         # Create a new account, which should have empty account settings by default.
         create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
-
         # Retrieve the account settings
         user = User.objects.get(username=self.USERNAME)
         request = RequestFactory().get("/api/user/v1/accounts/")
@@ -353,6 +360,22 @@ class AccountSettingsOnCreationTest(TestCase):
             'accomplishments_shared': False,
             'extended_profile': [],
         })
+
+    @override_waffle_flag(PASSWORD_UNICODE_NORMALIZE_FLAG, active=True)
+    def test_normalize_password(self):
+        """
+        Test that unicode normalization on passwords is happening when a user is created.
+        """
+        # Set user password to NFKD format so that we can test that it is normalized to
+        # NFKC format upon account creation.
+        create_account(self.USERNAME, unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'), self.EMAIL)
+
+        user = User.objects.get(username=self.USERNAME)
+
+        salt_val = user.password.split('$')[1]
+
+        expected_user_password = make_password(unicodedata.normalize('NFKC', u'Ṗŕệṿïệẅ Ṯệẍt'), salt_val)
+        self.assertEqual(expected_user_password, user.password)
 
 
 @attr(shard=2)

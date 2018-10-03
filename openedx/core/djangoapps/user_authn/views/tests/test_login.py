@@ -1,35 +1,43 @@
+#coding:utf-8
 """
 Tests for student activation and login
 """
 import json
+import unicodedata
 import unittest
 
+import ddt
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.cache import cache
 from django.core import mail
-from django.urls import NoReverseMatch, reverse
+from django.core.cache import cache
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.test.client import Client
 from django.test.utils import override_settings
+from django.urls import NoReverseMatch, reverse
 from mock import patch
 from six import text_type
 
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
-from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, waffle
-from openedx.core.djangoapps.user_authn.cookies import jwt_cookies
-from openedx.core.djangoapps.user_authn.tests.utils import setup_login_oauth_client
-from openedx.core.djangoapps.user_authn.waffle import JWT_COOKIES_FLAG
 from openedx.core.djangoapps.password_policy.compliance import (
     NonCompliantPasswordException,
     NonCompliantPasswordWarning
 )
+from openedx.core.djangoapps.user_api.config.waffle import (
+    PASSWORD_UNICODE_NORMALIZE_FLAG,
+    PREVENT_AUTH_USER_WRITES,
+    waffle
+)
+from openedx.core.djangoapps.user_authn.cookies import jwt_cookies
+from openedx.core.djangoapps.user_authn.tests.utils import setup_login_oauth_client
+from openedx.core.djangoapps.user_authn.waffle import JWT_COOKIES_FLAG
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
+@ddt.ddt
 class LoginTest(CacheIsolationTestCase):
     """
     Test login_user() view
@@ -481,6 +489,33 @@ class LoginTest(CacheIsolationTestCase):
             response_content = json.loads(response.content)
             self.assertIn('Test warning', self.client.session['_messages'])
         self.assertTrue(response_content.get('success'))
+
+    @ddt.data(
+        ('test_password', 'test_password', True, True),
+        (unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'),
+         unicodedata.normalize('NFKC', u'Ṗŕệṿïệẅ Ṯệẍt'), False, True),
+        (unicodedata.normalize('NFKC', u'Ṗŕệṿïệẅ Ṯệẍt'),
+         unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'), True, True),
+        (unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'),
+         unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'), False, True),
+        ('test_password', 'test_password', True, False),
+        (unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'),
+         unicodedata.normalize('NFKC', u'Ṗŕệṿïệẅ Ṯệẍt'), False, False),
+        (unicodedata.normalize('NFKC', u'Ṗŕệṿïệẅ Ṯệẍt'),
+         unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'), False, False),
+        (unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'),
+         unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'), True, False),
+    )
+    @ddt.unpack
+    def test_password_unicode_normalization_login(self, password, password_entered, login_success, waffle_flag):
+        """
+        Tests unicode normalization on user's passwords on login.
+        """
+        with PASSWORD_UNICODE_NORMALIZE_FLAG.override(active=waffle_flag):
+            self.user.set_password(password)
+            self.user.save()
+            response, _ = self._login_response(self.user.email, password_entered)
+            self._assert_response(response, success=login_success)
 
     def _login_response(self, email, password, patched_audit_log=None, extra_post_params=None):
         """
