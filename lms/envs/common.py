@@ -1425,6 +1425,19 @@ discussion_vendor_js = [
     'js/split.js'
 ]
 
+# TODO move to common/static/common/js/capa?
+capa_js = (
+    rooted_glob(COMMON_ROOT / 'lib', 'xmodule/xmodule/js/src/capa/display.js') +
+    rooted_glob(COMMON_ROOT / 'lib', 'xmodule/xmodule/js/src/capa/imageinput.js') +
+    rooted_glob(COMMON_ROOT / 'lib', 'xmodule/xmodule/js/src/capa/schematic.js')
+)
+
+# TODO any vendor files?  maybe these, which are shared by other xmodules?
+# * js/src/javascript_loader.js
+# * js/src/collapsible.js
+capa_vendor_js = [
+]
+
 notes_js = ['js/notes.js']
 instructor_dash_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/instructor_dashboard/**/*.js'))
 
@@ -1581,6 +1594,14 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/discussion/inline-discussion-rtl.css',
     },
+    # TODO: common/lib/xmodule/xmodule/css/editor/edit.scss is shared by CAPA and HTML XModules
+    'style-capa': {
+        'source_filenames': [
+            'sass/capa/display.scss',
+            'sass/capa/edit.scss',
+        ],
+        'output_filename': 'css/capa/capa.css',
+    },
     FOOTER_CSS['openedx']['ltr']: {
         'source_filenames': [
             'css/lms-footer.css',
@@ -1705,6 +1726,14 @@ PIPELINE_JS = {
     'discussion_vendor': {
         'source_filenames': discussion_vendor_js,
         'output_filename': 'js/discussion_vendor.js',
+    },
+    'capa': {
+        'source_filenames': capa_js,
+        'output_filename': 'js/capa.js',
+    },
+    'capa_vendor': {
+        'source_filenames': capa_vendor_js,
+        'output_filename': 'js/capa_vendor.js',
     },
     'notes': {
         'source_filenames': notes_js,

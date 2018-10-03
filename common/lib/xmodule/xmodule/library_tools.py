@@ -5,7 +5,7 @@ from django.core.exceptions import PermissionDenied
 from opaque_keys.edx.locator import LibraryLocator, LibraryUsageLocator
 from search.search_engine_base import SearchEngine
 
-from xmodule.capa_module import CapaDescriptor
+from openedx.core.lib.xblock_builtin.xblock_capa_problems.xblock_capa_problems import CapaProblemsXBlock
 from xmodule.library_content_module import ANY_CAPA_TYPE_VALUE
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -99,7 +99,7 @@ class LibraryToolsService(object):
         if search_engine:
             filter_clause = {
                 "library": unicode(normalize_key_for_search(library.location.library_key)),
-                "content_type": CapaDescriptor.INDEX_CONTENT_TYPE,
+                "content_type": CapaProblemsXBlock.INDEX_CONTENT_TYPE,
                 "problem_types": capa_type
             }
             search_result = search_engine.search(field_dictionary=filter_clause)
@@ -116,7 +116,7 @@ class LibraryToolsService(object):
             return False
 
         descriptor = self.store.get_item(usage_key, depth=0)
-        assert isinstance(descriptor, CapaDescriptor)
+        assert isinstance(descriptor, CapaProblemsXBlock)
         return capa_type in descriptor.problem_types
 
     def can_use_library_content(self, block):

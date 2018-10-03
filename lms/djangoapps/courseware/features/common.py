@@ -188,7 +188,7 @@ def get_courseware_with_tabs(course_id):
         }, {
             'clickable_tab_count': 0,
             'section_name': 'Lab0: Using the tools',
-            'tab_classes': ['HtmlDescriptor', 'HtmlDescriptor', 'CapaDescriptor']
+            'tab_classes': ['HtmlDescriptor', 'HtmlDescriptor', 'CapaProblemsXBlock']
         }, {
             'clickable_tab_count': 0,
             'section_name': 'Circuit Sandbox',
@@ -203,7 +203,7 @@ def get_courseware_with_tabs(course_id):
         }, {
             'clickable_tab_count': 0,
             'section_name': 'Basic Circuit Analysis',
-            'tab_classes': ['CapaDescriptor', 'CapaDescriptor', 'CapaDescriptor']
+            'tab_classes': ['CapaProblemsXBlock', 'CapaProblemsXBlock', 'CapaProblemsXBlock']
         }, {
             'clickable_tab_count': 0,
             'section_name': 'Resistor Divider',

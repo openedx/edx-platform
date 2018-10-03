@@ -230,7 +230,7 @@ class CapaFields(object):
     )
 
 
-class CapaMixin(ScorableXBlockMixin, CapaFields):
+class CapaMixin(ScorableXBlockMixin):
     """
         Core logic for Capa Problem, which can be used by XModules or XBlocks.
     """

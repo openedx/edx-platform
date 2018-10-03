@@ -1,52 +1,207 @@
-"""Implements basics of Capa, including class CapaModule."""
+# -*- coding: utf-8 -*-
+"""
+CAPA Problems XBlock
+"""
 import json
 import logging
 import re
 import sys
 
 from lxml import etree
-from pkg_resources import resource_string
+
+from django.contrib.staticfiles.storage import staticfiles_storage
+from django.utils.translation import gettext_noop as _
+from xblock.core import XBlock
+from web_fragments.fragment import Fragment
+from xblockutils.resources import ResourceLoader
+from xblockutils.studio_editable import StudioEditableXBlockMixin
 
 from capa import responsetypes
-from xmodule.exceptions import NotFoundError, ProcessingError
-from xmodule.raw_module import RawDescriptor
+from openedx.core.lib.xblock_builtin import get_css_dependencies, get_js_dependencies
 from xmodule.contentstore.django import contentstore
+from xmodule.exceptions import NotFoundError, ProcessingError
+from xmodule.capa_base import CapaFields, CapaMixin, ComplexEncoder
+from xmodule.raw_module import RawDescriptor
+from xmodule.xml_module import XmlParserMixin
 from xmodule.util.misc import escape_html_characters
 from xmodule.util.sandboxing import get_python_lib_zip
-from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT, XModule, module_attr
-
-from .capa_base import CapaFields, CapaMixin, ComplexEncoder
-
-log = logging.getLogger("edx.courseware")
 
 
-class CapaModule(CapaMixin, XModule):
+log = logging.getLogger(__name__)
+loader = ResourceLoader(__name__)  # pylint: disable=invalid-name
+
+
+@XBlock.needs('i18n')
+class CapaProblemsXBlock(CapaFields, CapaMixin, StudioEditableXBlockMixin, XmlParserMixin, XBlock):
     """
-    An XModule implementing LonCapa format problems, implemented by way of
+    An XBlock implementing LonCapa format problems, by way of
     capa.capa_problem.LoncapaProblem
-
-    CapaModule.__init__ takes the same arguments as xmodule.x_module:XModule.__init__
     """
+    INDEX_CONTENT_TYPE = 'CAPA'
     icon_class = 'problem'
 
-    js = {
-        'js': [
-            resource_string(__name__, 'js/src/javascript_loader.js'),
-            resource_string(__name__, 'js/src/capa/display.js'),
-            resource_string(__name__, 'js/src/collapsible.js'),
-            resource_string(__name__, 'js/src/capa/imageinput.js'),
-            resource_string(__name__, 'js/src/capa/schematic.js'),
+    editable_fields = [
+        "display_name",
+        "max_attempts",
+        "showanswer",
+        "show_reset_button",
+        "rerandomize",
+        "data",
+        "submission_wait_seconds",
+        "weight",
+        "source_code",
+        "use_latex_compiler",
+        "matlab_api_key",
+    ]
+
+    has_author_view = True
+
+    # TODO from CapaDescriptor
+    '''
+    resources_dir = None
+
+    show_in_read_only_mode = True
+    template_dir_name = 'problem'
+    mako_template = "widgets/problem-edit.html"
+
+    from pkg_resources import resource_string
+    js = {'js': [resource_string(__name__, 'js/src/problem/edit.js')]}
+    js_module_name = "MarkdownEditingDescriptor"
+    css = {
+        'scss': [
+            resource_string(__name__, 'css/editor/edit.scss'),
         ]
     }
 
-    js_module_name = "Problem"
-    css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
+    @classmethod
+    def filter_templates(cls, template, course):
+        """
+        Filter template that contains 'latex' from templates.
 
-    def author_view(self, context):
+        Show them only if use_latex_compiler is set to True in
+        course settings.
+        """
+        return 'latex' not in template['template_id'] or course.use_latex_compiler
+
+    # VS[compat]
+    # TODO (cpennington): Delete this method once all fall 2012 course are being
+    # edited in the cms
+    @classmethod
+    def backcompat_paths(cls, path):
+        import dogstats_wrapper as dog_stats_api
+        from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT
+        dog_stats_api.increment(
+            DEPRECATION_VSCOMPAT_EVENT,
+            tags=["location:capa_descriptor_backcompat_paths"]
+        )
+        return [
+            'problems/' + path[8:],
+            path[8:],
+        ]
+
+    def index_dictionary(self):
+        """
+        Return dictionary prepared with module content and type for indexing.
+        """
+        xblock_body = super(CapaDescriptor, self).index_dictionary()
+        # Removing solutions and hints, as well as script and style
+        capa_content = re.sub(
+            re.compile(
+                r"""
+                    <solution>.*?</solution> |
+                    <script>.*?</script> |
+                    <style>.*?</style> |
+                    <[a-z]*hint.*?>.*?</[a-z]*hint>
+                """,
+                re.DOTALL |
+                re.VERBOSE),
+            "",
+            self.data
+        )
+        capa_content = escape_html_characters(capa_content)
+        capa_body = {
+            "capa_content": capa_content,
+            "display_name": self.display_name,
+        }
+        if "content" in xblock_body:
+            xblock_body["content"].update(capa_body)
+        else:
+            xblock_body["content"] = capa_body
+        xblock_body["content_type"] = self.INDEX_CONTENT_TYPE
+        xblock_body["problem_types"] = list(self.problem_types)
+        return xblock_body
+
+    '''
+
+    # The capa format specifies that what we call max_attempts in the code
+    # is the attribute `attempts`. This will do that conversion
+    metadata_translations = dict(RawDescriptor.metadata_translations)
+    metadata_translations['attempts'] = 'max_attempts'
+
+    def student_view(self, context=None):  # pylint: disable=unused-argument
+        """
+        Return a fragment with the html from this XBlock
+
+        Doesn't yet add any of the javascript to the fragment, nor the css.
+        Also doesn't expect any javascript binding, yet.
+
+        Makes no use of the context parameter
+        """
+        log.debug("CapaProblemsXBlock.student_view")
+        fragment = Fragment()
+        self.add_resource_urls(fragment)
+        fragment.add_content(self.get_html())
+        fragment.initialize_js('Problem')
+        return fragment
+
+    def author_view(self, context=None):
         """
         Renders the Studio preview view.
         """
+        log.debug("CapaProblemsXBlock.author_view")
+        if context is None:
+            context = {}
+        context.update({
+            'markdown': self.markdown,
+            'enable_markdown': self.markdown is not None,
+            'enable_latex_compiler': self.use_latex_compiler,
+        })
         return self.student_view(context)
+
+    @staticmethod
+    def vendor_js_dependencies():
+        """
+        Returns list of vendor JS files that this XBlock depends on.
+        """
+        return get_js_dependencies('capa_vendor')
+
+    @staticmethod
+    def js_dependencies():
+        """
+        Returns list of JS files that this XBlock depends on.
+        """
+        return get_js_dependencies('capa')
+
+    @staticmethod
+    def css_dependencies():
+        """
+        Returns list of CSS files that this XBlock depends on.
+        """
+        return get_css_dependencies('style-capa')
+
+    def add_resource_urls(self, fragment):
+        """
+        Adds URLs for JS and CSS resources that this XBlock depends on to `fragment`.
+        """
+        for vendor_js_file in self.vendor_js_dependencies():
+            fragment.add_resource_url(staticfiles_storage.url(vendor_js_file), "application/javascript", "head")
+
+        for css_file in self.css_dependencies():
+            fragment.add_css_url(staticfiles_storage.url(css_file))
+
+        # Body dependencies
+        for js_file in self.js_dependencies():
+            fragment.add_javascript_url(staticfiles_storage.url(js_file))
 
     def handle_ajax(self, dispatch, data):
         """
@@ -59,6 +214,7 @@ class CapaModule(CapaMixin, XModule):
           'progress' : 'none'/'in_progress'/'done',
           <other request-specific values here > }
         """
+        log.debug("CapaProblemsXBlock.handle_ajax")
         handlers = {
             'hint_button': self.hint_button,
             'problem_get': self.get_problem,
@@ -139,43 +295,13 @@ class CapaModule(CapaMixin, XModule):
 
         return self.display_name
 
-
-class CapaDescriptor(CapaFields, RawDescriptor):
-    """
-    Module implementing problems in the LON-CAPA format,
-    as implemented by capa.capa_problem
-    """
-    INDEX_CONTENT_TYPE = 'CAPA'
-
-    module_class = CapaModule
-    resources_dir = None
-
-    has_score = True
-    show_in_read_only_mode = True
-    template_dir_name = 'problem'
-    mako_template = "widgets/problem-edit.html"
-    js = {'js': [resource_string(__name__, 'js/src/problem/edit.js')]}
-    js_module_name = "MarkdownEditingDescriptor"
-    has_author_view = True
-    css = {
-        'scss': [
-            resource_string(__name__, 'css/editor/edit.scss'),
-            resource_string(__name__, 'css/problem/edit.scss')
-        ]
-    }
-
-    # The capa format specifies that what we call max_attempts in the code
-    # is the attribute `attempts`. This will do that conversion
-    metadata_translations = dict(RawDescriptor.metadata_translations)
-    metadata_translations['attempts'] = 'max_attempts'
-
     @classmethod
-    def filter_templates(cls, template, course):
+    def parse_xml(cls, node, runtime, keys, id_generator):
         """
-        Filter template that contains 'latex' from templates.
+        Parses OLX into XBlock.
 
-        Show them only if use_latex_compiler is set to True in
-        course settings.
+        This method is overridden here to allow parsing legacy OLX, coming from CAPA XModule.
+        XBlock stores all the associated data, fields and children in a XML element inlined into vertical XML file.
         """
         return 'latex' not in template['template_id'] or course.use_latex_compiler
 
@@ -188,29 +314,6 @@ class CapaDescriptor(CapaFields, RawDescriptor):
         })
         return _context
 
-    # VS[compat]
-    # TODO (cpennington): Delete this method once all fall 2012 course are being
-    # edited in the cms
-    @classmethod
-    def backcompat_paths(cls, path):
-        return [
-            'problems/' + path[8:],
-            path[8:],
-        ]
-
-    @property
-    def non_editable_metadata_fields(self):
-        non_editable_fields = super(CapaDescriptor, self).non_editable_metadata_fields
-        non_editable_fields.extend([
-            CapaDescriptor.due,
-            CapaDescriptor.graceperiod,
-            CapaDescriptor.force_save_button,
-            CapaDescriptor.markdown,
-            CapaDescriptor.use_latex_compiler,
-            CapaDescriptor.show_correctness,
-        ])
-        return non_editable_fields
-
     @property
     def problem_types(self):
         """ Low-level problem type introspection for content libraries filtering by problem type """
@@ -221,38 +324,6 @@ class CapaDescriptor(CapaFields, RawDescriptor):
             return None  # short-term fix to prevent errors (TNL-5057). Will be more properly addressed in TNL-4525.
         registered_tags = responsetypes.registry.registered_tags()
         return {node.tag for node in tree.iter() if node.tag in registered_tags}
-
-    def index_dictionary(self):
-        """
-        Return dictionary prepared with module content and type for indexing.
-        """
-        xblock_body = super(CapaDescriptor, self).index_dictionary()
-        # Removing solutions and hints, as well as script and style
-        capa_content = re.sub(
-            re.compile(
-                r"""
-                    <solution>.*?</solution> |
-                    <script>.*?</script> |
-                    <style>.*?</style> |
-                    <[a-z]*hint.*?>.*?</[a-z]*hint>
-                """,
-                re.DOTALL |
-                re.VERBOSE),
-            "",
-            self.data
-        )
-        capa_content = escape_html_characters(capa_content)
-        capa_body = {
-            "capa_content": capa_content,
-            "display_name": self.display_name,
-        }
-        if "content" in xblock_body:
-            xblock_body["content"].update(capa_body)
-        else:
-            xblock_body["content"] = capa_body
-        xblock_body["content_type"] = self.INDEX_CONTENT_TYPE
-        xblock_body["problem_types"] = list(self.problem_types)
-        return xblock_body
 
     def has_support(self, view, functionality):
         """
@@ -401,36 +472,4 @@ class CapaDescriptor(CapaFields, RawDescriptor):
                     report[_("Correct Answer")] = correct_answer_text
                 yield (user_state.username, report)
 
-    # Proxy to CapaModule for access to any of its attributes
-    answer_available = module_attr('answer_available')
-    submit_button_name = module_attr('submit_button_name')
-    submit_button_submitting_name = module_attr('submit_button_submitting_name')
-    submit_problem = module_attr('submit_problem')
-    choose_new_seed = module_attr('choose_new_seed')
-    closed = module_attr('closed')
-    get_answer = module_attr('get_answer')
-    get_problem = module_attr('get_problem')
-    get_problem_html = module_attr('get_problem_html')
-    get_state_for_lcp = module_attr('get_state_for_lcp')
-    handle_input_ajax = module_attr('handle_input_ajax')
-    hint_button = module_attr('hint_button')
-    handle_problem_html_error = module_attr('handle_problem_html_error')
-    handle_ungraded_response = module_attr('handle_ungraded_response')
-    has_submitted_answer = module_attr('has_submitted_answer')
-    is_attempted = module_attr('is_attempted')
-    is_correct = module_attr('is_correct')
-    is_past_due = module_attr('is_past_due')
-    is_submitted = module_attr('is_submitted')
-    lcp = module_attr('lcp')
-    make_dict_of_responses = module_attr('make_dict_of_responses')
-    new_lcp = module_attr('new_lcp')
-    publish_grade = module_attr('publish_grade')
-    rescore = module_attr('rescore')
-    reset_problem = module_attr('reset_problem')
-    save_problem = module_attr('save_problem')
-    set_score = module_attr('set_score')
-    set_state_from_lcp = module_attr('set_state_from_lcp')
-    should_show_submit_button = module_attr('should_show_submit_button')
-    should_show_reset_button = module_attr('should_show_reset_button')
-    should_show_save_button = module_attr('should_show_save_button')
-    update_score = module_attr('update_score')
+

@@ -12,7 +12,6 @@ XMODULES = [
     "library_content = xmodule.library_content_module:LibraryContentDescriptor",
     "error = xmodule.error_module:ErrorDescriptor",
     "poll_question = xmodule.poll_module:PollDescriptor",
-    "problem = xmodule.capa_module:CapaDescriptor",
     "problemset = xmodule.seq_module:SequenceDescriptor",
     "randomize = xmodule.randomize_module:RandomizeDescriptor",
     "split_test = xmodule.split_test_module:SplitTestDescriptor",
