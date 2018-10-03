@@ -278,6 +278,11 @@ CELERY_QUEUES.update(
     }
 )
 
+# Allow additional celerybeat schedules to be configured from the environment
+ADDITIONAL_CELERYBEAT_SCHEDULES = ENV_TOKENS.get('ADDITIONAL_CELERYBEAT_SCHEDULES', {})
+for schedule in ADDITIONAL_CELERYBEAT_SCHEDULES:
+    CELERYBEAT_SCHEDULE[schedule] = ADDITIONAL_CELERYBEAT_SCHEDULES[schedule]
+
 # following setting is for backward compatibility
 if ENV_TOKENS.get('COMPREHENSIVE_THEME_DIR', None):
     COMPREHENSIVE_THEME_DIR = ENV_TOKENS.get('COMPREHENSIVE_THEME_DIR')
