@@ -1888,7 +1888,6 @@ CELERY_DEFAULT_EXCHANGE_TYPE = 'direct'
 
 HIGH_PRIORITY_QUEUE = 'edx.core.high'
 DEFAULT_PRIORITY_QUEUE = 'edx.core.default'
-LOW_PRIORITY_QUEUE = 'edx.core.low'
 HIGH_MEM_QUEUE = 'edx.core.high_mem'
 
 CELERY_QUEUE_HA_POLICY = 'all'
@@ -1900,7 +1899,6 @@ CELERY_DEFAULT_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
 
 CELERY_QUEUES = {
     HIGH_PRIORITY_QUEUE: {},
-    LOW_PRIORITY_QUEUE: {},
     DEFAULT_PRIORITY_QUEUE: {},
     HIGH_MEM_QUEUE: {},
 }
@@ -1955,7 +1953,7 @@ BULK_EMAIL_ROUTING_KEY = HIGH_PRIORITY_QUEUE
 
 # We also define a queue for smaller jobs so that large courses don't block
 # smaller emails (see BULK_EMAIL_JOB_SIZE_THRESHOLD setting)
-BULK_EMAIL_ROUTING_KEY_SMALL_JOBS = LOW_PRIORITY_QUEUE
+BULK_EMAIL_ROUTING_KEY_SMALL_JOBS = DEFAULT_PRIORITY_QUEUE
 
 # For emails with fewer than these number of recipients, send them through
 # a different queue to avoid large courses blocking emails that are meant to be
@@ -3251,7 +3249,7 @@ AUDIT_CERT_CUTOFF_DATE = None
 ################################ Settings for Credentials Service ################################
 
 CREDENTIALS_SERVICE_USERNAME = 'credentials_service_user'
-CREDENTIALS_GENERATION_ROUTING_KEY = HIGH_PRIORITY_QUEUE
+CREDENTIALS_GENERATION_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
 
 # Settings for Comprehensive Theming app
 
@@ -3401,7 +3399,7 @@ COURSE_ENROLLMENT_MODES = {
 COURSES_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 
 ############## Settings for CourseGraph ############################
-COURSEGRAPH_JOB_QUEUE = LOW_PRIORITY_QUEUE
+COURSEGRAPH_JOB_QUEUE = DEFAULT_PRIORITY_QUEUE
 
 
 # Initialize to 'unknown', but read from JSON in aws.py
