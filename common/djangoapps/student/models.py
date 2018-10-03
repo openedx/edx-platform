@@ -233,6 +233,13 @@ def is_username_retired(username):
         raise
 
 
+def username_exists_or_retired(username):
+    """
+    Check a username for existence -or- retirement against the User model.
+    """
+    return User.objects.filter(username=username).exists() or is_username_retired(username)
+
+
 def is_email_retired(email):
     """
     Checks to see if the given email has been previously retired

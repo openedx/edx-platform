@@ -14,7 +14,7 @@ from django.http import HttpResponseForbidden
 from openedx.core.djangoapps.theming.helpers import get_current_request
 from six import text_type
 
-from student.models import User, UserProfile, Registration, email_exists_or_retired
+from student.models import User, UserProfile, Registration, email_exists_or_retired, username_exists_or_retired
 from student import forms as student_forms
 from student import views as student_views
 from util.model_utils import emit_setting_changed_event
@@ -695,7 +695,7 @@ def _validate_username_doesnt_exist(username):
     :return: None
     :raises: errors.AccountUsernameAlreadyExists
     """
-    if username is not None and User.objects.filter(username=username).exists():
+    if username is not None and username_exists_or_retired(username):
         raise errors.AccountUsernameAlreadyExists(_(accounts.USERNAME_CONFLICT_MSG).format(username=username))
 
 
