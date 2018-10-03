@@ -122,13 +122,12 @@ class ScheduleMessageBaseTask(LoggedTask):
 
         # If no target date was provided, then enqueue tasks from the current date
         if target_day_str is None:
-            cls.enqueue(
+            return self.enqueue(
                 site,
                 now(),
                 day_offset,
                 override_recipient_email,
             )
-            return
 
         # Otherwise, process the batched tasks
         with emulate_http_request(site=site):
@@ -178,6 +177,9 @@ def _course_update_schedule_send(site_id, msg_str):
 
 
 class ScheduleRecurringNudge(ScheduleMessageBaseTask):
+    """
+    Task to send the course nudge emails
+    """
     num_bins = resolvers.RECURRING_NUDGE_NUM_BINS
     enqueue_config_var = 'enqueue_recurring_nudge'
     log_prefix = RECURRING_NUDGE_LOG_PREFIX
@@ -189,6 +191,9 @@ class ScheduleRecurringNudge(ScheduleMessageBaseTask):
 
 
 class ScheduleUpgradeReminder(ScheduleMessageBaseTask):
+    """
+    Task to send the course upgrade reminder emails
+    """
     num_bins = resolvers.UPGRADE_REMINDER_NUM_BINS
     enqueue_config_var = 'enqueue_upgrade_reminder'
     log_prefix = UPGRADE_REMINDER_LOG_PREFIX
@@ -200,6 +205,9 @@ class ScheduleUpgradeReminder(ScheduleMessageBaseTask):
 
 
 class ScheduleCourseUpdate(ScheduleMessageBaseTask):
+    """
+    Task to send the weekly course highlights emails
+    """
     num_bins = resolvers.COURSE_UPDATE_NUM_BINS
     enqueue_config_var = 'enqueue_course_update'
     log_prefix = COURSE_UPDATE_LOG_PREFIX
