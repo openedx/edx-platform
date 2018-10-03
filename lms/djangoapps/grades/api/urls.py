@@ -7,6 +7,9 @@ from django.conf.urls import include, url
 
 from lms.djangoapps.grades.api import views
 
+
+app_name = 'lms.djangoapps.grades'
+
 urlpatterns = [
     url(
         r'^v0/course_grade/{course_id}/users/$'.format(
