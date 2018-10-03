@@ -21,7 +21,6 @@ import datetime
 import json
 import os
 import logging
-import logging.config
 import dateutil
 
 from path import Path as path
@@ -1111,5 +1110,4 @@ plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_c
 
 derive_settings(__name__)
 
-logging.config.dictConfig(LOGGING)
 logging.warn('DEPRECATION WARNING: aws.py has been deprecated, you should use production.py instead.')

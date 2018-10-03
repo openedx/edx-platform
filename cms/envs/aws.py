@@ -9,7 +9,6 @@ This is the default template for our main set of AWS servers.
 import json
 import os
 import logging
-import logging.config
 
 from path import Path as path
 from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed
@@ -609,5 +608,4 @@ plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.CMS, plugin_c
 
 derive_settings(__name__)
 
-logging.config.dictConfig(LOGGING)
 logging.warn('DEPRECATION WARNING: aws.py has been deprecated, you should use production.py instead.')

@@ -28,7 +28,7 @@ TEST_ROOT = CONFIG_ROOT.dirname().dirname() / "test_root"
 os.environ['SERVICE_VARIANT'] = 'bok_choy_docker' if 'BOK_CHOY_HOSTNAME' in os.environ else 'bok_choy'
 os.environ['CONFIG_ROOT'] = CONFIG_ROOT
 
-from .aws import *  # pylint: disable=wildcard-import, unused-wildcard-import
+from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import, wrong-import-position
 
 
 ######################### Testing overrides ####################################

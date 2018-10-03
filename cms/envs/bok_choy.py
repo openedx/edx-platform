@@ -24,7 +24,7 @@ from openedx.core.release import RELEASE_LINE
 os.environ['SERVICE_VARIANT'] = 'bok_choy_docker' if 'BOK_CHOY_HOSTNAME' in os.environ else 'bok_choy'
 os.environ['CONFIG_ROOT'] = path(__file__).abspath().dirname()
 
-from .aws import *  # pylint: disable=wildcard-import, unused-wildcard-import
+from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import, wrong-import-position
 
 ######################### Testing overrides ####################################
 
