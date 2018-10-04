@@ -215,6 +215,7 @@
 
                 submitForm: function(event) {
                     var data = this.getFormData();
+                    var targetBtn = event.target;
 
                     if (!_.isUndefined(event)) {
                         event.preventDefault();
@@ -228,6 +229,10 @@
                         this.model.save();
                         this.clearFormErrors();
                     } else {
+                        // remove loader icon from button
+                        targetBtn.classList.remove('has-spinner');
+                        targetBtn.removeAttribute('data-loading');
+
                         this.renderErrors(this.defaultFormErrorsTitle, this.errors);
                         this.toggleDisableButton(false);
                     }
