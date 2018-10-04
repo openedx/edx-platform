@@ -14,6 +14,7 @@ from django.test.utils import override_settings
 from django.utils.translation import ugettext as _
 from opaque_keys.edx.locator import CourseLocator
 from search.api import perform_search
+from edx_django_utils.monitoring.middleware import _DEFAULT_NAMESPACE as DJANGO_UTILS_NAMESPACE
 
 from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
 from contentstore.tests.utils import CourseTestCase
@@ -23,6 +24,7 @@ from contentstore.views.course import (
     course_outline_initial_state,
     reindex_course_and_check_access
 )
+from contentstore.config.waffle import WAFFLE_NAMESPACE as STUDIO_WAFFLE_NAMESPACE
 from contentstore.views.course import WAFFLE_NAMESPACE as COURSE_WAFFLE_NAMESPACE
 from contentstore.views.item import VisibilityState, create_xblock_info
 from course_action_state.managers import CourseRerunUIStateManager
@@ -368,6 +370,8 @@ class TestCourseIndexArchived(CourseTestCase):
         # Make sure we've cached data which could change the query counts
         # depending on test execution order
         WaffleSwitchNamespace(name=COURSE_WAFFLE_NAMESPACE).is_enabled(u'enable_global_staff_optimization')
+        WaffleSwitchNamespace(name=STUDIO_WAFFLE_NAMESPACE).is_enabled(u'enable_policy_page')
+        WaffleSwitchNamespace(name=DJANGO_UTILS_NAMESPACE).is_enabled(u'enable_memory_middleware')
 
     def check_index_page_with_query_count(self, separate_archived_courses, org, mongo_queries, sql_queries):
         """
