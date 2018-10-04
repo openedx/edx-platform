@@ -173,8 +173,8 @@ def sanitize_html(html_code):
     attributes = bleach.ALLOWED_ATTRIBUTES.copy()
     # Yuck! but bleach does not offer the option of passing in allowed_protocols,
     # and matlab uses data urls for images
-    if u'data' not in bleach.BleachSanitizer.allowed_protocols:
-        bleach.BleachSanitizer.allowed_protocols.append(u'data')
+    if u'data' not in bleach.ALLOWED_PROTOCOLS:
+        bleach.ALLOWED_PROTOCOLS.append(u'data')
     attributes.update({
         '*': ['class', 'style', 'id'],
         'audio': ['controls', 'autobuffer', 'autoplay', 'src'],
