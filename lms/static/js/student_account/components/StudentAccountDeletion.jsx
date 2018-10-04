@@ -64,6 +64,14 @@ export class StudentAccountDeletion extends React.Component {
       },
     );
 
+    const changeAcctInfoText = StringUtils.interpolate(
+      gettext('{htmlStart}Want to change your email, name, or password instead?{htmlEnd}'),
+      {
+        htmlStart: '<a href="https://support.edx.org/hc/en-us/sections/115004139268-Manage-Your-Account-Settings" target="_blank">',
+        htmlEnd: '</a>',
+      },
+    );
+
     return (
       <div className="account-deletion-details">
         <p className="account-settings-header-subtitle">{ gettext('We’re sorry to see you go!') }</p>
@@ -73,7 +81,15 @@ export class StudentAccountDeletion extends React.Component {
           className="account-settings-header-subtitle"
           dangerouslySetInnerHTML={{ __html: loseAccessText }}
         />
-
+        <p className="account-settings-header-subtitle-warning">
+          <strong>{ gettext('Warning: Account deletion is permanent. ') }</strong>
+          {gettext('Please read the above carefully before proceeding. This is an irreversible action, and ')}
+          <strong>{ gettext('you will no longer be able to use the same email on edX.') }</strong>
+        </p>
+        <p
+          className="account-settings-header-subtitle"
+          dangerouslySetInnerHTML={{ __html: changeAcctInfoText }}
+        />
         <Button
           id="delete-account-btn"
           className={['btn-outline-primary']}
