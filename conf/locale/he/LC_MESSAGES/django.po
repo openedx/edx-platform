@@ -10919,7 +10919,7 @@ msgstr "דוגמה: שלום שלום"
 #: themes/stanford-style/lms/templates/register-form.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Public Username"
-msgstr "שם משתמש"
+msgstr "שם משתמש <באנגלית ובלי רווחים>"
 
 #. Translators: This is the placeholder text for a field that asks the user to
 #. pick a username
