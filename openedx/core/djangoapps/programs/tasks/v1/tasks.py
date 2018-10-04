@@ -16,6 +16,7 @@ from openedx.core.djangoapps.certificates.api import available_date_for_certific
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.credentials.utils import get_credentials, get_credentials_api_client
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 
 LOGGER = get_task_logger(__name__)
@@ -123,9 +124,13 @@ def award_program_certificates(self, username):
 
     """
     LOGGER.info('Running task award_program_certificates for username %s', username)
+    programs_without_certificates = configuration_helpers.get_value('programs_without_certificates', [])
+    if programs_without_certificates:
+        if str(programs_without_certificates[0]).lower() == "all":
+            # this check will prevent unnecessary logging for partners without program certificates
+            return
 
     countdown = 2 ** self.request.retries
-
     # If the credentials config model is disabled for this
     # feature, it may indicate a condition where processing of such tasks
     # has been temporarily disabled.  Since this is a recoverable situation,
@@ -156,6 +161,10 @@ def award_program_certificates(self, username):
         # Determine which program certificates the user has already been awarded, if any.
         existing_program_uuids = get_certified_programs(student)
 
+        # we will skip all the programs which have already been awarded and we want to skip the programs
+        # which are exit in site configuration in 'programs_without_certificates' list.
+        awarded_and_skipped_program_uuids = list(set(existing_program_uuids + list(programs_without_certificates)))
+
     except Exception as exc:
         LOGGER.exception('Failed to determine program certificates to be awarded for user %s', username)
         raise self.retry(exc=exc, countdown=countdown, max_retries=MAX_RETRIES)
@@ -166,7 +175,7 @@ def award_program_certificates(self, username):
     # This logic is important, because we will retry the whole task if awarding any particular program cert fails.
     #
     # N.B. the list is sorted to facilitate deterministic ordering, e.g. for tests.
-    new_program_uuids = sorted(list(set(completed_programs.keys()) - set(existing_program_uuids)))
+    new_program_uuids = sorted(list(set(completed_programs.keys()) - set(awarded_and_skipped_program_uuids)))
     if new_program_uuids:
         try:
             credentials_client = get_credentials_api_client(
