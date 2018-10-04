@@ -139,9 +139,9 @@ class ShibSPTest(CacheIsolationTestCase):
         user_wo_map.save()
         extauth.save()
 
-        inactive_user = UserFactory.create(email='inactive@stanford.edu')
+        inactive_user = UserFactory.create(email='inactive_two@stanford.edu')
         inactive_user.is_active = False
-        inactive_extauth = ExternalAuthMap(external_id='inactive@stanford.edu',
+        inactive_extauth = ExternalAuthMap(external_id='inactive_two@stanford.edu',
                                            external_email='',
                                            external_domain='shib:https://idp.stanford.edu/',
                                            external_credentials="",
@@ -151,7 +151,7 @@ class ShibSPTest(CacheIsolationTestCase):
 
         idps = ['https://idp.stanford.edu/', 'https://someother.idp.com/']
         remote_users = ['withmap@stanford.edu', 'womap@stanford.edu',
-                        'testuser2@someother_idp.com', 'inactive@stanford.edu']
+                        'testuser2@someother_idp.com', 'inactive_two@stanford.edu']
 
         for idp in idps:
             for remote_user in remote_users:
@@ -179,7 +179,7 @@ class ShibSPTest(CacheIsolationTestCase):
                     self.assertEquals(len(args), 1)
                     self.assertIn(u'Login success', args[0])
                     self.assertIn(remote_user, args[0])
-                elif idp == "https://idp.stanford.edu/" and remote_user == 'inactive@stanford.edu':
+                elif idp == "https://idp.stanford.edu/" and remote_user == 'inactive_two@stanford.edu':
                     self.assertEqual(response.status_code, 403)
                     self.assertIn("Account not yet activated: please look for link in your email", response.content)
                     # verify logging:
@@ -203,7 +203,7 @@ class ShibSPTest(CacheIsolationTestCase):
                     self.assertIn(u'Login success', args[0])
                     self.assertIn(remote_user, args[0])
                 elif idp == "https://someother.idp.com/" and remote_user in \
-                            ['withmap@stanford.edu', 'womap@stanford.edu', 'inactive@stanford.edu']:
+                            ['withmap@stanford.edu', 'womap@stanford.edu', 'inactive_two@stanford.edu']:
                     self.assertEqual(response.status_code, 403)
                     self.assertIn("You have already created an account using an external login", response.content)
                     # no audit logging calls
