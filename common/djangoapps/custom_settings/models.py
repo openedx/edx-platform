@@ -32,6 +32,9 @@ class CustomSettings(models.Model):
                 course_short_id = last_id + 1
                 self.course_short_id = course_short_id
 
+            else:
+                self.course_short_id = 100
+
         super(CustomSettings, self).save(*args, **kwargs)
 
     def get_course_meta_tags(self):

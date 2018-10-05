@@ -32,14 +32,17 @@ def log_action_response(user, status_code, response_body):
     else:
         log.info('Success: User(%s) has been updated on nodebb' % user.username)
 
+
 @receiver(post_save, sender=CourseEnrollment)
 def sync_enrolments_to_mailchimp(sender, instance, created, **kwargs):
-    send_user_enrollments_to_mailchimp(sender, instance, created, kwargs)
+    data = {"user_id": instance.user.id}
+    send_user_enrollments_to_mailchimp.delay(data)
 
 
 @receiver(COURSE_CERT_AWARDED, sender=GeneratedCertificate)
 def handle_course_cert_awarded(sender, user, course_key, **kwargs):  # pylint: disable=unused-argument
-    send_user_course_completions_to_mailchimp(sender, user, course_key, kwargs)
+    data = {"user_id": user.id}
+    send_user_course_completions_to_mailchimp.delay(data)
 
 
 @receiver(post_save, sender=UserProfile)
@@ -85,10 +88,11 @@ def sync_user_info_with_nodebb(sender, instance, created, **kwargs):  # pylint: 
 
     task_update_user_profile_on_nodebb.delay(username=user.username, profile_data=data_to_sync)
 
+
 @receiver(post_save, sender=User, dispatch_uid='update_user_profile_on_nodebb')
 def update_user_profile_on_nodebb(sender, instance, created, **kwargs):
     """
-    Create/update user account at nodeBB when user created/updated at edx Platform
+        Create user account at nodeBB when user created at edx Platform
     """
     send_user_info_to_mailchimp(sender, instance, created, kwargs)
 
@@ -114,6 +118,7 @@ def update_user_profile_on_nodebb(sender, instance, created, **kwargs):
         }
 
         task_update_user_profile_on_nodebb.delay(username=instance.username, profile_data=data_to_sync)
+
 
 @receiver(post_delete, sender=User)
 def delete_user_from_nodebb(sender, **kwargs):
@@ -169,6 +174,7 @@ def join_group_on_nodebb(sender, event=None, user=None, **kwargs):  # pylint: di
         community_name = '%s-%s-%s-%s' % (course.display_name, course.id.org, course.id.course, course.id.run)
 
         task_join_group_on_nodebb.delay(group_name=community_name, username=username)
+
 
 @receiver(post_save, sender=CourseTeam, dispatch_uid="nodebb.signals.handlers.create_update_groupchat_on_nodebb")
 def create_update_groupchat_on_nodebb(sender, instance, created, **kwargs):
@@ -283,3 +289,4 @@ def leave_groupchat_on_nodebb(sender, instance, **kwargs):
             )
         else:
             log.info('Success: User have unjoined the group %s successfully' % instance.team.name)
+

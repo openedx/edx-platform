@@ -1,3 +1,5 @@
+from common.lib.mandrill_client.client import MandrillClient
+from django.contrib.auth.models import User
 from mailchimp_pipeline.client import ChimpClient, MailChimpException
 from mailchimp_pipeline.helpers import get_org_data_for_mandrill, get_user_active_enrollements, \
     get_enrollements_course_short_ids
@@ -6,6 +8,7 @@ from lms.djangoapps.onboarding.models import (UserExtendedProfile, Organization,
 from lms.djangoapps.certificates import api as certificate_api
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import (UserProfile, CourseEnrollment, )
+from celery.task import task  # pylint: disable=no-name-in-module, import-error
 from django.conf import settings
 
 from logging import getLogger
@@ -55,7 +58,11 @@ def send_user_profile_info_to_mailchimp(sender, instance, kwargs):  # pylint: di
 
     if user_json and not sender == Organization:
         try:
-            response = ChimpClient().add_update_member_to_list(settings.MAILCHIMP_LEARNERS_LIST_ID, instance.user.email, user_json)
+            response = ChimpClient().add_update_member_to_list(
+                settings.MAILCHIMP_LEARNERS_LIST_ID,
+                instance.user.email,
+                user_json
+            )
             log.info(response)
         except MailChimpException as ex:
             log.exception(ex)
@@ -84,22 +91,48 @@ def send_user_info_to_mailchimp(sender, user, created, kwargs):
         log.exception(ex)
 
 
-def send_user_enrollments_to_mailchimp(sender, instance, created, kwargs):
+@task()
+def task_send_account_activation_email(data):
+
+    context = {
+        'first_name': data['first_name'],
+        'activation_link': data['activation_link'],
+    }
+
+    MandrillClient().send_mail(MandrillClient.USER_ACCOUNT_ACTIVATION_TEMPLATE, data['user_email'], context)
+
+
+@task()
+def task_send_user_info_to_mailchimp(data):
+    """ Create user account at nodeBB when user created at edx Platform """
+
+    user = User.objects.get(id=data['user_id'])
+    created = data["created"]
+
+    send_user_info_to_mailchimp(None, user, created, {})
+
+
+@task()
+def send_user_enrollments_to_mailchimp(data):
+    user = User.objects.get(id=data['user_id'])
     user_json = {
         "merge_fields": {
-            "ENROLLS": get_user_active_enrollements(instance.user.username),
-            "ENROLL_IDS": get_enrollements_course_short_ids(instance.user.username)
+            "ENROLLS": get_user_active_enrollements(user.username),
+            "ENROLL_IDS": get_enrollements_course_short_ids(user.username)
         }
     }
     try:
-        response = ChimpClient().add_update_member_to_list(settings.MAILCHIMP_LEARNERS_LIST_ID, instance.user.email,
+        response = ChimpClient().add_update_member_to_list(settings.MAILCHIMP_LEARNERS_LIST_ID, user.email,
                                                            user_json)
         log.info(response)
     except MailChimpException as ex:
         log.exception(ex)
 
 
-def send_user_course_completions_to_mailchimp(sender, user, course_key, kwargs):
+@task()
+def send_user_course_completions_to_mailchimp(data):
+
+    user = User.objects.get(id=data['user_id'])
     all_certs = []
     try:
         all_certs = certificate_api.get_certificates_for_user(user.username)
