@@ -3,7 +3,7 @@ Tests for the gating API
 """
 import unittest
 
-from completion.models import BlockCompletion
+import completion
 from mock import patch, Mock
 from ddt import ddt, data, unpack
 from django.conf import settings
