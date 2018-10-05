@@ -182,7 +182,7 @@ def update_account_settings(requesting_user, update, username=None):
         # Don't process with sending email to given new email, if it is already associated with
         # an account. User must see same success message with no error.
         # This is so that this endpoint cannot be used to determine if an email is valid or not.
-        changing_email = not _verify_email_does_not_already_exists(new_email)
+        changing_email = new_email and not email_exists_or_retired(new_email)
 
     # If the user asked to change full name, validate it
     if changing_full_name:
@@ -271,13 +271,6 @@ def update_account_settings(requesting_user, update, username=None):
                 u"Error thrown from do_email_change_request: '{}'".format(text_type(err)),
                 user_message=text_type(err)
             )
-
-
-def _verify_email_does_not_already_exists(new_email):
-    """
-    Return `True` if an account with given email already exists.
-    """
-    return User.objects.filter(email=new_email).count() != 0
 
 
 @helpers.intercept_errors(errors.UserAPIInternalError, ignore_errors=[errors.UserAPIRequestError])

@@ -20,7 +20,6 @@ from six import text_type
 from social_django.models import UserSocialAuth, Partial
 
 from django_comment_common import models
-from openedx.core.djangoapps.user_api.accounts.tests.test_retirement_views import RetirementTestCase
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from openedx.core.djangoapps.site_configuration.helpers import get_value
 from openedx.core.lib.api.test_utils import ApiTestCase, TEST_API_KEY
@@ -41,7 +40,11 @@ from ..accounts import (
     NAME_MAX_LENGTH, EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH,
     USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH, USERNAME_BAD_LENGTH_MSG
 )
-from ..accounts.tests.retirement_helpers import setup_retirement_states  # pylint: disable=unused-import
+from ..accounts.tests.retirement_helpers import (  # pylint: disable=unused-import
+    RetirementTestCase,
+    fake_requested_retirement,
+    setup_retirement_states
+)
 from ..accounts.api import get_account_settings
 from ..models import UserOrgTag
 from ..tests.factories import UserPreferenceFactory
@@ -804,18 +807,6 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
         super(RegistrationViewValidationErrorTest, self).setUp()
         self.url = reverse("user_api_registration")
 
-    def _retireRequestUser(self):
-        """
-        Very basic user retirement initiation, logic copied form DeactivateLogoutView.  This only lands the user in
-        PENDING, simulating a retirement request only.
-        """
-        user = User.objects.get(username=self.USERNAME)
-        UserRetirementStatus.create_retirement(user)
-        user.username = get_retired_username_by_username(user.username)
-        user.email = get_retired_email_by_email(user.email)
-        user.set_unusable_password()
-        user.save()
-
     @mock.patch('openedx.core.djangoapps.user_api.views.check_account_exists')
     def test_register_retired_email_validation_error(self, dummy_check_account_exists):
         dummy_check_account_exists.return_value = []
@@ -830,7 +821,7 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
         self.assertHttpOK(response)
 
         # Initiate retirement for the above user:
-        self._retireRequestUser()
+        fake_requested_retirement(User.objects.get(username=self.USERNAME))
 
         # Try to create a second user with the same email address as the retired user
         response = self.client.post(self.url, {
@@ -872,7 +863,7 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
         self.assertHttpOK(response)
 
         # Initiate retirement for the above user:
-        self._retireRequestUser()
+        fake_requested_retirement(User.objects.get(username=self.USERNAME))
 
         # Try to create a second user with the same email address as the retired user
         response = self.client.post(self.url, {
@@ -910,7 +901,7 @@ class RegistrationViewValidationErrorTest(ThirdPartyAuthTestMixin, UserAPITestCa
         self.assertHttpOK(response)
 
         # Initiate retirement for the above user.
-        self._retireRequestUser()
+        fake_requested_retirement(User.objects.get(username=self.USERNAME))
 
         with mock.patch('openedx.core.djangoapps.user_authn.views.register.do_create_account') as dummy_do_create_acct:
             # do_create_account should *not* be called - the duplicate retired username

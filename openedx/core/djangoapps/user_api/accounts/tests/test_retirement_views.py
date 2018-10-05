@@ -260,7 +260,7 @@ class TestAccountRetireMailings(RetirementTestCase):
 
         # Should be created in parent setUpClass
         retiring_email_lists = RetirementState.objects.get(state_name='RETIRING_EMAIL_LISTS')
-        self.retirement = create_retirement_status(retiring_email_lists)
+        self.retirement = create_retirement_status(UserFactory(), state=retiring_email_lists)
         self.test_user = self.retirement.user
 
         self.url = reverse('accounts_retire_mailings')
@@ -460,7 +460,7 @@ class TestPartnerReportingPut(RetirementTestCase, ModuleStoreTestCase):
         Checks the simple success case of creating a user, enrolling in a course, and doing the partner
         report PUT. User should then have the appropriate row in UserRetirementPartnerReportingStatus
         """
-        retirement = create_retirement_status(self.partner_queue_state)
+        retirement = create_retirement_status(UserFactory(), state=self.partner_queue_state)
         for course in self.courses:
             CourseEnrollment.enroll(user=retirement.user, course_key=course.id)
 
@@ -471,7 +471,7 @@ class TestPartnerReportingPut(RetirementTestCase, ModuleStoreTestCase):
         """
         Runs the success test twice to make sure that re-running the step still succeeds.
         """
-        retirement = create_retirement_status(self.partner_queue_state)
+        retirement = create_retirement_status(UserFactory(), state=self.partner_queue_state)
         for course in self.courses:
             CourseEnrollment.enroll(user=retirement.user, course_key=course.id)
 
@@ -504,7 +504,7 @@ class TestPartnerReportingPut(RetirementTestCase, ModuleStoreTestCase):
         the enrollment.course.org. We now just use the enrollment.course_id.org
         since for this purpose we don't care if the course exists.
         """
-        retirement = create_retirement_status(self.partner_queue_state)
+        retirement = create_retirement_status(UserFactory(), state=self.partner_queue_state)
         user = retirement.user
         enrollment = CourseEnrollment.enroll(user=user, course_key=CourseKey.from_string('edX/Test201/2018_Fall'))
 
@@ -722,7 +722,7 @@ class TestAccountRetirementList(RetirementTestCase):
         Verify that users in dead end states are not returned
         """
         for state in self._get_dead_end_states():
-            create_retirement_status(state)
+            create_retirement_status(UserFactory(), state=state)
         self.assert_status_and_user_list([], states_to_request=self._get_non_dead_end_states())
 
     def test_users_retrieved_in_multiple_states(self):
@@ -731,7 +731,7 @@ class TestAccountRetirementList(RetirementTestCase):
         """
         multiple_states = ['PENDING', 'FORUMS_COMPLETE']
         for state in multiple_states:
-            create_retirement_status(RetirementState.objects.get(state_name=state))
+            create_retirement_status(UserFactory(), state=RetirementState.objects.get(state_name=state))
         data = {'cool_off_days': 0, 'states': multiple_states}
         response = self.client.get(self.url, data, **self.headers)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -768,7 +768,11 @@ class TestAccountRetirementList(RetirementTestCase):
         pending_state = RetirementState.objects.get(state_name='PENDING')
         for days_back in range(1, days_back_to_test, -1):
             create_datetime = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=days_back)
-            retirements.append(create_retirement_status(state=pending_state, create_datetime=create_datetime))
+            retirements.append(create_retirement_status(
+                UserFactory(),
+                state=pending_state,
+                create_datetime=create_datetime
+            ))
 
         # Confirm we get the correct number and data back for each day we add to cool off days
         # For each day we add to `cool_off_days` we expect to get one fewer retirement.
@@ -891,7 +895,7 @@ class TestAccountRetirementsByStatusAndDate(RetirementTestCase):
         Verify that users in non-requested states are not returned
         """
         state = RetirementState.objects.get(state_name='PENDING')
-        create_retirement_status(state=state)
+        create_retirement_status(UserFactory(), state=state)
         self.assert_status_and_user_list([])
 
     def test_users_exist(self):
@@ -922,7 +926,7 @@ class TestAccountRetirementsByStatusAndDate(RetirementTestCase):
         # Create retirements for the last 10 days
         for days_back in range(0, 10):
             create_datetime = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=days_back)
-            ret = create_retirement_status(state=complete_state, create_datetime=create_datetime)
+            ret = create_retirement_status(UserFactory(), state=complete_state, create_datetime=create_datetime)
             retirements.append(self._retirement_to_dict(ret))
 
         # Go back in time adding days to the query, assert the correct retirements are present
@@ -1015,7 +1019,7 @@ class TestAccountRetirementRetrieve(RetirementTestCase):
         retirements = []
 
         for state in RetirementState.objects.all():
-            retirements.append(create_retirement_status(state))
+            retirements.append(create_retirement_status(UserFactory(), state=state))
 
         for retirement in retirements:
             values = self._retirement_to_dict(retirement)
@@ -1026,7 +1030,7 @@ class TestAccountRetirementRetrieve(RetirementTestCase):
         Simulate retrieving a retirement by the old username, after the name has been changed to the hashed one
         """
         pending_state = RetirementState.objects.get(state_name='PENDING')
-        retirement = create_retirement_status(pending_state)
+        retirement = create_retirement_status(UserFactory(), state=pending_state)
         original_username = retirement.user.username
 
         hashed_username = get_retired_username_by_username(original_username)
@@ -1049,7 +1053,7 @@ class TestAccountRetirementUpdate(RetirementTestCase):
         self.pending_state = RetirementState.objects.get(state_name='PENDING')
         self.locking_state = RetirementState.objects.get(state_name='LOCKING_ACCOUNT')
 
-        self.retirement = create_retirement_status(self.pending_state)
+        self.retirement = create_retirement_status(UserFactory(), state=self.pending_state)
         self.test_user = self.retirement.user
         self.test_superuser = SuperuserFactory()
         self.headers = build_jwt_headers(self.test_superuser)
