@@ -256,12 +256,13 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
             category='html',
             display_name='some html block'
         )
-        with patch('openedx.core.lib.gating.api.BlockCompletion.get_course_completions') as course_block_completions_mock:
+        with patch.object(BlockCompletion, 'get_course_completions') as course_block_completions_mock:
             course_block_completions_mock.return_value = {
                 problem_block.location: user_problem_completion,
                 html_block.location: user_html_completion,
             }
             completion_percentage = gating_api.get_subsection_completion_percentage(self.seq1.location, student)
+            assert course_block_completions_mock.called
             self.assertEqual(completion_percentage, expected_completion_percentage)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
