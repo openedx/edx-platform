@@ -38,6 +38,6 @@ def waffle_flags():
         ENFORCE_FREEZE_GRADE_AFTER_COURSE_END: CourseWaffleFlag(
             namespace,
             ENFORCE_FREEZE_GRADE_AFTER_COURSE_END,
-            flag_undefined_default=False,
+            flag_undefined_default=True,
         )
     }
