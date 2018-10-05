@@ -284,16 +284,24 @@ class ProgramProgressMeter(object):
 
         Returns a dict of {uuid_string: available_datetime}
         """
+        # Query for all user certs up front, for performance reasons (rather than querying per course run).
+        user_certificates = GeneratedCertificate.eligible_certificates.filter(user=self.user)
+        certificates_by_run = {cert.course_id: cert for cert in user_certificates}
+
         completed = {}
         for program in self.programs:
-            available_date = self._available_date_for_program(program)
+            available_date = self._available_date_for_program(program, certificates_by_run)
             if available_date:
                 completed[program['uuid']] = available_date
         return completed
 
-    def _available_date_for_program(self, program_data):
+    def _available_date_for_program(self, program_data, certificates):
         """
         Calculate the available date for the program based on the courses within it.
+
+        Arguments:
+            program_data (dict): nested courses and course runs
+            certificates (dict): course run key -> certificate mapping
 
         Returns a datetime object or None if the program is not complete.
         """
@@ -305,7 +313,7 @@ class ProgramProgressMeter(object):
                 key = CourseKey.from_string(course_run['key'])
 
                 # Get a certificate if one exists
-                certificate = GeneratedCertificate.eligible_certificates.filter(user=self.user, course_id=key).first()
+                certificate = certificates.get(key)
                 if certificate is None:
                     continue
 
