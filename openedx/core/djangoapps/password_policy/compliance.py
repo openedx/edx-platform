@@ -83,8 +83,7 @@ def enforce_compliance_on_login(user, password):
             _capitalize_first(_(
                 '{platform_name} now requires more complex passwords. Your current password does not meet the new '
                 'requirements. You must change your password by {deadline} to be able to continue using the site. '
-                'To change your password, select the dropdown menu icon next to your username, then select "Account". '
-                'You can reset your password from this page. Thank you for helping us keep your data safe.'
+                'A password reset e-mail has been sent to the address associated with this account.'
             ).format(
                 platform_name=settings.PLATFORM_NAME,
                 deadline=strftime_localized(deadline, DEFAULT_SHORT_DATE_FORMAT)

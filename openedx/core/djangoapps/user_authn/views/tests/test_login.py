@@ -7,6 +7,7 @@ import unittest
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
+from django.core import mail
 from django.urls import NoReverseMatch, reverse
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.test.client import Client
@@ -462,6 +463,8 @@ class LoginTest(CacheIsolationTestCase):
             )
             response_content = json.loads(response.content)
         self.assertFalse(response_content.get('success'))
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn('Password reset', mail.outbox[0].subject)
 
     @override_settings(PASSWORD_POLICY_COMPLIANCE_ROLLOUT_CONFIG={'ENFORCE_COMPLIANCE_ON_LOGIN': True})
     def test_check_password_policy_compliance_warning(self):

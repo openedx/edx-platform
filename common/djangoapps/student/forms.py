@@ -30,6 +30,34 @@ from student.models import CourseEnrollmentAllowed, email_exists_or_retired
 from util.password_policy_validators import password_max_length, password_min_length, validate_password
 
 
+def send_password_reset_email_for_user(user, request):
+    """
+    Send out a password reset email for the given user.
+    """
+    site = get_current_site()
+    message_context = get_base_template_context(site)
+    message_context.update({
+        'request': request,  # Used by google_analytics_tracking_pixel
+        # TODO: This overrides `platform_name` from `get_base_template_context` to make the tests passes
+        'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+        'reset_link': '{protocol}://{site}{link}'.format(
+            protocol='https' if request.is_secure() else 'http',
+            site=configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME),
+            link=reverse('password_reset_confirm', kwargs={
+                'uidb36': int_to_base36(user.id),
+                'token': default_token_generator.make_token(user),
+            }),
+        )
+    })
+
+    msg = PasswordReset().personalize(
+        recipient=Recipient(user.username, user.email),
+        language=get_user_preference(user, LANGUAGE_KEY),
+        user_context=message_context,
+    )
+    ace.send(msg)
+
+
 class PasswordResetFormNoActive(PasswordResetForm):
     error_messages = {
         'unknown': _("That e-mail address doesn't have an associated "
@@ -64,29 +92,7 @@ class PasswordResetFormNoActive(PasswordResetForm):
         user.
         """
         for user in self.users_cache:
-            site = get_current_site()
-            message_context = get_base_template_context(site)
-
-            message_context.update({
-                'request': request,  # Used by google_analytics_tracking_pixel
-                # TODO: This overrides `platform_name` from `get_base_template_context` to make the tests passes
-                'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
-                'reset_link': '{protocol}://{site}{link}'.format(
-                    protocol='https' if use_https else 'http',
-                    site=configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME),
-                    link=reverse('password_reset_confirm', kwargs={
-                        'uidb36': int_to_base36(user.id),
-                        'token': token_generator.make_token(user),
-                    }),
-                )
-            })
-
-            msg = PasswordReset().personalize(
-                recipient=Recipient(user.username, user.email),
-                language=get_user_preference(user, LANGUAGE_KEY),
-                user_context=message_context,
-            )
-            ace.send(msg)
+            send_password_reset_email_for_user(user, request)
 
 
 class TrueCheckbox(widgets.CheckboxInput):
