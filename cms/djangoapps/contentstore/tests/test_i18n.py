@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Tests for validate Internationalization and Module i18n service.
 """
@@ -5,6 +6,7 @@ import gettext
 from unittest import skip
 
 import mock
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils import translation
 from django.utils.translation import get_language
@@ -207,7 +209,7 @@ class InternationalizationTest(ModuleStoreTestCase):
 
         resp = self.client.get_html('/home/')
         self.assertContains(resp,
-                            '<h1 class="page-header">Studio Home</h1>',
+                            u'<h1 class="page-header">{} Home</h1>'.format(settings.STUDIO_SHORT_NAME),
                             status_code=200,
                             html=True)
 
@@ -223,7 +225,7 @@ class InternationalizationTest(ModuleStoreTestCase):
         )
 
         self.assertContains(resp,
-                            '<h1 class="page-header">Studio Home</h1>',
+                            u'<h1 class="page-header">{} Home</h1>'.format(settings.STUDIO_SHORT_NAME),
                             status_code=200,
                             html=True)
 
