@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Tests of XML export
 """
@@ -10,6 +11,7 @@ import shutil
 import unittest
 
 from datetime import datetime, timedelta, tzinfo
+from django.utils.translation import ugettext_lazy
 from fs.osfs import OSFS
 from path import Path as path
 from six import text_type
@@ -212,3 +214,17 @@ class TestEdxJsonEncoder(unittest.TestCase):
 
         with self.assertRaises(TypeError):
             self.encoder.default({})
+
+    def test_encode_unicode_lazy_text(self):
+        """
+        Verify that the encoding is functioning fine with lazy text
+        """
+
+        # Initializing a lazy text object with Unicode
+        unicode_text = u"Your 𝓟𝓵𝓪𝓽𝓯𝓸𝓻𝓶 Name Here"
+        lazy_text = ugettext_lazy(unicode_text)
+
+        self.assertEquals(
+            unicode_text,
+            self.encoder.default(lazy_text)
+        )

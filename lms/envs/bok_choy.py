@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Settings for Bok Choy tests that are used when running LMS.
 
@@ -14,6 +15,7 @@ import os
 from path import Path as path
 from tempfile import mkdtemp
 
+from django.utils.translation import ugettext_lazy
 from openedx.core.release import RELEASE_LINE
 
 CONFIG_ROOT = path(__file__).abspath().dirname()
@@ -51,6 +53,9 @@ update_module_store_settings(
 
 # Capture the console log via template includes, until webdriver supports log capture again
 CAPTURE_CONSOLE_LOG = True
+
+PLATFORM_NAME = ugettext_lazy(u"édX")
+PLATFORM_DESCRIPTION = ugettext_lazy(u"Open édX Platform")
 
 ############################ STATIC FILES #############################
 
