@@ -9,30 +9,40 @@ import sys
 
 from lxml import etree
 
+from django.conf import settings
+from django.core.cache import cache as django_cache
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.urls import reverse
 from django.utils.translation import gettext_noop as _
+from requests.auth import HTTPBasicAuth
+from six import text_type
 from xblock.core import XBlock
 from web_fragments.fragment import Fragment
 from xblockutils.resources import ResourceLoader
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 
+import static_replace
 from capa import responsetypes
+from capa.xqueue_interface import XQueueInterface
 from openedx.core.lib.xblock_builtin import get_css_dependencies, get_js_dependencies
+from student.models import anonymous_id_for_user
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.capa_base import CapaFields, CapaMixin, ComplexEncoder
 from xmodule.raw_module import RawDescriptor
 from xmodule.xml_module import XmlParserMixin
 from xmodule.util.misc import escape_html_characters
-from xmodule.util.sandboxing import get_python_lib_zip
+from xmodule.util.sandboxing import get_python_lib_zip, can_execute_unsafe_code
 
 
 log = logging.getLogger(__name__)
 loader = ResourceLoader(__name__)  # pylint: disable=invalid-name
 
 
+@XBlock.wants('user')
 @XBlock.needs('i18n')
-class CapaProblemsXBlock(CapaFields, CapaMixin, StudioEditableXBlockMixin, XmlParserMixin, XBlock):
+@XBlock.needs('request')
+class CapaProblemsXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixin, XmlParserMixin):
     """
     An XBlock implementing LonCapa format problems, by way of
     capa.capa_problem.LoncapaProblem
@@ -203,17 +213,24 @@ class CapaProblemsXBlock(CapaFields, CapaMixin, StudioEditableXBlockMixin, XmlPa
         for js_file in self.js_dependencies():
             fragment.add_javascript_url(staticfiles_storage.url(js_file))
 
-    def handle_ajax(self, dispatch, data):
+    @property
+    def ajax_url(self):
+        """
+        The url to be used by to call into handle_ajax
+        """
+        return self.runtime.handler_url(self, 'handle_ajax').rstrip('/?')
+
+    @XBlock.handler
+    def handle_ajax(self, request, dispatch):
         """
         This is called by courseware.module_render, to handle an AJAX call.
-
-        `data` is request.POST.
 
         Returns a json dictionary:
         { 'progress_changed' : True/False,
           'progress' : 'none'/'in_progress'/'done',
           <other request-specific values here > }
         """
+        # TODO: split these handlers into separate XBlock.handlers?
         log.debug("CapaProblemsXBlock.handle_ajax")
         handlers = {
             'hint_button': self.hint_button,
@@ -246,7 +263,7 @@ class CapaProblemsXBlock(CapaFields, CapaMixin, StudioEditableXBlockMixin, XmlPa
         before_attempts = self.attempts
 
         try:
-            result = handlers[dispatch](data)
+            result = handlers[dispatch](request.POST)
 
         except NotFoundError:
             log.info(
@@ -315,6 +332,154 @@ class CapaProblemsXBlock(CapaFields, CapaMixin, StudioEditableXBlockMixin, XmlPa
         return _context
 
     @property
+    def _user(self):
+        """
+        Returns the current user object.
+        """
+        user_service = self.runtime.service(self, 'user')
+        return user_service.get_current_user() if user_service else None
+
+    @property
+    def anonymous_student_id(self):
+        """
+        Returns the anonymous user ID for the current user+course.
+        """
+        user = self._user
+        if user:
+            return anonymous_id_for_user(user, self.runtime.course_id)
+        else:
+            return None
+
+    @property
+    def user_is_staff(self):
+        """
+        Returns true if the current user is a staff user.
+        """
+        user = self._user
+        if user:
+            return bool(has_access(user, u'staff', self.location, self.location.course_id))
+        return False
+
+    @property
+    def block_seed(self):
+        """
+        Returns the randomization seed.
+
+        Uncertain why we need a block-level seed, when there is a user_state seed too?
+        """
+        user = self._user
+        return user.id if user else 0
+
+    @property
+    def cache(self):
+        """
+        Returns the default django cache.
+        """
+        return django_cache
+
+    @property
+    def node_path(self):
+        """Return the configured node path."""
+        return settings.NODE_PATH
+
+    @property
+    def xqueue_interface(self):
+        """
+        Returns a dict containing XqueueInterface object, as well as parameters
+        for the specific StudentModule.
+
+        Copied from courseware.module_render.get_module_system_for_user
+        """
+        # TODO: refactor into common repo/code?
+
+        def get_xqueue_callback_url_prefix(request):
+            """
+            Calculates default prefix based on request, but allows override via settings
+
+            This is separated from get_module_for_descriptor so that it can be called
+            by the LMS before submitting background tasks to run.  The xqueue callbacks
+            should go back to the LMS, not to the worker.
+            """
+            prefix = '{proto}://{host}'.format(
+                proto=request.META.get('HTTP_X_FORWARDED_PROTO', 'https' if request.is_secure() else 'http'),
+                host=request.get_host()
+            )
+            return settings.XQUEUE_INTERFACE.get('callback_url', prefix)
+
+        def make_xqueue_callback(dispatch='score_update'):
+            """
+            Returns fully qualified callback URL for external queueing system
+            """
+            relative_xqueue_callback_url = reverse(
+                'xqueue_callback',
+                kwargs=dict(
+                    course_id=text_type(self.runtime.course_id),
+                    userid=str(self._user.id),
+                    mod_id=text_type(self.location),
+                    dispatch=dispatch
+                ),
+            )
+            xqueue_callback_url_prefix = get_xqueue_callback_url_prefix(self.runtime.request)
+            return xqueue_callback_url_prefix + relative_xqueue_callback_url
+
+        # Default queuename is course-specific and is derived from the course that
+        #   contains the current module.
+        # TODO: Queuename should be derived from 'course_settings.json' of each course
+        xqueue_default_queuename = self.location.org + '-' + self.location.course
+
+        if settings.XQUEUE_INTERFACE.get('basic_auth') is not None:
+            requests_auth = HTTPBasicAuth(*settings.XQUEUE_INTERFACE['basic_auth'])
+        else:
+            requests_auth = None
+
+        xqueue_interface = XQueueInterface(
+            settings.XQUEUE_INTERFACE['url'],
+            settings.XQUEUE_INTERFACE['django_auth'],
+            requests_auth,
+        )
+
+        return {
+            'interface': xqueue_interface,
+            'construct_callback': make_xqueue_callback,
+            'default_queuename': xqueue_default_queuename.replace(' ', '_'),
+            'waittime': settings.XQUEUE_WAITTIME_BETWEEN_REQUESTS
+        }
+
+    def replace_static_urls(self, html):
+        """
+        Replace the static URLs in the given html content.
+        """
+        # TODO: Refactor CAPA rendering so we don't need this?
+        return static_replace.replace_static_urls(
+            text=html,
+            data_directory=getattr(self, 'data_dir', None),
+            course_id=self.runtime.course_id,
+            static_asset_path=self.static_asset_path,
+        )
+
+    def replace_course_urls(self, html):
+        """
+        Replace the course URLs in the given html content.
+        """
+        # TODO: Refactor CAPA rendering so we don't need this?
+        return static_replace.replace_course_urls(
+            text=html,
+            course_key=self.runtime.course_id
+        )
+
+    def replace_jump_to_id_urls(self, html):
+        """
+        Replace the course URLs in the given html content.
+        """
+        # TODO: Refactor CAPA rendering so we don't need this?
+        course_id = self.runtime.course_id
+        return static_replace.replace_jump_to_id_urls(
+            text=html,
+            course_id=course_id,
+            jump_to_id_base_url=reverse('jump_to_id', kwargs={'course_id': text_type(course_id), 'module_id': ''})
+        )
+
+    @property
     def problem_types(self):
         """ Low-level problem type introspection for content libraries filtering by problem type """
         try:
@@ -324,6 +489,14 @@ class CapaProblemsXBlock(CapaFields, CapaMixin, StudioEditableXBlockMixin, XmlPa
             return None  # short-term fix to prevent errors (TNL-5057). Will be more properly addressed in TNL-4525.
         registered_tags = responsetypes.registry.registered_tags()
         return {node.tag for node in tree.iter() if node.tag in registered_tags}
+
+    def can_execute_unsafe_code(self):
+        """Pass through to xmodule.util.sandboxing method."""
+        return can_execute_unsafe_code(self.runtime.course_id)
+
+    def get_python_lib_zip(self):
+        """Pass through to xmodule.util.sandboxing method."""
+        return get_python_lib_zip(contentstore, self.runtime.course_id)
 
     def has_support(self, view, functionality):
         """
@@ -401,14 +574,10 @@ class CapaProblemsXBlock(CapaFields, CapaMixin, StudioEditableXBlockMixin, XmlPa
             return
         capa_system = LoncapaSystem(
             ajax_url=None,
-            # TODO set anonymous_student_id to the anonymous ID of the user which answered each problem
-            # Anonymous ID is required for Matlab, CodeResponse, and some custom problems that include
-            # '$anonymous_student_id' in their XML.
-            # For the purposes of this report, we don't need to support those use cases.
-            anonymous_student_id=None,
+            anonymous_student_id=self.anonymous_user_id,
             cache=None,
             can_execute_unsafe_code=lambda: None,
-            get_python_lib_zip=(lambda: get_python_lib_zip(contentstore, self.runtime.course_id)),
+            get_python_lib_zip=self.get_python_lib_zip,
             DEBUG=None,
             filestore=self.runtime.resources_fs,
             i18n=self.runtime.service(self, "i18n"),
@@ -471,5 +640,3 @@ class CapaProblemsXBlock(CapaFields, CapaMixin, StudioEditableXBlockMixin, XmlPa
                 if correct_answer_text is not None:
                     report[_("Correct Answer")] = correct_answer_text
                 yield (user_state.username, report)
-
-
