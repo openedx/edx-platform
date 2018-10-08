@@ -20,12 +20,27 @@ from openedx.core.lib.api.authentication import (
 from openedx.core.lib.api.permissions import IsUserInUrl
 
 
+class DeveloperErrorResponseException(Exception):
+    """
+    An exception class that wraps a DRF Response object so that
+    it does not need to be recreated when returning a response.
+    Intended to be used with and by DeveloperErrorViewMixin.
+    """
+    def __init__(self, response):
+        super(DeveloperErrorResponseException, self).__init__()
+        self.response = response
+
+
 class DeveloperErrorViewMixin(object):
     """
     A view mixin to handle common error cases other than validation failure
     (auth failure, method not allowed, etc.) by generating an error response
     conforming to our API conventions with a developer message.
     """
+    def api_error(self, status_code, developer_message, error_code=None):
+        response = self.make_error_response(status_code, developer_message, error_code)
+        return DeveloperErrorResponseException(response)
+
     def make_error_response(self, status_code, developer_message, error_code=None):
         """
         Build an error response with the given status code and developer_message
@@ -62,8 +77,9 @@ class DeveloperErrorViewMixin(object):
         """
         Generalized helper method for managing specific API exception workflows
         """
-
-        if isinstance(exc, APIException):
+        if isinstance(exc, DeveloperErrorResponseException):
+            return exc.response
+        elif isinstance(exc, APIException):
             return self.make_error_response(exc.status_code, exc.detail)
         elif isinstance(exc, Http404) or isinstance(exc, ObjectDoesNotExist):
             return self.make_error_response(404, exc.message or "Not found.")
