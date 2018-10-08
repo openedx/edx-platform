@@ -32,6 +32,12 @@ class DjangoXBlockUserService(UserService):
         """
         return self._convert_django_user_to_xblock_user(self._django_user)
 
+    def user_is_staff(self):
+        """
+        Returns true if the currently-logged in user is a staff user.
+        """
+        return self.get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
+
     def get_anonymous_user_id(self, username, course_id):
         """
         Get the anonymous user id for a user.
@@ -44,7 +50,7 @@ class DjangoXBlockUserService(UserService):
             A unique anonymous_user_id for (user, course) pair.
             None for Non-staff users.
         """
-        if not self.get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF):
+        if not self.user_is_staff():
             return None
 
         try:

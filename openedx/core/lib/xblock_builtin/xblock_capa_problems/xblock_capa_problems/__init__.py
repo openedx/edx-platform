@@ -339,7 +339,7 @@ class CapaProblemsXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixi
         Returns the current user object.
         """
         user_service = self.runtime.service(self, 'user')
-        return user_service.get_current_user() if user_service else None
+        return user_service._django_user if user_service else None
 
     @property
     def anonymous_student_id(self):
@@ -357,10 +357,8 @@ class CapaProblemsXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixi
         """
         Returns true if the current user is a staff user.
         """
-        user = self._user
-        if user:
-            return bool(has_access(user, u'staff', self.location, self.location.course_id))
-        return False
+        user_service = self.runtime.service(self, 'user')
+        return user_service.user_is_staff() if user_service else None
 
     @property
     def block_seed(self):
