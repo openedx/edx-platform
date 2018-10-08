@@ -2,13 +2,17 @@
 Discussion API views
 """
 from django.core.exceptions import ValidationError
+from edx_rest_framework_extensions.authentication import JwtAuthentication
 from opaque_keys.edx.keys import CourseKey
+from rest_framework import permissions
+from rest_framework import status
 from rest_framework.exceptions import UnsupportedMediaType
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
 
+from discussion.views import get_divided_discussions
 from discussion_api.api import (
     create_comment,
     create_thread,
@@ -23,9 +27,29 @@ from discussion_api.api import (
     update_comment,
     update_thread
 )
-from discussion_api.forms import CommentGetForm, CommentListGetForm, ThreadListGetForm
+from discussion_api.forms import (
+    CommentGetForm,
+    CommentListGetForm,
+    CourseDiscussionRolesForm,
+    CourseDiscussionSettingsForm,
+    ThreadListGetForm,
+)
+from discussion_api.serializers import (
+    DiscussionRolesSerializer,
+    DiscussionRolesListSerializer,
+    DiscussionSettingsSerializer,
+)
+from django_comment_client.utils import available_division_schemes
+from django_comment_common.models import Role
+from django_comment_common.utils import get_course_discussion_settings, set_course_discussion_settings
+from instructor.access import update_forum_role
+from openedx.core.lib.api.authentication import (
+    OAuth2AuthenticationAllowInactiveUser,
+    SessionAuthenticationAllowInactiveUser,
+)
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
+from util.json_request import JsonResponse
 from xmodule.modulestore.django import modulestore
 
 
@@ -512,3 +536,251 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
         if request.content_type != MergePatchParser.media_type:
             raise UnsupportedMediaType(request.content_type)
         return Response(update_comment(request, comment_id, request.data))
+
+
+class CourseDiscussionSettingsAPIView(DeveloperErrorViewMixin, APIView):
+    """
+    **Use Cases**
+    Retrieve all the discussion settings for a course or update one or more of them.
+
+    **Example Requests**
+
+        GET /api/discussion/v1/courses/{course_id}/settings
+
+        PATCH /api/discussion/v1/courses/{course_id}/settings
+        {"always_divide_inline_discussions": true}
+
+    **GET Discussion Settings Parameters**:
+
+        * course_id (required): The course to retrieve the discussion settings for.
+
+    **PATCH Discussion Settings Parameters**:
+
+        * course_id (required): The course to retrieve the discussion settings for.
+
+        The body should have the 'application/merge-patch+json' content type.
+
+        * divided_inline_discussions: A list of IDs of the topics to be marked as divided inline discussions.
+
+        * divided_course_wide_discussions: A list of IDs of the topics to be marked as divided course-wide discussions.
+
+        * always_divide_inline_discussions: A boolean indicating whether inline discussions should always be
+          divided or not.
+
+        * division_scheme: A string corresponding to the division scheme to be used from the list of
+          available division schemes.
+
+    **GET and PATCH Discussion Settings Parameters Response Values**:
+
+        A HTTP 404 Not Found response status code is returned when the requested course is invalid.
+
+        A HTTP 400 Bad Request response status code is returned when the request is invalid.
+
+        A HTTP 200 OK response status is returned to denote success for the GET method.
+
+        Values in the body are:
+
+        * id: The discussion settings id.
+
+        * divided_inline_discussions: A list of divided inline discussions.
+
+        * divided_course_wide_discussions: A list of divided course-wide discussions.
+
+        * division_scheme: The division scheme used for the course discussions.
+
+        * available_division_schemes: A list of available division schemes for the course.
+
+        A HTTP 204 No Content response is returned to denote success for the PATCH method.
+    """
+    authentication_classes = (
+        JwtAuthentication,
+        OAuth2AuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    parser_classes = (JSONParser, MergePatchParser,)
+    permission_classes = (permissions.IsAuthenticated, permissions.IsAdminUser)
+
+    def _get_representation(self, course, course_key, discussion_settings):
+        """
+        Return a serialized representation of the course discussion settings.
+        """
+        divided_course_wide_discussions, divided_inline_discussions = get_divided_discussions(
+            course, discussion_settings
+        )
+        return JsonResponse({
+            'id': discussion_settings.id,
+            'divided_inline_discussions': divided_inline_discussions,
+            'divided_course_wide_discussions': divided_course_wide_discussions,
+            'always_divide_inline_discussions': discussion_settings.always_divide_inline_discussions,
+            'division_scheme': discussion_settings.division_scheme,
+            'available_division_schemes': available_division_schemes(course_key)
+        })
+
+    def _get_request_kwargs(self, course_id):
+        return dict(course_id=course_id)
+
+    def get(self, request, course_id):
+        """
+        Implement a handler for the GET method.
+        """
+        kwargs = self._get_request_kwargs(course_id)
+        form = CourseDiscussionSettingsForm(kwargs, request_user=request.user)
+
+        if not form.is_valid():
+            raise ValidationError(form.errors)
+
+        course_key = form.cleaned_data['course_key']
+        course = form.cleaned_data['course']
+        discussion_settings = get_course_discussion_settings(course_key)
+        return self._get_representation(course, course_key, discussion_settings)
+
+    def patch(self, request, course_id):
+        """
+        Implement a handler for the PATCH method.
+        """
+        if request.content_type != MergePatchParser.media_type:
+            raise UnsupportedMediaType(request.content_type)
+
+        kwargs = self._get_request_kwargs(course_id)
+        form = CourseDiscussionSettingsForm(kwargs, request_user=request.user)
+        if not form.is_valid():
+            raise ValidationError(form.errors)
+
+        course = form.cleaned_data['course']
+        course_key = form.cleaned_data['course_key']
+        discussion_settings = get_course_discussion_settings(course_key)
+
+        serializer = DiscussionSettingsSerializer(
+            data=request.data,
+            partial=True,
+            course=course,
+            discussion_settings=discussion_settings
+        )
+        if not serializer.is_valid():
+            raise ValidationError(serializer.errors)
+
+        settings_to_change = serializer.validated_data['settings_to_change']
+
+        try:
+            discussion_settings = set_course_discussion_settings(course_key, **settings_to_change)
+        except ValueError as e:
+            raise ValidationError(unicode(e))
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class CourseDiscussionRolesAPIView(DeveloperErrorViewMixin, APIView):
+    """
+    **Use Cases**
+    Retrieve all the members of a given forum discussion role or update the membership of a role.
+
+    **Example Requests**
+
+        GET /api/discussion/v1/courses/{course_id}/roles/{rolename}
+
+        POST /api/discussion/v1/courses/{course_id}/roles/{rolename}
+        {"user_id": "<username or email>", "action": "<allow or revoke>"}
+
+    **GET List Members of a Role Parameters**:
+
+        * course_id (required): The course to which the role belongs to.
+
+        * rolename (required): The name of the forum discussion role, the members of which have to be listed.
+          Currently supported values are 'Moderator', 'Group Moderator', 'Community TA'. If the value has a space
+          it has to be URL encoded.
+
+    **POST Update the membership of a Role Parameters**:
+
+        * course_id (required): The course to which the role belongs to.
+
+        * rolename (required): The name of the forum discussion role, the members of which have to be listed.
+          Currently supported values are 'Moderator', 'Group Moderator', 'Community TA'. If the value has a space
+          it has to be URL encoded.
+
+        The body can use either 'application/x-www-form-urlencoded' or 'application/json' content type.
+
+        * user_id (required): The username or email address of the user whose membership has to be updated.
+
+        * action (required): Either 'allow' or 'revoke', depending on the action to be performed on the membership.
+
+    **GET and POST Response Values**:
+
+        A HTTP 404 Not Found response status code is returned when the requested course is invalid.
+
+        A HTTP 400 Bad Request response status code is returned when the request is invalid.
+
+        A HTTP 200 OK response status denote is returned to denote success.
+
+        * course_id: The course to which the role belongs to.
+
+        * results: A list of the members belonging to the specified role.
+
+            * username: Username of the user.
+
+            * email: Email address of the user.
+
+            * first_name: First name of the user.
+
+            * last_name: Last name of the user.
+
+            * group_name: Name of the group the user belongs to.
+
+        * division_scheme: The division scheme used by the course.
+    """
+    authentication_classes = (
+        JwtAuthentication,
+        OAuth2AuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (permissions.IsAuthenticated, permissions.IsAdminUser)
+
+    def _get_request_kwargs(self, course_id, rolename):
+        return dict(course_id=course_id, rolename=rolename)
+
+    def get(self, request, course_id, rolename):
+        """
+        Implement a handler for the GET method.
+        """
+        kwargs = self._get_request_kwargs(course_id, rolename)
+        form = CourseDiscussionRolesForm(kwargs, request_user=request.user)
+
+        if not form.is_valid():
+            raise ValidationError(form.errors)
+
+        course_id = form.cleaned_data['course_key']
+        role = form.cleaned_data['role']
+
+        data = {'course_id': course_id, 'users': role.users.all()}
+        context = {'course_discussion_settings': get_course_discussion_settings(course_id)}
+
+        serializer = DiscussionRolesListSerializer(data, context=context)
+        return Response(serializer.data)
+
+    def post(self, request, course_id, rolename):
+        """
+        Implement a handler for the POST method.
+        """
+        kwargs = self._get_request_kwargs(course_id, rolename)
+        form = CourseDiscussionRolesForm(kwargs, request_user=request.user)
+        if not form.is_valid():
+            raise ValidationError(form.errors)
+
+        course_id = form.cleaned_data['course_key']
+        rolename = form.cleaned_data['rolename']
+
+        serializer = DiscussionRolesSerializer(data=request.data)
+        if not serializer.is_valid():
+            raise ValidationError(serializer.errors)
+
+        action = serializer.validated_data['action']
+        user = serializer.validated_data['user']
+        try:
+            update_forum_role(course_id, user, rolename, action)
+        except Role.DoesNotExist:
+            raise ValidationError("Role '{}' does not exist".format(rolename))
+
+        role = form.cleaned_data['role']
+        data = {'course_id': course_id, 'users': role.users.all()}
+        context = {'course_discussion_settings': get_course_discussion_settings(course_id)}
+        serializer = DiscussionRolesListSerializer(data, context=context)
+        return Response(serializer.data)
