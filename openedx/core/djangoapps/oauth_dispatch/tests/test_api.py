@@ -30,7 +30,6 @@ class TestOAuthDispatchAPI(TestCase):
             redirect_uri=DUMMY_REDIRECT_URL,
             client_id='public-client-id',
         )
-        self.request = HttpRequest()
 
     def _assert_stored_token(self, stored_token_value, expected_token_user, expected_client):
         stored_access_token = AccessToken.objects.get(token=stored_token_value)
@@ -39,7 +38,7 @@ class TestOAuthDispatchAPI(TestCase):
         self.assertEqual(stored_access_token.application.user.id, expected_client.user.id)
 
     def test_create_token_success(self):
-        token = api.create_dot_access_token(self.request, self.user, self.client)
+        token = api.create_dot_access_token(HttpRequest(), self.user, self.client)
         self.assertTrue(token['access_token'])
         self.assertTrue(token['refresh_token'])
         self.assertDictContainsSubset(
@@ -54,20 +53,18 @@ class TestOAuthDispatchAPI(TestCase):
 
     def test_create_token_another_user(self):
         another_user = UserFactory()
-        token = api.create_dot_access_token(self.request, another_user, self.client)
+        token = api.create_dot_access_token(HttpRequest(), another_user, self.client)
         self._assert_stored_token(token['access_token'], another_user, self.client)
 
     def test_create_token_overrides(self):
         expires_in = 4800
-        token = api.create_dot_access_token(self.request, self.user, self.client, expires_in=expires_in, scope=2)
+        token = api.create_dot_access_token(HttpRequest(), self.user, self.client, expires_in=expires_in, scope=2)
         self.assertDictContainsSubset({u'scope': u'profile'}, token)
-        with self.assertRaises(AssertionError):  # TODO (ARCH-246) expiration override does not actually work
-            self.assertDictContainsSubset({u'expires_in': expires_in}, token)
-        self.assertDictContainsSubset({u'expires_in': EXPECTED_DEFAULT_EXPIRES_IN}, token)
+        self.assertDictContainsSubset({u'expires_in': expires_in}, token)
 
     def test_refresh_token_success(self):
-        old_token = api.create_dot_access_token(self.request, self.user, self.client)
-        new_token = api.refresh_dot_access_token(self.request, self.client.client_id, old_token['refresh_token'])
+        old_token = api.create_dot_access_token(HttpRequest(), self.user, self.client)
+        new_token = api.refresh_dot_access_token(HttpRequest(), self.client.client_id, old_token['refresh_token'])
         self.assertDictContainsSubset(
             {
                 u'token_type': u'Bearer',
@@ -87,17 +84,17 @@ class TestOAuthDispatchAPI(TestCase):
         self._assert_stored_token(new_token['access_token'], self.user, self.client)
 
     def test_refresh_token_invalid_client(self):
-        token = api.create_dot_access_token(self.request, self.user, self.client)
+        token = api.create_dot_access_token(HttpRequest(), self.user, self.client)
         with self.assertRaises(api.OAuth2Error) as error:
             api.refresh_dot_access_token(
-                self.request, 'invalid_client_id', token['refresh_token'],
+                HttpRequest(), 'invalid_client_id', token['refresh_token'],
             )
         self.assertIn('invalid_client', error.exception.description)
 
     def test_refresh_token_invalid_token(self):
-        api.create_dot_access_token(self.request, self.user, self.client)
+        api.create_dot_access_token(HttpRequest(), self.user, self.client)
         with self.assertRaises(api.OAuth2Error) as error:
             api.refresh_dot_access_token(
-                self.request, self.client.client_id, 'invalid_refresh_token',
+                HttpRequest(), self.client.client_id, 'invalid_refresh_token',
             )
         self.assertIn('invalid_grant', error.exception.description)

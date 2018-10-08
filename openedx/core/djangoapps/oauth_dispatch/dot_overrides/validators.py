@@ -3,7 +3,7 @@ Classes that override default django-oauth-toolkit behavior
 """
 from __future__ import unicode_literals
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.contrib.auth import authenticate, get_user_model
 from django.db.models.signals import pre_save
@@ -82,21 +82,9 @@ class EdxOAuth2Validator(OAuth2Validator):
 
         super(EdxOAuth2Validator, self).save_bearer_token(token, request, *args, **kwargs)
 
-        if RestrictedApplication.should_expire_access_token(request.client):
-            # Since RestrictedApplications will override the DOT defined expiry, so that access_tokens
-            # are always expired, we need to re-read the token from the database and then calculate the
-            # expires_in (in seconds) from what we stored in the database. This value should be a negative
-            #value, meaning that it is already expired
-
-            access_token = AccessToken.objects.get(token=token['access_token'])
-            utc_now = datetime.utcnow().replace(tzinfo=utc)
-            expires_in = (access_token.expires - utc_now).total_seconds()
-
-            # assert that RestrictedApplications only issue expired tokens
-            # blow up processing if we see otherwise
-            assert expires_in < 0
-
-            token['expires_in'] = expires_in
+        is_restricted_client = self._update_token_expiry_if_restricted_client(token, request.client)
+        if not is_restricted_client:
+            self._update_token_expiry_if_overridden_in_request(token, request)
 
         # Restore the original request attributes
         request.grant_type = grant_type
@@ -108,3 +96,43 @@ class EdxOAuth2Validator(OAuth2Validator):
         """
         available_scopes = get_scopes_backend().get_available_scopes(application=client, request=request)
         return set(scopes).issubset(set(available_scopes))
+
+    def _update_token_expiry_if_restricted_client(self, token, client):
+        """
+        Update the token's expires_in value if the given client is a
+        RestrictedApplication and return whether the given client is restricted.
+        """
+        # Since RestrictedApplications override the DOT defined expiry such that
+        # access_tokens are always expired, re-read the token from the database
+        # and calculate expires_in (in seconds) from the database value. This
+        # value should be a negative value, meaning that it is already expired.
+        if RestrictedApplication.should_expire_access_token(client):
+            access_token = AccessToken.objects.get(token=token['access_token'])
+            expires_in = (access_token.expires - _get_utc_now()).total_seconds()
+            assert expires_in < 0
+            token['expires_in'] = expires_in
+            return True
+
+    def _update_token_expiry_if_overridden_in_request(self, token, request):
+        """
+        Update the token's expires_in value if the request specifies an
+        expiration value and update the expires value on the stored AccessToken
+        object.
+
+        This is needed since DOT's save_bearer_token method always uses
+        the dot_settings.ACCESS_TOKEN_EXPIRE_SECONDS value instead of applying
+        the requesting expiration value.
+        """
+        expires_in = getattr(request, 'expires_in', None)
+        if expires_in:
+            access_token = AccessToken.objects.get(token=token['access_token'])
+            access_token.expires = _get_utc_now() + timedelta(seconds=expires_in)
+            access_token.save()
+            token['expires_in'] = expires_in
+
+
+def _get_utc_now():
+    """
+    Return current time in UTC.
+    """
+    return datetime.utcnow().replace(tzinfo=utc)
