@@ -72,7 +72,8 @@ edx-django-oauth2-provider
 edx-django-release-util             # Release utils for the edx release pipeline
 edx-django-sites-extensions==2.3.1
 edx-django-utils
-edx-drf-extensions
+# edx-drf-extensions
+-e git+https://github.com/edx/edx-drf-extensions.git@2ee2a957b56105b0918716ac281262a149c6a502#egg=edx-drf-extensions
 edx-enterprise
 edx-milestones
 edx-oauth2-provider

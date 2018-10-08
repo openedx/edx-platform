@@ -16,6 +16,7 @@ from django.contrib.auth import login
 from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+from edx_rest_framework_extensions.authentication import OAuth2AuthenticationAllowInactiveUser
 from oauth2_provider import models as dot_models
 from oauth2_provider.settings import oauth2_settings
 from oauth2_provider.views.base import TokenView as DOTAccessTokenView
@@ -30,7 +31,6 @@ from rest_framework.views import APIView
 from openedx.core.djangoapps.auth_exchange.forms import AccessTokenExchangeForm
 from openedx.core.djangoapps.oauth_dispatch import adapters
 from openedx.core.djangoapps.oauth_dispatch.api import create_dot_access_token
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 
 
 class AccessTokenExchangeBase(APIView):

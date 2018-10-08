@@ -3,6 +3,7 @@ import logging
 
 from django.urls import reverse
 from edx_rest_api_client import exceptions
+from edx_rest_framework_extensions.authentication import OAuth2AuthenticationAllowInactiveUser
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.authentication import SessionAuthentication
@@ -19,7 +20,6 @@ from entitlements.models import CourseEntitlement
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from student.models import CourseEnrollment
 from student.signals import SAILTHRU_AUDIT_PURCHASE
 from util.json_request import JsonResponse

@@ -8,7 +8,9 @@ from contextlib import closing
 
 from pytz import UTC
 from django.utils.translation import ugettext as _
-from edx_rest_framework_extensions.authentication import SessionAuthenticationAllowInactiveUser
+from edx_rest_framework_extensions.authentication import (
+    SessionAuthenticationAllowInactiveUser, OAuth2AuthenticationAllowInactiveUser
+)
 from rest_framework import permissions, status
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
@@ -17,7 +19,6 @@ from six import text_type
 
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
 from openedx.core.djangoapps.user_api.errors import UserNotFound
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.parsers import TypedFileUploadParser
 from openedx.core.lib.api.permissions import IsUserInUrl
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin

@@ -11,9 +11,10 @@ from rest_framework import permissions
 
 from django.db import transaction
 from django.utils.translation import ugettext as _
-from edx_rest_framework_extensions.authentication import SessionAuthenticationAllowInactiveUser
+from edx_rest_framework_extensions.authentication import (
+    SessionAuthenticationAllowInactiveUser, OAuth2AuthenticationAllowInactiveUser
+)
 
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.permissions import IsUserInUrlOrStaff
 from ..errors import UserNotFound, UserNotAuthorized, PreferenceValidationError, PreferenceUpdateError

@@ -9,7 +9,9 @@ from ccx_keys.locator import CCXLocator
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.http import Http404
-from edx_rest_framework_extensions.authentication import JwtAuthentication, SessionAuthenticationAllowInactiveUser
+from edx_rest_framework_extensions.authentication import (
+    JwtAuthentication, SessionAuthenticationAllowInactiveUser, OAuth2AuthenticationAllowInactiveUser
+)
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from rest_framework import status
@@ -27,7 +29,7 @@ from lms.djangoapps.ccx.utils import (
 )
 from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.lib.api import authentication, permissions
+from openedx.core.lib.api import permissions
 from student.models import CourseEnrollment
 from student.roles import CourseCcxCoachRole
 from xmodule.modulestore.django import SignalHandler
