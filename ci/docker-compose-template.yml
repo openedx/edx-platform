@@ -1,0 +1,17 @@
+version: "3.5"
+services:
+  edxapp${BUILD_ID}:
+    image: edxops/edxapp:hawthorn.master
+    container_name: "edxapp${BUILD_ID}"
+    volumes: 
+      - ..:/edx/app/edxapp/edx-platform
+    command: tail -f /dev/null
+    environment:
+      EDXAPP_TEST_MONGO_HOST: "mongodb${BUILD_ID}"
+      MONGO_HOST: "mongodb${BUILD_ID}"
+  mongodb${BUILD_ID}:
+    image: mongo
+    container_name: "mongodb${BUILD_ID}"
+networks:
+  default:
+    name: "ci_default${BUILD_ID}"

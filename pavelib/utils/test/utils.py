@@ -83,11 +83,18 @@ def clean_mongo():
     """
     Clean mongo test databases
     """
-    sh("mongo {host}:{port} {repo_root}/scripts/delete-mongo-test-dbs.js".format(
-        host=Env.MONGO_HOST,
-        port=MONGO_PORT_NUM,
-        repo_root=Env.REPO_ROOT,
-    ))
+    if os.environ.get('MONGO_HOST'):
+        sh("mongo {host}:{port} {repo_root}/scripts/delete-mongo-test-dbs.js".format(
+            host=os.environ.get('MONGO_HOST'),
+            port=MONGO_PORT_NUM,
+            repo_root=Env.REPO_ROOT,
+        ))
+    else:
+        sh("mongo {host}:{port} {repo_root}/scripts/delete-mongo-test-dbs.js".format(
+            host=Env.MONGO_HOST,
+            port=MONGO_PORT_NUM,
+            repo_root=Env.REPO_ROOT,
+        ))
 
 
 def check_firefox_version():
