@@ -66,6 +66,11 @@ class CapaProblemsXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixi
 
     has_author_view = True
 
+    # The capa format specifies that what we call max_attempts in the code
+    # is the attribute `attempts`. This will do that conversion
+    metadata_translations = dict(RawDescriptor.metadata_translations)
+    metadata_translations['attempts'] = 'max_attempts'
+
     # TODO from CapaDescriptor
     '''
     resources_dir = None
@@ -143,11 +148,6 @@ class CapaProblemsXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixi
 
     '''
 
-    # The capa format specifies that what we call max_attempts in the code
-    # is the attribute `attempts`. This will do that conversion
-    metadata_translations = dict(RawDescriptor.metadata_translations)
-    metadata_translations['attempts'] = 'max_attempts'
-
     def student_view(self, context=None):  # pylint: disable=unused-argument
         """
         Return a fragment with the html from this XBlock
@@ -158,6 +158,8 @@ class CapaProblemsXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixi
         Makes no use of the context parameter
         """
         log.debug("CapaProblemsXBlock.student_view")
+        self.load_state()
+
         fragment = Fragment()
         self.add_resource_urls(fragment)
         fragment.add_content(self.get_html())
