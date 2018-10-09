@@ -231,7 +231,6 @@
                     } else {
                         // remove loader icon from button
                         $targetBtn.removeClass('has-spinner');
-                        $targetBtn.removeAttribute('data-loading');
 
                         this.renderErrors(this.defaultFormErrorsTitle, this.errors);
                         this.toggleDisableButton(false);
