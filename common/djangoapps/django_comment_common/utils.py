@@ -3,6 +3,7 @@ Common comment client utility functions.
 """
 
 from django_comment_common.models import (
+    CourseDiscussionSettings,
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_GROUP_MODERATOR,
@@ -12,8 +13,6 @@ from django_comment_common.models import (
 )
 from openedx.core.djangoapps.course_groups.cohorts import get_legacy_discussion_settings
 from openedx.core.lib.cache_utils import request_cached
-
-from .models import CourseDiscussionSettings
 
 
 class ThreadContext(object):
@@ -33,6 +32,8 @@ GROUP_MODERATOR_ROLE_PERMISSIONS = ["group_edit_content", "group_delete_thread",
                                     "group_endorse_comment", "group_delete_comment"]
 
 ADMINISTRATOR_ROLE_PERMISSIONS = ["manage_moderator"]
+
+GLOBAL_STAFF_ROLE_PERMISSIONS = ["see_all_cohorts"]
 
 
 def _save_forum_role(course_key, name):

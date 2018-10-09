@@ -72,7 +72,7 @@ class ContentGroupTestCase(ModuleStoreTestCase):
         alpha_cohort = CohortFactory(
             course_id=self.course.id,
             name='Cohort Alpha',
-            users=[self.alpha_user, self.community_ta]
+            users=[self.alpha_user, self.community_ta, self.staff_user]
         )
         beta_cohort = CohortFactory(
             course_id=self.course.id,
