@@ -236,6 +236,7 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
         (0, 1, 0),
     )
     @unpack
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_get_subsection_completion_percentage(self, user_problem_completion, user_html_completion,
                                                   expected_completion_percentage):
         """

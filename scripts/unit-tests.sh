@@ -61,7 +61,7 @@ case "${TEST_SUITE}" in
                 paver test_system -s lms --disable_capture --eval-attr="shard==$SHARD" ${PAVER_ARGS} ${PARALLEL} 2> lms-tests.${SHARD}.log
                 ;;
             10|"noshard")
-                paver test_system -s lms --disable_capture --eval-attr='not shard' ${PAVER_ARGS} ${PARALLEL} 2> lms-tests.10.log
+                paver test_system -s lms --disable_capture --eval-attr="shard>=$SHARD or not shard" ${PAVER_ARGS} ${PARALLEL} 2> lms-tests.10.log
                 ;;
             *)
                 # If no shard is specified, rather than running all tests, create an empty xunit file. This is a
@@ -83,7 +83,7 @@ case "${TEST_SUITE}" in
                 paver test_system -s cms --disable_capture --eval-attr="shard==$SHARD" ${PAVER_ARGS} 2> cms-tests.${SHARD}.log
                 ;;
             2|"noshard")
-                paver test_system -s cms --disable_capture --eval-attr='not shard' ${PAVER_ARGS} 2> cms-tests.2.log
+                paver test_system -s cms --disable_capture --eval-attr="shard>=$SHARD or not shard" ${PAVER_ARGS} 2> cms-tests.2.log
                 ;;
             *)
                 # If no shard is specified, rather than running all tests, create an empty xunit file. This is a
@@ -105,7 +105,7 @@ case "${TEST_SUITE}" in
                 paver test_lib -l common/lib/xmodule --disable_capture --eval-attr="shard==$SHARD" ${PAVER_ARGS} 2> common-tests.${SHARD}.log
                 ;;
             3|"noshard")
-                paver test_lib --disable_capture --eval-attr='not shard' ${PAVER_ARGS} 2> common-tests.3.log
+                paver test_lib --disable_capture --eval-attr="shard>=$SHARD or not shard" ${PAVER_ARGS} 2> common-tests.3.log
                 ;;
             *)
                 # If no shard is specified, rather than running all tests, create an empty xunit file. This is a
