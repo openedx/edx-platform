@@ -3,7 +3,7 @@ Tests for the gating API
 """
 import unittest
 
-import completion
+from completion.models import BlockCompletion
 from mock import patch, Mock
 from ddt import ddt, data, unpack
 from django.conf import settings
@@ -256,7 +256,7 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
             category='html',
             display_name='some html block'
         )
-        with patch('gating_api.completion.models.BlockCompletion.get_course_completions') as course_block_completions_mock:
+        with patch.object(BlockCompletion, 'get_course_completions') as course_block_completions_mock:
             course_block_completions_mock.return_value = {
                 problem_block.location: user_problem_completion,
                 html_block.location: user_html_completion,
