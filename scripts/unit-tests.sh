@@ -79,10 +79,10 @@ case "${TEST_SUITE}" in
             "all")
                 paver test_system -s cms --disable_capture ${PAVER_ARGS} ${PARALLEL} 2> cms-tests.log
                 ;;
-            1)
+            1|2)
                 paver test_system -s cms --disable_capture --eval-attr="shard==$SHARD" ${PAVER_ARGS} 2> cms-tests.${SHARD}.log
                 ;;
-            2|"noshard")
+            "noshard")
                 paver test_system -s cms --disable_capture --eval-attr='not shard' ${PAVER_ARGS} 2> cms-tests.2.log
                 ;;
             *)
