@@ -29,6 +29,7 @@ from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 from openedx.core.djangoapps.course_groups.cohorts import bulk_cache_cohorts, get_cohort, is_course_cohorted
 from openedx.core.djangoapps.user_api.course_tag.api import BulkCourseTags
+from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 from student.models import CourseEnrollment
 from student.roles import BulkRoleCache
 from xmodule.modulestore.django import modulestore
@@ -37,6 +38,10 @@ from xmodule.split_test_module import get_split_user_partitions
 
 from .runner import TaskProgress
 from .utils import upload_csv_to_report_store
+
+WAFFLE_NAMESPACE = 'instructor_task'
+WAFFLE_SWITCHES = WaffleSwitchNamespace(name=WAFFLE_NAMESPACE)
+OPTIMIZE_GET_LEARNERS_FOR_COURSE = 'optimize_get_learners_for_course'
 
 TASK_LOG = logging.getLogger('edx.celery.task')
 
@@ -297,9 +302,38 @@ class CourseGradeReport(object):
             args = [iter(iterable)] * chunk_size
             return izip_longest(*args, fillvalue=fillvalue)
 
-        users = CourseEnrollment.objects.users_enrolled_in(context.course_id, include_inactive=True)
-        users = users.select_related('profile')
-        return grouper(users)
+        def users_for_course(course_id):
+            users = CourseEnrollment.objects.users_enrolled_in(course_id, include_inactive=True)
+            users = users.select_related('profile')
+            return grouper(users)
+
+        def users_for_course_v2(course_id):
+            """Get enrolled learners for the course chunk by chunk"""
+            filter_kwargs = {
+                'courseenrollment__course_id': course_id,
+            }
+
+            user_ids_list = get_user_model().objects.filter(**filter_kwargs).values_list('id', flat=True).order_by('id')
+            user_chunks = grouper(user_ids_list)
+            for user_ids in user_chunks:
+                user_ids = [user_id for user_id in user_ids if user_id is not None]
+                min_id = min(user_ids)
+                max_id = max(user_ids)
+                users = get_user_model().objects.filter(
+                    id__gte=min_id,
+                    id__lte=max_id,
+                    **filter_kwargs
+                ).select_related('profile')
+                yield users
+
+        task_log_message = u'{}, Task type: {}'.format(context.task_info_string, context.action_name)
+        if WAFFLE_SWITCHES.is_enabled(OPTIMIZE_GET_LEARNERS_FOR_COURSE):
+            TASK_LOG.info(u'%s, Creating Course Grade with optimization', task_log_message)
+            return users_for_course_v2(context.course_id)
+
+        TASK_LOG.info(u'%s, Creating Course Grade without optimization', task_log_message)
+        batch_users = users_for_course(context.course_id)
+        return batch_users
 
     def _user_grades(self, course_grade, context):
         """
