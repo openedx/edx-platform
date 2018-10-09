@@ -61,6 +61,25 @@ class SiteConfiguration(models.Model):
         return default
 
     @classmethod
+    def get_configuration_for_org(cls, org):
+        """
+        This returns a SiteConfiguration object which has an org_filter that matches
+        the supplied org
+
+        Args:
+            org (str): Org to use to filter SiteConfigurations
+        """
+        for configuration in cls.objects.filter(values__contains=org, enabled=True).all():
+            course_org_filter = configuration.get_value('course_org_filter', [])
+            # The value of 'course_org_filter' can be configured as a string representing
+            # a single organization or a list of strings representing multiple organizations.
+            if not isinstance(course_org_filter, list):
+                course_org_filter = [course_org_filter]
+            if org in course_org_filter:
+                return configuration
+        return None
+
+    @classmethod
     def get_value_for_org(cls, org, name, default=None):
         """
         This returns site configuration value which has an org_filter that matches
@@ -74,15 +93,11 @@ class SiteConfiguration(models.Model):
         Returns:
             Configuration value for the given key.
         """
-        for configuration in cls.objects.filter(values__contains=org, enabled=True).all():
-            course_org_filter = configuration.get_value('course_org_filter', [])
-            # The value of 'course_org_filter' can be configured as a string representing
-            # a single organization or a list of strings representing multiple organizations.
-            if not isinstance(course_org_filter, list):
-                course_org_filter = [course_org_filter]
-            if org in course_org_filter:
-                return configuration.get_value(name, default)
-        return default
+        configuration = cls.get_configuration_for_org(org)
+        if configuration is None:
+            return default
+        else:
+            return configuration.get_value(name, default)
 
     @classmethod
     def get_all_orgs(cls):
