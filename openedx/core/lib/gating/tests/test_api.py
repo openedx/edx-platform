@@ -256,7 +256,7 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
             category='html',
             display_name='some html block'
         )
-        with patch('completion.models.BlockCompletion.get_course_completions') as course_block_completions_mock:
+        with patch('gating_api.completion.models.BlockCompletion.get_course_completions') as course_block_completions_mock:
             course_block_completions_mock.return_value = {
                 problem_block.location: user_problem_completion,
                 html_block.location: user_html_completion,
