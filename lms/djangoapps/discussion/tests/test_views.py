@@ -771,6 +771,17 @@ class ForumFormDiscussionContentGroupTestCase(ForumsEnableMixin, ContentGroupTes
         )
         self.assert_has_access(response, 3)
 
+    def test_global_staff_user(self, mock_request):
+        """
+        Verify that global staff user has access to all threads regardless
+        of cohort.
+        """
+        response = self.call_view(
+            mock_request,
+            self.staff_user
+        )
+        self.assert_has_access(response, 4)
+
 
 @patch('requests.request', autospec=True)
 class SingleThreadContentGroupTestCase(ForumsEnableMixin, UrlResetMixin, ContentGroupTestCase):
