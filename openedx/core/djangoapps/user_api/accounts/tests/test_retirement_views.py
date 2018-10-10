@@ -1042,6 +1042,82 @@ class TestAccountRetirementRetrieve(RetirementTestCase):
         self.assert_status_and_user_data(values, username_to_find=original_username)
 
 
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
+class TestAccountRetirementCleanup(RetirementTestCase):
+    """
+    Tests the account retirement cleanup endpoint.
+    """
+    def setUp(self):
+        super(TestAccountRetirementCleanup, self).setUp()
+        self.pending_state = RetirementState.objects.get(state_name='PENDING')
+        self.complete_state = RetirementState.objects.get(state_name='COMPLETE')
+        self.retirements = []
+        self.usernames = []
+
+        for _ in range(1, 10):
+            user = UserFactory()
+            self.retirements.append(create_retirement_status(user, state=self.complete_state))
+            self.usernames.append(user.username)
+
+        self.test_superuser = SuperuserFactory()
+        self.headers = build_jwt_headers(self.test_superuser)
+        self.headers['content_type'] = "application/json"
+        self.url = reverse('accounts_retirement_cleanup')
+
+    def cleanup_and_assert_status(self, data=None, expected_status=status.HTTP_204_NO_CONTENT):
+        """
+        Helper function for making a request to the retirement cleanup endpoint, and asserting the status.
+        """
+        if data is None:
+            data = {'usernames': self.usernames}
+
+        response = self.client.delete(self.url, json.dumps(data), **self.headers)
+        print(response)
+        self.assertEqual(response.status_code, expected_status)
+        return response
+
+    def test_simple_success(self):
+        self.cleanup_and_assert_status()
+        self.assertFalse(UserRetirementStatus.objects.all())
+
+    def test_leaves_other_users(self):
+        remaining_usernames = []
+
+        # Create a bunch of local users in different states
+        for state in (self.pending_state, self.complete_state):
+            for _ in range(1, 3):
+                user = UserFactory()
+                remaining_usernames.append(create_retirement_status(user, state=state).user.username)
+
+        # Call should succeed and leave behind the local users in both states
+        self.cleanup_and_assert_status()
+        self.assertEqual(
+            UserRetirementStatus.objects.filter(user__username__in=remaining_usernames).count(),
+            len(remaining_usernames)
+        )
+
+    def test_no_usernames(self):
+        self.cleanup_and_assert_status(data={'usernames': []})
+
+    def test_bad_usernames(self):
+        self.cleanup_and_assert_status(data={'usernames': 'foo'}, expected_status=status.HTTP_400_BAD_REQUEST)
+
+    def test_nonexistent_username(self):
+        self.cleanup_and_assert_status(
+            data={'usernames': self.usernames + ['does not exist']},
+            expected_status=status.HTTP_400_BAD_REQUEST
+        )
+
+    def test_username_bad_state(self):
+        # Set one of the users we're looking up to a non-COMPLETE state to
+        # force the error
+        retirement = UserRetirementStatus.objects.get(user__username=self.usernames[0])
+        retirement.current_state = self.pending_state
+        retirement.save()
+
+        self.cleanup_and_assert_status(expected_status=status.HTTP_400_BAD_REQUEST)
+
+
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
 class TestAccountRetirementUpdate(RetirementTestCase):
