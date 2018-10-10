@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.db import migrations, models
 import model_utils.fields
 import django.db.models.deletion
-import onboarding.models
+import lms.djangoapps.onboarding.models
 import django.utils.timezone
 from django.conf import settings
 import django.core.validators
@@ -67,7 +67,7 @@ class Migration(migrations.Migration):
                 ('country', models.CharField(max_length=255, null=True, blank=True)),
                 ('city', models.CharField(max_length=255, null=True, blank=True)),
                 ('unclaimed_org_admin_email', models.EmailField(db_index=True, max_length=254, null=True, blank=True)),
-                ('url', models.URLField(blank=True, max_length=255, null=True, validators=[onboarding.models.SchemaOrNoSchemaURLValidator])),
+                ('url', models.URLField(blank=True, max_length=255, null=True, validators=[lms.djangoapps.onboarding.models.SchemaOrNoSchemaURLValidator])),
                 ('founding_year', models.PositiveSmallIntegerField(null=True, blank=True)),
                 ('registration_number', models.CharField(max_length=30, null=True, blank=True)),
                 ('org_type', models.CharField(max_length=10, null=True, blank=True)),
@@ -166,7 +166,7 @@ class Migration(migrations.Migration):
                 ('country', models.CharField(max_length=255, null=True, blank=True)),
                 ('city', models.CharField(max_length=255, null=True, blank=True)),
                 ('unclaimed_org_admin_email', models.EmailField(max_length=254, unique=True, null=True, blank=True)),
-                ('url', models.URLField(blank=True, max_length=255, null=True, validators=[onboarding.models.SchemaOrNoSchemaURLValidator])),
+                ('url', models.URLField(blank=True, max_length=255, null=True, validators=[lms.djangoapps.onboarding.models.SchemaOrNoSchemaURLValidator])),
                 ('founding_year', models.PositiveSmallIntegerField(null=True, blank=True)),
                 ('registration_number', models.CharField(max_length=30, null=True, blank=True)),
                 ('org_type', models.CharField(max_length=10, null=True, blank=True)),

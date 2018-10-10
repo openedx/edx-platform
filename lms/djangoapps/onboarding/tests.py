@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 
 from student.models import UserProfile, Registration
-from onboarding.models import UserExtendedProfile, EmailPreference
+from lms.djangoapps.onboarding.models import UserExtendedProfile, EmailPreference
 from common.lib.nodebb_client.client import NodeBBClient
 
 
@@ -87,7 +87,7 @@ class UserDeletionTestCase(TestCase):
         self.assertGreater(sum(1 for row in historical_user_profile_data), 0)
 
         historical_user_extended_profile_data = UserExtendedProfile.objects.raw(
-            'SELECT * FROM onboarding_historicaluserextendedprofile WHERE user_id={};'.format(user.id))
+            'SELECT * from onboarding_historicaluserextendedprofile WHERE user_id={};'.format(user.id))
         self.assertGreater(
             sum(1 for row in historical_user_extended_profile_data), 0)
 
@@ -113,7 +113,7 @@ class UserDeletionTestCase(TestCase):
         self.assertEqual(sum(1 for row in historical_user_profile_data), 0)
 
         historical_user_extended_profile_data = UserExtendedProfile.objects.raw(
-            'SELECT * FROM onboarding_historicaluserextendedprofile WHERE user_id={};'.format(user_id))
+            'SELECT * from onboarding_historicaluserextendedprofile WHERE user_id={};'.format(user_id))
         self.assertEqual(
             sum(1 for row in historical_user_extended_profile_data), 0)
 

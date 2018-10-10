@@ -8,7 +8,7 @@ from rest_framework import status
 
 from lms.djangoapps.oef.decorators import can_take_oef
 from lms.djangoapps.oef.helpers import *
-from onboarding.models import Organization
+from lms.djangoapps.onboarding.models import Organization
 
 @login_required
 def oef_dashboard(request):

@@ -9,9 +9,9 @@ from common.djangoapps.nodebb.tasks import (task_create_user_on_nodebb, task_upd
                                             task_delete_user_on_nodebb, task_activate_user_on_nodebb,
                                             task_join_group_on_nodebb)
 from common.lib.nodebb_client.client import NodeBBClient
-from onboarding.helpers import COUNTRIES
+from lms.djangoapps.onboarding.helpers import COUNTRIES
 from certificates.models import GeneratedCertificate
-from onboarding.models import (
+from lms.djangoapps.onboarding.models import (
     UserExtendedProfile, Organization, FocusArea, EmailPreference, )
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from mailchimp_pipeline.signals.handlers import send_user_info_to_mailchimp, \

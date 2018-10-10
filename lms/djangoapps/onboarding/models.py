@@ -8,8 +8,8 @@ from pytz import utc
 from constants import ORG_PARTNERSHIP_END_DATE_PLACEHOLDER
 from datetime import datetime
 from django.contrib.auth.models import User
-from simple_history import register
 from model_utils.models import TimeStampedModel
+from simple_history import register
 from simple_history.models import HistoricalRecords
 from django.core.validators import MaxValueValidator, URLValidator
 from django.db import models
@@ -19,6 +19,11 @@ from student.models import UserProfile
 log = logging.getLogger("edx.onboarding")
 
 
+# register User and UserProfile models for django-simple-history module
+register(User, app=__package__, table_name='auth_historicaluser')
+register(UserProfile, table_name='auth_historicaluserprofile')
+
+
 class SchemaOrNoSchemaURLValidator(URLValidator):
     regex = re.compile(
         r'((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]'
@@ -26,10 +31,6 @@ class SchemaOrNoSchemaURLValidator(URLValidator):
         r'?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)',
         re.IGNORECASE
     )
-
-# register User and UserProfile models for django-simple-history module
-register(User, app=__package__, table_name='auth_historicaluser')
-register(UserProfile, table_name='auth_historicaluserprofile')
 
 
 class OrgSector(models.Model):

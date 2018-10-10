@@ -1,6 +1,11 @@
 from django.contrib import admin
 
-from onboarding.models import (
+
+# import handlers to make sure that they are executed
+import onboarding.handlers
+
+
+from lms.djangoapps.onboarding.models import (
     RoleInsideOrg,
     Currency,
     OrgSector,

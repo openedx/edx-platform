@@ -1,7 +1,7 @@
 from django.db import models
 from model_utils.models import TimeStampedModel
 
-from onboarding.models import Organization
+from lms.djangoapps.onboarding.models import Organization
 from student.models import User
 
 
