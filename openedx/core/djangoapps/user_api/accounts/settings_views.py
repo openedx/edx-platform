@@ -15,7 +15,7 @@ from edxmako.shortcuts import render_to_response
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
-from openedx.core.djangoapps.lang_pref.api import all_languages, released_languages
+from openedx.core.djangoapps.lang_pref.api import all_languages, released_languages, beta_languages
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.edx_api_utils import get_edx_api_data
@@ -85,6 +85,8 @@ def account_settings_context(request):
                 'options': [(choice[0], _(choice[1])) for choice in UserProfile.GENDER_CHOICES],
             }, 'language': {
                 'options': released_languages(),
+            }, 'beta_language': {
+                'options': beta_languages(),
             }, 'level_of_education': {
                 'options': [(choice[0], _(choice[1])) for choice in UserProfile.LEVEL_OF_EDUCATION_CHOICES],
             }, 'password': {

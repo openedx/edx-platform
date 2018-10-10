@@ -69,6 +69,16 @@ class DarkLangMiddleware(object):
             language_options.append(settings.LANGUAGE_CODE)
         return language_options
 
+    @property
+    def beta_langs(self):
+        """
+        Current list of released languages
+        """
+        language_options = DarkLangConfig.current().beta_languages_list
+        if settings.LANGUAGE_CODE not in language_options:
+            language_options.append(settings.LANGUAGE_CODE)
+        return language_options
+
     def process_request(self, request):
         """
         Prevent user from requesting un-released languages except by using the preview-lang query string.
@@ -82,14 +92,20 @@ class DarkLangMiddleware(object):
     def _fuzzy_match(self, lang_code):
         """Returns a fuzzy match for lang_code"""
         match = None
-        if lang_code in self.released_langs:
+        dark_lang_config = DarkLangConfig.current()
+        langs = self.released_langs
+
+        if dark_lang_config.enable_beta_languages:
+            langs += self.beta_langs
+
+        if lang_code in langs:
             match = lang_code
         else:
             lang_prefix = lang_code.partition('-')[0]
-            for released_lang in self.released_langs:
-                released_prefix = released_lang.partition('-')[0]
+            for lang in langs:
+                released_prefix = lang.partition('-')[0]
                 if lang_prefix == released_prefix:
-                    match = released_lang
+                    match = lang
         return match
 
     def _clean_accept_headers(self, request):
