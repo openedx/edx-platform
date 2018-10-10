@@ -16,8 +16,10 @@ from django.urls import reverse
 from django.utils.translation import gettext_noop as _
 from requests.auth import HTTPBasicAuth
 from six import text_type
-from xblock.core import XBlock
+from webob import Response
+from webob.multidict import MultiDict
 from web_fragments.fragment import Fragment
+from xblock.core import XBlock
 from xblockutils.resources import ResourceLoader
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 
@@ -163,7 +165,7 @@ class CapaProblemsXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixi
         fragment = Fragment()
         self.add_resource_urls(fragment)
         fragment.add_content(self.get_html())
-        fragment.initialize_js('Problem')
+        fragment.initialize_js('CapaProblemXBlock')
         return fragment
 
     def author_view(self, context=None):
@@ -220,9 +222,40 @@ class CapaProblemsXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixi
         """
         The url to be used by to call into handle_ajax
         """
-        return self.runtime.handler_url(self, 'handle_ajax').rstrip('/?')
+        return self.runtime.handler_url(self, 'xmodule_handler')
 
     @XBlock.handler
+    def xmodule_handler(self, request, suffix=None):
+        """
+        XBlock handler that wraps `handle_ajax`
+        """
+        # TODO: copied from x_module.XModule: reimplement and simplify.
+        # Do we need all the webob stuff?
+        class FileObjForWebobFiles(object):
+            """
+            Turn Webob cgi.FieldStorage uploaded files into pure file objects.
+            Webob represents uploaded files as cgi.FieldStorage objects, which
+            have a .file attribute.  We wrap the FieldStorage object, delegating
+            attribute access to the .file attribute.  But the files have no
+            name, so we carry the FieldStorage .filename attribute as the .name.
+            """
+            def __init__(self, webob_file):
+                self.file = webob_file.file
+                self.name = webob_file.filename
+
+            def __getattr__(self, name):
+                return getattr(self.file, name)
+
+        # WebOb requests have multiple entries for uploaded files.  handle_ajax
+        # expects a single entry as a list.
+        request_post = MultiDict(request.POST)
+        for key in set(request.POST.iterkeys()):
+            if hasattr(request.POST[key], "file"):
+                request_post[key] = map(FileObjForWebobFiles, request.POST.getall(key))
+
+        response_data = self.handle_ajax(suffix, request_post)
+        return Response(response_data, content_type='application/json', charset='UTF-8')
+
     def handle_ajax(self, request, dispatch):
         """
         This is called by courseware.module_render, to handle an AJAX call.

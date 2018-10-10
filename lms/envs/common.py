@@ -1425,11 +1425,10 @@ discussion_vendor_js = [
     'js/split.js'
 ]
 
-# TODO move to common/static/common/js/capa?
 capa_js = (
-    rooted_glob(COMMON_ROOT / 'lib', 'xmodule/xmodule/js/src/capa/display.js') +
-    rooted_glob(COMMON_ROOT / 'lib', 'xmodule/xmodule/js/src/capa/imageinput.js') +
-    rooted_glob(COMMON_ROOT / 'lib', 'xmodule/xmodule/js/src/capa/schematic.js')
+    rooted_glob(COMMON_ROOT / 'static', 'common/js/capa/display.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'common/js/capa/imageinput.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'common/js/capa/schematic.js')
 )
 
 # TODO any vendor files?  maybe these, which are shared by other xmodules?

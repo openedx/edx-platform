@@ -1325,3 +1325,8 @@
         return Problem;
     }).call(this);
 }).call(this);
+
+function CapaProblemXBlock(runtime, element) {
+    'use strict';
+    var xblock = new Problem(element);
+}
