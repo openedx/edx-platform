@@ -132,7 +132,7 @@
 
     .account-settings-header-subtitle-warning {
       @extend .account-settings-header-subtitle;
-      color: #ab2121;
+      color: $alert-color;
     }
 
     .account-settings-section-message {

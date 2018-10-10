@@ -72,6 +72,14 @@ export class StudentAccountDeletion extends React.Component {
       },
     );
 
+    const acctDeletionWarningText = StringUtils.interpolate(
+      gettext('{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read the above carefully before proceeding. This is an irreversible action, and {strongStart}you will no longer be able to use the same email on edX.{strongEnd}'),
+      {
+        strongStart: '<strong>',
+        strongEnd: '</strong>',
+      },
+    );
+
     return (
       <div className="account-deletion-details">
         <p className="account-settings-header-subtitle">{ gettext('We’re sorry to see you go!') }</p>
@@ -81,11 +89,10 @@ export class StudentAccountDeletion extends React.Component {
           className="account-settings-header-subtitle"
           dangerouslySetInnerHTML={{ __html: loseAccessText }}
         />
-        <p className="account-settings-header-subtitle-warning">
-          <strong>{ gettext('Warning: Account deletion is permanent. ') }</strong>
-          {gettext('Please read the above carefully before proceeding. This is an irreversible action, and ')}
-          <strong>{ gettext('you will no longer be able to use the same email on edX.') }</strong>
-        </p>
+        <p
+          className="account-settings-header-subtitle-warning"
+          dangerouslySetInnerHTML={{ __html: acctDeletionWarningText }}
+        />
         <p
           className="account-settings-header-subtitle"
           dangerouslySetInnerHTML={{ __html: changeAcctInfoText }}
