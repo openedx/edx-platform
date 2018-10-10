@@ -1,7 +1,7 @@
 from django.core.exceptions import PermissionDenied
 
-from lms.djangoapps.onboarding.models import PartnerNetwork, Organization
-from lms.djangoapps.onboarding.helpers import oef_eligible_first_learner
+from onboarding.models import PartnerNetwork, Organization
+from onboarding.helpers import oef_eligible_first_learner
 
 def can_take_oef(function):
     def wrap(request, *args, **kwargs):

@@ -4,7 +4,7 @@ The middleware for on-boarding survey app.
 from django.core.urlresolvers import reverse, resolve
 from django.shortcuts import redirect
 
-from lms.djangoapps.onboarding.models import UserExtendedProfile
+from onboarding.models import UserExtendedProfile
 
 
 class RedirectMiddleware(object):

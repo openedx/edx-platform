@@ -22,17 +22,17 @@ from django.utils.translation import ugettext_lazy as _, ugettext_noop
 from django.views.decorators.csrf import csrf_exempt
 
 from edxmako.shortcuts import render_to_response
-from lms.djangoapps.onboarding.decorators import can_save_org_data, can_not_update_onboarding_steps, \
+from onboarding.decorators import can_save_org_data, can_not_update_onboarding_steps, \
     can_save_org_details
 from lms.djangoapps.onboarding.email_utils import send_admin_activation_email, send_admin_update_confirmation_email, \
     send_admin_update_email
 from lms.djangoapps.onboarding.helpers import calculate_age_years, COUNTRIES, LANGUAGES, oef_eligible_first_learner, \
     get_close_matching_orgs_with_suggestions, get_alquity_community_url
-from lms.djangoapps.onboarding.models import (
+from onboarding.models import (
     Organization,
     Currency, OrganizationMetric, OrganizationAdminHashKeys, PartnerNetwork)
-from lms.djangoapps.onboarding.models import UserExtendedProfile
-from lms.djangoapps.onboarding.signals import save_interests
+from onboarding.models import UserExtendedProfile
+from onboarding.signals import save_interests
 from lms.djangoapps.student_dashboard.views import get_recommended_xmodule_courses, get_joined_communities
 from nodebb.helpers import update_nodebb_for_user_status
 from onboarding import forms

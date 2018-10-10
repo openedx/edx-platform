@@ -12,10 +12,10 @@ from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext_noop
 from rest_framework.compat import MinValueValidator, MaxValueValidator
 
-from lms.djangoapps.onboarding.email_utils import send_admin_activation_email
-from lms.djangoapps.onboarding.helpers import COUNTRIES, LANGUAGES, get_country_iso, get_sorted_choices_from_dict, \
+from onboarding.email_utils import send_admin_activation_email
+from onboarding.helpers import COUNTRIES, LANGUAGES, get_country_iso, get_sorted_choices_from_dict, \
     get_actual_field_names, admin_not_assigned_or_me
-from lms.djangoapps.onboarding.models import (
+from onboarding.models import (
     UserExtendedProfile,
     EmailPreference,
     Organization,

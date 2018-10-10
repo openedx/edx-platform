@@ -2,7 +2,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 
-from lms.djangoapps.onboarding.models import PartnerNetwork
+from onboarding.models import PartnerNetwork
 
 
 def can_access_org_page(user_extended_profile):

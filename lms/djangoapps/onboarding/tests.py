@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 
 from student.models import UserProfile, Registration
-from lms.djangoapps.onboarding.models import UserExtendedProfile, EmailPreference
+from onboarding.models import UserExtendedProfile, EmailPreference
 from common.lib.nodebb_client.client import NodeBBClient
 
 
@@ -79,7 +79,7 @@ class UserDeletionTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
 
         historical_user_data = User.objects.raw(
-            'SELECT * FROM auth_historicaluser WHERE email="{}";'.format("test@email.com"))
+            'SELECT * FROM auth_historicaluser WHERE email="{}";'.format(user.email))
         self.assertGreater(sum(1 for row in historical_user_data), 0)
 
         historical_user_profile_data = UserProfile.objects.raw(
@@ -91,6 +91,7 @@ class UserDeletionTestCase(TestCase):
         self.assertGreater(
             sum(1 for row in historical_user_extended_profile_data), 0)
 
+        user_id = user.id
         user.delete()
 
         email_preference = EmailPreference.objects.filter(user=user).first()
@@ -98,21 +99,21 @@ class UserDeletionTestCase(TestCase):
         extended_profile = UserExtendedProfile.objects.filter(
             user=user).first()
 
-
         self.assertEqual(email_preference, None)
         self.assertEqual(user_profile, None)
         self.assertEqual(extended_profile, None)
 
+
         historical_user_data = User.objects.raw(
-            'SELECT * FROM auth_historicaluser WHERE email="{}";'.format("test@email.com"))
+            'SELECT * FROM auth_historicaluser WHERE email="{}";'.format(user.email))
         self.assertEqual(sum(1 for row in historical_user_data), 0)
 
         historical_user_profile_data = UserProfile.objects.raw(
-            'SELECT * FROM auth_historicaluserprofile WHERE user_id={};'.format(user.id))
+            'SELECT * FROM auth_historicaluserprofile WHERE user_id={};'.format(user_id))
         self.assertEqual(sum(1 for row in historical_user_profile_data), 0)
 
         historical_user_extended_profile_data = UserExtendedProfile.objects.raw(
-            'SELECT * FROM onboarding_historicaluserextendedprofile WHERE user_id={};'.format(user.id))
+            'SELECT * FROM onboarding_historicaluserextendedprofile WHERE user_id={};'.format(user_id))
         self.assertEqual(
             sum(1 for row in historical_user_extended_profile_data), 0)
 

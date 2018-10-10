@@ -1,7 +1,7 @@
 import re
 from datetime import date
 from difflib import SequenceMatcher
-from lms.djangoapps.onboarding.models import Organization
+from onboarding.models import Organization
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from django.conf import settings
 

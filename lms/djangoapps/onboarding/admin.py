@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from lms.djangoapps.onboarding.models import (
+from onboarding.models import (
     RoleInsideOrg,
     Currency,
     OrgSector,

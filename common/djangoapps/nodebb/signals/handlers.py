@@ -9,9 +9,9 @@ from common.djangoapps.nodebb.tasks import (task_create_user_on_nodebb, task_upd
                                             task_delete_user_on_nodebb, task_activate_user_on_nodebb,
                                             task_join_group_on_nodebb)
 from common.lib.nodebb_client.client import NodeBBClient
-from lms.djangoapps.onboarding.helpers import COUNTRIES
+from onboarding.helpers import COUNTRIES
 from certificates.models import GeneratedCertificate
-from lms.djangoapps.onboarding.models import (
+from onboarding.models import (
     UserExtendedProfile, Organization, FocusArea, EmailPreference, )
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from mailchimp_pipeline.signals.handlers import send_user_info_to_mailchimp, \
@@ -84,7 +84,7 @@ def sync_organization_info_with_nodebb(sender, instance, created, **kwargs):  # 
     request = get_current_request()
 
     # To prevent unnecessary updation in case Django only updates
-    # last_logged_in or last seen etc.
+    # updated_at etc.
     if request:
         if 'login' in request.path or 'logout' in request.path:
             return
