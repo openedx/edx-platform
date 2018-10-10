@@ -16,7 +16,7 @@ class CourseTeamPageTest(StudioCourseTest):
         user = {
             'username': username,
             'email': username + "@example.com",
-            'password': username + '123'
+            'password': username + '123$%^'
         }
         AutoAuthPage(
             self.browser, no_login=True,

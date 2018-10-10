@@ -387,9 +387,9 @@ class AccountCreationActivationAndPasswordChangeTest(TestCase):
     """
     Test cases to cover the account initialization workflow
     """
-    USERNAME = u'frank-underwood'
+    USERNAME = u'claire-underwood'
     PASSWORD = u'ṕáśśẃőŕd'
-    EMAIL = u'frank+underwood@example.com'
+    EMAIL = u'claire+underwood@example.com'
 
     IS_SECURE = False
 

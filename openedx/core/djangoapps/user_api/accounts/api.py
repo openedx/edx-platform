@@ -287,7 +287,6 @@ def create_account(username, password, email):
 
     * 3rd party auth
     * External auth (shibboleth)
-    * Complex password policies (ENFORCE_PASSWORD_POLICY)
 
     In addition, we assume that some functionality is handled
     at higher layers:
@@ -327,7 +326,7 @@ def create_account(username, password, email):
     # Validate the username, password, and email
     # This will raise an exception if any of these are not in a valid format.
     _validate_username(username)
-    _validate_password(password, username)
+    _validate_password(password, username, email)
     _validate_email(email)
 
     # Create the user account, setting them to "inactive" until they activate their account.
@@ -494,17 +493,17 @@ def get_confirm_email_validation_error(confirm_email, email):
     return _validate(_validate_confirm_email, errors.AccountEmailInvalid, confirm_email, email)
 
 
-def get_password_validation_error(password, username=None):
+def get_password_validation_error(password, username=None, email=None):
     """Get the built-in validation error message for when
     the password is invalid in some way.
 
     :param password: The proposed password (unicode).
     :param username: The username associated with the user's account (unicode).
-    :param default: The message to default to in case of no error.
+    :param email: The email associated with the user's account (unicode).
     :return: Validation error message.
 
     """
-    return _validate(_validate_password, errors.AccountPasswordInvalid, password, username)
+    return _validate(_validate_password, errors.AccountPasswordInvalid, password, username, email)
 
 
 def get_country_validation_error(country):
@@ -643,15 +642,17 @@ def _validate_confirm_email(confirm_email, email):
         raise errors.AccountEmailInvalid(accounts.REQUIRED_FIELD_CONFIRM_EMAIL_MSG)
 
 
-def _validate_password(password, username=None):
+def _validate_password(password, username=None, email=None):
     """Validate the format of the user's password.
 
     Passwords cannot be the same as the username of the account,
-    so we take `username` as an argument.
+    so we create a temp_user using the username and email to test the password against.
+    This user is never saved.
 
     Arguments:
         password (unicode): The proposed password.
         username (unicode): The username associated with the user's account.
+        email (unicode): The email associated with the user's account.
 
     Returns:
         None
@@ -662,12 +663,12 @@ def _validate_password(password, username=None):
     """
     try:
         _validate_type(password, basestring, accounts.PASSWORD_BAD_TYPE_MSG)
-
-        validate_password(password, username=username)
+        temp_user = User(username=username, email=email) if username else None
+        validate_password(password, user=temp_user)
     except errors.AccountDataBadType as invalid_password_err:
         raise errors.AccountPasswordInvalid(text_type(invalid_password_err))
     except ValidationError as validation_err:
-        raise errors.AccountPasswordInvalid(validation_err.message)
+        raise errors.AccountPasswordInvalid(' '.join(validation_err.messages))
 
 
 def _validate_country(country):

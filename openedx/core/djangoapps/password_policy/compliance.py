@@ -104,7 +104,7 @@ def _check_user_compliance(user, password):
     Returns a boolean indicating whether or not the user is compliant with password policy rules.
     """
     try:
-        validate_password(password, user=user, password_reset=False)
+        validate_password(password, user=user)
         return True
     except Exception:  # pylint: disable=broad-except
         # If anything goes wrong, we should assume the password is not compliant but we don't necessarily

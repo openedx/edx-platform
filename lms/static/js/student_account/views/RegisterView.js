@@ -195,7 +195,9 @@
 
                             // Hide each input tip
                             $(this).children().each(function() {
-                                if (inputTipSelectors.indexOf($(this).attr('class')) >= 0) {
+                                // This is a 1 instead of 0 so the error message for a field is not
+                                // hidden on blur and only the help tip is hidden.
+                                if (inputTipSelectors.indexOf($(this).attr('class')) >= 1) {
                                     $(this).addClass('hidden');
                                 }
                             });

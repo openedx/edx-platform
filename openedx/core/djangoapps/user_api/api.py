@@ -18,7 +18,7 @@ from openedx.features.enterprise_support.api import enterprise_customer_for_requ
 from student.forms import get_registration_extension_form
 from student.models import UserProfile
 from util.password_policy_validators import (
-    password_complexity, password_instructions, password_max_length, password_min_length
+    password_validators_instruction_texts, password_validators_restrictions, DEFAULT_MAX_PASSWORD_LENGTH,
 )
 
 
@@ -118,9 +118,7 @@ def get_login_session_form(request):
         "password",
         label=password_label,
         field_type="password",
-        restrictions={
-            "max_length": password_max_length(),
-        }
+        restrictions={'max_length': DEFAULT_MAX_PASSWORD_LENGTH}
     )
 
     form_desc.add_field(
@@ -419,22 +417,12 @@ class RegistrationFormFactory(object):
         # meant to hold the user's password.
         password_label = _(u"Password")
 
-        restrictions = {
-            "min_length": password_min_length(),
-            "max_length": password_max_length(),
-        }
-
-        complexities = password_complexity()
-        for key, value in complexities.iteritems():
-            api_key = key.lower().replace(' ', '_')
-            restrictions[api_key] = value
-
         form_desc.add_field(
             "password",
             label=password_label,
             field_type="password",
-            instructions=password_instructions(),
-            restrictions=restrictions,
+            instructions=password_validators_instruction_texts(),
+            restrictions=password_validators_restrictions(),
             required=required
         )
 

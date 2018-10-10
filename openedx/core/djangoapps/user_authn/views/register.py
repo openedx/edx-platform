@@ -137,7 +137,6 @@ def create_account_with_params(request, params):
     do_external_auth, eamap = pre_account_creation_external_auth(request, params)
 
     extended_profile_fields = configuration_helpers.get_value('extended_profile_fields', [])
-    enforce_password_policy = not do_external_auth
     # Can't have terms of service for certain SHIB users, like at Stanford
     registration_fields = getattr(settings, 'REGISTRATION_EXTRA_FIELDS', {})
     tos_required = (
@@ -154,7 +153,7 @@ def create_account_with_params(request, params):
         data=params,
         extra_fields=extra_fields,
         extended_profile_fields=extended_profile_fields,
-        enforce_password_policy=enforce_password_policy,
+        do_third_party_auth=do_external_auth,
         tos_required=tos_required,
     )
     custom_form = get_registration_extension_form(data=params)

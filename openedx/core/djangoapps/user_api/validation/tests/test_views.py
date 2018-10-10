@@ -16,7 +16,7 @@ from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.accounts.tests import testutils
 from openedx.core.lib.api import test_utils
 from openedx.core.djangoapps.user_api.validation.views import RegistrationValidationThrottle
-from util.password_policy_validators import password_max_length, password_min_length
+from util.password_policy_validators import DEFAULT_MAX_PASSWORD_LENGTH
 
 
 @ddt.ddt
@@ -174,23 +174,29 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
         )
 
     def test_password_empty_validation_decision(self):
-        msg = u'Enter a password with at least {0} characters.'.format(password_min_length())
+        # 2 is the default setting for minimum length found in lms/envs/common.py
+        # under AUTH_PASSWORD_VALIDATORS.MinimumLengthValidator
+        msg = u'This password is too short. It must contain at least 2 characters.'
         self.assertValidationDecision(
             {'password': ''},
             {"password": msg}
         )
 
     def test_password_bad_min_length_validation_decision(self):
-        password = 'p' * (password_min_length() - 1)
-        msg = u'Enter a password with at least {0} characters.'.format(password_min_length())
+        password = 'p'
+        # 2 is the default setting for minimum length found in lms/envs/common.py
+        # under AUTH_PASSWORD_VALIDATORS.MinimumLengthValidator
+        msg = u'This password is too short. It must contain at least 2 characters.'
         self.assertValidationDecision(
             {'password': password},
             {"password": msg}
         )
 
     def test_password_bad_max_length_validation_decision(self):
-        password = 'p' * (password_max_length() + 1)
-        msg = u'Enter a password with at most {0} characters.'.format(password_max_length())
+        password = 'p' * DEFAULT_MAX_PASSWORD_LENGTH
+        # 75 is the default setting for maximum length found in lms/envs/common.py
+        # under AUTH_PASSWORD_VALIDATORS.MaximumLengthValidator
+        msg = u'This password is too long. It must contain no more than 75 characters.'
         self.assertValidationDecision(
             {'password': password},
             {"password": msg}
@@ -199,7 +205,7 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase):
     def test_password_equals_username_validation_decision(self):
         self.assertValidationDecision(
             {"username": "somephrase", "password": "somephrase"},
-            {"username": "", "password": u"Password cannot be the same as the username."}
+            {"username": "", "password": u"The password is too similar to the username."}
         )
 
     @override_settings(

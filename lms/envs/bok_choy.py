@@ -173,7 +173,6 @@ YOUTUBE['TEXT_API']['url'] = "{0}:{1}/test_transcripts_youtube/".format(YOUTUBE_
 ############################# SECURITY SETTINGS ################################
 # Default to advanced security in common.py, so tests can reset here to use
 # a simpler security model
-FEATURES['ENFORCE_PASSWORD_POLICY'] = False
 FEATURES['ENABLE_MAX_FAILED_LOGIN_ATTEMPTS'] = False
 FEATURES['SQUELCH_PII_IN_LOGS'] = False
 FEATURES['PREVENT_CONCURRENT_LOGINS'] = False
@@ -182,9 +181,6 @@ FEATURES['ADVANCED_SECURITY'] = False
 FEATURES['ENABLE_MOBILE_REST_API'] = True  # Show video bumper in LMS
 FEATURES['ENABLE_VIDEO_BUMPER'] = True  # Show video bumper in LMS
 FEATURES['SHOW_BUMPER_PERIODICITY'] = 1
-
-PASSWORD_MIN_LENGTH = None
-PASSWORD_COMPLEXITY = {}
 
 # Enable courseware search for tests
 FEATURES['ENABLE_COURSEWARE_SEARCH'] = True

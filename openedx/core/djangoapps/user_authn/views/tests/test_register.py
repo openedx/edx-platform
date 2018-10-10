@@ -637,10 +637,14 @@ class TestCreateAccountValidation(TestCase):
         del params["email"]
         assert_email_error("A properly formatted e-mail is required")
 
-        # Empty, too short
-        for email in ["", "a"]:
-            params["email"] = email
-            assert_email_error("A properly formatted e-mail is required")
+        # Empty
+        params["email"] = ""
+        assert_email_error("A properly formatted e-mail is required")
+
+        #too short
+        params["email"] = "a"
+        assert_email_error("A properly formatted e-mail is required "
+                           "Ensure this value has at least 3 characters (it has 1).")
 
         # Too long
         params["email"] = '{email}@example.com'.format(
@@ -703,18 +707,21 @@ class TestCreateAccountValidation(TestCase):
 
         # Missing
         del params["password"]
-        assert_password_error("A valid password is required")
+        assert_password_error("This field is required.")
 
-        # Empty, too short
-        for password in ["", "a"]:
-            params["password"] = password
-            assert_password_error("A valid password is required")
+        # Empty
+        params["password"] = ""
+        assert_password_error("This field is required.")
+
+        # Too short
+        params["password"] = "a"
+        assert_password_error("This password is too short. It must contain at least 2 characters.")
 
         # Password policy is tested elsewhere
 
         # Matching username
         params["username"] = params["password"] = "test_username_and_password"
-        assert_password_error("Password cannot be the same as the username.")
+        assert_password_error("The password is too similar to the username.")
 
     def test_name(self):
         params = dict(self.minimal_params)
