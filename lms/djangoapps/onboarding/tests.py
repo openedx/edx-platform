@@ -1,5 +1,6 @@
 import requests
 
+from django.db import connection
 from django.test import TestCase
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -132,10 +133,18 @@ class UserDeletionTestCase(TestCase):
 
         if user:
             user.delete()
+
+            cursor = connection.cursor()
+            cursor.execute('DELETE FROM auth_historicaluser WHERE email="{}";'.format(user.email))
+            cursor.execute('DELETE FROM auth_historicaluserprofile WHERE user_id="{}";'.format(user.id))
+            cursor.execute('DELETE from onboarding_historicaluserextendedprofile WHERE user_id="{}";'.format(user.id))
+
         if email_preference:
             email_preference.delete()
+
         if user_profile:
             user_profile.delete()
+
         if extended_profile:
             extended_profile.delete()
 
