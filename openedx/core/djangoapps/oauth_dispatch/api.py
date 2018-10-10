@@ -7,7 +7,6 @@ from oauthlib.oauth2.rfc6749.errors import OAuth2Error
 from oauthlib.oauth2.rfc6749.tokens import BearerToken
 from oauth2_provider.models import AccessToken as dot_access_token
 from oauth2_provider.models import RefreshToken as dot_refresh_token
-from oauth2_provider.oauth2_backends import get_oauthlib_core
 from oauth2_provider.settings import oauth2_settings as dot_settings
 from provider.oauth2.models import AccessToken as dop_access_token
 from provider.oauth2.models import RefreshToken as dop_refresh_token
@@ -51,8 +50,8 @@ def refresh_dot_access_token(request, client_id, refresh_token, expires_in=None)
     Create and return a new (persisted) access token, given a previously created
     refresh_token, possibly returned from create_dot_access_token above.
     """
-    auth_core = get_oauthlib_core()
     expires_in = _get_expires_in_value(expires_in)
+    auth_core = _get_oauthlib_core(expires_in)
     _populate_refresh_token_request(request, client_id, refresh_token)
 
     # Note: Unlike create_dot_access_token, we use the top-level auth library
@@ -70,13 +69,7 @@ def _get_expires_in_value(expires_in):
     """
     Returns the expires_in value to use for the token.
     """
-    # TODO (ARCH-246) Fix expiration configuration as this does not actually
-    # override the token's expiration. Rather, DOT's save_bearer_token method
-    # will always use dot_settings.ACCESS_TOKEN_EXPIRE_SECONDS.
-    if not expires_in:
-        seconds_in_a_day = 24 * 60 * 60
-        expires_in = settings.OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS * seconds_in_a_day
-    return expires_in
+    return expires_in or dot_settings.ACCESS_TOKEN_EXPIRE_SECONDS
 
 
 def _populate_create_access_token_request(request, user, client, scope=None):
@@ -105,3 +98,13 @@ def _populate_refresh_token_request(request, client_id, refresh_token):
         refresh_token=refresh_token,
         grant_type='refresh_token',
     )
+
+
+def _get_oauthlib_core(expires_in):
+    """
+    Based on oauth2_provider.oauth2_backends.get_oauthlib_core, but allows
+    passing in a value for token_expires_in.
+    """
+    validator = dot_settings.OAUTH2_VALIDATOR_CLASS()
+    server = dot_settings.OAUTH2_SERVER_CLASS(validator, token_expires_in=expires_in)
+    return dot_settings.OAUTH2_BACKEND_CLASS(server)
