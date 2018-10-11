@@ -338,25 +338,6 @@ class CapaProblemsXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixi
 
         return self.display_name
 
-    @classmethod
-    def parse_xml(cls, node, runtime, keys, id_generator):
-        """
-        Parses OLX into XBlock.
-
-        This method is overridden here to allow parsing legacy OLX, coming from CAPA XModule.
-        XBlock stores all the associated data, fields and children in a XML element inlined into vertical XML file.
-        """
-        return 'latex' not in template['template_id'] or course.use_latex_compiler
-
-    def get_context(self):
-        _context = RawDescriptor.get_context(self)
-        _context.update({
-            'markdown': self.markdown,
-            'enable_markdown': self.markdown is not None,
-            'enable_latex_compiler': self.use_latex_compiler,
-        })
-        return _context
-
     @property
     def _user(self):
         """
