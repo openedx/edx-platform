@@ -30,7 +30,7 @@ from openedx.core.lib.xblock_builtin import get_css_dependencies, get_js_depende
 from student.models import anonymous_id_for_user
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError, ProcessingError
-from xmodule.capa_base import CapaFields, CapaMixin, ComplexEncoder
+from .capa_base import CapaFields, CapaMixin, ComplexEncoder
 from xmodule.raw_module import RawDescriptor
 from xmodule.xml_module import XmlParserMixin
 from xmodule.util.misc import escape_html_characters
