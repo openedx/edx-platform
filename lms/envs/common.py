@@ -1589,14 +1589,6 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/discussion/inline-discussion-rtl.css',
     },
-    # TODO: common/lib/xmodule/xmodule/css/editor/edit.scss is shared by CAPA and HTML XModules
-    'style-capa': {
-        'source_filenames': [
-            'sass/capa/display.scss',
-            'sass/capa/edit.scss',
-        ],
-        'output_filename': 'css/capa/capa.css',
-    },
     FOOTER_CSS['openedx']['ltr']: {
         'source_filenames': [
             'css/lms-footer.css',
