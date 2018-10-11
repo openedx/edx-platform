@@ -236,7 +236,7 @@ class ShibSPTest(CacheIsolationTestCase):
         request.META.update({
             'Shib-Identity-Provider': 'https://idp.stanford.edu/',
             'REMOTE_USER': expected_email,
-            'mail': expected_email'
+            'mail': expected_email
         })
 
         request.user = AnonymousUser()
