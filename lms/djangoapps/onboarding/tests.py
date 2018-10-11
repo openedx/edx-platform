@@ -80,7 +80,7 @@ class UserDeletionTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
 
         historical_user_data = User.objects.raw(
-            'SELECT * FROM auth_historicaluser WHERE email="{}";'.format(user.email))
+            'SELECT * FROM auth_historicaluser WHERE id="{}";'.format(user.id))
         self.assertGreater(sum(1 for row in historical_user_data), 0)
 
         historical_user_profile_data = UserProfile.objects.raw(

@@ -13,6 +13,6 @@ def delete_all_user_data(sender, instance, **kwargs):
 
     cursor = connection.cursor()
 
-    cursor.execute('DELETE FROM auth_historicaluser WHERE email="{}";'.format(instance.email))
+    cursor.execute('DELETE FROM auth_historicaluser WHERE id="{}";'.format(instance.id))
     cursor.execute('DELETE FROM auth_historicaluserprofile WHERE user_id="{}";'.format(instance.id))
     cursor.execute('DELETE from onboarding_historicaluserextendedprofile WHERE user_id="{}";'.format(instance.id))
