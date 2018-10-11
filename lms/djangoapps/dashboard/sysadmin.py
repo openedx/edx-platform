@@ -27,6 +27,7 @@ from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import condition
 from django.views.generic.base import TemplateView
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from path import Path as path
 from six import text_type
@@ -475,30 +476,37 @@ class Courses(SysadminDashboardView):
 
         elif action == 'del_course':
             course_id = request.POST.get('course_id', '').strip()
-            course_key = CourseKey.from_string(course_id)
-            course_found = False
-            if course_key in courses:
-                course_found = True
-                course = courses[course_key]
-            else:
+            if course_id:
                 try:
-                    course = get_course_by_id(course_key)
-                    course_found = True
-                except Exception as err:   # pylint: disable=broad-except
-                    self.msg += _(
-                        'Error - cannot get course with ID {0}<br/><pre>{1}</pre>'
-                    ).format(
-                        course_key,
-                        escape(str(err))
-                    )
+                    course_key = CourseKey.from_string(course_id)
+                except InvalidKeyError:
+                    self.msg += _('Error - cannot get course with ID {0}.').format(course_id)
+                else:
+                    course_found = False
+                    if course_key in courses:
+                        course_found = True
+                        course = courses[course_key]
+                    else:
+                        try:
+                            course = get_course_by_id(course_key)
+                            course_found = True
+                        except Exception as err:   # pylint: disable=broad-except
+                            self.msg += _(
+                                'Error - cannot get course with ID {0}<br/><pre>{1}</pre>'
+                            ).format(
+                                course_key,
+                                escape(str(err))
+                            )
 
-            if course_found:
-                # delete course that is stored with mongodb backend
-                self.def_ms.delete_course(course.id, request.user.id)
-                # don't delete user permission groups, though
-                self.msg += \
-                    u"<font color='red'>{0} {1} = {2} ({3})</font>".format(
-                        _('Deleted'), text_type(course.location), text_type(course.id), course.display_name)
+                    if course_found:
+                        # delete course that is stored with mongodb backend
+                        self.def_ms.delete_course(course.id, request.user.id)
+                        # don't delete user permission groups, though
+                        self.msg += \
+                            u"<font color='red'>{0} {1} = {2} ({3})</font>".format(
+                                _('Deleted'), text_type(course.location), text_type(course.id), course.display_name)
+            else:
+                self.msg += _('Please select a course.')
 
         context = {
             'datatable': self.make_datatable(),
