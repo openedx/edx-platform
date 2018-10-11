@@ -160,8 +160,6 @@ class CapaProblemsXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixi
         Makes no use of the context parameter
         """
         log.debug("CapaProblemsXBlock.student_view")
-        self.load_state()
-
         fragment = Fragment()
         self.add_resource_urls(fragment)
         fragment.add_content(self.get_html())
@@ -256,7 +254,7 @@ class CapaProblemsXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixi
         response_data = self.handle_ajax(suffix, request_post)
         return Response(response_data, content_type='application/json', charset='UTF-8')
 
-    def handle_ajax(self, request, dispatch):
+    def handle_ajax(self, dispatch, request_post):
         """
         This is called by courseware.module_render, to handle an AJAX call.
 
@@ -298,7 +296,7 @@ class CapaProblemsXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixi
         before_attempts = self.attempts
 
         try:
-            result = handlers[dispatch](request.POST)
+            result = handlers[dispatch](request_post)
 
         except NotFoundError:
             log.info(

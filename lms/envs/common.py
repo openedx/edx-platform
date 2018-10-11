@@ -1426,14 +1426,14 @@ discussion_vendor_js = [
 ]
 
 capa_js = (
+    rooted_glob(COMMON_ROOT / 'static', 'common/js/javascript_loader.js') +
     rooted_glob(COMMON_ROOT / 'static', 'common/js/capa/display.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'common/js/collapsible.js') +
     rooted_glob(COMMON_ROOT / 'static', 'common/js/capa/imageinput.js') +
     rooted_glob(COMMON_ROOT / 'static', 'common/js/capa/schematic.js')
 )
 
-# TODO any vendor files?  maybe these, which are shared by other xmodules?
-# * js/src/javascript_loader.js
-# * js/src/collapsible.js
+# TODO any vendor files?
 capa_vendor_js = [
 ]
 

@@ -242,66 +242,75 @@ class CapaMixin(ScorableXBlockMixin):
         else:
             self.close_date = due_date
 
-    def load_state(self):
-        """
-        Initialize the user state fields.
-        """
-        if self.seed is None:
-            self.choose_new_seed()
+        self._lcp = None
 
-        try:
-            # TODO (vshnayder): move as much as possible of this work and error
-            # checking to descriptor load time
-            self.lcp = self.new_lcp(self.get_state_for_lcp())
+    @property
+    def lcp(self):
+        """
+        Return the LoncapaProblem object.
 
-            # At this point, we need to persist the randomization seed
-            # so that when the problem is re-loaded (to check/view/save)
-            # it stays the same.
-            # However, we do not want to write to the database
-            # every time the module is loaded.
-            # So we set the seed ONLY when there is not one set already
+        Side-effect: updates the seed and score fields if not already set.
+        """
+        if self._lcp is None:
+
             if self.seed is None:
-                self.seed = self.lcp.seed
+                self.choose_new_seed()
 
-        except Exception as err:  # pylint: disable=broad-except
-            msg = u'cannot create LoncapaProblem {loc}: {err}'.format(
-                loc=text_type(self.location), err=err)
-            # TODO (vshnayder): do modules need error handlers too?
-            # We shouldn't be switching on DEBUG.
-            if settings.DEBUG:
-                log.warning(msg)
-                # TODO (vshnayder): This logic should be general, not here--and may
-                # want to preserve the data instead of replacing it.
-                # e.g. in the CMS
-                msg = u'<p>{msg}</p>'.format(msg=cgi.escape(msg))
-                msg += u'<p><pre>{tb}</pre></p>'.format(
-                    # just the traceback, no message - it is already present above
-                    tb=cgi.escape(
-                        u''.join(
-                            ['Traceback (most recent call last):\n'] +
-                            traceback.format_tb(sys.exc_info()[2])
+            try:
+                # TODO (vshnayder): move as much as possible of this work and error
+                # checking to descriptor load time
+                self._lcp = self.new_lcp(self.get_state_for_lcp())
+
+                # At this point, we need to persist the randomization seed
+                # so that when the problem is re-loaded (to check/view/save)
+                # it stays the same.
+                # However, we do not want to write to the database
+                # every time the module is loaded.
+                # So we set the seed ONLY when there is not one set already
+                if self.seed is None:
+                    self.seed = self._lcp.seed
+
+            except Exception as err:  # pylint: disable=broad-except
+                msg = u'cannot create LoncapaProblem {loc}: {err}'.format(
+                    loc=text_type(self.location), err=err)
+                # TODO (vshnayder): do modules need error handlers too?
+                # We shouldn't be switching on DEBUG.
+                if settings.DEBUG:
+                    log.warning(msg)
+                    # TODO (vshnayder): This logic should be general, not here--and may
+                    # want to preserve the data instead of replacing it.
+                    # e.g. in the CMS
+                    msg = u'<p>{msg}</p>'.format(msg=cgi.escape(msg))
+                    msg += u'<p><pre>{tb}</pre></p>'.format(
+                        # just the traceback, no message - it is already present above
+                        tb=cgi.escape(
+                            u''.join(
+                                ['Traceback (most recent call last):\n'] +
+                                traceback.format_tb(sys.exc_info()[2])
+                            )
                         )
                     )
-                )
-                # create a dummy problem with error message instead of failing
-                problem_text = (
-                    u'<problem><text><span class="inline-error">'
-                    u'Problem {url} has an error:</span>{msg}</text></problem>'.format(
-                        url=text_type(self.location),
-                        msg=msg,
+                    # create a dummy problem with error message instead of failing
+                    problem_text = (
+                        u'<problem><text><span class="inline-error">'
+                        u'Problem {url} has an error:</span>{msg}</text></problem>'.format(
+                            url=text_type(self.location),
+                            msg=msg,
+                        )
                     )
-                )
-                self.lcp = self.new_lcp(self.get_state_for_lcp(), text=problem_text)
-            else:
-                # add extra info and raise
-                raise Exception(msg), None, sys.exc_info()[2]
+                    self._lcp = self.new_lcp(self.get_state_for_lcp(), text=problem_text)
+                else:
+                    # add extra info and raise
+                    raise Exception(msg), None, sys.exc_info()[2]
 
-            self.set_state_from_lcp()
+                self.set_state_from_lcp()
 
-        if self.score is None:
-            self.set_score(self.score_from_lcp())
+            if self.score is None:
+                self.set_score(self.score_from_lcp())
 
-        assert self.seed is not None
+            assert self.seed is not None
+
+        return self._lcp
 
     def choose_new_seed(self):
         """
