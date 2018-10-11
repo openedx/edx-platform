@@ -692,10 +692,12 @@ class CourseMode(models.Model):
         be GeneratedCertificate records with mode='audit' which are
         eligible.
         """
-        if mode_slug == cls.AUDIT or mode_slug == cls.HONOR:
-            return False
 
-        return True
+        if settings.FEATURES.get('ENABLE_HONOR_CERTIFICATE'):
+            non_eligible_modes = [cls.AUDIT]
+        else:
+            non_eligible_modes = [cls.AUDIT, cls.HONOR]
+        return mode_slug not in non_eligible_modes
 
     def to_tuple(self):
         """
