@@ -12,6 +12,7 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
+from .helpers import CohortFactory
 from .. import cohorts
 
 USERNAME = 'honor'
@@ -192,6 +193,36 @@ class TestCohortApi(SharedModuleStoreTestCase):
         else:
             response = self.client.get(path=path)
         assert response.status_code == status
+
+    @ddt.data(
+        {'is_staff': False, 'status': 403},
+        {'is_staff': True, 'status': 200},
+    )
+    @ddt.unpack
+    def test_list_users_in_cohort(self, is_staff, status):
+        """
+        Test GET method for listing users in a cohort.
+        """
+        users = [UserFactory() for _ in range(5)]
+        cohort = CohortFactory(course_id=self.course_key, users=users)
+        path = reverse(
+            'api_cohorts:cohort_users',
+            kwargs={'course_key_string': self.course_str, 'cohort_id': cohort.id}
+        )
+        self.user = self.staff_user if is_staff else self.user
+        assert self.client.login(username=self.user.username, password=self.password)
+        response = self.client.get(
+            path=path
+        )
+        assert response.status_code == status
+        if status == 200:
+            results = json.loads(response.content)['results']
+            expected_results = [{
+                'username': user.username,
+                'email': user.email,
+                'name': '{} {}'.format(user.first_name, user.last_name)
+            } for user in users]
+            assert results == expected_results
 
     @ddt.data({'is_staff': False, 'payload': ADD_USER_PAYLOAD, 'status': 403},
               {'is_staff': True, 'payload': ADD_USER_PAYLOAD, 'status': 200}, )

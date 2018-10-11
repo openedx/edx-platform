@@ -20,8 +20,8 @@ from edx_rest_framework_extensions.authentication import JwtAuthentication
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from rest_framework import status, permissions
+from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from six import text_type
 
 from courseware.courses import get_course_with_access
@@ -38,6 +38,7 @@ from openedx.core.lib.api.paginators import NamespacedPageNumberPagination
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from . import api, cohorts
 from .models import CourseUserGroup, CourseUserGroupPartitionGroup
+from .serializers import CohortUsersAPISerializer
 
 MAX_PAGE_SIZE = 100
 
@@ -416,10 +417,16 @@ def _get_cohort_response(cohort, course):
 
 
 def _get_cohort_settings_response(course_key):
+    """
+    Get and return the serialized representation of the cohort settings for the given course.
+    """
     return Response(_cohort_settings(course_key))
 
 
-class APIPermissions(APIView):
+class APIPermissions(GenericAPIView):
+    """
+    Allow JWT, OAuth2 and session authentication and set up the permissions for the sub-class API views.
+    """
     authentication_classes = (
         JwtAuthentication,
         OAuth2AuthenticationAllowInactiveUser,
@@ -568,16 +575,58 @@ class CohortUsers(DeveloperErrorViewMixin, APIPermissions):
     """
     **Use Cases**
 
+        List users in a cohort
         Removes an user from a cohort.
         Add a user to a specific cohort.
 
-    **Example Requests**:
+    **Example Requests**
 
+        GET /api/cohorts/v1/courses/{course_id}/cohorts/{cohort_id}/users
         DELETE /api/cohorts/v1/courses/{course_id}/cohorts/{cohort_id}/users/{username}
         POST /api/cohorts/v1/courses/{course_id}/cohorts/{cohort_id}/users/{username}
         POST /api/cohorts/v1/courses/{course_id}/cohorts/{cohort_id}/users
 
-    **Response Values**
+    **GET list of users in a cohort request parameters**
+        * course_id (required): The course id of the course the cohort belongs to.
+        * cohort_id (required): The cohort id of the cohort to list the users in.
+        * page_size: A query string parameter with the number of results to return per page.
+          Optional. Default: 10. Maximum: 100.
+        * page: A query string parameter with the page number to retrieve. Optional. Default: 1.
+
+    ** POST add a user to a cohort request parameters**
+        * course_id (required): The course id of the course the cohort belongs to.
+        * cohort_id (required): The cohort id of the cohort to list the users in.
+        * users (required): A body JSON parameter with a list of usernames/email addresses of users
+          to be added to the cohort.
+
+    ** DELETE remove a user from a cohort request parameters**
+        * course_id (required): The course id of the course the cohort belongs to.
+        * cohort_id (required): The cohort id of the cohort to list the users in.
+        * username (required): The username of the user to be removed from the given cohort.
+
+    **GET Response Values**
+        Returns a HTTP 404 Not Found response status code when:
+            * The course corresponding to the corresponding course id could not be found.
+            * The requesting user does not have staff access to the course.
+            * The cohort corresponding to the given cohort id could not be found.
+        Returns a HTTP 200 OK response status code to indicate success.
+        * count: Number of users enrolled in the given cohort.
+        * num_pages: Total number of pages of results.
+        * current_page: Current page number.
+        * start: The list index of the first item in the response.
+        * previous: The URL of the previous page of results or null if it is the first page.
+        * next: The URL of the next page of results or null if it is the last page.
+        * results: A list of users in the cohort.
+            * username: Username of the user.
+            * email: Email address of the user.
+            * name: Full name of the user.
+
+    **POST Response Values**
+        Returns a HTTP 404 Not Found response status code when:
+            * The course corresponding to the corresponding course id could not be found.
+            * The requesting user does not have staff access to the course.
+            * The cohort corresponding to the given cohort id could not be found.
+        Returns a HTTP 200 OK response status code to indicate success.
         * success: Boolean indicating if the operation was successful.
         * added: Usernames/emails of the users that have been added to the cohort.
         * changed: Usernames/emails of the users that have been moved to the cohort.
@@ -593,10 +642,44 @@ class CohortUsers(DeveloperErrorViewMixin, APIPermissions):
     {
         "users": [username1, username2, username3...]
     }
+
+    **DELETE Response Values**
+
+        Returns a HTTP 404 Not Found response status code when:
+            * The course corresponding to the corresponding course id could not be found.
+            * The requesting user does not have staff access to the course.
+            * The cohort corresponding to the given cohort id could not be found.
+            * The user corresponding to the given username could not be found.
+        Returns a HTTP 204 No Content response status code to indicate success.
     """
+    serializer_class = CohortUsersAPISerializer
+
     @method_decorator(transaction.non_atomic_requests)
     def dispatch(self, *args, **kwargs):
         return super(CohortUsers, self).dispatch(*args, **kwargs)
+
+    def get(self, request, course_key_string, cohort_id, username=None):  # pylint: disable=unused-argument
+        """
+        Lists the users in a specific cohort.
+        """
+        course_key, _ = _get_course_with_access(request, course_key_string)
+
+        try:
+            cohort = cohorts.get_cohort_by_id(course_key, cohort_id)
+        except CourseUserGroup.DoesNotExist:
+            msg = 'Cohort (ID {cohort_id}) not found for {course_key_string}'.format(
+                cohort_id=cohort_id,
+                course_key_string=course_key_string
+            )
+            raise self.api_error(status.HTTP_404_NOT_FOUND, msg, 'cohort-not-found')
+        queryset = cohort.users.all()
+        page = self.paginate_queryset(queryset)
+
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        return Response(self.get_serializer(queryset, many=True).data)
 
     # pylint: disable=unused-argument
     def delete(self, request, course_key_string, cohort_id, username=None):
