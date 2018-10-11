@@ -3171,7 +3171,7 @@ JWT_AUTH = {
 
     # Number of seconds before JWTs expire
     'JWT_EXPIRATION': 30,
-    'JWT_COOKIE_EXPIRATION': 60 * 60,
+    'JWT_IN_COOKIE_EXPIRATION': 60 * 60,
 
     'JWT_LOGIN_CLIENT_ID': 'login-service-client-id',
     'JWT_LOGIN_SERVICE_USERNAME': 'login_service_user',

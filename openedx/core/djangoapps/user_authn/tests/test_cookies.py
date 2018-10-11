@@ -60,7 +60,7 @@ class CookieTests(TestCase):
         Verifies that a JWT can be properly recreated from the 2 separate
         JWT-related cookies using the JwtAuthCookieMiddleware middleware.
         """
-        self.request.COOKIES = response.cookies
+        self._copy_cookies_to_request(response, self.request)
         JwtAuthCookieMiddleware().process_request(self.request)
         self.assertEqual(
             cookies_api.jwt_cookies.jwt_cookie_name() in self.request.COOKIES,
@@ -68,7 +68,12 @@ class CookieTests(TestCase):
         )
 
     def _assert_cookies_present(self, response, expected_cookies):
+        """ Verify all expected_cookies are present in the response. """
         self.assertSetEqual(set(response.cookies.keys()), set(expected_cookies))
+
+    def _assert_consistent_expires(self, response):
+        """ Verify all cookies in the response have the same expiration. """
+        self.assertEqual(1, len(set([response.cookies[c]['expires'] for c in response.cookies])))
 
     def test_get_user_info_cookie_data(self):
         actual = cookies_api._get_user_info_cookie_data(self.request, self.user)  # pylint: disable=protected-access
@@ -90,6 +95,7 @@ class CookieTests(TestCase):
     def test_set_logged_in_deprecated_cookies(self):
         response = cookies_api.set_logged_in_cookies(self.request, HttpResponse(), self.user)
         self._assert_cookies_present(response, cookies_api.DEPRECATED_LOGGED_IN_COOKIE_NAMES)
+        self._assert_consistent_expires(response)
         self._assert_recreate_jwt_from_cookies(response, can_recreate=False)
 
     def test_set_logged_in_jwt_cookies(self):
@@ -97,6 +103,7 @@ class CookieTests(TestCase):
         with cookies_api.JWT_COOKIES_FLAG.override(True):
             response = cookies_api.set_logged_in_cookies(self.request, HttpResponse(), self.user)
             self._assert_cookies_present(response, cookies_api.ALL_LOGGED_IN_COOKIE_NAMES)
+            self._assert_consistent_expires(response)
             self._assert_recreate_jwt_from_cookies(response, can_recreate=True)
 
     def test_delete_and_is_logged_in_cookie_set(self):
