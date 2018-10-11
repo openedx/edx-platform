@@ -90,7 +90,8 @@ def standard_cookie_settings(request):
         expires = None
     else:
         max_age = request.session.get_expiry_age()
-        expires = _cookie_expiration_based_on_max_age(max_age)
+        _expires_time = time.time() + max_age
+        expires = cookie_date(_expires_time)
 
     cookie_settings = {
         'max_age': max_age,
@@ -246,10 +247,13 @@ def _create_and_set_jwt_cookies(response, request, user=None, refresh_token=None
     if not JWT_COOKIES_FLAG.is_enabled():
         return
 
-    # TODO (ARCH-246) Need to fix configuration of token expiration settings.
+    # JWT cookies expire at the same time as other login-related cookies
+    # so that cookie-based login determination remains consistent.
     cookie_settings = standard_cookie_settings(request)
-    _set_jwt_expiration(cookie_settings)
-    expires_in = cookie_settings['max_age']
+
+    # For security reasons, the JWT that is embedded inside the cookie expires
+    # much sooner than the cookie itself, per the following setting.
+    expires_in = settings.JWT_AUTH['JWT_IN_COOKIE_EXPIRATION']
 
     oauth_application = _get_login_oauth_client()
     if refresh_token:
@@ -304,21 +308,6 @@ def _set_jwt_cookies(response, cookie_settings, jwt_header_and_payload, jwt_sign
         refresh_token,
         **cookie_settings
     )
-
-
-def _set_jwt_expiration(cookie_settings):
-    """
-    Updates cookie_settings with the configured expiration values for JWT
-    Cookies.
-    """
-    max_age = settings.JWT_AUTH['JWT_COOKIE_EXPIRATION']
-    cookie_settings['max_age'] = max_age
-    cookie_settings['expires'] = _cookie_expiration_based_on_max_age(max_age)
-
-
-def _cookie_expiration_based_on_max_age(max_age):
-    expires_time = time.time() + max_age
-    return cookie_date(expires_time)
 
 
 def _get_login_oauth_client():
