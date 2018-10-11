@@ -28,7 +28,7 @@ setup(
     ],
     entry_points={
         'xblock.v1': [
-            'capa_module = xblock_capa_problems:CapaProblemsXBlock'
+            'problem = xblock_capa_problems:CapaProblemsXBlock',
         ]
     },
     packages=find_packages(exclude=['tests.*']),
