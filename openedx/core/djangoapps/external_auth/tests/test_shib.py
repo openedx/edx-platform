@@ -224,15 +224,19 @@ class ShibSPTest(CacheIsolationTestCase):
         Tests that FEATURES['BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'] means extauth automatically
         linked users, activates them, and logs them in
         """
-        inactive_user = UserFactory.create(email='inactive@stanford.edu')
+        if log_user_string == "mike@stanford.edu":
+            expected_email = "mike@stanford.edu"
+        else:
+            expected_email = "inactive@stanford.edu"
+        inactive_user = UserFactory.create(email=expected_email)
         inactive_user.is_active = False
         inactive_user.save()
         request = self.request_factory.get('/shib-login')
         request.session = import_module(settings.SESSION_ENGINE).SessionStore()  # empty session
         request.META.update({
             'Shib-Identity-Provider': 'https://idp.stanford.edu/',
-            'REMOTE_USER': 'inactive@stanford.edu',
-            'mail': 'inactive@stanford.edu'
+            'REMOTE_USER': expected_email,
+            'mail': expected_email'
         })
 
         request.user = AnonymousUser()
@@ -261,7 +265,7 @@ class ShibSPTest(CacheIsolationTestCase):
         """
         Wrapper to run base_test_extauth_auto_activate_user_with_flag with {'SQUELCH_PII_IN_LOGS': False}
         """
-        self._test_auto_activate_user_with_flag(log_user_string="inactive_mike@stanford.edu")
+        self._test_auto_activate_user_with_flag(log_user_string="mike@stanford.edu")
 
     @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     @patch.dict(settings.FEATURES, {'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': True, 'SQUELCH_PII_IN_LOGS': True})
