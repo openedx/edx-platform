@@ -263,6 +263,7 @@ class TestGatingApi(ModuleStoreTestCase, MilestonesTestCaseMixin):
                 html_block.location: user_html_completion,
             }
             completion_percentage = gating_api.get_subsection_completion_percentage(self.seq1.location, student)
+            assert course_block_completions_mock.called
             self.assertEqual(completion_percentage, expected_completion_percentage)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
