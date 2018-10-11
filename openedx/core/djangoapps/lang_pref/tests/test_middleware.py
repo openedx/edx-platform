@@ -202,6 +202,9 @@ class TestUserPreferenceMiddleware(TestCase):
                 }
             )
 
+        if response.status_code != 200:
+            assert response.__dict__ == "dummy_val"
+
         self.assertEqual(response.status_code, 200)
 
         if lang_cookie:
