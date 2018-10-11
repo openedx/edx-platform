@@ -26,6 +26,13 @@ class DjangoXBlockUserService(UserService):
         if self._django_user:
             self._django_user.user_is_staff = kwargs.get('user_is_staff', False)
 
+    @property
+    def django_user(self):
+        """
+        Return the django user object.
+        """
+        return self._django_user
+
     def get_current_user(self):
         """
         Returns the currently-logged in user, as an instance of XBlockUser
