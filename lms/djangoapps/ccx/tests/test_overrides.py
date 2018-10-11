@@ -11,7 +11,7 @@ from django.test.utils import override_settings
 from edx_django_utils.cache import RequestCache
 
 from courseware.courses import get_course_by_id
-from courseware.field_overrides import OverrideFieldData
+from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from courseware.testutils import FieldOverrideTestMixin
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import override_field_for_ccx
