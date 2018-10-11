@@ -181,13 +181,6 @@ class CapaProblemsXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixi
         return self.student_view(context)
 
     @staticmethod
-    def vendor_js_dependencies():
-        """
-        Returns list of vendor JS files that this XBlock depends on.
-        """
-        return get_js_dependencies('capa_vendor')
-
-    @staticmethod
     def js_dependencies():
         """
         Returns list of JS files that this XBlock depends on.
@@ -205,9 +198,6 @@ class CapaProblemsXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixi
         """
         Adds URLs for JS and CSS resources that this XBlock depends on to `fragment`.
         """
-        for vendor_js_file in self.vendor_js_dependencies():
-            fragment.add_resource_url(staticfiles_storage.url(vendor_js_file), "application/javascript", "head")
-
         for css_file in self.css_dependencies():
             fragment.add_css_url(staticfiles_storage.url(css_file))
 

@@ -1433,10 +1433,6 @@ capa_js = (
     rooted_glob(COMMON_ROOT / 'static', 'common/js/capa/schematic.js')
 )
 
-# TODO any vendor files?
-capa_vendor_js = [
-]
-
 notes_js = ['js/notes.js']
 instructor_dash_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/instructor_dashboard/**/*.js'))
 
@@ -1729,10 +1725,6 @@ PIPELINE_JS = {
     'capa': {
         'source_filenames': capa_js,
         'output_filename': 'js/capa.js',
-    },
-    'capa_vendor': {
-        'source_filenames': capa_vendor_js,
-        'output_filename': 'js/capa_vendor.js',
     },
     'notes': {
         'source_filenames': notes_js,
