@@ -208,12 +208,12 @@ class CapaProblemsXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixi
     @property
     def ajax_url(self):
         """
-        The url to be used by to call into handle_ajax
+        Returns the URL for the ajax handler.
         """
-        return self.runtime.handler_url(self, 'xmodule_handler')
+        return self.runtime.handler_url(self, 'ajax_handler')
 
     @XBlock.handler
-    def xmodule_handler(self, request, suffix=None):
+    def ajax_handler(self, request, suffix=None):
         """
         XBlock handler that wraps `handle_ajax`
         """
