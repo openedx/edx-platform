@@ -10,7 +10,7 @@ from django.utils.http import urlencode
 from django.views.generic import TemplateView
 from provider.oauth2.models import Client
 from openedx.core.djangoapps.user_authn.cookies import delete_logged_in_cookies
-from student.helpers import is_safe_redirect
+from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
 
 
 class LogoutView(TemplateView):
@@ -35,7 +35,7 @@ class LogoutView(TemplateView):
         """
         target_url = self.request.GET.get('redirect_url')
 
-        if target_url and is_safe_redirect(self.request, target_url):
+        if target_url and is_safe_login_or_logout_redirect(self.request, target_url):
             return target_url
         else:
             return self.default_target

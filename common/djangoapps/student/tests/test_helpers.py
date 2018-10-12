@@ -12,7 +12,7 @@ from django.test.utils import override_settings
 from mock import patch
 from testfixtures import LogCapture
 
-from student.helpers import get_next_url_for_login_page, is_safe_redirect
+from student.helpers import get_next_url_for_login_page
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 
 LOGGER_NAME = "student.helpers"
@@ -77,22 +77,6 @@ class TestLoginHelper(TestCase):
         req.META["HTTP_ACCEPT"] = "text/html"  # pylint: disable=no-member
         next_page = get_next_url_for_login_page(req)
         self.assertEqual(next_page, next_url)
-
-    @ddt.data(
-        ('/dashboard', 'testserver', True),
-        ('https://edx.org/courses', 'edx.org', True),
-        ('https://test.edx.org/courses', 'edx.org', True),
-        ('https://www.amazon.org', 'edx.org', False),
-        ('http://edx.org/courses', 'edx.org', False),
-        ('http:///edx.org/courses', 'edx.org', False),  # Django's is_safe_url protects against "///"
-    )
-    @ddt.unpack
-    @override_settings(LOGIN_REDIRECT_WHITELIST=['test.edx.org'])
-    def test_safe_redirect(self, url, host, expected_is_safe):
-        """ Test safe next parameter """
-        req = self.request.get(reverse("login"), HTTP_HOST=host)
-        actual_is_safe = is_safe_redirect(req, url)
-        self.assertEqual(actual_is_safe, expected_is_safe)
 
     @patch('student.helpers.third_party_auth.pipeline.get')
     @ddt.data(
