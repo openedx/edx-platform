@@ -13,6 +13,7 @@ from openedx.core.djangoapps.site_configuration.tests.test_util import with_site
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 
 EN = language_api.Language('en', 'English')
+AR = language_api.Language('ar', 'Arabic')
 ES_419 = language_api.Language('es-419', u'Español (Latinoamérica)')
 
 
@@ -83,6 +84,56 @@ class LanguageApiTest(CacheIsolationTestCase):
             ).save()
             released_languages = language_api.released_languages()
             self.assertEqual(released_languages, expected_languages)
+
+    @ddt.data(*[
+        (True, 'en', [], [], [], []),
+        (True, 'en', [EN], [], [], [EN]),
+        (True, 'en', [EN, ES_419], [], [], [EN]),
+        (True, 'en', [EN, ES_419], ['es-419'], ['ar'], [EN, ES_419, AR]),
+        (False, 'en', [EN, ES_419], ['es-419'], ['ar'], [EN, ES_419]),
+        (True, 'es-419', [EN, ES_419], ['es-419'], ['ar'], [ES_419, AR]),
+        (True, 'en', [EN, ES_419], ['es'], [], [EN]),
+    ])
+    @ddt.unpack
+    def test_released_beta_languages(
+            self, enable_beta_languages, default_lang, languages, dark_lang_released, beta_languages, expected_languages
+    ):
+        """
+        Tests for the released languages.
+        """
+        with override_settings(LANGUAGES=languages, LANGUAGE_CODE=default_lang):
+            user = User()
+            user.save()
+            DarkLangConfig(
+                released_languages=', '.join(dark_lang_released),
+                beta_languages=', '.join(beta_languages),
+                changed_by=user,
+                enabled=True,
+                enable_beta_languages=enable_beta_languages
+            ).save()
+            released_languages = language_api.released_languages()
+            self.assertEqual(released_languages, expected_languages)
+
+    @ddt.data(*[
+        (True, [], []),
+        (True, ['es-419'], [ES_419]),
+        (False, ['es-419'], [])
+    ])
+    def test_beta_languages(self, enable_beta_languages, beta_languages, expected_languages):
+        """
+        Test for beta languages 
+        """
+        user = User()
+        user.save()
+        DarkLangConfig(
+            released_languages='en',
+            enable_beta_languages=enable_beta_languages,
+            beta_languages=', '.join(beta_languages),
+            changed_by=user,
+            enabled=True
+        ).save()
+        beta_languages = language_api.beta_languages()
+        self.assertEqual(beta_languages, expected_languages)
 
     @override_settings(ALL_LANGUAGES=[[u"cs", u"Czech"], [u"nl", u"Dutch"]])
     def test_all_languages(self):
