@@ -9,7 +9,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.generics import GenericAPIView
-from rest_framework.pagination import PageNumberPagination
+from rest_framework.pagination import CursorPagination
 from rest_framework.response import Response
 from six import text_type
 
@@ -91,6 +91,14 @@ def verify_writable_gradebook_enabled(view_func):
             )
         return view_func(self, request, **kwargs)
     return wrapped_function
+
+
+class CourseEnrollmentPagination(CursorPagination):
+    """
+    Paginates over CourseEnrollment objects.
+    """
+    page_size = 25
+    ordering = 'id'
 
 
 class GradeViewMixin(DeveloperErrorViewMixin):
@@ -316,6 +324,8 @@ class CourseGradesView(GradeViewMixin, GenericAPIView):
 
     permission_classes = (permissions.JWT_RESTRICTED_APPLICATION_OR_USER_ACCESS,)
 
+    pagination_class = CourseEnrollmentPagination
+
     required_scopes = ['grades:read']
 
     @verify_course_exists
@@ -340,11 +350,6 @@ class CourseGradesView(GradeViewMixin, GenericAPIView):
         else:
             # If no username passed, get paginated list of grades for all users in course
             return self._get_user_grades(course_key)
-
-
-class GradebookPagination(PageNumberPagination):
-    page_size = 25
-    page_size_query_param = 'page_size'
 
 
 class GradebookView(GradeViewMixin, GenericAPIView):
@@ -452,9 +457,9 @@ class GradebookView(GradeViewMixin, GenericAPIView):
 
     permission_classes = (permissions.JWT_RESTRICTED_APPLICATION_OR_USER_ACCESS,)
 
-    required_scopes = ['grades:read']
+    pagination_class = CourseEnrollmentPagination
 
-    pagination_class = GradebookPagination
+    required_scopes = ['grades:read']
 
     def _section_breakdown(self, course_grade):
         """

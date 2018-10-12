@@ -647,7 +647,6 @@ class GradebookViewTest(GradeViewTestMixin, APITestCase):
                 self.get_url(course_key=self.empty_course.id)
             )
             expected_data = {
-                'count': 0,
                 'next': None,
                 'previous': None,
                 'results': [],
@@ -722,7 +721,6 @@ class GradebookViewTest(GradeViewTestMixin, APITestCase):
 
                 self.assertEqual(status.HTTP_200_OK, resp.status_code)
                 actual_data = dict(resp.data)
-                self.assertEqual(2, actual_data['count'])
                 self.assertIsNone(actual_data['next'])
                 self.assertIsNone(actual_data['previous'])
                 self.assertEqual(expected_results, actual_data['results'])
