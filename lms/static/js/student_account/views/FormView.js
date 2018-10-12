@@ -184,8 +184,10 @@
              * our calls to renderFormFeedback are for rendering error messages.
              */
                 renderErrors: function(title, errorMessages) {
-                    this.clearFormErrors();
+                    // Remove loader icon from button
+                    $('.ladda-button').removeClass('has-spinner');
 
+                    this.clearFormErrors();
                     this.renderFormFeedback(this.formErrorsTpl, {
                         jsHook: this.formErrorsJsHook,
                         title: title,
@@ -215,7 +217,6 @@
 
                 submitForm: function(event) {
                     var data = this.getFormData();
-                    var $targetBtn = $(event.target);
 
                     if (!_.isUndefined(event)) {
                         event.preventDefault();
@@ -229,9 +230,6 @@
                         this.model.save();
                         this.clearFormErrors();
                     } else {
-                        // remove loader icon from button
-                        $targetBtn.removeClass('has-spinner');
-
                         this.renderErrors(this.defaultFormErrorsTitle, this.errors);
                         this.toggleDisableButton(false);
                     }
