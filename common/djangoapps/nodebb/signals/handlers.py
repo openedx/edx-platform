@@ -85,15 +85,18 @@ def sync_organization_info_with_nodebb(sender, instance, created, **kwargs):  # 
     # To prevent unnecessary API calls in case Django only updates
     # updated_at etc.
     request = get_current_request()
-    if request:
-        if 'login' in request.path or 'logout' in request.path:
-            return
+
+    if request is None:
+        return
+
+    if 'login' in request.path or 'logout' in request.path:
+        return
 
     data_to_sync = {
         "focus_area": FocusArea.objects.get(code=instance.focus_area).label if instance.focus_area else ""
     }
 
-    user = instance.admin
+    user = request.user
 
     task_update_user_profile_on_nodebb.delay(
         username=user.username, profile_data=data_to_sync)
