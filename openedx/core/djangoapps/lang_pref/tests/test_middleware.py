@@ -202,11 +202,9 @@ class TestUserPreferenceMiddleware(TestCase):
                 }
             )
 
-        import django
-        assert django.conf.settings.FEATURES['ENABLE_MAX_FAILED_LOGIN_ATTEMPTS'] == False
-
         if response.status_code != 200:
-            assert response.__dict__ == "dummy_val"
+            import django
+            assert django.conf.settings.FEATURES == "dummy"
 
         self.assertEqual(response.status_code, 200)
 
