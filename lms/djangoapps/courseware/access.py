@@ -463,8 +463,8 @@ def _has_group_access(descriptor, user, course_key):
         try:
             partition = descriptor._get_user_partition(partition_id)  # pylint: disable=protected-access
 
-                # check for False in merged_access, which indicates that at least one
-                # partition's group list excludes all students.
+            # check for False in merged_access, which indicates that at least one
+            # partition's group list excludes all students.
             if group_ids is False:
                 log.warning("Group access check excludes all students, access will be denied.", exc_info=True)
                 return NoAllowedPartitionGroupsError(partition)

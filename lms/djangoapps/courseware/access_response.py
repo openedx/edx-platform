@@ -175,8 +175,7 @@ class NoAllowedPartitionGroupsError(AccessError):
     """
     Access denied because the content is not allowed to any group in a partition.
     """
-    def __init__(self, partition):
+    def __init__(self, partition, user_group=None, allowed_groups=None, user_message=None, user_fragment=None):
         error_code = "no_allowed_user_groups"
         developer_message = "Group access for {} excludes all students".format(partition.name)
-        super(NoAllowedPartitionGroupsError, self).__init__(error_code, developer_message)
-
+        super(NoAllowedPartitionGroupsError, self).__init__(error_code, developer_message, user_message)
