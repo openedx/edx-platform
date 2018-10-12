@@ -21,6 +21,7 @@ from bulk_email.models import BulkEmailFlag
 from course_modes.models import CourseMode
 from entitlements.tests.factories import CourseEntitlementFactory
 from milestones.tests.utils import MilestonesTestCaseMixin
+from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
@@ -289,10 +290,11 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         program = ProgramFactory()
         CourseEntitlementFactory.create(user=self.user, course_uuid=program['courses'][0]['uuid'])
         mock_get_programs.return_value = [program]
-        mock_course_overview.return_value = CourseOverviewFactory.create(start=self.TOMORROW)
+        course_key = CourseKey.from_string('course-v1:FAKE+FA1-MA1.X+3T2017')
+        mock_course_overview.return_value = CourseOverviewFactory.create(start=self.TOMORROW, id=course_key)
         mock_course_runs.return_value = [
             {
-                'key': 'course-v1:FAKE+FA1-MA1.X+3T2017',
+                'key': unicode(course_key),
                 'enrollment_end': str(self.TOMORROW),
                 'pacing_type': 'instructor_paced',
                 'type': 'verified',
@@ -300,7 +302,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             }
         ]
         mock_pseudo_session.return_value = {
-            'key': 'course-v1:FAKE+FA1-MA1.X+3T2017',
+            'key': unicode(course_key),
             'type': 'verified'
         }
         response = self.client.get(self.path)
@@ -361,8 +363,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
 
     @patch('entitlements.api.v1.views.get_course_runs_for_course')
     @patch.object(CourseOverview, 'get_from_id')
-    @patch('opaque_keys.edx.keys.CourseKey.from_string')
-    def test_sessions_for_entitlement_course_runs(self, mock_course_key, mock_course_overview, mock_course_runs):
+    def test_sessions_for_entitlement_course_runs(self, mock_course_overview, mock_course_runs):
         """
         When a learner has a fulfilled entitlement for a course run in the past, there should be no availableSession
         data passed to the JS view. When a learner has a fulfilled entitlement for a course run enrollment ending in the
@@ -378,7 +379,6 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             start=self.TOMORROW, end=self.THREE_YEARS_FROM_NOW, self_paced=True, enrollment_end=self.THREE_YEARS_AGO
         )
         mock_course_overview.return_value = mocked_course_overview
-        mock_course_key.return_value = mocked_course_overview.id
         course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=unicode(mocked_course_overview.id))
         mock_course_runs.return_value = [
             {
@@ -398,7 +398,6 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         mocked_course_overview.save()
 
         mock_course_overview.return_value = mocked_course_overview
-        mock_course_key.return_value = mocked_course_overview.id
         mock_course_runs.return_value = [
             {
                 'key': str(mocked_course_overview.id),
@@ -416,7 +415,6 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         mocked_course_overview.save()
 
         mock_course_overview.return_value = mocked_course_overview
-        mock_course_key.return_value = mocked_course_overview.id
         mock_course_runs.return_value = [
             {
                 'key': str(mocked_course_overview.id),
@@ -432,8 +430,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
     @patch('openedx.core.djangoapps.programs.utils.get_programs')
     @patch('student.views.dashboard.get_visible_sessions_for_entitlement')
     @patch.object(CourseOverview, 'get_from_id')
-    @patch('opaque_keys.edx.keys.CourseKey.from_string')
-    def test_fulfilled_entitlement(self, mock_course_key, mock_course_overview, mock_course_runs, mock_get_programs):
+    def test_fulfilled_entitlement(self, mock_course_overview, mock_course_runs, mock_get_programs):
         """
         When a learner has a fulfilled entitlement, their course dashboard should have:
             - exactly one course item, meaning it:
@@ -446,7 +443,6 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             start=self.TOMORROW, self_paced=True, enrollment_end=self.TOMORROW
         )
         mock_course_overview.return_value = mocked_course_overview
-        mock_course_key.return_value = mocked_course_overview.id
         course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=unicode(mocked_course_overview.id))
         mock_course_runs.return_value = [
             {
@@ -470,8 +466,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
     @patch('openedx.core.djangoapps.programs.utils.get_programs')
     @patch('student.views.dashboard.get_visible_sessions_for_entitlement')
     @patch.object(CourseOverview, 'get_from_id')
-    @patch('opaque_keys.edx.keys.CourseKey.from_string')
-    def test_fulfilled_expired_entitlement(self, mock_course_key, mock_course_overview, mock_course_runs, mock_get_programs):
+    def test_fulfilled_expired_entitlement(self, mock_course_overview, mock_course_runs, mock_get_programs):
         """
         When a learner has a fulfilled entitlement that is expired, their course dashboard should have:
             - exactly one course item, meaning it:
@@ -483,7 +478,6 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
             start=self.TOMORROW, self_paced=True, enrollment_end=self.TOMORROW
         )
         mock_course_overview.return_value = mocked_course_overview
-        mock_course_key.return_value = mocked_course_overview.id
         course_enrollment = CourseEnrollmentFactory(user=self.user, course_id=unicode(mocked_course_overview.id), created=self.THREE_YEARS_AGO)
         mock_course_runs.return_value = [
             {

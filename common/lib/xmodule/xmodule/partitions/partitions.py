@@ -239,3 +239,33 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
                 group_id=group_id, partition_id=self.id
             )
         )
+
+    def access_denied_message(self, block, user, user_group, allowed_groups):
+        """
+        Return a message that should be displayed to the user when they are not allowed to access
+        content managed by this partition, or None if there is no applicable message.
+
+        Arguments:
+            block (:class:`.XBlock`): The content being managed
+            user (:class:`.User`): The user who was denied access
+            user_group (:class:`.Group`): The current Group the user is in
+            allowed_groups (list of :class:`.Group`): The groups who are allowed to see the content
+
+        Returns: str
+        """
+        return None
+
+    def access_denied_fragment(self, block, user, course_key, user_group, allowed_groups):
+        """
+        Return an html fragment that should be displayed to the user when they are not allowed to access
+        content managed by this partition, or None if there is no applicable message.
+
+        Arguments:
+            block (:class:`.XBlock`): The content being managed
+            user (:class:`.User`): The user who was denied access
+            user_group (:class:`.Group`): The current Group the user is in
+            allowed_groups (list of :class:`.Group`): The groups who are allowed to see the content
+
+        Returns: :class:`.Fragment`
+        """
+        return None
