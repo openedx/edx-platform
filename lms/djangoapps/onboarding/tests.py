@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 
 from student.models import UserProfile, Registration
-from lms.djangoapps.onboarding.models import UserExtendedProfile, EmailPreference
+from lms.djangoapps.onboarding.models import UserExtendedProfile, EmailPreference, Organization
 from common.lib.nodebb_client.client import NodeBBClient
 
 
@@ -23,6 +23,8 @@ class UserDeletionTestCase(TestCase):
             email=self.email,
         )
         user.set_password("Arbisoft2")
+        user.save()
+        user.first_name = "Test2"
         user.save()
 
         user_data = {
@@ -48,6 +50,8 @@ class UserDeletionTestCase(TestCase):
             level_of_education='b',
         )
         user_profile.save()
+        user_profile.name = "Test User 2"
+        user_profile.save()
 
         extended_profile = UserExtendedProfile(
             user=user,
@@ -55,6 +59,17 @@ class UserDeletionTestCase(TestCase):
             english_proficiency="Master",
         )
         extended_profile.save()
+        extended_profile.english_proficiency = 'Novice',
+        extended_profile.save()
+
+        organization = Organization(
+            admin=user,
+            alternate_admin_email=self.email,
+        )
+        organization.save()
+        organization.unclaimed_org_admin_email = self.email
+        organization.alternate_admin_email = None
+        organization.save()
 
     def test_user_data_is_deleted(self):
         """
@@ -71,7 +86,7 @@ class UserDeletionTestCase(TestCase):
         response = requests.post(data_endpoint,
                                  data={'_uid': 1, 'username': self.username},
                                  headers=headers
-                                )
+                                 )
 
         self.assertNotEqual(user, None)
         self.assertNotEqual(email_preference, None)
@@ -80,7 +95,7 @@ class UserDeletionTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
 
         historical_user_data = User.objects.raw(
-            'SELECT * FROM auth_historicaluser WHERE id="{}";'.format(user.id))
+            'SELECT * FROM auth_historicaluser WHERE id={};'.format(user.id))
         self.assertGreater(sum(1 for row in historical_user_data), 0)
 
         historical_user_profile_data = UserProfile.objects.raw(
@@ -91,6 +106,18 @@ class UserDeletionTestCase(TestCase):
             'SELECT * from onboarding_historicaluserextendedprofile WHERE user_id={};'.format(user.id))
         self.assertGreater(
             sum(1 for row in historical_user_extended_profile_data), 0)
+
+        organization_data = Organization.objects.raw(
+            'SELECT * from onboarding_organization WHERE unclaimed_org_admin_email="{}" OR alternate_admin_email="{}"'.format(
+                self.email, self.email))
+        self.assertGreater(
+            sum(1 for row in organization_data), 0)
+
+        historical_organization_data = Organization.objects.raw(
+            'SELECT * from onboarding_historicalorganization WHERE unclaimed_org_admin_email="{}" OR alternate_admin_email="{}"'.format(
+                self.email, self.email))
+        self.assertGreater(
+            sum(1 for row in historical_organization_data), 0)
 
         user_id = user.id
         user.delete()
@@ -104,9 +131,8 @@ class UserDeletionTestCase(TestCase):
         self.assertEqual(user_profile, None)
         self.assertEqual(extended_profile, None)
 
-
         historical_user_data = User.objects.raw(
-            'SELECT * FROM auth_historicaluser WHERE email="{}";'.format(user.email))
+            'SELECT * FROM auth_historicaluser WHERE email="{}";'.format(self.email))
         self.assertEqual(sum(1 for row in historical_user_data), 0)
 
         historical_user_profile_data = UserProfile.objects.raw(
@@ -118,10 +144,22 @@ class UserDeletionTestCase(TestCase):
         self.assertEqual(
             sum(1 for row in historical_user_extended_profile_data), 0)
 
+        organization_data = Organization.objects.raw(
+            'SELECT * from onboarding_organization WHERE unclaimed_org_admin_email="{}" OR alternate_admin_email="{}"'.format(
+                self.email, self.email))
+        self.assertEqual(
+            sum(1 for row in organization_data), 0)
+
+        historical_organization_data = Organization.objects.raw(
+            'SELECT * from onboarding_historicalorganization WHERE unclaimed_org_admin_email="{}" OR alternate_admin_email="{}"'.format(
+                self.email, self.email))
+        self.assertEqual(
+            sum(1 for row in historical_organization_data), 0)
+
         response = requests.post(data_endpoint,
                                  data={'_uid': 1, 'username': self.username},
                                  headers=headers
-                                )
+                                 )
         self.assertEqual(response.status_code, 400)
 
     def tearDown(self):
@@ -135,9 +173,12 @@ class UserDeletionTestCase(TestCase):
             user.delete()
 
             cursor = connection.cursor()
-            cursor.execute('DELETE FROM auth_historicaluser WHERE email="{}";'.format(user.email))
-            cursor.execute('DELETE FROM auth_historicaluserprofile WHERE user_id="{}";'.format(user.id))
-            cursor.execute('DELETE from onboarding_historicaluserextendedprofile WHERE user_id="{}";'.format(user.id))
+            cursor.execute(
+                'DELETE FROM auth_historicaluser WHERE email="{}";'.format(user.email))
+            cursor.execute(
+                'DELETE FROM auth_historicaluserprofile WHERE user_id="{}";'.format(user.id))
+            cursor.execute(
+                'DELETE from onboarding_historicaluserextendedprofile WHERE user_id="{}";'.format(user.id))
 
         if email_preference:
             email_preference.delete()

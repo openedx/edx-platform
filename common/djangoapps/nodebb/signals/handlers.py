@@ -81,10 +81,10 @@ def sync_organization_info_with_nodebb(sender, instance, created, **kwargs):  # 
     """
     Sync information b/w NodeBB User Profile and Edx User Profile
     """
-    request = get_current_request()
 
-    # To prevent unnecessary updation in case Django only updates
+    # To prevent unnecessary API calls in case Django only updates
     # updated_at etc.
+    request = get_current_request()
     if request:
         if 'login' in request.path or 'logout' in request.path:
             return
@@ -93,7 +93,7 @@ def sync_organization_info_with_nodebb(sender, instance, created, **kwargs):  # 
         "focus_area": FocusArea.objects.get(code=instance.focus_area).label if instance.focus_area else ""
     }
 
-    user = request.user
+    user = instance.admin
 
     task_update_user_profile_on_nodebb.delay(
         username=user.username, profile_data=data_to_sync)
