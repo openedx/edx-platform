@@ -132,7 +132,7 @@ class UserDeletionTestCase(TestCase):
         self.assertEqual(extended_profile, None)
 
         historical_user_data = User.objects.raw(
-            'SELECT * FROM auth_historicaluser WHERE email="{}";'.format(self.email))
+            'SELECT * FROM auth_historicaluser WHERE id={};'.format(user_id))
         self.assertEqual(sum(1 for row in historical_user_data), 0)
 
         historical_user_profile_data = UserProfile.objects.raw(
@@ -174,11 +174,11 @@ class UserDeletionTestCase(TestCase):
 
             cursor = connection.cursor()
             cursor.execute(
-                'DELETE FROM auth_historicaluser WHERE email="{}";'.format(user.email))
+                'DELETE FROM auth_historicaluser WHERE id={};'.format(user.id))
             cursor.execute(
-                'DELETE FROM auth_historicaluserprofile WHERE user_id="{}";'.format(user.id))
+                'DELETE FROM auth_historicaluserprofile WHERE user_id={};'.format(user.id))
             cursor.execute(
-                'DELETE from onboarding_historicaluserextendedprofile WHERE user_id="{}";'.format(user.id))
+                'DELETE from onboarding_historicaluserextendedprofile WHERE user_id={};'.format(user.id))
 
         if email_preference:
             email_preference.delete()
