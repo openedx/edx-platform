@@ -11,7 +11,7 @@ Note: The access control logic in this file does NOT check for enrollment in
   It is a wrapper around has_access that additionally checks for enrollment.
 """
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser

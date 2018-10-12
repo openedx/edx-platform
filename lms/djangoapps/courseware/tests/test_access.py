@@ -836,15 +836,15 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
             user = getattr(self, user_attr_name)
             user = User.objects.get(id=user.id)
 
-        if (user_attr_name == 'user_staff' and
-            action == 'see_exists' and
-            course_attr_name in
-                ['course_default', 'course_not_started']):
+        if user_attr_name == 'user_staff' and action == 'see_exists':
             # checks staff role
             num_queries = 1
-        elif user_attr_name == 'user_normal' and action == 'see_exists' and course_attr_name != 'course_started':
-            # checks staff role and enrollment data
-            num_queries = 2
+        elif user_attr_name == 'user_normal' and action == 'see_exists':
+            if course_attr_name == 'course_started':
+                num_queries = 1
+            else:
+                # checks staff role and enrollment data
+                num_queries = 2
         else:
             num_queries = 0
 
