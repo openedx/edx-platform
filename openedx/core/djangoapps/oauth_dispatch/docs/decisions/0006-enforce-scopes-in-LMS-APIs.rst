@@ -189,7 +189,8 @@ See 0007-include-organizations-in-tokens_ for decisions on this.
 .. _function-based Django views: https://docs.djangoproject.com/en/2.0/topics/http/views/
 .. _Django Rest Framework (DRF): http://www.django-rest-framework.org/
 .. _Python decorator: http://www.django-rest-framework.org/tutorial/2-requests-and-responses/#wrapping-api-views
-.. _JwtAuthentication: https://github.com/edx/edx-drf-extensions/blob/1db9f5e3e5130a1e0f43af2035489b3ed916d245/edx_rest_framework_extensions/authentication.py#L153
+.. _JwtAuthentication: https://github.com/edx/edx-drf-extensions/blob/4569b9bf7e54a917d4acdd545b10c058c960dd1a/edx_rest_framework_extensions/auth/jwt/authentication.py#L17
+
 
 Consequences
 ------------

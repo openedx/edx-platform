@@ -92,7 +92,7 @@ Authentication by REST endpoints
   user of its EdXOpenIdConnect_ class is the edx-analytics-dashboard_.
 
 .. _Django Rest Framework (DRF): https://github.com/encode/django-rest-framework
-.. _JwtAuthentication: https://github.com/edx/edx-drf-extensions/blob/1db9f5e3e5130a1e0f43af2035489b3ed916d245/edx_rest_framework_extensions/authentication.py#L153
+.. _JwtAuthentication: https://github.com/edx/edx-drf-extensions/blob/4569b9bf7e54a917d4acdd545b10c058c960dd1a/edx_rest_framework_extensions/auth/jwt/authentication.py#L17
 .. _authentication_classes: http://www.django-rest-framework.org/api-guide/authentication/#setting-the-authentication-scheme
 .. _edx-drf-extensions: https://github.com/edx/edx-drf-extensions
 .. _django-rest-framework-jwt: https://github.com/GetBlimp/django-rest-framework-jwt
