@@ -89,9 +89,8 @@ class LanguageApiTest(CacheIsolationTestCase):
         (True, 'en', [], [], [], []),
         (True, 'en', [EN], [], [], [EN]),
         (True, 'en', [EN, ES_419], [], [], [EN]),
-        (True, 'en', [EN, ES_419], ['es-419'], ['ar'], [EN, ES_419, AR]),
         (False, 'en', [EN, ES_419], ['es-419'], ['ar'], [EN, ES_419]),
-        (True, 'es-419', [EN, ES_419], ['es-419'], ['ar'], [ES_419, AR]),
+        (True, 'es-419', [EN, ES_419], ['es-419'], ['ar'], [ES_419]),
         (True, 'en', [EN, ES_419], ['es'], [], [EN]),
     ])
     @ddt.unpack
@@ -119,9 +118,10 @@ class LanguageApiTest(CacheIsolationTestCase):
         (True, ['es-419'], [ES_419]),
         (False, ['es-419'], [])
     ])
+    @ddt.unpack
     def test_beta_languages(self, enable_beta_languages, beta_languages, expected_languages):
         """
-        Test for beta languages 
+        Test for beta languages.
         """
         user = User()
         user.save()
