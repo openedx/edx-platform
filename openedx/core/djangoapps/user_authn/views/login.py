@@ -14,7 +14,7 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
-from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from ratelimitbackend.exceptions import RateLimitException
 
@@ -398,7 +398,11 @@ def login_user(request):
         return JsonResponse(error.get_response())
 
 
-@ensure_csrf_cookie
+# CSRF protection is not needed here because the only side effect
+# of this endpoint is to refresh the cookie-based JWT, and attempting
+# to get a CSRF token before we need to refresh adds too much
+# complexity.
+@csrf_exempt
 @require_http_methods(['POST'])
 def login_refresh(request):
     try:
