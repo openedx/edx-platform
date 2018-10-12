@@ -115,7 +115,7 @@ class ShibSPTest(CacheIsolationTestCase):
         try:
             self.assertIn(remote_user, args[0])
         except:
-            assert User.objects.all().values() = "dummy"
+            assert User.objects.all().values() == "dummy"
 
     @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     def test_shib_login(self):
