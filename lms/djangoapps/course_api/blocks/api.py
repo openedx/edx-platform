@@ -59,7 +59,7 @@ def get_blocks(
     include_gated_sections = 'show_gated_sections' in requested_fields
 
     if user is not None:
-        transformers += course_blocks_api.get_course_block_access_transformers()
+        transformers += course_blocks_api.get_course_block_access_transformers(user)
         transformers += [MilestonesAndSpecialExamsTransformer(
             include_special_exams=include_special_exams,
             include_gated_sections=include_gated_sections)]
