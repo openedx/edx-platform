@@ -15,13 +15,16 @@ from openedx.features.content_type_gating.models import (
 class GlobalContentTypeGatingConfigAdmin(ConfigurationModelAdmin):
     pass
 
-class SiteContentTypeGatingConfigAdmin(KeyedConfigurationModelAdmin):
+
+class SiteContentTypeGatingConfigAdmin(ConfigurationModelAdmin):
     pass
 
-class OrgContentTypeGatingConfigAdmin(KeyedConfigurationModelAdmin):
+
+class OrgContentTypeGatingConfigAdmin(ConfigurationModelAdmin):
     pass
 
-class CourseContentTypeGatingConfigAdmin(KeyedConfigurationModelAdmin):
+
+class CourseContentTypeGatingConfigAdmin(ConfigurationModelAdmin):
     pass
 
 

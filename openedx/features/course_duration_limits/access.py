@@ -16,7 +16,8 @@ class AuditExpiredError(AccessError):
     def __init__(self, user, course, end_date):
         error_code = "audit_expired"
         developer_message = "User {} had access to {} until {}".format(user, course, end_date)
-        user_message = _("Your audit access period has expired.")
+        # TODO: Translate the end_date
+        user_message = _("Your audit access to this course expired on ") + end_date.strftime("%B %d, %Y")
         super(AuditExpiredError, self).__init__(error_code, developer_message, user_message)
 
 

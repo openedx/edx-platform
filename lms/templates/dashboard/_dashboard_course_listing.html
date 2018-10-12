@@ -128,7 +128,14 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
           %>
 
             <span class="info-date-block-container">
-                % if is_unfulfilled_entitlement:
+                % if not show_courseware_link and not is_unfulfilled_entitlement and hasattr(show_courseware_link, 'user_message'):
+                  <span data-course-key="${enrollment.course_id}">
+                    ${show_courseware_link.user_message}
+                    <span class="sr">
+                      &nbsp;${_('for {course_display_name}').format(course_display_name=course_overview.display_name_with_default)}
+                    </span>
+                  </span>
+                % elif is_unfulfilled_entitlement:
                     <span class="info-date-block" aria-live="polite">
                         <span class="icon fa fa-warning" aria-hidden="true"></span>
                         % if not entitlement_expired_at:
@@ -202,14 +209,6 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
                   </a>
                 % endif
               % endif
-            % elif hasattr(show_courseware_link, 'user_message'):
-              <span class="enter-course-blocked"
-                 data-course-key="${enrollment.course_id}">
-                ${show_courseware_link.user_message}
-                <span class="sr">
-                  &nbsp;${_('for {course_display_name}').format(course_display_name=course_overview.display_name_with_default)}
-                </span>
-              </span>
             % endif
 
             % if show_courseware_link or course_overview.has_social_sharing_url() or course_overview.has_marketing_url():
@@ -266,7 +265,7 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
                 % endif
             % endif
 
-            ## We should only show the gear dropdown if the user is able to refund/unenroll from their entitlement
+            ## We should only show tifhe gear droifown if the user is able to refund/unenroll from their entitlement
             ## and/or if they have selected a course run and email_settings are enabled
             ## as these are the only actions currently available
             % if entitlement and (can_refund_entitlement or show_email_settings):

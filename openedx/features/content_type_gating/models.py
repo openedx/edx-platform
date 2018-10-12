@@ -67,7 +67,6 @@ class StackedConfigurationModel(ConfigurationModel):
         cls._configuration_stack = (global_config, site_config, org_config, course_config)
         return cls._configuration_stack
 
-
     @classmethod
     def _stacked_current_config(cls, site=None, org=None, course=None):
 
@@ -148,7 +147,6 @@ class ContentTypeGatingConfig(StackedConfigurationModel):
         return current_config.enabled and current_config.enabled_after <= enrollment.created
 
 
-
 class GlobalContentTypeGatingConfig(ContentTypeGatingConfig):
     pass
 
@@ -159,7 +157,6 @@ class SiteContentTypeGatingConfig(ContentTypeGatingConfig):
     @classmethod
     def stacked_current(cls, site):
         return cls._stacked_current_config(site=site)
-
 
     site = models.ForeignKey('sites.Site', on_delete=models.CASCADE)
 
