@@ -5,7 +5,7 @@ from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from mandrill_client.client import MandrillClient
+from common.lib.mandrill_client.client import MandrillClient
 from lms.djangoapps.certificates import api as certificate_api
 from lms.djangoapps.onboarding.models import (
     UserExtendedProfile, Organization, EmailPreference,)
