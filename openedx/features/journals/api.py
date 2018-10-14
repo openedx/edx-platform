@@ -12,9 +12,9 @@ from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from edx_rest_api_client.client import EdxRestApiClient
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
-from openedx.core.lib.token_utils import JwtBuilder
 from slumber.exceptions import HttpClientError, HttpServerError
 
 
@@ -54,7 +54,7 @@ class DiscoveryApiClient(object):
             LOGGER.error("Unable to retrieve catalog integration service user")
             return None
 
-        jwt = JwtBuilder(user).build_token([])
+        jwt = create_jwt_for_user(user)
         base_url = configuration_helpers.get_value('COURSE_CATALOG_URL_BASE', settings.COURSE_CATALOG_URL_BASE)
         self.client = EdxRestApiClient(
             '{base_url}{journals_path}'.format(base_url=base_url, journals_path=JOURNALS_API_PATH),
@@ -110,7 +110,7 @@ class JournalsApiClient(object):
             LOGGER.error(error)
             raise ValueError(error)
 
-        jwt = JwtBuilder(self.user).build_token(['email', 'profile'], 16000)
+        jwt = create_jwt_for_user(self.user)
         self.client = EdxRestApiClient(
             configuration_helpers.get_value('JOURNALS_API_URL', settings.JOURNALS_API_URL),
             jwt=jwt

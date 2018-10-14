@@ -3,8 +3,9 @@ from django.conf import settings
 from edx_rest_api_client.client import EdxRestApiClient
 
 from eventtracking import tracker
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.lib.token_utils import JwtBuilder
+
 
 ECOMMERCE_DATE_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 
@@ -29,10 +30,10 @@ def is_commerce_service_configured():
     return bool(ecommerce_api_url)
 
 
-def ecommerce_api_client(user, session=None, token_expiration=None):
+def ecommerce_api_client(user, session=None):
     """ Returns an E-Commerce API client setup with authentication for the specified user. """
     claims = {'tracking_context': create_tracking_context(user)}
-    jwt = JwtBuilder(user).build_token(['email', 'profile'], expires_in=token_expiration, additional_claims=claims)
+    jwt = create_jwt_for_user(user, additional_claims=claims)
 
     return EdxRestApiClient(
         configuration_helpers.get_value('ECOMMERCE_API_URL', settings.ECOMMERCE_API_URL),

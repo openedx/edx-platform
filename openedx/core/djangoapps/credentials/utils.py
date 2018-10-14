@@ -5,8 +5,8 @@ from django.conf import settings
 from edx_rest_api_client.client import EdxRestApiClient
 
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.lib.edx_api_utils import get_edx_api_data
-from openedx.core.lib.token_utils import JwtBuilder
 
 
 def get_credentials_records_url(program_uuid=None):
@@ -35,10 +35,7 @@ def get_credentials_api_client(user, org=None):
         org (str): Optional organization to look up the site config for, rather than the current request
 
     """
-
-    scopes = ['email', 'profile']
-    expires_in = settings.OAUTH_ID_TOKEN_EXPIRATION
-    jwt = JwtBuilder(user).build_token(scopes, expires_in)
+    jwt = create_jwt_for_user(user)
 
     if org is None:
         url = CredentialsApiConfig.current().internal_api_url  # by current request

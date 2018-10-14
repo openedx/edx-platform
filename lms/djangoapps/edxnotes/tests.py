@@ -27,9 +27,9 @@ from edxnotes import helpers
 from edxnotes.decorators import edxnotes
 from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 from edxnotes.plugins import EdxNotesTab
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.user_api.models import RetirementState, UserRetirementStatus
 from openedx.core.lib.tests import attr
-from openedx.core.lib.token_utils import JwtBuilder
 from student.tests.factories import CourseEnrollmentFactory, SuperuserFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -1185,7 +1185,7 @@ class EdxNotesRetireAPITest(ModuleStoreTestCase):
         """
         Helper function for creating headers for the JWT authentication.
         """
-        token = JwtBuilder(user).build_token([])
+        token = create_jwt_for_user(user)
         headers = {'HTTP_AUTHORIZATION': 'JWT ' + token}
         return headers
 
