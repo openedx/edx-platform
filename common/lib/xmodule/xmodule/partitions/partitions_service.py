@@ -8,10 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 import logging
 
 from openedx.core.lib.cache_utils import request_cached
-from openedx.features.content_type_gating.partitions import (
-    CONTENT_GATING_PARTITION_ID,
-    create_content_gating_partition,
-)
+from openedx.features.content_type_gating.partitions import create_content_gating_partition
 from xmodule.partitions.partitions import (
     UserPartition,
     UserPartitionError,

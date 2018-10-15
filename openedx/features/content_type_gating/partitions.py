@@ -7,8 +7,11 @@ of audit learners.
 
 import logging
 
+from course_modes.models import CourseMode
+
 from django.utils.translation import ugettext_lazy as _
 
+from django.apps import apps
 from lms.djangoapps.courseware.masquerade import (
     get_course_masquerade,
     is_masquerading_as_specific_student,
@@ -20,12 +23,12 @@ from openedx.features.course_duration_limits.config import (
     CONTENT_TYPE_GATING_STUDIO_UI_FLAG,
 )
 
-
 LOG = logging.getLogger(__name__)
 
 # Studio generates partition IDs starting at 100. There is already a manually generated
 # partition for Enrollment Track that uses ID 50, so we'll use 51.
 CONTENT_GATING_PARTITION_ID = 51
+
 
 CONTENT_TYPE_GATE_GROUP_IDS = {
     'limited_access': 1,
@@ -102,7 +105,48 @@ class ContentTypeGatingPartitionScheme(object):
 
         # For now, treat everyone as a Full-access user, until we have the rest of the
         # feature gating logic in place.
-        return cls.FULL_ACCESS
+
+        if not CONTENT_TYPE_GATING_FLAG.is_enabled():
+            return cls.FULL_ACCESS
+
+        # If CONTENT_TYPE_GATING is enabled use the following logic to determine whether a user should have FULL_ACCESS
+        # or LIMITED_ACCESS
+
+        course_mode = apps.get_model('course_modes.CourseMode')
+        modes = course_mode.modes_for_course(course_key, include_expired=True, only_selectable=False)
+        modes_dict = {mode.slug: mode for mode in modes}
+
+        # If there is no verified mode, all users are granted FULL_ACCESS
+        if not course_mode.has_verified_mode(modes_dict):
+            return cls.FULL_ACCESS
+
+        course_enrollment = apps.get_model('student.CourseEnrollment')
+
+        mode_slug, is_active = course_enrollment.enrollment_mode_for_user(user, course_key)
+
+        if mode_slug and is_active:
+            course_mode = course_mode.mode_for_course(
+                course_key,
+                mode_slug,
+                modes=modes,
+            )
+            if course_mode is None:
+                LOG.error(
+                    "User %s is in an unknown CourseMode '%s'"
+                    " for course %s. Granting full access to content for this user",
+                    user.username,
+                    mode_slug,
+                    course_key,
+                )
+                return cls.FULL_ACCESS
+
+            if mode_slug == CourseMode.AUDIT:
+                return cls.LIMITED_ACCESS
+            else:
+                return cls.FULL_ACCESS
+        else:
+            # Unenrolled users don't get gated content
+            return cls.LIMITED_ACCESS
 
     @classmethod
     def create_user_partition(cls, id, name, description, groups=None, parameters=None, active=True):  # pylint: disable=redefined-builtin, invalid-name, unused-argument

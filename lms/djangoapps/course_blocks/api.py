@@ -6,6 +6,8 @@ from django.conf import settings
 
 from openedx.core.djangoapps.content.block_structure.api import get_block_structure_manager
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
+from openedx.features.content_type_gating.block_transformers import ContentTypeGateTransformer
+from openedx.features.course_duration_limits.config import CONTENT_TYPE_GATING_FLAG
 
 from .transformers import (
     library_content,
@@ -39,12 +41,23 @@ def get_course_block_access_transformers(user):
             which the block structure is to be transformed.
 
     """
-    course_block_access_transformers = [
-        library_content.ContentLibraryTransformer(),
-        start_date.StartDateTransformer(),
-        user_partitions.UserPartitionTransformer(),
-        visibility.VisibilityTransformer(),
-    ]
+    if CONTENT_TYPE_GATING_FLAG.is_enabled():
+        # [REV/Revisit] remove this duplicated code when flag is removed
+        course_block_access_transformers = [
+            library_content.ContentLibraryTransformer(),
+            start_date.StartDateTransformer(),
+            ContentTypeGateTransformer(),
+            user_partitions.UserPartitionTransformer(),
+            visibility.VisibilityTransformer(),
+        ]
+    else:
+        course_block_access_transformers = [
+            library_content.ContentLibraryTransformer(),
+            start_date.StartDateTransformer(),
+            user_partitions.UserPartitionTransformer(),
+            visibility.VisibilityTransformer(),
+        ]
+
     if has_individual_student_override_provider():
         course_block_access_transformers += [load_override_data.OverrideDataTransformer(user)]
 
