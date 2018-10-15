@@ -14,7 +14,7 @@ from lms.djangoapps.courseware.masquerade import (
     get_masquerading_user_group,
 )
 from xmodule.partitions.partitions import Group, UserPartition, UserPartitionError
-
+from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 
 LOG = logging.getLogger(__name__)
 
@@ -183,7 +183,13 @@ class ContentTypeGatingPartitionScheme(object):
             return cls.UNLOCKED
 
         CourseEnrollment = apps.get_model('student.CourseEnrollment')
+
+        enrollment = CourseEnrollment.get_enrollment(user, course_key)
+        if not ContentTypeGatingConfig.is_enabled(enrollment):
+            return cls.UNLOCKED
+
         mode_slug, is_active = CourseEnrollment.enrollment_mode_for_user(user, course_key)
+
         if mode_slug and is_active:
             course_mode = CourseMode.mode_for_course(
                 course_key,
