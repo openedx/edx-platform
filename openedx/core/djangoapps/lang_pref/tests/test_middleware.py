@@ -203,6 +203,10 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
                 }
             )
 
+        if response.status_code != 200:
+            import django
+            assert django.conf.settings.FEATURES == "dummy"
+
         self.assertEqual(response.status_code, 200)
 
         if lang_cookie:
