@@ -2282,6 +2282,8 @@ INSTALLED_APPS = [
     'openedx.features.learner_profile',
     'openedx.features.learner_analytics',
     'openedx.features.portfolio_project',
+    'openedx.features.content_type_gating',
+    'openedx.features.course_duration_limits',
 
     'experiments',
 
@@ -3073,7 +3075,7 @@ FIELD_OVERRIDE_PROVIDERS = ()
 
 # Modulestore-level field override providers. These field override providers don't
 # require student context.
-MODULESTORE_FIELD_OVERRIDE_PROVIDERS = ()
+MODULESTORE_FIELD_OVERRIDE_PROVIDERS = ('openedx.features.content_type_gating.field_override.ContentTypeGatingFieldOverride',)
 
 # PROFILE IMAGE CONFIG
 # WARNING: Certain django storage backends do not support atomic
@@ -3405,6 +3407,11 @@ COURSE_ENROLLMENT_MODES = {
         "display_name": _("Honor"),
         "min_price": 0
     },
+}
+
+CONTENT_TYPE_GATE_PARTITION_IDS = {
+    'locked': 1,
+    'unlocked': 2,
 }
 
 ############## Settings for the Discovery App ######################

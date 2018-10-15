@@ -4,10 +4,10 @@
 #
 #    make upgrade
 #
--e common/lib/calc
--e common/lib/chem
--e common/lib/sandbox-packages
--e common/lib/symmath
+-e file:///home/cpennington/work/code/edx-platform/common/lib/calc
+-e file:///home/cpennington/work/code/edx-platform/common/lib/chem
+-e file:///home/cpennington/work/code/edx-platform/common/lib/sandbox-packages
+-e file:///home/cpennington/work/code/edx-platform/common/lib/symmath
 asn1crypto==0.24.0        # via cryptography
 cffi==1.11.5              # via cryptography
 cryptography==2.3.1
