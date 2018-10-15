@@ -115,8 +115,8 @@ class HtmlModuleMixin(HtmlBlock, XModule):
     js = {
         'js': [
             resource_string(__name__, 'js/src/html/display.js'),
-            resource_string(__name__, 'js/src/javascript_loader.js'),
-            resource_string(__name__, 'js/src/collapsible.js'),
+            resource_string(__name__, 'js/common_static/common/js/javascript_loader.js'),
+            resource_string(__name__, 'js/common_static/common/js/collapsible.js'),
             resource_string(__name__, 'js/src/html/imageModal.js'),
             resource_string(__name__, 'js/common_static/js/vendor/draggabilly.js'),
         ]

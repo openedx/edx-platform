@@ -70,8 +70,8 @@ var options = {
     sourceFiles: [
         { pattern: 'src/xmodule.js', included: true, ignoreCoverage: true }, // To prevent getting instrumented twice.
         // Load these before the xmodules that use them
-        { pattern: 'src/javascript_loader.js', included: true },
-        { pattern: 'src/collapsible.js', included: true },
+        { pattern: 'common_static/common/js/src/javascript_loader.js', included: true },
+        { pattern: 'common_static/common/js/src/collapsible.js', included: true },
         // Load everything else
         {pattern: 'src/**/!(video)/!(poll|time).js', included: true}
     ],

@@ -118,8 +118,8 @@ class ConditionalModule(ConditionalFields, XModule, StudioEditableModule):
     js = {
         'js': [
             resource_string(__name__, 'js/src/conditional/display.js'),
-            resource_string(__name__, 'js/src/javascript_loader.js'),
-            resource_string(__name__, 'js/src/collapsible.js'),
+            resource_string(__name__, 'js/common_static/common/js/javascript_loader.js'),
+            resource_string(__name__, 'js/common_static/common/js/collapsible.js'),
         ]
     }
 

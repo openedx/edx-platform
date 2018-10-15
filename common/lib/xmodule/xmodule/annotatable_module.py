@@ -50,8 +50,8 @@ class AnnotatableModule(AnnotatableFields, XModule):
         'js': [
             resource_string(__name__, 'js/src/html/display.js'),
             resource_string(__name__, 'js/src/annotatable/display.js'),
-            resource_string(__name__, 'js/src/javascript_loader.js'),
-            resource_string(__name__, 'js/src/collapsible.js'),
+            resource_string(__name__, 'js/common_static/common/js/javascript_loader.js'),
+            resource_string(__name__, 'js/common_static/common/js/collapsible.js'),
         ]
     }
     js_module_name = "Annotatable"
