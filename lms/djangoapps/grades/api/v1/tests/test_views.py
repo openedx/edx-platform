@@ -2,7 +2,8 @@
 Tests for v1 views
 """
 from __future__ import unicode_literals
-from collections import OrderedDict
+import json
+from collections import OrderedDict, namedtuple
 from datetime import datetime
 
 import ddt
@@ -19,6 +20,7 @@ from lms.djangoapps.grades.api.v1.views import CourseGradesView
 from lms.djangoapps.grades.config.waffle import waffle_flags, WRITABLE_GRADEBOOK
 from lms.djangoapps.grades.course_data import CourseData
 from lms.djangoapps.grades.course_grade import CourseGrade
+from lms.djangoapps.grades.models import PersistentSubsectionGrade
 from lms.djangoapps.grades.subsection_grade import ReadSubsectionGrade
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.user_authn.tests.utils import AuthAndScopesTestMixin
@@ -371,18 +373,18 @@ class CourseGradesViewTest(GradeViewTestMixin, APITestCase):
         self.assertEqual(expected_data, resp.data)
 
 
-class GradebookViewTest(GradeViewTestMixin, APITestCase):
+class GradebookViewTestBase(GradeViewTestMixin, APITestCase):
     """
-    Tests for the gradebook view.
+    Base class for the gradebook GET and POST view tests.
     """
-
     @classmethod
     def setUpClass(cls):
-        super(GradebookViewTest, cls).setUpClass()
+        super(GradebookViewTestBase, cls).setUpClass()
         cls.namespaced_url = 'grades_api:v1:course_gradebook'
         cls.waffle_flag = waffle_flags()[WRITABLE_GRADEBOOK]
 
         cls.course = CourseFactory.create(display_name='test-course', run='run-1')
+        cls.course_key = cls.course.id
         cls.course_overview = CourseOverviewFactory.create(id=cls.course.id)
 
         cls.chapter_1 = ItemFactory.create(
@@ -434,16 +436,34 @@ class GradebookViewTest(GradeViewTestMixin, APITestCase):
             ],
         }
 
-    def get_url(self, course_key=None, username=None):
+    def get_url(self, course_key=None):
         """
-        Helper function to create the course gradebook API read url.
+        Helper function to create the course gradebook API url.
         """
-        base_url = reverse(
+        return reverse(
             self.namespaced_url,
             kwargs={
                 'course_id': course_key or self.course_key,
             }
         )
+
+    def login_staff(self):
+        """
+        Helper function to login the global staff user, who has permissions to read from the
+        Gradebook API.
+        """
+        self.client.login(username=self.global_staff.username, password=self.password)
+
+
+class GradebookViewTest(GradebookViewTestBase):
+    """
+    Tests for the gradebook view.
+    """
+    def get_url(self, course_key=None, username=None):  # pylint: disable=arguments-differ
+        """
+        Helper function to create the course gradebook API read url.
+        """
+        base_url = super(GradebookViewTest, self).get_url(course_key)
         if username:
             return "{0}?username={1}".format(base_url, username)
         return base_url
@@ -503,13 +523,6 @@ class GradebookViewTest(GradeViewTestMixin, APITestCase):
             }),
         ])
         return course_grade
-
-    def login_staff(self):
-        """
-        Helper function to login the global staff user, who has permissions to read from the
-        Gradebook API.
-        """
-        self.client.login(username=self.global_staff.username, password=self.password)
 
     def expected_subsection_grades(self, letter_grade=None):
         """
@@ -772,3 +785,249 @@ class GradebookViewTest(GradeViewTestMixin, APITestCase):
                 self.assertEqual(status.HTTP_200_OK, resp.status_code)
                 actual_data = dict(resp.data)
                 self.assertEqual(expected_results, actual_data)
+
+
+class GradebookBulkUpdateViewTest(GradebookViewTestBase):
+    """
+    Tests for the gradebook bulk-update view.
+    """
+    @classmethod
+    def setUpClass(cls):
+        super(GradebookBulkUpdateViewTest, cls).setUpClass()
+        cls.namespaced_url = 'grades_api:v1:course_gradebook_bulk_update'
+
+    def test_feature_not_enabled(self):
+        self.client.login(username=self.global_staff.username, password=self.password)
+        with override_waffle_flag(self.waffle_flag, active=False):
+            resp = self.client.post(
+                self.get_url(course_key=self.empty_course.id)
+            )
+            self.assertEqual(status.HTTP_403_FORBIDDEN, resp.status_code)
+
+    def test_anonymous(self):
+        with override_waffle_flag(self.waffle_flag, active=True):
+            resp = self.client.post(self.get_url())
+            self.assertEqual(status.HTTP_401_UNAUTHORIZED, resp.status_code)
+
+    def test_student(self):
+        self.client.login(username=self.student.username, password=self.password)
+        with override_waffle_flag(self.waffle_flag, active=True):
+            resp = self.client.post(self.get_url())
+            self.assertEqual(status.HTTP_403_FORBIDDEN, resp.status_code)
+
+    def test_course_does_not_exist(self):
+        with override_waffle_flag(self.waffle_flag, active=True):
+            self.login_staff()
+            resp = self.client.post(
+                self.get_url(course_key='course-v1:MITx+8.MechCX+2014_T1')
+            )
+            self.assertEqual(status.HTTP_404_NOT_FOUND, resp.status_code)
+
+    def test_user_not_enrolled(self):
+        with override_waffle_flag(self.waffle_flag, active=True):
+            self.login_staff()
+            unenrolled_student = UserFactory()
+            post_data = [
+                {
+                    'user_id': unenrolled_student.id,
+                    'usage_id': text_type(self.subsections[self.chapter_1.location][0].location),
+                    'grade': {},  # doesn't matter what we put here.
+                }
+            ]
+
+            resp = self.client.post(
+                self.get_url(),
+                data=json.dumps(post_data),
+                content_type='application/json',
+            )
+
+            expected_data = [
+                {
+                    'user_id': unenrolled_student.id,
+                    'usage_id': text_type(self.subsections[self.chapter_1.location][0].location),
+                    'success': False,
+                    'reason': 'CourseEnrollment matching query does not exist.',
+                },
+            ]
+            self.assertEqual(status.HTTP_422_UNPROCESSABLE_ENTITY, resp.status_code)
+            self.assertEqual(expected_data, json.loads(resp.data))
+
+    def test_user_does_not_exist(self):
+        with override_waffle_flag(self.waffle_flag, active=True):
+            self.login_staff()
+            post_data = [
+                {
+                    'user_id': -123,
+                    'usage_id': text_type(self.subsections[self.chapter_1.location][0].location),
+                    'grade': {},  # doesn't matter what we put here.
+                }
+            ]
+
+            resp = self.client.post(
+                self.get_url(),
+                data=json.dumps(post_data),
+                content_type='application/json',
+            )
+
+            expected_data = [
+                {
+                    'user_id': -123,
+                    'usage_id': text_type(self.subsections[self.chapter_1.location][0].location),
+                    'success': False,
+                    'reason': 'User matching query does not exist.',
+                },
+            ]
+            self.assertEqual(status.HTTP_422_UNPROCESSABLE_ENTITY, resp.status_code)
+            self.assertEqual(expected_data, json.loads(resp.data))
+
+    def test_invalid_usage_key(self):
+        with override_waffle_flag(self.waffle_flag, active=True):
+            self.login_staff()
+            post_data = [
+                {
+                    'user_id': self.student.id,
+                    'usage_id': 'not-a-valid-usage-key',
+                    'grade': {},  # doesn't matter what we put here.
+                }
+            ]
+
+            resp = self.client.post(
+                self.get_url(),
+                data=json.dumps(post_data),
+                content_type='application/json',
+            )
+
+            expected_data = [
+                {
+                    'user_id': self.student.id,
+                    'usage_id': 'not-a-valid-usage-key',
+                    'success': False,
+                    'reason': "<class 'opaque_keys.edx.locator.BlockUsageLocator'>: not-a-valid-usage-key",
+                },
+            ]
+            self.assertEqual(status.HTTP_422_UNPROCESSABLE_ENTITY, resp.status_code)
+            self.assertEqual(expected_data, json.loads(resp.data))
+
+    def test_subsection_does_not_exist(self):
+        """
+        When trying to override a grade for a valid usage key that does not exist in the requested course,
+        we should get an error reason specifying that the key does not exist in the course.
+        """
+        with override_waffle_flag(self.waffle_flag, active=True):
+            self.login_staff()
+            usage_id = 'block-v1:edX+DemoX+Demo_Course+type@sequential+block@workflow'
+            post_data = [
+                {
+                    'user_id': self.student.id,
+                    'usage_id': usage_id,
+                    'grade': {},  # doesn't matter what we put here.
+                }
+            ]
+
+            resp = self.client.post(
+                self.get_url(),
+                data=json.dumps(post_data),
+                content_type='application/json',
+            )
+
+            expected_data = [
+                {
+                    'user_id': self.student.id,
+                    'usage_id': usage_id,
+                    'success': False,
+                    'reason': 'usage_key {} does not exist in this course.'.format(usage_id),
+                },
+            ]
+            self.assertEqual(status.HTTP_422_UNPROCESSABLE_ENTITY, resp.status_code)
+            self.assertEqual(expected_data, json.loads(resp.data))
+
+    def test_override_is_created(self):
+        """
+        Test that when we make multiple requests to update grades for the same user/subsection,
+        the score from the most recent request is recorded.
+        """
+        with override_waffle_flag(self.waffle_flag, active=True):
+            self.login_staff()
+            post_data = [
+                {
+                    'user_id': self.student.id,
+                    'usage_id': text_type(self.subsections[self.chapter_1.location][0].location),
+                    'grade': {
+                        'earned_all_override': 3,
+                        'possible_all_override': 3,
+                        'earned_graded_override': 2,
+                        'possible_graded_override': 2,
+                    },
+                },
+                {
+                    'user_id': self.student.id,
+                    'usage_id': text_type(self.subsections[self.chapter_1.location][1].location),
+                    'grade': {
+                        'earned_all_override': 1,
+                        'possible_all_override': 4,
+                        'earned_graded_override': 1,
+                        'possible_graded_override': 4,
+                    },
+                }
+            ]
+
+            resp = self.client.post(
+                self.get_url(),
+                data=json.dumps(post_data),
+                content_type='application/json',
+            )
+
+            expected_data = [
+                {
+                    'user_id': self.student.id,
+                    'usage_id': text_type(self.subsections[self.chapter_1.location][0].location),
+                    'success': True,
+                    'reason': None,
+                },
+                {
+                    'user_id': self.student.id,
+                    'usage_id': text_type(self.subsections[self.chapter_1.location][1].location),
+                    'success': True,
+                    'reason': None,
+                },
+            ]
+            self.assertEqual(status.HTTP_202_ACCEPTED, resp.status_code)
+            self.assertEqual(expected_data, json.loads(resp.data))
+
+            second_post_data = [
+                {
+                    'user_id': self.student.id,
+                    'usage_id': text_type(self.subsections[self.chapter_1.location][1].location),
+                    'grade': {
+                        'earned_all_override': 3,
+                        'possible_all_override': 4,
+                        'earned_graded_override': 3,
+                        'possible_graded_override': 4,
+                    },
+                },
+            ]
+
+            self.client.post(
+                self.get_url(),
+                data=json.dumps(second_post_data),
+                content_type='application/json',
+            )
+
+            GradeFields = namedtuple('GradeFields', ['earned_all', 'possible_all', 'earned_graded', 'possible_graded'])
+
+            # We should now have PersistentSubsectionGradeOverride records corresponding to
+            # our bulk-update request, and PersistentSubsectionGrade records with grade values
+            # equal to those of the override.
+            for usage_key, expected_grades in (
+                (self.subsections[self.chapter_1.location][0].location, GradeFields(3, 3, 2, 2)),
+                (self.subsections[self.chapter_1.location][1].location, GradeFields(3, 4, 3, 4)),
+            ):
+                # this selects related PersistentSubsectionGradeOverride objects.
+                grade = PersistentSubsectionGrade.read_grade(
+                    user_id=self.student.id,
+                    usage_key=usage_key,
+                )
+                for field_name in expected_grades._fields:
+                    expected_value = getattr(expected_grades, field_name)
+                    self.assertEqual(expected_value, getattr(grade, field_name))
+                    self.assertEqual(expected_value, getattr(grade.override, field_name + '_override'))

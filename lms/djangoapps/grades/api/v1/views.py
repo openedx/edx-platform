@@ -1,6 +1,7 @@
 """ API v0 views. """
+import json
 import logging
-from collections import defaultdict
+from collections import defaultdict, namedtuple
 from contextlib import contextmanager
 from functools import wraps
 
@@ -17,12 +18,16 @@ from courseware.courses import get_course_with_access
 from edx_rest_framework_extensions import permissions
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
-from enrollment import data as enrollment_data
 from lms.djangoapps.grades.api.serializers import StudentGradebookEntrySerializer
 from lms.djangoapps.grades.config.waffle import waffle_flags, WRITABLE_GRADEBOOK
+from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
+from lms.djangoapps.grades.course_data import CourseData
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.grades.models import PersistentSubsectionGrade, PersistentSubsectionGradeOverride
+from lms.djangoapps.grades.signals import signals
+from lms.djangoapps.grades.subsection_grade import CreateSubsectionGrade
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
@@ -106,13 +111,15 @@ class GradeViewMixin(DeveloperErrorViewMixin):
     """
     Mixin class for Grades related views.
     """
-    def _get_single_user(self, request, course_key):
+    def _get_single_user(self, request, course_key, user_id=None):
         """
-        Returns a single USER_MODEL object corresponding to the request's `username` parameter,
-        or the current `request.user` if no `username` was provided.
+        Returns a single USER_MODEL object corresponding to either the user_id provided, or if no id is provided,
+        then the request's `username` parameter, or the current `request.user` if no `username` was provided.
+
         Args:
             request (Request): django request object to check for username or request.user object
             course_key (CourseLocator): The course to retrieve user grades for.
+            user_id (int): Optional user id to fetch the user object for.
 
         Returns:
             A USER_MODEL object.
@@ -121,15 +128,15 @@ class GradeViewMixin(DeveloperErrorViewMixin):
             USER_MODEL.DoesNotExist if no such user exists.
             CourseEnrollment.DoesNotExist if the user is not enrolled in the given course.
         """
-        if 'username' in request.GET:
-            username = request.GET.get('username')
+        if user_id:
+            # May raise USER_MODEL.DoesNotExist if no user with this id exists
+            grade_user = USER_MODEL.objects.get(id=user_id)
         else:
-            username = request.user.username
+            username = request.GET.get('username') or request.user.username
+            grade_user = USER_MODEL.objects.get(username=username)
 
-        grade_user = USER_MODEL.objects.get(username=username)
-
-        if not enrollment_data.get_course_enrollment(username, text_type(course_key)):
-            raise CourseEnrollment.DoesNotExist
+        # May raise CourseEnrollment.DoesNotExist if no enrollment exists for this user/course.
+        _ = CourseEnrollment.objects.get(user=grade_user, course_id=course_key)
 
         return grade_user
 
@@ -333,7 +340,7 @@ class CourseGradesView(GradeViewMixin, GenericAPIView):
 
         if username:
             # If there is a username passed, get grade for a single user
-            with self._get_user_or_raise(request, course_id) as grade_user:
+            with self._get_user_or_raise(request, course_key) as grade_user:
                 return self._get_single_user_grade(grade_user, course_key)
         else:
             # If no username passed, get paginated list of grades for all users in course
@@ -559,7 +566,7 @@ class GradebookView(GradeViewMixin, GenericAPIView):
         course = get_course_with_access(request.user, 'staff', course_key, depth=None)
 
         if username:
-            with self._get_user_or_raise(request, course_id) as grade_user:
+            with self._get_user_or_raise(request, course_key) as grade_user:
                 course_grade = CourseGradeFactory().read(grade_user, course)
 
             entry = self._gradebook_entry(grade_user, course, course_grade)
@@ -573,3 +580,205 @@ class GradebookView(GradeViewMixin, GenericAPIView):
                     entries.append(self._gradebook_entry(user, course, course_grade))
             serializer = StudentGradebookEntrySerializer(entries, many=True)
             return self.get_paginated_response(serializer.data)
+
+
+GradebookUpdateResponseItem = namedtuple('GradebookUpdateResponseItem', ['user_id', 'usage_id', 'success', 'reason'])
+
+
+class GradebookBulkUpdateView(GradeViewMixin, GenericAPIView):
+    """
+    **Use Case**
+        Creates `PersistentSubsectionGradeOverride` objects for multiple (user_id, usage_id)
+        pairs in a given course, and invokes a Django signal to update subsection grades in
+        an asynchronous celery task.
+
+    **Example Request**
+        POST /api/grades/v1/gradebook/{course_id}/bulk-update
+
+    **POST Parameters**
+        This endpoint does not accept any URL parameters.
+
+    **Example POST Data**
+        [
+          {
+            "user_id": 9,
+            "usage_id": "block-v1:edX+DemoX+Demo_Course+type@sequential+block@basic_questions",
+            "grade": {
+              "earned_all_override": 11,
+              "possible_all_override": 11,
+              "earned_graded_override": 11,
+              "possible_graded_override": 11
+            }
+          },
+          {
+            "user_id": 9,
+            "usage_id": "block-v1:edX+DemoX+Demo_Course+type@sequential+block@advanced_questions",
+            "grade": {
+              "earned_all_override": 10,
+              "possible_all_override": 15,
+              "earned_graded_override": 9,
+              "possible_graded_override": 12
+            }
+          }
+        ]
+
+    **POST Response Values**
+        An HTTP 202 may be returned if a grade override was created for each of the requested (user_id, usage_id)
+        pairs in the request data.
+        An HTTP 403 may be returned if the `writable_gradebook` feature is not
+        enabled for this course.
+        An HTTP 404 may be returned for the following reasons:
+            * The requested course_key is invalid.
+            * No course corresponding to the requested key exists.
+            * The requesting user is not enrolled in the requested course.
+        An HTTP 422 may be returned if any of the requested (user_id, usage_id) pairs
+        did not have a grade override created due to some exception.  A `reason` detailing the exception
+        is provided with each response item.
+
+    **Example successful POST Response**
+        [
+          {
+            "user_id": 9,
+            "usage_id": "some-requested-usage-id",
+            "success": true,
+            "reason": null
+          },
+          {
+            "user_id": 9,
+            "usage_id": "an-invalid-usage-id",
+            "success": false,
+            "reason": "<class 'opaque_keys.edx.locator.BlockUsageLocator'>: not-a-valid-usage-key"
+          },
+          {
+            "user_id": 9,
+            "usage_id": "a-valid-usage-key-that-doesn't-exist",
+            "success": false,
+            "reason": "a-valid-usage-key-that-doesn't-exist does not exist in this course"
+          },
+          {
+            "user_id": 1234-I-DO-NOT-EXIST,
+            "usage_id": "a-valid-usage-key",
+            "success": false,
+            "reason": "User matching query does not exist."
+          }
+        ]
+    """
+    authentication_classes = (
+        JwtAuthentication,
+        OAuth2AuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+
+    permission_classes = (permissions.JWT_RESTRICTED_APPLICATION_OR_USER_ACCESS,)
+
+    required_scopes = ['grades:write']
+
+    @verify_course_exists
+    @verify_writable_gradebook_enabled
+    def post(self, request, course_id):
+        """
+        Creates or updates `PersistentSubsectionGradeOverrides` for the (user_id, usage_key)
+        specified in the request data.  The `SUBSECTION_OVERRIDE_CHANGED` signal is invoked
+        after the grade override is created, which triggers a celery task to update the
+        course and subsection grades for the specified user.
+        """
+        course_key = get_course_key(request, course_id)
+        course = get_course_with_access(request.user, 'staff', course_key, depth=None)
+
+        result = []
+
+        for user_data in request.data:
+            requested_user_id = user_data['user_id']
+            requested_usage_id = user_data['usage_id']
+            try:
+                user = self._get_single_user(request, course_key, requested_user_id)
+                usage_key = UsageKey.from_string(requested_usage_id)
+            except (USER_MODEL.DoesNotExist, InvalidKeyError, CourseEnrollment.DoesNotExist) as exc:
+                result.append(GradebookUpdateResponseItem(
+                    user_id=requested_user_id,
+                    usage_id=requested_usage_id,
+                    success=False,
+                    reason=text_type(exc)
+                ))
+                continue
+
+            try:
+                subsection_grade_model = PersistentSubsectionGrade.objects.get(
+                    user_id=user.id,
+                    course_id=course_key,
+                    usage_key=usage_key
+                )
+            except PersistentSubsectionGrade.DoesNotExist:
+                subsection = course.get_child(usage_key)
+                if subsection:
+                    subsection_grade_model = self._create_subsection_grade(user, course, subsection)
+                else:
+                    result.append(GradebookUpdateResponseItem(
+                        user_id=requested_user_id,
+                        usage_id=requested_usage_id,
+                        success=False,
+                        reason='usage_key {} does not exist in this course.'.format(usage_key)
+                    ))
+                    continue
+
+            if subsection_grade_model:
+                self._create_override(subsection_grade_model, **user_data['grade'])
+                result.append(GradebookUpdateResponseItem(
+                    user_id=user.id,
+                    usage_id=text_type(usage_key),
+                    success=True,
+                    reason=None
+                ))
+
+        status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+        if all((item.success for item in result)):
+            status_code = status.HTTP_202_ACCEPTED
+
+        return Response(
+            json.dumps([item._asdict() for item in result]),
+            status=status_code,
+            content_type='application/json'
+        )
+
+    def _create_subsection_grade(self, user, course, subsection):
+        course_data = CourseData(user, course=course)
+        subsection_grade = CreateSubsectionGrade(subsection, course_data.structure, {}, {})
+        return subsection_grade.update_or_create_model(user, force_update_subsections=True)
+
+    def _create_override(self, subsection_grade_model, **override_data):
+        """
+        Helper method to create a `PersistentSubsectionGradeOverride` object
+        and send a `SUBSECTION_OVERRIDE_CHANGED` signal.
+        """
+        override, _ = PersistentSubsectionGradeOverride.objects.update_or_create(
+            grade=subsection_grade_model,
+            defaults=self._clean_override_data(override_data),
+        )
+        signals.SUBSECTION_OVERRIDE_CHANGED.send(
+            sender=None,
+            user_id=subsection_grade_model.user_id,
+            course_id=text_type(subsection_grade_model.course_id),
+            usage_id=text_type(subsection_grade_model.usage_key),
+            only_if_higher=False,
+            modified=override.modified,
+            score_deleted=False,
+            score_db_table=ScoreDatabaseTableEnum.overrides,
+            force_update_subsections=True,
+        )
+
+    def _clean_override_data(self, override_data):
+        """
+        Helper method to strip any grade override field names that won't work
+        as defaults when calling PersistentSubsectionGradeOverride.update_or_create().
+        """
+        allowed_fields = {
+            'earned_all_override',
+            'possible_all_override',
+            'earned_graded_override',
+            'possible_graded_override',
+        }
+        stripped_data = {}
+        for field in override_data.keys():
+            if field in allowed_fields:
+                stripped_data[field] = override_data[field]
+        return stripped_data

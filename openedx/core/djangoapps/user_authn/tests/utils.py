@@ -4,6 +4,7 @@ from enum import Enum
 from itertools import product
 
 import ddt
+import pytz
 from mock import patch
 from django.conf import settings
 from oauth2_provider import models as dot_models
@@ -35,6 +36,13 @@ def setup_login_oauth_client():
         redirect_uri='',
         client_id=settings.JWT_AUTH['JWT_LOGIN_CLIENT_ID'],
     )
+
+
+def utcnow():
+    """
+    Helper function to return the current UTC time localized to the UTC timezone.
+    """
+    return datetime.now(pytz.UTC)
 
 
 @ddt.ddt
@@ -102,7 +110,7 @@ class AuthAndScopesTestMixin(object):
         return dot_models.AccessToken.objects.create(
             user=user,
             application=dot_app,
-            expires=datetime.utcnow() + timedelta(weeks=1),
+            expires=utcnow() + timedelta(weeks=1),
             scope='read write',
             token='test_token',
         )
@@ -244,7 +252,7 @@ class AuthAndScopesTestMixin(object):
 
     def test_expired_oauth_token(self):
         token = self._create_oauth_token(self.student)
-        token.expires = datetime.utcnow() - timedelta(weeks=1)
+        token.expires = utcnow() - timedelta(weeks=1)
         token.save()
         resp = self.get_response(AuthType.oauth, token=token)
         self.assertEqual(resp.status_code, status.HTTP_401_UNAUTHORIZED)
