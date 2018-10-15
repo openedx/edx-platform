@@ -18,11 +18,16 @@ from student.models import User, UserProfile, Registration, email_exists_or_reti
 from student import forms as student_forms
 from student import views as student_views
 from util.model_utils import emit_setting_changed_event
-from util.password_policy_validators import validate_password
+from util.password_policy_validators import validate_password, normalize_password
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import errors, accounts, forms, helpers
-from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
+from openedx.core.djangoapps.user_api.config.waffle import (
+    PASSWORD_UNICODE_NORMALIZE_FLAG,
+    PREVENT_AUTH_USER_WRITES,
+    SYSTEM_MAINTENANCE_MSG,
+    waffle,
+)
 from openedx.core.djangoapps.user_api.errors import (
     AccountUpdateError,
     AccountValidationError,
@@ -331,6 +336,8 @@ def create_account(username, password, email):
 
     # Create the user account, setting them to "inactive" until they activate their account.
     user = User(username=username, email=email, is_active=False)
+    if PASSWORD_UNICODE_NORMALIZE_FLAG.is_enabled():
+        password = normalize_password(password)
     user.set_password(password)
 
     try:
