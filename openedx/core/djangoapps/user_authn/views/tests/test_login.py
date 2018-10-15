@@ -23,11 +23,7 @@ from openedx.core.djangoapps.password_policy.compliance import (
     NonCompliantPasswordException,
     NonCompliantPasswordWarning
 )
-from openedx.core.djangoapps.user_api.config.waffle import (
-    PASSWORD_UNICODE_NORMALIZE_FLAG,
-    PREVENT_AUTH_USER_WRITES,
-    waffle
-)
+from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, waffle
 from openedx.core.djangoapps.user_authn.cookies import jwt_cookies
 from openedx.core.djangoapps.user_authn.tests.utils import setup_login_oauth_client
 from openedx.core.djangoapps.user_authn.waffle import JWT_COOKIES_FLAG
@@ -491,31 +487,23 @@ class LoginTest(CacheIsolationTestCase):
         self.assertTrue(response_content.get('success'))
 
     @ddt.data(
-        ('test_password', 'test_password', True, True),
+        ('test_password', 'test_password', True),
         (unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'),
-         unicodedata.normalize('NFKC', u'Ṗŕệṿïệẅ Ṯệẍt'), False, True),
+         unicodedata.normalize('NFKC', u'Ṗŕệṿïệẅ Ṯệẍt'), False),
         (unicodedata.normalize('NFKC', u'Ṗŕệṿïệẅ Ṯệẍt'),
-         unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'), True, True),
+         unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'), True),
         (unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'),
-         unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'), False, True),
-        ('test_password', 'test_password', True, False),
-        (unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'),
-         unicodedata.normalize('NFKC', u'Ṗŕệṿïệẅ Ṯệẍt'), False, False),
-        (unicodedata.normalize('NFKC', u'Ṗŕệṿïệẅ Ṯệẍt'),
-         unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'), False, False),
-        (unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'),
-         unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'), True, False),
+         unicodedata.normalize('NFKD', u'Ṗŕệṿïệẅ Ṯệẍt'), False),
     )
     @ddt.unpack
-    def test_password_unicode_normalization_login(self, password, password_entered, login_success, waffle_flag):
+    def test_password_unicode_normalization_login(self, password, password_entered, login_success):
         """
         Tests unicode normalization on user's passwords on login.
         """
-        with PASSWORD_UNICODE_NORMALIZE_FLAG.override(active=waffle_flag):
-            self.user.set_password(password)
-            self.user.save()
-            response, _ = self._login_response(self.user.email, password_entered)
-            self._assert_response(response, success=login_success)
+        self.user.set_password(password)
+        self.user.save()
+        response, _ = self._login_response(self.user.email, password_entered)
+        self._assert_response(response, success=login_success)
 
     def _login_response(self, email, password, patched_audit_log=None, extra_post_params=None):
         """

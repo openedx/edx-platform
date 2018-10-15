@@ -57,9 +57,7 @@ from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.theming.helpers import get_current_site
-from openedx.core.djangoapps.user_api.config.waffle import (
-    PASSWORD_UNICODE_NORMALIZE_FLAG, PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
-)
+from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangoapps.user_api.errors import UserNotFound, UserAPIInternalError
 from openedx.core.djangoapps.user_api.models import UserRetirementRequest
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
@@ -829,16 +827,15 @@ def password_reset_confirm_wrapper(request, uidb36=None, token=None):
         )
 
     if request.method == 'POST':
-        if PASSWORD_UNICODE_NORMALIZE_FLAG.is_enabled():
-            # We have to make a copy of request.POST because it is a QueryDict object which is immutable until copied.
-            # We have to use request.POST because the password_reset_confirm method takes in the request and a user's
-            # password is set to the request.POST['new_password1'] field. We have to also normalize the new_password2
-            # field so it passes the equivalence check that new_password1 == new_password2
-            # In order to switch out of having to do this copy, we would want to move the normalize_password code into
-            # a custom User model's set_password method to ensure it is always happening upon calling set_password.
-            request.POST = request.POST.copy()
-            request.POST['new_password1'] = normalize_password(request.POST['new_password1'])
-            request.POST['new_password2'] = normalize_password(request.POST['new_password2'])
+        # We have to make a copy of request.POST because it is a QueryDict object which is immutable until copied.
+        # We have to use request.POST because the password_reset_confirm method takes in the request and a user's
+        # password is set to the request.POST['new_password1'] field. We have to also normalize the new_password2
+        # field so it passes the equivalence check that new_password1 == new_password2
+        # In order to switch out of having to do this copy, we would want to move the normalize_password code into
+        # a custom User model's set_password method to ensure it is always happening upon calling set_password.
+        request.POST = request.POST.copy()
+        request.POST['new_password1'] = normalize_password(request.POST['new_password1'])
+        request.POST['new_password2'] = normalize_password(request.POST['new_password2'])
 
         password = request.POST['new_password1']
 

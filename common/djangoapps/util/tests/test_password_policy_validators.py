@@ -9,15 +9,13 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.test.utils import override_settings
 
-from openedx.core.djangoapps.user_api.config.waffle import PASSWORD_UNICODE_NORMALIZE_FLAG
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from util.password_policy_validators import (
     create_validator_config, validate_password, password_validators_instruction_texts,
 )
 
 
 @ddt
-class PasswordPolicyValidatorsTestCase(CacheIsolationTestCase):
+class PasswordPolicyValidatorsTestCase(unittest.TestCase):
     """
     Tests for password validator utility functions
 
@@ -66,14 +64,11 @@ class PasswordPolicyValidatorsTestCase(CacheIsolationTestCase):
         # s ̣ ̇ (s with combining dot below and combining dot above)
         not_normalized_password = u'\u0073\u0323\u0307'
         self.assertEqual(len(not_normalized_password), 3)
-        # When the flag is not set, the validation should succeed since len > 2
-        self.validation_errors_checker(not_normalized_password, None)
 
         # When we normalize we expect the not_normalized password to fail
         # because it should be normalized to u'\u1E69' -> ṩ
-        with PASSWORD_UNICODE_NORMALIZE_FLAG.override(active=True):
-            self.validation_errors_checker(not_normalized_password,
-                                           'This password is too short. It must contain at least 2 characters.')
+        self.validation_errors_checker(not_normalized_password,
+                                       'This password is too short. It must contain at least 2 characters.')
 
     @data(
         ([create_validator_config('util.password_policy_validators.MinimumLengthValidator', {'min_length': 2})],

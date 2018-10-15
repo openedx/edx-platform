@@ -759,11 +759,11 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
 
     def test_first_party_auth_trumps_third_party_auth_and_fails_when_credentials_bad(self):
         self.assert_first_party_auth_trumps_third_party_auth(
-            email='user@example.com', password='password', success=False)
+            email='user@example.com', password=u'password', success=False)
 
     def test_first_party_auth_trumps_third_party_auth_and_succeeds_when_credentials_good(self):
         self.assert_first_party_auth_trumps_third_party_auth(
-            email='user@example.com', password='password', success=True)
+            email='user@example.com', password=u'password', success=True)
 
     def test_full_pipeline_succeeds_registering_new_account(self):
         # First, create, the request and strategy that store pipeline state.
