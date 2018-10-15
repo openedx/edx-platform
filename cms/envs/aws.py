@@ -152,11 +152,7 @@ ENTERPRISE_CONSENT_API_URL = ENV_TOKENS.get('ENTERPRISE_CONSENT_API_URL', LMS_IN
 
 SITE_NAME = ENV_TOKENS['SITE_NAME']
 
-ALLOWED_HOSTS = [
-    # TODO: bbeggs remove this before prod, temp fix to get load testing running
-    "*",
-    ENV_TOKENS.get('CMS_BASE')
-]
+ALLOWED_HOSTS = ENV_TOKENS.get('CMS_ALLOWED_HOSTS')
 
 LOG_DIR = ENV_TOKENS['LOG_DIR']
 DATA_DIR = path(ENV_TOKENS.get('DATA_DIR', DATA_DIR))
