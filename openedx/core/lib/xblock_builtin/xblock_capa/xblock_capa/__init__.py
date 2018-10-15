@@ -26,7 +26,7 @@ from xblockutils.studio_editable import StudioEditableXBlockMixin
 import static_replace
 from capa import responsetypes
 from capa.xqueue_interface import XQueueInterface
-from openedx.core.lib.xblock_builtin import get_js_dependencies
+from openedx.core.lib.xblock_builtin import get_css_dependencies, get_js_dependencies
 from student.models import anonymous_id_for_user
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError, ProcessingError
@@ -194,6 +194,13 @@ class CapaXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixin, XmlPa
         return self.student_view(context)
 
     @staticmethod
+    def css_dependencies():
+        """
+        Returns list of CSS files that this XBlock depends on.
+        """
+        return get_css_dependencies('style-capa')
+
+    @staticmethod
     def js_dependencies():
         """
         Returns list of JS files that this XBlock depends on.
@@ -204,6 +211,9 @@ class CapaXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixin, XmlPa
         """
         Adds URLs for static resources that this XBlock depends on to `fragment`.
         """
+        for css_file in self.css_dependencies():
+            fragment.add_css_url(staticfiles_storage.url(css_file))
+
         # Body dependencies
         for js_file in self.js_dependencies():
             fragment.add_javascript_url(staticfiles_storage.url(js_file))

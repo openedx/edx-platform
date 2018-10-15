@@ -124,7 +124,7 @@ class ConditionalModule(ConditionalFields, XModule, StudioEditableModule):
     }
 
     js_module_name = "Conditional"
-    css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
+    css = {'scss': [resource_string(__name__, 'js/common_static/common/scss/capa.scss')]}
 
     # Map
     # key: <tag attribute in xml>
