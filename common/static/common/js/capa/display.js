@@ -1326,7 +1326,7 @@
     }).call(this);
 }).call(this);
 
-function CapaProblemXBlock(runtime, element) {
+function CapaXBlock(runtime, element) {
     'use strict';
     var xblock = new Problem(element);
 }

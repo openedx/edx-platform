@@ -44,7 +44,7 @@ loader = ResourceLoader(__name__)  # pylint: disable=invalid-name
 @XBlock.wants('user')
 @XBlock.needs('i18n')
 @XBlock.needs('request')
-class CapaProblemsXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixin, XmlParserMixin):
+class CapaXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixin, XmlParserMixin):
     """
     An XBlock implementing LonCapa format problems, by way of
     capa.capa_problem.LoncapaProblem
@@ -172,18 +172,18 @@ class CapaProblemsXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixi
 
         Makes no use of the context parameter
         """
-        log.debug("CapaProblemsXBlock.student_view")
+        log.debug("CapaXBlock.student_view")
         fragment = Fragment()
         self.add_resource_urls(fragment)
         fragment.add_content(self.get_html())
-        fragment.initialize_js('CapaProblemXBlock')
+        fragment.initialize_js('CapaXBlock')
         return fragment
 
     def author_view(self, context=None):
         """
         Renders the Studio preview view.
         """
-        log.debug("CapaProblemsXBlock.author_view")
+        log.debug("CapaXBlock.author_view")
         if context is None:
             context = {}
         context.update({
@@ -257,7 +257,7 @@ class CapaProblemsXBlock(XBlock, CapaFields, CapaMixin, StudioEditableXBlockMixi
           <other request-specific values here > }
         """
         # TODO: split these handlers into separate XBlock.handlers?
-        log.debug("CapaProblemsXBlock.handle_ajax")
+        log.debug("CapaXBlock.handle_ajax")
         handlers = {
             'hint_button': self.hint_button,
             'problem_get': self.get_problem,

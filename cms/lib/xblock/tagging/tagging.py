@@ -43,8 +43,8 @@ class StructuredTagsAside(XBlockAside):
         Display the tag selector with specific categories and allowed values,
         depending on the context.
         """
-        from openedx.core.lib.xblock_builtin.xblock_capa_problems.xblock_capa_problems import CapaProblemsXBlock
-        if isinstance(block, CapaProblemsXBlock):
+        from openedx.core.lib.xblock_builtin.xblock_capa.xblock_capa import CapaXBlock
+        if isinstance(block, CapaXBlock):
             tags = []
             for tag in self.get_available_tags():
                 tag_available_values = tag.get_values()

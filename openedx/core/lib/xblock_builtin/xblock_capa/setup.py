@@ -20,7 +20,7 @@ def package_data(pkg, root_list):
 
 
 setup(
-    name='xblock-capa-problems',
+    name='xblock-capa',
     version='0.1',
     description='XBlock - CAPA Problems',
     install_requires=[
@@ -28,9 +28,9 @@ setup(
     ],
     entry_points={
         'xblock.v1': [
-            'problem = xblock_capa_problems:CapaProblemsXBlock',
+            'problem = xblock_capa:CapaXBlock',
         ]
     },
     packages=find_packages(exclude=['tests.*']),
-    package_data=package_data("xblock_capa_problems", ["static"]),
+    package_data=package_data("xblock_capa", ["static"]),
 )
