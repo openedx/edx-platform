@@ -33,7 +33,7 @@ def connect_to_mongodb(
         # No 'replicaSet' in kwargs - so no secondary reads.
         mongo_client_class = pymongo.MongoClient
 
-    read_preference = kwargs['read_preference']
+    read_preference = kwargs.get('read_preference')
 
     if read_preference == 'PRIMARY':
         kwargs['read_preference'] = 'primary'

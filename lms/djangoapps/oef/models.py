@@ -61,7 +61,7 @@ class OrganizationOefScore(TimeStampedModel):
     external_relations_score = models.PositiveIntegerField(null=True, blank=True)
     systems_score = models.PositiveIntegerField(null=True, blank=True)
 
-    
+
 class Instruction(TimeStampedModel):
     question_index = models.IntegerField()
     question = models.TextField()
