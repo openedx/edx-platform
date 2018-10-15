@@ -36,14 +36,17 @@ def log_action_response(user, status_code, response_body):
                  user.username)
 
 
+
 @receiver(post_save, sender=CourseEnrollment)
 def sync_enrolments_to_mailchimp(sender, instance, created, **kwargs):
-    send_user_enrollments_to_mailchimp(sender, instance, created, kwargs)
+    data = {"user_id": instance.user.id}
+    send_user_enrollments_to_mailchimp.delay(data)
 
 
 @receiver(COURSE_CERT_AWARDED, sender=GeneratedCertificate)
 def handle_course_cert_awarded(sender, user, course_key, **kwargs):  # pylint: disable=unused-argument
-    send_user_course_completions_to_mailchimp(sender, user, course_key, kwargs)
+    data = {"user_id": user.id}
+    send_user_course_completions_to_mailchimp.delay(data)
 
 
 @receiver(post_save, sender=UserProfile)
@@ -102,10 +105,11 @@ def sync_organization_info_with_nodebb(sender, instance, created, **kwargs):  # 
         username=user.username, profile_data=data_to_sync)
 
 
+
 @receiver(post_save, sender=User, dispatch_uid='update_user_profile_on_nodebb')
 def update_user_profile_on_nodebb(sender, instance, created, **kwargs):
     """
-    Create/update user account at nodeBB when user created/updated at edx Platform
+        Create user account at nodeBB when user created at edx Platform
     """
     send_user_info_to_mailchimp(sender, instance, created, kwargs)
 
@@ -133,6 +137,7 @@ def update_user_profile_on_nodebb(sender, instance, created, **kwargs):
 
         task_update_user_profile_on_nodebb.delay(
             username=instance.username, profile_data=data_to_sync)
+
 
 
 @receiver(post_delete, sender=User)
@@ -196,6 +201,7 @@ def join_group_on_nodebb(sender, event=None, user=None, **kwargs):  # pylint: di
 
         task_join_group_on_nodebb.delay(
             group_name=community_name, username=username)
+
 
 
 @receiver(post_save, sender=CourseTeam, dispatch_uid="nodebb.signals.handlers.create_update_groupchat_on_nodebb")

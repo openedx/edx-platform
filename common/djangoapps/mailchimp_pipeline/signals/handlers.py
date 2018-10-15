@@ -1,3 +1,4 @@
+
 """
 Handlers and signals for Mailchimp pipeline
 """
@@ -5,6 +6,7 @@ from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+from django.contrib.auth.models import User
 from common.lib.mandrill_client.client import MandrillClient
 from lms.djangoapps.certificates import api as certificate_api
 from lms.djangoapps.onboarding.models import (
@@ -15,6 +17,8 @@ from mailchimp_pipeline.helpers import get_org_data_for_mandrill, get_user_activ
 from mailchimp_pipeline.tasks import update_org_details_at_mailchimp
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import (UserProfile, CourseEnrollment, )
+from celery.task import task  # pylint: disable=no-name-in-module, import-error
+
 
 from logging import getLogger
 log = getLogger(__name__)
@@ -106,18 +110,44 @@ def send_user_info_to_mailchimp(sender, user, created, kwargs):
     update_mailchimp(user.email, user_json)
 
 
-def send_user_enrollments_to_mailchimp(sender, instance, created, kwargs):
+@task()
+def task_send_account_activation_email(data):
+
+    context = {
+        'first_name': data['first_name'],
+        'activation_link': data['activation_link'],
+    }
+
+    MandrillClient().send_mail(MandrillClient.USER_ACCOUNT_ACTIVATION_TEMPLATE, data['user_email'], context)
+
+
+@task()
+def task_send_user_info_to_mailchimp(data):
+    """ Create user account at nodeBB when user created at edx Platform """
+
+    user = User.objects.get(id=data['user_id'])
+    created = data["created"]
+
+    send_user_info_to_mailchimp(None, user, created, {})
+
+
+@task()
+def send_user_enrollments_to_mailchimp(data):
+    user = User.objects.get(id=data['user_id'])
     user_json = {
         "merge_fields": {
-            "ENROLLS": get_user_active_enrollements(instance.user.username),
-            "ENROLL_IDS": get_enrollements_course_short_ids(instance.user.username)
+            "ENROLLS": get_user_active_enrollements(user.username),
+            "ENROLL_IDS": get_enrollements_course_short_ids(user.username)
         }
     }
 
     update_mailchimp(instance.user.email, user_json)
 
 
-def send_user_course_completions_to_mailchimp(sender, user, course_key, kwargs):
+@task()
+def send_user_course_completions_to_mailchimp(data):
+
+    user = User.objects.get(id=data['user_id'])
     all_certs = []
     try:
         all_certs = certificate_api.get_certificates_for_user(user.username)

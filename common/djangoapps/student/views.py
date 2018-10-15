@@ -9,6 +9,7 @@ import warnings
 from collections import defaultdict
 from urlparse import urljoin, urlsplit, parse_qs, urlunsplit
 
+from celery.task import task
 from django.views.generic import TemplateView
 from pytz import UTC
 from requests import HTTPError
@@ -1937,6 +1938,7 @@ def create_account_with_params(request, params):
     return new_user
 
 
+@task()
 def _enroll_user_in_pending_courses(student):
     """
     Enroll student in any pending courses he/she may have.
