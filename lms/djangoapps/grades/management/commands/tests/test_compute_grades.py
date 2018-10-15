@@ -15,7 +15,7 @@ from mock import ANY, patch
 from lms.djangoapps.grades.config.models import ComputeGradesSetting
 from lms.djangoapps.grades.management.commands import compute_grades
 from student.models import CourseEnrollment
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
@@ -27,7 +27,7 @@ def _sorted_by_batch(calls):
 
 
 @ddt.ddt
-class TestComputeGrades(SharedModuleStoreTestCase):
+class TestComputeGrades(ModuleStoreTestCase):
     """
     Tests compute_grades management command.
     """
