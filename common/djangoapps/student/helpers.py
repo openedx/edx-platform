@@ -15,7 +15,6 @@ from django.core.validators import ValidationError
 from django.contrib.auth import load_backend
 from django.contrib.auth.models import User
 from django.db import IntegrityError, transaction
-from django.utils import http
 from django.utils.translation import ugettext as _
 from pytz import UTC
 from six import iteritems, text_type
@@ -37,6 +36,7 @@ from openedx.core.djangoapps.certificates.api import certificates_viewable_for_c
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.theming.helpers import get_themes
+from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
 from student.models import (
     LinkedInAddToProfileConfiguration,
     PasswordHistory,
@@ -326,7 +326,7 @@ def _get_redirect_to(request):
     # get information about a user on edx.org. In any such case drop the parameter.
     if redirect_to:
         mime_type, _ = mimetypes.guess_type(redirect_to, strict=False)
-        if not is_safe_redirect(request, redirect_to):
+        if not is_safe_login_or_logout_redirect(request, redirect_to):
             log.warning(
                 u'Unsafe redirect parameter detected after login page: %(redirect_to)r',
                 {"redirect_to": redirect_to}
@@ -367,19 +367,6 @@ def _get_redirect_to(request):
                     break
 
     return redirect_to
-
-
-def is_safe_redirect(request, redirect_to):
-    """
-    Determine if the given redirect URL/path is safe for redirection.
-    """
-    request_host = request.get_host()  # e.g. 'courses.edx.org'
-
-    login_redirect_whitelist = set(getattr(settings, 'LOGIN_REDIRECT_WHITELIST', []))
-    login_redirect_whitelist.add(request_host)
-
-    is_safe_url = http.is_safe_url(redirect_to, allowed_hosts=login_redirect_whitelist, require_https=True)
-    return is_safe_url
 
 
 def generate_activation_email_context(user, registration):
