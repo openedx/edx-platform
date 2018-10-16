@@ -20,6 +20,7 @@ from courseware.tests.factories import StaffFactory
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.course_goals.api import add_course_goal, remove_course_goal
+from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
@@ -414,7 +415,9 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         2) Unenrolled users are shown a course message allowing them to enroll
         3) Enrolled users who show up on the course page after the course has begun
         are not shown a course message.
-        4) Enrolled users who show up on the course page before the course begins
+        4) Enrolled users who show up on the course page after the course has begun will
+        see the course expiration banner if course duration limits are on for the course.
+        5) Enrolled users who show up on the course page before the course begins
         are shown a message explaining when the course starts as well as a call to
         action button that allows them to add a calendar event.
         """
@@ -432,12 +435,27 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         self.assertContains(response, TEST_COURSE_HOME_MESSAGE_UNENROLLED)
 
         # Verify that enrolled users are not shown any state warning message when enrolled and course has begun.
-        CourseEnrollment.enroll(user, self.course.id)
+        enrollment = CourseEnrollment.enroll(user, self.course.id)
         url = course_home_url(self.course)
         response = self.client.get(url)
         self.assertNotContains(response, TEST_COURSE_HOME_MESSAGE_ANONYMOUS)
         self.assertNotContains(response, TEST_COURSE_HOME_MESSAGE_UNENROLLED)
         self.assertNotContains(response, TEST_COURSE_HOME_MESSAGE_PRE_START)
+
+        # Verify that enrolled users are shown the course expiration banner if content gating is enabled
+        with override_waffle_flag(CONTENT_TYPE_GATING_FLAG, True):
+            url = course_home_url(self.course)
+            response = self.client.get(url)
+
+            expiration_date = (now() + timedelta(weeks=4)).strftime('%b %-d')
+            upgrade_link = verified_upgrade_deadline_link(user=user, course=self.course)
+            bannerText = 'Your access to this course expires on {expiration_date}. \
+                <a href="{upgrade_link}">Upgrade now</a> for unlimited access.'.format(
+                expiration_date=expiration_date,
+                upgrade_link=upgrade_link
+            )
+
+            self.assertContains(response, bannerText, html=True)
 
         # Verify that enrolled users are shown 'days until start' message before start date
         future_course = self.create_future_course()

@@ -48,6 +48,7 @@ from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration, CertificateStatuses, CertificateWhitelist,
 )
 from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
+from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.grades.config.waffle import waffle as grades_waffle
@@ -2645,10 +2646,56 @@ class TestIndexViewWithGating(ModuleStoreTestCase, MilestonesTestCaseMixin):
                 }
             )
         )
-
         self.assertEquals(response.status_code, 200)
         self.assertIn("Content Locked", response.content)
 
+@attr(shard=5)
+class TestIndexViewWithCourseDurationLimits(ModuleStoreTestCase):
+    """
+    Test the index view for a course with course duration limits enabled.
+    """
+
+    def setUp(self):
+        """
+        Set up the initial test data.
+        """
+        super(TestIndexViewWithCourseDurationLimits, self).setUp()
+
+        self.user = UserFactory()
+        self.course = CourseFactory.create(start=datetime.now()-timedelta(weeks=1))
+        with self.store.bulk_operations(self.course.id):
+            self.chapter = ItemFactory.create(parent=self.course, category="chapter")
+            self.sequential = ItemFactory.create(parent=self.chapter, category='sequential')
+
+        CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
+
+    @override_waffle_flag(CONTENT_TYPE_GATING_FLAG, True)
+    def test_index_with_course_duration_limits(self):
+        """
+        Test that the courseware contains the course expiration banner
+        when course_duration_limits are enabled.
+        """
+        self.assertTrue(self.client.login(username=self.user.username, password='test'))
+        response = self.client.get(
+            reverse(
+                'courseware_section',
+                kwargs={
+                    'course_id': unicode(self.course.id),
+                    'chapter': self.chapter.url_name,
+                    'section': self.sequential.url_name,
+                }
+            )
+        )
+
+        expiration_date = (datetime.now() + timedelta(weeks=4)).strftime('%b %-d')
+        upgrade_link = verified_upgrade_deadline_link(user=self.user, course=self.course)
+        bannerText = 'Your access to this course expires on {expiration_date}. \
+            <a href="{upgrade_link}">Upgrade now</a> for unlimited access.'.format(
+            expiration_date=expiration_date,
+            upgrade_link=upgrade_link
+        )
+
+        self.assertContains(response, bannerText, html=True)
 
 @attr(shard=5)
 class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaffleTestMixin):
