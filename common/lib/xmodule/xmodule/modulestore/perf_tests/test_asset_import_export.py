@@ -11,7 +11,6 @@ import datetime
 import ddt
 import pytest
 
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from xmodule.assetstore import AssetMetadata
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.xml_importer import import_course_from_xml
@@ -61,7 +60,7 @@ ASSET_XSD_PATH = PLATFORM_ROOT / "common" / "lib" / "xmodule" / "xmodule" / "ass
 
 @ddt.ddt
 @unittest.skip
-class CrossStoreXMLRoundtrip(CacheIsolationTestCase):
+class CrossStoreXMLRoundtrip(unittest.TestCase):
     """
     This class exists to time XML import and export between different modulestore
     classes with different amount of asset metadata.
