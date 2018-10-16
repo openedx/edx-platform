@@ -31,6 +31,7 @@ from xmodule.modulestore.tests.utils import (
     MongoContentstoreBuilder, MODULESTORE_SETUPS, SPLIT_MODULESTORE_SETUP,
     CONTENTSTORE_SETUPS, TEST_DATA_DIR
 )
+from django.core.cache import cache
 
 COURSE_DATA_NAMES = (
     'toy',
@@ -131,26 +132,31 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest, PartitionTestCase):
                         self.ignore_asset_key('content_son')
                         self.ignore_asset_key('thumbnail_location')
 
-                        self.assertCoursesEqual(
-                            source_store,
-                            source_course_key,
-                            dest_store,
-                            dest_course_key,
-                        )
+                        assert _mock_tab_from_json.called
 
-                        self.assertAssetsEqual(
-                            source_content,
-                            source_course_key,
-                            dest_content,
-                            dest_course_key,
-                        )
+                        try:
+                            self.assertCoursesEqual(
+                                source_store,
+                                source_course_key,
+                                dest_store,
+                                dest_course_key,
+                            )
 
-                        self.assertAssetsMetadataEqual(
-                            source_store,
-                            source_course_key,
-                            dest_store,
-                            dest_course_key,
-                        )
+                            self.assertAssetsEqual(
+                                source_content,
+                                source_course_key,
+                                dest_content,
+                                dest_course_key,
+                            )
+
+                            self.assertAssetsMetadataEqual(
+                                source_store,
+                                source_course_key,
+                                dest_store,
+                                dest_course_key,
+                            )
+                        except:
+                            assert cache.__dict__ = "hey"
 
     def test_split_course_export_import(self):
         # Construct the contentstore for storing the first import
