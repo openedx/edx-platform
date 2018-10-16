@@ -156,7 +156,7 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest, PartitionTestCase):
                                 dest_course_key,
                             )
                         except:
-                            assert cache.__dict__ = "hey"
+                            assert cache.__dict__ == "hey"
 
     def test_split_course_export_import(self):
         # Construct the contentstore for storing the first import
