@@ -40,6 +40,7 @@ from courseware.access_utils import check_course_open_for_learner
 from courseware.model_data import FieldDataCache, set_score
 from courseware.module_render import get_module, handle_xblock_callback
 from courseware.tests.factories import GlobalStaffFactory, StudentModuleFactory
+from courseware.tests.helpers import get_expiration_banner_text
 from courseware.testutils import RenderXBlockTestMixin
 from courseware.url_helpers import get_redirect_url
 from courseware.user_state_client import DjangoXBlockUserStateClient
@@ -211,8 +212,8 @@ class IndexQueryTestCase(ModuleStoreTestCase):
 
     @override_waffle_flag(CONTENT_TYPE_GATING_FLAG, True)
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 10, 157),
-        (ModuleStoreEnum.Type.split, 4, 153),
+        (ModuleStoreEnum.Type.mongo, 10, 160),
+        (ModuleStoreEnum.Type.split, 4, 156),
     )
     @ddt.unpack
     def test_index_query_counts(self, store_type, expected_mongo_query_count, expected_mysql_query_count):
@@ -2645,9 +2646,69 @@ class TestIndexViewWithGating(ModuleStoreTestCase, MilestonesTestCaseMixin):
                 }
             )
         )
-
         self.assertEquals(response.status_code, 200)
         self.assertIn("Content Locked", response.content)
+
+
+@attr(shard=5)
+class TestIndexViewWithCourseDurationLimits(ModuleStoreTestCase):
+    """
+    Test the index view for a course with course duration limits enabled.
+    """
+
+    def setUp(self):
+        """
+        Set up the initial test data.
+        """
+        super(TestIndexViewWithCourseDurationLimits, self).setUp()
+
+        self.user = UserFactory()
+        self.course = CourseFactory.create(start=datetime.now() - timedelta(weeks=1))
+        with self.store.bulk_operations(self.course.id):
+            self.chapter = ItemFactory.create(parent=self.course, category="chapter")
+            self.sequential = ItemFactory.create(parent=self.chapter, category='sequential')
+
+        CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
+
+    @override_waffle_flag(CONTENT_TYPE_GATING_FLAG, True)
+    def test_index_with_course_duration_limits(self):
+        """
+        Test that the courseware contains the course expiration banner
+        when course_duration_limits are enabled.
+        """
+        self.assertTrue(self.client.login(username=self.user.username, password='test'))
+        response = self.client.get(
+            reverse(
+                'courseware_section',
+                kwargs={
+                    'course_id': unicode(self.course.id),
+                    'chapter': self.chapter.url_name,
+                    'section': self.sequential.url_name,
+                }
+            )
+        )
+        bannerText = get_expiration_banner_text(self.user, self.course)
+        self.assertContains(response, bannerText, html=True)
+
+    @override_waffle_flag(CONTENT_TYPE_GATING_FLAG, False)
+    def test_index_without_course_duration_limits(self):
+        """
+        Test that the courseware does not contain the course expiration banner
+        when course_duration_limits are disabled.
+        """
+        self.assertTrue(self.client.login(username=self.user.username, password='test'))
+        response = self.client.get(
+            reverse(
+                'courseware_section',
+                kwargs={
+                    'course_id': unicode(self.course.id),
+                    'chapter': self.chapter.url_name,
+                    'section': self.sequential.url_name,
+                }
+            )
+        )
+        bannerText = get_expiration_banner_text(self.user, self.course)
+        self.assertNotContains(response, bannerText, html=True)
 
 
 @attr(shard=5)

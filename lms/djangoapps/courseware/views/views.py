@@ -88,6 +88,7 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.features.course_duration_limits.access import register_course_expired_message
 from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, course_home_url_name
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from openedx.features.course_experience.views.course_dates import CourseDatesFragmentView
@@ -504,6 +505,7 @@ class CourseTabView(EdxFragmentView):
                 # Show warnings if the user has limited access
                 # Must come after masquerading on creation of page context
                 self.register_user_access_warning_messages(request, course_key)
+                register_course_expired_message(request, course)
 
                 set_custom_metrics_for_course_key(course_key)
                 return super(CourseTabView, self).get(request, course=course, page_context=page_context, **kwargs)
