@@ -122,9 +122,8 @@ class ConditionalModule(ConditionalFields, XModule, StudioEditableModule):
             resource_string(__name__, 'js/common_static/common/js/collapsible.js'),
         ]
     }
-
     js_module_name = "Conditional"
-    css = {'scss': [resource_string(__name__, 'js/common_static/common/scss/capa.scss')]}
+    css = {'scss': [resource_string(__name__, 'js/common_static/common/sass/capa.scss')]}
 
     # Map
     # key: <tag attribute in xml>

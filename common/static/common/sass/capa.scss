@@ -23,6 +23,26 @@
 // ====================
 $annotation-yellow: rgba(255, 255, 10, 0.3);
 $color-copy-tip: rgb(100, 100, 100);
+$success: #009b00 !default;
+$danger: #cb0712 !default;
+$warning: #ffc01f !default;
+$black: black !default;
+$white: white !default;
+$blue: #0075b4 !default;
+$gray: gray !default;
+$gray-600: $gray !default;
+$correct: $success;
+$incorrect: $danger;
+$partially-correct: $warning;
+$submitted: $blue;
+$primary: $blue !default;
+$general-color-accent: $submitted;
+
+// Copied from lms/static/sass/partials/lms/theme/variables
+$gray-d1: shade($gray, 20%) !default;
+$gray-l3: tint($gray, 60%) !default;
+$gray-l4: tint($gray, 80%) !default;
+$gray-l6: tint($gray, 95%) !default;
 
 // FontAwesome Icon code
 // ====================
@@ -30,8 +50,14 @@ $checkmark-icon: '\f00c'; // .fa-check
 $cross-icon: '\f00d'; // .fa-close
 $asterisk-icon: '\f069'; // .fa-asterisk
 
+@import 'edx-pattern-library-shims/base/variables';
+@import 'vendor/bi-app/bi-app-ltr';
+@import 'bourbon/bourbon';
+@import 'neat/neat';
 
-@import '../../../../../static/sass/edx-pattern-library-shims/base/variables';
+// Set the relative path to the static root
+$static-path: '../..';
+
 
 // +Extends - Capa
 // ====================

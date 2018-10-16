@@ -42,6 +42,7 @@ SYSTEMS = {
 COMMON_LOOKUP_PATHS = [
     path("common/static"),
     path("common/static/sass"),
+    path("lms/static/sass"),  # vendor/bi-app
     path('node_modules/@edx'),
     path('node_modules'),
     path('node_modules/edx-pattern-library/node_modules'),
@@ -146,6 +147,11 @@ def get_common_sass_directories():
     applicable_directories.append({
         "sass_source_dir": path("common/static/sass"),
         "css_destination_dir": path("common/static/css"),
+        "lookup_paths": COMMON_LOOKUP_PATHS,
+    })
+    applicable_directories.append({
+        "sass_source_dir": path("common/static/common/sass"),
+        "css_destination_dir": path("common/static/common/css"),
         "lookup_paths": COMMON_LOOKUP_PATHS,
     })
 

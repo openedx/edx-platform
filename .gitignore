@@ -100,7 +100,7 @@ lms/static/css/
 lms/static/certificates/css/
 cms/static/css/
 common/static/common/js/vendor/
-common/static/common/css/vendor/
+common/static/common/css
 common/static/bundles
 webpack-stats.json
 
