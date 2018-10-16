@@ -270,6 +270,9 @@
                         if ($input.length > 0 && !isCheckbox) {
                             handleInputBehavior($input);
                         }
+
+                        // Workaround for the chrome/firefox when they don't react on autocomplete="off" attribute.
+                        $input.find('input[type=text]').attr('readonly', 'readonly');
                     });
                     setTimeout(handleAutocomplete, 1000);
                 },
@@ -303,6 +306,9 @@
                             $label.addClass('error');
                         });
                     }
+
+                    // Workaround for the chrome/firefox when they don't react on autocomplete="off" attribute.
+                    $el.removeAttr('readonly');
                 },
 
                 renderRequiredMessage: function($el) {
