@@ -3,7 +3,6 @@ Stub implementation of an HTTP service.
 """
 
 from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
-from SocketServer import ThreadingMixIn
 import urllib
 import urlparse
 import threading
@@ -234,7 +233,7 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
         self.send_response(200)
 
 
-class StubHttpService(ThreadingMixIn, HTTPServer, object):
+class StubHttpService(HTTPServer, object):
     """
     Stub HTTP service implementation.
     """

@@ -191,13 +191,13 @@ class StubLtiHandler(StubHttpRequestHandler):
         if submit_url:
             submit_form = textwrap.dedent("""
                 <form action="{submit_url}/grade" method="post">
-                    <input type="submit" name="submit-button" value="Submit" id="submit-button">
+                    <input type="submit" name="submit-button" value="Submit">
                 </form>
                 <form action="{submit_url}/lti2_outcome" method="post">
-                    <input type="submit" name="submit-lti2-button" value="Submit" id="submit-lti2-button">
+                    <input type="submit" name="submit-lti2-button" value="Submit">
                 </form>
                 <form action="{submit_url}/lti2_delete" method="post">
-                    <input type="submit" name="submit-lti2-delete-button" value="Submit" id="submit-lti-delete-button">
+                    <input type="submit" name="submit-lti2-delete-button" value="Submit">
                 </form>
             """).format(submit_url=submit_url)
         else:

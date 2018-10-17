@@ -241,6 +241,6 @@ extensions = [
     'sphinx.ext.todo', 'sphinx.ext.coverage', 'sphinx.ext.pngmath',
     'sphinx.ext.mathjax', 'sphinx.ext.viewcode', 'sphinxcontrib.napoleon']
 
-project = 'Open edX Platform APIs: Ficus Release'
+project = 'Open edX Platform APIs'
 
 exclude_patterns = ['build', 'links.rst']
