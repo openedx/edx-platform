@@ -62,6 +62,7 @@ django-user-tasks
 django-waffle==0.12.0
 django-webpack-loader               # Used to wire webpack bundles into the django asset pipeline
 djangorestframework-jwt
+django-xforwardedfor-middleware==2.0 # Middleware to use the X-Forwarded-For header as the request IP
 dogapi==1.2.1                       # Python bindings to Datadog's API, for metrics gathering
 edx-ace==0.1.9
 edx-analytics-data-api-client
