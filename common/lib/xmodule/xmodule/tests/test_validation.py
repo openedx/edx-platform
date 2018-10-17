@@ -3,7 +3,8 @@ Test xblock/validation.py
 """
 
 import unittest
-from xblock.test.tools import assert_raises
+
+from nose.tools import assert_raises
 
 from xmodule.validation import StudioValidationMessage, StudioValidation
 from xblock.validation import Validation, ValidationMessage
