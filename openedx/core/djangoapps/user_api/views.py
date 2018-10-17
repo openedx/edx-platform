@@ -17,7 +17,7 @@ from six import text_type
 
 import accounts
 from django_comment_common.models import Role
-from edx_rest_framework_extensions.authentication import SessionAuthenticationAllowInactiveUser
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx import locator
 from opaque_keys.edx.keys import CourseKey

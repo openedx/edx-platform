@@ -10,7 +10,8 @@ from django.db import transaction
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.decorators import method_decorator
-from edx_rest_framework_extensions.authentication import JwtAuthentication, SessionAuthenticationAllowInactiveUser
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from enrollment import api
 from enrollment.errors import CourseEnrollmentError, CourseEnrollmentExistsError, CourseModeNotFoundError
 from opaque_keys import InvalidKeyError

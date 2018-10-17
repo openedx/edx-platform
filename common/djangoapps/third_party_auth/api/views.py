@@ -4,7 +4,7 @@ Third Party Auth REST API views
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.http import Http404
-from edx_rest_framework_extensions.authentication import SessionAuthenticationAllowInactiveUser
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from rest_framework import exceptions, status
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response

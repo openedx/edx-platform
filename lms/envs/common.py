@@ -3167,7 +3167,7 @@ JWT_AUTH = {
 
     'JWT_PAYLOAD_GET_USERNAME_HANDLER': lambda d: d.get('username'),
     'JWT_LEEWAY': 1,
-    'JWT_DECODE_HANDLER': 'edx_rest_framework_extensions.utils.jwt_decode_handler',
+    'JWT_DECODE_HANDLER': 'edx_rest_framework_extensions.auth.jwt.decoder.jwt_decode_handler',
 
     # Number of seconds before JWTs expire
     'JWT_EXPIRATION': 30,

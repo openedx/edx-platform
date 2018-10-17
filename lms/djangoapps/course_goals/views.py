@@ -9,7 +9,7 @@ from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.http import JsonResponse
-from edx_rest_framework_extensions.authentication import JwtAuthentication
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.lib.api.permissions import IsStaffOrOwner

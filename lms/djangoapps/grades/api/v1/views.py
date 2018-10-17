@@ -15,7 +15,8 @@ from six import text_type
 
 from courseware.courses import get_course_with_access
 from edx_rest_framework_extensions import permissions
-from edx_rest_framework_extensions.authentication import JwtAuthentication, SessionAuthenticationAllowInactiveUser
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from enrollment import data as enrollment_data
 from lms.djangoapps.grades.api.serializers import StudentGradebookEntrySerializer
 from lms.djangoapps.grades.config.waffle import waffle_flags, WRITABLE_GRADEBOOK
