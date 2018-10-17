@@ -24,9 +24,9 @@ from openedx.core.djangoapps.credit.signature import signature
 from openedx.core.djangoapps.credit.tests.factories import (
     CreditProviderFactory, CreditEligibilityFactory, CreditCourseFactory, CreditRequestFactory,
 )
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.core.lib.tests import attr
-from openedx.core.lib.token_utils import JwtBuilder
 from student.tests.factories import UserFactory, AdminFactory
 from util.date_utils import to_timestamp
 
@@ -88,9 +88,7 @@ class AuthMixin(object):
 
     def test_jwt_auth(self):
         """ verify the endpoints JWT authentication. """
-        scopes = ['email', 'profile']
-        expires_in = settings.OAUTH_ID_TOKEN_EXPIRATION
-        token = JwtBuilder(self.user).build_token(scopes, expires_in)
+        token = create_jwt_for_user(self.user)
         headers = {
             'HTTP_AUTHORIZATION': 'JWT ' + token
         }

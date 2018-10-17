@@ -18,8 +18,8 @@ from openedx.core.djangoapps.catalog.cache import (PATHWAY_CACHE_KEY_TPL, PROGRA
                                                    SITE_PATHWAY_IDS_CACHE_KEY_TPL,
                                                    SITE_PROGRAM_UUIDS_CACHE_KEY_TPL)
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.lib.edx_api_utils import get_edx_api_data
-from openedx.core.lib.token_utils import JwtBuilder
 from student.models import CourseEnrollment
 
 logger = logging.getLogger(__name__)
@@ -27,9 +27,7 @@ logger = logging.getLogger(__name__)
 
 def create_catalog_api_client(user, site=None):
     """Returns an API client which can be used to make Catalog API requests."""
-    scopes = ['email', 'profile']
-    expires_in = settings.OAUTH_ID_TOKEN_EXPIRATION
-    jwt = JwtBuilder(user).build_token(scopes, expires_in)
+    jwt = create_jwt_for_user(user)
 
     if site:
         url = site.configuration.get_value('COURSE_CATALOG_API_URL')

@@ -28,16 +28,16 @@ from enrollment import api
 from enrollment.errors import CourseEnrollmentError
 from enrollment.views import EnrollmentUserThrottle
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.embargo.models import Country, CountryAccessRule, RestrictedCourse
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
-from openedx.core.djangoapps.course_groups import cohorts
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.user_api.models import (
     RetirementState,
     UserRetirementStatus,
     UserOrgTag
 )
 from openedx.core.lib.django_test_client_utils import get_absolute_url
-from openedx.core.lib.token_utils import JwtBuilder
 from openedx.features.enterprise_support.tests import FAKE_ENTERPRISE_CUSTOMER
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
 from student.models import (
@@ -1340,7 +1340,7 @@ class UnenrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase):
         """
         Helper function for creating headers for the JWT authentication.
         """
-        token = JwtBuilder(user).build_token([])
+        token = create_jwt_for_user(user)
         headers = {'HTTP_AUTHORIZATION': 'JWT ' + token}
 
         return headers

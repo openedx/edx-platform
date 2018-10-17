@@ -44,6 +44,7 @@ from openedx.core.djangoapps.credit.models import (
     CreditRequirementStatus, CreditRequest, CreditCourse, CreditProvider, CreditRequirement
 )
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup, UnregisteredLearnerCohortAssignments
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.user_api.accounts.signals import USER_RETIRE_THIRD_PARTY_MAILINGS
 from openedx.core.djangoapps.user_api.models import (
@@ -53,7 +54,6 @@ from openedx.core.djangoapps.user_api.models import (
     UserOrgTag
 )
 from openedx.core.djangoapps.user_api.accounts.views import AccountRetirementPartnerReportView
-from openedx.core.lib.token_utils import JwtBuilder
 from student.models import (
     CourseEnrollment,
     CourseEnrollmentAllowed,
@@ -90,7 +90,7 @@ def build_jwt_headers(user):
     """
     Helper function for creating headers for the JWT authentication.
     """
-    token = JwtBuilder(user).build_token([])
+    token = create_jwt_for_user(user)
     headers = {
         'HTTP_AUTHORIZATION': 'JWT ' + token
     }
