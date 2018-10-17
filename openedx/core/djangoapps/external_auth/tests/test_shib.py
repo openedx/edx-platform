@@ -222,6 +222,8 @@ class ShibSPTest(CacheIsolationTestCase):
         linked users, activates them, and logs them in
         """
         inactive_user = UserFactory.create(email='inactive@stanford.edu')
+        if not log_user_string:
+            log_user_string = "user.id: {}".format(inactive_user.id)
         inactive_user.is_active = False
         inactive_user.save()
         request = self.request_factory.get('/shib-login')
@@ -266,7 +268,7 @@ class ShibSPTest(CacheIsolationTestCase):
         """
         Wrapper to run base_test_extauth_auto_activate_user_with_flag with {'SQUELCH_PII_IN_LOGS': True}
         """
-        self._test_auto_activate_user_with_flag(log_user_string="user.id: 1")
+        self._test_auto_activate_user_with_flag(log_user_string=None)
 
     @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     @data(*gen_all_identities())
