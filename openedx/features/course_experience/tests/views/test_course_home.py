@@ -20,6 +20,8 @@ from courseware.tests.factories import StaffFactory
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.course_goals.api import add_course_goal, remove_course_goal
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
 from openedx.features.course_experience import (
     SHOW_REVIEWS_TOOL_FLAG,
@@ -311,6 +313,34 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         start_date = strftime_localized(future_course.start, 'SHORT_DATE')
         expected_params = QueryDict(mutable=True)
         expected_params['notlive'] = start_date
+        expected_url = '{url}?{params}'.format(
+            url=reverse('dashboard'),
+            params=expected_params.urlencode()
+        )
+        self.assertRedirects(response, expected_url)
+
+    @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
+    def test_expired_course(self):
+        """
+        Ensure that a user accessing an expired course sees a redirect to
+        the student dashboard, not a 404.
+        """
+        three_years_ago = now() - timedelta(days=(365 * 3))
+        course = CourseFactory.create(start=three_years_ago)
+        user = self.create_user_for_course(course, CourseUserType.ENROLLED)
+        enrollment = CourseEnrollment.get_enrollment(user, course.id)
+        ScheduleFactory(start=three_years_ago, enrollment=enrollment)
+
+        url = course_home_url(course)
+        response = self.client.get(url)
+
+        expiration_date = strftime_localized(course.start + timedelta(weeks=8), 'SHORT_DATE')
+        expected_params = QueryDict(mutable=True)
+        course_name = CourseOverview.get_from_id(course.id).display_name_with_default
+        expected_params['expired_message'] = 'Access to {run} expired on {expiration_date}'.format(
+            run=course_name,
+            expiration_date=expiration_date
+        )
         expected_url = '{url}?{params}'.format(
             url=reverse('dashboard'),
             params=expected_params.urlencode()

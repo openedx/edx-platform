@@ -767,6 +767,8 @@ def student_dashboard(request):
         redirect_message = _("The course you are looking for is closed for enrollment as of {date}.").format(
             date=request.GET['course_closed']
         )
+    elif 'expired_message' in request.GET:
+        redirect_message = request.GET['expired_message']
     else:
         redirect_message = ''
 

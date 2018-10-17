@@ -9,9 +9,10 @@ from django.apps import apps
 from django.utils import timezone
 from django.utils.translation import ugettext as _
 
-
+from util.date_utils import DEFAULT_SHORT_DATE_FORMAT, strftime_localized
 from lms.djangoapps.courseware.access_response import AccessError
 from lms.djangoapps.courseware.access_utils import ACCESS_GRANTED
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
 
 class AuditExpiredError(AccessError):
@@ -21,9 +22,19 @@ class AuditExpiredError(AccessError):
     def __init__(self, user, course, expiration_date):
         error_code = "audit_expired"
         developer_message = "User {} had access to {} until {}".format(user, course, expiration_date)
-        # TODO: Translate the expiration_date
-        user_message = _("Course access expired on ") + expiration_date.strftime("%B %d, %Y")
-        super(AuditExpiredError, self).__init__(error_code, developer_message, user_message)
+        expiration_date = strftime_localized(expiration_date, DEFAULT_SHORT_DATE_FORMAT)
+        user_message = _("Access expired on {expiration_date}").format(expiration_date=expiration_date)
+        try:
+            course_name = CourseOverview.get_from_id(course.id).display_name_with_default
+            detailed_user_message = _("Access to {course_name} expired on {expiration_date}").format(
+                course_name=course_name,
+                expiration_date=expiration_date
+            )
+        except CourseOverview.DoesNotExist:
+            detailed_user_message = _("Access to the course you were looking for expired on {expiration_date}").format(
+                expiration_date=expiration_date
+            )
+        super(AuditExpiredError, self).__init__(error_code, developer_message, user_message, detailed_user_message)
 
 
 def get_user_course_expiration_date(user, course):
