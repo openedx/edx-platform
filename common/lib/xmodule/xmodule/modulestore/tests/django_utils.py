@@ -75,14 +75,7 @@ def mixed_store_config(data_dir, mappings, store_order=None):
 
     store = {
         'default': {
-            'NAME': 'mixed',
             'ENGINE': 'xmodule.modulestore.mixed.MixedModuleStore',
-            'DOC_STORE_CONFIG': {
-                'host': MONGO_HOST,
-                'port': MONGO_PORT_NUM,
-                'db': 'test_xmodule_{}'.format(os.getpid()),
-                'collection': 'modulestore',
-            },
             'OPTIONS': {
                 'mappings': mappings,
                 'stores': [store_constructors[store] for store in store_order],
