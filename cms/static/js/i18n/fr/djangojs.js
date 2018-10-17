@@ -442,7 +442,6 @@
     "Description of the certificate": "Description du certificat", 
     "Details": "D\u00e9tails", 
     "Dimensions": "Dimensions", 
-    "Disable Account": "D\u00e9sactiver le compte", 
     "Disc": "Disque", 
     "Discard Changes": "Supprimer les changements", 
     "Discussion": "Discussion", 
