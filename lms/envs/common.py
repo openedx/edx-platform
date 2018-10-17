@@ -1166,7 +1166,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sites.middleware.CurrentSiteMiddleware',
 
     # Allows us to define redirects via Django admin
-    'django_sites_extensions.middleware.RedirectMiddleware',
+    'openedx.core.djangoapps.appsembler.sites.middleware.CustomDomainsRedirectMiddleware',
+    'openedx.core.djangoapps.appsembler.sites.middleware.RedirectMiddleware',
 
     # Instead of SessionMiddleware, we use a more secure version
     # 'django.contrib.sessions.middleware.SessionMiddleware',

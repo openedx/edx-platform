@@ -52,5 +52,5 @@ class LmsSearchFilterGenerator(SearchFilterGenerator):
             org_filter_out_set = configuration_helpers.get_all_orgs()
             if org_filter_out_set:
                 exclude_dictionary['org'] = list(org_filter_out_set)
-
+        exclude_dictionary['catalog_visibility'] = ['none', 'about']
         return exclude_dictionary

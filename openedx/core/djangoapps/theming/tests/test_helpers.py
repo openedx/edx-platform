@@ -22,6 +22,7 @@ class TestHelpers(TestCase):
         Tests template paths are returned from enabled theme.
         """
         expected_themes = [
+            Theme('appsembler-theme', 'appsembler-theme', get_theme_base_dir('appsembler-theme')),
             Theme('test-theme', 'test-theme', get_theme_base_dir('test-theme')),
             Theme('red-theme', 'red-theme', get_theme_base_dir('red-theme')),
             Theme('edge.edx.org', 'edge.edx.org', get_theme_base_dir('edge.edx.org')),

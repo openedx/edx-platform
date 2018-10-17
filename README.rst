@@ -1,3 +1,20 @@
+Appsembler Changes
+------------------
+
+As part of separating out our custom features from the main edx-platform branch, we've created our own environment. We now have an "aws_appsembler" setting. It can be used as follows:
+
+e.g. bringing up a shell in production:
+```
+python manage.py lms --settings=aws_appsembler shell
+```
+
+we also have custom paver commands for the devstack:
+```
+paver devstack_appsembler lms
+```
+
+
+
 This is the main edX platform which consists of LMS and Studio.
 
 

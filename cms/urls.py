@@ -169,17 +169,16 @@ if settings.FEATURES.get('ENTRANCE_EXAMS'):
     )
 
 # Enable Web/HTML Certificates
-if settings.FEATURES.get('CERTIFICATES_HTML_VIEW'):
-    urlpatterns += (
-        url(r'^certificates/activation/{}/'.format(settings.COURSE_KEY_PATTERN),
-            'contentstore.views.certificates.certificate_activation_handler'),
-        url(r'^certificates/{}/(?P<certificate_id>\d+)/signatories/(?P<signatory_id>\d+)?$'.format(
-            settings.COURSE_KEY_PATTERN), 'contentstore.views.certificates.signatory_detail_handler'),
-        url(r'^certificates/{}/(?P<certificate_id>\d+)?$'.format(settings.COURSE_KEY_PATTERN),
-            'contentstore.views.certificates.certificates_detail_handler'),
-        url(r'^certificates/{}$'.format(settings.COURSE_KEY_PATTERN),
-            'contentstore.views.certificates.certificates_list_handler')
-    )
+urlpatterns += (
+    url(r'^certificates/activation/{}/'.format(settings.COURSE_KEY_PATTERN),
+        'contentstore.views.certificates.certificate_activation_handler'),
+    url(r'^certificates/{}/(?P<certificate_id>\d+)/signatories/(?P<signatory_id>\d+)?$'.format(
+        settings.COURSE_KEY_PATTERN), 'contentstore.views.certificates.signatory_detail_handler'),
+    url(r'^certificates/{}/(?P<certificate_id>\d+)?$'.format(settings.COURSE_KEY_PATTERN),
+        'contentstore.views.certificates.certificates_detail_handler'),
+    url(r'^certificates/{}$'.format(settings.COURSE_KEY_PATTERN),
+        'contentstore.views.certificates.certificates_list_handler')
+)
 
 # Maintenance Dashboard
 urlpatterns += patterns(
@@ -210,4 +209,8 @@ handler500 = 'contentstore.views.render_500'
 urlpatterns += (
     url(r'^404$', handler404),
     url(r'^500$', handler500),
+)
+
+urlpatterns += (
+    url(r'^hijack/', include('hijack.urls')),
 )

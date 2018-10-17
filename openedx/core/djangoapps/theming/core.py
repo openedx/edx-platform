@@ -2,6 +2,7 @@
 Core logic for Comprehensive Theming.
 """
 from logging import getLogger
+import os
 
 from django.conf import settings
 from path import Path as path
@@ -25,6 +26,16 @@ def enable_theming():
     for theme in get_themes():
         if theme.themes_base_dir not in settings.MAKO_TEMPLATES['main']:
             settings.MAKO_TEMPLATES['main'].insert(0, theme.themes_base_dir)
+
+        customer_themes_dir = os.path.join(theme.themes_base_dir, 'customer_themes')
+        if os.path.isdir(customer_themes_dir):
+            settings.STATICFILES_DIRS.insert(0, ('customer_themes', customer_themes_dir))
+
+        theme_static = theme.path / 'static'
+        if os.path.isdir(theme_static):
+            settings.STATICFILES_DIRS.append(
+                (u'', theme_static)
+            )
 
     _add_theming_locales()
 

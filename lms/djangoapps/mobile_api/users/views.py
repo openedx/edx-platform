@@ -268,9 +268,6 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
     pagination_class = None
 
     def is_org(self, check_org, course_org):
-        """
-        Check course org matches request org param or no param provided
-        """
         return check_org is None or (check_org.lower() == course_org.lower())
 
     def get_queryset(self):
@@ -281,7 +278,8 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
         org = self.request.query_params.get('org', None)
         return [
             enrollment for enrollment in enrollments
-            if enrollment.course_overview and self.is_org(org, enrollment.course_overview.org) and
+            if enrollment.course_overview and
+            self.is_org(org, enrollment.course_overview.org) and
             is_mobile_available_for_user(self.request.user, enrollment.course_overview)
         ]
 

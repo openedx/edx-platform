@@ -87,6 +87,7 @@ from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangolib.markup import HTML
 from openedx.features.course_experience import course_home_url_name
 from openedx.features.enterprise_support.api import get_dashboard_consent_notification
+from organizations.models import Organization, UserOrganizationMapping
 from shoppingcart.api import order_history
 from shoppingcart.models import CourseRegistrationCode, DonationConfiguration
 from student.cookies import delete_logged_in_cookies, set_logged_in_cookies, set_user_info_cookie
@@ -121,6 +122,7 @@ from student.models import (
     create_comments_service_user,
     unique_id_for_user
 )
+from student.roles import CourseCreatorRole
 from student.tasks import send_activation_email
 from third_party_auth import pipeline, provider
 from util.bad_request_rate_limiter import BadRequestRateLimiter
@@ -129,6 +131,7 @@ from util.json_request import JsonResponse
 from util.milestones_helpers import get_pre_requisite_courses_not_completed
 from util.password_policy_validators import validate_password_strength
 from xmodule.modulestore.django import modulestore
+
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
@@ -763,6 +766,7 @@ def dashboard(request):
     # If a course is not included in this dictionary,
     # there is no verification messaging to display.
     verify_status_by_course = check_verify_status_by_course(user, course_enrollments)
+
     cert_statuses = {
         enrollment.course_id: cert_info(request.user, enrollment.course_overview, enrollment.mode)
         for enrollment in course_enrollments
@@ -1976,6 +1980,26 @@ def create_account_with_params(request, params):
 
     create_comments_service_user(user)
 
+    # APPSEMBLER SPECIFIC
+    organization_name = params.get('organization')
+    organization = None
+    # organization name is passed during signup when invited through AMC,
+    # otherwise it's a regular signup on a microsite
+    if organization_name:
+        try:
+            organization = Organization.objects.get(name=organization_name)
+        except:
+            pass
+    elif hasattr(request, 'site'):
+        organization = request.site.organizations.first()
+
+    is_amc_admin = "registered_from_amc" in params
+
+    if organization:
+        UserOrganizationMapping.objects.get_or_create(user=user, organization=organization, is_amc_admin=is_amc_admin)
+
+    # APPSEMBLER SPECIFIC END
+
     # Don't send email if we are:
     #
     # 1. Doing load testing.
@@ -1995,7 +2019,8 @@ def create_account_with_params(request, params):
         not (
             third_party_provider and third_party_provider.skip_email_verification and
             user.email == running_pipeline['kwargs'].get('details', {}).get('email')
-        )
+        ) and
+        "registered_from_amc" not in params  # don't need to activate email if the user already did that on AMC
     )
     if send_email:
         compose_and_send_activation_email(user, profile, registration)
@@ -2009,6 +2034,14 @@ def create_account_with_params(request, params):
     new_user = authenticate(username=user.username, password=params['password'])
     login(request, new_user)
     request.session.set_expiry(0)
+
+    # APPSEMBLER SPECIFIC
+    # allow users registered from AMC to create courses
+    if is_amc_admin:
+        from cms.djangoapps.course_creators.models import CourseCreator
+        CourseCreator.objects.update_or_create(user=user, defaults={'state': CourseCreator.GRANTED})
+        CourseCreatorRole().add_users(user)
+    # APPSEMBLER SPECIFIC END
 
     try:
         record_registration_attributions(request, new_user)
@@ -2258,6 +2291,11 @@ def auto_auth(request):
     profile.save()
 
     _create_or_set_user_attribute_created_on_site(user, request.site)
+
+    organization = Organization.objects.filter(name=request.GET.get('organization_name'))[0]
+    UserOrganizationMapping.objects.create(
+        user=user,
+        organization=organization)
 
     # Enroll the user in a course
     course_key = None

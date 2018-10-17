@@ -112,6 +112,10 @@ urlpatterns = (
 
     url(r'^dashboard/', include('learner_dashboard.urls')),
     url(r'^api/experiments/', include('experiments.urls', namespace='api_experiments')),
+
+    # appsembler management console endpoint for student enrollment
+    url(r'^appsembler/api/', include('openedx.core.djangoapps.appsembler.sites.urls')),
+    url(r'^appsembler/api/', include('openedx.core.djangoapps.appsembler.tpa_admin.urls')),
 )
 
 # TODO: This needs to move to a separate urls.py once the student_account and
@@ -1030,3 +1034,9 @@ if settings.FEATURES.get('ENABLE_FINANCIAL_ASSISTANCE_FORM'):
             name='submit_financial_assistance_request'
         )
     )
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+urlpatterns += (
+    url(r'^hijack/', include('hijack.urls')),
+)
