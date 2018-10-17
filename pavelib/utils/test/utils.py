@@ -1,9 +1,13 @@
 """
 Helper functions for test tasks
 """
+from __future__ import print_function
+
+import io
 import os
 import re
 import subprocess
+import sys
 
 from paver.easy import cmdopts, sh, task
 
@@ -68,7 +72,7 @@ def clean_reports_dir(options):
     Clean coverage files, to ensure that we don't use stale data to generate reports.
     """
     if getattr(options, 'skip_clean', False):
-        print '--skip-clean is set, skipping...'
+        print('--skip-clean is set, skipping...')
         return
 
     # We delete the files but preserve the directory structure
@@ -148,3 +152,31 @@ def check_firefox_version():
                 debian_path=debian_path
             )
         )
+
+
+@task
+@timed
+def install_chrome():
+    """
+    If running on Linux, a Chrome binary path was specified, and no file
+    exists at that path, install it.  Primarily used in devstack when running
+    pa11ycrawler, in order to install all the correct dependencies.
+    """
+    if not sys.platform.startswith('linux'):
+        print("Not on Linux, skipping...")
+        return
+    chrome_path = os.environ.get('PUPPETEER_EXECUTABLE_PATH')
+    if not chrome_path:
+        print("Path to system Chrome not specified, skipping...")
+        return
+    if os.path.exists(chrome_path):
+        print("Chrome has already been installed, skipping...")
+        return
+    apt_source_path = '/etc/apt/sources.list.d/google.list'
+    if not os.path.exists(apt_source_path):
+        with io.open(apt_source_path, 'w') as f:
+            f.write(u'deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main\n')
+        subprocess.check_call('curl -q https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -',
+                              shell=True)
+    subprocess.check_call(['apt-get', 'update'])
+    subprocess.check_call(['apt-get', 'install', '-y', 'google-chrome-stable'])

@@ -102,7 +102,7 @@ def perf_report_bokchoy(options, passthrough_options):
     run_bokchoy(options.perf_report_bokchoy, passthrough_options)
 
 
-@needs('pavelib.prereqs.install_prereqs', 'get_test_course')
+@needs('pavelib.prereqs.install_prereqs', 'get_test_course', 'install_chrome')
 @cmdopts(
     BOKCHOY_OPTS + [PA11Y_SINGLE_URL, PA11Y_HTML, PA11Y_COURSE_KEY, PA11Y_FETCH_COURSE],
     share_with=['get_test_course', 'prepare_bokchoy_run', 'load_courses']

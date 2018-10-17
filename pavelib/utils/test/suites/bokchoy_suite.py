@@ -131,7 +131,7 @@ def get_test_course(options):
     print msg
 
     sh(
-        'wget {tar_gz_file} -O {zipped_course}'.format(
+        'curl -L {tar_gz_file} -o {zipped_course}'.format(
             tar_gz_file=DEMO_COURSE_TAR_GZ,
             zipped_course=zipped_course,
         )
@@ -433,13 +433,12 @@ class Pa11yCrawler(BokChoyTestSuite):
         """
         data_dir = os.path.join(self.report_dir, 'data')
         url = "https://raw.githubusercontent.com/edx/pa11ycrawler-ignore/master/ignore.yaml"
-
         command = [
             "scrapy",
             "crawl",
             "edx",
             "-a",
-            "port=8003",
+            "port={port}".format(port=Env.BOK_CHOY_SERVERS['lms']['port']),
             "-a",
             "course_key={key}".format(key=self.course_key),
             "-a",

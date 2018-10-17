@@ -244,7 +244,7 @@ class TestPaverPa11yCrawlerCmd(unittest.TestCase):
         else:
             self._mock_sh.assert_has_calls([
                 call(
-                    'wget {targz} -O {dir}demo_course.tar.gz'.format(targz=DEMO_COURSE_TAR_GZ, dir=downloaded_to)),
+                    'curl -L {targz} -o {dir}demo_course.tar.gz'.format(targz=DEMO_COURSE_TAR_GZ, dir=downloaded_to)),
                 call(
                     'tar zxf {dir}demo_course.tar.gz -C {dir}'.format(dir=downloaded_to)),
             ])
