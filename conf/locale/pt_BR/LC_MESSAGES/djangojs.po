@@ -7,6 +7,7 @@
 # Abrantes Araújo Silva Filho <abrantesasf@gmail.com>, 2017
 # Álex Filipe <alexfilipe@outlook.com>, 2014
 # Allan Melo, 2015
+# Allan Melo, 2015
 # Andre Eduardo <andre_meneses2001@hotmail.com>, 2015
 # Andrei Bosco Bezerra Torres <andreibosco@gmail.com>, 2013
 # Andrei Bosco Bezerra Torres <andreibosco@gmail.com>, 2013
@@ -14,6 +15,8 @@
 # brk0_0, 2013
 # brunojm <inactive+brunojm@transifex.com>, 2014
 # brunojm <inactive+brunojm@transifex.com>, 2014
+# brunojm <inactive+brunojm@transifex.com>, 2014
+# Bruno Sette <inactive+BrunoSette@transifex.com>, 2015
 # Bruno Sette <inactive+BrunoSette@transifex.com>, 2015
 # Cleomir Waiczyk <w.cleomir@gmail.com>, 2015
 # rqllira <contato@raquellira.com>, 2014
@@ -30,23 +33,30 @@
 # Gislene Kucker Arantes <gislene.trad@gmail.com>, 2015
 # Gustavo Henrique de Almeida Gonçalves <gustavo@faprender.org>, 2015
 # Hudson Martins <p4p4l3gu4x@gmail.com>, 2015
+# Hudson Martins <p4p4l3gu4x@gmail.com>, 2015
 # Igor Brandorff <igor.souza@adaptivesoft.com.br>, 2017
 # javiercencig <javier@jecnet.com.br>, 2014
+# javiercencig <javier@jecnet.com.br>, 2014
+# Jefferson Floyd Conz, 2014
 # Jefferson Floyd Conz, 2014
 # Kaio Vinícius Vilerá <kaiovilera@gmail.com>, 2016
 # Kayo Leone Dias Perim <kayo_2008_@hotmail.com>, 2014
 # Kevin Grist <kgrist@localconcept.com>, 2014
 # Leonardo Flores Zambaldi <fzleonardo@gmail.com>, 2014
 # Leonardo Lehnemann <lehneman@gmail.com>, 2014
+# Leonardo Lehnemann <lehneman@gmail.com>, 2014
 # LucasPPires <lucaspylespires@hotmail.com>, 2014
 # LucasPPires <lucaspylespires@hotmail.com>, 2014
 # Lulatini <inactive+Lulatini@transifex.com>, 2014
+# Lulatini <inactive+Lulatini@transifex.com>, 2014
 # Maíta Medeiros e Silva <moliveira.maita@gmail.com>, 2015
+# Marcelo Soares Souza <marcelo@libertais.org>, 2014
 # Marcelo Soares Souza <marcelo@libertais.org>, 2014
 # Marco Túlio Pires <mtrpires@outlook.com>, 2014
 # marcus vinicius oliveira martins <mbodock@gmail.com>, 2015
 # Mariana Baroni <maribaroni@gmail.com>, 2014
 # Matheus Andrade <matheusflkandrade@hotmail.com>, 2014
+# Matheus Gomes Correia, 2017
 # Matheus Gomes Correia, 2017
 # Monica Farias <monifar.tp@gmail.com>, 2015-2016
 # Nayse Hillesheim <nayse.hillesheim@gmail.com>, 2016
@@ -54,16 +64,21 @@
 # niels006 <niels006@gmail.com>, 2014
 # niels006 <niels006@gmail.com>, 2014
 # Paulo Castro, 2013
+# Paulo Castro, 2013
 # Paulo Romano <pauloromanocarvalho@gmail.com>, 2017
 # Pedro Guimarães Martins <pedrogmartins7@gmail.com>, 2014
 # RenataBarboza, 2013
 # Renata Barboza, 2013-2016
 # Ricardo Pietrobon <pietr007@gmail.com>, 2013-2014
 # RODRIGOR77 <rodrigo_magalhaes_rodrigues_alve@yahoo.com.br>, 2014
+# RODRIGOR77 <rodrigo_magalhaes_rodrigues_alve@yahoo.com.br>, 2014
+# rqllira <contato@raquellira.com>, 2014
 # Siderlan Santos <siderlan.santos@gmail.com>, 2015
 # Victor Hochgreb <victorfeec@gmail.com>, 2015
 # Victor Hochgreb de Freitas <victorhochgreb@gmail.com>, 2015
+# Victor Hochgreb <victorfeec@gmail.com>, 2015
 # Vitor Silva Martins Costa <costa.vsm@gmail.com>, 2014
+# wesleyide <wesley36@gmail.com>, 2014
 # wesleyide <wesley36@gmail.com>, 2014
 # William Bellinazo Roca <williambr_1331@hotmail.com>, 2016
 # William Bellinazo Roca <williambr_1331@hotmail.com>, 2016
@@ -131,6 +146,7 @@
 #
 # Translators:
 # Alan Ribeiro Mól <alan3df@gmail.com>, 2015
+# alconost <alpha@alconost.com>, 2018
 # Ana Paula D'Almeida <paulladalmeida@gmail.com>, 2015
 # Anderson Franca <anderson.frca@gmail.com>, 2017
 # Andrea Z. Bitencourt <azbitencourt@gmail.com>, 2015
@@ -202,7 +218,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-09-23 20:42+0000\n"
+"POT-Creation-Date: 2018-10-14 20:42+0000\n"
 "PO-Revision-Date: 2018-09-26 12:47+0000\n"
 "Last-Translator: Fabio Oliveira Silva <fabio.oliv.silva@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
@@ -4543,6 +4559,19 @@ msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid "Before proceeding, please {htmlStart}activate your account{htmlEnd}."
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid ""
+"{htmlStart}Want to change your email, name, or password instead?{htmlEnd}"
+msgstr ""
+
+#: lms/static/js/student_account/components/StudentAccountDeletion.jsx
+msgid ""
+"{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read "
+"the above carefully before proceeding. This is an irreversible action, and "
+"{strongStart}you will no longer be able to use the same email on "
+"edX.{strongEnd}"
 msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx

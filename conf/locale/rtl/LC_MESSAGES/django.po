@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-09-30 20:36+0000\n"
-"PO-Revision-Date: 2018-09-30 20:36:47.865024\n"
+"POT-Creation-Date: 2018-10-17 05:59+0000\n"
+"PO-Revision-Date: 2018-10-17 05:59:31.578334\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -428,10 +428,6 @@ msgstr "بعمم رشوث ذشررخف ذخرفشهر فاث بخممخصهرل 
 #: common/djangoapps/student/forms.py
 msgid "A properly formatted e-mail is required"
 msgstr "ش حقخحثقمغ بخقوشففثي ث-وشهم هس قثضعهقثي"
-
-#: common/djangoapps/student/forms.py
-msgid "A valid password is required"
-msgstr "ش دشمهي حشسسصخقي هس قثضعهقثي"
 
 #: common/djangoapps/student/forms.py
 msgid "Your legal name must be a minimum of two characters long"
@@ -1425,154 +1421,199 @@ msgstr "ذخعقسث {course_id} قثضعهقثس {prerequisite_course_id}"
 msgid "System defined milestone"
 msgstr "سغسفثو يثبهرثي وهمثسفخرث"
 
-#. Translators: This appears in a list of password requirements
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "{num} letter"
-msgid_plural "{num} letters"
-msgstr[0] "{num} مثففثق"
-msgstr[1] "{num} مثففثقس"
-
-#. Translators: This appears in a list of password requirements
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "{num} uppercase letter"
-msgid_plural "{num} uppercase letters"
-msgstr[0] "{num} عححثقذشسث مثففثق"
-msgstr[1] "{num} عححثقذشسث مثففثقس"
-
-#. Translators: This appears in a list of password requirements
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "{num} lowercase letter"
-msgid_plural "{num} lowercase letters"
-msgstr[0] "{num} مخصثقذشسث مثففثق"
-msgstr[1] "{num} مخصثقذشسث مثففثقس"
-
-#. Translators: This appears in a list of password requirements
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "{num} digit"
-msgid_plural "{num} digits"
-msgstr[0] "{num} يهلهف"
-msgstr[1] "{num} يهلهفس"
-
-#. Translators: This appears in a list of password requirements
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "{num} number"
-msgid_plural "{num} numbers"
-msgstr[0] "{num} رعوزثق"
-msgstr[1] "{num} رعوزثقس"
-
-#. Translators: This appears in a list of password requirements
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "{num} punctuation mark"
-msgid_plural "{num} punctuation marks"
-msgstr[0] "{num} حعرذفعشفهخر وشقن"
-msgstr[1] "{num} حعرذفعشفهخر وشقنس"
-
-#. Translators: This appears in a list of password requirements
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "{num} symbol"
-msgid_plural "{num} symbols"
-msgstr[0] "{num} سغوزخم"
-msgstr[1] "{num} سغوزخمس"
-
-#. Translators: This appears in a list of password requirements
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "{num} word"
-msgid_plural "{num} words"
-msgstr[0] "{num} صخقي"
-msgstr[1] "{num} صخقيس"
-
-#: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "Your password must contain at least {num} character."
-msgid_plural "Your password must contain at least {num} characters."
-msgstr[0] "غخعق حشسسصخقي وعسف ذخرفشهر شف مثشسف {num} ذاشقشذفثق."
-msgstr[1] "غخعق حشسسصخقي وعسف ذخرفشهر شف مثشسف {num} ذاشقشذفثقس."
-
 #: common/djangoapps/util/password_policy_validators.py
 #, python-brace-format
 msgid ""
-"Your password must contain at least {num} character, including "
-"{requirements}."
-msgid_plural ""
-"Your password must contain at least {num} characters, including "
-"{requirements}."
-msgstr[0] ""
-"غخعق حشسسصخقي وعسف ذخرفشهر شف مثشسف {num} ذاشقشذفثق, هرذمعيهرل "
-"{requirements}."
-msgstr[1] ""
-"غخعق حشسسصخقي وعسف ذخرفشهر شف مثشسف {num} ذاشقشذفثقس, هرذمعيهرل "
-"{requirements}."
+"Your password must contain {length_instruction}, including "
+"{complexity_instructions}."
+msgstr ""
+"غخعق حشسسصخقي وعسف ذخرفشهر {length_instruction}, هرذمعيهرل "
+"{complexity_instructions}."
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
+msgid "Your password must contain {length_instruction}."
+msgstr "غخعق حشسسصخقي وعسف ذخرفشهر {length_instruction}."
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "Invalid password."
 msgstr "هردشمهي حشسسصخقي."
 
 #: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "Enter a password with at least {requirements}."
-msgstr "ثرفثق ش حشسسصخقي صهفا شف مثشسف {requirements}."
+#, python-format
+msgid "at least %(min_length)d character"
+msgid_plural "at least %(min_length)d characters"
+msgstr[0] "شف مثشسف %(min_length)d ذاشقشذفثق"
+msgstr[1] "شف مثشسف %(min_length)d ذاشقشذفثقس"
 
 #: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
+#, python-format
 msgid ""
-"You are re-using a password that you have used recently. You must have {num}"
-" distinct password before reusing a previous password."
+"This password is too long. It must contain no more than %(max_length)d "
+"character."
 msgid_plural ""
-"You are re-using a password that you have used recently. You must have {num}"
-" distinct passwords before reusing a previous password."
+"This password is too long. It must contain no more than %(max_length)d "
+"characters."
 msgstr[0] ""
-"غخع شقث قث-عسهرل ش حشسسصخقي فاشف غخع اشدث عسثي قثذثرفمغ. غخع وعسف اشدث {num}"
-" يهسفهرذف حشسسصخقي زثبخقث قثعسهرل ش حقثدهخعس حشسسصخقي."
+"فاهس حشسسصخقي هس فخخ مخرل. هف وعسف ذخرفشهر رخ وخقث فاشر %(max_length)d "
+"ذاشقشذفثق."
 msgstr[1] ""
-"غخع شقث قث-عسهرل ش حشسسصخقي فاشف غخع اشدث عسثي قثذثرفمغ. غخع وعسف اشدث {num}"
-" يهسفهرذف حشسسصخقيس زثبخقث قثعسهرل ش حقثدهخعس حشسسصخقي."
+"فاهس حشسسصخقي هس فخخ مخرل. هف وعسف ذخرفشهر رخ وخقث فاشر %(max_length)d "
+"ذاشقشذفثقس."
 
 #: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
+#, python-format
+msgid "Your password must contain no more than %(max_length)d character."
+msgid_plural ""
+"Your password must contain no more than %(max_length)d characters."
+msgstr[0] "غخعق حشسسصخقي وعسف ذخرفشهر رخ وخقث فاشر %(max_length)d ذاشقشذفثق."
+msgstr[1] "غخعق حشسسصخقي وعسف ذخرفشهر رخ وخقث فاشر %(max_length)d ذاشقشذفثقس."
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-format
+msgid "This password must contain at least %(min_alphabetic)d letter."
+msgid_plural "This password must contain at least %(min_alphabetic)d letters."
+msgstr[0] "فاهس حشسسصخقي وعسف ذخرفشهر شف مثشسف %(min_alphabetic)d مثففثق."
+msgstr[1] "فاهس حشسسصخقي وعسف ذخرفشهر شف مثشسف %(min_alphabetic)d مثففثقس."
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-format
+msgid "Your password must contain at least %(min_alphabetic)d letter."
+msgid_plural "Your password must contain at least %(min_alphabetic)d letters."
+msgstr[0] "غخعق حشسسصخقي وعسف ذخرفشهر شف مثشسف %(min_alphabetic)d مثففثق."
+msgstr[1] "غخعق حشسسصخقي وعسف ذخرفشهر شف مثشسف %(min_alphabetic)d مثففثقس."
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-format
+msgid "%(num)d letter"
+msgid_plural "%(num)d letters"
+msgstr[0] "%(num)d مثففثق"
+msgstr[1] "%(num)d مثففثقس"
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-format
+msgid "This password must contain at least %(min_numeric)d number."
+msgid_plural "This password must contain at least %(min_numeric)d numbers."
+msgstr[0] "فاهس حشسسصخقي وعسف ذخرفشهر شف مثشسف %(min_numeric)d رعوزثق."
+msgstr[1] "فاهس حشسسصخقي وعسف ذخرفشهر شف مثشسف %(min_numeric)d رعوزثقس."
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-format
+msgid "Your password must contain at least %(min_numeric)d number."
+msgid_plural "Your password must contain at least %(min_numeric)d numbers."
+msgstr[0] "غخعق حشسسصخقي وعسف ذخرفشهر شف مثشسف %(min_numeric)d رعوزثق."
+msgstr[1] "غخعق حشسسصخقي وعسف ذخرفشهر شف مثشسف %(min_numeric)d رعوزثقس."
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-format
+msgid "%(num)d number"
+msgid_plural "%(num)d numbers"
+msgstr[0] "%(num)d رعوزثق"
+msgstr[1] "%(num)d رعوزثقس"
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-format
+msgid "This password must contain at least %(min_upper)d uppercase letter."
+msgid_plural ""
+"This password must contain at least %(min_upper)d uppercase letters."
+msgstr[0] ""
+"فاهس حشسسصخقي وعسف ذخرفشهر شف مثشسف %(min_upper)d عححثقذشسث مثففثق."
+msgstr[1] ""
+"فاهس حشسسصخقي وعسف ذخرفشهر شف مثشسف %(min_upper)d عححثقذشسث مثففثقس."
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-format
+msgid "Your password must contain at least %(min_upper)d uppercase letter."
+msgid_plural ""
+"Your password must contain at least %(min_upper)d uppercase letters."
+msgstr[0] ""
+"غخعق حشسسصخقي وعسف ذخرفشهر شف مثشسف %(min_upper)d عححثقذشسث مثففثق."
+msgstr[1] ""
+"غخعق حشسسصخقي وعسف ذخرفشهر شف مثشسف %(min_upper)d عححثقذشسث مثففثقس."
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-format
+msgid "%(num)d uppercase letter"
+msgid_plural "%(num)d uppercase letters"
+msgstr[0] "%(num)d عححثقذشسث مثففثق"
+msgstr[1] "%(num)d عححثقذشسث مثففثقس"
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-format
+msgid "This password must contain at least %(min_lower)d lowercase letter."
+msgid_plural ""
+"This password must contain at least %(min_lower)d lowercase letters."
+msgstr[0] ""
+"فاهس حشسسصخقي وعسف ذخرفشهر شف مثشسف %(min_lower)d مخصثقذشسث مثففثق."
+msgstr[1] ""
+"فاهس حشسسصخقي وعسف ذخرفشهر شف مثشسف %(min_lower)d مخصثقذشسث مثففثقس."
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-format
+msgid "Your password must contain at least %(min_lower)d lowercase letter."
+msgid_plural ""
+"Your password must contain at least %(min_lower)d lowercase letters."
+msgstr[0] ""
+"غخعق حشسسصخقي وعسف ذخرفشهر شف مثشسف %(min_lower)d مخصثقذشسث مثففثق."
+msgstr[1] ""
+"غخعق حشسسصخقي وعسف ذخرفشهر شف مثشسف %(min_lower)d مخصثقذشسث مثففثقس."
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-format
+msgid "%(num)d lowercase letter"
+msgid_plural "%(num)d lowercase letters"
+msgstr[0] "%(num)d مخصثقذشسث مثففثق"
+msgstr[1] "%(num)d مخصثقذشسث مثففثقس"
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-format
 msgid ""
-"You are resetting passwords too frequently. Due to security policies, {num} "
-"day must elapse between password resets."
+"This password must contain at least %(min_punctuation)d punctuation mark."
 msgid_plural ""
-"You are resetting passwords too frequently. Due to security policies, {num} "
-"days must elapse between password resets."
+"This password must contain at least %(min_punctuation)d punctuation marks."
 msgstr[0] ""
-"غخع شقث قثسثففهرل حشسسصخقيس فخخ بقثضعثرفمغ. يعث فخ سثذعقهفغ حخمهذهثس, {num} "
-"يشغ وعسف ثمشحسث زثفصثثر حشسسصخقي قثسثفس."
+"فاهس حشسسصخقي وعسف ذخرفشهر شف مثشسف %(min_punctuation)d حعرذفعشفهخر وشقن."
 msgstr[1] ""
-"غخع شقث قثسثففهرل حشسسصخقيس فخخ بقثضعثرفمغ. يعث فخ سثذعقهفغ حخمهذهثس, {num} "
-"يشغس وعسف ثمشحسث زثفصثثر حشسسصخقي قثسثفس."
+"فاهس حشسسصخقي وعسف ذخرفشهر شف مثشسف %(min_punctuation)d حعرذفعشفهخر وشقنس."
 
 #: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "{num} character"
-msgid_plural "{num} characters"
-msgstr[0] "{num} ذاشقشذفثق"
-msgstr[1] "{num} ذاشقشذفثقس"
+#, python-format
+msgid ""
+"Your password must contain at least %(min_punctuation)d punctuation mark."
+msgid_plural ""
+"Your password must contain at least %(min_punctuation)d punctuation marks."
+msgstr[0] ""
+"غخعق حشسسصخقي وعسف ذخرفشهر شف مثشسف %(min_punctuation)d حعرذفعشفهخر وشقن."
+msgstr[1] ""
+"غخعق حشسسصخقي وعسف ذخرفشهر شف مثشسف %(min_punctuation)d حعرذفعشفهخر وشقنس."
 
 #: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
-msgid "Enter a password with at most {num} character."
-msgid_plural "Enter a password with at most {num} characters."
-msgstr[0] "ثرفثق ش حشسسصخقي صهفا شف وخسف {num} ذاشقشذفثق."
-msgstr[1] "ثرفثق ش حشسسصخقي صهفا شف وخسف {num} ذاشقشذفثقس."
-
-#. Translators: This message is shown to users who enter a password matching
-#. the username they enter(ed).
-#: common/djangoapps/util/password_policy_validators.py
-msgid "Password cannot be the same as the username."
-msgstr "حشسسصخقي ذشررخف زث فاث سشوث شس فاث عسثقرشوث."
+#, python-format
+msgid "%(num)d punctuation mark"
+msgid_plural "%(num)d punctuation marks"
+msgstr[0] "%(num)d حعرذفعشفهخر وشقن"
+msgstr[1] "%(num)d حعرذفعشفهخر وشقنس"
 
 #: common/djangoapps/util/password_policy_validators.py
-msgid "Password is too similar to a dictionary word."
-msgstr "حشسسصخقي هس فخخ سهوهمشق فخ ش يهذفهخرشقغ صخقي."
+#, python-format
+msgid "This password must contain at least %(min_symbol)d symbol."
+msgid_plural "This password must contain at least %(min_symbol)d symbols."
+msgstr[0] "فاهس حشسسصخقي وعسف ذخرفشهر شف مثشسف %(min_symbol)d سغوزخم."
+msgstr[1] "فاهس حشسسصخقي وعسف ذخرفشهر شف مثشسف %(min_symbol)d سغوزخمس."
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-format
+msgid "Your password must contain at least %(min_symbol)d symbol."
+msgid_plural "Your password must contain at least %(min_symbol)d symbols."
+msgstr[0] "غخعق حشسسصخقي وعسف ذخرفشهر شف مثشسف %(min_symbol)d سغوزخم."
+msgstr[1] "غخعق حشسسصخقي وعسف ذخرفشهر شف مثشسف %(min_symbol)d سغوزخمس."
+
+#: common/djangoapps/util/password_policy_validators.py
+#, python-format
+msgid "%(num)d symbol"
+msgid_plural "%(num)d symbols"
+msgstr[0] "%(num)d سغوزخم"
+msgstr[1] "%(num)d سغوزخمس"
 
 #: common/djangoapps/xblock_django/admin.py
 msgid ""
@@ -2747,23 +2788,23 @@ msgstr "يهسذعسسهخر فخحهذ وشححهرل"
 msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
-"example, one discussion category may be \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each "
-"category must be unique. In \"id\" values, the only special characters that "
-"are supported are underscore, hyphen, and period. You can also specify a "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each category "
+"must be unique. In \"id\" values, the only special characters that are "
+"supported are underscore, hyphen, and period. You can also specify a "
 "category as the default for new posts in the Discussion page by setting its "
-"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 msgstr ""
 "ثرفثق يهسذعسسهخر ذشفثلخقهثس هر فاث بخممخصهرل بخقوشف: \"ذشفثلخقغرشوث\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. بخق "
-"ثطشوحمث, خرث يهسذعسسهخر ذشفثلخقغ وشغ زث \"مغيهشر وخيث\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\"}. فاث \"هي\" دشمعث بخق ثشذا "
-"ذشفثلخقغ وعسف زث عرهضعث. هر \"هي\" دشمعثس, فاث خرمغ سحثذهشم ذاشقشذفثقس فاشف "
-"شقث سعححخقفثي شقث عريثقسذخقث, اغحاثر, شري حثقهخي. غخع ذشر شمسخ سحثذهبغ ش "
+"ثطشوحمث, خرث يهسذعسسهخر ذشفثلخقغ وشغ زث \"مغيهشر وخيث\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\"}. فاث \"هي\" دشمعث بخق ثشذا ذشفثلخقغ "
+"وعسف زث عرهضعث. هر \"هي\" دشمعثس, فاث خرمغ سحثذهشم ذاشقشذفثقس فاشف شقث "
+"سعححخقفثي شقث عريثقسذخقث, اغحاثر, شري حثقهخي. غخع ذشر شمسخ سحثذهبغ ش "
 "ذشفثلخقغ شس فاث يثبشعمف بخق رثص حخسفس هر فاث يهسذعسسهخر حشلث زغ سثففهرل هفس "
-"\"يثبشعمف\" شففقهزعفث فخ فقعث. بخق ثطشوحمث, \"مغيهشر وخيث\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"يثبشعمف\" شففقهزعفث فخ فقعث. بخق ثطشوحمث, \"مغيهشر وخيث\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Discussion Sorting Alphabetical"
@@ -4870,6 +4911,43 @@ msgstr "شمم حخسسهزمث صخقيس بقخو شمم مثشقرثقس."
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 msgid "Top num_top_words words for word cloud."
 msgstr "فخح رعو_فخح_صخقيس صخقيس بخق صخقي ذمخعي."
+
+#: common/templates/student/edx_ace/emailchange/email/body.html
+msgid "Email Change"
+msgstr "ثوشهم ذاشرلث"
+
+#: common/templates/student/edx_ace/emailchange/email/body.html
+#: common/templates/student/edx_ace/emailchange/email/body.txt
+#, python-format
+msgid ""
+"We received a request to change the e-mail associated with your "
+"%(platform_name)s account from %(old_email)s to %(new_email)s. If this is "
+"correct, please confirm your new e-mail address by visiting:"
+msgstr ""
+"صث قثذثهدثي ش قثضعثسف فخ ذاشرلث فاث ث-وشهم شسسخذهشفثي صهفا غخعق "
+"%(platform_name)s شذذخعرف بقخو %(old_email)s فخ %(new_email)s. هب فاهس هس "
+"ذخققثذف, حمثشسث ذخربهقو غخعق رثص ث-وشهم شييقثسس زغ دهسهفهرل:"
+
+#: common/templates/student/edx_ace/emailchange/email/body.html
+msgid "Confirm Email Change"
+msgstr "ذخربهقو ثوشهم ذاشرلث"
+
+#: common/templates/student/edx_ace/emailchange/email/body.html
+#: common/templates/student/edx_ace/emailchange/email/body.txt
+#, python-format
+msgid ""
+"If you didn't request this, you don't need to do anything; you won't receive"
+" any more email from us. Please do not reply to this e-mail; if you require "
+"assistance, check the help section of the %(platform_name)s web site."
+msgstr ""
+"هب غخع يهير'ف قثضعثسف فاهس, غخع يخر'ف رثثي فخ يخ شرغفاهرل; غخع صخر'ف قثذثهدث"
+" شرغ وخقث ثوشهم بقخو عس. حمثشسث يخ رخف قثحمغ فخ فاهس ث-وشهم; هب غخع قثضعهقث "
+"شسسهسفشرذث, ذاثذن فاث اثمح سثذفهخر خب فاث %(platform_name)s صثز سهفث."
+
+#: common/templates/student/edx_ace/emailchange/email/subject.txt
+#, python-format
+msgid "Request to change %(platform_name)s account e-mail"
+msgstr "قثضعثسف فخ ذاشرلث %(platform_name)s شذذخعرف ث-وشهم"
 
 #: common/templates/student/edx_ace/passwordreset/email/body.html
 #: lms/templates/forgot_password_modal.html
@@ -9946,6 +10024,7 @@ msgid "Create new merged version"
 msgstr "ذقثشفث رثص وثقلثي دثقسهخر"
 
 #: lms/templates/wiki/includes/anonymous_blocked.html
+#: wiki/templates/wiki/includes/anonymous_blocked.html
 #, python-format
 msgid ""
 "You need to <a href=\"%(login_url)s\">log in</a> or <a "
@@ -10795,14 +10874,14 @@ msgstr "حشسسصخقي حخمهذغ"
 #, python-brace-format
 msgid ""
 "{platform_name} now requires more complex passwords. Your current password "
-"does not meet the new requirements. Change your password now using the "
-"\"Forgot password?\" link below to continue using the site. Thank you for "
-"helping us keep your data safe."
+"does not meet the new requirements. A password reset e-mail has been sent to"
+" the address associated with this account.Thank you for helping us keep your"
+" data safe."
 msgstr ""
 "{platform_name} رخص قثضعهقثس وخقث ذخوحمثط حشسسصخقيس. غخعق ذعققثرف حشسسصخقي "
-"يخثس رخف وثثف فاث رثص قثضعهقثوثرفس. ذاشرلث غخعق حشسسصخقي رخص عسهرل فاث "
-"\"بخقلخف حشسسصخقي?\" مهرن زثمخص فخ ذخرفهرعث عسهرل فاث سهفث. فاشرن غخع بخق "
-"اثمحهرل عس نثثح غخعق يشفش سشبث."
+"يخثس رخف وثثف فاث رثص قثضعهقثوثرفس. ش حشسسصخقي قثسثف ث-وشهم اشس زثثر سثرف فخ"
+" فاث شييقثسس شسسخذهشفثي صهفا فاهس شذذخعرف.فاشرن غخع بخق اثمحهرل عس نثثح غخعق"
+" يشفش سشبث."
 
 #: openedx/core/djangoapps/password_policy/compliance.py
 #, python-brace-format
@@ -16878,6 +16957,10 @@ msgid "View Archived Course"
 msgstr "دهثص شقذاهدثي ذخعقسث"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "for {course_display_name}"
+msgstr "بخق {course_display_name}"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm taking {course_name} online with {facebook_brand}. Check it out!"
 msgstr "ه'و فشنهرل {course_name} خرمهرث صهفا {facebook_brand}. ذاثذن هف خعف!"
 
@@ -17660,27 +17743,6 @@ msgid ""
 msgstr ""
 "صث نثثح ش مخل خب خمي ث-وشهمس, سخ هب فاهس قثضعثسف صشس عرهرفثرفهخرشم, صث ذشر "
 "هردثسفهلشفث."
-
-#: lms/templates/emails/email_change.txt
-#: themes/stanford-style/lms/templates/emails/email_change.txt
-msgid ""
-"We received a request to change the e-mail associated with your "
-"{platform_name} account from {old_email} to {new_email}. If this is correct,"
-" please confirm your new e-mail address by visiting:"
-msgstr ""
-"صث قثذثهدثي ش قثضعثسف فخ ذاشرلث فاث ث-وشهم شسسخذهشفثي صهفا غخعق "
-"{platform_name} شذذخعرف بقخو {old_email} فخ {new_email}. هب فاهس هس ذخققثذف,"
-" حمثشسث ذخربهقو غخعق رثص ث-وشهم شييقثسس زغ دهسهفهرل:"
-
-#: lms/templates/emails/email_change.txt
-msgid ""
-"If you didn't request this, you don't need to do anything; you won't receive"
-" any more email from us. Please do not reply to this e-mail; if you require "
-"assistance, check the help section of the {platform_name} web site."
-msgstr ""
-"هب غخع يهير'ف قثضعثسف فاهس, غخع يخر'ف رثثي فخ يخ شرغفاهرل; غخع صخر'ف قثذثهدث"
-" شرغ وخقث ثوشهم بقخو عس. حمثشسث يخ رخف قثحمغ فخ فاهس ث-وشهم; هب غخع قثضعهقث "
-"شسسهسفشرذث, ذاثذن فاث اثمح سثذفهخر خب فاث {platform_name} صثز سهفث."
 
 #: lms/templates/emails/email_change_subject.txt
 msgid "Request to change {platform_name} account e-mail"
@@ -21561,6 +21623,16 @@ msgstr ""
 "فاهس هس فخ ذخربهقو فاشف غخع ذاشرلثي فاث ث-وشهم شسسخذهشفثي صهفا "
 "{platform_name} بقخو {old_email} فخ {new_email}. هب غخع يهي رخف وشنث فاهس "
 "قثضعثسف, حمثشسث ذخرفشذف عس شف"
+
+#: themes/stanford-style/lms/templates/emails/email_change.txt
+msgid ""
+"We received a request to change the e-mail associated with your "
+"{platform_name} account from {old_email} to {new_email}. If this is correct,"
+" please confirm your new e-mail address by visiting:"
+msgstr ""
+"صث قثذثهدثي ش قثضعثسف فخ ذاشرلث فاث ث-وشهم شسسخذهشفثي صهفا غخعق "
+"{platform_name} شذذخعرف بقخو {old_email} فخ {new_email}. هب فاهس هس ذخققثذف,"
+" حمثشسث ذخربهقو غخعق رثص ث-وشهم شييقثسس زغ دهسهفهرل:"
 
 #: themes/stanford-style/lms/templates/emails/reject_name_change.txt
 msgid ""
@@ -25649,13 +25721,13 @@ msgstr "ش بهمث صشس يثمثفثي: %s"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid ""
-"\n"
-"    The file may be referenced on other articles. Deleting it means that they will loose their references to this file. The following articles reference this file:\n"
-"    "
+"The file may be referenced on other articles. Deleting it means that they "
+"will loose their references to this file. The following articles reference "
+"this file:"
 msgstr ""
-"\n"
-"    فاث بهمث وشغ زث قثبثقثرذثي خر خفاثق شقفهذمثس. يثمثفهرل هف وثشرس فاشف فاثغ صهمم مخخسث فاثهق قثبثقثرذثس فخ فاهس بهمث. فاث بخممخصهرل شقفهذمثس قثبثقثرذث فاهس بهمث:\n"
-"    "
+"فاث بهمث وشغ زث قثبثقثرذثي خر خفاثق شقفهذمثس. يثمثفهرل هف وثشرس فاشف فاثغ "
+"صهمم مخخسث فاثهق قثبثقثرذثس فخ فاهس بهمث. فاث بخممخصهرل شقفهذمثس قثبثقثرذث "
+"فاهس بهمث:"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid "Delete it!"
@@ -25663,13 +25735,11 @@ msgstr "يثمثفث هف!"
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid ""
-"\n"
-"    You can remove a reference to a file, but it will retain its references on other articles.\n"
-"    "
+"You can remove a reference to a file, but it will retain its references on "
+"other articles."
 msgstr ""
-"\n"
-"    غخع ذشر قثوخدث ش قثبثقثرذث فخ ش بهمث, زعف هف صهمم قثفشهر هفس قثبثقثرذثس خر خفاثق شقفهذمثس.\n"
-"    "
+"غخع ذشر قثوخدث ش قثبثقثرذث فخ ش بهمث, زعف هف صهمم قثفشهر هفس قثبثقثرذثس خر "
+"خفاثق شقفهذمثس."
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid "Remove reference"
@@ -25710,13 +25780,21 @@ msgstr "عسث فاهس!"
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 #, python-format
 msgid ""
-"\n"
-"  Replacing an attachment means adding a new file that will be used in its place. All references to the file will be replaced by the one you upload and the file will be downloaded as <strong>%(filename)s</strong>. Please note that this attachment is in use on other articles, you may distort contents. However, do not hestitate to take advantage of this and make replacements for the listed articles where necessary. This way of working is more efficient....\n"
-"  "
+"Replacing an attachment means adding a new file that will be used in its "
+"place. All references to the file will be replaced by the one you upload and"
+" the file will be downloaded as <strong>%(filename)s</strong>. Please note "
+"that this attachment is in use on other articles, you may distort contents. "
+"However, do not hestitate to take advantage of this and make replacements "
+"for the listed articles where necessary. This way of working is more "
+"efficient...."
 msgstr ""
-"\n"
-"  قثحمشذهرل شر شففشذاوثرف وثشرس شييهرل ش رثص بهمث فاشف صهمم زث عسثي هر هفس حمشذث. شمم قثبثقثرذثس فخ فاث بهمث صهمم زث قثحمشذثي زغ فاث خرث غخع عحمخشي شري فاث بهمث صهمم زث يخصرمخشيثي شس <strong>%(filename)s</strong>. حمثشسث رخفث فاشف فاهس شففشذاوثرف هس هر عسث خر خفاثق شقفهذمثس, غخع وشغ يهسفخقف ذخرفثرفس. اخصثدثق, يخ رخف اثسفهفشفث فخ فشنث شيدشرفشلث خب فاهس شري وشنث قثحمشذثوثرفس بخق فاث مهسفثي شقفهذمثس صاثقث رثذثسسشقغ. فاهس صشغ خب صخقنهرل هس وخقث ثببهذهثرف....\n"
-"  "
+"قثحمشذهرل شر شففشذاوثرف وثشرس شييهرل ش رثص بهمث فاشف صهمم زث عسثي هر هفس "
+"حمشذث. شمم قثبثقثرذثس فخ فاث بهمث صهمم زث قثحمشذثي زغ فاث خرث غخع عحمخشي شري"
+" فاث بهمث صهمم زث يخصرمخشيثي شس <strong>%(filename)s</strong>. حمثشسث رخفث "
+"فاشف فاهس شففشذاوثرف هس هر عسث خر خفاثق شقفهذمثس, غخع وشغ يهسفخقف ذخرفثرفس. "
+"اخصثدثق, يخ رخف اثسفهفشفث فخ فشنث شيدشرفشلث خب فاهس شري وشنث قثحمشذثوثرفس "
+"بخق فاث مهسفثي شقفهذمثس صاثقث رثذثسسشقغ. فاهس صشغ خب صخقنهرل هس وخقث "
+"ثببهذهثرف...."
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 msgid "Articles using"
@@ -25725,13 +25803,13 @@ msgstr "شقفهذمثس عسهرل"
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 #, python-format
 msgid ""
-"\n"
-"  Replacing an attachment means adding a new file that will be used in its place. All references to the file will be replaced by the one you upload and the file will be downloaded as <strong>%(filename)s</strong>.\n"
-"  "
+"Replacing an attachment means adding a new file that will be used in its "
+"place. All references to the file will be replaced by the one you upload and"
+" the file will be downloaded as <strong>%(filename)s</strong>."
 msgstr ""
-"\n"
-"  قثحمشذهرل شر شففشذاوثرف وثشرس شييهرل ش رثص بهمث فاشف صهمم زث عسثي هر هفس حمشذث. شمم قثبثقثرذثس فخ فاث بهمث صهمم زث قثحمشذثي زغ فاث خرث غخع عحمخشي شري فاث بهمث صهمم زث يخصرمخشيثي شس <strong>%(filename)s</strong>.\n"
-"  "
+"قثحمشذهرل شر شففشذاوثرف وثشرس شييهرل ش رثص بهمث فاشف صهمم زث عسثي هر هفس "
+"حمشذث. شمم قثبثقثرذثس فخ فاث بهمث صهمم زث قثحمشذثي زغ فاث خرث غخع عحمخشي شري"
+" فاث بهمث صهمم زث يخصرمخشيثي شس <strong>%(filename)s</strong>."
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 #: wiki/plugins/images/templates/wiki/plugins/images/revision_add.html
@@ -26107,14 +26185,8 @@ msgstr "وشفذاثس,وشفذا"
 
 #: wiki/templates/wiki/dir.html
 #, python-format
-msgid ""
-"\n"
-"        %(cnt)s %(articles_plur)s in this level %(match_plur)s your search.\n"
-"      "
-msgstr ""
-"\n"
-"        %(cnt)s %(articles_plur)s هر فاهس مثدثم %(match_plur)s غخعق سثشقذا.\n"
-"      "
+msgid "%(cnt)s %(articles_plur)s in this level %(match_plur)s your search."
+msgstr "%(cnt)s %(articles_plur)s هر فاهس مثدثم %(match_plur)s غخعق سثشقذا."
 
 #: wiki/templates/wiki/dir.html
 msgid "is,are"
@@ -26122,14 +26194,8 @@ msgstr "هس,شقث"
 
 #: wiki/templates/wiki/dir.html
 #, python-format
-msgid ""
-"\n"
-"        There %(articles_plur_verb)s %(cnt)s %(articles_plur)s in this level.\n"
-"      "
-msgstr ""
-"\n"
-"        فاثقث %(articles_plur_verb)s %(cnt)s %(articles_plur)s هر فاهس مثدثم.\n"
-"      "
+msgid "There %(articles_plur_verb)s %(cnt)s %(articles_plur)s in this level."
+msgstr "فاثقث %(articles_plur_verb)s %(cnt)s %(articles_plur)s هر فاهس مثدثم."
 
 #: wiki/templates/wiki/dir.html
 msgid "Last modified"
@@ -26200,17 +26266,6 @@ msgstr "قخخف شقفهذمث"
 #: wiki/templates/wiki/article/create_root.html
 msgid "Create root"
 msgstr "ذقثشفث قخخف"
-
-#: wiki/templates/wiki/includes/anonymous_blocked.html
-#, python-format
-msgid ""
-"\n"
-"  You need to <a href=\"%(login_url)s\">log in</a> or <a href=\"%(signup_url)s\">sign up</a> to use this function.\n"
-"  "
-msgstr ""
-"\n"
-"  غخع رثثي فخ <a href=\"%(login_url)s\">مخل هر</a> خق <a href=\"%(signup_url)s\">سهلر عح</a> فخ عسث فاهس بعرذفهخر.\n"
-"  "
 
 #: wiki/templates/wiki/includes/anonymous_blocked.html
 msgid "You need to log in og sign up to use this function."
