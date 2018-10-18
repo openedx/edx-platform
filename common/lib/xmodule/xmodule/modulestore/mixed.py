@@ -10,6 +10,7 @@ from contextlib import contextmanager
 import itertools
 import functools
 from contracts import contract, new_contract
+import re
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, AssetKey
@@ -164,7 +165,8 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 continue
 
         for store_settings in stores:
-            if str(os.getpid()) in store_settings['DOC_STORE_CONFIG']['db']:
+            db_name = store_settings['DOC_STORE_CONFIG']['db']
+            if not re.search('/d', db_name) or str(os.getpid()) in store_settings['DOC_STORE_CONFIG']['db']:
                 key = store_settings['NAME']
                 store = create_modulestore_instance(
                     store_settings['ENGINE'],
