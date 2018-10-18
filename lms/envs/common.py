@@ -521,6 +521,10 @@ OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
 OAUTH_DELETE_EXPIRED = True
 OAUTH_ID_TOKEN_EXPIRATION = 60 * 60
 
+################################## THIRD_PARTY_AUTH CONFIGURATION #############################
+TPA_PROVIDER_BURST_THROTTLE = '10/min'
+TPA_PROVIDER_SUSTAINED_THROTTLE = '50/hr'
+
 ################################## TEMPLATE CONFIGURATION #####################################
 # Mako templating
 import tempfile
