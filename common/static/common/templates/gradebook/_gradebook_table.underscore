@@ -1,0 +1,80 @@
+<table id="student-grades-table" class="display">
+    <thead>
+      <tr>
+        <th class="user-data"><%- strLib.userHeading %></th>
+  
+        <% var sections = studentsData[0].section_breakdown; %>
+        <% _.each(sections, function(section, i){ %>
+          <% var tooltip = section.detail; %>
+          
+          <% //The next two if statements are going to parse the section details for tooltip %>
+          <% if (_.str.include(tooltip, '=')) { %>
+            <% tooltip = tooltip.substring(0, tooltip.indexOf('=')); %>
+          <% } %>
+  
+          <% if (_.str.include(tooltip, '-')) { %>
+            <% tooltip = tooltip.substring(0, tooltip.indexOf('-')); %>
+          <% } %>
+  
+          <% var category = (section.category || '').replace(/[\W_]+/g, ''); %>
+          <% var chapterName = (section.chapter_name || '').replace(/[\W_]+/g, ''); %>
+          <%
+            var moduleId = '';
+            studentsData.every(function(student) {
+              moduleId = student.section_breakdown[i].module_id;
+              return _.contains(['', 'None'], moduleId);
+            });
+          %>
+  
+          <th title="<%- tooltip %>" class="<%- category %> <%- chapterName %>">
+            <div class="assignment-label automatic-grade-label"><%- section.label %></div>
+            <% if (!(section.is_average || section.is_ag)) { %>
+              <i class="fa fa-pencil-square-o fa-2x grade-override" aria-hidden="true" data-block-id='<%- moduleId %>' data-assignment-name='<%- section.subsection_name %>' data-manual-grading='<%- section.is_manually_graded %>' data-published='<%- section.are_grades_published %>' data-section-block-id="<%- section.section_block_id %>"></i>
+            <% } %>
+          </th>
+        <% }) %>
+  
+        <th title="Current grade"><div class="assignment-label"><%- strLib.userHeading %></div></th>
+        <th title="Total"><div class="assignment-label"><%- strLib.total %></div></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% _.each(studentsData, function(student){ %>
+        <tr>
+          <td class="user-data"><a href="<%- student.progress_page_url %>"><%- student.full_name || student.username %></a></td>
+  
+          <% _.each(student.section_breakdown, function(section){ %>
+            <% var category = (section.category || '').replace(/[\W_]+/g, ''); %>
+            <% var chapterName = (section.chapter_name || '').replace(/[\W_]+/g, ''); %>
+            <td class="grade_<%- section.letter_grade || 'none' %> data-score-container-class <%- category %> <%- chapterName %>"
+                title="<%- section.detail || '' %>"
+                data-block-id="<%- section.module_id || '' %>"
+                data-course-id="<%- student.course_id %>"
+                data-is-manually-graded="<%- section.is_manually_graded || '' %>"
+                data-percent="<%- section.percent || 0.0 %>"
+                data-score-absolute="<%- section.grade_description || '' %>"
+                data-score-auto="<%- section.auto_grade %>"
+                data-score-earned="<%- section.score_earned || 0 %>"
+                data-score-percent="<%- section.displayed_value || '' %>"
+                data-score-possible="<%- section.score_possible || 0 %>"
+                data-sort="<%- parseInt(section.score_earned) %>"
+                data-student-id="<%- student.user_id %>">
+              <%- (section.grade_description || '') %>
+            </td>
+          <% }) %>
+  
+          <td class="grade_<%- student.current_letter_grade %> data-score-container-class"
+              title="Current grade">
+            <%- (student.current_percent * 100).toFixed(2) %>&percnt;
+          </td>
+  
+          <td class="grade_<%- student.total_letter_grade %> data-score-container-class"
+              title="Total">
+            <%- (student.percent * 100).toFixed(2) %>&percnt;
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+  
+  <div id="grade-override-modal"></div>
