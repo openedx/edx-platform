@@ -804,6 +804,39 @@ class AccountRetirementStatusView(ViewSet):
         except Exception as exc:  # pylint: disable=broad-except
             return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    def cleanup(self, request):
+        """
+        DELETE /api/user/v1/accounts/update_retirement_status/
+
+        {
+            'usernames': ['user1', 'user2', ...]
+        }
+
+        Deletes a batch of retirement requests by username.
+        """
+        try:
+            usernames = request.data['usernames']
+
+            if not isinstance(usernames, list):
+                raise TypeError('Usernames should be an array.')
+
+            complete_state = RetirementState.objects.get(state_name='COMPLETE')
+            retirements = UserRetirementStatus.objects.filter(
+                original_username__in=usernames,
+                current_state=complete_state
+            )
+
+            # Sanity check that they're all valid usernames in the right state
+            if len(usernames) != len(retirements):
+                raise UserRetirementStatus.DoesNotExist('Not all usernames exist in the COMPLETE state.')
+
+            retirements.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except (RetirementStateError, UserRetirementStatus.DoesNotExist, TypeError) as exc:
+            return Response(text_type(exc), status=status.HTTP_400_BAD_REQUEST)
+        except Exception as exc:  # pylint: disable=broad-except
+            return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 class LMSAccountRetirementView(ViewSet):
     """

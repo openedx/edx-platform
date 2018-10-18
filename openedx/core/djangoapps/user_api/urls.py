@@ -58,6 +58,10 @@ RETIREMENT_UPDATE = AccountRetirementStatusView.as_view({
     'patch': 'partial_update',
 })
 
+RETIREMENT_CLEANUP = AccountRetirementStatusView.as_view({
+    'delete': 'cleanup',
+})
+
 RETIREMENT_POST = AccountRetirementView.as_view({
     'post': 'post',
 })
@@ -126,6 +130,11 @@ urlpatterns = [
         r'^v1/accounts/retirement_queue/$',
         RETIREMENT_QUEUE,
         name='accounts_retirement_queue'
+    ),
+    url(
+        r'^v1/accounts/retirement_cleanup/$',
+        RETIREMENT_CLEANUP,
+        name='accounts_retirement_cleanup'
     ),
     url(
         r'^v1/accounts/retirements_by_status_and_date/$',
