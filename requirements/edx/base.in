@@ -99,7 +99,7 @@ ipaddr==2.1.11                      # Ip network support for Embargo feature
 jsonfield                           # Django model field for validated JSON; used in several apps
 mailsnake==1.6.2                    # Needed for mailchimp (mailing djangoapp)
 mako==1.0.2                         # Primary template language used for server-side page rendering
-Markdown                            # Convert text markup to HTML; used in capa problems, forums, and course wikis
+Markdown==2.6.11                    # Convert text markup to HTML; used in capa problems, forums, and course wikis; pin Markdown version as tests failed for its upgrade to latest release
 mongoengine==0.10.0                 # Object-document mapper for MongoDB, used in the LMS dashboard
 MySQL-python                        # Driver for the default production relational database
 newrelic                            # New Relic agent for performance monitoring

@@ -207,7 +207,7 @@ lxml==3.8.0
 mailsnake==1.6.2
 mako==1.0.2
 mando==0.6.4
-markdown==3.0.1
+markdown==2.6.11
 markey==0.8
 markupsafe==1.0
 mccabe==0.6.1
@@ -328,7 +328,7 @@ toml==0.10.0
 tox-battery==0.5.1
 tox==3.5.2
 traceback2==1.4.0
-transifex-client==0.13.4
+transifex-client==0.13.5
 twisted==16.6.0
 typing==3.6.6             # via sphinx
 unicodecsv==0.14.1

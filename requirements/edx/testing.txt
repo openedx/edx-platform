@@ -200,7 +200,7 @@ lxml==3.8.0
 mailsnake==1.6.2
 mako==1.0.2
 mando==0.6.4              # via radon
-markdown==3.0.1
+markdown==2.6.11
 markey==0.8
 markupsafe==1.0
 mccabe==0.6.1             # via flake8, pylint
@@ -313,7 +313,7 @@ toml==0.10.0              # via tox
 tox-battery==0.5.1
 tox==3.5.2
 traceback2==1.4.0         # via testtools, unittest2
-transifex-client==0.13.4
+transifex-client==0.13.5
 twisted==16.6.0           # via pa11ycrawler, scrapy
 unicodecsv==0.14.1
 unidecode==1.0.22         # via python-slugify
