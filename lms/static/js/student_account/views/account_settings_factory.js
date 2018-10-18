@@ -6,10 +6,11 @@
         'js/student_account/models/user_preferences_model',
         'js/student_account/views/account_settings_fields',
         'js/student_account/views/account_settings_view',
+        'text!templates/fields/field_language_account.underscore',
         'edx-ui-toolkit/js/utils/string-utils',
         'edx-ui-toolkit/js/utils/html-utils'
     ], function(gettext, $, _, Backbone, Logger, UserAccountModel, UserPreferencesModel,
-                 AccountSettingsFieldViews, AccountSettingsView, StringUtils, HtmlUtils) {
+                 AccountSettingsFieldViews, AccountSettingsView, field_language_template, StringUtils, HtmlUtils) {
         return function(
             fieldsData,
             ordersHistoryData,
@@ -159,6 +160,7 @@
                         {
                             view: new AccountSettingsFieldViews.LanguagePreferenceFieldView({
                                 model: userPreferencesModel,
+                                fieldTemplate: field_language_template,
                                 title: gettext('Language'),
                                 valueAttribute: 'pref-lang',
                                 required: true,
@@ -168,6 +170,7 @@
                                     {platform_name: platformName}
                                 ),
                                 options: fieldsData.language.options,
+                                betaOptions: fieldsData.beta_language,
                                 persistChanges: true,
                                 focusNextID: '#u-field-select-country',
                             })

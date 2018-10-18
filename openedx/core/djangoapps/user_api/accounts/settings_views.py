@@ -114,6 +114,7 @@ def account_settings_context(request):
         ),
         'extended_profile_fields': _get_extended_profile_fields(),
     }
+    # import pdb; pdb.set_trace()
 
     enterprise_customer = get_enterprise_customer_for_learner(site=request.site, user=request.user)
     update_account_settings_context_for_enterprise(context, enterprise_customer)

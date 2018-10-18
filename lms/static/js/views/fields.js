@@ -56,7 +56,7 @@
                     gettext('Success'),
                     HtmlUtils.HTML('</span>')
                 ),
-                plus: HtmlUtils.joinHtml(
+                fplus: HtmlUtils.joinHtml(
                     HtmlUtils.HTML('<span class="fa fa-plus placeholder" aria-hidden="true"></span><span class="sr">'),
                     gettext('Placeholder'),
                     HtmlUtils.HTML('</span>')
@@ -413,6 +413,9 @@
             },
 
             render: function() {
+                if (this.options.fieldTemplate){
+                    this.fieldTemplate = this.options.fieldTemplate;
+                }
                 HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.fieldTemplate)({
                     id: this.options.valueAttribute,
                     mode: this.mode,

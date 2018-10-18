@@ -51,12 +51,42 @@
             LanguagePreferenceFieldView: FieldViews.DropdownFieldView.extend({
                 fieldTemplate: field_dropdown_account_template,
                 saveSucceeded: function() {
+                    var betaOptions = this.options.betaOptions.options;
+                    var isBetaLanguage = false;
+
+                    for(var i=0; i<betaOptions.length; i++) {
+                        if (this.modelValue() == betaOptions[i][0]) {
+                            isBetaLanguage = true;
+                        }
+                    }
+                    if (isBetaLanguage){
+                        this.showNotificationMessage(
+                            HtmlUtils.joinHtml(
+                                gettext('The language selected is one of the partially supported languages.'),  // eslint-disable-line max-le
+                                gettext('Are you sure you want to keep the changes?'),
+                                HtmlUtils.HTML('<button class="btn-outline-primary paragon__btn" type="button" ">'),
+                                gettext('Yes'),
+                                HtmlUtils.HTML('</button>'),
+                                HtmlUtils.HTML('<button class="btn-outline-primary paragon__btn" type="button">'),
+                                gettext('No'),
+                                HtmlUtils.HTML('</button>'),
+                            ),
+
+                        );
+                    }
+                    else {
+                        this.saveLanguage()
+                    }
+
+                },
+                saveLanguage: function () {
                     var data = {
                         language: this.modelValue(),
                         next: window.location.href
                     };
 
                     var view = this;
+
                     $.ajax({
                         type: 'POST',
                         url: '/i18n/setlang/',
