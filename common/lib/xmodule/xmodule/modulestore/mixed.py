@@ -171,7 +171,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             except:
                 pass
             if db_name:
-                if not re.search('/d', db_name) or str(os.getpid()) in store_settings['DOC_STORE_CONFIG']['db']:
+                if re.search('/d', db_name) and str(os.getpid()) not in store_settings['DOC_STORE_CONFIG']['db']:
                     assert stores == os.getpid()
 
             key = store_settings['NAME']
