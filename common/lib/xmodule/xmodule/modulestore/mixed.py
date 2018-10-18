@@ -165,6 +165,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 continue
 
         for store_settings in stores:
+            db_name = None
             try:
                 db_name = store_settings['DOC_STORE_CONFIG']['db']
                 pid_num = os.getpid()
