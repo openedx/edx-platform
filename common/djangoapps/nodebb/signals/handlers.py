@@ -163,11 +163,12 @@ def activate_deactivate_user_on_nodebb(sender, instance, **kwargs):
 
 
 @receiver(post_save, sender=CourseOverview, dispatch_uid="nodebb.signals.handlers.create_category_on_nodebb")
-def create_category_on_nodebb(sender, instance, created, **kwargs):
+def create_category_on_nodebb(instance, **kwargs):
     """
-    Create a community on NodeBB whenever a new course is created
+    Create a community on NodeBB if it's already not exists
     """
-    if created:
+    community_exists = DiscussionCommunity.objects.filter(course_id=instance.id).first()
+    if not community_exists:
         community_name = '%s-%s-%s-%s' % (instance.display_name,
                                           instance.id.org, instance.id.course, instance.id.run)
         status_code, response_body = NodeBBClient().categories.create(
