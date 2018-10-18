@@ -15,6 +15,7 @@ from openedx.core.djangoapps.verified_track_content.models import VerifiedTrackC
 from student.models import CourseEnrollment
 from xmodule.partitions.partitions import Group, UserPartition
 
+
 LOGGER = logging.getLogger(__name__)
 
 

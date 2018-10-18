@@ -39,6 +39,7 @@ from course_modes.models import CourseMode
 from courseware import module_render as render
 from courseware.courses import get_course_info_section, get_course_with_access
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData
+from courseware.access_response import AccessResponse
 from courseware.masquerade import CourseMasquerade
 from courseware.model_data import FieldDataCache
 from courseware.models import StudentModule
@@ -2362,10 +2363,9 @@ class TestFilteredChildren(SharedModuleStoreTestCase):
             key = obj.scope_ids.usage_id
         elif isinstance(obj, UsageKey):
             key = obj
-
         if key == self.parent.scope_ids.usage_id:
-            return True
-        return key in self.children_for_user[user]
+            return AccessResponse(True)
+        return AccessResponse(key in self.children_for_user[user])
 
     def assertBoundChildren(self, block, user):
         """

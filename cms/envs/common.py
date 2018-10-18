@@ -114,6 +114,7 @@ from lms.envs.common import (
     FILE_UPLOAD_STORAGE_PREFIX,
 
     COURSE_ENROLLMENT_MODES,
+    CONTENT_TYPE_GATE_PARTITION_IDS,
 
     HELP_TOKENS_BOOKS,
 
@@ -1161,6 +1162,9 @@ INSTALLED_APPS = [
 
     # API Documentation
     'rest_framework_swagger',
+
+    'openedx.features.content_type_gating',
+    'openedx.features.course_duration_limits',
 ]
 
 
