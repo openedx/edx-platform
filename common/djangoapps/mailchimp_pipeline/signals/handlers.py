@@ -141,7 +141,7 @@ def send_user_enrollments_to_mailchimp(data):
         }
     }
 
-    update_mailchimp(instance.user.email, user_json)
+    update_mailchimp(user.email, user_json)
 
 
 @task()
