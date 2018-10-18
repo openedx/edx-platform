@@ -135,9 +135,13 @@ def set_logged_in_cookies(request, response, user):
     # that is passed in when needed.
     if user.is_authenticated and not user.is_anonymous:
 
-        _set_deprecated_logged_in_cookie(response, request)
-        _set_deprecated_user_info_cookie(response, request, user)
-        _create_and_set_jwt_cookies(response, request, user)
+        # JWT cookies expire at the same time as other login-related cookies
+        # so that cookie-based login determination remains consistent.
+        cookie_settings = standard_cookie_settings(request)
+
+        _set_deprecated_logged_in_cookie(response, cookie_settings)
+        set_deprecated_user_info_cookie(response, request, user, cookie_settings)
+        _create_and_set_jwt_cookies(response, request, cookie_settings, user=user)
         CREATE_LOGON_COOKIE.send(sender=None, user=user, response=response)
 
     return response
@@ -153,29 +157,14 @@ def refresh_jwt_cookies(request, response):
             refresh_token = request.COOKIES[jwt_cookies.jwt_refresh_cookie_name()]
         except KeyError:
             raise AuthFailedError(u"JWT Refresh Cookie not found in request.")
-        _create_and_set_jwt_cookies(response, request, refresh_token=refresh_token)
+
+        # TODO don't extend the cookie expiration - reuse value from existing cookie
+        cookie_settings = standard_cookie_settings(request)
+        _create_and_set_jwt_cookies(response, request, cookie_settings, refresh_token=refresh_token)
     return response
 
 
-def _set_deprecated_logged_in_cookie(response, request):
-    """ Sets the logged in cookie on the response. """
-
-    # Backwards compatibility: set the cookie indicating that the user
-    # is logged in.  This is just a boolean value, so it's not very useful.
-    # In the future, we should be able to replace this with the "user info"
-    # cookie set below.
-    cookie_settings = standard_cookie_settings(request)
-
-    response.set_cookie(
-        settings.EDXMKTG_LOGGED_IN_COOKIE_NAME.encode('utf-8'),
-        'true',
-        **cookie_settings
-    )
-
-    return response
-
-
-def _set_deprecated_user_info_cookie(response, request, user):
+def set_deprecated_user_info_cookie(response, request, user, cookie_settings=None):
     """
     Sets the user info cookie on the response.
 
@@ -192,14 +181,29 @@ def _set_deprecated_user_info_cookie(response, request, user):
         }
     }
     """
-    cookie_settings = standard_cookie_settings(request)
-
+    cookie_settings = cookie_settings or standard_cookie_settings(request)
     user_info = _get_user_info_cookie_data(request, user)
     response.set_cookie(
         settings.EDXMKTG_USER_INFO_COOKIE_NAME.encode('utf-8'),
         json.dumps(user_info),
         **cookie_settings
     )
+
+
+def _set_deprecated_logged_in_cookie(response, cookie_settings):
+    """ Sets the logged in cookie on the response. """
+
+    # Backwards compatibility: set the cookie indicating that the user
+    # is logged in.  This is just a boolean value, so it's not very useful.
+    # In the future, we should be able to replace this with the "user info"
+    # cookie set below.
+    response.set_cookie(
+        settings.EDXMKTG_LOGGED_IN_COOKIE_NAME.encode('utf-8'),
+        'true',
+        **cookie_settings
+    )
+
+    return response
 
 
 def _get_user_info_cookie_data(request, user):
@@ -242,14 +246,10 @@ def _get_user_info_cookie_data(request, user):
     return user_info
 
 
-def _create_and_set_jwt_cookies(response, request, user=None, refresh_token=None):
+def _create_and_set_jwt_cookies(response, request, cookie_settings, user=None, refresh_token=None):
     """ Sets a cookie containing a JWT on the response. """
     if not JWT_COOKIES_FLAG.is_enabled():
         return
-
-    # JWT cookies expire at the same time as other login-related cookies
-    # so that cookie-based login determination remains consistent.
-    cookie_settings = standard_cookie_settings(request)
 
     # For security reasons, the JWT that is embedded inside the cookie expires
     # much sooner than the cookie itself, per the following setting.
@@ -262,7 +262,7 @@ def _create_and_set_jwt_cookies(response, request, user=None, refresh_token=None
         )
     else:
         access_token = create_dot_access_token(
-            request, user, oauth_application, expires_in=expires_in,
+            request, user, oauth_application, expires_in=expires_in, scopes=['email', 'profile'],
         )
     jwt = create_jwt_from_token(access_token, DOTAdapter(), use_asymmetric_key=True)
     jwt_header_and_payload, jwt_signature = _parse_jwt(jwt)
