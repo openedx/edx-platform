@@ -449,7 +449,7 @@ def get_visibility_partition_info(xblock, course=None):
     """
     selectable_partitions = []
     # We wish to display enrollment partitions before cohort partitions.
-    enrollment_user_partitions = get_user_partition_info(xblock, schemes=["enrollment_track"], course=course)
+    enrollment_user_partitions = get_user_partition_info(xblock, schemes=["enrollment_track", "content_type_gate"], course=course)
 
     # For enrollment partitions, we only show them if there is a selected group or
     # or if the number of groups > 1.

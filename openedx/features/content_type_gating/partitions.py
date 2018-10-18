@@ -50,7 +50,7 @@ def create_content_gating_partition(course):
 
     partition = content_gate_scheme.create_user_partition(
         id=CONTENT_GATING_PARTITION_ID,
-        name=_(u"Content Type Gating"),
+        name=_(u"Feature-based Enrollments"),
         description=_(u"Partition for segmenting users by access to gated content types"),
         parameters={"course_id": unicode(course.id)}
     )
@@ -158,8 +158,8 @@ class ContentTypeGatingPartitionScheme(object):
     the gated content despite not being verified users.
     """
 
-    LOCKED = Group(settings.CONTENT_TYPE_GATE_PARTITION_IDS['locked'], 'Locked')
-    UNLOCKED = Group(settings.CONTENT_TYPE_GATE_PARTITION_IDS['unlocked'], 'Unlocked')
+    LOCKED = Group(settings.CONTENT_TYPE_GATE_PARTITION_IDS['locked'], 'Limited-access Users')
+    UNLOCKED = Group(settings.CONTENT_TYPE_GATE_PARTITION_IDS['unlocked'], 'Full-access Users')
 
     @classmethod
     def get_group_for_user(cls, course_key, user, user_partition, **kwargs):
