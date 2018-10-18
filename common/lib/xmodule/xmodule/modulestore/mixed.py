@@ -165,24 +165,30 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 continue
 
         for store_settings in stores:
-            db_name = store_settings['DOC_STORE_CONFIG']['db']
-            if not re.search('/d', db_name) or str(os.getpid()) in store_settings['DOC_STORE_CONFIG']['db']:
-                key = store_settings['NAME']
-                store = create_modulestore_instance(
-                    store_settings['ENGINE'],
-                    self.contentstore,
-                    store_settings.get('DOC_STORE_CONFIG', {}),
-                    store_settings.get('OPTIONS', {}),
-                    i18n_service=i18n_service,
-                    fs_service=fs_service,
-                    user_service=user_service,
-                    signal_handler=signal_handler,
-                )
-                # replace all named pointers to the store into actual pointers
-                for course_key, store_name in self.mappings.iteritems():
-                    if store_name == key:
-                        self.mappings[course_key] = store
-                self.modulestores.append(store)
+            try:
+                db_name = store_settings['DOC_STORE_CONFIG']['db']
+                pid_num = os.getpid()
+            except:
+                pass
+            if db_name:
+                assert stores == os.getpid()
+
+            key = store_settings['NAME']
+            store = create_modulestore_instance(
+                store_settings['ENGINE'],
+                self.contentstore,
+                store_settings.get('DOC_STORE_CONFIG', {}),
+                store_settings.get('OPTIONS', {}),
+                i18n_service=i18n_service,
+                fs_service=fs_service,
+                user_service=user_service,
+                signal_handler=signal_handler,
+            )
+            # replace all named pointers to the store into actual pointers
+            for course_key, store_name in self.mappings.iteritems():
+                if store_name == key:
+                    self.mappings[course_key] = store
+            self.modulestores.append(store)
 
     def _clean_locator_for_mapping(self, locator):
         """
