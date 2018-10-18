@@ -103,7 +103,3 @@ class DOTAdapterMixin(object):
     def test_single_access_token(self):
         # TODO: Single access tokens not supported yet for DOT (See MA-2122)
         super(DOTAdapterMixin, self).test_single_access_token()
-
-    @skip("Not supported yet (See MA-2123)")
-    def test_scopes(self):
-        super(DOTAdapterMixin, self).test_scopes()

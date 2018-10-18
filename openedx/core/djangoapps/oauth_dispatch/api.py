@@ -2,7 +2,6 @@
 import json
 from django.conf import settings
 
-from edx_oauth2_provider.constants import SCOPE_VALUE_DICT
 from oauthlib.oauth2.rfc6749.errors import OAuth2Error
 from oauthlib.oauth2.rfc6749.tokens import BearerToken
 from oauth2_provider.models import AccessToken as dot_access_token
@@ -22,7 +21,7 @@ def destroy_oauth_tokens(user):
     dot_refresh_token.objects.filter(user=user.id).delete()
 
 
-def create_dot_access_token(request, user, client, expires_in=None, scope=None):
+def create_dot_access_token(request, user, client, expires_in=None, scopes=None):
     """
     Create and return a new (persisted) access token, including a refresh token.
     The token is returned in the form of a Dict:
@@ -31,17 +30,15 @@ def create_dot_access_token(request, user, client, expires_in=None, scope=None):
             u'refresh_token': u'another string',
             u'token_type': u'Bearer',
             u'expires_in': 36000,
-            u'scope': u'default',
+            u'scope': u'profile email',
         },
     """
-    # TODO (ARCH-204) the 'scope' argument may not really be needed by callers.
-
     expires_in = _get_expires_in_value(expires_in)
     token_generator = BearerToken(
         expires_in=expires_in,
         request_validator=dot_settings.OAUTH2_VALIDATOR_CLASS(),
     )
-    _populate_create_access_token_request(request, user, client, scope)
+    _populate_create_access_token_request(request, user, client, scopes)
     return token_generator.create_token(request, refresh_token=True)
 
 
@@ -72,17 +69,15 @@ def _get_expires_in_value(expires_in):
     return expires_in or dot_settings.ACCESS_TOKEN_EXPIRE_SECONDS
 
 
-def _populate_create_access_token_request(request, user, client, scope=None):
+def _populate_create_access_token_request(request, user, client, scopes):
     """
     django-oauth-toolkit expects certain non-standard attributes to
     be present on the request object.  This function modifies the
     request object to match these expectations
     """
-    if scope is None:
-        scope = 0
     request.user = user
-    request.scopes = [SCOPE_VALUE_DICT[scope]]
     request.client = client
+    request.scopes = scopes or ''
     request.state = None
     request.refresh_token = None
     request.extra_credentials = None

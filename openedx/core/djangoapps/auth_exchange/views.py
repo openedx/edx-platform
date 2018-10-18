@@ -21,6 +21,7 @@ from oauth2_provider.settings import oauth2_settings
 from oauth2_provider.views.base import TokenView as DOTAccessTokenView
 from oauthlib.oauth2.rfc6749.tokens import BearerToken
 from provider import constants
+from provider import scope as dop_scope
 from provider.oauth2.views import AccessTokenView as DOPAccessTokenView
 from rest_framework import permissions
 from rest_framework.exceptions import AuthenticationFailed
@@ -111,7 +112,8 @@ class DOTAccessTokenExchangeView(AccessTokenExchangeBase, DOTAccessTokenView):
         """
         Create and return a new access token.
         """
-        return create_dot_access_token(request, user, client, scope=scope)
+        scopes = dop_scope.to_names(scope)
+        return create_dot_access_token(request, user, client, scopes=scopes)
 
     def access_token_response(self, token):
         """
