@@ -135,7 +135,7 @@ def task_send_user_info_to_mailchimp(data):
 def send_user_enrollments_to_mailchimp(data):
     user = User.objects.get(id=data['user_id'])
 
-    log.info("fetching enrollments")
+    log.info("-------------------------\n fetching enrollments \n ------------------------------\n")
 
     enrollment_titles = get_user_active_enrollements(user.username)
     enrollment_short_ids = get_enrollements_course_short_ids(user.username)

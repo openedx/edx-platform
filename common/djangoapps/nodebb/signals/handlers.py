@@ -36,11 +36,11 @@ def log_action_response(user, status_code, response_body):
                  user.username)
 
 
-
 @receiver(post_save, sender=CourseEnrollment)
 def sync_enrolments_to_mailchimp(sender, instance, created, **kwargs):
     data = {"user_id": instance.user.id}
-    send_user_enrollments_to_mailchimp.delay(data)
+    if instance.is_active:
+        send_user_enrollments_to_mailchimp.delay(data)
 
 
 @receiver(COURSE_CERT_AWARDED, sender=GeneratedCertificate)
