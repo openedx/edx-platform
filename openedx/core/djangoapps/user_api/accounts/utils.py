@@ -1,6 +1,8 @@
 """
 Utility methods for the account settings.
 """
+from __future__ import unicode_literals
+
 import random
 import re
 import string
