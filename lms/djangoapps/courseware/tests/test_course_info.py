@@ -15,6 +15,7 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
 from openedx.core.lib.tests import attr
+from openedx.features.course_duration_limits.config import CONTENT_TYPE_GATING_FLAG
 from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from pyquery import PyQuery as pq
@@ -430,8 +431,10 @@ class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
                     resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
 
+    @override_waffle_flag(CONTENT_TYPE_GATING_FLAG, True)
     def test_num_queries_instructor_paced(self):
         self.fetch_course_info_with_queries(self.instructor_paced_course, 29, 3)
 
+    @override_waffle_flag(CONTENT_TYPE_GATING_FLAG, True)
     def test_num_queries_self_paced(self):
         self.fetch_course_info_with_queries(self.self_paced_course, 29, 3)

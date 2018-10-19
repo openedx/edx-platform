@@ -23,6 +23,7 @@ from lms.djangoapps.course_goals.api import add_course_goal, remove_course_goal
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
+from openedx.features.course_duration_limits.config import CONTENT_TYPE_GATING_FLAG
 from openedx.features.course_experience import (
     SHOW_REVIEWS_TOOL_FLAG,
     SHOW_UPGRADE_MSG_ON_COURSE_HOME,
@@ -167,6 +168,7 @@ class TestCourseHomePage(CourseHomePageTestCase):
         response = self.client.get(url)
         self.assertContains(response, TEST_COURSE_UPDATES_TOOL, status_code=200)
 
+    @override_waffle_flag(CONTENT_TYPE_GATING_FLAG, True)
     def test_queries(self):
         """
         Verify that the view's query count doesn't regress.
@@ -319,6 +321,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         )
         self.assertRedirects(response, expected_url)
 
+    @override_waffle_flag(CONTENT_TYPE_GATING_FLAG, True)
     @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
     def test_expired_course(self):
         """
@@ -337,7 +340,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         expiration_date = strftime_localized(course.start + timedelta(weeks=8), 'SHORT_DATE')
         expected_params = QueryDict(mutable=True)
         course_name = CourseOverview.get_from_id(course.id).display_name_with_default
-        expected_params['expired_message'] = 'Access to {run} expired on {expiration_date}'.format(
+        expected_params['access_response_error'] = 'Access to {run} expired on {expiration_date}'.format(
             run=course_name,
             expiration_date=expiration_date
         )

@@ -26,15 +26,17 @@ class AuditExpiredError(AccessError):
         user_message = _("Access expired on {expiration_date}").format(expiration_date=expiration_date)
         try:
             course_name = CourseOverview.get_from_id(course.id).display_name_with_default
-            detailed_user_message = _("Access to {course_name} expired on {expiration_date}").format(
+            additional_context_user_message = _("Access to {course_name} expired on {expiration_date}").format(
                 course_name=course_name,
                 expiration_date=expiration_date
             )
         except CourseOverview.DoesNotExist:
-            detailed_user_message = _("Access to the course you were looking for expired on {expiration_date}").format(
+            additional_context_user_message = _("Access to the course you were looking"
+                                                "for expired on {expiration_date}").format(
                 expiration_date=expiration_date
             )
-        super(AuditExpiredError, self).__init__(error_code, developer_message, user_message, detailed_user_message)
+        super(AuditExpiredError, self).__init__(error_code, developer_message, user_message,
+                                                additional_context_user_message)
 
 
 def get_user_course_expiration_date(user, course):

@@ -147,7 +147,7 @@ def check_course_access(course, user, action, check_if_enrolled=False, check_sur
         # Redirect if AuditExpiredError
         if isinstance(access_response, AuditExpiredError):
             params = QueryDict(mutable=True)
-            params['expired_message'] = access_response.detailed_user_message
+            params['access_response_error'] = access_response.additional_context_user_message
             raise CourseAccessRedirect('{dashboard_url}?{params}'.format(
                 dashboard_url=reverse('dashboard'),
                 params=params.urlencode()
