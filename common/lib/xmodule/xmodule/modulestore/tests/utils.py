@@ -1,6 +1,7 @@
 """
 Helper classes and methods for running modulestore tests without Django.
 """
+from uuid import uuid4
 import io
 import os
 import random
@@ -228,7 +229,7 @@ class MongoContentstoreBuilder(object):
         when the context closes.
         """
         contentstore = MongoContentStore(
-            db='contentstore{}'.format(random.randint(0, 10000)),
+            db='contentstore{}'.format(THIS_UUID),
             collection='content',
             **COMMON_DOCSTORE_CONFIG
         )
@@ -286,7 +287,7 @@ class MongoModulestoreBuilder(StoreBuilderBase):
                 all of its assets.
         """
         doc_store_config = dict(
-            db='modulestore{}'.format(random.randint(0, 10000)),
+            db='modulestore{}'.format(THIS_UUID),
             collection='xmodule',
             asset_collection='asset_metadata',
             **COMMON_DOCSTORE_CONFIG
@@ -334,7 +335,7 @@ class VersioningModulestoreBuilder(StoreBuilderBase):
                 all of its assets.
         """
         doc_store_config = dict(
-            db='modulestore{}'.format(random.randint(0, 10000)),
+            db='modulestore{}'.format(THIS_UUID),
             collection='split_module',
             **COMMON_DOCSTORE_CONFIG
         )
@@ -454,6 +455,8 @@ class MixedModulestoreBuilder(StoreBuilderBase):
             # Split stores all asset metadata in the structure collection.
             return store.db_connection.structures
 
+
+THIS_UUID = uuid4().hex
 
 COMMON_DOCSTORE_CONFIG = {
     'host': MONGO_HOST,
