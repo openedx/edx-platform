@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-10-17 06:50+0000\n"
-"PO-Revision-Date: 2018-10-17 06:50:47.973520\n"
+"POT-Creation-Date: 2018-10-21 20:37+0000\n"
+"PO-Revision-Date: 2018-10-21 20:37:16.736206\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -88,7 +88,7 @@ msgstr "Délété Ⱡ'σяєм ιρѕυ#"
 #: cms/static/js/views/validation.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/common/js/components/utils/view_utils.js
-#: lms/static/js/Markdown.Editor.js
+#: lms/static/js/Markdown.Editor.js lms/static/js/writable_gradebook.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 #: cms/templates/js/add-xblock-component-menu.underscore
 #: cms/templates/js/certificate-editor.underscore
@@ -215,6 +215,7 @@ msgstr "Ûplöäd Fïlé Ⱡ'σяєм ιρѕυм ∂σłσя #"
 #: cms/static/js/views/modals/base_modal.js
 #: cms/static/js/views/modals/course_outline_modals.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: lms/static/js/writable_gradebook.js
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/content-group-editor.underscore
 #: cms/templates/js/course_info_handouts.underscore
@@ -4183,6 +4184,7 @@ msgstr "Märk énröllmént çödé äs ünüséd Ⱡ'σяєм ιρѕυм ∂σ�
 
 #: lms/static/js/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: lms/static/js/writable_gradebook.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 #: cms/templates/js/transcript-organization-credentials.underscore
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
@@ -5889,6 +5891,43 @@ msgstr "KB Ⱡ'σя#"
 #: lms/static/js/views/image_field.js
 msgid "MB"
 msgstr "MB Ⱡ'σя#"
+
+#: lms/static/js/writable_gradebook.js
+msgid "Current grade"
+msgstr "Çürrént grädé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: lms/static/js/writable_gradebook.js
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Total"
+msgstr "Tötäl Ⱡ'σяєм ιρѕ#"
+
+#: lms/static/js/writable_gradebook.js
+msgid "The Assignment name is:"
+msgstr "Thé Àssïgnmént nämé ïs: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: lms/static/js/writable_gradebook.js
+msgid "Publish grades"
+msgstr "Püßlïsh grädés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: lms/static/js/writable_gradebook.js
+msgid "No matching records found"
+msgstr "Nö mätçhïng réçörds föünd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: lms/static/js/writable_gradebook.js
+msgid "Student Name"
+msgstr "Stüdént Nämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: lms/static/js/writable_gradebook.js
+msgid "Comment"
+msgstr "Çömmént Ⱡ'σяєм ιρѕυм #"
+
+#: lms/static/js/writable_gradebook.js
+msgid "There are no student grades to adjust."
+msgstr ""
+"Théré äré nö stüdént grädés tö ädjüst. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
 
 #: lms/static/lms/js/preview/preview_factory.js
 msgid "Course is not yet visible to students."
@@ -8561,12 +8600,6 @@ msgstr "Ördér Nö. Ⱡ'σяєм ιρѕυм ∂σł#"
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Amount"
 msgstr "Àmöünt Ⱡ'σяєм ιρѕυ#"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Total"
-msgstr "Tötäl Ⱡ'σяєм ιρѕ#"
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore

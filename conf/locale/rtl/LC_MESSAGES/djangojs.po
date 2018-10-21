@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-10-17 06:50+0000\n"
-"PO-Revision-Date: 2018-10-17 06:50:47.973520\n"
+"POT-Creation-Date: 2018-10-21 20:37+0000\n"
+"PO-Revision-Date: 2018-10-21 20:37:16.736206\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -88,7 +88,7 @@ msgstr "يثمثفث"
 #: cms/static/js/views/validation.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/common/js/components/utils/view_utils.js
-#: lms/static/js/Markdown.Editor.js
+#: lms/static/js/Markdown.Editor.js lms/static/js/writable_gradebook.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 #: cms/templates/js/add-xblock-component-menu.underscore
 #: cms/templates/js/certificate-editor.underscore
@@ -215,6 +215,7 @@ msgstr "عحمخشي بهمث"
 #: cms/static/js/views/modals/base_modal.js
 #: cms/static/js/views/modals/course_outline_modals.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: lms/static/js/writable_gradebook.js
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/content-group-editor.underscore
 #: cms/templates/js/course_info_handouts.underscore
@@ -3811,6 +3812,7 @@ msgstr "وشقن ثرقخمموثرف ذخيث شس عرعسثي"
 
 #: lms/static/js/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
+#: lms/static/js/writable_gradebook.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 #: cms/templates/js/transcript-organization-credentials.underscore
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
@@ -5257,6 +5259,41 @@ msgstr "نز"
 #: lms/static/js/views/image_field.js
 msgid "MB"
 msgstr "وز"
+
+#: lms/static/js/writable_gradebook.js
+msgid "Current grade"
+msgstr "ذعققثرف لقشيث"
+
+#: lms/static/js/writable_gradebook.js
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Total"
+msgstr "فخفشم"
+
+#: lms/static/js/writable_gradebook.js
+msgid "The Assignment name is:"
+msgstr "فاث شسسهلروثرف رشوث هس:"
+
+#: lms/static/js/writable_gradebook.js
+msgid "Publish grades"
+msgstr "حعزمهسا لقشيثس"
+
+#: lms/static/js/writable_gradebook.js
+msgid "No matching records found"
+msgstr "رخ وشفذاهرل قثذخقيس بخعري"
+
+#: lms/static/js/writable_gradebook.js
+msgid "Student Name"
+msgstr "سفعيثرف رشوث"
+
+#: lms/static/js/writable_gradebook.js
+msgid "Comment"
+msgstr "ذخووثرف"
+
+#: lms/static/js/writable_gradebook.js
+msgid "There are no student grades to adjust."
+msgstr "فاثقث شقث رخ سفعيثرف لقشيثس فخ شيتعسف."
 
 #: lms/static/lms/js/preview/preview_factory.js
 msgid "Course is not yet visible to students."
@@ -7647,12 +7684,6 @@ msgstr "خقيثق رخ."
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Amount"
 msgstr "شوخعرف"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Total"
-msgstr "فخفشم"
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
