@@ -1,10 +1,14 @@
-from django.http import HttpResponse
+from __future__ import absolute_import, print_function, unicode_literals
+
+from django.http import Http404, HttpResponse
 
 from opaque_keys.edx.keys import UsageKey
 from openedx.core.lib.xblock_runtime.blockstore_kvs import BlockstoreKVS
 from openedx.core.lib.xblock_runtime.runtime import XBlockRuntimeSystem
 from xblock.exceptions import NoSuchViewError
 from xblock.runtime import DictKeyValueStore
+
+from .blockstore_api import get_bundle_by_slug, get_bundle_file_data
 
 
 def get_blockstore_kvs():
@@ -49,6 +53,15 @@ def get_readonly_runtime_system():
 
 def bundle_unit(request, bundle_slug, olx_path):
 
+    # Find the bundle UUID:
+    bundle = get_bundle_by_slug(bundle_slug)
+    if not bundle:
+        raise Http404("Bundle not found")
+
+    xml_raw = get_bundle_file_data(bundle.uuid, olx_path)
+    if xml_raw is None:
+        raise Http404("OLX file not found")
+
     # Temporary:
 
     unit_key = UsageKey.from_string('block-v1:OpenCraft+B+1+type@drag-and-drop-v2+block@971aadaaaa5a4886b37fee3ced711b30')
@@ -59,6 +72,6 @@ def bundle_unit(request, bundle_slug, olx_path):
     except NoSuchViewError:
         fragment = block.render('student_view')
 
-    return HttpResponse("This would load the unit {} from the bundle with slug {} and content: {}".format(
-        olx_path, bundle_slug, fragment.content
-    ))
+    return HttpResponse("This would load the unit {} from the bundle with slug {} and content: {} from bundle OLX: {}".format(
+        olx_path, bundle_slug, fragment.content, xml_raw
+    ), content_type="text/plain")
