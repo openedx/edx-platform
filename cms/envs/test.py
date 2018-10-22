@@ -192,6 +192,8 @@ PASSWORD_HASHERS = [
 # No segment key
 CMS_SEGMENT_KEY = None
 
+FEATURES['DISABLE_SET_JWT_COOKIES_FOR_TESTS'] = True
+
 FEATURES['ENABLE_SERVICE_STATUS'] = True
 
 # Toggles embargo on for testing

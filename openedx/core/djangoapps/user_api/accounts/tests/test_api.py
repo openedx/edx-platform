@@ -57,7 +57,6 @@ from openedx.core.djangoapps.user_api.errors import (
     UserNotAuthorized,
     UserNotFound
 )
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.core.lib.tests import attr
 from student.models import PendingEmailChange
