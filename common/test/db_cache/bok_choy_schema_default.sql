@@ -376,7 +376,7 @@ CREATE TABLE `auth_user` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `auth_user_groups`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2122,7 +2122,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=485 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=488 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3565,7 +3565,7 @@ CREATE TABLE `oauth2_provider_application` (
   KEY `oauth2_provider_application_9d667c2b` (`client_secret`),
   KEY `oauth2_provider_applica_user_id_7fa13387c260b798_fk_auth_user_id` (`user_id`),
   CONSTRAINT `oauth2_provider_application_user_id_79829054_fk` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `oauth2_provider_grant`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -5380,6 +5380,11 @@ CREATE TABLE `third_party_auth_samlproviderconfig` (
   `send_welcome_email` tinyint(1) NOT NULL,
   `slug` varchar(30) NOT NULL,
   `enable_sso_id_verification` tinyint(1) NOT NULL,
+  `default_email` varchar(255) NOT NULL,
+  `default_first_name` varchar(255) NOT NULL,
+  `default_full_name` varchar(255) NOT NULL,
+  `default_last_name` varchar(255) NOT NULL,
+  `default_username` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `third_party_auth__changed_by_id_508190ecd0b0e845_fk_auth_user_id` (`changed_by_id`),
   KEY `third_party_auth_samlproviderconfig_9365d6e7` (`site_id`),
@@ -5839,6 +5844,7 @@ CREATE TABLE `video_config_videothumbnailsetting` (
   `all_course_videos` tinyint(1) NOT NULL,
   `course_ids` longtext NOT NULL,
   `changed_by_id` int(11) DEFAULT NULL,
+  `offset` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   KEY `video_config_videoth_changed_by_id_9385a0b2_fk_auth_user` (`changed_by_id`),
   CONSTRAINT `video_config_videoth_changed_by_id_9385a0b2_fk_auth_user` FOREIGN KEY (`changed_by_id`) REFERENCES `auth_user` (`id`)
