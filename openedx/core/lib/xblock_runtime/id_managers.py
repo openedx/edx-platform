@@ -90,38 +90,3 @@ class OpaqueKeyReader(IdReader):
             The `aside_type` of the aside.
         """
         return aside_id.aside_type
-
-
-class AsideKeyGenerator(IdGenerator):
-    """
-    An :class:`.IdGenerator` that only provides facilities for constructing new XBlockAsides.
-    """
-    def create_aside(self, definition_id, usage_id, aside_type):
-        """
-        Make a new aside definition and usage ids, indicating an :class:`.XBlockAside` of type `aside_type`
-        commenting on an :class:`.XBlock` usage `usage_id`
-
-        Returns:
-            (aside_definition_id, aside_usage_id)
-        """
-        def_key = AsideDefinitionKeyV2(definition_id, aside_type)
-        usage_key = AsideUsageKeyV2(usage_id, aside_type)
-        return (def_key, usage_key)
-
-    def create_usage(self, def_id):
-        """Make a usage, storing its definition id.
-
-        Returns the newly-created usage id.
-        """
-        raise NotImplementedError("Open edX does not support create_usage")
-
-    def create_definition(self, block_type, slug=None):
-        """Make a definition, storing its block type.
-
-        If `slug` is provided, it is a suggestion that the definition id
-        incorporate the slug somehow.
-
-        Returns the newly-created definition id.
-
-        """
-        raise NotImplementedError("Open edX does not support create_definition")

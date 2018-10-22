@@ -1,9 +1,9 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
-from django.http import Http404, HttpResponse
+from django.http import Http404, JsonResponse
 
 from opaque_keys.edx.keys import UsageKey
-from openedx.core.lib.xblock_runtime.blockstore_kvs import BlockstoreKVS
+from openedx.core.lib.xblock_runtime.blockstore_kvs import BlockstoreKVS, blockstore_transaction
 from openedx.core.lib.xblock_runtime.runtime import XBlockRuntimeSystem
 from xblock.exceptions import NoSuchViewError
 from xblock.runtime import DictKeyValueStore
@@ -46,7 +46,6 @@ def get_readonly_runtime_system():
             handler_url=lambda *args, **kwargs: 'test_url',  # TODO: Need an actual method for calling handler_urls with this runtime
             authored_data_kvs=get_blockstore_kvs(),
             student_data_kvs=get_user_state_kvs(),
-            authored_data_readonly=True,
         )
     return get_readonly_runtime_system._system
 
@@ -62,16 +61,18 @@ def bundle_unit(request, bundle_slug, olx_path):
     if xml_raw is None:
         raise Http404("OLX file not found")
 
-    # Temporary:
+    runtime = get_readonly_runtime_system().get_runtime(user_id=request.user.id)
+    with blockstore_transaction():
+        unit_key = runtime.parse_xml_string(xml_raw)
+        block = runtime.get_block(unit_key)
+        try:
+            fragment = block.render('author_view')
+        except NoSuchViewError:
+            fragment = block.render('student_view')
 
-    unit_key = UsageKey.from_string('block-v1:OpenCraft+B+1+type@drag-and-drop-v2+block@971aadaaaa5a4886b37fee3ced711b30')
+    data = {
+        "root_usage_key": unit_key,
+    }
+    data.update(fragment.to_dict())
 
-    block = get_readonly_runtime_system().get_block(unit_key, user_id=request.user.id)
-    try:
-        fragment = block.render('author_view')
-    except NoSuchViewError:
-        fragment = block.render('student_view')
-
-    return HttpResponse("This would load the unit {} from the bundle with slug {} and content: {} from bundle OLX: {}".format(
-        olx_path, bundle_slug, fragment.content, xml_raw
-    ), content_type="text/plain")
+    return JsonResponse(data)

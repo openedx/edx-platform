@@ -1,11 +1,13 @@
+from lxml import etree
+
 from xblock.core import XBlock, XBlockAside
 from xblock.field_data import ReadOnlyFieldData, SplitFieldData
 from xblock.fields import Scope, ScopeIds
-from xblock.runtime import Runtime, IdReader, IdGenerator, NullI18nService
+from xblock.runtime import Runtime, IdReader, IdGenerator, NullI18nService, MemoryIdManager
 
 from openedx.core.lib.xblock_utils import xblock_local_resource_url
 from xmodule.modulestore.inheritance import inheriting_field_data
-from .id_managers import OpaqueKeyReader, AsideKeyGenerator
+from .blockstore_kvs import collect_parsed_fields
 
 
 class XBlockRuntime(Runtime):
@@ -52,6 +54,9 @@ class XBlockRuntime(Runtime):
         """ Disable XBlock asides in this runtime """
         return []
 
+    def parse_xml_file(self, fileobj, id_generator=None):
+        with collect_parsed_fields():
+            return super(XBlockRuntime, self).parse_xml_file(fileobj, id_generator)
 
 class XBlockRuntimeSystem(object):
     """
@@ -66,7 +71,6 @@ class XBlockRuntimeSystem(object):
         handler_url,  # type: (Callable[[XBlock, string, string, string, bool], string]
         authored_data_kvs,  # type: InheritanceKeyValueStore
         student_data_kvs,  # type: InheritanceKeyValueStore
-        authored_data_readonly=True  # type: bool
     ):
         """
         args:
@@ -76,18 +80,17 @@ class XBlockRuntimeSystem(object):
                 any fields with UserScope.NONE
             student_data_kvs: An InheritanceKeyValueStore used to retrieve
                 any fields with UserScope.ONE or UserScope.ALL
-            authored_data_readonly: If true, this runtime system will not allow
-                XBlocks to write to any UserScope.NONE fields.
         """
         self.handler_url = handler_url
-        self.id_reader = OpaqueKeyReader()
-        self.id_generator = AsideKeyGenerator()
+        # TODO: new ID manager:
+        self.id_reader = MemoryIdManager()
+        self.id_generator = self.id_reader
 
         # Field data storage/retrieval:
         authored_data = inheriting_field_data(authored_data_kvs)
         student_data = student_data_kvs
-        if authored_data_readonly:
-            authored_data = ReadOnlyFieldData(authored_data)
+        #if authored_data_readonly:
+        #    authored_data = ReadOnlyFieldData(authored_data)
 
         self.field_data = SplitFieldData({
             Scope.content: authored_data,
@@ -100,7 +103,6 @@ class XBlockRuntimeSystem(object):
             Scope.preferences: student_data,
         })
 
-    def get_block(self, usage_id, user_id):
-        # type: (UsageKey, int) -> XBlock
-        runtime = XBlockRuntime(self, user_id)
-        return runtime.get_block(usage_id)
+    def get_runtime(self, user_id):
+        # type: (int) -> XBlockRuntime
+        return XBlockRuntime(self, user_id)
