@@ -35,6 +35,7 @@
                 DiscussionUtil.loadRoles(options.roles);
                 window.$$course_id = options.courseId;
                 window.courseName = options.courseName;
+                window.$$roles = options.roles;
                 DiscussionUtil.setUser(user);
                 window.user = user;
                 Content.loadContentInfos(contentInfo);
