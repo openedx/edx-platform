@@ -22,7 +22,6 @@ from openedx.core.djangoapps.oauth_dispatch.api import create_dot_access_token, 
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_from_token
 from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewide_block_completed
 from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
-from openedx.core.djangoapps.user_authn.waffle import JWT_COOKIES_FLAG
 from student.models import CourseEnrollment
 
 
@@ -152,15 +151,14 @@ def refresh_jwt_cookies(request, response):
     Resets the JWT related cookies in the response, while expecting a refresh
     cookie in the request.
     """
-    if JWT_COOKIES_FLAG.is_enabled():
-        try:
-            refresh_token = request.COOKIES[jwt_cookies.jwt_refresh_cookie_name()]
-        except KeyError:
-            raise AuthFailedError(u"JWT Refresh Cookie not found in request.")
+    try:
+        refresh_token = request.COOKIES[jwt_cookies.jwt_refresh_cookie_name()]
+    except KeyError:
+        raise AuthFailedError(u"JWT Refresh Cookie not found in request.")
 
-        # TODO don't extend the cookie expiration - reuse value from existing cookie
-        cookie_settings = standard_cookie_settings(request)
-        _create_and_set_jwt_cookies(response, request, cookie_settings, refresh_token=refresh_token)
+    # TODO don't extend the cookie expiration - reuse value from existing cookie
+    cookie_settings = standard_cookie_settings(request)
+    _create_and_set_jwt_cookies(response, request, cookie_settings, refresh_token=refresh_token)
     return response
 
 
@@ -248,9 +246,6 @@ def _get_user_info_cookie_data(request, user):
 
 def _create_and_set_jwt_cookies(response, request, cookie_settings, user=None, refresh_token=None):
     """ Sets a cookie containing a JWT on the response. """
-    if not JWT_COOKIES_FLAG.is_enabled():
-        return
-
     # For security reasons, the JWT that is embedded inside the cookie expires
     # much sooner than the cookie itself, per the following setting.
     expires_in = settings.JWT_AUTH['JWT_IN_COOKIE_EXPIRATION']

@@ -107,11 +107,10 @@ class CookieTests(TestCase):
 
     def test_set_logged_in_jwt_cookies(self):
         setup_login_oauth_client()
-        with cookies_api.JWT_COOKIES_FLAG.override(True):
-            response = cookies_api.set_logged_in_cookies(self.request, HttpResponse(), self.user)
-            self._assert_cookies_present(response, cookies_api.ALL_LOGGED_IN_COOKIE_NAMES)
-            self._assert_consistent_expires(response)
-            self._assert_recreate_jwt_from_cookies(response, can_recreate=True)
+        response = cookies_api.set_logged_in_cookies(self.request, HttpResponse(), self.user)
+        self._assert_cookies_present(response, cookies_api.ALL_LOGGED_IN_COOKIE_NAMES)
+        self._assert_consistent_expires(response)
+        self._assert_recreate_jwt_from_cookies(response, can_recreate=True)
 
     def test_delete_and_is_logged_in_cookie_set(self):
         response = cookies_api.set_logged_in_cookies(self.request, HttpResponse(), self.user)
@@ -127,13 +126,12 @@ class CookieTests(TestCase):
             return response.cookies[cookies_api.jwt_cookies.jwt_refresh_cookie_name()].value
 
         setup_login_oauth_client()
-        with cookies_api.JWT_COOKIES_FLAG.override(True):
-            response = cookies_api.set_logged_in_cookies(self.request, HttpResponse(), self.user)
-            self._copy_cookies_to_request(response, self.request)
+        response = cookies_api.set_logged_in_cookies(self.request, HttpResponse(), self.user)
+        self._copy_cookies_to_request(response, self.request)
 
-            new_response = cookies_api.refresh_jwt_cookies(self.request, HttpResponse())
-            self._assert_recreate_jwt_from_cookies(new_response, can_recreate=True)
-            self.assertNotEqual(
-                _get_refresh_token_value(response),
-                _get_refresh_token_value(new_response),
-            )
+        new_response = cookies_api.refresh_jwt_cookies(self.request, HttpResponse())
+        self._assert_recreate_jwt_from_cookies(new_response, can_recreate=True)
+        self.assertNotEqual(
+            _get_refresh_token_value(response),
+            _get_refresh_token_value(new_response),
+        )

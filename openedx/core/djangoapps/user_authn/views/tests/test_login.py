@@ -30,7 +30,6 @@ from openedx.core.djangoapps.user_api.config.waffle import (
 )
 from openedx.core.djangoapps.user_authn.cookies import jwt_cookies
 from openedx.core.djangoapps.user_authn.tests.utils import setup_login_oauth_client
-from openedx.core.djangoapps.user_authn.waffle import JWT_COOKIES_FLAG
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -302,12 +301,11 @@ class LoginTest(CacheIsolationTestCase):
             self.assertIn(jwt_cookies.jwt_refresh_cookie_name(), self.client.cookies)
 
         setup_login_oauth_client()
-        with JWT_COOKIES_FLAG.override(True):
-            response, _ = self._login_response('test@edx.org', 'test_password')
-            _assert_jwt_cookie_present(response)
+        response, _ = self._login_response('test@edx.org', 'test_password')
+        _assert_jwt_cookie_present(response)
 
-            response = self.client.post(reverse('login_refresh'))
-            _assert_jwt_cookie_present(response)
+        response = self.client.post(reverse('login_refresh'))
+        _assert_jwt_cookie_present(response)
 
     @patch.dict("django.conf.settings.FEATURES", {'PREVENT_CONCURRENT_LOGINS': True})
     def test_single_session(self):
