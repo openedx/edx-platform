@@ -48,14 +48,15 @@
 @import "course/syllabus"; // TODO arjun replace w/ custom tabs, see courseware/courses.py
 @import "course/textbook";
 @import "course/profile";
-@import "course/gradebook";
 @import "course/tabs";
 @import "course/student-notes";
 @import "views/teams";
 
 // course - instructor-only views
+@import "course/gradebook";
 @import "course/instructor/instructor_2";
 @import "course/instructor/email";
+@import "course/instructor/writable_gradebook";
 @import "xmodule/descriptors/css/module-styles.scss";
 
 // course - ccx_coach

@@ -42,10 +42,10 @@ from django.core.urlresolvers import reverse
       %if number_of_students > 0:
         <div id="filters-container" class="hidden">
           <div class="view-container">
-            <span>${_("Score View:")} </span>
+            <span class="filter-title">${_("Score View:")} </span>
             <input type="radio" id="table-data-view-percent" name="table-data-view" value="percent"> ${_("Percent")}
             <input type="radio" id="table-data-view-absolute" name="table-data-view" value="absolute" checked> ${_("Absolute")}
-            <a id="download-grade-report" href="../../instructor?report=grade-report#view-data_download">${_("Download Grade Report")}</a>
+            <a class="report-download-link" id="download-grade-report" href="../../instructor?report=grade-report#view-data_download">${_("Download Grade Report")}</a>
           </div>
 
           <div id="gp-filter" class="gradebook-filter">

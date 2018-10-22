@@ -1,0 +1,105 @@
+@mixin table-filter-input {
+    border: 1px $gray solid;
+    background-color: $white;
+    border-radius: 4px;
+}
+
+.gradebook-content {
+
+    .dataTables_filter {
+        input {
+            @include table-filter-input;
+        }
+    } 
+
+    .gradebook-filter {
+        select {
+            @include table-filter-input;
+        }
+    }
+
+    .view-container {
+        padding-bottom: 30px;
+        .filter-title {
+            margin-right: 5px;
+        }
+        input {
+            margin: 0px 2px;
+        }
+    }
+
+    .gradebook-filter {
+        margin: 10px 0px;
+    }
+
+
+    .dataTables_wrapper {
+        #student-grades-table{
+            margin:0;
+        }
+        .dataTables_info {
+            float: none;
+            width: 100%;
+            text-align: center;
+        }
+    }
+    .grade-override-modal {
+        left: 0px;
+        top: 50%;
+        background: $white;
+        border: 1px $gray solid;
+        width: 100%;
+        .modal-content {
+            background-color: $white;
+            p{
+                padding: 5px;
+            }
+            .block-id-placeholder {
+                font-size: $small-font-size;
+            }
+            .grade-override-message {
+                padding: 5px;
+                margin: 0px 5px;
+                background-color: $uxpl-gray-background;
+                color: $error-color;
+            }
+            .user-adjusted-grade input {
+                max-width: 50px;
+                height: 18px;
+                padding: 5px 2px;
+            }
+            .user-grade-comment textarea {
+                max-width: 150px;
+            }
+            .grade-override-menu-buttons {
+                padding: 10px;
+            }
+        }
+    }
+
+
+    @media (min-width: $bp-screen-md) {
+        .view-container {
+            .report-download-link {
+                float: right;
+            }
+        }
+        .grade-override-modal {
+            left: 22px;
+            top: 40%;
+        }
+    }
+
+    @media (min-width: $bp-screen-xl) {
+        .view-container {
+            .report-download-link {
+                float: right;
+            }
+        }
+        .grade-override-modal {
+            left: 10%;
+            top: 30%;
+            max-width: 1100px;
+        }
+    }
+}
