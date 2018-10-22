@@ -737,8 +737,11 @@ def set_microsite(domain):
             """
             Execute the function after setting up the microsite.
             """
-            microsite.set_by_domain(domain)
-            return func(request, *args, **kwargs)
+            try:
+                microsite.set_by_domain(domain)
+                return func(request, *args, **kwargs)
+            finally:
+                microsite.clear()
         return inner
     return decorator
 
