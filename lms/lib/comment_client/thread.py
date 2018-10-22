@@ -234,7 +234,7 @@ class Thread(models.Model):
             url,
             params
         )
-        return response['num_followers']
+        return response.get('num_followers', 0)
 
 
 def get_course_thread_stats(course_id):

@@ -97,7 +97,11 @@ class MockSignalHandlerMixin(object):
                     del mock_kwargs[key]
                 del kwargs['exclude_args']
             self.assertEqual(mock_args, args)
-            self.assertEqual(mock_kwargs, dict(kwargs, signal=mock_signal))
+            expected_kwargs = dict(kwargs, signal=mock_signal)
+            undo = mock_handler.call_args[1].get('undo')
+            if undo is not None:
+                expected_kwargs['undo'] = undo
+            self.assertEqual(mock_kwargs, expected_kwargs)
 
 
 @contextmanager
