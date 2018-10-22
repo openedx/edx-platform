@@ -328,7 +328,7 @@
         }
 
         .remove-setting {
-          @include transition(color .25s ease-in-out);
+          @include transition(color 0.25s ease-in-out);
 
           @extend %t-action1;
 

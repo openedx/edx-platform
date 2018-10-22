@@ -33,7 +33,7 @@
       max-width: map-get($container-max-widths, xl);
 
       @include media-breakpoint-up(md) {
-          min-width: map-get($container-max-widths, md);
+        min-width: map-get($container-max-widths, md);
       }
 
       position: relative;
@@ -296,7 +296,7 @@
           color: $white;
         }
 
-       @extend %ui-print-excluded;
+        @extend %ui-print-excluded;
       }
     }
   }
@@ -603,7 +603,7 @@
 
           @include margin(($baseline/5), ($baseline/2), 0, 0);
 
-          opacity: .6;
+          opacity: 0.6;
         }
 
         .important-dates-item-text {

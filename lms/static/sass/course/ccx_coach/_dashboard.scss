@@ -95,7 +95,7 @@ form.ccx-form {
     display: inline-block;
     line-height: normal;
     transition: all 0.125s ease-in-out 0s;
-    padding: 5px 10px 5px 10px;
+    padding: 5px 10px;
 
     &:focus {
       border-color: #0ea6ec;
@@ -111,7 +111,7 @@ form.ccx-form {
   }
 
   .field {
-    margin: 5px 0 5px 0;
+    margin: 5px 0;
   }
 }
 

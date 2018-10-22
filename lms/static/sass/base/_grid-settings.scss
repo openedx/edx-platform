@@ -25,13 +25,13 @@ $edx-bp-huge:  new-breakpoint(min-width 980px 12);
 
 // Wrap grids with grid-container.
 @mixin grid-container() {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    align-items: flex-start;
-    box-sizing: border-box;
-    margin: 0 auto;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  box-sizing: border-box;
+  margin: 0 auto;
 }
 
 @mixin span($cols, $margin:'') {
@@ -44,11 +44,15 @@ $edx-bp-huge:  new-breakpoint(min-width 980px 12);
     @include margin-right(0);
 
     width: calc(#{cols($cols)} - 0.5 * #{$grid-gutter-width});
-  } @else if ($margin == 'after') {
+  }
+
+  @else if ($margin == 'after') {
     @include margin-left(0);
 
     width: calc(#{cols($cols)} - 0.5 * #{$grid-gutter-width});
-  } @else if ($margin == 'none') {
+  }
+
+  @else if ($margin == 'none') {
     @include margin-left(0);
     @include margin-right(0);
 

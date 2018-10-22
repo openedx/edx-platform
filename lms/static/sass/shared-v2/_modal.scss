@@ -58,7 +58,7 @@
         @include background-image(
           radial-gradient(
             50% 50%, circle closest-side,
-                        $white-opacity-80 0%,
+            $white-opacity-80 0%,
                         $white-transparent 100%
                    )
                );
@@ -78,7 +78,7 @@
         @include background-image(
           linear-gradient(
             180deg,
-                        $white-transparent 0%,
+            $white-transparent 0%,
                         $white-opacity-80 50%,
                         $white-transparent
                    )
@@ -95,7 +95,7 @@
           @include background-image(
             linear-gradient(
               180deg,
-                            $light-grey-transparent 0%,
+              $light-grey-transparent 0%,
                             $light-grey-solid 50%,
                             $light-grey-transparent
                        )

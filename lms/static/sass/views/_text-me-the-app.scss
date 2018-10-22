@@ -19,7 +19,6 @@
     padding-right: ($baseline/2);
     padding-top: ($baseline*6);
     padding-bottom: ($baseline*6);
-
     display: block;
     max-width: 350px;
     min-width: 250px;
@@ -28,7 +27,6 @@
 }
 
 .text-me-fragment {
-
   h2 {
     @extend %t-title4;
 
