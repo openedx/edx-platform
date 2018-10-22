@@ -19,9 +19,10 @@ from entitlements.api.v1.permissions import IsAdminOrSupportOrAuthenticatedReadO
 from entitlements.api.v1.serializers import CourseEntitlementSerializer
 from entitlements.models import CourseEntitlement, CourseEntitlementPolicy, CourseEntitlementSupportDetail
 from entitlements.utils import is_course_run_entitlement_fulfillable
-from openedx.core.djangoapps.catalog.utils import get_course_runs_for_course
+from openedx.core.djangoapps.catalog.utils import get_course_runs_for_course, get_owners_for_course
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
+from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 from student.models import AlreadyEnrolledError, CourseEnrollment, CourseEnrollmentException
 
 log = logging.getLogger(__name__)
@@ -158,12 +159,20 @@ class EntitlementViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         support_details = request.data.pop('support_details', [])
+        email_opt_in = request.data.pop('email_opt_in', False)
+
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
 
         entitlement = serializer.instance
         set_entitlement_policy(entitlement, request.site)
+
+        # The owners for a course are the organizations that own the course. By taking owner.key,
+        # we are able to pass in the organization key for email_opt_in
+        owners = get_owners_for_course(entitlement.course_uuid)
+        for owner in owners:
+            update_email_opt_in(entitlement.user, owner['key'], email_opt_in)
 
         if support_details:
             for support_detail in support_details:
