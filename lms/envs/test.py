@@ -596,7 +596,6 @@ JWT_AUTH.update({
         'ayjB_lvltHyZxfl0dvruShZOx1N6ykEo7YrAskC_qxUyrIvqmJ64zPW3jkuOYrFs7Ykj3zFx3Zq1H5568G0", "kid": "BTZ9HA6K", "kty"'
         ': "RSA"}'
     ),
-    'JWT_LOGIN_CLIENT_ID': 'test-login-service-client-id',
 })
 
 ####################### Plugin Settings ##########################
