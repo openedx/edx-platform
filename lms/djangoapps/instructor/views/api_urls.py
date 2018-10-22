@@ -22,6 +22,7 @@ urlpatterns = [
     url(r'^get_sale_order_records$', api.get_sale_order_records, name='get_sale_order_records'),
     url(r'^sale_validation_url$', api.sale_validation, name='sale_validation'),
     url(r'^get_anon_ids$', api.get_anon_ids, name='get_anon_ids'),
+    url(r'^get_student_enrollment_status$', api.get_student_enrollment_status, name="get_student_enrollment_status"),
     url(r'^get_student_progress_url$', api.get_student_progress_url, name='get_student_progress_url'),
     url(r'^reset_student_attempts$', api.reset_student_attempts, name='reset_student_attempts'),
     url(r'^rescore_problem$', api.rescore_problem, name='rescore_problem'),
