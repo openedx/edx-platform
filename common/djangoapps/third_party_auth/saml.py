@@ -211,6 +211,17 @@ class EdXSAMLIdentityProvider(SAMLIdentityProvider):
         })
         return details
 
+    def get_attr(self, attributes, conf_key, default_attribute):
+        """
+        Internal helper method.
+        Get the attribute 'default_attribute' out of the attributes,
+        unless self.conf[conf_key] overrides the default by specifying
+        another attribute to use.
+        """
+        key = self.conf.get(conf_key, default_attribute)
+        default = self.conf['attr_defaults'].get(conf_key) or None
+        return attributes[key][0] if key in attributes else default
+
     @property
     def saml_sp_configuration(self):
         """Get the SAMLConfiguration for this IdP"""
@@ -242,6 +253,14 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
         'country': 'country',
     }
 
+    defaults_value_mapping = {
+        'defaultFullName': 'attr_full_name',
+        'firstName': 'attr_first_name',
+        'lastName': 'attr_last_name',
+        'username': 'attr_username',
+        'email': 'attr_email',
+    }
+
     # Define a simple mapping to relate SAPSF values to Open edX-compatible values for
     # any given field. By default, this only contains the Country field, as SAPSF supplies
     # a country name, which has to be translated to a country code.
@@ -260,7 +279,12 @@ class SapSuccessFactorsIdentityProvider(EdXSAMLIdentityProvider):
         Get a dictionary mapping registration field names to default values.
         """
         field_mapping = self.field_mappings
-        registration_fields = {edx_name: response['d'].get(odata_name, '') for odata_name, edx_name in field_mapping.items()}
+        value_defaults = self.conf.get('attr_defaults', {})
+        value_defaults = {key: value_defaults.get(value, '') for key, value in self.defaults_value_mapping.items()}
+        registration_fields = {
+            edx_name: response['d'].get(odata_name, value_defaults.get(odata_name, ''))
+            for odata_name, edx_name in field_mapping.items()
+        }
         value_mapping = self.value_mappings
         for field, value in registration_fields.items():
             if field in value_mapping and value in value_mapping[field]:
