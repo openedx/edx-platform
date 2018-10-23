@@ -14,7 +14,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from six import text_type
 
-from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory, StaffFactory
+from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
 from lms.djangoapps.grades.api.v1.views import CourseGradesView
 from lms.djangoapps.grades.config.waffle import waffle_flags, WRITABLE_GRADEBOOK
 from lms.djangoapps.grades.course_data import CourseData
