@@ -64,6 +64,7 @@ from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.tests import attr
 from openedx.core.lib.url_utils import quote_slashes
+from openedx.features.course_duration_limits.config import CONTENT_TYPE_GATING_FLAG
 from openedx.features.course_experience import COURSE_OUTLINE_PAGE_FLAG, UNIFIED_COURSE_TAB_FLAG
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from student.models import CourseEnrollment
@@ -204,9 +205,10 @@ class IndexQueryTestCase(ModuleStoreTestCase):
     CREATE_USER = False
     NUM_PROBLEMS = 20
 
+    @override_waffle_flag(CONTENT_TYPE_GATING_FLAG, True)
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 10, 147),
-        (ModuleStoreEnum.Type.split, 4, 147),
+        (ModuleStoreEnum.Type.mongo, 10, 157),
+        (ModuleStoreEnum.Type.split, 4, 153),
     )
     @ddt.unpack
     def test_index_query_counts(self, store_type, expected_mongo_query_count, expected_mysql_query_count):
@@ -1429,9 +1431,10 @@ class ProgressPageTests(ProgressPageBaseTests):
                 resp = self._get_progress_page()
                 self.assertContains(resp, u"Download Your Certificate")
 
+    @override_waffle_flag(CONTENT_TYPE_GATING_FLAG, True)
     @ddt.data(
-        (True, 38),
-        (False, 37)
+        (True, 40),
+        (False, 39)
     )
     @ddt.unpack
     def test_progress_queries_paced_courses(self, self_paced, query_count):
@@ -1440,10 +1443,11 @@ class ProgressPageTests(ProgressPageBaseTests):
         with self.assertNumQueries(query_count, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST), check_mongo_calls(1):
             self._get_progress_page()
 
+    @override_waffle_flag(CONTENT_TYPE_GATING_FLAG, True)
     @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
     @ddt.data(
-        (False, 45, 28),
-        (True, 37, 24)
+        (False, 47, 30),
+        (True, 39, 26)
     )
     @ddt.unpack
     def test_progress_queries(self, enable_waffle, initial, subsequent):

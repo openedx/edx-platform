@@ -29,8 +29,9 @@ from courseware.tests.factories import (
 from courseware.tests.helpers import LoginEnrollmentTestCase, masquerade_as_group_member
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
+from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
 from openedx.core.lib.tests import attr
+from openedx.features.course_duration_limits.config import CONTENT_TYPE_GATING_FLAG
 from student.models import CourseEnrollment
 from student.roles import CourseCcxCoachRole, CourseStaffRole
 from student.tests.factories import (
@@ -826,6 +827,7 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
     )
     @ddt.unpack
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @override_waffle_flag(CONTENT_TYPE_GATING_FLAG, True)
     def test_course_catalog_access_num_queries(self, user_attr_name, action, course_attr_name):
         course = getattr(self, course_attr_name)
 
@@ -836,15 +838,15 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
             user = getattr(self, user_attr_name)
             user = User.objects.get(id=user.id)
 
-        if (user_attr_name == 'user_staff' and
-            action == 'see_exists' and
-            course_attr_name in
-                ['course_default', 'course_not_started']):
+        if user_attr_name == 'user_staff' and action == 'see_exists':
             # checks staff role
             num_queries = 1
-        elif user_attr_name == 'user_normal' and action == 'see_exists' and course_attr_name != 'course_started':
-            # checks staff role and enrollment data
-            num_queries = 2
+        elif user_attr_name == 'user_normal' and action == 'see_exists':
+            if course_attr_name == 'course_started':
+                num_queries = 1
+            else:
+                # checks staff role and enrollment data
+                num_queries = 2
         else:
             num_queries = 0
 

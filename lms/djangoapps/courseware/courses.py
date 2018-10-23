@@ -8,6 +8,7 @@ from datetime import datetime
 
 import branding
 import pytz
+from openedx.features.course_duration_limits.access import AuditExpiredError
 from courseware.access import has_access
 from courseware.access_response import StartDateError, MilestoneAccessError
 from courseware.date_summary import (
@@ -138,6 +139,15 @@ def check_course_access(course, user, action, check_if_enrolled=False, check_sur
             start_date = strftime_localized(course.start, 'SHORT_DATE')
             params = QueryDict(mutable=True)
             params['notlive'] = start_date
+            raise CourseAccessRedirect('{dashboard_url}?{params}'.format(
+                dashboard_url=reverse('dashboard'),
+                params=params.urlencode()
+            ), access_response)
+
+        # Redirect if AuditExpiredError
+        if isinstance(access_response, AuditExpiredError):
+            params = QueryDict(mutable=True)
+            params['access_response_error'] = access_response.additional_context_user_message
             raise CourseAccessRedirect('{dashboard_url}?{params}'.format(
                 dashboard_url=reverse('dashboard'),
                 params=params.urlencode()

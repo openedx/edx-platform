@@ -21,6 +21,7 @@ from lms.djangoapps.ccx.tests.factories import CcxFactory
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
+from openedx.features.course_duration_limits.config import CONTENT_TYPE_GATING_FLAG
 from pytz import UTC
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
@@ -194,7 +195,8 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
         XBLOCK_FIELD_DATA_WRAPPERS=[],
         MODULESTORE_FIELD_OVERRIDE_PROVIDERS=[],
     )
-    def test_field_overrides(self, overrides, course_width, enable_ccx, view_as_ccx):
+    @mock.patch.object(CONTENT_TYPE_GATING_FLAG, 'is_enabled', return_value=True)
+    def test_field_overrides(self, overrides, course_width, enable_ccx, view_as_ccx, _mock_flag):
         """
         Test without any field overrides.
         """
@@ -235,18 +237,18 @@ class TestFieldOverrideMongoPerformance(FieldOverridePerformanceTestCase):
         #     # of sql queries to default,
         #     # of mongo queries,
         # )
-        ('no_overrides', 1, True, False): (18, 1),
-        ('no_overrides', 2, True, False): (18, 1),
-        ('no_overrides', 3, True, False): (18, 1),
-        ('ccx', 1, True, False): (18, 1),
-        ('ccx', 2, True, False): (18, 1),
-        ('ccx', 3, True, False): (18, 1),
-        ('no_overrides', 1, False, False): (18, 1),
-        ('no_overrides', 2, False, False): (18, 1),
-        ('no_overrides', 3, False, False): (18, 1),
-        ('ccx', 1, False, False): (18, 1),
-        ('ccx', 2, False, False): (18, 1),
-        ('ccx', 3, False, False): (18, 1),
+        ('no_overrides', 1, True, False): (20, 1),
+        ('no_overrides', 2, True, False): (20, 1),
+        ('no_overrides', 3, True, False): (20, 1),
+        ('ccx', 1, True, False): (20, 1),
+        ('ccx', 2, True, False): (20, 1),
+        ('ccx', 3, True, False): (20, 1),
+        ('no_overrides', 1, False, False): (20, 1),
+        ('no_overrides', 2, False, False): (20, 1),
+        ('no_overrides', 3, False, False): (20, 1),
+        ('ccx', 1, False, False): (20, 1),
+        ('ccx', 2, False, False): (20, 1),
+        ('ccx', 3, False, False): (20, 1),
     }
 
 
@@ -258,19 +260,19 @@ class TestFieldOverrideSplitPerformance(FieldOverridePerformanceTestCase):
     __test__ = True
 
     TEST_DATA = {
-        ('no_overrides', 1, True, False): (18, 3),
-        ('no_overrides', 2, True, False): (18, 3),
-        ('no_overrides', 3, True, False): (18, 3),
-        ('ccx', 1, True, False): (18, 3),
-        ('ccx', 2, True, False): (18, 3),
-        ('ccx', 3, True, False): (18, 3),
-        ('ccx', 1, True, True): (19, 3),
-        ('ccx', 2, True, True): (19, 3),
-        ('ccx', 3, True, True): (19, 3),
-        ('no_overrides', 1, False, False): (18, 3),
-        ('no_overrides', 2, False, False): (18, 3),
-        ('no_overrides', 3, False, False): (18, 3),
-        ('ccx', 1, False, False): (18, 3),
-        ('ccx', 2, False, False): (18, 3),
-        ('ccx', 3, False, False): (18, 3),
+        ('no_overrides', 1, True, False): (20, 3),
+        ('no_overrides', 2, True, False): (20, 3),
+        ('no_overrides', 3, True, False): (20, 3),
+        ('ccx', 1, True, False): (20, 3),
+        ('ccx', 2, True, False): (20, 3),
+        ('ccx', 3, True, False): (20, 3),
+        ('ccx', 1, True, True): (21, 3),
+        ('ccx', 2, True, True): (21, 3),
+        ('ccx', 3, True, True): (21, 3),
+        ('no_overrides', 1, False, False): (20, 3),
+        ('no_overrides', 2, False, False): (20, 3),
+        ('no_overrides', 3, False, False): (20, 3),
+        ('ccx', 1, False, False): (20, 3),
+        ('ccx', 2, False, False): (20, 3),
+        ('ccx', 3, False, False): (20, 3),
     }
