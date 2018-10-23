@@ -3178,6 +3178,8 @@ JWT_AUTH = {
     'JWT_EXPIRATION': 30,
     'JWT_IN_COOKIE_EXPIRATION': 60 * 60,
 
+    'JWT_AUTH_COOKIE': 'edx-jwt-cookie',
+
     'JWT_LOGIN_CLIENT_ID': 'login-service-client-id',
     'JWT_LOGIN_SERVICE_USERNAME': 'login_service_user',
 
