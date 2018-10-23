@@ -343,7 +343,11 @@ class CatalogEditViewTest(CatalogTest):
     @httpretty.activate
     def test_get(self):
         self.mock_catalog_endpoint(self.catalog.attributes, catalog_id=self.catalog.id)
-        response = self.client.get(self.url)
+        try:
+            response = self.client.get(self.url)
+        except:
+            self.assertEqual(self.url, self.catalog.id)
+            self.assertEqual(1,2)
         self.assertEqual(response.status_code, 200)
         self.assertIn(self.catalog.name, response.content.decode('utf-8'))
 
@@ -354,7 +358,11 @@ class CatalogEditViewTest(CatalogTest):
             method=httpretty.DELETE,
             catalog_id=self.catalog.id
         )
-        response = self.client.post(self.url, {'delete-catalog': 'on'})
+        try:
+            response = self.client.post(self.url, {'delete-catalog': 'on'})
+        except:
+            self.assertEqual(self.url, self.catalog.id)
+            self.assertEqual(1,2)
         self.assertRedirects(response, reverse('api_admin:catalog-search'))
         self.assertEqual(httpretty.last_request().method, 'DELETE')
         self.assertEqual(
@@ -367,7 +375,11 @@ class CatalogEditViewTest(CatalogTest):
     def test_edit(self):
         self.mock_catalog_endpoint(self.catalog.attributes, method=httpretty.PATCH, catalog_id=self.catalog.id)
         new_attributes = dict(self.catalog.attributes, **{'delete-catalog': 'off', 'name': 'changed'})
-        response = self.client.post(self.url, new_attributes)
+        try:
+            response = self.client.post(self.url, new_attributes)
+        except:
+            self.assertEqual(self.url, self.catalog.id)
+            self.assertEqual(1,2)
         self.mock_catalog_endpoint(new_attributes, catalog_id=self.catalog.id)
         self.assertRedirects(response, reverse('api_admin:catalog-edit', kwargs={'catalog_id': self.catalog.id}))
 
