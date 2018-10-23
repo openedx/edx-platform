@@ -5,7 +5,6 @@ import crum
 from django.apps import apps
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
-import waffle
 
 from web_fragments.fragment import Fragment
 from lms.djangoapps.commerce.utils import EcommerceService
@@ -15,7 +14,7 @@ from lms.djangoapps.courseware.masquerade import (
     get_masquerading_user_group,
 )
 from xmodule.partitions.partitions import Group, UserPartition, UserPartitionError
-
+from openedx.features.content_type_gating.config.waffle import CONTENT_TYPE_GATING_FLAG
 
 LOG = logging.getLogger(__name__)
 
@@ -186,7 +185,7 @@ class ContentTypeGatingPartitionScheme(object):
         CourseEnrollment = apps.get_model('student.CourseEnrollment')
 
         enrollment = CourseEnrollment.get_enrollment(user, course_key)
-        if not waffle.flag_is_active(crum.get_current_request(), 'content_type_gating.debug'):
+        if not CONTENT_TYPE_GATING_FLAG.is_enabled():
             return cls.UNLOCKED
 
         mode_slug, is_active = CourseEnrollment.enrollment_mode_for_user(user, course_key)
