@@ -16,6 +16,9 @@
         };
 
         DiscussionUtil.getUser = function() {
+            if (_.isUndefined(this.user)) {
+                this.user = window.user;
+            }
             return this.user;
         };
 
