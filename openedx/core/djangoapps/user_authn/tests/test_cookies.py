@@ -11,13 +11,14 @@ from django.test import RequestFactory, TestCase
 from edx_rest_framework_extensions.auth.jwt.decoder import jwt_decode_handler
 from edx_rest_framework_extensions.auth.jwt.middleware import JwtAuthCookieMiddleware
 from openedx.core.djangoapps.user_authn import cookies as cookies_api
+from openedx.core.djangoapps.user_authn.test_helpers import UserAuthnTestCase
 from openedx.core.djangoapps.user_authn.tests.utils import setup_login_oauth_client
 from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewide_block_completed
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory, AnonymousUserFactory
 
 
-class CookieTests(TestCase):
+class CookieTests(UserAuthnTestCase):
     def setUp(self):
         super(CookieTests, self).setUp()
         self.user = UserFactory.create()

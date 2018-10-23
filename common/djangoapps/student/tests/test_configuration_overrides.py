@@ -10,6 +10,8 @@ from django.test import TestCase
 
 from student.models import UserSignupSource
 
+from openedx.core.djangoapps.user_authn.test_helpers import UserAuthnTestCase
+
 FAKE_SITE = {
     "SITE_NAME": "openedx.localhost",
     "university": "fakeuniversity",
@@ -48,7 +50,7 @@ def fake_get_value(name, default=None):
     return FAKE_SITE.get(name, default)
 
 
-class TestSite(TestCase):
+class TestSite(UserAuthnTestCase):
     """Test for Account Creation from white labeled Sites"""
     def setUp(self):
         super(TestSite, self).setUp()
