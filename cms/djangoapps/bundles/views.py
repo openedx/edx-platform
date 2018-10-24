@@ -19,7 +19,7 @@ def get_blockstore_kvs():
     class as the underlying data store for authored data. It reads and
     writes XML data from bundles in blockstore.
     """
-    if not hasattr('get_blockstore_kvs', '_kvs'):
+    if not hasattr(get_blockstore_kvs, '_kvs'):
         get_blockstore_kvs._kvs = BlockstoreKVS()
     return get_blockstore_kvs._kvs
 
@@ -31,7 +31,7 @@ def get_user_state_kvs():
 
     This user state is not persisted anywhere.
     """
-    if not hasattr('get_user_state_kvs', '_kvs'):
+    if not hasattr(get_user_state_kvs, '_kvs'):
         get_user_state_kvs._kvs = DictKeyValueStore()
     return get_user_state_kvs._kvs
 
@@ -41,7 +41,7 @@ def get_readonly_runtime_system():
     Get the XBlockRuntimeSystem for viewing content in Studio but
     not editing it at the moment
     """
-    if not hasattr('get_blockstore_runtime_system', '_system'):
+    if not hasattr(get_readonly_runtime_system, '_system'):
         get_readonly_runtime_system._system = XBlockRuntimeSystem(
             handler_url=lambda *args, **kwargs: 'test_url',  # TODO: Need an actual method for calling handler_urls with this runtime
             authored_data_kvs=get_blockstore_kvs(),
