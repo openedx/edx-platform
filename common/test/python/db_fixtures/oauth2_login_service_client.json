@@ -1,0 +1,27 @@
+[
+    {
+        "model": "auth.user",
+        "pk": 1,
+        "fields": {
+            "username": "login_service_user",
+            "email": "login_service_user@fake.email"
+        }
+    },
+
+    {
+        "model": "oauth2_provider.application",
+        "pk": 1,
+        "fields": {
+            "name": "Login Service for JWT Cookies",
+            "client_id": "login-service-client-id",
+            "user": "1",
+            "client_type": "public",
+            "authorization_grant_type": "password",
+            "redirect_uris": "",
+            "client_secret": "",
+            "skip_authorization": "False",
+            "created": "2018-10-24T10:14:50Z",
+            "updated": "2018-10-24T10:14:50Z"
+        }
+    }
+]

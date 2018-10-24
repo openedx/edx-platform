@@ -13,7 +13,7 @@ class UserAuthnTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         super(UserAuthnTestCase, cls).setUpClass()
-        cls._add_login_service()
+#        cls._add_login_service()
 
     @classmethod
     def _add_login_service(cls):

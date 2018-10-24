@@ -13,6 +13,8 @@ import os
 import contracts
 import pytest
 
+# Imports an autouse fixture for loading Python test data.
+from common.test.python.utils import load_python_test_data  # pylint: disable=unused-import
 
 # Patch the xml libs before anything else.
 from safe_lxml import defuse_xml_libs
