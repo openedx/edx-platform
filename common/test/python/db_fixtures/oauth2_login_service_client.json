@@ -1,7 +1,7 @@
 [
     {
         "model": "auth.user",
-        "pk": 1,
+        "pk": 200,
         "fields": {
             "username": "login_service_user",
             "email": "login_service_user@fake.email"
@@ -14,7 +14,7 @@
         "fields": {
             "name": "Login Service for JWT Cookies",
             "client_id": "login-service-client-id",
-            "user": "1",
+            "user": "200",
             "client_type": "public",
             "authorization_grant_type": "password",
             "redirect_uris": "",
