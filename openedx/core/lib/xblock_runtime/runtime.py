@@ -1,5 +1,3 @@
-from lxml import etree
-
 from xblock.core import XBlock, XBlockAside
 from xblock.field_data import ReadOnlyFieldData, SplitFieldData
 from xblock.fields import Scope, ScopeIds
@@ -8,6 +6,7 @@ from xblock.runtime import Runtime, IdReader, IdGenerator, NullI18nService, Memo
 from openedx.core.lib.xblock_utils import xblock_local_resource_url
 from xmodule.modulestore.inheritance import inheriting_field_data
 from .blockstore_kvs import collect_parsed_fields
+from .id_managers import OpaqueKeyReader
 
 
 class XBlockRuntime(Runtime):
@@ -55,8 +54,16 @@ class XBlockRuntime(Runtime):
         return []
 
     def parse_xml_file(self, fileobj, id_generator=None):
-        with collect_parsed_fields():
-            return super(XBlockRuntime, self).parse_xml_file(fileobj, id_generator)
+        # Deny access to the inherited method
+        raise NotImplementedError("XML Serialization is only supported with BlockstoreXBlockRuntime")
+
+    def add_node_as_child(self, block, node, id_generator=None):
+         """
+         Called by XBlock.parse_xml to treat a child node as a child block.
+         """
+         # Deny access to the inherited method
+         raise NotImplementedError("XML Serialization is only supported with BlockstoreXBlockRuntime")
+
 
 class XBlockRuntimeSystem(object):
     """
@@ -71,6 +78,7 @@ class XBlockRuntimeSystem(object):
         handler_url,  # type: (Callable[[XBlock, string, string, string, bool], string]
         authored_data_kvs,  # type: InheritanceKeyValueStore
         student_data_kvs,  # type: InheritanceKeyValueStore
+        runtime_class,  # type: XBlockRuntime
     ):
         """
         args:
@@ -83,8 +91,9 @@ class XBlockRuntimeSystem(object):
         """
         self.handler_url = handler_url
         # TODO: new ID manager:
-        self.id_reader = MemoryIdManager()
-        self.id_generator = self.id_reader
+        self.id_reader = OpaqueKeyReader()
+        self.id_generator = MemoryIdManager()  # We don't really use id_generator until we need to support asides
+        self.runtime_class = runtime_class
 
         # Field data storage/retrieval:
         authored_data = inheriting_field_data(authored_data_kvs)
@@ -105,4 +114,4 @@ class XBlockRuntimeSystem(object):
 
     def get_runtime(self, user_id):
         # type: (int) -> XBlockRuntime
-        return XBlockRuntime(self, user_id)
+        return self.runtime_class(self, user_id)

@@ -9,7 +9,6 @@ from uuid import UUID
 from django.conf import settings
 import requests
 
-
 Bundle = namedtuple('Bundle', ['uuid', 'title', 'slug'])
 BundleFile = namedtuple('BundleFile', ['bundle_uuid', 'path', 'size', 'public_url', 'data_url'])
 
@@ -35,7 +34,7 @@ def get_bundle_by_slug(slug):
 def get_bundle_file_metadata(bundle_uuid, path):
     assert isinstance(bundle_uuid, UUID)
     # TODO: the following URL needs a weird double // ("".../files//file.xml")
-    response = requests.get(api_url('bundles', str(bundle_uuid), 'files/', path))
+    response = requests.get(api_url('bundles', str(bundle_uuid), 'files', path))
     response.raise_for_status()
     file_metadata = response.json()
     return BundleFile(

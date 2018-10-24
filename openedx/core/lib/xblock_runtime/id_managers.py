@@ -1,4 +1,5 @@
 from xblock.runtime import IdReader, IdGenerator
+from opaque_keys.edx.locator import BlockUsageLocator
 from opaque_keys.edx.asides import AsideUsageKeyV2, AsideDefinitionKeyV2
 
 from xmodule.modulestore import ModuleStoreEnum
@@ -22,13 +23,15 @@ class OpaqueKeyReader(IdReader):
         Returns:
             The `definition_id` the usage is derived from
         """
-        # TODO: if this is a usage v2, then extract the definition from the key
-        # else:
+        if isinstance(usage_id, BlockUsageLocator):
+            # This is a key to a block in split mongo.
+            # TODO: is there something more efficient than this mess that can get us the definition key?
+            split_modulestore = modulestore().default_modulestore
+            course_entry = split_modulestore._lookup_course(usage_id.course_key.for_branch(ModuleStoreEnum.BranchName.published))
+            return split_modulestore.create_runtime(course_entry, lazy=True).id_reader.get_definition_id(usage_id)
 
-        # TODO: there has got to be a better way:
-        split_modulestore = modulestore().default_modulestore
-        course_entry = split_modulestore._lookup_course(usage_id.course_key.for_branch(ModuleStoreEnum.BranchName.published))
-        return split_modulestore.create_runtime(course_entry, lazy=True).id_reader.get_definition_id(usage_id)
+        # Newer key types should encode their own definition ID:
+        return usage_id.definition_key
 
     def get_block_type(self, def_id):
         """Retrieve the block_type of a particular definition

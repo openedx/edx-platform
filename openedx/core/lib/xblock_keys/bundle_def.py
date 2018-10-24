@@ -29,7 +29,7 @@ class BundleDefinitionLocator(DefinitionKey):
         if not isinstance(bundle_uuid, UUID):
             bundle_uuid = UUID(bundle_uuid)
         if len(olx_path) < 2 or olx_path[0] != '/' or olx_path.find(':') != -1:
-            raise InvalidKeyError("Invalid OLX path.")
+            raise ValueError("Invalid OLX path: {}".format(olx_path))
         super(BundleDefinitionLocator, self).__init__(
             bundle_uuid=bundle_uuid,
             olx_path=olx_path,
@@ -49,7 +49,7 @@ class BundleDefinitionLocator(DefinitionKey):
         Returns a tuple: short_string, type_part or None, id_part or None
         """
         if len(olx_path) < 2 or olx_path[0] != '/':
-            raise InvalidKeyError("An OLX path must start with / and contain a filename")
+            raise ValueError("An OLX path must start with / and contain a filename")
         if olx_path.endswith('.olx'):
             id_part = olx_path[:-4].rpartition('/')[2]  # from "/foo/bar.olx", get "bar"
             type_part = olx_path[1:].partition('-' + id_part + '/')[0] # from "/foo-bar/bar.olx", get "foo"
@@ -67,13 +67,13 @@ class BundleDefinitionLocator(DefinitionKey):
         Returns a tuple: olx_path, type_part or None, id_part or None
         """
         if len(olx_path_shortened) < 2:
-            raise InvalidKeyError("Invalid short OLX path")
+            raise ValueError("Invalid short OLX path")
         if olx_path_shortened[0] == '/':
             return (olx_path_shortened, None, None)  # It's a normal OLX path
         try:
             type_part, _, id_part = olx_path_shortened.partition('/')
         except ValueError:
-            raise InvalidKeyError("Invalid short OLX path")
+            raise ValueError("Invalid short OLX path")
         olx_path = '/' + type_part + '-' + id_part + '/' + id_part + '.olx'
         return (olx_path, type_part, id_part)
 
@@ -122,14 +122,14 @@ class BundleDefinitionLocator(DefinitionKey):
                 definition_id_encoded,
             ) = serialized.split(':')
         except ValueError:
-            raise InvalidKeyError("Not a valid bundle definition")
+            raise InvalidKeyError(cls, serialized)
 
         bundle_uuid = UUID(bytes=cls._b64_decode(bundle_uuid_encoded))
         olx_path, root_type, root_id = cls._olx_path_expanded(olx_path_encoded)
         block_type = block_type_encoded if block_type_encoded else root_type
         definition_id = definition_id_encoded if definition_id_encoded else root_id
         if not block_type or not definition_id:
-            raise InvalidKeyError("Not a valid bundle definition")
+            raise InvalidKeyError(cls, serialized)
 
         return cls(
             bundle_uuid=bundle_uuid,
