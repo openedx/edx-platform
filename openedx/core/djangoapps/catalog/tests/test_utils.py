@@ -35,9 +35,10 @@ from openedx.core.djangoapps.catalog.utils import (
     get_course_runs,
     get_course_runs_for_course,
     get_course_run_details,
-    get_pathways,
     get_currency_data,
     get_localized_price_text,
+    get_owners_for_course,
+    get_pathways,
     get_program_types,
     get_programs,
     get_visible_sessions_for_entitlement
@@ -462,6 +463,31 @@ class TestGetCourseRuns(CatalogIntegrationMixin, TestCase):
         data = get_course_runs_for_course(course_uuid=str(catalog_course['uuid']))
         self.assertTrue(mock_get_edx_api_data.called)
         self.assertEqual(data, catalog_course_runs)
+
+
+@skip_unless_lms
+@mock.patch(UTILS_MODULE + '.get_edx_api_data')
+class TestGetCourseOwners(CatalogIntegrationMixin, TestCase):
+    """
+    Tests covering retrieval of course runs from the catalog service.
+    """
+    def setUp(self):
+        super(TestGetCourseOwners, self).setUp()
+
+        self.catalog_integration = self.create_catalog_integration(cache_ttl=1)
+        self.user = UserFactory(username=self.catalog_integration.service_username)
+
+    def test_get_course_owners_by_course(self, mock_get_edx_api_data):
+        """
+        Test retrieval of course runs.
+        """
+        catalog_course_runs = CourseRunFactory.create_batch(10)
+        catalog_course = CourseFactory(course_runs=catalog_course_runs)
+        mock_get_edx_api_data.return_value = catalog_course
+
+        data = get_owners_for_course(course_uuid=str(catalog_course['uuid']))
+        self.assertTrue(mock_get_edx_api_data.called)
+        self.assertEqual(data, catalog_course['owners'])
 
 
 @skip_unless_lms

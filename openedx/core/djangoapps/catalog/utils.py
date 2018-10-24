@@ -37,6 +37,45 @@ def create_catalog_api_client(user, site=None):
     return EdxRestApiClient(url, jwt=jwt)
 
 
+def check_catalog_integration_and_get_user(error_message_field):
+    """
+    Checks that catalog integration is enabled, and if so, attempts to get and
+    return the service user.
+
+    Parameters:
+        error_message_field (str): The field that will be attempted to be
+            retrieved when calling the api client. Used for the error message.
+
+    Returns:
+        Tuple of:
+            The catalog integration service user if it exists, else None
+            The catalog integration Object
+                Note: (This is necessary for future calls of functions using this method)
+    """
+    catalog_integration = CatalogIntegration.current()
+
+    if catalog_integration.is_enabled():
+        try:
+            user = catalog_integration.get_service_user()
+        except ObjectDoesNotExist:
+            logger.error(
+                'Catalog service user with username [{username}] does not exist. '
+                '{field} will not be retrieved.'.format(
+                    username=catalog_integration.service_username,
+                    field=error_message_field,
+                )
+            )
+            return None, catalog_integration
+        return user, catalog_integration
+    else:
+        logger.error(
+            'Unable to retrieve details about {field} because Catalog Integration is not enabled'.format(
+                field=error_message_field,
+            )
+        )
+        return None, catalog_integration
+
+
 def get_programs(site, uuid=None):
     """Read programs from the cache.
 
@@ -101,13 +140,8 @@ def get_program_types(name=None):
         list of dict, representing program types.
         dict, if a specific program type is requested.
     """
-    catalog_integration = CatalogIntegration.current()
-    if catalog_integration.enabled:
-        try:
-            user = catalog_integration.get_service_user()
-        except ObjectDoesNotExist:
-            return []
-
+    user, catalog_integration = check_catalog_integration_and_get_user(error_message_field='Program types')
+    if user:
         api = create_catalog_api_client(user)
         cache_key = '{base}.program_types'.format(base=catalog_integration.CACHE_KEY)
 
@@ -186,13 +220,8 @@ def get_currency_data():
         list of dict, representing program types.
         dict, if a specific program type is requested.
     """
-    catalog_integration = CatalogIntegration.current()
-    if catalog_integration.enabled:
-        try:
-            user = catalog_integration.get_service_user()
-        except ObjectDoesNotExist:
-            return []
-
+    user, catalog_integration = check_catalog_integration_and_get_user(error_message_field='Currency data')
+    if user:
         api = create_catalog_api_client(user)
         cache_key = '{base}.currency'.format(base=catalog_integration.CACHE_KEY)
 
@@ -289,18 +318,9 @@ def get_course_runs():
     Returns:
         list of dict with each record representing a course run.
     """
-    catalog_integration = CatalogIntegration.current()
     course_runs = []
-    if catalog_integration.enabled:
-        try:
-            user = catalog_integration.get_service_user()
-        except ObjectDoesNotExist:
-            logger.error(
-                'Catalog service user with username [%s] does not exist. Course runs will not be retrieved.',
-                catalog_integration.service_username,
-            )
-            return course_runs
-
+    user, catalog_integration = check_catalog_integration_and_get_user(error_message_field='Course runs')
+    if user:
         api = create_catalog_api_client(user)
 
         querystring = {
@@ -314,18 +334,8 @@ def get_course_runs():
 
 
 def get_course_runs_for_course(course_uuid):
-    catalog_integration = CatalogIntegration.current()
-
-    if catalog_integration.is_enabled():
-        try:
-            user = catalog_integration.get_service_user()
-        except ObjectDoesNotExist:
-            logger.error(
-                'Catalog service user with username [%s] does not exist. Course runs will not be retrieved.',
-                catalog_integration.service_username,
-            )
-            return []
-
+    user, catalog_integration = check_catalog_integration_and_get_user(error_message_field='Course runs')
+    if user:
         api = create_catalog_api_client(user)
         cache_key = '{base}.course.{uuid}.course_runs'.format(
             base=catalog_integration.CACHE_KEY,
@@ -345,6 +355,28 @@ def get_course_runs_for_course(course_uuid):
         return []
 
 
+def get_owners_for_course(course_uuid):
+    user, catalog_integration = check_catalog_integration_and_get_user(error_message_field='Owners')
+    if user:
+        api = create_catalog_api_client(user)
+        cache_key = '{base}.course.{uuid}.course_runs'.format(
+            base=catalog_integration.CACHE_KEY,
+            uuid=course_uuid
+        )
+        data = get_edx_api_data(
+            catalog_integration,
+            'courses',
+            resource_id=course_uuid,
+            api=api,
+            cache_key=cache_key if catalog_integration.is_cache_enabled else None,
+            long_term_cache=True,
+            many=False
+        )
+        return data.get('owners', [])
+    else:
+        return []
+
+
 def get_course_uuid_for_course(course_run_key):
     """
     Retrieve the Course UUID for a given course key
@@ -356,18 +388,8 @@ def get_course_uuid_for_course(course_run_key):
     Returns:
         UUID: Course UUID and None if it was not retrieved.
     """
-    catalog_integration = CatalogIntegration.current()
-
-    if catalog_integration.is_enabled():
-        try:
-            user = catalog_integration.get_service_user()
-        except ObjectDoesNotExist:
-            logger.error(
-                'Catalog service user with username [%s] does not exist. Course UUID will not be retrieved.',
-                catalog_integration.service_username,
-            )
-            return []
-
+    user, catalog_integration = check_catalog_integration_and_get_user(error_message_field='Course UUID')
+    if user:
         api = create_catalog_api_client(user)
 
         run_cache_key = '{base}.course_run.{course_run_key}'.format(
@@ -483,27 +505,15 @@ def get_course_run_details(course_run_key, fields):
     Returns:
         dict with language, start date, end date, and max_effort details about specified course run
     """
-    catalog_integration = CatalogIntegration.current()
     course_run_details = dict()
-    if catalog_integration.enabled:
-        try:
-            user = catalog_integration.get_service_user()
-        except ObjectDoesNotExist:
-            msg = 'Catalog service user {} does not exist. Data for course_run {} will not be retrieved'.format(
-                catalog_integration.service_username,
-                course_run_key
-            )
-            logger.error(msg)
-            return course_run_details
+    user, catalog_integration = check_catalog_integration_and_get_user(
+        error_message_field='Data for course_run {}'.format(course_run_key)
+    )
+    if user:
         api = create_catalog_api_client(user)
 
         cache_key = '{base}.course_runs'.format(base=catalog_integration.CACHE_KEY)
 
         course_run_details = get_edx_api_data(catalog_integration, 'course_runs', api, resource_id=course_run_key,
                                               cache_key=cache_key, many=False, traverse_pagination=False, fields=fields)
-    else:
-        msg = 'Unable to retrieve details about course_run {} because Catalog Integration is not enabled'.format(
-            course_run_key
-        )
-        logger.error(msg)
     return course_run_details
