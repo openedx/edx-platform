@@ -21,6 +21,7 @@ from .usage_info import CourseUsageInfo
 if CONTENT_TYPE_GATING_FLAG.is_enabled():
     from openedx.features.content_type_gating.block_transformers import ContentTypeGateTransformer
 
+
 INDIVIDUAL_STUDENT_OVERRIDE_PROVIDER = (
     'lms.djangoapps.courseware.student_field_overrides.IndividualStudentOverrideProvider'
 )
