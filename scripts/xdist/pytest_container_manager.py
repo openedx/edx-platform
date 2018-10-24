@@ -4,6 +4,7 @@ import time
 
 import boto3
 from botocore.exceptions import ClientError
+from botocore.vendored.requests.exceptions import ConnectTimeout
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -56,7 +57,7 @@ class PytestContainerManager():
                         },
                         taskDefinition=task_definition
                     )
-                except ClientError as err:
+                except (ClientError, ConnectTimeout) as err:
                     # Handle AWS throttling with an exponential backoff
                     if retry == MAX_RUN_TASK_RETRIES:
                         raise StandardError(
