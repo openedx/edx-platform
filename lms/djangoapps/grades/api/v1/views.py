@@ -99,7 +99,7 @@ class CourseEnrollmentPagination(CursorPagination):
     Paginates over CourseEnrollment objects.
     """
     page_size = 25
-    ordering = 'id'
+    ordering = 'created'
 
 
 class GradeViewMixin(DeveloperErrorViewMixin):
@@ -182,7 +182,10 @@ class GradeViewMixin(DeveloperErrorViewMixin):
         Returns:
             An iterator of CourseGrade objects for users enrolled in the given course.
         """
-        enrollments_in_course = enrollment_data.get_user_enrollments(course_key)
+        enrollments_in_course = CourseEnrollment.objects.filter(
+            course_id=course_key,
+            is_active=True
+        )
 
         paged_enrollments = self.paginate_queryset(enrollments_in_course)
         users = (enrollment.user for enrollment in paged_enrollments)
@@ -190,22 +193,6 @@ class GradeViewMixin(DeveloperErrorViewMixin):
 
         for user, course_grade, exc in grades:
             yield user, course_grade, exc
-
-    def _get_user_grades(self, course_key):
-        """
-        Get paginated grades for users in a course.
-        Args:
-            course_key (CourseLocator): The course to retrieve user grades for.
-
-        Returns:
-            A serializable list of grade responses
-        """
-        grade_responses = []
-        for user, course_grade, exc in self._iter_user_grades(course_key):
-            if not exc:
-                grade_responses.append(self._serialize_user_grade(user, course_key, course_grade))
-
-        return Response(grade_responses)
 
     def _serialize_user_grade(self, user, course_key, course_grade):
         """
@@ -351,6 +338,22 @@ class CourseGradesView(GradeViewMixin, GenericAPIView):
         else:
             # If no username passed, get paginated list of grades for all users in course
             return self._get_user_grades(course_key)
+
+    def _get_user_grades(self, course_key):
+        """
+        Get paginated grades for users in a course.
+        Args:
+            course_key (CourseLocator): The course to retrieve user grades for.
+
+        Returns:
+            A serializable list of grade responses
+        """
+        user_grades = []
+        for user, course_grade, exc in self._iter_user_grades(course_key):
+            if not exc:
+                user_grades.append(self._serialize_user_grade(user, course_key, course_grade))
+
+        return self.get_paginated_response(user_grades)
 
 
 class GradebookView(GradeViewMixin, GenericAPIView):

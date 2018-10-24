@@ -14,7 +14,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from six import text_type
 
-from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory, StaffFactory
+from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
 from lms.djangoapps.grades.api.v1.views import CourseGradesView
 from lms.djangoapps.grades.config.waffle import waffle_flags, WRITABLE_GRADEBOOK
 from lms.djangoapps.grades.course_data import CourseData
@@ -332,7 +332,12 @@ class CourseGradesViewTest(GradeViewTestMixin, APITestCase):
             self.get_url(course_key=self.empty_course.id)
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(resp.data, [])
+        expected_data = OrderedDict([
+            ('next', None),
+            ('previous', None),
+            ('results', []),
+        ])
+        self.assertEqual(expected_data, resp.data)
 
     def test_staff_can_get_all_grades(self):
         self.client.login(username=self.global_staff.username, password=self.password)
@@ -340,26 +345,30 @@ class CourseGradesViewTest(GradeViewTestMixin, APITestCase):
 
         # this should have permission to access this API endpoint
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        expected_data = [
-            {
-                'username': self.student.username,
-                'email': self.student.email,
-                'course_id': str(self.course.id),
-                'passed': False,
-                'percent': 0.0,
-                'letter_grade': None
-            },
-            {
-                'username': self.other_student.username,
-                'email': self.other_student.email,
-                'course_id': str(self.course.id),
-                'passed': False,
-                'percent': 0.0,
-                'letter_grade': None
-            },
-        ]
+        expected_data = OrderedDict([
+            ('next', None),
+            ('previous', None),
+            ('results', [
+                {
+                    'username': self.student.username,
+                    'email': self.student.email,
+                    'course_id': str(self.course.id),
+                    'passed': False,
+                    'percent': 0.0,
+                    'letter_grade': None
+                },
+                {
+                    'username': self.other_student.username,
+                    'email': self.other_student.email,
+                    'course_id': str(self.course.id),
+                    'passed': False,
+                    'percent': 0.0,
+                    'letter_grade': None
+                },
+            ]),
+        ])
 
-        self.assertEqual(resp.data, expected_data)
+        self.assertEqual(expected_data, resp.data)
 
 
 class GradebookViewTest(GradeViewTestMixin, APITestCase):
