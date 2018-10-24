@@ -15,12 +15,11 @@ from mock import patch
 
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
-from openedx.core.djangoapps.user_authn.test_helpers import UserAuthnTestCase
 from openedx.core.djangoapps.user_authn.views.deprecated import create_account
 from util.password_policy_validators import create_validator_config
 
 
-class TestPasswordPolicy(UserAuthnTestCase):
+class TestPasswordPolicy(TestCase):
     """
     Go through some password policy tests to make sure things are properly working
     """
@@ -280,7 +279,7 @@ class TestPasswordPolicy(UserAuthnTestCase):
         self.assertTrue(obj['success'])
 
 
-class TestUsernamePasswordNonmatch(UserAuthnTestCase):
+class TestUsernamePasswordNonmatch(TestCase):
     """
     Test that registration username and password fields differ
     """

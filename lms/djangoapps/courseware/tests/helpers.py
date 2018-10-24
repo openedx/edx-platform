@@ -15,7 +15,6 @@ from courseware.masquerade import handle_ajax, setup_masquerade
 from edxmako.shortcuts import render_to_string
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.user_authn.test_helpers import UserAuthnTestCase
 from openedx.core.lib.url_utils import quote_slashes
 from student.models import Registration
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -145,7 +144,7 @@ class XModuleRenderingTestBase(BaseTestXmodule):
         return runtime
 
 
-class LoginEnrollmentTestCase(UserAuthnTestCase):
+class LoginEnrollmentTestCase(TestCase):
     """
     Provides support for user creation,
     activation, login, and course enrollment.

@@ -22,7 +22,6 @@ from social_django.models import UserSocialAuth, Partial
 from django_comment_common import models
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from openedx.core.djangoapps.site_configuration.helpers import get_value
-from openedx.core.djangoapps.user_authn.test_helpers import UserAuthnTestCase
 from openedx.core.lib.api.test_utils import ApiTestCase, TEST_API_KEY
 from openedx.core.lib.time_zone_utils import get_display_time_zone
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
@@ -58,7 +57,7 @@ USER_PREFERENCE_LIST_URI = "/user_api/v1/user_prefs/"
 ROLE_LIST_URI = "/user_api/v1/forum_roles/Moderator/users/"
 
 
-class UserAPITestCase(UserAuthnTestCase, ApiTestCase):
+class UserAPITestCase(ApiTestCase):
     """
     Parent test case for User API workflow coverage
     """
@@ -2578,7 +2577,7 @@ class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTe
 
 @skipUnless(settings.FEATURES.get("ENABLE_THIRD_PARTY_AUTH"), "third party auth not enabled")
 class TestFacebookRegistrationView(
-    ThirdPartyRegistrationTestMixin, ThirdPartyOAuthTestMixinFacebook, UserAuthnTestCase
+    ThirdPartyRegistrationTestMixin, ThirdPartyOAuthTestMixinFacebook, TransactionTestCase
 ):
     """Tests the User API registration endpoint with Facebook authentication."""
     __test__ = True
@@ -2596,7 +2595,7 @@ class TestFacebookRegistrationView(
 
 @skipUnless(settings.FEATURES.get("ENABLE_THIRD_PARTY_AUTH"), "third party auth not enabled")
 class TestGoogleRegistrationView(
-    ThirdPartyRegistrationTestMixin, ThirdPartyOAuthTestMixinGoogle, UserAuthnTestCase
+    ThirdPartyRegistrationTestMixin, ThirdPartyOAuthTestMixinGoogle, TransactionTestCase
 ):
     """Tests the User API registration endpoint with Google authentication."""
     __test__ = True

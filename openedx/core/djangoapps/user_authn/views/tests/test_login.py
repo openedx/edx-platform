@@ -29,7 +29,6 @@ from openedx.core.djangoapps.user_api.config.waffle import (
     waffle
 )
 from openedx.core.djangoapps.user_authn.cookies import jwt_cookies
-from openedx.core.djangoapps.user_authn.test_helpers import UserAuthnTestCase
 from openedx.core.djangoapps.user_authn.tests.utils import setup_login_oauth_client
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
@@ -38,7 +37,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @ddt.ddt
-class LoginTest(CacheIsolationTestCase, UserAuthnTestCase):
+class LoginTest(CacheIsolationTestCase):
     """
     Test login_user() view
     """

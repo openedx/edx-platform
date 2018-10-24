@@ -21,8 +21,6 @@ from six.moves import xrange
 from contentstore.models import PushNotificationConfig
 from contentstore.tests.test_course_settings import CourseTestCase
 from contentstore.tests.utils import AjaxEnabledTestClient, parse_json, registration, user
-
-from openedx.core.djangoapps.user_authn.test_helpers import UserAuthnTestCase
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -118,7 +116,7 @@ def test_create_account_email_already_exists(django_db_use_migrations):
         assert resp.status_code == 400, 'Migrations are run, but creating an account with duplicate email succeeded!'
 
 
-class AuthTestCase(ContentStoreTestCase, UserAuthnTestCase):
+class AuthTestCase(ContentStoreTestCase):
     """Check that various permissions-related things work"""
 
     CREATE_USER = False

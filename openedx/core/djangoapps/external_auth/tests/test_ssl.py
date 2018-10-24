@@ -19,7 +19,6 @@ from django.test.utils import override_settings
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 import openedx.core.djangoapps.external_auth.views as external_auth_views
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
-from openedx.core.djangoapps.user_authn.test_helpers import UserAuthnTestCase
 from openedx.core.djangolib.testing.utils import skip_unless_cms, skip_unless_lms
 from student.models import CourseEnrollment
 from student.roles import CourseStaffRole
@@ -41,7 +40,7 @@ CACHES_ENABLE_GENERAL['general']['BACKEND'] = 'django.core.cache.backends.locmem
 
 @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH)
 @override_settings(CACHES=CACHES_ENABLE_GENERAL)
-class SSLClientTest(UserAuthnTestCase, ModuleStoreTestCase):
+class SSLClientTest(ModuleStoreTestCase):
     """
     Tests SSL Authentication code sections of external_auth
     """

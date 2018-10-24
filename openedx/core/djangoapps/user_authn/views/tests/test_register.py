@@ -12,14 +12,13 @@ import pytz
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User
 from django.urls import reverse
+from django.test import TestCase, TransactionTestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.contrib.auth.hashers import make_password
 
 from django_comment_common.models import ForumsConfig
 from notification_prefs import NOTIFICATION_PREF_KEY
-
-from openedx.core.djangoapps.user_authn.test_helpers import UserAuthnTestCase
 from openedx.core.djangoapps.user_authn.views.deprecated import create_account
 from openedx.core.djangoapps.user_authn.views.register import (
     REGISTRATION_AFFILIATE_ID, REGISTRATION_UTM_CREATED_AT, REGISTRATION_UTM_PARAMETERS,
@@ -94,7 +93,7 @@ def get_mock_pipeline_data(username=TEST_USERNAME, email=TEST_EMAIL):
         ]
     }
 )
-class TestCreateAccount(SiteMixin, UserAuthnTestCase):
+class TestCreateAccount(SiteMixin, TestCase):
     """Tests for account creation"""
 
     def setUp(self):
@@ -578,7 +577,7 @@ class TestCreateAccount(SiteMixin, UserAuthnTestCase):
 
 
 @ddt.ddt
-class TestCreateAccountValidation(UserAuthnTestCase):
+class TestCreateAccountValidation(TestCase):
     """
     Test validation of various parameters in the create_account view
     """
@@ -858,7 +857,7 @@ class TestCreateAccountValidation(UserAuthnTestCase):
 @mock.patch.dict("student.models.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 @mock.patch("lms.lib.comment_client.User.base_url", TEST_CS_URL)
 @mock.patch("lms.lib.comment_client.utils.requests.request", return_value=mock.Mock(status_code=200, text='{}'))
-class TestCreateCommentsServiceUser(UserAuthnTestCase):
+class TestCreateCommentsServiceUser(TransactionTestCase):
     """ Tests for creating comments service user. """
 
     def setUp(self):
@@ -901,7 +900,7 @@ class TestCreateCommentsServiceUser(UserAuthnTestCase):
         self.assertFalse(request.called)
 
 
-class TestUnicodeUsername(UserAuthnTestCase):
+class TestUnicodeUsername(TestCase):
     """
     Test for Unicode usernames which is an optional feature.
     """

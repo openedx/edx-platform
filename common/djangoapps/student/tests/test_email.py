@@ -19,7 +19,6 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
-from openedx.core.djangoapps.user_authn.test_helpers import UserAuthnTestCase
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, CacheIsolationMixin
 from student.models import (
     PendingEmailChange,
@@ -94,7 +93,7 @@ class EmailTestMixin(object):
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class ActivationEmailTests(UserAuthnTestCase, CacheIsolationTestCase):
+class ActivationEmailTests(CacheIsolationTestCase):
     """
     Test sending of the activation email.
     """
