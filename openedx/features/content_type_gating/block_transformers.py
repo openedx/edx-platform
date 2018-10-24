@@ -1,6 +1,7 @@
 """
 Start Date Transformer implementation.
 """
+
 from django.conf import settings
 
 from openedx.core.djangoapps.content.block_structure.transformer import (

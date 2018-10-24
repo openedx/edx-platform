@@ -2,8 +2,6 @@
 FieldOverride that forces graded components to be only accessible to
 students in the Unlocked Group of the ContentTypeGating partition.
 """
-import json
-
 from django.conf import settings
 
 from lms.djangoapps.courseware.field_overrides import FieldOverrideProvider, disable_overrides
