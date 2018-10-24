@@ -8,10 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 import logging
 
 from openedx.core.lib.cache_utils import request_cached
-from openedx.features.content_type_gating.partitions import (
-    CONTENT_GATING_PARTITION_ID,
-    create_content_gating_partition,
-)
+from openedx.features.course_duration_limits.config import CONTENT_TYPE_GATING_FLAG
 from xmodule.partitions.partitions import (
     UserPartition,
     UserPartitionError,
@@ -19,11 +16,15 @@ from xmodule.partitions.partitions import (
 )
 from xmodule.modulestore.django import modulestore
 
+if CONTENT_TYPE_GATING_FLAG.is_enabled():
+    from openedx.features.content_type_gating.partitions import (
+        CONTENT_GATING_PARTITION_ID,
+        create_content_gating_partition,
+    )
 
 log = logging.getLogger(__name__)
 
 FEATURES = getattr(settings, 'FEATURES', {})
-
 
 @request_cached()
 def get_all_partitions_for_course(course, active_only=False):
@@ -50,14 +51,18 @@ def _get_dynamic_partitions(course):
     Return the dynamic user partitions for this course.
     If none exists, returns an empty array.
     """
-    return [
-        partition
-        for partition in [
-            _create_enrollment_track_partition(course),
-            create_content_gating_partition(course),
+    if CONTENT_TYPE_GATING_FLAG.is_enabled():
+        return [
+            partition
+            for partition in [
+                _create_enrollment_track_partition(course),
+                create_content_gating_partition(course),
+            ]
+            if partition
         ]
-        if partition
-    ]
+    else:
+        enrollment_partition = _create_enrollment_track_partition(course)
+        return [enrollment_partition] if enrollment_partition else []
 
 
 def _create_enrollment_track_partition(course):

@@ -14,9 +14,12 @@ from .transformers import (
     visibility,
     load_override_data
 )
-from openedx.features.content_type_gating.block_transformers import ContentTypeGateTransformer
+from openedx.features.course_duration_limits.config import CONTENT_TYPE_GATING_FLAG
 
 from .usage_info import CourseUsageInfo
+
+if CONTENT_TYPE_GATING_FLAG.is_enabled():
+    from openedx.features.content_type_gating.block_transformers import ContentTypeGateTransformer
 
 INDIVIDUAL_STUDENT_OVERRIDE_PROVIDER = (
     'lms.djangoapps.courseware.student_field_overrides.IndividualStudentOverrideProvider'
@@ -44,10 +47,13 @@ def get_course_block_access_transformers(user):
     course_block_access_transformers = [
         library_content.ContentLibraryTransformer(),
         start_date.StartDateTransformer(),
-        ContentTypeGateTransformer(),
         user_partitions.UserPartitionTransformer(),
         visibility.VisibilityTransformer(),
     ]
+
+    if CONTENT_TYPE_GATING_FLAG.is_enabled():
+        course_block_access_transformers.append(ContentTypeGateTransformer())
+
     if has_individual_student_override_provider():
         course_block_access_transformers += [load_override_data.OverrideDataTransformer(user)]
 

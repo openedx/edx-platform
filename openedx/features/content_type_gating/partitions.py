@@ -16,6 +16,14 @@ from lms.djangoapps.courseware.masquerade import (
 from xmodule.partitions.partitions import Group, UserPartition, UserPartitionError
 from openedx.features.course_duration_limits.config import CONTENT_TYPE_GATING_FLAG
 
+LOG = logging.getLogger(__name__)
+CONTENT_GATING_PARTITION_ID = 51
+CONTENT_TYPE_GATE_PARTITION_IDS = {
+    'locked': 1,
+    'unlocked': 2,
+}
+
+
 if CONTENT_TYPE_GATING_FLAG.is_enabled():
 
     def create_content_gating_partition(course):
