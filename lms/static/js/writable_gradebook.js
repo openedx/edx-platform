@@ -235,7 +235,6 @@ $(document).ready(function() {
                     studentsData: studentsData,
                     strLib: {
                         userHeading: gettext('Username'),
-                        currentGrade: gettext('Current grade'),
                         total: gettext('Total')
                     }
                 }).toString();
