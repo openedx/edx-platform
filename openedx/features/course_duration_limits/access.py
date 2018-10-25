@@ -46,14 +46,12 @@ class AuditExpiredError(AccessError):
 
 def get_user_course_expiration_date(user, course):
     """
-    Return course expiration date for given user course pair.
+    Return expiration date for given user course pair.
     Return None if the course does not expire.
-    Defaults to MIN_DURATION.
 
     Business Logic:
-      -
-      - should be bounded with min / max
-      - if fields are missing, default to minimum time
+      - Course access duration is bounded by the min and max duration.
+      - If course fields are missing, default course access duration to MIN_DURATION.
     """
 
     access_duration = MIN_DURATION
@@ -64,23 +62,28 @@ def get_user_course_expiration_date(user, course):
         return None
 
     try:
-        start_date = enrollment.schedule.start
+        # Content availability date is equivalent to max(enrollment date, course start date)
+        # for most people. Using the schedule date will provide flexibility to deal with
+        # more complex business rules in the future.
+        content_availability_date = enrollment.schedule.start
     except CourseEnrollment.schedule.RelatedObjectDoesNotExist:
-        start_date = max(enrollment.created, course.start)
+        content_availability_date = max(enrollment.created, course.start)
 
     if course.self_paced:
-        # self-paced expirations should be start date plus the marketing course length discovery
+        # The user course expiration date for self paced courses is the
+        # content availability date plus the weeks_to_complete field from course-discovery.
         discovery_course_details = get_course_run_details(course.id, ['weeks_to_complete'])
         expected_weeks = discovery_course_details['weeks_to_complete'] or int(MIN_DURATION.days / 7)
         access_duration = timedelta(weeks=expected_weeks)
     elif not course.self_paced and course.end and course.start:
-        # instructor-paced expirations should be the start date plus the length of the course
+        # The user course expiration date for instructor paced courses is the
+        # content availability date plus the duration of the course (course end date minus course start date).
         access_duration = course.end - course.start
 
-    # available course time should bound my the min and max duration
+    # Course access duration is bounded by the min and max duration.
     access_duration = max(MIN_DURATION, min(MAX_DURATION, access_duration))
 
-    return start_date + access_duration
+    return content_availability_date + access_duration
 
 
 def check_course_expired(user, course):
