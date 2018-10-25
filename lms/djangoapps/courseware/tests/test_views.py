@@ -1433,8 +1433,8 @@ class ProgressPageTests(ProgressPageBaseTests):
 
     @override_waffle_flag(CONTENT_TYPE_GATING_FLAG, True)
     @ddt.data(
-        (True, 40),
-        (False, 39)
+        (True, 39),
+        (False, 38)
     )
     @ddt.unpack
     def test_progress_queries_paced_courses(self, self_paced, query_count):
@@ -1446,8 +1446,8 @@ class ProgressPageTests(ProgressPageBaseTests):
     @override_waffle_flag(CONTENT_TYPE_GATING_FLAG, True)
     @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
     @ddt.data(
-        (False, 47, 30),
-        (True, 39, 26)
+        (False, 46, 29),
+        (True, 38, 25)
     )
     @ddt.unpack
     def test_progress_queries(self, enable_waffle, initial, subsequent):
