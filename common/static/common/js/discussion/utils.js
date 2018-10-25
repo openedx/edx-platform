@@ -1,4 +1,4 @@
-/* globals $$course_id, Content, Markdown, MathJax, URI */
+/* globals _, $$course_id, $$roles, Content, Markdown, MathJax, URI */
 (function() {
     'use strict';
     this.DiscussionUtil = (function() {
@@ -16,6 +16,9 @@
         };
 
         DiscussionUtil.getUser = function() {
+            if (_.isUndefined(this.user)) {
+                this.user = window.user;
+            }
             return this.user;
         };
 
@@ -28,6 +31,9 @@
             if (_.isUndefined(userId)) {
                 userId = this.user ? this.user.id : void 0;
             }
+            if (_.isUndefined(this.roleIds)) {
+                this.loadRoles($$roles);
+            }
             staff = _.union(this.roleIds.Moderator, this.roleIds.Administrator);
             return _.include(staff, parseInt(userId));
         };
@@ -36,6 +42,9 @@
             var ta;
             if (_.isUndefined(userId)) {
                 userId = this.user ? this.user.id : void 0;
+            }
+            if (_.isUndefined(this.roleIds)) {
+                this.loadRoles($$roles);
             }
             ta = _.union(this.roleIds['Community TA']);
             return _.include(ta, parseInt(userId));

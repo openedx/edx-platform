@@ -522,9 +522,9 @@ def _create_comment(request, course_key, thread_id=None, parent_id=None):
         if is_comment:
             # If creating a comment, then we don't have the original thread_id
             # so we have to get it from the parent
-            comment = cc.Comment.find(parent_id)
-            thread_id = comment.thread_id
-            replying_to_id = comment.user_id
+            parent_comment = cc.Comment.find(parent_id)
+            thread_id = parent_comment.thread_id
+            replying_to_id = parent_comment.user_id
 
         thread = cc.Thread.find(thread_id)
 
