@@ -59,7 +59,7 @@ RETIREMENT_UPDATE = AccountRetirementStatusView.as_view({
 })
 
 RETIREMENT_CLEANUP = AccountRetirementStatusView.as_view({
-    'delete': 'cleanup',
+    'post': 'cleanup',
 })
 
 RETIREMENT_POST = AccountRetirementView.as_view({
