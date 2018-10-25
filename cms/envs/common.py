@@ -467,6 +467,8 @@ XQUEUE_INTERFACE = {
 ################################# Middleware ###################################
 
 MIDDLEWARE_CLASSES = [
+    'x_forwarded_for.middleware.XForwardedForMiddleware',
+
     'crum.CurrentRequestUserMiddleware',
 
     # A newer and safer request cache.
