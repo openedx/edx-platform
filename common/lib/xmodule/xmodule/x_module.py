@@ -1400,30 +1400,7 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
             Used for example to get a list of all non-fatal problems on course
             load, and display them to the user.
 
-            A function of (error_msg). errortracker.py provides a
-            handy make_error_tracker() function.
-
-            Patterns for using the error handler:
-               try:
-                  x = access_some_resource()
-                  check_some_format(x)
-               except SomeProblem as err:
-                  msg = 'Grommet {0} is broken: {1}'.format(x, str(err))
-                  log.warning(msg)  # don't rely on tracker to log
-                        # NOTE: we generally don't want content errors logged as errors
-                  self.system.error_tracker(msg)
-                  # work around
-                  return 'Oops, couldn't load grommet'
-
-               OR, if not in an exception context:
-
-               if not check_something(thingy):
-                  msg = "thingy {0} is broken".format(thingy)
-                  log.critical(msg)
-                  self.system.error_tracker(msg)
-
-               NOTE: To avoid duplication, do not call the tracker on errors
-               that you're about to re-raise---let the caller track them.
+            See errortracker.py for more documentation
 
         get_policy: a function that takes a usage id and returns a dict of
             policy to apply.
