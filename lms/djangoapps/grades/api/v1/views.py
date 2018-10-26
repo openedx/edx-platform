@@ -1,5 +1,4 @@
 """ API v0 views. """
-import json
 import logging
 from collections import defaultdict, namedtuple
 from contextlib import contextmanager
@@ -128,12 +127,13 @@ class GradeViewMixin(DeveloperErrorViewMixin):
             USER_MODEL.DoesNotExist if no such user exists.
             CourseEnrollment.DoesNotExist if the user is not enrolled in the given course.
         """
+        # May raise USER_MODEL.DoesNotExist if no user matching the given query exists.
         if user_id:
-            # May raise USER_MODEL.DoesNotExist if no user with this id exists
             grade_user = USER_MODEL.objects.get(id=user_id)
+        elif 'username' in request.GET:
+            grade_user = USER_MODEL.objects.get(username=request.GET.get('username'))
         else:
-            username = request.GET.get('username') or request.user.username
-            grade_user = USER_MODEL.objects.get(username=username)
+            grade_user = request.user
 
         # May raise CourseEnrollment.DoesNotExist if no enrollment exists for this user/course.
         _ = CourseEnrollment.objects.get(user=grade_user, course_id=course_key)
@@ -181,18 +181,22 @@ class GradeViewMixin(DeveloperErrorViewMixin):
         course_grade = CourseGradeFactory().read(grade_user, course_key=course_key)
         return Response([self._serialize_user_grade(grade_user, course_key, course_grade)])
 
-    def _iter_user_grades(self, course_key):
+    def _iter_user_grades(self, course_key, course_enrollment_filter=None):
         """
         Args:
             course_key (CourseLocator): The course to retrieve grades for.
+            course_enrollment_filter: Optional dictionary of keyword arguments to pass
+            to `CourseEnrollment.filter()`.
 
         Returns:
             An iterator of CourseGrade objects for users enrolled in the given course.
         """
-        enrollments_in_course = CourseEnrollment.objects.filter(
-            course_id=course_key,
-            is_active=True
-        )
+        filter_kwargs = {
+            'course_id': course_key,
+            'is_active': True,
+        }
+        filter_kwargs.update(course_enrollment_filter or {})
+        enrollments_in_course = CourseEnrollment.objects.filter(**filter_kwargs)
 
         paged_enrollments = self.paginate_queryset(enrollments_in_course)
         users = (enrollment.user for enrollment in paged_enrollments)
@@ -372,9 +376,12 @@ class GradebookView(GradeViewMixin, GenericAPIView):
     **Example Request**
         GET /api/grades/v1/gradebook/{course_id}/                       - Get gradebook entries for all users in course
         GET /api/grades/v1/gradebook/{course_id}/?username={username}   - Get grades for specific user in course
+        GET /api/grades/v1/gradebook/{course_id}/?username_contains={username_contains}
     **GET Parameters**
         A GET request may include the following query parameters.
         * username:  (optional) A string representation of a user's username.
+        * username_contains: (optional) A substring against which a case-insensitive substring filter will be performed
+          on the USER_MODEL.username field.
     **GET Response Values**
         If the request for gradebook data is successful,
         an HTTP 200 "OK" response is returned.
@@ -561,11 +568,10 @@ class GradebookView(GradeViewMixin, GenericAPIView):
             request: A Django request object.
             course_id: A string representation of a CourseKey object.
         """
-        username = request.GET.get('username')
         course_key = get_course_key(request, course_id)
         course = get_course_with_access(request.user, 'staff', course_key, depth=None)
 
-        if username:
+        if request.GET.get('username'):
             with self._get_user_or_raise(request, course_key) as grade_user:
                 course_grade = CourseGradeFactory().read(grade_user, course)
 
@@ -573,9 +579,16 @@ class GradebookView(GradeViewMixin, GenericAPIView):
             serializer = StudentGradebookEntrySerializer(entry)
             return Response(serializer.data)
         else:
-            # list gradebook data for all course enrollees
+            if request.GET.get('username_contains'):
+                users = USER_MODEL.objects.filter(username__icontains=request.GET.get('username_contains'))
+                filter_kwargs = {'user__in': users}
+                user_grades = self._iter_user_grades(course_key, filter_kwargs)
+            else:
+                # list gradebook data for all course enrollees
+                user_grades = self._iter_user_grades(course_key)
+
             entries = []
-            for user, course_grade, exc in self._iter_user_grades(course_key):
+            for user, course_grade, exc in user_grades:
                 if not exc:
                     entries.append(self._gradebook_entry(user, course, course_grade))
             serializer = StudentGradebookEntrySerializer(entries, many=True)
@@ -735,7 +748,7 @@ class GradebookBulkUpdateView(GradeViewMixin, GenericAPIView):
             status_code = status.HTTP_202_ACCEPTED
 
         return Response(
-            json.dumps([item._asdict() for item in result]),
+            [item._asdict() for item in result],
             status=status_code,
             content_type='application/json'
         )

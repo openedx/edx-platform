@@ -28,8 +28,10 @@ Decisions
 
 #. **The read (GET) API**
 
-   a. The read API supports either fetching subsection scores for a single user, by `username`, or fetching
-      a paginated result of subsection grade data for all enrollees in the requested course.
+   a. The read API supports either fetching subsection scores for a single user via ``?username=my-user-name``,
+      where we look up a user by their exact ``username`` value; via ``?username_contains=name-substring`` where
+      we do a case-insensitive substring query for a user, or fetching a paginated result of
+      subsection grade data for all enrollees in the requested course.
 
    b. We will use the data schema required by the EE's front-end implementation.  This will allow us to port
       over much of EE's front-end code with only minor modifications.  Note that there are some fields specified

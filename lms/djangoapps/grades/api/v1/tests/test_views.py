@@ -96,8 +96,8 @@ class GradeViewTestMixin(SharedModuleStoreTestCase):
         super(GradeViewTestMixin, self).setUp()
         self.password = 'test'
         self.global_staff = GlobalStaffFactory.create()
-        self.student = UserFactory(password=self.password)
-        self.other_student = UserFactory(password=self.password)
+        self.student = UserFactory(password=self.password, username='student')
+        self.other_student = UserFactory(password=self.password, username='other_student')
         self._create_user_enrollments(self.student, self.other_student)
 
     @classmethod
@@ -459,13 +459,15 @@ class GradebookViewTest(GradebookViewTestBase):
     """
     Tests for the gradebook view.
     """
-    def get_url(self, course_key=None, username=None):  # pylint: disable=arguments-differ
+    def get_url(self, course_key=None, username=None, username_contains=None):  # pylint: disable=arguments-differ
         """
         Helper function to create the course gradebook API read url.
         """
         base_url = super(GradebookViewTest, self).get_url(course_key)
         if username:
             return "{0}?username={1}".format(base_url, username)
+        if username_contains:
+            return "{0}?username_contains={1}".format(base_url, username_contains)
         return base_url
 
     def mock_subsection_grade(self, subsection, **kwargs):
@@ -786,6 +788,70 @@ class GradebookViewTest(GradebookViewTestBase):
                 actual_data = dict(resp.data)
                 self.assertEqual(expected_results, actual_data)
 
+    def test_gradebook_data_filter_username_contains(self):
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
+            mock_grade.return_value = self.mock_course_grade(
+                self.other_student, passed=True, letter_grade='A', percent=0.85
+            )
+
+            with override_waffle_flag(self.waffle_flag, active=True):
+                self.login_staff()
+                resp = self.client.get(
+                    self.get_url(course_key=self.course.id, username_contains='other')
+                )
+                expected_results = [
+                    OrderedDict([
+                        ('course_id', text_type(self.course.id)),
+                        ('email', self.other_student.email),
+                        ('user_id', self.other_student.id),
+                        ('username', self.other_student.username),
+                        ('full_name', self.other_student.get_full_name()),
+                        ('passed', True),
+                        ('percent', 0.85),
+                        ('letter_grade', 'A'),
+                        ('progress_page_url', reverse(
+                            'student_progress',
+                            kwargs=dict(course_id=text_type(self.course.id), student_id=self.other_student.id)
+                        )),
+                        ('section_breakdown', self.expected_subsection_grades(letter_grade='A')),
+                        ('aggregates', {
+                            'Lab': {
+                                'score_earned': 2.0,
+                                'score_possible': 4.0,
+                            },
+                            'Homework': {
+                                'score_earned': 2.0,
+                                'score_possible': 4.0,
+                            },
+                        }),
+                    ]),
+                ]
+
+                self.assertEqual(status.HTTP_200_OK, resp.status_code)
+                actual_data = dict(resp.data)
+                self.assertIsNone(actual_data['next'])
+                self.assertIsNone(actual_data['previous'])
+                self.assertEqual(expected_results, actual_data['results'])
+
+    def test_gradebook_data_filter_username_contains_no_match(self):
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
+            mock_grade.return_value = self.mock_course_grade(
+                self.other_student, passed=True, letter_grade='A', percent=0.85
+            )
+
+            with override_waffle_flag(self.waffle_flag, active=True):
+                self.login_staff()
+                resp = self.client.get(
+                    self.get_url(course_key=self.course.id, username_contains='fooooooooooooooooo')
+                )
+
+                expected_results = []
+                self.assertEqual(status.HTTP_200_OK, resp.status_code)
+                actual_data = dict(resp.data)
+                self.assertIsNone(actual_data['next'])
+                self.assertIsNone(actual_data['previous'])
+                self.assertEqual(expected_results, actual_data['results'])
+
 
 class GradebookBulkUpdateViewTest(GradebookViewTestBase):
     """
@@ -850,7 +916,7 @@ class GradebookBulkUpdateViewTest(GradebookViewTestBase):
                 },
             ]
             self.assertEqual(status.HTTP_422_UNPROCESSABLE_ENTITY, resp.status_code)
-            self.assertEqual(expected_data, json.loads(resp.data))
+            self.assertEqual(expected_data, resp.data)
 
     def test_user_does_not_exist(self):
         with override_waffle_flag(self.waffle_flag, active=True):
@@ -878,7 +944,7 @@ class GradebookBulkUpdateViewTest(GradebookViewTestBase):
                 },
             ]
             self.assertEqual(status.HTTP_422_UNPROCESSABLE_ENTITY, resp.status_code)
-            self.assertEqual(expected_data, json.loads(resp.data))
+            self.assertEqual(expected_data, resp.data)
 
     def test_invalid_usage_key(self):
         with override_waffle_flag(self.waffle_flag, active=True):
@@ -906,7 +972,7 @@ class GradebookBulkUpdateViewTest(GradebookViewTestBase):
                 },
             ]
             self.assertEqual(status.HTTP_422_UNPROCESSABLE_ENTITY, resp.status_code)
-            self.assertEqual(expected_data, json.loads(resp.data))
+            self.assertEqual(expected_data, resp.data)
 
     def test_subsection_does_not_exist(self):
         """
@@ -939,7 +1005,7 @@ class GradebookBulkUpdateViewTest(GradebookViewTestBase):
                 },
             ]
             self.assertEqual(status.HTTP_422_UNPROCESSABLE_ENTITY, resp.status_code)
-            self.assertEqual(expected_data, json.loads(resp.data))
+            self.assertEqual(expected_data, resp.data)
 
     def test_override_is_created(self):
         """
@@ -992,7 +1058,7 @@ class GradebookBulkUpdateViewTest(GradebookViewTestBase):
                 },
             ]
             self.assertEqual(status.HTTP_202_ACCEPTED, resp.status_code)
-            self.assertEqual(expected_data, json.loads(resp.data))
+            self.assertEqual(expected_data, resp.data)
 
             second_post_data = [
                 {
