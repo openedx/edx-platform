@@ -12,6 +12,7 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.pagination import CursorPagination
 from rest_framework.response import Response
 from six import text_type
+from util.date_utils import to_timestamp
 
 from courseware.courses import get_course_with_access
 from edx_rest_framework_extensions import permissions
@@ -22,16 +23,23 @@ from lms.djangoapps.grades.config.waffle import waffle_flags, WRITABLE_GRADEBOOK
 from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
 from lms.djangoapps.grades.course_data import CourseData
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.grades.events import SUBSECTION_GRADE_CALCULATED, subsection_grade_calculated
 from lms.djangoapps.grades.models import PersistentSubsectionGrade, PersistentSubsectionGradeOverride
 from lms.djangoapps.grades.signals import signals
 from lms.djangoapps.grades.subsection_grade import CreateSubsectionGrade
+from lms.djangoapps.grades.tasks import recalculate_subsection_grade_v3
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from student.models import CourseEnrollment
-
+from track.event_transaction_utils import (
+    create_new_event_transaction_id,
+    get_event_transaction_id,
+    get_event_transaction_type,
+    set_event_transaction_type
+)
 
 log = logging.getLogger(__name__)
 USER_MODEL = get_user_model()
@@ -767,17 +775,27 @@ class GradebookBulkUpdateView(GradeViewMixin, GenericAPIView):
             grade=subsection_grade_model,
             defaults=self._clean_override_data(override_data),
         )
-        signals.SUBSECTION_OVERRIDE_CHANGED.send(
-            sender=None,
-            user_id=subsection_grade_model.user_id,
-            course_id=text_type(subsection_grade_model.course_id),
-            usage_id=text_type(subsection_grade_model.usage_key),
-            only_if_higher=False,
-            modified=override.modified,
-            score_deleted=False,
-            score_db_table=ScoreDatabaseTableEnum.overrides,
-            force_update_subsections=True,
+
+        set_event_transaction_type(SUBSECTION_GRADE_CALCULATED)
+        create_new_event_transaction_id()
+
+        recalculate_subsection_grade_v3.apply(
+            kwargs=dict(
+                user_id=subsection_grade_model.user_id,
+                anonymous_user_id=None,
+                course_id=text_type(subsection_grade_model.course_id),
+                usage_id=text_type(subsection_grade_model.usage_key),
+                only_if_higher=False,
+                expected_modified_time=to_timestamp(override.modified),
+                score_deleted=False,
+                event_transaction_id=unicode(get_event_transaction_id()),
+                event_transaction_type=unicode(get_event_transaction_type()),
+                score_db_table=ScoreDatabaseTableEnum.overrides,
+                force_update_subsections=True,
+            )
         )
+        # Emit events to let our tracking system to know we updated subsection grade
+        subsection_grade_calculated(subsection_grade_model)
 
     def _clean_override_data(self, override_data):
         """

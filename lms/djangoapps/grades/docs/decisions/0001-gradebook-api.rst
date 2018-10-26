@@ -71,11 +71,18 @@ Decisions
 
    d. A status code of ``422`` will be returned for requests that contain any failed item.  This allows a client
       to easily tell if any item in their request payload was problematic and needs special handling.  If all
-      requested items succeed, a ``202 (accepted)`` is returned.  This status code was chosen because an
-      asynchronous celery task is enqueued for each subsection grade that needs to be updated.
+      requested items succeed, a ``202 (accepted)`` is returned.  This status code was chosen because a
+      celery task is enqueued and waited for each subsection grade that needs to be updated.
 
-   e. We have to thread a ``force_update_subsections`` keyword argument through the Django signal invocation
-      that enqueues the subsection update task.  This is because we may be creating a new subsection grade
-      with no score data available from either ``courseware.StudentModule`` records or from the `Submissions` API.
-      In this case, the only score data available exists in the grade override record, and the subsection ``update()``
-      call should be forced to read from this record.
+   e. We have to thread a ``force_update_subsections`` keyword argument into the subsection update task that
+      we enqueue.  This is because we may be creating a new subsection grade with no score data available from 
+      either ``courseware.StudentModule`` records or from the `Submissions` API. In this case, the only score
+      data available exists in the grade override record, and the subsection ``update()`` call should be forced
+      to read from this record.
+
+   f. We have to synchronously update each grade record for each user in this endpoint. This means the request
+      will be left open for longer period than we wanted. The reason is: the primary consumer gradebook UI
+      would need to display the updated grade result for all users, after update is complete. If we do update
+      asynchronously, the gradebook UI do not know how to update the table with new values, including agregations
+      for the user's course grade. This is the lowest effort change to address the UI display problem. We will
+      need to improve this mechanism as we continue to develop.

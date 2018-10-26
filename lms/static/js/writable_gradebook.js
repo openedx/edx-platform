@@ -16,26 +16,21 @@ function _templateLoader(templateName, staticPath, callback, errorCallback) {
 }
 
 function courseXblockUpdater(courseID, dataToSend, visibilityData, callback, errorCallback) {
-    var cleanData = {'users' : {}};
+    var cleanData = _.map(dataToSend, function (data) {
+        return {
+            user_id: data.user_id,
+            usage_id: data.block_id,
+            grade: {
+                earned_all_override: data.grade || 0,
+                possible_all_override: data.max_grade || 0,
+                earned_graded_override: data.grade || 0,
+                possible_graded_override: data.max_grade || 0
+            }
+        };
+    });
 
-    if (dataToSend instanceof Array)
-        for (var i = 0; i < dataToSend.length; i++) {
-            cleanData.users['id_' + dataToSend.userID] = {
-                'block_id' : dataToSend[i].blockID || '',
-                'grade' : dataToSend[i].grade || '',
-                'max_grade' : dataToSend[i].maxGrade || null,
-                'state' :  dataToSend[i].state || '{}',
-                'user_id' : dataToSend[i].userID || ''
-            };
-        }
-    else if (dataToSend instanceof Object)
-        cleanData.users = dataToSend;
-
-    var postUrl = '/api/score/courses/' + courseID;
-
-    if (!_.isEmpty(visibilityData))
-        cleanData.visibility = visibilityData;
-
+    var postUrl = '/api/grades/v1/gradebook/' + courseID + '/bulk-update';
+    $('')
     $.ajax({
         url: postUrl,
         method: 'POST',
@@ -314,6 +309,7 @@ $(document).ready(function() {
         isManualGrading = JSON.parse($(gradeOverrideObject).attr('data-manual-grading'));
         $modal.find('.assignment-name-placeholder').text(assignmentName);
         $modal.find('.block-id-placeholder').text(blockID);
+        $modal.find('.grade-override-info-container').hide();
         if ( _.isEmpty(userAutoGrades) ) {
             $tableWrapper.hide();
             $manualGradeVisibilityWrapper.toggle(false);
@@ -486,6 +482,18 @@ $(document).ready(function() {
         });
     }
 
+    function setInfoMessage(messageText){
+        var $messageField = $('.grade-override-modal').find('.grade-override-info-container');
+        if(messageText) {
+            $messageField.text(messageText);
+            $messageField.show();
+        }
+        else {
+            $messageField.empty();
+            $messageField.hide();
+        }
+    }
+
     $(document).on('click', '.grade-override-modal-save', function() {
         var visibilityData = {};
         if (isManualGrading) {
@@ -499,12 +507,14 @@ $(document).ready(function() {
             return;
         var validStatus = ValidateAdjustedGradesData();
         if (validStatus) {
+            setInfoMessage(gettext('Update in progress, please wait...'));
             courseXblockUpdater(
                 courseID,
                 adjustedGradesData,
                 visibilityData,
                 function(data){
                     gradebookOverrideModalReset();
+                    setInfoMessage();
                     renderAllGradebook = false;
                     gradeBookData = [];
                     $gradesTableWrapper.empty();
