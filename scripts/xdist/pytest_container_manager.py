@@ -3,8 +3,8 @@ import logging
 import time
 
 import boto3
+from botocore.config import Config
 from botocore.exceptions import ClientError
-from botocore.vendored.requests.exceptions import ConnectTimeout
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -14,9 +14,16 @@ class PytestContainerManager():
     """
     Responsible for spinning up and terminating ECS tasks to be used with pytest-xdist
     """
+    TASK_RUN_TIMEOUT_MINUTES = 10
+    MAX_RUN_TASK_RETRIES = 7
 
     def __init__(self, region, cluster):
-        self.ecs = boto3.client('ecs', region)
+        config = Config(
+            retries = {
+                'max_attempts': self.MAX_RUN_TASK_RETRIES
+            }
+        )
+        self.ecs = boto3.client('ecs', region, config=config)
         self.cluster_name = cluster
 
     def spin_up_tasks(self, number_of_tasks, task_name, subnets, security_groups, public_ip, launch_type):
@@ -24,9 +31,6 @@ class PytestContainerManager():
         Spins up tasks and generates two .txt files, containing the IP/ arns
         of the new tasks.
         """
-        TASK_RUN_TIMEOUT_MINUTES = 10
-        MAX_RUN_TASK_RETRIES = 7
-
         revision = self.ecs.describe_task_definition(taskDefinition=task_name)['taskDefinition']['revision']
         task_definition = "{}:{}".format(task_name, revision)
 
@@ -42,7 +46,7 @@ class PytestContainerManager():
         # Spin up tasks. boto3's run_task only allows 10 tasks to be launched at a time
         task_arns = []
         for num in task_num_list:
-            for retry in range(1, MAX_RUN_TASK_RETRIES + 1):
+            for retry in range(1, self.MAX_RUN_TASK_RETRIES + 1):
                 try:
                     response = self.ecs.run_task(
                         count=num,
@@ -57,11 +61,11 @@ class PytestContainerManager():
                         },
                         taskDefinition=task_definition
                     )
-                except (ClientError, ConnectTimeout) as err:
+                except ClientError as err:
                     # Handle AWS throttling with an exponential backoff
-                    if retry == MAX_RUN_TASK_RETRIES:
+                    if retry == self.MAX_RUN_TASK_RETRIES:
                         raise StandardError(
-                            "MAX_RUN_TASK_RETRIES ({}) reached while spinning up tasks due to AWS throttling.".format(MAX_RUN_TASK_RETRIES)
+                            "self.MAX_RUN_TASK_RETRIES ({}) reached while spinning up tasks due to AWS throttling.".format(self.MAX_RUN_TASK_RETRIES)
                         )
                     logger.info("Hit error: {}. Retrying".format(err))
                     countdown = 2 ** retry
@@ -77,7 +81,7 @@ class PytestContainerManager():
         not_running = task_arns[:]
         ip_addresses = []
         all_running = False
-        for attempt in range(0, TASK_RUN_TIMEOUT_MINUTES * 2):
+        for attempt in range(0, self.TASK_RUN_TIMEOUT_MINUTES * 2):
             time.sleep(30)
             list_tasks_response = self.ecs.describe_tasks(cluster=self.cluster_name, tasks=not_running)['tasks']
             del not_running[:]
