@@ -39,6 +39,8 @@ git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.1.6#egg=xblock-d
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@138e6fa0bf3a2013e904a085b9fed77dab7f3f21#egg=xblock-google-drive
 git+https://github.com/open-craft/xblock-poll@add89e14558c30f3c8dc7431e5cd6536fff6d941#egg=xblock-poll==1.5.1
 git+https://github.com/edx/xblock-utils.git@v1.1.1#egg=xblock-utils==1.1.1
+-e git+https://github.com/raccoongang/rg_instructor_analytics@release-0.3.0#egg=rg_instructor_analytics
+-e git+https://github.com/raccoongang/rg_instructor_analytics_log_collector@release-0.1.0#egg=rg_instructor_analytics_log_collector
 -e common/lib/xmodule
 amqp==1.4.9               # via kombu
 analytics-python==1.1.0

@@ -103,3 +103,7 @@
 -e git+https://github.com/mitodl/edx-sga.git@6b2f7aa2a18206023c8407e2c46f86d4b4c3ac96#egg=edx-sga==0.8.0
 -e git+https://github.com/open-craft/xblock-poll@add89e14558c30f3c8dc7431e5cd6536fff6d941#egg=xblock-poll==1.5.1
 -e git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.1.6#egg=xblock-drag-and-drop-v2==2.1.6
+
+# Raccoongang Instructor analytics
+-e git+https://github.com/raccoongang/rg_instructor_analytics@release-0.3.0#egg=rg_instructor_analytics
+-e git+https://github.com/raccoongang/rg_instructor_analytics_log_collector@release-0.1.0#egg=rg_instructor_analytics_log_collector
