@@ -21,7 +21,6 @@
             <th><%- strLib.studentNameHeading %></th>
             <th id="auto-grade-header"></th>
             <th id="adjusted-grade-header"></th>
-            <th><%- strLib.commentHeading %></th>
           </thead>
           <tbody>
             <% _.each(studentsData, function(student){ %>
@@ -31,9 +30,6 @@
                 </td>
                 <td class="user-adjusted-grade" data-username="<%- student.username %>">
                     <input type=text>/<span></span>
-                </td>
-                <td class="user-grade-comment" data-username="<%- student.username %>">
-                    <textarea></textarea>
                 </td>
               </tr>
             <% }) %>

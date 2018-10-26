@@ -80,7 +80,6 @@ $(document).ready(function() {
         staticPath = $gradebookWrapper.attr('data-static-path'),
         userAdjustedGrades = {},
         userAutoGrades = {},
-        userComments = {},
         createMainDataTable = function(studentsDataLength) {
             const $gradebookErrorMessageContainer = $gradebookWrapper.find('#gradebook-table-empty-message');
             const $studentGradesTable = $gradesTableWrapper.find('#student-grades-table');
@@ -102,7 +101,7 @@ $(document).ready(function() {
             const options = {
                 columnDefs: [{
                     orderable: false,
-                    targets: 3
+                    targets: 2
                 }],
                 language: {
                     zeroRecords: ''
@@ -268,7 +267,6 @@ $(document).ready(function() {
                 var score_earned = parseFloat(gradeData[0].score_earned);
                 var score_possible = parseFloat(gradeData[0].score_possible);
                 var username = userData.username;
-                userComments[username] = gradeData[0].comment;
 
                 if (! (isNaN(score_earned) || isNaN(score_possible))) {
                     if (! isNaN(auto_grade)) {
@@ -292,7 +290,6 @@ $(document).ready(function() {
                     publishGrades: gettext("Publish grades"),
                     noMatch: gettext("No matching records found"),
                     studentNameHeading: gettext("Student Name"),
-                    commentHeading: gettext("Comment"),
                     save: gettext("Save"),
                     cancel: gettext("Cancel")
                 }
@@ -341,9 +338,6 @@ $(document).ready(function() {
                 $(this).attr('data-block-id', blockID);
                 var $adjustedGradePlaceholder = $(this).find('td.user-adjusted-grade');
                 var $autoGradePlaceholder = $(this).find('td.user-auto-grade');
-                var $commentPlaceholder = $(this).find('td.user-grade-comment');
-                var $commentTextArea = $commentPlaceholder.find('textarea');
-                var comment;
                 var username = $autoGradePlaceholder.attr('data-username');
 
                 if (username in userAutoGrades) {
@@ -359,20 +353,12 @@ $(document).ready(function() {
                         $adjustedGradePlaceholder.attr('data-score-earned', adjustedGrade);
                         $adjustedGradePlaceholder.attr('data-sort', adjustedGrade);
                         $adjustedGradePlaceholder.addClass('has-adjusted-score');
-                        if (autoEarnedGrade != adjustedGrade){
-                            DisplayGradeComment(username, $commentPlaceholder, $commentTextArea);
-                        }
-                        else
-                            $commentTextArea.prop('disabled', true).val('');
                     }
                     else if (isManualGrading) {
                         $adjustedGradePlaceholder.attr('data-sort', autoEarnedGrade);
-                        DisplayGradeComment(username, $commentPlaceholder, $commentTextArea);
                     }
                     else {
-                        $(this).find('.user-grade-comment textarea').attr('disabled', 'disabled');
                         $adjustedGradePlaceholder.attr('data-sort', autoEarnedGrade);
-                        $commentTextArea.prop('disabled', true).val('');
                     }
                     $adjustedGradePlaceholder.find('input').val($adjustedGradePlaceholder.attr('data-score-earned'));
                     $adjustedGradePlaceholder.find('span').text($adjustedGradePlaceholder.attr('data-score-possible'));
@@ -410,7 +396,6 @@ $(document).ready(function() {
         adjustedGradesData = {};
         userAdjustedGrades = {};
         userAutoGrades = {};
-        userComments = {};
 
         $modal.hide();
         $modal.find('.grade-override-table-wrapper').find('tr').show();
@@ -420,12 +405,6 @@ $(document).ready(function() {
         $modal.find('table').find('textarea').removeClass('score-visited').removeClass('error');
         $modal.find('#modal-table-empty-message').hide();
         destroyDataTable($('#grade-override-modal-table'));
-    }
-
-    function DisplayGradeComment(username, $commentPlaceholder, $commentTextArea) {
-        comment = userComments[username];
-        $commentPlaceholder.attr('data-comment', comment);
-        $commentTextArea.prop('disabled', false).val(comment);
     }
 
     /* Block ID modal window manipulation */
@@ -455,7 +434,6 @@ $(document).ready(function() {
     $(document).on('keyup focus', '.user-adjusted-grade input', function(){
         var $row = $(this).parents('tr'),
             $cell = $(this).parents('td'),
-            $commentTextArea = $row.find('.user-grade-comment textarea'),
             autoGrade = $row.find('.user-auto-grade').html().split('/')[0],
             previousGrade = $cell.attr('data-score-earned');
             adjustedGrade = $(this).val();
@@ -469,23 +447,7 @@ $(document).ready(function() {
 
         ToggleSaveButton(!HasUserMadeChanges());
 
-        if (!isManualGrading) {
-            if (autoGrade == adjustedGrade)
-                $commentTextArea.prop('disabled', true).val('');
-            else
-                $commentTextArea.prop('disabled', false);
-        }
-
         modalDataTable.rows().invalidate();
-    });
-
-    $(document).on('keyup focus', '.user-grade-comment textarea', function(){
-        var originalComment = $(this).parents('td').attr('data-comment'),
-            changedComment = $(this).val();
-
-        $(this).toggleClass('score-visited', changedComment != originalComment)
-
-        ToggleSaveButton(!HasUserMadeChanges());
     });
 
     $(document).on('change', 'input[name=grades-published]', function() {
@@ -499,14 +461,12 @@ $(document).ready(function() {
             var $row = $(this);
             var $gradeCell = $row.find('.user-adjusted-grade');
             var $grade = $gradeCell.find('input');
-            var $commentCell = $row.find('.user-grade-comment');
-            var $comment = $commentCell.find('textarea');
             var username = $gradeCell.attr('data-username');
             var autoGrade;
             var grade;
             var removeAdjustedGrade;
 
-            if ($grade.hasClass('score-visited') || $comment.hasClass('score-visited'))
+            if ($grade.hasClass('score-visited'))
                 adjustedGradesData[username] = {
                     'block_id' : $row.attr('data-block-id'),
                     'max_grade' : $gradeCell.attr('data-score-possible'),
@@ -520,7 +480,6 @@ $(document).ready(function() {
                 removeAdjustedGrade = isManualGrading || autoGrade === grade;
 
                 adjustedGradesData[username].grade = grade;
-                adjustedGradesData[username].state.comment = $comment.val().trim();
                 adjustedGradesData[username].remove_adjusted_grade = removeAdjustedGrade;
                 adjustedGradesData[username].section_block_id = sectionBlockId;
             }
@@ -632,7 +591,6 @@ $(document).ready(function() {
                 'block_id': blockID,
                 'state': {}
             };
-        module_list.users[module_key].state.comment = $(this).val();
     });
 
     if ($gradebookWrapper.attr('data-number-of-students') > 0)
