@@ -34,7 +34,6 @@
           </th>
         <% }) %>
   
-        <th title="Current grade"><div class="assignment-label"><%- strLib.userHeading %></div></th>
         <th title="Total"><div class="assignment-label"><%- strLib.total %></div></th>
       </tr>
     </thead>
@@ -62,11 +61,6 @@
               <%- (section.grade_description || '') %>
             </td>
           <% }) %>
-  
-          <td class="grade_<%- student.current_letter_grade %> data-score-container-class"
-              title="Current grade">
-            <%- (student.current_percent * 100).toFixed(2) %>&percnt;
-          </td>
   
           <td class="grade_<%- student.total_letter_grade %> data-score-container-class"
               title="Total">
