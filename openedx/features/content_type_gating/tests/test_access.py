@@ -27,6 +27,18 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
 
     PROBLEM_TYPES = ['problem', 'openassessment', 'drag-and-drop-v2', 'done', 'edx_sga', ]
 
+    GRADED_SCORE_WEIGHT_TEST_CASES = [
+        # graded, has_score, weight, is_gated
+        (False, False, 0, False),
+        (False, True, 0, False),
+        (False, False, 1, False),
+        (False, True, 1, False),
+        (True, False, 0, False),
+        (True, True, 0, False),
+        (True, False, 1, False),
+        (True, True, 1, True)
+    ]
+
     @classmethod
     def setUpClass(self):
         super(TestProblemTypeAccess, self).setUpClass()
@@ -53,7 +65,7 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
                 category='sequential',
                 display_name='Lesson 1'
             )
-            chapter_vertical = ItemFactory.create(
+            self.vertical = ItemFactory.create(
                 parent=self.chapter_subsection,
                 category='vertical',
                 display_name='Lesson 1 Vertical - Unit 1'
@@ -61,32 +73,74 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
             self.problem_dict = {}
             for prob_type in self.PROBLEM_TYPES:
                 block = ItemFactory.create(
-                    parent=chapter_vertical,
+                    parent=self.vertical,
                     category=prob_type,
                     display_name=prob_type,
                     graded=True,
                 )
                 self.problem_dict[prob_type] = block
 
+            '''
+            Create components with the cartesian product of possible values of
+            graded/has_score/weight for the test_graded_score_weight_values test.
+            '''
+            self.graded_score_weight_blocks = {}
+            for graded, has_score, weight, gated in self.GRADED_SCORE_WEIGHT_TEST_CASES:
+                case_name = ' Graded: ' + str(graded) + ' Has Score: ' + str(has_score) + ' Weight: ' + str(weight)
+                block = ItemFactory.create(
+                    parent=self.vertical,
+                    # has_score is determined by XBlock type. It is not a value set on an instance of an XBlock.
+                    # Therefore, we create a problem component when has_score is True
+                    # and an html component when has_score is False.
+                    category='problem' if has_score else 'html',
+                    display_name=case_name,
+                    graded=graded,
+                    weight=weight,
+                )
+                self.graded_score_weight_blocks[(graded, has_score, weight)] = block
+
     def setUp(self):
         super(TestProblemTypeAccess, self).setUp()
         self.audit_user = UserFactory.create()
         self.enrollment = CourseEnrollmentFactory.create(user=self.audit_user, course_id=self.course.id, mode='audit')
 
+    def assert_block_is_gated(self, block, is_gated):
+        '''
+        This functions asserts whether the passed in block is gated by content type gating.
+        This is determined by checking whether the has_access method called the IncorrectPartitionGroupError.
+        This error gets swallowed up and is raised as a 404, which is why we are checking for a 404 being raised.
+        However, the 404 could also be caused by other errors, which is why the actual assertion is checking
+        whether the IncorrectPartitionGroupError was called.
+        '''
+        fake_request = Mock()
+
+        with patch.object(IncorrectPartitionGroupError, '__init__',
+                          wraps=IncorrectPartitionGroupError.__init__) as mock_access_error:
+            if is_gated:
+                with self.assertRaises(Http404):
+                    block = load_single_xblock(fake_request, self.audit_user.id, unicode(self.course.id),
+                                               unicode(block.scope_ids.usage_id), course=None)
+                # check that has_access raised the IncorrectPartitionGroupError in order to gate the block
+                self.assertTrue(mock_access_error.called)
+            else:
+                block = load_single_xblock(fake_request, self.audit_user.id, unicode(self.course.id),
+                                           unicode(block.scope_ids.usage_id), course=None)
+                # check that has_access did not raise the IncorrectPartitionGroupError thereby not gating the block
+                self.assertFalse(mock_access_error.called)
+
     @ddt.data(
         *PROBLEM_TYPES
     )
     def test_audit_fails_access_graded_problems(self, prob_type):
-        fake_request = Mock()
-        with patch.object(IncorrectPartitionGroupError, '__init__',
-                          wraps=IncorrectPartitionGroupError.__init__) as mock_access_error:
-            mock_access_error.return_value = IncorrectPartitionGroupError
-            with self.assertRaises(Http404):
-                load_single_xblock(
-                    request=fake_request,
-                    user_id=self.audit_user.id,
-                    course_id=unicode(self.course.id),
-                    usage_key_string=unicode(self.problem_dict[prob_type].scope_ids.usage_id),
-                    course=None
-                )
-            self.assertTrue(mock_access_error.called)
+        block = self.problem_dict[prob_type]
+        is_gated = True
+        self.assert_block_is_gated(block, is_gated)
+
+    @ddt.data(
+        *GRADED_SCORE_WEIGHT_TEST_CASES
+    )
+    @ddt.unpack
+    def test_graded_score_weight_values(self, graded, has_score, weight, is_gated):
+        # Verify that graded, has_score and weight must all be true for a component to be gated
+        block = self.graded_score_weight_blocks[(graded, has_score, weight)]
+        self.assert_block_is_gated(block, is_gated)
