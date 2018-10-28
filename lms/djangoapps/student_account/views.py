@@ -82,17 +82,13 @@ def login_and_registration_form(request, initial_mode="login"):
                 if tpa_hint_provider.skip_hinted_login_dialog:
                     # Forward the user directly to the provider's login URL when the provider is configured
                     # to skip the dialog.
-                    if initial_mode == "register":
-                        auth_entry = pipeline.AUTH_ENTRY_REGISTER
-                    else:
-                        auth_entry = pipeline.AUTH_ENTRY_LOGIN
                     return redirect(
-                        pipeline.get_login_url(provider_id, auth_entry, redirect_url=redirect_to)
+                        pipeline.get_login_url(provider_id, pipeline.AUTH_ENTRY_LOGIN, redirect_url=redirect_to)
                     )
                 third_party_auth_hint = provider_id
                 initial_mode = "hinted_login"
-        except (KeyError, ValueError, IndexError) as ex:
-            log.error("Unknown tpa_hint provider: %s", ex)
+        except (KeyError, ValueError, IndexError):
+            pass
 
     # If this is a themed site, revert to the old login/registration pages.
     # We need to do this for now to support existing themes.
@@ -194,7 +190,7 @@ def password_change_request_handler(request):
 
     if email:
         try:
-            request_password_change(email, request.is_secure())
+            request_password_change(email, request.get_host(), request.is_secure())
             user = user if user.is_authenticated() else User.objects.get(email=email)
             destroy_oauth_tokens(user)
         except UserNotFound:

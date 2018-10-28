@@ -61,10 +61,6 @@ from lms.envs.common import (
     ENABLE_CREDIT_ELIGIBILITY, YOUTUBE_API_KEY,
     COURSE_MODE_DEFAULTS, DEFAULT_COURSE_ABOUT_IMAGE_URL,
 
-    # User-uploaded content
-    MEDIA_ROOT,
-    MEDIA_URL,
-
     # Django REST framework configuration
     REST_FRAMEWORK,
 
@@ -149,8 +145,8 @@ FEATURES = {
     'AUTOPLAY_VIDEOS': False,
 
     # If set to True, new Studio users won't be able to author courses unless
-    # an Open edX admin has added them to the course creator group.
-    'ENABLE_CREATOR_GROUP': True,
+    # edX has explicitly added them to the course creator group.
+    'ENABLE_CREATOR_GROUP': False,
 
     # whether to use password policy enforcement or not
     'ENFORCE_PASSWORD_POLICY': False,

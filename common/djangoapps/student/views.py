@@ -1679,7 +1679,7 @@ def user_signup_handler(sender, **kwargs):  # pylint: disable=unused-argument
             log.info(u'user {} originated from a white labeled "Microsite"'.format(kwargs['instance'].id))
 
 
-def _do_create_account(form, custom_form=None):
+def _do_create_account(form, custom_form=None, site=None):
     """
     Given cleaned post variables, create the User and UserProfile objects, as well as the
     registration for this user.
@@ -1720,6 +1720,10 @@ def _do_create_account(form, custom_form=None):
                 custom_model = custom_form.save(commit=False)
                 custom_model.user = user
                 custom_model.save()
+
+            if site:
+                # Set UserAttribute indicating the site the user account was created on.
+                UserAttribute.set_user_attribute(user, 'created_on_site', site.domain)
     except IntegrityError:
         # Figure out the cause of the integrity error
         if len(User.objects.filter(username=user.username)) > 0:
@@ -1760,13 +1764,6 @@ def _do_create_account(form, custom_form=None):
         raise
 
     return (user, profile, registration)
-
-
-def _create_or_set_user_attribute_created_on_site(user, site):
-    # Create or Set UserAttribute indicating the microsite site the user account was created on.
-    # User maybe created on 'courses.edx.org', or a white-label site
-    if site:
-        UserAttribute.set_user_attribute(user, 'created_on_site', site.domain)
 
 
 def create_account_with_params(request, params):
@@ -1875,7 +1872,7 @@ def create_account_with_params(request, params):
     # Perform operations within a transaction that are critical to account creation
     with transaction.atomic():
         # first, create the account
-        (user, profile, registration) = _do_create_account(form, custom_form)
+        (user, profile, registration) = _do_create_account(form, custom_form, site=request.site)
 
         # If a 3rd party auth provider and credentials were provided in the API, link the account with social auth
         # (If the user is using the normal register page, the social auth pipeline does the linking, not this code)
@@ -1912,8 +1909,6 @@ def create_account_with_params(request, params):
                 raise ValidationError({'access_token': [error_message]})
 
     # Perform operations that are non-critical parts of account creation
-    _create_or_set_user_attribute_created_on_site(user, request.site)
-
     preferences_api.set_user_preference(user, LANGUAGE_KEY, get_language())
 
     if settings.FEATURES.get('ENABLE_DISCUSSION_EMAIL_DIGEST'):
@@ -2263,7 +2258,7 @@ def auto_auth(request):
     # If successful, this will return a tuple containing
     # the new user object.
     try:
-        user, profile, reg = _do_create_account(form)
+        user, profile, reg = _do_create_account(form, site=request.site)
     except (AccountValidationError, ValidationError):
         # Attempt to retrieve the existing user.
         user = User.objects.get(username=username)
@@ -2289,8 +2284,6 @@ def auto_auth(request):
     age_limit = settings.PARENTAL_CONSENT_AGE_LIMIT
     profile.year_of_birth = (year - age_limit) - 1
     profile.save()
-
-    _create_or_set_user_attribute_created_on_site(user, request.site)
 
     organization = Organization.objects.filter(name=request.GET.get('organization_name'))[0]
     UserOrganizationMapping.objects.create(
@@ -2455,7 +2448,8 @@ def password_reset(request):
     if form.is_valid():
         form.save(use_https=request.is_secure(),
                   from_email=configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
-                  request=request)
+                  request=request,
+                  domain_override=request.get_host())
         # When password change is complete, a "edx.user.settings.changed" event will be emitted.
         # But because changing the password is multi-step, we also emit an event here so that we can
         # track where the request was initiated.

@@ -21,7 +21,7 @@ class CourseGradeBase(object):
     """
     Base class for Course Grades.
     """
-    def __init__(self, user, course_data, percent=0, letter_grade=None, passed=False, force_update_subsections=False):
+    def __init__(self, user, course_data, percent=0, letter_grade=None, passed=False):
         self.user = user
         self.course_data = course_data
 
@@ -30,7 +30,6 @@ class CourseGradeBase(object):
 
         # Convert empty strings to None when reading from the table
         self.letter_grade = letter_grade or None
-        self.force_update_subsections = force_update_subsections
 
     def __unicode__(self):
         return u'Course Grade: percent: {}, letter_grade: {}, passed: {}'.format(
@@ -204,9 +203,7 @@ class CourseGrade(CourseGradeBase):
 
     def update(self):
         """
-        Updates the grade for the course. Also updates subsection grades
-        if self.force_update_subsections is true, via the lazy call
-        to self.grader_result.
+        Updates the grade for the course.
         """
         grade_cutoffs = self.course_data.course.grade_cutoffs
         self.percent = self._compute_percent(self.grader_result)
@@ -227,10 +224,7 @@ class CourseGrade(CourseGradeBase):
 
     def _get_subsection_grade(self, subsection):
         # Pass read_only here so the subsection grades can be persisted in bulk at the end.
-        if self.force_update_subsections:
-            return self._subsection_grade_factory.update(subsection)
-        else:
-            return self._subsection_grade_factory.create(subsection, read_only=True)
+        return self._subsection_grade_factory.create(subsection, read_only=True)
 
     @staticmethod
     def _compute_percent(grader_result):

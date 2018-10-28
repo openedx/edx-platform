@@ -110,7 +110,7 @@ ignore_dirs:
     - '*/terrain'
     - '*/spec'
     - '*/tests'
-    - '*/djangoapps/*/features'
+    - '*/features'
     # Directories full of auto-generated JS
     - lms/static/js/i18n
     - cms/static/js/i18n
