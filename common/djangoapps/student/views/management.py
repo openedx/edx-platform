@@ -70,6 +70,7 @@ from openedx.core.djangoapps.user_api.models import UserRetirementRequest
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangolib.markup import HTML, Text
+from organizations.models import Organization, UserOrganizationMapping
 from student.cookies import set_logged_in_cookies
 from student.forms import AccountCreationForm, PasswordResetFormNoActive, get_registration_extension_form
 from student.helpers import (
@@ -97,6 +98,7 @@ from student.models import (
     create_comments_service_user,
     email_exists_or_retired,
 )
+from student.roles import CourseCreatorRole
 from student.signals import REFUND_ORDER
 from student.tasks import send_activation_email
 from student.text_me_the_app import TextMeTheAppFragmentView
@@ -717,6 +719,14 @@ def create_account_with_params(request, params):
         django_login(request, new_user)
         request.session.set_expiry(0)
 
+        # APPSEMBLER SPECIFIC
+        # allow users registered from AMC to create courses
+        if 'registered_from_amc' in params:
+            from cms.djangoapps.course_creators.models import CourseCreator
+            CourseCreator.objects.update_or_create(user=user, defaults={'state': CourseCreator.GRANTED})
+            CourseCreatorRole().add_users(user)
+        # APPSEMBLER SPECIFIC END
+
         if do_external_auth:
             eamap.user = new_user
             eamap.dtsignup = datetime.datetime.now(UTC)
@@ -733,7 +743,7 @@ def create_account_with_params(request, params):
 
     # Check if system is configured to skip activation email for the current user.
     skip_email = skip_activation_email(
-        user, do_external_auth, running_pipeline, third_party_provider,
+        user, do_external_auth, running_pipeline, third_party_provider, params,
     )
 
     if skip_email:
@@ -743,6 +753,12 @@ def create_account_with_params(request, params):
 
     # Perform operations that are non-critical parts of account creation
     create_or_set_user_attribute_created_on_site(user, request.site)
+
+    organization = Organization.objects.filter(name=request.GET.get('organization_name'))[0]
+    UserOrganizationMapping.objects.create(
+        user=user,
+        organization=organization,
+    )
 
     preferences_api.set_user_preference(user, LANGUAGE_KEY, get_language())
 
@@ -803,6 +819,26 @@ def create_account_with_params(request, params):
 
     create_comments_service_user(user)
 
+    # APPSEMBLER SPECIFIC
+    organization_name = params.get('organization')
+    organization = None
+    # organization name is passed during signup when invited through AMC,
+    # otherwise it's a regular signup on a microsite
+    if organization_name:
+        try:
+            organization = Organization.objects.get(name=organization_name)
+        except:
+            pass
+    elif hasattr(request, 'site'):
+        organization = request.site.organizations.first()
+
+    is_amc_admin = "registered_from_amc" in params
+
+    if organization:
+        UserOrganizationMapping.objects.get_or_create(user=user, organization=organization, is_amc_admin=is_amc_admin)
+
+    # APPSEMBLER SPECIFIC END
+
     try:
         record_registration_attributions(request, new_user)
     # Don't prevent a user from registering due to attribution errors.
@@ -817,7 +853,7 @@ def create_account_with_params(request, params):
     return new_user
 
 
-def skip_activation_email(user, do_external_auth, running_pipeline, third_party_provider):
+def skip_activation_email(user, do_external_auth, running_pipeline, third_party_provider, params):
     """
     Return `True` if activation email should be skipped.
 
@@ -838,6 +874,7 @@ def skip_activation_email(user, do_external_auth, running_pipeline, third_party_
         do_external_auth (bool): True if external authentication is in progress.
         running_pipeline (dict): Dictionary containing user and pipeline data for third party authentication.
         third_party_provider (ProviderConfig): An instance of third party provider configuration.
+        params (dict): A copy of the request.POST.
 
     Returns:
         (bool): `True` if account activation email should be skipped, `False` if account activation email should be
@@ -873,6 +910,8 @@ def skip_activation_email(user, do_external_auth, running_pipeline, third_party_
         settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING') or
         (settings.FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH') and do_external_auth) or
         (third_party_provider and third_party_provider.skip_email_verification and valid_email)
+        and
+        'registered_from_amc' not in params  # don't need to activate email if the user already did that on AMC
     )
 
 
@@ -1090,6 +1129,7 @@ def password_reset(request):
     if form.is_valid():
         form.save(use_https=request.is_secure(),
                   from_email=configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
+                  domain_override=request.get_host(),
                   request=request)
         # When password change is complete, a "edx.user.settings.changed" event will be emitted.
         # But because changing the password is multi-step, we also emit an event here so that we can

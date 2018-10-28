@@ -85,7 +85,7 @@ class CourseValidationView(DeveloperErrorViewMixin, GenericAPIView):
                 )
             if get_bool_param(request, 'certificates', all_requested):
                 response.update(
-                    certificates=self._certificates_validation(course)
+                    certificates=self._certificates_validation(course, request)
                 )
             if get_bool_param(request, 'updates', all_requested):
                 response.update(
@@ -136,8 +136,8 @@ class CourseValidationView(DeveloperErrorViewMixin, GenericAPIView):
             sum_of_weights=sum_of_weights,
         )
 
-    def _certificates_validation(self, course):
-        is_activated, certificates = CertificateManager.is_activated(course)
+    def _certificates_validation(self, course, request):
+        is_activated, certificates = CertificateManager.is_activated(request=request, course=course)
         return dict(
             is_activated=is_activated,
             has_certificate=len(certificates) > 0,

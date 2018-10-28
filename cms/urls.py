@@ -208,7 +208,7 @@ if settings.FEATURES.get('ENTRANCE_EXAMS'):
                        contentstore.views.entrance_exam))
 
 # Enable Web/HTML Certificates
-if settings.FEATURES.get('CERTIFICATES_HTML_VIEW'):
+if True:  # if: settings.FEATURES.get('CERTIFICATES_HTML_VIEW'):
     from contentstore.views.certificates import (
         certificate_activation_handler,
         signatory_detail_handler,
@@ -275,3 +275,7 @@ if settings.FEATURES.get('ENABLE_API_DOCS'):
 
 from openedx.core.djangoapps.plugins import constants as plugin_constants, plugin_urls
 urlpatterns.extend(plugin_urls.get_patterns(plugin_constants.ProjectType.CMS))
+
+urlpatterns += (
+    url(r'^hijack/', include('hijack.urls')),
+)

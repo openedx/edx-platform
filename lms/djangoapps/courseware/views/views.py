@@ -1017,7 +1017,8 @@ def _downloadable_certificate_message(course, cert_downloadable_status):
         elif not cert_downloadable_status['download_url']:
             return GENERATING_CERT_DATA
 
-    return _downloadable_cert_data(download_url=cert_downloadable_status['download_url'])
+    # Hack: Was `return _downloadable_cert_data(download_url=cert_downloadable_status['download_url'])`
+    return None
 
 
 def _missing_required_verification(student, enrollment_mode):
@@ -1041,7 +1042,10 @@ def _certificate_message(student, course, enrollment_mode):
     if cert_downloadable_status['is_downloadable']:
         return _downloadable_certificate_message(course, cert_downloadable_status)
 
-    return REQUESTING_CERT_DATA
+    if certs_api.has_html_certificates_enabled(course) and certs_api.get_active_web_certificate(course) is not None:
+        return REQUESTING_CERT_DATA
+    else:
+        return None
 
 
 def _get_cert_data(student, course, enrollment_mode, course_grade=None):

@@ -11,6 +11,7 @@ dependencies:
   override:
     - npm install
 
+    - pip install -U pip
     - pip install setuptools
 
     # Mirror what paver install_prereqs does.
@@ -20,7 +21,11 @@ dependencies:
     # from scratch again.
     - pip install --exists-action w -r requirements/edx/testing.txt
 
+    # Try to fix SSL handshake problems when running tests
+    - pip install ndg-httpsclient==0.3.0 pyasn1
+     
     - pip install coveralls==1.0
+    - pip install codecov requests
 
     # Output the installed python packages to the console to help
     # with troubleshooting any issues with python requirements.
@@ -39,6 +44,7 @@ test:
         parallel: true
 
   post:
+    - paver coverage
     - mkdir -p $CIRCLE_TEST_REPORTS/junit
     # Copy the junit results up to be consumed by circleci,
     # but only do this if there actually are results.
@@ -55,3 +61,4 @@ test:
     # If you have not set up set up coveralls then the following statement will
     # print a message but not affect the pass/fail status of the build.
     - if [ -z $COVERALLS_REPO_TOKEN ]; then echo "Coveralls token not defined."; else coveralls; fi
+    - codecov

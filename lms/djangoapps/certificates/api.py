@@ -27,6 +27,7 @@ from lms.djangoapps.certificates.models import (
 from lms.djangoapps.certificates.queue import XQueueCertInterface
 from eventtracking import tracker
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from util.organizations_helpers import get_course_organization_id
 from xmodule.modulestore.django import modulestore
 
@@ -436,7 +437,7 @@ def _certificate_download_url(user_id, course_id):
 
 
 def has_html_certificates_enabled(course):
-    if not settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
+    if not configuration_helpers.get_value("CERTIFICATES_HTML_VIEW", False):
         return False
     return course.cert_html_view_enabled
 

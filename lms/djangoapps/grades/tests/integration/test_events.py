@@ -4,6 +4,7 @@ Test grading events across apps.
 # pylint: disable=protected-access
 
 from mock import call as mock_call, patch
+from unittest import skip
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
@@ -74,6 +75,7 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
         self.instructor = UserFactory.create(is_staff=True, username=u'test_instructor', password=u'test')
         self.refresh_course()
 
+    @skip("Occasionally fails and adding the flaky decorator doesn't help")
     @patch('lms.djangoapps.grades.events.tracker')
     def test_submit_answer(self, events_tracker):
         self.submit_question_answer('p1', {'2_1': 'choice_choice_2'})

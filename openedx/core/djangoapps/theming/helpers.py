@@ -84,7 +84,11 @@ def get_template_path_with_theme(relative_path):
 
     template_path = theme.template_path / template_name
     absolute_path = theme.path / "templates" / template_name
-    if absolute_path.exists():
+    customer_template_path = theme.customer_specific_template_path / template_name
+    customer_absolute_path = theme.customer_specific_path / "templates" / template_name
+    if customer_absolute_path.exists():
+        return str(customer_template_path)
+    elif absolute_path.exists():
         return str(template_path)
     else:
         return relative_path

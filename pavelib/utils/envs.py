@@ -210,7 +210,7 @@ class Env(object):
         dir_name = (REPO_ROOT / 'common/lib' / item)
         if dir_name.isdir() and not dir_name.endswith(IGNORED_TEST_DIRS):
             LIB_TEST_DIRS.append(path("common/lib") / item.basename())
-    LIB_TEST_DIRS.append(path("pavelib/paver_tests"))
+    #LIB_TEST_DIRS.append(path("pavelib/paver_tests"))
 
     # Directory for i18n test reports
     I18N_REPORT_DIR = REPORT_DIR / 'i18n'

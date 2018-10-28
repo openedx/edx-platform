@@ -78,6 +78,24 @@ from openedx.core.release import RELEASE_LINE
   </head>
 
   <body class="${static.dir_rtl()} <%block name='bodyclass'></%block> lang_${LANGUAGE_CODE}">
+
+    <% is_anonymous = user.is_anonymous() %>
+
+    % if not is_anonymous:
+
+        <% tier_has_expired = request.session.get('TIER_EXPIRED', False) %>
+        <% tier_display_warning = request.session.get('DISPLAY_EXPIRATION_WARNING', False) %>
+        <% tier_expires_in = request.session.get('TIER_EXPIRES_IN', False) %>
+
+        % if tier_display_warning and tier_has_expired:
+            <span style="position: absolute; top: 0; left: 0; padding: 15px; font-size: 14px; background-color: #e74c3c; display: block; width: 100%; color: #fff; font-family: sans-serif;">Your AMC Trial has <strong>expired!</strong> Please <a href="http://www.appsembler.com/contact/" style="display: inline-block; padding: 7px 10px; border: 2px solid #fff; color: #fff; border-radius: 30px; margin: 0 3px; font-weight: bolder;">let us know</a> about your experience or if you want to extend your Trial.</span><span style="display: block; height: 68px; width: 100%;"></span>
+        % elif tier_display_warning and tier_expires_in:
+            <span style="padding: 15px; font-size: 14px; background-color: #0090c1; display: block; width: 100%; color: #fff; font-family: sans-serif;">Your AMC Trial <strong>expires</strong> in: <strong>${tier_expires_in}</strong>.</span>
+        % endif
+
+    % endif
+
+
     <%block name="view_notes"></%block>
 
     <a class="nav-skip" href="#main">${_("Skip to main content")}</a>
@@ -168,5 +186,18 @@ from openedx.core.release import RELEASE_LINE
     </%block>
     <%include file="widgets/segment-io-footer.html" />
     <div class="modal-cover"></div>
+    <script>!function(e,o,n){window.HSCW=o,window.HS=n,n.beacon=n.beacon||{};var t=n.beacon;t.userConfig={},t.readyQueue=[],t.config=function(e){this.userConfig=e},t.ready=function(e){this.readyQueue.push(e)},o.config={docs:{enabled:!0,baseUrl:"//appsembler.helpscoutdocs.com/"},contact:{enabled:!0,formId:"fdef890f-fabb-11e5-a329-0ee2467769ff"}};var r=e.getElementsByTagName("script")[0],c=e.createElement("script");c.type="text/javascript",c.async=!0,c.src="https://djtflbt20bdde.cloudfront.net/",r.parentNode.insertBefore(c,r)}(document,window.HSCW||{},window.HS||{});</script>
+      % if user.is_authenticated():
+        <script>
+          HS.beacon.ready(function() {
+            HS.beacon.identify({
+              %if user.get_full_name():
+                name: '${user.get_full_name()}',
+              %endif
+              email: '${user.email}'
+            });
+          });
+        </script>
+      %endif
   </body>
 </html>

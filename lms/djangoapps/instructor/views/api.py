@@ -2839,7 +2839,7 @@ def _instructor_dash_url(course_key, section=None):
     return url
 
 
-@require_global_staff
+@require_level('staff')
 @require_POST
 def generate_example_certificates(request, course_id=None):  # pylint: disable=unused-argument
     """Start generating a set of example certificates.
@@ -2856,7 +2856,7 @@ def generate_example_certificates(request, course_id=None):  # pylint: disable=u
     return redirect(_instructor_dash_url(course_key, section='certificates'))
 
 
-@require_global_staff
+@require_level('staff')
 @require_POST
 def enable_certificate_generation(request, course_id=None):
     """Enable/disable self-generated certificates for a course.
@@ -2901,7 +2901,7 @@ def mark_student_can_skip_entrance_exam(request, course_id):  # pylint: disable=
 @transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_global_staff
+@require_level('staff')
 @require_POST
 @common_exceptions_400
 def start_certificate_generation(request, course_id):
@@ -2923,7 +2923,7 @@ def start_certificate_generation(request, course_id):
 @transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_global_staff
+@require_level('staff')
 @require_POST
 @common_exceptions_400
 def start_certificate_regeneration(request, course_id):
@@ -2965,7 +2965,7 @@ def start_certificate_regeneration(request, course_id):
 @transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_global_staff
+@require_level('staff')
 @require_http_methods(['POST', 'DELETE'])
 def certificate_exception_view(request, course_id):
     """
@@ -3140,7 +3140,7 @@ def get_student(username_or_email, course_key):
 @transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_global_staff
+@require_level('staff')
 @require_POST
 @common_exceptions_400
 def generate_certificate_exceptions(request, course_id, generate_for=None):
@@ -3182,7 +3182,7 @@ def generate_certificate_exceptions(request, course_id, generate_for=None):
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_global_staff
+@require_level('staff')
 @require_POST
 def generate_bulk_certificate_exceptions(request, course_id):  # pylint: disable=invalid-name
     """
@@ -3277,7 +3277,7 @@ def generate_bulk_certificate_exceptions(request, course_id):  # pylint: disable
 @transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_global_staff
+@require_level('staff')
 @require_http_methods(['POST', 'DELETE'])
 def certificate_invalidation_view(request, course_id):
     """
