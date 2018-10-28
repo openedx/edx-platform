@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-10-21 20:37+0000\n"
-"PO-Revision-Date: 2018-10-21 20:37:16.139905\n"
+"POT-Creation-Date: 2018-10-28 20:37+0000\n"
+"PO-Revision-Date: 2018-10-28 20:37:28.196547\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -8276,6 +8276,41 @@ msgstr ""
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid "Enrollment status for {student}: unknown"
+msgstr ""
+"Énröllmént stätüs för {student}: ünknöwn Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєт#"
+
+#: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid "Enrollment status for {student}: active"
+msgstr ""
+"Énröllmént stätüs för {student}: äçtïvé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тє#"
+
+#: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid "Enrollment status for {student}: inactive"
+msgstr ""
+"Énröllmént stätüs för {student}: ïnäçtïvé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєт#"
+
+#: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid "Enrollment status for {student}: pending"
+msgstr ""
+"Énröllmént stätüs för {student}: péndïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєт#"
+
+#: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid "Enrollment status for {student}: never enrolled"
+msgstr ""
+"Énröllmént stätüs för {student}: névér énrölléd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
+" ¢σηѕє¢тєтυя #"
+
+#: lms/djangoapps/instructor/views/api.py
 msgid "Module does not exist."
 msgstr "Mödülé döés nöt éxïst. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
@@ -13736,6 +13771,25 @@ msgid ""
 msgstr ""
 "Ýöü äré nöt sïgnéd ïn. Tö vïéw thé dïsçüssïön çöntént, {sign_in_link} ör "
 "{register_link}, änd énröll ïn thïs çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: openedx/features/course_duration_limits/access.py
+#, python-brace-format
+msgid "Access expired on {expiration_date}"
+msgstr "Àççéss éxpïréd ön {expiration_date} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: openedx/features/course_duration_limits/access.py
+#, python-brace-format
+msgid "Access to {course_name} expired on {expiration_date}"
+msgstr ""
+"Àççéss tö {course_name} éxpïréd ön {expiration_date} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢#"
+
+#: openedx/features/course_duration_limits/access.py
+#, python-brace-format
+msgid "Access to the course you were lookingfor expired on {expiration_date}"
+msgstr ""
+"Àççéss tö thé çöürsé ýöü wéré löökïngför éxpïréd ön {expiration_date} Ⱡ'σяєм"
+" ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: openedx/features/course_experience/plugins.py
 #: cms/templates/widgets/header.html
@@ -19396,6 +19450,10 @@ msgid "Starts - {date}"
 msgstr "Stärts - {date} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "for {course_display_name}"
+msgstr "för {course_display_name} Ⱡ'σяєм ιρѕυм #"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You must select a session by {expiration_date} to access the course."
 msgstr ""
 "Ýöü müst séléçt ä séssïön ßý {expiration_date} tö äççéss thé çöürsé. Ⱡ'σяєм "
@@ -19425,10 +19483,6 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Archived Course"
 msgstr "Vïéw Àrçhïvéd Çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "for {course_display_name}"
-msgstr "för {course_display_name} Ⱡ'σяєм ιρѕυм #"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm taking {course_name} online with {facebook_brand}. Check it out!"
@@ -22744,6 +22798,27 @@ msgid "View Gradebook"
 msgstr "Vïéw Grädéßöök Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "View a specific learner's enrollment status"
+msgstr ""
+"Vïéw ä spéçïfïç léärnér's énröllmént stätüs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Learner's {platform_name} email address or username *"
+msgstr ""
+"Léärnér's {platform_name} émäïl äddréss ör üsérnämé * Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
+" αмєт, ¢σηѕє¢тєтυя #"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Learner email address or username"
+msgstr ""
+"Léärnér émäïl äddréss ör üsérnämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "View Enrollment Status"
+msgstr "Vïéw Énröllmént Stätüs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View a specific learner's grades and progress"
 msgstr ""
 "Vïéw ä spéçïfïç léärnér's grädés änd prögréss Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
@@ -22754,11 +22829,6 @@ msgid "Learner's {platform_name} email address or username"
 msgstr ""
 "Léärnér's {platform_name} émäïl äddréss ör üsérnämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя#"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Learner email address or username"
-msgstr ""
-"Léärnér émäïl äddréss ör üsérnämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View Progress Page"

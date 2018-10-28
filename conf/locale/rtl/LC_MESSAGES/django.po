@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-10-21 20:37+0000\n"
-"PO-Revision-Date: 2018-10-21 20:37:16.139905\n"
+"POT-Creation-Date: 2018-10-28 20:37+0000\n"
+"PO-Revision-Date: 2018-10-28 20:37:28.196547\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -7139,6 +7139,31 @@ msgid "pdf download unavailable right now, please contact support."
 msgstr "حيب يخصرمخشي عرشدشهمشزمث قهلاف رخص, حمثشسث ذخرفشذف سعححخقف."
 
 #: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid "Enrollment status for {student}: unknown"
+msgstr "ثرقخمموثرف سفشفعس بخق {student}: عرنرخصر"
+
+#: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid "Enrollment status for {student}: active"
+msgstr "ثرقخمموثرف سفشفعس بخق {student}: شذفهدث"
+
+#: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid "Enrollment status for {student}: inactive"
+msgstr "ثرقخمموثرف سفشفعس بخق {student}: هرشذفهدث"
+
+#: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid "Enrollment status for {student}: pending"
+msgstr "ثرقخمموثرف سفشفعس بخق {student}: حثريهرل"
+
+#: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid "Enrollment status for {student}: never enrolled"
+msgstr "ثرقخمموثرف سفشفعس بخق {student}: رثدثق ثرقخممثي"
+
+#: lms/djangoapps/instructor/views/api.py
 msgid "Module does not exist."
 msgstr "وخيعمث يخثس رخف ثطهسف."
 
@@ -11889,6 +11914,21 @@ msgid ""
 msgstr ""
 "غخع شقث رخف سهلرثي هر. فخ دهثص فاث يهسذعسسهخر ذخرفثرف, {sign_in_link} خق "
 "{register_link}, شري ثرقخمم هر فاهس ذخعقسث."
+
+#: openedx/features/course_duration_limits/access.py
+#, python-brace-format
+msgid "Access expired on {expiration_date}"
+msgstr "شذذثسس ثطحهقثي خر {expiration_date}"
+
+#: openedx/features/course_duration_limits/access.py
+#, python-brace-format
+msgid "Access to {course_name} expired on {expiration_date}"
+msgstr "شذذثسس فخ {course_name} ثطحهقثي خر {expiration_date}"
+
+#: openedx/features/course_duration_limits/access.py
+#, python-brace-format
+msgid "Access to the course you were lookingfor expired on {expiration_date}"
+msgstr "شذذثسس فخ فاث ذخعقسث غخع صثقث مخخنهرلبخق ثطحهقثي خر {expiration_date}"
 
 #: openedx/features/course_experience/plugins.py
 #: cms/templates/widgets/header.html
@@ -16960,6 +17000,10 @@ msgid "Starts - {date}"
 msgstr "سفشقفس - {date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "for {course_display_name}"
+msgstr "بخق {course_display_name}"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You must select a session by {expiration_date} to access the course."
 msgstr "غخع وعسف سثمثذف ش سثسسهخر زغ {expiration_date} فخ شذذثسس فاث ذخعقسث."
 
@@ -16982,10 +17026,6 @@ msgstr "غخع ذشر ذاشرلث سثسسهخرس عرفهم {entitlement_expi
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Archived Course"
 msgstr "دهثص شقذاهدثي ذخعقسث"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "for {course_display_name}"
-msgstr "بخق {course_display_name}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm taking {course_name} online with {facebook_brand}. Check it out!"
@@ -19829,16 +19869,28 @@ msgid "View Gradebook"
 msgstr "دهثص لقشيثزخخن"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "View a specific learner's enrollment status"
+msgstr "دهثص ش سحثذهبهذ مثشقرثق'س ثرقخمموثرف سفشفعس"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Learner's {platform_name} email address or username *"
+msgstr "مثشقرثق'س {platform_name} ثوشهم شييقثسس خق عسثقرشوث *"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Learner email address or username"
+msgstr "مثشقرثق ثوشهم شييقثسس خق عسثقرشوث"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "View Enrollment Status"
+msgstr "دهثص ثرقخمموثرف سفشفعس"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View a specific learner's grades and progress"
 msgstr "دهثص ش سحثذهبهذ مثشقرثق'س لقشيثس شري حقخلقثسس"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Learner's {platform_name} email address or username"
 msgstr "مثشقرثق'س {platform_name} ثوشهم شييقثسس خق عسثقرشوث"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Learner email address or username"
-msgstr "مثشقرثق ثوشهم شييقثسس خق عسثقرشوث"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View Progress Page"
