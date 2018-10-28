@@ -198,7 +198,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-10-17 06:43+0000\n"
+"POT-Creation-Date: 2018-10-21 20:42+0000\n"
 "PO-Revision-Date: 2018-07-23 07:15+0000\n"
 "Last-Translator: Muhammad Ayub khan <ayubkhan@edx.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -239,6 +239,7 @@ msgstr "امتحان الدخول"
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: cms/templates/course_outline.html lms/templates/seq_module.html
 #: lms/templates/ccx/schedule.html
+#: lms/templates/courseware/writable_gradebook.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Section"
 msgstr "قسم"
@@ -5900,6 +5901,7 @@ msgid "Grade"
 msgstr "الدرجة"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/templates/courseware/writable_gradebook.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Percent"
 msgstr "النسبة المئوية"
@@ -10894,21 +10896,21 @@ msgstr ""
 #: openedx/core/djangoapps/password_policy/compliance.py
 #, python-brace-format
 msgid ""
-"{platform_name} now requires more complex passwords. Your current password "
-"does not meet the new requirements. A password reset e-mail has been sent to"
-" the address associated with this account.Thank you for helping us keep your"
-" data safe."
+"{strong_tag_open}We recently changed our password "
+"requirements{strong_tag_close}{break_line_tag}Your current password does not"
+" meet the new security requirements. We just sent a password-reset message "
+"to the email address associated with this account. Thank you for helping us "
+"keep your data safe."
 msgstr ""
 
 #: openedx/core/djangoapps/password_policy/compliance.py
 #, python-brace-format
 msgid ""
-"{platform_name} now requires more complex passwords. Your current password "
-"does not meet the new requirements. You must change your password by "
-"{deadline} to be able to continue using the site. To change your password, "
-"select the dropdown menu icon next to your username, then select "
-"\"Account\". You can reset your password from this page. Thank you for "
-"helping us keep your data safe."
+"{strong_tag_open}Required Action: Please update your "
+"password{strong_tag_close}{break_line_tag}As of {deadline}, {platform_name} "
+"will require all learners to have complex passwords. Your current password "
+"does not meet these requirements. To reset your password, go to to "
+"{anchor_tag_open}Account Settings{anchor_tag_close}."
 msgstr ""
 
 #: openedx/core/djangoapps/profile_images/images.py
@@ -15353,6 +15355,7 @@ msgstr "إنشاء مقرّر مخصّص جديد لمنصّة edX"
 
 #: lms/templates/ccx/coach_dashboard.html
 #: lms/templates/ccx/grading_policy.html
+#: lms/templates/courseware/writable_gradebook.html
 msgid "Grading Policy"
 msgstr "سياسة التقييم"
 
@@ -16048,6 +16051,7 @@ msgid "Your score is {current_score}%. You have passed the entrance exam."
 msgstr "علامتك هي {current_score}%. لقد نجحت في اختبار الدخول."
 
 #: lms/templates/courseware/gradebook.html
+#: lms/templates/courseware/writable_gradebook.html
 msgid "Gradebook"
 msgstr "دفتر الدرجات"
 
@@ -16371,6 +16375,30 @@ msgid ""
 msgstr ""
 "لقد زرتَ مؤخّرًا القسم {section_link}. فإذا انتهيت من العمل فيه، يُرجى "
 "اختيار قسم آخر على الجهة اليمنى. "
+
+#: lms/templates/courseware/writable_gradebook.html
+msgid "Score View:"
+msgstr ""
+
+#: lms/templates/courseware/writable_gradebook.html
+msgid "Absolute"
+msgstr ""
+
+#: lms/templates/courseware/writable_gradebook.html
+msgid "Download Grade Report"
+msgstr ""
+
+#: lms/templates/courseware/writable_gradebook.html
+msgid "Fetching gradebook data"
+msgstr ""
+
+#: lms/templates/courseware/writable_gradebook.html
+msgid "No matching records found"
+msgstr ""
+
+#: lms/templates/courseware/writable_gradebook.html
+msgid "There are no students enrolled in this course."
+msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 #: lms/templates/emails/business_order_confirmation_email.txt

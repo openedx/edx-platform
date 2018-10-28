@@ -166,6 +166,7 @@
 # bnw, 2014
 # bnw, 2014
 # ifLab <webmaster@iflab.org>, 2014-2015
+# ifLab <webmaster@iflab.org>, 2018
 # j <786855796@qq.com>, 2015
 # Jerome Huang <canni3269@gmail.com>, 2014
 # Jerome Huang <canni3269@gmail.com>, 2014
@@ -271,6 +272,7 @@
 # Wentao Han <wentao.han@gmail.com>, 2013
 # 李莉 <happylily0516@foxmail.com>, 2013
 # Harry Li <harry75369@gmail.com>, 2014
+# ifLab <webmaster@iflab.org>, 2018
 # Jerome Huang <canni3269@gmail.com>, 2014
 # jg Ma <jg20040308@126.com>, 2016
 # Jianfei Wang <me@thinxer.com>, 2013
@@ -338,6 +340,7 @@
 # focusheart <focusheart@gmail.com>, 2014
 # Harry Li <harry75369@gmail.com>, 2014
 # Henry Zhao <shzhaotc@gmail.com>, 2017
+# ifLab <webmaster@iflab.org>, 2018
 # Jerome Huang <canni3269@gmail.com>, 2014
 # jiangnan.hugo <jiangnan.hugo@gmail.com>, 2014
 # jiangnan.hugo <jiangnan.hugo@gmail.com>, 2014
@@ -359,9 +362,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-10-17 06:43+0000\n"
-"PO-Revision-Date: 2018-10-19 06:56+0000\n"
-"Last-Translator: jsgang <jsgang9@gmail.com>\n"
+"POT-Creation-Date: 2018-10-21 20:42+0000\n"
+"PO-Revision-Date: 2018-10-23 01:16+0000\n"
+"Last-Translator: ifLab <webmaster@iflab.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -397,6 +400,7 @@ msgstr "入学考试"
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: cms/templates/course_outline.html lms/templates/seq_module.html
 #: lms/templates/ccx/schedule.html
+#: lms/templates/courseware/writable_gradebook.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Section"
 msgstr "章"
@@ -5481,6 +5485,7 @@ msgid "Grade"
 msgstr "成绩"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/templates/courseware/writable_gradebook.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Percent"
 msgstr "百分比"
@@ -10232,21 +10237,21 @@ msgstr ""
 #: openedx/core/djangoapps/password_policy/compliance.py
 #, python-brace-format
 msgid ""
-"{platform_name} now requires more complex passwords. Your current password "
-"does not meet the new requirements. A password reset e-mail has been sent to"
-" the address associated with this account.Thank you for helping us keep your"
-" data safe."
+"{strong_tag_open}We recently changed our password "
+"requirements{strong_tag_close}{break_line_tag}Your current password does not"
+" meet the new security requirements. We just sent a password-reset message "
+"to the email address associated with this account. Thank you for helping us "
+"keep your data safe."
 msgstr ""
 
 #: openedx/core/djangoapps/password_policy/compliance.py
 #, python-brace-format
 msgid ""
-"{platform_name} now requires more complex passwords. Your current password "
-"does not meet the new requirements. You must change your password by "
-"{deadline} to be able to continue using the site. To change your password, "
-"select the dropdown menu icon next to your username, then select "
-"\"Account\". You can reset your password from this page. Thank you for "
-"helping us keep your data safe."
+"{strong_tag_open}Required Action: Please update your "
+"password{strong_tag_close}{break_line_tag}As of {deadline}, {platform_name} "
+"will require all learners to have complex passwords. Your current password "
+"does not meet these requirements. To reset your password, go to to "
+"{anchor_tag_open}Account Settings{anchor_tag_close}."
 msgstr ""
 
 #: openedx/core/djangoapps/profile_images/images.py
@@ -14490,6 +14495,7 @@ msgstr "创建一个新的 edX 自定义课程"
 
 #: lms/templates/ccx/coach_dashboard.html
 #: lms/templates/ccx/grading_policy.html
+#: lms/templates/courseware/writable_gradebook.html
 msgid "Grading Policy"
 msgstr "评分标准"
 
@@ -15142,6 +15148,7 @@ msgid "Your score is {current_score}%. You have passed the entrance exam."
 msgstr "您的分数为 {current_score}%，通过了入门测试"
 
 #: lms/templates/courseware/gradebook.html
+#: lms/templates/courseware/writable_gradebook.html
 msgid "Gradebook"
 msgstr "成绩簿"
 
@@ -15461,6 +15468,30 @@ msgid ""
 "You were most recently in {section_link}.  If you're done with that, choose "
 "another section on the left."
 msgstr "您最近在{section_link}。如果您已经完成此章节，请选择左侧的另一个章节。"
+
+#: lms/templates/courseware/writable_gradebook.html
+msgid "Score View:"
+msgstr ""
+
+#: lms/templates/courseware/writable_gradebook.html
+msgid "Absolute"
+msgstr ""
+
+#: lms/templates/courseware/writable_gradebook.html
+msgid "Download Grade Report"
+msgstr ""
+
+#: lms/templates/courseware/writable_gradebook.html
+msgid "Fetching gradebook data"
+msgstr ""
+
+#: lms/templates/courseware/writable_gradebook.html
+msgid "No matching records found"
+msgstr ""
+
+#: lms/templates/courseware/writable_gradebook.html
+msgid "There are no students enrolled in this course."
+msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
 #: lms/templates/emails/business_order_confirmation_email.txt

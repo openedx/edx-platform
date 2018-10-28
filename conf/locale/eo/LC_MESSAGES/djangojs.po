@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-10-21 20:37+0000\n"
-"PO-Revision-Date: 2018-10-21 20:37:16.736206\n"
+"POT-Creation-Date: 2018-10-28 20:37+0000\n"
+"PO-Revision-Date: 2018-10-28 20:37:27.836967\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -4530,6 +4530,18 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
+"Error getting enrollment status for '<%- student_id %>'. Make sure that the "
+"student identifier is spelled correctly."
+msgstr ""
+"Érrör géttïng énröllmént stätüs för '<%- student_id %>'. Mäké süré thät thé "
+"stüdént ïdéntïfïér ïs spélléd çörréçtlý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid "Retrieving enrollment status..."
+msgstr "Rétrïévïng énröllmént stätüs... Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
 "Error getting student progress url for '<%- student_id %>'. Make sure that "
 "the student identifier is spelled correctly."
 msgstr ""
@@ -5893,10 +5905,6 @@ msgid "MB"
 msgstr "MB Ⱡ'σя#"
 
 #: lms/static/js/writable_gradebook.js
-msgid "Current grade"
-msgstr "Çürrént grädé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: lms/static/js/writable_gradebook.js
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -5918,10 +5926,6 @@ msgstr "Nö mätçhïng réçörds föünd Ⱡ'σяєм ιρѕυм ∂σłσя �
 #: lms/static/js/writable_gradebook.js
 msgid "Student Name"
 msgstr "Stüdént Nämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: lms/static/js/writable_gradebook.js
-msgid "Comment"
-msgstr "Çömmént Ⱡ'σяєм ιρѕυм #"
 
 #: lms/static/js/writable_gradebook.js
 msgid "There are no student grades to adjust."
