@@ -350,7 +350,7 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=too-man
         try:
             upload_file = request.FILES.get('students_list')
             if upload_file.name.endswith('.csv'):
-                students = [row for row in csv.reader(upload_file.read().splitlines())]
+                students = [row for row in unicodecsv.reader(UniversalNewlineIterator(upload_file), encoding='utf-8')]
                 course = get_course_by_id(course_id)
             else:
                 general_errors.append({
