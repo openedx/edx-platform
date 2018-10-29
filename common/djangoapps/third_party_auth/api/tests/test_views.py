@@ -34,6 +34,7 @@ ALICE_USERNAME = "alice"
 CARL_USERNAME = "carl"
 STAFF_USERNAME = "staff"
 ADMIN_USERNAME = "admin"
+INACTIVE_USERNAME = "inactive"
 NONEXISTENT_USERNAME = "nobody"
 # These users will be created and linked to third party accounts:
 LINKED_USERS = (ALICE_USERNAME, STAFF_USERNAME, ADMIN_USERNAME)
@@ -85,6 +86,17 @@ class TpaAPITestCase(ThirdPartyAuthTestMixin, APITestCase):
             )
         # Create another user not linked to any providers:
         UserFactory.create(username=CARL_USERNAME, email='{}@example.com'.format(CARL_USERNAME), password=PASSWORD)
+
+        # Create an inactive user
+        UserFactory.create(
+            username=INACTIVE_USERNAME,
+            email='{}@example.com'.format(INACTIVE_USERNAME),
+            password=PASSWORD
+        )
+
+        inactive_user = User.objects.get(username=INACTIVE_USERNAME)
+        inactive_user.is_active = False
+        inactive_user.save()
 
 
 @override_settings(EDX_API_KEY=VALID_API_KEY)
@@ -179,6 +191,15 @@ class UserViewAPITests(TpaAPITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertGreater(len(response.data['active']), 0)
+
+    def test_get_inactive_user(self):
+        self.client.login(username=STAFF_USERNAME, password=PASSWORD)
+        url = reverse('third_party_auth_users_api', kwargs={'username': INACTIVE_USERNAME})
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(len(response.data['active']), 0)
+        self.assertEqual(response.data['account_activated'], False)
 
 
 @override_settings(EDX_API_KEY=VALID_API_KEY)

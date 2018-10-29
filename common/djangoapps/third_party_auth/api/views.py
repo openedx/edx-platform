@@ -121,7 +121,8 @@ class UserView(APIView):
         # In the future this can be trivially modified to return the inactive/disconnected providers as well.
 
         return Response({
-            "active": active_providers
+            "active": active_providers,
+            "account_active": user.is_active,
         })
 
     def get_provider_data(self, assoc, is_unprivileged):
