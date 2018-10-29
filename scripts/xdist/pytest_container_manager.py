@@ -74,8 +74,7 @@ class PytestContainerManager():
                 else:
                     break
 
-            if not response['tasks']:
-                assert response == 'dummy_val'
+            print(response)
 
             for task_response in response['tasks']:
                 task_arns.append(task_response['taskArn'])
