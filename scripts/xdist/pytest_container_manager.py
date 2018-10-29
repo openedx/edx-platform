@@ -65,7 +65,7 @@ class PytestContainerManager():
                     # Handle AWS throttling with an exponential backoff
                     if retry == self.MAX_RUN_TASK_RETRIES:
                         raise StandardError(
-                            "self.MAX_RUN_TASK_RETRIES ({}) reached while spinning up tasks due to AWS throttling.".format(self.MAX_RUN_TASK_RETRIES)
+                            "MAX_RUN_TASK_RETRIES ({}) reached while spinning up tasks due to AWS throttling.".format(self.MAX_RUN_TASK_RETRIES)
                         )
                     logger.info("Hit error: {}. Retrying".format(err))
                     countdown = 2 ** retry
@@ -73,6 +73,9 @@ class PytestContainerManager():
                     time.sleep(countdown)
                 else:
                     break
+
+            if not response['tasks']:
+                assert response == 'dummy_val'
 
             for task_response in response['tasks']:
                 task_arns.append(task_response['taskArn'])
