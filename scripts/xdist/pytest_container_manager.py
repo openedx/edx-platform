@@ -74,7 +74,8 @@ class PytestContainerManager():
                 else:
                     break
 
-            logger.info(response)
+            if not response['tasks']:
+                logger.info(response)
 
             for task_response in response['tasks']:
                 task_arns.append(task_response['taskArn'])
