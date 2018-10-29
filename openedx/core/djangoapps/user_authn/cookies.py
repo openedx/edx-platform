@@ -150,7 +150,7 @@ def set_logged_in_cookies(request, response, user):
         except _AuthClientMissing as e:
             # In production this message would represent a real configuration problem.
             # In the unit tests, this is not a problem.  This output is a compromise.
-            log.info(e.message)
+            log.warn(e.message)
         CREATE_LOGON_COOKIE.send(sender=None, user=user, response=response)
 
     return response
