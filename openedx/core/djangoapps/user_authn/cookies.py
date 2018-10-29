@@ -147,11 +147,11 @@ def set_logged_in_cookies(request, response, user):
         set_deprecated_user_info_cookie(response, request, user, cookie_settings)
         try:
             _create_and_set_jwt_cookies(response, request, cookie_settings, user=user)
-            CREATE_LOGON_COOKIE.send(sender=None, user=user, response=response)
         except _AuthClientMissing as e:
             # In production this message would represent a real configuration problem.
             # In the unit tests, this is not a problem.  This output is a compromise.
             log.info(e.message)
+        CREATE_LOGON_COOKIE.send(sender=None, user=user, response=response)
 
     return response
 
