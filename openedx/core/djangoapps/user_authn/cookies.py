@@ -326,6 +326,3 @@ def _get_login_oauth_client():
         raise _AuthClientMissing(
             u"OAuth Client for the Login service, '{}', is not configured.".format(login_client_id)
         )
-        # raise AuthFailedError(
-        #     u"OAuth Client for the Login service, '{}', is not configured.".format(login_client_id)
-        # )
