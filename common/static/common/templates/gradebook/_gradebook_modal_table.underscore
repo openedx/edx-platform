@@ -36,6 +36,7 @@
           </tbody>
         </table>
       </div>
+      <div class="grade-override-info-container alert alert-info pattern-library-shim" role="alert"></div>
       <div class="grade-override-menu-buttons">
         <button class="btn grade-override-modal-save"><%- strLib.save %></button>
         <button class="btn grade-override-modal-close"><%- strLib.cancel %></button>
