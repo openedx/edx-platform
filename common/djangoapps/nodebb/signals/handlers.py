@@ -17,7 +17,7 @@ from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from mailchimp_pipeline.signals.handlers import send_user_info_to_mailchimp, \
     send_user_enrollments_to_mailchimp, send_user_course_completions_to_mailchimp
 from nodebb.models import DiscussionCommunity, TeamGroupChat
-from common.djangoapps.nodebb.helpers import get_community_name
+from common.djangoapps.nodebb.helpers import get_community_id
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED
 
@@ -197,10 +197,10 @@ def join_group_on_nodebb(sender, event=None, user=None, **kwargs):  # pylint: di
     if event == EnrollStatusChange.enroll:
         username = user.username
         course = modulestore().get_course(kwargs.get('course_id'))
-        community_name = get_community_name(course.id)
+        community_id = get_community_id(course.id)
 
         task_join_group_on_nodebb.delay(
-            group_name=community_name, username=username)
+            category_id=community_id, username=username)
 
 
 

@@ -8,11 +8,11 @@ class ForumUser(User):
     Added custom methods to the default User class of pynodebb package
     """
 
-    def join(self, group_name, username, uid=1):
+    def join(self, category_id, username, uid=1):
         """
         Make user a participant of specified group
         """
-        payload = {'name': group_name, 'username': username, '_uid': uid}
+        payload = {'category_id': category_id, 'username': username, '_uid': uid}
         return self.client.post('/api/v2/users/join', **payload)
 
     def create(self, username, user_data):

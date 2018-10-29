@@ -69,10 +69,10 @@ def get_community_url(course_id):
         return discussion_community.community_url
 
 
-def get_community_name(course_id):
+def get_community_id(course_id):
     discussion_community = DiscussionCommunity.objects.filter(course_id=course_id).first()
     if discussion_community:
-        return discussion_community.community_url.split('/')[1]
+        return discussion_community.community_url.split('/')[0]
 
 
 def get_room_id(user_info):
