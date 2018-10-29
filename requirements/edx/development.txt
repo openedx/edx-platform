@@ -140,7 +140,8 @@ edx-django-utils==1.0.1
 edx-drf-extensions==2.0.0
 edx-enterprise==1.0.2
 edx-i18n-tools==0.4.6
-edx-lint==0.5.5
+#edx-lint==0.5.5
+git+https://github.com/edx/edx-lint.git@nedbat/setuptestdata#egg=edx_lint==0.0
 edx-milestones==0.1.13
 edx-oauth2-provider==1.2.2
 edx-opaque-keys[django]==0.4.4
