@@ -1165,6 +1165,7 @@ INSTALLED_APPS = [
     'rest_framework_swagger',
 
     'openedx.features.course_duration_limits',
+    'openedx.features.content_type_gating',
 ]
 
 
