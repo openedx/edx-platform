@@ -591,7 +591,7 @@ def get_module_system_for_user(
             )
         else:
             if user_id != user.id:
-                log.warning("{} tried to submit a completion on behalf of {}".format(user, requested_user_id))
+                log.warning("{} tried to submit a completion on behalf of {}".format(user, user_id))
                 return
             BlockCompletion.objects.submit_completion(
                 user=user,
