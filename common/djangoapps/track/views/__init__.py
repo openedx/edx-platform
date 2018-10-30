@@ -96,6 +96,8 @@ def server_track(request, event_type, event, page=None):
     except:
         username = "anonymous"
 
+    host_header = 'HTTP_HOST' if request is not None and 'HTTP_HOST' in request.META else 'SERVER_NAME'
+
     # define output:
     event = {
         "username": username,
@@ -108,7 +110,7 @@ def server_track(request, event_type, event, page=None):
         "agent": _get_request_header(request, 'HTTP_USER_AGENT').decode('latin1'),
         "page": page,
         "time": datetime.datetime.utcnow().replace(tzinfo=pytz.utc),
-        "host": _get_request_header(request, 'SERVER_NAME'),
+        "host": _get_request_header(request, host_header),
         "context": eventtracker.get_tracker().resolve_context(),
     }
 

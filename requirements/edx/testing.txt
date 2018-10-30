@@ -109,7 +109,7 @@ django-require==1.0.11
 django-rest-swagger==2.2.0
 django-sekizai==0.10.0
 django-ses==0.8.4
-django-simple-history==2.4.0
+django-simple-history==2.5.1
 django-splash==0.2.2
 django-statici18n==1.4.0
 django-storages==1.4.1
@@ -141,7 +141,7 @@ edx-oauth2-provider==1.2.2
 edx-opaque-keys[django]==0.4.4
 edx-organizations==1.0.0
 edx-proctoring==1.4.0
-edx-rest-api-client==1.8.2
+edx-rest-api-client==1.9
 edx-search==1.2.1
 edx-submissions==2.0.12
 edx-user-state-client==1.0.4
@@ -158,18 +158,18 @@ filelock==3.0.9           # via tox
 firebase-token-generator==1.3.2
 fixtures==3.0.0           # via testtools
 flake8-polyfill==1.0.2    # via radon
-flake8==3.5.0             # via flake8-polyfill
+flake8==3.5.0
 flask==1.0.2              # via moto
 freezegun==0.3.11
 fs-s3fs==0.1.8
 fs==2.0.18
 funcsigs==1.0.2           # via pytest
 functools32==3.2.3.post2  # via parsel
-future==0.16.0
+future==0.17.0
 futures==3.2.0 ; python_version == "2.7"
 fuzzywuzzy==0.17.0
 glob2==0.3
-gunicorn==17.5
+gunicorn==19.0
 hash-ring==1.3.1
 help-tokens==1.0.3
 html5lib==0.999
@@ -182,7 +182,7 @@ ipaddr==2.1.11
 ipaddress==1.0.22
 isodate==0.6.0
 isort==4.3.4
-itsdangerous==0.24        # via flask
+itsdangerous==1.1.0       # via flask
 itypes==1.1.0
 jinja2-pluralize==0.3.0
 jinja2==2.10
@@ -218,11 +218,11 @@ oauth2==1.9.0.post1
 oauthlib==2.1.0
 openapi-codec==1.3.2
 pa11ycrawler==1.6.2
-parsel==1.5.0             # via scrapy
+parsel==1.5.1             # via scrapy
 path.py==8.2.1
 pathtools==0.1.2
 paver==1.3.4
-pbr==5.0.0
+pbr==5.1.0
 pdfminer==20140328
 piexif==1.0.2
 pillow==5.3.0
@@ -260,7 +260,7 @@ pytest-cov==2.5.1
 pytest-django==3.1.2
 pytest-forked==0.2        # via pytest-xdist
 pytest-randomly==1.2.3
-pytest-xdist==1.23.2
+pytest-xdist==1.24.0
 pytest==3.6.3
 python-dateutil==2.4.0
 python-levenshtein==0.12.0
@@ -279,7 +279,7 @@ radon==2.4.0
 redis==2.10.6
 reportlab==3.5.9
 requests-oauthlib==1.0.0
-requests==2.19.1
+requests==2.20.0
 rest-condition==1.0.3
 rfc6266-parser==0.0.5.post2
 rules==2.0
@@ -311,7 +311,7 @@ text-unidecode==1.2       # via faker
 tincan==0.0.5
 toml==0.10.0              # via tox
 tox-battery==0.5.1
-tox==3.5.2
+tox==3.5.3
 traceback2==1.4.0         # via testtools, unittest2
 transifex-client==0.13.5
 twisted==16.6.0           # via pa11ycrawler, scrapy
@@ -335,4 +335,4 @@ xblock-utils==1.2.0
 xblock==1.2.2
 xmltodict==0.11.0         # via moto
 zendesk==1.1.1
-zope.interface==4.5.0     # via twisted
+zope.interface==4.6.0     # via twisted

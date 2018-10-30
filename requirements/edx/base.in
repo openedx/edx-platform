@@ -24,6 +24,7 @@
 #    as development.in or testing.in instead.
 
 analytics-python==1.1.0             # Used for Segment analytics
+aniso8601==3.0.2                    # via tincan
 attrs                               # Reduces boilerplate code involving class attributes
 Babel==1.3                          # Internationalization utilities, used for date formatting in a few places
 bleach==1.4                         # Allowed-list-based HTML sanitizing library that escapes or strips markup and attributes; used for capa and LTI
@@ -92,7 +93,7 @@ fs==2.0.18
 fs-s3fs==0.1.8
 futures ; python_version == "2.7"   # via django-pipeline, python-swift-client, s3transfer
 glob2==0.3                          # Enhanced glob module, used in openedx.core.lib.rooted_paths
-gunicorn==17.5
+gunicorn==19.0
 help-tokens
 html5lib==0.999                     # HTML parser, used for capa problems
 ipaddr==2.1.11                      # Ip network support for Embargo feature
@@ -128,8 +129,8 @@ pyuca==1.1                          # For more accurate sorting of translated co
 reportlab                           # Used for shopping cart's pdf invoice/receipt generation
 rest-condition                      # DRF's recommendation for supporting complex permissions
 rfc6266-parser                      # Used to generate Content-Disposition headers.
-social-auth-app-django
-social-auth-core
+social-auth-app-django==2.1.0
+social-auth-core==1.7.0
 pysrt==0.4.7                        # Support for SubRip subtitle files, used in the video XModule
 pytz==2016.10                       # Time zone information database
 PyYAML                              # Used to parse XModule resource templates

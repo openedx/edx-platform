@@ -296,12 +296,14 @@ class Users(SysadminDashboardView):
         action = request.POST.get('action', '')
         track.views.server_track(request, action, {}, page='user_sysdashboard')
 
+        host_header = 'HTTP_HOST' if request is not None and 'HTTP_HOST' in request.META else 'SERVER_NAME'
+
         if action == 'download_users':
             header = [_('username'), _('email'), ]
             data = ([u.username, u.email] for u in
                     (User.objects.all().iterator()))
             return self.return_csv('users_{0}.csv'.format(
-                request.META['SERVER_NAME']), header, data)
+                request.META[host_header]), header, data)
         elif action == 'repair_eamap':
             self.msg = u'<h4>{0}</h4><pre>{1}</pre>{2}'.format(
                 _('Repair Results'),
@@ -552,6 +554,8 @@ class Staffing(SysadminDashboardView):
         track.views.server_track(request, action, {},
                                  page='staffing_sysdashboard')
 
+        host_header = 'HTTP_HOST' if request is not None and 'HTTP_HOST' in request.META else 'SERVER_NAME'
+
         if action == 'get_staff_csv':
             data = []
             roles = [CourseInstructorRole, CourseStaffRole, ]
@@ -566,7 +570,7 @@ class Staffing(SysadminDashboardView):
                       _('role'), _('username'),
                       _('email'), _('full_name'), ]
             return self.return_csv('staff_{0}.csv'.format(
-                request.META['SERVER_NAME']), header, data)
+                request.META[host_header]), header, data)
 
         return self.get(request)
 
