@@ -15,6 +15,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from six import text_type
 
+from course_modes.models import CourseMode
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
 from lms.djangoapps.grades.api.v1.views import CourseGradesView
 from lms.djangoapps.grades.config.waffle import waffle_flags, WRITABLE_GRADEBOOK
@@ -23,6 +24,7 @@ from lms.djangoapps.grades.course_grade import CourseGrade
 from lms.djangoapps.grades.models import PersistentSubsectionGrade
 from lms.djangoapps.grades.subsection_grade import ReadSubsectionGrade
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.djangoapps.user_authn.tests.utils import AuthAndScopesTestMixin
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -621,6 +623,80 @@ class GradebookViewTest(GradebookViewTestBase):
             ]),
         ]
 
+    def _assert_data_all_users(self, response):
+        """
+        Helper method to assert that self.student and self.other_student
+        have the expected gradebook data.
+        """
+        expected_results = [
+            OrderedDict([
+                ('course_id', text_type(self.course.id)),
+                ('email', self.student.email),
+                ('user_id', self.student.id),
+                ('username', self.student.username),
+                ('full_name', self.student.get_full_name()),
+                ('passed', True),
+                ('percent', 0.85),
+                ('letter_grade', 'A'),
+                ('progress_page_url', reverse(
+                    'student_progress',
+                    kwargs=dict(course_id=text_type(self.course.id), student_id=self.student.id)
+                )),
+                ('section_breakdown', self.expected_subsection_grades(letter_grade='A')),
+                ('aggregates', {
+                    'Lab': {
+                        'score_earned': 2.0,
+                        'score_possible': 4.0,
+                    },
+                    'Homework': {
+                        'score_earned': 2.0,
+                        'score_possible': 4.0,
+                    },
+                }),
+            ]),
+            OrderedDict([
+                ('course_id', text_type(self.course.id)),
+                ('email', self.other_student.email),
+                ('user_id', self.other_student.id),
+                ('username', self.other_student.username),
+                ('full_name', self.other_student.get_full_name()),
+                ('passed', False),
+                ('percent', 0.45),
+                ('letter_grade', None),
+                ('progress_page_url', reverse(
+                    'student_progress',
+                    kwargs=dict(course_id=text_type(self.course.id), student_id=self.other_student.id)
+                )),
+                ('section_breakdown', self.expected_subsection_grades()),
+                ('aggregates', {
+                    'Lab': {
+                        'score_earned': 2.0,
+                        'score_possible': 4.0,
+                    },
+                    'Homework': {
+                        'score_earned': 2.0,
+                        'score_possible': 4.0,
+                    },
+                }),
+            ]),
+        ]
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        actual_data = dict(response.data)
+        self.assertIsNone(actual_data['next'])
+        self.assertIsNone(actual_data['previous'])
+        self.assertEqual(expected_results, actual_data['results'])
+
+    def _assert_empty_response(self, response):
+        """
+        Helper method for assertions about OK, empty responses.
+        """
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        actual_data = dict(response.data)
+        self.assertIsNone(actual_data['next'])
+        self.assertIsNone(actual_data['previous'])
+        self.assertEqual([], actual_data['results'])
+
     def test_feature_not_enabled(self):
         self.client.login(username=self.global_staff.username, password=self.password)
         with override_waffle_flag(self.waffle_flag, active=False):
@@ -670,13 +746,7 @@ class GradebookViewTest(GradebookViewTestBase):
             resp = self.client.get(
                 self.get_url(course_key=self.empty_course.id)
             )
-            expected_data = {
-                'next': None,
-                'previous': None,
-                'results': [],
-            }
-            self.assertEqual(status.HTTP_200_OK, resp.status_code)
-            self.assertEqual(expected_data, dict(resp.data))
+            self._assert_empty_response(resp)
 
     def test_gradebook_data_for_course(self):
         with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
@@ -690,64 +760,7 @@ class GradebookViewTest(GradebookViewTestBase):
                 resp = self.client.get(
                     self.get_url(course_key=self.course.id)
                 )
-                expected_results = [
-                    OrderedDict([
-                        ('course_id', text_type(self.course.id)),
-                        ('email', self.student.email),
-                        ('user_id', self.student.id),
-                        ('username', self.student.username),
-                        ('full_name', self.student.get_full_name()),
-                        ('passed', True),
-                        ('percent', 0.85),
-                        ('letter_grade', 'A'),
-                        ('progress_page_url', reverse(
-                            'student_progress',
-                            kwargs=dict(course_id=text_type(self.course.id), student_id=self.student.id)
-                        )),
-                        ('section_breakdown', self.expected_subsection_grades(letter_grade='A')),
-                        ('aggregates', {
-                            'Lab': {
-                                'score_earned': 2.0,
-                                'score_possible': 4.0,
-                            },
-                            'Homework': {
-                                'score_earned': 2.0,
-                                'score_possible': 4.0,
-                            },
-                        }),
-                    ]),
-                    OrderedDict([
-                        ('course_id', text_type(self.course.id)),
-                        ('email', self.other_student.email),
-                        ('user_id', self.other_student.id),
-                        ('username', self.other_student.username),
-                        ('full_name', self.other_student.get_full_name()),
-                        ('passed', False),
-                        ('percent', 0.45),
-                        ('letter_grade', None),
-                        ('progress_page_url', reverse(
-                            'student_progress',
-                            kwargs=dict(course_id=text_type(self.course.id), student_id=self.other_student.id)
-                        )),
-                        ('section_breakdown', self.expected_subsection_grades()),
-                        ('aggregates', {
-                            'Lab': {
-                                'score_earned': 2.0,
-                                'score_possible': 4.0,
-                            },
-                            'Homework': {
-                                'score_earned': 2.0,
-                                'score_possible': 4.0,
-                            },
-                        }),
-                    ]),
-                ]
-
-                self.assertEqual(status.HTTP_200_OK, resp.status_code)
-                actual_data = dict(resp.data)
-                self.assertIsNone(actual_data['next'])
-                self.assertIsNone(actual_data['previous'])
-                self.assertEqual(expected_results, actual_data['results'])
+                self._assert_data_all_users(resp)
 
     def test_gradebook_data_for_single_learner(self):
         with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
@@ -844,13 +857,101 @@ class GradebookViewTest(GradebookViewTestBase):
                 resp = self.client.get(
                     self.get_url(course_key=self.course.id, username_contains='fooooooooooooooooo')
                 )
+                self._assert_empty_response(resp)
 
-                expected_results = []
+    def test_filter_cohort_id(self):
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
+            mock_grade.return_value = self.mock_course_grade(self.student, passed=True, letter_grade='A', percent=0.85)
+
+            cohort = CohortFactory(course_id=self.course.id, name="TestCohort", users=[self.student])
+            with override_waffle_flag(self.waffle_flag, active=True):
+                self.login_staff()
+                resp = self.client.get(
+                    self.get_url(course_key=self.course.id) + '?cohort_id={}'.format(cohort.id)
+                )
+
+                expected_results = [
+                    OrderedDict([
+                        ('course_id', text_type(self.course.id)),
+                        ('email', self.student.email),
+                        ('user_id', self.student.id),
+                        ('username', self.student.username),
+                        ('full_name', self.student.get_full_name()),
+                        ('passed', True),
+                        ('percent', 0.85),
+                        ('letter_grade', 'A'),
+                        ('progress_page_url', reverse(
+                            'student_progress',
+                            kwargs=dict(course_id=text_type(self.course.id), student_id=self.student.id)
+                        )),
+                        ('section_breakdown', self.expected_subsection_grades(letter_grade='A')),
+                        ('aggregates', {
+                            'Lab': {
+                                'score_earned': 2.0,
+                                'score_possible': 4.0,
+                            },
+                            'Homework': {
+                                'score_earned': 2.0,
+                                'score_possible': 4.0,
+                            },
+                        }),
+                    ]),
+                ]
+
                 self.assertEqual(status.HTTP_200_OK, resp.status_code)
                 actual_data = dict(resp.data)
                 self.assertIsNone(actual_data['next'])
                 self.assertIsNone(actual_data['previous'])
                 self.assertEqual(expected_results, actual_data['results'])
+
+    def test_filter_cohort_id_does_not_exist(self):
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
+            mock_grade.return_value = self.mock_course_grade(self.student, passed=True, letter_grade='A', percent=0.85)
+
+            empty_cohort = CohortFactory(course_id=self.course.id, name="TestCohort", users=[])
+            with override_waffle_flag(self.waffle_flag, active=True):
+                self.login_staff()
+                resp = self.client.get(
+                    self.get_url(course_key=self.course.id) + '?cohort_id={}'.format(empty_cohort.id)
+                )
+                self._assert_empty_response(resp)
+
+    def test_filter_enrollment_mode(self):
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
+            mock_grade.side_effect = [
+                self.mock_course_grade(self.student, passed=True, letter_grade='A', percent=0.85),
+                self.mock_course_grade(self.other_student, passed=False, letter_grade=None, percent=0.45),
+            ]
+
+            # Enroll a verified student, for whom data should not be returned.
+            verified_student = UserFactory()
+            _ = CourseEnrollmentFactory(
+                course_id=self.course.id,
+                user=verified_student,
+                created=datetime(2013, 1, 1, tzinfo=UTC),
+                mode=CourseMode.VERIFIED,
+            )
+            with override_waffle_flag(self.waffle_flag, active=True):
+                self.login_staff()
+                resp = self.client.get(
+                    self.get_url(course_key=self.course.id) + '?enrollment_mode={}'.format(CourseMode.AUDIT)
+                )
+
+                self._assert_data_all_users(resp)
+
+    def test_filter_enrollment_mode_no_students(self):
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
+            mock_grade.side_effect = [
+                self.mock_course_grade(self.student, passed=True, letter_grade='A', percent=0.85),
+                self.mock_course_grade(self.other_student, passed=False, letter_grade=None, percent=0.45),
+            ]
+
+            with override_waffle_flag(self.waffle_flag, active=True):
+                self.login_staff()
+                resp = self.client.get(
+                    self.get_url(course_key=self.course.id) + '?enrollment_mode={}'.format(CourseMode.VERIFIED)
+                )
+                self._assert_empty_response(resp)
 
 
 class GradebookBulkUpdateViewTest(GradebookViewTestBase):

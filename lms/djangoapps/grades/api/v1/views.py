@@ -30,6 +30,7 @@ from lms.djangoapps.grades.tasks import recalculate_subsection_grade_v3, are_gra
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from student.models import CourseEnrollment
@@ -188,12 +189,13 @@ class GradeViewMixin(DeveloperErrorViewMixin):
         course_grade = CourseGradeFactory().read(grade_user, course_key=course_key)
         return Response([self._serialize_user_grade(grade_user, course_key, course_grade)])
 
-    def _iter_user_grades(self, course_key, course_enrollment_filter=None):
+    def _iter_user_grades(self, course_key, course_enrollment_filter=None, related_models=None):
         """
         Args:
             course_key (CourseLocator): The course to retrieve grades for.
             course_enrollment_filter: Optional dictionary of keyword arguments to pass
             to `CourseEnrollment.filter()`.
+            related_models: Optional list of related models to join to the CourseEnrollment table.
 
         Returns:
             An iterator of CourseGrade objects for users enrolled in the given course.
@@ -204,6 +206,8 @@ class GradeViewMixin(DeveloperErrorViewMixin):
         }
         filter_kwargs.update(course_enrollment_filter or {})
         enrollments_in_course = CourseEnrollment.objects.filter(**filter_kwargs)
+        if related_models:
+            enrollments_in_course = enrollments_in_course.select_related(*related_models)
 
         paged_enrollments = self.paginate_queryset(enrollments_in_course)
         users = (enrollment.user for enrollment in paged_enrollments)
@@ -378,17 +382,23 @@ class GradebookView(GradeViewMixin, GenericAPIView):
     """
     **Use Case**
         * Get course gradebook entries of a single user in a course,
-        or of all users who are enrolled in a course.  The currently logged-in user may request
+        or of all users who are actively enrolled in a course.  The currently logged-in user may request
         all enrolled user's grades information if they are allowed.
     **Example Request**
         GET /api/grades/v1/gradebook/{course_id}/                       - Get gradebook entries for all users in course
         GET /api/grades/v1/gradebook/{course_id}/?username={username}   - Get grades for specific user in course
         GET /api/grades/v1/gradebook/{course_id}/?username_contains={username_contains}
+        GET /api/grades/v1/gradebook/{course_id}/?cohort_id={cohort_id}
+        GET /api/grades/v1/gradebook/{course_id}/?enrollment_mode={enrollment_mode}
     **GET Parameters**
         A GET request may include the following query parameters.
         * username:  (optional) A string representation of a user's username.
         * username_contains: (optional) A substring against which a case-insensitive substring filter will be performed
           on the USER_MODEL.username field.
+        * cohort_id: (optional) The id of a cohort in this course.  If present, will return grades
+          only for course enrollees who belong to that cohort.
+        * enrollment_mode: (optional) The slug of an enrollment mode (e.g. "verified").  If present, will return grades
+          only for course enrollees with the given enrollment mode.
     **GET Response Values**
         If the request for gradebook data is successful,
         an HTTP 200 "OK" response is returned.
@@ -586,13 +596,21 @@ class GradebookView(GradeViewMixin, GenericAPIView):
             serializer = StudentGradebookEntrySerializer(entry)
             return Response(serializer.data)
         else:
+            filter_kwargs = {}
+            related_models = []
             if request.GET.get('username_contains'):
-                users = USER_MODEL.objects.filter(username__icontains=request.GET.get('username_contains'))
-                filter_kwargs = {'user__in': users}
-                user_grades = self._iter_user_grades(course_key, filter_kwargs)
-            else:
-                # list gradebook data for all course enrollees
-                user_grades = self._iter_user_grades(course_key)
+                filter_kwargs = {'user__username__icontains': request.GET.get('username_contains')}
+                related_models.append('user')
+            elif request.GET.get('cohort_id'):
+                cohort = cohorts.get_cohort_by_id(course_key, request.GET.get('cohort_id'))
+                if cohort:
+                    filter_kwargs = {'user__in': cohort.users.all()}
+                else:
+                    filter_kwargs = {'user__in': []}
+            elif request.GET.get('enrollment_mode'):
+                filter_kwargs = {'mode': request.GET.get('enrollment_mode')}
+
+            user_grades = self._iter_user_grades(course_key, filter_kwargs, related_models)
 
             entries = []
             for user, course_grade, exc in user_grades:
