@@ -889,6 +889,28 @@ class GradebookBulkUpdateViewTest(GradebookViewTestBase):
             )
             self.assertEqual(status.HTTP_404_NOT_FOUND, resp.status_code)
 
+    def test_grades_frozen(self):
+        """
+        Should receive a 403 when grades have been frozen for a course.
+        """
+        with patch('lms.djangoapps.grades.api.v1.views.are_grades_frozen', return_value=True):
+            with override_waffle_flag(self.waffle_flag, active=True):
+                self.login_staff()
+                post_data = [
+                    {
+                        'user_id': self.student.id,
+                        'usage_id': text_type(self.subsections[self.chapter_1.location][0].location),
+                        'grade': {},  # doesn't matter what we put here.
+                    }
+                ]
+
+                resp = self.client.post(
+                    self.get_url(),
+                    data=json.dumps(post_data),
+                    content_type='application/json',
+                )
+                self.assertEqual(status.HTTP_403_FORBIDDEN, resp.status_code)
+
     def test_user_not_enrolled(self):
         with override_waffle_flag(self.waffle_flag, active=True):
             self.login_staff()
