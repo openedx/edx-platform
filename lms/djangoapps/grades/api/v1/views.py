@@ -25,9 +25,8 @@ from lms.djangoapps.grades.course_data import CourseData
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.events import SUBSECTION_GRADE_CALCULATED, subsection_grade_calculated
 from lms.djangoapps.grades.models import PersistentSubsectionGrade, PersistentSubsectionGradeOverride
-from lms.djangoapps.grades.signals import signals
 from lms.djangoapps.grades.subsection_grade import CreateSubsectionGrade
-from lms.djangoapps.grades.tasks import recalculate_subsection_grade_v3
+from lms.djangoapps.grades.tasks import recalculate_subsection_grade_v3, are_grades_frozen
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -704,6 +703,13 @@ class GradebookBulkUpdateView(GradeViewMixin, GenericAPIView):
         course and subsection grades for the specified user.
         """
         course_key = get_course_key(request, course_id)
+        if are_grades_frozen(course_key):
+            raise self.api_error(
+                status_code=status.HTTP_403_FORBIDDEN,
+                developer_message='Grades are frozen for this course.',
+                error_code='grades_frozen'
+            )
+
         course = get_course_with_access(request.user, 'staff', course_key, depth=None)
 
         result = []
