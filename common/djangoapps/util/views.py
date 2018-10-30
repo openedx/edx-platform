@@ -388,6 +388,8 @@ def get_feedback_form_context(request):
 
     context["additional_info"] = {}
 
+    host_header = 'HTTP_HOST' if request is not None and 'HTTP_HOST' in request.META else 'SERVER_NAME'
+
     if request.user.is_authenticated:
         context["realname"] = request.user.profile.name
         context["email"] = request.user.email
@@ -397,7 +399,7 @@ def get_feedback_form_context(request):
         context["email"] = request.POST["email"]
 
     for header, pretty in [("HTTP_REFERER", "Page"), ("HTTP_USER_AGENT", "Browser"), ("REMOTE_ADDR", "Client IP"),
-                           ("SERVER_NAME", "Host")]:
+                           (host_header, "Host")]:
         context["additional_info"][pretty] = request.META.get(header)
 
     context["support_email"] = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)

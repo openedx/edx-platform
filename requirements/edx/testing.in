@@ -25,6 +25,7 @@ edx-lint                  # pylint extensions for Open edX repositories
 pylint-plugin-utils==0.3  # required by edx-lint and pinned explicitly here because newer versions don't guarantee python 2 support.
                           # can be removed when we get to python 3
 factory_boy==2.8.1        # Library for creating test fixtures, used in many tests
+flake8==3.5.0             # via flake8-polyfill
 freezegun                 # Allows tests to mock the output of assorted datetime module functions
 httpretty                 # Library for mocking HTTP requests, used in many tests
 isort                     # For checking and fixing the order of imports
