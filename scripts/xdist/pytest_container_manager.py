@@ -14,7 +14,7 @@ class PytestContainerManager():
     """
     Responsible for spinning up and terminating ECS tasks to be used with pytest-xdist
     """
-    TASK_RUN_TIMEOUT_MINUTES = 10
+    TASK_RUN_TIMEOUT_MINUTES = 20
     MAX_RUN_TASK_RETRIES = 7
 
     def __init__(self, region, cluster):
