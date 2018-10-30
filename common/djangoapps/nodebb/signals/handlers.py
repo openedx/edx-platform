@@ -39,7 +39,7 @@ def log_action_response(user, status_code, response_body):
 @receiver(post_save, sender=CourseEnrollment)
 def sync_enrolments_to_mailchimp(sender, instance, created, **kwargs):
     data = {"user_id": instance.user.id}
-    print(instance.is_actve)
+    log.info("\n\n\n-----------------------------\n" + instance.is_active +"\n-------------------------\n\n\n")
     if instance.is_active:
         send_user_enrollments_to_mailchimp.delay(data)
 
