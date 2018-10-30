@@ -25,9 +25,7 @@ from provider.oauth2 import models as dop_models
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.models import UserRetirementRequest
-from openedx.core.djangoapps.user_api.config.waffle import (
-    PASSWORD_UNICODE_NORMALIZE_FLAG, PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
-)
+from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory
 from student.tests.test_email import mock_render_to_string
@@ -360,21 +358,20 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         method of NFKC.
         In this test, the input password is u'p\u212bssword'. It should be normalized to u'p\xc5ssword'
         """
-        with PASSWORD_UNICODE_NORMALIZE_FLAG.override(active=True):
-            url = reverse(
-                "password_reset_confirm",
-                kwargs={"uidb36": self.uidb36, "token": self.token}
-            )
+        url = reverse(
+            "password_reset_confirm",
+            kwargs={"uidb36": self.uidb36, "token": self.token}
+        )
 
-            password = u'p\u212bssword'
-            request_params = {'new_password1': password, 'new_password2': password}
-            confirm_request = self.request_factory.post(url, data=request_params)
-            response = password_reset_confirm_wrapper(confirm_request, self.uidb36, self.token)
+        password = u'p\u212bssword'
+        request_params = {'new_password1': password, 'new_password2': password}
+        confirm_request = self.request_factory.post(url, data=request_params)
+        response = password_reset_confirm_wrapper(confirm_request, self.uidb36, self.token)
 
-            user = User.objects.get(pk=self.user.pk)
-            salt_val = user.password.split('$')[1]
-            expected_user_password = make_password(unicodedata.normalize('NFKC', u'p\u212bssword'), salt_val)
-            self.assertEqual(expected_user_password, user.password)
+        user = User.objects.get(pk=self.user.pk)
+        salt_val = user.password.split('$')[1]
+        expected_user_password = make_password(unicodedata.normalize('NFKC', u'p\u212bssword'), salt_val)
+        self.assertEqual(expected_user_password, user.password)
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
         create_validator_config('util.password_policy_validators.MinimumLengthValidator', {'min_length': 2}),

@@ -27,7 +27,6 @@ from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
-from openedx.core.djangoapps.user_api.config.waffle import PASSWORD_UNICODE_NORMALIZE_FLAG
 from student.models import (
     LoginFailures,
     PasswordHistory,
@@ -213,9 +212,7 @@ def _authenticate_first_party(request, unauthenticated_user):
     username = unauthenticated_user.username if unauthenticated_user else ""
 
     try:
-        password = request.POST['password']
-        if PASSWORD_UNICODE_NORMALIZE_FLAG.is_enabled():
-            password = normalize_password(password)
+        password = normalize_password(request.POST['password'])
         return authenticate(
             username=username,
             password=password,

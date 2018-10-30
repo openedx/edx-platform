@@ -41,7 +41,6 @@ from openedx.core.djangoapps.user_api.accounts.tests.testutils import (
     VALID_USERNAMES_UNICODE
 )
 from openedx.core.djangoapps.user_api.config.waffle import (
-    PASSWORD_UNICODE_NORMALIZE_FLAG,
     PREVENT_AUTH_USER_WRITES,
     SYSTEM_MAINTENANCE_MSG,
     waffle
@@ -361,7 +360,6 @@ class AccountSettingsOnCreationTest(TestCase):
             'extended_profile': [],
         })
 
-    @override_waffle_flag(PASSWORD_UNICODE_NORMALIZE_FLAG, active=True)
     def test_normalize_password(self):
         """
         Test that unicode normalization on passwords is happening when a user is created.
