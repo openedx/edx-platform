@@ -48,7 +48,9 @@ function courseXblockUpdater(courseID, dataToSend, visibilityData, callback, err
 }
 
 function getEdxUserInfoAsObject() {
-    return JSON.parse($.cookie('edx-user-info').replace(/\\054/g, ',').replace(/^"(.*)"$/, '$1').replace(/\\"/g, '"'));
+    var edxCookie = $.cookie('prod-edx-user-info') || $.cookie('stage-edx-user-info') || $.cookie('edx-user-info');
+    return JSON.parse(edxCookie.replace(/\\054/g, ',').replace(/^"(.*)"$/, '$1').replace(/\\"/g, '"'));
+ 
 }
 
 $(document).ready(function() {
