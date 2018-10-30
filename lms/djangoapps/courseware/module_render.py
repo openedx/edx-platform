@@ -43,6 +43,7 @@ from courseware.masquerade import (
 )
 from courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from edxmako.shortcuts import render_to_string
+from edx_django_utils.cache import RequestCache
 from eventtracking import tracker
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from lms.djangoapps.grades.signals.signals import SCORE_PUBLISHED
@@ -71,6 +72,7 @@ from track import contexts
 from util import milestones_helpers
 from util.json_request import JsonResponse
 from django.utils.text import slugify
+from web_fragments.fragment import Fragment
 from xmodule.util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from xblock_django.user_service import DjangoXBlockUserService
 from xmodule.contentstore.django import contentstore
@@ -333,6 +335,38 @@ def get_module(user, request, usage_key, field_data_cache,
         # Something has gone terribly wrong, but still not letting it turn into a 500.
         log.exception("Error in get_module")
         return None
+
+
+def display_access_messages(user, block, view, frag, context):
+    blocked_prior_sibling = RequestCache('display_access_messages_prior_sibling')
+
+    load_access = has_access(user, 'load', block, block.scope_ids.usage_id.course_key)
+    if load_access:
+        blocked_prior_sibling.delete(block.parent)
+        return frag
+
+    prior_sibling = blocked_prior_sibling.get_cached_response(block.parent)
+
+    if prior_sibling.is_found and prior_sibling.value == load_access:
+        return Fragment(u"")
+    else:
+        blocked_prior_sibling.set(block.parent, load_access)
+
+    if load_access.user_fragment:
+        msg_fragment = load_access.user_fragment
+    elif load_access.user_message:
+        msg_fragment = Fragment(textwrap.dedent(u"""\
+            <div>{}</div>
+        """.format(load_access.user_message)))
+    else:
+        msg_fragment = Fragment(u"")
+
+    if load_access.developer_message and has_access(user, 'staff', block, block.scope_ids.usage_id.course_key):
+        msg_fragment.content += textwrap.dedent(u"""\
+            <div>{}</div>
+        """.format(load_access.developer_message))
+
+    return msg_fragment
 
 
 def get_xqueue_callback_url_prefix(request):
@@ -679,6 +713,8 @@ def get_module_system_for_user(
         reverse('jump_to_id', kwargs={'course_id': text_type(course_id), 'module_id': ''}),
     ))
 
+    block_wrappers.append(partial(display_access_messages, user))
+
     if settings.FEATURES.get('DISPLAY_DEBUG_INFO_TO_STAFF'):
         if is_masquerading_as_specific_student(user, course_id):
             # When masquerading as a specific student, we want to show the debug button
@@ -846,8 +882,13 @@ def get_module_for_descriptor_internal(user, descriptor, student_data, course_id
     # that affects xblock visibility.
     user_needs_access_check = getattr(user, 'known', True) and not isinstance(user, SystemUser)
     if user_needs_access_check:
-        if not has_access(user, 'load', descriptor, course_id):
-            return None
+        access = has_access(user, 'load', descriptor, course_id)
+        if not access:
+            if access.user_message or access.user_fragment:
+                # This content will be access restricted by modifying the outgoing html
+                return descriptor
+            else:
+                return None
     return descriptor
 
 
