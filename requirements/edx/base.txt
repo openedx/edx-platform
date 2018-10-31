@@ -239,6 +239,7 @@ user-util==0.1.5
 voluptuous==0.11.5
 watchdog==0.9.0
 web-fragments==0.2.2
+webencodings==0.5.1       # via html5lib
 webob==1.8.3              # via xblock
 wrapt==1.10.5
 xblock-review==1.1.5

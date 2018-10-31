@@ -322,11 +322,12 @@ uritemplate==3.0.0
 urllib3==1.23
 urlobject==2.4.3          # via pa11ycrawler
 user-util==0.1.5
-virtualenv==16.0.0        # via tox
+virtualenv==16.1.0        # via tox
 voluptuous==0.11.5
 w3lib==1.19.0             # via parsel, scrapy
 watchdog==0.9.0
 web-fragments==0.2.2
+webencodings==0.5.1
 webob==1.8.3
 werkzeug==0.14.1          # via flask
 wrapt==1.10.5
