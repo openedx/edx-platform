@@ -7,6 +7,7 @@ from rest_framework.reverse import reverse
 
 from lms.djangoapps.certificates.api import certificate_downloadable_status
 from courseware.access import has_access
+from openedx.features.course_duration_limits.access import get_user_course_expiration_date
 from student.models import CourseEnrollment, User
 from util.course import get_encoded_course_sharing_utm_params, get_link_for_about_page
 
@@ -15,10 +16,11 @@ class CourseOverviewField(serializers.RelatedField):
     """
     Custom field to wrap a CourseOverview object. Read-only.
     """
-
     def to_representation(self, course_overview):
         course_id = unicode(course_overview.id)
         request = self.context.get('request')
+        api_version = self.context.get('api_version')
+
         return {
             # identifiers
             'id': course_id,
@@ -56,12 +58,12 @@ class CourseOverviewField(serializers.RelatedField):
             'course_sharing_utm_parameters': get_encoded_course_sharing_utm_params(),
             'course_updates': reverse(
                 'course-updates-list',
-                kwargs={'course_id': course_id},
+                kwargs={'api_version': api_version, 'course_id': course_id},
                 request=request,
             ),
             'course_handouts': reverse(
                 'course-handouts-list',
-                kwargs={'course_id': course_id},
+                kwargs={'api_version': api_version, 'course_id': course_id},
                 request=request,
             ),
             'discussion_url': reverse(
@@ -72,7 +74,7 @@ class CourseOverviewField(serializers.RelatedField):
 
             'video_outline': reverse(
                 'video-summary-list',
-                kwargs={'course_id': course_id},
+                kwargs={'api_version': api_version, 'course_id': course_id},
                 request=request,
             ),
         }
@@ -84,6 +86,13 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
     """
     course = CourseOverviewField(source="course_overview", read_only=True)
     certificate = serializers.SerializerMethodField()
+    audit_access_expires = serializers.SerializerMethodField()
+
+    def get_audit_access_expires(self, model):
+        """
+        Returns expiration date for a course audit expiration, if any or null
+        """
+        return get_user_course_expiration_date(model.user, model.course)
 
     def get_certificate(self, model):
         """Returns the information about the user's certificate in the course."""
@@ -99,19 +108,37 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
 
     class Meta(object):
         model = CourseEnrollment
+        fields = ('audit_access_expires', 'created', 'mode', 'is_active', 'course', 'certificate')
+        lookup_field = 'username'
+
+
+class CourseEnrollmentSerializerv05(CourseEnrollmentSerializer):
+    """
+    Serializes CourseEnrollment models for v0.5 api
+    Does not include 'audit_access_expires' field that is present in v1 api
+    """
+    class Meta(object):
+        model = CourseEnrollment
         fields = ('created', 'mode', 'is_active', 'course', 'certificate')
         lookup_field = 'username'
 
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     """
     Serializes User models
     """
     name = serializers.ReadOnlyField(source='profile.name')
-    course_enrollments = serializers.HyperlinkedIdentityField(
-        view_name='courseenrollment-detail',
-        lookup_field='username'
-    )
+    course_enrollments = serializers.SerializerMethodField()
+
+    def get_course_enrollments(self, model):
+        request = self.context.get('request')
+        api_version = self.context.get('api_version')
+
+        return reverse(
+            'courseenrollment-detail',
+            kwargs={'api_version': api_version, 'username': model.username},
+            request=request
+        )
 
     class Meta(object):
         model = User

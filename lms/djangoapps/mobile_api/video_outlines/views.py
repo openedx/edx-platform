@@ -90,6 +90,7 @@ class VideoSummaryList(generics.ListAPIView):
                 {"video": partial(video_summary, video_profiles)},
                 request,
                 video_profiles,
+                kwargs.get('api_version')
             )
         )
         return Response(video_outline)
