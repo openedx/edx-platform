@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 from opaque_keys import OpaqueKey, InvalidKeyError
 
 from .usage_locator import GlobalUsageLocator
@@ -24,12 +25,14 @@ class GlobalContextLocator(LearningContextKey):
     A key for the "global context", which means viewing some
     block definition directly (e.g. in a library/bundle) and
     not as part of a course or other context.
+
+    Always serializes as "gcl:global"
     """
     CANONICAL_NAMESPACE = 'gcl'
     KEY_FIELDS = ()
     __slots__ = KEY_FIELDS
     CHECKED_INIT = False
-    KEY_VALUE = u'global'
+    KEY_VALUE = 'global'
 
     def __init__(self):
         super(GlobalContextLocator, self).__init__()

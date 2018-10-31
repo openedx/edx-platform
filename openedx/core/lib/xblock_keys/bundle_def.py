@@ -1,8 +1,9 @@
-import base64
+from __future__ import absolute_import, division, print_function, unicode_literals
 from uuid import UUID
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import DefinitionKey
+import six
 
 
 class BundleDefinitionLocator(DefinitionKey):

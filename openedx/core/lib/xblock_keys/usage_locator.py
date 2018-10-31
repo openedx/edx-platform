@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 import warnings
 
 from opaque_keys import InvalidKeyError
@@ -49,12 +50,14 @@ class GlobalUsageLocator(BlockUsageKeyV2):
     def block_id(self):
         """
         All usage keys must implement 'block_id', though it's less relevant for blocks in
-        the global scope. Return our definition key instead and raise a warning.
+        the global scope.
         (We generally want code to use this key as a whole, not looking at its constituent
-        parts like block_id, which require assumptions about how these keys work.)
+        parts like block_id, which require assumptions about how these keys work. For example,
+        block_id is not necessarily unique; it's only unique when combined with block_type
+        and bundle_uuid.)
         """
         warnings.warn("Using .block_id of a GlobalUsageLocator is not recommended.", DeprecationWarning, stacklevel=2)
-        return self.definition_key._to_string()
+        return self.definition_key.definition_id
 
     def _to_string(self):
         """
@@ -64,5 +67,8 @@ class GlobalUsageLocator(BlockUsageKeyV2):
 
     @classmethod
     def _from_string(cls, serialized):
+        """
+        Instantiate this key from a serialized string
+        """
         definition_key = BundleDefinitionLocator._from_string(serialized)
         return cls(definition_key=definition_key)

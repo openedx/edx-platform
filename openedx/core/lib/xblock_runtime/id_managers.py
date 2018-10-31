@@ -1,3 +1,4 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 from xblock.runtime import IdReader, IdGenerator
 from opaque_keys.edx.locator import BlockUsageLocator
 from opaque_keys.edx.asides import AsideUsageKeyV2, AsideDefinitionKeyV2

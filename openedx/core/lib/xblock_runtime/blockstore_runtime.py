@@ -1,4 +1,4 @@
-import warnings
+from __future__ import absolute_import, division, print_function, unicode_literals
 from lxml import etree
 
 from xblock.exceptions import XBlockNotFoundError
