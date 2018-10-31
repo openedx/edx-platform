@@ -131,9 +131,9 @@ def task_send_user_info_to_mailchimp(data):
     send_user_info_to_mailchimp(None, user, created, {})
 
 
-@task()
-def send_user_enrollments_to_mailchimp(data):
-    user = User.objects.get(id=data['user_id'])
+# @task()
+def send_user_enrollments_to_mailchimp(user):
+    # user = User.objects.get(id=data['user_id'])
 
     log.info("-------------------------\n fetching enrollments \n ------------------------------\n")
 

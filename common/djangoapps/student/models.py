@@ -1289,6 +1289,10 @@ class CourseEnrollment(models.Model):
         # User is allowed to enroll if they've reached this point.
         enrollment = cls.get_or_create_enrollment(user, course_key)
         enrollment.update_enrollment(is_active=True, mode=mode)
+
+        from mailchimp_pipeline.signals.handlers import send_user_enrollments_to_mailchimp
+        send_user_enrollments_to_mailchimp(user)
+
         enrollment.send_signal(EnrollStatusChange.enroll)
 
         return enrollment
