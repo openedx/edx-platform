@@ -31,6 +31,25 @@ class BlockstoreXBlockRuntime(XBlockRuntime):
     def parse_xml_file(self, fileobj, id_generator=None):
         raise NotImplementedError("Use parse_olx_file() instead")
 
+    @staticmethod
+    def _definition_key_from_node(bundle_uuid, node):
+        """
+        Helper code used by _parse_and_cache_olx and add_node_as_child
+        """
+        block_type = node.tag
+        # remove xblock-family attribute
+        node.attrib.pop('xblock-family', None)
+        # Get the definition ID:
+        definition_id = node.attrib.pop('url_name', None)
+        if not definition_id:
+            raise KeyError("Root block is missing a url_name attribute.")
+
+        return BundleDefinitionLocator(
+            bundle_uuid=bundle_uuid,
+            block_type=block_type,
+            definition_id=definition_id,
+        )
+
     def _parse_and_cache_olx(self, bundle_uuid, data_url):
         """
         Load the authored field data for all XBlocks in the given
@@ -43,19 +62,8 @@ class BlockstoreXBlockRuntime(XBlockRuntime):
             xml_raw = r.content
 
         node = etree.fromstring(xml_raw)
-        block_type = node.tag
-        # remove xblock-family attribute
-        node.attrib.pop('xblock-family', None)
-        # Get the definition ID:
-        definition_id = node.attrib.pop('url_name', None)
-        if not definition_id:
-            raise KeyError("Root block is missing a url_name attribute.")
-
-        definition_key = BundleDefinitionLocator(
-            bundle_uuid=bundle_uuid,
-            block_type=block_type,
-            definition_id=definition_id,
-        )
+        definition_key = self._definition_key_from_node(bundle_uuid, node)
+        block_type = definition_key.block_type
         # At this point, we don't know what context/usage this OLX is loaded for.
         # For now, while we are simply caching the authored OLX data, so set the
         # usage_id (and learning context) to the global context. Later, specific
@@ -68,6 +76,7 @@ class BlockstoreXBlockRuntime(XBlockRuntime):
 
         with collect_parsed_fields():
             block = block_class.parse_xml(node, self, scope_ids, None)
+            block.save()  # Cache field data in the KVS
 
         self._parsed_olx_files.add(key)
 
@@ -90,4 +99,24 @@ class BlockstoreXBlockRuntime(XBlockRuntime):
         return super(BlockstoreXBlockRuntime, self).get_block(usage_id, for_parent=for_parent)
 
     def add_node_as_child(self, block, node, id_generator=None):
-        raise NotImplementedError("Todo: support child blocks")
+        """
+        This runtime API should normally be used via
+        get_block() -> _parse_and_cache_olx -> parse_xml
+        """
+        bundle_uuid = block.scope_ids.def_id.bundle_uuid
+        definition_key = self._definition_key_from_node(bundle_uuid, node)
+        block_type = definition_key.block_type
+        context_key = block.scope_ids.usage_id.context_key
+        # We can't generate a proper usage_id for this block at this point, since
+        # we'd need a usage-specific block_id/usage_id, and we don't have one.
+        # But normally this method is only used when parsing XML to extract
+        # authored data, so the usage key doesn't actually get used at this point.
+        usage_id = context_key.make_usage_key(definition_key, usage_id=None)
+        scope_ids = ScopeIds(self.user_id, block_type, definition_key, usage_id)
+
+        block_class = self.mixologist.mix(self.load_block_type(block_type))
+        child_block = block_class.parse_xml(node, self, scope_ids, None)
+        block.children.append(usage_id)
+        # And save the updated fields to the key value store:
+        child_block.save()
+        block.save()
