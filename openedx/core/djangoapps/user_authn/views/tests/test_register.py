@@ -25,7 +25,6 @@ from openedx.core.djangoapps.user_authn.views.register import (
     _skip_activation_email,
 )
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.user_api.accounts import (

@@ -50,6 +50,8 @@ os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'localhost:8000-9000'
 
 THIS_UUID = uuid4().hex[:5]
 
+FEATURES['DISABLE_SET_JWT_COOKIES_FOR_TESTS'] = True
+
 # can't test start dates with this True, but on the other hand,
 # can test everything else :)
 FEATURES['DISABLE_START_DATES'] = True
@@ -596,7 +598,6 @@ JWT_AUTH.update({
         'ayjB_lvltHyZxfl0dvruShZOx1N6ykEo7YrAskC_qxUyrIvqmJ64zPW3jkuOYrFs7Ykj3zFx3Zq1H5568G0", "kid": "BTZ9HA6K", "kty"'
         ': "RSA"}'
     ),
-    'JWT_LOGIN_CLIENT_ID': 'test-login-service-client-id',
 })
 
 ####################### Plugin Settings ##########################
