@@ -3,6 +3,8 @@ import warnings
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
+
+from .learning_context_key import global_context
 from .bundle_def import BundleDefinitionLocator
 
 
@@ -38,6 +40,10 @@ class GlobalUsageLocator(BlockUsageKeyV2):
         if not isinstance(definition_key, BundleDefinitionLocator):
             raise TypeError("GlobalUsageLocator only works with BundleDefinitionLocator")
         super(GlobalUsageLocator, self).__init__(definition_key=definition_key)
+
+    @property
+    def context_key(self):
+        return global_context
     
     def block_type(self):
         """

@@ -1,7 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 from opaque_keys import OpaqueKey, InvalidKeyError
 
-from .usage_locator import GlobalUsageLocator
 
 class LearningContextKey(OpaqueKey):
     """
@@ -54,6 +53,7 @@ class GlobalContextLocator(LearningContextKey):
         """
         if usage_id is not None:
             raise ValueError("Cannot have a usage_id in the global context")
+        from .usage_locator import GlobalUsageLocator  # Avoid circular import        
         return GlobalUsageLocator(definition_key)
 
 global_context = GlobalContextLocator()
