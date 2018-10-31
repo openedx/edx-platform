@@ -5,11 +5,10 @@ from django.utils.lru_cache import lru_cache
 from xblock.core import XBlock, XBlockAside
 from xblock.field_data import ReadOnlyFieldData, SplitFieldData
 from xblock.fields import Scope, ScopeIds
-from xblock.runtime import Runtime, IdReader, IdGenerator, NullI18nService, MemoryIdManager
+from xblock.runtime import Runtime, IdReader, IdGenerator, NullI18nService, MemoryIdManager, KvsFieldData
 
 from openedx.core.lib.xblock_utils import xblock_local_resource_url
 from xmodule.errortracker import make_error_tracker
-from xmodule.modulestore.inheritance import inheriting_field_data
 from .blockstore_kvs import collect_parsed_fields
 from .id_managers import OpaqueKeyReader
 from .shims import RuntimeShim, XBlockShim
@@ -100,17 +99,17 @@ class XBlockRuntimeSystem(object):
     def __init__(
         self,
         handler_url,  # type: (Callable[[XBlock, string, string, string, bool], string]
-        authored_data_kvs,  # type: InheritanceKeyValueStore
-        student_data_kvs,  # type: InheritanceKeyValueStore
+        authored_data_kvs,  # type: KeyValueStore
+        student_data_kvs,  # type: KeyValueStore
         runtime_class,  # type: XBlockRuntime
     ):
         """
         args:
             handler_url: A method that implements the XBlock runtime
                 handler_url interface.
-            authored_data_kvs: An InheritanceKeyValueStore used to retrieve
+            authored_data_kvs: An KeyValueStore used to retrieve
                 any fields with UserScope.NONE
-            student_data_kvs: An InheritanceKeyValueStore used to retrieve
+            student_data_kvs: An KeyValueStore used to retrieve
                 any fields with UserScope.ONE or UserScope.ALL
         """
         self.handler_url = handler_url
@@ -120,8 +119,8 @@ class XBlockRuntimeSystem(object):
         self.runtime_class = runtime_class
 
         # Field data storage/retrieval:
-        authored_data = inheriting_field_data(authored_data_kvs)
-        student_data = student_data_kvs
+        authored_data = KvsFieldData(kvs=authored_data_kvs)
+        student_data = KvsFieldData(kvs=student_data_kvs)
         #if authored_data_readonly:
         #    authored_data = ReadOnlyFieldData(authored_data)
 

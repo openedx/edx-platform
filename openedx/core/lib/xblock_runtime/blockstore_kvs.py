@@ -2,8 +2,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from contextlib import contextmanager
 
 from xblock.fields import Scope
-
-from xmodule.modulestore.inheritance import InheritanceKeyValueStore
+from xblock.runtime import KeyValueStore
 
 # The XBlock API does not contain a mechanism for reading XBlock data
 # (block IDs and field data) out of XML. Instead, it only has the
@@ -96,7 +95,7 @@ def collect_changes():
         _pending_writes.pop()  # Discard all changes
 
 
-class BlockstoreKVS(InheritanceKeyValueStore):
+class BlockstoreKVS(KeyValueStore):
     """
     A KeyValueStore that reads XBlock field data directly out of Blockstore.
     Note that this is considered too slow for use in the LMS, but is fine
