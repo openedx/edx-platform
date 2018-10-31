@@ -56,6 +56,9 @@ class CookieTests(TestCase):
             for key, val in response.cookies.iteritems()
         }
 
+    def _set_use_jwt_cookie_header(self, request):
+        request.META['HTTP_USE_JWT_COOKIE'] = 'true'
+
     def _assert_recreate_jwt_from_cookies(self, response, can_recreate):
         """
         If can_recreate is True, verifies that a JWT can be properly recreated
@@ -107,6 +110,7 @@ class CookieTests(TestCase):
 
     def test_set_logged_in_jwt_cookies(self):
         setup_login_oauth_client()
+        self._set_use_jwt_cookie_header(self.request)
         with cookies_api.JWT_COOKIES_FLAG.override(True):
             response = cookies_api.set_logged_in_cookies(self.request, HttpResponse(), self.user)
             self._assert_cookies_present(response, cookies_api.ALL_LOGGED_IN_COOKIE_NAMES)
@@ -127,6 +131,7 @@ class CookieTests(TestCase):
             return response.cookies[cookies_api.jwt_cookies.jwt_refresh_cookie_name()].value
 
         setup_login_oauth_client()
+        self._set_use_jwt_cookie_header(self.request)
         with cookies_api.JWT_COOKIES_FLAG.override(True):
             response = cookies_api.set_logged_in_cookies(self.request, HttpResponse(), self.user)
             self._copy_cookies_to_request(response, self.request)
