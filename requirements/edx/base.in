@@ -35,7 +35,7 @@ celery==3.1.25                      # Asynchronous task execution library
 defusedxml==0.4.1                   # XML bomb protection for common XML parsers
 Django==1.11.16                     # Web application framework
 django-babel-underscore             # underscore template extractor for django-babel (internationalization utilities)
-django-config-models                # Configuration models for Django allowing config management with auditing
+django-config-models>=0.2.2         # Configuration models for Django allowing config management with auditing
 django-cors-headers==2.1.0          # Used to allow to configure CORS headers for cross-domain requests
 django-countries==4.6.1             # Country data for Django forms and model fields
 django-crum                         # Middleware that stores the current request and user in thread local storage
@@ -129,8 +129,8 @@ pyuca==1.1                          # For more accurate sorting of translated co
 reportlab                           # Used for shopping cart's pdf invoice/receipt generation
 rest-condition                      # DRF's recommendation for supporting complex permissions
 rfc6266-parser                      # Used to generate Content-Disposition headers.
-social-auth-app-django==2.1.0
-social-auth-core==1.7.0
+social-auth-app-django<3.0.0
+social-auth-core<2.0.0
 pysrt==0.4.7                        # Support for SubRip subtitle files, used in the video XModule
 pytz==2016.10                       # Time zone information database
 PyYAML                              # Used to parse XModule resource templates

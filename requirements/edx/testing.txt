@@ -165,7 +165,7 @@ fs-s3fs==0.1.8
 fs==2.0.18
 funcsigs==1.0.2           # via pytest
 functools32==3.2.3.post2  # via parsel
-future==0.17.0
+future==0.17.1
 futures==3.2.0 ; python_version == "2.7"
 fuzzywuzzy==0.17.0
 glob2==0.3
