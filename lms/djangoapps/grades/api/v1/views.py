@@ -8,9 +8,9 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
-from rest_framework.generics import GenericAPIView
 from rest_framework.pagination import CursorPagination
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from six import text_type
 from util.date_utils import to_timestamp
 
@@ -112,6 +112,39 @@ class CourseEnrollmentPagination(CursorPagination):
     """
     page_size = 25
     ordering = 'created'
+
+
+class PaginatedAPIView(APIView):
+    """
+    An `APIView` class enhanced with the pagination methods of `GenericAPIView`.
+    """
+    # pylint: disable=attribute-defined-outside-init
+    @property
+    def paginator(self):
+        """
+        The paginator instance associated with the view, or `None`.
+        """
+        if not hasattr(self, '_paginator'):
+            if self.pagination_class is None:
+                self._paginator = None
+            else:
+                self._paginator = self.pagination_class()
+        return self._paginator
+
+    def paginate_queryset(self, queryset):
+        """
+        Return a single page of results, or `None` if pagination is disabled.
+        """
+        if self.paginator is None:
+            return None
+        return self.paginator.paginate_queryset(queryset, self.request, view=self)
+
+    def get_paginated_response(self, data):
+        """
+        Return a paginated style `Response` object for the given output data.
+        """
+        assert self.paginator is not None
+        return self.paginator.get_paginated_response(data)
 
 
 class GradeViewMixin(DeveloperErrorViewMixin):
@@ -274,7 +307,7 @@ class SubsectionLabelFinder(object):
             return summary['label']
 
 
-class CourseGradesView(GradeViewMixin, GenericAPIView):
+class CourseGradesView(GradeViewMixin, PaginatedAPIView):
     """
     **Use Case**
         * Get course grades of all users who are enrolled in a course.
@@ -378,7 +411,7 @@ class CourseGradesView(GradeViewMixin, GenericAPIView):
         return self.get_paginated_response(user_grades)
 
 
-class GradebookView(GradeViewMixin, GenericAPIView):
+class GradebookView(GradeViewMixin, PaginatedAPIView):
     """
     **Use Case**
         * Get course gradebook entries of a single user in a course,
@@ -623,7 +656,7 @@ class GradebookView(GradeViewMixin, GenericAPIView):
 GradebookUpdateResponseItem = namedtuple('GradebookUpdateResponseItem', ['user_id', 'usage_id', 'success', 'reason'])
 
 
-class GradebookBulkUpdateView(GradeViewMixin, GenericAPIView):
+class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
     """
     **Use Case**
         Creates `PersistentSubsectionGradeOverride` objects for multiple (user_id, usage_id)
