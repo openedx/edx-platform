@@ -634,6 +634,20 @@ class RegModelForm(BaseOnboardingModelForm):
             'org_admin_email': {'field_type': 'email'}
         }
 
+    def clean_first_name(self):
+        first_name = self.cleaned_data['first_name'].strip()
+        if len(first_name) <= 0:
+            raise forms.ValidationError("Please enter valid First Name.")
+
+        return first_name
+
+    def clean_last_name(self):
+        last_name = self.cleaned_data['last_name'].strip()
+        if len(last_name) <= 0:
+            raise forms.ValidationError("Please enter valid Last Name.")
+
+        return last_name
+
     def save_email_preferences(self, user, opt_in):
         user_email_preferences, created = EmailPreference.objects.get_or_create(user=user)
         if (not user_email_preferences.opt_in and opt_in in ['yes', 'no']) or (
