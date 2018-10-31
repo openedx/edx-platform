@@ -255,7 +255,7 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
         """
         return None
 
-    def access_denied_fragment(self, block, user, course_key, user_group, allowed_groups):
+    def access_denied_fragment(self, block, user, user_group, allowed_groups):
         """
         Return an html fragment that should be displayed to the user when they are not allowed to access
         content managed by this partition, or None if there is no applicable message.
