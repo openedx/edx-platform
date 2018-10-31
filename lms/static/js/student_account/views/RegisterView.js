@@ -173,18 +173,18 @@
                     var inputs = this.$('.form-field'),
                         inputSelectors = 'input, select, textarea',
                         inputTipSelectors = ['tip error', 'tip tip-input'],
-                        inputTipSelectorsHidden = ['tip error hidden', 'tip tip-input hidden'],
+                        inputTipSelectorsHidden = ['tip error hidden', 'tip tip-input'],
                         onInputFocus = function() {
                             // Apply on focus styles to input
                             $(this).find('label').addClass('focus-in')
                                 .removeClass('focus-out');
 
-                            // Show each input tip
-                            $(this).children().each(function() {
-                                if (inputTipSelectorsHidden.indexOf($(this).attr('class')) >= 0) {
-                                    $(this).removeClass('hidden');
-                                }
-                            });
+//                            // Show each input tip
+//                            $(this).children().each(function() {
+//                                if (inputTipSelectorsHidden.indexOf($(this).attr('class')) >= 0) {
+//                                    $(this).removeClass('hidden');
+//                                }
+//                            });
                         },
                         onInputFocusOut = function() {
                             // If input has no text apply focus out styles
@@ -194,13 +194,13 @@
                             }
 
                             // Hide each input tip
-                            $(this).children().each(function() {
-                                // This is a 1 instead of 0 so the error message for a field is not
-                                // hidden on blur and only the help tip is hidden.
-                                if (inputTipSelectors.indexOf($(this).attr('class')) >= 1) {
-                                    $(this).addClass('hidden');
-                                }
-                            });
+//                            $(this).children().each(function() {
+//                                // This is a 1 instead of 0 so the error message for a field is not
+//                                // hidden on blur and only the help tip is hidden.
+//                                if (inputTipSelectors.indexOf($(this).attr('class')) >= 1) {
+//                                    $(this).addClass('hidden');
+//                                }
+//                            });
                         },
                         handleInputBehavior = function(input) {
                             // Initially put label in input
