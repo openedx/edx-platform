@@ -64,15 +64,11 @@
                             HtmlUtils.joinHtml(
                                 gettext('The language selected is one of the partially supported languages.'),  // eslint-disable-line max-le
                                 gettext('Are you sure you want to keep the changes?'),
-                                HtmlUtils.HTML('<button class="btn-outline-primary paragon__btn" type="button" ">'),
-                                gettext('Yes'),
-                                HtmlUtils.HTML('</button>'),
-                                HtmlUtils.HTML('<button class="btn-outline-primary paragon__btn" type="button">'),
-                                gettext('No'),
-                                HtmlUtils.HTML('</button>'),
                             ),
 
                         );
+                        this.$('#confirm-language').show();
+                        this.$('#revert-language').show();
                     }
                     else {
                         this.saveLanguage()

@@ -46,4 +46,8 @@
 <span class="u-field-message" id="u-field-message-<%- id %>">
     <span class="u-field-message-notification" aria-live="polite"></span>
     <span class="u-field-message-help" id="u-field-help-message-<%- id %>"><%- message %></span>
+    <span class="u-field-confirm">
+        <button id="confirm-language" class="u-field-value-display"><%- gettext('Confirm') %></button>
+        <button id="revert-language" class="u-field-value-display"><%- gettext('Revert') %></button>
+    </span>
 </span>
