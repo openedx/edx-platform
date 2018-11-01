@@ -41,7 +41,7 @@ urlpatterns = (
     url(r'^change_enrollment$', 'student.views.change_enrollment', name='change_enrollment'),
 
     # philu features
-    url(r'', include('lms.djangoapps.philu_features.urls')),
+    url(r'', include('openedx.features.philu_features.urls')),
 
     # Event tracking endpoints
     url(r'', include('track.urls')),
