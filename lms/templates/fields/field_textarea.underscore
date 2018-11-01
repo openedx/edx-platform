@@ -18,6 +18,8 @@
             aria-labelledby="u-field-title-<%- id %>"><textarea maxlength="<%- maxCharacters%>" id="u-field-textarea-<%- id %>" rows="4"
             <% if (message) { %>
                 aria-describedby="u-field-message-help-<%- id %>"
+            <% } else { %>
+                aria-describedby="character-count-<%- id %>"
             <% } %>
             ><%- value %></textarea>
         <% } else if (editable === 'never') { %>
@@ -44,7 +46,7 @@
             </span>
         <% } %>
         <% if (mode === 'edit' && maxCharacters) { %>
-            <div class="field-textarea-character-count">
+            <div id="character-count-<%- id %>" class="field-textarea-character-count">
                 <%=
                     HtmlUtils.interpolateHtml(
                         gettext('{currentCountOpeningTag}{currentCharacterCount}{currentCountClosingTag} of {maxCharacters}'),
