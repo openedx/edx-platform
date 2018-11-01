@@ -95,5 +95,15 @@ setup(
             "password_policy = openedx.core.djangoapps.password_policy.apps:PasswordPolicyConfig",
             "user_authn = openedx.core.djangoapps.user_authn.apps:UserAuthnConfig"
         ],
+        'definition_key': [
+            'olx-v1 = openedx.core.lib.xblock_keys.bundle_def:BundleDefinitionLocator',
+        ],
+        'context_key': [
+            'gcl = openedx.core.lib.xblock_keys.learning_context_key:GlobalContextLocator',
+        ],
+        'usage_key': [
+            'gblock-v1 = openedx.core.lib.xblock_keys.usage_locator:GlobalUsageLocator',
+        ],
+
     }
 )

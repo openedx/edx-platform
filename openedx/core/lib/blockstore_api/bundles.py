@@ -1,7 +1,7 @@
 """
-API Client for Blockstore
+API Client for Blockstore bundle API
 """
-from __future__ import absolute_import, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function, unicode_literals
 from collections import namedtuple
 from future.moves.urllib.parse import urljoin
 from uuid import UUID
@@ -9,9 +9,8 @@ from uuid import UUID
 from django.conf import settings
 import requests
 
-
 Bundle = namedtuple('Bundle', ['uuid', 'title', 'slug'])
-BundleFile = namedtuple('BundleFile', ['bundle_uuid', 'path', 'size', 'public_url', 'data_url'])
+BundleFile = namedtuple('BundleFile', ['path', 'size', 'data_url'])
 
 def api_url(*path_parts):
     if not settings.BLOCKSTORE_API_URL.endswith('/api/v1/'):
@@ -19,30 +18,44 @@ def api_url(*path_parts):
     return settings.BLOCKSTORE_API_URL + '/'.join(path_parts) + '/'
 
 
-def get_bundle_by_slug(slug):
-    """ Retrieve the bundle with the specified slug """
+def get_bundle(bundle_uuid):
+    """
+    Retrieve metadata about the specified bundle
 
-    # TODO: Add a proper API to fetch bundles by slug, and make the slugs unique.
-    # Maybe store slugs in a table so even old slugs can still redirect to current ones?
-    all_bundles_response = requests.get(api_url('bundles'))
-    all_bundles_response.raise_for_status()
-    all_bundles = all_bundles_response.json()
-    for bundle in all_bundles:
-        if bundle['slug'] == slug:
-            return Bundle(uuid=UUID(bundle['uuid']), title=bundle['title'], slug=bundle['slug'])
-    return None
+    Returns None if the bundle does not exist
+    """
+    assert isinstance(bundle_uuid, UUID)
+    response = requests.get(api_url('bundles', str(bundle_uuid)))
+    if response.status_code == 404:
+        return None
+    response.raise_for_status()
+    data = response.json()
+    return Bundle(uuid=bundle_uuid, title=data['title'], slug=data['slug'])
+
+
+def get_bundle_files(bundle_uuid):
+    """
+    Retrieve the list of files in the specified bundle
+    """
+    assert isinstance(bundle_uuid, UUID)
+    files_response = requests.get(api_url('bundles', str(bundle_uuid), 'files'))
+    files_response.raise_for_status()
+    files_data = files_response.json()
+    files = [
+        BundleFile(path=f['path'], size=f['size'], data_url=f['data'])
+        for f in files_data
+    ]
+    return files
 
 def get_bundle_file_metadata(bundle_uuid, path):
     assert isinstance(bundle_uuid, UUID)
     # TODO: the following URL needs a weird double // ("".../files//file.xml")
-    response = requests.get(api_url('bundles', str(bundle_uuid), 'files/', path))
+    response = requests.get(api_url('bundles', str(bundle_uuid), 'files', path))
     response.raise_for_status()
     file_metadata = response.json()
     return BundleFile(
-        bundle_uuid=bundle_uuid,
         path=file_metadata['path'],
         size=file_metadata['size'],
-        public_url = file_metadata['data'] if file_metadata['public'] else None,
         data_url = file_metadata['data'],
     )
 

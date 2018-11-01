@@ -1,16 +1,21 @@
-from lxml import etree
+from __future__ import absolute_import, division, print_function, unicode_literals
+import warnings
 
+from django.utils.lru_cache import lru_cache
 from xblock.core import XBlock, XBlockAside
 from xblock.field_data import ReadOnlyFieldData, SplitFieldData
 from xblock.fields import Scope, ScopeIds
-from xblock.runtime import Runtime, IdReader, IdGenerator, NullI18nService, MemoryIdManager
+from xblock.runtime import Runtime, IdReader, IdGenerator, NullI18nService, MemoryIdManager, KvsFieldData
 
 from openedx.core.lib.xblock_utils import xblock_local_resource_url
-from xmodule.modulestore.inheritance import inheriting_field_data
+from xmodule.errortracker import make_error_tracker
 from .blockstore_kvs import collect_parsed_fields
+from .id_managers import OpaqueKeyReader
+from .shims import RuntimeShim, XBlockShim
 
 
-class XBlockRuntime(Runtime):
+
+class XBlockRuntime(RuntimeShim, Runtime):
     """
     This class manages one or more instantiated XBlocks for a particular user,
     providing those XBlocks with the standard XBlock runtime API (and some
@@ -25,15 +30,17 @@ class XBlockRuntime(Runtime):
         # type: (XBlockRuntimeSystem, int) -> None
         super(XBlockRuntime, self).__init__(
             id_reader=system.id_reader,
-            mixins=(),
+            mixins=(
+                XBlockShim,
+            ),
             services={
-                "field-data": system.field_data,
                 "i18n": NullI18nService(),
             },
             default_class=None,
             select=None,
             id_generator=system.id_generator,
         )
+        self.system = system
         self.user_id = user_id
 
     def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
@@ -55,8 +62,31 @@ class XBlockRuntime(Runtime):
         return []
 
     def parse_xml_file(self, fileobj, id_generator=None):
-        with collect_parsed_fields():
-            return super(XBlockRuntime, self).parse_xml_file(fileobj, id_generator)
+        # Deny access to the inherited method
+        raise NotImplementedError("XML Serialization is only supported with BlockstoreXBlockRuntime")
+
+    def add_node_as_child(self, block, node, id_generator=None):
+         """
+         Called by XBlock.parse_xml to treat a child node as a child block.
+         """
+         # Deny access to the inherited method
+         raise NotImplementedError("XML Serialization is only supported with BlockstoreXBlockRuntime")
+
+    def service(self, block, service_name):
+        """
+        Return a service, or None.
+        Services are objects implementing arbitrary other interfaces.
+        """
+        # TODO: Do these declarations actually help with anything? Maybe this check should
+        # be removed from here and from XBlock.runtime
+        declaration = block.service_declaration(service_name)
+        if declaration is None:
+            raise NoSuchServiceError("Service {!r} was not requested.".format(service_name))
+        # Special case handling for some services:
+        service = self.system.get_service(block.scope_ids, service_name)
+        if service is None:
+            service = super(XBlockRuntime, self).service(block, service_name)
+        return service
 
 class XBlockRuntimeSystem(object):
     """
@@ -69,26 +99,28 @@ class XBlockRuntimeSystem(object):
     def __init__(
         self,
         handler_url,  # type: (Callable[[XBlock, string, string, string, bool], string]
-        authored_data_kvs,  # type: InheritanceKeyValueStore
-        student_data_kvs,  # type: InheritanceKeyValueStore
+        authored_data_kvs,  # type: KeyValueStore
+        student_data_kvs,  # type: KeyValueStore
+        runtime_class,  # type: XBlockRuntime
     ):
         """
         args:
             handler_url: A method that implements the XBlock runtime
                 handler_url interface.
-            authored_data_kvs: An InheritanceKeyValueStore used to retrieve
+            authored_data_kvs: An KeyValueStore used to retrieve
                 any fields with UserScope.NONE
-            student_data_kvs: An InheritanceKeyValueStore used to retrieve
+            student_data_kvs: An KeyValueStore used to retrieve
                 any fields with UserScope.ONE or UserScope.ALL
         """
         self.handler_url = handler_url
         # TODO: new ID manager:
-        self.id_reader = MemoryIdManager()
-        self.id_generator = self.id_reader
+        self.id_reader = OpaqueKeyReader()
+        self.id_generator = MemoryIdManager()  # We don't really use id_generator until we need to support asides
+        self.runtime_class = runtime_class
 
         # Field data storage/retrieval:
-        authored_data = inheriting_field_data(authored_data_kvs)
-        student_data = student_data_kvs
+        authored_data = KvsFieldData(kvs=authored_data_kvs)
+        student_data = KvsFieldData(kvs=student_data_kvs)
         #if authored_data_readonly:
         #    authored_data = ReadOnlyFieldData(authored_data)
 
@@ -103,6 +135,31 @@ class XBlockRuntimeSystem(object):
             Scope.preferences: student_data,
         })
 
+        self._error_trackers = {}
+
     def get_runtime(self, user_id):
         # type: (int) -> XBlockRuntime
-        return XBlockRuntime(self, user_id)
+        return self.runtime_class(self, user_id)
+
+    def get_service(self, scope_ids, service_name):
+        """
+        Get a runtime service
+
+        Runtime services may come from this XBlockRuntimeSystem,
+        or if this method returns None, they may come from the
+        XBlockRuntime.
+        """
+        if service_name == "field-data":
+            return self.field_data
+        if service_name == 'error_tracker':
+            return self.get_error_tracker_for_context(scope_ids.usage_id.context_key)
+        return None  # None means see if XBlockRuntime offers this service
+
+    @lru_cache(maxsize=32)
+    def get_error_tracker_for_context(self, context_key):
+        """
+        Get an error tracker for the specified context.
+        lru_cache makes this error tracker long-lived, for
+        up to 32 contexts that have most recently been used.
+        """
+        return make_error_tracker()
