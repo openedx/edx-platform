@@ -1,0 +1,195 @@
+{% load i18n %}
+{% load ace %}
+
+{% get_current_language as LANGUAGE_CODE %}
+{% get_current_language_bidi as LANGUAGE_BIDI %}
+
+{# This is preview text that is visible in the inbox view of many email clients but not visible in the actual #}
+{# email itself. #}
+
+<div lang="{{ LANGUAGE_CODE|default:"en" }}" style="
+    display:none;
+    font-size:1px;
+    line-height:1px;
+    max-height:0px;
+    max-width:0px;
+    opacity:0;
+    overflow:hidden;
+    visibility:hidden;
+">
+    {% block preview_text %}{% endblock %}
+</div>
+
+<!-- TEST RED THEME MARKER: Do not remove this comment, it is used by the tests to tell if this theme was used -->
+
+{% for image_src in channel.tracker_image_sources %}
+    <img src="{image_src}" alt="" role="presentation" aria-hidden="true" />
+{% endfor %}
+
+{% google_analytics_tracking_pixel %}
+
+<div bgcolor="#f5f5f5" lang="{{ LANGUAGE_CODE|default:"en" }}" dir="{{ LANGUAGE_BIDI|yesno:"rtl,ltr" }}" style="
+    margin: 0;
+    padding: 0;
+    min-width: 100%;
+">
+    <!-- Hack for outlook 2010, which wants to render everything in Times New Roman -->
+    <!--[if mso]>
+    <style type="text/css">
+    body, table, td {font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;}
+    </style>
+    <![endif]-->
+
+    <!--[if (gte mso 9)|(IE)]>
+    <table role="presentation" width="600" align="center" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+    <td>
+    <![endif]-->
+
+    <!-- CONTENT -->
+    <table class="content" role="presentation" align="center" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffd1d1" width="100%" style="
+        font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        font-size: 1em;
+        line-height: 1.5;
+        max-width: 600px;
+        padding: 0 20px 0 20px;
+    ">
+        <tr>
+            <!-- HEADER -->
+            <td class="header" style="
+                padding: 20px;
+            ">
+                <table role="presentation" width="100%" align="left" border="0" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td width="70">
+                            <a href="{% with_link_tracking homepage_url %}"><img
+                                    src="http://localhost:18000/static/red-theme/images/logo.png"
+                                    alt="{% blocktrans %}Go to {{ platform_name }} Home Page{% endblocktrans %}"/></a>
+                        </td>
+                        <td align="right" style="text-align: {{ LANGUAGE_BIDI|yesno:"left,right" }};">
+                            <a class="login" href="{% with_link_tracking dashboard_url %}" style="color: #960909;">{%  trans "Sign In" %}</a>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+
+        <tr>
+            <!-- MAIN -->
+            <td class="main" bgcolor="#ffffff" style="
+                padding: 30px 20px;
+                box-shadow: 0 1px 5px rgba(0,0,0,0.25);
+            ">
+                {% block content %}{% endblock %}
+            </td>
+        </tr>
+
+        <tr>
+            <!-- FOOTER -->
+            <td class="footer" style="padding: 20px;">
+                <table role="presentation" width="100%" align="left" border="0" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td style="padding-bottom: 20px;">
+                            <!-- SOCIAL -->
+                            <table role="presentation" align="{{ LANGUAGE_BIDI|yesno:"right,left" }}" border="0" border="0" cellpadding="0" cellspacing="0" width="210">
+                                <tr>
+                                    {% if social_media_urls.linkedin %}
+                                        <td height="32" width="42">
+                                            <a href="{{ social_media_urls.linkedin|safe }}">
+                                                <img src="https://media.sailthru.com/595/1k1/8/o/599f354ec70cb.png"
+                                                     width="32" height="32" alt="{% blocktrans %}{{ platform_name }} on LinkedIn{% endblocktrans %}"/>
+                                            </a>
+                                        </td>
+                                    {% endif %}
+                                    {% if social_media_urls.twitter %}
+                                        <td height="32" width="42">
+                                            <a href="{{ social_media_urls.twitter|safe }}">
+                                                <img src="https://media.sailthru.com/595/1k1/8/o/599f354d9c26e.png"
+                                                     width="32" height="32" alt="{% blocktrans %}{{ platform_name }} on Twitter{% endblocktrans %}"/>
+                                            </a>
+                                        </td>
+                                    {% endif %}
+                                    {% if social_media_urls.facebook %}
+                                        <td height="32" width="42">
+                                            <a href="{{ social_media_urls.facebook|safe }}">
+                                                <img src="https://media.sailthru.com/595/1k1/8/o/599f355052c8e.png"
+                                                     width="32" height="32" alt="{% blocktrans %}{{ platform_name }} on Facebook{% endblocktrans %}"/>
+                                            </a>
+                                        </td>
+                                    {% endif %}
+                                    {% if social_media_urls.google_plus %}
+                                        <td height="32" width="42">
+                                            <a href="{{ social_media_urls.google_plus|safe }}">
+                                                <img src="https://media.sailthru.com/595/1k1/8/o/599f354fc554a.png"
+                                                     width="32" height="32" alt="{% blocktrans %}{{ platform_name }} on Google Plus{% endblocktrans %}"/>
+                                            </a>
+                                        </td>
+                                    {% endif %}
+                                    {% if social_media_urls.reddit %}
+                                        <td height="32" width="42">
+                                            <a href="{{ social_media_urls.reddit|safe }}">
+                                                <img src="https://media.sailthru.com/595/1k1/8/o/599f354e326b9.png"
+                                                     width="32" height="32" alt="{% blocktrans %}{{ platform_name }} on Reddit{% endblocktrans %}"/>
+                                            </a>
+                                        </td>
+                                    {% endif %}
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <!-- APP BUTTONS -->
+                        <td style="padding-bottom: 20px;">
+                            {% if mobile_store_urls.apple %}
+                                <a href="{{ mobile_store_urls.apple|safe }}" style="text-decoration: none">
+                                    <img src="https://media.sailthru.com/595/1k1/6/2/5931cfbba391b.png"
+                                         alt="{% trans "Download the iOS app on the Apple Store" %}"
+                                         width="136" height="50" style="margin-{{ LANGUAGE_BIDI|yesno:"left,right" }}: 10px"/>
+                                </a>
+                            {% endif %}
+                            {% if mobile_store_urls.google %}
+                                <a href="{{ mobile_store_urls.google|safe }}" style="text-decoration: none">
+                                    <img src="https://media.sailthru.com/595/1k1/6/2/5931cf879a033.png"
+                                         alt="{% trans "Download the Android app on the Google Play Store" %}"
+                                         width="136" height="50"/>
+                                </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <!-- Actions -->
+                        <td style="padding-bottom: 20px;">
+                            {% for action_link_url, action_link_text in channel.action_links %}
+                                <p>
+                                    <a href="{{ action_link_url }}" style="color: #960909">
+                                        <font color="#960909"><b>{{ action_link_text }}</b></font>
+                                    </a>
+                                </p>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <!-- COPYRIGHT -->
+                        <td>
+                            &copy; {% now "Y" %} {{ platform_name }}, {% trans "All rights reserved" %}.<br/>
+                            <br/>
+                            {% trans "Our mailing address is" %}:<br/>
+                            {{ contact_mailing_address }}
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <!--[if (gte mso 9)|(IE)]>
+    </td>
+    </tr>
+    </table>
+    <![endif]-->
+
+</div>
+
+{# Debug info that is not user-visible #}
+<span id="ace-message-id" style="display:none;">{{ message.log_id }}</span>
+<span id="template-revision" style="display:none;">{{ template_revision }}</span>
