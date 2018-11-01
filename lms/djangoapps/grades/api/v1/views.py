@@ -549,8 +549,9 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
 
         label_finder = SubsectionLabelFinder(course_grade)
 
-        for chapter_location, section_data in course_grade.chapter_grades.items():
-            for subsection_grade in section_data['sections']:
+        for chapter_index, (chapter_location, section_data) in enumerate(course_grade.chapter_grades.items(), start=1):
+            for subsection_index, subsection_grade in enumerate(section_data['sections'], start=1):
+                default_label = 'Ch. {:02d}-{:02d}'.format(chapter_index, subsection_index)
                 breakdown.append({
                     'are_grades_published': True,
                     'auto_grade': False,
@@ -567,7 +568,7 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
                     'is_ag': False,
                     'is_average': False,
                     'is_manually_graded': False,
-                    'label': label_finder.get_label(subsection_grade.display_name),
+                    'label': label_finder.get_label(subsection_grade.display_name) or default_label,
                     'letter_grade': course_grade.letter_grade,
                     'module_id': text_type(subsection_grade.location),
                     'percent': subsection_grade.percent_graded,
