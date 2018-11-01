@@ -8,12 +8,15 @@ from uuid import UUID
 from lxml import etree
 import requests
 
-from .bundles import api_url, get_bundle_files
+from .bundles import get_bundle_files
 
 
 log = logging.getLogger(__name__)
-_olx_lookup_cache = {}  # _olx_lookup_cache[bundle_uuid][(block_type, url_name)] = BundleFile
-                        # This cache is designed so the cache of any given bundle can be easily invalidated
+
+# OLX lookup cache:
+# Format is _olx_lookup_cache[bundle_uuid][(block_type, url_name)] = BundleFile
+# This cache is designed so the cache of any given bundle can be easily invalidated
+_olx_lookup_cache = {}
 
 
 def _cache_bundle_olx(bundle_uuid):
@@ -75,6 +78,7 @@ def list_olx_definitions(bundle_uuid):
     Return value: a dict whose keys are the OLX file paths and whose
     values are a list of tuples of (block_tupe, definition_id)
     """
+    assert isinstance(bundle_uuid, UUID)
     _cache_bundle_olx(bundle_uuid)
     by_path = {}
     for key, file_data in _olx_lookup_cache[bundle_uuid].items():

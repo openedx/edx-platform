@@ -1,22 +1,19 @@
+"""
+A runtime designed to work with Blockstore, reading and writing
+XBlock field data directly from Blockstore.
+"""
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from lxml import etree
-from django.utils.lru_cache import lru_cache
 import requests
 from xblock.exceptions import XBlockNotFoundError
 from xblock.fields import ScopeIds
 
-from openedx.core.lib.blockstore_api import (
-    get_bundle_files,
-    get_bundle_file_metadata,
-    which_olx_file_contains,
-)
+from openedx.core.lib.blockstore_api import which_olx_file_contains
 from openedx.core.lib.xblock_runtime.blockstore_kvs import collect_parsed_fields
-from openedx.core.lib.xblock_keys import global_context, LearningContextKey, BundleDefinitionLocator
+from openedx.core.lib.xblock_keys import global_context, BundleDefinitionLocator
 
 from .runtime import XBlockRuntime
-
-
 
 
 class BlockstoreXBlockRuntime(XBlockRuntime):

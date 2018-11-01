@@ -1,3 +1,6 @@
+"""
+Key-value store that holds XBlock field data read out of Blockstore
+"""
 from __future__ import absolute_import, division, print_function, unicode_literals
 from contextlib import contextmanager
 
@@ -71,6 +74,7 @@ def collect_parsed_fields():
     finally:
         _pending_writes.pop()  # Discard all changes
 
+
 @contextmanager
 def collect_changes():
     """
@@ -112,7 +116,9 @@ class BlockstoreKVS(KeyValueStore):
 
     def get(self, key):
         if _transaction_depth < 1:
-            raise RuntimeError("You need to be in a blockstore_transaction() context to access blockstore-backed fields")
+            raise RuntimeError(
+                "You need to be in a blockstore_transaction() context to access blockstore-backed fields"
+            )
         for cache in reversed(_pending_writes):
             if key in cache:
                 return cache[key]

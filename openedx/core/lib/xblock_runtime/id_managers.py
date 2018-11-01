@@ -1,7 +1,10 @@
+"""
+Implementation of the APIs required for XBlock runtimes to work with
+our Open edX-specific opaque key formats.
+"""
 from __future__ import absolute_import, division, print_function, unicode_literals
-from xblock.runtime import IdReader, IdGenerator
+from xblock.runtime import IdReader
 from opaque_keys.edx.locator import BlockUsageLocator
-from opaque_keys.edx.asides import AsideUsageKeyV2, AsideDefinitionKeyV2
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -28,7 +31,10 @@ class OpaqueKeyReader(IdReader):
             # This is a key to a block in split mongo.
             # TODO: is there something more efficient than this mess that can get us the definition key?
             split_modulestore = modulestore().default_modulestore
-            course_entry = split_modulestore._lookup_course(usage_id.course_key.for_branch(ModuleStoreEnum.BranchName.published))
+            # pylint: disable=protected-access
+            course_entry = split_modulestore._lookup_course(
+                usage_id.course_key.for_branch(ModuleStoreEnum.BranchName.published)
+            )
             return split_modulestore.create_runtime(course_entry, lazy=True).id_reader.get_definition_id(usage_id)
 
         # Newer key types should encode their own definition ID:

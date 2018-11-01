@@ -3,7 +3,6 @@ API Client for Blockstore bundle API
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 from collections import namedtuple
-from future.moves.urllib.parse import urljoin
 from uuid import UUID
 
 from django.conf import settings
@@ -11,6 +10,7 @@ import requests
 
 Bundle = namedtuple('Bundle', ['uuid', 'title', 'slug'])
 BundleFile = namedtuple('BundleFile', ['path', 'size', 'data_url'])
+
 
 def api_url(*path_parts):
     if not settings.BLOCKSTORE_API_URL.endswith('/api/v1/'):
@@ -47,7 +47,11 @@ def get_bundle_files(bundle_uuid):
     ]
     return files
 
+
 def get_bundle_file_metadata(bundle_uuid, path):
+    """
+    Get the metadata of the specified file.
+    """
     assert isinstance(bundle_uuid, UUID)
     # TODO: the following URL needs a weird double // ("".../files//file.xml")
     response = requests.get(api_url('bundles', str(bundle_uuid), 'files', path))
@@ -56,8 +60,9 @@ def get_bundle_file_metadata(bundle_uuid, path):
     return BundleFile(
         path=file_metadata['path'],
         size=file_metadata['size'],
-        data_url = file_metadata['data'],
+        data_url=file_metadata['data'],
     )
+
 
 def get_bundle_file_data(bundle_uuid, path):
     """

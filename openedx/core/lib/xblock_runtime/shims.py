@@ -1,3 +1,7 @@
+"""
+Code to implement backwards compatibility
+"""
+# pylint: disable=no-member
 from __future__ import absolute_import, division, print_function, unicode_literals
 import warnings
 
@@ -11,6 +15,9 @@ class RuntimeShim(object):
     """
     @property
     def error_tracker(self):
+        """
+        Accessor for the course's error tracker
+        """
         warnings.warn(
             "Use of system.error_tracker is deprecated; use self.runtime.service(self, 'error_tracker') instead",
             DeprecationWarning, stacklevel=2,
@@ -53,6 +60,9 @@ class XBlockShim(object):
     """
     @property
     def location(self):
+        """
+        Accessor for the usage ID
+        """
         warnings.warn(
             "Use of block.location should be replaced with block.scope_ids.usage_id",
             DeprecationWarning, stacklevel=2,
@@ -61,6 +71,9 @@ class XBlockShim(object):
 
     @property
     def system(self):
+        """
+        Accessor for the XModule runtime
+        """
         warnings.warn(
             "Use of block.system should be replaced with block.runtime",
             DeprecationWarning, stacklevel=2,

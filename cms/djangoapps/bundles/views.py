@@ -1,10 +1,13 @@
+"""
+Views for dealing with XBlocks that are in a Blockstore bundle.
+"""
 from __future__ import absolute_import, division, print_function, unicode_literals
 from uuid import UUID
 
 from django.http import Http404, JsonResponse, HttpResponseBadRequest
 from django.urls import reverse
 import six
-from xblock.exceptions import NoSuchViewError, XBlockNotFoundError
+from xblock.exceptions import NoSuchViewError
 from xblock.runtime import DictKeyValueStore
 
 from opaque_keys.edx.keys import UsageKey
@@ -23,6 +26,7 @@ def get_blockstore_kvs():
     class as the underlying data store for authored data. It reads and
     writes XML data from bundles in blockstore.
     """
+    # pylint: disable=protected-access
     if not hasattr(get_blockstore_kvs, '_kvs'):
         get_blockstore_kvs._kvs = BlockstoreKVS()
     return get_blockstore_kvs._kvs
@@ -35,6 +39,7 @@ def get_user_state_kvs():
 
     This user state is not persisted anywhere.
     """
+    # pylint: disable=protected-access
     if not hasattr(get_user_state_kvs, '_kvs'):
         get_user_state_kvs._kvs = DictKeyValueStore()
     return get_user_state_kvs._kvs
@@ -45,9 +50,11 @@ def get_readonly_runtime_system():
     Get the XBlockRuntimeSystem for viewing content in Studio but
     not editing it at the moment
     """
+    # pylint: disable=protected-access
     if not hasattr(get_readonly_runtime_system, '_system'):
         get_readonly_runtime_system._system = XBlockRuntimeSystem(
-            handler_url=lambda *args, **kwargs: 'test_url',  # TODO: Need an actual method for calling handler_urls with this runtime
+            # TODO: Need an actual method for calling handler_urls with this runtime:
+            handler_url=lambda *args, **kwargs: 'test_url',
             authored_data_kvs=get_blockstore_kvs(),
             student_data_kvs=get_user_state_kvs(),
             runtime_class=BlockstoreXBlockRuntime,
@@ -63,7 +70,7 @@ def bundle_blocks(request, bundle_uuid_str):
     bundle = get_bundle(bundle_uuid)
     if bundle is None:
         raise Http404("Bundle not found")
-    
+
     data = list_olx_definitions(bundle_uuid)
     result = []
     for path, entries in six.viewitems(data):

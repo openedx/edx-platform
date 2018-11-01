@@ -1,18 +1,18 @@
+"""
+Common base classes for all new XBlock runtimes.
+"""
 from __future__ import absolute_import, division, print_function, unicode_literals
-import warnings
 
 from django.utils.lru_cache import lru_cache
-from xblock.core import XBlock, XBlockAside
-from xblock.field_data import ReadOnlyFieldData, SplitFieldData
-from xblock.fields import Scope, ScopeIds
-from xblock.runtime import Runtime, IdReader, IdGenerator, NullI18nService, MemoryIdManager, KvsFieldData
+from xblock.exceptions import NoSuchServiceError
+from xblock.field_data import SplitFieldData
+from xblock.fields import Scope
+from xblock.runtime import Runtime, NullI18nService, MemoryIdManager, KvsFieldData
 
 from openedx.core.lib.xblock_utils import xblock_local_resource_url
 from xmodule.errortracker import make_error_tracker
-from .blockstore_kvs import collect_parsed_fields
 from .id_managers import OpaqueKeyReader
 from .shims import RuntimeShim, XBlockShim
-
 
 
 class XBlockRuntime(RuntimeShim, Runtime):
@@ -44,7 +44,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
         self.user_id = user_id
 
     def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
-        return system.handler_url(block, handler_name, suffix, query, thirdparty)
+        return self.system.handler_url(block, handler_name, suffix, query, thirdparty)
 
     def resource_url(self, resource):
         raise NotImplementedError("resource_url is not supported by Open edX.")
@@ -55,7 +55,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
     def publish(self, block, event_type, event_data):
         if block.scope_ids.user_id != self.user_id:
             raise ValueError("XBlocks are not allowed to publish events for other users.")  # Is that true?
-        pass  # TODO: publish events properly
+        # TODO: publish events properly
 
     def applicable_aside_types(self, block):
         """ Disable XBlock asides in this runtime """
@@ -66,11 +66,11 @@ class XBlockRuntime(RuntimeShim, Runtime):
         raise NotImplementedError("XML Serialization is only supported with BlockstoreXBlockRuntime")
 
     def add_node_as_child(self, block, node, id_generator=None):
-         """
-         Called by XBlock.parse_xml to treat a child node as a child block.
-         """
-         # Deny access to the inherited method
-         raise NotImplementedError("XML Serialization is only supported with BlockstoreXBlockRuntime")
+        """
+        Called by XBlock.parse_xml to treat a child node as a child block.
+        """
+        # Deny access to the inherited method
+        raise NotImplementedError("XML Serialization is only supported with BlockstoreXBlockRuntime")
 
     def service(self, block, service_name):
         """
@@ -87,6 +87,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
         if service is None:
             service = super(XBlockRuntime, self).service(block, service_name)
         return service
+
 
 class XBlockRuntimeSystem(object):
     """
@@ -156,7 +157,7 @@ class XBlockRuntimeSystem(object):
         return None  # None means see if XBlockRuntime offers this service
 
     @lru_cache(maxsize=32)
-    def get_error_tracker_for_context(self, context_key):
+    def get_error_tracker_for_context(self, context_key):  # pylint: disable=unused-argument
         """
         Get an error tracker for the specified context.
         lru_cache makes this error tracker long-lived, for

@@ -1,7 +1,12 @@
+"""
+Key types and implementations for locating usages of block definitions.
+When a definition is used in a specific learning context, that's called a usage.
+"""
+# Disable warnings about _to_deprecated_string etc. which we don't want to implement:
+# pylint: disable=abstract-method
 from __future__ import absolute_import, division, print_function, unicode_literals
 import warnings
 
-from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
 
 from .learning_context_key import global_context
@@ -32,7 +37,6 @@ class GlobalUsageLocator(BlockUsageKeyV2):
     __slots__ = KEY_FIELDS
     CHECKED_INIT = False
 
-
     def __init__(self, definition_key):
         """
         Construct a GlobalUsageLocator
@@ -44,7 +48,7 @@ class GlobalUsageLocator(BlockUsageKeyV2):
     @property
     def context_key(self):
         return global_context
-    
+
     def block_type(self):
         """
         The XBlock type of this usage.
@@ -69,7 +73,7 @@ class GlobalUsageLocator(BlockUsageKeyV2):
         """
         Serialize this key as a string
         """
-        return self.definition_key._to_string()
+        return self.definition_key._to_string()  # pylint: disable=protected-access
 
     @classmethod
     def _from_string(cls, serialized):

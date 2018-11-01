@@ -1,3 +1,8 @@
+"""
+Defines keys for "learning contexts" and the global learning context singleton.
+"""
+# Disable warnings about _to_deprecated_string etc. which we don't want to implement:
+# pylint: disable=abstract-method
 from __future__ import absolute_import, division, print_function, unicode_literals
 from opaque_keys import OpaqueKey, InvalidKeyError
 
@@ -33,15 +38,12 @@ class GlobalContextLocator(LearningContextKey):
     CHECKED_INIT = False
     KEY_VALUE = 'global'
 
-    def __init__(self):
-        super(GlobalContextLocator, self).__init__()
-
     def _to_string(self):
         return self.KEY_VALUE
 
     @classmethod
     def _from_string(cls, serialized):
-        if (serialized != cls.KEY_VALUE):
+        if serialized != cls.KEY_VALUE:
             raise InvalidKeyError(cls, serialized)
         return cls()
 
@@ -53,7 +55,7 @@ class GlobalContextLocator(LearningContextKey):
         """
         if usage_id is not None:
             raise ValueError("Cannot have a usage_id in the global context")
-        from .usage_locator import GlobalUsageLocator  # Avoid circular import        
+        from .usage_locator import GlobalUsageLocator  # Avoid circular import
         return GlobalUsageLocator(definition_key)
 
 global_context = GlobalContextLocator()

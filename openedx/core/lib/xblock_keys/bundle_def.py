@@ -1,3 +1,9 @@
+"""
+Implementation of keys to locate XBlock definitions in Blockstore
+"""
+# Disable warnings about _to_deprecated_string etc. which we don't want to implement.
+# And fix warnings about key fields, which pylint doesn't see as member variables.
+# pylint: disable=abstract-method, no-member
 from __future__ import absolute_import, division, print_function, unicode_literals
 from uuid import UUID
 
