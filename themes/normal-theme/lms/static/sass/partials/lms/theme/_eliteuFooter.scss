@@ -1,0 +1,138 @@
+// my-footer
+.my-footer{
+  width: 100%;
+  color: $font;
+  font-size: 14px;
+  border-top: 1px solid $border;
+  line-height: 1.8;
+  padding: 40px 0;
+
+  // 1. 布局
+  .footer-content{
+    width: 96%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .footer-app{
+    display: inline-block;
+    width: 25%;
+    vertical-align: text-top;
+  }
+
+  .footer-wechat{
+    text-align: center;
+    display: inline-block;
+    width: 13%;
+    vertical-align: text-top;
+  }
+
+  // 2. 中间链接
+  .footer-links{
+    display: inline-block;
+    width: 60%;
+  }
+  .footer-list{
+    display: inline-block;
+    width: 24.5%;
+    vertical-align: text-top;
+  }
+  ul{
+    list-style: none;
+    padding: 0;
+    margin: 20px 0 0 0;
+  }
+  li{
+    cursor: pointer;
+  }
+  a,a:not(.btn){
+    color: $font;
+  }
+  a:hover,a:not(.btn):hover{
+    text-decoration: none;
+    color: $blue;
+  }
+  h3{
+    font-size: 14px;
+    color: $title;
+  }
+
+  // 3. 左侧app按钮
+  .logo{
+    width: 120px;
+  }
+  .slogan{
+    margin: 10px 0;
+  }
+  .footer-btn{
+    display: inline-block;
+    border: 1px solid $blue;
+    color: $blue;
+    border-radius: 4px;
+    margin-right: 5px;
+    padding: 4px 10px 2px;
+    cursor: pointer;
+  }
+  .footer-icon{
+    font-size: 16px;
+    vertical-align: middle;
+  }
+  .footer-icon svg{
+    fill: $blue;
+  }
+
+  .footer-btn:hover{
+    color: #fff;
+    background: $blue;
+    .footer-icon svg{
+      fill: #fff;
+    }
+  }
+  // Wechat
+  .footer-qrcode{
+    width: 60px;
+    margin: 10px 0;
+  }
+  .footer-wechat div{
+    font-size: 12px;
+  }
+  // 备案信息
+  .footer-text{
+    text-align: center;
+    margin-top: 30px;
+    padding: 0 20px;
+  }
+}
+
+@media screen and (max-width: 996px){
+  .my-footer{
+    .footer-app, .footer-wechat{
+      display: none;
+    }
+    .footer-links{
+      width: 100%;
+    }
+    .footer-list{
+      min-width: 160px;
+    }
+  }
+  
+}
+
+@media screen and (max-width:767px){
+  .my-footer{
+    .footer-content{
+      width: 80%;
+    }
+    .footer-list{
+      width: 49%;
+      margin-bottom: 30px;
+    }
+    ul{
+      margin: 10px 0 0 0;
+    }
+    .footer-text{
+      margin-top: 0;
+    }
+  }
+}

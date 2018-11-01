@@ -1,0 +1,355 @@
+*{  
+  box-sizing: content-box;
+}
+@media screen and (min-width: 768px) {
+  .content-wrapper {
+    padding: 0;
+  }
+}
+
+.content-wrapper{ 
+  margin: 0 auto;
+  max-width: none;
+  width: 100%;
+  flex: 1;
+}
+//courses
+.find-courses .courses-container .courses .courses-listing .courses-listing-item, .university-profile .courses-container .courses .courses-listing .courses-listing-item{
+  margin-top: 0;
+}
+
+
+
+//课程详情页
+.course-info header.course-profile .intro-inner-wrapper{  
+  max-width: 1200px;
+  border: none;
+}
+.find-courses, .university-profile{
+  background: none;
+}
+
+.find-courses .courses-container, .university-profile .courses-container{
+  padding: 0;
+}
+
+.highlighted-courses .courses, .find-courses .courses{
+  padding: 30px 0 15px;
+}
+.course-info header.course-profile{ 
+  padding-top: 60px;
+  background: url('../images/course_bg.jpg');
+}
+.wrapper-course-material .course-tabs .tab a, .wrapper-course-material .course-tabs .tab a:visited {
+  padding: 20px 15px 13px 15px;
+}
+// course card border
+.highlighted-courses .courses .course, .find-courses .courses .course{
+  border-radius: 3px;
+  border: none;
+}
+.courses-container .courses .course .course-image .cover-image .learn-more{
+  display: none;
+}
+//头部
+
+.window-wrap .global-header{
+  border-bottom: none;
+  overflow: inherit;
+  // height: 63px;
+  .main-header{
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .header-logo{ 
+    a{  
+      margin-left: 0px;
+    }
+  }
+}
+@media (max-width: 991px){  
+  .window-wrap .global-header .header-logo a{ 
+    margin-left: 50%;
+  }
+}
+
+
+@media screen and (min-width: 992px){ 
+  .global-header{ 
+    .nav-links{
+      .main .nav-tab a {  
+        // padding-top: 0px;
+      }
+      .secondary{
+        margin-right: 0px;
+        .nav-item.nav-item-dropdown {
+          position: relative;
+        }
+      }
+    }
+  } 
+}
+
+
+
+//尾部
+.wrapper-footer footer#footer-openedx{  
+  max-width: 1200px;
+}
+
+//查看课程页
+//导航
+.content-wrapper .course-tabs{  
+  max-width: 1200px;
+  margin: 0 auto;
+}
+//内容
+.page-content-container{  
+  max-width: 1200px;
+}
+
+.wrapper-footer{  
+  box-shadow: none;
+  border-top: 1px solid #ccd1d9;
+}
+.course-info header.course-profile .intro-inner-wrapper .intro .main-cta span.register, .course-info header.course-profile .intro-inner-wrapper .intro .main-cta span.add-to-cart{
+  height: 45px;
+  line-height: 25px;
+  border-radius: 3px;
+  border-color: #ccd1d9;
+  margin-top: 0;
+}
+
+//课程卡片
+.courses-container{ 
+  max-width: 1200px;
+}
+
+//登录之后的
+#main{  
+  max-width:100%;
+  margin:0 auto;
+}
+.home>header .outer-wrapper{  
+  max-width: 1200px;
+}
+.dashboard{ 
+  width: 1200px;
+  margin: 0 auto;
+}
+.home>header{ 
+  background: url("../images/index_bg.png") no-repeat center top;
+}
+.home>header .title{  
+  box-shadow:0 4px 5px 0 rgba(0,0,0,0.2);
+}
+//头像样式
+@media screen and (min-width: 768px){ 
+
+  .global-header .nav-links .secondary .dropdown-user-menu{ 
+    right:8px;
+    top: 49px;
+  }
+}
+//登录后的课程
+.dashboard .main-container{ 
+  padding-left: 0px;
+  padding-top: 30px;
+}
+.dashboard .side-container{
+  padding-top: 30px;
+}
+
+.dashboard .main-container .my-courses .listing-courses .course-item .course-container{
+  background: #fff;
+}
+
+
+//programs的页面
+@media (min-width: 576px){ 
+  #main{
+    .program-cards-container{ 
+      margin-left: 0px;
+    }
+    .program-list-wrapper{  
+      padding-left:0px;
+    }
+    .empty-programs-message{  
+      margin-left: 0px;
+    }
+  }
+}
+
+// 详情页面
+.wrapper-preview-menu .preview-menu {
+  width: auto;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+// Profile
+// .content-wrapper{ 
+//   // margin-top: 20px;
+//   // margin-bottom: 20px;
+// }
+.view-profile .content-wrapper{ 
+  // margin-top: 20px;
+  margin-bottom: 20px;
+}
+.profile.profile-self{ 
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+
+
+//注册
+
+.login-register .submission-error{  
+  border-bottom: none;
+  border-radius: 3px;
+}
+.login-register .form-field input,.login-register .form-field select{  
+  border-radius: 3px;
+  height: 34px;
+}
+
+
+.login-register .action-primary, .financial-assistance-wrapper .financial-assistance-form .action-primary{  
+  border-radius: 3px;
+}
+
+//flex布局
+
+.window-wrap{  
+  display: -webkit-flex;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+.wrapper-preview-menu{  
+  width: 100%;
+}
+body.view-in-course .container .course-wrapper, body.view-in-course .profile-wrapper, body.view-in-course .instructor-dashboard-wrapper-2, body.view-in-course .wiki-wrapper, body.view-in-course .teams-wrapper, body.view-in-course .static_tab_wrapper{ 
+  max-width: 1200px;
+}
+// 教授介绍
+.about-tab{
+  display: inline-block;
+  height: 44px;
+  line-height: 44px;
+  margin-right: 26px;
+}
+.about-tab-active {
+  border-bottom: 1px solid $bule;
+}
+
+.content-wrapper {
+  background: #F5F7FA;
+  background-image: none;
+  background-size: auto auto;
+  background-image: linear-gradient(rgba(230,233,237,.1) 1px, transparent 0), linear-gradient(90deg, rgba(230,233,237,.1) 1px, transparent 0), linear-gradient(rgba(230,233,237,.1) 1px, transparent 0), linear-gradient(90deg, rgba(230,233,237,.1)1px, transparent 0);
+  background-size: 5px 5px, 5px 5px, 30px 30px, 30px 30px;
+}
+
+
+// 
+.modal .inner-wrapper form .submit input[type="submit"], .leanModal_box .inner-wrapper form .submit input[type="submit"], .entitlement-unenrollment-modal .inner-wrapper form .submit input[type="submit"], .entitlement-unenrollment-modal .entitlement-unenrollment-modal-inner-wrapper form .submit input[type="submit"] {
+  width: inherit;
+}
+
+
+
+
+
+
+// 1. 课程详情页
+.course-info .details .my-theme-course-about{
+  font-family: $font-family-sans-serif;
+  font-size: 14px;
+  color: $font;
+  line-height: 1.8;
+
+  p{
+    margin-bottom: 20px;
+  }
+
+  h3{
+    color:$title;
+    font-size: 14px;
+    margin-top: 30px;
+    font-weight: bold;
+    margin-bottom: 3px;
+  }
+
+  .about-info div, .about-staff div{
+    margin-top: 20px;
+  }
+
+  // 1.1 课程详情页 tab
+  .about-tabs{
+    border-bottom:1px solid $border;
+  }
+  .about-tab{
+    display: inline-block;
+    line-height: 38px;
+    margin-right: 20px;
+    color: $title;
+    cursor: pointer;
+  }
+  .about-tab-active {
+    border-bottom: 2px solid $bule;
+  }
+  .about-tabs{ 
+    margin-bottom: 30px;
+  }
+  
+
+  // 1.1 课程详情页 课程简介
+  .about-info ul{
+    padding: 0 0 0 20px;
+    margin: 0;
+  }
+
+  // 1.2 课程性情页 授课老师 
+  .about-staff ul{
+    list-style: none;
+    padding: 0;
+    margin:0;
+  }
+  .about-staff-block{
+    position: relative;
+    padding-left: 150px;
+    height: 140px;
+  }
+  .about-staff-img{  
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    border: 3px solid #e6e9ed;
+    margin-right: 25px;
+  }
+  .about-staff-name{ 
+    color: $bule;
+    font-size: 18px;
+    font-weight: bold;
+    padding-top:30px;
+    display: block;
+  }
+  .about-outline-indent{
+    padding-left: 20px;
+  }
+
+  // 1.3 课程详情页 大纲
+  .about-outline{
+    padding-left: 20px;
+  }
+
+  .about-outline h3{
+    position: relative;
+    left: -20px;
+  }
+}

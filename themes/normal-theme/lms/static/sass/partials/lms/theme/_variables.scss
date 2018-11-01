@@ -1,0 +1,40 @@
+// Sample red theme to demonstrate SASS overrides
+
+// Theme colors
+//
+// Note: define colors needed by your theme first
+
+// Define the primary red color
+$bule: #4788C7;
+//基础绿色按钮
+$m-green:#40A24D;
+
+//基础红色
+$red:#D8353E;
+// Make red the primary color
+$primary: $bule;
+
+$border: #E6E9ED;
+
+$font: #656D78;
+$title: #2E313C;
+$note: #AAB2BD;
+// Theme fonts
+//$font-family-sans-serif: cursive;
+
+$font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,"Helvetica Neue", Helvetica,Tahoma，Arial, "PingFang SC", "Hiragino Sans GB", 
+"Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei",SimHei，sans-serif;
+$georgia: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,"Helvetica Neue", Helvetica,Tahoma，Arial, "PingFang SC", "Hiragino Sans GB", 
+"Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei",SimHei，sans-serif;
+$helvetica: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,"Helvetica Neue", Helvetica,Tahoma，Arial, "PingFang SC", "Hiragino Sans GB", 
+"Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei",SimHei，sans-serif;
+$lucida-grande: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,"Helvetica Neue", Helvetica,Tahoma，Arial, "PingFang SC", "Hiragino Sans GB", 
+"Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei",SimHei，sans-serif;
+$monospace: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,"Helvetica Neue", Helvetica,Tahoma，Arial, "PingFang SC", "Hiragino Sans GB", 
+"Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei",SimHei，sans-serif;
+$verdana: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,"Helvetica Neue", Helvetica,Tahoma，Arial, "PingFang SC", "Hiragino Sans GB", 
+"Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei",SimHei，sans-serif;
+
+// Initialize the Open edX Bootstrap theme
+@import 'edx-bootstrap/sass/open-edx/theme';
+
