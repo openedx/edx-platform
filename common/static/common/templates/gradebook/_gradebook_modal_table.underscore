@@ -19,15 +19,12 @@
         <table id="grade-override-modal-table">
           <thead>
             <th><%- strLib.studentNameHeading %></th>
-            <th id="auto-grade-header"></th>
             <th id="adjusted-grade-header"></th>
           </thead>
           <tbody>
             <% _.each(studentsData, function(student){ %>
               <tr data-user-id="<%- student.user_id %>" data-course-id="<%- student.course_id %>" data-username="<%- student.username %>">
                 <td class="user-student-name"><%- student.full_name || student.username %></td>
-                <td class="user-auto-grade" data-username="<%- student.username %>">
-                </td>
                 <td class="user-adjusted-grade" data-username="<%- student.username %>">
                     <input type=text>/<span></span>
                 </td>

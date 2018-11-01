@@ -98,7 +98,7 @@ $(document).ready(function() {
             const options = {
                 columnDefs: [{
                     orderable: false,
-                    targets: 2
+                    targets: 1
                 }],
                 language: {
                     zeroRecords: ''
@@ -299,7 +299,6 @@ $(document).ready(function() {
     function fillModalTemplate() {
         var $modal = $('.grade-override-modal');
         var $adjustedGradeHeader = $modal.find('#adjusted-grade-header');
-        var $autoGradeHeader = $modal.find('#auto-grade-header');
         var $manualGradeVisibilityWrapper = $modal.find('#manual-grade-visibility');
         var $saveGradeOverrideButton = $modal.find('.grade-override-modal-save');
         var $tableWrapper = $modal.find('.grade-override-table-wrapper');
@@ -312,59 +311,46 @@ $(document).ready(function() {
         $modal.find('.assignment-name-placeholder').text(assignmentName);
         $modal.find('.block-id-placeholder').text(blockID);
         $modal.find('.grade-override-info-container').hide();
-        if ( _.isEmpty(userAutoGrades) ) {
-            $tableWrapper.hide();
-            $manualGradeVisibilityWrapper.toggle(false);
-            $modal.find('.grade-override-message').text(gettext('There are no student grades to adjust.'));
-            $modal.find('.grade-override-message').show();
-            $saveGradeOverrideButton.hide();
-        }
-        else {
-            $adjustedGradeHeader.text(isManualGrading ? 'Manual grade' : 'Adjusted grade');
-            $autoGradeHeader.text(isManualGrading ? 'Current grade' : 'Auto grade');
+        $adjustedGradeHeader.text(isManualGrading ? 'Manual grade' : 'Grade');
 
-            $manualGradeVisibilityWrapper.toggle(isManualGrading);
-            $saveGradeOverrideButton.attr('data-manual-grading', isManualGrading);
-            $manualGradeVisibilityWrapper.attr('data-visibility', gradesPublished);
-            $('input[name=grades-published]').prop('checked', gradesPublished);
+        $manualGradeVisibilityWrapper.toggle(isManualGrading);
+        $saveGradeOverrideButton.attr('data-manual-grading', isManualGrading);
+        $manualGradeVisibilityWrapper.attr('data-visibility', gradesPublished);
+        $('input[name=grades-published]').prop('checked', gradesPublished);
 
-            $tableWrapper.attr('data-manual-grading', isManualGrading);
-            $tableWrapper.show();
-            $modal.find('#modal-table-empty-message').hide();
-            $saveGradeOverrideButton.show().prop('disabled', true);
-            modalDataTable.$('tr').each(function(){
-                $(this).attr('data-block-id', blockID);
-                var $adjustedGradePlaceholder = $(this).find('td.user-adjusted-grade');
-                var $autoGradePlaceholder = $(this).find('td.user-auto-grade');
-                var username = $autoGradePlaceholder.attr('data-username');
+        $tableWrapper.attr('data-manual-grading', isManualGrading);
+        $tableWrapper.show();
+        $modal.find('#modal-table-empty-message').hide();
+        $saveGradeOverrideButton.show().prop('disabled', true);
+        modalDataTable.$('tr').each(function(){
+            $(this).attr('data-block-id', blockID);
+            var $adjustedGradePlaceholder = $(this).find('td.user-adjusted-grade');
+            var username = $adjustedGradePlaceholder.attr('data-username');
 
-                if (username in userAutoGrades) {
-                    $autoGradePlaceholder.text(userAutoGrades[username]);
-                    var autoEarnedGrade = userAutoGrades[username].split('/')[0],
-                        autoPossibleGrade = userAutoGrades[username].split('/')[1];
-                    $adjustedGradePlaceholder.attr('data-score-earned', autoEarnedGrade);
-                    $adjustedGradePlaceholder.attr('data-score-possible', autoPossibleGrade);
-                    $autoGradePlaceholder.attr('data-sort', autoEarnedGrade);
+            if (username in userAutoGrades) {
+                var autoEarnedGrade = userAutoGrades[username].split('/')[0],
+                    autoPossibleGrade = userAutoGrades[username].split('/')[1];
+                $adjustedGradePlaceholder.attr('data-score-earned', autoEarnedGrade);
+                $adjustedGradePlaceholder.attr('data-score-possible', autoPossibleGrade);
 
-                    if (username in userAdjustedGrades) {
-                        var adjustedGrade = userAdjustedGrades[username].split('/')[0];
-                        $adjustedGradePlaceholder.attr('data-score-earned', adjustedGrade);
-                        $adjustedGradePlaceholder.attr('data-sort', adjustedGrade);
-                        $adjustedGradePlaceholder.addClass('has-adjusted-score');
-                    }
-                    else if (isManualGrading) {
-                        $adjustedGradePlaceholder.attr('data-sort', autoEarnedGrade);
-                    }
-                    else {
-                        $adjustedGradePlaceholder.attr('data-sort', autoEarnedGrade);
-                    }
-                    $adjustedGradePlaceholder.find('input').val($adjustedGradePlaceholder.attr('data-score-earned'));
-                    $adjustedGradePlaceholder.find('span').text($adjustedGradePlaceholder.attr('data-score-possible'));
+                if (username in userAdjustedGrades) {
+                    var adjustedGrade = userAdjustedGrades[username].split('/')[0];
+                    $adjustedGradePlaceholder.attr('data-score-earned', adjustedGrade);
+                    $adjustedGradePlaceholder.attr('data-sort', adjustedGrade);
+                    $adjustedGradePlaceholder.addClass('has-adjusted-score');
                 }
-                else
-                    $(this).hide();
-            });
-        }
+                else if (isManualGrading) {
+                    $adjustedGradePlaceholder.attr('data-sort', autoEarnedGrade);
+                }
+                else {
+                    $adjustedGradePlaceholder.attr('data-sort', autoEarnedGrade);
+                }
+                $adjustedGradePlaceholder.find('input').val($adjustedGradePlaceholder.attr('data-score-earned'));
+                $adjustedGradePlaceholder.find('span').text($adjustedGradePlaceholder.attr('data-score-possible'));
+            }
+            else
+                $(this).hide();
+        });
         $modal.show();
     }
 
@@ -430,15 +416,13 @@ $(document).ready(function() {
     }
 
     $(document).on('keyup focus', '.user-adjusted-grade input', function(){
-        var $row = $(this).parents('tr'),
-            $cell = $(this).parents('td'),
-            autoGrade = $row.find('.user-auto-grade').html().split('/')[0],
+        var $cell = $(this).parents('td'),
             previousGrade = $cell.attr('data-score-earned');
             adjustedGrade = $(this).val();
 
         $cell.attr('data-sort', adjustedGrade);
 
-        if (autoGrade != adjustedGrade || previousGrade != adjustedGrade)
+        if (previousGrade != adjustedGrade)
             $(this).addClass('score-visited');
         else
             $(this).removeClass('score-visited');
@@ -460,9 +444,7 @@ $(document).ready(function() {
             var $gradeCell = $row.find('.user-adjusted-grade');
             var $grade = $gradeCell.find('input');
             var username = $gradeCell.attr('data-username');
-            var autoGrade;
             var grade;
-            var removeAdjustedGrade;
 
             if ($grade.hasClass('score-visited'))
                 adjustedGradesData[username] = {
@@ -473,12 +455,10 @@ $(document).ready(function() {
                 };
 
             if (username in adjustedGradesData) {
-                autoGrade = $row.find('.user-auto-grade').text().split('/')[0];
                 grade = $grade.val().trim();
-                removeAdjustedGrade = isManualGrading || autoGrade === grade;
 
                 adjustedGradesData[username].grade = grade;
-                adjustedGradesData[username].remove_adjusted_grade = removeAdjustedGrade;
+                adjustedGradesData[username].remove_adjusted_grade = true;
                 adjustedGradesData[username].section_block_id = sectionBlockId;
             }
         });
