@@ -953,6 +953,91 @@ class GradebookViewTest(GradebookViewTestBase):
                 )
                 self._assert_empty_response(resp)
 
+    def test_ungraded_subsection(self):
+        """
+        Tests that an ungraded subsection is returned with the response data, and that the default
+        subsection label is returned (since no short label is generated for ungraded content).
+        """
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
+            course_grade = self.mock_course_grade(self.student, passed=True, letter_grade='A', percent=0.85)
+            ungraded_subsection = ItemFactory.create(
+                category='sequential',
+                parent_location=self.chapter_2.location,
+                due=datetime(2017, 12, 18, 11, 30, 00),
+                display_name='HW 3',
+                format='Homework',
+                graded=False,
+            )
+            subsection_grade = self.mock_subsection_grade(
+                ungraded_subsection,
+                earned_all=0.0,
+                possible_all=1.0,
+                earned_graded=0.0,
+                possible_graded=0.0,
+            )
+            course_grade.chapter_grades[self.chapter_2.location]['sections'].append(subsection_grade)
+            mock_grade.return_value = course_grade
+
+            with override_waffle_flag(self.waffle_flag, active=True):
+                self.login_staff()
+                resp = self.client.get(
+                    self.get_url(course_key=self.course.id, username=self.student.username)
+                )
+
+                expected_subsection_breakdown = self.expected_subsection_grades(letter_grade='A')
+                expected_subsection_breakdown.append(OrderedDict([
+                    ('are_grades_published', True),
+                    ('auto_grade', False),
+                    ('category', 'Homework'),
+                    ('chapter_name', 'Chapter 2'),
+                    ('comment', ''),
+                    ('detail', ''),
+                    ('displayed_value', '0.00'),
+                    ('is_graded', False),
+                    ('grade_description', '(0.00/0.00)'),
+                    ('is_ag', False),
+                    ('is_average', False),
+                    ('is_manually_graded', False),
+                    ('label', 'Ch. 02-03'),
+                    ('letter_grade', 'A'),
+                    ('module_id', text_type(ungraded_subsection.location)),
+                    ('percent', 0.0),
+                    ('score_earned', 0.0),
+                    ('score_possible', 0.0),
+                    ('section_block_id', text_type(self.chapter_2.location)),
+                    ('subsection_name', 'HW 3')
+                ]))
+
+                expected_results = OrderedDict([
+                    ('course_id', text_type(self.course.id)),
+                    ('email', self.student.email),
+                    ('user_id', self.student.id),
+                    ('username', self.student.username),
+                    ('full_name', self.student.get_full_name()),
+                    ('passed', True),
+                    ('percent', 0.85),
+                    ('letter_grade', 'A'),
+                    ('progress_page_url', reverse(
+                        'student_progress',
+                        kwargs=dict(course_id=text_type(self.course.id), student_id=self.student.id)
+                    )),
+                    ('section_breakdown', expected_subsection_breakdown),
+                    ('aggregates', {
+                        'Lab': {
+                            'score_earned': 2.0,
+                            'score_possible': 4.0,
+                        },
+                        'Homework': {
+                            'score_earned': 2.0,
+                            'score_possible': 4.0,
+                        },
+                    }),
+                ])
+
+                self.assertEqual(status.HTTP_200_OK, resp.status_code)
+                actual_data = dict(resp.data)
+                self.assertEqual(expected_results, actual_data)
+
 
 class GradebookBulkUpdateViewTest(GradebookViewTestBase):
     """
