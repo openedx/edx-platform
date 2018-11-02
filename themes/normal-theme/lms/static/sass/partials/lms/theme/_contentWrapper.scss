@@ -188,10 +188,9 @@
 }
 
 // Profile
-// .content-wrapper{ 
-//   // margin-top: 20px;
-//   // margin-bottom: 20px;
-// }
+.content-wrapper{ 
+  padding-bottom: 20px;
+}
 .view-profile .content-wrapper{ 
   // margin-top: 20px;
   margin-bottom: 20px;
@@ -352,4 +351,10 @@ body.view-in-course .container .course-wrapper, body.view-in-course .profile-wra
     position: relative;
     left: -20px;
   }
+}
+
+//选择课程
+.verification-process.step-select-track .container{ 
+  max-width: 1200px;
+  padding:30px 0;
 }
