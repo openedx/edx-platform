@@ -1,0 +1,32 @@
+.content-paywall {
+    margin-top: 10px;
+    border-radius: 5px 5px 5px 5px;
+    display: flex;
+    justify-content: space-between;
+    border: lightgrey 1px solid;
+    padding: 15px 20px;
+}
+.content-paywall h3 {
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+.content-paywall .fa-lock {
+    color: black;
+    margin-right: 10px;
+    font-size: 24px;
+    margin-left: 5px;
+}
+.content-paywall .certDIV_1 {
+    color: rgb(25, 125, 29);
+    height: 20px;
+    width: 300px;
+    font: normal normal 600 normal 14px / 20px 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+.content-paywall .certA_2 {
+    text-decoration: underline !important;
+    color: rgb(0, 117, 180);
+    font: normal normal 400 normal 16px / 25.6px 'Open Sans';
+}
+.content-paywall img {
+    height: 60px;
+}

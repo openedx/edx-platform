@@ -104,7 +104,8 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
         self.audit_user = UserFactory.create()
         self.enrollment = CourseEnrollmentFactory.create(user=self.audit_user, course_id=self.course.id, mode='audit')
 
-    def assert_block_is_gated(self, block, is_gated):
+    @patch("crum.get_current_request")
+    def assert_block_is_gated(self, block, is_gated, mock_get_current_request):
         '''
         This functions asserts whether the passed in block is gated by content type gating.
         This is determined by checking whether the has_access method called the IncorrectPartitionGroupError.
@@ -113,6 +114,8 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
         whether the IncorrectPartitionGroupError was called.
         '''
         fake_request = Mock()
+        fake_request = self.factory.get('')
+        mock_get_current_request.return_value = fake_request
 
         with patch.object(IncorrectPartitionGroupError, '__init__',
                           wraps=IncorrectPartitionGroupError.__init__) as mock_access_error:
