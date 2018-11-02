@@ -51,6 +51,17 @@ DATABASES = {
     }
 }
 
+PROCTORING_BACKENDS = {
+    'DEFAULT': 'mock',
+    'mock': {
+        'default_rules': {
+            'allow_snarfing': True,
+            'allow_grok': False,
+        }
+    },
+    'mock_proctoring_without_rules': {},
+}
+
 FEATURES = {}
 
 INSTALLED_APPS = (
