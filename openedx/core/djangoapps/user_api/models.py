@@ -295,7 +295,7 @@ class UserRetirementStatus(TimeStampedModel):
 
         UserRetirementRequest.create_retirement_request(user)
         rg_delete_retired_flag = settings.FEATURES.get('RG_DELETE_RETIRED', False)
-        rg_delete_retired_prefix = '#rg-delete-{}-'.format(int(time())) if rg_delete_flag else ''
+        rg_delete_retired_prefix = '#rg-delete-{}-'.format(int(time())) if rg_delete_retired_flag else ''
 
         return cls.objects.create(
             user=user,
