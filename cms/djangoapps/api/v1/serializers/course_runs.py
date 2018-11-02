@@ -182,7 +182,7 @@ class CourseRunRerunSerializer(CourseRunSerializerCommonFieldsMixin, CourseRunTe
         }
         fields.update(validated_data)
         new_course_run_key = rerun_course(user, course_run_key, course_run_key.org, course_run_key.course, _id['run'],
-                                          fields, async=False)
+                                          fields, background=False)
 
         course_run = get_course_and_check_access(new_course_run_key, user)
         self.update_team(course_run, team)
