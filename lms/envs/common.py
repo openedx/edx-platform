@@ -32,6 +32,7 @@ import imp
 import sys
 import os
 
+from corsheaders.defaults import default_headers as corsheaders_default_headers
 from path import Path as path
 from django.utils.translation import ugettext_lazy as _
 
@@ -2509,6 +2510,9 @@ if FEATURES.get('ENABLE_CORS_HEADERS'):
     CORS_ALLOW_CREDENTIALS = True
     CORS_ORIGIN_WHITELIST = ()
     CORS_ORIGIN_ALLOW_ALL = False
+    CORS_ALLOW_HEADERS = corsheaders_default_headers + (
+        'use-jwt-cookie',
+    )
 
 # Default cache expiration for the cross-domain proxy HTML page.
 # This is a static page that can be iframed into an external page
