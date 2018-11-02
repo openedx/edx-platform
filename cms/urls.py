@@ -278,3 +278,7 @@ if settings.FEATURES.get('ENABLE_API_DOCS'):
 
 from openedx.core.djangoapps.plugins import constants as plugin_constants, plugin_urls
 urlpatterns.extend(plugin_urls.get_patterns(plugin_constants.ProjectType.CMS))
+# Jupyter Graded XBlock Endpoints
+urlpatterns += (
+    url(r'^api/jupyter_graded/', include('xblock_jupyter_graded.rest.urls')),
+)
