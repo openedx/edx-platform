@@ -45,7 +45,7 @@ git+https://github.com/open-craft/xblock-poll@add89e14558c30f3c8dc7431e5cd6536ff
 alabaster==0.7.12         # via sphinx
 amqp==1.4.9
 analytics-python==1.1.0
-aniso8601==3.0.2
+aniso8601==4.0.1
 anyjson==0.3.3
 apipkg==1.5
 appdirs==1.4.3
@@ -113,7 +113,7 @@ django-require==1.0.11
 django-rest-swagger==2.2.0
 django-sekizai==0.10.0
 django-ses==0.8.4
-django-simple-history==2.4.0
+django-simple-history==2.5.1
 django-splash==0.2.2
 django-statici18n==1.4.0
 django-storages==1.4.1
@@ -138,7 +138,7 @@ edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==1.0.1
 edx-drf-extensions==2.0.1
-edx-enterprise==1.0.2
+edx-enterprise==1.0.3
 edx-i18n-tools==0.4.6
 edx-lint==0.5.5
 edx-milestones==0.1.13
@@ -146,7 +146,7 @@ edx-oauth2-provider==1.2.2
 edx-opaque-keys[django]==0.4.4
 edx-organizations==1.0.0
 edx-proctoring==1.4.0
-edx-rest-api-client==1.8.2
+edx-rest-api-client==1.9
 edx-search==1.2.1
 edx-sphinx-theme==1.3.0
 edx-submissions==2.0.12
@@ -154,17 +154,17 @@ edx-user-state-client==1.0.4
 edxval==0.1.21
 elasticsearch==1.9.0
 enum34==1.1.6
-event-tracking==0.2.4
+event-tracking==0.2.5
 execnet==1.5.0
 extras==1.0.0
 factory_boy==2.8.1
 faker==0.9.2
 feedparser==5.1.3
-filelock==3.0.9
+filelock==3.0.10
 firebase-token-generator==1.3.2
 fixtures==3.0.0
 flake8-polyfill==1.0.2
-flake8==3.5.0
+flake8==3.6.0
 flask==1.0.2
 freezegun==0.3.11
 fs-s3fs==0.1.8
@@ -189,7 +189,7 @@ ipaddr==2.1.11
 ipaddress==1.0.22
 isodate==0.6.0
 isort==4.3.4
-itsdangerous==0.24
+itsdangerous==1.1.0
 itypes==1.1.0
 jinja2-pluralize==0.3.0
 jinja2==2.10
@@ -227,11 +227,11 @@ oauthlib==2.1.0
 openapi-codec==1.3.2
 pa11ycrawler==1.6.2
 packaging==18.0           # via sphinx
-parsel==1.5.0
+parsel==1.5.1
 path.py==8.2.1
 pathtools==0.1.2
 paver==1.3.4
-pbr==5.0.0
+pbr==5.1.0
 pdfminer==20140328
 piexif==1.0.2
 pillow==5.3.0
@@ -243,13 +243,13 @@ py2neo==3.1.2
 py==1.7.0
 pyasn1-modules==0.2.2
 pyasn1==0.4.4
-pycodestyle==2.3.1
+pycodestyle==2.4.0
 pycontracts==1.7.1
 pycountry==1.20
 pycparser==2.19
 pycryptodomex==3.4.7
 pydispatcher==2.0.5
-pyflakes==1.6.0
+pyflakes==2.0.0
 pygments==2.2.0
 pygraphviz==1.1
 pyinotify==0.9.6
@@ -271,7 +271,7 @@ pytest-cov==2.5.1
 pytest-django==3.1.2
 pytest-forked==0.2
 pytest-randomly==1.2.3
-pytest-xdist==1.23.2
+pytest-xdist==1.24.0
 pytest==3.6.3
 python-dateutil==2.4.0
 python-levenshtein==0.12.0
@@ -290,7 +290,7 @@ radon==2.4.0
 redis==2.10.6
 reportlab==3.5.9
 requests-oauthlib==1.0.0
-requests==2.19.1
+requests==2.20.0
 rest-condition==1.0.3
 rfc6266-parser==0.0.5.post2
 rules==2.0
@@ -298,7 +298,7 @@ s3transfer==0.1.13
 sailthru-client==2.2.3
 scipy==0.14.0
 scrapy==1.1.2
-selenium==3.14.1
+selenium==3.141.0
 semantic-version==2.6.0
 service-identity==17.0.0
 shapely==1.2.16
@@ -326,7 +326,7 @@ text-unidecode==1.2
 tincan==0.0.5
 toml==0.10.0
 tox-battery==0.5.1
-tox==3.5.2
+tox==3.5.3
 traceback2==1.4.0
 transifex-client==0.13.5
 twisted==16.6.0
@@ -340,7 +340,7 @@ urlobject==2.4.3
 user-util==0.1.5
 virtualenv==16.1.0
 voluptuous==0.11.5
-vulture==0.29
+vulture==1.0
 w3lib==1.19.0
 watchdog==0.9.0
 web-fragments==0.2.2
@@ -353,4 +353,4 @@ xblock-utils==1.2.0
 xblock==1.2.2
 xmltodict==0.11.0
 zendesk==1.1.1
-zope.interface==4.5.0
+zope.interface==4.6.0
