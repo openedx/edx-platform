@@ -893,7 +893,7 @@ def create_new_course_in_store(store, user, org, number, run, fields):
     return new_course
 
 
-def rerun_course(user, source_course_key, org, number, run, fields, async=True):
+def rerun_course(user, source_course_key, org, number, run, fields, background=True):
     """
     Rerun an existing course.
     """
@@ -926,7 +926,7 @@ def rerun_course(user, source_course_key, org, number, run, fields, async=True):
     json_fields = json.dumps(fields, cls=EdxJSONEncoder)
     args = [unicode(source_course_key), unicode(destination_course_key), user.id, json_fields]
 
-    if async:
+    if background:
         rerun_course_task.delay(*args)
     else:
         rerun_course_task(*args)
