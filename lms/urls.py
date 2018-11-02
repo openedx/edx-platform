@@ -1050,3 +1050,8 @@ urlpatterns += [
 ]
 
 urlpatterns.extend(plugin_urls.get_patterns(plugin_constants.ProjectType.LMS))
+
+# Jupyter Graded XBlock Endpoints
+urlpatterns += (
+    url(r'^api/jupyter_graded/', include('xblock_jupyter_graded.rest.urls')),
+)
