@@ -9,7 +9,7 @@ from django.core.management import call_command
 from user_util.user_util import get_retired_username
 
 from lms.lib import comment_client
-from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import (
+from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import (  # pylint: disable=unused-import
     setup_retirement_states, fake_completed_retirement
 )
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus

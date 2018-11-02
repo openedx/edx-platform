@@ -104,7 +104,7 @@ class SignInHelpTest(AcceptanceTest):
         And help url should be correct
         """
         sign_in_page = self.index_page.click_sign_in()
-        expected_url = _get_expected_documentation_url('/getting_started/index.html')
+        expected_url = _get_expected_documentation_url('/index.html')
 
         # Assert that help link is correct.
         assert_nav_help_link(
@@ -135,7 +135,7 @@ class SignUpHelpTest(AcceptanceTest):
         And help url should be correct
         """
         sign_up_page = self.index_page.click_sign_up()
-        expected_url = _get_expected_documentation_url('/getting_started/index.html')
+        expected_url = _get_expected_documentation_url('/index.html')
 
         # Assert that help link is correct.
         assert_nav_help_link(
@@ -165,7 +165,7 @@ class HomeHelpTest(StudioCourseTest):
         Then Help link should open.
         And help url should be correct
         """
-        expected_url = _get_expected_documentation_url('/getting_started/CA_get_started_Studio.html')
+        expected_url = _get_expected_documentation_url('/CA_get_started_Studio.html')
 
         # Assert that help link is correct.
         assert_nav_help_link(
@@ -183,7 +183,7 @@ class HomeHelpTest(StudioCourseTest):
         Then Help link should open.
         And help url should be correct
         """
-        expected_url = _get_expected_documentation_url('/getting_started/CA_get_started_Studio.html')
+        expected_url = _get_expected_documentation_url('/CA_get_started_Studio.html')
 
         # Assert that help link is correct.
         assert_side_bar_help_link(
@@ -218,7 +218,7 @@ class NewCourseHelpTest(AcceptanceTest):
         Then Help link should open.
         And help url should be correct
         """
-        expected_url = _get_expected_documentation_url('/getting_started/CA_get_started_Studio.html')
+        expected_url = _get_expected_documentation_url('/CA_get_started_Studio.html')
 
         # Assert that help link is correct.
         assert_nav_help_link(
@@ -236,7 +236,7 @@ class NewCourseHelpTest(AcceptanceTest):
         Then Help link should open.
         And help url should be correct
         """
-        expected_url = _get_expected_documentation_url('/getting_started/CA_get_started_Studio.html')
+        expected_url = _get_expected_documentation_url('/CA_get_started_Studio.html')
 
         # Assert that help link is correct.
         assert_side_bar_help_link(
@@ -271,7 +271,7 @@ class NewLibraryHelpTest(AcceptanceTest):
         Then Help link should open.
         And help url should be correct
         """
-        expected_url = _get_expected_documentation_url('/getting_started/CA_get_started_Studio.html')
+        expected_url = _get_expected_documentation_url('/CA_get_started_Studio.html')
 
         # Assert that help link is correct.
         assert_nav_help_link(
@@ -289,7 +289,7 @@ class NewLibraryHelpTest(AcceptanceTest):
         Then Help link should open.
         And help url should be correct
         """
-        expected_url = _get_expected_documentation_url('/getting_started/CA_get_started_Studio.html')
+        expected_url = _get_expected_documentation_url('/CA_get_started_Studio.html')
 
         # Assert that help link is correct.
         assert_side_bar_help_link(
@@ -324,7 +324,7 @@ class LibraryTabHelpTest(AcceptanceTest):
         """
         self.assertTrue(self.dashboard_page.has_new_library_button)
         click_css(self.dashboard_page, '#course-index-tabs .libraries-tab', 0, False)
-        expected_url = _get_expected_documentation_url('/getting_started/CA_get_started_Studio.html')
+        expected_url = _get_expected_documentation_url('/CA_get_started_Studio.html')
 
         # Assert that help link is correct.
         assert_nav_help_link(
@@ -1201,7 +1201,7 @@ class StudioWelcomeHelpTest(AcceptanceTest):
         Then Help link should open.
         And help url should be correct
         """
-        expected_url = _get_expected_documentation_url('/getting_started/index.html')
+        expected_url = _get_expected_documentation_url('/index.html')
 
         # Assert that help link is correct.
         assert_nav_help_link(
