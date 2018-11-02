@@ -909,7 +909,6 @@ def get_module_for_descriptor_internal(user, descriptor, student_data, course_id
         return None
     return descriptor
 
-
 def load_single_xblock(request, user_id, course_id, usage_key_string, course=None):
     """
     Load a single XBlock identified by usage_key_string.
