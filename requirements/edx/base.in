@@ -80,7 +80,7 @@ edx-enterprise
 edx-milestones
 edx-oauth2-provider
 edx-organizations
-edx-proctoring
+edx-proctoring==1.5.0b1
 edx-rest-api-client
 edx-search
 edx-submissions
@@ -133,7 +133,7 @@ rfc6266-parser                      # Used to generate Content-Disposition heade
 social-auth-app-django<3.0.0
 social-auth-core<2.0.0
 pysrt==0.4.7                        # Support for SubRip subtitle files, used in the video XModule
-pytz==2016.10                       # Time zone information database
+pytz                                # Time zone information database
 PyYAML                              # Used to parse XModule resource templates
 redis==2.10.6                       # celery task broker
 requests-oauthlib                   # Simplifies use of OAuth via the requests library, used for CCX and LTI
