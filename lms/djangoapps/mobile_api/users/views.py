@@ -22,7 +22,6 @@ from experiments.models import ExperimentData, ExperimentKeyValue
 from lms.djangoapps.courseware.access_utils import ACCESS_GRANTED
 from mobile_api.utils import API_V05
 from openedx.features.course_duration_limits.access import check_course_expired
-from openedx.features.course_duration_limits.config import CONTENT_TYPE_GATING_FLAG
 from student.models import CourseEnrollment, User
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError

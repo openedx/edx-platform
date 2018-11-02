@@ -1,6 +1,6 @@
 import json
 import logging
-from datetime import datetime
+from datetime import datetime, date
 
 import ddt
 from django.urls import reverse
@@ -46,7 +46,7 @@ from openedx.core.djangoapps.course_groups.tests.helpers import config_course_co
 from openedx.core.djangoapps.course_groups.tests.test_views import CohortViewsTestCase
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
-from openedx.features.course_duration_limits.config import CONTENT_TYPE_GATING_FLAG
+from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from student.roles import CourseStaffRole, UserBasedRole
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -424,7 +424,6 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
     def setUp(self):
         super(SingleThreadQueryCountTestCase, self).setUp()
 
-    @override_waffle_flag(CONTENT_TYPE_GATING_FLAG, True)
     @ddt.data(
         # Old mongo with cache. There is an additional SQL query for old mongo
         # because the first time that disabled_xblocks is queried is in call_single_thread,
@@ -432,18 +431,18 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         # course is outside the context manager that is verifying the number of queries,
         # and with split mongo, that method ends up querying disabled_xblocks (which is then
         # cached and hence not queried as part of call_single_thread).
-        (ModuleStoreEnum.Type.mongo, False, 1, 5, 2, 19, 7),
-        (ModuleStoreEnum.Type.mongo, False, 50, 5, 2, 19, 7),
+        (ModuleStoreEnum.Type.mongo, False, 1, 5, 2, 21, 6),
+        (ModuleStoreEnum.Type.mongo, False, 50, 5, 2, 21, 6),
         # split mongo: 3 queries, regardless of thread response size.
-        (ModuleStoreEnum.Type.split, False, 1, 3, 3, 19, 7),
-        (ModuleStoreEnum.Type.split, False, 50, 3, 3, 19, 7),
+        (ModuleStoreEnum.Type.split, False, 1, 3, 3, 21, 6),
+        (ModuleStoreEnum.Type.split, False, 50, 3, 3, 21, 6),
 
         # Enabling Enterprise integration should have no effect on the number of mongo queries made.
-        (ModuleStoreEnum.Type.mongo, True, 1, 5, 2, 19, 7),
-        (ModuleStoreEnum.Type.mongo, True, 50, 5, 2, 19, 7),
+        (ModuleStoreEnum.Type.mongo, True, 1, 5, 2, 21, 6),
+        (ModuleStoreEnum.Type.mongo, True, 50, 5, 2, 21, 6),
         # split mongo: 3 queries, regardless of thread response size.
-        (ModuleStoreEnum.Type.split, True, 1, 3, 3, 19, 7),
-        (ModuleStoreEnum.Type.split, True, 50, 3, 3, 19, 7),
+        (ModuleStoreEnum.Type.split, True, 1, 3, 3, 21, 6),
+        (ModuleStoreEnum.Type.split, True, 50, 3, 3, 21, 6),
     )
     @ddt.unpack
     def test_number_of_mongo_queries(
@@ -457,6 +456,7 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
             num_cached_sql_queries,
             mock_request
     ):
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=date(2018, 1, 1))
         with modulestore().default_store(default_store):
             course = CourseFactory.create(discussion_topics={'dummy discussion': {'id': 'dummy_discussion_id'}})
 

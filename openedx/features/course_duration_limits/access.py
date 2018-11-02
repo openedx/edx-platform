@@ -17,7 +17,7 @@ from openedx.core.djangoapps.catalog.utils import get_course_run_details
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangolib.markup import HTML
-from openedx.features.course_duration_limits.config import CONTENT_TYPE_GATING_FLAG
+from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 
 MIN_DURATION = timedelta(weeks=4)
 MAX_DURATION = timedelta(weeks=12)
@@ -100,7 +100,7 @@ def register_course_expired_message(request, course):
     """
     Add a banner notifying the user of the user course expiration date if it exists.
     """
-    if CONTENT_TYPE_GATING_FLAG.is_enabled():
+    if CourseDurationLimitConfig.enabled_for_enrollment(user=request.user, course_key=course.id):
         expiration_date = get_user_course_expiration_date(request.user, course)
         if expiration_date:
             upgrade_message = _('Your access to this course expires on {expiration_date}. \

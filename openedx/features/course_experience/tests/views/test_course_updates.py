@@ -1,10 +1,12 @@
 """
 Tests for the course updates page.
 """
+from datetime import date
+
 from courseware.courses import get_course_info_usage_key
 from django.urls import reverse
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
-from openedx.features.course_duration_limits.config import CONTENT_TYPE_GATING_FLAG
+from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_experience.views.course_updates import STATUS_VISIBLE
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
@@ -119,15 +121,15 @@ class TestCourseUpdatesPage(SharedModuleStoreTestCase):
         self.assertContains(response, 'First Message')
         self.assertContains(response, 'Second Message')
 
-    @override_waffle_flag(CONTENT_TYPE_GATING_FLAG, True)
     def test_queries(self):
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=date(2018, 1, 1))
         create_course_update(self.course, self.user, 'First Message')
 
         # Pre-fetch the view to populate any caches
         course_updates_url(self.course)
 
         # Fetch the view and verify that the query counts haven't changed
-        with self.assertNumQueries(44, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+        with self.assertNumQueries(46, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
             with check_mongo_calls(4):
                 url = course_updates_url(self.course)
                 self.client.get(url)

@@ -8,6 +8,7 @@ from openedx.core.djangoapps.content.block_structure.transformer import (
     BlockStructureTransformer,
 )
 from openedx.features.content_type_gating.partitions import CONTENT_GATING_PARTITION_ID
+from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 
 
 class ContentTypeGateTransformer(BlockStructureTransformer):
@@ -35,6 +36,12 @@ class ContentTypeGateTransformer(BlockStructureTransformer):
         block_structure.request_xblock_fields('group_access', 'graded', 'has_score', 'weight')
 
     def transform(self, usage_info, block_structure):
+        if not ContentTypeGatingConfig.enabled_for_enrollment(
+            user=usage_info.user,
+            course_key=usage_info.course_key,
+        ):
+            return
+
         for block_key in block_structure.topological_traversal():
             graded = block_structure.get_xblock_field(block_key, 'graded')
             has_score = block_structure.get_xblock_field(block_key, 'has_score')
