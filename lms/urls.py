@@ -144,6 +144,12 @@ urlpatterns += (
     url(r'^api/completion-aggregator/', include('completion_aggregator.urls')),
 )
 
+# USER MANAGER API
+urlpatterns += (
+    url(r'^api/user_manager/', include('user_manager.api.urls', namespace='user-manager-api')),
+)
+
+
 # OPEN EDX USER API
 # mattdrayer: Please note that the user_api declaration must follow
 # the server api declaration.  When declared ahead of the server api

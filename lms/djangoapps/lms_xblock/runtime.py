@@ -1,7 +1,9 @@
 """
 Module implementing `xblock.runtime.Runtime` functionality for the LMS
 """
+
 import xblock.reference.plugins
+from completion.services import CompletionService
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
@@ -178,6 +180,7 @@ class LmsModuleSystem(LmsCourse, LmsUser, ModuleSystem):  # pylint: disable=abst
     def __init__(self, **kwargs):
         request_cache_dict = RequestCache.get_request_cache().data
         services = kwargs.setdefault('services', {})
+        services['completion'] = CompletionService(user=kwargs.get('user'), course_key=kwargs.get('course_id'))
         services['fs'] = xblock.reference.plugins.FSService()
         services['i18n'] = ModuleI18nService
         services['library_tools'] = LibraryToolsService(modulestore())

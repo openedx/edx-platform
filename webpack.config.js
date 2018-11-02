@@ -21,12 +21,13 @@ var wpconfig = {
         CourseOutline: './openedx/features/course_experience/static/course_experience/js/CourseOutline.js',
         CourseSock: './openedx/features/course_experience/static/course_experience/js/CourseSock.js',
         WelcomeMessage: './openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js',
-        Import: './cms/static/js/features/import/factories/import.js'
+        Import: './cms/static/js/features/import/factories/import.js',
+        CompletionOnViewService: './lms/static/completion/js/CompletionOnViewService.js'
     },
 
     output: {
         path: path.resolve(__dirname, 'common/static/bundles'),
-        filename: isProd ? '[name].[chunkhash].js' : '[name].js',
+        filename: '[name].js',
         libraryTarget: 'window'
     },
 
