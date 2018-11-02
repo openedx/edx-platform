@@ -49,7 +49,7 @@ class TestSyncCourseRunsCommand(ModuleStoreTestCase):
             course_overview_field_name = field.course_overview_name
             catalog_field_name = field.catalog_name
 
-            previous_course_overview_value = getattr(self.course_overview, course_overview_field_name),
+            previous_course_overview_value = getattr(self.course_overview, course_overview_field_name)
             updated_course_overview_value = getattr(updated_course_overview, course_overview_field_name)
 
             # course overview value matches catalog value
