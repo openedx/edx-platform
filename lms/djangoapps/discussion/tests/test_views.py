@@ -1483,6 +1483,7 @@ class InlineDiscussionUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCa
 
     @classmethod
     def setUpClass(cls):
+        # pylint: disable=super-method-not-called
         with super(InlineDiscussionUnicodeTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
 
@@ -1516,6 +1517,7 @@ class ForumFormDiscussionUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTes
 
     @classmethod
     def setUpClass(cls):
+        # pylint: disable=super-method-not-called
         with super(ForumFormDiscussionUnicodeTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
 
@@ -1605,6 +1607,7 @@ class ForumDiscussionSearchUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreT
 
     @classmethod
     def setUpClass(cls):
+        # pylint: disable=super-method-not-called
         with super(ForumDiscussionSearchUnicodeTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
 
@@ -1641,6 +1644,7 @@ class SingleThreadUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, 
 
     @classmethod
     def setUpClass(cls):
+        # pylint: disable=super-method-not-called
         with super(SingleThreadUnicodeTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create(discussion_topics={'dummy_discussion_id': {'id': 'dummy_discussion_id'}})
 
@@ -1674,6 +1678,7 @@ class UserProfileUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, U
 
     @classmethod
     def setUpClass(cls):
+        # pylint: disable=super-method-not-called
         with super(UserProfileUnicodeTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
 
@@ -1706,6 +1711,7 @@ class FollowedThreadsUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCas
 
     @classmethod
     def setUpClass(cls):
+        # pylint: disable=super-method-not-called
         with super(FollowedThreadsUnicodeTestCase, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
 

@@ -92,6 +92,7 @@ class CourseHomePageTestCase(SharedModuleStoreTestCase):
         """
         Set up a course to be used for testing.
         """
+        # pylint: disable=super-method-not-called
         with super(CourseHomePageTestCase, cls).setUpClassAndTestData():
             with cls.store.default_store(ModuleStoreEnum.Type.split):
                 cls.course = CourseFactory.create(

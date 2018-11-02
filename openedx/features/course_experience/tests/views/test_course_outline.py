@@ -49,6 +49,7 @@ class TestCourseOutlinePage(SharedModuleStoreTestCase):
         Set up an array of various courses to be tested.
         """
         # setUpClassAndTestData() already calls setUpClass on SharedModuleStoreTestCase
+        # pylint: disable=super-method-not-called
         with super(TestCourseOutlinePage, cls).setUpClassAndTestData():
             cls.courses = []
             course = CourseFactory.create()
@@ -145,6 +146,7 @@ class TestCourseOutlinePageWithPrerequisites(SharedModuleStoreTestCase, Mileston
         """
         Creates a test course that can be used for non-destructive tests
         """
+        # pylint: disable=super-method-not-called
 
         cls.PREREQ_REQUIRED = '(Prerequisite required)'
         cls.UNLOCKED = 'Unlocked'
@@ -297,6 +299,7 @@ class TestCourseOutlineResumeCourse(SharedModuleStoreTestCase, CompletionWaffleT
         Creates a test course that can be used for non-destructive tests
         """
         # setUpClassAndTestData() already calls setUpClass on SharedModuleStoreTestCase
+        # pylint: disable=super-method-not-called
         with super(TestCourseOutlineResumeCourse, cls).setUpClassAndTestData():
             cls.course = cls.create_test_course()
 
