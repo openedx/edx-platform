@@ -124,6 +124,22 @@ XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
 MOCK_STAFF_GRADING = True
 MOCK_PEER_GRADING = True
 
+PROCTORING_BACKENDS = {
+    'DEFAULT': 'mock_proctoring_with_rules',
+    'mock_proctoring_with_rules': {
+        'client_id': 'secret_id',
+        'client_secret': 'secret_key',
+        'default_config': {
+            'allow_snarfing': True,
+            'allow_grok': False
+        }
+    },
+    'mock_proctoring_without_rules': {
+        'client_id': 'secret_id',
+        'client_secret': 'secret_key',
+    }
+}
+
 ############################ STATIC FILES #############################
 
 # TODO (cpennington): We need to figure out how envs/test.py can inject things

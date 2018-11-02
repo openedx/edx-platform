@@ -4,10 +4,10 @@
 #
 #    make upgrade
 #
--e common/lib/calc
--e common/lib/chem
--e common/lib/sandbox-packages
--e common/lib/symmath
+-e file:///edx/app/edxapp/edx-platform/common/lib/calc
+-e file:///edx/app/edxapp/edx-platform/common/lib/chem
+-e file:///edx/app/edxapp/edx-platform/common/lib/sandbox-packages
+-e file:///edx/app/edxapp/edx-platform/common/lib/symmath
 asn1crypto==0.24.0        # via cryptography
 cffi==1.11.5              # via cryptography
 cryptography==2.3.1
@@ -15,7 +15,7 @@ enum34==1.1.6             # via cryptography
 idna==2.7                 # via cryptography
 ipaddress==1.0.22         # via cryptography
 lxml==3.8.0
-markupsafe==1.0
+markupsafe==1.1.0
 networkx==1.7
 nltk==3.3.0
 numpy==1.6.2

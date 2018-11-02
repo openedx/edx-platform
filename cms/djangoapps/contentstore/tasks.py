@@ -900,7 +900,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
                 )[0]
 
                 metadata = {u'entrance_exam_id': text_type(entrance_exam_chapter.location)}
-                CourseMetadata.update_from_dict(metadata, course, user)
+                CourseMetadata.update_from_dict(metadata, course, user) 
                 from contentstore.views.entrance_exam import add_entrance_exam_milestone
                 add_entrance_exam_milestone(course.id, entrance_exam_chapter)
                 LOGGER.info(u'Course %s Entrance exam imported', course.id)

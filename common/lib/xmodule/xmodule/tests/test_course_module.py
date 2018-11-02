@@ -9,6 +9,8 @@ from fs.memoryfs import MemoryFS
 from mock import Mock, patch
 from pytz import utc
 from xblock.runtime import KvsFieldData, DictKeyValueStore
+from django.conf import settings
+from django.test import override_settings
 
 import xmodule.course_module
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
@@ -419,3 +421,231 @@ class CourseDescriptorTestCase(unittest.TestCase):
         """
         expected_certificate_available_date = self.course.end + timedelta(days=2)
         self.assertEqual(expected_certificate_available_date, self.course.certificate_available_date)
+
+
+class ProctoringConfigurationTestCase(unittest.TestCase):
+    shard = 1
+
+    def setUp(self):
+        """
+        Initialize dummy testing course.
+        """
+        super(ProctoringConfigurationTestCase, self).setUp()
+        # self.course = get_dummy_course(start=_TODAY, end=_NEXT_WEEK)
+        self.proctoring_configuration = xmodule.course_module.ProctoringConfiguration()
+
+    def test_from_json_with_platform_default(self):
+        """
+        Test that a proctoring configuration value equivalent to the platform
+        default will pass validation.
+        """
+        default_provider = settings.PROCTORING_BACKENDS.get('DEFAULT')
+
+        value = {
+            'backend': default_provider,
+            'rules': settings.PROCTORING_BACKENDS[default_provider]['default_config'],
+        }
+
+        # we expect the validated value to be equivalent to the value passed in,
+        # since there are no validation errors or missing data
+        self.assertEqual(self.proctoring_configuration.from_json(value), value)
+
+    def test_from_json_with_provider_with_rules(self):
+        """
+        Test that a proctoring provider other than the default
+        """
+        return
+
+    def test_from_json_with_provider_without_rules(self):
+        """
+        Test that a proctoring provider without rules passes validation.
+        """
+        value = {
+            'backend': 'mock_proctoring_without_rules',
+            'rules': {},
+        }
+
+        # we expect the validated value to be equivalent to the value passed in,
+        # since there are no validation errors or missing data
+        self.assertEqual(self.proctoring_configuration.from_json(value), value)
+
+    def test_from_json_with_invalid_provider(self):
+        """
+        Test that an invalid provider (i.e. not one configured at the platform level)
+        throws a ValueError with the correct error message.
+        """
+        provider = 'invalid-provider'
+        proctoring_provider_whitelist = ['mock_proctoring_with_rules', 'mock_proctoring_without_rules']
+
+        value = {
+            'backend': provider,
+            'rules': {},
+        }
+
+        with self.assertRaises(ValueError) as context_manager:
+            self.proctoring_configuration.from_json(value)
+        self.assertEqual(
+            context_manager.exception.args[0],
+            ['The selected proctoring backend, {}, is not a valid backend. Please select from one of {}.'
+                .format(provider, proctoring_provider_whitelist)]
+        )
+
+    def test_from_json_with_invalid_rules(self):
+        """
+        Test that an invalid rule (i.e. not one configured at the platform level) for a
+        valid provider throws a ValueError with the correct error message.
+        """
+        provider = 'mock_proctoring_with_rules'
+        rules = settings.PROCTORING_BACKENDS[provider]['default_config'].copy()
+        rules['allow_foo'] = True
+
+        value = {
+            'backend': provider,
+            'rules': rules,
+        }
+
+        with self.assertRaises(ValueError) as context_manager:
+            self.proctoring_configuration.from_json(value)
+        self.assertEqual(
+            context_manager.exception.args[0],
+            ['The proctoring configuration rule {} is not a valid rule for provider {}.'.
+                format('allow_foo', provider)]
+        )
+
+    def test_from_json_with_invalid_rule_value(self):
+        """
+        Test that an invalid rule value (i.e. not a boolean) for a valid rule for a
+        valid provider throws a ValueError with the correct error message.
+        """
+        provider = 'mock_proctoring_with_rules'
+        rules = settings.PROCTORING_BACKENDS[provider]['default_config'].copy()
+        rules['allow_grok'] = 'yes'
+
+        value = {
+            'backend': provider,
+            'rules': rules,
+        }
+
+        with self.assertRaises(ValueError) as context_manager:
+            self.proctoring_configuration.from_json(value)
+        self.assertEqual(
+            context_manager.exception.args[0],
+            ['The value for proctoring configuration rule {} should be either true or false.'.
+                format('allow_grok')]
+        )
+
+    def test_from_json_adds_platform_default_for_missing_provider(self):
+        """
+        Test that a value with no provider will inherit the default provider
+        from the platform defaults.
+        """
+        provider = 'mock_proctoring_with_rules'
+
+        value = {
+            'rules': {}
+        }
+
+        expected_value = value.copy()
+        expected_value['backend'] = provider
+
+        self.assertEqual(self.proctoring_configuration.from_json(value), expected_value)
+
+    def test_from_json_adds_platform_defaults_for_missing_rules(self):
+        """
+        Test that a value with no rules will inherit the default rules for
+        that provider from the platform defaults.
+        """
+        provider = 'mock_proctoring_with_rules'
+
+        value = {
+            'backend': provider
+        }
+
+        expected_value = value.copy()
+        expected_value['rules'] = settings.PROCTORING_BACKENDS[provider]['default_config']
+
+        self.assertEqual(self.proctoring_configuration.from_json(value), expected_value)
+
+    def test_from_json_adds_platform_defaults_for_missing_rules_no_rules_as_empty_dict(self):
+        """
+        Test that a value with no rules will inherit an empty dict for
+        a provider without rules in the platform defaults.
+        """
+        provider = 'mock_proctoring_without_rules'
+
+        value = {
+            'backend': provider
+        }
+
+        expected_value = value.copy()
+        expected_value['rules'] = {}
+
+        self.assertEqual(self.proctoring_configuration.from_json(value), expected_value)
+
+    def test_from_json_adds_platform_defaults_for_missing_provider_and_rules(self):
+        self.assertEqual(self.proctoring_configuration.from_json({}), self.proctoring_configuration.default)
+
+    def test_from_json_adds_missing_rules_from_platform_default(self):
+        return
+
+    @override_settings(PROCTORING_BACKENDS={
+    'mock_proctoring_with_rules': {
+        'client_id': 'secret_id',
+        'client_secret': 'secret_key',
+        'default_config': {
+            'allow_snarfing': True,
+            'allow_grok': False
+        }
+    },
+    'mock_proctoring_without_rules': {
+        'client_id': 'secret_id',
+        'client_secret': 'secret_key',
+    }})
+    def test_default_with_no_platform_default(self):
+        expected_default = {
+            'backend': None,
+            'rules': {}
+        }
+
+        self. assertEqual(self.proctoring_configuration.default, expected_default)
+
+    def test_default_with_platform_default_with_rules(self):
+        default_provider = settings.PROCTORING_BACKENDS.get('DEFAULT')
+        default_rules = settings.PROCTORING_BACKENDS[default_provider]['default_config']
+
+        expected_default = {
+            'backend': default_provider,
+            'rules': default_rules
+        }
+
+        self.assertEqual(self.proctoring_configuration.default, expected_default)
+    
+    @override_settings(PROCTORING_BACKENDS={
+    'DEFAULT': 'mock_proctoring_without_rules',
+    'mock_proctoring_with_rules': {
+        'client_id': 'secret_id',
+        'client_secret': 'secret_key',
+        'default_config': {
+            'allow_snarfing': True,
+            'allow_grok': False
+        }
+    },
+    'mock_proctoring_without_rules': {
+        'client_id': 'secret_id',
+        'client_secret': 'secret_key',
+    }})
+    def test_default_with_platform_default_without_rules(self):
+        default_provider = 'mock_proctoring_without_rules'
+        default_rules = {}
+
+        expected_default = {
+            'backend': default_provider,
+            'rules': default_rules
+        }
+
+        self.assertEqual(self.proctoring_configuration.default, expected_default)
+        
+    @override_settings(PROCTORING_BACKENDS=None)
+    def test_default_default_with_no_platform_default(self):
+        default = self.proctoring_configuration.default
+        self.assertEqual(default, {})

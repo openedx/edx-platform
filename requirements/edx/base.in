@@ -78,7 +78,8 @@ edx-enterprise
 edx-milestones
 edx-oauth2-provider
 edx-organizations
-edx-proctoring
+#edx-proctoring
+-e /edx/src/edx-proctoring
 edx-rest-api-client
 edx-search
 edx-submissions
