@@ -44,3 +44,16 @@ $static-path: '../..';
 @import 'views/search';
 @import 'views/inline';
 @import 'utilities/shame';
+// add theme style
+.content-wrapper{
+    max-width: 1200px;
+    margin-top: 0px;
+    padding: 0;
+}
+.content-wrapper .course-tabs .nav-item .nav-link{
+    padding: 20px 15px 13px 15px;
+}
+.page-content{
+    overflow: hidden;
+    position: relative;
+}
