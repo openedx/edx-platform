@@ -1,0 +1,19 @@
+<div class=".content-paywall">
+    <div>
+        <h3>
+            <span class="fa fa-lock" aria-hidden="true"></span>
+            Verified Track Access
+        </h3>
+        <span style=" padding: 10px 0;">
+            Graded assessments are available to Verified Track learners.
+        </span>
+        {% if not mobile_app %}
+        <span class="certDIV_1" style="">
+            <a href="{{ecommerce_checkout_link}}" class="certA_2">
+                Upgrade to unlock  (${{min_price}})
+            </a>
+        </span>
+        {% endif %}
+    </div>
+    <img src="https://courses.edx.org/static/images/edx-verified-mini-cert.png">
+</div>

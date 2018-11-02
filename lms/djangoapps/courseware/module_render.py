@@ -883,14 +883,10 @@ def get_module_for_descriptor_internal(user, descriptor, student_data, course_id
     user_needs_access_check = getattr(user, 'known', True) and not isinstance(user, SystemUser)
     if user_needs_access_check:
         access = has_access(user, 'load', descriptor, course_id)
-        if not access:
-            if access.user_message or access.user_fragment:
-                # This content will be access restricted by modifying the outgoing html
-                return descriptor
-            else:
-                return None
+        if not access and not (access.user_message or access.user_fragment):
+        # Content with message or fragment will be access restricted by modifying the outgoing html
+            return None
     return descriptor
-
 
 def load_single_xblock(request, user_id, course_id, usage_key_string, course=None):
     """
