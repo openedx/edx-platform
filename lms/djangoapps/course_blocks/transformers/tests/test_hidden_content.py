@@ -23,8 +23,8 @@ class HiddenContentTransformerTestCase(BlockParentsMapTestCase):
         """
         Use constant enum types for deterministic ddt test method names (rather than dynamically generated timestamps)
         """
-        none = 1,
-        future = 2,
+        none = 1
+        future = 2
         past = 3
 
         TODAY = now()

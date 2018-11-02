@@ -27,8 +27,8 @@ class StartDateTransformerTestCase(BlockParentsMapTestCase):
         """
         Use constant enum types for deterministic ddt test method names (rather than dynamically generated timestamps)
         """
-        released = 1,
-        future = 2,
+        released = 1
+        future = 2
         default = 3
 
         TODAY = now()

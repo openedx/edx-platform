@@ -54,8 +54,8 @@ class BulkEnrollView(APIView):
     """
 
     authentication_classes = JwtAuthentication, OAuth2Authentication
-    permission_classes = IsStaff,
-    throttle_classes = EnrollmentUserThrottle,
+    permission_classes = (IsStaff,)
+    throttle_classes = (EnrollmentUserThrottle,)
 
     def post(self, request):
         serializer = BulkEnrollmentSerializer(data=request.data)

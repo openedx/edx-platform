@@ -32,8 +32,8 @@ class ZendeskPassthroughView(APIView):
     An APIView that will take in inputs from an unauthenticated endpoint, and use them to securely create a zendesk
     ticket.
     """
-    throttle_classes = ZendeskProxyThrottle,
-    parser_classes = JSONParser,
+    throttle_classes = (ZendeskProxyThrottle,)
+    parser_classes = (JSONParser,)
 
     def post(self, request):
         """

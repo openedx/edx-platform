@@ -2737,6 +2737,7 @@ class TestIndexViewCrawlerStudentStateWrites(SharedModuleStoreTestCase):
     def setUpClass(cls):
         """Set up the simplest course possible."""
         # setUpClassAndTestData() already calls setUpClass on SharedModuleStoreTestCase
+        # pylint: disable=super-method-not-called
         with super(TestIndexViewCrawlerStudentStateWrites, cls).setUpClassAndTestData():
             cls.course = CourseFactory.create()
             with cls.store.bulk_operations(cls.course.id):
