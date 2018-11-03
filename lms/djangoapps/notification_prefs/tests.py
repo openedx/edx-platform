@@ -7,7 +7,7 @@ from django.http import Http404
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from mock import Mock, patch
+from mock import patch
 
 from notification_prefs import NOTIFICATION_PREF_KEY
 from notification_prefs.views import UsernameCipher, ajax_disable, ajax_enable, ajax_status, set_subscription

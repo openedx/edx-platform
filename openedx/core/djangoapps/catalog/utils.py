@@ -5,7 +5,6 @@ import logging
 import uuid
 
 import pycountry
-from django.conf import settings
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from edx_rest_api_client.client import EdxRestApiClient

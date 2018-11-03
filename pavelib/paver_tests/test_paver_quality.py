@@ -7,8 +7,6 @@ import tempfile
 import textwrap
 import unittest
 
-import paver.easy
-import paver.tasks
 from ddt import ddt, file_data, data, unpack
 from mock import MagicMock, mock_open, patch
 from path import Path as path

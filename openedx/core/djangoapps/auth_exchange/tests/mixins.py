@@ -3,7 +3,7 @@ Mixins to facilitate testing OAuth connections to Django-OAuth-Toolkit or
 Django-OAuth2-Provider.
 """
 
-from unittest import skip, expectedFailure
+from unittest import expectedFailure
 from django.test.client import RequestFactory
 
 from openedx.core.djangoapps.oauth_dispatch import adapters

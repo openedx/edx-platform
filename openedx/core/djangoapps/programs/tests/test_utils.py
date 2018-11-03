@@ -30,10 +30,7 @@ from openedx.core.djangoapps.catalog.tests.factories import (
     SeatFactory,
     generate_course_run_key
 )
-from openedx.core.djangoapps.programs import (
-    PROGRAMS_WAFFLE_SWITCH_NAMESPACE,
-    ALWAYS_CALCULATE_PROGRAM_PRICE_AS_ANONYMOUS_USER
-)
+from openedx.core.djangoapps.programs import ALWAYS_CALCULATE_PROGRAM_PRICE_AS_ANONYMOUS_USER
 from openedx.core.djangoapps.programs.tests.factories import ProgressFactory
 from openedx.core.djangoapps.programs.utils import (
     DEFAULT_ENROLLMENT_START_DATE,

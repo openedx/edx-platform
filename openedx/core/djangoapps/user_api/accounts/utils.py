@@ -9,7 +9,6 @@ import string
 from urlparse import urlparse
 
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 from six import text_type
 

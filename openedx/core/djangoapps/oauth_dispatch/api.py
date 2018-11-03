@@ -1,6 +1,5 @@
 """ OAuth related Python apis. """
 import json
-from django.conf import settings
 
 from oauthlib.oauth2.rfc6749.errors import OAuth2Error
 from oauthlib.oauth2.rfc6749.tokens import BearerToken

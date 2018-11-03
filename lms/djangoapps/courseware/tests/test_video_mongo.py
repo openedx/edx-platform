@@ -45,7 +45,7 @@ from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE, TEST_DATA_SPLIT_MODULESTORE
 from xmodule.tests.test_import import DummySystem
 from xmodule.tests.test_video import VideoDescriptorTestBase, instantiate_descriptor
-from xmodule.video_module import VideoDescriptor, bumper_utils, rewrite_video_url, video_utils
+from xmodule.video_module import VideoDescriptor, bumper_utils, video_utils
 from xmodule.video_module.transcripts_utils import Transcript, save_to_store, subs_filename
 from xmodule.video_module.video_module import (
     EXPORT_IMPORT_COURSE_DIR,

@@ -5,7 +5,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import ddt
 from django.test import TestCase
 from django.test.utils import override_settings
-from mock import patch
 
 from completion import models
 from completion.test_utils import CompletionWaffleTestMixin

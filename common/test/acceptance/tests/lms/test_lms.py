@@ -2,7 +2,6 @@
 """
 End-to-end tests for the LMS.
 """
-import urllib
 from datetime import datetime, timedelta
 from textwrap import dedent
 

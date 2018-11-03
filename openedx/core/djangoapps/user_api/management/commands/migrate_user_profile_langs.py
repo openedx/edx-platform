@@ -8,7 +8,6 @@ from time import sleep
 
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
-from django.db import transaction
 from django.db.models import Q, Max
 
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
