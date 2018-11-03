@@ -1,0 +1,11 @@
+Metadata-Version: 1.2
+Name: entrypoints
+Version: 0.2.3
+Summary: Discover and load entry points from installed packages.
+Home-page: https://github.com/takluyver/entrypoints
+License: UNKNOWN
+Author: Thomas Kluyver
+Author-email: thomas@kluyver.me.uk
+Requires-Python: >=2.7
+Classifier: License :: OSI Approved :: MIT License
+Requires-Dist: configparser (>=3.5); python_version == '2.7'

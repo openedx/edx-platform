@@ -1,0 +1,66 @@
+div.nbgrader-points, div.nbgrader-id {
+    margin-right: 0.5em;
+}
+
+input.nbgrader-points-input {
+    width: 3.5em;
+    height: 22px;
+    text-align: right;
+    line-height: 10px;
+    color: black;
+}
+
+input.nbgrader-id-input {
+    height: 22px;
+    text-align: left;
+    color: black;
+}
+
+#nbgrader-total-points {
+    width: 3em;
+    height: 24px;
+    text-align: right;
+    line-height: 10px;
+    margin-left: 0.3em;
+    margin-right: 0.3em;
+}
+
+div.nbgrader-highlight div.celltoolbar {
+    color: white;
+    background-color: #337ab7;
+    border: 1px solid #337ab7;
+}
+
+div.nbgrader-highlight div.text_cell_render, div.nbgrader-highlight div.input_area {
+    border: 1px solid #337ab7 !important;
+}
+
+.celltoolbar {
+    /* safari fix, we cannot use -webkit-flex on hbox
+    and vbox either or all css get borked
+    cf https://github.com/jupyter/nbgrader/issues/394.
+    manual workaround while #370 is not released. */
+    display: -webkit-flex;
+}
+
+div.lock-cell-container {
+    margin-right: auto;
+    padding-left: 0.5em;
+    line-height: 25px;
+    font-size: 1.4em;
+}
+
+.tooltip-inner {
+    max-width: 300px;
+}
+
+a.lock-button {
+    color: black
+}
+div.nbgrader-highlight a.lock-button {
+    color: white;
+}
+
+a.lock-editable:hover {
+    cursor: pointer;
+}

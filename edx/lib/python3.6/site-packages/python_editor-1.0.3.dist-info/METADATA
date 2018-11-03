@@ -1,0 +1,26 @@
+Metadata-Version: 2.0
+Name: python-editor
+Version: 1.0.3
+Summary: Programmatically open an editor, capture the result.
+Home-page: https://github.com/fmoo/python-editor
+Author: Peter Ruibal
+Author-email: ruibalp@gmail.com
+License: Apache
+Keywords: editor library vim emacs
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.6
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.3
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Topic :: Software Development :: Libraries
+
+UNKNOWN
+
+

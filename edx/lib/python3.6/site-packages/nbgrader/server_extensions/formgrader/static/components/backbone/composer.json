@@ -1,0 +1,37 @@
+{
+    "name": "components/backbone",
+    "description": "Give your JS App some Backbone with Models, Views, Collections, and Events.",
+    "keywords": ["model", "view", "controller", "router", "server", "client", "browser"],
+    "type": "component",
+    "homepage": "http://backbonejs.org",
+    "license": "MIT",
+    "support": {
+        "issues": "https://github.com/documentcloud/backbone/issues",
+        "source": "https://github.com/documentcloud/backbone"
+    },
+    "authors": [
+        {
+            "name": "Jeremy Ashkenas",
+            "email": "jeremy@documentcloud.org"
+        }
+    ],
+    "require": {
+        "components/underscore": ">=1.4.3"
+    },
+    "extra": {
+        "component": {
+            "scripts": [
+                "backbone.js"
+            ],
+            "files": [
+                "backbone-min.js"
+            ],
+            "shim": {
+                "deps": [
+                    "underscore"
+                ],
+                "exports": "Backbone"
+            }
+        }
+    }
+}

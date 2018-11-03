@@ -1,0 +1,51 @@
+table.inner-table {
+    width: 50%;
+    max-width: 50%;
+    margin-left: 1em;
+}
+
+table.inner-table td {
+    padding: 0.25em;
+}
+
+td.inner-table {
+    border-top: none !important;
+    padding-top: 0 !important;
+}
+
+td.inner-table span.glyphicon {
+    font-size: 0.75em;
+}
+
+td.assignment-id span.glyphicon {
+    font-size: 0.5em;
+}
+
+.name-shown {
+  display: none;
+}
+
+.glyphicon.name-shown, .glyphicon.name-hidden {
+  cursor: pointer;
+  cursor: hand;
+  color: #000;
+}
+
+table.form-table > tbody > tr > td {
+  vertical-align: middle;
+}
+
+div.modal div.panel pre {
+  border: none;
+  font-size: 8pt;
+  max-height: 30em;
+}
+
+div.modal p {
+  margin-bottom: 20px;
+}
+
+.jupyter-logo {
+  height: 100px;
+  width: 100px;
+}

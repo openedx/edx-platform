@@ -1,0 +1,57 @@
+Metadata-Version: 2.1
+Name: notebook
+Version: 5.7.0
+Summary: A web-based notebook environment for interactive computing
+Home-page: http://jupyter.org
+Author: Jupyter Development Team
+Author-email: jupyter@googlegroups.com
+License: BSD
+Keywords: Interactive,Interpreter,Shell,Web
+Platform: Linux
+Platform: Mac OS X
+Platform: Windows
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: System Administrators
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Provides-Extra: test
+Requires-Dist: jinja2
+Requires-Dist: tornado (>=4)
+Requires-Dist: pyzmq (>=17)
+Requires-Dist: ipython-genutils
+Requires-Dist: traitlets (>=4.2.1)
+Requires-Dist: jupyter-core (>=4.4.0)
+Requires-Dist: jupyter-client (>=5.2.0)
+Requires-Dist: nbformat
+Requires-Dist: nbconvert
+Requires-Dist: ipykernel
+Requires-Dist: Send2Trash
+Requires-Dist: terminado (>=0.8.1)
+Requires-Dist: prometheus-client
+Requires-Dist: ipaddress; python_version == "2.7"
+Provides-Extra: test
+Requires-Dist: nose; extra == 'test'
+Requires-Dist: coverage; extra == 'test'
+Requires-Dist: requests; extra == 'test'
+Requires-Dist: nose-warnings-filters; extra == 'test'
+Requires-Dist: nbval; extra == 'test'
+Requires-Dist: nose-exclude; extra == 'test'
+Requires-Dist: selenium; extra == 'test'
+Provides-Extra: test
+Requires-Dist: mock; (python_version == "2.7") and extra == 'test'
+Provides-Extra: test
+Requires-Dist: nose-exclude; (sys_platform == "win32") and extra == 'test'
+
+
+The Jupyter Notebook is a web application that allows you to create and
+share documents that contain live code, equations, visualizations, and
+explanatory text. The Notebook has support for multiple programming
+languages, sharing, and interactive widgets.
+
+Read `the documentation <https://jupyter-notebook.readthedocs.io>`_
+for more information.
+
+

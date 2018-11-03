@@ -1,0 +1,31 @@
+Metadata-Version: 2.1
+Name: jupyter-console
+Version: 6.0.0
+Summary: Jupyter terminal console
+Home-page: https://jupyter.org
+Author: Jupyter Development Team
+Author-email: jupyter@googlegroups.com
+License: BSD
+Keywords: Interactive,Interpreter,Shell,Web
+Platform: Linux
+Platform: Mac OS X
+Platform: Windows
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: System Administrators
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Requires-Python: >=3.5
+Provides-Extra: test
+Requires-Dist: jupyter-client
+Requires-Dist: ipython
+Requires-Dist: ipykernel
+Requires-Dist: prompt-toolkit (<2.1.0,>=2.0.0)
+Requires-Dist: pygments
+Provides-Extra: test
+Requires-Dist: pexpect; (sys_platform != "win32") and extra == 'test'
+
+An IPython-like terminal frontend for Jupyter kernels in any language.
+
+

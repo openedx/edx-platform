@@ -1,0 +1,13 @@
+ptyprocess-0.6.0.dist-info/INSTALLER,sha256=zuuue4knoyJ-UwPPXg8fezS7VCrXJQrAP7zeNuwvFQg,4
+ptyprocess-0.6.0.dist-info/LICENSE,sha256=yCLThbGnMymEYkF5m-zxhpC11Edkwb7WkwC1NqQFAwo,905
+ptyprocess-0.6.0.dist-info/METADATA,sha256=E32CAJai9AnGYv75eEH1QQngK3Sg-v1JEOJ2q-FOD3Q,1312
+ptyprocess-0.6.0.dist-info/RECORD,,
+ptyprocess-0.6.0.dist-info/WHEEL,sha256=Pnb1-aANNEDpiI6zZkifNVAxs3Mjlbjz3HYhduOZleI,97
+ptyprocess/__init__.py,sha256=Q7Cd31VTCkFWg4KPHqZ75ykOQ7kj5kuo-tzkqOz8suo,138
+ptyprocess/__pycache__/__init__.cpython-36.pyc,,
+ptyprocess/__pycache__/_fork_pty.cpython-36.pyc,,
+ptyprocess/__pycache__/ptyprocess.cpython-36.pyc,,
+ptyprocess/__pycache__/util.cpython-36.pyc,,
+ptyprocess/_fork_pty.py,sha256=VVvMy8c4ZpjDMiIMSg8T1BQ1g3SBexDpey_cxi0n5aw,2362
+ptyprocess/ptyprocess.py,sha256=rD_1VuW02HxwB4hPIm6cah5XGx7pHj8QaYz5OhCXwf4,31355
+ptyprocess/util.py,sha256=rQAdDRZfoOiOn6vykWth0wI6FFKAp7aJtBSdt-KBWdU,2785

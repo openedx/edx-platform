@@ -1,0 +1,55 @@
+<h2>{{ title }}</h2>
+<h2>Instructions</h2>
+<p>{{ instructions|linebreaks }}</p>
+
+{% if student_download_url %}
+<a id="student_nb_url_{{ xblock_id }}" href="{{ student_download_url }}">Download Student Notebook</a>
+{% else %}
+<a id="student_nb_url_{{ xblock_id }}">No Notebook Uploaded</a>
+{% endif %}
+
+<hr>
+<h2>Student Upload</h2>
+<p><b>Notebook Name: </b>{{ nb_name }}</p>
+<form enctype="multipark/form-data">
+    <input id="student_file_{{ xblock_id }}" name="student_file" type="file" accept=".ipynb" {{ student_disabled }}/>
+    <br><br>
+    <input class="upload-group" id="student_upload_{{ xblock_id }}" type="button" value="Upload" {{ student_disabled }}/>
+    <div id="student_loader_{{ xblock_id }}" class="upload-group loader"></div>
+</form>
+<br>
+<div class="" id="student_upload_result_{{ xblock_id }}">
+</div>
+<hr>
+<h2>Results</h2>
+<div>
+    {% if max_attempts == 0 %}
+    <p><b>Attempts: </b><span id="student_attempts_{{ xblock_id }}">{{ student_attempts }}</span> / <span id="max_attempts">Unlimited</span></p>
+    {% else %}
+    <p><b>Attempts: </b><span id="student_attempts_{{ xblock_id }}">{{ student_attempts }}</span> / {{ max_attempts }}</p>
+    {% endif %}
+    <p><b>Last Submitted:</b> <span id="submitted_dt_{{ xblock_id }}">{{ submitted_dt }}</span></p>
+
+    {% if autograded_url %}
+    <p id="autograded_wrap_{{ xblock_id }}"><b>Autograded Notebook:</b> <a id="autograded_nb_url_{{ xblock_id }}" href="{{ autograded_url }}">Download</a></p>
+    {% else %}
+    <p class="hidden" id="autograded_wrap_{{ xblock_id }}"><b>Autograded Notebook:</b> <a id="autograded_nb_url_{{ xblock_id }}" href="{{ autograded_url }}">Download</a></p>
+    {% endif %}
+
+    {% if student_attempts > 0 %}
+    <p><b>Total Score:</b> <span id="student_score_{{ xblock_id }}">{{ student_score }}</span> / <span id="max_score_{{ xblock_id }}">{{ max_score }}</span></p>
+
+	<div id="section_scores_{{ xblock_id }}">
+		{% include "xblock_jupyter_graded/section_scores.html" %}
+	</div>
+
+    {% else %}
+
+		<p><b>Total Score:</b> <span id="student_score_{{ xblock_id }}">-</span> / <span id="max_score_{{ xblock_id }}">{{ max_score }}</span></p>
+	<div id="section_scores_{{ xblock_id }}">
+	</div>
+    {% endif %}
+
+
+</div>
+

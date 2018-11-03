@@ -1,0 +1,231 @@
+td.center, th.center {
+    text-align: center;
+}
+
+.nav .breadcrumb {
+    margin-bottom: 0px;
+    padding: 0px;
+    margin-left: 1em;
+}
+
+.breadcrumb > li {
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+.navbar-header .navbar-brand {
+    padding: 15px;
+    font-size: 18px;
+    height: 50px;
+    line-height: 20px;
+}
+
+.navbar-nav > li > a {
+    padding: 15px;
+}
+
+li.next, li.previous {
+    padding: 1px;
+}
+
+li.next a, li.previous a {
+    padding: 15px 0;
+}
+
+.navbar .col-md-2 {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+.navbar-nav.navbar-right:last-child {
+  margin-right: 0px;
+}
+
+body {
+  overflow: visible;
+  font-size: 14px;
+  padding-top: 70px;
+}
+
+div#notebook {
+  overflow: visible;
+  border-top: none;
+}
+
+div#notebook-container {
+  width: 100%;
+}
+
+@media print {
+  div.cell {
+    display: block;
+    page-break-inside: avoid;
+  }
+  div.output_wrapper {
+    display: block;
+    page-break-inside: avoid;
+  }
+  div.output {
+    display: block;
+    page-break-inside: avoid;
+  }
+}
+
+div.prompt {
+  min-width: 21ex;
+}
+
+img {
+    border: 2px solid red;
+}
+
+div.nbgrader_cell {
+    width: 100%;
+}
+
+div.nbgrader_cell .panel-footer {
+    padding: 0.4em 0.6em;
+}
+
+div.nbgrader_cell .panel-body {
+    padding: 0.4em;
+}
+
+.comment {
+    width: 100%;
+    margin-top: 0.5em;
+    max-height: 150px;
+}
+
+div.nbgrader_cell .input_area {
+    background: white;
+    border: none;
+}
+
+.score, .extra-credit {
+    color: black;
+    height: 29px;
+    margin-left: 1em;
+    border-width: 1px;
+    border-color: white;
+}
+
+.needs_manual_grade {
+  background-color: #f2dede;
+  border-color: #d43f3a;
+}
+
+.mark-graded {
+  display: none;
+}
+
+.nbgrader-label {
+    line-height: 29px;
+}
+
+.save-icon {
+    margin-left: 1em;
+    top: 4px;
+    display: none;
+}
+
+.panel-heading {
+    overflow: hidden;
+}
+
+.scoring-buttons button {
+  background-color: #337ab7;
+}
+
+.scoring-buttons button.btn-success {
+  background-color: rgba(92, 184, 92, .1);
+  border-color: rgb(47, 92, 47);
+}
+
+.scoring-buttons button.btn-success:hover {
+  background-color: #5cb85c;
+  border-color: #4cae4c;
+}
+
+.scoring-buttons button.btn-danger {
+  background-color: rgba(217, 83, 79, .2);
+  border-color: rgb(120, 45, 45);
+}
+
+.scoring-buttons button.btn-danger:hover {
+  background-color: #d9534f;
+  border-color: #d43f3a;
+}
+
+.scoring-buttons button.btn-warning {
+  background-color: rgba(240, 173, 78, 0.2);
+  border-color: #7C4F0E;
+}
+
+.scoring-buttons button.btn-warning:hover {
+  background-color: #f0ad4e;
+  border-color: #eea236;
+}
+
+.help {
+  position: fixed;
+  font-size: 4em;
+  bottom: 10px;
+  right: 10px;
+  width: 56px;
+  height: 56px;
+  line-height: 56px;
+  color: rgba(0, 0, 0, .3);
+}
+
+.help:hover {
+  color: rgba(0, 0, 0, 1);
+  cursor: pointer;
+  cursor: hand;
+}
+
+.shortcut-key {
+  font-family: monospace;
+}
+
+.striped > div {
+  padding: .3em 1em;
+}
+
+.striped > div:nth-child(odd) {
+   background-color: #ddd;
+ }
+
+ .modal {
+  z-index: 1050;
+ }
+
+.modal-backdrop {
+  bottom: 0;
+  position: fixed;
+  z-index: 1040;
+}
+
+#statusmessage {
+    position: fixed;
+    top: 40%;
+    width: 100%;
+    z-index: 9999;
+    font-size: 3em;
+    text-align: center;
+    font-weight: bold;
+}
+
+.name-shown {
+  display: none;
+}
+
+.glyphicon.name-shown, .glyphicon.name-hidden {
+  cursor: pointer;
+  cursor: hand;
+  color: #000;
+}
+
+.breadcrumb .glyphicon {
+  margin-left: 5px;
+}

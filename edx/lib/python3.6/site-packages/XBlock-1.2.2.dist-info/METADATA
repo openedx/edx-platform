@@ -1,0 +1,38 @@
+Metadata-Version: 2.1
+Name: XBlock
+Version: 1.2.2
+Summary: XBlock Core Library
+Home-page: https://github.com/edx/XBlock
+Author: edX
+Author-email: oscm@edx.org
+License: Apache 2.0
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Framework :: Django
+Classifier: Framework :: Django :: 1.8
+Classifier: Framework :: Django :: 1.9
+Classifier: Framework :: Django :: 1.10
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Natural Language :: English
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.5
+Provides-Extra: django
+Requires-Dist: fs
+Requires-Dist: lxml
+Requires-Dist: markupsafe
+Requires-Dist: python-dateutil
+Requires-Dist: pytz
+Requires-Dist: pyyaml
+Requires-Dist: six
+Requires-Dist: webob
+Requires-Dist: web-fragments
+Provides-Extra: django
+Requires-Dist: django-pyfs (>=1.0.5); extra == 'django'
+Requires-Dist: lazy; extra == 'django'
+
+UNKNOWN
+
+

@@ -1,0 +1,24 @@
+{
+  "name": "components-backbone",
+  "description": "Give your JS App some Backbone with Models, Views, Collections, and Events. Shim repository.",
+  "homepage": "http://backbonejs.org",
+  "keywords": [
+    "model",
+    "view",
+    "controller",
+    "router",
+    "server",
+    "client",
+    "browser"
+  ],
+  "dependencies": {
+    "underscore": ">=1.4.3"
+  },
+  "author": "Jeremy Ashkenas <jeremy@documentcloud.org>",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/components/backbone.git"
+  },
+  "main": "backbone.js",
+  "version": "1.1.2"
+}

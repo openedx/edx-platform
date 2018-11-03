@@ -1,0 +1,61 @@
+<div class="instructor-section">
+<h1>Instructor Section</h1>
+<h2>Python Virtual Environment</h2>
+
+<p>Select a requirements.txt file to upload.</p>
+<ul class="bullets">
+    <li>Only include packages that are actually imported from within the notebook itself.</li>
+    <li>There is a single Virtual Environment for each course.</li>
+    <li>The uploaded requirements.txt will overwrite the current requirements for this course, so please be sure to include all packages required for this course</li>
+</ul>
+
+<form enctype="multipark/form-data">
+    <input id="requirements_file_{{ xblock_id }}" name="instructor_file" type="file" accept=".txt"/>
+    <br><br>
+    <input class="upload-group" id="requirements_upload_{{ xblock_id }}" type="button" value="Upload"/>
+    <div id="req_loader_{{ xblock_id }}" class="upload-group loader"></div>
+</form>
+
+<br>
+<div class="" id="req_upload_result_{{ xblock_id }}"></div>
+
+<b>Installed Packages</b>
+<div class="requirements" id="requirements_{{ xblock_id }}">
+    <ul>
+    {% for req in requirements %}
+    <li>{{ req }}</li>
+    {% empty %}
+    <li>No Packages Specified</li>
+    {% endfor %}
+    </ul>
+    
+</div>
+<hr>
+
+<h2>Instructor Notebook Upload</h2>
+<p>Select an Instructor Notebook to upload</p>
+<form enctype="multipark/form-data">
+    <input id="instructor_file_{{ xblock_id }}" name="instructor_file" type="file" accept=".ipynb" {{ inst_disabled }}/>
+    <br><br>
+    <input class="upload-group" id="instructor_upload_{{ xblock_id }}" type="button" value="Upload" {{ inst_disabled }}/>
+    <div id="inst_loader_{{ xblock_id }}" class="upload-group loader"></div>
+</form>
+
+<br>
+<div class="" id="inst_upload_result_{{ xblock_id }}"></div>
+<hr>
+
+
+<h2>Uploaded Notebook Details</h2>
+<p><b>Notebook Link: </b>
+{% if instructor_download_url %}
+<a id="instructor_nb_url_{{ xblock_id }}" href="{{ instructor_download_url }}">Download</a>
+{% else %}
+<a id="instructor_nb_url_{{ xblock_id }}">No Notebook Uploaded</a>
+{% endif %}
+</p>
+<p><b>Notebook Name:</b> <span id="nb_name_{{ xblock_id }}">{{ nb_name }}</span></p>
+<p><b>Max Possible Score:</b> <span id="max_nb_score_{{ xblock_id }}">{{ max_score }}</span></p>
+<p><b>Uploaded At: </b><span id="nb_upload_date_{{ xblock_id }}">{{ nb_upload_date }}</span></p>
+
+</div>

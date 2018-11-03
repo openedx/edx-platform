@@ -1,0 +1,17 @@
+<p><b>Section Scores:</b></p>
+<table class="section-scores">
+    <tr>
+        <th class="text-center">Cell Name</th>
+        <th class="text-center">Score</th>
+    <tr>
+{% for section in section_scores %}
+    {% if section.failed_tests %}
+        <tr class="text-danger bg-danger">
+    {% else %}
+        <tr class="text-success bg-success">
+    {% endif %}
+        <td>{{ section.name }}</td>
+        <td class="text-center">{{ section.score }} / {{ section.max_score }}</td>
+    </tr>
+{% endfor %}
+</table>

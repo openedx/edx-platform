@@ -1,0 +1,103 @@
+#assignments .panel-group .panel {
+    margin-top: 3px;
+    margin-bottom: 1em;
+}
+
+#assignments .panel-group .panel .panel-heading {
+    background-color: #eee;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-left: 7px;
+    padding-right: 7px;
+    line-height: 22px;
+}
+
+#assignments .panel-group .panel .panel-heading a:focus, a:hover {
+    text-decoration: none;
+}
+
+#assignments .panel-group .panel .panel-body {
+    padding: 0;
+}
+
+#assignments .panel-group .panel .panel-body .list_container {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    border: 0px;
+    border-radius: 0px;
+}
+
+#assignments .panel-group .panel .panel-body .list_container .list_item {
+    border-bottom: 1px solid #ddd;
+}
+
+#assignments .panel-group .panel .panel-body .list_container .list_item:last-child {
+    border-bottom: 0px;
+}
+
+#assignments .assignment-notebooks .list_item {
+    background-color: inherit !important;
+}
+
+#assignments .assignment-notebooks .list_item:hover {
+    background-color: #ddd !important;
+}
+
+#assignments .assignment-notebooks .list_item:first-child:hover {
+    background-color: inherit !important;
+}
+
+#assignments .list_item {
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-left: 7px;
+    padding-right: 7px;
+    line-height: 22px;
+}
+
+#assignments .list_item > div {
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+#assignments .item_status {
+    text-align: right;
+}
+
+#assignments .item_status .btn {
+    min-width: 13ex;
+}
+
+#assignments .list_placeholder {
+    display: none;
+}
+
+#assignments .list_error, #assignments .version_error {
+    display: none;
+}
+
+#submission-message p,
+#validation-message p {
+    margin-bottom: 1em;
+    padding-top: 1em;
+}
+
+#submission-message pre,
+#validation-message pre {
+    margin-left: 1em;
+    margin-right: 1em;
+}
+
+#submission-message pre {
+    white-space: pre;
+}
+
+#assignments .list_placeholder, #assignments .list_loading, #assignments .list_error {
+    font-weight: bold;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-left: 7px;
+    padding-right: 7px;
+}

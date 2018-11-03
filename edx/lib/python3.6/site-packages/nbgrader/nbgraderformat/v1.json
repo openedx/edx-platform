@@ -1,0 +1,46 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "nbgrader cell metadata schema",
+    "type": "object",
+    "properties": {
+        "schema_version": {
+            "description": "the version of the cell metadata schema",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1
+        },
+        "grade": {
+            "description": "whether this cell should be graded",
+            "type": "boolean",
+            "default": false
+        },
+        "locked": {
+            "description": "whether the cell should be editable",
+            "type": "boolean",
+            "default": false
+        },
+        "solution": {
+            "description": "whether this cell contains a solution",
+            "type": "boolean",
+            "default": false
+        },
+        "grade_id": {
+            "description": "the nbgrader id of the cell, only present if one or more of grade/locked/solution is true",
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_\\-]*$"
+        },
+        "points": {
+            "description": "the number of points this cell is worth; only present if grade is true",
+            "type": "number",
+            "minimum": 0
+        },
+        "checksum": {
+            "description": "a checksum of the cell contents; generally only present in the student version of an assignment",
+            "type": "string",
+            "minLength": 32,
+            "maxLength": 32
+        }
+    },
+    "required": ["schema_version", "grade", "locked", "solution"],
+    "additionalProperties": false
+}

@@ -1,0 +1,14 @@
+{
+  "name": "jquery-color",
+  "homepage": "https://github.com/jquery/jquery-color",
+  "version": "2.1.2",
+  "_release": "2.1.2",
+  "_resolution": {
+    "type": "version",
+    "tag": "2.1.2",
+    "commit": "9e5e04c1c4ee66427fbe04cfce8155b76748ca64"
+  },
+  "_source": "git://github.com/jquery/jquery-color.git",
+  "_target": "~2.1.2",
+  "_originalSource": "jquery/jquery-color"
+}

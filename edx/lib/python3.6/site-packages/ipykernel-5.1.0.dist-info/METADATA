@@ -1,0 +1,32 @@
+Metadata-Version: 2.1
+Name: ipykernel
+Version: 5.1.0
+Summary: IPython Kernel for Jupyter
+Home-page: https://ipython.org
+Author: IPython Development Team
+Author-email: ipython-dev@scipy.org
+License: BSD
+Keywords: Interactive,Interpreter,Shell,Web
+Platform: Linux
+Platform: Mac OS X
+Platform: Windows
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: System Administrators
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Requires-Python: >=3.4
+Provides-Extra: test
+Requires-Dist: ipython (>=5.0.0)
+Requires-Dist: traitlets (>=4.1.0)
+Requires-Dist: jupyter-client
+Requires-Dist: tornado (>=4.2)
+Provides-Extra: test
+Requires-Dist: pytest; extra == 'test'
+Requires-Dist: pytest-cov; extra == 'test'
+Requires-Dist: nose; extra == 'test'
+
+The IPython kernel for Jupyter
+
+

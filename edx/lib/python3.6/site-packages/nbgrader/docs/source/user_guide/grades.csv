@@ -1,0 +1,3 @@
+assignment,duedate,timestamp,student_id,last_name,first_name,email,raw_score,late_submission_penalty,score,max_score
+ps1,,2015-02-02 22:58:23.948203,bitdiddle,,,,1.5,0.0,1.5,9.0
+ps1,,2015-02-01 17:28:58.749302,hacker,,,,3.0,0.0,3.0,9.0

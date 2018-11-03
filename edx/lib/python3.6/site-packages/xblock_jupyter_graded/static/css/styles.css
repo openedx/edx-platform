@@ -1,0 +1,111 @@
+.my-alert {
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+
+.my-alert-info {
+  color: #31708f;
+  background-color: #d9edf7;
+  border-color: #bce8f1;
+}
+
+.my-alert-success {
+  color: #3c763d;
+  background-color: #dff0d8;
+  border-color: #d6e9c6;
+}
+
+.my-alert-danger {
+  color: #a94442;
+  background-color: #f2dede;
+  border-color: #ebccd1;
+}
+
+.my-alert-warning {
+  color: #8a6d3b;
+  background-color: #fcf8e3;
+  border-color: #faebcc;
+}
+
+.instructor-section {
+    background: #f9f9f9;
+    border-radius: 7px;
+    padding: 10px;
+}
+
+/* From W3Schools */
+.loader {
+    margin-left: 10px;
+    border: 5px solid #f3f3f3; /* Light grey */
+    border-top: 5px solid #3498db; /* Blue */
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 2s linear infinite;
+    animation-play-state: paused;
+    visibility: hidden;
+    box-sizing: unset;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.upload-group {
+    display: inline-block;
+    vertical-align: middle !important;
+}
+
+.requirements {
+    max-height: 150px;
+    overflow: scroll;
+}
+
+.hidden {
+    display: none;
+}
+
+.section-scores {
+	margin-left: 25px;
+}
+
+.text-center {
+	text-align: center;
+}
+
+.section-scores tr {
+	border: 1px solid gray;
+	border-collapse: collapse;
+}
+
+.section-scores tr td {
+	padding: 5px 15px;
+}
+
+.text-success {
+  color: #3c763d;
+}
+
+.text-danger {
+  color: #a94442;
+}
+
+.bg-success {
+  background-color: #dff0d8;
+}
+
+.bg-danger {
+  background-color: #f2dede;
+}
+
+.bullets {
+    list-style: disc inside none;
+}
+
+.bullets li {
+    padding-top: 3px;
+    padding-bottom: 3px;
+}

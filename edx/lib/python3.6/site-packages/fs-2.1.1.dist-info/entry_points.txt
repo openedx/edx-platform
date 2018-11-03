@@ -1,0 +1,15 @@
+[fs.opener]
+file = fs.opener.osfs:OSFSOpener
+ftp = fs.opener.ftpfs:FTPOpener
+mem = fs.opener.memoryfs:MemOpener
+osfs = fs.opener.osfs:OSFSOpener
+siteconf = fs.opener.appfs:AppFSOpener
+sitedata = fs.opener.appfs:AppFSOpener
+tar = fs.opener.tarfs:TarOpener
+temp = fs.opener.tempfs:TempOpener
+usercache = fs.opener.appfs:AppFSOpener
+userconf = fs.opener.appfs:AppFSOpener
+userdata = fs.opener.appfs:AppFSOpener
+userlog = fs.opener.appfs:AppFSOpener
+zip = fs.opener.zipfs:ZipOpener
+
