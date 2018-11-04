@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-10-28 20:37+0000\n"
-"PO-Revision-Date: 2018-10-28 20:37:27.836967\n"
+"POT-Creation-Date: 2018-11-04 20:36+0000\n"
+"PO-Revision-Date: 2018-11-04 20:37:00.840623\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -5928,10 +5928,9 @@ msgid "Student Name"
 msgstr "Stüdént Nämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/static/js/writable_gradebook.js
-msgid "There are no student grades to adjust."
+msgid "Update in progress, please wait..."
 msgstr ""
-"Théré äré nö stüdént grädés tö ädjüst. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
+"Ûpdäté ïn prögréss, pléäsé wäït... Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: lms/static/lms/js/preview/preview_factory.js
 msgid "Course is not yet visible to students."

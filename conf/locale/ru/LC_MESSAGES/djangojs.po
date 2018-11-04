@@ -159,7 +159,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-10-21 20:42+0000\n"
+"POT-Creation-Date: 2018-10-28 20:42+0000\n"
 "PO-Revision-Date: 2018-10-17 17:41+0000\n"
 "Last-Translator: Michael Savin <m.savin.ru@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
@@ -4304,6 +4304,16 @@ msgstr "Пожалуйста, введите электронный адрес �
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
+"Error getting enrollment status for '<%- student_id %>'. Make sure that the "
+"student identifier is spelled correctly."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid "Retrieving enrollment status..."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
 "Error getting student progress url for '<%- student_id %>'. Make sure that "
 "the student identifier is spelled correctly."
 msgstr ""
@@ -5446,10 +5456,6 @@ msgstr "КБ"
 msgid "MB"
 msgstr "МБ"
 
-#: lms/static/js/writable_gradebook.js
-msgid "Current grade"
-msgstr ""
-
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -5470,10 +5476,6 @@ msgstr ""
 
 #: lms/static/js/writable_gradebook.js
 msgid "Student Name"
-msgstr ""
-
-#: lms/static/js/writable_gradebook.js
-msgid "Comment"
 msgstr ""
 
 #: lms/static/js/writable_gradebook.js

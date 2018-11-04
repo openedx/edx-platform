@@ -362,7 +362,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-10-21 20:42+0000\n"
+"POT-Creation-Date: 2018-10-28 20:42+0000\n"
 "PO-Revision-Date: 2018-10-23 01:16+0000\n"
 "Last-Translator: ifLab <webmaster@iflab.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -6825,6 +6825,31 @@ msgid "pdf download unavailable right now, please contact support."
 msgstr "pdf文件现在无法下载，请联系技术支持。"
 
 #: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid "Enrollment status for {student}: unknown"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid "Enrollment status for {student}: active"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid "Enrollment status for {student}: inactive"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid "Enrollment status for {student}: pending"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid "Enrollment status for {student}: never enrolled"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 msgid "Module does not exist."
 msgstr "模块不存在。"
 
@@ -11134,6 +11159,21 @@ msgstr "讨论子类别名称时，该名称会出现在课程论坛的左窗格
 msgid ""
 "You are not signed in. To view the discussion content, {sign_in_link} or "
 "{register_link}, and enroll in this course."
+msgstr ""
+
+#: openedx/features/course_duration_limits/access.py
+#, python-brace-format
+msgid "Access expired on {expiration_date}"
+msgstr ""
+
+#: openedx/features/course_duration_limits/access.py
+#, python-brace-format
+msgid "Access to {course_name} expired on {expiration_date}"
+msgstr ""
+
+#: openedx/features/course_duration_limits/access.py
+#, python-brace-format
+msgid "Access to the course you were lookingfor expired on {expiration_date}"
 msgstr ""
 
 #: openedx/features/course_experience/plugins.py
@@ -15696,6 +15736,10 @@ msgid "Starts - {date}"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "for {course_display_name}"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You must select a session by {expiration_date} to access the course."
 msgstr ""
 
@@ -15718,10 +15762,6 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Archived Course"
 msgstr "查看存档的课程"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "for {course_display_name}"
-msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm taking {course_name} online with {facebook_brand}. Check it out!"
@@ -18291,15 +18331,27 @@ msgid "View Gradebook"
 msgstr "查看成绩单"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "View a specific learner's enrollment status"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Learner's {platform_name} email address or username *"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Learner email address or username"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "View Enrollment Status"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View a specific learner's grades and progress"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Learner's {platform_name} email address or username"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Learner email address or username"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html

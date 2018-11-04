@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-10-28 20:37+0000\n"
-"PO-Revision-Date: 2018-10-28 20:37:28.196547\n"
+"POT-Creation-Date: 2018-11-04 20:36+0000\n"
+"PO-Revision-Date: 2018-11-04 20:37:00.635055\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -13772,6 +13772,16 @@ msgstr ""
 "Ýöü äré nöt sïgnéd ïn. Tö vïéw thé dïsçüssïön çöntént, {sign_in_link} ör "
 "{register_link}, änd énröll ïn thïs çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
+#: openedx/features/content_type_gating/partitions.py
+msgid "Feature-based Enrollments"
+msgstr "Féätüré-ßäséd Énröllménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: openedx/features/content_type_gating/partitions.py
+msgid "Partition for segmenting users by access to gated content types"
+msgstr ""
+"Pärtïtïön för ségméntïng üsérs ßý äççéss tö gätéd çöntént týpés Ⱡ'σяєм ιρѕυм"
+" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
 #: openedx/features/course_duration_limits/access.py
 #, python-brace-format
 msgid "Access expired on {expiration_date}"
@@ -18401,6 +18411,13 @@ msgstr ""
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
+msgid "Pursue Academic Credit with the Verified Track"
+msgstr ""
+"Pürsüé Àçädémïç Çrédït wïth thé Vérïfïéd Träçk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α#"
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
 msgid "Pursue Academic Credit with a Verified Certificate"
 msgstr ""
 "Pürsüé Àçädémïç Çrédït wïth ä Vérïfïéd Çértïfïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
@@ -18425,9 +18442,8 @@ msgstr ""
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
-msgid "Benefits of a Verified Certificate"
-msgstr ""
-"Bénéfïts öf ä Vérïfïéd Çértïfïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+msgid "Benefits of the Verified Track"
+msgstr "Bénéfïts öf thé Vérïfïéd Träçk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -18437,6 +18453,39 @@ msgid ""
 msgstr ""
 "{b_start}Élïgïßlé för çrédït:{b_end} Réçéïvé äçädémïç çrédït äftér "
 "süççéssfüllý çömplétïng thé çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"{b_start}Unlimited Course Access: {b_end}Learn at your own pace, and access "
+"materials anytime to brush up on what you've learned."
+msgstr ""
+"{b_start}Ûnlïmïtéd Çöürsé Àççéss: {b_end}Léärn ät ýöür öwn päçé, änd äççéss "
+"mätérïäls änýtïmé tö ßrüsh üp ön whät ýöü'vé léärnéd. Ⱡ'σяєм ιρѕυм#"
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"{b_start}Graded Assignments: {b_end}Build your skills through graded "
+"assignments and projects."
+msgstr ""
+"{b_start}Grädéd Àssïgnménts: {b_end}Büïld ýöür skïlls thröügh grädéd "
+"ässïgnménts änd pröjéçts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"{b_start}Easily Sharable: {b_end}Add the certificate to your CV or resume, "
+"or post it directly on LinkedIn."
+msgstr ""
+"{b_start}Éäsïlý Shäräßlé: {b_end}Àdd thé çértïfïçäté tö ýöür ÇV ör résümé, "
+"ör pöst ït dïréçtlý ön LïnkédÌn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid "Benefits of a Verified Certificate"
+msgstr ""
+"Bénéfïts öf ä Vérïfïéd Çértïfïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -18460,6 +18509,11 @@ msgstr ""
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid "Pursue a Verified Certificate"
 msgstr "Pürsüé ä Vérïfïéd Çértïfïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid "Pursue the Verified Track"
+msgstr "Pürsüé thé Vérïfïéd Träçk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -18524,8 +18578,23 @@ msgid "Audit This Course (No Certificate)"
 msgstr ""
 "Àüdït Thïs Çöürsé (Nö Çértïfïçäté) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
-#. Translators: b_start notes the beginning of a section of text bolded for
-#. emphasis, and b_end marks the end of the bolded text.
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"Audit this course for free and have access to course materials and "
+"discussions forums. {b_start}This track does not include graded assignments,"
+" or unlimited course access.{b_end}"
+msgstr ""
+"Àüdït thïs çöürsé för fréé änd hävé äççéss tö çöürsé mätérïäls änd "
+"dïsçüssïöns förüms. {b_start}Thïs träçk döés nöt ïnçlüdé grädéd ässïgnménts,"
+" ör ünlïmïtéd çöürsé äççéss.{b_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя"
+" α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє "
+"мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ "
+"łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
+"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
+"ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι "
+"σƒƒ#"
+
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
@@ -24758,6 +24827,14 @@ msgstr ""
 "¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
 "¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
 "ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łαвσя#"
+
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"{b_start}Support our Mission: {b_end}EdX, a non-profit, relies on verified "
+"certificates to help fund affordable education to everyone globally."
+msgstr ""
+"{b_start}Süppört öür Mïssïön: {b_end}ÉdX, ä nön-pröfït, rélïés ön vérïfïéd "
+"çértïfïçätés tö hélp fünd äffördäßlé édüçätïön tö évérýöné glößällý.#"
 
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""

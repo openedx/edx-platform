@@ -143,7 +143,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-10-21 20:42+0000\n"
+"POT-Creation-Date: 2018-10-28 20:42+0000\n"
 "PO-Revision-Date: 2018-08-02 22:07+0000\n"
 "Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -4288,6 +4288,16 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
+"Error getting enrollment status for '<%- student_id %>'. Make sure that the "
+"student identifier is spelled correctly."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid "Retrieving enrollment status..."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
 "Error getting student progress url for '<%- student_id %>'. Make sure that "
 "the student identifier is spelled correctly."
 msgstr ""
@@ -5487,10 +5497,6 @@ msgstr "KB"
 msgid "MB"
 msgstr "MB"
 
-#: lms/static/js/writable_gradebook.js
-msgid "Current grade"
-msgstr ""
-
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -5511,10 +5517,6 @@ msgstr ""
 
 #: lms/static/js/writable_gradebook.js
 msgid "Student Name"
-msgstr ""
-
-#: lms/static/js/writable_gradebook.js
-msgid "Comment"
 msgstr ""
 
 #: lms/static/js/writable_gradebook.js
@@ -5681,7 +5683,7 @@ msgstr ""
 
 #: cms/static/cms/js/main.js
 msgid "Studio's having trouble saving your work"
-msgstr ""
+msgstr "Studio tiene problemas para guardar tu trabajo"
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 msgid "OpenAssessment Save Error"

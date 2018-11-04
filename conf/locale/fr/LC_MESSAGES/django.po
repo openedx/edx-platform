@@ -272,7 +272,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-10-21 20:42+0000\n"
+"POT-Creation-Date: 2018-10-28 20:42+0000\n"
 "PO-Revision-Date: 2018-08-18 07:26+0000\n"
 "Last-Translator: John Burke <johnb@matinee.co.uk>\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
@@ -7415,6 +7415,31 @@ msgstr ""
 "téléchargement du pdf non disponible en ce moment, svp contacter le support."
 
 #: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid "Enrollment status for {student}: unknown"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid "Enrollment status for {student}: active"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid "Enrollment status for {student}: inactive"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid "Enrollment status for {student}: pending"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid "Enrollment status for {student}: never enrolled"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 msgid "Module does not exist."
 msgstr "Le module n'existe pas."
 
@@ -12066,6 +12091,21 @@ msgstr ""
 msgid ""
 "You are not signed in. To view the discussion content, {sign_in_link} or "
 "{register_link}, and enroll in this course."
+msgstr ""
+
+#: openedx/features/course_duration_limits/access.py
+#, python-brace-format
+msgid "Access expired on {expiration_date}"
+msgstr ""
+
+#: openedx/features/course_duration_limits/access.py
+#, python-brace-format
+msgid "Access to {course_name} expired on {expiration_date}"
+msgstr ""
+
+#: openedx/features/course_duration_limits/access.py
+#, python-brace-format
+msgid "Access to the course you were lookingfor expired on {expiration_date}"
 msgstr ""
 
 #: openedx/features/course_experience/plugins.py
@@ -16916,6 +16956,10 @@ msgid "Starts - {date}"
 msgstr "Début - {date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "for {course_display_name}"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You must select a session by {expiration_date} to access the course."
 msgstr ""
 
@@ -16938,10 +16982,6 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Archived Course"
 msgstr "Voir le cours"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "for {course_display_name}"
-msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm taking {course_name} online with {facebook_brand}. Check it out!"
@@ -19800,16 +19840,28 @@ msgid "View Gradebook"
 msgstr "Voir le bulletin de notes"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "View a specific learner's enrollment status"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Learner's {platform_name} email address or username *"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Learner email address or username"
+msgstr "Adresse email ou nom d'utilisateur de l'apprenant"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "View Enrollment Status"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View a specific learner's grades and progress"
 msgstr "Voir les notes et la progression d'un apprenant spécifique"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Learner's {platform_name} email address or username"
 msgstr "Email ou nom d'utilisateur {platform_name} de l'apprenant"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Learner email address or username"
-msgstr "Adresse email ou nom d'utilisateur de l'apprenant"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View Progress Page"
