@@ -224,7 +224,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-10-21 20:42+0000\n"
+"POT-Creation-Date: 2018-10-28 20:42+0000\n"
 "PO-Revision-Date: 2018-08-02 21:25+0000\n"
 "Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -7490,6 +7490,31 @@ msgstr ""
 "equipo de soporte"
 
 #: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid "Enrollment status for {student}: unknown"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid "Enrollment status for {student}: active"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid "Enrollment status for {student}: inactive"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid "Enrollment status for {student}: pending"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid "Enrollment status for {student}: never enrolled"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 msgid "Module does not exist."
 msgstr "No existe el módulo."
 
@@ -12277,6 +12302,21 @@ msgid ""
 msgstr ""
 "No has iniciado sesión. Para ver el contenido {sign_in_link} o "
 "{register_link}, e inscríbete en este curso."
+
+#: openedx/features/course_duration_limits/access.py
+#, python-brace-format
+msgid "Access expired on {expiration_date}"
+msgstr ""
+
+#: openedx/features/course_duration_limits/access.py
+#, python-brace-format
+msgid "Access to {course_name} expired on {expiration_date}"
+msgstr ""
+
+#: openedx/features/course_duration_limits/access.py
+#, python-brace-format
+msgid "Access to the course you were lookingfor expired on {expiration_date}"
+msgstr ""
 
 #: openedx/features/course_experience/plugins.py
 #: cms/templates/widgets/header.html
@@ -17452,6 +17492,10 @@ msgid "Starts - {date}"
 msgstr "Inicia - {date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "for {course_display_name}"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You must select a session by {expiration_date} to access the course."
 msgstr ""
 "Debe seleccionar una sesión antes de {expiration_date} para acceder al "
@@ -17476,10 +17520,6 @@ msgstr "Puede cambiar la sesión hasta el {entitlement_expiration_date}."
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Archived Course"
 msgstr "Ver curso archivado"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "for {course_display_name}"
-msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm taking {course_name} online with {facebook_brand}. Check it out!"
@@ -20411,6 +20451,22 @@ msgid "View Gradebook"
 msgstr "Ver libro de calificaciones"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "View a specific learner's enrollment status"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Learner's {platform_name} email address or username *"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Learner email address or username"
+msgstr "Dirección de correo electrónico o nombre de usuario del estudiante"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "View Enrollment Status"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View a specific learner's grades and progress"
 msgstr "Ver las notas y el progreso de un estudiante específico"
 
@@ -20418,10 +20474,6 @@ msgstr "Ver las notas y el progreso de un estudiante específico"
 msgid "Learner's {platform_name} email address or username"
 msgstr ""
 "Correo electrónico o nombre de usuario del estudiante en {platform_name}"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Learner email address or username"
-msgstr "Dirección de correo electrónico o nombre de usuario del estudiante"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View Progress Page"

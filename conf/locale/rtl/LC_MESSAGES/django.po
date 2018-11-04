@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-10-28 20:37+0000\n"
-"PO-Revision-Date: 2018-10-28 20:37:28.196547\n"
+"POT-Creation-Date: 2018-11-04 20:36+0000\n"
+"PO-Revision-Date: 2018-11-04 20:37:00.635055\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -11915,6 +11915,14 @@ msgstr ""
 "غخع شقث رخف سهلرثي هر. فخ دهثص فاث يهسذعسسهخر ذخرفثرف, {sign_in_link} خق "
 "{register_link}, شري ثرقخمم هر فاهس ذخعقسث."
 
+#: openedx/features/content_type_gating/partitions.py
+msgid "Feature-based Enrollments"
+msgstr "بثشفعقث-زشسثي ثرقخمموثرفس"
+
+#: openedx/features/content_type_gating/partitions.py
+msgid "Partition for segmenting users by access to gated content types"
+msgstr "حشقفهفهخر بخق سثلوثرفهرل عسثقس زغ شذذثسس فخ لشفثي ذخرفثرف فغحثس"
+
 #: openedx/features/course_duration_limits/access.py
 #, python-brace-format
 msgid "Access expired on {expiration_date}"
@@ -16068,6 +16076,11 @@ msgstr "سخققغ, فاثقث صشس شر ثققخق صاثر فقغهرل فخ
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
+msgid "Pursue Academic Credit with the Verified Track"
+msgstr "حعقسعث شذشيثوهذ ذقثيهف صهفا فاث دثقهبهثي فقشذن"
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
 msgid "Pursue Academic Credit with a Verified Certificate"
 msgstr "حعقسعث شذشيثوهذ ذقثيهف صهفا ش دثقهبهثي ذثقفهبهذشفث"
 
@@ -16086,8 +16099,8 @@ msgstr ""
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
-msgid "Benefits of a Verified Certificate"
-msgstr "زثرثبهفس خب ش دثقهبهثي ذثقفهبهذشفث"
+msgid "Benefits of the Verified Track"
+msgstr "زثرثبهفس خب فاث دثقهبهثي فقشذن"
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -16097,6 +16110,38 @@ msgid ""
 msgstr ""
 "{b_start}ثمهلهزمث بخق ذقثيهف:{b_end} قثذثهدث شذشيثوهذ ذقثيهف شبفثق "
 "سعذذثسسبعممغ ذخوحمثفهرل فاث ذخعقسث"
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"{b_start}Unlimited Course Access: {b_end}Learn at your own pace, and access "
+"materials anytime to brush up on what you've learned."
+msgstr ""
+"{b_start}عرمهوهفثي ذخعقسث شذذثسس: {b_end}مثشقر شف غخعق خصر حشذث, شري شذذثسس "
+"وشفثقهشمس شرغفهوث فخ زقعسا عح خر صاشف غخع'دث مثشقرثي."
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"{b_start}Graded Assignments: {b_end}Build your skills through graded "
+"assignments and projects."
+msgstr ""
+"{b_start}لقشيثي شسسهلروثرفس: {b_end}زعهمي غخعق سنهممس فاقخعلا لقشيثي "
+"شسسهلروثرفس شري حقختثذفس."
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"{b_start}Easily Sharable: {b_end}Add the certificate to your CV or resume, "
+"or post it directly on LinkedIn."
+msgstr ""
+"{b_start}ثشسهمغ ساشقشزمث: {b_end}شيي فاث ذثقفهبهذشفث فخ غخعق ذد خق قثسعوث, "
+"خق حخسف هف يهقثذفمغ خر مهرنثيهر."
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid "Benefits of a Verified Certificate"
+msgstr "زثرثبهفس خب ش دثقهبهثي ذثقفهبهذشفث"
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -16120,6 +16165,11 @@ msgstr ""
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid "Pursue a Verified Certificate"
 msgstr "حعقسعث ش دثقهبهثي ذثقفهبهذشفث"
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid "Pursue the Verified Track"
+msgstr "حعقسعث فاث دثقهبهثي فقشذن"
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
@@ -16178,8 +16228,17 @@ msgstr ""
 msgid "Audit This Course (No Certificate)"
 msgstr "شعيهف فاهس ذخعقسث (رخ ذثقفهبهذشفث)"
 
-#. Translators: b_start notes the beginning of a section of text bolded for
-#. emphasis, and b_end marks the end of the bolded text.
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"Audit this course for free and have access to course materials and "
+"discussions forums. {b_start}This track does not include graded assignments,"
+" or unlimited course access.{b_end}"
+msgstr ""
+"شعيهف فاهس ذخعقسث بخق بقثث شري اشدث شذذثسس فخ ذخعقسث وشفثقهشمس شري "
+"يهسذعسسهخرس بخقعوس. {b_start}فاهس فقشذن يخثس رخف هرذمعيث لقشيثي شسسهلروثرفس,"
+" خق عرمهوهفثي ذخعقسث شذذثسس.{b_end}"
+
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
@@ -21596,6 +21655,14 @@ msgid ""
 msgstr ""
 "شمم قهلافس قثسثقدثي ثطذثحف صاثقث رخفثي. ثيط, خحثر ثيط شري فاث ثيط شري خحثر "
 "ثيط مخلخس شقث قثلهسفثقثي فقشيثوشقنس خق فقشيثوشقنس خب ثيط هرذ."
+
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"{b_start}Support our Mission: {b_end}EdX, a non-profit, relies on verified "
+"certificates to help fund affordable education to everyone globally."
+msgstr ""
+"{b_start}سعححخقف خعق وهسسهخر: {b_end}ثيط, ش رخر-حقخبهف, قثمهثس خر دثقهبهثي "
+"ذثقفهبهذشفثس فخ اثمح بعري شببخقيشزمث ثيعذشفهخر فخ ثدثقغخرث لمخزشممغ."
 
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""

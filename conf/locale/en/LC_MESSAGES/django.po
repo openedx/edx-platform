@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-10-28 20:37+0000\n"
-"PO-Revision-Date: 2018-10-28 20:37:28.196547\n"
+"POT-Creation-Date: 2018-11-04 20:36+0000\n"
+"PO-Revision-Date: 2018-11-04 20:37:00.635055\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -10788,6 +10788,14 @@ msgid ""
 "{register_link}, and enroll in this course."
 msgstr ""
 
+#: openedx/features/content_type_gating/partitions.py
+msgid "Feature-based Enrollments"
+msgstr ""
+
+#: openedx/features/content_type_gating/partitions.py
+msgid "Partition for segmenting users by access to gated content types"
+msgstr ""
+
 #: openedx/features/course_duration_limits/access.py
 #, python-brace-format
 msgid "Access expired on {expiration_date}"
@@ -14464,6 +14472,11 @@ msgstr ""
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
+msgid "Pursue Academic Credit with the Verified Track"
+msgstr ""
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
 msgid "Pursue Academic Credit with a Verified Certificate"
 msgstr ""
 
@@ -14478,7 +14491,7 @@ msgstr ""
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
-msgid "Benefits of a Verified Certificate"
+msgid "Benefits of the Verified Track"
 msgstr ""
 
 #: lms/templates/course_modes/choose.html
@@ -14486,6 +14499,32 @@ msgstr ""
 msgid ""
 "{b_start}Eligible for credit:{b_end} Receive academic credit after "
 "successfully completing the course"
+msgstr ""
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"{b_start}Unlimited Course Access: {b_end}Learn at your own pace, and access "
+"materials anytime to brush up on what you've learned."
+msgstr ""
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"{b_start}Graded Assignments: {b_end}Build your skills through graded "
+"assignments and projects."
+msgstr ""
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"{b_start}Easily Sharable: {b_end}Add the certificate to your CV or resume, "
+"or post it directly on LinkedIn."
+msgstr ""
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid "Benefits of a Verified Certificate"
 msgstr ""
 
 #: lms/templates/course_modes/choose.html
@@ -14505,6 +14544,11 @@ msgstr ""
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid "Pursue a Verified Certificate"
+msgstr ""
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid "Pursue the Verified Track"
 msgstr ""
 
 #: lms/templates/course_modes/choose.html
@@ -14553,8 +14597,14 @@ msgstr ""
 msgid "Audit This Course (No Certificate)"
 msgstr ""
 
-#. Translators: b_start notes the beginning of a section of text bolded for
-#. emphasis, and b_end marks the end of the bolded text.
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"Audit this course for free and have access to course materials and "
+"discussions forums. {b_start}This track does not include graded assignments,"
+" or unlimited course access.{b_end}"
+msgstr ""
+
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
@@ -19456,6 +19506,12 @@ msgstr ""
 msgid ""
 "All rights reserved except where noted. edX, Open edX and the edX and Open "
 "edX logos are registered trademarks or trademarks of edX Inc."
+msgstr ""
+
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"{b_start}Support our Mission: {b_end}EdX, a non-profit, relies on verified "
+"certificates to help fund affordable education to everyone globally."
 msgstr ""
 
 #: themes/edx.org/lms/templates/course_modes/choose.html

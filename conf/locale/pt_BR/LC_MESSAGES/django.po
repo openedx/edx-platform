@@ -78,6 +78,7 @@
 # Paulo Romano <pauloromanocarvalho@gmail.com>, 2017
 # Paulo Romano <pauloromanocarvalho@gmail.com>, 2017
 # Pedro Guimarães Martins <pedrogmartins7@gmail.com>, 2015
+# Piero Lunelli, 2018
 # RenataBarboza, 2013
 # Renata Barboza, 2013-2016
 # Rene Souza Vianello Argento <rene.argento@gmail.com>, 2015
@@ -212,6 +213,7 @@
 # Paulo Castro, 2013
 # Paulo Romano <pauloromanocarvalho@gmail.com>, 2017
 # Pedro Guimarães Martins <pedrogmartins7@gmail.com>, 2014-2015
+# Piero Lunelli, 2018
 # Raphael Mendonça, 2014
 # Raphael Mendonça, 2014
 # Raysa Valentim dos Santos <450196c3c524855835a0620c3ad54b43_291153>, 2015
@@ -318,7 +320,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-10-21 20:42+0000\n"
+"POT-Creation-Date: 2018-10-28 20:42+0000\n"
 "PO-Revision-Date: 2018-10-03 10:24+0000\n"
 "Last-Translator: alconost <alpha@alconost.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
@@ -7257,6 +7259,31 @@ msgstr ""
 "suporte"
 
 #: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid "Enrollment status for {student}: unknown"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid "Enrollment status for {student}: active"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid "Enrollment status for {student}: inactive"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid "Enrollment status for {student}: pending"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
+msgid "Enrollment status for {student}: never enrolled"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 msgid "Module does not exist."
 msgstr "O módulo não existe."
 
@@ -11818,6 +11845,21 @@ msgstr ""
 msgid ""
 "You are not signed in. To view the discussion content, {sign_in_link} or "
 "{register_link}, and enroll in this course."
+msgstr ""
+
+#: openedx/features/course_duration_limits/access.py
+#, python-brace-format
+msgid "Access expired on {expiration_date}"
+msgstr ""
+
+#: openedx/features/course_duration_limits/access.py
+#, python-brace-format
+msgid "Access to {course_name} expired on {expiration_date}"
+msgstr ""
+
+#: openedx/features/course_duration_limits/access.py
+#, python-brace-format
+msgid "Access to the course you were lookingfor expired on {expiration_date}"
 msgstr ""
 
 #: openedx/features/course_experience/plugins.py
@@ -16531,6 +16573,10 @@ msgid "Starts - {date}"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "for {course_display_name}"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You must select a session by {expiration_date} to access the course."
 msgstr ""
 
@@ -16553,10 +16599,6 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Archived Course"
 msgstr "Visualizar curso arquivado"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "for {course_display_name}"
-msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm taking {course_name} online with {facebook_brand}. Check it out!"
@@ -19350,15 +19392,27 @@ msgid "View Gradebook"
 msgstr "Visualizar boletim"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "View a specific learner's enrollment status"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Learner's {platform_name} email address or username *"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Learner email address or username"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "View Enrollment Status"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View a specific learner's grades and progress"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Learner's {platform_name} email address or username"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Learner email address or username"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html

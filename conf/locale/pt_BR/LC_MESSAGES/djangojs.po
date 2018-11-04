@@ -67,6 +67,7 @@
 # Paulo Castro, 2013
 # Paulo Romano <pauloromanocarvalho@gmail.com>, 2017
 # Pedro Guimarães Martins <pedrogmartins7@gmail.com>, 2014
+# Piero Lunelli, 2018
 # RenataBarboza, 2013
 # Renata Barboza, 2013-2016
 # Ricardo Pietrobon <pietr007@gmail.com>, 2013-2014
@@ -174,6 +175,7 @@
 # Maurício Gonçalves Melara Camargo <mauriciogmc@gmail.com>, 2015
 # Monica Farias <monifar.tp@gmail.com>, 2015-2016
 # Drew Melim <nokostya.translation@gmail.com>, 2015
+# Piero Lunelli, 2018
 # Sergio Silva <sergiohrs@gmail.com>, 2016
 # sgtmarciosilva <sgtmarciosilva@ibest.com.br>, 2015
 # Thiago Perrotta <tbperrotta@gmail.com>, 2016
@@ -208,6 +210,7 @@
 # Mike Job <mikejobrn@gmail.com>, 2015
 # Monica Farias <monifar.tp@gmail.com>, 2015-2016
 # Paulo Romano <pauloromanocarvalho@gmail.com>, 2017
+# Piero Lunelli, 2018
 # Renata Barboza, 2015
 # Ricardo Pietrobon <pietr007@gmail.com>, 2014
 # Rodrigo Mozelli <romozelli@outlook.com>, 2016
@@ -218,9 +221,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-10-21 20:42+0000\n"
-"PO-Revision-Date: 2018-09-26 12:47+0000\n"
-"Last-Translator: Fabio Oliveira Silva <fabio.oliv.silva@gmail.com>\n"
+"POT-Creation-Date: 2018-10-28 20:42+0000\n"
+"PO-Revision-Date: 2018-11-02 13:11+0000\n"
+"Last-Translator: Piero Lunelli\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
@@ -4091,6 +4094,16 @@ msgstr "Adicione o endereço de e-mail ou o nome de usuário de um aluno."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
+"Error getting enrollment status for '<%- student_id %>'. Make sure that the "
+"student identifier is spelled correctly."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid "Retrieving enrollment status..."
+msgstr ""
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
 "Error getting student progress url for '<%- student_id %>'. Make sure that "
 "the student identifier is spelled correctly."
 msgstr ""
@@ -5162,10 +5175,6 @@ msgstr "KB"
 msgid "MB"
 msgstr "MB"
 
-#: lms/static/js/writable_gradebook.js
-msgid "Current grade"
-msgstr ""
-
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -5186,10 +5195,6 @@ msgstr ""
 
 #: lms/static/js/writable_gradebook.js
 msgid "Student Name"
-msgstr ""
-
-#: lms/static/js/writable_gradebook.js
-msgid "Comment"
 msgstr ""
 
 #: lms/static/js/writable_gradebook.js
