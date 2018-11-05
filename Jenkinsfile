@@ -40,7 +40,7 @@ pipeline {
                     environment {
                         TEST_SUITE = "lms-unit"
                         XDIST_NUM_TASKS = 10
-                        XDIST_REMOTE_NUM_PROCESSES = 2
+                        XDIST_REMOTE_NUM_PROCESSES = 4
                     }
                     steps {
                         script {
@@ -60,7 +60,7 @@ pipeline {
                     environment {
                         TEST_SUITE = "cms-unit"
                         XDIST_NUM_TASKS = 4
-                        XDIST_REMOTE_NUM_PROCESSES = 2
+                        XDIST_REMOTE_NUM_PROCESSES = 4
                     }
                     steps {
                         script {
@@ -80,7 +80,7 @@ pipeline {
                     environment {
                         TEST_SUITE = "commonlib-unit"
                         XDIST_NUM_TASKS = 3
-                        XDIST_REMOTE_NUM_PROCESSES = 2
+                        XDIST_REMOTE_NUM_PROCESSES = 4
                     }
                     steps {
                         script {
