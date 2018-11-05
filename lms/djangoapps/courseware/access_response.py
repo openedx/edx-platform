@@ -173,10 +173,10 @@ class IncorrectPartitionGroupError(AccessError):
     """
     def __init__(self, partition, user_group, allowed_groups, user_message=None, user_fragment=None):
         error_code = "incorrect_user_group"
-        developer_message = "In partition {}, user was in group {}, but only {} are allowed access".format(
+        developer_message = u"In partition {}, user was in group {}, but only {} are allowed access".format(
             partition.name,
             user_group.name if user_group is not None else user_group,
-            ", ".join(group.name for group in allowed_groups),
+            u", ".join(group.name for group in allowed_groups),
         )
         super(IncorrectPartitionGroupError, self).__init__(
             error_code=error_code,
