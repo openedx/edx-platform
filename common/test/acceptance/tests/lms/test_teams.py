@@ -1030,7 +1030,7 @@ class CreateTeamTest(TeamFormActions):
         # way to write something that waits for that event handler to be bound
         # to the button element. So I used time.sleep as well, even though
         # the bok choy docs explicitly ask us not to:
-        # http://bok-choy.readthedocs.io/en/latest/guidelines.html
+        # https://bok-choy.readthedocs.io/en/latest/guidelines.html
         # Sorry! For the story to address this anti-pattern, see TNL-5820
         time.sleep(0.5)
         self.team_management_page.submit_form()

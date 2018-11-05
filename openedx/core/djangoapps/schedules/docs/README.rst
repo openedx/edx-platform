@@ -155,7 +155,7 @@ Configuring A.C.E.
 
 These instructions assume you have already setup an Open edX instance or
 are running devstack. See the `Open edX Developer’s
-Guide <http://edx.readthedocs.io/projects/edx-developer-guide/en/latest/>`__
+Guide <https://edx.readthedocs.io/projects/edx-developer-guide/en/latest/>`__
 for information on setting them up.
 
 The Schedule app relies on ACE. When live, ACE sends emails to users

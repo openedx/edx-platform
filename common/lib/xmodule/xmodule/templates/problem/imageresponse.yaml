@@ -7,7 +7,7 @@ data:   |
             <p>
                 In an image mapped input problem, also known as a "pointing on a picture" problem, students click inside a defined region in an image. You define this region by including coordinates in the body of the problem. You can define one rectangular region,
                 multiple rectangular regions, or one non-rectangular region. For more information, see
-                <a href="http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/image_mapped_input.html" target="_blank">Image Mapped Input Problem</a>
+                <a href="https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/image_mapped_input.html" target="_blank">Image Mapped Input Problem</a>
                 in
                 <i>Building and Running an edx Course</i>.
             </p>
