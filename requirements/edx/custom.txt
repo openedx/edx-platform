@@ -20,7 +20,7 @@
 -e git+https://github.com/open-craft/xblock-eoc-journal.git@2490351747eb9cc72b01cacfe0c9cc383c3fd6db#egg=xblock-eoc-journal
 -e git+https://github.com/mckinseyacademy/xblock-scorm.git@v2.0.11#egg=xblock-scorm==2.0.11
 -e git+https://github.com/mckinseyacademy/xblock-diagnosticfeedback.git@v0.2.4#egg=xblock-diagnostic-feedback==0.2.4
--e git+https://github.com/open-craft/xblock-group-project-v2.git@0.4.9#egg=xblock-group-project-v2==0.4.9
+-e git+https://github.com/open-craft/xblock-group-project-v2.git@0.4.10#egg=xblock-group-project-v2==0.4.10
 -e git+https://github.com/open-craft/xblock-virtualreality.git@v0.1.1#egg=xblock-virtualreality==0.1.1
 git+https://github.com/edx-solutions/api-integration.git@v2.0.7#egg=api-integration==2.0.7
 git+https://github.com/edx-solutions/organizations-edx-platform-extensions.git@v1.2.6#egg=organizations-edx-platform-extensions==1.2.6
