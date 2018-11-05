@@ -1,0 +1,14 @@
+//programs的页面
+@media (min-width: 576px){ 
+  #main{
+    .program-cards-container{ 
+      margin-left: 0px;
+    }
+    .program-list-wrapper{  
+      padding-left:0px;
+    }
+    .empty-programs-message{  
+      margin-left: 0px;
+    }
+  }
+}

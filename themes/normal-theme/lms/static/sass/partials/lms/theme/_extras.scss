@@ -5,11 +5,6 @@
 // to add any custom rules that you need. You can also import
 // partials directly into this file so that you can break your
 // rules into modular pieces.
-
 @import 'certificates';
-@import './contentWrapper';
-@import './eliteuFooter';
-
-@import './page/courses.scss';
-@import './page/dashboard.scss';
-@import './page/main.scss';
+@import './page/allChange';
+@import './page/profile';
