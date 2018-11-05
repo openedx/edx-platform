@@ -4,11 +4,11 @@ Message Types for user_api emails
 
 from django.conf import settings
 
-from edx_ace import message
+from openedx.core.djangoapps.ace_common.message import BaseMessageType
 from openedx.core.djangoapps.site_configuration import helpers
 
 
-class DeletionNotificationMessage(message.MessageType):
+class DeletionNotificationMessage(BaseMessageType):
     """
     Message to notify learners that their account is queued for deletion.
     """

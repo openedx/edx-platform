@@ -13,6 +13,8 @@ sessions. Assumes structure:
 # want to import all variables from base settings files
 # pylint: disable=wildcard-import, unused-wildcard-import
 
+from django.utils.translation import ugettext_lazy
+
 from .common import *
 import os
 from path import Path as path
@@ -397,8 +399,12 @@ FEATURES['CLASS_DASHBOARD'] = True
 import openid.oidutil
 openid.oidutil.log = lambda message, level=0: None
 
-# Include a non-ascii character in PLATFORM_NAME to uncover possible UnicodeEncodeErrors in tests.
-PLATFORM_NAME = u"édX"
+
+# Include a non-ascii character in PLATFORM_NAME and PLATFORM_DESCRIPTION to uncover possible
+# UnicodeEncodeErrors in tests. Also use lazy text to reveal possible json dumps errors
+PLATFORM_NAME = ugettext_lazy(u"édX")
+PLATFORM_DESCRIPTION = ugettext_lazy(u"Open édX Platform")
+
 SITE_NAME = "edx.org"
 
 # set up some testing for microsites
