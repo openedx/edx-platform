@@ -601,10 +601,29 @@
 
             updateCharCount: function() {
                 var curCharCount;
+                var remainingCharCount;
+                var $charCount = $('.u-field-footer .current-char-count');
                 // Update character count for textarea
                 if (this.options.maxCharacters) {
                     curCharCount = $('#u-field-textarea-' + this.options.valueAttribute).val().length;
-                    $('.u-field-footer .current-char-count').text(curCharCount);
+                    remainingCharCount = this.options.maxCharacters - curCharCount;
+                    if (remainingCharCount < 20) {
+                        $charCount.attr({
+                            'aria-live': 'assertive',
+                            'aria-atomic': true
+                        });
+                    }
+                    else if (remainingCharCount < 60) {
+                        $charCount.attr('aria-atomic', 'false');
+                    }
+                    else if (remainingCharCount < 70) {
+                        $charCount.attr({
+                            'aria-live': 'polite',
+                            'aria-atomic': true
+                        });
+                    }
+                    $charCount.text(curCharCount);
+
                 }
             },
 
