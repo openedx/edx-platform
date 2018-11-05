@@ -89,7 +89,7 @@ def user_info(request):
 
     if year_of_birth:
         years = calculate_age_years(int(year_of_birth))
-        if years < 13:
+        if years < 16:
             is_under_age = True
 
     if request.method == 'POST':
