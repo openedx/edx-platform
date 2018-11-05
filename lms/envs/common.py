@@ -2036,6 +2036,7 @@ INSTALLED_APPS = [
 
     # Database-backed configuration
     'config_models',
+    'openedx.core.djangoapps.config_model_utils',
     'waffle',
 
     # Monitor the status of services
