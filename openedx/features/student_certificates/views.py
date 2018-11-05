@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.core.exceptions import ObjectDoesNotExist
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from edxmako.shortcuts import render_to_response
@@ -61,6 +62,7 @@ def student_certificates(request):
 
         if cert_downloadable_status['is_downloadable']:
             certificate_url = cert_downloadable_status['download_url']
+
             if certs_api.has_html_certificates_enabled(course_id, course):
                 if certs_api.get_active_web_certificate(course) is not None:
                     certificate_url = certs_api.get_certificate_url(
@@ -74,7 +76,11 @@ def student_certificates(request):
 
         course_name = course.display_name
         completion_date = None
-        grade = PersistentCourseGrade.read_course_grade(user.id, course_id)
+
+        try:
+            grade = PersistentCourseGrade.read_course_grade(user.id, course_id)
+        except ObjectDoesNotExist:
+            grade = None
 
         if grade:
             completion_date = grade.passed_timestamp

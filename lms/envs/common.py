@@ -2229,7 +2229,7 @@ INSTALLED_APPS = (
     'lms.djangoapps.philu_overrides',
 
     # Philu Features
-    'openedx.features.philu_features',
+    'openedx.features.student_certificates',
 
     #third party surveys
     'lms.djangoapps.third_party_surveys',
