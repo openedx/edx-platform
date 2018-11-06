@@ -3,6 +3,8 @@ Specific overrides to the base prod settings to make development easier.
 """
 from os.path import abspath, dirname, join
 
+from corsheaders.defaults import default_headers as corsheaders_default_headers
+
 from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
 # Don't use S3 in devstack, fall back to filesystem
@@ -223,6 +225,9 @@ FEATURES['ENABLE_CORS_HEADERS'] = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = ()
 CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_HEADERS = corsheaders_default_headers + (
+    'use-jwt-cookie',
+)
 
 LOGIN_REDIRECT_WHITELIST = []
 
