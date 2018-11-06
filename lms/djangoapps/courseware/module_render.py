@@ -5,6 +5,7 @@ Module rendering
 import hashlib
 import json
 import logging
+import textwrap
 from collections import OrderedDict
 from functools import partial
 
@@ -46,6 +47,7 @@ from edxmako.shortcuts import render_to_string
 from edx_django_utils.cache import RequestCache
 from eventtracking import tracker
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData
+from lms.djangoapps.courseware.access_response import IncorrectPartitionGroupError
 from lms.djangoapps.grades.signals.signals import SCORE_PUBLISHED
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
@@ -338,6 +340,10 @@ def get_module(user, request, usage_key, field_data_cache,
 
 
 def display_access_messages(user, block, view, frag, context):
+    """
+    An XBlock wrapper that replaces the content fragment with a fragment or message determined by
+    the has_access check.
+    """
     blocked_prior_sibling = RequestCache('display_access_messages_prior_sibling')
 
     load_access = has_access(user, 'load', block, block.scope_ids.usage_id.course_key)
@@ -887,10 +893,17 @@ def get_module_for_descriptor_internal(user, descriptor, student_data, course_id
         # A descriptor should only be returned if either the user has access, or the user doesn't have access, but
         # the failed access has a message for the user and the caller of this function specifies it will check access
         # again. This allows blocks to show specific error message or upsells when access is denied.
-        if access or (not access and will_recheck_access and (access.user_message or access.user_fragment)):
+        caller_will_handle_access_error = (
+            not access
+            and will_recheck_access
+            and (access.user_message or access.user_fragment)
+            and isinstance(access, IncorrectPartitionGroupError)
+        )
+        if access or caller_will_handle_access_error:
             return descriptor
         return None
     return descriptor
+
 
 def load_single_xblock(request, user_id, course_id, usage_key_string, course=None):
     """
