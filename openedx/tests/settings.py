@@ -75,6 +75,7 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.self_paced',
     'milestones',
     'celery_utils',
+    'waffle',
 
     # Django 1.11 demands to have imported models supported by installed apps.
     'completion',
