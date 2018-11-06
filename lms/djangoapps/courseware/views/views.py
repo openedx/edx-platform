@@ -561,7 +561,7 @@ class CourseTabView(EdxFragmentView):
 
     @staticmethod
     def handle_exceptions(request, course_key, course, exception):
-        """
+        u"""
         Handle exceptions raised when rendering a view.
         """
         if isinstance(exception, Redirect) or isinstance(exception, Http404):
