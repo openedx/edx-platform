@@ -405,8 +405,8 @@ class ViewsQueryCountTestCase(
 
     @override_waffle_flag(CONTENT_TYPE_GATING_FLAG, True)
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 3, 4, 37),
-        (ModuleStoreEnum.Type.split, 3, 13, 37),
+        (ModuleStoreEnum.Type.mongo, 3, 4, 38),
+        (ModuleStoreEnum.Type.split, 3, 13, 38),
     )
     @ddt.unpack
     @count_queries
@@ -415,8 +415,8 @@ class ViewsQueryCountTestCase(
 
     @override_waffle_flag(CONTENT_TYPE_GATING_FLAG, True)
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 3, 3, 33),
-        (ModuleStoreEnum.Type.split, 3, 10, 33),
+        (ModuleStoreEnum.Type.mongo, 3, 3, 34),
+        (ModuleStoreEnum.Type.split, 3, 10, 34),
     )
     @ddt.unpack
     @count_queries
