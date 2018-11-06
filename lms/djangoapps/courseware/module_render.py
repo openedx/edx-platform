@@ -49,6 +49,7 @@ from courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData
+from lms.djangoapps.courseware.access_response import IncorrectPartitionGroupError
 from lms.djangoapps.grades.signals.signals import SCORE_PUBLISHED
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
@@ -908,6 +909,7 @@ def get_module_for_descriptor_internal(user, descriptor, student_data, course_id
             return descriptor
         return None
     return descriptor
+
 
 def load_single_xblock(request, user_id, course_id, usage_key_string, course=None):
     """
