@@ -99,10 +99,13 @@ def get_certificates_for_user(username):
     ]
 
     """
-    return [
-        format_certificate_for_user(username, cert)
-        for cert in GeneratedCertificate.eligible_certificates.filter(user__username=username).order_by("course_id")
-    ]
+    certs = []
+    for cert in GeneratedCertificate.eligible_certificates.filter(user__username=username).order_by("course_id"):
+        try:
+            certs.append(format_certificate_for_user(username, cert))
+        except CourseOverview.DoesNotExist:
+            log.warning('Course %s does not exist.', cert.course_id)
+    return certs
 
 
 def get_certificate_for_user(username, course_key):
