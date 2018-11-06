@@ -508,7 +508,8 @@ def get_module_system_for_user(
             static_asset_path=static_asset_path,
             user_location=user_location,
             request_token=request_token,
-            course=course
+            course=course,
+            will_recheck_access=True,
         )
 
     def get_event_handler(event_type):
@@ -838,7 +839,7 @@ def get_module_for_descriptor_internal(user, descriptor, student_data, course_id
                                        track_function, xqueue_callback_url_prefix, request_token,
                                        position=None, wrap_xmodule_display=True, grade_bucket_type=None,
                                        static_asset_path='', user_location=None, disable_staff_debug_info=False,
-                                       course=None):
+                                       course=None, will_recheck_access=False):
     """
     Actually implement get_module, without requiring a request.
 
@@ -883,9 +884,12 @@ def get_module_for_descriptor_internal(user, descriptor, student_data, course_id
     user_needs_access_check = getattr(user, 'known', True) and not isinstance(user, SystemUser)
     if user_needs_access_check:
         access = has_access(user, 'load', descriptor, course_id)
-        if not access and not (access.user_message or access.user_fragment):
-        # Content with message or fragment will be access restricted by modifying the outgoing html
-            return None
+        # A descriptor should only be returned if either the user has access, or the user doesn't have access, but
+        # the failed access has a message for the user and the caller of this function specifies it will check access
+        # again. This allows blocks to show specific error message or upsells when access is denied.
+        if access or (not access and will_recheck_access and (access.user_message or access.user_fragment)):
+            return descriptor
+        return None
     return descriptor
 
 def load_single_xblock(request, user_id, course_id, usage_key_string, course=None):

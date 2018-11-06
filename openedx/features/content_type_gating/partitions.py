@@ -99,7 +99,7 @@ class ContentTypeGatingPartition(UserPartition):
         return frag
 
     def access_denied_message(self, block, user, user_group, allowed_groups):
-        return "Oh wow"
+        return "Graded assessments are available to Verified Track learners. Upgrade to Unlock."
 
     def _get_checkout_link(self, user, sku):
         ecomm_service = EcommerceService()
