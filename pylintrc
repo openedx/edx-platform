@@ -55,7 +55,7 @@
 [MASTER]
 ignore = ,.git,.tox,migrations,node_modules,.pycharm_helpers
 persistent = yes
-load-plugins = edx_lint.pylint,pylint_django,pylint_celery
+#load-plugins = edx_lint.pylint,pylint_django,pylint_celery
 init-hook = "import sys; sys.path.extend(['lms/djangoapps', 'cms/djangoapps', 'common/djangoapps'])"
 
 [MESSAGES CONTROL]

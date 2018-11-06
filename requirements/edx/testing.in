@@ -22,11 +22,14 @@ cssselect                 # Used to extract HTML fragments via CSS selectors in 
 ddt                       # Run a test case multiple times with different input; used in many, many of our tests
 edx-i18n-tools>=0.4.6     # Commands for developers and translators to extract, compile and validate translations
 #edx-lint                  # pylint extensions for Open edX repositories
--e git+https://github.com/edx/edx-lint.git@nedbat/pylint-19#egg=edx_lint==0.0
+#-e git+https://github.com/edx/edx-lint.git@nedbat/pylint-19#egg=edx_lint==0.0
 # edx-lint has a -e for pylint-django, but it doesn't get pulled in?
--e git+https://github.com/nedbat/pylint-django.git@nedbat/scopeconsumer#egg=pylint-django==0.0
-pylint-plugin-utils==0.3  # required by edx-lint and pinned explicitly here because newer versions don't guarantee python 2 support.
+#-e git+https://github.com/nedbat/pylint-django.git@nedbat/scopeconsumer#egg=pylint-django==0.0
+#pylint-plugin-utils==0.3  # required by edx-lint and pinned explicitly here because newer versions don't guarantee python 2 support.
                           # can be removed when we get to python 3
+# Without edx-lint, we need to install pylint ourselves
+pylint==1.9.3
+
 factory_boy==2.8.1        # Library for creating test fixtures, used in many tests
 freezegun                 # Allows tests to mock the output of assorted datetime module functions
 httpretty                 # Library for mocking HTTP requests, used in many tests
