@@ -20,7 +20,7 @@ from course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from student.models import ENROLLED_TO_ENROLLED, CourseEnrollment, ManualEnrollmentAudit
 from student.roles import GlobalStaff, SupportStaffRole
-from student.tests.factories import TEST_PASSWORD, CourseEnrollmentFactory, UserFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

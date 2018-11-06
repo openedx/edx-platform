@@ -14,7 +14,7 @@ from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ...pages.common.auto_auth import AutoAuthPage
 from ...pages.common.logout import LogoutPage
 from ...pages.lms.course_home import CourseHomePage
-from ...pages.lms.courseware import CoursewarePage, CoursewareSequentialTabPage, RenderXBlockPage
+from ...pages.lms.courseware import CoursewarePage, CoursewareSequentialTabPage
 from ...pages.lms.create_mode import ModeCreationPage
 from ...pages.lms.dashboard import DashboardPage
 from ...pages.lms.pay_and_verify import FakePaymentPage, FakeSoftwareSecureVerificationPage, PaymentAndVerificationFlow

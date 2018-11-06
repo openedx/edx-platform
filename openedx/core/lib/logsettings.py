@@ -1,7 +1,6 @@
 """Get log settings."""
 
 import logging
-import os
 import platform
 import sys
 import warnings

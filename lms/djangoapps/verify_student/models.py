@@ -21,8 +21,6 @@ import requests
 import six
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
 from django.core.cache import cache
 from django.core.files.base import ContentFile
 from django.urls import reverse
@@ -33,7 +31,6 @@ from django.utils.translation import ugettext_lazy
 from model_utils import Choices
 from model_utils.models import StatusModel, TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
-from openedx.core.djangolib.model_mixins import DeletableByUserValue
 
 from lms.djangoapps.verify_student.ssencrypt import (
     encrypt_and_encode,

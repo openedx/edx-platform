@@ -9,7 +9,7 @@ import ddt
 import httpretty
 from django.conf import settings
 from django.urls import reverse
-from django.test import RequestFactory, TestCase, override_settings
+from django.test import RequestFactory, TestCase
 from mock import call, patch
 
 from Cryptodome.PublicKey import RSA

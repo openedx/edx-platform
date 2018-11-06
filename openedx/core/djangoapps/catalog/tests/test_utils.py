@@ -1,9 +1,8 @@
 """Tests covering utilities for integrating with the catalog service."""
 # pylint: disable=missing-docstring
-import copy
+
 from datetime import timedelta
 
-import ddt
 import mock
 from django.contrib.auth import get_user_model
 from django.core.cache import cache

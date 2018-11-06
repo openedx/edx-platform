@@ -12,7 +12,6 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 
 from celery_utils.logged_task import LoggedTask
-from django_comment_common.utils import set_course_discussion_settings
 from django_comment_common.models import DiscussionsIdMapping
 from edx_ace import ace
 from edx_ace.utils import date

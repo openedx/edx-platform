@@ -21,7 +21,6 @@ from gating import api as lms_gating_api
 from lms.djangoapps.course_api.blocks.transformers.milestones import MilestonesAndSpecialExamsTransformer
 from milestones.tests.utils import MilestonesTestCaseMixin
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.lib.gating import api as gating_api
 from openedx.features.course_experience.views.course_outline import (
     CourseOutlineFragmentView, DEFAULT_COMPLETION_TRACKING_START

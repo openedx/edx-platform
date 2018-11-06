@@ -4,7 +4,7 @@ Django ORM model specifications for the User API application
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from django.db import models
-from django.db.models.signals import post_delete, post_save, pre_delete, pre_save
+from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField

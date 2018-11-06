@@ -17,9 +17,7 @@ from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from oauth2_provider import models as dot_models
-from oauth2_provider.settings import oauth2_settings
 from oauth2_provider.views.base import TokenView as DOTAccessTokenView
-from oauthlib.oauth2.rfc6749.tokens import BearerToken
 from provider import constants
 from provider import scope as dop_scope
 from provider.oauth2.views import AccessTokenView as DOPAccessTokenView

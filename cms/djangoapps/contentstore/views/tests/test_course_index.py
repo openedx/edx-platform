@@ -33,8 +33,6 @@ from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 from student.auth import has_course_author_access
 from student.roles import CourseStaffRole, GlobalStaff, LibraryUserRole
 from student.tests.factories import UserFactory
-from util.date_utils import get_default_time_display
-from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory, check_mongo_calls
