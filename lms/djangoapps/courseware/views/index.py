@@ -151,7 +151,7 @@ class CoursewareIndex(View):
 
                 return self.render(request)
         except Exception as exception:  # pylint: disable=broad-except
-            return CourseTabView.handle_exceptions(request, self.course, exception)
+            return CourseTabView.handle_exceptions(request, self.course_key, self.course, exception)
 
     def _setup_masquerade_for_effective_user(self):
         """
@@ -315,7 +315,7 @@ class CoursewareIndex(View):
             if not child:
                 # User may be trying to access a child that isn't live yet
                 if not self._is_masquerading_as_student():
-                    raise Http404('No {block_type} found with name {url_name}'.format(
+                    raise Http404(u'No {block_type} found with name {url_name}'.format(
                         block_type=block_type,
                         url_name=url_name,
                     ))
