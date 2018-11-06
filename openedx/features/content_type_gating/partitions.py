@@ -114,6 +114,7 @@ class ContentTypeGatingPartition(UserPartition):
         if ecommerce_checkout and sku:
             return ecomm_service.get_checkout_page_url(sku) or ''
 
+
 class ContentTypeGatingPartitionScheme(object):
     """
     This scheme implements the Content Type Gating permission partitioning.
