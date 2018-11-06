@@ -43,6 +43,7 @@ from openedx.core.djangoapps.user_api.accounts.utils import generate_password
 from student.models import CourseEnrollment, Registration, UserProfile
 from student.roles import CourseInstructorRole, CourseStaffRole
 from xmodule.modulestore.django import modulestore
+from search.search_engine_base import SearchEngine
 
 log = logging.getLogger(__name__)
 
@@ -337,6 +338,7 @@ class Courses(SysadminDashboardView):
     This manages adding/updating courses from git, deleting courses, and
     provides course listing information.
     """
+    _searcher = SearchEngine.get_search_engine(getattr(settings, "COURSEWARE_INDEX_NAME", "courseware_index"))
 
     def git_info_for_course(self, cdir):
         """This pulls out some git info like the last commit"""
@@ -501,6 +503,12 @@ class Courses(SysadminDashboardView):
                     if course_found:
                         # delete course that is stored with mongodb backend
                         self.def_ms.delete_course(course.id, request.user.id)
+
+                        response = self._searcher.search(doc_type="courseware_content", field_dictionary={'course': course_id})
+                        result_ids = [result["data"]["id"] for result in response["results"]]
+                        self._searcher.remove('courseware_content', result_ids)
+                        self._searcher.remove('course_info', [course_id])
+
                         # don't delete user permission groups, though
                         self.msg += \
                             u"<font color='red'>{0} {1} = {2} ({3})</font>".format(
