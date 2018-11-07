@@ -9,6 +9,6 @@ diff-cover==0.9.8
 inflect==1.0.1            # via jinja2-pluralize
 jinja2-pluralize==0.3.0   # via diff-cover
 jinja2==2.10              # via diff-cover, jinja2-pluralize
-markupsafe==1.0           # via jinja2
+markupsafe==1.1.0         # via jinja2
 pygments==2.2.0           # via diff-cover
 six==1.11.0               # via diff-cover
