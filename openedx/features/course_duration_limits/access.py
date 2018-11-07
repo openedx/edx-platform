@@ -73,7 +73,7 @@ def get_user_course_expiration_date(user, course):
         # The user course expiration date for self paced courses is the
         # content availability date plus the weeks_to_complete field from course-discovery.
         discovery_course_details = get_course_run_details(course.id, ['weeks_to_complete'])
-        expected_weeks = discovery_course_details['weeks_to_complete'] or int(MIN_DURATION.days / 7)
+        expected_weeks = discovery_course_details.get('weeks_to_complete') or int(MIN_DURATION.days / 7)
         access_duration = timedelta(weeks=expected_weeks)
     elif not course.self_paced and course.end and course.start:
         # The user course expiration date for instructor paced courses is the
