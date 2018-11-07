@@ -35,42 +35,57 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         result = get_user_course_expiration_date(self.user, self.course)
         self.assertEqual(result, None)
 
-    def test_instructor_paced(self):
-        """Tests that instructor paced courses give the learner start_date - end_date time in the course"""
-        expected_difference = timedelta(weeks=6)
-        self.course.self_paced = False
-        self.course.end = self.course.start + expected_difference
-        enrollment = CourseEnrollment.enroll(self.user, self.course.id, CourseMode.AUDIT)
-        result = get_user_course_expiration_date(self.user, self.course)
-        self.assertEqual(result, enrollment.created + expected_difference)
-
-    def test_instructor_paced_no_end_date(self):
-        """Tests that instructor paced with no end dates returns default (minimum)"""
-        self.course.self_paced = False
-        enrollment = CourseEnrollment.enroll(self.user, self.course.id, CourseMode.AUDIT)
-        result = get_user_course_expiration_date(self.user, self.course)
-        self.assertEqual(result, enrollment.created + MIN_DURATION)
-
     @mock.patch("openedx.features.course_duration_limits.access.get_course_run_details")
     @ddt.data(
-        [int(MIN_DURATION.days / 7) - 1, MIN_DURATION],
-        [7, timedelta(weeks=7)],
-        [int(MAX_DURATION.days / 7) + 1, MAX_DURATION],
-        [None, MIN_DURATION],
+        [int(MIN_DURATION.days / 7) - 1, MIN_DURATION, False],
+        [7, timedelta(weeks=7), False],
+        [int(MAX_DURATION.days / 7) + 1, MAX_DURATION, False],
+        [None, MIN_DURATION, False],
+        [int(MIN_DURATION.days / 7) - 1, MIN_DURATION, True],
+        [7, timedelta(weeks=7), True],
+        [int(MAX_DURATION.days / 7) + 1, MAX_DURATION, True],
+        [None, MIN_DURATION, True],
     )
     @ddt.unpack
-    def test_self_paced_with_weeks_to_complete(
+    def test_all_courses_with_weeks_to_complete(
         self,
         weeks_to_complete,
-        expected_difference,
+        access_duration,
+        self_paced,
         mock_get_course_run_details,
     ):
         """
-            Tests that self paced courses allow for a (bounded) # of weeks in courses determined via
-            weeks_to_complete field in discovery. If the field doesn't exist, it should return default (minimum)
+        Test that access_duration for a course is equal to the value of the weeks_to_complete field in discovery.
+        If weeks_to_complete is None, access_duration will be the MIN_DURATION constant.
+
         """
-        self.course.self_paced = True
+        if self_paced:
+            self.course.self_paced = True
         mock_get_course_run_details.return_value = {'weeks_to_complete': weeks_to_complete}
         enrollment = CourseEnrollment.enroll(self.user, self.course.id, CourseMode.AUDIT)
         result = get_user_course_expiration_date(self.user, self.course)
-        self.assertEqual(result, enrollment.created + expected_difference)
+        self.assertEqual(result, enrollment.created + access_duration)
+
+    @mock.patch("openedx.features.course_duration_limits.access.get_course_run_details")
+    def test_content_availability_date(self, mock_get_course_run_details):
+        """
+        Content availability date is course start date or enrollment date, whichever is later.
+        """
+        access_duration = timedelta(weeks=7)
+        mock_get_course_run_details.return_value = {'weeks_to_complete': 7}
+
+        # Content availability date is enrollment date
+        start_date = now() - timedelta(weeks=10)
+        past_course = CourseFactory(start=start_date)
+        enrollment = CourseEnrollment.enroll(self.user, past_course.id, CourseMode.AUDIT)
+        result = get_user_course_expiration_date(self.user, past_course)
+        content_availability_date = enrollment.created
+        self.assertEqual(result, content_availability_date + access_duration)
+
+        # Content availability date is course start date
+        start_date = now() + timedelta(weeks=10)
+        future_course = CourseFactory(start=start_date)
+        enrollment = CourseEnrollment.enroll(self.user, future_course.id, CourseMode.AUDIT)
+        result = get_user_course_expiration_date(self.user, future_course)
+        content_availability_date = start_date
+        self.assertEqual(result, content_availability_date + access_duration)

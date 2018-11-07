@@ -69,16 +69,12 @@ def get_user_course_expiration_date(user, course):
     except CourseEnrollment.schedule.RelatedObjectDoesNotExist:
         content_availability_date = max(enrollment.created, course.start)
 
-    if course.self_paced:
-        # The user course expiration date for self paced courses is the
-        # content availability date plus the weeks_to_complete field from course-discovery.
-        discovery_course_details = get_course_run_details(course.id, ['weeks_to_complete'])
-        expected_weeks = discovery_course_details['weeks_to_complete'] or int(MIN_DURATION.days / 7)
+    # The user course expiration date is the content availability date
+    # plus the weeks_to_complete field from course-discovery.
+    discovery_course_details = get_course_run_details(course.id, ['weeks_to_complete'])
+    expected_weeks = discovery_course_details.get('weeks_to_complete')
+    if expected_weeks:
         access_duration = timedelta(weeks=expected_weeks)
-    elif not course.self_paced and course.end and course.start:
-        # The user course expiration date for instructor paced courses is the
-        # content availability date plus the duration of the course (course end date minus course start date).
-        access_duration = course.end - course.start
 
     # Course access duration is bounded by the min and max duration.
     access_duration = max(MIN_DURATION, min(MAX_DURATION, access_duration))
