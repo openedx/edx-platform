@@ -70,6 +70,19 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
                 category='vertical',
                 display_name='Lesson 1 Vertical - Unit 1'
             )
+            self.lti_block = ItemFactory.create(
+                parent=self.vertical,
+                category='lti_consumer',
+                display_name='lti_consumer',
+                has_score=True,
+                graded=True,
+            )
+            self.lti_block_not_scored = ItemFactory.create(
+                parent=self.vertical,
+                category='lti_consumer',
+                display_name='lti_consumer_2',
+                has_score=False,
+            )
             self.problem_dict = {}
             for prob_type in self.PROBLEM_TYPES:
                 block = ItemFactory.create(
@@ -127,6 +140,15 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
                                            unicode(block.scope_ids.usage_id), course=None)
                 # check that has_access did not raise the IncorrectPartitionGroupError thereby not gating the block
                 self.assertFalse(mock_access_error.called)
+
+    def test_lti_audit_access(self):
+        """
+        LTI stands for learning tools interoperability and is a 3rd party iframe that pulls in learning content from
+        outside sources. This tests that audit users cannot see LTI components with graded content but can see the LTI
+        components which do not have graded content.
+        """
+        self.assert_block_is_gated(self.lti_block, True)
+        self.assert_block_is_gated(self.lti_block_not_scored, False)
 
     @ddt.data(
         *PROBLEM_TYPES
