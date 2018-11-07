@@ -83,7 +83,6 @@ class UserView(APIView):
         OAuth2AuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
-    throttle_classes = [ProviderSustainedThrottle, ProviderBurstThrottle]
 
     def get(self, request, username):
         """Create, read, or update enrollment information for a user.
