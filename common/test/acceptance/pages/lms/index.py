@@ -3,6 +3,7 @@
 LMS index (home) page.
 """
 from bok_choy.page_object import PageObject
+
 from common.test.acceptance.pages.lms import BASE_URL
 
 BANNER_SELECTOR = 'section.home header div.outer-wrapper div.title .heading-group h1'
@@ -14,14 +15,6 @@ class IndexPage(PageObject):
     """
     LMS index (home) page, the default landing page for Open edX users when they are not logged in
     """
-    def __init__(self, browser):
-        """Initialize the page.
-
-        Arguments:
-            browser (Browser): The browser instance.
-        """
-        super(IndexPage, self).__init__(browser)
-
     url = "{base}/".format(base=BASE_URL)
 
     def is_browser_on_page(self):

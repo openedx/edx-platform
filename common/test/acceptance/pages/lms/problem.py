@@ -2,8 +2,9 @@
 Problem Page.
 """
 from bok_choy.page_object import PageObject
-from common.test.acceptance.pages.common.utils import click_css
 from selenium.webdriver.common.keys import Keys
+
+from common.test.acceptance.pages.common.utils import click_css
 
 
 class ProblemPage(PageObject):
@@ -148,7 +149,10 @@ class ProblemPage(PageObject):
         """
         Click the Show Answer button.
         """
-        self.q(css='.problem .show').click()
+        css = '.problem .show'
+        # First make sure that the button visible and can be clicked on.
+        self.scroll_to_element(css)
+        self.q(css=css).click()
         self.wait_for_ajax()
 
     def is_hint_notification_visible(self):
@@ -199,6 +203,15 @@ class ProblemPage(PageObject):
                                          'Waiting for Gentle Alert notification to be visible')
         self.wait_for(lambda: self.q(css='.notification.warning.notification-gentle-alert').focused,
                       'Waiting for the focus to be on the gentle alert notification')
+
+    def wait_for_show_answer_notification(self):
+        """
+        Wait for the show answer Notification to be present
+        """
+        self.wait_for_element_visibility('.notification.general.notification-show-answer',
+                                         'Waiting for Show Answer notification to be visible')
+        self.wait_for(lambda: self.q(css='.notification.general.notification-show-answer').focused,
+                      'Waiting for the focus to be on the show answer notification')
 
     def is_gentle_alert_notification_visible(self):
         """
@@ -308,6 +321,14 @@ class ProblemPage(PageObject):
         self.wait_for_element_visibility('.fa-asterisk', "Waiting for asterisk notification icon")
         self.wait_for_focus_on_submit_notification()
 
+    def wait_submitted_notification(self):
+        """
+        Check for visibility of the "answer received" general notification and icon.
+        """
+        msg = "Wait for submitted notification to be visible"
+        self.wait_for_element_visibility('.notification.general.notification-submit', msg)
+        self.wait_for_focus_on_submit_notification()
+
     def click_hint(self):
         """
         Click the Hint button.
@@ -409,15 +430,36 @@ class ProblemPage(PageObject):
         solution_selector = '.solution-span div.detailed-solution'
         return self.q(css=solution_selector).is_present()
 
+    def is_choice_highlighted(self, choice, choices_list):
+        """
+        Check if the given answer/choice is highlighted for choice group.
+        """
+        choice_status_xpath = ('//fieldset/div[contains(@class, "field")][{{0}}]'
+                               '/label[contains(@class, "choicegroup_{choice}")]'
+                               '/span[contains(@class, "status {choice}")]'.format(choice=choice))
+        any_status_xpath = '//fieldset/div[contains(@class, "field")][{0}]/label/span'
+        for choice in choices_list:
+            if not self.q(xpath=choice_status_xpath.format(choice)).is_present():
+                return False
+
+            # Check that there is only a single status span, as there were some bugs with multiple
+            # spans (with various classes) being appended.
+            if not len(self.q(xpath=any_status_xpath.format(choice)).results) == 1:
+                return False
+
+        return True
+
     def is_correct_choice_highlighted(self, correct_choices):
         """
         Check if correct answer/choice highlighted for choice group.
         """
-        xpath = '//fieldset/div[contains(@class, "field")][{0}]/label[contains(@class, "choicegroup_correct")]'
-        for choice in correct_choices:
-            if not self.q(xpath=xpath.format(choice)).is_present():
-                return False
-        return True
+        return self.is_choice_highlighted('correct', correct_choices)
+
+    def is_submitted_choice_highlighted(self, correct_choices):
+        """
+        Check if submitted answer/choice highlighted for choice group.
+        """
+        return self.is_choice_highlighted('submitted', correct_choices)
 
     @property
     def problem_question(self):

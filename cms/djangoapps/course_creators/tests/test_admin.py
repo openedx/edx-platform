@@ -2,17 +2,17 @@
 Tests course_creators.admin.py.
 """
 
-from django.test import TestCase
-from django.contrib.auth.models import User
-from django.contrib.admin.sites import AdminSite
-from django.http import HttpRequest
 import mock
+from django.contrib.admin.sites import AdminSite
+from django.contrib.auth.models import User
+from django.core import mail
+from django.http import HttpRequest
+from django.test import TestCase
 
 from course_creators.admin import CourseCreatorAdmin
 from course_creators.models import CourseCreator
-from django.core import mail
-from student.roles import CourseCreatorRole
 from student import auth
+from student.roles import CourseCreatorRole
 
 
 def mock_render_to_string(template_name, context):

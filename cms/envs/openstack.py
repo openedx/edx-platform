@@ -27,3 +27,6 @@ elif SWIFT_AUTH_URL and SWIFT_USERNAME and SWIFT_KEY:
     DEFAULT_FILE_STORAGE = 'swift.storage.SwiftStorage'
 else:
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
+# Use default file storage class set above for course import/export
+COURSE_IMPORT_EXPORT_STORAGE = DEFAULT_FILE_STORAGE

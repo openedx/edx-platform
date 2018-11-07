@@ -11,9 +11,10 @@ from search.tests.test_course_discovery import DemoCourse
 from search.tests.tests import TEST_INDEX_NAME
 from search.tests.utils import SearcherMixin
 
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, ModuleStoreTestCase
-from .mixins import CourseApiFactoryMixin, TEST_PASSWORD
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
+
 from ..views import CourseDetailView
+from .mixins import TEST_PASSWORD, CourseApiFactoryMixin
 
 
 class CourseApiTestViewMixin(CourseApiFactoryMixin):
@@ -105,6 +106,7 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
     Test responses returned from CourseListView (with tests that modify the
     courseware).
     """
+    ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
         super(CourseListViewTestCaseMultipleCourses, self).setUp()

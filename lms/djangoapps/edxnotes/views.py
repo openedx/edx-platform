@@ -3,28 +3,29 @@ Views related to EdxNotes.
 """
 import json
 import logging
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, Http404
+
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
+from django.http import Http404, HttpResponse
 from django.views.decorators.http import require_GET
-from edxmako.shortcuts import render_to_response
 from opaque_keys.edx.keys import CourseKey
+
 from courseware.courses import get_course_with_access
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
-from util.json_request import JsonResponse, JsonResponseBadRequest
+from edxmako.shortcuts import render_to_response
 from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 from edxnotes.helpers import (
-    get_edxnotes_id_token,
-    get_notes,
-    is_feature_enabled,
-    get_course_position,
     DEFAULT_PAGE,
     DEFAULT_PAGE_SIZE,
     NoteJSONEncoder,
+    get_course_position,
+    get_edxnotes_id_token,
+    get_notes,
+    is_feature_enabled
 )
-
+from util.json_request import JsonResponse, JsonResponseBadRequest
 
 log = logging.getLogger(__name__)
 

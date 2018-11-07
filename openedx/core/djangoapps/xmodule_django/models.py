@@ -1,12 +1,14 @@
 """
 Useful django models for implementing XBlock infrastructure in django.
 """
-import warnings
 import logging
+import warnings
 
-from django.db import models
 from django.core.exceptions import ValidationError
-from opaque_keys.edx.keys import CourseKey, UsageKey, BlockTypeKey
+from django.db import models
+from opaque_keys.edx.keys import BlockTypeKey, CourseKey, UsageKey
+
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
@@ -16,13 +18,6 @@ class NoneToEmptyManager(models.Manager):
     A :class:`django.db.models.Manager` that has a :class:`NoneToEmptyQuerySet`
     as its `QuerySet`, initialized with a set of specified `field_names`.
     """
-    def __init__(self):
-        """
-        Args:
-            field_names: The list of field names to initialize the :class:`NoneToEmptyQuerySet` with.
-        """
-        super(NoneToEmptyManager, self).__init__()
-
     def get_queryset(self):
         """
         Returns the result of NoneToEmptyQuerySet instead of a regular QuerySet.
@@ -179,6 +174,18 @@ class UsageKeyField(OpaqueKeyField):
     """
     description = "A Location object, saved to the DB in the form of a string"
     KEY_CLASS = UsageKey
+
+
+class UsageKeyWithRunField(UsageKeyField):
+    """
+    Subclass of UsageKeyField that automatically fills in
+    missing `run` values, for old Mongo courses.
+    """
+    def to_python(self, value):
+        value = super(UsageKeyWithRunField, self).to_python(value)
+        if value is not None and value.run is None:
+            value = value.replace(course_key=modulestore().fill_in_run(value.course_key))
+        return value
 
 
 class LocationKeyField(UsageKeyField):

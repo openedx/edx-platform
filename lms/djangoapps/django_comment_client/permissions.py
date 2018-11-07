@@ -5,12 +5,12 @@ Module for checking permissions with the comment_client backend
 import logging
 from types import NoneType
 
-from request_cache.middleware import RequestCache, request_cached
-from lms.lib.comment_client import Thread
 from opaque_keys.edx.keys import CourseKey
 
 from django_comment_common.models import all_permissions_for_user_in_course
 from lms.djangoapps.teams.models import CourseTeam
+from lms.lib.comment_client import Thread
+from request_cache.middleware import RequestCache, request_cached
 
 
 def has_permission(user, permission, course_id=None):
@@ -81,7 +81,7 @@ def _check_condition(user, condition, content):
         try:
             commentable_id = content['commentable_id']
             request_cache_dict = RequestCache.get_request_cache().data
-            cache_key = "django_comment_client.check_team_member.{}.{}".format(user.id, commentable_id)
+            cache_key = u"django_comment_client.check_team_member.{}.{}".format(user.id, commentable_id)
             if cache_key in request_cache_dict:
                 return request_cache_dict[cache_key]
             team = get_team(commentable_id)

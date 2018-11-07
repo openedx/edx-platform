@@ -3,19 +3,18 @@ Tests for the LTI outcome service handlers, both in outcomes.py and in tasks.py
 """
 import unittest
 
+import requests
+import requests_oauthlib
 from django.test import TestCase
 from lxml import etree
-from mock import patch, MagicMock, ANY
-import requests_oauthlib
-import requests
+from mock import ANY, MagicMock, patch
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
-from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
-from student.tests.factories import UserFactory
-
-from lti_provider.models import GradedAssignment, LtiConsumer, OutcomeService
 import lti_provider.outcomes as outcomes
+from lti_provider.models import GradedAssignment, LtiConsumer, OutcomeService
+from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory, check_mongo_calls
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 
 class StoreOutcomeParametersTest(TestCase):

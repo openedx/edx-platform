@@ -8,14 +8,14 @@ If student have answered - words he entered and cloud.
 
 import json
 import logging
+
 from pkg_resources import resource_string
-
-from xmodule.raw_module import EmptyDataRawDescriptor
-from xmodule.editing_module import MetadataOnlyEditingDescriptor
-from xmodule.x_module import XModule
-
-from xblock.fields import Scope, Dict, Boolean, List, Integer, String
+from xblock.fields import Boolean, Dict, Integer, List, Scope, String
 from xblock.fragment import Fragment
+
+from xmodule.editing_module import MetadataOnlyEditingDescriptor
+from xmodule.raw_module import EmptyDataRawDescriptor
+from xmodule.x_module import XModule
 
 log = logging.getLogger(__name__)
 
@@ -38,7 +38,7 @@ class WordCloudFields(object):
     """XFields for word cloud."""
     display_name = String(
         display_name=_("Display Name"),
-        help=_("The label for this word cloud on the course page."),
+        help=_("The display name for this component."),
         scope=Scope.settings,
         default="Word cloud"
     )

@@ -2,15 +2,15 @@
 This module is essentially a broker to xmodule/tabs.py -- it was originally introduced to
 perform some LMS-specific tab display gymnastics for the Entrance Exams feature
 """
-from django.conf import settings
-from django.utils.translation import ugettext as _, ugettext_noop
-
 from courseware.access import has_access
-from courseware.entrance_exams import user_must_complete_entrance_exam
+from courseware.entrance_exams import user_can_skip_entrance_exam
+from django.conf import settings
+from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_noop
 from openedx.core.lib.course_tabs import CourseTabPluginManager
+from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, default_course_url_name
 from student.models import CourseEnrollment
-from student.roles import CourseStaffRole
-from xmodule.tabs import CourseTab, CourseTabList, key_checker
+from xmodule.tabs import CourseTab, CourseTabList, course_reverse_func_from_name_func, key_checker
 
 
 class EnrolledTab(CourseTab):
@@ -34,6 +34,16 @@ class CoursewareTab(EnrolledTab):
     view_name = 'courseware'
     is_movable = False
     is_default = False
+    supports_preview_menu = True
+
+    @property
+    def link_func(self):
+        """
+        Returns a function that takes a course and reverse function and will
+        compute the course URL for this tab.
+        """
+        reverse_name_func = lambda course: default_course_url_name(course.id)
+        return course_reverse_func_from_name_func(reverse_name_func)
 
 
 class CourseInfoTab(CourseTab):
@@ -50,7 +60,10 @@ class CourseInfoTab(CourseTab):
 
     @classmethod
     def is_enabled(cls, course, user=None):
-        return True
+        """
+        The "Home" tab is not shown for the new unified course experience.
+        """
+        return not UNIFIED_COURSE_TAB_FLAG.is_enabled(course.id)
 
 
 class SyllabusTab(EnrolledTab):
@@ -295,7 +308,7 @@ def get_course_tab_list(request, course):
     # If the user has to take an entrance exam, we'll need to hide away all but the
     # "Courseware" tab. The tab is then renamed as "Entrance Exam".
     course_tab_list = []
-    must_complete_ee = user_must_complete_entrance_exam(request, user, course)
+    must_complete_ee = not user_can_skip_entrance_exam(user, course)
     for tab in xmodule_tab_list:
         if must_complete_ee:
             # Hide all of the tabs except for 'Courseware'

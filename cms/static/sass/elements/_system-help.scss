@@ -245,6 +245,7 @@
 
   // learn more (aka external help button)
   .external-help-button {
+    display: inline-block;
     @extend %ui-btn-flat-outline;
     @extend %sizing;
   }

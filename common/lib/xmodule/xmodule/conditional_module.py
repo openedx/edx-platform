@@ -4,18 +4,18 @@ some xmodules by conditions.
 
 import json
 import logging
+
 from lazy import lazy
 from lxml import etree
 from pkg_resources import resource_string
-
-from xmodule.x_module import XModule, STUDENT_VIEW
-from xmodule.seq_module import SequenceDescriptor
-from xmodule.studio_editable import StudioEditableModule, StudioEditableDescriptor
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.validation import StudioValidation, StudioValidationMessage
-from xblock.fields import Scope, ReferenceList, String
+from xblock.fields import ReferenceList, Scope, String
 from xblock.fragment import Fragment
 
+from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.seq_module import SequenceDescriptor
+from xmodule.studio_editable import StudioEditableDescriptor, StudioEditableModule
+from xmodule.validation import StudioValidation, StudioValidationMessage
+from xmodule.x_module import STUDENT_VIEW, XModule
 
 log = logging.getLogger('edx.' + __name__)
 
@@ -27,7 +27,7 @@ class ConditionalFields(object):
     has_children = True
     display_name = String(
         display_name=_("Display Name"),
-        help=_("This name appears in the horizontal navigation at the top of the page."),
+        help=_("The display name for this component."),
         scope=Scope.settings,
         default=_('Conditional')
     )

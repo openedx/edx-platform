@@ -71,20 +71,23 @@ ${HTML(fragment.foot_html())}
 
 <div class="course-wrapper">
   <section class="course-content" id="course-content">
-    ${HTML(fragment.body_html())}
+      <main id="main" tabindex="-1" aria-label="Content">
+        ${HTML(fragment.body_html())}
+      </main>
   </section>
 </div>
+% if course.show_calculator or is_edxnotes_enabled(course):
+    <nav class="nav-utilities ${"has-utility-calculator" if course.show_calculator else ""}" aria-label="${_('Course Utilities')}">
+      ## Utility: Notes
+      % if is_edxnotes_enabled(course):
+        <%include file="/edxnotes/toggle_notes.html" args="course=course"/>
+      % endif
 
-<nav class="nav-utilities ${"has-utility-calculator" if course.show_calculator else ""}" aria-label="${_('Course Utilities')}">
-  ## Utility: Notes
-  % if is_edxnotes_enabled(course):
-    <%include file="/edxnotes/toggle_notes.html" args="course=course"/>
-  % endif
-
-  ## Utility: Calc
-  % if course.show_calculator:
-    <%include file="/calculator/toggle_calculator.html" />
-  % endif
-</nav>
+      ## Utility: Calc
+      % if course.show_calculator:
+        <%include file="/calculator/toggle_calculator.html" />
+      % endif
+    </nav>
+% endif
 
 <%include file="../modal/accessible_confirm.html" />

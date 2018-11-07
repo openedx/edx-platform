@@ -3,9 +3,27 @@ var releasedToStudents = xblockInfo.get('released_to_students');
 var visibilityState = xblockInfo.get('visibility_state');
 var published = xblockInfo.get('published');
 var prereq = xblockInfo.get('prereq');
+var hasPartitionGroups = xblockInfo.get('has_partition_group_components');
 
-var statusMessage = null;
+var statusMessages = [];
+var messageType;
+var messageText;
 var statusType = null;
+var addStatusMessage = function (statusType, message) {
+    var statusIconClass = '';
+    if (statusType === 'warning') {
+        statusIconClass = 'fa-file-o';
+    } else if (statusType === 'error') {
+        statusIconClass = 'fa-warning';
+    } else if (statusType === 'staff-only' || statusType === 'gated') {
+        statusIconClass = 'fa-lock';
+    } else if (statusType === 'partition-groups') {
+        statusIconClass = 'fa-eye';
+    }
+
+    statusMessages.push({iconClass: statusIconClass, text: message});
+};
+
 if (prereq) {
     var prereqDisplayName = '';
     _.each(xblockInfo.get('prereqs'), function (p) {
@@ -14,38 +32,37 @@ if (prereq) {
             return false;
         }
     });
-    statusType = 'gated';
-    statusMessage = interpolate(
+    messageType = 'gated';
+    messageText = interpolate(
         gettext('Prerequisite: %(prereq_display_name)s'),
         {prereq_display_name: prereqDisplayName},
         true
     );
+    addStatusMessage(messageType, messageText);
 }
 if (staffOnlyMessage) {
-    statusType = 'staff-only';
-    statusMessage = gettext('Contains staff only content');
-} else if (visibilityState === 'needs_attention') {
-    if (xblockInfo.isVertical()) {
-        statusType = 'warning';
+    messageType = 'staff-only';
+    messageText = gettext('Contains staff only content');
+    addStatusMessage(messageType, messageText);
+} else {
+    if (visibilityState === 'needs_attention' && xblockInfo.isVertical()) {
+        messageType = 'warning';
         if (published && releasedToStudents) {
-            statusMessage = gettext('Unpublished changes to live content');
+            messageText = gettext('Unpublished changes to live content');
         } else if (!published) {
-            statusMessage = gettext('Unpublished units will not be released');
+            messageText = gettext('Unpublished units will not be released');
         } else {
-            statusMessage = gettext('Unpublished changes to content that will release in the future');
+            messageText = gettext('Unpublished changes to content that will release in the future');
         }
+        addStatusMessage(messageType, messageText);
     }
-}
 
-var statusIconClass = '';
-if (statusType === 'warning') {
-    statusIconClass = 'fa-file-o';
-} else if (statusType === 'error') {
-    statusIconClass = 'fa-warning';
-} else if (statusType === 'staff-only') {
-    statusIconClass = 'fa-lock';
-} else if (statusType === 'gated') {
-    statusIconClass = 'fa-lock';
+    if (hasPartitionGroups) {
+        addStatusMessage(
+            'partition-groups',
+            gettext('Access to some content in this unit is restricted to specific groups of learners')
+        );
+    }
 }
 
 var gradingType = gettext('Ungraded');
@@ -201,16 +218,25 @@ if (is_proctored_exam) {
                 <p>
                     <% if (xblockInfo.get('hide_after_due')) { %>
                         <span class="icon fa fa-eye-slash" aria-hidden="true"></span>
-                        <span class="status-hide-after-due-value"> <%- gettext("Subsection is hidden after due date") %> </span>
+                        <span class="status-hide-after-due-value">
+                        <% if (course.get('self_paced')) { %>
+                            <%- gettext("Subsection is hidden after course end date") %> </span>
+                        <% } else { %>
+                            <%- gettext("Subsection is hidden after due date") %> </span>
+                        <% } %>
                     <% } %>
                 </p>
             </div>
         <% } %>
-        <% if (statusMessage) { %>
-        <div class="status-message">
-            <span class="icon fa <%- statusIconClass %>" aria-hidden="true"></span>
-            <p class="status-message-copy"><%- statusMessage %></p>
-        </div>
+        <% if (statusMessages.length > 0) { %>
+            <div class="status-messages">
+            <% for (var i=0; i<statusMessages.length; i++) { %>
+                <div class="status-message">
+                    <span class="icon fa <%- statusMessages[i].iconClass %>" aria-hidden="true"></span>
+                    <p class="status-message-copy"><%- statusMessages[i].text %></p>
+                </div>
+            <% } %>
+            </div>
         <% } %>
     </div>
     <% } %>

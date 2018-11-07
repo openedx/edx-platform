@@ -6,7 +6,7 @@ navigation.  We want to do this in the context_processor to
 2) because navigation.html is "called" by being included in other templates, there's no "views.py" to put this.
 """
 
-from .models import Order, PaidCourseRegistration, CourseRegCodeItem
+from .models import CourseRegCodeItem, Order, PaidCourseRegistration
 from .utils import is_shopping_cart_enabled
 
 

@@ -2,16 +2,15 @@
 Tests authz.py
 """
 import mock
-
-from django.test import TestCase
-from django.contrib.auth.models import User, AnonymousUser
-from django.core.exceptions import PermissionDenied
-
-from student.roles import CourseInstructorRole, CourseStaffRole, CourseCreatorRole
-from student.tests.factories import AdminFactory
-from student.auth import user_has_role, add_users, remove_users, has_studio_write_access, has_studio_read_access
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from ccx_keys.locator import CCXLocator
+from django.contrib.auth.models import AnonymousUser, User
+from django.core.exceptions import PermissionDenied
+from django.test import TestCase
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
+from student.auth import add_users, has_studio_read_access, has_studio_write_access, remove_users, user_has_role
+from student.roles import CourseCreatorRole, CourseInstructorRole, CourseStaffRole
+from student.tests.factories import AdminFactory
 
 
 class CreatorGroupTest(TestCase):

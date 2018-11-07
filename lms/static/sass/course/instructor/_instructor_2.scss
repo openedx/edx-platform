@@ -242,7 +242,7 @@
     }
   }
 
-  h1 {
+  .instructor-dashboard-title {
     @extend .top-header;
     display: inline-block;
     margin-bottom: ($baseline*.75);
@@ -1181,49 +1181,6 @@
     }
   }
 
-  // cohort discussions interface.
-  .cohort-discussions-nav {
-
-    .cohort-course-wide-discussions-form {
-
-      .form-actions {
-        padding-top: ($baseline/2);
-      }
-    }
-
-    .category-title,
-    .topic-name,
-    .all-inline-discussions,
-    .always_cohort_inline_discussions,
-    .cohort_inline_discussions {
-      padding-left: ($baseline/2);
-    }
-
-    .always_cohort_inline_discussions,
-    .cohort_inline_discussions {
-      padding-top: ($baseline/2);
-    }
-
-    .category-item,
-    .subcategory-item {
-      padding-top: ($baseline/2);
-    }
-
-    .cohorted-text {
-      color: $uxpl-blue-base;
-    }
-
-    .discussions-wrapper {
-      @extend %ui-no-list;
-      padding: 0 ($baseline/2);
-
-      .subcategories {
-        padding: 0 ($baseline*1.5);
-      }
-    }
-  }
-
-
   .wrapper-tabs { // This applies to the tab-like interface that toggles between the student management and the group settings
     @extend %ui-no-list;
     @extend %ui-depth1;
@@ -1277,6 +1234,107 @@
         margin-top: $baseline;
       }
     }
+  }
+}
+
+// view - discussions management
+// --------------------
+.instructor-dashboard-wrapper-2 section.idash-section#discussions_management {
+
+  .division-scheme-container {
+    // See https://css-tricks.com/snippets/css/a-guide-to-flexbox/
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .division-scheme {
+      font-size: 18px;
+    }
+
+    .division-scheme-item {
+      padding-left: 1%;
+      padding-right: 1%;
+      float: left;
+    }
+
+    .three-column-layout {
+       max-width: 30%;
+    }
+
+    .two-column-layout {
+       max-width: 47%;
+    }
+
+    .field-message {
+        font-size: 13px;
+    }
+  }
+
+  // cohort management
+  .form-submit {
+    @include idashbutton($uxpl-blue-base);
+    @include font-size(14);
+    @include line-height(14);
+    margin-right: ($baseline/2);
+    margin-bottom: 0;
+    text-shadow: none;
+  }
+
+  .discussions-management-supplemental {
+    @extend %t-copy-sub1;
+    margin-top: $baseline;
+    padding: ($baseline/2) $baseline;
+    background: $gray-l6;
+    border-radius: ($baseline/10);
+  }
+
+  // cohort discussions interface.
+  .discussions-nav {
+
+    .cohort-course-wide-discussions-form {
+
+      .form-actions {
+        padding-top: ($baseline/2);
+      }
+    }
+
+    .category-title,
+    .topic-name,
+    .all-inline-discussions,
+    .always_divide_inline_discussions,
+    .divide_inline_discussions {
+      padding-left: ($baseline/2);
+    }
+
+    .always_divide_inline_discussions,
+    .divide_inline_discussions {
+      padding-top: ($baseline/2);
+    }
+
+    .category-item,
+    .subcategory-item {
+      padding-top: ($baseline/2);
+    }
+
+    .divided-discussion-text{
+      color: $uxpl-blue-base;
+    }
+
+    .discussions-wrapper {
+      @extend %ui-no-list;
+      padding: 0 ($baseline/2);
+
+      .subcategories {
+        padding: 0 ($baseline*1.5);
+      }
+    }
+  }
+  .wrapper-tabs {
+    @extend %ui-no-list;
+    @extend %ui-depth1;
+    position: relative;
+    top: 1px;
+    padding: 0 $baseline;
   }
 }
 
@@ -1479,6 +1537,14 @@
       border-radius: 5px;
       margin-top: 25px;
     }
+  }
+}
+
+// view - student admin
+// --------------------
+.instructor-dashboard-wrapper-2 section.idash-section#open_response_assessment {
+  .open-response-assessment {
+    padding-top: 20px;
   }
 }
 

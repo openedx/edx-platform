@@ -1,5 +1,5 @@
 // COLORS
-$light-gray1: rgb(221, 221, 221);
+$light-gray1: rgb(221, 221, 221) !default;
 
 
 // Font Sizes in em
@@ -127,15 +127,15 @@ $font-sizes: (
 
 // +Colors - UXPL new pattern library colors
 // ====================
-$uxpl-blue-base: rgba(0, 116, 180, 1); // wcag2a compliant
-$uxpl-blue-hover-active: darken($uxpl-blue-base, 7%); // wcag2a compliant
+$uxpl-blue-base: rgba(0, 116, 180, 1) !default; // wcag2a compliant
+$uxpl-blue-hover-active: darken($uxpl-blue-base, 7%) !default; // wcag2a compliant
 
-$uxpl-green-base: rgba(0, 129, 0, 1); // wcag2a compliant
-$uxpl-green-hover-active: lighten($uxpl-green-base, 7%); // wcag2a compliant
+$uxpl-green-base: rgba(0, 129, 0, 1) !default; // wcag2a compliant
+$uxpl-green-hover-active: lighten($uxpl-green-base, 7%) !default; // wcag2a compliant
 
-$uxpl-gray-dark: rgb(17, 17, 17);
-$uxpl-gray-base: rgb(65, 65, 65);
-$uxpl-gray-background: rgb(217, 217, 217);
+$uxpl-gray-dark: rgb(17, 17, 17) !default;
+$uxpl-gray-base: rgb(65, 65, 65) !default;
+$uxpl-gray-background: rgb(217, 217, 217) !default;
 
 
 // Alert styles
@@ -143,12 +143,15 @@ $error-color: rgb(203, 7, 18) !default;
 $success-color: rgb(0, 155, 0) !default;
 $warning-color: rgb(255, 192, 31) !default;
 $warning-color-accent: rgb(255, 252, 221) !default;
+$general-color: $uxpl-blue-base !default;;
+$general-color-accent: $uxpl-blue-base !default
 
 
 // CAPA correctness color to be consistent with Alert styles above
-$correct: $success-color;
-$partially-correct: $success-color;
-$incorrect: $error-color;
+$correct: $success-color !default;
+$partially-correct: $success-color !default;
+$incorrect: $error-color !default;
+$submitted: $general-color !default;
 
 
 // BUTTONS
@@ -190,7 +193,6 @@ $btn-border-radius:                         $component-border-radius !default;
 // sizes
 $btn-large-padding-vertical: spacing-vertical(small);
 $btn-large-padding-horizontal: spacing-horizontal(mid-large);
-
 
 $btn-base-padding-vertical: spacing-vertical(x-small);
 $btn-base-padding-horizontal: spacing-horizontal(base);

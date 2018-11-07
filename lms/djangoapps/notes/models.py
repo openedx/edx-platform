@@ -1,9 +1,10 @@
-from django.db import models
-from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
-from django.core.exceptions import ValidationError
-from django.utils.html import strip_tags
 import json
+
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+from django.core.urlresolvers import reverse
+from django.db import models
+from django.utils.html import strip_tags
 
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 

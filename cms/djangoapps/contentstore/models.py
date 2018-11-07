@@ -2,9 +2,8 @@
 Models for contentstore
 """
 
-from django.db.models.fields import TextField
-
 from config_models.models import ConfigurationModel
+from django.db.models.fields import TextField
 
 
 class VideoUploadConfig(ConfigurationModel):

@@ -2,17 +2,17 @@
 Helper functions and classes for discussion tests.
 """
 
-from uuid import uuid4
 import json
+from uuid import uuid4
 
 from common.test.acceptance.fixtures import LMS_BASE_URL
-from common.test.acceptance.fixtures.course import CourseFixture
+from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.fixtures.discussion import (
-    SingleThreadViewFixture,
-    Thread,
-    Response,
     ForumsConfigMixin,
     MultipleThreadFixture,
+    Response,
+    SingleThreadViewFixture,
+    Thread
 )
 from common.test.acceptance.pages.lms.discussion import DiscussionTabSingleThreadPage
 from common.test.acceptance.tests.helpers import UniqueCourseTest
@@ -74,11 +74,28 @@ class CohortTestMixin(object):
             },
         })
 
+    def enable_cohorting(self, course_fixture):
+        """
+        Enables cohorting for the specified course fixture.
+        """
+        url = LMS_BASE_URL + "/courses/" + course_fixture._course_key + '/cohorts/settings'
+        data = json.dumps({'is_cohorted': True})
+        response = course_fixture.session.patch(url, data=data, headers=course_fixture.headers)
+        self.assertTrue(response.ok, "Failed to enable cohorts")
+
+    def enable_always_divide_inline_discussions(self, course_fixture):
+        """
+        Enables "always_divide_inline_discussions" (but does not enabling cohorting).
+        """
+        discussions_url = LMS_BASE_URL + "/courses/" + course_fixture._course_key + '/discussions/settings'
+        discussions_data = json.dumps({'always_divide_inline_discussions': True})
+        course_fixture.session.patch(discussions_url, data=discussions_data, headers=course_fixture.headers)
+
     def disable_cohorting(self, course_fixture):
         """
-        Disables cohorting for the current course fixture.
+        Disables cohorting for the specified course fixture.
         """
-        url = LMS_BASE_URL + "/courses/" + course_fixture._course_key + '/cohorts/settings'  # pylint: disable=protected-access
+        url = LMS_BASE_URL + "/courses/" + course_fixture._course_key + '/cohorts/settings'
         data = json.dumps({'is_cohorted': False})
         response = course_fixture.session.patch(url, data=data, headers=course_fixture.headers)
         self.assertTrue(response.ok, "Failed to disable cohorts")
@@ -111,8 +128,21 @@ class BaseDiscussionTestCase(UniqueCourseTest, ForumsConfigMixin):
 
         self.discussion_id = "test_discussion_{}".format(uuid4().hex)
         self.course_fixture = CourseFixture(**self.course_info)
+        self.course_fixture.add_children(
+            XBlockFixtureDesc("chapter", "Test Section").add_children(
+                XBlockFixtureDesc("sequential", "Test Subsection").add_children(
+                    XBlockFixtureDesc("vertical", "Test Unit").add_children(
+                        XBlockFixtureDesc(
+                            "discussion",
+                            "Test Discussion",
+                            metadata={"discussion_id": self.discussion_id}
+                        )
+                    )
+                )
+            )
+        )
         self.course_fixture.add_advanced_settings(
-            {'discussion_topics': {'value': {'Test Discussion Topic': {'id': self.discussion_id}}}}
+            {'discussion_topics': {'value': {'General': {'id': 'course'}}}}
         )
         self.course_fixture.install()
 

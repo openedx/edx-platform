@@ -2,21 +2,21 @@
 Install Python and Node prerequisites.
 """
 
-from distutils import sysconfig
 import hashlib
 import os
 import re
 import sys
+from distutils import sysconfig
 
-from paver.easy import sh, task, BuildFailure
+from paver.easy import BuildFailure, sh, task
 
 from .utils.envs import Env
 from .utils.timer import timed
 
-
 PREREQS_STATE_DIR = os.getenv('PREREQ_CACHE_DIR', Env.REPO_ROOT / '.prereqs_cache')
 NPM_REGISTRY = "https://registry.npmjs.org/"
 NO_PREREQ_MESSAGE = "NO_PREREQ_INSTALL is set, not installing prereqs"
+NO_PYTHON_UNINSTALL_MESSAGE = 'NO_PYTHON_UNINSTALL is set. No attempts will be made to uninstall old Python libs.'
 COVERAGE_REQ_FILE = 'requirements/edx/coverage.txt'
 
 # If you make any changes to this list you also need to make
@@ -38,23 +38,21 @@ if os.path.exists(PRIVATE_REQS):
     PYTHON_REQ_FILES.append(PRIVATE_REQS)
 
 
+def str2bool(s):
+    s = str(s)
+    return s.lower() in ('yes', 'true', 't', '1')
+
+
 def no_prereq_install():
     """
     Determine if NO_PREREQ_INSTALL should be truthy or falsy.
     """
-    vals = {
-        '0': False,
-        '1': True,
-        'true': True,
-        'false': False,
-    }
+    return str2bool(os.environ.get('NO_PREREQ_INSTALL', 'False'))
 
-    val = os.environ.get("NO_PREREQ_INSTALL", 'False').lower()
 
-    try:
-        return vals[val]
-    except KeyError:
-        return False
+def no_python_uninstall():
+    """ Determine if we should run the uninstall_python_packages task. """
+    return str2bool(os.environ.get('NO_PYTHON_UNINSTALL', 'False'))
 
 
 def create_prereqs_cache_dir():
@@ -199,8 +197,12 @@ def uninstall_python_packages():
     uninstalled, notably, South.  Some other packages were once installed in
     ways that were resistant to being upgraded, like edxval.  Also uninstall
     them.
-
     """
+
+    if no_python_uninstall():
+        print(NO_PYTHON_UNINSTALL_MESSAGE)
+        return
+
     # So that we don't constantly uninstall things, use a hash of the packages
     # to be uninstalled.  Check it, and skip this if we're up to date.
     hasher = hashlib.sha1()

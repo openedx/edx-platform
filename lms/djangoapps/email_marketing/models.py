@@ -1,10 +1,9 @@
 """
 Email-marketing-related models.
 """
+from config_models.models import ConfigurationModel
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-
-from config_models.models import ConfigurationModel
 
 
 class EmailMarketingConfiguration(ConfigurationModel):
@@ -124,6 +123,16 @@ class EmailMarketingConfiguration(ConfigurationModel):
         blank=True,
         help_text=_(
             "Optional lms url scheme + host used to construct urls for content library, e.g. https://courses.edx.org."
+        )
+    )
+
+    # The number of seconds to delay for welcome emails sending. This is needed to acommendate those
+    # learners who created user account during course enrollment so we can send a different message
+    # in our welcome email.
+    welcome_email_send_delay = models.fields.IntegerField(
+        default=600,
+        help_text=_(
+            "Number of seconds to delay the sending of User Welcome email after user has been activated"
         )
     )
 

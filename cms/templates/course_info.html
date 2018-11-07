@@ -62,7 +62,11 @@ from openedx.core.djangolib.js_utils import (
 
   <div class="main-wrapper">
     <div class="inner-wrapper">
-      <div class="course-info-wrapper">
+      <div class="course-info-wrapper"
+        % if getattr(context_course, 'language'):
+          lang="${context_course.language}"
+        % endif
+      >
         <div class="main-column window">
           <article class="course-updates" id="course-update-view">
             <ol class="update-list" id="course-update-list"></ol>

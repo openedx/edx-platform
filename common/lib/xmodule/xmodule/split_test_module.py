@@ -58,7 +58,7 @@ class SplitTestFields(object):
 
     display_name = String(
         display_name=_("Display Name"),
-        help=_("This name is used for organizing your course content, but is not shown to students."),
+        help=_("The display name for this component. (Not shown to learners)"),
         scope=Scope.settings,
         default=_("Content Experiment")
     )
@@ -98,7 +98,8 @@ def get_split_user_partitions(user_partitions):
 
 
 @XBlock.needs('user_tags')  # pylint: disable=abstract-method
-@XBlock.wants('partitions')
+@XBlock.needs('partitions')
+@XBlock.needs('user')
 class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
     """
     Show the user the appropriate child.  Uses the ExperimentState
@@ -193,9 +194,9 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         Returns the group ID, or None if none is available.
         """
         partitions_service = self.runtime.service(self, 'partitions')
-        if not partitions_service:
-            return None
-        return partitions_service.get_user_group_id_for_partition(self.user_partition_id)
+        user_service = self.runtime.service(self, 'user')
+        user = user_service._django_user  # pylint: disable=protected-access
+        return partitions_service.get_user_group_id_for_partition(user, self.user_partition_id)
 
     @property
     def is_configured(self):
@@ -370,8 +371,8 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
 
 
 @XBlock.needs('user_tags')  # pylint: disable=abstract-method
-@XBlock.wants('partitions')
-@XBlock.wants('user')
+@XBlock.needs('partitions')
+@XBlock.needs('user')
 class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDescriptor):
     # the editing interface can be the same as for sequences -- just a container
     module_class = SplitTestModule
@@ -641,10 +642,6 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
 
         Called from Studio view.
         """
-        user_service = self.runtime.service(self, 'user')
-        if user_service is None:
-            return Response()
-
         user_partition = self.get_selected_partition()
 
         changed = False

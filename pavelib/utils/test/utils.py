@@ -1,15 +1,18 @@
 """
 Helper functions for test tasks
 """
-from paver.easy import sh, task, cmdopts
-from pavelib.utils.envs import Env
-from pavelib.utils.timer import timed
 import os
 import re
 import subprocess
 
+from paver.easy import cmdopts, sh, task
+
+from pavelib.utils.envs import Env
+from pavelib.utils.timer import timed
+
+from bok_choy.browser import browser
+
 MONGO_PORT_NUM = int(os.environ.get('EDXAPP_TEST_MONGO_PORT', '27017'))
-MONGO_HOST = os.environ.get('EDXAPP_TEST_MONGO_HOST', 'localhost')
 MINIMUM_FIREFOX_VERSION = 28.0
 
 __test__ = False  # do not collect
@@ -66,7 +69,7 @@ def clean_mongo():
     Clean mongo test databases
     """
     sh("mongo {host}:{port} {repo_root}/scripts/delete-mongo-test-dbs.js".format(
-        host=MONGO_HOST,
+        host=Env.MONGO_HOST,
         port=MONGO_PORT_NUM,
         repo_root=Env.REPO_ROOT,
     ))
@@ -76,6 +79,33 @@ def check_firefox_version():
     """
     Check that firefox is the correct version.
     """
+    if 'BOK_CHOY_HOSTNAME' in os.environ:
+        # Firefox is running in a separate Docker container; get its version via Selenium
+        driver = browser()
+        capabilities = driver.capabilities
+        if capabilities['browserName'] == 'firefox':
+            firefox_version_regex = re.compile(r'^\d+\.\d+')
+            version_key = 'browserVersion' if 'browserVersion' in 'capabilities' else 'version'
+            try:
+                firefox_ver = float(firefox_version_regex.search(capabilities[version_key]).group(0))
+            except AttributeError:
+                firefox_ver = 0.0
+        else:
+            firefox_ver = 0.0
+        driver.close()
+        if firefox_ver < MINIMUM_FIREFOX_VERSION:
+            raise Exception(
+                'Required firefox version not found.\n'
+                'Expected: {expected_version}; Actual: {actual_version}.\n\n'
+                'Make sure that the edx.devstack.firefox container is up-to-date and running\n'
+                '\t{expected_version}'.format(
+                    actual_version=firefox_ver,
+                    expected_version=MINIMUM_FIREFOX_VERSION
+                )
+            )
+        return
+
+    # Firefox will be run as a local process
     expected_firefox_ver = "Mozilla Firefox " + str(MINIMUM_FIREFOX_VERSION)
     firefox_ver_string = subprocess.check_output("firefox --version", shell=True).strip()
     firefox_version_regex = re.compile(r"Mozilla Firefox (\d+.\d+)")

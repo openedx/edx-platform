@@ -10,8 +10,6 @@ from functools import wraps
 
 from django.conf import settings
 from django.core import cache
-
-
 # If we can't find a 'general' CACHE defined in settings.py, we simply fall back
 # to returning the default cache. This will happen with dev machines.
 from django.utils.translation import get_language

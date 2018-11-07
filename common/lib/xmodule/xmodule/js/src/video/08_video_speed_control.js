@@ -31,13 +31,13 @@
     SpeedControl.prototype = {
         template: [
             '<div class="speeds menu-container" role="application">',
-            '<p class="sr instructions" id="speed-instructions">',
+            '<p class="sr instructions">',
                     gettext('Press UP to enter the speed menu then use the UP and DOWN arrow keys to navigate the different speeds, then press ENTER to change to the selected speed.'),  // eslint-disable-line max-len, indent
             '</p>',
             '<button class="control speed-button" aria-disabled="false" aria-expanded="false"',
             'title="',
             gettext('Adjust video speed'),
-            '" aria-describedby="speed-instructions">',
+            '">',
             '<span>',
             '<span class="icon fa fa-caret-right" aria-hidden="true"></span>',
             '</span>',
@@ -98,6 +98,7 @@
         render: function(speeds, currentSpeed) {
             var speedsContainer = this.speedsContainer,
                 reversedSpeeds = speeds.concat().reverse(),
+                instructionsId = 'speed-instructions-' + this.state.id,
                 speedsList = $.map(reversedSpeeds, function(speed) {
                     return HtmlUtils.interpolateHtml(
                         HtmlUtils.HTML(
@@ -125,6 +126,10 @@
                 HtmlUtils.HTML(this.el)
             );
             this.setActiveSpeed(currentSpeed);
+
+            // set dynamic id for instruction element to avoid collisions
+            this.el.find('.instructions').attr('id', instructionsId);
+            this.speedButton.attr('aria-describedby', instructionsId);
         },
 
         /**

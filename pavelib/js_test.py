@@ -2,9 +2,11 @@
 Javascript test tasks
 """
 import sys
-from paver.easy import task, cmdopts, needs
-from pavelib.utils.test.suites import JsTestSuite
+
+from paver.easy import cmdopts, needs, task
+
 from pavelib.utils.envs import Env
+from pavelib.utils.test.suites import JsTestSuite
 from pavelib.utils.timer import timed
 
 __test__ = False  # do not collect

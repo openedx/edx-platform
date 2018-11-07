@@ -1,21 +1,22 @@
 """
 This module contains celery task functions for handling the management of subtasks.
 """
-from time import time
 import json
-from uuid import uuid4
-import psutil
-from contextlib import contextmanager
 import logging
+from contextlib import contextmanager
+from time import time
+from uuid import uuid4
 
-from celery.states import SUCCESS, READY_STATES, RETRY
-import dogstats_wrapper as dog_stats_api
-
-from django.db import transaction, DatabaseError
+import psutil
+from celery.states import READY_STATES, RETRY, SUCCESS
 from django.core.cache import cache
+from django.db import DatabaseError, transaction
 
-from lms.djangoapps.instructor_task.models import InstructorTask, PROGRESS, QUEUING
+import dogstats_wrapper as dog_stats_api
 from util.db import outer_atomic
+
+from .exceptions import DuplicateTaskException
+from .models import PROGRESS, QUEUING, InstructorTask
 
 TASK_LOG = logging.getLogger('edx.celery.task')
 
@@ -24,11 +25,6 @@ SUBTASK_LOCK_EXPIRE = 60 * 10  # Lock expires in 10 minutes
 # Number of times to retry if a subtask update encounters a lock on the InstructorTask.
 # (These are recursive retries, so don't make this number too large.)
 MAX_DATABASE_LOCK_RETRIES = 5
-
-
-class DuplicateTaskException(Exception):
-    """Exception indicating that a task already exists or has already completed."""
-    pass
 
 
 def _get_number_of_subtasks(total_num_items, items_per_task):

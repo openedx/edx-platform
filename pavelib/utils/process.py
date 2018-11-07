@@ -2,13 +2,14 @@
 Helper functions for managing processes.
 """
 from __future__ import print_function
-import sys
-import os
-import subprocess
-import signal
-import psutil
-import atexit
 
+import atexit
+import os
+import signal
+import subprocess
+import sys
+
+import psutil
 from paver import tasks
 
 

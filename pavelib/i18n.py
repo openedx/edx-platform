@@ -3,13 +3,14 @@ Internationalization tasks
 """
 
 import re
-import sys
 import subprocess
+import sys
 
 from path import Path as path
-from paver.easy import task, cmdopts, needs, sh
+from paver.easy import cmdopts, needs, sh, task
 
 from .utils.cmd import django_cmd
+from .utils.envs import Env
 from .utils.timer import timed
 
 try:
@@ -17,7 +18,7 @@ try:
 except ImportError:
     colorize = lambda color, text: text
 
-DEFAULT_SETTINGS = 'devstack'
+DEFAULT_SETTINGS = Env.DEVSTACK_SETTINGS
 
 
 @task

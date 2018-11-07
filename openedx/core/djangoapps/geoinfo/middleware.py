@@ -11,10 +11,11 @@ decorator `django.utils.decorators.decorator_from_middleware(middleware_class)`
 """
 
 import logging
-import pygeoip
 
-from ipware.ip import get_real_ip
 from django.conf import settings
+from ipware.ip import get_real_ip
+
+import pygeoip
 
 log = logging.getLogger(__name__)
 

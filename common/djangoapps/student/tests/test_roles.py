@@ -3,15 +3,20 @@ Tests of student.roles
 """
 import ddt
 from django.test import TestCase
-
-from courseware.tests.factories import UserFactory, StaffFactory, InstructorFactory
-from student.tests.factories import AnonymousUserFactory
-
-from student.roles import (
-    GlobalStaff, CourseRole, CourseStaffRole, CourseInstructorRole,
-    OrgStaffRole, OrgInstructorRole, RoleCache, CourseBetaTesterRole
-)
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
+from courseware.tests.factories import InstructorFactory, StaffFactory, UserFactory
+from student.roles import (
+    CourseBetaTesterRole,
+    CourseInstructorRole,
+    CourseRole,
+    CourseStaffRole,
+    GlobalStaff,
+    OrgInstructorRole,
+    OrgStaffRole,
+    RoleCache
+)
+from student.tests.factories import AnonymousUserFactory
 
 
 class RolesTestCase(TestCase):

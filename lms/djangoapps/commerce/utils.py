@@ -1,10 +1,26 @@
 """Utilities to assist with commerce tasks."""
+from urllib import urlencode
 from urlparse import urljoin
 
+import waffle
 from django.conf import settings
 
 from commerce.models import CommerceConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+
+
+def is_account_activation_requirement_disabled():
+    """
+    Checks to see if the django-waffle switch for disabling the account activation requirement is active
+
+    Returns:
+        Boolean value representing switch status
+    """
+    switch_name = configuration_helpers.get_value(
+        'DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH',
+        settings.DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH
+    )
+    return waffle.switch_is_active(switch_name)
 
 
 class EcommerceService(object):
@@ -38,12 +54,8 @@ class EcommerceService(object):
         Returns:
             Receipt page for the specified Order.
         """
-        ecommerce_receipt_page_url = configuration_helpers.get_value('ECOMMERCE_RECEIPT_PAGE_URL')
-        if ecommerce_receipt_page_url:
-            receipt_page_url = self.get_absolute_ecommerce_url(ecommerce_receipt_page_url)
-        else:
-            receipt_page_url = self.config.receipt_page
-        return receipt_page_url + order_number
+
+        return self.get_absolute_ecommerce_url(CommerceConfiguration.DEFAULT_RECEIPT_PAGE_URL + order_number)
 
     def is_enabled(self, user):
         """
@@ -53,7 +65,8 @@ class EcommerceService(object):
         Returns:
             Boolean
         """
-        allow_user = user.is_active or user.is_anonymous()
+        user_is_active = user.is_active or is_account_activation_requirement_disabled()
+        allow_user = user_is_active or user.is_anonymous()
         return allow_user and self.config.checkout_on_ecommerce_service
 
     def payment_page_url(self):
@@ -64,10 +77,19 @@ class EcommerceService(object):
         """
         return self.get_absolute_ecommerce_url(self.config.single_course_checkout_page)
 
-    def checkout_page_url(self, sku):
-        """ Construct the URL to the ecommerce checkout page and include a product.
+    def get_checkout_page_url(self, *skus):
+        """ Construct the URL to the ecommerce checkout page and include products.
+
+        Args:
+            skus (list): List of SKUs associated with products to be added to basket
+
+        Returns:
+            Absolute path to the ecommerce checkout page showing basket that contains specified products.
 
         Example:
-            http://localhost:8002/basket/single_item/?sku=5H3HG5
+            http://localhost:8002/basket/add/?sku=5H3HG5&sku=57FHHD
         """
-        return "{}?sku={}".format(self.get_absolute_ecommerce_url(self.config.single_course_checkout_page), sku)
+        return '{checkout_page_path}?{skus}'.format(
+            checkout_page_path=self.get_absolute_ecommerce_url(self.config.MULTIPLE_ITEMS_BASKET_PAGE_URL),
+            skus=urlencode({'sku': skus}, doseq=True),
+        )

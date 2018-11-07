@@ -3,12 +3,13 @@ Tests for contentstore/views/user.py.
 """
 import json
 
+from django.contrib.auth.models import User
+
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url
-from django.contrib.auth.models import User
-from student.models import CourseEnrollment
-from student.roles import CourseStaffRole, CourseInstructorRole
 from student import auth
+from student.models import CourseEnrollment
+from student.roles import CourseInstructorRole, CourseStaffRole
 
 
 class UsersTestCase(CourseTestCase):

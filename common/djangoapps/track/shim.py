@@ -4,7 +4,6 @@ import json
 
 from .transformers import EventTransformerRegistry
 
-
 CONTEXT_FIELDS_TO_INCLUDE = [
     'username',
     'session',

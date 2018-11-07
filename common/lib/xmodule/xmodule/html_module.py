@@ -1,27 +1,28 @@
 import copy
-from datetime import datetime
-from fs.errors import ResourceNotFoundError
 import logging
-from lxml import etree
 import os
-from path import Path as path
-from pkg_resources import resource_string
 import re
 import sys
 import textwrap
+from datetime import datetime
+
+from fs.errors import ResourceNotFoundError
+from lxml import etree
+from path import Path as path
+from pkg_resources import resource_string
+from xblock.core import XBlock
+from xblock.fields import Boolean, List, Scope, String
+from xblock.fragment import Fragment
 
 import dogstats_wrapper as dog_stats_api
-from xmodule.util.misc import escape_html_characters
 from xmodule.contentstore.content import StaticContent
 from xmodule.editing_module import EditingDescriptor
 from xmodule.edxnotes_utils import edxnotes
 from xmodule.html_checker import check_html
 from xmodule.stringify import stringify_children
-from xmodule.x_module import XModule, DEPRECATION_VSCOMPAT_EVENT
+from xmodule.util.misc import escape_html_characters
+from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT, XModule
 from xmodule.xml_module import XmlDescriptor, name_to_pathname
-from xblock.core import XBlock
-from xblock.fields import Scope, String, Boolean, List
-from xblock.fragment import Fragment
 
 log = logging.getLogger("edx.courseware")
 
@@ -38,7 +39,7 @@ class HtmlBlock(object):
     """
     display_name = String(
         display_name=_("Display Name"),
-        help=_("This name appears in the horizontal navigation at the top of the page."),
+        help=_("The display name for this component."),
         scope=Scope.settings,
         # it'd be nice to have a useful default but it screws up other things; so,
         # use display_name_with_default for those
@@ -329,7 +330,7 @@ class HtmlDescriptor(HtmlBlock, XmlDescriptor, EditingDescriptor):  # pylint: di
 
 class AboutFields(object):
     display_name = String(
-        help=_("Display name for this module"),
+        help=_("The display name for this component."),
         scope=Scope.settings,
         default="overview",
     )
@@ -364,7 +365,7 @@ class StaticTabFields(object):
     """
     display_name = String(
         display_name=_("Display Name"),
-        help=_("This name appears in the horizontal navigation at the top of the page."),
+        help=_("The display name for this component."),
         scope=Scope.settings,
         default="Empty",
     )
@@ -446,17 +447,26 @@ class CourseInfoModule(CourseInfoFields, HtmlModuleMixin):
                 return self.data.replace("%%USER_ID%%", self.system.anonymous_student_id)
             return self.data
         else:
-            course_updates = [item for item in self.items if item.get('status') == self.STATUS_VISIBLE]
-            course_updates.sort(
-                key=lambda item: (CourseInfoModule.safe_parse_date(item['date']), item['id']),
-                reverse=True
-            )
+            # This should no longer be called on production now that we are using a separate updates page
+            # and using a fragment HTML file - it will be called in tests until those are removed.
+            course_updates = self.order_updates(self.items)
             context = {
                 'visible_updates': course_updates[:3],
                 'hidden_updates': course_updates[3:],
             }
-
             return self.system.render_template("{0}/course_updates.html".format(self.TEMPLATE_DIR), context)
+
+    @classmethod
+    def order_updates(self, updates):
+        """
+        Returns any course updates in reverse chronological order.
+        """
+        sorted_updates = [update for update in updates if update.get('status') == self.STATUS_VISIBLE]
+        sorted_updates.sort(
+            key=lambda item: (self.safe_parse_date(item['date']), item['id']),
+            reverse=True
+        )
+        return sorted_updates
 
     @staticmethod
     def safe_parse_date(date):

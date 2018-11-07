@@ -3,13 +3,13 @@ define([
     'common/js/spec_helpers/view_helpers', 'js/models/course', 'js/models/group_configuration', 'js/models/group',
     'js/collections/group_configuration', 'js/collections/group', 'js/views/group_configuration_details',
     'js/views/group_configurations_list', 'js/views/group_configuration_editor', 'js/views/group_configuration_item',
-    'js/views/experiment_group_edit', 'js/views/content_group_list', 'js/views/content_group_details',
-    'js/views/content_group_editor', 'js/views/content_group_item'
+    'js/views/experiment_group_edit', 'js/views/partition_group_list', 'js/views/partition_group_details',
+    'js/views/content_group_editor', 'js/views/partition_group_item'
 ], function(
     _, AjaxHelpers, TemplateHelpers, ViewHelpers, Course, GroupConfigurationModel, GroupModel,
     GroupConfigurationCollection, GroupCollection, GroupConfigurationDetailsView, GroupConfigurationsListView,
     GroupConfigurationEditorView, GroupConfigurationItemView, ExperimentGroupEditView, GroupList,
-    ContentGroupDetailsView, ContentGroupEditorView, ContentGroupItemView
+    PartitionGroupDetailsView, ContentGroupEditorView, PartitionGroupItemView
 ) {
     'use strict';
     var SELECTORS = {
@@ -675,7 +675,7 @@ define([
             verifyEditingGroup, respondToSave, expectGroupsVisible, correctValidationError;
 
         scopedGroupSelector = function(groupIndex, additionalSelectors) {
-            var groupSelector = '.content-groups-list-item-' + groupIndex;
+            var groupSelector = '.partition-groups-list-item-' + groupIndex;
             if (additionalSelectors) {
                 return groupSelector + ' ' + additionalSelectors;
             } else {
@@ -775,13 +775,13 @@ define([
 
         expectGroupsVisible = function(view, groupNames) {
             _.each(groupNames, function(groupName) {
-                expect(view.$('.content-groups-list-item')).toContainText(groupName);
+                expect(view.$('.partition-groups-list-item')).toContainText(groupName);
             });
         };
 
         beforeEach(function() {
             TemplateHelpers.installTemplates(
-                ['content-group-editor', 'content-group-details', 'list']
+                ['content-group-editor', 'partition-group-details', 'list']
             );
         });
 
@@ -792,7 +792,7 @@ define([
 
         it('can render groups', function() {
             var groupNames = ['Group 1', 'Group 2', 'Group 3'];
-            renderView(groupNames).$('.content-group-details').each(function(index) {
+            renderView(groupNames).$('.partition-group-details').each(function(index) {
                 expect($(this)).toContainText(groupNames[index]);
             });
         });
@@ -874,7 +874,7 @@ define([
 
     describe('Content groups details view', function() {
         beforeEach(function() {
-            TemplateHelpers.installTemplate('content-group-details', true);
+            TemplateHelpers.installTemplate('partition-group-details', true);
             this.model = new GroupModel({name: 'Content Group', id: 0, courseOutlineUrl: 'CourseOutlineUrl'});
 
             var saveableModel = new GroupConfigurationModel({
@@ -889,7 +889,7 @@ define([
             this.collection = new GroupConfigurationCollection([saveableModel]);
             this.collection.outlineUrl = '/outline';
 
-            this.view = new ContentGroupDetailsView({
+            this.view = new PartitionGroupDetailsView({
                 model: this.model
             });
             appendSetFixtures(this.view.render().el);
@@ -901,7 +901,7 @@ define([
 
         it('should show empty usage appropriately', function() {
             this.view.$('.show-groups').click();
-            assertShowEmptyUsages(this.view, 'This content group is not in use. ');
+            assertShowEmptyUsages(this.view, 'use this group to control access to a component');
         });
 
         it('should hide empty usage appropriately', function() {
@@ -915,7 +915,7 @@ define([
 
             assertShowNonEmptyUsages(
                 this.view,
-                'This content group is used in:',
+                'This group controls access to:',
                 'Cannot delete when in use by a unit'
             );
         });
@@ -1015,7 +1015,7 @@ define([
     describe('Content group controller view', function() {
         beforeEach(function() {
             TemplateHelpers.installTemplates([
-                'content-group-editor', 'content-group-details'
+                'content-group-editor', 'partition-group-details'
             ], true);
 
             this.model = new GroupModel({name: 'Content Group', id: 0, courseOutlineUrl: 'CourseOutlineUrl'});
@@ -1029,14 +1029,14 @@ define([
             this.saveableModel.urlRoot = '/group_configurations';
             this.collection = new GroupConfigurationCollection([this.saveableModel]);
             this.collection.url = '/group_configurations';
-            this.view = new ContentGroupItemView({
+            this.view = new PartitionGroupItemView({
                 model: this.model
             });
             appendSetFixtures(this.view.render().el);
         });
 
         it('should render properly', function() {
-            assertControllerView(this.view, '.content-group-details', '.content-group-edit');
+            assertControllerView(this.view, '.partition-group-details', '.content-group-edit');
         });
 
         it('should destroy itself on confirmation of deleting', function() {
@@ -1047,7 +1047,7 @@ define([
             assertAndDeleteItemWithError(
                 this,
                 '/group_configurations/0/0',
-                '.content-groups-list-item',
+                '.partition-groups-list-item',
                 'Delete this content group'
             );
         });

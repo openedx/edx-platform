@@ -4,17 +4,16 @@ Utility library for working with the edx-milestones app
 """
 from django.conf import settings
 from django.utils.translation import ugettext as _
-
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
-
 from milestones import api as milestones_api
 from milestones.exceptions import InvalidMilestoneRelationshipTypeException
 from milestones.models import MilestoneRelationshipType
 from milestones.services import MilestonesService
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+
+import request_cache
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.django import modulestore
-import request_cache
 
 NAMESPACE_CHOICES = {
     'ENTRANCE_EXAM': 'entrance_exams'
@@ -207,7 +206,7 @@ def remove_course_milestones(course_key, user, relationship):
         milestones_api.remove_user_milestone({'id': user.id}, milestone)
 
 
-def get_required_content(course, user):
+def get_required_content(course_key, user):
     """
     Queries milestones subsystem to see if the specified course is gated on one or more milestones,
     and if those milestones can be fulfilled via completion of a particular course content module
@@ -217,7 +216,7 @@ def get_required_content(course, user):
         # Get all of the outstanding milestones for this course, for this user
         try:
             milestone_paths = get_course_milestones_fulfillment_paths(
-                unicode(course.id),
+                unicode(course_key),
                 serialize_user(user)
             )
         except InvalidMilestoneRelationshipTypeException:

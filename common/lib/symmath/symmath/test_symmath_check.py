@@ -1,4 +1,5 @@
 from unittest import TestCase
+
 from .symmath_check import symmath_check
 
 

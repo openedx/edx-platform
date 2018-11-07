@@ -1,11 +1,12 @@
 """
 Fixture to manipulate configuration models.
 """
-import requests
-import re
 import json
+import re
 
+import requests
 from lazy import lazy
+
 from common.test.acceptance.fixtures import LMS_BASE_URL
 
 

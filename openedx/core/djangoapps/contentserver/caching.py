@@ -4,6 +4,7 @@ Helper functions for caching course assets.
 from django.core.cache import caches
 from django.core.cache.backends.base import InvalidCacheBackendError
 from opaque_keys import InvalidKeyError
+
 from xmodule.contentstore.content import STATIC_CONTENT_VERSION
 
 # See if there's a "course_assets" cache configured, and if not, fallback to the default cache.

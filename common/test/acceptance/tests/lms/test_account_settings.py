@@ -9,8 +9,8 @@ from bok_choy.page_object import XSS_INJECTION
 from nose.plugins.attrib import attr
 from pytz import timezone, utc
 
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
-from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
 from common.test.acceptance.tests.helpers import AcceptanceTest, EventsTestMixin
 
@@ -226,10 +226,13 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
         Test behaviour of a dropdown field.
         """
         self.assertEqual(self.account_settings_page.title_for_field(field_id), title)
-        self.assertEqual(self.account_settings_page.value_for_dropdown_field(field_id), initial_value)
+        self.assertEqual(self.account_settings_page.value_for_dropdown_field(field_id, focus_out=True), initial_value)
 
         for new_value in new_values:
-            self.assertEqual(self.account_settings_page.value_for_dropdown_field(field_id, new_value), new_value)
+            self.assertEqual(
+                self.account_settings_page.value_for_dropdown_field(field_id, new_value, focus_out=True),
+                new_value
+            )
             # An XHR request is made when changing the field
             self.account_settings_page.wait_for_ajax()
             if reloads_on_save:
@@ -237,7 +240,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
             else:
                 self.browser.refresh()
                 self.account_settings_page.wait_for_page()
-            self.assertEqual(self.account_settings_page.value_for_dropdown_field(field_id), new_value)
+            self.assertEqual(self.account_settings_page.value_for_dropdown_field(field_id, focus_out=True), new_value)
 
     def _test_link_field(self, field_id, title, link_title, field_type, success_message):
         """
@@ -387,7 +390,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
         Test behaviour of "Year of Birth" field.
         """
         # Note that when we clear the year_of_birth here we're firing an event.
-        self.assertEqual(self.account_settings_page.value_for_dropdown_field('year_of_birth', ''), '')
+        self.assertEqual(self.account_settings_page.value_for_dropdown_field('year_of_birth', '', focus_out=True), '')
 
         expected_events = [
             self.expected_settings_changed_event('year_of_birth', None, 1980),
@@ -486,15 +489,25 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
         # verify that we are on correct tab
         self.assertTrue(self.account_settings_page.is_order_history_tab_visible)
 
-        expected_order_data = {
-            'title': 'Test Course',
+        expected_order_data_first_row = {
+            'number': 'Order Number:\nEdx-123',
             'date': 'Date Placed:\nApr 21, 2016',
-            'price': 'Cost:\n$100.0',
-            'number': 'Order Number:\nEdx-123'
+            'price': 'Cost:\n$100.00',
         }
-        for field_name, value in expected_order_data.iteritems():
+        expected_order_data_second_row = {
+            'number': 'Product Name:\nTest Course',
+            'date': 'Date Placed:\nApr 21, 2016',
+            'price': 'Cost:\n$100.00',
+        }
+
+        for field_name, value in expected_order_data_first_row.iteritems():
             self.assertEqual(
-                self.account_settings_page.get_value_of_order_history_row_item('order-Edx-123', field_name), value
+                self.account_settings_page.get_value_of_order_history_row_item('order-Edx-123', field_name)[0], value
+            )
+
+        for field_name, value in expected_order_data_second_row.iteritems():
+            self.assertEqual(
+                self.account_settings_page.get_value_of_order_history_row_item('order-Edx-123', field_name)[1], value
             )
 
         self.assertTrue(self.account_settings_page.order_button_is_visible('order-Edx-123'))

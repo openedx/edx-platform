@@ -18,6 +18,7 @@ from xmodule.capa_module import CapaModule
 from opaque_keys.edx.locations import Location
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
+from xblock.scorable import Score
 
 from . import get_test_system
 from pytz import UTC
@@ -111,9 +112,9 @@ class CapaFactoryWithDelay(object):
 
         if correct:
             # Could set the internal state formally, but here we just jam in the score.
-            module.get_score = lambda: {'score': 1, 'total': 1}
+            module.score = Score(raw_earned=1, raw_possible=1)
         else:
-            module.get_score = lambda: {'score': 0, 'total': 1}
+            module.score = Score(raw_earned=0, raw_possible=1)
 
         return module
 

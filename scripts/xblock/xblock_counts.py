@@ -1,10 +1,10 @@
 import argparse
 import csv
 import json
+import os
 import sys
 from datetime import datetime
 
-import os
 import requests
 
 # Keys for the CSV and JSON interpretation

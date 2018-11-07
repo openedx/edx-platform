@@ -1,46 +1,47 @@
 """HTTP end-points for the User API. """
 import copy
 
-from opaque_keys import InvalidKeyError
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.http import HttpResponse
+from django.core.exceptions import NON_FIELD_ERRORS, ImproperlyConfigured, PermissionDenied, ValidationError
 from django.core.urlresolvers import reverse
-from django.core.exceptions import ImproperlyConfigured, NON_FIELD_ERRORS, ValidationError
-from django.utils.translation import ugettext as _
+from django.http import HttpResponse, HttpResponseForbidden
 from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect, csrf_exempt
-from opaque_keys.edx import locator
-from rest_framework import authentication
-from rest_framework import filters
-from rest_framework import generics
-from rest_framework import status
-from rest_framework import viewsets
-from rest_framework.views import APIView
-from rest_framework.exceptions import ParseError
+from django.utils.translation import ugettext as _
+from django.views.decorators.csrf import csrf_exempt, csrf_protect, ensure_csrf_cookie
 from django_countries import countries
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx import locator
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from rest_framework import authentication, filters, generics, status, viewsets
+from rest_framework.exceptions import ParseError
+from rest_framework.views import APIView
 
-from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 import third_party_auth
 from django_comment_common.models import Role
 from edxmako.shortcuts import marketing_link
-from student.forms import get_registration_extension_form
-from student.views import create_account_with_params
-from student.cookies import set_logged_in_cookies
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.api.authentication import SessionAuthenticationAllowInactiveUser
+from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
+from student.cookies import set_logged_in_cookies
+from student.forms import get_registration_extension_form
+from student.views import create_account_with_params
 from util.json_request import JsonResponse
-from util.enterprise_helpers import insert_enterprise_fields
-from .preferences.api import get_country_time_zones, update_email_opt_in
-from .helpers import FormDescription, shim_student_view, require_post_params
-from .models import UserPreference, UserProfile
+
 from .accounts import (
-    NAME_MAX_LENGTH, EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH, PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH,
-    USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH
+    EMAIL_MAX_LENGTH,
+    EMAIL_MIN_LENGTH,
+    NAME_MAX_LENGTH,
+    PASSWORD_MAX_LENGTH,
+    PASSWORD_MIN_LENGTH,
+    USERNAME_MAX_LENGTH,
+    USERNAME_MIN_LENGTH
 )
 from .accounts.api import check_account_exists
-from .serializers import CountryTimeZoneSerializer, UserSerializer, UserPreferenceSerializer
+from .helpers import FormDescription, require_post_params, shim_student_view
+from .models import UserPreference, UserProfile
+from .preferences.api import get_country_time_zones, update_email_opt_in
+from .serializers import CountryTimeZoneSerializer, UserPreferenceSerializer, UserSerializer
 
 
 class LoginSessionView(APIView):
@@ -161,6 +162,7 @@ class RegistrationView(APIView):
     DEFAULT_FIELDS = ["email", "name", "username", "password"]
 
     EXTRA_FIELDS = [
+        "confirm_email",
         "first_name",
         "last_name",
         "city",
@@ -207,9 +209,20 @@ class RegistrationView(APIView):
 
         # Map field names to the instance method used to add the field to the form
         self.field_handlers = {}
-        for field_name in self.DEFAULT_FIELDS + self.EXTRA_FIELDS:
+        valid_fields = self.DEFAULT_FIELDS + self.EXTRA_FIELDS
+        for field_name in valid_fields:
             handler = getattr(self, "_add_{field_name}_field".format(field_name=field_name))
             self.field_handlers[field_name] = handler
+
+        field_order = configuration_helpers.get_value('REGISTRATION_FIELD_ORDER')
+        if not field_order:
+            field_order = settings.REGISTRATION_FIELD_ORDER or valid_fields
+
+        # Check that all of the valid_fields are in the field order and vice versa, if not set to the default order
+        if set(valid_fields) != set(field_order):
+            field_order = valid_fields
+
+        self.field_order = field_order
 
     @method_decorator(ensure_csrf_cookie)
     def get(self, request):
@@ -236,14 +249,14 @@ class RegistrationView(APIView):
         form_desc = FormDescription("post", reverse("user_api_registration"))
         self._apply_third_party_auth_overrides(request, form_desc)
 
-        # Default fields are always required
-        for field_name in self.DEFAULT_FIELDS:
-            self.field_handlers[field_name](form_desc, required=True)
-
         # Custom form fields can be added via the form set in settings.REGISTRATION_EXTENSION_FORM
         custom_form = get_registration_extension_form()
 
         if custom_form:
+            # Default fields are always required
+            for field_name in self.DEFAULT_FIELDS:
+                self.field_handlers[field_name](form_desc, required=True)
+
             for field_name, field in custom_form.fields.items():
                 restrictions = {}
                 if getattr(field, 'max_length', None):
@@ -271,17 +284,24 @@ class RegistrationView(APIView):
                     include_default_option=field_options.get('include_default_option'),
                 )
 
-        # Extra fields configured in Django settings
-        # may be required, optional, or hidden
-        for field_name in self.EXTRA_FIELDS:
-            if self._is_field_visible(field_name):
-                self.field_handlers[field_name](
-                    form_desc,
-                    required=self._is_field_required(field_name)
-                )
-
-        # Add any Enterprise fields if the app is enabled
-        insert_enterprise_fields(request, form_desc)
+            # Extra fields configured in Django settings
+            # may be required, optional, or hidden
+            for field_name in self.EXTRA_FIELDS:
+                if self._is_field_visible(field_name):
+                    self.field_handlers[field_name](
+                        form_desc,
+                        required=self._is_field_required(field_name)
+                    )
+        else:
+            # Go through the fields in the fields order and add them if they are required or visible
+            for field_name in self.field_order:
+                if field_name in self.DEFAULT_FIELDS:
+                    self.field_handlers[field_name](form_desc, required=True)
+                elif self._is_field_visible(field_name):
+                    self.field_handlers[field_name](
+                        form_desc,
+                        required=self._is_field_required(field_name)
+                    )
 
         return HttpResponse(form_desc.to_json(), content_type="application/json")
 
@@ -302,6 +322,7 @@ class RegistrationView(APIView):
             HttpResponse: 400 if the request is not valid.
             HttpResponse: 409 if an account with the given username or email
                 address already exists
+            HttpResponse: 403 operation not allowed
         """
         data = request.POST.copy()
 
@@ -352,6 +373,8 @@ class RegistrationView(APIView):
                 for field, error_list in err.message_dict.items()
             }
             return JsonResponse(errors, status=400)
+        except PermissionDenied:
+            return HttpResponseForbidden(_("Account creation not allowed."))
 
         response = JsonResponse({"success": True})
         set_logged_in_cookies(request, response, user)
@@ -375,16 +398,45 @@ class RegistrationView(APIView):
         # a field on the registration form meant to hold the user's email address.
         email_placeholder = _(u"username@domain.com")
 
+        # Translators: These instructions appear on the registration form, immediately
+        # below a field meant to hold the user's email address.
+        email_instructions = _(u"This is what you will use to login.")
+
         form_desc.add_field(
             "email",
             field_type="email",
             label=email_label,
             placeholder=email_placeholder,
+            instructions=email_instructions,
             restrictions={
                 "min_length": EMAIL_MIN_LENGTH,
                 "max_length": EMAIL_MAX_LENGTH,
             },
             required=required
+        )
+
+    def _add_confirm_email_field(self, form_desc, required=True):
+        """Add an email confirmation field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to True
+
+        """
+        # Translators: This label appears above a field on the registration form
+        # meant to confirm the user's email address.
+        email_label = _(u"Confirm Email")
+        error_msg = _(u"The email addresses do not match.")
+
+        form_desc.add_field(
+            "confirm_email",
+            label=email_label,
+            required=required,
+            error_messages={
+                "required": error_msg
+            }
         )
 
     def _add_name_field(self, form_desc, required=True):
@@ -399,15 +451,15 @@ class RegistrationView(APIView):
         """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's full name.
-        name_label = _(u"Full name")
+        name_label = _(u"Full Name")
 
         # Translators: This example name is used as a placeholder in
         # a field on the registration form meant to hold the user's name.
-        name_placeholder = _(u"Jane Doe")
+        name_placeholder = _(u"Jane Q. Learner")
 
         # Translators: These instructions appear on the registration form, immediately
         # below a field meant to hold the user's full name.
-        name_instructions = _(u"Your legal name, used for any certificates you earn.")
+        name_instructions = _(u"This name will be used on any certificates that you earn.")
 
         form_desc.add_field(
             "name",
@@ -432,18 +484,18 @@ class RegistrationView(APIView):
         """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's public username.
-        username_label = _(u"Public username")
+        username_label = _(u"Public Username")
 
         username_instructions = _(
             # Translators: These instructions appear on the registration form, immediately
             # below a field meant to hold the user's public username.
-            u"The name that will identify you in your courses - "
-            u"{bold_start}(cannot be changed later){bold_end}"
-        ).format(bold_start=u'<strong>', bold_end=u'</strong>')
+            u"The name that will identify you in your courses. "
+            u"It cannot be changed later."
+        )
 
         # Translators: This example username is used as a placeholder in
         # a field on the registration form meant to hold the user's username.
-        username_placeholder = _(u"JaneDoe")
+        username_placeholder = _(u"Jane_Q_Learner")
 
         form_desc.add_field(
             "username",
@@ -735,6 +787,14 @@ class RegistrationView(APIView):
         country_label = _(u"Country")
         error_msg = _(u"Please select your Country.")
 
+        # If we set a country code, make sure it's uppercase for the sake of the form.
+        default_country = form_desc._field_overrides.get('country', {}).get('defaultValue')
+        if default_country:
+            form_desc.override_field_properties(
+                'country',
+                default=default_country.upper()
+            )
+
         form_desc.add_field(
             "country",
             label=country_label,
@@ -872,7 +932,7 @@ class RegistrationView(APIView):
                         running_pipeline.get('kwargs')
                     )
 
-                    for field_name in self.DEFAULT_FIELDS:
+                    for field_name in self.DEFAULT_FIELDS + self.EXTRA_FIELDS:
                         if field_name in field_overrides:
                             form_desc.override_field_properties(
                                 field_name, default=field_overrides[field_name]
@@ -887,6 +947,14 @@ class RegistrationView(APIView):
                         label="",
                         instructions="",
                         restrictions={}
+                    )
+                    # used to identify that request is running third party social auth
+                    form_desc.add_field(
+                        "social_auth_provider",
+                        field_type="hidden",
+                        label="",
+                        default=current_provider.name if current_provider.name else "Third Party",
+                        required=False,
                     )
 
 
@@ -949,7 +1017,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     """
     authentication_classes = (authentication.SessionAuthentication,)
     permission_classes = (ApiKeyHeaderPermission,)
-    queryset = User.objects.all().prefetch_related("preferences")
+    queryset = User.objects.all().prefetch_related("preferences").select_related("profile")
     serializer_class = UserSerializer
     paginate_by = 10
     paginate_by_param = "page_size"
@@ -975,7 +1043,7 @@ class ForumRoleUsersListView(generics.ListAPIView):
             raise ParseError('course_id must be specified')
         course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id_string)
         role = Role.objects.get_or_create(course_id=course_id, name=name)[0]
-        users = role.users.all()
+        users = role.users.prefetch_related("preferences").select_related("profile").all()
         return users
 
 
@@ -1004,7 +1072,7 @@ class PreferenceUsersListView(generics.ListAPIView):
     paginate_by_param = "page_size"
 
     def get_queryset(self):
-        return User.objects.filter(preferences__key=self.kwargs["pref_key"]).prefetch_related("preferences")
+        return User.objects.filter(preferences__key=self.kwargs["pref_key"]).prefetch_related("preferences").select_related("profile")
 
 
 class UpdateEmailOptInPreference(APIView):

@@ -1,57 +1,79 @@
-import logging
 import datetime
 import decimal
+import json
+import logging
+
 import pytz
-from ipware.ip import get_ip
-from django.db.models import Q
+from config_models.decorators import require_config
 from django.conf import settings
-from django.contrib.auth.models import Group
-from django.shortcuts import redirect
-from django.http import (
-    HttpResponse, HttpResponseRedirect, HttpResponseNotFound,
-    HttpResponseBadRequest, HttpResponseForbidden, Http404
-)
-from django.utils.translation import ugettext as _
-from course_modes.models import CourseMode
-from util.json_request import JsonResponse
-from django.views.decorators.http import require_POST, require_http_methods
-from django.core.urlresolvers import reverse
-from django.views.decorators.csrf import csrf_exempt
-from util.bad_request_rate_limiter import BadRequestRateLimiter
-from util.date_utils import get_default_time_display
 from django.contrib.auth.decorators import login_required
-from edxmako.shortcuts import render_to_response
+from django.contrib.auth.models import Group
+from django.core.urlresolvers import reverse
+from django.db.models import Q
+from django.http import (
+    Http404,
+    HttpResponse,
+    HttpResponseBadRequest,
+    HttpResponseForbidden,
+    HttpResponseNotFound,
+    HttpResponseRedirect
+)
+from django.shortcuts import redirect
+from django.utils.translation import ugettext as _
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods, require_POST
+from ipware.ip import get_ip
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
-from opaque_keys import InvalidKeyError
+
+from course_modes.models import CourseMode
 from courseware.courses import get_course_by_id
-from config_models.decorators import require_config
-from shoppingcart.reports import RefundReport, ItemizedPurchaseReport, UniversityRevenueShareReport, CertificateStatusReport
-from student.models import CourseEnrollment, EnrollmentClosedError, CourseFullError, \
-    AlreadyEnrolledError
+from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.embargo import api as embargo_api
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from shoppingcart.reports import (
+    CertificateStatusReport,
+    ItemizedPurchaseReport,
+    RefundReport,
+    UniversityRevenueShareReport
+)
+from student.models import AlreadyEnrolledError, CourseEnrollment, CourseFullError, EnrollmentClosedError
+from util.bad_request_rate_limiter import BadRequestRateLimiter
+from util.date_utils import get_default_time_display
+from util.json_request import JsonResponse
+
+from .decorators import enforce_shopping_cart_enabled
 from .exceptions import (
-    ItemAlreadyInCartException, AlreadyEnrolledInCourseException,
-    CourseDoesNotExistException, ReportTypeDoesNotExistException,
-    MultipleCouponsNotAllowedException, InvalidCartItem,
-    ItemNotFoundInCartException, RedemptionCodeError
+    AlreadyEnrolledInCourseException,
+    CourseDoesNotExistException,
+    InvalidCartItem,
+    ItemAlreadyInCartException,
+    ItemNotFoundInCartException,
+    MultipleCouponsNotAllowedException,
+    RedemptionCodeError,
+    ReportTypeDoesNotExistException
 )
 from .models import (
-    Order, OrderTypes,
-    PaidCourseRegistration, OrderItem, Coupon,
-    CertificateItem, CouponRedemption, CourseRegistrationCode,
-    RegistrationCodeRedemption, CourseRegCodeItem,
-    Donation, DonationConfiguration
+    CertificateItem,
+    Coupon,
+    CouponRedemption,
+    CourseRegCodeItem,
+    CourseRegistrationCode,
+    Donation,
+    DonationConfiguration,
+    Order,
+    OrderItem,
+    OrderTypes,
+    PaidCourseRegistration,
+    RegistrationCodeRedemption
 )
 from .processors import (
-    process_postpay_callback, render_purchase_form_html,
-    get_signed_purchase_params, get_purchase_endpoint
+    get_purchase_endpoint,
+    get_signed_purchase_params,
+    process_postpay_callback,
+    render_purchase_form_html
 )
-
-import json
-from .decorators import enforce_shopping_cart_enabled
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-
 
 log = logging.getLogger("shoppingcart")
 AUDIT_LOG = logging.getLogger("audit")

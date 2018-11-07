@@ -1,7 +1,6 @@
 import logging
 
-from .utils import extract, perform_request, CommentClientRequestError
-
+from .utils import CommentClientRequestError, extract, perform_request
 
 log = logging.getLogger(__name__)
 

@@ -19,15 +19,15 @@ else:
 <a href="#${chapter['display_id']}-child" role="button" class="button-chapter chapter ${active_class}" id="${chapter['display_id']}-parent" aria-controls="${chapter['display_id']}-child" aria-expanded="false">
     <span class="group-heading ${active_class}" aria-label="${aria_label}">
         <span class="icon fa fa-caret-right" aria-hidden="true"></span>
-        ${chapter['display_name']}
+        ${HTML(chapter['display_name'])}
     </span>
 </a>
-<div class="chapter-content-container" id="${chapter['display_id']}-child" tabindex="-1" role="group" aria-label="${chapter['display_name']} submenu">
+<div class="chapter-content-container" id="${chapter['display_id']}-child" tabindex="-1" role="region" aria-label="${chapter['display_name']} submenu">
     <div class="chapter-menu">
         % for section in chapter['sections']:
         <div class="menu-item ${'active' if 'active' in section and section['active'] else ''} ${'graded'  if 'graded' in section and section['graded'] else ''}">
             <a class="accordion-nav" href="${reverse('courseware_section', args=[course_id, chapter['url_name'], section['url_name']])}">
-                <p class="accordion-display-name">${section['display_name']} ${Text(_('{span_start}current section{span_end}')).format(
+                <p class="accordion-display-name">${HTML(section['display_name'])} ${Text(_('{span_start}current section{span_end}')).format(
                         span_start=HTML('<span class="sr">'),
                         span_end=HTML('</span>'),
                     ) if 'active' in section and section['active'] else ''}</p>

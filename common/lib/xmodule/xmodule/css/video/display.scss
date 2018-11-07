@@ -149,6 +149,16 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
     background-color: black;
     position: relative;
 
+    &:hover {
+      .btn-play {
+        color: $uxpl-blue-base;
+      }
+
+      .btn-play:after {
+        background: $white;
+      }
+    }
+
     .video-player-pre,
     .video-player-post {
        height: 50px;
@@ -182,28 +192,30 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
       @include transform(translate(-50%, -50%));
       position: absolute;
       z-index: 1;
-      background: rgba(0, 0, 0, 0.7);
-      top: 50%;
+      top: 46%;
       left: 50%;
-      padding: 30px;
-      border-radius: 25%;
+      font-size: 4em;
+      cursor: pointer;
 
-      &:after{
+      &:after {
+        background: $white;
+        position: absolute;
+        width: 50%;
+        height: 50%;
         content: '';
-        display: block;
-        width: 0px;
-        height: 0px;
-        border-style: solid;
-        border-width: 30px 0 30px 50px;
-        border-color: transparent transparent transparent $white;
-        position: relative;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        margin: auto;
+        z-index: -1;
       }
     }
 
     .closed-captions {
+      @include left(5%);
       position: absolute;
       width: 85%;
-      left: 5%;
       top: 70%;
       text-align: center;
     }
@@ -250,7 +262,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
         }
       }
 
-      .video-error {
+      .video-error, .video-hls-error {
         padding: ($baseline / 5);
         background: black;
         color: white !important; // the pattern library headings shim is more scoped
@@ -259,6 +271,7 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
       object,
       iframe,
       video {
+        @include left(0);
         display: block;
         border: none;
         width: 100%;

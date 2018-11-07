@@ -3,9 +3,9 @@ Tests core caching facilities.
 """
 
 from django.test import TestCase
-
 from opaque_keys.edx.locations import Location
-from openedx.core.djangoapps.contentserver.caching import get_cached_content, set_cached_content, del_cached_content
+
+from openedx.core.djangoapps.contentserver.caching import del_cached_content, get_cached_content, set_cached_content
 
 
 class Content(object):

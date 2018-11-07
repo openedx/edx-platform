@@ -6,7 +6,6 @@ from django.conf.urls import patterns, url
 
 from course_structure_api.v0 import views
 
-
 COURSE_ID_PATTERN = settings.COURSE_ID_PATTERN
 
 urlpatterns = patterns(

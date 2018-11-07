@@ -4,8 +4,8 @@ Test for LMS courseware app.
 from textwrap import dedent
 from unittest import TestCase
 
-from django.core.urlresolvers import reverse
 import mock
+from django.core.urlresolvers import reverse
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
@@ -13,9 +13,7 @@ from courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase, TEST_DATA_MIXED_MODULESTORE
-)
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory
 
 

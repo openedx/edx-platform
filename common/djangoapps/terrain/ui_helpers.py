@@ -1,27 +1,27 @@
 # pylint: disable=missing-docstring
 
-from lettuce import world
-
-import time
 import json
-import re
 import platform
+import re
+import time
+from textwrap import dedent
+from urllib import quote_plus
 
 # django_url is assigned late in the process of loading lettuce,
 # so we import this as a module, and then read django_url from
 # it to get the correct value
 import lettuce.django
-
-
-from textwrap import dedent
-from urllib import quote_plus
-from selenium.common.exceptions import (
-    WebDriverException, TimeoutException,
-    StaleElementReferenceException, InvalidElementStateException)
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
+from lettuce import world
 from nose.tools import assert_true
+from selenium.common.exceptions import (
+    InvalidElementStateException,
+    StaleElementReferenceException,
+    TimeoutException,
+    WebDriverException
+)
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 GLOBAL_WAIT_FOR_TIMEOUT = 60
 

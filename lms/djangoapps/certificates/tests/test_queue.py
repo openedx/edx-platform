@@ -1,24 +1,17 @@
 # -*- coding: utf-8 -*-
 """Tests for the XQueue certificates interface. """
+import json
 from contextlib import contextmanager
 from datetime import datetime, timedelta
-import ddt
-import json
-from mock import patch, Mock
-from nose.plugins.attrib import attr
 
-from django.test import TestCase
-from django.test.utils import override_settings
+import ddt
 import freezegun
 import pytz
-
-from course_modes.models import CourseMode
-from lms.djangoapps.grades.tests.utils import mock_passing_grade
+from django.test import TestCase
+from django.test.utils import override_settings
+from mock import Mock, patch
+from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from xmodule.modulestore.tests.factories import CourseFactory
-
 
 # It is really unfortunate that we are using the XQueue client
 # code from the capa library.  In the future, we should move this
@@ -26,16 +19,15 @@ from xmodule.modulestore.tests.factories import CourseFactory
 # and verify that items are being correctly added to the queue
 # in our `XQueueCertInterface` implementation.
 from capa.xqueue_interface import XQueueInterface
-
-from certificates.models import (
-    ExampleCertificateSet,
-    ExampleCertificate,
-    GeneratedCertificate,
-    CertificateStatuses,
-)
+from certificates.models import CertificateStatuses, ExampleCertificate, ExampleCertificateSet, GeneratedCertificate
 from certificates.queue import XQueueCertInterface
 from certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory
+from course_modes.models import CourseMode
+from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @ddt.ddt

@@ -6,24 +6,23 @@ tests for functionalities that require django API, and lms specific
 functionalities.
 """
 
+import json
 import uuid
 
 import ddt
-import json
 import mock
-
 from django.core.urlresolvers import reverse
-from course_api.blocks.tests.helpers import deserialize_usage_key
-from courseware.module_render import get_module_for_descriptor_internal
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xblock.field_data import DictFieldData
 from xblock.fragment import Fragment
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.factories import ToyCourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from lms.djangoapps.courseware.tests import XModuleRenderingTestBase
 
+from course_api.blocks.tests.helpers import deserialize_usage_key
+from courseware.module_render import get_module_for_descriptor_internal
+from lms.djangoapps.courseware.tests import XModuleRenderingTestBase
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xblock_discussion import DiscussionXBlock, loader
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import ItemFactory, ToyCourseFactory
 
 
 @ddt.ddt

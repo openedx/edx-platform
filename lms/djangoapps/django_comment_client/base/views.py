@@ -1,6 +1,6 @@
 import functools
-import logging
 import json
+import logging
 import random
 import time
 import urlparse
@@ -8,47 +8,49 @@ import urlparse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core import exceptions
-from django.http import Http404, HttpResponseBadRequest, HttpResponse
+from django.http import Http404, HttpResponse, HttpResponseServerError
 from django.utils.translation import ugettext as _
 from django.views.decorators import csrf
 from django.views.decorators.http import require_GET, require_POST
 from opaque_keys.edx.keys import CourseKey
 
-from courseware.access import has_access
-from util.file import store_uploaded_file
-from courseware.courses import get_course_with_access, get_course_overview_with_access, get_course_by_id
 import django_comment_client.settings as cc_settings
-from django_comment_common.signals import (
-    thread_created,
-    thread_edited,
-    thread_voted,
-    thread_deleted,
-    comment_created,
-    comment_edited,
-    comment_voted,
-    comment_deleted,
-    comment_endorsed,
-)
-from django_comment_common.utils import ThreadContext
+import lms.lib.comment_client as cc
+from courseware.access import has_access
+from courseware.courses import get_course_by_id, get_course_overview_with_access, get_course_with_access
+from django_comment_client.permissions import check_permissions_by_view, get_team, has_permission
 from django_comment_client.utils import (
-    add_courseware_context,
-    get_annotated_content_info,
-    get_ability,
-    is_comment_too_deep,
     JsonError,
     JsonResponse,
-    prepare_content,
-    get_group_id_for_comments_service,
+    add_courseware_context,
     discussion_category_id_access,
+    get_ability,
+    get_annotated_content_info,
     get_cached_discussion_id_map,
+    get_group_id_for_comments_service,
+    is_comment_too_deep,
+    prepare_content
 )
-from django_comment_client.permissions import check_permissions_by_view, has_permission, get_team
+from django_comment_common.signals import (
+    comment_created,
+    comment_deleted,
+    comment_edited,
+    comment_endorsed,
+    comment_voted,
+    thread_created,
+    thread_deleted,
+    thread_edited,
+    thread_voted
+)
+from django_comment_common.utils import ThreadContext
 from eventtracking import tracker
-import lms.lib.comment_client as cc
+from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
+from util.file import store_uploaded_file
 
 log = logging.getLogger(__name__)
 
 TRACKING_MAX_FORUM_BODY = 2000
+TRACKING_MAX_FORUM_TITLE = 1000
 _EVENT_NAME_TEMPLATE = 'edx.forum.{obj_type}.{action_name}'
 
 
@@ -93,6 +95,11 @@ def track_created_event(request, event_name, course, obj, data):
     track_forum_event(request, event_name, course, obj, data)
 
 
+def add_truncated_title_to_event_data(event_data, full_title):
+    event_data['title_truncated'] = (len(full_title) > TRACKING_MAX_FORUM_TITLE)
+    event_data['title'] = full_title[:TRACKING_MAX_FORUM_TITLE]
+
+
 def track_thread_created_event(request, course, thread, followed):
     """
     Send analytics event for a newly created thread.
@@ -102,7 +109,6 @@ def track_thread_created_event(request, course, thread, followed):
         'commentable_id': thread.commentable_id,
         'group_id': thread.get("group_id"),
         'thread_type': thread.thread_type,
-        'title': thread.title,
         'anonymous': thread.anonymous,
         'anonymous_to_peers': thread.anonymous_to_peers,
         'options': {'followed': followed},
@@ -111,6 +117,7 @@ def track_thread_created_event(request, course, thread, followed):
         # However, the view does not contain that data, and including it will
         # likely require changes elsewhere.
     }
+    add_truncated_title_to_event_data(event_data, thread.title)
     track_created_event(request, event_name, course, thread, event_data)
 
 
@@ -239,11 +246,11 @@ def create_thread(request, course_id, commentable_id):
 
     thread = cc.Thread(**params)
 
-    # Cohort the thread if required
+    # Divide the thread if required
     try:
         group_id = get_group_id_for_comments_service(request, course_key, commentable_id)
     except ValueError:
-        return HttpResponseBadRequest("Invalid cohort id")
+        return HttpResponseServerError("Invalid group id for commentable")
     if group_id is not None:
         thread.group_id = group_id
 
@@ -777,6 +784,9 @@ def users(request, course_id):
         get_course_overview_with_access(request.user, 'load', course_key, check_if_enrolled=True)
     except Http404:
         # course didn't exist, or requesting user does not have access to it.
+        return JsonError(status=404)
+    except CourseAccessRedirect:
+        # user does not have access to the course.
         return JsonError(status=404)
 
     try:

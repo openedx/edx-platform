@@ -30,16 +30,19 @@
                 var _ref;
                 DiscussionThreadShowView.__super__.initialize.call(this);
                 this.mode = options.mode || 'inline';
+                this.startHeader = options.startHeader;
+                this.is_commentable_divided = options.is_commentable_divided;
                 if ((_ref = this.mode) !== 'tab' && _ref !== 'inline') {
                     throw new Error('invalid mode: ' + this.mode);
                 }
             };
 
             DiscussionThreadShowView.prototype.renderTemplate = function() {
-                var context;
-                context = $.extend({
+                var context = $.extend({
                     mode: this.mode,
+                    startHeader: this.startHeader,
                     flagged: this.model.isFlagged(),
+                    is_commentable_divided: this.is_commentable_divided,
                     author_display: this.getAuthorDisplay(),
                     cid: this.model.cid,
                     readOnly: $('.discussion-module').data('read-only')

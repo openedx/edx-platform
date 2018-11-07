@@ -3,13 +3,11 @@
 Teams pages.
 """
 
+from common.test.acceptance.pages.common.paging import PaginatedUIMixin
+from common.test.acceptance.pages.common.utils import click_css, confirm_prompt
 from common.test.acceptance.pages.lms.course_page import CoursePage
 from common.test.acceptance.pages.lms.discussion import InlineDiscussionPage
-from common.test.acceptance.pages.common.paging import PaginatedUIMixin
-from common.test.acceptance.pages.common.utils import confirm_prompt, click_css
-
 from common.test.acceptance.pages.lms.fields import FieldsMixin
-
 
 TOPIC_CARD_CSS = 'div.wrapper-card-core'
 CARD_TITLE_CSS = 'h3.card-title'

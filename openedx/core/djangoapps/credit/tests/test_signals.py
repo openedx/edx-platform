@@ -6,9 +6,7 @@ import ddt
 import pytz
 from datetime import timedelta, datetime
 from mock import MagicMock
-from unittest import skipUnless
 
-from django.conf import settings
 from django.test.client import RequestFactory
 from nose.plugins.attrib import attr
 from course_modes.models import CourseMode
@@ -22,10 +20,11 @@ from openedx.core.djangoapps.credit.api import (
 )
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
 from openedx.core.djangoapps.credit.signals import listen_for_grade_calculation
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
 @attr(shard=2)
-@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')
+@skip_unless_lms
 @ddt.ddt
 class TestMinGradedRequirementStatus(ModuleStoreTestCase):
     """Test cases to check the minimum grade requirement status updated.

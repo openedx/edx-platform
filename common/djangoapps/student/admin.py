@@ -1,4 +1,5 @@
 """ Django admin pages for student app """
+from config_models.admin import ConfigurationModelAdmin
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
@@ -6,15 +7,23 @@ from django.utils.translation import ugettext_lazy as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from ratelimitbackend import admin
-from xmodule.modulestore.django import modulestore
 
-from config_models.admin import ConfigurationModelAdmin
 from student.models import (
-    UserProfile, UserTestGroup, CourseEnrollmentAllowed, DashboardConfiguration, CourseEnrollment, Registration,
-    PendingNameChange, CourseAccessRole, LinkedInAddToProfileConfiguration, UserAttribute, LogoutViewConfiguration,
-    RegistrationCookieConfiguration
+    CourseAccessRole,
+    CourseEnrollment,
+    CourseEnrollmentAllowed,
+    DashboardConfiguration,
+    LinkedInAddToProfileConfiguration,
+    LogoutViewConfiguration,
+    PendingNameChange,
+    Registration,
+    RegistrationCookieConfiguration,
+    UserAttribute,
+    UserProfile,
+    UserTestGroup
 )
 from student.roles import REGISTERED_ACCESS_ROLES
+from xmodule.modulestore.django import modulestore
 
 User = get_user_model()  # pylint:disable=invalid-name
 
@@ -165,6 +174,15 @@ class UserProfileInline(admin.StackedInline):
 class UserAdmin(BaseUserAdmin):
     """ Admin interface for the User model. """
     inlines = (UserProfileInline,)
+
+    def get_readonly_fields(self, *args, **kwargs):
+        """
+        Allows editing the users while skipping the username check, so we can have Unicode username with no problems.
+        The username is marked read-only regardless of `ENABLE_UNICODE_USERNAME`, to simplify the bokchoy tests.
+        """
+
+        django_readonly = super(UserAdmin, self).get_readonly_fields(*args, **kwargs)
+        return django_readonly + ('username',)
 
 
 @admin.register(UserAttribute)

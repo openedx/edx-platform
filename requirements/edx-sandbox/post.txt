@@ -7,3 +7,4 @@
 # Packages to install in the Python sandbox for secured execution.
 scipy==0.14.0
 lxml==3.4.4
+matplotlib==1.3.1

@@ -39,7 +39,7 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):
     discussion_id = String(scope=Scope.settings, default=UNIQUE_ID)
     display_name = String(
         display_name=_("Display Name"),
-        help=_("Display name for this component"),
+        help=_("The display name for this component."),
         default="Discussion",
         scope=Scope.settings
     )

@@ -1,0 +1,82 @@
+## mako
+
+<%page args="active_page=None" expression_filter="h" />
+<%namespace name='static' file='/static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from django.conf import settings
+from openedx.core.djangolib.js_utils import dump_js_escaped_json
+from openedx.core.djangolib.markup import HTML, Text
+from xmodule.partitions.partitions_service import get_all_partitions_for_course
+%>
+
+<%
+show_preview_menu = course and staff_access and supports_preview_menu
+%>
+
+% if show_preview_menu:
+    <%
+    def selected(is_selected):
+      return "selected" if is_selected else ""
+
+    course_partitions = get_all_partitions_for_course(course)
+    masquerade_user_name = masquerade.user_name if masquerade else None
+    masquerade_group_id = masquerade.group_id if masquerade else None
+    staff_selected = selected(not masquerade or masquerade.role != "student")
+    specific_student_selected = selected(not staff_selected and masquerade.user_name)
+    student_selected = selected(not staff_selected and not specific_student_selected and not masquerade_group_id)
+    %>
+    <nav class="wrapper-preview-menu" aria-label="${_('Course View')}">
+        <div class="preview-menu">
+            <ol class="preview-actions">
+                <li class="action-preview">
+                    <form action="#" class="action-preview-form" method="post">
+                        <label for="action-preview-select" class="action-preview-label">${_("View this course as:")}</label>
+                        <select class="action-preview-select" id="action-preview-select" name="select">
+                            <option value="staff" ${staff_selected}>${_("Staff")}</option>
+                            <option value="student" ${student_selected}>${_("Learner")}</option>
+                            <option value="specific student" ${specific_student_selected}>${_("Specific learner")}</option>
+                            % if course_partitions:
+                                % for course_partition in course_partitions:
+                                    % for group in sorted(course_partition.groups, key=lambda group: group.name):
+                                    <option value="group.id" data-group-id="${group.id}" data-partition-id="${course_partition.id}" ${selected(masquerade_group_id == group.id)}>
+                                        ${_("Learner in {content_group}").format(content_group=group.name)}
+                                    </option>
+                                    % endfor
+                                % endfor
+                            % endif
+                        </select>
+                        <div class="action-preview-username-container">
+                          <label for="action-preview-username" class="action-preview-label">${_("Username or email:")}</label>
+                          <input type="text" class="action-preview-username" id="action-preview-username">
+                        </div>
+                        <button type="submit" class="sr" name="submit" value="submit">${_("Set preview mode")}</button>
+                    </form>
+                </li>
+            </ol>
+            % if specific_student_selected:
+                <div class="preview-specific-student-notice">
+                    <p>
+                        ${Text(_("You are now viewing the course as {i_start}{user_name}{i_end}.")).format(
+                            user_name=masquerade_user_name,
+                            i_start=HTML(u'<i>'),
+                            i_end=HTML(u'</i>'),
+                        )}
+                    </p>
+                </div>
+            % endif
+        </div>
+    </nav>
+
+    <%
+    preview_options = {
+        "courseId": course.id,
+        "disableStudentAccess": disable_student_access if disable_student_access is not UNDEFINED else False,
+        "specificStudentSelected": specific_student_selected,
+        "masqueradeUsername" : masquerade_user_name if masquerade_user_name is not UNDEFINED else None,
+    }
+    %>
+    <%static:require_module_async module_name="lms/js/preview/preview_factory" class_name="PreviewFactory">
+        PreviewFactory(${preview_options | n, dump_js_escaped_json});
+    </%static:require_module_async>
+% endif

@@ -4,12 +4,13 @@ Unit tests for the gating feature in Studio
 import json
 
 from mock import patch
-from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE
-from xmodule.modulestore.tests.factories import ItemFactory
+
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_usage_url
 from contentstore.views.item import VisibilityState
 from openedx.core.lib.gating.api import GATING_NAMESPACE_QUALIFIER
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE
+from xmodule.modulestore.tests.factories import ItemFactory
 
 
 class TestSubsectionGating(CourseTestCase):
@@ -17,6 +18,7 @@ class TestSubsectionGating(CourseTestCase):
     Tests for the subsection gating feature
     """
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+    ENABLED_SIGNALS = ['item_deleted']
 
     def setUp(self):
         """
@@ -127,8 +129,8 @@ class TestSubsectionGating(CourseTestCase):
         self.assertEqual(resp['prereq_min_score'], 100)
         self.assertEqual(resp['visibility_state'], VisibilityState.gated)
 
-    @patch('contentstore.signals.gating_api.set_required_content')
-    @patch('contentstore.signals.gating_api.remove_prerequisite')
+    @patch('contentstore.signals.handlers.gating_api.set_required_content')
+    @patch('contentstore.signals.handlers.gating_api.remove_prerequisite')
     def test_delete_item_signal_handler_called(self, mock_remove_prereq, mock_set_required):
         seq3 = ItemFactory.create(
             parent_location=self.chapter.location,

@@ -2,10 +2,13 @@
 Tests for Blocks api.py
 """
 
+from itertools import product
+
 import ddt
 from django.test.client import RequestFactory
 
 from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
+from openedx.core.djangoapps.content.block_structure.config import STORAGE_BACKING_FOR_CACHE, waffle
 from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -105,6 +108,8 @@ class TestGetBlocksQueryCounts(SharedModuleStoreTestCase):
     """
     Tests query counts for the get_blocks function.
     """
+    ENABLED_SIGNALS = ['course_published']
+
     def setUp(self):
         super(TestGetBlocksQueryCounts, self).setUp()
 
@@ -119,26 +124,45 @@ class TestGetBlocksQueryCounts(SharedModuleStoreTestCase):
         with self.store.default_store(store_type):
             return SampleCourseFactory.create()
 
-    def _get_blocks(self, course, expected_mongo_queries):
+    def _get_blocks(self, course, expected_mongo_queries, expected_sql_queries):
         """
         Verifies the number of expected queries when calling
         get_blocks on the given course.
         """
         with check_mongo_calls(expected_mongo_queries):
-            with self.assertNumQueries(2):
+            with self.assertNumQueries(expected_sql_queries):
                 get_blocks(self.request, course.location, self.user)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_query_counts_cached(self, store_type):
-        course = self._create_course(store_type)
-        self._get_blocks(course, expected_mongo_queries=0)
-
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 5),
-        (ModuleStoreEnum.Type.split, 3),
+        *product(
+            (ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split),
+            (True, False),
+        )
     )
     @ddt.unpack
-    def test_query_counts_uncached(self, store_type, expected_mongo_queries):
-        course = self._create_course(store_type)
-        clear_course_from_cache(course.id)
-        self._get_blocks(course, expected_mongo_queries)
+    def test_query_counts_cached(self, store_type, with_storage_backing):
+        with waffle().override(STORAGE_BACKING_FOR_CACHE, active=with_storage_backing):
+            course = self._create_course(store_type)
+            self._get_blocks(
+                course,
+                expected_mongo_queries=0,
+                expected_sql_queries=6 if with_storage_backing else 5,
+            )
+
+    @ddt.data(
+        *product(
+            ((ModuleStoreEnum.Type.mongo, 5), (ModuleStoreEnum.Type.split, 3)),
+            (True, False),
+        )
+    )
+    @ddt.unpack
+    def test_query_counts_uncached(self, store_type_tuple, with_storage_backing):
+        store_type, expected_mongo_queries = store_type_tuple
+        with waffle().override(STORAGE_BACKING_FOR_CACHE, active=with_storage_backing):
+            course = self._create_course(store_type)
+            clear_course_from_cache(course.id)
+            self._get_blocks(
+                course,
+                expected_mongo_queries,
+                expected_sql_queries=14 if with_storage_backing else 6,
+            )

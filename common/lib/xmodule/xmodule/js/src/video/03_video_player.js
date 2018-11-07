@@ -1,9 +1,10 @@
+/* eslint-disable no-console, no-param-reassign */
 (function(requirejs, require, define) {
 // VideoPlayer module.
     define(
 'video/03_video_player.js',
-['video/02_html5_video.js', 'video/00_resizer.js'],
-function(HTML5Video, Resizer) {
+['video/02_html5_video.js', 'video/02_html5_hls_video.js', 'video/00_resizer.js', 'hls', 'underscore'],
+function(HTML5Video, HTML5HLSVideo, Resizer, HLS, _) {
     var dfd = $.Deferred(),
         VideoPlayer = function(state) {
             state.videoPlayer = {};
@@ -100,8 +101,13 @@ function(HTML5Video, Resizer) {
     //     initial configuration. Also make the created DOM elements available
     //     via the 'state' object. Much easier to work this way - you don't
     //     have to do repeated jQuery element selects.
+    // eslint-disable-next-line no-underscore-dangle
     function _initialize(state) {
-        var youTubeId, player, userAgent;
+        var youTubeId,
+            player,
+            userAgent,
+            commonPlayerConfig,
+            eventToBeTriggered = 'loadedmetadata';
 
         // The function is called just once to apply pre-defined configurations
         // by student before video starts playing. Waits until the video's
@@ -109,16 +115,7 @@ function(HTML5Video, Resizer) {
         // starts playing. Just after that configurations can be applied.
         state.videoPlayer.ready = _.once(function() {
             if (!state.isFlashMode() && state.speed != '1.0') {
-                // Work around a bug in the Youtube API that causes videos to
-                // play at normal speed rather than at the configured speed in
-                // Safari.  Setting the playback rate to 1.0 *after* playing
-                // started and then to the actual value tricks the player into
-                // picking up the speed setting.
-                if (state.browserIsSafari && state.isYoutubeType()) {
-                    state.videoPlayer.setPlaybackRate(1.0, false);
-                }
-
-                state.videoPlayer.setPlaybackRate(state.speed, true);
+                state.videoPlayer.setPlaybackRate(state.speed);
             }
         });
 
@@ -156,19 +153,42 @@ function(HTML5Video, Resizer) {
         state.browserIsSafari = (userAgent.indexOf('safari') > -1 &&
                                  !state.browserIsChrome);
 
-        if (state.videoType === 'html5') {
-            state.videoPlayer.player = new HTML5Video.Player(state.el, {
-                playerVars: state.videoPlayer.playerVars,
-                videoSources: state.config.sources,
-                events: {
-                    onReady: state.videoPlayer.onReady,
-                    onStateChange: state.videoPlayer.onStateChange,
-                    onError: state.videoPlayer.onError
-                }
-            });
+        // Browser can play HLS videos if either `Media Source Extensions`
+        // feature is supported or browser is safari (native HLS support)
+        state.canPlayHLS = state.HLSVideoSources.length > 0 && (HLS.isSupported() || state.browserIsSafari);
+        state.HLSOnlySources = state.config.sources.length > 0 &&
+                               state.config.sources.length === state.HLSVideoSources.length;
 
+        commonPlayerConfig = {
+            playerVars: state.videoPlayer.playerVars,
+            videoSources: state.config.sources,
+            browserIsSafari: state.browserIsSafari,
+            events: {
+                onReady: state.videoPlayer.onReady,
+                onStateChange: state.videoPlayer.onStateChange,
+                onError: state.videoPlayer.onError
+            }
+        };
+
+        if (state.videoType === 'html5') {
+            if (state.canPlayHLS || state.HLSOnlySources) {
+                state.videoPlayer.player = new HTML5HLSVideo.Player(
+                    state.el,
+                    _.extend({}, commonPlayerConfig, {
+                        videoSources: state.HLSVideoSources,
+                        canPlayHLS: state.canPlayHLS,
+                        HLSOnlySources: state.HLSOnlySources
+                    })
+                );
+                // `loadedmetadata` event triggered too early on Safari due
+                // to which correct video dimensions were not calculated
+                eventToBeTriggered = state.browserIsSafari ? 'loadeddata' : eventToBeTriggered;
+            } else {
+                state.videoPlayer.player = new HTML5Video.Player(state.el, commonPlayerConfig);
+            }
             player = state.videoEl = state.videoPlayer.player.videoEl;
-            player[0].addEventListener('loadedmetadata', state.videoPlayer.onLoadMetadataHtml5, false);
+            player[0].addEventListener(eventToBeTriggered, state.videoPlayer.onLoadMetadataHtml5, false);
+            player.on('remove', state.videoPlayer.destroy);
         } else {
             youTubeId = state.youtubeId();
 
@@ -187,6 +207,8 @@ function(HTML5Video, Resizer) {
                 var player = state.videoEl = state.el.find('iframe'),
                     videoWidth = player.attr('width') || player.width(),
                     videoHeight = player.attr('height') || player.height();
+
+                player.on('remove', state.videoPlayer.destroy);
 
                 _resize(state, videoWidth, videoHeight);
                 _updateVcrAndRegion(state, true);
@@ -332,6 +354,9 @@ function(HTML5Video, Resizer) {
         if (player && _.isFunction(player.destroy)) {
             player.destroy();
         }
+        if (this.canPlayHLS && player.hls) {
+            player.hls.destroy();
+        }
         delete this.videoPlayer;
     }
 
@@ -381,73 +406,8 @@ function(HTML5Video, Resizer) {
         }
     }
 
-    function setPlaybackRate(newSpeed, useCueVideoById) {
-        var duration = this.videoPlayer.duration(),
-            time = this.videoPlayer.currentTime,
-            methodName, youtubeId;
-
-        // There is a bug which prevents YouTube API to correctly set the speed
-        // to 1.0 from another speed in Firefox when in HTML5 mode. There is a
-        // fix which basically reloads the video at speed 1.0 when this change
-        // is requested (instead of simply requesting a speed change to 1.0).
-        // This has to be done only when the video is being watched in Firefox.
-        // We need to figure out what browser is currently executing this code.
-        //
-        // TODO: Check the status of
-        // http://code.google.com/p/gdata-issues/issues/detail?id=4654
-        // When the YouTube team fixes the API bug, we can remove this
-        // temporary bug fix.
-
-        // If useCueVideoById is true it will reload video again.
-        // Used useCueVideoById to fix the issue video not playing if we change
-        // the speed before playing the video.
-        if (
-          this.isHtml5Mode() && !(this.browserIsFirefox &&
-          (useCueVideoById || newSpeed === '1.0') && this.isYoutubeType())
-        ) {
-            this.videoPlayer.player.setPlaybackRate(newSpeed);
-        } else {
-            // We request the reloading of the video in the case when YouTube
-            // is in Flash player mode, or when we are in Firefox, and the new
-            // speed is 1.0. The second case is necessary to avoid the bug
-            // where in Firefox speed switching to 1.0 in HTML5 player mode is
-            // handled incorrectly by YouTube API.
-            methodName = 'cueVideoById';
-            youtubeId = this.youtubeId(newSpeed);
-
-            if (this.videoPlayer.isPlaying()) {
-                methodName = 'loadVideoById';
-            }
-
-            this.videoPlayer.player[methodName](youtubeId, time);
-
-            // We need to call play() explicitly because after the call
-            // to functions cueVideoById() followed by seekTo() the video
-            // is in a PAUSED state.
-            //
-            // Why? This is how the YouTube API is implemented.
-            // sjson.search() only works if time is defined.
-            if (!_.isUndefined(time)) {
-                this.videoPlayer.updatePlayTime(time);
-            }
-            if (time > 0 && this.isFlashMode()) {
-                this.videoPlayer.seekTo(time);
-                this.trigger(
-                    'videoProgressSlider.updateStartEndTimeRegion',
-                    {
-                        duration: duration
-                    }
-                );
-            }
-            // In Html5 mode if video speed is changed before playing in firefox and
-            // changed speed is not '1.0' then manually trigger setPlaybackRate method.
-            // In browsers other than firefox like safari user can set speed to '1.0'
-            // if its not already set to '1.0' so in that case we don't have to
-            // call 'setPlaybackRate'
-            if (this.isHtml5Mode() && newSpeed != '1.0') {
-                this.videoPlayer.player.setPlaybackRate(newSpeed);
-            }
-        }
+    function setPlaybackRate(newSpeed) {
+        this.videoPlayer.player.setPlaybackRate(newSpeed);
     }
 
     function onSpeedChange(newSpeed) {
@@ -479,6 +439,8 @@ function(HTML5Video, Resizer) {
         this.videoPlayer.goToStartTime = false;
 
         this.videoPlayer.seekTo(time);
+        this.trigger('videoProgressSlider.focusSlider');
+
         this.el.trigger('seek', [time, oldTime, type]);
     }
 

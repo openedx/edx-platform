@@ -3,12 +3,13 @@ Script for granting existing course instructors course creator privileges.
 
 This script is only intended to be run once on a given environment.
 """
-from course_creators.views import add_user_with_status_granted, add_user_with_status_unrequested
-from django.core.management.base import BaseCommand
-
 from django.contrib.auth.models import User
+from django.core.management.base import BaseCommand
 from django.db.utils import IntegrityError
+
+from course_creators.views import add_user_with_status_granted, add_user_with_status_unrequested
 from student.roles import CourseInstructorRole, CourseStaffRole
+
 
 #------------ to run: ./manage.py cms populate_creators --settings=dev
 

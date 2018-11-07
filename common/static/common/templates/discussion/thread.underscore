@@ -24,7 +24,8 @@
             </div>
             <% if (can_create_comment && !readOnly) { %>
             <form class="discussion-reply-new" data-id="<%- id %>">
-                <h4><%- gettext("Add a response:") %></h4>
+                <h<%- startHeader %> class="add-response"><%- gettext("Add a response:") %></h<%- startHeader %> >
+
                 <ul class="discussion-errors"></ul>
                 <div class="reply-body" data-id="<%- id %>"></div>
                 <div class="reply-post-control">

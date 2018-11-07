@@ -17,6 +17,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
 from django.test.client import RequestFactory
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.models import PendingEmailChange
 from student.tests.tests import UserSettingsEventTestMixin
 from ...errors import (
@@ -35,7 +36,7 @@ def mock_render_to_string(template_name, context):
 
 
 @attr(shard=2)
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
+@skip_unless_lms
 class TestAccountApi(UserSettingsEventTestMixin, TestCase):
     """
     These tests specifically cover the parts of the API methods that are not covered by test_views.py.
@@ -192,6 +193,16 @@ class TestAccountApi(UserSettingsEventTestMixin, TestCase):
         account_settings = get_account_settings(self.default_request)[0]
         self.assertEqual("Mickey Mouse", account_settings["name"])
 
+    @patch.dict(settings.FEATURES, dict(ALLOW_EMAIL_ADDRESS_CHANGE=False))
+    def test_email_changes_disabled(self):
+        """
+        Test that email address changes are rejected when ALLOW_EMAIL_ADDRESS_CHANGE is not set.
+        """
+        disabled_update = {"email": "valid@example.com"}
+        with self.assertRaises(AccountUpdateError) as context_manager:
+            update_account_settings(self.user, disabled_update)
+        self.assertIn("Email address changes have been disabled", context_manager.exception.developer_message)
+
     @patch('openedx.core.djangoapps.user_api.accounts.serializers.AccountUserSerializer.save')
     def test_serializer_save_fails(self, serializer_save):
         """
@@ -239,7 +250,7 @@ class TestAccountApi(UserSettingsEventTestMixin, TestCase):
     {'full': 50, 'small': 10},
     clear=True
 )
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
+@skip_unless_lms
 class AccountSettingsOnCreationTest(TestCase):
     # pylint: disable=missing-docstring
 
@@ -296,7 +307,6 @@ class AccountCreationActivationAndPasswordChangeTest(TestCase):
     PASSWORD = u'ṕáśśẃőŕd'
     EMAIL = u'frank+underwood@example.com'
 
-    ORIG_HOST = 'example.com'
     IS_SECURE = False
 
     INVALID_USERNAMES = [
@@ -333,7 +343,7 @@ class AccountCreationActivationAndPasswordChangeTest(TestCase):
         u'a' * (PASSWORD_MAX_LENGTH + 1)
     ]
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @skip_unless_lms
     def test_activate_account(self):
         # Create the account, which is initially inactive
         activation_key = create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
@@ -393,14 +403,14 @@ class AccountCreationActivationAndPasswordChangeTest(TestCase):
     def test_activate_account_invalid_key(self):
         activate_account(u'invalid')
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')
+    @skip_unless_lms
     def test_request_password_change(self):
         # Create and activate an account
         activation_key = create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
         activate_account(activation_key)
 
         # Request a password change
-        request_password_change(self.EMAIL, self.ORIG_HOST, self.IS_SECURE)
+        request_password_change(self.EMAIL, self.IS_SECURE)
 
         # Verify that one email message has been sent
         self.assertEqual(len(mail.outbox), 1)
@@ -411,20 +421,20 @@ class AccountCreationActivationAndPasswordChangeTest(TestCase):
         result = re.search(r'(?P<url>https?://[^\s]+)', email_body)
         self.assertIsNot(result, None)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')
+    @skip_unless_lms
     def test_request_password_change_invalid_user(self):
         with self.assertRaises(UserNotFound):
-            request_password_change(self.EMAIL, self.ORIG_HOST, self.IS_SECURE)
+            request_password_change(self.EMAIL, self.IS_SECURE)
 
         # Verify that no email messages have been sent
         self.assertEqual(len(mail.outbox), 0)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')
+    @skip_unless_lms
     def test_request_password_change_inactive_user(self):
         # Create an account, but do not activate it
         create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
 
-        request_password_change(self.EMAIL, self.ORIG_HOST, self.IS_SECURE)
+        request_password_change(self.EMAIL, self.IS_SECURE)
 
         # Verify that the activation email was still sent
         self.assertEqual(len(mail.outbox), 1)
@@ -441,3 +451,42 @@ class AccountCreationActivationAndPasswordChangeTest(TestCase):
             return False
         else:
             return True
+
+    @patch("openedx.core.djangoapps.site_configuration.helpers.get_value", Mock(return_value=False))
+    def test_create_account_not_allowed(self):
+        """
+        Test case to check user creation is forbidden when ALLOW_PUBLIC_ACCOUNT_CREATION feature flag is turned off
+        """
+        response = create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
+        self.assertEqual(response.status_code, 403)
+
+
+@attr(shard=2)
+@ddt.ddt
+class AccountCreationUnicodeUsernameTest(TestCase):
+    """
+    Test cases to cover the account initialization workflow
+    """
+    PASSWORD = u'unicode-user-password'
+    EMAIL = u'unicode-user-username@example.com'
+
+    UNICODE_USERNAMES = [
+        u'Enchanté',
+        u'username_with_@',
+        u'username with spaces',
+        u'eastern_arabic_numbers_١٢٣',
+    ]
+
+    @ddt.data(*UNICODE_USERNAMES)
+    def test_unicode_usernames(self, unicode_username):
+        with patch.dict(settings.FEATURES, {'ENABLE_UNICODE_USERNAME': False}):
+            with self.assertRaises(AccountUsernameInvalid):
+                create_account(unicode_username, self.PASSWORD, self.EMAIL)  # Feature is disabled, therefore invalid.
+
+        with patch.dict(settings.FEATURES, {'ENABLE_UNICODE_USERNAME': True}):
+            try:
+                create_account(unicode_username, self.PASSWORD, self.EMAIL)
+            except AccountUsernameInvalid:
+                self.fail(u'The API should accept Unicode username `{unicode_username}`.'.format(
+                    unicode_username=unicode_username,
+                ))

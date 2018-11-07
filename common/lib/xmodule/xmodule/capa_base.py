@@ -20,11 +20,14 @@ except ImportError:
 from pytz import utc
 
 from capa.capa_problem import LoncapaProblem, LoncapaSystem
+from capa.inputtypes import Status
 from capa.responsetypes import StudentInputError, ResponseError, LoncapaProblemError
 from capa.util import convert_files_to_filenames, get_inner_html_from_xpath
 from xblock.fields import Boolean, Dict, Float, Integer, Scope, String, XMLString
+from xblock.scorable import ScorableXBlockMixin, Score
 from xmodule.capa_base_constants import RANDOMIZATION, SHOWANSWER
 from xmodule.exceptions import NotFoundError
+from xmodule.graders import ShowCorrectness
 from .fields import Date, Timedelta
 from .progress import Progress
 
@@ -92,7 +95,7 @@ class CapaFields(object):
     """
     display_name = String(
         display_name=_("Display Name"),
-        help=_("This name appears in the horizontal navigation at the top of the page."),
+        help=_("The display name for this component."),
         scope=Scope.settings,
         # it'd be nice to have a useful default but it screws up other things; so,
         # use display_name_with_default for those
@@ -112,6 +115,18 @@ class CapaFields(object):
     graceperiod = Timedelta(
         help=_("Amount of time after the due date that submissions will be accepted"),
         scope=Scope.settings
+    )
+    show_correctness = String(
+        display_name=_("Show Results"),
+        help=_("Defines when to show whether a learner's answer to the problem is correct. "
+               "Configured on the subsection."),
+        scope=Scope.settings,
+        default=ShowCorrectness.ALWAYS,
+        values=[
+            {"display_name": _("Always"), "value": ShowCorrectness.ALWAYS},
+            {"display_name": _("Never"), "value": ShowCorrectness.NEVER},
+            {"display_name": _("Past Due"), "value": ShowCorrectness.PAST_DUE},
+        ],
     )
     showanswer = String(
         display_name=_("Show Answer"),
@@ -206,7 +221,7 @@ class CapaFields(object):
     )
 
 
-class CapaMixin(CapaFields):
+class CapaMixin(ScorableXBlockMixin, CapaFields):
     """
         Core logic for Capa Problem, which can be used by XModules or XBlocks.
     """
@@ -276,6 +291,8 @@ class CapaMixin(CapaFields):
                 raise Exception(msg), None, sys.exc_info()[2]
 
             self.set_state_from_lcp()
+
+        self.set_score(self.score_from_lcp())
 
         assert self.seed is not None
 
@@ -359,43 +376,52 @@ class CapaMixin(CapaFields):
         """
         self.last_submission_time = datetime.datetime.now(utc)
 
-    def get_score(self):
-        """
-        Access the problem's score
-        """
-        return self.lcp.get_score()
-
     def get_progress(self):
         """
-        For now, just return score / max_score
+        For now, just return weighted earned / weighted possible
         """
-        score_dict = self.get_score()
-        score = score_dict['score']
-        total = score_dict['total']
+        score = self.get_score()
+        raw_earned = score.raw_earned
+        raw_possible = score.raw_possible
 
-        if total > 0:
+        if raw_possible > 0:
             if self.weight is not None:
                 # Progress objects expect total > 0
                 if self.weight == 0:
                     return None
 
                 # scale score and total by weight/total:
-                score = score * self.weight / total
-                total = self.weight
-
+                weighted_earned = raw_earned * self.weight / raw_possible
+                weighted_possible = self.weight
+            else:
+                weighted_earned = raw_earned
+                weighted_possible = raw_possible
             try:
-                return Progress(score, total)
+                return Progress(weighted_earned, weighted_possible)
             except (TypeError, ValueError):
                 log.exception("Got bad progress")
                 return None
         return None
 
+    def get_display_progress(self):
+        """
+        Return (score, total) to be displayed to the learner.
+        """
+        progress = self.get_progress()
+        score, total = (progress.frac() if progress else (0, 0))
+
+        # Withhold the score if hiding correctness
+        if not self.correctness_available():
+            score = None
+
+        return score, total
+
     def get_html(self):
         """
         Return some html with data about the module
         """
-        progress = self.get_progress()
-        curr_score, total_possible = (progress.frac() if progress else (0, 0))
+        curr_score, total_possible = self.get_display_progress()
+
         return self.runtime.render_template('problem_ajax.html', {
             'element_id': self.location.html_id(),
             'id': self.location.to_deprecated_string(),
@@ -546,7 +572,7 @@ class CapaMixin(CapaFields):
             # Next, generate a fresh LoncapaProblem
             self.lcp = self.new_lcp(None)
             self.set_state_from_lcp()
-
+            self.set_score(self.score_from_lcp())
             # Prepend a scary warning to the student
             _ = self.runtime.service(self, "i18n").ugettext
             warning_msg = _("Warning: The problem has been reset to its initial state!")
@@ -684,7 +710,7 @@ class CapaMixin(CapaFields):
         save_message = None
         if self.has_saved_answers:
             save_message = _(
-                "Your answers were previously saved. Click '{button_name}' to grade them."
+                u"Your answers were previously saved. Click '{button_name}' to grade them."
             ).format(button_name=self.submit_button_name())
 
         context = {
@@ -738,7 +764,11 @@ class CapaMixin(CapaFields):
         if render_notifications:
             progress = self.get_progress()
             id_list = self.lcp.correct_map.keys()
-            if len(id_list) == 1:
+
+            # Show only a generic message if hiding correctness
+            if not self.correctness_available():
+                answer_notification_type = 'submitted'
+            elif len(id_list) == 1:
                 # Only one answer available
                 answer_notification_type = self.lcp.correct_map.get_correctness(id_list[0])
             elif len(id_list) > 1:
@@ -781,6 +811,8 @@ class CapaMixin(CapaFields):
                     ).format(progress=str(progress))
                 else:
                     answer_notification_message = _('Partially Correct')
+            elif answer_notification_type == 'submitted':
+                answer_notification_message = _("Answer submitted.")
 
         return answer_notification_type, answer_notification_message
 
@@ -847,14 +879,16 @@ class CapaMixin(CapaFields):
         """
         True iff full points
         """
-        score_dict = self.get_score()
-        return score_dict['score'] == score_dict['total']
+        return self.score.raw_earned == self.score.raw_possible
 
     def answer_available(self):
         """
         Is the user allowed to see an answer?
         """
-        if self.showanswer == '':
+        if not self.correctness_available():
+            # If correctness is being withheld, then don't show answers either.
+            return False
+        elif self.showanswer == '':
             return False
         elif self.showanswer == SHOWANSWER.NEVER:
             return False
@@ -882,6 +916,18 @@ class CapaMixin(CapaFields):
 
         return False
 
+    def correctness_available(self):
+        """
+        Is the user allowed to see whether she's answered correctly?
+
+        Limits access to the correct/incorrect flags, messages, and problem score.
+        """
+        return ShowCorrectness.correctness_available(
+            show_correctness=self.show_correctness,
+            due_date=self.close_date,
+            has_staff_access=self.runtime.user_is_staff,
+        )
+
     def update_score(self, data):
         """
         Delivers grading response (e.g. from asynchronous code checking) to
@@ -896,6 +942,7 @@ class CapaMixin(CapaFields):
         score_msg = data['xqueue_body']
         self.lcp.update_score(score_msg, queuekey)
         self.set_state_from_lcp()
+        self.set_score(self.score_from_lcp())
         self.publish_grade()
 
         return dict()  # No AJAX return is needed
@@ -942,7 +989,12 @@ class CapaMixin(CapaFields):
         """
         For the "show answer" button.
 
-        Returns the answers: {'answers' : answers}
+        Returns the answers and rendered "correct status span" HTML:
+            {'answers' : answers, 'correct_status_html': correct_status_span_html}.
+            The "correct status span" HTML is injected beside the correct answers
+            for radio button and checkmark problems, so that there is a visual
+            indication of the correct answers that is not solely based on color
+            (and also screen reader text).
         """
         event_info = dict()
         event_info['problem_id'] = self.location.to_deprecated_string()
@@ -968,7 +1020,13 @@ class CapaMixin(CapaFields):
                 new_answer = {answer_id: answers[answer_id]}
             new_answers.update(new_answer)
 
-        return {'answers': new_answers}
+        return {
+            'answers': new_answers,
+            'correct_status_html': self.runtime.render_template(
+                'status_span.html',
+                {'status': Status('correct', self.runtime.service(self, "i18n").ugettext)}
+            )
+        }
 
     # Figure out if we should move these to capa_problem?
     def get_problem(self, _data):
@@ -1068,18 +1126,17 @@ class CapaMixin(CapaFields):
         """
         Publishes the student's current grade to the system as an event
         """
-        score = self.lcp.get_score()
         self.runtime.publish(
             self,
             'grade',
             {
-                'value': score['score'],
-                'max_value': score['total'],
+                'value': self.score.raw_earned,
+                'max_value': self.score.raw_possible,
                 'only_if_higher': only_if_higher,
             }
         )
 
-        return {'grade': score['score'], 'max_grade': score['total']}
+        return {'grade': self.score.raw_earned, 'max_grade': self.score.raw_possible}
 
     # pylint: disable=too-many-statements
     def submit_problem(self, data, override_time=False):
@@ -1152,6 +1209,7 @@ class CapaMixin(CapaFields):
             self.attempts = self.attempts + 1
             self.lcp.done = True
             self.set_state_from_lcp()
+            self.set_score(self.score_from_lcp())
             self.set_last_submission_time()
 
         except (StudentInputError, ResponseError, LoncapaProblemError) as inst:
@@ -1163,6 +1221,7 @@ class CapaMixin(CapaFields):
 
             # Save the user's state before failing
             self.set_state_from_lcp()
+            self.set_score(self.score_from_lcp())
 
             # If the user is a staff member, include
             # the full exception, including traceback,
@@ -1173,14 +1232,19 @@ class CapaMixin(CapaFields):
             # Otherwise, display just an error message,
             # without a stack trace
             else:
-                # Translators: {msg} will be replaced with a problem's error message.
-                msg = _(u"Error: {msg}").format(msg=inst.message)
+                escaped_message = cgi.escape(inst.args[0])
+                try:
+                    # only return the error value of the exception
+                    msg = escaped_message.split("\\n")[-2].split(": ", 1)[1]
+                except IndexError:
+                    msg = escaped_message
 
             return {'success': msg}
 
         except Exception as err:
             # Save the user's state before failing
             self.set_state_from_lcp()
+            self.set_score(self.score_from_lcp())
 
             if self.runtime.DEBUG:
                 msg = u"Error checking problem: {}".format(err.message)
@@ -1220,6 +1284,10 @@ class CapaMixin(CapaFields):
 
         # render problem into HTML
         html = self.get_problem_html(encapsulate=False, submit_notification=True)
+
+        # Withhold success indicator if hiding correctness
+        if not self.correctness_available():
+            success = 'submitted'
 
         return {
             'success': success,
@@ -1389,93 +1457,6 @@ class CapaMixin(CapaFields):
 
         return input_metadata
 
-    def rescore_problem(self, only_if_higher):
-        """
-        Checks whether the existing answers to a problem are correct.
-
-        This is called when the correct answer to a problem has been changed,
-        and the grade should be re-evaluated.
-
-        If only_if_higher is True, the answer and grade are updated
-        only if the resulting score is higher than before.
-
-        Returns a dict with one key:
-            {'success' : 'correct' | 'incorrect' | AJAX alert msg string }
-
-        Raises NotFoundError if called on a problem that has not yet been
-        answered, or NotImplementedError if it's a problem that cannot be rescored.
-
-        Returns the error messages for exceptions occurring while performing
-        the rescoring, rather than throwing them.
-        """
-        event_info = {'state': self.lcp.get_state(), 'problem_id': self.location.to_deprecated_string()}
-
-        _ = self.runtime.service(self, "i18n").ugettext
-
-        if not self.lcp.supports_rescoring():
-            event_info['failure'] = 'unsupported'
-            self.track_function_unmask('problem_rescore_fail', event_info)
-            # pylint: disable=line-too-long
-            # Translators: 'rescoring' refers to the act of re-submitting a student's solution so it can get a new score.
-            raise NotImplementedError(_("Problem's definition does not support rescoring."))
-            # pylint: enable=line-too-long
-
-        if not self.done:
-            event_info['failure'] = 'unanswered'
-            self.track_function_unmask('problem_rescore_fail', event_info)
-            raise NotFoundError(_("Problem must be answered before it can be graded again."))
-
-        # get old score, for comparison:
-        orig_score = self.lcp.get_score()
-        event_info['orig_score'] = orig_score['score']
-        event_info['orig_total'] = orig_score['total']
-
-        try:
-            correct_map = self.lcp.rescore_existing_answers()
-
-        except (StudentInputError, ResponseError, LoncapaProblemError) as inst:
-            log.warning("Input error in capa_module:problem_rescore", exc_info=True)
-            event_info['failure'] = 'input_error'
-            self.track_function_unmask('problem_rescore_fail', event_info)
-            return {'success': u"Error: {0}".format(inst.message)}
-
-        except Exception as err:
-            event_info['failure'] = 'unexpected'
-            self.track_function_unmask('problem_rescore_fail', event_info)
-            if self.runtime.DEBUG:
-                msg = u"Error checking problem: {0}".format(err.message)
-                msg += u'\nTraceback:\n' + traceback.format_exc()
-                return {'success': msg}
-            raise
-
-        # rescoring should have no effect on attempts, so don't
-        # need to increment here, or mark done.  Just save.
-        self.set_state_from_lcp()
-        self.publish_grade(only_if_higher)
-
-        new_score = self.lcp.get_score()
-        event_info['new_score'] = new_score['score']
-        event_info['new_total'] = new_score['total']
-
-        # success = correct if ALL questions in this problem are correct
-        success = 'correct'
-        for answer_id in correct_map:
-            if not correct_map.is_correct(answer_id):
-                success = 'incorrect'
-
-        # NOTE: We are logging both full grading and queued-grading submissions. In the latter,
-        #       'success' will always be incorrect
-        event_info['correct_map'] = correct_map.get_dict()
-        event_info['success'] = success
-        event_info['attempts'] = self.attempts
-        self.track_function_unmask('problem_rescore', event_info)
-
-        return {
-            'success': success,
-            'new_raw_earned': new_score['score'],
-            'new_raw_possible': new_score['total'],
-        }
-
     def save_problem(self, data):
         """
         Save the passed in answers.
@@ -1516,6 +1497,7 @@ class CapaMixin(CapaFields):
         self.lcp.has_saved_answers = True
 
         self.set_state_from_lcp()
+        self.set_score(self.score_from_lcp())
 
         self.track_function_unmask('save_problem_success', event_info)
         msg = _("Your answers have been saved.")
@@ -1574,6 +1556,7 @@ class CapaMixin(CapaFields):
 
         # Pull in the new problem seed
         self.set_state_from_lcp()
+        self.set_score(self.score_from_lcp())
 
         # Grade may have changed, so publish new value
         self.publish_grade()
@@ -1585,3 +1568,116 @@ class CapaMixin(CapaFields):
             'success': True,
             'html': self.get_problem_html(encapsulate=False),
         }
+
+    # ScorableXBlockMixin methods
+
+    def rescore(self, only_if_higher=False):
+        """
+        Checks whether the existing answers to a problem are correct.
+
+        This is called when the correct answer to a problem has been changed,
+        and the grade should be re-evaluated.
+
+        If only_if_higher is True, the answer and grade are updated
+        only if the resulting score is higher than before.
+
+        Returns a dict with one key:
+            {'success' : 'correct' | 'incorrect' | AJAX alert msg string }
+
+        Raises NotFoundError if called on a problem that has not yet been
+        answered, or NotImplementedError if it's a problem that cannot be rescored.
+
+        Returns the error messages for exceptions occurring while performing
+        the rescoring, rather than throwing them.
+        """
+        event_info = {'state': self.lcp.get_state(), 'problem_id': self.location.to_deprecated_string()}
+
+        _ = self.runtime.service(self, "i18n").ugettext
+
+        if not self.lcp.supports_rescoring():
+            event_info['failure'] = 'unsupported'
+            self.track_function_unmask('problem_rescore_fail', event_info)
+            # pylint: disable=line-too-long
+            # Translators: 'rescoring' refers to the act of re-submitting a student's solution so it can get a new score.
+            raise NotImplementedError(_("Problem's definition does not support rescoring."))
+            # pylint: enable=line-too-long
+
+        if not self.done:
+            event_info['failure'] = 'unanswered'
+            self.track_function_unmask('problem_rescore_fail', event_info)
+            raise NotFoundError(_("Problem must be answered before it can be graded again."))
+
+        # get old score, for comparison:
+        orig_score = self.get_score()
+        event_info['orig_score'] = orig_score.raw_earned
+        event_info['orig_total'] = orig_score.raw_possible
+
+        try:
+            calculated_score = self.calculate_score()
+
+        except (StudentInputError, ResponseError, LoncapaProblemError) as inst:
+            log.warning("Input error in capa_module:problem_rescore", exc_info=True)
+            event_info['failure'] = 'input_error'
+            self.track_function_unmask('problem_rescore_fail', event_info)
+            raise
+
+        except Exception:
+            event_info['failure'] = 'unexpected'
+            self.track_function_unmask('problem_rescore_fail', event_info)
+            raise
+
+        # rescoring should have no effect on attempts, so don't
+        # need to increment here, or mark done.  Just save.
+        self.set_state_from_lcp()
+        self.set_score(calculated_score)
+        self.publish_grade(only_if_higher)
+
+        event_info['new_score'] = calculated_score.raw_earned
+        event_info['new_total'] = calculated_score.raw_possible
+
+        # success = correct if ALL questions in this problem are correct
+        success = 'correct'
+        for answer_id in self.lcp.correct_map:
+            if not self.lcp.correct_map.is_correct(answer_id):
+                success = 'incorrect'
+
+        # NOTE: We are logging both full grading and queued-grading submissions. In the latter,
+        #       'success' will always be incorrect
+        event_info['correct_map'] = self.lcp.correct_map.get_dict()
+        event_info['success'] = success
+        event_info['attempts'] = self.attempts
+        self.track_function_unmask('problem_rescore', event_info)
+
+    def has_submitted_answer(self):
+        return self.done
+
+    def set_score(self, score):
+        """
+        Sets the internal score for the problem. This is not derived directly
+        from the internal LCP in keeping with the ScorableXBlock spec.
+        """
+        self.score = score
+
+    def get_score(self):
+        """
+        Returns the score currently set on the block.
+        """
+        return self.score
+
+    def calculate_score(self):
+        """
+        Returns the score calculated from the current problem state.
+        Operates by creating a new correctness map based on the current
+        state of the LCP, and having the LCP generate a score from that.
+        """
+        new_correctness = self.lcp.get_grade_from_current_answers(None)
+        new_score = self.lcp.calculate_score(new_correctness)
+        return Score(raw_earned=new_score['score'], raw_possible=new_score['total'])
+
+    def score_from_lcp(self):
+        """
+        Returns the score associated with the correctness map
+        currently stored by the LCP.
+        """
+        lcp_score = self.lcp.calculate_score()
+        return Score(raw_earned=lcp_score['score'], raw_possible=lcp_score['total'])

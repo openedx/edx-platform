@@ -1,0 +1,73 @@
+## mako
+
+<%page expression_filter="h"/>
+<%namespace name='static' file='../static_content.html'/>
+
+<%!
+from openedx.core.djangolib.markup import HTML
+from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
+%>
+
+<%block name="content">
+    % if show_course_sock:
+    <div class="verification-sock"
+        % if not DISPLAY_COURSE_SOCK_FLAG.is_enabled(course_id):
+        style="display: none"
+        %endif
+    >
+        <button type="button" class="btn btn-brand focusable action-toggle-verification-sock">
+            Learn About Verified Certificate
+        </button>
+        <div class="verification-main-panel">
+            <div class="verification-desc-panel content-main">
+                <h2>edX Verified Certificate</h2>
+                <h4>Why upgrade?</h4>
+                <ul>
+                    <li>Official proof of completion</li>
+                    <li>Easily shareable certificate</li>
+                    <li>Proven motivator to complete the course</li>
+                    <li>Certificate purchases help edX continue to offer free courses</li>
+                </ul>
+                <h4>How it works</h4>
+                <ul>
+                    <li>Pay the Verified Certificate upgrade fee</li>
+                    <li>Verify your identity with a webcam and government-issued ID</li>
+                    <li>Study hard and pass the course</li>
+                    <li>Share your certificate with friends, employers, and others</li>
+                </ul>
+                <h4>edX Learner Stories</h4>
+                <div class="learner-story-container">
+                    <img class="student-image" alt="Student Image" src="${static.url('course_experience/images/learner-quote.png')}" />
+                    <div class="story-quote">
+                        My certificate has helped me showcase my knowledge on my
+                        resume - I feel like this certificate could really help me land
+                        my dream job!
+                        <span class="author">- Christina Fong, edX Learner</span>
+                    </div>
+                </div>
+                <div class="learner-story-container">
+                    <img class="student-image" alt="Student Image" src="${static.url('course_experience/images/learner-quote2.png')}" />
+                    <div class="story-quote">
+                        I wanted to include a verified certificate on my resume and my profile to
+                        illustrate that I am working towards this goal I have and that I have
+                        achieved something while I was unemployed.<br/>
+                        <span class="author">- Cheryl Troell, edX Learner</span>
+                    </div>
+                </div>
+                <img class="mini-cert" src="${static.url('course_experience/images/verified-cert.png')}"/>
+                <a href="/verify_student/upgrade/${course_id}/">
+                    <button type="button" class="btn btn-brand stuck-top focusable action-upgrade-certificate">
+                        Upgrade Now (${HTML(course_price)})
+                    </button>
+                </a>
+            </div>
+        </div>
+    </div>
+    %endif
+</%block>
+
+<%static:webpack entry="CourseSock">
+    new CourseSock({
+        el:'.verification-sock'
+    });
+</%static:webpack>

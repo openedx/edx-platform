@@ -1,12 +1,13 @@
 """Django admin interface for the shopping cart models. """
 from ratelimitbackend import admin
+
 from shoppingcart.models import (
-    PaidCourseRegistrationAnnotation,
     Coupon,
+    CourseRegistrationCodeInvoiceItem,
     DonationConfiguration,
     Invoice,
-    CourseRegistrationCodeInvoiceItem,
-    InvoiceTransaction
+    InvoiceTransaction,
+    PaidCourseRegistrationAnnotation
 )
 
 

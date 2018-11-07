@@ -2,11 +2,16 @@
 
 (function(AjaxPrefix) {
     'use strict';
-    define(['domReady', 'jquery', 'underscore.string', 'backbone', 'gettext',
-            'common/js/components/views/feedback_notification', 'coffee/src/ajax_prefix',
-            'jquery.cookie'],
-    function(domReady, $, str, Backbone, gettext, NotificationView) {
-        var main;
+    define([
+        'domReady',
+        'jquery',
+        'underscore.string',
+        'backbone',
+        'gettext',
+        '../../common/js/components/views/feedback_notification',
+        'jquery.cookie'
+    ], function(domReady, $, str, Backbone, gettext, NotificationView) {
+        var main, sendJSON;
         main = function() {
             AjaxPrefix.addAjaxPrefix(jQuery, function() {
                 return $("meta[name='path_prefix']").attr('content');
@@ -22,7 +27,10 @@
                 headers: {
                     'X-CSRFToken': $.cookie('csrftoken')
                 },
-                dataType: 'json'
+                dataType: 'json',
+                content: {
+                    script: false
+                }
             });
             $(document).ajaxError(function(event, jqXHR, ajaxSettings) {
                 var msg, contentType,
@@ -45,19 +53,25 @@
                 });
                 return msg.show();
             });
-            $.postJSON = function(url, data, callback) {
+            sendJSON = function(url, data, callback, type) {  // eslint-disable-line no-param-reassign
                 if ($.isFunction(data)) {
                     callback = data;
                     data = undefined;
                 }
                 return $.ajax({
                     url: url,
-                    type: 'POST',
+                    type: type,
                     contentType: 'application/json; charset=utf-8',
                     dataType: 'json',
                     data: JSON.stringify(data),
                     success: callback
                 });
+            };
+            $.postJSON = function(url, data, callback) {  // eslint-disable-line no-param-reassign
+                return sendJSON(url, data, callback, 'POST');
+            };
+            $.patchJSON = function(url, data, callback) {  // eslint-disable-line no-param-reassign
+                return sendJSON(url, data, callback, 'PATCH');
             };
             return domReady(function() {
                 if (window.onTouchBasedDevice()) {

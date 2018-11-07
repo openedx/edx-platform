@@ -31,15 +31,15 @@
     <% } %>
     <h3 class="modal-section-title"><%- gettext('Use as a Prerequisite') %></h3>
     <div class="modal-section-content gating-is-prereq">
-        <ul class="list-fields list-input">
-            <li class="field field-checkbox checkbox-cosmetic">
+        <div class="list-fields list-input">
+            <div class="field-checkbox checkbox-cosmetic">
                 <input type="checkbox" id="is_prereq" name="is_prereq" class="input input-checkbox" />
                 <label for="is_prereq" class="label">
                     <span class="icon fa fa-check-square-o input-checkbox-checked" aria-hidden="true"></span>
                     <span class="icon fa fa-square-o input-checkbox-unchecked" aria-hidden="true"></span>
                     <%- gettext('Make this subsection available as a prerequisite to other content') %>
                 </label>
-            </li>
-        </ul>
+            </div>
+        </div>
     </div>
 </form>

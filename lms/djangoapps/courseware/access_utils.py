@@ -4,14 +4,15 @@ It allows us to share code between access.py and block transformers.
 """
 
 from datetime import datetime, timedelta
+from logging import getLogger
+
 from django.conf import settings
 from django.utils.timezone import UTC
-from logging import getLogger
-from student.roles import CourseBetaTesterRole
-from courseware.masquerade import is_masquerading_as_student
-from courseware.access_response import AccessResponse, StartDateError
-from xmodule.util.django import get_current_request_hostname
 
+from courseware.access_response import AccessResponse, StartDateError
+from courseware.masquerade import is_masquerading_as_student
+from student.roles import CourseBetaTesterRole
+from xmodule.util.django import get_current_request_hostname
 
 DEBUG_ACCESS = False
 log = getLogger(__name__)
@@ -80,3 +81,12 @@ def in_preview_mode():
     hostname = get_current_request_hostname()
     preview_lms_base = settings.FEATURES.get('PREVIEW_LMS_BASE', None)
     return bool(preview_lms_base and hostname and hostname.split(':')[0] == preview_lms_base.split(':')[0])
+
+
+def is_course_open_for_learner(user, course):
+    """
+    Check if the course is open for learners based on the start date.
+    """
+    now = datetime.now(UTC())
+    effective_start = adjust_start_date(user, course.days_early_for_beta, course.start, course.id)
+    return not(not in_preview_mode() and now < effective_start)

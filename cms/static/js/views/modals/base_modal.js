@@ -16,8 +16,11 @@
  *     size of the modal.
  *   viewSpecificClasses: A string of CSS classes to be attached to
  *     the modal window.
- *   addSaveButton: A boolean indicating whether to include a save
+ *   addPrimaryActionButton: A boolean indicating whether to include a primary action
  *     button on the modal.
+ *   primaryActionButtonType: A string to be used as type for primary action button.
+ *   primaryActionButtonTitle: A string to be used as title for primary action button.
+ *   showEditorModeButtons: Whether to show editor mode button in the modal header.
  */
 define(['jquery', 'underscore', 'gettext', 'js/views/baseview'],
     function($, _, gettext, BaseView) {
@@ -36,7 +39,11 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview'],
                 title: '',
                 modalWindowClass: '.modal-window',
                 // A list of class names, separated by space.
-                viewSpecificClasses: ''
+                viewSpecificClasses: '',
+                addPrimaryActionButton: false,
+                primaryActionButtonType: 'save',
+                primaryActionButtonTitle: gettext('Save'),
+                showEditorModeButtons: true
             }),
 
             initialize: function() {
@@ -61,6 +68,8 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview'],
                     type: this.options.modalType,
                     size: this.options.modalSize,
                     title: this.getTitle(),
+                    modalSRTitle: this.options.modalSRTitle,
+                    showEditorModeButtons: this.options.showEditorModeButtons,
                     viewSpecificClasses: this.options.viewSpecificClasses
                 }));
                 this.addActionButtons();
@@ -84,14 +93,17 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview'],
                 return '';
             },
 
-            show: function() {
+            show: function(focusModal) {
+                var focusModalWindow = focusModal === undefined;
                 this.render();
                 this.resize();
                 $(window).resize(_.bind(this.resize, this));
 
-                // after showing and resizing, send focus
-                var modal = this.$el.find(this.options.modalWindowClass);
-                modal.focus();
+                // child may want to have its own focus management
+                if (focusModalWindow) {
+                    // after showing and resizing, send focus
+                    this.$el.find(this.options.modalWindowClass).focus();
+                }
             },
 
             hide: function() {
@@ -112,8 +124,12 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview'],
              * Adds the action buttons to the modal.
              */
             addActionButtons: function() {
-                if (this.options.addSaveButton) {
-                    this.addActionButton('save', gettext('Save'), true);
+                if (this.options.addPrimaryActionButton) {
+                    this.addActionButton(
+                        this.options.primaryActionButtonType,
+                        this.options.primaryActionButtonTitle,
+                        true
+                    );
                 }
                 this.addActionButton('cancel', gettext('Cancel'));
             },

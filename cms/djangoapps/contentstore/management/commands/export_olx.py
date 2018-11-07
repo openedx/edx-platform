@@ -19,17 +19,16 @@ import os
 import re
 import shutil
 import tarfile
-from tempfile import mktemp, mkdtemp
+from tempfile import mkdtemp, mktemp
 from textwrap import dedent
 
-from path import Path as path
-
 from django.core.management.base import BaseCommand, CommandError
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+from path import Path as path
 
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml_exporter import export_course_to_xml
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
 
 
 class Command(BaseCommand):

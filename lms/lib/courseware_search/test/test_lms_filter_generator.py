@@ -1,13 +1,13 @@
 """
 Tests for the lms_filter_generator
 """
-from mock import patch, Mock
+from mock import Mock, patch
 
-from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from student.tests.factories import UserFactory
-from student.models import CourseEnrollment
 from lms.lib.courseware_search.lms_filter_generator import LmsSearchFilterGenerator
+from student.models import CourseEnrollment
+from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
@@ -109,7 +109,7 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
         field_dictionary, _, exclude_dictionary = LmsSearchFilterGenerator.generate_field_filters(user=self.user)
         self.assertNotIn('org', exclude_dictionary)
         self.assertIn('org', field_dictionary)
-        self.assertEqual('TestSiteX', field_dictionary['org'])
+        self.assertEqual(['TestSiteX'], field_dictionary['org'])
 
     @patch(
         'openedx.core.djangoapps.site_configuration.helpers.get_all_orgs',
@@ -134,4 +134,4 @@ class LmsSearchFilterGeneratorTestCase(ModuleStoreTestCase):
         field_dictionary, _, exclude_dictionary = LmsSearchFilterGenerator.generate_field_filters(user=self.user)
         self.assertNotIn('org', exclude_dictionary)
         self.assertIn('org', field_dictionary)
-        self.assertEqual('TestSite3', field_dictionary['org'])
+        self.assertEqual(['TestSite3'], field_dictionary['org'])

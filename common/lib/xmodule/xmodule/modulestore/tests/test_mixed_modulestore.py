@@ -1143,6 +1143,378 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
                 self.store.get_parent_location(child_location, revision=revision)
             )
 
+    def verify_item_parent(self, item_location, expected_parent_location, old_parent_location, is_reverted=False):
+        """
+        Verifies that item is placed under expected parent.
+
+        Arguments:
+            item_location (BlockUsageLocator)    : Locator of item.
+            expected_parent_location (BlockUsageLocator)  : Expected parent block locator.
+            old_parent_location (BlockUsageLocator)  : Old parent block locator.
+            is_reverted (Boolean)   : A flag to notify that item was reverted.
+        """
+        with self.store.bulk_operations(self.course.id):
+            source_item = self.store.get_item(item_location)
+            old_parent = self.store.get_item(old_parent_location)
+            expected_parent = self.store.get_item(expected_parent_location)
+
+            self.assertEqual(expected_parent_location, source_item.get_parent().location)
+
+            # If an item is reverted, it means it's actual parent was the one that is the current parent now
+            # i.e expected_parent_location otherwise old_parent_location.
+            published_parent_location = expected_parent_location if is_reverted else old_parent_location
+
+            # Check parent locations wrt branches
+            with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
+                self.assertEqual(expected_parent_location, self.store.get_item(item_location).get_parent().location)
+            with self.store.branch_setting(ModuleStoreEnum.Branch.published_only):
+                self.assertEqual(published_parent_location, self.store.get_item(item_location).get_parent().location)
+
+            # Make location specific to published branch for verify_get_parent_locations_results call.
+            published_parent_location = published_parent_location.for_branch(ModuleStoreEnum.BranchName.published)
+
+            # Verify expected item parent locations
+            self.verify_get_parent_locations_results([
+                (item_location, expected_parent_location, None),
+                (item_location, expected_parent_location, ModuleStoreEnum.RevisionOption.draft_preferred),
+                (item_location, published_parent_location, ModuleStoreEnum.RevisionOption.published_only),
+            ])
+
+            # Also verify item.parent has correct parent location set.
+            self.assertEqual(source_item.parent, expected_parent_location)
+            self.assertEqual(source_item.parent, self.store.get_parent_location(item_location))
+
+            # Item should be present in new parent's children list but not in old parent's children list.
+            self.assertIn(item_location, expected_parent.children)
+            self.assertNotIn(item_location, old_parent.children)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_update_item_parent(self, store_type):
+        """
+        Test that when we move an item from old to new parent, the item should be present in new parent.
+        """
+        self.initdb(store_type)
+        self._create_block_hierarchy()
+
+        # Publish the course.
+        self.course = self.store.publish(self.course.location, self.user_id)
+
+        # Move child problem_x1a_1 to vertical_y1a.
+        item_location = self.problem_x1a_1
+        new_parent_location = self.vertical_y1a
+        old_parent_location = self.vertical_x1a
+        updated_item_location = self.store.update_item_parent(
+            item_location, new_parent_location, old_parent_location, self.user_id
+        )
+        self.assertEqual(updated_item_location, item_location)
+
+        self.verify_item_parent(
+            item_location=item_location,
+            expected_parent_location=new_parent_location,
+            old_parent_location=old_parent_location
+        )
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_move_revert(self, store_type):
+        """
+        Test that when we move an item to new parent and then discard the original parent, the item should be present
+        back in original parent.
+        """
+        self.initdb(store_type)
+        self._create_block_hierarchy()
+
+        # Publish the course
+        self.course = self.store.publish(self.course.location, self.user_id)
+
+        # Move child problem_x1a_1 to vertical_y1a.
+        item_location = self.problem_x1a_1
+        new_parent_location = self.vertical_y1a
+        old_parent_location = self.vertical_x1a
+        updated_item_location = self.store.update_item_parent(
+            item_location, new_parent_location, old_parent_location, self.user_id
+        )
+        self.assertEqual(updated_item_location, item_location)
+
+        self.verify_item_parent(
+            item_location=item_location,
+            expected_parent_location=new_parent_location,
+            old_parent_location=old_parent_location
+        )
+
+        # Now discard changes in old_parent_location i.e original parent.
+        self.store.revert_to_published(old_parent_location, self.user_id)
+
+        self.verify_item_parent(
+            item_location=item_location,
+            expected_parent_location=old_parent_location,
+            old_parent_location=new_parent_location,
+            is_reverted=True
+        )
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_move_delete_revert(self, store_type):
+        """
+        Test that when we move an item and delete it and then discard changes for original parent, item should be
+        present back in original parent.
+        """
+        self.initdb(store_type)
+        self._create_block_hierarchy()
+
+        # Publish the course
+        self.course = self.store.publish(self.course.location, self.user_id)
+
+        # Move child problem_x1a_1 to vertical_y1a.
+        item_location = self.problem_x1a_1
+        new_parent_location = self.vertical_y1a
+        old_parent_location = self.vertical_x1a
+        updated_item_location = self.store.update_item_parent(
+            item_location, new_parent_location, old_parent_location, self.user_id
+        )
+        self.assertEqual(updated_item_location, item_location)
+
+        self.verify_item_parent(
+            item_location=item_location,
+            expected_parent_location=new_parent_location,
+            old_parent_location=old_parent_location
+        )
+
+        # Now delete the item.
+        self.store.delete_item(item_location, self.user_id)
+
+        # Now discard changes in old_parent_location i.e original parent.
+        self.store.revert_to_published(old_parent_location, self.user_id)
+
+        self.verify_item_parent(
+            item_location=item_location,
+            expected_parent_location=old_parent_location,
+            old_parent_location=new_parent_location,
+            is_reverted=True
+        )
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_move_revert_move(self, store_type):
+        """
+        Test that when we move an item to new parent and discard changes for the old parent, then the item should be
+        present in the old parent and then moving an item from old parent to new parent should place that item under
+        new parent.
+        """
+        self.initdb(store_type)
+        self._create_block_hierarchy()
+
+        # Publish the course
+        self.course = self.store.publish(self.course.location, self.user_id)
+
+        # Move child problem_x1a_1 to vertical_y1a.
+        item_location = self.problem_x1a_1
+        new_parent_location = self.vertical_y1a
+        old_parent_location = self.vertical_x1a
+        updated_item_location = self.store.update_item_parent(
+            item_location, new_parent_location, old_parent_location, self.user_id
+        )
+        self.assertEqual(updated_item_location, item_location)
+
+        self.verify_item_parent(
+            item_location=item_location,
+            expected_parent_location=new_parent_location,
+            old_parent_location=old_parent_location
+        )
+
+        # Now discard changes in old_parent_location i.e original parent.
+        self.store.revert_to_published(old_parent_location, self.user_id)
+
+        self.verify_item_parent(
+            item_location=item_location,
+            expected_parent_location=old_parent_location,
+            old_parent_location=new_parent_location,
+            is_reverted=True
+        )
+
+        # Again try to move from x1 to y1
+        updated_item_location = self.store.update_item_parent(
+            item_location, new_parent_location, old_parent_location, self.user_id
+        )
+        self.assertEqual(updated_item_location, item_location)
+
+        self.verify_item_parent(
+            item_location=item_location,
+            expected_parent_location=new_parent_location,
+            old_parent_location=old_parent_location
+        )
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_move_edited_revert(self, store_type):
+        """
+        Test that when we move an edited item from old parent to new parent and then discard changes in old parent,
+        item should be placed under original parent with initial state.
+        """
+        self.initdb(store_type)
+        self._create_block_hierarchy()
+
+        # Publish the course.
+        self.course = self.store.publish(self.course.location, self.user_id)
+
+        # Move child problem_x1a_1 to vertical_y1a.
+        item_location = self.problem_x1a_1
+        new_parent_location = self.vertical_y1a
+        old_parent_location = self.vertical_x1a
+
+        problem = self.store.get_item(self.problem_x1a_1)
+        orig_display_name = problem.display_name
+
+        # Change display name of problem and update just it.
+        problem.display_name = 'updated'
+        self.store.update_item(problem, self.user_id)
+
+        updated_problem = self.store.get_item(self.problem_x1a_1)
+        self.assertEqual(updated_problem.display_name, 'updated')
+
+        # Now, move from x1 to y1.
+        updated_item_location = self.store.update_item_parent(
+            item_location, new_parent_location, old_parent_location, self.user_id
+        )
+        self.assertEqual(updated_item_location, item_location)
+
+        self.verify_item_parent(
+            item_location=item_location,
+            expected_parent_location=new_parent_location,
+            old_parent_location=old_parent_location
+        )
+
+        # Now discard changes in old_parent_location i.e original parent.
+        self.store.revert_to_published(old_parent_location, self.user_id)
+
+        # Check that problem has the original name back.
+        reverted_problem = self.store.get_item(self.problem_x1a_1)
+        self.assertEqual(orig_display_name, reverted_problem.display_name)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_move_1_moved_1_unchanged(self, store_type):
+        """
+        Test that when we move an item from an old parent which have multiple items then only moved item's parent
+        is changed while other items are still present inside old parent.
+        """
+        self.initdb(store_type)
+        self._create_block_hierarchy()
+
+        # Create some children in vertical_x1a
+        problem_item2 = self.store.create_child(self.user_id, self.vertical_x1a, 'problem', 'Problem_Item2')
+
+        # Publish the course.
+        self.course = self.store.publish(self.course.location, self.user_id)
+
+        item_location = self.problem_x1a_1
+        new_parent_location = self.vertical_y1a
+        old_parent_location = self.vertical_x1a
+
+        # Move problem_x1a_1 from x1 to y1.
+        updated_item_location = self.store.update_item_parent(
+            item_location, new_parent_location, old_parent_location, self.user_id
+        )
+        self.assertEqual(updated_item_location, item_location)
+
+        self.verify_item_parent(
+            item_location=item_location,
+            expected_parent_location=new_parent_location,
+            old_parent_location=old_parent_location
+        )
+
+        # Check that problem_item2 is still present in vertical_x1a
+        problem_item2 = self.store.get_item(problem_item2.location)
+        self.assertEqual(problem_item2.parent, self.vertical_x1a)
+        self.assertIn(problem_item2.location, problem_item2.get_parent().children)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_move_1_moved_1_edited(self, store_type):
+        """
+        Test that when we move an item inside an old parent having multiple items, we edit one item and move
+        other item from old to new parent, then discard changes in old parent would discard the changes of the
+        edited item and move back the moved item to old location.
+        """
+        self.initdb(store_type)
+        self._create_block_hierarchy()
+
+        # Create some children in vertical_x1a
+        problem_item2 = self.store.create_child(self.user_id, self.vertical_x1a, 'problem', 'Problem_Item2')
+        orig_display_name = problem_item2.display_name
+
+        # Publish the course.
+        self.course = self.store.publish(self.course.location, self.user_id)
+
+        # Edit problem_item2.
+        problem_item2.display_name = 'updated'
+        self.store.update_item(problem_item2, self.user_id)
+
+        updated_problem2 = self.store.get_item(problem_item2.location)
+        self.assertEqual(updated_problem2.display_name, 'updated')
+
+        item_location = self.problem_x1a_1
+        new_parent_location = self.vertical_y1a
+        old_parent_location = self.vertical_x1a
+
+        # Move problem_x1a_1 from x1 to y1.
+        updated_item_location = self.store.update_item_parent(
+            item_location, new_parent_location, old_parent_location, self.user_id
+        )
+        self.assertEqual(updated_item_location, item_location)
+
+        self.verify_item_parent(
+            item_location=item_location,
+            expected_parent_location=new_parent_location,
+            old_parent_location=old_parent_location
+        )
+
+        # Now discard changes in old_parent_location i.e original parent.
+        self.store.revert_to_published(old_parent_location, self.user_id)
+
+        # Check that problem_item2 has the original name back.
+        reverted_problem2 = self.store.get_item(problem_item2.location)
+        self.assertEqual(orig_display_name, reverted_problem2.display_name)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_move_1_moved_1_deleted(self, store_type):
+        """
+        Test that when we move an item inside an old parent having multiple items, we delete one item and move
+        other item from old to new parent, then discard changes in old parent would undo delete the deleted
+        item and move back the moved item to old location.
+        """
+        self.initdb(store_type)
+        self._create_block_hierarchy()
+
+        # Create some children in vertical_x1a
+        problem_item2 = self.store.create_child(self.user_id, self.vertical_x1a, 'problem', 'Problem_Item2')
+        orig_display_name = problem_item2.display_name
+
+        # Publish the course.
+        self.course = self.store.publish(self.course.location, self.user_id)
+
+        # Now delete other problem problem_item2.
+        self.store.delete_item(problem_item2.location, self.user_id)
+
+        # Move child problem_x1a_1 to vertical_y1a.
+        item_location = self.problem_x1a_1
+        new_parent_location = self.vertical_y1a
+        old_parent_location = self.vertical_x1a
+
+        # Move problem_x1a_1 from x1 to y1.
+        updated_item_location = self.store.update_item_parent(
+            item_location, new_parent_location, old_parent_location, self.user_id
+        )
+        self.assertEqual(updated_item_location, item_location)
+
+        self.verify_item_parent(
+            item_location=item_location,
+            expected_parent_location=new_parent_location,
+            old_parent_location=old_parent_location
+        )
+
+        # Now discard changes in old_parent_location i.e original parent.
+        self.store.revert_to_published(old_parent_location, self.user_id)
+
+        # Check that problem_item2 is also back in vertical_x1a
+        problem_item2 = self.store.get_item(problem_item2.location)
+        self.assertEqual(problem_item2.parent, self.vertical_x1a)
+        self.assertIn(problem_item2.location, problem_item2.get_parent().children)
+
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_get_parent_locations_moved_child(self, default_ms):
         self.initdb(default_ms)
@@ -3395,13 +3767,17 @@ class TestAsidesWithMixedModuleStore(CommonMixedModuleStoreSetup):
         _check_asides(item)
 
         # Private -> Public
-        self.store.publish(item_location, self.user_id)
+        published_block = self.store.publish(item_location, self.user_id)
+        _check_asides(published_block)
+
         item = self.store.get_item(item_location)
         self.assertTrue(self.store.has_published_version(item))
         _check_asides(item)
 
         # Public -> Private
-        self.store.unpublish(item_location, self.user_id)
+        unpublished_block = self.store.unpublish(item_location, self.user_id)
+        _check_asides(unpublished_block)
+
         item = self.store.get_item(item_location)
         self.assertFalse(self.store.has_published_version(item))
         _check_asides(item)

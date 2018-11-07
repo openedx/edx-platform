@@ -1,11 +1,12 @@
 """Utilities for writing unit tests that involve course embargos. """
 import contextlib
+
 import mock
+from django.core.cache import cache
+from django.core.urlresolvers import reverse
 
 import pygeoip
 
-from django.core.urlresolvers import reverse
-from django.core.cache import cache
 from .models import Country, CountryAccessRule, RestrictedCourse
 
 
@@ -74,7 +75,7 @@ def restrict_course(course_key, access_point="enrollment", disable_access_check=
         # Yield the redirect url so the tests don't need to know
         # the embargo messaging URL structure.
         redirect_url = reverse(
-            'embargo_blocked_message',
+            'embargo:blocked_message',
             kwargs={
                 'access_point': access_point,
                 'message_key': 'default'

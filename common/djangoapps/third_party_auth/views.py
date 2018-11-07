@@ -3,13 +3,16 @@ Extra views required for SSO
 """
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseServerError, Http404, HttpResponseNotAllowed
+from django.http import Http404, HttpResponse, HttpResponseNotAllowed, HttpResponseServerError
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
-import social
-from social.apps.django_app.views import complete
-from social.apps.django_app.utils import load_strategy, load_backend
-from social.utils import setting_name
+from social_django.utils import load_strategy, load_backend, psa
+from social_django.views import complete
+from social_core.utils import setting_name
+
+from student.models import UserProfile
+from student.views import compose_and_send_activation_email
+
 from .models import SAMLConfiguration
 
 URL_NAMESPACE = getattr(settings, setting_name('URL_NAMESPACE'), None) or 'social'
@@ -28,6 +31,8 @@ def inactive_user_view(request):
     # 'next' may be set to '/account/finish_auth/.../' if this user needs to be auto-enrolled
     # in a course. Otherwise, just redirect them to the dashboard, which displays a message
     # about activating their account.
+    profile = UserProfile.objects.get(user=request.user)
+    compose_and_send_activation_email(request.user, profile)
     return redirect(request.GET.get('next', 'dashboard'))
 
 
@@ -50,7 +55,7 @@ def saml_metadata_view(request):
 
 
 @csrf_exempt
-@social.apps.django_app.utils.psa('{0}:complete'.format(URL_NAMESPACE))
+@psa('{0}:complete'.format(URL_NAMESPACE))
 def lti_login_and_complete_view(request, backend, *args, **kwargs):
     """This is a combination login/complete due to LTI being a one step login"""
 

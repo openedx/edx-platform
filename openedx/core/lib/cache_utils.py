@@ -5,6 +5,7 @@ import collections
 import cPickle as pickle
 import functools
 import zlib
+
 from xblock.core import XBlock
 
 

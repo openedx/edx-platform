@@ -7,12 +7,50 @@ Stores global metadata using the UserPreference model, and per-course metadata u
 UserCourseTag model.
 """
 
+from collections import defaultdict
+from request_cache import get_cache
 from ..models import UserCourseTag
 
 # Scopes
 # (currently only allows per-course tags.  Can be expanded to support
 # global tags (e.g. using the existing UserPreferences table))
 COURSE_SCOPE = 'course'
+
+
+class BulkCourseTags(object):
+    CACHE_NAMESPACE = u'user_api.course_tag.api'
+
+    @classmethod
+    def prefetch(cls, course_id, users):
+        """
+        Prefetches the value of the course tags for the specified users
+        for the specified course_id.
+
+        Args:
+            users: iterator of User objects
+            course_id: course identifier (CourseKey)
+
+        Returns:
+            course_tags: a dict of dicts,
+                where the primary key is the user's id
+                and the secondary key is the course tag's key
+        """
+        course_tags = defaultdict(dict)
+        for tag in UserCourseTag.objects.filter(user__in=users, course_id=course_id).select_related('user__id'):
+            course_tags[tag.user.id][tag.key] = tag.value
+        get_cache(cls.CACHE_NAMESPACE)[cls._cache_key(course_id)] = course_tags
+
+    @classmethod
+    def get_course_tag(cls, user_id, course_id, key):
+        return get_cache(cls.CACHE_NAMESPACE)[cls._cache_key(course_id)][user_id][key]
+
+    @classmethod
+    def is_prefetched(cls, course_id):
+        return cls._cache_key(course_id) in get_cache(cls.CACHE_NAMESPACE)
+
+    @classmethod
+    def _cache_key(cls, course_id):
+        return u'course_tag.{}'.format(course_id)
 
 
 def get_course_tag(user, course_id, key):
@@ -28,6 +66,11 @@ def get_course_tag(user, course_id, key):
     Returns:
         string value, or None if there is no value saved
     """
+    if BulkCourseTags.is_prefetched(course_id):
+        try:
+            return BulkCourseTags.get_course_tag(user.id, course_id, key)
+        except KeyError:
+            return None
     try:
         record = UserCourseTag.objects.get(
             user=user,

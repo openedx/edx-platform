@@ -40,10 +40,10 @@ function(HtmlUtils) {
         videoVolumeControlHtml: HtmlUtils.interpolateHtml(
             HtmlUtils.HTML([
                 '<div class="volume" role="application">',
-                '<p class="sr instructions" id="volume-instructions">',
+                '<p class="sr instructions">',
                 '{volumeInstructions}',
                 '</p>',
-                '<button class="control" aria-disabled="false" aria-describedby="volume-instructions"',
+                '<button class="control" aria-disabled="false"',
                 '" aria-expanded="false" title="',
                 '{adjustVideoVolume}',
                 '">',
@@ -129,7 +129,8 @@ function(HtmlUtils) {
          * initial configuration.
          */
         render: function() {
-            var container = this.el.find('.volume-slider');
+            var container = this.el.find('.volume-slider'),
+                instructionsId = 'volume-instructions-' + this.state.id;
 
             HtmlUtils.append(container, HtmlUtils.HTML('<div class="ui-slider-handle volume-handle"></div>'));
 
@@ -146,6 +147,10 @@ function(HtmlUtils) {
             // order.
             container.find('.volume-handle').attr('tabindex', -1);
             this.state.el.find('.secondary-controls').append(this.el);
+
+            // set dynamic id for instruction element to avoid collisions
+            this.el.find('.instructions').attr('id', instructionsId);
+            this.button.attr('aria-describedby', instructionsId);
         },
 
         /** Bind any necessary function callbacks to DOM events. */

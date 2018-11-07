@@ -2,9 +2,12 @@
 Utilities for grades related tests
 """
 from contextlib import contextmanager
+from datetime import datetime
+
 from mock import patch
-from courseware.module_render import get_module
+
 from courseware.model_data import FieldDataCache
+from courseware.module_render import get_module
 from xmodule.graders import ProblemScore
 
 
@@ -14,7 +17,7 @@ def mock_passing_grade(grade_pass='Pass', percent=0.75, ):
     Mock the grading function to always return a passing grade.
     """
     with patch('lms.djangoapps.grades.new.course_grade.CourseGrade._compute_letter_grade') as mock_letter_grade:
-        with patch('lms.djangoapps.grades.new.course_grade.CourseGrade._calc_percent') as mock_percent_grade:
+        with patch('lms.djangoapps.grades.new.course_grade.CourseGrade._compute_percent') as mock_percent_grade:
             mock_letter_grade.return_value = grade_pass
             mock_percent_grade.return_value = percent
             yield
@@ -33,18 +36,18 @@ def mock_get_score(earned=0, possible=1):
             weighted_possible=possible,
             weight=1,
             graded=True,
-            attempted=True,
+            first_attempted=datetime(2000, 1, 1, 0, 0, 0)
         )
         yield mock_score
 
 
 @contextmanager
-def mock_get_submissions_score(earned=0, possible=1, attempted=True):
+def mock_get_submissions_score(earned=0, possible=1, first_attempted=datetime(2000, 1, 1, 0, 0, 0)):
     """
     Mocks the _get_submissions_score function to return the specified values
     """
     with patch('lms.djangoapps.grades.scores._get_score_from_submissions') as mock_score:
-        mock_score.return_value = (earned, possible, earned, possible, attempted)
+        mock_score.return_value = (earned, possible, earned, possible, first_attempted)
         yield mock_score
 
 

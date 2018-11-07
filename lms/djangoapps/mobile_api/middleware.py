@@ -2,15 +2,17 @@
 Middleware for Mobile APIs
 """
 from datetime import datetime
+
 from django.conf import settings
 from django.core.cache import cache
 from django.http import HttpResponse
 from pytz import UTC
+
+import request_cache
 from mobile_api.mobile_platform import MobilePlatform
 from mobile_api.models import AppVersionConfig
 from mobile_api.utils import parsed_version
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
-import request_cache
 
 
 class AppVersionUpgrade(object):

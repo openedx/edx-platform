@@ -1,8 +1,8 @@
 """
 DummyBackend: A fake Third Party Auth provider for testing & development purposes.
 """
-from social.backends.oauth import BaseOAuth2
-from social.exceptions import AuthFailed
+from social_core.backends.oauth import BaseOAuth2
+from social_core.exceptions import AuthFailed
 
 
 class DummyBackend(BaseOAuth2):  # pylint: disable=abstract-method

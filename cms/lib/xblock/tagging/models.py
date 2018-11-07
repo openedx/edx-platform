@@ -14,6 +14,8 @@ class TagCategories(models.Model):
     class Meta(object):
         app_label = "tagging"
         ordering = ('title',)
+        verbose_name = "tag category"
+        verbose_name_plural = "tag categories"
 
     def __unicode__(self):
         return "[TagCategories] {}: {}".format(self.name, self.title)
@@ -35,6 +37,7 @@ class TagAvailableValues(models.Model):
     class Meta(object):
         app_label = "tagging"
         ordering = ('id',)
+        verbose_name = "available tag value"
 
     def __unicode__(self):
         return "[TagAvailableValues] {}: {}".format(self.category, self.value)

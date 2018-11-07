@@ -1,17 +1,19 @@
 """
 Programmatic integration point for User API Accounts sub-application
 """
-from django.utils.translation import ugettext as _
+from django.utils.translation import override as override_language, ugettext as _
 from django.db import transaction, IntegrityError
 import datetime
 from pytz import UTC
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
-from django.core.validators import validate_email, validate_slug, ValidationError
+from django.core.validators import validate_email, ValidationError
+from django.http import HttpResponseForbidden
 from openedx.core.djangoapps.user_api.preferences.api import update_user_preferences
 from openedx.core.djangoapps.user_api.errors import PreferenceValidationError
 
 from student.models import User, UserProfile, Registration
+from student import forms as student_forms
 from student import views as student_views
 from util.model_utils import emit_setting_changed_event
 
@@ -230,6 +232,8 @@ def update_account_settings(requesting_user, update, username=None):
 
     # And try to send the email change request if necessary.
     if changing_email:
+        if not settings.FEATURES['ALLOW_EMAIL_ADDRESS_CHANGE']:
+            raise AccountUpdateError(u"Email address changes have been disabled by the site operators.")
         try:
             student_views.do_email_change_request(existing_user, new_email)
         except ValueError as err:
@@ -245,9 +249,10 @@ def _get_user_and_profile(username):
     """
     try:
         existing_user = User.objects.get(username=username)
-        existing_user_profile = UserProfile.objects.get(user=existing_user)
     except ObjectDoesNotExist:
         raise UserNotFound()
+
+    existing_user_profile, _ = UserProfile.objects.get_or_create(user=existing_user)
 
     return existing_user, existing_user_profile
 
@@ -292,6 +297,13 @@ def create_account(username, password, email):
         AccountPasswordInvalid
         UserAPIInternalError: the operation failed due to an unexpected error.
     """
+    # Check if ALLOW_PUBLIC_ACCOUNT_CREATION flag turned off to restrict user account creation
+    if not configuration_helpers.get_value(
+            'ALLOW_PUBLIC_ACCOUNT_CREATION',
+            settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION', True)
+    ):
+        return HttpResponseForbidden(_("Account creation not allowed."))
+
     # Validate the username, password, and email
     # This will raise an exception if any of these are not in a valid format.
     _validate_username(username)
@@ -371,7 +383,7 @@ def activate_account(activation_key):
 
 
 @intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])
-def request_password_change(email, orig_host, is_secure):
+def request_password_change(email, is_secure):
     """Email a single-use link for performing a password reset.
 
     Users must confirm the password change before we update their information.
@@ -399,7 +411,6 @@ def request_password_change(email, orig_host, is_secure):
         # and email it to the user.
         form.save(
             from_email=configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
-            domain_override=orig_host,
             use_https=is_secure
         )
     else:
@@ -438,11 +449,12 @@ def _validate_username(username):
             )
         )
     try:
-        validate_slug(username)
-    except ValidationError:
-        raise AccountUsernameInvalid(
-            u"Username '{username}' must contain only A-Z, a-z, 0-9, -, or _ characters"
-        )
+        with override_language('en'):
+            # `validate_username` provides a proper localized message, however the API needs only the English
+            # message by convention.
+            student_forms.validate_username(username)
+    except ValidationError as error:
+        raise AccountUsernameInvalid(error.message)
 
 
 def _validate_password(password, username):

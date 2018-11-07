@@ -5,7 +5,7 @@ from openedx.core.djangolib.markup import HTML, Text
 %>
 
 %if settings.FEATURES.get('DISPLAY_ANALYTICS_ENROLLMENTS') or section_data.get('enrollment_message'):
-  <h3 class="hd hd-3">${_("Enrollment Information")}</h3>
+  <h4 class="hd hd-4">${_("Enrollment Information")}</h4>
   <div class="enrollment-wrapper">
     %if settings.FEATURES.get('DISPLAY_ANALYTICS_ENROLLMENTS'):
       ## Translators: 'track' refers to the enrollment type ('honor', 'verified', or 'audit')
@@ -41,7 +41,7 @@ from openedx.core.djangolib.markup import HTML, Text
 %endif
 
 <div class="basic-wrapper">
-  <h3 class="hd hd-3">${_("Basic Course Information")}</h3>
+  <h4 class="hd hd-4">${_("Basic Course Information")}</h4>
 
   <ul class="list-input">
     <li class="field text is-not-editable" id="field-course-organization">
@@ -119,7 +119,7 @@ from openedx.core.djangolib.markup import HTML, Text
 %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
   <div class="running-tasks-container action-type-container">
     <hr>
-    <h3 class="hd hd-3"> ${_("Pending Tasks")} </h3>
+    <h4 class="hd hd-4"> ${_("Pending Tasks")} </h4>
     <div class="running-tasks-section">
       <p>${_("The status for any active tasks appears in a table below.")} </p>
       <br />
@@ -136,7 +136,7 @@ from openedx.core.djangolib.markup import HTML, Text
     <hr>
     <p>
     <div class="toggle-wrapper">
-      <h3 class="hd hd-3 title">${_("Course Warnings")}:</h3>
+      <h4 class="hd hd-4 title">${_("Course Warnings")}:</h4>
       <div class="triangle"></div>
     </div>
     <div class="course-errors-visibility-wrapper">

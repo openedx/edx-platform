@@ -8,10 +8,11 @@ and the xml element.
 
 import logging
 import re
-
-from cgi import escape as cgi_escape
-from lxml import etree
 import xml.sax.saxutils as saxutils
+from cgi import escape as cgi_escape
+
+from lxml import etree
+
 from .registry import TagRegistry
 
 log = logging.getLogger(__name__)

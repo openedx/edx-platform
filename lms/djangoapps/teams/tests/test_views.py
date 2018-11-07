@@ -1,34 +1,35 @@
 # -*- coding: utf-8 -*-
 """Tests for the teams API at the HTTP request level."""
 import json
+import unittest
 from datetime import datetime
 
+import ddt
 import pytz
 from dateutil import parser
-import ddt
-from elasticsearch.exceptions import ConnectionError
-from mock import patch
-from search.search_engine_base import SearchEngine
-from django.core.urlresolvers import reverse
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.db.models.signals import post_save
 from django.utils import translation
+from elasticsearch.exceptions import ConnectionError
+from mock import patch
 from nose.plugins.attrib import attr
-import unittest
-from rest_framework.test import APITestCase, APIClient
+from rest_framework.test import APIClient, APITestCase
+from search.search_engine_base import SearchEngine
+
+from common.test.utils import skip_signal
+from courseware.tests.factories import StaffFactory
+from django_comment_common.models import FORUM_ROLE_COMMUNITY_TA, Role
+from django_comment_common.utils import seed_permissions_roles
+from student.models import CourseEnrollment
+from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+from util.testing import EventTestMixin
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from courseware.tests.factories import StaffFactory
-from common.test.utils import skip_signal
-from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
-from student.models import CourseEnrollment
-from util.testing import EventTestMixin
-from .factories import CourseTeamFactory, LAST_ACTIVITY_AT
 from ..models import CourseTeamMembership
-from ..search_indexes import CourseTeamIndexer, CourseTeam, course_team_post_save_callback
-from django_comment_common.models import Role, FORUM_ROLE_COMMUNITY_TA
-from django_comment_common.utils import seed_permissions_roles
+from ..search_indexes import CourseTeam, CourseTeamIndexer, course_team_post_save_callback
+from .factories import LAST_ACTIVITY_AT, CourseTeamFactory
 
 
 @attr(shard=1)

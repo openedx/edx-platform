@@ -1,11 +1,13 @@
 # pylint: disable=missing-docstring
 
 import urllib
-from lettuce import world
+
 from django.contrib.auth.models import User
+from lettuce import world
+
 from student.models import CourseEnrollment
-from xmodule.modulestore.django import modulestore, clear_existing_modulestores
 from xmodule.contentstore.django import _CONTENTSTORE
+from xmodule.modulestore.django import clear_existing_modulestores, modulestore
 
 
 @world.absorb

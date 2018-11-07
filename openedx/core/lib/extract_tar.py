@@ -5,10 +5,12 @@ be, or symlink to a file that is, outside of the directory extracted in.
 Adapted from:
 http://stackoverflow.com/questions/10060069/safely-extract-zip-or-tar-using-python
 """
-from os.path import abspath, realpath, dirname, join as joinpath
-from django.core.exceptions import SuspiciousOperation
-from django.conf import settings
 import logging
+from os.path import join as joinpath
+from os.path import abspath, dirname, realpath
+
+from django.conf import settings
+from django.core.exceptions import SuspiciousOperation
 
 log = logging.getLogger(__name__)
 

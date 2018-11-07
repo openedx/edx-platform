@@ -10,7 +10,7 @@ If true, it:
     b) calls apply_settings(), passing in the Django settings
 """
 
-from util.enterprise_helpers import insert_enterprise_pipeline_elements
+from openedx.features.enterprise_support.api import insert_enterprise_pipeline_elements
 
 _FIELDS_STORED_IN_SESSION = ['auth_entry', 'next']
 _MIDDLEWARE_CLASSES = (
@@ -42,18 +42,18 @@ def apply_settings(django_settings):
     # this pipeline.
     django_settings.SOCIAL_AUTH_PIPELINE = [
         'third_party_auth.pipeline.parse_query_params',
-        'social.pipeline.social_auth.social_details',
-        'social.pipeline.social_auth.social_uid',
-        'social.pipeline.social_auth.auth_allowed',
-        'social.pipeline.social_auth.social_user',
+        'social_core.pipeline.social_auth.social_details',
+        'social_core.pipeline.social_auth.social_uid',
+        'social_core.pipeline.social_auth.auth_allowed',
+        'social_core.pipeline.social_auth.social_user',
         'third_party_auth.pipeline.associate_by_email_if_login_api',
-        'social.pipeline.user.get_username',
+        'social_core.pipeline.user.get_username',
         'third_party_auth.pipeline.set_pipeline_timeout',
         'third_party_auth.pipeline.ensure_user_information',
-        'social.pipeline.user.create_user',
-        'social.pipeline.social_auth.associate_user',
-        'social.pipeline.social_auth.load_extra_data',
-        'social.pipeline.user.user_details',
+        'social_core.pipeline.user.create_user',
+        'social_core.pipeline.social_auth.associate_user',
+        'social_core.pipeline.social_auth.load_extra_data',
+        'social_core.pipeline.user.user_details',
         'third_party_auth.pipeline.set_logged_in_cookies',
         'third_party_auth.pipeline.login_analytics',
     ]
@@ -87,6 +87,6 @@ def apply_settings(django_settings):
     # Context processors required under Django.
     django_settings.SOCIAL_AUTH_UUID_LENGTH = 4
     django_settings.DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors'] += (
-        'social.apps.django_app.context_processors.backends',
-        'social.apps.django_app.context_processors.login_redirect',
+        'social_django.context_processors.backends',
+        'social_django.context_processors.login_redirect',
     )

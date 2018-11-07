@@ -7,31 +7,28 @@ from urlparse import urlparse
 import ddt
 import httpretty
 import mock
+from django.test.client import RequestFactory
 from nose.plugins.attrib import attr
 
-from django.test.client import RequestFactory
-
 from discussion_api.serializers import CommentSerializer, ThreadSerializer, get_context
-from discussion_api.tests.utils import (
-    CommentsServiceMockMixin,
-    make_minimal_cs_thread,
-    make_minimal_cs_comment,
-)
+from discussion_api.tests.utils import CommentsServiceMockMixin, make_minimal_cs_comment, make_minimal_cs_thread
+from django_comment_client.tests.utils import ForumsEnableMixin
 from django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_MODERATOR,
     FORUM_ROLE_STUDENT,
-    Role,
+    Role
 )
 from lms.lib.comment_client.comment import Comment
 from lms.lib.comment_client.thread import Thread
+from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from student.tests.factories import UserFactory
 from util.testing import UrlResetMixin
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
-from django_comment_client.tests.utils import ForumsEnableMixin
 
 
 @ddt.ddt
@@ -209,6 +206,8 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
         self.assertEqual(serialized["pinned"], False)
 
     def test_group(self):
+        self.course.cohort_config = {"cohorted": True}
+        modulestore().update_item(self.course, ModuleStoreEnum.UserID.test)
         cohort = CohortFactory.create(course_id=self.course.id)
         serialized = self.serialize(self.make_cs_content({"group_id": cohort.id}))
         self.assertEqual(serialized["group_id"], cohort.id)

@@ -1,23 +1,20 @@
 """
 Tests for the maintenance app views.
 """
-import ddt
 import json
 
+import ddt
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
+from contentstore.management.commands.utils import get_course_versions
+from student.tests.factories import AdminFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
-
-from contentstore.management.commands.utils import get_course_versions
-from student.tests.factories import AdminFactory, UserFactory
-
 from .views import COURSE_KEY_ERROR_MESSAGES, MAINTENANCE_VIEWS
-
 
 # This list contains URLs of all maintenance app views.
 MAINTENANCE_URLS = [reverse(view['url']) for view in MAINTENANCE_VIEWS.values()]

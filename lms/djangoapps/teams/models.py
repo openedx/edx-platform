@@ -2,33 +2,34 @@
 
 from datetime import datetime
 from uuid import uuid4
-import pytz
-from model_utils import FieldTracker
 
-from django.core.exceptions import ObjectDoesNotExist
+import pytz
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy
 from django_countries.fields import CountryField
+from model_utils import FieldTracker
 
 from django_comment_common.signals import (
-    thread_created,
-    thread_edited,
-    thread_deleted,
-    thread_voted,
     comment_created,
-    comment_edited,
     comment_deleted,
+    comment_edited,
+    comment_endorsed,
     comment_voted,
-    comment_endorsed
+    thread_created,
+    thread_deleted,
+    thread_edited,
+    thread_voted
 )
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
-from util.model_utils import slugify
-from student.models import LanguageField, CourseEnrollment
-from .errors import AlreadyOnTeamInCourse, NotEnrolledInCourseForTeam, ImmutableMembershipFieldException
-from lms.djangoapps.teams.utils import emit_team_event
 from lms.djangoapps.teams import TEAM_DISCUSSION_CONTEXT
+from lms.djangoapps.teams.utils import emit_team_event
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
+from student.models import CourseEnrollment, LanguageField
+from util.model_utils import slugify
+
+from .errors import AlreadyOnTeamInCourse, ImmutableMembershipFieldException, NotEnrolledInCourseForTeam
 
 
 @receiver(thread_voted)

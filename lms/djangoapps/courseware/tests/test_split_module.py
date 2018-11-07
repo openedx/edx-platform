@@ -5,13 +5,13 @@ from django.core.urlresolvers import reverse
 from mock import MagicMock
 from nose.plugins.attrib import attr
 
-from courseware.module_render import get_module_for_descriptor
 from courseware.model_data import FieldDataCache
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.partitions.partitions import Group, UserPartition
+from courseware.module_render import get_module_for_descriptor
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.partitions.partitions import Group, UserPartition
 
 
 @attr(shard=1)
@@ -125,7 +125,7 @@ class SplitTestBase(SharedModuleStoreTestCase):
         content = resp.content
 
         # Assert we see the proper icon in the top display
-        self.assertIn('<button class="{} inactive nav-item"'.format(self.ICON_CLASSES[user_tag]), content)
+        self.assertIn('<button class="{} inactive nav-item tab"'.format(self.ICON_CLASSES[user_tag]), content)
         # And proper tooltips
         for tooltip in self.TOOLTIPS[user_tag]:
             self.assertIn(tooltip, content)

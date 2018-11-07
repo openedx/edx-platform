@@ -83,6 +83,7 @@ class PreferenceValidationError(PreferenceRequestError):
     """
     def __init__(self, preference_errors):
         self.preference_errors = preference_errors
+        super(PreferenceValidationError, self).__init__(preference_errors)
 
 
 class PreferenceUpdateError(PreferenceRequestError):
@@ -93,6 +94,7 @@ class PreferenceUpdateError(PreferenceRequestError):
     def __init__(self, developer_message, user_message=None):
         self.developer_message = developer_message
         self.user_message = user_message
+        super(PreferenceUpdateError, self).__init__(developer_message)
 
 
 class CountryCodeError(ValueError):

@@ -1,0 +1,34 @@
+<form>
+<h3 class="modal-section-title" id="show_correctness_label"><%- gettext('Assessment Results Visibility') %></h3>
+<div class="modal-section-content show-correctness">
+    <div role="group" class="list-fields" aria-labelledby="show_correctness_label">
+        <label class="label">
+            <input class="input input-radio" name="show-correctness" type="radio" value="always" aria-describedby="always_show_correctness_description" />
+            <%- gettext('Always show assessment results') %>
+        </label>
+        <p class='field-message' id='always_show_correctness_description'>
+            <%- gettext('When learners submit an answer to an assessment, they immediately see whether the answer is correct or incorrect, and the score received.') %>
+        </p>
+        <label class="label">
+            <input class="input input-radio" name="show-correctness" type="radio" value="never" aria-describedby="never_show_correctness_description" />
+            <%- gettext('Never show assessment results') %>
+        </label>
+        <p class='field-message' id='never_show_correctness_description'>
+            <%- gettext('Learners never see whether their answers to assessments are correct or incorrect, nor the score received.') %>
+        </p>
+        <label class="label">
+            <input class="input input-radio" name="show-correctness" type="radio" value="past_due" aria-describedby="show_correctness_past_due_description" />
+            <%- gettext('Show assessment results when subsection is past due') %>
+        </label>
+        <p class='field-message' id='show_correctness_past_due_description'>
+            <% if (self_paced) { %>
+                <%- gettext('Learners do not see whether their answers to assessments were correct or incorrect, nor the score received, until after the course end date has passed.') %>
+                <%- gettext('If the course does not have an end date, learners always see their scores when they submit answers to assessments.') %>
+            <% } else { %>
+                <%- gettext('Learners do not see whether their answers to assessments were correct or incorrect, nor the score received, until after the due date for the subsection has passed.') %>
+                <%- gettext('If the subsection does not have a due date, learners always see their scores when they submit answers to assessments.') %>
+            <% } %>
+        </p>
+    </div>
+</div>
+</form>

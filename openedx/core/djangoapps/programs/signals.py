@@ -7,7 +7,6 @@ from django.dispatch import receiver
 
 from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED
 
-
 LOGGER = logging.getLogger(__name__)
 
 
@@ -35,10 +34,11 @@ def handle_course_cert_awarded(sender, user, course_key, mode, status, **kwargs)
 
     """
     # Import here instead of top of file since this module gets imported before
-    # the programs app is loaded, resulting in a Django deprecation warning.
-    from openedx.core.djangoapps.programs.models import ProgramsApiConfig
+    # the credentials app is loaded, resulting in a Django deprecation warning.
+    from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 
-    if not ProgramsApiConfig.current().is_certification_enabled:
+    # Avoid scheduling new tasks if certification is disabled.
+    if not CredentialsApiConfig.current().is_learner_issuance_enabled:
         return
 
     # schedule background task to process

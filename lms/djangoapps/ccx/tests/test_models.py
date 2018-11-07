@@ -1,28 +1,20 @@
 """
 tests for the models
 """
-import ddt
 import json
 from datetime import datetime, timedelta
+
+import ddt
 from nose.plugins.attrib import attr
 from pytz import utc
-from student.roles import CourseCcxCoachRole
-from student.tests.factories import (
-    AdminFactory,
-)
-from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase,
-    TEST_DATA_SPLIT_MODULESTORE
-)
-from xmodule.modulestore.tests.factories import (
-    CourseFactory,
-    check_mongo_calls
-)
 
-from .factories import (
-    CcxFactory,
-)
+from student.roles import CourseCcxCoachRole
+from student.tests.factories import AdminFactory
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
+
 from ..overrides import override_field_for_ccx
+from .factories import CcxFactory
 
 
 @ddt.ddt

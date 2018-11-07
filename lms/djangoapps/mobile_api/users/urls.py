@@ -1,11 +1,10 @@
 """
 URLs for user API
 """
-from django.conf.urls import patterns, url
 from django.conf import settings
+from django.conf.urls import patterns, url
 
-from .views import UserDetail, UserCourseEnrollmentsList, UserCourseStatus
-
+from .views import UserCourseEnrollmentsList, UserCourseStatus, UserDetail
 
 urlpatterns = patterns(
     'mobile_api.users.views',

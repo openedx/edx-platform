@@ -53,6 +53,13 @@
                 return checkCommentForm(false);
             });
         });
+        describe('submitComment', function() {
+            it('focus should be in response container after a new comment is posted', function() {
+                this.view.render();
+                expect(this.view.$('.comments')).toBeVisible();
+                expect(document.activeElement === this.view.$('.forum-response')[0]);
+            });
+        });
         describe('renderComments', function() {
             it('hides "show comments" link if collapseComments is not set', function() {
                 this.view.render();

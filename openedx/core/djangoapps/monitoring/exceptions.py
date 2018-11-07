@@ -1,9 +1,10 @@
 """
 Signal handler for exceptions.
 """
+import logging
+
 from django.core.signals import got_request_exception
 from django.dispatch import receiver
-import logging
 
 
 @receiver(got_request_exception)

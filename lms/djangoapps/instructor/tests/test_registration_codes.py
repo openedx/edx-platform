@@ -1,22 +1,28 @@
 """
 Test for the registration code status information.
 """
+import json
+
+from django.core.urlresolvers import reverse
+from django.test.utils import override_settings
+from django.utils.translation import ugettext as _
+from nose.plugins.attrib import attr
+
 from course_modes.models import CourseMode
 from courseware.tests.factories import InstructorFactory
-from xmodule.modulestore.tests.factories import CourseFactory
-from django.utils.translation import ugettext as _
 from shoppingcart.models import (
-    Invoice, CourseRegistrationCodeInvoiceItem, CourseRegistrationCode,
-    CourseRegCodeItem, Order, RegistrationCodeRedemption
+    CourseRegCodeItem,
+    CourseRegistrationCode,
+    CourseRegistrationCodeInvoiceItem,
+    Invoice,
+    Order,
+    RegistrationCodeRedemption
 )
 from student.models import CourseEnrollment
 from student.roles import CourseSalesAdminRole
-from nose.plugins.attrib import attr
-import json
-from student.tests.factories import UserFactory, CourseModeFactory
-from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
+from student.tests.factories import CourseModeFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @attr(shard=1)

@@ -5,16 +5,13 @@ by the individual custom courses feature.
 import json
 import logging
 
+from ccx_keys.locator import CCXBlockUsageLocator, CCXLocator
 from django.db import transaction
+from opaque_keys.edx.keys import CourseKey, UsageKey
 
 import request_cache
-
 from courseware.field_overrides import FieldOverrideProvider
-from opaque_keys.edx.keys import CourseKey, UsageKey
-from ccx_keys.locator import CCXLocator, CCXBlockUsageLocator
-
 from lms.djangoapps.ccx.models import CcxFieldOverride, CustomCourseForEdX
-
 
 log = logging.getLogger(__name__)
 

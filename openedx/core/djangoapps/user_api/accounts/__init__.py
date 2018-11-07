@@ -12,7 +12,7 @@ USERNAME_MAX_LENGTH = 30
 
 # The minimum and maximum length for the email account field
 EMAIL_MIN_LENGTH = 3
-EMAIL_MAX_LENGTH = 254
+EMAIL_MAX_LENGTH = 254  # Limit per RFCs is 254
 
 # The minimum and maximum length for the password account field
 PASSWORD_MIN_LENGTH = 2

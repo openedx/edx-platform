@@ -6,17 +6,15 @@ from setuptools import setup
 
 setup(
     name="Open edX",
-    version="0.6",
+    version="0.7",
     install_requires=["setuptools"],
     requires=[],
     # NOTE: These are not the names we should be installing.  This tree should
     # be reorganized to be a more conventional Python tree.
     packages=[
-        "openedx.core.djangoapps.course_groups",
-        "openedx.core.djangoapps.credit",
-        "openedx.core.djangoapps.user_api",
-        "lms",
         "cms",
+        "lms",
+        "openedx",
     ],
     entry_points={
         "openedx.course_tab": [
@@ -38,10 +36,16 @@ setup(
             "textbooks = lms.djangoapps.courseware.tabs:TextbookTabs",
             "wiki = lms.djangoapps.course_wiki.tab:WikiTab",
         ],
+        "openedx.course_tool": [
+            "course_bookmarks = openedx.features.course_bookmarks.plugins:CourseBookmarksTool",
+            "course_updates = openedx.features.course_experience.plugins:CourseUpdatesTool",
+            "course_reviews = openedx.features.course_experience.plugins:CourseReviewsTool",
+        ],
         "openedx.user_partition_scheme": [
             "random = openedx.core.djangoapps.user_api.partition_schemes:RandomUserPartitionScheme",
             "cohort = openedx.core.djangoapps.course_groups.partition_scheme:CohortPartitionScheme",
-            "verification = openedx.core.djangoapps.credit.partition_schemes:VerificationPartitionScheme",
+            "verification = openedx.core.djangoapps.user_api.partition_schemes:ReturnGroup1PartitionScheme",
+            "enrollment_track = openedx.core.djangoapps.verified_track_content.partition_scheme:EnrollmentTrackPartitionScheme",
         ],
         "openedx.block_structure_transformer": [
             "library_content = lms.djangoapps.course_blocks.transformers.library_content:ContentLibraryTransformer",
@@ -51,7 +55,7 @@ setup(
             "visibility = lms.djangoapps.course_blocks.transformers.visibility:VisibilityTransformer",
             "hidden_content = lms.djangoapps.course_blocks.transformers.hidden_content:HiddenContentTransformer",
             "course_blocks_api = lms.djangoapps.course_api.blocks.transformers.blocks_api:BlocksAPITransformer",
-            "milestones = lms.djangoapps.course_api.blocks.transformers.milestones:MilestonesTransformer",
+            "milestones = lms.djangoapps.course_api.blocks.transformers.milestones:MilestonesAndSpecialExamsTransformer",
             "grades = lms.djangoapps.grades.transformer:GradesTransformer",
         ],
     }

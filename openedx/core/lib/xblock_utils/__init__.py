@@ -383,7 +383,7 @@ def add_staff_markup(user, has_instructor_access, disable_staff_debug_info, bloc
         'is_released': is_released,
         'has_instructor_access': has_instructor_access,
         'can_reset_attempts': 'attempts' in block.fields,
-        'can_rescore_problem': hasattr(block, 'rescore_problem'),
+        'can_rescore_problem': any(hasattr(block, rescore) for rescore in ['rescore_problem', 'rescore']),
         'disable_staff_debug_info': disable_staff_debug_info,
     }
     return wrap_fragment(frag, render_to_string("staff_problem_info.html", staff_context))

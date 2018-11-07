@@ -4,20 +4,21 @@
 #
 # Create user.  Prompt for groups and ExternalAuthMap
 
-import os
-import sys
-import string
 import datetime
-from getpass import getpass
 import json
-from random import choice
+import os
 import readline
+import string
+import sys
+from getpass import getpass
+from random import choice
 
+from django.contrib.auth.models import Group, User
 from django.core.management.base import BaseCommand
-from student.models import UserProfile, Registration
-from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
-from django.contrib.auth.models import User, Group
 from pytz import UTC
+
+from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
+from student.models import Registration, UserProfile
 
 
 class MyCompleter(object):  # Custom completer

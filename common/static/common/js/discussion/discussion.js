@@ -36,6 +36,7 @@
                 this.pages = options.pages || 1;
                 this.current_page = 1;
                 this.sort_preference = options.sort;
+                this.is_commentable_divided = options.is_commentable_divided;
                 this.bind('add', function(item) {
                     item.discussion = self;
                 });
@@ -99,7 +100,7 @@
                     data.text = options.search_text;
                     break;
                 case 'commentables':
-                    url = DiscussionUtil.urlFor('search');
+                    url = DiscussionUtil.urlFor('retrieve_discussion', options.commentable_ids);
                     data.commentable_ids = options.commentable_ids;
                     break;
                 case 'all':
@@ -107,6 +108,10 @@
                     break;
                 case 'followed':
                     url = DiscussionUtil.urlFor('followed_threads', options.user_id);
+                    break;
+                case 'user':
+                    url = DiscussionUtil.urlFor('user_profile', options.user_id);
+                    break;
                 }
                 if (options.group_id) {
                     data.group_id = options.group_id;
@@ -137,6 +142,7 @@
                         Content.loadContentInfos(response.annotated_content_info);
                         self.pages = response.num_pages;
                         self.current_page = response.page;
+                        self.is_commentable_divided = response.is_commentable_divided;
                         return self.reset(new_collection);
                     },
                     error: error

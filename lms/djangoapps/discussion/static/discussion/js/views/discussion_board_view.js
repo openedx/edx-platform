@@ -26,7 +26,7 @@
                 'keydown .forum-nav-browse-filter-input': 'keyboardBinding',
                 'click .forum-nav-browse-menu-wrapper': 'ignoreClick',
                 'keydown .search-input': 'performSearch',
-                'click .search-btn': 'performSearch',
+                'click .search-button': 'performSearch',
                 'topic:selected': 'clearSearch'
             },
 
@@ -46,13 +46,14 @@
                     collection: this.discussion,
                     el: this.$('.discussion-thread-list-container'),
                     courseSettings: this.courseSettings,
-                    supportsActiveThread: true
+                    supportsActiveThread: true,
+                    mode: this.mode
                 }).render();
                 this.searchView = new DiscussionSearchView({
                     el: this.$('.forum-search')
                 }).render();
                 this.renderBreadcrumbs();
-                $(window).bind('load scroll resize', this.updateSidebar);
+                $(window).bind('load scroll resize', _.bind(this.updateSidebar, this));
                 this.showBrowseMenu(true);
                 return this;
             },

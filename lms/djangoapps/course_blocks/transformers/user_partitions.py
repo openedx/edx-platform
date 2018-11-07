@@ -1,7 +1,11 @@
 """
 User Partitions Transformer
 """
-from openedx.core.lib.block_structure.transformer import BlockStructureTransformer, FilteringTransformerMixin
+from openedx.core.djangoapps.content.block_structure.transformer import (
+    BlockStructureTransformer,
+    FilteringTransformerMixin
+)
+from xmodule.partitions.partitions_service import get_all_partitions_for_course
 
 from .split_test import SplitTestTransformer
 from .utils import get_field_on_block
@@ -16,7 +20,8 @@ class UserPartitionTransformer(FilteringTransformerMixin, BlockStructureTransfor
 
     Staff users are *not* exempted from user partition pathways.
     """
-    VERSION = 1
+    WRITE_VERSION = 1
+    READ_VERSION = 1
 
     @classmethod
     def name(cls):
@@ -42,11 +47,7 @@ class UserPartitionTransformer(FilteringTransformerMixin, BlockStructureTransfor
         # Because user partitions are course-wide, only store data for
         # them on the root block.
         root_block = block_structure.get_xblock(block_structure.root_block_usage_key)
-        user_partitions = [
-            user_partition
-            for user_partition in getattr(root_block, 'user_partitions', [])
-            if user_partition.active
-        ]
+        user_partitions = get_all_partitions_for_course(root_block, active_only=True)
         block_structure.set_transformer_data(cls, 'user_partitions', user_partitions)
 
         # If there are no user partitions, this transformation is a

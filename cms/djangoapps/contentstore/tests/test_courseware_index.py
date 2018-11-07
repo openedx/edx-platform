@@ -1,19 +1,29 @@
 """
 Testing indexing of the courseware as it is changed
 """
-import ddt
 import json
-from lazy.lazy import lazy
 import time
 from datetime import datetime
+from unittest import skip
+from uuid import uuid4
+
+import ddt
 from dateutil.tz import tzutc
+from django.conf import settings
+from lazy.lazy import lazy
 from mock import patch
 from pytz import UTC
-from uuid import uuid4
-from unittest import skip
+from search.search_engine_base import SearchEngine
 
-from django.conf import settings
-
+from contentstore.courseware_index import (
+    CourseAboutSearchIndexer,
+    CoursewareSearchIndexer,
+    LibrarySearchIndexer,
+    SearchIndexingError
+)
+from contentstore.signals.handlers import listen_for_course_publish, listen_for_library_update
+from contentstore.tests.utils import CourseTestCase
+from contentstore.utils import reverse_course_url, reverse_usage_url
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from xmodule.library_tools import normalize_key_for_search
@@ -25,28 +35,19 @@ from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MONGO_MODULESTORE,
     TEST_DATA_SPLIT_MODULESTORE,
-    SharedModuleStoreTestCase)
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory
-from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
-from xmodule.modulestore.tests.utils import (
-    create_modulestore_instance, LocationMixin,
-    MixedSplitTestCase, MongoContentstoreBuilder
+    SharedModuleStoreTestCase
 )
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory
+from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
+from xmodule.modulestore.tests.utils import (
+    LocationMixin,
+    MixedSplitTestCase,
+    MongoContentstoreBuilder,
+    create_modulestore_instance
+)
+from xmodule.partitions.partitions import UserPartition
 from xmodule.tests import DATA_DIR
 from xmodule.x_module import XModuleMixin
-from xmodule.partitions.partitions import UserPartition
-
-from search.search_engine_base import SearchEngine
-
-from contentstore.courseware_index import (
-    CoursewareSearchIndexer,
-    LibrarySearchIndexer,
-    SearchIndexingError,
-    CourseAboutSearchIndexer,
-)
-from contentstore.signals import listen_for_course_publish, listen_for_library_update
-from contentstore.utils import reverse_course_url, reverse_usage_url
-from contentstore.tests.utils import CourseTestCase
 
 COURSE_CHILD_STRUCTURE = {
     "course": "chapter",
@@ -130,9 +131,6 @@ class MixedWithOptionsTestCase(MixedSplitTestCase):
 
     INDEX_NAME = None
     DOCUMENT_TYPE = None
-
-    def setUp(self):
-        super(MixedWithOptionsTestCase, self).setUp()
 
     def setup_course_base(self, store):
         """ base version of setup_course_base is a no-op """

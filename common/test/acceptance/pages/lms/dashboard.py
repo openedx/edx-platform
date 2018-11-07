@@ -3,6 +3,7 @@
 Student dashboard page.
 """
 from bok_choy.page_object import PageObject
+
 from common.test.acceptance.pages.lms import BASE_URL
 
 
@@ -11,14 +12,6 @@ class DashboardPage(PageObject):
     Student dashboard, where the student can view
     courses she/he has registered for.
     """
-    def __init__(self, browser):
-        """Initialize the page.
-
-        Arguments:
-            browser (Browser): The browser instance.
-        """
-        super(DashboardPage, self).__init__(browser)
-
     url = "{base}/dashboard".format(base=BASE_URL)
 
     def is_browser_on_page(self):
@@ -176,26 +169,26 @@ class DashboardPage(PageObject):
         """
         Click username dropdown.
         """
-        self.q(css='.dropdown').first.click()
+        self.q(css='.user-dropdown').first.click()
 
     @property
     def username_dropdown_link_text(self):
         """
         Return list username dropdown links.
         """
-        return self.q(css='.dropdown-menu li a').text
+        return self.q(css='.user-dropdown-menu li a').text
 
     def click_my_profile_link(self):
         """
         Click on `Profile` link.
         """
-        self.q(css='.dropdown-menu li a').nth(1).click()
+        self.q(css='.user-dropdown-menu li a').nth(1).click()
 
     def click_account_settings_link(self):
         """
         Click on `Account` link.
         """
-        self.q(css='.dropdown-menu li a').nth(2).click()
+        self.q(css='.user-dropdown-menu li a').nth(2).click()
 
     @property
     def language_selector(self):

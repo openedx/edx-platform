@@ -1,38 +1,41 @@
 # -*- coding: utf-8 -*-
 import datetime
 import json
+
 import ddt
 import mock
-from mock import patch, Mock
+from django.core.urlresolvers import reverse
+from django.test import RequestFactory, TestCase
+from django.utils.timezone import UTC as django_utc
+from mock import Mock, patch
 from nose.plugins.attrib import attr
 from pytz import UTC
-from django.utils.timezone import UTC as django_utc
 
-from django.core.urlresolvers import reverse
-from django.test import TestCase, RequestFactory
-from edxmako import add_lookup
-
+import django_comment_client.utils as utils
+from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
+from courseware.tabs import get_course_tab_list
+from courseware.tests.factories import InstructorFactory
+from django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 from django_comment_client.tests.factories import RoleFactory
 from django_comment_client.tests.unicode import UnicodeTestMixin
-from django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
-import django_comment_client.utils as utils
-from lms.lib.comment_client.utils import perform_request, CommentClientMaintenanceError
-from django_comment_common.models import ForumsConfig
-
-from courseware.tests.factories import InstructorFactory
-from courseware.tabs import get_course_tab_list
-from openedx.core.djangoapps.course_groups import cohorts
-from openedx.core.djangoapps.course_groups.cohorts import set_course_cohort_settings
-from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts, topic_name_to_id
-from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
+from django_comment_client.tests.utils import config_course_discussions, topic_name_to_id
+from django_comment_common.models import CourseDiscussionSettings, ForumsConfig
+from django_comment_common.utils import get_course_discussion_settings, set_course_discussion_settings
+from edxmako import add_lookup
+from lms.djangoapps.teams.tests.factories import CourseTeamFactory
+from lms.lib.comment_client.utils import CommentClientMaintenanceError, perform_request
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
+from openedx.core.djangoapps.course_groups import cohorts
+from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
+from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory, config_course_cohorts
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
 from student.roles import CourseStaffRole
+from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, ToyCourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MIXED_MODULESTORE
 from xmodule.modulestore.django import modulestore
-from lms.djangoapps.teams.tests.factories import CourseTeamFactory
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, ToyCourseFactory
 
 
 @attr(shard=1)
@@ -178,6 +181,22 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
         assertThreadCorrect(threads[0], self.discussion1, "Chapter / Discussion 1")
         assertThreadCorrect(threads[1], self.discussion2, "Subsection / Discussion 2")
 
+    def test_empty_discussion_subcategory_title(self):
+        """
+        Test that for empty subcategory inline discussion modules,
+        the divider " / " is not rendered on a post or inline discussion topic label.
+        """
+        discussion = ItemFactory.create(
+            parent_location=self.course.location,
+            category="discussion",
+            discussion_id="discussion",
+            discussion_category="Chapter",
+            discussion_target=""  # discussion-subcategory
+        )
+        thread = {"commentable_id": discussion.discussion_id}
+        utils.add_courseware_context([thread], self.course, self.user)
+        self.assertNotIn('/', thread.get("courseware_title"))
+
     @ddt.data((ModuleStoreEnum.Type.mongo, 2), (ModuleStoreEnum.Type.split, 1))
     @ddt.unpack
     def test_get_accessible_discussion_xblocks(self, modulestore_type, expected_discussion_xblocks):
@@ -210,6 +229,8 @@ class CachedDiscussionIdMapTestCase(ModuleStoreTestCase):
     """
     Tests that using the cache of discussion id mappings has the same behavior as searching through the course.
     """
+    ENABLED_SIGNALS = ['course_published']
+
     def setUp(self):
         super(CachedDiscussionIdMapTestCase, self).setUp()
 
@@ -356,7 +377,6 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         )
         # Courses get a default discussion topic on creation, so remove it
         self.course.discussion_topics = {}
-        self.course.save()
         self.discussion_num = 0
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.maxDiff = None  # pylint: disable=invalid-name
@@ -372,12 +392,14 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
             **kwargs
         )
 
-    def assert_category_map_equals(self, expected, cohorted_if_in_list=False, exclude_unstarted=True):  # pylint: disable=arguments-differ
+    def assert_category_map_equals(self, expected, divided_only_if_explicit=False, exclude_unstarted=True):  # pylint: disable=arguments-differ
         """
         Asserts the expected map with the map returned by get_discussion_category_map method.
         """
         self.assertEqual(
-            utils.get_discussion_category_map(self.course, self.instructor, cohorted_if_in_list, exclude_unstarted),
+            utils.get_discussion_category_map(
+                self.course, self.instructor, divided_only_if_explicit, exclude_unstarted
+            ),
             expected
         )
 
@@ -395,9 +417,9 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
             self.assert_category_map_equals(
                 {
                     "entries": {
-                        "Topic A": {"id": "Topic_A", "sort_key": "Topic A", "is_cohorted": "Topic_A" in expected_ids},
-                        "Topic B": {"id": "Topic_B", "sort_key": "Topic B", "is_cohorted": "Topic_B" in expected_ids},
-                        "Topic C": {"id": "Topic_C", "sort_key": "Topic C", "is_cohorted": "Topic_C" in expected_ids},
+                        "Topic A": {"id": "Topic_A", "sort_key": "Topic A", "is_divided": "Topic_A" in expected_ids},
+                        "Topic B": {"id": "Topic_B", "sort_key": "Topic B", "is_divided": "Topic_B" in expected_ids},
+                        "Topic C": {"id": "Topic_C", "sort_key": "Topic C", "is_divided": "Topic_C" in expected_ids},
                     },
                     "subcategories": {},
                     "children": [("Topic A", TYPE_ENTRY), ("Topic B", TYPE_ENTRY), ("Topic C", TYPE_ENTRY)]
@@ -406,34 +428,31 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
 
         check_cohorted_topics([])  # default (empty) cohort config
 
-        set_course_cohort_settings(course_key=self.course.id, is_cohorted=False, cohorted_discussions=[])
+        set_discussion_division_settings(self.course.id, enable_cohorts=False)
         check_cohorted_topics([])
 
-        set_course_cohort_settings(course_key=self.course.id, is_cohorted=True, cohorted_discussions=[])
+        set_discussion_division_settings(self.course.id, enable_cohorts=True)
         check_cohorted_topics([])
 
-        set_course_cohort_settings(
-            course_key=self.course.id,
-            is_cohorted=True,
-            cohorted_discussions=["Topic_B", "Topic_C"],
-            always_cohort_inline_discussions=False,
+        set_discussion_division_settings(
+            self.course.id,
+            enable_cohorts=True,
+            divided_discussions=["Topic_B", "Topic_C"]
         )
         check_cohorted_topics(["Topic_B", "Topic_C"])
 
-        set_course_cohort_settings(
-            course_key=self.course.id,
-            is_cohorted=True,
-            cohorted_discussions=["Topic_A", "Some_Other_Topic"],
-            always_cohort_inline_discussions=False,
+        set_discussion_division_settings(
+            self.course.id,
+            enable_cohorts=True,
+            divided_discussions=["Topic_A", "Some_Other_Topic"]
         )
         check_cohorted_topics(["Topic_A"])
 
         # unlikely case, but make sure it works.
-        set_course_cohort_settings(
-            course_key=self.course.id,
-            is_cohorted=False,
-            cohorted_discussions=["Topic_A"],
-            always_cohort_inline_discussions=False,
+        set_discussion_division_settings(
+            self.course.id,
+            enable_cohorts=False,
+            divided_discussions=["Topic_A"]
         )
         check_cohorted_topics([])
 
@@ -448,7 +467,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                             "Discussion": {
                                 "id": "discussion1",
                                 "sort_key": None,
-                                "is_cohorted": False,
+                                "is_divided": False,
                             }
                         },
                         "subcategories": {},
@@ -459,9 +478,9 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
             }
         )
 
-    def test_inline_with_always_cohort_inline_discussion_flag(self):
+    def test_inline_with_always_divide_inline_discussion_flag(self):
         self.create_discussion("Chapter", "Discussion")
-        set_course_cohort_settings(course_key=self.course.id, is_cohorted=True)
+        set_discussion_division_settings(self.course.id, enable_cohorts=True, always_divide_inline_discussions=True)
 
         self.assert_category_map_equals(
             {
@@ -472,7 +491,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                             "Discussion": {
                                 "id": "discussion1",
                                 "sort_key": None,
-                                "is_cohorted": True,
+                                "is_divided": True,
                             }
                         },
                         "subcategories": {},
@@ -483,9 +502,9 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
             }
         )
 
-    def test_inline_without_always_cohort_inline_discussion_flag(self):
+    def test_inline_without_always_divide_inline_discussion_flag(self):
         self.create_discussion("Chapter", "Discussion")
-        set_course_cohort_settings(course_key=self.course.id, is_cohorted=True, always_cohort_inline_discussions=False)
+        set_discussion_division_settings(self.course.id, enable_cohorts=True)
 
         self.assert_category_map_equals(
             {
@@ -496,7 +515,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                             "Discussion": {
                                 "id": "discussion1",
                                 "sort_key": None,
-                                "is_cohorted": False,
+                                "is_divided": False,
                             }
                         },
                         "subcategories": {},
@@ -505,7 +524,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                 },
                 "children": [("Chapter", TYPE_SUBCATEGORY)]
             },
-            cohorted_if_in_list=True
+            divided_only_if_explicit=True
         )
 
     def test_get_unstarted_discussion_xblocks(self):
@@ -522,7 +541,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                             "Discussion 1": {
                                 "id": "discussion1",
                                 "sort_key": None,
-                                "is_cohorted": False,
+                                "is_divided": False,
                                 "start_date": later
                             }
                         },
@@ -534,7 +553,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                 },
                 "children": [("Chapter 1", TYPE_SUBCATEGORY)]
             },
-            cohorted_if_in_list=True,
+            divided_only_if_explicit=True,
             exclude_unstarted=False
         )
 
@@ -546,7 +565,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.create_discussion("Chapter 2 / Section 1 / Subsection 2", "Discussion")
         self.create_discussion("Chapter 3 / Section 1", "Discussion")
 
-        def check_cohorted(is_cohorted):
+        def check_divided(is_divided):
 
             self.assert_category_map_equals(
                 {
@@ -557,12 +576,12 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                                 "Discussion 1": {
                                     "id": "discussion1",
                                     "sort_key": None,
-                                    "is_cohorted": is_cohorted,
+                                    "is_divided": is_divided,
                                 },
                                 "Discussion 2": {
                                     "id": "discussion2",
                                     "sort_key": None,
-                                    "is_cohorted": is_cohorted,
+                                    "is_divided": is_divided,
                                 }
                             },
                             "subcategories": {},
@@ -573,7 +592,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                                 "Discussion": {
                                     "id": "discussion3",
                                     "sort_key": None,
-                                    "is_cohorted": is_cohorted,
+                                    "is_divided": is_divided,
                                 }
                             },
                             "subcategories": {
@@ -585,7 +604,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                                                 "Discussion": {
                                                     "id": "discussion4",
                                                     "sort_key": None,
-                                                    "is_cohorted": is_cohorted,
+                                                    "is_divided": is_divided,
                                                 }
                                             },
                                             "subcategories": {},
@@ -596,7 +615,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                                                 "Discussion": {
                                                     "id": "discussion5",
                                                     "sort_key": None,
-                                                    "is_cohorted": is_cohorted,
+                                                    "is_divided": is_divided,
                                                 }
                                             },
                                             "subcategories": {},
@@ -616,7 +635,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                                         "Discussion": {
                                             "id": "discussion6",
                                             "sort_key": None,
-                                            "is_cohorted": is_cohorted,
+                                            "is_divided": is_divided,
                                         }
                                     },
                                     "subcategories": {},
@@ -632,15 +651,15 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
             )
 
         # empty / default config
-        check_cohorted(False)
+        check_divided(False)
 
         # explicitly disabled cohorting
-        set_course_cohort_settings(course_key=self.course.id, is_cohorted=False)
-        check_cohorted(False)
+        set_discussion_division_settings(self.course.id, enable_cohorts=False)
+        check_divided(False)
 
-        # explicitly enabled cohorting
-        set_course_cohort_settings(course_key=self.course.id, is_cohorted=True)
-        check_cohorted(True)
+        # explicitly enable courses divided by Cohort with inline discusssions also divided.
+        set_discussion_division_settings(self.course.id, enable_cohorts=True, always_divide_inline_discussions=True)
+        check_divided(True)
 
     def test_tree_with_duplicate_targets(self):
         self.create_discussion("Chapter 1", "Discussion A")
@@ -686,7 +705,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                             "Discussion 1": {
                                 "id": "discussion1",
                                 "sort_key": None,
-                                "is_cohorted": False,
+                                "is_divided": False,
                             }
                         },
                         "subcategories": {},
@@ -697,7 +716,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                             "Discussion": {
                                 "id": "discussion3",
                                 "sort_key": None,
-                                "is_cohorted": False,
+                                "is_divided": False,
                             }
                         },
                         "subcategories": {},
@@ -710,7 +729,6 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
 
     def test_self_paced_start_date_filter(self):
         self.course.self_paced = True
-        self.course.save()
 
         now = datetime.datetime.now()
         later = datetime.datetime.max
@@ -731,12 +749,12 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                             "Discussion 1": {
                                 "id": "discussion1",
                                 "sort_key": None,
-                                "is_cohorted": False,
+                                "is_divided": False,
                             },
                             "Discussion 2": {
                                 "id": "discussion2",
                                 "sort_key": None,
-                                "is_cohorted": False,
+                                "is_divided": False,
                             }
                         },
                         "subcategories": {},
@@ -747,7 +765,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                             "Discussion": {
                                 "id": "discussion3",
                                 "sort_key": None,
-                                "is_cohorted": False,
+                                "is_divided": False,
                             }
                         },
                         "subcategories": {
@@ -759,7 +777,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                                             "Discussion": {
                                                 "id": "discussion4",
                                                 "sort_key": None,
-                                                "is_cohorted": False,
+                                                "is_divided": False,
                                             }
                                         },
                                         "subcategories": {},
@@ -770,7 +788,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                                             "Discussion": {
                                                 "id": "discussion5",
                                                 "sort_key": None,
-                                                "is_cohorted": False,
+                                                "is_divided": False,
                                             }
                                         },
                                         "subcategories": {},
@@ -790,7 +808,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                                     "Discussion": {
                                         "id": "discussion6",
                                         "sort_key": None,
-                                        "is_cohorted": False,
+                                        "is_divided": False,
                                     }
                                 },
                                 "subcategories": {},
@@ -821,27 +839,27 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                             "Discussion 1": {
                                 "id": "discussion1",
                                 "sort_key": "D",
-                                "is_cohorted": False,
+                                "is_divided": False,
                             },
                             "Discussion 2": {
                                 "id": "discussion2",
                                 "sort_key": "A",
-                                "is_cohorted": False,
+                                "is_divided": False,
                             },
                             "Discussion 3": {
                                 "id": "discussion3",
                                 "sort_key": "E",
-                                "is_cohorted": False,
+                                "is_divided": False,
                             },
                             "Discussion 4": {
                                 "id": "discussion4",
                                 "sort_key": "C",
-                                "is_cohorted": False,
+                                "is_divided": False,
                             },
                             "Discussion 5": {
                                 "id": "discussion5",
                                 "sort_key": "B",
-                                "is_cohorted": False,
+                                "is_divided": False,
                             }
                         },
                         "subcategories": {},
@@ -867,9 +885,9 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.assert_category_map_equals(
             {
                 "entries": {
-                    "Topic A": {"id": "Topic_A", "sort_key": "B", "is_cohorted": False},
-                    "Topic B": {"id": "Topic_B", "sort_key": "C", "is_cohorted": False},
-                    "Topic C": {"id": "Topic_C", "sort_key": "A", "is_cohorted": False},
+                    "Topic A": {"id": "Topic_A", "sort_key": "B", "is_divided": False},
+                    "Topic B": {"id": "Topic_B", "sort_key": "C", "is_divided": False},
+                    "Topic C": {"id": "Topic_C", "sort_key": "A", "is_divided": False},
                 },
                 "subcategories": {},
                 "children": [("Topic C", TYPE_ENTRY), ("Topic A", TYPE_ENTRY), ("Topic B", TYPE_ENTRY)]
@@ -878,7 +896,6 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
 
     def test_sort_alpha(self):
         self.course.discussion_sort_alpha = True
-        self.course.save()
         self.create_discussion("Chapter", "Discussion D")
         self.create_discussion("Chapter", "Discussion A")
         self.create_discussion("Chapter", "Discussion E")
@@ -894,27 +911,27 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                             "Discussion D": {
                                 "id": "discussion1",
                                 "sort_key": "Discussion D",
-                                "is_cohorted": False,
+                                "is_divided": False,
                             },
                             "Discussion A": {
                                 "id": "discussion2",
                                 "sort_key": "Discussion A",
-                                "is_cohorted": False,
+                                "is_divided": False,
                             },
                             "Discussion E": {
                                 "id": "discussion3",
                                 "sort_key": "Discussion E",
-                                "is_cohorted": False,
+                                "is_divided": False,
                             },
                             "Discussion C": {
                                 "id": "discussion4",
                                 "sort_key": "Discussion C",
-                                "is_cohorted": False,
+                                "is_divided": False,
                             },
                             "Discussion B": {
                                 "id": "discussion5",
                                 "sort_key": "Discussion B",
-                                "is_cohorted": False,
+                                "is_divided": False,
                             }
                         },
                         "subcategories": {},
@@ -947,12 +964,12 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                             "Discussion 1": {
                                 "id": "discussion3",
                                 "sort_key": None,
-                                "is_cohorted": False,
+                                "is_divided": False,
                             },
                             "Discussion 2": {
                                 "id": "discussion5",
                                 "sort_key": None,
-                                "is_cohorted": False,
+                                "is_divided": False,
                             }
                         },
                         "subcategories": {},
@@ -963,12 +980,12 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                             "Discussion 1": {
                                 "id": "discussion4",
                                 "sort_key": None,
-                                "is_cohorted": False,
+                                "is_divided": False,
                             },
                             "Discussion 2": {
                                 "id": "discussion1",
                                 "sort_key": None,
-                                "is_cohorted": False,
+                                "is_divided": False,
                             }
                         },
                         "subcategories": {},
@@ -979,7 +996,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                             "Discussion": {
                                 "id": "discussion2",
                                 "sort_key": None,
-                                "is_cohorted": False,
+                                "is_divided": False,
                             }
                         },
                         "subcategories": {},
@@ -1056,17 +1073,17 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
                         'entries': {
                             'Visible to Alpha': {
                                 'sort_key': None,
-                                'is_cohorted': True,
+                                'is_divided': False,
                                 'id': 'alpha_group_discussion'
                             },
                             'Visible to Beta': {
                                 'sort_key': None,
-                                'is_cohorted': True,
+                                'is_divided': False,
                                 'id': 'beta_group_discussion'
                             },
                             'Visible to Everyone': {
                                 'sort_key': None,
-                                'is_cohorted': True,
+                                'is_divided': False,
                                 'id': 'global_group_discussion'
                             }
                         }
@@ -1076,7 +1093,7 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
                 'entries': {
                     'General': {
                         'sort_key': 'General',
-                        'is_cohorted': False,
+                        'is_divided': False,
                         'id': 'i4x-org-number-course-run'
                     }
                 }
@@ -1101,12 +1118,12 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
                         'entries': {
                             'Visible to Alpha': {
                                 'sort_key': None,
-                                'is_cohorted': True,
+                                'is_divided': False,
                                 'id': 'alpha_group_discussion'
                             },
                             'Visible to Everyone': {
                                 'sort_key': None,
-                                'is_cohorted': True,
+                                'is_divided': False,
                                 'id': 'global_group_discussion'
                             }
                         }
@@ -1116,7 +1133,7 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
                 'entries': {
                     'General': {
                         'sort_key': 'General',
-                        'is_cohorted': False,
+                        'is_divided': False,
                         'id': 'i4x-org-number-course-run'
                     }
                 }
@@ -1141,12 +1158,12 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
                         'entries': {
                             'Visible to Beta': {
                                 'sort_key': None,
-                                'is_cohorted': True,
+                                'is_divided': False,
                                 'id': 'beta_group_discussion'
                             },
                             'Visible to Everyone': {
                                 'sort_key': None,
-                                'is_cohorted': True,
+                                'is_divided': False,
                                 'id': 'global_group_discussion'
                             }
                         }
@@ -1156,7 +1173,7 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
                 'entries': {
                     'General': {
                         'sort_key': 'General',
-                        'is_cohorted': False,
+                        'is_divided': False,
                         'id': 'i4x-org-number-course-run'
                     }
                 }
@@ -1180,7 +1197,7 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
                         'entries': {
                             'Visible to Everyone': {
                                 'sort_key': None,
-                                'is_cohorted': True,
+                                'is_divided': False,
                                 'id': 'global_group_discussion'
                             }
                         }
@@ -1190,7 +1207,7 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
                 'entries': {
                     'General': {
                         'sort_key': 'General',
-                        'is_cohorted': False,
+                        'is_divided': False,
                         'id': 'i4x-org-number-course-run'
                     }
                 }
@@ -1255,9 +1272,9 @@ class DiscussionTabTestCase(ModuleStoreTestCase):
             self.assertFalse(self.discussion_tab_present(self.enrolled_user))
 
 
-class IsCommentableCohortedTestCase(ModuleStoreTestCase):
+class IsCommentableDividedTestCase(ModuleStoreTestCase):
     """
-    Test the is_commentable_cohorted function.
+    Test the is_commentable_divided function.
     """
 
     MODULESTORE = TEST_DATA_MIXED_MODULESTORE
@@ -1266,10 +1283,10 @@ class IsCommentableCohortedTestCase(ModuleStoreTestCase):
         """
         Make sure that course is reloaded every time--clear out the modulestore.
         """
-        super(IsCommentableCohortedTestCase, self).setUp()
+        super(IsCommentableDividedTestCase, self).setUp()
         self.toy_course_key = ToyCourseFactory.create().id
 
-    def test_is_commentable_cohorted(self):
+    def test_is_commentable_divided(self):
         course = modulestore().get_course(self.toy_course_key)
         self.assertFalse(cohorts.is_course_cohorted(course.id))
 
@@ -1279,46 +1296,46 @@ class IsCommentableCohortedTestCase(ModuleStoreTestCase):
 
         # no topics
         self.assertFalse(
-            utils.is_commentable_cohorted(course.id, to_id("General")),
+            utils.is_commentable_divided(course.id, to_id("General")),
             "Course doesn't even have a 'General' topic"
         )
 
         # not cohorted
-        config_course_cohorts(course, is_cohorted=False, discussion_topics=["General", "Feedback"])
-
+        config_course_cohorts(course, is_cohorted=False)
+        config_course_discussions(course, discussion_topics=["General", "Feedback"])
         self.assertFalse(
-            utils.is_commentable_cohorted(course.id, to_id("General")),
+            utils.is_commentable_divided(course.id, to_id("General")),
             "Course isn't cohorted"
         )
 
         # cohorted, but top level topics aren't
-        config_course_cohorts(course, is_cohorted=True, discussion_topics=["General", "Feedback"])
+        config_course_cohorts(course, is_cohorted=True)
+        config_course_discussions(course, discussion_topics=["General", "Feedback"])
 
         self.assertTrue(cohorts.is_course_cohorted(course.id))
         self.assertFalse(
-            utils.is_commentable_cohorted(course.id, to_id("General")),
+            utils.is_commentable_divided(course.id, to_id("General")),
             "Course is cohorted, but 'General' isn't."
         )
 
         # cohorted, including "Feedback" top-level topics aren't
         config_course_cohorts(
             course,
-            is_cohorted=True,
-            discussion_topics=["General", "Feedback"],
-            cohorted_discussions=["Feedback"]
+            is_cohorted=True
         )
+        config_course_discussions(course, discussion_topics=["General", "Feedback"], divided_discussions=["Feedback"])
 
         self.assertTrue(cohorts.is_course_cohorted(course.id))
         self.assertFalse(
-            utils.is_commentable_cohorted(course.id, to_id("General")),
+            utils.is_commentable_divided(course.id, to_id("General")),
             "Course is cohorted, but 'General' isn't."
         )
         self.assertTrue(
-            utils.is_commentable_cohorted(course.id, to_id("Feedback")),
+            utils.is_commentable_divided(course.id, to_id("Feedback")),
             "Feedback was listed as cohorted.  Should be."
         )
 
-    def test_is_commentable_cohorted_inline_discussion(self):
+    def test_is_commentable_divided_inline_discussion(self):
         course = modulestore().get_course(self.toy_course_key)
         self.assertFalse(cohorts.is_course_cohorted(course.id))
 
@@ -1328,47 +1345,262 @@ class IsCommentableCohortedTestCase(ModuleStoreTestCase):
         config_course_cohorts(
             course,
             is_cohorted=True,
-            discussion_topics=["General", "Feedback"],
-            cohorted_discussions=["Feedback", "random_inline"]
         )
-        self.assertTrue(
-            utils.is_commentable_cohorted(course.id, to_id("random")),
-            "By default, Non-top-level discussion is always cohorted in cohorted courses."
+        config_course_discussions(
+            course,
+            discussion_topics=["General", "Feedback"],
+            divided_discussions=["Feedback", "random_inline"]
         )
 
-        # if always_cohort_inline_discussions is set to False, non-top-level discussion are always
-        # non cohorted unless they are explicitly set in cohorted_discussions
+        self.assertFalse(
+            utils.is_commentable_divided(course.id, to_id("random")),
+            "By default, Non-top-level discussions are not cohorted in a cohorted courses."
+        )
+
+        # if always_divide_inline_discussions is set to False, non-top-level discussion are always
+        # not divided unless they are explicitly set in divided_discussions
         config_course_cohorts(
             course,
             is_cohorted=True,
-            discussion_topics=["General", "Feedback"],
-            cohorted_discussions=["Feedback", "random_inline"],
-            always_cohort_inline_discussions=False
         )
+        config_course_discussions(
+            course,
+            discussion_topics=["General", "Feedback"],
+            divided_discussions=["Feedback", "random_inline"],
+            always_divide_inline_discussions=False
+        )
+
         self.assertFalse(
-            utils.is_commentable_cohorted(course.id, to_id("random")),
-            "Non-top-level discussion is not cohorted if always_cohort_inline_discussions is False."
+            utils.is_commentable_divided(course.id, to_id("random")),
+            "Non-top-level discussion is not cohorted if always_divide_inline_discussions is False."
         )
         self.assertTrue(
-            utils.is_commentable_cohorted(course.id, to_id("random_inline")),
-            "If always_cohort_inline_discussions set to False, Non-top-level discussion is "
+            utils.is_commentable_divided(course.id, to_id("random_inline")),
+            "If always_divide_inline_discussions set to False, Non-top-level discussion is "
             "cohorted if explicitly set in cohorted_discussions."
         )
         self.assertTrue(
-            utils.is_commentable_cohorted(course.id, to_id("Feedback")),
-            "If always_cohort_inline_discussions set to False, top-level discussion are not affected."
+            utils.is_commentable_divided(course.id, to_id("Feedback")),
+            "If always_divide_inline_discussions set to False, top-level discussion are not affected."
         )
 
-    def test_is_commentable_cohorted_team(self):
+    def test_is_commentable_divided_team(self):
         course = modulestore().get_course(self.toy_course_key)
         self.assertFalse(cohorts.is_course_cohorted(course.id))
 
         config_course_cohorts(course, is_cohorted=True)
+        config_course_discussions(course, always_divide_inline_discussions=True)
+
         team = CourseTeamFactory(course_id=course.id)
 
         # Verify that team discussions are not cohorted, but other discussions are
-        self.assertFalse(utils.is_commentable_cohorted(course.id, team.discussion_topic_id))
-        self.assertTrue(utils.is_commentable_cohorted(course.id, "random"))
+        # if "always cohort inline discussions" is set to true.
+        self.assertFalse(utils.is_commentable_divided(course.id, team.discussion_topic_id))
+        self.assertTrue(utils.is_commentable_divided(course.id, "random"))
+
+    def test_is_commentable_divided_cohorts(self):
+        course = modulestore().get_course(self.toy_course_key)
+        set_discussion_division_settings(
+            course.id,
+            enable_cohorts=True,
+            divided_discussions=[],
+            always_divide_inline_discussions=True,
+            division_scheme=CourseDiscussionSettings.NONE,
+        )
+
+        # Although Cohorts are enabled, discussion division is explicitly disabled.
+        self.assertFalse(utils.is_commentable_divided(course.id, "random"))
+
+        # Now set the discussion division scheme.
+        set_discussion_division_settings(
+            course.id,
+            enable_cohorts=True,
+            divided_discussions=[],
+            always_divide_inline_discussions=True,
+            division_scheme=CourseDiscussionSettings.COHORT,
+        )
+        self.assertTrue(utils.is_commentable_divided(course.id, "random"))
+
+    def test_is_commentable_divided_enrollment_track(self):
+        course = modulestore().get_course(self.toy_course_key)
+        set_discussion_division_settings(
+            course.id,
+            divided_discussions=[],
+            always_divide_inline_discussions=True,
+            division_scheme=CourseDiscussionSettings.ENROLLMENT_TRACK,
+        )
+
+        # Although division scheme is set to ENROLLMENT_TRACK, divided returns
+        # False because there is only a single enrollment mode.
+        self.assertFalse(utils.is_commentable_divided(course.id, "random"))
+
+        # Now create 2 explicit course modes.
+        CourseModeFactory.create(course_id=course.id, mode_slug=CourseMode.AUDIT)
+        CourseModeFactory.create(course_id=course.id, mode_slug=CourseMode.VERIFIED)
+        self.assertTrue(utils.is_commentable_divided(course.id, "random"))
+
+
+@attr(shard=1)
+class GroupIdForUserTestCase(ModuleStoreTestCase):
+    """ Test the get_group_id_for_user method. """
+
+    def setUp(self):
+        super(GroupIdForUserTestCase, self).setUp()
+        self.course = CourseFactory.create()
+        CourseModeFactory.create(course_id=self.course.id, mode_slug=CourseMode.AUDIT)
+        CourseModeFactory.create(course_id=self.course.id, mode_slug=CourseMode.VERIFIED)
+        self.test_user = UserFactory.create()
+        CourseEnrollmentFactory.create(
+            mode=CourseMode.VERIFIED, user=self.test_user, course_id=self.course.id
+        )
+        self.test_cohort = CohortFactory(
+            course_id=self.course.id,
+            name='Test Cohort',
+            users=[self.test_user]
+        )
+
+    def test_discussion_division_disabled(self):
+        course_discussion_settings = get_course_discussion_settings(self.course.id)
+        self.assertEqual(CourseDiscussionSettings.NONE, course_discussion_settings.division_scheme)
+        self.assertIsNone(utils.get_group_id_for_user(self.test_user, course_discussion_settings))
+
+    def test_discussion_division_by_cohort(self):
+        set_discussion_division_settings(
+            self.course.id, enable_cohorts=True, division_scheme=CourseDiscussionSettings.COHORT
+        )
+        course_discussion_settings = get_course_discussion_settings(self.course.id)
+        self.assertEqual(CourseDiscussionSettings.COHORT, course_discussion_settings.division_scheme)
+        self.assertEqual(
+            self.test_cohort.id,
+            utils.get_group_id_for_user(self.test_user, course_discussion_settings)
+        )
+
+    def test_discussion_division_by_enrollment_track(self):
+        set_discussion_division_settings(
+            self.course.id, division_scheme=CourseDiscussionSettings.ENROLLMENT_TRACK
+        )
+        course_discussion_settings = get_course_discussion_settings(self.course.id)
+        self.assertEqual(CourseDiscussionSettings.ENROLLMENT_TRACK, course_discussion_settings.division_scheme)
+        self.assertEqual(
+            -2,  # Verified has group ID 2, and we negate that value to ensure unique IDs
+            utils.get_group_id_for_user(self.test_user, course_discussion_settings)
+        )
+
+
+@attr(shard=1)
+class CourseDiscussionDivisionEnabledTestCase(ModuleStoreTestCase):
+    """ Test the course_discussion_division_enabled and available_division_schemes methods. """
+
+    def setUp(self):
+        super(CourseDiscussionDivisionEnabledTestCase, self).setUp()
+        self.course = CourseFactory.create()
+        CourseModeFactory.create(course_id=self.course.id, mode_slug=CourseMode.AUDIT)
+        self.test_cohort = CohortFactory(
+            course_id=self.course.id,
+            name='Test Cohort',
+            users=[]
+        )
+
+    def test_discussion_division_disabled(self):
+        course_discussion_settings = get_course_discussion_settings(self.course.id)
+        self.assertFalse(utils.course_discussion_division_enabled(course_discussion_settings))
+        self.assertEqual([], utils.available_division_schemes(self.course.id))
+
+    def test_discussion_division_by_cohort(self):
+        set_discussion_division_settings(
+            self.course.id, enable_cohorts=False, division_scheme=CourseDiscussionSettings.COHORT
+        )
+        # Because cohorts are disabled, discussion division is not enabled.
+        self.assertFalse(utils.course_discussion_division_enabled(get_course_discussion_settings(self.course.id)))
+        self.assertEqual([], utils.available_division_schemes(self.course.id))
+        # Now enable cohorts, which will cause discussions to be divided.
+        set_discussion_division_settings(
+            self.course.id, enable_cohorts=True, division_scheme=CourseDiscussionSettings.COHORT
+        )
+        self.assertTrue(utils.course_discussion_division_enabled(get_course_discussion_settings(self.course.id)))
+        self.assertEqual([CourseDiscussionSettings.COHORT], utils.available_division_schemes(self.course.id))
+
+    def test_discussion_division_by_enrollment_track(self):
+        set_discussion_division_settings(
+            self.course.id, division_scheme=CourseDiscussionSettings.ENROLLMENT_TRACK
+        )
+        # Only a single enrollment track exists, so discussion division is not enabled.
+        self.assertFalse(utils.course_discussion_division_enabled(get_course_discussion_settings(self.course.id)))
+        self.assertEqual([], utils.available_division_schemes(self.course.id))
+
+        # Now create a second CourseMode, which will cause discussions to be divided.
+        CourseModeFactory.create(course_id=self.course.id, mode_slug=CourseMode.VERIFIED)
+        self.assertTrue(utils.course_discussion_division_enabled(get_course_discussion_settings(self.course.id)))
+        self.assertEqual([CourseDiscussionSettings.ENROLLMENT_TRACK], utils.available_division_schemes(self.course.id))
+
+
+@attr(shard=1)
+class GroupNameTestCase(ModuleStoreTestCase):
+    """ Test the get_group_name and get_group_names_by_id methods. """
+
+    def setUp(self):
+        super(GroupNameTestCase, self).setUp()
+        self.course = CourseFactory.create()
+        CourseModeFactory.create(course_id=self.course.id, mode_slug=CourseMode.AUDIT)
+        CourseModeFactory.create(course_id=self.course.id, mode_slug=CourseMode.VERIFIED)
+        self.test_cohort_1 = CohortFactory(
+            course_id=self.course.id,
+            name='Cohort 1',
+            users=[]
+        )
+        self.test_cohort_2 = CohortFactory(
+            course_id=self.course.id,
+            name='Cohort 2',
+            users=[]
+        )
+
+    def test_discussion_division_disabled(self):
+        course_discussion_settings = get_course_discussion_settings(self.course.id)
+        self.assertEqual({}, utils.get_group_names_by_id(course_discussion_settings))
+        self.assertIsNone(utils.get_group_name(-1000, course_discussion_settings))
+
+    def test_discussion_division_by_cohort(self):
+        set_discussion_division_settings(
+            self.course.id, enable_cohorts=True, division_scheme=CourseDiscussionSettings.COHORT
+        )
+        course_discussion_settings = get_course_discussion_settings(self.course.id)
+        self.assertEqual(
+            {
+                self.test_cohort_1.id: self.test_cohort_1.name,
+                self.test_cohort_2.id: self.test_cohort_2.name
+            },
+            utils.get_group_names_by_id(course_discussion_settings)
+        )
+        self.assertEqual(
+            self.test_cohort_2.name,
+            utils.get_group_name(self.test_cohort_2.id, course_discussion_settings)
+        )
+        # Test also with a group_id that doesn't exist.
+        self.assertIsNone(
+            utils.get_group_name(-1000, course_discussion_settings)
+        )
+
+    def test_discussion_division_by_enrollment_track(self):
+        set_discussion_division_settings(
+            self.course.id, division_scheme=CourseDiscussionSettings.ENROLLMENT_TRACK
+        )
+        course_discussion_settings = get_course_discussion_settings(self.course.id)
+        self.assertEqual(
+            {
+                -1: "audit course",
+                -2: "verified course"
+            },
+            utils.get_group_names_by_id(course_discussion_settings)
+        )
+
+        self.assertEqual(
+            "verified course",
+            utils.get_group_name(-2, course_discussion_settings)
+        )
+        # Test also with a group_id that doesn't exist.
+        self.assertIsNone(
+            utils.get_group_name(-1000, course_discussion_settings)
+        )
 
 
 class PermissionsTestCase(ModuleStoreTestCase):
@@ -1400,6 +1632,26 @@ class PermissionsTestCase(ModuleStoreTestCase):
                 'can_delete': True,
                 'can_openclose': True,
                 'can_vote': True,
+                'can_report': True
+            })
+
+    def test_get_ability_with_global_staff(self):
+        """
+        Tests that global staff has rights to report other user's post inspite
+        of enrolled in the course or not.
+        """
+        content = {'user_id': '1', 'type': 'thread'}
+
+        with mock.patch('django_comment_client.utils.check_permissions_by_view') as check_perm:
+            # check_permissions_by_view returns false because user is not enrolled in the course.
+            check_perm.return_value = False
+            global_staff = UserFactory(username='global_staff', email='global_staff@edx.org', is_staff=True)
+            self.assertEqual(utils.get_ability(None, content, global_staff), {
+                'editable': False,
+                'can_reply': False,
+                'can_delete': False,
+                'can_openclose': False,
+                'can_vote': False,
                 'can_report': True
             })
 
@@ -1456,3 +1708,21 @@ class ClientConfigurationTestCase(TestCase):
 
         result = perform_request('GET', 'http://www.google.com')
         self.assertEqual(result, {})
+
+
+def set_discussion_division_settings(
+        course_key, enable_cohorts=False, always_divide_inline_discussions=False,
+        divided_discussions=[], division_scheme=CourseDiscussionSettings.COHORT
+):
+    """
+    Convenience method for setting cohort enablement and discussion settings.
+    COHORT is the default division_scheme, as no other schemes were supported at
+    the time that the unit tests were originally written.
+    """
+    set_course_discussion_settings(
+        course_key=course_key,
+        divided_discussions=divided_discussions,
+        division_scheme=division_scheme,
+        always_divide_inline_discussions=always_divide_inline_discussions,
+    )
+    set_course_cohorted(course_key, enable_cohorts)

@@ -10,12 +10,13 @@ Example usage:
 
 """
 import logging
-from django.core.management.base import BaseCommand, CommandError
-from django.contrib.auth.models import User
 from optparse import make_option
-from opaque_keys.edx.keys import CourseKey
-from certificates.models import GeneratedCertificate, CertificateStatuses
 
+from django.contrib.auth.models import User
+from django.core.management.base import BaseCommand, CommandError
+from opaque_keys.edx.keys import CourseKey
+
+from certificates.models import CertificateStatuses, GeneratedCertificate
 
 LOGGER = logging.getLogger(__name__)
 

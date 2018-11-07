@@ -27,17 +27,13 @@ else:
 <%block name="bodyclass">is-signedin course tools view-export</%block>
 
 <%block name="requirejs">
-% if in_err:
-  var hasUnit = ${bool(unit) | n, dump_js_escaped_json},
-      editUnitUrl = "${edit_unit_url | n, js_escaped_string}",
-      courselikeHomeUrl = "${courselike_home_url | n, js_escaped_string}",
-      is_library = ${library | n, dump_js_escaped_json}
-      errMsg = "${raw_err_msg | n, js_escaped_string}";
+  var courselikeHomeUrl = "${courselike_home_url | n, js_escaped_string}",
+      is_library = ${library | n, dump_js_escaped_json},
+      statusUrl = "${status_url | n, js_escaped_string}";
 
   require(["js/factories/export"], function(ExportFactory) {
-      ExportFactory(hasUnit, editUnitUrl, courselikeHomeUrl, is_library, errMsg);
+      ExportFactory(courselikeHomeUrl, is_library, statusUrl);
   });
-%endif
 </%block>
 
 <%block name="content">
@@ -93,7 +89,7 @@ else:
 
         <ul class="list-actions">
           <li class="item-action">
-            <a class="action action-export action-primary" href="${export_url}">
+            <a class="action action-export action-primary" href="#">
               <span class="icon fa fa-arrow-circle-o-down" aria-hidden="true"></span>
               <span class="copy">
                   %if library:
@@ -105,6 +101,90 @@ else:
           </li>
         </ul>
       </div>
+
+      <div class="wrapper wrapper-status is-hidden">
+        <h3 class="title">
+            %if library:
+                ${_("Library Export Status")}
+            %else:
+                ${_("Course Export Status")}
+            %endif
+        </h3>
+
+        <ol class="status-progress list-progress">
+          <li class="item-progresspoint item-progresspoint-prepare is-complete">
+            <span class="deco status-visual">
+              <span class="icon fa fa-cog" aria-hidden="true"></span>
+              <span class="icon fa fa-warning" aria-hidden="true"></span>
+            </span>
+
+            <div class="status-detail">
+              <h3 class="title">${_("Preparing")}</h3>
+              <div class="progress-bar">
+                <div class="progress-fill"></div>
+              </div>
+              <p class="copy">${_("Preparing to start the export")}</p>
+            </div>
+          </li>
+
+          <li class="item-progresspoint item-progresspoint-export is-started">
+            <span class="deco status-visual">
+              <span class="icon fa fa-cog" aria-hidden="true"></span>
+              <span class="icon fa fa-warning" aria-hidden="true"></span>
+            </span>
+
+            <div class="status-detail">
+              <h3 class="title">${_("Exporting")}</h3>
+              <p class="copy">${_("Creating the export data files (You can now leave this page safely, but avoid making drastic changes to content until this export is complete)")}</p>
+            </div>
+          </li>
+
+          <li class="item-progresspoint item-progresspoint-compress is-not-started">
+            <span class="deco status-visual">
+              <span class="icon fa fa-cog" aria-hidden="true"></span>
+              <span class="icon fa fa-warning" aria-hidden="true"></span>
+            </span>
+
+            <div class="status-detail">
+              <h3 class="title">${_("Compressing")}</h3>
+              <p class="copy">${_("Compressing the exported data and preparing it for download")}</p>
+            </div>
+          </li>
+
+          <li class="item-progresspoint item-progresspoint-success has-actions is-not-started">
+            <span class="deco status-visual">
+              <span class="icon fa fa-square-o" aria-hidden="true"></span>
+            </span>
+
+            <div class="status-detail">
+              <h3 class="title">
+                ${_("Success")}
+                <span class="item-progresspoint-success-date"></span>
+              </h3>
+              <p class="copy">
+                  %if library:
+                      ${_("Your exported library can now be downloaded")}
+                  %else:
+                      ${_("Your exported course can now be downloaded")}
+                  %endif
+              </p>
+
+              <ul class="list-actions">
+                <li class="item-action">
+                  <a href="#" id="download-exported-button" class="action action-primary">
+                      %if library:
+                          ${_("Download Exported Library")}
+                      %else:
+                          ${_("Download Exported Course")}
+                      %endif
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </li>
+        </ol>
+      </div>
+
     %if not library:
       <div class="export-contents">
         <div class="export-includes">

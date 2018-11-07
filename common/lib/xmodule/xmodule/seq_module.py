@@ -14,7 +14,6 @@ from lxml import etree
 from xblock.core import XBlock
 from xblock.fields import Integer, Scope, Boolean, String
 from xblock.fragment import Fragment
-import newrelic.agent
 
 from .exceptions import NotFoundError
 from .fields import Date
@@ -24,6 +23,11 @@ from .x_module import XModule, STUDENT_VIEW
 from .xml_module import XmlDescriptor
 
 log = logging.getLogger(__name__)
+
+try:
+    import newrelic.agent
+except ImportError:
+    newrelic = None  # pylint: disable=invalid-name
 
 # HACK: This shouldn't be hard-coded to two types
 # OBSOLETE: This obsoletes 'type'
@@ -202,16 +206,16 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         raise NotFoundError('Unexpected dispatch type')
 
     @classmethod
-    def verify_current_content_visibility(cls, due, hide_after_due):
+    def verify_current_content_visibility(cls, date, hide_after_date):
         """
         Returns whether the content visibility policy passes
-        for the given due date and hide_after_due values and
+        for the given date and hide_after_date values and
         the current date-time.
         """
         return (
-            not due or
-            not hide_after_due or
-            datetime.now(UTC()) < due
+            not date or
+            not hide_after_date or
+            datetime.now(UTC()) < date
         )
 
     def student_view(self, context):
@@ -246,20 +250,17 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         runtime user. If so, returns a banner_text or the fragment to
         display depending on whether staff is masquerading.
         """
-        if not self._can_user_view_content():
-            subsection_format = (self.format or _("subsection")).lower()  # pylint: disable=no-member
-
-            # Translators: subsection_format refers to the assignment
-            # type of the subsection, such as Homework, Lab, Exam, etc.
-            banner_text = _(
-                "Because the due date has passed, "
-                "this {subsection_format} is hidden from the learner."
-            ).format(subsection_format=subsection_format)
+        course = self._get_course()
+        if not self._can_user_view_content(course):
+            if course.self_paced:
+                banner_text = _("Because the course has ended, this assignment is hidden from the learner.")
+            else:
+                banner_text = _("Because the due date has passed, this assignment is hidden from the learner.")
 
             hidden_content_html = self.system.render_template(
                 'hidden_content.html',
                 {
-                    'subsection_format': subsection_format,
+                    'self_paced': course.self_paced,
                     'progress_url': context.get('progress_url'),
                 }
             )
@@ -280,14 +281,15 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             if content_milestones and self.runtime.user_is_staff:
                 return banner_text
 
-    def _can_user_view_content(self):
+    def _can_user_view_content(self, course):
         """
         Returns whether the runtime user can view the content
         of this sequential.
         """
+        hidden_date = course.end if course.self_paced else self.due
         return (
             self.runtime.user_is_staff or
-            self.verify_current_content_visibility(self.due, self.hide_after_due)
+            self.verify_current_content_visibility(hidden_date, self.hide_after_due)
         )
 
     def _student_view(self, context, banner_text=None):
@@ -387,6 +389,8 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         """
         Capture basic information about this sequence in New Relic.
         """
+        if not newrelic:
+            return
         newrelic.agent.add_custom_parameter('seq.block_id', unicode(self.location))
         newrelic.agent.add_custom_parameter('seq.display_name', self.display_name or '')
         newrelic.agent.add_custom_parameter('seq.position', self.position)
@@ -398,6 +402,8 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         the sequence as a whole. We send this information to New Relic so that
         we can do better performance analysis of courseware.
         """
+        if not newrelic:
+            return
         # Basic count of the number of Units (a.k.a. VerticalBlocks) we have in
         # this learning sequence
         newrelic.agent.add_custom_parameter('seq.num_units', len(display_items))
@@ -416,6 +422,8 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         """
         Capture information about the current selected Unit within the Sequence.
         """
+        if not newrelic:
+            return
         # Positions are stored with indexing starting at 1. If we get into a
         # weird state where the saved position is out of bounds (e.g. the
         # content was changed), avoid going into any details about this unit.
@@ -515,7 +523,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
 
 class SequenceDescriptor(SequenceFields, ProctoringFields, MakoModuleDescriptor, XmlDescriptor):
     """
-    A Sequences Descriptor object
+    A Sequence's Descriptor object
     """
     mako_template = 'widgets/sequence-edit.html'
     module_class = SequenceModule

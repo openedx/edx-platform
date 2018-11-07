@@ -12,20 +12,17 @@ file and check it in at the same time as your model changes. To do that,
 ASSUMPTIONS: modules have unique IDs, even across different module_types
 
 """
-import logging
 import itertools
+import logging
 
-from django.contrib.auth.models import User
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
-
 from model_utils.models import TimeStampedModel
-import coursewarehistoryextended
 
-from openedx.core.djangoapps.xmodule_django.models import (
-    CourseKeyField, LocationKeyField, BlockTypeKeyField
-)
+import coursewarehistoryextended
+from openedx.core.djangoapps.xmodule_django.models import BlockTypeKeyField, CourseKeyField, LocationKeyField
 
 log = logging.getLogger("edx.courseware")
 

@@ -1,27 +1,31 @@
+# -*- coding: utf-8 -*-
 """Tests for account creation"""
-from datetime import datetime
 import json
 import unittest
+from datetime import datetime
+from importlib import import_module
 
 import ddt
+import mock
+import pytz
 from django.conf import settings
-from django.contrib.auth.models import User, AnonymousUser
+from django.contrib.auth.models import AnonymousUser, User
 from django.core.urlresolvers import reverse
 from django.test import TestCase, TransactionTestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from django.utils.importlib import import_module
-import mock
-import pytz
+from mock import patch
 
-from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
-from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
+import student
+from django_comment_common.models import ForumsConfig
 from notification_prefs import NOTIFICATION_PREF_KEY
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
-import student
+from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
+from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
+from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
+from student.forms import USERNAME_INVALID_CHARS_ASCII, USERNAME_INVALID_CHARS_UNICODE
 from student.models import UserAttribute
-from student.views import REGISTRATION_AFFILIATE_ID, REGISTRATION_UTM_PARAMETERS, REGISTRATION_UTM_CREATED_AT
-from django_comment_common.models import ForumsConfig
+from student.views import REGISTRATION_AFFILIATE_ID, REGISTRATION_UTM_CREATED_AT, REGISTRATION_UTM_PARAMETERS
 
 TEST_CS_URL = 'https://comments.service.test:123/'
 
@@ -42,7 +46,7 @@ TEST_CS_URL = 'https://comments.service.test:123/'
         ]
     }
 )
-class TestCreateAccount(TestCase):
+class TestCreateAccount(SiteMixin, TestCase):
     """Tests for account creation"""
 
     def setUp(self):
@@ -74,12 +78,12 @@ class TestCreateAccount(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(get_user_preference(user, LANGUAGE_KEY), lang)
 
-    def create_account_and_fetch_profile(self):
+    def create_account_and_fetch_profile(self, host='microsite.example.com'):
         """
         Create an account with self.params, assert that the response indicates
         success, and return the UserProfile object for the newly created user
         """
-        response = self.client.post(self.url, self.params, HTTP_HOST="microsite.example.com")
+        response = self.client.post(self.url, self.params, HTTP_HOST=host)
         self.assertEqual(response.status_code, 200)
         user = User.objects.get(username=self.username)
         return user.profile
@@ -223,6 +227,7 @@ class TestCreateAccount(TestCase):
         """
 
         request = self.request_factory.post(self.url, self.params)
+        request.site = self.site
         # now indicate we are doing ext_auth by setting 'ExternalAuthMap' in the session.
         request.session = import_module(settings.SESSION_ENGINE).SessionStore()  # empty session
         extauth = ExternalAuthMap(external_id='withmap@stanford.edu',
@@ -404,6 +409,18 @@ class TestCreateAccount(TestCase):
                 UserAttribute.get_user_attribute(user, REGISTRATION_UTM_CREATED_AT)
             )
 
+    @patch("openedx.core.djangoapps.site_configuration.helpers.get_value", mock.Mock(return_value=False))
+    def test_create_account_not_allowed(self):
+        """
+        Test case to check user creation is forbidden when ALLOW_PUBLIC_ACCOUNT_CREATION feature flag is turned off
+        """
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_created_on_site_user_attribute_set(self):
+        profile = self.create_account_and_fetch_profile(host=self.site.domain)
+        self.assertEqual(UserAttribute.get_user_attribute(profile.user, 'created_on_site'), self.site.domain)
+
 
 @ddt.ddt
 class TestCreateAccountValidation(TestCase):
@@ -472,8 +489,7 @@ class TestCreateAccountValidation(TestCase):
 
         # Invalid
         params["username"] = "invalid username"
-        assert_username_error("Usernames can only contain Roman letters, western numerals (0-9), underscores (_), and "
-                              "hyphens (-).")
+        assert_username_error(str(USERNAME_INVALID_CHARS_ASCII))
 
     def test_email(self):
         params = dict(self.minimal_params)
@@ -720,3 +736,66 @@ class TestCreateCommentsServiceUser(TransactionTestCase):
             User.objects.get(username=self.username)
         self.assertTrue(register.called)
         self.assertFalse(request.called)
+
+
+class TestUnicodeUsername(TestCase):
+    """
+    Test for Unicode usernames which is an optional feature.
+    """
+
+    def setUp(self):
+        super(TestUnicodeUsername, self).setUp()
+        self.url = reverse('create_account')
+
+        # The word below reads "Omar II", in Arabic. It also contains a space and
+        # an Eastern Arabic Number another option is to use the Esperanto fake
+        # language but this was used instead to test non-western letters.
+        self.username = u'عمر ٢'
+
+        self.url_params = {
+            'username': self.username,
+            'email': 'unicode_user@example.com',
+            "password": "testpass",
+            'name': 'unicode_user',
+            'terms_of_service': 'true',
+            'honor_code': 'true',
+        }
+
+    @patch.dict(settings.FEATURES, {'ENABLE_UNICODE_USERNAME': False})
+    def test_with_feature_disabled(self):
+        """
+        Ensures backward-compatible defaults.
+        """
+        response = self.client.post(self.url, self.url_params)
+
+        self.assertEquals(response.status_code, 400)
+        obj = json.loads(response.content)
+        self.assertEquals(USERNAME_INVALID_CHARS_ASCII, obj['value'])
+
+        with self.assertRaises(User.DoesNotExist):
+            User.objects.get(email=self.url_params['email'])
+
+    @patch.dict(settings.FEATURES, {'ENABLE_UNICODE_USERNAME': True})
+    def test_with_feature_enabled(self):
+        response = self.client.post(self.url, self.url_params)
+        self.assertEquals(response.status_code, 200)
+
+        self.assertTrue(User.objects.get(email=self.url_params['email']))
+
+    @patch.dict(settings.FEATURES, {'ENABLE_UNICODE_USERNAME': True})
+    def test_special_chars_with_feature_enabled(self):
+        """
+        Ensures that special chars are still prevented.
+        """
+
+        invalid_params = self.url_params.copy()
+        invalid_params['username'] = '**john**'
+
+        response = self.client.post(self.url, invalid_params)
+        self.assertEquals(response.status_code, 400)
+
+        obj = json.loads(response.content)
+        self.assertEquals(USERNAME_INVALID_CHARS_UNICODE, obj['value'])
+
+        with self.assertRaises(User.DoesNotExist):
+            User.objects.get(email=self.url_params['email'])

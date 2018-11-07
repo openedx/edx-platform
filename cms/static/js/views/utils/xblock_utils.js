@@ -2,11 +2,12 @@
  * Provides utilities for views to work with xblocks.
  */
 define(['jquery', 'underscore', 'gettext', 'common/js/components/utils/view_utils', 'js/utils/module',
-        'edx-ui-toolkit/js/utils/string-utils'],
-    function($, _, gettext, ViewUtils, ModuleUtils, StringUtils) {
+        'js/models/xblock_info', 'edx-ui-toolkit/js/utils/string-utils'],
+    function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
         'use strict';
         var addXBlock, duplicateXBlock, deleteXBlock, createUpdateRequestData, updateXBlockField, VisibilityState,
-            getXBlockVisibilityClass, getXBlockListTypeClass, updateXBlockFields, getXBlockType;
+            getXBlockVisibilityClass, getXBlockListTypeClass, updateXBlockFields, getXBlockType, findXBlockInfo,
+            moveXBlock;
 
         /**
          * Represents the possible visibility states for an xblock:
@@ -88,6 +89,34 @@ define(['jquery', 'underscore', 'gettext', 'common/js/components/utils/view_util
                         duplicationOperation.reject();
                     });
                     return duplicationOperation.promise();
+                });
+        };
+
+        /**
+         * Moves the specified xblock in a new parent xblock.
+         * @param {String}  sourceLocator  Locator of xblock element to be moved.
+         * @param {String}  targetParentLocator  Locator of the target parent xblock, moved xblock would be placed
+         *      under this xblock.
+         * @param {Integer}  targetIndex  Intended index position of the xblock in parent xblock. If provided,
+         *      xblock would be placed at the particular index in the parent xblock.
+         * @returns {jQuery promise} A promise representing the moving of the xblock.
+         */
+        moveXBlock = function(sourceLocator, targetParentLocator, targetIndex) {
+            var moveOperation = $.Deferred(),
+                operationText = targetIndex !== undefined ? gettext('Undo moving') : gettext('Moving');
+            return ViewUtils.runOperationShowingMessage(operationText,
+                function() {
+                    $.patchJSON(ModuleUtils.getUpdateUrl(), {
+                        move_source_locator: sourceLocator,
+                        parent_locator: targetParentLocator,
+                        target_index: targetIndex
+                    }, function(response) {
+                        moveOperation.resolve(response);
+                    })
+                    .fail(function() {
+                        moveOperation.reject();
+                    });
+                    return moveOperation.promise();
                 });
         };
 
@@ -240,15 +269,44 @@ define(['jquery', 'underscore', 'gettext', 'common/js/components/utils/view_util
             return xblockType;
         };
 
+        findXBlockInfo = function(xblockWrapperElement, defaultXBlockInfo) {
+            var xblockInfo = defaultXBlockInfo,
+                xblockElement,
+                displayName,
+                hasChildren;
+            if (xblockWrapperElement.length > 0) {
+                xblockElement = xblockWrapperElement.find('.xblock');
+                displayName = xblockWrapperElement.find(
+                    '.xblock-header .header-details .xblock-display-name'
+                ).text().trim();
+                // If not found, try looking for the old unit page style rendering.
+                // Only used now by static pages.
+                if (!displayName) {
+                    displayName = xblockElement.find('.component-header').text().trim();
+                }
+                hasChildren = defaultXBlockInfo ? defaultXBlockInfo.get('has_children') : false;
+                xblockInfo = new XBlockInfo({
+                    id: xblockWrapperElement.data('locator'),
+                    courseKey: xblockWrapperElement.data('course-key'),
+                    category: xblockElement.data('block-type'),
+                    display_name: displayName,
+                    has_children: hasChildren
+                });
+            }
+            return xblockInfo;
+        };
+
         return {
-            'VisibilityState': VisibilityState,
-            'addXBlock': addXBlock,
+            VisibilityState: VisibilityState,
+            addXBlock: addXBlock,
+            moveXBlock: moveXBlock,
             duplicateXBlock: duplicateXBlock,
-            'deleteXBlock': deleteXBlock,
-            'updateXBlockField': updateXBlockField,
-            'getXBlockVisibilityClass': getXBlockVisibilityClass,
-            'getXBlockListTypeClass': getXBlockListTypeClass,
-            'updateXBlockFields': updateXBlockFields,
-            'getXBlockType': getXBlockType
+            deleteXBlock: deleteXBlock,
+            updateXBlockField: updateXBlockField,
+            getXBlockVisibilityClass: getXBlockVisibilityClass,
+            getXBlockListTypeClass: getXBlockListTypeClass,
+            updateXBlockFields: updateXBlockFields,
+            getXBlockType: getXBlockType,
+            findXBlockInfo: findXBlockInfo
         };
     });

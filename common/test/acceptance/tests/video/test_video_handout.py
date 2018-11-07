@@ -4,6 +4,7 @@
 Acceptance tests for CMS Video Handout.
 """
 from nose.plugins.attrib import attr
+
 from common.test.acceptance.tests.video.test_studio_video_module import CMSVideoBaseTest
 
 
@@ -12,9 +13,6 @@ class VideoHandoutTest(CMSVideoBaseTest):
     """
     CMS Video Handout Test Class
     """
-
-    def setUp(self):
-        super(VideoHandoutTest, self).setUp()
 
     def _create_course_unit_with_handout(self, handout_filename, save_settings=True):
         """

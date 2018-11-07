@@ -1,11 +1,10 @@
 """
 Base class for account settings page.
 """
-from common.test.acceptance.pages.lms import BASE_URL
-
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise
 
+from common.test.acceptance.pages.lms import BASE_URL
 from common.test.acceptance.pages.lms.fields import FieldsMixin
 
 
@@ -72,7 +71,7 @@ class AccountSettingsPage(FieldsMixin, PageObject):
     def get_value_of_order_history_row_item(self, field_id, field_name):
         """ Return the text value of the provided order field name."""
         query = self.q(css='.u-field-{} .u-field-order-{}'.format(field_id, field_name))
-        return query.text[0] if query.present else None
+        return query.text if query.present else None
 
     def order_button_is_visible(self, field_id):
         """ Check that if hovering over the order history row shows the

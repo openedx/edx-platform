@@ -1,54 +1,63 @@
 <div class="text-section">
-    <h3 id="program-<%- id %>" class="title hd-3"><%- gettext(name) %></h3>
+    <h3 id="program-<%- uuid %>" class="title hd-3"><%- gettext(title) %></h3>
     <div class="meta-info grid-container">
         <div class="organization col"><%- orgList %></div>
         <div class="category col col-last">
-            <span class="category-text"><%- gettext(category) %></span>
-            <span class="category-icon <%- category.toLowerCase() %>-icon" aria-hidden="true"></span>
+            <span class="category-text"><%- gettext(type) %></span>
+            <span class="category-icon <%- type.toLowerCase() %>-icon" aria-hidden="true"></span>
         </div>
     </div>
-  <% if (progress) { %>  
-    <p class="certificate-status">
-        <a href="<%- detailUrl %>" class="status-text secondary" aria-describedby="program-<%- id %>"><%= interpolate(
-            ngettext(
-                '%(count)s course is in progress.',
-                '%(count)s courses are in progress.',
-                progress.total.in_progress
-            ),
-            {count: progress.total.in_progress}, true 
-        ) %></a>
-
-        <a href="<%- detailUrl %>" class="status-text secondary" aria-describedby="program-<%- id %>"><%= interpolate(
-            ngettext(
-                '%(count)s course has not been started.',
-                '%(count)s courses have not been started.',
-                progress.total.not_started
-            ),
-            {count: progress.total.not_started}, true 
-        ) %></a>
-
-        <span id="status-<%- id %>" class="status-text"><%= interpolate(
-            gettext('You have earned certificates in %(completed_courses)s of the %(total_courses)s courses so far.'),
-            {completed_courses: progress.total.completed, total_courses: progress.total.courses}, true
-        ) %></span>
-    </p>
-  <% } %>
 </div>
 <% if (progress) { %>
-<div class="progress">
-    <div class="bar complete" style="width:<%- progress.percentage.completed %>;"></div>
-    <div class="bar in-progress" style="width:<%- progress.percentage.in_progress %>;"></div>
-    <div class="bar not-started"></div>
-</div>
+    <div class="status-text">
+        <div class="number-status">
+            <div class="number-circle completed"><%- progress.completed %></div>
+            <span class="sr-only">
+                <%- ngettext('Course', 'Courses', progress.completed) %>
+            </span>
+            <%- gettext('Completed') %>
+        </div>
+
+        <div class="number-status">
+            <div class="number-circle enrolled"><%- progress.in_progress %></div>
+            <span class="sr-only">
+                <%- ngettext('Course', 'Courses', progress.in_progress) %>
+            </span>
+            <%- gettext('In Progress') %>
+        </div>
+
+        <div class="number-status">
+            <div class="number-circle not-enrolled"><%- progress.not_started %></div>
+            <span class="sr-only">
+                <%- ngettext('Course', 'Courses', progress.not_started) %>
+            </span>
+            <%- gettext('Remaining') %>
+        </div>
+    </div>
+<% } %>
+<% if (progress) { %>
+    <div class="progress-container">
+      <div class="progress-bar">
+        <% _.times(progress.completed, function() { %>
+            <div class="item completed"></div>
+        <% }) %>
+        <% _.times(progress.in_progress, function() { %>
+            <div class="item enrolled"></div>
+        <% }) %>
+        <% _.times(progress.not_started, function() { %>
+            <div class="item not-enrolled"></div>
+        <% }) %>
+      </div>
+    </div>
 <% } %>
 <a href="<%- detailUrl %>" class="card-link">
     <div class="banner-image-container">
         <picture>
-            <source srcset="<%- smallBannerUrl %>" media="(max-width: <%- breakpoints.max.tiny %>)">
-            <source srcset="<%- mediumBannerUrl %>" media="(max-width: <%- breakpoints.max.small %>)">
-            <source srcset="<%- largeBannerUrl %>" media="(max-width: <%- breakpoints.max.medium %>)">
-            <source srcset="<%- smallBannerUrl %>" media="(max-width: <%- breakpoints.max.large %>)">
-            <img class="banner-image" srcset="<%- mediumBannerUrl %>" alt="<%= interpolate(gettext('%(programName)s Home Page.'), {programName: name}, true)%>">
+            <source srcset="<%- xsmallBannerUrl %>" media="(max-width: <%- breakpoints.max.xsmall %>)">
+            <source srcset="<%- smallBannerUrl %>" media="(max-width: <%- breakpoints.max.small %>)">
+            <source srcset="<%- mediumBannerUrl %>" media="(max-width: <%- breakpoints.max.medium %>)">
+            <source srcset="<%- xsmallBannerUrl %>" media="(max-width: <%- breakpoints.max.large %>)">
+            <img class="banner-image" srcset="<%- smallBannerUrl %>" alt="<%= interpolate(gettext('%(programName)s Home Page.'), {programName: title}, true)%>">
         </picture>
     </div>
 </a>

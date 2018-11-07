@@ -13,7 +13,6 @@ def _listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable
     Catches the signal that a course has been published in Studio and
     updates the corresponding CourseOverview cache entry.
     """
-    CourseOverview.objects.filter(id=course_key).delete()
     CourseOverview.load_from_module_store(course_key)
 
 

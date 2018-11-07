@@ -1,19 +1,19 @@
 """ Search index used to load data into elasticsearch"""
 
 import logging
-from elasticsearch.exceptions import ConnectionError
+from functools import wraps
 
 from django.conf import settings
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 from django.utils import translation
-from functools import wraps
-
+from elasticsearch.exceptions import ConnectionError
 from search.search_engine_base import SearchEngine
+
+from lms.djangoapps.teams.models import CourseTeam
 from request_cache import get_request_or_stub
 
 from .errors import ElasticSearchConnectionError
-from lms.djangoapps.teams.models import CourseTeam
 from .serializers import CourseTeamSerializer
 
 

@@ -1,3 +1,4 @@
+<%namespace name='static' file='/static_content.html'/>
 <%page expression_filter="h"/>
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "login" %></%def>
@@ -15,7 +16,9 @@ from openedx.core.djangolib.js_utils import js_escaped_string
   <section class="content">
     <header>
       <h1 class="title title-1">${_("Sign In to {studio_name}").format(studio_name=settings.STUDIO_NAME)}</h1>
-      <a href="${reverse('signup')}" class="action action-signin">${_("Don't have a {studio_name} Account? Sign up!").format(studio_name=settings.STUDIO_SHORT_NAME)}</a>
+      % if static.get_value('ALLOW_PUBLIC_ACCOUNT_CREATION', settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION')):
+          <a href="${reverse('signup')}" class="action action-signin">${_("Don't have a {studio_name} Account? Sign up!").format(studio_name=settings.STUDIO_SHORT_NAME)}</a>
+      % endif
     </header>
 
     <article class="content-primary" role="main">

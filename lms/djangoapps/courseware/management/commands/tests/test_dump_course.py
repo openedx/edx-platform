@@ -3,22 +3,23 @@
 """Tests for Django management commands"""
 
 import json
-from nose.plugins.attrib import attr
-from path import Path as path
 import shutil
-from StringIO import StringIO
 import tarfile
+from StringIO import StringIO
 from tempfile import mkdtemp
-import factory
 
+import factory
 from django.conf import settings
 from django.core.management import call_command
+from nose.plugins.attrib import attr
+from path import Path as path
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MONGO_MODULESTORE, TEST_DATA_SPLIT_MODULESTORE
+    TEST_DATA_MONGO_MODULESTORE,
+    TEST_DATA_SPLIT_MODULESTORE,
+    SharedModuleStoreTestCase
 )
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.xml_importer import import_course_from_xml
@@ -38,6 +39,7 @@ class CommandsTestBase(SharedModuleStoreTestCase):
     """
     __test__ = False
     url_name = '2012_Fall'
+    ENABLED_SIGNALS = ['course_published']
 
     @classmethod
     def setUpClass(cls):

@@ -2,11 +2,13 @@
 Tests for the fake payment page used in acceptance tests.
 """
 
+from collections import OrderedDict
+
 from django.test import TestCase
+
 from shoppingcart.processors.CyberSource2 import sign, verify_signatures
 from shoppingcart.processors.exceptions import CCProcessorSignatureException
 from shoppingcart.tests.payment_fake import PaymentFakeView
-from collections import OrderedDict
 
 
 class PaymentFakeViewTest(TestCase):

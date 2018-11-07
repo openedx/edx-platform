@@ -5,7 +5,6 @@ from django.conf.urls import patterns, url
 
 from lms.djangoapps.verify_student import views
 
-
 urlpatterns = patterns(
     '',
 
@@ -104,18 +103,6 @@ urlpatterns = patterns(
         r'^reverify$',
         views.ReverifyView.as_view(),
         name="verify_student_reverify"
-    ),
-
-    # Endpoint for in-course reverification
-    # Users are sent to this end-point from within courseware
-    # to re-verify their identities by re-submitting face photos.
-    url(
-        r'^reverify/{course_id}/{usage_id}/$'.format(
-            course_id=settings.COURSE_ID_PATTERN,
-            usage_id=settings.USAGE_ID_PATTERN
-        ),
-        views.InCourseReverifyView.as_view(),
-        name="verify_student_incourse_reverify"
     ),
 )
 

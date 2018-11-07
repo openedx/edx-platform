@@ -77,7 +77,7 @@ def get_editable_fields(cc_content, context):
         ret |= {"following", "read"}
         if _is_author_or_privileged(cc_content, context):
             ret |= {"topic_id", "type", "title"}
-        if context["is_requester_privileged"] and context["course"].is_cohorted:
+        if context["is_requester_privileged"] and context["discussion_division_enabled"]:
             ret |= {"group_id"}
 
     # Comment fields

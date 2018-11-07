@@ -1221,11 +1221,41 @@
 
   // CASE: is pending
   &.is-pending {
+    border-top: 3px solid $active-color !important;
 
     .status-data-message {
       color: $m-gray-d3;
       border-bottom-color: $m-gray-l4;
     }
+  }
+
+  // Warning for status verification
+  &.warning {
+     border-top: 3px solid #ffc01f !important;
+
+    .status-title {
+      font-weight: 400 !important;
+
+      .fa {
+        color: #ffc01f;
+      }
+    }
+
+    .btn {
+      font-size: 16px;
+      line-height: 25.16px;
+      padding: 10px 10px;
+      border: 1px solid #0079bc;
+      color: #0079bc;
+      text-decoration: none;
+      display: block;
+    }
+    .btn:hover {
+      cursor: pointer;
+      color: #fff;
+      background-color: #0079bc;
+    }
+
   }
 }
 
@@ -1391,3 +1421,80 @@ a.fade-cover{
   }
 }
 
+// Dashboard alert messages
+.activation-message-container {
+  @include clearfix();
+  margin: 0 auto 0;
+  padding-top: ($baseline/2);
+  max-width: grid-width(12);
+  min-width: 760px;
+  width: flex-grid(12);
+}
+
+.account-activation {
+
+  .message-copy {
+    position: relative;
+    left: 2em;
+    padding: 1em;
+  }
+
+  .message-title {
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  &.info {
+    color: $palette-info-text;
+    background-color: $palette-info-back;
+    border: $palette-info-border 1px solid;
+    padding: 5px;
+
+    .message-title{
+      margin-bottom: 0;
+    }
+
+    &.aa-icon .message-copy:before {
+      position: absolute;
+      left: -1em;
+      content: "\f05a";  // fa-info-circle
+      font-size: 1.5em;
+      padding: 0 2px;
+      font-family: FontAwesome;
+    }
+  }
+
+  &.success {
+    color: $palette-success-text;
+    background-color: $palette-success-back;
+    border: $palette-success-border 1px solid;
+
+    &.aa-icon .message-copy:before {
+      position: absolute;
+      left: -1em;
+      content: "\f00c";  // fa-check
+      font-size: 1.5em;
+      padding: 0 2px;
+      font-family: FontAwesome;
+    }
+  }
+
+  &.error {
+    color: $palette-error-text;
+    background-color: $palette-error-back;
+    border: $palette-error-border 1px solid;
+
+    &.aa-icon .message-copy:before {
+      position: absolute;
+      left: -1em;
+      content: "\f06a";  // fa-exclamation-circle
+      font-size: 1.5em;
+      padding: 0 2px;
+      font-family: FontAwesome;
+    }
+
+    a {
+      text-decoration: underline;
+    }
+  }
+}

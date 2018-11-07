@@ -2,16 +2,16 @@
 Asynchronous tasks for the CCX app.
 """
 
-from django.dispatch import receiver
 import logging
 
+from ccx_keys.locator import CCXLocator
+from django.dispatch import receiver
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseLocator
-from ccx_keys.locator import CCXLocator
-from xmodule.modulestore.django import SignalHandler
-from lms import CELERY_APP
 
+from lms import CELERY_APP
 from lms.djangoapps.ccx.models import CustomCourseForEdX
+from xmodule.modulestore.django import SignalHandler
 
 log = logging.getLogger("edx.ccx")
 

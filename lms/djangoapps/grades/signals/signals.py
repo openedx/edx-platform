@@ -3,6 +3,9 @@ Grades related signals.
 """
 from django.dispatch import Signal
 
+# Signal that indicates that a user's grade for a course has been updated.
+# This is a downstream signal of SUBSECTION_SCORE_CHANGED.
+from openedx.core.djangoapps.signals.signals import COURSE_GRADE_CHANGED
 
 # Signal that indicates that a user's raw score for a problem has been updated.
 # This signal is generated when a scoring event occurs within the core
@@ -22,6 +25,7 @@ PROBLEM_RAW_SCORE_CHANGED = Signal(
                             # made only if the new score is higher than previous.
         'modified',  # A datetime indicating when the database representation of
                      # this the problem score was saved.
+        'score_db_table',  # The database table that houses the score that changed.
     ]
 )
 
@@ -35,6 +39,7 @@ PROBLEM_RAW_SCORE_CHANGED = Signal(
 PROBLEM_WEIGHTED_SCORE_CHANGED = Signal(
     providing_args=[
         'user_id',  # Integer User ID
+        'anonymous_user_id',  # Anonymous User ID
         'course_id',  # Unicode string representing the course
         'usage_id',  # Unicode string indicating the courseware instance
         'weighted_earned',   # Score obtained by the user
@@ -43,6 +48,7 @@ PROBLEM_WEIGHTED_SCORE_CHANGED = Signal(
                             # made only if the new score is higher than previous.
         'modified',  # A datetime indicating when the database representation of
                      # this the problem score was saved.
+        'score_db_table',  # The database table that houses the score that changed.
     ]
 )
 
@@ -59,6 +65,7 @@ SCORE_PUBLISHED = Signal(
         'raw_possible',  # Maximum score available for the exercise
         'only_if_higher',   # Boolean indicating whether updates should be
                             # made only if the new score is higher than previous.
+        'score_db_table',  # The database table that houses the score that changed.
     ]
 )
 

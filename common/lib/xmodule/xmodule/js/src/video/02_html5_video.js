@@ -1,3 +1,4 @@
+/* eslint-disable no-console, no-param-reassign */
 /**
  * @file HTML5 video player module. Provides methods to control the in-browser
  * HTML5 video player.
@@ -16,11 +17,81 @@
 (function(requirejs, require, define) {
     define(
 'video/02_html5_video.js',
-[],
-function() {
+['underscore'],
+function(_) {
     var HTML5Video = {};
 
     HTML5Video.Player = (function() {
+        /*
+         * Constructor function for HTML5 Video player.
+         *
+         * @param {String|Object} el A DOM element where the HTML5 player will
+         * be inserted (as returned by jQuery(selector) function), or a
+         * selector string which will be used to select an element. This is a
+         * required parameter.
+         *
+         * @param config - An object whose properties will be used as
+         * configuration options for the HTML5 video player. This is an
+         * optional parameter. In the case if this parameter is missing, or
+         * some of the config object's properties are missing, defaults will be
+         * used. The available options (and their defaults) are as
+         * follows:
+         *
+         *     config = {
+         *
+         *        videoSources: [],   // An array with properties being video
+         *                            // sources. The property name is the
+         *                            // video format of the source. Supported
+         *                            // video formats are: 'mp4', 'webm', and
+         *                            // 'ogg'.
+         *
+         *          events: {         // Object's properties identify the
+         *                            // events that the API fires, and the
+         *                            // functions (event listeners) that the
+         *                            // API will call when those events occur.
+         *                            // If value is null, or property is not
+         *                            // specified, then no callback will be
+         *                            // called for that event.
+         *
+         *              onReady: null,
+         *              onStateChange: null
+         *          }
+         *     }
+         */
+        function Player(el, config) {
+            var errorMessage, lastSource, sourceList;
+
+            // Create HTML markup for individual sources of the HTML5 <video> element.
+            sourceList = $.map(config.videoSources, function(source) {
+                return [
+                    '<source ',
+                    'src="', source,
+            // Following hack allows to open the same video twice
+            // https://code.google.com/p/chromium/issues/detail?id=31014
+            // Check whether the url already has a '?' inside, and if so,
+            // use '&' instead of '?' to prevent breaking the url's integrity.
+                        (source.indexOf('?') === -1 ? '?' : '&'),
+                    (new Date()).getTime(), '" />'
+                ].join('');
+            });
+
+            // do common initialization independent of player type
+            this.init(el, config);
+
+            // Create HTML markup for the <video> element, populating it with
+            // sources from previous step. Set playback not supported error message.
+            errorMessage = [
+                gettext('This browser cannot play .mp4, .ogg, or .webm files.'),
+                gettext('Try using a different browser, such as Google Chrome.')
+            ].join('');
+            this.video.innerHTML = sourceList.join('') + errorMessage;
+
+            lastSource = this.videoEl.find('source').last();
+            lastSource.on('error', this.showErrorMessage.bind(this));
+            lastSource.on('error', this.onError.bind(this));
+            this.videoEl.on('error', this.onError.bind(this));
+        }
+
         Player.prototype.callStateChangeCallback = function() {
             if ($.isFunction(this.config.events.onStateChange)) {
                 this.config.events.onStateChange({
@@ -89,27 +160,29 @@ function() {
             return [0.75, 1.0, 1.25, 1.5];
         };
 
+        // eslint-disable-next-line no-underscore-dangle
         Player.prototype._getLogs = function() {
             return this.logs;
         };
 
-        Player.prototype.showErrorMessage = function() {
+        Player.prototype.showErrorMessage = function(event, css) {
+            var cssSelecter = css || '.video-player .video-error';
             this.el
                 .find('.video-player div')
                     .addClass('hidden')
                 .end()
-                .find('.video-player .video-error')
+                .find(cssSelecter)
                     .removeClass('is-hidden')
                 .end()
                     .addClass('is-initialized')
                 .find('.spinner')
                     .attr({
                         'aria-hidden': 'true',
-                        'tabindex': -1
+                        tabindex: -1
                     });
         };
 
-        Player.prototype.onError = function(event) {
+        Player.prototype.onError = function() {
             if ($.isFunction(this.config.events.onError)) {
                 this.config.events.onError();
             }
@@ -122,11 +195,16 @@ function() {
             this.video.removeEventListener('pause', this.onPause, false);
             this.video.removeEventListener('ended', this.onEnded, false);
             this.el
-                .find('.video-player div').removeClass('is-hidden')
+                .find('.video-player div')
+                .removeClass('is-hidden')
                 .end()
-                .find('.video-player .video-error').addClass('is-hidden')
-                .end().removeClass('is-initialized')
-                .find('.spinner').attr({'aria-hidden': 'false'});
+                .find('.video-player .video-error')
+                .addClass('is-hidden')
+                .end()
+                .removeClass('is-initialized')
+                .find('.spinner')
+                .attr({'aria-hidden': 'false'});
+            this.videoEl.off('remove');
             this.videoEl.remove();
         };
 
@@ -134,22 +212,26 @@ function() {
             this.playerState = HTML5Video.PlayerState.PAUSED;
             if ($.isFunction(this.config.events.onReady)) {
                 this.config.events.onReady(null);
+                this.videoOverlayEl.removeClass('is-hidden');
             }
         };
 
         Player.prototype.onPlay = function() {
             this.playerState = HTML5Video.PlayerState.BUFFERING;
             this.callStateChangeCallback();
+            this.videoOverlayEl.addClass('is-hidden');
         };
 
         Player.prototype.onPlaying = function() {
             this.playerState = HTML5Video.PlayerState.PLAYING;
             this.callStateChangeCallback();
+            this.videoOverlayEl.addClass('is-hidden');
         };
 
         Player.prototype.onPause = function() {
             this.playerState = HTML5Video.PlayerState.PAUSED;
             this.callStateChangeCallback();
+            this.videoOverlayEl.removeClass('is-hidden');
         };
 
         Player.prototype.onEnded = function() {
@@ -157,167 +239,67 @@ function() {
             this.callStateChangeCallback();
         };
 
-        return Player;
+        Player.prototype.init = function(el, config) {
+            var isTouch = window.onTouchBasedDevice() || '',
+                events = ['loadstart', 'progress', 'suspend', 'abort', 'error',
+                    'emptied', 'stalled', 'play', 'pause', 'loadedmetadata',
+                    'loadeddata', 'waiting', 'playing', 'canplay', 'canplaythrough',
+                    'seeking', 'seeked', 'timeupdate', 'ended', 'ratechange',
+                    'durationchange', 'volumechange'
+                ],
+                self = this,
+                callback;
 
-        /*
-         * Constructor function for HTML5 Video player.
-         *
-         * @param {String|Object} el A DOM element where the HTML5 player will
-         * be inserted (as returned by jQuery(selector) function), or a
-         * selector string which will be used to select an element. This is a
-         * required parameter.
-         *
-         * @param config - An object whose properties will be used as
-         * configuration options for the HTML5 video player. This is an
-         * optional parameter. In the case if this parameter is missing, or
-         * some of the config object's properties are missing, defaults will be
-         * used. The available options (and their defaults) are as
-         * follows:
-         *
-         *     config = {
-         *
-         *        videoSources: [],   // An array with properties being video
-         *                            // sources. The property name is the
-         *                            // video format of the source. Supported
-         *                            // video formats are: 'mp4', 'webm', and
-         *                            // 'ogg'.
-         *
-         *          events: {         // Object's properties identify the
-         *                            // events that the API fires, and the
-         *                            // functions (event listeners) that the
-         *                            // API will call when those events occur.
-         *                            // If value is null, or property is not
-         *                            // specified, then no callback will be
-         *                            // called for that event.
-         *
-         *              onReady: null,
-         *              onStateChange: null
-         *          }
-         *     }
-         */
-        function Player(el, config) {
-            var isTouch = onTouchBasedDevice() || '',
-                sourceList, _this, errorMessage, lastSource;
-
-            _.bindAll(this, 'onLoadedMetadata', 'onPlay', 'onPlaying', 'onPause', 'onEnded');
+            this.config = config;
             this.logs = [];
-            // Initially we assume that el is a DOM element. If jQuery selector
-            // fails to select something, we assume that el is an ID of a DOM
-            // element. We try to select by ID. If jQuery fails this time, we
-            // return. Nothing breaks because the player 'onReady' event will
-            // never be fired.
-
             this.el = $(el);
-            if (this.el.length === 0) {
-                this.el = $('#' + el);
 
-                if (this.el.length === 0) {
-                    errorMessage = gettext('VideoPlayer: Element corresponding to the given selector was not found.');
-                    if (window.console && console.log) {
-                        console.log(errorMessage);
-                    } else {
-                        throw new Error(errorMessage);
-                    }
-                    return;
-                }
-            }
-
-            // A simple test to see that the 'config' is a normal object.
-            if ($.isPlainObject(config)) {
-                this.config = config;
-            } else {
-                return;
-            }
-
-            // We should have at least one video source. Otherwise there is no
-            // point to continue.
-            if (!config.videoSources && !config.videoSources.length) {
-                return;
-            }
-
-
-            // Will be used in inner functions to point to the current object.
-            _this = this;
-
-            // Create HTML markup for individual sources of the HTML5 <video>
-            // element.
-            sourceList = $.map(config.videoSources, function(source) {
-                return [
-                    '<source ',
-                    'src="', source,
-            // Following hack allows to open the same video twice
-            // https://code.google.com/p/chromium/issues/detail?id=31014
-            // Check whether the url already has a '?' inside, and if so,
-            // use '&' instead of '?' to prevent breaking the url's integrity.
-                        (source.indexOf('?') === -1 ? '?' : '&'),
-                    (new Date()).getTime(), '" />'
-                ].join('');
-            });
-
-
-            // Create HTML markup for the <video> element, populating it with
-            // sources from previous step. Because of problems with creating
-            // video element via jquery (http://bugs.jquery.com/ticket/9174) we
-            // create it using native JS.
+            // Because of problems with creating video element via jquery
+            // (http://bugs.jquery.com/ticket/9174) we create it using native JS.
             this.video = document.createElement('video');
 
-            errorMessage = [
-                gettext('This browser cannot play .mp4, .ogg, or .webm files.'),
-                gettext('Try using a different browser, such as Google Chrome.')
-            ].join('');
-            this.video.innerHTML = sourceList.join('') + errorMessage;
-
-            // Get the jQuery object, and set the player state to UNSTARTED.
-            // The player state is used by other parts of the VideoPlayer to
-            // determine what the video is currently doing.
+            // Get the jQuery object and set error event handlers
             this.videoEl = $(this.video);
 
-            lastSource = this.videoEl.find('source').last();
-            lastSource.on('error', this.showErrorMessage.bind(this));
-            lastSource.on('error', this.onError.bind(this));
-            this.videoEl.on('error', this.onError.bind(this));
+            // Video player overlay play button
+            this.videoOverlayEl = this.el.find('.video-wrapper .btn-play');
 
-            if (/iP(hone|od)/i.test(isTouch[0])) {
-                this.videoEl.prop('controls', true);
-            }
-
+            // The player state is used by other parts of the VideoPlayer to
+            // determine what the video is currently doing.
             this.playerState = HTML5Video.PlayerState.UNSTARTED;
+
+            _.bindAll(this, 'onLoadedMetadata', 'onPlay', 'onPlaying', 'onPause', 'onEnded');
 
             // Attach a 'click' event on the <video> element. It will cause the
             // video to pause/play.
-            this.videoEl.on('click', function(event) {
+            callback = function() {
                 var PlayerState = HTML5Video.PlayerState;
 
-                if (_this.playerState === PlayerState.PLAYING) {
-                    _this.playerState = PlayerState.PAUSED;
-                    _this.pauseVideo();
+                if (self.playerState === PlayerState.PLAYING) {
+                    self.playerState = PlayerState.PAUSED;
+                    self.pauseVideo();
                 } else {
-                    _this.playerState = PlayerState.PLAYING;
-                    _this.playVideo();
+                    self.playerState = PlayerState.PLAYING;
+                    self.playVideo();
                 }
-            });
-
-            var events = ['loadstart', 'progress', 'suspend', 'abort', 'error',
-                'emptied', 'stalled', 'play', 'pause', 'loadedmetadata',
-                'loadeddata', 'waiting', 'playing', 'canplay', 'canplaythrough',
-                'seeking', 'seeked', 'timeupdate', 'ended', 'ratechange',
-                'durationchange', 'volumechange'
-            ];
+            };
+            this.videoEl.on('click', callback);
+            this.videoOverlayEl.on('click', callback);
 
             this.debug = false;
             $.each(events, function(index, eventName) {
-                _this.video.addEventListener(eventName, function() {
-                    _this.logs.push({
+                self.video.addEventListener(eventName, function() {
+                    self.logs.push({
                         'event name': eventName,
-                        'state': _this.playerState
+                        state: self.playerState
                     });
 
-                    if (_this.debug) {
+                    if (self.debug) {
                         console.log(
                             'event name:', eventName,
-                            'state:', _this.playerState,
-                            'readyState:', _this.video.readyState,
-                            'networkState:', _this.video.networkState
+                            'state:', self.playerState,
+                            'readyState:', self.video.readyState,
+                            'networkState:', self.video.networkState
                         );
                     }
 
@@ -334,9 +316,15 @@ function() {
             this.video.addEventListener('pause', this.onPause, false);
             this.video.addEventListener('ended', this.onEnded, false);
 
+            if (/iP(hone|od)/i.test(isTouch[0])) {
+                this.videoEl.prop('controls', true);
+            }
+
             // Place the <video> element on the page.
-            this.videoEl.appendTo(this.el.find('.video-player div'));
-        }
+            this.videoEl.appendTo(el.find('.video-player > div:first-child'));
+        };
+
+        return Player;
     }());
 
     // The YouTube API presents several constants which describe the player's

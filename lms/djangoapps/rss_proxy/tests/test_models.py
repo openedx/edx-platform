@@ -2,6 +2,7 @@
 Tests for the rss_proxy models
 """
 from django.test import TestCase
+
 from rss_proxy.models import WhitelistedRssUrl
 
 

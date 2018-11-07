@@ -5,40 +5,27 @@ Does not include any access control, be sure to check access before calling.
 """
 import datetime
 import logging
-import pytz
 from contextlib import contextmanager
-
-from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
-from django.utils.translation import ugettext as _
-from django.core.validators import validate_email
-from django.core.urlresolvers import reverse
 from smtplib import SMTPException
 
+import pytz
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+from django.core.urlresolvers import reverse
+from django.core.validators import validate_email
+from django.utils.translation import ugettext as _
+
 from courseware.courses import get_course_by_id
-from lms.djangoapps.instructor.enrollment import (
-    enroll_email,
-    get_email_params,
-    unenroll_email,
-)
-from lms.djangoapps.instructor.access import (
-    allow_access,
-    list_with_level,
-    revoke_access,
-)
+from lms.djangoapps.ccx.custom_exception import CCXUserValidationException
+from lms.djangoapps.ccx.models import CustomCourseForEdX
+from lms.djangoapps.ccx.overrides import get_override_for_ccx
+from lms.djangoapps.instructor.access import allow_access, list_with_level, revoke_access
+from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params, unenroll_email
 from lms.djangoapps.instructor.views.tools import get_student_from_identifier
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from student.models import CourseEnrollment, CourseEnrollmentException
-from student.roles import (
-    CourseCcxCoachRole,
-    CourseInstructorRole,
-    CourseStaffRole
-)
-
-from lms.djangoapps.ccx.overrides import get_override_for_ccx
-from lms.djangoapps.ccx.custom_exception import CCXUserValidationException
-from lms.djangoapps.ccx.models import CustomCourseForEdX
+from student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
 
 log = logging.getLogger("edx.ccx")
 

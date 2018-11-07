@@ -5,12 +5,15 @@ Code used to calculate learner grades.
 from __future__ import division
 
 import abc
-from collections import OrderedDict
 import inspect
 import logging
 import random
 import sys
+from collections import OrderedDict
+from datetime import datetime
 
+from contracts import contract
+from pytz import UTC
 
 log = logging.getLogger("edx.courseware")
 
@@ -18,15 +21,22 @@ log = logging.getLogger("edx.courseware")
 class ScoreBase(object):
     """
     Abstract base class for encapsulating fields of values scores.
-    Field common to all scores include:
-        graded (boolean) - whether or not this module is graded
-        attempted (boolean) - whether the module was attempted
     """
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, graded, attempted):
+    @contract(graded="bool", first_attempted="datetime|None")
+    def __init__(self, graded, first_attempted):
+        """
+        Fields common to all scores include:
+
+            :param graded: Whether or not this module is graded
+            :type graded: bool
+
+            :param first_attempted: When the module was first attempted, or None
+            :type first_attempted: datetime|None
+        """
         self.graded = graded
-        self.attempted = attempted
+        self.first_attempted = first_attempted
 
     def __eq__(self, other):
         if type(other) is type(self):
@@ -43,14 +53,27 @@ class ScoreBase(object):
 class ProblemScore(ScoreBase):
     """
     Encapsulates the fields of a Problem's score.
-    In addition to the fields in ScoreBase, also includes:
-        raw_earned (float) - raw points earned on this problem
-        raw_possible (float) - raw points possible to earn on this problem
-        weighted_earned = earned (float) - weighted value of the points earned
-        weighted_possible = possible (float) - weighted possible points on this problem
-        weight (float) - weight of this problem
     """
+    @contract
     def __init__(self, raw_earned, raw_possible, weighted_earned, weighted_possible, weight, *args, **kwargs):
+        """
+        In addition to the fields in ScoreBase, arguments include:
+
+            :param raw_earned: Raw points earned on this problem
+            :type raw_earned: int|float|None
+
+            :param raw_possible: Raw points possible to earn on this problem
+            :type raw_possible: int|float|None
+
+            :param weighted_earned: Weighted value of the points earned
+            :type weighted_earned: int|float|None
+
+            :param weighted_possible: Weighted possible points on this problem
+            :type weighted_possible: int|float|None
+
+            :param weight: Weight of this problem
+            :type weight: int|float|None
+        """
         super(ProblemScore, self).__init__(*args, **kwargs)
         self.raw_earned = float(raw_earned) if raw_earned is not None else None
         self.raw_possible = float(raw_possible) if raw_possible is not None else None
@@ -62,11 +85,18 @@ class ProblemScore(ScoreBase):
 class AggregatedScore(ScoreBase):
     """
     Encapsulates the fields of a Subsection's score.
-    In addition to the fields in ScoreBase, also includes:
-        tw_earned = earned - total aggregated sum of all weighted earned values
-        tw_possible = possible - total aggregated sum of all weighted possible values
     """
+    @contract
     def __init__(self, tw_earned, tw_possible, *args, **kwargs):
+        """
+        In addition to the fields in ScoreBase, also includes:
+
+            :param tw_earned: Total aggregated sum of all weighted earned values
+            :type tw_earned: int|float|None
+
+            :param tw_possible: Total aggregated sum of all weighted possible values
+            :type tw_possible: int|float|None
+        """
         super(AggregatedScore, self).__init__(*args, **kwargs)
         self.earned = float(tw_earned) if tw_earned is not None else None
         self.possible = float(tw_possible) if tw_possible is not None else None
@@ -81,25 +111,32 @@ def float_sum(iterable):
 
 def aggregate_scores(scores):
     """
-    scores: A list of ScoreBase objects
+    scores: A list of ProblemScore objects
     returns: A tuple (all_total, graded_total).
-        all_total: A ScoreBase representing the total score summed over all input scores
-        graded_total: A ScoreBase representing the score summed over all graded input scores
+        all_total: An AggregatedScore representing the total score summed over all input scores
+        graded_total: An AggregatedScore representing the score summed over all graded input scores
     """
-    total_correct_graded = float_sum(score.earned for score in scores if score.graded)
-    total_possible_graded = float_sum(score.possible for score in scores if score.graded)
-    any_attempted_graded = any(score.attempted for score in scores if score.graded)
+    total_correct_graded = float_sum(score.earned for score in _iter_graded(scores))
+    total_possible_graded = float_sum(score.possible for score in _iter_graded(scores))
+    first_attempted_graded = _min_or_none(
+        score.first_attempted for score in _iter_graded(scores) if score.first_attempted
+    )
 
     total_correct = float_sum(score.earned for score in scores)
     total_possible = float_sum(score.possible for score in scores)
-    any_attempted = any(score.attempted for score in scores)
+    first_attempted = _min_or_none(
+        score.first_attempted for score in scores if score.first_attempted
+    )
 
     # regardless of whether it is graded
-    all_total = AggregatedScore(total_correct, total_possible, False, any_attempted)
+    all_total = AggregatedScore(total_correct, total_possible, False, first_attempted=first_attempted)
 
     # selecting only graded things
     graded_total = AggregatedScore(
-        total_correct_graded, total_possible_graded, True, any_attempted_graded,
+        total_correct_graded,
+        total_possible_graded,
+        True,
+        first_attempted=first_attempted_graded
     )
 
     return all_total, graded_total
@@ -407,3 +444,57 @@ class AssignmentFormatGrader(CourseGrader):
             'section_breakdown': breakdown,
             # No grade_breakdown here
         }
+
+
+def _iter_graded(scores):
+    """
+    Yield the scores that belong to explicitly graded blocks
+    """
+    return (score for score in scores if score.graded)
+
+
+def _min_or_none(itr):
+    """
+    Return the lowest value in itr, or None if itr is empty.
+
+    In python 3, this is just min(itr, default=None)
+    """
+    try:
+        return min(itr)
+    except ValueError:
+        return None
+
+
+class ShowCorrectness(object):
+    """
+    Helper class for determining whether correctness is currently hidden for a block.
+
+    When correctness is hidden, this limits the user's access to the correct/incorrect flags, messages, problem scores,
+    and aggregate subsection and course grades.
+    """
+
+    """
+    Constants used to indicate when to show correctness
+    """
+    ALWAYS = "always"
+    PAST_DUE = "past_due"
+    NEVER = "never"
+
+    @classmethod
+    def correctness_available(cls, show_correctness='', due_date=None, has_staff_access=False):
+        """
+        Returns whether correctness is available now, for the given attributes.
+        """
+        if show_correctness == cls.NEVER:
+            return False
+        elif has_staff_access:
+            # This is after the 'never' check because course staff can see correctness
+            # unless the sequence/problem explicitly prevents it
+            return True
+        elif show_correctness == cls.PAST_DUE:
+            # Is it now past the due date?
+            return (due_date is None or
+                    due_date < datetime.now(UTC))
+
+        # else: show_correctness == cls.ALWAYS
+        return True

@@ -1,23 +1,20 @@
 """
 This module contains signals needed for email integration
 """
-import crum
 import datetime
 import logging
 
+import crum
 from django.conf import settings
 from django.dispatch import receiver
-
-from student.cookies import CREATE_LOGON_COOKIE
-from student.views import REGISTER_USER
-from email_marketing.models import EmailMarketingConfiguration
-from util.model_utils import USER_FIELD_CHANGED
-from lms.djangoapps.email_marketing.tasks import (
-    update_user, update_user_email
-)
-
 from sailthru.sailthru_client import SailthruClient
 from sailthru.sailthru_error import SailthruClientError
+
+from email_marketing.models import EmailMarketingConfiguration
+from lms.djangoapps.email_marketing.tasks import update_user, update_user_email
+from student.cookies import CREATE_LOGON_COOKIE
+from student.views import REGISTER_USER
+from util.model_utils import USER_FIELD_CHANGED
 
 log = logging.getLogger(__name__)
 
@@ -50,19 +47,28 @@ def add_email_marketing_cookies(sender, response=None, user=None,
         'vars': {'last_login_date': datetime.datetime.now().strftime("%Y-%m-%d")}
     }
 
-    # get sailthru_content cookie to capture usage before logon
+    # get anonymous_interest cookie to capture usage before logon
     request = crum.get_current_request()
     if request:
-        sailthru_content = request.COOKIES.get('sailthru_content')
+        sailthru_content = request.COOKIES.get('anonymous_interest')
         if sailthru_content:
-            post_parms['cookies'] = {'sailthru_content': sailthru_content}
+            post_parms['cookies'] = {'anonymous_interest': sailthru_content}
 
     try:
         sailthru_client = SailthruClient(email_config.sailthru_key, email_config.sailthru_secret)
+        log.info(
+            'Sending to Sailthru the user interest cookie [%s] for user [%s]',
+            post_parms.get('cookies', ''),
+            user.email
+        )
+        time_before_call = datetime.datetime.now()
+
         sailthru_response = \
             sailthru_client.api_post("user", post_parms)
+
     except SailthruClientError as exc:
         log.error("Exception attempting to obtain cookie from Sailthru: %s", unicode(exc))
+
         return response
 
     if sailthru_response.is_ok():
@@ -76,12 +82,14 @@ def add_email_marketing_cookies(sender, response=None, user=None,
                 domain=settings.SESSION_COOKIE_DOMAIN,
                 path='/',
             )
+            _log_sailthru_api_call_time(time_before_call)
         else:
             log.error("No cookie returned attempting to obtain cookie from Sailthru for %s", user.email)
     else:
         error = sailthru_response.get_error()
         # generally invalid email address
         log.info("Error attempting to obtain cookie from Sailthru: %s", error.get_message())
+
     return response
 
 
@@ -186,3 +194,17 @@ def _get_current_site():
         return
 
     return {'id': request.site.id, 'domain': request.site.domain, 'name': request.site.name}
+
+
+def _log_sailthru_api_call_time(time_before_call):
+    """
+    Logs Sailthru api synchronous call time
+    """
+
+    time_after_call = datetime.datetime.now()
+    delta_sailthru_api_call_time = time_after_call - time_before_call
+
+    log.info("Started at %s and ended at %s, time spent:%s milliseconds",
+             time_before_call.isoformat(' '),
+             time_after_call.isoformat(' '),
+             delta_sailthru_api_call_time.microseconds / 1000)

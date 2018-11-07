@@ -1,8 +1,10 @@
 """Login and Registration pages """
 
 from urllib import urlencode
+
 from bok_choy.page_object import PageObject, unguarded
-from bok_choy.promise import Promise, EmptyPromise
+from bok_choy.promise import EmptyPromise, Promise
+
 from common.test.acceptance.pages.lms import BASE_URL
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
 
@@ -70,9 +72,6 @@ class ResetPasswordPage(PageObject):
             browser (Browser): The browser instance.
     """
     url = BASE_URL + "/login#forgot-password-modal"
-
-    def __init__(self, browser):
-        super(ResetPasswordPage, self).__init__(browser)
 
     def is_browser_on_page(self):
         return (
@@ -223,7 +222,7 @@ class CombinedLoginAndRegisterPage(PageObject):
         if favorite_movie:
             self.q(css="#register-favorite_movie").fill(favorite_movie)
         if terms_of_service:
-            self.q(css="#register-honor_code").click()
+            self.q(css="label[for='register-honor_code']").click()
 
         # Submit it
         self.q(css=".register-button").click()
@@ -356,7 +355,7 @@ class CombinedLoginAndRegisterPage(PageObject):
         """Wait for a status message to be visible following third_party registration, then return it."""
         def _check_func():
             """Return third party auth status notice message."""
-            selector = '.js-auth-warning p'
+            selector = '.js-auth-warning div'
             msg_element = self.q(css=selector)
             if msg_element.visible:
                 return (True, msg_element.text[0])

@@ -83,6 +83,7 @@ class JsTestSubSuite(TestSuite):
             "--single-run={}".format('false' if self.mode == 'dev' else 'true'),
             "--capture-timeout=60000",
             "--junitreportpath={}".format(self.xunit_report),
+            "--browsers={}".format(Env.KARMA_BROWSER),
         ]
 
         if self.port:

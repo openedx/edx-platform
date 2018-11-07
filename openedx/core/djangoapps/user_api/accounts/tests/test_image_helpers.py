@@ -6,13 +6,12 @@ import hashlib
 from mock import patch
 from nose.plugins.attrib import attr
 from pytz import UTC
-from unittest import skipUnless
 
-from django.conf import settings
 from django.test import TestCase
 
-from ..image_helpers import get_profile_image_urls_for_user
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
+from ..image_helpers import get_profile_image_urls_for_user
 
 TEST_SIZES = {'full': 50, 'small': 10}
 TEST_PROFILE_IMAGE_UPLOAD_DT = datetime.datetime(2002, 1, 9, 15, 43, 01, tzinfo=UTC)
@@ -20,7 +19,7 @@ TEST_PROFILE_IMAGE_UPLOAD_DT = datetime.datetime(2002, 1, 9, 15, 43, 01, tzinfo=
 
 @attr(shard=2)
 @patch.dict('openedx.core.djangoapps.user_api.accounts.image_helpers.PROFILE_IMAGE_SIZES_MAP', TEST_SIZES, clear=True)
-@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class ProfileImageUrlTestCase(TestCase):
     """
     Tests for profile image URL generation helpers.

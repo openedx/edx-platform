@@ -1,0 +1,104 @@
+## mako
+
+<%page expression_filter="h"/>
+<%namespace name='static' file='../static_content.html'/>
+
+<%!
+import json
+
+from django.conf import settings
+from django.utils.translation import ugettext as _
+from django.template.defaultfilters import escapejs
+from django.core.urlresolvers import reverse
+
+from django_comment_client.permissions import has_permission
+from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
+from openedx.core.djangolib.markup import HTML
+from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, SHOW_REVIEWS_TOOL_FLAG
+from openedx.features.course_experience.course_tools import CourseToolsPluginManager
+%>
+
+<%block name="content">
+<div class="course-view container" id="course-container">
+    <header class="page-header has-secondary">
+        <div class="page-header-main">
+            <nav aria-label="${_('Course Outline')}" class="sr-is-focusable" tabindex="-1">
+                <h2 class="hd hd-3 page-title">${course.display_name_with_default}</h2>
+            </nav>
+        </div>
+        <div class="page-header-secondary">
+            % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
+                <div class="page-header-search">
+                    <form class="search-form" role="search" action="${reverse('openedx.course_search.course_search_results', args=[course_key])}">
+                        <label class="field-label sr-only" for="search" id="search-hint">${_('Search the course')}</label>
+                        <input
+                                class="field-input input-text search-input"
+                                type="search"
+                                name="query"
+                                id="search"
+                                placeholder="${_('Search the course')}"
+                        />
+                        <button class="btn btn-small search-button" type="submit">${_('Search')}</button>
+                    </form>
+                </div>
+            % endif
+            <div class="form-actions">
+                % if resume_course_url:
+                    <a class="btn btn-brand action-resume-course" href="${resume_course_url}">
+                        % if has_visited_course:
+                            ${_("Resume Course")}
+                        % else:
+                            ${_("Start Course")}
+                        % endif
+                    </a>
+                % endif
+            </div>
+        </div>
+    </header>
+    <div class="page-content">
+        <div class="layout layout-1t2t">
+            <main class="layout-col layout-col-b">
+                % if welcome_message_fragment and UNIFIED_COURSE_TAB_FLAG.is_enabled(course.id):
+                    <div class="section section-dates">
+                        ${HTML(welcome_message_fragment.body_html())}
+                    </div>
+                % endif
+
+                ${HTML(outline_fragment.body_html())}
+            </main>
+            <aside class="course-sidebar layout-col layout-col-a">
+                <%
+                course_tools = CourseToolsPluginManager.get_course_tools()
+                %>
+                % if course_tools:
+                    <div class="section section-tools">
+                        <h3 class="hd-6">${_("Course Tools")}</h3>
+                        <ul class="list-unstyled">
+                            % for course_tool in course_tools:
+                                % if course_tool.is_enabled(request, course_key):
+                                    <li>
+                                        <a href="${course_tool.url(course_key)}">
+                                            <span class="icon ${course_tool.icon_classes()}" aria-hidden="true"></span>
+                                            ${course_tool.title()}
+                                        </a>
+                                    </li>
+                                % endif
+                            % endfor
+                        </ul>
+                    </div>
+                % endif
+                <div class="section section-dates">
+                    ${HTML(dates_fragment.body_html())}
+                </div>
+                % if handouts_html:
+                    <div class="section section-handouts">
+                        <h3 class="hd-6">${_("Course Handouts")}</h3>
+                        ${HTML(handouts_html)}
+                    </div>
+                % endif
+            </aside>
+        </div>
+    </div>
+    ${HTML(course_sock_fragment.body_html())}
+</div>
+</%block>

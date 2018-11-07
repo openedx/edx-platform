@@ -4,32 +4,48 @@ Tests for instructor.basic
 
 import datetime
 import json
+
 import pytz
-from mock import MagicMock, Mock, patch
-from nose.plugins.attrib import attr
 from django.core.urlresolvers import reverse
 from django.db.models import Q
+from edx_proctoring.api import create_exam
+from edx_proctoring.models import ProctoredExamStudentAttempt
+from mock import MagicMock, Mock, patch
+from nose.plugins.attrib import attr
+from opaque_keys.edx.locator import UsageKey
 
 from course_modes.models import CourseMode
 from courseware.tests.factories import InstructorFactory
 from instructor_analytics.basic import (
-    StudentModule, sale_record_features, sale_order_record_features, enrolled_students_features,
-    course_registration_features, coupon_codes_features, get_proctored_exam_results, list_may_enroll,
-    list_problem_responses, AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES
+    AVAILABLE_FEATURES,
+    PROFILE_FEATURES,
+    STUDENT_FEATURES,
+    StudentModule,
+    coupon_codes_features,
+    course_registration_features,
+    enrolled_students_features,
+    get_proctored_exam_results,
+    list_may_enroll,
+    list_problem_responses,
+    sale_order_record_features,
+    sale_record_features
 )
-from opaque_keys.edx.locator import UsageKey
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
+from shoppingcart.models import (
+    Coupon,
+    CouponRedemption,
+    CourseRegCodeItem,
+    CourseRegistrationCode,
+    CourseRegistrationCodeInvoiceItem,
+    Invoice,
+    Order,
+    RegistrationCodeRedemption
+)
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from student.roles import CourseSalesAdminRole
-from student.tests.factories import UserFactory, CourseModeFactory
-from shoppingcart.models import (
-    CourseRegistrationCode, RegistrationCodeRedemption, Order,
-    Invoice, Coupon, CourseRegCodeItem, CouponRedemption, CourseRegistrationCodeInvoiceItem
-)
+from student.tests.factories import CourseModeFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from edx_proctoring.api import create_exam
-from edx_proctoring.models import ProctoredExamStudentAttempt
 
 
 @attr(shard=3)

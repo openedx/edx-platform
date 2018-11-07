@@ -1,7 +1,7 @@
 """
 Urls for verifying health (heartbeat) of the app.
 """
-from django.conf.urls import url, patterns
+from django.conf.urls import patterns, url
 
 urlpatterns = patterns(
     '',

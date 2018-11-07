@@ -6,9 +6,10 @@ Includes:
         use Branding.
 """
 import json
-from django.db.models import TextField
-from django.core.exceptions import ValidationError
+
 from config_models.models import ConfigurationModel
+from django.core.exceptions import ValidationError
+from django.db.models import TextField
 
 
 class BrandingInfoConfig(ConfigurationModel):

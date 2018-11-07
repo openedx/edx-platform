@@ -2,7 +2,6 @@
 Class used for defining and running Bok Choy acceptance test suite
 """
 from time import sleep
-from urllib import urlencode
 from textwrap import dedent
 
 from common.test.acceptance.fixtures.course import CourseFixture, FixtureError
@@ -49,9 +48,10 @@ def load_bok_choy_data(options):
     print 'Loading data from json fixtures in db_fixtures directory'
     sh(
         "DEFAULT_STORE={default_store}"
-        " ./manage.py lms --settings bok_choy loaddata --traceback"
+        " ./manage.py lms --settings {settings} loaddata --traceback"
         " common/test/db_fixtures/*.json".format(
             default_store=options.default_store,
+            settings=Env.SETTINGS
         )
     )
 
@@ -77,9 +77,10 @@ def load_courses(options):
 
         sh(
             "DEFAULT_STORE={default_store}"
-            " ./manage.py cms --settings=bok_choy import {import_dir}".format(
+            " ./manage.py cms --settings={settings} import {import_dir}".format(
                 default_store=options.default_store,
-                import_dir=options.imports_dir
+                import_dir=options.imports_dir,
+                settings=Env.SETTINGS
             )
         )
     else:
@@ -214,6 +215,11 @@ class BokChoyTestSuite(TestSuite):
         self.report_dir.makedirs_p()
         test_utils.clean_reports_dir()  # pylint: disable=no-value-for-parameter
 
+        # Set the environment so that webpack understands where to compile its resources.
+        # This setting is expected in other environments, so we are setting it for the
+        # bok-choy test run.
+        os.environ['EDX_PLATFORM_SETTINGS'] = 'test_static_optimized'
+
         if not (self.fasttest or self.skip_clean or self.testsonly):
             test_utils.clean_test_files()
 
@@ -257,7 +263,7 @@ class BokChoyTestSuite(TestSuite):
             # Clean up data we created in the databases
             msg = colorize('green', "Cleaning up databases...")
             print msg
-            sh("./manage.py lms --settings bok_choy flush --traceback --noinput")
+            sh("./manage.py lms --settings {settings} flush --traceback --noinput".format(settings=Env.SETTINGS))
             clear_mongo()
 
     @property
@@ -350,6 +356,7 @@ class Pa11yCrawler(BokChoyTestSuite):
     def __init__(self, *args, **kwargs):
         super(Pa11yCrawler, self).__init__(*args, **kwargs)
         self.course_key = kwargs.get('course_key')
+        self.single_url = kwargs.get('single_url', False)
         self.ensure_scrapy_cfg()
 
     def ensure_scrapy_cfg(self):
@@ -395,8 +402,9 @@ class Pa11yCrawler(BokChoyTestSuite):
         Runs pa11ycrawler as staff user against the test course.
         """
         data_dir = os.path.join(self.report_dir, 'data')
-        url = "https://raw.githubusercontent.com/singingwolfboy/pa11ycrawler-ignore/master/ignore.yaml"
-        return [
+        url = "https://raw.githubusercontent.com/edx/pa11ycrawler-ignore/master/ignore.yaml"
+
+        command = [
             "scrapy",
             "crawl",
             "edx",
@@ -407,5 +415,13 @@ class Pa11yCrawler(BokChoyTestSuite):
             "-a",
             "pa11y_ignore_rules_url={url}".format(url=url),
             "-a",
-            "data_dir={dir}".format(dir=data_dir)
+            "data_dir={dir}".format(dir=data_dir),
         ]
+
+        if self.single_url:
+            command = command + [
+                "-a",
+                "single_url={url}".format(url=self.single_url),
+            ]
+
+        return command

@@ -2,12 +2,11 @@ from contextlib import contextmanager
 
 from bok_choy.javascript import wait_for_js
 from bok_choy.page_object import PageObject
-from bok_choy.promise import EmptyPromise, Promise
+from bok_choy.promise import EmptyPromise
 
-from common.test.acceptance.tests.helpers import is_focused_on_element
 from common.test.acceptance.pages.common.utils import hover
-
 from common.test.acceptance.pages.lms.course_page import CoursePage
+from common.test.acceptance.tests.helpers import is_focused_on_element
 
 
 class DiscussionPageMixin(object):
@@ -567,6 +566,12 @@ class InlineDiscussionPage(PageObject, DiscussionPageMixin):
         )
         self._find_within(selector).click()
 
+    def is_new_post_button_visible(self):
+        """
+        Check if new post button present and visible
+        """
+        return self._is_element_visible('.new-post-btn')
+
     @wait_for_js
     def _is_element_visible(self, selector):
         query = self._find_within(selector)
@@ -712,12 +717,12 @@ class DiscussionTabHomePage(CoursePage, DiscussionPageMixin):
         """
         self.q(css=".wmd-input").fill(new_body)
 
-    def get_new_post_preview_value(self):
+    def get_new_post_preview_value(self, selector=".wmd-preview > *"):
         """
         Get the rendered preview of the contents of the Discussions new post editor
         Waits for content to appear, as the preview is triggered on debounced/delayed onchange
         """
-        self.wait_for_element_visibility(".wmd-preview > *", "WMD preview pane has contents", timeout=10)
+        self.wait_for_element_visibility(selector, "WMD preview pane has contents", timeout=10)
         return self.q(css=".wmd-preview").html[0]
 
     def get_new_post_preview_text(self):

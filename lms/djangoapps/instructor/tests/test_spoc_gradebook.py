@@ -4,12 +4,12 @@ Tests of the instructor dashboard spoc gradebook
 
 from django.core.urlresolvers import reverse
 from nose.plugins.attrib import attr
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from student.tests.factories import UserFactory, CourseEnrollmentFactory, AdminFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.tests.factories import StudentModuleFactory
-
+from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 USER_COUNT = 11
 

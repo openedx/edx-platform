@@ -4,17 +4,19 @@
 from __future__ import absolute_import
 
 import time
+from logging import getLogger
 
-from lettuce import world, step, before
-from lettuce.django import django_url
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from student.models import CourseEnrollment
-from xmodule.modulestore.django import modulestore
-from xmodule.course_module import CourseDescriptor
+from lettuce import before, step, world
+from lettuce.django import django_url
+
 from courseware.courses import get_course_by_id
+from student.models import CourseEnrollment
 from xmodule import seq_module, vertical_block
-from logging import getLogger
+from xmodule.course_module import CourseDescriptor
+from xmodule.modulestore.django import modulestore
+
 logger = getLogger(__name__)
 
 

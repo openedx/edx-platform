@@ -86,6 +86,7 @@ define(['backbone',
 
                 // change country
                 countryView.$(baseSelector).val(countryChange[countryData.valueAttribute]).change();
+                countryView.$(baseSelector).focusout();
                 FieldViewsSpecHelpers.expectAjaxRequestWithData(requests, countryChange);
                 AjaxHelpers.respondWithJson(requests, {success: 'true'});
 
@@ -106,6 +107,7 @@ define(['backbone',
 
                 // select time zone option from option
                 timeZoneView.$(baseSelector).val(timeZoneChange[timeZoneData.valueAttribute]).change();
+                timeZoneView.$(baseSelector).focusout();
                 FieldViewsSpecHelpers.expectAjaxRequestWithData(requests, timeZoneChange);
                 AjaxHelpers.respondWithJson(requests, {success: 'true'});
                 timeZoneView.render();
@@ -130,6 +132,7 @@ define(['backbone',
 
                 var data = {'language': FieldViewsSpecHelpers.SELECT_OPTIONS[2][0]};
                 view.$(selector).val(data[fieldData.valueAttribute]).change();
+                view.$(selector).focusout();
                 FieldViewsSpecHelpers.expectAjaxRequestWithData(requests, data);
                 AjaxHelpers.respondWithNoContent(requests);
 
@@ -144,6 +147,7 @@ define(['backbone',
 
                 data = {'language': FieldViewsSpecHelpers.SELECT_OPTIONS[1][0]};
                 view.$(selector).val(data[fieldData.valueAttribute]).change();
+                view.$(selector).focusout();
                 FieldViewsSpecHelpers.expectAjaxRequestWithData(requests, data);
                 AjaxHelpers.respondWithNoContent(requests);
 
@@ -177,6 +181,7 @@ define(['backbone',
 
                 var data = {'language_proficiencies': [{'code': FieldViewsSpecHelpers.SELECT_OPTIONS[1][0]}]};
                 view.$(selector).val(FieldViewsSpecHelpers.SELECT_OPTIONS[1][0]).change();
+                view.$(selector).focusout();
                 FieldViewsSpecHelpers.expectAjaxRequestWithData(requests, data);
                 AjaxHelpers.respondWithNoContent(requests);
             });

@@ -3,29 +3,38 @@
 
     function StructuredTagsView(runtime, element) {
         var $element = $(element);
+        var saveTagsInProgress = false;
+        // we need studio runtime to get handler capable of saving xblock data
+        var studioRuntime = new window.StudioRuntime.v1();
 
-        $element.find('select').each(function() {
-            var loader = this;
-            var sts = $(this).attr('structured-tags-select-init');
+        $($element).find('.save_tags').click(function(e) {
+            var dataToPost = {};
+            if (!saveTagsInProgress) {
+                saveTagsInProgress = true;
 
-            if (typeof sts === typeof undefined || sts === false) {
-                $(this).attr('structured-tags-select-init', 1);
-                $(this).change(function(e) {
-                    e.preventDefault();
-                    var selectedKey = $(loader).find('option:selected').val();
+                $element.find('select').each(function() {
+                    dataToPost[$(this).attr('name')] = $(this).val();
+                });
+
+                e.preventDefault();
+                runtime.notify('save', {
+                    state: 'start',
+                    element: element,
+                    message: gettext('Updating Tags')
+                });
+
+                $.ajax({
+                    type: 'POST',
+                    url: studioRuntime.handlerUrl(element, 'save_tags'),
+                    data: JSON.stringify(dataToPost),
+                    dataType: 'json',
+                    contentType: 'application/json; charset=utf-8'
+                }).always(function() {
                     runtime.notify('save', {
-                        state: 'start',
-                        element: element,
-                        message: gettext('Updating Tags')
+                        state: 'end',
+                        element: element
                     });
-                    $.post(runtime.handlerUrl(element, 'save_tags'), {
-                        'tag': $(loader).attr('name') + ':' + selectedKey
-                    }).done(function() {
-                        runtime.notify('save', {
-                            state: 'end',
-                            element: element
-                        });
-                    });
+                    saveTagsInProgress = false;
                 });
             }
         });

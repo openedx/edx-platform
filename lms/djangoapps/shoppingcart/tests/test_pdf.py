@@ -1,11 +1,13 @@
 """
 Tests for Pdf file
 """
-from datetime import datetime
-from django.test.utils import override_settings
-from django.conf import settings
 import unittest
+from datetime import datetime
 from io import BytesIO
+
+from django.conf import settings
+from django.test.utils import override_settings
+
 from shoppingcart.pdf import PDFInvoice
 from shoppingcart.utils import parse_pages
 

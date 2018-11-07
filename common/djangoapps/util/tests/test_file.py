@@ -2,26 +2,27 @@
 """
 Tests for file.py
 """
-import ddt
+import os
+from datetime import datetime
 from io import StringIO
 
-from django.test import TestCase
-from datetime import datetime
-from django.utils.timezone import UTC
-from mock import patch, Mock
-from django.http import HttpRequest
+import ddt
+from django.core import exceptions
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.http import HttpRequest
+from django.test import TestCase
+from django.utils.timezone import UTC
+from mock import Mock, patch
+from opaque_keys.edx.locations import CourseLocator, SlashSeparatedCourseKey
+
 import util.file
 from util.file import (
+    FileValidationException,
+    UniversalNewlineIterator,
     course_and_time_based_filename_generator,
     course_filename_prefix_generator,
-    store_uploaded_file,
-    FileValidationException,
-    UniversalNewlineIterator
+    store_uploaded_file
 )
-from opaque_keys.edx.locations import CourseLocator, SlashSeparatedCourseKey
-from django.core import exceptions
-import os
 
 
 @ddt.ddt

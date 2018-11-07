@@ -1,11 +1,15 @@
 """
 Common utility functions related to courses.
 """
+from django import forms
 from django.conf import settings
 
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.locator import CourseKey
 from xmodule.assetstore.assetmgr import AssetManager
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
+from xmodule.modulestore.django import modulestore
 
 
 def course_image_url(course, image_key='course_image'):
@@ -43,3 +47,37 @@ def create_course_image_thumbnail(course, dimensions):
     _content, thumb_loc = contentstore().generate_thumbnail(course_image, dimensions=dimensions)
 
     return StaticContent.serialize_asset_key_with_slash(thumb_loc)
+
+
+def clean_course_id(model_form, is_required=True):
+    """
+    Cleans and validates a course_id for use with a Django ModelForm.
+
+    Arguments:
+        model_form (form.ModelForm): The form that has a course_id.
+        is_required (Boolean): Default True. When True, validates that the
+            course_id is not empty.  In all cases, when course_id is supplied,
+            validates that it is a valid course.
+
+    Returns:
+        (CourseKey) The cleaned and validated course_id as a CourseKey.
+
+    NOTE: This should ultimately replace all copies of "def clean_course_id".
+
+    """
+    cleaned_id = model_form.cleaned_data["course_id"]
+
+    if not cleaned_id and not is_required:
+        return None
+
+    try:
+        course_key = CourseKey.from_string(cleaned_id)
+    except InvalidKeyError:
+        msg = u'Course id invalid. Entered course id was: "{0}."'.format(cleaned_id)
+        raise forms.ValidationError(msg)
+
+    if not modulestore().has_course(course_key):
+        msg = u'Course not found. Entered course id was: "{0}". '.format(course_key.to_deprecated_string())
+        raise forms.ValidationError(msg)
+
+    return course_key

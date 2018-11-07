@@ -1,17 +1,25 @@
 """
 Check code quality using pep8, pylint, and diff_quality.
 """
-from paver.easy import sh, task, cmdopts, needs, BuildFailure
 import json
 import os
 import re
+from string import join
+
+from paver.easy import BuildFailure, cmdopts, needs, sh, task
 
 from openedx.core.djangolib.markup import HTML
 
 from .utils.envs import Env
 from .utils.timer import timed
 
-ALL_SYSTEMS = 'lms,cms,common,openedx,pavelib'
+ALL_SYSTEMS = [
+    'cms',
+    'common',
+    'lms',
+    'openedx',
+    'pavelib',
+]
 
 
 def top_python_dirs(dirname):
@@ -45,7 +53,7 @@ def find_fixme(options):
     Run pylint on system code, only looking for fixme items.
     """
     num_fixme = 0
-    systems = getattr(options, 'system', ALL_SYSTEMS).split(',')
+    systems = getattr(options, 'system', '').split(',') or ALL_SYSTEMS
 
     for system in systems:
         # Directory to put the pylint report in.
@@ -93,7 +101,7 @@ def run_pylint(options):
     num_violations = 0
     violations_limit = int(getattr(options, 'limit', -1))
     errors = getattr(options, 'errors', False)
-    systems = getattr(options, 'system', ALL_SYSTEMS).split(',')
+    systems = getattr(options, 'system', '').split(',') or ALL_SYSTEMS
 
     # Make sure the metrics subdirectory exists
     Env.METRICS_DIR.makedirs_p()
@@ -234,7 +242,7 @@ def run_complexity():
     Uses radon to examine cyclomatic complexity.
     For additional details on radon, see http://radon.readthedocs.org/
     """
-    system_string = 'cms/ lms/ common/ openedx/'
+    system_string = join(ALL_SYSTEMS, '/ ') + '/'
     complexity_report_dir = (Env.REPORT_DIR / "complexity")
     complexity_report = complexity_report_dir / "python_complexity.log"
 
@@ -313,9 +321,9 @@ def run_eslint(options):
     ("thresholds=", "t", "json containing limit for number of acceptable violations per rule"),
 ])
 @timed
-def run_safelint(options):
+def run_xsslint(options):
     """
-    Runs safe_template_linter.py on the codebase
+    Runs xss_linter.py on the codebase
     """
 
     thresholds_option = getattr(options, 'thresholds', '{}')
@@ -334,42 +342,42 @@ def run_safelint(options):
             )
         )
 
-    safelint_script = "safe_template_linter.py"
-    safelint_report_dir = (Env.REPORT_DIR / "safelint")
-    safelint_report = safelint_report_dir / "safelint.report"
-    _prepare_report_dir(safelint_report_dir)
+    xsslint_script = "xss_linter.py"
+    xsslint_report_dir = (Env.REPORT_DIR / "xsslint")
+    xsslint_report = xsslint_report_dir / "xsslint.report"
+    _prepare_report_dir(xsslint_report_dir)
 
     sh(
-        "{repo_root}/scripts/{safelint_script} --rule-totals >> {safelint_report}".format(
+        "{repo_root}/scripts/{xsslint_script} --rule-totals >> {xsslint_report}".format(
             repo_root=Env.REPO_ROOT,
-            safelint_script=safelint_script,
-            safelint_report=safelint_report,
+            xsslint_script=xsslint_script,
+            xsslint_report=xsslint_report,
         ),
         ignore_error=True
     )
 
-    safelint_counts = _get_safelint_counts(safelint_report)
+    xsslint_counts = _get_xsslint_counts(xsslint_report)
 
     try:
-        metrics_str = "Number of {safelint_script} violations: {num_violations}\n".format(
-            safelint_script=safelint_script, num_violations=int(safelint_counts['total'])
+        metrics_str = "Number of {xsslint_script} violations: {num_violations}\n".format(
+            xsslint_script=xsslint_script, num_violations=int(xsslint_counts['total'])
         )
-        if 'rules' in safelint_counts and any(safelint_counts['rules']):
+        if 'rules' in xsslint_counts and any(xsslint_counts['rules']):
             metrics_str += "\n"
-            rule_keys = sorted(safelint_counts['rules'].keys())
+            rule_keys = sorted(xsslint_counts['rules'].keys())
             for rule in rule_keys:
                 metrics_str += "{rule} violations: {count}\n".format(
                     rule=rule,
-                    count=int(safelint_counts['rules'][rule])
+                    count=int(xsslint_counts['rules'][rule])
                 )
     except TypeError:
         raise BuildFailure(
-            "Error. Number of {safelint_script} violations could not be found in {safelint_report}".format(
-                safelint_script=safelint_script, safelint_report=safelint_report
+            "Error. Number of {xsslint_script} violations could not be found in {xsslint_report}".format(
+                xsslint_script=xsslint_script, xsslint_report=xsslint_report
             )
         )
 
-    metrics_report = (Env.METRICS_DIR / "safelint")
+    metrics_report = (Env.METRICS_DIR / "xsslint")
     # Record the metric
     _write_metric(metrics_str, metrics_report)
     # Print number of violations to log.
@@ -379,35 +387,35 @@ def run_safelint(options):
 
     # Test total violations against threshold.
     if 'total' in violation_thresholds.keys():
-        if violation_thresholds['total'] < safelint_counts['total']:
+        if violation_thresholds['total'] < xsslint_counts['total']:
             error_message = "Too many violations total ({count}).\nThe limit is {violations_limit}.".format(
-                count=safelint_counts['total'], violations_limit=violation_thresholds['total']
+                count=xsslint_counts['total'], violations_limit=violation_thresholds['total']
             )
 
     # Test rule violations against thresholds.
     if 'rules' in violation_thresholds:
         threshold_keys = sorted(violation_thresholds['rules'].keys())
         for threshold_key in threshold_keys:
-            if threshold_key not in safelint_counts['rules']:
+            if threshold_key not in xsslint_counts['rules']:
                 error_message += (
-                    "\nNumber of {safelint_script} violations for {rule} could not be found in "
-                    "{safelint_report}."
+                    "\nNumber of {xsslint_script} violations for {rule} could not be found in "
+                    "{xsslint_report}."
                 ).format(
-                    safelint_script=safelint_script, rule=threshold_key, safelint_report=safelint_report
+                    xsslint_script=xsslint_script, rule=threshold_key, xsslint_report=xsslint_report
                 )
-            elif violation_thresholds['rules'][threshold_key] < safelint_counts['rules'][threshold_key]:
+            elif violation_thresholds['rules'][threshold_key] < xsslint_counts['rules'][threshold_key]:
                 error_message += \
                     "\nToo many {rule} violations ({count}).\nThe {rule} limit is {violations_limit}.".format(
-                        rule=threshold_key, count=safelint_counts['rules'][threshold_key],
+                        rule=threshold_key, count=xsslint_counts['rules'][threshold_key],
                         violations_limit=violation_thresholds['rules'][threshold_key],
                     )
 
     if error_message is not "":
         raise BuildFailure(
-            "SafeTemplateLinter Failed.\n{error_message}\n"
-            "See {safelint_report} or run the following command to hone in on the problem:\n"
-            "  ./scripts/safe-commit-linter.sh -h".format(
-                error_message=error_message, safelint_report=safelint_report
+            "XSSLinter Failed.\n{error_message}\n"
+            "See {xsslint_report} or run the following command to hone in on the problem:\n"
+            "  ./scripts/xss-commit-linter.sh -h".format(
+                error_message=error_message, xsslint_report=xsslint_report
             )
         )
 
@@ -415,42 +423,42 @@ def run_safelint(options):
 @task
 @needs('pavelib.prereqs.install_python_prereqs')
 @timed
-def run_safecommit_report():
+def run_xsscommitlint():
     """
-    Runs safe-commit-linter.sh on the current branch.
+    Runs xss-commit-linter.sh on the current branch.
     """
-    safecommit_script = "safe-commit-linter.sh"
-    safecommit_report_dir = (Env.REPORT_DIR / "safecommit")
-    safecommit_report = safecommit_report_dir / "safecommit.report"
-    _prepare_report_dir(safecommit_report_dir)
+    xsscommitlint_script = "xss-commit-linter.sh"
+    xsscommitlint_report_dir = (Env.REPORT_DIR / "xsscommitlint")
+    xsscommitlint_report = xsscommitlint_report_dir / "xsscommitlint.report"
+    _prepare_report_dir(xsscommitlint_report_dir)
 
     sh(
-        "{repo_root}/scripts/{safecommit_script} | tee {safecommit_report}".format(
+        "{repo_root}/scripts/{xsscommitlint_script} | tee {xsscommitlint_report}".format(
             repo_root=Env.REPO_ROOT,
-            safecommit_script=safecommit_script,
-            safecommit_report=safecommit_report,
+            xsscommitlint_script=xsscommitlint_script,
+            xsscommitlint_report=xsscommitlint_report,
         ),
         ignore_error=True
     )
 
-    safecommit_count = _get_safecommit_count(safecommit_report)
+    xsscommitlint_count = _get_xsscommitlint_count(xsscommitlint_report)
 
     try:
-        num_violations = int(safecommit_count)
+        num_violations = int(xsscommitlint_count)
     except TypeError:
         raise BuildFailure(
-            "Error. Number of {safecommit_script} violations could not be found in {safecommit_report}".format(
-                safecommit_script=safecommit_script, safecommit_report=safecommit_report
+            "Error. Number of {xsscommitlint_script} violations could not be found in {xsscommitlint_report}".format(
+                xsscommitlint_script=xsscommitlint_script, xsscommitlint_report=xsscommitlint_report
             )
         )
 
     # Print number of violations to log.
-    violations_count_str = "Number of {safecommit_script} violations: {num_violations}\n".format(
-        safecommit_script=safecommit_script, num_violations=num_violations
+    violations_count_str = "Number of {xsscommitlint_script} violations: {num_violations}\n".format(
+        xsscommitlint_script=xsscommitlint_script, num_violations=num_violations
     )
 
     # Record the metric
-    metrics_report = (Env.METRICS_DIR / "safecommit")
+    metrics_report = (Env.METRICS_DIR / "xsscommitlint")
     _write_metric(violations_count_str, metrics_report)
     # Output report to console.
     sh("cat {metrics_report}".format(metrics_report=metrics_report), ignore_error=True)
@@ -526,12 +534,12 @@ def _get_count_from_last_line(filename, file_type):
         return None
 
 
-def _get_safelint_counts(filename):
+def _get_xsslint_counts(filename):
     """
-    This returns a dict of violations from the safelint report.
+    This returns a dict of violations from the xsslint report.
 
     Arguments:
-        filename: The name of the safelint report.
+        filename: The name of the xsslint report.
 
     Returns:
         A dict containing the following:
@@ -558,15 +566,15 @@ def _get_safelint_counts(filename):
     return violations
 
 
-def _get_safecommit_count(filename):
+def _get_xsscommitlint_count(filename):
     """
-    Returns the violation count from the safecommit report.
+    Returns the violation count from the xsscommitlint report.
 
     Arguments:
-        filename: The name of the safecommit report.
+        filename: The name of the xsscommitlint report.
 
     Returns:
-        The count of safecommit violations, or None if there is  a problem.
+        The count of xsscommitlint violations, or None if there is  a problem.
 
     """
     report_contents = _get_report_contents(filename)

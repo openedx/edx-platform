@@ -1,23 +1,23 @@
 """
 Acceptance tests for the Import and Export pages
 """
-from nose.plugins.attrib import attr
+from abc import abstractmethod
 from datetime import datetime
 
-from flaky import flaky
+from nose.plugins.attrib import attr
 
-from abc import abstractmethod
-
-from common.test.acceptance.tests.studio.base_studio_test import StudioLibraryTest, StudioCourseTest
+from common.test.acceptance.pages.lms.course_home import CourseHomePage
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.lms.staff_view import StaffCoursewarePage
 from common.test.acceptance.pages.studio.import_export import (
-    ExportLibraryPage,
     ExportCoursePage,
-    ImportLibraryPage,
-    ImportCoursePage)
+    ExportLibraryPage,
+    ImportCoursePage,
+    ImportLibraryPage
+)
 from common.test.acceptance.pages.studio.library import LibraryEditPage
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage
-from common.test.acceptance.pages.lms.courseware import CoursewarePage
-from common.test.acceptance.pages.lms.staff_view import StaffPage
+from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest, StudioLibraryTest
 
 
 class ExportTestMixin(object):
@@ -32,9 +32,69 @@ class ExportTestMixin(object):
             The download will succeed
             And the file will be of the right MIME type.
         """
+        self.export_page.wait_for_export_click_handler()
+        self.export_page.click_export()
+        self.export_page.wait_for_export()
         good_status, is_tarball_mimetype = self.export_page.download_tarball()
         self.assertTrue(good_status)
         self.assertTrue(is_tarball_mimetype)
+
+    def test_export_timestamp(self):
+        """
+        Scenario: I perform a course / library export
+            On export success, the page displays a UTC timestamp previously not visible
+            And if I refresh the page, the timestamp is still displayed
+        """
+        self.assertFalse(self.export_page.is_timestamp_visible())
+
+        # Get the time when the export has started.
+        # export_page timestamp is in (MM/DD/YYYY at HH:mm) so replacing (second, microsecond) to
+        # keep the comparison consistent
+        export_start_time = datetime.utcnow().replace(microsecond=0, second=0)
+        self.export_page.wait_for_export_click_handler()
+        self.export_page.click_export()
+        self.export_page.wait_for_export()
+
+        # Get the time when the export has finished.
+        # export_page timestamp is in (MM/DD/YYYY at HH:mm) so replacing (second, microsecond) to
+        # keep the comparison consistent
+        export_finish_time = datetime.utcnow().replace(microsecond=0, second=0)
+
+        export_timestamp = self.export_page.parsed_timestamp
+        self.export_page.wait_for_timestamp_visible()
+
+        # Verify that 'export_timestamp' is between start and finish upload time
+        self.assertLessEqual(
+            export_start_time,
+            export_timestamp,
+            "Course export timestamp should be export_start_time <= export_timestamp <= export_end_time"
+        )
+        self.assertGreaterEqual(
+            export_finish_time,
+            export_timestamp,
+            "Course export timestamp should be export_start_time <= export_timestamp <= export_end_time"
+        )
+
+        self.export_page.visit()
+        self.export_page.wait_for_tasks(completed=True)
+        self.export_page.wait_for_timestamp_visible()
+
+    def test_task_list(self):
+        """
+        Scenario: I should see feedback checkpoints when exporting a course or library
+            Given that I am on an export page
+            No task checkpoint list should be showing
+            When I export the course or library
+            Each task in the checklist should be marked confirmed
+            And the task list should be visible
+        """
+        # The task list shouldn't be visible to start.
+        self.assertFalse(self.export_page.is_task_list_showing(), "Task list shown too early.")
+        self.export_page.wait_for_tasks()
+        self.export_page.wait_for_export_click_handler()
+        self.export_page.click_export()
+        self.export_page.wait_for_tasks(completed=True)
+        self.assertTrue(self.export_page.is_task_list_showing(), "Task list did not display.")
 
 
 @attr(shard=7)
@@ -211,7 +271,6 @@ class TestEntranceExamCourseImport(ImportTestMixin, StudioCourseTest):
     def page_args(self):
         return [self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run']]
 
-    @flaky  # TODO fix this, see TNL-6009
     def test_course_updated_with_entrance_exam(self):
         """
         Given that I visit an empty course before import
@@ -219,9 +278,13 @@ class TestEntranceExamCourseImport(ImportTestMixin, StudioCourseTest):
         When I visit the import page
         And I upload a course that has an entrance exam section named 'Entrance Exam'
         And I visit the course outline page again
-        The section named 'Entrance Exam' should now be available.
-        And when I switch the view mode to student view and Visit CourseWare
-        Then I see one section in the sidebar that is 'Entrance Exam'
+        The section named 'Entrance Exam' should now be available
+        When I visit the LMS Course Home page
+        Then I should see a section named 'Section' or 'Entrance Exam'
+        When I switch the view mode to student view
+        Then I should only see a section named 'Entrance Exam'
+        When I visit the courseware page
+        Then a message regarding the 'Entrance Exam'
         """
         self.landing_page.visit()
         # Should not exist yet.
@@ -236,10 +299,16 @@ class TestEntranceExamCourseImport(ImportTestMixin, StudioCourseTest):
         self.landing_page.section("Section")
 
         self.landing_page.view_live()
+
+        course_home = CourseHomePage(self.browser, self.course_id)
+        course_home.visit()
+        self.assertEqual(course_home.outline.num_sections, 2)
+        course_home.preview.set_staff_view_mode('Learner')
+        self.assertEqual(course_home.outline.num_sections, 1)
+
         courseware = CoursewarePage(self.browser, self.course_id)
-        courseware.wait_for_page()
-        StaffPage(self.browser, self.course_id).set_staff_view_mode('Student')
-        self.assertEqual(courseware.num_sections, 1)
+        courseware.visit()
+        StaffCoursewarePage(self.browser, self.course_id).set_staff_view_mode('Learner')
         self.assertIn(
             "To access course materials, you must score", courseware.entrance_exam_message_selector.text[0]
         )
@@ -258,7 +327,6 @@ class TestCourseImport(ImportTestMixin, StudioCourseTest):
     def page_args(self):
         return [self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run']]
 
-    @flaky  # TNL-6042
     def test_course_updated(self):
         """
         Given that I visit an empty course before import
@@ -329,7 +397,6 @@ class TestLibraryImport(ImportTestMixin, StudioLibraryTest):
     def page_args(self):
         return [self.browser, self.library_key]
 
-    @flaky  # TODO: SOL-430
     def test_library_updated(self):
         """
         Given that I visit an empty library

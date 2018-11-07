@@ -4,16 +4,15 @@ from django.conf import settings
 from django.conf.urls import patterns, url
 
 from .views import (
-    TeamsListView,
-    TeamsDetailView,
-    TopicDetailView,
-    TopicListView,
+    MembershipDetailView,
     MembershipListView,
-    MembershipDetailView
+    TeamsDetailView,
+    TeamsListView,
+    TopicDetailView,
+    TopicListView
 )
 
 TEAM_ID_PATTERN = r'(?P<team_id>[a-z\d_-]+)'
-USERNAME_PATTERN = r'(?P<username>[\w.+-]+)'
 TOPIC_ID_PATTERN = r'(?P<topic_id>[A-Za-z\d_.-]+)'
 
 urlpatterns = patterns(
@@ -24,7 +23,9 @@ urlpatterns = patterns(
         name="teams_list"
     ),
     url(
-        r'^v0/teams/' + TEAM_ID_PATTERN + '$',
+        r'^v0/teams/{team_id_pattern}$'.format(
+            team_id_pattern=TEAM_ID_PATTERN,
+        ),
         TeamsDetailView.as_view(),
         name="teams_detail"
     ),
@@ -34,7 +35,10 @@ urlpatterns = patterns(
         name="topics_list"
     ),
     url(
-        r'^v0/topics/' + TOPIC_ID_PATTERN + ',' + settings.COURSE_ID_PATTERN + '$',
+        r'^v0/topics/{topic_id_pattern},{course_id_pattern}$'.format(
+            topic_id_pattern=TOPIC_ID_PATTERN,
+            course_id_pattern=settings.COURSE_ID_PATTERN,
+        ),
         TopicDetailView.as_view(),
         name="topics_detail"
     ),
@@ -44,7 +48,10 @@ urlpatterns = patterns(
         name="team_membership_list"
     ),
     url(
-        r'^v0/team_membership/' + TEAM_ID_PATTERN + ',' + USERNAME_PATTERN + '$',
+        r'^v0/team_membership/{team_id_pattern},{username_pattern}$'.format(
+            team_id_pattern=TEAM_ID_PATTERN,
+            username_pattern=settings.USERNAME_PATTERN,
+        ),
         MembershipDetailView.as_view(),
         name="team_membership_detail"
     )

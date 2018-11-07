@@ -4,10 +4,14 @@ Models for credentials support for the LMS and Studio.
 
 from urlparse import urljoin
 
-from django.utils.translation import ugettext_lazy as _
-from django.db import models
-
 from config_models.models import ConfigurationModel
+from django.conf import settings
+from django.db import models
+from django.utils.translation import ugettext_lazy as _
+
+from openedx.core.djangoapps.site_configuration import helpers
+
+API_VERSION = 'v2'
 
 
 class CredentialsApiConfig(ConfigurationModel):
@@ -15,35 +19,42 @@ class CredentialsApiConfig(ConfigurationModel):
     Manages configuration for connecting to the Credential service and using its
     API.
     """
+
     class Meta(object):
-        app_label = "credentials"
+        app_label = 'credentials'
 
     OAUTH2_CLIENT_NAME = 'credentials'
     API_NAME = 'credentials'
     CACHE_KEY = 'credentials.api.data'
 
-    internal_service_url = models.URLField(verbose_name=_("Internal Service URL"))
-    public_service_url = models.URLField(verbose_name=_("Public Service URL"))
+    internal_service_url = models.URLField(
+        verbose_name=_('Internal Service URL'),
+        help_text='DEPRECATED: Use the setting CREDENTIALS_INTERNAL_SERVICE_URL.'
+    )
+    public_service_url = models.URLField(
+        verbose_name=_('Public Service URL'),
+        help_text='DEPRECATED: Use the setting CREDENTIALS_PUBLIC_SERVICE_URL.'
+    )
 
     enable_learner_issuance = models.BooleanField(
-        verbose_name=_("Enable Learner Issuance"),
+        verbose_name=_('Enable Learner Issuance'),
         default=False,
         help_text=_(
-            "Enable issuance of credentials via Credential Service."
+            'Enable issuance of credentials via Credential Service.'
         )
     )
     enable_studio_authoring = models.BooleanField(
-        verbose_name=_("Enable Authoring of Credential in Studio"),
+        verbose_name=_('Enable Authoring of Credential in Studio'),
         default=False,
         help_text=_(
-            "Enable authoring of Credential Service credentials in Studio."
+            'Enable authoring of Credential Service credentials in Studio.'
         )
     )
     cache_ttl = models.PositiveIntegerField(
-        verbose_name=_("Cache Time To Live"),
+        verbose_name=_('Cache Time To Live'),
         default=0,
         help_text=_(
-            "Specified in seconds. Enable caching by setting this to a value greater than 0."
+            'Specified in seconds. Enable caching by setting this to a value greater than 0.'
         )
     )
 
@@ -53,31 +64,25 @@ class CredentialsApiConfig(ConfigurationModel):
     @property
     def internal_api_url(self):
         """
-        Generate a URL based on internal service URL and API version number.
+        Internally-accessible API URL root.
         """
-        return urljoin(self.internal_service_url, '/api/v1/')
+        root = helpers.get_value('CREDENTIALS_INTERNAL_SERVICE_URL', settings.CREDENTIALS_INTERNAL_SERVICE_URL)
+        return urljoin(root, '/api/{}/'.format(API_VERSION))
 
     @property
     def public_api_url(self):
         """
-        Generate a URL based on public service URL and API version number.
+        Publicly-accessible API URL root.
         """
-        return urljoin(self.public_service_url, '/api/v1/')
+        root = helpers.get_value('CREDENTIALS_PUBLIC_SERVICE_URL', settings.CREDENTIALS_PUBLIC_SERVICE_URL)
+        return urljoin(root, '/api/{}/'.format(API_VERSION))
 
     @property
     def is_learner_issuance_enabled(self):
         """
-        Indicates whether the learner credential should be enabled or not.
+        Returns boolean indicating if credentials should be issued.
         """
         return self.enabled and self.enable_learner_issuance
-
-    @property
-    def is_studio_authoring_enabled(self):
-        """
-        Indicates whether Studio functionality related to Credential should
-        be enabled or not.
-        """
-        return self.enabled and self.enable_studio_authoring
 
     @property
     def is_cache_enabled(self):

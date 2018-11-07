@@ -1,29 +1,29 @@
 """
 Unit tests for the asset upload endpoint.
 """
+import json
 from datetime import datetime
 from io import BytesIO
-from pytz import UTC
-from PIL import Image
-import json
-from mock import patch
+
+import mock
+from ddt import data, ddt
 from django.conf import settings
+from django.test.utils import override_settings
+from mock import patch
+from opaque_keys.edx.locations import AssetLocation, SlashSeparatedCourseKey
+from PIL import Image
+from pytz import UTC
 
 from contentstore.tests.utils import CourseTestCase
-from contentstore.views import assets
 from contentstore.utils import reverse_course_url
+from contentstore.views import assets
+from static_replace import replace_static_urls
 from xmodule.assetstore import AssetMetadata
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
-from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml_importer import import_course_from_xml
-from django.test.utils import override_settings
-from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
-from static_replace import replace_static_urls
-import mock
-from ddt import ddt
-from ddt import data
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 

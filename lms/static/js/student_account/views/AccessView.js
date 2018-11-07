@@ -52,6 +52,9 @@
 
                     this.thirdPartyAuthHint = options.third_party_auth_hint || null;
 
+                    // Account activation messages
+                    this.accountActivationMessages = options.account_activation_messages || [];
+
                     if (options.login_redirect_url) {
                     // Ensure that the next URL is internal for security reasons
                         if (! window.isExternal(options.login_redirect_url)) {
@@ -69,6 +72,9 @@
 
                     this.platformName = options.platform_name;
                     this.supportURL = options.support_link;
+                    this.passwordResetSupportUrl = options.password_reset_support_link;
+                    this.createAccountOption = options.account_creation_allowed;
+                    this.hideAuthWarnings = options.hide_auth_warnings || false;
 
                 // The login view listens for 'sync' events from the reset model
                     this.resetModel = new PasswordResetModel({}, {
@@ -81,6 +87,10 @@
                 // Once the third party error message has been shown once,
                 // there is no need to show it again, if the user changes mode:
                     this.thirdPartyAuth.errorMessage = null;
+
+                    // Once the account activation messages have been shown once,
+                    // there is no need to show it again, if the user changes mode:
+                    this.accountActivationMessages = [];
                 },
 
                 render: function() {
@@ -118,8 +128,12 @@
                             model: model,
                             resetModel: this.resetModel,
                             thirdPartyAuth: this.thirdPartyAuth,
+                            accountActivationMessages: this.accountActivationMessages,
                             platformName: this.platformName,
-                            supportURL: this.supportURL
+                            supportURL: this.supportURL,
+                            passwordResetSupportUrl: this.passwordResetSupportUrl,
+                            createAccountOption: this.createAccountOption,
+                            hideAuthWarnings: this.hideAuthWarnings
                         });
 
                     // Listen for 'password-help' event to toggle sub-views
@@ -155,7 +169,8 @@
                             fields: data.fields,
                             model: model,
                             thirdPartyAuth: this.thirdPartyAuth,
-                            platformName: this.platformName
+                            platformName: this.platformName,
+                            hideAuthWarnings: this.hideAuthWarnings
                         });
 
                     // Listen for 'auth-complete' event so we can enroll/redirect the user appropriately.
@@ -203,7 +218,8 @@
                 toggleForm: function(e) {
                     var type = $(e.currentTarget).data('type'),
                         $form = $('#' + type + '-form'),
-                        $anchor = $('#' + type + '-anchor'),
+                        scrollX = window.scrollX,
+                        scrollY = window.scrollY,
                         queryParams = url('?'),
                         queryStr = queryParams.length > 0 ? '?' + queryParams : '';
 
@@ -222,7 +238,6 @@
                     this.element.hide($(this.el).find('.submission-success'));
                     this.element.hide($(this.el).find('.form-wrapper'));
                     this.element.show($form);
-                    this.element.scrollTop($anchor);
 
                 // Update url without reloading page
                     if (type != 'institution_login') {
@@ -232,6 +247,9 @@
 
                 // Focus on the form
                     $('#' + type).focus();
+
+               // Maintain original scroll position
+                    window.scrollTo(scrollX, scrollY);
                 },
 
             /**

@@ -5,12 +5,10 @@ Django Views for service status app
 import json
 import time
 
-from django.http import HttpResponse
-
-from dogapi import dog_stats_api
-
-from djcelery import celery
 from celery.exceptions import TimeoutError
+from django.http import HttpResponse
+from djcelery import celery
+from dogapi import dog_stats_api
 
 from openedx.core.djangoapps.service_status.tasks import delayed_ping
 

@@ -2,16 +2,15 @@
 Handles requests for data, returning a json
 """
 
-import logging
 import json
+import logging
 
 from django.http import HttpResponse
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from courseware.courses import get_course_overview_with_access
-from courseware.access import has_access
 from class_dashboard import dashboard_data
-
+from courseware.access import has_access
+from courseware.courses import get_course_overview_with_access
 
 log = logging.getLogger(__name__)
 

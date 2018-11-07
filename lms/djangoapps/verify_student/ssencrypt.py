@@ -22,11 +22,11 @@ In case of PEM encoding, the private key can be encrypted with DES or 3TDES
 according to a certain pass phrase. Only OpenSSL-compatible pass phrases are
 supported.
 """
-from hashlib import md5, sha256
 import base64
 import binascii
 import hmac
 import logging
+from hashlib import md5, sha256
 
 from Crypto import Random
 from Crypto.Cipher import AES, PKCS1_OAEP

@@ -3,15 +3,11 @@
 End-to-end tests for the LMS that utilize the
 progress page.
 """
-import ddt
-
 from contextlib import contextmanager
-from nose.plugins.attrib import attr
-from flaky import flaky
 
-from ..helpers import (
-    UniqueCourseTest, auto_auth, create_multiple_choice_problem, create_multiple_choice_xml, get_modal_alert
-)
+import ddt
+from nose.plugins.attrib import attr
+
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ...pages.common.logout import LogoutPage
 from ...pages.lms.courseware import CoursewarePage
@@ -19,8 +15,15 @@ from ...pages.lms.instructor_dashboard import InstructorDashboardPage, StudentSp
 from ...pages.lms.problem import ProblemPage
 from ...pages.lms.progress import ProgressPage
 from ...pages.studio.component_editor import ComponentEditorView
+from ...pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
 from ...pages.studio.utils import type_in_codemirror
-from ...pages.studio.overview import CourseOutlinePage
+from ..helpers import (
+    UniqueCourseTest,
+    auto_auth,
+    create_multiple_choice_problem,
+    create_multiple_choice_xml,
+    get_modal_alert
+)
 
 
 class ProgressPageBaseTest(UniqueCourseTest):
@@ -43,7 +46,7 @@ class ProgressPageBaseTest(UniqueCourseTest):
         self.progress_page = ProgressPage(self.browser, self.course_id)
         self.logout_page = LogoutPage(self.browser)
 
-        self.course_outline = CourseOutlinePage(
+        self.studio_course_outline = StudioCourseOutlinePage(
             self.browser,
             self.course_info['org'],
             self.course_info['number'],
@@ -140,10 +143,11 @@ class PersistentGradesTest(ProgressPageBaseTest):
         Adds a unit to the subsection, which
         should not affect a persisted subsection grade.
         """
-        self.course_outline.visit()
-        subsection = self.course_outline.section(self.SECTION_NAME).subsection(self.SUBSECTION_NAME)
+        self.studio_course_outline.visit()
+        subsection = self.studio_course_outline.section(self.SECTION_NAME).subsection(self.SUBSECTION_NAME)
         subsection.expand_subsection()
         subsection.add_unit()
+        self.studio_course_outline.wait_for_ajax()
         subsection.publish()
 
     def _set_staff_lock_on_subsection(self, locked):
@@ -151,8 +155,8 @@ class PersistentGradesTest(ProgressPageBaseTest):
         Sets staff lock for a subsection, which should hide the
         subsection score from students on the progress page.
         """
-        self.course_outline.visit()
-        subsection = self.course_outline.section_at(0).subsection_at(0)
+        self.studio_course_outline.visit()
+        subsection = self.studio_course_outline.section_at(0).subsection_at(0)
         subsection.set_staff_lock(locked)
         self.assertEqual(subsection.has_staff_lock_warning, locked)
 
@@ -162,9 +166,9 @@ class PersistentGradesTest(ProgressPageBaseTest):
         along with its container unit, so any changes can
         be published.
         """
-        self.course_outline.visit()
-        self.course_outline.section_at(0).subsection_at(0).expand_subsection()
-        unit = self.course_outline.section_at(0).subsection_at(0).unit(self.UNIT_NAME).go_to()
+        self.studio_course_outline.visit()
+        self.studio_course_outline.section_at(0).subsection_at(0).expand_subsection()
+        unit = self.studio_course_outline.section_at(0).subsection_at(0).unit(self.UNIT_NAME).go_to()
         component = unit.xblocks[1]
         return unit, component
 
@@ -227,7 +231,6 @@ class PersistentGradesTest(ProgressPageBaseTest):
         _change_subsection_structure,
         _change_weight_for_problem
     )
-    @flaky  # TODO: fix this, see TNL-6040
     def test_content_changes_do_not_change_score(self, edit):
         with self._logged_in_session():
             self.courseware_page.visit()
@@ -289,8 +292,8 @@ class SubsectionGradingPolicyTest(ProgressPageBaseTest):
         If a section index is not provided, 0 is assumed.
         """
         with self._logged_in_session(staff=True):
-            self.course_outline.visit()
-            modal = self.course_outline.section_at(section).subsection_at(0).edit()
+            self.studio_course_outline.visit()
+            modal = self.studio_course_outline.section_at(section).subsection_at(0).edit()
             modal.policy = policy
             modal.save()
 

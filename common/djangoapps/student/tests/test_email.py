@@ -2,26 +2,33 @@
 import json
 import unittest
 
-from student.tests.factories import UserFactory, RegistrationFactory, PendingEmailChangeFactory
-from student.views import (
-    reactivation_email_for_user, do_email_change_request, confirm_email_change,
-    validate_new_email, SETTING_CHANGE_INITIATED
-)
-from student.models import UserProfile, PendingEmailChange
-from django.core.urlresolvers import reverse
-from django.core import mail
+import mock
+from django.conf import settings
 from django.contrib.auth.models import User
+from django.core import mail
+from django.core.urlresolvers import reverse
 from django.db import transaction
+from django.http import HttpResponse
 from django.test import TestCase, TransactionTestCase
 from django.test.client import RequestFactory
 from mock import Mock, patch
-from django.http import HttpResponse
-from django.conf import settings
+
 from edxmako.shortcuts import render_to_string
-from util.request import safe_get_host
-from util.testing import EventTestMixin
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
+from student.models import PendingEmailChange, Registration, UserProfile
+from student.tests.factories import PendingEmailChangeFactory, RegistrationFactory, UserFactory
+from student.views import (
+    SETTING_CHANGE_INITIATED,
+    confirm_email_change,
+    do_email_change_request,
+    generate_activation_email_context,
+    reactivation_email_for_user,
+    validate_new_email
+)
+from third_party_auth.views import inactive_user_view
+from util.request import safe_get_host
+from util.testing import EventTestMixin
 
 
 class TestException(Exception):
@@ -70,30 +77,18 @@ class EmailTestMixin(object):
 class ActivationEmailTests(TestCase):
     """Test sending of the activation email. """
 
-    ACTIVATION_SUBJECT = u"Activate Your {} Account".format(settings.PLATFORM_NAME)
+    ACTIVATION_SUBJECT = u"Action Required: Activate your {} account".format(settings.PLATFORM_NAME)
 
     # Text fragments we expect in the body of an email
     # sent from an OpenEdX installation.
     OPENEDX_FRAGMENTS = [
-        u"Thank you for creating an account with {platform}!".format(platform=settings.PLATFORM_NAME),
+        u"high-quality {platform} courses".format(platform=settings.PLATFORM_NAME),
         "http://edx.org/activate/",
         (
-            "Check the help section of the "
-            u"{platform} website".format(platform=settings.PLATFORM_NAME)
+            "please use our web form at "
+            u"{support_url} ".format(support_url=settings.SUPPORT_SITE_LINK)
         )
     ]
-
-    # Text fragments we expect in the body of an email
-    # sent from an EdX-controlled domain.
-    EDX_DOMAIN_FRAGMENTS = [
-        u"Thank you for creating an account with {platform}!".format(platform=settings.PLATFORM_NAME),
-        "http://edx.org/activate/",
-        "https://www.edx.org/contact-us",
-        "This email message was automatically sent by edx.org"
-    ]
-
-    def setUp(self):
-        super(ActivationEmailTests, self).setUp()
 
     def test_activation_email(self):
         self._create_account()
@@ -102,7 +97,7 @@ class ActivationEmailTests(TestCase):
     @with_comprehensive_theme("edx.org")
     def test_activation_email_edx_domain(self):
         self._create_account()
-        self._assert_activation_email(self.ACTIVATION_SUBJECT, self.EDX_DOMAIN_FRAGMENTS)
+        self._assert_activation_email(self.ACTIVATION_SUBJECT, self.OPENEDX_FRAGMENTS)
 
     def _create_account(self):
         """Create an account, triggering the activation email. """
@@ -132,6 +127,24 @@ class ActivationEmailTests(TestCase):
         for fragment in body_fragments:
             self.assertIn(fragment, msg.body)
 
+    @mock.patch('student.tasks.log')
+    def test_send_email_to_inactive_user(self, mock_log):
+        """
+        Tests that when an inactive user logs-in using the social auth, system
+        sends an activation email to the user.
+        """
+        inactive_user = UserFactory(is_active=False)
+        Registration().register(inactive_user)
+        request = RequestFactory().get(settings.SOCIAL_AUTH_INACTIVE_USER_URL)
+        request.user = inactive_user
+        with patch('edxmako.request_context.get_current_request'):
+            inactive_user_view(request)
+            mock_log.info.assert_called_with(
+                "Activation Email has been sent to User {user_email}".format(
+                    user_email=inactive_user.email
+                )
+            )
+
 
 @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
 @patch('django.contrib.auth.models.User.email_user')
@@ -153,10 +166,7 @@ class ReactivationEmailTests(EmailTestMixin, TestCase):
 
     def assertReactivateEmailSent(self, email_user):
         """Assert that the correct reactivation email has been sent"""
-        context = {
-            'name': self.user.profile.name,
-            'key': self.registration.activation_key
-        }
+        context = generate_activation_email_context(self.user, self.registration)
 
         self.assertEmailUser(
             email_user,
@@ -192,6 +202,16 @@ class ReactivationEmailTests(EmailTestMixin, TestCase):
         """
         response_data = self.reactivation_email(self.unregisteredUser)
 
+        self.assertFalse(response_data['success'])
+
+    def test_reactivation_for_no_user_profile(self, email_user):
+        """
+        Test that trying to send a reactivation email to a user without
+        user profile fails without throwing 500 error.
+        """
+        user = UserFactory.build(username='test_user', email='test_user@test.com')
+        user.save()
+        response_data = self.reactivation_email(user)
         self.assertFalse(response_data['success'])
 
     def test_reactivation_email_success(self, email_user):

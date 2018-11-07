@@ -231,6 +231,7 @@ define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helper
                     }
                     expect(view.$(dropdownSelectClass).length).toBe(1);
                     view.$(dropdownSelectClass).val(FieldViewsSpecHelpers.SELECT_OPTIONS[0]).change();
+                    view.$(dropdownSelectClass).focusout();
                     expect(view.fieldValue()).toBe(FieldViewsSpecHelpers.SELECT_OPTIONS[0][0]);
 
                     AjaxHelpers.respondWithNoContent(requests);

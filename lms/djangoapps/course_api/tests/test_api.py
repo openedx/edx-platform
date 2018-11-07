@@ -11,10 +11,11 @@ from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import check_mongo_calls
-from .mixins import CourseApiFactoryMixin
+
 from ..api import course_detail, list_courses
+from .mixins import CourseApiFactoryMixin
 
 
 class CourseApiTestMixin(CourseApiFactoryMixin):
@@ -38,6 +39,8 @@ class CourseDetailTestMixin(CourseApiTestMixin):
     """
     Common functionality for course_detail tests
     """
+    ENABLED_SIGNALS = ['course_published']
+
     def _make_api_call(self, requesting_user, target_user, course_key):
         """
         Call the `course_detail` api endpoint to get information on the course
@@ -109,6 +112,7 @@ class TestGetCourseList(CourseListTestMixin, SharedModuleStoreTestCase):
     """
     Test the behavior of the `list_courses` api function.
     """
+    ENABLED_SIGNALS = ['course_published']
 
     @classmethod
     def setUpClass(cls):
@@ -150,6 +154,7 @@ class TestGetCourseListMultipleCourses(CourseListTestMixin, ModuleStoreTestCase)
     Test the behavior of the `list_courses` api function (with tests that
     modify the courseware).
     """
+    ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
         super(TestGetCourseListMultipleCourses, self).setUp()
@@ -207,6 +212,8 @@ class TestGetCourseListExtras(CourseListTestMixin, ModuleStoreTestCase):
     Tests of course_list api function that require alternative configurations
     of created courses.
     """
+    ENABLED_SIGNALS = ['course_published']
+
     @classmethod
     def setUpClass(cls):
         super(TestGetCourseListExtras, cls).setUpClass()

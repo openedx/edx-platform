@@ -3,12 +3,16 @@ This module provides an abstraction for Module Stores that support Draft and Pub
 """
 
 import threading
+import logging
 from abc import ABCMeta, abstractmethod
 from contextlib import contextmanager
 from . import ModuleStoreEnum, BulkOperationsMixin
+from .exceptions import ItemNotFoundError
 
 # Things w/ these categories should never be marked as version=DRAFT
 DIRECT_ONLY_CATEGORIES = ['course', 'chapter', 'sequential', 'about', 'static_tab', 'course_info']
+
+log = logging.getLogger(__name__)
 
 
 class BranchSettingMixin(object):
@@ -133,6 +137,61 @@ class ModuleStoreDraftAndPublished(BranchSettingMixin, BulkOperationsMixin):
             else:
                 # We remove the branch, because publishing always means copying from draft to published
                 self.signal_handler.send("course_published", course_key=course_key.for_branch(None))
+
+    def update_item_parent(self, item_location, new_parent_location, old_parent_location, user_id, insert_at=None):
+        """
+        Updates item's parent and removes it's reference from old parent.
+
+        Arguments:
+            item_location (BlockUsageLocator)    : Locator of item.
+            new_parent_location (BlockUsageLocator)  : New parent block locator.
+            old_parent_location (BlockUsageLocator)  : Old parent block locator.
+            user_id (int)   : User id.
+            insert_at (int) : Insert item at the particular index in new parent.
+
+        Returns:
+           BlockUsageLocator or None: Source item location if updated, otherwise None.
+        """
+        try:
+            source_item = self.get_item(item_location)  # pylint: disable=no-member
+            old_parent_item = self.get_item(old_parent_location)    # pylint: disable=no-member
+            new_parent_item = self.get_item(new_parent_location)    # pylint: disable=no-member
+        except ItemNotFoundError as exception:
+            log.error('Unable to find the item : %s', exception.message)
+            return
+
+        # Remove item from the list of children of old parent.
+        if source_item.location in old_parent_item.children:
+            old_parent_item.children.remove(source_item.location)
+            self.update_item(old_parent_item, user_id)  # pylint: disable=no-member
+            log.info(
+                '%s removed from %s children',
+                unicode(source_item.location),
+                unicode(old_parent_item.location)
+            )
+
+        # Add item to new parent at particular location.
+        if source_item.location not in new_parent_item.children:
+            if insert_at is not None:
+                new_parent_item.children.insert(insert_at, source_item.location)
+            else:
+                new_parent_item.children.append(source_item.location)
+            self.update_item(new_parent_item, user_id)  # pylint: disable=no-member
+            log.info(
+                '%s added to %s children',
+                unicode(source_item.location),
+                unicode(new_parent_item.location)
+            )
+
+        # Update parent attribute of the item block
+        source_item.parent = new_parent_location
+        self.update_item(source_item, user_id)  # pylint: disable=no-member
+        log.info(
+            '%s parent updated to %s',
+            unicode(source_item.location),
+            unicode(new_parent_item.location)
+        )
+        return source_item.location
 
 
 class UnsupportedRevisionError(ValueError):

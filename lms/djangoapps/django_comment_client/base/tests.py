@@ -1,36 +1,38 @@
+# -*- coding: utf-8 -*-
 """Tests for django comment client views."""
-from contextlib import contextmanager
-import logging
 import json
-import ddt
+import logging
+from contextlib import contextmanager
 
-from django.test.client import RequestFactory
+import ddt
 from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
-from mock import patch, ANY, Mock
-from nose.tools import assert_true, assert_equal
+from django.test.client import RequestFactory
+from mock import ANY, Mock, patch
 from nose.plugins.attrib import attr
+from nose.tools import assert_equal, assert_true
 from opaque_keys.edx.keys import CourseKey
-from lms.lib.comment_client import Thread
 
 from common.test.utils import MockSignalHandlerMixin, disable_signal
 from django_comment_client.base import views
-from django_comment_client.tests.group_id import CohortedTopicGroupIdTestMixin, NonCohortedTopicGroupIdTestMixin, GroupIdAssertionMixin
-from django_comment_client.tests.utils import CohortedTestCase, ForumsEnableMixin
+from django_comment_client.tests.group_id import (
+    CohortedTopicGroupIdTestMixin,
+    GroupIdAssertionMixin,
+    NonCohortedTopicGroupIdTestMixin
+)
 from django_comment_client.tests.unicode import UnicodeTestMixin
+from django_comment_client.tests.utils import CohortedTestCase, ForumsEnableMixin
 from django_comment_common.models import Role
-from django_comment_common.utils import seed_permissions_roles, ThreadContext
-
+from django_comment_common.utils import ThreadContext, seed_permissions_roles
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
-from student.tests.factories import CourseEnrollmentFactory, UserFactory, CourseAccessRoleFactory
+from lms.lib.comment_client import Thread
+from student.tests.factories import CourseAccessRoleFactory, CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import check_mongo_calls
-from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
-
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 log = logging.getLogger(__name__)
 
@@ -356,6 +358,7 @@ class ViewsQueryCountTestCase(
 
     CREATE_USER = False
     ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
+    ENABLED_SIGNALS = ['course_published']
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
@@ -1154,9 +1157,6 @@ class CreateThreadUnicodeTestCase(
         cls.student = UserFactory.create()
         CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
 
-    def setUp(self):
-        super(CreateThreadUnicodeTestCase, self).setUp()
-
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request,):
         """
@@ -1167,7 +1167,8 @@ class CreateThreadUnicodeTestCase(
         request.user = self.student
         request.view_name = "create_thread"
         response = views.create_thread(
-            request, course_id=unicode(self.course.id), commentable_id="non_team_dummy_id"
+            # The commentable ID contains a username, the Unicode char below ensures it works fine
+            request, course_id=unicode(self.course.id), commentable_id=u"non_tåem_dummy_id"
         )
 
         self.assertEqual(response.status_code, 200)
@@ -1198,9 +1199,6 @@ class UpdateThreadUnicodeTestCase(
         seed_permissions_roles(cls.course.id)
         cls.student = UserFactory.create()
         CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
-
-    def setUp(self):
-        super(UpdateThreadUnicodeTestCase, self).setUp()
 
     @patch('django_comment_client.utils.get_discussion_categories_ids', return_value=["test_commentable"])
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
@@ -1244,9 +1242,6 @@ class CreateCommentUnicodeTestCase(
         seed_permissions_roles(cls.course.id)
         cls.student = UserFactory.create()
         CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
-
-    def setUp(self):
-        super(CreateCommentUnicodeTestCase, self).setUp()
 
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
@@ -1296,9 +1291,6 @@ class UpdateCommentUnicodeTestCase(
         cls.student = UserFactory.create()
         CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
 
-    def setUp(self):
-        super(UpdateCommentUnicodeTestCase, self).setUp()
-
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
         self._set_mock_request_data(mock_request, {
@@ -1339,9 +1331,6 @@ class CreateSubCommentUnicodeTestCase(
         seed_permissions_roles(cls.course.id)
         cls.student = UserFactory.create()
         CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
-
-    def setUp(self):
-        super(CreateSubCommentUnicodeTestCase, self).setUp()
 
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
@@ -1666,9 +1655,6 @@ class ForumEventTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockReque
         cls.student.roles.add(Role.objects.get(name="Student", course_id=cls.course.id))
         CourseAccessRoleFactory(course_id=cls.course.id, user=cls.student, role='Wizard')
 
-    def setUp(self):
-        super(ForumEventTestCase, self).setUp()
-
     @patch('eventtracking.tracker.emit')
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def test_thread_event(self, __, mock_emit):
@@ -1850,9 +1836,6 @@ class UsersEndpointTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockRe
         cls.enrollment = CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
         cls.other_user = UserFactory.create(username="other")
         CourseEnrollmentFactory(user=cls.other_user, course_id=cls.course.id)
-
-    def setUp(self):
-        super(UsersEndpointTestCase, self).setUp()
 
     def set_post_counts(self, mock_request, threads_count=1, comments_count=1):
         """

@@ -3,13 +3,15 @@ Utilities for tests within the django_comment_client module.
 """
 from mock import patch
 
+from django_comment_common.models import ForumsConfig, Role
+from django_comment_common.utils import CourseDiscussionSettings, seed_permissions_roles, set_course_discussion_settings
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
-from django_comment_common.models import Role, ForumsConfig
-from django_comment_common.utils import seed_permissions_roles
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class ForumsEnableMixin(object):
@@ -63,3 +65,58 @@ class CohortedTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCa
             course_id=self.course.id,
             users=[self.moderator]
         )
+
+
+# pylint: disable=dangerous-default-value
+def config_course_discussions(
+        course,
+        discussion_topics={},
+        divided_discussions=[],
+        always_divide_inline_discussions=False
+):
+        """
+        Set discussions and configure divided discussions for a course.
+
+        Arguments:
+            course: CourseDescriptor
+            discussion_topics (Dict): Discussion topic names. Picks ids and
+                sort_keys automatically.
+            divided_discussions: Discussion topics to divide. Converts the
+                list to use the same ids as discussion topic names.
+            always_divide_inline_discussions (bool): Whether inline discussions
+                should be divided by default.
+
+        Returns:
+            Nothing -- modifies course in place.
+        """
+
+        def to_id(name):
+            """Convert name to id."""
+            return topic_name_to_id(course, name)
+
+        set_course_discussion_settings(
+            course.id,
+            divided_discussions=[to_id(name) for name in divided_discussions],
+            always_divide_inline_discussions=always_divide_inline_discussions,
+            division_scheme=CourseDiscussionSettings.COHORT,
+        )
+
+        course.discussion_topics = dict((name, {"sort_key": "A", "id": to_id(name)})
+                                        for name in discussion_topics)
+        try:
+            # Not implemented for XMLModulestore, which is used by test_cohorts.
+            modulestore().update_item(course, ModuleStoreEnum.UserID.test)
+        except NotImplementedError:
+            pass
+
+
+def topic_name_to_id(course, name):
+    """
+    Given a discussion topic name, return an id for that name (includes
+    course and url_name).
+    """
+    return "{course}_{run}_{name}".format(
+        course=course.location.course,
+        run=course.url_name,
+        name=name
+    )

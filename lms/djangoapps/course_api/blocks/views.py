@@ -3,12 +3,12 @@ CourseBlocks API views
 """
 from django.core.exceptions import ValidationError
 from django.http import Http404
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
-from openedx.core.lib.api.view_utils import view_auth_classes, DeveloperErrorViewMixin
+from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -172,6 +172,9 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
 
           * due: The due date of the block. Returned only if "due" is included
             in the "requested_fields" parameter.
+
+          * show_correctness: Whether to show scores/correctness to learners for the current sequence or problem.
+            Returned only if "show_correctness" is included in the "requested_fields" parameter.
     """
 
     def list(self, request, usage_key_string):  # pylint: disable=arguments-differ

@@ -1,4 +1,4 @@
-<li data-id="<%- id %>" class="forum-nav-thread<% if (neverRead) { %> never-read<% } %>">
+<li data-id="<%- id %>" class="forum-nav-thread<% if (!hideReadState && neverRead) { %> never-read<% } %>">
   <a href="<%- threadUrl %>" class="forum-nav-thread-link">
     <div class="forum-nav-thread-wrapper-0">
       <%
@@ -75,7 +75,7 @@
       %>
       </span>
 
-      <% if (!neverRead && unread_comments_count > 0) { %>
+      <% if (!hideReadState && !neverRead && unread_comments_count > 0) { %>
         <span class="forum-nav-thread-unread-comments-count">
           <%-
             StringUtils.interpolate(

@@ -2,19 +2,20 @@
 This test file will run through some LMS test scenarios regarding access and navigation of the LMS
 """
 import time
-from mock import patch
-from nose.plugins.attrib import attr
 
+from courseware.tests.factories import GlobalStaffFactory
+from courseware.tests.helpers import LoginEnrollmentTestCase
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
-
-from courseware.tests.helpers import LoginEnrollmentTestCase
-from courseware.tests.factories import GlobalStaffFactory
+from mock import patch
+from nose.plugins.attrib import attr
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
+from openedx.features.course_experience import COURSE_OUTLINE_PAGE_FLAG
 from student.tests.factories import UserFactory
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.django import modulestore
 
 
 @attr(shard=1)
@@ -95,6 +96,8 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
                 raise AssertionError("assertTabInactive failed: " + tabname + " active")
         return
 
+    # TODO: LEARNER-71: Do we need to adjust or remove this test?
+    @override_waffle_flag(COURSE_OUTLINE_PAGE_FLAG, active=False)
     def test_chrome_settings(self):
         '''
         Test settings for disabling and modifying navigation chrome in the courseware:
@@ -223,6 +226,8 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         resp = self.client.get(url)
         self.assertRedirects(resp, section_url)
 
+    # TODO: LEARNER-71: Do we need to adjust or remove this test?
+    @override_waffle_flag(COURSE_OUTLINE_PAGE_FLAG, active=False)
     def test_incomplete_course(self):
         email = self.staff_user.email
         password = "test"

@@ -3,12 +3,16 @@
 <%namespace name='static' file='/static_content.html'/>
 <%def name="online_help_token()"><% return "courseware" %></%def>
 <%!
-from django.utils.translation import ugettext as _
+import waffle
+
 from django.conf import settings
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
 
 from edxnotes.helpers import is_feature_enabled as is_edxnotes_enabled
-from openedx.core.djangolib.markup import HTML
 from openedx.core.djangolib.js_utils import js_escaped_string
+from openedx.core.djangolib.markup import HTML
+from openedx.features.course_experience import course_home_page_title, COURSE_OUTLINE_PAGE_FLAG
 %>
 <%
   include_special_exams = settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and (course.enable_proctored_exams or course.enable_timed_exams)
@@ -19,13 +23,11 @@ from openedx.core.djangolib.js_utils import js_escaped_string
 
 <%block name="bodyclass">view-in-course view-courseware courseware ${course.css_class or ''}</%block>
 
-<%block name="title"><title>
-    % if section_title:
-${static.get_page_title_breadcrumbs(section_title, course_name())}
-    % else:
-${static.get_page_title_breadcrumbs(course_name())}
-    %endif
-</title></%block>
+<%block name="title">
+<title data-base-title="${static.get_page_title_breadcrumbs(section_title, course_name())}">
+  ${static.get_page_title_breadcrumbs(sequence_title, section_title, course_name())}
+</title>
+</%block>
 
 <%block name="header_extras">
 
@@ -35,15 +37,7 @@ ${static.get_page_title_breadcrumbs(course_name())}
 </script>
 % endfor
 
-% if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
-    % for template_name in ["course_search_item", "course_search_results", "search_loading", "search_error"]:
-        <script type="text/template" id="${template_name}-tpl">
-            <%static:include path="search/${template_name}.underscore" />
-        </script>
-    % endfor
-% endif
-
-% if include_special_exams:
+% if include_special_exams is not UNDEFINED and include_special_exams:
   % for template_name in ["proctored-exam-status"]:
     <script type="text/template" id="${template_name}-tpl">
         <%static:include path="courseware/${template_name}.underscore" />
@@ -79,9 +73,12 @@ ${static.get_page_title_breadcrumbs(course_name())}
   <%include file="/mathjax_include.html" args="disable_fast_preview=True"/>
 
   % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
-    <%static:require_module module_name="js/search/course/course_search_factory" class_name="CourseSearchFactory">
+    <%static:require_module module_name="course_search/js/course_search_factory" class_name="CourseSearchFactory">
         var courseId = $('.courseware-results').data('courseId');
-        CourseSearchFactory(courseId);
+        CourseSearchFactory({
+            courseId: courseId,
+            searchHeader: $('.search-bar')
+        });
     </%static:require_module>
   % endif
 
@@ -109,7 +106,11 @@ ${HTML(fragment.foot_html())}
   <%include file="/courseware/course_navigation.html" args="active_page='courseware'" />
 % endif
 
-<div class="container">
+<div class="container"
+  % if getattr(course, 'language'):
+    lang="${course.language}"
+  % endif
+  >
   <div class="course-wrapper" role="presentation">
 
 % if disable_accordion is UNDEFINED or not disable_accordion:
@@ -117,15 +118,15 @@ ${HTML(fragment.foot_html())}
 
       <div class="wrapper-course-modes">
 
-          <div class="courseware-bookmarks-button" data-bookmarks-api-url="${bookmarks_api_url}">
-              <button type="button" class="bookmarks-list-button is-inactive" aria-pressed="false">
+          <div class="courseware-bookmarks-button">
+              <a class="bookmarks-list-button" href="${reverse('openedx.course_bookmarks.home', args=[course.id])}">
                   ${_('Bookmarks')}
-              </button>
+              </a>
           </div>
 
           % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
             <div id="courseware-search-bar" class="search-bar courseware-search-bar" role="search" aria-label="Course">
-              <form>
+              <form class="search-form">
                 <label for="course-search-input" class="sr">${_('Course Search')}</label>
                 <div class="search-field-wrapper">
                   <input id="course-search-input" type="text" class="search-field"/>
@@ -153,39 +154,68 @@ ${HTML(fragment.foot_html())}
     </div>
 % endif
     <section class="course-content" id="course-content">
-        <div class="path"></div>
-        <main id="main" aria-label="Content" tabindex="-1">
-        % if getattr(course, 'entrance_exam_enabled') and \
-           getattr(course, 'entrance_exam_minimum_score_pct') and \
-           entrance_exam_current_score is not UNDEFINED:
-            % if not entrance_exam_passed:
-            <p class="sequential-status-message">
-                ${_('To access course materials, you must score {required_score}% or higher on this \
-                exam. Your current score is {current_score}%.').format(
-                    required_score=int(round(course.entrance_exam_minimum_score_pct * 100)),
-                    current_score=int(round(entrance_exam_current_score * 100))
-                )}
-            </p>
-            <script type="text/javascript">
-            $(document).ajaxSuccess(function(event, xhr, settings) {
-                if (settings.url.indexOf("xmodule_handler/problem_check") > -1) {
-                    var data = JSON.parse(xhr.responseText);
-                    if (data.entrance_exam_passed){
-                        location.reload();
-                    }
-                }
-            });
-            </script>
-            % else:
-              <p class="sequential-status-message">
-                ${_('Your score is {current_score}%. You have passed the entrance exam.').format(
-                    current_score=int(round(entrance_exam_current_score * 100))
-                )}
-            </p>
-            % endif
-        % endif
+        <header class="page-header has-secondary">
+            <div class="page-header-main">
+                <nav aria-label="${_('Course')}" class="sr-is-focusable" tabindex="-1">
+                    <div class="has-breadcrumbs">
+                        <div class="breadcrumbs">
+                            % if COURSE_OUTLINE_PAGE_FLAG.is_enabled(course.id):
+                                <span class="nav-item nav-item-course">
+                                    <a href="${course_url}">${course_home_page_title(course)}</a>
+                                </span>
+                                <span class="icon fa fa-angle-right" aria-hidden="true"></span>
+                            % endif
+                            % if chapter:
+                                <span class="nav-item nav-item-chapter">
+                                    <a href="${course_url}#${unicode(chapter.location)}">${chapter.display_name_with_default}</a>
+                                </span>
+                                <span class="icon fa fa-angle-right" aria-hidden="true"></span>
+                            % endif
+                            % if section:
+                                <span class="nav-item nav-item-section">
+                                    <a href="${course_url}#${unicode(section.location)}">${section.display_name_with_default}</a>
+                                </span>
+                                <span class="icon fa fa-angle-right" aria-hidden="true"></span>
+                            % endif
+                            <span class="nav-item nav-item-sequence">${sequence_title}</span>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </header>
 
-          ${HTML(fragment.body_html())}
+        <main id="main" tabindex="-1" aria-label="Content">
+            % if getattr(course, 'entrance_exam_enabled') and \
+               getattr(course, 'entrance_exam_minimum_score_pct') and \
+               entrance_exam_current_score is not UNDEFINED:
+                % if not entrance_exam_passed:
+                <p class="sequential-status-message">
+                    ${_('To access course materials, you must score {required_score}% or higher on this \
+                    exam. Your current score is {current_score}%.').format(
+                        required_score=int(round(course.entrance_exam_minimum_score_pct * 100)),
+                        current_score=int(round(entrance_exam_current_score * 100))
+                    )}
+                </p>
+                <script type="text/javascript">
+                $(document).ajaxSuccess(function(event, xhr, settings) {
+                    if (settings.url.indexOf("xmodule_handler/problem_check") > -1) {
+                        var data = JSON.parse(xhr.responseText);
+                        if (data.entrance_exam_passed){
+                            location.reload();
+                        }
+                    }
+                });
+                </script>
+                % else:
+                  <p class="sequential-status-message">
+                    ${_('Your score is {current_score}%. You have passed the entrance exam.').format(
+                        current_score=int(round(entrance_exam_current_score * 100))
+                    )}
+                </p>
+                % endif
+            % endif
+
+              ${HTML(fragment.body_html())}
         </main>
     </section>
 
@@ -196,6 +226,7 @@ ${HTML(fragment.foot_html())}
     </section>
 
   </div>
+  ${HTML(course_sock_fragment.body_html())}
 </div>
 <div class="container-footer">
   % if settings.FEATURES.get("LICENSING", False):
@@ -209,17 +240,17 @@ ${HTML(fragment.foot_html())}
     </div>
   % endif
 </div>
+% if course.show_calculator or is_edxnotes_enabled(course):
+    <nav class="nav-utilities ${"has-utility-calculator" if course.show_calculator else ""}" aria-label="${_('Course Utilities')}">
+      ## Utility: Notes
+      % if is_edxnotes_enabled(course):
+        <%include file="/edxnotes/toggle_notes.html" args="course=course"/>
+      % endif
 
-<nav class="nav-utilities ${"has-utility-calculator" if course.show_calculator else ""}" aria-label="${_('Course Utilities')}">
-  ## Utility: Notes
-  % if is_edxnotes_enabled(course):
-    <%include file="/edxnotes/toggle_notes.html" args="course=course"/>
-  % endif
-
-  ## Utility: Calc
-  % if course.show_calculator:
-    <%include file="/calculator/toggle_calculator.html" />
-  % endif
-</nav>
-
+      ## Utility: Calc
+      % if course.show_calculator:
+        <%include file="/calculator/toggle_calculator.html" />
+      % endif
+    </nav>
+% endif
 <%include file="../modal/accessible_confirm.html" />

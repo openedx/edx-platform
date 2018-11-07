@@ -5,7 +5,7 @@ set -e
 source $HOME/jenkins_env
 
 NODE_ENV_DIR=$HOME/nenv
-NODE_VERSION=6.9.4
+NODE_VERSION=6.11.1
 
 NODE_INSTALL_COMMAND="nodeenv --node=$NODE_VERSION --prebuilt $NODE_ENV_DIR --force"
 
@@ -68,3 +68,5 @@ npm cache clean
 TIMESTAMP=$(date +%s)
 export PAVER_TIMER_LOG="test_root/log/timing.paver.$TIMESTAMP.log"
 export ANSIBLE_TIMER_LOG="test_root/log/timing.ansible.$TIMESTAMP.log"
+
+echo "This node is `curl http://169.254.169.254/latest/meta-data/hostname`"

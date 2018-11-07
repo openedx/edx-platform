@@ -5,6 +5,7 @@
 <%!
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
+from openedx.core.djangolib.markup import HTML
 %>
 <%block name="bodyclass">view-in-course view-instructordash</%block>
 
@@ -63,11 +64,24 @@ from django.core.urlresolvers import reverse
   <script type="text/javascript" src="${static.url('js/views/notification.js')}"></script>
   <script type="text/javascript" src="${static.url('js/views/file_uploader.js')}"></script>
   <script type="text/javascript" src="${static.url('js/utils/animation.js')}"></script>
+  % for section_data in sections:
+    % if 'fragment' in section_data:
+      ${HTML(section_data['fragment'].head_html())}
+    % endif
+  % endfor
+</%block>
+
+<%block name="js_extra">
+  % for section_data in sections:
+    % if 'fragment' in section_data:
+      ${HTML(section_data['fragment'].foot_html())}
+    % endif
+  % endfor
 </%block>
 
 ## Include Underscore templates
 <%block name="header_extras">
-% for template_name in ["cohorts", "enrollment-code-lookup-links", "cohort-editor", "cohort-group-header", "cohort-selector", "cohort-form", "notification", "cohort-state", "cohort-discussions-inline", "cohort-discussions-course-wide", "cohort-discussions-category", "cohort-discussions-subcategory", "certificate-white-list", "certificate-white-list-editor", "certificate-bulk-white-list", "certificate-invalidation"]:
+% for template_name in ["cohorts", "discussions", "enrollment-code-lookup-links", "cohort-editor", "cohort-group-header", "cohort-selector", "cohort-form", "notification", "cohort-state", "divided-discussions-inline", "divided-discussions-course-wide", "cohort-discussions-category", "cohort-discussions-subcategory", "certificate-white-list", "certificate-white-list-editor", "certificate-bulk-white-list", "certificate-invalidation"]:
 <script type="text/template" id="${template_name}-tpl">
   <%static:include path="instructor/instructor_dashboard_2/${template_name}.underscore" />
 </script>
@@ -89,7 +103,7 @@ from django.core.urlresolvers import reverse
   <div class="instructor-dashboard-wrapper-2">
         <main id="main" aria-label="Content" tabindex="-1">
         <section class="instructor-dashboard-content-2" id="instructor-dashboard-content">
-            <h1 class="hd hd-1">${_("Instructor Dashboard")}</h1>
+          <h2 class="hd hd-2 instructor-dashboard-title">${_("Instructor Dashboard")}</h2>
           <div class="wrap-instructor-info studio-view">
             %if studio_url:
             <a class="instructor-info-action" href="${studio_url}">${_("View Course in Studio")}</a>
@@ -107,9 +121,10 @@ from django.core.urlresolvers import reverse
         ## when the javascript loads, it clicks on the first section
         <ul class="instructor-nav">
           % for section_data in sections:
+            <% is_hidden = section_data.get('is_hidden', False) %>
             ## This is necessary so we don't scrape 'section_display_name' as a string.
             <% dname = section_data['section_display_name'] %>
-            <li class="nav-item"><button type="button" class="btn-link" data-section="${ section_data['section_key'] }">${_(dname)}</button></li>
+            <li class="nav-item"><button type="button" class="btn-link ${ section_data['section_key'] }${' hidden' if is_hidden else ''}" data-section="${ section_data['section_key'] }">${_(dname)}</button></li>
           % endfor
         </ul>
 
@@ -117,8 +132,9 @@ from django.core.urlresolvers import reverse
         ## to keep this short, sections can be pulled out into their own files
 
         % for section_data in sections:
-          <section id="${ section_data['section_key'] }" class="idash-section" aria-labelledby="header-${section_data['section_key']}">
-              <h2 class="hd hd-2" id="header-${ section_data['section_key'] }">${ section_data['section_display_name'] }</h2>
+          <% is_hidden = section_data.get('is_hidden', False) %>
+          <section id="${ section_data['section_key'] }" class="idash-section${' hidden' if hidden else ''}" aria-labelledby="header-${section_data['section_key']}">
+              <h3 class="hd hd-3" id="header-${ section_data['section_key'] }">${ section_data['section_display_name'] }</h3>
               <%include file="${ section_data['section_key'] }.html" args="section_data=section_data" />
           </section>
           % endfor

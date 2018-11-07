@@ -1,54 +1,57 @@
 """
 Tests for Shopping Cart views
 """
-from collections import OrderedDict
-import pytz
-from urlparse import urlparse
-from decimal import Decimal
 import json
+from collections import OrderedDict
+from datetime import datetime, timedelta
+from decimal import Decimal
+from urlparse import urlparse
 
-from django.http import HttpRequest
+import ddt
+import pytz
 from django.conf import settings
-from django.test import TestCase
-from django.test.utils import override_settings
-from django.core.urlresolvers import reverse
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import Group, User
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core import mail
-
 from django.core.cache import cache
-from pytz import UTC
+from django.core.urlresolvers import reverse
+from django.http import HttpRequest
+from django.test import TestCase
+from django.test.utils import override_settings
 from freezegun import freeze_time
-from datetime import datetime, timedelta
-from mock import patch, Mock
+from mock import Mock, patch
 from nose.plugins.attrib import attr
-import ddt
+from pytz import UTC
 
 from common.test.utils import XssTestMixin
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
-from student.roles import CourseSalesAdminRole
-from util.date_utils import get_default_time_display
-from util.testing import UrlResetMixin
-
-from shoppingcart.views import _can_download_report, _get_date_from_str
-from shoppingcart.models import (
-    Order, CertificateItem, PaidCourseRegistration, CourseRegCodeItem,
-    Coupon, CourseRegistrationCode, RegistrationCodeRedemption,
-    DonationConfiguration,
-    CouponRedemption)
-from student.tests.factories import UserFactory, AdminFactory, CourseModeFactory
-from courseware.tests.factories import InstructorFactory
-from student.models import CourseEnrollment
 from course_modes.models import CourseMode
+from courseware.tests.factories import InstructorFactory
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
-from shoppingcart.processors import render_purchase_form_html
 from shoppingcart.admin import SoftDeleteCouponAdmin
-from shoppingcart.views import initialize_report
-from shoppingcart.tests.payment_fake import PaymentFakeView
+from shoppingcart.models import (
+    CertificateItem,
+    Coupon,
+    CouponRedemption,
+    CourseRegCodeItem,
+    CourseRegistrationCode,
+    DonationConfiguration,
+    Order,
+    PaidCourseRegistration,
+    RegistrationCodeRedemption
+)
+from shoppingcart.processors import render_purchase_form_html
 from shoppingcart.processors.CyberSource2 import sign
+from shoppingcart.tests.payment_fake import PaymentFakeView
+from shoppingcart.views import _can_download_report, _get_date_from_str, initialize_report
+from student.models import CourseEnrollment
+from student.roles import CourseSalesAdminRole
+from student.tests.factories import AdminFactory, CourseModeFactory, UserFactory
+from util.date_utils import get_default_time_display
+from util.testing import UrlResetMixin
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 def mock_render_purchase_form_html(*args, **kwargs):
@@ -481,7 +484,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.add_course_to_user_cart(self.course_key)
         resp = self.client.post(reverse('register_code_redemption', args=[self.reg_code]), HTTP_HOST='localhost')
         self.assertEqual(resp.status_code, 200)
-        self.assertIn(self.course.display_name, resp.content)
+        self.assertIn(self.course.display_name.encode('utf-8'), resp.content)
 
     @ddt.data(True, False)
     def test_reg_code_uses_unknown_mode(self, expired_mode):
@@ -493,7 +496,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.add_course_to_user_cart(self.course_key)
         resp = self.client.post(reverse('register_code_redemption', args=[self.reg_code]), HTTP_HOST='localhost')
         self.assertEqual(resp.status_code, 200)
-        self.assertIn(self.course.display_name, resp.content)
+        self.assertIn(self.course.display_name.encode('utf-8'), resp.content)
         self.assertIn("error processing your redeem code", resp.content)
 
     def test_course_discount_for_valid_active_coupon_code(self):
@@ -1836,7 +1839,7 @@ class RegistrationCodeRedemptionCourseEnrollment(SharedModuleStoreTestCase):
         dashboard_url = reverse('dashboard')
         response = self.client.get(dashboard_url)
         self.assertEquals(response.status_code, 200)
-        self.assertIn(self.course.display_name, response.content)
+        self.assertIn(self.course.display_name.encode('utf-8'), response.content)
 
 
 @ddt.ddt

@@ -1,12 +1,12 @@
 import logging
+import textwrap
 
 from lxml import etree
 from pkg_resources import resource_string
-
-from xmodule.x_module import XModule
-from xmodule.raw_module import RawDescriptor
 from xblock.fields import Scope, String
-import textwrap
+
+from xmodule.raw_module import RawDescriptor
+from xmodule.x_module import XModule
 
 log = logging.getLogger(__name__)
 
@@ -39,7 +39,7 @@ class AnnotatableFields(object):
     )
     display_name = String(
         display_name=_("Display Name"),
-        help=_("Display name for this module"),
+        help=_("The display name for this component."),
         scope=Scope.settings,
         default=_('Annotation'),
     )

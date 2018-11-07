@@ -8,7 +8,7 @@
     <div class="script_placeholder" data-src="${preprocessor['script_src']}"/>
 % endif
 
-% if status in ('unsubmitted', 'correct', 'incorrect', 'partially-correct', 'incomplete'):
+% if status in ('unsubmitted', 'submitted', 'correct', 'incorrect', 'partially-correct', 'incomplete'):
     <div class="${status.classname} ${doinline}">
 % endif
 
@@ -34,7 +34,7 @@
         style="display:none;"
     % endif
 />
-<span class="trailing_text">${trailing_text}</span>
+<span class="trailing_text" id="trailing_text_${id}">${trailing_text}</span>
 
 <%include file="status_span.html" args="status=status, status_id=id"/>
 
@@ -45,7 +45,7 @@
     <textarea style="display:none" id="input_${id}_dynamath" name="input_${id}_dynamath"></textarea>
 % endif
 
-% if status in ('unsubmitted', 'correct', 'incorrect', 'partially-correct', 'incomplete'):
+% if status in ('unsubmitted', 'submitted', 'correct', 'incorrect', 'partially-correct', 'incomplete'):
     </div>
 % endif
 

@@ -4,8 +4,8 @@ Provides factories for third_party_auth models.
 from factory import SubFactory
 from factory.django import DjangoModelFactory
 
-from third_party_auth.models import SAMLConfiguration, SAMLProviderConfig
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
+from third_party_auth.models import SAMLConfiguration, SAMLProviderConfig
 
 
 class SAMLConfigurationFactory(DjangoModelFactory):

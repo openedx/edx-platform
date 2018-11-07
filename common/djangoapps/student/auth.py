@@ -4,14 +4,23 @@ authorization has authorization to do so, which infers authorization via role hi
 (GlobalStaff is superset of auths of course instructor, ...), which consults the config
 to decide whether to check course creator role, and other such functions.
 """
-from django.core.exceptions import PermissionDenied
+from ccx_keys.locator import CCXBlockUsageLocator, CCXLocator
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 from opaque_keys.edx.locator import LibraryLocator
-from ccx_keys.locator import CCXLocator, CCXBlockUsageLocator
 
-from student.roles import GlobalStaff, CourseCreatorRole, CourseStaffRole, CourseInstructorRole, CourseRole, \
-    CourseBetaTesterRole, OrgInstructorRole, OrgStaffRole, LibraryUserRole, OrgLibraryUserRole
-
+from student.roles import (
+    CourseBetaTesterRole,
+    CourseCreatorRole,
+    CourseInstructorRole,
+    CourseRole,
+    CourseStaffRole,
+    GlobalStaff,
+    LibraryUserRole,
+    OrgInstructorRole,
+    OrgLibraryUserRole,
+    OrgStaffRole
+)
 
 # Studio permissions:
 STUDIO_EDIT_ROLES = 8

@@ -35,6 +35,7 @@ var options = {
         {pattern: 'xmodule_js/common_static/coffee/src/jquery.immediateDescendents.js', included: true},
         {pattern: 'xmodule_js/common_static/js/vendor/jquery-ui.min.js', included: true},
         {pattern: 'xmodule_js/common_static/js/vendor/URI.min.js', included: true},
+        {pattern: 'common/js/vendor/hls.js', included: true},
 
         {pattern: 'xmodule_js/src/capa/*.js', included: true},
         {pattern: 'xmodule_js/src/video/*.js', included: true},

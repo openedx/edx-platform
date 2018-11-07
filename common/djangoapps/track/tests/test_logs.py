@@ -1,10 +1,11 @@
 """Tests that tracking data are successfully logged"""
-import mock
 import unittest
 
-from django.test import TestCase
-from django.core.urlresolvers import reverse
+import mock
 from django.conf import settings
+from django.core.urlresolvers import reverse
+from django.test import TestCase
+
 from track.models import TrackingLog
 from track.views import user_track
 

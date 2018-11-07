@@ -4,19 +4,20 @@ Tests for django admin commands in the verify_student module
 Lots of imports from verify_student's model tests, since they cover similar ground
 """
 import boto
-from nose.tools import assert_equals
-from mock import patch
-
-from django.test import TestCase
 from django.conf import settings
+from django.core.management import call_command
+from django.test import TestCase
+from mock import patch
+from nose.tools import assert_equals
 
 from common.test.utils import MockS3Mixin
-from student.tests.factories import UserFactory
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
-from django.core.management import call_command
 from lms.djangoapps.verify_student.tests.test_models import (
-    mock_software_secure_post, mock_software_secure_post_error, FAKE_SETTINGS,
+    FAKE_SETTINGS,
+    mock_software_secure_post,
+    mock_software_secure_post_error
 )
+from student.tests.factories import UserFactory
 
 
 # Lots of patching to stub in our own settings, and HTTP posting

@@ -2,11 +2,10 @@
 Definitions of all options used by the various bok_choy tasks.
 """
 
-from optparse import make_option
 import os
+from optparse import make_option
 
 from pavelib.utils.envs import Env
-
 
 BOKCHOY_IMPORTS_DIR = ('imports-dir=', 'i', 'Directory containing (un-archived) courses to be imported')
 BOKCHOY_IMPORTS_DIR_DEPR = ('imports_dir=', None, 'deprecated in favor of imports-dir')
@@ -81,6 +80,7 @@ BOKCHOY_OPTS = [
     ),
 ]
 
+PA11Y_SINGLE_URL = make_option('--single-url', help='Crawl only the specified url')
 PA11Y_HTML = ('with-html', 'w', 'Include html reports')
 PA11Y_COURSE_KEY = make_option('--course-key', help='Course key for test course')
 PA11Y_FETCH_COURSE = make_option(

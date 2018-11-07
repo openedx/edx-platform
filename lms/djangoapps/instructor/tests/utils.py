@@ -4,7 +4,9 @@ Utilities for instructor unit tests
 import datetime
 import json
 import random
+
 from django.utils.timezone import utc
+
 from util.date_utils import get_default_time_display
 
 

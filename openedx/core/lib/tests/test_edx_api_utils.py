@@ -1,47 +1,47 @@
 """Tests covering edX API utilities."""
+# pylint: disable=missing-docstring
 import json
 
-from django.core.cache import cache
-from django.test.utils import override_settings
 import httpretty
 import mock
-from nose.plugins.attrib import attr
+import waffle
+from django.core.cache import cache
+from django.test.utils import override_settings
 from edx_oauth2_provider.tests.factories import ClientFactory
+from nose.plugins.attrib import attr
 from provider.constants import CONFIDENTIAL
 
-from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
-from openedx.core.djangoapps.programs.models import ProgramsApiConfig
-from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
+from openedx.core.djangoapps.catalog.models import CatalogIntegration
+from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
+from openedx.core.djangoapps.catalog.utils import create_catalog_api_client
+from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
+from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 from student.tests.factories import UserFactory
 
-
 UTILITY_MODULE = 'openedx.core.lib.edx_api_utils'
 TEST_API_URL = 'http://www-internal.example.com/api'
-TEST_API_SIGNING_KEY = 'edx'
 
 
+@skip_unless_lms
 @attr(shard=2)
 @httpretty.activate
-class TestGetEdxApiData(ProgramsApiConfigMixin, CacheIsolationTestCase):
+class TestGetEdxApiData(CatalogIntegrationMixin, CredentialsApiConfigMixin, CacheIsolationTestCase):
     """Tests for edX API data retrieval utility."""
-
     ENABLED_CACHES = ['default']
 
     def setUp(self):
         super(TestGetEdxApiData, self).setUp()
 
         self.user = UserFactory()
-        ClientFactory(name=ProgramsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
 
         cache.clear()
 
-    def _mock_programs_api(self, responses, url=None):
-        """Helper for mocking out Programs API URLs."""
-        self.assertTrue(httpretty.is_enabled(), msg='httpretty must be enabled to mock Programs API calls.')
+    def _mock_catalog_api(self, responses, url=None):
+        self.assertTrue(httpretty.is_enabled(), msg='httpretty must be enabled to mock Catalog API calls.')
 
-        url = url if url else ProgramsApiConfig.current().internal_api_url.strip('/') + '/programs/'
+        url = url if url else CatalogIntegration.current().get_internal_api_url().strip('/') + '/programs/'
 
         httpretty.register_uri(httpretty.GET, url, responses=responses)
 
@@ -51,7 +51,8 @@ class TestGetEdxApiData(ProgramsApiConfigMixin, CacheIsolationTestCase):
 
     def test_get_unpaginated_data(self):
         """Verify that unpaginated data can be retrieved."""
-        program_config = self.create_programs_config()
+        catalog_integration = self.create_catalog_integration()
+        api = create_catalog_api_client(self.user)
 
         expected_collection = ['some', 'test', 'data']
         data = {
@@ -59,22 +60,28 @@ class TestGetEdxApiData(ProgramsApiConfigMixin, CacheIsolationTestCase):
             'results': expected_collection,
         }
 
-        self._mock_programs_api(
+        self._mock_catalog_api(
             [httpretty.Response(body=json.dumps(data), content_type='application/json')]
         )
 
-        actual_collection = get_edx_api_data(program_config, self.user, 'programs')
-        self.assertEqual(actual_collection, expected_collection)
+        with mock.patch('openedx.core.lib.edx_api_utils.EdxRestApiClient.__init__') as mock_init:
+            actual_collection = get_edx_api_data(catalog_integration, 'programs', api=api)
+
+            # Verify that the helper function didn't initialize its own client.
+            self.assertFalse(mock_init.called)
+            self.assertEqual(actual_collection, expected_collection)
 
         # Verify the API was actually hit (not the cache)
         self._assert_num_requests(1)
 
+    @waffle.testutils.override_switch("populate-multitenant-programs", True)
     def test_get_paginated_data(self):
         """Verify that paginated data can be retrieved."""
-        program_config = self.create_programs_config()
+        catalog_integration = self.create_catalog_integration()
+        api = create_catalog_api_client(self.user)
 
         expected_collection = ['some', 'test', 'data']
-        url = ProgramsApiConfig.current().internal_api_url.strip('/') + '/programs/?page={}'
+        url = CatalogIntegration.current().get_internal_api_url().strip('/') + '/programs/?page={}'
 
         responses = []
         for page, record in enumerate(expected_collection, start=1):
@@ -88,38 +95,101 @@ class TestGetEdxApiData(ProgramsApiConfigMixin, CacheIsolationTestCase):
                 httpretty.Response(body=body, content_type='application/json')
             )
 
-        self._mock_programs_api(responses)
+        self._mock_catalog_api(responses)
 
-        actual_collection = get_edx_api_data(program_config, self.user, 'programs')
+        actual_collection = get_edx_api_data(catalog_integration, 'programs', api=api)
         self.assertEqual(actual_collection, expected_collection)
 
         self._assert_num_requests(len(expected_collection))
 
+    @waffle.testutils.override_switch("populate-multitenant-programs", True)
+    def test_get_paginated_data_do_not_traverse_pagination(self):
+        """
+        Verify that pagination is not traversed if traverse_pagination=False is passed as argument.
+        """
+        catalog_integration = self.create_catalog_integration()
+        api = create_catalog_api_client(self.user)
+
+        url = CatalogIntegration.current().get_internal_api_url().strip('/') + '/programs/?page={}'
+        responses = [
+            {
+                'next': url.format(2),
+                'results': ['some'],
+            },
+            {
+                'next': url.format(None),
+                'results': ['test'],
+            },
+        ]
+        expected_response = responses[0]
+
+        self._mock_catalog_api(
+            [httpretty.Response(body=json.dumps(body), content_type='application/json') for body in responses]
+        )
+
+        actual_collection = get_edx_api_data(catalog_integration, 'programs', api=api, traverse_pagination=False)
+        self.assertEqual(actual_collection, expected_response)
+        self._assert_num_requests(1)
+
+    @waffle.testutils.override_switch("populate-multitenant-programs", True)
     def test_get_specific_resource(self):
         """Verify that a specific resource can be retrieved."""
-        program_config = self.create_programs_config()
+        catalog_integration = self.create_catalog_integration()
+        api = create_catalog_api_client(self.user)
 
         resource_id = 1
         url = '{api_root}/programs/{resource_id}/'.format(
-            api_root=ProgramsApiConfig.current().internal_api_url.strip('/'),
+            api_root=CatalogIntegration.current().get_internal_api_url().strip('/'),
             resource_id=resource_id,
         )
 
         expected_resource = {'key': 'value'}
 
-        self._mock_programs_api(
+        self._mock_catalog_api(
             [httpretty.Response(body=json.dumps(expected_resource), content_type='application/json')],
             url=url
         )
 
-        actual_resource = get_edx_api_data(program_config, self.user, 'programs', resource_id=resource_id)
+        actual_resource = get_edx_api_data(catalog_integration, 'programs', api=api, resource_id=resource_id)
         self.assertEqual(actual_resource, expected_resource)
 
         self._assert_num_requests(1)
 
+    @waffle.testutils.override_switch("populate-multitenant-programs", True)
+    def test_get_specific_resource_with_falsey_id(self):
+        """
+        Verify that a specific resource can be retrieved, and pagination parsing is
+        not attempted, if the ID passed is falsey (e.g., 0). The expected resource contains
+        a "results" key, as a paginatable item would have, so if the function looks for falsey
+        values in the resource_id field, rather than specifically None, the function will
+        return the value of that "results" key.
+        """
+        catalog_integration = self.create_catalog_integration()
+        api = create_catalog_api_client(self.user)
+
+        resource_id = 0
+        url = '{api_root}/programs/{resource_id}/'.format(
+            api_root=CatalogIntegration.current().get_internal_api_url().strip('/'),
+            resource_id=resource_id,
+        )
+
+        expected_resource = {'key': 'value', 'results': []}
+
+        self._mock_catalog_api(
+            [httpretty.Response(body=json.dumps(expected_resource), content_type='application/json')],
+            url=url
+        )
+
+        actual_resource = get_edx_api_data(catalog_integration, 'programs', api=api, resource_id=resource_id)
+        self.assertEqual(actual_resource, expected_resource)
+
+        self._assert_num_requests(1)
+
+    @waffle.testutils.override_switch("populate-multitenant-programs", True)
     def test_cache_utilization(self):
         """Verify that when enabled, the cache is used."""
-        program_config = self.create_programs_config(cache_ttl=5)
+        catalog_integration = self.create_catalog_integration(cache_ttl=5)
+        api = create_catalog_api_client(self.user)
 
         expected_collection = ['some', 'test', 'data']
         data = {
@@ -127,35 +197,35 @@ class TestGetEdxApiData(ProgramsApiConfigMixin, CacheIsolationTestCase):
             'results': expected_collection,
         }
 
-        self._mock_programs_api(
+        self._mock_catalog_api(
             [httpretty.Response(body=json.dumps(data), content_type='application/json')],
         )
 
         resource_id = 1
         url = '{api_root}/programs/{resource_id}/'.format(
-            api_root=ProgramsApiConfig.current().internal_api_url.strip('/'),
+            api_root=CatalogIntegration.current().get_internal_api_url().strip('/'),
             resource_id=resource_id,
         )
 
         expected_resource = {'key': 'value'}
 
-        self._mock_programs_api(
+        self._mock_catalog_api(
             [httpretty.Response(body=json.dumps(expected_resource), content_type='application/json')],
             url=url
         )
 
-        cache_key = ProgramsApiConfig.current().CACHE_KEY
+        cache_key = CatalogIntegration.current().CACHE_KEY
 
         # Warm up the cache.
-        get_edx_api_data(program_config, self.user, 'programs', cache_key=cache_key)
-        get_edx_api_data(program_config, self.user, 'programs', resource_id=resource_id, cache_key=cache_key)
+        get_edx_api_data(catalog_integration, 'programs', api=api, cache_key=cache_key)
+        get_edx_api_data(catalog_integration, 'programs', api=api, resource_id=resource_id, cache_key=cache_key)
 
         # Hit the cache.
-        actual_collection = get_edx_api_data(program_config, self.user, 'programs', cache_key=cache_key)
+        actual_collection = get_edx_api_data(catalog_integration, 'programs', api=api, cache_key=cache_key)
         self.assertEqual(actual_collection, expected_collection)
 
         actual_resource = get_edx_api_data(
-            program_config, self.user, 'programs', resource_id=resource_id, cache_key=cache_key
+            catalog_integration, 'programs', api=api, resource_id=resource_id, cache_key=cache_key
         )
         self.assertEqual(actual_resource, expected_resource)
 
@@ -165,48 +235,60 @@ class TestGetEdxApiData(ProgramsApiConfigMixin, CacheIsolationTestCase):
     @mock.patch(UTILITY_MODULE + '.log.warning')
     def test_api_config_disabled(self, mock_warning):
         """Verify that no data is retrieved if the provided config model is disabled."""
-        program_config = self.create_programs_config(enabled=False)
+        catalog_integration = self.create_catalog_integration(enabled=False)
 
-        actual = get_edx_api_data(program_config, self.user, 'programs')
+        actual = get_edx_api_data(catalog_integration, 'programs', api=None)
 
         self.assertTrue(mock_warning.called)
-        self.assertEqual(actual, [])
-
-    @mock.patch('edx_rest_api_client.client.EdxRestApiClient.__init__')
-    @mock.patch(UTILITY_MODULE + '.log.exception')
-    def test_client_initialization_failure(self, mock_exception, mock_init):
-        """Verify that an exception is logged when the API client fails to initialize."""
-        mock_init.side_effect = Exception
-
-        program_config = self.create_programs_config()
-
-        actual = get_edx_api_data(program_config, self.user, 'programs')
-
-        self.assertTrue(mock_exception.called)
         self.assertEqual(actual, [])
 
     @mock.patch(UTILITY_MODULE + '.log.exception')
     def test_data_retrieval_failure(self, mock_exception):
         """Verify that an exception is logged when data can't be retrieved."""
-        program_config = self.create_programs_config()
+        catalog_integration = self.create_catalog_integration()
+        api = create_catalog_api_client(self.user)
 
-        self._mock_programs_api(
+        self._mock_catalog_api(
             [httpretty.Response(body='clunk', content_type='application/json', status_code=500)]
         )
 
-        actual = get_edx_api_data(program_config, self.user, 'programs')
+        actual = get_edx_api_data(catalog_integration, 'programs', api=api)
 
         self.assertTrue(mock_exception.called)
         self.assertEqual(actual, [])
 
-    @override_settings(JWT_AUTH={'JWT_ISSUER': 'http://example.com/oauth', 'JWT_EXPIRATION': 30},
-                       ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY, ECOMMERCE_API_URL=TEST_API_URL)
-    def test_client_passed(self):
-        """ Verify that when API client is passed edx_rest_api_client is not
-        used.
-        """
-        program_config = self.create_programs_config()
-        api = ecommerce_api_client(self.user)
-        with mock.patch('openedx.core.lib.edx_api_utils.EdxRestApiClient.__init__') as mock_init:
-            get_edx_api_data(program_config, self.user, 'orders', api=api)
-            self.assertFalse(mock_init.called)
+    @mock.patch(UTILITY_MODULE + '.log.warning')
+    def test_api_config_disabled_with_id_and_not_collection(self, mock_warning):
+        """Verify that no data is retrieved if the provided config model is disabled."""
+        catalog_integration = self.create_catalog_integration(enabled=False)
+
+        actual = get_edx_api_data(
+            catalog_integration,
+            'programs',
+            api=None,
+            resource_id=100,
+            many=False
+        )
+
+        self.assertTrue(mock_warning.called)
+        self.assertEqual(actual, {})
+
+    @mock.patch(UTILITY_MODULE + '.log.exception')
+    def test_data_retrieval_failure_with_id(self, mock_exception):
+        """Verify that an exception is logged when data can't be retrieved."""
+        catalog_integration = self.create_catalog_integration()
+        api = create_catalog_api_client(self.user)
+
+        self._mock_catalog_api(
+            [httpretty.Response(body='clunk', content_type='application/json', status_code=500)]
+        )
+
+        actual = get_edx_api_data(
+            catalog_integration,
+            'programs',
+            api=api,
+            resource_id=100,
+            many=False
+        )
+        self.assertTrue(mock_exception.called)
+        self.assertEqual(actual, {})

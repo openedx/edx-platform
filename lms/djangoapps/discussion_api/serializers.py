@@ -7,27 +7,18 @@ from urlparse import urlunparse
 from django.contrib.auth.models import User as DjangoUser
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
-
 from rest_framework import serializers
 
-from discussion_api.permissions import (
-    NON_UPDATABLE_COMMENT_FIELDS,
-    NON_UPDATABLE_THREAD_FIELDS,
-    get_editable_fields,
-)
+from discussion_api.permissions import NON_UPDATABLE_COMMENT_FIELDS, NON_UPDATABLE_THREAD_FIELDS, get_editable_fields
 from discussion_api.render import render_body
 from django_comment_client.utils import is_comment_too_deep
-from django_comment_common.models import (
-    FORUM_ROLE_ADMINISTRATOR,
-    FORUM_ROLE_COMMUNITY_TA,
-    FORUM_ROLE_MODERATOR,
-    Role,
-)
+from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_MODERATOR, Role
+from django_comment_common.utils import get_course_discussion_settings
+from lms.djangoapps.django_comment_client.utils import course_discussion_division_enabled, get_group_names_by_id
 from lms.lib.comment_client.comment import Comment
 from lms.lib.comment_client.thread import Thread
 from lms.lib.comment_client.user import User as CommentClientUser
 from lms.lib.comment_client.utils import CommentClientRequestError
-from openedx.core.djangoapps.course_groups.cohorts import get_cohort_names
 
 
 def get_context(course, request, thread=None):
@@ -52,12 +43,13 @@ def get_context(course, request, thread=None):
     requester = request.user
     cc_requester = CommentClientUser.from_django_user(requester).retrieve()
     cc_requester["course_id"] = course.id
+    course_discussion_settings = get_course_discussion_settings(course.id)
     return {
         "course": course,
         "request": request,
         "thread": thread,
-        # For now, the only groups are cohorts
-        "group_ids_to_names": get_cohort_names(course),
+        "discussion_division_enabled": course_discussion_division_enabled(course_discussion_settings),
+        "group_ids_to_names": get_group_names_by_id(course_discussion_settings),
         "is_requester_privileged": requester.id in staff_user_ids or requester.id in ta_user_ids,
         "staff_user_ids": staff_user_ids,
         "ta_user_ids": ta_user_ids,

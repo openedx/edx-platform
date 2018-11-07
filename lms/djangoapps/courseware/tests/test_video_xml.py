@@ -16,8 +16,8 @@ course, section, subsection, unit, etc.
 """
 from nose.plugins.attrib import attr
 
-from xmodule.video_module import VideoDescriptor
 from xmodule.tests import LogicTest
+from xmodule.video_module import VideoDescriptor
 
 
 SOURCE_XML = """

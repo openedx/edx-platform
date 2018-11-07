@@ -6,10 +6,14 @@
                     <label for="action-preview-select" class="action-preview-label">View this course as:</label>
                     <select class="action-preview-select" id="action-preview-select" name="select">
                         <option value="staff" selected>Staff</option>
-                        <option value="student">Student</option>
-                        <option value="specific student">Specific student</option>
-                        <option value="group-a" data-group-id="group-a">Student in Group A</option>
-                        <option value="group-b" data-group-id="group-b">Student in Group B</option>
+                        <option value="student">Learner</option>
+                        <option value="specific student">Specific learner</option>
+                        <option value="group-a" data-group-id="group-a" data-partition-id="test_partition_a_id">
+                            Learner in Group A
+                        </option>
+                        <option value="group-b" data-group-id="group-b" data-partition-id="test_partition_b_id">
+                            Learner in Group B
+                        </option>
                     </select>
                     <div class="action-preview-username-container">
                         <label for="action-preview-username" class="action-preview-label">Username or email:</label>

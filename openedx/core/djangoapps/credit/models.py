@@ -6,23 +6,25 @@ Credit courses allow students to receive university credit for
 successful completion of a course on EdX
 """
 
-from collections import defaultdict
 import datetime
 import logging
+from collections import defaultdict
 
+import pytz
 from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.core.cache import cache
 from django.core.validators import RegexValidator
-from django.db import models, transaction, IntegrityError
+from django.db import IntegrityError, models, transaction
 from django.dispatch import receiver
-from django.utils.translation import ugettext_lazy, ugettext as _
+from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy
 from jsonfield.fields import JSONField
 from model_utils.models import TimeStampedModel
-import pytz
 from simple_history.models import HistoricalRecords
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
+from request_cache.middleware import RequestCache, ns_request_cached
 
 CREDIT_PROVIDER_ID_REGEX = r"[a-z,A-Z,0-9,\-]+"
 log = logging.getLogger(__name__)
@@ -290,6 +292,8 @@ class CreditRequirement(TimeStampedModel):
     criteria = JSONField()
     active = models.BooleanField(default=True)
 
+    CACHE_NAMESPACE = u"credit.CreditRequirement.cache."
+
     class Meta(object):
         unique_together = ('namespace', 'name', 'course')
         ordering = ["order"]
@@ -331,6 +335,7 @@ class CreditRequirement(TimeStampedModel):
         return credit_requirement, created
 
     @classmethod
+    @ns_request_cached(CACHE_NAMESPACE)
     def get_course_requirements(cls, course_key, namespace=None, name=None):
         """
         Get credit requirements of a given course.
@@ -390,6 +395,13 @@ class CreditRequirement(TimeStampedModel):
             )
         except cls.DoesNotExist:
             return None
+
+
+@receiver(models.signals.post_save, sender=CreditRequirement)
+@receiver(models.signals.post_delete, sender=CreditRequirement)
+def invalidate_credit_requirement_cache(sender, **kwargs):   # pylint: disable=unused-argument
+    """Invalidate the cache of credit requirements. """
+    RequestCache.clear_request_cache(name=CreditRequirement.CACHE_NAMESPACE)
 
 
 class CreditRequirementStatus(TimeStampedModel):
@@ -465,8 +477,15 @@ class CreditRequirementStatus(TimeStampedModel):
             defaults={"reason": reason, "status": status}
         )
         if not created:
+            # do not update status to `failed` if user has `satisfied` the requirement
+            if status == 'failed' and requirement_status.status == 'satisfied':
+                log.info(
+                    u'Can not change status of credit requirement "%s" from satisfied to failed ',
+                    requirement_status.requirement_id
+                )
+                return
             requirement_status.status = status
-            requirement_status.reason = reason if reason else {}
+            requirement_status.reason = reason
             requirement_status.save()
 
     @classmethod

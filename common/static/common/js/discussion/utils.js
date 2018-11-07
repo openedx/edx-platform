@@ -127,7 +127,8 @@
 
         DiscussionUtil.showLoadingIndicator = function(element, takeFocus) {
             var animElem = edx.HtmlUtils.joinHtml(
-                edx.HtmlUtils.HTML("<div class='loading-animation' tabindex='0'><span class='sr'>"),
+                edx.HtmlUtils.HTML("<div class='loading-animation' tabindex='0'>"),
+                edx.HtmlUtils.HTML("<span class='icon fa fa-spinner' aria-hidden='true'></span><span class='sr'>"),
                 gettext('Loading content'),
                 edx.HtmlUtils.HTML('</span></div>')
             );

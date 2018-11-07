@@ -7,12 +7,11 @@ that would have been used in the settings.
 """
 import collections
 
-from django.db import models
-from django.dispatch import receiver
-from django.db.models.signals import pre_save, pre_delete
-from django.db.models.base import ObjectDoesNotExist
 from django.contrib.sites.models import Site
-
+from django.db import models
+from django.db.models.base import ObjectDoesNotExist
+from django.db.models.signals import pre_delete, pre_save
+from django.dispatch import receiver
 from jsonfield.fields import JSONField
 from model_utils.models import TimeStampedModel
 from simple_history.models import HistoricalRecords

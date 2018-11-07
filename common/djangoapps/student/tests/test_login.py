@@ -4,29 +4,29 @@ Tests for student activation and login
 import json
 import unittest
 
-from django.test import TestCase
-from django.test.client import Client
-from django.test.utils import override_settings
+import httpretty
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
-from django.core.urlresolvers import reverse, NoReverseMatch
-from django.http import HttpResponseBadRequest, HttpResponse
-import httpretty
+from django.core.urlresolvers import NoReverseMatch, reverse
+from django.http import HttpResponse, HttpResponseBadRequest
+from django.test import TestCase
+from django.test.client import Client
+from django.test.utils import override_settings
 from mock import patch
-from social.apps.django_app.default.models import UserSocialAuth
+from social_django.models import UserSocialAuth
 
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from student.tests.factories import UserFactory, RegistrationFactory, UserProfileFactory
+from student.tests.factories import RegistrationFactory, UserFactory, UserProfileFactory
 from student.views import login_oauth_token
 from third_party_auth.tests.utils import (
     ThirdPartyOAuthTestMixin,
     ThirdPartyOAuthTestMixinFacebook,
     ThirdPartyOAuthTestMixinGoogle
 )
-from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class LoginTest(CacheIsolationTestCase):
@@ -126,7 +126,7 @@ class LoginTest(CacheIsolationTestCase):
         # Should now be unable to login
         response, mock_audit_log = self._login_response('test@edx.org', 'test_password')
         self._assert_response(response, success=False,
-                              value="Before you sign in, you need to activate your account")
+                              value="In order to sign in, you need to activate your account.")
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Account not active for user'])
 
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
@@ -138,7 +138,7 @@ class LoginTest(CacheIsolationTestCase):
         # Should now be unable to login
         response, mock_audit_log = self._login_response('test@edx.org', 'test_password')
         self._assert_response(response, success=False,
-                              value="Before you sign in, you need to activate your account")
+                              value="In order to sign in, you need to activate your account.")
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Account not active for user'])
         self._assert_not_in_audit_log(mock_audit_log, 'warning', [u'test'])
 
@@ -408,7 +408,7 @@ class LoginTest(CacheIsolationTestCase):
 
         if value is not None:
             msg = ("'%s' did not contain '%s'" %
-                   (str(response_dict['value']), str(value)))
+                   (unicode(response_dict['value']), unicode(value)))
             self.assertIn(value, response_dict['value'], msg)
 
     def _assert_audit_log(self, mock_audit_log, level, log_strings):
@@ -498,7 +498,7 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
         Should vary by course depending on its enrollment_domain
         """
         TARGET_URL = reverse('courseware', args=[self.course.id.to_deprecated_string()])            # pylint: disable=invalid-name
-        noshib_response = self.client.get(TARGET_URL, follow=True)
+        noshib_response = self.client.get(TARGET_URL, follow=True, HTTP_ACCEPT="text/html")
         self.assertEqual(noshib_response.redirect_chain[-1],
                          ('http://testserver/login?next={url}'.format(url=TARGET_URL), 302))
         self.assertContains(noshib_response, (u"Sign in or Register | {platform_name}"
@@ -509,7 +509,8 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
         shib_response = self.client.get(**{'path': TARGET_URL_SHIB,
                                            'follow': True,
                                            'REMOTE_USER': self.extauth.external_id,
-                                           'Shib-Identity-Provider': 'https://idp.stanford.edu/'})
+                                           'Shib-Identity-Provider': 'https://idp.stanford.edu/',
+                                           'HTTP_ACCEPT': "text/html"})
         # Test that the shib-login redirect page with ?next= and the desired page are part of the redirect chain
         # The 'courseware' page actually causes a redirect itself, so it's not the end of the chain and we
         # won't test its contents
@@ -539,7 +540,6 @@ class LoginOAuthTokenMixin(ThirdPartyOAuthTestMixin):
         """Assert that the given response was a 400 with the given error code"""
         self.assertEqual(response.status_code, status_code)
         self.assertEqual(json.loads(response.content), {"error": error})
-        self.assertNotIn("partial_pipeline", self.client.session)
 
     def test_success(self):
         self._setup_provider_response(success=True)

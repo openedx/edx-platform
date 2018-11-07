@@ -2,15 +2,10 @@
 Factories module to hold microsite factories
 """
 import factory
+from django.contrib.sites.models import Site
 from factory.django import DjangoModelFactory
 
-from django.contrib.sites.models import Site
-
-from microsite_configuration.models import (
-    Microsite,
-    MicrositeOrganizationMapping,
-    MicrositeTemplate,
-)
+from microsite_configuration.models import Microsite, MicrositeOrganizationMapping, MicrositeTemplate
 
 
 class SiteFactory(DjangoModelFactory):

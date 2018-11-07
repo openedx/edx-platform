@@ -9,15 +9,17 @@ to the E-Commerce service is complete.
 """
 import datetime
 
+import pytz
 from django.test.client import Client
+from mock import patch
 
 from course_modes.models import CourseMode
 from shoppingcart.models import CertificateItem, Order
 from student.models import CourseEnrollment
 from student.roles import SupportStaffRole
 from student.tests.factories import UserFactory
-from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class RefundTests(ModuleStoreTestCase):
@@ -91,10 +93,12 @@ class RefundTests(ModuleStoreTestCase):
         response = self.client.post('/support/refund/', {'course_id': str(self.course_id), 'user': 'unknown@foo.com'})
         self.assertContains(response, 'User not found')
 
-    def test_not_refundable(self):
+    @patch('student.models.CourseEnrollment.refund_cutoff_date')
+    def test_not_refundable(self, cutoff_date):
         self._enroll()
         self.course_mode.expiration_datetime = datetime.datetime(2033, 4, 6)
         self.course_mode.save()
+        cutoff_date.return_value = datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=1)
         response = self.client.post('/support/refund/', self.form_pars)
         self.assertContains(response, 'not past the refund window')
 

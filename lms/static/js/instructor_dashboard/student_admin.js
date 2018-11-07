@@ -436,7 +436,7 @@
         }
 
         StudentAdmin.prototype.rescore_problem_single = function(onlyIfHigher) {
-            var errorMessage, fullErrorMessage, fullSuccessMessage,
+            var defaultErrorMessage, fullDefaultErrorMessage, fullSuccessMessage,
                 problemToReset, sendData, successMessage, uniqStudentIdentifier,
                 that = this;
             uniqStudentIdentifier = this.$field_student_select_grade.val();
@@ -461,8 +461,8 @@
                 student_id: uniqStudentIdentifier,
                 problem_id: problemToReset
             });
-            errorMessage = gettext("Error starting a task to rescore problem '<%- problem_id %>' for student '<%- student_id %>'. Make sure that the the problem and student identifiers are complete and correct.");  // eslint-disable-line max-len
-            fullErrorMessage = _.template(errorMessage)({
+            defaultErrorMessage = gettext("Error starting a task to rescore problem '<%- problem_id %>' for student '<%- student_id %>'. Make sure that the the problem and student identifiers are complete and correct.");  // eslint-disable-line max-len
+            fullDefaultErrorMessage = _.template(defaultErrorMessage)({
                 student_id: uniqStudentIdentifier,
                 problem_id: problemToReset
             });
@@ -474,8 +474,11 @@
                 success: this.clear_errors_then(function() {
                     return alert(fullSuccessMessage);  // eslint-disable-line no-alert
                 }),
-                error: statusAjaxError(function() {
-                    return that.$request_err_grade.text(fullErrorMessage);
+                error: statusAjaxError(function(response) {
+                    if (response.responseText) {
+                        return that.$request_err_grade.text(response.responseText);
+                    }
+                    return that.$request_err_grade.text(fullDefaultErrorMessage);
                 })
             });
         };
@@ -518,8 +521,9 @@
         };
 
         StudentAdmin.prototype.rescore_problem_all = function(onlyIfHigher) {
-            var confirmMessage, errorMessage, fullConfirmMessage,
-                fullErrorMessage, fullSuccessMessage, problemToReset, sendData, successMessage,
+            var confirmMessage, defaultErrorMessage, fullConfirmMessage,
+                fullDefaultErrorMessage, fullSuccessMessage, problemToReset,
+                sendData, successMessage,
                 that = this;
             problemToReset = this.$field_problem_select_all.val();
             if (!problemToReset) {
@@ -541,8 +545,8 @@
                 fullSuccessMessage = _.template(successMessage)({
                     problem_id: problemToReset
                 });
-                errorMessage = gettext("Error starting a task to rescore problem '<%- problem_id %>'. Make sure that the problem identifier is complete and correct.");  // eslint-disable-line max-len
-                fullErrorMessage = _.template(errorMessage)({
+                defaultErrorMessage = gettext("Error starting a task to rescore problem '<%- problem_id %>'. Make sure that the problem identifier is complete and correct.");  // eslint-disable-line max-len
+                fullDefaultErrorMessage = _.template(defaultErrorMessage)({
                     problem_id: problemToReset
                 });
                 return $.ajax({
@@ -553,8 +557,11 @@
                     success: this.clear_errors_then(function() {
                         return alert(fullSuccessMessage);  // eslint-disable-line no-alert
                     }),
-                    error: statusAjaxError(function() {
-                        return that.$request_response_error_all.text(fullErrorMessage);
+                    error: statusAjaxError(function(response) {
+                        if (response.responseText) {
+                            return that.$request_response_error_all.text(response.responseText);
+                        }
+                        return that.$request_response_error_all.text(fullDefaultErrorMessage);
                     })
                 });
             } else {

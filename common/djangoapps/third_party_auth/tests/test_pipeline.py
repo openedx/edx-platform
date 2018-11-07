@@ -1,10 +1,10 @@
 """Unit tests for third_party_auth/pipeline.py."""
 
 import random
+import unittest
 
 from third_party_auth import pipeline
 from third_party_auth.tests import testutil
-import unittest
 
 
 # Allow tests access to protected methods (or module-protected methods) under test.
@@ -35,7 +35,7 @@ class MakeRandomPasswordTest(testutil.TestCase):
         self.assertEqual(expected, pipeline.make_random_password(choice_fn=random_instance.choice))
 
 
-@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, 'third_party_auth not enabled')
+@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
 class ProviderUserStateTestCase(testutil.TestCase):
     """Tests ProviderUserState behavior."""
 

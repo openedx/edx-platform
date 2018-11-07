@@ -11,6 +11,7 @@
  *   of items this list contains.  For example, 'Group Configuration'.
  *   Note that it must be translated.
  * - emptyMessage (string): Text to render when the list is empty.
+ * - restrictEditing (bool) : Boolean flag for hiding edit and remove options, defaults to false.
  */
 define([
     'js/views/baseview'
@@ -25,6 +26,7 @@ define([
         listContainerCss: '.list-items',
 
         initialize: function() {
+            this.restrictEditing = this.options.restrictEditing || false;
             this.listenTo(this.collection, 'add', this.addNewItemView);
             this.listenTo(this.collection, 'remove', this.onRemoveItem);
             this.template = this.loadTemplate('list');
@@ -42,11 +44,14 @@ define([
                 emptyMessage: this.emptyMessage,
                 length: this.collection.length,
                 isEditing: model && model.get('editing'),
-                canCreateNewItem: this.canCreateItem(this.collection)
+                canCreateNewItem: this.canCreateItem(this.collection),
+                restrictEditing: this.restrictEditing
             }));
 
             this.collection.each(function(model) {
-                this.$(this.listContainerCss).append(this.createItemView({model: model}).render().el);
+                this.$(this.listContainerCss).append(
+                    this.createItemView({model: model, restrictEditing: this.restrictEditing}).render().el
+                );
             }, this);
 
             return this;

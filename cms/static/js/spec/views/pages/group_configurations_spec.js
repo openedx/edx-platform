@@ -19,9 +19,8 @@ define([
                     name: 'Configuration 1',
                     courseOutlineUrl: 'CourseOutlineUrl'
                 }),
-                contentGroupConfiguration: new GroupConfigurationModel({groups: []})
+                allGroupConfigurations: [new GroupConfigurationModel({groups: []})]
             });
-
             if (!disableSpy) {
                 spyOn(view, 'addWindowActions');
             }
@@ -36,7 +35,7 @@ define([
         beforeEach(function() {
             setFixtures(mockGroupConfigurationsPage);
             TemplateHelpers.installTemplates([
-                'group-configuration-editor', 'group-configuration-details', 'content-group-details',
+                'group-configuration-editor', 'group-configuration-details', 'partition-group-details',
                 'content-group-editor', 'group-edit', 'list'
             ]);
 
@@ -116,7 +115,7 @@ define([
             });
 
             it('should show a notification message if a content group is changed', function() {
-                this.view.contentGroupConfiguration.get('groups').add({id: 0, name: 'Content Group'});
+                this.view.allGroupConfigurations[0].get('groups').add({id: 0, name: 'Content Group'});
                 expect(this.view.onBeforeUnload())
                     .toBe('You have unsaved changes. Do you really want to leave this page?');
             });

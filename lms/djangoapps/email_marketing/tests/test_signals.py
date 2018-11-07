@@ -1,30 +1,38 @@
 """Tests of email marketing signal handlers."""
-import ddt
+import datetime
 import logging
 
-from django.test import TestCase
+import ddt
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.models import Site
-from mock import patch, ANY
-from util.json_request import JsonResponse
-
-from email_marketing.signals import email_marketing_register_user, \
-    email_marketing_user_field_changed, \
-    add_email_marketing_cookies
-from email_marketing.tasks import (
-    update_user, update_user_email, _get_or_create_user_list,
-    _get_list_from_email_marketing_provider, _create_user_list
-)
+from django.test import TestCase
+from django.test.client import RequestFactory
+from freezegun import freeze_time
+from mock import ANY, patch
+from opaque_keys.edx.keys import CourseKey
+from sailthru.sailthru_error import SailthruClientError
+from sailthru.sailthru_response import SailthruResponse
+from testfixtures import LogCapture
 
 from email_marketing.models import EmailMarketingConfiguration
-from django.test.client import RequestFactory
+from email_marketing.signals import (
+    add_email_marketing_cookies,
+    email_marketing_register_user,
+    email_marketing_user_field_changed
+)
+from email_marketing.tasks import (
+    _create_user_list,
+    _get_list_from_email_marketing_provider,
+    _get_or_create_user_list,
+    update_user,
+    update_user_email
+)
 from student.tests.factories import UserFactory, UserProfileFactory
-from opaque_keys.edx.keys import CourseKey
-
-from sailthru.sailthru_response import SailthruResponse
-from sailthru.sailthru_error import SailthruClientError
+from util.json_request import JsonResponse
 
 log = logging.getLogger(__name__)
+
+LOGGER_NAME = "email_marketing.signals"
 
 TEST_EMAIL = "test@edx.org"
 
@@ -45,6 +53,7 @@ def update_email_marketing_config(enabled=True, key='badkey', secret='badsecret'
         sailthru_get_tags_from_sailthru=False,
         sailthru_enroll_cost=enroll_cost,
         sailthru_max_retries=0,
+        welcome_email_send_delay=600
     )
 
 
@@ -75,6 +84,7 @@ class EmailMarketingTests(TestCase):
         self.request.site = self.site
         super(EmailMarketingTests, self).setUp()
 
+    @freeze_time(datetime.datetime.now())
     @patch('email_marketing.signals.crum.get_current_request')
     @patch('email_marketing.signals.SailthruClient.api_post')
     def test_drop_cookie(self, mock_sailthru, mock_get_current_request):
@@ -85,13 +95,26 @@ class EmailMarketingTests(TestCase):
             "success": True,
             "redirect_url": 'test.com/test',
         })
-        self.request.COOKIES['sailthru_content'] = 'cookie_content'
+        self.request.COOKIES['anonymous_interest'] = 'cookie_content'
         mock_get_current_request.return_value = self.request
         mock_sailthru.return_value = SailthruResponse(JsonResponse({'keys': {'cookie': 'test_cookie'}}))
-        add_email_marketing_cookies(None, response=response, user=self.user)
+        cookie_log = "Sending to Sailthru the user interest cookie [{'anonymous_interest': 'cookie_content'}]" \
+                     ' for user [test@edx.org]'
+
+        with LogCapture(LOGGER_NAME, level=logging.INFO) as logger:
+            add_email_marketing_cookies(None, response=response, user=self.user)
+            logger.check(
+                (LOGGER_NAME, 'INFO', cookie_log),
+                (LOGGER_NAME, 'INFO',
+                    'Started at {start} and ended at {end}, time spent:{delta} milliseconds'.format(
+                        start=datetime.datetime.now().isoformat(' '),
+                        end=datetime.datetime.now().isoformat(' '),
+                        delta=0)
+                 )
+            )
         mock_sailthru.assert_called_with('user',
                                          {'fields': {'keys': 1},
-                                          'cookies': {'sailthru_content': 'cookie_content'},
+                                          'cookies': {'anonymous_interest': 'cookie_content'},
                                           'id': TEST_EMAIL,
                                           'vars': {'last_login_date': ANY}})
         self.assertTrue('sailthru_hid' in response.cookies)
@@ -168,12 +191,14 @@ class EmailMarketingTests(TestCase):
         """
         mock_sailthru_post.return_value = SailthruResponse(JsonResponse({'ok': True}))
         mock_sailthru_get.return_value = SailthruResponse(JsonResponse({'lists': [{'name': 'new list'}], 'ok': True}))
+        expected_schedule = datetime.datetime.utcnow() + datetime.timedelta(seconds=600)
         update_user.delay({}, self.user.email, new_user=True, activation=True)
         # look for call args for 2nd call
         self.assertEquals(mock_sailthru_post.call_args[0][0], "send")
         userparms = mock_sailthru_post.call_args[0][1]
         self.assertEquals(userparms['email'], TEST_EMAIL)
         self.assertEquals(userparms['template'], "Activation")
+        self.assertEquals(userparms['schedule_time'], expected_schedule.strftime('%Y-%m-%dT%H:%M:%SZ'))
 
     @patch('email_marketing.tasks.log.error')
     @patch('email_marketing.tasks.SailthruClient.api_post')

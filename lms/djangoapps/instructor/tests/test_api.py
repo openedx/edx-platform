@@ -3,15 +3,15 @@
 Unit tests for instructor.api methods.
 """
 import datetime
-import ddt
 import functools
-import random
-import pytz
 import io
 import json
+import random
 import shutil
 import tempfile
 
+import ddt
+import pytz
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
@@ -22,54 +22,72 @@ from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
 from django.utils.timezone import utc
 from django.utils.translation import ugettext as _
-
 from mock import Mock, patch
-from nose.tools import raises
 from nose.plugins.attrib import attr
+from nose.tools import raises
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import UsageKey
-from xmodule.modulestore import ModuleStoreEnum
 
-from bulk_email.models import BulkEmailFlag
+import lms.djangoapps.instructor.views.api
+import lms.djangoapps.instructor_task.api
+from bulk_email.models import BulkEmailFlag, CourseEmail, CourseEmailTemplate
+from certificates.models import CertificateStatuses
+from certificates.tests.factories import GeneratedCertificateFactory
 from course_modes.models import CourseMode
-from courseware.models import StudentModule
+from courseware.models import StudentFieldOverride, StudentModule
 from courseware.tests.factories import (
-    BetaTesterFactory, GlobalStaffFactory, InstructorFactory, StaffFactory, UserProfileFactory
+    BetaTesterFactory,
+    GlobalStaffFactory,
+    InstructorFactory,
+    StaffFactory,
+    UserProfileFactory
 )
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from django_comment_common.models import FORUM_ROLE_COMMUNITY_TA
 from django_comment_common.utils import seed_permissions_roles
+from lms.djangoapps.instructor.tests.utils import FakeContentTask, FakeEmail, FakeEmailInfo
+from lms.djangoapps.instructor.views.api import (
+    _split_input_list,
+    common_exceptions_400,
+    generate_unique_password,
+    require_finance_admin
+)
+from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError
+from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
+from openedx.core.lib.xblock_utils import grade_histogram
 from shoppingcart.models import (
-    RegistrationCodeRedemption, Order, CouponRedemption,
-    PaidCourseRegistration, Coupon, Invoice, CourseRegistrationCode, CourseRegistrationCodeInvoiceItem,
-    InvoiceTransaction)
+    Coupon,
+    CouponRedemption,
+    CourseRegistrationCode,
+    CourseRegistrationCodeInvoiceItem,
+    Invoice,
+    InvoiceTransaction,
+    Order,
+    PaidCourseRegistration,
+    RegistrationCodeRedemption
+)
 from shoppingcart.pdf import PDFInvoice
 from student.models import (
-    CourseEnrollment, CourseEnrollmentAllowed, NonExistentCourseError,
-    ManualEnrollmentAudit, UNENROLLED_TO_ENROLLED, ENROLLED_TO_UNENROLLED,
-    ALLOWEDTOENROLL_TO_UNENROLLED, ENROLLED_TO_ENROLLED, UNENROLLED_TO_ALLOWEDTOENROLL,
-    UNENROLLED_TO_UNENROLLED, ALLOWEDTOENROLL_TO_ENROLLED
+    ALLOWEDTOENROLL_TO_ENROLLED,
+    ALLOWEDTOENROLL_TO_UNENROLLED,
+    ENROLLED_TO_ENROLLED,
+    ENROLLED_TO_UNENROLLED,
+    UNENROLLED_TO_ALLOWEDTOENROLL,
+    UNENROLLED_TO_ENROLLED,
+    UNENROLLED_TO_UNENROLLED,
+    CourseEnrollment,
+    CourseEnrollmentAllowed,
+    ManualEnrollmentAudit,
+    NonExistentCourseError
 )
-from student.tests.factories import UserFactory, CourseModeFactory, AdminFactory
-from student.roles import CourseBetaTesterRole, CourseSalesAdminRole, CourseFinanceAdminRole, CourseInstructorRole
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from student.roles import CourseBetaTesterRole, CourseFinanceAdminRole, CourseInstructorRole, CourseSalesAdminRole
+from student.tests.factories import AdminFactory, CourseModeFactory, UserFactory
 from xmodule.fields import Date
-
-from courseware.models import StudentFieldOverride
-
-import lms.djangoapps.instructor_task.api
-import lms.djangoapps.instructor.views.api
-from lms.djangoapps.instructor.views.api import require_finance_admin
-from lms.djangoapps.instructor.tests.utils import FakeContentTask, FakeEmail, FakeEmailInfo
-from lms.djangoapps.instructor.views.api import _split_input_list, common_exceptions_400, generate_unique_password
-from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError
-from certificates.tests.factories import GeneratedCertificateFactory
-from certificates.models import CertificateStatuses
-
-from openedx.core.djangoapps.course_groups.cohorts import set_course_cohort_settings
-from openedx.core.lib.xblock_utils import grade_histogram
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from .test_tools import msk_from_problem_urlname
 
@@ -1773,7 +1791,8 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
                 {
                     "identifier": identifier,
                     "error": False,
-                    "userDoesNotExist": False
+                    "userDoesNotExist": False,
+                    "is_active": True
                 }
             ]
         }
@@ -1824,7 +1843,8 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
                 {
                     "identifier": self.notenrolled_student.email,
                     "error": False,
-                    "userDoesNotExist": False
+                    "userDoesNotExist": False,
+                    "is_active": True
                 }
             ]
         }
@@ -1871,7 +1891,8 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
                 {
                     "identifier": self.notenrolled_student.email,
                     "error": False,
-                    "userDoesNotExist": False
+                    "userDoesNotExist": False,
+                    "is_active": True
                 }
             ]
         }
@@ -1934,7 +1955,8 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
                 {
                     "identifier": self.notregistered_email,
                     "error": True,
-                    "userDoesNotExist": True
+                    "userDoesNotExist": True,
+                    "is_active": None
                 }
             ]
         }
@@ -1964,7 +1986,8 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
                 {
                     "identifier": self.beta_tester.email,
                     "error": False,
-                    "userDoesNotExist": False
+                    "userDoesNotExist": False,
+                    "is_active": True
                 }
             ]
         }
@@ -1994,7 +2017,8 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
                 {
                     "identifier": self.beta_tester.email,
                     "error": False,
-                    "userDoesNotExist": False
+                    "userDoesNotExist": False,
+                    "is_active": True
                 }
             ]
         }
@@ -2694,7 +2718,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         cohorted, and does not when the course is not cohorted.
         """
         url = reverse('get_students_features', kwargs={'course_id': unicode(self.course.id)})
-        set_course_cohort_settings(self.course.id, is_cohorted=is_cohorted)
+        set_course_cohorted(self.course.id, is_cohorted)
 
         response = self.client.post(url, {})
         res_json = json.loads(response.content)
@@ -3558,7 +3582,7 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
 
 @attr(shard=1)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
-class TestInstructorSendEmail(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
+class TestInstructorSendEmail(SiteMixin, SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Checks that only instructors have access to email endpoints, and that
     these endpoints are only accessible with courses that actually exist,
@@ -3644,6 +3668,43 @@ class TestInstructorSendEmail(SharedModuleStoreTestCase, LoginEnrollmentTestCase
             'subject': 'test subject',
         })
         self.assertEqual(response.status_code, 400)
+
+    def test_send_email_with_site_template_and_from_addr(self):
+        site_email = self.site_configuration.values.get('course_email_from_addr')
+        site_template = self.site_configuration.values.get('course_email_template_name')
+        CourseEmailTemplate.objects.create(name=site_template)
+        url = reverse('send_email', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.post(url, self.full_test_message)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(1, CourseEmail.objects.filter(
+            course_id=self.course.id,
+            sender=self.instructor,
+            subject=self.full_test_message['subject'],
+            html_message=self.full_test_message['message'],
+            template_name=site_template,
+            from_addr=site_email
+        ).count())
+
+    def test_send_email_with_org_template_and_from_addr(self):
+        org_email = 'fake_org@example.com'
+        org_template = 'fake_org_email_template'
+        CourseEmailTemplate.objects.create(name=org_template)
+        self.site_configuration.values.update({
+            'course_email_from_addr': {self.course.id.org: org_email},
+            'course_email_template_name': {self.course.id.org: org_template}
+        })
+        self.site_configuration.save()
+        url = reverse('send_email', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.post(url, self.full_test_message)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(1, CourseEmail.objects.filter(
+            course_id=self.course.id,
+            sender=self.instructor,
+            subject=self.full_test_message['subject'],
+            html_message=self.full_test_message['message'],
+            template_name=org_template,
+            from_addr=org_email
+        ).count())
 
 
 class MockCompletionInfo(object):

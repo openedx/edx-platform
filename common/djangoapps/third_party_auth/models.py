@@ -5,6 +5,9 @@ Models used to implement SAML SSO support in third_party_auth
 """
 from __future__ import absolute_import
 
+import json
+import logging
+
 from config_models.models import ConfigurationModel, cache
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -12,20 +15,26 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-import json
-import logging
-from provider.utils import long_token
 from provider.oauth2.models import Client
-from social.backends.base import BaseAuth
-from social.backends.oauth import OAuthAuth
-from social.backends.saml import SAMLAuth, SAMLIdentityProvider
-from .lti import LTIAuthBackend, LTI_PARAMS_KEY
-from social.exceptions import SocialAuthBaseException
-from social.utils import module_member
+from provider.utils import long_token
+from social_core.backends.base import BaseAuth
+from social_core.backends.oauth import OAuthAuth
+from social_core.backends.saml import SAMLAuth, SAMLIdentityProvider
+from social_core.exceptions import SocialAuthBaseException
+from social_core.utils import module_member
+
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import get_current_request
 
+from .lti import LTI_PARAMS_KEY, LTIAuthBackend
+from .saml import STANDARD_SAML_PROVIDER_KEY, get_saml_idp_choices, get_saml_idp_class
+
 log = logging.getLogger(__name__)
+
+REGISTRATION_FORM_FIELD_BLACKLIST = [
+    'name',
+    'username'
+]
 
 
 # A dictionary of {name: class} entries for each python-social-auth backend available.
@@ -116,6 +125,14 @@ class ProviderConfig(ConfigurationModel):
             'The Site that this provider configuration belongs to.'
         ),
     )
+    skip_hinted_login_dialog = models.BooleanField(
+        default=False,
+        help_text=_(
+            "If this option is enabled, users that visit a \"TPA hinted\" URL for this provider "
+            "(e.g. a URL ending with `?tpa_hint=[provider_name]`) will be forwarded directly to "
+            "the login URL of the provider instead of being first prompted with a login dialog."
+        ),
+    )
     skip_registration_form = models.BooleanField(
         default=False,
         help_text=_(
@@ -137,6 +154,33 @@ class ProviderConfig(ConfigurationModel):
             "If this option is not selected, users will not be presented with the provider "
             "as an option to authenticate with on the login screen, but manual "
             "authentication using the correct link is still possible."
+        ),
+    )
+    drop_existing_session = models.BooleanField(
+        default=False,
+        help_text=_(
+            "Whether to drop an existing session when accessing a view decorated with "
+            "third_party_auth.decorators.tpa_hint_ends_existing_session when a tpa_hint "
+            "URL query parameter mapping to this provider is included in the request."
+        )
+    )
+    max_session_length = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        default=None,
+        verbose_name='Max session length (seconds)',
+        help_text=_(
+            "If this option is set, then users logging in using this SSO provider will have "
+            "their session length limited to no longer than this value. If set to 0 (zero), "
+            "the session will expire upon the user closing their browser. If left blank, the "
+            "Django platform session default length will be used."
+        )
+    )
+    send_to_registration_first = models.BooleanField(
+        default=False,
+        help_text=_(
+            "If this option is selected, users will be directed to the registration page "
+            "immediately after authenticating with the third party instead of the login page."
         ),
     )
     prefix = None  # used for provider_id. Set to a string value in subclass
@@ -209,8 +253,13 @@ class ProviderConfig(ConfigurationModel):
             values for that field. Where there is no value, the empty string
             must be used.
         """
+        registration_form_data = {}
+
         # Details about the user sent back from the provider.
-        details = pipeline_kwargs.get('details')
+        details = pipeline_kwargs.get('details').copy()
+
+        # Set the registration form to use the `fullname` detail for the `name` field.
+        registration_form_data['name'] = details.get('fullname', '')
 
         # Get the username separately to take advantage of the de-duping logic
         # built into the pipeline. The provider cannot de-dupe because it can't
@@ -218,13 +267,19 @@ class ProviderConfig(ConfigurationModel):
         # technically a data race between the creation of this value and the
         # creation of the user object, so it is still possible for users to get
         # an error on submit.
-        suggested_username = pipeline_kwargs.get('username')
+        registration_form_data['username'] = pipeline_kwargs.get('username')
 
-        return {
-            'email': details.get('email', ''),
-            'name': details.get('fullname', ''),
-            'username': suggested_username,
-        }
+        # Any other values that are present in the details dict should be copied
+        # into the registration form details. This may include details that do
+        # not map to a value that exists in the registration form. However,
+        # because the fields that are actually rendered are not based on this
+        # list, only those values that map to a valid registration form field
+        # will actually be sent to the form as default values.
+        for blacklisted_field in REGISTRATION_FORM_FIELD_BLACKLIST:
+            details.pop(blacklisted_field, None)
+        registration_form_data.update(details)
+
+        return registration_form_data
 
     def get_authentication_backend(self):
         """Gets associated Django settings.AUTHENTICATION_BACKEND string."""
@@ -347,6 +402,17 @@ class SAMLProviderConfig(ProviderConfig):
     attr_email = models.CharField(
         max_length=128, blank=True, verbose_name="Email Attribute",
         help_text="URN of SAML attribute containing the user's email address[es]. Leave blank for default.")
+    automatic_refresh_enabled = models.BooleanField(
+        default=True, verbose_name="Enable automatic metadata refresh",
+        help_text="When checked, the SAML provider's metadata will be included in the automatic refresh job, if configured.")
+    identity_provider_type = models.CharField(
+        max_length=128, blank=False, verbose_name="Identity Provider Type", default=STANDARD_SAML_PROVIDER_KEY,
+        choices=get_saml_idp_choices(), help_text=(
+            "Some SAML providers require special behavior. For example, SAP SuccessFactors SAML providers require an "
+            "additional API call to retrieve user metadata not provided in the SAML response. Select the provider type "
+            "which best matches your use case. If in doubt, choose the Standard SAML Provider type."
+        )
+    )
     debug_mode = models.BooleanField(
         default=False, verbose_name="Debug Mode",
         help_text=(
@@ -358,8 +424,13 @@ class SAMLProviderConfig(ProviderConfig):
         verbose_name="Advanced settings", blank=True,
         help_text=(
             'For advanced use cases, enter a JSON object with addtional configuration. '
-            'The tpa-saml backend supports only {"requiredEntitlements": ["urn:..."]} '
-            'which can be used to require the presence of a specific eduPersonEntitlement.'
+            'The tpa-saml backend supports {"requiredEntitlements": ["urn:..."]}, '
+            'which can be used to require the presence of a specific eduPersonEntitlement, '
+            'and {"extra_field_definitions": [{"name": "...", "urn": "..."},...]}, which can be '
+            'used to define registration form fields and the URNs that can be used to retrieve '
+            'the relevant values from the SAML response. Custom provider types, as selected '
+            'in the "Identity Provider Type" field, may make use of the information stored '
+            'in this field for additional configuration.'
         ))
 
     def clean(self):
@@ -420,7 +491,8 @@ class SAMLProviderConfig(ProviderConfig):
             raise AuthNotConfigured(provider_name=self.name)
         conf['x509cert'] = data.public_key
         conf['url'] = data.sso_url
-        return SAMLIdentityProvider(self.idp_slug, **conf)
+        idp_class = get_saml_idp_class(self.identity_provider_type)
+        return idp_class(self.idp_slug, **conf)
 
 
 class SAMLConfiguration(ConfigurationModel):
@@ -516,7 +588,7 @@ class SAMLConfiguration(ConfigurationModel):
             return getattr(settings, 'SOCIAL_AUTH_SAML_SP_PRIVATE_KEY', '')
         other_config = {
             # These defaults can be overriden by self.other_config_str
-            "EXTRA_DATA": ["attributes"],  # Save all attribute values the IdP sends into the UserSocialAuth table
+            "GET_ALL_EXTRA_DATA": True,  # Save all attribute values the IdP sends into the UserSocialAuth table
             "TECHNICAL_CONTACT": DEFAULT_SAML_CONTACT,
             "SUPPORT_CONTACT": DEFAULT_SAML_CONTACT,
         }

@@ -283,7 +283,7 @@ def copy_or_rename_transcript(new_name, old_name, item, delete_old=False, user=N
     If `old_name` is not found in storage, raises `NotFoundError`.
     If `delete_old` is True, removes `old_name` files from storage.
     """
-    filename = 'subs_{0}.srt.sjson'.format(old_name)
+    filename = u'subs_{0}.srt.sjson'.format(old_name)
     content_location = StaticContent.compute_location(item.location.course_key, filename)
     transcripts = contentstore().find(content_location).data
     save_subs_to_store(json.loads(transcripts), new_name, item)
@@ -296,11 +296,9 @@ def copy_or_rename_transcript(new_name, old_name, item, delete_old=False, user=N
 def get_html5_ids(html5_sources):
     """
     Helper method to parse out an HTML5 source into the ideas
-    NOTE: This assumes that '/' are not in the filename.
-    Slices each id by 150, restricting too long strings as video names.
+    NOTE: This assumes that '/' are not in the filename
     """
-    html5_ids = [x.split('/')[-1].rsplit('.', 1)[0][:150] for x in html5_sources]
-
+    html5_ids = [x.split('/')[-1].rsplit('.', 1)[0] for x in html5_sources]
     return html5_ids
 
 
@@ -340,7 +338,10 @@ def manage_video_subtitles_save(item, user, old_metadata=None, generate_translat
 
     # 1.
     html5_ids = get_html5_ids(item.html5_sources)
-    possible_video_id_list = [item.youtube_id_1_0] + html5_ids
+
+    # Youtube transcript source should always have a higher priority than html5 sources. Appending
+    # `youtube_id_1_0` at the end helps achieve this when we read transcripts list.
+    possible_video_id_list = html5_ids + [item.youtube_id_1_0]
     sub_name = item.sub
     for video_id in possible_video_id_list:
         if not video_id:

@@ -4,24 +4,26 @@ Class for manipulating groups configuration on a course object.
 import json
 import logging
 
-from util.db import generate_int_id, MYSQL_MAX_INT
-
 from django.utils.translation import ugettext as _
-from contentstore.utils import reverse_usage_url
-from xmodule.partitions.partitions import UserPartition
-from xmodule.split_test_module import get_split_user_partitions
-from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition
 
-MINIMUM_GROUP_ID = 100
+from contentstore.utils import reverse_usage_url
+from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition
+from util.db import MYSQL_MAX_INT, generate_int_id
+from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, UserPartition
+from xmodule.partitions.partitions_service import get_all_partitions_for_course
+from xmodule.split_test_module import get_split_user_partitions
+
+MINIMUM_GROUP_ID = MINIMUM_STATIC_PARTITION_ID
 
 RANDOM_SCHEME = "random"
 COHORT_SCHEME = "cohort"
+ENROLLMENT_SCHEME = "enrollment_track"
 
-# Note: the following content group configuration strings are not
-# translated since they are not visible to users.
-CONTENT_GROUP_CONFIGURATION_DESCRIPTION = 'The groups in this configuration can be mapped to cohort groups in the LMS.'
+CONTENT_GROUP_CONFIGURATION_DESCRIPTION = _(
+    'The groups in this configuration can be mapped to cohorts in the Instructor Dashboard.'
+)
 
-CONTENT_GROUP_CONFIGURATION_NAME = 'Content Group Configuration'
+CONTENT_GROUP_CONFIGURATION_NAME = _('Content Groups')
 
 log = logging.getLogger(__name__)
 
@@ -84,7 +86,7 @@ class GroupConfiguration(object):
         """
         Assign ids for the group_configuration's groups.
         """
-        used_ids = [g.id for p in self.course.user_partitions for g in p.groups]
+        used_ids = [g.id for p in get_all_partitions_for_course(self.course) for g in p.groups]
         # Assign ids to every group in configuration.
         for group in self.configuration.get('groups', []):
             if group.get('id') is None:
@@ -96,7 +98,7 @@ class GroupConfiguration(object):
         """
         Return a list of IDs that already in use.
         """
-        return set([p.id for p in course.user_partitions])
+        return set([p.id for p in get_all_partitions_for_course(course)])
 
     def get_user_partition(self):
         """
@@ -186,20 +188,9 @@ class GroupConfiguration(object):
         return usage_info
 
     @staticmethod
-    def get_content_groups_usage_info(store, course):
-        """
-        Get usage information for content groups.
-        """
-        items = store.get_items(course.id, settings={'group_access': {'$exists': True}}, include_orphans=False)
-
-        return GroupConfiguration._get_content_groups_usage_info(course, items)
-
-    @staticmethod
-    def _get_content_groups_usage_info(course, items):
+    def get_partitions_usage_info(store, course):
         """
         Returns all units names and their urls.
-
-        This will return only groups for the cohort user partition.
 
         Returns:
         {'group_id':
@@ -215,8 +206,10 @@ class GroupConfiguration(object):
             ],
         }
         """
+        items = store.get_items(course.id, settings={'group_access': {'$exists': True}}, include_orphans=False)
+
         usage_info = {}
-        for item, group_id in GroupConfiguration._iterate_items_and_content_group_ids(course, items):
+        for item, group_id in GroupConfiguration._iterate_items_and_group_ids(course, items):
             if group_id not in usage_info:
                 usage_info[group_id] = []
 
@@ -266,7 +259,7 @@ class GroupConfiguration(object):
         }
         """
         usage_info = {}
-        for item, group_id in GroupConfiguration._iterate_items_and_content_group_ids(course, items):
+        for item, group_id in GroupConfiguration._iterate_items_and_group_ids(course, items):
             if group_id not in usage_info:
                 usage_info[group_id] = []
 
@@ -281,22 +274,23 @@ class GroupConfiguration(object):
         return usage_info
 
     @staticmethod
-    def _iterate_items_and_content_group_ids(course, items):
+    def _iterate_items_and_group_ids(course, items):
         """
-        Iterate through items and content group IDs in a course.
+        Iterate through items and group IDs in a course.
 
-        This will yield group IDs *only* for cohort user partitions.
+        This will yield group IDs for all user partitions except those with a scheme of random.
 
         Yields: tuple of (item, group_id)
         """
-        content_group_configuration = get_cohorted_user_partition(course)
-        if content_group_configuration is not None:
-            for item in items:
-                if hasattr(item, 'group_access') and item.group_access:
-                    group_ids = item.group_access.get(content_group_configuration.id, [])
+        all_partitions = get_all_partitions_for_course(course)
+        for config in all_partitions:
+            if config is not None and config.scheme.name != RANDOM_SCHEME:
+                for item in items:
+                    if hasattr(item, 'group_access') and item.group_access:
+                        group_ids = item.group_access.get(config.id, [])
 
-                    for group_id in group_ids:
-                        yield item, group_id
+                        for group_id in group_ids:
+                            yield item, group_id
 
     @staticmethod
     def update_usage_info(store, course, configuration):
@@ -318,23 +312,23 @@ class GroupConfiguration(object):
             configuration_json['usage'] = usage_information.get(configuration.id, [])
         elif configuration.scheme.name == COHORT_SCHEME:
             # In case if scheme is "cohort"
-            configuration_json = GroupConfiguration.update_content_group_usage_info(store, course, configuration)
+            configuration_json = GroupConfiguration.update_partition_usage_info(store, course, configuration)
         return configuration_json
 
     @staticmethod
-    def update_content_group_usage_info(store, course, configuration):
+    def update_partition_usage_info(store, course, configuration):
         """
-        Update usage information for particular Content Group Configuration.
+        Update usage information for particular Partition Configuration.
 
-        Returns json of particular content group configuration updated with usage information.
+        Returns json of particular partition configuration updated with usage information.
         """
-        usage_info = GroupConfiguration.get_content_groups_usage_info(store, course)
-        content_group_configuration = configuration.to_json()
+        usage_info = GroupConfiguration.get_partitions_usage_info(store, course)
+        partition_configuration = configuration.to_json()
 
-        for group in content_group_configuration['groups']:
+        for group in partition_configuration['groups']:
             group['usage'] = usage_info.get(group['id'], [])
 
-        return content_group_configuration
+        return partition_configuration
 
     @staticmethod
     def get_or_create_content_group(store, course):
@@ -356,9 +350,27 @@ class GroupConfiguration(object):
             )
             return content_group_configuration.to_json()
 
-        content_group_configuration = GroupConfiguration.update_content_group_usage_info(
+        content_group_configuration = GroupConfiguration.update_partition_usage_info(
             store,
             course,
             content_group_configuration
         )
         return content_group_configuration
+
+    @staticmethod
+    def get_all_user_partition_details(store, course):
+        """
+        Returns all the available partitions with updated usage information
+
+        :return: list of all partitions available with details
+        """
+        all_partitions = get_all_partitions_for_course(course)
+        all_updated_partitions = []
+        for partition in all_partitions:
+            configuration = GroupConfiguration.update_partition_usage_info(
+                store,
+                course,
+                partition
+            )
+            all_updated_partitions.append(configuration)
+        return all_updated_partitions

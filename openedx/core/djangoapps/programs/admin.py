@@ -1,9 +1,8 @@
 """
 django admin pages for program support models
 """
-from django.contrib import admin
-
 from config_models.admin import ConfigurationModelAdmin
+from django.contrib import admin
 
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 

@@ -2,8 +2,8 @@
 Helper methods for Surveys
 """
 
-from survey.models import SurveyForm, SurveyAnswer
 from courseware.access import has_access
+from survey.models import SurveyAnswer, SurveyForm
 
 
 def is_survey_required_for_course(course_descriptor):
@@ -23,6 +23,10 @@ def must_answer_survey(course_descriptor, user):
     Returns whether a user needs to answer a required survey
     """
     if not is_survey_required_for_course(course_descriptor):
+        return False
+
+    # anonymous users do not need to answer the survey
+    if user.is_anonymous():
         return False
 
     # this will throw exception if not found, but a non existing survey name will

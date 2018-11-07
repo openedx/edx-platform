@@ -2,34 +2,38 @@
 """
 Integration tests for submitting problem responses and getting grades.
 """
-import ddt
+
+# pylint: disable=attribute-defined-outside-init
+
 import json
 import os
 from textwrap import dedent
 
+import ddt
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory
+from django.utils.timezone import now
 from mock import patch
 from nose.plugins.attrib import attr
 
 from capa.tests.response_xml_factory import (
-    OptionResponseXMLFactory, CustomResponseXMLFactory, SchematicResponseXMLFactory,
     CodeResponseXMLFactory,
+    CustomResponseXMLFactory,
+    OptionResponseXMLFactory,
+    SchematicResponseXMLFactory
 )
 from course_modes.models import CourseMode
-from courseware.models import StudentModule, BaseStudentModuleHistory
+from courseware.models import BaseStudentModuleHistory, StudentModule
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
-from openedx.core.djangoapps.credit.api import (
-    set_credit_requirements, get_credit_requirement_status
-)
+from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
+from openedx.core.djangoapps.credit.api import get_credit_requirement_status, set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 from openedx.core.lib.url_utils import quote_slashes
-from student.models import anonymous_id_for_user, CourseEnrollment
+from student.models import CourseEnrollment, anonymous_id_for_user
 from submissions import api as submissions_api
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -296,13 +300,11 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
         """
         Returns SubsectionGrade for given url.
         """
-        # list of grade summaries for each section
-        sections_list = []
-        for chapter in self.get_course_grade().chapter_grades:
-            sections_list.extend(chapter['sections'])
-
-        # get the first section that matches the url (there should only be one)
-        return next(section for section in sections_list if section.url_name == hw_url_name)
+        for chapter in self.get_course_grade().chapter_grades.itervalues():
+            for section in chapter['sections']:
+                if section.url_name == hw_url_name:
+                    return section
+        return None
 
     def score_for_hw(self, hw_url_name):
         """
@@ -311,7 +313,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
         Returns list of scores for the given homework:
             [<points on problem_1>, <points on problem_2>, ..., <points on problem_n>]
         """
-        return [s.earned for s in self.hw_grade(hw_url_name).scores]
+        return [s.earned for s in self.hw_grade(hw_url_name).problem_scores.values()]
 
 
 class TestCourseGrades(TestSubmittingProblems):
@@ -335,7 +337,7 @@ class TestCourseGrades(TestSubmittingProblems):
         Verifies the problem score and the homework grade are as expected.
         """
         hw_grade = self.hw_grade('homework')
-        problem_score = hw_grade.scores[0]
+        problem_score = hw_grade.problem_scores.values()[0]
         self.assertEquals((problem_score.earned, problem_score.possible), expected_problem_score)
         self.assertEquals((hw_grade.graded_total.earned, hw_grade.graded_total.possible), expected_hw_grade)
 
@@ -388,7 +390,6 @@ class TestCourseGrader(TestSubmittingProblems):
         """
         Set up a simple course for testing weighted grading functionality.
         """
-        # pylint: disable=attribute-defined-outside-init
 
         self.set_weighted_policy(hw_weight, final_weight)
 
@@ -451,12 +452,13 @@ class TestCourseGrader(TestSubmittingProblems):
         self.hw3_names = ['h3p1', 'h3p2']
 
         self.homework1 = self.add_graded_section_to_course('homework1')
+        self.homework2 = self.add_graded_section_to_course('homework2')
+        self.homework3 = self.add_graded_section_to_course('homework3')
+
         self.add_dropdown_to_section(self.homework1.location, self.hw1_names[0], 1)
         self.add_dropdown_to_section(self.homework1.location, self.hw1_names[1], 1)
-        self.homework2 = self.add_graded_section_to_course('homework2')
         self.add_dropdown_to_section(self.homework2.location, self.hw2_names[0], 1)
         self.add_dropdown_to_section(self.homework2.location, self.hw2_names[1], 1)
-        self.homework3 = self.add_graded_section_to_course('homework3')
         self.add_dropdown_to_section(self.homework3.location, self.hw3_names[0], 1)
         self.add_dropdown_to_section(self.homework3.location, self.hw3_names[1], 1)
 
@@ -621,7 +623,11 @@ class TestCourseGrader(TestSubmittingProblems):
 
         with patch('submissions.api.get_scores') as mock_get_scores:
             mock_get_scores.return_value = {
-                self.problem_location('p3').to_deprecated_string(): (1, 1)
+                self.problem_location('p3').to_deprecated_string(): {
+                    'points_earned': 1,
+                    'points_possible': 1,
+                    'created_at': now(),
+                },
             }
             self.get_course_grade()
 
@@ -818,7 +824,7 @@ class ProblemWithUploadedFilesTest(TestSubmittingProblems):
         self.assertEqual(name, "post")
         self.assertEqual(len(args), 1)
         self.assertTrue(args[0].endswith("/submit/"))
-        self.assertItemsEqual(kwargs.keys(), ["files", "data"])
+        self.assertItemsEqual(kwargs.keys(), ["files", "data", "timeout"])
         self.assertItemsEqual(kwargs['files'].keys(), filenames.split())
 
 

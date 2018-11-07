@@ -5,14 +5,13 @@ Python tests for the Survey views
 import json
 from collections import OrderedDict
 
-from django.test.client import Client
 from django.core.urlresolvers import reverse
-
-from survey.models import SurveyForm, SurveyAnswer
+from django.test.client import Client
 
 from student.tests.factories import UserFactory
-from xmodule.modulestore.tests.factories import CourseFactory
+from survey.models import SurveyAnswer, SurveyForm
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class SurveyViewsTests(ModuleStoreTestCase):
@@ -83,7 +82,7 @@ class SurveyViewsTests(ModuleStoreTestCase):
         # is the SurveyForm html present in the HTML response?
         self.assertIn(self.test_form, resp.content)
 
-    def test_unautneticated_survey_postback(self):
+    def test_unauthenticated_survey_postback(self):
         """
         Asserts that an anonymous user cannot answer a survey
         """

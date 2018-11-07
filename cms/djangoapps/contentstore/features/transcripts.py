@@ -2,14 +2,14 @@
 # pylint: disable=missing-docstring
 
 import os
-from lettuce import world, step
 
 from django.conf import settings
+from lettuce import step, world
+from splinter.request_handler.request_handler import RequestHandler
 
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
-from splinter.request_handler.request_handler import RequestHandler
 
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 

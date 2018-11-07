@@ -1,25 +1,28 @@
 """
 Test the student dashboard view.
 """
+import datetime
+import itertools
 import json
 import unittest
 
 import ddt
+import pytz
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.test import RequestFactory
-from django.test import TestCase
+from django.test import RequestFactory, TestCase
 from edx_oauth2_provider.constants import AUTHORIZED_CLIENTS_SESSION_KEY
 from edx_oauth2_provider.tests.factories import ClientFactory, TrustedClientFactory
 from mock import patch
 from pyquery import PyQuery as pq
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 from student.cookies import get_user_info_cookie_data
 from student.helpers import DISABLE_UNENROLL_CERT_STATES
-from student.models import CourseEnrollment, LogoutViewConfiguration
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from student.models import CourseEnrollment, LogoutViewConfiguration, UserProfile
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 PASSWORD = 'test'
 
@@ -157,22 +160,36 @@ class LogoutTests(TestCase):
         self.client.post(reverse('oauth2:capture'), data, follow=True)
         self.assertListEqual(self.client.session[AUTHORIZED_CLIENTS_SESSION_KEY], [oauth_client.client_id])
 
-    def assert_logout_redirects(self):
+    def assert_logout_redirects_to_root(self):
         """ Verify logging out redirects the user to the homepage. """
         response = self.client.get(reverse('logout'))
         self.assertRedirects(response, '/', fetch_redirect_response=False)
 
-    def test_switch(self):
+    def assert_logout_redirects_with_target(self):
+        """ Verify logging out with a redirect_url query param redirects the user to the target. """
+        url = '{}?{}'.format(reverse('logout'), 'redirect_url=/courses')
+        response = self.client.get(url)
+        self.assertRedirects(response, '/courses', fetch_redirect_response=False)
+
+    def test_switch_default(self):
         """ Verify the IDA logout functionality is disabled if the associated switch is disabled. """
         LogoutViewConfiguration.objects.create(enabled=False)
         oauth_client = self.create_oauth_client()
         self.authenticate_with_oauth(oauth_client)
-        self.assert_logout_redirects()
+        self.assert_logout_redirects_to_root()
+
+    def test_switch_with_redirect_url(self):
+        """ Verify the IDA logout functionality is disabled if the associated switch is disabled. """
+        LogoutViewConfiguration.objects.create(enabled=False)
+        oauth_client = self.create_oauth_client()
+        self.authenticate_with_oauth(oauth_client)
+        self.assert_logout_redirects_with_target()
 
     def test_without_session_value(self):
         """ Verify logout works even if the session does not contain an entry with
         the authenticated OpenID Connect clients."""
-        self.assert_logout_redirects()
+        self.assert_logout_redirects_to_root()
+        self.assert_logout_redirects_with_target()
 
     def test_client_logout(self):
         """ Verify the context includes a list of the logout URIs of the authenticated OpenID Connect clients.
@@ -200,19 +217,53 @@ class LogoutTests(TestCase):
         self.assertDictContainsSubset(expected, response.context_data)  # pylint: disable=no-member
 
 
+@ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class StudentDashboardTests(TestCase):
-    """ Tests for the student dashboard. """
+class StudentDashboardTests(SharedModuleStoreTestCase):
+    """
+    Tests for the student dashboard.
+    """
+
+    ENABLED_SIGNALS = ['course_published']
+    TOMORROW = datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1)
+    MOCK_SETTINGS = {
+        'FEATURES': {
+            'DISABLE_START_DATES': False,
+            'ENABLE_MKTG_SITE': True
+        },
+        'SOCIAL_SHARING_SETTINGS': {
+            'CUSTOM_COURSE_URLS': True,
+            'DASHBOARD_FACEBOOK': True,
+            'DASHBOARD_TWITTER': True,
+        },
+    }
 
     def setUp(self):
-        """ Create a course and user, then log in. """
+        """
+        Create a course and user, then log in.
+        """
         super(StudentDashboardTests, self).setUp()
         self.user = UserFactory()
         self.client.login(username=self.user.username, password=PASSWORD)
         self.path = reverse('dashboard')
 
+    def set_course_sharing_urls(self, set_marketing, set_social_sharing):
+        """
+        Set course sharing urls (i.e. social_sharing_url, marketing_url)
+        """
+        course_overview = self.course_enrollment.course_overview
+        if set_marketing:
+            course_overview.marketing_url = 'http://www.testurl.com/marketing/url/'
+
+        if set_social_sharing:
+            course_overview.social_sharing_url = 'http://www.testurl.com/social/url/'
+
+        course_overview.save()
+
     def test_user_info_cookie(self):
-        """ Verify visiting the learner dashboard sets the user info cookie. """
+        """
+        Verify visiting the learner dashboard sets the user info cookie.
+        """
         self.assertNotIn(settings.EDXMKTG_USER_INFO_COOKIE_NAME, self.client.cookies)
 
         request = RequestFactory().get(self.path)
@@ -221,3 +272,35 @@ class StudentDashboardTests(TestCase):
         self.client.get(self.path)
         actual = self.client.cookies[settings.EDXMKTG_USER_INFO_COOKIE_NAME].value
         self.assertEqual(actual, expected)
+
+    def test_redirect_account_settings(self):
+        """
+        Verify if user does not have profile he/she is redirected to account_settings.
+        """
+        UserProfile.objects.get(user=self.user).delete()
+        response = self.client.get(self.path)
+        self.assertRedirects(response, reverse('account_settings'))
+
+    @patch.multiple('django.conf.settings', **MOCK_SETTINGS)
+    @ddt.data(
+        *itertools.product(
+            [TOMORROW],
+            [True, False],
+            [True, False],
+            [ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split],
+        )
+    )
+    @ddt.unpack
+    def test_sharing_icons_for_future_course(self, start_date, set_marketing, set_social_sharing, modulestore_type):
+        """
+        Verify that the course sharing icons show up if course is starting in future and
+        any of marketing or social sharing urls are set.
+        """
+        self.course = CourseFactory.create(start=start_date, emit_signals=True, default_store=modulestore_type)
+        self.course_enrollment = CourseEnrollmentFactory(course_id=self.course.id, user=self.user)
+        self.set_course_sharing_urls(set_marketing, set_social_sharing)
+
+        # Assert course sharing icons
+        response = self.client.get(reverse('dashboard'))
+        self.assertEqual('Share on Twitter' in response.content, set_marketing or set_social_sharing)
+        self.assertEqual('Share on Facebook' in response.content, set_marketing or set_social_sharing)

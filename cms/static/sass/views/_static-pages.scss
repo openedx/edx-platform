@@ -17,6 +17,7 @@
     .add-pages {
       @extend %no-content;
       margin: ($baseline*1.5) 0;
+      color: $gray-d1;
     }
 
     .notice-incontext {
@@ -257,7 +258,7 @@
           width: auto;
           height: ($baseline*1.5);
           border-radius: 3px;
-          color: $gray-l1;
+          color: $gray-d1;
           text-transform: uppercase;
 
           &:hover {
@@ -281,7 +282,7 @@
           vertical-align: bottom;
         }
 
-        &.action-duplicate {
+        &.action-duplicate, &.action-move {
           display: none;
         }
       }

@@ -69,9 +69,9 @@ Support
 ``cache_relation`` currently only works with ``OneToOneField`` fields. Support
 for regular ``ForeignKey`` fields is planned.
 """
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_delete, post_save
 
-from .core import get_instance, delete_instance
+from .core import delete_instance, get_instance
 
 
 def cache_relation(descriptor, timeout=None):

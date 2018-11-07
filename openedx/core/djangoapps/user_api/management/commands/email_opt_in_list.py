@@ -49,6 +49,8 @@ class Command(BaseCommand):
 
     # Fields output in the CSV
     OUTPUT_FIELD_NAMES = [
+        "user_id",
+        "username",
         "email",
         "full_name",
         "course_id",
@@ -199,6 +201,8 @@ class Command(BaseCommand):
         query = (
             u"""
             SELECT
+                user.`id` AS `user_id`,
+                user.`username` AS username,
                 user.`email` AS `email`,
                 profile.`name` AS `full_name`,
                 enrollment.`course_id` AS `course_id`,
@@ -234,8 +238,10 @@ class Command(BaseCommand):
         cursor.execute(query)
         row_count = 0
         for row in self._iterate_results(cursor):
-            email, full_name, course_id, is_opted_in, pref_set_datetime = row
+            user_id, username, email, full_name, course_id, is_opted_in, pref_set_datetime = row
             writer.writerow({
+                "user_id": user_id,
+                "username": username.encode('utf-8'),
                 "email": email.encode('utf-8'),
                 # There should not be a case where users are without full_names. We only need this safe check because
                 # of ECOM-1995.

@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 """Tests for tracking middleware."""
 import ddt
-from mock import patch
-from mock import sentinel
-
 from django.contrib.auth.models import User
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from mock import patch, sentinel
 
 from eventtracking import tracker
 from track.middleware import TrackMiddleware

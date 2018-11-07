@@ -1,40 +1,25 @@
 """
 test utils
 """
-import mock
 import uuid
-from nose.plugins.attrib import attr
 from smtplib import SMTPException
 
+import mock
 from ccx_keys.locator import CCXLocator
-from student.roles import (
-    CourseCcxCoachRole,
-    CourseInstructorRole,
-    CourseStaffRole,
-)
-from student.tests.factories import AdminFactory
-
-from student.models import CourseEnrollment, CourseEnrollmentException
-
-from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase,
-    TEST_DATA_SPLIT_MODULESTORE
-)
-from xmodule.modulestore.tests.factories import CourseFactory
+from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
-from xmodule.modulestore.django import modulestore
 
 from lms.djangoapps.ccx import utils
-from lms.djangoapps.instructor.access import (
-    list_with_level,
-)
-from lms.djangoapps.ccx.utils import (
-    add_master_course_staff_to_ccx,
-    ccx_course,
-    remove_master_course_staff_from_ccx
-)
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 from lms.djangoapps.ccx.tests.utils import CcxTestCase
+from lms.djangoapps.ccx.utils import add_master_course_staff_to_ccx, ccx_course, remove_master_course_staff_from_ccx
+from lms.djangoapps.instructor.access import list_with_level
+from student.models import CourseEnrollment, CourseEnrollmentException
+from student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
+from student.tests.factories import AdminFactory
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @attr(shard=1)
@@ -75,6 +60,8 @@ class TestGetCourseChapters(CcxTestCase):
     """
     Tests for the `get_course_chapters` util function
     """
+    ENABLED_SIGNALS = ['course_published']
+
     def setUp(self):
         """
         Set up tests

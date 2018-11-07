@@ -1,7 +1,7 @@
 """
 URLs for mobile API
 """
-from django.conf.urls import patterns, url, include
+from django.conf.urls import include, patterns, url
 
 from .users.views import my_user_info
 

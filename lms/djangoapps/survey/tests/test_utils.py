@@ -4,15 +4,13 @@ Python tests for the Survey models
 
 from collections import OrderedDict
 
-from django.test.client import Client
 from django.contrib.auth.models import User
+from django.test.client import Client
 
 from survey.models import SurveyForm
-
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-
 from survey.utils import is_survey_required_for_course, must_answer_survey
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class SurveyModelsTests(ModuleStoreTestCase):

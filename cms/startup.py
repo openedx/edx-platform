@@ -2,33 +2,28 @@
 Module with code executed during Studio startup
 """
 
+import django
 from django.conf import settings
+
+import cms.lib.xblock.runtime
+import xmodule.x_module
+from openedx.core.djangoapps.monkey_patch import django_db_models_options
+from openedx.core.djangoapps.theming.core import enable_theming
+from openedx.core.djangoapps.theming.helpers import is_comprehensive_theming_enabled
+from openedx.core.lib.django_startup import autostartup
+from openedx.core.lib.xblock_utils import xblock_local_resource_url
+from openedx.core.release import doc_version
+from startup_configurations.validate_config import validate_cms_config
 
 # Force settings to run so that the python path is modified
 
 settings.INSTALLED_APPS  # pylint: disable=pointless-statement
-
-from openedx.core.lib.django_startup import autostartup
-import django
-from openedx.core.djangoapps.monkey_patch import (
-    third_party_auth,
-    django_db_models_options
-)
-from openedx.core.lib.xblock_utils import xblock_local_resource_url
-
-import xmodule.x_module
-import cms.lib.xblock.runtime
-
-from startup_configurations.validate_config import validate_cms_config
-from openedx.core.djangoapps.theming.core import enable_theming
-from openedx.core.djangoapps.theming.helpers import is_comprehensive_theming_enabled
 
 
 def run():
     """
     Executed during django startup
     """
-    third_party_auth.patch()
     django_db_models_options.patch()
 
     # Comprehensive theming needs to be set up before django startup,
@@ -48,6 +43,10 @@ def run():
     # https://openedx.atlassian.net/wiki/display/PLAT/Convert+from+Storage-centric+runtimes+to+Application-centric+runtimes
     xmodule.x_module.descriptor_global_handler_url = cms.lib.xblock.runtime.handler_url
     xmodule.x_module.descriptor_global_local_resource_url = xblock_local_resource_url
+
+    # Set the version of docs that help-tokens will go to.
+    settings.HELP_TOKENS_LANGUAGE_CODE = settings.LANGUAGE_CODE
+    settings.HELP_TOKENS_VERSION = doc_version()
 
     # validate configurations on startup
     validate_cms_config(settings)

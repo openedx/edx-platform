@@ -31,30 +31,30 @@
                 return expect(group_disabled).toEqual(true);
             }
         };
-        describe('cohort selector', function() {
+        describe('group selector', function() {
             beforeEach(function() {
                 this.course_settings = new DiscussionCourseSettings({
                     category_map: {
                         children: [['Topic', 'entry'], ['General', 'entry'], ['Not Cohorted', 'entry']],
                         entries: {
                             Topic: {
-                                is_cohorted: true,
+                                is_divided: true,
                                 id: 'topic'
                             },
                             General: {
-                                is_cohorted: true,
+                                is_divided: true,
                                 id: 'general'
                             },
                             'Not Cohorted': {
-                                is_cohorted: false,
+                                is_divided: false,
                                 id: 'not-cohorted'
                             }
                         }
                     },
                     allow_anonymous: false,
                     allow_anonymous_to_peers: false,
-                    is_cohorted: true,
-                    cohorts: [
+                    is_discussion_division_enabled: true,
+                    groups: [
                         {
                             id: 1,
                             name: 'Cohort1'
@@ -75,15 +75,15 @@
             it('is not visible to students', function() {
                 return checkVisibility(this.view, false, false, true);
             });
-            it('allows TAs to see the cohort selector when the topic is cohorted', function() {
+            it('allows TAs to see the group selector when the topic is divided', function() {
                 DiscussionSpecHelper.makeTA();
                 return checkVisibility(this.view, true, false, true);
             });
-            it('allows moderators to see the cohort selector when the topic is cohorted', function() {
+            it('allows moderators to see the group selector when the topic is divided', function() {
                 DiscussionSpecHelper.makeModerator();
                 return checkVisibility(this.view, true, false, true);
             });
-            it('only enables the cohort selector when applicable', function() {
+            it('only enables the group selector when applicable', function() {
                 DiscussionSpecHelper.makeModerator();
                 checkVisibility(this.view, true, false, true);
 
@@ -95,7 +95,7 @@
                 $('.post-topic').trigger('change');
                 return checkVisibility(this.view, true, false, false);
             });
-            it('allows the user to make a cohort selection', function() {
+            it('allows the user to make a group selection', function() {
                 var expectedGroupId,
                     self = this;
                 DiscussionSpecHelper.makeModerator();
@@ -116,23 +116,23 @@
                 });
             });
         });
-        describe('always cohort inline discussions ', function() {
+        describe('always divide inline discussions ', function() {
             beforeEach(function() {
                 this.course_settings = new DiscussionCourseSettings({
-                    'category_map': {
-                        'children': [],
-                        'entries': {}
+                    category_map: {
+                        children: [],
+                        entries: {}
                     },
-                    'allow_anonymous': false,
-                    'allow_anonymous_to_peers': false,
-                    'is_cohorted': true,
-                    'cohorts': [
+                    allow_anonymous: false,
+                    allow_anonymous_to_peers: false,
+                    is_discussion_division_enabled: true,
+                    groups: [
                         {
-                            'id': 1,
-                            'name': 'Cohort1'
+                            id: 1,
+                            name: 'Cohort1'
                         }, {
-                            'id': 2,
-                            'name': 'Cohort2'
+                            id: 2,
+                            name: 'Cohort2'
                         }
                     ]
                 });
@@ -143,22 +143,22 @@
                     mode: 'tab'
                 });
             });
-            it('disables the cohort menu if it is set false', function() {
+            it('disables the group menu if it is set false', function() {
                 DiscussionSpecHelper.makeModerator();
-                this.view.is_commentable_cohorted = false;
+                this.view.is_commentable_divided = false;
                 return checkVisibility(this.view, true, true, true);
             });
-            it('enables the cohort menu if it is set true', function() {
+            it('enables the group menu if it is set true', function() {
                 DiscussionSpecHelper.makeModerator();
-                this.view.is_commentable_cohorted = true;
+                this.view.is_commentable_divided = true;
                 return checkVisibility(this.view, true, false, true);
             });
             it('is not visible to students when set false', function() {
-                this.view.is_commentable_cohorted = false;
+                this.view.is_commentable_divided = false;
                 return checkVisibility(this.view, false, false, true);
             });
             it('is not visible to students when set true', function() {
-                this.view.is_commentable_cohorted = true;
+                this.view.is_commentable_divided = true;
                 return checkVisibility(this.view, false, false, true);
             });
         });
@@ -166,33 +166,33 @@
             var checkPostCancelReset;
             beforeEach(function() {
                 this.course_settings = new DiscussionCourseSettings({
-                    'allow_anonymous_to_peers': true,
-                    'allow_anonymous': true,
-                    'category_map': {
-                        'subcategories': {
+                    allow_anonymous_to_peers: true,
+                    allow_anonymous: true,
+                    category_map: {
+                        subcategories: {
                             'Week 1': {
-                                'subcategories': {},
-                                'children': [ // eslint-disable-line quote-props
+                                subcategories: {},
+                                children: [
                                     ['Topic-Level Student-Visible Label', 'entry']
                                 ],
-                                'entries': {
+                                entries: {
                                     'Topic-Level Student-Visible Label': {
-                                        'sort_key': null,
-                                        'is_cohorted': false,
-                                        'id': '2b3a858d0c884eb4b272dbbe3f2ffddd'
+                                        sort_key: null,
+                                        is_divided: false,
+                                        id: '2b3a858d0c884eb4b272dbbe3f2ffddd'
                                     }
                                 }
                             }
                         },
-                        'children': [ // eslint-disable-line quote-props
+                        children: [
                             ['General', 'entry'],
                             ['Week 1', 'subcategory']
                         ],
-                        'entries': {
-                            'General': {
-                                'sort_key': 'General',
-                                'is_cohorted': false,
-                                'id': 'i4x-waqastest-waqastest-course-waqastest'
+                        entries: {
+                            General: {
+                                sort_key: 'General',
+                                is_divided: false,
+                                id: 'i4x-waqastest-waqastest-course-waqastest'
                             }
                         }
                     }
@@ -214,9 +214,9 @@
                 view.$('.js-post-title').val('Test Title');
                 view.$('.js-post-body textarea').val('Test body');
                 view.$('.wmd-preview p').html('Test body');
-                view.$('.js-follow').prop('checked', false);
-                view.$('.js-anon').prop('checked', true);
-                view.$('.js-anon-peers').prop('checked', true);
+                view.$('input[name=follow]').prop('checked', false);
+                view.$('input[name=anonymous]').prop('checked', true);
+                view.$('input[name=anonymous_to_peers]').prop('checked', true);
                 if (mode === 'tab') {
                     view.$("a[data-discussion-id='2b3a858d0c884eb4b272dbbe3f2ffddd']").click();
                 }
@@ -227,9 +227,9 @@
                 expect($("input[id$='post-type-question']")).not.toBeChecked();
                 expect(view.$('.js-post-title').val()).toEqual('');
                 expect(view.$('.js-post-body textarea').val()).toEqual('');
-                expect(view.$('.js-follow')).toBeChecked();
-                expect(view.$('.js-anon')).not.toBeChecked();
-                expect(view.$('.js-anon-peers')).not.toBeChecked();
+                expect(view.$('input[name=follow]')).toBeChecked();
+                expect(view.$('input[name=anonymous]')).not.toBeChecked();
+                expect(view.$('input[name=anonymous_to_peers]')).not.toBeChecked();
                 if (mode === 'tab') {
                     return expect(view.$('.post-topic option:selected').text()).toEqual('General');
                 }
@@ -238,6 +238,66 @@
                 it('resets the form in ' + mode + ' mode', function() {
                     return checkPostCancelReset(mode, this.discussion, this.course_settings);
                 });
+            });
+        });
+        describe('default topic ', function() {
+            beforeEach(function() {
+                this.course_settings = new DiscussionCourseSettings({
+                    allow_anonymous_to_peers: true,
+                    allow_anonymous: true,
+                    category_map: {
+                        subcategories: {
+                            'Week 1': {
+                                subcategories: {},
+                                children: [
+                                    ['Topic-Level Student-Visible Label', 'entry']
+                                ],
+                                entries: {
+                                    'Topic-Level Student-Visible Label': {
+                                        sort_key: null,
+                                        is_divided: false,
+                                        id: '2b3a858d0c884eb4b272dbbe3f2ffddd'
+                                    }
+                                }
+                            }
+                        },
+                        children: [
+                            ['First topic', 'entry'],
+                            ['Week 1', 'subcategory']
+                        ],
+                        entries: {
+                            'First topic': {
+                                sort_key: 'First topic',
+                                is_divided: false,
+                                id: 'i4x-waqastest-waqastest-course-waqastest'
+                            }
+                        }
+                    }
+                });
+            });
+
+            it('should be the first topic if General is not found', function() {
+                var eventSpy, view;
+                view = new NewPostView({
+                    el: $('#fixture-element'),
+                    collection: this.discussion,
+                    course_settings: this.course_settings,
+                    mode: 'tab'
+                });
+                view.render();
+                eventSpy = jasmine.createSpy('eventSpy');
+                view.listenTo(view, 'newPost:cancel', eventSpy);
+                view.$('.post-errors').html("<li class='post-error'>Title can't be empty</li>");
+                view.$("label[for$='post-type-question']").click();
+                view.$('.js-post-title').val('Test Title');
+                view.$('.js-post-body textarea').val('Test body');
+                view.$('.wmd-preview p').html('Test body');
+                view.$('input[name=follow]').prop('checked', false);
+                view.$('input[name=anonymous]').prop('checked', true);
+                view.$('input[name=anonymous_to_peers]').prop('checked', true);
+                view.$("a[data-discussion-id='2b3a858d0c884eb4b272dbbe3f2ffddd']").click();
+                view.$('.cancel').click();
+                expect(view.$('.post-topic option:selected').text()).toEqual('First topic');
             });
         });
         it('posts to the correct URL', function() {

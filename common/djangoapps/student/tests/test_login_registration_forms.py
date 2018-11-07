@@ -1,16 +1,16 @@
 """Tests for the login and registration form rendering. """
-import urllib
 import unittest
+import urllib
 
 import ddt
-from mock import patch
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from mock import patch
 
-from util.testing import UrlResetMixin
-from xmodule.modulestore.tests.factories import CourseFactory
 from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin
+from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 # This relies on third party auth being enabled in the test
 # settings with the feature flag `ENABLE_THIRD_PARTY_AUTH`
@@ -90,7 +90,7 @@ class LoginFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, SharedModuleStoreTes
     def test_courseware_redirect(self, backend_name):
         # Try to access courseware while logged out, expecting to be
         # redirected to the login page.
-        response = self.client.get(self.courseware_url, follow=True)
+        response = self.client.get(self.courseware_url, follow=True, HTTP_ACCEPT="text/html")
         self.assertRedirects(
             response,
             u"{url}?next={redirect_url}".format(
@@ -118,7 +118,7 @@ class LoginFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, SharedModuleStoreTes
             ('email_opt_in', 'true'),
             ('next', '/custom/final/destination'),
         ]
-        response = self.client.get(self.url, params)
+        response = self.client.get(self.url, params, HTTP_ACCEPT="text/html")
         expected_url = _third_party_login_url(
             backend_name,
             "login",
@@ -137,7 +137,7 @@ class LoginFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, SharedModuleStoreTes
         ]
 
         # Get the login page
-        response = self.client.get(self.url, params)
+        response = self.client.get(self.url, params, HTTP_ACCEPT="text/html")
 
         # Verify that the parameters are sent on to the next page correctly
         post_login_handler = _finish_auth_url(params)
@@ -194,7 +194,7 @@ class RegisterFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, SharedModuleStore
             ('email_opt_in', 'true'),
             ('next', '/custom/final/destination'),
         ]
-        response = self.client.get(self.url, params)
+        response = self.client.get(self.url, params, HTTP_ACCEPT="text/html")
         expected_url = _third_party_login_url(
             backend_name,
             "register",
@@ -213,7 +213,7 @@ class RegisterFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, SharedModuleStore
         ]
 
         # Get the login page
-        response = self.client.get(self.url, params)
+        response = self.client.get(self.url, params, HTTP_ACCEPT="text/html")
 
         # Verify that the parameters are sent on to the next page correctly
         post_login_handler = _finish_auth_url(params)

@@ -3,18 +3,17 @@ Python tests for the Survey workflows
 """
 
 from collections import OrderedDict
-from nose.plugins.attrib import attr
 from copy import deepcopy
 
-from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
-
-from survey.models import SurveyForm, SurveyAnswer
+from django.core.urlresolvers import reverse
+from nose.plugins.attrib import attr
 
 from common.test.utils import XssTestMixin
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from courseware.tests.helpers import LoginEnrollmentTestCase
+from survey.models import SurveyAnswer, SurveyForm
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @attr(shard=1)
@@ -120,7 +119,7 @@ class SurveyViewsTests(LoginEnrollmentTestCase, SharedModuleStoreTestCase, XssTe
     def test_anonymous_user_visiting_course_with_survey(self):
         """
         Verifies that anonymous user going to the courseware info with an unanswered survey is not
-        redirected to survery and info page renders without server error.
+        redirected to survey and info page renders without server error.
         """
         self.logout()
         resp = self.client.get(

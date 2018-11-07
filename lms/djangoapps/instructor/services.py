@@ -4,22 +4,18 @@ Implementation of "Instructor" service
 
 import logging
 
+from django.core.exceptions import ObjectDoesNotExist
+from django.utils.translation import ugettext as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
+
+import lms.djangoapps.instructor.enrollment as enrollment
 from commerce.signals import create_zendesk_ticket
 from courseware.models import StudentModule
 from lms.djangoapps.instructor.views.tools import get_student_from_identifier
-from django.core.exceptions import ObjectDoesNotExist
-import lms.djangoapps.instructor.enrollment as enrollment
-from django.utils.translation import ugettext as _
-
-
-from xmodule.modulestore.django import modulestore
-
-from student.roles import CourseStaffRole
-
 from student import auth
-
+from student.roles import CourseStaffRole
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 

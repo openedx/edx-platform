@@ -2,8 +2,9 @@
 Class Dashboard API endpoint urls.
 """
 
-from django.conf.urls import patterns, url
 from django.conf import settings
+from django.conf.urls import patterns, url
+
 COURSE_ID_PATTERN = settings.COURSE_ID_PATTERN
 
 urlpatterns = patterns(

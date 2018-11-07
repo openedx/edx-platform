@@ -58,5 +58,22 @@ define([
             enrollmentView.$('.change-enrollment-btn').first().click();
             expect($('.enrollment-modal').length).toBe(1);
         });
+        it('renders correct datetime format in UTC', function() {
+            var $enrollmentResultRow,
+                requests = AjaxHelpers.requests(this);
+            enrollmentView = createEnrollmentView().render();
+            AjaxHelpers.expectRequest(requests, 'GET', '/support/enrollment/test-user', null);
+            AjaxHelpers.respondWithJson(requests, [EnrollmentHelpers.mockEnrollmentData]);
+            expect($('.enrollment-results').length).toBe(1);
+            expect($('.enrollment-search input').val()).toBe('test-user');
+            $enrollmentResultRow = $('.enrollment-results tbody tr');
+            expect($enrollmentResultRow.find('td:nth-child(2)').text())
+                .toBe('Jan 1, 2015 12:00 AM UTC'); // course Start Date
+            expect($enrollmentResultRow.find('td:nth-child(3)').text())
+                .toBe('Jan 1, 2017 12:00 AM UTC'); // course End date
+            expect($enrollmentResultRow.find('td:nth-child(5)').text())
+                .toBe('Sep 1, 2017 4:00 PM UTC'); // Verification Deadline
+        });
+
     });
 });

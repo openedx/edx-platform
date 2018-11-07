@@ -7,8 +7,8 @@ from django.test.utils import override_settings
 from nose.plugins.attrib import attr
 
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 from ..courses import course_image_url
 

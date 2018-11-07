@@ -5,40 +5,34 @@ Tests for discussion pages
 import datetime
 from uuid import uuid4
 
+from flaky import flaky
 from nose.plugins.attrib import attr
 from nose.tools import nottest
 from pytz import UTC
-from flaky import flaky
-
-from common.test.acceptance.tests.discussion.helpers import BaseDiscussionTestCase
-from common.test.acceptance.tests.helpers import UniqueCourseTest
-from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
-from common.test.acceptance.pages.lms.courseware import CoursewarePage
-from common.test.acceptance.pages.lms.discussion import (
-    DiscussionTabSingleThreadPage,
-    InlineDiscussionPage,
-    InlineDiscussionThreadPage,
-    DiscussionUserProfilePage,
-    DiscussionTabHomePage,
-    DiscussionSortPreferencePage,
-)
-from common.test.acceptance.pages.lms.learner_profile import LearnerProfilePage
-from common.test.acceptance.pages.lms.tab_nav import TabNavPage
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.fixtures.discussion import (
-    SingleThreadViewFixture,
-    UserProfileViewFixture,
-    SearchResultFixture,
-    Thread,
-    Response,
     Comment,
+    Response,
     SearchResult,
-    MultipleThreadFixture,
+    SearchResultFixture,
+    SingleThreadViewFixture,
+    Thread,
+    UserProfileViewFixture
 )
-
-from common.test.acceptance.tests.discussion.helpers import BaseDiscussionMixin
-from common.test.acceptance.tests.helpers import skip_if_browser
+from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.lms.discussion import (
+    DiscussionSortPreferencePage,
+    DiscussionTabHomePage,
+    DiscussionTabSingleThreadPage,
+    DiscussionUserProfilePage,
+    InlineDiscussionPage
+)
+from common.test.acceptance.pages.lms.learner_profile import LearnerProfilePage
+from common.test.acceptance.pages.lms.tab_nav import TabNavPage
+from common.test.acceptance.tests.discussion.helpers import BaseDiscussionMixin, BaseDiscussionTestCase
+from common.test.acceptance.tests.helpers import UniqueCourseTest, get_modal_alert, skip_if_browser
 
 
 THREAD_CONTENT_WITH_LATEX = """Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
@@ -270,12 +264,13 @@ class DiscussionNavigationTest(BaseDiscussionTestCase):
             css=".forum-nav-browse-menu-item[data-discussion-id='{}']".format(self.discussion_id)
         )
         self.assertTrue(topic_button.visible)
+
         topic_button.click()
 
         # Verify the thread's topic has been pushed to breadcrumbs
         breadcrumbs = self.thread_page.q(css=".breadcrumbs .nav-item")
-        self.assertEqual(len(breadcrumbs), 2)
-        self.assertEqual(breadcrumbs[1].text, "Test Discussion Topic")
+        self.assertEqual(len(breadcrumbs), 3)
+        self.assertEqual(breadcrumbs[2].text, "Topic-Level Student-Visible Label")
 
     def test_breadcrumbs_back_to_all_topics(self):
         topic_button = self.thread_page.q(
@@ -290,11 +285,27 @@ class DiscussionNavigationTest(BaseDiscussionTestCase):
 
     def test_breadcrumbs_clear_search(self):
         self.thread_page.q(css=".search-input").fill("search text")
-        self.thread_page.q(css=".search-btn").click()
+        self.thread_page.q(css=".search-button").click()
 
         # Verify that clicking the first breadcrumb clears your search
         self.thread_page.q(css=".breadcrumbs .nav-item")[0].click()
         self.assertEqual(self.thread_page.q(css=".search-input").text[0], "")
+
+    def test_navigation_and_sorting(self):
+        """
+        Test that after adding the post, user sorting preference is changing properly
+        and recently added post is shown.
+        """
+        topic_button = self.thread_page.q(
+            css=".forum-nav-browse-menu-item[data-discussion-id='{}']".format(self.discussion_id)
+        )
+        self.assertTrue(topic_button.visible)
+        topic_button.click()
+        sort_page = DiscussionSortPreferencePage(self.browser, self.course_id)
+        for sort_type in ["votes", "comments", "activity"]:
+            sort_page.change_sort_preference(sort_type)
+            # Verify that recently added post titled "dummy thread title" is shown in each sorting preference
+            self.assertEqual(self.thread_page.q(css=".forum-nav-thread-title").text[0], 'dummy thread title')
 
 
 @attr(shard=2)
@@ -980,6 +991,27 @@ class DiscussionEditorPreviewTest(UniqueCourseTest):
 
         self.assertEqual(self.page.get_new_post_preview_text(), 'Text line 1\nText line 2')
 
+    def test_mathjax_not_rendered_after_post_cancel(self):
+        """
+        Tests that mathjax is not rendered when we cancel the post
+
+        When user types the mathjax expression into discussion editor, it will appear in te preview
+        box, and when user cancel it and again click the "Add new post" button, mathjax will not
+        appear in the preview box
+        """
+        self.page.set_new_post_editor_value(
+            '\\begin{equation}'
+            '\\tau_g(\omega) = - \\frac{d}{d\omega}\phi(\omega) \hspace{2em} (1) '
+            '\\end{equation}'
+        )
+        self.assertIsNotNone(self.page.get_new_post_preview_text())
+        self.page.click_element(".cancel")
+        alert = get_modal_alert(self.browser)
+        alert.accept()
+        self.assertIsNotNone(self.page.new_post_button)
+        self.page.click_new_post_button()
+        self.assertEqual(self.page.get_new_post_preview_value('.wmd-preview'), "")
+
 
 @attr(shard=2)
 class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMixin):
@@ -1054,6 +1086,15 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         # Add a Post link is present
         self.assertTrue(self.discussion_page.q(css='.new-post-btn').present)
 
+    def test_add_post_not_present_if_discussion_blackout_period_started(self):
+        """
+        If discussion blackout period has started Add a post button should not appear.
+        """
+        self.start_discussion_blackout_period()
+        self.browser.refresh()
+        self.discussion_page.expand_discussion()
+        self.assertFalse(self.discussion_page.is_new_post_button_visible())
+
     def test_initial_render(self):
         self.assertFalse(self.discussion_page.is_discussion_expanded())
 
@@ -1077,20 +1118,7 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         self.check_anonymous_to_peers(False)
 
     def test_discussion_blackout_period(self):
-        now = datetime.datetime.now(UTC)
-        self.course_fix.add_advanced_settings(
-            {
-                u"discussion_blackouts": {
-                    "value": [
-                        [
-                            (now - datetime.timedelta(days=14)).isoformat(),
-                            (now + datetime.timedelta(days=2)).isoformat()
-                        ]
-                    ]
-                }
-            }
-        )
-        self.course_fix._add_advanced_settings()
+        self.start_discussion_blackout_period()
         self.browser.refresh()
         thread = Thread(id=uuid4().hex, commentable_id=self.discussion_id)
         thread_fixture = SingleThreadViewFixture(thread)
@@ -1158,6 +1186,25 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         # Verify that neither discussion's forms are shwon
         self.assertIsNone(self.discussion_page.new_post_form)
         self.assertIsNone(self.additional_discussion_page.new_post_form)
+
+    def start_discussion_blackout_period(self):
+        """
+        Start discussion blackout period, starting 14 days before now to 2 days ago.
+        """
+        now = datetime.datetime.now(UTC)
+        self.course_fix.add_advanced_settings(
+            {
+                u"discussion_blackouts": {
+                    "value": [
+                        [
+                            (now - datetime.timedelta(days=14)).isoformat(),
+                            (now + datetime.timedelta(days=2)).isoformat()
+                        ]
+                    ]
+                }
+            }
+        )
+        self.course_fix._add_advanced_settings()  # pylint: disable=protected-access
 
 
 @attr(shard=2)

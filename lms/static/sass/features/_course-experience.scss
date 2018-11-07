@@ -1,0 +1,205 @@
+// Welcome message
+.welcome-message {
+  border: solid 1px $lms-border-color;
+  @include border-left(solid 4px $black);
+  margin-bottom: $baseline;
+  padding: $baseline;
+
+  h1, h2, h3 {
+    font-size: font-size(large);
+    font-weight: $font-bold;
+    color: $black;
+  }
+
+  .dismiss-message {
+      @include float(right);
+  }
+}
+
+// Course sidebar
+.course-sidebar {
+  @include margin-left(0);
+  @include padding-left($baseline);
+
+  .section-tools li:not(:first-child) {
+    margin-top: ($baseline / 5);
+  }
+}
+
+// Course outline
+.course-outline {
+  color: $lms-gray;
+
+  .block-tree {
+    margin: 0;
+    list-style-type: none;
+
+    .section {
+      margin: 0 (-1 * $baseline);
+      width: calc(100% + (2 * $baseline));
+      padding: 0 ($baseline);
+
+      &:not(:first-child) {
+        .section-name {
+          margin-top: $baseline;
+        }
+      }
+
+      .section-name {
+        @include margin(0, 0, ($baseline / 2), ($baseline / 2));
+        padding: 0;
+
+        h3 {
+          font-weight: $font-bold;
+          font-size: 1.1rem;
+          margin: 0;
+        }
+      }
+
+      .outline-item {
+        @include padding-left(0);
+      }
+
+      ol.outline-item {
+        padding-bottom: $baseline;
+        border-bottom: 1px solid $light-grey-solid;
+        margin: 0 0 ($baseline / 2) 0;
+        
+
+        .subsection {
+          list-style-type: none;
+          border: 1px solid transparent;
+          border-radius: 3px;
+
+          a.outline-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: ($baseline / 2);
+
+            .subsection-title {
+              margin: 0;
+            }
+
+            &:hover, &:focus {
+              background-color: palette(primary, x-back);
+              border-radius: $btn-border-radius;
+              text-decoration: none;
+            }
+
+            .subsection-text {
+              .details {
+                font-size: $body-font-size;
+                color: $lms-gray;
+              }
+            }
+
+            .subsection-actions {
+              .resume-right {
+                position: relative;
+                top: calc(50% - (#{$baseline} / 2));
+              }
+            }
+          }
+
+          &.current {
+            border: 1px solid $lms-active-color;
+            border-radius: $btn-border-radius;
+
+            .resume-right {
+              @include float(right);
+            }
+          }
+
+          &:hover {
+            border: 1px solid $lms-active-color;
+          }
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+      }
+    }
+  }
+}
+
+// date summary
+.date-summary-container {
+  .date-summary {
+    @include clearfix;
+    padding: 10px;
+    @include border-left(3px solid $gray-l3);
+
+    .heading {
+      font-size: 1.1rem;
+      line-height: 1;
+      font-weight: $font-bold;
+      color: $lms-gray;
+    }
+
+    .description {
+      margin-top: $baseline/2;
+      margin-bottom: $baseline/2;
+      display: inline-block;
+      color: $gray-d1;
+    }
+
+    .date-summary-link {
+      font-weight: $font-semibold;
+      a {
+        color: $link-color;
+        font-weight: $font-regular;
+      }
+    }
+
+    .date {
+      color: $gray-d1;
+    }
+
+    &-todays-date {
+      @include border-left(3px solid $blue);
+    }
+
+    &-verified-upgrade-deadline {
+      @include border-left(3px solid $green);
+    }
+
+    &-verification-deadline-passed {
+      @include border-left(3px solid $red);
+    }
+
+    &-verification-deadline-retry {
+      @include border-left(3px solid $red);
+    }
+
+    &-verification-deadline-upcoming {
+      @include border-left(3px solid $orange);
+    }
+  }
+}
+
+// Course Updates Page
+.course-updates {
+  .all-updates {
+    .updates-article {
+      margin: ($baseline*6/5) 0;
+      padding-bottom: ($baseline*6/5);
+      border-bottom: 1px solid $lms-border-color;
+      .date {
+        font-size: font-size(small);
+        font-weight: 300;
+        float: none;
+        padding-bottom: ($baseline/4);
+      }
+      &:last-child {
+        border-bottom: 0;
+      }
+    }
+  }
+}
+
+// Course Reviews Page
+.course-reviews-tool {
+  margin: ($baseline * 2) ($baseline * 3);
+}

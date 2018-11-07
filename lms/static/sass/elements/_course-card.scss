@@ -60,6 +60,10 @@
       margin-bottom: $baseline/4;
       font-size: font-size(small);
       visibility: hidden;
+
+      .visible {
+        visibility: visible;
+      }
     }
 
     .no-action-message {

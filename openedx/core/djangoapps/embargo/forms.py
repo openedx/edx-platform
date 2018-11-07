@@ -2,14 +2,13 @@
 Defines forms for providing validation of embargo admin details.
 """
 
+import ipaddr
 from django import forms
 from django.utils.translation import ugettext as _
-
-import ipaddr
-
-from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+
+from xmodule.modulestore.django import modulestore
 
 from .models import IPFilter, RestrictedCourse
 

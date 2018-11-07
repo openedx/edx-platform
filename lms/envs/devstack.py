@@ -8,6 +8,7 @@ from .aws import *  # pylint: disable=wildcard-import, unused-wildcard-import
 # Don't use S3 in devstack, fall back to filesystem
 del DEFAULT_FILE_STORAGE
 MEDIA_ROOT = "/edx/var/edxapp/uploads"
+ORA2_FILEUPLOAD_BACKEND = 'django'
 
 
 DEBUG = True
@@ -20,6 +21,7 @@ CELERY_ALWAYS_EAGER = True
 HTTPS = 'off'
 
 LMS_ROOT_URL = 'http://localhost:8000'
+ENTERPRISE_API_URL = LMS_ROOT_URL + '/enterprise/api/v1/'
 
 ################################ LOGGERS ######################################
 
@@ -83,7 +85,8 @@ DEBUG_TOOLBAR_PANELS = (
 )
 
 DEBUG_TOOLBAR_CONFIG = {
-    'SHOW_TOOLBAR_CALLBACK': 'lms.envs.devstack.should_show_debug_toolbar'
+    'SHOW_TOOLBAR_CALLBACK': 'lms.envs.devstack.should_show_debug_toolbar',
+    'JQUERY_URL': None,
 }
 
 
@@ -198,6 +201,7 @@ VERIFY_STUDENT["SOFTWARE_SECURE"] = {
     "API_ACCESS_KEY": "BBBBBBBBBBBBBBBBBBBB",
     "API_SECRET_KEY": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
 }
+DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH = "verify_student_disable_account_activation_requirement"
 
 # Skip enrollment start date filtering
 SEARCH_SKIP_ENROLLMENT_START_DATE_FILTERING = True
@@ -217,6 +221,9 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and 'third_party_auth.dummy.DummyBack
 ############## ECOMMERCE API CONFIGURATION SETTINGS ###############
 ECOMMERCE_PUBLIC_URL_ROOT = "http://localhost:8002"
 
+CREDENTIALS_INTERNAL_SERVICE_URL = 'http://localhost:8008'
+CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:8008'
+
 ###################### Cross-domain requests ######################
 FEATURES['ENABLE_CORS_HEADERS'] = True
 CORS_ALLOW_CREDENTIALS = True
@@ -224,18 +231,7 @@ CORS_ORIGIN_WHITELIST = ()
 CORS_ORIGIN_ALLOW_ALL = True
 
 # JWT settings for devstack
-PUBLIC_RSA_KEY = """\
------BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApCujf5oZBGK4MafMRGY9
-+zdRRI9YDm1r+81coDCysSrwkhTkFIwP2dmS6lYvJuQ5wifuQa3WFv1Kh9Nr2XRJ
-1m9OL3/JpmMyTi/YuwD7tIf65tab1SOSRYkoxOKRuuvZuXQG9nWbXrGDncnwuWxf
-eymwWaIrAhALUS5+nDa7dauj8VngsWauMrEA/MWShEzsR53wGKlciEZA1r/AfQ55
-XS42GvBobhhy9SeZ3B6LHiaAEywpwFmKPssuoHSNhbPa49LW3gXJ6CsFGRDcBFKd
-xJ/l8O847Q7kg1lvckpLsKyu5167NK9Qj1X/O3SwVBL3cxx1HpQ6+q3SGLZ4ngow
-hwIDAQAB
------END PUBLIC KEY-----"""
-
-PRIVATE_RSA_KEY = """\
+JWT_PRIVATE_SIGNING_KEY = """\
 -----BEGIN PRIVATE KEY-----
 MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQCkK6N/mhkEYrgx
 p8xEZj37N1FEj1gObWv7zVygMLKxKvCSFOQUjA/Z2ZLqVi8m5DnCJ+5BrdYW/UqH

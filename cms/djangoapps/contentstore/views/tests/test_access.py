@@ -1,14 +1,14 @@
 """
 Tests access.py
 """
-from django.test import TestCase
 from django.contrib.auth.models import User
+from django.test import TestCase
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
+from contentstore.views.access import get_user_role
+from student.auth import add_users
 from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import AdminFactory
-from student.auth import add_users
-from contentstore.views.access import get_user_role
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 class RolesTest(TestCase):

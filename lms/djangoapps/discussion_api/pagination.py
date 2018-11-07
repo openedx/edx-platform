@@ -2,6 +2,7 @@
 Discussion API pagination support
 """
 from rest_framework.utils.urls import replace_query_param
+
 from openedx.core.lib.api.paginators import NamespacedPageNumberPagination
 
 

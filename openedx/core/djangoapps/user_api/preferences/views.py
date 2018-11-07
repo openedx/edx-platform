@@ -1,8 +1,7 @@
 """
-NOTE: this API is WIP and has not yet been approved. Do not use this API
-without talking to Christina or Andy.
+An API for retrieving user preference information.
 
-For more information, see:
+For additional information and historical context, see:
 https://openedx.atlassian.net/wiki/display/TNL/User+API
 """
 from rest_framework.views import APIView

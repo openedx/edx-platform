@@ -1,9 +1,9 @@
 """
 Django models supporting the Comprehensive Theming subsystem
 """
-from django.db import models
 from django.conf import settings
 from django.contrib.sites.models import Site
+from django.db import models
 
 
 class SiteTheme(models.Model):

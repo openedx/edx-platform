@@ -3,16 +3,16 @@ Acceptance tests for Studio related to course reruns.
 """
 
 import random
+
 from bok_choy.promise import EmptyPromise
 from nose.tools import assert_in
 
-from common.test.acceptance.pages.studio.index import DashboardPage
-from common.test.acceptance.pages.studio.course_rerun import CourseRerunPage
-from common.test.acceptance.pages.studio.overview import CourseOutlinePage
-from common.test.acceptance.pages.lms.courseware import CoursewarePage
-from common.test.acceptance.fixtures.course import XBlockFixtureDesc
-
 from base_studio_test import StudioCourseTest
+from common.test.acceptance.fixtures.course import XBlockFixtureDesc
+from common.test.acceptance.pages.lms.courseware import CoursewarePage
+from common.test.acceptance.pages.studio.course_rerun import CourseRerunPage
+from common.test.acceptance.pages.studio.index import DashboardPage
+from common.test.acceptance.pages.studio.overview import CourseOutlinePage
 
 
 class CourseRerunTest(StudioCourseTest):

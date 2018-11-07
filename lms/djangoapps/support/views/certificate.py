@@ -1,12 +1,13 @@
 """
 Certificate tool in the student support app.
 """
-from django.views.generic import View
+import urllib
+
 from django.utils.decorators import method_decorator
+from django.views.generic import View
 
 from edxmako.shortcuts import render_to_response
 from support.decorators import require_support_permission
-import urllib
 
 
 class CertificatesSupportView(View):

@@ -4,21 +4,21 @@ import logging
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
+from django.http import HttpResponseBadRequest
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
+from opaque_keys.edx.locator import CourseLocator
 
 from commerce.models import CommerceConfiguration
+from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
 from shoppingcart.processors.CyberSource2 import is_user_payment_error
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from opaque_keys.edx.locator import CourseLocator
 from student.models import CourseEnrollment
 from util.json_request import JsonResponse
-from django.views.decorators.http import require_http_methods
-from course_modes.models import CourseMode
-from django.http import HttpResponseBadRequest
 
 log = logging.getLogger(__name__)
 

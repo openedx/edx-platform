@@ -1,18 +1,19 @@
 """
-Tests for Themeing locales
+Tests for Theming locales
 """
+import os
 
-import unittest
 from django.conf import settings
 from django.test import TestCase
-import os
+
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
 class TestComprehensiveThemeLocale(TestCase):
     """
     Test Comprehensive Theme Locales
     """
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @skip_unless_lms
     def test_theme_locale_path_in_settings(self):
         """
         test comprehensive theming paths in settings.

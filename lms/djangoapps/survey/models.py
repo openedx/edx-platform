@@ -3,17 +3,16 @@ Models to support Course Surveys feature
 """
 
 import logging
-from lxml import etree
 from collections import OrderedDict
-from django.db import models
-from student.models import User
-from django.core.exceptions import ValidationError
 
+from django.core.exceptions import ValidationError
+from django.db import models
+from lxml import etree
 from model_utils.models import TimeStampedModel
 
-from survey.exceptions import SurveyFormNameAlreadyExists, SurveyFormNotFound
-
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
+from student.models import User
+from survey.exceptions import SurveyFormNameAlreadyExists, SurveyFormNotFound
 
 log = logging.getLogger("edx.survey")
 
@@ -177,6 +176,8 @@ class SurveyAnswer(TimeStampedModel):
         Returns whether a user has any answers for a given SurveyForm for a course
         This can be used to determine if a user has taken a CourseSurvey.
         """
+        if user.is_anonymous():
+            return False
         return SurveyAnswer.objects.filter(form=form, user=user).exists()
 
     @classmethod

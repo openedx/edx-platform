@@ -2,12 +2,15 @@
 Script for force publishing a course
 """
 from django.core.management.base import BaseCommand, CommandError
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+
 from .prompt import query_yes_no
 from .utils import get_course_versions
+
 
 # To run from command line: ./manage.py cms force_publish course-v1:org+course+run
 

@@ -1,22 +1,19 @@
-import json
 import copy
+import json
 import logging
 import os
 import sys
-from lxml import etree
 
+from lxml import etree
+from lxml.etree import Element, ElementTree, XMLParser
 from xblock.core import XML_NAMESPACES
 from xblock.fields import Dict, Scope, ScopeIds
 from xblock.runtime import KvsFieldData
-from xmodule.x_module import XModuleDescriptor, DEPRECATION_VSCOMPAT_EVENT
-from xmodule.modulestore.inheritance import own_metadata, InheritanceKeyValueStore
-from xmodule.modulestore import EdxJSONEncoder
 
 import dogstats_wrapper as dog_stats_api
-
-from lxml.etree import (
-    Element, ElementTree, XMLParser,
-)
+from xmodule.modulestore import EdxJSONEncoder
+from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata
+from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT, XModuleDescriptor
 
 log = logging.getLogger(__name__)
 

@@ -20,24 +20,27 @@ To enable this implementation, add the following Django settings:
 
 """
 
-import hmac
 import binascii
-import re
+import hmac
 import json
-import uuid
 import logging
-from textwrap import dedent
-from datetime import datetime
+import re
+import uuid
 from collections import OrderedDict, defaultdict
+from datetime import datetime
 from decimal import Decimal, InvalidOperation
 from hashlib import sha256
+from textwrap import dedent
+
 from django.conf import settings
-from django.utils.translation import ugettext as _, ugettext_noop
+from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_noop
+
 from edxmako.shortcuts import render_to_string
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from shoppingcart.models import Order
 from shoppingcart.processors.exceptions import *
 from shoppingcart.processors.helpers import get_processor_config
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger(__name__)
 

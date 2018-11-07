@@ -5,8 +5,11 @@ from uuid import uuid4
 from factory.django import DjangoModelFactory
 
 from certificates.models import (
-    GeneratedCertificate, CertificateStatuses, CertificateHtmlViewConfiguration, CertificateWhitelist,
+    CertificateHtmlViewConfiguration,
     CertificateInvalidation,
+    CertificateStatuses,
+    CertificateWhitelist,
+    GeneratedCertificate
 )
 from student.models import LinkedInAddToProfileConfiguration
 

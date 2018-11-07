@@ -8,14 +8,14 @@
 #
 from optparse import make_option
 from django.core.management.base import BaseCommand, CommandError
-from .prompt import query_yes_no
-
-from courseware.courses import get_course_by_id
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from contentstore.views import tabs
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from opaque_keys.edx.keys import CourseKey
+from courseware.courses import get_course_by_id
+
+from .prompt import query_yes_no
 
 
 def print_course(course):

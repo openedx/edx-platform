@@ -5,8 +5,8 @@ import unittest
 
 from django.conf import settings
 from django.contrib.admin.sites import AdminSite
-from django.core.urlresolvers import reverse
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.urlresolvers import reverse
 from django.forms import models
 
 from student.tests.factories import UserFactory
@@ -16,7 +16,7 @@ from third_party_auth.tests import testutil
 
 
 # This is necessary because cms does not implement third party auth
-@unittest.skipUnless(settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'), 'third party auth not enabled')
+@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
 class Oauth2ProviderConfigAdminTest(testutil.TestCase):
     """
     Tests for oauth2 provider config admin
@@ -66,6 +66,9 @@ class Oauth2ProviderConfigAdminTest(testutil.TestCase):
         # Remove the icon_image from the POST data, to simulate unchanged icon_image
         post_data = models.model_to_dict(provider1)
         del post_data['icon_image']
+        # Remove max_session_length; it has a default null value which must be POSTed
+        # back as an absent value, rather than as a "null-like" included value.
+        del post_data['max_session_length']
 
         # Change the name, to verify POST
         post_data['name'] = 'Another name'

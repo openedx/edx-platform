@@ -1,33 +1,29 @@
 """
 Tests for xblock_utils.py
 """
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
-import ddt
-from nose.plugins.attrib import attr
 import uuid
 
+import ddt
 from django.test.client import RequestFactory
+from nose.plugins.attrib import attr
+from xblock.fragment import Fragment
 
 from openedx.core.lib.url_utils import quote_slashes
-from xblock.fragment import Fragment
+from openedx.core.lib.xblock_builtin import get_css_dependencies, get_js_dependencies
+from openedx.core.lib.xblock_utils import (
+    replace_course_urls,
+    replace_jump_to_id_urls,
+    replace_static_urls,
+    request_token,
+    sanitize_html_id,
+    wrap_fragment,
+    wrap_xblock
+)
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-
-from openedx.core.lib.xblock_utils import (
-    wrap_fragment,
-    request_token,
-    wrap_xblock,
-    replace_jump_to_id_urls,
-    replace_course_urls,
-    replace_static_urls,
-    sanitize_html_id,
-)
-from openedx.core.lib.xblock_builtin import (
-    get_css_dependencies,
-    get_js_dependencies,
-)
 
 
 @attr(shard=2)
@@ -52,9 +48,6 @@ class TestXblockUtils(SharedModuleStoreTestCase):
             number='TS02',
             run='2015'
         )
-
-    def setUp(self):
-        super(TestXblockUtils, self).setUp()
 
     def create_fragment(self, content=None):
         """

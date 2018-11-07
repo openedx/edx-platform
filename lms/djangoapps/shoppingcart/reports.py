@@ -1,12 +1,12 @@
 """ Objects and functions related to generating CSV reports """
 
 from decimal import Decimal
-import unicodecsv
 
+import unicodecsv
 from django.utils.translation import ugettext as _
 
-from courseware.courses import get_course_by_id
 from course_modes.models import CourseMode
+from courseware.courses import get_course_by_id
 from shoppingcart.models import CertificateItem, OrderItem
 from student.models import CourseEnrollment
 from util.query import use_read_replica_if_available

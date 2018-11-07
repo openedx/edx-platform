@@ -1669,8 +1669,9 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-docstring
         problem = self.build_problem(answer=4)
 
         errors = [  # (exception raised, message to student)
-            (calc.UndefinedVariable("x"), r"You may not use variables \(x\) in numerical problems"),
-            (ValueError("factorial() mess-up"), "factorial function evaluated outside its domain"),
+            (calc.UndefinedVariable("x"), "Answers can include numerals, operation signs, "
+                                          "and a few specific characters, such as the constants e and i."),
+            (ValueError("factorial() mess-up"), "Factorial function evaluated outside its domain"),
             (ValueError(), "Could not interpret '.*' as a number"),
             (pyparsing.ParseException("oopsie"), "Invalid math syntax"),
             (ZeroDivisionError(), "Could not interpret '.*' as a number")

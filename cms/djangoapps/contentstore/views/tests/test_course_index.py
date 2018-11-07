@@ -1,34 +1,37 @@
 """
 Unit tests for getting the list of courses and the course outline.
 """
-import ddt
-import json
-import lxml
 import datetime
+import json
+
+import ddt
+import lxml
 import mock
 import pytz
-
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.utils.translation import ugettext as _
+from opaque_keys.edx.locator import CourseLocator
+from search.api import perform_search
 
 from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
 from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import reverse_course_url, reverse_library_url, add_instructor, reverse_usage_url
+from contentstore.utils import add_instructor, reverse_course_url, reverse_library_url, reverse_usage_url
 from contentstore.views.course import (
-    course_outline_initial_state, reindex_course_and_check_access, _deprecated_blocks_info
+    _deprecated_blocks_info,
+    course_outline_initial_state,
+    reindex_course_and_check_access
 )
-from contentstore.views.item import create_xblock_info, VisibilityState
+from contentstore.views.item import VisibilityState, create_xblock_info
 from course_action_state.managers import CourseRerunUIStateManager
 from course_action_state.models import CourseRerunState
-from opaque_keys.edx.locator import CourseLocator
-from search.api import perform_search
 from student.auth import has_course_author_access
+from student.roles import LibraryUserRole
 from student.tests.factories import UserFactory
 from util.date_utils import get_default_time_display
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory
 
 
@@ -75,22 +78,37 @@ class TestCourseIndex(CourseTestCase):
         """
         Test getting the list of libraries from the course listing page
         """
+        def _assert_library_link_present(response, library):
+            """
+            Asserts there's a valid library link on libraries tab.
+            """
+            parsed_html = lxml.html.fromstring(response.content)
+            library_link_elements = parsed_html.find_class('library-link')
+            self.assertEqual(len(library_link_elements), 1)
+            link = library_link_elements[0]
+            self.assertEqual(
+                link.get("href"),
+                reverse_library_url('library_handler', library.location.library_key),
+            )
+            # now test that url
+            outline_response = self.client.get(link.get("href"), {}, HTTP_ACCEPT='text/html')
+            self.assertEqual(outline_response.status_code, 200)
+
         # Add a library:
         lib1 = LibraryFactory.create()
 
         index_url = '/home/'
         index_response = self.client.get(index_url, {}, HTTP_ACCEPT='text/html')
-        parsed_html = lxml.html.fromstring(index_response.content)
-        library_link_elements = parsed_html.find_class('library-link')
-        self.assertEqual(len(library_link_elements), 1)
-        link = library_link_elements[0]
-        self.assertEqual(
-            link.get("href"),
-            reverse_library_url('library_handler', lib1.location.library_key),
-        )
-        # now test that url
-        outline_response = self.client.get(link.get("href"), {}, HTTP_ACCEPT='text/html')
-        self.assertEqual(outline_response.status_code, 200)
+        _assert_library_link_present(index_response, lib1)
+
+        # Make sure libraries are visible to non-staff users too
+        self.client.logout()
+        non_staff_user, non_staff_userpassword = self.create_non_staff_user()
+        lib2 = LibraryFactory.create(user_id=non_staff_user.id)
+        LibraryUserRole(lib2.location.library_key).add_users(non_staff_user)
+        self.client.login(username=non_staff_user.username, password=non_staff_userpassword)
+        index_response = self.client.get(index_url, {}, HTTP_ACCEPT='text/html')
+        _assert_library_link_present(index_response, lib2)
 
     def test_is_staff_access(self):
         """
@@ -315,6 +333,8 @@ class TestCourseOutline(CourseTestCase):
     """
     Unit tests for the course outline.
     """
+    ENABLED_SIGNALS = ['course_published']
+
     def setUp(self):
         """
         Set up the for the course outline tests.
@@ -334,11 +354,16 @@ class TestCourseOutline(CourseTestCase):
             parent_location=self.vertical.location, category="video", display_name="My Video"
         )
 
-    def test_json_responses(self):
+    @ddt.data(True, False)
+    def test_json_responses(self, is_concise):
         """
         Verify the JSON responses returned for the course.
+
+        Arguments:
+            is_concise (Boolean) : If True, fetch concise version of course outline.
         """
         outline_url = reverse_course_url('course_handler', self.course.id)
+        outline_url = outline_url + '?format=concise' if is_concise else outline_url
         resp = self.client.get(outline_url, HTTP_ACCEPT='application/json')
         json_response = json.loads(resp.content)
 
@@ -346,8 +371,8 @@ class TestCourseOutline(CourseTestCase):
         self.assertEqual(json_response['category'], 'course')
         self.assertEqual(json_response['id'], unicode(self.course.location))
         self.assertEqual(json_response['display_name'], self.course.display_name)
-        self.assertTrue(json_response['published'])
-        self.assertIsNone(json_response['visibility_state'])
+        self.assertNotEqual(json_response.get('published', False), is_concise)
+        self.assertIsNone(json_response.get('visibility_state'))
 
         # Now verify the first child
         children = json_response['child_info']['children']
@@ -356,24 +381,25 @@ class TestCourseOutline(CourseTestCase):
         self.assertEqual(first_child_response['category'], 'chapter')
         self.assertEqual(first_child_response['id'], unicode(self.chapter.location))
         self.assertEqual(first_child_response['display_name'], 'Week 1')
-        self.assertTrue(json_response['published'])
-        self.assertEqual(first_child_response['visibility_state'], VisibilityState.unscheduled)
+        self.assertNotEqual(json_response.get('published', False), is_concise)
+        if not is_concise:
+            self.assertEqual(first_child_response['visibility_state'], VisibilityState.unscheduled)
         self.assertGreater(len(first_child_response['child_info']['children']), 0)
 
         # Finally, validate the entire response for consistency
-        self.assert_correct_json_response(json_response)
+        self.assert_correct_json_response(json_response, is_concise)
 
-    def assert_correct_json_response(self, json_response):
+    def assert_correct_json_response(self, json_response, is_concise=False):
         """
         Asserts that the JSON response is syntactically consistent
         """
         self.assertIsNotNone(json_response['display_name'])
         self.assertIsNotNone(json_response['id'])
         self.assertIsNotNone(json_response['category'])
-        self.assertTrue(json_response['published'])
+        self.assertNotEqual(json_response.get('published', False), is_concise)
         if json_response.get('child_info', None):
             for child_response in json_response['child_info']['children']:
-                self.assert_correct_json_response(child_response)
+                self.assert_correct_json_response(child_response, is_concise)
 
     def test_course_outline_initial_state(self):
         course_module = modulestore().get_item(self.course.location)
@@ -456,10 +482,9 @@ class TestCourseOutline(CourseTestCase):
                 ]
             )
 
-        self.assertEqual(info['block_types'], deprecated_block_types)
         self.assertEqual(
-            info['block_types_enabled'],
-            any(component in advanced_modules for component in deprecated_block_types)
+            info['deprecated_enabled_block_types'],
+            [component for component in advanced_modules if component in deprecated_block_types]
         )
 
         self.assertItemsEqual(info['blocks'], expected_blocks)
@@ -486,6 +511,28 @@ class TestCourseOutline(CourseTestCase):
             course_module.advanced_modules,
             info,
             block_types
+        )
+
+    @ddt.data(
+        (["a", "b", "c"], ["a", "b", "c"]),
+        (["a", "b", "c"], ["a", "b", "d"]),
+        (["a", "b", "c"], ["a", "d", "e"]),
+        (["a", "b", "c"], ["d", "e", "f"])
+    )
+    @ddt.unpack
+    def test_verify_warn_only_on_enabled_modules(self, enabled_block_types, deprecated_block_types):
+        """
+        Verify that we only warn about block_types that are both deprecated and enabled.
+        """
+        expected_block_types = list(set(enabled_block_types) & set(deprecated_block_types))
+        course_module = modulestore().get_item(self.course.location)
+        self._create_test_data(course_module, create_blocks=True, block_types=enabled_block_types)
+        info = _deprecated_blocks_info(course_module, deprecated_block_types)
+        self._verify_deprecated_info(
+            course_module.id,
+            course_module.advanced_modules,
+            info,
+            expected_block_types
         )
 
     @ddt.data(
@@ -562,6 +609,8 @@ class TestCourseReIndex(CourseTestCase):
     Unit tests for the course outline.
     """
     SUCCESSFUL_RESPONSE = _("Course has been successfully reindexed.")
+
+    ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
         """

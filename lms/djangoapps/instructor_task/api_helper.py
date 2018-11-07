@@ -8,19 +8,16 @@ import hashlib
 import json
 import logging
 
-from django.utils.translation import ugettext as _
-from util.db import outer_atomic
-
 from celery.result import AsyncResult
-from celery.states import READY_STATES, SUCCESS, FAILURE, REVOKED
-
-from courseware.module_render import get_xqueue_callback_url_prefix
-from courseware.courses import get_problems_in_section
-
-from xmodule.modulestore.django import modulestore
+from celery.states import FAILURE, READY_STATES, REVOKED, SUCCESS
+from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import UsageKey
-from lms.djangoapps.instructor_task.models import InstructorTask, PROGRESS
 
+from courseware.courses import get_problems_in_section
+from courseware.module_render import get_xqueue_callback_url_prefix
+from lms.djangoapps.instructor_task.models import PROGRESS, InstructorTask
+from util.db import outer_atomic
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
@@ -98,6 +95,17 @@ def _get_xmodule_instance_args(request, task_id):
                              'task_id': task_id,
                              }
     return xmodule_instance_args
+
+
+def _supports_rescore(descriptor):
+    """
+    Helper method to determine whether a given item supports rescoring.
+    In order to accommodate both XModules and XBlocks, we have to check
+    the descriptor itself then fall back on its module class.
+    """
+    return hasattr(descriptor, 'rescore') or (
+        hasattr(descriptor, 'module_class') and hasattr(descriptor.module_class, 'rescore')
+    )
 
 
 def _update_instructor_task(instructor_task, task_result):
@@ -244,10 +252,14 @@ def check_arguments_for_rescoring(usage_key):
     in).  An ItemNotFoundException is raised if the corresponding module
     descriptor doesn't exist.  NotImplementedError is raised if the
     corresponding module doesn't support rescoring calls.
+
+    Note: the string returned here is surfaced as the error
+    message on the instructor dashboard when a rescore is
+    submitted for a non-rescorable block.
     """
     descriptor = modulestore().get_item(usage_key)
-    if not hasattr(descriptor, 'module_class') or not hasattr(descriptor.module_class, 'rescore_problem'):
-        msg = "Specified module does not support rescoring."
+    if not _supports_rescore(descriptor):
+        msg = _("This component cannot be rescored.")
         raise NotImplementedError(msg)
 
 
@@ -261,8 +273,7 @@ def check_entrance_exam_problems_for_rescoring(exam_key):  # pylint: disable=inv
     any of the problem in entrance exam doesn't support re-scoring calls.
     """
     problems = get_problems_in_section(exam_key).values()
-    if any(not hasattr(problem, 'module_class') or not hasattr(problem.module_class, 'rescore_problem')
-           for problem in problems):
+    if any(not _supports_rescore(problem) for problem in problems):
         msg = _("Not all problems in entrance exam support re-scoring.")
         raise NotImplementedError(msg)
 

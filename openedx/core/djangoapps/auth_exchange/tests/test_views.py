@@ -17,11 +17,12 @@ import httpretty
 import provider.constants
 from provider.oauth2.models import AccessToken, Client
 from rest_framework.test import APIClient
+from social_django.models import Partial
 
 from student.tests.factories import UserFactory
 from third_party_auth.tests.utils import ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
 from .mixins import DOPAdapterMixin, DOTAdapterMixin
-from .utils import AccessTokenExchangeTestMixin
+from .utils import AccessTokenExchangeTestMixin, TPA_FEATURE_ENABLED, TPA_FEATURES_KEY
 
 
 @ddt.ddt
@@ -34,6 +35,10 @@ class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
         self.url = reverse("exchange_access_token", kwargs={"backend": self.BACKEND})
         self.csrf_client = APIClient(enforce_csrf_checks=True)
 
+    def tearDown(self):
+        super(AccessTokenExchangeViewTest, self).tearDown()
+        Partial.objects.all().delete()
+
     def _assert_error(self, data, expected_error, expected_error_description):
         response = self.csrf_client.post(self.url, data)
         self.assertEqual(response.status_code, 400)
@@ -42,7 +47,6 @@ class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
             json.loads(response.content),
             {u"error": expected_error, u"error_description": expected_error_description}
         )
-        self.assertNotIn("partial_pipeline", self.client.session)
 
     def _assert_success(self, data, expected_scopes):
         response = self.csrf_client.post(self.url, data)
@@ -101,7 +105,7 @@ class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
 
 
 # This is necessary because cms does not implement third party auth
-@unittest.skipUnless(settings.FEATURES.get("ENABLE_THIRD_PARTY_AUTH"), "third party auth not enabled")
+@unittest.skipUnless(TPA_FEATURE_ENABLED, TPA_FEATURES_KEY + " not enabled")
 @httpretty.activate
 class DOPAccessTokenExchangeViewTestFacebook(
         DOPAdapterMixin,
@@ -115,7 +119,7 @@ class DOPAccessTokenExchangeViewTestFacebook(
     pass
 
 
-@unittest.skipUnless(settings.FEATURES.get("ENABLE_THIRD_PARTY_AUTH"), "third party auth not enabled")
+@unittest.skipUnless(TPA_FEATURE_ENABLED, TPA_FEATURES_KEY + " not enabled")
 @httpretty.activate
 class DOTAccessTokenExchangeViewTestFacebook(
         DOTAdapterMixin,
@@ -130,7 +134,7 @@ class DOTAccessTokenExchangeViewTestFacebook(
 
 
 # This is necessary because cms does not implement third party auth
-@unittest.skipUnless(settings.FEATURES.get("ENABLE_THIRD_PARTY_AUTH"), "third party auth not enabled")
+@unittest.skipUnless(TPA_FEATURE_ENABLED, TPA_FEATURES_KEY + " not enabled")
 @httpretty.activate
 class DOPAccessTokenExchangeViewTestGoogle(
         DOPAdapterMixin,
@@ -146,7 +150,7 @@ class DOPAccessTokenExchangeViewTestGoogle(
 
 
 # This is necessary because cms does not implement third party auth
-@unittest.skipUnless(settings.FEATURES.get("ENABLE_THIRD_PARTY_AUTH"), "third party auth not enabled")
+@unittest.skipUnless(TPA_FEATURE_ENABLED, TPA_FEATURES_KEY + " not enabled")
 @httpretty.activate
 class DOTAccessTokenExchangeViewTestGoogle(
         DOTAdapterMixin,

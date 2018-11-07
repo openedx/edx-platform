@@ -2,6 +2,8 @@
 Module for code that should run during LMS startup
 """
 
+import logging
+
 import django
 from django.conf import settings
 
@@ -10,12 +12,10 @@ from django.conf import settings
 settings.INSTALLED_APPS  # pylint: disable=pointless-statement
 
 from openedx.core.lib.django_startup import autostartup
-import logging
+from openedx.core.release import doc_version
 import analytics
-from openedx.core.djangoapps.monkey_patch import (
-    third_party_auth,
-    django_db_models_options
-)
+
+from openedx.core.djangoapps.monkey_patch import django_db_models_options
 
 import xmodule.x_module
 import lms_xblock.runtime
@@ -33,7 +33,6 @@ def run():
     """
     Executed during django startup
     """
-    third_party_auth.patch()
     django_db_models_options.patch()
 
     # To override the settings before executing the autostartup() for python-social-auth
@@ -82,6 +81,10 @@ def run():
     # https://openedx.atlassian.net/wiki/display/PLAT/Convert+from+Storage-centric+runtimes+to+Application-centric+runtimes
     xmodule.x_module.descriptor_global_handler_url = lms_xblock.runtime.handler_url
     xmodule.x_module.descriptor_global_local_resource_url = lms_xblock.runtime.local_resource_url
+
+    # Set the version of docs that help-tokens will go to.
+    settings.HELP_TOKENS_LANGUAGE_CODE = settings.LANGUAGE_CODE
+    settings.HELP_TOKENS_VERSION = doc_version()
 
     # validate configurations on startup
     validate_lms_config(settings)

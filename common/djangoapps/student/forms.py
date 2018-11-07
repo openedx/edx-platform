@@ -1,25 +1,38 @@
 """
 Utility functions for validating forms
 """
-from importlib import import_module
 import re
+from importlib import import_module
 
 from django import forms
-from django.forms import widgets
-from django.core.exceptions import ValidationError
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
+from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
-
+from django.core.exceptions import ValidationError
+from django.forms import widgets
+from django.template import loader
 from django.utils.http import int_to_base36
 from django.utils.translation import ugettext_lazy as _
-from django.template import loader
+from django.core.validators import RegexValidator, slug_re
 
-from django.conf import settings
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_api import accounts as accounts_settings
 from student.models import CourseEnrollmentAllowed
 from util.password_policy_validators import validate_password_strength
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+
+
+USERNAME_TOO_SHORT_MSG = _("Username must be minimum of two characters long")
+USERNAME_TOO_LONG_MSG = _("Username cannot be more than %(limit_value)s characters long")
+
+# Translators: This message is shown when the Unicode usernames are NOT allowed
+USERNAME_INVALID_CHARS_ASCII = _("Usernames can only contain Roman letters, western numerals (0-9), "
+                                 "underscores (_), and hyphens (-).")
+
+# Translators: This message is shown only when the Unicode usernames are allowed
+USERNAME_INVALID_CHARS_UNICODE = _("Usernames can only contain letters, numerals, underscore (_), numbers "
+                                   "and @/./+/-/_ characters.")
 
 
 class PasswordResetFormNoActive(PasswordResetForm):
@@ -48,7 +61,6 @@ class PasswordResetFormNoActive(PasswordResetForm):
 
     def save(
             self,
-            domain_override=None,
             subject_template_name='registration/password_reset_subject.txt',
             email_template_name='registration/password_reset_email.html',
             use_https=False,
@@ -64,13 +76,10 @@ class PasswordResetFormNoActive(PasswordResetForm):
         # django.contrib.auth.forms.PasswordResetForm directly, which has this import in this place.
         from django.core.mail import send_mail
         for user in self.users_cache:
-            if not domain_override:
-                site_name = configuration_helpers.get_value(
-                    'SITE_NAME',
-                    settings.SITE_NAME
-                )
-            else:
-                site_name = domain_override
+            site_name = configuration_helpers.get_value(
+                'SITE_NAME',
+                settings.SITE_NAME
+            )
             context = {
                 'email': user.email,
                 'site_name': site_name,
@@ -103,10 +112,61 @@ class TrueField(forms.BooleanField):
     widget = TrueCheckbox
 
 
-_USERNAME_TOO_SHORT_MSG = _("Username must be minimum of two characters long")
-_EMAIL_INVALID_MSG = _("A properly formatted e-mail is required")
-_PASSWORD_INVALID_MSG = _("A valid password is required")
-_NAME_TOO_SHORT_MSG = _("Your legal name must be a minimum of two characters long")
+def validate_username(username):
+    """
+    Verifies a username is valid, raises a ValidationError otherwise.
+    Args:
+        username (unicode): The username to validate.
+
+    This function is configurable with `ENABLE_UNICODE_USERNAME` feature.
+    """
+
+    username_re = slug_re
+    flags = None
+    message = USERNAME_INVALID_CHARS_ASCII
+
+    if settings.FEATURES.get("ENABLE_UNICODE_USERNAME"):
+        username_re = r"^{regex}$".format(regex=settings.USERNAME_REGEX_PARTIAL)
+        flags = re.UNICODE
+        message = USERNAME_INVALID_CHARS_UNICODE
+
+    validator = RegexValidator(
+        regex=username_re,
+        flags=flags,
+        message=message,
+        code='invalid',
+    )
+
+    validator(username)
+
+
+class UsernameField(forms.CharField):
+    """
+    A CharField that validates usernames based on the `ENABLE_UNICODE_USERNAME` feature.
+    """
+
+    default_validators = [validate_username]
+
+    def __init__(self, *args, **kwargs):
+        super(UsernameField, self).__init__(
+            min_length=accounts_settings.USERNAME_MIN_LENGTH,
+            max_length=accounts_settings.USERNAME_MAX_LENGTH,
+            error_messages={
+                "required": USERNAME_TOO_SHORT_MSG,
+                "min_length": USERNAME_TOO_SHORT_MSG,
+                "max_length": USERNAME_TOO_LONG_MSG,
+            }
+        )
+
+    def clean(self, value):
+        """
+        Strips the spaces from the username.
+
+        Similar to what `django.forms.SlugField` does.
+        """
+
+        value = self.to_python(value).strip()
+        return super(UsernameField, self).clean(value)
 
 
 class AccountCreationForm(forms.Form):
@@ -114,20 +174,18 @@ class AccountCreationForm(forms.Form):
     A form to for account creation data. It is currently only used for
     validation, not rendering.
     """
+
+    _EMAIL_INVALID_MSG = _("A properly formatted e-mail is required")
+    _PASSWORD_INVALID_MSG = _("A valid password is required")
+    _NAME_TOO_SHORT_MSG = _("Your legal name must be a minimum of two characters long")
+
     # TODO: Resolve repetition
-    username = forms.SlugField(
-        min_length=2,
-        max_length=30,
-        error_messages={
-            "required": _USERNAME_TOO_SHORT_MSG,
-            "invalid": _("Usernames can only contain Roman letters, western numerals (0-9), underscores (_), and "
-                         "hyphens (-)."),
-            "min_length": _USERNAME_TOO_SHORT_MSG,
-            "max_length": _("Username cannot be more than %(limit_value)s characters long"),
-        }
-    )
+
+    username = UsernameField()
+
     email = forms.EmailField(
-        max_length=254,  # Limit per RFCs is 254
+        max_length=accounts_settings.EMAIL_MAX_LENGTH,
+        min_length=accounts_settings.EMAIL_MIN_LENGTH,
         error_messages={
             "required": _EMAIL_INVALID_MSG,
             "invalid": _EMAIL_INVALID_MSG,
@@ -135,14 +193,14 @@ class AccountCreationForm(forms.Form):
         }
     )
     password = forms.CharField(
-        min_length=2,
+        min_length=accounts_settings.PASSWORD_MIN_LENGTH,
         error_messages={
             "required": _PASSWORD_INVALID_MSG,
             "min_length": _PASSWORD_INVALID_MSG,
         }
     )
     name = forms.CharField(
-        min_length=2,
+        min_length=accounts_settings.NAME_MIN_LENGTH,
         error_messages={
             "required": _NAME_TOO_SHORT_MSG,
             "min_length": _NAME_TOO_SHORT_MSG,
@@ -187,19 +245,6 @@ class AccountCreationForm(forms.Form):
                             error_messages={
                                 "required": _("To enroll, you must follow the honor code.")
                             }
-                        )
-                elif field_name == 'data_sharing_consent':
-                    if field_value == "required":
-                        self.fields[field_name] = TrueField(
-                            error_messages={
-                                "required": _(
-                                    "You must consent to data sharing to register."
-                                )
-                            }
-                        )
-                    elif field_value == 'optional':
-                        self.fields[field_name] = forms.BooleanField(
-                            required=False
                         )
                 else:
                     required = field_value == "required"

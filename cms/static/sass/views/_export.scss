@@ -86,98 +86,183 @@
     }
   }
 
-  // OLD
-  .description {
-    @extend %t-copy-sub1;
-    float: left;
-    width: 62%;
-    margin-right: 3%;
+  // ====================
 
-    h2 {
-      @extend %t-title5;
-      @extend %t-strong;
+  // UI: upload progress
+  .wrapper-status {
+    @include transition(opacity $tmg-f2 ease-in-out 0);
+    opacity: 1.0;
+
+    // STATE: hidden
+    &.is-hidden {
+      opacity: 0.0;
+      display: none;
+    }
+
+    > .title {
+      @extend %t-title4;
       margin-bottom: $baseline;
+      border-bottom: 1px solid $gray-l3;
+      padding-bottom: ($baseline/2);
     }
+    // elem - progress list
+    .list-progress {
+      width: flex-grid(9, 9);
 
-    strong {
-      @extend %t-strong;
-    }
+      .status-visual {
+        position: relative;
+        float: left;
+        width: flex-grid(1,9);
 
-    p + p {
-      margin-top: $baseline;
-    }
-
-    ul {
-      margin: 20px 0;
-      list-style: disc inside;
-
-      li {
-        margin: 0 0 5px 0;
-      }
-    }
-  }
-
-  .export-form-wrapper {
-
-    .export-form {
-      float: left;
-      width: 35%;
-      padding: 25px 30px 35px;
-      @include box-sizing(border-box);
-      border: 1px solid $mediumGrey;
-      border-radius: 3px;
-      background: $lightGrey;
-      text-align: center;
-
-      h2 {
-        @extend %t-title4;
-        @extend %t-light;
-        margin-bottom: ($baseline*1.5);
-      }
-
-      .error-block {
-        @extend %t-copy-sub1;
-        display: none;
-        margin-bottom: ($baseline*0.75);
-      }
-
-      .error-block {
-        color: $error-red;
-      }
-
-      .button-export {
-        @include green-button();
-        @extend %t-action1;
-        padding: 10px 50px 11px;
-      }
-
-      .message-status {
-        @extend %t-copy-sub2;
-        margin-top: ($baseline/2);
-      }
-
-      .progress-bar {
-        display: none;
-        width: 350px;
-        height: 30px;
-        margin: 30px auto 10px;
-        border: 1px solid $blue;
-
-        &.loaded {
-          border-color: #66b93d;
-
-          .progress-fill {
-            background: #66b93d;
-          }
+        .icon {
+          @include transition(opacity $tmg-f1 ease-in-out 0);
+          @extend %t-icon4;
+          position: absolute;
+          top: ($baseline/2);
+          left: $baseline;
         }
       }
 
-      .progress-fill {
-        width: 0%;
-        height: 30px;
-        background: $blue;
-        color: $white;
-        line-height: 48px;
+      .status-detail {
+        float: left;
+        width: flex-grid(8,9);
+        margin-left: ($baseline*3);
+
+        .title {
+          @extend %t-title5;
+          @extend %t-strong;
+        }
+
+        .copy {
+          @extend %t-copy-base;
+          color: $gray-l2;
+        }
+      }
+
+      .item-progresspoint {
+        @include clearfix();
+        @include transition(opacity $tmg-f1 ease-in-out 0);
+        margin-bottom: $baseline;
+        border-bottom: 1px solid $gray-l4;
+        padding-bottom: $baseline;
+
+        &:last-child {
+          margin-bottom: 0;
+          border-bottom: none;
+          padding-bottom: 0;
+        }
+
+        // CASE: has actions
+        &.has-actions {
+
+          .list-actions {
+            display: none;
+
+            .action-primary {
+              @extend %btn-primary-blue;
+            }
+          }
+        }
+
+        // TYPE: success
+        &.item-progresspoint-success {
+
+          .item-progresspoint-success-date {
+            @include margin-left($baseline/4);
+            display: none;
+          }
+
+          &.is-complete {
+
+            .item-progresspoint-success-date {
+              display: inline;
+            }
+          }
+        }
+
+
+        // STATE: not started
+        &.is-not-started {
+          opacity: 0.5;
+
+          .fa-warning {
+            visibility: hidden;
+            opacity: 0.0;
+          }
+
+          .fa-cog {
+            visibility: visible;
+            opacity: 1.0;
+          }
+
+          .fa-check {
+            opacity: 0.3;
+          }
+        }
+
+        // STATE: started
+        &.is-started {
+
+          .fa-warning  {
+            visibility: hidden;
+            opacity: 0.0;
+          }
+
+          .fa-cog {
+            @include animation(fa-spin 2s infinite linear);
+
+            visibility: visible;
+            opacity: 1.0;
+          }
+        }
+
+        // STATE: completed
+        &.is-complete {
+
+          .fa-cog {
+            visibility: visible;
+            opacity: 1.0;
+          }
+
+          .fa-warning {
+            visibility: hidden;
+            opacity: 0.0;
+          }
+
+          .icon {
+            color: $green;
+          }
+
+          .status-detail .title {
+            color: $green;
+          }
+
+          .list-actions {
+            display: block;
+          }
+        }
+
+        // STATE: error
+        &.has-error {
+
+          .fa-cog {
+            visibility: hidden;
+            opacity: 0.0;
+          }
+
+          .fa-warning {
+            visibility: visible;
+            opacity: 1.0;
+          }
+
+          .icon {
+            color: $red;
+          }
+
+          .status-detail .title, .status-detail .copy {
+            color: $red;
+          }
+        }
       }
     }
   }

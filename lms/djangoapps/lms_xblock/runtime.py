@@ -1,23 +1,22 @@
 """
 Module implementing `xblock.runtime.Runtime` functionality for the LMS
 """
+import xblock.reference.plugins
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
 from badges.service import BadgingService
 from badges.utils import badges_enabled
+from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from openedx.core.djangoapps.user_api.course_tag import api as user_course_tag_api
-from openedx.core.lib.xblock_utils import xblock_local_resource_url
 from openedx.core.lib.url_utils import quote_slashes
+from openedx.core.lib.xblock_utils import xblock_local_resource_url
 from request_cache.middleware import RequestCache
-import xblock.reference.plugins
 from xmodule.library_tools import LibraryToolsService
-from xmodule.modulestore.django import modulestore, ModuleI18nService
+from xmodule.modulestore.django import ModuleI18nService, modulestore
 from xmodule.partitions.partitions_service import PartitionService
 from xmodule.services import SettingsService
 from xmodule.x_module import ModuleSystem
-
-from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 
 
 def handler_url(block, handler_name, suffix='', query='', thirdparty=False):
@@ -80,22 +79,6 @@ def local_resource_url(block, uri):
     return xblock_local_resource_url(block, uri)
 
 
-class LmsPartitionService(PartitionService):
-    """
-    Another runtime mixin that provides access to the student partitions defined on the
-    course.
-
-    (If and when XBlock directly provides access from one block (e.g. a split_test_module)
-    to another (e.g. a course_module), this won't be necessary, but for now it seems like
-    the least messy way to hook things through)
-
-    """
-    @property
-    def course_partitions(self):
-        course = modulestore().get_course(self._course_id)
-        return course.user_partitions
-
-
 class UserTagsService(object):
     """
     A runtime class that provides an interface to the user service.  It handles filling in
@@ -154,10 +137,8 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         services['fs'] = xblock.reference.plugins.FSService()
         services['i18n'] = ModuleI18nService
         services['library_tools'] = LibraryToolsService(modulestore())
-        services['partitions'] = LmsPartitionService(
-            user=kwargs.get('user'),
+        services['partitions'] = PartitionService(
             course_id=kwargs.get('course_id'),
-            track_function=kwargs.get('track_function', None),
             cache=request_cache_dict
         )
         store = modulestore()

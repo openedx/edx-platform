@@ -2,10 +2,9 @@
 Unit tests for Edx Proctoring feature flag in new instructor dashboard.
 """
 
-from mock import patch
-
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from mock import patch
 from nose.plugins.attrib import attr
 
 from student.roles import CourseFinanceAdminRole
@@ -27,7 +26,7 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
 
         # URL for instructor dash
         cls.url = reverse('instructor_dashboard', kwargs={'course_id': cls.course.id.to_deprecated_string()})
-        button = '<button type="button" class="btn-link" data-section="special_exams">Special Exams</button>'
+        button = '<button type="button" class="btn-link special_exams" data-section="special_exams">Special Exams</button>'
         cls.proctoring_link = button
 
     def setUp(self):

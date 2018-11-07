@@ -3,9 +3,10 @@
 
 from lettuce import world
 from nose.tools import assert_equal, assert_in
-from terrain.steps import reload_the_page
-from common import type_in_codemirror
 from selenium.webdriver.common.keys import Keys
+
+from common import type_in_codemirror
+from terrain.steps import reload_the_page
 
 
 @world.absorb
@@ -129,8 +130,8 @@ def edit_component(index=0):
     # Verify that the "loading" indication has been hidden.
     world.wait_for_loading()
     # Verify that the "edit" button is present.
-    world.wait_for(lambda _driver: world.css_visible('a.edit-button'))
-    world.css_click('a.edit-button', index)
+    world.wait_for(lambda _driver: world.css_visible('.edit-button'))
+    world.css_click('.edit-button', index)
     world.wait_for_ajax_complete()
 
 

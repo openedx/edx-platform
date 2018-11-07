@@ -1,24 +1,21 @@
 # pylint: disable=missing-docstring
 from django.core.cache import cache
 from django.test.utils import override_settings
-
-from xmodule.modulestore.tests.factories import (check_mongo_calls, CourseFactory)
-from student.models import anonymous_id_for_user
-from student.models import UserProfile
-from student.roles import (CourseInstructorRole, CourseStaffRole, GlobalStaff,
-                           OrgInstructorRole, OrgStaffRole)
-from student.tests.factories import UserFactory, UserProfileFactory
-from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
-from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-
-
 # Will also run default tests for IDTokens and UserInfo
 from edx_oauth2_provider.tests import IDTokenTestCase, UserInfoTestCase
+
+from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
+from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
+from student.models import UserProfile, anonymous_id_for_user
+from student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff, OrgInstructorRole, OrgStaffRole
+from student.tests.factories import UserFactory, UserProfileFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 
 
 class BaseTestMixin(ModuleStoreTestCase):
     profile = None
+    ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
         super(BaseTestMixin, self).setUp()
@@ -72,6 +69,11 @@ class IDTokenTest(BaseTestMixin, IDTokenTestCase):
 
         locale = claims['locale']
         self.assertEqual(language, locale)
+
+    def test_user_tracking_id_claim(self):
+        scopes, claims = self.get_id_token_values('openid profile')
+        self.assertIn('profile', scopes)
+        self.assertEqual(claims['user_tracking_id'], self.user.id)
 
     def test_no_special_course_access(self):
         with check_mongo_calls(0):
@@ -232,3 +234,8 @@ class UserInfoTest(BaseTestMixin, UserInfoTestCase):
         self.user.save()
         claims = self.get_with_scope('permissions')
         self.assertTrue(claims['administrator'])
+
+    def test_profile_scope(self):
+        claims = self.get_with_scope('profile')
+        self.assertEqual(claims['name'], UserProfile.objects.get(user=self.user).name)
+        self.assertEqual(claims['user_tracking_id'], self.user.id)

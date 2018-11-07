@@ -1,26 +1,24 @@
 """Tests of commerce utilities."""
+from urllib import urlencode
+
+import ddt
 from django.conf import settings
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from mock import patch
+from waffle.testutils import override_switch
 
 from commerce.models import CommerceConfiguration
 from commerce.utils import EcommerceService
 from openedx.core.lib.log_utils import audit_log
-from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from student.tests.factories import UserFactory
 
-TEST_SITE_CONFIGURATION = {
-    'ECOMMERCE_RECEIPT_PAGE_URL': '/checkout/receipt/?order_number='
-}
 
-
-def update_commerce_config(enabled=False, checkout_page='/test_basket/', receipt_page='/checkout/receipt/'):
+def update_commerce_config(enabled=False, checkout_page='/test_basket/'):
     """ Enable / Disable CommerceConfiguration model """
     CommerceConfiguration.objects.create(
         checkout_on_ecommerce_service=enabled,
-        receipt_page=receipt_page,
         single_course_checkout_page=checkout_page,
     )
 
@@ -38,9 +36,9 @@ class AuditLogTests(TestCase):
         self.assertTrue(mock_log.info.called_with(message))
 
 
+@ddt.ddt
 class EcommerceServiceTests(TestCase):
     """Tests for the EcommerceService helper class."""
-    SKU = 'TESTSKU'
 
     def setUp(self):
         self.request_factory = RequestFactory()
@@ -59,6 +57,14 @@ class EcommerceServiceTests(TestCase):
         config.save()
         is_not_enabled = EcommerceService().is_enabled(self.user)
         self.assertFalse(is_not_enabled)
+
+    @override_switch(settings.DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH, active=True)
+    def test_is_enabled_activation_requirement_disabled(self):
+        """Verify that is_enabled() returns True when ecomm checkout is enabled. """
+        self.user.is_active = False
+        self.user.save()
+        is_enabled = EcommerceService().is_enabled(self.user)
+        self.assertTrue(is_enabled)
 
     @patch('openedx.core.djangoapps.theming.helpers.is_request_in_themed_site')
     def test_is_enabled_for_microsites(self, is_microsite):
@@ -83,28 +89,18 @@ class EcommerceServiceTests(TestCase):
         """Verify that the proper Receipt page URL is returned."""
         order_number = 'ORDER1'
         url = EcommerceService().get_receipt_page_url(order_number)
-        expected_url = '/checkout/receipt/{}'.format(order_number)
+        expected_url = 'http://ecommerce_url/checkout/receipt/?order_number={}'.format(order_number)
         self.assertEqual(url, expected_url)
 
     @override_settings(ECOMMERCE_PUBLIC_URL_ROOT='http://ecommerce_url')
-    def test_checkout_page_url(self):
+    @ddt.data(['TESTSKU'], ['TESTSKU1', 'TESTSKU2', 'TESTSKU3'])
+    def test_get_checkout_page_url(self, skus):
         """ Verify the checkout page URL is properly constructed and returned. """
-        url = EcommerceService().checkout_page_url(self.SKU)
-        expected_url = 'http://ecommerce_url/test_basket/?sku={}'.format(self.SKU)
-        self.assertEqual(url, expected_url)
-
-    @override_settings(ECOMMERCE_PUBLIC_URL_ROOT='http://ecommerce_url')
-    @with_site_configuration(configuration=TEST_SITE_CONFIGURATION)
-    def test_get_receipt_page_url_with_site_configuration(self):
-        order_number = 'ORDER1'
+        url = EcommerceService().get_checkout_page_url(*skus)
         config = CommerceConfiguration.current()
-        config.use_ecommerce_receipt_page = True
-        config.save()
-
-        receipt_page_url = EcommerceService().get_receipt_page_url(order_number)
-        expected_url = '{ecommerce_root}{receipt_page_url}{order_number}'.format(
-            ecommerce_root=settings.ECOMMERCE_PUBLIC_URL_ROOT,
-            order_number=order_number,
-            receipt_page_url=TEST_SITE_CONFIGURATION['ECOMMERCE_RECEIPT_PAGE_URL']
+        expected_url = '{root}{basket_url}?{skus}'.format(
+            basket_url=config.MULTIPLE_ITEMS_BASKET_PAGE_URL,
+            root=settings.ECOMMERCE_PUBLIC_URL_ROOT,
+            skus=urlencode({'sku': skus}, doseq=True),
         )
-        self.assertEqual(receipt_page_url, expected_url)
+        self.assertEqual(url, expected_url)

@@ -11,25 +11,24 @@ file and check it in at the same time as your model changes. To do that,
 3. Add the migration file created in edx-platform/openedx/core/djangoapps/embargo/migrations/
 """
 
-import ipaddr
 import json
 import logging
 
-from django.db import models
-from django.utils.translation import ugettext as _, ugettext_lazy
+import ipaddr
+from config_models.models import ConfigurationModel
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
-from django.db.models.signals import post_save, post_delete
-
-from django_countries.fields import CountryField
+from django.db import models
+from django.db.models.signals import post_delete, post_save
+from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy
 from django_countries import countries
+from django_countries.fields import CountryField
 
-from config_models.models import ConfigurationModel
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, NoneToEmptyManager
 
 from .exceptions import InvalidAccessPoint
-from .messages import ENROLL_MESSAGES, COURSEWARE_MESSAGES
-
+from .messages import COURSEWARE_MESSAGES, ENROLL_MESSAGES
 
 log = logging.getLogger(__name__)
 
@@ -318,7 +317,7 @@ class RestrictedCourse(models.Model):
         # We use generic messaging unless we find something more specific,
         # but *always* return a valid URL path.
         default_path = reverse(
-            'embargo_blocked_message',
+            'embargo:blocked_message',
             kwargs={
                 'access_point': 'courseware',
                 'message_key': 'default'
@@ -337,7 +336,7 @@ class RestrictedCourse(models.Model):
             course = cls.objects.get(course_key=course_key)
             msg_key = course.message_key_for_access_point(access_point)
             return reverse(
-                'embargo_blocked_message',
+                'embargo:blocked_message',
                 kwargs={
                     'access_point': access_point,
                     'message_key': msg_key

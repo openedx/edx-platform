@@ -3,8 +3,8 @@ Helpers for API tests.
 """
 import base64
 import json
-
 import re
+
 from django.test import TestCase
 from django.test.utils import override_settings
 

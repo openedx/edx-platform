@@ -6,15 +6,14 @@ Due to a bug, many rows in courseware_studentmodule were written with a
 course_id that had a trailing newline. This command tries to fix that, and to
 merge that data with data that might have been written to the correct course_id.
 """
+import json
+import logging
 from collections import namedtuple
 from optparse import make_option
 from textwrap import dedent
-import json
-import logging
 
-from django.db import DatabaseError
-from django.db import transaction
 from django.core.management.base import BaseCommand, CommandError
+from django.db import DatabaseError, transaction
 
 from courseware.models import StudentModule
 from util.query import use_read_replica_if_available

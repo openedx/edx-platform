@@ -1,36 +1,33 @@
 """
     Tests for enrollment refund capabilities.
 """
+import logging
+import unittest
 from datetime import datetime, timedelta
+
 import ddt
 import httpretty
-import logging
 import pytz
-import unittest
-
+# Explicitly import the cache from ConfigurationModel so we can reset it after each test
+from config_models.models import cache
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.client import Client
 from django.test.utils import override_settings
 from mock import patch
 
-from student.models import CourseEnrollment, CourseEnrollmentAttribute
-from student.tests.factories import UserFactory, CourseModeFactory
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-
 # These imports refer to lms djangoapps.
 # Their testcases are only run under lms.
-from certificates.models import CertificateStatuses  # pylint: disable=import-error
+from certificates.models import CertificateStatuses, GeneratedCertificate  # pylint: disable=import-error
 from certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
 from openedx.core.djangoapps.commerce.utils import ECOMMERCE_DATE_FORMAT
-
-# Explicitly import the cache from ConfigurationModel so we can reset it after each test
-from config_models.models import cache
+from student.models import CourseEnrollment, CourseEnrollmentAttribute
+from student.tests.factories import CourseModeFactory, UserFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 log = logging.getLogger(__name__)
 TEST_API_URL = 'http://www-internal.example.com/api'
-TEST_API_SIGNING_KEY = 'edx'
 JSON = 'application/json'
 
 
@@ -56,23 +53,24 @@ class RefundableTest(SharedModuleStoreTestCase):
             mode_display_name='Verified',
             expiration_datetime=datetime.now(pytz.UTC) + timedelta(days=1)
         )
+
         self.enrollment = CourseEnrollment.enroll(self.user, self.course.id, mode='verified')
 
         self.client = Client()
         cache.clear()
 
-    def test_refundable(self):
+    @patch('student.models.CourseEnrollment.refund_cutoff_date')
+    def test_refundable(self, cutoff_date):
         """ Assert base case is refundable"""
+        cutoff_date.return_value = datetime.now(pytz.UTC) + timedelta(days=1)
         self.assertTrue(self.enrollment.refundable())
 
-    def test_refundable_expired_verification(self):
-        """ Assert that enrollment is not refundable if course mode has expired."""
+    @patch('student.models.CourseEnrollment.refund_cutoff_date')
+    def test_refundable_expired_verification(self, cutoff_date):
+        """ Assert that enrollment is refundable if course mode has expired."""
+        cutoff_date.return_value = datetime.now(pytz.UTC) + timedelta(days=1)
         self.verified_mode.expiration_datetime = datetime.now(pytz.UTC) - timedelta(days=1)
         self.verified_mode.save()
-        self.assertFalse(self.enrollment.refundable())
-
-        # Assert that can_refund overrides this and allows refund
-        self.enrollment.can_refund = True
         self.assertTrue(self.enrollment.refundable())
 
     def test_refundable_of_purchased_course(self):
@@ -95,8 +93,12 @@ class RefundableTest(SharedModuleStoreTestCase):
         resp = self.client.post(reverse('student.views.dashboard', args=[]))
         self.assertIn('You will not be refunded the amount you paid.', resp.content)
 
-    def test_refundable_when_certificate_exists(self):
+    @patch('student.models.CourseEnrollment.refund_cutoff_date')
+    def test_refundable_when_certificate_exists(self, cutoff_date):
         """ Assert that enrollment is not refundable once a certificat has been generated."""
+
+        cutoff_date.return_value = datetime.now(pytz.UTC) + timedelta(days=1)
+
         self.assertTrue(self.enrollment.refundable())
 
         GeneratedCertificateFactory.create(
@@ -107,21 +109,32 @@ class RefundableTest(SharedModuleStoreTestCase):
         )
 
         self.assertFalse(self.enrollment.refundable())
+        self.assertFalse(
+            self.enrollment.refundable(
+                user_already_has_certs_for=GeneratedCertificate.course_ids_with_certs_for_user(self.user)
+            )
+        )
 
         # Assert that can_refund overrides this and allows refund
         self.enrollment.can_refund = True
         self.assertTrue(self.enrollment.refundable())
+        self.assertTrue(
+            self.enrollment.refundable(
+                user_already_has_certs_for=GeneratedCertificate.course_ids_with_certs_for_user(self.user)
+            )
+        )
 
-    def test_refundable_with_cutoff_date(self):
+    @patch('student.models.CourseEnrollment.refund_cutoff_date')
+    def test_refundable_with_cutoff_date(self, cutoff_date):
         """ Assert enrollment is refundable before cutoff and not refundable after."""
+        cutoff_date.return_value = datetime.now(pytz.UTC) + timedelta(days=1)
         self.assertTrue(self.enrollment.refundable())
 
-        with patch('student.models.CourseEnrollment.refund_cutoff_date') as cutoff_date:
-            cutoff_date.return_value = datetime.now(pytz.UTC) - timedelta(minutes=5)
-            self.assertFalse(self.enrollment.refundable())
+        cutoff_date.return_value = datetime.now(pytz.UTC) - timedelta(minutes=5)
+        self.assertFalse(self.enrollment.refundable())
 
-            cutoff_date.return_value = datetime.now(pytz.UTC) + timedelta(minutes=5)
-            self.assertTrue(self.enrollment.refundable())
+        cutoff_date.return_value = datetime.now(pytz.UTC) + timedelta(minutes=5)
+        self.assertTrue(self.enrollment.refundable())
 
     @ddt.data(
         (timedelta(days=1), timedelta(days=2), timedelta(days=2), 14),
@@ -131,7 +144,7 @@ class RefundableTest(SharedModuleStoreTestCase):
     )
     @ddt.unpack
     @httpretty.activate
-    @override_settings(ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY, ECOMMERCE_API_URL=TEST_API_URL)
+    @override_settings(ECOMMERCE_API_URL=TEST_API_URL)
     def test_refund_cutoff_date(self, order_date_delta, course_start_delta, expected_date_delta, days):
         """
         Assert that the later date is used with the configurable refund period in calculating the returned cutoff date.
@@ -172,7 +185,7 @@ class RefundableTest(SharedModuleStoreTestCase):
         self.assertIsNone(self.enrollment.refund_cutoff_date())
 
     @httpretty.activate
-    @override_settings(ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY, ECOMMERCE_API_URL=TEST_API_URL)
+    @override_settings(ECOMMERCE_API_URL=TEST_API_URL)
     def test_multiple_refunds_dashbaord_page_error(self):
         """ Order with mutiple refunds will not throw 500 error when dashboard page will access."""
         now = datetime.now(pytz.UTC).replace(microsecond=0)

@@ -7,36 +7,58 @@ from __future__ import absolute_import
 
 import logging
 
-from contentstore.views.item import create_xblock_info
-from contentstore.utils import reverse_library_url, add_instructor
-from django.http import HttpResponseNotAllowed, Http404
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.conf import settings
+from django.http import Http404, HttpResponseForbidden, HttpResponseNotAllowed
 from django.utils.translation import ugettext as _
-from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import ensure_csrf_cookie
-from edxmako.shortcuts import render_to_response
+from django.views.decorators.http import require_http_methods
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator, LibraryUsageLocator
-from xmodule.modulestore.exceptions import DuplicateCourseError
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from .user import user_with_role
 
-from .component import get_component_templates, CONTAINER_TEMPLATES
+from contentstore.utils import add_instructor, reverse_library_url
+from contentstore.views.item import create_xblock_info
+from course_creators.views import get_course_creator_status
+from edxmako.shortcuts import render_to_response
 from student.auth import (
-    STUDIO_VIEW_USERS, STUDIO_EDIT_ROLES, get_user_permissions, has_studio_read_access, has_studio_write_access
+    STUDIO_EDIT_ROLES,
+    STUDIO_VIEW_USERS,
+    get_user_permissions,
+    has_studio_read_access,
+    has_studio_write_access
 )
 from student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
-from util.json_request import expect_json, JsonResponse, JsonResponseBadRequest
+from util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import DuplicateCourseError
+
+from .component import CONTAINER_TEMPLATES, get_component_templates
+from .user import user_with_role
 
 __all__ = ['library_handler', 'manage_library_users']
 
 log = logging.getLogger(__name__)
 
 LIBRARIES_ENABLED = settings.FEATURES.get('ENABLE_CONTENT_LIBRARIES', False)
+
+
+def get_library_creator_status(user):
+    """
+    Helper method for returning the library creation status for a particular user,
+    taking into account the value LIBRARIES_ENABLED.
+    """
+
+    if not LIBRARIES_ENABLED:
+        return False
+    elif user.is_staff:
+        return True
+    elif settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
+        return get_course_creator_status(user) == 'granted'
+    else:
+        return True
 
 
 @login_required
@@ -49,6 +71,10 @@ def library_handler(request, library_key_string=None):
     if not LIBRARIES_ENABLED:
         log.exception("Attempted to use the content library API when the libraries feature is disabled.")
         raise Http404  # Should never happen because we test the feature in urls.py also
+
+    if not get_library_creator_status(request.user):
+        if not request.user.is_staff:
+            return HttpResponseForbidden()
 
     if library_key_string is not None and request.method == 'POST':
         return HttpResponseNotAllowed(("POST",))

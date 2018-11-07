@@ -2,10 +2,11 @@
 Helper functions for the account/profile Python APIs.
 This is NOT part of the public API.
 """
+import json
+import logging
+import traceback
 from collections import defaultdict
 from functools import wraps
-import logging
-import json
 
 from django import forms
 from django.core.serializers.json import DjangoJSONEncoder
@@ -65,16 +66,19 @@ def intercept_errors(api_error, ignore_errors=None):
                         LOGGER.warning(msg)
                         raise
 
+                caller = traceback.format_stack(limit=2)[0]
+
                 # Otherwise, log the error and raise the API-specific error
                 msg = (
                     u"An unexpected error occurred when calling '{func_name}' "
-                    u"with arguments '{args}' and keyword arguments '{kwargs}': "
+                    u"with arguments '{args}' and keyword arguments '{kwargs}' from {caller}: "
                     u"{exception}"
                 ).format(
                     func_name=func.func_name,
                     args=args,
                     kwargs=kwargs,
-                    exception=ex.developer_message if hasattr(ex, 'developer_message') else repr(ex)
+                    exception=ex.developer_message if hasattr(ex, 'developer_message') else repr(ex),
+                    caller=caller.strip(),
                 )
                 LOGGER.exception(msg)
                 raise api_error(msg)
@@ -117,7 +121,7 @@ class InvalidFieldError(Exception):
 class FormDescription(object):
     """Generate a JSON representation of a form. """
 
-    ALLOWED_TYPES = ["text", "email", "select", "textarea", "checkbox", "password"]
+    ALLOWED_TYPES = ["text", "email", "select", "textarea", "checkbox", "password", "hidden"]
 
     ALLOWED_RESTRICTIONS = {
         "text": ["min_length", "max_length"],
@@ -230,21 +234,29 @@ class FormDescription(object):
             "supplementalText": supplementalText
         }
 
+        field_override = self._field_overrides.get(name, {})
+
         if field_type == "select":
             if options is not None:
                 field_dict["options"] = []
 
-                # Include an empty "default" option at the beginning of the list
+                # Get an existing default value from the field override
+                existing_default_value = field_override.get('defaultValue')
+
+                # Include an empty "default" option at the beginning of the list;
+                # preselect it if there isn't an overriding default.
                 if include_default_option:
                     field_dict["options"].append({
                         "value": "",
                         "name": "--",
-                        "default": True
+                        "default": existing_default_value is None
                     })
-
                 field_dict["options"].extend([
-                    {"value": option_value, "name": option_name}
-                    for option_value, option_name in options
+                    {
+                        'value': option_value,
+                        'name': option_name,
+                        'default': option_value == existing_default_value
+                    } for option_value, option_name in options
                 ])
             else:
                 raise InvalidFieldError("You must provide options for a select field.")
@@ -266,7 +278,7 @@ class FormDescription(object):
 
         # If there are overrides for this field, apply them now.
         # Any field property can be overwritten (for example, the default value or placeholder)
-        field_dict.update(self._field_overrides.get(name, {}))
+        field_dict.update(field_override)
 
         self.fields.append(field_dict)
 
@@ -287,8 +299,8 @@ class FormDescription(object):
                     "placeholder": "",
                     "instructions": "",
                     "options": [
-                        {"value": "cheese", "name": "Cheese"},
-                        {"value": "wine", "name": "Wine"}
+                        {"value": "cheese", "name": "Cheese", "default": False},
+                        {"value": "wine", "name": "Wine", "default": False}
                     ]
                     "restrictions": {},
                     "errorMessages": {},
@@ -502,3 +514,13 @@ def shim_student_view(view_func, check_logged_in=False):
         return response
 
     return _inner
+
+
+def serializer_is_dirty(preference_serializer):
+    """
+    Return True if saving the supplied (Raw)UserPreferenceSerializer would change the database.
+    """
+    return (
+        preference_serializer.instance is None or
+        preference_serializer.instance.value != preference_serializer.validated_data['value']
+    )

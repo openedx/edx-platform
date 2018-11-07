@@ -1,8 +1,9 @@
+import json
 import unittest
 
 import draganddrop
+
 from .draganddrop import PositionsCompare
-import json
 
 
 class Test_PositionsCompare(unittest.TestCase):

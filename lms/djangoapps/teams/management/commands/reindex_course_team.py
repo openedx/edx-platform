@@ -1,9 +1,10 @@
 """ Management command to update course_teams' search index. """
-from django.core.management import BaseCommand, CommandError
-from django.core.exceptions import ObjectDoesNotExist
-from django.conf import settings
 from optparse import make_option
 from textwrap import dedent
+
+from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.management import BaseCommand, CommandError
 
 from lms.djangoapps.teams.models import CourseTeam
 

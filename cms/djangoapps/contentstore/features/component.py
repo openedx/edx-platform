@@ -5,8 +5,8 @@
 # argument name "step" instead of "_step" and pylint does not like that.
 # pylint: disable=unused-argument
 
-from lettuce import world, step
-from nose.tools import assert_true, assert_in, assert_equal
+from lettuce import step, world
+from nose.tools import assert_equal, assert_in, assert_true
 
 DISPLAY_NAME = "Display Name"
 

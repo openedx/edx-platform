@@ -2,10 +2,11 @@
  * Subviews (usually small side panels) for XBlockContainerPage.
  */
 define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/components/utils/view_utils',
-    'js/views/utils/xblock_utils'],
-    function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils) {
-        var VisibilityState = XBlockViewUtils.VisibilityState,
-            disabledCss = 'is-disabled';
+    'js/views/utils/xblock_utils', 'js/views/utils/move_xblock_utils', 'edx-ui-toolkit/js/utils/html-utils'],
+    function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, HtmlUtils) {
+        'use strict';
+
+        var disabledCss = 'is-disabled';
 
         /**
          * A view that refreshes the view when certain values in the XBlockInfo have changed
@@ -42,9 +43,12 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/compo
             },
 
             render: function() {
-                this.$el.html(this.template({
-                    currentlyVisibleToStudents: this.model.get('currently_visible_to_students')
-                }));
+                HtmlUtils.setHtml(
+                    this.$el,
+                    HtmlUtils.HTML(
+                        this.template({currentlyVisibleToStudents: this.model.get('currently_visible_to_students')})
+                    )
+                );
                 return this;
             }
         });
@@ -94,30 +98,38 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/compo
             onSync: function(model) {
                 if (ViewUtils.hasChangedAttributes(model, [
                     'has_changes', 'published', 'edited_on', 'edited_by', 'visibility_state',
-                    'has_explicit_staff_lock', 'has_content_group_components'
+                    'has_explicit_staff_lock', 'has_partition_group_components'
                 ])) {
                     this.render();
                 }
             },
 
             render: function() {
-                this.$el.html(this.template({
-                    visibilityState: this.model.get('visibility_state'),
-                    visibilityClass: XBlockViewUtils.getXBlockVisibilityClass(this.model.get('visibility_state')),
-                    hasChanges: this.model.get('has_changes'),
-                    editedOn: this.model.get('edited_on'),
-                    editedBy: this.model.get('edited_by'),
-                    published: this.model.get('published'),
-                    publishedOn: this.model.get('published_on'),
-                    publishedBy: this.model.get('published_by'),
-                    released: this.model.get('released_to_students'),
-                    releaseDate: this.model.get('release_date'),
-                    releaseDateFrom: this.model.get('release_date_from'),
-                    hasExplicitStaffLock: this.model.get('has_explicit_staff_lock'),
-                    staffLockFrom: this.model.get('staff_lock_from'),
-                    hasContentGroupComponents: this.model.get('has_content_group_components'),
-                    course: window.course
-                }));
+                HtmlUtils.setHtml(
+                    this.$el,
+                    HtmlUtils.HTML(
+                        this.template({
+                            visibilityState: this.model.get('visibility_state'),
+                            visibilityClass: XBlockViewUtils.getXBlockVisibilityClass(
+                                this.model.get('visibility_state')
+                            ),
+                            hasChanges: this.model.get('has_changes'),
+                            editedOn: this.model.get('edited_on'),
+                            editedBy: this.model.get('edited_by'),
+                            published: this.model.get('published'),
+                            publishedOn: this.model.get('published_on'),
+                            publishedBy: this.model.get('published_by'),
+                            released: this.model.get('released_to_students'),
+                            releaseDate: this.model.get('release_date'),
+                            releaseDateFrom: this.model.get('release_date_from'),
+                            hasExplicitStaffLock: this.model.get('has_explicit_staff_lock'),
+                            staffLockFrom: this.model.get('staff_lock_from'),
+                            hasPartitionGroupComponents: this.model.get('has_partition_group_components'),
+                            course: window.course,
+                            HtmlUtils: HtmlUtils
+                        })
+                    )
+                );
 
                 return this;
             },
@@ -132,6 +144,8 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/compo
                         return xblockInfo.save({publish: 'make_public'}, {patch: true});
                     }).always(function() {
                         xblockInfo.set('publish', null);
+                        // Hide any move notification if present.
+                        MoveXBlockUtils.hideMovedNotification();
                     }).done(function() {
                         xblockInfo.fetch();
                     });
@@ -151,6 +165,8 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/compo
                                 return xblockInfo.save({publish: 'discard_changes'}, {patch: true});
                             }).always(function() {
                                 xblockInfo.set('publish', null);
+                                // Hide any move notification if present.
+                                MoveXBlockUtils.hideMovedNotification();
                             }).done(function() {
                                 renderPage();
                             });
@@ -238,11 +254,16 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/compo
             },
 
             render: function() {
-                this.$el.html(this.template({
-                    published: this.model.get('published'),
-                    published_on: this.model.get('published_on'),
-                    published_by: this.model.get('published_by')
-                }));
+                HtmlUtils.setHtml(
+                    this.$el,
+                    HtmlUtils.HTML(
+                        this.template({
+                            published: this.model.get('published'),
+                            published_on: this.model.get('published_on'),
+                            published_by: this.model.get('published_by')
+                        })
+                    )
+                );
 
                 return this;
             }

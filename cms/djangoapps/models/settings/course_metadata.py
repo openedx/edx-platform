@@ -1,13 +1,14 @@
 """
 Django module for Course Metadata class -- manages advanced settings and related parameters
 """
+from django.conf import settings
+from django.utils.translation import ugettext as _
 from xblock.fields import Scope
+
+from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
+
 from xblock_django.models import XBlockStudioConfigurationFlag
 from xmodule.modulestore.django import modulestore
-
-from django.utils.translation import ugettext as _
-from django.conf import settings
-from openedx.core.djangoapps.site_configuration.helpers import get_value_for_org
 
 
 class CourseMetadata(object):
@@ -55,6 +56,7 @@ class CourseMetadata(object):
         'exam_review_rules',
         'hide_after_due',
         'self_paced',
+        'show_correctness',
         'chrome',
         'default_tab',
     ]
@@ -111,6 +113,13 @@ class CourseMetadata(object):
         #    )
         # ):
         #     filtered_list.append('is_microsoft_course')
+
+        # TODO: https://openedx.atlassian.net/browse/EDUCATOR-736
+        # Before we roll out the auto-certs feature, move this to a good, shared
+        # place such that we're not repeating code found in LMS.
+        switches = WaffleSwitchNamespace(name=u'certificates', log_prefix=u'Certificates: ')
+        if not switches.is_enabled(u'instructor_paced_only'):
+            filtered_list.append('certificate_available_date')
 
         return filtered_list
 

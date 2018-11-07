@@ -5,16 +5,17 @@ Browser set up for acceptance tests.
 # pylint: disable=no-member
 # pylint: disable=unused-argument
 
-from lettuce import before, after, world
-from splinter.browser import Browser
-from logging import getLogger
-from django.core.management import call_command
-from django.conf import settings
-from selenium.common.exceptions import WebDriverException
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-import requests
 from base64 import encodestring
 from json import dumps
+from logging import getLogger
+
+import requests
+from django.conf import settings
+from django.core.management import call_command
+from lettuce import after, before, world
+from selenium.common.exceptions import WebDriverException
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from splinter.browser import Browser
 
 import xmodule.modulestore.django
 from xmodule.contentstore.django import _CONTENTSTORE

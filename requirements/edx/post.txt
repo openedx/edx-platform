@@ -9,11 +9,4 @@
 # resolution of this dependency during compilation. So we need to install
 # python-saml only after lxml has been successfully installed. 
 
-# In addition, we are currently utilizing a forked version of python-saml,
-# managed by OpenCraft, which features enhanced logging and improved
-# unicode support. We will return to the official version of python-saml
-# on PyPI when these pull requests (or their derivatives) have been
-# incorporated into the main project.
-# https://github.com/onelogin/python-saml/pull/159
-# https://github.com/onelogin/python-saml/pull/164
-git+https://github.com/open-craft/python-saml.git@d50f8d25419c2e981605e5c64e8528a125bcf303#egg=python-saml==2.2.0
+python-saml==2.2.1

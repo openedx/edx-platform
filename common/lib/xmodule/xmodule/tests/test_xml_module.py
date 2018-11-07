@@ -37,8 +37,12 @@ class TestFields(object):
     # Will not be returned by editable_metadata_fields because is not Scope.settings.
     student_answers = Dict(scope=Scope.user_state)
     # Will be returned, and can override the inherited value from XModule.
-    display_name = String(scope=Scope.settings, default='local default', display_name='Local Display Name',
-                          help='local help')
+    display_name = String(
+        scope=Scope.settings,
+        default='local default',
+        display_name='Local Display Name',
+        help='local help'
+    )
     # Used for testing select type, effect of to_json method
     string_select = CrazyJsonString(
         scope=Scope.settings,

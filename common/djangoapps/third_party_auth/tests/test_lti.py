@@ -3,8 +3,10 @@ Unit tests for third_party_auth LTI auth providers
 """
 
 import unittest
+
 from oauthlib.common import Request
-from third_party_auth.lti import LTIAuthBackend, LTI_PARAMS_KEY
+
+from third_party_auth.lti import LTI_PARAMS_KEY, LTIAuthBackend
 from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin
 
 

@@ -2,20 +2,20 @@
 Models for the custom course feature
 """
 from __future__ import unicode_literals
+
 import json
 import logging
 from datetime import datetime
 
+from ccx_keys.locator import CCXLocator
 from django.contrib.auth.models import User
 from django.db import models
-from pytz import utc
 from lazy import lazy
+from pytz import utc
 
-from ccx_keys.locator import CCXLocator
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, LocationKeyField
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
-
 
 log = logging.getLogger("edx.ccx")
 

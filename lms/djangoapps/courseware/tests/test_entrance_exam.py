@@ -1,38 +1,35 @@
 """
 Tests use cases related to LMS Entrance Exam behavior, such as gated content access (TOC)
 """
-from mock import patch, Mock
-
-from django.core.urlresolvers import reverse
-from django.test.client import RequestFactory
-from nose.plugins.attrib import attr
-
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from courseware.model_data import FieldDataCache
-from courseware.module_render import toc_for_course, get_module, handle_xblock_callback
-from courseware.tests.factories import UserFactory, InstructorFactory, StaffFactory
-from courseware.tests.helpers import (
-    LoginEnrollmentTestCase,
-)
 from courseware.entrance_exams import (
     course_has_entrance_exam,
     get_entrance_exam_content,
-    get_entrance_exam_score,
     user_can_skip_entrance_exam,
-    user_has_passed_entrance_exam,
+    user_has_passed_entrance_exam
 )
-from openedx.core.djangolib.testing.utils import get_mock_request
-from student.models import CourseEnrollment
-from student.tests.factories import CourseEnrollmentFactory, AnonymousUserFactory
-from util.milestones_helpers import (
-    add_milestone,
-    add_course_milestone,
-    get_namespace_choices,
-    generate_milestone_namespace,
-    add_course_content_milestone,
-    get_milestone_relationship_types,
-)
+from courseware.model_data import FieldDataCache
+from courseware.module_render import get_module, handle_xblock_callback, toc_for_course
+from courseware.tests.factories import InstructorFactory, StaffFactory, UserFactory
+from courseware.tests.helpers import LoginEnrollmentTestCase
+from django.core.urlresolvers import reverse
+from django.test.client import RequestFactory
 from milestones.tests.utils import MilestonesTestCaseMixin
+from mock import Mock, patch
+from nose.plugins.attrib import attr
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
+from openedx.core.djangolib.testing.utils import get_mock_request
+from openedx.features.course_experience import COURSE_OUTLINE_PAGE_FLAG
+from student.models import CourseEnrollment
+from student.tests.factories import AnonymousUserFactory, CourseEnrollmentFactory
+from util.milestones_helpers import (
+    add_course_content_milestone,
+    add_course_milestone,
+    add_milestone,
+    generate_milestone_namespace,
+    get_milestone_relationship_types,
+    get_namespace_choices
+)
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -58,81 +55,82 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
                 'entrance_exam_enabled': True,
             }
         )
-        self.chapter = ItemFactory.create(
-            parent=self.course,
-            display_name='Overview'
-        )
-        self.welcome = ItemFactory.create(
-            parent=self.chapter,
-            display_name='Welcome'
-        )
-        ItemFactory.create(
-            parent=self.course,
-            category='chapter',
-            display_name="Week 1"
-        )
-        self.chapter_subsection = ItemFactory.create(
-            parent=self.chapter,
-            category='sequential',
-            display_name="Lesson 1"
-        )
-        chapter_vertical = ItemFactory.create(
-            parent=self.chapter_subsection,
-            category='vertical',
-            display_name='Lesson 1 Vertical - Unit 1'
-        )
-        ItemFactory.create(
-            parent=chapter_vertical,
-            category="problem",
-            display_name="Problem - Unit 1 Problem 1"
-        )
-        ItemFactory.create(
-            parent=chapter_vertical,
-            category="problem",
-            display_name="Problem - Unit 1 Problem 2"
-        )
+        with self.store.bulk_operations(self.course.id):
+            self.chapter = ItemFactory.create(
+                parent=self.course,
+                display_name='Overview'
+            )
+            self.welcome = ItemFactory.create(
+                parent=self.chapter,
+                display_name='Welcome'
+            )
+            ItemFactory.create(
+                parent=self.course,
+                category='chapter',
+                display_name="Week 1"
+            )
+            self.chapter_subsection = ItemFactory.create(
+                parent=self.chapter,
+                category='sequential',
+                display_name="Lesson 1"
+            )
+            chapter_vertical = ItemFactory.create(
+                parent=self.chapter_subsection,
+                category='vertical',
+                display_name='Lesson 1 Vertical - Unit 1'
+            )
+            ItemFactory.create(
+                parent=chapter_vertical,
+                category="problem",
+                display_name="Problem - Unit 1 Problem 1"
+            )
+            ItemFactory.create(
+                parent=chapter_vertical,
+                category="problem",
+                display_name="Problem - Unit 1 Problem 2"
+            )
 
-        ItemFactory.create(
-            category="instructor",
-            parent=self.course,
-            data="Instructor Tab",
-            display_name="Instructor"
-        )
-        self.entrance_exam = ItemFactory.create(
-            parent=self.course,
-            category="chapter",
-            display_name="Entrance Exam Section - Chapter 1",
-            is_entrance_exam=True,
-            in_entrance_exam=True
-        )
-        self.exam_1 = ItemFactory.create(
-            parent=self.entrance_exam,
-            category='sequential',
-            display_name="Exam Sequential - Subsection 1",
-            graded=True,
-            in_entrance_exam=True
-        )
-        subsection = ItemFactory.create(
-            parent=self.exam_1,
-            category='vertical',
-            display_name='Exam Vertical - Unit 1'
-        )
-        problem_xml = MultipleChoiceResponseXMLFactory().build_xml(
-            question_text='The correct answer is Choice 3',
-            choices=[False, False, True, False],
-            choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
-        )
-        self.problem_1 = ItemFactory.create(
-            parent=subsection,
-            category="problem",
-            display_name="Exam Problem - Problem 1",
-            data=problem_xml
-        )
-        self.problem_2 = ItemFactory.create(
-            parent=subsection,
-            category="problem",
-            display_name="Exam Problem - Problem 2"
-        )
+            ItemFactory.create(
+                category="instructor",
+                parent=self.course,
+                data="Instructor Tab",
+                display_name="Instructor"
+            )
+            self.entrance_exam = ItemFactory.create(
+                parent=self.course,
+                category="chapter",
+                display_name="Entrance Exam Section - Chapter 1",
+                is_entrance_exam=True,
+                in_entrance_exam=True
+            )
+            self.exam_1 = ItemFactory.create(
+                parent=self.entrance_exam,
+                category='sequential',
+                display_name="Exam Sequential - Subsection 1",
+                graded=True,
+                in_entrance_exam=True
+            )
+            subsection = ItemFactory.create(
+                parent=self.exam_1,
+                category='vertical',
+                display_name='Exam Vertical - Unit 1'
+            )
+            problem_xml = MultipleChoiceResponseXMLFactory().build_xml(
+                question_text='The correct answer is Choice 3',
+                choices=[False, False, True, False],
+                choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
+            )
+            self.problem_1 = ItemFactory.create(
+                parent=subsection,
+                category="problem",
+                display_name="Exam Problem - Problem 1",
+                data=problem_xml
+            )
+            self.problem_2 = ItemFactory.create(
+                parent=subsection,
+                category="problem",
+                display_name="Exam Problem - Problem 2"
+            )
 
         add_entrance_exam_milestone(self.course, self.entrance_exam)
 
@@ -280,32 +278,14 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         """
         exam_chapter = get_entrance_exam_content(self.request.user, self.course)
         self.assertEqual(exam_chapter.url_name, self.entrance_exam.url_name)
-        self.assertFalse(user_has_passed_entrance_exam(self.request, self.course))
+        self.assertFalse(user_has_passed_entrance_exam(self.request.user, self.course))
 
         answer_entrance_exam_problem(self.course, self.request, self.problem_1)
         answer_entrance_exam_problem(self.course, self.request, self.problem_2)
 
         exam_chapter = get_entrance_exam_content(self.request.user, self.course)
         self.assertEqual(exam_chapter, None)
-        self.assertTrue(user_has_passed_entrance_exam(self.request, self.course))
-
-    def test_entrance_exam_score(self):
-        """
-        test entrance exam score. we will hit the method get_entrance_exam_score to verify exam score.
-        """
-        # One query is for getting the list of disabled XBlocks (which is
-        # then stored in the request).
-        with self.assertNumQueries(2):
-            exam_score = get_entrance_exam_score(self.request, self.course)
-        self.assertEqual(exam_score, 0)
-
-        answer_entrance_exam_problem(self.course, self.request, self.problem_1)
-        answer_entrance_exam_problem(self.course, self.request, self.problem_2)
-
-        with self.assertNumQueries(1):
-            exam_score = get_entrance_exam_score(self.request, self.course)
-        # 50 percent exam score should be achieved.
-        self.assertGreater(exam_score * 100, 50)
+        self.assertTrue(user_has_passed_entrance_exam(self.request.user, self.course))
 
     def test_entrance_exam_requirement_message(self):
         """
@@ -331,6 +311,10 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         minimum_score_pct = 29
         self.course.entrance_exam_minimum_score_pct = float(minimum_score_pct) / 100
         modulestore().update_item(self.course, self.request.user.id)  # pylint: disable=no-member
+
+        # answer the problem so it results in only 20% correct.
+        answer_entrance_exam_problem(self.course, self.request, self.problem_1, value=1, max_value=5)
+
         url = reverse(
             'courseware_section',
             kwargs={
@@ -341,9 +325,11 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         )
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
-        self.assertIn('To access course materials, you must score {required_score}% or higher'.format(
-            required_score=minimum_score_pct
-        ), resp.content)
+        self.assertIn(
+            'To access course materials, you must score {}% or higher'.format(minimum_score_pct),
+            resp.content
+        )
+        self.assertIn('Your current score is 20%.', resp.content)
 
     def test_entrance_exam_requirement_message_hidden(self):
         """
@@ -368,6 +354,8 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         self.assertNotIn('To access course materials, you must score', resp.content)
         self.assertNotIn('You have passed the entrance exam.', resp.content)
 
+    # TODO: LEARNER-71: Do we need to adjust or remove this test?
+    @override_waffle_flag(COURSE_OUTLINE_PAGE_FLAG, active=False)
     def test_entrance_exam_passed_message_and_course_content(self):
         """
         Unit Test: exam passing message and rest of the course section should be present
@@ -387,7 +375,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
 
         resp = self.client.get(url)
         self.assertNotIn('To access course materials, you must score', resp.content)
-        self.assertIn('You have passed the entrance exam.', resp.content)
+        self.assertIn('Your score is 100%. You have passed the entrance exam.', resp.content)
         self.assertIn('Lesson 1', resp.content)
 
     def test_entrance_exam_gating(self):
@@ -449,7 +437,6 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         for toc_section in self.expected_unlocked_toc:
             self.assertIn(toc_section, unlocked_toc)
 
-    @patch('courseware.entrance_exams.user_has_passed_entrance_exam', Mock(return_value=False))
     def test_courseware_page_access_without_passing_entrance_exam(self):
         """
         Test courseware access page without passing entrance exam
@@ -467,7 +454,6 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
                                })
         self.assertRedirects(response, expected_url, status_code=302, target_status_code=200)
 
-    @patch('courseware.entrance_exams.user_has_passed_entrance_exam', Mock(return_value=False))
     def test_courseinfo_page_access_without_passing_entrance_exam(self):
         """
         Test courseware access page without passing entrance exam
@@ -480,12 +466,11 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         exam_url = response.get('Location')
         self.assertRedirects(response, exam_url)
 
-    @patch('courseware.entrance_exams.user_has_passed_entrance_exam', Mock(return_value=True))
+    @patch('courseware.entrance_exams.get_entrance_exam_content', Mock(return_value=None))
     def test_courseware_page_access_after_passing_entrance_exam(self):
         """
         Test courseware access page after passing entrance exam
         """
-        # Mocking get_required_content with empty list to assume user has passed entrance exam
         self._assert_chapter_loaded(self.course, self.chapter)
 
     @patch('util.milestones_helpers.get_required_content', Mock(return_value=['a value']))
@@ -527,7 +512,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         Test has_passed_entrance_exam method with anonymous user
         """
         self.request.user = self.anonymous_user
-        self.assertFalse(user_has_passed_entrance_exam(self.request, self.course))
+        self.assertFalse(user_has_passed_entrance_exam(self.request.user, self.course))
 
     def test_course_has_entrance_exam_missing_exam_id(self):
         course = CourseFactory.create(
@@ -540,7 +525,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
     def test_user_has_passed_entrance_exam_short_circuit_missing_exam(self):
         course = CourseFactory.create(
         )
-        self.assertTrue(user_has_passed_entrance_exam(self.request, course))
+        self.assertTrue(user_has_passed_entrance_exam(self.request.user, course))
 
     @patch.dict("django.conf.settings.FEATURES", {'ENABLE_MASQUERADE': False})
     def test_entrance_exam_xblock_response(self):
@@ -598,7 +583,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         return toc['chapters']
 
 
-def answer_entrance_exam_problem(course, request, problem, user=None):
+def answer_entrance_exam_problem(course, request, problem, user=None, value=1, max_value=1):
     """
     Takes a required milestone `problem` in a `course` and fulfills it.
 
@@ -607,11 +592,13 @@ def answer_entrance_exam_problem(course, request, problem, user=None):
         request (Request): request Object
         problem (xblock): xblock object, the problem to be fulfilled
         user (User): User object in case it is different from request.user
+        value (int): raw_earned value of the problem
+        max_value (int): raw_possible value of the problem
     """
     if not user:
         user = request.user
 
-    grade_dict = {'value': 1, 'max_value': 1, 'user_id': user.id}
+    grade_dict = {'value': value, 'max_value': max_value, 'user_id': user.id}
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         course.id,
         user,

@@ -2,16 +2,14 @@
 """
 Tests for js_utils.py
 """
-import json
-from nose.plugins.attrib import attr
-from unittest import TestCase
 import HTMLParser
+import json
+from unittest import TestCase
 
 from mako.template import Template
+from nose.plugins.attrib import attr
 
-from openedx.core.djangolib.js_utils import (
-    dump_js_escaped_json, js_escaped_string
-)
+from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 
 
 @attr(shard=2)
