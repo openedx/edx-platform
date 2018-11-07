@@ -241,6 +241,11 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
     #   - https://github.com/elastic/elasticsearch/commit/8b0a863d427b4ebcbcfb1dcd69c996c52e7ae05e
     results_size_infinity = 10000
 
+    # Return all the results, 10K is the maximum allowed value for ElasticSearch.
+    # We should use 0 after upgrading to 1.1+:
+    #   - https://github.com/elastic/elasticsearch/commit/8b0a863d427b4ebcbcfb1dcd69c996c52e7ae05e
+    results_size_infinity = 10000
+
     def get_queryset(self):
         """
         Return a list of courses visible to the user.
