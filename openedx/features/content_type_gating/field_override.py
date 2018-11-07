@@ -24,7 +24,11 @@ class ContentTypeGatingFieldOverride(FieldOverrideProvider):
         if name != 'group_access':
             return default
 
-        if not (getattr(block, 'graded', False) and block.has_score):
+        graded = getattr(block, 'graded', False)
+        has_score = block.has_score
+        weight_not_zero = getattr(block, 'weight', 0) != 0
+        problem_eligible_for_content_gating = graded and has_score and weight_not_zero
+        if not problem_eligible_for_content_gating:
             return default
 
         # Read the group_access from the fallback field-data service
