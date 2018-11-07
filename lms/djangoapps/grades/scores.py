@@ -7,6 +7,7 @@ from xblock.core import XBlock
 
 from openedx.core.lib.cache_utils import memoized
 from xmodule.graders import ProblemScore
+from numpy import around
 
 from .transformer import GradesTransformer
 
@@ -141,6 +142,17 @@ def weighted_score(raw_earned, raw_possible, weight):
         return raw_earned, raw_possible
     else:
         return float(raw_earned) * weight / raw_possible, float(weight)
+
+
+def compute_percent(earned, possible):
+    """
+     Returns the percentage of the given earned and possible values.
+     """
+    if possible > 0:
+        # Rounds to two decimal places.
+        return around(earned / possible, decimals=2)
+    else:
+        return 0.0
 
 
 def _get_score_from_submissions(submissions_scores, block):

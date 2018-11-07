@@ -5,7 +5,7 @@ import django.db.models.deletion
 from django.conf import settings
 from django.db import migrations, models
 
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
+from opaque_keys.edx.django.models import CourseKeyField
 
 
 class Migration(migrations.Migration):
@@ -40,6 +40,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='coursemessage',
             name='global_message',
-            field=models.ForeignKey(to='status.GlobalStatusMessage'),
+            field=models.ForeignKey(to='status.GlobalStatusMessage', on_delete=models.CASCADE),
         ),
     ]

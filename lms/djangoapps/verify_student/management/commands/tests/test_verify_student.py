@@ -27,6 +27,7 @@ class TestVerifyStudentCommand(MockS3Mixin, TestCase):
     """
     Tests for django admin commands in the verify_student module
     """
+    shard = 4
 
     def setUp(self):
         super(TestVerifyStudentCommand, self).setUp()

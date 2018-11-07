@@ -1,33 +1,20 @@
-(function(define) {
-    'use strict';
-    define(['backbone',
-        'jquery',
-        'underscore',
-        'gettext',
-        'edx-ui-toolkit/js/utils/html-utils',
-        'text!../../../templates/learner_dashboard/expired_notification.underscore'
-    ],
-         function(
-             Backbone,
-             $,
-             _,
-             gettext,
-             HtmlUtils,
-             expiredNotificationTpl
-         ) {
-             return Backbone.View.extend({
-                 expiredNotificationTpl: HtmlUtils.template(expiredNotificationTpl),
+import Backbone from 'backbone';
 
-                 initialize: function(options) {
-                     this.$el = options.$el;
-                     this.render();
-                 },
+import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
 
-                 render: function() {
-                     var data = this.model.toJSON();
-                     HtmlUtils.setHtml(this.$el, this.expiredNotificationTpl(data));
-                 }
-             });
-         }
-    );
-}).call(this, define || RequireJS.define);
+import expiredNotificationTpl from '../../../templates/learner_dashboard/expired_notification.underscore';
+
+class ExpiredNotificationView extends Backbone.View {
+  initialize(options) {
+    this.expiredNotificationTpl = HtmlUtils.template(expiredNotificationTpl);
+    this.$el = options.$el;
+    this.render();
+  }
+
+  render() {
+    const data = this.model.toJSON();
+    HtmlUtils.setHtml(this.$el, this.expiredNotificationTpl(data));
+  }
+}
+
+export default ExpiredNotificationView;

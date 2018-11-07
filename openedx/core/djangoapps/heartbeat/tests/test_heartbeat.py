@@ -3,7 +3,7 @@ Test the heartbeat
 """
 import json
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db.utils import DatabaseError
 from django.test.client import Client
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

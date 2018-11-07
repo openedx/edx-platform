@@ -95,7 +95,7 @@
                 'thread-response-edit', 'response-comment-show', 'response-comment-edit', 'thread-list-item',
                 'search-alert', 'new-post', 'thread-type', 'new-post-menu-entry', 'new-post-alert',
                 'new-post-menu-category', 'topic', 'post-user-display', 'inline-discussion', 'pagination',
-                'profile-thread', 'customwmd-prompt', 'nav-loading'
+                'profile-thread', 'customwmd-prompt', 'nav-loading', 'new-post-visibility'
             ];
             templateNamesNoTrailingTemplate = [
                 'forum-action-endorse', 'forum-action-answer', 'forum-action-follow', 'forum-action-vote',

@@ -13,6 +13,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 class WikiTabTestCase(ModuleStoreTestCase):
     """Test cases for Wiki Tab."""
+    shard = 4
 
     def setUp(self):
         super(WikiTabTestCase, self).setUp()

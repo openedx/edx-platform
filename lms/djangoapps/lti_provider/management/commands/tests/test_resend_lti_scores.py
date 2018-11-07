@@ -19,6 +19,7 @@ class CommandArgsTestCase(TestCase):
     """
     Test management command parses arguments properly.
     """
+    shard = 4
 
     def _get_arg_parser(self):
         """
@@ -45,6 +46,7 @@ class CommandExecutionTestCase(SharedModuleStoreTestCase):
     """
     Test `manage.py resend_lti_scores` command.
     """
+    shard = 4
 
     @classmethod
     def setUpClass(cls):

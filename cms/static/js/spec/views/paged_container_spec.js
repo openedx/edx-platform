@@ -1,6 +1,6 @@
 define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'URI', 'js/models/xblock_info',
-        'js/views/paged_container', 'js/views/paging_header',
-        'common/js/components/views/paging_footer', 'js/views/xblock'],
+    'js/views/paged_container', 'js/views/paging_header',
+    'common/js/components/views/paging_footer', 'js/views/xblock'],
     function($, _, AjaxHelpers, URI, XBlockInfo, PagedContainer, PagingHeader, PagingFooter, XBlockView) {
         var htmlResponseTpl = _.template('' +
             '<div class="xblock-container-paging-parameters" ' +
@@ -54,7 +54,7 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
 
         var respondWithMockPage = function(requests, mockPage) {
             var request = AjaxHelpers.currentRequest(requests);
-            if (typeof mockPage == 'undefined') {
+            if (typeof mockPage === 'undefined') {
                 var url = new URI(request.url);
                 var queryParameters = url.query(true); // Returns an object with each query parameter stored as a value
                 var page = queryParameters.page_number;

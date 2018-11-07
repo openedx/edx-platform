@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import ddt
+import pytz
 from celery.states import FAILURE
 from django.core.management import call_command
 from django.core.management.base import CommandError
@@ -15,6 +16,7 @@ class TestFailOldQueueingTasksCommand(InstructorTaskTestCase):
     """
     Tests for the `fail_old_tasks` management command
     """
+    shard = 4
 
     def setUp(self):
         super(TestFailOldQueueingTasksCommand, self).setUp()
@@ -45,7 +47,7 @@ class TestFailOldQueueingTasksCommand(InstructorTaskTestCase):
         Override each task's "created" date
         """
         for task in self.tasks:
-            task.created = datetime.strptime(created_date, "%Y-%m-%d")
+            task.created = datetime.strptime(created_date, "%Y-%m-%d").replace(tzinfo=pytz.UTC)
             task.save()
 
     def get_tasks(self):

@@ -10,6 +10,7 @@ from django.utils.translation import ugettext as _
 from django.views.generic import View
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from six import text_type
 
 from contentstore.management.commands.utils import get_course_versions
 from edxmako.shortcuts import render_to_response
@@ -169,10 +170,10 @@ class ForcePublishCourseView(MaintenanceBaseView):
             self.context['msg'] = COURSE_KEY_ERROR_MESSAGES['invalid_course_key']
         except ItemNotFoundError as exc:
             self.context['error'] = True
-            self.context['msg'] = exc.message
+            self.context['msg'] = text_type(exc)
         except ValidationError as exc:
             self.context['error'] = True
-            self.context['msg'] = exc.message
+            self.context['msg'] = text_type(exc)
 
         if self.context['error']:
             return self.render_response()

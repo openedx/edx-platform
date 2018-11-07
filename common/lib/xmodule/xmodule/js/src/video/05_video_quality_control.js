@@ -66,8 +66,8 @@ function(HtmlUtils) {
 
     function destroy() {
         this.videoQualityControl.el.off({
-            'click': this.videoQualityControl.toggleQuality,
-            'destroy': this.videoQualityControl.destroy
+            click: this.videoQualityControl.toggleQuality,
+            destroy: this.videoQualityControl.destroy
         });
         this.el.off('.quality');
         this.videoQualityControl.el.remove();
@@ -164,7 +164,8 @@ function(HtmlUtils) {
     // This function toggles the quality of video only if HD qualities are
     // available.
     function toggleQuality(event) {
-        var newQuality, value = this.videoQualityControl.quality,
+        var newQuality,
+            value = this.videoQualityControl.quality,
             isHD = _.contains(this.config.availableHDQualities, value);
 
         event.preventDefault();

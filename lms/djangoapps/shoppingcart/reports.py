@@ -4,6 +4,7 @@ from decimal import Decimal
 
 import unicodecsv
 from django.utils.translation import ugettext as _
+from six import text_type
 
 from course_modes.models import CourseMode
 from courseware.courses import get_course_by_id
@@ -275,7 +276,7 @@ def course_ids_between(start_word, end_word):
 
     valid_courses = []
     for course in modulestore().get_courses():
-        course_id = course.id.to_deprecated_string()
+        course_id = text_type(course.id)
         if start_word.lower() <= course_id.lower() <= end_word.lower():
             valid_courses.append(course.id)
     return valid_courses

@@ -1,11 +1,9 @@
 """Factories for generating fake credentials-related data."""
 # pylint: disable=missing-docstring, invalid-name
-from functools import partial
 
 import factory
 
 from openedx.core.djangoapps.catalog.tests.factories import (
-    generate_instances,
     generate_course_run_key,
     DictFactoryBase,
 )
@@ -28,4 +26,4 @@ class UserCredential(DictFactoryBase):
     status = 'awarded'
     uuid = factory.Faker('uuid4')
     certificate_url = factory.Faker('url')
-    credential = factory.LazyFunction(partial(generate_instances, ProgramCredential, count=1))
+    credential = ProgramCredential()

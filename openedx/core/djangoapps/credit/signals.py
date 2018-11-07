@@ -9,7 +9,6 @@ from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.signals.signals import COURSE_GRADE_CHANGED
-from xmodule.modulestore.django import SignalHandler
 
 log = logging.getLogger(__name__)
 
@@ -48,7 +47,7 @@ def listen_for_grade_calculation(sender, user, course_grade, course_key, deadlin
 
     """
     # This needs to be imported here to avoid a circular dependency
-    # that can cause syncdb to fail.
+    # that can cause migrations to fail.
     from openedx.core.djangoapps.credit import api
     course_id = CourseKey.from_string(unicode(course_key))
     is_credit = api.is_credit_course(course_id)

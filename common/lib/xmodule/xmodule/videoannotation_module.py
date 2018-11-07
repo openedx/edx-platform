@@ -5,8 +5,8 @@ import textwrap
 
 from lxml import etree
 from pkg_resources import resource_string
+from web_fragments.fragment import Fragment
 from xblock.core import Scope, String
-from xblock.fragment import Fragment
 
 from xmodule.annotator_mixin import get_extension, get_instructions
 from xmodule.annotator_token import retrieve_token
@@ -85,11 +85,9 @@ class AnnotatableFields(object):
 class VideoAnnotationModule(AnnotatableFields, XModule):
     '''Video Annotation Module'''
     js = {
-        'coffee': [
-            resource_string(__name__, 'js/src/html/display.coffee'),
-            resource_string(__name__, 'js/src/annotatable/display.coffee'),
-        ],
         'js': [
+            resource_string(__name__, 'js/src/html/display.js'),
+            resource_string(__name__, 'js/src/annotatable/display.js'),
             resource_string(__name__, 'js/src/javascript_loader.js'),
             resource_string(__name__, 'js/src/collapsible.js'),
         ]

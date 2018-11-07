@@ -260,18 +260,21 @@ class SettingsPage(CoursePage):
         Set the entrance exam requirement via the checkbox.
         """
         checkbox = self.entrance_exam_field
+        # Wait for license section to load before interacting with the checkbox to avoid race condition
+        self.wait_for_element_presence('div.wrapper-license', 'License section present')
         selected = checkbox.is_selected()
+        self.scroll_to_element('#entrance-exam-enabled')
         if required and not selected:
             checkbox.click()
-            self.wait_for_element_visibility(
+            self.wait_for_element_presence(
                 '#entrance-exam-minimum-score-pct',
-                'Entrance exam minimum score percent is visible'
+                'Entrance exam minimum score percent is present'
             )
         if not required and selected:
             checkbox.click()
-            self.wait_for_element_invisibility(
+            self.wait_for_element_absence(
                 '#entrance-exam-minimum-score-pct',
-                'Entrance exam minimum score percent is invisible'
+                'Entrance exam minimum score percent is absent'
             )
 
     def save_changes(self, wait_for_confirmation=True):

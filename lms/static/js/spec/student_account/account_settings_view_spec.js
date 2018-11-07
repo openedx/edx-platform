@@ -1,13 +1,13 @@
 define(['backbone',
-        'jquery',
-        'underscore',
-        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-        'common/js/spec_helpers/template_helpers',
-        'js/spec/student_account/helpers',
-        'js/views/fields',
-        'js/student_account/models/user_account_model',
-        'js/student_account/views/account_settings_view'
-       ],
+    'jquery',
+    'underscore',
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+    'common/js/spec_helpers/template_helpers',
+    'js/spec/student_account/helpers',
+    'js/views/fields',
+    'js/student_account/models/user_account_model',
+    'js/student_account/views/account_settings_view'
+],
     function(Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, FieldViews, UserAccountModel,
               AccountSettingsView) {
         'use strict';
@@ -20,6 +20,9 @@ define(['backbone',
                 var aboutSectionsData = [
                     {
                         title: 'Basic Account Information',
+                        messageType: 'info',
+                        message: 'Your profile settings are managed by Test Enterprise. ' +
+                        'Contact your administrator or <a href="https://support.edx.org/">edX Support</a> for help.',
                         fields: [
                             {
                                 view: new FieldViews.ReadonlyFieldView({

@@ -42,6 +42,10 @@ def mobile_course_access(depth=0):
                 except CoursewareAccessException as error:
                     return Response(data=error.to_json(), status=status.HTTP_404_NOT_FOUND)
                 except CourseAccessRedirect as error:
+                    # If the redirect contains information about the triggering AccessError,
+                    # return the information contained in the AccessError.
+                    if error.access_error is not None:
+                        return Response(data=error.access_error.to_json(), status=status.HTTP_404_NOT_FOUND)
                     # Raise a 404 if the user does not have course access
                     raise Http404
                 return func(self, request, course=course, *args, **kwargs)

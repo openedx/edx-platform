@@ -70,7 +70,7 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
             'blocks_url': u'http://testserver/api/courses/v1/blocks/?course_id=edX%2Ftoy%2F2012_Fall',
             'effort': u'6 hours',
             'pacing': 'instructor',
-            'mobile_available': False,
+            'mobile_available': True,
             'hidden': False,
             'invitation_only': False,
 

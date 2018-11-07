@@ -12,12 +12,9 @@
 
 // MISC: expandable UI
 .is-expandable {
-
-  .title-expand {
-  }
-
   .expandable-icon {
     @include transition(all $tmg-f2 ease-in-out 0s);
+
     display: inline-block;
     vertical-align: middle;
     margin-right: ($baseline/4);
@@ -25,16 +22,17 @@
 
   // STATE: active
   &.is-ready {
-
     .expandable-icon {
       @include transform(rotate(-90deg));
     }
 
     .title-expand {
       @extend %ui-fake-link;
+
       color: $m-blue-d2;
 
-      &:hover, &:focus {
+      &:hover,
+      &:focus {
         color: $m-blue;
       }
     }
@@ -42,7 +40,6 @@
 
   // STATE: expanded
   &.is-expanded {
-
     .expandable-icon {
       @include transform(rotate(0));
       @include transform-origin(50% 50%);
@@ -61,23 +58,40 @@
   }
 
   // reset: typography
-  font-family: $sans-serif;
+  font-family: $font-family-sans-serif;
 
   // reset: typography - heading
-  h1, h2, h3, h4, h5 ,h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @extend %t-title;
+
     color: $m-gray-d4;
   }
 
   // reset: typography - copy
-  p, ol, ul, dl, input, select, textarea {
-    font-family: $f-sans-serif;
+  p,
+  ol,
+  ul,
+  dl,
+  input,
+  select,
+  textarea {
+    font-family: $font-family-sans-serif;
     color: $m-gray-d1;
   }
 
   .copy {
-
-    p, ul, li, dl, blockquote, input, select {
+    p,
+    ul,
+    li,
+    dl,
+    blockquote,
+    input,
+    select {
       margin-bottom: ($baseline*0.75);
 
       &:last-child {
@@ -90,10 +104,13 @@
 
 
   // reset: forms
-  input,textarea {
+  input,
+  textarea {
     font-style: normal;
     font-weight: 400;
+
     @include margin-right($baseline/5);
+
     padding: ($baseline/4) ($baseline/2);
   }
 
@@ -103,7 +120,8 @@
 
   label {
     @extend %t-weight4;
-    font-family: $sans-serif;
+
+    font-family: $font-family-sans-serif;
     font-style: normal;
     color: $m-gray-d4;
   }
@@ -119,9 +137,14 @@
   }
 
   // HACK: nasty override due to our bad input/button styling
-  button, input[type="submit"], input[type="button"], button[type="submit"] {
+  button,
+  input[type="submit"],
+  input[type="button"],
+  button[type="submit"] {
     @include font-size(16);
+
     @extend %t-weight4;
+
     text-transform: none;
     text-shadow: none;
     letter-spacing: 0;
@@ -136,7 +159,22 @@
   }
 
   //  reset: lists
-  .list-actions, .list-steps, .progress-steps, .list-controls, .list-fields, .list-nav, .list-help, .list-faq, .nav-wizard, .list-reqs, .list-faq, .review-tasks, .list-tips, .wrapper-photos, .field-group, .list-info {
+  .list-actions,
+  .list-steps,
+  .progress-steps,
+  .list-controls,
+  .list-fields,
+  .list-nav,
+  .list-help,
+  .list-faq,
+  .nav-wizard,
+  .list-reqs,
+  .list-faq,
+  .review-tasks,
+  .list-tips,
+  .wrapper-photos,
+  .field-group,
+  .list-info {
     @extend %ui-no-list;
   }
 
@@ -144,12 +182,13 @@
 
   // elements: layout
   .content-wrapper {
-    background: $m-gray-l4;
+    background: $body-bg;
     padding-bottom: 0;
   }
 
   .container {
     background-color: $white;
+
     @include padding(($baseline*1.5), ($baseline*1.5), ($baseline*2), ($baseline*1.5));
   }
 
@@ -198,12 +237,12 @@
 
   // UI: reports/tables
   .wrapper-report {
-
     .report {
       @extend %ui-window;
-      width: flex-grid(12,12);
+
+      width: flex-grid(12, 12);
       border-color: $m-gray-t3;
-      border-collapse:collapse;
+      border-collapse: collapse;
 
       tr {
         @include text-align(left);
@@ -211,6 +250,7 @@
 
       td {
         @extend %t-weight3;
+
         vertical-align: middle;
         padding: ($baseline*0.75) $baseline;
         color: $m-gray-d3;
@@ -218,11 +258,11 @@
 
       th {
         @extend %t-weight2;
+
         padding: ($baseline/2) $baseline;
       }
 
       thead {
-
         tr {
           border-bottom: 1px solid $m-gray-l3;
         }
@@ -230,6 +270,7 @@
         th[scope="col"] {
           @extend %t-title7;
           @extend %t-weight2;
+
           vertical-align: middle;
           color: $m-gray-d3;
           background: $m-gray-l4;
@@ -237,7 +278,6 @@
       }
 
       tbody {
-
         tr {
           border-bottom: 1px solid $m-gray-l3;
         }
@@ -245,19 +285,18 @@
 
       tfoot {
         background: $m-blue-t0;
-
-        th[scope="row"] {
-
-        }
       }
     }
   }
+
   .report-receipt-provider {
     @extend %ui-window;
+
     padding: ($baseline*0.75) $baseline;
 
     .provider-wrapper {
       width: 70%;
+
       @include float(left);
 
       .provider-info {
@@ -271,8 +310,8 @@
       @include text-align(center);
 
       .provider-logo img {
-          max-width: 160px;
-          margin-bottom: $baseline * 0.5;
+        max-width: 160px;
+        margin-bottom: $baseline * 0.5;
       }
 
       .complete-order {
@@ -280,6 +319,7 @@
 
         button {
           @extend %btn-pl-primary-base;
+
           white-space: nowrap;
         }
       }
@@ -289,9 +329,9 @@
 
   // UI: help
   .help-item {
-
     .title {
       @extend %hd-lv4;
+
       margin-bottom: ($baseline/4);
     }
 
@@ -315,19 +355,22 @@
 
     .msg {
       @include clearfix();
+
       max-width: grid-width(12);
       min-width: 760px;
       width: flex-grid(12);
       margin: 0 auto;
     }
 
-    .msg-content, .msg-icon {
+    .msg-content,
+    .msg-icon {
       display: block;
+
       @include float(left);
     }
 
     .msg-content {
-      width: flex-grid(11,12);
+      width: flex-grid(11, 12);
 
       .title {
         @extend %t-title6;
@@ -340,9 +383,12 @@
     }
 
     .msg-icon {
-      width: flex-grid(1,12);
+      width: flex-grid(1, 12);
+
       @extend %t-icon2;
+
       @include margin-right(flex-gutter());
+
       text-align: center;
       color: $m-blue;
     }
@@ -358,7 +404,6 @@
     }
 
     .msg-content {
-
       .title {
         color: $red;
       }
@@ -375,7 +420,6 @@
     }
 
     .msg-content {
-
       .title {
         color: $m-pink;
       }
@@ -386,10 +430,9 @@
 
   // UI: inline messages
   .msg-inline {
-
     &.msg-error {
-
-      .copy, .copy p {
+      .copy,
+      .copy p {
         color: $red;
       }
     }
@@ -399,51 +442,59 @@
 
   // UI: page header
   .page-header {
-    width: flex-grid(12,12);
+    width: flex-grid(12, 12);
     margin-bottom: 0;
     border-bottom: none;
 
     .title {
       @include clearfix();
-      width: flex-grid(12,12);
+
+      width: flex-grid(12, 12);
       margin: 0;
 
-      .sts-course, .sts-track {
+      .sts-course,
+      .sts-track {
         display: inline-block;
         vertical-align: middle;
       }
 
       .sts-track {
-        width: flex-grid(3,12);
+        width: flex-grid(3, 12);
+
         @include text-align(right);
 
         .sts-track-value {
           @extend %copy-badge;
+
           display: inline-block;
           background: $verified-color-lvl3;
           color: $white;
           font-weight: 600;
 
           .context {
-            opacity: 0.80;
+            opacity: 0.8;
             color: $white;
             letter-spacing: 0.1rem;
           }
         }
 
         &.professional-ed {
-
           .sts-track-value {
             background-color: $professional-color-lvl1;
           }
         }
       }
 
-      .sts-label, .sts-course-org, .sts-course-number, .sts-course-name {
+      .sts-label,
+      .sts-course-org,
+      .sts-course-number,
+      .sts-course-name {
         @extend %t-title5;
         @extend %t-weight4;
+
         @include font-size(14);
         @include line-height(14);
+
         display: inline-block;
         color: $gray;
         text-transform: none;
@@ -465,7 +516,7 @@
 
       .wrapper-sts {
         display: inline-block;
-        width: flex-grid(9,12);
+        width: flex-grid(9, 12);
         margin-bottom: ($baseline/4);
       }
 
@@ -477,7 +528,6 @@
         }
 
         &.professional-ed {
-
           .sts-track-value {
             background-color: $professional-color-lvl1;
           }
@@ -496,10 +546,14 @@
 
   .progress-sts {
     @include size($baseline/4);
+
     @extend %ui-depth1;
+
     position: absolute;
     top: 43px;
+
     @include left(7%);
+
     display: block;
     width: 83%;
     margin: 0 auto;
@@ -514,12 +568,13 @@
   }
 
   .progress {
-    width: flex-grid(12,12);
+    width: flex-grid(12, 12);
     margin: 0 auto;
     border-bottom: ($baseline/4) solid $m-gray-l4;
 
     .progress-steps {
       @include clearfix();
+
       position: relative;
       top: ($baseline/4);
       display: table;
@@ -528,18 +583,22 @@
 
     .progress-step {
       @extend %ui-depth2;
+
       position: relative;
       display: table-cell;
       height: ($baseline*6);
       padding: $baseline $baseline ($baseline*1.5) $baseline;
       text-align: center;
 
-      .wrapper-step-number, .step-number, .step-name {
+      .wrapper-step-number,
+      .step-number,
+      .step-name {
         display: block;
       }
 
       .wrapper-step-number {
         @include size(($baseline*2) ($baseline*2));
+
         margin: 0 auto ($baseline/2) auto;
         border-radius: ($baseline*10);
         border: ($baseline/5) solid $m-gray-l4;
@@ -548,8 +607,10 @@
         .step-number {
           @extend %t-title7;
           @extend %t-weight4;
+
           @include line-height(0);
           @include margin(16px, auto, 0, auto);
+
           color: $m-gray-l1;
         }
       }
@@ -557,12 +618,12 @@
       .step-name {
         @extend %t-title7;
         @extend %t-weight4;
+
         color: $m-gray-l1;
       }
 
       // confirmation step w/ icon
       &.progress-step-icon {
-
         .step-number {
           margin-top: ($baseline/2);
         }
@@ -576,7 +637,8 @@
           border-color: $verified-color-lvl3;
         }
 
-        .step-number, .step-name {
+        .step-number,
+        .step-name {
           color: $m-gray-l3;
         }
       }
@@ -584,13 +646,14 @@
       // STATE: is current
       &.is-current {
         border-bottom: ($baseline/5) solid $m-blue-d1;
-        opacity: 1.0;
+        opacity: 1;
 
         .wrapper-step-number {
           border-color: $m-blue-d1;
         }
 
-        .step-number, .step-name {
+        .step-number,
+        .step-name {
           color: $m-gray-d3;
         }
       }
@@ -604,29 +667,26 @@
 
     // carousel item
     .carousel-item {
-      opacity: 0.0;
+      opacity: 0;
     }
 
     // STATE: active
     .carousel-active {
-      opacity: 1.0;
-    }
-
-    // indiv slides
-    .wrapper-view {
-
+      opacity: 1;
     }
 
     .view {
-      width: flex-grid(12,12);
+      width: flex-grid(12, 12);
 
       > .title {
         @extend %hd-lv2;
+
         color: $m-blue-d1;
       }
 
       .instruction {
         @extend %t-copy-lead1;
+
         margin-bottom: $baseline;
       }
     }
@@ -649,10 +709,12 @@
 
     .requirements {
       margin-bottom: 10px;
+
       @include outer-container;
 
       .title {
         @extend %hd-lv3;
+
         margin-bottom: 10px;
       }
 
@@ -662,7 +724,7 @@
         border: 1px solid #e5e5e5;
         border-top: 5px solid #f4d78a;
         padding: 10px;
-        box-shadow: 1px 1px 3px #888888;
+        box-shadow: 1px 1px 3px #888;
 
         // TODO Determine why this is not responsive.
         @include span-columns(6);
@@ -671,12 +733,14 @@
 
     .wrapper-task {
       @include clearfix();
+
       width: flex-grid(12,12);
       margin: $baseline 0;
 
       .wrapper-help {
         @include float(right);
-        width: flex-grid(6,12);
+
+        width: flex-grid(6, 12);
         padding: 0 $baseline;
 
         .help {
@@ -721,9 +785,11 @@
 
       .task {
         @extend %ui-window;
+
         @include float(left);
         @include margin-right(flex-gutter());
-        width: flex-grid(6,12);
+
+        width: flex-grid(6, 12);
       }
 
       .controls {
@@ -736,14 +802,15 @@
         }
 
         .control {
-
           .action {
             @extend %btn-primary-blue;
+
             padding: ($baseline/2) ($baseline*0.75);
 
             .icon {
               @extend %t-icon4;
-              padding: ($baseline*.25) ($baseline*.5);
+
+              padding: ($baseline*0.25) ($baseline*0.5);
               display: block;
             }
           }
@@ -760,9 +827,9 @@
 
           // STATE: approved
           &.approved {
-
             .action {
               @extend %btn-verify-primary;
+
               padding: ($baseline/2) ($baseline*0.75);
             }
           }
@@ -771,41 +838,52 @@
         // control - redo
         .control-redo {
           position: absolute;
+
           @include left($baseline/2);
         }
 
         // control - take/do, retake
-        .control-do, .control-retake {
+        .control-do,
+        .control-retake {
           @include left(45%);
         }
 
         // control - approve
         .control-approve {
           position: absolute;
+
           @include right($baseline/2);
         }
       }
 
       .msg {
         @include clearfix();
+
         margin-top: ($baseline*2);
 
         .copy {
           @include float(left);
-          width: flex-grid(8,12);
+
+          width: flex-grid(8, 12);
+
           @include margin-right(flex-gutter());
         }
 
         .list-actions {
           position: relative;
           top: -($baseline/2);
+
           @include float(left);
-          width: flex-grid(4,12);
+
+          width: flex-grid(4, 12);
+
           @include text-align(right);
 
           .action-retakephotos a {
             @extend %btn-primary-blue;
+
             @include font-size(14);
+
             padding: ($baseline/2) ($baseline*0.75);
           }
         }
@@ -817,54 +895,50 @@
       }
     }
 
-    // indiv slides - photo
-    #wrapper-facephoto {
-
-    }
-
-    // indiv slides - ID
-    #wrapper-idphoto {
-
-    }
-
     // indiv slides - review
     #wrapper-review {
       color: $black;
 
       .page-title {
-          @extend %t-strong;
-          border-bottom: 2px solid $m-gray-d3;
-          padding-bottom: ($baseline*0.75);
-          margin-bottom: $baseline;
-          text-transform: inherit;
-        }
+        @extend %t-strong;
+
+        border-bottom: 2px solid $m-gray-d3;
+        padding-bottom: ($baseline*0.75);
+        margin-bottom: $baseline;
+        text-transform: inherit;
+      }
 
       .review {
-
         .certificate {
           @include font-size(18);
+
           background-repeat: no-repeat;
           padding-left: ($baseline*2.5);
           overflow: hidden;
           min-height: 32px;
 
-            p {
-              @include line-height(22);
+          p {
+            @include line-height(22);
+
+            @extend %t-strong;
+
+            margin-top: 0;
+            color: $black;
+          }
+
+          .purchase {
+            @include float(right);
+            @include margin-left($baseline*0.75);
+
+            text-align: right;
+
+            .product-info {
+              @include font-size(22);
+
               @extend %t-strong;
-              margin-top: 0;
-              color: $black;
+
+              color: $blue;
             }
-
-            .purchase {
-              @include float(right);
-              @include margin-left($baseline*0.75);
-              text-align: right;
-
-              .product-info {
-                @include font-size(22);
-                @extend %t-strong;
-                color: $blue;
-              }
           }
 
           &.verified_icon {
@@ -881,14 +955,15 @@
           overflow: auto;
           padding-bottom: ($baseline/4);
           margin: {
-              top: ($baseline / 2);
-              bottom: ($baseline * 0.75);
+            top: ($baseline / 2);
+            bottom: ($baseline * 0.75);
           };
 
           .payment-button {
             padding: ($baseline*0.4) $baseline;
             min-width: 200px;
           }
+
           .action-primary-blue {
             &.is-selected {
               background: $blue !important;
@@ -900,17 +975,20 @@
           border-bottom: 2px solid $gray;
           margin: ($baseline*1.12) 0;
         }
-    }
+      }
 
       .container {
         padding: ($baseline*0.75) 0;
 
         p {
           @include line-height(22);
+
           color: $black;
         }
+
         .photo-requirement {
           @include font-size(12);
+
           position: relative;
           padding-left: ($baseline*2);
           margin-top: ($baseline*0.75);
@@ -918,15 +996,15 @@
           background-position: left top;
 
           .fa {
-              position: absolute;
-              left:0;
-              color: $mediumGrey;
-            }
+            position: absolute;
+            left: 0;
+            color: $mediumGrey;
+          }
 
-            h6 {
-              font-weight: bold;
-              color: $extraDarkGrey;
-            }
+          h6 {
+            font-weight: bold;
+            color: $extraDarkGrey;
+          }
         }
       }
 
@@ -952,6 +1030,7 @@
 
           strong {
             @extend %t-weight5;
+
             color: $m-gray-d4;
           }
         }
@@ -959,15 +1038,17 @@
 
       // individual task - photos
       .review-task-photos {
-
         .wrapper-photos {
           @include clearfix();
-          width: flex-grid(12,12);
+
+          width: flex-grid(12, 12);
           margin: $baseline 0;
 
           .wrapper-photo {
             @include float(left);
-            width: flex-grid(6,12);
+
+            width: flex-grid(6, 12);
+
             @include margin-right(flex-gutter());
 
             &:last-child {
@@ -976,6 +1057,7 @@
 
             .placeholder-photo {
               @extend %ui-window;
+
               padding: ($baseline*0.75) $baseline;
 
               img {
@@ -1023,20 +1105,27 @@
 
         .copy {
           @include float(left);
-          width: flex-grid(8,12);
+
+          width: flex-grid(8, 12);
+
           @include margin-right(flex-gutter());
         }
 
         .list-actions {
           position: relative;
           top: -($baseline);
+
           @include float(left);
-          width: flex-grid(4,12);
+
+          width: flex-grid(4, 12);
+
           @include text-align(right);
 
           .action-editname a {
             @extend %btn-primary-blue;
+
             @include font-size(14);
+
             padding: ($baseline/2) ($baseline*0.75);
           }
         }
@@ -1044,14 +1133,15 @@
 
       // individual task - contribution
       .review-task-contribution {
-
         .list-fields {
           @include clearfix();
+
           margin: $baseline 0;
 
           .field {
             @include float(left);
             @include margin-right(($baseline/2));
+
             padding: ($baseline/2) ($baseline*0.75);
             background: $m-gray-t0;
 
@@ -1061,11 +1151,12 @@
           }
 
           .field-group-other {
-
             .contribution-option {
               display: inline-block;
               vertical-align: middle;
+
               @include margin-right($baseline/4);
+
               padding: 3px 0;
 
               &:last-child {
@@ -1073,19 +1164,18 @@
               }
             }
 
-            .contribution-option-other1 label, .contribution-option-other2 label {
+            .contribution-option-other1 label,
+            .contribution-option-other2 label {
               @extend %text-sr;
             }
           }
         }
       }
     }
-
   }
 
   // UI: camera states
   .cam {
-
     .placeholder-cam {
       position: relative;
       width: 95%;
@@ -1102,15 +1192,19 @@
           position: absolute;
           top: 40%;
           margin: 0 40px;
+
           @include text-align(center);
         }
       }
 
       // previously defined in HTML
-      video, canvas {
+      video,
+      canvas {
         position: relative;
         display: block;
+
         @include size(100% 100%);
+
         z-index: 500;
       }
     }
@@ -1131,15 +1225,17 @@
   .deco-divider {
     position: relative;
     display: block;
-    margin: $baseline 0 ($baseline*2) 0;
+    margin: $baseline 0 ($baseline*2);
     border-top: ($baseline/5) solid $m-gray-l4;
 
     .copy {
       @extend %t-copy-lead1;
       @extend %t-weight4;
+
+      @include left(calc(50% - 46px));
+
       position: absolute;
       top: -($baseline*1.25);
-      @include left(calc( 50% - 46px ));
       padding: ($baseline/2) ($baseline*1.5);
       background: white;
       text-align: center;
@@ -1153,20 +1249,21 @@
   // UI: nav - wizard
   .nav-wizard {
     @extend %ui-well;
+
     @include clearfix();
-    width: flex-grid(12,12);
+
+    width: flex-grid(12, 12);
     border-radius: ($baseline/10);
     background: $m-gray-l4;
     padding: ($baseline*0.75) $baseline;
 
-    .help-inline, .wizard-steps {
-
-    }
-
     .help-inline {
       @extend %t-copy-sub1;
+
       @include float(left);
-      width: flex-grid(6,12);
+
+      width: flex-grid(6, 12);
+
       @include margin(($baseline*0.75), flex-gutter(), 0, 0);
     }
 
@@ -1188,16 +1285,18 @@
 
   // UI: forms - payment
   .contribution-options {
-
     .contribution-option {
       border-radius: ($baseline/5);
 
-      .label, label, input {
+      .label,
+      label,
+      input {
         display: inline-block;
         vertical-align: middle;
       }
 
-      .label, label {
+      .label,
+      label {
         margin-bottom: 0;
         padding: 6px 0;
       }
@@ -1206,12 +1305,11 @@
         margin-right: ($baseline/4);
       }
 
-      .deco-denomination, .label-value, .denomination-name {
+      .deco-denomination,
+      .label-value,
+      .denomination-name {
         display: inline-block;
         vertical-align: middle;
-      }
-
-      .deco-denomination {
       }
 
       .label-value {
@@ -1220,6 +1318,7 @@
 
       .denomination-name {
         @include font-size(14);
+
         color: $m-gray-l1;
       }
 
@@ -1235,9 +1334,9 @@
 
   // help - faq
   .list-faq {
-
     .faq-question {
       @extend %hd-lv3;
+
       border-bottom: 1px solid $m-gray-l4;
       padding-bottom: ($baseline/4);
     }
@@ -1251,15 +1350,17 @@
 
   // UI: main content
   .content-main {
-    width: flex-grid(12,12);
+    width: flex-grid(12, 12);
 
     > .title {
       @extend %hd-lv2;
+
       color: $m-blue-d1;
     }
 
     .instruction {
       @extend %t-copy-lead1;
+
       margin-bottom: $baseline;
     }
   }
@@ -1282,6 +1383,7 @@
 
       .help-item {
         @include fill-parent;
+
         margin-bottom: 25px;
 
         &:last-child {
@@ -1290,10 +1392,11 @@
       }
     }
 
-    @include media( 550px ) {
+    @include media(550px) {
       .list-help {
         .help-item {
           @include span-columns(4);
+
           margin-bottom: 0;
 
           &.help-item-technical {
@@ -1310,7 +1413,7 @@
   &.step-select-track {
     .container {
       min-width: 0;
-      max-width: 1200px;
+      max-width: map-get($container-max-widths, xl);
     }
 
     .sts-track {
@@ -1319,6 +1422,7 @@
 
     .form-register-choose {
       @include clearfix();
+
       margin: ($baseline*2) 0;
 
       .deco-divider {
@@ -1327,13 +1431,15 @@
       }
     }
 
-    .register-choice, .help-register {
+    .register-choice,
+    .help-register {
       @include float(left);
     }
 
     .register-choice {
       @include fill-parent;
       @include margin(0, flex-gutter(), $baseline, 0);
+
       border-top: ($baseline/4) solid $m-gray-d4;
       padding: $baseline ($baseline*1.5);
       background: $m-gray-l4;
@@ -1342,7 +1448,8 @@
         margin-bottom: 0;
       }
 
-      .wrapper-copy, .list-actions {
+      .wrapper-copy,
+      .list-actions {
         display: inline-block;
         vertical-align: middle;
       }
@@ -1351,6 +1458,7 @@
         @include fill-parent;
         @include text-align(right);
         @include float(right);
+
         margin: ($baseline/4) 0;
         border-top: none;
         clear: both;
@@ -1359,8 +1467,9 @@
       .title {
         @extend %t-title5;
         @extend %t-weight5;
+
         margin-bottom: ($baseline/2);
-        width: calc( 100% - 30px );
+        width: calc(100% - 30px);
       }
 
       .copy {
@@ -1369,12 +1478,14 @@
 
       .wrapper-copy-inline {
         @extend %t-copy-base;
+
         display: inline-block;
         width: 100%;
       }
 
       .copy-inline {
         @extend %t-copy-base;
+
         display: inline-block;
       }
 
@@ -1383,6 +1494,7 @@
 
         input {
           @extend %t-weight4;
+
           padding: ($baseline/2) ($baseline*0.75);
           width: 100%;
           white-space: normal;
@@ -1396,8 +1508,10 @@
       .deco-ribbon {
         position: relative;
         top: -($baseline*2.5);
+
         @include right(-($baseline*0.35));
         @include float(right);
+
         display: block;
         width: ($baseline*2.9);
         height: ($baseline*4.2);
@@ -1419,21 +1533,26 @@
       .deco-ribbon {
         position: absolute;
         top: -10px;
+
         @include right($baseline);
+
         display: block;
         width: 45px;
         height: 45px;
         background: transparent url('#{$static-path}/images/verified-ribbon.png') no-repeat 0 0;
       }
 
-      .action-intro, .action-select {
+      .action-intro,
+      .action-select {
         display: inline-block;
         vertical-align: middle;
       }
 
       .action-intro {
         @include fill-parent;
+
         @extend %copy-detail;
+
         @include text-align(left);
       }
 
@@ -1441,13 +1560,10 @@
         @extend %btn-verify-primary;
       }
 
-      .action-intro {
-
-      }
-
       // extra register options/info
       .title-expand {
         @extend %t-copy-sub1;
+
         font-weight: 500 !important;
         display: inline-block;
         margin: 0;
@@ -1464,6 +1580,7 @@
       .title {
         @extend %hd-lv4;
         @extend %t-weight4;
+
         margin-top: $baseline;
         margin-bottom: ($baseline/2);
       }
@@ -1485,6 +1602,7 @@
       .label {
         @extend %hd-lv4;
         @extend %t-weight4;
+
         margin-bottom: ($baseline/2);
       }
     }
@@ -1492,9 +1610,10 @@
     .contribution-options {
       @include clearfix();
       @include fill-parent;
+
       margin: 0;
 
-      &:after{
+      &::after {
         clear: none;
         display: none;
       }
@@ -1503,6 +1622,7 @@
         @include fill-parent;
         @include float(left);
         @include margin(0, ($baseline/2), ($baseline/2), 0);
+
         padding: ($baseline/2) ($baseline*0.75);
         background: $m-gray-t0;
 
@@ -1522,11 +1642,12 @@
       }
 
       .field-group-other {
-
         .contribution-option {
           display: inline-block;
           vertical-align: middle;
+
           @include margin-right($baseline/4);
+
           padding: 1px 0;
 
           &:last-child {
@@ -1534,7 +1655,8 @@
           }
         }
 
-        .contribution-option-other1 label, .contribution-option-other2 label {
+        .contribution-option-other1 label,
+        .contribution-option-other2 label {
           @extend %text-sr;
         }
       }
@@ -1554,6 +1676,7 @@
       .register-choice {
         .list-actions {
           @include float(left);
+
           width: auto;
         }
 
@@ -1567,7 +1690,7 @@
       }
     }
 
-    @include media( $edx-bp-large ) {
+    @include media($edx-bp-large) {
       .contribution-options {
         .field {
           width: auto;
@@ -1577,6 +1700,7 @@
       .register-choice {
         .list-actions {
           @include span-columns(4);
+
           width: auto;
         }
 
@@ -1590,10 +1714,11 @@
       }
     }
 
-    @include media( $edx-bp-huge ) {
+    @include media($edx-bp-huge) {
       .register-choice {
         .list-actions {
           @include float(right);
+
           clear: none;
         }
       }
@@ -1602,7 +1727,6 @@
 
   // VIEW: requirements
   &.step-requirements {
-
     .help-item-technical {
       display: none;
     }
@@ -1613,13 +1737,14 @@
       // STATE: is current
       &#progress-step0 {
         border-bottom: ($baseline/5) solid $m-blue-d1;
-        opacity: 1.0;
+        opacity: 1;
 
         .wrapper-step-number {
           border-color: $m-blue-d1;
         }
 
-        .step-number, .step-name {
+        .step-number,
+        .step-name {
           color: $m-gray-d3;
         }
       }
@@ -1632,15 +1757,18 @@
 
     .list-reqs {
       @include clearfix();
-      width: flex-grid(12,12);
+
+      width: flex-grid(12, 12);
       text-align: center;
 
       .req {
         @extend %ui-window;
+
         @include margin-right(flex-gutter());
+
         display: inline-block;
         vertical-align: top;
-        width: flex-grid(4,12);
+        width: flex-grid(4, 12);
         min-height: ($baseline*15);
         border-color: $verified-color-lvl4;
         text-align: center;
@@ -1652,6 +1780,7 @@
         .title {
           @extend %t-title5;
           @extend %t-weight4;
+
           padding: $baseline;
           border-bottom: 1px solid $verified-color-lvl4;
           background: $verified-color-lvl5;
@@ -1661,17 +1790,19 @@
         .placeholder-art {
           position: relative;
           display: inline-block;
-          margin: $baseline 0 ($baseline/2) 0;
+          margin: $baseline 0 ($baseline/2);
           padding: $baseline;
           background: $verified-color-lvl3;
           border-radius: ($baseline*10);
 
           *[class^="icon"] {
             @extend %t-icon1;
+
             color: $white;
           }
 
-          .fa-stack-1x, .fa-stack-2x {
+          .fa-stack-1x,
+          .fa-stack-2x {
             position: relative;
           }
 
@@ -1682,8 +1813,11 @@
           .fa-stack-1x {
             @extend %ui-depth2;
             @extend %t-icon5;
+
             position: absolute;
+
             @include left(24px);
+
             top: 34px;
             background: $verified-color-lvl3;
             padding: 3px 5px;
@@ -1704,7 +1838,9 @@
 
             .id-photo {
               top: 13px;
+
               @include left(-3px);
+
               line-height: 1.1em;
             }
           }
@@ -1714,12 +1850,14 @@
           padding: ($baseline/2) $baseline;
         }
 
-        .copy-super, .copy-sub {
+        .copy-super,
+        .copy-sub {
           display: block;
         }
 
         .copy-super {
           @extend %t-copy-base;
+
           margin-bottom: ($baseline/2);
           color: $verified-color-lvl1;
         }
@@ -1736,12 +1874,14 @@
       // specific requirements
       .req-activate {
         @include float(left);
+
         text-align: center;
         border-color: $m-pink-l3;
 
         .title {
           @extend %t-title5;
           @extend %t-weight4;
+
           border-bottom-color: $m-pink-l3;
           background: tint($m-pink, 95%);
           color: $m-pink;
@@ -1753,6 +1893,7 @@
 
         .copy-super {
           @extend %t-copy-lead1;
+
           color: $m-pink;
         }
 
@@ -1763,18 +1904,12 @@
 
       // CASE: account not activated
       &.account-not-activated {
-
         .req {
-          width: flex-grid(3,12);
+          width: flex-grid(3, 12);
           min-height: ($baseline*18);
         }
       }
     }
-  }
-
-  // VIEW: take and review photos
-  &.step-photos {
-
   }
 
   // VIEW: take cam photo
@@ -1784,14 +1919,15 @@
     .progress .progress-step {
 
       // STATE: is completed
-       &#progress-step0 {
+      &#progress-step0 {
         border-bottom: ($baseline/5) solid $verified-color-lvl3;
 
         .wrapper-step-number {
           border-color: $verified-color-lvl3;
         }
 
-        .step-number, .step-name {
+        .step-number,
+        .step-name {
           color: $m-gray-l3;
         }
       }
@@ -1799,13 +1935,14 @@
       // STATE: is current
       &#progress-step1 {
         border-bottom: ($baseline/5) solid $m-blue-d1;
-        opacity: 1.0;
+        opacity: 1;
 
         .wrapper-step-number {
           border-color: $m-blue-d1;
         }
 
-        .step-number, .step-name {
+        .step-number,
+        .step-name {
           color: $m-gray-d3;
         }
       }
@@ -1824,14 +1961,16 @@
     .progress .progress-step {
 
       // STATE: is completed
-       &#progress-step0, &#progress-step1 {
+      &#progress-step0,
+      &#progress-step1 {
         border-bottom: ($baseline/5) solid $verified-color-lvl3;
 
         .wrapper-step-number {
           border-color: $verified-color-lvl3;
         }
 
-        .step-number, .step-name {
+        .step-number,
+        .step-name {
           color: $m-gray-l3;
         }
       }
@@ -1839,13 +1978,14 @@
       // STATE: is current
       &#progress-step2 {
         border-bottom: ($baseline/5) solid $m-blue-d1;
-        opacity: 1.0;
+        opacity: 1;
 
         .wrapper-step-number {
           border-color: $m-blue-d1;
         }
 
-        .step-number, .step-name {
+        .step-number,
+        .step-name {
           color: $m-gray-d3;
         }
       }
@@ -1859,7 +1999,6 @@
 
   // VIEW: review photos
   &.step-review {
-
     .help-item-technical {
       display: none;
     }
@@ -1869,16 +2008,17 @@
     }
 
     .modal {
-
       fieldset {
         margin-top: $baseline;
       }
 
       .close-modal {
         @include font-size(24);
+
         color: $m-blue-d3;
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           color: $m-blue-d1;
           border: none;
         }
@@ -1886,14 +2026,15 @@
     }
 
     .nav-wizard {
-
       .prompt-verify {
         @include float(left);
         @include margin(0, flex-gutter(), 0, 0);
-        width: flex-grid(6,12);
+
+        width: flex-grid(6, 12);
 
         .title {
           @extend %hd-lv4;
+
           margin-bottom: ($baseline/4);
         }
 
@@ -1906,7 +2047,7 @@
           margin-top: ($baseline/2);
         }
 
-        .action-verify label  {
+        .action-verify label {
           @extend %t-copy-sub1;
         }
       }
@@ -1916,6 +2057,7 @@
 
         .wizard-step {
           @include margin-right(flex-gutter());
+
           display: inline-block;
           vertical-align: middle;
 
@@ -1926,14 +2068,9 @@
       }
 
       .step-match {
-
         label {
           @extend %t-copy-sub1;
         }
-      }
-
-      .step-proceed {
-
       }
     }
 
@@ -1941,14 +2078,17 @@
     .progress .progress-step {
 
       // STATE: is completed
-       &#progress-step0, &#progress-step1, &#progress-step2 {
+      &#progress-step0,
+      &#progress-step1,
+      &#progress-step2 {
         border-bottom: ($baseline/5) solid $verified-color-lvl3;
 
         .wrapper-step-number {
           border-color: $verified-color-lvl3;
         }
 
-        .step-number, .step-name {
+        .step-number,
+        .step-name {
           color: $m-gray-l3;
         }
       }
@@ -1956,13 +2096,14 @@
       // STATE: is current
       &#progress-step3 {
         border-bottom: ($baseline/5) solid $m-blue-d1;
-        opacity: 1.0;
+        opacity: 1;
 
         .wrapper-step-number {
           border-color: $m-blue-d1;
         }
 
-        .step-number, .step-name {
+        .step-number,
+        .step-name {
           color: $m-gray-d3;
         }
       }
@@ -1976,7 +2117,6 @@
 
   // VIEW: confirmation/receipt
   &.step-confirmation {
-
     .help-item-technical {
       display: none;
     }
@@ -1985,14 +2125,19 @@
     .progress .progress-step {
 
       // STATE: is completed
-       &#progress-step0, &#progress-step1, &#progress-step2, &#progress-step3, &#progress-step4 {
+      &#progress-step0,
+      &#progress-step1,
+      &#progress-step2,
+      &#progress-step3,
+      &#progress-step4 {
         border-bottom: ($baseline/5) solid $verified-color-lvl3;
 
         .wrapper-step-number {
           border-color: $verified-color-lvl3;
         }
 
-        .step-number, .step-name {
+        .step-number,
+        .step-name {
           color: $m-gray-l3;
         }
       }
@@ -2000,13 +2145,14 @@
       // STATE: is current
       &#progress-step5 {
         border-bottom: ($baseline/5) solid $m-blue-d1;
-        opacity: 1.0;
+        opacity: 1;
 
         .wrapper-step-number {
           border-color: $m-blue-d1;
         }
 
-        .step-number, .step-name {
+        .step-number,
+        .step-name {
           color: $m-gray-d3;
         }
       }
@@ -2019,7 +2165,6 @@
 
     // information elements
     .list-info {
-
       .info-item {
         margin-bottom: ($baseline*1.5);
         border-bottom: ($baseline/4) solid $m-gray-l4;
@@ -2033,11 +2178,13 @@
 
         > .title {
           @extend %hd-lv3;
+
           margin-bottom: $baseline;
         }
 
         .copy {
           @extend %copy-base;
+
           margin-bottom: $baseline;
         }
       }
@@ -2045,61 +2192,44 @@
 
     // information - course
     .course-info {
-
       .options {
-
         .action-course {
           @extend %btn-primary-blue;
+
           @include font-size(14);
+
           padding: 5px 10px;
         }
       }
 
       .course-actions {
-
         .action-dashboard {
           @extend %btn-primary-blue;
         }
       }
     }
 
-    // information - verification
-    .verification-info {
-
-    }
-
-    // information - payment
-    .payment-info {
-
-    }
-
-    // UI: table/report
-    .wrapper-report {
-
-      .report {
-
-      }
-    }
-
     .instruction {
       display: inline-block;
-      width: flex-grid(8,12);
+      width: flex-grid(8, 12);
       vertical-align: top;
     }
 
     .actions-next {
       display: inline-block;
-      width: flex-grid(4,12);
+      width: flex-grid(4, 12);
       vertical-align: top;
       margin-top: $baseline;
     }
 
     .nav-item {
       display: block;
+
       @include margin(0, 0, $baseline, 0);
+
       text-align: center;
 
-      &.conditional:after {
+      &.conditional::after {
         content: "or";
         display: block;
         margin: $baseline 0;
@@ -2110,6 +2240,7 @@
   .reverify-success-step {
     .title {
       @extend %t-title4;
+
       text-align: left;
       text-transform: none;
     }
@@ -2121,11 +2252,11 @@
 }
 
 .reverify-blocked {
-
   @include padding(($baseline*1.5), ($baseline*1.5), ($baseline*2), ($baseline*1.5));
 
   .title {
     @extend %t-title4;
+
     text-align: left;
     text-transform: none;
   }
@@ -2135,7 +2266,7 @@
   }
 
   .action-primary {
-      @extend %btn-primary-blue;
+    @extend %btn-primary-blue;
   }
 }
 
@@ -2162,10 +2293,11 @@
 
 // STATE: already verified
 .register.is-verified {
-
   .nav-wizard .price-value {
     @extend %t-weight4;
+
     @include font-size(16);
+
     margin-top: 18px;
     color: $m-blue-d1;
   }
@@ -2178,14 +2310,15 @@
   .progress .progress-step {
 
     // STATE: is completed
-     &#progress-step1 {
+    &#progress-step1 {
       border-bottom: ($baseline/5) solid $verified-color-lvl3;
 
       .wrapper-step-number {
         border-color: $verified-color-lvl3;
       }
 
-      .step-number, .step-name {
+      .step-number,
+      .step-name {
         color: $m-gray-l3;
       }
     }
@@ -2193,13 +2326,14 @@
     // STATE: is current
     &#progress-step2 {
       border-bottom: ($baseline/5) solid $m-blue-d1;
-      opacity: 1.0;
+      opacity: 1;
 
       .wrapper-step-number {
         border-color: $m-blue-d1;
       }
 
-      .step-number, .step-name {
+      .step-number,
+      .step-name {
         color: $m-gray-d3;
       }
     }
@@ -2208,6 +2342,7 @@
   // progress indicator
   .progress-sts {
     width: 75%;
+
     @include left(13%);
   }
 
@@ -2220,7 +2355,6 @@
 
 // STATE: upgrading registration type
 .register.is-upgrading {
-
   .form-register-choose {
     margin-top: ($baseline*2) !important;
   }
@@ -2228,7 +2362,6 @@
 
 // STATE: re-verifying
 .register.is-not-verified {
-
   .help-item-emphasis {
     color: $m-pink;
   }
@@ -2236,6 +2369,7 @@
   // progress indicator
   .progress-sts {
     width: 72%;
+
     @include left(15%);
   }
 
@@ -2248,20 +2382,21 @@
       // STATE: is current
       &#progress-step1 {
         border-bottom: ($baseline/5) solid $m-blue-d1;
-        opacity: 1.0;
+        opacity: 1;
 
         .wrapper-step-number {
           border-color: $m-blue-d1;
         }
 
-        .step-number, .step-name {
+        .step-number,
+        .step-name {
           color: $m-gray-d3;
         }
       }
     }
 
     .progress-sts-value {
-      width: 0% !important;
+      width: 0 !important;
     }
   }
 
@@ -2272,14 +2407,15 @@
     .progress .progress-step {
 
       // STATE: is completed
-       &#progress-step1 {
+      &#progress-step1 {
         border-bottom: ($baseline/5) solid $verified-color-lvl3;
 
         .wrapper-step-number {
           border-color: $verified-color-lvl3;
         }
 
-        .step-number, .step-name {
+        .step-number,
+        .step-name {
           color: $m-gray-l3;
         }
       }
@@ -2287,13 +2423,14 @@
       // STATE: is current
       &#progress-step2 {
         border-bottom: ($baseline/5) solid $m-blue-d1;
-        opacity: 1.0;
+        opacity: 1;
 
         .wrapper-step-number {
           border-color: $m-blue-d1;
         }
 
-        .step-number, .step-name {
+        .step-number,
+        .step-name {
           color: $m-gray-d3;
         }
       }
@@ -2311,14 +2448,15 @@
     .progress .progress-step {
 
       // STATE: is completed
-       &#progress-step1, &#progress-step2 {
+      &#progress-step1, &#progress-step2 {
         border-bottom: ($baseline/5) solid $verified-color-lvl3;
 
         .wrapper-step-number {
           border-color: $verified-color-lvl3;
         }
 
-        .step-number, .step-name {
+        .step-number,
+        .step-name {
           color: $m-gray-l3;
         }
       }
@@ -2326,13 +2464,14 @@
       // STATE: is current
       &#progress-step3 {
         border-bottom: ($baseline/5) solid $m-blue-d1;
-        opacity: 1.0;
+        opacity: 1;
 
         .wrapper-step-number {
           border-color: $m-blue-d1;
         }
 
-        .step-number, .step-name {
+        .step-number,
+        .step-name {
           color: $m-gray-d3;
         }
       }
@@ -2344,20 +2483,20 @@
   }
 
   &.step-confirmation {
-
     .content-confirmation {
       margin-bottom: ($baseline*2);
     }
 
     .view {
-
       .title {
         @extend %hd-lv2;
+
         color: $m-blue-d1;
       }
 
       .instruction {
         @extend %t-copy-lead1;
+
         margin-bottom: $baseline;
       }
     }

@@ -10,14 +10,15 @@ Test utilities for mobile API tests:
      MobileCourseAccessTestMixin - tests for APIs with mobile_course_access.
 """
 # pylint: disable=no-member
-from datetime import timedelta
 
 import ddt
+import datetime
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils import timezone
 from mock import patch
 from opaque_keys.edx.keys import CourseKey
+import pytz
 from rest_framework.test import APITestCase
 
 from courseware.access_response import MobileAvailabilityError, StartDateError, VisibilityError
@@ -39,7 +40,12 @@ class MobileAPITestCase(ModuleStoreTestCase, APITestCase):
     """
     def setUp(self):
         super(MobileAPITestCase, self).setUp()
-        self.course = CourseFactory.create(mobile_available=True, static_asset_path="needed_for_split")
+        self.course = CourseFactory.create(
+            mobile_available=True,
+            static_asset_path="needed_for_split",
+            end=datetime.datetime.now(pytz.UTC),
+            certificate_available_date=datetime.datetime.now(pytz.UTC)
+        )
         self.user = UserFactory.create()
         self.password = 'test'
         self.username = self.user.username
@@ -110,7 +116,7 @@ class MobileAuthUserTestMixin(MobileAuthTestMixin):
     """
     def test_invalid_user(self):
         self.login_and_enroll()
-        self.api_response(expected_response_code=404, username='no_user')
+        self.api_response(expected_response_code=403, username='no_user')
 
     def test_other_user(self):
         # login and enroll as the test user
@@ -125,7 +131,7 @@ class MobileAuthUserTestMixin(MobileAuthTestMixin):
 
         # now login and call the API as the test user
         self.login()
-        self.api_response(expected_response_code=404, username=other.username)
+        self.api_response(expected_response_code=403, username=other.username)
 
 
 @ddt.ddt
@@ -172,7 +178,7 @@ class MobileCourseAccessTestMixin(MobileAPIMilestonesMixin):
         # pylint: disable=attribute-defined-outside-init
         self.course = CourseFactory.create(mobile_available=True, static_asset_path="needed_for_split")
         # pylint: disable=attribute-defined-outside-init
-        self.course.start = timezone.now() + timedelta(days=365)
+        self.course.start = timezone.now() + datetime.timedelta(days=365)
         self.init_course_access()
         self._verify_response(self.ALLOW_ACCESS_TO_UNRELEASED_COURSE, StartDateError(self.course.start))
 

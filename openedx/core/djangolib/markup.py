@@ -3,6 +3,8 @@ Utilities for use in Mako markup.
 """
 
 import markupsafe
+import bleach
+from mako.filters import decode
 
 # Text() can be used to declare a string as plain text, as HTML() is used
 # for HTML.  It simply wraps markupsafe's escape, which will HTML-escape if
@@ -31,3 +33,24 @@ def HTML(html):                                 # pylint: disable=invalid-name
 
     """
     return markupsafe.Markup(html)
+
+
+def strip_all_tags_but_br(string_to_strip):
+    """
+    Strips all tags from a string except <br/> and marks as HTML.
+
+    Usage:
+        <%page expression_filter="h"/>
+        <%!
+        from openedx.core.djangolib.markup import strip_all_tags_but_br
+        %>
+        ${accomplishment_course_title | n, strip_all_tags_but_br}
+    """
+
+    if string_to_strip is None:
+        string_to_strip = ""
+
+    string_to_strip = decode.utf8(string_to_strip)
+    string_to_strip = bleach.clean(string_to_strip, tags=['br'], strip=True)
+
+    return HTML(string_to_strip)

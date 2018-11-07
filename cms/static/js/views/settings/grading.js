@@ -1,11 +1,11 @@
 define(['js/views/validation',
-        'underscore',
-        'jquery',
-        'jquery.ui',
-        'js/views/settings/grader',
-        'edx-ui-toolkit/js/utils/string-utils',
-        'edx-ui-toolkit/js/utils/html-utils'
-    ],
+    'underscore',
+    'jquery',
+    'jquery.ui',
+    'js/views/settings/grader',
+    'edx-ui-toolkit/js/utils/string-utils',
+    'edx-ui-toolkit/js/utils/html-utils'
+],
     function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
         var GradingView = ValidatingView.extend({
     // Model class is CMS.Models.Settings.CourseGradingPolicy
@@ -76,7 +76,7 @@ define(['js/views/validation',
                     HtmlUtils.append(gradelist, self.template({model: gradeModel}));
                     var newEle = gradelist.children().last();
                     var newView = new GraderView({el: newEle,
-                model: gradeModel, collection: gradeCollection});
+                        model: gradeModel, collection: gradeCollection});
             // Listen in order to rerender when the 'cancel' button is
             // pressed
                     self.listenTo(newView, 'revert', _.bind(self.render, self));
@@ -92,8 +92,8 @@ define(['js/views/validation',
                 this.model.get('graders').push({});
             },
             fieldToSelectorMap: {
-                'grace_period': 'course-grading-graceperiod',
-                'minimum_grade_credit': 'course-minimum_grade_credit'
+                grace_period: 'course-grading-graceperiod',
+                minimum_grade_credit: 'course-minimum_grade_credit'
             },
             renderGracePeriod: function() {
                 var format = function(time) {
@@ -215,9 +215,9 @@ define(['js/views/validation',
                 return function(event, ui) {
                     var barIndex = ui.element.index();
             // min and max represent limits not labels (note, can's make smaller than 3 points wide)
-                    var min = (barIndex < cachethis.descendingCutoffs.length ? cachethis.descendingCutoffs[barIndex]['cutoff'] + 3 : 3);
+                    var min = (barIndex < cachethis.descendingCutoffs.length ? cachethis.descendingCutoffs[barIndex].cutoff + 3 : 3);
             // minus 2 b/c minus 1 is the element we're effecting. It's max is just shy of the next one above it
-                    var max = (barIndex >= 2 ? cachethis.descendingCutoffs[barIndex - 2]['cutoff'] - 3 : 97);
+                    var max = (barIndex >= 2 ? cachethis.descendingCutoffs[barIndex - 2].cutoff - 3 : 97);
                     ui.element.resizable('option', {minWidth: min * widthPerPoint, maxWidth: max * widthPerPoint});
                 };
             },
@@ -228,11 +228,11 @@ define(['js/views/validation',
                 return function(event, ui) {
                     var barIndex = ui.element.index();
             // min and max represent limits not labels (note, can's make smaller than 3 points wide)
-                    var min = (barIndex < cachethis.descendingCutoffs.length ? cachethis.descendingCutoffs[barIndex]['cutoff'] + 3 : 3);
+                    var min = (barIndex < cachethis.descendingCutoffs.length ? cachethis.descendingCutoffs[barIndex].cutoff + 3 : 3);
             // minus 2 b/c minus 1 is the element we're effecting. It's max is just shy of the next one above it
-                    var max = (barIndex >= 2 ? cachethis.descendingCutoffs[barIndex - 2]['cutoff'] - 3 : 100);
+                    var max = (barIndex >= 2 ? cachethis.descendingCutoffs[barIndex - 2].cutoff - 3 : 100);
                     var percentage = Math.min(Math.max(ui.size.width / cachethis.gradeBarWidth * 100, min), max);
-                    cachethis.descendingCutoffs[barIndex - 1]['cutoff'] = Math.round(percentage);
+                    cachethis.descendingCutoffs[barIndex - 1].cutoff = Math.round(percentage);
                     cachethis.renderGradeRanges();
                 };
             },
@@ -241,8 +241,8 @@ define(['js/views/validation',
         // the labels showing the range e.g., 71-80
                 var cutoffs = this.descendingCutoffs;
                 this.$el.find('.range').each(function(i) {
-                    var min = (i < cutoffs.length ? cutoffs[i]['cutoff'] : 0);
-                    var max = (i > 0 ? cutoffs[i - 1]['cutoff'] : 100);
+                    var min = (i < cutoffs.length ? cutoffs[i].cutoff : 0);
+                    var max = (i > 0 ? cutoffs[i - 1].cutoff : 100);
                     $(this).text(min + '-' + max);
                 });
             },
@@ -258,12 +258,12 @@ define(['js/views/validation',
             renderGradeLabels: function() {
         // When a grade is removed, keep the remaining grades consistent.
                 var _this = this;
-                if (_this.descendingCutoffs.length === 1 && _this.descendingCutoffs[0]['designation'] === _this.GRADES[0]) {
-                    _this.descendingCutoffs[0]['designation'] = 'Pass';
+                if (_this.descendingCutoffs.length === 1 && _this.descendingCutoffs[0].designation === _this.GRADES[0]) {
+                    _this.descendingCutoffs[0].designation = 'Pass';
                     _this.setTopGradeLabel();
                 } else {
                     _.each(_this.descendingCutoffs, function(cutoff, index) {
-                        cutoff['designation'] = _this.GRADES[index];
+                        cutoff.designation = _this.GRADES[index];
                     });
                     _this.updateDomGradeLabels();
                 }
@@ -281,7 +281,7 @@ define(['js/views/validation',
                 this.model.set('grade_cutoffs',
                 _.reduce(this.descendingCutoffs,
                         function(object, cutoff) {
-                            object[cutoff['designation']] = cutoff['cutoff'] / 100.0;
+                            object[cutoff.designation] = cutoff.cutoff / 100.0;
                             return object;
                         },
                 {}),
@@ -295,12 +295,12 @@ define(['js/views/validation',
             // TODO shouldn't we disable the button
                     return;
                 }
-                var failBarWidth = this.descendingCutoffs[gradeLength - 1]['cutoff'];
+                var failBarWidth = this.descendingCutoffs[gradeLength - 1].cutoff;
         // going to split the grade above the insertion point in half leaving fail in same place
-                var nextGradeTop = (gradeLength > 1 ? this.descendingCutoffs[gradeLength - 2]['cutoff'] : 100);
+                var nextGradeTop = (gradeLength > 1 ? this.descendingCutoffs[gradeLength - 2].cutoff : 100);
                 var targetWidth = failBarWidth + ((nextGradeTop - failBarWidth) / 2);
                 this.descendingCutoffs.push({designation: this.GRADES[gradeLength], cutoff: failBarWidth});
-                this.descendingCutoffs[gradeLength - 1]['cutoff'] = Math.round(targetWidth);
+                this.descendingCutoffs[gradeLength - 1].cutoff = Math.round(targetWidth);
 
                 var newGradeHtml = this.gradeCutoffTemplate({
                     descriptor: this.GRADES[gradeLength],
@@ -335,7 +335,7 @@ define(['js/views/validation',
                 var domElement = $(e.currentTarget).closest('li');
                 var index = domElement.index();
         // copy the boundary up to the next higher grade then remove
-                this.descendingCutoffs[index - 1]['cutoff'] = this.descendingCutoffs[index]['cutoff'];
+                this.descendingCutoffs[index - 1].cutoff = this.descendingCutoffs[index].cutoff;
                 this.descendingCutoffs.splice(index, 1);
                 domElement.remove();
 
@@ -347,7 +347,7 @@ define(['js/views/validation',
 
             updateDesignation: function(e) {
                 var index = $(e.currentTarget).closest('li').index();
-                this.descendingCutoffs[index]['designation'] = $(e.currentTarget).html();
+                this.descendingCutoffs[index].designation = $(e.currentTarget).html();
                 this.saveCutoffs();
             },
 
@@ -369,7 +369,7 @@ define(['js/views/validation',
                     this.descendingCutoffs.push({designation: cutoff, cutoff: Math.round(modelCutoffs[cutoff] * 100)});
                 }
                 this.descendingCutoffs = _.sortBy(this.descendingCutoffs,
-                                          function(gradeEle) { return -gradeEle['cutoff']; });
+                                          function(gradeEle) { return -gradeEle.cutoff; });
             },
             revertView: function() {
                 var self = this;

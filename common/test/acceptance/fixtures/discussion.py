@@ -83,7 +83,7 @@ class DiscussionContentFixture(object):
         """
         Push the data to the stub comments service.
         """
-        requests.put(
+        return requests.put(
             '{}/set_config'.format(COMMENTS_STUB_URL),
             data=self.get_config_data()
         )

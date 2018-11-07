@@ -1,6 +1,6 @@
 define(['backbone', 'jquery', 'underscore',
-        'common/js/spec_helpers/template_helpers', 'js/views/message_banner'
-       ],
+    'common/js/spec_helpers/template_helpers', 'js/views/message_banner'
+],
     function(Backbone, $, _, TemplateHelpers, MessageBannerView) {
         'use strict';
 

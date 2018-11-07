@@ -2,8 +2,6 @@
 Test utilities for waffle utilities.
 """
 
-from functools import wraps
-
 from waffle.testutils import override_flag
 
 # Can be used with FilteredQueryCountMixin.assertNumQueries() to blacklist
@@ -13,54 +11,56 @@ from waffle.testutils import override_flag
 WAFFLE_TABLES = ['waffle_utils_waffleflagcourseoverridemodel', 'waffle_flag', 'waffle_switch', 'waffle_sample']
 
 
-def override_waffle_flag(flag, active):
+class override_waffle_flag(override_flag):
     """
-    To be used as a decorator for a test function to override a namespaced
-    waffle flag.
+    override_waffle_flag is a contextmanager for easier testing of flags.
 
-        flag (WaffleFlag): The namespaced cached waffle flag.
-        active (Boolean): The value to which the flag will be set.
+    It accepts two parameters, the flag itself and its intended state. Example
+    usage::
 
-    Example usage:
+        with override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=True):
+            ...
+
+    If the flag already exists, its value will be changed inside the context
+    block, then restored to the original value. If the flag does not exist
+    before entering the context, it is created, then removed at the end of the
+    block.
+
+    It can also act as a decorator::
 
         @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=True)
-
+        def test_happy_mode_enabled():
+            ...
     """
+    _cached_value = None
 
-    def real_decorator(function):
+    def __init__(self, flag, active):
         """
-        Actual decorator function.
+
+        Args:
+             flag (WaffleFlag): The namespaced cached waffle flag.
+             active (Boolean): The value to which the flag will be set.
         """
+        self.flag = flag
+        waffle_namespace = flag.waffle_namespace
+        name = waffle_namespace._namespaced_name(flag.flag_name)  # pylint: disable=protected-access
+        super(override_waffle_flag, self).__init__(name, active)
 
-        @wraps(function)
-        def wrapper(*args, **kwargs):
-            """
-            Provides the actual override functionality of the decorator.
+    def __enter__(self):
+        super(override_waffle_flag, self).__enter__()
 
-            Saves the previous cached value of the flag and restores it (if it
-            was set), after overriding it.
+        # pylint: disable=protected-access
+        # Store values that have been cached on the flag
+        self._cached_value = self.flag.waffle_namespace._cached_flags.get(self.name)
+        self.flag.waffle_namespace._cached_flags[self.name] = self.active
 
-            """
-            waffle_namespace = flag.waffle_namespace
-            namespaced_flag_name = waffle_namespace._namespaced_name(flag.flag_name)
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        super(override_waffle_flag, self).__exit__(exc_type, exc_val, exc_tb)
 
-            # save previous value and whether it existed in the cache
-            cached_value_existed = namespaced_flag_name in waffle_namespace._cached_flags
-            if cached_value_existed:
-                previous_value = waffle_namespace._cached_flags[namespaced_flag_name]
+        # pylint: disable=protected-access
+        # Restore the cached values
+        waffle_namespace = self.flag.waffle_namespace
+        waffle_namespace._cached_flags.pop(self.name, None)
 
-            # set new value
-            waffle_namespace._cached_flags[namespaced_flag_name] = active
-
-            with override_flag(namespaced_flag_name, active):
-                # call wrapped function
-                function(*args, **kwargs)
-
-            # restore value
-            if cached_value_existed:
-                waffle_namespace._cached_flags[namespaced_flag_name] = previous_value
-            elif namespaced_flag_name in waffle_namespace._cached_flags:
-                del waffle_namespace._cached_flags[namespaced_flag_name]
-        return wrapper
-
-    return real_decorator
+        if self._cached_value is not None:
+            waffle_namespace._cached_flags[self.name] = self._cached_value

@@ -2,10 +2,10 @@
 Test for asset XML generation / parsing.
 """
 
+import unittest
 from path import Path as path
 from lxml import etree
 from contracts import ContractNotRespected
-import unittest
 
 from opaque_keys.edx.locator import CourseLocator
 from xmodule.assetstore import AssetMetadata
@@ -16,6 +16,8 @@ class TestAssetXml(unittest.TestCase):
     """
     Tests for storing/querying course asset metadata.
     """
+    shard = 1
+
     def setUp(self):
         super(TestAssetXml, self).setUp()
 

@@ -1,4 +1,4 @@
-(function(requirejs, require, define, undefined) {
+(function(require) {
     'use strict';
 
     require(
@@ -17,9 +17,9 @@ function(Initialize) {
             beforeEach(function() {
                 state.config = {};
                 state.config.transcriptLanguages = {
-                    'de': 'German',
-                    'en': 'English',
-                    'uk': 'Ukrainian'
+                    de: 'German',
+                    en: 'English',
+                    uk: 'Ukrainian'
                 };
             });
 
@@ -47,8 +47,8 @@ function(Initialize) {
 
                 state.lang = 'zh';
                 state.config.transcriptLanguages = {
-                    'de': 'German',
-                    'uk': 'Ukrainian'
+                    de: 'German',
+                    uk: 'Ukrainian'
                 };
                 expected = Initialize.prototype.getCurrentLanguage.call(state);
                 expect(expected).toBe('uk');
@@ -69,10 +69,10 @@ function(Initialize) {
                 state = {
                     speed: '1.50',
                     metadata: {
-                        'testId': {
+                        testId: {
                             duration: 'PT6M40S'
                         },
-                        'videoId': {
+                        videoId: {
                             duration: 'PT1M40S'
                         }
                     },
@@ -85,8 +85,7 @@ function(Initialize) {
                 };
             });
 
-            var msg = 'returns duration for the 1.0 speed if speed is not 1.0';
-            it(msg, function() {
+            it('returns duration for the 1.0 speed if speed is not 1.0', function() {
                 var expected;
 
                 state.speed = '1.50';
@@ -105,8 +104,7 @@ function(Initialize) {
                     expect(expected).toEqual(100);
                 });
 
-                var msg = 'returns duration for the 1.0 speed as a fall-back';
-                it(msg, function() {
+                it('returns duration for the 1.0 speed as a fall-back', function() {
                     var expected;
 
                     state.isFlashMode.and.returnValue(true);
@@ -182,8 +180,8 @@ function(Initialize) {
 
                 it('check mapping', function() {
                     var map = {
-                        '0.75': '0.50',
-                        '1.25': '1.50'
+                        0.75: '0.50',
+                        1.25: '1.50'
                     };
 
                     $.each(map, function(key, expected) {
@@ -223,7 +221,7 @@ function(Initialize) {
 
                 it('check mapping', function() {
                     var map = {
-                        '0.25': '0.75',
+                        0.25: '0.75',
                         '0.50': '0.75',
                         '2.0': '1.50'
                     };
@@ -277,21 +275,21 @@ function(Initialize) {
 
         describe('isFlashMode', function() {
             it('returns `true` if player in `flash` mode', function() {
-                var state = {
+                var testState = {
                         getPlayerMode: jasmine.createSpy().and.returnValue('flash')
                     },
                     isFlashMode = Initialize.prototype.isFlashMode,
-                    actual = isFlashMode.call(state);
+                    actual = isFlashMode.call(testState);
 
                 expect(actual).toBeTruthy();
             });
 
             it('returns `false` if player is not in `flash` mode', function() {
-                var state = {
+                var testState = {
                         getPlayerMode: jasmine.createSpy().and.returnValue('html5')
                     },
                     isFlashMode = Initialize.prototype.isFlashMode,
-                    actual = isFlashMode.call(state);
+                    actual = isFlashMode.call(testState);
 
                 expect(actual).toBeFalsy();
             });
@@ -299,25 +297,25 @@ function(Initialize) {
 
         describe('isHtml5Mode', function() {
             it('returns `true` if player in `html5` mode', function() {
-                var state = {
+                var testState = {
                         getPlayerMode: jasmine.createSpy().and.returnValue('html5')
                     },
                     isHtml5Mode = Initialize.prototype.isHtml5Mode,
-                    actual = isHtml5Mode.call(state);
+                    actual = isHtml5Mode.call(testState);
 
                 expect(actual).toBeTruthy();
             });
 
             it('returns `false` if player is not in `html5` mode', function() {
-                var state = {
+                var testState = {
                         getPlayerMode: jasmine.createSpy().and.returnValue('flash')
                     },
                     isHtml5Mode = Initialize.prototype.isHtml5Mode,
-                    actual = isHtml5Mode.call(state);
+                    actual = isHtml5Mode.call(testState);
 
                 expect(actual).toBeFalsy();
             });
         });
     });
 });
-}(RequireJS.requirejs, RequireJS.require, RequireJS.define));
+}(require));

@@ -6,7 +6,7 @@ from ccx_keys.locator import CCXLocator
 from django.contrib.auth.models import AnonymousUser, User
 from django.core.exceptions import PermissionDenied
 from django.test import TestCase
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
 
 from student.auth import add_users, has_studio_read_access, has_studio_write_access, remove_users, user_has_role
 from student.roles import CourseCreatorRole, CourseInstructorRole, CourseStaffRole
@@ -113,8 +113,12 @@ class CreatorGroupTest(TestCase):
 
     def test_add_user_to_group_requires_authenticated(self):
         with self.assertRaises(PermissionDenied):
-            self.admin.is_authenticated = mock.Mock(return_value=False)
-            add_users(self.admin, CourseCreatorRole(), self.user)
+            with mock.patch(
+                'django.contrib.auth.models.User.is_authenticated',
+                new_callable=mock.PropertyMock
+            ) as mock_is_auth:
+                mock_is_auth.return_value = False
+                add_users(self.admin, CourseCreatorRole(), self.user)
 
     def test_remove_user_from_group_requires_staff_access(self):
         with self.assertRaises(PermissionDenied):
@@ -128,8 +132,12 @@ class CreatorGroupTest(TestCase):
 
     def test_remove_user_from_group_requires_authenticated(self):
         with self.assertRaises(PermissionDenied):
-            self.admin.is_authenticated = mock.Mock(return_value=False)
-            remove_users(self.admin, CourseCreatorRole(), self.user)
+            with mock.patch(
+                'django.contrib.auth.models.User.is_authenticated',
+                new_callable=mock.PropertyMock
+            ) as mock_is_auth:
+                mock_is_auth.return_value = False
+                remove_users(self.admin, CourseCreatorRole(), self.user)
 
 
 class CCXCourseGroupTest(TestCase):
@@ -182,7 +190,7 @@ class CourseGroupTest(TestCase):
         self.global_admin = AdminFactory()
         self.creator = User.objects.create_user('testcreator', 'testcreator+courses@edx.org', 'foo')
         self.staff = User.objects.create_user('teststaff', 'teststaff+courses@edx.org', 'foo')
-        self.course_key = SlashSeparatedCourseKey('mitX', '101', 'test')
+        self.course_key = CourseLocator('mitX', '101', 'test')
 
     def test_add_user_to_course_group(self):
         """

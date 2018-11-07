@@ -6,7 +6,7 @@ from mock import patch
 from nose.plugins.attrib import attr
 import ddt
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.conf import settings
 from django.core.cache import cache as django_cache
 
@@ -45,7 +45,7 @@ class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
 
         self.courseware_url = reverse(
-            'course_root',
+            'openedx.course_experience.course_home',
             kwargs={'course_id': unicode(self.course.id)}
         )
         self.non_courseware_url = reverse('dashboard')
@@ -174,34 +174,3 @@ class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
         # even though we would have been blocked by country
         # access rules.
         self.assertEqual(response.status_code, 200)
-
-    @patch.dict(settings.FEATURES, {'EMBARGO': True})
-    def test_always_allow_course_detail_access(self):
-        """ Access to the Course Structure API's course detail endpoint should always be granted. """
-        # Make the user staff so that it has permissions to access the views.
-        self.user.is_staff = True
-        self.user.save()  # pylint: disable=no-member
-
-        # Blacklist an IP address
-        ip_address = "192.168.10.20"
-        IPFilter.objects.create(
-            blacklist=ip_address,
-            enabled=True
-        )
-
-        url = reverse('course_structure_api:v0:detail', kwargs={'course_id': unicode(self.course.id)})
-        response = self.client.get(
-            url,
-            HTTP_X_FORWARDED_FOR=ip_address,
-            REMOTE_ADDR=ip_address
-        )
-        self.assertEqual(response.status_code, 200)
-
-        # Test with a fully-restricted course
-        with restrict_course(self.course.id):
-            response = self.client.get(
-                url,
-                HTTP_X_FORWARDED_FOR=ip_address,
-                REMOTE_ADDR=ip_address
-            )
-            self.assertEqual(response.status_code, 200)

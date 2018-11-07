@@ -16,7 +16,7 @@ from common.test.acceptance.fixtures.course import CourseFixture
 from common.test.acceptance.fixtures.discussion import ForumsConfigMixin, MultipleThreadFixture, Thread
 from common.test.acceptance.pages.common.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.common.utils import confirm_prompt
-from common.test.acceptance.pages.lms.course_info import CourseInfoPage
+from common.test.acceptance.pages.lms.course_home import CourseHomePage
 from common.test.acceptance.pages.lms.learner_profile import LearnerProfilePage
 from common.test.acceptance.pages.lms.tab_nav import TabNavPage
 from common.test.acceptance.pages.lms.teams import (
@@ -38,7 +38,7 @@ class TeamsTabBase(EventsTestMixin, ForumsConfigMixin, UniqueCourseTest):
     def setUp(self):
         super(TeamsTabBase, self).setUp()
         self.tab_nav = TabNavPage(self.browser)
-        self.course_info_page = CourseInfoPage(self.browser, self.course_id)
+        self.course_home_page = CourseHomePage(self.browser, self.course_id)
         self.teams_page = TeamsPage(self.browser, self.course_id)
         # TODO: Refactor so resetting events database is not necessary
         self.reset_event_tracking()
@@ -115,7 +115,7 @@ class TeamsTabBase(EventsTestMixin, ForumsConfigMixin, UniqueCourseTest):
         enroll_course_id = self.course_id if enroll_in_course else None
         #pylint: disable=attribute-defined-outside-init
         self.user_info = AutoAuthPage(self.browser, course_id=enroll_course_id, staff=global_staff).visit().user_info
-        self.course_info_page.visit()
+        self.course_home_page.visit()
 
     def verify_teams_present(self, present):
         """
@@ -179,21 +179,6 @@ class TeamsTabTest(TeamsTabBase):
         Then I should not see the Teams tab
         """
         self.set_team_configuration({u"max_team_size": 10, u"topics": []})
-        self.verify_teams_present(False)
-
-    def test_teams_not_enabled_not_enrolled(self):
-        """
-        Scenario: teams tab should not be present if student is not enrolled in the course
-        Given there is a course with team configuration and topics
-
-        And I am not enrolled in that course, and am not global staff
-        When I view the course info page
-        Then I should not see the Teams tab
-        """
-        self.set_team_configuration(
-            {u"max_team_size": 10, u"topics": self.create_topics(1)},
-            enroll_in_course=False
-        )
         self.verify_teams_present(False)
 
     def test_teams_enabled(self):
@@ -902,7 +887,6 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
             alert.accept()
 
 
-@attr(shard=5)
 class TeamFormActions(TeamsTabBase):
     """
     Base class for create, edit, and delete team.
@@ -1001,6 +985,7 @@ class TeamFormActions(TeamsTabBase):
         )
 
 
+@attr(shard=5)
 @ddt.ddt
 class CreateTeamTest(TeamFormActions):
     """
@@ -1195,6 +1180,7 @@ class CreateTeamTest(TeamFormActions):
             self.verify_and_navigate_to_create_team_page()
 
 
+@attr(shard=21)
 @ddt.ddt
 class DeleteTeamTest(TeamFormActions):
     """
@@ -1318,6 +1304,7 @@ class DeleteTeamTest(TeamFormActions):
         self.teams_page.verify_topic_team_count(0)
 
 
+@attr(shard=17)
 @ddt.ddt
 class EditTeamTest(TeamFormActions):
     """
@@ -1534,6 +1521,7 @@ class EditTeamTest(TeamFormActions):
             self.verify_and_navigate_to_edit_team_page()
 
 
+@attr(shard=17)
 @ddt.ddt
 class EditMembershipTest(TeamFormActions):
     """
@@ -1635,7 +1623,7 @@ class EditMembershipTest(TeamFormActions):
         self.edit_membership_helper(role, cancel=True)
 
 
-@attr(shard=5)
+@attr(shard=17)
 @ddt.ddt
 class TeamPageTest(TeamsTabBase):
     """Tests for viewing a specific team"""

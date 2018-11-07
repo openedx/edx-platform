@@ -5,7 +5,7 @@ from ddt import data, ddt, unpack
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 
-from request_cache.middleware import RequestCache
+from openedx.core.djangoapps.request_cache.middleware import RequestCache
 
 from ..models import WaffleFlagCourseOverrideModel
 

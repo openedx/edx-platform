@@ -14,13 +14,12 @@ attribute is set and the FEATURE['ENABLE_EXPORT_GIT'] is set.
 """
 
 import logging
-from optparse import make_option
+from six import text_type
 
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.translation import ugettext as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 import contentstore.git_export_utils as git_export_utils
 from contentstore.git_export_utils import GitExportError
@@ -32,44 +31,34 @@ class Command(BaseCommand):
     """
     Take a course from studio and export it to a git repository.
     """
-
-    option_list = BaseCommand.option_list + (
-        make_option('--username', '-u', dest='user',
-                    help=('Specify a username from LMS/Studio to be used '
-                          'as the commit author.')),
-        make_option('--repo_dir', '-r', dest='repo',
-                    help='Specify existing git repo directory.'),
-    )
-
     help = _('Take the specified course and attempt to '
              'export it to a git repository\n. Course directory '
              'must already be a git repository. Usage: '
              ' git_export <course_loc> <git_url>')
 
+    def add_arguments(self, parser):
+        parser.add_argument('course_loc')
+        parser.add_argument('git_url')
+        parser.add_argument('--username', '-u', dest='user',
+                            help='Specify a username from LMS/Studio to be used as the commit author.')
+        parser.add_argument('--repo_dir', '-r', dest='repo', help='Specify existing git repo directory.')
+
     def handle(self, *args, **options):
         """
         Checks arguments and runs export function if they are good
         """
-
-        if len(args) != 2:
-            raise CommandError('This script requires exactly two arguments: '
-                               'course_loc and git_url')
-
         # Rethrow GitExportError as CommandError for SystemExit
         try:
-            course_key = CourseKey.from_string(args[0])
+            course_key = CourseKey.from_string(options['course_loc'])
         except InvalidKeyError:
-            try:
-                course_key = SlashSeparatedCourseKey.from_deprecated_string(args[0])
-            except InvalidKeyError:
-                raise CommandError(unicode(GitExportError.BAD_COURSE))
+            raise CommandError(text_type(GitExportError.BAD_COURSE))
 
         try:
             git_export_utils.export_to_git(
                 course_key,
-                args[1],
+                options['git_url'],
                 options.get('user', ''),
                 options.get('rdir', None)
             )
         except git_export_utils.GitExportError as ex:
-            raise CommandError(unicode(ex.message))
+            raise CommandError(text_type(ex))

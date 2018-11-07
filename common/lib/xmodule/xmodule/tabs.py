@@ -5,9 +5,10 @@ import logging
 from abc import ABCMeta
 
 from django.core.files.storage import get_storage_class
+from six import text_type
 from xblock.fields import List
 
-from openedx.core.lib.api.plugins import PluginError
+from openedx.core.lib.plugins import PluginError
 
 log = logging.getLogger("edx.courseware")
 
@@ -107,6 +108,13 @@ class CourseTab(object):
             user (User): an optional user interacting with the course (defaults to None)
         """
         raise NotImplementedError()
+
+    @property
+    def uses_bootstrap(self):
+        """
+        Returns true if this tab is rendered with Bootstrap.
+        """
+        return False
 
     def get(self, key, default=None):
         """
@@ -259,7 +267,7 @@ class TabFragmentViewMixin(object):
         # If not, then use the generic course tab URL
         def link_func(course, reverse_func):
             """ Returns a function that returns the course tab's URL. """
-            return reverse_func("course_tab_view", args=[course.id.to_deprecated_string(), self.type])
+            return reverse_func("course_tab_view", args=[text_type(course.id), self.type])
 
         return link_func
 
@@ -297,7 +305,7 @@ class StaticTab(CourseTab):
     def __init__(self, tab_dict=None, name=None, url_slug=None):
         def link_func(course, reverse_func):
             """ Returns a function that returns the static tab's URL. """
-            return reverse_func(self.type, args=[course.id.to_deprecated_string(), self.url_slug])
+            return reverse_func(self.type, args=[text_type(course.id), self.url_slug])
 
         self.url_slug = tab_dict.get('url_slug') if tab_dict else url_slug
 
@@ -435,13 +443,13 @@ class CourseTabList(List):
         return next((tab for tab in tab_list if tab.tab_id == tab_id), None)
 
     @staticmethod
-    def iterate_displayable(course, user=None, inline_collections=True):
+    def iterate_displayable(course, user=None, inline_collections=True, include_hidden=False):
         """
         Generator method for iterating through all tabs that can be displayed for the given course and
         the given user with the provided access settings.
         """
         for tab in course.tabs:
-            if tab.is_enabled(course, user=user) and not (user and tab.is_hidden):
+            if tab.is_enabled(course, user=user) and (include_hidden or not (user and tab.is_hidden)):
                 if tab.is_collection:
                     # If rendering inline that add each item in the collection,
                     # else just show the tab itself as long as it is not empty.
@@ -605,7 +613,7 @@ def course_reverse_func_from_name_func(reverse_name_func):
     """
     return lambda course, reverse_url_func: reverse_url_func(
         reverse_name_func(course),
-        args=[course.id.to_deprecated_string()]
+        args=[text_type(course.id)]
     )
 
 

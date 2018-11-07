@@ -1,5 +1,5 @@
 """Django admin interface for the shopping cart models. """
-from ratelimitbackend import admin
+from django.contrib import admin
 
 from shoppingcart.models import (
     Coupon,
@@ -21,13 +21,13 @@ class SoftDeleteCouponAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at',)
     actions = ['really_delete_selected']
 
-    def queryset(self, request):
-        """ Returns a QuerySet of all model instances that can be edited by the
-        admin site. This is used by changelist_view. """
-        # Default: qs = self.model._default_manager.get_active_coupons_query_set()
-        # Queryset with all the coupons including the soft-deletes: qs = self.model._default_manager.get_queryset()
-        query_string = self.model._default_manager.get_active_coupons_queryset()  # pylint: disable=protected-access
-        return query_string
+    def get_queryset(self, request):
+        """
+        Returns a QuerySet of all model instances that can be edited by the
+        admin site - used by changelist_view.
+        """
+        qs = super(SoftDeleteCouponAdmin, self).get_queryset(request)
+        return qs.filter(is_active=True)
 
     def get_actions(self, request):
         actions = super(SoftDeleteCouponAdmin, self).get_actions(request)

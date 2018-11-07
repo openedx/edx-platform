@@ -4,15 +4,18 @@
 <%namespace name='static' file='../static_content.html'/>
 
 <%!
-from openedx.core.djangolib.js_utils import js_escaped_string
 from django.utils.translation import ugettext as _
+from openedx.core.djangolib.js_utils import js_escaped_string
 from openedx.core.djangolib.markup import HTML
 %>
 
 <%block name="content">
 <div class="welcome-message">
     <div class="dismiss-message">
-        <button type="button" class="btn-link">${_("Dismiss")}</button>
+        <button type="button" class="btn-link">
+            <span class="sr">${_("Dismiss")}</span>
+            <span class="icon fa fa-times" aria-hidden="true"></span>
+        </button>
     </div>
 
     ${HTML(welcome_message_html)}
@@ -20,5 +23,7 @@ from openedx.core.djangolib.markup import HTML
 </%block>
 
 <%static:webpack entry="WelcomeMessage">
-    new WelcomeMessage("${dismiss_url | n, js_escaped_string}");
+    new WelcomeMessage({
+        dismissUrl: "${dismiss_url | n, js_escaped_string}",
+    });
 </%static:webpack>

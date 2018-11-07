@@ -2,9 +2,11 @@
 Platform plugins to support course bookmarks.
 """
 
-from django.core.urlresolvers import reverse
+from courseware.access import has_access
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 from openedx.features.course_experience.course_tools import CourseTool
+from student.models import CourseEnrollment
 
 
 class CourseBookmarksTool(CourseTool):
@@ -12,11 +14,20 @@ class CourseBookmarksTool(CourseTool):
     The course bookmarks tool.
     """
     @classmethod
+    def analytics_id(cls):
+        """
+        Returns an id to uniquely identify this tool in analytics events.
+        """
+        return 'edx.bookmarks'
+
+    @classmethod
     def is_enabled(cls, request, course_key):
         """
-        Always show the bookmarks tool.
+        The bookmarks tool is only enabled for enrolled users or staff.
         """
-        return True
+        if has_access(request.user, 'staff', course_key):
+            return True
+        return CourseEnrollment.is_enrolled(request.user, course_key)
 
     @classmethod
     def title(cls):

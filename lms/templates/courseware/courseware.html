@@ -6,7 +6,7 @@
 import waffle
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from edxnotes.helpers import is_feature_enabled as is_edxnotes_enabled
@@ -51,7 +51,7 @@ from openedx.features.course_experience import course_home_page_title, COURSE_OU
 <%static:css group='style-course-vendor'/>
 <%static:css group='style-course'/>
 ## Utility: Notes
-% if is_edxnotes_enabled(course):
+% if is_edxnotes_enabled(course, request.user):
 <%static:css group='style-student-notes'/>
 % endif
 
@@ -65,9 +65,6 @@ from openedx.features.course_experience import course_home_page_title, COURSE_OU
 <%block name="js_extra">
   <script type="text/javascript" src="${static.url('common/js/vendor/jquery.scrollTo.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
-
-  ## codemirror
-  <script type="text/javascript" src="${static.url('js/vendor/codemirror-compressed.js')}"></script>
 
   <%static:js group='courseware'/>
   <%include file="/mathjax_include.html" args="disable_fast_preview=True"/>
@@ -93,6 +90,16 @@ from openedx.features.course_experience import course_home_page_title, COURSE_OU
   <script type="text/javascript">
     var $$course_id = "${course.id | n, js_escaped_string}";
   </script>
+
+  % if not request.user.is_authenticated:
+      <script type="text/javascript">
+        // Disable discussions
+        $('.xblock-student_view-discussion button.discussion-show').attr('disabled', true);
+
+        // Insert message informing user discussions are only available to logged in users.
+        $('.discussion-module')
+      </script>
+  % endif
 
 ${HTML(fragment.foot_html())}
 
@@ -166,7 +173,7 @@ ${HTML(fragment.foot_html())}
                                 <span class="icon fa fa-angle-right" aria-hidden="true"></span>
                             % endif
                             % if chapter:
-                                <span class="nav-item nav-item-chapter">
+                                <span class="nav-item nav-item-chapter" data-course-position="${course.position}" data-chapter-position="${chapter.position}">
                                     <a href="${course_url}#${unicode(chapter.location)}">${chapter.display_name_with_default}</a>
                                 </span>
                                 <span class="icon fa fa-angle-right" aria-hidden="true"></span>
@@ -240,10 +247,10 @@ ${HTML(fragment.foot_html())}
     </div>
   % endif
 </div>
-% if course.show_calculator or is_edxnotes_enabled(course):
+% if course.show_calculator or is_edxnotes_enabled(course, request.user):
     <nav class="nav-utilities ${"has-utility-calculator" if course.show_calculator else ""}" aria-label="${_('Course Utilities')}">
       ## Utility: Notes
-      % if is_edxnotes_enabled(course):
+      % if is_edxnotes_enabled(course, request.user):
         <%include file="/edxnotes/toggle_notes.html" args="course=course"/>
       % endif
 
@@ -253,4 +260,3 @@ ${HTML(fragment.foot_html())}
       % endif
     </nav>
 % endif
-<%include file="../modal/accessible_confirm.html" />

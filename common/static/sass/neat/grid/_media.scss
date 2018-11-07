@@ -3,6 +3,7 @@
     @media screen and ($default-feature: nth($query, 1)) {
       $default-grid-columns: $grid-columns;
       $grid-columns: $total-columns !global;
+
       @content;
       $grid-columns: $default-grid-columns !global;
     }
@@ -20,6 +21,7 @@
     }
 
     $i: 1;
+
     @while $i <= $loopTo {
       $mediaQuery: $mediaQuery + '(' + nth($query, $i) + ': ' + nth($query, $i + 1) + ') ';
 

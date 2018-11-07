@@ -3,11 +3,12 @@ Views to show a course's bookmarks.
 """
 
 from django.contrib.auth.decorators import login_required
-from django.core.context_processors import csrf
-from django.core.urlresolvers import reverse
+from django.template.context_processors import csrf
+from django.urls import reverse
 from django.shortcuts import render_to_response
 from django.template.loader import render_to_string
 from django.utils.decorators import method_decorator
+from django.utils.translation import ugettext as _
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import View
@@ -16,6 +17,7 @@ from web_fragments.fragment import Fragment
 
 from courseware.courses import get_course_with_access
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
+from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.features.course_experience import default_course_url_name
 from util.views import ensure_valid_course_key
 
@@ -68,11 +70,13 @@ class CourseBookmarksFragmentView(EdxFragmentView):
         course_key = CourseKey.from_string(course_id)
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
 
+        language = UserPreference.get_value(request.user, 'pref-lang', default='en')
+
         context = {
             'csrf': csrf(request)['csrf_token'],
             'course': course,
             'bookmarks_api_url': reverse('bookmarks'),
-            'language_preference': 'en',  # TODO:
+            'language_preference': language,
         }
         html = render_to_string('course_bookmarks/course-bookmarks-fragment.html', context)
         inline_js = render_to_string('course_bookmarks/course_bookmarks_js.template', context)
@@ -80,3 +84,9 @@ class CourseBookmarksFragmentView(EdxFragmentView):
         self.add_fragment_resource_urls(fragment)
         fragment.add_javascript(inline_js)
         return fragment
+
+    def standalone_page_title(self, request, fragment, **kwargs):
+        """
+        Returns the standalone page title.
+        """
+        return _('Bookmarks')

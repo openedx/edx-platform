@@ -33,10 +33,14 @@ from openedx.core.djangolib.markup import HTML, Text
     <%static:include path="common/templates/image-modal.underscore" />
 </script>
 <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
+% if not settings.STUDIO_FRONTEND_CONTAINER_URL:
+    <link rel="stylesheet" type="text/css" href="${static.url('common/css/vendor/common.min.css')}" />
+    <link rel="stylesheet" type="text/css" href="${static.url('common/css/vendor/editImageModal.min.css')}" />
+% endif
 </%block>
 
-<%block name="requirejs">
-    require(["js/factories/container"], function(ContainerFactory) {
+<%block name="page_bundle">
+    <%static:webpack entry="js/factories/container">
         ContainerFactory(
             ${component_templates | n, dump_js_escaped_json},
             ${xblock_info | n, dump_js_escaped_json},
@@ -47,10 +51,14 @@ from openedx.core.djangolib.markup import HTML, Text
                 outlineURL: "${outline_url | n, js_escaped_string}"
             }
         );
-    });
+    </%static:webpack>
 </%block>
 
 <%block name="content">
+
+<script type="text/javascript">
+    window.STUDIO_FRONTEND_IN_CONTEXT_IMAGE_SELECTION = true;
+</script>
 
 
 <div class="wrapper-mast wrapper">
@@ -71,6 +79,8 @@ from openedx.core.djangolib.markup import HTML, Text
             <div class="wrapper-xblock-field incontext-editor is-editable"
                  data-field="display_name" data-field-display-name="${_("Display Name")}">
                 <h1 class="page-header-title xblock-field-value incontext-editor-value"><span class="title-value">${xblock.display_name_with_default}</span></h1>
+            </div>
+            <div class="container-access">
             </div>
         </div>
 
@@ -144,7 +154,7 @@ from openedx.core.djangolib.markup import HTML, Text
                         <div class="wrapper-unit-id bar-mod-content">
                             <h5 class="title">${_("Location ID")}</h5>
                             <p class="unit-id">
-                                <span class="unit-id-value" id="unit-location-id-input">${unit.location.name}</span>
+                                <span class="unit-id-value" id="unit-location-id-input">${unit.location.block_id}</span>
                                 <span class="tip"><span class="sr">Tip: </span>${_('To create a link to this unit from an HTML component in this course, enter "/jump_to_id/<location ID>" as the URL value.')}</span>
                             </p>
                         </div>
@@ -157,6 +167,25 @@ from openedx.core.djangolib.markup import HTML, Text
                 % endif
             </aside>
         </section>
+        <div id="edit-image-modal">
+        <%static:studiofrontend entry="editImageModal">
+            {
+            "course": {
+                "id": "${context_course.id | n, js_escaped_string}",
+                "name": "${context_course.display_name_with_default | n, js_escaped_string}",
+                "url_name": "${context_course.location.name | n, js_escaped_string}",
+                "org": "${context_course.location.org | n, js_escaped_string}",
+                "num": "${context_course.location.course | n, js_escaped_string}",
+                "display_course_number": "${context_course.display_coursenumber | n, js_escaped_string}",
+                "revision": "${context_course.location.revision | n, js_escaped_string}"
+            },
+            "help_tokens": {
+                "image_accessibility": "${get_online_help_info('image_accessibility')['doc_url'] | n, js_escaped_string}"
+            },
+            "lang": "${language_code | n, js_escaped_string}"
+            }
+        </%static:studiofrontend>
+        </div>
     </div>
 </div>
 </%block>

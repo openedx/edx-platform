@@ -36,6 +36,8 @@ class LibraryTestCase(ModuleStoreTestCase):
     """
     Common functionality for content libraries tests
     """
+    shard = 1
+
     def setUp(self):
         super(LibraryTestCase, self).setUp()
 
@@ -148,6 +150,8 @@ class TestLibraries(LibraryTestCase):
     """
     High-level tests for libraries
     """
+    shard = 1
+
     @ddt.data(
         (2, 1, 1),
         (2, 2, 2),
@@ -480,6 +484,8 @@ class TestLibraryAccess(SignalDisconnectTestMixin, LibraryTestCase):
     """
     Test Roles and Permissions related to Content Libraries
     """
+    shard = 1
+
     def setUp(self):
         """ Create a library, staff user, and non-staff user """
         super(TestLibraryAccess, self).setUp()
@@ -813,6 +819,8 @@ class TestOverrides(LibraryTestCase):
     """
     Test that overriding block Scope.settings fields from a library in a specific course works
     """
+    shard = 1
+
     def setUp(self):
         super(TestOverrides, self).setUp()
         self.original_display_name = "A Problem Block"
@@ -997,6 +1005,8 @@ class TestIncompatibleModuleStore(LibraryTestCase):
     """
     Tests for proper validation errors with an incompatible course modulestore.
     """
+    shard = 1
+
     def setUp(self):
         super(TestIncompatibleModuleStore, self).setUp()
         # Create a course in an incompatible modulestore.

@@ -3,6 +3,7 @@
 from django.utils.translation import ugettext as _
 from contentstore.views.helpers import xblock_studio_url
 from contentstore.utils import is_visible_to_specific_partition_groups
+from lms.lib.utils import is_unit
 from openedx.core.djangolib.js_utils import (
     dump_js_escaped_json, js_escaped_string
 )
@@ -14,6 +15,7 @@ section_class = "level-nesting" if show_inline else "level-element"
 collapsible_class = "is-collapsible" if xblock.has_children else ""
 label = xblock.display_name_with_default or xblock.scope_ids.block_type
 messages = xblock.validate().to_json()
+block_is_unit = is_unit(xblock)
 %>
 
 <%namespace name='static' file='static_content.html'/>
@@ -24,15 +26,14 @@ messages = xblock.validate().to_json()
 </script>
 </%block>
 
-<script>
-    require(["jquery", "js/factories/xblock_validation"], function($, XBlockValidationFactory) {
-        XBlockValidationFactory(
-            ${messages | n, dump_js_escaped_json},
-            ${bool(xblock_url) | n, dump_js_escaped_json},  // xblock_url will be None or a string
-            ${bool(is_root) | n, dump_js_escaped_json},  // is_root will be None or a boolean
-            $('div.xblock-validation-messages[data-locator="${xblock.location | n, js_escaped_string}"]')
-        );
-    });
+<script type="text/javascript">
+    XBlockValidationFactory(
+        ${messages | n, dump_js_escaped_json},
+        ${bool(xblock_url) | n, dump_js_escaped_json},  // xblock_url will be None or a string
+        ${bool(is_root) | n, dump_js_escaped_json},  // is_root will be None or a boolean
+        ${bool(block_is_unit) | n, dump_js_escaped_json},  // block_is_unit will be None or a boolean
+        $('div.xblock-validation-messages[data-locator="${xblock.location | n, js_escaped_string}"]')
+    );
 </script>
 
 % if not is_root:
@@ -82,7 +83,7 @@ messages = xblock.validate().to_json()
                             </li>
                             % if can_edit_visibility:
                                 <li class="action-item action-visibility">
-                                    <button data-tooltip="${_("Access Settings")}" class="btn-default visibility-button action-button">
+                                    <button data-tooltip="${_("Access Settings")}" class="btn-default access-button action-button">
                                         <span class="icon fa fa-gear" aria-hidden="true"></span>
                                         <span class="sr">${_("Set Access")}</span>
                                     </button>

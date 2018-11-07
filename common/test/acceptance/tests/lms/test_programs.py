@@ -62,6 +62,7 @@ class ProgramPageBase(ProgramsConfigMixin, CatalogIntegrationMixin, UniqueCourse
         cache_programs_page.visit()
 
 
+@attr(shard=21)
 class ProgramListingPageTest(ProgramPageBase):
     """Verify user-facing behavior of the program listing page."""
     def setUp(self):
@@ -93,22 +94,6 @@ class ProgramListingPageTest(ProgramPageBase):
 
         self.assertTrue(self.listing_page.is_sidebar_present)
         self.assertFalse(self.listing_page.are_cards_present)
-
-    def test_enrollments_and_programs(self):
-        """
-        Verify that cards appear when the user has enrollments
-        which are included in at least one active program.
-        """
-        self.auth()
-
-        program = self.create_program()
-        self.stub_catalog_api(programs=[program])
-        self.cache_programs()
-
-        self.listing_page.visit()
-
-        self.assertTrue(self.listing_page.is_sidebar_present)
-        self.assertTrue(self.listing_page.are_cards_present)
 
 
 @attr('a11y')

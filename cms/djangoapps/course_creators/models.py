@@ -35,7 +35,7 @@ class CourseCreator(models.Model):
         (DENIED, _(u'denied')),
     )
 
-    user = models.OneToOneField(User, help_text=_("Studio user"))
+    user = models.OneToOneField(User, help_text=_("Studio user"), on_delete=models.CASCADE)
     state_changed = models.DateTimeField('state last updated', auto_now_add=True,
                                          help_text=_("The date when state was last updated"))
     state = models.CharField(max_length=24, blank=False, choices=STATES, default=UNREQUESTED,

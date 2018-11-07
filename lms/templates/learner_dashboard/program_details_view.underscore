@@ -1,5 +1,6 @@
 <header class="js-program-header program-header full-width-banner"></header>
-<section class="program-details-content">
+<!-- TODO: consider if article is the most appropriate element here -->
+<article class="program-details-content">
     <div class="program-heading">
             <% if (completedCount === totalCount) { %>
                 <h3 class="program-heading-title"><%- gettext('Congratulations!') %></h3>
@@ -19,6 +20,24 @@
                     </div>
                     <div><%- gettext('To complete the program, you must earn a verified certificate for each course.') %></div>
                 </div>
+            <% } %>
+            <% if (is_learner_eligible_for_one_click_purchase && (typeof is_mobile_only === 'undefined' || is_mobile_only === false)) { %>
+            <a href="<%- completeProgramURL %>" class="btn-brand btn cta-primary upgrade-button complete-program">
+                <%- gettext('Upgrade All Remaining Courses (')%>
+                <% if (discount_data.is_discounted) { %>
+                    <span class='list-price'>
+                        <%- StringUtils.interpolate(
+                            gettext('${listPrice}'), {listPrice: discount_data.total_incl_tax_excl_discounts.toFixed(2)}
+                        )
+                        %>
+                    </span>
+                <% } %>
+                <%- StringUtils.interpolate(
+                        gettext(' ${price} {currency} )'),
+                        {price: full_program_price.toFixed(2), currency: discount_data.currency}
+                    )
+                %>
+            </a>
             <% } %>
     </div>
     <div class="course-list-headings">
@@ -55,5 +74,5 @@
             <% } %>
         </div>
     </div>
-</section>
+</article>
 <aside class="js-program-sidebar program-sidebar"></aside>

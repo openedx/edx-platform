@@ -62,6 +62,7 @@ function(VideoPlayer, i18n, moment, _) {
             });
         },
 
+        /* eslint-disable no-use-before-define */
         methodsDict = {
             bindTo: bindTo,
             fetchMetadata: fetchMetadata,
@@ -77,6 +78,7 @@ function(VideoPlayer, i18n, moment, _) {
             parseYoutubeStreams: parseYoutubeStreams,
             setPlayerMode: setPlayerMode,
             setSpeed: setSpeed,
+            setAutoAdvance: setAutoAdvance,
             speedToString: speedToString,
             trigger: trigger,
             youtubeId: youtubeId,
@@ -84,6 +86,7 @@ function(VideoPlayer, i18n, moment, _) {
             loadYoutubePlayer: loadYoutubePlayer,
             loadYouTubeIFrameAPI: loadYouTubeIFrameAPI
         },
+        /* eslint-enable no-use-before-define */
 
         _youtubeApiDeferred = null,
         _oldOnYouTubeIframeAPIReady;
@@ -238,17 +241,17 @@ function(VideoPlayer, i18n, moment, _) {
     //     Defines whether or not captions are shown on first viewing.
     //
     //     Option
-    //          this.hide_captions = true | false
+    //          this.hideCaptions = true | false
     //
     //     represents the user's choice of having the subtitles shown or
     //     hidden. This choice is stored in cookies.
     function _configureCaptions(state) {
         if (state.config.showCaptions) {
-            state.hide_captions = ($.cookie('hide_captions') === 'true');
+            state.hideCaptions = ($.cookie('hide_captions') === 'true');
         } else {
-            state.hide_captions = true;
+            state.hideCaptions = true;
 
-            $.cookie('hide_captions', state.hide_captions, {
+            $.cookie('hide_captions', state.hideCaptions, {
                 expires: 3650,
                 path: '/'
             });
@@ -286,7 +289,7 @@ function(VideoPlayer, i18n, moment, _) {
      */
     function extractHLSVideoSources(state) {
         return _.filter(state.config.sources, function(source) {
-            return /\.m3u8$/.test(source);
+            return /\.m3u8(\?.*)?$/.test(source);
         });
     }
 
@@ -325,7 +328,7 @@ function(VideoPlayer, i18n, moment, _) {
             .find('.spinner')
             .attr({
                 'aria-hidden': 'true',
-                'tabindex': -1
+                tabindex: -1
             });
     }
 
@@ -367,33 +370,41 @@ function(VideoPlayer, i18n, moment, _) {
                 // Compatibility keys used to change names of some parameters in
                 // the final configuration.
             compatKeys = {
-                'start': 'startTime',
-                'end': 'endTime'
+                start: 'startTime',
+                end: 'endTime'
             },
                 // Conversions used to pre-process some configuration data.
             conversions = {
-                'showCaptions': isBoolean,
-                'autoplay': isBoolean,
-                'autohideHtml5': isBoolean,
-                'savedVideoPosition': function(value) {
+                showCaptions: isBoolean,
+                autoplay: isBoolean,
+                autohideHtml5: isBoolean,
+                autoAdvance: function(value) {
+                    var shouldAutoAdvance = storage.getItem('auto_advance');
+                    if (_.isUndefined(shouldAutoAdvance)) {
+                        return isBoolean(value) || false;
+                    } else {
+                        return shouldAutoAdvance;
+                    }
+                },
+                savedVideoPosition: function(value) {
                     return storage.getItem('savedVideoPosition', true) ||
                             Number(value) ||
                             0;
                 },
-                'speed': function(value) {
+                speed: function(value) {
                     return storage.getItem('speed', true) || value;
                 },
-                'generalSpeed': function(value) {
+                generalSpeed: function(value) {
                     return storage.getItem('general_speed') ||
                             value ||
                             '1.0';
                 },
-                'transcriptLanguage': function(value) {
+                transcriptLanguage: function(value) {
                     return storage.getItem('language') ||
                             value ||
                             'en';
                 },
-                'ytTestTimeout': function(value) {
+                ytTestTimeout: function(value) {
                     value = parseInt(value, 10);
 
                     if (!isFinite(value)) {
@@ -402,7 +413,7 @@ function(VideoPlayer, i18n, moment, _) {
 
                     return value;
                 },
-                'startTime': function(value) {
+                startTime: function(value) {
                     value = parseInt(value, 10);
                     if (!isFinite(value) || value < 0) {
                         return 0;
@@ -410,7 +421,7 @@ function(VideoPlayer, i18n, moment, _) {
 
                     return value;
                 },
-                'endTime': function(value) {
+                endTime: function(value) {
                     value = parseInt(value, 10);
 
                     if (!isFinite(value) || value === 0) {
@@ -568,7 +579,9 @@ function(VideoPlayer, i18n, moment, _) {
         this.speed = this.speedToString(
             this.config.speed || this.config.generalSpeed
         );
+        this.auto_advance = this.config.autoAdvance;
         this.htmlPlayerLoaded = false;
+        this.duration = this.metadata.duration;
 
         _setConfigurations(this);
 
@@ -688,10 +701,10 @@ function(VideoPlayer, i18n, moment, _) {
         // Youtube Flash =  [0.75, 1, 1.25, 1.5]
         // Youtube HTML5 =  [0.25, 0.5, 1, 1.5, 2]
         var map = {
-            '0.25': '0.75', // Youtube HTML5 -> HTML5 or Youtube Flash
+            0.25: '0.75', // Youtube HTML5 -> HTML5 or Youtube Flash
             '0.50': '0.75', // Youtube HTML5 -> HTML5 or Youtube Flash
-            '0.75': '0.50', // HTML5 or Youtube Flash -> Youtube HTML5
-            '1.25': '1.50', // HTML5 or Youtube Flash -> Youtube HTML5
+            0.75: '0.50', // HTML5 or Youtube Flash -> Youtube HTML5
+            1.25: '1.50', // HTML5 or Youtube Flash -> Youtube HTML5
             '2.0': '1.50'   // Youtube HTML5 -> HTML5 or Youtube Flash
         };
 
@@ -701,6 +714,10 @@ function(VideoPlayer, i18n, moment, _) {
             newSpeed = map[newSpeed];
             this.speed = _.contains(this.speeds, newSpeed) ? newSpeed : '1.0';
         }
+    }
+
+    function setAutoAdvance(enabled) {
+        this.auto_advance = enabled;
     }
 
     function getVideoMetadata(url, callback) {

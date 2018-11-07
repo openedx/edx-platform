@@ -24,7 +24,7 @@ from rest_framework_oauth.authentication import OAuth2Authentication
 from courseware.courses import get_course_with_access, has_access
 from django_comment_client.utils import has_discussion_privileges
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
-from openedx.core.lib.api.paginators import DefaultPagination, paginate_search_results
+from edx_rest_framework_extensions.paginators import DefaultPagination, paginate_search_results
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.permissions import IsStaffOrReadOnly
 from openedx.core.lib.api.view_utils import (
@@ -499,7 +499,7 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
             return Response(status=status.HTTP_403_FORBIDDEN)
 
         data = request.data.copy()
-        data['course_id'] = course_key
+        data['course_id'] = unicode(course_key)
 
         serializer = CourseTeamCreationSerializer(data=data)
         add_serializer_errors(serializer, data, field_errors)
@@ -1055,7 +1055,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
                     CourseAccessRole.objects.filter(user=request.user, role='staff').values_list('course_id', flat=True)
                 )
                 accessible_course_ids = [item for sublist in (enrolled_courses, staff_courses) for item in sublist]
-                if requested_course_id is not None and requested_course_id not in accessible_course_ids:
+                if requested_course_id is not None and requested_course_key not in accessible_course_ids:
                     return Response(status=status.HTTP_400_BAD_REQUEST)
 
         if not specified_username_or_team:
@@ -1068,7 +1068,7 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
         if requested_course_key is not None:
             course_keys = [requested_course_key]
         elif accessible_course_ids is not None:
-            course_keys = [CourseKey.from_string(course_string) for course_string in accessible_course_ids]
+            course_keys = accessible_course_ids
 
         queryset = CourseTeamMembership.get_memberships(username, course_keys, team_id)
         page = self.paginate_queryset(queryset)

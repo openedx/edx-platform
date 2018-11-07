@@ -15,17 +15,17 @@ class CommerceConfiguration(ConfigurationModel):
     API_NAME = 'commerce'
     CACHE_KEY = 'commerce.api.data'
     DEFAULT_RECEIPT_PAGE_URL = '/checkout/receipt/?order_number='
-    MULTIPLE_ITEMS_BASKET_PAGE_URL = '/basket/add/'
+    DEFAULT_ORDER_DASHBOARD_URL = '/dashboard/orders/'
 
     checkout_on_ecommerce_service = models.BooleanField(
         default=False,
         help_text=_('Use the checkout page hosted by the E-Commerce service.')
     )
 
-    single_course_checkout_page = models.CharField(
+    basket_checkout_page = models.CharField(
         max_length=255,
-        default='/basket/single-item/',
-        help_text=_('Path to single course checkout page hosted by the E-Commerce service.')
+        default='/basket/add/',
+        help_text=_('Path to course(s) checkout page hosted by the E-Commerce service.')
     )
     cache_ttl = models.PositiveIntegerField(
         verbose_name=_('Cache Time To Live'),

@@ -9,7 +9,7 @@ import uuid
 import pytz
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import Http404, HttpResponseServerError
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
@@ -20,13 +20,12 @@ from django.views.decorators.http import require_POST
 from mock import patch
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
 from bulk_email.models import BulkEmailFlag
-from certificates import api as certs_api
-from certificates.models import (
+from lms.djangoapps.certificates import api as certs_api
+from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     CertificateGenerationHistory,
     CertificateInvalidation,
@@ -50,7 +49,7 @@ from openedx.core.lib.url_utils import quote_slashes
 from openedx.core.lib.xblock_utils import wrap_xblock
 from shoppingcart.models import Coupon, CourseRegCodeItem, PaidCourseRegistration
 from student.models import CourseEnrollment
-from student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
+from student.roles import CourseFinanceAdminRole, CourseSalesAdminRole, CourseStaffRole, CourseInstructorRole
 from util.json_request import JsonResponse
 from xmodule.html_module import HtmlDescriptor
 from xmodule.modulestore.django import modulestore
@@ -122,7 +121,7 @@ def instructor_dashboard_2(request, course_id):
 
     sections = [
         _section_course_info(course, access),
-        _section_membership(course, access, is_white_label),
+        _section_membership(course, access),
         _section_cohort_management(course, access),
         _section_discussions_management(course, access),
         _section_student_admin(course, access),
@@ -174,13 +173,15 @@ def instructor_dashboard_2(request, course_id):
     # Gate access to Special Exam tab depending if either timed exams or proctored exams
     # are enabled in the course
 
-    # NOTE: For now, if we only have procotred exams enabled, then only platform Staff
-    # (user.is_staff) will be able to view the special exams tab. This may
-    # change in the future
-    can_see_special_exams = (
-        ((course.enable_proctored_exams and request.user.is_staff) or course.enable_timed_exams) and
-        settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False)
-    )
+    user_has_access = any([
+        request.user.is_staff,
+        CourseStaffRole(course_key).has_user(request.user),
+        CourseInstructorRole(course_key).has_user(request.user)
+    ])
+    course_has_special_exams = course.enable_proctored_exams or course.enable_timed_exams
+    can_see_special_exams = course_has_special_exams and user_has_access and settings.FEATURES.get(
+        'ENABLE_SPECIAL_EXAMS', False)
+
     if can_see_special_exams:
         sections.append(_section_special_exams(course, access))
 
@@ -331,7 +332,7 @@ def _section_certificates(course):
 
     """
     example_cert_status = None
-    html_cert_enabled = certs_api.has_html_certificates_enabled(course.id, course)
+    html_cert_enabled = certs_api.has_html_certificates_enabled(course)
     if html_cert_enabled:
         can_enable_for_course = True
     else:
@@ -410,7 +411,7 @@ def set_course_mode_price(request, course_id):
             status=400)  # status code 400: Bad Request
 
     currency = request.POST['currency']
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
 
     course_honor_mode = CourseMode.objects.filter(mode_slug='honor', course_id=course_key)
     if not course_honor_mode:
@@ -439,7 +440,9 @@ def _section_course_info(course, access):
         'section_display_name': _('Course Info'),
         'access': access,
         'course_id': course_key,
-        'course_display_name': course.display_name,
+        'course_display_name': course.display_name_with_default,
+        'course_org': course.display_org_with_default,
+        'course_number': course.display_number_with_default,
         'has_started': course.has_started(),
         'has_ended': course.has_ended(),
         'start_date': course.start,
@@ -476,16 +479,18 @@ def _section_course_info(course, access):
     return section_data
 
 
-def _section_membership(course, access, is_white_label):
+def _section_membership(course, access):
     """ Provide data for the corresponding dashboard section """
     course_key = course.id
     ccx_enabled = settings.FEATURES.get('CUSTOM_COURSES_EDX', False) and course.enable_ccx
+    enrollment_role_choices = configuration_helpers.get_value('MANUAL_ENROLLMENT_ROLE_CHOICES',
+                                                              settings.MANUAL_ENROLLMENT_ROLE_CHOICES)
+
     section_data = {
         'section_key': 'membership',
         'section_display_name': _('Membership'),
         'access': access,
         'ccx_is_enabled': ccx_enabled,
-        'is_white_label': is_white_label,
         'enroll_button_url': reverse('students_update_enrollment', kwargs={'course_id': unicode(course_key)}),
         'unenroll_button_url': reverse('students_update_enrollment', kwargs={'course_id': unicode(course_key)}),
         'upload_student_csv_button_url': reverse('register_and_enroll_students', kwargs={'course_id': unicode(course_key)}),
@@ -494,6 +499,7 @@ def _section_membership(course, access, is_white_label):
         'modify_access_url': reverse('modify_access', kwargs={'course_id': unicode(course_key)}),
         'list_forum_members_url': reverse('list_forum_members', kwargs={'course_id': unicode(course_key)}),
         'update_forum_role_membership_url': reverse('update_forum_role_membership', kwargs={'course_id': unicode(course_key)}),
+        'enrollment_role_choices': enrollment_role_choices
     }
     return section_data
 
@@ -566,6 +572,7 @@ def _section_student_admin(course, access):
             kwargs={'course_id': unicode(course_key)},
         ),
         'rescore_problem_url': reverse('rescore_problem', kwargs={'course_id': unicode(course_key)}),
+        'override_problem_score_url': reverse('override_problem_score', kwargs={'course_id': unicode(course_key)}),
         'rescore_entrance_exam_url': reverse('rescore_entrance_exam', kwargs={'course_id': unicode(course_key)}),
         'student_can_skip_entrance_exam_url': reverse(
             'mark_student_can_skip_entrance_exam',

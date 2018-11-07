@@ -12,55 +12,97 @@ from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML, Text
 %>
 
+<%
+course_sections = blocks.get('children')
+%>
 <main role="main" class="course-outline" id="main" tabindex="-1">
-    % if blocks.get('children'):
-        <ol class="block-tree" role="tree">
-            % for section in blocks.get('children'):
-                <li
-                    aria-expanded="true"
-                    class="outline-item focusable section"
-                    id="${ section['id'] }"
-                    role="treeitem"
-                    tabindex="0"
+    % if course_sections is not None:
+        <button class="btn btn-primary"
+                id="expand-collapse-outline-all-button"
+                aria-expanded="false"
+                aria-controls="course-outline-block-tree"
                 >
-                    <div class="section-name">
-                        <h3>${ section['display_name'] }</h3>
-                    </div>
-                    <ol class="outline-item focusable" role="group" tabindex="0">
-                        % for subsection in section.get('children', []):
-                            <li
-                                class="subsection ${ 'current' if subsection['last_accessed'] else '' }"
-                                role="treeitem"
-                                tabindex="-1"
-                                aria-expanded="true"
-                            >
-                                <a
-                                    class="outline-item focusable"
-                                    href="${ subsection['lms_web_url'] }"
-                                    id="${ subsection['id'] }"
-                                >
-                                    <div class="subsection-text">
-                                        ## Subsection title
-                                        <span class="subsection-title">${ subsection['display_name'] }</span>
-
-                                        <div class="details">
-                                            ## There are behavior differences between rendering of subsections which have
-                                            ## exams (timed, graded, etc) and those that do not.
-                                            ##
-                                            ## Exam subsections expose exam status message field as well as a status icon
+          <span class="expand-collapse-outline-all-extra-padding" id="expand-collapse-outline-all-span">${_("Expand All")}</span>
+        </button>
+        <ol class="block-tree accordion"
+            id="course-outline-block-tree"
+            aria-labelledby="expand-collapse-outline-all-button">
+        % for section in course_sections:
+            <%
+            section_is_auto_opened = section.get('resume_block') is True
+            %>
+                <li class="outline-item section">
+                    <button class="section-name accordion-trigger"
+                            aria-expanded="${ 'true' if section_is_auto_opened else 'false' }"
+                            aria-controls="${ section['id'] }_contents"
+                            id="${ section['id'] }">
+                        <span class="fa fa-chevron-right ${ 'fa-rotate-90' if section_is_auto_opened else '' }" aria-hidden="true"></span>
+                        <h3 class="section-title">${ section['display_name'] }</h3>
+            % if section.get('complete'):
+                            <span class="complete-checkmark fa fa-check"></span>
+            % endif
+                    </button>
+                    <ol class="outline-item accordion-panel ${ '' if section_is_auto_opened else 'is-hidden' }"
+                        id="${ section['id'] }_contents"
+                        aria-labelledby="${ section['id'] }">
+            % for subsection in section.get('children', []):
+                <%
+                gated_subsection = subsection['id'] in gated_content
+                completed_prereqs = gated_content[subsection['id']]['completed_prereqs'] if gated_subsection else False
+                subsection_is_auto_opened = subsection.get('resume_block') is True
+                %>
+                      <li class="subsection accordion ${ 'current' if subsection['resume_block'] else '' }">
+                % if gated_subsection and not completed_prereqs:
+                                <a href="${ subsection['lms_web_url'] }">
+                                    <button class="subsection-text prerequisite-button"
+                                            id="${ subsection['id'] }">
+                                    <span class="menu-icon icon fa fa-lock"
+                                            aria-hidden="true">
+                                    </span>
+                                    <h4 class="subsection-title">
+                                        ${ subsection['display_name'] }
+                                    </h4>
+                                    <div class="details prerequisite">
+                                        ${ _("Prerequisite: ") }
                                             <%
-                                                if subsection.get('due') is None:
-                                                    # examples: Homework, Lab, etc.
-                                                    data_string = subsection.get('format')
-                                                else:
-                                                    if 'special_exam_info' in subsection:
-                                                        data_string = _('due {date}')
-                                                    else:
-                                                        data_string = _("{subsection_format} due {{date}}").format(subsection_format=subsection.get('format'))
+                                                prerequisite_id = gated_content[subsection['id']]['prerequisite']
+                                                prerequisite_name = xblock_display_names.get(prerequisite_id)
                                             %>
-                                            % if subsection.get('format') or 'special_exam_info' in subsection:
+                                            ${ prerequisite_name }
+                                    </div>
+                % else:
+                                    <button class="subsection-text accordion-trigger"
+                                            id="${ subsection['id'] }"
+                                            aria-expanded="${ 'true' if subsection_is_auto_opened else 'false' }"
+                                            aria-controls="${ subsection['id'] }_contents">
+                                        <span class="fa fa-chevron-right ${ 'fa-rotate-90' if subsection_is_auto_opened else '' }"
+                                              aria-hidden="true"></span>
+                                        <h4 class="subsection-title">
+                                            ${ subsection['display_name'] }
+                                        </h4>
+                    % if subsection.get('complete'):
+                                        <span class="complete-checkmark fa fa-check"></span>
+                    % endif
+                % endif
+                                        <div class="details">
+
+                ## There are behavior differences between rendering of subsections which have
+                ## exams (timed, graded, etc) and those that do not.
+                ##
+                ## Exam subsections expose exam status message field as well as a status icon
+                <%
+                if subsection.get('due') is None:
+                    # examples: Homework, Lab, etc.
+                    data_string = subsection.get('format')
+                else:
+                    if 'special_exam_info' in subsection:
+                        data_string = _('due {date}')
+                    else:
+                        data_string = _("{subsection_format} due {{date}}").format(subsection_format=subsection.get('format'))
+                %>
+                % if subsection.get('format') or 'special_exam_info' in subsection:
                                             <span class="subtitle">
-                                                % if 'special_exam' in subsection:
+                    % if 'special_exam' in subsection:
                                                     ## Display the exam status icon and status message
                                                     <span
                                                         class="menu-icon icon fa ${subsection['special_exam_info'].get('suggested_icon', 'fa-pencil-square-o')} ${subsection['special_exam_info'].get('status', 'eligible')}"
@@ -70,9 +112,9 @@ from openedx.core.djangolib.markup import HTML, Text
                                                         ${subsection['special_exam_info'].get('short_description', '')}
                                                     </span>
 
-                                                    ## completed exam statuses should not show the due date
-                                                    ## since the exam has already been submitted by the user
-                                                    % if not subsection['special_exam_info'].get('in_completed_state', False):
+                        ## completed exam statuses should not show the due date
+                        ## since the exam has already been submitted by the user
+                        % if not subsection['special_exam_info'].get('in_completed_state', False):
                                                         <span
                                                             class="localized-datetime subtitle-name"
                                                             data-datetime="${subsection.get('due')}"
@@ -80,8 +122,8 @@ from openedx.core.djangolib.markup import HTML, Text
                                                             data-timezone="${user_timezone}"
                                                             data-language="${user_language}"
                                                         ></span>
-                                                    % endif
-                                                % else:
+                        % endif
+                    % else:
                                                     ## non-graded section, we just show the exam format and the due date
                                                     ## this is the standard case in edx-platform
                                                     <span
@@ -92,67 +134,46 @@ from openedx.core.djangolib.markup import HTML, Text
                                                         data-language="${user_language}"
                                                     ></span>
 
-                                                    % if 'graded' in subsection and subsection['graded']:
-                                                        <span
-                                                            class="menu-icon icon fa fa-pencil-square-o"
-                                                            aria-hidden="true"
-                                                        ></span>
-                                                        <span class="sr">${_("This content is graded")}</span>
-                                                    % endif
-                                                % endif
+                        % if subsection.get('graded'):
+                                                        <span class="sr">&nbsp;${_("This content is graded")}</span>
+                        % endif
+                    % endif
                                             </span>
-                                            % endif
+                % endif
                                         </div> <!-- /details -->
-                                    </div> <!-- /subsection-text -->
-                                    <div class="subsection-actions">
-                                        ## Resume button (if last visited section)
-                                        % if subsection['last_accessed']:
-                                            <span class="sr-only">${ _("This is your last visited course section.") }</span>
-                                            <span class="resume-right">
-                                                <b>${ _("Resume Course") }</b>
-                                                <span class="icon fa fa-arrow-circle-right" aria-hidden="true"></span>
-                                            </span>
-                                        %endif
-                                    </div>
+                                    </button> <!-- /subsection-text -->
+                % if gated_subsection and not completed_prereqs:
                                 </a>
+                % endif
+                % if not gated_subsection or (gated_subsection and completed_prereqs):
+                                <ol class="outline-item accordion-panel ${ '' if subsection_is_auto_opened else 'is-hidden' }"
+                                    id="${ subsection['id'] }_contents"
+                                    aria-labelledby="${ subsection['id'] }"
+                                >
+                    % for vertical in subsection.get('children', []):
+                                    <li class="vertical outline-item focusable">
+                                        <a class="outline-item focusable"
+                                            href="${ vertical['lms_web_url'] }"
+                                            id="${ vertical['id'] }">
+                                            <div class="vertical-details">
+                                              <div class="vertical-title">
+                                                ${ vertical['display_name'] }
+                                              </div>
+                                            </div>
+                        % if vertical.get('complete'):
+                                                <span class="complete-checkmark fa fa-check"></span>
+                        % endif
+                                        </a>
+                                    </li>
+                    % endfor
+                                </ol>
+                % endif
                             </li>
-                        % endfor
+            % endfor
                     </ol>
                 </li>
-            % endfor
+        % endfor
         </ol>
-    % else:
-        <div class="well depth-0 message-area">
-            <div class="copy-large">
-                <span class="icon fa fa-calendar-o" aria-hidden="true"></span>
-                <%
-                course_started = course.start.date() <= date.today()
-                %>
-
-                % if course.start_date_is_still_default:
-                    ${_("This course has not started yet.")}
-                % elif course_started:
-                    ${_("We're still working on course content.")}
-                % else:
-                    ${Text(_("This course has not started yet, and will launch on {launch_date_html}.")).format(
-                        launch_date_html=HTML(
-                            '<span'
-                            '    class="localized-datetime start-date"'
-                            '    data-datetime="{start_date}"'
-                            '    data-format="shortDate"'
-                            '    data-timezone="{user_timezone}"'
-                            '    data-language="{user_language}"'
-                            '></span>'
-                        ).format(
-                            start_date=course.start,
-                            user_timezone=user_timezone,
-                            user_language=user_language,
-                        ),
-                    )}
-                % endif
-            </div>
-
-        </div>
     % endif
 </main>
 
@@ -161,5 +182,5 @@ from openedx.core.djangolib.markup import HTML, Text
 </%static:require_module_async>
 
 <%static:webpack entry="CourseOutline">
-    new CourseOutline('.block-tree');
+    new CourseOutline();
 </%static:webpack>

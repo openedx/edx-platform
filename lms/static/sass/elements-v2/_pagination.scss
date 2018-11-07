@@ -1,134 +1,139 @@
 // Copied from elements/_pagination.scss
 
 .pagination {
-    @include clearfix();
+  @include clearfix();
+
+  display: inline-block;
+  width: flex-grid(3, 12);
+
+  &.pagination-compact {
+    @include text-align(right);
+  }
+
+  &.pagination-full {
+    display: block;
+    width: flex-grid(4, 12);
+    margin: $baseline auto;
+  }
+
+  .nav-item {
+    position: relative;
     display: inline-block;
-    width: flex-grid(3, 12);
+    vertical-align: middle;
+  }
 
-    &.pagination-compact {
-        @include text-align(right);
+  .nav-link {
+    @include transition(all $tmg-f2 ease-in-out 0s);
+
+    display: block;
+    border: 0;
+    background-image: none;
+    background-color: transparent;
+    padding: ($baseline/2) ($baseline*0.75);
+
+    &.previous {
+      margin-right: ($baseline/2);
     }
 
-    &.pagination-full {
-        display: block;
-        width: flex-grid(4, 12);
-        margin: $baseline auto;
+    &.next {
+      margin-left: ($baseline/2);
     }
 
-    .nav-item {
-        position: relative;
-        display: inline-block;
-        vertical-align: middle;
+    &:hover {
+      background-color: theme-color("primary");
+      background-image: none;
+      border-radius: 3px;
+      color: $white;
     }
 
-    .nav-link {
-        @include transition(all $tmg-f2 ease-in-out 0s);
-        display: block;
-        border: 0;
-        background-image: none;
-        background-color: transparent;
-        padding: ($baseline/2) ($baseline*0.75);
+    &.is-disabled {
+      background-color: transparent;
+      color: theme-color("disabled");
+      pointer-events: none;
+    }
+  }
 
-        &.previous {
-            margin-right: ($baseline/2);
-        }
+  .nav-label {
+    @extend .sr-only;
+  }
 
-        &.next {
-            margin-left: ($baseline/2);
-        }
+  .pagination-form,
+  .current-page,
+  .page-divider,
+  .total-pages {
+    display: inline-block;
+  }
 
-        &:hover {
-            background-color: $lms-active-color;
-            background-image: none;
-            border-radius: 3px;
-            color: $white;
-        }
+  .current-page,
+  .page-number-input,
+  .total-pages {
+    width: ($baseline*2.5);
+    vertical-align: middle;
+    margin: 0 ($baseline*0.75);
+    padding: ($baseline/4);
+    text-align: center;
+    color: theme-color("dark");
+  }
 
-        &.is-disabled {
-            background-color: transparent;
-            color: $lms-gray;
-            pointer-events: none;
-        }
+  .current-page {
+    position: absolute;
+
+    @include left(-($baseline/4));
+  }
+
+  .page-divider {
+    vertical-align: middle;
+    color: theme-color("dark");
+  }
+
+  .pagination-form {
+    position: relative;
+    z-index: 100;
+
+    .page-number-label,
+    .submit-pagination-form {
+      @extend .sr-only;
     }
 
-    .nav-label {
-        @extend .sr-only;
+    .page-number-input {
+      @include transition(all $tmg-f2 ease-in-out 0s);
+
+      border: 1px solid transparent;
+      border-bottom: 1px dotted $gray;
+      border-radius: 0;
+      box-shadow: none;
+      background: none;
+
+      &:hover {
+        background-color: $white;
+        opacity: 0.6;
+      }
+
+      &:focus {
+        // borrowing the base input focus styles to match overall app
+        @include linear-gradient($yellow-l4, tint($yellow-l4, 90%));
+
+        opacity: 1;
+        box-shadow: 0 0 3px $black inset;
+        background-color: $white;
+        border: 1px solid transparent;
+        border-radius: 3px;
+      }
     }
-
-    .pagination-form,
-    .current-page,
-    .page-divider,
-    .total-pages {
-        display: inline-block;
-    }
-
-    .current-page,
-    .page-number-input,
-    .total-pages {
-        width: ($baseline*2.5);
-        vertical-align: middle;
-        margin: 0 ($baseline*0.75);
-        padding: ($baseline/4);
-        text-align: center;
-        color: $lms-gray;
-    }
-
-    .current-page {
-        position: absolute;
-        @include left(-($baseline/4));
-    }
-
-    .page-divider {
-        vertical-align: middle;
-        color: $lms-gray;
-    }
-
-    .pagination-form {
-        position: relative;
-        z-index: 100;
-
-        .page-number-label,
-        .submit-pagination-form {
-            @extend .sr-only;
-        }
-
-        .page-number-input {
-            @include transition(all $tmg-f2 ease-in-out 0s);
-            border: 1px solid transparent;
-            border-bottom: 1px dotted $lms-gray;
-            border-radius: 0;
-            box-shadow: none;
-            background: none;
-
-            &:hover {
-                background-color: $white;
-                opacity: 0.6;
-            }
-
-            &:focus {
-                // borrowing the base input focus styles to match overall app
-                @include linear-gradient($yellow-l4, tint($yellow-l4, 90%));
-                opacity: 1.0;
-                box-shadow: 0 0 3px $black inset;
-                background-color: $white;
-                border: 1px solid transparent;
-                border-radius: 3px;
-            }
-        }
-    }
+  }
 }
 
 // styles for search/pagination metadata and sorting
 .listing-tools {
-    color: $lms-gray;
+  color: theme-color("dark");
 
-    label { // override
-        color: inherit;
-        font-size: inherit;
-        cursor: auto;
-    }
+  label { // override
+    color: inherit;
+    font-size: inherit;
+    cursor: auto;
+  }
 
-    .listing-sort-select {
-        border: 0;
-    }
+  .listing-sort-select {
+    border: 0;
+  }
 }

@@ -141,6 +141,7 @@
             },
 
             imageChangeSucceeded: function() {
+                this.$('.u-field-upload-button').removeClass('in-progress');
                 this.render();
             },
 
@@ -182,7 +183,7 @@
             },
 
             showUploadInProgressMessage: function() {
-                this.$('.u-field-upload-button').css('opacity', 1);
+                this.$('.u-field-upload-button').addClass('in-progress');
                 this.$('.upload-button-icon').html(this.iconProgress);
                 this.$('.upload-button-title').html(this.titleUploading);
             },

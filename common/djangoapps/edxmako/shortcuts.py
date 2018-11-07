@@ -16,14 +16,14 @@ import logging
 from urlparse import urljoin
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponse
-from django.template import Context
+from django.template import engines
 
-from edxmako import lookup_template
-from edxmako.request_context import get_template_request_context
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.theming.helpers import get_template_path, is_request_in_themed_site
+from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
+
+from . import Engines
 
 log = logging.getLogger(__name__)
 
@@ -131,7 +131,7 @@ def footer_context_processor(request):  # pylint: disable=unused-argument
     )
 
 
-def render_to_string(template_name, dictionary, context=None, namespace='main', request=None):
+def render_to_string(template_name, dictionary, namespace='main', request=None):
     """
     Render a Mako template to as a string.
 
@@ -147,52 +147,23 @@ def render_to_string(template_name, dictionary, context=None, namespace='main', 
             from the template paths specified in configuration.
         dictionary: A dictionary of variables to insert into the template during
             rendering.
-        context: A :class:`~django.template.Context` with values to make
-            available to the template.
         namespace: The Mako namespace to find the named template in.
         request: The request to use to construct the RequestContext for rendering
             this template. If not supplied, the current request will be used.
     """
-
-    template_name = get_template_path(template_name)
-
-    context_instance = Context(dictionary)
-    # add dictionary to context_instance
-    context_instance.update(dictionary or {})
-    # collapse context_instance to a single dictionary for mako
-    context_dictionary = {}
-    context_instance['settings'] = settings
-    context_instance['EDX_ROOT_URL'] = settings.EDX_ROOT_URL
-    context_instance['marketing_link'] = marketing_link
-    context_instance['is_any_marketing_link_set'] = is_any_marketing_link_set
-    context_instance['is_marketing_link_set'] = is_marketing_link_set
-
-    # In various testing contexts, there might not be a current request context.
-    request_context = get_template_request_context(request)
-    if request_context:
-        for item in request_context:
-            context_dictionary.update(item)
-    for item in context_instance:
-        context_dictionary.update(item)
-    if context:
-        context_dictionary.update(context)
-
-    # "Fix" CSRF token by evaluating the lazy object
-    KEY_CSRF_TOKENS = ('csrf_token', 'csrf')
-    for key in KEY_CSRF_TOKENS:
-        if key in context_dictionary:
-            context_dictionary[key] = unicode(context_dictionary[key])
-
-    # fetch and render template
-    template = lookup_template(namespace, template_name)
-    return template.render_unicode(**context_dictionary)
+    if namespace == 'lms.main':
+        engine = engines[Engines.PREVIEW]
+    else:
+        engine = engines[Engines.MAKO]
+    template = engine.get_template(template_name)
+    return template.render(dictionary, request)
 
 
-def render_to_response(template_name, dictionary=None, context_instance=None, namespace='main', request=None, **kwargs):
+def render_to_response(template_name, dictionary=None, namespace='main', request=None, **kwargs):
     """
     Returns a HttpResponse whose content is filled with the result of calling
     lookup.get_template(args[0]).render with the passed arguments.
     """
 
     dictionary = dictionary or {}
-    return HttpResponse(render_to_string(template_name, dictionary, context_instance, namespace, request), **kwargs)
+    return HttpResponse(render_to_string(template_name, dictionary, namespace, request), **kwargs)

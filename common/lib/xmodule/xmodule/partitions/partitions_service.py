@@ -7,17 +7,17 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 import logging
 
+from openedx.core.djangoapps.request_cache.middleware import request_cached
 from xmodule.partitions.partitions import UserPartition, UserPartitionError, ENROLLMENT_TRACK_PARTITION_ID
 from xmodule.modulestore.django import modulestore
 
 
 log = logging.getLogger(__name__)
 
-
-# settings will not be available when running nosetests.
 FEATURES = getattr(settings, 'FEATURES', {})
 
 
+@request_cached
 def get_all_partitions_for_course(course, active_only=False):
     """
     A method that returns all `UserPartitions` associated with a course, as a List.
@@ -62,7 +62,6 @@ def _create_enrollment_track_partition(course):
 
     used_ids = set(p.id for p in course.user_partitions)
     if ENROLLMENT_TRACK_PARTITION_ID in used_ids:
-        # TODO: change to Exception after this has been in production for awhile, see TNL-6796.
         log.warning(
             "Can't add 'enrollment_track' partition, as ID {id} is assigned to {partition} in course {course}.".format(
                 id=ENROLLMENT_TRACK_PARTITION_ID,

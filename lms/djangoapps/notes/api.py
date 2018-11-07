@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import collections
 import json
 import logging
@@ -5,11 +6,12 @@ import logging
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.http import Http404, HttpResponse
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 from courseware.courses import get_course_with_access
 from notes.models import Note
 from notes.utils import notes_enabled_for_course
+import six
 
 log = logging.getLogger(__name__)
 
@@ -50,8 +52,8 @@ def api_request(request, course_id, **kwargs):
     Raises a 404 if the requested resource does not exist or notes are
         disabled for the course.
     '''
-    assert isinstance(course_id, basestring)
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    assert isinstance(course_id, six.string_types)
+    course_key = CourseKey.from_string(course_id)
 
     # Verify that the api should be accessible to this course
     if not api_enabled(request, course_key):
@@ -68,7 +70,7 @@ def api_request(request, course_id, **kwargs):
         log.debug('Resource "{0}" does not exist'.format(resource_name))
         raise Http404
 
-    if resource_method not in resource.keys():
+    if resource_method not in list(resource.keys()):
         log.debug('Resource "{0}" does not support method "{1}"'.format(resource_name, resource_method))
         raise Http404
 

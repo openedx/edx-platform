@@ -1,7 +1,7 @@
 """Tests covering the Organizations listing on the Studio home."""
 import json
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase
 from mock import patch
 

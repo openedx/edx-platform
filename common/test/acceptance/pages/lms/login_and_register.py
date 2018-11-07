@@ -188,8 +188,7 @@ class CombinedLoginAndRegisterPage(PageObject):
         ).fulfill()
 
     def register(
-            self, email="", password="", username="", full_name="", country="", favorite_movie="",
-            terms_of_service=False
+            self, email="", password="", username="", full_name="", country="", favorite_movie=""
     ):
         """Fills in and submits the registration form.
 
@@ -204,11 +203,10 @@ class CombinedLoginAndRegisterPage(PageObject):
             username (unicode): The user's username.
             full_name (unicode): The user's full name.
             country (unicode): Two-character country code.
-            terms_of_service (boolean): If True, agree to the terms of service and honor code.
 
         """
         # Fill in the form
-        self.wait_for_element_visibility('#register-email', 'Email field is shown')
+        self.wait_for_element_visibility('#toggle_optional_fields', 'Support education research field is shown')
         if email:
             self.q(css="#register-email").fill(email)
         if full_name:
@@ -218,11 +216,9 @@ class CombinedLoginAndRegisterPage(PageObject):
         if password:
             self.q(css="#register-password").fill(password)
         if country:
-            self.q(css="#register-country option[value='{country}']".format(country=country)).click()
+            self.q(css="#register-country").results[0].send_keys(country)
         if favorite_movie:
             self.q(css="#register-favorite_movie").fill(favorite_movie)
-        if terms_of_service:
-            self.q(css="label[for='register-honor_code']").click()
 
         # Submit it
         self.q(css=".register-button").click()
@@ -333,6 +329,8 @@ class CombinedLoginAndRegisterPage(PageObject):
         def _check_func():
             """Return success status and any errors that occurred."""
             errors = self.errors
+            if not errors:
+                self.q(css=".register-button").click()
             return (bool(errors), errors)
         return Promise(_check_func, "Errors are visible").fulfill()
 

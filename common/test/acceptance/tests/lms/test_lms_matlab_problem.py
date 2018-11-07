@@ -5,8 +5,6 @@ Test for matlab problems
 import time
 from textwrap import dedent
 
-from flaky import flaky
-
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.fixtures.xqueue import XQueueResponseFixture
 from common.test.acceptance.pages.lms.matlab_problem import MatlabProblemPage
@@ -61,7 +59,6 @@ class MatlabProblemTest(ProblemsTest):
         self.assertEqual(matlab_problem_page.problem_name, 'Test Matlab Problem')
         return matlab_problem_page
 
-    @flaky  # TNL-4132
     def test_run_code(self):
         """
         Test "Run Code" button functionality.

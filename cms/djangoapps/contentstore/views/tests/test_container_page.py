@@ -211,6 +211,7 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
         """
         request = RequestFactory().get('foo')
         request.user = self.user
+        request.LANGUAGE_CODE = 'en'
 
         # Check for invalid 'usage_key_strings'
         self.assertRaises(

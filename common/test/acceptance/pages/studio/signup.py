@@ -18,6 +18,10 @@ class SignupPage(PageObject, HelpMixin):
     def is_browser_on_page(self):
         return self.q(css='body.view-signup').visible
 
+    def input_password(self, password):
+        """Inputs a password and then returns the password input"""
+        return set_input_value(self, '#password', password)
+
     def sign_up_user(self, registration_dictionary):
         """
         Register the user.

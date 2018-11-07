@@ -26,7 +26,6 @@
             var match;
             this.$el = options.el;
             this.readOnly = options.readOnly;
-            this.showByDefault = options.showByDefault || false;
             this.toggleDiscussionBtn = this.$('.discussion-show');
             this.listenTo(this.model, 'change', this.render);
             this.escKey = 27;
@@ -46,12 +45,8 @@
 
             this.defaultSortKey = 'activity';
             this.defaultSortOrder = 'desc';
-
-            // By default the view is displayed in a hidden state. If you want it to be shown by default (e.g. in Teams)
-            // pass showByDefault as an option. This code will open it on initialization.
-            if (this.showByDefault) {
-                this.toggleDiscussion();
-            }
+            // discussions are open by default
+            this.toggleDiscussion();
         },
 
         loadDiscussions: function($elem, error) {
@@ -126,7 +121,8 @@
                 course_settings: this.courseSettings,
                 topicId: discussionId,
                 startHeader: this.startHeader,
-                is_commentable_divided: response.is_commentable_divided
+                is_commentable_divided: response.is_commentable_divided,
+                user_group_id: response.user_group_id
             });
 
             this.newPostView.render();

@@ -4,24 +4,113 @@ An API for retrieving user account information.
 For additional information and historical context, see:
 https://openedx.atlassian.net/wiki/display/TNL/User+API
 """
+import datetime
+import logging
+from functools import wraps
 
+import pytz
+from consent.models import DataSharingConsent
+from django.contrib.auth import authenticate, get_user_model, logout
+from django.contrib.sites.models import Site
+from django.core.cache import cache
 from django.db import transaction
+from django.utils.translation import ugettext as _
+from edx_ace import ace
+from edx_ace.recipient import Recipient
 from edx_rest_framework_extensions.authentication import JwtAuthentication
-from rest_framework import permissions
-from rest_framework import status
+from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomerUser, PendingEnterpriseCustomerUser
+from integrated_channels.degreed.models import DegreedLearnerDataTransmissionAudit
+from integrated_channels.sap_success_factors.models import SapSuccessFactorsLearnerDataTransmissionAudit
+from rest_framework import permissions, status
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
+from six import iteritems, text_type
+from social_django.models import UserSocialAuth
+from wiki.models import ArticleRevision
+from wiki.models.pluginbase import RevisionPluginRevision
 
-from .api import get_account_settings, update_account_settings
-from .permissions import CanDeactivateUser
-from ..errors import UserNotFound, UserNotAuthorized, AccountUpdateError, AccountValidationError
+from entitlements.models import CourseEntitlement
+from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
+from openedx.core.djangoapps.api_admin.models import ApiAccessRequest
+from openedx.core.djangoapps.credit.models import CreditRequirementStatus, CreditRequest
+from openedx.core.djangoapps.course_groups.models import UnregisteredLearnerCohortAssignments
+from openedx.core.djangoapps.profile_images.images import remove_profile_images
+from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_names, set_has_profile_image
+from openedx.core.djangolib.oauth2_retirement_utils import retire_dot_oauth2_models, retire_dop_oauth2_models
 from openedx.core.lib.api.authentication import (
-    SessionAuthenticationAllowInactiveUser,
     OAuth2AuthenticationAllowInactiveUser,
+    SessionAuthenticationAllowInactiveUser
 )
 from openedx.core.lib.api.parsers import MergePatchParser
-from student.models import User
+from student.models import (
+    CourseEnrollment,
+    ManualEnrollmentAudit,
+    PasswordHistory,
+    PendingNameChange,
+    CourseEnrollmentAllowed,
+    PendingEmailChange,
+    Registration,
+    User,
+    UserProfile,
+    get_potentially_retired_user_by_username,
+    get_retired_email_by_email,
+    get_retired_username_by_username,
+    is_username_retired
+)
+from student.views.login import AuthFailedError, LoginFailures
+
+from ..errors import AccountUpdateError, AccountValidationError, UserNotAuthorized, UserNotFound
+from ..models import (
+    RetirementState,
+    RetirementStateError,
+    UserOrgTag,
+    UserRetirementPartnerReportingStatus,
+    UserRetirementStatus
+)
+from .api import get_account_settings, update_account_settings
+from .permissions import CanDeactivateUser, CanRetireUser
+from .serializers import UserRetirementPartnerReportSerializer, UserRetirementStatusSerializer
+from .signals import (
+    USER_RETIRE_LMS_CRITICAL,
+    USER_RETIRE_LMS_MISC,
+    USER_RETIRE_MAILINGS,
+    USER_RETIRE_THIRD_PARTY_MAILINGS
+)
+from ..message_types import DeletionNotificationMessage
+
+log = logging.getLogger(__name__)
+
+USER_PROFILE_PII = {
+    'name': '',
+    'meta': '',
+    'location': '',
+    'year_of_birth': None,
+    'gender': None,
+    'mailing_address': None,
+    'city': None,
+    'country': None,
+    'bio': None,
+}
+
+
+def request_requires_username(function):
+    """
+    Requires that a ``username`` key containing a truthy value exists in
+    the ``request.data`` attribute of the decorated function.
+    """
+    @wraps(function)
+    def wrapper(self, request):  # pylint: disable=missing-docstring
+        username = request.data.get('username', None)
+        if not username:
+            return Response(
+                status=status.HTTP_404_NOT_FOUND,
+                data={'message': text_type('The user was not specified.')}
+            )
+        return function(self, request)
+    return wrapper
 
 
 class AccountViewSet(ViewSet):
@@ -109,6 +198,12 @@ class AccountViewSet(ViewSet):
 
             * requires_parental_consent: True if the user is a minor
               requiring parental consent.
+            * social_links: Array of social links. Each
+              preference is a JSON object with the following keys:
+
+                * "platform": A particular social platform, ex: 'facebook'
+                * "social_link": The link to the user's profile on the particular platform
+
             * username: The username associated with the account.
             * year_of_birth: The year the user was born, as an integer, or null.
             * account_privacy: The user's setting for sharing her personal
@@ -238,8 +333,659 @@ class AccountDeactivationView(APIView):
 
         Marks the user as having no password set for deactivation purposes.
         """
-        user = User.objects.get(username=username)
-        user.set_unusable_password()
-        user.save()
-        account_settings = get_account_settings(request, [username])[0]
-        return Response(account_settings)
+        _set_unusable_password(User.objects.get(username=username))
+        return Response(get_account_settings(request, [username])[0])
+
+
+class AccountRetireMailingsView(APIView):
+    """
+    Part of the retirement API, accepts POSTs to unsubscribe a user
+    from all EXTERNAL email lists (ex: Sailthru). LMS email subscriptions
+    are handled in the LMS retirement endpoints.
+    """
+    authentication_classes = (JwtAuthentication, )
+    permission_classes = (permissions.IsAuthenticated, CanRetireUser)
+
+    def post(self, request):
+        """
+        POST /api/user/v1/accounts/{username}/retire_mailings/
+
+        Fires the USER_RETIRE_THIRD_PARTY_MAILINGS signal, currently the
+        only receiver is email_marketing to force opt-out the user from
+        externally managed email lists.
+        """
+        username = request.data['username']
+
+        try:
+            retirement = UserRetirementStatus.get_retirement_for_retirement_action(username)
+
+            with transaction.atomic():
+                # This signal allows lms' email_marketing and other 3rd party email
+                # providers to unsubscribe the user
+                USER_RETIRE_THIRD_PARTY_MAILINGS.send(
+                    sender=self.__class__,
+                    email=retirement.original_email,
+                    new_email=retirement.retired_email,
+                    user=retirement.user
+                )
+
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except UserRetirementStatus.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        except Exception as exc:  # pylint: disable=broad-except
+            return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class DeactivateLogoutView(APIView):
+    """
+    POST /api/user/v1/accounts/deactivate_logout/
+    {
+        "password": "example_password",
+    }
+
+    **POST Parameters**
+
+      A POST request must include the following parameter.
+
+      * password: Required. The current password of the user being deactivated.
+
+    **POST Response Values**
+
+     If the request does not specify a username or submits a username
+     for a non-existent user, the request returns an HTTP 404 "Not Found"
+     response.
+
+     If a user who is not a superuser tries to deactivate a user,
+     the request returns an HTTP 403 "Forbidden" response.
+
+     If the specified user is successfully deactivated, the request
+     returns an HTTP 204 "No Content" response.
+
+     If an unanticipated error occurs, the request returns an
+     HTTP 500 "Internal Server Error" response.
+
+    Allows an LMS user to take the following actions:
+    -  Change the user's password permanently to Django's unusable password
+    -  Log the user out
+    - Create a row in the retirement table for that user
+    """
+    authentication_classes = (SessionAuthentication, JwtAuthentication, )
+    permission_classes = (permissions.IsAuthenticated, )
+
+    def post(self, request):
+        """
+        POST /api/user/v1/accounts/deactivate_logout/
+
+        Marks the user as having no password set for deactivation purposes,
+        and logs the user out.
+        """
+        user_model = get_user_model()
+        try:
+            # Get the username from the request and check that it exists
+            verify_user_password_response = self._verify_user_password(request)
+            if verify_user_password_response.status_code != status.HTTP_204_NO_CONTENT:
+                return verify_user_password_response
+            with transaction.atomic():
+                UserRetirementStatus.create_retirement(request.user)
+                # Unlink LMS social auth accounts
+                UserSocialAuth.objects.filter(user_id=request.user.id).delete()
+                # Change LMS password & email
+                user_email = request.user.email
+                request.user.email = get_retired_email_by_email(request.user.email)
+                request.user.save()
+                _set_unusable_password(request.user)
+                # TODO: Unlink social accounts & change password on each IDA.
+                # Remove the activation keys sent by email to the user for account activation.
+                Registration.objects.filter(user=request.user).delete()
+                # Add user to retirement queue.
+                # Delete OAuth tokens associated with the user.
+                retire_dop_oauth2_models(request.user)
+                retire_dot_oauth2_models(request.user)
+
+                try:
+                    # Send notification email to user
+                    site = Site.objects.get_current()
+                    notification_context = get_base_template_context(site)
+                    notification_context.update({'full_name': request.user.profile.name})
+                    notification = DeletionNotificationMessage().personalize(
+                        recipient=Recipient(username='', email_address=user_email),
+                        language=request.user.profile.language,
+                        user_context=notification_context,
+                    )
+                    ace.send(notification)
+                except Exception as exc:
+                    log.exception('Error sending out deletion notification email')
+                    raise
+
+                # Log the user out.
+                logout(request)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except KeyError:
+            return Response(u'Username not specified.', status=status.HTTP_404_NOT_FOUND)
+        except user_model.DoesNotExist:
+            return Response(
+                u'The user "{}" does not exist.'.format(request.user.username), status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as exc:  # pylint: disable=broad-except
+            return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def _verify_user_password(self, request):
+        """
+        If the user is logged in and we want to verify that they have submitted the correct password
+        for a major account change (for example, retiring this user's account).
+
+        Args:
+            request (HttpRequest): A request object where the password should be included in the POST fields.
+        """
+        try:
+            self._check_excessive_login_attempts(request.user)
+            user = authenticate(username=request.user.username, password=request.POST['password'], request=request)
+            if user:
+                if LoginFailures.is_feature_enabled():
+                    LoginFailures.clear_lockout_counter(user)
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            else:
+                self._handle_failed_authentication(request.user)
+        except AuthFailedError as err:
+            return Response(text_type(err), status=status.HTTP_403_FORBIDDEN)
+        except Exception as err:  # pylint: disable=broad-except
+            return Response(u"Could not verify user password: {}".format(err), status=status.HTTP_400_BAD_REQUEST)
+
+    def _check_excessive_login_attempts(self, user):
+        """
+        See if account has been locked out due to excessive login failures
+        """
+        if user and LoginFailures.is_feature_enabled():
+            if LoginFailures.is_user_locked_out(user):
+                raise AuthFailedError(_('This account has been temporarily locked due '
+                                        'to excessive login failures. Try again later.'))
+
+    def _handle_failed_authentication(self, user):
+        """
+        Handles updating the failed login count, inactive user notifications, and logging failed authentications.
+        """
+        if user and LoginFailures.is_feature_enabled():
+            LoginFailures.increment_lockout_counter(user)
+
+        raise AuthFailedError(_('Email or password is incorrect.'))
+
+
+def _set_unusable_password(user):
+    """
+    Helper method for the shared functionality of setting a user's
+    password to the unusable password, thus deactivating the account.
+    """
+    user.set_unusable_password()
+    user.save()
+
+
+class AccountRetirementPartnerReportView(ViewSet):
+    """
+    Provides API endpoints for managing partner reporting of retired
+    users.
+    """
+    authentication_classes = (JwtAuthentication,)
+    permission_classes = (permissions.IsAuthenticated, CanRetireUser,)
+    parser_classes = (JSONParser,)
+    serializer_class = UserRetirementStatusSerializer
+
+    @staticmethod
+    def _get_orgs_for_user(user):
+        """
+        Returns a set of orgs that the user has enrollments with
+        """
+        orgs = set()
+        for enrollment in user.courseenrollment_set.all():
+            org = enrollment.course_id.org
+
+            # Org can concievably be blank or this bogus default value
+            if org and org != 'outdated_entry':
+                orgs.add(org)
+        return orgs
+
+    def retirement_partner_report(self, request):  # pylint: disable=unused-argument
+        """
+        POST /api/user/v1/accounts/retirement_partner_report/
+
+        Returns the list of UserRetirementPartnerReportingStatus users
+        that are not already being processed and updates their status
+        to indicate they are currently being processed.
+        """
+        retirement_statuses = UserRetirementPartnerReportingStatus.objects.filter(
+            is_being_processed=False
+        ).order_by('id')
+
+        retirements = [
+            {
+                'original_username': retirement.original_username,
+                'original_email': retirement.original_email,
+                'original_name': retirement.original_name,
+                'orgs': self._get_orgs_for_user(retirement.user)
+            }
+            for retirement in retirement_statuses
+        ]
+
+        serializer = UserRetirementPartnerReportSerializer(retirements, many=True)
+
+        retirement_statuses.update(is_being_processed=True)
+
+        return Response(serializer.data)
+
+    @request_requires_username
+    def retirement_partner_status_create(self, request):
+        """
+        PUT /api/user/v1/accounts/retirement_partner_report/
+
+        {
+            'username': 'user_to_retire'
+        }
+
+        Creates a UserRetirementPartnerReportingStatus object for the given user
+        as part of the retirement pipeline.
+        """
+        username = request.data['username']
+
+        try:
+            retirement = UserRetirementStatus.get_retirement_for_retirement_action(username)
+            orgs = self._get_orgs_for_user(retirement.user)
+
+            if orgs:
+                UserRetirementPartnerReportingStatus.objects.get_or_create(
+                    user=retirement.user,
+                    defaults={
+                        'original_username': retirement.original_username,
+                        'original_email': retirement.original_email,
+                        'original_name': retirement.original_name
+                    }
+                )
+
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except UserRetirementStatus.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def retirement_partner_cleanup(self, request):
+        """
+        DELETE /api/user/v1/accounts/retirement_partner_report/
+
+        [{'original_username': 'user1'}, {'original_username': 'user2'}, ...]
+
+        Deletes UserRetirementPartnerReportingStatus objects for a list of users
+        that have been reported on.
+        """
+        usernames = [u['original_username'] for u in request.data]
+
+        if not usernames:
+            return Response('No original_usernames given.', status=status.HTTP_400_BAD_REQUEST)
+
+        retirement_statuses = UserRetirementPartnerReportingStatus.objects.filter(
+            is_being_processed=True,
+            original_username__in=usernames
+        )
+
+        # Need to de-dupe usernames that differ only by case to find the exact right match
+        retirement_statuses_clean = [rs for rs in retirement_statuses if rs.original_username in usernames]
+
+        # During a narrow window learners were able to re-use a username that had been retired if
+        # they altered the capitalization of one or more characters. Therefore we can have more
+        # than one row returned here (due to our MySQL collation being case-insensitive), and need
+        # to disambiguate them in Python, which will respect case in the comparison.
+        if len(usernames) != len(retirement_statuses_clean):
+            return Response(
+                '{} original_usernames given, {} found!\n'
+                'Given usernames:\n{}\n'
+                'Found UserRetirementReportingStatuses:\n{}'.format(
+                    len(usernames),
+                    len(retirement_statuses_clean),
+                    usernames,
+                    ', '.join([rs.original_username for rs in retirement_statuses_clean])
+                ),
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        retirement_statuses.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class AccountRetirementStatusView(ViewSet):
+    """
+    Provides API endpoints for managing the user retirement process.
+    """
+    authentication_classes = (JwtAuthentication,)
+    permission_classes = (permissions.IsAuthenticated, CanRetireUser,)
+    parser_classes = (JSONParser,)
+    serializer_class = UserRetirementStatusSerializer
+
+    def retirement_queue(self, request):
+        """
+        GET /api/user/v1/accounts/retirement_queue/
+        {'cool_off_days': 7, 'states': ['PENDING', 'COMPLETE']}
+
+        Returns the list of RetirementStatus users in the given states that were
+        created in the retirement queue at least `cool_off_days` ago.
+        """
+        try:
+            cool_off_days = int(request.GET['cool_off_days'])
+            if cool_off_days < 0:
+                raise RetirementStateError('Invalid argument for cool_off_days, must be greater than 0.')
+
+            states = request.GET.getlist('states')
+            if not states:
+                raise RetirementStateError('Param "states" required with at least one state.')
+
+            state_objs = RetirementState.objects.filter(state_name__in=states)
+            if state_objs.count() != len(states):
+                found = [s.state_name for s in state_objs]
+                raise RetirementStateError('Unknown state. Requested: {} Found: {}'.format(states, found))
+
+            earliest_datetime = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=cool_off_days)
+
+            retirements = UserRetirementStatus.objects.select_related(
+                'user', 'current_state', 'last_state'
+            ).filter(
+                current_state__in=state_objs, created__lt=earliest_datetime
+            ).order_by(
+                'id'
+            )
+            serializer = UserRetirementStatusSerializer(retirements, many=True)
+            return Response(serializer.data)
+        # This should only occur on the int() converstion of cool_off_days at this point
+        except ValueError:
+            return Response('Invalid cool_off_days, should be integer.', status=status.HTTP_400_BAD_REQUEST)
+        except KeyError as exc:
+            return Response('Missing required parameter: {}'.format(text_type(exc)), status=status.HTTP_400_BAD_REQUEST)
+        except RetirementStateError as exc:
+            return Response(text_type(exc), status=status.HTTP_400_BAD_REQUEST)
+
+    def retirements_by_status_and_date(self, request):
+        """
+        GET /api/user/v1/accounts/retirements_by_status_and_date/
+        ?start_date=2018-09-05&end_date=2018-09-07&state=COMPLETE
+
+        Returns a list of UserRetirementStatusSerializer serialized
+        RetirementStatus rows in the given state that were created in the
+        retirement queue between the dates given. Date range is inclusive,
+        so to get one day you would set both dates to that day.
+        """
+        try:
+            start_date = datetime.datetime.strptime(request.GET['start_date'], '%Y-%m-%d')
+            end_date = datetime.datetime.strptime(request.GET['end_date'], '%Y-%m-%d')
+            now = datetime.datetime.now()
+            if start_date > now or end_date > now or start_date > end_date:
+                raise RetirementStateError('Dates must be today or earlier, and start must be earlier than end.')
+
+            # Add a day to make sure we get all the way to 23:59:59.999, this is compared "lt" in the query
+            # not "lte".
+            end_date += datetime.timedelta(days=1)
+            state = request.GET['state']
+
+            state_obj = RetirementState.objects.get(state_name=state)
+
+            retirements = UserRetirementStatus.objects.select_related(
+                'user', 'current_state', 'last_state'
+            ).filter(
+                current_state=state_obj, created__lt=end_date, created__gte=start_date
+            ).order_by(
+                'id'
+            )
+            serializer = UserRetirementStatusSerializer(retirements, many=True)
+            return Response(serializer.data)
+        # This should only occur on the datetime conversion of the start / end dates.
+        except ValueError as exc:
+            return Response('Invalid start or end date: {}'.format(text_type(exc)), status=status.HTTP_400_BAD_REQUEST)
+        except KeyError as exc:
+            return Response('Missing required parameter: {}'.format(text_type(exc)), status=status.HTTP_400_BAD_REQUEST)
+        except RetirementState.DoesNotExist:
+            return Response('Unknown retirement state.', status=status.HTTP_400_BAD_REQUEST)
+        except RetirementStateError as exc:
+            return Response(text_type(exc), status=status.HTTP_400_BAD_REQUEST)
+
+    def retrieve(self, request, username):  # pylint: disable=unused-argument
+        """
+        GET /api/user/v1/accounts/{username}/retirement_status/
+        Returns the RetirementStatus of a given user, or 404 if that row
+        doesn't exist.
+        """
+        try:
+            user = get_potentially_retired_user_by_username(username)
+            retirement = UserRetirementStatus.objects.select_related(
+                'user', 'current_state', 'last_state'
+            ).get(user=user)
+            serializer = UserRetirementStatusSerializer(instance=retirement)
+            return Response(serializer.data)
+        except (UserRetirementStatus.DoesNotExist, User.DoesNotExist):
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+    @request_requires_username
+    def partial_update(self, request):
+        """
+        PATCH /api/user/v1/accounts/update_retirement_status/
+
+        {
+            'username': 'user_to_retire',
+            'new_state': 'LOCKING_COMPLETE',
+            'response': 'User account locked and logged out.'
+        }
+
+        Updates the RetirementStatus row for the given user to the new
+        status, and append any messages to the message log.
+
+        Note that this implementation DOES NOT use the "merge patch"
+        implementation seen in AccountViewSet. Slumber, the project
+        we use to power edx-rest-api-client, does not currently support
+        it. The content type for this request is 'application/json'.
+        """
+        try:
+            username = request.data['username']
+            retirements = UserRetirementStatus.objects.filter(original_username=username)
+
+            # During a narrow window learners were able to re-use a username that had been retired if
+            # they altered the capitalization of one or more characters. Therefore we can have more
+            # than one row returned here (due to our MySQL collation being case-insensitive), and need
+            # to disambiguate them in Python, which will respect case in the comparison.
+            retirement = None
+            if len(retirements) < 1:
+                raise UserRetirementStatus.DoesNotExist()
+            elif len(retirements) >= 1:
+                for r in retirements:
+                    if r.original_username == username:
+                        retirement = r
+                        break
+                # UserRetirementStatus was found, but it was the wrong case.
+                if retirement is None:
+                    raise UserRetirementStatus.DoesNotExist()
+
+            retirement.update_state(request.data)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except UserRetirementStatus.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        except RetirementStateError as exc:
+            return Response(text_type(exc), status=status.HTTP_400_BAD_REQUEST)
+        except Exception as exc:  # pylint: disable=broad-except
+            return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class LMSAccountRetirementView(ViewSet):
+    """
+    Provides an API endpoint for retiring a user in the LMS.
+    """
+    authentication_classes = (JwtAuthentication,)
+    permission_classes = (permissions.IsAuthenticated, CanRetireUser,)
+    parser_classes = (JSONParser,)
+
+    @request_requires_username
+    def post(self, request):
+        """
+        POST /api/user/v1/accounts/retire_misc/
+
+        {
+            'username': 'user_to_retire'
+        }
+
+        Retires the user with the given username in the LMS.
+        """
+
+        username = request.data['username']
+
+        try:
+            retirement = UserRetirementStatus.get_retirement_for_retirement_action(username)
+            RevisionPluginRevision.retire_user(retirement.user)
+            ArticleRevision.retire_user(retirement.user)
+            PendingNameChange.delete_by_user_value(retirement.user, field='user')
+            PasswordHistory.retire_user(retirement.user.id)
+            course_enrollments = CourseEnrollment.objects.filter(user=retirement.user)
+            ManualEnrollmentAudit.retire_manual_enrollments(course_enrollments, retirement.retired_email)
+
+            CreditRequest.retire_user(retirement)
+            ApiAccessRequest.retire_user(retirement.user)
+            CreditRequirementStatus.retire_user(retirement)
+
+            # This signal allows code in higher points of LMS to retire the user as necessary
+            USER_RETIRE_LMS_MISC.send(sender=self.__class__, user=retirement.user)
+
+            # This signal allows code in higher points of LMS to unsubscribe the user
+            # from various types of mailings.
+            USER_RETIRE_MAILINGS.send(
+                sender=self.__class__,
+                email=retirement.original_email,
+                new_email=retirement.retired_email,
+                user=retirement.user
+            )
+        except UserRetirementStatus.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        except RetirementStateError as exc:
+            return Response(text_type(exc), status=status.HTTP_400_BAD_REQUEST)
+        except Exception as exc:  # pylint: disable=broad-except
+            return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class AccountRetirementView(ViewSet):
+    """
+    Provides API endpoint for retiring a user.
+    """
+    authentication_classes = (JwtAuthentication,)
+    permission_classes = (permissions.IsAuthenticated, CanRetireUser,)
+    parser_classes = (JSONParser,)
+
+    @request_requires_username
+    def post(self, request):
+        """
+        POST /api/user/v1/accounts/retire/
+
+        {
+            'username': 'user_to_retire'
+        }
+
+        Retires the user with the given username.  This includes
+        retiring this username, the associated email address, and
+        any other PII associated with this user.
+        """
+        username = request.data['username']
+
+        try:
+            retirement_status = UserRetirementStatus.get_retirement_for_retirement_action(username)
+            user = retirement_status.user
+            retired_username = retirement_status.retired_username or get_retired_username_by_username(username)
+            retired_email = retirement_status.retired_email or get_retired_email_by_email(user.email)
+            original_email = retirement_status.original_email
+
+            # Retire core user/profile information
+            self.clear_pii_from_userprofile(user)
+            self.delete_users_profile_images(user)
+            self.delete_users_country_cache(user)
+
+            # Retire data from Enterprise models
+            self.retire_users_data_sharing_consent(username, retired_username)
+            self.retire_sapsf_data_transmission(user)
+            self.retire_degreed_data_transmission(user)
+            self.retire_user_from_pending_enterprise_customer_user(user, retired_email)
+            self.retire_entitlement_support_detail(user)
+
+            # Retire misc. models that may contain PII of this user
+            PendingEmailChange.delete_by_user_value(user, field='user')
+            UserOrgTag.delete_by_user_value(user, field='user')
+
+            # Retire any objects linked to the user via their original email
+            CourseEnrollmentAllowed.delete_by_user_value(original_email, field='email')
+            UnregisteredLearnerCohortAssignments.delete_by_user_value(original_email, field='email')
+
+            # This signal allows code in higher points of LMS to retire the user as necessary
+            USER_RETIRE_LMS_CRITICAL.send(sender=self.__class__, user=user)
+
+            user.first_name = ''
+            user.last_name = ''
+            user.is_active = False
+            user.username = retired_username
+            user.save()
+        except UserRetirementStatus.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        except RetirementStateError as exc:
+            return Response(text_type(exc), status=status.HTTP_400_BAD_REQUEST)
+        except Exception as exc:  # pylint: disable=broad-except
+            return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @staticmethod
+    def clear_pii_from_userprofile(user):
+        """
+        For the given user, sets all of the user's profile fields to some retired value.
+        This also deletes all ``SocialLink`` objects associated with this user's profile.
+        """
+        for model_field, value_to_assign in iteritems(USER_PROFILE_PII):
+            setattr(user.profile, model_field, value_to_assign)
+
+        user.profile.save()
+        user.profile.social_links.all().delete()
+
+    @staticmethod
+    def delete_users_profile_images(user):
+        set_has_profile_image(user.username, False)
+        names_of_profile_images = get_profile_image_names(user.username)
+        remove_profile_images(names_of_profile_images)
+
+    @staticmethod
+    def delete_users_country_cache(user):
+        cache_key = UserProfile.country_cache_key_name(user.id)
+        cache.delete(cache_key)
+
+    @staticmethod
+    def retire_users_data_sharing_consent(username, retired_username):
+        DataSharingConsent.objects.filter(username=username).update(username=retired_username)
+
+    @staticmethod
+    def retire_sapsf_data_transmission(user):
+        for ent_user in EnterpriseCustomerUser.objects.filter(user_id=user.id):
+            for enrollment in EnterpriseCourseEnrollment.objects.filter(
+                enterprise_customer_user=ent_user
+            ):
+                audits = SapSuccessFactorsLearnerDataTransmissionAudit.objects.filter(
+                    enterprise_course_enrollment_id=enrollment.id
+                )
+                audits.update(sapsf_user_id='')
+
+    @staticmethod
+    def retire_degreed_data_transmission(user):
+        for ent_user in EnterpriseCustomerUser.objects.filter(user_id=user.id):
+            for enrollment in EnterpriseCourseEnrollment.objects.filter(
+                enterprise_customer_user=ent_user
+            ):
+                audits = DegreedLearnerDataTransmissionAudit.objects.filter(
+                    enterprise_course_enrollment_id=enrollment.id
+                )
+                audits.update(degreed_user_email='')
+
+    @staticmethod
+    def retire_user_from_pending_enterprise_customer_user(user, retired_email):
+        PendingEnterpriseCustomerUser.objects.filter(user_email=user.email).update(user_email=retired_email)
+
+    @staticmethod
+    def retire_entitlement_support_detail(user):
+        """
+        Updates all CourseEntitleSupportDetail records for the given
+        user to have an empty ``comments`` field.
+        """
+        for entitlement in CourseEntitlement.objects.filter(user_id=user.id):
+            entitlement.courseentitlementsupportdetail_set.all().update(comments='')

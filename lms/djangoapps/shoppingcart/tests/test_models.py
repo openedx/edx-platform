@@ -15,11 +15,11 @@ from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core import mail
 from django.core.mail.message import EmailMessage
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import DatabaseError
 from django.test import TestCase
 from django.test.utils import override_settings
-from mock import MagicMock, patch
+from mock import Mock, MagicMock, patch
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
 
@@ -247,12 +247,8 @@ class OrderTest(ModuleStoreTestCase):
         self.assertEqual(cart.status, status)
         self.assertEqual(item.status, status)
 
-    @override_settings(
-        LMS_SEGMENT_KEY="foobar",
-        FEATURES={
-            'STORE_BILLING_INFO': True,
-        }
-    )
+    @override_settings(LMS_SEGMENT_KEY="foobar")
+    @patch.dict(settings.FEATURES, {'STORE_BILLING_INFO': True})
     def test_purchase(self):
         # This test is for testing the subclassing functionality of OrderItem, but in
         # order to do this, we end up testing the specific functionality of
@@ -914,12 +910,9 @@ class CertificateItemTest(ModuleStoreTestCase):
         cert_item = CertificateItem.add_to_order(cart, self.course_key, self.cost, 'honor')
         self.assertEquals(cert_item.single_item_receipt_template, 'shoppingcart/receipt.html')
 
-    @override_settings(
-        LMS_SEGMENT_KEY="foobar",
-        FEATURES={
-            'STORE_BILLING_INFO': True,
-        }
-    )
+    @override_settings(LMS_SEGMENT_KEY="foobar")
+    @patch.dict(settings.FEATURES, {'STORE_BILLING_INFO': True})
+    @patch('lms.djangoapps.course_goals.views.update_google_analytics', Mock(return_value=True))
     @patch('student.models.CourseEnrollment.refund_cutoff_date')
     def test_refund_cert_callback_no_expiration(self, cutoff_date):
         # When there is no expiration date on a verified mode, the user can always get a refund
@@ -956,12 +949,9 @@ class CertificateItemTest(ModuleStoreTestCase):
         self.assertFalse(target_certs[0].refund_requested_time)
         self.assertEquals(target_certs[0].order.status, 'purchased')
 
-    @override_settings(
-        LMS_SEGMENT_KEY="foobar",
-        FEATURES={
-            'STORE_BILLING_INFO': True,
-        }
-    )
+    @override_settings(LMS_SEGMENT_KEY="foobar")
+    @patch.dict(settings.FEATURES, {'STORE_BILLING_INFO': True})
+    @patch('lms.djangoapps.course_goals.views.update_google_analytics', Mock(return_value=True))
     @patch('student.models.CourseEnrollment.refund_cutoff_date')
     def test_refund_cert_callback_before_expiration(self, cutoff_date):
         # If the expiration date has not yet passed on a verified mode, the user can be refunded

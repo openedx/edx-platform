@@ -59,7 +59,7 @@
                                             </span>
                                             <span class="tip tip-error is-hidden"></span>
                                         </li>
-                                        <li class="field text required" id="field-organization">
+                                        <li class="field text required">
                                             <label for="rerun-course-org">Organization</label>
                                             <input class="rerun-course-org" id="rerun-course-org" type="text"
                                                    name="rerun-course-org" aria-required="true"

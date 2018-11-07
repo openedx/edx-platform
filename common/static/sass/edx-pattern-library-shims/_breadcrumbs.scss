@@ -9,10 +9,33 @@
 
   .nav-item {
     @include margin-left($baseline/4);
+
     display: inline-block;
 
-    a, a:visited {
-      color: $uxpl-blue-base;
+    @include media-breakpoint-down(lg) {
+      max-width: 240px;
+    }
+
+    @include media-breakpoint-down(sm) {
+      max-width: 140px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    @include media-breakpoint-down(xs) {
+      &:not(:first-child) {
+        max-width: 60px;
+      }
+    }
+
+    &.nav-item-course {
+      max-width: none;
+    }
+
+    a,
+    a:visited {
+      color: theme-color("primary");
     }
 
     a:hover {
@@ -22,8 +45,14 @@
 
   .fa-angle-right {
     @include margin-left($baseline/4);
+
+    @include media-breakpoint-down(sm) {
+      position: relative;
+      top: -5px;
+    }
+
     display: inline-block;
-    color: $base-font-color;
+    color: $body-color;
 
     @include rtl {
       @include transform(rotateY(180deg));

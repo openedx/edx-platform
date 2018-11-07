@@ -45,21 +45,28 @@ class TestOverrideProvider(FieldOverrideProvider):
         return True
 
 
-@attr(shard=1)
-@override_settings(FIELD_OVERRIDE_PROVIDERS=(
-    'courseware.tests.test_field_overrides.TestOverrideProvider',))
-class OverrideFieldDataTests(SharedModuleStoreTestCase):
+class OverrideFieldBase(SharedModuleStoreTestCase):
     """
-    Tests for `OverrideFieldData`.
+    Base class for field data override tests.  Using override_settings and
+    a setUpClass() override in a test class which is inherited by another
+    test class doesn't work well with pytest-django.
     """
-
     @classmethod
     def setUpClass(cls):
         """
         Course is created here and shared by all the class's tests.
         """
-        super(OverrideFieldDataTests, cls).setUpClass()
+        super(OverrideFieldBase, cls).setUpClass()
         cls.course = CourseFactory.create(enable_ccx=True)
+
+
+@attr(shard=1)
+@override_settings(FIELD_OVERRIDE_PROVIDERS=(
+    'courseware.tests.test_field_overrides.TestOverrideProvider',))
+class OverrideFieldDataTests(OverrideFieldBase):
+    """
+    Tests for `OverrideFieldData`.
+    """
 
     def setUp(self):
         super(OverrideFieldDataTests, self).setUp()

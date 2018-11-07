@@ -49,8 +49,7 @@ function($, _, str, gettext, BaseView, SignatoryModel, SignatoryDetailsView, Vie
                         return self.model.set('editing', true);
                     }
                 );
-            }
-            else {
+            } else {
                 this.model.set('editing', true);
             }
         },

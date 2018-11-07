@@ -1,5 +1,5 @@
 define(['backbone', 'underscore', 'gettext', 'js/models/chapter', 'js/collections/chapter',
-        'backbone.associations', 'cms/js/main'],
+    'backbone.associations', 'cms/js/main'],
     function(Backbone, _, gettext, ChapterModel, ChapterCollection) {
         var Textbook = Backbone.AssociatedModel.extend({
             defaults: function() {
@@ -40,7 +40,7 @@ define(['backbone', 'underscore', 'gettext', 'js/models/chapter', 'js/collection
                     delete ret.tab_title;
                 }
                 if ('url' in ret && !('chapters' in ret)) {
-                    ret.chapters = {'url': ret.url};
+                    ret.chapters = {url: ret.url};
                     delete ret.url;
                 }
                 _.each(ret.chapters, function(chapter, i) {

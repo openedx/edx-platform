@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 //////////////////////////////////////////////////////////////////////////////
 //
 //  Circuit simulator
@@ -1886,27 +1888,25 @@ var cktsim = (function() {
 	    }
 	    var vgs = this.type_sign * ckt.get_two_terminal(this.g, this.s, soln);
 	    var vgst = vgs - this.vt;
-	    with (this) {
-		var gmgs,ids,gds;
-		if (vgst > 0.0 ) { // vgst < 0, transistor off, no subthreshold here.
-		    if (vgst < vds) { /* Saturation. */
-			gmgs =  beta * (1 + (lambda * vds)) * vgst;
-			ids = type_sign * 0.5 * gmgs * vgst;
-			gds = 0.5 * beta * vgst * vgst * lambda;
-		    } else {  /* Linear region */
-			gmgs =  beta * (1 + lambda * vds);
-			ids = type_sign * gmgs * vds * (vgst - 0.50 * vds);
-			gds = gmgs * (vgst - vds) + beta * lambda * vds * (vgst - 0.5 * vds);
-			gmgs *= vds;
-		    }
-		    ckt.add_to_rhs(d,-ids,rhs);  // current flows into the drain
-		    ckt.add_to_rhs(s, ids,rhs);   // and out the source
-		    ckt.add_conductance(d,s,gds);
-		    ckt.add_to_G(s,s, gmgs);
-		    ckt.add_to_G(d,s,-gmgs);
-		    ckt.add_to_G(d,g, gmgs);
-		    ckt.add_to_G(s,g,-gmgs);
+	    var gmgs,ids,gds;
+	    if (vgst > 0.0 ) { // vgst < 0, transistor off, no subthreshold here.
+		if (vgst < vds) { /* Saturation. */
+	    	gmgs =  this.beta * (1 + (this.lambda * vds)) * vgst;
+	    	ids = this.type_sign * 0.5 * gmgs * vgst;
+	    	gds = 0.5 * this.beta * vgst * vgst * this.lambda;
+		} else {  /* Linear region */
+	    	gmgs =  this.beta * (1 + this.lambda * vds);
+	    	ids = this.type_sign * gmgs * vds * (vgst - 0.50 * vds);
+	    	gds = gmgs * (vgst - vds) + this.beta * this.lambda * vds * (vgst - 0.5 * vds);
+	    	gmgs *= vds;
 		}
+		ckt.add_to_rhs(this.d,-ids,rhs);  // current flows into the drain
+		ckt.add_to_rhs(this.s, ids,rhs);   // and out the source
+		ckt.add_conductance(this.d,this.s,gds);
+		ckt.add_to_G(this.s,this.s, gmgs);
+		ckt.add_to_G(this.d,this.s,-gmgs);
+		ckt.add_to_G(this.d,this.g, gmgs);
+		ckt.add_to_G(this.s,this.g,-gmgs);
 	    }
 	}
 

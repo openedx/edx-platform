@@ -6,7 +6,8 @@ from mock import MagicMock, Mock, patch
 from nose.plugins.attrib import attr
 
 from bulk_email.models import SEND_TO_LEARNERS, SEND_TO_MYSELF, SEND_TO_STAFF, CourseEmail
-from certificates.models import CertificateGenerationHistory, CertificateStatuses
+from lms.djangoapps.certificates.models import CertificateGenerationHistory, CertificateStatuses
+from common.test.utils import normalize_repr
 from courseware.tests.factories import UserFactory
 from lms.djangoapps.instructor_task.api import (
     SpecificStudentIdMissingError,
@@ -25,13 +26,14 @@ from lms.djangoapps.instructor_task.api import (
     submit_detailed_enrollment_features_csv,
     submit_executive_summary_report,
     submit_export_ora2_data,
+    submit_override_score,
     submit_rescore_entrance_exam_for_student,
     submit_rescore_problem_for_all_students,
     submit_rescore_problem_for_student,
     submit_reset_problem_attempts_for_all_students,
     submit_reset_problem_attempts_in_entrance_exam
 )
-from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError
+from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError, QueueConnectionError
 from lms.djangoapps.instructor_task.models import PROGRESS, InstructorTask
 from lms.djangoapps.instructor_task.tasks import export_ora2_data
 from lms.djangoapps.instructor_task.tests.test_base import (
@@ -42,6 +44,7 @@ from lms.djangoapps.instructor_task.tests.test_base import (
     TestReportMixin
 )
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from celery.states import FAILURE
 
 
 class InstructorTaskReportTest(InstructorTaskTestCase):
@@ -145,32 +148,57 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
         self._test_submit_with_long_url(submit_delete_problem_state_for_all_students)
 
     @ddt.data(
-        (submit_rescore_problem_for_all_students, 'rescore_problem'),
-        (submit_rescore_problem_for_all_students, 'rescore_problem_if_higher', {'only_if_higher': True}),
-        (submit_rescore_problem_for_student, 'rescore_problem', {'student': True}),
-        (submit_rescore_problem_for_student, 'rescore_problem_if_higher', {'student': True, 'only_if_higher': True}),
-        (submit_reset_problem_attempts_for_all_students, 'reset_problem_attempts'),
-        (submit_delete_problem_state_for_all_students, 'delete_problem_state'),
-        (submit_rescore_entrance_exam_for_student, 'rescore_problem', {'student': True}),
+        (normalize_repr(submit_rescore_problem_for_all_students), 'rescore_problem'),
         (
-            submit_rescore_entrance_exam_for_student,
+            normalize_repr(submit_rescore_problem_for_all_students),
+            'rescore_problem_if_higher',
+            {'only_if_higher': True}
+        ),
+        (normalize_repr(submit_rescore_problem_for_student), 'rescore_problem', {'student': True}),
+        (
+            normalize_repr(submit_rescore_problem_for_student),
+            'rescore_problem_if_higher',
+            {'student': True, 'only_if_higher': True}
+        ),
+        (normalize_repr(submit_reset_problem_attempts_for_all_students), 'reset_problem_attempts'),
+        (normalize_repr(submit_delete_problem_state_for_all_students), 'delete_problem_state'),
+        (normalize_repr(submit_rescore_entrance_exam_for_student), 'rescore_problem', {'student': True}),
+        (
+            normalize_repr(submit_rescore_entrance_exam_for_student),
             'rescore_problem_if_higher',
             {'student': True, 'only_if_higher': True},
         ),
-        (submit_reset_problem_attempts_in_entrance_exam, 'reset_problem_attempts', {'student': True}),
-        (submit_delete_entrance_exam_state_for_student, 'delete_problem_state', {'student': True}),
+        (normalize_repr(submit_reset_problem_attempts_in_entrance_exam), 'reset_problem_attempts', {'student': True}),
+        (normalize_repr(submit_delete_entrance_exam_state_for_student), 'delete_problem_state', {'student': True}),
+        (normalize_repr(submit_override_score), 'override_problem_score', {'student': True, 'score': 0})
     )
     @ddt.unpack
     def test_submit_task(self, task_function, expected_task_type, params=None):
+        """
+        Tests submission of instructor task.
+        """
         if params is None:
             params = {}
         if params.get('student'):
             params['student'] = self.student
 
-        # tests submit, and then tests a second identical submission.
         problem_url_name = 'H1P1'
         self.define_option_problem(problem_url_name)
         location = InstructorTaskModuleTestCase.problem_location(problem_url_name)
+
+        # unsuccessful submission, exception raised while submitting.
+        with patch('lms.djangoapps.instructor_task.tasks_base.BaseInstructorTask.apply_async') as apply_async:
+
+            error = Exception()
+            apply_async.side_effect = error
+
+            with self.assertRaises(QueueConnectionError):
+                instructor_task = task_function(self.create_task_request(self.instructor), location, **params)
+
+            most_recent_task = InstructorTask.objects.latest('id')
+            self.assertEquals(most_recent_task.task_state, FAILURE)
+
+        # successful submission
         instructor_task = task_function(self.create_task_request(self.instructor), location, **params)
         self.assertEquals(instructor_task.task_type, expected_task_type)
 

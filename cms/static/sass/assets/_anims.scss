@@ -20,7 +20,7 @@
 // fade in keyframes
 @include keyframes(fadeIn) {
   0% {
-    opacity: 0.0;
+    opacity: 0;
   }
 
   50% {
@@ -28,7 +28,7 @@
   }
 
   100% {
-    opacity: 1.0;
+    opacity: 1;
   }
 }
 
@@ -42,7 +42,7 @@
 // fade out keyframes
 @include keyframes(fadeOut) {
   0% {
-    opacity: 1.0;
+    opacity: 1;
   }
 
   50% {
@@ -50,7 +50,7 @@
   }
 
   100% {
-    opacity: 0.0;
+    opacity: 0;
   }
 }
 
@@ -188,12 +188,14 @@
 // bounce in keyframes
 @include keyframes(bounceIn) {
   0% {
-    opacity: 0.0;
+    opacity: 0;
+
     @include transform(scale(0.3));
   }
 
   50% {
-    opacity: 1.0;
+    opacity: 1;
+
     @include transform(scale(1.05));
   }
 
@@ -216,12 +218,14 @@
   }
 
   50% {
-    opacity: 1.0;
+    opacity: 1;
+
     @include transform(scale(1.05));
   }
 
   100% {
-    opacity: 0.0;
+    opacity: 0;
+
     @include transform(scale(0.3));
   }
 }
@@ -235,12 +239,13 @@
 // ====================
 // flash keyframes
 @include keyframes(flash) {
-  0%, 100% {
-    opacity: 1.0;
+  0%,
+  100% {
+    opacity: 1;
   }
 
   50% {
-    opacity: 0.0;
+    opacity: 0;
   }
 }
 
@@ -253,13 +258,16 @@
 // ====================
 // flash double keyframes
 @include keyframes(flashDouble) {
-  0%, 50%, 100% {
-    opacity: 1.0;
+  0%,
+  50%,
+  100% {
+    opacity: 1;
   }
 
-  25%, 75% {
-      opacity: 0.0;
-    }
+  25%,
+  75% {
+    opacity: 0;
+  }
 }
 
 // flash double animation
@@ -272,15 +280,15 @@
 // pulse keyframes
 @include keyframes(pulse) {
   0% {
-    opacity: 0.0;
+    opacity: 0;
   }
 
   50% {
-    opacity: 1.0;
+    opacity: 1;
   }
 
   100% {
-    opacity: 0.0;
+    opacity: 0;
   }
 }
 
@@ -294,7 +302,7 @@
 // was dropped keyframes
 @include keyframes(was-dropped) {
   0% {
-    opacity: 1.0;
+    opacity: 1;
   }
 
   50% {
@@ -302,7 +310,7 @@
   }
 
   100% {
-    opacity: 1.0;
+    opacity: 1;
   }
 }
 

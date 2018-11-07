@@ -2,8 +2,8 @@
 Tests for manager.py
 """
 import ddt
+from django.test import TestCase
 from nose.plugins.attrib import attr
-from unittest import TestCase
 
 from ..block_structure import BlockStructureBlockData
 from ..config import RAISE_ERROR_WHEN_NOT_FOUND, STORAGE_BACKING_FOR_CACHE, waffle

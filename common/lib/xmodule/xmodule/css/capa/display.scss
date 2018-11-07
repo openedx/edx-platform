@@ -21,8 +21,8 @@
 
 // +Variables - Capa
 // ====================
-$annotation-yellow: rgba(255,255,10,0.3);
-$color-copy-tip: rgb(100,100,100);
+$annotation-yellow: rgba(255, 255, 10, 0.3);
+$color-copy-tip: rgb(100, 100, 100);
 
 // FontAwesome Icon code
 // ====================
@@ -45,11 +45,11 @@ $asterisk-icon: '\f069'; // .fa-asterisk
 
 // +Mixins - Status Icon - Capa
 // ====================
-@mixin status-icon($color: $gray, $fontAwesomeIcon: "\f00d"){
-
+@mixin status-icon($color: $gray, $fontAwesomeIcon: "\f00d") {
   .status-icon {
-    &:after {
+    &::after {
       @extend %use-font-awesome;
+
       color: $color;
       font-size: 1.2em;
       content: $fontAwesomeIcon;
@@ -65,6 +65,7 @@ h2 {
 
   &.problem-header {
     display: inline-block;
+
     section.staff {
       margin-top: ($baseline*1.5);
       font-size: 80%;
@@ -92,6 +93,7 @@ h2 {
 
 .feedback-hint-incorrect {
   @extend %feedback-hint;
+
   .icon {
     color: $incorrect;
   }
@@ -100,6 +102,7 @@ h2 {
 .feedback-hint-partially-correct,
 .feedback-hint-correct {
   @extend %feedback-hint;
+
   .icon {
     color: $correct;
   }
@@ -111,6 +114,7 @@ h2 {
 
 .problem-hint {
   margin-bottom: 20px;
+  width: 100%;
 }
 
 .hint-label {
@@ -199,12 +203,14 @@ div.problem {
 // Choice Group - silent class
 %choicegroup-base {
   @include clearfix();
+
   min-width: 100px;
   width: auto !important;
   width: 100px;
 
   label {
     @include box-sizing(border-box);
+
     display: inline-block;
     clear: both;
     margin-bottom: ($baseline/2);
@@ -213,8 +219,8 @@ div.problem {
     padding: ($baseline/2);
     width: 100%;
 
-    &:after {
-      @include margin-left($baseline*.75);
+    &::after {
+      @include margin-left($baseline*0.75);
     }
 
     &:hover {
@@ -223,6 +229,7 @@ div.problem {
 
     &.choicegroup_correct {
       @include status-icon($correct, $checkmark-icon);
+
       border: 2px solid $correct;
 
       // keep green for correct answers on hover.
@@ -233,6 +240,7 @@ div.problem {
 
     &.choicegroup_partially-correct {
       @include status-icon($partially-correct, $asterisk-icon);
+
       border: 2px solid $partially-correct;
 
       // keep green for correct answers on hover.
@@ -243,6 +251,7 @@ div.problem {
 
     &.choicegroup_incorrect {
       @include status-icon($incorrect, $cross-icon);
+
       border: 2px solid $incorrect;
 
       // keep red for incorrect answers on hover.
@@ -282,9 +291,11 @@ div.problem {
 div.problem {
   .choicegroup {
     @extend %choicegroup-base;
+
     label {
       @include padding($baseline/2);
       @include padding-left($baseline*1.9);
+
       position: relative;
       font-size: $base-font-size;
       line-height: normal;
@@ -294,6 +305,7 @@ div.problem {
     input[type="radio"],
     input[type="checkbox"] {
       @include left(em(9));
+
       position: absolute;
       top: em(9);
     }
@@ -316,9 +328,8 @@ div.problem {
 // ====================
 // Summary status indicators shown after the input area
 div.problem {
-
   .indicator-container {
-      @include margin-left($baseline*.75);
+    @include margin-left($baseline*0.75);
 
     .status {
       width: $baseline;
@@ -354,7 +365,7 @@ div.problem {
 div.problem {
   ol.enumerate {
     li {
-      &:before {
+      &::before {
         display: block;
         visibility: hidden;
         height: 0;
@@ -397,6 +408,7 @@ div.problem {
 
       span.clarification i {
         font-style: normal;
+
         &:hover {
           color: $blue;
         }
@@ -444,14 +456,16 @@ div.problem {
       margin-top: ($baseline / 2);
       margin-bottom: 0;
 
-      &:before {
+      &::before {
         @extend %t-strong;
+
         display: inline;
         content: "Answer: ";
 
       }
+
       &:empty {
-        &:before {
+        &::before {
           display: none;
         }
       }
@@ -467,6 +481,7 @@ div.problem {
 
       img.loading {
         @include padding-left($baseline/2);
+
         display: inline-block;
       }
 
@@ -532,12 +547,14 @@ div.problem {
 
     .reload {
       @include float(right);
+
       margin: ($baseline/2);
     }
 
 
     .grader-status {
       @include clearfix();
+
       margin: $baseline/2 0;
       padding: $baseline/2;
       border-radius: 5px;
@@ -582,6 +599,7 @@ div.problem {
       }
 
     }
+
     .evaluation {
       p {
         margin-bottom: ($baseline/5);
@@ -597,6 +615,7 @@ div.problem {
     .evaluation-response {
       header {
         text-align: right;
+
         a {
           font-size: .85em;
         }
@@ -685,7 +704,6 @@ div.problem {
     table-layout: auto;
 
     td, th {
-
       &.cont-justified-left {
         text-align: left !important; // nasty, but needed to override the bad specificity of the xmodule css selectors
       }
@@ -701,6 +719,7 @@ div.problem {
 
     th {
       @extend %t-strong;
+
       text-align: left;
     }
 
@@ -759,9 +778,9 @@ div.problem {
 // ====================
 .problem {
   .capa_inputtype.textline, .inputtype.formulaequationinput {
-
     input {
       @include box-sizing(border-box);
+
       border: 2px solid $gray-l4;
       border-radius: 3px;
       min-width: 160px;
@@ -776,7 +795,6 @@ div.problem {
 
     // CASE: incorrect answer
     > .incorrect {
-
       input {
         border: 2px solid $incorrect;
       }
@@ -788,7 +806,6 @@ div.problem {
 
     // CASE: partially correct answer
     > .partially-correct {
-
       input {
         border: 2px solid $partially-correct;
       }
@@ -800,7 +817,6 @@ div.problem {
 
     // CASE: correct answer
     > .correct {
-
       input {
         border: 2px solid $correct;
       }
@@ -812,7 +828,6 @@ div.problem {
 
     // CASE: submitted, correctness withheld
     > .submitted {
-
       input {
         border: 2px solid $submitted;
       }
@@ -824,14 +839,13 @@ div.problem {
 
     // CASE: unanswered and unsubmitted
     > .unanswered, > .unsubmitted {
-
       input {
         border: 2px solid $gray-l4;
       }
 
       .status {
         .status-icon {
-          &:after {
+          &::after {
             content: '';
           }
         }
@@ -842,6 +856,7 @@ div.problem {
 
   .trailing_text {
     @include margin-right($baseline/2);
+
     display: inline-block;
   }
 }
@@ -856,11 +871,11 @@ div.problem {
     .indicator-container {
       display: inline-block;
 
-      .status.correct:after,
-      .status.partially-correct:after,
-      .status.incorrect:after,
-      .status.submitted:after,
-      .status.unanswered:after {
+      .status.correct::after,
+      .status.partially-correct::after,
+      .status.incorrect::after,
+      .status.submitted::after,
+      .status.unanswered::after {
         @include margin-left(0);
       }
     }
@@ -870,7 +885,6 @@ div.problem {
 // +Problem - CodeMirror
 // ====================
 div.problem {
-
   .CodeMirror {
     border: 1px solid black;
     font-size: 14px;
@@ -878,9 +892,9 @@ div.problem {
     resize: none;
 
     .cm-tab {
-        background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAMCAYAAAAkuj5RAAAAAXNSR0IArs4c6QAAAGFJREFUSMft1LsRQFAQheHPowAKoACx3IgEKtaEHujDjORSgWTH/ZOdnZOcM/sgk/kFFWY0qV8foQwS4MKBCS3qR6ixBJvElOobYAtivseIE120FaowJPN75GMu8j/LfMwNjh4HUpwg4LUAAAAASUVORK5CYII=);
-        background-position: right;
-        background-repeat: no-repeat;
+      background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAMCAYAAAAkuj5RAAAAAXNSR0IArs4c6QAAAGFJREFUSMft1LsRQFAQheHPowAKoACx3IgEKtaEHujDjORSgWTH/ZOdnZOcM/sgk/kFFWY0qV8foQwS4MKBCS3qR6ixBJvElOobYAtivseIE120FaowJPN75GMu8j/LfMwNjh4HUpwg4LUAAAAASUVORK5CYII=);
+      background-position: right;
+      background-repeat: no-repeat;
     }
 
     pre {
@@ -898,6 +912,7 @@ div.problem {
 
       &.CodeMirror-cursor {
         @extend %ui-depth1;
+
         position: absolute;
         visibility: hidden;
         width: 0;
@@ -943,6 +958,7 @@ div.problem .action {
 
   .problem-action-button-wrapper {
     @include border-right(1px solid $light-gray1);
+
     display: inline-block;
 
     &:last-child {
@@ -952,6 +968,7 @@ div.problem .action {
 
   .problem-action-btn {
     @include margin-right($baseline / 5);
+
     max-width: 110px;
 
     .icon {
@@ -973,15 +990,18 @@ div.problem .action {
       max-width: 100%;
       padding-bottom: $baseline;
     }
+
     .submit {
       @include margin-right($baseline / 2);
       @include float(left);
+
       white-space: nowrap;
     }
   }
 
   .submission-feedback {
     @include margin-right($baseline / 2);
+
     margin-top: $baseline / 2;
     display: inline-block;
     color: $gray-d1;
@@ -1033,6 +1053,7 @@ div.problem {
 
     &:first-child {
       @extend %t-strong;
+
       margin-bottom: 0;
     }
 
@@ -1042,12 +1063,12 @@ div.problem {
   .detailed-targeted-feedback-partially-correct,
   .detailed-targeted-feedback-correct {
     > p {
-        margin: 0;
-        font-weight: normal;
+      margin: 0;
+      font-weight: normal;
 
-        &:first-child {
-          @extend %t-strong;
-        }
+      &:first-child {
+        @extend %t-strong;
+      }
     }
   }
 
@@ -1062,20 +1083,21 @@ div.problem {
 
   .notification {
     @include float(left);
+
     margin-top: $baseline / 2;
     padding: ($baseline / 2.5) ($baseline / 2) ($baseline / 5) ($baseline / 2);
     line-height: $base-line-height;
 
     &.success {
-      @include notification-by-type($success-color);
+      @include notification-by-type($success);
     }
 
     &.error {
-      @include notification-by-type($error-color);
+      @include notification-by-type($danger);
     }
 
     &.warning {
-      @include notification-by-type($warning-color);
+      @include notification-by-type($warning);
     }
 
     &.general {
@@ -1088,6 +1110,7 @@ div.problem {
 
       .icon {
         @include margin-right(3 * $baseline / 4);
+
         color: $uxpl-gray-dark;
       }
 
@@ -1102,6 +1125,7 @@ div.problem {
 
     .icon {
       @include float(left);
+
       position: relative;
       top: $baseline / 5;
     }
@@ -1132,6 +1156,7 @@ div.problem {
 
   .notification-btn {
     @include float(right);
+
     padding: ($baseline / 10) ($baseline / 4);
     min-width: ($baseline * 3);
     display: block;
@@ -1182,7 +1207,7 @@ div.problem {
   }
 
   .capa_reset>h2 {
-    color: #aa0000;
+    color: #a00;
   }
 
   .capa_reset li {
@@ -1194,6 +1219,7 @@ div.problem {
 
     h3 {
       @extend %t-strong;
+
       padding: 9px;
       border-bottom: 1px solid #e3e3e3;
       background: #eee;
@@ -1235,8 +1261,8 @@ div.problem {
 
       h3 {
         @extend %t-strong;
+
         color: #aaa;
-        text-transform: uppercase;
         font-style: normal;
         font-size: 0.9em;
       }
@@ -1262,6 +1288,7 @@ div.problem {
       a.full {
         @include position(absolute, 0 0 1px 0);
         @include box-sizing(border-box);
+
         display: block;
         padding: ($baseline/5);
         background: $gray-l4;
@@ -1354,7 +1381,7 @@ div.problem {
           background: url('#{$static-path}/images/incorrect-icon.png') left 20px no-repeat;
 
           .result-actual-output {
-            color: #B00;
+            color: #b00;
           }
         }
 
@@ -1365,7 +1392,7 @@ div.problem {
           border-left: 20px solid #fafafa;
 
           bs {
-            color: #bb0000;
+            color: #b00;
           }
 
           bg {
@@ -1445,6 +1472,7 @@ div.problem {
 
     .annotation-header {
       @extend %t-strong;
+
       padding: .5em 1em;
       border-bottom: 1px solid $gray-l3;
     }
@@ -1457,7 +1485,7 @@ div.problem {
       font-weight: normal;
     }
 
-    a.annotation-return:after { content: " \2191" }
+    a.annotation-return::after { content: " \2191" }
 
     .block, ul.tags {
       margin: .5em 0;
@@ -1486,6 +1514,7 @@ div.problem {
 
         .tag {
           @extend %ui-fake-link;
+
           display: inline-block;
           margin-left: ($baseline*2);
           border: 1px solid rgb(102,102,102);
@@ -1494,6 +1523,7 @@ div.problem {
             background-color: $annotation-yellow;
           }
         }
+
         .tag-status {
           position: absolute;
           left: 0;
@@ -1506,6 +1536,7 @@ div.problem {
       $num-lines-to-show: 5;
       $line-height: 1.4em;
       $padding: .2em;
+
       padding: $padding (2 * $padding);
       width: 100%;
       height: ($num-lines-to-show * $line-height) + (2*$padding) - (($line-height - 1)/2);
@@ -1526,11 +1557,11 @@ div.problem {
 
       pre { background-color: $gray-l3; color: $black; }
 
-      &:before {
+      &::before {
         @extend %t-strong;
+
         display: block;
         content: "debug input value";
-        text-transform: uppercase;
         font-size: 1.5em;
       }
     }
@@ -1572,8 +1603,9 @@ div.problem {
     }
 
     label.choicetextgroup_show_correct, section.choicetextgroup_show_correct {
-      &:after {
-        @include margin-left($baseline*.75);
+      &::after {
+        @include margin-left($baseline*0.75);
+
         content: url('#{$static-path}/images/correct-icon.png');
       }
     }
@@ -1589,7 +1621,6 @@ div.problem {
 
 // NOTE: temporary override until image inputs use same base html structure as other common capa input types.
 div.problem .imageinput.capa_inputtype {
-
   .status {
     display: inline-block;
     position: relative;
@@ -1620,7 +1651,6 @@ div.problem .imageinput.capa_inputtype {
 
 // NOTE: temporary override until annotation problem inputs use same base html structure as other common capa input types.
 div.problem .annotation-input {
-
   .tag-status {
     display: inline-block;
     position: relative;
@@ -1644,4 +1674,11 @@ div.problem .annotation-input {
   .submitted {
     content: '';
   }
+}
+
+// Loading Spinner
+// ====================
+.problems-wrapper .loading-spinner {
+  text-align: center;
+  color: $gray-d1;
 }

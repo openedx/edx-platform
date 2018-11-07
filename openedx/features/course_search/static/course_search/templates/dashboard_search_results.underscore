@@ -1,5 +1,4 @@
 <header class="search-info">
-    <a class="search-back-to-courses" href="#"><%- gettext("Back to Dashboard") %></a>
     <h2><%- gettext("Search Results") %></h2>
     <div class="search-count"><%- totalCountMsg %></div>
 </header>

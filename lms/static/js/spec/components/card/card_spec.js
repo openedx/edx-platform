@@ -2,10 +2,10 @@
     'use strict';
 
     define(['jquery',
-            'underscore',
-            'backbone',
-            'js/components/card/views/card'
-           ],
+        'underscore',
+        'backbone',
+        'js/components/card/views/card'
+    ],
         function($, _, Backbone, CardView) {
             describe('card component view', function() {
                 it('can render itself as a square card', function() {

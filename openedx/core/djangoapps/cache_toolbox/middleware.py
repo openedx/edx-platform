@@ -9,7 +9,7 @@ avoid querying the database for a ``User`` instance in each request.
 Whilst the built-in ``AuthenticationMiddleware`` mechanism will only obtain the
 ``User`` instance when it is required, the vast majority of sites will do so on
 every page to render "Logged in as 'X'" text as well to evaluate the result of
-``user.is_authenticated()`` and ``user.is_superuser`` to provide conditional
+``user.is_authenticated`` and ``user.is_superuser`` to provide conditional
 functionality.
 
 This middleware eliminates the cost of retrieving this ``User`` instance by
@@ -120,19 +120,15 @@ class CacheBackedAuthenticationMiddleware(AuthenticationMiddleware):
 
     def _verify_session_auth(self, request):
         """
-        Ensure that the user's session hash hasn't changed. We check that
-        SessionAuthenticationMiddleware is enabled in order to match Django's
-        behavior.
+        Ensure that the user's session hash hasn't changed.
         """
-        session_auth_class = 'django.contrib.auth.middleware.SessionAuthenticationMiddleware'
-        session_auth_enabled = session_auth_class in settings.MIDDLEWARE_CLASSES
         # Auto-auth causes issues in Bok Choy tests because it resets
         # the requesting user. Since session verification is a
         # security feature, we can turn it off when auto-auth is
         # enabled since auto-auth is highly insecure and only for
         # tests.
         auto_auth_enabled = settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING', False)
-        if not auto_auth_enabled and session_auth_enabled and hasattr(request.user, 'get_session_auth_hash'):
+        if not auto_auth_enabled and hasattr(request.user, 'get_session_auth_hash'):
             session_hash = request.session.get(HASH_SESSION_KEY)
             if not (session_hash and constant_time_compare(session_hash, request.user.get_session_auth_hash())):
                 # The session hash has changed due to a password

@@ -11,6 +11,7 @@ from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy
 from django_countries.fields import CountryField
 from model_utils import FieldTracker
+from opaque_keys.edx.django.models import CourseKeyField
 
 from django_comment_common.signals import (
     comment_created,
@@ -21,13 +22,14 @@ from django_comment_common.signals import (
     thread_created,
     thread_deleted,
     thread_edited,
-    thread_voted
+    thread_voted,
+    thread_followed,
+    thread_unfollowed,
 )
 from lms.djangoapps.teams import TEAM_DISCUSSION_CONTEXT
 from lms.djangoapps.teams.utils import emit_team_event
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from student.models import CourseEnrollment, LanguageField
-from util.model_utils import slugify
+from django.utils.text import slugify
 
 from .errors import AlreadyOnTeamInCourse, ImmutableMembershipFieldException, NotEnrolledInCourseForTeam
 
@@ -38,6 +40,14 @@ from .errors import AlreadyOnTeamInCourse, ImmutableMembershipFieldException, No
 @receiver(comment_created)
 def post_create_vote_handler(sender, **kwargs):  # pylint: disable=unused-argument
     """Update the user's last activity date upon creating or voting for a
+    post."""
+    handle_activity(kwargs['user'], kwargs['post'])
+
+
+@receiver(thread_followed)
+@receiver(thread_unfollowed)
+def post_followed_unfollowed_handler(sender, **kwargs):  # pylint: disable=unused-argument
+    """Update the user's last activity date upon followed or unfollowed of a
     post."""
     handle_activity(kwargs['user'], kwargs['post'])
 
@@ -161,8 +171,8 @@ class CourseTeamMembership(models.Model):
         app_label = "teams"
         unique_together = (('user', 'team'),)
 
-    user = models.ForeignKey(User)
-    team = models.ForeignKey(CourseTeam, related_name='membership')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    team = models.ForeignKey(CourseTeam, related_name='membership', on_delete=models.CASCADE)
     date_joined = models.DateTimeField(auto_now_add=True)
     last_activity_at = models.DateTimeField()
 
@@ -172,7 +182,8 @@ class CourseTeamMembership(models.Model):
         """Memberships are immutable, with the exception of last activity
         date.
         """
-        if name in self.immutable_fields:
+        creating_model = name == '_state' or self._state.adding
+        if not creating_model and name in self.immutable_fields:
             # Check the current value -- if it is None, then this
             # model is being created from the database and it's fine
             # to set the value. Otherwise, we're trying to overwrite

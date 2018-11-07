@@ -15,7 +15,8 @@
   // ====================
 
   // basic layout
-  .content-primary, .content-supplementary {
+  .content-primary,
+  .content-supplementary {
     @include box-sizing(border-box);
   }
 
@@ -34,9 +35,10 @@
     width: flexgrid(9, 9);
 
     // CASE: notice has actions {
-    &.has-actions, &.list-notices .notice-item.has-actions {
-
-      .msg, .list-actions {
+    &.has-actions,
+    &.list-notices .notice-item.has-actions {
+      .msg,
+      .list-actions {
         display: inline-block;
         vertical-align: middle;
       }
@@ -51,11 +53,8 @@
         text-align: right;
         margin-top: 0;
 
-        .action-item {
-
-        }
-
-        .action-create-course, .action-create-library {
+        .action-create-course,
+        .action-create-library {
           @extend %btn-primary-green;
           @extend %t-action3;
         }
@@ -72,7 +71,9 @@
     .ui-toggle-control {
       @extend %ui-depth2;
       @extend %btn-secondary-gray;
+
       @include clearfix();
+
       display: block;
       text-align: left;
 
@@ -84,6 +85,7 @@
 
       .label {
         @extend %t-action3;
+
         float: left;
         width: flex-grid(8, 9);
         margin: 3px flex-gutter() 0 0;
@@ -91,9 +93,11 @@
 
       .fa-times-circle {
         @extend %t-action1;
+
         @include transform(rotate(45deg));
         @include transform-origin(center center);
         @include transition(all $tmg-f1 linear 0s);
+
         float: right;
         text-align: right;
       }
@@ -101,7 +105,9 @@
 
     .ui-toggle-target {
       @extend %ui-depth1;
+
       @include transition(opacity $tmg-f1 ease-in-out 0s);
+
       position: relative;
       top: -2px;
       display: none;
@@ -110,7 +116,6 @@
 
     // CASE: when the content area is shown
     &.is-shown {
-
       .ui-toggle-control {
         @include border-bottom-radius(0);
 
@@ -122,11 +127,9 @@
 
       .ui-toggle-target {
         display: block;
-        opacity: 1.0;
+        opacity: 1;
       }
     }
-
-
   }
 
   // elements - course creation rights controls
@@ -136,20 +139,14 @@
     .title {
       @extend %t-title7;
       @extend %t-strong;
+
       margin-bottom: ($baseline/4);
       color: $gray-d1;
     }
 
-    .copy {
-
-    }
-
-    .list-actions, .form-actions {
+    .list-actions,
+    .form-actions {
       margin-top: ($baseline*0.75);
-
-      .action-item {
-
-      }
 
       .action-primary {
         @extend %btn-primary-blue;
@@ -164,12 +161,14 @@
 
         .fa-cog {
           @include transition(all $tmg-f1 ease-in-out $tmg-f1);
+
           @extend %t-icon4;
+
           position: absolute;
           top: ($baseline/2);
           left: -($baseline);
           visibility: hidden;
-          opacity: 0.0;
+          opacity: 0;
         }
 
         // state: submitting
@@ -179,7 +178,7 @@
           .fa-cog {
             left: ($baseline*0.75);
             visibility: visible;
-            opacity: 1.0;
+            opacity: 1;
           }
         }
 
@@ -192,14 +191,13 @@
           .fa-cog {
             left: ($baseline*0.75);
             visibility: visible;
-            opacity: 1.0;
+            opacity: 1;
           }
         }
       }
     }
 
     .status-update {
-
       .label {
         @extend %cont-text-sr;
       }
@@ -218,11 +216,12 @@
           display: block;
           width: 100%;
           height: ($baseline/4);
-          opacity: 0.40;
+          opacity: 0.4;
         }
       }
 
-      .value-formal, .value-description {
+      .value-formal,
+      .value-description {
         border-radius: ($baseline/10);
         display: inline-block;
         vertical-align: middle;
@@ -232,6 +231,7 @@
       .value-formal {
         @extend %t-title5;
         @extend %t-strong;
+
         margin: ($baseline/2);
 
         .icon {
@@ -241,6 +241,7 @@
 
       .value-description {
         @extend %t-copy-sub1;
+
         position: relative;
         color: $white;
         opacity: 0.85;
@@ -249,7 +250,6 @@
 
     // CASE: rights are not requested yet
     &.is-unrequested {
-
       .title {
         @extend %cont-text-sr;
       }
@@ -257,9 +257,7 @@
 
     // CASE: status is pending
     &.is-pending {
-
       .status-update {
-
         .value {
           background: $orange;
         }
@@ -273,9 +271,7 @@
 
     // CASE: status is denied
     &.is-denied {
-
       .status-update {
-
         .value {
           background: $red-l1;
         }
@@ -300,17 +296,18 @@
       margin: 0 10px;
 
       &.active {
-        border-bottom: 4px solid $uxpl-blue-base;
+        border-bottom: 4px solid theme-color("primary");
       }
 
-      &.active, &:hover {
+      &.active,
+      &:hover {
         a {
           color: $gray-d2;
         }
       }
 
       a {
-        color: $uxpl-blue-base;
+        color: theme-color("primary");
         cursor: pointer;
         display: inline-block;
       }
@@ -318,7 +315,9 @@
   }
 
   // ELEM: course listings
-  .courses-tab, .libraries-tab {
+  .courses-tab,
+  .archived-courses-tab,
+  .libraries-tab {
     display: none;
 
     &.active {
@@ -326,9 +325,12 @@
     }
   }
 
-  .courses, .libraries {
+  .courses,
+  .libraries,
+  .archived-courses {
     .title {
       @extend %t-title6;
+
       margin-bottom: $baseline;
       border-bottom: 1px solid $gray-l3;
       padding-bottom: ($baseline/2);
@@ -337,12 +339,13 @@
 
     .title {
       @extend %t-title6;
+
       margin-bottom: $baseline;
       border-bottom: 1px solid $gray-l3;
       padding-bottom: ($baseline/2);
       color: $gray-l2;
     }
-	}
+  }
 
   .list-courses {
     border-radius: 3px;
@@ -353,7 +356,7 @@
     li:last-child {
       margin-bottom: 0;
     }
-	}
+  }
 
 
   // UI: course wrappers (needed for status messages)
@@ -361,9 +364,9 @@
 
     // CASE: has status
     &.has-status {
-
       .course-status {
         @include box-sizing(border-box);
+
         display: inline-block;
         vertical-align: middle;
         width: flex-grid(3, 9);
@@ -371,14 +374,15 @@
         text-align: right;
 
         .value {
-
-          .copy, .icon {
+          .copy,
+          .icon {
             display: inline-block;
             vertical-align: middle;
           }
 
           .icon {
             @extend %t-icon4;
+
             margin-right: ($baseline/2);
           }
 
@@ -390,13 +394,14 @@
 
       .status-message {
         @extend %t-copy-sub1;
+
         background-color: $gray-l5;
         box-shadow: 0 2px 2px 0 $shadow inset;
         padding: ($baseline*0.75) $baseline;
 
         &.has-actions {
-
-          .copy, .status-actions {
+          .copy,
+          .status-actions {
             display: inline-block;
             vertical-align: middle;
           }
@@ -412,16 +417,19 @@
 
             .button {
               @extend %btn-secondary-white;
-              padding:($baseline/4) ($baseline/2);
+
+              padding: ($baseline/4) ($baseline/2);
             }
 
-            .icon,.button-copy {
+            .icon,
+            .button-copy {
               display: inline-block;
               vertical-align: middle;
             }
 
             .icon {
               @extend %t-icon4;
+
               margin-right: ($baseline/4);
             }
 
@@ -437,6 +445,7 @@
   // UI: individual course listings
   .course-item {
     @include box-sizing(border-box);
+
     width: flex-grid(9, 9);
     position: relative;
     border-bottom: 1px solid $gray-l2;
@@ -445,30 +454,12 @@
     // STATE: hover/focus
     &:hover {
       background: $paleYellow;
-
-      .course-actions {
-        opacity: 1.0;
-        pointer-events: auto;
-      }
-
-      .view-live-button {
-        @extend %ui-depth3;
-        @extend %btn-primary-blue;
-        @extend %sizing;
-        @include transition(opacity $tmg-f2 ease-in-out 0);
-        @include box-sizing(border-box);
-        padding: ($baseline/2);
-        opacity: 0.0;
-        pointer-events: none;
-      }
-
-      .course-metadata {
-        opacity: 1.0;
-      }
     }
 
-    .course-link, .course-actions {
+    .course-link,
+    .course-actions {
       @include box-sizing(border-box);
+
       display: inline-block;
       vertical-align: middle;
     }
@@ -476,30 +467,36 @@
     // encompassing course link
     .course-link {
       @extend %ui-depth2;
+
       width: flex-grid(6, 9);
+
       @include margin-right(flex-gutter());
     }
 
     // course title
     .course-title {
       @extend %t-title4;
+
       @include margin(0, ($baseline*2), ($baseline/4), 0);
+
       font-weight: 300;
     }
 
     // course metadata
     .course-metadata {
       @extend %t-copy-sub1;
+
       @include transition(opacity $tmg-f1 ease-in-out 0);
+
       color: $gray-d2;
 
       .metadata-item {
         display: inline-block;
 
-        & + .metadata-item:before {
+        & + .metadata-item::before {
           content: "/";
-          margin-left: ($baseline/10);
-          margin-right: ($baseline/10);
+          margin-left: ($baseline/4);
+          margin-right: ($baseline/4);
           color: $gray-l4;
         }
 
@@ -509,22 +506,22 @@
       }
 
       .extra-metadata {
-        margin-left: ($baseline/10);
+        margin-left: ($baseline/4);
       }
     }
 
     .course-actions {
-      @include transition(opacity $tmg-f2 ease-in-out 0);
       @extend %ui-depth3;
+
       position: static;
       width: flex-grid(3, 9);
+
       @include text-align(right);
-      opacity: 0;
-      pointer-events: none;
 
       .action {
         display: inline-block;
         vertical-align: middle;
+
         @include margin-right($baseline/2);
 
         &:last-child {
@@ -539,6 +536,7 @@
       // view live button
       .view-button {
         @include box-sizing(border-box);
+
         padding: ($baseline/2);
       }
 
@@ -546,16 +544,10 @@
       .action-rerun {
         margin-right: $baseline;
       }
-
-      .rerun-button {
-        font-weight: 600;
-        // TODO: sync up button styling and add secondary style here
-      }
     }
 
     // CASE: is processing
     &.is-processing {
-
       .course-status .value {
         color: $gray-l2;
       }
@@ -563,7 +555,6 @@
 
     // CASE: has an error
     &.has-error {
-
       .course-status {
         color: $red; // TODO: abstract this out to an error-based color variable
       }
@@ -597,6 +588,7 @@
 
     .wrapper-course {
       @extend %ui-window;
+
       position: relative;
     }
 
@@ -611,18 +603,17 @@
           color: inherit;
         }
       }
-
     }
 
     // course details (replacement for course-link when a course cannot be linked)
     .course-details {
       @extend %ui-depth2;
+
       display: inline-block;
       vertical-align: middle;
       width: flex-grid(6, 9);
       margin-right: flex-gutter();
     }
-
   }
 
   .optimization-form {
@@ -661,10 +652,11 @@
 
   // course listings
 
-  .create-course, .create-library {
-
+  .create-course,
+  .create-library {
     .row {
       @include clearfix();
+
       margin-bottom: ($baseline*0.75);
     }
 
@@ -680,6 +672,7 @@
     label {
       @extend %t-title7;
       @extend %t-strong;
+
       display: block;
     }
 
@@ -689,14 +682,15 @@
     .new-course-run {
       width: 100%;
     }
+
     .course-run-text-direction {
       direction: ltr;
       text-align: right;
     }
 
     .placeholder-text-direction {
-        direction: rtl;
-      }
+      direction: rtl;
+    }
 
     .new-course-name {
       @extend %t-title5;
@@ -715,23 +709,25 @@
       padding-bottom: 0;
     }
 
-      .wrap-error {
-        @include transition(all $tmg-f2 ease 0s);
-        height: 0;
-        overflow: hidden;
-        opacity: 0;
-      }
+    .wrap-error {
+      @include transition(all $tmg-f2 ease 0s);
 
-      .wrap-error.is-shown {
-        height: 65px;
-        opacity: 1;
-      }
+      height: 0;
+      overflow: hidden;
+      opacity: 0;
+    }
 
-      .message-status {
-        @extend %t-strong;
-        display: block;
-        margin-bottom: 0;
-        padding: ($baseline*.5) ($baseline*1.5) 8px ($baseline*1.5);
-      }
+    .wrap-error.is-shown {
+      height: 65px;
+      opacity: 1;
+    }
+
+    .message-status {
+      @extend %t-strong;
+
+      display: block;
+      margin-bottom: 0;
+      padding: ($baseline*0.5) ($baseline*1.5) 8px ($baseline*1.5);
+    }
   }
 }

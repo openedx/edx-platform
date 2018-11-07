@@ -62,6 +62,6 @@
             };
 
             return DiscussionThreadProfileView;
-        })(Backbone.View);
+        }(Backbone.View));
     }
 }).call(window);

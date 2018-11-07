@@ -1,6 +1,7 @@
 """
 Exceptions related to the handling of profile images.
 """
+from six import text_type
 
 
 class ImageValidationError(Exception):
@@ -12,4 +13,4 @@ class ImageValidationError(Exception):
         """
         Translate the developer-facing exception message for API clients.
         """
-        return self.message
+        return text_type(self)

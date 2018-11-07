@@ -155,7 +155,9 @@
                     return MathJax.Hub.Queue(['Typeset', MathJax.Hub, element]);
                 });
             }
-            window.update_schematics();
+            if (window.hasOwnProperty('update_schematics')) {
+                window.update_schematics();
+            }
             problemPrefix = this.element_id.replace(/problem_/, '');
             this.inputs = this.$('[id^="input_' + problemPrefix + '_"]');
             this.$('div.action button').click(this.refreshAnswers);
@@ -241,8 +243,9 @@
                         totalScore
                     );
                 }
-            } else if (attemptsUsed === 0 || totalScore === 0) {
+            } else if ((attemptsUsed === 0 || totalScore === 0) && curScore === 0) {
                 // Render 'x point(s) possible' if student has not yet attempted question
+                // But if staff has overridden score to a non-zero number, show it
                 if (graded) {
                     progressTemplate = ngettext(
                         // Translators: %(num_points)s is the number of points possible (examples: 1, 3, 10).;
@@ -485,8 +488,8 @@
             this.focus_on_notification('submit');
         };
 
-        Problem.prototype.focus_on_hint_notification = function() {
-            this.focus_on_notification('hint');
+        Problem.prototype.focus_on_hint_notification = function(hintIndex) {
+            this.$('.notification-hint .notification-message > ol > li.hint-index-' + hintIndex).focus();
         };
 
         Problem.prototype.focus_on_save_notification = function() {
@@ -709,9 +712,10 @@
                 var answers;
                 answers = response.answers;
                 $.each(answers, function(key, value) {
+                    var safeKey = key.replace(':', '\\:'); // fix for courses which use url_names with colons, e.g. problem:question1
                     var answer;
                     if (!$.isArray(value)) {
-                        answer = that.$('#answer_' + key + ', #solution_' + key);
+                        answer = that.$('#answer_' + safeKey + ', #solution_' + safeKey);
                         edx.HtmlUtils.setHtml(answer, edx.HtmlUtils.HTML(value));
                         Collapsible.setCollapsibles(answer);
 
@@ -766,7 +770,6 @@
             this.gentleAlertNotification.hide();
             this.saveNotification.hide();
             this.showAnswerNotification.hide();
-
         };
 
         Problem.prototype.gentle_alert = function(msg) {
@@ -1061,6 +1064,7 @@
                 var answer, choice, inputId, i, len, results, $element, $inputLabel, $inputStatus;
                 $element = $(element);
                 inputId = $element.attr('id').replace(/inputtype_/, '');
+                inputId = inputId.replace(':', '\\:'); // fix for courses which use url_names with colons, e.g. problem:question1
                 answer = answers[inputId];
                 results = [];
                 for (i = 0, len = answer.length; i < len; i++) {
@@ -1311,7 +1315,7 @@
                         that.hintButton.attr({disabled: 'disabled'});
                     }
                     that.el.find('.notification-hint').show();
-                    that.focus_on_hint_notification();
+                    that.focus_on_hint_notification(nextIndex);
                 } else {
                     that.gentle_alert(response.msg);
                 }

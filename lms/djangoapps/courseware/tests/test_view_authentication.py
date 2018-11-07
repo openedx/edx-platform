@@ -1,9 +1,10 @@
 import datetime
 
 import pytz
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from mock import patch
 from nose.plugins.attrib import attr
+from six import text_type
 
 from courseware.access import has_access
 from courseware.tests.factories import (
@@ -15,6 +16,7 @@ from courseware.tests.factories import (
     StaffFactory
 )
 from courseware.tests.helpers import CourseAccessTestMixin, LoginEnrollmentTestCase
+from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -22,12 +24,13 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 @attr(shard=1)
-class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
+class TestViewAuth(EnterpriseTestConsentRequired, ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Check that view authentication works properly.
     """
 
     ACCOUNT_INFO = [('view@test.com', 'foo'), ('view2@test.com', 'foo')]
+    ENABLED_SIGNALS = ['course_published']
 
     @staticmethod
     def _reverse_urls(names, course):
@@ -41,7 +44,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         Returns a list URLs corresponding to section in the passed in course.
 
         """
-        return [reverse(name, kwargs={'course_id': course.id.to_deprecated_string()})
+        return [reverse(name, kwargs={'course_id': text_type(course.id)})
                 for name in names]
 
     def _check_non_staff_light(self, course):
@@ -50,7 +53,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         `course` is an instance of CourseDescriptor.
         """
-        urls = [reverse('about_course', kwargs={'course_id': course.id.to_deprecated_string()}),
+        urls = [reverse('about_course', kwargs={'course_id': text_type(course.id)}),
                 reverse('courses')]
         for url in urls:
             self.assert_request_status_code(200, url)
@@ -60,15 +63,19 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         Check that non-staff don't have access to dark urls.
         """
 
-        names = ['courseware', 'instructor_dashboard', 'progress']
+        names = ['courseware', 'progress']
         urls = self._reverse_urls(names, course)
         urls.extend([
-            reverse('book', kwargs={'course_id': course.id.to_deprecated_string(),
+            reverse('book', kwargs={'course_id': text_type(course.id),
                                     'book_index': index})
             for index, __ in enumerate(course.textbooks)
         ])
         for url in urls:
-            self.assert_request_status_code(404, url)
+            self.assert_request_status_code(302, url)
+
+        self.assert_request_status_code(
+            404, reverse('instructor_dashboard', kwargs={'course_id': text_type(course.id)})
+        )
 
     def _check_staff(self, course):
         """
@@ -77,7 +84,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         names = ['about_course', 'instructor_dashboard', 'progress']
         urls = self._reverse_urls(names, course)
         urls.extend([
-            reverse('book', kwargs={'course_id': course.id.to_deprecated_string(),
+            reverse('book', kwargs={'course_id': text_type(course.id),
                                     'book_index': index})
             for index in xrange(len(course.textbooks))
         ])
@@ -93,11 +100,11 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         url = reverse(
             'student_progress',
             kwargs={
-                'course_id': course.id.to_deprecated_string(),
+                'course_id': text_type(course.id),
                 'student_id': self.enrolled_user.id,
             }
         )
-        self.assert_request_status_code(404, url)
+        self.assert_request_status_code(302, url)
 
         # The courseware url should redirect, not 200
         url = self._reverse_urls(['courseware'], course)[0]
@@ -164,12 +171,12 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         self.login(self.unenrolled_user)
         response = self.client.get(reverse('courseware',
-                                           kwargs={'course_id': self.course.id.to_deprecated_string()}))
+                                           kwargs={'course_id': text_type(self.course.id)}))
         self.assertRedirects(
             response,
             reverse(
                 'about_course',
-                args=[self.course.id.to_deprecated_string()]
+                args=[text_type(self.course.id)]
             )
         )
 
@@ -183,7 +190,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         response = self.client.get(
             reverse(
                 'courseware',
-                kwargs={'course_id': self.course.id.to_deprecated_string()}
+                kwargs={'course_id': text_type(self.course.id)}
             )
         )
 
@@ -191,34 +198,24 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
             response,
             reverse(
                 'courseware_section',
-                kwargs={'course_id': self.course.id.to_deprecated_string(),
+                kwargs={'course_id': text_type(self.course.id),
                         'chapter': self.overview_chapter.url_name,
                         'section': self.welcome_section.url_name}
             )
         )
 
-    @patch('openedx.features.enterprise_support.api.get_enterprise_consent_url')
-    def test_redirection_missing_enterprise_consent(self, mock_get_url):
+    def test_redirection_missing_enterprise_consent(self):
         """
         Verify that enrolled students are redirected to the Enterprise consent
         URL if a linked Enterprise Customer requires data sharing consent
         and it has not yet been provided.
         """
-        mock_get_url.return_value = reverse('dashboard')
         self.login(self.enrolled_user)
         url = reverse(
             'courseware',
-            kwargs={'course_id': self.course.id.to_deprecated_string()}
+            kwargs={'course_id': text_type(self.course.id)}
         )
-        response = self.client.get(url)
-        self.assertRedirects(
-            response,
-            reverse('dashboard')
-        )
-        mock_get_url.assert_called_once()
-        mock_get_url.return_value = None
-        response = self.client.get(url)
-        self.assertNotIn("You are not currently enrolled in this course", response.content)
+        self.verify_consent_required(self.client, url, status_code=302)
 
     def test_instructor_page_access_nonstaff(self):
         """
@@ -227,8 +224,8 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         self.login(self.enrolled_user)
 
-        urls = [reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()}),
-                reverse('instructor_dashboard', kwargs={'course_id': self.test_course.id.to_deprecated_string()})]
+        urls = [reverse('instructor_dashboard', kwargs={'course_id': text_type(self.course.id)}),
+                reverse('instructor_dashboard', kwargs={'course_id': text_type(self.test_course.id)})]
 
         # Shouldn't be able to get to the instructor pages
         for url in urls:
@@ -242,10 +239,10 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.login(self.staff_user)
 
         # Now should be able to get to self.course, but not  self.test_course
-        url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.course.id)})
         self.assert_request_status_code(200, url)
 
-        url = reverse('instructor_dashboard', kwargs={'course_id': self.test_course.id.to_deprecated_string()})
+        url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.test_course.id)})
         self.assert_request_status_code(404, url)
 
     def test_instructor_course_access(self):
@@ -256,10 +253,10 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.login(self.instructor_user)
 
         # Now should be able to get to self.course, but not  self.test_course
-        url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.course.id)})
         self.assert_request_status_code(200, url)
 
-        url = reverse('instructor_dashboard', kwargs={'course_id': self.test_course.id.to_deprecated_string()})
+        url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.test_course.id)})
         self.assert_request_status_code(404, url)
 
     def test_org_staff_access(self):
@@ -268,13 +265,13 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         and student profile pages for course in their org.
         """
         self.login(self.org_staff_user)
-        url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.course.id)})
         self.assert_request_status_code(200, url)
 
-        url = reverse('instructor_dashboard', kwargs={'course_id': self.test_course.id.to_deprecated_string()})
+        url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.test_course.id)})
         self.assert_request_status_code(200, url)
 
-        url = reverse('instructor_dashboard', kwargs={'course_id': self.other_org_course.id.to_deprecated_string()})
+        url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.other_org_course.id)})
         self.assert_request_status_code(404, url)
 
     def test_org_instructor_access(self):
@@ -283,13 +280,13 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         and student profile pages for course in their org.
         """
         self.login(self.org_instructor_user)
-        url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.course.id)})
         self.assert_request_status_code(200, url)
 
-        url = reverse('instructor_dashboard', kwargs={'course_id': self.test_course.id.to_deprecated_string()})
+        url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.test_course.id)})
         self.assert_request_status_code(200, url)
 
-        url = reverse('instructor_dashboard', kwargs={'course_id': self.other_org_course.id.to_deprecated_string()})
+        url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.other_org_course.id)})
         self.assert_request_status_code(404, url)
 
     def test_global_staff_access(self):
@@ -299,8 +296,8 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.login(self.global_staff_user)
 
         # and now should be able to load both
-        urls = [reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()}),
-                reverse('instructor_dashboard', kwargs={'course_id': self.test_course.id.to_deprecated_string()})]
+        urls = [reverse('instructor_dashboard', kwargs={'course_id': text_type(self.course.id)}),
+                reverse('instructor_dashboard', kwargs={'course_id': text_type(self.test_course.id)})]
 
         for url in urls:
             self.assert_request_status_code(200, url)
@@ -351,9 +348,9 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.enroll(self.test_course, True)
 
         # should now be able to get to everything for self.course
+        self._check_staff(self.course)
         self._check_non_staff_light(self.test_course)
         self._check_non_staff_dark(self.test_course)
-        self._check_staff(self.course)
 
     @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_dark_launch_global_staff(self):

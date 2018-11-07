@@ -3,10 +3,13 @@
 from django.utils.translation import ugettext as _
 
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.djangolib.js_utils import (
+      dump_js_escaped_json
+  )
 %>
 
 <%inherit file="base.html" />
-
+<%namespace name='static' file='static_content.html'/>
 <%def name="online_help_token()"><% return "home" %></%def>
 <%block name="title">${_("{studio_name} Home").format(studio_name=settings.STUDIO_SHORT_NAME)}</%block>
 <%block name="bodyclass">is-signedin index view-dashboard</%block>
@@ -73,7 +76,7 @@ from openedx.core.djangolib.markup import HTML, Text
                   <span class="tip" id="tip-new-course-name">${_("The public display name for your course. This cannot be changed, but you can set a different display name in Advanced Settings later.")}</span>
                   <span class="tip tip-error is-hiding" id="tip-error-new-course-name"></span>
                 </li>
-                <li class="field text required" id="field-organization">
+                <li class="field text required">
                   <label for="new-course-org">${_("Organization")}</label>
                   ## Translators: This is an example for the name of the organization sponsoring a course, seen when filling out the form to create a new course. The organization name cannot contain spaces.
                   ## Translators: "e.g. UniversityX or OrganizationX" is a placeholder displayed when user put no data into this field.
@@ -149,7 +152,7 @@ from openedx.core.djangolib.markup import HTML, Text
                   <span class="tip" id="tip-new-library-name">${_("The public display name for your library.")}</span>
                   <span class="tip tip-error is-hiding" id="tip-error-new-library-name"></span>
                 </li>
-                <li class="field text required" id="field-organization">
+                <li class="field text required">
                   <label for="new-library-org">${_("Organization")}</label>
                   <input class="new-library-org" id="new-library-org" type="text" name="new-library-org" required placeholder="${_('e.g. UniversityX or OrganizationX')}" aria-describedby="tip-new-library-org tip-error-new-library-org" />
                   <span class="tip" id="tip-new-library-org">${_("The public organization name for your library.")} ${_("This cannot be changed.")}</span>
@@ -192,11 +195,6 @@ from openedx.core.djangolib.markup import HTML, Text
               <label class="field-label">${_("Show all courses in organization:")}
                 <input class="field-input input-text" type="text" name="org"
                        placeholder="${_('For example, MITx')}"/>
-              </label>
-            </div>
-            <div class="field">
-              <label class="field-label">${_("Show content libraries")}
-                <input class="field-input input-text" type="checkbox" value="true" name="libraries"/>
               </label>
             </div>
           </fieldset>
@@ -313,48 +311,30 @@ from openedx.core.djangolib.markup import HTML, Text
       </div>
       %endif
 
-      % if libraries_enabled:
+      % if libraries_enabled or archived_courses:
       <ul id="course-index-tabs">
         <li class="courses-tab active"><a>${_("Courses")}</a></li>
+        % if archived_courses:
+        <li class="archived-courses-tab"><a>${_("Archived Courses")}</a></li>
+        % endif
+        % if libraries_enabled:
         <li class="libraries-tab"><a>${_("Libraries")}</a></li>
+        % endif
       </ul>
       % endif
 
       %if len(courses) > 0 or optimization_enabled:
-      <div class="courses courses-tab active">
-        <ul class="list-courses">
-          %for course_info in sorted(courses, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else ''):
-          <li class="course-item" data-course-key="${course_info['course_key']}">
-            <a class="course-link" href="${course_info['url']}">
-              <h3 class="course-title">${course_info['display_name']}</h3>
-
-              <div class="course-metadata">
-                <span class="course-org metadata-item">
-                  <span class="label">${_("Organization:")}</span> <span class="value">${course_info['org']}</span>
-                </span>
-                <span class="course-num metadata-item">
-                  <span class="label">${_("Course Number:")}</span>
-                  <span class="value">${course_info['number']}</span>
-                </span>
-                <span class="course-run metadata-item">
-                  <span class="label">${_("Course Run:")}</span> <span class="value">${course_info['run']}</span>
-                </span>
-              </div>
-            </a>
-
-            <ul  class="item-actions course-actions">
-              % if allow_course_reruns and rerun_creator_status and course_creator_status=='granted':
-              <li class="action action-rerun">
-                <a href="${course_info['rerun_link']}" class="button rerun-button">${_("Re-run Course")}</a>
-              </li>
-              % endif
-              <li class="action action-view">
-                <a href="${course_info['lms_link']}" rel="external" class="button view-button">${_("View Live")}</a>
-              </li>
-            </ul>
-          </li>
-          %endfor
-        </ul>
+      <div class="courses courses-tab react-course-listing active">
+        ${static.renderReact(
+          component="CourseOrLibraryListing",
+          id="react-course-listing",
+          props={
+            'items': sorted(courses, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else ''),
+            'linkClass': 'course-link',
+            'idBase': 'course',
+            'allowReruns': allow_course_reruns and rerun_creator_status and course_creator_status=='granted'
+          }
+        )}
       </div>
 
       %else:
@@ -472,30 +452,33 @@ from openedx.core.djangolib.markup import HTML, Text
       </div>
       % endif
 
-      %if len(libraries) > 0:
-      <div class="libraries libraries-tab">
-        <ul class="list-courses">
-          %for library_info in sorted(libraries, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else ''):
-          <li class="course-item">
-            <a class="library-link" href="${library_info['url']}">
-              <h3 class="course-title">${library_info['display_name']}</h3>
+      %if archived_courses:
+      <div class="archived-courses react-archived-course-listing archived-courses-tab">
+        ${static.renderReact(
+          component="CourseOrLibraryListing",
+          id="react-archived-course-listing",
+          props={
+            'items': sorted(archived_courses, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else ''),
+            'linkClass': 'course-link',
+            'idBase': 'archived',
+            'allowReruns': allow_course_reruns and rerun_creator_status and course_creator_status=='granted'
+          }
+        )}
+      </div>
+      %endif
 
-              <div class="course-metadata">
-                <span class="course-org metadata-item">
-                  <span class="label">${_("Organization:")}</span> <span class="value">${library_info['org']}</span>
-                </span>
-                <span class="course-num metadata-item">
-                  <span class="label">${_("Course Number:")}</span>
-                  <span class="value">${library_info['number']}</span>
-                </span>
-                % if not library_info["can_edit"]:
-                  <span class="extra-metadata">${_("(Read-only)")}</span>
-                % endif
-              </div>
-            </a>
-          </li>
-          %endfor
-        </ul>
+      %if len(libraries) > 0 or optimization_enabled:
+      <div class="libraries react-library-listing libraries-tab">
+        ${static.renderReact(
+          component="CourseOrLibraryListing",
+          id="react-library-listing",
+          props={
+            'items': sorted(libraries, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else ''),
+            'linkClass': 'library-link',
+            'idBase': 'library',
+            'allowReruns': allow_course_reruns and rerun_creator_status and course_creator_status=='granted'
+          }
+        )}
       </div>
 
       %else:

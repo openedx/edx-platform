@@ -10,14 +10,15 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework_oauth.authentication import OAuth2Authentication
 
-from commerce.api.v1.models import Course
-from commerce.api.v1.permissions import ApiKeyOrModelPermission, IsAuthenticatedOrActivationOverridden
-from commerce.api.v1.serializers import CourseSerializer
-from commerce.utils import is_account_activation_requirement_disabled
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.lib.api.mixins import PutAsCreateMixin
 from util.json_request import JsonResponse
+
+from ...utils import is_account_activation_requirement_disabled
+from .models import Course
+from .permissions import ApiKeyOrModelPermission, IsAuthenticatedOrActivationOverridden
+from .serializers import CourseSerializer
 
 log = logging.getLogger(__name__)
 
@@ -72,7 +73,7 @@ class OrderView(APIView):
         """ HTTP handler. """
         # If the account activation requirement is disabled for this installation, override the
         # anonymous user object attached to the request with the actual user object (if it exists)
-        if not request.user.is_authenticated() and is_account_activation_requirement_disabled():
+        if not request.user.is_authenticated and is_account_activation_requirement_disabled():
             try:
                 request.user = User.objects.get(id=request.session._session_cache['_auth_user_id'])
             except User.DoesNotExist:

@@ -5,6 +5,7 @@ Useful utilities for management commands.
 from django.core.management.base import CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from six import text_type
 
 
 def get_mutually_exclusive_required_option(options, *selections):
@@ -45,4 +46,4 @@ def parse_course_keys(course_key_strings):
     try:
         return [CourseKey.from_string(course_key_string) for course_key_string in course_key_strings]
     except InvalidKeyError as error:
-        raise CommandError('Invalid key specified: {}'.format(error.message))
+        raise CommandError('Invalid key specified: {}'.format(text_type(error)))

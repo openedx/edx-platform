@@ -4,6 +4,9 @@ var visibilityState = xblockInfo.get('visibility_state');
 var published = xblockInfo.get('published');
 var prereq = xblockInfo.get('prereq');
 var hasPartitionGroups = xblockInfo.get('has_partition_group_components');
+var userPartitionInfo = xblockInfo.get('user_partition_info');
+var selectedGroupsLabel = userPartitionInfo['selected_groups_label'];
+var selectedPartitionIndex = userPartitionInfo['selected_partition_index'];
 
 var statusMessages = [];
 var messageType;
@@ -57,7 +60,16 @@ if (staffOnlyMessage) {
         addStatusMessage(messageType, messageText);
     }
 
-    if (hasPartitionGroups) {
+    if (selectedPartitionIndex !== -1 && !isNaN(selectedPartitionIndex) && xblockInfo.isVertical()) {
+        messageType = 'partition-groups';
+        messageText = edx.StringUtils.interpolate(
+                gettext('Access to this unit is restricted to: {selectedGroupsLabel}'),
+                {
+                    selectedGroupsLabel: selectedGroupsLabel
+                }
+        )
+        addStatusMessage(messageType, messageText);
+    } else if (hasPartitionGroups && xblockInfo.isVertical()) {
         addStatusMessage(
             'partition-groups',
             gettext('Access to some content in this unit is restricted to specific groups of learners')
@@ -187,6 +199,15 @@ if (is_proctored_exam) {
                     </span>
                 </p>
               </div>
+            <% } %>
+            <% if (xblockInfo.get('highlights_enabled') && course.get('self_paced') && xblockInfo.isChapter()) { %>
+                <div class="block-highlights">
+                    <% var number_of_highlights = (xblockInfo.get('highlights') || []).length; %>
+                        <button class="block-highlights-value highlights-button action-button">
+                            <span class="number-highlights"><%- number_of_highlights %></span>
+                            <%- gettext('Section Highlights') %>
+                        </button>
+                </div>
             <% } %>
             <% if (xblockInfo.get('is_time_limited')) { %>
                 <div class="status-timed-proctored-exam">

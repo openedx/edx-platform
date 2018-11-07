@@ -26,7 +26,7 @@
             'jquery.fileupload': 'js/vendor/jQuery-File-Upload/js/jquery.fileupload',
             'jquery.iframe-transport': 'js/vendor/jQuery-File-Upload/js/jquery.iframe-transport',
             'jquery.inputnumber': 'js/vendor/html5-input-polyfills/number-polyfill',
-            'jquery.immediateDescendents': 'coffee/src/jquery.immediateDescendents',
+            'jquery.immediateDescendents': 'js/src/jquery.immediateDescendents',
             'jquery.simulate': 'js/vendor/jquery.simulate',
             'jquery.url': 'js/vendor/url.min',
             'sinon': 'common/js/vendor/sinon',
@@ -165,7 +165,6 @@
         'common/js/spec/components/paginated_view_spec.js',
         'common/js/spec/components/paging_header_spec.js',
         'common/js/spec/components/paging_footer_spec.js',
-        'common/js/spec/components/progress_circle_view_spec.js',
         'common/js/spec/components/search_field_spec.js',
         'common/js/spec/components/view_utils_spec.js',
         'common/js/spec/utils/edx.utils.validate_spec.js'

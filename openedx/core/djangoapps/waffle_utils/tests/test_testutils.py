@@ -1,18 +1,20 @@
 """
 Tests for waffle utils test utilities.
 """
+
+import crum
 from django.test import TestCase
+from django.test.client import RequestFactory
 from opaque_keys.edx.keys import CourseKey
 
-from request_cache.middleware import RequestCache
-
+from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from .. import CourseWaffleFlag, WaffleFlagNamespace
 from ..testutils import override_waffle_flag
 
 
 class OverrideWaffleFlagTests(TestCase):
     """
-    Tests for the override_waffle_flag decorator.
+    Tests for the override_waffle_flag decorator/context manager.
     """
 
     NAMESPACE_NAME = "test_namespace"
@@ -25,33 +27,40 @@ class OverrideWaffleFlagTests(TestCase):
 
     def setUp(self):
         super(OverrideWaffleFlagTests, self).setUp()
+        request = RequestFactory().request()
+        crum.set_current_request(request)
         RequestCache.clear_request_cache()
 
     @override_waffle_flag(TEST_COURSE_FLAG, True)
-    def check_is_enabled_with_decorator(self):
-        # test flag while overridden with decorator
-        self.assertTrue(self.TEST_COURSE_FLAG.is_enabled(self.TEST_COURSE_KEY))
+    def assert_decorator_activates_flag(self):
+        assert self.TEST_COURSE_FLAG.is_enabled(self.TEST_COURSE_KEY)
 
     def test_override_waffle_flag_pre_cached(self):
         # checks and caches the is_enabled value
-        self.assertFalse(self.TEST_COURSE_FLAG.is_enabled(self.TEST_COURSE_KEY))
+        assert not self.TEST_COURSE_FLAG.is_enabled(self.TEST_COURSE_KEY)
         flag_cache = self.TEST_COURSE_FLAG.waffle_namespace._cached_flags
-        self.assertIn(self.NAMESPACED_FLAG_NAME, flag_cache)
+        assert self.NAMESPACED_FLAG_NAME in flag_cache
 
-        # test flag while overridden with decorator
-        self.check_is_enabled_with_decorator()
+        self.assert_decorator_activates_flag()
 
         # test cached flag is restored
-        self.assertIn(self.NAMESPACED_FLAG_NAME, flag_cache)
-        self.assertEquals(self.TEST_COURSE_FLAG.is_enabled(self.TEST_COURSE_KEY), False)
+        assert self.NAMESPACED_FLAG_NAME in flag_cache
+        assert not self.TEST_COURSE_FLAG.is_enabled(self.TEST_COURSE_KEY)
 
     def test_override_waffle_flag_not_pre_cached(self):
         # check that the flag is not yet cached
         flag_cache = self.TEST_COURSE_FLAG.waffle_namespace._cached_flags
-        self.assertNotIn(self.NAMESPACED_FLAG_NAME, flag_cache)
+        assert self.NAMESPACED_FLAG_NAME not in flag_cache
 
-        # test flag while overridden with decorator
-        self.check_is_enabled_with_decorator()
+        self.assert_decorator_activates_flag()
 
         # test cache is removed when no longer using decorator/context manager
-        self.assertNotIn(self.NAMESPACED_FLAG_NAME, flag_cache)
+        assert self.NAMESPACED_FLAG_NAME not in flag_cache
+
+    def test_override_waffle_flag_as_context_manager(self):
+        assert not self.TEST_COURSE_FLAG.is_enabled(self.TEST_COURSE_KEY)
+
+        with override_waffle_flag(self.TEST_COURSE_FLAG, True):
+            assert self.TEST_COURSE_FLAG.is_enabled(self.TEST_COURSE_KEY)
+
+        assert not self.TEST_COURSE_FLAG.is_enabled(self.TEST_COURSE_KEY)

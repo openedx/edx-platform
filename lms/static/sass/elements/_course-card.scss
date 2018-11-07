@@ -7,10 +7,12 @@
     right: auto;
     bottom: $baseline;
   }
+
   padding: $baseline/2 0;
 
   .section {
     @extend .grid-manual;
+
     padding: $baseline/2 $baseline;
   }
 
@@ -19,7 +21,8 @@
 
     .header-img {
       max-width: 100%;
-      @media(min-width: $bp-screen-sm) {
+
+      @media (min-width: $bp-screen-sm) {
         max-width: 191px;
       }
     }
@@ -27,8 +30,11 @@
 
   .course-details {
     @include float(right);
+
     width: 100%;
-    @media(min-width: $bp-screen-sm) { width: calc(100% - 191px); }
+
+    @media (min-width: $bp-screen-sm) { width: calc(100% - 191px); }
+
     padding-left: $baseline*1.5;
 
     .course-title {
@@ -47,12 +53,10 @@
   }
 
   .course-actions {
-
     .enrollment-info {
       width: $baseline*10;
       text-align: center;
       margin-bottom: $baseline/2;
-      text-transform: uppercase;
     }
 
     .select-error {
@@ -72,12 +76,12 @@
       color: palette(grayscale, dark);
       font-size: font-size(large);
       text-align: center;
-      text-transform: uppercase;
     }
 
     .enrollment-opens {
       text-align: center;
       margin-bottom: $baseline/2;
+
       .enrollment-open-date {
         white-space: nowrap;
       }
@@ -135,7 +139,7 @@
   .message {
     margin-bottom: $baseline;
 
-    @media(min-width: $bp-screen-md) {
+    @media (min-width: $bp-screen-md) {
       margin-bottom: 0;
     }
   }
@@ -145,7 +149,7 @@
     border-top: 1px solid palette(grayscale, back);
     padding-top: $baseline;
 
-    @media(min-width: $bp-screen-md) {
+    @media (min-width: $bp-screen-md) {
       display: flex;
       align-items: center;
     }

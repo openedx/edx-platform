@@ -1,8 +1,8 @@
 from common.test.acceptance.pages.studio.utils import type_in_codemirror
-from component_editor import ComponentEditorView
+from xblock_editor import XBlockEditorView
 
 
-class HtmlComponentEditorView(ComponentEditorView):
+class HtmlXBlockEditorView(XBlockEditorView):
     """
     Represents the rendered view of an HTML component editor.
     """

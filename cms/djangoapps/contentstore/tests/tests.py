@@ -1,20 +1,22 @@
 """
 This test file will test registration, login, activation, and session activity timeouts
 """
+from __future__ import print_function
 import datetime
 import time
-import unittest
 
 import mock
+import pytest
 from ddt import data, ddt, unpack
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
 from freezegun import freeze_time
 from pytz import UTC
+from six.moves import xrange
 
 from contentstore.models import PushNotificationConfig
 from contentstore.tests.test_course_settings import CourseTestCase
@@ -85,6 +87,36 @@ class ContentStoreTestCase(ModuleStoreTestCase):
         self.assertTrue(user(email).is_active)
 
 
+@pytest.mark.django_db
+def test_create_account_email_already_exists(django_db_use_migrations):
+    """
+    This is tricky. Django's user model doesn't have a constraint on
+    unique email addresses, but we *add* that constraint during the
+    migration process:
+    see common/djangoapps/student/migrations/0004_add_email_index.py
+
+    The behavior we *want* is for this account creation request
+    to fail, due to this uniqueness constraint, but the request will
+    succeed if the migrations have not run.
+
+    django_db_use_migration is a pytest fixture that tells us if
+    migrations have been run. Since pytest fixtures don't play nice
+    with TestCase objects this is a function and doesn't get to use
+    assertRaises.
+    """
+    if django_db_use_migrations:
+        email = 'a@b.com'
+        pw = 'xyz'
+        username = 'testuser'
+        User.objects.create_user(username, email, pw)
+
+        # Hack to use the _create_account shortcut
+        case = ContentStoreTestCase()
+        resp = case._create_account("abcdef", email, "password")  # pylint: disable=protected-access
+
+        assert resp.status_code == 400, 'Migrations are run, but creating an account with duplicate email succeeded!'
+
+
 class AuthTestCase(ContentStoreTestCase):
     """Check that various permissions-related things work"""
 
@@ -113,7 +145,7 @@ class AuthTestCase(ContentStoreTestCase):
             reverse('signup'),
         )
         for page in pages:
-            print "Checking '{0}'".format(page)
+            print("Checking '{0}'".format(page))
             self.check_page_get(page, 200)
 
     def test_create_account_errors(self):
@@ -138,20 +170,6 @@ class AuthTestCase(ContentStoreTestCase):
         resp = self._create_account("abcdef", "abc@def.com", self.pw)
         # we can have two users with the same password, so this should succeed
         self.assertEqual(resp.status_code, 200)
-
-    @unittest.skipUnless(settings.SOUTH_TESTS_MIGRATE, "South migrations required")
-    def test_create_account_email_already_exists(self):
-        User.objects.create_user(self.username, self.email, self.pw)
-        resp = self._create_account("abcdef", self.email, "password")
-        # This is tricky. Django's user model doesn't have a constraint on
-        # unique email addresses, but we *add* that constraint during the
-        # migration process:
-        # see common/djangoapps/student/migrations/0004_add_email_index.py
-        #
-        # The behavior we *want* is for this account creation request
-        # to fail, due to this uniqueness constraint, but the request will
-        # succeed if the migrations have not run.
-        self.assertEqual(resp.status_code, 400)
 
     def test_login(self):
         self.create_account(self.username, self.email, self.pw)
@@ -205,7 +223,7 @@ class AuthTestCase(ContentStoreTestCase):
             data = parse_json(resp)
             self.assertFalse(data['success'])
             self.assertIn(
-                'This account has been temporarily locked due to excessive login failures. Try again later.',
+                'This account has been temporarily locked due to excessive login failures.',
                 data['value']
             )
 
@@ -256,17 +274,17 @@ class AuthTestCase(ContentStoreTestCase):
         self.client = AjaxEnabledTestClient()
 
         # Not logged in.  Should redirect to login.
-        print 'Not logged in'
+        print('Not logged in')
         for page in auth_pages:
-            print "Checking '{0}'".format(page)
+            print("Checking '{0}'".format(page))
             self.check_page_get(page, expected=302)
 
         # Logged in should work.
         self.login(self.email, self.pw)
 
-        print 'Logged in'
+        print('Logged in')
         for page in simple_auth_pages:
-            print "Checking '{0}'".format(page)
+            print("Checking '{0}'".format(page))
             self.check_page_get(page, expected=200)
 
     def test_index_auth(self):

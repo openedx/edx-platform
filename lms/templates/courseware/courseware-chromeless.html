@@ -36,7 +36,7 @@ ${static.get_page_title_breadcrumbs(course_name())}
 <%static:css group='style-course-vendor'/>
 <%static:css group='style-course'/>
 ## Utility: Notes
-% if is_edxnotes_enabled(course):
+% if is_edxnotes_enabled(course, request.user):
 <%static:css group='style-student-notes'/>
 % endif
 
@@ -50,9 +50,6 @@ ${static.get_page_title_breadcrumbs(course_name())}
 <%block name="js_extra">
   <script type="text/javascript" src="${static.url('common/js/vendor/jquery.scrollTo.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
-
-  ## codemirror
-  <script type="text/javascript" src="${static.url('js/vendor/codemirror-compressed.js')}"></script>
 
   <%static:js group='courseware'/>
 
@@ -69,17 +66,23 @@ ${HTML(fragment.foot_html())}
 
 </%block>
 
-<div class="course-wrapper">
-  <section class="course-content" id="course-content">
+<div class="course-wrapper chromeless">
+  <section class="course-content" id="course-content"\
+    % if enable_completion_on_view_service:
+      data-enable-completion-on-view-service="true" \
+    % else:
+      data-enable-completion-on-view-service="false" \
+    % endif
+  >
       <main id="main" tabindex="-1" aria-label="Content">
         ${HTML(fragment.body_html())}
       </main>
   </section>
 </div>
-% if course.show_calculator or is_edxnotes_enabled(course):
+% if course.show_calculator or is_edxnotes_enabled(course, request.user):
     <nav class="nav-utilities ${"has-utility-calculator" if course.show_calculator else ""}" aria-label="${_('Course Utilities')}">
       ## Utility: Notes
-      % if is_edxnotes_enabled(course):
+      % if is_edxnotes_enabled(course, request.user):
         <%include file="/edxnotes/toggle_notes.html" args="course=course"/>
       % endif
 
@@ -89,5 +92,3 @@ ${HTML(fragment.foot_html())}
       % endif
     </nav>
 % endif
-
-<%include file="../modal/accessible_confirm.html" />

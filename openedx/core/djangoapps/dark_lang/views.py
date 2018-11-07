@@ -2,27 +2,26 @@
 Views file for the Darklang Django App
 """
 from django.contrib.auth.decorators import login_required
+from django.http import Http404
+from django.shortcuts import redirect
+from django.template.loader import render_to_string
 from django.utils.decorators import method_decorator
-from django.utils.translation import ugettext as _
-from django.utils.translation import LANGUAGE_SESSION_KEY
-from django.views.generic.base import View
+from django.utils.translation import LANGUAGE_SESSION_KEY, ugettext as _
 
-from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.dark_lang import DARK_LANGUAGE_KEY
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
-from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
+from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.user_api.preferences.api import (
     delete_user_preference,
-    get_user_preference,
     set_user_preference
 )
-from openedx.core.lib.api.view_utils import view_auth_classes
+from openedx.core.djangoapps.util.user_messages import PageLevelMessages
+from web_fragments.fragment import Fragment
 
-LANGUAGE_INPUT_FIELD = 'preview_lang'
+LANGUAGE_INPUT_FIELD = 'preview_language'
 
 
-@view_auth_classes()
-class DarkLangView(View):
+class PreviewLanguageFragmentView(EdxFragmentView):
     """
     View used when a user is attempting to change the preview language using Darklang.
 
@@ -30,136 +29,84 @@ class DarkLangView(View):
     GET - returns a form for setting/resetting the user's dark language
     POST - updates or clears the setting to the given dark language
     """
-    template_name = 'darklang/preview_lang.html'
+
+    def render_to_fragment(self, request, course_id=None, **kwargs):
+        """
+        Renders the language preview view as a fragment.
+        """
+        html = render_to_string('dark_lang/preview-language-fragment.html', {})
+        return Fragment(html)
+
+    def create_base_standalone_context(self, request, fragment, **kwargs):
+        """
+        Creates the base context for rendering a fragment as a standalone page.
+        """
+        return {
+            'uses_bootstrap': True,
+        }
+
+    def standalone_page_title(self, request, fragment, **kwargs):
+        """
+        Returns the page title for the standalone update page.
+        """
+        return _('Preview Language Administration')
 
     @method_decorator(login_required)
-    def get(self, request):
+    def get(self, request, *args, **kwargs):
         """
-        Returns the Form for setting/resetting a User's dark language setting
-
-        Arguments:
-            request (Request): The Django Request Object
-
-        Returns:
-            HttpResponse: View containing the form for setting the preview lang
+        Renders the fragment to control the preview language.
         """
-        context = {
-            'disable_courseware_js': True,
-            'uses_pattern_library': True
-        }
-        return render_to_response(self.template_name, context)
+        if not self._user_can_preview_languages(request.user):
+            raise Http404
+        return super(PreviewLanguageFragmentView, self).get(request, *args, **kwargs)
 
     @method_decorator(login_required)
-    def post(self, request):
+    def post(self, request, **kwargs):
         """
-        Sets or clears the DarkLang depending on the incoming post data.
-
-        Arguments:
-            request (Request): The Django Request Object
-
-        Returns:
-            HttpResponse: View containing the form for setting the preview lang with the status
-                included in the context
+        Accept requests to update the preview language.
         """
-        return self.process_darklang_request(request)
+        if not self._user_can_preview_languages(request.user):
+            raise Http404
+        action = request.POST.get('action', None)
+        if action == 'set_preview_language':
+            self._set_preview_language(request)
+        elif action == 'reset_preview_language':
+            self._clear_preview_language(request)
+        return redirect(request.path)
 
-    def process_darklang_request(self, request):
+    def _user_can_preview_languages(self, user):
         """
-        Proccess the request to Set or clear the DarkLang depending on the incoming request.
-
-        Arguments:
-            request (Request): The Django Request Object
-
-        Returns:
-            HttpResponse: View containing the form for setting the preview lang with the status
-                included in the context
+        Returns true if the specified user can preview languages.
         """
-        context = {
-            'disable_courseware_js': True,
-            'uses_pattern_library': True
-        }
-        response = None
         if not DarkLangConfig.current().enabled:
-            message = _('Preview Language is currently disabled')
-            context.update({'form_submit_message': message})
-            context.update({'success': False})
-            response = render_to_response(self.template_name, context, request=request)
+            return False
+        return user and not user.is_anonymous
 
-        elif 'set_language' in request.POST:
-            # Set the Preview Language
-            response = self._set_preview_language(request, context)
-        elif 'reset' in request.POST:
-            # Reset and clear the language preference
-            response = self._clear_preview_language(request, context)
-        return response
-
-    def _set_preview_language(self, request, context):
+    def _set_preview_language(self, request):
         """
-        Set the Preview language
-
-        Arguments:
-            request (Request): The incoming Django Request
-            context dict: The basic context for the Response
-
-        Returns:
-            HttpResponse: View containing the form for setting the preview lang with the status
-                included in the context
+        Sets the preview language for the current user.
         """
-        message = None
-        show_refresh_message = False
+        preview_language = request.POST.get(LANGUAGE_INPUT_FIELD, '')
+        if not preview_language.strip():
+            PageLevelMessages.register_error_message(request, _('Language not provided'))
+            return
 
-        preview_lang = request.POST.get(LANGUAGE_INPUT_FIELD, '')
-        if not preview_lang.strip():
-            message = _('Language code not provided')
-        else:
-            # Set the session key to the requested preview lang
-            request.session[LANGUAGE_SESSION_KEY] = preview_lang
-
-            # Make sure that we set the requested preview lang as the dark lang preference for the
-            # user, so that the lang_pref middleware doesn't clobber away the dark lang preview.
-            auth_user = request.user
-            if auth_user:
-                set_user_preference(request.user, DARK_LANGUAGE_KEY, preview_lang)
-
-            message = _('Language set to language code: {preview_language_code}').format(
-                preview_language_code=preview_lang
+        set_user_preference(request.user, DARK_LANGUAGE_KEY, preview_language)
+        PageLevelMessages.register_success_message(
+            request,
+            _('Language set to {preview_language}').format(
+                preview_language=preview_language
             )
-            show_refresh_message = True
-        context.update({'form_submit_message': message})
-        context.update({'success': show_refresh_message})
-        response = render_to_response(self.template_name, context)
-        return response
+        )
 
-    def _clear_preview_language(self, request, context):
+    def _clear_preview_language(self, request):
         """
-        Clears the dark language preview
-
-        Arguments:
-            request (Request): The incoming Django Request
-            context dict: The basic context for the Response
-        Returns:
-            HttpResponse: View containing the form for setting the preview lang with the status
-                included in the context
+        Clears the preview language for the current user.
         """
-        # delete the session language key (if one is set)
+        delete_user_preference(request.user, DARK_LANGUAGE_KEY)
         if LANGUAGE_SESSION_KEY in request.session:
             del request.session[LANGUAGE_SESSION_KEY]
-
-        user_pref = ''
-        auth_user = request.user
-        if auth_user:
-            # Reset user's dark lang preference to null
-            delete_user_preference(auth_user, DARK_LANGUAGE_KEY)
-            # Get & set user's preferred language
-            user_pref = get_user_preference(auth_user, LANGUAGE_KEY)
-            if user_pref:
-                request.session[LANGUAGE_SESSION_KEY] = user_pref
-        if user_pref is None:
-            message = _('Language reset to the default language code')
-        else:
-            message = _("Language reset to user's preference: {preview_language_code}").format(
-                preview_language_code=user_pref
-            )
-        context.update({'form_submit_message': message})
-        context.update({'success': True})
-        return render_to_response(self.template_name, context)
+        PageLevelMessages.register_success_message(
+            request,
+            _('Language reset to the default')
+        )

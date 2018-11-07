@@ -1,7 +1,7 @@
 """Decorators for API access management."""
 from functools import wraps
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponseNotFound
 from django.shortcuts import redirect
 

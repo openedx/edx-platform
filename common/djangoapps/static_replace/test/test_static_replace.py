@@ -6,11 +6,12 @@ from cStringIO import StringIO
 from urlparse import parse_qsl, urlparse, urlunparse
 
 import ddt
+import pytest
 from django.test import override_settings
 from django.utils.http import urlencode, urlquote
 from mock import Mock, patch
 from nose.tools import assert_equals, assert_false, assert_true  # pylint: disable=no-name-in-module
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 from PIL import Image
 
 from static_replace import (
@@ -32,7 +33,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 from xmodule.modulestore.xml import XMLModuleStore
 
 DATA_DIRECTORY = 'data_dir'
-COURSE_KEY = SlashSeparatedCourseKey('org', 'course', 'run')
+COURSE_KEY = CourseKey.from_string('org/course/run')
 STATIC_SOURCE = '"/static/file.png"'
 
 
@@ -115,9 +116,9 @@ def test_storage_url_not_exists(mock_storage):
 
 
 @patch('static_replace.StaticContent', autospec=True)
-@patch('static_replace.modulestore', autospec=True)
-@patch('static_replace.AssetBaseUrlConfig.get_base_url')
-@patch('static_replace.AssetExcludedExtensionsConfig.get_excluded_extensions')
+@patch('xmodule.modulestore.django.modulestore', autospec=True)
+@patch('static_replace.models.AssetBaseUrlConfig.get_base_url')
+@patch('static_replace.models.AssetExcludedExtensionsConfig.get_excluded_extensions')
 def test_mongo_filestore(mock_get_excluded_extensions, mock_get_base_url, mock_modulestore, mock_static_content):
 
     mock_modulestore.return_value = Mock(MongoModuleStore)
@@ -138,7 +139,7 @@ def test_mongo_filestore(mock_get_excluded_extensions, mock_get_base_url, mock_m
 
 
 @patch('static_replace.settings', autospec=True)
-@patch('static_replace.modulestore', autospec=True)
+@patch('xmodule.modulestore.django.modulestore', autospec=True)
 @patch('static_replace.staticfiles_storage', autospec=True)
 def test_data_dir_fallback(mock_storage, mock_modulestore, mock_settings):
     mock_modulestore.return_value = Mock(XMLModuleStore)
@@ -162,8 +163,9 @@ def test_raw_static_check():
     assert_equals(path, replace_static_urls(path, text))
 
 
+@pytest.mark.django_db
 @patch('static_replace.staticfiles_storage', autospec=True)
-@patch('static_replace.modulestore', autospec=True)
+@patch('xmodule.modulestore.django.modulestore', autospec=True)
 def test_static_url_with_query(mock_modulestore, mock_storage):
     """
     Make sure that for urls with query params:
@@ -199,7 +201,7 @@ def test_regex():
 
 
 @patch('static_replace.staticfiles_storage', autospec=True)
-@patch('static_replace.modulestore', autospec=True)
+@patch('xmodule.modulestore.django.modulestore', autospec=True)
 def test_static_url_with_xblock_resource(mock_modulestore, mock_storage):
     """
     Make sure that for URLs with XBlock resource URL, which start with /static/,
@@ -214,7 +216,7 @@ def test_static_url_with_xblock_resource(mock_modulestore, mock_storage):
 
 
 @patch('static_replace.staticfiles_storage', autospec=True)
-@patch('static_replace.modulestore', autospec=True)
+@patch('xmodule.modulestore.django.modulestore', autospec=True)
 @override_settings(STATIC_URL='https://example.com/static/')
 def test_static_url_with_xblock_resource_on_cdn(mock_modulestore, mock_storage):
     """

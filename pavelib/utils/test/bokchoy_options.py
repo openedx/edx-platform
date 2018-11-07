@@ -19,8 +19,15 @@ BOKCHOY_DEFAULT_STORE_DEPR = make_option(
     default=os.environ.get('DEFAULT_STORE', 'split'),
     help='deprecated in favor of default-store'
 )
-BOKCHOY_FASTTEST = make_option('-a', '--fasttest', action='store_true', help='Skip some setup')
-BOKCHOY_COVERAGERC = make_option('--coveragerc', help='coveragerc file to use during this test')
+BOKCHOY_EVAL_ATTR = make_option(
+    "-a", "--eval-attr",
+    dest="eval_attr", help="Only run tests matching given attribute expression."
+)
+BOKCHOY_FASTTEST = make_option('--fasttest', action='store_true', help='Skip some setup')
+BOKCHOY_COVERAGERC = make_option(
+    '--coveragerc',
+    help='coveragerc file to use during this test'
+)
 
 BOKCHOY_OPTS = [
     ('test-spec=', 't', 'Specific test to run'),
@@ -28,7 +35,9 @@ BOKCHOY_OPTS = [
     ('skip-clean', 'C', 'Skip cleaning repository before running tests'),
     make_option('-r', '--serversonly', action='store_true', help='Prepare suite and leave servers running'),
     make_option('-o', '--testsonly', action='store_true', help='Assume servers are running and execute tests only'),
+    BOKCHOY_COVERAGERC,
     BOKCHOY_DEFAULT_STORE,
+    BOKCHOY_EVAL_ATTR,
     make_option(
         '-d', '--test-dir',
         default='tests',

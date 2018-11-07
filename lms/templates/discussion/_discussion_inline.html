@@ -13,6 +13,15 @@ from openedx.core.djangolib.js_utils import js_escaped_string
     data-user-create-comment="${json_dumps(can_create_comment)}"
     data-user-create-subcomment="${json_dumps(can_create_subcomment)}"
     data-read-only="${'false' if can_create_thread else 'true'}">
+    % if not user.is_authenticated:
+        <div class="page-banner">
+            <div class="alert alert-warning" role="alert">
+                <span class="icon icon-alert fa fa fa-warning" aria-hidden="true"></span>
+                <div class="message-content">${login_msg}</div>
+            </div>
+        </div>
+        <br>
+    % endif
     <div class="discussion-module-header">
         <h3 class="hd hd-3 discussion-module-title">${_(display_name)}</h3>
         <div class="inline-discussion-topic"><span class="inline-discussion-topic-title">${_("Topic:")}</span> ${discussion_category}
@@ -21,9 +30,12 @@ from openedx.core.djangolib.js_utils import js_escaped_string
               %endif
            </div>
     </div>
-    <button class="discussion-show btn" data-discussion-id="${discussion_id}">
+    <button class="discussion-show btn"
+        data-discussion-id="${discussion_id}"
+        ${"disabled=disabled" if not user.is_authenticated else ""}>
         <span class="button-text">${_("Show Discussion")}</span>
     </button>
+
 </div>
 <script type="text/javascript">
 var $$course_id = "${course_id | n, js_escaped_string}";

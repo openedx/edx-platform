@@ -5,8 +5,7 @@ from django.contrib.auth.models import User
 from django.utils.timezone import now
 from rest_framework import serializers
 
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
-from student.models import UserProfile
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, SSOVerification, ManualVerification
 
 from .models import UserPreference
 
@@ -39,13 +38,14 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
 class UserPreferenceSerializer(serializers.HyperlinkedModelSerializer):
     """
-    Serializer that generates a represenation of a UserPreference entity
+    Serializer that generates a representation of a UserPreference entity.
     """
     user = UserSerializer()
 
     class Meta(object):
         model = UserPreference
         depth = 1
+        fields = ('user', 'key', 'value', 'url')
 
 
 class RawUserPreferenceSerializer(serializers.ModelSerializer):
@@ -57,6 +57,7 @@ class RawUserPreferenceSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = UserPreference
         depth = 1
+        fields = ('user', 'key', 'value', 'url')
 
 
 class ReadOnlyFieldsSerializerMixin(object):
@@ -93,9 +94,9 @@ class CountryTimeZoneSerializer(serializers.Serializer):  # pylint: disable=abst
     description = serializers.CharField()
 
 
-class SoftwareSecurePhotoVerificationSerializer(serializers.ModelSerializer):
+class IDVerificationSerializer(serializers.ModelSerializer):
     """
-    Serializer that generates a representation of a user's photo verification status.
+    Serializer that generates a representation of a user's ID verification status.
     """
     is_verified = serializers.SerializerMethodField()
 
@@ -105,6 +106,23 @@ class SoftwareSecurePhotoVerificationSerializer(serializers.ModelSerializer):
         """
         return obj.status == 'approved' and obj.expiration_datetime > now()
 
+
+class SoftwareSecurePhotoVerificationSerializer(IDVerificationSerializer):
+
     class Meta(object):
         fields = ('status', 'expiration_datetime', 'is_verified')
         model = SoftwareSecurePhotoVerification
+
+
+class SSOVerificationSerializer(IDVerificationSerializer):
+
+    class Meta(object):
+        fields = ('status', 'expiration_datetime', 'is_verified')
+        model = SSOVerification
+
+
+class ManualVerificationSerializer(IDVerificationSerializer):
+
+    class Meta(object):
+        fields = ('status', 'expiration_datetime', 'is_verified')
+        model = ManualVerification

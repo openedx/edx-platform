@@ -3,7 +3,7 @@ Fragment for rendering the course reviews panel
 """
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.template.loader import render_to_string
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_control
@@ -11,16 +11,18 @@ from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 
 from courseware.courses import get_course_with_access
+from student.models import CourseEnrollment
 from lms.djangoapps.courseware.views.views import CourseTabView
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_experience import default_course_url_name
+
+from .. import USE_BOOTSTRAP_FLAG
 
 
 class CourseReviewsView(CourseTabView):
     """
     The course reviews page.
     """
-
     @method_decorator(login_required)
     @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
     def get(self, request, course_id, **kwargs):
@@ -28,6 +30,12 @@ class CourseReviewsView(CourseTabView):
         Displays the reviews page for the specified course.
         """
         return super(CourseReviewsView, self).get(request, course_id, 'courseware', **kwargs)
+
+    def uses_bootstrap(self, request, course, tab):
+        """
+        Returns true if the USE_BOOTSTRAP Waffle flag is enabled.
+        """
+        return USE_BOOTSTRAP_FLAG.is_enabled(course.id)
 
     def render_to_fragment(self, request, course=None, tab=None, **kwargs):
         course_id = unicode(course.id)
@@ -45,12 +53,14 @@ class CourseReviewsFragmentView(EdxFragmentView):
 
         """
         course_key = CourseKey.from_string(course_id)
-        course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
+        course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=False)
         course_url_name = default_course_url_name(course.id)
         course_url = reverse(course_url_name, kwargs={'course_id': unicode(course.id)})
 
+        is_enrolled = CourseEnrollment.is_enrolled(request.user, course.id)
+
         # Create the fragment
-        course_reviews_provider_fragment = CourseReviewsModuleFragmentView().render_to_fragment(
+        course_reviews_fragment = CourseReviewsModuleFragmentView().render_to_fragment(
             request,
             course=course,
             **kwargs
@@ -59,7 +69,8 @@ class CourseReviewsFragmentView(EdxFragmentView):
         context = {
             'course': course,
             'course_url': course_url,
-            'course_reviews_provider_fragment': course_reviews_provider_fragment
+            'course_reviews_fragment': course_reviews_fragment,
+            'is_enrolled': is_enrolled,
         }
 
         html = render_to_string('course_experience/course-reviews-fragment.html', context)

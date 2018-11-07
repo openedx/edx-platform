@@ -46,7 +46,7 @@ import mock
 import pytz
 from bs4 import BeautifulSoup
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from xblock.plugin import Plugin
 
 import lms.djangoapps.lms_xblock.runtime

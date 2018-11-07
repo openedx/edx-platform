@@ -1,10 +1,10 @@
 .wrapper-assets {
-
   .assets-library {
     @include clearfix();
 
     .assets-title {
       @extend %t-strong;
+
       margin-top: ($baseline*2);
       margin-bottom: ($baseline*2);
     }
@@ -15,6 +15,7 @@
 
     .meta {
       @extend %t-copy-sub2;
+
       display: inline-block;
       vertical-align: top;
       width: flex-grid(9, 12);
@@ -36,8 +37,10 @@
       font-size: 80%;
       word-wrap: break-word;
 
-      th {
+      th,
+      .video-head-col {
         @extend %t-copy-sub2;
+
         background-color: $gray-l5;
         padding: 0 ($baseline/2) ($baseline*0.75) ($baseline/2);
         vertical-align: middle;
@@ -51,6 +54,7 @@
 
         .current-sort {
           @extend %t-strong;
+
           border-bottom: 1px solid $gray-l3;
         }
 
@@ -60,19 +64,23 @@
         }
       }
 
-      td {
+      td,
+      .video-col {
         padding: ($baseline/2);
         vertical-align: middle;
         text-align: left;
       }
 
-      tbody {
+      tbody,
+      .js-table-body {
         box-shadow: 0 2px 2px $shadow-l1;
         border: 1px solid $gray-l4;
         background: $white;
 
-        tr {
+        tr,
+        .video-row {
           @include transition(all $tmg-f2 ease-in-out 0s);
+
           border-top: 1px solid $gray-l4;
 
           .name-col {
@@ -106,7 +114,7 @@
           }
 
           &:hover {
-            background-color: $blue-l5;
+            background-color: $blue-l5 !important;
 
             .date-col,
             .embed-col,
@@ -116,12 +124,12 @@
           }
         }
 
-      .thumb-col {
-        padding: ($baseline/2) $baseline;
+        .thumb-col {
+          padding: ($baseline/2) $baseline;
 
-        .thumb {
-          width: 100px;
-        }
+          .thumb {
+            width: 100px;
+          }
 
           img {
             width: 100%;
@@ -129,9 +137,9 @@
         }
 
         .name-col {
-
           .title {
             @extend %t-copy-sub1;
+
             display: inline-block;
             max-width: 200px;
             overflow: hidden;
@@ -140,18 +148,23 @@
 
         .date-col {
           @include transition(all $tmg-f2 ease-in-out 0s);
+
           @extend %t-copy-sub2;
+
           color: $gray-d1;
         }
 
         .embed-col {
           @include transition(all $tmg-f2 ease-in-out 0s);
+
           padding-left: ($baseline*0.75);
           color: $gray-d1;
 
           .embeddable-xml-input {
             @include transition(all $tmg-f2 ease-in-out 0s);
+
             @extend %t-copy-sub2;
+
             box-shadow: none;
             border: 1px solid transparent;
             background: none;

@@ -14,7 +14,7 @@ from .tasks import update_course_in_cache_v2
 
 
 @receiver(SignalHandler.course_published)
-def _update_block_structure_on_course_publish(sender, course_key, **kwargs):  # pylint: disable=unused-argument
+def update_block_structure_on_course_publish(sender, course_key, **kwargs):  # pylint: disable=unused-argument
     """
     Catches the signal that a course has been published in the module
     store and creates/updates the corresponding cache entry.

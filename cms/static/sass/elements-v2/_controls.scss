@@ -3,6 +3,7 @@
 %ui-btn-dd {
   @extend %ui-btn;
   @extend %ui-btn-pill;
+
   padding:($baseline/4) ($baseline/2);
   border-width: 1px;
   border-style: solid;
@@ -11,6 +12,7 @@
 
   &:hover, &:active {
     @extend %ui-fake-link;
+
     border-color: $gray-l3;
   }
 
@@ -24,6 +26,7 @@
 // ====================
 %ui-btn-dd-nav-primary {
   @extend %ui-btn-dd;
+
   background: $white;
   border-color: $white;
   color: $gray-d1;

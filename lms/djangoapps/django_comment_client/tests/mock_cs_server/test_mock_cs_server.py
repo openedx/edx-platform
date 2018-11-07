@@ -13,6 +13,7 @@ class MockCommentServiceServerTest(unittest.TestCase):
     A mock version of the Comment Service server that listens on a local
     port and responds with pre-defined grade messages.
     '''
+    shard = 4
 
     def setUp(self):
         super(MockCommentServiceServerTest, self).setUp()

@@ -2,7 +2,6 @@
 // ====================
 
 .view-uploads {
-
   .content-primary, .content-supplementary {
     @include box-sizing(border-box);
   }
@@ -16,17 +15,17 @@
   }
 
   .nav-actions {
-
     .fa-cloud-upload {
       @extend %t-copy;
+
       vertical-align: bottom;
       margin-right: ($baseline/5);
     }
-
   }
 
   .no-asset-content {
     @extend %ui-well;
+
     padding: ($baseline*2);
     background-color: $gray-l4;
     text-align: center;
@@ -35,6 +34,7 @@
     .new-button {
       @extend %btn-primary-green;
       @extend %t-action3;
+
       @include margin-left($baseline);
 
       .icon {
@@ -49,8 +49,10 @@
     .meta-wrap {
       margin-bottom: $baseline;
     }
+
     .meta {
       @extend %t-copy-sub2;
+
       display: inline-block;
       vertical-align: top;
       width: flex-grid(9, 12);
@@ -66,6 +68,7 @@
 
     .pagination {
       @include clearfix;
+
       display: inline-block;
       width: flex-grid(3, 12);
 
@@ -86,6 +89,7 @@
 
       .nav-link {
         @include transition(all $tmg-f2 ease-in-out 0s);
+
         display: block;
         padding: ($baseline/4) ($baseline*0.75);
 
@@ -126,6 +130,7 @@
       .total-pages {
         @extend %t-copy-base;
         @extend %t-strong;
+
         width: ($baseline*2.5);
         margin: 0 ($baseline*0.75);
         padding: ($baseline/4);
@@ -135,13 +140,16 @@
 
       .current-page {
         @extend %ui-depth1;
+
         position: absolute;
+
         @include left(-($baseline/4));
       }
 
       .page-divider {
         @extend %t-title4;
         @extend %t-regular;
+
         vertical-align: middle;
         color: $gray;
       }
@@ -149,6 +157,7 @@
 
       .pagination-form {
         @extend %ui-depth2;
+
         position: relative;
 
         .page-number-label,
@@ -158,6 +167,7 @@
 
         .page-number-input {
           @include transition(all $tmg-f2 ease-in-out 0s);
+
           border: 1px solid transparent;
           border-bottom: 1px dotted $gray-l2;
           border-radius: 0;
@@ -172,15 +182,14 @@
           &:focus {
             // borrowing the base input focus styles to match overall app
             @include linear-gradient($paleYellow, tint($paleYellow, 90%));
-            opacity: 1.0;
+
+            opacity: 1;
             box-shadow: 0 0 3px $shadow-d1 inset;
             background-color: $white;
             border: 1px solid transparent;
             border-radius: 3px;
           }
         }
-
-
       }
     }
 
@@ -194,6 +203,7 @@
 
       th {
         @extend %t-copy-sub2;
+
         background-color: $gray-l5;
         padding: 0 ($baseline/2) ($baseline*0.75) ($baseline/2);
         vertical-align: middle;
@@ -207,6 +217,7 @@
 
         .current-sort {
           @extend %t-strong;
+
           border-bottom: 1px solid $gray-l3;
         }
 
@@ -216,18 +227,21 @@
           padding-right: ($baseline*0.75);
         }
 
-        &.nav-dd{
+        &.nav-dd {
           // basic layout - nav items
           margin: 0 -($baseline/2);
           color: $blue-d2;
           cursor: pointer;
+
           .wrapper-nav-sub {
             top: 35px;
+
             @extend %ui-depth2;
 
             > ol > .nav-item {
               @extend %t-action3;
               @extend %t-strong;
+
               display: inline-block;
               vertical-align: middle;
 
@@ -235,22 +249,23 @@
                 margin-right: 0;
               }
             }
+
             .nav-sub {
               @include text-align(left);
 
               // ui triangle/nub
-              &:after {
+              &::after {
                 left: $baseline;
                 margin-left: -10px;
               }
 
-              &:before {
+              &::before {
                 left: $baseline;
                 margin-left: -11px;
               }
 
               .nav-item {
-                &.reset-filter{
+                &.reset-filter {
                   display:none;
                 }
 
@@ -280,6 +295,7 @@
 
         tr {
           @include transition(all $tmg-f2 ease-in-out 0s);
+
           border-top: 1px solid $gray-l4;
 
           &:first-child {
@@ -315,14 +331,16 @@
           }
         }
 
-      .thumb-col {
-        padding: ($baseline/2) $baseline;
-        @extend %t-copy-sub2;
-        color: $gray-l2;
+        .thumb-col {
+          padding: ($baseline/2) $baseline;
 
-        .thumb {
-          width: 100px;
-        }
+          @extend %t-copy-sub2;
+
+          color: $gray-l2;
+
+          .thumb {
+            width: 100px;
+          }
 
           img {
             width: 100%;
@@ -331,9 +349,9 @@
 
 
         .name-col {
-
           .title {
             @extend %t-copy-sub1;
+
             display: inline-block;
             max-width: 200px;
             overflow: hidden;
@@ -342,18 +360,23 @@
 
         .type-col {
           @extend %t-copy-sub2;
+
           color: $gray-d1;
         }
 
         .date-col {
           @include transition(all $tmg-f2 ease-in-out 0s);
+
           @extend %t-copy-sub2;
+
           color: $gray-l2;
         }
 
         .embed-col {
           @include transition(all $tmg-f2 ease-in-out 0s);
+
           @extend %t-copy-sub2;
+
           padding-left: ($baseline*0.75);
           color: $gray-l2;
 
@@ -364,7 +387,9 @@
 
           .embeddable-xml-input {
             @include transition(all $tmg-f2 ease-in-out 0s);
+
             @extend %t-copy-sub2;
+
             box-shadow: none;
             border: 1px solid transparent;
             background: none;
@@ -445,7 +470,7 @@
           pointer-events: none;
         }
 
-       .fa-unlock-alt {
+        .fa-unlock-alt {
           display: none;
         }
       }
@@ -470,6 +495,7 @@
     .title {
       @extend %t-title3;
       @extend %t-light;
+
       float: none;
       margin: ($baseline*2) 0 ($baseline*1.5);
     }
@@ -480,7 +506,9 @@
 
     .choose-file-button {
       @include blue-button();
+
       @extend %t-action2;
+
       padding: 10px 82px 12px;
     }
 
@@ -503,6 +531,7 @@
 
     .progress-fill {
       @extend %t-copy-sub1;
+
       width: 0%;
       height: ($baseline*1.5);
       border-radius: ($baseline*2);
@@ -513,6 +542,7 @@
 
     .close-button {
       @include transition(color $tmg-f2 ease-in-out 0s);
+
       position: absolute;
       top: 0;
       right: ($baseline*0.75);
@@ -537,6 +567,7 @@
 
       label {
         @extend %t-strong;
+
         display: block;
         margin-bottom: ($baseline/2);
       }
@@ -549,6 +580,7 @@
 
     .copy-button {
       @include white-button;
+
       display: none;
       margin-bottom: ($baseline*5);
     }

@@ -7,27 +7,33 @@ import unittest
 
 import ddt
 import httpretty
-from Crypto.PublicKey import RSA
+from Cryptodome.PublicKey import RSA
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import RequestFactory, TestCase, override_settings
 from oauth2_provider import models as dot_models
-from provider import constants
+from organizations.tests.factories import OrganizationFactory
 
+from openedx.core.djangoapps.oauth_dispatch.toggles import ENFORCE_JWT_SCOPES
+from provider import constants
 from student.tests.factories import UserFactory
 from third_party_auth.tests.utils import ThirdPartyOAuthTestMixin, ThirdPartyOAuthTestMixinGoogle
 from . import mixins
-from .constants import DUMMY_REDIRECT_URL
-from .. import adapters
-from .. import models
 
 # NOTE (CCB): We use this feature flag in a roundabout way to determine if the oauth_dispatch app is installed
 # in the current service--LMS or Studio. Normally we would check if settings.ROOT_URLCONF == 'lms.urls'; however,
 # simply importing the views will results in an error due to the requisite apps not being installed (in Studio). Thus,
 # we are left with this hack, of checking the feature flag which will never be True for Studio.
+#
+# NOTE (BJM): As of Django 1.9 we also can't import models for apps which aren't in INSTALLED_APPS, so making all of
+# these imports conditional except mixins, which doesn't currently import forbidden models, and is needed at test
+# discovery time.
 OAUTH_PROVIDER_ENABLED = settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER')
 
 if OAUTH_PROVIDER_ENABLED:
+    from .constants import DUMMY_REDIRECT_URL
+    from .. import adapters
+    from .. import models
     from .. import views
 
 
@@ -75,11 +81,10 @@ class _DispatchingViewTestCase(TestCase):
 
     Subclasses need to define self.url.
     """
-    dop_adapter = adapters.DOPAdapter()
-    dot_adapter = adapters.DOTAdapter()
-
     def setUp(self):
         super(_DispatchingViewTestCase, self).setUp()
+        self.dop_adapter = adapters.DOPAdapter()
+        self.dot_adapter = adapters.DOTAdapter()
         self.user = UserFactory()
         self.dot_app = self.dot_adapter.create_public_client(
             name='test dot application',
@@ -94,6 +99,15 @@ class _DispatchingViewTestCase(TestCase):
             client_id='dop-app-client-id',
         )
 
+        self.dot_app_access = models.ApplicationAccess.objects.create(
+            application=self.dot_app,
+            scopes=['grades:read'],
+        )
+        self.dot_app_org = models.ApplicationOrganization.objects.create(
+            application=self.dot_app,
+            organization=OrganizationFactory()
+        )
+
         # Create a "restricted" DOT Application which means any AccessToken/JWT
         # generated for this application will be immediately expired
         self.restricted_dot_app = self.dot_adapter.create_public_client(
@@ -104,14 +118,14 @@ class _DispatchingViewTestCase(TestCase):
         )
         models.RestrictedApplication.objects.create(application=self.restricted_dot_app)
 
-    def _post_request(self, user, client, token_type=None):
+    def _post_request(self, user, client, token_type=None, scope=None):
         """
-        Call the view with a POST request objectwith the appropriate format,
+        Call the view with a POST request object with the appropriate format,
         returning the response object.
         """
-        return self.client.post(self.url, self._post_body(user, client, token_type))  # pylint: disable=no-member
+        return self.client.post(self.url, self._post_body(user, client, token_type, scope))  # pylint: disable=no-member
 
-    def _post_body(self, user, client, token_type=None):
+    def _post_body(self, user, client, token_type=None, scope=None):
         """
         Return a dictionary to be used as the body of the POST request
         """
@@ -129,19 +143,27 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         self.url = reverse('access_token')
         self.view_class = views.AccessTokenView
 
-    def _post_body(self, user, client, token_type=None):
+    def _post_body(self, user, client, token_type=None, scope=None):
         """
         Return a dictionary to be used as the body of the POST request
         """
+        grant_type = getattr(client, 'authorization_grant_type', dot_models.Application.GRANT_PASSWORD)
         body = {
             'client_id': client.client_id,
-            'grant_type': 'password',
-            'username': user.username,
-            'password': 'test',
+            'grant_type': grant_type.replace('-', '_'),
         }
+
+        if grant_type == dot_models.Application.GRANT_PASSWORD:
+            body['username'] = user.username
+            body['password'] = 'test'
+        elif grant_type == dot_models.Application.GRANT_CLIENT_CREDENTIALS:
+            body['client_secret'] = client.client_secret
 
         if token_type:
             body['token_type'] = token_type
+
+        if scope:
+            body['scope'] = scope
 
         return body
 
@@ -156,21 +178,24 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         self.assertIn('scope', data)
         self.assertIn('token_type', data)
 
-    def test_restricted_access_token_fields(self):
-        response = self._post_request(self.user, self.restricted_dot_app)
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
-        self.assertIn('access_token', data)
-        self.assertIn('expires_in', data)
-        self.assertIn('scope', data)
-        self.assertIn('token_type', data)
+    @ddt.data(False, True)
+    def test_restricted_non_jwt_access_token_fields(self, enforce_jwt_scopes_enabled):
+        with ENFORCE_JWT_SCOPES.override(enforce_jwt_scopes_enabled):
+            response = self._post_request(self.user, self.restricted_dot_app)
+            self.assertEqual(response.status_code, 200)
+            data = json.loads(response.content)
+            self.assertIn('access_token', data)
+            self.assertIn('expires_in', data)
+            self.assertIn('scope', data)
+            self.assertIn('token_type', data)
 
-        # Restricted applications have immediately expired tokens
-        self.assertLess(data['expires_in'], 0)
-
-        # double check that the token stored in the DB is marked as expired
-        access_token = dot_models.AccessToken.objects.get(token=data['access_token'])
-        self.assertTrue(models.RestrictedApplication.verify_access_token_as_expired(access_token))
+            # Verify token expiration.
+            self.assertEqual(data['expires_in'] < 0, True)
+            access_token = dot_models.AccessToken.objects.get(token=data['access_token'])
+            self.assertEqual(
+                models.RestrictedApplication.verify_access_token_as_expired(access_token),
+                True
+            )
 
     @ddt.data('dop_app', 'dot_app')
     def test_jwt_access_token(self, client_attr):
@@ -180,28 +205,41 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         data = json.loads(response.content)
         self.assertIn('expires_in', data)
         self.assertEqual(data['token_type'], 'JWT')
-        self.assert_valid_jwt_access_token(data['access_token'], self.user, data['scope'].split(' '))
+        self.assert_valid_jwt_access_token(
+            data['access_token'],
+            self.user,
+            data['scope'].split(' '),
+            should_be_restricted=False,
+        )
 
-    def test_restricted_jwt_access_token(self):
+    @ddt.data(
+        (False, True, settings.DEFAULT_JWT_ISSUER),
+        (True, False, settings.RESTRICTED_APPLICATION_JWT_ISSUER),
+    )
+    @ddt.unpack
+    def test_restricted_jwt_access_token(self, enforce_jwt_scopes_enabled, expiration_expected,
+                                         jwt_issuer_expected):
         """
         Verify that when requesting a JWT token from a restricted Application
         within the DOT subsystem, that our claims is marked as already expired
         (i.e. expiry set to Jan 1, 1970)
         """
-        response = self._post_request(self.user, self.restricted_dot_app, token_type='jwt')
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
-        self.assertIn('expires_in', data)
+        with ENFORCE_JWT_SCOPES.override(enforce_jwt_scopes_enabled):
+            response = self._post_request(self.user, self.restricted_dot_app, token_type='jwt')
+            self.assertEqual(response.status_code, 200)
+            data = json.loads(response.content)
 
-        # jwt must indicate that it is already expired
-        self.assertLess(data['expires_in'], 0)
-        self.assertEqual(data['token_type'], 'JWT')
-        self.assert_valid_jwt_access_token(
-            data['access_token'],
-            self.user,
-            data['scope'].split(' '),
-            should_be_expired=True
-        )
+            self.assertIn('expires_in', data)
+            self.assertEqual(data['expires_in'] < 0, expiration_expected)
+            self.assertEqual(data['token_type'], 'JWT')
+            self.assert_valid_jwt_access_token(
+                data['access_token'],
+                self.user,
+                data['scope'].split(' '),
+                should_be_expired=expiration_expected,
+                jwt_issuer=jwt_issuer_expected,
+                should_be_restricted=True,
+            )
 
     def test_restricted_access_token(self):
         """
@@ -235,6 +273,38 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
         data = json.loads(response.content)
         self.assertNotIn('refresh_token', data)
 
+    @ddt.data(dot_models.Application.GRANT_CLIENT_CREDENTIALS, dot_models.Application.GRANT_PASSWORD)
+    def test_jwt_access_token_scopes_and_filters(self, grant_type):
+        """
+        Verify the JWT contains the expected scopes and filters.
+        """
+        dot_app = self.dot_adapter.create_public_client(
+            name='test dot application',
+            user=self.user,
+            redirect_uri=DUMMY_REDIRECT_URL,
+            client_id='dot-app-client-id-{grant_type}'.format(grant_type=grant_type),
+            grant_type=grant_type,
+        )
+        dot_app_access = models.ApplicationAccess.objects.create(
+            application=dot_app,
+            scopes=['grades:read'],
+        )
+        models.ApplicationOrganization.objects.create(
+            application=dot_app,
+            organization=OrganizationFactory()
+        )
+        scopes = dot_app_access.scopes
+        filters = self.dot_adapter.get_authorization_filters(dot_app.client_id)
+        response = self._post_request(self.user, dot_app, token_type='jwt', scope=scopes)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assert_valid_jwt_access_token(
+            data['access_token'],
+            self.user,
+            scopes,
+            filters=filters,
+        )
+
 
 @ddt.ddt
 @httpretty.activate
@@ -248,7 +318,7 @@ class TestAccessTokenExchangeView(ThirdPartyOAuthTestMixinGoogle, ThirdPartyOAut
         self.view_class = views.AccessTokenExchangeView
         super(TestAccessTokenExchangeView, self).setUp()
 
-    def _post_body(self, user, client, token_type=None):
+    def _post_body(self, user, client, token_type=None, scope=None):
         return {
             'client_id': client.client_id,
             'access_token': self.access_token,
@@ -270,16 +340,23 @@ class TestAuthorizationView(_DispatchingViewTestCase):
     Test class for AuthorizationView
     """
 
-    dop_adapter = adapters.DOPAdapter()
-
     def setUp(self):
         super(TestAuthorizationView, self).setUp()
+        self.dop_adapter = adapters.DOPAdapter()
         self.user = UserFactory()
         self.dot_app = self.dot_adapter.create_confidential_client(
             name='test dot application',
             user=self.user,
             redirect_uri=DUMMY_REDIRECT_URL,
             client_id='confidential-dot-app-client-id',
+        )
+        models.ApplicationAccess.objects.create(
+            application=self.dot_app,
+            scopes=['grades:read'],
+        )
+        self.dot_app_org = models.ApplicationOrganization.objects.create(
+            application=self.dot_app,
+            organization=OrganizationFactory()
         )
         self.dop_app = self.dop_adapter.create_confidential_client(
             name='test dop client',
@@ -325,7 +402,7 @@ class TestAuthorizationView(_DispatchingViewTestCase):
                 'response_type': 'code',
                 'state': 'random_state_string',
                 'redirect_uri': DUMMY_REDIRECT_URL,
-                'scope': 'profile'
+                'scope': 'profile grades:read'
             },
             follow=True,
         )
@@ -333,6 +410,7 @@ class TestAuthorizationView(_DispatchingViewTestCase):
         # are the requested scopes on the page? We only requested 'profile', lets make
         # sure the page only lists that one
         self.assertContains(response, settings.OAUTH2_PROVIDER['SCOPES']['profile'])
+        self.assertContains(response, settings.OAUTH2_PROVIDER['SCOPES']['grades:read'])
         self.assertNotContains(response, settings.OAUTH2_PROVIDER['SCOPES']['read'])
         self.assertNotContains(response, settings.OAUTH2_PROVIDER['SCOPES']['write'])
         self.assertNotContains(response, settings.OAUTH2_PROVIDER['SCOPES']['email'])
@@ -351,6 +429,12 @@ class TestAuthorizationView(_DispatchingViewTestCase):
         self.assertContains(
             response,
             '<button type="submit" class="btn btn-authorization-allow" name="allow" value="Authorize"/>Allow</button>'
+        )
+
+        # Are the content provider organizations listed on the page?
+        self.assertContains(
+            response,
+            '<li>{org}</li>'.format(org=self.dot_app_org.organization.name)
         )
 
     def _check_dot_response(self, response):
@@ -399,11 +483,10 @@ class TestViewDispatch(TestCase):
     Test that the DispatchingView dispatches the right way.
     """
 
-    dop_adapter = adapters.DOPAdapter()
-    dot_adapter = adapters.DOTAdapter()
-
     def setUp(self):
         super(TestViewDispatch, self).setUp()
+        self.dop_adapter = adapters.DOPAdapter()
+        self.dot_adapter = adapters.DOTAdapter()
         self.user = UserFactory()
         self.view = views._DispatchingView()  # pylint: disable=protected-access
         self.dop_adapter.create_public_client(

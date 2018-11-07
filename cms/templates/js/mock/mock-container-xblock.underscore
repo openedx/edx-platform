@@ -47,7 +47,7 @@
                                                             <button class="edit-button action-button"></button>
                                                         </li>
                                                         <li class="action-item action-visibility">
-                                                            <button class="visibility-button action-button"></button>
+                                                            <button class="access-button action-button"></button>
                                                         </li>
                                                         <li class="action-item action-duplicate">
                                                             <button class="duplicate-button action-button"></button>
@@ -78,7 +78,7 @@
                                                             <button class="edit-button action-button"></button>
                                                         </li>
                                                         <li class="action-item action-visibility">
-                                                            <button class="visibility-button action-button"></button>
+                                                            <button class="access-button action-button"></button>
                                                         </li>
                                                         <li class="action-item action-duplicate">
                                                             <button class="duplicate-button action-button"></button>
@@ -109,7 +109,7 @@
                                                             <button class="edit-button action-button"></button>
                                                         </li>
                                                         <li class="action-item action-visibility">
-                                                            <button class="visibility-button action-button"></button>
+                                                            <button class="access-button action-button"></button>
                                                         </li>
                                                         <li class="action-item action-duplicate">
                                                             <button class="duplicate-button action-button"></button>
@@ -170,7 +170,7 @@
                                                             <button class="edit-button action-button"></button>
                                                         </li>
                                                         <li class="action-item action-visibility">
-                                                            <button class="visibility-button action-button"></button>
+                                                            <button class="access-button action-button"></button>
                                                         </li>
                                                         <li class="action-item action-duplicate">
                                                             <button class="duplicate-button action-button"></button>
@@ -201,7 +201,7 @@
                                                             <button class="edit-button action-button"></button>
                                                         </li>
                                                         <li class="action-item action-visibility">
-                                                            <button class="visibility-button action-button"></button>
+                                                            <button class="access-button action-button"></button>
                                                         </li>
                                                         <li class="action-item action-duplicate">
                                                             <button class="duplicate-button action-button"></button>
@@ -232,7 +232,7 @@
                                                             <button class="edit-button action-button"></button>
                                                         </li>
                                                         <li class="action-item action-visibility">
-                                                            <button class="visibility-button action-button"></button>
+                                                            <button class="access-button action-button"></button>
                                                         </li>
                                                         <li class="action-item action-duplicate">
                                                             <button class="duplicate-button action-button"></button>

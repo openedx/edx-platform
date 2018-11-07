@@ -1,8 +1,8 @@
 (function(requirejs, require, define) {
     define([], function() {
         return {
-            'check': check,
-            'update': update
+            check: check,
+            update: update
         };
 
         function update(state) {
@@ -235,8 +235,8 @@
                         }
 
                         draggable.moveDraggableTo('XY', {
-                            'x': answer[c1][draggableId][0],
-                            'y': answer[c1][draggableId][1]
+                            x: answer[c1][draggableId][0],
+                            y: answer[c1][draggableId][1]
                         });
                     }
 

@@ -1,57 +1,86 @@
 // LMS layouts
 
 .content-wrapper {
-    max-width: $lms-max-width;
-    padding-bottom: $baseline*2;
+  max-width: map-get($container-max-widths, xl);
+  margin-top: $baseline;
+  padding: 0 0 $baseline/2;
 
-    .container {
-        @include clearfix();
-        border: 1px solid $lms-border-color;
-        background-color: $lms-container-background-color;
+  @include media-breakpoint-up(md) {
+    padding: 0 $baseline $baseline/2;
+  }
+
+  .page-content-container {
+    @include clearfix();
+
+    border: 1px solid $border-color;
+    background-color: $body-bg;
+    max-width: map-get($container-max-widths, xl);
+    margin: 0 auto;
+  }
+
+  .page-header {
+    @include clearfix();
+
+    border-bottom: 1px solid $border-color;
+    padding: $baseline;
+
+    .page-title {
+      @extend %t-title4;
+
+      margin-bottom: ($baseline/4);
+      text-transform: none;
+      color: $black;
     }
 
-    .page-header {
-        @include clearfix();
-        border-bottom: 1px solid $lms-border-color;
-        padding: $baseline;
+    .page-description {
+      @extend %t-copy-sub1;
 
-        .page-title {
-            @extend %t-title4;
-            margin-bottom: ($baseline/4);
-            text-transform: none;
-            color: $black;
-        }
-
-        .page-description {
-            @extend %t-copy-sub1;
-            margin-bottom: ($baseline/4);
-            color: $gray;
-        }
-
-        &.has-secondary {
-            .page-header-main {
-                display: inline-block;
-            }
-
-            .page-header-secondary {
-                @include float(right);
-                @include text-align(right);
-                display: inline-block;
-                vertical-align: text-bottom;
-
-                .form-actions {
-                    @include margin-left($baseline/2);
-                    display: inline-block;
-                }
-
-                .form-actions > *:first-child {
-                    @include margin-left(0);
-                }
-            }
-        }
+      margin-bottom: ($baseline/4);
+      color: $gray;
     }
 
-    .page-content {
-        padding: $baseline;
+    &.has-secondary {
+      .page-header-main {
+        display: inline-block;
+      }
+
+      @include media-breakpoint-up(md) {
+        .page-header-secondary {
+          @include float(right);
+          @include text-align(right);
+
+          display: flex;
+          vertical-align: text-bottom;
+
+          .form-actions {
+            @include margin-left($baseline/2);
+
+            display: inline-block;
+          }
+
+          .form-actions > *:first-child {
+            @include margin-left(0);
+          }
+        }
+      }
     }
+  }
+
+  .page-content {
+    padding: $baseline;
+
+    @media (min-width: $grid-breakpoints-md) {
+      display: flex;
+
+      .page-content-main {
+        flex-grow: 1;  // This column should consume all the available space
+      }
+
+      .page-content-secondary {
+        min-width: 350px;  // Note: setting width only is not obeyed
+        max-width: 350px;  // Note: setting width only is not obeyed
+        margin-left: $baseline*2;
+      }
+    }
+  }
 }

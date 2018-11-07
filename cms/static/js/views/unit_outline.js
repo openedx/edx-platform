@@ -18,7 +18,8 @@ define(['underscore', 'js/views/xblock_outline', 'js/views/unit_outline_child'],
 
             renderAncestors: function() {
                 var i, listElement,
-                    ancestors, ancestor, ancestorView = this,
+                    ancestors, ancestor,
+                    ancestorView = this,
                     previousAncestor = null;
                 if (this.model.get('ancestor_info')) {
                     ancestors = this.model.get('ancestor_info').ancestors;

@@ -13,16 +13,13 @@ import re
 from unittest import skipUnless
 
 import crum
-from django import db
 from django.conf import settings
 from django.contrib import sites
-from django.contrib.auth.models import AnonymousUser
 from django.core.cache import caches
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.test import RequestFactory, TestCase, override_settings
 from django.test.utils import CaptureQueriesContext
-from nose.plugins import Plugin
-from request_cache.middleware import RequestCache
+from openedx.core.djangoapps.request_cache.middleware import RequestCache
 
 
 class CacheIsolationMixin(object):
@@ -223,27 +220,12 @@ class FilteredQueryCountMixin(object):
             func(*args, **kwargs)
 
 
-class NoseDatabaseIsolation(Plugin):
-    """
-    nosetest plugin that resets django databases before any tests begin.
-
-    Used to make sure that tests running in multi processes aren't sharing
-    a database connection.
-    """
-    name = "database-isolation"
-
-    def begin(self):
-        """
-        Before any tests start, reset all django database connections.
-        """
-        for db_ in db.connections.all():
-            db_.close()
-
-
 def get_mock_request(user=None):
     """
     Create a request object for the user, if specified.
     """
+    # Import is placed here to avoid model import at project startup.
+    from django.contrib.auth.models import AnonymousUser
     request = RequestFactory().get('/')
     if user is not None:
         request.user = user

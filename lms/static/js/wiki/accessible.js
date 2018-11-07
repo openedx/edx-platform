@@ -4,8 +4,8 @@
 
 (function() {
     var keyMap = CodeMirror.keyMap.accessible = {
-        'Tab': false,
+        Tab: false,
         'Shift-Tab': false,
         fallthrough: 'default'
     };
-})();
+}());

@@ -13,7 +13,7 @@ from django.http import Http404
 from django.test.client import RequestFactory
 from django_comment_common.models import CourseDiscussionSettings
 from django_comment_common.utils import get_course_discussion_settings
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -1101,7 +1101,7 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
         """
         users = [UserFactory(username="user{0}".format(i)) for i in range(3)]
         usernames = [user.username for user in users]
-        wrong_course_key = SlashSeparatedCourseKey("some", "arbitrary", "course")
+        wrong_course_key = CourseLocator("some", "arbitrary", "course")
         wrong_course_cohort = CohortFactory(name="wrong_cohort", course_id=wrong_course_key, users=[])
         self.request_add_users_to_cohort(
             ",".join(usernames),

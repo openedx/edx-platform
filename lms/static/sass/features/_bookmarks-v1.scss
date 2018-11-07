@@ -8,6 +8,7 @@ $bookmarked-icon: "\f02e"; // .fa-bookmark
 
   > div {
     @include box-sizing(border-box);
+
     display: inline-block;
   }
 }
@@ -22,11 +23,13 @@ $bookmarked-icon: "\f02e"; // .fa-bookmark
 
     // set styles
     @extend %btn-pl-default-base;
+
     @include font-size(13);
+
     width: 100%;
     padding: ($baseline/4) ($baseline/2);
 
-    &:before {
+    &::before {
       content: $bookmarked-icon;
       font-family: FontAwesome;
     }
@@ -35,9 +38,9 @@ $bookmarked-icon: "\f02e"; // .fa-bookmark
 
 // Rules for bookmark icon shown on each sequence nav item
 .course-content {
-
   .bookmark-icon.bookmarked {
     @include right($baseline / 4);
+
     top: -3px;
     position: absolute;
   }
@@ -45,20 +48,22 @@ $bookmarked-icon: "\f02e"; // .fa-bookmark
   // Rules for bookmark button's different styles
   .bookmark-button-wrapper {
     margin-bottom: ($baseline * 1.5);
+
+    @extend %ui-print-excluded;
   }
 
   .bookmark-button {
+    &::before {
+      @include padding-right($baseline / 4);
 
-    &:before {
       content: $bookmark-icon;
       font-family: FontAwesome;
     }
 
     &.bookmarked {
-      &:before {
+      &::before {
         content: $bookmarked-icon;
       }
     }
-
   }
 }

@@ -1,35 +1,96 @@
 
 
-(function (globals) {
+(function(globals) {
 
   var django = globals.django || (globals.django = {});
 
   
-  django.pluralidx = function (count) { return (count == 1) ? 0 : 1; };
-  
-
-  
-  /* gettext identity library */
-
-  django.gettext = function (msgid) { return msgid; };
-  django.ngettext = function (singular, plural, count) { return (count == 1) ? singular : plural; };
-  django.gettext_noop = function (msgid) { return msgid; };
-  django.pgettext = function (context, msgid) { return msgid; };
-  django.npgettext = function (context, singular, plural, count) { return (count == 1) ? singular : plural; };
-  
-
-  django.interpolate = function (fmt, obj, named) {
-    if (named) {
-      return fmt.replace(/%\(\w+\)s/g, function(match){return String(obj[match.slice(2,-2)])});
+  django.pluralidx = function(n) {
+    var v=(n != 1);
+    if (typeof(v) == 'boolean') {
+      return v ? 1 : 0;
     } else {
-      return fmt.replace(/%s/g, function(match){return String(obj.shift())});
+      return v;
     }
   };
+  
+
+  /* gettext library */
+
+  django.catalog = django.catalog || {};
+  
+  var newcatalog = {
+    "6 a.m.": "6 a.m", 
+    "Available %s": "\u0c06\u0c02\u0c26\u0c41\u0c2c\u0c3e\u0c24\u0c41\u0c32\u0c4b\u0c09\u0c28\u0c4d\u0c28 %s ", 
+    "Cancel": "\u0c30\u0c26\u0c4d\u0c26\u0c41 \u0c1a\u0c47\u0c2f\u0c41", 
+    "Choose a time": "\u0c12\u0c15 \u0c38\u0c2e\u0c2f\u0c2e\u0c41 \u0c0e\u0c28\u0c4d\u0c28\u0c41\u0c15\u0c4b\u0c02\u0c21\u0c3f", 
+    "Choose all": "\u0c05\u0c28\u0c4d\u0c28\u0c40 \u0c0e\u0c28\u0c4d\u0c28\u0c41\u0c15\u0c4b\u0c02\u0c21\u0c3f", 
+    "Chosen %s": "\u0c0e\u0c28\u0c4d\u0c28\u0c41\u0c15\u0c41\u0c28\u0c4d\u0c28 %s", 
+    "Filter": "\u0c35\u0c21\u0c2a\u0c4b\u0c24", 
+    "Hide": "\u0c26\u0c3e\u0c1a\u0c41", 
+    "Midnight": "\u0c06\u0c30\u0c4d\u0c27\u0c30\u0c3e\u0c24\u0c4d\u0c30\u0c3f", 
+    "Noon": "\u0c2e\u0c27\u0c4d\u0c2f\u0c3e\u0c39\u0c4d\u0c28\u0c2e\u0c41", 
+    "Now": "\u0c07\u0c2a\u0c4d\u0c2a\u0c41\u0c21\u0c41", 
+    "Remove": "\u0c24\u0c40\u0c38\u0c3f\u0c35\u0c47\u0c2f\u0c02\u0c21\u0c3f", 
+    "Show": "\u0c1a\u0c42\u0c2a\u0c3f\u0c02\u0c1a\u0c41\u0c2e\u0c41", 
+    "Today": "\u0c08\u0c28\u0c3e\u0c21\u0c41", 
+    "Tomorrow": "\u0c30\u0c47\u0c2a\u0c41", 
+    "Yesterday": "\u0c28\u0c3f\u0c28\u0c4d\u0c28"
+  };
+  for (var key in newcatalog) {
+    django.catalog[key] = newcatalog[key];
+  }
+  
+
+  if (!django.jsi18n_initialized) {
+    django.gettext = function(msgid) {
+      var value = django.catalog[msgid];
+      if (typeof(value) == 'undefined') {
+        return msgid;
+      } else {
+        return (typeof(value) == 'string') ? value : value[0];
+      }
+    };
+
+    django.ngettext = function(singular, plural, count) {
+      var value = django.catalog[singular];
+      if (typeof(value) == 'undefined') {
+        return (count == 1) ? singular : plural;
+      } else {
+        return value[django.pluralidx(count)];
+      }
+    };
+
+    django.gettext_noop = function(msgid) { return msgid; };
+
+    django.pgettext = function(context, msgid) {
+      var value = django.gettext(context + '\x04' + msgid);
+      if (value.indexOf('\x04') != -1) {
+        value = msgid;
+      }
+      return value;
+    };
+
+    django.npgettext = function(context, singular, plural, count) {
+      var value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
+      if (value.indexOf('\x04') != -1) {
+        value = django.ngettext(singular, plural, count);
+      }
+      return value;
+    };
+
+    django.interpolate = function(fmt, obj, named) {
+      if (named) {
+        return fmt.replace(/%\(\w+\)s/g, function(match){return String(obj[match.slice(2,-2)])});
+      } else {
+        return fmt.replace(/%s/g, function(match){return String(obj.shift())});
+      }
+    };
 
 
-  /* formatting library */
+    /* formatting library */
 
-  django.formats = {
+    django.formats = {
     "DATETIME_FORMAT": "N j, Y, P", 
     "DATETIME_INPUT_FORMATS": [
       "%Y-%m-%d %H:%M:%S", 
@@ -75,24 +136,27 @@
     "YEAR_MONTH_FORMAT": "F Y"
   };
 
-  django.get_format = function (format_type) {
-    var value = django.formats[format_type];
-    if (typeof(value) == 'undefined') {
-      return format_type;
-    } else {
-      return value;
-    }
-  };
+    django.get_format = function(format_type) {
+      var value = django.formats[format_type];
+      if (typeof(value) == 'undefined') {
+        return format_type;
+      } else {
+        return value;
+      }
+    };
 
-  /* add to global namespace */
-  globals.pluralidx = django.pluralidx;
-  globals.gettext = django.gettext;
-  globals.ngettext = django.ngettext;
-  globals.gettext_noop = django.gettext_noop;
-  globals.pgettext = django.pgettext;
-  globals.npgettext = django.npgettext;
-  globals.interpolate = django.interpolate;
-  globals.get_format = django.get_format;
+    /* add to global namespace */
+    globals.pluralidx = django.pluralidx;
+    globals.gettext = django.gettext;
+    globals.ngettext = django.ngettext;
+    globals.gettext_noop = django.gettext_noop;
+    globals.pgettext = django.pgettext;
+    globals.npgettext = django.npgettext;
+    globals.interpolate = django.interpolate;
+    globals.get_format = django.get_format;
+
+    django.jsi18n_initialized = true;
+  }
 
 }(this));
 

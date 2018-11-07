@@ -2,22 +2,22 @@
   This file mirror UXPL Form field styles
 */
 
-@import 'base/variables';
+@import 'lms/theme/variables';
 
 .post-type-label {
   @include margin-right($baseline);
+
   display: inline-block;
   line-height: 100%;
 }
 
 .field-label {
-
   .post-options & {
     display: inline-block;
   }
 
   .field-input:checked + .field-input-label {
-    color: $uxpl-blue-base;
+    color: theme-color("primary");
   }
 
 }

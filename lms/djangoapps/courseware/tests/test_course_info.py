@@ -2,17 +2,23 @@
 """
 Test the course_info xblock
 """
+import ddt
 import mock
-from ccx_keys.locator import CCXLocator
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import QueryDict
 from django.test.utils import override_settings
-from nose.plugins.attrib import attr
-from pyquery import PyQuery as pq
 
+from ccx_keys.locator import CCXLocator
 from lms.djangoapps.ccx.tests.factories import CcxFactory
+from nose.plugins.attrib import attr
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
+from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
+from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG
+from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
+from pyquery import PyQuery as pq
+from six import text_type
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory
 from util.date_utils import strftime_localized
@@ -28,9 +34,12 @@ from xmodule.modulestore.xml_importer import import_course_from_xml
 
 from .helpers import LoginEnrollmentTestCase
 
+QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
+
 
 @attr(shard=1)
-class CourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
+@override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
+class CourseInfoTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """
     Tests for the Course Info page
     """
@@ -46,7 +55,7 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
 
     def test_logged_in_unenrolled(self):
         self.setup_user()
-        url = reverse('info', args=[self.course.id.to_deprecated_string()])
+        url = reverse('info', args=[text_type(self.course.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("OOGIE BLOOGIE", resp.content)
@@ -54,42 +63,37 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
 
     def test_logged_in_enrolled(self):
         self.enroll(self.course)
-        url = reverse('info', args=[self.course.id.to_deprecated_string()])
+        url = reverse('info', args=[text_type(self.course.id)])
         resp = self.client.get(url)
         self.assertNotIn("You are not currently enrolled in this course", resp.content)
 
-    @mock.patch('openedx.features.enterprise_support.api.get_enterprise_consent_url')
-    def test_redirection_missing_enterprise_consent(self, mock_get_url):
+    # TODO: LEARNER-611: If this is only tested under Course Info, does this need to move?
+    @mock.patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
+    def test_redirection_missing_enterprise_consent(self, mock_enterprise_customer_for_request):
         """
         Verify that users viewing the course info who are enrolled, but have not provided
         data sharing consent, are first redirected to a consent page, and then, once they've
         provided consent, are able to view the course info.
         """
+        # ENT-924: Temporary solution to replace sensitive SSO usernames.
+        mock_enterprise_customer_for_request.return_value = None
+
         self.setup_user()
         self.enroll(self.course)
-        mock_get_url.return_value = reverse('dashboard')
-        url = reverse('info', args=[self.course.id.to_deprecated_string()])
 
-        response = self.client.get(url)
+        url = reverse('info', args=[text_type(self.course.id)])
 
-        self.assertRedirects(
-            response,
-            reverse('dashboard')
-        )
-        mock_get_url.assert_called_once()
-        mock_get_url.return_value = None
-        response = self.client.get(url)
-        self.assertNotIn("You are not currently enrolled in this course", response.content)
+        self.verify_consent_required(self.client, url)
 
     def test_anonymous_user(self):
-        url = reverse('info', args=[self.course.id.to_deprecated_string()])
+        url = reverse('info', args=[text_type(self.course.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertNotIn("OOGIE BLOOGIE", resp.content)
 
     def test_logged_in_not_enrolled(self):
         self.setup_user()
-        url = reverse('info', args=[self.course.id.to_deprecated_string()])
+        url = reverse('info', args=[text_type(self.course.id)])
         self.client.get(url)
 
         # Check whether the user has been enrolled in the course.
@@ -108,7 +112,7 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         """
         self.setup_user()
         self.enroll(self.course)
-        url = reverse('info', args=[unicode(self.course.id)])
+        url = reverse('info', args=[text_type(self.course.id)])
         response = self.client.get(url)
         start_date = strftime_localized(self.course.start, 'SHORT_DATE')
         expected_params = QueryDict(mutable=True)
@@ -120,7 +124,7 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         self.assertRedirects(response, expected_url)
 
     @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
-    @mock.patch("courseware.views.views.strftime_localized")
+    @mock.patch("util.date_utils.strftime_localized")
     def test_non_live_course_other_language(self, mock_strftime_localized):
         """Ensure that a user accessing a non-live course sees a redirect to
         the student dashboard, not a 404, even if the localized date is unicode
@@ -130,7 +134,7 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         fake_unicode_start_time = u"üñîçø∂é_ßtå®t_tîµé"
         mock_strftime_localized.return_value = fake_unicode_start_time
 
-        url = reverse('info', args=[unicode(self.course.id)])
+        url = reverse('info', args=[text_type(self.course.id)])
         response = self.client.get(url)
         expected_params = QueryDict(mutable=True)
         expected_params['notlive'] = fake_unicode_start_time
@@ -148,6 +152,7 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
 
 
 @attr(shard=1)
+@override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
 class CourseInfoLastAccessedTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests of the CourseInfo last accessed link.
@@ -216,59 +221,99 @@ class CourseInfoLastAccessedTestCase(LoginEnrollmentTestCase, ModuleStoreTestCas
 
 
 @attr(shard=1)
+@override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
+@ddt.ddt
 class CourseInfoTitleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
-    Tests of the CourseInfo page title.
+    Tests of the CourseInfo page title site configuration options.
     """
-
     def setUp(self):
         super(CourseInfoTitleTestCase, self).setUp()
-        self.course = CourseFactory.create()
-        self.page = ItemFactory.create(
-            category="course_info", parent_location=self.course.location,
-            data="OOGIE BLOOGIE", display_name="updates"
-        )
-
-    def test_info_title(self):
-        """
-        Test the info page on a course without any display_* settings against
-        one that does.
-        """
-        url = reverse('info', args=(unicode(self.course.id),))
-        response = self.client.get(url)
-        content = pq(response.content)
-        expected_title = "Welcome to {org}'s {course_name}!".format(
-            org=self.course.display_org_with_default,
-            course_name=self.course.display_number_with_default
-        )
-        display_course = CourseFactory.create(
+        self.course = CourseFactory.create(
             org="HogwartZ",
             number="Potions_3",
             display_organization="HogwartsX",
-            display_coursenumber="Potions",
-            display_name="Introduction_to_Potions"
+            display_coursenumber="Potions101",
+            display_name="Introduction to Potions"
         )
-        display_url = reverse('info', args=(unicode(display_course.id),))
-        display_response = self.client.get(display_url)
-        display_content = pq(display_response.content)
-        expected_display_title = "Welcome to {org}'s {course_name}!".format(
-            org=display_course.display_org_with_default,
-            course_name=display_course.display_number_with_default
-        )
-        self.assertIn(
+
+    @ddt.data(
+        # Default site configuration shows course number, org, and display name as subtitle.
+        (dict(),
+         "Welcome to HogwartsX's Potions101!", "Introduction to Potions"),
+
+        # Show org in title
+        (dict(COURSE_HOMEPAGE_INVERT_TITLE=False,
+              COURSE_HOMEPAGE_SHOW_SUBTITLE=True,
+              COURSE_HOMEPAGE_SHOW_ORG=True),
+         "Welcome to HogwartsX's Potions101!", "Introduction to Potions"),
+
+        # Don't show org in title
+        (dict(COURSE_HOMEPAGE_INVERT_TITLE=False,
+              COURSE_HOMEPAGE_SHOW_SUBTITLE=True,
+              COURSE_HOMEPAGE_SHOW_ORG=False),
+         "Welcome to Potions101!", "Introduction to Potions"),
+
+        # Hide subtitle and org
+        (dict(COURSE_HOMEPAGE_INVERT_TITLE=False,
+              COURSE_HOMEPAGE_SHOW_SUBTITLE=False,
+              COURSE_HOMEPAGE_SHOW_ORG=False),
+         "Welcome to Potions101!", None),
+
+        # Show display name as title, hide subtitle and org.
+        (dict(COURSE_HOMEPAGE_INVERT_TITLE=True,
+              COURSE_HOMEPAGE_SHOW_SUBTITLE=False,
+              COURSE_HOMEPAGE_SHOW_ORG=False),
+         "Welcome to Introduction to Potions!", None),
+
+        # Show display name as title with org, hide subtitle.
+        (dict(COURSE_HOMEPAGE_INVERT_TITLE=True,
+              COURSE_HOMEPAGE_SHOW_SUBTITLE=False,
+              COURSE_HOMEPAGE_SHOW_ORG=True),
+         "Welcome to HogwartsX's Introduction to Potions!", None),
+
+        # Show display name as title, hide org, and show course number as subtitle.
+        (dict(COURSE_HOMEPAGE_INVERT_TITLE=True,
+              COURSE_HOMEPAGE_SHOW_SUBTITLE=True,
+              COURSE_HOMEPAGE_SHOW_ORG=False),
+         "Welcome to Introduction to Potions!", 'Potions101'),
+
+        # Show display name as title with org, and show course number as subtitle.
+        (dict(COURSE_HOMEPAGE_INVERT_TITLE=True,
+              COURSE_HOMEPAGE_SHOW_SUBTITLE=True,
+              COURSE_HOMEPAGE_SHOW_ORG=True),
+         "Welcome to HogwartsX's Introduction to Potions!", 'Potions101'),
+    )
+    @ddt.unpack
+    def test_info_title(self, site_config, expected_title, expected_subtitle):
+        """
+        Test the info page on a course with all the multiple display options
+        depeding on the current site configuration
+        """
+        url = reverse('info', args=(unicode(self.course.id),))
+        with with_site_configuration_context(configuration=site_config):
+            response = self.client.get(url)
+
+        content = pq(response.content)
+
+        self.assertEqual(
             expected_title,
-            content('.page-title').contents()[0]
-        )
-        self.assertIn(
-            expected_display_title,
-            display_content('.page-title').contents()[0]
-        )
-        self.assertIn(
-            display_course.display_name_with_default,
-            display_content('.page-subtitle').contents()
+            content('.page-title').contents()[0].strip(),
         )
 
+        if expected_subtitle is None:
+            self.assertEqual(
+                [],
+                content('.page-subtitle'),
+            )
+        else:
+            self.assertEqual(
+                expected_subtitle,
+                content('.page-subtitle').contents()[0].strip(),
+            )
 
+
+@override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
 class CourseInfoTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test for unenrolled student tries to access ccx.
@@ -306,6 +351,7 @@ class CourseInfoTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
 
 @attr(shard=1)
+@override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
 class CourseInfoTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests for the Course Info page for an XML course
@@ -340,21 +386,22 @@ class CourseInfoTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
     @mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_logged_in_xml(self):
         self.setup_user()
-        url = reverse('info', args=[self.xml_course_key.to_deprecated_string()])
+        url = reverse('info', args=[text_type(self.xml_course_key)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn(self.xml_data, resp.content)
 
     @mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_anonymous_user_xml(self):
-        url = reverse('info', args=[self.xml_course_key.to_deprecated_string()])
+        url = reverse('info', args=[text_type(self.xml_course_key)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertNotIn(self.xml_data, resp.content)
 
 
 @attr(shard=1)
-@override_settings(FEATURES=dict(settings.FEATURES, EMBARGO=False), ENABLE_ENTERPRISE_INTEGRATION=False)
+@override_settings(FEATURES=dict(settings.FEATURES, EMBARGO=False))
+@override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
 class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
     """
     Tests for the info page of self-paced courses.
@@ -368,7 +415,6 @@ class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
         cls.self_paced_course = CourseFactory.create(self_paced=True)
 
     def setUp(self):
-        SelfPacedConfiguration(enabled=True).save()
         super(SelfPacedCourseInfoTestCase, self).setUp()
         self.setup_user()
 
@@ -377,15 +423,15 @@ class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
         Fetch the given course's info page, asserting the number of SQL
         and Mongo queries.
         """
-        url = reverse('info', args=[unicode(course.id)])
-        with self.assertNumQueries(sql_queries):
+        url = reverse('info', args=[text_type(course.id)])
+        with self.assertNumQueries(sql_queries, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
             with check_mongo_calls(mongo_queries):
                 with mock.patch("openedx.core.djangoapps.theming.helpers.get_current_site", return_value=None):
                     resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
 
     def test_num_queries_instructor_paced(self):
-        self.fetch_course_info_with_queries(self.instructor_paced_course, 26, 4)
+        self.fetch_course_info_with_queries(self.instructor_paced_course, 28, 3)
 
     def test_num_queries_self_paced(self):
-        self.fetch_course_info_with_queries(self.self_paced_course, 26, 4)
+        self.fetch_course_info_with_queries(self.self_paced_course, 28, 3)

@@ -1,0 +1,25 @@
+// Open edX: components
+// ====================
+
+// Page banner
+.page-banner {
+  max-width: map-get($container-max-widths, xl);
+  margin: 0 auto;
+
+  .user-messages {
+    margin-top: $baseline;
+  }
+}
+
+// Alerts
+.alert {
+  display: flex;
+
+  .icon-alert {
+    margin-right: $baseline;
+  }
+
+  .message-actions {
+    margin-left: $baseline;
+  }
+}

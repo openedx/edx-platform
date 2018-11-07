@@ -1,11 +1,15 @@
 ## mako
 
+## This navigation has been deprecated in favor of the responsive header found in header/header.html
+## To use this new header, change the include statement in your templates/header.html file to import
+## the header/header.html file as opposed to the navigation/navigation.html file.
+
 <%page expression_filter="h" args="online_help_token"/>
 
 <%namespace name='static' file='../static_content.html'/>
 <%namespace file='../main.html' import="login_query"/>
 <%!
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from lms.djangoapps.ccx.overrides import get_current_ccx
@@ -13,10 +17,10 @@ from openedx.core.djangolib.markup import HTML, Text
 
 # App that handles subdomain specific branding
 from branding import api as branding_api
-# app that handles site status messages
-from status.status import get_site_status_msg
 from openedx.core.djangoapps.lang_pref.api import header_language_selector_is_enabled, released_languages
 %>
+
+<script type="text/javascript" src="${static.url('js/header/header.js')}"></script>
 
 ## Provide a hook for themes to inject branding on top.
 <%block name="navigation_top" />
@@ -30,36 +34,17 @@ from openedx.core.djangoapps.lang_pref.api import header_language_selector_is_en
     </%block>
 % endif
 
-<%block>
-<%
-try:
-    course_id = course.id
-except:
-    # can't figure out a better way to get at a possibly-defined course var
-    course_id = None
-site_status_msg = get_site_status_msg(course_id)
-%>
-% if site_status_msg:
-<div class="site-status">
-  <div class="inner-wrapper">
-    <span class="icon fa fa-warning"></span>
-    <p>${site_status_msg}</p>
-  </div>
-</div>
-% endif
-</%block>
-
 % if uses_bootstrap:
-  <header class="navigation-container header-global ${"slim" if course else ""}">
-    <nav class="navbar navbar-toggleable-md navbar-light">
+  <header class="navigation-container header-global ${'slim' if course else ''}">
+    <nav class="navbar navbar-expand-lg">
+      <%include file="bootstrap/navbar-logo-header.html" args="online_help_token=online_help_token"/>
       <button class="navbar-toggler navbar-toggler-right mt-2" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <%include file="bootstrap/navbar-logo-header.html" args="online_help_token=online_help_token"/>
-      % if user.is_authenticated():
-        <%include file="bootstrap/navbar-authenticated.html" args="online_help_token=online_help_token"/>
+      % if user.is_authenticated:
+        <%include file="navbar-authenticated.html" args="online_help_token=online_help_token"/>
       % else:
-        <%include file="bootstrap/navbar-not-authenticated.html" args="online_help_token=online_help_token"/>
+        <%include file="navbar-not-authenticated.html" args="online_help_token=online_help_token"/>
       % endif
     </nav>
   </header>
@@ -67,7 +52,7 @@ site_status_msg = get_site_status_msg(course_id)
   <header id="global-navigation" class="header-global ${"slim" if course else ""}" >
     <nav class="wrapper-header" aria-label="${_('Global')}">
       <%include file="navbar-logo-header.html" args="online_help_token=online_help_token"/>
-      % if user.is_authenticated():
+      % if user.is_authenticated:
         <%include file="navbar-authenticated.html" args="online_help_token=online_help_token"/>
       % else:
         <%include file="navbar-not-authenticated.html" args="online_help_token=online_help_token"/>
@@ -79,7 +64,7 @@ site_status_msg = get_site_status_msg(course_id)
             <li class="primary">
               <form action="/i18n/setlang/" method="post" class="settings-language-form" id="language-settings-form">
                 <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
-                % if user.is_authenticated():
+                % if user.is_authenticated:
                   <input title="preference api" type="hidden" class="url-endpoint" value="${reverse('preferences_api', kwargs={'username': user.username})}" data-user-is-authenticated="true">
                 % else:
                   <input title="session update url" type="hidden" class="url-endpoint" value="${reverse('session_language')}" data-user-is-authenticated="false">
@@ -115,3 +100,6 @@ site_status_msg = get_site_status_msg(course_id)
 % endif
 
 <%include file="../help_modal.html"/>
+% if settings.FEATURES.get('ENABLE_COOKIE_CONSENT', False):
+  <%include file="../widgets/cookie-consent.html" />
+% endif

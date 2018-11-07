@@ -11,7 +11,10 @@ from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.http import Http404
 from django.test import TestCase
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locator import CourseLocator
+from six import text_type
+
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
@@ -19,7 +22,10 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, 
 from xmodule.modulestore.tests.factories import ToyCourseFactory
 
 from .. import cohorts
-from ..models import CourseCohort, CourseUserGroup, CourseUserGroupPartitionGroup
+from ..models import (
+    CourseCohort, CourseUserGroup, CourseUserGroupPartitionGroup,
+    UnregisteredLearnerCohortAssignments
+)
 from ..tests.helpers import CohortFactory, CourseCohortFactory, config_course_cohorts, config_course_cohorts_legacy
 
 
@@ -32,7 +38,7 @@ class TestCohortSignals(TestCase):
 
     def setUp(self):
         super(TestCohortSignals, self).setUp()
-        self.course_key = SlashSeparatedCourseKey("dummy", "dummy", "dummy")
+        self.course_key = CourseLocator("dummy", "dummy", "dummy")
 
     def test_cohort_added(self, mock_tracker):
         # Add cohort
@@ -164,7 +170,7 @@ class TestCohorts(ModuleStoreTestCase):
         self.assertTrue(cohorts.is_course_cohorted(course.id))
 
         # Make sure we get a Http404 if there's no course
-        fake_key = SlashSeparatedCourseKey('a', 'b', 'c')
+        fake_key = CourseLocator('a', 'b', 'c')
         self.assertRaises(Http404, lambda: cohorts.is_course_cohorted(fake_key))
 
     def test_get_cohort_id(self):
@@ -184,7 +190,7 @@ class TestCohorts(ModuleStoreTestCase):
 
         self.assertRaises(
             Http404,
-            lambda: cohorts.get_cohort_id(user, SlashSeparatedCourseKey("course", "does_not", "exist"))
+            lambda: cohorts.get_cohort_id(user, CourseLocator("course", "does_not", "exist"))
         )
 
     def test_assignment_type(self):
@@ -265,7 +271,7 @@ class TestCohorts(ModuleStoreTestCase):
         """
         course = modulestore().get_course(self.toy_course_key)
         cohort = CohortFactory(course_id=course.id, name="TestCohort", users=[])
-        cohort2 = CohortFactory(course_id=course.id, name="RandomCohort", users=[])
+        CohortFactory(course_id=course.id, name="RandomCohort", users=[])
         config_course_cohorts(course, is_cohorted=True)
 
         # Add email address to the cohort
@@ -545,7 +551,7 @@ class TestCohorts(ModuleStoreTestCase):
 
         self.assertRaises(
             CourseUserGroup.DoesNotExist,
-            lambda: cohorts.get_cohort_by_name(SlashSeparatedCourseKey("course", "does_not", "exist"), cohort)
+            lambda: cohorts.get_cohort_by_name(CourseLocator("course", "does_not", "exist"), cohort)
         )
 
     def test_get_cohort_by_id(self):
@@ -584,14 +590,15 @@ class TestCohorts(ModuleStoreTestCase):
             ValueError,
             lambda: cohorts.add_cohort(course.id, "My Cohort", assignment_type)
         )
-        does_not_exist_course_key = SlashSeparatedCourseKey("course", "does_not", "exist")
+        does_not_exist_course_key = CourseLocator("course", "does_not", "exist")
         self.assertRaises(
             ValueError,
             lambda: cohorts.add_cohort(does_not_exist_course_key, "My Cohort", assignment_type)
         )
 
     @patch("openedx.core.djangoapps.course_groups.cohorts.tracker")
-    def test_add_user_to_cohort(self, mock_tracker):
+    @patch("openedx.core.djangoapps.course_groups.cohorts.COHORT_MEMBERSHIP_UPDATED")
+    def test_add_user_to_cohort(self, mock_signal, mock_tracker):
         """
         Make sure cohorts.add_user_to_cohort() properly adds a user to a cohort and
         handles errors.
@@ -602,6 +609,10 @@ class TestCohorts(ModuleStoreTestCase):
         CourseEnrollment.enroll(course_user, self.toy_course_key)
         first_cohort = CohortFactory(course_id=course.id, name="FirstCohort")
         second_cohort = CohortFactory(course_id=course.id, name="SecondCohort")
+
+        def check_and_reset_signal():
+            mock_signal.send.assert_called_with(sender=None, user=course_user, course_key=self.toy_course_key)
+            mock_signal.reset_mock()
 
         # Success cases
         # We shouldn't get back a previous cohort, since the user wasn't in one
@@ -619,6 +630,8 @@ class TestCohorts(ModuleStoreTestCase):
                 "previous_cohort_name": None,
             }
         )
+        check_and_reset_signal()
+
         # Should get (user, previous_cohort_name) when moved from one cohort to
         # another
         self.assertEqual(
@@ -635,6 +648,8 @@ class TestCohorts(ModuleStoreTestCase):
                 "previous_cohort_name": first_cohort.name,
             }
         )
+        check_and_reset_signal()
+
         # Should preregister email address for a cohort if an email address
         # not associated with a user is added
         (user, previous_cohort, prereg) = cohorts.add_user_to_cohort(first_cohort, "new_email@example.com")
@@ -650,6 +665,7 @@ class TestCohorts(ModuleStoreTestCase):
                 "cohort_name": first_cohort.name,
             }
         )
+
         # Error cases
         # Should get ValueError if user already in cohort
         self.assertRaises(
@@ -710,7 +726,7 @@ class TestCohorts(ModuleStoreTestCase):
         with self.assertRaises(ValueError) as value_error:
             cohorts.set_course_cohorted(course.id, 'not a boolean')
 
-        self.assertEqual("Cohorted must be a boolean", value_error.exception.message)
+        self.assertEqual("Cohorted must be a boolean", text_type(value_error.exception))
 
 
 @attr(shard=2)
@@ -861,3 +877,47 @@ class TestCohortsAndPartitionGroups(ModuleStoreTestCase):
             CourseUserGroupPartitionGroup.objects.get(
                 course_user_group_id=self.first_cohort.id
             )
+
+
+class TestUnregisteredLearnerCohortAssignments(TestCase):
+    """
+    Tests the UnregisteredLearnerCohortAssignment.retire_user method.
+    """
+
+    def setUp(self):
+        super(TestUnregisteredLearnerCohortAssignments, self).setUp()
+        self.course_key = CourseKey.from_string('course-v1:edX+DemoX+Demo_Course')
+        self.cohort = CourseUserGroup.objects.create(
+            name="TestCohort",
+            course_id=self.course_key,
+            group_type=CourseUserGroup.COHORT
+        )
+        self.cohort_assignment = UnregisteredLearnerCohortAssignments.objects.create(
+            course_user_group=self.cohort,
+            course_id=self.course_key,
+            email='learner@example.com'
+        )
+
+    def test_retired_user_has_deleted_record(self):
+        was_retired = UnregisteredLearnerCohortAssignments.delete_by_user_value(
+            value='learner@example.com',
+            field='email'
+        )
+
+        self.assertTrue(was_retired)
+
+        search_retired_user_results = \
+            UnregisteredLearnerCohortAssignments.objects.filter(
+                email=self.cohort_assignment.email
+            )
+        self.assertFalse(search_retired_user_results)
+
+    def test_retired_user_with_no_cohort_returns_false(self):
+        known_learner_email = self.cohort_assignment.email
+        was_retired = UnregisteredLearnerCohortAssignments.delete_by_user_value(
+            value='nonexistantlearner@example.com',
+            field='email'
+        )
+
+        self.assertFalse(was_retired)
+        self.assertEqual(self.cohort_assignment.email, known_learner_email)

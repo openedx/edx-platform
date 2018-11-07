@@ -5,7 +5,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 import logging
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.dispatch import receiver
 from user_tasks.models import UserTaskArtifact
 from user_tasks.signals import user_task_stopped

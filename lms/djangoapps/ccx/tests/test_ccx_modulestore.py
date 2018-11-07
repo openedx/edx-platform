@@ -17,6 +17,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 class TestCCXModulestoreWrapper(SharedModuleStoreTestCase):
     """tests for a modulestore wrapped by CCXModulestoreWrapper
     """
+    shard = 7
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     @classmethod

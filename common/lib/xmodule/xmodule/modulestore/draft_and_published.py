@@ -6,6 +6,7 @@ import threading
 import logging
 from abc import ABCMeta, abstractmethod
 from contextlib import contextmanager
+from six import text_type
 from . import ModuleStoreEnum, BulkOperationsMixin
 from .exceptions import ItemNotFoundError
 
@@ -157,7 +158,7 @@ class ModuleStoreDraftAndPublished(BranchSettingMixin, BulkOperationsMixin):
             old_parent_item = self.get_item(old_parent_location)    # pylint: disable=no-member
             new_parent_item = self.get_item(new_parent_location)    # pylint: disable=no-member
         except ItemNotFoundError as exception:
-            log.error('Unable to find the item : %s', exception.message)
+            log.error('Unable to find the item : %s', text_type(exception))
             return
 
         # Remove item from the list of children of old parent.

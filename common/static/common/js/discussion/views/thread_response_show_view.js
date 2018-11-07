@@ -64,6 +64,6 @@
             };
 
             return ThreadResponseShowView;
-        })(DiscussionContentShowView);
+        }(DiscussionContentShowView));
     }
 }).call(window);

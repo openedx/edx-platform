@@ -1,0 +1,38 @@
+## mako
+
+## Override the default styles_version to use Bootstrap
+<%! main_css = "css/bootstrap/lms-main.css" %>
+
+<%page expression_filter="h"/>
+
+<%namespace name='static' file='/static_content.html'/>
+<%inherit file="/main.html" />
+
+<%block name="pagetitle">Course Skeleton</%block>
+
+<%block name="bodyclass">view-in-course view-courseware courseware</%block>
+
+<%block name="headextra">
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-course'/>
+</%block>
+
+<%block name="content">
+<nav class="navbar course-tabs navbar-expand">
+    <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+            <a class="nav-link" href="#">Course <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">Discussion</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">Wiki</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">Progress</a>
+        </li>
+    </ul>
+</nav>
+<%include file="../fragments/unit-fragment.html"/>
+</%block>

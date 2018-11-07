@@ -8,15 +8,18 @@
 
   // basic modal content
   // ------------------------
-  .modal-window  {
+  .modal-window {
     @extend %ui-depth3;
+
     @include box-sizing(border-box);
+
     position: absolute;
     width: 50%;
     box-shadow: 0 0 7px $shadow-d1;
     border-radius: ($baseline/5);
     background-color: $gray-l4;
     padding: 7px;
+
     @include text-align(left);
     @include direction();
 
@@ -29,14 +32,16 @@
     .title {
       @extend %t-title5;
       @extend %t-demi-strong;
+
       margin: ($baseline/4) ($baseline/2) ($baseline/2) ($baseline/2);
       color: $black;
     }
 
     .message {
       @extend %t-copy-sub1;
+
       margin: 0 0 $baseline 0;
-      color: $gray;
+      color: $gray-d2;
     }
 
     .message-status {
@@ -61,19 +66,23 @@
       padding: ($baseline*0.75);
       background: $gray-d3;
 
-      .icon, .copy {
+      .icon,
+      .copy {
         display: inline-block;
         vertical-align: top;
       }
 
       .icon {
         @extend %t-icon4;
+
         @include margin-right($baseline/2);
+
         color: $white;
       }
 
       .copy {
         @extend %t-copy-sub1;
+
         max-width: 85%;
         color: $white;
       }
@@ -101,6 +110,7 @@
       &:last-child {
         margin-bottom: 0;
       }
+
       .settings-tabs-header {
         margin-bottom: $baseline;
         border-bottom: 1px solid $gray-l3;
@@ -112,6 +122,7 @@
           .settings-tab-button {
             @extend %t-copy-sub1;
             @extend %t-regular;
+
             background-image: none;
             background-color: $white;
             color: $gray-d1;
@@ -120,13 +131,15 @@
             border: 0;
             padding: ($baseline/4) ($baseline/2);
             text-transform: uppercase;
+
             &:hover {
-              background-color: $white;
-              color: $uxpl-blue-base;
+              background-color: theme-color("inverse");
+              color: theme-color("primary");
             }
+
             &.active {
-              border-bottom: 4px solid $uxpl-blue-base;
-              color: $uxpl-blue-base;
+              border-bottom: 4px solid theme-color("primary");
+              color: theme-color("primary");
             }
           }
         }
@@ -135,6 +148,7 @@
 
     .modal-section-title {
       @extend %t-title6;
+
       margin: 0 0 ($baseline/2) 0;
       border-bottom: ($baseline/10) solid $gray-l4;
       padding-bottom: ($baseline/4);
@@ -144,21 +158,26 @@
     .modal-subsection-title {
       @extend %t-title8;
       @extend %t-strong;
+
       margin-bottom: ($baseline/4);
       text-transform: uppercase;
-      letter-spacing: 0.1;
       color: $gray-l2;
     }
 
     .modal-section-content {
+      .user-partition-group-checkboxes {
+        min-height: 95px;
+      }
 
-      .list-fields, .list-actions {
+      .list-fields,
+      .list-actions {
         display: inline-block;
         vertical-align: middle;
       }
 
       .list-actions {
         @extend %actions-list;
+
         margin-left: ($baseline/4);
 
         .action-button {
@@ -175,6 +194,7 @@
 
       .action-item {
         @extend %t-action3;
+
         display: inline-block;
         margin-right: ($baseline*0.75);
 
@@ -185,7 +205,9 @@
 
       .action-primary {
         @include blue-button();
+
         @extend %t-action3;
+
         border-color: $blue-d1;
         color: $white;
       }
@@ -194,7 +216,7 @@
         color: $blue-d2;
 
         &:hover {
-          color: $blue-s2;
+          color: $blue-d4;
         }
       }
     }
@@ -235,7 +257,6 @@
     }
 
     &.modal-editor {
-
       .modal-header {
         margin: ($baseline/4) ($baseline/2);
 
@@ -247,6 +268,7 @@
         .editor-modes {
           width: 48%;
           display: inline-block;
+
           @include text-align(right);
 
           .action-item {
@@ -257,12 +279,10 @@
             .settings-button {
               @extend %btn-secondary-gray;
               @extend %t-copy-sub1;
+
               border: 0;
               padding: ($baseline/4) ($baseline/2);
               text-transform: uppercase;
-
-              &:hover {
-              }
 
               &.is-set {
                 background-color: $gray-d1;
@@ -292,6 +312,7 @@
     position: fixed;
     left: 50%;
     top: 50%;
+
     @include transform(translate(-50%,-50%));
   }
 
@@ -299,6 +320,7 @@
     .modal-content {
       padding: ($baseline/2) ($baseline/2) ($baseline*1.25) ($baseline/2);
     }
+
     .ui-loading {
       box-shadow: none;
     }
@@ -311,7 +333,6 @@
 
   // upload modal
   .assetupload-modal {
-
     .status-upload {
       margin-top: $baseline;
     }
@@ -320,7 +341,6 @@
 
   // component editor
   .modal-window {
-
     .CodeMirror {
       height: 365px;
     }
@@ -330,9 +350,7 @@
     }
 
     .wrapper-comp-settings {
-
       .list-input {
-
         &.settings-list {
           height: auto;
           max-height: none;
@@ -362,7 +380,6 @@
 
   // MODAL TYPE: component - video modal (includes special overrides for xblock-related editing view)
   .modal-lg.modal-type-video {
-
     .modal-content {
       box-shadow: none;
       height: auto;
@@ -370,7 +387,6 @@
 
       // modal within a modal
       .wrapper-modal-window-assetupload {
-
         .modal-window {
           top: 10% !important;
           left: 10% !important;
@@ -408,7 +424,6 @@
     }
 
     .xmodule_edit.xmodule_VideoDescriptor .editor-with-tabs {
-
       .edit-header {
         border: 0;
         background-color: $gray-l4;
@@ -417,6 +432,7 @@
         .component-name {
           @extend %t-title5;
           @extend %t-strong;
+
           display: inline-block;
           vertical-align: middle;
           width: 48%;
@@ -445,6 +461,7 @@
               @extend %btn-secondary-gray;
               @extend %t-copy-sub1;
               @extend %t-regular;
+
               background-image: none;
               box-shadow: none;
               border: 0;
@@ -474,6 +491,7 @@
 
   .modal-window-overlay {
     @extend %ui-depth3;
+
     position: fixed;
     top: 0;
     left: 0;
@@ -510,12 +528,11 @@
     }
 
     .partition-visibility {
-        padding-top: $baseline;
+      padding-top: $baseline;
     }
 
     // UI: form fields
     .partition-group-control {
-
       padding-top: ($baseline/2);
 
       .field {
@@ -523,6 +540,7 @@
 
         label {
           @include margin-left($baseline/4);
+
           font-size: inherit;
         }
       }
@@ -530,7 +548,6 @@
 
     // CASE: content or enrollment group has been removed
     .partition-group-visibility.was-removed {
-
       .input-checkbox:checked ~ label {
         color: $error-color;
       }
@@ -538,6 +555,7 @@
       .note {
         @extend %t-copy-sub2;
         @extend %t-regular;
+
         display: block;
         color: $error-color;
       }
@@ -546,11 +564,14 @@
     // CASE: no groups configured for visibility
     .is-not-configured {
       @extend %no-content;
+
       padding: ($baseline);
+
       @include text-align(left); // reset for %no-content's default styling
 
       .title {
         @extend %t-title6;
+
         font-weight: 600;  // needed for poorly scoped .title rule in modals
         margin: 0 0 ($baseline/2) 0; // needed for poorly scoped .title rule in modals
       }
@@ -558,14 +579,14 @@
       .copy {
         @extend %t-copy-sub1;
 
-         p {
+        p {
           @extend %wipe-last-child;
+
           margin-bottom: $baseline;
         }
       }
 
       &.has-actions {
-
         .actions {
           margin-top: $baseline;
         }
@@ -590,24 +611,32 @@
     .list-fields {
       .field-message {
         @extend %t-copy-sub1;
+
         color: $gray-d1;
         margin-bottom: ($baseline/4);
       }
+
       label {
         @extend %t-title6;
+
         font-weight: font-weight(semi-bold);
       }
 
       .field {
         display: inline-block;
         vertical-align: top;
+
         @include margin-right($baseline/2);
+
         margin-bottom: ($baseline/4);
 
         label {
           @include font-size(16);
+
           font-weight: font-weight(semi-bold);
+
           @include transition(color $tmg-f3 ease-in-out 0s);
+
           margin-bottom: ($baseline/4);
 
           &.is-focused {
@@ -616,9 +645,12 @@
         }
 
 
-        input, textarea {
+        input,
+        textarea {
           @extend %t-copy-base;
+
           @include transition(all $tmg-f2 ease-in-out 0s);
+
           height: 100%;
           width: 100%;
           padding: ($baseline/2);
@@ -642,9 +674,16 @@
           width: ($baseline*7);
         }
 
+        input.percentage {
+          display: inline-block;
+          width: ($baseline*3);
+        }
+
         .tip {
           @extend %t-copy-sub1;
+
           @include transition(color, 0.15s, ease-in-out);
+
           display: block;
           margin-top: ($baseline/4);
           color: $gray-l2;
@@ -659,15 +698,17 @@
       .field-text {
 
         // TODO: refactor the _forms.scss partial to allow for this area to inherit from it
-        label, input, textarea {
+        label,
+        input,
+        textarea {
           display: block;
         }
       }
 
       // CASE: select input
       .field-select {
-
-        .label, .input {
+        .label,
+        .input {
           display: inline-block;
           vertical-align: middle;
         }
@@ -682,8 +723,8 @@
 
         // CASE: checkbox input
         .field-checkbox {
-
-          .label, label {
+          .label,
+          label {
             margin-bottom: 0;
           }
         }
@@ -694,13 +735,14 @@
 
     // UI: grading section
     .edit-settings-grading {
-
       .grading-type {
         margin-bottom: $baseline;
       }
     }
 
-    .edit-staff-lock, .edit-content-visibility {
+    .edit-staff-lock,
+    .edit-content-visibility,
+    .edit-unit-access {
       margin-bottom: $baseline;
 
       .tip {
@@ -710,8 +752,9 @@
     }
 
     // UI: staff lock section
-    .edit-staff-lock, .edit-settings-timed-examination {
-
+    .edit-staff-lock,
+    .edit-settings-timed-examination,
+    .edit-unit-access {
       .checkbox-cosmetic .input-checkbox {
         @extend %cont-text-sr;
 
@@ -722,7 +765,6 @@
 
         // CASE: checked
         &:checked {
-
           ~ .tip-warning {
             display: none;
           }
@@ -737,6 +779,7 @@
       .note {
         @extend %t-copy-sub2;
         @extend %t-regular;
+
         margin: 14px 0 0 21px;
         display: block;
       }
@@ -744,7 +787,6 @@
 
     // UI: timed and proctored exam section
     .edit-settings-timed-examination {
-
       margin-bottom: $baseline;
 
       .checkbox-cosmetic .input-checkbox {
@@ -757,7 +799,6 @@
 
         // CASE: checked
         &:checked {
-
           ~ .tip-warning {
             display: none;
           }
@@ -774,6 +815,92 @@
     .edit-settings-access {
       .gating-prereq {
         margin-bottom: 10px;
+        .list-fields .field {
+          display: block;
+        }
+      }
+    }
+  }
+
+  .edit-unit-access,
+  .edit-staff-lock {
+    .modal-section-content {
+      @include font-size(16);
+
+      .group-select-title {
+        font-weight: font-weight(semi-bold);
+        font-size: inherit;
+        margin-bottom: ($baseline/4);
+
+        .user-partition-select {
+          font-size: inherit;
+        }
+      }
+
+      .partition-group-directions {
+        padding-top: ($baseline/2);
+      }
+
+      .label {
+        &.deleted {
+          color: $red;
+        }
+
+        font-size: inherit;
+        margin-left: ($baseline/4);
+      }
+
+      .deleted-group-message {
+        display: block;
+        color: $red;
+
+        @include font-size(14);
+      }
+
+      .field {
+        margin-top: ($baseline/4);
+      }
+    }
+  }
+
+  .edit-unit-access,
+  .edit-staff-lock {
+    .modal-section-content {
+      @include font-size(16);
+
+      .group-select-title {
+        font-weight: font-weight(semi-bold);
+        font-size: inherit;
+        margin-bottom: ($baseline/4);
+
+        .user-partition-select {
+          font-size: inherit;
+        }
+      }
+
+      .partition-group-directions {
+        padding-top: ($baseline/2);
+      }
+
+      .label {
+        &.deleted {
+          color: $red;
+        }
+
+        font-size: inherit;
+
+        @include margin-left($baseline/4);
+      }
+
+      .deleted-group-message {
+        display: block;
+        color: $red;
+
+        @include font-size(14);
+      }
+
+      .field {
+        margin-top: ($baseline/4);
       }
     }
   }

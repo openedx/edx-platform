@@ -8,14 +8,18 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import ugettext_noop
+from jsonfield.fields import JSONField
+from opaque_keys.edx.django.models import CourseKeyField
+from six import text_type
 
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, NoneToEmptyManager
+from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 FORUM_ROLE_ADMINISTRATOR = ugettext_noop('Administrator')
 FORUM_ROLE_MODERATOR = ugettext_noop('Moderator')
+FORUM_ROLE_GROUP_MODERATOR = ugettext_noop('Group Moderator')
 FORUM_ROLE_COMMUNITY_TA = ugettext_noop('Community TA')
 FORUM_ROLE_STUDENT = ugettext_noop('Student')
 
@@ -53,7 +57,9 @@ def assign_role(course_id, user, rolename):
     """
     Assign forum role `rolename` to user
     """
-    role, __ = Role.objects.get_or_create(course_id=course_id, name=rolename)
+    role, created = Role.objects.get_or_create(course_id=course_id, name=rolename)
+    if created:
+        logging.info("EDUCATOR-1635: Created role {} for course {}".format(role, course_id))
     user.roles.add(role)
 
 
@@ -71,7 +77,7 @@ class Role(models.Model):
 
     def __unicode__(self):
         # pylint: disable=no-member
-        return self.name + " for " + (self.course_id.to_deprecated_string() if self.course_id else "all courses")
+        return self.name + " for " + (text_type(self.course_id) if self.course_id else "all courses")
 
     # TODO the name of this method is a little bit confusing,
     # since it's one-off and doesn't handle inheritance later
@@ -132,6 +138,9 @@ def permission_blacked_out(course, role_names, permission_name):
 
 def all_permissions_for_user_in_course(user, course_id):  # pylint: disable=invalid-name
     """Returns all the permissions the user has in the given course."""
+    if not user.is_authenticated:
+        return {}
+
     course = modulestore().get_course(course_id)
     if course is None:
         raise ItemNotFoundError(course_id)
@@ -172,6 +181,11 @@ class CourseDiscussionSettings(models.Model):
         db_index=True,
         help_text="Which course are these settings associated with?",
     )
+    discussions_id_map = JSONField(
+        null=True,
+        blank=True,
+        help_text="Key/value store mapping discussion IDs to discussion XBlock usage keys.",
+    )
     always_divide_inline_discussions = models.BooleanField(default=False)
     _divided_discussions = models.TextField(db_column='divided_discussions', null=True, blank=True)  # JSON list
 
@@ -190,3 +204,24 @@ class CourseDiscussionSettings(models.Model):
     def divided_discussions(self, value):
         """Un-Jsonify the divided_discussions"""
         self._divided_discussions = json.dumps(value)
+
+
+class DiscussionsIdMapping(models.Model):
+    """This model is a performance optimization, updated on course publish."""
+    course_id = CourseKeyField(db_index=True, primary_key=True, max_length=255)
+    mapping = JSONField(
+        help_text="Key/value store mapping discussion IDs to discussion XBlock usage keys.",
+    )
+
+    @classmethod
+    def update_mapping(cls, course_key, discussions_id_map):
+        """Update the mapping of discussions IDs to XBlock usage key strings."""
+        mapping_entry, created = cls.objects.get_or_create(
+            course_id=course_key,
+            defaults={
+                'mapping': discussions_id_map,
+            },
+        )
+        if not created:
+            mapping_entry.mapping = discussions_id_map
+            mapping_entry.save()

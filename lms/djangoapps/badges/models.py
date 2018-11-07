@@ -13,10 +13,10 @@ from jsonfield import JSONField
 from lazy import lazy
 from model_utils.models import TimeStampedModel
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.django.models import CourseKeyField
 from opaque_keys.edx.keys import CourseKey
 
 from badges.utils import deserialize_count_specs
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from xmodule.modulestore.django import modulestore
 
 
@@ -141,8 +141,8 @@ class BadgeAssertion(TimeStampedModel):
     """
     Tracks badges on our side of the badge baking transaction
     """
-    user = models.ForeignKey(User)
-    badge_class = models.ForeignKey(BadgeClass)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    badge_class = models.ForeignKey(BadgeClass, on_delete=models.CASCADE)
     data = JSONField()
     backend = models.CharField(max_length=50)
     image_url = models.URLField()

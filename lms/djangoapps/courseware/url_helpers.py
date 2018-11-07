@@ -3,7 +3,7 @@ Module to define url helpers functions
 """
 from urllib import urlencode
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.search import navigation_index, path_to_location

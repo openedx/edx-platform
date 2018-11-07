@@ -6,11 +6,14 @@ that is defined by XModules and XModuleDescriptors (javascript and css)
 
 import errno
 import hashlib
+import json
 import logging
 import os
 import sys
+import textwrap
 from collections import defaultdict
 
+import django
 from docopt import docopt
 from path import Path as path
 
@@ -97,7 +100,7 @@ def _write_styles(selector, output_root, classes):
 
     module_styles_lines = [
         "@import 'bourbon/bourbon';",
-        "@import 'base/variables';",
+        "@import 'lms/theme/variables';",
     ]
     for class_, fragment_names in css_imports.items():
         module_styles_lines.append("""{selector}.xmodule_{class_} {{""".format(
@@ -116,28 +119,33 @@ def _write_js(output_root, classes):
     Write the javascript fragments from all XModules in `classes`
     into `output_root` as individual files, hashed by the contents to remove
     duplicates
-    """
-    contents = {}
 
-    js_fragments = set()
+    Returns a dictionary mapping class names to the files that they depend on.
+    """
+    file_contents = {}
+    file_owners = defaultdict(list)
+
+    fragment_owners = defaultdict(list)
     for class_ in classes:
         module_js = class_.get_javascript()
         # It will enforce 000 prefix for xmodule.js.
-        js_fragments.add((0, 'js', module_js.get('xmodule_js')))
+        fragment_owners[(0, 'js', module_js.get('xmodule_js'))].append(class_.__name__)
         for filetype in ('coffee', 'js'):
             for idx, fragment in enumerate(module_js.get(filetype, [])):
-                js_fragments.add((idx + 1, filetype, fragment))
+                fragment_owners[(idx + 1, filetype, fragment)].append(class_.__name__)
 
-    for idx, filetype, fragment in sorted(js_fragments):
+    for (idx, filetype, fragment), owners in sorted(fragment_owners.items()):
         filename = "{idx:0=3d}-{hash}.{type}".format(
             idx=idx,
             hash=hashlib.md5(fragment).hexdigest(),
             type=filetype)
-        contents[filename] = fragment
+        file_contents[filename] = fragment
+        for owner in owners:
+            file_owners[owner].append(output_root / filename)
 
-    _write_files(output_root, contents, {'.coffee': '.js'})
+    _write_files(output_root, file_contents, {'.coffee': '.js'})
 
-    return [output_root / filename for filename in contents.keys()]
+    return file_owners
 
 
 def _write_files(output_root, contents, generated_suffix_map=None):
@@ -181,21 +189,65 @@ def _write_files(output_root, contents, generated_suffix_map=None):
             LOG.debug("%s unchanged, skipping", output_file)
 
 
+def write_webpack(output_file, module_files, descriptor_files):
+    """
+    Write all xmodule and xmodule descriptor javascript into module-specific bundles.
+
+    The output format should be suitable for smart-merging into an existing webpack configuration.
+    """
+    _ensure_dir(output_file.dirname())
+
+    config = {
+        'entry': {}
+    }
+    for (owner, files) in module_files.items() + descriptor_files.items():
+        unique_files = sorted(set('./{}'.format(file) for file in files))
+        if len(unique_files) == 1:
+            unique_files = unique_files[0]
+        config['entry'][owner] = unique_files
+    # config['entry']['modules/js/all'] = sorted(set('./{}'.format(file) for file in sum(module_files.values(), [])))
+    # config['entry']['descriptors/js/all'] = sorted(set('./{}'.format(file) for file in sum(descriptor_files.values(), [])))
+
+    with output_file.open('w') as outfile:
+        outfile.write(
+            textwrap.dedent(u"""\
+                module.exports = {config_json};
+            """).format(config_json=json.dumps(config, indent=4))
+        )
+
+
 def main():
     """
     Generate
     Usage: static_content.py <output_root>
     """
     from django.conf import settings
-    settings.configure()
+    # Install only the apps whose models are imported when this runs
+    installed_apps = (
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'config_models',
+        'openedx.core.djangoapps.video_config',
+        'openedx.core.djangoapps.video_pipeline',
+    )
+    try:
+        import edxval
+        installed_apps += ('edxval',)
+    except ImportError:
+        pass
+    settings.configure(
+        INSTALLED_APPS=installed_apps,
+    )
+    django.setup()
 
     args = docopt(main.__doc__)
     root = path(args['<output_root>'])
 
-    write_descriptor_js(root / 'descriptors/js')
+    descriptor_files = write_descriptor_js(root / 'descriptors/js')
     write_descriptor_styles(root / 'descriptors/css')
-    write_module_js(root / 'modules/js')
+    module_files = write_module_js(root / 'modules/js')
     write_module_styles(root / 'modules/css')
+    write_webpack(root / 'webpack.xmodule.config.js', module_files, descriptor_files)
 
 
 if __name__ == '__main__':

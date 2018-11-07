@@ -31,7 +31,7 @@
             'jquery.fileupload': 'xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload',
             'jquery.iframe-transport': 'xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.iframe-transport',  // eslint-disable-line max-len
             'jquery.inputnumber': 'xmodule_js/common_static/js/vendor/html5-input-polyfills/number-polyfill',
-            'jquery.immediateDescendents': 'xmodule_js/common_static/coffee/src/jquery.immediateDescendents',
+            'jquery.immediateDescendents': 'xmodule_js/common_static/js/src/jquery.immediateDescendents',
             'jquery.simulate': 'xmodule_js/common_static/js/vendor/jquery.simulate',
             'jquery.timeago': 'xmodule_js/common_static/js/vendor/jquery.timeago',
             'jquery.url': 'xmodule_js/common_static/js/vendor/url.min',
@@ -58,7 +58,7 @@
             'domReady': 'xmodule_js/common_static/js/vendor/domReady',
             mathjax: '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured',  // eslint-disable-line max-len
             'youtube': '//www.youtube.com/player_api?noext',
-            'coffee/src/ajax_prefix': 'xmodule_js/common_static/coffee/src/ajax_prefix',
+            'js/src/ajax_prefix': 'xmodule_js/common_static/js/src/ajax_prefix',
             'js/instructor_dashboard/student_admin': 'js/instructor_dashboard/student_admin',
             'xmodule_js/common_static/js/test/add_ajax_prefix': 'xmodule_js/common_static/js/test/add_ajax_prefix',
             'xblock/lms.runtime.v1': 'lms/js/xblock/lms.runtime.v1',
@@ -71,9 +71,10 @@
             'Markdown.Editor': 'js/Markdown.Editor',
             'Markdown.Sanitizer': 'js/Markdown.Sanitizer',
             '_split': 'js/split',
-            'mathjax_delay_renderer': 'coffee/src/mathjax_delay_renderer',
-            'MathJaxProcessor': 'coffee/src/customwmd',
+            'mathjax_delay_renderer': 'js/mathjax_delay_renderer',
+            'MathJaxProcessor': 'js/customwmd',
             'picturefill': 'common/js/vendor/picturefill',
+            'bootstrap': 'common/js/vendor/bootstrap.bundle',
             'draggabilly': 'xmodule_js/common_static/js/vendor/draggabilly',
 
             // Manually specify LMS files that are not converted to RequireJS
@@ -88,9 +89,6 @@
             'js/views/file_uploader': 'js/views/file_uploader',
             'js/views/notification': 'js/views/notification',
             'js/student_account/account': 'js/student_account/account',
-            'js/student_profile/views/learner_profile_fields': 'js/student_profile/views/learner_profile_fields',
-            'js/student_profile/views/learner_profile_factory': 'js/student_profile/views/learner_profile_factory',
-            'js/student_profile/views/learner_profile_view': 'js/student_profile/views/learner_profile_view',
             'js/ccx/schedule': 'js/ccx/schedule',
             'js/views/message_banner': 'js/views/message_banner',
 
@@ -189,6 +187,9 @@
                 deps: ['underscore', 'jquery'],
                 exports: 'Backbone'
             },
+            'bootstrap': {
+                deps: ['jquery']
+            },
             'backbone.associations': {
                 deps: ['backbone'],
                 exports: 'Backbone.Associations'
@@ -281,7 +282,7 @@
             },
             'xmodule_js/common_static/js/test/add_ajax_prefix': {
                 exports: 'AjaxPrefix',
-                deps: ['coffee/src/ajax_prefix']
+                deps: ['js/src/ajax_prefix']
             },
             'js/instructor_dashboard/util': {
                 exports: 'js/instructor_dashboard/util',
@@ -305,6 +306,21 @@
             'js/instructor_dashboard/certificates': {
                 exports: 'js/instructor_dashboard/certificates',
                 deps: ['jquery', 'gettext', 'underscore']
+            },
+            'js/instructor_dashboard/membership': {
+                exports: 'js/instructor_dashboard/membership',
+                deps: ['jquery', 'underscore'],
+                init: function() {
+                    // Set global variables that the util code is expecting to be defined
+                    require([  // eslint-disable-line global-require
+                        'edx-ui-toolkit/js/utils/html-utils',
+                        'edx-ui-toolkit/js/utils/string-utils'
+                    ], function(HtmlUtils, StringUtils) {
+                        window.edx = window.edx || {};
+                        window.edx.HtmlUtils = HtmlUtils;
+                        window.edx.StringUtils = StringUtils;
+                    });
+                }
             },
             // LMS class loaded explicitly until they are converted to use RequireJS
             'js/student_account/account': {
@@ -341,6 +357,7 @@
                 exports: 'edx.instructor_dashboard.ecommerce.ExpiryCouponView',
                 deps: ['backbone', 'jquery', 'underscore']
             },
+
             'js/models/notification': {
                 exports: 'NotificationModel',
                 deps: ['backbone']
@@ -673,6 +690,7 @@
     });
 
     testFiles = [
+        'completion/js/spec/ViewedEvent_spec.js',
         'course_bookmarks/js/spec/bookmark_button_view_spec.js',
         'course_bookmarks/js/spec/bookmarks_list_view_spec.js',
         'course_bookmarks/js/spec/course_bookmarks_factory_spec.js',
@@ -682,13 +700,25 @@
         'discussion/js/spec/discussion_board_view_spec.js',
         'discussion/js/spec/views/discussion_user_profile_view_spec.js',
         'lms/js/spec/preview/preview_factory_spec.js',
+        'js/learner_dashboard/spec/collection_list_view_spec.js',
+        'js/learner_dashboard/spec/course_card_view_spec.js',
+        'js/learner_dashboard/spec/course_enroll_view_spec.js',
+        'js/learner_dashboard/spec/course_entitlement_view_spec.js',
+        'js/learner_dashboard/spec/entitlement_unenrollment_view_spec.js',
+        'js/learner_dashboard/spec/program_card_view_spec.js',
+        'js/learner_dashboard/spec/program_details_header_spec.js',
+        'js/learner_dashboard/spec/program_details_sidebar_view_spec.js',
+        'js/learner_dashboard/spec/program_details_view_spec.js',
+        'js/learner_dashboard/spec/progress_circle_view_spec.js',
+        'js/learner_dashboard/spec/sidebar_view_spec.js',
+        'js/learner_dashboard/spec/unenroll_view_spec.js',
         'js/spec/api_admin/catalog_preview_spec.js',
         'js/spec/ccx/schedule_spec.js',
         'js/spec/commerce/receipt_view_spec.js',
         'js/spec/components/card/card_spec.js',
         'js/spec/components/header/header_spec.js',
         'js/spec/course_sharing/course_sharing_events_spec.js',
-        'js/spec/courseware/course_home_events_spec.js',
+        'js/spec/courseware/course_info_events_spec.js',
         'js/spec/courseware/link_clicked_events_spec.js',
         'js/spec/courseware/updates_visibility_spec.js',
         'js/spec/dashboard/donation.js',
@@ -738,15 +768,8 @@
         'js/spec/instructor_dashboard/certificates_invalidation_spec.js',
         'js/spec/instructor_dashboard/certificates_spec.js',
         'js/spec/instructor_dashboard/ecommerce_spec.js',
+        'js/spec/instructor_dashboard/membership_auth_spec.js',
         'js/spec/instructor_dashboard/student_admin_spec.js',
-        'js/spec/learner_dashboard/collection_list_view_spec.js',
-        'js/spec/learner_dashboard/program_card_view_spec.js',
-        'js/spec/learner_dashboard/sidebar_view_spec.js',
-        'js/spec/learner_dashboard/program_details_header_spec.js',
-        'js/spec/learner_dashboard/program_details_view_spec.js',
-        'js/spec/learner_dashboard/program_details_sidebar_view_spec.js',
-        'js/spec/learner_dashboard/course_card_view_spec.js',
-        'js/spec/learner_dashboard/course_enroll_view_spec.js',
         'js/spec/markdown_editor_spec.js',
         'js/spec/dateutil_factory_spec.js',
         'js/spec/navigation_spec.js',
@@ -756,7 +779,6 @@
         'js/spec/student_account/account_settings_factory_spec.js',
         'js/spec/student_account/account_settings_fields_spec.js',
         'js/spec/student_account/account_settings_view_spec.js',
-        'js/spec/student_account/account_spec.js',
         'js/spec/student_account/emailoptin_spec.js',
         'js/spec/student_account/enrollment_spec.js',
         'js/spec/student_account/finish_auth_spec.js',
@@ -767,14 +789,6 @@
         'js/spec/student_account/password_reset_spec.js',
         'js/spec/student_account/register_spec.js',
         'js/spec/student_account/shoppingcart_spec.js',
-        'js/spec/student_profile/badge_list_container_spec.js',
-        'js/spec/student_profile/badge_list_view_spec.js',
-        'js/spec/student_profile/badge_view_spec.js',
-        'js/spec/student_profile/learner_profile_factory_spec.js',
-        'js/spec/student_profile/learner_profile_fields_spec.js',
-        'js/spec/student_profile/learner_profile_view_spec.js',
-        'js/spec/student_profile/section_two_tab_spec.js',
-        'js/spec/student_profile/share_modal_view_spec.js',
         'js/spec/verify_student/image_input_spec.js',
         'js/spec/verify_student/make_payment_step_view_ab_testing_spec.js',
         'js/spec/verify_student/make_payment_step_view_spec.js',
@@ -786,6 +800,14 @@
         'js/spec/views/file_uploader_spec.js',
         'js/spec/views/message_banner_spec.js',
         'js/spec/views/notification_spec.js',
+        'learner_profile/js/spec/learner_profile_factory_spec.js',
+        'learner_profile/js/spec/views/badge_list_container_spec.js',
+        'learner_profile/js/spec/views/badge_list_view_spec.js',
+        'learner_profile/js/spec/views/badge_view_spec.js',
+        'learner_profile/js/spec/views/learner_profile_fields_spec.js',
+        'learner_profile/js/spec/views/learner_profile_view_spec.js',
+        'learner_profile/js/spec/views/section_two_tab_spec.js',
+        'learner_profile/js/spec/views/share_modal_view_spec.js',
         'support/js/spec/collections/enrollment_spec.js',
         'support/js/spec/models/enrollment_spec.js',
         'support/js/spec/views/certificates_spec.js',

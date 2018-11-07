@@ -52,35 +52,20 @@ image is overridden.
 Sass/CSS
 --------
 
-Most CSS styling in Open edX is done with Sass files compiled to CSS.  You can
-override individual settings by creating a new Sass file that uses the existing
-file, and overrides the few settings you want.
+Most CSS styling in Open edX is done with Sass files compiled to CSS. EdX is
+converting over to use `Bootstrap Theming`_, so you can follow the instructions
+defined here:
 
-For example, to change the fonts used throughout the site, you can create an
-``lms/static/sass/_overrides.scss`` file with the change you want::
+.. _Bootstrap Theming: https://getbootstrap.com/docs/4.0/getting-started/theming/
 
-    $sans-serif: 'Helvetica';
+There are two example themes provided within edx-platform's themes directory:
 
-The variables that can currently be overridden are defined in
-``lms/static/sass/base/_variables.scss``.
+* red-theme: switches Open edX's primary color to red instead of blue
+* dark-theme: uses a dark background and light foreground colors
 
-**Note:** We are currently in the middle of a re-engineering of the Sass
-variables.  They will change in the future.  If you are interested, you can see
-the new development in the `edX Pattern Library`_.
+For more details, see `Changing Themes for an Open edX Site`_.
 
-.. _edX Pattern Library: http://ux.edx.org/
-
-Then create ``lms/static/sass/lms-main.scss`` to use those overrides, and also
-the rest of the definitions from the original file::
-
-    // Our overrides for settings we want to change.
-    @import 'overrides';
-
-    // Import the original styles from edx-platform.
-    @import 'lms/static/sass/lms-main';
-
-Do this for each .scss file your site needs.
-
+.. _Changing Themes for an Open edX Site: https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/changing_appearance/theming/index.html
 
 HTML Templates
 --------------
@@ -193,6 +178,13 @@ In addition, there are some other changes you'll need to make:
   You can set this account ID either using the "GOOGLE_ANALYTICS_ACCOUNT" value
   in the Django settings, or by setting the newly-added "GOOGLE_ANALYTICS_ACCOUNT"
   config value in your site configuration.
+
+* You can set the google site verification ID in the GOOGLE_SITE_VERIFICATION_ID
+  in your site configuration. Otherwise, edit the /edx/app/edxapp/lms.env.json
+  file to set the value for GOOGLE_SITE_VERIFICATION_ID. Setting the value for
+  GOOGLE_SITE_VERIFICATION_ID will add the meta tag for google site verification
+  in the lms/templates/main.html which is the main Mako template that all page
+  templates should include.
 
 * If you don't want the Google Analytics JavaScript to be output at all in your
   site, set the "GOOGLE_ANALYTICS_ACCOUNT" config value to the empty string.

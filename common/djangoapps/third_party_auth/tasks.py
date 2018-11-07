@@ -10,9 +10,11 @@ import dateutil.parser
 import pytz
 import requests
 from celery.task import task
+from django.utils.timezone import now
 from lxml import etree
 from onelogin.saml2.utils import OneLogin_Saml2_Utils
 from requests import exceptions
+from six import text_type
 
 from third_party_auth.models import SAMLConfiguration, SAMLProviderConfig, SAMLProviderData
 
@@ -45,18 +47,19 @@ def fetch_saml_metadata():
     """
 
     # First make a list of all the metadata XML URLs:
-    saml_providers = SAMLProviderConfig.key_values('idp_slug', flat=True)
+    saml_providers = SAMLProviderConfig.key_values('slug', flat=True)
     num_total = len(saml_providers)
     num_skipped = 0
     url_map = {}
     for idp_slug in saml_providers:
         config = SAMLProviderConfig.current(idp_slug)
+        saml_config_slug = config.saml_configuration.slug if config.saml_configuration else 'default'
 
         # Skip SAML provider configurations which do not qualify for fetching
         if any([
             not config.enabled,
             not config.automatic_refresh_enabled,
-            not SAMLConfiguration.is_enabled(config.site)
+            not SAMLConfiguration.is_enabled(config.site, saml_config_slug)
         ]):
             num_skipped += 1
             continue
@@ -103,11 +106,11 @@ def fetch_saml_metadata():
             # RequestException is the base exception for any request related error that "requests" lib raises.
             # MetadataParseError is raised if there is error in the fetched meta data (e.g. missing @entityID etc.)
 
-            log.exception(error.message)
+            log.exception(text_type(error))
             failure_messages.append(
                 "{error_type}: {error_message}\nMetadata Source: {url}\nEntity IDs: \n{entity_ids}.".format(
                     error_type=type(error).__name__,
-                    error_message=error.message,
+                    error_message=text_type(error),
                     url=url,
                     entity_ids="\n".join(
                         ["\t{}: {}".format(count, item) for count, item in enumerate(entity_ids, start=1)],
@@ -115,7 +118,7 @@ def fetch_saml_metadata():
                 )
             )
         except etree.XMLSyntaxError as error:
-            log.exception(error.message)
+            log.exception(text_type(error))
             failure_messages.append(
                 "XMLSyntaxError: {error_message}\nMetadata Source: {url}\nEntity IDs: \n{entity_ids}.".format(
                     error_message=str(error.error_log),
@@ -188,7 +191,7 @@ def _update_data(entity_id, public_key, sso_url, expires_at):
         True if a new record was created. (Either this is a new provider or something changed.)
     """
     data_obj = SAMLProviderData.current(entity_id)
-    fetched_at = datetime.datetime.now()
+    fetched_at = now()
     if data_obj and (data_obj.public_key == public_key and data_obj.sso_url == sso_url):
         data_obj.expires_at = expires_at
         data_obj.fetched_at = fetched_at

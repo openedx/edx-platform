@@ -50,6 +50,7 @@ import bleach
 import html5lib
 import pyparsing
 from lxml import etree
+from six import text_type
 
 import xqueue_interface
 from calc.preview import latex_preview
@@ -251,7 +252,7 @@ class InputTypeBase(object):
         except Exception as err:
             # Something went wrong: add xml to message, but keep the traceback
             msg = u"Error in xml '{x}': {err} ".format(
-                x=etree.tostring(xml), err=err.message)
+                x=etree.tostring(xml), err=text_type(err))
             raise Exception, msg, sys.exc_info()[2]
 
     @classmethod
@@ -517,12 +518,14 @@ class ChoiceGroup(InputTypeBase):
                 'name_array_suffix': self.suffix}
 
     @staticmethod
-    def extract_choices(element, i18n):
+    def extract_choices(element, i18n, text_only=False):
         """
         Extracts choices for a few input types, such as ChoiceGroup, RadioGroup and
         CheckboxGroup.
 
         returns list of (choice_name, choice_text) tuples
+
+        By default it will return any XML tag in the choice (e.g. <choicehint>) unless text_only=True is passed.
 
         TODO: allow order of choices to be randomized, following lon-capa spec.  Use
         "location" attribute, ie random, top, bottom.
@@ -533,7 +536,11 @@ class ChoiceGroup(InputTypeBase):
 
         for choice in element:
             if choice.tag == 'choice':
-                choices.append((choice.get("name"), stringify_children(choice)))
+                if not text_only:
+                    text = stringify_children(choice)
+                else:
+                    text = choice.text
+                choices.append((choice.get("name"), text))
             else:
                 if choice.tag != 'compoundhint':
                     msg = Text('[capa.inputtypes.extract_choices] {error_message}').format(

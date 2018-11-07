@@ -1,23 +1,23 @@
 """
 Tests for Bookmarks models.
 """
-from contextlib import contextmanager
 import datetime
-import ddt
-from freezegun import freeze_time
-import mock
-from nose.plugins.attrib import attr
-import pytz
+from contextlib import contextmanager
 
+import ddt
+import mock
+import pytz
+from freezegun import freeze_time
+from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.factories import check_mongo_calls, CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import AdminFactory, UserFactory
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 from .. import DEFAULT_FIELDS, OPTIONAL_FIELDS, PathItem
 from ..models import Bookmark, XBlockCache, parse_path_data
@@ -224,7 +224,7 @@ class BookmarksTestsBase(ModuleStoreTestCase):
             self.assertEqual(bookmark_data['path'], bookmark.path)
 
 
-@attr(shard=2)
+@attr(shard=9)
 @ddt.ddt
 @skip_unless_lms
 class BookmarkModelTests(BookmarksTestsBase):
@@ -410,7 +410,7 @@ class BookmarkModelTests(BookmarksTestsBase):
             self.assertEqual(bookmark.path, [])
 
 
-@attr(shard=2)
+@attr(shard=9)
 @ddt.ddt
 class XBlockCacheModelTest(ModuleStoreTestCase):
     """

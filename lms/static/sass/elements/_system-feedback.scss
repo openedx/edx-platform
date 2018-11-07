@@ -12,6 +12,7 @@
   // basic object
   .msg {
     @include clearfix();
+
     max-width: grid-width(12);
     min-width: 760px;
     width: flex-grid(12);
@@ -25,10 +26,10 @@
   }
 
   .msg-content {
-
     .title {
       @extend %t-title5;
       @extend %t-weight4;
+
       margin-bottom: ($baseline/4);
       color: inherit;
       text-transform: none;
@@ -37,17 +38,18 @@
 
     .copy {
       @extend %t-copy-sub1;
+
       color: inherit;
 
       p { // nasty reset
         @extend %t-copy-sub1;
+
         color: inherit;
       }
     }
   }
 
   .has-actions {
-
     .msg-content {
       width: flex-grid(10,12);
     }
@@ -66,7 +68,6 @@
   }
 
   .is-dismissable {
-
     .msg-content {
       width: flex-grid(11,12);
     }
@@ -79,6 +80,7 @@
 
       .button-dismiss {  //ugly reset on button element
         @extend %t-icon4;
+
         background: none;
         box-shadow: none;
         border: none;
@@ -120,13 +122,16 @@
 
   &.urgency-info {
     background: $msg-bg;
+
     .msg {
       color: $white;
     }
+
     .msg-icon {
       font-size: 2.5em;
       padding: 20px;
     }
+
     .msg-content {
       max-width: 80%;
     }
@@ -137,15 +142,15 @@
   }
 
   &.error {
-    border-top: 3px solid $error-color;
+    border-top: 3px solid theme-color("danger");
   }
 
   &.warning {
-    border-top: 3px solid $warning-color;
+    border-top: 3px solid theme-color("warning");
   }
 
   &.success {
-    border-top: 3px solid $success-color;
+    border-top: 3px solid theme-color("success");
   }
 
 
@@ -174,13 +179,16 @@
 // messages
 .message {
   @extend %t-copy-sub1;
+
   display: block;
 }
 
 .message-status {
   @include border-top-radius(2px);
   @include box-sizing(border-box);
+
   @extend %t-strong;
+
   display: none;
   margin: 0 0 $baseline 0;
   padding: ($baseline/2) $baseline;
@@ -188,6 +196,7 @@
 
   .feedback-symbol {
     @extend %t-icon5;
+
     position: relative;
     top: 1px;
     display: inline-block;
@@ -232,7 +241,6 @@
     }
 
     .nav-actions {
-
       .action-primary {
         color: $gray-d4;
       }
@@ -244,10 +252,11 @@
 
   // types - confirm
   &.confirm {
-
     .nav-actions .action-primary {
       @include blue-button();
+
       @extend %t-action4;
+
       border-color: $blue-d2;
     }
 
@@ -262,10 +271,11 @@
 
   // types - warning
   &.warning {
-
     .nav-actions .action-primary {
       @include orange-button();
+
       @extend %t-action4;
+
       border-color: $orange-d2;
       color: $gray-d4;
     }
@@ -281,10 +291,11 @@
 
   // types - error
   &.error {
-
     .nav-actions .action-primary {
       @include red-button();
+
       @extend %t-action4;
+
       border-color: $red-d2;
     }
 
@@ -299,10 +310,11 @@
 
   // types - announcement
   &.announcement {
-
     .nav-actions .action-primary {
       @include blue-button();
+
       @extend %t-action4;
+
       border-color: $blue-d2;
     }
 
@@ -317,10 +329,11 @@
 
   // types - confirmation
   &.confirmation {
-
     .nav-actions .action-primary {
       @include green-button();
+
       @extend %t-action4;
+
       border-color: $green-d2;
     }
 
@@ -335,10 +348,11 @@
 
   // types - step required
   &.step-required {
-
     .nav-actions .action-primary {
       @include pink-button();
+
       @extend %t-action4;
+
       border-color: $pink-d2;
     }
 
@@ -355,7 +369,9 @@
 // prompts
 .wrapper-prompt {
   @extend %ui-depth5;
+
   @include transition(all $tmg-f3 ease-in-out  0s);
+
   position: fixed;
   top: 0;
   background: $black-t1;
@@ -363,7 +379,7 @@
   height: 100%;
   text-align: center;
 
-  &:before {
+  &::before {
     content: '';
     display: inline-block;
     height: 100%;
@@ -378,6 +394,7 @@
     vertical-align: middle;
     width: $baseline*17.5;
     border: 4px solid $black;
+
     @include text-align(left);
 
     .copy {
@@ -393,6 +410,7 @@
 
       .nav-item {
         display: inline-block;
+
         @include margin-right($baseline*0.75);
 
         &:last-child {
@@ -413,7 +431,6 @@
 
   // types of prompts - error
   .prompt.error {
-
     .feedback-symbol {
       color: $red-l1;
     }
@@ -425,7 +442,6 @@
 
   // types of prompts - confirmation
   .prompt.confirmation {
-
     .feedback-symbol {
       color: $green;
     }
@@ -437,7 +453,6 @@
 
   // types of prompts - error
   .prompt.warning {
-
     .feedback-symbol {
       color: $orange;
     }
@@ -453,7 +468,9 @@
 // notifications
 .wrapper-notification {
   @extend %ui-depth5;
+
   @include clearfix();
+
   box-shadow: 0 -1px 3px $shadow, inset 0 3px 1px $blue;
   position: fixed;
   bottom: 0;
@@ -491,6 +508,7 @@
   // shorter/status notifications
   &.wrapper-notification-status {
     @include border-top-radius(3px);
+
     right: ($baseline);
     width: auto;
     border: 4px solid $black;
@@ -500,6 +518,7 @@
     .notification {
       @include box-sizing(border-box);
       @include clearfix();
+
       width: 100%;
       max-width: none;
       min-width: none;
@@ -526,6 +545,7 @@
   // help notifications
   &.wrapper-notification-help {
     @include border-top-radius(3px);
+
     width: ($baseline*14);
     right: ($baseline);
     border: 4px solid $black;
@@ -535,6 +555,7 @@
     .notification {
       @include box-sizing(border-box);
       @include clearfix();
+
       width: 100%;
       max-width: none;
       min-width: none;
@@ -558,6 +579,7 @@
 .notification {
   @include box-sizing(border-box);
   @include clearfix();
+
   margin: 0 auto;
   width: flex-grid(12);
   max-width: $fg-max-width;
@@ -574,7 +596,9 @@
 
   .feedback-symbol {
     @include transition (color $tmg-f1 ease-in-out 0s);
+
     @extend %t-icon3;
+
     width: flex-grid(1, 12);
     height: ($baseline*1.25);
     margin-top: ($baseline/4);
@@ -585,11 +609,13 @@
 
   .copy {
     @extend %t-copy-sub1;
+
     width: flex-grid(10, 12);
     color: $gray-l2;
 
     .title {
       @extend %t-title7;
+
       margin-bottom: 0;
       color: $white;
     }
@@ -597,25 +623,28 @@
 
   // with actions
   &.has-actions {
-
     .feedback-symbol {
       width: flex-grid(1, 12);
     }
 
     .copy {
       width: flex-grid(7, 12);
+
       @include margin-right(flex-gutter());
     }
 
     .nav-actions {
       width: flex-grid(4, 12);
+
       @include float(left);
+
       margin-top: ($baseline/4);
       text-align: right;
 
       .nav-item {
         display: inline-block;
         vertical-align: middle;
+
         @include margin-right($baseline/2);
 
         &:last-child {
@@ -626,18 +655,18 @@
 
     .action-primary {
       @include blue-button();
+
       @extend %t-strong;
+
       border-color: $blue-d2;
     }
 
     .action-secondary {
-
       @extend %t-action4;
     }
   }
 
   &.confirmation {
-
     .copy {
       margin-top: ($baseline/5);
     }
@@ -650,8 +679,10 @@
 
     .feedback-symbol {
       @include animation(rotateCW $tmg-s3 linear infinite);
+
       width: 25px;
       margin: -4px 10px 0 0;
+
       @include transform-origin(52% 60%);
     }
 
@@ -674,7 +705,9 @@
 // alerts
 .wrapper-alert {
   @extend %ui-depth2;
+
   @include box-sizing(border-box);
+
   box-shadow: 0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $blue;
   position: relative;
   overflow: hidden;
@@ -736,6 +769,7 @@
 .alert:not(.pattern-library-shim) {
   @include box-sizing(border-box);
   @include clearfix();
+
   margin: 0 auto;
   width: flex-grid(12);
   max-width: $fg-max-width;
@@ -752,7 +786,9 @@
 
   .feedback-symbol {
     @include transition (color $tmg-f1 ease-in-out 0s);
+
     @extend %t-icon3;
+
     width: flex-grid(1, 12);
     margin: ($baseline/4) flex-gutter() 0 0;
     text-align: right;
@@ -765,6 +801,7 @@
 
     .title {
       @extend %t-title7;
+
       margin-bottom: 0;
       color: $white;
     }
@@ -772,46 +809,50 @@
 
   // with actions
   &.has-actions {
-
     .feedback-symbol {
       width: flex-grid(1, 12);
     }
 
-  	.copy {
-  		width: flex-grid(7, 12);
-  		@include margin-right(flex-gutter());
-  	}
+    .copy {
+      width: flex-grid(7, 12);
 
-  	.nav-actions {
-  	  width: flex-grid(4, 12);
+      @include margin-right(flex-gutter());
+    }
+
+    .nav-actions {
+      width: flex-grid(4, 12);
+
       @include float(left);
+
       margin-top: ($baseline/2);
-  	  text-align: right;
+      text-align: right;
 
-  	  .nav-item {
-  	    display: inline-block;
-  	    vertical-align: middle;
-  	    @include margin-right($baseline/2);
+      .nav-item {
+        display: inline-block;
+        vertical-align: middle;
 
-  	    &:last-child {
-  	      @include margin-right(0);
-  	    }
+        @include margin-right($baseline/2);
 
-       .action-primary {
-        @extend %t-action4;
-        @extend %t-strong;
-      }
+        &:last-child {
+          @include margin-right(0);
+        }
 
-      .action-secondary {
-        @extend %t-action4;
+        .action-primary {
+          @extend %t-action4;
+          @extend %t-strong;
+        }
+
+        .action-secondary {
+          @extend %t-action4;
+        }
       }
     }
   }
-}
 
   // with cancel
   .action-alert-close {
     @include border-bottom-radius(($baseline/5));
+
     position: absolute;
     top: -($baseline/10);
     right: $baseline;
@@ -825,6 +866,7 @@
 
     .icon {
       @extend %t-icon6;
+
       color: $white;
       width: auto;
       margin: 0;
@@ -838,7 +880,6 @@
 
   // with dismiss (to sunset action-alert-clos)
   .action-dismiss {
-
     .button {
       // I tried moving the btn-secondary-white into lms/static/sass/elements/_controls.scss
       // but sass compiler fails to find ui-btn-secondary, ui-btn-secondary is defined in
@@ -846,6 +887,7 @@
       // lms/static/sass/_build-lms.scss but issue is still there, so i made it optional.
       // Making this optional wouldn't cause any issue for confirmation dialog at-least.
       @extend %btn-secondary-white !optional;
+
       padding:($baseline/4) ($baseline/2);
     }
 
@@ -856,6 +898,7 @@
 
     .icon {
       @extend %t-icon4;
+
       margin-right: ($baseline/4);
     }
 
@@ -882,7 +925,6 @@
 
   // prompt showing
   &.prompt-is-shown {
-
     .wrapper-prompt.is-shown {
       visibility: visible;
       pointer-events: auto;
@@ -895,9 +937,7 @@
 
   // prompt hiding
   &.prompt-is-hiding {
-
     .wrapper-prompt {
-
       .prompt {
         @include animation(bounceOut $tmg-f1 ease-in-out 1);
       }
@@ -928,9 +968,9 @@
 
 // block-level messages and validation
 .wrapper-message {
-
   .message {
     @extend %t-copy-sub1;
+
     background-color: $gray-d2;
     padding: ($baseline/2) ($baseline*0.75);
     color: $white;
@@ -941,6 +981,7 @@
 
     &.information {
       @extend %t-copy-sub1;
+
       background-color: $gray-l5;
       color: $gray-d2;
     }
@@ -992,16 +1033,19 @@
 
 // temporary
 body.uxdesign.alerts {
-
   .content-primary, .content-supplementary {
     @include box-sizing(border-box);
+
     float: left;
   }
 
   .content-primary {
     @extend %ui-window;
+
     width: flex-grid(12, 12);
+
     @include margin-right(flex-gutter());
+
     padding: $baseline ($baseline*1.5);
 
     > section {
@@ -1013,9 +1057,9 @@ body.uxdesign.alerts {
     }
 
     ul {
-
       li {
         @include clearfix();
+
         width: flex-grid(12, 12);
         margin-bottom: ($baseline/4);
         border-bottom: 1px solid $gray-l4;
@@ -1029,7 +1073,9 @@ body.uxdesign.alerts {
 
         a {
           @include float(left);
+
           width: flex-grid(5, 12);
+
           @include margin-right(flex-gutter());
         }
       }
@@ -1041,9 +1087,9 @@ body.uxdesign.alerts {
 
 // artifact styles
 .main-wrapper {
-
   .alert {
     @extend %t-copy-sub1;
+
     padding: 15px 20px;
     margin-bottom: ($baseline*1.5);
     border-radius: 3px;
@@ -1055,6 +1101,7 @@ body.uxdesign.alerts {
 
     .alert-message {
       @include float(left);
+
       margin: 4px 0 0 0;
       color: $gray-d3;
     }
@@ -1093,6 +1140,7 @@ body.error {
   h1 {
     @extend %t-title1;
     @extend %t-light;
+
     float: none;
     margin: 0;
     color: $gray-d3;
@@ -1100,12 +1148,15 @@ body.error {
 
   .description {
     @extend %t-copy-lead2;
+
     margin-bottom: 50px;
   }
 
   .back-button {
     @include blue-button();
+
     @extend %t-action1;
+
     padding: 14px 40px 18px;
   }
 }

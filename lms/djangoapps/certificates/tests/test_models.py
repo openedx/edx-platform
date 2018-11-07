@@ -7,12 +7,11 @@ from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.test.utils import override_settings
-from mock import Mock
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locator import CourseLocator
 from path import Path as path
 
-from certificates.models import (
+from lms.djangoapps.certificates.models import (
     CertificateGenerationHistory,
     CertificateHtmlViewConfiguration,
     CertificateInvalidation,
@@ -22,7 +21,7 @@ from certificates.models import (
     ExampleCertificateSet,
     GeneratedCertificate
 )
-from certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
+from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory, GeneratedCertificateFactory
 from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from student.tests.factories import AdminFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -217,12 +216,12 @@ class EligibleCertificateManagerTest(SharedModuleStoreTestCase):
         self.eligible_cert = GeneratedCertificateFactory.create(
             status=CertificateStatuses.downloadable,
             user=self.user,
-            course_id=self.courses[0].id  # pylint: disable=no-member
+            course_id=self.courses[0].id
         )
         self.ineligible_cert = GeneratedCertificateFactory.create(
             status=CertificateStatuses.audit_passing,
             user=self.user,
-            course_id=self.courses[1].id  # pylint: disable=no-member
+            course_id=self.courses[1].id
         )
 
     def test_filter_ineligible_certificates(self):
@@ -233,7 +232,7 @@ class EligibleCertificateManagerTest(SharedModuleStoreTestCase):
         """
         self.assertEqual(list(GeneratedCertificate.eligible_certificates.filter(user=self.user)), [self.eligible_cert])
         self.assertEqual(
-            list(GeneratedCertificate.objects.filter(user=self.user)),  # pylint: disable=no-member
+            list(GeneratedCertificate.objects.filter(user=self.user)),
             [self.eligible_cert, self.ineligible_cert]
         )
 
@@ -268,8 +267,8 @@ class TestCertificateGenerationHistory(TestCase):
         instructor_task = InstructorTaskFactory.create(
             task_input=json.dumps(task_input),
             requester=staff,
-            task_key=Mock(),
-            task_id=Mock(),
+            task_key='',
+            task_id='',
         )
         certificate_generation_history = CertificateGenerationHistory(
             course_id=instructor_task.course_id,
@@ -289,8 +288,8 @@ class TestCertificateGenerationHistory(TestCase):
         instructor_task = InstructorTaskFactory.create(
             task_input=json.dumps({}),
             requester=staff,
-            task_key=Mock(),
-            task_id=Mock(),
+            task_key='',
+            task_id='',
         )
         certificate_generation_history = CertificateGenerationHistory(
             course_id=instructor_task.course_id,
@@ -314,7 +313,7 @@ class CertificateInvalidationTest(SharedModuleStoreTestCase):
         super(CertificateInvalidationTest, self).setUp()
         self.course = CourseFactory()
         self.user = UserFactory()
-        self.course_id = self.course.id  # pylint: disable=no-member
+        self.course_id = self.course.id
         self.certificate = GeneratedCertificateFactory.create(
             status=CertificateStatuses.downloadable,
             user=self.user,

@@ -1,6 +1,6 @@
 define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-        'common/js/spec_helpers/template_helpers', 'common/js/spec_helpers/view_helpers',
-        'js/views/modals/move_xblock_modal', 'js/models/xblock_info'],
+    'common/js/spec_helpers/template_helpers', 'common/js/spec_helpers/view_helpers',
+    'js/views/modals/move_xblock_modal', 'js/models/xblock_info'],
     function($, _, AjaxHelpers, TemplateHelpers, ViewHelpers, MoveXBlockModal, XBlockInfo) {
         'use strict';
         describe('MoveXBlockModal', function() {

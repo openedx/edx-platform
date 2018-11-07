@@ -7,7 +7,7 @@ from urllib import urlencode
 from urlparse import urlunparse
 
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import Http404
 from enum import Enum
 from opaque_keys import InvalidKeyError

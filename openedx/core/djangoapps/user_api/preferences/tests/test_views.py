@@ -7,7 +7,7 @@ import ddt
 import json
 from mock import patch
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test.testcases import TransactionTestCase
 from rest_framework.test import APIClient
 from student.tests.factories import UserFactory, TEST_PASSWORD
@@ -52,7 +52,7 @@ class TestPreferencesAPI(UserAPITestCase):
         Test that a client (logged in) cannot get the preferences information for a different client.
         """
         self.different_client.login(username=self.different_user.username, password=TEST_PASSWORD)
-        self.send_get(self.different_client, expected_status=404)
+        self.send_get(self.different_client, expected_status=403)
 
     @ddt.data(
         ("client", "user"),
@@ -61,11 +61,11 @@ class TestPreferencesAPI(UserAPITestCase):
     @ddt.unpack
     def test_get_unknown_user(self, api_client, username):
         """
-        Test that requesting a user who does not exist returns a 404.
+        Test that requesting a user who does not exist returns a 404 for staff users, but 403 for others.
         """
         client = self.login_client(api_client, username)
         response = client.get(reverse(self.url_endpoint_name, kwargs={'username': "does_not_exist"}))
-        self.assertEqual(404, response.status_code)
+        self.assertEqual(404 if username == "staff_user" else 403, response.status_code)
 
     def test_get_preferences_default(self):
         """
@@ -83,8 +83,7 @@ class TestPreferencesAPI(UserAPITestCase):
     @ddt.unpack
     def test_get_preferences(self, api_client, user):
         """
-        Test that a client (logged in) can get her own preferences information. Also verifies that a "is_staff"
-        user can get the preferences information for other users.
+        Test that a client (logged in) can get her own preferences information.
         """
         # Create some test preferences values.
         set_user_preference(self.user, "dict_pref", {"int_key": 10})
@@ -104,14 +103,14 @@ class TestPreferencesAPI(UserAPITestCase):
     @ddt.unpack
     def test_patch_unknown_user(self, api_client, user):
         """
-        Test that trying to update preferences for a user who does not exist returns a 404.
+        Test that trying to update preferences for a user who does not exist returns a 403.
         """
         client = self.login_client(api_client, user)
         response = client.patch(
             reverse(self.url_endpoint_name, kwargs={'username': "does_not_exist"}),
             data=json.dumps({"string_pref": "value"}), content_type="application/merge-patch+json"
         )
-        self.assertEqual(404, response.status_code)
+        self.assertEqual(403, response.status_code)
 
     def test_patch_bad_content_type(self):
         """
@@ -168,7 +167,7 @@ class TestPreferencesAPI(UserAPITestCase):
                 "dict_pref": {"int_key": 10},
                 "string_pref": "value",
             },
-            expected_status=403 if user == "staff_user" else 404,
+            expected_status=403,
         )
 
     def test_update_preferences(self):
@@ -311,7 +310,7 @@ class TestPreferencesAPI(UserAPITestCase):
                 "new_pref": "new_value",
                 "extra_pref": None,
             },
-            expected_status=403 if user == "staff_user" else 404
+            expected_status=403
         )
 
 
@@ -405,9 +404,9 @@ class TestPreferencesDetailAPI(UserAPITestCase):
         Test that a client (logged in) cannot manipulate a preference for a different client.
         """
         self.different_client.login(username=self.different_user.username, password=TEST_PASSWORD)
-        self.send_get(self.different_client, expected_status=404)
-        self.send_put(self.different_client, "new_value", expected_status=404)
-        self.send_delete(self.different_client, expected_status=404)
+        self.send_get(self.different_client, expected_status=403)
+        self.send_put(self.different_client, "new_value", expected_status=403)
+        self.send_delete(self.different_client, expected_status=403)
 
     @ddt.data(
         ("client", "user"),
@@ -416,13 +415,13 @@ class TestPreferencesDetailAPI(UserAPITestCase):
     @ddt.unpack
     def test_get_unknown_user(self, api_client, username):
         """
-        Test that requesting a user who does not exist returns a 404.
+        Test that requesting a user who does not exist returns a 404 for staff users, but 403 for others.
         """
         client = self.login_client(api_client, username)
         response = client.get(
             reverse(self.url_endpoint_name, kwargs={'username': "does_not_exist", 'preference_key': self.test_pref_key})
         )
-        self.assertEqual(404, response.status_code)
+        self.assertEqual(404 if username == "staff_user" else 403, response.status_code)
 
     def test_get_preference_does_not_exist(self):
         """
@@ -532,7 +531,7 @@ class TestPreferencesDetailAPI(UserAPITestCase):
         self._set_url("new_key")
         client = self.login_client(api_client, user)
         new_value = "new value"
-        self.send_put(client, new_value, expected_status=403 if user == "staff_user" else 404)
+        self.send_put(client, new_value, expected_status=403)
 
     @ddt.data(
         (u"new value",),
@@ -560,7 +559,7 @@ class TestPreferencesDetailAPI(UserAPITestCase):
         """
         client = self.login_client(api_client, user)
         new_value = "new value"
-        self.send_put(client, new_value, expected_status=403 if user == "staff_user" else 404)
+        self.send_put(client, new_value, expected_status=403)
 
     @ddt.data(
         (None,),
@@ -607,4 +606,4 @@ class TestPreferencesDetailAPI(UserAPITestCase):
         Test that a client (logged in) cannot delete a preference for another user.
         """
         client = self.login_client(api_client, user)
-        self.send_delete(client, expected_status=403 if user == "staff_user" else 404)
+        self.send_delete(client, expected_status=403)

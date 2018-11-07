@@ -53,7 +53,6 @@
                     el: this.$('.forum-search')
                 }).render();
                 this.renderBreadcrumbs();
-                $(window).bind('load scroll resize', _.bind(this.updateSidebar, this));
                 this.showBrowseMenu(true);
                 return this;
             },
@@ -88,7 +87,6 @@
                         $('.forum-nav-browse-filter-input').focus();
                         this.filterInputReset();
                     }
-                    this.updateSidebar();
                 }
             },
 
@@ -101,7 +99,6 @@
                     if (this.selectedTopicId !== 'undefined') {
                         this.$('.forum-nav-browse-filter-input').attr('aria-activedescendant', this.selectedTopicId);
                     }
-                    this.updateSidebar();
                 }
             },
 
@@ -133,37 +130,6 @@
             clearSearch: function() {
                 this.$('.search-input').val('');
                 this.discussionThreadListView.clearSearchAlerts();
-            },
-
-            updateSidebar: function() {
-                var amount, browseFilterHeight, discussionBottomOffset, discussionsBodyBottom,
-                    discussionsBodyTop, headerHeight, refineBarHeight, scrollTop, sidebarHeight, topOffset,
-                    windowHeight, $discussionBody, $sidebar;
-                scrollTop = $(window).scrollTop();
-                windowHeight = $(window).height();
-                $discussionBody = this.$('.discussion-column');
-                discussionsBodyTop = $discussionBody[0] ? $discussionBody.offset().top : undefined;
-                discussionsBodyBottom = discussionsBodyTop + $discussionBody.outerHeight();
-                $sidebar = this.$('.forum-nav');
-                if (scrollTop > discussionsBodyTop - this.sidebar_padding) {
-                    $sidebar.css('top', scrollTop - discussionsBodyTop + this.sidebar_padding);
-                } else {
-                    $sidebar.css('top', '0');
-                }
-                sidebarHeight = windowHeight - Math.max(discussionsBodyTop - scrollTop, this.sidebar_padding);
-                topOffset = scrollTop + windowHeight;
-                discussionBottomOffset = discussionsBodyBottom + this.sidebar_padding;
-                amount = Math.max(topOffset - discussionBottomOffset, 0);
-                sidebarHeight = sidebarHeight - this.sidebar_padding - amount;
-                sidebarHeight = Math.min(sidebarHeight + 1, $discussionBody.outerHeight());
-                $sidebar.css('height', sidebarHeight);
-                headerHeight = this.$('.forum-nav-header').outerHeight();
-                refineBarHeight = this.$('.forum-nav-refine-bar').outerHeight();
-                browseFilterHeight = this.$('.forum-nav-browse-filter').outerHeight();
-                this.$('.forum-nav-thread-list')
-                    .css('height', (sidebarHeight - headerHeight - refineBarHeight - 2) + 'px');
-                this.$('.forum-nav-browse-menu')
-                    .css('height', (sidebarHeight - headerHeight - browseFilterHeight - 2) + 'px');
             },
 
             goHome: function() {
@@ -313,12 +279,17 @@
                     crumbs = [],
                     subTopic = $('.forum-nav-browse-title', $item)
                         .first()
+                        .contents()
+                        .last()
                         .text()
                         .trim();
 
                 $parentSubMenus.each(function(i, el) {
-                    crumbs.push($(el).siblings('.forum-nav-browse-title')
+                    crumbs.push(
+                        $(el).siblings('.forum-nav-browse-title')
                         .first()
+                        .contents()
+                        .last()
                         .text()
                         .trim()
                     );

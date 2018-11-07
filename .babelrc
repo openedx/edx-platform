@@ -1,4 +1,8 @@
 {
+  "plugins": [
+    "transform-object-assign",
+    "transform-object-rest-spread"
+  ],
   "presets": [
     [
       "env",
@@ -11,6 +15,7 @@
         },
         "modules": false
       }
-    ]
+    ],
+    "babel-preset-react"
   ]
 }

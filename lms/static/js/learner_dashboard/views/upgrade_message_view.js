@@ -1,34 +1,20 @@
-(function(define) {
-    'use strict';
-    define(['backbone',
-        'jquery',
-        'underscore',
-        'gettext',
-        'edx-ui-toolkit/js/utils/html-utils',
-        'text!../../../templates/learner_dashboard/upgrade_message.underscore'
-    ],
-         function(
-             Backbone,
-             $,
-             _,
-             gettext,
-             HtmlUtils,
-             upgradeMessageTpl
-         ) {
-             return Backbone.View.extend({
-                 messageTpl: HtmlUtils.template(upgradeMessageTpl),
+import Backbone from 'backbone';
 
-                 initialize: function(options) {
-                     this.$el = options.$el;
-                     this.render();
-                 },
+import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
 
-                 render: function() {
-                     var data = this.model.toJSON();
+import upgradeMessageTpl from '../../../templates/learner_dashboard/upgrade_message.underscore';
 
-                     HtmlUtils.setHtml(this.$el, this.messageTpl(data));
-                 }
-             });
-         }
-    );
-}).call(this, define || RequireJS.define);
+class UpgradeMessageView extends Backbone.View {
+  initialize(options) {
+    this.messageTpl = HtmlUtils.template(upgradeMessageTpl);
+    this.$el = options.$el;
+    this.render();
+  }
+
+  render() {
+    const data = this.model.toJSON();
+    HtmlUtils.setHtml(this.$el, this.messageTpl(data));
+  }
+}
+
+export default UpgradeMessageView;

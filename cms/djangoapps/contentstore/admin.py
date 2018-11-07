@@ -7,5 +7,6 @@ from django.contrib import admin
 
 from contentstore.models import PushNotificationConfig, VideoUploadConfig
 
+
 admin.site.register(VideoUploadConfig, ConfigurationModelAdmin)
 admin.site.register(PushNotificationConfig, ConfigurationModelAdmin)

@@ -9,6 +9,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 class LmsSearchResultProcessorTestCase(ModuleStoreTestCase):
     """ Test case class to test search result processor """
+    shard = 5
 
     def build_course(self):
         """

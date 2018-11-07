@@ -12,6 +12,7 @@ except ImportError:
 from django.http import (
     HttpResponse, HttpResponseNotModified, HttpResponseForbidden,
     HttpResponseBadRequest, HttpResponseNotFound, HttpResponsePermanentRedirect)
+from six import text_type
 from student.models import CourseEnrollment
 
 from xmodule.assetstore.assetmgr import AssetManager
@@ -132,18 +133,18 @@ class StaticContentServer(object):
                 except ValueError as exception:
                     # If the header field is syntactically invalid it should be ignored.
                     log.exception(
-                        u"%s in Range header: %s for content: %s", exception.message, header_value, unicode(loc)
+                        u"%s in Range header: %s for content: %s", text_type(exception), header_value, unicode(loc)
                     )
                 else:
                     if unit != 'bytes':
                         # Only accept ranges in bytes
-                        log.warning(u"Unknown unit in Range header: %s for content: %s", header_value, unicode(loc))
+                        log.warning(u"Unknown unit in Range header: %s for content: %s", header_value, text_type(loc))
                     elif len(ranges) > 1:
                         # According to Http/1.1 spec content for multiple ranges should be sent as a multipart message.
                         # http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.16
                         # But we send back the full content.
                         log.warning(
-                            u"More than 1 ranges in Range header: %s for content: %s", header_value, unicode(loc)
+                            u"More than 1 ranges in Range header: %s for content: %s", header_value, text_type(loc)
                         )
                     else:
                         first, last = ranges[0]
@@ -161,7 +162,8 @@ class StaticContentServer(object):
                                 newrelic.agent.add_custom_parameter('contentserver.ranged', True)
                         else:
                             log.warning(
-                                u"Cannot satisfy ranges in Range header: %s for content: %s", header_value, unicode(loc)
+                                u"Cannot satisfy ranges in Range header: %s for content: %s",
+                                header_value, text_type(loc)
                             )
                             return HttpResponse(status=416)  # Requested Range Not Satisfiable
 
@@ -253,7 +255,7 @@ class StaticContentServer(object):
         if not self.is_content_locked(content):
             return True
 
-        if not hasattr(request, "user") or not request.user.is_authenticated():
+        if not hasattr(request, "user") or not request.user.is_authenticated:
             return False
 
         if not request.user.is_staff:

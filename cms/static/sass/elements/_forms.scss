@@ -17,7 +17,6 @@
 // --------------------
 // UI: checkbox/radio inputs
 %input-tickable {
-
   ~ label {
     color: $color-copy-base;
   }
@@ -25,6 +24,7 @@
   // STATE: checked/selected
   &:checked ~ label {
     @extend %t-strong;
+
     color: $ui-action-primary-color-focus;
   }
 }
@@ -35,8 +35,10 @@ input[type="password"],
 textarea.text {
   @include box-sizing(border-box);
   @include linear-gradient($gray-l5, $white);
+
   @extend %t-copy-sub2;
   @extend %t-demi-strong;
+
   padding: 6px 8px 8px;
   border: 1px solid $gray-l2;
   border-radius: 2px;
@@ -49,11 +51,12 @@ textarea.text {
   &::-webkit-input-placeholder,
   &:-moz-placeholder,
   &:-ms-input-placeholder {
-      color: $gray-l2;
+    color: $gray-l2;
   }
 
   &:focus {
     @include linear-gradient($paleYellow, tint($paleYellow, 90%));
+
     outline: 0;
   }
 }
@@ -61,12 +64,13 @@ textarea.text {
 // +Fields - Not Editable
 // ====================
 .field.is-not-editable {
-
   & label.is-focused {
-   color: $gray-d2;
+    color: $gray-d2;
   }
 
-  label, input, textarea {
+  label,
+  input,
+  textarea {
     pointer-events: none;
   }
 }
@@ -74,8 +78,8 @@ textarea.text {
 // +Fields - With Error
 // ====================
 .field.error {
-
-  input, textarea {
+  input,
+  textarea {
     border-color: $red;
   }
 }
@@ -86,13 +90,15 @@ form {
 
   // CASE: cosmetic checkbox input
   .checkbox-cosmetic {
-
-    .input-checkbox-checked, .input-checkbox-unchecked, .label {
+    .input-checkbox-checked,
+    .input-checkbox-unchecked,
+    .label {
       display: inline-block;
       vertical-align: middle;
     }
 
-    .input-checkbox-checked, .input-checkbox-unchecked {
+    .input-checkbox-checked,
+    .input-checkbox-unchecked {
       width: ($baseline*0.75);
     }
 
@@ -110,7 +116,6 @@ form {
 
       // CASE: checked
       &:checked {
-
         ~ label .input-checkbox-checked {
           display: inline-block;
         }
@@ -119,7 +124,6 @@ form {
           display: none;
         }
       }
-
     }
   }
 
@@ -141,34 +145,10 @@ form {
   .note {
     @include box-sizing(border-box);
 
-    .title {
-
-    }
-
-    .copy {
-
-    }
-
     // note with actions
     &.has-actions {
       @include clearfix();
-
-      .title {
-
-      }
-
-      .copy {
-
-      }
-
-      .list-actions {
-
-      }
     }
-  }
-
-  .note-promotion {
-
   }
 }
 
@@ -182,6 +162,7 @@ form {
   .title {
     @extend %t-title4;
     @extend %t-strong;
+
     padding: $baseline ($baseline*1.5) 0 ($baseline*1.5);
   }
 
@@ -201,24 +182,27 @@ form {
       }
 
       &.required {
-
         label {
           @extend %t-strong;
         }
 
-        label:after {
+        label::after {
           margin-left: ($baseline/4);
           content: "*";
         }
       }
 
-      label, input, textarea {
+      label,
+      input,
+      textarea {
         display: block;
       }
 
       label {
         @extend %t-copy-sub1;
+
         @include transition(color $tmg-f3 ease-in-out 0s);
+
         margin: 0 0 ($baseline/4) 0;
 
         &.is-focused {
@@ -227,9 +211,12 @@ form {
       }
 
 
-      input, textarea {
+      input,
+      textarea {
         @extend %t-copy-base;
+
         @include transition(all $tmg-f2 ease-in-out 0s);
+
         height: 100%;
         width: 100%;
         padding: ($baseline/2);
@@ -242,12 +229,7 @@ form {
           width: 25%;
         }
 
-        /*@include placeholder {
-          color: $gray-l3;
-        }*/
-
         &:focus {
-
           + .tip {
             color: $gray-d1;
           }
@@ -271,6 +253,7 @@ form {
 
       .tip {
         @extend %t-copy-sub2;
+
         @include transition(color 0.15s ease-in-out);
 
 
@@ -295,11 +278,11 @@ form {
         }
 
         .is-showing {
-            @extend %anim-fadeIn;
+          @extend %anim-fadeIn;
         }
 
         .is-hiding {
-            @extend %anim-fadeOut;
+          @extend %anim-fadeOut;
         }
 
         .tip-error {
@@ -314,8 +297,9 @@ form {
     }
 
     .field-inline {
-
-      input, textarea, select {
+      input,
+      textarea,
+      select {
         width: 62%;
         display: inline-block;
       }
@@ -326,16 +310,11 @@ form {
         width: 35%;
         margin-top: 0;
       }
-
-      &.error {
-        .tip-error {
-        }
-      }
-
     }
 
     .field-group {
       @include clearfix();
+
       margin: 0 0 ($baseline/2) 0;
 
       .field {
@@ -356,7 +335,8 @@ form {
           margin-right: 0;
         }
 
-        input, textarea {
+        input,
+        textarea {
           width: 100%;
         }
       }
@@ -372,7 +352,9 @@ form {
 
     .action {
       @include transition(all $tmg-f2 linear 0s);
+
       @extend %t-strong;
+
       display: inline-block;
       padding: ($baseline/5) $baseline;
       text-transform: uppercase;
@@ -380,11 +362,13 @@ form {
 
     .action-primary {
       @include blue-button;
+
       @extend %t-action2;
     }
 
     .action-secondary {
       @include grey-button;
+
       @extend %t-action2;
     }
   }
@@ -395,18 +379,30 @@ form {
 // form - inline xblock name edit on unit, container, outline
 // TODO: abstract this out into a Sass placeholder
 .incontext-editor.is-editable {
+  .access-editor-action-wrapper {
+    display: inline-block;
+    vertical-align: middle;
+    max-width: 80%;
+
+    .icon.icon {
+      vertical-align: baseline;
+    }
+  }
 
   .incontext-editor-value,
   .incontext-editor-action-wrapper {
     @extend %cont-truncated;
+
     display: inline-block;
     vertical-align: middle;
     max-width: 80%;
   }
 
-  .incontext-editor-open-action {
+  .incontext-editor-open-action,
+  .access-button {
     @extend %ui-btn-non-blue;
     @extend %t-copy-base;
+
     padding-top: ($baseline/10);
 
     .icon.icon {
@@ -419,7 +415,6 @@ form {
   }
 
   &.is-editing {
-
     .incontext-editor-value,
     .incontext-editor-action-wrapper {
       display: none;
@@ -435,7 +430,7 @@ form {
 // ====================
 .wrapper-create-element {
   height: auto;
-  opacity: 1.0;
+  opacity: 1;
   pointer-events: auto;
   overflow: hidden;
   display: none;
@@ -453,16 +448,18 @@ form {
 // ====================
 input.search {
   padding: 6px 15px 8px 30px;
+
   @include box-sizing(border-box);
+
   border: 1px solid $darkGrey;
   border-radius: 20px;
   background: url('#{$static-path}/images/search-icon.png') no-repeat 8px 7px #edf1f5;
   font-family: 'Open Sans', sans-serif;
-  color: $baseFontColor;
+  color: $body-color;
   outline: 0;
 
   &::-webkit-input-placeholder {
-      color: #979faf;
+    color: #979faf;
   }
 }
 
@@ -479,6 +476,7 @@ code {
 
 .CodeMirror {
   @extend %t-copy-sub1;
+
   background: $white;
   font-family: $f-monospace;
 }
@@ -487,10 +485,14 @@ code {
   width: 100%;
   min-height: 80px;
   padding: 10px;
+
   @include box-sizing(border-box);
+
   border: 1px solid $mediumGrey;
+
   @include linear-gradient(top, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.3));
-  background-color:  #edf1f5;
+
+  background-color: #edf1f5;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
   font-family: Monaco, monospace;
 }

@@ -5,7 +5,6 @@
     'use strict';
 
     function VisibilityEditorView(runtime, element) {
-
         this.getGroupAccess = function() {
             var groupAccess = {},
                 partitionId,
@@ -60,4 +59,4 @@
 
     // XBlock initialization functions must be global
     window.VisibilityEditorInit = initializeVisibilityEditor;
-})($);
+}($));

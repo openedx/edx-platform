@@ -8,6 +8,7 @@ import mock
 from django.conf import settings
 from mock import patch
 from opaque_keys.edx.locator import CourseKey, LibraryLocator
+from six import binary_type, text_type
 
 from contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase, parse_json
 from contentstore.utils import reverse_course_url, reverse_library_url
@@ -23,11 +24,12 @@ LIBRARY_REST_URL = '/library/'  # URL for GET/POST requests involving libraries
 def make_url_for_lib(key):
     """ Get the RESTful/studio URL for testing the given library """
     if isinstance(key, LibraryLocator):
-        key = unicode(key)
+        key = text_type(key)
     return LIBRARY_REST_URL + key
 
 
 @ddt.ddt
+@mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_COURSE_CREATION': False})
 class UnitTestLibraries(CourseTestCase):
     """
     Unit tests for library views
@@ -62,6 +64,47 @@ class UnitTestLibraries(CourseTestCase):
     def test_library_creator_status_with_no_course_creator_role(self):
         _, nostaff_user = self.create_non_staff_authed_user_client()
         self.assertEqual(get_library_creator_status(nostaff_user), True)
+
+    @ddt.data(
+        (False, False, True),
+        (False, True, False),
+        (True, False, True),
+        (True, True, False),
+        (True, None, False),
+        (False, None, True)
+    )
+    @ddt.unpack
+    def test_library_creator_status_settings(self, disable_course, disable_library, expected_status):
+        """
+        Ensure that the setting DISABLE_LIBRARY_CREATION overrides DISABLE_COURSE_CREATION as expected.
+        """
+        _, nostaff_user = self.create_non_staff_authed_user_client()
+        with mock.patch("contentstore.views.library.LIBRARIES_ENABLED", True):
+            with mock.patch.dict(
+                "django.conf.settings.FEATURES",
+                {
+                    "DISABLE_COURSE_CREATION": disable_course,
+                    "DISABLE_LIBRARY_CREATION": disable_library
+                }
+            ):
+                self.assertEqual(get_library_creator_status(nostaff_user), expected_status)
+
+    @mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_COURSE_CREATION': True})
+    @mock.patch("contentstore.views.library.LIBRARIES_ENABLED", True)
+    def test_library_creator_status_with_no_course_creator_role_and_disabled_nonstaff_course_creation(self):
+        """
+        Ensure that `DISABLE_COURSE_CREATION` feature works with libraries as well.
+        """
+        nostaff_client, nostaff_user = self.create_non_staff_authed_user_client()
+        self.assertFalse(get_library_creator_status(nostaff_user))
+
+        # To be explicit, this user can GET, but not POST
+        get_response = nostaff_client.get_json(LIBRARY_REST_URL)
+        post_response = nostaff_client.ajax_post(LIBRARY_REST_URL, {
+            'org': 'org', 'library': 'lib', 'display_name': "New Library",
+        })
+        self.assertEqual(get_response.status_code, 200)
+        self.assertEqual(post_response.status_code, 403)
 
     @patch("contentstore.views.library.LIBRARIES_ENABLED", False)
     def test_with_libraries_disabled(self):
@@ -197,11 +240,11 @@ class UnitTestLibraries(CourseTestCase):
         self.assertEqual(response.status_code, 200)
         info = parse_json(response)
         self.assertEqual(info['display_name'], lib.display_name)
-        self.assertEqual(info['library_id'], unicode(lib_key))
+        self.assertEqual(info['library_id'], text_type(lib_key))
         self.assertEqual(info['previous_version'], None)
         self.assertNotEqual(info['version'], None)
         self.assertNotEqual(info['version'], '')
-        self.assertEqual(info['version'], unicode(version))
+        self.assertEqual(info['version'], text_type(version))
 
     def test_get_lib_edit_html(self):
         """
@@ -277,12 +320,12 @@ class UnitTestLibraries(CourseTestCase):
         """
         library = LibraryFactory.create()
         extra_user, _ = self.create_non_staff_user()
-        manage_users_url = reverse_library_url('manage_library_users', unicode(library.location.library_key))
+        manage_users_url = reverse_library_url('manage_library_users', text_type(library.location.library_key))
 
         response = self.client.get(manage_users_url)
         self.assertEqual(response.status_code, 200)
         # extra_user has not been assigned to the library so should not show up in the list:
-        self.assertNotIn(extra_user.username, response.content)
+        self.assertNotIn(binary_type(extra_user.username), response.content)
 
         # Now add extra_user to the library:
         user_details_url = reverse_course_url(
@@ -295,4 +338,4 @@ class UnitTestLibraries(CourseTestCase):
         # Now extra_user should apear in the list:
         response = self.client.get(manage_users_url)
         self.assertEqual(response.status_code, 200)
-        self.assertIn(extra_user.username, response.content)
+        self.assertIn(binary_type(extra_user.username), response.content)

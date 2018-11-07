@@ -18,23 +18,30 @@ import requests
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.core import mail
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
+from django.utils.translation import ugettext as _
 from mock import Mock, patch
 from nose.plugins.attrib import attr
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 from waffle.testutils import override_switch
 
-from commerce.models import CommerceConfiguration
-from commerce.tests import TEST_API_URL, TEST_PAYMENT_DATA, TEST_PUBLIC_URL_ROOT
 from common.test.utils import XssTestMixin
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
+from lms.djangoapps.commerce.models import CommerceConfiguration
+from lms.djangoapps.commerce.tests import TEST_API_URL, TEST_PAYMENT_DATA, TEST_PUBLIC_URL_ROOT
+from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
-from lms.djangoapps.verify_student.views import PayAndVerifyView, checkout_with_ecommerce_service, render_to_response
+from lms.djangoapps.verify_student.views import (
+    PayAndVerifyView,
+    checkout_with_ecommerce_service,
+    render_to_response,
+    EmailMarketingConfiguration
+)
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
@@ -88,8 +95,15 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
     PASSWORD = "test_password"
 
     NOW = datetime.now(pytz.UTC)
-    YESTERDAY = NOW - timedelta(days=1)
-    TOMORROW = NOW + timedelta(days=1)
+    YESTERDAY = 'yesterday'
+    TOMORROW = 'tomorrow'
+    NEXT_YEAR = 'next_year'
+    DATES = {
+        YESTERDAY: NOW - timedelta(days=1),
+        TOMORROW: NOW + timedelta(days=1),
+        NEXT_YEAR: NOW + timedelta(days=360),
+        None: None,
+    }
 
     URLCONF_MODULES = ['openedx.core.djangoapps.embargo']
 
@@ -140,13 +154,18 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
             content_type="application/json",
         )
         configuration = CommerceConfiguration.objects.create(checkout_on_ecommerce_service=True)
-        checkout_page = configuration.MULTIPLE_ITEMS_BASKET_PAGE_URL
+        checkout_page = configuration.basket_checkout_page
+        checkout_page += "?utm_source=test"
         httpretty.register_uri(httpretty.GET, "{}{}".format(TEST_PUBLIC_URL_ROOT, checkout_page))
 
         course = self._create_course('verified', sku=sku)
         self._enroll(course.id)
-        response = self._get_page('verify_student_start_flow', course.id, expected_status_code=302)
-        expected_page = '{}{}?sku={}'.format(TEST_PUBLIC_URL_ROOT, checkout_page, sku)
+
+        # Verify that utm params are included in the url used for redirect
+        url_with_utm = 'http://www.example.com/basket/add/?utm_source=test&sku=TESTSKU'
+        with mock.patch.object(EcommerceService, 'get_checkout_page_url', return_value=url_with_utm):
+            response = self._get_page('verify_student_start_flow', course.id, expected_status_code=302)
+        expected_page = '{}{}&sku={}'.format(TEST_PUBLIC_URL_ROOT, checkout_page, sku)
         self.assertRedirects(response, expected_page, fetch_redirect_response=False)
 
     @ddt.data(
@@ -486,7 +505,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
     )
     @ddt.unpack
     def test_payment_confirmation_course_details(self, course_start, show_courseware_url):
-        course = self._create_course("verified", course_start=course_start)
+        course = self._create_course("verified", course_start=self.DATES[course_start])
         self._enroll(course.id, "verified")
         response = self._get_page('verify_student_payment_confirmation', course.id)
 
@@ -747,9 +766,10 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         self.assertContains(response, "verification deadline")
         self.assertContains(response, deadline)
 
-    @ddt.data(datetime.now(tz=pytz.UTC) + timedelta(days=360), None)
+    @ddt.data(NEXT_YEAR, None)
     def test_course_mode_expired_verification_deadline_in_future(self, verification_deadline):
         """Verify that student can not upgrade in expired course mode."""
+        verification_deadline = self.DATES[verification_deadline]
         course_modes = ("verified", "credit")
         course = self._create_course(*course_modes)
 
@@ -825,7 +845,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         self.assertContains(response, "verification deadline")
         self.assertContains(response, verification_deadline_in_past)
 
-    @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
+    @patch.dict(settings.FEATURES, {'EMBARGO': True})
     @ddt.data("verify_student_start_flow", "verify_student_begin_flow")
     def test_embargo_restrict(self, payment_flow):
         course = self._create_course("verified")
@@ -835,7 +855,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
             response = self._get_page(payment_flow, course.id, expected_status_code=302)
             self.assertRedirects(response, redirect_url)
 
-    @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
+    @patch.dict(settings.FEATURES, {'EMBARGO': True})
     @ddt.data("verify_student_start_flow", "verify_student_begin_flow")
     def test_embargo_allow(self, payment_flow):
         course = self._create_course("verified")
@@ -1086,6 +1106,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         self.assertNotEqual(httpretty.last_request().headers, {})
 
 
+@attr(shard=2)
 class CheckoutTestMixin(object):
     """
     Mixin implementing test methods that should behave identically regardless
@@ -1304,7 +1325,7 @@ class TestCreateOrderView(ModuleStoreTestCase):
         self.course_id = 'Robot/999/Test_Course'
         self.course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
         verified_mode = CourseMode(
-            course_id=SlashSeparatedCourseKey("Robot", "999", 'Test_Course'),
+            course_id=CourseKey.from_string("Robot/999/Test_Course"),
             mode_slug="verified",
             mode_display_name="Verified Certificate",
             min_price=50
@@ -1609,8 +1630,11 @@ class TestSubmitPhotosForVerification(TestCase):
         """
         if expect_email:
             # Verify that photo submission confirmation email was sent
+            subject = _("{platform_name} ID Verification Photos Received").format(
+                platform_name=settings.PLATFORM_NAME
+            )
             self.assertEqual(len(mail.outbox), 1)
-            self.assertEqual("Verification photos received", mail.outbox[0].subject)
+            self.assertEqual(subject, mail.outbox[0].subject)
         else:
             # Verify that photo submission confirmation email was not sent
             self.assertEqual(len(mail.outbox), 0)
@@ -1691,7 +1715,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertIn('JSON should be dict', response.content)
         self.assertEqual(response.status_code, 400)
 
-    @mock.patch(
+    @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
         mock.Mock(side_effect=mocked_has_valid_signature)
     )
@@ -1716,7 +1740,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertIn('Access key invalid', response.content)
         self.assertEqual(response.status_code, 400)
 
-    @mock.patch(
+    @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
         mock.Mock(side_effect=mocked_has_valid_signature)
     )
@@ -1741,14 +1765,17 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertIn('edX ID Invalid-Id not found', response.content)
         self.assertEqual(response.status_code, 400)
 
-    @mock.patch(
+    @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
         mock.Mock(side_effect=mocked_has_valid_signature)
     )
-    def test_pass_result(self):
+    @patch('lms.djangoapps.verify_student.views.log.error')
+    @patch('lms.djangoapps.verify_student.utils.SailthruClient.send')
+    def test_passed_status_template(self, mock_sailthru_send, mock_log_error):
         """
         Test for verification passed.
         """
+        EmailMarketingConfiguration.objects.create(sailthru_verification_passed_template='test_template')
         data = {
             "EdX-ID": self.receipt_id,
             "Result": "PASS",
@@ -1765,15 +1792,20 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=self.receipt_id)
         self.assertEqual(attempt.status, u'approved')
         self.assertEquals(response.content, 'OK!')
+        self.assertFalse(mock_log_error.called)
+        self.assertTrue(mock_sailthru_send.call_args[1], 'test_template')
 
-    @mock.patch(
+    @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
         mock.Mock(side_effect=mocked_has_valid_signature)
     )
-    def test_fail_result(self):
+    @patch('lms.djangoapps.verify_student.views.log.error')
+    @patch('sailthru.sailthru_client.SailthruClient.send')
+    def test_failed_status_template(self, mock_sailthru_send, mock_log_error):
         """
         Test for failed verification.
         """
+        EmailMarketingConfiguration.objects.create(sailthru_verification_failed_template='test_template')
         data = {
             "EdX-ID": self.receipt_id,
             "Result": 'FAIL',
@@ -1793,8 +1825,10 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertEqual(attempt.error_code, u'Your photo doesn\'t meet standards.')
         self.assertEqual(attempt.error_msg, u'"Invalid photo"')
         self.assertEquals(response.content, 'OK!')
+        self.assertFalse(mock_log_error.called)
+        self.assertTrue(mock_sailthru_send.call_args[1], 'test_template')
 
-    @mock.patch(
+    @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
         mock.Mock(side_effect=mocked_has_valid_signature)
     )
@@ -1820,7 +1854,7 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertEqual(attempt.error_msg, u'"Memory overflow"')
         self.assertEquals(response.content, 'OK!')
 
-    @mock.patch(
+    @patch(
         'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
         mock.Mock(side_effect=mocked_has_valid_signature)
     )

@@ -1,30 +1,42 @@
 """Tests of commerce utilities."""
+import json
+import unittest
 from urllib import urlencode
 
 import ddt
+import httpretty
 from django.conf import settings
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from mock import patch
 from waffle.testutils import override_switch
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
-from commerce.models import CommerceConfiguration
-from commerce.utils import EcommerceService
+from course_modes.models import CourseMode
+from lms.djangoapps.commerce.models import CommerceConfiguration
+from lms.djangoapps.commerce.utils import EcommerceService, refund_entitlement
 from openedx.core.lib.log_utils import audit_log
-from student.tests.factories import UserFactory
+from student.tests.factories import (TEST_PASSWORD, UserFactory)
+
+# Entitlements is not in CMS' INSTALLED_APPS so these imports will error during test collection
+if settings.ROOT_URLCONF == 'lms.urls':
+    from entitlements.tests.factories import CourseEntitlementFactory
 
 
-def update_commerce_config(enabled=False, checkout_page='/test_basket/'):
+def update_commerce_config(enabled=False, checkout_page='/test_basket/add/'):
     """ Enable / Disable CommerceConfiguration model """
     CommerceConfiguration.objects.create(
         checkout_on_ecommerce_service=enabled,
-        single_course_checkout_page=checkout_page,
+        basket_checkout_page=checkout_page,
     )
 
 
 class AuditLogTests(TestCase):
     """Tests of the commerce audit logging helper."""
+    shard = 4
+
     @patch('openedx.core.lib.log_utils.log')
     def test_log_message(self, mock_log):
         """Verify that log messages are constructed correctly."""
@@ -39,6 +51,7 @@ class AuditLogTests(TestCase):
 @ddt.ddt
 class EcommerceServiceTests(TestCase):
     """Tests for the EcommerceService helper class."""
+    shard = 4
 
     def setUp(self):
         self.request_factory = RequestFactory()
@@ -93,14 +106,217 @@ class EcommerceServiceTests(TestCase):
         self.assertEqual(url, expected_url)
 
     @override_settings(ECOMMERCE_PUBLIC_URL_ROOT='http://ecommerce_url')
-    @ddt.data(['TESTSKU'], ['TESTSKU1', 'TESTSKU2', 'TESTSKU3'])
-    def test_get_checkout_page_url(self, skus):
+    def test_get_order_dashboard_url(self):
+        """Verify that the proper order dashboard url is returned."""
+        url = EcommerceService().get_order_dashboard_url()
+        expected_url = 'http://ecommerce_url/dashboard/orders/'
+        self.assertEqual(url, expected_url)
+
+    @override_settings(ECOMMERCE_PUBLIC_URL_ROOT='http://ecommerce_url')
+    @ddt.data(
+        {
+            'skus': ['TESTSKU']
+        },
+        {
+            'skus': ['TESTSKU1', 'TESTSKU2', 'TESTSKU3']
+        },
+        {
+            'skus': ['TESTSKU'],
+            'program_uuid': '12345678-9012-3456-7890-123456789012'
+        },
+        {
+            'skus': ['TESTSKU1', 'TESTSKU2', 'TESTSKU3'],
+            'program_uuid': '12345678-9012-3456-7890-123456789012'
+        }
+    )
+    def test_get_checkout_page_url(self, skus, program_uuid=None):
         """ Verify the checkout page URL is properly constructed and returned. """
-        url = EcommerceService().get_checkout_page_url(*skus)
+        url = EcommerceService().get_checkout_page_url(*skus, program_uuid=program_uuid)
         config = CommerceConfiguration.current()
         expected_url = '{root}{basket_url}?{skus}'.format(
-            basket_url=config.MULTIPLE_ITEMS_BASKET_PAGE_URL,
+            basket_url=config.basket_checkout_page,
             root=settings.ECOMMERCE_PUBLIC_URL_ROOT,
             skus=urlencode({'sku': skus}, doseq=True),
         )
+        if program_uuid:
+            expected_url = '{expected_url}&basket={program_uuid}'.format(
+                expected_url=expected_url,
+                program_uuid=program_uuid
+            )
         self.assertEqual(url, expected_url)
+
+    @override_settings(ECOMMERCE_PUBLIC_URL_ROOT='http://ecommerce_url')
+    @ddt.data(
+        {
+            'skus': ['TESTSKU'],
+            'enterprise_catalog_uuid': None
+        },
+        {
+            'skus': ['TESTSKU'],
+            'enterprise_catalog_uuid': '6eca3efb-f3a0-4c08-806f-c6e6b65d61cb'
+        },
+    )
+    @ddt.unpack
+    def test_get_checkout_page_url_with_enterprise_catalog_uuid(self, skus, enterprise_catalog_uuid):
+        """ Verify the checkout page URL is properly constructed and returned. """
+        url = EcommerceService().get_checkout_page_url(
+            *skus,
+            enterprise_customer_catalog_uuid=enterprise_catalog_uuid
+        )
+        config = CommerceConfiguration.current()
+
+        query = {'sku': skus}
+        if enterprise_catalog_uuid:
+            query.update({'enterprise_customer_catalog_uuid': enterprise_catalog_uuid})
+
+        expected_url = '{root}{basket_url}?{skus}'.format(
+            basket_url=config.basket_checkout_page,
+            root=settings.ECOMMERCE_PUBLIC_URL_ROOT,
+            skus=urlencode(query, doseq=True),
+        )
+
+        self.assertEqual(url, expected_url)
+
+
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class RefundUtilMethodTests(ModuleStoreTestCase):
+    shard = 4
+
+    def setUp(self):
+        super(RefundUtilMethodTests, self).setUp()
+        self.user = UserFactory()
+        UserFactory(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME, is_staff=True)
+
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+        self.course = CourseFactory.create(org='edX', number='DemoX', display_name='Demo_Course')
+        self.course2 = CourseFactory.create(org='edX', number='DemoX2', display_name='Demo_Course 2')
+
+    @patch('lms.djangoapps.commerce.utils.is_commerce_service_configured', return_value=False)
+    def test_ecommerce_service_not_configured(self, mock_commerce_configured):
+        course_entitlement = CourseEntitlementFactory.create(mode=CourseMode.VERIFIED)
+        refund_success = refund_entitlement(course_entitlement)
+        assert mock_commerce_configured.is_called
+        assert not refund_success
+
+    @httpretty.activate
+    def test_no_ecommerce_connection_and_failure(self):
+        httpretty.register_uri(
+            httpretty.POST,
+            settings.ECOMMERCE_API_URL + 'refunds/',
+            status=404,
+            body='{}',
+            content_type='application/json'
+        )
+        course_entitlement = CourseEntitlementFactory.create(mode=CourseMode.VERIFIED)
+        refund_success = refund_entitlement(course_entitlement)
+        assert not refund_success
+
+    @httpretty.activate
+    def test_ecommerce_successful_refund(self):
+        httpretty.register_uri(
+            httpretty.POST,
+            settings.ECOMMERCE_API_URL + 'refunds/',
+            status=201,
+            body='[1]',
+            content_type='application/json'
+        )
+        httpretty.register_uri(
+            httpretty.PUT,
+            settings.ECOMMERCE_API_URL + 'refunds/1/process/',
+            status=200,
+            body=json.dumps({
+                "id": 9,
+                "created": "2017-12-21T18:23:49.468298Z",
+                "modified": "2017-12-21T18:24:02.741426Z",
+                "total_credit_excl_tax": "100.00",
+                "currency": "USD",
+                "status": "Complete",
+                "order": 15,
+                "user": 5
+            }),
+            content_type='application/json'
+        )
+        course_entitlement = CourseEntitlementFactory.create(mode=CourseMode.VERIFIED)
+        refund_success = refund_entitlement(course_entitlement)
+        assert refund_success
+
+    @httpretty.activate
+    @patch('lms.djangoapps.commerce.utils._send_refund_notification', return_value=True)
+    def test_ecommerce_refund_failed_process_notification_sent(self, mock_send_notification):
+        httpretty.register_uri(
+            httpretty.POST,
+            settings.ECOMMERCE_API_URL + 'refunds/',
+            status=201,
+            body='[1]',
+            content_type='application/json'
+        )
+        httpretty.register_uri(
+            httpretty.PUT,
+            settings.ECOMMERCE_API_URL + 'refunds/1/process/',
+            status=400,
+            body='{}',
+            content_type='application/json'
+        )
+        course_entitlement = CourseEntitlementFactory.create(mode=CourseMode.VERIFIED)
+        refund_success = refund_entitlement(course_entitlement)
+        assert mock_send_notification.is_called
+        call_args = list(mock_send_notification.call_args)
+        assert call_args[0] == (course_entitlement.user, [1])
+        assert refund_success
+
+    @httpretty.activate
+    @patch('lms.djangoapps.commerce.utils._send_refund_notification', return_value=True)
+    def test_ecommerce_refund_not_verified_notification_for_entitlement(self, mock_send_notification):
+        """
+        Note that we are currently notifying Support whenever a refund require approval for entitlements as
+        Entitlements are only available in paid modes. This test should be updated if this logic changes
+        in the future.
+
+        PROFESSIONAL mode is used here although we never auto approve PROFESSIONAL refunds right now
+        """
+        httpretty.register_uri(
+            httpretty.POST,
+            settings.ECOMMERCE_API_URL + 'refunds/',
+            status=201,
+            body='[1]',
+            content_type='application/json'
+        )
+        httpretty.register_uri(
+            httpretty.PUT,
+            settings.ECOMMERCE_API_URL + 'refunds/1/process/',
+            status=400,
+            body='{}',
+            content_type='application/json'
+        )
+        course_entitlement = CourseEntitlementFactory.create(mode=CourseMode.PROFESSIONAL)
+        refund_success = refund_entitlement(course_entitlement)
+        assert mock_send_notification.is_called
+        call_args = list(mock_send_notification.call_args)
+        assert call_args[0] == (course_entitlement.user, [1])
+        assert refund_success
+
+    @httpretty.activate
+    @patch('lms.djangoapps.commerce.utils._send_refund_notification', return_value=True)
+    def test_ecommerce_refund_send_notification_failed(self, mock_send_notification):
+        httpretty.register_uri(
+            httpretty.POST,
+            settings.ECOMMERCE_API_URL + 'refunds/',
+            status=201,
+            body='[1]',
+            content_type='application/json'
+        )
+        httpretty.register_uri(
+            httpretty.PUT,
+            settings.ECOMMERCE_API_URL + 'refunds/1/process/',
+            status=400,
+            body='{}',
+            content_type='application/json'
+        )
+        mock_send_notification.side_effect = NotImplementedError
+        course_entitlement = CourseEntitlementFactory.create(mode=CourseMode.VERIFIED)
+        refund_success = refund_entitlement(course_entitlement)
+
+        assert mock_send_notification.is_called
+        call_args = list(mock_send_notification.call_args)
+        assert call_args[0] == (course_entitlement.user, [1])
+        assert not refund_success

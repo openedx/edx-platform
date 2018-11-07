@@ -14,6 +14,8 @@ from pkg_resources import (
     resource_string,
     resource_isdir,
 )
+from six import text_type
+from web_fragments.fragment import Fragment
 from webob import Response
 from webob.multidict import MultiDict
 from lazy import lazy
@@ -25,7 +27,6 @@ from xblock.fields import (
     ReferenceValueDict, UserScope
 )
 
-from xblock.fragment import Fragment
 from xblock.runtime import Runtime, IdReader, IdGenerator
 from xmodule import block_metadata_utils
 from xmodule.fields import RelativeTime
@@ -249,11 +250,18 @@ class HTMLSnippet(object):
 
 def shim_xmodule_js(block, fragment):
     """
-    Set up the XBlock -> XModule shim on the supplied :class:`xblock.fragment.Fragment`
+    Set up the XBlock -> XModule shim on the supplied :class:`web_fragments.fragment.Fragment`
     """
+    # Delay this import so that it is only used (and django settings are parsed) when
+    # they are required (rather than at startup)
+    import webpack_loader.utils
+
     if not fragment.js_init_fn:
         fragment.initialize_js('XBlockToXModuleShim')
         fragment.json_init_args = {'xmodule-type': block.js_module_name}
+
+        for tag in webpack_loader.utils.get_as_tags('XModuleShim'):
+            fragment.add_resource(tag, mimetype='text/html', placement='head')
 
 
 class XModuleFields(object):
@@ -420,8 +428,8 @@ class XModuleMixin(XModuleFields, XBlock):
                     result[field.name] = field.read_json(self)
                 except TypeError as exception:
                     exception_message = "{message}, Block-location:{location}, Field-name:{field_name}".format(
-                        message=exception.message,
-                        location=unicode(self.location),
+                        message=text_type(exception),
+                        location=text_type(self.location),
                         field_name=field.name
                     )
                     raise TypeError(exception_message)
@@ -881,7 +889,7 @@ class XModule(HTMLSnippet, XModuleMixin):
                 request_post[key] = map(FileObjForWebobFiles, request.POST.getall(key))
 
         response_data = self.handle_ajax(suffix, request_post)
-        return Response(response_data, content_type='application/json')
+        return Response(response_data, content_type='application/json', charset='UTF-8')
 
     def get_child(self, usage_id):
         if usage_id in self._child_cache:
@@ -936,7 +944,7 @@ def policy_key(location):
     Get the key for a location in a policy file.  (Since the policy file is
     specific to a course, it doesn't need the full location url).
     """
-    return u'{cat}/{name}'.format(cat=location.category, name=location.name)
+    return u'{cat}/{name}'.format(cat=location.block_type, name=location.block_id)
 
 
 Template = namedtuple("Template", "metadata data children")
@@ -1270,7 +1278,7 @@ class ConfigurableFragmentWrapper(object):
 # the Runtime part of its interface. This function mostly matches the
 # Runtime.handler_url interface.
 #
-# The monkey-patching happens in (lms|cms)/startup.py
+# The monkey-patching happens in cms/djangoapps/xblock_config/apps.py and lms/djangoapps/lms_xblock/apps.py
 def descriptor_global_handler_url(block, handler_name, suffix='', query='', thirdparty=False):  # pylint: disable=unused-argument
     """
     See :meth:`xblock.runtime.Runtime.handler_url`.
@@ -1282,7 +1290,7 @@ def descriptor_global_handler_url(block, handler_name, suffix='', query='', thir
 # we can refactor modulestore to split out the FieldData half of its interface from
 # the Runtime part of its interface. This function matches the Runtime.local_resource_url interface
 #
-# The monkey-patching happens in (lms|cms)/startup.py
+# The monkey-patching happens in cms/djangoapps/xblock_config/apps.py and lms/djangoapps/lms_xblock/apps.py
 def descriptor_global_local_resource_url(block, uri):  # pylint: disable=invalid-name, unused-argument
     """
     See :meth:`xblock.runtime.Runtime.local_resource_url`.
@@ -1632,7 +1640,8 @@ class XMLParsingSystem(DescriptorSystem):
         """
         if isinstance(value, UsageKey):
             return value
-        return course_key.make_usage_key_from_deprecated_string(value)
+        usage_key = UsageKey.from_string(value)
+        return usage_key.map_into_course(course_key)
 
     def _convert_reference_fields_to_keys(self, xblock):
         """

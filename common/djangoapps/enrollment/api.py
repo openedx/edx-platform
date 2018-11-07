@@ -456,6 +456,15 @@ def validate_course_mode(course_id, mode, is_active=None, include_expired=False)
         raise errors.CourseModeNotFoundError(msg, course_enrollment_info)
 
 
+def unenroll_user_from_all_courses(user_id):
+    """
+    Unenrolls a specified user from all of the courses they are currently enrolled in.
+    :param user_id: The id of the user being unenrolled.
+    :return: The IDs of all of the organizations from which the learner was unenrolled.
+    """
+    return _data_api().unenroll_user_from_all_courses(user_id)
+
+
 def _data_api():
     """Returns a Data API.
     This relies on Django settings to find the appropriate data API.

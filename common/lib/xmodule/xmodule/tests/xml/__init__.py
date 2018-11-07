@@ -2,14 +2,15 @@
 Xml parsing tests for XModules
 """
 import pprint
+from django.test import TestCase
 from lxml import etree
 from mock import Mock
-from unittest import TestCase
+from six import text_type
 
 from xmodule.x_module import XMLParsingSystem, policy_key
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.modulestore.xml import CourseLocationManager
-from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
+from opaque_keys.edx.keys import CourseKey
 
 from xblock.runtime import KvsFieldData, DictKeyValueStore
 
@@ -19,7 +20,7 @@ class InMemorySystem(XMLParsingSystem, MakoDescriptorSystem):  # pylint: disable
     The simplest possible XMLParsingSystem
     """
     def __init__(self, xml_import_data):
-        self.course_id = SlashSeparatedCourseKey.from_deprecated_string(xml_import_data.course_id)
+        self.course_id = CourseKey.from_string(xml_import_data.course_id)
         self.default_class = xml_import_data.default_class
         self._descriptors = {}
 
@@ -47,12 +48,12 @@ class InMemorySystem(XMLParsingSystem, MakoDescriptorSystem):  # pylint: disable
             None,
             CourseLocationManager(self.course_id),
         )
-        self._descriptors[descriptor.location.to_deprecated_string()] = descriptor
+        self._descriptors[text_type(descriptor.location)] = descriptor
         return descriptor
 
     def load_item(self, location, for_parent=None):  # pylint: disable=method-hidden, unused-argument
         """Return the descriptor loaded for `location`"""
-        return self._descriptors[location.to_deprecated_string()]
+        return self._descriptors[text_type(location)]
 
 
 class XModuleXmlImportTest(TestCase):

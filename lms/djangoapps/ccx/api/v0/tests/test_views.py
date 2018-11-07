@@ -6,16 +6,16 @@ import math
 import string
 import urllib
 import urlparse
-from datetime import datetime, timedelta
+from datetime import timedelta
 from itertools import izip
 
 import ddt
 import mock
-import pytz
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.urlresolvers import Resolver404, resolve, reverse
+from django.urls import Resolver404, resolve, reverse
+from django.utils.timezone import now
 from nose.plugins.attrib import attr
 from oauth2_provider import models as dot_models
 from opaque_keys.edx.keys import CourseKey
@@ -30,7 +30,6 @@ from lms.djangoapps.ccx.models import CcxFieldOverride, CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import override_field_for_ccx
 from lms.djangoapps.ccx.tests.utils import CcxTestCase
 from lms.djangoapps.ccx.utils import ccx_course as ccx_course_cm
-from lms.djangoapps.ccx.utils import get_course_chapters
 from lms.djangoapps.instructor.access import allow_access, list_with_level
 from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params
 from student.models import CourseEnrollment
@@ -72,12 +71,13 @@ class CcxRestApiTest(CcxTestCase, APITestCase):
         instructor = UserFactory()
         allow_access(self.course, instructor, 'instructor')
 
+        # FIXME: Testing for multiple authentication types in multiple test cases is overkill. Stop it!
         self.auth, self.auth_header_oauth2_provider = self.prepare_auth_token(app_user)
 
         self.course.enable_ccx = True
         self.mstore.update_item(self.course, self.coach.id)
         # making the master course chapters easily available
-        self.master_course_chapters = get_course_chapters(self.master_course_key)
+        self.master_course_chapters = courses.get_course_chapter_ids(self.master_course_key)
 
     def get_auth_token(self, app_grant, app_client):
         """
@@ -89,7 +89,7 @@ class CcxRestApiTest(CcxTestCase, APITestCase):
             'client_id': app_client.client_id,
             'client_secret': app_client.client_secret
         }
-        token_resp = self.client.post('/oauth2/access_token/', data=token_data)
+        token_resp = self.client.post(reverse('oauth2:access_token'), data=token_data, format='multipart')
         self.assertEqual(token_resp.status_code, status.HTTP_200_OK)
         token_resp_json = json.loads(token_resp.content)
         return '{token_type} {token}'.format(
@@ -128,7 +128,7 @@ class CcxRestApiTest(CcxTestCase, APITestCase):
         auth_oauth2_provider = dot_models.AccessToken.objects.create(
             user=user,
             application=app_client_oauth2_provider,
-            expires=datetime.utcnow() + timedelta(weeks=1),
+            expires=now() + timedelta(weeks=1),
             scope='read write',
             token='16MGyP3OaQYHmpT1lK7Q6MMNAZsjwF'
         )
@@ -161,7 +161,7 @@ class CcxRestApiTest(CcxTestCase, APITestCase):
         self.assertEqual(expected_field_errors, resp_dict_error)
 
 
-@attr(shard=1)
+@attr(shard=9)
 @ddt.ddt
 class CcxListTest(CcxRestApiTest):
     """
@@ -872,7 +872,7 @@ class CcxListTest(CcxRestApiTest):
             self.assertEqual(course_user, ccx_user)
 
 
-@attr(shard=1)
+@attr(shard=9)
 @ddt.ddt
 class CcxDetailTest(CcxRestApiTest):
     """
@@ -901,9 +901,7 @@ class CcxDetailTest(CcxRestApiTest):
         ccx.structure_json = json.dumps(self.master_course_chapters)
         ccx.save()
 
-        today = datetime.today()
-        start = today.replace(tzinfo=pytz.UTC)
-        override_field_for_ccx(ccx, self.course, 'start', start)
+        override_field_for_ccx(ccx, self.course, 'start', now())
         override_field_for_ccx(ccx, self.course, 'due', None)
         # Hide anything that can show up in the schedule
         hidden = 'visible_to_staff_only'

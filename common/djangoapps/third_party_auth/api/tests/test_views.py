@@ -5,7 +5,7 @@ Tests for the Third Party Auth REST API
 import unittest
 
 import ddt
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import QueryDict
 from mock import patch
 from provider.constants import CONFIDENTIAL
@@ -54,7 +54,7 @@ class TpaAPITestCase(ThirdPartyAuthTestMixin, APITestCase):
         testshib = self.configure_saml_provider(
             name='TestShib',
             enabled=True,
-            idp_slug=IDP_SLUG_TESTSHIB
+            slug=IDP_SLUG_TESTSHIB
         )
 
         # Create several users and link each user to Google and TestShib
@@ -75,7 +75,7 @@ class TpaAPITestCase(ThirdPartyAuthTestMixin, APITestCase):
             UserSocialAuth.objects.create(
                 user=user,
                 provider=testshib.backend_name,
-                uid='{}:remote_{}'.format(testshib.idp_slug, username),
+                uid='{}:remote_{}'.format(testshib.slug, username),
             )
         # Create another user not linked to any providers:
         UserFactory.create(username=CARL_USERNAME, password=PASSWORD)
@@ -238,7 +238,7 @@ class UserMappingViewAPITests(TpaAPITestCase):
         self._verify_response(response, expect_code, expect_data)
 
     def test_user_mappings_only_return_requested_idp_mapping_by_provider_id(self):
-        testshib2 = self.configure_saml_provider(name='TestShib2', enabled=True, idp_slug='testshib2')
+        testshib2 = self.configure_saml_provider(name='TestShib2', enabled=True, slug='testshib2')
         username = 'testshib2user'
         user = UserFactory.create(
             username=username,
@@ -249,7 +249,7 @@ class UserMappingViewAPITests(TpaAPITestCase):
         UserSocialAuth.objects.create(
             user=user,
             provider=testshib2.backend_name,
-            uid='{}:{}'.format(testshib2.idp_slug, username),
+            uid='{}:{}'.format(testshib2.slug, username),
         )
 
         url = reverse('third_party_auth_user_mapping_api', kwargs={'provider_id': PROVIDER_ID_TESTSHIB})

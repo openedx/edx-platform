@@ -1,26 +1,44 @@
 """Tests covering utilities for integrating with the catalog service."""
 # pylint: disable=missing-docstring
 import copy
-import uuid
+from datetime import timedelta
 
 import ddt
 import mock
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.test import TestCase, override_settings
+from django.test.client import RequestFactory
+from django.utils.timezone import now
+from opaque_keys.edx.keys import CourseKey
 
-from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL, PROGRAM_UUIDS_CACHE_KEY
+from course_modes.helpers import CourseMode
+from course_modes.tests.factories import CourseModeFactory
+from entitlements.tests.factories import CourseEntitlementFactory
+from openedx.core.constants import COURSE_UNPUBLISHED
+from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL, SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
-from openedx.core.djangoapps.catalog.tests.factories import CourseRunFactory, ProgramFactory, ProgramTypeFactory
+from openedx.core.djangoapps.catalog.tests.factories import (
+    CourseFactory,
+    CourseRunFactory,
+    ProgramFactory,
+    ProgramTypeFactory
+)
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.catalog.utils import (
     get_course_runs,
+    get_course_runs_for_course,
+    get_course_run_details,
+    get_currency_data,
+    get_localized_price_text,
     get_program_types,
     get_programs,
-    get_programs_with_type
+    get_visible_sessions_for_entitlement
 )
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
-from student.tests.factories import UserFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 UTILS_MODULE = 'openedx.core.djangoapps.catalog.utils'
 User = get_user_model()  # pylint: disable=invalid-name
@@ -31,6 +49,10 @@ User = get_user_model()  # pylint: disable=invalid-name
 @mock.patch(UTILS_MODULE + '.logger.warning')
 class TestGetPrograms(CacheIsolationTestCase):
     ENABLED_CACHES = ['default']
+
+    def setUp(self):
+        super(TestGetPrograms, self).setUp()
+        self.site = SiteFactory()
 
     def test_get_many(self, mock_warning, mock_info):
         programs = ProgramFactory.create_batch(3)
@@ -43,18 +65,18 @@ class TestGetPrograms(CacheIsolationTestCase):
 
         # When called before UUIDs are cached, the function should return an
         # empty list and log a warning.
-        self.assertEqual(get_programs(), [])
+        self.assertEqual(get_programs(self.site), [])
         mock_warning.assert_called_once_with('Failed to get program UUIDs from the cache.')
         mock_warning.reset_mock()
 
         # Cache UUIDs for all 3 programs.
         cache.set(
-            PROGRAM_UUIDS_CACHE_KEY,
+            SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=self.site.domain),
             [program['uuid'] for program in programs],
             None
         )
 
-        actual_programs = get_programs()
+        actual_programs = get_programs(self.site)
 
         # The 2 cached programs should be returned while info and warning
         # messages should be logged for the missing one.
@@ -82,7 +104,7 @@ class TestGetPrograms(CacheIsolationTestCase):
         }
         cache.set_many(all_programs, None)
 
-        actual_programs = get_programs()
+        actual_programs = get_programs(self.site)
 
         # All 3 programs should be returned.
         self.assertEqual(
@@ -116,7 +138,7 @@ class TestGetPrograms(CacheIsolationTestCase):
         mock_cache.get.return_value = [program['uuid'] for program in programs]
         mock_cache.get_many.side_effect = fake_get_many
 
-        actual_programs = get_programs()
+        actual_programs = get_programs(self.site)
 
         # All 3 cached programs should be returned. An info message should be
         # logged about the one that was initially missing, but the code should
@@ -136,7 +158,7 @@ class TestGetPrograms(CacheIsolationTestCase):
         expected_program = ProgramFactory()
         expected_uuid = expected_program['uuid']
 
-        self.assertEqual(get_programs(uuid=expected_uuid), None)
+        self.assertEqual(get_programs(self.site, uuid=expected_uuid), None)
         mock_warning.assert_called_once_with(
             'Failed to get details for program {uuid} from the cache.'.format(uuid=expected_uuid)
         )
@@ -148,62 +170,9 @@ class TestGetPrograms(CacheIsolationTestCase):
             None
         )
 
-        actual_program = get_programs(uuid=expected_uuid)
+        actual_program = get_programs(self.site, uuid=expected_uuid)
         self.assertEqual(actual_program, expected_program)
         self.assertFalse(mock_warning.called)
-
-
-@skip_unless_lms
-@ddt.ddt
-class TestGetProgramsWithType(TestCase):
-
-    @mock.patch(UTILS_MODULE + '.get_programs')
-    @mock.patch(UTILS_MODULE + '.get_program_types')
-    def test_get_programs_with_type(self, mock_get_program_types, mock_get_programs):
-        """Verify get_programs_with_type returns the expected list of programs."""
-        programs_with_program_type = []
-        programs = ProgramFactory.create_batch(2)
-        program_types = []
-
-        for program in programs:
-            program_type = ProgramTypeFactory(name=program['type'])
-            program_types.append(program_type)
-
-            program_with_type = copy.deepcopy(program)
-            program_with_type['type'] = program_type
-            programs_with_program_type.append(program_with_type)
-
-        mock_get_programs.return_value = programs
-        mock_get_program_types.return_value = program_types
-
-        actual = get_programs_with_type()
-        self.assertEqual(actual, programs_with_program_type)
-
-    @ddt.data(False, True)
-    @mock.patch(UTILS_MODULE + '.get_programs')
-    @mock.patch(UTILS_MODULE + '.get_program_types')
-    def test_get_programs_with_type_include_hidden(self, include_hidden, mock_get_program_types, mock_get_programs):
-        """Verify get_programs_with_type returns the expected list of programs with include_hidden parameter."""
-        programs_with_program_type = []
-        programs = [ProgramFactory(hidden=False), ProgramFactory(hidden=True)]
-        program_types = []
-
-        for program in programs:
-            if program['hidden'] and not include_hidden:
-                continue
-
-            program_type = ProgramTypeFactory(name=program['type'])
-            program_types.append(program_type)
-
-            program_with_type = copy.deepcopy(program)
-            program_with_type['type'] = program_type
-            programs_with_program_type.append(program_with_type)
-
-        mock_get_programs.return_value = programs
-        mock_get_program_types.return_value = program_types
-
-        actual = get_programs_with_type(include_hidden=include_hidden)
-        self.assertEqual(actual, programs_with_program_type)
 
 
 @mock.patch(UTILS_MODULE + '.get_edx_api_data')
@@ -229,6 +198,50 @@ class TestGetProgramTypes(CatalogIntegrationMixin, TestCase):
         self.assertEqual(data, program)
 
 
+@mock.patch(UTILS_MODULE + '.get_edx_api_data')
+class TestGetCurrency(CatalogIntegrationMixin, TestCase):
+    """Tests covering retrieval of currency data from the catalog service."""
+    @override_settings(COURSE_CATALOG_API_URL='https://api.example.com/v1/')
+    def test_get_currency_data(self, mock_get_edx_api_data):
+        """Verify get_currency_data returns the currency data."""
+        currency_data = {
+            "code": "CAD",
+            "rate": 1.257237,
+            "symbol": "$"
+        }
+        mock_get_edx_api_data.return_value = currency_data
+
+        # Catalog integration is disabled.
+        data = get_currency_data()
+        self.assertEqual(data, [])
+
+        catalog_integration = self.create_catalog_integration()
+        UserFactory(username=catalog_integration.service_username)
+        data = get_currency_data()
+        self.assertEqual(data, currency_data)
+
+
+@mock.patch(UTILS_MODULE + '.get_currency_data')
+class TestGetLocalizedPriceText(TestCase):
+    """
+    Tests covering converting prices to a localized currency
+    """
+    def test_localized_string(self, mock_get_currency_data):
+        currency_data = {
+            "BEL": {"rate": 0.835621, "code": "EUR", "symbol": u"\u20ac"},
+            "GBR": {"rate": 0.737822, "code": "GBP", "symbol": u"\u00a3"},
+            "CAN": {"rate": 2, "code": "CAD", "symbol": "$"},
+        }
+        mock_get_currency_data.return_value = currency_data
+
+        request = RequestFactory().get('/dummy-url')
+        request.session = {
+            'country_code': 'CA'
+        }
+        expected_result = '$20 CAD'
+        self.assertEqual(get_localized_price_text(10, request), expected_result)
+
+
 @skip_unless_lms
 @mock.patch(UTILS_MODULE + '.get_edx_api_data')
 class TestGetCourseRuns(CatalogIntegrationMixin, TestCase):
@@ -241,7 +254,7 @@ class TestGetCourseRuns(CatalogIntegrationMixin, TestCase):
         self.catalog_integration = self.create_catalog_integration(cache_ttl=1)
         self.user = UserFactory(username=self.catalog_integration.service_username)
 
-    def assert_contract(self, call_args):  # pylint: disable=redefined-builtin
+    def assert_contract(self, call_args):
         """
         Verify that API data retrieval utility is used correctly.
         """
@@ -297,3 +310,96 @@ class TestGetCourseRuns(CatalogIntegrationMixin, TestCase):
         self.assertTrue(mock_get_edx_api_data.called)
         self.assert_contract(mock_get_edx_api_data.call_args)
         self.assertEqual(data, catalog_course_runs)
+
+    def test_get_course_runs_by_course(self, mock_get_edx_api_data):
+        """
+        Test retrievals of run from a Course.
+        """
+        catalog_course_runs = CourseRunFactory.create_batch(10)
+        catalog_course = CourseFactory(course_runs=catalog_course_runs)
+        mock_get_edx_api_data.return_value = catalog_course
+
+        data = get_course_runs_for_course(course_uuid=str(catalog_course['uuid']))
+        self.assertTrue(mock_get_edx_api_data.called)
+        self.assertEqual(data, catalog_course_runs)
+
+
+@skip_unless_lms
+@mock.patch(UTILS_MODULE + '.get_edx_api_data')
+class TestSessionEntitlement(CatalogIntegrationMixin, TestCase):
+    """
+    Test Covering data related Entitlements.
+    """
+    def setUp(self):
+        super(TestSessionEntitlement, self).setUp()
+
+        self.catalog_integration = self.create_catalog_integration(cache_ttl=1)
+        self.user = UserFactory(username=self.catalog_integration.service_username)
+        self.tomorrow = now() + timedelta(days=1)
+
+    def test_get_visible_sessions_for_entitlement(self, mock_get_edx_api_data):
+        """
+        Test retrieval of visible session entitlements.
+        """
+        catalog_course_runs = CourseRunFactory.create()
+        catalog_course = CourseFactory(course_runs=[catalog_course_runs])
+        mock_get_edx_api_data.return_value = catalog_course
+        course_key = CourseKey.from_string(catalog_course_runs.get('key'))
+        course_overview = CourseOverviewFactory.create(id=course_key, start=self.tomorrow)
+        CourseModeFactory.create(mode_slug=CourseMode.VERIFIED, min_price=100, course_id=course_overview.id)
+        course_enrollment = CourseEnrollmentFactory(
+            user=self.user, course_id=unicode(course_overview.id), mode=CourseMode.VERIFIED
+        )
+        entitlement = CourseEntitlementFactory(
+            user=self.user, enrollment_course_run=course_enrollment, mode=CourseMode.VERIFIED
+        )
+
+        session_entitlements = get_visible_sessions_for_entitlement(entitlement)
+        self.assertEqual(session_entitlements, [catalog_course_runs])
+
+    def test_unpublished_sessions_for_entitlement(self, mock_get_edx_api_data):
+        """
+        Test unpublished course runs are not part of visible session entitlements.
+        """
+        catalog_course_runs = CourseRunFactory.create(status=COURSE_UNPUBLISHED)
+        catalog_course = CourseFactory(course_runs=[catalog_course_runs])
+        mock_get_edx_api_data.return_value = catalog_course
+        course_key = CourseKey.from_string(catalog_course_runs.get('key'))
+        course_overview = CourseOverviewFactory.create(id=course_key, start=self.tomorrow)
+        CourseModeFactory.create(mode_slug=CourseMode.VERIFIED, min_price=100, course_id=course_overview.id)
+        course_enrollment = CourseEnrollmentFactory(
+            user=self.user, course_id=unicode(course_overview.id), mode=CourseMode.VERIFIED
+        )
+        entitlement = CourseEntitlementFactory(
+            user=self.user, enrollment_course_run=course_enrollment, mode=CourseMode.VERIFIED
+        )
+
+        session_entitlements = get_visible_sessions_for_entitlement(entitlement)
+        self.assertEqual(session_entitlements, [])
+
+
+@skip_unless_lms
+@mock.patch(UTILS_MODULE + '.get_edx_api_data')
+class TestGetCourseRunDetails(CatalogIntegrationMixin, TestCase):
+    """
+    Tests covering retrieval of information about a specific course run from the catalog service.
+    """
+    def setUp(self):
+        super(TestGetCourseRunDetails, self).setUp()
+        self.catalog_integration = self.create_catalog_integration(cache_ttl=1)
+        self.user = UserFactory(username=self.catalog_integration.service_username)
+
+    def test_get_course_run_details(self, mock_get_edx_api_data):
+        """
+        Test retrieval of details about a specific course run
+        """
+        course_run = CourseRunFactory()
+        course_run_details = {
+            'content_language': course_run['content_language'],
+            'weeks_to_complete': course_run['weeks_to_complete'],
+            'max_effort': course_run['max_effort']
+        }
+        mock_get_edx_api_data.return_value = course_run_details
+        data = get_course_run_details(course_run['key'], ['content_language', 'weeks_to_complete', 'max_effort'])
+        self.assertTrue(mock_get_edx_api_data.called)
+        self.assertEqual(data, course_run_details)

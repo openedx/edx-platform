@@ -24,7 +24,7 @@
                 });
 
                 it('build the slider', function() {
-                    expect($('.slider')).toContain(state.videoProgressSlider.slider);
+                    expect($('.slider').toArray()).toContain(state.videoProgressSlider.slider);
                     expect($.fn.slider).toHaveBeenCalledWith({
                         range: 'min',
                         min: 0,
@@ -35,20 +35,20 @@
                 });
 
                 it('build the seek handle', function() {
-                    expect($('.ui-slider-handle'))
+                    expect($('.ui-slider-handle').toArray())
                         .toContain(state.videoProgressSlider.handle);
                 });
 
                 it('add ARIA attributes to time control', function() {
-                    var timeControl = $('div.slider > .progress-handle');
+                    var $timeControl = $('div.slider > .progress-handle');
 
-                    expect(timeControl).toHaveAttrs({
-                        'role': 'slider',
+                    expect($timeControl).toHaveAttrs({
+                        role: 'slider',
                         'aria-label': 'Video position. Press space to toggle playback',
                         'aria-disabled': 'false'
                     });
 
-                    expect(timeControl).toHaveAttr('aria-valuetext');
+                    expect($timeControl).toHaveAttr('aria-valuetext');
                 });
             });
 
@@ -293,15 +293,15 @@
 
         it('getTimeDescription', function() {
             var cases = {
-                    '0': '0 seconds',
-                    '1': '1 second',
-                    '10': '10 seconds',
+                    0: '0 seconds',
+                    1: '1 second',
+                    10: '10 seconds',
 
-                    '60': '1 minute 0 seconds',
-                    '121': '2 minutes 1 second',
+                    60: '1 minute 0 seconds',
+                    121: '2 minutes 1 second',
 
-                    '3670': '1 hour 1 minute 10 seconds',
-                    '21541': '5 hours 59 minutes 1 second'
+                    3670: '1 hour 1 minute 10 seconds',
+                    21541: '5 hours 59 minutes 1 second'
                 },
                 getTimeDescription;
 

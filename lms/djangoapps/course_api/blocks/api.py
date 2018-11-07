@@ -2,12 +2,13 @@
 API function for retrieving course blocks data
 """
 
-from lms.djangoapps.course_blocks.api import COURSE_BLOCK_ACCESS_TRANSFORMERS, get_course_blocks
+import lms.djangoapps.course_blocks.api as course_blocks_api
 from lms.djangoapps.course_blocks.transformers.hidden_content import HiddenContentTransformer
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 
 from .serializers import BlockDictSerializer, BlockSerializer
 from .transformers.blocks_api import BlocksAPITransformer
+from .transformers.block_completion import BlockCompletionTransformer
 from .transformers.milestones import MilestonesAndSpecialExamsTransformer
 
 
@@ -51,12 +52,18 @@ def get_blocks(
     """
     # create ordered list of transformers, adding BlocksAPITransformer at end.
     transformers = BlockStructureTransformers()
-    include_special_exams = False
-    if requested_fields is not None and 'special_exam_info' in requested_fields:
-        include_special_exams = True
+    if requested_fields is None:
+        requested_fields = []
+    include_completion = 'completion' in requested_fields
+    include_special_exams = 'special_exam_info' in requested_fields
+    include_gated_sections = 'show_gated_sections' in requested_fields
+
     if user is not None:
-        transformers += COURSE_BLOCK_ACCESS_TRANSFORMERS
-        transformers += [MilestonesAndSpecialExamsTransformer(include_special_exams), HiddenContentTransformer()]
+        transformers += course_blocks_api.get_course_block_access_transformers(user)
+        transformers += [MilestonesAndSpecialExamsTransformer(
+            include_special_exams=include_special_exams,
+            include_gated_sections=include_gated_sections)]
+        transformers += [HiddenContentTransformer()]
     transformers += [
         BlocksAPITransformer(
             block_counts,
@@ -66,8 +73,11 @@ def get_blocks(
         )
     ]
 
+    if include_completion:
+        transformers += [BlockCompletionTransformer()]
+
     # transform
-    blocks = get_course_blocks(user, usage_key, transformers)
+    blocks = course_blocks_api.get_course_blocks(user, usage_key, transformers)
 
     # filter blocks by types
     if block_types_filter:

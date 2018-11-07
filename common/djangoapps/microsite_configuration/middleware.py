@@ -7,8 +7,6 @@ A microsite enables the following features:
 3) Ability to swap out some branding elements in the website
 """
 
-from django.conf import settings
-
 from microsite_configuration import microsite
 
 

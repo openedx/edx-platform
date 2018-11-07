@@ -2,10 +2,10 @@
     'use strict';
 
     define(['jquery',
-            'underscore',
-            'js/components/header/views/header',
-            'js/components/header/models/header'
-           ],
+        'underscore',
+        'js/components/header/views/header',
+        'js/components/header/models/header'
+    ],
            function($, _, HeaderView, HeaderModel) {
                describe('header component view', function() {
                    var model, view;

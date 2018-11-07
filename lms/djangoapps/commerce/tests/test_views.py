@@ -4,7 +4,7 @@ import json
 
 import ddt
 import mock
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from nose.plugins.attrib import attr
 
 from course_modes.models import CourseMode
@@ -109,7 +109,7 @@ class ReceiptViewTests(UserMixin, ModuleStoreTestCase):
         self.assertRegexpMatches(response.content, expected_pattern)
 
     @ddt.data(True, False)
-    @mock.patch('commerce.views.is_user_payment_error')
+    @mock.patch('lms.djangoapps.commerce.views.is_user_payment_error')
     def test_cybersource_message(self, is_user_message_expected, mock_is_user_payment_error):
         """
         Ensure that the page displays the right message for the reason_code (it

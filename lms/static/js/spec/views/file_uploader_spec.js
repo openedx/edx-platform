@@ -1,10 +1,11 @@
 define(['backbone', 'jquery', 'js/views/file_uploader', 'common/js/spec_helpers/template_helpers',
-        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/models/notification', 'string_utils'],
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/models/notification', 'string_utils'],
     function(Backbone, $, FileUploaderView, TemplateHelpers, AjaxHelpers, NotificationModel) {
         describe('FileUploaderView', function() {
             var verifyTitle, verifyInputLabel, verifyInputTip, verifySubmitButton, verifyExtensions, verifyText,
                 verifyFileUploadOption, verifyNotificationMessage, verifySubmitButtonEnabled, mimicUpload,
-                respondWithSuccess, respondWithError, fileUploaderView, url = 'http://test_url/';
+                respondWithSuccess, respondWithError, fileUploaderView,
+                url = 'http://test_url/';
 
             verifyText = function(css, expectedText) {
                 expect(fileUploaderView.$(css).text().trim()).toBe(expectedText);
@@ -22,8 +23,7 @@ define(['backbone', 'jquery', 'js/views/file_uploader', 'common/js/spec_helpers/
                 var acceptAttribute = fileUploaderView.$('input.input-file').attr('accept');
                 if (expectedExtensions) {
                     expect(acceptAttribute).toBe(expectedExtensions);
-                }
-                else {
+                } else {
                     expect(acceptAttribute).toBe(undefined);
                 }
             };
@@ -32,8 +32,7 @@ define(['backbone', 'jquery', 'js/views/file_uploader', 'common/js/spec_helpers/
                 var submitButton = fileUploaderView.$('.submit-file-button');
                 if (expectedEnabled) {
                     expect(submitButton).not.toHaveClass('is-disabled');
-                }
-                else {
+                } else {
                     expect(submitButton).toHaveClass('is-disabled');
                 }
             };
@@ -66,8 +65,7 @@ define(['backbone', 'jquery', 'js/views/file_uploader', 'common/js/spec_helpers/
             respondWithError = function(requests, errorMessage) {
                 if (errorMessage) {
                     AjaxHelpers.respondWithError(requests, 500, {error: errorMessage});
-                }
-                else {
+                } else {
                     AjaxHelpers.respondWithError(requests);
                 }
             };

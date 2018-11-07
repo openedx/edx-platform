@@ -5,15 +5,16 @@
 //   overflow-y: scroll;
 // }
 
-html, body {
-  font-family: $sans-serif;
-  font-size: 1em;
+html,
+body {
+  font-family: $font-family-sans-serif;
+  font-size: $font-size-base;
   font-style: normal;
   line-height: 1em;
 }
 
-html{
-  background: white;
+html {
+  background: theme-color("inverse");
 }
 
 body {
@@ -22,18 +23,23 @@ body {
 
 // removing the outline on any element that we make programmatically focusable
 [tabindex="-1"] {
-    outline: none;
+  outline: none;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  color: $base-font-color;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: $body-color;
   font: normal 1.2em/1.2em $serif;
   margin: 0;
 }
 
 h1 {
-  color: $base-font-color;
-  font: normal 2em/1.4em $sans-serif;
+  color: $body-color;
+  font: normal 2em/1.4em $font-family-sans-serif;
   margin-bottom: ($baseline*1.5);
   text-align: center;
 }
@@ -45,7 +51,9 @@ h2 {
   -webkit-font-smoothing: antialiased;
 }
 
-p + h2, ul + h2, ol + h2 {
+p + h2,
+ul + h2,
+ol + h2 {
   margin-top: ($baseline*2);
 }
 
@@ -73,29 +81,36 @@ span {
   font-size: 24px;
 }
 
-p + p, ul + p, ol + p {
+p + p,
+ul + p,
+ol + p {
   margin-top: $baseline;
 }
 
 p {
-  a, a:visited {
+  a:not(.btn),
+  a:visited:not(.btn) {
     color: $link-color;
     font: inherit;
     font-weight: inherit;
     text-decoration: none;
+
     @include transition(all 0.1s linear 0s);
 
-    &:hover, &:focus {
+    &:hover,
+    &:focus {
       color: $link-hover;
       text-decoration: underline;
     }
   }
 }
 
-a, a:visited {
+a:not(.btn),
+a:visited:not(.btn) {
   color: $link-color;
   font: inherit;
   text-decoration: none;
+
   @include transition(all 0.1s linear 0s);
 
   &:hover,
@@ -104,17 +119,24 @@ a, a:visited {
     text-decoration: underline;
   }
 
-  &:disabled, &.is-disabled, &.disabled {
+  &:disabled,
+  &.is-disabled,
+  &.disabled {
     @extend %ui-disabled;
+
     opacity: 0.5;
     cursor: not-allowed;
   }
 }
 
 .content-wrapper {
-  width: flex-grid(12);
-  margin: 0 auto;
-  background: $content-wrapper-bg;
+  max-width: map-get($container-max-widths, xl);
+  margin-top: $baseline;
+  padding: 0 0 $baseline/2;
+
+  @include media-breakpoint-up(md) {
+    padding: 0 $baseline $baseline/2;
+  }
 
   @media print {
     padding-bottom: 0;
@@ -124,15 +146,18 @@ a, a:visited {
 .container {
   @include clearfix();
   @include box-sizing(border-box);
-  margin: 0 auto 0;
-  padding: ($baseline*2) 0;
-  max-width: grid-width(12);
-  min-width: 760px;
-  width: flex-grid(12);
+
+  @include media-breakpoint-up(md) {
+    margin: 0 auto;
+    padding: ($baseline*2) 0;
+    max-width: grid-width(12);
+    min-width: 760px;
+    width: flex-grid(12);
+  }
 }
 
 .no-min-scale {
-  min-width: 0px !important;
+  min-width: 0 !important;
 }
 
 span.edx {
@@ -142,21 +167,23 @@ span.edx {
 
 .static-container {
   @include clearfix();
-  margin: 0 auto 0;
-  max-width: 1200px;
+
+  margin: 0 auto;
+  max-width: map-get($container-max-widths, xl);
   padding: ($baseline*3) 0 ($baseline*6);
   width: flex-grid(12);
 
   .inner-wrapper {
-    margin: 0 auto 0;
+    margin: 0 auto;
     width: flex-grid(10);
   }
 
-  ol, ul {
+  ol,
+  ul {
     list-style: disc;
 
     li {
-      color: $base-font-color;
+      color: $body-color;
       font: normal 1em/1.4em $serif;
       margin: 0;
     }
@@ -170,17 +197,21 @@ span.edx {
     margin-bottom: ($baseline*3);
   }
 
-  p + h2, ul + h2, ol + h2 {
+  p + h2,
+  ul + h2,
+  ol + h2 {
     margin-top: ($baseline*2);
   }
 
-  ul + p, ol + p {
+  ul + p,
+  ol + p {
     margin-top: $baseline;
   }
 }
 
 .loading-animation {
   @include animation(fa-spin 2s infinite linear);
+
   text-align: center;
   width: 100%;
 }
@@ -194,7 +225,7 @@ mark {
 
 .ie-banner {
   display: none;
-  max-width: 1140px;
+  max-width: map-get($container-max-widths, xl);
   min-width: 720px;
   margin: auto;
   border-radius: 0 0 3px 3px;
@@ -206,73 +237,6 @@ mark {
 
   strong {
     font-weight: 700;
-  }
-}
-
-.help-tab {
-    @include transform(rotate(-90deg));
-    @include transform-origin(0 0);
-    @extend %ui-depth2;
-    @extend %ui-print-excluded;
-    position: fixed;
-    top: 250px;
-    left: 0;
-
-    a:link,
-    a:visited {
-        border: 1px solid $gray-l3;
-        border-top-style: none;
-        border-radius: 0 0 ($baseline/2) ($baseline/2);
-        background: transparentize($white, 0.25);
-        color: transparentize($base-font-color, 0.25);
-        font-weight: bold;
-        text-decoration: none;
-        padding: 6px 22px 11px;
-        display: inline-block;
-
-        &:hover,
-        &:focus {
-            color: $white;
-            background: $link-color;
-        }
-    }
-}
-
-.help-buttons {
-    padding: ($baseline/2) ($baseline*2.5);
-    text-align: center;
-
-    button {
-        @extend %btn-secondary-blue-outline;
-        margin: .5rem 0;
-        font-weight: initial;
-        text-shadow: none;
-        letter-spacing: initial !important;
-        text-transform: normal !important;
-        vertical-align: initial;
-        
-        &:hover,
-        &:focus {
-            background: $link-color !important;
-            color: $white;
-            box-shadow: none !important;
-            text-shadow: none !important;
-        }
-    }
-}
-
-#feedback_form {
-  input, textarea {
-    font: normal 1em/1.4em $sans-serif;
-  }
-  textarea[name="details"] {
-    height: 150px;
-  }
-}
-
-#feedback_success_wrapper {
-  p {
-    padding: 0 $baseline $baseline $baseline;
   }
 }
 
@@ -294,7 +258,8 @@ mark {
 }
 
 // UI - semantically hide text
-.sr, .sr-only {
+.sr,
+.sr-only {
   @extend %text-sr;
   @extend %a11y-ensure-contrast;
 }
@@ -311,14 +276,31 @@ mark {
   overflow: hidden;
   background: $white;
   border-bottom: 1px solid $border-color-4;
-  padding: ($baseline*0.75) ($baseline/2);
+  padding: ($baseline*0.75) 0;
 
   &:focus,
   &:active {
-    position: relative;
-    top: auto;
-    width: auto;
+    @include left(45%);
+    @include margin-left(-1 * $baseline * 1.5);
+
+    position: absolute;
+    top: $baseline/4;
+    width: 10%;
     height: auto;
+    background-color: black;
     margin: 0;
+    opacity: 0.8;
+    color: white !important;
+    text-decoration: none !important;
+    outline: none;
+    text-align: center;
+
+
+    // Responsive styling for mobile
+    @include media-breakpoint-down(md) {
+      @include left(40%);
+
+      width: 20%;
+    }
   }
 }

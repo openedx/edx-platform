@@ -61,16 +61,16 @@ import base64
 import hashlib
 import hmac
 import json
-import random
-import string
 import urllib
 from collections import OrderedDict
 from logging import getLogger
+from smtplib import SMTPException
 
 import analytics
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.core.mail.message import EmailMessage
+from django.urls import reverse
 from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect
 import social_django
@@ -79,7 +79,12 @@ from social_core.pipeline import partial
 from social_core.pipeline.social_auth import associate_by_email
 
 import student
+from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from third_party_auth.utils import user_exists
+from lms.djangoapps.verify_student.models import SSOVerification
+from lms.djangoapps.verify_student.utils import earliest_allowed_verification_date
 
 from . import provider
 
@@ -143,14 +148,12 @@ _AUTH_ENTRY_CHOICES = frozenset([
     AUTH_ENTRY_REGISTER_API,
 ] + AUTH_ENTRY_CUSTOM.keys())
 
-_DEFAULT_RANDOM_PASSWORD_LENGTH = 12
-_PASSWORD_CHARSET = string.letters + string.digits
 
 logger = getLogger(__name__)
 
 
 class AuthEntryError(AuthException):
-    """Raised when auth_entry is missing or invalid on URLs.
+    """Raised when auth_entry is invalid on URLs.
 
     auth_entry tells us whether the auth flow was initiated to register a new
     user (in which case it has the value of AUTH_ENTRY_REGISTER) or log in an
@@ -425,27 +428,6 @@ def get_provider_user_states(user):
     return states
 
 
-def make_random_password(length=None, choice_fn=random.SystemRandom().choice):
-    """Makes a random password.
-
-    When a user creates an account via a social provider, we need to create a
-    placeholder password for them to satisfy the ORM's consistency and
-    validation requirements. Users don't know (and hence cannot sign in with)
-    this password; that's OK because they can always use the reset password
-    flow to set it to a known value.
-
-    Args:
-        choice_fn: function or method. Takes an iterable and returns a random
-            element.
-        length: int. Number of chars in the returned value. None to use default.
-
-    Returns:
-        String. The resulting password.
-    """
-    length = length if length is not None else _DEFAULT_RANDOM_PASSWORD_LENGTH
-    return ''.join(choice_fn(_PASSWORD_CHARSET) for _ in xrange(length))
-
-
 def running(request):
     """Returns True iff request is running a third-party auth pipeline."""
     return get(request) is not None  # Avoid False for {}.
@@ -459,10 +441,11 @@ def running(request):
 
 def parse_query_params(strategy, response, *args, **kwargs):
     """Reads whitelisted query params, transforms them into pipeline args."""
-    auth_entry = strategy.request.session.get(AUTH_ENTRY_KEY)
-    if not (auth_entry and auth_entry in _AUTH_ENTRY_CHOICES):
-        raise AuthEntryError(strategy.request.backend, 'auth_entry missing or invalid')
-
+    # If auth_entry is not in the session, we got here by a non-standard workflow.
+    # We simply assume 'login' in that case.
+    auth_entry = strategy.request.session.get(AUTH_ENTRY_KEY, AUTH_ENTRY_LOGIN)
+    if auth_entry not in _AUTH_ENTRY_CHOICES:
+        raise AuthEntryError(strategy.request.backend, 'auth_entry invalid')
     return {'auth_entry': auth_entry}
 
 
@@ -496,7 +479,7 @@ def set_pipeline_timeout(strategy, user, *args, **kwargs):
         # choice of the user.
 
 
-def redirect_to_custom_form(request, auth_entry, kwargs):
+def redirect_to_custom_form(request, auth_entry, details, kwargs):
     """
     If auth_entry is found in AUTH_ENTRY_CUSTOM, this is used to send provider
     data to an external server's registration/login page.
@@ -515,7 +498,7 @@ def redirect_to_custom_form(request, auth_entry, kwargs):
         "auth_entry": auth_entry,
         "backend_name": backend_name,
         "provider_id": provider_id,
-        "user_details": kwargs['details'],
+        "user_details": details,
     })
     digest = hmac.new(secret_key, msg=data_str, digestmod=hashlib.sha256).digest()
     # Store the data in the session temporarily, then redirect to a page that will POST it to
@@ -530,7 +513,7 @@ def redirect_to_custom_form(request, auth_entry, kwargs):
 
 @partial.partial
 def ensure_user_information(strategy, auth_entry, backend=None, user=None, social=None, current_partial=None,
-                            allow_inactive_user=False, *args, **kwargs):
+                            allow_inactive_user=False, details=None, *args, **kwargs):
     """
     Ensure that we have the necessary information about a user (either an
     existing account or registration data) to proceed with the pipeline.
@@ -562,7 +545,12 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
                 (current_provider.skip_email_verification or current_provider.send_to_registration_first))
 
     if not user:
-        if auth_entry in [AUTH_ENTRY_LOGIN_API, AUTH_ENTRY_REGISTER_API]:
+        if user_exists(details or {}):
+            # User has not already authenticated and the details sent over from
+            # identity provider belong to an existing user.
+            return dispatch_to_login()
+
+        if is_api(auth_entry):
             return HttpResponseBadRequest()
         elif auth_entry == AUTH_ENTRY_LOGIN:
             # User has authenticated with the third party provider but we don't know which edX
@@ -578,7 +566,7 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
             raise AuthEntryError(backend, 'auth_entry is wrong. Settings requires a user.')
         elif auth_entry in AUTH_ENTRY_CUSTOM:
             # Pass the username, email, etc. via query params to the custom entry page:
-            return redirect_to_custom_form(strategy.request, auth_entry, kwargs)
+            return redirect_to_custom_form(strategy.request, auth_entry, details or {}, kwargs)
         else:
             raise AuthEntryError(backend, 'auth_entry invalid')
 
@@ -638,7 +626,7 @@ def set_logged_in_cookies(backend=None, user=None, strategy=None, auth_entry=Non
     to the next pipeline step.
 
     """
-    if not is_api(auth_entry) and user is not None and user.is_authenticated():
+    if not is_api(auth_entry) and user is not None and user.is_authenticated:
         request = strategy.request if strategy else None
         # n.b. for new users, user.is_active may be False at this point; set the cookie anyways.
         if request is not None:
@@ -709,3 +697,108 @@ def associate_by_email_if_login_api(auth_entry, backend, details, user, current_
             # email address and the legitimate user would now login to the illegitimate
             # account.
             return association_response
+
+
+def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **kwargs):
+    """
+    Update normally protected user details using data from provider.
+
+    This step in the pipeline is akin to `social_core.pipeline.user.user_details`, which updates
+    the user details but has an unconfigurable protection over updating the username & email, and
+    is unable to update information such as the user's full name which isn't on the user model, but
+    rather on the user profile model.
+
+    Additionally, because the email field is normally used to log in, if the email is changed by this
+    forced synchronization, we send an email to both the old and new emails, letting the user know.
+
+    This step is controlled by the `sync_learner_profile_data` flag on the provider's configuration.
+    """
+    current_provider = provider.Registry.get_from_pipeline({'backend': strategy.request.backend.name, 'kwargs': kwargs})
+    if user and current_provider.sync_learner_profile_data:
+        # Keep track of which incoming values get applied.
+        changed = {}
+
+        # Map each incoming field from the provider to the name on the user model (by default, they always match).
+        field_mapping = {field: (user, field) for field in details.keys() if hasattr(user, field)}
+
+        # This is a special case where the field mapping should go to the user profile object and not the user object,
+        # in some cases with differing field names (i.e. 'fullname' vs. 'name').
+        field_mapping.update({
+            'fullname': (user.profile, 'name'),
+            'country': (user.profile, 'country'),
+        })
+
+        # Remove username from list of fields for update
+        field_mapping.pop('username', None)
+
+        # Track any fields that would raise an integrity error if there was a conflict.
+        integrity_conflict_fields = {'email': user.email, 'username': user.username}
+
+        for provider_field, (model, field) in field_mapping.items():
+            provider_value = details.get(provider_field)
+            current_value = getattr(model, field)
+            if provider_value is not None and current_value != provider_value:
+                if field in integrity_conflict_fields and User.objects.filter(**{field: provider_value}).exists():
+                    logger.warning('User with ID [%s] tried to synchronize profile data through [%s] '
+                                   'but there was a conflict with an existing [%s]: [%s].',
+                                   user.id, current_provider.name, field, provider_value)
+                    continue
+                changed[provider_field] = current_value
+                setattr(model, field, provider_value)
+
+        if changed:
+            logger.info(
+                "User [%s] performed SSO through [%s] who synchronizes profile data, and the "
+                "following fields were changed: %s", user.username, current_provider.name, changed.keys(),
+            )
+
+            # Save changes to user and user.profile models.
+            strategy.storage.user.changed(user)
+            user.profile.save()
+
+            # Send an email to the old and new email to alert the user that their login email changed.
+            if changed.get('email'):
+                old_email = changed['email']
+                new_email = user.email
+                email_context = {'old_email': old_email, 'new_email': new_email}
+                # Subjects shouldn't have new lines.
+                subject = ''.join(render_to_string(
+                    'emails/sync_learner_profile_data_email_change_subject.txt',
+                    email_context
+                ).splitlines())
+                body = render_to_string('emails/sync_learner_profile_data_email_change_body.txt', email_context)
+                from_email = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
+
+                email = EmailMessage(subject=subject, body=body, from_email=from_email, to=[old_email, new_email])
+                email.content_subtype = "html"
+                try:
+                    email.send()
+                except SMTPException:
+                    logger.exception('Error sending IdP learner data sync-initiated email change '
+                                     'notification email for user [%s].', user.username)
+
+
+def set_id_verification_status(auth_entry, strategy, details, user=None, *args, **kwargs):
+    """
+    Use the user's authentication with the provider, if configured, as evidence of their identity being verified.
+    """
+    current_provider = provider.Registry.get_from_pipeline({'backend': strategy.request.backend.name, 'kwargs': kwargs})
+    if user and current_provider.enable_sso_id_verification:
+        # Get previous valid, non expired verification attempts for this SSO Provider and user
+        verifications = SSOVerification.objects.filter(
+            user=user,
+            status="approved",
+            created_at__gte=earliest_allowed_verification_date(),
+            identity_provider_type=current_provider.full_class_name,
+            identity_provider_slug=current_provider.slug,
+        )
+
+        # If there is none, create a new approved verification for the user.
+        if not verifications:
+            SSOVerification.objects.create(
+                user=user,
+                status="approved",
+                name=user.profile.name,
+                identity_provider_type=current_provider.full_class_name,
+                identity_provider_slug=current_provider.slug,
+            )

@@ -1,0 +1,35 @@
+<%page expression_filter="h"/>
+<%!
+from django.utils.translation import ugettext as _
+%>
+<div class="reasons_survey">
+  <div class="slide1 hidden">
+    <h3>${_("We're sorry to see you go! Please share your main reason for unenrolling.")}</h3><br>
+    <ul class="options">
+      <li><label class="option"><input type="radio" name="reason" val="I just wanted to browse the material">${_('I just wanted to browse the material')}</label></li>
+      <li><label class="option"><input type="radio" name="reason" val="This won’t help me reach my goals">${_("This won't help me reach my goals")}</label></li>
+      <li><label class="option"><input type="radio" name="reason" val="I don't have the time">${_("I don't have the time")}</label></li>
+      <li><label class="option"><input type="radio" name="reason" val="I don’t have the academic or language prerequisites">${_("I don't have the academic or language prerequisites")}</label></li>
+      <li><label class="option"><input type="radio" name="reason" val="I don't have enough support">${_("I don't have enough support")}</label></li>
+      <li><label class="option"><input type="radio" name="reason" val="I am not happy with the quality of the content">${_('I am not happy with the quality of the content')}</label></li>
+      <li><label class="option"><input type="radio" name="reason" val="The course material was too hard">${_('The course material was too hard')}</label></li>
+      <li><label class="option"><input type="radio" name="reason" val="The course material was too easy">${_('The course material was too easy')}</label></li>
+      <li><label class="option"><input type="radio" name="reason" val="Something was broken">${_('Something was broken')}</label></li>
+      <li><label class="option"><input class="other_radio" type="radio" name="reason" val="Other">${_('Other')}   <input type="text" class="other_text"/></label></li>
+    </ul>
+    <button class="submit_reasons">${_('Submit')}</button>
+  </div>
+  <div class="slide2 hidden">
+    ${_('Thank you for sharing your reasons for unenrolling.')}<br>
+    ${_('You are unenrolled from')} <span class="survey_course_name"></span>.
+
+    <div>
+      <a class="btn button survey_button return_to_dashboard">
+        ${_('Return To Dashboard')}
+      </a>
+      <a class="btn button survey_button browse_courses">
+        ${_('Browse Courses')}
+      </a>
+    </div>
+  </div>
+</div>

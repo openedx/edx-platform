@@ -10,35 +10,40 @@ import mock
 import pytz
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.test.utils import override_settings
 from django.utils.translation import ugettext as _
 from opaque_keys.edx.locator import CourseLocator
 from search.api import perform_search
 
 from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
 from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import add_instructor, reverse_course_url, reverse_library_url, reverse_usage_url
+from contentstore.utils import add_instructor, reverse_course_url, reverse_usage_url
 from contentstore.views.course import (
     _deprecated_blocks_info,
     course_outline_initial_state,
     reindex_course_and_check_access
 )
+from contentstore.views.course import WAFFLE_NAMESPACE as COURSE_WAFFLE_NAMESPACE
 from contentstore.views.item import VisibilityState, create_xblock_info
 from course_action_state.managers import CourseRerunUIStateManager
 from course_action_state.models import CourseRerunState
+from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
 from student.auth import has_course_author_access
-from student.roles import LibraryUserRole
+from student.roles import CourseStaffRole, GlobalStaff, LibraryUserRole
 from student.tests.factories import UserFactory
 from util.date_utils import get_default_time_display
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory, check_mongo_calls
 
 
 class TestCourseIndex(CourseTestCase):
     """
     Unit tests for getting the list of courses and the course outline.
     """
+    shard = 1
+
     def setUp(self):
         """
         Add a course with odd characters in the fields
@@ -51,55 +56,34 @@ class TestCourseIndex(CourseTestCase):
             display_name='dotted.course.name-2',
         )
 
-    def check_index_and_outline(self, authed_client):
+    def check_courses_on_index(self, authed_client):
         """
-        Test getting the list of courses and then pulling up their outlines
+        Test that the React course listing is present.
         """
         index_url = '/home/'
         index_response = authed_client.get(index_url, {}, HTTP_ACCEPT='text/html')
         parsed_html = lxml.html.fromstring(index_response.content)
-        course_link_eles = parsed_html.find_class('course-link')
-        self.assertGreaterEqual(len(course_link_eles), 2)
-        for link in course_link_eles:
-            self.assertRegexpMatches(
-                link.get("href"),
-                'course/{}'.format(settings.COURSE_KEY_PATTERN)
-            )
-            # now test that url
-            outline_response = authed_client.get(link.get("href"), {}, HTTP_ACCEPT='text/html')
-            # ensure it has the expected 2 self referential links
-            outline_parsed = lxml.html.fromstring(outline_response.content)
-            outline_link = outline_parsed.find_class('course-link')[0]
-            self.assertEqual(outline_link.get("href"), link.get("href"))
-            course_menu_link = outline_parsed.find_class('nav-course-courseware-outline')[0]
-            self.assertEqual(course_menu_link.find("a").get("href"), link.get("href"))
+        courses_tab = parsed_html.find_class('react-course-listing')
+        self.assertEqual(len(courses_tab), 1)
 
-    def test_libraries_on_course_index(self):
+    def test_libraries_on_index(self):
         """
-        Test getting the list of libraries from the course listing page
+        Test that the library tab is present.
         """
-        def _assert_library_link_present(response, library):
+        def _assert_library_tab_present(response):
             """
-            Asserts there's a valid library link on libraries tab.
+            Asserts there's a library tab.
             """
             parsed_html = lxml.html.fromstring(response.content)
-            library_link_elements = parsed_html.find_class('library-link')
-            self.assertEqual(len(library_link_elements), 1)
-            link = library_link_elements[0]
-            self.assertEqual(
-                link.get("href"),
-                reverse_library_url('library_handler', library.location.library_key),
-            )
-            # now test that url
-            outline_response = self.client.get(link.get("href"), {}, HTTP_ACCEPT='text/html')
-            self.assertEqual(outline_response.status_code, 200)
+            library_tab = parsed_html.find_class('react-library-listing')
+            self.assertEqual(len(library_tab), 1)
 
         # Add a library:
         lib1 = LibraryFactory.create()
 
         index_url = '/home/'
         index_response = self.client.get(index_url, {}, HTTP_ACCEPT='text/html')
-        _assert_library_link_present(index_response, lib1)
+        _assert_library_tab_present(index_response)
 
         # Make sure libraries are visible to non-staff users too
         self.client.logout()
@@ -108,13 +92,13 @@ class TestCourseIndex(CourseTestCase):
         LibraryUserRole(lib2.location.library_key).add_users(non_staff_user)
         self.client.login(username=non_staff_user.username, password=non_staff_userpassword)
         index_response = self.client.get(index_url, {}, HTTP_ACCEPT='text/html')
-        _assert_library_link_present(index_response, lib2)
+        _assert_library_tab_present(index_response)
 
     def test_is_staff_access(self):
         """
         Test that people with is_staff see the courses and can navigate into them
         """
-        self.check_index_and_outline(self.client)
+        self.check_courses_on_index(self.client)
 
     def test_negative_conditions(self):
         """
@@ -142,7 +126,7 @@ class TestCourseIndex(CourseTestCase):
             )
 
         # test access
-        self.check_index_and_outline(course_staff_client)
+        self.check_courses_on_index(course_staff_client)
 
     def test_json_responses(self):
         outline_url = reverse_course_url('course_handler', self.course.id)
@@ -329,10 +313,124 @@ class TestCourseIndex(CourseTestCase):
 
 
 @ddt.ddt
+class TestCourseIndexArchived(CourseTestCase):
+    """
+    Unit tests for testing the course index list when there are archived courses.
+    """
+    shard = 1
+
+    NOW = datetime.datetime.now(pytz.utc)
+    DAY = datetime.timedelta(days=1)
+    YESTERDAY = NOW - DAY
+    TOMORROW = NOW + DAY
+
+    ORG = 'MyOrg'
+
+    ENABLE_SEPARATE_ARCHIVED_COURSES = settings.FEATURES.copy()
+    ENABLE_SEPARATE_ARCHIVED_COURSES['ENABLE_SEPARATE_ARCHIVED_COURSES'] = True
+    DISABLE_SEPARATE_ARCHIVED_COURSES = settings.FEATURES.copy()
+    DISABLE_SEPARATE_ARCHIVED_COURSES['ENABLE_SEPARATE_ARCHIVED_COURSES'] = False
+
+    def setUp(self):
+        """
+        Add courses with the end date set to various values
+        """
+        super(TestCourseIndexArchived, self).setUp()
+
+        # Base course has no end date (so is active)
+        self.course.end = None
+        self.course.display_name = 'Active Course 1'
+        self.ORG = self.course.location.org
+        self.save_course()
+
+        # Active course has end date set to tomorrow
+        self.active_course = CourseFactory.create(
+            display_name='Active Course 2',
+            org=self.ORG,
+            end=self.TOMORROW,
+        )
+
+        # Archived course has end date set to yesterday
+        self.archived_course = CourseFactory.create(
+            display_name='Archived Course',
+            org=self.ORG,
+            end=self.YESTERDAY,
+        )
+
+        # Base user has global staff access
+        self.assertTrue(GlobalStaff().has_user(self.user))
+
+        # Staff user just has course staff access
+        self.staff, self.staff_password = self.create_non_staff_user()
+        for course in (self.course, self.active_course, self.archived_course):
+            CourseStaffRole(course.id).add_users(self.staff)
+
+        # Make sure we've cached data which could change the query counts
+        # depending on test execution order
+        WaffleSwitchNamespace(name=COURSE_WAFFLE_NAMESPACE).is_enabled(u'enable_global_staff_optimization')
+
+    def check_index_page_with_query_count(self, separate_archived_courses, org, mongo_queries, sql_queries):
+        """
+        Checks the index page, and ensures the number of database queries is as expected.
+        """
+        with self.assertNumQueries(sql_queries):
+            with check_mongo_calls(mongo_queries):
+                self.check_index_page(separate_archived_courses=separate_archived_courses, org=org)
+
+    def check_index_page(self, separate_archived_courses, org):
+        """
+        Ensure that the index page displays the archived courses as expected.
+        """
+        index_url = '/home/'
+        index_params = {}
+        if org is not None:
+            index_params['org'] = org
+        index_response = self.client.get(index_url, index_params, HTTP_ACCEPT='text/html')
+        self.assertEquals(index_response.status_code, 200)
+
+        parsed_html = lxml.html.fromstring(index_response.content)
+        course_tab = parsed_html.find_class('courses')
+        self.assertEqual(len(course_tab), 1)
+        archived_course_tab = parsed_html.find_class('archived-courses')
+        self.assertEqual(len(archived_course_tab), 1 if separate_archived_courses else 0)
+
+    @ddt.data(
+        # Staff user has course staff access
+        (True, 'staff', None, 3, 18),
+        (False, 'staff', None, 3, 18),
+        # Base user has global staff access
+        (True, 'user', ORG, 3, 18),
+        (False, 'user', ORG, 3, 18),
+        (True, 'user', None, 3, 18),
+        (False, 'user', None, 3, 18),
+    )
+    @ddt.unpack
+    def test_separate_archived_courses(self, separate_archived_courses, username, org, mongo_queries, sql_queries):
+        """
+        Ensure that archived courses are shown as expected for all user types, when the feature is enabled/disabled.
+        Also ensure that enabling the feature does not adversely affect the database query count.
+        """
+        # Authenticate the requested user
+        user = getattr(self, username)
+        password = getattr(self, username + '_password')
+        self.client.login(username=user, password=password)
+
+        # Enable/disable the feature before viewing the index page.
+        features = settings.FEATURES.copy()
+        features['ENABLE_SEPARATE_ARCHIVED_COURSES'] = separate_archived_courses
+        with override_settings(FEATURES=features):
+            self.check_index_page_with_query_count(separate_archived_courses=separate_archived_courses,
+                                                   org=org,
+                                                   mongo_queries=mongo_queries,
+                                                   sql_queries=sql_queries)
+
+
+@ddt.ddt
 class TestCourseOutline(CourseTestCase):
     """
     Unit tests for the course outline.
     """
+    shard = 1
     ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
@@ -535,79 +633,12 @@ class TestCourseOutline(CourseTestCase):
             expected_block_types
         )
 
-    @ddt.data(
-        {'delete_vertical': True},
-        {'delete_vertical': False},
-    )
-    @ddt.unpack
-    def test_deprecated_blocks_list_updated_correctly(self, delete_vertical):
-        """
-        Verify that deprecated blocks list shown on banner is updated correctly.
-
-        Here is the scenario:
-            This list of deprecated blocks shown on banner contains published
-            and un-published blocks. That list should be updated when we delete
-            un-published block(s). This behavior should be same if we delete
-            unpublished vertical or problem.
-        """
-        block_types = ['notes']
-        course_module = modulestore().get_item(self.course.location)
-
-        vertical1 = ItemFactory.create(
-            parent_location=self.sequential.location, category='vertical', display_name='Vert1 Subsection1'
-        )
-        problem1 = ItemFactory.create(
-            parent_location=vertical1.location,
-            category='notes',
-            display_name='notes problem in vert1',
-            publish_item=False
-        )
-
-        info = _deprecated_blocks_info(course_module, block_types)
-        # info['blocks'] should be empty here because there is nothing
-        # published or un-published present
-        self.assertEqual(info['blocks'], [])
-
-        vertical2 = ItemFactory.create(
-            parent_location=self.sequential.location, category='vertical', display_name='Vert2 Subsection1'
-        )
-        ItemFactory.create(
-            parent_location=vertical2.location,
-            category='notes',
-            display_name='notes problem in vert2',
-            pubish_item=True
-        )
-        # At this point CourseStructure will contain both the above
-        # published and un-published verticals
-
-        info = _deprecated_blocks_info(course_module, block_types)
-        self.assertItemsEqual(
-            info['blocks'],
-            [
-                [reverse_usage_url('container_handler', vertical1.location), 'notes problem in vert1'],
-                [reverse_usage_url('container_handler', vertical2.location), 'notes problem in vert2']
-            ]
-        )
-
-        # Delete the un-published vertical or problem so that CourseStructure updates its data
-        if delete_vertical:
-            self.store.delete_item(vertical1.location, self.user.id)
-        else:
-            self.store.delete_item(problem1.location, self.user.id)
-
-        info = _deprecated_blocks_info(course_module, block_types)
-        # info['blocks'] should only contain the info about vertical2 which is published.
-        # There shouldn't be any info present about un-published vertical1
-        self.assertEqual(
-            info['blocks'],
-            [[reverse_usage_url('container_handler', vertical2.location), 'notes problem in vert2']]
-        )
-
 
 class TestCourseReIndex(CourseTestCase):
     """
     Unit tests for the course outline.
     """
+    shard = 1
     SUCCESSFUL_RESPONSE = _("Course has been successfully reindexed.")
 
     ENABLED_SIGNALS = ['course_published']

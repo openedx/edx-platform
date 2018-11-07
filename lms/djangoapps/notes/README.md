@@ -48,7 +48,7 @@ lms/djangoapps/notes:
 
 Also requires:
 
-*  lms/static/coffee/src/notes.coffee -- wrapper around annotator.js
+*  lms/static/js/notes.js -- wrapper around annotator.js
 *  lms/templates/notes.html -- used by views.py to display the notes
 
 Interacts with:

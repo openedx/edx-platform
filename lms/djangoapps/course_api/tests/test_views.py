@@ -1,9 +1,11 @@
 """
 Tests for Course API views.
 """
+import ddt
 from hashlib import md5
 
-from django.core.urlresolvers import reverse
+from django.core.exceptions import ImproperlyConfigured
+from django.urls import reverse
 from django.test import RequestFactory
 from django.test.utils import override_settings
 from nose.plugins.attrib import attr
@@ -12,8 +14,9 @@ from search.tests.tests import TEST_INDEX_NAME
 from search.tests.utils import SearcherMixin
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
+from waffle.testutils import override_switch
 
-from ..views import CourseDetailView
+from ..views import CourseDetailView, CourseListUserThrottle
 from .mixins import TEST_PASSWORD, CourseApiFactoryMixin
 
 
@@ -52,7 +55,8 @@ class CourseApiTestViewMixin(CourseApiFactoryMixin):
         return response
 
 
-@attr(shard=3)
+@attr(shard=9)
+@ddt.ddt
 class CourseListViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
     """
     Test responses returned from CourseListView.
@@ -100,7 +104,40 @@ class CourseListViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
         self.client.logout()
         self.verify_response()
 
+    def assert_throttle_configured_correctly(self, user_scope, throws_exception, expected_rate):
+        """Helper to determine throttle configuration is correctly set."""
+        throttle = CourseListUserThrottle()
+        throttle.check_for_switches()
+        throttle.scope = user_scope
+        try:
+            rate_limit, __ = throttle.parse_rate(throttle.get_rate())
+            self.assertEqual(rate_limit, expected_rate)
+            self.assertFalse(throws_exception)
+        except ImproperlyConfigured:
+            self.assertTrue(throws_exception)
 
+    @ddt.data(('staff', False, 40), ('user', False, 20), ('unknown', True, None))
+    @ddt.unpack
+    def test_throttle_rate_default(self, user_scope, throws_exception, expected_rate):
+        """ Make sure throttle rate default is set correctly for different user scopes. """
+        self.assert_throttle_configured_correctly(user_scope, throws_exception, expected_rate)
+
+    @ddt.data(('staff', False, 10), ('user', False, 2), ('unknown', True, None))
+    @ddt.unpack
+    @override_switch('course_list_api_rate_limit.rate_limit_2', active=True)
+    def test_throttle_rate_2(self, user_scope, throws_exception, expected_rate):
+        """ Make sure throttle rate 2 is set correctly for different user scopes. """
+        self.assert_throttle_configured_correctly(user_scope, throws_exception, expected_rate)
+
+    @ddt.data(('staff', False, 20), ('user', False, 10), ('unknown', True, None))
+    @ddt.unpack
+    @override_switch('course_list_api_rate_limit.rate_limit_10', active=True)
+    def test_throttle_rate_20(self, user_scope, throws_exception, expected_rate):
+        """ Make sure throttle rate 20 is set correctly for different user scopes. """
+        self.assert_throttle_configured_correctly(user_scope, throws_exception, expected_rate)
+
+
+@attr(shard=9)
 class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreTestCase):
     """
     Test responses returned from CourseListView (with tests that modify the
@@ -110,7 +147,7 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
 
     def setUp(self):
         super(CourseListViewTestCaseMultipleCourses, self).setUp()
-        self.course = self.create_course()
+        self.course = self.create_course(mobile_available=False)
         self.url = reverse('course-list')
         self.staff_user = self.create_user(username='staff', is_staff=True)
         self.honor_user = self.create_user(username='honor', is_staff=False)
@@ -143,7 +180,7 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
         self.setup_user(self.staff_user)
 
         # Create a second course to be filtered out of queries.
-        alternate_course = self.create_course(course='mobile', mobile_available=True)
+        alternate_course = self.create_course(course='mobile')
 
         test_cases = [
             (None, [alternate_course, self.course]),
@@ -162,6 +199,7 @@ class CourseListViewTestCaseMultipleCourses(CourseApiTestViewMixin, ModuleStoreT
             )
 
 
+@attr(shard=9)
 class CourseDetailViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase):
     """
     Test responses returned from CourseDetailView.
@@ -229,6 +267,7 @@ class CourseDetailViewTestCase(CourseApiTestViewMixin, SharedModuleStoreTestCase
         self.assertEquals(response.status_code, 400)
 
 
+@attr(shard=9)
 @override_settings(ELASTIC_FIELD_MAPPINGS={
     'start_date': {'type': 'date'},
     'enrollment_start': {'type': 'date'},

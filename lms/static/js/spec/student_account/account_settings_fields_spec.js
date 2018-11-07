@@ -1,21 +1,23 @@
 define(['backbone',
-        'jquery',
-        'underscore',
-        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-        'common/js/spec_helpers/template_helpers',
-        'js/views/fields',
-        'js/spec/views/fields_helpers',
-        'js/spec/student_account/account_settings_fields_helpers',
-        'js/student_account/views/account_settings_fields',
-        'js/student_account/models/user_account_model',
-        'string_utils'],
-    function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, FieldViewsSpecHelpers,
+    'jquery',
+    'underscore',
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+    'common/js/spec_helpers/template_helpers',
+    'js/student_account/models/user_account_model',
+    'js/views/fields',
+    'js/spec/views/fields_helpers',
+    'js/spec/student_account/account_settings_fields_helpers',
+    'js/student_account/views/account_settings_fields',
+    'js/student_account/models/user_account_model',
+    'string_utils'],
+    function(Backbone, $, _, AjaxHelpers, TemplateHelpers, UserAccountModel, FieldViews, FieldViewsSpecHelpers,
               AccountSettingsFieldViewSpecHelpers, AccountSettingsFieldViews) {
         'use strict';
 
         describe('edx.AccountSettingsFieldViews', function() {
             var requests,
-                timerCallback;
+                timerCallback, // eslint-disable-line no-unused-vars
+                data;
 
             beforeEach(function() {
                 timerCallback = jasmine.createSpy('timerCallback');
@@ -40,7 +42,7 @@ define(['backbone',
                 view.$('.u-field-value > button').click();
                 expect(view.$('.u-field-value > button').is(':disabled')).toBe(true);
                 AjaxHelpers.expectRequest(requests, 'POST', '/password_reset', 'email=legolas%40woodland.middlearth');
-                AjaxHelpers.respondWithJson(requests, {'success': 'true'});
+                AjaxHelpers.respondWithJson(requests, {success: 'true'});
                 FieldViewsSpecHelpers.expectMessageContains(
                     view,
                     "We've sent a message to legolas@woodland.middlearth. " +
@@ -130,7 +132,7 @@ define(['backbone',
 
                 var view = new AccountSettingsFieldViews.LanguagePreferenceFieldView(fieldData).render();
 
-                var data = {'language': FieldViewsSpecHelpers.SELECT_OPTIONS[2][0]};
+                data = {language: FieldViewsSpecHelpers.SELECT_OPTIONS[2][0]};
                 view.$(selector).val(data[fieldData.valueAttribute]).change();
                 view.$(selector).focusout();
                 FieldViewsSpecHelpers.expectAjaxRequestWithData(requests, data);
@@ -140,12 +142,17 @@ define(['backbone',
                     requests,
                     'POST',
                     '/i18n/setlang/',
-                    'language=' + data[fieldData.valueAttribute]
+                    $.param({
+                        language: data[fieldData.valueAttribute],
+                        next: window.location.href
+                    })
                 );
+                // Django will actually respond with a 302 redirect, but that would cause a page load during these
+                // unittests.  204 should work fine for testing.
                 AjaxHelpers.respondWithNoContent(requests);
                 FieldViewsSpecHelpers.expectMessageContains(view, 'Your changes have been saved.');
 
-                data = {'language': FieldViewsSpecHelpers.SELECT_OPTIONS[1][0]};
+                data = {language: FieldViewsSpecHelpers.SELECT_OPTIONS[1][0]};
                 view.$(selector).val(data[fieldData.valueAttribute]).change();
                 view.$(selector).focusout();
                 FieldViewsSpecHelpers.expectAjaxRequestWithData(requests, data);
@@ -155,7 +162,10 @@ define(['backbone',
                     requests,
                     'POST',
                     '/i18n/setlang/',
-                    'language=' + data[fieldData.valueAttribute]
+                    $.param({
+                        language: data[fieldData.valueAttribute],
+                        next: window.location.href
+                    })
                 );
                 AjaxHelpers.respondWithError(requests, 500);
                 FieldViewsSpecHelpers.expectMessageContains(
@@ -173,13 +183,13 @@ define(['backbone',
                     options: FieldViewsSpecHelpers.SELECT_OPTIONS,
                     persistChanges: true
                 });
-                fieldData.model.set({'language_proficiencies': [{'code': FieldViewsSpecHelpers.SELECT_OPTIONS[0][0]}]});
+                fieldData.model.set({language_proficiencies: [{code: FieldViewsSpecHelpers.SELECT_OPTIONS[0][0]}]});
 
                 var view = new AccountSettingsFieldViews.LanguageProficienciesFieldView(fieldData).render();
 
                 expect(view.modelValue()).toBe(FieldViewsSpecHelpers.SELECT_OPTIONS[0][0]);
 
-                var data = {'language_proficiencies': [{'code': FieldViewsSpecHelpers.SELECT_OPTIONS[1][0]}]};
+                data = {language_proficiencies: [{code: FieldViewsSpecHelpers.SELECT_OPTIONS[1][0]}]};
                 view.$(selector).val(FieldViewsSpecHelpers.SELECT_OPTIONS[1][0]).change();
                 view.$(selector).focusout();
                 FieldViewsSpecHelpers.expectAjaxRequestWithData(requests, data);

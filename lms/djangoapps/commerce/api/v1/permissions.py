@@ -1,11 +1,11 @@
 """ Custom API permissions. """
-from django.conf import settings
+
 from django.contrib.auth.models import User
 from rest_framework.permissions import BasePermission, DjangoModelPermissions
 
-from commerce.utils import is_account_activation_requirement_disabled
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
+
+from ...utils import is_account_activation_requirement_disabled
 
 
 class ApiKeyOrModelPermission(BasePermission):
@@ -19,9 +19,9 @@ class ApiKeyOrModelPermission(BasePermission):
 class IsAuthenticatedOrActivationOverridden(BasePermission):
     """ Considers the account activation override switch when determining the authentication status of the user """
     def has_permission(self, request, view):
-        if not request.user.is_authenticated() and is_account_activation_requirement_disabled():
+        if not request.user.is_authenticated and is_account_activation_requirement_disabled():
             try:
                 request.user = User.objects.get(id=request.session._session_cache['_auth_user_id'])
             except DoesNotExist:
                 pass
-        return request.user.is_authenticated()
+        return request.user.is_authenticated

@@ -230,6 +230,7 @@
             if (this.position !== newPosition) {
                 if (this.position) {
                     this.mark_visited(this.position);
+                    this.update_completion(this.position);
                     modxFullUrl = '' + this.ajaxUrl + '/goto_position';
                     $.postWithPrefix(modxFullUrl, {
                         position: newPosition
@@ -266,7 +267,9 @@
                 XBlock.initializeBlocks(this.content_container, this.requestToken);
 
                 // For embedded circuit simulator exercises in 6.002x
-                window.update_schematics();
+                if (window.hasOwnProperty('update_schematics')) {
+                    window.update_schematics();
+                }
                 this.position = newPosition;
                 this.toggleArrows();
                 this.hookUpContentStateChangeEvent();
@@ -398,6 +401,22 @@
                 .removeClass('active')
                 .removeClass('focused')
                 .addClass('visited');
+        };
+
+        Sequence.prototype.update_completion = function(position) {
+            var element = this.link_for(position);
+            var completionUrl = this.ajaxUrl + '/get_completion';
+            var usageKey = element[0].attributes['data-id'].value;
+            var completionIndicators = element.find('.check-circle');
+            if (completionIndicators.length) {
+                $.postWithPrefix(completionUrl, {
+                    usage_key: usageKey
+                }, function(data) {
+                    if (data.complete === true) {
+                        completionIndicators.removeClass('is-hidden');
+                    }
+                });
+            }
         };
 
         Sequence.prototype.mark_active = function(position) {

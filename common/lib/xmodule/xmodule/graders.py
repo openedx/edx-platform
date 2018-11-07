@@ -14,6 +14,7 @@ from datetime import datetime
 
 from contracts import contract
 from pytz import UTC
+from django.utils.translation import ugettext_lazy as _
 
 log = logging.getLogger("edx.courseware")
 
@@ -170,7 +171,6 @@ def grader_from_conf(conf):
         weight = subgraderconf.pop("weight", 0)
         try:
             if 'min_count' in subgraderconf:
-                #This is an AssignmentFormatGrader
                 subgrader_class = AssignmentFormatGrader
             else:
                 raise ValueError("Configuration has no appropriate grader class.")
@@ -262,6 +262,13 @@ class WeightedSubsectionsGrader(CourseGrader):
     def __init__(self, subgraders):
         self.subgraders = subgraders
 
+    @property
+    def sum_of_weights(self):
+        sum = 0
+        for _, _, weight in self.subgraders:
+            sum += weight
+        return sum
+
     def grade(self, grade_sheet, generate_random_scores=False):
         total_percent = 0.0
         section_breakdown = []
@@ -271,7 +278,10 @@ class WeightedSubsectionsGrader(CourseGrader):
             subgrade_result = subgrader.grade(grade_sheet, generate_random_scores)
 
             weighted_percent = subgrade_result['percent'] * weight
-            section_detail = u"{0} = {1:.2%} of a possible {2:.2%}".format(assignment_type, weighted_percent, weight)
+            section_detail = _(u"{assignment_type} = {weighted_percent:.2%} of a possible {weight:.2%}").format(
+                assignment_type=assignment_type,
+                weighted_percent=weighted_percent,
+                weight=weight)
 
             total_percent += weighted_percent
             section_breakdown += subgrade_result['section_breakdown']
@@ -344,28 +354,28 @@ class AssignmentFormatGrader(CourseGrader):
         self.starting_index = starting_index
         self.hide_average = hide_average
 
+    def total_with_drops(self, breakdown):
+        """
+        Calculates total score for a section while dropping lowest scores
+        """
+        # Create an array of tuples with (index, mark), sorted by mark['percent'] descending
+        sorted_breakdown = sorted(enumerate(breakdown), key=lambda x: -x[1]['percent'])
+
+        # A list of the indices of the dropped scores
+        dropped_indices = []
+        if self.drop_count > 0:
+            dropped_indices = [x[0] for x in sorted_breakdown[-self.drop_count:]]
+        aggregate_score = 0
+        for index, mark in enumerate(breakdown):
+            if index not in dropped_indices:
+                aggregate_score += mark['percent']
+
+        if len(breakdown) - self.drop_count > 0:
+            aggregate_score /= len(breakdown) - self.drop_count
+
+        return aggregate_score, dropped_indices
+
     def grade(self, grade_sheet, generate_random_scores=False):
-        def total_with_drops(breakdown, drop_count):
-            """
-            Calculates total score for a section while dropping lowest scores
-            """
-            # Create an array of tuples with (index, mark), sorted by mark['percent'] descending
-            sorted_breakdown = sorted(enumerate(breakdown), key=lambda x: -x[1]['percent'])
-
-            # A list of the indices of the dropped scores
-            dropped_indices = []
-            if drop_count > 0:
-                dropped_indices = [x[0] for x in sorted_breakdown[-drop_count:]]
-            aggregate_score = 0
-            for index, mark in enumerate(breakdown):
-                if index not in dropped_indices:
-                    aggregate_score += mark['percent']
-
-            if len(breakdown) - drop_count > 0:
-                aggregate_score /= len(breakdown) - drop_count
-
-            return aggregate_score, dropped_indices
-
         scores = grade_sheet.get(self.type, {}).values()
         breakdown = []
         for i in range(max(self.min_count, len(scores))):
@@ -373,14 +383,14 @@ class AssignmentFormatGrader(CourseGrader):
                 if generate_random_scores:  	# for debugging!
                     earned = random.randint(2, 15)
                     possible = random.randint(earned, 15)
-                    section_name = "Generated"
+                    section_name = _("Generated")
 
                 else:
                     earned = scores[i].graded_total.earned
                     possible = scores[i].graded_total.possible
                     section_name = scores[i].display_name
 
-                percentage = earned / possible
+                percentage = scores[i].percent_graded
                 summary_format = u"{section_type} {index} - {name} - {percent:.0%} ({earned:.3n}/{possible:.3n})"
                 summary = summary_format.format(
                     index=i + self.starting_index,
@@ -392,11 +402,11 @@ class AssignmentFormatGrader(CourseGrader):
                 )
             else:
                 percentage = 0.0
-                summary = u"{section_type} {index} Unreleased - 0% (?/?)".format(
+                # Translators: "Homework 1 - Unreleased - 0% (?/?)" The section has not been released for viewing.
+                summary = _(u"{section_type} {index} Unreleased - 0% (?/?)").format(
                     index=i + self.starting_index,
                     section_type=self.section_type
                 )
-
             short_label = u"{short_label} {index:02d}".format(
                 index=i + self.starting_index,
                 short_label=self.short_label
@@ -405,11 +415,11 @@ class AssignmentFormatGrader(CourseGrader):
             breakdown.append({'percent': percentage, 'label': short_label,
                               'detail': summary, 'category': self.category})
 
-        total_percent, dropped_indices = total_with_drops(breakdown, self.drop_count)
+        total_percent, dropped_indices = self.total_with_drops(breakdown)
 
         for dropped_index in dropped_indices:
             breakdown[dropped_index]['mark'] = {
-                'detail': u"The lowest {drop_count} {section_type} scores are dropped.".format(
+                'detail': _(u"The lowest {drop_count} {section_type} scores are dropped.").format(
                     drop_count=self.drop_count,
                     section_type=self.section_type
                 )
@@ -426,11 +436,13 @@ class AssignmentFormatGrader(CourseGrader):
             breakdown = [{'percent': total_percent, 'label': total_label,
                           'detail': total_detail, 'category': self.category, 'prominent': True}, ]
         else:
-            total_detail = u"{section_type} Average = {percent:.0%}".format(
+            # Translators: "Homework Average = 0%"
+            total_detail = _(u"{section_type} Average = {percent:.0%}").format(
                 percent=total_percent,
                 section_type=self.section_type
             )
-            total_label = u"{short_label} Avg".format(short_label=self.short_label)
+            # Translators: Avg is short for Average
+            total_label = _(u"{short_label} Avg").format(short_label=self.short_label)
 
             if self.show_only_average:
                 breakdown = []

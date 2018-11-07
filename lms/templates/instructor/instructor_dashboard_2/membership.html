@@ -1,36 +1,10 @@
+<%page args="section_data" expression_filter="h"/>
 <%namespace name='static' file='/static_content.html'/>
-<%page args="section_data"/>
 <%!
 from django.utils.translation import ugettext as _
+from django.utils.translation import pgettext
+from openedx.core.djangolib.markup import HTML, Text
 %>
-<script type="text/template" id="member-list-widget-template">
-  <div class="member-list-widget">
-    <div class="header">
-      <div class="title"> {{title}} </div>
-    </div>
-    <div class="info"> {{info}} </div>
-    <div class="member-list">
-      <table>
-        <thead>
-          <tr>
-            {{#labels}}
-              <th class="label" scope="column">{{.}}</th>
-            {{/labels}}
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-    <div class="bottom-bar">
-      <label>
-          <span class="label-text sr">{{add_placeholder}}</span>
-          <input type="text" name="add-field" class="add-field" placeholder="{{add_placeholder}}">
-      </label>
-      <input type="button" name="add" class="add" value="{{add_btn_label}}">
-    </div>
-  </div>
-</script>
-
 <fieldset class="batch-enrollment membership-section">
     <legend id="heading-batch-enrollment" class="hd hd-3">${_("Batch Enrollment")}</legend>
     <label>
@@ -38,15 +12,24 @@ from django.utils.translation import ugettext as _
         ${_("You will not get notification for emails that bounce, so please double-check spelling.")}
         <textarea rows="6" name="student-ids" placeholder="${_("Email Addresses/Usernames")}" spellcheck="false"></textarea>
     </label>
-    <input type="hidden" id="is_course_white_label" value="${section_data['is_white_label']}">
-    % if section_data['is_white_label']:
+
+    <div class="role">
         <label>
-            ${_("Enter the reason why the students are to be manually enrolled or unenrolled.")}
-            ${_("This cannot be left blank and will be recorded and presented in Enrollment Reports.")}
-            ${_("Therefore, please give enough detail to account for this action.")}
-            <textarea rows="2" id="reason-field-id" name="reason-field" placeholder="${_('Reason')}" spellcheck="false"></textarea>
+            ${_("Role of the users being enrolled.")}
+            <select name="role">
+                % for role in section_data['enrollment_role_choices']:
+                  <option value="${role}">${role}</option>
+                % endfor
+            </select>
         </label>
-    %endif
+    </div>
+
+    <label>
+        ${_("Enter the reason why the students are to be manually enrolled or unenrolled.")}
+        ${_("This cannot be left blank and will be recorded and presented in Enrollment Reports.")}
+        ${_("Therefore, please give enough detail to account for this action.")}
+        <textarea rows="2" id="reason-field-id" name="reason-field" placeholder="${_('Reason')}" spellcheck="false"></textarea>
+    </label>
     <div class="enroll-option">
         <label class="has-hint">
             <input type="checkbox" name="auto-enroll" id="auto-enroll" value="Auto-Enroll" checked="yes" aria-describedby="heading-batch-enrollment">
@@ -54,8 +37,8 @@ from django.utils.translation import ugettext as _
             <div class="hint auto-enroll-hint">
                 <span class="hint-caret"></span>
                 <p id="auto-enroll-tip">
-                    ${_("If this option is <em>checked</em>, users who have not yet registered for {platform_name} will be automatically enrolled.").format(platform_name=settings.PLATFORM_NAME)}
-                    ${_("If this option is left <em>unchecked</em>, users who have not yet registered for {platform_name} will not be enrolled, but will be allowed to enroll once they make an account.").format(platform_name=settings.PLATFORM_NAME)}
+                    ${Text(_("If this option is {em_start}checked{em_end}, users who have not yet registered for {platform_name} will be automatically enrolled.")).format(em_start=HTML('<em>'), em_end=HTML('</em>'), platform_name=settings.PLATFORM_NAME)}
+                    ${Text(_("If this option is left {em_start}unchecked{em_end}, users who have not yet registered for {platform_name} will not be enrolled, but will be allowed to enroll once they make an account.")).format(em_start=HTML('<em>'), em_end=HTML('</em>'), platform_name=settings.PLATFORM_NAME)}
                     <br /><br />
                     ${_("Checking this box has no effect if 'Unenroll' is selected.")}
                 </p>
@@ -70,13 +53,13 @@ from django.utils.translation import ugettext as _
             <div class="hint email-students-hint">
                 <span class="hint-caret"></span>
                 <p id="email-students-tip">
-                    ${_("If this option is <em>checked</em>, users will receive an email notification.")}
+                    ${Text(_("If this option is {em_start}checked{em_end}, users will receive an email notification.")).format(em_start=HTML('<em>'), em_end=HTML('</em>'))}
                 </p>
             </div>
         </label>
     </div>
     <div>
-        <input type="button" name="enrollment-button" class="enrollment-button" value="${_("Enroll")}" data-endpoint="${ section_data['enroll_button_url'] }" data-action="enroll" >
+        <input type="button" name="enrollment-button" class="enrollment-button" value="${pgettext('someone','Enroll')}" data-endpoint="${ section_data['enroll_button_url'] }" data-action="enroll" >
         <input type="button" name="enrollment-button" class="enrollment-button" value="${_("Unenroll")}" data-endpoint="${ section_data['unenroll_button_url'] }" data-action="unenroll" >
     </div>
     <div class="request-response"></div>
@@ -86,7 +69,7 @@ from django.utils.translation import ugettext as _
 %if static.get_value('ALLOW_AUTOMATED_SIGNUPS', settings.FEATURES.get('ALLOW_AUTOMATED_SIGNUPS', False)):
 <hr class="divider" />
 
-  <div class="auto_enroll auto_enroll_csv">
+  <div class="auto_enroll auto_enroll_csv membership-section">
     <h3 class="hd hd-3">${_("Register/Enroll Students")}</h3>
     <p>${_("To register and enroll a list of users in this course, choose a CSV file that contains the following columns in this exact order: email, username, name, and country. Please include one student per row and do not include any headers, footers, or blank lines.")}</p>
     <form id="student-auto-enroll-form" method="post" action="${ section_data['upload_student_csv_button_url'] }" enctype="multipart/form-data">
@@ -122,7 +105,7 @@ from django.utils.translation import ugettext as _
             <div class="hint auto-enroll-beta-hint">
                 <span class="hint-caret"></span>
                 <p id="auto-enroll-beta-tip">
-                    ${_("If this option is <em>checked</em>, users who have not enrolled in your course will be automatically enrolled.")}
+                    ${Text(_("If this option is {em_start}checked{em_end}, users who have not enrolled in your course will be automatically enrolled.")).format(em_start=HTML('<em>'), em_end=HTML('</em>'))}
                     <br /><br />
                     ${_("Checking this box has no effect if 'Remove beta testers' is selected.")}
                 </p>
@@ -136,7 +119,7 @@ from django.utils.translation import ugettext as _
             <div class="hint email-students-beta-hint">
                 <span class="hint-caret"></span>
                 <p id="email-students-beta-tip">
-                    ${_("If this option is <em>checked</em>, users will receive an email notification.")}
+                    ${Text(_("If this option is {em_start}checked{em_end}, users will receive an email notification.")).format(em_start=HTML('<em>'), em_end=HTML('</em>'))}
                 </p>
             </div>
         </label>
@@ -249,14 +232,27 @@ from django.utils.translation import ugettext as _
     ></div>
 
     <div class="auth-list-container"
-      data-rolename="Community TA"
-      data-display-name="${_("Discussion Community TAs")}"
+      data-rolename="Group Moderator"
+      data-display-name="${_("Group Community TA")}"
       data-info-text="
-        ${_("Community TAs are members of the community whom you deem particularly "
-        "helpful on the discussion boards. They can edit or delete any post, clear "
-        "misuse flags, close and re-open threads, endorse responses, and see posts from "
-        "all groups. Their posts are marked as 'Community TA'. Only enrolled users can "
-        "be added as Community TAs.")}"
+        ${_("Group Community TAs are members of the community who help course teams moderate discussions. Group "
+            "Community TAs see only posts by learners in their assigned group. They can edit or delete posts, "
+            "clear flags, close and re-open threads, and endorse responses, but only for posts by learners in "
+            "their group. Their posts are marked as 'Community TA'. Only enrolled learners can be added as Group "
+            "Community TAs.")}"
+      data-list-endpoint="${ section_data['list_forum_members_url'] }"
+      data-modify-endpoint="${ section_data['update_forum_role_membership_url'] }"
+      data-add-button-label="${_("Add Group Community TA")}"
+    ></div>
+
+    <div class="auth-list-container"
+      data-rolename="Community TA"
+      data-display-name="${_("Community TA")}"
+      data-info-text="
+        ${_("Community TAs are members of the community who help course teams moderate discussions. "
+        "They can see posts by learners in their assigned cohort or enrollment track, and can edit or delete posts, "
+        "clear flags, close or re-open threads, and endorse responses. Their posts are marked as 'Community TA'. "
+        "Only enrolled learners can be added as Community TAs.")}"
       data-list-endpoint="${ section_data['list_forum_members_url'] }"
       data-modify-endpoint="${ section_data['update_forum_role_membership_url'] }"
       data-add-button-label="${_("Add Community TA")}"

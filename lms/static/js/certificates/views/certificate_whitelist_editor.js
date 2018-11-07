@@ -33,13 +33,14 @@
                 addException: function() {
                     var value = this.$('#certificate-exception').val();
                     var notes = this.$('#notes').val();
-                    var user_email = '', user_name = '', model = {};
+                    var user_email = '',
+                        user_name = '',
+                        model = {};
 
                     if (this.isEmailAddress(value)) {
                         user_email = value;
                         model = {user_email: user_email};
-                    }
-                    else {
+                    } else {
                         user_name = value;
                         model = {user_name: user_name};
                     }
@@ -62,8 +63,7 @@
                         this.escapeAndShowMessage(
                             _.template(message)({user: (user_name || user_email)})
                         );
-                    }
-                    else if (certificate_exception.isValid()) {
+                    } else if (certificate_exception.isValid()) {
                         message = gettext('<%= user %> has been successfully added to the exception list. Click Generate Exception Certificate below to send the certificate.');  // eslint-disable-line max-len
                         certificate_exception.save(
                             null,
@@ -76,8 +76,7 @@
                                 error: this.showError(this)
                             }
                         );
-                    }
-                    else {
+                    } else {
                         this.escapeAndShowMessage(certificate_exception.validationError);
                     }
                 },
@@ -106,8 +105,7 @@
                         try {
                             var response_data = JSON.parse(response.responseText);
                             caller.escapeAndShowMessage(response_data.message);
-                        }
-                        catch (exception) {
+                        } catch (exception) {
                             caller.escapeAndShowMessage(
                                 gettext('Server Error, Please refresh the page and try again.')
                             );

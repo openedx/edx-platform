@@ -9,7 +9,7 @@ import logging
 
 from django.core.management import BaseCommand
 
-from commerce.models import CommerceConfiguration
+from ...models import CommerceConfiguration
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 

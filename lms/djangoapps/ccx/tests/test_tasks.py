@@ -29,6 +29,7 @@ class TestSendCCXCoursePublished(ModuleStoreTestCase):
     """
     Unit tests for the send ccx course published task
     """
+    shard = 7
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     ENABLED_SIGNALS = ['course_published']

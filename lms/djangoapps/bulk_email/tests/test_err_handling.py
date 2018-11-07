@@ -10,11 +10,12 @@ import ddt
 from celery.states import RETRY, SUCCESS  # pylint: disable=no-name-in-module, import-error
 from django.conf import settings
 from django.core.management import call_command
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import DatabaseError
 from mock import Mock, patch
 from nose.plugins.attrib import attr
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
+from six import text_type
 
 from bulk_email.models import SEND_TO_MYSELF, BulkEmailFlag, CourseEmail
 from bulk_email.tasks import perform_delegate_email_batches, send_course_email
@@ -56,10 +57,10 @@ class TestEmailErrors(ModuleStoreTestCase):
 
         # load initial content (since we don't run migrations as part of tests):
         call_command("loaddata", "course_email_template.json")
-        self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        self.send_mail_url = reverse('send_email', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        self.url = reverse('instructor_dashboard', kwargs={'course_id': text_type(self.course.id)})
+        self.send_mail_url = reverse('send_email', kwargs={'course_id': text_type(self.course.id)})
         self.success_content = {
-            'course_id': self.course.id.to_deprecated_string(),
+            'course_id': text_type(self.course.id),
             'success': True,
         }
 
@@ -193,7 +194,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         """
         Tests exception when the course in the email doesn't exist
         """
-        course_id = SlashSeparatedCourseKey("I", "DONT", "EXIST")
+        course_id = CourseLocator("I", "DONT", "EXIST")
         email = CourseEmail(course_id=course_id)
         email.save()
         entry = InstructorTask.create(course_id, "task_type", "task_key", "task_input", self.instructor)
@@ -250,7 +251,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         Tests exception when the course_id in CourseEmail is not the same as one explicitly passed in.
         """
         email = CourseEmail.create(
-            SlashSeparatedCourseKey("bogus", "course", "id"),
+            CourseLocator("bogus", "course", "id"),
             self.instructor,
             [SEND_TO_MYSELF],
             "re: subject",

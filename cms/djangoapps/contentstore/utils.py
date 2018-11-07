@@ -7,15 +7,15 @@ import re
 from datetime import datetime
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from pytz import UTC
+from six import text_type
 
 from django_comment_common.models import assign_default_role
 from django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.appsembler.sites.utils import get_lms_link_from_course_key
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from student import auth
 from student.models import CourseEnrollment
@@ -116,8 +116,8 @@ def get_lms_link_for_item(location, preview=False):
 
     return u"//{lms_base}/courses/{course_key}/jump_to/{location}".format(
         lms_base=get_lms_link_from_course_key(lms_base, location.course_key),
-        course_key=location.course_key.to_deprecated_string(),
-        location=location.to_deprecated_string(),
+        course_key=text_type(location.course_key),
+        location=text_type(location),
     )
 
 
@@ -297,7 +297,7 @@ def reverse_url(handler_name, key_name=None, key_value=None, kwargs=None):
     kwargs_for_reverse = {key_name: unicode(key_value)} if key_name else None
     if kwargs:
         kwargs_for_reverse.update(kwargs)
-    return reverse('contentstore.views.' + handler_name, kwargs=kwargs_for_reverse)
+    return reverse(handler_name, kwargs=kwargs_for_reverse)
 
 
 def reverse_course_url(handler_name, course_key, kwargs=None):
@@ -414,17 +414,18 @@ def get_user_partition_info(xblock, schemes=None, course=None):
     for p in sorted(get_all_partitions_for_course(course, active_only=True), key=lambda p: p.name):
 
         # Exclude disabled partitions, partitions with no groups defined
+        # The exception to this case is when there is a selected group within that partition, which means there is
+        # a deleted group
         # Also filter by scheme name if there's a filter defined.
-        if p.groups and (schemes is None or p.scheme.name in schemes):
+        selected_groups = set(xblock.group_access.get(p.id, []) or [])
+        if (p.groups or selected_groups) and (schemes is None or p.scheme.name in schemes):
 
             # First, add groups defined by the partition
             groups = []
             for g in p.groups:
-
                 # Falsey group access for a partition mean that all groups
                 # are selected.  In the UI, though, we don't show the particular
                 # groups selected, since there's a separate option for "all users".
-                selected_groups = set(xblock.group_access.get(p.id, []) or [])
                 groups.append({
                     "id": g.id,
                     "name": g.name,
@@ -454,7 +455,7 @@ def get_user_partition_info(xblock, schemes=None, course=None):
     return partitions
 
 
-def get_visibility_partition_info(xblock):
+def get_visibility_partition_info(xblock, course=None):
     """
     Retrieve user partition information for the component visibility editor.
 
@@ -463,12 +464,16 @@ def get_visibility_partition_info(xblock):
     Arguments:
         xblock (XBlock): The component being edited.
 
+        course (XBlock): The course descriptor.  If provided, uses this to look up the user partitions
+            instead of loading the course.  This is useful if we're calling this function multiple
+            times for the same course want to minimize queries to the modulestore.
+
     Returns: dict
 
     """
     selectable_partitions = []
     # We wish to display enrollment partitions before cohort partitions.
-    enrollment_user_partitions = get_user_partition_info(xblock, schemes=["enrollment_track"])
+    enrollment_user_partitions = get_user_partition_info(xblock, schemes=["enrollment_track"], course=course)
 
     # For enrollment partitions, we only show them if there is a selected group or
     # or if the number of groups > 1.
@@ -477,7 +482,7 @@ def get_visibility_partition_info(xblock):
             selectable_partitions.append(partition)
 
     # Now add the cohort user partitions.
-    selectable_partitions = selectable_partitions + get_user_partition_info(xblock, schemes=["cohort"])
+    selectable_partitions = selectable_partitions + get_user_partition_info(xblock, schemes=["cohort"], course=course)
 
     # Find the first partition with a selected group. That will be the one initially enabled in the dialog
     # (if the course has only been added in Studio, only one partition should have a selected group).
@@ -526,4 +531,4 @@ def is_self_paced(course):
     """
     Returns True if course is self-paced, False otherwise.
     """
-    return course and course.self_paced and SelfPacedConfiguration.current().enabled
+    return course and course.self_paced

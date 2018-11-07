@@ -3,17 +3,19 @@
 
   .user-info {
     @extend .sidebar;
+
     border-left: 1px solid #d3d3d3;
-    border-radius: 0px 4px 4px 0;
+    border-radius: 0 4px 4px 0;
     border-right: 0;
 
-    &:after {
+    &::after {
       left: -1px;
       right: auto;
     }
 
     header {
       @extend .bottom-border;
+
       margin: 0;
       padding: lh(0.5);
 
@@ -34,9 +36,11 @@
         padding: lh(0.5) 0 lh(0.5) lh(0.5);
         position: relative;
         text-decoration: none;
+
         @include transition(none);
 
-        div#location_sub, div#language_sub {
+        div#location_sub,
+        div#language_sub {
           font-weight: bold;
           display: inline-block;
 
@@ -45,14 +49,11 @@
           }
 
           input {
-
             &[type="text"] {
               @include box-sizing(border-box);
+
               margin: lh(0.5) 0;
               width: 100%;
-            }
-
-            &[type="input"]{
             }
           }
 
@@ -74,10 +75,10 @@
           font-size: 12px;
           position: absolute;
           right: lh(0.5);
-          text-transform: uppercase;
           top: 9px;
 
-          &:hover, &:focus {
+          &:hover,
+          &:focus {
             color: #555;
           }
         }
@@ -105,10 +106,10 @@
           padding: 0;
           position: absolute;
           right: lh(0.5);
-          text-transform: uppercase;
           top: 9px;
 
-          &:hover, &:focus {
+          &:hover,
+          &:focus {
             color: #555;
           }
         }
@@ -118,14 +119,13 @@
     #change_password_pop {
       border-bottom: 1px solid #d3d3d3;
       box-shadow: 0 1px 0 #eee;
-      color: #4D4D4D;
+      color: #4d4d4d;
       padding: 7px lh();
 
       h2 {
         font-size: $body-font-size;
         font-weight: bold;
         margin-top: 0;
-        text-transform: uppercase;
       }
     }
   }
@@ -136,10 +136,12 @@
     header {
       @extend .clearfix;
       @extend h1.top-header;
+
       margin-bottom: lh();
 
       .hd {
         @include float(left);
+
         font-size: 1em;
         font-weight: 100;
         margin: 0;
@@ -155,16 +157,19 @@
     #course-success {
       margin-bottom: ($baseline*1.5);
       text-align: center;
+
       > a {
         @include button(simple, $button-color);
         @include box-sizing(border-box);
+
         border-radius: 3px;
-        font: normal 15px/1.6rem $sans-serif;
+        font: normal 15px/1.6rem $font-family-sans-serif;
         letter-spacing: 0;
         padding: 5px 18px 6px;
         text-align: center;
 
-        &:hover, &:focus {
+        &:hover,
+        &:focus {
           text-decoration: none;
         }
       }
@@ -175,13 +180,15 @@
       width: 100%;
     }
 
-    > .credit-eligibility{
+    > .credit-eligibility {
       border-top: 1px solid $lightGrey;
       margin-top: lh();
+
       @include padding-left(0);
 
       > .credit-eligibility-container {
-          padding: lh();
+        padding: lh();
+
         > .credit-help {
           display: inline-block;
           background: $blue;
@@ -192,43 +199,58 @@
           border-radius: lh(0.9);
           border-color: $white;
           text-shadow: None;
+
           @include padding-left(0.2em);
         }
-        > .detail-collapse{
+
+        > .detail-collapse {
           border: none;
           box-shadow: none;
           background: $white;
           padding: 0;
           color: $blue;
+
           > i {
             padding: lh(0.25);
           }
-          > span{
+
+          > span {
             color: inherit;
           }
         }
-        > .requirement-container{
+
+        > .requirement-container {
           padding: lh();
-          > .requirement{
+
+          > .requirement {
             border-bottom: 1px solid $lightGrey;
             padding: lh(0.5);
+
             > .requirement-name {
               width: bi-app-invert-percentage(40%);
               display: inline-block;
             }
-            > .requirement-status{
+
+            > .requirement-status {
               width: bi-app-invert-percentage(60%);
+
               @include float(right);
+
               display: inline-block;
-              .fa-times{
+
+              .fa-times {
                 @extend %t-icon6;
+
                 color: $alert-color;
               }
-              .fa-check{
+
+              .fa-check {
                 @extend %t-icon6;
-                color: $success-color;
+
+                color: theme-color("success");
               }
-              > .not-achieve{
+
+              > .not-achieve {
                 color: $darkGrey;
               }
             }
@@ -244,18 +266,20 @@
 
       > section {
         @extend .clearfix;
+
         border-bottom: 1px solid #e3e3e3;
         display: table;
         padding: lh() 0;
         width: 100%;
 
         &:last-child {
-          border-bottom: 0px;
+          border-bottom: 0;
         }
 
         .hd {
           @include border-right(1px dashed #ddd);
           @include box-sizing(border-box);
+
           display: table-cell;
           letter-spacing: 0;
           margin: 0;
@@ -268,11 +292,13 @@
 
         .sections {
           display: inline-block;
+
           @include padding-left(flex-gutter(9));
+
           width: flex-grid(7, 9);
 
           > div {
-            padding:0 0 lh() 0;
+            padding: 0 0 lh() 0;
 
             &:first-child {
               padding-top: 0;
@@ -294,9 +320,13 @@
 
             p {
               margin: lh(0.5) 0;
-              color: $gray-d1;;
+              color: $gray-d1;
               font-size: em(14);
               font-weight: 600;
+
+              &.override-notice {
+                color: $red-d1;
+              }
             }
 
             .scores {
@@ -306,7 +336,9 @@
                 display: inline-block;
                 width: auto;
                 margin: initial;
+
                 @include margin-right($baseline);
+
                 border: initial;
                 padding: initial;
                 font-size: em(14);
@@ -315,8 +347,10 @@
               dd {
                 display: inline-block;
                 margin: 0;
+
                 @include margin-right($baseline);
                 @include padding-right(1em);
+
                 font-size: em(14);
                 font-weight: normal;
                 color: $gray-d2;

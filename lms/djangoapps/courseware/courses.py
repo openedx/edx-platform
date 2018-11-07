@@ -6,32 +6,37 @@ import logging
 from collections import defaultdict
 from datetime import datetime
 
-import pytz
-from django.conf import settings
-from django.core.urlresolvers import reverse
-from django.http import Http404
-from fs.errors import ResourceNotFoundError
-from opaque_keys.edx.keys import UsageKey
-from path import Path as path
-
 import branding
+import pytz
 from courseware.access import has_access
+from courseware.access_response import StartDateError, MilestoneAccessError
 from courseware.date_summary import (
     CourseEndDate,
     CourseStartDate,
     TodaysDate,
     VerificationDeadlineDate,
-    VerifiedUpgradeDeadlineDate
+    VerifiedUpgradeDeadlineDate,
+    CertificateAvailableDate
 )
 from courseware.model_data import FieldDataCache
-from courseware.module_render import get_module, get_module_for_descriptor
+from courseware.module_render import get_module
+from django.conf import settings
+from django.urls import reverse
+from django.http import Http404, QueryDict
+from enrollment.api import get_course_enrollment_details
 from edxmako.shortcuts import render_to_string
+from fs.errors import ResourceNotFound
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
+from opaque_keys.edx.keys import UsageKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from path import Path as path
+from six import text_type
 from static_replace import replace_static_urls
 from student.models import CourseEnrollment
+from survey.utils import is_survey_required_and_unanswered
+from util.date_utils import strftime_localized
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.x_module import STUDENT_VIEW
@@ -71,7 +76,7 @@ def get_course_by_id(course_key, depth=0):
         raise Http404("Course not found: {}.".format(unicode(course_key)))
 
 
-def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=False):
+def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=False, check_survey_complete=True):
     """
     Given a course_key, look up the corresponding course descriptor,
     check that the user has the access to perform the specified action
@@ -83,9 +88,14 @@ def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=
 
     check_if_enrolled: If true, additionally verifies that the user is either enrolled in the course
       or has staff access.
+    check_survey_complete: If true, additionally verifies that the user has either completed the course survey
+      or has staff access.
+      Note: We do not want to continually add these optional booleans.  Ideally,
+      these special cases could not only be handled inside has_access, but could
+      be plugged in as additional callback checks for different actions.
     """
     course = get_course_by_id(course_key, depth)
-    check_course_access(course, user, action, check_if_enrolled)
+    check_course_access(course, user, action, check_if_enrolled, check_survey_complete)
     return course
 
 
@@ -108,27 +118,86 @@ def get_course_overview_with_access(user, action, course_key, check_if_enrolled=
     return course_overview
 
 
-def check_course_access(course, user, action, check_if_enrolled=False):
+def check_course_access(course, user, action, check_if_enrolled=False, check_survey_complete=True):
     """
     Check that the user has the access to perform the specified action
     on the course (CourseDescriptor|CourseOverview).
 
-    check_if_enrolled: If true, additionally verifies that the user is either
-    enrolled in the course or has staff access.
+    check_if_enrolled: If true, additionally verifies that the user is enrolled.
+    check_survey_complete: If true, additionally verifies that the user has completed the survey.
     """
-    access_response = has_access(user, action, course, course.id)
+    # Allow staff full access to the course even if not enrolled
+    if has_access(user, 'staff', course.id):
+        return
 
+    access_response = has_access(user, action, course, course.id)
     if not access_response:
+        # Redirect if StartDateError
+        if isinstance(access_response, StartDateError):
+            start_date = strftime_localized(course.start, 'SHORT_DATE')
+            params = QueryDict(mutable=True)
+            params['notlive'] = start_date
+            raise CourseAccessRedirect('{dashboard_url}?{params}'.format(
+                dashboard_url=reverse('dashboard'),
+                params=params.urlencode()
+            ), access_response)
+
+        # Redirect if the user must answer a survey before entering the course.
+        if isinstance(access_response, MilestoneAccessError):
+            raise CourseAccessRedirect('{dashboard_url}'.format(
+                dashboard_url=reverse('dashboard'),
+            ), access_response)
+
         # Deliberately return a non-specific error message to avoid
         # leaking info about access control settings
         raise CoursewareAccessException(access_response)
 
     if check_if_enrolled:
-        # Verify that the user is either enrolled in the course or a staff
-        # member.  If the user is not enrolled, raise a Redirect exception
-        # that will be handled by middleware.
-        if not ((user.id and CourseEnrollment.is_enrolled(user, course.id)) or has_access(user, 'staff', course)):
+        # If the user is not enrolled, redirect them to the about page
+        if not CourseEnrollment.is_enrolled(user, course.id):
             raise CourseAccessRedirect(reverse('about_course', args=[unicode(course.id)]))
+
+    # Redirect if the user must answer a survey before entering the course.
+    if check_survey_complete and action == 'load':
+        if is_survey_required_and_unanswered(user, course):
+            raise CourseAccessRedirect(reverse('course_survey', args=[unicode(course.id)]))
+
+
+def can_self_enroll_in_course(course_key):
+    """
+    Returns True if the user can enroll themselves in a course.
+
+    Note: an example of a course that a user cannot enroll in directly
+    is a CCX course. For such courses, a user can only be enrolled by
+    a CCX coach.
+    """
+    if hasattr(course_key, 'ccx'):
+        return False
+    return True
+
+
+def course_open_for_self_enrollment(course_key):
+    """
+    For a given course_key, determine if the course is available for enrollment
+    """
+    # Check to see if learners can enroll themselves.
+    if not can_self_enroll_in_course(course_key):
+        return False
+
+    # Check the enrollment start and end dates.
+    course_details = get_course_enrollment_details(unicode(course_key))
+    now = datetime.now().replace(tzinfo=pytz.UTC)
+    start = course_details['enrollment_start']
+    end = course_details['enrollment_end']
+
+    start = start if start is not None else now
+    end = end if end is not None else now
+
+    # If we are not within the start and end date for enrollment.
+    if now < start or end < now:
+        return False
+
+    return True
 
 
 def find_file(filesystem, dirs, filename):
@@ -139,13 +208,13 @@ def find_file(filesystem, dirs, filename):
     dirs: a list of path objects
     filename: a string
 
-    Returns d / filename if found in dir d, else raises ResourceNotFoundError.
+    Returns d / filename if found in dir d, else raises ResourceNotFound.
     """
     for directory in dirs:
         filepath = path(directory) / filename
         if filesystem.exists(filepath):
             return filepath
-    raise ResourceNotFoundError(u"Could not find {0}".format(filename))
+    raise ResourceNotFound(u"Could not find {0}".format(filename))
 
 
 def get_course_about_section(request, course, section_key):
@@ -155,6 +224,7 @@ def get_course_about_section(request, course, section_key):
 
     Valid keys:
     - overview
+    - about_sidebar_html
     - short_description
     - description
     - key_dates (includes start, end, exams, etc)
@@ -190,6 +260,7 @@ def get_course_about_section(request, course, section_key):
         'effort',
         'end_date',
         'prerequisites',
+        'about_sidebar_html',
         'ocw_links'
     }
 
@@ -226,7 +297,7 @@ def get_course_about_section(request, course, section_key):
         except ItemNotFoundError:
             log.warning(
                 u"Missing about section %s in course %s",
-                section_key, course.location.to_deprecated_string()
+                section_key, text_type(course.location)
             )
             return None
 
@@ -300,6 +371,7 @@ def get_course_date_blocks(course, user):
     sorted by date.
     """
     block_classes = (
+        CertificateAvailableDate,
         CourseEndDate,
         CourseStartDate,
         TodaysDate,
@@ -350,10 +422,10 @@ def get_course_syllabus_section(course, section_key):
                     course_id=course.id,
                     static_asset_path=course.static_asset_path,
                 )
-        except ResourceNotFoundError:
+        except ResourceNotFound:
             log.exception(
                 u"Missing syllabus section %s in course %s",
-                section_key, course.location.to_deprecated_string()
+                section_key, text_type(course.location)
             )
             return "! Syllabus missing !"
 
@@ -466,7 +538,7 @@ def get_problems_in_section(section):
     for subsection in section_descriptor.get_children():
         for vertical in subsection.get_children():
             for component in vertical.get_children():
-                if component.location.category == 'problem' and getattr(component, 'has_score', False):
+                if component.location.block_type == 'problem' and getattr(component, 'has_score', False):
                     problem_descriptors[unicode(component.location)] = component
 
     return problem_descriptors
@@ -523,3 +595,20 @@ def get_current_child(xmodule, min_depth=None, requested_child=None):
                 child = _get_default_child_module(children)
 
     return child
+
+
+def get_course_chapter_ids(course_key):
+    """
+    Extracts the chapter block keys from a course structure.
+
+    Arguments:
+        course_key (CourseLocator): The course key
+    Returns:
+        list (string): The list of string representations of the chapter block keys in the course.
+    """
+    try:
+        chapter_keys = modulestore().get_course(course_key).children
+    except Exception:  # pylint: disable=broad-except
+        log.exception('Failed to retrieve course from modulestore.')
+        return []
+    return [unicode(chapter_key) for chapter_key in chapter_keys if chapter_key.block_type == 'chapter']

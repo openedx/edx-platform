@@ -4,7 +4,8 @@
 <%namespace name='static' file='../static_content.html'/>
 
 <%!
-from openedx.core.djangolib.markup import HTML
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
 %>
 
@@ -15,50 +16,52 @@ from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
         style="display: none"
         %endif
     >
-        <button type="button" class="btn btn-brand focusable action-toggle-verification-sock">
-            Learn About Verified Certificate
+        <button type="button" aria-expanded="false" class="btn btn-primary focusable action-toggle-verification-sock">
+            ${_('Learn About Verified Certificates')}
         </button>
         <div class="verification-main-panel">
             <div class="verification-desc-panel content-main">
-                <h2>edX Verified Certificate</h2>
-                <h4>Why upgrade?</h4>
+                <h2>${_('{platform_name} Verified Certificate').format(platform_name=settings.PLATFORM_NAME)}</h2>
+                <h3>${_('Why upgrade?')}</h3>
                 <ul>
-                    <li>Official proof of completion</li>
-                    <li>Easily shareable certificate</li>
-                    <li>Proven motivator to complete the course</li>
-                    <li>Certificate purchases help edX continue to offer free courses</li>
+                    <li>${_('Official proof of completion')}</li>
+                    <li>${_('Easily shareable certificate')}</li>
+                    <li>${_('Proven motivator to complete the course')}</li>
+                    <li>${_('Certificate purchases help {platform_name} continue to offer free courses').format(platform_name=settings.PLATFORM_NAME)}</li>
                 </ul>
-                <h4>How it works</h4>
+                <h3>${_('How it works')}</h3>
                 <ul>
-                    <li>Pay the Verified Certificate upgrade fee</li>
-                    <li>Verify your identity with a webcam and government-issued ID</li>
-                    <li>Study hard and pass the course</li>
-                    <li>Share your certificate with friends, employers, and others</li>
+                    <li>${_('Pay the Verified Certificate upgrade fee')}</li>
+                    <li>${_('Verify your identity with a webcam and government-issued ID')}</li>
+                    <li>${_('Study hard and pass the course')}</li>
+                    <li>${_('Share your certificate with friends, employers, and others')}</li>
                 </ul>
-                <h4>edX Learner Stories</h4>
-                <div class="learner-story-container">
-                    <img class="student-image" alt="Student Image" src="${static.url('course_experience/images/learner-quote.png')}" />
-                    <div class="story-quote">
-                        My certificate has helped me showcase my knowledge on my
-                        resume - I feel like this certificate could really help me land
-                        my dream job!
-                        <span class="author">- Christina Fong, edX Learner</span>
+                % if settings.PLATFORM_NAME == 'edX':
+                    <h3>${_('edX Learner Stories')}</h3>
+                    <div class="learner-story-container">
+                        <img class="student-image" alt="Student Image" src="${static.url('course_experience/images/learner-quote.png')}" />
+                        <div class="story-quote">
+                            ${_('My certificate has helped me showcase my knowledge on my \
+                            resume - I feel like this certificate could really help me land \
+                            my dream job!')}
+                            <span class="author">- ${_('{learner_name}, edX Learner').format(learner_name='Christina Fong')}</span>
+                        </div>
                     </div>
-                </div>
-                <div class="learner-story-container">
-                    <img class="student-image" alt="Student Image" src="${static.url('course_experience/images/learner-quote2.png')}" />
-                    <div class="story-quote">
-                        I wanted to include a verified certificate on my resume and my profile to
-                        illustrate that I am working towards this goal I have and that I have
-                        achieved something while I was unemployed.<br/>
-                        <span class="author">- Cheryl Troell, edX Learner</span>
+                    <div class="learner-story-container">
+                        <img class="student-image" alt="Student Image" src="${static.url('course_experience/images/learner-quote2.png')}" />
+                        <div class="story-quote">
+                            ${_('I wanted to include a verified certificate on my resume and my profile to \
+                            illustrate that I am working towards this goal I have and that I have \
+                            achieved something while I was unemployed.')}<br/>
+                            <span class="author">- ${_('{learner_name}, edX Learner').format(learner_name='Cheryl Troell')}</span>
+                        </div>
                     </div>
-                </div>
-                <img class="mini-cert" src="${static.url('course_experience/images/verified-cert.png')}"/>
-                <a href="/verify_student/upgrade/${course_id}/">
-                    <button type="button" class="btn btn-brand stuck-top focusable action-upgrade-certificate">
-                        Upgrade Now (${HTML(course_price)})
-                    </button>
+                % endif
+                <img class="mini-cert" alt="Example Certificate Image" src="${static.url('course_experience/images/verified-cert.png')}"/>
+                <a href="${upgrade_url}">
+                    <div class="btn btn-upgrade stuck-top focusable action-upgrade-certificate" data-creative="original_sock" data-position="sock">
+                        ${Text(_('Upgrade ({course_price})')).format(course_price=HTML(course_price))}
+                    </div>
                 </a>
             </div>
         </div>

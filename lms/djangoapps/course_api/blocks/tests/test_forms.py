@@ -22,6 +22,8 @@ class TestBlockListGetForm(FormTestMixin, SharedModuleStoreTestCase):
     """
     Tests for BlockListGetForm
     """
+    shard = 4
+
     FORM_CLASS = BlockListGetForm
 
     @classmethod

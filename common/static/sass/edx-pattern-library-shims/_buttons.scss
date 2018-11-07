@@ -2,7 +2,7 @@
 // LMS Problem Feedback Revamp styling
 // Mirror styles from the Pattern Library
 
-@import 'base/variables';
+@import 'lms/theme/variables';
 
 
 // ----------------------------
@@ -43,6 +43,7 @@
       @include margin-right(0);
     }
   }
+
   &.btn-small {
     @extend %btn-small;
   }
@@ -53,6 +54,7 @@
 // ----------------------------
 .btn-default {
   @extend %btn-shims;
+
   border-color: $btn-default-border-color;
   background: $btn-default-background;
   color: $btn-default-color;
@@ -84,10 +86,11 @@
 }
 
 // ----------------------------
-// #BRAND
+// #PRIMARY
 // ----------------------------
-.btn-brand {
+.btn-primary {
   @extend %btn-shims;
+
   border-color: $btn-brand-border-color;
   background: $btn-brand-background;
   color: $btn-brand-color;
@@ -119,3 +122,38 @@
   }
 }
 
+// ----------------------------
+// #UPGRADE
+// ----------------------------
+.btn-upgrade {
+  @extend %btn-shims;
+
+  border-color: $btn-upgrade-border-color;
+  background: $btn-upgrade-background;
+  color: $btn-upgrade-color;
+
+  // STATE: hover and focus
+  &:hover,
+  &.is-hovered,
+  &:focus,
+  &.is-focused {
+    border-color: $btn-upgrade-focus-border-color;
+    background-color: $btn-upgrade-focus-background;
+    color: $btn-upgrade-focus-color;
+  }
+
+  // STATE: is disabled
+  &:disabled,
+  &.is-disabled {
+    border-color: $btn-disabled-border-color;
+    background: $btn-brand-disabled-background;
+    color: $btn-upgrade-color;
+  }
+}
+
+// ----------------------------
+// #BRAND
+// ----------------------------
+.btn-brand {
+  @extend .btn-primary;
+}

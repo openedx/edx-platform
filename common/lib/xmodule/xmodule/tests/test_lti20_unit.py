@@ -3,7 +3,7 @@
 import datetime
 import textwrap
 
-from django.utils.timezone import UTC
+from pytz import UTC
 from mock import Mock
 from xmodule.lti_module import LTIDescriptor
 from xmodule.lti_2_util import LTIError
@@ -13,6 +13,7 @@ from . import LogicTest
 
 class LTI20RESTResultServiceTest(LogicTest):
     """Logic tests for LTI module. LTI2.0 REST ResultService"""
+    shard = 1
     descriptor_class = LTIDescriptor
 
     def setUp(self):
@@ -251,7 +252,10 @@ class LTI20RESTResultServiceTest(LogicTest):
         self.assertIsNone(self.xmodule.module_score)
         self.assertEqual(self.xmodule.score_comment, u"")
         (_, evt_type, called_grade_obj), _ = self.system.publish.call_args
-        self.assertEqual(called_grade_obj, {'user_id': self.USER_STANDIN.id, 'value': None, 'max_value': None})
+        self.assertEqual(
+            called_grade_obj,
+            {'user_id': self.USER_STANDIN.id, 'value': None, 'max_value': None, 'score_deleted': True},
+        )
         self.assertEqual(evt_type, 'grade')
 
     def test_lti20_delete_success(self):
@@ -271,7 +275,10 @@ class LTI20RESTResultServiceTest(LogicTest):
         self.assertIsNone(self.xmodule.module_score)
         self.assertEqual(self.xmodule.score_comment, u"")
         (_, evt_type, called_grade_obj), _ = self.system.publish.call_args
-        self.assertEqual(called_grade_obj, {'user_id': self.USER_STANDIN.id, 'value': None, 'max_value': None})
+        self.assertEqual(
+            called_grade_obj,
+            {'user_id': self.USER_STANDIN.id, 'value': None, 'max_value': None, 'score_deleted': True},
+        )
         self.assertEqual(evt_type, 'grade')
 
     def test_lti20_put_set_score_success(self):
@@ -288,7 +295,10 @@ class LTI20RESTResultServiceTest(LogicTest):
         self.assertEqual(self.xmodule.score_comment, u"ಠ益ಠ")
         (_, evt_type, called_grade_obj), _ = self.system.publish.call_args
         self.assertEqual(evt_type, 'grade')
-        self.assertEqual(called_grade_obj, {'user_id': self.USER_STANDIN.id, 'value': 0.1, 'max_value': 1.0})
+        self.assertEqual(
+            called_grade_obj,
+            {'user_id': self.USER_STANDIN.id, 'value': 0.1, 'max_value': 1.0, 'score_deleted': False},
+        )
 
     def test_lti20_get_no_score_success(self):
         """
@@ -379,7 +389,7 @@ class LTI20RESTResultServiceTest(LogicTest):
         Test that we get a 404 when accept_grades_past_due is False and it is past due
         """
         self.setup_system_xmodule_mocks_for_lti20_request_test()
-        self.xmodule.due = datetime.datetime.now(UTC())
+        self.xmodule.due = datetime.datetime.now(UTC)
         self.xmodule.accept_grades_past_due = False
         mock_request = self.get_signed_lti20_mock_request(self.GOOD_JSON_PUT)
         response = self.xmodule.lti_2_0_result_rest_handler(mock_request, "user/abcd")

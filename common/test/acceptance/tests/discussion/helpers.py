@@ -34,7 +34,8 @@ class BaseDiscussionMixin(object):
         )
         for i in range(num_responses):
             thread_fixture.addResponse(Response(id=str(i), body=str(i)))
-        thread_fixture.push()
+        response = thread_fixture.push()
+        self.assertTrue(response.ok, "Failed to push discussion content")
         self.setup_thread_page(thread_id)
         return thread_id
 
@@ -52,7 +53,8 @@ class BaseDiscussionMixin(object):
             )
             self.thread_ids.append(thread_id)
         thread_fixture = MultipleThreadFixture(threads)
-        thread_fixture.push()
+        response = thread_fixture.push()
+        self.assertTrue(response.ok, "Failed to push discussion content")
 
 
 class CohortTestMixin(object):

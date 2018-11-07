@@ -61,6 +61,7 @@ $spacing-horizontal:        (
   }
 
   @warn "Unknown `#{$key}` in $spacing-vertical.";
+
   @return null;
 }
 
@@ -71,6 +72,7 @@ $spacing-horizontal:        (
   }
 
   @warn "Unknown `#{$key}` in $spacing-horizontal.";
+
   @return null;
 }
 
@@ -104,6 +106,7 @@ $font-sizes: (
   }
 
   @warn "Unknown `#{$key}` in $font-sizes.";
+
   @return null;
 }
 
@@ -114,6 +117,7 @@ $font-sizes: (
   }
 
   @warn "Unknown `#{$key}` in $font-weights.";
+
   @return null;
 }
 
@@ -127,8 +131,7 @@ $font-sizes: (
 
 // +Colors - UXPL new pattern library colors
 // ====================
-$uxpl-blue-base: rgba(0, 116, 180, 1) !default; // wcag2a compliant
-$uxpl-blue-hover-active: darken($uxpl-blue-base, 7%) !default; // wcag2a compliant
+$uxpl-blue-hover-active: darken($primary, 7%) !default; // wcag2a compliant
 
 $uxpl-green-base: rgba(0, 129, 0, 1) !default; // wcag2a compliant
 $uxpl-green-hover-active: lighten($uxpl-green-base, 7%) !default; // wcag2a compliant
@@ -140,17 +143,15 @@ $uxpl-gray-background: rgb(217, 217, 217) !default;
 
 // Alert styles
 $error-color: rgb(203, 7, 18) !default;
-$success-color: rgb(0, 155, 0) !default;
 $warning-color: rgb(255, 192, 31) !default;
 $warning-color-accent: rgb(255, 252, 221) !default;
-$general-color: $uxpl-blue-base !default;;
-$general-color-accent: $uxpl-blue-base !default
-
+$general-color: theme-color("primary") !default;
+$general-color-accent: theme-color("primary") !default;
 
 // CAPA correctness color to be consistent with Alert styles above
-$correct: $success-color !default;
-$partially-correct: $success-color !default;
-$incorrect: $error-color !default;
+$correct: theme-color("success") !default;
+$partially-correct: theme-color("success") !default;
+$incorrect: theme-color("danger") !default;
 $submitted: $general-color !default;
 
 
@@ -163,23 +164,33 @@ $btn-disabled-color:                        #6b6969 !default;
 // base button
 $btn-default-border-color:                transparent !default;
 $btn-default-background:                  transparent !default;
-$btn-default-color:                       $uxpl-blue-base !default;
-$btn-default-focus-border-color:          $uxpl-blue-base !default;
-$btn-default-focus-color:                 $uxpl-blue-base !default;
-$btn-default-active-border-color:         $uxpl-blue-base !default;
-$btn-default-active-color:                $uxpl-blue-base !default;
+$btn-default-color:                       theme-color("primary") !default;
+$btn-default-focus-border-color:          theme-color("primary") !default;
+$btn-default-focus-color:                 theme-color("primary") !default;
+$btn-default-active-border-color:         theme-color("primary") !default;
+$btn-default-active-color:                theme-color("primary") !default;
 
 // brand button
-$btn-brand-border-color:                  $uxpl-blue-base !default;
-$btn-brand-background:                    $uxpl-blue-base !default;
+$btn-brand-border-color:                  theme-color("primary") !default;
+$btn-brand-background:                    theme-color("primary") !default;
 $btn-brand-color:                         #fcfcfc !default;
 $btn-brand-focus-color:                   $btn-brand-color !default;
 $btn-brand-focus-border-color:            $uxpl-blue-hover-active !default;
 $btn-brand-focus-background:              $uxpl-blue-hover-active !default;
-$btn-brand-active-border-color:           $uxpl-blue-base !default;
-$btn-brand-active-background:             $uxpl-blue-base !default;
+$btn-brand-active-border-color:           theme-color("primary") !default;
+$btn-brand-active-background:             theme-color("primary") !default;
 $btn-brand-disabled-background:           #f2f3f3 !default;
 $btn-brand-disabled-color:                #676666 !default;
+
+// Upgrade button
+$btn-upgrade-border-color:                $uxpl-green-base !default;
+$btn-upgrade-background:                  $uxpl-green-base !default;
+$btn-upgrade-color:                       #fcfcfc !default;
+$btn-upgrade-focus-color:                 $btn-upgrade-color !default;
+$btn-upgrade-focus-border-color:          rgb(0, 155, 0) !default;
+$btn-upgrade-focus-background:            rgb(0, 155, 0) !default;
+$btn-upgrade-active-border-color:         $uxpl-green-base !default;
+$btn-upgrade-active-background:           $uxpl-green-base !default;
 
 // ----------------------------
 // #SETTINGS
@@ -193,6 +204,7 @@ $btn-border-radius:                         $component-border-radius !default;
 // sizes
 $btn-large-padding-vertical: spacing-vertical(small);
 $btn-large-padding-horizontal: spacing-horizontal(mid-large);
+
 
 $btn-base-padding-vertical: spacing-vertical(x-small);
 $btn-base-padding-horizontal: spacing-horizontal(base);
@@ -223,8 +235,10 @@ $btn-small-padding-horizontal: spacing-horizontal(small);
 
 @mixin notification-by-type($color) {
   border-top: 3px solid $color;
+
   .icon {
     @include margin-right(3 * $baseline/ 4);
+
     color: $color;
   }
 }

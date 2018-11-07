@@ -46,11 +46,11 @@
                 children: count > 0 ? (function() {
                     var _i, _results;
                     _results = [];
-                    for (index = _i = 1; 1 <= count ? _i <= count : _i >= count; index = 1 <= count ? ++_i : --_i) {
+                    for (index = _i = 1; count >= 1 ? _i <= count : _i >= count; index = count >= 1 ? ++_i : --_i) {
                         _results.push(createTestResponseJson(index));
                     }
                     return _results;
-                })() : []
+                }()) : []
             }, options));
         };
         createTestResponseJson = function(index) {
@@ -305,14 +305,14 @@
                 );
             };
             _.each({
-                'no': 0,
-                'one': 1,
-                'many': 5
+                no: 0,
+                one: 1,
+                many: 5
             }, function(numEndorsed, endorsedDesc) {
                 return _.each({
-                    'no': 0,
-                    'one': 1,
-                    'many': 5
+                    no: 0,
+                    one: 1,
+                    many: 5
                 }, function(numNonEndorsed, nonEndorsedDesc) {
                     it(
                         'renders correctly with ' + endorsedDesc + ' marked answer(s) and ' + nonEndorsedDesc +

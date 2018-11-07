@@ -3,10 +3,9 @@ Tests third_party_auth admin views
 """
 import unittest
 
-from django.conf import settings
 from django.contrib.admin.sites import AdminSite
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.forms import models
 
 from student.tests.factories import UserFactory

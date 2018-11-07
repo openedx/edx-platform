@@ -27,9 +27,9 @@
             });
 
             it('correctly adds ARIA attributes to fullscreen control', function() {
-                var fullScreenControl = $('.add-fullscreen');
+                var $fullScreenControl = $('.add-fullscreen');
 
-                expect(fullScreenControl).toHaveAttrs({
+                expect($fullScreenControl).toHaveAttrs({
                     'aria-disabled': 'false'
                 });
             });
@@ -48,13 +48,13 @@
             });
 
             it('correctly updates ARIA on state change', function() {
-                var fullScreenControl = $('.add-fullscreen');
-                fullScreenControl.click();
-                expect(fullScreenControl).toHaveAttrs({
+                var $fullScreenControl = $('.add-fullscreen');
+                $fullScreenControl.click();
+                expect($fullScreenControl).toHaveAttrs({
                     'aria-disabled': 'false'
                 });
-                fullScreenControl.click();
-                expect(fullScreenControl).toHaveAttrs({
+                $fullScreenControl.click();
+                expect($fullScreenControl).toHaveAttrs({
                     'aria-disabled': 'false'
                 });
             });

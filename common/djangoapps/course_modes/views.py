@@ -3,11 +3,13 @@ Views for the course_mode module
 """
 
 import decimal
+import json
 import urllib
 
+import waffle
 from babel.dates import format_datetime
 from django.contrib.auth.decorators import login_required
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import transaction
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect
@@ -17,18 +19,16 @@ from django.utils.translation import get_language, to_locale
 from django.views.generic.base import View
 from ipware.ip import get_ip
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from six import text_type
 
 from course_modes.models import CourseMode
 from courseware.access import has_access
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.commerce.utils import EcommerceService
+from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
+from openedx.core.djangoapps.catalog.utils import get_currency_data
 from openedx.core.djangoapps.embargo import api as embargo_api
-from openedx.features.enterprise_support import api as enterprise_api
-from openedx.features.enterprise_support.api import get_enterprise_consent_url
 from student.models import CourseEnrollment
-from third_party_auth.decorators import tpa_hint_ends_existing_session
-from util import organizations_helpers as organization_api
 from util.db import outer_atomic
 from xmodule.modulestore.django import modulestore
 
@@ -55,7 +55,6 @@ class ChooseModeView(View):
         """
         return super(ChooseModeView, self).dispatch(*args, **kwargs)
 
-    @method_decorator(tpa_hint_ends_existing_session)
     @method_decorator(login_required)
     @method_decorator(transaction.atomic)
     def get(self, request, course_id, error=None):
@@ -105,29 +104,23 @@ class ChooseModeView(View):
                     redirect_url = ecommerce_service.get_checkout_page_url(professional_mode.bulk_sku)
             return redirect(redirect_url)
 
+        course = modulestore().get_course(course_key)
+
         # If there isn't a verified mode available, then there's nothing
         # to do on this page.  Send the user to the dashboard.
         if not CourseMode.has_verified_mode(modes):
-            # If the learner has arrived at this screen via the traditional enrollment workflow,
-            # then they should already be enrolled in an audit mode for the course, assuming one has
-            # been configured.  However, alternative enrollment workflows have been introduced into the
-            # system, such as third-party discovery.  These workflows result in learners arriving
-            # directly at this screen, and they will not necessarily be pre-enrolled in the audit mode.
-            # In this particular case, Audit is the ONLY option available, and thus we need to ensure
-            # that the learner is truly enrolled before we redirect them away to the dashboard.
-            if len(modes) == 1 and modes.get(CourseMode.AUDIT):
-                CourseEnrollment.enroll(request.user, course_key, CourseMode.AUDIT)
-                return redirect(self._get_redirect_url_for_audit_enrollment(request, course_id))
             return redirect(reverse('dashboard'))
 
         # If a user has already paid, redirect them to the dashboard.
         if is_active and (enrollment_mode in CourseMode.VERIFIED_MODES + [CourseMode.NO_ID_PROFESSIONAL_MODE]):
+            # If the course has started redirect to course home instead
+            if course.has_started():
+                return redirect(reverse('openedx.course_experience.course_home', kwargs={'course_id': course_key}))
             return redirect(reverse('dashboard'))
 
         donation_for_course = request.session.get("donation_for_course", {})
         chosen_price = donation_for_course.get(unicode(course_key), None)
 
-        course = modulestore().get_course(course_key)
         if CourseEnrollment.is_enrollment_closed(request.user, course):
             locale = to_locale(get_language())
             enrollment_end_date = format_datetime(course.enrollment_end, 'short', locale=locale)
@@ -146,7 +139,7 @@ class ChooseModeView(View):
             CourseMode.is_credit_mode(mode) for mode
             in CourseMode.modes_for_course(course_key, only_selectable=False)
         )
-        course_id = course_key.to_deprecated_string()
+        course_id = text_type(course_key)
         context = {
             "course_modes_choose_url": reverse(
                 "course_modes_choose",
@@ -162,40 +155,16 @@ class ChooseModeView(View):
             "responsive": True,
             "nav_hidden": True,
         }
+        context.update(
+            get_experiment_user_metadata_context(
+                course,
+                request.user,
+            )
+        )
 
         title_content = _("Congratulations!  You are now enrolled in {course_name}").format(
             course_name=course.display_name_with_default_escaped
         )
-        enterprise_learner_data = enterprise_api.get_enterprise_learner_data(site=request.site, user=request.user)
-        if enterprise_learner_data:
-            enterprise_learner = enterprise_learner_data[0]
-            is_course_in_enterprise_catalog = enterprise_api.is_course_in_enterprise_catalog(
-                site=request.site,
-                course_id=course_id,
-                enterprise_catalog_id=enterprise_learner['enterprise_customer']['catalog']
-            )
-
-            if is_course_in_enterprise_catalog:
-                partner_names = partner_name = course.display_organization \
-                    if course.display_organization else course.org
-                enterprise_name = enterprise_learner['enterprise_customer']['name']
-                organizations = organization_api.get_course_organizations(course_id=course.id)
-                if organizations:
-                    partner_names = ' and '.join([org.get('name', partner_name) for org in organizations])
-
-                title_content = _("Welcome, {username}! You are about to enroll in {course_name},"
-                                  " from {partner_names}, sponsored by {enterprise_name}. Please select your enrollment"
-                                  " information below.").format(
-                    username=request.user.username,
-                    course_name=course.display_name_with_default_escaped,
-                    partner_names=partner_names,
-                    enterprise_name=enterprise_name
-                )
-
-                # Hide the audit modes for this enterprise customer, if necessary
-                if not enterprise_learner['enterprise_customer'].get('enable_audit_enrollment'):
-                    for audit_mode in CourseMode.AUDIT_MODES:
-                        modes.pop(audit_mode, None)
 
         context["title_content"] = title_content
 
@@ -217,9 +186,16 @@ class ChooseModeView(View):
                 context["sku"] = verified_mode.sku
                 context["bulk_sku"] = verified_mode.bulk_sku
 
+        context['currency_data'] = []
+        if waffle.switch_is_active('local_currency'):
+            if 'edx-price-l10n' not in request.COOKIES:
+                currency_data = get_currency_data()
+                try:
+                    context['currency_data'] = json.dumps(currency_data)
+                except TypeError:
+                    pass
         return render_to_response("course_modes/choose.html", context)
 
-    @method_decorator(tpa_hint_ends_existing_session)
     @method_decorator(transaction.non_atomic_requests)
     @method_decorator(login_required)
     @method_decorator(outer_atomic(read_committed=True))
@@ -237,7 +213,7 @@ class ChooseModeView(View):
             below the minimum, otherwise redirects to the verification flow.
 
         """
-        course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        course_key = CourseKey.from_string(course_id)
         user = request.user
 
         # This is a bit redundant with logic in student.views.change_enrollment,
@@ -252,14 +228,25 @@ class ChooseModeView(View):
         allowed_modes = CourseMode.modes_for_course_dict(course_key)
         if requested_mode not in allowed_modes:
             return HttpResponseBadRequest(_("Enrollment mode not supported"))
-        if requested_mode in CourseMode.AUDIT_MODES:
+
+        if requested_mode == 'audit':
             # If the learner has arrived at this screen via the traditional enrollment workflow,
             # then they should already be enrolled in an audit mode for the course, assuming one has
             # been configured.  However, alternative enrollment workflows have been introduced into the
             # system, such as third-party discovery.  These workflows result in learners arriving
             # directly at this screen, and they will not necessarily be pre-enrolled in the audit mode.
+            CourseEnrollment.enroll(request.user, course_key, CourseMode.AUDIT)
+            # If the course has started redirect to course home instead
+            if course.has_started():
+                return redirect(reverse('openedx.course_experience.course_home', kwargs={'course_id': course_key}))
+            return redirect(reverse('dashboard'))
+
+        if requested_mode == 'honor':
             CourseEnrollment.enroll(user, course_key, mode=requested_mode)
-            return redirect(self._get_redirect_url_for_audit_enrollment(request, course_id))
+            # If the course has started redirect to course home instead
+            if course.has_started():
+                return redirect(reverse('openedx.course_experience.course_home', kwargs={'course_id': course_key}))
+            return redirect(reverse('dashboard'))
 
         mode_info = allowed_modes[requested_mode]
 
@@ -289,44 +276,6 @@ class ChooseModeView(View):
                     kwargs={'course_id': unicode(course_key)}
                 )
             )
-
-    def _get_redirect_url_for_audit_enrollment(self, request, course_id):
-        """
-        After a user has been enrolled in a course in an audit mode, determine the appropriate location
-        to which they ought to be redirected, bearing in mind enterprise data sharing consent considerations.
-        """
-        enterprise_learner_data = enterprise_api.get_enterprise_learner_data(site=request.site, user=request.user)
-
-        if enterprise_learner_data:
-            enterprise_learner = enterprise_learner_data[0]
-            # If we have an enterprise learner, check to see if the current course is in the enterprise's catalog.
-            is_course_in_enterprise_catalog = enterprise_api.is_course_in_enterprise_catalog(
-                site=request.site,
-                course_id=course_id,
-                enterprise_catalog_id=enterprise_learner['enterprise_customer']['catalog']
-            )
-            # If the course is in the catalog, check for an existing Enterprise enrollment
-            if is_course_in_enterprise_catalog:
-                client = enterprise_api.EnterpriseApiClient()
-                if not client.get_enterprise_course_enrollment(enterprise_learner['id'], course_id):
-                    # If there's no existing Enterprise enrollment, create one.
-                    client.post_enterprise_course_enrollment(request.user.username, course_id, None)
-                # Check if consent is required, and generate a redirect URL to the
-                # consent service if so; this function returns None if consent
-                # is not required or has already been granted.
-                consent_url = get_enterprise_consent_url(
-                    request,
-                    course_id,
-                    user=request.user,
-                    return_to='dashboard',
-                    course_specific_return=False,
-                )
-                # If we got a redirect URL for consent, go there.
-                if consent_url:
-                    return consent_url
-
-        # If the enrollment isn't Enterprise-linked, or if consent isn't necessary, go to the Dashboard.
-        return reverse('dashboard')
 
     def _get_requested_mode(self, request_dict):
         """Get the user's requested mode

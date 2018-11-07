@@ -36,7 +36,7 @@ class BookmarkApiEventTestMixin(object):
         self.assertFalse(mock_tracker.called)  # pylint: disable=maybe-no-member
 
 
-@attr(shard=2)
+@attr(shard=9)
 @ddt.ddt
 @skip_unless_lms
 class BookmarksAPITests(BookmarkApiEventTestMixin, BookmarksTestsBase):

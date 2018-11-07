@@ -1,6 +1,15 @@
 """Middleware classes for third_party_auth."""
 
+import urlparse
+
+from django.contrib import messages
+from django.shortcuts import redirect
+from django.urls import reverse
+from django.utils.translation import ugettext as _
+from requests import HTTPError
 from social_django.middleware import SocialAuthExceptionMiddleware
+
+from student.helpers import get_next_url_for_login_page
 
 from . import pipeline
 
@@ -24,31 +33,18 @@ class ExceptionMiddleware(SocialAuthExceptionMiddleware):
 
         return redirect_uri
 
+    def process_exception(self, request, exception):
+        """Handles specific exception raised by Python Social Auth eg HTTPError."""
 
-class PipelineQuarantineMiddleware(object):
-    """
-    Middleware flushes the session if a user agent with a quarantined session
-    attempts to leave the quarantined set of views.
-    """
+        referer_url = request.META.get('HTTP_REFERER', '')
+        if (referer_url and isinstance(exception, HTTPError) and
+                exception.response.status_code == 502):
+            referer_url = urlparse.urlparse(referer_url).path
+            if referer_url == reverse('signin_user'):
+                messages.error(request, _('Unable to connect with the external provider, please try again'),
+                               extra_tags='social-auth')
 
-    def process_view(self, request, view_func, view_args, view_kwargs):  # pylint: disable=unused-argument
-        """
-        Check the session to see if we've quarantined the user to a particular
-        step of the authentication pipeline; if so, look up which modules the
-        user is allowed to browse to without breaking the pipeline. If the view
-        that's been requested is outside those modules, then flush the session.
+                redirect_url = get_next_url_for_login_page(request)
+                return redirect('/login?next=' + redirect_url)
 
-        In general, this middleware should be used in cases where allowing the
-        user to exit the running pipeline would be undesirable, and where it'd
-        be better to flush the session state rather than allow it. Pipeline
-        quarantining is utilized by the Enterprise application to enforce
-        collection of user consent for sharing data with a linked third-party
-        authentication provider.
-        """
-        if not pipeline.running(request):
-            return
-
-        view_module = view_func.__module__
-        quarantined_modules = request.session.get('third_party_auth_quarantined_modules')
-        if quarantined_modules is not None and not any(view_module.startswith(mod) for mod in quarantined_modules):
-            request.session.flush()
+        return super(ExceptionMiddleware, self).process_exception(request, exception)

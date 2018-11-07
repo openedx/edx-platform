@@ -5,7 +5,7 @@
  *
  *   getTitle():
  *     returns the title for the modal.
- *   getHTMLContent():
+ *   getContentHtml():
  *     returns the HTML content to be shown inside the modal.
  *
  * A modal implementation should also provide the following options:

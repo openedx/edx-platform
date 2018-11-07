@@ -102,4 +102,4 @@
          }
 
      });
- })(jQuery, _, Backbone, gettext);
+ }(jQuery, _, Backbone, gettext));

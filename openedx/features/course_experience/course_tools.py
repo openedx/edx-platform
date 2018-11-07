@@ -1,7 +1,7 @@
 """
 Support for course tool plugins.
 """
-from openedx.core.lib.api.plugins import PluginManager
+from openedx.core.lib.plugins import PluginManager
 
 # Stevedore extension point namespace
 COURSE_TOOLS_NAMESPACE = 'openedx.course_tool'
@@ -16,6 +16,14 @@ class CourseTool(object):
     not a requirement, and plugin implementations outside of this repo should
     simply follow the contract defined below.
     """
+    @classmethod
+    def analytics_id(cls):
+        """
+        Returns an id to uniquely identify this tool in analytics events.
+
+        For example, 'edx.bookmarks'.  New tools may warrant doc updates for the new id.
+        """
+        raise NotImplementedError("Must specify an id to enable course tool eventing.")
 
     @classmethod
     def is_enabled(cls, request, course_key):
@@ -65,3 +73,11 @@ class CourseToolsPluginManager(PluginManager):
         course_tools = cls.get_available_plugins().values()
         course_tools.sort(key=lambda course_tool: course_tool.title())
         return course_tools
+
+    @classmethod
+    def get_enabled_course_tools(cls, request, course_key):
+        """
+        Returns the course tools applicable to the current user and course.
+        """
+        course_tools = CourseToolsPluginManager.get_course_tools()
+        return filter(lambda tool: tool.is_enabled(request, course_key), course_tools)

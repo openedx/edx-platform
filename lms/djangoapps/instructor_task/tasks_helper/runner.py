@@ -2,7 +2,7 @@ import json
 import logging
 from time import time
 
-from celery import Task, current_task
+from celery import current_task
 from django.db import reset_queries
 
 import dogstats_wrapper as dog_stats_api

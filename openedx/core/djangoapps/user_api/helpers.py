@@ -10,7 +10,7 @@ from functools import wraps
 
 from django import forms
 from django.core.serializers.json import DjangoJSONEncoder
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponseBadRequest, HttpRequest
 from django.utils.encoding import force_text
 from django.utils.functional import Promise
 
@@ -121,12 +121,13 @@ class InvalidFieldError(Exception):
 class FormDescription(object):
     """Generate a JSON representation of a form. """
 
-    ALLOWED_TYPES = ["text", "email", "select", "textarea", "checkbox", "password", "hidden"]
+    ALLOWED_TYPES = ["text", "email", "select", "textarea", "checkbox", "plaintext", "password", "hidden"]
 
     ALLOWED_RESTRICTIONS = {
         "text": ["min_length", "max_length"],
-        "password": ["min_length", "max_length"],
-        "email": ["min_length", "max_length"],
+        "password": ["min_length", "max_length", "upper", "lower", "digits", "punctuation", "non_ascii", "words",
+                     "numeric", "alphabetic"],
+        "email": ["min_length", "max_length", "readonly"],
     }
 
     FIELD_TYPE_MAP = {
@@ -407,26 +408,32 @@ def shim_student_view(view_func, check_logged_in=False):
     """
     @wraps(view_func)
     def _inner(request):  # pylint: disable=missing-docstring
-        # Ensure that the POST querydict is mutable
-        request.POST = request.POST.copy()
+        # Make a copy of the current POST request to modify.
+        modified_request = request.POST.copy()
+        if isinstance(request, HttpRequest):
+            # Works for an HttpRequest but not a rest_framework.request.Request.
+            request.POST = modified_request
+        else:
+            # The request must be a rest_framework.request.Request.
+            request._data = modified_request
 
         # The login and registration handlers in student view try to change
         # the user's enrollment status if these parameters are present.
         # Since we want the JavaScript client to communicate directly with
         # the enrollment API, we want to prevent the student views from
         # updating enrollments.
-        if "enrollment_action" in request.POST:
-            del request.POST["enrollment_action"]
-        if "course_id" in request.POST:
-            del request.POST["course_id"]
+        if "enrollment_action" in modified_request:
+            del modified_request["enrollment_action"]
+        if "course_id" in modified_request:
+            del modified_request["course_id"]
 
         # Include the course ID if it's specified in the analytics info
         # so it can be included in analytics events.
-        if "analytics" in request.POST:
+        if "analytics" in modified_request:
             try:
-                analytics = json.loads(request.POST["analytics"])
+                analytics = json.loads(modified_request["analytics"])
                 if "enroll_course_id" in analytics:
-                    request.POST["course_id"] = analytics.get("enroll_course_id")
+                    modified_request["course_id"] = analytics.get("enroll_course_id")
             except (ValueError, TypeError):
                 LOGGER.error(
                     u"Could not parse analytics object sent to user API: {analytics}".format(
@@ -475,7 +482,7 @@ def shim_student_view(view_func, check_logged_in=False):
         # the request through authentication middleware.
         is_authenticated = (
             getattr(request, 'user', None) is not None
-            and request.user.is_authenticated()
+            and request.user.is_authenticated
         )
         if check_logged_in and not is_authenticated:
             # If we get a 403 status code from the student view

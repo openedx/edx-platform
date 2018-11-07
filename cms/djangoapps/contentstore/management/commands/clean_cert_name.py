@@ -4,6 +4,8 @@ erroneous certificate names.
 """
 
 from collections import namedtuple
+from six.moves import input
+from six import text_type
 
 from django.core.management.base import BaseCommand
 
@@ -150,10 +152,10 @@ class Command(BaseCommand):
         """
         headers = ["Course Key", "cert_name_short", "cert_name_short", "Should clean?"]
         col_widths = [
-            max(len(unicode(result[col])) for result in results + [headers])
+            max(len(text_type(result[col])) for result in results + [headers])
             for col in range(len(results[0]))
         ]
-        id_format = "{{:>{}}} |".format(len(unicode(len(results))))
+        id_format = "{{:>{}}} |".format(len(text_type(len(results))))
         col_format = "| {{:>{}}} |"
 
         self.stdout.write(id_format.format(""), ending='')
@@ -165,7 +167,7 @@ class Command(BaseCommand):
         for idx, result in enumerate(results):
             self.stdout.write(id_format.format(idx), ending='')
             for col, width in zip(result, col_widths):
-                self.stdout.write(col_format.format(width).format(unicode(col)), ending='')
+                self.stdout.write(col_format.format(width).format(text_type(col)), ending='')
             self.stdout.write("")
 
     def _commit(self, results):
@@ -191,7 +193,7 @@ class Command(BaseCommand):
 
         while True:
             self._display(results)
-            command = raw_input("<index>|commit|quit: ").strip()
+            command = input("<index>|commit|quit: ").strip()
 
             if command == 'quit':
                 return

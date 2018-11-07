@@ -1,4 +1,6 @@
 """
+THIS MODULE IS DEPRECATED IN FAVOR OF https://github.com/edx/xblock-lti-consumer
+
 Learning Tools Interoperability (LTI) module.
 
 
@@ -62,10 +64,11 @@ from xml.sax.saxutils import escape
 import bleach
 import mock
 import oauthlib.oauth1
-from django.utils.timezone import UTC
+from pytz import UTC
 from lxml import etree
 from oauthlib.oauth1.rfc5849 import signature
 from pkg_resources import resource_string
+from six import text_type
 from webob import Response
 from xblock.core import List, Scope, String, XBlock
 from xblock.fields import Boolean, Float
@@ -249,6 +252,8 @@ class LTIFields(object):
 
 class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
     """
+    THIS MODULE IS DEPRECATED IN FAVOR OF https://github.com/edx/xblock-lti-consumer
+
     Module provides LTI integration to course.
 
     Except usual Xmodule structure it proceeds with OAuth signing.
@@ -532,7 +537,7 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
         context_id is an opaque identifier that uniquely identifies the context (e.g., a course)
         that contains the link being launched.
         """
-        return self.course_id.to_deprecated_string()
+        return text_type(self.course_id)
 
     @property
     def role(self):
@@ -557,8 +562,8 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
         """
 
         client = oauthlib.oauth1.Client(
-            client_key=unicode(client_key),
-            client_secret=unicode(client_secret)
+            client_key=text_type(client_key),
+            client_secret=text_type(client_secret)
         )
 
         # Must have parameters for correct signing from LTI:
@@ -733,7 +738,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         try:
             imsx_messageIdentifier, sourcedId, score, action = self.parse_grade_xml_body(request.body)
         except Exception as e:
-            error_message = "Request body XML parsing error: " + escape(e.message)
+            error_message = "Request body XML parsing error: " + escape(text_type(e))
             log.debug("[LTI]: " + error_message)
             failure_values['imsx_description'] = error_message
             return Response(response_xml_template.format(**failure_values), content_type="application/xml")
@@ -743,7 +748,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
             self.verify_oauth_body_sign(request)
         except (ValueError, LTIError) as e:
             failure_values['imsx_messageIdentifier'] = escape(imsx_messageIdentifier)
-            error_message = "OAuth verification error: " + escape(e.message)
+            error_message = "OAuth verification error: " + escape(text_type(e))
             failure_values['imsx_description'] = error_message
             log.debug("[LTI]: " + error_message)
             return Response(response_xml_template.format(**failure_values), content_type="application/xml")
@@ -889,7 +894,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
             close_date = due_date + self.graceperiod  # pylint: disable=no-member
         else:
             close_date = due_date
-        return close_date is not None and datetime.datetime.now(UTC()) > close_date
+        return close_date is not None and datetime.datetime.now(UTC) > close_date
 
 
 class LTIDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRawDescriptor):

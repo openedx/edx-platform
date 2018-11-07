@@ -1,31 +1,34 @@
+from __future__ import print_function
+
 from django.contrib.auth.models import User
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
-    args = 'user'
-    help = "Show a user's roles and permissions"
+    help = "Show a user's roles and permissions."
+
+    def add_arguments(self, parser):
+        parser.add_argument('email_or_username',
+                            help='the email or username of the user')
 
     def handle(self, *args, **options):
-        print args
-        if len(args) != 1:
-            raise CommandError("The number of arguments does not match. ")
+        email_or_username = options['email_or_username']
         try:
-            if '@' in args[0]:
-                user = User.objects.get(email=args[0])
+            if '@' in email_or_username:
+                user = User.objects.get(email=email_or_username)
             else:
-                user = User.objects.get(username=args[0])
+                user = User.objects.get(username=email_or_username)
         except User.DoesNotExist:
-            print "User %s does not exist. " % args[0]
-            print "Available users: "
-            print User.objects.all()
+            print('User {} does not exist. '.format(email_or_username))
+            print('Available users: ')
+            print(User.objects.all())
             return
 
         roles = user.roles.all()
-        print "%s has %d roles:" % (user, len(roles))
+        print('{} has %d roles:'.format(user, len(roles)))
         for role in roles:
-            print "\t%s" % role
+            print('\t{}'.format(role))
 
         for role in roles:
-            print "%s has permissions: " % role
-            print role.permissions.all()
+            print('{} has permissions: '.format(role))
+            print(role.permissions.all())

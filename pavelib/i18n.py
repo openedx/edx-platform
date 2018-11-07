@@ -25,7 +25,6 @@ DEFAULT_SETTINGS = Env.DEVSTACK_SETTINGS
 @needs(
     "pavelib.prereqs.install_prereqs",
     "pavelib.i18n.i18n_validate_gettext",
-    "pavelib.assets.compile_coffeescript",
 )
 @cmdopts([
     ("verbose", "v", "Sets 'verbose' to True"),
@@ -315,7 +314,7 @@ def find_release_resources():
     if len(resources) == 2:
         return resources
 
-    if len(resources) == 0:
+    if not resources:
         raise ValueError("You need two release-* resources defined to use this command.")
     else:
         msg = "Strange Transifex config! Found these release-* resources:\n" + "\n".join(resources)

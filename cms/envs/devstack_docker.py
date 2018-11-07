@@ -9,12 +9,22 @@ LOGGING['handlers']['local'] = LOGGING['handlers']['tracking'] = {
 
 LOGGING['loggers']['tracking']['handlers'] = ['console']
 
-LMS_ROOT_URL = 'http://edx.devstack.lms:18000'
+LMS_BASE = 'edx.devstack.lms:18000'
+CMS_BASE = 'edx.devstack.studio:18010'
+LMS_ROOT_URL = 'http://{}'.format(LMS_BASE)
 
 FEATURES.update({
     'ENABLE_COURSEWARE_INDEX': False,
     'ENABLE_LIBRARY_INDEX': False,
-    'ENABLE_DISCUSSION_SERVICE': False,
+    'ENABLE_DISCUSSION_SERVICE': True,
 })
 
 CREDENTIALS_SERVICE_USERNAME = 'credentials_worker'
+
+OAUTH_OIDC_ISSUER = '{}/oauth2'.format(LMS_ROOT_URL)
+
+JWT_AUTH.update({
+    'JWT_SECRET_KEY': 'lms-secret',
+    'JWT_ISSUER': OAUTH_OIDC_ISSUER,
+    'JWT_AUDIENCE': 'lms-key',
+})

@@ -1,17 +1,18 @@
 define(['backbone'], function(Backbone) {
     /**
      * Model used for metadata setting editors. This model does not do its own saving,
-     * as that is done by module_edit.coffee.
+     * as that is done by module_edit.js.
      */
     var Metadata = Backbone.Model.extend({
         defaults: {
-            'field_name': null,
-            'display_name': null,
-            'value': null,
-            'explicitly_set': null,
-            'default_value': null,
-            'options': null,
-            'type': null
+            field_name: null,
+            display_name: null,
+            value: null,
+            explicitly_set: null,
+            default_value: null,
+            options: null,
+            type: null,
+            custom: false  // Used only for non-metadata fields
         },
 
         initialize: function() {
@@ -24,6 +25,11 @@ define(['backbone'], function(Backbone) {
          * property has changed.
          */
         isModified: function() {
+            // A non-metadata field will handle itself
+            if (this.get('custom') === true) {
+                return false;
+            }
+
             if (!this.get('explicitly_set') && !this.original_explicitly_set) {
                 return false;
             }

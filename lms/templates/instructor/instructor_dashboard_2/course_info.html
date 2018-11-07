@@ -44,24 +44,24 @@ from openedx.core.djangolib.markup import HTML, Text
   <h4 class="hd hd-4">${_("Basic Course Information")}</h4>
 
   <ul class="list-input">
-    <li class="field text is-not-editable" id="field-course-organization">
-      <label for="course-organization">${_("Organization:")}</label>
-      <b>${ section_data['course_id'].org}</b>
+    <li class="field text is-not-editable" id="field-course-display-name">
+      <label for="course-display-name">${_("Course Name:")}</label>
+      <b>${ section_data['course_display_name']}</b>
+    </li>
+
+    <li class="field text is-not-editable" id="field-course-name">
+      <label for="course-name">${_("Course Run:")}</label>
+      <b>${ section_data['course_id'].run}</b>
     </li>
 
     <li class="field text is-not-editable" id="field-course-number">
       <label for="course-number">${_("Course Number:")}</label>
-      <b>${ section_data['course_id'].course}</b>
+      <b>${ section_data['course_number']}</b>
     </li>
 
-    <li class="field text is-not-editable" id="field-course-name">
-      <label for="course-name">${_("Course Name:")}</label>
-      <b>${ section_data['course_id'].run}</b>
-    </li>
-
-    <li class="field text is-not-editable" id="field-course-display-name">
-      <label for="course-display-name">${_("Course Display Name:")}</label>
-      <b>${ section_data['course_display_name']}</b>
+    <li class="field text is-not-editable" id="field-course-organization">
+      <label for="course-organization">${_("Organization:")}</label>
+      <b>${ section_data['course_org']}</b>
     </li>
 
     <li class="field text is-not-editable" id="field-course-start-date">
@@ -104,7 +104,7 @@ from openedx.core.djangolib.markup import HTML, Text
     </li>
   </ul>
 
-  %if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD', ''):
+  %if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD', '') and user.is_staff:
       <p>
         ## Translators: git is a version-control system; see http://git-scm.com/about
         ${Text(_("View detailed Git import logs for this course {link_start}by clicking here{link_end}.")).format(

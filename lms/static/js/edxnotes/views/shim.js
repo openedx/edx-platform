@@ -26,7 +26,7 @@
             this._unsafeToken.exp &&
             this._unsafeToken.iat &&
             this.timeToExpiry() > 0
-        );
+            );
         };
 
     /**
@@ -61,7 +61,7 @@
         function() {
             // Add ARIA information for viewing mode.
             $('div.annotator-tags', this.wrapper).attr({
-                'role': 'region',
+                role: 'region',
                 'aria-label': 'tags'
             });
             return this;
@@ -78,8 +78,8 @@
         Annotator.prototype.highlightRange = _.compose(
         function(results) {
             $('.annotator-hl', this.wrapper).attr({
-                'tabindex': 0,
-                'role': 'link'
+                tabindex: 0,
+                role: 'link'
             });
             return results;
         },
@@ -167,8 +167,8 @@
                 }
             })
             .element.appendTo(this.wrapper).bind({
-                'mouseover': this.clearViewerHideTimer,
-                'mouseout': this.startViewerHideTimer
+                mouseover: this.clearViewerHideTimer,
+                mouseout: this.startViewerHideTimer
             });
             return this;
         };
@@ -272,14 +272,14 @@
             },
 
             onNoteClick: function(event) {
-                var target = $(event.target);
+                var $target = $(event.target);
                 event.stopPropagation();
                 Annotator.Util.preventEventDefault(event);
 
-                if (!(target.is('.annotator-delete') || target.is('.annotator-close'))) {
+                if (!($target.is('.annotator-delete') || $target.is('.annotator-close'))) {
                     Annotator.frozenSrc = this;
                     this.freezeAll();
-                } else if (target.is('.annotator-close')) {
+                } else if ($target.is('.annotator-close')) {
                     this.viewer.hide();
                 }
             },
@@ -301,8 +301,8 @@
                 // Add default events
                     this.addEvents();
                     this.viewer.element.bind({
-                        'mouseover': this.clearViewerHideTimer,
-                        'mouseout': this.startViewerHideTimer
+                        mouseover: this.clearViewerHideTimer,
+                        mouseout: this.startViewerHideTimer
                     });
                     this.viewer.hide();
                     $(document).off('click.edxnotes:freeze' + this.uid);

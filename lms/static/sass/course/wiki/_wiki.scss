@@ -1,5 +1,4 @@
 .wiki-wrapper section.wiki {
-
   .pull-left {
     float: left;
   }
@@ -53,11 +52,11 @@
         color: $link-color;
       }
 
-      &:after {
+      &::after {
         content: '›';
         display: inline;
         margin-left: ($baseline/2);
-        color: $base-font-color;
+        color: $body-color;
         height: 30px;
         line-height: 31px;
       }
@@ -84,6 +83,7 @@
 
   .add-article-btn {
     @include button(simple, #eee);
+
     margin-left: 25px;
     padding: 7px 15px !important;
     font-size: 0.72em;
@@ -105,8 +105,9 @@
       border: 1px solid #c8c8c8;
       border-radius: 14px;
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12) inset;
-      font-family: $sans-serif;
+      font-family: $font-family-sans-serif;
       font-size: 12px;
+
       @include transition(border-color .1s linear 0s);
 
       &:-webkit-input-placholder {
@@ -139,7 +140,7 @@
     border-bottom: 1px solid $light-gray;
     font-size: 1.6em;
     font-weight: bold;
-    color: $base-font-color;
+    color: $body-color;
     text-transform: none;
     letter-spacing: 0;
   }
@@ -148,7 +149,8 @@
     float: left;
     width: flex-grid(9);
     padding: 40px 0 40px 40px;
-    color: $base-font-color;
+    color: $body-color;
+
     @include box-sizing(border-box);
   }
 
@@ -159,7 +161,7 @@
       border-bottom: 1px solid $light-gray;
       font-size: 1.6em;
       font-weight: bold;
-      color: $base-font-color;
+      color: $body-color;
       text-transform: none;
       letter-spacing: 0;
     }
@@ -180,17 +182,15 @@
 
     h5 {
       margin: 20px 0 10px;
-      font-size: .8em;
+      font-size: 0.8em;
       font-weight: bold;
-      text-transform: uppercase;
     }
 
     h6 {
       margin: 20px 0 10px;
-      font-size: .8em;
+      font-size: 0.8em;
       font-weight: bold;
       color: #999;
-      text-transform: uppercase;
     }
 
     ul {
@@ -238,9 +238,10 @@
     float: left;
     width: flex-grid(3);
     padding: 40px 40px;
+
     @include box-sizing(border-box);
 
-    .timestamp{
+    .timestamp {
       margin-top: ($baseline*0.75);
       padding: 15px 0 0 10px;
       border-top: 1px solid $light-gray;
@@ -248,7 +249,6 @@
       .label {
         font-size: 0.7em;
         color: $uxpl-gray-base;
-        text-transform: uppercase;
       }
 
       .date {
@@ -328,16 +328,15 @@
   -----------------*/
 
   label {
-    font-family: $sans-serif;
+    font-family: $font-family-sans-serif;
     font-size: 0.9em;
     font-weight: bold;
     font-style: normal;
-    text-transform: uppercase;
     color: $uxpl-gray-base;
   }
 
   input {
-    font-family: $sans-serif;
+    font-family: $font-family-sans-serif;
     font-style: normal;
     font-weight: normal;
   }
@@ -383,13 +382,14 @@
       box-shadow: 0 0 1px 1px $shadow-l1, 0 1px 6px $shadow;
     }
 
-    &:before {
+    &::before {
       @extend %ui-depth4;
+
       content: 'click to edit schematic';
       position: absolute;
       top: 10px;
       left: 7px;
-      font-family: $sans-serif;
+      font-family: $font-family-sans-serif;
       font-size: 0.75em;
       color: $uxpl-gray-base;
       pointer-events: none;
@@ -416,11 +416,12 @@
   }
 
   button {
-    font-family: $sans-serif;
+    font-family: $font-family-sans-serif;
   }
 
   .btn {
     @include button(simple, #eee);
+
     font-size: 0.8em;
     margin-right: ($baseline/4);
     line-height: 1.2em;
@@ -428,22 +429,25 @@
     letter-spacing: 0 !important;
 
     &:hover, &:focus {
-      color: $base-font-color;
+      color: $body-color;
       text-decoration: none;
     }
 
     &.btn-primary {
       @include button(simple, $btn-default-color);
+
       font-size: 0.8em;
     }
 
     &.btn-danger {
       @include button(simple, $pink);
+
       font-size: 0.8em;
     }
 
     &.btn-info {
       @include button(simple, $gray-l3);
+
       font-size: 0.8em;
     }
   }
@@ -454,6 +458,7 @@
 
   .modal {
     @extend %ui-depth4;
+
     width: 960px;
     min-height: 500px;
     margin-left: -480px;
@@ -503,7 +508,7 @@
       margin-bottom: ($baseline/2);
 
       h1, p {
-        color: $base-font-color;
+        color: $body-color;
       }
 
       h1 {
@@ -570,6 +575,7 @@
     text-align: left;
     padding: 20px;
     font-size: 14px;
+
     @include clearfix();
 
     h3 {
@@ -587,7 +593,7 @@
     margin-top: ($baseline*2);
   }
 
-  #cheatsheet-body pre{
+  #cheatsheet-body pre {
     color: $black;
     text-align: left;
     background: #eee;
@@ -640,7 +646,7 @@
     }
 
     th {
-      font-family: $sans-serif;
+      font-family: $font-family-sans-serif;
       font-size: 0.7em;
     }
 
@@ -666,6 +672,7 @@
   #settings_form {
     .well {
       margin-bottom: ($baseline*0.75);
+
       @include clearfix();
     }
 
@@ -815,8 +822,8 @@
 
     li {
       margin-bottom: ($baseline*0.75);
-      border: 1px solid #DDD;
-      background: #F9F9F9;
+      border: 1px solid #ddd;
+      background: #f9f9f9;
       border-radius: 5px;
     }
 
@@ -906,9 +913,9 @@
   .alert {
     position: relative;
     width: auto;
-    margin: 24px 0px;
+    margin: 24px 0;
     padding: 8px 12px;
-    border: 1px solid #EBE8BF;
+    border: 1px solid #ebe8bf;
     border-radius: 3px;
     background: $yellow;
     color: $black;
@@ -951,7 +958,9 @@
         color: $white;
         font-weight: bold;
         font-size: em(18);
+
         @include transition(none);
+
         text-align: center;
         -webkit-font-smoothing: antialiased;
 
@@ -965,6 +974,7 @@
 
 .modal-backdrop {
   @extend %ui-depth3;
+
   position: fixed;
   top: 0;
   left: 0;

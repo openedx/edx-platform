@@ -5,16 +5,17 @@ from celery import task
 from celery.utils.log import get_task_logger  # pylint: disable=no-name-in-module, import-error
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.exceptions import ImproperlyConfigured
+from django.contrib.sites.models import Site
 from edx_rest_api_client import exceptions
-from edx_rest_api_client.client import EdxRestApiClient
-from provider.oauth2.models import Client
+from opaque_keys.edx.keys import CourseKey
 
+from course_modes.models import CourseMode
+from lms.djangoapps.certificates.models import GeneratedCertificate
+from openedx.core.djangoapps.certificates.api import display_date_for_certificate
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
-from openedx.core.djangoapps.credentials.utils import get_credentials
+from openedx.core.djangoapps.credentials.utils import get_credentials, get_credentials_api_client
 from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
-from openedx.core.lib.token_utils import JwtBuilder
-
 
 LOGGER = get_task_logger(__name__)
 # Under cms the following setting is not defined, leading to errors during tests.
@@ -25,48 +26,23 @@ ROUTING_KEY = getattr(settings, 'CREDENTIALS_GENERATION_ROUTING_KEY', None)
 # unwanted behavior: infinite retries.
 MAX_RETRIES = 11
 
-
-def get_api_client(api_config, student):
-    """
-    Create and configure an API client for authenticated HTTP requests.
-
-    Args:
-        api_config: CredentialsApiConfig object
-        student: User object as whom to authenticate to the API
-
-    Returns:
-        EdxRestApiClient
-
-    """
-    # TODO: Use the system's JWT_AUDIENCE and JWT_SECRET_KEY instead of client ID and name.
-    client_name = api_config.OAUTH2_CLIENT_NAME
-
-    try:
-        client = Client.objects.get(name=client_name)
-    except Client.DoesNotExist:
-        raise ImproperlyConfigured(
-            'OAuth2 Client with name [{}] does not exist.'.format(client_name)
-        )
-
-    scopes = ['email', 'profile']
-    expires_in = settings.OAUTH_ID_TOKEN_EXPIRATION
-    jwt = JwtBuilder(student, secret=client.client_secret).build_token(scopes, expires_in, aud=client.client_id)
-
-    return EdxRestApiClient(api_config.internal_api_url, jwt=jwt)
+PROGRAM_CERTIFICATE = 'program'
+COURSE_CERTIFICATE = 'course-run'
 
 
-def get_completed_programs(student):
+def get_completed_programs(site, student):
     """
     Given a set of completed courses, determine which programs are completed.
 
     Args:
+        site (Site): Site for which data should be retrieved.
         student (User): Representing the student whose completed programs to check for.
 
     Returns:
         list of program UUIDs
 
     """
-    meter = ProgramProgressMeter(student)
+    meter = ProgramProgressMeter(site, student)
     return meter.completed_programs
 
 
@@ -80,13 +56,12 @@ def get_certified_programs(student):
             User object representing the student
 
     Returns:
-        UUIDs of the programs for which the student has been awarded a certificate
+        str[]: UUIDs of the programs for which the student has been awarded a certificate
 
     """
     certified_programs = []
-    for credential in get_credentials(student):
-        if 'program_uuid' in credential['credential']:
-            certified_programs.append(credential['credential']['program_uuid'])
+    for credential in get_credentials(student, credential_type='program'):
+        certified_programs.append(credential['credential']['program_uuid'])
     return certified_programs
 
 
@@ -108,7 +83,10 @@ def award_program_certificate(client, username, program_uuid):
     """
     client.credentials.post({
         'username': username,
-        'credential': {'program_uuid': program_uuid},
+        'credential': {
+            'type': PROGRAM_CERTIFICATE,
+            'program_uuid': program_uuid
+        },
         'attributes': []
     })
 
@@ -129,8 +107,7 @@ def award_program_certificates(self, username):
     student.
 
     Args:
-        username:
-            The username of the student
+        username (str): The username of the student
 
     Returns:
         None
@@ -158,16 +135,16 @@ def award_program_certificates(self, username):
             LOGGER.exception('Task award_program_certificates was called with invalid username %s', username)
             # Don't retry for this case - just conclude the task.
             return
-
-        program_uuids = get_completed_programs(student)
+        program_uuids = []
+        for site in Site.objects.all():
+            program_uuids.extend(get_completed_programs(site, student))
         if not program_uuids:
             # No reason to continue beyond this point unless/until this
             # task gets updated to support revocation of program certs.
             LOGGER.info('Task award_program_certificates was called for user %s with no completed programs', username)
             return
 
-        # Determine which program certificates the user has already been
-        # awarded, if any.
+        # Determine which program certificates the user has already been awarded, if any.
         existing_program_uuids = get_certified_programs(student)
 
     except Exception as exc:  # pylint: disable=broad-except
@@ -183,9 +160,8 @@ def award_program_certificates(self, username):
     new_program_uuids = sorted(list(set(program_uuids) - set(existing_program_uuids)))
     if new_program_uuids:
         try:
-            credentials_client = get_api_client(
-                CredentialsApiConfig.current(),
-                User.objects.get(username=settings.CREDENTIALS_SERVICE_USERNAME)  # pylint: disable=no-member
+            credentials_client = get_credentials_api_client(
+                User.objects.get(username=settings.CREDENTIALS_SERVICE_USERNAME),
             )
         except Exception as exc:  # pylint: disable=broad-except
             LOGGER.exception('Failed to create a credentials API client to award program certificates')
@@ -204,7 +180,8 @@ def award_program_certificates(self, username):
                 )
             except Exception:  # pylint: disable=broad-except
                 # keep trying to award other certs, but retry the whole task to fix any missing entries
-                LOGGER.exception('Failed to award certificate for program %s to user %s', program_uuid, username)
+                LOGGER.warning('Failed to award certificate for program {uuid} to user {username}.'.format(
+                    uuid=program_uuid, username=username))
                 retry = True
 
         if retry:
@@ -215,3 +192,91 @@ def award_program_certificates(self, username):
         LOGGER.info('User %s is not eligible for any new program certificates', username)
 
     LOGGER.info('Successfully completed the task award_program_certificates for username %s', username)
+
+
+def post_course_certificate(client, username, certificate, visible_date):
+    """
+    POST a certificate that has been updated to Credentials
+    """
+    client.credentials.post({
+        'username': username,
+        'status': 'awarded' if certificate.is_valid() else 'revoked',  # Only need the two options at this time
+        'credential': {
+            'course_run_key': str(certificate.course_id),
+            'mode': certificate.mode,
+            'type': COURSE_CERTIFICATE,
+        },
+        'attributes': [
+            {
+                'name': 'visible_date',
+                'value': visible_date.strftime('%Y-%m-%dT%H:%M:%SZ')
+            }
+        ]
+    })
+
+
+@task(bind=True, ignore_result=True, routing_key=ROUTING_KEY)
+def award_course_certificate(self, username, course_run_key):
+    """
+    This task is designed to be called whenever a student GeneratedCertificate is updated.
+    It can be called independently for a username and a course_run, but is invoked on each GeneratedCertificate.save.
+    """
+    LOGGER.info('Running task award_course_certificate for username %s', username)
+
+    countdown = 2 ** self.request.retries
+
+    # If the credentials config model is disabled for this
+    # feature, it may indicate a condition where processing of such tasks
+    # has been temporarily disabled.  Since this is a recoverable situation,
+    # mark this task for retry instead of failing it altogether.
+
+    if not CredentialsApiConfig.current().is_learner_issuance_enabled:
+        LOGGER.warning(
+            'Task award_course_certificate cannot be executed when credentials issuance is disabled in API config',
+        )
+        raise self.retry(countdown=countdown, max_retries=MAX_RETRIES)
+
+    try:
+        course_key = CourseKey.from_string(course_run_key)
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            LOGGER.exception('Task award_course_certificate was called with invalid username %s', username)
+            # Don't retry for this case - just conclude the task.
+            return
+        # Get the cert for the course key and username if it's both passing and available in professional/verified
+        try:
+            certificate = GeneratedCertificate.eligible_certificates.get(
+                user=user.id,
+                course_id=course_key
+            )
+        except GeneratedCertificate.DoesNotExist:
+            LOGGER.exception(
+                'Task award_course_certificate was called without Certificate found for %s to user %s',
+                course_key,
+                username
+            )
+            return
+        if certificate.mode in CourseMode.VERIFIED_MODES + CourseMode.CREDIT_MODES:
+            try:
+                course_overview = CourseOverview.get_from_id(course_key)
+            except (CourseOverview.DoesNotExist, IOError):
+                LOGGER.exception(
+                    'Task award_course_certificate was called without course overview data for course %s',
+                    course_key
+                )
+                return
+            credentials_client = get_credentials_api_client(User.objects.get(
+                username=settings.CREDENTIALS_SERVICE_USERNAME),
+                org=course_key.org,
+            )
+            # FIXME This may result in visible dates that do not update alongside the Course Overview if that changes
+            # This is a known limitation of this implementation and was chosen to reduce the amount of replication,
+            # endpoints, celery tasks, and jenkins jobs that needed to be written for this functionality
+            visible_date = display_date_for_certificate(course_overview, certificate)
+            post_course_certificate(credentials_client, username, certificate, visible_date)
+
+            LOGGER.info('Awarded certificate for course %s to user %s', course_key, username)
+    except Exception as exc:
+        LOGGER.exception('Failed to determine course certificates to be awarded for user %s', username)
+        raise self.retry(exc=exc, countdown=countdown, max_retries=MAX_RETRIES)

@@ -9,25 +9,36 @@ LOGGING['handlers']['local'] = LOGGING['handlers']['tracking'] = {
 
 LOGGING['loggers']['tracking']['handlers'] = ['console']
 
-HOST = 'edx.devstack.lms:18000'
-SITE_NAME = HOST
-LMS_ROOT_URL = 'http://{}'.format(HOST)
+LMS_BASE = 'edx.devstack.lms:18000'
+CMS_BASE = 'edx.devstack.studio:18010'
+SITE_NAME = LMS_BASE
+LMS_ROOT_URL = 'http://{}'.format(LMS_BASE)
+LMS_INTERNAL_ROOT_URL = LMS_ROOT_URL
 
 ECOMMERCE_PUBLIC_URL_ROOT = 'http://localhost:18130'
 ECOMMERCE_API_URL = 'http://edx.devstack.ecommerce:18130/api/v2'
 
-ENTERPRISE_API_URL = '{}/enterprise/api/v1/'.format(LMS_ROOT_URL)
-ENABLE_ENTERPRISE_INTEGRATION = False
+COMMENTS_SERVICE_URL = 'http://edx.devstack.forum:4567'
+
+ENTERPRISE_API_URL = '{}/enterprise/api/v1/'.format(LMS_INTERNAL_ROOT_URL)
 
 CREDENTIALS_INTERNAL_SERVICE_URL = 'http://edx.devstack.credentials:18150'
 CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'
 
 OAUTH_OIDC_ISSUER = '{}/oauth2'.format(LMS_ROOT_URL)
 
+DEFAULT_JWT_ISSUER = {
+    'ISSUER': OAUTH_OIDC_ISSUER,
+    'SECRET_KEY': 'lms-secret',
+    'AUDIENCE': 'lms-key',
+}
 JWT_AUTH.update({
-    'JWT_SECRET_KEY': 'lms-secret',
-    'JWT_ISSUER': OAUTH_OIDC_ISSUER,
-    'JWT_AUDIENCE': 'lms-key',
+    'JWT_ISSUER': DEFAULT_JWT_ISSUER['ISSUER'],
+    'JWT_AUDIENCE': DEFAULT_JWT_ISSUER['AUDIENCE'],
+    'JWT_ISSUERS': [
+        DEFAULT_JWT_ISSUER,
+        RESTRICTED_APPLICATION_JWT_ISSUER,
+    ],
 })
 
 FEATURES.update({
@@ -35,19 +46,21 @@ FEATURES.update({
     'ENABLE_COURSEWARE_SEARCH': False,
     'ENABLE_COURSE_DISCOVERY': False,
     'ENABLE_DASHBOARD_SEARCH': False,
-    'ENABLE_DISCUSSION_SERVICE': False,
-    'SHOW_HEADER_LANGUAGE_SELECTOR': True
+    'ENABLE_DISCUSSION_SERVICE': True,
+    'SHOW_HEADER_LANGUAGE_SELECTOR': True,
+    'ENABLE_ENTERPRISE_INTEGRATION': False,
 })
 
 ENABLE_MKTG_SITE = os.environ.get('ENABLE_MARKETING_SITE', False)
 MARKETING_SITE_ROOT = os.environ.get('MARKETING_SITE_ROOT', 'http://localhost:8080')
 
 MKTG_URLS = {
-    'ABOUT': '/about-us',
+    'ABOUT': '/about',
     'ACCESSIBILITY': '/accessibility',
+    'AFFILIATES': '/affiliate-program',
     'BLOG': '/blog',
     'CAREERS': '/careers',
-    'CONTACT': '/contact',
+    'CONTACT': '/support/contact_us',
     'COURSES': '/course',
     'DONATE': '/donate',
     'ENTERPRISE': '/enterprise',
@@ -61,9 +74,12 @@ MKTG_URLS = {
     'ROOT': MARKETING_SITE_ROOT,
     'SCHOOLS': '/schools-partners',
     'SITE_MAP': '/sitemap',
+    'TRADEMARKS': '/trademarks',
     'TOS': '/edx-terms-service',
     'TOS_AND_HONOR': '/edx-terms-service',
     'WHAT_IS_VERIFIED_CERT': '/verified-certificate',
 }
 
 CREDENTIALS_SERVICE_USERNAME = 'credentials_worker'
+
+COURSE_CATALOG_API_URL = 'http://edx.devstack.discovery:18381/api/v1/'

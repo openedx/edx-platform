@@ -3,19 +3,9 @@ Model factories for unit testing views or models.
 """
 from django.contrib.sites.models import Site
 from factory.django import DjangoModelFactory
+from factory import SubFactory, Sequence, SelfAttribute, lazy_attribute
 
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
-
-
-class SiteConfigurationFactory(DjangoModelFactory):
-    """
-    Factory class for SiteConfiguration model
-    """
-    class Meta(object):
-        model = SiteConfiguration
-
-    values = {}
-    enabled = True
 
 
 class SiteFactory(DjangoModelFactory):
@@ -26,5 +16,20 @@ class SiteFactory(DjangoModelFactory):
         model = Site
         django_get_or_create = ('domain',)
 
-    domain = 'testserver.fake'
-    name = 'testserver.fake'
+    domain = Sequence('{}.testserver.fake'.format)
+    name = SelfAttribute('domain')
+
+
+class SiteConfigurationFactory(DjangoModelFactory):
+    """
+    Factory class for SiteConfiguration model
+    """
+    class Meta(object):
+        model = SiteConfiguration
+
+    enabled = True
+    site = SubFactory(SiteFactory)
+
+    @lazy_attribute
+    def values(self):
+        return {}

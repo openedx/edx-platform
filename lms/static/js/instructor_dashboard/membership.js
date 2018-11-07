@@ -8,11 +8,14 @@ wrap in (-> ... apply) to defer evaluation
 such that the value can be defined later than this assignment (file load order).
 */
 
-
 (function() {
     'use strict';
-    var AuthListWidget, BatchEnrollment, BetaTesterBulkAddition,
-        MemberListWidget, Membership, emailStudents, plantTimeout, statusAjaxError,
+    var AuthListWidget,
+        Membership,
+        BatchEnrollment,
+        BetaTesterBulkAddition,
+        MemberListWidget,
+        emailStudents, plantTimeout, statusAjaxError, enableAddButton,
         /* eslint-disable */
         __hasProp = {}.hasOwnProperty,
         __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -24,6 +27,18 @@ such that the value can be defined later than this assignment (file load order).
 
     statusAjaxError = function() {
         return window.InstructorDashboard.util.statusAjaxError.apply(this, arguments);
+    };
+
+    enableAddButton = function(enable, parent) {
+        var $addButton = parent.$('input[type="button"].add');
+        var $addField = parent.$('input[type="text"].add-field');
+        if (enable) {
+            $addButton.removeAttr('disabled');
+            $addField.removeAttr('disabled');
+        } else {
+            $addButton.attr('disabled', true);
+            $addField.attr('disabled', true);
+        }
     };
 
     emailStudents = false;
@@ -42,8 +57,8 @@ such that the value can be defined later than this assignment (file load order).
                 add_btn_label: 'Add Member',
                 add_handler: function() {}
             });
-            templateHtml = window.Mustache.render($('#member-list-widget-template').html(), memberListParams);
-            edx.HtmlUtils.setHtml(this.$container, edx.HtmlUtils.HTML(templateHtml));
+            templateHtml = edx.HtmlUtils.template($('#membership-list-widget-tpl').text())(memberListParams);
+            edx.HtmlUtils.setHtml(this.$container, templateHtml);
             this.$('input[type="button"].add').click(function() {
                 condition = typeof memberListParams.add_handler === 'function';
                 return condition ? memberListParams.add_handler(memberlistwidget.$('.add-field').val()) : undefined;
@@ -92,17 +107,22 @@ such that the value can be defined later than this assignment (file load order).
         __extends(AuthListWidget, _super);  // eslint-disable-line no-use-before-define
         function AuthListWidget($container, rolename, $errorSection) {  // eslint-disable-line no-shadow
             var msg,
-                authlistwidget = this;
+                authListWidget = this,
+                labelsList = [gettext('Username'), gettext('Email'), gettext('Revoke access')];
             this.rolename = rolename;
             this.$errorSection = $errorSection;
+            this.list_enabled = true;
+            if (this.rolename === 'Group Moderator') {
+                labelsList = [gettext('Username'), gettext('Email'), gettext('Group'), gettext('Revoke access')];
+            }
             AuthListWidget.__super__.constructor.call(this, $container, {  // eslint-disable-line no-underscore-dangle
                 title: $container.data('display-name'),
                 info: $container.data('info-text'),
-                labels: [gettext('Username'), gettext('Email'), gettext('Revoke access')],
+                labels: labelsList,
                 add_placeholder: gettext('Enter username or email'),
                 add_btn_label: $container.data('add-button-label'),
                 add_handler: function(input) {
-                    return authlistwidget.add_handler(input);
+                    return authListWidget.add_handler(input);
                 }
             });
             this.debug = true;
@@ -122,15 +142,15 @@ such that the value can be defined later than this assignment (file load order).
         };
 
         AuthListWidget.prototype.add_handler = function(input) {
-            var authlistwidgetaddhandler = this;
+            var authListWidgetAddHandler = this;
             if ((input != null) && input !== '') {
                 return this.modify_member_access(input, 'allow', function(error) {
                     if (error !== null) {
-                        return authlistwidgetaddhandler.show_errors(error);
+                        return authListWidgetAddHandler.show_errors(error);
                     }
-                    authlistwidgetaddhandler.clear_errors();
-                    authlistwidgetaddhandler.clear_input();
-                    return authlistwidgetaddhandler.reload_list();
+                    authListWidgetAddHandler.clear_errors();
+                    authListWidgetAddHandler.clear_input();
+                    return authListWidgetAddHandler.reload_list();
                 });
             } else {
                 return this.show_errors(gettext('Please enter a username or email.'));
@@ -138,49 +158,75 @@ such that the value can be defined later than this assignment (file load order).
         };
 
         AuthListWidget.prototype.reload_list = function() {
-            var authlistwidgetreloadlist = this;
-            return this.get_member_list(function(error, memberList) {
+            var authListWidgetReloadList = this,
+                $selectedOption;
+            return this.get_member_list(function(error, memberList, divisionScheme) {
                 if (error !== null) {
-                    return authlistwidgetreloadlist.show_errors(error);
+                    authListWidgetReloadList.show_errors(error);
+                    return;
                 }
-                authlistwidgetreloadlist.clear_rows();
-                return _.each(memberList, function(member) {
+                authListWidgetReloadList.clear_rows();
+
+                _.each(memberList, function(member) {
                     var $revokeBtn, labelTrans;
                     labelTrans = gettext('Revoke access');
+
                     $revokeBtn = $(_.template('<div class="revoke"><span class="icon fa fa-times-circle" aria-hidden="true"></span> <%- label %></div>')({  // eslint-disable-line max-len
                         label: labelTrans
                     }), {
                         class: 'revoke'
                     });
                     $revokeBtn.click(function() {
-                        return authlistwidgetreloadlist.modify_member_access(member.email, 'revoke', function(err) {
+                        authListWidgetReloadList.modify_member_access(member.email, 'revoke', function(err) {
                             if (err !== null) {
-                                return authlistwidgetreloadlist.show_errors(err);
+                                authListWidgetReloadList.show_errors(err);
+                                return;
                             }
-                            authlistwidgetreloadlist.clear_errors();
-                            return authlistwidgetreloadlist.reload_list();
+                            authListWidgetReloadList.clear_errors();
+                            authListWidgetReloadList.reload_list();
                         });
                     });
-                    return authlistwidgetreloadlist.add_row([member.username, member.email, $revokeBtn]);
+                    if (authListWidgetReloadList.rolename === 'Group Moderator') {
+                        if (divisionScheme !== undefined && divisionScheme === 'none') {
+                            // There is No discussion division scheme selected so the Group Moderator role
+                            // should be disabled
+                            authListWidgetReloadList.list_enabled = false;
+                            $selectedOption = $('select#member-lists-selector').children('option:selected');
+                            if ($selectedOption[0].value === authListWidgetReloadList.rolename) {
+                                authListWidgetReloadList.show_errors(
+                                    gettext('This role requires a divided discussions scheme.')
+                                );
+                                enableAddButton(false, authListWidgetReloadList);
+                            }
+                        } else {
+                            authListWidgetReloadList.list_enabled = true;
+                            enableAddButton(true, authListWidgetReloadList);
+                            authListWidgetReloadList.add_row([member.username, member.email,
+                                member.group_name, $revokeBtn]
+                            );
+                        }
+                    } else {
+                        authListWidgetReloadList.add_row([member.username, member.email, $revokeBtn]);
+                    }
                 });
             });
         };
 
         AuthListWidget.prototype.clear_errors = function() {
-            var ref, result;
-            result = (this.$error_section) != null ? ref.text('') : undefined;
+            var result;
+            result = this.$errorSection !== undefined ? this.$errorSection.text('') : undefined;
             return result;
         };
 
         AuthListWidget.prototype.show_errors = function(msg) {
-            var ref, result;
-            result = (this.$error_section) != null ? ref.text(msg) : undefined;
+            var result;
+            result = this.$errorSection !== undefined ? this.$errorSection.text(msg) : undefined;
             return result;
         };
 
         AuthListWidget.prototype.get_member_list = function(cb) {
             var authlistwidgetgetmemberlist = this;
-            return $.ajax({
+            $.ajax({
                 type: 'POST',
                 dataType: 'json',
                 url: this.list_endpoint,
@@ -188,7 +234,11 @@ such that the value can be defined later than this assignment (file load order).
                     rolename: this.rolename
                 },
                 success: function(data) {
-                    return typeof cb === 'function' ? cb(null, data[authlistwidgetgetmemberlist.rolename]) : undefined;
+                    return typeof cb === 'function' ? cb(
+                        null,
+                        data[authlistwidgetgetmemberlist.rolename],
+                        data.division_scheme
+                    ) : undefined;
                 }
             });
         };
@@ -543,8 +593,8 @@ such that the value can be defined later than this assignment (file load order).
             var batchEnroll = this;
             this.$container = $container;
             this.$identifier_input = this.$container.find("textarea[name='student-ids']");
+            this.$role = this.$container.find("select[name='role']");
             this.$enrollment_button = this.$container.find('.enrollment-button');
-            this.$is_course_white_label = this.$container.find('#is_course_white_label').val();
             this.$reason_field = this.$container.find("textarea[name='reason-field']");
             this.$checkbox_autoenroll = this.$container.find("input[name='auto-enroll']");
             this.$checkbox_emailstudents = this.$container.find("input[name='email-students']");
@@ -553,16 +603,20 @@ such that the value can be defined later than this assignment (file load order).
             this.$request_response_error = this.$container.find('.request-response-error');
             this.$enrollment_button.click(function(event) {
                 var sendData;
-                if (batchEnroll.$is_course_white_label === 'True') {
-                    if (!batchEnroll.$reason_field.val()) {
-                        batchEnroll.fail_with_error(gettext('Reason field should not be left blank.'));
-                        return false;
-                    }
+                if (!batchEnroll.$reason_field.val()) {
+                    batchEnroll.fail_with_error(gettext('Reason field should not be left blank.'));
+                    return false;
                 }
+                if (!batchEnroll.$role.val()) {
+                    batchEnroll.fail_with_error(gettext('Role field should not be left unselected.'));
+                    return false;
+                }
+
                 emailStudents = batchEnroll.$checkbox_emailstudents.is(':checked');
                 sendData = {
                     action: $(event.target).data('action'),
                     identifiers: batchEnroll.$identifier_input.val(),
+                    role: batchEnroll.$role.val(),
                     auto_enroll: batchEnroll.$checkbox_autoenroll.is(':checked'),
                     email_students: emailStudents,
                     reason: batchEnroll.$reason_field.val()
@@ -934,6 +988,7 @@ such that the value can be defined later than this assignment (file load order).
             this.$list_selector = this.$section.find('select#member-lists-selector');
             this.$auth_list_containers = this.$section.find('.auth-list-container');
             this.$auth_list_errors = this.$section.find('.member-lists-management .request-response-error');
+
             this.auth_lists = _.map(this.$auth_list_containers, function(authListContainer) {
                 var rolename;
                 rolename = $(authListContainer).data('rolename');
@@ -945,6 +1000,7 @@ such that the value can be defined later than this assignment (file load order).
                 authList = ref[i];
                 this.$list_selector.append($('<option/>', {
                     text: authList.$container.data('display-name'),
+                    value: authList.rolename,
                     data: {
                         auth_list: authList
                     }
@@ -967,11 +1023,28 @@ such that the value can be defined later than this assignment (file load order).
                 authList = $opt.data('auth_list');
                 authList.$container.addClass('active');
                 authList.re_view();
+
+                // On Change update the Group Moderation list
+                if ($opt[0].value === 'Group Moderator') {
+                    if (!authList.list_enabled) {
+                        authList.show_errors(gettext('This role requires a divided discussions scheme.'));
+                        enableAddButton(false, authList);
+                    } else {
+                        enableAddButton(true, authList);
+                    }
+                }
             });
             this.$list_selector.change();
         }
 
-        membership.prototype.onClickTitle = function() {};
+        membership.prototype.onClickTitle = function() {
+            var list;
+            // When the title is clicked refresh all the authorization lists as the member list
+            // may have changed since render.
+            for (list = 0; list < this.auth_lists.length; list++) {
+                this.auth_lists[list].re_view();
+            }
+        };
 
         return membership;
     }());

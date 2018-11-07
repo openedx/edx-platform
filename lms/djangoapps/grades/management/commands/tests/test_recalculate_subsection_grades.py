@@ -25,6 +25,8 @@ class TestRecalculateSubsectionGrades(HasCourseWithProblemsMixin, ModuleStoreTes
     """
     Tests recalculate subsection grades management command.
     """
+    shard = 4
+
     def setUp(self):
         super(TestRecalculateSubsectionGrades, self).setUp()
         self.command = recalculate_subsection_grades.Command()

@@ -18,9 +18,9 @@
 (function(define) {
     'use strict';
     define(['jquery',
-            'underscore',
-            'backbone',
-            'text!templates/components/card/card.underscore'],
+        'underscore',
+        'backbone',
+        'text!templates/components/card/card.underscore'],
         function($, _, Backbone, cardTemplate) {
             var CardView = Backbone.View.extend({
                 tagName: 'li',

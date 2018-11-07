@@ -18,7 +18,7 @@ locations.
 
 .. _edx-platform docs directory: https://github.com/edx/edx-platform/tree/master/docs
 .. _Developer Documentation Index: https://openedx.atlassian.net/wiki/display/OpenDev/Developer+Documentation
-.. _Open edX Development space: https://openedx.atlassian.net/wiki/display/OpenDev/Open+edX+Development
+.. _Open edX Development space: https://openedx.atlassian.net/wiki/spaces/OpenDev/overview
 .. _Open edX ReadTheDocs: http://docs.edx.org/
 
 .. toctree::

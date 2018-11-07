@@ -43,7 +43,7 @@ var edx = edx || {};
         return {
             analytics: _fn.analytics.init
         };
-    })();
+    }());
 
     edx.footer.analytics();
-})(jQuery);
+}(jQuery));

@@ -4,7 +4,6 @@ The container page is used both for displaying units, and
 for displaying containers within units.
 """
 import datetime
-from unittest import skip
 
 import ddt
 from nose.plugins.attrib import attr
@@ -14,11 +13,11 @@ from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
 from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
 from common.test.acceptance.pages.lms.staff_view import StaffCoursewarePage
-from common.test.acceptance.pages.studio.component_editor import ComponentEditorView, ComponentVisibilityEditorView
+from common.test.acceptance.pages.studio.xblock_editor import XBlockEditorView, XBlockVisibilityEditorView
 from common.test.acceptance.pages.studio.container import ContainerPage
-from common.test.acceptance.pages.studio.html_component_editor import HtmlComponentEditorView
+from common.test.acceptance.pages.studio.html_component_editor import HtmlXBlockEditorView
 from common.test.acceptance.pages.studio.move_xblock import MoveModalView
-from common.test.acceptance.pages.studio.utils import add_discussion, drag
+from common.test.acceptance.pages.studio.utils import add_discussion
 from common.test.acceptance.tests.helpers import create_user_partition_json
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID, MINIMUM_STATIC_PARTITION_ID, Group
 
@@ -71,87 +70,6 @@ class NestedVerticalTest(ContainerBase):
                 )
             )
         )
-
-
-@skip("Flaky: 01/16/2015")
-@attr(shard=1)
-class DragAndDropTest(NestedVerticalTest):
-    """
-    Tests of reordering within the container page.
-    """
-
-    def drag_and_verify(self, source, target, expected_ordering):
-        self.do_action_and_verify(
-            lambda (container): drag(container, source, target, 40),
-            expected_ordering
-        )
-
-    def test_reorder_in_group(self):
-        """
-        Drag Group A Item 2 before Group A Item 1.
-        """
-        expected_ordering = [{self.container_title: [self.group_a, self.group_empty, self.group_b]},
-                             {self.group_a: [self.group_a_item_2, self.group_a_item_1]},
-                             {self.group_b: [self.group_b_item_1, self.group_b_item_2]},
-                             {self.group_empty: []}]
-        self.drag_and_verify(self.group_a_item_2_handle, self.group_a_item_1_handle, expected_ordering)
-
-    def test_drag_to_top(self):
-        """
-        Drag Group A Item 1 to top level (outside of Group A).
-        """
-        expected_ordering = [{self.container_title: [self.group_a_item_1, self.group_a, self.group_empty, self.group_b]},
-                             {self.group_a: [self.group_a_item_2]},
-                             {self.group_b: [self.group_b_item_1, self.group_b_item_2]},
-                             {self.group_empty: []}]
-        self.drag_and_verify(self.group_a_item_1_handle, self.group_a_handle, expected_ordering)
-
-    def test_drag_into_different_group(self):
-        """
-        Drag Group B Item 1 into Group A (first element).
-        """
-        expected_ordering = [{self.container_title: [self.group_a, self.group_empty, self.group_b]},
-                             {self.group_a: [self.group_b_item_1, self.group_a_item_1, self.group_a_item_2]},
-                             {self.group_b: [self.group_b_item_2]},
-                             {self.group_empty: []}]
-        self.drag_and_verify(self.group_b_item_1_handle, self.group_a_item_1_handle, expected_ordering)
-
-    def test_drag_group_into_group(self):
-        """
-        Drag Group B into Group A (first element).
-        """
-        expected_ordering = [{self.container_title: [self.group_a, self.group_empty]},
-                             {self.group_a: [self.group_b, self.group_a_item_1, self.group_a_item_2]},
-                             {self.group_b: [self.group_b_item_1, self.group_b_item_2]},
-                             {self.group_empty: []}]
-        self.drag_and_verify(self.group_b_handle, self.group_a_item_1_handle, expected_ordering)
-
-    def test_drag_after_addition(self):
-        """
-        Add some components and then verify that drag and drop still works.
-        """
-        group_a_menu = 0
-
-        def add_new_components_and_rearrange(container):
-            # Add a video component to Group 1
-            add_discussion(container, group_a_menu)
-            # Duplicate the first item in Group A
-            container.duplicate(self.group_a_item_1_action_index)
-
-            first_handle = self.group_a_item_1_handle
-            # Drag newly added video component to top.
-            drag(container, first_handle + 3, first_handle, 40)
-            # Drag duplicated component to top.
-            drag(container, first_handle + 2, first_handle, 40)
-
-        duplicate_label = self.duplicate_label.format(self.group_a_item_1)
-
-        expected_ordering = [{self.container_title: [self.group_a, self.group_empty, self.group_b]},
-                             {self.group_a: [duplicate_label, self.discussion_label, self.group_a_item_1, self.group_a_item_2]},
-                             {self.group_b: [self.group_b_item_1, self.group_b_item_2]},
-                             {self.group_empty: []}]
-
-        self.do_action_and_verify(add_new_components_and_rearrange, expected_ordering)
 
 
 @attr(shard=1)
@@ -263,7 +181,7 @@ class DeleteComponentTest(NestedVerticalTest):
         self.delete_and_verify(group_a_item_1_delete_index, expected_ordering)
 
 
-@attr(shard=1)
+@attr(shard=16)
 class EditContainerTest(NestedVerticalTest):
     """
     Tests of editing a container.
@@ -276,7 +194,7 @@ class EditContainerTest(NestedVerticalTest):
         modified_name = 'modified'
         self.assertNotEqual(component.name, modified_name)
         component.edit()
-        component_editor = ComponentEditorView(self.browser, component.locator)
+        component_editor = XBlockEditorView(self.browser, component.locator)
         component_editor.set_field_value_and_save('Display Name', modified_name)
         self.assertEqual(component.name, modified_name)
 
@@ -307,7 +225,7 @@ class EditContainerTest(NestedVerticalTest):
         component = container.xblocks[1].children[0]
         component.edit()
 
-        html_editor = HtmlComponentEditorView(self.browser, component.locator)
+        html_editor = HtmlXBlockEditorView(self.browser, component.locator)
         html_editor.set_content_and_save(modified_content, raw=True)
 
         #note we're expecting the <p> tags to have been removed
@@ -315,14 +233,15 @@ class EditContainerTest(NestedVerticalTest):
 
 
 class BaseGroupConfigurationsTest(ContainerBase):
-    ALL_LEARNERS_AND_STAFF = ComponentVisibilityEditorView.ALL_LEARNERS_AND_STAFF
+    ALL_LEARNERS_AND_STAFF = XBlockVisibilityEditorView.ALL_LEARNERS_AND_STAFF
     CHOOSE_ONE = "Select a group type"
-    CONTENT_GROUP_PARTITION = ComponentVisibilityEditorView.CONTENT_GROUP_PARTITION
-    ENROLLMENT_TRACK_PARTITION = ComponentVisibilityEditorView.ENROLLMENT_TRACK_PARTITION
-    MISSING_GROUP_LABEL = 'Deleted Group\nThis group no longer exists. Choose another group or do not restrict access to this component.'
+    CONTENT_GROUP_PARTITION = XBlockVisibilityEditorView.CONTENT_GROUP_PARTITION
+    ENROLLMENT_TRACK_PARTITION = XBlockVisibilityEditorView.ENROLLMENT_TRACK_PARTITION
+    MISSING_GROUP_LABEL = 'Deleted Group\nThis group no longer exists. Choose another group or remove the access restriction.'
     VALIDATION_ERROR_LABEL = 'This component has validation issues.'
     VALIDATION_ERROR_MESSAGE = "Error:\nThis component's access settings refer to deleted or invalid groups."
     GROUP_VISIBILITY_MESSAGE = 'Access to some content in this unit is restricted to specific groups of learners.'
+    MODAL_NOT_RESTRICTED_MESSAGE = "Access is not restricted"
 
     def setUp(self):
         super(BaseGroupConfigurationsTest, self).setUp()
@@ -365,10 +284,17 @@ class BaseGroupConfigurationsTest(ContainerBase):
 
     def edit_component_visibility(self, component):
         """
-        Edit the visibility of an xblock on the container page.
+        Edit the visibility of an xblock on the container page and returns an XBlockVisibilityEditorView.
         """
         component.edit_visibility()
-        return ComponentVisibilityEditorView(self.browser, component.locator)
+        return XBlockVisibilityEditorView(self.browser, component.locator)
+
+    def edit_unit_visibility(self, unit):
+        """
+        Edit the visibility of a unit on the container page and returns an XBlockVisibilityEditorView.
+        """
+        unit.edit_visibility()
+        return XBlockVisibilityEditorView(self.browser, unit.locator)
 
     def verify_current_groups_message(self, visibility_editor, expected_current_groups):
         """
@@ -402,6 +328,7 @@ class BaseGroupConfigurationsTest(ContainerBase):
         """
         # Make initial edit(s) and save
         visibility_editor = self.edit_component_visibility(component)
+
         visibility_editor.select_groups_in_partition_scheme(partition_label, groups)
 
         # Re-open the modal and inspect its selected inputs. If no groups were selected,
@@ -412,6 +339,22 @@ class BaseGroupConfigurationsTest(ContainerBase):
         self.verify_selected_partition_scheme(visibility_editor, partition_label)
         self.verify_selected_groups(visibility_editor, groups)
         visibility_editor.save()
+
+    def select_and_verify_unit_group_access(self, unit, partition_label, groups=[]):
+        """
+        Edit the visibility of an xblock on the unit page and
+        verify that the edit persists. Note that `groups`
+        are labels which should be clicked, but are not necessarily checked.
+        """
+        unit_access_editor = self.edit_unit_visibility(unit)
+        unit_access_editor.select_groups_in_partition_scheme(partition_label, groups)
+
+        if not groups:
+            partition_label = self.CHOOSE_ONE
+        unit_access_editor = self.edit_unit_visibility(unit)
+        self.verify_selected_partition_scheme(unit_access_editor, partition_label)
+        self.verify_selected_groups(unit_access_editor, groups)
+        unit_access_editor.save()
 
     def verify_component_validation_error(self, component):
         """
@@ -433,6 +376,19 @@ class BaseGroupConfigurationsTest(ContainerBase):
         else:
             self.assertNotIn(self.GROUP_VISIBILITY_MESSAGE, self.container_page.sidebar_visibility_message)
             self.assertFalse(component.has_group_visibility_set)
+
+    def verify_unit_visibility_set(self, unit, set_groups=[]):
+        """
+        Verify that the container visibility modal shows that unit visibility
+        settings have been edited if there are `set_groups`. Otherwise verify
+        that the modal shows no such information.
+        """
+        unit_access_editor = self.edit_unit_visibility(unit)
+        if set_groups:
+            self.assertIn(", ".join(set_groups), unit_access_editor.current_groups_message)
+        else:
+            self.assertEqual(self.MODAL_NOT_RESTRICTED_MESSAGE, unit_access_editor.current_groups_message)
+        unit_access_editor.cancel()
 
     def update_component(self, component, metadata):
         """
@@ -458,7 +414,64 @@ class BaseGroupConfigurationsTest(ContainerBase):
         self.assertFalse(component.has_validation_error)
 
 
-@attr(shard=3)
+@attr(shard=21)
+class UnitAccessContainerTest(BaseGroupConfigurationsTest):
+    """
+    Tests unit level access
+    """
+    GROUP_RESTRICTED_MESSAGE = 'Access to this unit is restricted to: Dogs'
+
+    def _toggle_container_unit_access(self, group_ids, unit):
+        """
+        Toggle the unit level access on the course outline page
+        """
+        unit.toggle_unit_access('Content Groups', group_ids)
+
+    def _verify_container_unit_access_message(self, group_ids, expected_message):
+        """
+        Check that the container page displays the correct unit
+        access message.
+        """
+        self.outline.visit()
+        self.outline.expand_all_subsections()
+        unit = self.outline.section_at(0).subsection_at(0).unit_at(0)
+        self._toggle_container_unit_access(group_ids, unit)
+
+        container_page = self.go_to_unit_page()
+        self.assertEqual(str(container_page.get_xblock_access_message()), expected_message)
+
+    def test_default_selection(self):
+        """
+        Tests that no message is displayed when there are no
+        restrictions on the unit or components.
+        """
+        self._verify_container_unit_access_message([], '')
+
+    def test_restricted_components_message(self):
+        """
+        Test that the proper message is displayed when access to
+        some components is restricted.
+        """
+        container_page = self.go_to_unit_page()
+        html_component = container_page.xblocks[1]
+
+        # Initially set visibility to Dog group.
+        self.update_component(
+            html_component,
+            {'group_access': {self.id_base: [self.id_base + 1]}}
+        )
+
+        self._verify_container_unit_access_message([], self.GROUP_VISIBILITY_MESSAGE)
+
+    def test_restricted_access_message(self):
+        """
+        Test that the proper message is displayed when access to the
+        unit is restricted to a particular group.
+        """
+        self._verify_container_unit_access_message([self.id_base + 1], self.GROUP_RESTRICTED_MESSAGE)
+
+
+@attr(shard=9)
 class ContentGroupVisibilityModalTest(BaseGroupConfigurationsTest):
     """
     Tests of the visibility settings modal for components on the unit
@@ -484,20 +497,35 @@ class ContentGroupVisibilityModalTest(BaseGroupConfigurationsTest):
         Scenario: The component visibility modal can be set to be visible to all students and staff.
             Given I have a unit with one component
             When I go to the container page for that unit
-            And I open the visibility editor modal for that unit's component
-            And I select 'Dogs'
-            And I save the modal
-            Then the container page should display the content visibility warning
-            And I re-open the visibility editor modal for that unit's component
+            Then the container page should not display the content visibility warning by default.
+            If I then restrict access and save, and then I open the visibility editor modal for that unit's component
             And I select 'All Students and Staff'
             And I save the modal
             Then the visibility selection should be 'All Students and Staff'
-            And the container page should not display the content visibility warning
+            And the container page should still not display the content visibility warning
         """
         self.select_and_verify_saved(self.html_component, self.CONTENT_GROUP_PARTITION, ['Dogs'])
-        self.verify_visibility_set(self.html_component, True)
         self.select_and_verify_saved(self.html_component, self.ALL_LEARNERS_AND_STAFF)
         self.verify_visibility_set(self.html_component, False)
+
+    def test_reset_unit_access_to_all_students_and_staff(self):
+        """
+        Scenario: The unit visibility modal can be set to be visible to all students and staff.
+            Given I have a unit
+            When I go to the container page for that unit
+            And I open the visibility editor modal for that unit
+            And I select 'Dogs'
+            And I save the modal
+            Then I re-open the modal, the unit access modal should display the content visibility settings
+            Then after re-opening the modal again
+            And I select 'All Learners and Staff'
+            And I save the modal
+            And I re-open the modal, the unit access modal should display that no content is restricted
+        """
+        self.select_and_verify_unit_group_access(self.container_page, self.CONTENT_GROUP_PARTITION, ['Dogs'])
+        self.verify_unit_visibility_set(self.container_page, set_groups=["Dogs"])
+        self.select_and_verify_unit_group_access(self.container_page, self.ALL_LEARNERS_AND_STAFF)
+        self.verify_unit_visibility_set(self.container_page)
 
     def test_select_single_content_group(self):
         """
@@ -508,10 +536,8 @@ class ContentGroupVisibilityModalTest(BaseGroupConfigurationsTest):
             And I select 'Dogs'
             And I save the modal
             Then the visibility selection should be 'Dogs' and 'Specific Content Groups'
-            And the container page should display the content visibility warning
         """
         self.select_and_verify_saved(self.html_component, self.CONTENT_GROUP_PARTITION, ['Dogs'])
-        self.verify_visibility_set(self.html_component, True)
 
     def test_select_multiple_content_groups(self):
         """
@@ -522,10 +548,8 @@ class ContentGroupVisibilityModalTest(BaseGroupConfigurationsTest):
             And I select 'Dogs' and 'Cats'
             And I save the modal
             Then the visibility selection should be 'Dogs', 'Cats', and 'Specific Content Groups'
-            And the container page should display the content visibility warning
         """
         self.select_and_verify_saved(self.html_component, self.CONTENT_GROUP_PARTITION, ['Dogs', 'Cats'])
-        self.verify_visibility_set(self.html_component, True)
 
     def test_select_zero_content_groups(self):
         """
@@ -581,12 +605,10 @@ class ContentGroupVisibilityModalTest(BaseGroupConfigurationsTest):
             Then I should see a validation error message on that unit's component
             And I open the visibility editor modal for that unit's component
             Then I should see that I have selected multiple deleted groups
-            And the container page should display the content visibility warning
-            And I de-select the missing groups
+            And then if I de-select the missing groups
             And I save the modal
             Then the visibility selection should be the names of the valid groups.
             And I should not see any validation errors on the component
-            And the container page should display the content visibility warning
         """
         self.update_component(
             self.html_component,
@@ -603,7 +625,6 @@ class ContentGroupVisibilityModalTest(BaseGroupConfigurationsTest):
         expected_groups = ['Dogs', 'Cats']
         self.verify_current_groups_message(visibility_editor, ", ".join(expected_groups))
         self.verify_selected_groups(visibility_editor, expected_groups)
-        self.verify_visibility_set(self.html_component, True)
 
     def _verify_and_remove_missing_content_groups(self, current_groups_message, all_group_labels):
         self.verify_component_validation_error(self.html_component)
@@ -681,7 +702,7 @@ class EnrollmentTrackVisibilityModalTest(BaseGroupConfigurationsTest):
         self.verify_component_group_visibility_messsage(self.html_component, "Audit Track")
 
 
-@attr(shard=1)
+@attr(shard=16)
 class UnitPublishingTest(ContainerBase):
     """
     Tests of the publishing control and related widgets on the Unit page.
@@ -982,33 +1003,6 @@ class UnitPublishingTest(ContainerBase):
         unit_page = unit.go_to()
         self._verify_explicit_lock_overrides_implicit_lock_information(unit_page)
 
-    def test_published_unit_with_draft_child(self):
-        """
-        Scenario: A published unit with a draft child can be published
-            Given I have a published unit with no unpublished changes
-            When I go to the unit page in Studio
-            And edit the content of the only component
-            Then the content changes
-            And the title in the Publish information box is "Draft (Unpublished changes)"
-            And when I click the Publish button
-            Then the title in the Publish information box is "Published and Live"
-            And when I click the View Live button
-            Then I see the changed content in LMS
-        """
-        modified_content = 'modified content'
-
-        unit = self.go_to_unit_page()
-        component = unit.xblocks[1]
-        component.edit()
-        HtmlComponentEditorView(self.browser, component.locator).set_content_and_save(modified_content)
-        self.assertEqual(component.student_content, modified_content)
-        unit.verify_publish_title(self.DRAFT_STATUS)
-        unit.publish_action.click()
-        unit.wait_for_ajax()
-        unit.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
-        self._view_published_version(unit)
-        self.assertIn(modified_content, self.courseware.xblock_component_html_content(0))
-
     def test_cancel_does_not_create_draft(self):
         """
         Scenario: Editing a component and then canceling does not create a draft version (TNL-399)
@@ -1023,7 +1017,7 @@ class UnitPublishingTest(ContainerBase):
         unit = self.go_to_unit_page()
         component = unit.xblocks[1]
         component.edit()
-        HtmlComponentEditorView(self.browser, component.locator).set_content_and_cancel("modified content")
+        HtmlXBlockEditorView(self.browser, component.locator).set_content_and_cancel("modified content")
         self.assertEqual(component.student_content, "Body of HTML Unit.")
         unit.verify_publish_title(self.PUBLISHED_LIVE_STATUS)
         self.browser.refresh()
@@ -1238,7 +1232,7 @@ class ProblemCategoryTabsTest(ContainerBase):
         self.assertEqual(page.get_category_tab_components('problem', 1), expected_components)
 
 
-@attr(shard=1)
+@attr(shard=16)
 @ddt.ddt
 class MoveComponentTest(ContainerBase):
     """

@@ -7,12 +7,9 @@ This module provides functions to retrieve basic branded parts
 such as the site visible courses, university name and logo.
 """
 
-from xmodule.modulestore.django import modulestore
-from xmodule.course_module import CourseDescriptor
 from django.conf import settings
 
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
@@ -27,6 +24,9 @@ def get_visible_courses(org=None, filter_=None):
         filter_ (dict): Optional parameter that allows custom filtering by
             fields on the course.
     """
+    # Import is placed here to avoid model import at project startup.
+    from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+
     courses = []
     current_site_orgs = configuration_helpers.get_current_site_orgs()
 
@@ -53,7 +53,7 @@ def get_visible_courses(org=None, filter_=None):
     subdomain = configuration_helpers.get_value('subdomain', 'default')
     if hasattr(settings, 'COURSE_LISTINGS') and subdomain in settings.COURSE_LISTINGS and not settings.DEBUG:
         filtered_visible_ids = frozenset(
-            [SlashSeparatedCourseKey.from_deprecated_string(c) for c in settings.COURSE_LISTINGS[subdomain]]
+            [CourseKey.from_string(c) for c in settings.COURSE_LISTINGS[subdomain]]
         )
 
     if filtered_visible_ids:

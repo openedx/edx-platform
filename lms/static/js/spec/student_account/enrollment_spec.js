@@ -62,7 +62,7 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/student_account
                 // explaining why he/she can't enroll.
                 AjaxHelpers.respondWithError(
                     requests, 403,
-                    {'user_message_url': EMBARGO_MSG_URL}
+                    {user_message_url: EMBARGO_MSG_URL}
                 );
 
                 // Verify that the user was redirected

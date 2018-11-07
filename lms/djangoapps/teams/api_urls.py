@@ -1,7 +1,9 @@
-"""Defines the URL routes for the Team API."""
+"""
+Defines the URL routes for the Team API.
+"""
 
 from django.conf import settings
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
 from .views import (
     MembershipDetailView,
@@ -15,8 +17,7 @@ from .views import (
 TEAM_ID_PATTERN = r'(?P<team_id>[a-z\d_-]+)'
 TOPIC_ID_PATTERN = r'(?P<topic_id>[A-Za-z\d_.-]+)'
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(
         r'^v0/teams/$',
         TeamsListView.as_view(),
@@ -55,4 +56,4 @@ urlpatterns = patterns(
         MembershipDetailView.as_view(),
         name="team_membership_detail"
     )
-)
+]

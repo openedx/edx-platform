@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
-import openedx.core.djangoapps.xmodule_django.models
+from opaque_keys.edx.django.models import CourseKeyField
 
 
 class Migration(migrations.Migration):
@@ -17,8 +17,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('email', models.CharField(db_index=True, max_length=255, blank=True)),
-                ('course_id', openedx.core.djangoapps.xmodule_django.models.CourseKeyField(max_length=255)),
-                ('course_user_group', models.ForeignKey(to='course_groups.CourseUserGroup')),
+                ('course_id', CourseKeyField(max_length=255)),
+                ('course_user_group', models.ForeignKey(to='course_groups.CourseUserGroup', on_delete=models.CASCADE)),
             ],
         ),
         migrations.AlterUniqueTogether(

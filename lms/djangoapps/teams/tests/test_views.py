@@ -8,7 +8,7 @@ import ddt
 import pytz
 from dateutil import parser
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db.models.signals import post_save
 from django.utils import translation
 from elasticsearch.exceptions import ConnectionError
@@ -35,6 +35,7 @@ from .factories import LAST_ACTIVITY_AT, CourseTeamFactory
 @attr(shard=1)
 class TestDashboard(SharedModuleStoreTestCase):
     """Tests for the Teams dashboard."""
+    shard = 6
     test_password = "test"
 
     NUM_TOPICS = 10
@@ -197,6 +198,7 @@ class TestDashboard(SharedModuleStoreTestCase):
 class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
     """Base class for Team API test cases."""
 
+    shard = 6
     test_password = 'password'
 
     @classmethod
@@ -543,6 +545,7 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
 @ddt.ddt
 class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the team listing API endpoint."""
+    shard = 6
 
     def setUp(self):  # pylint: disable=arguments-differ
         super(TestListTeamsAPI, self).setUp('lms.djangoapps.teams.utils.tracker')
@@ -721,6 +724,7 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
 @ddt.ddt
 class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the team creation endpoint."""
+    shard = 6
 
     def setUp(self):  # pylint: disable=arguments-differ
         super(TestCreateTeamAPI, self).setUp('lms.djangoapps.teams.utils.tracker')
@@ -893,6 +897,7 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
 @ddt.ddt
 class TestDetailTeamAPI(TeamAPITestCase):
     """Test cases for the team detail endpoint."""
+    shard = 6
 
     @ddt.data(
         (None, 401),
@@ -932,6 +937,7 @@ class TestDetailTeamAPI(TeamAPITestCase):
 @ddt.ddt
 class TestDeleteTeamAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the team delete endpoint."""
+    shard = 6
 
     def setUp(self):  # pylint: disable=arguments-differ
         super(TestDeleteTeamAPI, self).setUp('lms.djangoapps.teams.utils.tracker')
@@ -982,6 +988,7 @@ class TestDeleteTeamAPI(EventTestMixin, TeamAPITestCase):
 @ddt.ddt
 class TestUpdateTeamAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the team update endpoint."""
+    shard = 6
 
     def setUp(self):  # pylint: disable=arguments-differ
         super(TestUpdateTeamAPI, self).setUp('lms.djangoapps.teams.utils.tracker')
@@ -1058,6 +1065,7 @@ class TestUpdateTeamAPI(EventTestMixin, TeamAPITestCase):
 @ddt.ddt
 class TestListTopicsAPI(TeamAPITestCase):
     """Test cases for the topic listing endpoint."""
+    shard = 6
 
     @ddt.data(
         (None, 401),
@@ -1177,6 +1185,7 @@ class TestListTopicsAPI(TeamAPITestCase):
 @ddt.ddt
 class TestDetailTopicAPI(TeamAPITestCase):
     """Test cases for the topic detail endpoint."""
+    shard = 6
 
     @ddt.data(
         (None, 401),
@@ -1215,6 +1224,7 @@ class TestDetailTopicAPI(TeamAPITestCase):
 @ddt.ddt
 class TestListMembershipAPI(TeamAPITestCase):
     """Test cases for the membership list endpoint."""
+    shard = 6
 
     @ddt.data(
         (None, 401),
@@ -1314,6 +1324,7 @@ class TestListMembershipAPI(TeamAPITestCase):
 @ddt.ddt
 class TestCreateMembershipAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the membership creation endpoint."""
+    shard = 6
 
     def setUp(self):  # pylint: disable=arguments-differ
         super(TestCreateMembershipAPI, self).setUp('lms.djangoapps.teams.utils.tracker')
@@ -1412,6 +1423,7 @@ class TestCreateMembershipAPI(EventTestMixin, TeamAPITestCase):
 @ddt.ddt
 class TestDetailMembershipAPI(TeamAPITestCase):
     """Test cases for the membership detail endpoint."""
+    shard = 6
 
     @ddt.data(
         (None, 401),
@@ -1478,6 +1490,7 @@ class TestDetailMembershipAPI(TeamAPITestCase):
 @ddt.ddt
 class TestDeleteMembershipAPI(EventTestMixin, TeamAPITestCase):
     """Test cases for the membership deletion endpoint."""
+    shard = 6
 
     def setUp(self):  # pylint: disable=arguments-differ
         super(TestDeleteMembershipAPI, self).setUp('lms.djangoapps.teams.utils.tracker')
@@ -1538,6 +1551,7 @@ class TestDeleteMembershipAPI(EventTestMixin, TeamAPITestCase):
 
 class TestElasticSearchErrors(TeamAPITestCase):
     """Test that the Team API is robust to Elasticsearch connection errors."""
+    shard = 6
 
     ES_ERROR = ConnectionError('N/A', 'connection error', {})
 

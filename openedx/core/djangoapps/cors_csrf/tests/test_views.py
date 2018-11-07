@@ -1,16 +1,21 @@
 """Tests for cross-domain request views. """
 
-import ddt
 import json
+import unittest
 
+from django.conf import settings
+from django.urls import NoReverseMatch, reverse
 from django.test import TestCase
-from django.core.urlresolvers import reverse, NoReverseMatch
 
+import ddt
 from config_models.models import cache
 
-from ..models import XDomainProxyConfiguration
+# cors_csrf is not in CMS' INSTALLED_APPS so these imports will error during test collection
+if settings.ROOT_URLCONF == 'lms.urls':
+    from ..models import XDomainProxyConfiguration
 
 
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
 class XDomainProxyTest(TestCase):
     """Tests for the xdomain proxy end-point. """

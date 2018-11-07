@@ -2,7 +2,7 @@
 Tests for comprehensive themes.
 """
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase
 from django.contrib import staticfiles
 
@@ -63,6 +63,81 @@ class TestComprehensiveThemeLMS(TestCase):
         """
         result = staticfiles.finders.find('test-theme/images/logo.png')
         self.assertEqual(result, settings.TEST_THEME / 'lms/static/images/logo.png')
+
+    @with_comprehensive_theme("test-theme")
+    def test_override_block_in_parent(self):
+        """
+        Test that theme title is used instead of parent title.
+        """
+        self._login()
+        dashboard_url = reverse('dashboard')
+        resp = self.client.get(dashboard_url)
+        self.assertEqual(resp.status_code, 200)
+        # This string comes from the 'pagetitle' block of the overriding theme.
+        self.assertContains(resp, "Overridden Title!")
+
+    @with_comprehensive_theme("test-theme")
+    def test_override_block_in_grandparent(self):
+        """
+        Test that theme title is used instead of parent's parent's title.
+        """
+        self._login()
+        dashboard_url = reverse('dashboard')
+        resp = self.client.get(dashboard_url)
+        self.assertEqual(resp.status_code, 200)
+        # This string comes from the 'bodyextra' block of the overriding theme.
+        self.assertContains(resp, "Overriden Body Extra!")
+
+    @with_comprehensive_theme("test-theme")
+    def test_parent_content_in_self_inherited_template(self):
+        """
+        Test that parent's body is present in self inherited template.
+        """
+        self._login()
+        dashboard_url = reverse('dashboard')
+        resp = self.client.get(dashboard_url)
+        self.assertEqual(resp.status_code, 200)
+        # This string comes from the default dashboard.html template.
+        self.assertContains(resp, "Explore courses")
+
+    @with_comprehensive_theme("test-theme")
+    def test_include_default_template(self):
+        """
+        Test that theme template can include template which is not part of the theme.
+        """
+        self._login()
+        courses_url = reverse('courses')
+        resp = self.client.get(courses_url)
+        self.assertEqual(resp.status_code, 200)
+        # The courses.html template includes the error-message.html template.
+        # Verify that the error message is included in the output.
+        self.assertContains(resp, "this module is temporarily unavailable")
+
+    @with_comprehensive_theme("test-theme")
+    def test_include_overridden_template(self):
+        """
+        Test that theme template can include template which is overridden in the active theme.
+        """
+        self._login()
+        courses_url = reverse('courses')
+        resp = self.client.get(courses_url)
+        self.assertEqual(resp.status_code, 200)
+        # The courses.html template includes the info.html file, which is overriden in the theme.
+        self.assertContains(resp, "This overrides the courseware/info.html template.")
+
+    @with_comprehensive_theme("test-theme")
+    def test_include_custom_template(self):
+        """
+        Test that theme template can include template which is only present in the theme, but has no standard LMS
+        equivalent.
+        """
+        self._login()
+        courses_url = reverse('courses')
+        resp = self.client.get(courses_url)
+        self.assertEqual(resp.status_code, 200)
+        # The courses.html template includes the test-theme.custom.html file.
+        # Verify its contents are present in the output.
+        self.assertContains(resp, "This is a custom template.")
 
 
 @skip_unless_cms

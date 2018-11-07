@@ -2,7 +2,7 @@
 django admin pages for courseware model
 '''
 
-from ratelimitbackend import admin
+from django.contrib import admin
 
 from track.models import TrackingLog
 

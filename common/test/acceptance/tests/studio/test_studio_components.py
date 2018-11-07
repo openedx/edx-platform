@@ -11,7 +11,7 @@ from common.test.acceptance.pages.studio.utils import add_component, add_compone
 from common.test.acceptance.tests.studio.base_studio_test import ContainerBase
 
 
-@attr(shard=9)
+@attr(shard=22)
 @ddt.ddt
 class AdvancedProblemComponentTest(ContainerBase):
     """
@@ -70,7 +70,7 @@ class AdvancedProblemComponentTest(ContainerBase):
         self.assertEqual(problem.name, component)
 
 
-@attr(shard=9)
+@attr(shard=22)
 class ComponentTest(ContainerBase):
     """
     Test class to add different components.

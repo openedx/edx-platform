@@ -13,6 +13,7 @@ from student.models import CourseEnrollment
 
 class TestSubtasks(InstructorTaskCourseTestCase):
     """Tests for subtasks."""
+    shard = 4
 
     def setUp(self):
         super(TestSubtasks, self).setUp()

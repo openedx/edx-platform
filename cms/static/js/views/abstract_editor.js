@@ -72,8 +72,7 @@ define(['js/views/baseview', 'underscore'], function(BaseView, _) {
 
             if (this.model.isExplicitlySet()) {
                 this.showClearButton();
-            }
-            else {
+            } else {
                 this.$el.removeClass('is-set');
                 this.getClearButton().addClass('inactive');
                 this.getClearButton().removeClass('active');

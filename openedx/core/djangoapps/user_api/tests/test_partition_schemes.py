@@ -2,8 +2,10 @@
 Test the user api's partition extensions.
 """
 from collections import defaultdict
+
+import pytest
+from django.test import TestCase
 from mock import patch
-from unittest import TestCase
 
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme, UserPartitionError
 from student.tests.factories import UserFactory
@@ -32,6 +34,7 @@ class MemoryCourseTagAPI(object):
             return False
 
 
+@pytest.mark.django_db
 class TestRandomUserPartitionScheme(PartitionTestCase):
     """
     Test getting a user's group out of a partition

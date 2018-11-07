@@ -1,12 +1,12 @@
 describe('Tests for split_test staff view switching', function() {
     var ab_module;
-    var elem;
+    var $elem;
 
     beforeEach(function() {
         loadFixtures('split_test_staff.html');
-        elem = $('#split-test');
+        $elem = $('#split-test');
         window.XBlock = jasmine.createSpyObj('XBlock', ['initializeBlocks']);
-        ab_module = ABTestSelector(null, elem);
+        ab_module = ABTestSelector(null, $elem);
     });
 
     afterEach(function() {
@@ -14,8 +14,8 @@ describe('Tests for split_test staff view switching', function() {
     });
 
     it('test that we have only one visible condition', function() {
-        var containers = elem.find('.split-test-child-container').length;
-        var conditions_shown = elem.find('.split-test-child-container .condition-text').length;
+        var containers = $elem.find('.split-test-child-container').length;
+        var conditions_shown = $elem.find('.split-test-child-container .condition-text').length;
         expect(containers).toEqual(1);
         expect(conditions_shown).toEqual(1);
         expect(XBlock.initializeBlocks).toHaveBeenCalled();
@@ -26,8 +26,8 @@ describe('Tests for split_test staff view switching', function() {
 
         for (var i = 0; i < groups.length; i++) {
             var to_select = groups[i];
-            elem.find('.split-test-select').val(to_select).change();
-            var child_text = elem.find('.split-test-child-container .condition-text').text();
+            $elem.find('.split-test-select').val(to_select).change();
+            var child_text = $elem.find('.split-test-child-container .condition-text').text();
             expect(child_text).toContain(to_select);
             expect(XBlock.initializeBlocks).toHaveBeenCalled();
         }

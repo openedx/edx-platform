@@ -6,7 +6,6 @@ from datetime import datetime
 from unittest import skip
 from uuid import uuid4
 
-from flaky import flaky
 from nose.plugins.attrib import attr
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
@@ -124,7 +123,7 @@ class EdxNotesTestMixin(UniqueCourseTest):
         self.edxnotes_fixture.install()
 
 
-@attr(shard=4)
+@attr(shard=18)
 class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
     """
     Tests for creation, editing, deleting annotations inside annotatable components in LMS.
@@ -276,7 +275,6 @@ class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
         components = self.note_unit_page.components
         self.assert_notes_are_removed(components)
 
-    @flaky  # TODO: fix this, see TNL-6494
     def test_can_create_note_with_tags(self):
         """
         Scenario: a user of notes can define one with tags
@@ -1064,7 +1062,6 @@ class EdxNotesPageTest(EventsTestMixin, EdxNotesTestMixin):
         self.assertNotIn(u"Search Results", self.notes_page.tabs)
         self.assertEqual(len(self.notes_page.notes), 5)
 
-    @flaky  # TODO: fix this, see TNL-6493
     def test_open_note_when_accessed_from_notes_page(self):
         """
         Scenario: Ensure that the link to the Unit opens a note only once.

@@ -1,93 +1,278 @@
 """
 Test the enterprise support APIs.
 """
-import unittest
 
+import ddt
+import httpretty
 import mock
 from django.conf import settings
+from django.contrib.auth.models import User
+from django.core.cache import cache
+from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.test.utils import override_settings
 
+from consent.models import DataSharingConsent
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.features.enterprise_support.api import (
+    ConsentApiClient,
+    ConsentApiServiceClient,
+    consent_needed_for_course,
+    get_consent_required_courses,
     data_sharing_consent_required,
+    EnterpriseApiClient,
+    EnterpriseApiServiceClient,
     enterprise_customer_for_request,
-    enterprise_enabled,
     get_dashboard_consent_notification,
     get_enterprise_consent_url,
-    insert_enterprise_pipeline_elements
+    insert_enterprise_pipeline_elements,
+    enterprise_enabled,
 )
+from openedx.features.enterprise_support.tests import FEATURES_WITH_ENTERPRISE_ENABLED
+from openedx.features.enterprise_support.tests.factories import EnterpriseCustomerUserFactory
+from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
+from openedx.features.enterprise_support.utils import get_cache_key
+from student.tests.factories import UserFactory
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class TestEnterpriseApi(unittest.TestCase):
+class MockEnrollment(mock.MagicMock):
+    """
+    Mock object for an enrollment which has a consistent string representation
+    suitable for use in ddt parameters.
+    """
+    def __repr__(self):
+        return '<MockEnrollment course_id={}>'.format(getattr(self, 'course_id', None))
+
+
+@ddt.ddt
+@override_settings(FEATURES=FEATURES_WITH_ENTERPRISE_ENABLED)
+@skip_unless_lms
+class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
     """
     Test enterprise support APIs.
     """
+    ENABLED_CACHES = ['default']
 
-    @override_settings(ENABLE_ENTERPRISE_INTEGRATION=False)
-    def test_utils_with_enterprise_disabled(self):
-        """
-        Test that disabling the enterprise integration flag causes
-        the utilities to return the expected default values.
-        """
-        self.assertFalse(enterprise_enabled())
-        self.assertEqual(insert_enterprise_pipeline_elements(None), None)
-
-    @override_settings(ENABLE_ENTERPRISE_INTEGRATION=True)
-    def test_utils_with_enterprise_enabled(self):
-        """
-        Test that enabling enterprise integration (which is currently on by default) causes the
-        the utilities to return the expected values.
-        """
-        self.assertTrue(enterprise_enabled())
-        pipeline = ['abc', 'social_core.pipeline.social_auth.load_extra_data', 'def']
-        insert_enterprise_pipeline_elements(pipeline)
-        self.assertEqual(pipeline, ['abc',
-                                    'enterprise.tpa_pipeline.handle_enterprise_logistration',
-                                    'social_core.pipeline.social_auth.load_extra_data',
-                                    'def'])
-
-    @override_settings(ENABLE_ENTERPRISE_INTEGRATION=True)
-    @mock.patch('openedx.features.enterprise_support.api.get_enterprise_customer_for_request')
-    @mock.patch('openedx.features.enterprise_support.api.EnterpriseCustomer')
-    def test_enterprise_customer_for_request(self, ec_class_mock, get_ec_pipeline_mock):
-        """
-        Test that the correct EnterpriseCustomer, if any, is returned.
-        """
-        def get_ec_mock(**kwargs):
-            by_provider_id_kw = 'enterprise_customer_identity_provider__provider_id'
-            provider_id = kwargs.get(by_provider_id_kw, '')
-            uuid = kwargs.get('uuid', '')
-            if uuid == 'real-uuid' or provider_id == 'real-provider-id':
-                return 'this-is-actually-an-enterprise-customer'
-            elif uuid == 'not-a-uuid':
-                raise ValueError
-            else:
-                raise Exception
-
-        ec_class_mock.DoesNotExist = Exception
-        ec_class_mock.objects.get.side_effect = get_ec_mock
-
-        get_ec_pipeline_mock.return_value = None
-
-        request = mock.MagicMock()
-        request.GET.get.return_value = 'real-uuid'
-        self.assertEqual(enterprise_customer_for_request(request), 'this-is-actually-an-enterprise-customer')
-        request.GET.get.return_value = 'not-a-uuid'
-        self.assertEqual(enterprise_customer_for_request(request), None)
-        request.GET.get.return_value = 'fake-uuid'
-        self.assertEqual(enterprise_customer_for_request(request), None)
-        request.GET.get.return_value = None
-        self.assertEqual(
-            enterprise_customer_for_request(request, tpa_hint='real-provider-id'),
-            'this-is-actually-an-enterprise-customer'
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = UserFactory.create(
+            username=settings.ENTERPRISE_SERVICE_WORKER_USERNAME,
+            email='ent_worker@example.com',
+            password='password123',
         )
-        self.assertEqual(enterprise_customer_for_request(request, tpa_hint='fake-provider-id'), None)
-        self.assertEqual(enterprise_customer_for_request(request, tpa_hint=None), None)
+        super(TestEnterpriseApi, cls).setUpTestData()
 
-        get_ec_pipeline_mock.return_value = 'also-a-real-enterprise'
+    def _assert_api_service_client(self, api_client, mocked_jwt_builder):
+        """
+        Verify that the provided api client uses the enterprise service user to generate
+        JWT token for auth.
+        """
+        mocked_jwt_builder.return_value.build_token.return_value = 'test-token'
+        enterprise_service_user = User.objects.get(username=settings.ENTERPRISE_SERVICE_WORKER_USERNAME)
+        enterprise_api_service_client = api_client()
 
-        self.assertEqual(enterprise_customer_for_request(request), 'also-a-real-enterprise')
+        mocked_jwt_builder.assert_called_once_with(enterprise_service_user)
+        # pylint: disable=protected-access
+        self.assertEqual(enterprise_api_service_client.client._store['session'].auth.token, 'test-token')
+
+    def _assert_api_client_with_user(self, api_client, mocked_jwt_builder):
+        """
+        Verify that the provided api client uses the expected user to generate
+        JWT token for auth.
+        """
+        mocked_jwt_builder.return_value.build_token.return_value = 'test-token'
+        dummy_enterprise_user = UserFactory.create(
+            username='dummy-enterprise-user',
+            email='dummy-enterprise-user@example.com',
+            password='password123',
+        )
+        enterprise_api_service_client = api_client(dummy_enterprise_user)
+
+        mocked_jwt_builder.assert_called_once_with(dummy_enterprise_user)
+        # pylint: disable=protected-access
+        self.assertEqual(enterprise_api_service_client.client._store['session'].auth.token, 'test-token')
+
+    def _assert_get_enterprise_customer(self, api_client, enterprise_api_data_for_mock):
+        """
+        DRY method to verify caching for get enterprise customer method.
+        """
+        cache_key = get_cache_key(
+            resource='enterprise-customer',
+            resource_id=enterprise_api_data_for_mock['uuid'],
+            username=settings.ENTERPRISE_SERVICE_WORKER_USERNAME,
+        )
+        self.mock_get_enterprise_customer(enterprise_api_data_for_mock['uuid'], enterprise_api_data_for_mock, 200)
+        self._assert_get_enterprise_customer_with_cache(api_client, enterprise_api_data_for_mock, cache_key)
+
+    def _assert_get_enterprise_customer_with_cache(self, api_client, enterprise_customer_data, cache_key):
+        """
+        DRY method to verify that get enterprise customer response is cached.
+        """
+        cached_enterprise_customer = cache.get(cache_key)
+        self.assertIsNone(cached_enterprise_customer)
+
+        enterprise_customer = api_client.get_enterprise_customer(enterprise_customer_data['uuid'])
+        self.assertEqual(enterprise_customer_data, enterprise_customer)
+        cached_enterprise_customer = cache.get(cache_key)
+        self.assertEqual(cached_enterprise_customer, enterprise_customer)
+
+    @httpretty.activate
+    @mock.patch('openedx.features.enterprise_support.api.JwtBuilder')
+    def test_enterprise_api_client_with_service_user(self, mock_jwt_builder):
+        """
+        Verify that enterprise API service client uses enterprise service user
+        by default to authenticate and access enterprise API.
+        """
+        self._assert_api_service_client(EnterpriseApiServiceClient, mock_jwt_builder)
+
+        # Verify that enterprise customer data is cached properly for the
+        # enterprise api client.
+        enterprise_api_client = EnterpriseApiServiceClient()
+        enterprise_api_data_for_mock_1 = {'name': 'dummy-enterprise-customer-1', 'uuid': 'enterprise-uuid-1'}
+        self._assert_get_enterprise_customer(enterprise_api_client, enterprise_api_data_for_mock_1)
+
+        # Now try to get enterprise customer for another enterprise and verify
+        # that enterprise api client returns data according to the provided
+        # enterprise UUID.
+        enterprise_api_data_for_mock_2 = {'name': 'dummy-enterprise-customer-2', 'uuid': 'enterprise-uuid-2'}
+        self._assert_get_enterprise_customer(enterprise_api_client, enterprise_api_data_for_mock_2)
+
+    @httpretty.activate
+    @mock.patch('openedx.features.enterprise_support.api.JwtBuilder')
+    def test_enterprise_api_client_with_user(self, mock_jwt_builder):
+        """
+        Verify that enterprise API client uses the provided user to
+        authenticate and access enterprise API.
+        """
+        self._assert_api_client_with_user(EnterpriseApiClient, mock_jwt_builder)
+
+    @httpretty.activate
+    @mock.patch('openedx.features.enterprise_support.api.JwtBuilder')
+    def test_enterprise_consent_api_client_with_service_user(self, mock_jwt_builder):
+        """
+        Verify that enterprise API consent service client uses enterprise
+        service user by default to authenticate and access enterprise API.
+        """
+        self._assert_api_service_client(ConsentApiServiceClient, mock_jwt_builder)
+
+    @httpretty.activate
+    @mock.patch('openedx.features.enterprise_support.api.JwtBuilder')
+    def test_enterprise_consent_api_client_with_user(self, mock_jwt_builder):
+        """
+        Verify that enterprise API consent service client uses the provided
+        user to authenticate and access enterprise API.
+        """
+        self._assert_api_client_with_user(ConsentApiClient, mock_jwt_builder)
+
+    @httpretty.activate
+    def test_consent_needed_for_course(self):
+        user = mock.MagicMock(
+            username='janedoe',
+            is_authenticated=lambda: True,
+        )
+        request = mock.MagicMock(session={}, user=user)
+        self.mock_enterprise_learner_api()
+        self.mock_consent_missing(user.username, 'fake-course', 'cf246b88-d5f6-4908-a522-fc307e0b0c59')
+        self.assertTrue(consent_needed_for_course(request, user, 'fake-course'))
+        self.mock_consent_get(user.username, 'fake-course', 'cf246b88-d5f6-4908-a522-fc307e0b0c59')
+        self.assertFalse(consent_needed_for_course(request, user, 'fake-course'))
+        # Test that the result is cached when false (remove the HTTP mock so if the result
+        # isn't cached, we'll fail spectacularly.)
+        httpretty.reset()
+        self.assertFalse(consent_needed_for_course(request, user, 'fake-course'))
+
+    @httpretty.activate
+    @mock.patch('enterprise.models.EnterpriseCustomer.catalog_contains_course')
+    def test_get_consent_required_courses(self, mock_catalog_contains_course):
+        mock_catalog_contains_course.return_value = True
+        user = UserFactory()
+        enterprise_customer_user = EnterpriseCustomerUserFactory(user_id=user.id)
+
+        course_id = 'fake-course'
+        data_sharing_consent = DataSharingConsent(
+            course_id=course_id,
+            enterprise_customer=enterprise_customer_user.enterprise_customer,
+            username=user.username,
+            granted=False
+        )
+        data_sharing_consent.save()
+        consent_required = get_consent_required_courses(user, [course_id])
+        self.assertTrue(course_id in consent_required)
+
+        # now grant consent and call our method again
+        data_sharing_consent.granted = True
+        data_sharing_consent.save()
+        consent_required = get_consent_required_courses(user, [course_id])
+        self.assertFalse(course_id in consent_required)
+
+    @httpretty.activate
+    @mock.patch('openedx.features.enterprise_support.api.get_enterprise_learner_data')
+    @mock.patch('openedx.features.enterprise_support.api.EnterpriseCustomer')
+    @mock.patch('openedx.features.enterprise_support.api.get_partial_pipeline')
+    @mock.patch('openedx.features.enterprise_support.api.Registry')
+    def test_enterprise_customer_for_request(
+            self,
+            mock_registry,
+            mock_partial,
+            mock_enterprise_customer_model,
+            mock_get_enterprise_learner_data,
+    ):
+        def mock_get_enterprise_customer(**kwargs):
+            uuid = kwargs.get('enterprise_customer_identity_provider__provider_id')
+            if uuid:
+                return mock.MagicMock(uuid=uuid, user=self.user)
+            raise Exception
+
+        dummy_request = mock.MagicMock(session={}, user=self.user)
+        mock_enterprise_customer_model.objects.get.side_effect = mock_get_enterprise_customer
+        mock_enterprise_customer_model.DoesNotExist = Exception
+        mock_partial.return_value = True
+        mock_registry.get_from_pipeline.return_value.provider_id = 'real-ent-uuid'
+
+        # Verify that the method `enterprise_customer_for_request` returns
+        # expected enterprise customer against the requesting user.
+        self.mock_get_enterprise_customer('real-ent-uuid', {'real': 'enterprisecustomer'}, 200)
+        enterprise_customer = enterprise_customer_for_request(dummy_request)
+        self.assertEqual(enterprise_customer, {'real': 'enterprisecustomer'})
+
+        httpretty.reset()
+
+        # Verify that the method `enterprise_customer_for_request` returns no
+        # enterprise customer if the enterprise customer API throws 404.
+        self.mock_get_enterprise_customer('real-ent-uuid', {'detail': 'Not found.'}, 404)
+        enterprise_customer = enterprise_customer_for_request(dummy_request)
+        self.assertIsNone(enterprise_customer)
+
+        httpretty.reset()
+
+        # Verify that the method `enterprise_customer_for_request` returns
+        # expected enterprise customer against the requesting user even if
+        # the third-party auth pipeline has no `provider_id`.
+        mock_registry.get_from_pipeline.return_value.provider_id = None
+        self.mock_get_enterprise_customer('real-ent-uuid', {'real': 'enterprisecustomer'}, 200)
+        enterprise_customer = enterprise_customer_for_request(
+            mock.MagicMock(GET={'enterprise_customer': 'real-ent-uuid'}, user=self.user)
+        )
+        self.assertEqual(enterprise_customer, {'real': 'enterprisecustomer'})
+
+        # Verify that the method `enterprise_customer_for_request` returns
+        # expected enterprise customer against the requesting user even if
+        # the third-party auth pipeline has no `provider_id` but there is
+        # enterprise customer UUID in the cookie.
+        enterprise_customer = enterprise_customer_for_request(
+            mock.MagicMock(GET={}, COOKIES={settings.ENTERPRISE_CUSTOMER_COOKIE_NAME: 'real-ent-uuid'}, user=self.user)
+        )
+        self.assertEqual(enterprise_customer, {'real': 'enterprisecustomer'})
+
+        # Verify that we can still get enterprise customer from enterprise
+        # learner API even if we are unable to get it from preferred sources,
+        # e.g. url query parameters, third-party auth pipeline, enterprise
+        # cookie.
+        mock_get_enterprise_learner_data.return_value = [{'enterprise_customer': {'uuid': 'real-ent-uuid'}}]
+        enterprise_customer = enterprise_customer_for_request(
+            mock.MagicMock(GET={}, COOKIES={}, user=self.user, site=1)
+        )
+        self.assertEqual(enterprise_customer, {'real': 'enterprisecustomer'})
 
     def check_data_sharing_consent(self, consent_required=False, consent_url=None):
         """
@@ -118,7 +303,7 @@ class TestEnterpriseApi(unittest.TestCase):
             self.assertEqual(response, (args, kwargs))
 
     @mock.patch('openedx.features.enterprise_support.api.enterprise_enabled')
-    @mock.patch('openedx.features.enterprise_support.api.consent_necessary_for_course')
+    @mock.patch('openedx.features.enterprise_support.api.consent_needed_for_course')
     def test_data_consent_required_enterprise_disabled(self,
                                                        mock_consent_necessary,
                                                        mock_enterprise_enabled):
@@ -134,7 +319,7 @@ class TestEnterpriseApi(unittest.TestCase):
         mock_consent_necessary.assert_not_called()
 
     @mock.patch('openedx.features.enterprise_support.api.enterprise_enabled')
-    @mock.patch('openedx.features.enterprise_support.api.consent_necessary_for_course')
+    @mock.patch('openedx.features.enterprise_support.api.consent_needed_for_course')
     def test_no_course_data_consent_required(self,
                                              mock_consent_necessary,
                                              mock_enterprise_enabled):
@@ -152,7 +337,7 @@ class TestEnterpriseApi(unittest.TestCase):
         mock_consent_necessary.assert_called_once()
 
     @mock.patch('openedx.features.enterprise_support.api.enterprise_enabled')
-    @mock.patch('openedx.features.enterprise_support.api.consent_necessary_for_course')
+    @mock.patch('openedx.features.enterprise_support.api.consent_needed_for_course')
     @mock.patch('openedx.features.enterprise_support.api.get_enterprise_consent_url')
     def test_data_consent_required(self, mock_get_consent_url, mock_consent_necessary, mock_enterprise_enabled):
         """
@@ -170,15 +355,30 @@ class TestEnterpriseApi(unittest.TestCase):
         mock_enterprise_enabled.assert_called_once()
         mock_consent_necessary.assert_called_once()
 
+    @httpretty.activate
+    @mock.patch('openedx.features.enterprise_support.api.enterprise_customer_uuid_for_request')
+    @mock.patch('openedx.features.enterprise_support.api.reverse')
     @mock.patch('openedx.features.enterprise_support.api.consent_needed_for_course')
-    def test_get_enterprise_consent_url(self, needed_for_course_mock):
+    def test_get_enterprise_consent_url(
+            self,
+            needed_for_course_mock,
+            reverse_mock,
+            enterprise_customer_uuid_for_request_mock,
+    ):
         """
         Verify that get_enterprise_consent_url correctly builds URLs.
         """
-        needed_for_course_mock.return_value = True
 
+        def fake_reverse(*args, **kwargs):
+            if args[0] == 'grant_data_sharing_permissions':
+                return '/enterprise/grant_data_sharing_permissions'
+            return reverse(*args, **kwargs)
+
+        enterprise_customer_uuid_for_request_mock.return_value = 'cf246b88-d5f6-4908-a522-fc307e0b0c59'
+        reverse_mock.side_effect = fake_reverse
+        needed_for_course_mock.return_value = True
         request_mock = mock.MagicMock(
-            user=None,
+            user=self.user,
             build_absolute_uri=lambda x: 'http://localhost:8000' + x  # Don't do it like this in prod. Ever.
         )
 
@@ -188,148 +388,117 @@ class TestEnterpriseApi(unittest.TestCase):
         expected_url = (
             '/enterprise/grant_data_sharing_permissions?course_id=course-v1%3AedX%2BDemoX%2BDemo_'
             'Course&failure_url=http%3A%2F%2Flocalhost%3A8000%2Fdashboard%3Fconsent_failed%3Dcou'
-            'rse-v1%253AedX%252BDemoX%252BDemo_Course&next=http%3A%2F%2Flocalhost%3A8000%2Fcours'
-            'es%2Fcourse-v1%3AedX%2BDemoX%2BDemo_Course%2Finfo'
+            'rse-v1%253AedX%252BDemoX%252BDemo_Course&enterprise_customer_uuid=cf246b88-d5f6-4908'
+            '-a522-fc307e0b0c59&next=http%3A%2F%2Flocalhost%3A8000%2Fcourses%2Fcourse-v1%3AedX%2B'
+            'DemoX%2BDemo_Course%2Finfo'
         )
         actual_url = get_enterprise_consent_url(request_mock, course_id, return_to=return_to)
         self.assertEqual(actual_url, expected_url)
 
-    @mock.patch('openedx.features.enterprise_support.api.consent_needed_for_course')
-    def test_get_enterprise_consent_url_next_provided_not_course_specific(self, needed_for_course_mock):
-        """
-        Verify that get_enterprise_consent_url correctly builds URLs.
-        """
-        needed_for_course_mock.return_value = True
-
-        request_mock = mock.MagicMock(
-            user=None,
-            build_absolute_uri=lambda x: 'http://localhost:8000' + x  # Don't do it like this in prod. Ever.
-        )
-
-        course_id = 'course-v1:edX+DemoX+Demo_Course'
-
-        expected_url = (
-            '/enterprise/grant_data_sharing_permissions?course_id=course-v1%3AedX%2BDemoX%2BDemo_'
-            'Course&failure_url=http%3A%2F%2Flocalhost%3A8000%2Fdashboard%3Fconsent_failed%3Dcou'
-            'rse-v1%253AedX%252BDemoX%252BDemo_Course&next=http%3A%2F%2Flocalhost%3A8000%2Fdashboard'
-        )
-
-        actual_url = get_enterprise_consent_url(request_mock, course_id, return_to='dashboard', course_specific_return=False)
-        self.assertEqual(actual_url, expected_url)
-
-    def test_get_dashboard_consent_notification_no_param(self):
-        """
-        Test that the output of the consent notification renderer meets expectations.
-        """
-        request = mock.MagicMock(
-            GET={}
-        )
-        notification_string = get_dashboard_consent_notification(
-            request, None, None
-        )
-        self.assertEqual(notification_string, '')
-
-    def test_get_dashboard_consent_notification_no_enrollments(self):
-        request = mock.MagicMock(
-            GET={'consent_failed': 'course-v1:edX+DemoX+Demo_Course'}
-        )
-        enrollments = []
-        user = mock.MagicMock(id=1)
-        notification_string = get_dashboard_consent_notification(
-            request, user, enrollments,
-        )
-        self.assertEqual(notification_string, '')
-
-    def test_get_dashboard_consent_notification_no_matching_enrollments(self):
-        request = mock.MagicMock(
-            GET={'consent_failed': 'course-v1:edX+DemoX+Demo_Course'}
-        )
-        enrollments = [mock.MagicMock(course_id='other_course_id')]
-        user = mock.MagicMock(id=1)
-        notification_string = get_dashboard_consent_notification(
-            request, user, enrollments,
-        )
-        self.assertEqual(notification_string, '')
-
-    def test_get_dashboard_consent_notification_no_matching_ece(self):
-        request = mock.MagicMock(
-            GET={'consent_failed': 'course-v1:edX+DemoX+Demo_Course'}
-        )
-        enrollments = [mock.MagicMock(course_id='course-v1:edX+DemoX+Demo_Course')]
-        user = mock.MagicMock(id=1)
-        notification_string = get_dashboard_consent_notification(
-            request, user, enrollments,
-        )
-        self.assertEqual(notification_string, '')
-
-    @mock.patch('openedx.features.enterprise_support.api.EnterpriseCourseEnrollment')
-    def test_get_dashboard_consent_notification_no_contact_info(self, ece_mock):
-        mock_get_ece = ece_mock.objects.get
-        ece_mock.DoesNotExist = Exception
-        mock_ece = mock_get_ece.return_value
-        mock_ece.enterprise_customer_user = mock.MagicMock(
-            enterprise_customer=mock.MagicMock(
-                contact_email=None
-            )
-        )
-        mock_ec = mock_ece.enterprise_customer_user.enterprise_customer
-        mock_ec.name = 'Veridian Dynamics'
-
-        request = mock.MagicMock(
-            GET={'consent_failed': 'course-v1:edX+DemoX+Demo_Course'}
-        )
-        enrollments = [
-            mock.MagicMock(
-                course_id='course-v1:edX+DemoX+Demo_Course',
-                course_overview=mock.MagicMock(
-                    display_name='edX Demo Course',
+    @ddt.data(
+        (False, {'real': 'enterprise', 'uuid': ''}, 'course', [], [], "", ""),
+        (True, {}, 'course', [], [], "", ""),
+        (True, {'real': 'enterprise'}, None, [], [], "", ""),
+        (True, {'name': 'GriffCo', 'uuid': ''}, 'real-course', [], [], "", ""),
+        (True, {'name': 'GriffCo', 'uuid': ''}, 'real-course', [MockEnrollment(course_id='other-id')], [], "", ""),
+        (
+            True,
+            {'name': 'GriffCo', 'uuid': 'real-uuid'},
+            'real-course',
+            [
+                MockEnrollment(
+                    course_id='real-course',
+                    course_overview=mock.MagicMock(
+                        display_name='My Cool Course'
+                    )
                 )
-            ),
-        ]
-        user = mock.MagicMock(id=1)
-        notification_string = get_dashboard_consent_notification(
-            request, user, enrollments,
-        )
-        expected_message = (
-            'If you have concerns about sharing your data, please contact your '
-            'administrator at Veridian Dynamics.'
-        )
-        self.assertIn(expected_message, notification_string)
-        expected_header = 'Enrollment in edX Demo Course was not complete.'
-        self.assertIn(expected_header, notification_string)
-
-    @mock.patch('openedx.features.enterprise_support.api.EnterpriseCourseEnrollment')
-    def test_get_dashboard_consent_notification_contact_info(self, ece_mock):
-        mock_get_ece = ece_mock.objects.get
-        ece_mock.DoesNotExist = Exception
-        mock_ece = mock_get_ece.return_value
-        mock_ece.enterprise_customer_user = mock.MagicMock(
-            enterprise_customer=mock.MagicMock(
-                contact_email='v.palmer@veridiandynamics.com'
-            )
-        )
-        mock_ec = mock_ece.enterprise_customer_user.enterprise_customer
-        mock_ec.name = 'Veridian Dynamics'
-
-        request = mock.MagicMock(
-            GET={'consent_failed': 'course-v1:edX+DemoX+Demo_Course'}
-        )
-        enrollments = [
-            mock.MagicMock(
-                course_id='course-v1:edX+DemoX+Demo_Course',
-                course_overview=mock.MagicMock(
-                    display_name='edX Demo Course',
+            ],
+            [
+                'If you have concerns about sharing your data, please contact your administrator at GriffCo.',
+                'Enrollment in My Cool Course was not complete.'
+            ],
+            "", ""
+        ),
+        (
+            True,
+            {'name': 'GriffCo', 'uuid': 'real-uuid'},
+            'real-course',
+            [
+                MockEnrollment(
+                    course_id='real-course',
+                    course_overview=mock.MagicMock(
+                        display_name='My Cool Course'
+                    )
                 )
-            ),
-        ]
-        user = mock.MagicMock(id=1)
+            ],
+            [
+                'If you have concerns about sharing your data, please contact your administrator at GriffCo.',
+                'Enrollment in My Cool Course was not complete.'
+            ],
+            "Title from DataSharingConsentTextOverrides model in consent app",
+            "Message from DataSharingConsentTextOverrides model in consent app"
+        ),
+
+    )
+    @ddt.unpack
+    @mock.patch('openedx.features.enterprise_support.api.ConsentApiClient')
+    @mock.patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
+    @mock.patch('openedx.features.enterprise_support.api.get_consent_notification_data')
+    def test_get_dashboard_consent_notification(
+            self,
+            consent_return_value,
+            enterprise_customer,
+            course_id,
+            enrollments,
+            expected_substrings,
+            notification_title,
+            notification_message,
+            consent_notification_data,
+            ec_for_request,
+            consent_client_class
+    ):
+        request = mock.MagicMock(
+            GET={'consent_failed': course_id}
+        )
+        consent_notification_data.return_value = notification_title, notification_message
+        consent_client = consent_client_class.return_value
+        consent_client.consent_required.return_value = consent_return_value
+
+        ec_for_request.return_value = enterprise_customer
+
+        user = mock.MagicMock()
+
         notification_string = get_dashboard_consent_notification(
             request, user, enrollments,
         )
-        expected_message = (
-            'If you have concerns about sharing your data, please contact your '
-            'administrator at Veridian Dynamics at v.palmer@veridiandynamics.com.'
-        )
-        self.assertIn(expected_message, notification_string)
-        expected_header = 'Enrollment in edX Demo Course was not complete.'
-        self.assertIn(expected_header, notification_string)
+
+        if notification_message and notification_title:
+            self.assertIn(notification_title, notification_string)
+            self.assertIn(notification_message, notification_string)
+        elif expected_substrings:
+            for substr in expected_substrings:
+                self.assertIn(substr, notification_string)
+        else:
+            self.assertEqual(notification_string, '')
+
+    @override_settings(FEATURES=dict(ENABLE_ENTERPRISE_INTEGRATION=False))
+    def test_utils_with_enterprise_disabled(self):
+        """
+        Test that disabling the enterprise integration flag causes
+        the utilities to return the expected default values.
+        """
+        self.assertFalse(enterprise_enabled())
+        self.assertEqual(insert_enterprise_pipeline_elements(None), None)
+
+    def test_utils_with_enterprise_enabled(self):
+        """
+        Test that enabling enterprise integration (which is currently on by default) causes the
+        the utilities to return the expected values.
+        """
+        self.assertTrue(enterprise_enabled())
+        pipeline = ['abc', 'social_core.pipeline.social_auth.load_extra_data', 'def']
+        insert_enterprise_pipeline_elements(pipeline)
+        self.assertEqual(pipeline, ['abc',
+                                    'enterprise.tpa_pipeline.handle_enterprise_logistration',
+                                    'social_core.pipeline.social_auth.load_extra_data',
+                                    'def'])

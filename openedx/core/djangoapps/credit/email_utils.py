@@ -15,7 +15,7 @@ from django.contrib.auth.models import User
 from django.contrib.staticfiles import finders
 from django.core.cache import cache
 from django.core.mail import EmailMessage, SafeMIMEText
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from edxmako.shortcuts import render_to_string
@@ -113,7 +113,7 @@ def send_credit_notifications(username, course_key):
         else:
             email_body_content = ''
 
-    email_body = Template(email_body_content).render([context])
+    email_body = Template(email_body_content).render(context)
     msg_alternative.attach(SafeMIMEText(email_body, _subtype='html', _charset='utf-8'))
 
     # attach logo image
@@ -125,7 +125,7 @@ def send_credit_notifications(username, course_key):
     to_address = user.email
 
     # send the root email message
-    msg = EmailMessage(subject, None, from_address, [to_address])
+    msg = EmailMessage(subject, '', from_address, [to_address])
     msg.attach(notification_msg)
     msg.send()
 

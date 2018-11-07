@@ -1,7 +1,7 @@
 define(['backbone'], function(Backbone) {
     var Course = Backbone.Model.extend({
         defaults: {
-            'name': ''
+            name: ''
         },
         validate: function(attrs, options) {
             if (!attrs.name) {

@@ -4,7 +4,7 @@ Tests for credit requirement display on the progress page.
 
 import ddt
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from mock import patch
 
 from course_modes.models import CourseMode
@@ -21,6 +21,7 @@ class ProgressPageCreditRequirementsTest(SharedModuleStoreTestCase):
     """
     Tests for credit requirement display on the progress page.
     """
+    shard = 4
 
     USERNAME = "bob"
     PASSWORD = "test"

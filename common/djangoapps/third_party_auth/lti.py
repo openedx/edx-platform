@@ -14,6 +14,7 @@ from oauthlib.oauth1.rfc5849.signature import (
     normalize_parameters,
     sign_hmac_sha1
 )
+from six import text_type
 from social_core.backends.base import BaseAuth
 from social_core.exceptions import AuthFailed
 from social_core.utils import sanitize_redirect
@@ -185,7 +186,7 @@ class LTIAuthBackend(BaseAuth):
             if valid:
                 return data
         except AttributeError as error:
-            log.error("'{}' not found.".format(error.message))
+            log.error("'{}' not found.".format(text_type(error)))
         return None
 
     @classmethod

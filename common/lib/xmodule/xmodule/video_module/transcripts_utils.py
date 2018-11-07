@@ -2,23 +2,36 @@
 Utility functions for transcripts.
 ++++++++++++++++++++++++++++++++++
 """
+from functools import wraps
+from django.conf import settings
 import os
 import copy
 import json
 import requests
 import logging
 from pysrt import SubRipTime, SubRipItem, SubRipFile
+from pysrt.srtexc import Error
 from lxml import etree
+from opaque_keys.edx.locator import BlockUsageLocator
 from HTMLParser import HTMLParser
+from six import text_type
 
+from xmodule.modulestore.django import modulestore
 from xmodule.exceptions import NotFoundError
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 
 from .bumper_utils import get_bumper_settings
 
+try:
+    from edxval import api as edxval_api
+except ImportError:
+    edxval_api = None
+
 
 log = logging.getLogger(__name__)
+
+NON_EXISTENT_TRANSCRIPT = 'non_existent_dummy_file_name'
 
 
 class TranscriptException(Exception):  # pylint: disable=missing-docstring
@@ -35,6 +48,26 @@ class GetTranscriptsFromYouTubeException(Exception):  # pylint: disable=missing-
 
 class TranscriptsRequestValidationException(Exception):  # pylint: disable=missing-docstring
     pass
+
+
+def exception_decorator(func):
+    """
+    Generate NotFoundError for TranscriptsGenerationException, UnicodeDecodeError.
+
+    Args:
+    `func`: Input function
+
+    Returns:
+    'wrapper': Decorated function
+    """
+    @wraps(func)
+    def wrapper(*args, **kwds):
+        try:
+            return func(*args, **kwds)
+        except (TranscriptsGenerationException, UnicodeDecodeError) as ex:
+            log.exception(text_type(ex))
+            raise NotFoundError
+    return wrapper
 
 
 def generate_subs(speed, source_speed, source_subs):
@@ -167,7 +200,7 @@ def get_transcripts_from_youtube(youtube_id, settings, i18n, youtube_transcript_
 
 def download_youtube_subs(youtube_id, video_descriptor, settings):
     """
-    Download transcripts from Youtube and save them to assets.
+    Download transcripts from Youtube.
 
     Args:
         youtube_id: str, actual youtube_id of the video.
@@ -176,7 +209,7 @@ def download_youtube_subs(youtube_id, video_descriptor, settings):
     We save transcripts for 1.0 speed, as for other speed conversion is done on front-end.
 
     Returns:
-        None, if transcripts were successfully downloaded and saved.
+        Serialized sjson transcript content, if transcripts were successfully downloaded and saved.
 
     Raises:
         GetTranscriptsFromYouTubeException, if fails.
@@ -185,9 +218,7 @@ def download_youtube_subs(youtube_id, video_descriptor, settings):
     _ = i18n.ugettext
 
     subs = get_transcripts_from_youtube(youtube_id, settings, i18n)
-    save_subs_to_store(subs, youtube_id, video_descriptor)
-
-    log.info("Transcripts for youtube_id %s for 1.0 speed are downloaded and saved.", youtube_id)
+    return json.dumps(subs, indent=2)
 
 
 def remove_subs_from_store(subs_id, item, lang='en'):
@@ -217,7 +248,7 @@ def generate_subs_from_source(speed_subs, subs_type, subs_filedata, item, langua
         srt_subs_obj = SubRipFile.from_string(subs_filedata)
     except Exception as ex:
         msg = _("Something wrong with SubRip transcripts file during parsing. Inner message is {error_message}").format(
-            error_message=ex.message
+            error_message=text_type(ex)
         )
         raise TranscriptsGenerationException(msg)
     if not srt_subs_obj:
@@ -276,6 +307,32 @@ def generate_srt_from_sjson(sjson_subs, speed):
     return output
 
 
+def generate_sjson_from_srt(srt_subs):
+    """
+    Generate transcripts from sjson to SubRip (*.srt).
+
+    Arguments:
+        srt_subs(SubRip): "SRT" subs object
+
+    Returns:
+        Subs converted to "SJSON" format.
+    """
+    sub_starts = []
+    sub_ends = []
+    sub_texts = []
+    for sub in srt_subs:
+        sub_starts.append(sub.start.ordinal)
+        sub_ends.append(sub.end.ordinal)
+        sub_texts.append(sub.text.replace('\n', ' '))
+
+    sjson_subs = {
+        'start': sub_starts,
+        'end': sub_ends,
+        'text': sub_texts
+    }
+    return sjson_subs
+
+
 def copy_or_rename_transcript(new_name, old_name, item, delete_old=False, user=None):
     """
     Renames `old_name` transcript file in storage to `new_name`.
@@ -323,7 +380,7 @@ def manage_video_subtitles_save(item, user, old_metadata=None, generate_translat
     This whole action ensures that after user changes video fields, proper `sub` files, corresponding
     to new values of video fields, will be presented in system.
 
-    # 2 convert /static/filename.srt  to filename.srt in self.transcripts.
+    # 2. convert /static/filename.srt  to filename.srt in self.transcripts.
     (it is done to allow user to enter both /static/filename.srt and filename.srt)
 
     # 3. Generate transcripts translation only  when user clicks `save` button, not while switching tabs.
@@ -333,33 +390,32 @@ def manage_video_subtitles_save(item, user, old_metadata=None, generate_translat
         (To avoid confusing situation if you attempt to correct a translation by uploading
         a new version of the SRT file with same name).
     """
-
     _ = item.runtime.service(item, "i18n").ugettext
 
-    # 1.
-    html5_ids = get_html5_ids(item.html5_sources)
+    # # 1.
+    # html5_ids = get_html5_ids(item.html5_sources)
 
-    # Youtube transcript source should always have a higher priority than html5 sources. Appending
-    # `youtube_id_1_0` at the end helps achieve this when we read transcripts list.
-    possible_video_id_list = html5_ids + [item.youtube_id_1_0]
-    sub_name = item.sub
-    for video_id in possible_video_id_list:
-        if not video_id:
-            continue
-        if not sub_name:
-            remove_subs_from_store(video_id, item)
-            continue
-        # copy_or_rename_transcript changes item.sub of module
-        try:
-            # updates item.sub with `video_id`, if it is successful.
-            copy_or_rename_transcript(video_id, sub_name, item, user=user)
-        except NotFoundError:
-            # subtitles file `sub_name` is not presented in the system. Nothing to copy or rename.
-            log.debug(
-                "Copying %s file content to %s name is failed, "
-                "original file does not exist.",
-                sub_name, video_id
-            )
+    # # Youtube transcript source should always have a higher priority than html5 sources. Appending
+    # # `youtube_id_1_0` at the end helps achieve this when we read transcripts list.
+    # possible_video_id_list = html5_ids + [item.youtube_id_1_0]
+    # sub_name = item.sub
+    # for video_id in possible_video_id_list:
+    #     if not video_id:
+    #         continue
+    #     if not sub_name:
+    #         remove_subs_from_store(video_id, item)
+    #         continue
+    #     # copy_or_rename_transcript changes item.sub of module
+    #     try:
+    #         # updates item.sub with `video_id`, if it is successful.
+    #         copy_or_rename_transcript(video_id, sub_name, item, user=user)
+    #     except NotFoundError:
+    #         # subtitles file `sub_name` is not presented in the system. Nothing to copy or rename.
+    #         log.debug(
+    #             "Copying %s file content to %s name is failed, "
+    #             "original file does not exist.",
+    #             sub_name, video_id
+    #         )
 
     # 2.
     if generate_translation:
@@ -370,6 +426,9 @@ def manage_video_subtitles_save(item, user, old_metadata=None, generate_translat
     if generate_translation:
         old_langs = set(old_metadata.get('transcripts', {})) if old_metadata else set()
         new_langs = set(item.transcripts)
+
+        html5_ids = get_html5_ids(item.html5_sources)
+        possible_video_id_list = html5_ids + [item.youtube_id_1_0]
 
         for lang in old_langs.difference(new_langs):  # 3a
             for video_id in possible_video_id_list:
@@ -424,7 +483,7 @@ def generate_sjson_for_all_speeds(item, user_filename, result_subs_dict, lang):
         srt_transcripts = contentstore().find(Transcript.asset_location(item.location, user_filename))
     except NotFoundError as ex:
         raise TranscriptException(_("{exception_message}: Can't find uploaded transcripts: {user_filename}").format(
-            exception_message=ex.message,
+            exception_message=text_type(ex),
             user_filename=user_filename
         ))
 
@@ -468,14 +527,107 @@ def get_or_create_sjson(item, transcripts):
     return sjson_transcript
 
 
+def get_video_ids_info(edx_video_id, youtube_id_1_0, html5_sources):
+    """
+    Returns list internal or external video ids.
+
+    Arguments:
+        edx_video_id (unicode): edx_video_id
+        youtube_id_1_0 (unicode): youtube id
+        html5_sources (list): html5 video ids
+
+    Returns:
+        tuple: external or internal, video ids list
+    """
+    clean = lambda item: item.strip() if isinstance(item, basestring) else item
+    external = not bool(clean(edx_video_id))
+
+    video_ids = [edx_video_id, youtube_id_1_0] + get_html5_ids(html5_sources)
+
+    # video_ids cleanup
+    video_ids = filter(lambda item: bool(clean(item)), video_ids)
+
+    return external, video_ids
+
+
+def clean_video_id(edx_video_id):
+    """
+    Cleans an edx video ID.
+
+    Arguments:
+        edx_video_id(unicode): edx-val's video identifier
+    """
+    return edx_video_id and edx_video_id.strip()
+
+
+def get_video_transcript_content(edx_video_id, language_code):
+    """
+    Gets video transcript content, only if the corresponding feature flag is enabled for the given `course_id`.
+
+    Arguments:
+        language_code(unicode): Language code of the requested transcript
+        edx_video_id(unicode): edx-val's video identifier
+
+    Returns:
+        A dict containing transcript's file name and its sjson content.
+    """
+    transcript = None
+    edx_video_id = clean_video_id(edx_video_id)
+    if edxval_api and edx_video_id:
+        transcript = edxval_api.get_video_transcript_data(edx_video_id, language_code)
+
+    return transcript
+
+
+def get_available_transcript_languages(edx_video_id):
+    """
+    Gets available transcript languages for a video.
+
+    Arguments:
+        edx_video_id(unicode): edx-val's video identifier
+
+    Returns:
+        A list containing distinct transcript language codes against all the passed video ids.
+    """
+    available_languages = []
+    edx_video_id = clean_video_id(edx_video_id)
+    if edxval_api and edx_video_id:
+        available_languages = edxval_api.get_available_transcript_languages(video_id=edx_video_id)
+
+    return available_languages
+
+
+def convert_video_transcript(file_name, content, output_format):
+    """
+    Convert video transcript into desired format
+
+    Arguments:
+        file_name: name of transcript file along with its extension
+        content: transcript content stream
+        output_format: the format in which transcript will be converted
+
+    Returns:
+        A dict containing the new transcript filename and the content converted into desired format.
+    """
+    name_and_extension = os.path.splitext(file_name)
+    basename, input_format = name_and_extension[0], name_and_extension[1][1:]
+    filename = '{base_name}.{ext}'.format(base_name=basename.encode('utf8'), ext=output_format)
+    converted_transcript = Transcript.convert(content, input_format=input_format, output_format=output_format)
+
+    return dict(filename=filename, content=converted_transcript)
+
+
 class Transcript(object):
     """
     Container for transcript methods.
     """
+    SRT = 'srt'
+    TXT = 'txt'
+    SJSON = 'sjson'
     mime_types = {
-        'srt': 'application/x-subrip; charset=utf-8',
-        'txt': 'text/plain; charset=utf-8',
-        'sjson': 'application/json',
+        SRT: 'application/x-subrip; charset=utf-8',
+        TXT: 'text/plain; charset=utf-8',
+        SJSON: 'application/json',
     }
 
     @staticmethod
@@ -484,7 +636,10 @@ class Transcript(object):
         Convert transcript `content` from `input_format` to `output_format`.
 
         Accepted input formats: sjson, srt.
-        Accepted output format: srt, txt.
+        Accepted output format: srt, txt, sjson.
+
+        Raises:
+            TranscriptsGenerationException: On parsing the invalid srt content during conversion from srt to sjson.
         """
         assert input_format in ('srt', 'sjson')
         assert output_format in ('txt', 'srt', 'sjson')
@@ -499,7 +654,18 @@ class Transcript(object):
                 return HTMLParser().unescape(text)
 
             elif output_format == 'sjson':
-                raise NotImplementedError
+                try:
+                    # With error handling (set to 'ERROR_RAISE'), we will be getting
+                    # the exception if something went wrong in parsing the transcript.
+                    srt_subs = SubRipFile.from_string(
+                        # Skip byte order mark(BOM) character
+                        content.decode('utf-8-sig'),
+                        error_handling=SubRipFile.ERROR_RAISE
+                    )
+                except Error as ex:   # Base exception from pysrt
+                    raise TranscriptsGenerationException(text_type(ex))
+
+                return json.dumps(generate_sjson_from_srt(srt_subs))
 
         if input_format == 'sjson':
 
@@ -517,6 +683,13 @@ class Transcript(object):
 
         `location` is module location.
         """
+        # HACK Warning! this is temporary and will be removed once edx-val take over the
+        # transcript module and contentstore will only function as fallback until all the
+        # data is migrated to edx-val. It will be saving a contentstore hit for a hardcoded
+        # dummy-non-existent-transcript name.
+        if NON_EXISTENT_TRANSCRIPT in [subs_id, filename]:
+            raise NotFoundError
+
         asset_filename = subs_filename(subs_id, lang) if not filename else filename
         return Transcript.get_asset(location, asset_filename)
 
@@ -556,56 +729,52 @@ class VideoTranscriptsMixin(object):
     This is necessary for both VideoModule and VideoDescriptor.
     """
 
-    def available_translations(self, transcripts, verify_assets=True):
-        """Return a list of language codes for which we have transcripts.
+    def available_translations(self, transcripts, verify_assets=None, is_bumper=False):
+        """
+        Return a list of language codes for which we have transcripts.
 
-        Args:
+        Arguments:
             verify_assets (boolean): If True, checks to ensure that the transcripts
                 really exist in the contentstore. If False, we just look at the
                 VideoDescriptor fields and do not query the contentstore. One reason
                 we might do this is to avoid slamming contentstore() with queries
                 when trying to make a listing of videos and their languages.
 
-                Defaults to True.
+                Defaults to `not FALLBACK_TO_ENGLISH_TRANSCRIPTS`.
 
             transcripts (dict): A dict with all transcripts and a sub.
-
-                Defaults to False
+            include_val_transcripts(boolean): If True, adds the edx-val transcript languages as well.
         """
         translations = []
+        if verify_assets is None:
+            verify_assets = not settings.FEATURES.get('FALLBACK_TO_ENGLISH_TRANSCRIPTS')
+
         sub, other_langs = transcripts["sub"], transcripts["transcripts"]
 
-        # If we're not verifying the assets, we just trust our field values
-        if not verify_assets:
-            if other_langs:
-                translations = list(other_langs)
+        if verify_assets:
+            all_langs = dict(**other_langs)
+            if sub:
+                all_langs.update({'en': sub})
+
+            for language, filename in all_langs.iteritems():
+                try:
+                    # for bumper videos, transcripts are stored in content store only
+                    if is_bumper:
+                        get_transcript_for_video(self.location, filename, filename, language)
+                    else:
+                        get_transcript(self, language)
+                except NotFoundError:
+                    continue
+
+                translations.append(language)
+        else:
+            # If we're not verifying the assets, we just trust our field values
+            translations = list(other_langs)
             if not translations or sub:
                 translations += ['en']
-            return translations
 
-        # If we've gotten this far, we're going to verify that the transcripts
-        # being referenced are actually in the contentstore.
-        if sub:  # check if sjson exists for 'en'.
-            try:
-                Transcript.asset(self.location, sub, 'en')
-            except NotFoundError:
-                try:
-                    Transcript.asset(self.location, None, None, sub)
-                except NotFoundError:
-                    pass
-                else:
-                    translations += ['en']
-            else:
-                translations += ['en']
-
-        for lang in other_langs:
-            try:
-                Transcript.asset(self.location, None, None, other_langs[lang])
-            except NotFoundError:
-                continue
-            translations += [lang]
-
-        return translations
+        # to clean redundant language codes.
+        return list(set(translations))
 
     def get_transcript(self, transcripts, transcript_format='srt', lang=None):
         """
@@ -671,6 +840,10 @@ class VideoTranscriptsMixin(object):
     def get_transcripts_info(self, is_bumper=False):
         """
         Returns a transcript dictionary for the video.
+
+        Arguments:
+            is_bumper(bool): If True, the request is for the bumper transcripts
+            include_val_transcripts(bool): If True, include edx-val transcripts as well
         """
         if is_bumper:
             transcripts = copy.deepcopy(get_bumper_settings(self).get('transcripts', {}))
@@ -684,7 +857,165 @@ class VideoTranscriptsMixin(object):
             language_code: transcript_file
             for language_code, transcript_file in transcripts.items() if transcript_file != ''
         }
+
+        # bumper transcripts are stored in content store so we don't need to include val transcripts
+        if not is_bumper:
+            transcript_languages = get_available_transcript_languages(edx_video_id=self.edx_video_id)
+            # HACK Warning! this is temporary and will be removed once edx-val take over the
+            # transcript module and contentstore will only function as fallback until all the
+            # data is migrated to edx-val.
+            for language_code in transcript_languages:
+                if language_code == 'en' and not sub:
+                    sub = NON_EXISTENT_TRANSCRIPT
+                elif not transcripts.get(language_code):
+                    transcripts[language_code] = NON_EXISTENT_TRANSCRIPT
+
         return {
             "sub": sub,
             "transcripts": transcripts,
         }
+
+
+@exception_decorator
+def get_transcript_from_val(edx_video_id, lang=None, output_format=Transcript.SRT):
+    """
+    Get video transcript from edx-val.
+    Arguments:
+        edx_video_id (unicode): video identifier
+        lang (unicode): transcript language
+        output_format (unicode): transcript output format
+    Returns:
+        tuple containing content, filename, mimetype
+    """
+    transcript = get_video_transcript_content(edx_video_id, lang)
+    if not transcript:
+        raise NotFoundError(u'Transcript not found for {}, lang: {}'.format(edx_video_id, lang))
+
+    transcript_conversion_props = dict(transcript, output_format=output_format)
+    transcript = convert_video_transcript(**transcript_conversion_props)
+    filename = transcript['filename']
+    content = transcript['content']
+    mimetype = Transcript.mime_types[output_format]
+
+    return content, filename, mimetype
+
+
+def get_transcript_for_video(video_location, subs_id, file_name, language):
+    """
+    Get video transcript from content store.
+
+    NOTE: Transcripts can be searched from content store by two ways:
+    1. by an id(a.k.a subs_id) which will be used to construct transcript filename
+    2. by providing transcript filename
+
+    Arguments:
+        video_location (Locator): Video location
+        subs_id (unicode): id for a transcript in content store
+        file_name (unicode): file_name for a transcript in content store
+        language (unicode): transcript language
+
+    Returns:
+        tuple containing transcript input_format, basename, content
+    """
+    try:
+        if subs_id is None:
+            raise NotFoundError
+        content = Transcript.asset(video_location, subs_id, language).data
+        base_name = subs_id
+        input_format = Transcript.SJSON
+    except NotFoundError:
+        content = Transcript.asset(video_location, None, language, file_name).data
+        base_name = os.path.splitext(file_name)[0]
+        input_format = Transcript.SRT
+
+    return input_format, base_name, content
+
+
+@exception_decorator
+def get_transcript_from_contentstore(video, language, output_format, transcripts_info, youtube_id=None):
+    """
+    Get video transcript from content store.
+
+    Arguments:
+        video (Video Descriptor): Video descriptor
+        language (unicode): transcript language
+        output_format (unicode): transcript output format
+        transcripts_info (dict): transcript info for a video
+        youtube_id (unicode): youtube video id
+
+    Returns:
+        tuple containing content, filename, mimetype
+    """
+    input_format, base_name, transcript_content = None, None, None
+    if output_format not in (Transcript.SRT, Transcript.SJSON, Transcript.TXT):
+        raise NotFoundError('Invalid transcript format `{output_format}`'.format(output_format=output_format))
+
+    sub, other_languages = transcripts_info['sub'], transcripts_info['transcripts']
+    transcripts = dict(other_languages)
+
+    # this is sent in case of a translation dispatch and we need to use it as our subs_id.
+    possible_sub_ids = [youtube_id, sub, video.youtube_id_1_0] + get_html5_ids(video.html5_sources)
+    for sub_id in possible_sub_ids:
+        try:
+            transcripts[u'en'] = sub_id
+            input_format, base_name, transcript_content = get_transcript_for_video(
+                video.location,
+                subs_id=sub_id,
+                file_name=transcripts[language],
+                language=language
+            )
+            break
+        except (KeyError, NotFoundError):
+            continue
+
+    if transcript_content is None:
+        raise NotFoundError('No transcript for `{lang}` language'.format(
+            lang=language
+        ))
+
+    # add language prefix to transcript file only if language is not None
+    language_prefix = '{}_'.format(language) if language else ''
+    transcript_name = u'{}{}.{}'.format(language_prefix, base_name, output_format)
+    transcript_content = Transcript.convert(transcript_content, input_format=input_format, output_format=output_format)
+    if not transcript_content.strip():
+        raise NotFoundError('No transcript content')
+
+    if youtube_id:
+        youtube_ids = youtube_speed_dict(video)
+        transcript_content = json.dumps(
+            generate_subs(youtube_ids.get(youtube_id, 1), 1, json.loads(transcript_content))
+        )
+
+    return transcript_content, transcript_name, Transcript.mime_types[output_format]
+
+
+def get_transcript(video, lang=None, output_format=Transcript.SRT, youtube_id=None):
+    """
+    Get video transcript from edx-val or content store.
+
+    Arguments:
+        video (Video Descriptor): Video Descriptor
+        lang (unicode): transcript language
+        output_format (unicode): transcript output format
+        youtube_id (unicode): youtube video id
+
+    Returns:
+        tuple containing content, filename, mimetype
+    """
+    transcripts_info = video.get_transcripts_info()
+    if not lang:
+        lang = video.get_default_transcript_language(transcripts_info)
+
+    try:
+        edx_video_id = clean_video_id(video.edx_video_id)
+        if not edx_video_id:
+            raise NotFoundError
+        return get_transcript_from_val(edx_video_id, lang, output_format)
+    except NotFoundError:
+        return get_transcript_from_contentstore(
+            video,
+            lang,
+            youtube_id=youtube_id,
+            output_format=output_format,
+            transcripts_info=transcripts_info
+        )

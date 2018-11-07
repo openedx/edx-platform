@@ -20,6 +20,8 @@ class ReportStoreTestMixin(object):
     """
     Mixin for report store tests.
     """
+    shard = 4
+
     def setUp(self):
         super(ReportStoreTestMixin, self).setUp()
         self.course_id = CourseLocator(org="testx", course="coursex", run="runx")
@@ -119,6 +121,8 @@ class TestS3ReportStorage(MockS3Mixin, TestCase):
     Test the S3ReportStorage to make sure that configuration overrides from settings.FINANCIAL_REPORTS
     are used instead of default ones.
     """
+    shard = 4
+
     def test_financial_report_overrides(self):
         """
         Test that CUSTOM_DOMAIN from FINANCIAL_REPORTS is used to construct file url. instead of domain defined via

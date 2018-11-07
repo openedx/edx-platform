@@ -7,8 +7,8 @@ import time
 from logging import getLogger
 
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
-from lettuce import before, step, world
+from django.urls import reverse
+from lettuce import step, world
 from lettuce.django import django_url
 
 from courseware.courses import get_course_by_id

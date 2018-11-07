@@ -14,6 +14,7 @@
         beforeEach(function() {
             loadFixtures('sequence.html');
             local.XBlock = window.XBlock = jasmine.createSpyObj('XBlock', ['initializeBlocks']);
+            this.sequence = new Sequence($('.xblock-student_view-sequential'));
         });
 
         afterEach(function() {
@@ -29,7 +30,6 @@
 
         describe('Navbar', function() {
             it('works with keyboard navigation LEFT and ENTER', function() {
-                this.sequence = new Sequence($('.xblock-student_view-sequential'));
                 this.sequence.$('.nav-item[data-index=0]').focus();
                 keydownHandler(keys.LEFT);
                 keydownHandler(keys.ENTER);
@@ -47,7 +47,6 @@
             });
 
             it('works with keyboard navigation RIGHT and ENTER', function() {
-                this.sequence = new Sequence($('.xblock-student_view-sequential'));
                 this.sequence.$('.nav-item[data-index=0]').focus();
                 keydownHandler(keys.RIGHT);
                 keydownHandler(keys.ENTER);
@@ -61,6 +60,64 @@
                     'aria-expanded': 'true',
                     'aria-selected': 'true',
                     tabindex: '0'
+                });
+            });
+
+            it('Completion Indicator missing', function() {
+                this.sequence.$('.nav-item[data-index=0]').children('.check-circle').remove();
+                spyOn($, 'postWithPrefix').and.callFake(function(url, data, callback) {
+                    callback({
+                        complete: true
+                    });
+                });
+                this.sequence.update_completion(1);
+                expect($.postWithPrefix).not.toHaveBeenCalled();
+            });
+
+            describe('Completion', function() {
+                beforeEach(function() {
+                    expect(
+                        this.sequence.$('.nav-item[data-index=0]').children('.check-circle').first()
+                        .hasClass('is-hidden')
+                    ).toBe(true);
+                    expect(
+                        this.sequence.$('.nav-item[data-index=1]').children('.check-circle').first()
+                        .hasClass('is-hidden')
+                    ).toBe(true);
+                });
+
+                afterEach(function() {
+                    expect($.postWithPrefix).toHaveBeenCalled();
+                    expect(
+                        this.sequence.$('.nav-item[data-index=1]').children('.check-circle').first()
+                        .hasClass('is-hidden')
+                    ).toBe(true);
+                });
+
+                it('API check returned true', function() {
+                    spyOn($, 'postWithPrefix').and.callFake(function(url, data, callback) {
+                        callback({
+                            complete: true
+                        });
+                    });
+                    this.sequence.update_completion(1);
+                    expect(
+                        this.sequence.$('.nav-item[data-index=0]').children('.check-circle').first()
+                        .hasClass('is-hidden')
+                    ).toBe(false);
+                });
+
+                it('API check returned false', function() {
+                    spyOn($, 'postWithPrefix').and.callFake(function(url, data, callback) {
+                        callback({
+                            complete: false
+                        });
+                    });
+                    this.sequence.update_completion(1);
+                    expect(
+                        this.sequence.$('.nav-item[data-index=0]').children('.check-circle').first()
+                        .hasClass('is-hidden')
+                    ).toBe(true);
                 });
             });
         });

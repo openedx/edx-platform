@@ -1,11 +1,9 @@
 ## mako
 
-<%! main_css = "style-main-v2" %>
-
 <%page expression_filter="h"/>
-<%!
-from openedx.core.djangolib.markup import HTML
-%>
+
+## Override the default styles_version to use Bootstrap
+<%! main_css = "css/bootstrap/lms-main.css" %>
 
 <%!
 from django.utils.translation import ugettext as _

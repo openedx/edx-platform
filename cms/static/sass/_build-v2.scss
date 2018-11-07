@@ -2,17 +2,28 @@
 // Studio: Shared Build Compile
 // Version 2 - introduces the Pattern Library
 
+// Base build
+@import 'build';
 
 // Configuration
 @import 'config';
 
-// Extensions
-@import 'partials/variables';
+// Legacy variables
+//
+// Note: these should be replaced by Bootstrap theme variables
+@import 'cms/theme/variables-v1';
+
+// Utilities
 @import 'mixins-v2';
 @import 'base-v2';
+
+// Pattern Library styling
 @import 'elements-v2/controls';
 @import 'elements-v2/header';
 @import 'elements-v2/navigation';
 @import 'elements/footer';
 @import 'elements-v2/sock';
 @import 'elements-v2/tooltip';
+
+// Extra theme-specific rules
+@import 'cms/theme/extras';

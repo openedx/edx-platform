@@ -270,7 +270,7 @@ class CourseUpdateTest(CourseTestCase):
 
         updates_location = self.course.id.make_usage_key('course_info', 'updates')
         self.assertTrue(isinstance(updates_location, UsageKey))
-        self.assertEqual(updates_location.name, u'updates')
+        self.assertEqual(updates_location.block_id, u'updates')
 
         # check posting on handouts
         handouts_location = self.course.id.make_usage_key('course_info', 'handouts')

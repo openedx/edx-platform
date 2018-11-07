@@ -8,7 +8,7 @@ import mock
 from config_models.models import cache
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase
 
 from branding.models import BrandingApiConfig
@@ -22,6 +22,7 @@ from student.tests.factories import UserFactory
 @ddt.ddt
 class TestFooter(TestCase):
     """Test API end-point for retrieving the footer. """
+    shard = 4
 
     def setUp(self):
         """Clear the configuration cache. """
@@ -185,9 +186,9 @@ class TestFooter(TestCase):
         self.assertEqual(resp.status_code, 200)
 
         if show_logo:
-            self.assertIn(settings.FOOTER_OPENEDX_URL, resp.content)
+            self.assertIn('alt="Powered by Open edX"', resp.content)
         else:
-            self.assertNotIn(settings.FOOTER_OPENEDX_URL, resp.content)
+            self.assertNotIn('alt="Powered by Open edX"', resp.content)
 
     @ddt.data(
         # OpenEdX
@@ -283,6 +284,7 @@ class TestFooter(TestCase):
 
 class TestIndex(SiteMixin, TestCase):
     """ Test the index view """
+    shard = 4
 
     def setUp(self):
         """ Set up a user """

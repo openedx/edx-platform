@@ -3,7 +3,7 @@
 <%def name="online_help_token()"><% return "course_rerun" %></%def>
 <%!
 from django.utils.translation import ugettext as _
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from openedx.core.djangolib.js_utils import js_escaped_string
 %>
 
@@ -80,7 +80,7 @@ from openedx.core.djangolib.js_utils import js_escaped_string
                       </span>
                       <span class="tip tip-error is-hidden"></span>
                     </li>
-                    <li class="field text required" id="field-organization">
+                    <li class="field text required">
                       <label for="rerun-course-org">${_("Organization")}</label>
                       <input class="rerun-course-org" id="rerun-course-org" type="text" name="rerun-course-org" aria-required="true" value="${source_course_key.org}" placeholder="${_('e.g. UniversityX or OrganizationX')}" />
                       <span class="tip">

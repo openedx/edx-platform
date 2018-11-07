@@ -5,7 +5,6 @@ End-to-end tests for the LMS Instructor Dashboard.
 
 import ddt
 from bok_choy.promise import EmptyPromise
-from flaky import flaky
 from nose.plugins.attrib import attr
 
 from common.test.acceptance.fixtures.certificates import CertificateConfigFixture
@@ -19,6 +18,7 @@ from common.test.acceptance.pages.lms.dashboard import DashboardPage
 from common.test.acceptance.pages.lms.instructor_dashboard import (
     EntranceExamAdmin,
     InstructorDashboardPage,
+    StudentAdminPage,
     StudentSpecificAdmin
 )
 from common.test.acceptance.pages.lms.login_and_register import CombinedLoginAndRegisterPage
@@ -37,7 +37,7 @@ class BaseInstructorDashboardTest(EventsTestMixin, UniqueCourseTest):
     """
     Mixin class for testing the instructor dashboard.
     """
-    def log_in_as_instructor(self, course_access_roles=None):
+    def log_in_as_instructor(self, global_staff=True, course_access_roles=None):
         """
         Login with an instructor account.
 
@@ -50,7 +50,7 @@ class BaseInstructorDashboardTest(EventsTestMixin, UniqueCourseTest):
         """
         course_access_roles = course_access_roles or []
         auto_auth_page = AutoAuthPage(
-            self.browser, course_id=self.course_id, staff=True, course_access_roles=course_access_roles
+            self.browser, course_id=self.course_id, staff=global_staff, course_access_roles=course_access_roles
         )
         auto_auth_page.visit()
         user_info = auto_auth_page.user_info
@@ -113,7 +113,7 @@ class BulkEmailTest(BaseInstructorDashboardTest):
         self.send_email_page.a11y_audit.check_for_accessibility_errors()
 
 
-@attr(shard=10)
+@attr(shard=3)
 class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
     """
     End-to-end tests for Auto-Registration and enrollment functionality via CSV file.
@@ -162,7 +162,6 @@ class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
             password="123456",
             username=username,
             full_name="Test User",
-            terms_of_service=True,
             country="US",
             favorite_movie="Harry Potter",
         )
@@ -395,37 +394,8 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
 
         # Stop the timed exam.
         self.courseware_page.stop_timed_exam()
+        LogoutPage(self.browser).visit()
 
-    def test_can_add_remove_allowance(self):
-        """
-        Make sure that allowances can be added and removed.
-        """
-        # Given that an exam has been configured to be a timed exam.
-        self._create_a_timed_exam_and_attempt()
-
-        # When I log in as an instructor,
-        __, __ = self.log_in_as_instructor()
-
-        # And visit the Allowance Section of Instructor Dashboard's Special Exams tab
-        instructor_dashboard_page = self.visit_instructor_dashboard()
-        allowance_section = instructor_dashboard_page.select_special_exams().select_allowance_section()
-
-        # Then I can add Allowance to that exam for a student
-        self.assertTrue(allowance_section.is_add_allowance_button_visible)
-
-        # When I click the Add Allowance button
-        allowance_section.click_add_allowance_button()
-
-        # Then popup should be visible
-        self.assertTrue(allowance_section.is_add_allowance_popup_visible)
-
-        # When I fill and submit the allowance form
-        allowance_section.submit_allowance_form('10', self.USERNAME)
-
-        # Then, the added record should be visible
-        self.assertTrue(allowance_section.is_allowance_record_visible)
-
-    @flaky  # See EDUCATOR-551
     def test_can_reset_attempts(self):
         """
         Make sure that Exam attempts are visible and can be reset.
@@ -1043,7 +1013,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.a11y_audit.check_for_accessibility_errors()
 
 
-@attr(shard=10)
+@attr(shard=20)
 class CertificateInvalidationTest(BaseInstructorDashboardTest):
     """
     Tests for Certificates functionality on instructor dashboard.
@@ -1252,7 +1222,7 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
         self.certificates_section.a11y_audit.check_for_accessibility_errors()
 
 
-@attr(shard=10)
+@attr(shard=20)
 class EcommerceTest(BaseInstructorDashboardTest):
     """
     Bok Choy tests for the "E-Commerce" tab.
@@ -1374,16 +1344,6 @@ class StudentAdminTest(BaseInstructorDashboardTest):
         self.username, _ = self.log_in_as_instructor()
         self.instructor_dashboard_page = self.visit_instructor_dashboard()
 
-    @flaky  # See EDUCATOR-552
-    def test_rescore_nonrescorable(self):
-        student_admin_section = self.instructor_dashboard_page.select_student_admin(StudentSpecificAdmin)
-        student_admin_section.set_student_email_or_username(self.username)
-
-        # not a rescorable block
-        student_admin_section.set_problem_location(self.vertical.locator)
-        getattr(student_admin_section, 'rescore_button').click()
-        self.assertTrue(self.instructor_dashboard_page.is_rescore_unsupported_message_visible())
-
     def test_rescore_rescorable(self):
         student_admin_section = self.instructor_dashboard_page.select_student_admin(StudentSpecificAdmin)
         student_admin_section.set_student_email_or_username(self.username)
@@ -1392,3 +1352,20 @@ class StudentAdminTest(BaseInstructorDashboardTest):
         alert = get_modal_alert(student_admin_section.browser)
         alert.dismiss()
         self.assertFalse(self.instructor_dashboard_page.is_rescore_unsupported_message_visible())
+
+    def test_task_list_visibility(self):
+        """
+        Test that instructor task list is visible on student admin section
+        to users who have access to instructor tab/dashboard
+        """
+        # first check for global staff users
+        student_admin_section = self.instructor_dashboard_page.select_student_admin(StudentAdminPage)
+        self.assertTrue(student_admin_section.running_tasks_section.visible)
+
+        # logout global-staff user and check for users with staff access to course
+        LogoutPage(self.browser).visit()
+        # having staff access to course is compulsory to access instructor dashboard
+        self.log_in_as_instructor(False, ['staff'])
+        self.instructor_dashboard_page = self.visit_instructor_dashboard()
+        student_admin_section = self.instructor_dashboard_page.select_student_admin(StudentAdminPage)
+        self.assertTrue(student_admin_section.running_tasks_section.visible)

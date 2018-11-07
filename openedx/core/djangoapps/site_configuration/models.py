@@ -12,8 +12,8 @@ from django.core.files.storage import get_storage_class
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django_extensions.db.models import TimeStampedModel
 from jsonfield.fields import JSONField
+from model_utils.models import TimeStampedModel
 
 from storages.backends.s3boto import S3BotoStorage
 from openedx.core.djangoapps.appsembler.sites.utils import get_initial_sass_variables, get_initial_page_elements, \
@@ -31,7 +31,7 @@ class SiteConfiguration(models.Model):
         site (OneToOneField): one to one field relating each configuration to a single site
         values (JSONField):  json field to store configurations for a site
     """
-    site = models.OneToOneField(Site, related_name='configuration')
+    site = models.OneToOneField(Site, related_name='configuration', on_delete=models.CASCADE)
     enabled = models.BooleanField(default=False, verbose_name="Enabled")
     values = JSONField(
         null=False,
@@ -218,13 +218,17 @@ class SiteConfigurationHistory(TimeStampedModel):
         site (ForeignKey): foreign-key to django Site
         values (JSONField): json field to store configurations for a site
     """
-    site = models.ForeignKey(Site, related_name='configuration_histories')
+    site = models.ForeignKey(Site, related_name='configuration_histories', on_delete=models.CASCADE)
     enabled = models.BooleanField(default=False, verbose_name="Enabled")
     values = JSONField(
         null=False,
         blank=True,
         load_kwargs={'object_pairs_hook': collections.OrderedDict}
     )
+
+    class Meta:
+        get_latest_by = 'modified'
+        ordering = ('-modified', '-created',)
 
     def __unicode__(self):
         return u"<SiteConfigurationHistory: {site}, Last Modified: {modified} >".format(

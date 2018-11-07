@@ -1,6 +1,7 @@
 """
 Tests for block_structure.py
 """
+from datetime import datetime
 # pylint: disable=protected-access
 from collections import namedtuple
 from copy import deepcopy
@@ -155,6 +156,45 @@ class TestBlockStructureData(TestCase, ChildrenMapTestMixin):
                     getattr(bs_block, field, None),
                     block.field_map.get(field),
                 )
+
+    def test_xblock_field_override(self):
+        # block field override test cases
+        attribute = {
+            "start": datetime(2017, 3, 23, 16, 38, 46, 271475),
+            "display_name": "Foo block",
+            "due": datetime(2017, 5, 23, 16, 38, 46, 271475)
+        }
+        override_due_date = datetime(2018, 2, 23, 16, 38, 46, 271475)
+        block = MockXBlock("Foo", attribute)
+
+        # add each block
+        block_structure = BlockStructureModulestoreData(root_block_usage_key=0)
+        block_structure._add_xblock(block.location, block)
+        block_structure._get_or_create_block(block.location)
+
+        fields = attribute.keys()
+        block_structure.request_xblock_fields(*fields)
+
+        # collect fields
+        block_structure._collect_requested_xblock_fields()
+
+        # verify values of collected fields
+        bs_block = block_structure[block.location]
+        for field in fields:
+            self.assertEquals(
+                getattr(bs_block, field, None),
+                block.field_map.get(field),
+            )
+
+        block_structure.override_xblock_field(
+            block.location,
+            "due",
+            override_due_date
+        )
+        self.assertEquals(
+            block_structure.get_xblock_field(block.location, "due", None),
+            override_due_date
+        )
 
     @ddt.data(
         *itertools.product(

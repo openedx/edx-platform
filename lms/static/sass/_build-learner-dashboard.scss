@@ -1,11 +1,17 @@
 // ------------------------------
 // Learner Dashboard: Shared Build Compile
-// Uses the Pattern Library
 
+// Base build
+@import 'base/build';
+
+// Pattern Library
 @import 'elements/banners';
 @import 'elements/course-card';
 @import 'elements/program-card';
 @import 'elements-v2/icons';
 @import 'elements/progress-circle';
+
+// Various View Styling
+@import 'views/course-entitlements';
 @import 'views/program-details';
 @import 'views/program-list';

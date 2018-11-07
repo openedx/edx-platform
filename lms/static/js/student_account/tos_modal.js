@@ -79,6 +79,7 @@
     var buildIframe = function(link, modalSelector, contentSelector, tosLinkSelector) {
         // Create an iframe with contents from the link and set its height to match the content area
         return $('<iframe>', {
+            title: 'Terms of Service and Honor Code',
             src: link.href,
             load: function() {
                 var $iframeHead = $(this).contents().find('head'),

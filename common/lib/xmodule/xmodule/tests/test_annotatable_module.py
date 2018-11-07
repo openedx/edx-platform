@@ -8,12 +8,13 @@ from mock import Mock
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from xmodule.annotatable_module import AnnotatableModule
-from opaque_keys.edx.locations import Location
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
 from . import get_test_system
 
 
 class AnnotatableModuleTestCase(unittest.TestCase):
+    shard = 1
     sample_xml = '''
         <annotatable display_name="Iliad">
             <instructions>Read the text.</instructions>
@@ -37,7 +38,7 @@ class AnnotatableModuleTestCase(unittest.TestCase):
             Mock(),
             get_test_system(),
             DictFieldData({'data': self.sample_xml}),
-            ScopeIds(None, None, None, Location('org', 'course', 'run', 'category', 'name', None))
+            ScopeIds(None, None, None, BlockUsageLocator(CourseLocator('org', 'course', 'run'), 'category', 'name'))
         )
 
     def test_annotation_data_attr(self):

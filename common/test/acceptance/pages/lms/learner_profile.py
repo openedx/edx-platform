@@ -13,10 +13,6 @@ from common.test.acceptance.tests.helpers import select_option_by_value
 
 PROFILE_VISIBILITY_SELECTOR = '#u-field-select-account_privacy option[value="{}"]'
 PROFILE_VISIBILITY_INPUT = '#u-field-select-account_privacy'
-FIELD_ICONS = {
-    'country': 'fa-map-marker',
-    'language_proficiencies': 'fa-comment',
-}
 
 
 class Badge(PageObject):
@@ -148,8 +144,9 @@ class LearnerProfilePage(FieldsMixin, PageObject):
 
         if privacy != self.privacy:
             query = self.q(css=PROFILE_VISIBILITY_INPUT)
-            select_option_by_value(query, privacy, focus_out=True)
+            select_option_by_value(query, privacy)
             EmptyPromise(lambda: privacy == self.privacy, 'Privacy is set to {}'.format(privacy)).fulfill()
+            self.q(css='.btn-change-privacy').first.click()
             self.wait_for_ajax()
 
             if privacy == 'all_users':
@@ -213,18 +210,6 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         """
         self.wait_for_ajax()
         return self.q(css='#u-field-select-account_privacy').visible
-
-    def field_icon_present(self, field_id):
-        """
-        Check if an icon is present for a field. Only dropdown fields have icons.
-
-        Arguments:
-            field_id (str): field id
-
-        Returns:
-            True/False
-        """
-        return self.icon_for_field(field_id, FIELD_ICONS[field_id])
 
     def wait_for_public_fields(self):
         """
@@ -296,10 +281,6 @@ class LearnerProfilePage(FieldsMixin, PageObject):
         self.browser.execute_script('$(".upload-button-input").css("opacity",1);')
 
         self.wait_for_element_visibility('.upload-button-input', "upload button is visible")
-
-        self.browser.execute_script('$(".upload-submit").show();')
-
-        self.q(css='.upload-submit').first.click()
         self.q(css='.upload-button-input').results[0].send_keys(file_path)
         self.wait_for_ajax()
 

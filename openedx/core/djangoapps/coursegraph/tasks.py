@@ -12,11 +12,8 @@ from django.utils import six, timezone
 from opaque_keys.edx.keys import CourseKey
 from py2neo import Graph, Node, Relationship, authenticate, NodeSelector
 from py2neo.compat import integer, string, unicode as neo4j_unicode
-from request_cache.middleware import RequestCache
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
+from openedx.core.djangoapps.request_cache.middleware import RequestCache
 
-from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 
 log = logging.getLogger(__name__)
 celery_log = logging.getLogger('edx.celery.task')
@@ -39,6 +36,8 @@ def serialize_item(item):
         block_type: the name of the XBlock's type (i.e. 'course'
         or 'problem')
     """
+    from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
+
     # convert all fields to a dict and filter out parent and children field
     fields = dict(
         (field, field_value.read_from(item))
@@ -135,13 +134,30 @@ def get_course_last_published(course_key):
         text, or None, if there's no record of the last time this course
         was published.
     """
+    # Import is placed here to avoid model import at project startup.
+    from xmodule.modulestore.django import modulestore
+    from openedx.core.djangoapps.content.block_structure.models import BlockStructureModel
+    from openedx.core.djangoapps.content.block_structure.exceptions import BlockStructureNotFound
+
+    store = modulestore()
+    course_usage_key = store.make_course_usage_key(course_key)
     try:
-        structure = CourseStructure.objects.get(course_id=course_key)
+        structure = BlockStructureModel.get(course_usage_key)
         course_last_published_date = six.text_type(structure.modified)
-    except CourseStructure.DoesNotExist:
+    except BlockStructureNotFound:
         course_last_published_date = None
 
     return course_last_published_date
+
+
+def strip_branch_and_version(location):
+    """
+    Removes the branch and version information from a location.
+    Args:
+        location: an xblock's location.
+    Returns: that xblock's location without branch and version information.
+    """
+    return location.for_branch(None)
 
 
 def serialize_course(course_id):
@@ -154,6 +170,9 @@ def serialize_course(course_id):
         nodes: a list of py2neo Node objects
         relationships: a list of py2neo Relationships objects
     """
+    # Import is placed here to avoid model import at project startup.
+    from xmodule.modulestore.django import modulestore
+
     # create a location to node mapping we'll need later for
     # writing relationships
     location_to_node = {}
@@ -167,17 +186,19 @@ def serialize_course(course_id):
             fields[field_name] = coerce_types(value)
 
         node = Node(block_type, 'item', **fields)
-        location_to_node[item.location] = node
+        location_to_node[strip_branch_and_version(item.location)] = node
 
     # create relationships
     relationships = []
     for item in items:
         previous_child_node = None
-        for index, child_loc in enumerate(item.get_children()):
-            parent_node = location_to_node.get(item.location)
-            child_node = location_to_node.get(child_loc.location)
-            child_node["index"] = index
+        for index, child in enumerate(item.get_children()):
+            parent_node = location_to_node.get(strip_branch_and_version(item.location))
+            child_node = location_to_node.get(strip_branch_and_version(child.location))
+
             if parent_node is not None and child_node is not None:
+                child_node["index"] = index
+
                 relationship = Relationship(parent_node, "PARENT_OF", child_node)
                 relationships.append(relationship)
 
@@ -291,6 +312,8 @@ class ModuleStoreSerializer(object):
                 For example, ["course-v1:org+course+run"].
             skip: Also a list of string serializations of course keys.
         """
+        # Import is placed here to avoid model import at project startup.
+        from xmodule.modulestore.django import modulestore
         if courses:
             course_keys = [CourseKey.from_string(course.strip()) for course in courses]
         else:

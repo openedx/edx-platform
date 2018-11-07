@@ -7,6 +7,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
+from six import text_type
 
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from xmodule.modulestore.django import modulestore
@@ -128,6 +129,11 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
             the child blocks.  Returned only if "children" is included in the
             "requested_fields" parameter.
 
+          * completion: (float or None) The level of completion of the block.
+            Its value can vary between 0.0 and 1.0 or be equal to None
+            if block is not completable. Returned only if "completion"
+            is included in the "requested_fields" parameter.
+
           * block_counts: (dict) For each block type specified in the
             block_counts parameter to the endpoint, the aggregate number of
             blocks of that type for this block and all of its descendants.
@@ -210,7 +216,7 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
                 )
             )
         except ItemNotFoundError as exception:
-            raise Http404("Block not found: {}".format(exception.message))
+            raise Http404("Block not found: {}".format(text_type(exception)))
 
 
 @view_auth_classes()

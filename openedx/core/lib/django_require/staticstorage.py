@@ -2,7 +2,7 @@
 :class:`~django_require.staticstorage.OptimizedCachedRequireJsStorage`
 """
 
-from django_pipeline_forgiving.storages import PipelineForgivingStorage
+from openedx.core.storage import PipelineForgivingStorage
 from require.storage import OptimizedFilesMixin
 
 

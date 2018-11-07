@@ -41,9 +41,9 @@
 var path = require('path');
 var _ = require('underscore');
 var appRoot = path.join(__dirname, '../../../../');
-var webpackConfig = require(path.join(appRoot, 'webpack.config.js'));
-
-delete webpackConfig.entry;
+var webdriver = require('selenium-webdriver');
+var firefox = require('selenium-webdriver/firefox');
+var webpackConfig = require(path.join(appRoot, 'webpack.dev.config.js'));
 
 // The following crazy bit is to work around the webpack.optimize.CommonsChunkPlugin
 // plugin. The problem is that it it factors out the code that defines webpackJsonp
@@ -54,8 +54,7 @@ delete webpackConfig.entry;
 //     https://github.com/webpack-contrib/karma-webpack/issues/24#issuecomment-257613167
 //
 // This should be fixed in v3 of karma-webpack
-const commonsChunkPluginIndex = webpackConfig.plugins.findIndex(plugin => plugin.chunkNames);
-webpackConfig.plugins.splice(commonsChunkPluginIndex, 1);
+var commonsChunkPluginIndex = webpackConfig.plugins.findIndex(function(plugin) { return plugin.chunkNames; });
 
 // Files which are needed by all lms/cms suites.
 var commonFiles = {
@@ -63,7 +62,6 @@ var commonFiles = {
         {pattern: 'common/js/vendor/**/*.js'},
         {pattern: 'edx-pattern-library/js/**/*.js'},
         {pattern: 'edx-ui-toolkit/js/**/*.js'},
-        {pattern: 'xmodule_js/common_static/coffee/src/**/!(*spec).js'},
         {pattern: 'xmodule_js/common_static/common/js/**/!(*spec).js'},
         {pattern: 'xmodule_js/common_static/js/**/!(*spec).js'},
         {pattern: 'xmodule_js/src/**/*.js'}
@@ -81,6 +79,10 @@ var commonFiles = {
         {pattern: 'common/templates/**/*.underscore'}
     ]
 };
+
+webpackConfig.plugins.splice(commonsChunkPluginIndex, 1);
+
+delete webpackConfig.entry;
 
 /**
  * Customize the name attribute in xml testcase element
@@ -123,6 +125,8 @@ function reporters(config) {
  * @return {Object}
  */
 function getBasepathAndFilename(filepath) {
+    var file, dir;
+
     if (!filepath) {
         // these will configure the reporters to create report files relative to this karma config file
         return {
@@ -130,9 +134,8 @@ function getBasepathAndFilename(filepath) {
             file: undefined
         };
     }
-
-    var file = filepath.replace(/^.*[\\\/]/, ''),
-        dir = filepath.replace(file, '');
+    file = filepath.replace(/^.*[\\/]/, '');
+    dir = filepath.replace(file, '');
 
     return {
         dir: dir,
@@ -147,13 +150,13 @@ function getBasepathAndFilename(filepath) {
  * @return {Object}
  */
 function coverageSettings(config) {
-    var path = getBasepathAndFilename(config.coveragereportpath);
+    var pth = getBasepathAndFilename(config.coveragereportpath);
     return {
-        dir: path.dir,
+        dir: pth.dir,
         subdir: '.',
         includeAllSources: true,
         reporters: [
-            {type: 'cobertura', file: path.file},
+            {type: 'cobertura', file: pth.file},
             {type: 'text-summary'}
         ]
     };
@@ -166,10 +169,10 @@ function coverageSettings(config) {
  * @return {Object}
  */
 function junitSettings(config) {
-    var path = getBasepathAndFilename(config.junitreportpath);
+    var pth = getBasepathAndFilename(config.junitreportpath);
     return {
-        outputDir: path.dir,
-        outputFile: path.file,
+        outputDir: pth.dir,
+        outputFile: pth.file,
         suite: 'javascript',
         useBrowserName: false,
         nameFormatter: junitNameFormatter,
@@ -184,14 +187,15 @@ function junitSettings(config) {
  * @return {String}
  */
 // I'd like to fix the no-shadow violation on the next line, but it would break this shared conf's API.
-function defaultNormalizeFunc(appRoot, pattern) {  // eslint-disable-line no-shadow
-    if (pattern.match(/^common\/js/)) {
-        pattern = path.join(appRoot, '/common/static/' + pattern);
-    } else if (pattern.match(/^xmodule_js\/common_static/)) {
-        pattern = path.join(appRoot, '/common/static/' +
-            pattern.replace(/^xmodule_js\/common_static\//, ''));
+function defaultNormalizeFunc(appRoot, pattern) { // eslint-disable-line no-shadow
+    var pat = pattern;
+    if (pat.match(/^common\/js/)) {
+        pat = path.join(appRoot, '/common/static/' + pat);
+    } else if (pat.match(/^xmodule_js\/common_static/)) {
+        pat = path.join(appRoot, '/common/static/' +
+            pat.replace(/^xmodule_js\/common_static\//, ''));
     }
-    return pattern;
+    return pat;
 }
 
 function normalizePathsForCoverage(files, normalizeFunc, preprocessors) {
@@ -224,7 +228,7 @@ function setDefaults(files) {
     return files.map(function(f) {
         var file = _.isObject(f) ? f : {pattern: f};
         if (!file.included && !file.webpack) {
-            f.included = false;
+            file.included = false;
         }
         return file;
     });
@@ -233,12 +237,17 @@ function setDefaults(files) {
 function getBaseConfig(config, useRequireJs) {
     var getFrameworkFiles = function() {
         var files = [
-            'node_modules/jquery/dist/jquery.js',
+            'common/static/common/js/vendor/jquery.js',
             'node_modules/jasmine-core/lib/jasmine-core/jasmine.js',
             'common/static/common/js/jasmine_stack_trace.js',
             'node_modules/karma-jasmine/lib/boot.js',
             'node_modules/karma-jasmine/lib/adapter.js',
-            'node_modules/jasmine-jquery/lib/jasmine-jquery.js'
+            'node_modules/jasmine-jquery/lib/jasmine-jquery.js',
+            'node_modules/popper.js/dist/umd/popper.js',
+            'node_modules/bootstrap/dist/js/bootstrap.js',
+            'node_modules/underscore/underscore.js',
+            'node_modules/backbone/backbone.js',
+            'common/static/js/test/i18n.js'
         ];
 
         if (useRequireJs) {
@@ -269,15 +278,21 @@ function getBaseConfig(config, useRequireJs) {
     };
 
     var hostname = 'localhost';
-    if (process.env.hasOwnProperty('BOK_CHOY_HOSTNAME')) {
-        hostname = process.env.BOK_CHOY_HOSTNAME;
-    }
-
-    initFrameworks.$inject = ['config.files'];
-
+    var port = 9876;
     var customPlugin = {
         'framework:custom': ['factory', initFrameworks]
     };
+
+    if (process.env.hasOwnProperty('BOK_CHOY_HOSTNAME')) {
+        hostname = process.env.BOK_CHOY_HOSTNAME;
+        if (hostname === 'edx.devstack.lms') {
+            port = 19876;
+        } else {
+            port = 19877;
+        }
+    }
+
+    initFrameworks.$inject = ['config.files'];
 
     return {
         // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -296,7 +311,7 @@ function getBaseConfig(config, useRequireJs) {
             'karma-chrome-launcher',
             'karma-firefox-launcher',
             'karma-spec-reporter',
-            'karma-webdriver-launcher',
+            'karma-selenium-webdriver-launcher',
             'karma-webpack',
             'karma-sourcemap-loader',
             customPlugin
@@ -324,7 +339,7 @@ function getBaseConfig(config, useRequireJs) {
 
         // web server hostname and port
         hostname: hostname,
-        port: 9876,
+        port: port,
 
 
         // enable / disable colors in the output (reporters and logs)
@@ -354,12 +369,29 @@ function getBaseConfig(config, useRequireJs) {
                     'app.update.enabled': false
                 }
             },
+            ChromeDocker: {
+                base: 'SeleniumWebdriver',
+                browserName: 'chrome',
+                getDriver: function() {
+                    return new webdriver.Builder()
+                        .forBrowser('chrome')
+                        .usingServer('http://edx.devstack.chrome:4444/wd/hub')
+                        .build();
+                }
+            },
             FirefoxDocker: {
-                base: 'WebDriver',
+                base: 'SeleniumWebdriver',
                 browserName: 'firefox',
-                config: {
-                    hostname: 'edx.devstack.firefox',
-                    port: 4444
+                getDriver: function() {
+                    var options = new firefox.Options(),
+                        profile = new firefox.Profile();
+                    profile.setPreference('focusmanager.testmode', true);
+                    options.setProfile(profile);
+                    return new webdriver.Builder()
+                        .forBrowser('firefox')
+                        .usingServer('http://edx.devstack.firefox:4444/wd/hub')
+                        .setFirefoxOptions(options)
+                        .build();
                 }
             }
         },
@@ -389,8 +421,9 @@ function getBaseConfig(config, useRequireJs) {
 }
 
 function configure(config, options) {
-    var useRequireJs = options.useRequireJs === undefined ? true : useRequireJs,
-        baseConfig = getBaseConfig(config, useRequireJs);
+    var useRequireJs = options.useRequireJs === undefined ? true : options.useRequireJs,
+        baseConfig = getBaseConfig(config, useRequireJs),
+        files, filesForCoverage, preprocessors;
 
     if (options.includeCommonFiles) {
         _.forEach(['libraryFiles', 'sourceFiles', 'specFiles', 'fixtureFiles'], function(collectionName) {
@@ -398,7 +431,7 @@ function configure(config, options) {
         });
     }
 
-    var files = _.flatten(
+    files = _.flatten(
         _.map(
             ['libraryFilesToInclude', 'libraryFiles', 'sourceFiles', 'specFiles', 'fixtureFiles', 'runFiles'],
             function(collectionName) { return options[collectionName] || []; }
@@ -417,7 +450,7 @@ function configure(config, options) {
     // We set it to false by default because RequireJS should be used instead.
     files = setDefaults(files);
 
-    var filesForCoverage = _.flatten(
+    filesForCoverage = _.flatten(
         _.map(
             ['sourceFiles', 'specFiles'],
             function(collectionName) { return options[collectionName]; }
@@ -426,7 +459,7 @@ function configure(config, options) {
 
     // If we give symlink paths to Istanbul, coverage for each path gets tracked
     // separately. So we pass absolute paths to the karma-coverage preprocessor.
-    var preprocessors = _.extend(
+    preprocessors = _.extend(
         {},
         options.preprocessors,
         normalizePathsForCoverage(filesForCoverage, options.normalizePathsForCoverageFunc, options.preprocessors)

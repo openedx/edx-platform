@@ -1,19 +1,32 @@
+"""
+Views to support notification preferences.
+"""
+
+from __future__ import division
+
 import json
+import os
 from base64 import urlsafe_b64decode, urlsafe_b64encode
 from hashlib import sha256
 
-from Crypto import Random
-from Crypto.Cipher import AES
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.ciphers import Cipher
+from cryptography.hazmat.primitives.ciphers.algorithms import AES
+from cryptography.hazmat.primitives.ciphers.modes import CBC
+from cryptography.hazmat.primitives.padding import PKCS7
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponse
 from django.views.decorators.http import require_GET, require_POST
+from six import text_type
 
 from edxmako.shortcuts import render_to_response
 from notification_prefs import NOTIFICATION_PREF_KEY
 from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.core.djangoapps.user_api.preferences.api import delete_user_preference
+
+AES_BLOCK_SIZE_BYTES = int(AES.block_size / 8)
 
 
 class UsernameDecryptionException(Exception):
@@ -39,35 +52,20 @@ class UsernameCipher(object):
        decryption cipher
     5. base64url encode the result
     """
-
     @staticmethod
     def _get_aes_cipher(initialization_vector):
         hash_ = sha256()
         hash_.update(settings.SECRET_KEY)
-        return AES.new(hash_.digest(), AES.MODE_CBC, initialization_vector)
-
-    @staticmethod
-    def _add_padding(input_str):
-        """Return `input_str` with PKCS#7 padding added to match AES block length"""
-        padding_len = AES.block_size - len(input_str) % AES.block_size
-        return input_str + padding_len * chr(padding_len)
-
-    @staticmethod
-    def _remove_padding(input_str):
-        """Return `input_str` with PKCS#7 padding trimmed to match AES block length"""
-        num_pad_bytes = ord(input_str[-1])
-        if num_pad_bytes < 1 or num_pad_bytes > AES.block_size or num_pad_bytes >= len(input_str):
-            raise UsernameDecryptionException("padding")
-        return input_str[:-num_pad_bytes]
+        return Cipher(AES(hash_.digest()), CBC(initialization_vector), backend=default_backend())
 
     @staticmethod
     def encrypt(username):
-        initialization_vector = Random.new().read(AES.block_size)
+        initialization_vector = os.urandom(AES_BLOCK_SIZE_BYTES)
         aes_cipher = UsernameCipher._get_aes_cipher(initialization_vector)
-        return urlsafe_b64encode(
-            initialization_vector +
-            aes_cipher.encrypt(UsernameCipher._add_padding(username.encode("utf-8")))
-        )
+        encryptor = aes_cipher.encryptor()
+        padder = PKCS7(AES.block_size).padder()
+        padded = padder.update(username.encode("utf-8")) + padder.finalize()
+        return urlsafe_b64encode(initialization_vector + encryptor.update(padded) + encryptor.finalize())
 
     @staticmethod
     def decrypt(token):
@@ -76,19 +74,27 @@ class UsernameCipher(object):
         except TypeError:
             raise UsernameDecryptionException("base64url")
 
-        if len(base64_decoded) < AES.block_size:
+        if len(base64_decoded) < AES_BLOCK_SIZE_BYTES:
             raise UsernameDecryptionException("initialization_vector")
 
-        initialization_vector = base64_decoded[:AES.block_size]
-        aes_encrypted = base64_decoded[AES.block_size:]
+        initialization_vector = base64_decoded[:AES_BLOCK_SIZE_BYTES]
+        aes_encrypted = base64_decoded[AES_BLOCK_SIZE_BYTES:]
         aes_cipher = UsernameCipher._get_aes_cipher(initialization_vector)
+        decryptor = aes_cipher.decryptor()
+        unpadder = PKCS7(AES.block_size).unpadder()
 
         try:
-            decrypted = aes_cipher.decrypt(aes_encrypted)
+            decrypted = decryptor.update(aes_encrypted) + decryptor.finalize()
         except ValueError:
             raise UsernameDecryptionException("aes")
 
-        return UsernameCipher._remove_padding(decrypted)
+        try:
+            unpadded = unpadder.update(decrypted) + unpadder.finalize()
+            if len(unpadded) == 0:
+                raise UsernameDecryptionException("padding")
+            return unpadded
+        except ValueError:
+            raise UsernameDecryptionException("padding")
 
 
 def enable_notifications(user):
@@ -117,7 +123,7 @@ def ajax_enable(request):
     user, this has no effect. Otherwise, a preference is created with the
     unsubscribe token (an encryption of the username) as the value.username
     """
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         raise PermissionDenied
 
     enable_notifications(request.user)
@@ -133,7 +139,7 @@ def ajax_disable(request):
     This view should be invoked by an AJAX POST call. It returns status 204
     (no content) or an error.
     """
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         raise PermissionDenied
 
     delete_user_preference(request.user, NOTIFICATION_PREF_KEY)
@@ -149,7 +155,7 @@ def ajax_status(request):
     This view should be invoked by an AJAX GET call. It returns status 200,
     with a JSON-formatted payload, or an error.
     """
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         raise PermissionDenied
 
     qs = UserPreference.objects.filter(
@@ -180,7 +186,7 @@ def set_subscription(request, token, subscribe):  # pylint: disable=unused-argum
     except UnicodeDecodeError:
         raise Http404("base64url")
     except UsernameDecryptionException as exn:
-        raise Http404(exn.message)
+        raise Http404(text_type(exn))
     except User.DoesNotExist:
         raise Http404("username")
 

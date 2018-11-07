@@ -1,0 +1,51 @@
+## mako
+
+<%page expression_filter="h"/>
+
+<%namespace name='static' file='../static_content.html'/>
+
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangoapps.theming.helpers import get_themes
+%>
+
+<%block name="content">
+<div class="page-content-container">
+    <header class="page-header">
+        <div class="page-header-main">
+            <nav aria-label="Theming Administration" class="sr-is-focusable" tabindex="-1">
+                <h3>${_("Theming Administration")}</h3>
+            </nav>
+        </div>
+    </header>
+    <div class="page-content">
+        <div class="page-content-main">
+            <form class="form" action="${request.path}" method="post">
+                <div class="form-group">
+                    <label>${_("Preview Theme")}
+                        <select class="form-control" name="preview_theme">
+                            <%
+                            all_themes = list(get_themes())
+                            all_themes.sort(key=lambda x: x.theme_dir_name)
+                            current_theme_name = request.site_theme.theme_dir_name if request.site_theme else None
+                            %>
+                            % for theme in all_themes:
+                                <% theme_name = theme.theme_dir_name %>
+                                <option value="${theme_name}"${' selected=selected' if theme_name == current_theme_name else ''}>${theme_name}</option>
+                            % endfor
+                        </select>
+                    </label>
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-primary" type="submit" name="action" value="set_preview_theme">${_("Submit")}</button>
+                    <button class="btn btn-secondary" type="submit" name="action" value="reset_preview_theme">${_("Reset")}</button>
+                </div>
+
+                <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }"/>
+            </form>
+
+            <p>See also <a href="/admin">Django admin</a> for more theming settings.</p>
+        </div>
+    </div>
+</div>
+</%block>

@@ -1,0 +1,15 @@
+{% load i18n %}
+<h3>{% blocktrans with filter_title=title %} By {{ filter_title }} {% endblocktrans %}</h3>
+<form method="GET">
+    {% for name, param in spec.unused_parameters.items %}
+    <input type="hidden" name="{{ name }}" value="{{ param }}"/>
+    {% endfor %}
+    <select name="{{ spec.parameter_name }}">
+        {% for choice in choices %}
+        <option{% if choice.selected %} selected="selected" {% endif %} value="{{ choice.value }}">
+            {{ choice.display }}
+        </option>
+        {% endfor %}
+    </select>
+    <input type="submit" value="Filter!"/>
+</form>

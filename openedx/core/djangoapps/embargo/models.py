@@ -17,15 +17,17 @@ import logging
 import ipaddr
 from config_models.models import ConfigurationModel
 from django.core.cache import cache
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import models
 from django.db.models.signals import post_delete, post_save
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 from django_countries import countries
 from django_countries.fields import CountryField
+from opaque_keys.edx.django.models import CourseKeyField
+from six import text_type
 
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, NoneToEmptyManager
+from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 
 from .exceptions import InvalidAccessPoint
 from .messages import COURSEWARE_MESSAGES, ENROLL_MESSAGES
@@ -65,7 +67,7 @@ class EmbargoedCourse(models.Model):
         if self.embargoed:
             not_em = ""
         # pylint: disable=no-member
-        return u"Course '{}' is {}Embargoed".format(self.course_id.to_deprecated_string(), not_em)
+        return u"Course '{}' is {}Embargoed".format(text_type(self.course_id), not_em)
 
 
 class EmbargoedState(ConfigurationModel):
@@ -426,12 +428,14 @@ class CountryAccessRule(models.Model):
 
     restricted_course = models.ForeignKey(
         "RestrictedCourse",
-        help_text=ugettext_lazy(u"The course to which this rule applies.")
+        help_text=ugettext_lazy(u"The course to which this rule applies."),
+        on_delete=models.CASCADE,
     )
 
     country = models.ForeignKey(
         "Country",
-        help_text=ugettext_lazy(u"The country to which this rule applies.")
+        help_text=ugettext_lazy(u"The country to which this rule applies."),
+        on_delete=models.CASCADE,
     )
 
     CACHE_KEY = u"embargo.allowed_countries.{course_key}"

@@ -1,0 +1,31 @@
+<%page expression_filter="h"/>
+
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.js_utils import js_escaped_string
+%>
+
+<%namespace name='static' file='../static_content.html'/>
+
+<%inherit file="../main.html" />
+
+<%block name="js_extra">
+<%static:require_module module_name="support/js/manage_user_factory" class_name="ManageUserFactory">
+    new ManageUserFactory({
+        user: '${username | n, js_escaped_string}',
+        userSupportUrl: '${user_support_url | n, js_escaped_string}',
+        userDetailUrl: '${user_detail_url | n, js_escaped_string}'
+    });
+</%static:require_module>
+</%block>
+
+<%block name="pagetitle">
+${_("Manage User")}
+</%block>
+
+<%block name="content">
+<section class="container outside-app">
+  <h1>${_("Student Support: Manage User")}</h1>
+  <div class="manage-user-content"></div>
+</section>
+</%block>

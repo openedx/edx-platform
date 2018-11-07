@@ -24,7 +24,7 @@ class SessionInactivityTimeout(object):
         """
         Standard entry point for processing requests in Django
         """
-        if not hasattr(request, "user") or not request.user.is_authenticated():
+        if not hasattr(request, "user") or not request.user.is_authenticated:
             #Can't log out if not logged in
             return
 

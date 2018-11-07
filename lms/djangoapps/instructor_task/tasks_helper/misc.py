@@ -20,7 +20,7 @@ from instructor_analytics.csvs import format_dictlist
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from survey.models import SurveyAnswer
-from util.file import UniversalNewlineIterator, course_filename_prefix_generator
+from util.file import UniversalNewlineIterator
 
 from .runner import TaskProgress
 from .utils import UPDATE_STATUS_FAILED, UPDATE_STATUS_SUCCEEDED, upload_csv_to_report_store
@@ -100,7 +100,23 @@ def upload_proctored_exam_results_report(_xmodule_instance_args, _entry_id, cour
     task_progress.update_task_state(extra_meta=current_step)
 
     # Compute result table and format it
-    query_features = _task_input.get('features')
+    query_features = [
+        'course_id',
+        'exam_name',
+        'username',
+        'email',
+        'attempt_code',
+        'allowed_time_limit_mins',
+        'is_sample_attempt',
+        'started_at',
+        'completed_at',
+        'status',
+        'review_status',
+        'Suspicious Count',
+        'Suspicious Comments',
+        'Rules Violation Count',
+        'Rules Violation Comments'
+    ]
     student_data = get_proctored_exam_results(course_id, query_features)
     header, rows = format_dictlist(student_data, query_features)
 

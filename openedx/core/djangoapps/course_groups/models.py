@@ -10,8 +10,10 @@ from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from util.db import outer_atomic
+
+from opaque_keys.edx.django.models import CourseKeyField
+from openedx.core.djangolib.model_mixins import DeletableByUserValue
 
 log = logging.getLogger(__name__)
 
@@ -68,8 +70,8 @@ class CourseUserGroup(models.Model):
 class CohortMembership(models.Model):
     """Used internally to enforce our particular definition of uniqueness"""
 
-    course_user_group = models.ForeignKey(CourseUserGroup)
-    user = models.ForeignKey(User)
+    course_user_group = models.ForeignKey(CourseUserGroup, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     course_id = CourseKeyField(max_length=255)
 
     previous_cohort = None
@@ -153,7 +155,7 @@ class CourseUserGroupPartitionGroup(models.Model):
     """
     Create User Partition Info.
     """
-    course_user_group = models.OneToOneField(CourseUserGroup)
+    course_user_group = models.OneToOneField(CourseUserGroup, on_delete=models.CASCADE)
     partition_id = models.IntegerField(
         help_text="contains the id of a cohorted partition in this course"
     )
@@ -183,7 +185,6 @@ class CourseCohortsSettings(models.Model):
     # Note that although a default value is specified here for always_cohort_inline_discussions (False),
     # in reality the default value at the time that cohorting is enabled for a course comes from
     # course_module.always_cohort_inline_discussions (via `migrate_cohort_settings`).
-    # pylint: disable=invalid-name
     # DEPRECATED-- DO NOT USE: Instead use `CourseDiscussionSettings.always_divide_inline_discussions`
     # via `get_course_discussion_settings` or `set_course_discussion_settings`.
     always_cohort_inline_discussions = models.BooleanField(default=False)
@@ -208,7 +209,8 @@ class CourseCohort(models.Model):
     """
     This model represents cohort related info.
     """
-    course_user_group = models.OneToOneField(CourseUserGroup, unique=True, related_name='cohort')
+    course_user_group = models.OneToOneField(CourseUserGroup, unique=True, related_name='cohort',
+                                             on_delete=models.CASCADE)
 
     RANDOM = 'random'
     MANUAL = 'manual'
@@ -237,11 +239,14 @@ class CourseCohort(models.Model):
         return course_cohort
 
 
-class UnregisteredLearnerCohortAssignments(models.Model):
-
+class UnregisteredLearnerCohortAssignments(DeletableByUserValue, models.Model):
+    """
+    Tracks the assignment of an unregistered learner to a course's cohort.
+    """
+    #pylint: disable=model-missing-unicode
     class Meta(object):
         unique_together = (('course_id', 'email'), )
 
-    course_user_group = models.ForeignKey(CourseUserGroup)
+    course_user_group = models.ForeignKey(CourseUserGroup, on_delete=models.CASCADE)
     email = models.CharField(blank=True, max_length=255, db_index=True)
     course_id = CourseKeyField(max_length=255)

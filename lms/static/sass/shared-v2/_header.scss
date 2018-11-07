@@ -1,148 +1,164 @@
 // LMS header styles
 
 .header-global {
-    @extend %ui-depth1;
-    box-sizing: border-box;
-    position: relative;
-    width: 100%;
-    border-bottom: 1px solid $gray-l1;
-    box-shadow: 0 1px 5px 0 $shadow-l1;
-    background: $header-bg;
+  @extend %ui-depth1;
 
-    .logo-header {
+  box-sizing: border-box;
+  position: relative;
+  width: 100%;
+  border-bottom: 1px solid $header-border-color;
+  box-shadow: 0 1px 5px 0 $shadow-l1;
+  background: $header-bg;
+
+  .logo-header {
+    display: inline;
+  }
+
+  .wrapper-header {
+    @include clearfix();
+
+    box-sizing: border-box;
+    margin: 0 auto;
+    padding: 10px 10px 0;
+    width: 100%;
+    max-width: map-get($container-max-widths, xl);
+
+    .left {
+      @include float(left);
+    }
+
+    .right {
+      @include float(right);
+    }
+
+    .logo {
+      @include float(left);
+      @include margin-right(10px);
+
+      margin-top: 4px;
+      margin-bottom: 0;
+      position: relative;
+    }
+
+    .course-header {
+      @include float(left);
+      @include margin(12px, 10px, 0, 10px);
+
+      color: $body-color;
+
+      .provider {
+        font-weight: bold;
+      }
+    }
+
+    .wrapper-user-menu {
+      @include float(right);
+
+      margin-top: 4px;
+      width: auto;
+    }
+
+    .dropdown-menu {
+      @include text-align(left);
+
+      top: inherit;
+    }
+
+    .user-menu {
       display: inline;
     }
 
+    .list-inline {
+      &.nav-global {
+        @include margin(0, 0, 0, $baseline/2);
+
+        .btn {
+          border: none;
+          padding: 0;
+          color: theme-color("primary");
+          background: transparent;
+
+          &:hover {
+            background: transparent;
+            color: $link-hover;
+            text-decoration: underline;
+          }
+        }
+      }
+
+      .item {
+        font-weight: font-weight(semi-bold);
+
+        &.active {
+          a {
+            text-decoration: none;
+            color: $link-color;
+          }
+        }
+      }
+    }
+
+    .tab-nav-item {
+      @include float(left);
+
+      display: flex;
+      margin: 0;
+      justify-content: center;
+
+      .tab-nav-link {
+        font-size: font-size(base);
+        font-weight: font-weight(semi-bold);
+        color: palette(grayscale, dark);
+        padding: 5px 25px 23px;
+        display: inline-block;
+
+        &:active,
+        &:focus,
+        &:hover {
+          border-bottom: 4px solid $border-color;
+        }
+      }
+
+      .active {
+        border-bottom: 4px solid $black-t3 !important;
+      }
+    }
+  }
+
+  // Style the courseware's slim version of the header
+  &.slim {
     .wrapper-header {
-        @include clearfix();
-        box-sizing: border-box;
-        margin: 0 auto;
-        padding: 10px 10px 0;
-        width: 100%;
-        max-width: $lms-max-width;
+      height: 60px;
 
-        .left {
-            @include float(left);
-        }
+      .logo img {
+        margin-top: 4px;
+        height: 30px;
+      }
 
-        .right {
-            @include float(right);
-        }
+      .course-header {
+        margin-top: 10px;
+      }
 
-        .logo {
-            @include float(left);
-            @include margin-right(10px);
-            margin-top: 4px;
-            margin-bottom: 0;
-            position: relative;
-        }
+      .list-inline.nav-global {
+        margin-top: 10px;
+      }
 
-        .course-header {
-            @include float(left);
-            @include margin(12px, 10px, 0px, 10px);
-            color: $lms-label-color;
-            .provider {
-              font-weight: bold;
-            }
-        }
-
-        .wrapper-user-menu {
-            @include float(right);
-            margin-top: 4px;
-            width: auto;
-        }
-
-        .dropdown-menu {
-            @include text-align(left);
-            top: inherit;
-        }
-
-        .user-menu {
-            display: inline;
-        }
-
-        .list-inline {
-            &.nav-global {
-                margin-top: 12px;
-                margin-bottom: 0;
-            }
-
-            &.nav-courseware {
-                margin-top: 5px;
-            }
-
-            .item {
-                font-weight: font-weight(semi-bold);
-                text-transform: uppercase;
-
-                &.active {
-                    a {
-                        text-decoration: none;
-                        color: $link-color;
-                    }
-                }
-            }
-        }
-
-        .tab-nav-item{
-            @include float(left);
-            display: flex;
-            margin: 0;
-            justify-content: center;
-
-            .tab-nav-link{
-                font-size: font-size(base);
-                font-weight: font-weight(semi-bold);
-                color: palette(grayscale, dark);
-                padding: 5px 25px 23px;
-                display: inline-block;
-
-                &:active,
-                &:focus,
-                &:hover {
-                    border-bottom: 4px solid $lms-border-color;
-                }
-            }
-
-            .active{
-                border-bottom: 4px solid $black-t3 !important;
-            }
-        }
+      .wrapper-user-menu {
+        margin-top: 0;
+      }
     }
-
-    // Style the courseware's slim version of the header
-    &.slim {
-        .wrapper-header {
-            height: 60px;
-
-            .logo img {
-                margin-top: 4px;
-                height: 30px;
-            }
-
-            .course-header {
-                margin-top: 10px;
-            }
-
-            .list-inline.nav-global {
-                margin-top: 10px;
-            }
-
-            .wrapper-user-menu {
-                margin-top: 0;
-            }
-        }
-    }
+  }
 }
 
 .doc-link {
-    @include float(right);
-    @include margin(($baseline*0.75), ($baseline*0.75), ($baseline*0.75), ($baseline*0.75));
-    font-size: 14px;
-    font-weight: bold;
-    color: $base-font-color;
+  @include float(right);
+  @include margin(($baseline*0.75), ($baseline*0.75), ($baseline*0.75), ($baseline*0.75));
 
-    &:visited {
-      color: $base-font-color;
-    }
+  font-size: 14px;
+  font-weight: bold;
+  color: $body-color;
+
+  &:visited {
+    color: $body-color;
+  }
 }

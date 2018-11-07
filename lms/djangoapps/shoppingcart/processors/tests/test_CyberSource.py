@@ -66,6 +66,7 @@ def fake_site(name, default=None):  # pylint: disable=unused-argument
     CC_PROCESSOR=TEST_CC_PROCESSOR
 )
 class CyberSourceTests(TestCase):
+    shard = 4
 
     def test_override_settings(self):
         self.assertEqual(settings.CC_PROCESSOR['CyberSource']['MERCHANT_ID'], 'edx_test')

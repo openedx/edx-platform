@@ -329,19 +329,28 @@ class ProblemPage(PageObject):
         self.wait_for_element_visibility('.notification.general.notification-submit', msg)
         self.wait_for_focus_on_submit_notification()
 
-    def click_hint(self):
+    def click_hint(self, hint_index=0):
         """
         Click the Hint button.
+
+        Arguments:
+            hint_index (int): Index of a displayed hint
         """
         click_css(self, '.problem .hint-button', require_notification=False)
-        self.wait_for_focus_on_hint_notification()
+        self.wait_for_focus_on_hint_notification(hint_index)
 
-    def wait_for_focus_on_hint_notification(self):
+    def wait_for_focus_on_hint_notification(self, hint_index=0):
         """
         Wait for focus to be on the hint notification.
+
+        Arguments:
+            hint_index (int): Index of a displayed hint
         """
+        css = '.notification-hint .notification-message > ol > li.hint-index-{hint_index}'.format(
+            hint_index=hint_index
+        )
         self.wait_for(
-            lambda: self.q(css='.notification-hint').focused,
+            lambda: self.q(css=css).focused,
             'Waiting for the focus to be on the hint notification'
         )
 

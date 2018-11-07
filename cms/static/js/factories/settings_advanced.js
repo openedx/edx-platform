@@ -24,17 +24,16 @@ define([
         editor.render();
 
         $('#deprecated-settings').click(function() {
-            var wrapperDeprecatedSetting = $('.wrapper-deprecated-setting'),
-                deprecatedSettingsLabel = $('.deprecated-settings-label');
+            var $wrapperDeprecatedSetting = $('.wrapper-deprecated-setting'),
+                $deprecatedSettingsLabel = $('.deprecated-settings-label');
 
             if ($(this).is(':checked')) {
-                wrapperDeprecatedSetting.addClass('is-set');
-                deprecatedSettingsLabel.text(gettext('Hide Deprecated Settings'));
+                $wrapperDeprecatedSetting.addClass('is-set');
+                $deprecatedSettingsLabel.text(gettext('Hide Deprecated Settings'));
                 editor.render_deprecated = true;
-            }
-            else {
-                wrapperDeprecatedSetting.removeClass('is-set');
-                deprecatedSettingsLabel.text(gettext('Show Deprecated Settings'));
+            } else {
+                $wrapperDeprecatedSetting.removeClass('is-set');
+                $deprecatedSettingsLabel.text(gettext('Show Deprecated Settings'));
                 editor.render_deprecated = false;
             }
 

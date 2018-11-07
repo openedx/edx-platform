@@ -4,9 +4,16 @@
 
 .discussion-body {
   @include clearfix();
+
+  width: 100%;
   border: none;
   background: transparent;
   box-shadow: none;
+
+  @include media-breakpoint-up(md) {
+    display: flex;
+    flex-direction: row-reverse;
+  }
 
   .bottom-post-status {
     padding: 30px;
@@ -32,7 +39,7 @@
 
   .discussion-reply-new {
     @include clearfix();
-    @include transition(opacity .2s linear 0s);
+    @include transition(opacity 0.2s linear 0s);
 
     h4 {
       font-size: $forum-large-font-size;
@@ -50,12 +57,13 @@
 // inline discussion module
 .discussion-module {
   @extend .discussion-body;
+
   display: block;
   position: relative;
   border-radius: $forum-border-radius;
 
   header {
-    .anonymous{
+    .anonymous {
       font-size: $forum-base-font-size;
     }
   }
@@ -71,12 +79,14 @@
 
   .discussion-module-header {
     @include float(left);
+
     width: flex-grid(7);
     margin-bottom: ($baseline * 0.75);
   }
 
   .add_post_btn_container {
     @include text-align(right);
+
     width: flex-grid(12);
     height: (2 * $baseline);
   }
@@ -85,19 +95,19 @@
     margin-top: $baseline;
     margin-bottom: $baseline;
   }
-
 }
 
 .discussion-show {
   @include float(right);
+
   position: relative;
   top: 3px;
   font-size: $forum-base-font-size;
   text-align: center;
 
   &.shown {
-    background-color: $btn-default-background-color;
-    color: $uxpl-primary-blue;
+    background-color: theme-color("inverse");
+    color: theme-color("primary");
   }
 }
 
@@ -111,7 +121,7 @@ section.discussion {
   }
 
   .inner-wrapper {
-    max-width: 1180px;
+    max-width: map-get($container-max-widths, xl);
     min-width: 760px;
     margin: auto;
   }
@@ -136,6 +146,7 @@ section.discussion-pagination {
     ol {
       li {
         @include padding-right($baseline/2);
+
         list-style: none;
         display: inline-block;
 
@@ -148,7 +159,7 @@ section.discussion-pagination {
           font-size: $forum-base-font-size;
           font-weight: 700;
           line-height: 32px;
-          color: $gray-d3;
+          color: theme-color("gray-dark");
           text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
         }
       }

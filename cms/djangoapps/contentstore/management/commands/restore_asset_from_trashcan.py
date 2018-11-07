@@ -6,8 +6,8 @@ from xmodule.contentstore.utils import restore_asset_from_trashcan
 class Command(BaseCommand):
     help = '''Restore a deleted asset from the trashcan back to it's original course'''
 
-    def handle(self, *args, **options):
-        if len(args) != 1 and len(args) != 0:
-            raise CommandError("restore_asset_from_trashcan requires one argument: <location>")
+    def add_arguments(self, parser):
+        parser.add_argument('location')
 
-        restore_asset_from_trashcan(args[0])
+    def handle(self, *args, **options):
+        restore_asset_from_trashcan(options['location'])

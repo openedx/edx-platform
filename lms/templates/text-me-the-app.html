@@ -1,0 +1,20 @@
+## mako
+
+<%page expression_filter="h"/>
+<%inherit file="main.html" />
+<%namespace name='static' file='static_content.html'/>
+
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML
+%>
+
+<%block name="title">
+  <title>${_("Text Me The App")}</title>
+</%block>
+
+<div class="text-me-content">
+    <div class="container text-me-container">
+        ${HTML(fragment.body_html())}
+    </div>
+</div>

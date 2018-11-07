@@ -7,7 +7,7 @@ import unittest
 import ddt
 import pytz
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test.utils import override_settings
 from mock import patch
 
@@ -233,7 +233,7 @@ class CreditCourseDashboardTest(ModuleStoreTestCase):
         self._make_eligible()
 
         # The user should have the option to purchase credit
-        with patch('student.views.get_credit_provider_display_names') as mock_method:
+        with patch('student.views.dashboard.get_credit_provider_display_names') as mock_method:
             mock_method.return_value = providers_list
             response = self._load_dashboard()
 

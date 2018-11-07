@@ -38,8 +38,8 @@
 
         // Get answer from protex and store it into the hidden input field
         // when Check button is clicked
-        var fold_button = $('#fold-button');
-        fold_button.on('click', function() {
+        var $fold_button = $('#fold-button');
+        $fold_button.on('click', function() {
             var problem = $('#protex_container').parents('.problem');
             var input_field = problem.find('input[type=hidden]');
             var protex_answer = protexCheckAnswer();

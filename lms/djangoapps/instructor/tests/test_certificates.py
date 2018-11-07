@@ -11,20 +11,20 @@ from config_models.models import cache
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test.utils import override_settings
 from nose.plugins.attrib import attr
 
 from capa.xqueue_interface import XQueueInterface
-from certificates import api as certs_api
-from certificates.models import (
+from lms.djangoapps.certificates import api as certs_api
+from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     CertificateInvalidation,
     CertificateStatuses,
     CertificateWhitelist,
     GeneratedCertificate
 )
-from certificates.tests.factories import (
+from lms.djangoapps.certificates.tests.factories import (
     CertificateInvalidationFactory,
     CertificateWhitelistFactory,
     GeneratedCertificateFactory
@@ -32,7 +32,7 @@ from certificates.tests.factories import (
 from course_modes.models import CourseMode
 from courseware.tests.factories import StaffFactory, GlobalStaffFactory, InstructorFactory, UserFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from student.models import CourseEnrollment
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -408,10 +408,9 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
 
             # Create and assert user's ID verification record.
             SoftwareSecurePhotoVerificationFactory.create(user=self.user, status=id_verification_status)
-            actual_verification_status = SoftwareSecurePhotoVerification.verification_status_for_user(
+            actual_verification_status = IDVerificationService.verification_status_for_user(
                 self.user,
-                self.course.id,
-                enrollment.mode,
+                enrollment.mode
             )
             self.assertEquals(actual_verification_status, verification_output)
 

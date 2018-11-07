@@ -4,6 +4,6 @@
     <div class="form-row">
         <div class="edit-comment-body" name="body" data-id="<%- id %>"><%- body %></div>
     </div>
-    <button type="submit" id="edit-comment-submit" class="btn-brand post-update"><%- gettext("Update comment") %></button>
-    <button class="btn post-cancel"><%- gettext("Cancel") %></button>
+    <button type="submit" id="edit-comment-submit" class="btn btn-primary post-update"><%- gettext("Update comment") %></button>
+    <button class="btn btn-outline-primary post-cancel"><%- gettext("Cancel") %></button>
 </div>

@@ -7,6 +7,8 @@ from config_models.models import ConfigurationModel
 from django.db import models
 from django.utils.text import compress_string
 
+from opaque_keys.edx.django.models import CreatorMixin
+
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 
@@ -40,11 +42,9 @@ def decompress_string(value):
     return ret
 
 
-class CompressedTextField(models.TextField):
+class CompressedTextField(CreatorMixin, models.TextField):
     """ TextField that transparently compresses data when saving to the database, and decompresses the data
     when retrieving it from the database. """
-
-    __metaclass__ = models.SubfieldBase
 
     def get_prep_value(self, value):
         """ Compress the text data. """

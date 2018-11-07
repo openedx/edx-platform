@@ -1,10 +1,10 @@
 from django.conf import settings
 from django.db import models
-from django_extensions.db.models import TimeStampedModel
+from model_utils.models import TimeStampedModel
 
 
 class ExperimentData(TimeStampedModel):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     experiment_id = models.PositiveSmallIntegerField(
         null=False, blank=False, db_index=True, verbose_name='Experiment ID'
     )
@@ -30,8 +30,8 @@ class ExperimentKeyValue(TimeStampedModel):
     value = models.TextField()
 
     class Meta(object):
-        verbose_name = 'Experiment Data'
-        verbose_name_plural = 'Experiment Data'
+        verbose_name = 'Experiment Key-Value Pair'
+        verbose_name_plural = 'Experiment Key-Value Pairs'
         unique_together = (
             ('experiment_id', 'key'),
         )

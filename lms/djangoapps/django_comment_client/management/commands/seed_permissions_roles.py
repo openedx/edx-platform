@@ -1,21 +1,20 @@
 """
 Management command to seed default permissions and roles.
 """
-from django.core.management.base import BaseCommand, CommandError
-from opaque_keys.edx.keys import CourseKey
-
+from django.core.management.base import BaseCommand
 from django_comment_common.utils import seed_permissions_roles
+from opaque_keys.edx.keys import CourseKey
 
 
 class Command(BaseCommand):
-    args = 'course_id'
-    help = 'Seed default permisssions and roles'
+    help = 'Seed default permisssions and roles.'
+
+    def add_arguments(self, parser):
+        parser.add_argument('course_id',
+                            help='the edx course_id')
 
     def handle(self, *args, **options):
-        if len(args) == 0:
-            raise CommandError("Please provide a course id")
-        if len(args) > 1:
-            raise CommandError("Too many arguments")
-        course_id = CourseKey.from_string(args[0])
+        course_id = options['course_id']
 
-        seed_permissions_roles(course_id)
+        course_key = CourseKey.from_string(course_id)
+        seed_permissions_roles(course_key)

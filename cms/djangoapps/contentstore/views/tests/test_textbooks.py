@@ -19,7 +19,7 @@ class TextbookIndexTestCase(CourseTestCase):
         self.assertEqual(resp.status_code, 200)
         # we don't have resp.context right now,
         # due to bugs in our testing harness :(
-        if resp.context:
+        if resp.context and resp.context.get('course'):
             self.assertEqual(resp.context['course'], self.course)
 
     def test_view_index_xhr(self):

@@ -5,7 +5,7 @@ Tests course_creators.views.py.
 import mock
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase
 
 from course_creators.views import (

@@ -1,96 +1,119 @@
-(function(define) {
-    'use strict';
+import Backbone from 'backbone';
 
-    define(['backbone',
-        'jquery',
-        'underscore',
-        'gettext',
-        'edx-ui-toolkit/js/utils/html-utils',
-        'js/learner_dashboard/models/course_enroll_model',
-        'js/learner_dashboard/views/upgrade_message_view',
-        'js/learner_dashboard/views/certificate_status_view',
-        'js/learner_dashboard/views/expired_notification_view',
-        'js/learner_dashboard/views/course_enroll_view',
-        'text!../../../templates/learner_dashboard/course_card.underscore'
-    ],
-         function(
-             Backbone,
-             $,
-             _,
-             gettext,
-             HtmlUtils,
-             EnrollModel,
-             UpgradeMessageView,
-             CertificateStatusView,
-             ExpiredNotificationView,
-             CourseEnrollView,
-             pageTpl
-         ) {
-             return Backbone.View.extend({
-                 className: 'program-course-card',
+import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
 
-                 tpl: HtmlUtils.template(pageTpl),
+import EnrollModel from '../models/course_enroll_model';
+import UpgradeMessageView from './upgrade_message_view';
+import CertificateStatusView from './certificate_status_view';
+import ExpiredNotificationView from './expired_notification_view';
+import CourseEnrollView from './course_enroll_view';
+import EntitlementView from './course_entitlement_view';
 
-                 initialize: function(options) {
-                     this.enrollModel = new EnrollModel();
-                     if (options.context) {
-                         this.urlModel = new Backbone.Model(options.context.urls);
-                         this.enrollModel.urlRoot = this.urlModel.get('commerce_api_url');
-                     }
-                     this.context = options.context || {};
-                     this.render();
-                     this.listenTo(this.model, 'change', this.render);
-                 },
+import pageTpl from '../../../templates/learner_dashboard/course_card.underscore';
 
-                 render: function() {
-                     var data = $.extend(this.model.toJSON(), {
-                         enrolled: this.context.enrolled || ''
-                     });
-                     HtmlUtils.setHtml(this.$el, this.tpl(data));
-                     this.postRender();
-                 },
+class CourseCardView extends Backbone.View {
+  constructor(options) {
+    const defaults = {
+      className: 'program-course-card',
+    };
+    super(Object.assign({}, defaults, options));
+  }
 
-                 postRender: function() {
-                     var $upgradeMessage = this.$('.upgrade-message'),
-                         $certStatus = this.$('.certificate-status'),
-                         $expiredNotification = this.$('.expired-notification'),
-                         expired = this.model.get('expired');
+  initialize(options) {
+    this.tpl = HtmlUtils.template(pageTpl);
+    this.enrollModel = new EnrollModel();
+    if (options.context) {
+      this.urlModel = new Backbone.Model(options.context.urls);
+      this.enrollModel.urlRoot = this.urlModel.get('commerce_api_url');
+    }
+    this.context = options.context || {};
+    if (this.context.collectionCourseStatus === 'completed') {
+      this.model.updateCourseRunWithHighestGrade(this.context.courseData.grades);
+    }
+    this.grade = this.context.courseData.grades[this.model.get('course_run_key')];
+    this.grade = this.grade * 100;
+    this.collectionCourseStatus = this.context.collectionCourseStatus || '';
+    this.entitlement = this.model.get('user_entitlement');
 
-                     this.enrollView = new CourseEnrollView({
-                         $parentEl: this.$('.course-actions'),
-                         model: this.model,
-                         urlModel: this.urlModel,
-                         enrollModel: this.enrollModel
-                     });
+    this.render();
+    this.listenTo(this.model, 'change', this.render);
+  }
 
-                     if (this.model.get('upgrade_url') && !(expired === true)) {
-                         this.upgradeMessage = new UpgradeMessageView({
-                             $el: $upgradeMessage,
-                             model: this.model
-                         });
+  render() {
+    const data = $.extend(this.model.toJSON(), {
+      enrolled: this.context.enrolled || '',
+    });
+    HtmlUtils.setHtml(this.$el, this.tpl(data));
+    this.postRender();
+  }
 
-                         $certStatus.remove();
-                     } else if (this.model.get('certificate_url') && !(expired === true)) {
-                         this.certificateStatus = new CertificateStatusView({
-                             $el: $certStatus,
-                             model: this.model
-                         });
+  postRender() {
+    const $upgradeMessage = this.$('.upgrade-message');
+    const $certStatus = this.$('.certificate-status');
+    const $expiredNotification = this.$('.expired-notification');
+    const expired = this.model.get('expired');
+    const courseUUID = this.model.get('uuid');
+    const containerSelector = `#course-${courseUUID}`;
 
-                         $upgradeMessage.remove();
-                     } else {
-                        // Styles are applied to these elements which will be visible if they're empty.
-                         $upgradeMessage.remove();
-                         $certStatus.remove();
-                     }
+    this.enrollView = new CourseEnrollView({
+      $parentEl: this.$('.course-actions'),
+      model: this.model,
+      grade: this.grade,
+      collectionCourseStatus: this.collectionCourseStatus,
+      urlModel: this.urlModel,
+      enrollModel: this.enrollModel,
+    });
 
-                     if (expired) {
-                         this.expiredNotification = new ExpiredNotificationView({
-                             $el: $expiredNotification,
-                             model: this.model
-                         });
-                     }
-                 }
-             });
-         }
-    );
-}).call(this, define || RequireJS.define);
+    if (this.entitlement) {
+      this.sessionSelectionView = new EntitlementView({
+        el: this.$(`${containerSelector} .course-entitlement-selection-container`),
+        $parentEl: this.$el,
+        courseCardModel: this.model,
+        enrollModel: this.enrollModel,
+        triggerOpenBtn: '.course-details .change-session',
+        courseCardMessages: '',
+        courseImageLink: '',
+        courseTitleLink: `${containerSelector} .course-details .course-title`,
+        dateDisplayField: `${containerSelector} .course-details .course-text`,
+        enterCourseBtn: `${containerSelector} .view-course-button`,
+        availableSessions: JSON.stringify(this.model.get('course_runs')),
+        entitlementUUID: this.entitlement.uuid,
+        currentSessionId: this.model.isEnrolledInSession() ?
+                                 this.model.get('course_run_key') : null,
+        enrollUrl: this.model.get('enroll_url'),
+        courseHomeUrl: this.model.get('course_url'),
+        expiredAt: this.entitlement.expired_at,
+        daysUntilExpiration: this.entitlement.days_until_expiration,
+      });
+    }
+
+    if (this.model.get('upgrade_url') && !(expired === true)) {
+      this.upgradeMessage = new UpgradeMessageView({
+        $el: $upgradeMessage,
+        model: this.model,
+      });
+
+      $certStatus.remove();
+    } else if (this.model.get('certificate_url') && !(expired === true)) {
+      this.certificateStatus = new CertificateStatusView({
+        $el: $certStatus,
+        model: this.model,
+      });
+
+      $upgradeMessage.remove();
+    } else {
+      // Styles are applied to these elements which will be visible if they're empty.
+      $upgradeMessage.remove();
+      $certStatus.remove();
+    }
+
+    if (expired) {
+      this.expiredNotification = new ExpiredNotificationView({
+        $el: $expiredNotification,
+        model: this.model,
+      });
+    }
+  }
+}
+
+export default CourseCardView;

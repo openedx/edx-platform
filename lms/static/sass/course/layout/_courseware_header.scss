@@ -1,28 +1,37 @@
 .wrapper-course-material {
   @include clearfix();
   @include box-sizing(border-box);
+
   @extend %ui-print-excluded;
 
   border-bottom: none;
-  margin: 0 auto 0;
+  margin: 0 auto;
   padding: 0;
   width: 100%;
 
-  .course-material{
+  .course-material {
     @extend %inner-wrapper;
+
+    @include media-breakpoint-down(md) {
+      overflow-x: scroll;
+      overflow-y: hidden;
+      white-space: nowrap;
+    }
   }
 
   .course-tabs {
     @include border-top-radius(4px);
     @include clearfix();
+
     padding: ($baseline*0.75) 0 ($baseline*0.75) 0;
 
-    li {
+    .tab {
       display: inline-block;
       list-style: none;
 
       &.prominent {
         @include margin-right(16px);
+
         background: rgba(255, 255, 255, 0.5);
         border-radius: 3px;
       }
@@ -35,19 +44,22 @@
       a,
       a:visited {
         @include padding(($baseline/2), ($baseline*0.75), 13px, ($baseline*0.75));
+
         @extend %t-title7;
         @extend %t-regular;
-        color: $gray-d1;
+
+        color: theme-color("dark");
         display: block;
         text-align: center;
         text-decoration: none;
-        border-bottom: 4px solid transparent;
+        border-bottom: 4px hidden theme-color("primary");
 
         &:hover,
         &:focus,
         &.active {
-          color: $uxpl-blue-hover-active;
-          border-bottom-color: $uxpl-blue-hover-active;
+          color: theme-color("primary");
+          border-bottom-style: solid;
+          background-color: transparent;
         }
       }
     }
@@ -86,19 +98,20 @@
     display: none;
 
     &#login {
-      display: block;
       @include background-image(linear-gradient(-90deg, lighten($link-color, 8%), lighten($link-color, 5%) 50%, $link-color 50%, darken($link-color, 10%) 100%));
+
       border: 1px solid transparent;
-      border-color: $uxpl-blue-base;
+      border-color: theme-color("primary");
       border-radius: 3px;
+
       @include box-sizing(border-box);
-      box-shadow: 0 1px 0 0 rgba(255,255,255, 0.6);
-      color: $white;
+
+      box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
+      color: theme-color("inverse");
       display: inline-block;
-      font-family: $sans-serif;
-      font-size: 14px;
+      font-family: $font-family-sans-serif;
+      font-size: $font-size-sm;
       font-weight: bold;
-      display: inline-block;
       letter-spacing: 0;
       line-height: 1em;
       margin: 4px;
@@ -108,8 +121,10 @@
       text-shadow: 0 -1px rgba(0, 0, 0, 0.6);
       vertical-align: middle;
 
-      &:hover, &:active, &:focus {
-        @include background-image(linear-gradient(-90deg, $uxpl-blue-base, $uxpl-blue-base 50%, $uxpl-blue-base 50%, $uxpl-blue-base 100%));
+      &:hover,
+      &:active,
+      &:focus {
+        @include background-image(linear-gradient(-90deg, $primary, $primary 50%, $primary 50%, $primary 100%));
       }
     }
   }
@@ -134,7 +149,7 @@
 
   .course-header {
     @include float(left);
-    @include margin(10px, 10px, 0px, 10px);
+    @include margin(10px, 10px, 0, 10px);
 
     display: inline-block;
     width: 65%;
@@ -146,7 +161,6 @@
       font: inherit;
       font-weight: bold;
     }
-
   }
 
   a#signup {

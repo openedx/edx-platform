@@ -25,12 +25,12 @@ class SAMLProviderConfigFactory(DjangoModelFactory):
     """
     class Meta(object):
         model = SAMLProviderConfig
-        django_get_or_create = ('idp_slug', 'metadata_source', "entity_id")
+        django_get_or_create = ('slug', 'metadata_source', "entity_id")
 
     site = SubFactory(SiteFactory)
 
     enabled = True
-    idp_slug = "test-shib"
+    slug = "test-shib"
     name = "TestShib College"
 
     entity_id = "https://idp.testshib.org/idp/shibboleth"

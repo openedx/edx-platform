@@ -4,6 +4,7 @@
 // view introductions - common greeting/starting points for the UI
 .content .introduction {
   @include box-sizing(border-box);
+
   margin-bottom: $baseline;
 
   .title {
@@ -25,19 +26,25 @@
 
     .copy {
       @include float(left);
-      width: flex-grid(8,12);
+
+      width: flex-grid(8, 12);
+
       @include margin-right(flex-gutter());
     }
 
     .nav-introduction-supplementary {
       @extend %t-copy-sub2;
+
       @include float(right);
-      width: flex-grid(4,12);
+
+      width: flex-grid(4, 12);
       display: block;
+
       @include text-align(right);
 
       .icon {
         @extend %t-action3;
+
         display: inline-block;
         vertical-align: middle;
         margin-right: ($baseline/4);
@@ -49,6 +56,7 @@
 // notices - in-context: to be used as notices to users within the context of a form/action
 .notice-incontext {
   @extend %ui-well;
+
   border-radius: ($baseline/10);
   position: relative;
   overflow: hidden;
@@ -57,12 +65,15 @@
   .title {
     @extend %t-title6;
     @extend %t-strong;
+
     margin-bottom: ($baseline/2);
   }
 
   .copy {
     @extend %t-copy-sub1;
+
     @include transition(opacity $tmg-f2 ease-in-out 0s);
+
     opacity: 0.75;
     margin-bottom: $baseline;
 
@@ -76,7 +87,6 @@
   }
 
   &.has-status {
-
     .status-indicator {
       position: absolute;
       top: 0;
@@ -84,19 +94,14 @@
       display: block;
       width: 100%;
       height: ($baseline/4);
-      opacity: 0.40;
+      opacity: 0.4;
     }
   }
 
   // CASE: notice has actions {
   &.has-actions {
-
     .list-actions {
       margin-top: ($baseline*0.75);
-
-      .action-item {
-
-      }
 
       .action-primary {
         @extend %btn-primary-blue;
@@ -107,7 +112,6 @@
 
   // list of notices all in one
   &.list-notices {
-
     .notice-item {
       margin-bottom: $baseline;
       border-bottom: 1px solid $gray-l3;
@@ -152,13 +156,7 @@
   }
 
   &.has-actions {
-
     .list-actions {
-
-      .action-item {
-
-      }
-
       .action-primary {
         @extend %btn-primary-blue;
         @extend %t-action3;
@@ -180,13 +178,7 @@
   }
 
   &.has-actions {
-
     .list-actions {
-
-      .action-item {
-
-      }
-
       .action-primary {
         @extend %btn-primary-green;
         @extend %t-action3;
@@ -217,6 +209,7 @@
 // informational bits (rename once UI pattern is further defined)
 .bit {
   @extend %t-copy-sub1;
+
   margin: 0 0 $baseline 0;
   border-bottom: 1px solid $gray-l4;
   padding: 0 0 $baseline 0;
@@ -228,14 +221,17 @@
     padding-bottom: 0;
   }
 
-  h3, .title {
+  h3,
+  .title {
     @extend %t-title7;
     @extend %t-strong;
+
     margin: 0 0 ($baseline/4) 0;
     color: $gray-d2;
   }
 
-  p, .copy {
+  p,
+  .copy {
     margin: 0 0 $baseline 0;
 
     &:last-child {
@@ -246,6 +242,7 @@
   // learn more (aka external help button)
   .external-help-button {
     display: inline-block;
+
     @extend %ui-btn-flat-outline;
     @extend %sizing;
   }
@@ -256,6 +253,7 @@
 
     .action-item {
       @extend %wipe-last-child;
+
       margin-bottom: ($baseline/4);
       border-bottom: 1px dotted $gray-l4;
       padding-bottom: ($baseline/4);
@@ -268,6 +266,7 @@
 
     .item-detail {
       @extend %wipe-last-child;
+
       margin-bottom: ($baseline/4);
       border-bottom: 1px dotted $gray-l4;
       padding-bottom: ($baseline/4);
@@ -275,11 +274,13 @@
   }
 
   // navigation
-  .nav-related, .nav-page {
+  .nav-related,
+  .nav-page {
     @extend %cont-no-list;
 
     .nav-item {
       @extend %wipe-last-child;
+
       margin-bottom: ($baseline/4);
       border-bottom: 1px dotted $gray-l5;
       padding-bottom: ($baseline/4);

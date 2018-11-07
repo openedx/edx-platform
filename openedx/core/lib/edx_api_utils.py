@@ -3,20 +3,23 @@ from __future__ import unicode_literals
 
 import logging
 
-from django.conf import settings
 from django.core.cache import cache
-from django.core.exceptions import ImproperlyConfigured
-from edx_rest_api_client.client import EdxRestApiClient
-from provider.oauth2.models import Client
 
 from openedx.core.lib.cache_utils import zpickle, zunpickle
-from openedx.core.lib.token_utils import JwtBuilder
 
 log = logging.getLogger(__name__)
 
 
+def get_fields(fields, response):
+    """Extracts desired fields from the API response"""
+    results = {}
+    for field in fields:
+        results[field] = response.get(field)
+    return results
+
+
 def get_edx_api_data(api_config, resource, api, resource_id=None, querystring=None, cache_key=None, many=True,
-                     traverse_pagination=True):
+                     traverse_pagination=True, fields=None, long_term_cache=False):
     """GET data from an edX REST API.
 
     DRY utility for handling caching and pagination.
@@ -34,6 +37,7 @@ def get_edx_api_data(api_config, resource, api, resource_id=None, querystring=No
         many (bool): Whether the resource requested is a collection of objects, or a single object.
             If false, an empty dict will be returned in cases of failure rather than the default empty list.
         traverse_pagination (bool): Whether to traverse pagination or return paginated response..
+        long_term_cache (bool): Whether to use the long term cache ttl or the standard cache ttl
 
     Returns:
         Data returned by the API. When hitting a list endpoint, extracts "results" (list of dict)
@@ -59,7 +63,10 @@ def get_edx_api_data(api_config, resource, api, resource_id=None, querystring=No
         response = endpoint(resource_id).get(**querystring)
 
         if resource_id is not None:
-            results = response
+            if fields:
+                results = get_fields(fields, response)
+            else:
+                results = response
         elif traverse_pagination:
             results = _traverse_pagination(response, endpoint, querystring, no_data)
         else:
@@ -70,7 +77,10 @@ def get_edx_api_data(api_config, resource, api, resource_id=None, querystring=No
 
     if cache_key:
         zdata = zpickle(results)
-        cache.set(cache_key, zdata, api_config.cache_ttl)
+        cache_ttl = api_config.cache_ttl
+        if long_term_cache:
+            cache_ttl = api_config.long_term_cache_ttl
+        cache.set(cache_key, zdata, cache_ttl)
 
     return results
 

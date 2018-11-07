@@ -28,7 +28,7 @@ from django.conf import settings
 from django.core.management import call_command
 from mock import Mock, patch
 from nose.plugins.attrib import attr
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
 
 from bulk_email.models import SEND_TO_LEARNERS, SEND_TO_MYSELF, SEND_TO_STAFF, CourseEmail, Optout
 from bulk_email.tasks import _get_course_email_context
@@ -73,7 +73,7 @@ def my_update_subtask_status(entry_id, current_task_id, new_subtask_status):
         update_subtask_status(entry_id, current_task_id, new_subtask_status)
 
 
-@attr(shard=3)
+@attr(shard=5)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
     """Tests instructor task that send bulk email."""
@@ -120,7 +120,7 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
 
     def test_email_undefined_course(self):
         # Check that we fail when passing in a course that doesn't exist.
-        task_entry = self._create_input_entry(course_id=SlashSeparatedCourseKey("bogus", "course", "id"))
+        task_entry = self._create_input_entry(course_id=CourseLocator("bogus", "course", "id"))
         with self.assertRaises(ValueError):
             self._run_task_with_mock_celery(send_bulk_course_email, task_entry.id, task_entry.task_id)
 

@@ -5,43 +5,43 @@ import datetime
 import json
 
 import ddt
-from django.contrib.auth.models import User
-from django.core import mail
-from django.test.utils import override_settings
-from django.db import connection
-from nose.plugins.attrib import attr
 import httpretty
-from lms.djangoapps.commerce.tests import TEST_API_URL
 import mock
 import pytz
+from django.contrib.auth.models import User
+from django.core import mail
+from django.db import connection
+from django.test.utils import override_settings
+from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
+
+from course_modes.models import CourseMode
+from lms.djangoapps.commerce.tests import TEST_API_URL
 from openedx.core.djangoapps.credit import api
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_display_names, make_providers_strings
 from openedx.core.djangoapps.credit.exceptions import (
-    InvalidCreditRequirements,
-    InvalidCreditCourse,
-    RequestAlreadyCompleted,
-    UserIsNotEligible,
-    InvalidCreditStatus,
     CreditRequestNotFound,
+    InvalidCreditCourse,
+    InvalidCreditRequirements,
+    InvalidCreditStatus,
+    RequestAlreadyCompleted,
+    UserIsNotEligible
 )
 from openedx.core.djangoapps.credit.models import (
     CreditConfig,
     CreditCourse,
-    CreditProvider,
-    CreditRequirement,
-    CreditRequirementStatus,
     CreditEligibility,
-    CreditRequest
+    CreditProvider,
+    CreditRequest,
+    CreditRequirement,
+    CreditRequirementStatus
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from course_modes.models import CourseMode
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from util.date_utils import from_timestamp
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-
 
 TEST_CREDIT_PROVIDER_SECRET_KEY = "931433d583c84ca7ba41784bad3232e6"
 TEST_ECOMMERCE_WORKER = 'test_worker'
@@ -158,7 +158,8 @@ class CreditApiTestBase(ModuleStoreTestCase):
 
     def setUp(self, **kwargs):
         super(CreditApiTestBase, self).setUp()
-        self.course_key = CourseKey.from_string("edX/DemoX/Demo_Course")
+        self.course = CourseFactory.create(org="edx", course="DemoX", run="Demo_Course")
+        self.course_key = self.course.id
 
     def add_credit_course(self, course_key=None, enabled=True):
         """Mark the course as a credit """
@@ -631,8 +632,6 @@ class CreditRequirementApiTests(CreditApiTestBase):
         # Configure a course with two credit requirements
         self.add_credit_course()
         user = self.create_and_enroll_user(username=self.USER_INFO['username'], password=self.USER_INFO['password'])
-        CourseFactory.create(org='edX', number='DemoX', display_name='Demo_Course')
-
         requirements = [
             {
                 "namespace": "grade",
@@ -652,7 +651,7 @@ class CreditRequirementApiTests(CreditApiTestBase):
         api.set_credit_requirements(self.course_key, requirements)
 
         # Satisfy one of the requirements, but not the other
-        with self.assertNumQueries(12):
+        with self.assertNumQueries(11):
             api.set_credit_requirement_status(
                 user,
                 self.course_key,
@@ -664,7 +663,7 @@ class CreditRequirementApiTests(CreditApiTestBase):
         self.assertFalse(api.is_user_eligible_for_credit(user.username, self.course_key))
 
         # Satisfy the other requirement
-        with self.assertNumQueries(24):
+        with self.assertNumQueries(22):
             api.set_credit_requirement_status(
                 user,
                 self.course_key,
@@ -718,7 +717,7 @@ class CreditRequirementApiTests(CreditApiTestBase):
         # Delete the eligibility entries and satisfy the user's eligibility
         # requirement again to trigger eligibility notification
         CreditEligibility.objects.all().delete()
-        with self.assertNumQueries(16):
+        with self.assertNumQueries(15):
             api.set_credit_requirement_status(
                 user,
                 self.course_key,
@@ -822,7 +821,6 @@ class CreditRequirementApiTests(CreditApiTestBase):
         # Configure a course with two credit requirements
         self.add_credit_course()
         user = self.create_and_enroll_user(username=self.USER_INFO['username'], password=self.USER_INFO['password'])
-        CourseFactory.create(org='edX', number='DemoX', display_name='Demo_Course')
         requirements = [
             {
                 "namespace": "grade",
@@ -1050,15 +1048,13 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
         # - 1 query: Look up the user's enrollment date in the course.
         # - 2 query: Look up the user's completion date in the course.
         # - 1 query: Update the request.
-        # - 2 queries: Update the history table for the request.
         # - 4 Django savepoints
-        with self.assertNumQueries(16):
+        with self.assertNumQueries(14):
             request = api.create_credit_request(self.course_key, self.PROVIDER_ID, self.USER_INFO['username'])
 
         # - 2 queries: Retrieve and update the request
-        # - 1 query: Update the history table for the request.
         uuid = request["parameters"]["request_uuid"]
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(2):
             api.update_credit_request_status(uuid, self.PROVIDER_ID, "approved")
 
         with self.assertNumQueries(1):

@@ -12,6 +12,7 @@ class UsersCanAddUpdatesTest(StudioCourseTest):
     """
     Series of Bok Choy Tests to test the Course Updates page
     """
+    shard = 21
 
     def _create_and_verify_update(self, message):
         """

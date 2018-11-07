@@ -52,10 +52,10 @@
 
         destroy: function() {
             this.el.off({
-                'mouseenter': this.mouseEnterHandler,
-                'mouseleave': this.mouseLeaveHandler,
-                'click': this.clickMenuHandler,
-                'keydown': this.keyDownMenuHandler
+                mouseenter: this.mouseEnterHandler,
+                mouseleave: this.mouseLeaveHandler,
+                click: this.clickMenuHandler,
+                keydown: this.keyDownMenuHandler
             });
 
             this.state.el.off({
@@ -139,10 +139,10 @@
         bindHandlers: function() {
             // Attach various events handlers to the speed menu button.
             this.el.on({
-                'mouseenter': this.mouseEnterHandler,
-                'mouseleave': this.mouseLeaveHandler,
-                'click': this.openMenu,
-                'keydown': this.keyDownMenuHandler
+                mouseenter: this.mouseEnterHandler,
+                mouseleave: this.mouseLeaveHandler,
+                click: this.openMenu,
+                keydown: this.keyDownMenuHandler
             });
 
             // Attach click and keydown event handlers to the individual speed
@@ -341,7 +341,7 @@
             // We do not stop propagation and default behavior on a TAB
             // keypress.
             return event.keyCode === KEY.TAB;
-                                                },
+        },
 
         /**
          * Keydown event handler for speed links.
@@ -409,7 +409,7 @@
             }
 
             return true;
-                                                }
+        }
     };
 
     return SpeedControl;

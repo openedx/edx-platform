@@ -2,14 +2,20 @@
 Tests for static templates
 """
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase
+
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 
 
 class MarketingSiteViewTests(TestCase):
     """ Tests for the marketing site views """
+    shard = 4
 
     def _test_view(self, view_name, mimetype):
+        """
+        Gets a view and tests that it exists.
+        """
         resp = self.client.get(reverse(view_name))
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp['Content-Type'], mimetype)
@@ -25,6 +31,36 @@ class MarketingSiteViewTests(TestCase):
         Test the about view
         """
         self._test_view('about', 'text/html')
+
+    def test_about_with_site_configuration(self):
+        """
+        Test the about view with the header and content set in SiteConfiguration.
+        """
+        test_header = u"Very Unique Test Header"
+        test_content = u"Very Unique Test Content"
+        test_header_key = u'static_template_about_header'
+        test_content_key = u'static_template_about_content'
+        response = None
+        configuration = {test_header_key: test_header, test_content_key: test_content}
+        with with_site_configuration_context(configuration=configuration):
+            response = self.client.get(reverse("about"))
+        self.assertIn(test_header.encode('utf-8'), response.content)
+        self.assertIn(test_content.encode('utf-8'), response.content)
+
+    def test_about_with_site_configuration_and_html(self):
+        """
+        Test the about view with html in the header.
+        """
+        test_header = u"<i>Very Unique Test Header</i>"
+        test_content = u"<i>Very Unique Test Content</i>"
+        test_header_key = u'static_template_about_header'
+        test_content_key = u'static_template_about_content'
+        response = None
+        configuration = {test_header_key: test_header, test_content_key: test_content}
+        with with_site_configuration_context(configuration=configuration):
+            response = self.client.get(reverse("about"))
+        self.assertIn(test_header.encode('utf-8'), response.content)
+        self.assertIn(test_content.encode('utf-8'), response.content)
 
     def test_404(self):
         """

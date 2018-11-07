@@ -1,9 +1,9 @@
 <%page expression_filter="h"/>
 <%inherit file="base.html" />
 <%def name="online_help_token()">
-<% 
+<%
 if library:
-    return "export_library" 
+    return "export_library"
 else:
     return "export_course"
 %>
@@ -249,10 +249,20 @@ else:
 
       <div class="bit">
         <h3 class="title-3">${_("What content is exported?")}</h3>
-
-        <p>${_("The course content and structure (including sections, subsections, and units) are exported. Values from Advanced Settings, including MATLAB API keys and LTI passports, are also exported. Other data, including student data, grading information, discussion forum data, course settings, and course team information, is not exported.")}</p>
+        <p>${_("The following content is exported.")}</p>
+        <ul>
+          <li>${_("Course content and structure")}</li>
+          <li>${_("Course dates")}</li>
+          <li>${_("Grading policy")}</li>
+          <li>${_("Any group configurations")}</li>
+          <li>${_("Settings on the Advanced Settings page, including MATLAB API keys and LTI passports")}</li>
+        </ul>
+        <p>${_("The following content is not exported.")}</p>
+        <ul>
+          <li>${_("Learner-specific content, such as learner grades and discussion forum data")}</li>
+          <li>${_("The course team")}</li>
+        </ul>
       </div>
-
       <div class="bit">
         <h3 class="title-3">${_("Opening the downloaded file")}</h3>
         ## Translators: ".tar.gz" is a file extension, and should not be translated

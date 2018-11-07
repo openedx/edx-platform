@@ -108,4 +108,4 @@
                 .attr('aria-disabled', !isEnabled);
          }
      });
- })(jQuery, _, Backbone, gettext);
+ }(jQuery, _, Backbone, gettext));

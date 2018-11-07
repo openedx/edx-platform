@@ -10,6 +10,14 @@ define(['underscore'], function(_) {
     var PASSWORD_RESET_SUPPORT_LINK = 'https://support.edx.org/hc/en-us/articles/206212088-What-if-I-did-not-receive-a-password-reset-message-'; // eslint-disable-line max-len
     var PLATFORM_NAME = 'edX';
     var CONTACT_EMAIL = 'info@example.com';
+
+    var SYNC_LEARNER_PROFILE_DATA = true;
+    var ENTERPRISE_NAME = 'Test Enterprise';
+    var ENTERPRISE_READ_ONLY_ACCOUNT_FIELDS = {
+        fields: ['username', 'name', 'email', 'country']
+    };
+    var EDX_SUPPORT_URL = 'https://support.edx.org/';
+
     var PROFILE_IMAGE = {
         image_url_large: '/media/profile-images/image.jpg',
         has_image: true
@@ -65,6 +73,23 @@ define(['underscore'], function(_) {
     };
     var IMAGE_MAX_BYTES = 1024 * 1024;
     var IMAGE_MIN_BYTES = 100;
+    var SOCIAL_PLATFORMS = {
+        facebook: {
+            display_name: 'Facebook',
+            url_stub: 'facebook.com/',
+            example: 'https://www.facebook.com/username'
+        },
+        twitter: {
+            display_name: 'Twitter',
+            url_stub: 'twitter.com/',
+            example: 'https://www.twitter.com/username'
+        },
+        linkedin: {
+            display_name: 'LinkedIn',
+            url_stub: 'linkedin.com/in/',
+            example: 'https://www.linkedin.com/in/username'
+        }
+    };
     var DEFAULT_ACCOUNT_SETTINGS_DATA = {
         username: 'student',
         name: 'Student',
@@ -74,15 +99,17 @@ define(['underscore'], function(_) {
         year_of_birth: '3',    // Note: test birth year range is a string from 0-3
         requires_parental_consent: false,
         country: '1',
-        language: null,
+        language: 'en-US',
+        date_joined: 'December 17, 1995 03:24:00',
         bio: 'About the student',
+        social_links: [{platform: 'facebook', social_link: 'https://www.facebook.com/edX'}],
         language_proficiencies: [{code: '1'}],
         profile_image: PROFILE_IMAGE,
         accomplishments_shared: false
     };
     var DEFAULT_USER_PREFERENCES_DATA = {
         'pref-lang': '2',
-        'time_zone': null
+        time_zone: 'America/New_York'
     };
 
     var createAccountSettingsData = function(options) {
@@ -148,6 +175,36 @@ define(['underscore'], function(_) {
         });
     };
 
+    var expectSettingsSectionsAndFieldsToBeRenderedWithMessage = function(accountSettingsView, fieldsAreRendered) {
+        var sectionFieldElements;
+        var sectionsData = accountSettingsView.options.tabSections.aboutTabSections;
+
+        var sectionElements = accountSettingsView.$('#aboutTabSections-tabpanel .section');
+        expect(sectionElements.length).toBe(sectionsData.length);
+
+        _.each(sectionElements, function(sectionElement, sectionIndex) {
+            expect($(sectionElement).find('.section-header').text()
+                .trim()).toBe(sectionsData[sectionIndex].title);
+
+            if (!_.isUndefined(sectionsData[sectionIndex].message)) {
+                expect($(sectionElement).find('.account-settings-section-message span').html()
+                    .trim()).toBe(String(sectionsData[sectionIndex].message));
+            }
+
+            sectionFieldElements = $(sectionElement).find('.u-field');
+
+            if (fieldsAreRendered === false) {
+                expect(sectionFieldElements.length).toBe(0);
+            } else {
+                expect(sectionFieldElements.length).toBe(sectionsData[sectionIndex].fields.length);
+
+                _.each(sectionFieldElements, function(sectionFieldElement, fieldIndex) {
+                    expectElementContainsField(sectionFieldElement, sectionsData[sectionIndex].fields[fieldIndex]);
+                });
+            }
+        });
+    };
+
     var expectSettingsSectionsButNotFieldsToBeRendered = function(accountSettingsView) {
         expectSettingsSectionsAndFieldsToBeRendered(accountSettingsView, false);
     };
@@ -162,6 +219,12 @@ define(['underscore'], function(_) {
         PASSWORD_RESET_SUPPORT_LINK: PASSWORD_RESET_SUPPORT_LINK,
         PLATFORM_NAME: PLATFORM_NAME,
         CONTACT_EMAIL: CONTACT_EMAIL,
+
+        SYNC_LEARNER_PROFILE_DATA: SYNC_LEARNER_PROFILE_DATA,
+        ENTERPRISE_NAME: ENTERPRISE_NAME,
+        ENTERPRISE_READ_ONLY_ACCOUNT_FIELDS: ENTERPRISE_READ_ONLY_ACCOUNT_FIELDS,
+        EDX_SUPPORT_URL: EDX_SUPPORT_URL,
+
         PROFILE_IMAGE: PROFILE_IMAGE,
         FIELD_OPTIONS: FIELD_OPTIONS,
         TIME_ZONE_RESPONSE: TIME_ZONE_RESPONSE,
@@ -169,12 +232,14 @@ define(['underscore'], function(_) {
         AUTH_DATA: AUTH_DATA,
         IMAGE_MAX_BYTES: IMAGE_MAX_BYTES,
         IMAGE_MIN_BYTES: IMAGE_MIN_BYTES,
+        SOCIAL_PLATFORMS: SOCIAL_PLATFORMS,
         createAccountSettingsData: createAccountSettingsData,
         createUserPreferencesData: createUserPreferencesData,
         expectLoadingIndicatorIsVisible: expectLoadingIndicatorIsVisible,
         expectLoadingErrorIsVisible: expectLoadingErrorIsVisible,
         expectElementContainsField: expectElementContainsField,
         expectSettingsSectionsButNotFieldsToBeRendered: expectSettingsSectionsButNotFieldsToBeRendered,
-        expectSettingsSectionsAndFieldsToBeRendered: expectSettingsSectionsAndFieldsToBeRendered
+        expectSettingsSectionsAndFieldsToBeRendered: expectSettingsSectionsAndFieldsToBeRendered,
+        expectSettingsSectionsAndFieldsToBeRenderedWithMessage: expectSettingsSectionsAndFieldsToBeRenderedWithMessage
     };
 });

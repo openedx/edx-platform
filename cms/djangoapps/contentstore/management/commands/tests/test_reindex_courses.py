@@ -2,6 +2,7 @@
 import ddt
 from django.core.management import call_command, CommandError
 import mock
+from six import text_type
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -47,7 +48,7 @@ class TestReindexCourse(ModuleStoreTestCase):
 
     def test_given_no_arguments_raises_command_error(self):
         """ Test that raises CommandError for incorrect arguments """
-        with self.assertRaisesRegexp(CommandError, ".* requires one or more arguments.*"):
+        with self.assertRaisesRegexp(CommandError, ".* requires one or more *"):
             call_command('reindex_course')
 
     @ddt.data('qwerty', 'invalid_key', 'xblockv1:qwerty')
@@ -60,34 +61,34 @@ class TestReindexCourse(ModuleStoreTestCase):
     def test_given_library_key_raises_command_error(self):
         """ Test that raises CommandError if library key is passed """
         with self.assertRaisesRegexp(CommandError, ".* is not a course key"):
-            call_command('reindex_course', unicode(self._get_lib_key(self.first_lib)))
+            call_command('reindex_course', text_type(self._get_lib_key(self.first_lib)))
 
         with self.assertRaisesRegexp(CommandError, ".* is not a course key"):
-            call_command('reindex_course', unicode(self._get_lib_key(self.second_lib)))
+            call_command('reindex_course', text_type(self._get_lib_key(self.second_lib)))
 
         with self.assertRaisesRegexp(CommandError, ".* is not a course key"):
             call_command(
                 'reindex_course',
-                unicode(self.second_course.id),
-                unicode(self._get_lib_key(self.first_lib))
+                text_type(self.second_course.id),
+                text_type(self._get_lib_key(self.first_lib))
             )
 
     def test_given_id_list_indexes_courses(self):
         """ Test that reindexes courses when given single course key or a list of course keys """
         with mock.patch(self.REINDEX_PATH_LOCATION) as patched_index, \
                 mock.patch(self.MODULESTORE_PATCH_LOCATION, mock.Mock(return_value=self.store)):
-            call_command('reindex_course', unicode(self.first_course.id))
+            call_command('reindex_course', text_type(self.first_course.id))
             self.assertEqual(patched_index.mock_calls, self._build_calls(self.first_course))
             patched_index.reset_mock()
 
-            call_command('reindex_course', unicode(self.second_course.id))
+            call_command('reindex_course', text_type(self.second_course.id))
             self.assertEqual(patched_index.mock_calls, self._build_calls(self.second_course))
             patched_index.reset_mock()
 
             call_command(
                 'reindex_course',
-                unicode(self.first_course.id),
-                unicode(self.second_course.id)
+                text_type(self.first_course.id),
+                text_type(self.second_course.id)
             )
             expected_calls = self._build_calls(self.first_course, self.second_course)
             self.assertEqual(patched_index.mock_calls, expected_calls)
@@ -121,4 +122,4 @@ class TestReindexCourse(ModuleStoreTestCase):
             patched_index.side_effect = SearchIndexingError("message", [])
 
             with self.assertRaises(SearchIndexingError):
-                call_command('reindex_course', unicode(self.second_course.id))
+                call_command('reindex_course', text_type(self.second_course.id))

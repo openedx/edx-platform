@@ -5,22 +5,27 @@
 
 // weights
 %t-ultrastrong {
- font-weight: 700;
+  font-weight: 700;
 }
+
 %t-strong {
- font-weight: 600;
+  font-weight: 600;
 }
+
 %t-demi-strong {
- font-weight: 500;
+  font-weight: 500;
 }
+
 %t-regular {
- font-weight: 400;
+  font-weight: 400;
 }
+
 %t-light {
- font-weight: 300;
+  font-weight: 300;
 }
+
 %t-ultralight {
- font-weight: 200;
+  font-weight: 200;
 }
 
 // headings/titles
@@ -30,12 +35,14 @@
 
 %t-title1 {
   @extend %t-title;
+
   @include font-size(60);
   @include line-height(60);
 }
 
 %t-title2 {
   @extend %t-title;
+
   @include font-size(48);
   @include line-height(48);
 }
@@ -47,36 +54,42 @@
 
 %t-title4 {
   @extend %t-title;
+
   @include font-size(24);
   @include line-height(24);
 }
 
 %t-title5 {
   @extend %t-title;
+
   @include font-size(18);
   @include line-height(18);
 }
 
 %t-title6 {
   @extend %t-title;
+
   @include font-size(16);
   @include line-height(16);
 }
 
 %t-title7 {
   @extend %t-title;
+
   @include font-size(14);
   @include line-height(14);
 }
 
 %t-title8 {
   @extend %t-title;
+
   @include font-size(12);
   @include line-height(12);
 }
 
 %t-title9 {
   @extend %t-title;
+
   @include font-size(11);
   @include line-height(11);
 }
@@ -90,30 +103,35 @@
 
 %t-copy-base {
   @extend %t-copy;
+
   @include font-size(16);
   @include line-height(16);
 }
 
 %t-copy-lead1 {
   @extend %t-copy;
+
   @include font-size(18);
   @include line-height(18);
 }
 
 %t-copy-lead2 {
   @extend %t-copy;
+
   @include font-size(24);
   @include line-height(24);
 }
 
 %t-copy-sub1 {
   @extend %t-copy;
+
   @include font-size(14);
   @include line-height(14);
 }
 
 %t-copy-sub2 {
   @extend %t-copy;
+
   @include font-size(12);
   @include line-height(12);
 }

@@ -2,10 +2,11 @@
 // LMS: Shared Build Compile
 // Version 2 - introduces the Pattern Library
 
+// Base build
+@import 'base-v2/build';
 
 // Configuration
 @import 'config';
-@import 'base/variables';
 @import 'base-v2/extends';
 
 // Extensions
@@ -21,6 +22,8 @@
 
 // Elements
 @import 'notifications';
+@import 'elements/controls';
+@import 'elements-v2/buttons';
 @import 'elements-v2/pagination';
 
 // Features
@@ -28,6 +31,12 @@
 @import 'features/course-experience';
 @import 'features/course-search';
 @import 'features/course-sock';
+@import 'features/course-upgrade-message';
+@import 'features/learner-analytics-dashboard';
 
-// Views
-@import "views/program-marketing-page";
+// Responsive Design
+@import 'header';
+
+// Extra theme-specific rules
+@import 'lms/theme/extras';
+@import 'lms/theme/extras-v2';

@@ -41,13 +41,7 @@ class ThemeFilesystemLoader(FilesystemLoader):
         if isinstance(theme_dirs, list):
             template_dirs = theme_dirs + template_dirs
 
-        for template_dir in template_dirs:
-            try:
-                yield safe_join(template_dir, template_name)
-            except SuspiciousFileOperation:
-                # The joined path was located outside of this template_dir
-                # (it might be inside another one, so this isn't fatal).
-                pass
+        return list(super(ThemeFilesystemLoader, self).get_template_sources(template_name, template_dirs))
 
     @staticmethod
     def get_theme_template_sources():

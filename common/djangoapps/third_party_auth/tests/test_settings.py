@@ -2,14 +2,14 @@
 
 import unittest
 
-from openedx.features.enterprise_support.api import enterprise_enabled
 from third_party_auth import provider, settings
 from third_party_auth.tests import testutil
 
-_ORIGINAL_AUTHENTICATION_BACKENDS = ('first_authentication_backend',)
-_ORIGINAL_INSTALLED_APPS = ('first_installed_app',)
-_ORIGINAL_MIDDLEWARE_CLASSES = ('first_middleware_class',)
-_ORIGINAL_TEMPLATE_CONTEXT_PROCESSORS = ('first_template_context_preprocessor',)
+
+_ORIGINAL_AUTHENTICATION_BACKENDS = ['first_authentication_backend']
+_ORIGINAL_INSTALLED_APPS = ['first_installed_app']
+_ORIGINAL_MIDDLEWARE_CLASSES = ['first_middleware_class']
+_ORIGINAL_TEMPLATE_CONTEXT_PROCESSORS = ['first_template_context_preprocessor']
 _SETTINGS_MAP = {
     'AUTHENTICATION_BACKENDS': _ORIGINAL_AUTHENTICATION_BACKENDS,
     'INSTALLED_APPS': _ORIGINAL_INSTALLED_APPS,
@@ -56,8 +56,3 @@ class SettingsUnitTest(testutil.TestCase):
         # bad in prod.
         settings.apply_settings(self.settings)
         self.assertFalse(self.settings.SOCIAL_AUTH_RAISE_EXCEPTIONS)
-
-    @unittest.skipUnless(enterprise_enabled(), 'enterprise not enabled')
-    def test_enterprise_elements_inserted(self):
-        settings.apply_settings(self.settings)
-        self.assertIn('enterprise.tpa_pipeline.handle_enterprise_logistration', self.settings.SOCIAL_AUTH_PIPELINE)

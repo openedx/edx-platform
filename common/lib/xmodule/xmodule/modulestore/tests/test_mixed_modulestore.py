@@ -22,6 +22,7 @@ import pymongo
 from pytz import UTC
 from shutil import rmtree
 from tempfile import mkdtemp
+from web_fragments.fragment import Fragment
 
 from xmodule.x_module import XModuleMixin
 from xmodule.modulestore.edit_info import EditInfoMixin
@@ -33,14 +34,13 @@ from xmodule.modulestore.xml_exporter import export_course_to_xml
 from xmodule.modulestore.tests.test_asides import AsideTestType
 from xblock.core import XBlockAside
 from xblock.fields import Scope, String, ScopeIds
-from xblock.fragment import Fragment
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 from xblock.test.tools import TestRuntime
 
 if not settings.configured:
     settings.configure()
 
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator, LibraryLocator
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
@@ -323,7 +323,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         )
         # try an unknown mapping, it should be the 'default' store
         self.assertEqual(self.store.get_modulestore_type(
-            SlashSeparatedCourseKey('foo', 'bar', '2012_Fall')), default_ms
+            CourseKey.from_string('foo/bar/2012_Fall')), default_ms
         )
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
@@ -418,7 +418,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #    wildcard query, 6! load pertinent items for inheritance calls, load parents, course root fetch (why)
     # Split:
     #    active_versions (with regex), structure, and spurious active_versions refetch
-    @ddt.data((ModuleStoreEnum.Type.mongo, 14, 0), (ModuleStoreEnum.Type.split, 3, 0))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 14, 0), (ModuleStoreEnum.Type.split, 4, 0))
     @ddt.unpack
     def test_get_items(self, default_ms, max_find, max_send):
         self.initdb(default_ms)
@@ -1043,7 +1043,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
     #   1) wildcard split search,
     #   2-4) active_versions, structure, definition (s/b lazy; so, unnecessary)
     #   5) wildcard draft mongo which has none
-    @ddt.data((ModuleStoreEnum.Type.mongo, 3, 0), (ModuleStoreEnum.Type.split, 5, 0))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 3, 0), (ModuleStoreEnum.Type.split, 6, 0))
     @ddt.unpack
     def test_get_courses(self, default_ms, max_find, max_send):
         self.initdb(default_ms)

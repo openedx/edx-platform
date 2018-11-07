@@ -17,14 +17,11 @@ import inspect
 import json
 import logging
 import numbers
-import os
 import random
 import re
-import subprocess
 import sys
 import textwrap
 import traceback
-import xml.sax.saxutils as saxutils
 from collections import namedtuple
 from datetime import datetime
 from sys import float_info
@@ -37,12 +34,13 @@ from lxml.html.soupparser import fromstring as fromstring_bs  # uses Beautiful S
 from pyparsing import ParseException
 from pytz import UTC
 from shapely.geometry import MultiPoint, Point
+from six import text_type
 
 import capa.safe_exec as safe_exec
 import capa.xqueue_interface as xqueue_interface
 import dogstats_wrapper as dog_stats_api
 # specific library imports
-from calc import UndefinedVariable, evaluator
+from calc import UndefinedVariable, UnmatchedParenthesis, evaluator
 from cmath import isnan
 from openedx.core.djangolib.markup import HTML, Text
 
@@ -371,7 +369,7 @@ class LoncapaResponse(object):
         # self.runtime.track_function('get_demand_hint', event_info)
         # This this "feedback hint" event
         event_info = dict()
-        event_info['module_id'] = self.capa_module.location.to_deprecated_string()
+        event_info['module_id'] = text_type(self.capa_module.location)
         event_info['problem_part_id'] = self.id
         event_info['trigger_type'] = 'single'  # maybe be overwritten by log_extra
         event_info['hint_label'] = label
@@ -1602,14 +1600,19 @@ class NumericalResponse(LoncapaResponse):
             student_float = evaluator({}, {}, student_answer)
         except UndefinedVariable as undef_var:
             raise StudentInputError(
-                _(u"Answers can include numerals, operation signs, and a few specific characters, "
-                  u"such as the constants e and i.")
+                _(u"You may not use variables ({bad_variables}) in numerical problems.").format(
+                    bad_variables=text_type(undef_var),
+                )
+            )
+        except UnmatchedParenthesis as err:
+            raise StudentInputError(
+                err.args[0]
             )
         except ValueError as val_err:
-            if 'factorial' in val_err.message:
+            if 'factorial' in text_type(val_err):
                 # This is thrown when fact() or factorial() is used in an answer
                 #   that evaluates on negative and/or non-integer inputs
-                # ve.message will be: `factorial() only accepts integral values` or
+                # text_type(ve) will be: `factorial() only accepts integral values` or
                 # `factorial() not defined for negative values`
                 raise StudentInputError(
                     _("Factorial function evaluated outside its domain:"
@@ -1771,7 +1774,7 @@ class NumericalResponse(LoncapaResponse):
         try:
             evaluator(dict(), dict(), answer)
             return True
-        except (StudentInputError, UndefinedVariable):
+        except (StudentInputError, UndefinedVariable, UnmatchedParenthesis):
             return False
 
     def get_answers(self):
@@ -2039,7 +2042,7 @@ class StringResponse(LoncapaResponse):
             except Exception as err:
                 msg = u'[courseware.capa.responsetypes.stringresponse] {error}: {message}'.format(
                     error=_('error'),
-                    message=err.message
+                    message=text_type(err)
                 )
                 log.error(msg, exc_info=True)
                 raise ResponseError(msg)
@@ -2467,8 +2470,7 @@ class CustomResponse(LoncapaResponse):
             msg = msg.replace('&#60;', '&lt;')
 
             # Use etree to prettify the HTML
-            msg = etree.tostring(fromstring_bs(msg, convertEntities=None),
-                                 pretty_print=True)
+            msg = etree.tostring(fromstring_bs(msg), pretty_print=True)
 
             msg = msg.replace('&#13;', '')
 
@@ -2513,7 +2515,7 @@ class CustomResponse(LoncapaResponse):
 
         # Notify student with a student input error
         _, _, traceback_obj = sys.exc_info()
-        raise ResponseError(err.message, traceback_obj)
+        raise ResponseError(text_type(err), traceback_obj)
 
 #-----------------------------------------------------------------------------
 
@@ -3108,14 +3110,21 @@ class FormulaResponse(LoncapaResponse):
                     cgi.escape(answer)
                 )
                 raise StudentInputError(
-                    _(u"Answers can include numerals, operation signs, and a few specific characters, "
-                      u"such as the constants e and i.")
+                    _("Invalid input: {bad_input} not permitted in answer.").format(bad_input=text_type(err))
+                )
+            except UnmatchedParenthesis as err:
+                log.debug(
+                    'formularesponse: unmatched parenthesis in formula=%s',
+                    cgi.escape(answer)
+                )
+                raise StudentInputError(
+                    err.args[0]
                 )
             except ValueError as err:
-                if 'factorial' in err.message:
+                if 'factorial' in text_type(err):
                     # This is thrown when fact() or factorial() is used in a formularesponse answer
                     #   that tests on negative and/or non-integer inputs
-                    # err.message will be: `factorial() only accepts integral values` or
+                    # text_type(err) will be: `factorial() only accepts integral values` or
                     # `factorial() not defined for negative values`
                     log.debug(
                         ('formularesponse: factorial function used in response '

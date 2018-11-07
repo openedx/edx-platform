@@ -1,3 +1,6 @@
+"""
+Acceptance tests that ensure components with bad content do not break page.
+"""
 from base_studio_test import ContainerBase
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.studio.utils import verify_ordering
@@ -7,6 +10,7 @@ class BadComponentTest(ContainerBase):
     """
     Tests that components with bad content do not break the Unit page.
     """
+    shard = 21
     __test__ = False
 
     def get_bad_html_content(self):

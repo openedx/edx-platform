@@ -5,18 +5,19 @@ from collections import OrderedDict
 
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 
+from .course_grade import CourseGrade
 from .scores import possibly_scored
 
 
-def grading_context_for_course(course_key):
+def grading_context_for_course(course):
     """
     Same as grading_context, but takes in a course key.
     """
-    course_structure = get_course_in_cache(course_key)
-    return grading_context(course_structure)
+    course_structure = get_course_in_cache(course.id)
+    return grading_context(course, course_structure)
 
 
-def grading_context(course_structure):
+def grading_context(course, course_structure):
     """
     This returns a dictionary with keys necessary for quickly grading
     a student.
@@ -36,7 +37,7 @@ def grading_context(course_structure):
         the descriptor tree again.
 
     """
-    all_graded_blocks = []
+    count_all_graded_blocks = 0
     all_graded_subsections_by_type = OrderedDict()
 
     for chapter_key in course_structure.get_children(course_structure.root_block_usage_key):
@@ -64,9 +65,10 @@ def grading_context(course_structure):
                 if subsection_format not in all_graded_subsections_by_type:
                     all_graded_subsections_by_type[subsection_format] = []
                 all_graded_subsections_by_type[subsection_format].append(subsection_info)
-                all_graded_blocks.extend(scored_descendants_of_subsection)
+                count_all_graded_blocks += len(scored_descendants_of_subsection)
 
     return {
         'all_graded_subsections_by_type': all_graded_subsections_by_type,
-        'all_graded_blocks': all_graded_blocks,
+        'count_all_graded_blocks': count_all_graded_blocks,
+        'subsection_type_graders': CourseGrade.get_subsection_type_graders(course)
     }

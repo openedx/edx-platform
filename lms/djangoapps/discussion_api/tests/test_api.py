@@ -100,7 +100,7 @@ def _create_course_and_cohort_with_user_role(course_is_cohorted, user, role_name
     return [cohort_course, cohort]
 
 
-@attr(shard=2)
+@attr(shard=8)
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase):
     """Test for get_course"""
@@ -147,7 +147,7 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
         )
 
 
-@attr(shard=2)
+@attr(shard=8)
 @ddt.ddt
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class GetCourseTestBlackouts(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase):
@@ -191,7 +191,7 @@ class GetCourseTestBlackouts(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCa
         self.assertEqual(result["blackouts"], [])
 
 
-@attr(shard=2)
+@attr(shard=8)
 @mock.patch.dict("django.conf.settings.FEATURES", {"DISABLE_START_DATES": False})
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class GetCourseTopicsTest(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase):
@@ -565,7 +565,7 @@ class GetCourseTopicsTest(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
         )
 
 
-@attr(shard=2)
+@attr(shard=8)
 @ddt.ddt
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMixin, SharedModuleStoreTestCase):
@@ -581,6 +581,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
         super(GetThreadListTest, self).setUp()
         httpretty.reset()
         httpretty.enable()
+        self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
         self.maxDiff = None  # pylint: disable=invalid-name
         self.user = UserFactory.create()
@@ -982,7 +983,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
         self.assertIn("order_direction", assertion.exception.message_dict)
 
 
-@attr(shard=2)
+@attr(shard=8)
 @ddt.ddt
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModuleStoreTestCase):
@@ -998,6 +999,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
         super(GetCommentListTest, self).setUp()
         httpretty.reset()
         httpretty.enable()
+        self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
         self.maxDiff = None  # pylint: disable=invalid-name
         self.user = UserFactory.create()
@@ -1415,7 +1417,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
             self.get_comment_list(thread, endorsed=True, page=2, page_size=10)
 
 
-@attr(shard=2)
+@attr(shard=8)
 @ddt.ddt
 @disable_signal(api, 'thread_created')
 @disable_signal(api, 'thread_voted')
@@ -1427,6 +1429,7 @@ class CreateThreadTest(
         SharedModuleStoreTestCase,
         MockSignalHandlerMixin
 ):
+    """Tests for create_thread"""
     LONG_TITLE = (
         'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. '
         'Aenean commodo ligula eget dolor. Aenean massa. Cum sociis '
@@ -1466,7 +1469,6 @@ class CreateThreadTest(
         'nonummy metus.'
     )
 
-    """Tests for create_thread"""
     @classmethod
     def setUpClass(cls):
         super(CreateThreadTest, cls).setUpClass()
@@ -1477,6 +1479,7 @@ class CreateThreadTest(
         super(CreateThreadTest, self).setUp()
         httpretty.reset()
         httpretty.enable()
+        self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)
@@ -1718,7 +1721,7 @@ class CreateThreadTest(
             create_thread(self.request, data)
 
 
-@attr(shard=2)
+@attr(shard=8)
 @ddt.ddt
 @disable_signal(api, 'comment_created')
 @disable_signal(api, 'comment_voted')
@@ -1741,6 +1744,7 @@ class CreateCommentTest(
         super(CreateCommentTest, self).setUp()
         httpretty.reset()
         httpretty.enable()
+        self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)
@@ -1983,7 +1987,7 @@ class CreateCommentTest(
             create_comment(self.request, data)
 
 
-@attr(shard=2)
+@attr(shard=8)
 @ddt.ddt
 @disable_signal(api, 'thread_edited')
 @disable_signal(api, 'thread_voted')
@@ -2006,6 +2010,7 @@ class UpdateThreadTest(
         super(UpdateThreadTest, self).setUp()
         httpretty.reset()
         httpretty.enable()
+        self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
 
         self.user = UserFactory.create()
@@ -2363,7 +2368,7 @@ class UpdateThreadTest(
         )
 
 
-@attr(shard=2)
+@attr(shard=8)
 @ddt.ddt
 @disable_signal(api, 'comment_edited')
 @disable_signal(api, 'comment_voted')
@@ -2388,6 +2393,7 @@ class UpdateCommentTest(
 
         httpretty.reset()
         httpretty.enable()
+        self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
 
         self.user = UserFactory.create()
@@ -2765,7 +2771,7 @@ class UpdateCommentTest(
             )
 
 
-@attr(shard=2)
+@attr(shard=8)
 @ddt.ddt
 @disable_signal(api, 'thread_deleted')
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -2787,6 +2793,7 @@ class DeleteThreadTest(
         super(DeleteThreadTest, self).setUp()
         httpretty.reset()
         httpretty.enable()
+        self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)
@@ -2902,7 +2909,7 @@ class DeleteThreadTest(
             self.assertTrue(expected_error)
 
 
-@attr(shard=2)
+@attr(shard=8)
 @ddt.ddt
 @disable_signal(api, 'comment_deleted')
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -2924,6 +2931,7 @@ class DeleteCommentTest(
         super(DeleteCommentTest, self).setUp()
         httpretty.reset()
         httpretty.enable()
+        self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)
@@ -3058,7 +3066,7 @@ class DeleteCommentTest(
             self.assertTrue(expected_error)
 
 
-@attr(shard=2)
+@attr(shard=8)
 @ddt.ddt
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class RetrieveThreadTest(
@@ -3078,6 +3086,7 @@ class RetrieveThreadTest(
         super(RetrieveThreadTest, self).setUp()
         httpretty.reset()
         httpretty.enable()
+        self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)

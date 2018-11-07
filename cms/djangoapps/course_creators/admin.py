@@ -6,9 +6,9 @@ import logging
 from smtplib import SMTPException
 
 from django.conf import settings
+from django.contrib import admin
 from django.core.mail import send_mail
 from django.dispatch import receiver
-from ratelimitbackend import admin
 
 from course_creators.models import CourseCreator, send_admin_notification, send_user_notification, update_creator_state
 from course_creators.views import update_course_creator_group

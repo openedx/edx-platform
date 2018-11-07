@@ -15,13 +15,13 @@ DEBUG = True
 USE_I18N = True
 DEFAULT_TEMPLATE_ENGINE['OPTIONS']['debug'] = True
 SITE_NAME = 'localhost:8000'
-PLATFORM_NAME = ENV_TOKENS.get('PLATFORM_NAME', 'Devstack')
 # By default don't use a worker, execute tasks as if they were local functions
 CELERY_ALWAYS_EAGER = True
 HTTPS = 'off'
 
 LMS_ROOT_URL = 'http://localhost:8000'
-ENTERPRISE_API_URL = LMS_ROOT_URL + '/enterprise/api/v1/'
+LMS_INTERNAL_ROOT_URL = LMS_ROOT_URL
+ENTERPRISE_API_URL = LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/'
 
 ################################ LOGGERS ######################################
 
@@ -39,16 +39,8 @@ for log_name, log_level in LOG_OVERRIDES:
 
 ################################ EMAIL ########################################
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
-########################## ANALYTICS TESTING ########################
-
-ANALYTICS_SERVER_URL = "http://127.0.0.1:9000/"
-ANALYTICS_API_KEY = ""
-
-# Set this to the dashboard URL in order to display the link from the
-# dashboard to the Analytics Dashboard.
-ANALYTICS_DASHBOARD_URL = None
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = '/edx/src/ace_messages/'
 
 ############################ PYFS XBLOCKS SERVICE #############################
 # Set configuration for Django pyfilesystem
@@ -61,11 +53,12 @@ DJFS = {
 
 ################################ DEBUG TOOLBAR ################################
 
-INSTALLED_APPS += ('debug_toolbar', 'debug_toolbar_mongo')
-MIDDLEWARE_CLASSES += (
+INSTALLED_APPS += ['debug_toolbar', 'debug_toolbar_mongo']
+MIDDLEWARE_CLASSES += [
     'django_comment_client.utils.QueryCountDebugMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
-)
+]
+
 INTERNAL_IPS = ('127.0.0.1',)
 
 DEBUG_TOOLBAR_PANELS = (
@@ -86,13 +79,18 @@ DEBUG_TOOLBAR_PANELS = (
 
 DEBUG_TOOLBAR_CONFIG = {
     'SHOW_TOOLBAR_CALLBACK': 'lms.envs.devstack.should_show_debug_toolbar',
-    'JQUERY_URL': None,
 }
 
 
-def should_show_debug_toolbar(_):
-    return True  # We always want the toolbar on devstack regardless of IP, auth, etc.
+def should_show_debug_toolbar(request):
+    # We always want the toolbar on devstack unless running tests from another Docker container
+    if request.get_host().startswith('edx.devstack.lms:'):
+        return False
+    return True
 
+########################### API DOCS #################################
+
+FEATURES['ENABLE_API_DOCS'] = True
 
 ########################### PIPELINE #################################
 
@@ -113,6 +111,9 @@ PIPELINE_JS_COMPRESSOR = None
 REQUIRE_DEBUG = DEBUG
 
 PIPELINE_SASS_ARGUMENTS = '--debug-info'
+
+# Load development webpack donfiguration
+WEBPACK_CONFIG_PATH = 'webpack.dev.config.js'
 
 ########################### VERIFIED CERTIFICATES #################################
 
@@ -221,9 +222,6 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and 'third_party_auth.dummy.DummyBack
 ############## ECOMMERCE API CONFIGURATION SETTINGS ###############
 ECOMMERCE_PUBLIC_URL_ROOT = "http://localhost:8002"
 
-CREDENTIALS_INTERNAL_SERVICE_URL = 'http://localhost:8008'
-CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:8008'
-
 ###################### Cross-domain requests ######################
 FEATURES['ENABLE_CORS_HEADERS'] = True
 CORS_ALLOW_CREDENTIALS = True
@@ -266,6 +264,10 @@ JWT_AUTH.update({
     'JWT_ISSUER': 'http://127.0.0.1:8000/oauth2',
     'JWT_AUDIENCE': 'lms-key',
 })
+
+#####################################################################
+from openedx.core.djangoapps.plugins import plugin_settings, constants as plugin_constants
+plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_constants.SettingsType.DEVSTACK)
 
 #####################################################################
 # See if the developer has any local overrides.

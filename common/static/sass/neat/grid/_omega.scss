@@ -5,7 +5,9 @@
 
   @if $direction != default {
     @warn "The omega mixin will no longer take a $direction argument. To change the layout direction, use row($direction) or set $default-layout-direction instead."
-  } @else {
+  }
+
+  @else {
     $direction: get-direction($layout-direction, $default-layout-direction);
   }
 

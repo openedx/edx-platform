@@ -5,13 +5,13 @@ Utility library for working with the edx-milestones app
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from milestones import api as milestones_api
-from milestones.exceptions import InvalidMilestoneRelationshipTypeException
+from milestones.exceptions import InvalidMilestoneRelationshipTypeException, InvalidUserException
 from milestones.models import MilestoneRelationshipType
 from milestones.services import MilestonesService
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-import request_cache
+from openedx.core.djangoapps.request_cache import get_cache
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.django import modulestore
 
@@ -213,21 +213,32 @@ def get_required_content(course_key, user):
     """
     required_content = []
     if settings.FEATURES.get('MILESTONES_APP'):
-        # Get all of the outstanding milestones for this course, for this user
-        try:
-            milestone_paths = get_course_milestones_fulfillment_paths(
-                unicode(course_key),
-                serialize_user(user)
-            )
-        except InvalidMilestoneRelationshipTypeException:
-            return required_content
+        course_run_id = unicode(course_key)
 
-        # For each outstanding milestone, see if this content is one of its fulfillment paths
-        for path_key in milestone_paths:
-            milestone_path = milestone_paths[path_key]
-            if milestone_path.get('content') and len(milestone_path['content']):
-                for content in milestone_path['content']:
-                    required_content.append(content)
+        if user.is_authenticated:
+            # Get all of the outstanding milestones for this course, for this user
+            try:
+
+                milestone_paths = get_course_milestones_fulfillment_paths(
+                    course_run_id,
+                    serialize_user(user)
+                )
+            except InvalidMilestoneRelationshipTypeException:
+                return required_content
+
+            # For each outstanding milestone, see if this content is one of its fulfillment paths
+            for path_key in milestone_paths:
+                milestone_path = milestone_paths[path_key]
+                if milestone_path.get('content') and len(milestone_path['content']):
+                    for content in milestone_path['content']:
+                        required_content.append(content)
+        else:
+            if get_course_milestones(course_run_id):
+                # NOTE (CCB): The initial version of anonymous courseware access is very simple. We avoid accidentally
+                # exposing locked content by simply avoiding anonymous access altogether for courses runs with
+                # milestones.
+                raise InvalidUserException('Anonymous access is not allowed for course runs with milestones set.')
+
     return required_content
 
 
@@ -333,11 +344,14 @@ def add_course_content_milestone(course_id, content_id, relationship, milestone)
     return milestones_api.add_course_content_milestone(course_id, content_id, relationship, milestone)
 
 
-def get_course_content_milestones(course_id, content_id, relationship, user_id=None):
+def get_course_content_milestones(course_id, content_id=None, relationship='requires', user_id=None):
     """
     Client API operation adapter/wrapper
     Uses the request cache to store all of a user's
     milestones
+
+    Returns all content blocks in a course if content_id is None, otherwise it just returns that
+    specific content block.
     """
     if not settings.FEATURES.get('MILESTONES_APP'):
         return []
@@ -345,7 +359,7 @@ def get_course_content_milestones(course_id, content_id, relationship, user_id=N
     if user_id is None:
         return milestones_api.get_course_content_milestones(course_id, content_id, relationship)
 
-    request_cache_dict = request_cache.get_cache(REQUEST_CACHE_NAME)
+    request_cache_dict = get_cache(REQUEST_CACHE_NAME)
     if user_id not in request_cache_dict:
         request_cache_dict[user_id] = {}
 
@@ -355,6 +369,9 @@ def get_course_content_milestones(course_id, content_id, relationship, user_id=N
             relationship=relationship,
             user={"id": user_id}
         )
+
+    if content_id is None:
+        return request_cache_dict[user_id][relationship]
 
     return [m for m in request_cache_dict[user_id][relationship] if m['content_id'] == unicode(content_id)]
 

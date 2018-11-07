@@ -7,13 +7,14 @@ import markupsafe
 from config_models.models import ConfigurationModel
 from django.contrib.auth.models import User
 from django.db import models
+from opaque_keys.edx.django.models import CourseKeyField
+from six import text_type
 
 from course_modes.models import CourseMode
 from enrollment.api import validate_course_mode
 from enrollment.errors import CourseModeNotFoundError
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_name
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from openedx.core.lib.html_to_text import html_to_text
 from openedx.core.lib.mail_utils import wrap_message
 from student.roles import CourseInstructorRole, CourseStaffRole
@@ -27,7 +28,7 @@ class Email(models.Model):
     """
     Abstract base class for common information for an email.
     """
-    sender = models.ForeignKey(User, default=1, blank=True, null=True)
+    sender = models.ForeignKey(User, default=1, blank=True, null=True, on_delete=models.CASCADE)
     slug = models.CharField(max_length=128, db_index=True)
     subject = models.CharField(max_length=128, blank=True)
     html_message = models.TextField(null=True, blank=True)
@@ -138,7 +139,7 @@ class CohortTarget(Target):
     """
     Subclass of Target, specifically referring to a cohort.
     """
-    cohort = models.ForeignKey('course_groups.CourseUserGroup')
+    cohort = models.ForeignKey('course_groups.CourseUserGroup', on_delete=models.CASCADE)
 
     class Meta:
         app_label = "bulk_email"
@@ -181,7 +182,7 @@ class CourseModeTarget(Target):
     """
     Subclass of Target, specifically for course modes.
     """
-    track = models.ForeignKey('course_modes.CourseMode')
+    track = models.ForeignKey('course_modes.CourseMode', on_delete=models.CASCADE)
 
     class Meta:
         app_label = "bulk_email"
@@ -197,14 +198,12 @@ class CourseModeTarget(Target):
         return "{}-{}".format(self.target_type, self.track.mode_slug)  # pylint: disable=no-member
 
     def long_display(self):
-        all_modes = CourseMode.objects.filter(
-            course_id=self.track.course_id,
-            mode_slug=self.track.mode_slug,  # pylint: disable=no-member
-        )
-        return "Course mode: {}, Currencies: {}".format(
-            self.track.mode_display_name,  # pylint: disable=no-member
-            ", ".join([mode.currency for mode in all_modes])
-        )
+        course_mode = self.track
+        long_course_mode_display = 'Course mode: {}'.format(course_mode.mode_display_name)
+        if course_mode.mode_slug not in CourseMode.AUDIT_MODES:
+            mode_currency = 'Currency: {}'.format(course_mode.currency)
+            long_course_mode_display = '{}, {}'.format(long_course_mode_display, mode_currency)
+        return long_course_mode_display
 
     @classmethod
     def ensure_valid_mode(cls, mode_slug, course_id):
@@ -307,7 +306,7 @@ class Optout(models.Model):
     # Allowing null=True to support data migration from email->user.
     # We need to first create the 'user' column with some sort of default in order to run the data migration,
     # and given the unique index, 'null' is the best default value.
-    user = models.ForeignKey(User, db_index=True, null=True)
+    user = models.ForeignKey(User, db_index=True, null=True, on_delete=models.CASCADE)
     course_id = CourseKeyField(max_length=255, db_index=True)
 
     class Meta(object):
@@ -434,7 +433,7 @@ class CourseAuthorization(models.Model):
         if self.email_enabled:
             not_en = ""
         # pylint: disable=no-member
-        return u"Course '{}': Instructor Email {}Enabled".format(self.course_id.to_deprecated_string(), not_en)
+        return u"Course '{}': Instructor Email {}Enabled".format(text_type(self.course_id), not_en)
 
 
 class BulkEmailFlag(ConfigurationModel):

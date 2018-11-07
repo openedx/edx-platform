@@ -14,7 +14,7 @@ from common.test.acceptance.pages.common.utils import click_css, confirm_prompt
 from common.test.acceptance.pages.studio.container import ContainerPage
 from common.test.acceptance.pages.studio.course_page import CoursePage
 from common.test.acceptance.pages.studio.utils import set_input_value, set_input_value_and_save
-from common.test.acceptance.tests.helpers import disable_animations, enable_animations
+from common.test.acceptance.tests.helpers import disable_animations, enable_animations, select_option_by_text
 
 
 @js_defined('jQuery')
@@ -89,6 +89,11 @@ class CourseOutlineItem(object):
         return self.status_message == 'Contains staff only content' if self.has_status_message else False
 
     @property
+    def has_restricted_warning(self):
+        """ Returns True if the 'Access to this unit is restricted to' message is visible """
+        return 'Access to this unit is restricted to' in self.status_message if self.has_status_message else False
+
+    @property
     def is_staff_only(self):
         """ Returns True if the visiblity state of this item is staff only (has a black sidebar) """
         return "is-staff-only" in self.q(css=self._bounded_selector(''))[0].get_attribute("class")  # pylint: disable=no-member
@@ -128,6 +133,29 @@ class CourseOutlineItem(object):
         modal = self.edit()
         modal.is_explicitly_locked = is_locked
         modal.save()
+
+    def get_enrollment_select_options(self):
+        """
+        Gets the option names available for unit group access
+        """
+        modal = self.edit()
+        group_options = self.q(css='.group-select-title option').text
+        modal.cancel()
+        return group_options
+
+    def toggle_unit_access(self, partition_name, group_ids):
+        """
+        Toggles unit access to the groups in group_ids
+        """
+        if group_ids:
+            modal = self.edit()
+            groups_select = self.q(css='.group-select-title select')
+            select_option_by_text(groups_select, partition_name)
+
+            for group_id in group_ids:
+                checkbox = self.q(css='#content-group-{group_id}'.format(group_id=group_id))
+                checkbox.click()
+            modal.save()
 
     def in_editable_form(self):
         """
@@ -262,13 +290,17 @@ class CourseOutlineContainer(CourseOutlineItem):
             self.wait_for_element_presence(
                 self._bounded_selector(self.ADD_BUTTON_SELECTOR), 'Toggle control is present'
             )
-            add_button = self.q(css=self._bounded_selector(self.ADD_BUTTON_SELECTOR)).first.results
+            css_element = self._bounded_selector(self.ADD_BUTTON_SELECTOR)
+            add_button = self.q(css=css_element).first.results  # pylint: disable=no-member
+            self.scroll_to_element(css_element)  # pylint: disable=no-member
             return add_button and add_button[0].is_displayed()
 
         currently_expanded = subsection_expanded()
 
         # Need to click slightly off-center in order for the click to be recognized.
-        ele = self.browser.find_element_by_css_selector(self._bounded_selector('.ui-toggle-expansion .fa'))
+        css_element = self._bounded_selector('.ui-toggle-expansion .fa')
+        self.scroll_to_element(css_element)  # pylint: disable=no-member
+        ele = self.browser.find_element_by_css_selector(css_element)  # pylint: disable=no-member
         ActionChains(self.browser).move_to_element_with_offset(ele, 8, 8).click().perform()  # pylint: disable=no-member
         self.wait_for_element_presence(self._bounded_selector(self.ADD_BUTTON_SELECTOR), 'Subsection is expanded')
 
@@ -286,7 +318,9 @@ class CourseOutlineContainer(CourseOutlineItem):
         """
         Return whether this outline item is currently collapsed.
         """
-        return "is-collapsed" in self.q(css=self._bounded_selector('')).first.attrs("class")[0]  # pylint: disable=no-member
+        css_element = self._bounded_selector('')
+        self.scroll_to_element(css_element)  # pylint: disable=no-member
+        return "is-collapsed" in self.q(css=css_element).first.attrs("class")[0]  # pylint: disable=no-member
 
 
 class CourseOutlineChild(PageObject, CourseOutlineItem):
@@ -469,6 +503,7 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         Clicks the "View Live" link and switches to the new tab
         """
         click_css(self, '.view-live-button', require_notification=False)
+        self.wait_for_page()
         self.browser.switch_to_window(self.browser.window_handles[-1])
 
     def section(self, title):
@@ -685,12 +720,13 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         self.q(css=".action-save").first.click()
         self.wait_for_ajax()
 
-    def add_prerequisite_to_subsection(self, min_score):
+    def add_prerequisite_to_subsection(self, min_score, min_completion):
         """
         Adds a prerequisite to a subsection.
         """
         Select(self.q(css="#prereq")[0]).select_by_index(1)
         self.q(css="#prereq_min_score").fill(min_score)
+        self.q(css="#prereq_min_completion").fill(min_completion)
         self.q(css=".action-save").first.click()
         self.wait_for_ajax()
 
@@ -1082,7 +1118,7 @@ class CourseOutlineModal(object):
         """
         self.ensure_staff_lock_visible()
         if value != self.is_explicitly_locked:
-            self.find_css('label[for="staff_lock"]').click()
+            self.find_css('#staff_lock').click()
         EmptyPromise(lambda: value == self.is_explicitly_locked, "Explicit staff lock is updated").fulfill()
 
     def shows_staff_lock_warning(self):

@@ -60,17 +60,20 @@ def get_bookmarks(user, course_key=None, fields=None, serialized=True):
     Returns:
          List of dicts if serialized is True else queryset.
     """
-    bookmarks_queryset = Bookmark.objects.filter(user=user)
+    if user.is_authenticated:
+        bookmarks_queryset = Bookmark.objects.filter(user=user)
 
-    if course_key:
-        bookmarks_queryset = bookmarks_queryset.filter(course_key=course_key)
+        if course_key:
+            bookmarks_queryset = bookmarks_queryset.filter(course_key=course_key)
 
-    if len(set(fields or []) & set(OPTIONAL_FIELDS)) > 0:
-        bookmarks_queryset = bookmarks_queryset.select_related('user', 'xblock_cache')
+        if len(set(fields or []) & set(OPTIONAL_FIELDS)) > 0:
+            bookmarks_queryset = bookmarks_queryset.select_related('user', 'xblock_cache')
+        else:
+            bookmarks_queryset = bookmarks_queryset.select_related('user')
+
+        bookmarks_queryset = bookmarks_queryset.order_by('-created')
     else:
-        bookmarks_queryset = bookmarks_queryset.select_related('user')
-
-    bookmarks_queryset = bookmarks_queryset.order_by('-created')
+        bookmarks_queryset = Bookmark.objects.none()
 
     if serialized:
         return BookmarkSerializer(bookmarks_queryset, context={'fields': fields}, many=True).data

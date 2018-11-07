@@ -169,8 +169,8 @@ class SplitMigrator(object):
                 continue
             old_parent = self.source_modulestore.get_item(parent_loc, **kwargs)
             split_parent_loc = new_draft_course_loc.make_usage_key(
-                parent_loc.category,
-                parent_loc.block_id if parent_loc.category != 'course' else published_course_usage_key.block_id
+                parent_loc.block_type,
+                parent_loc.block_id if parent_loc.block_type != 'course' else published_course_usage_key.block_id
             )
             new_parent = self.split_modulestore.get_item(split_parent_loc, **kwargs)
             # this only occurs if the parent was also awaiting adoption: skip this one, go to next
@@ -202,8 +202,8 @@ class SplitMigrator(object):
             Convert the location
             """
             return new_course_key.make_usage_key(
-                location.category,
-                location.block_id if location.category != 'course' else course_block_id
+                location.block_type,
+                location.block_id if location.block_type != 'course' else course_block_id
             )
 
         result = {}

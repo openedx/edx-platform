@@ -63,11 +63,11 @@ define([
             };
 
             var expectButtonShown = function(obj) {
-                var resetButton = $('#webcam_reset_button'),
-                    captureButton = $('#webcam_capture_button');
+                var $resetButton = $('#webcam_reset_button'),
+                    $captureButton = $('#webcam_capture_button');
 
-                expect(captureButton.hasClass('is-hidden')).toBe(!obj.snapshot);
-                expect(resetButton.hasClass('is-hidden')).toBe(!obj.reset);
+                expect($captureButton.hasClass('is-hidden')).toBe(!obj.snapshot);
+                expect($resetButton.hasClass('is-hidden')).toBe(!obj.reset);
             };
 
             var expectSubmitEnabled = function(isEnabled) {

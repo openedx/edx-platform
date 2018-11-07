@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 from django.conf import settings
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, LocationKeyField
+from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 
 
 class Migration(migrations.Migration):
@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
             name='CcxFieldOverride',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('location', LocationKeyField(max_length=255, db_index=True)),
+                ('location', UsageKeyField(max_length=255, db_index=True)),
                 ('field', models.CharField(max_length=255)),
                 ('value', models.TextField(default=b'null')),
             ],
@@ -28,13 +28,13 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('course_id', CourseKeyField(max_length=255, db_index=True)),
                 ('display_name', models.CharField(max_length=255)),
-                ('coach', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('coach', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
         migrations.AddField(
             model_name='ccxfieldoverride',
             name='ccx',
-            field=models.ForeignKey(to='ccx.CustomCourseForEdX'),
+            field=models.ForeignKey(to='ccx.CustomCourseForEdX', on_delete=models.CASCADE),
         ),
         migrations.AlterUniqueTogether(
             name='ccxfieldoverride',

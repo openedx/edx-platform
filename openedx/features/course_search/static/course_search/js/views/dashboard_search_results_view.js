@@ -12,12 +12,10 @@
     ) {
         return SearchResultsView.extend({
             el: '.search-results',
-            contentElement: '#my-courses, #profile-sidebar',
             resultsTemplate: dashboardSearchResultsTemplate,
             itemTemplate: dashboardSearchItemTemplate,
             events: {
-                'click .search-load-next': 'loadNext',
-                'click .search-back-to-courses': 'backToCourses'
+                'click .search-load-next': 'loadNext'
             },
 
             backToCourses: function() {

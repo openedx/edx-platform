@@ -2,6 +2,7 @@
 .nav-skip,
 .transcript-skip {
   @include left(0);
+
   font-size: font-size(small);
   display: inline-block;
   position: absolute;

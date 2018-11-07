@@ -51,9 +51,9 @@ def quote_attr(s):
 
 
 class OptionInputTest(unittest.TestCase):
-    '''
+    """
     Make sure option inputs work
-    '''
+    """
 
     def test_rendering(self):
         xml_str = """<optioninput options="('Up','Down','Don't know')" id="sky_input" correct="Up"/>"""
@@ -89,7 +89,9 @@ class OptionInputTest(unittest.TestCase):
         f = inputtypes.OptionInput.parse_options
 
         def check(input, options):
-            """Take list of options, confirm that output is in the silly doubled format"""
+            """
+            Take list of options, confirm that output is in the silly doubled format
+            """
             expected = [(o, o) for o in options]
             self.assertEqual(f(input), expected)
 
@@ -108,9 +110,9 @@ class OptionInputTest(unittest.TestCase):
 
 
 class ChoiceGroupTest(unittest.TestCase):
-    '''
+    """
     Test choice groups, radio groups, and checkbox groups
-    '''
+    """
 
     def check_group(self, tag, expected_input_type, expected_suffix):
         xml_str = """
@@ -248,9 +250,9 @@ class JSInputTest(unittest.TestCase):
 
 
 class TextLineTest(unittest.TestCase):
-    '''
+    """
     Check that textline inputs work, with and without math.
-    '''
+    """
 
     def test_rendering(self):
         size = "42"
@@ -369,9 +371,9 @@ class TextLineTest(unittest.TestCase):
 
 
 class FileSubmissionTest(unittest.TestCase):
-    '''
+    """
     Check that file submission inputs work
-    '''
+    """
 
     def test_rendering(self):
         allowed_files = "runme.py nooooo.rb ohai.java"
@@ -413,9 +415,9 @@ class FileSubmissionTest(unittest.TestCase):
 
 
 class CodeInputTest(unittest.TestCase):
-    '''
+    """
     Check that codeinput inputs work
-    '''
+    """
 
     def test_rendering(self):
         mode = "parrot"
@@ -433,8 +435,6 @@ class CodeInputTest(unittest.TestCase):
         />""".format(m=mode, c=cols, r=rows, ln=linenumbers, ts=tabsize)
 
         element = etree.fromstring(xml_str)
-
-        escapedict = {'"': '&quot;'}
 
         state = {
             'value': 'print "good evening"',
@@ -471,9 +471,9 @@ class CodeInputTest(unittest.TestCase):
 
 
 class MatlabTest(unittest.TestCase):
-    '''
+    """
     Test Matlab input types
-    '''
+    """
     def setUp(self):
         super(MatlabTest, self).setUp()
         self.rows = '10'
@@ -921,10 +921,9 @@ def html_tree_equal(received, expected):
 
 
 class SchematicTest(unittest.TestCase):
-    '''
+    """
     Check that schematic inputs work
-    '''
-
+    """
     def test_rendering(self):
         height = '12'
         width = '33'
@@ -977,10 +976,9 @@ class SchematicTest(unittest.TestCase):
 
 
 class ImageInputTest(unittest.TestCase):
-    '''
+    """
     Check that image inputs work
-    '''
-
+    """
     def check(self, value, egx, egy):
         height = '78'
         width = '427'
@@ -1037,10 +1035,9 @@ class ImageInputTest(unittest.TestCase):
 
 
 class CrystallographyTest(unittest.TestCase):
-    '''
+    """
     Check that crystallography inputs work
-    '''
-
+    """
     def test_rendering(self):
         height = '12'
         width = '33'
@@ -1079,10 +1076,9 @@ class CrystallographyTest(unittest.TestCase):
 
 
 class VseprTest(unittest.TestCase):
-    '''
+    """
     Check that vsepr inputs work
-    '''
-
+    """
     def test_rendering(self):
         height = '12'
         width = '33'
@@ -1127,9 +1123,9 @@ class VseprTest(unittest.TestCase):
 
 
 class ChemicalEquationTest(unittest.TestCase):
-    '''
+    """
     Check that chemical equation inputs work.
-    '''
+    """
     def setUp(self):
         super(ChemicalEquationTest, self).setUp()
         self.size = "42"
@@ -1144,7 +1140,9 @@ class ChemicalEquationTest(unittest.TestCase):
         self.the_input = lookup_tag('chemicalequationinput')(test_capa_system(), element, state)
 
     def test_rendering(self):
-        ''' Verify that the render context matches the expected render context'''
+        """
+        Verify that the render context matches the expected render context
+        """
         context = self.the_input._get_render_context()  # pylint: disable=protected-access
         prob_id = 'prob_1_2'
         expected = {
@@ -1161,7 +1159,9 @@ class ChemicalEquationTest(unittest.TestCase):
         self.assertEqual(context, expected)
 
     def test_chemcalc_ajax_sucess(self):
-        ''' Verify that using the correct dispatch and valid data produces a valid response'''
+        """
+        Verify that using the correct dispatch and valid data produces a valid response
+        """
         data = {'formula': "H"}
         response = self.the_input.handle_ajax("preview_chemcalc", data)
 
@@ -1366,10 +1366,9 @@ class FormulaEquationTest(unittest.TestCase):
 
 
 class DragAndDropTest(unittest.TestCase):
-    '''
+    """
     Check that drag and drop inputs work
-    '''
-
+    """
     def test_rendering(self):
         path_to_images = '/dummy-static/images/'
 
@@ -1441,9 +1440,9 @@ class DragAndDropTest(unittest.TestCase):
 
 
 class AnnotationInputTest(unittest.TestCase):
-    '''
+    """
     Make sure option inputs work
-    '''
+    """
     def test_rendering(self):
         xml_str = '''
 <annotationinput>

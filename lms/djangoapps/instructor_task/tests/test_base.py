@@ -12,9 +12,11 @@ from uuid import uuid4
 import unicodecsv
 from celery.states import FAILURE, SUCCESS
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from mock import Mock, patch
-from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
+from opaque_keys.edx.locations import Location
+from opaque_keys.edx.keys import CourseKey
+from six import text_type
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from courseware.model_data import StudentModule
@@ -34,7 +36,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 TEST_COURSE_ORG = 'edx'
 TEST_COURSE_NAME = 'test_course'
 TEST_COURSE_NUMBER = '1.23x'
-TEST_COURSE_KEY = SlashSeparatedCourseKey(TEST_COURSE_ORG, TEST_COURSE_NUMBER, TEST_COURSE_NAME)
+TEST_COURSE_KEY = CourseKey.from_string('/'.join([TEST_COURSE_ORG, TEST_COURSE_NUMBER, TEST_COURSE_NAME]))
 TEST_CHAPTER_NAME = "Section"
 TEST_SECTION_NAME = "Subsection"
 
@@ -206,7 +208,7 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
         Create an internal location for a test problem.
         """
         if "i4x:" in problem_url_name:
-            return Location.from_deprecated_string(problem_url_name)
+            return Location.from_string(problem_url_name)
         elif course_key:
             return course_key.make_usage_key('problem', problem_url_name)
         else:
@@ -231,12 +233,12 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
         factory = OptionResponseXMLFactory()
         factory_args = self._option_problem_factory_args()
         problem_xml = factory.build_xml(**factory_args)
-        ItemFactory.create(parent_location=parent.location,
-                           parent=parent,
-                           category="problem",
-                           display_name=problem_url_name,
-                           data=problem_xml,
-                           **kwargs)
+        return ItemFactory.create(parent_location=parent.location,
+                                  parent=parent,
+                                  category="problem",
+                                  display_name=problem_url_name,
+                                  data=problem_xml,
+                                  **kwargs)
 
     def redefine_option_problem(self, problem_url_name, correct_answer=OPTION_1, num_inputs=1, num_responses=2):
         """Change the problem definition so the answer is Option 2"""
@@ -254,7 +256,7 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
         """Get StudentModule object for test course, given the `username` and the problem's `descriptor`."""
         return StudentModule.objects.get(course_id=self.course.id,
                                          student=User.objects.get(username=username),
-                                         module_type=descriptor.location.category,
+                                         module_type=descriptor.location.block_type,
                                          module_state_key=descriptor.location,
                                          )
 
@@ -282,9 +284,9 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
         self.login_username(username)
         # make ajax call:
         modx_url = reverse('xblock_handler', kwargs={
-            'course_id': self.course.id.to_deprecated_string(),
+            'course_id': text_type(self.course.id),
             'usage_id': quote_slashes(
-                InstructorTaskModuleTestCase.problem_location(problem_url_name, self.course.id).to_deprecated_string()
+                text_type(InstructorTaskModuleTestCase.problem_location(problem_url_name, self.course.id))
             ),
             'handler': 'xmodule_handler',
             'suffix': 'problem_check',
@@ -301,6 +303,8 @@ class TestReportMixin(object):
     """
     Cleans up after tests that place files in the reports directory.
     """
+    shard = 4
+
     def setUp(self):
 
         def clean_up_tmpdir():
@@ -350,7 +354,7 @@ class TestReportMixin(object):
         report_path = report_store.path_to(self.course.id, report_csv_filename)
         with report_store.storage.open(report_path) as csv_file:
             # Expand the dict reader generator so we don't lose it's content
-            csv_rows = [row for row in unicodecsv.DictReader(csv_file)]
+            csv_rows = [row for row in unicodecsv.DictReader(csv_file, encoding='utf-8-sig')]
 
             if ignore_other_columns:
                 csv_rows = [
@@ -370,5 +374,5 @@ class TestReportMixin(object):
         report_csv_filename = report_store.links_for(self.course.id)[0][0]
         report_path = report_store.path_to(self.course.id, report_csv_filename)
         with report_store.storage.open(report_path) as csv_file:
-            rows = unicodecsv.reader(csv_file, encoding='utf-8')
+            rows = unicodecsv.reader(csv_file, encoding='utf-8-sig')
             return rows.next()

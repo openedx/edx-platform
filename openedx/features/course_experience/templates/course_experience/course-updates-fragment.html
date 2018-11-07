@@ -11,18 +11,18 @@ from openedx.features.course_experience import course_home_page_title
 %>
 
 <%block name="content">
-<div class="course-updates container" id="course-container">
+<div class="course-updates page-content-container" id="course-container">
     <header class="page-header has-secondary">
         ## Breadcrumb navigation
         <div class="page-header-main">
-            <nav aria-label="${_('Course Updates')}" class="sr-is-focusable" tabindex="-1">
+            <nav aria-label="${_('Updates')}" class="sr-is-focusable" tabindex="-1">
                 <div class="has-breadcrumbs">
                     <div class="breadcrumbs">
                         <span class="nav-item">
                             <a href="${course_url}">${course_home_page_title(course)}</a>
                         </span>
                         <span class="icon fa fa-angle-right" aria-hidden="true"></span>
-                        <span class="nav-item">${_('Course Updates')}</span>
+                        <span class="nav-item">${_('Updates')}</span>
                     </div>
                 </div>
             </nav>

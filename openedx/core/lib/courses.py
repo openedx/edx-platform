@@ -6,6 +6,7 @@ from django.conf import settings
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseKey
+from six import text_type
 from xmodule.assetstore.assetmgr import AssetManager
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
@@ -62,7 +63,7 @@ def clean_course_id(model_form, is_required=True):
     Returns:
         (CourseKey) The cleaned and validated course_id as a CourseKey.
 
-    NOTE: This should ultimately replace all copies of "def clean_course_id".
+    NOTE: Use this method in model forms instead of a custom "clean_course_id" method!
 
     """
     cleaned_id = model_form.cleaned_data["course_id"]
@@ -73,11 +74,11 @@ def clean_course_id(model_form, is_required=True):
     try:
         course_key = CourseKey.from_string(cleaned_id)
     except InvalidKeyError:
-        msg = u'Course id invalid. Entered course id was: "{0}."'.format(cleaned_id)
+        msg = u'Course id invalid. Entered course id was: "{0}".'.format(cleaned_id)
         raise forms.ValidationError(msg)
 
     if not modulestore().has_course(course_key):
-        msg = u'Course not found. Entered course id was: "{0}". '.format(course_key.to_deprecated_string())
+        msg = u'Course not found. Entered course id was: "{0}".'.format(text_type(course_key))
         raise forms.ValidationError(msg)
 
     return course_key

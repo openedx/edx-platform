@@ -4,7 +4,8 @@ Utilities for grades related tests
 from contextlib import contextmanager
 from datetime import datetime
 
-from mock import patch
+import pytz
+from mock import patch, MagicMock
 
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module
@@ -12,23 +13,29 @@ from xmodule.graders import ProblemScore
 
 
 @contextmanager
-def mock_passing_grade(grade_pass='Pass', percent=0.75, ):
+def mock_passing_grade(letter_grade='Pass', percent=0.75, ):
     """
     Mock the grading function to always return a passing grade.
     """
-    with patch('lms.djangoapps.grades.new.course_grade.CourseGrade._compute_letter_grade') as mock_letter_grade:
-        with patch('lms.djangoapps.grades.new.course_grade.CourseGrade._compute_percent') as mock_percent_grade:
-            mock_letter_grade.return_value = grade_pass
-            mock_percent_grade.return_value = percent
+    passing_grade_fields = dict(
+        letter_grade=letter_grade,
+        percent=percent,
+        passed=letter_grade is not None,
+        attempted=True,
+    )
+    with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade_read:
+        mock_grade_read.return_value = MagicMock(**passing_grade_fields)
+        with patch('lms.djangoapps.grades.course_grade.CourseGrade.update') as mock_grade_update:
+            mock_grade_update.return_value = MagicMock(**passing_grade_fields)
             yield
 
 
 @contextmanager
-def mock_get_score(earned=0, possible=1):
+def mock_get_score(earned=0, possible=1, first_attempted=datetime(2000, 1, 1, 0, 0, 0, tzinfo=pytz.UTC)):
     """
     Mocks the get_score function to return a valid grade.
     """
-    with patch('lms.djangoapps.grades.new.subsection_grade.get_score') as mock_score:
+    with patch('lms.djangoapps.grades.subsection_grade.get_score') as mock_score:
         mock_score.return_value = ProblemScore(
             raw_earned=earned,
             raw_possible=possible,
@@ -36,13 +43,13 @@ def mock_get_score(earned=0, possible=1):
             weighted_possible=possible,
             weight=1,
             graded=True,
-            first_attempted=datetime(2000, 1, 1, 0, 0, 0)
+            first_attempted=first_attempted
         )
         yield mock_score
 
 
 @contextmanager
-def mock_get_submissions_score(earned=0, possible=1, first_attempted=datetime(2000, 1, 1, 0, 0, 0)):
+def mock_get_submissions_score(earned=0, possible=1, first_attempted=datetime(2000, 1, 1, 0, 0, 0, tzinfo=pytz.UTC)):
     """
     Mocks the _get_submissions_score function to return the specified values
     """

@@ -9,3 +9,4 @@ class ScoreDatabaseTableEnum(object):
     """
     courseware_student_module = 'csm'
     submissions = 'submissions'
+    overrides = 'overrides'

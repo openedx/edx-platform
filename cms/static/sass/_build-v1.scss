@@ -4,13 +4,22 @@
 
 // About: Sass compile for Studio that are shared between LTR and RTL UI. Configuration and vendor specific imports happen before this shared set of imports are compiled in the studio-main-*.scss files.
 
+// +Base - Build
+// =============
+@import 'build';
+
+// +Base - Legacy Variables
+// ========================
+//
+// Note: these should be replaced by Bootstrap theme variables
+@import 'cms/theme/variables-v1';
+
 // +Vendor and Rebase - *referenced/used vendor presentation and reset*
 // ====================
 @import 'reset';
 
 // +Base - Utilities
 // ====================
-@import 'partials/variables';
 @import 'mixins';
 @import 'mixins-inherited';
 
@@ -60,7 +69,6 @@
 @import 'views/outline';
 @import 'views/settings';
 @import 'views/static-pages';
-@import 'views/unit';
 @import 'views/container';
 @import 'views/users';
 @import 'views/textbooks';
@@ -80,7 +88,6 @@
 @import 'xmodule/descriptors/css/module-styles.scss';
 @import 'xmodule/headings';
 @import 'elements/xmodules'; // styling for Studio-specific contexts
-
 @import 'developer'; // used for any developer-created scss that needs further polish/refactoring
 @import 'shame';     // used for any bad-form/orphaned scss
 
@@ -90,6 +97,7 @@
 
 // CAPA Problem Feedback
 @import 'edx-pattern-library-shims/buttons';
-
 @import 'edx-pattern-library-shims/base/variables';
 
+// Extra theme-specific rules
+@import 'cms/theme/extras';

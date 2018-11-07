@@ -14,5 +14,5 @@
     <p class="sr-only field-help" id="edit-post-editor-description"><%- gettext('Edit your post below.') %></p>
     <div class="edit-post-body" aria-describedby="edit-post-editor-description" name="body"><%- body %></div>
 </div>
-<button type="submit" id="edit-post-submit" class="btn-brand submit post-update"><%- gettext("Update post") %></button>
-<button class="btn post-cancel"><%- gettext("Cancel") %></button>
+<button type="submit" id="edit-post-submit" class="btn btn-primary submit post-update"><%- gettext("Update post") %></button>
+<button class="btn btn-outline-primary post-cancel"><%- gettext("Cancel") %></button>

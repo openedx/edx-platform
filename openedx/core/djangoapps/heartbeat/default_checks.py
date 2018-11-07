@@ -13,7 +13,6 @@ from django.db.utils import DatabaseError
 from xmodule.modulestore.django import modulestore
 from xmodule.exceptions import HeartbeatFailure
 
-from .defaults import HEARTBEAT_CELERY_TIMEOUT
 from .tasks import sample_task
 
 
@@ -51,7 +50,7 @@ def check_database():
     """
     cursor = connection.cursor()
     try:
-        cursor.execute("SELECT CURRENT_DATE")
+        cursor.execute("SELECT 1")
         cursor.fetchone()
         return 'sql', True, u'OK'
     except DatabaseError as fail:
@@ -107,7 +106,7 @@ def check_celery():
     """
     now = time()
     datetimenow = datetime.now()
-    expires = datetimenow + timedelta(seconds=getattr(settings, 'HEARTBEAT_CELERY_TIMEOUT', HEARTBEAT_CELERY_TIMEOUT))
+    expires = datetimenow + timedelta(seconds=settings.HEARTBEAT_CELERY_TIMEOUT)
 
     try:
         task = sample_task.apply_async(expires=expires)

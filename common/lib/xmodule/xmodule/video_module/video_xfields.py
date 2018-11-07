@@ -104,6 +104,8 @@ class VideoFields(object):
         scope=Scope.settings,
         default=False
     )
+    # `sub` is deprecated field and should not be used in future. Now, transcripts are primarily handled in VAL and
+    # backward compatibility for the video modules already using this field has been ensured.
     sub = String(
         help=_("The default transcript for the video, from the Default Timed Transcript field on the Basic tab. This transcript should be in English. You don't have to change this setting."),  # pylint: disable=line-too-long
         display_name=_("Default Timed Transcript"),
@@ -147,6 +149,15 @@ class VideoFields(object):
         help=_("The default speed for the video."),
         scope=Scope.preferences,
         default=1.0
+    )
+    auto_advance = Boolean(
+        help=_("Specify whether to advance automatically to the next unit when the video ends."),
+        scope=Scope.preferences,
+        # The default is True because this field only has an effect when auto-advance controls are enabled
+        # (globally enabled through feature flag and locally enabled through course setting); in that case
+        # it's good to start auto-advancing and let the student disable it, instead of the other way around
+        # (requiring the user to enable it). When auto-advance controls are hidden, this field won't be used.
+        default=True,
     )
     youtube_is_available = Boolean(
         help=_("Specify whether YouTube is available for the user."),

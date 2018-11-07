@@ -6,7 +6,7 @@ from urlparse import urlunparse
 
 from django.contrib.auth.models import User as DjangoUser
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from rest_framework import serializers
 
 from discussion_api.permissions import NON_UPDATABLE_COMMENT_FIELDS, NON_UPDATABLE_THREAD_FIELDS, get_editable_fields

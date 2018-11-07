@@ -581,6 +581,7 @@ class InlineDiscussionPage(PageObject, DiscussionPageMixin):
         """
         Clicks the link for the specified thread to show the detailed view.
         """
+        self.wait_for_element_presence('.forum-nav-thread-link', 'Thread list has loaded')
         thread_selector = ".forum-nav-thread[data-id='{thread_id}'] .forum-nav-thread-link".format(thread_id=thread_id)
         self._find_within(thread_selector).first.click()
         self.thread_page = InlineDiscussionThreadPage(self.browser, thread_id)  # pylint: disable=attribute-defined-outside-init

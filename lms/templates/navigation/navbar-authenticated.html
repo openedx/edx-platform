@@ -5,7 +5,7 @@
 <%namespace name='static' file='../static_content.html'/>
 <%namespace file='../main.html' import="login_query"/>
 <%!
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 %>
 
@@ -13,27 +13,38 @@ from django.utils.translation import ugettext as _
   <%block name="navigation_global_links_authenticated">
     % if settings.FEATURES.get('COURSES_ARE_BROWSABLE') and not show_program_listing:
       <li class="item nav-global-01">
-        <a href="${marketing_link('COURSES')}">${_('Explore courses')}</a>
+        <a class="btn" href="${marketing_link('COURSES')}">${_('Explore courses')}</a>
       </li>
     % endif
-    % if show_program_listing:
+    % if show_dashboard_tabs:
       <li class="tab-nav-item">
         <a class="${'active ' if reverse('dashboard') == request.path else ''}tab-nav-link" href="${reverse('dashboard')}">
           ${_("Courses")}
         </a>
       </li>
+      % if show_program_listing:
+        <li class="tab-nav-item">
+          <a class="${'active ' if reverse('program_listing_view') in request.path else ''}tab-nav-link" href="${reverse('program_listing_view')}">
+            ${_("Programs")}
+          </a>
+        </li>
+      % endif
+      <%
+        self.real_user = getattr(user, 'real_user', user)
+        is_on_profile_page = data and data.get('profile_user_id') is not None
+      %>
       <li class="tab-nav-item">
-        <a class="${'active ' if reverse('program_listing_view') in request.path else ''}tab-nav-link" href="${reverse('program_listing_view')}">
-          ${_("Programs")}
+        <a class="${'active ' if is_on_profile_page else ''}tab-nav-link" href="${reverse('learner_profile', args=[self.real_user.username])}">
+          ${_("Profile")}
         </a>
       </li>
     % endif
-    %if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD','') and user.is_staff:
+    % if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD','') and user.is_staff:
       <li class="item">
         ## Translators: This is short for "System administration".
-        <a href="${reverse('sysadmin')}">${_("Sysadmin")}</a>
+        <a class="btn" href="${reverse('sysadmin')}">${_("Sysadmin")}</a>
       </li>
-    %endif
+    % endif
   </%block>
 </ol>
 

@@ -8,11 +8,15 @@ import mimetypes
 from django.conf import settings
 from django.http import Http404, HttpResponseNotFound, HttpResponseServerError
 from django.shortcuts import redirect
+from django.template import TemplateDoesNotExist
+from django.utils.safestring import mark_safe
 from django.views.decorators.csrf import ensure_csrf_cookie
-from mako.exceptions import TopLevelLookupException
 
+from mako.exceptions import TopLevelLookupException
 from edxmako.shortcuts import render_to_response, render_to_string
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from util.cache import cache_if_anonymous
+from util.views import fix_crum_request
 
 valid_templates = []
 
@@ -50,8 +54,19 @@ def render(request, template):
         # This is necessary for the dialog presented with the TOS in /register
         if template == 'honor.html':
             context['allow_iframing'] = True
-        return render_to_response('static_templates/' + template, context, content_type=content_type)
+        # Format Examples: static_template_about_header
+        configuration_base = 'static_template_' + template.replace('.html', '').replace('-', '_')
+        page_header = configuration_helpers.get_value(configuration_base + '_header')
+        page_content = configuration_helpers.get_value(configuration_base + '_content')
+        if page_header:
+            context['page_header'] = mark_safe(page_header)
+        if page_content:
+            context['page_content'] = mark_safe(page_content)
+        result = render_to_response('static_templates/' + template, context, content_type=content_type)
+        return result
     except TopLevelLookupException:
+        raise Http404
+    except TemplateDoesNotExist:
         raise Http404
 
 
@@ -68,15 +83,17 @@ def render_press_release(request, slug):
     template = slug.lower().replace('-', '_') + ".html"
     try:
         resp = render_to_response('static_templates/press_releases/' + template, {})
-    except TopLevelLookupException:
+    except TemplateDoesNotExist:
         raise Http404
     else:
         return resp
 
 
+@fix_crum_request
 def render_404(request):
     return HttpResponseNotFound(render_to_string('static_templates/404.html', {}, request=request))
 
 
+@fix_crum_request
 def render_500(request):
     return HttpResponseServerError(render_to_string('static_templates/server-error.html', {}, request=request))

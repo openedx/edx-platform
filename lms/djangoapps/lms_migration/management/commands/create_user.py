@@ -18,7 +18,7 @@ from django.core.management.base import BaseCommand
 from pytz import UTC
 
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
-from student.models import Registration, UserProfile
+from student.models import Registration, UserProfile, email_exists_or_retired
 
 
 class MyCompleter(object):  # Custom completer
@@ -95,7 +95,7 @@ class Command(BaseCommand):
 
             while True:
                 email = raw_input('email: ')
-                if User.objects.filter(email=email):
+                if email_exists_or_retired(email):
                     print "email %s already taken" % email
                 else:
                     break

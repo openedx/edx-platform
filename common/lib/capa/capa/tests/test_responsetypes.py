@@ -15,6 +15,7 @@ import zipfile
 
 import mock
 from pytz import UTC
+from six import text_type
 import requests
 
 from capa.tests.helpers import new_loncapa_problem, test_capa_system, load_fixture
@@ -308,34 +309,6 @@ class ImageResponseTest(ResponseTest):  # pylint: disable=missing-docstring
 class SymbolicResponseTest(ResponseTest):  # pylint: disable=missing-docstring
     xml_factory_class = SymbolicResponseXMLFactory
 
-    def test_grade_single_input_correct(self):
-        problem = self.build_problem(math_display=True, expect="2*x+3*y")
-
-        # Correct answers
-        correct_inputs = [
-            ('2x+3y', textwrap.dedent("""
-                <math xmlns="http://www.w3.org/1998/Math/MathML">
-                    <mstyle displaystyle="true">
-                    <mn>2</mn><mo>*</mo><mi>x</mi><mo>+</mo><mn>3</mn><mo>*</mo><mi>y</mi>
-                    </mstyle></math>"""),
-             'snuggletex_2x+3y.xml'),
-
-            ('x+x+3y', textwrap.dedent("""
-                <math xmlns="http://www.w3.org/1998/Math/MathML">
-                    <mstyle displaystyle="true">
-                    <mi>x</mi><mo>+</mo><mi>x</mi><mo>+</mo><mn>3</mn><mo>*</mo><mi>y</mi>
-                    </mstyle></math>"""),
-             'snuggletex_x+x+3y.xml'),
-        ]
-
-        for (input_str, input_mathml, server_fixture) in correct_inputs:
-            print "Testing input: {0}".format(input_str)
-            server_resp = load_fixture(server_fixture)
-            self._assert_symbolic_grade(
-                problem, input_str, input_mathml,
-                'correct', snuggletex_resp=server_resp
-            )
-
     def test_grade_single_input_incorrect(self):
         problem = self.build_problem(math_display=True, expect="2*x+3*y")
 
@@ -351,23 +324,6 @@ class SymbolicResponseTest(ResponseTest):  # pylint: disable=missing-docstring
 
         for (input_str, input_mathml) in incorrect_inputs:
             self._assert_symbolic_grade(problem, input_str, input_mathml, 'incorrect')
-
-    def test_complex_number_grade_correct(self):
-        problem = self.build_problem(
-            math_display=True,
-            expect="[[cos(theta),i*sin(theta)],[i*sin(theta),cos(theta)]]",
-            options=["matrix", "imaginary"]
-        )
-
-        correct_snuggletex = load_fixture('snuggletex_correct.html')
-        dynamath_input = load_fixture('dynamath_input.txt')
-        student_response = "cos(theta)*[[1,0],[0,1]] + i*sin(theta)*[[0,1],[1,0]]"
-
-        self._assert_symbolic_grade(
-            problem, student_response, dynamath_input,
-            'correct',
-            snuggletex_resp=correct_snuggletex
-        )
 
     def test_complex_number_grade_incorrect(self):
 
@@ -843,7 +799,7 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-docstring
         problem = self.build_problem(answer="a2", case_sensitive=False, regexp=True, additional_answers=['?\\d?'])
         with self.assertRaises(Exception) as cm:
             self.assert_grade(problem, "a3", "correct")
-        exception_message = cm.exception.message
+        exception_message = text_type(cm.exception)
         self.assertIn("nothing to repeat", exception_message)
 
     def test_hints(self):
@@ -1669,8 +1625,7 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-docstring
         problem = self.build_problem(answer=4)
 
         errors = [  # (exception raised, message to student)
-            (calc.UndefinedVariable("x"), "Answers can include numerals, operation signs, "
-                                          "and a few specific characters, such as the constants e and i."),
+            (calc.UndefinedVariable("x"), r"You may not use variables \(x\) in numerical problems"),
             (ValueError("factorial() mess-up"), "Factorial function evaluated outside its domain"),
             (ValueError(), "Could not interpret '.*' as a number"),
             (pyparsing.ParseException("oopsie"), "Invalid math syntax"),

@@ -14,13 +14,14 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
-from ...new.subsection_grade_factory import SubsectionGradeFactory
+from ...subsection_grade_factory import SubsectionGradeFactory
 
 
 class GradesAccessIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTestCase):
     """
     Tests integration between grading and block access.
     """
+    shard = 4
     ENABLED_SIGNALS = ['course_published']
 
     @classmethod

@@ -18,7 +18,7 @@ var options = {
     // Avoid adding files to this list. Use RequireJS.
     libraryFilesToInclude: [
         // Load the core JavaScript dependencies
-        {pattern: 'common_static/coffee/src/ajax_prefix.js', included: true},
+        {pattern: 'common_static/js/src/ajax_prefix.js', included: true},
         {pattern: 'common_static/common/js/vendor/underscore.js', included: true},
         {pattern: 'common_static/common/js/vendor/backbone.js', included: true},
         {pattern: 'common_static/js/vendor/CodeMirror/codemirror.js', included: true},
@@ -68,13 +68,18 @@ var options = {
     // Make sure the patterns in sourceFiles and specFiles do not match the same file.
     // Otherwise Istanbul which is used for coverage tracking will cause tests to not run.
     sourceFiles: [
-        {pattern: 'src/xmodule.js', included: true, ignoreCoverage: true}, // To prevent getting instrumented twice.
-        {pattern: 'src/**/*.js', included: true}
+        { pattern: 'src/xmodule.js', included: true, ignoreCoverage: true }, // To prevent getting instrumented twice.
+        // Load these before the xmodules that use them
+        { pattern: 'src/javascript_loader.js', included: true },
+        { pattern: 'src/collapsible.js', included: true },
+        // Load everything else
+        {pattern: 'src/**/!(video)/!(poll|time).js', included: true}
     ],
 
     specFiles: [
         {pattern: 'spec/helper.js', included: true, ignoreCoverage: true}, // Helper which depends on source files.
-        {pattern: 'spec/**/*.js', included: true}
+        { pattern: 'spec/**/!(video)/*.js', included: true },
+        { pattern: 'spec/!(time_spec|video_helper).js', included: true }
     ],
 
     fixtureFiles: [
@@ -87,6 +92,8 @@ var options = {
     ]
 };
 
+
 module.exports = function(config) {
     configModule.configure(config, options);
 };
+

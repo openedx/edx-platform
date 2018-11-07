@@ -2,7 +2,7 @@ define(['backbone', 'gettext', 'common/js/components/views/feedback_notification
     function(Backbone, gettext, NotificationView, ModuleUtils) {
         var Section = Backbone.Model.extend({
             defaults: {
-                'name': ''
+                name: ''
             },
             validate: function(attrs, options) {
                 if (!attrs.name) {

@@ -20,7 +20,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """Execute the command"""
-        course_id = options.get('course_id', None)
+        course_id = options['course_id']
 
         course_key = CourseKey.from_string(course_id)
         # for now only support on split mongo

@@ -4,20 +4,23 @@ $seq-nav-link-color: $link-color !default;
 $seq-nav-icon-color: rgb(10, 10, 10) !default;
 $seq-nav-icon-color-muted: rgb(90, 90, 90) !default;
 $seq-nav-tooltip-color: rgb(51, 51, 51) !default;
-$seq-nav-height: 44px;
+$seq-nav-height: 50px;
 
 // repeated extends - needed since LMS styling was referenced
 .block-link {
   @include border-left(1px solid $seq-nav-border-color);
+
   display: block;
 
-  &:hover, &:focus {
+  &:hover,
+  &:focus {
     background: none;
   }
 }
 
 .topbar {
   @include clearfix();
+
   border-bottom: 1px solid $seq-nav-border-color;
 
   @media print {
@@ -27,23 +30,24 @@ $seq-nav-height: 44px;
   a {
     &.block-link {
       @include border-left(1px solid $seq-nav-border-color);
+
       display: block;
 
-      &:hover, &:focus {
+      &:hover,
+      &:focus {
         background: none;
       }
     }
   }
 }
 
-%ui-clear-button  {
+%ui-clear-button {
   background-color: transparent;
   background-image: none;
   background-position: center 14px;
   background-repeat: no-repeat;
   border: none;
   border-radius: 0;
-
   background-clip: border-box;
   box-shadow: none;
   box-sizing: content-box;
@@ -57,16 +61,14 @@ $seq-nav-height: 44px;
 
 .sequence-nav {
   @extend .topbar;
-  margin: 0 0 $baseline 0;
+
+  margin: 0 auto $baseline;
   position: relative;
   border-bottom: none;
   z-index: 0;
   height: $seq-nav-height;
   display: flex;
-
-  .sequence-nav-button {
-    max-width: 200px;
-  }
+  justify-content: center;
 
   @media print {
     display: none;
@@ -74,9 +76,15 @@ $seq-nav-height: 44px;
 
   .sequence-list-wrapper {
     @extend %ui-depth2;
+
     position: relative;
     height: 100%;
     flex-grow: 1;
+
+    @include media-breakpoint-down(md) {
+      white-space: nowrap;
+      overflow-x: scroll;
+    }
   }
 
   ol {
@@ -84,7 +92,7 @@ $seq-nav-height: 44px;
 
     li {
       box-sizing: border-box;
-      min-width: 20px;
+      min-width: 40px;
       flex-grow: 1;
       border-color: $seq-nav-border-color;
       border-width: 1px;
@@ -109,9 +117,10 @@ $seq-nav-height: 44px;
         border-width: 1px;
         border-bottom-style: solid;
         box-sizing: border-box;
+        overflow: visible; // for tooltip - IE11 uses 'hidden' by default if width/height is specified
 
         .icon {
-          display: block;
+          display: inline-block;
           line-height: 100%; // This matches the height of the <a> its within (the parent) to get vertical centering.
           font-size: 110%;
           color: $seq-nav-icon-color-muted;
@@ -123,39 +132,41 @@ $seq-nav-height: 44px;
 
         //video
         &.seq_video {
-          .icon:before {
+          .icon::before {
             content: "\f008"; // .fa-film
           }
         }
 
         //other
         &.seq_other {
-          .icon:before {
+          .icon::before {
             content: "\f02d"; // .fa-book
           }
         }
 
         //vertical
         &.seq_vertical {
-          .icon:before {
+          .icon::before {
             content: "\f00b";  // .fa-tasks
           }
         }
 
         //problems
         &.seq_problem {
-          .icon:before {
+          .icon::before {
             content: "\f044";  // .fa-pencil-square-o
           }
         }
 
         .sequence-tooltip {
           @include text-align(left);
+
           @extend %ui-depth2;
-          margin-top: ($baseline/5);
+
+          margin-top: 12px;
           background: $seq-nav-tooltip-color;
           color: $white;
-          font-family: $sans-serif;
+          font-family: $font-family-sans-serif;
           line-height: lh();
           right: 0;  // Should not be RTLed, tooltips do not move in RTL
           padding: 6px;
@@ -176,6 +187,7 @@ $seq-nav-height: 44px;
           &::after {
             @include transform(rotate(45deg));
             @include right(18px);
+
             background: $seq-nav-tooltip-color;
             content: " ";
             display: block;
@@ -197,40 +209,63 @@ $seq-nav-height: 44px;
 
 .sequence-nav-button {
   @extend %ui-depth3;
+
   display: block;
   top: 0;
+  min-width: 40px;
+  max-width: 40px;
   height: 100%;
   text-shadow: none; // overrides default button text-shadow
   background: none;  // overrides default button gradient
-  background-color: white;
+  background-color: theme-color("inverse");
   border-color: $seq-nav-border-color;
   box-shadow: none;
-  min-width: 120px;
   font-size: inherit;
   font-weight: normal;
-  padding: 0 $baseline;
-  text-overflow: ellipsis;
+  padding: 0;
   white-space: nowrap;
-  overflow: hidden;
+  overflow-x: hidden;
 
-  span:not(:last-child) {
-    @include padding-right($baseline / 2);
+  @include media-breakpoint-up(md) {
+    min-width: 120px;
+    max-width: 200px;
+    text-overflow: ellipsis;
+
+    span:not(:last-child) {
+      @include padding-right($baseline / 2);
+    }
+  }
+
+  .sequence-nav-button-label {
+    display: none;
+
+    @include media-breakpoint-up(md) {
+      display: inline;
+    }
   }
 
   &.button-previous {
-    @include left(0);
-    @include border-top-left-radius(3px);
-    @include border-top-right-radius(0);
-    @include border-bottom-right-radius(0);
-    @include border-bottom-left-radius(3px);
+    order: -999;
+
+    @include media-breakpoint-up(md) {
+      @include left(0);
+      @include border-top-left-radius(3px);
+      @include border-top-right-radius(0);
+      @include border-bottom-right-radius(0);
+      @include border-bottom-left-radius(3px);
+    }
   }
 
   &.button-next {
-    @include right(0);
-    @include border-top-left-radius(0);
-    @include border-top-right-radius(3px);
-    @include border-bottom-right-radius(3px);
-    @include border-bottom-left-radius(0);
+    order: 999;
+
+    @include media-breakpoint-up(md) {
+      @include right(0);
+      @include border-top-left-radius(0);
+      @include border-top-right-radius(3px);
+      @include border-bottom-right-radius(3px);
+      @include border-bottom-left-radius(0);
+    }
   }
 
   &.disabled {
@@ -242,7 +277,7 @@ $seq-nav-height: 44px;
   display: none;
 }
 
-nav.sequence-bottom {
+.sequence-bottom {
   position: relative;
   height: 45px;
   margin: lh(2) auto;
@@ -251,6 +286,9 @@ nav.sequence-bottom {
 
   .sequence-nav-button {
     position: relative;
+    min-width: 120px;
+    max-width: 200px;
+    text-overflow: ellipsis;
 
     &:last-of-type {
       @include border-left(none);
@@ -276,12 +314,20 @@ nav.sequence-bottom {
   &:hover,
   &:active,
   &.active {
-    border-bottom: 3px solid $seq-nav-link-color;
-    // keeps icon/text centered on hover, necessary due to border-box setting
     padding-top: 2px;
+    background-color: theme-color("primary");
 
     .icon {
-      color: $seq-nav-icon-color;
+      color: theme-color("inverse");
+    }
+
+    @include media-breakpoint-up(sm) {
+      border-bottom: 3px solid $seq-nav-link-color;
+      background-color: theme-color("inverse");
+
+      .icon {
+        color: $seq-nav-icon-color;
+      }
     }
   }
 }

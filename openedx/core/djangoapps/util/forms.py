@@ -65,17 +65,21 @@ class ExtendedNullBooleanField(NullBooleanField):
     widget = Select(choices=NULL_BOOLEAN_CHOICES)
 
     def to_python(self, value):
-        """
-        Explicitly checks for the string 'True', 'False', 'true',
-        'false', '1' and '0' and returns boolean True or False.
-        Returns None if value is not passed at all and raises an
-        exception for any other value.
-        """
-        if value in (True, 'True', 'true', '1'):
-            return True
-        elif value in (False, 'False', 'false', '0'):
-            return False
-        elif not value:
-            return None
-        else:
-            raise ValidationError("Invalid Boolean Value.")
+        return to_bool(value)
+
+
+def to_bool(value):
+    """
+    Explicitly checks for the string 'True', 'False', 'true',
+    'false', '1' and '0' and returns boolean True or False.
+    Returns None if value is not passed at all and raises an
+    exception for any other value.
+    """
+    if value in (True, 'True', 'true', '1'):
+        return True
+    elif value in (False, 'False', 'false', '0'):
+        return False
+    elif not value:
+        return None
+    else:
+        raise ValidationError("Invalid Boolean Value.")

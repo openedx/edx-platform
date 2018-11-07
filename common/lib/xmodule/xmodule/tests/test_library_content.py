@@ -7,7 +7,7 @@ Higher-level tests are in `cms/djangoapps/contentstore/tests/test_libraries.py`.
 from bson.objectid import ObjectId
 from mock import Mock, patch
 
-from xblock.fragment import Fragment
+from web_fragments.fragment import Fragment
 from xblock.runtime import Runtime as VanillaRuntime
 
 from xmodule.library_content_module import ANY_CAPA_TYPE_VALUE, LibraryContentDescriptor
@@ -71,6 +71,7 @@ class LibraryContentModuleTestMixin(object):
     """
     Basic unit tests for LibraryContentModule
     """
+    shard = 1
     problem_types = [
         ["multiplechoiceresponse"], ["optionresponse"], ["optionresponse", "coderesponse"],
         ["coderesponse", "optionresponse"]
@@ -241,6 +242,42 @@ class LibraryContentModuleTestMixin(object):
         self.assertIn(LibraryContentDescriptor.mode, non_editable_metadata_fields)
         self.assertNotIn(LibraryContentDescriptor.display_name, non_editable_metadata_fields)
 
+    def test_overlimit_blocks_chosen_randomly(self):
+        """
+        Tests that blocks to remove from selected children are chosen
+        randomly when len(selected) > max_count.
+        """
+        blocks_seen = set()
+        total_tries, max_tries = 0, 100
+
+        self.lc_block.refresh_children()
+        self.lc_block = self.store.get_item(self.lc_block.location)
+        self._bind_course_module(self.lc_block)
+
+        # Eventually, we should see every child block selected
+        while len(blocks_seen) != len(self.lib_blocks):
+            self._change_count_and_refresh_children(len(self.lib_blocks))
+            # Now set the number of selections to 1
+            selected = self._change_count_and_refresh_children(1)
+            blocks_seen.update(selected)
+            total_tries += 1
+            if total_tries >= max_tries:
+                assert False, "Max tries exceeded before seeing all blocks."
+                break
+
+    def _change_count_and_refresh_children(self, count):
+        """
+        Helper method that changes the max_count of self.lc_block, refreshes
+        children, and asserts that the number of selected children equals the count provided.
+        """
+        # Clear the cache (only needed because we skip saving/re-loading the block) pylint: disable=protected-access
+        if hasattr(self.lc_block._xmodule, '_selected_set'):
+            del self.lc_block._xmodule._selected_set
+        self.lc_block.max_count = count
+        selected = self.lc_block.get_child_descriptors()
+        self.assertEqual(len(selected), count)
+        return selected
+
 
 @patch('xmodule.library_tools.SearchEngine.get_search_engine', Mock(return_value=None, autospec=True))
 class TestLibraryContentModuleNoSearchIndex(LibraryContentModuleTestMixin, LibraryContentTest):
@@ -287,6 +324,8 @@ class TestLibraryContentRender(LibraryContentTest):
     """
     Rendering unit tests for LibraryContentModule
     """
+    shard = 1
+
     def test_preview_view(self):
         """ Test preview view rendering """
         self.lc_block.refresh_children()
@@ -311,6 +350,8 @@ class TestLibraryContentAnalytics(LibraryContentTest):
     """
     Test analytics features of LibraryContentModule
     """
+    shard = 1
+
     def setUp(self):
         super(TestLibraryContentAnalytics, self).setUp()
         self.publisher = Mock()

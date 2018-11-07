@@ -17,6 +17,7 @@ from django.views.decorators.http import require_http_methods
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator, LibraryUsageLocator
+from six import text_type
 
 from contentstore.utils import add_instructor, reverse_library_url
 from contentstore.views.item import create_xblock_info
@@ -58,7 +59,13 @@ def get_library_creator_status(user):
     elif settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
         return get_course_creator_status(user) == 'granted'
     else:
-        return True
+        # EDUCATOR-1924: DISABLE_LIBRARY_CREATION overrides DISABLE_COURSE_CREATION, if present.
+        disable_library_creation = settings.FEATURES.get('DISABLE_LIBRARY_CREATION', None)
+        disable_course_creation = settings.FEATURES.get('DISABLE_COURSE_CREATION', False)
+        if disable_library_creation is not None:
+            return not disable_library_creation
+        else:
+            return not disable_course_creation
 
 
 @login_required
@@ -72,21 +79,20 @@ def library_handler(request, library_key_string=None):
         log.exception("Attempted to use the content library API when the libraries feature is disabled.")
         raise Http404  # Should never happen because we test the feature in urls.py also
 
-    if not get_library_creator_status(request.user):
-        if not request.user.is_staff:
+    if request.method == 'POST':
+        if not get_library_creator_status(request.user):
             return HttpResponseForbidden()
 
-    if library_key_string is not None and request.method == 'POST':
-        return HttpResponseNotAllowed(("POST",))
+        if library_key_string is not None:
+            return HttpResponseNotAllowed(("POST",))
 
-    if request.method == 'POST':
         return _create_library(request)
 
-    # request method is get, since only GET and POST are allowed by @require_http_methods(('GET', 'POST'))
-    if library_key_string:
-        return _display_library(library_key_string, request)
+    else:
+        if library_key_string:
+            return _display_library(library_key_string, request)
 
-    return _list_libraries(request)
+        return _list_libraries(request)
 
 
 def _display_library(library_key_string, request):
@@ -159,12 +165,12 @@ def _create_library(request):
     except KeyError as error:
         log.exception("Unable to create library - missing required JSON key.")
         return JsonResponseBadRequest({
-            "ErrMsg": _("Unable to create library - missing required field '{field}'").format(field=error.message)
+            "ErrMsg": _("Unable to create library - missing required field '{field}'").format(field=text_type(error))
         })
     except InvalidKeyError as error:
         log.exception("Unable to create library - invalid key.")
         return JsonResponseBadRequest({
-            "ErrMsg": _("Unable to create library '{name}'.\n\n{err}").format(name=display_name, err=error.message)
+            "ErrMsg": _("Unable to create library '{name}'.\n\n{err}").format(name=display_name, err=text_type(error))
         })
     except DuplicateCourseError:
         log.exception("Unable to create library - one already exists with the same key.")
@@ -203,7 +209,7 @@ def library_blocks_view(library, user, response_format):
         return JsonResponse({
             "display_name": library.display_name,
             "library_id": unicode(library.location.library_key),
-            "version": unicode(library.runtime.course_entry.course_key.version),
+            "version": unicode(library.runtime.course_entry.course_key.version_guid),
             "previous_version": unicode(prev_version) if prev_version else None,
             "blocks": [unicode(x) for x in children],
         })

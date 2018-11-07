@@ -28,7 +28,7 @@ function() {
 
             return new F();
         };
-    })();
+    }());
 
     /**
      * Component module.

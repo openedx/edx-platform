@@ -9,8 +9,8 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from lxml import etree
 from model_utils.models import TimeStampedModel
+from opaque_keys.edx.django.models import CourseKeyField
 
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from student.models import User
 from survey.exceptions import SurveyFormNameAlreadyExists, SurveyFormNotFound
 
@@ -26,6 +26,9 @@ class SurveyForm(TimeStampedModel):
     """
     name = models.CharField(max_length=255, db_index=True, unique=True)
     form = models.TextField()
+
+    class Meta(object):
+        app_label = 'survey'
 
     def __unicode__(self):
         return self.name
@@ -161,8 +164,8 @@ class SurveyAnswer(TimeStampedModel):
     """
     Model for the answers that a user gives for a particular form in a course
     """
-    user = models.ForeignKey(User, db_index=True)
-    form = models.ForeignKey(SurveyForm, db_index=True)
+    user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
+    form = models.ForeignKey(SurveyForm, db_index=True, on_delete=models.CASCADE)
     field_name = models.CharField(max_length=255, db_index=True)
     field_value = models.CharField(max_length=1024)
 
@@ -170,13 +173,16 @@ class SurveyAnswer(TimeStampedModel):
     # since it didn't exist in the beginning, it is nullable
     course_key = CourseKeyField(max_length=255, db_index=True, null=True)
 
+    class Meta(object):
+        app_label = 'survey'
+
     @classmethod
     def do_survey_answers_exist(cls, form, user):
         """
         Returns whether a user has any answers for a given SurveyForm for a course
         This can be used to determine if a user has taken a CourseSurvey.
         """
-        if user.is_anonymous():
+        if user.is_anonymous:
             return False
         return SurveyAnswer.objects.filter(form=form, user=user).exists()
 
@@ -233,8 +239,6 @@ class SurveyAnswer(TimeStampedModel):
         supplied to this method is presumed to be previously validated
         """
         for name in answers.keys():
-            value = answers[name]
-
             # See if there is an answer stored for this user, form, field_name pair or not
             # this will allow for update cases. This does include an additional lookup,
             # but write operations will be relatively infrequent
@@ -255,3 +259,19 @@ class SurveyAnswer(TimeStampedModel):
                 answer.field_value = value
                 answer.course_key = course_key
                 answer.save()
+
+    @classmethod
+    def retire_user(cls, user_id):
+        """
+        With the parameter user_id, blank out the survey answer values for all survey questions
+        This is to fulfill our GDPR obligations
+
+        Return True if there are data to be blanked
+        Return False if there are no matching data
+        """
+        answers = cls.objects.filter(user=user_id)
+        if not answers:
+            return False
+
+        answers.update(field_value='')
+        return True

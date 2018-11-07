@@ -1,5 +1,4 @@
 """Models providing Programs support for the LMS and Studio."""
-from urlparse import urljoin
 
 from config_models.models import ConfigurationModel
 from django.db import models

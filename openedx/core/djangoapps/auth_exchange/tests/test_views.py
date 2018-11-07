@@ -11,7 +11,7 @@ import unittest
 
 import ddt
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase
 import httpretty
 import provider.constants
@@ -19,6 +19,7 @@ from provider.oauth2.models import AccessToken, Client
 from rest_framework.test import APIClient
 from social_django.models import Partial
 
+from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from student.tests.factories import UserFactory
 from third_party_auth.tests.utils import ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
 from .mixins import DOPAdapterMixin, DOTAdapterMixin
@@ -185,15 +186,37 @@ class TestLoginWithAccessTokenView(TestCase):
         if expected_cookie_name:
             self.assertIn(expected_cookie_name, response.cookies)
 
-    def test_success(self):
-        access_token = AccessToken.objects.create(
+    def _create_dot_access_token(self, grant_type='Client credentials'):
+        """
+        Create dot based access token
+        """
+        dot_application = dot_factories.ApplicationFactory(user=self.user, authorization_grant_type=grant_type)
+        return dot_factories.AccessTokenFactory(user=self.user, application=dot_application)
+
+    def _create_dop_access_token(self):
+        """
+        Create dop based access token
+        """
+        return AccessToken.objects.create(
             token="test_access_token",
             client=self.oauth2_client,
             user=self.user,
         )
+
+    def test_dop_unsupported(self):
+        access_token = self._create_dop_access_token()
+        self._verify_response(access_token, expected_status_code=401)
+
+    def test_invalid_token(self):
+        self._verify_response("invalid_token", expected_status_code=401)
+        self.assertNotIn("session_key", self.client.session)
+
+    def test_dot_password_grant_supported(self):
+        access_token = self._create_dot_access_token(grant_type='password')
+
         self._verify_response(access_token, expected_status_code=204, expected_cookie_name='sessionid')
         self.assertEqual(int(self.client.session['_auth_user_id']), self.user.id)
 
-    def test_unauthenticated(self):
-        self._verify_response("invalid_token", expected_status_code=401)
-        self.assertNotIn("session_key", self.client.session)
+    def test_dot_client_credentials_unsupported(self):
+        access_token = self._create_dot_access_token()
+        self._verify_response(access_token, expected_status_code=401)

@@ -3,8 +3,8 @@ This file contains implementation override of SearchResultProcessor which will a
     * Blends in "location" property
     * Confirms user access to object
 """
-from django.core.urlresolvers import reverse
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from django.urls import reverse
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from search.result_processor import SearchResultProcessor
 
 from lms.djangoapps.course_blocks.api import get_course_blocks
@@ -22,13 +22,14 @@ class LmsSearchResultProcessor(SearchResultProcessor):
     def get_course_key(self):
         """ fetch course key object from string representation - retain result for subsequent uses """
         if self._course_key is None:
-            self._course_key = SlashSeparatedCourseKey.from_deprecated_string(self._results_fields["course"])
+            self._course_key = CourseKey.from_string(self._results_fields["course"])
         return self._course_key
 
     def get_usage_key(self):
         """ fetch usage key for component from string representation - retain result for subsequent uses """
         if self._usage_key is None:
-            self._usage_key = self.get_course_key().make_usage_key_from_deprecated_string(self._results_fields["id"])
+            usage_key = UsageKey.from_string(self._results_fields["id"])
+            self._usage_key = usage_key.map_into_course(self.get_course_key())
         return self._usage_key
 
     def get_module_store(self):

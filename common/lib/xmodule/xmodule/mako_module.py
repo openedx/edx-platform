@@ -1,7 +1,7 @@
 """
 Code to handle mako templating for XModules and XBlocks.
 """
-from xblock.fragment import Fragment
+from web_fragments.fragment import Fragment
 
 from .x_module import DescriptorSystem, XModuleDescriptor, shim_xmodule_js
 

@@ -21,8 +21,8 @@ from django.utils.translation import ugettext as _
 from django.views.generic.edit import FormView
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
+from openedx.core.lib.courses import clean_course_id
 from student.models import CourseEnrollment
 from support.decorators import require_support_permission
 
@@ -50,17 +50,9 @@ class RefundForm(forms.Form):
 
     def clean_course_id(self):
         """
-        validate course id field
+        Validate the course id
         """
-        course_id = self.cleaned_data['course_id']
-        try:
-            course_key = CourseKey.from_string(course_id)
-        except InvalidKeyError:
-            try:
-                course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-            except InvalidKeyError:
-                raise forms.ValidationError(_("Invalid course id"))
-        return course_key
+        return clean_course_id(self)
 
     def clean(self):
         """
@@ -114,6 +106,7 @@ class RefundSupportView(FormView):
         """
         extra context data to add to page
         """
+        kwargs = super(RefundSupportView, self).get_context_data(**kwargs)
         form = getattr(kwargs['form'], 'cleaned_data', {})
         if form.get('confirmed') == 'true':
             kwargs['cert'] = form.get('cert')

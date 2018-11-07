@@ -1,8 +1,8 @@
 """
 Tests for block_structure_factory.py
 """
+from django.test import TestCase
 from nose.plugins.attrib import attr
-from unittest import TestCase
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from ..store import BlockStructureStore

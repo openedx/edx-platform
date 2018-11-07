@@ -1,9 +1,10 @@
+<%namespace name='static' file='/static_content.html'/>
 <%page expression_filter="h"/>
 
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "login" %></%def>
 <%!
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 %>
 <%block name="title">${_("Sign In")}</%block>
@@ -50,8 +51,8 @@ from django.utils.translation import ugettext as _
 </div>
 </%block>
 
-<%block name="requirejs">
-  require(["js/factories/login"], function(LoginFactory) {
-      LoginFactory("${reverse('homepage')}");
-  });
+<%block name="page_bundle">
+  <%static:webpack entry="js/factories/login">
+     LoginFactory("${reverse('homepage') | n, js_escaped_string}");
+  </%static:webpack>
 </%block>

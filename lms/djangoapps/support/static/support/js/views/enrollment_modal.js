@@ -49,8 +49,7 @@
                 event.preventDefault();
                 if (!reason) {
                     this.showErrors(gettext('Please specify a reason.'));
-                }
-                else {
+                } else {
                     this.enrollment.updateEnrollment(new_mode, reason).then(
                         // Success callback
                         _.bind(function() {

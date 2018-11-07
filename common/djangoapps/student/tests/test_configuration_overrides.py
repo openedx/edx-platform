@@ -5,7 +5,7 @@ import json
 
 import mock
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase
 
 from student.models import UserSignupSource
@@ -15,6 +15,7 @@ FAKE_SITE = {
     "university": "fakeuniversity",
     "course_org_filter": "fakeorg",
     "platform_name": "Fake University",
+    "PLATFORM_NAME": "Fake University",
     "email_from_address": "no-reply@fakeuniversity.com",
     "REGISTRATION_EXTRA_FIELDS": {
         "address1": "required",

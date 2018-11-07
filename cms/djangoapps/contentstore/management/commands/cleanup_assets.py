@@ -24,17 +24,17 @@ class Command(BaseCommand):
         content_store = contentstore()
         success = False
 
-        log.info(u"-" * 80)
-        log.info(u"Cleaning up assets for all courses")
+        log.info("-" * 80)
+        log.info("Cleaning up assets for all courses")
         try:
             # Remove all redundant Mac OS metadata files
             assets_deleted = content_store.remove_redundant_content_for_courses()
             success = True
         except Exception as err:
-            log.info(u"=" * 30 + u"> failed to cleanup")
-            log.info(u"Error:")
+            log.info("=" * 30 + u"> failed to cleanup")
+            log.info("Error:")
             log.info(err)
 
         if success:
-            log.info(u"=" * 80)
-            log.info(u"Total number of assets deleted: {0}".format(assets_deleted))
+            log.info("=" * 80)
+            log.info("Total number of assets deleted: {0}".format(assets_deleted))

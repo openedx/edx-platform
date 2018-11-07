@@ -1,19 +1,18 @@
 # coding=utf-8
 
-"""Tests for Django management commands"""
+"""
+Tests for Django management commands
+"""
 
 import json
-import shutil
-import tarfile
 from StringIO import StringIO
-from tempfile import mkdtemp
+
+from nose.plugins.attrib import attr
+from six import text_type
 
 import factory
 from django.conf import settings
 from django.core.management import call_command
-from nose.plugins.attrib import attr
-from path import Path as path
-
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
@@ -49,7 +48,9 @@ class CommandsTestBase(SharedModuleStoreTestCase):
 
     @classmethod
     def load_courses(cls):
-        """Load test courses and return list of ids"""
+        """
+        Load test courses and return list of ids
+        """
         store = modulestore()
 
         unique_org = factory.Sequence(lambda n: 'edX.%d' % n)
@@ -76,7 +77,9 @@ class CommandsTestBase(SharedModuleStoreTestCase):
         return [course.id for course in store.get_courses()]
 
     def call_command(self, name, *args, **kwargs):
-        """Call management command and return output"""
+        """
+        Call management command and return output
+        """
         out = StringIO()  # To Capture the output of the command
         call_command(name, *args, stdout=out, **kwargs)
         out.seek(0)
@@ -85,12 +88,12 @@ class CommandsTestBase(SharedModuleStoreTestCase):
     def test_dump_course_ids(self):
         output = self.call_command('dump_course_ids')
         dumped_courses = output.decode('utf-8').strip().split('\n')
-        course_ids = {unicode(course_id) for course_id in self.loaded_courses}
+        course_ids = {text_type(course_id) for course_id in self.loaded_courses}
         dumped_ids = set(dumped_courses)
         self.assertEqual(course_ids, dumped_ids)
 
     def test_correct_course_structure_metadata(self):
-        course_id = unicode(self.test_course_key)
+        course_id = text_type(self.test_course_key)
         args = [course_id]
         kwargs = {'modulestore': 'default'}
 
@@ -103,7 +106,7 @@ class CommandsTestBase(SharedModuleStoreTestCase):
         self.assertGreater(len(dump.values()), 0)
 
     def test_dump_course_structure(self):
-        args = [unicode(self.test_course_key)]
+        args = [text_type(self.test_course_key)]
         kwargs = {'modulestore': 'default'}
         output = self.call_command('dump_course_structure', *args, **kwargs)
 
@@ -119,7 +122,7 @@ class CommandsTestBase(SharedModuleStoreTestCase):
 
         # Check a few elements in the course dump
         test_course_key = self.test_course_key
-        parent_id = unicode(test_course_key.make_usage_key('chapter', 'Overview'))
+        parent_id = text_type(test_course_key.make_usage_key('chapter', 'Overview'))
         self.assertEqual(dump[parent_id]['category'], 'chapter')
         self.assertEqual(len(dump[parent_id]['children']), 3)
 
@@ -127,10 +130,12 @@ class CommandsTestBase(SharedModuleStoreTestCase):
         self.assertEqual(dump[child_id]['category'], 'videosequence')
         self.assertEqual(len(dump[child_id]['children']), 2)
 
-        video_id = unicode(test_course_key.make_usage_key('video', 'Welcome'))
+        video_id = text_type(test_course_key.make_usage_key('video', 'Welcome'))
         self.assertEqual(dump[video_id]['category'], 'video')
+        course_metadata = dump[video_id]['metadata']
+        course_metadata.pop('edx_video_id', None)
         self.assertItemsEqual(
-            dump[video_id]['metadata'].keys(),
+            course_metadata.keys(),
             ['download_video', 'youtube_id_0_75', 'youtube_id_1_0', 'youtube_id_1_25', 'youtube_id_1_5']
         )
         self.assertIn('youtube_id_1_0', dump[video_id]['metadata'])
@@ -140,7 +145,7 @@ class CommandsTestBase(SharedModuleStoreTestCase):
         self.assertEqual(len(dump), 17)
 
     def test_dump_inherited_course_structure(self):
-        args = [unicode(self.test_course_key)]
+        args = [text_type(self.test_course_key)]
         kwargs = {'modulestore': 'default', 'inherited': True}
         output = self.call_command('dump_course_structure', *args, **kwargs)
         dump = json.loads(output)
@@ -155,7 +160,7 @@ class CommandsTestBase(SharedModuleStoreTestCase):
             self.assertNotIn('due', element['inherited_metadata'])
 
     def test_dump_inherited_course_structure_with_defaults(self):
-        args = [unicode(self.test_course_key)]
+        args = [text_type(self.test_course_key)]
         kwargs = {'modulestore': 'default', 'inherited': True, 'inherited_defaults': True}
         output = self.call_command('dump_course_structure', *args, **kwargs)
         dump = json.loads(output)
@@ -170,36 +175,17 @@ class CommandsTestBase(SharedModuleStoreTestCase):
             self.assertIsNone(element['inherited_metadata']['due'])
 
     def test_export_discussion_ids(self):
-        output = self.call_command('dump_course_structure', unicode(self.course.id))
+        output = self.call_command('dump_course_structure', text_type(self.course.id))
         dump = json.loads(output)
-        dumped_id = dump[unicode(self.discussion.location)]['metadata']['discussion_id']
+        dumped_id = dump[text_type(self.discussion.location)]['metadata']['discussion_id']
         self.assertEqual(dumped_id, self.discussion.discussion_id)
 
     def test_export_discussion_id_custom_id(self):
-        output = self.call_command('dump_course_structure', unicode(self.test_course_key))
+        output = self.call_command('dump_course_structure', text_type(self.test_course_key))
         dump = json.loads(output)
-        discussion_key = unicode(self.test_course_key.make_usage_key('discussion', 'custom_id'))
-        dumped_id = dump[unicode(discussion_key)]['metadata']['discussion_id']
+        discussion_key = text_type(self.test_course_key.make_usage_key('discussion', 'custom_id'))
+        dumped_id = dump[text_type(discussion_key)]['metadata']['discussion_id']
         self.assertEqual(dumped_id, "custom")
-
-    def test_export_course(self):
-        tmp_dir = path(mkdtemp())
-        self.addCleanup(shutil.rmtree, tmp_dir)
-        filename = tmp_dir / 'test.tar.gz'
-
-        self.run_export_course(filename)
-        with tarfile.open(filename) as tar_file:
-            self.check_export_file(tar_file)
-
-    def test_export_course_stdout(self):
-        output = self.run_export_course('-')
-        with tarfile.open(fileobj=StringIO(output)) as tar_file:
-            self.check_export_file(tar_file)
-
-    def run_export_course(self, filename):  # pylint: disable=missing-docstring
-        args = [unicode(self.test_course_key), filename]
-        kwargs = {'modulestore': 'default'}
-        return self.call_command('export_course', *args, **kwargs)
 
     def check_export_file(self, tar_file):  # pylint: disable=missing-docstring
         names = tar_file.getnames()

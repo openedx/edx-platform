@@ -6,7 +6,7 @@
             DiscussionSpecHelper.setUpGlobals();
             DiscussionSpecHelper.setUnderscoreFixtures();
             this.thread = new Thread({
-                'thread_type': 'discussion'
+                thread_type: 'discussion'
             });
             this.response = new Comment({
                 children: [{}, {}],
@@ -24,8 +24,8 @@
             checkCommentForm = function(closed) {
                 var comment, commentData, thread, view;
                 thread = new Thread({
-                    'thread_type': 'discussion',
-                    'closed': closed
+                    thread_type: 'discussion',
+                    closed: closed
                 });
                 commentData = {
                     id: 'dummy',

@@ -4,7 +4,7 @@ Basic unit tests for LibraryRoot
 """
 from mock import patch
 
-from xblock.fragment import Fragment
+from web_fragments.fragment import Fragment
 from xblock.runtime import Runtime as VanillaRuntime
 from xmodule.x_module import AUTHOR_VIEW
 
@@ -24,6 +24,8 @@ class TestLibraryRoot(MixedSplitTestCase):
     """
     Basic unit tests for LibraryRoot (library_root_xblock.py)
     """
+    shard = 1
+
     def test_library_author_view(self):
         """
         Test that LibraryRoot.author_view can run and includes content from its

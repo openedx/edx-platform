@@ -21,7 +21,7 @@ from contextlib import contextmanager
 from django.conf import settings
 from xblock.field_data import FieldData
 
-from request_cache.middleware import RequestCache
+from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from xmodule.modulestore.inheritance import InheritanceMixin
 
 NOTSET = object()
@@ -257,6 +257,7 @@ class OverrideFieldData(FieldData):
 
 class OverrideModulestoreFieldData(OverrideFieldData):
     """Apply field data overrides at the modulestore level. No student context required."""
+    provider_classes = None
 
     @classmethod
     def wrap(cls, block, field_data):  # pylint: disable=arguments-differ

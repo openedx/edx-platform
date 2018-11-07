@@ -1,44 +1,34 @@
-(function(define) {
-    'use strict';
+import Backbone from 'backbone';
 
-    define(['backbone',
-            'jquery',
-            'underscore',
-            'gettext',
-            'text!../../../templates/learner_dashboard/explore_new_programs.underscore'
-           ],
-         function(
-             Backbone,
-             $,
-             _,
-             gettext,
-             exploreTpl
-         ) {
-             return Backbone.View.extend({
-                 el: '.program-advertise',
+import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
 
-                 tpl: _.template(exploreTpl),
+import exploreTpl from '../../../templates/learner_dashboard/explore_new_programs.underscore';
 
-                 initialize: function(data) {
-                     this.context = data.context;
-                     this.$parentEl = $(this.parentEl);
+class ExploreNewProgramsView extends Backbone.View {
+  constructor(options) {
+    const defaults = {
+      el: '.program-advertise',
+    };
+    super(Object.assign({}, defaults, options));
+  }
 
-                     if (this.context.marketingUrl) {
-                        // Only render if there is a link
-                         this.render();
-                     } else {
-                        /**
-                         *  If not rendering remove el because
-                         *  styles are applied to it
-                         */
-                         this.remove();
-                     }
-                 },
+  initialize(data) {
+    this.tpl = HtmlUtils.template(exploreTpl);
+    this.context = data.context;
+    this.$parentEl = $(this.parentEl);
 
-                 render: function() {
-                     this.$el.html(this.tpl(this.context));
-                 }
-             });
-         }
-    );
-}).call(this, define || RequireJS.define);
+    if (this.context.marketingUrl) {
+      // Only render if there is a link
+      this.render();
+    } else {
+      // If not rendering, remove el because styles are applied to it
+      this.remove();
+    }
+  }
+
+  render() {
+    HtmlUtils.setHtml(this.$el, this.tpl(this.context));
+  }
+}
+
+export default ExploreNewProgramsView;

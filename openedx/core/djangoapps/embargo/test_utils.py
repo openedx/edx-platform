@@ -3,7 +3,7 @@ import contextlib
 
 import mock
 from django.core.cache import cache
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 import pygeoip
 

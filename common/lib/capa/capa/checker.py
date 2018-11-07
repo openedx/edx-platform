@@ -24,14 +24,11 @@ class DemoSystem(object):
         self.lookup = TemplateLookup(directories=[path(__file__).dirname() / 'templates'])
         self.DEBUG = True
 
-    def render_template(self, template_filename, dictionary, context=None):
-        if context is None:
-            context = {}
-
-        context_dict = {}
-        context_dict.update(dictionary)
-        context_dict.update(context)
-        return self.lookup.get_template(template_filename).render(**context_dict)
+    def render_template(self, template_filename, dictionary):
+        """
+        Render the specified template with the given dictionary of context data.
+        """
+        return self.lookup.get_template(template_filename).render(**dictionary)
 
 
 def main():

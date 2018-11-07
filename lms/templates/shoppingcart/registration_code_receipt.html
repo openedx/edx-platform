@@ -1,6 +1,7 @@
 <%!
 from django.utils.translation import ugettext as _
-from django.core.urlresolvers import reverse
+from django.urls import reverse
+from six import text_type
 from openedx.core.lib.courses import course_image_url
 from openedx.features.course_experience import course_home_url_name
 %>
@@ -75,7 +76,7 @@ from openedx.features.course_experience import course_home_url_name
       </div>
       % if not reg_code_already_redeemed:
         %if redemption_success:
-          <% course_url = reverse(course_home_url_name(course.id), args=[course.id.to_deprecated_string()]) %>
+          <% course_url = reverse(course_home_url_name(course.id), args=[text_type(course.id)]) %>
           <a href="${course_url}" class="link-button course-link-bg-color">${_("View Course")} <span class="icon fa fa-caret-right" aria-hidden="true"></span></a>
         %elif not registered_for_course:
           <form method="post">

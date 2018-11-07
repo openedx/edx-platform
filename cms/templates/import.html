@@ -1,9 +1,9 @@
 <%page expression_filter="h"/>
 <%inherit file="base.html" />
 <%def name="online_help_token()">
-<% 
+<%
 if library:
-    return "import_library" 
+    return "import_library"
 else:
     return "import_course"
 %>
@@ -214,7 +214,7 @@ else:
       </div>
       <div class="bit external-help">
           <a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about importing a library")}</a>
-      </div>      
+      </div>
     </aside>
   %else:
     <aside class="content-supplementary" role="complementary">
@@ -225,7 +225,19 @@ else:
 
       <div class="bit">
         <h3 class="title-3">${_("What content is imported?")}</h3>
-        <p>${_("Only the course content and structure (including sections, subsections, and units) are imported. Other data, including student data, grading information, discussion forum data, course settings, and course team information, remains the same as it was in the existing course.")}</p>
+        <p>${_("The following content is imported.")}</p>
+        <ul>
+          <li>${_("Course content and structure")}</li>
+          <li>${_("Course dates")}</li>
+          <li>${_("Grading policy")}</li>
+          <li>${_("Any group configurations")}</li>
+          <li>${_("Settings on the Advanced Settings page, including MATLAB API keys and LTI passports")}</li>
+        </ul>
+        <p>${_("The following content is not imported.")}</p>
+        <ul>
+          <li>${_("Learner-specific content, such as learner grades and discussion forum data")}</li>
+          <li>${_("The course team")}</li>
+        </ul>
       </div>
 
       <div class="bit">
@@ -234,7 +246,7 @@ else:
       </div>
       <div class="bit external-help">
           <a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about importing a course")}</a>
-      </div>      
+      </div>
     </aside>
   %endif
   </section>

@@ -1,5 +1,6 @@
 div.static_tab_wrapper {
-	@include box-sizing(border-box);
+  @include box-sizing(border-box);
+
   padding: 2em 2.5em;
 
   h1 {
@@ -7,7 +8,7 @@ div.static_tab_wrapper {
   }
 
   section {
-    margin: 0px 0px 20px;
+    margin: 0 0 20px;
   }
 
   @media print {

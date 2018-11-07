@@ -105,7 +105,8 @@ class CourseCreatorAdminTest(TestCase):
             # message sent. Admin message will follow.
             base_num_emails = 1 if expect_sent_to_user else 0
             if expect_sent_to_admin:
-                context = {'user_name': "test_user", 'user_email': u'test_user+courses@edx.org'}
+                context = {'user_name': u'test_user', 'user_email': u'test_user+courses@edx.org'}
+
                 self.assertEquals(base_num_emails + 1, len(mail.outbox), 'Expected admin message to be sent')
                 sent_mail = mail.outbox[base_num_emails]
                 self.assertEquals(

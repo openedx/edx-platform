@@ -11,7 +11,7 @@ from django.conf import settings
 from django.contrib.auth import SESSION_KEY
 from django.contrib.auth.models import AnonymousUser, User
 from django.contrib.sessions.middleware import SessionMiddleware
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test.client import Client
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
@@ -110,7 +110,7 @@ class SSLClientTest(ModuleStoreTestCase):
         redirects them to the signup page on CMS.
         """
         self.client.get(
-            reverse('contentstore.views.login_page'),
+            reverse('login'),
             SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL)
         )
 
@@ -152,7 +152,7 @@ class SSLClientTest(ModuleStoreTestCase):
         """
 
         response = self.client.get(
-            reverse('contentstore.views.login_page'),
+            reverse('login'),
             SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL)
         )
         self.assertEqual(response.status_code, 302)
@@ -182,7 +182,7 @@ class SSLClientTest(ModuleStoreTestCase):
         response = self.client.get(
             reverse('dashboard'), follow=True,
             SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL))
-        self.assertEquals(('http://testserver/dashboard', 302),
+        self.assertEquals(('/dashboard', 302),
                           response.redirect_chain[-1])
         self.assertIn(SESSION_KEY, self.client.session)
 
@@ -196,7 +196,7 @@ class SSLClientTest(ModuleStoreTestCase):
         response = self.client.get(
             reverse('register_user'), follow=True,
             SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL))
-        self.assertEquals(('http://testserver/dashboard', 302),
+        self.assertEquals(('/dashboard', 302),
                           response.redirect_chain[-1])
         self.assertIn(SESSION_KEY, self.client.session)
 
@@ -236,7 +236,7 @@ class SSLClientTest(ModuleStoreTestCase):
         response = self.client.get(
             reverse('signin_user'), follow=True,
             SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL))
-        self.assertEquals(('http://testserver/dashboard', 302),
+        self.assertEquals(('/dashboard', 302),
                           response.redirect_chain[-1])
         self.assertIn(SESSION_KEY, self.client.session)
 
@@ -359,7 +359,7 @@ class SSLClientTest(ModuleStoreTestCase):
             SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL),
             HTTP_ACCEPT='text/html'
         )
-        self.assertEqual(('http://testserver{0}'.format(course_private_url), 302),
+        self.assertEqual((course_private_url, 302),
                          response.redirect_chain[-1])
         self.assertIn(SESSION_KEY, self.client.session)
 
@@ -391,7 +391,7 @@ class SSLClientTest(ModuleStoreTestCase):
             SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL),
             HTTP_ACCEPT='text/html'
         )
-        self.assertEqual(('http://testserver{0}'.format(course_private_url), 302),
+        self.assertEqual((course_private_url, 302),
                          response.redirect_chain[-1])
         self.assertIn(SESSION_KEY, self.client.session)
 
@@ -409,7 +409,7 @@ class SSLClientTest(ModuleStoreTestCase):
         response = self.client.get(
             reverse('dashboard'), follow=True,
             SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL))
-        self.assertEquals(('http://testserver/dashboard', 302),
+        self.assertEquals(('/dashboard', 302),
                           response.redirect_chain[-1])
         self.assertIn(SESSION_KEY, self.client.session)
         response = self.client.get(

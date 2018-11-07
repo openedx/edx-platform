@@ -1,7 +1,6 @@
 """
 Tests for the score change signals defined in the courseware models module.
 """
-
 import re
 from datetime import datetime
 
@@ -16,10 +15,9 @@ from util.date_utils import to_timestamp
 from ..constants import ScoreDatabaseTableEnum
 from ..signals.handlers import (
     disconnect_submissions_signal_receiver,
-    enqueue_subsection_update,
     problem_raw_score_changed_handler,
     submissions_score_reset_handler,
-    submissions_score_set_handler
+    submissions_score_set_handler,
 )
 from ..signals.signals import PROBLEM_RAW_SCORE_CHANGED
 
@@ -28,20 +26,30 @@ UUID_REGEX = re.compile(ur'%(hex)s{8}-%(hex)s{4}-%(hex)s{4}-%(hex)s{4}-%(hex)s{1
 FROZEN_NOW_DATETIME = datetime.now().replace(tzinfo=pytz.UTC)
 FROZEN_NOW_TIMESTAMP = to_timestamp(FROZEN_NOW_DATETIME)
 
-SUBMISSION_SET_KWARGS = {
-    'points_possible': 10,
-    'points_earned': 5,
-    'anonymous_user_id': 'anonymous_id',
-    'course_id': 'CourseID',
-    'item_id': 'i4x://org/course/usage/123456',
-    'created_at': FROZEN_NOW_TIMESTAMP,
+SUBMISSIONS_SCORE_SET_HANDLER = 'submissions_score_set_handler'
+SUBMISSIONS_SCORE_RESET_HANDLER = 'submissions_score_reset_handler'
+HANDLERS = {
+    SUBMISSIONS_SCORE_SET_HANDLER: submissions_score_set_handler,
+    SUBMISSIONS_SCORE_RESET_HANDLER: submissions_score_reset_handler,
 }
 
-SUBMISSION_RESET_KWARGS = {
-    'anonymous_user_id': 'anonymous_id',
-    'course_id': 'CourseID',
-    'item_id': 'i4x://org/course/usage/123456',
-    'created_at': FROZEN_NOW_TIMESTAMP,
+SUBMISSION_SET_KWARGS = 'submission_set_kwargs'
+SUBMISSION_RESET_KWARGS = 'submission_reset_kwargs'
+SUBMISSION_KWARGS = {
+    SUBMISSION_SET_KWARGS: {
+        'points_possible': 10,
+        'points_earned': 5,
+        'anonymous_user_id': 'anonymous_id',
+        'course_id': 'CourseID',
+        'item_id': 'i4x://org/course/usage/123456',
+        'created_at': FROZEN_NOW_TIMESTAMP,
+    },
+    SUBMISSION_RESET_KWARGS: {
+        'anonymous_user_id': 'anonymous_id',
+        'course_id': 'CourseID',
+        'item_id': 'i4x://org/course/usage/123456',
+        'created_at': FROZEN_NOW_TIMESTAMP,
+    },
 }
 
 PROBLEM_RAW_SCORE_CHANGED_KWARGS = {
@@ -82,6 +90,11 @@ class ScoreChangedSignalRelayTest(TestCase):
     This ensures that listeners in the LMS only have to handle one type
     of signal for all scoring events regardless of their origin.
     """
+    shard = 4
+    SIGNALS = {
+        'score_set': score_set,
+        'score_reset': score_reset,
+    }
 
     def setUp(self):
         """
@@ -110,11 +123,11 @@ class ScoreChangedSignalRelayTest(TestCase):
         return mock
 
     @ddt.data(
-        [submissions_score_set_handler, SUBMISSION_SET_KWARGS, 5, 10],
-        [submissions_score_reset_handler, SUBMISSION_RESET_KWARGS, 0, 0],
+        [SUBMISSIONS_SCORE_SET_HANDLER, SUBMISSION_SET_KWARGS, 5, 10],
+        [SUBMISSIONS_SCORE_RESET_HANDLER, SUBMISSION_RESET_KWARGS, 0, 0],
     )
     @ddt.unpack
-    def test_score_set_signal_handler(self, handler, kwargs, earned, possible):
+    def test_score_set_signal_handler(self, handler_name, kwargs, earned, possible):
         """
         Ensure that on receipt of a score_(re)set signal from the Submissions API,
         the signal handler correctly converts it to a PROBLEM_WEIGHTED_SCORE_CHANGED
@@ -122,7 +135,9 @@ class ScoreChangedSignalRelayTest(TestCase):
 
         Also ensures that the handler calls user_by_anonymous_id correctly.
         """
-        handler(None, **kwargs)
+        local_kwargs = SUBMISSION_KWARGS[kwargs].copy()
+        handler = HANDLERS[handler_name]
+        handler(None, **local_kwargs)
         expected_set_kwargs = {
             'sender': None,
             'weighted_possible': possible,
@@ -134,35 +149,36 @@ class ScoreChangedSignalRelayTest(TestCase):
             'modified': FROZEN_NOW_TIMESTAMP,
             'score_db_table': 'submissions',
         }
-        if handler == submissions_score_reset_handler:
+        if kwargs == SUBMISSION_RESET_KWARGS:
             expected_set_kwargs['score_deleted'] = True
         self.signal_mock.assert_called_once_with(**expected_set_kwargs)
-        self.get_user_mock.assert_called_once_with(kwargs['anonymous_user_id'])
+        self.get_user_mock.assert_called_once_with(local_kwargs['anonymous_user_id'])
 
     def test_tnl_6599_zero_possible_bug(self):
         """
         Ensure that, if coming from the submissions API, signals indicating a
         a possible score of 0 are swallowed for reasons outlined in TNL-6559.
         """
-        local_kwargs = SUBMISSION_SET_KWARGS.copy()
+        local_kwargs = SUBMISSION_KWARGS[SUBMISSION_SET_KWARGS].copy()
         local_kwargs['points_earned'] = 0
         local_kwargs['points_possible'] = 0
         submissions_score_set_handler(None, **local_kwargs)
         self.signal_mock.assert_not_called()
 
     @ddt.data(
-        [submissions_score_set_handler, SUBMISSION_SET_KWARGS],
-        [submissions_score_reset_handler, SUBMISSION_RESET_KWARGS]
+        [SUBMISSIONS_SCORE_SET_HANDLER, SUBMISSION_SET_KWARGS],
+        [SUBMISSIONS_SCORE_RESET_HANDLER, SUBMISSION_RESET_KWARGS]
     )
     @ddt.unpack
-    def test_score_set_missing_kwarg(self, handler, kwargs):
+    def test_score_set_missing_kwarg(self, handler_name, kwargs):
         """
         Ensure that, on receipt of a score_(re)set signal from the Submissions API
         that does not have the correct kwargs, the courseware model does not
         generate a signal.
         """
-        for missing in kwargs:
-            local_kwargs = kwargs.copy()
+        handler = HANDLERS[handler_name]
+        for missing in SUBMISSION_KWARGS[kwargs]:
+            local_kwargs = SUBMISSION_KWARGS[kwargs].copy()
             del local_kwargs[missing]
 
             with self.assertRaises(KeyError):
@@ -170,18 +186,19 @@ class ScoreChangedSignalRelayTest(TestCase):
             self.signal_mock.assert_not_called()
 
     @ddt.data(
-        [submissions_score_set_handler, SUBMISSION_SET_KWARGS],
-        [submissions_score_reset_handler, SUBMISSION_RESET_KWARGS]
+        [SUBMISSIONS_SCORE_SET_HANDLER, SUBMISSION_SET_KWARGS],
+        [SUBMISSIONS_SCORE_RESET_HANDLER, SUBMISSION_RESET_KWARGS]
     )
     @ddt.unpack
-    def test_score_set_bad_user(self, handler, kwargs):
+    def test_score_set_bad_user(self, handler_name, kwargs):
         """
         Ensure that, on receipt of a score_(re)set signal from the Submissions API
         that has an invalid user ID, the courseware model does not generate a
         signal.
         """
+        handler = HANDLERS[handler_name]
         self.get_user_mock = self.setup_patch('lms.djangoapps.grades.signals.handlers.user_by_anonymous_id', None)
-        handler(None, **kwargs)
+        handler(None, **SUBMISSION_KWARGS[kwargs])
         self.signal_mock.assert_not_called()
 
     def test_raw_score_changed_signal_handler(self):
@@ -197,37 +214,19 @@ class ScoreChangedSignalRelayTest(TestCase):
         expected_set_kwargs['score_deleted'] = False
         self.signal_mock.assert_called_with(**expected_set_kwargs)
 
-    @patch('lms.djangoapps.grades.signals.handlers.log.info')
-    def test_subsection_update_logging(self, mocklog):
-        enqueue_subsection_update(
-            sender='test',
-            user_id=1,
-            course_id=u'course-v1:edX+Demo_Course+DemoX',
-            usage_id=u'block-v1:block-key',
-            modified=FROZEN_NOW_DATETIME,
-            score_db_table=ScoreDatabaseTableEnum.courseware_student_module,
-        )
-        log_statement = mocklog.call_args[0][0]
-        log_statement = UUID_REGEX.sub(u'*UUID*', log_statement)
-        self.assertEqual(
-            log_statement,
-            (
-                u'Grades: Request async calculation of subsection grades with args: '
-                u'course_id:course-v1:edX+Demo_Course+DemoX, modified:{time}, '
-                u'score_db_table:csm, '
-                u'usage_id:block-v1:block-key, user_id:1. Task [*UUID*]'
-            ).format(time=FROZEN_NOW_DATETIME)
-        )
-
     @ddt.data(
-        [score_set, 'lms.djangoapps.grades.signals.handlers.submissions_score_set_handler', SUBMISSION_SET_KWARGS],
-        [score_reset, 'lms.djangoapps.grades.signals.handlers.submissions_score_reset_handler', SUBMISSION_RESET_KWARGS]
+        ['score_set', 'lms.djangoapps.grades.signals.handlers.submissions_score_set_handler',
+         SUBMISSION_SET_KWARGS],
+        ['score_reset', 'lms.djangoapps.grades.signals.handlers.submissions_score_reset_handler',
+         SUBMISSION_RESET_KWARGS]
     )
     @ddt.unpack
-    def test_disconnect_manager(self, signal, handler, kwargs):
+    def test_disconnect_manager(self, signal_name, handler, kwargs):
         """
         Tests to confirm the disconnect_submissions_signal_receiver context manager is working correctly.
         """
+        signal = self.SIGNALS[signal_name]
+        kwargs = SUBMISSION_KWARGS[kwargs].copy()
         handler_mock = self.setup_patch(handler, None)
 
         # Receiver connected before we start

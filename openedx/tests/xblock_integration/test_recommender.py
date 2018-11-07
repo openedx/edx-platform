@@ -9,13 +9,14 @@ import StringIO
 import unittest
 from copy import deepcopy
 
-from ddt import data, ddt
 from django.conf import settings
-from django.core.urlresolvers import reverse
-from nose.plugins.attrib import attr
+from django.urls import reverse
 
+from ddt import data, ddt
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
+from nose.plugins.attrib import attr
+from six import text_type
 from openedx.core.lib.url_utils import quote_slashes
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -67,7 +68,7 @@ class TestRecommender(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         cls.course_url = reverse(
             'courseware_section',
             kwargs={
-                'course_id': cls.course.id.to_deprecated_string(),
+                'course_id': text_type(cls.course.id),
                 'chapter': 'Overview',
                 'section': 'Welcome',
             }
@@ -129,8 +130,8 @@ class TestRecommender(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         if xblock_name is None:
             xblock_name = TestRecommender.XBLOCK_NAMES[0]
         return reverse('xblock_handler', kwargs={
-            'course_id': self.course.id.to_deprecated_string(),
-            'usage_id': quote_slashes(self.course.id.make_usage_key('recommender', xblock_name).to_deprecated_string()),
+            'course_id': text_type(self.course.id),
+            'usage_id': quote_slashes(text_type(self.course.id.make_usage_key('recommender', xblock_name))),
             'handler': handler,
             'suffix': ''
         })
@@ -195,7 +196,7 @@ class TestRecommender(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assert_request_status_code(200, self.course_url)
 
 
-@attr(shard=1)
+@attr(shard=6)
 class TestRecommenderCreateFromEmpty(TestRecommender):
     """
     Check whether we can add resources to an empty database correctly
@@ -222,7 +223,7 @@ class TestRecommenderCreateFromEmpty(TestRecommender):
                 self.assert_request_status_code(200, self.course_url)
 
 
-@attr(shard=1)
+@attr(shard=6)
 class TestRecommenderResourceBase(TestRecommender):
     """Base helper class for tests with resources."""
     def setUp(self):
@@ -249,13 +250,13 @@ class TestRecommenderResourceBase(TestRecommender):
         """
         resource = {"id": resource_id}
         edited_recommendations = {
-            key: value + " edited" for key, value in self.test_recommendations[self.resource_id].iteritems()
+            key: value + "edited" for key, value in self.test_recommendations[self.resource_id].iteritems()
         }
         resource.update(edited_recommendations)
         return resource
 
 
-@attr(shard=1)
+@attr(shard=6)
 class TestRecommenderWithResources(TestRecommenderResourceBase):
     """
     Check whether we can add/edit/flag/export resources correctly
@@ -420,7 +421,7 @@ class TestRecommenderWithResources(TestRecommenderResourceBase):
         self.assert_request_status_code(200, self.course_url)
 
 
-@attr(shard=1)
+@attr(shard=6)
 @ddt
 class TestRecommenderVoteWithResources(TestRecommenderResourceBase):
     """
@@ -534,7 +535,7 @@ class TestRecommenderVoteWithResources(TestRecommenderResourceBase):
         self.check_event_response_by_key('handle_vote', resource, 'newVotes', test_case['new_votes'])
 
 
-@attr(shard=1)
+@attr(shard=6)
 @ddt
 class TestRecommenderStaffFeedbackWithResources(TestRecommenderResourceBase):
     """
@@ -629,7 +630,7 @@ class TestRecommenderStaffFeedbackWithResources(TestRecommenderResourceBase):
         self.check_event_response_by_http_status(test_case['handler'], resource, test_case['status'])
 
 
-@attr(shard=1)
+@attr(shard=6)
 @ddt
 class TestRecommenderFileUploading(TestRecommender):
     """

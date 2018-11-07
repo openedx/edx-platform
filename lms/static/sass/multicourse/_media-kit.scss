@@ -1,16 +1,19 @@
 // vars
 $baseline: 20px;
-$white: rgb(255,255,255);
+$white: rgb(255, 255, 255);
 
 .mediakit {
   @include box-sizing(border-box);
+
   margin: 0 auto;
   padding: ($baseline*3) 0;
   width: 980px;
 
   .wrapper-mediakit {
     border-radius: 4px;
+
     @include box-sizing(border-box);
+
     box-shadow: 0 1px 10px 0 $shadow-l1;
     margin: ($baseline*3) 0 0 0;
     border: 1px solid $border-color;
@@ -37,6 +40,7 @@ $white: rgb(255,255,255);
 
   hr {
     @extend %faded-hr-divider-light;
+
     border: none;
     margin: 0;
     position: relative;
@@ -44,7 +48,8 @@ $white: rgb(255,255,255);
 
     &::after {
       @extend %faded-hr-divider;
-      bottom: 0px;
+
+      bottom: 0;
       content: "";
       display: block;
       position: absolute;
@@ -56,29 +61,32 @@ $white: rgb(255,255,255);
   a.action-download {
     position: relative;
     color: $blue;
-    font-family: $sans-serif;
+    font-family: $font-family-sans-serif;
     text-decoration: none;
+
     @include transition(all 0.1s linear 0s);
 
     .note {
       position: relative;
       color: $blue;
-      font-family: $sans-serif;
+      font-family: $font-family-sans-serif;
       font-size: 13px;
       text-decoration: none;
+
       @include transition(all 0.1s linear 0s);
 
-      &:before {
+      &::before {
         position: relative;
         top: -1px;
+
         @include margin(0, 5px, 0, 0);
+
         content: "➤";
         font-size: 11px;
       }
     }
 
     &:hover, &:focus {
-
       .note {
         color: shade($blue, 25%);
       }
@@ -107,28 +115,33 @@ $white: rgb(255,255,255);
 
     article {
       @include box-sizing(border-box);
+
       width: 500px;
+
       @include margin-right($baseline);
       @include float(left);
     }
 
     aside {
       border-radius: 2px;
+
       @include box-sizing(border-box);
+
       box-shadow: 0 1px 4px 0 $shadow;
       width: 330px;
+
       @include float(left);
+
       border: 3px solid tint(rgb(96, 155, 216), 35%);
       background: tint(rgb(96, 155, 216), 35%);
 
       h3 {
         padding: ($baseline/2) ($baseline*0.75);
-        font-family: $sans-serif;
+        font-family: $font-family-sans-serif;
         font-weight: bold;
         font-size: 16px;
         letter-spacing: 0;
         color: $white;
-        text-transform: uppercase;
 
         .org-name {
           color: $white !important;
@@ -138,7 +151,6 @@ $white: rgb(255,255,255);
       }
 
       a.action-download {
-
         .note {
           width: 100%;
           display: inline-block;
@@ -148,6 +160,7 @@ $white: rgb(255,255,255);
 
       figure {
         @include box-sizing(border-box);
+
         background: $white;
         width: 100%;
 
@@ -172,7 +185,9 @@ $white: rgb(255,255,255);
   // library section
   .library {
     border-radius: 2px;
+
     @include box-sizing(border-box);
+
     box-shadow: 0 1px 4px 0 $shadow;
     border: 3px solid tint($light-gray,50%);
     padding: 0;
@@ -186,7 +201,7 @@ $white: rgb(255,255,255);
         padding: 0;
         color: $dark-gray;
         font-size: 16px;
-        font-family: $sans-serif;
+        font-family: $font-family-sans-serif;
         font-weight: bold;
         letter-spacing: 0;
 
@@ -200,6 +215,7 @@ $white: rgb(255,255,255);
 
     .listing {
       @include clearfix();
+
       background: $white;
       margin: 0;
       padding: ($baseline*2);
@@ -207,9 +223,13 @@ $white: rgb(255,255,255);
 
       li {
         @include box-sizing(border-box);
+
         overflow-y: auto;
+
         @include float(left);
+
         width: 350px;
+
         @include margin(0, 0, $baseline, 0);
 
         &:nth-child(odd) {
@@ -218,10 +238,11 @@ $white: rgb(255,255,255);
       }
 
       figure {
-
         a {
           border-radius: 2px;
+
           @include box-sizing(border-box);
+
           box-shadow: 0 1px 2px 0 $shadow-l1;
           display: block;
           min-height: 380px;

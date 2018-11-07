@@ -82,22 +82,7 @@ Feature: CMS.Problem Editor
     And I can modify the display name
     Then If I press Cancel my changes are not persisted
 
-  Scenario: Edit High Level source is available for LaTeX problem
-    Given I have created a LaTeX Problem
-    When I edit and select Settings
-    Then Edit High Level Source is visible
-
   Scenario: Cheat sheet visible on toggle
     Given I have created a Blank Common Problem
     And I can edit the problem
     Then I can see cheatsheet
-
-  Scenario: Reply on Annotation and Return to Annotation link works for Annotation problem
-    Given I have created a unit with advanced module "annotatable"
-    And I have created an advanced component "Annotation" of type "annotatable"
-    And I have created an advanced problem of type "Blank Advanced Problem"
-    And I edit first blank advanced problem for annotation response
-    When I mouseover on "annotatable-span"
-    Then I can see Reply to Annotation link
-    And I see that page has scrolled "down" when I click on "annotatable-reply" link
-    And I see that page has scrolled "up" when I click on "annotation-return" link

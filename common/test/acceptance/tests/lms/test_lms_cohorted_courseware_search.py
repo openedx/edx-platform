@@ -13,7 +13,7 @@ from common.test.acceptance.pages.common.logout import LogoutPage
 from common.test.acceptance.pages.lms.course_home import CourseHomePage
 from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
 from common.test.acceptance.pages.lms.staff_view import StaffCoursewarePage
-from common.test.acceptance.pages.studio.component_editor import ComponentVisibilityEditorView
+from common.test.acceptance.pages.studio.xblock_editor import XBlockVisibilityEditorView
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
 from common.test.acceptance.pages.studio.settings_group_configurations import GroupConfigurationsPage
 from common.test.acceptance.tests.discussion.helpers import CohortTestMixin
@@ -177,7 +177,7 @@ class CoursewareSearchCohortTest(ContainerBase, CohortTestMixin):
             """
             html_block = container_page.xblocks[html_block_index]
             html_block.edit_visibility()
-            visibility_dialog = ComponentVisibilityEditorView(self.browser, html_block.locator)
+            visibility_dialog = XBlockVisibilityEditorView(self.browser, html_block.locator)
             visibility_dialog.select_groups_in_partition_scheme(visibility_dialog.CONTENT_GROUP_PARTITION, groups)
 
         set_visibility(1, [self.content_group_a])

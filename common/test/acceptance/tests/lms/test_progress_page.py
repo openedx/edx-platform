@@ -14,7 +14,7 @@ from ...pages.lms.courseware import CoursewarePage
 from ...pages.lms.instructor_dashboard import InstructorDashboardPage, StudentSpecificAdmin
 from ...pages.lms.problem import ProblemPage
 from ...pages.lms.progress import ProgressPage
-from ...pages.studio.component_editor import ComponentEditorView
+from ...pages.studio.xblock_editor import XBlockEditorView
 from ...pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
 from ...pages.studio.utils import type_in_codemirror
 from ..helpers import (
@@ -127,7 +127,7 @@ class ProgressPageBaseTest(UniqueCourseTest):
             self.logout_page.visit()
 
 
-@attr(shard=9)
+@attr(shard=22)
 @ddt.ddt
 class PersistentGradesTest(ProgressPageBaseTest):
     """
@@ -179,7 +179,7 @@ class PersistentGradesTest(ProgressPageBaseTest):
         """
         unit, component = self._get_problem_in_studio()
         component.edit()
-        component_editor = ComponentEditorView(self.browser, component.locator)
+        component_editor = XBlockEditorView(self.browser, component.locator)
         component_editor.set_field_value_and_save('Problem Weight', 5)
         unit.publish()
 
@@ -275,7 +275,7 @@ class PersistentGradesTest(ProgressPageBaseTest):
             self.assertEqual(self._get_section_score(), (0, 2))
 
 
-@attr(shard=9)
+@attr(shard=22)
 class SubsectionGradingPolicyTest(ProgressPageBaseTest):
     """
     Tests changing a subsection's 'graded' field
@@ -325,6 +325,9 @@ class SubsectionGradingPolicyTest(ProgressPageBaseTest):
             # Answer the first Lab problem (unit only contains a single problem)
             self._answer_problem_correctly()
             self.progress_page.visit()
+
+            # Verify the basic a11y of the progress page
+            self.progress_page.a11y_audit.check_for_accessibility_errors()
 
             # Verify that y-Axis labels are aria-hidden
             self.assertEqual(['100%', 'true'], self.progress_page.y_tick_label(0))

@@ -5,9 +5,8 @@ Mixin class that provides authoring capabilities for XBlocks.
 import logging
 
 from django.conf import settings
-from xblock.core import XBlock
-from xblock.fields import XBlockMixin
-from xblock.fragment import Fragment
+from web_fragments.fragment import Fragment
+from xblock.core import XBlock, XBlockMixin
 
 log = logging.getLogger(__name__)
 

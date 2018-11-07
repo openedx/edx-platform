@@ -3,16 +3,9 @@
 
 // common
 nav {
-
-  ol, ul {
+  ol,
+  ul {
     @extend %cont-no-list;
-  }
-
-  .nav-item {
-
-    a {
-
-    }
   }
 }
 
@@ -26,9 +19,10 @@ nav {
 .nav-skip,
 .transcript-skip {
   @include font-size(13);
+
   display: inline-block;
   position: absolute;
-  left: 0px;
+  left: 0;
   top: -($baseline*30);
   overflow: hidden;
   background: $white;
@@ -49,16 +43,16 @@ nav {
 
 // dropdown
 .nav-dd {
-
   .title {
-
-    .label, .fa-caret-down {
+    .label,
+    .fa-caret-down {
       display: inline-block;
       vertical-align: middle;
     }
 
     .ui-toggle-dd {
       @include transition(all $tmg-f2 ease-in-out 0s);
+
       margin: 0;
       display: inline-block;
       vertical-align: middle;
@@ -66,7 +60,6 @@ nav {
 
     // dropped down state
     &.is-selected {
-
       .ui-toggle-dd {
         @include transform(rotate(-180deg));
         @include transform-origin(50% 50%);
@@ -77,10 +70,6 @@ nav {
   .nav-item {
     position: relative;
 
-    &:hover {
-
-    }
-
     &.nav-course-settings {
       .wrapper-nav-sub {
         width: ($baseline*9);
@@ -90,9 +79,10 @@ nav {
 
   .wrapper-nav-sub {
     @include transition(opacity $tmg-f2 ease-in-out 0s);
+
     position: absolute;
     top: ($baseline*2.5);
-    opacity: 0.0;
+    opacity: 0;
     pointer-events: none;
     width: ($baseline*8);
     overflow: hidden;
@@ -101,7 +91,7 @@ nav {
 
     // dropped down state
     &.is-shown {
-      opacity: 1.0;
+      opacity: 1;
       pointer-events: auto;
       overflow: visible;
       height: auto;
@@ -110,7 +100,9 @@ nav {
 
   .nav-sub {
     border-radius: 2px;
+
     @include box-sizing(border-box);
+
     box-shadow: 0 1px 1px $shadow-l1;
     position: relative;
     width: 100%;
@@ -118,7 +110,8 @@ nav {
     padding: ($baseline/2) ($baseline*0.75);
     background: $white;
 
-    &:after, &:before {
+    &::after,
+    &::before {
       bottom: 100%;
       border: solid transparent;
       content: " ";
@@ -129,13 +122,13 @@ nav {
     }
 
     // ui triangle/nub
-    &:after {
+    &::after {
       border-color: rgba(255, 255, 255, 0);
       border-bottom-color: $white;
       border-width: 10px;
     }
 
-    &:before {
+    &::before {
       border-color: rgba(178, 178, 178, 0);
       border-bottom-color: $gray-l3;
       border-width: 11px;
@@ -144,6 +137,7 @@ nav {
     .nav-item {
       @extend %t-action3;
       @extend %t-regular;
+
       display: block;
       margin: 0 0 ($baseline/4) 0;
       border-bottom: 1px solid $gray-l5;
@@ -158,8 +152,9 @@ nav {
       a {
         display: block;
 
-        &:hover, &:active {
-          color: $uxpl-blue-base;
+        &:hover,
+        &:active {
+          color: theme-color("primary");
         }
       }
     }
@@ -167,7 +162,6 @@ nav {
 
   // CASE: left-hand side arrow/dd
   &.ui-left {
-
     .wrapper-nav-sub {
       left: 0;
     }
@@ -176,12 +170,12 @@ nav {
       @include text-align(left);
 
       // ui triangle/nub
-      &:after {
+      &::after {
         left: $baseline;
         margin-left: -10px;
       }
 
-      &:before {
+      &::before {
         left: $baseline;
         margin-left: -11px;
       }
@@ -190,7 +184,6 @@ nav {
 
   // CASE: right-hand side arrow/dd
   &.ui-right {
-
     .wrapper-nav-sub {
       @include left(none);
       @include right(0);
@@ -199,13 +192,15 @@ nav {
     .nav-sub {
 
       // ui triangle/nub
-      &:after {
+      &::after {
         @include right($baseline);
+
         margin-right: -10px;
       }
 
-      &:before {
+      &::before {
         @include right($baseline);
+
         margin-right: -11px;
       }
     }

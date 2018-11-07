@@ -4,12 +4,14 @@ import json
 
 import ddt
 import mock
-from django.core.urlresolvers import reverse
+import pytest
+
+from django.urls import reverse
 from django.test import RequestFactory, TestCase
-from django.utils.timezone import UTC as django_utc
 from mock import Mock, patch
 from nose.plugins.attrib import attr
 from pytz import UTC
+from six import text_type
 
 import django_comment_client.utils as utils
 from course_modes.models import CourseMode
@@ -20,15 +22,23 @@ from django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 from django_comment_client.tests.factories import RoleFactory
 from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_client.tests.utils import config_course_discussions, topic_name_to_id
-from django_comment_common.models import CourseDiscussionSettings, ForumsConfig
-from django_comment_common.utils import get_course_discussion_settings, set_course_discussion_settings
-from edxmako import add_lookup
+from django_comment_common.models import (
+    CourseDiscussionSettings,
+    ForumsConfig,
+    assign_role
+)
+from django_comment_common.utils import (
+    get_course_discussion_settings,
+    seed_permissions_roles,
+    set_course_discussion_settings
+)
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 from lms.lib.comment_client.utils import CommentClientMaintenanceError, perform_request
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory, config_course_cohorts
+from openedx.core.djangoapps.request_cache.middleware import RequestCache
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
 from student.roles import CourseStaffRole
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
@@ -55,12 +65,6 @@ class DictionaryTestCase(TestCase):
         d = {'cats': 'meow', 'dogs': 'woof', 'hamsters': ' ', 'yetis': ''}
         expected = {'cats': 'meow', 'dogs': 'woof'}
         self.assertEqual(utils.strip_blank(d), expected)
-
-    def test_merge_dict(self):
-        d1 = {'cats': 'meow', 'dogs': 'woof'}
-        d2 = {'lions': 'roar', 'ducks': 'quack'}
-        expected = {'cats': 'meow', 'dogs': 'woof', 'lions': 'roar', 'ducks': 'quack'}
-        self.assertEqual(utils.merge_dict(d1, d2), expected)
 
 
 @attr(shard=1)
@@ -127,7 +131,6 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
     """
     def setUp(self):
         super(CoursewareContextTestCase, self).setUp()
-
         self.course = CourseFactory.create(org="TestX", number="101", display_name="Test Course")
         self.discussion1 = ItemFactory.create(
             parent_location=self.course.location,
@@ -171,8 +174,8 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
                 reverse(
                     "jump_to",
                     kwargs={
-                        "course_id": self.course.id.to_deprecated_string(),
-                        "location": discussion.location.to_deprecated_string()
+                        "course_id": text_type(self.course.id),
+                        "location": text_type(discussion.location)
                     }
                 )
             )
@@ -214,6 +217,8 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
         # Assert that there is only one discussion xblock in the course at the moment.
         self.assertEqual(len(utils.get_accessible_discussion_xblocks(course, self.user)), 1)
 
+        # The above call is request cached, so we need to clear it for this test.
+        RequestCache.clear_request_cache()
         # Add an orphan discussion xblock to that course
         orphan = course.id.make_usage_key('discussion', 'orphan_discussion')
         self.store.create_item(self.user.id, orphan.course_key, orphan.block_type, block_id=orphan.block_id)
@@ -380,6 +385,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.discussion_num = 0
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.maxDiff = None  # pylint: disable=invalid-name
+        self.later = datetime.datetime(2050, 1, 1, tzinfo=UTC)
 
     def create_discussion(self, discussion_category, discussion_target, **kwargs):
         self.discussion_num += 1
@@ -528,9 +534,8 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         )
 
     def test_get_unstarted_discussion_xblocks(self):
-        later = datetime.datetime(datetime.MAXYEAR, 1, 1, tzinfo=django_utc())
 
-        self.create_discussion("Chapter 1", "Discussion 1", start=later)
+        self.create_discussion("Chapter 1", "Discussion 1", start=self.later)
 
         self.assert_category_map_equals(
             {
@@ -542,12 +547,12 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                                 "id": "discussion1",
                                 "sort_key": None,
                                 "is_divided": False,
-                                "start_date": later
+                                "start_date": self.later
                             }
                         },
                         "subcategories": {},
                         "children": [("Discussion 1", TYPE_ENTRY)],
-                        "start_date": later,
+                        "start_date": self.later,
                         "sort_key": "Chapter 1"
                     }
                 },
@@ -687,13 +692,12 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
 
     def test_start_date_filter(self):
         now = datetime.datetime.now()
-        later = datetime.datetime.max
         self.create_discussion("Chapter 1", "Discussion 1", start=now)
-        self.create_discussion("Chapter 1", "Discussion 2 обсуждение", start=later)
+        self.create_discussion("Chapter 1", u"Discussion 2 обсуждение", start=self.later)
         self.create_discussion("Chapter 2", "Discussion", start=now)
-        self.create_discussion("Chapter 2 / Section 1 / Subsection 1", "Discussion", start=later)
-        self.create_discussion("Chapter 2 / Section 1 / Subsection 2", "Discussion", start=later)
-        self.create_discussion("Chapter 3 / Section 1", "Discussion", start=later)
+        self.create_discussion("Chapter 2 / Section 1 / Subsection 1", "Discussion", start=self.later)
+        self.create_discussion("Chapter 2 / Section 1 / Subsection 2", "Discussion", start=self.later)
+        self.create_discussion("Chapter 3 / Section 1", "Discussion", start=self.later)
 
         self.assertFalse(self.course.self_paced)
         self.assert_category_map_equals(
@@ -731,13 +735,12 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.course.self_paced = True
 
         now = datetime.datetime.now()
-        later = datetime.datetime.max
         self.create_discussion("Chapter 1", "Discussion 1", start=now)
-        self.create_discussion("Chapter 1", "Discussion 2", start=later)
+        self.create_discussion("Chapter 1", "Discussion 2", start=self.later)
         self.create_discussion("Chapter 2", "Discussion", start=now)
-        self.create_discussion("Chapter 2 / Section 1 / Subsection 1", "Discussion", start=later)
-        self.create_discussion("Chapter 2 / Section 1 / Subsection 2", "Discussion", start=later)
-        self.create_discussion("Chapter 3 / Section 1", "Discussion", start=later)
+        self.create_discussion("Chapter 2 / Section 1 / Subsection 1", "Discussion", start=self.later)
+        self.create_discussion("Chapter 2 / Section 1 / Subsection 2", "Discussion", start=self.later)
+        self.create_discussion("Chapter 3 / Section 1", "Discussion", start=self.later)
 
         self.assertTrue(self.course.self_paced)
         self.assert_category_map_equals(
@@ -1223,21 +1226,6 @@ class JsonResponseTestCase(TestCase, UnicodeTestMixin):
         self.assertEqual(reparsed, text)
 
 
-@attr(shard=1)
-class RenderMustacheTests(TestCase):
-    """
-    Test the `render_mustache` utility function.
-    """
-
-    @mock.patch('edxmako.LOOKUP', {})
-    def test_it(self):
-        """
-        Basic test.
-        """
-        add_lookup('main', '', package=__name__)
-        self.assertEqual(utils.render_mustache('test.mustache', {}), 'Testing 1 2 3.\n')
-
-
 class DiscussionTabTestCase(ModuleStoreTestCase):
     """ Test visibility of the discussion tab. """
 
@@ -1679,6 +1667,148 @@ class PermissionsTestCase(ModuleStoreTestCase):
         # content has no known author
         del content['user_id']
         self.assertFalse(utils.is_content_authored_by(content, user))
+
+
+class GroupModeratorPermissionsTestCase(ModuleStoreTestCase):
+    """Test utils functionality related to forums "abilities" (permissions) for group moderators"""
+
+    def _check_condition(user, condition, content):
+        """
+        Mocks check_condition method because is_open and is_team_member_if_applicable must always be true
+        in order to interact with a thread or comment.
+        """
+        return True if condition == 'is_open' or condition == 'is_team_member_if_applicable' else False
+
+    def setUp(self):
+        super(GroupModeratorPermissionsTestCase, self).setUp()
+
+        # Create course, seed permissions roles, and create team
+        self.course = CourseFactory.create()
+        seed_permissions_roles(self.course.id)
+        verified_coursemode = CourseModeFactory.create(
+            course_id=self.course.id,
+            mode_slug=CourseMode.VERIFIED
+        )
+        audit_coursemode = CourseModeFactory.create(
+            course_id=self.course.id,
+            mode_slug=CourseMode.AUDIT
+        )
+
+        # Create four users: group_moderator (who is within the verified enrollment track and in the cohort),
+        # verified_user (who is in the verified enrollment track but not the cohort),
+        # cohorted_user (who is in the cohort but not the verified enrollment track),
+        # and plain_user (who is neither in the cohort nor the verified enrollment track)
+        self.group_moderator = UserFactory(username='group_moderator', email='group_moderator@edx.org')
+        CourseEnrollmentFactory(
+            course_id=self.course.id,
+            user=self.group_moderator,
+            mode=verified_coursemode
+        )
+        self.verified_user = UserFactory(username='verified', email='verified@edx.org')
+        CourseEnrollmentFactory(
+            course_id=self.course.id,
+            user=self.verified_user,
+            mode=verified_coursemode
+        )
+        self.cohorted_user = UserFactory(username='cohort', email='cohort@edx.org')
+        CourseEnrollmentFactory(
+            course_id=self.course.id,
+            user=self.cohorted_user,
+            mode=audit_coursemode
+        )
+        self.plain_user = UserFactory(username='plain', email='plain@edx.org')
+        CourseEnrollmentFactory(
+            course_id=self.course.id,
+            user=self.plain_user,
+            mode=audit_coursemode
+        )
+        CohortFactory(
+            course_id=self.course.id,
+            name='Test Cohort',
+            users=[self.group_moderator, self.cohorted_user]
+        )
+
+        # Give group moderator permissions to group_moderator
+        assign_role(self.course.id, self.group_moderator, 'Group Moderator')
+
+    @mock.patch('django_comment_client.permissions._check_condition', side_effect=_check_condition)
+    def test_not_divided(self, check_condition_function):
+        """
+        Group moderator should not have moderator permissions if the discussions are not divided.
+        """
+        content = {'user_id': self.plain_user.id, 'type': 'thread', 'username': self.plain_user.username}
+        self.assertEqual(utils.get_ability(self.course.id, content, self.group_moderator), {
+            'editable': False,
+            'can_reply': True,
+            'can_delete': False,
+            'can_openclose': False,
+            'can_vote': True,
+            'can_report': True
+        })
+        content = {'user_id': self.cohorted_user.id, 'type': 'thread'}
+        self.assertEqual(utils.get_ability(self.course.id, content, self.group_moderator), {
+            'editable': False,
+            'can_reply': True,
+            'can_delete': False,
+            'can_openclose': False,
+            'can_vote': True,
+            'can_report': True
+        })
+        content = {'user_id': self.verified_user.id, 'type': 'thread'}
+        self.assertEqual(utils.get_ability(self.course.id, content, self.group_moderator), {
+            'editable': False,
+            'can_reply': True,
+            'can_delete': False,
+            'can_openclose': False,
+            'can_vote': True,
+            'can_report': True
+        })
+
+    @mock.patch('django_comment_client.permissions._check_condition', side_effect=_check_condition)
+    def test_divided_within_group(self, check_condition_function):
+        """
+        Group moderator should have moderator permissions within their group if the discussions are divided.
+        """
+        set_discussion_division_settings(self.course.id, enable_cohorts=True,
+                                         division_scheme=CourseDiscussionSettings.COHORT)
+        content = {'user_id': self.cohorted_user.id, 'type': 'thread', 'username': self.cohorted_user.username}
+        self.assertEqual(utils.get_ability(self.course.id, content, self.group_moderator), {
+            'editable': True,
+            'can_reply': True,
+            'can_delete': True,
+            'can_openclose': True,
+            'can_vote': True,
+            'can_report': True
+        })
+        RequestCache.clear_request_cache()
+
+        set_discussion_division_settings(self.course.id, division_scheme=CourseDiscussionSettings.ENROLLMENT_TRACK)
+        content = {'user_id': self.verified_user.id, 'type': 'thread', 'username': self.verified_user.username}
+        self.assertEqual(utils.get_ability(self.course.id, content, self.group_moderator), {
+            'editable': True,
+            'can_reply': True,
+            'can_delete': True,
+            'can_openclose': True,
+            'can_vote': True,
+            'can_report': True
+        })
+
+    @mock.patch('django_comment_client.permissions._check_condition', side_effect=_check_condition)
+    def test_divided_outside_group(self, check_condition_function):
+        """
+        Group moderator should not have moderator permissions outside of their group.
+        """
+        content = {'user_id': self.plain_user.id, 'type': 'thread', 'username': self.plain_user.username}
+        set_discussion_division_settings(self.course.id, division_scheme=CourseDiscussionSettings.NONE)
+
+        self.assertEqual(utils.get_ability(self.course.id, content, self.group_moderator), {
+            'editable': False,
+            'can_reply': True,
+            'can_delete': False,
+            'can_openclose': False,
+            'can_vote': True,
+            'can_report': True
+        })
 
 
 class ClientConfigurationTestCase(TestCase):

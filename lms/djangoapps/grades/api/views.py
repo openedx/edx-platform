@@ -11,11 +11,10 @@ from rest_framework.generics import GenericAPIView, ListAPIView
 from rest_framework.response import Response
 
 from courseware.access import has_access
-from lms.djangoapps.ccx.utils import prep_course_for_grading
 from lms.djangoapps.courseware import courses
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.grades.api.serializers import GradingPolicySerializer
-from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from student.roles import CourseStaffRole
 
@@ -36,7 +35,7 @@ class GradeViewMixin(DeveloperErrorViewMixin):
         try:
             course_key = CourseKey.from_string(course_key_string)
         except InvalidKeyError:
-            return self.make_error_response(
+            raise self.api_error(
                 status_code=status.HTTP_404_NOT_FOUND,
                 developer_message='The provided course key cannot be parsed.',
                 error_code='invalid_course_key'
@@ -53,7 +52,8 @@ class GradeViewMixin(DeveloperErrorViewMixin):
             log.info('Course with ID "%s" not found', course_key_string)
         except CourseAccessRedirect:
             log.info('User %s does not have access to course with ID "%s"', user.username, course_key_string)
-        return self.make_error_response(
+
+        raise self.api_error(
             status_code=status.HTTP_404_NOT_FOUND,
             developer_message='The user, the course or both do not exist.',
             error_code='user_or_course_does_not_exist',
@@ -85,7 +85,7 @@ class GradeViewMixin(DeveloperErrorViewMixin):
                 request.user.username,
                 username
             )
-            return self.make_error_response(
+            raise self.api_error(
                 status_code=status.HTTP_403_FORBIDDEN,
                 developer_message='The user requested does not match the logged in user.',
                 error_code='user_mismatch'
@@ -95,7 +95,7 @@ class GradeViewMixin(DeveloperErrorViewMixin):
             return USER_MODEL.objects.get(username=username)
 
         except USER_MODEL.DoesNotExist:
-            return self.make_error_response(
+            raise self.api_error(
                 status_code=status.HTTP_404_NOT_FOUND,
                 developer_message='The user matching the requested username does not exist.',
                 error_code='user_does_not_exist'
@@ -106,7 +106,7 @@ class GradeViewMixin(DeveloperErrorViewMixin):
         Ensures that the user is authenticated (e.g. not an AnonymousUser), unless DEBUG mode is enabled.
         """
         super(GradeViewMixin, self).perform_authentication(request)
-        if request.user.is_anonymous():
+        if request.user.is_anonymous:
             raise AuthenticationFailed
 
 
@@ -174,18 +174,9 @@ class UserGradeView(GradeViewMixin, GenericAPIView):
         """
 
         course = self._get_course(course_id, request.user, 'load')
-        if isinstance(course, Response):
-            # Returns a 404 if course_id is invalid, or request.user is not enrolled in the course
-            return course
-
         grade_user = self._get_effective_user(request, course)
-        if isinstance(grade_user, Response):
-            # Returns a 403 if the request.user can't access grades for the requested user,
-            # or a 404 if the requested user does not exist.
-            return grade_user
+        course_grade = CourseGradeFactory().read(grade_user, course)
 
-        prep_course_for_grading(course, request)
-        course_grade = CourseGradeFactory().create(grade_user, course)
         return Response([{
             'username': grade_user.username,
             'course_key': course_id,
@@ -223,6 +214,4 @@ class CourseGradingPolicy(GradeViewMixin, ListAPIView):
 
     def get(self, request, course_id, **kwargs):
         course = self._get_course(course_id, request.user, 'staff')
-        if isinstance(course, Response):
-            return course
         return Response(GradingPolicySerializer(course.raw_grader, many=True).data)

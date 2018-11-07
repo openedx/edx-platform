@@ -8,6 +8,7 @@ import textwrap
 import unittest
 
 from nose.plugins.skip import SkipTest
+from six import text_type
 
 from capa.safe_exec import safe_exec, update_hash
 from codejail.safe_exec import SafeExecException
@@ -69,7 +70,7 @@ class TestSafeExec(unittest.TestCase):
         g = {}
         with self.assertRaises(SafeExecException) as cm:
             safe_exec("1/0", g)
-        self.assertIn("ZeroDivisionError", cm.exception.message)
+        self.assertIn("ZeroDivisionError", text_type(cm.exception))
 
 
 class TestSafeOrNot(unittest.TestCase):
@@ -81,8 +82,8 @@ class TestSafeOrNot(unittest.TestCase):
         g = {}
         with self.assertRaises(SafeExecException) as cm:
             safe_exec("import os; files = os.listdir('/')", g)
-        self.assertIn("OSError", cm.exception.message)
-        self.assertIn("Permission denied", cm.exception.message)
+        assert "OSError" in text_type(cm.exception)
+        assert "Permission denied" in text_type(cm.exception)
 
     def test_can_do_something_forbidden_if_run_unsafely(self):
         g = {}

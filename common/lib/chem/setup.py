@@ -2,13 +2,13 @@ from setuptools import setup
 
 setup(
     name="chem",
-    version="0.1.1",
+    version="0.2.0",
     packages=["chem"],
     install_requires=[
-        "pyparsing==2.0.7",
+        "pyparsing==2.2.0",
         "numpy==1.6.2",
         "scipy==0.14.0",
-        "nltk==2.0.6",
-        "markupsafe",
+        "nltk",
+        "markupsafe",  # Should be replaced by other utilities. See LEARNER-5853 for more details.
     ],
 )

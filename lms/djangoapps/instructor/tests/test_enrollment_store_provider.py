@@ -37,6 +37,7 @@ class TestBaseNotificationDataProvider(TestCase):
     """
     Cover the EnrollmentReportProvider class
     """
+    shard = 4
 
     def test_cannot_create_instance(self):
         """

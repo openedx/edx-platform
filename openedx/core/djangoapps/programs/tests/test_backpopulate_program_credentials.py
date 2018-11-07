@@ -4,7 +4,7 @@ import mock
 from django.core.management import call_command
 from django.test import TestCase
 
-from certificates.models import CertificateStatuses  # pylint: disable=import-error
+from lms.djangoapps.certificates.models import CertificateStatuses  # pylint: disable=import-error
 from course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import MODES
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
@@ -29,6 +29,10 @@ COMMAND_MODULE = 'openedx.core.djangoapps.programs.management.commands.backpopul
 class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsApiConfigMixin, TestCase):
     """Tests for the backpopulate_program_credentials management command."""
     course_run_key, alternate_course_run_key = (generate_course_run_key() for __ in range(2))
+    # Constants for the _get_programs_data hierarchy types used in test_flatten()
+    SEPARATE_PROGRAMS = 'separate_programs'
+    SEPARATE_COURSES = 'separate_courses'
+    SAME_COURSE = 'same_course'
 
     def setUp(self):
         super(BackpopulateProgramCredentialsTests, self).setUp()
@@ -43,6 +47,54 @@ class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsAp
 
         catalog_integration = self.create_catalog_integration()
         UserFactory(username=catalog_integration.service_username)
+
+    def _get_programs_data(self, hierarchy_type):
+        """
+        Generate a mock response for get_programs() with the given type of
+        course hierarchy.  Dramatically simplifies (and makes consistent
+        between test runs) the ddt-generated test_flatten methods.
+        """
+        if hierarchy_type == self.SEPARATE_PROGRAMS:
+            return [
+                ProgramFactory(
+                    courses=[
+                        CourseFactory(course_runs=[
+                            CourseRunFactory(key=self.course_run_key),
+                        ]),
+                    ]
+                ),
+                ProgramFactory(
+                    courses=[
+                        CourseFactory(course_runs=[
+                            CourseRunFactory(key=self.alternate_course_run_key),
+                        ]),
+                    ]
+                ),
+            ]
+        elif hierarchy_type == self.SEPARATE_COURSES:
+            return [
+                ProgramFactory(
+                    courses=[
+                        CourseFactory(course_runs=[
+                            CourseRunFactory(key=self.course_run_key),
+                        ]),
+                        CourseFactory(course_runs=[
+                            CourseRunFactory(key=self.alternate_course_run_key),
+                        ]),
+                    ]
+                ),
+            ]
+        else:  # SAME_COURSE
+            return [
+                ProgramFactory(
+                    courses=[
+                        CourseFactory(course_runs=[
+                            CourseRunFactory(key=self.course_run_key),
+                            CourseRunFactory(key=self.alternate_course_run_key),
+                        ]),
+                    ]
+                ),
+            ]
 
     @ddt.data(True, False)
     def test_handle(self, commit, mock_task, mock_get_programs):
@@ -110,51 +162,12 @@ class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsAp
         call_command('backpopulate_program_credentials', commit=True)
 
         # The task should be called for both users since professional and no-id-professional are equivalent.
-        mock_task.assert_has_calls([mock.call(self.alice.username), mock.call(self.bob.username)])
+        mock_task.assert_has_calls([mock.call(self.alice.username), mock.call(self.bob.username)], any_order=True)
 
-    @ddt.data(
-        [
-            ProgramFactory(
-                courses=[
-                    CourseFactory(course_runs=[
-                        CourseRunFactory(key=course_run_key),
-                    ]),
-                ]
-            ),
-            ProgramFactory(
-                courses=[
-                    CourseFactory(course_runs=[
-                        CourseRunFactory(key=alternate_course_run_key),
-                    ]),
-                ]
-            ),
-        ],
-        [
-            ProgramFactory(
-                courses=[
-                    CourseFactory(course_runs=[
-                        CourseRunFactory(key=course_run_key),
-                    ]),
-                    CourseFactory(course_runs=[
-                        CourseRunFactory(key=alternate_course_run_key),
-                    ]),
-                ]
-            ),
-        ],
-        [
-            ProgramFactory(
-                courses=[
-                    CourseFactory(course_runs=[
-                        CourseRunFactory(key=course_run_key),
-                        CourseRunFactory(key=alternate_course_run_key),
-                    ]),
-                ]
-            ),
-        ],
-    )
-    def test_handle_flatten(self, data, mock_task, mock_get_programs):
+    @ddt.data(SEPARATE_PROGRAMS, SEPARATE_COURSES, SAME_COURSE)
+    def test_handle_flatten(self, hierarchy_type, mock_task, mock_get_programs):
         """Verify that program structures are flattened correctly."""
-        mock_get_programs.return_value = data
+        mock_get_programs.return_value = self._get_programs_data(hierarchy_type)
 
         GeneratedCertificateFactory(
             user=self.alice,

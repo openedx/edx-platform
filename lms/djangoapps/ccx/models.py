@@ -11,9 +11,9 @@ from ccx_keys.locator import CCXLocator
 from django.contrib.auth.models import User
 from django.db import models
 from lazy import lazy
+from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 from pytz import utc
 
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, LocationKeyField
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 
@@ -26,7 +26,7 @@ class CustomCourseForEdX(models.Model):
     """
     course_id = CourseKeyField(max_length=255, db_index=True)
     display_name = models.CharField(max_length=255)
-    coach = models.ForeignKey(User, db_index=True)
+    coach = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     # if not empty, this field contains a json serialized list of
     # the master course modules
     structure_json = models.TextField(verbose_name='Structure JSON', blank=True, null=True)
@@ -107,8 +107,8 @@ class CcxFieldOverride(models.Model):
     """
     Field overrides for custom courses.
     """
-    ccx = models.ForeignKey(CustomCourseForEdX, db_index=True)
-    location = LocationKeyField(max_length=255, db_index=True)
+    ccx = models.ForeignKey(CustomCourseForEdX, db_index=True, on_delete=models.CASCADE)
+    location = UsageKeyField(max_length=255, db_index=True)
     field = models.CharField(max_length=255)
 
     class Meta(object):

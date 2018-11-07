@@ -7,13 +7,33 @@ from django import forms
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseLocator
 
-from openedx.core.djangoapps.video_config.models import CourseHLSPlaybackEnabledFlag
+from openedx.core.djangoapps.video_config.models import (
+    CourseHLSPlaybackEnabledFlag,
+    CourseVideoTranscriptEnabledFlag,
+)
+from openedx.core.lib.courses import clean_course_id
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
 
-class CourseHLSPlaybackFlagAdminForm(forms.ModelForm):
+class CourseSpecificFlagAdminBaseForm(forms.ModelForm):
+    """
+    Form for course-specific feature configuration.
+    """
+
+    # Make abstract base class
+    class Meta(object):
+        abstract = True
+
+    def clean_course_id(self):
+        """
+        Validate the course id
+        """
+        return clean_course_id(self)
+
+
+class CourseHLSPlaybackFlagAdminForm(CourseSpecificFlagAdminBaseForm):
     """
     Form for course-specific HLS Playback configuration.
     """
@@ -22,23 +42,12 @@ class CourseHLSPlaybackFlagAdminForm(forms.ModelForm):
         model = CourseHLSPlaybackEnabledFlag
         fields = '__all__'
 
-    def clean_course_id(self):
-        """
-        Validate the course id
-        """
-        cleaned_id = self.cleaned_data["course_id"]
-        try:
-            course_key = CourseLocator.from_string(cleaned_id)
-        except InvalidKeyError:
-            msg = u'Course id invalid. Entered course id was: "{course_id}."'.format(
-                course_id=cleaned_id
-            )
-            raise forms.ValidationError(msg)
 
-        if not modulestore().has_course(course_key):
-            msg = u'Course not found. Entered course id was: "{course_key}". '.format(
-                course_key=unicode(course_key)
-            )
-            raise forms.ValidationError(msg)
+class CourseVideoTranscriptFlagAdminForm(CourseSpecificFlagAdminBaseForm):
+    """
+    Form for course-specific Video Transcript configuration.
+    """
 
-        return course_key
+    class Meta(object):
+        model = CourseVideoTranscriptEnabledFlag
+        fields = '__all__'

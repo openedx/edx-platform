@@ -1,7 +1,7 @@
 (function(requirejs, require, define) {
     define(['js/capa/drag_and_drop/draggable_events', 'js/capa/drag_and_drop/draggable_logic'], function(draggableEvents, draggableLogic) {
         return {
-            'init': init
+            init: init
         };
 
         function init(state) {
@@ -39,18 +39,18 @@
                 draggableObj.iconImgEl.attr('src', draggableObj.originalConfigObj.icon);
                 draggableObj.iconImgEl.load(function() {
                     draggableObj.iconEl.css({
-                        'position': 'absolute',
-                        'width': draggableObj.iconWidthSmall,
-                        'height': draggableObj.iconHeightSmall,
-                        'left': 50 - draggableObj.iconWidthSmall * 0.5,
-                        'top': ((draggableObj.originalConfigObj.label.length > 0) ? 5 : 50 - draggableObj.iconHeightSmall * 0.5)
+                        position: 'absolute',
+                        width: draggableObj.iconWidthSmall,
+                        height: draggableObj.iconHeightSmall,
+                        left: 50 - draggableObj.iconWidthSmall * 0.5,
+                        top: ((draggableObj.originalConfigObj.label.length > 0) ? 5 : 50 - draggableObj.iconHeightSmall * 0.5)
                     });
                     draggableObj.iconImgEl.css({
-                        'position': 'absolute',
-                        'width': draggableObj.iconWidthSmall,
-                        'height': draggableObj.iconHeightSmall,
-                        'left': 0,
-                        'top': 0
+                        position: 'absolute',
+                        width: draggableObj.iconWidthSmall,
+                        height: draggableObj.iconHeightSmall,
+                        left: 0,
+                        top: 0
                     });
                     draggableObj.iconImgEl.appendTo(draggableObj.iconEl);
 
@@ -67,8 +67,8 @@
                         '</div>'
                     );
                         draggableObj.labelEl.css({
-                            'left': 50 - draggableObj.labelWidth * 0.5,
-                            'top': 5 + draggableObj.iconHeightSmall + 5
+                            left: 50 - draggableObj.labelWidth * 0.5,
+                            top: 5 + draggableObj.iconHeightSmall + 5
                         });
 
                         draggableObj.attachMouseEventsTo('labelEl');
@@ -98,8 +98,8 @@
                     '</div>'
                 );
                     draggableObj.iconEl.css({
-                        'left': 50 - draggableObj.iconWidthSmall * 0.5,
-                        'top': 50 - draggableObj.iconHeightSmall * 0.5
+                        left: 50 - draggableObj.iconWidthSmall * 0.5,
+                        top: 50 - draggableObj.iconHeightSmall * 0.5
                     });
 
                     draggableObj.attachMouseEventsTo('iconEl');
@@ -119,53 +119,53 @@
             var draggableObj;
 
             draggableObj = {
-                'uniqueId': state.getUniqueId(),
-                'originalConfigObj': obj,
-                'stateDraggablesIndex': null,
-                'id': obj.id,
-                'isReusable': obj.can_reuse,
-                'isOriginal': true,
-                'x': -1,
-                'y': -1,
-                'zIndex': 1,
-                'containerEl': null,
-                'iconEl': null,
-                'iconImgEl': null,
-                'iconElBGColor': null,
-                'iconElPadding': null,
-                'iconElBorder': null,
-                'iconElLeftOffset': null,
-                'iconWidth': null,
-                'iconHeight': null,
-                'iconWidthSmall': null,
-                'iconHeightSmall': null,
-                'labelEl': null,
-                'labelWidth': null,
-                'hasLoaded': false,
-                'inContainer': true,
-                'mousePressed': false,
-                'onTarget': null,
-                'onTargetIndex': null,
-                'state': state,
+                uniqueId: state.getUniqueId(),
+                originalConfigObj: obj,
+                stateDraggablesIndex: null,
+                id: obj.id,
+                isReusable: obj.can_reuse,
+                isOriginal: true,
+                x: -1,
+                y: -1,
+                zIndex: 1,
+                containerEl: null,
+                iconEl: null,
+                iconImgEl: null,
+                iconElBGColor: null,
+                iconElPadding: null,
+                iconElBorder: null,
+                iconElLeftOffset: null,
+                iconWidth: null,
+                iconHeight: null,
+                iconWidthSmall: null,
+                iconHeightSmall: null,
+                labelEl: null,
+                labelWidth: null,
+                hasLoaded: false,
+                inContainer: true,
+                mousePressed: false,
+                onTarget: null,
+                onTargetIndex: null,
+                state: state,
 
-                'mouseDown': draggableEvents.mouseDown,
-                'mouseUp': draggableEvents.mouseUp,
-                'mouseMove': draggableEvents.mouseMove,
+                mouseDown: draggableEvents.mouseDown,
+                mouseUp: draggableEvents.mouseUp,
+                mouseMove: draggableEvents.mouseMove,
 
-                'checkLandingElement': draggableLogic.checkLandingElement,
-                'checkIfOnTarget': draggableLogic.checkIfOnTarget,
-                'snapToTarget': draggableLogic.snapToTarget,
-                'correctZIndexes': draggableLogic.correctZIndexes,
-                'moveBackToSlider': draggableLogic.moveBackToSlider,
-                'moveDraggableTo': draggableLogic.moveDraggableTo,
-                'toggleTargets': draggableLogic.toggleTargets,
+                checkLandingElement: draggableLogic.checkLandingElement,
+                checkIfOnTarget: draggableLogic.checkIfOnTarget,
+                snapToTarget: draggableLogic.snapToTarget,
+                correctZIndexes: draggableLogic.correctZIndexes,
+                moveBackToSlider: draggableLogic.moveBackToSlider,
+                moveDraggableTo: draggableLogic.moveDraggableTo,
+                toggleTargets: draggableLogic.toggleTargets,
 
-                'makeDraggableCopy': makeDraggableCopy,
+                makeDraggableCopy: makeDraggableCopy,
 
-                'attachMouseEventsTo': draggableEvents.attachMouseEventsTo,
+                attachMouseEventsTo: draggableEvents.attachMouseEventsTo,
 
-                'targetField': [],
-                'numDraggablesOnMe': 0
+                targetField: [],
+                numDraggablesOnMe: 0
             };
 
             draggableObj.containerEl = $(
@@ -209,22 +209,22 @@
                     }
 
                     draggableObj.iconEl.css({
-                        'position': 'absolute',
-                        'width': draggableObj.iconWidthSmall,
-                        'height': draggableObj.iconHeightSmall,
-                        'left': 50 - draggableObj.iconWidthSmall * 0.5,
+                        position: 'absolute',
+                        width: draggableObj.iconWidthSmall,
+                        height: draggableObj.iconHeightSmall,
+                        left: 50 - draggableObj.iconWidthSmall * 0.5,
 
                     // Before:
                     // 'top': ((obj.label.length > 0) ? (100 - draggableObj.iconHeightSmall - 25) * 0.5 : 50 - draggableObj.iconHeightSmall * 0.5)
                     // After:
-                        'top': ((obj.label.length > 0) ? 37.5 : 50.0) - 0.5 * draggableObj.iconHeightSmall
+                        top: ((obj.label.length > 0) ? 37.5 : 50.0) - 0.5 * draggableObj.iconHeightSmall
                     });
                     draggableObj.iconImgEl.css({
-                        'position': 'absolute',
-                        'width': draggableObj.iconWidthSmall,
-                        'height': draggableObj.iconHeightSmall,
-                        'left': 0,
-                        'top': 0
+                        position: 'absolute',
+                        width: draggableObj.iconWidthSmall,
+                        height: draggableObj.iconHeightSmall,
+                        left: 0,
+                        top: 0
                     });
                     draggableObj.iconImgEl.appendTo(draggableObj.iconEl);
                     draggableObj.iconEl.appendTo(draggableObj.containerEl);
@@ -246,12 +246,12 @@
                         draggableObj.labelEl.appendTo(draggableObj.containerEl);
                         draggableObj.labelWidth = draggableObj.labelEl.width();
                         draggableObj.labelEl.css({
-                            'left': 50 - draggableObj.labelWidth * 0.5,
+                            left: 50 - draggableObj.labelWidth * 0.5,
 
                         // Before:
                         // 'top': (100 - this.iconHeightSmall - 25) * 0.5 + this.iconHeightSmall + 5
                         // After:
-                            'top': 42.5 + 0.5 * draggableObj.iconHeightSmall
+                            top: 42.5 + 0.5 * draggableObj.iconHeightSmall
                         });
 
                         draggableObj.attachMouseEventsTo('labelEl');
@@ -292,8 +292,8 @@
                     draggableObj.iconHeightSmall = draggableObj.iconHeight;
 
                     draggableObj.iconEl.css({
-                        'left': 50 - draggableObj.iconWidthSmall * 0.5,
-                        'top': 50 - draggableObj.iconHeightSmall * 0.5
+                        left: 50 - draggableObj.iconWidthSmall * 0.5,
+                        top: 50 - draggableObj.iconHeightSmall * 0.5
                     });
 
                     draggableObj.hasLoaded = true;

@@ -157,10 +157,10 @@ define([
             var mockViewer = null;
 
             beforeEach(function() {
-                var element = $('<div />');
+                var $element = $('<div />');
                 mockViewer = {
                     fields: [],
-                    element: element
+                    element: $element
                 };
 
                 mockViewer.on = jasmine.createSpy().and.returnValue(mockViewer);
@@ -171,8 +171,8 @@ define([
                     return mockViewer;
                 });
 
-                spyOn(element, 'bind').and.returnValue(element);
-                spyOn(element, 'appendTo').and.returnValue(element);
+                spyOn($element, 'bind').and.returnValue($element);
+                spyOn($element, 'appendTo').and.returnValue($element);
                 spyOn(Annotator, 'Viewer').and.returnValue(mockViewer);
 
                 annotators[0]._setupViewer();
@@ -226,8 +226,8 @@ define([
 
             it('should bind to browser mouseover and mouseout events', function() {
                 expect(mockViewer.element.bind).toHaveBeenCalledWith({
-                    'mouseover': annotators[0].clearViewerHideTimer,
-                    'mouseout': annotators[0].startViewerHideTimer
+                    mouseover: annotators[0].clearViewerHideTimer,
+                    mouseout: annotators[0].startViewerHideTimer
                 });
             });
 

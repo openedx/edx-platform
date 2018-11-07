@@ -44,8 +44,11 @@ function(_) {
          *                            // video format of the source. Supported
          *                            // video formats are: 'mp4', 'webm', and
          *                            // 'ogg'.
+         *        poster:             Video poster URL
          *
-         *          events: {         // Object's properties identify the
+         *        browserIsSafari:    Flag to tell if current browser is Safari
+         *
+         *        events: {           // Object's properties identify the
          *                            // events that the API fires, and the
          *                            // functions (event listeners) that the
          *                            // API will call when those events occur.
@@ -318,6 +321,11 @@ function(_) {
 
             if (/iP(hone|od)/i.test(isTouch[0])) {
                 this.videoEl.prop('controls', true);
+            }
+
+            // Set video poster
+            if (this.config.poster) {
+                this.videoEl.prop('poster', this.config.poster);
             }
 
             // Place the <video> element on the page.

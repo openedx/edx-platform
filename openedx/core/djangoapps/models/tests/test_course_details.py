@@ -4,14 +4,13 @@ Tests for CourseDetails
 
 import datetime
 import ddt
-from django.utils.timezone import UTC
+from pytz import UTC
 from nose.plugins.attrib import attr
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.models.course_details import CourseDetails, ABOUT_ATTRIBUTES
 
 
@@ -29,7 +28,7 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
         details = CourseDetails.fetch(self.course.id)
         self.assertEqual(details.org, self.course.location.org, "Org not copied into")
         self.assertEqual(details.course_id, self.course.location.course, "Course_id not copied into")
-        self.assertEqual(details.run, self.course.location.name, "Course name not copied into")
+        self.assertEqual(details.run, self.course.location.block_id, "Course name not copied into")
         self.assertEqual(details.course_image_name, self.course.course_image)
         self.assertIsNotNone(details.start_date.tzinfo)
         self.assertIsNone(details.end_date, "end date somehow initialized " + str(details.end_date))
@@ -39,6 +38,10 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
         self.assertIsNone(
             details.enrollment_end, "enrollment_end date somehow initialized " + str(details.enrollment_end)
         )
+        self.assertIsNone(
+            details.certificate_available_date,
+            "certificate_available_date date somehow initialized " + str(details.certificate_available_date)
+        )
         self.assertIsNone(details.syllabus, "syllabus somehow initialized" + str(details.syllabus))
         self.assertIsNone(details.intro_video, "intro_video somehow initialized" + str(details.intro_video))
         self.assertIsNone(details.effort, "effort somehow initialized" + str(details.effort))
@@ -46,7 +49,6 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
         self.assertFalse(details.self_paced)
 
     def test_update_and_fetch(self):
-        SelfPacedConfiguration(enabled=True).save()
         jsondetails = CourseDetails.fetch(self.course.id)
         jsondetails.syllabus = "<a href='foo'>bar</a>"
         # encode - decode to convert date fields and other data which changes form
@@ -70,6 +72,11 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
                 CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).intro_video,
                 jsondetails.intro_video, "After set intro_video"
             )
+            jsondetails.about_sidebar_html = "About Sidebar HTML"
+            self.assertEqual(
+                CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).about_sidebar_html,
+                jsondetails.about_sidebar_html, "After set about_sidebar_html"
+            )
             jsondetails.effort = "effort"
             self.assertEqual(
                 CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).effort,
@@ -80,15 +87,22 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
                 CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).self_paced,
                 jsondetails.self_paced
             )
-            jsondetails.start_date = datetime.datetime(2010, 10, 1, 0, tzinfo=UTC())
+            jsondetails.start_date = datetime.datetime(2010, 10, 1, 0, tzinfo=UTC)
             self.assertEqual(
                 CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).start_date,
                 jsondetails.start_date
             )
-            jsondetails.end_date = datetime.datetime(2011, 10, 1, 0, tzinfo=UTC())
+            jsondetails.end_date = datetime.datetime(2011, 10, 1, 0, tzinfo=UTC)
             self.assertEqual(
                 CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).end_date,
                 jsondetails.end_date
+            )
+            jsondetails.certificate_available_date = datetime.datetime(2010, 10, 1, 0, tzinfo=UTC)
+            self.assertEqual(
+                CourseDetails.update_from_json(
+                    self.course.id, jsondetails.__dict__, self.user
+                ).certificate_available_date,
+                jsondetails.certificate_available_date
             )
             jsondetails.course_image_name = "an_image.jpg"
             self.assertEqual(
@@ -132,7 +146,6 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
             )
 
     def test_toggle_pacing_during_course_run(self):
-        SelfPacedConfiguration(enabled=True).save()
         self.course.start = datetime.datetime.now()
         self.store.update_item(self.course, self.user.id)
 

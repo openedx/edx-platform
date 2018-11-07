@@ -34,6 +34,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='tagavailablevalues',
             name='category',
-            field=models.ForeignKey(to='tagging.TagCategories'),
+            field=models.ForeignKey(to='tagging.TagCategories', on_delete=models.CASCADE),
         ),
     ]

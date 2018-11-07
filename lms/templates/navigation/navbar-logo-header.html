@@ -4,8 +4,10 @@
 
 <%namespace name='static' file='../static_content.html'/>
 <%!
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 from lms.djangoapps.ccx.overrides import get_current_ccx
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 # App that handles subdomain specific branding
 from branding import api as branding_api
@@ -13,7 +15,7 @@ from branding import api as branding_api
 
 <h1 class="hd logo-header">
   <div class="logo">
-    <a href="${marketing_link('ROOT')}">
+    <a href="${branding_api.get_home_url()}">
       <%block name="navigation_logo">
       <img src="${branding_api.get_logo_url(is_secure)}" alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}"/>
       </%block>
@@ -34,3 +36,11 @@ from branding import api as branding_api
     </div>
   % endif
 </h1>
+% if enable_enterprise_sidebar:
+  <div class="enterprise-tagline">
+    <% tagline = configuration_helpers.get_value('ENTERPRISE_TAGLINE', settings.ENTERPRISE_TAGLINE) %>
+    % if tagline:
+      ${tagline}
+    % endif
+  </div>
+% endif

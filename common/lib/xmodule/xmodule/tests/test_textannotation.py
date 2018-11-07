@@ -26,6 +26,7 @@ class TextAnnotationModuleTestCase(unittest.TestCase):
             </p>
         </annotatable>
     '''
+    shard = 1
 
     def setUp(self):
         """

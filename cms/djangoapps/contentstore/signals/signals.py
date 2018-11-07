@@ -9,6 +9,6 @@ from django.dispatch import Signal
 GRADING_POLICY_CHANGED = Signal(
     providing_args=[
         'user_id',  # Integer User ID
-        'course_id',  # Unicode string representing the course
+        'course_key',  # Unicode string representing the course
     ]
 )

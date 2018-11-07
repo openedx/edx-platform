@@ -7,14 +7,13 @@ Course Auth is turned on.
 import unittest
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from django.urls import reverse
 
 # This import is for an lms djangoapp.
 # Its testcases are only run under lms.
 from bulk_email.models import BulkEmailFlag, CourseAuthorization  # pylint: disable=import-error
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
@@ -84,49 +83,3 @@ class TestStudentDashboardEmailView(SharedModuleStoreTestCase):
         # if this course isn't authorized
         response = self.client.get(self.url)
         self.assertIn(self.email_modal_link, response.content)
-
-
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class TestStudentDashboardEmailViewXMLBacked(SharedModuleStoreTestCase):
-    """
-    Check for email view on student dashboard, with XML backed course.
-    """
-    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
-
-    def setUp(self):
-        super(TestStudentDashboardEmailViewXMLBacked, self).setUp()
-        self.course_name = 'edX/toy/2012_Fall'
-
-        # Create student account
-        student = UserFactory.create()
-        CourseEnrollmentFactory.create(
-            user=student,
-            course_id=SlashSeparatedCourseKey.from_deprecated_string(self.course_name)
-        )
-        self.client.login(username=student.username, password="test")
-
-        self.url = reverse('dashboard')
-
-        # URL for email settings modal
-        self.email_modal_link = (
-            '<a href="#email-settings-modal" class="action action-email-settings" rel="leanModal" '
-            'data-course-id="{org}/{num}/{name}" data-course-number="{num}" '
-            'data-dashboard-index="0" data-optout="False">Email Settings</a>'
-        ).format(
-            org='edX',
-            num='toy',
-            name='2012_Fall',
-        )
-
-    def test_email_flag_true_xml_store(self):
-        BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=False)
-        # The flag is enabled, and since REQUIRE_COURSE_EMAIL_AUTH is False, all courses should
-        # be authorized to use email. But the course is not Mongo-backed (should not work)
-        response = self.client.get(self.url)
-        self.assertNotIn(self.email_modal_link, response.content)
-
-    def test_email_flag_false_xml_store(self):
-        BulkEmailFlag.objects.create(enabled=False, require_course_email_auth=False)
-        # Email disabled, shouldn't see link.
-        response = self.client.get(self.url)
-        self.assertNotIn(self.email_modal_link, response.content)

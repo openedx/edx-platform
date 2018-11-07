@@ -7,12 +7,10 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import hashlib
 import logging
 
-import six
 from django.core.management.base import BaseCommand
 
 from lms.djangoapps.grades.config.models import ComputeGradesSetting
 from openedx.core.lib.command_utils import get_mutually_exclusive_required_option, parse_course_keys
-from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 
 from ... import tasks

@@ -13,6 +13,8 @@
   {% stylesheet 'style-course-vendor' %}
   {% stylesheet 'style-course' %}
 
+	<link rel="stylesheet" type="text/css" href="{% static 'paragon/static/paragon.min.css' %}" />
+
   <script type="text/javascript">
     function ajaxError(){}
 
@@ -35,6 +37,8 @@
     }
   </script>
 
+  {% comment %} The wiki page does not use the main.html template {% endcomment %}
+  <script type="text/javascript" src="{% static 'js/header/header.js' %}"></script>
 
   {% addtoblock 'js' %}
     {% comment %} These scripts load at the bottom of the body {% endcomment %}
@@ -57,6 +61,9 @@
   {% endif %}
 
 <div class="container">
+    {% load render_bundle from webpack_loader %}
+    {% render_bundle "AlertStatusBar" %}
+
   <div class="wiki-wrapper">
     <main id="main" aria-label="Content" tabindex="-1">
           <section class="wiki {{ selected_tab }}" id="wiki-content"
@@ -70,10 +77,15 @@
 
           {% if messages %}
             {% for message in messages %}
-              <div class="alert alert-{{ message.tags }}">
-                <a class="close" data-dismiss="alert" href="#">&times;</a>
-                {{ message }}
-              </div>
+              <div id="alert_stat_bar"></div>
+              <script type="text/javascript">
+                new StatusAlertRenderer(
+                  "{{ message }}",
+                  "#alert_stat_bar",
+                  ".nav nav-tabs"
+                );
+              </script>
+
             {% endfor %}
           {% endif %}
 

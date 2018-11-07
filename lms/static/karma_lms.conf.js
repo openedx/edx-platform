@@ -26,19 +26,26 @@ var options = {
     // Make sure the patterns in sourceFiles and specFiles do not match the same file.
     // Otherwise Istanbul which is used for coverage tracking will cause tests to not run.
     sourceFiles: [
-        {pattern: 'coffee/src/**/!(*spec).js'},
         {pattern: 'course_bookmarks/**/!(*spec).js'},
         {pattern: 'course_search/**/!(*spec).js'},
         {pattern: 'discussion/js/**/!(*spec).js'},
         {pattern: 'js/**/!(*spec|djangojs).js'},
+        {pattern: 'learner_profile/**/!(*spec).js'},
         {pattern: 'lms/js/**/!(*spec).js'},
         {pattern: 'support/js/**/!(*spec).js'},
-        {pattern: 'teams/js/**/!(*spec).js'}
+        {pattern: 'teams/js/**/!(*spec).js'},
+        {pattern: 'completion/js/**/!(*spec).js'}
     ],
 
     specFiles: [
-        {pattern: '../**/*spec.js'},
-        {pattern: 'course_experience/js/**/*_spec.js', webpack: true}
+        // Define the Webpack-built spec files first
+        {pattern: 'course_experience/js/**/*_spec.js', webpack: true},
+        {pattern: 'js/learner_dashboard/**/*_spec.js', webpack: true},
+        {pattern: 'js/student_account/components/**/*_spec.js', webpack: true},
+        {pattern: 'completion/js/**/*_spec.js', webpack: true},
+
+        // Add all remaining spec files to be used without Webpack
+        {pattern: '../**/*spec.js'}
     ],
 
     fixtureFiles: [

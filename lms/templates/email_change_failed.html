@@ -8,7 +8,11 @@
     <h1 class="invalid">${_("E-mail change failed")}</h1>
     <hr class="horizontal-divider">
 
+    % if err_msg is not UNDEFINED:
+    <p>${err_msg}</p>
+    % else:
     <p>${_("We were unable to send a confirmation email to {email}").format(email=email)}</p>
+    % endif
 
     <p>${_('Go back to the {link_start}home page{link_end}.').format(link_start='<a href="/">', link_end='</a>')}</p>
   </section>

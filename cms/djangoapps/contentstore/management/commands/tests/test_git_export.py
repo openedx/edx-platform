@@ -18,7 +18,7 @@ from django.test.utils import override_settings
 from contentstore.tests.utils import CourseTestCase
 import contentstore.git_export_utils as git_export_utils
 from contentstore.git_export_utils import GitExportError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
 
 FEATURES_WITH_EXPORT_GIT = settings.FEATURES.copy()
 FEATURES_WITH_EXPORT_GIT['ENABLE_EXPORT_GIT'] = True
@@ -56,10 +56,10 @@ class TestGitExport(CourseTestCase):
         Test that the command interface works. Ignore stderr for clean
         test output.
         """
-        with self.assertRaisesRegexp(CommandError, 'This script requires.*'):
+        with self.assertRaisesRegexp(CommandError, 'Error: unrecognized arguments:*'):
             call_command('git_export', 'blah', 'blah', 'blah', stderr=StringIO.StringIO())
 
-        with self.assertRaisesRegexp(CommandError, 'This script requires.*'):
+        with self.assertRaisesMessage(CommandError, 'Error: too few arguments'):
             call_command('git_export', stderr=StringIO.StringIO())
 
         # Send bad url to get course not exported
@@ -88,7 +88,7 @@ class TestGitExport(CourseTestCase):
         """
         Test several bad URLs for validation
         """
-        course_key = SlashSeparatedCourseKey('org', 'course', 'run')
+        course_key = CourseLocator('org', 'course', 'run')
         with self.assertRaisesRegexp(GitExportError, unicode(GitExportError.URL_BAD)):
             git_export_utils.export_to_git(course_key, 'Sillyness')
 
@@ -105,7 +105,7 @@ class TestGitExport(CourseTestCase):
         """
         test_repo_path = '{}/test_repo'.format(git_export_utils.GIT_REPO_EXPORT_DIR)
         self.assertFalse(os.path.isdir(test_repo_path))
-        course_key = SlashSeparatedCourseKey('foo', 'blah', '100-')
+        course_key = CourseLocator('foo', 'blah', '100-')
         # Test bad clones
         with self.assertRaisesRegexp(GitExportError,
                                      unicode(GitExportError.CANNOT_PULL)):

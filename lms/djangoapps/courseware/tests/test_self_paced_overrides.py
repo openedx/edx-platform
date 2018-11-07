@@ -11,7 +11,6 @@ from courseware.tests.factories import BetaTesterFactory
 from lms.djangoapps.ccx.tests.test_overrides import inject_field_overrides
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData, OverrideModulestoreFieldData
 from lms.djangoapps.django_comment_client.utils import get_accessible_discussion_xblocks
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -24,12 +23,11 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
     """
     Tests for self-paced due date overrides.
     """
+    shard = 4
 
     def setUp(self):
         self.reset_setting_cache_variables()
         super(SelfPacedDateOverrideTest, self).setUp()
-
-        SelfPacedConfiguration(enabled=True).save()
 
         self.non_staff_user, __ = self.create_non_staff_user()
         self.now = datetime.datetime.now(pytz.UTC).replace(microsecond=0)
@@ -83,11 +81,6 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
     def test_self_paced_due_date(self):
         __, sp_section = self.setup_course(display_name="Self-Paced Course", self_paced=True)
         self.assertIsNone(sp_section.due)
-
-    def test_self_paced_disabled_due_date(self):
-        SelfPacedConfiguration(enabled=False).save()
-        __, sp_section = self.setup_course(display_name="Self-Paced Course", self_paced=True)
-        self.assertEqual(sp_section.due, self.now)
 
     @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_course_access_to_beta_users(self):

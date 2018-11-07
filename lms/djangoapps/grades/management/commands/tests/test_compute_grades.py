@@ -31,6 +31,7 @@ class TestComputeGrades(SharedModuleStoreTestCase):
     """
     Tests compute_grades management command.
     """
+    shard = 4
     num_users = 3
     num_courses = 5
 

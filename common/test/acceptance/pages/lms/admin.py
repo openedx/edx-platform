@@ -29,7 +29,7 @@ class ChangeUserAdminPage(PageObject):
         """
         Reads the read-only username.
         """
-        return self.q(css='.field-username p').text[0]
+        return self.q(css='.field-username .readonly').text[0]
 
     @property
     def first_name_element(self):

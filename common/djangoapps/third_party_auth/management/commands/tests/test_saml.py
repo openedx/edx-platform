@@ -62,15 +62,25 @@ class TestSAMLCommand(TestCase):
         # We are creating SAMLConfiguration instance here so that there is always at-least one
         # disabled saml configuration instance, this is done to verify that disabled configurations are
         # not processed.
-        SAMLConfigurationFactory.create(enabled=False)
-        SAMLProviderConfigFactory.create()
+        SAMLConfigurationFactory.create(enabled=False, site__domain='testserver.fake', site__name='testserver.fake')
+        SAMLProviderConfigFactory.create(site__domain='testserver.fake', site__name='testserver.fake')
 
     def __create_saml_configurations__(self, saml_config=None, saml_provider_config=None):
         """
         Helper method to create SAMLConfiguration and AMLProviderConfig.
         """
-        SAMLConfigurationFactory.create(enabled=True, **(saml_config or {}))
-        SAMLProviderConfigFactory.create(enabled=True, **(saml_provider_config or {}))
+        SAMLConfigurationFactory.create(enabled=True, **(
+            saml_config or {
+                'site__domain': 'testserver.fake',
+                'site__name': 'testserver.fake'
+            }
+        ))
+        SAMLProviderConfigFactory.create(enabled=True, **(
+            saml_provider_config or {
+                'site__domain': 'testserver.fake',
+                'site__name': 'testserver.fake'
+            }
+        ))
 
     def test_raises_command_error_for_invalid_arguments(self):
         """
@@ -137,10 +147,12 @@ class TestSAMLCommand(TestCase):
         self.__create_saml_configurations__(
             saml_config={
                 "site__domain": "second.testserver.fake",
+                "site__name": "testserver.fake",
             },
             saml_provider_config={
                 "site__domain": "second.testserver.fake",
-                "idp_slug": "second-test-shib",
+                "site__name": "testserver.fake",
+                "slug": "second-test-shib",
                 "entity_id": "https://idp.testshib.org/idp/another-shibboleth",
                 "metadata_source": "https://www.testshib.org/metadata/another-testshib-providers.xml",
             }
@@ -150,10 +162,12 @@ class TestSAMLCommand(TestCase):
         self.__create_saml_configurations__(
             saml_config={
                 "site__domain": "third.testserver.fake",
+                "site__name": "testserver.fake",
             },
             saml_provider_config={
                 "site__domain": "third.testserver.fake",
-                "idp_slug": "third-test-shib",
+                "site__name": "testserver.fake",
+                "slug": "third-test-shib",
                 # Note: This entity id will not be present in returned response and will cause failed update.
                 "entity_id": "https://idp.testshib.org/idp/non-existent-shibboleth",
                 "metadata_source": "https://www.testshib.org/metadata/third/testshib-providers.xml",
@@ -169,10 +183,12 @@ class TestSAMLCommand(TestCase):
         self.__create_saml_configurations__(
             saml_config={
                 "site__domain": "fourth.testserver.fake",
+                "site__name": "testserver.fake",
             },
             saml_provider_config={
                 "site__domain": "fourth.testserver.fake",
-                "idp_slug": "fourth-test-shib",
+                "site__name": "testserver.fake",
+                "slug": "fourth-test-shib",
                 "automatic_refresh_enabled": False,
                 # Note: This invalid entity id will not be present in the refresh set
                 "entity_id": "https://idp.testshib.org/idp/fourth-shibboleth",
@@ -226,7 +242,7 @@ class TestSAMLCommand(TestCase):
             },
             saml_provider_config={
                 "site__domain": "third.testserver.fake",
-                "idp_slug": "third-test-shib",
+                "slug": "third-test-shib",
                 # Note: This entity id will not be present in returned response and will cause failed update.
                 "entity_id": "https://idp.testshib.org/idp/non-existent-shibboleth",
                 "metadata_source": "https://www.testshib.org/metadata/third/testshib-providers.xml",

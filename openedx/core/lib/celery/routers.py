@@ -21,9 +21,16 @@ class AlternateEnvironmentRouter(object):
     @abstractproperty
     def alternate_env_tasks(self):
         """
-        Defines the task -> alternate worker environment queue to be used when routing.
+        Defines the task -> alternate worker environment to be used when routing.
 
         Subclasses must override this property with their own specific mappings.
+        """
+        return {}
+
+    @property
+    def explicit_queues(self):
+        """
+        Defines the task -> alternate worker queue to be used when routing.
         """
         return {}
 
@@ -33,9 +40,13 @@ class AlternateEnvironmentRouter(object):
 
         If None is returned from this method, default routing logic is used.
         """
+        if task in self.explicit_queues:
+            return self.explicit_queues[task]
+
         alternate_env = self.alternate_env_tasks.get(task, None)
         if alternate_env:
             return self.ensure_queue_env(alternate_env)
+
         return None
 
     def ensure_queue_env(self, desired_env):

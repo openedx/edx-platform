@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from django.test.client import Client
 
 from survey.models import SurveyForm
-from survey.utils import is_survey_required_for_course, must_answer_survey
+from survey.utils import is_survey_required_for_course, is_survey_required_and_unanswered
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -17,6 +17,8 @@ class SurveyModelsTests(ModuleStoreTestCase):
     """
     All tests for the utils.py file
     """
+    shard = 4
+
     def setUp(self):
         """
         Set up the test data used in the specific tests
@@ -89,28 +91,28 @@ class SurveyModelsTests(ModuleStoreTestCase):
         """
         Assert that a new course which has a required survey but user has not answered it yet
         """
-        self.assertTrue(must_answer_survey(self.course, self.student))
+        self.assertTrue(is_survey_required_and_unanswered(self.student, self.course))
 
         temp_course = CourseFactory.create(
             course_survey_required=False
         )
-        self.assertFalse(must_answer_survey(temp_course, self.student))
+        self.assertFalse(is_survey_required_and_unanswered(self.student, temp_course))
 
         temp_course = CourseFactory.create(
             course_survey_required=True,
             course_survey_name="NonExisting"
         )
-        self.assertFalse(must_answer_survey(temp_course, self.student))
+        self.assertFalse(is_survey_required_and_unanswered(self.student, temp_course))
 
     def test_user_has_answered_required_survey(self):
         """
         Assert that a new course which has a required survey and user has answers for it
         """
         self.survey.save_user_answers(self.student, self.student_answers, None)
-        self.assertFalse(must_answer_survey(self.course, self.student))
+        self.assertFalse(is_survey_required_and_unanswered(self.student, self.course))
 
     def test_staff_must_answer_survey(self):
         """
         Assert that someone with staff level permissions does not have to answer the survey
         """
-        self.assertFalse(must_answer_survey(self.course, self.staff))
+        self.assertFalse(is_survey_required_and_unanswered(self.staff, self.course))

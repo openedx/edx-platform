@@ -6,18 +6,19 @@ import urllib
 
 from django.conf import settings
 from openedx.core.djangoapps.appsembler.sites.utils import get_lms_link_from_course_key
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger(__name__)
 
 COURSE_SHARING_UTM_PARAMETERS = {
     'facebook': {
-        'utm_medium': 'social-post',
-        'utm_campaign': 'social-sharing',
+        'utm_medium': 'social',
+        'utm_campaign': 'social-sharing-db',
         'utm_source': 'facebook',
     },
     'twitter': {
-        'utm_medium': 'social-post',
-        'utm_campaign': 'social-sharing',
+        'utm_medium': 'social',
+        'utm_campaign': 'social-sharing-db',
         'utm_source': 'twitter',
     },
 }
@@ -41,14 +42,17 @@ def get_link_for_about_page(course):
     Returns the course sharing url, this can be one of course's social sharing url, marketing url, or
     lms course about url.
     """
-    is_social_sharing_enabled = getattr(settings, 'SOCIAL_SHARING_SETTINGS', {}).get('CUSTOM_COURSE_URLS')
+    is_social_sharing_enabled = configuration_helpers.get_value(
+        'SOCIAL_SHARING_SETTINGS',
+        getattr(settings, 'SOCIAL_SHARING_SETTINGS', {})
+    ).get('CUSTOM_COURSE_URLS')
     if is_social_sharing_enabled and course.social_sharing_url:
         course_about_url = course.social_sharing_url
     elif settings.FEATURES.get('ENABLE_MKTG_SITE') and getattr(course, 'marketing_url', None):
         course_about_url = course.marketing_url
     else:
         about_base = u'https://{}'.format(get_lms_link_from_course_key(
-            settings.LMS_BASE,
+            configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL),
             course.id,
         ))
 

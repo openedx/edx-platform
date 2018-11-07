@@ -1,1 +1,1 @@
-<%- gettext("There was an error, try searching again.") %>
+<% if (errorMessage) { %><%- errorMessage %><%} else {%><%- gettext("There was an error, try searching again.") %><% } %>

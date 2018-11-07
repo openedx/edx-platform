@@ -4,7 +4,6 @@ Tests for OAuth token exchange forms
 """
 import unittest
 
-from django.conf import settings
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import TestCase
 from django.test.client import RequestFactory

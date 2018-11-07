@@ -28,6 +28,7 @@
   // a single alert, which can be independently displayed / dismissed
   .search-alert {
     @include transition(none);
+
     padding: ($baseline/2) 11px ($baseline/2) 18px;
     background-color: $black;
   }
@@ -48,6 +49,7 @@
 
       em {
         @extend %t-weight5;
+
         font-style: italic;
       }
     }
@@ -55,6 +57,7 @@
     // links to jump to users/content in alerts
     .link-jump {
       @include transition(none);
+
       @extend %t-weight5;
     }
   }
@@ -62,11 +65,14 @@
   // alert controls
   .search-alert-controls {
     @include text-align(right);
+
     width: 28%;
 
     .control {
       @include transition(none);
+
       @extend %t-weight5;
+
       padding: ($baseline/4) ($baseline/2);
       color: $white;
       font-size: $forum-base-font-size;

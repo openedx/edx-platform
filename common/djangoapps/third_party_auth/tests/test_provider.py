@@ -58,7 +58,7 @@ class RegistryTest(testutil.TestCase):
         self.configure_saml_provider(
             enabled=True,
             name="Disallowed",
-            idp_slug="test",
+            slug="test",
             backend_name="disallowed"
         )
         self.assertEqual(len(provider.Registry.enabled()), 0)
@@ -150,12 +150,12 @@ class RegistryTest(testutil.TestCase):
         google_provider = self.configure_google_provider(enabled=True)
         self.assertEqual(google_provider.id, provider.Registry.get(google_provider.provider_id).id)
 
-    def test_oauth2_provider_keyed_by_provider_slug(self):
+    def test_oauth2_provider_keyed_by_slug(self):
         """
-        Regression test to ensure that the Registry properly fetches OAuth2ProviderConfigs that have a provider_slug
+        Regression test to ensure that the Registry properly fetches OAuth2ProviderConfigs that have a slug
         which doesn't match any of the possible backend_names.
         """
-        google_provider = self.configure_google_provider(enabled=True, provider_slug='custom_slug')
+        google_provider = self.configure_google_provider(enabled=True, slug='custom_slug')
         self.assertIn(google_provider, provider.Registry._enabled_providers())
         self.assertIn(google_provider, provider.Registry.get_enabled_by_backend_name('google-oauth2'))
 
@@ -167,6 +167,9 @@ class RegistryTest(testutil.TestCase):
         facebook_provider = self.configure_facebook_provider(enabled=True)
         self.configure_google_provider(enabled=True)
         self.assertNotIn(facebook_provider, provider.Registry.get_enabled_by_backend_name('google-oauth2'))
+
+    def test_get_returns_none_if_provider_id_is_none(self):
+        self.assertIsNone(provider.Registry.get(None))
 
     def test_get_returns_none_if_provider_not_enabled(self):
         linkedin_provider_id = "oa2-linkedin-oauth2"

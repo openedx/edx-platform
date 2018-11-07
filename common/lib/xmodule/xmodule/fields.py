@@ -5,7 +5,9 @@ import time
 
 import dateutil.parser
 from pytz import UTC
+from six import text_type
 from xblock.fields import JSONField
+from xblock.scorable import Score
 
 log = logging.getLogger(__name__)
 
@@ -174,7 +176,7 @@ class RelativeTime(JSONField):
         except ValueError as e:
             raise ValueError(
                 "Incorrect RelativeTime value {!r} was set in XML or serialized. "
-                "Original parse message is {}".format(value, e.message)
+                "Original parse message is {}".format(value, text_type(e))
             )
         return datetime.timedelta(
             hours=obj_time.tm_hour,
@@ -252,3 +254,48 @@ class RelativeTime(JSONField):
             return value
 
         return self.from_json(value)
+
+
+class ScoreField(JSONField):
+    """
+    Field for blocks that need to store a Score. XBlocks that implement
+    the ScorableXBlockMixin may need to store their score separately
+    from their problem state, specifically for use in staff override
+    of problem scores.
+    """
+    MUTABLE = False
+
+    def from_json(self, value):
+        if value is None:
+            return value
+        if isinstance(value, Score):
+            return value
+
+        if set(value) != {'raw_earned', 'raw_possible'}:
+            raise TypeError('Scores must contain only a raw earned and raw possible value. Got {}'.format(
+                set(value)
+            ))
+
+        raw_earned = value['raw_earned']
+        raw_possible = value['raw_possible']
+
+        if raw_possible < 0:
+            raise ValueError(
+                'Error deserializing field of type {0}: Expected a positive number for raw_possible, got {1}.'.format(
+                    self.display_name,
+                    raw_possible,
+                )
+            )
+
+        if not (0 <= raw_earned <= raw_possible):
+            raise ValueError(
+                'Error deserializing field of type {0}: Expected raw_earned between 0 and {1}, got {2}.'.format(
+                    self.display_name,
+                    raw_possible,
+                    raw_earned
+                )
+            )
+
+        return Score(raw_earned, raw_possible)
+
+    enforce_type = from_json

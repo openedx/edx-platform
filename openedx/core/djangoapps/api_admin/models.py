@@ -8,15 +8,14 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.mail import send_mail
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import models
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.utils.translation import ugettext as _
-from django_extensions.db.models import TimeStampedModel
-from simple_history.models import HistoricalRecords
 
 from edxmako.shortcuts import render_to_string
+from model_utils.models import TimeStampedModel
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger(__name__)
@@ -33,7 +32,7 @@ class ApiAccessRequest(TimeStampedModel):
         (DENIED, _('Denied')),
         (APPROVED, _('Approved')),
     )
-    user = models.OneToOneField(User, related_name='api_access_request')
+    user = models.OneToOneField(User, related_name='api_access_request', on_delete=models.CASCADE)
     status = models.CharField(
         max_length=255,
         choices=STATUS_CHOICES,
@@ -45,10 +44,12 @@ class ApiAccessRequest(TimeStampedModel):
     reason = models.TextField(help_text=_('The reason this user wants to access the API.'))
     company_name = models.CharField(max_length=255, default='')
     company_address = models.CharField(max_length=255, default='')
-    site = models.ForeignKey(Site)
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
     contacted = models.BooleanField(default=False)
 
-    history = HistoricalRecords()
+    class Meta:
+        get_latest_by = 'modified'
+        ordering = ('-modified', '-created',)
 
     @classmethod
     def has_api_access(cls, user):
@@ -78,6 +79,30 @@ class ApiAccessRequest(TimeStampedModel):
             return cls.objects.get(user=user).status
         except cls.DoesNotExist:
             return None
+
+    @classmethod
+    def retire_user(cls, user):
+        """
+        Retires the user's API acccess request table for GDPR
+
+        Arguments:
+            user (User): The user linked to the data to retire in the model.
+
+        Returns:
+            True: If the user has a linked data in the model and retirement is successful
+            False: user has no linked data in the model.
+        """
+        try:
+            retire_target = cls.objects.get(user=user)
+        except cls.DoesNotExist:
+            return False
+        else:
+            retire_target.website = ''
+            retire_target.company_address = ''
+            retire_target.company_name = ''
+            retire_target.reason = ''
+            retire_target.save()
+            return True
 
     def approve(self):
         """Approve this request."""

@@ -6,7 +6,8 @@ import textwrap
 
 import mock
 import requests
-from django.core.urlresolvers import NoReverseMatch, reverse
+from django.urls import NoReverseMatch, reverse
+from six import text_type
 
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -67,7 +68,7 @@ class StaticBookTest(ModuleStoreTestCase):
         Automatically provides the course id.
 
         """
-        kwargs['course_id'] = self.course.id.to_deprecated_string()
+        kwargs['course_id'] = text_type(self.course.id)
         url = reverse(url_name, kwargs=kwargs)
         return url
 

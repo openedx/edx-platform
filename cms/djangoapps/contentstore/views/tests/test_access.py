@@ -3,7 +3,7 @@ Tests access.py
 """
 from django.contrib.auth.models import User
 from django.test import TestCase
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
 
 from contentstore.views.access import get_user_role
 from student.auth import add_users
@@ -22,7 +22,7 @@ class RolesTest(TestCase):
         self.global_admin = AdminFactory()
         self.instructor = User.objects.create_user('testinstructor', 'testinstructor+courses@edx.org', 'foo')
         self.staff = User.objects.create_user('teststaff', 'teststaff+courses@edx.org', 'foo')
-        self.course_key = SlashSeparatedCourseKey('mitX', '101', 'test')
+        self.course_key = CourseLocator('mitX', '101', 'test')
 
     def test_get_user_role_instructor(self):
         """

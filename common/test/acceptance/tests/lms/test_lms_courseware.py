@@ -7,14 +7,13 @@ import json
 from datetime import datetime, timedelta
 
 import ddt
-from flaky import flaky
 from nose.plugins.attrib import attr
 
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ...pages.common.auto_auth import AutoAuthPage
 from ...pages.common.logout import LogoutPage
 from ...pages.lms.course_home import CourseHomePage
-from ...pages.lms.courseware import CoursewarePage, CoursewareSequentialTabPage
+from ...pages.lms.courseware import CoursewarePage, CoursewareSequentialTabPage, RenderXBlockPage
 from ...pages.lms.create_mode import ModeCreationPage
 from ...pages.lms.dashboard import DashboardPage
 from ...pages.lms.pay_and_verify import FakePaymentPage, FakeSoftwareSecureVerificationPage, PaymentAndVerificationFlow
@@ -238,32 +237,6 @@ class ProctoredExamTest(UniqueCourseTest):
         self.studio_course_outline.open_subsection_settings_dialog()
         self.assertTrue(self.studio_course_outline.proctoring_items_are_displayed())
 
-    def test_proctored_exam_flow(self):
-        """
-        Given that I am a staff member on the exam settings section
-        select advanced settings tab
-        When I Make the exam proctored.
-        And I login as a verified student.
-        And I verify the user's ID.
-        And visit the courseware as a verified student.
-        Then I can see an option to take the exam as a proctored exam.
-        """
-        LogoutPage(self.browser).visit()
-        auto_auth(self.browser, "STAFF_TESTER", "staff101@example.com", True, self.course_id)
-        self.studio_course_outline.visit()
-        self.studio_course_outline.open_subsection_settings_dialog()
-
-        self.studio_course_outline.select_advanced_tab()
-        self.studio_course_outline.make_exam_proctored()
-
-        LogoutPage(self.browser).visit()
-        self._login_as_a_verified_user()
-
-        self._verify_user()
-
-        self.courseware_page.visit()
-        self.assertTrue(self.courseware_page.can_start_proctored_exam)
-
     def _setup_and_take_timed_exam(self, hide_after_due=False):
         """
         Helper to perform the common action "set up a timed exam as staff,
@@ -285,6 +258,7 @@ class ProctoredExamTest(UniqueCourseTest):
         self.assertTrue(self.courseware_page.is_timer_bar_present)
 
         self.courseware_page.stop_timed_exam()
+        self.courseware_page.wait_for_page()
         self.assertTrue(self.courseware_page.has_submitted_exam_message())
 
         LogoutPage(self.browser).visit()
@@ -318,25 +292,6 @@ class ProctoredExamTest(UniqueCourseTest):
         auto_auth(self.browser, self.USERNAME, self.EMAIL, False, self.course_id)
         self.courseware_page.visit()
         self.assertEqual(self.courseware_page.has_submitted_exam_message(), hide_after_due)
-
-    def test_masquerade_visibility_override(self):
-        """
-        Given that a timed exam problem exists in the course
-        And a student has taken that exam
-        And that exam is hidden to the student
-        And I am a staff user masquerading as the student
-        Then I should be able to see the exam content
-        """
-        self._setup_and_take_timed_exam()
-
-        LogoutPage(self.browser).visit()
-        auto_auth(self.browser, "STAFF_TESTER", "staff101@example.com", True, self.course_id)
-        self.courseware_page.visit()
-        staff_page = StaffCoursewarePage(self.browser, self.course_id)
-        self.assertEqual(staff_page.staff_view_mode, 'Staff')
-
-        staff_page.set_staff_view_mode_specific_student(self.USERNAME)
-        self.assertFalse(self.courseware_page.has_submitted_exam_message())
 
     def test_field_visiblity_with_all_exam_types(self):
         """
@@ -439,7 +394,6 @@ class CoursewareMultipleVerticalsTest(CoursewareMultipleVerticalsTestBase):
     Test courseware with multiple verticals
     """
 
-    @flaky  # PLAT-1198; should be fixed, but verify that failures stop before removing
     def test_navigation_buttons(self):
         self.courseware_page.visit()
 
@@ -666,24 +620,6 @@ class CoursewareMultipleVerticalsTest(CoursewareMultipleVerticalsTestBase):
         self.assertIn('html 2 dummy body', html2_page.get_selected_tab_content())
 
 
-@attr('a11y')
-class CoursewareMultipleVerticalsA11YTest(CoursewareMultipleVerticalsTestBase):
-    """
-    Test a11y for courseware with multiple verticals
-    """
-
-    def test_courseware_a11y(self):
-        """
-        Run accessibility audit for the problem type.
-        """
-        self.course_home_page.visit()
-        self.course_home_page.outline.go_to_section('Test Section 1', 'Test Subsection 1,1')
-        # Set the scope to the sequence navigation
-        self.courseware_page.a11y_audit.config.set_scope(
-            include=['div.sequence-nav'])
-        self.courseware_page.a11y_audit.check_for_accessibility_errors()
-
-
 @attr(shard=9)
 class ProblemStateOnNavigationTest(UniqueCourseTest):
     """
@@ -808,42 +744,6 @@ class ProblemStateOnNavigationTest(UniqueCourseTest):
         self.assertIn(problem1_content_after_coming_back, problem1_content_before_switch)
         self.assertEqual(before_meta, after_meta)
 
-    def test_perform_problem_reset_and_navigate(self):
-        """
-        Scenario:
-        I go to sequential position 1
-        Facing problem1, I select 'choice_1'
-        Then perform the action – check and reset
-        Then I go to sequential position 2
-        Then I came back to sequential position 1 again
-        Facing problem1, I observe the problem1 content is not
-        outdated before and after sequence navigation
-        """
-        # Go to sequential position 1 and assert that we are on problem 1.
-        self.go_to_tab_and_assert_problem(1, self.problem1_name)
-
-        # Update problem 1's content state – by performing reset operation.
-        self.problem_page.click_choice('choice_choice_1')
-        self.problem_page.click_submit()
-        self.problem_page.wait_for_expected_status('label.choicegroup_incorrect', 'incorrect')
-        self.problem_page.click_reset()
-        self.problem_page.wait_for_expected_status('span.unanswered', 'unanswered')
-
-        # Save problem 1's content state as we're about to switch units in the sequence.
-        problem1_content_before_switch = self.problem_page.problem_content
-        before_meta = self.problem_page.problem_meta
-
-        # Go to sequential position 2 and assert that we are on problem 2.
-        self.go_to_tab_and_assert_problem(2, self.problem2_name)
-
-        # Come back to our original unit in the sequence and assert that the content hasn't changed.
-        self.go_to_tab_and_assert_problem(1, self.problem1_name)
-        problem1_content_after_coming_back = self.problem_page.problem_content
-        after_meta = self.problem_page.problem_meta
-
-        self.assertEqual(problem1_content_before_switch, problem1_content_after_coming_back)
-        self.assertEqual(before_meta, after_meta)
-
 
 @attr(shard=9)
 class SubsectionHiddenAfterDueDateTest(UniqueCourseTest):
@@ -947,3 +847,129 @@ class SubsectionHiddenAfterDueDateTest(UniqueCourseTest):
 
         self.progress_page.visit()
         self.assertEqual(self.progress_page.scores('Test Section 1', 'Test Subsection 1'), [(0, 1)])
+
+
+@attr(shard=9)
+class CompletionTestCase(UniqueCourseTest, EventsTestMixin):
+    """
+    Test the completion on view functionality.
+    """
+    USERNAME = "STUDENT_TESTER"
+    EMAIL = "student101@example.com"
+    COMPLETION_BY_VIEWING_DELAY_MS = '1000'
+
+    def setUp(self):
+        super(CompletionTestCase, self).setUp()
+
+        self.studio_course_outline = StudioCourseOutlinePage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+
+        # Install a course with sections/problems, tabs, updates, and handouts
+        course_fix = CourseFixture(
+            self.course_info['org'], self.course_info['number'],
+            self.course_info['run'], self.course_info['display_name']
+        )
+
+        self.html_1_block = XBlockFixtureDesc('html', 'html 1', data="<html>html 1 dummy body</html>")
+        self.problem_1_block = XBlockFixtureDesc(
+            'problem', 'Test Problem 1', data='<problem>problem 1 dummy body</problem>'
+        )
+
+        course_fix.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section 1').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection 1,1').add_children(
+                    XBlockFixtureDesc('vertical', 'Test Unit 1,1,1').add_children(
+                        XBlockFixtureDesc('html', 'html 1', data="<html>html 1 dummy body</html>"),
+                        XBlockFixtureDesc(
+                            'html', 'html 2',
+                            data=("<html>html 2 dummy body</html>" * 100) + "<span id='html2-end'>End</span>",
+                        ),
+                        XBlockFixtureDesc('problem', 'Test Problem 1', data='<problem>problem 1 dummy body</problem>'),
+                    ),
+                    XBlockFixtureDesc('vertical', 'Test Unit 1,1,2').add_children(
+                        XBlockFixtureDesc('html', 'html 1', data="<html>html 1 dummy body</html>"),
+                        XBlockFixtureDesc('problem', 'Test Problem 1', data='<problem>problem 1 dummy body</problem>'),
+                    ),
+                    XBlockFixtureDesc('vertical', 'Test Unit 1,1,2').add_children(
+                        self.html_1_block,
+                        self.problem_1_block,
+                    ),
+                ),
+            ),
+        ).install()
+
+        # Auto-auth register for the course.
+        AutoAuthPage(self.browser, username=self.USERNAME, email=self.EMAIL,
+                     course_id=self.course_id, staff=False).visit()
+
+    def test_courseware_publish_completion_is_sent_on_view(self):
+        """
+        Test that when viewing courseware XBlocks are correctly marked as completed on view.
+        """
+        courseware_page = CoursewarePage(self.browser, self.course_id)
+        courseware_page.visit()
+        courseware_page.wait_for_page()
+
+        # Initially, the first two blocks in the first vertical should be marked as needing to be completed on view.
+        self.assertEqual(
+            courseware_page.xblock_components_mark_completed_on_view_value(),
+            [self.COMPLETION_BY_VIEWING_DELAY_MS, self.COMPLETION_BY_VIEWING_DELAY_MS, None],
+        )
+        # Wait and verify that the first block which is completely visible is marked as completed.
+        courseware_page.wait_for_xblock_component_to_be_marked_completed_on_view(0)
+        self.assertEqual(
+            courseware_page.xblock_components_mark_completed_on_view_value(),
+            ['0', self.COMPLETION_BY_VIEWING_DELAY_MS, None],
+        )
+
+        # Scroll to the bottom of the second block.
+        courseware_page.scroll_to_element('#html2-end', 'Scroll to end of html 2 block')
+        # Wait and verify that the second block is also now marked as completed.
+        courseware_page.wait_for_xblock_component_to_be_marked_completed_on_view(1)
+        self.assertEqual(courseware_page.xblock_components_mark_completed_on_view_value(), ['0', '0', None])
+
+        # After page refresh, no blocks in the vertical should be marked as needing to be completed on view.
+        self.browser.refresh()
+        courseware_page.wait_for_page()
+        self.assertEqual(courseware_page.xblock_components_mark_completed_on_view_value(), [None, None, None])
+
+        courseware_page.go_to_sequential_position(2)
+
+        # Initially, the first block in the second vertical should be marked as needing to be completed on view.
+        self.assertEqual(
+            courseware_page.xblock_components_mark_completed_on_view_value(),
+            [self.COMPLETION_BY_VIEWING_DELAY_MS, None],
+        )
+        # Wait and verify that the first block which is completely visible is marked as completed.
+        courseware_page.wait_for_xblock_component_to_be_marked_completed_on_view(0)
+        self.assertEqual(courseware_page.xblock_components_mark_completed_on_view_value(), ['0', None])
+
+        # After page refresh, no blocks in the vertical should be marked as needing to be completed on view.
+        self.browser.refresh()
+        courseware_page.wait_for_page()
+        self.assertEqual(courseware_page.xblock_components_mark_completed_on_view_value(), [None, None])
+
+    def test_render_xblock_publish_completion_is_sent_on_view(self):
+        """
+        Test that when viewing a XBlock in render_xblock, it is correctly marked as completed on view.
+        """
+        block_page = RenderXBlockPage(self.browser, self.html_1_block.locator)
+        block_page.visit()
+        block_page.wait_for_page()
+
+        # Initially the block should be marked as needing to be completed on view.
+        self.assertEqual(
+            block_page.xblock_components_mark_completed_on_view_value(), [self.COMPLETION_BY_VIEWING_DELAY_MS]
+        )
+        # Wait and verify that the block is marked as completed on view.
+        block_page.wait_for_xblock_component_to_be_marked_completed_on_view(0)
+        self.assertEqual(block_page.xblock_components_mark_completed_on_view_value(), ['0'])
+
+        # After page refresh, it should not be marked as needing to be completed on view.
+        self.browser.refresh()
+        block_page.wait_for_page()
+        self.assertEqual(block_page.xblock_components_mark_completed_on_view_value(), [None])

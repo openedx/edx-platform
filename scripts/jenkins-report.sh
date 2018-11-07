@@ -12,7 +12,7 @@ set -e
 source scripts/jenkins-common.sh
 
 # Get the diff coverage and html reports for unit tests
-paver coverage
+paver coverage -b $TARGET_BRANCH
 
 # Test for the CodeCov API token
 if [ -z $CODE_COV_TOKEN ]; then

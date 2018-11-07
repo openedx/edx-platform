@@ -27,8 +27,8 @@
             destroy: function() {
                 this.el.off('click', this.onClick);
                 this.state.el.on({
-                    'destroy': this.destroy,
-                    'play': this.hide,
+                    destroy: this.destroy,
+                    play: this.hide,
                     'ended pause': this.show
                 });
                 this.hide();
@@ -59,8 +59,8 @@
             bindHandlers: function() {
                 this.el.on('click', this.onClick);
                 this.state.el.on({
-                    'destroy': this.destroy,
-                    'play': this.hide,
+                    destroy: this.destroy,
+                    play: this.hide,
                     'ended pause': this.show
                 });
             },
@@ -72,13 +72,13 @@
             hide: function() {
                 this.el
                 .addClass('is-hidden')
-                .attr({'aria-hidden': 'true', 'tabindex': -1});
+                .attr({'aria-hidden': 'true', tabindex: -1});
             },
 
             show: function() {
                 this.el
                 .removeClass('is-hidden')
-                .attr({'aria-hidden': 'false', 'tabindex': 0});
+                .attr({'aria-hidden': 'false', tabindex: 0});
             }
         };
 

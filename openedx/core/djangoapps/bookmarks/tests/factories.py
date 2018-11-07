@@ -7,10 +7,10 @@ from factory.django import DjangoModelFactory
 from functools import partial
 
 from student.tests.factories import UserFactory
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
 from ..models import Bookmark, XBlockCache
 
-COURSE_KEY = SlashSeparatedCourseKey(u'edX', u'test_course', u'test')
+COURSE_KEY = CourseLocator(u'edX', u'test_course', u'test')
 LOCATION = partial(COURSE_KEY.make_usage_key, u'problem')
 
 
@@ -23,7 +23,6 @@ class BookmarkFactory(DjangoModelFactory):
     user = factory.SubFactory(UserFactory)
     course_key = COURSE_KEY
     usage_key = LOCATION('usage_id')
-    path = list()
     xblock_cache = factory.SubFactory(
         'openedx.core.djangoapps.bookmarks.tests.factories.XBlockCacheFactory',
         course_key=factory.SelfAttribute('..course_key'),

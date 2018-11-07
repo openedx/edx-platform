@@ -13,8 +13,15 @@ class TabNavPage(PageObject):
 
     url = None
 
-    def is_browser_on_page(self):
+    def is_using_v1_style_tabs(self):
         return self.q(css='ol.course-tabs').present
+
+    def is_using_boostrap_style_tabs(self):
+        return self.q(css='ul.navbar-nav').present
+
+    def is_browser_on_page(self):
+        return (self.q(css='ol.course-tabs').present or
+                self.q(css='ul.navbar-nav').present)
 
     def go_to_tab(self, tab_name):
         """
@@ -66,7 +73,10 @@ class TabNavPage(PageObject):
         except ValueError:
             return None
         else:
-            return 'ol.course-tabs li:nth-of-type({0}) a'.format(tab_index + 1)
+            if self.is_using_boostrap_style_tabs():
+                return 'ul.navbar-nav li:nth-of-type({0}) a'.format(tab_index + 1)
+            else:
+                return 'ol.course-tabs li:nth-of-type({0}) a'.format(tab_index + 1)
 
     @property
     def tab_names(self):
@@ -75,11 +85,18 @@ class TabNavPage(PageObject):
         are available, wait for them to load.  Raises a `BrokenPromiseError`
         if the tab names fail to load.
         """
-        def _check_func():
+        def _standard_check_func():
             tab_names = self.q(css='ol.course-tabs li a').text
             return (len(tab_names) > 0, tab_names)
 
-        return Promise(_check_func, "Get all tab names").fulfill()
+        def _bootstrap_check_func():
+            tab_names = self.q(css='ul.navbar-nav li a').text
+            return (len(tab_names) > 0, tab_names)
+
+        if self.is_using_boostrap_style_tabs():
+            return Promise(_bootstrap_check_func, "Get all tab names").fulfill()
+        else:
+            return Promise(_standard_check_func, "Get all tab names").fulfill()
 
     def _is_on_tab(self, tab_name):
         """
@@ -87,7 +104,10 @@ class TabNavPage(PageObject):
         This is a private method, so it does NOT enforce the page check,
         which is what we want when we're polling the DOM in a promise.
         """
-        current_tab_list = self.q(css='ol.course-tabs > li > a.active').text
+        if self.is_using_boostrap_style_tabs():
+            current_tab_list = self.q(css='ul.navbar-nav > .nav-item.active').text
+        else:
+            current_tab_list = self.q(css='ol.course-tabs > li > a.active').text
 
         if len(current_tab_list) == 0:
             self.warning("Could not find current tab")

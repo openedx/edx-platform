@@ -1,8 +1,8 @@
 define(['jquery',
-        'underscore',
-        'moment',
-        'teams/js/views/team_card',
-        'teams/js/models/team'],
+    'underscore',
+    'moment',
+    'teams/js/views/team_card',
+    'teams/js/models/team'],
     function($, _, moment, TeamCardView, Team) {
         'use strict';
 

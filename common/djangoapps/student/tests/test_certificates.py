@@ -2,16 +2,18 @@
 
 import unittest
 
+import datetime
 import ddt
 import mock
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test.utils import override_settings
 from mock import patch
+from pytz import UTC
 
-from certificates.api import get_certificate_url  # pylint: disable=import-error
-from certificates.models import CertificateStatuses  # pylint: disable=import-error
-from certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
+from lms.djangoapps.certificates.api import get_certificate_url  # pylint: disable=import-error
+from lms.djangoapps.certificates.models import CertificateStatuses  # pylint: disable=import-error
+from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
 from course_modes.models import CourseMode
 from student.models import LinkedInAddToProfileConfiguration
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -21,6 +23,9 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 
 # pylint: disable=no-member
+
+PAST_DATE = datetime.datetime.now(UTC) - datetime.timedelta(days=2)
+FUTURE_DATE = datetime.datetime.now(UTC) + datetime.timedelta(days=2)
 
 
 class CertificateDisplayTestBase(SharedModuleStoreTestCase):
@@ -57,13 +62,16 @@ class CertificateDisplayTestBase(SharedModuleStoreTestCase):
 
     def _create_certificate(self, enrollment_mode):
         """Simulate that the user has a generated certificate. """
-        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id, mode=enrollment_mode)
+        CourseEnrollmentFactory.create(
+            user=self.user,
+            course_id=self.course.id,
+            mode=enrollment_mode)
         return GeneratedCertificateFactory(
             user=self.user,
             course_id=self.course.id,
             mode=enrollment_mode,
             download_url=self.DOWNLOAD_URL,
-            status="downloadable",
+            status=CertificateStatuses.downloadable,
             grade=0.98,
         )
 
@@ -98,6 +106,54 @@ class CertificateDisplayTestBase(SharedModuleStoreTestCase):
 
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class CertificateDashboardMessageDisplayTest(CertificateDisplayTestBase):
+    """
+    Tests the certificates messages for a course in the dashboard.
+    """
+
+    ENABLED_SIGNALS = ['course_published']
+
+    @classmethod
+    def setUpClass(cls):
+        super(CertificateDashboardMessageDisplayTest, cls).setUpClass()
+        cls.course.certificates_display_behavior = "end"
+        cls.course.save()
+        cls.store.update_item(cls.course, cls.USERNAME)
+
+    def _check_message(self, certificate_available_date):
+        response = self.client.get(reverse('dashboard'))
+
+        if certificate_available_date is None:
+            self.assertNotContains(response, u"Your certificate will be available on")
+            self.assertNotContains(response, u"View Test_Certificate")
+        elif datetime.datetime.now(UTC) < certificate_available_date:
+            self.assertContains(response, u"Your certificate will be available on")
+            self.assertNotContains(response, u"View Test_Certificate")
+        else:
+            self._check_can_download_certificate()
+
+    @ddt.data(True, False, None)
+    def test_certificate_available_date(self, past_certificate_available_date):
+        cert = self._create_certificate('verified')
+        cert.status = CertificateStatuses.downloadable
+        cert.save()
+
+        if past_certificate_available_date is None:
+            certificate_available_date = None
+        elif past_certificate_available_date:
+            certificate_available_date = PAST_DATE
+        elif not past_certificate_available_date:
+            certificate_available_date = FUTURE_DATE
+
+        self.course.certificate_available_date = certificate_available_date
+        self.course.save()
+        self.store.update_item(self.course, self.USERNAME)
+
+        self._check_message(certificate_available_date)
+
+
+@ddt.ddt
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class CertificateDisplayTest(CertificateDisplayTestBase):
     """
     Tests of certificate display.
@@ -108,6 +164,12 @@ class CertificateDisplayTest(CertificateDisplayTestBase):
     def test_display_verified_certificate(self, enrollment_mode):
         self._create_certificate(enrollment_mode)
         self._check_can_download_certificate()
+
+    @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
+    def test_no_certificate_status_no_problem(self):
+        with patch('student.views.dashboard.cert_info', return_value={}):
+            self._create_certificate('honor')
+            self._check_can_not_download_certificate()
 
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
     def test_display_verified_certificate_no_id(self):

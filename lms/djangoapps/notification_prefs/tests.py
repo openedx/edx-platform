@@ -2,7 +2,7 @@ import json
 
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import Http404
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -103,11 +103,9 @@ class NotificationPrefViewTest(UrlResetMixin, TestCase):
         self.assertRaises(PermissionDenied, ajax_enable, request)
         self.assertNotPrefExists(self.user)
 
-    @patch("Crypto.Random.new")
-    def test_ajax_enable_success(self, mock_random_new):
-        mock_stream = Mock()
-        mock_stream.read.return_value = self.INITIALIZATION_VECTOR
-        mock_random_new.return_value = mock_stream
+    @patch("os.urandom")
+    def test_ajax_enable_success(self, mock_urandom):
+        mock_urandom.return_value = self.INITIALIZATION_VECTOR
 
         def test_user(user):
             request = self.request_factory.post("dummy")

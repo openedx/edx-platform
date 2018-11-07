@@ -3,8 +3,8 @@
 // VideoPlayer module.
     define(
 'video/03_video_player.js',
-['video/02_html5_video.js', 'video/02_html5_hls_video.js', 'video/00_resizer.js', 'hls', 'underscore'],
-function(HTML5Video, HTML5HLSVideo, Resizer, HLS, _) {
+['video/02_html5_video.js', 'video/02_html5_hls_video.js', 'video/00_resizer.js', 'hls', 'underscore', '../time.js'],
+function(HTML5Video, HTML5HLSVideo, Resizer, HLS, _, Time) {
     var dfd = $.Deferred(),
         VideoPlayer = function(state) {
             state.videoPlayer = {};
@@ -14,6 +14,7 @@ function(HTML5Video, HTML5HLSVideo, Resizer, HLS, _) {
 
             return dfd.promise();
         },
+        /* eslint-disable no-use-before-define */
         methodsDict = {
             destroy: destroy,
             duration: duration,
@@ -41,6 +42,7 @@ function(HTML5Video, HTML5HLSVideo, Resizer, HLS, _) {
             onReady: onReady,
             onSlideSeek: onSeek,
             onSpeedChange: onSpeedChange,
+            onAutoAdvanceChange: onAutoAdvanceChange,
             onStateChange: onStateChange,
             onUnstarted: onUnstarted,
             onVolumeChange: onVolumeChange,
@@ -53,6 +55,7 @@ function(HTML5Video, HTML5HLSVideo, Resizer, HLS, _) {
             figureOutStartingTime: figureOutStartingTime,
             updatePlayTime: updatePlayTime
         };
+        /* eslint-enable no-use-before-define */
 
     VideoPlayer.prototype = methodsDict;
 
@@ -162,6 +165,7 @@ function(HTML5Video, HTML5HLSVideo, Resizer, HLS, _) {
         commonPlayerConfig = {
             playerVars: state.videoPlayer.playerVars,
             videoSources: state.config.sources,
+            poster: state.config.poster,
             browserIsSafari: state.browserIsSafari,
             events: {
                 onReady: state.videoPlayer.onReady,
@@ -426,6 +430,10 @@ function(HTML5Video, HTML5HLSVideo, Resizer, HLS, _) {
         this.videoPlayer.setPlaybackRate(newSpeed);
     }
 
+    function onAutoAdvanceChange(enabled) {
+        this.setAutoAdvance(enabled);
+    }
+
     // Every 200 ms, if the video is playing, we call the function update, via
     // clearInterval. This interval is called updateInterval.
     // It is created on a onPlay event. Cleared on a onPause event.
@@ -563,6 +571,10 @@ function(HTML5Video, HTML5HLSVideo, Resizer, HLS, _) {
             _this.videoPlayer.onSpeedChange(speed);
         });
 
+        this.el.on('autoadvancechange', function(event, enabled) {
+            _this.videoPlayer.onAutoAdvanceChange(enabled);
+        });
+
         this.el.on('volumechange volumechange:silent', function(event, volume) {
             _this.videoPlayer.onVolumeChange(volume);
         });
@@ -651,6 +663,9 @@ function(HTML5Video, HTML5HLSVideo, Resizer, HLS, _) {
 
         var duration = this.videoPlayer.duration(),
             time = this.videoPlayer.figureOutStartingTime(duration);
+
+        // this.duration will be set initially only if duration is coming from edx-val
+        this.duration = this.duration || duration;
 
         if (time > 0 && this.videoPlayer.goToStartTime) {
             this.videoPlayer.seekTo(time);

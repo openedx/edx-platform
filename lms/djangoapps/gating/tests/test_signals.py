@@ -14,6 +14,8 @@ class TestHandleScoreChanged(ModuleStoreTestCase):
     """
     Test case for handle_score_changed django signal handler
     """
+    shard = 4
+
     def setUp(self):
         super(TestHandleScoreChanged, self).setUp()
         self.course = CourseFactory.create(org='TestX', number='TS01', run='2016_Q1')

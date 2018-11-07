@@ -117,7 +117,7 @@ class StaticContent(object):
         the actual /c4x/... path which the client needs to reference static content
         """
         if location is not None:
-            return u"/static/{name}".format(name=location.name)
+            return u"/static/{name}".format(name=location.block_id)
         else:
             return None
 
@@ -404,7 +404,7 @@ class ContentStore(object):
         is_svg = content.content_type == 'image/svg+xml'
         # use a naming convention to associate originals with the thumbnail
         thumbnail_name = StaticContent.generate_thumbnail_name(
-            content.location.name, dimensions=dimensions, extension='.svg' if is_svg else None
+            content.location.block_id, dimensions=dimensions, extension='.svg' if is_svg else None
         )
         thumbnail_file_location = StaticContent.compute_location(
             content.location.course_key, thumbnail_name, is_thumbnail=True

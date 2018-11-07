@@ -16,8 +16,8 @@
             }
 
             _.bindAll(this, 'onReady', 'onPlay', 'onPause', 'onEnded', 'onSeek',
-            'onSpeedChange', 'onShowLanguageMenu', 'onHideLanguageMenu', 'onSkip',
-            'onShowTranscript', 'onHideTranscript', 'onShowCaptions', 'onHideCaptions',
+            'onSpeedChange', 'onAutoAdvanceChange', 'onShowLanguageMenu', 'onHideLanguageMenu',
+            'onSkip', 'onShowTranscript', 'onHideTranscript', 'onShowCaptions', 'onHideCaptions',
             'destroy');
 
             this.state = state;
@@ -38,20 +38,21 @@
 
             initialize: function() {
                 this.events = {
-                    'ready': this.onReady,
-                    'play': this.onPlay,
-                    'pause': this.onPause,
+                    ready: this.onReady,
+                    play: this.onPlay,
+                    pause: this.onPause,
                     'ended stop': this.onEnded,
-                    'seek': this.onSeek,
-                    'skip': this.onSkip,
-                    'speedchange': this.onSpeedChange,
+                    seek: this.onSeek,
+                    skip: this.onSkip,
+                    speedchange: this.onSpeedChange,
+                    autoadvancechange: this.onAutoAdvanceChange,
                     'language_menu:show': this.onShowLanguageMenu,
                     'language_menu:hide': this.onHideLanguageMenu,
                     'transcript:show': this.onShowTranscript,
                     'transcript:hide': this.onHideTranscript,
                     'captions:show': this.onShowCaptions,
                     'captions:hide': this.onHideCaptions,
-                    'destroy': this.destroy
+                    destroy: this.destroy
                 };
                 this.bindHandlers();
                 this.emitPlayVideoEvent = true;
@@ -105,6 +106,12 @@
                 });
             },
 
+            onAutoAdvanceChange: function(event, enabled) {
+                this.log('auto_advance_change_video', {
+                    enabled: enabled
+                });
+            },
+
             onShowLanguageMenu: function() {
                 this.log('edx.video.language_menu.shown');
             },
@@ -143,7 +150,8 @@
                 var logInfo = _.extend({
                     id: this.state.id,
                     // eslint-disable-next-line no-nested-ternary
-                    code: this.state.isYoutubeType() ? this.state.youtubeId() : this.state.canPlayHLS ? 'hls' : 'html5'
+                    code: this.state.isYoutubeType() ? this.state.youtubeId() : this.state.canPlayHLS ? 'hls' : 'html5',
+                    duration: this.state.duration
                 }, data, this.options.data);
                 Logger.log(eventName, logInfo);
             }

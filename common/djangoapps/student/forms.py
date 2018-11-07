@@ -11,28 +11,23 @@ from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.core.exceptions import ValidationError
+from django.urls import reverse
+from django.core.validators import RegexValidator, slug_re
 from django.forms import widgets
-from django.template import loader
 from django.utils.http import int_to_base36
 from django.utils.translation import ugettext_lazy as _
-from django.core.validators import RegexValidator, slug_re
 
+from edx_ace import ace
+from edx_ace.recipient import Recipient
+from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
+from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.theming.helpers import get_current_site
 from openedx.core.djangoapps.user_api import accounts as accounts_settings
-from student.models import CourseEnrollmentAllowed
-from util.password_policy_validators import validate_password_strength
-
-
-USERNAME_TOO_SHORT_MSG = _("Username must be minimum of two characters long")
-USERNAME_TOO_LONG_MSG = _("Username cannot be more than %(limit_value)s characters long")
-
-# Translators: This message is shown when the Unicode usernames are NOT allowed
-USERNAME_INVALID_CHARS_ASCII = _("Usernames can only contain Roman letters, western numerals (0-9), "
-                                 "underscores (_), and hyphens (-).")
-
-# Translators: This message is shown only when the Unicode usernames are allowed
-USERNAME_INVALID_CHARS_UNICODE = _("Usernames can only contain letters, numerals, underscore (_), numbers "
-                                   "and @/./+/-/_ characters.")
+from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
+from student.message_types import PasswordReset
+from student.models import CourseEnrollmentAllowed, email_exists_or_retired
+from util.password_policy_validators import password_max_length, password_min_length, validate_password
 
 
 class PasswordResetFormNoActive(PasswordResetForm):
@@ -59,41 +54,39 @@ class PasswordResetFormNoActive(PasswordResetForm):
             raise forms.ValidationError(self.error_messages['unusable'])
         return email
 
-    def save(
-            self,
-            subject_template_name='registration/password_reset_subject.txt',
-            email_template_name='registration/password_reset_email.html',
-            use_https=False,
-            token_generator=default_token_generator,
-            from_email=configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
-            request=None
-    ):
+    def save(self,  # pylint: disable=arguments-differ
+             use_https=False,
+             token_generator=default_token_generator,
+             request=None,
+             **_kwargs):
         """
         Generates a one-use only link for resetting password and sends to the
         user.
         """
-        # This import is here because we are copying and modifying the .save from Django 1.4.5's
-        # django.contrib.auth.forms.PasswordResetForm directly, which has this import in this place.
-        from django.core.mail import send_mail
         for user in self.users_cache:
-            site_name = configuration_helpers.get_value(
-                'SITE_NAME',
-                settings.SITE_NAME
+            site = get_current_site()
+            message_context = get_base_template_context(site)
+
+            message_context.update({
+                'request': request,  # Used by google_analytics_tracking_pixel
+                # TODO: This overrides `platform_name` from `get_base_template_context` to make the tests passes
+                'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+                'reset_link': '{protocol}://{site}{link}'.format(
+                    protocol='https' if use_https else 'http',
+                    site=configuration_helpers.get_value('SITE_NAME', settings.SITE_NAME),
+                    link=reverse('password_reset_confirm', kwargs={
+                        'uidb36': int_to_base36(user.id),
+                        'token': token_generator.make_token(user),
+                    }),
+                )
+            })
+
+            msg = PasswordReset().personalize(
+                recipient=Recipient(user.username, user.email),
+                language=get_user_preference(user, LANGUAGE_KEY),
+                user_context=message_context,
             )
-            context = {
-                'email': user.email,
-                'site_name': site_name,
-                'uid': int_to_base36(user.id),
-                'user': user,
-                'token': token_generator.make_token(user),
-                'protocol': 'https' if use_https else 'http',
-                'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
-            }
-            subject = loader.render_to_string(subject_template_name, context)
-            # Email subject *must not* contain newlines
-            subject = subject.replace('\n', '')
-            email = loader.render_to_string(email_template_name, context)
-            send_mail(subject, email, from_email, [user.email])
+            ace.send(msg)
 
 
 class TrueCheckbox(widgets.CheckboxInput):
@@ -123,12 +116,12 @@ def validate_username(username):
 
     username_re = slug_re
     flags = None
-    message = USERNAME_INVALID_CHARS_ASCII
+    message = accounts_settings.USERNAME_INVALID_CHARS_ASCII
 
     if settings.FEATURES.get("ENABLE_UNICODE_USERNAME"):
         username_re = r"^{regex}$".format(regex=settings.USERNAME_REGEX_PARTIAL)
         flags = re.UNICODE
-        message = USERNAME_INVALID_CHARS_UNICODE
+        message = accounts_settings.USERNAME_INVALID_CHARS_UNICODE
 
     validator = RegexValidator(
         regex=username_re,
@@ -138,6 +131,24 @@ def validate_username(username):
     )
 
     validator(username)
+
+
+def contains_html(value):
+    """
+    Validator method to check whether name contains html tags
+    """
+    regex = re.compile('(<|>)', re.UNICODE)
+    return bool(regex.search(value))
+
+
+def validate_name(name):
+    """
+    Verifies a Full_Name is valid, raises a ValidationError otherwise.
+    Args:
+        name (unicode): The name to validate.
+    """
+    if contains_html(name):
+        raise forms.ValidationError(_('Full Name cannot contain the following characters: < >'))
 
 
 class UsernameField(forms.CharField):
@@ -152,9 +163,9 @@ class UsernameField(forms.CharField):
             min_length=accounts_settings.USERNAME_MIN_LENGTH,
             max_length=accounts_settings.USERNAME_MAX_LENGTH,
             error_messages={
-                "required": USERNAME_TOO_SHORT_MSG,
-                "min_length": USERNAME_TOO_SHORT_MSG,
-                "max_length": USERNAME_TOO_LONG_MSG,
+                "required": accounts_settings.USERNAME_BAD_LENGTH_MSG,
+                "min_length": accounts_settings.USERNAME_BAD_LENGTH_MSG,
+                "max_length": accounts_settings.USERNAME_BAD_LENGTH_MSG,
             }
         )
 
@@ -193,10 +204,12 @@ class AccountCreationForm(forms.Form):
         }
     )
     password = forms.CharField(
-        min_length=accounts_settings.PASSWORD_MIN_LENGTH,
+        min_length=password_min_length(),
+        max_length=password_max_length(),
         error_messages={
             "required": _PASSWORD_INVALID_MSG,
             "min_length": _PASSWORD_INVALID_MSG,
+            "max_length": _PASSWORD_INVALID_MSG,
         }
     )
     name = forms.CharField(
@@ -204,7 +217,8 @@ class AccountCreationForm(forms.Form):
         error_messages={
             "required": _NAME_TOO_SHORT_MSG,
             "min_length": _NAME_TOO_SHORT_MSG,
-        }
+        },
+        validators=[validate_name]
     )
 
     def __init__(
@@ -212,7 +226,6 @@ class AccountCreationForm(forms.Form):
             data=None,
             extra_fields=None,
             extended_profile_fields=None,
-            enforce_username_neq_password=False,
             enforce_password_policy=False,
             tos_required=True
     ):
@@ -220,7 +233,6 @@ class AccountCreationForm(forms.Form):
 
         extra_fields = extra_fields or {}
         self.extended_profile_fields = extended_profile_fields or {}
-        self.enforce_username_neq_password = enforce_username_neq_password
         self.enforce_password_policy = enforce_password_policy
         if tos_required:
             self.fields["terms_of_service"] = TrueField(
@@ -269,17 +281,8 @@ class AccountCreationForm(forms.Form):
     def clean_password(self):
         """Enforce password policies (if applicable)"""
         password = self.cleaned_data["password"]
-        if (
-                self.enforce_username_neq_password and
-                "username" in self.cleaned_data and
-                self.cleaned_data["username"] == password
-        ):
-            raise ValidationError(_("Username and password fields cannot match"))
         if self.enforce_password_policy:
-            try:
-                validate_password_strength(password)
-            except ValidationError, err:
-                raise ValidationError(_("Password: ") + "; ".join(err.messages))
+            validate_password(password, username=self.cleaned_data.get('username'))
         return password
 
     def clean_email(self):
@@ -296,7 +299,7 @@ class AccountCreationForm(forms.Form):
                 # reject the registration.
                 if not CourseEnrollmentAllowed.objects.filter(email=email).exists():
                     raise ValidationError(_("Unauthorized email address."))
-        if User.objects.filter(email__iexact=email).exists():
+        if email_exists_or_retired(email):
             raise ValidationError(
                 _(
                     "It looks like {email} belongs to an existing account. Try again with a different email address."

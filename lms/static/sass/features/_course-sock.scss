@@ -2,8 +2,7 @@
   display: inline-block;
   position: relative;
   width: 100%;
-  margin-top: $baseline;
-  max-width: $lms-max-width;
+  max-width: map-get($container-max-widths, xl);
   margin: $baseline auto 0;
   -webkit-transition: all 0.4s ease-out;
   -moz-transition: all 0.4s ease-out;
@@ -14,37 +13,24 @@
   .action-toggle-verification-sock {
     @include left(50%);
     @include margin-left(-1 * $baseline * 15/2);
+
     position: absolute;
     top: (-1 * $baseline);
     width: ($baseline * 15);
-    color: $button-bg-hover-color;
-    background-color: $success-color;
-    border-color: $success-color;
+    color: theme-color("inverse");
+    background-color: theme-color("success");
+    border-color: theme-color("success");
     background-image: none;
     box-shadow: none;
     -webkit-transition: background-color 0.5s;
     transition: background-color 0.5s;
+    cursor: pointer;
 
-    &.active {
-      color: $success-color;
-      background-color: $button-bg-hover-color;
-      border-color: $success-color;
-      background-image: none;
-      box-shadow: none;
-
-      &:hover {
-        color: $button-bg-hover-color;
-        background-color: $success-color-hover;
-        border-color: $success-color-hover;
-        background-image: none;
-        box-shadow: none;
-      }
-    }
-
+    &.active,
     &:hover {
-      color: $button-bg-hover-color;
-      background-color: $success-color-hover;
-      border-color: $success-color-hover;
+      color: theme-color("success");
+      background-color: theme-color("inverse");
+      border-color: theme-color("success");
       background-image: none;
       box-shadow: none;
     }
@@ -53,7 +39,7 @@
   .verification-main-panel {
     display: none;
     overflow: hidden;
-    border-top: 1px solid $lms-border-color;
+    border-top: 1px solid $border-color;
     padding: ($baseline * 5/2) ($baseline * 2);
     -webkit-transition: height ease-out;
     transition: height ease-out;
@@ -61,6 +47,15 @@
     .verification-desc-panel {
       color: $black-t3;
       position: relative;
+
+      h2 {
+        font-size: 1.5rem;
+        font-weight: $font-weight-bold;
+      }
+
+      h3 {
+        font-size: 1.25rem;
+      }
 
       @media (max-width: 960px) {
         .mini-cert {
@@ -71,19 +66,10 @@
 
       .mini-cert {
         @include right($baseline);
+
         position: absolute;
         top: $baseline;
         width: ($baseline * 13);
-      }
-
-      h2 {
-        font-size: 1.5rem;
-        font-weight: 700;
-      }
-
-      h4 {
-        font-size: 1.25rem;
-        font-weight: 600;
       }
 
       .learner-story-container {
@@ -96,7 +82,7 @@
           width: ($baseline * 5/2);
         }
 
-        .story-quote > .author{
+        .story-quote > .author {
           display: block;
           margin-top: ($baseline / 4);
           font-weight: 600;
@@ -110,10 +96,17 @@
       .action-upgrade-certificate {
         position: absolute;
         right: $baseline;
-        background-color: $success-color;
-        border-color: $success-color;
+        background-color: theme-color("success");
+        border-color: theme-color("success");
+        color: theme-color("inverse");
         background-image: none;
         box-shadow: none;
+        cursor: pointer;
+
+        &:hover {
+          background-color: theme-color("inverse");
+          color: theme-color("success");
+        }
 
         @media (max-width: 960px) {
           & {
@@ -135,15 +128,11 @@
 
           &.attached {
             @include right($baseline);
+
             position: fixed;
             bottom: $baseline;
             top: auto;
           }
-        }
-
-        &:hover {
-          background-color: $success-color-hover;
-          border-color: $success-color-hover;
         }
       }
     }
@@ -161,10 +150,10 @@
       top: (-1 * $baseline * 5/4);
 
       &:not(.active) {
-        color: $button-bg-hover-color;
-        background-color: $success-color;
+        color: theme-color("inverse");
+        background-color: theme-color("success");
         box-shadow: none;
-        border: 1px solid $success-color;
+        border: 1px solid theme-color("success");
 
         &:hover {
           background-color: $success-color-hover;
@@ -174,7 +163,7 @@
 
     .verification-main-panel {
       border-top: 0;
-      border-bottom: 1px solid $lms-border-color;
+      border-bottom: 1px solid $border-color;
     }
   }
 }

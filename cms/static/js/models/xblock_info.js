@@ -159,7 +159,15 @@ function(Backbone, _, str, ModuleUtils) {
              * some additional fields that are not stored in the course descriptor
              * (for example, which groups are selected for this particular XBlock).
              */
-            user_partitions: null
+            user_partitions: null,
+            /**
+             * This xBlock's Highlights to message to learners.
+             */
+            highlights: [],
+            highlights_enabled: false,
+            highlights_enabled_for_messaging: false,
+            highlights_preview_only: true,
+            highlights_doc_url: ''
         },
 
         initialize: function() {

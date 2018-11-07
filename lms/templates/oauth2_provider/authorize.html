@@ -27,6 +27,16 @@
                                 <li>{{ scope }}</li>
                             {% endfor %}
                         </ul>
+
+                        {% if content_orgs %}
+                            <p>{% trans "These permissions will be granted for data from your courses associated with the following content providers:" %}</p>
+                            <ul>
+                                {% for org_name in content_orgs %}
+                                    <li>{{ org_name }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+
                         <p>{% trans "Please click the 'Allow' button to grant these permissions to the above application. Otherwise, to withhold these permissions, please click the 'Cancel' button." %}
                         </p>
 

@@ -72,4 +72,4 @@
 
         });
     });
-})(define || RequireJS.define);
+}(define || RequireJS.define));

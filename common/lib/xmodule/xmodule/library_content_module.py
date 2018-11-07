@@ -3,6 +3,7 @@
 LibraryContent: The XBlock used to include blocks from a library in a course.
 """
 import json
+import logging
 import random
 from copy import copy
 from gettext import ngettext
@@ -11,10 +12,11 @@ from lazy import lazy
 from lxml import etree
 from opaque_keys.edx.locator import LibraryLocator
 from pkg_resources import resource_string
+from six import text_type
+from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.core import XBlock
-from xblock.fields import Boolean, Integer, List, Scope, String
-from xblock.fragment import Fragment
+from xblock.fields import Integer, List, Scope, String
 
 from capa.responsetypes import registry
 from xmodule.studio_editable import StudioEditableDescriptor, StudioEditableModule
@@ -27,6 +29,8 @@ from .xml_module import XmlDescriptor
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
+
+logger = logging.getLogger(__name__)
 
 ANY_CAPA_TYPE_VALUE = 'any'
 
@@ -148,10 +152,13 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
             'overlimit' (set) of dropped (block_type, block_id) tuples that were previously selected
             'added' (set) of newly added (block_type, block_id) tuples
         """
+        rand = random.Random()
+
         selected = set(tuple(k) for k in selected)  # set of (block_type, block_id) tuples assigned to this student
 
         # Determine which of our children we will show:
         valid_block_keys = set([(c.block_type, c.block_id) for c in children])
+
         # Remove any selected blocks that are no longer valid:
         invalid_block_keys = (selected - valid_block_keys)
         if invalid_block_keys:
@@ -159,8 +166,10 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
 
         # If max_count has been decreased, we may have to drop some previously selected blocks:
         overlimit_block_keys = set()
-        while len(selected) > max_count:
-            overlimit_block_keys.add(selected.pop())
+        if len(selected) > max_count:
+            num_to_remove = len(selected) - max_count
+            overlimit_block_keys = set(rand.sample(selected, num_to_remove))
+            selected -= overlimit_block_keys
 
         # Do we have enough blocks now?
         num_to_add = max_count - len(selected)
@@ -171,18 +180,47 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
             pool = valid_block_keys - selected
             if mode == "random":
                 num_to_add = min(len(pool), num_to_add)
-                added_block_keys = set(random.sample(pool, num_to_add))
+                added_block_keys = set(rand.sample(pool, num_to_add))
                 # We now have the correct n random children to show for this user.
             else:
                 raise NotImplementedError("Unsupported mode.")
             selected |= added_block_keys
-
+        # TODO: used for temporary logging for EDUCATOR-1290
+        cls._log_if_mit_supply_chain(
+            valid_block_keys, selected, invalid_block_keys, overlimit_block_keys, added_block_keys, children
+        )
         return {
             'selected': selected,
             'invalid': invalid_block_keys,
             'overlimit': overlimit_block_keys,
             'added': added_block_keys,
         }
+
+    @staticmethod
+    def _log_if_mit_supply_chain(
+            valid_block_keys, selected, invalid_block_keys, overlimit_block_keys, added_block_keys, children
+    ):
+        """
+        Helper method to debug case where random block_keys are not assigned for particular courses.
+        TODO: Delete this before closing EDUCATOR-1290
+        """
+        if not selected:
+            return
+        course_key = ''
+        if children:
+            course_key = children[0].course_key
+        if selected and "MITx+CTL" in text_type(course_key):
+            logger.info(
+                "EDUCATOR-1290: LibraryContentModule.make_selection executed for course {0}: "
+                "valid_block_keys: {1} | selected: {2} | invalid: {3} | overlimit: {4} | added: {5}".format(
+                    text_type(course_key),
+                    valid_block_keys,
+                    selected,
+                    invalid_block_keys,
+                    overlimit_block_keys,
+                    added_block_keys
+                )
+            )
 
     def _publish_event(self, event_name, result, **kwargs):
         """
@@ -303,9 +341,9 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
         for child in self._get_selected_child_blocks():
             for displayable in child.displayable_items():
                 rendered_child = displayable.render(STUDENT_VIEW, child_context)
-                fragment.add_frag_resources(rendered_child)
+                fragment.add_fragment_resources(rendered_child)
                 contents.append({
-                    'id': displayable.location.to_deprecated_string(),
+                    'id': text_type(displayable.location),
                     'content': rendered_child.content,
                 })
 
@@ -313,6 +351,8 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
             'items': contents,
             'xblock_context': context,
             'show_bookmark_button': False,
+            'watched_completable_blocks': set(),
+            'completion_delay_ms': None,
         }))
         return fragment
 
@@ -369,7 +409,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
 
     module_class = LibraryContentModule
     mako_template = 'widgets/metadata-edit.html'
-    js = {'coffee': [resource_string(__name__, 'js/src/vertical/edit.coffee')]}
+    js = {'js': [resource_string(__name__, 'js/src/vertical/edit.js')]}
     js_module_name = "VerticalDescriptor"
 
     show_in_read_only_mode = True
@@ -624,7 +664,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         ]
         definition = {
             attr_name: json.loads(attr_value)
-            for attr_name, attr_value in xml_object.attrib
+            for attr_name, attr_value in xml_object.attrib.items()
         }
         return definition, children
 
@@ -634,9 +674,45 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         for child in self.get_children():
             self.runtime.add_block_as_child_node(child, xml_object)
         # Set node attributes based on our fields.
-        for field_name, field in self.fields.iteritems():
+        for field_name, field in self.fields.iteritems():  # pylint: disable=no-member
             if field_name in ('children', 'parent', 'content'):
                 continue
             if field.is_set_on(self):
                 xml_object.set(field_name, unicode(field.read_from(self)))
         return xml_object
+
+
+class LibrarySummary(object):
+    """
+    A library summary object which contains the fields required for library listing on studio.
+    """
+
+    def __init__(self, library_locator, display_name):
+        """
+        Initialize LibrarySummary
+
+        Arguments:
+        library_locator (LibraryLocator):  LibraryLocator object of the library.
+
+        display_name (unicode): display name of the library.
+        """
+        self.display_name = display_name if display_name else _(u"Empty")
+
+        self.id = library_locator  # pylint: disable=invalid-name
+        self.location = library_locator.make_usage_key('library', 'library')
+
+    @property
+    def display_org_with_default(self):
+        """
+        Org display names are not implemented. This just provides API compatibility with CourseDescriptor.
+        Always returns the raw 'org' field from the key.
+        """
+        return self.location.library_key.org
+
+    @property
+    def display_number_with_default(self):
+        """
+        Display numbers are not implemented. This just provides API compatibility with CourseDescriptor.
+        Always returns the raw 'library' field from the key.
+        """
+        return self.location.library_key.library

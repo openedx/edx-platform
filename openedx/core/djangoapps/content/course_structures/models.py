@@ -6,9 +6,9 @@ import logging
 
 from collections import OrderedDict
 from model_utils.models import TimeStampedModel
+from opaque_keys.edx.django.models import CourseKeyField, UsageKey
 
 from util.models import CompressedTextField
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, UsageKey
 
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name

@@ -1,115 +1,103 @@
-(function(define) {
-    'use strict';
+/* globals gettext */
 
-    define(['backbone',
-            'jquery',
-            'underscore',
-            'gettext',
-            'text!../../../templates/learner_dashboard/program_card.underscore',
-            'picturefill'
-           ],
-         function(
-             Backbone,
-             $,
-             _,
-             gettext,
-             programCardTpl,
-             picturefill
-         ) {
-             return Backbone.View.extend({
+import Backbone from 'backbone';
+import picturefill from 'picturefill';
 
-                 className: 'program-card',
+import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
 
-                 attributes: function() {
-                     return {
-                         'aria-labelledby': 'program-' + this.model.get('uuid'),
-                         'role': 'group'
-                     };
-                 },
+import programCardTpl from '../../../templates/learner_dashboard/program_card.underscore';
 
-                 tpl: _.template(programCardTpl),
+class ProgramCardView extends Backbone.View {
+  constructor(options) {
+    const defaults = {
+      className: 'program-card',
+      attributes: function attr() {
+        return {
+          'aria-labelledby': `program-${this.model.get('uuid')}`,
+          role: 'group',
+        };
+      },
+    };
+    super(Object.assign({}, defaults, options));
+  }
 
-                 initialize: function(data) {
-                     this.progressCollection = data.context.progressCollection;
-                     if (this.progressCollection) {
-                         this.progressModel = this.progressCollection.findWhere({
-                             uuid: this.model.get('uuid')
-                         });
-                     }
-                     this.render();
-                 },
+  initialize(data) {
+    this.tpl = HtmlUtils.template(programCardTpl);
+    this.progressCollection = data.context.progressCollection;
+    if (this.progressCollection) {
+      this.progressModel = this.progressCollection.findWhere({
+        uuid: this.model.get('uuid'),
+      });
+    }
+    this.render();
+  }
 
-                 render: function() {
-                     var orgList = _.map(this.model.get('authoring_organizations'), function(org) {
-                             return gettext(org.key);
-                         }),
-                         data = $.extend(
-                            this.model.toJSON(),
-                            this.getProgramProgress(),
-                            {orgList: orgList.join(' ')}
-                        );
-
-                     this.$el.html(this.tpl(data));
-                     this.postRender();
-                 },
-
-                 postRender: function() {
-                     if (navigator.userAgent.indexOf('MSIE') !== -1 ||
-                        navigator.appVersion.indexOf('Trident/') > 0) {
-                        /* Microsoft Internet Explorer detected in. */
-                         window.setTimeout(function() {
-                             this.reLoadBannerImage();
-                         }.bind(this), 100);
-                     }
-                 },
-
-                // Calculate counts for progress and percentages for styling
-                 getProgramProgress: function() {
-                     var progress = this.progressModel ? this.progressModel.toJSON() : false;
-
-                     if (progress) {
-
-                         progress.total = progress.completed +
-                                          progress.in_progress +
-                                          progress.not_started;
-
-                         progress.percentage = {
-                             completed: this.getWidth(progress.completed, progress.total),
-                             in_progress: this.getWidth(progress.in_progress, progress.total)
-                         };
-                     }
-
-                     return {
-                         progress: progress
-                     };
-                 },
-
-                 getWidth: function(val, total) {
-                     var int = (val / total) * 100;
-
-                     return int + '%';
-                 },
-
-                // Defer loading the rest of the page to limit FOUC
-                 reLoadBannerImage: function() {
-                     var $img = this.$('.program_card .banner-image'),
-                         imgSrcAttr = $img ? $img.attr('src') : {};
-
-                     if (!imgSrcAttr || imgSrcAttr.length < 0) {
-                         try {
-                             this.reEvaluatePicture();
-                         } catch (err) {
-                            // Swallow the error here
-                         }
-                     }
-                 },
-
-                 reEvaluatePicture: function() {
-                     picturefill({
-                         reevaluate: true
-                     });
-                 }
-             });
-         }
+  render() {
+    const orgList = this.model.get('authoring_organizations').map(org => gettext(org.key));
+    const data = $.extend(
+      this.model.toJSON(),
+      this.getProgramProgress(),
+      { orgList: orgList.join(' ') },
     );
-}).call(this, define || RequireJS.define);
+
+    HtmlUtils.setHtml(this.$el, this.tpl(data));
+    this.postRender();
+  }
+
+  postRender() {
+    if (navigator.userAgent.indexOf('MSIE') !== -1 ||
+        navigator.appVersion.indexOf('Trident/') > 0) {
+      /* Microsoft Internet Explorer detected in. */
+      window.setTimeout(() => {
+        this.reLoadBannerImage();
+      }, 100);
+    }
+  }
+
+  // Calculate counts for progress and percentages for styling
+  getProgramProgress() {
+    const progress = this.progressModel ? this.progressModel.toJSON() : false;
+
+    if (progress) {
+      progress.total = progress.completed +
+        progress.in_progress +
+        progress.not_started;
+
+      progress.percentage = {
+        completed: ProgramCardView.getWidth(progress.completed, progress.total),
+        in_progress: ProgramCardView.getWidth(progress.in_progress, progress.total),
+      };
+    }
+
+    return {
+      progress,
+    };
+  }
+
+  static getWidth(val, total) {
+    const int = (val / total) * 100;
+    return `${int}%`;
+  }
+
+  // Defer loading the rest of the page to limit FOUC
+  reLoadBannerImage() {
+    const $img = this.$('.program_card .banner-image');
+    const imgSrcAttr = $img ? $img.attr('src') : {};
+
+    if (!imgSrcAttr || imgSrcAttr.length < 0) {
+      try {
+        ProgramCardView.reEvaluatePicture();
+      } catch (err) {
+        // Swallow the error here
+      }
+    }
+  }
+
+  static reEvaluatePicture() {
+    picturefill({
+      reevaluate: true,
+    });
+  }
+}
+
+export default ProgramCardView;

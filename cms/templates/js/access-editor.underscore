@@ -4,7 +4,7 @@
         <div class="modal-section-content gating-prereq">
             <ul class="list-fields list-input">
                 <p class="field-message">
-                    <%- gettext('Select a prerequisite subsection and enter a minimum score percentage to limit access to this subsection.') %>
+                    <%- gettext('Select a prerequisite subsection and enter a minimum score percentage and minimum completion percentage to limit access to this subsection. Allowed values are 0-100') %>
                 </p>
                 <li class="field field-select">
                     <label class="label">
@@ -18,14 +18,25 @@
                     </label>
                 </li>
                 <li id="prereq_min_score_input" class="field field-input input-cosmetic">
-                    <label class="label">
+                    <label for="prereq_min_score">
                         <%- gettext('Minimum Score:') %>
-                        <input type="text" id="prereq_min_score" name="prereq_min_score" class="input input-text" size="3" />
                     </label>
+                    <input type="number" id="prereq_min_score" aria-describedby="msp" class="input input-text percentage" min="0" max="100" />
+                    <span id="msp">%</span>
                 </li>
-                <div id="prereq_min_score_error" class="message-status error">
+                <li id="prereq_min_completion_input" class="field field-input input-cosmetic">
+                    <label for="prereq_min_completion">
+                        <%- gettext('Minimum Completion:') %>
+                    </label>
+                    <input type="number" id="prereq_min_completion" aria-describedby="mcp" class="input input-text percentage" min="0" max="100" />
+                    <span id="mcp">%</span>
+                </li>
+                <li id="prereq_min_score_error" class="message-status error">
                     <%- gettext('The minimum score percentage must be a whole number between 0 and 100.') %>
-                </div>
+                </li>
+                <li id="prereq_min_completion_error" class="message-status error">
+                    <%- gettext('The minimum completion percentage must be a whole number between 0 and 100.') %>
+                </li>
             </ul>
         </div>
     <% } %>

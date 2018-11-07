@@ -17,7 +17,7 @@ SUBSECTION_NAME = 'Test Subsection'
 UNIT_NAME = 'Test Unit'
 
 
-@attr(shard=5)
+@attr(shard=17)
 @ddt.ddt
 class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest, TestWithSearchIndexMixin):
     """

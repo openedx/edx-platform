@@ -1,6 +1,8 @@
 """
 Tests for the Badges app models.
 """
+import pytest
+from path import Path
 from django.core.exceptions import ValidationError
 from django.core.files.images import ImageFile
 from django.core.files.storage import default_storage
@@ -18,7 +20,7 @@ from badges.models import (
     validate_badge_image
 )
 from badges.tests.factories import BadgeAssertionFactory, BadgeClassFactory, RandomBadgeClassFactory
-from certificates.tests.test_models import TEST_DATA_ROOT
+from lms.djangoapps.certificates.tests.test_models import TEST_DATA_ROOT
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -32,10 +34,14 @@ def get_image(name):
 
 
 @attr(shard=1)
+@override_settings(MEDIA_ROOT=TEST_DATA_ROOT)
 class BadgeImageConfigurationTest(TestCase):
     """
     Test the validation features of BadgeImageConfiguration.
     """
+    def tearDown(self):
+        tmp_path = Path(TEST_DATA_ROOT / 'course_complete_badges')
+        Path.rmtree_p(tmp_path)
 
     def test_no_double_default(self):
         """
@@ -64,6 +70,7 @@ class DummyBackend(object):
     award = Mock()
 
 
+@override_settings(MEDIA_ROOT=TEST_DATA_ROOT)
 class BadgeClassTest(ModuleStoreTestCase):
     """
     Test BadgeClass functionality
@@ -155,7 +162,7 @@ class BadgeClassTest(ModuleStoreTestCase):
         self.assertEqual(badge_class.description, 'This is a test')
         self.assertEqual(badge_class.criteria, 'https://example.com/test_criteria')
         self.assertEqual(badge_class.display_name, 'Super Badge')
-        self.assertEqual(badge_class.image.name.rsplit('/', 1)[-1], 'good.png')
+        self.assertTrue('good' in badge_class.image.name.rsplit('/', 1)[-1])
 
     def test_get_badge_class_nocreate(self):
         """

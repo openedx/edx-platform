@@ -1,7 +1,8 @@
 """
 Tests for course welcome messages.
 """
-from django.core.urlresolvers import reverse
+import ddt
+from django.urls import reverse
 
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
@@ -27,6 +28,18 @@ def welcome_message_url(course):
     )
 
 
+def latest_update_url(course):
+    """
+    Returns the URL for the latest update view.
+    """
+    return reverse(
+        'openedx.course_experience.latest_update_fragment_view',
+        kwargs={
+            'course_id': unicode(course.id),
+        }
+    )
+
+
 def dismiss_message_url(course):
     """
     Returns the URL for the dismiss message endpoint.
@@ -39,9 +52,12 @@ def dismiss_message_url(course):
     )
 
 
+@ddt.ddt
 class TestWelcomeMessageView(ModuleStoreTestCase):
     """
     Tests for the course welcome message fragment view.
+
+    Also tests the LatestUpdate view because the functionality is similar.
     """
     def setUp(self):
         """Set up the simplest course possible, then set up and enroll our fake user in the course."""
@@ -61,30 +77,35 @@ class TestWelcomeMessageView(ModuleStoreTestCase):
         remove_course_updates(self.user, self.course)
         super(TestWelcomeMessageView, self).tearDown()
 
-    def test_welcome_message(self):
+    @ddt.data(welcome_message_url, latest_update_url)
+    def test_message_display(self, url_generator):
         create_course_update(self.course, self.user, 'First Update', date='January 1, 2000')
         create_course_update(self.course, self.user, 'Second Update', date='January 1, 2017')
         create_course_update(self.course, self.user, 'Retroactive Update', date='January 1, 2010')
-        response = self.client.get(welcome_message_url(self.course))
+        response = self.client.get(url_generator(self.course))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Second Update')
         self.assertContains(response, 'Dismiss')
 
-    def test_replace_urls(self):
+    @ddt.data(welcome_message_url, latest_update_url)
+    def test_replace_urls(self, url_generator):
         img_url = 'img.png'
         create_course_update(self.course, self.user, "<img src='/static/{url}'>".format(url=img_url))
-        response = self.client.get(welcome_message_url(self.course))
-        self.assertContains(response, "/asset-v1:{org}+{course}+{run}+type@asset+block/img.png".format(
+        response = self.client.get(url_generator(self.course))
+        self.assertContains(response, "/asset-v1:{org}+{course}+{run}+type@asset+block/{url}".format(
             org=self.course.id.org,
             course=self.course.id.course,
-            run=self.course.id.run
+            run=self.course.id.run,
+            url=img_url,
         ))
 
-    def test_empty_welcome_message(self):
-        response = self.client.get(welcome_message_url(self.course))
+    @ddt.data(welcome_message_url, latest_update_url)
+    def test_empty_message(self, url_generator):
+        response = self.client.get(url_generator(self.course))
         self.assertEqual(response.status_code, 204)
 
-    def test_dismiss_message(self):
+    def test_dismiss_welcome_message(self):
+        # Latest update is dimssed in JS and has no server/backend component.
         create_course_update(self.course, self.user, 'First Update', date='January 1, 2017')
 
         response = self.client.get(welcome_message_url(self.course))

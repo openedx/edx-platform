@@ -15,20 +15,7 @@ from openedx.core.djangolib.markup import HTML, Text
           <span class="sr">Notice</span>
           ${_("Activate your account!")}
         </span>
-        <p class="status-note">${Text(_(
-          "Check your {email_start}{email}{email_end} inbox for an account activation link from {platform_name}. "
-          "If you need help, contact {link_start}{platform_name} Support{link_end}."
-        )).format(
-          platform_name=platform_name,
-          email_start=HTML("<strong>"),
-          email_end=HTML("</strong>"),
-          email=email,
-          link_start=HTML("<a target='_blank' href='{activation_email_support_link}'>").format(
-            activation_email_support_link=activation_email_support_link,
-          ),
-          link_end=HTML("</a>"),
-        )}
-        </p>
+        <p class="status-note">${ activate_account_message | n, decode.utf8 }</p>
         ## TODO: Add resend activation email functionality.
         ## TODO: Implementation of this is part of ENT-353.
         ## <button class="btn btn-neutral"><i class="fa fa-envelope-o"></i> Resend Activation Email </button>

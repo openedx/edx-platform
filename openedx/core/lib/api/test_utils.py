@@ -24,11 +24,18 @@ class ApiTestCase(TestCase):
         return {'HTTP_AUTHORIZATION': 'Basic ' + base64.b64encode('%s:%s' % (username, password))}
 
     def request_with_auth(self, method, *args, **kwargs):
-        """Issue a get request to the given URI with the API key header"""
+        """Issue a request to the given URI with the API key header"""
         return getattr(self.client, method)(*args, HTTP_X_EDX_API_KEY=TEST_API_KEY, **kwargs)
 
+    def request_without_auth(self, method, *args, **kwargs):
+        """
+        Issue a request to the given URI without the API key header. This may be useful if you'll be calling
+        an endpoint from javascript code and want to avoid exposing our API key.
+        """
+        return getattr(self.client, method)(*args, **kwargs)
+
     def get_json(self, *args, **kwargs):
-        """Make a request with the given args and return the parsed JSON repsonse"""
+        """Make a request with the given args and return the parsed JSON response"""
         resp = self.request_with_auth("get", *args, **kwargs)
         self.assertHttpOK(resp)
         self.assertTrue(resp["Content-Type"].startswith("application/json"))
@@ -51,6 +58,10 @@ class ApiTestCase(TestCase):
     def assertHttpOK(self, response):
         """Assert that the given response has the status code 200"""
         self.assertEqual(response.status_code, 200)
+
+    def assertHttpCreated(self, response):
+        """Assert that the given response has the status code 201"""
+        self.assertEqual(response.status_code, 201)
 
     def assertHttpForbidden(self, response):
         """Assert that the given response has the status code 403"""

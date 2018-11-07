@@ -2,6 +2,7 @@
 This module creates a sysadmin dashboard for managing and viewing
 courses.
 """
+from __future__ import absolute_import
 import unicodecsv as csv
 import json
 import logging
@@ -26,8 +27,9 @@ from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import condition
 from django.views.generic.base import TemplateView
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 from path import Path as path
+from six import text_type
 
 import dashboard.git_import as git_import
 import track.views
@@ -36,7 +38,7 @@ from dashboard.git_import import GitImportError
 from dashboard.models import CourseImportLog
 from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
-from openedx.core.djangoapps.external_auth.views import generate_password
+from openedx.core.djangoapps.user_api.accounts.utils import generate_password
 from student.models import CourseEnrollment, Registration, UserProfile
 from student.roles import CourseInstructorRole, CourseStaffRole
 from xmodule.modulestore.django import modulestore
@@ -126,7 +128,7 @@ class Users(SysadminDashboardView):
                 continue
             try:
                 testuser = authenticate(username=euser.username, password=epass)
-            except (TypeError, PermissionDenied, AttributeError), err:
+            except (TypeError, PermissionDenied, AttributeError) as err:
                 # Translators: This message means that the user could not be authenticated (that is, we could
                 # not log them in for some reason - maybe they don't have permission, or their password was wrong)
                 msg += _('Failed in authenticating {username}, error {error}\n').format(
@@ -234,13 +236,13 @@ class Users(SysadminDashboardView):
         if '@' in uname:
             try:
                 user = User.objects.get(email=uname)
-            except User.DoesNotExist, err:
+            except User.DoesNotExist as err:
                 msg = _('Cannot find user with email address {email_addr}').format(email_addr=uname)
                 return msg
         else:
             try:
                 user = User.objects.get(username=uname)
-            except User.DoesNotExist, err:
+            except User.DoesNotExist as err:
                 msg = _('Cannot find user with username {username} - {error}').format(
                     username=uname,
                     error=str(err)
@@ -265,7 +267,7 @@ class Users(SysadminDashboardView):
         self.msg += u'<ol>'
         for course in self.get_courses():
             self.msg += u'<li>{0} ({1})</li>'.format(
-                escape(course.id.to_deprecated_string()), course.location.to_deprecated_string())
+                escape(text_type(course.id)), text_type(course.location))
         self.msg += u'</ol>'
 
     def get(self, request):
@@ -427,7 +429,7 @@ class Courses(SysadminDashboardView):
 
         for course in self.get_courses():
             gdir = course.id.course
-            data.append([course.display_name, course.id.to_deprecated_string()]
+            data.append([course.display_name, text_type(course.id)]
                         + self.git_info_for_course(gdir))
 
         return dict(header=[_('Course Name'),
@@ -472,7 +474,7 @@ class Courses(SysadminDashboardView):
 
         elif action == 'del_course':
             course_id = request.POST.get('course_id', '').strip()
-            course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+            course_key = CourseKey.from_string(course_id)
             course_found = False
             if course_key in courses:
                 course_found = True
@@ -481,7 +483,7 @@ class Courses(SysadminDashboardView):
                 try:
                     course = get_course_by_id(course_key)
                     course_found = True
-                except Exception, err:   # pylint: disable=broad-except
+                except Exception as err:   # pylint: disable=broad-except
                     self.msg += _(
                         'Error - cannot get course with ID {0}<br/><pre>{1}</pre>'
                     ).format(
@@ -495,7 +497,7 @@ class Courses(SysadminDashboardView):
                 # don't delete user permission groups, though
                 self.msg += \
                     u"<font color='red'>{0} {1} = {2} ({3})</font>".format(
-                        _('Deleted'), course.location.to_deprecated_string(), course.id.to_deprecated_string(), course.display_name)
+                        _('Deleted'), text_type(course.location), text_type(course.id), course.display_name)
 
         context = {
             'datatable': self.make_datatable(),
@@ -558,7 +560,7 @@ class Staffing(SysadminDashboardView):
                 for role in roles:
                     for user in role(course.id).users_with_role():
                         datum = [course.id, role, user.username, user.email,
-                                 user.profile.name]
+                                 user.profile.name.encode('utf-8')]
                         data.append(datum)
             header = [_('course_id'),
                       _('role'), _('username'),
@@ -584,7 +586,7 @@ class GitLogs(TemplateView):
 
         course_id = kwargs.get('course_id')
         if course_id:
-            course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+            course_id = CourseKey.from_string(course_id)
 
         page_size = 10
 
@@ -653,7 +655,7 @@ class GitLogs(TemplateView):
         mdb.disconnect()
         context = {
             'logs': logs,
-            'course_id': course_id.to_deprecated_string() if course_id else None,
+            'course_id': text_type(course_id) if course_id else None,
             'error_msg': error_msg,
             'page_size': page_size
         }

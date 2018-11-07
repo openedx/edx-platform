@@ -28,13 +28,13 @@ class Registry(object):
         Helper method that returns a generator used to iterate over all providers
         of the current site.
         """
-        oauth2_slugs = OAuth2ProviderConfig.key_values('provider_slug', flat=True)
+        oauth2_slugs = OAuth2ProviderConfig.key_values('slug', flat=True)
         for oauth2_slug in oauth2_slugs:
             provider = OAuth2ProviderConfig.current(oauth2_slug)
             if provider.enabled_for_current_site and provider.backend_name in _PSA_OAUTH2_BACKENDS:
                 yield provider
-        if SAMLConfiguration.is_enabled(Site.objects.get_current(get_current_request())):
-            idp_slugs = SAMLProviderConfig.key_values('idp_slug', flat=True)
+        if SAMLConfiguration.is_enabled(Site.objects.get_current(get_current_request()), 'default'):
+            idp_slugs = SAMLProviderConfig.key_values('slug', flat=True)
             for idp_slug in idp_slugs:
                 provider = SAMLProviderConfig.current(idp_slug)
                 if provider.enabled_for_current_site and provider.backend_name in _PSA_SAML_BACKENDS:
@@ -71,6 +71,8 @@ class Registry(object):
     @classmethod
     def get(cls, provider_id):
         """Gets provider by provider_id string if enabled, else None."""
+        if not provider_id:
+            return None
         if '-' not in provider_id:  # Check format - see models.py:ProviderConfig
             raise ValueError("Invalid provider_id. Expect something like oa2-google")
         try:
@@ -110,14 +112,14 @@ class Registry(object):
             Instances of ProviderConfig.
         """
         if backend_name in _PSA_OAUTH2_BACKENDS:
-            oauth2_slugs = OAuth2ProviderConfig.key_values('provider_slug', flat=True)
+            oauth2_slugs = OAuth2ProviderConfig.key_values('slug', flat=True)
             for oauth2_slug in oauth2_slugs:
                 provider = OAuth2ProviderConfig.current(oauth2_slug)
                 if provider.backend_name == backend_name and provider.enabled_for_current_site:
                     yield provider
         elif backend_name in _PSA_SAML_BACKENDS and SAMLConfiguration.is_enabled(
-                Site.objects.get_current(get_current_request())):
-            idp_names = SAMLProviderConfig.key_values('idp_slug', flat=True)
+                Site.objects.get_current(get_current_request()), 'default'):
+            idp_names = SAMLProviderConfig.key_values('slug', flat=True)
             for idp_name in idp_names:
                 provider = SAMLProviderConfig.current(idp_name)
                 if provider.backend_name == backend_name and provider.enabled_for_current_site:

@@ -1,8 +1,12 @@
-(function(undefined) {
+/* global _, WAIT_TIMEOUT */
+
+(function() {
+    'use strict';
+
     describe('VideoCaption', function() {
         var state, oldOTBD;
         var parseIntAttribute = function(element, attrName) {
-            return parseInt(element.attr(attrName));
+            return parseInt(element.attr(attrName), 10);
         };
 
         beforeEach(function() {
@@ -42,10 +46,10 @@
                     $('.video .toggle-captions').trigger('click');
 
                     expect($('.video .subtitles-menu')).toHaveAttrs({
-                        'lang': 'en'
+                        lang: 'en'
                     });
                     expect($('.video .closed-captions')).toHaveAttrs({
-                        'lang': 'en'
+                        lang: 'en'
                     });
                 });
 
@@ -55,9 +59,10 @@
                 });
 
                 it('add ARIA attributes to transcript control', function() {
+                    var $captionControl;
                     state = jasmine.initializePlayer();
-                    var captionControl = $('.toggle-transcript');
-                    expect(captionControl).toHaveAttrs({
+                    $captionControl = $('.toggle-transcript');
+                    expect($captionControl).toHaveAttrs({
                         'aria-disabled': 'false'
                     });
                 });
@@ -149,9 +154,10 @@
             });
 
             it('can destroy itself', function() {
+                var plugin;
                 spyOn($, 'ajaxWithPrefix');
                 state = jasmine.initializePlayer();
-                var plugin = state.videoCaption;
+                plugin = state.videoCaption;
 
                 spyOn($.fn, 'off').and.callThrough();
                 state.videoCaption.destroy();
@@ -161,11 +167,11 @@
                     'caption:fetch': plugin.fetchCaption,
                     'caption:resize': plugin.onResize,
                     'caption:update': plugin.onCaptionUpdate,
-                    'ended': plugin.pause,
-                    'fullscreen': plugin.onResize,
-                    'pause': plugin.pause,
-                    'play': plugin.play,
-                    'destroy': plugin.destroy
+                    ended: plugin.pause,
+                    fullscreen: plugin.onResize,
+                    pause: plugin.pause,
+                    play: plugin.play,
+                    destroy: plugin.destroy
                 });
             });
 
@@ -224,16 +230,17 @@
                         };
 
                     it('if languages more than 1', function() {
+                        var transcripts, langCodes, langLabels;
                         state = jasmine.initializePlayer();
-                        var transcripts = state.config.transcriptLanguages,
-                            langCodes = _.keys(transcripts),
-                            langLabels = _.values(transcripts);
+                        transcripts = state.config.transcriptLanguages;
+                        langCodes = _.keys(transcripts);
+                        langLabels = _.values(transcripts);
 
                         expect($('.langs-list')).toExist();
                         expect($('.langs-list')).toHandle('click');
 
 
-                        $('.langs-list li').each(function(index) {
+                        $('.langs-list li').each(function() {
                             var code = $(this).data('lang-code'),
                                 link = $(this).find('.control'),
                                 label = link.text();
@@ -244,15 +251,16 @@
                     });
 
                     it('when clicking on link with new language', function() {
+                        var Caption, $link;
                         state = jasmine.initializePlayer();
-                        var Caption = state.videoCaption,
-                            link = $('.langs-list li[data-lang-code="de"] .control-lang');
+                        Caption = state.videoCaption;
+                        $link = $('.langs-list li[data-lang-code="de"] .control-lang');
 
                         spyOn(Caption, 'fetchCaption');
                         spyOn(state.storage, 'setItem');
 
                         state.lang = 'en';
-                        link.trigger('click');
+                        $link.trigger('click');
 
                         expect(Caption.fetchCaption).toHaveBeenCalled();
                         expect(state.lang).toBe('de');
@@ -260,31 +268,33 @@
                             .toHaveBeenCalledWith('language', 'de');
                         expect($('.langs-list li.is-active').length).toBe(1);
                         expect($('.subtitles .subtitles-menu')).toHaveAttrs({
-                            'lang': 'de'
+                            lang: 'de'
                         });
                         expect($('.closed-captions')).toHaveAttrs({
-                            'lang': 'de'
+                            lang: 'de'
                         });
-                        expect(link).toHaveAttr('aria-pressed', 'true');
+                        expect($link).toHaveAttr('aria-pressed', 'true');
                     });
 
                     it('when clicking on link with current language', function() {
+                        var Caption, $link;
+
                         state = jasmine.initializePlayer();
-                        var Caption = state.videoCaption,
-                            link = $('.langs-list li[data-lang-code="en"] .control-lang');
+                        Caption = state.videoCaption;
+                        $link = $('.langs-list li[data-lang-code="en"] .control-lang');
 
                         spyOn(Caption, 'fetchCaption');
                         spyOn(state.storage, 'setItem');
 
                         state.lang = 'en';
-                        link.trigger('click');
+                        $link.trigger('click');
 
                         expect(Caption.fetchCaption).not.toHaveBeenCalled();
                         expect(state.lang).toBe('en');
                         expect(state.storage.setItem)
                             .not.toHaveBeenCalledWith('language', 'en');
                         expect($('.langs-list li.is-active').length).toBe(1);
-                        expect(link).toHaveAttr('aria-pressed', 'true');
+                        expect($link).toHaveAttr('aria-pressed', 'true');
                     });
 
                     it('open the language toggle on hover', function() {
@@ -300,7 +310,11 @@
                         $('.language-menu').focus();
                         $('.language-menu').trigger(keyPressEvent(KEY.UP));
                         expect($('.lang')).toHaveClass('is-opened');
-                        expect($('.langs-list').find('li').last().find('.control-lang')).toBeFocused();
+                        expect($('.langs-list')
+                            .find('li')
+                            .last()
+                            .find('.control-lang'))
+                            .toBeFocused();
                     });
 
                     it('closes the language menu on ESC', function() {
@@ -316,7 +330,7 @@
                 describe('is not rendered', function() {
                     it('if just 1 language', function() {
                         state = jasmine.initializePlayer(null, {
-                            'transcriptLanguages': {'en': 'English'}
+                            transcriptLanguages: {en: 'English'}
                         });
 
                         expect($('.langs-list')).not.toExist();
@@ -445,8 +459,8 @@
             describe('when no transcripts file was specified', function() {
                 beforeEach(function() {
                     state = jasmine.initializePlayer('video_all.html', {
-                        'sub': '',
-                        'transcriptLanguages': {}
+                        sub: '',
+                        transcriptLanguages: {}
                     });
                 });
 
@@ -456,9 +470,10 @@
             });
         });
 
-        var originalClearTimeout;
 
         describe('mouse movement', function() {
+            var originalClearTimeout;
+
             beforeEach(function(done) {
                 jasmine.clock().install();
                 state = jasmine.initializePlayer();
@@ -587,7 +602,7 @@
                     'loaded yet';
             it(msg, function() {
                 Caption.loaded = false;
-                state.hide_captions = false;
+                state.hideCaptions = false;
                 Caption.fetchCaption();
 
                 expect($.ajaxWithPrefix).toHaveBeenCalled();
@@ -595,7 +610,7 @@
 
                 Caption.loaded = false;
                 Caption.hideCaptions.calls.reset();
-                state.hide_captions = true;
+                state.hideCaptions = true;
                 Caption.fetchCaption();
 
                 expect($.ajaxWithPrefix).toHaveBeenCalled();
@@ -698,7 +713,7 @@
 
                 expect(Caption.fetchAvailableTranslations).not.toHaveBeenCalled();
                 expect($.ajaxWithPrefix.calls.mostRecent().args[0].data)
-                    .toEqual({'videoId': 'Z5KLxerq05Y'});
+                    .toEqual({videoId: 'Z5KLxerq05Y'});
                 expect(Caption.hideCaptions.calls.mostRecent().args)
                     .toEqual([true, false]);
                 expect(Caption.fetchCaption.calls.mostRecent().args[0]).toEqual(true);
@@ -719,7 +734,7 @@
 
                 expect(Caption.fetchAvailableTranslations).not.toHaveBeenCalled();
                 expect($.ajaxWithPrefix.calls.mostRecent().args[0].data)
-                    .toEqual({'videoId': 'Z5KLxerq05Y'});
+                    .toEqual({videoId: 'Z5KLxerq05Y'});
                 expect(Caption.hideCaptions).toHaveBeenCalledWith(false);
                 expect(Caption.fetchCaption.calls.mostRecent().args[0]).toEqual(true);
                 expect(Caption.fetchCaption.calls.count()).toEqual(1);
@@ -734,8 +749,8 @@
                     });
 
                 state.config.transcriptLanguages = {
-                    'en': 'English',
-                    'uk': 'Ukrainian'
+                    en: 'English',
+                    uk: 'Ukrainian'
                 };
 
                 spyOn(Caption, 'fetchAvailableTranslations');
@@ -772,28 +787,28 @@
             msg = 'on succes: language menu is rendered if translations available';
             it(msg, function() {
                 state.config.transcriptLanguages = {
-                    'en': 'English',
-                    'uk': 'Ukrainian',
-                    'de': 'German'
+                    en: 'English',
+                    uk: 'Ukrainian',
+                    de: 'German'
                 };
                 Caption.fetchAvailableTranslations();
 
                 expect($.ajaxWithPrefix).toHaveBeenCalled();
                 expect(state.config.transcriptLanguages).toEqual({
-                    'uk': 'Ukrainian',
-                    'de': 'German'
+                    uk: 'Ukrainian',
+                    de: 'German'
                 });
                 expect(Caption.renderLanguageMenu).toHaveBeenCalledWith({
-                    'uk': 'Ukrainian',
-                    'de': 'German'
+                    uk: 'Ukrainian',
+                    de: 'German'
                 });
             });
 
             msg = 'on succes: language menu isn\'t rendered if translations unavailable';
             it(msg, function() {
                 state.config.transcriptLanguages = {
-                    'en': 'English',
-                    'ru': 'Russian'
+                    en: 'English',
+                    ru: 'Russian'
                 };
                 Caption.fetchAvailableTranslations();
 
@@ -957,7 +972,6 @@
                 jasmine.waitUntil(function() {
                     return state.videoCaption.rendered;
                 }).then(function() {
-                    videoControl = state.videoControl;
                     $('.subtitles li span[data-index=1]').addClass('current');
                     state.videoCaption.onResize();
                 }).always(done);

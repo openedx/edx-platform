@@ -33,6 +33,16 @@ class AccountUserAlreadyExists(AccountRequestError):
     pass
 
 
+class AccountUsernameAlreadyExists(AccountRequestError):
+    """User with the same username already exists. """
+    pass
+
+
+class AccountEmailAlreadyExists(AccountRequestError):
+    """User with the same email already exists. """
+    pass
+
+
 class AccountUsernameInvalid(AccountRequestError):
     """The requested username is not in a valid format. """
     pass
@@ -45,6 +55,21 @@ class AccountEmailInvalid(AccountRequestError):
 
 class AccountPasswordInvalid(AccountRequestError):
     """The requested password is not in a valid format. """
+    pass
+
+
+class AccountCountryInvalid(AccountRequestError):
+    """The requested country does not exist. """
+    pass
+
+
+class AccountDataBadLength(AccountRequestError):
+    """The requested account data is either too short or too long. """
+    pass
+
+
+class AccountDataBadType(AccountRequestError):
+    """The requested account data is of the wrong type. """
     pass
 
 

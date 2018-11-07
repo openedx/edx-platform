@@ -8,19 +8,21 @@ import logging
 from collections import OrderedDict
 from functools import partial
 
+from completion.models import BlockCompletion
+from completion import waffle as completion_waffle
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
-from django.core.context_processors import csrf
+from django.template.context_processors import csrf
 from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse
-from django.http import Http404, HttpResponse
+from django.urls import reverse
+from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 from edx_proctoring.services import ProctoringService
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from requests.auth import HTTPBasicAuth
+from six import text_type
 from xblock.core import XBlock
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
@@ -44,12 +46,13 @@ from lms.djangoapps.grades.signals.signals import SCORE_PUBLISHED
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
-from lms.djangoapps.verify_student.services import VerificationService
+from lms.djangoapps.verify_student.services import XBlockVerificationService
 from openedx.core.djangoapps.bookmarks.services import BookmarksService
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.services import CreditService
 from openedx.core.djangoapps.monitoring_utils import set_custom_metrics_for_course_key, set_monitoring_transaction_name
 from openedx.core.djangoapps.util.user_utils import SystemUser
+from openedx.core.lib.gating.services import GatingService
 from openedx.core.lib.license import wrap_with_license
 from openedx.core.lib.url_utils import quote_slashes, unquote_slashes
 from openedx.core.lib.xblock_utils import request_token as xblock_request_token
@@ -65,7 +68,7 @@ from student.roles import CourseBetaTesterRole
 from track import contexts
 from util import milestones_helpers
 from util.json_request import JsonResponse
-from util.model_utils import slugify
+from django.utils.text import slugify
 from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from xblock_django.user_service import DjangoXBlockUserService
 from xmodule.contentstore.django import contentstore
@@ -385,12 +388,23 @@ def get_module_for_descriptor(user, request, descriptor, field_data_cache, cours
     )
 
 
-def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=too-many-statements
-                               # Arguments preceding this comment have user binding, those following don't
-                               descriptor, course_id, track_function, xqueue_callback_url_prefix,
-                               request_token, position=None, wrap_xmodule_display=True, grade_bucket_type=None,
-                               static_asset_path='', user_location=None, disable_staff_debug_info=False,
-                               course=None):
+def get_module_system_for_user(
+        user,
+        student_data,  # TODO  # pylint: disable=too-many-statements
+        # Arguments preceding this comment have user binding, those following don't
+        descriptor,
+        course_id,
+        track_function,
+        xqueue_callback_url_prefix,
+        request_token,
+        position=None,
+        wrap_xmodule_display=True,
+        grade_bucket_type=None,
+        static_asset_path='',
+        user_location=None,
+        disable_staff_debug_info=False,
+        course=None
+):
     """
     Helper function that returns a module system and student_data bound to a user and a descriptor.
 
@@ -418,9 +432,9 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
         relative_xqueue_callback_url = reverse(
             'xqueue_callback',
             kwargs=dict(
-                course_id=course_id.to_deprecated_string(),
+                course_id=text_type(course_id),
                 userid=str(user.id),
-                mod_id=descriptor.location.to_deprecated_string(),
+                mod_id=text_type(descriptor.location),
                 dispatch=dispatch
             ),
         )
@@ -462,17 +476,29 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
             course=course
         )
 
+    def get_event_handler(event_type):
+        """
+        Return an appropriate function to handle the event.
+
+        Returns None if no special processing is required.
+        """
+        handlers = {
+            'grade': handle_grade_event,
+        }
+        if completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
+            handlers.update({
+                'completion': handle_completion_event,
+                'progress': handle_deprecated_progress_event,
+            })
+        return handlers.get(event_type)
+
     def publish(block, event_type, event):
-        """A function that allows XModules to publish events."""
-        if event_type == 'grade' and not is_masquerading_as_specific_student(user, course_id):
-            SCORE_PUBLISHED.send(
-                sender=None,
-                block=block,
-                user=user,
-                raw_earned=event['value'],
-                raw_possible=event['max_value'],
-                only_if_higher=event.get('only_if_higher'),
-            )
+        """
+        A function that allows XModules to publish events.
+        """
+        handle_event = get_event_handler(event_type)
+        if handle_event and not is_masquerading_as_specific_student(user, course_id):
+            handle_event(block, event)
         else:
             context = contexts.course_context_from_course_id(course_id)
             if block.runtime.user_id:
@@ -485,6 +511,63 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
                         context['asides'][aside.scope_ids.block_type] = aside_event_info
             with tracker.get_tracker().context(event_type, context):
                 track_function(event_type, event)
+
+    def handle_completion_event(block, event):
+        """
+        Submit a completion object for the block.
+        """
+        if not completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
+            raise Http404
+        else:
+            BlockCompletion.objects.submit_completion(
+                user=user,
+                course_key=course_id,
+                block_key=block.scope_ids.usage_id,
+                completion=event['completion'],
+            )
+
+    def handle_grade_event(block, event):
+        """
+        Submit a grade for the block.
+        """
+        SCORE_PUBLISHED.send(
+            sender=None,
+            block=block,
+            user=user,
+            raw_earned=event['value'],
+            raw_possible=event['max_value'],
+            only_if_higher=event.get('only_if_higher'),
+            score_deleted=event.get('score_deleted'),
+        )
+
+    def handle_deprecated_progress_event(block, event):
+        """
+        DEPRECATED: Submit a completion for the block represented by the
+        progress event.
+
+        This exists to support the legacy progress extension used by
+        edx-solutions.  New XBlocks should not emit these events, but instead
+        emit completion events directly.
+        """
+        if not completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
+            raise Http404
+        else:
+            requested_user_id = event.get('user_id', user.id)
+            if requested_user_id != user.id:
+                log.warning("{} tried to submit a completion on behalf of {}".format(user, requested_user_id))
+                return
+
+            # If blocks explicitly declare support for the new completion API,
+            # we expect them to emit 'completion' events,
+            # and we ignore the deprecated 'progress' events
+            # in order to avoid duplicate work and possibly conflicting semantics.
+            if not getattr(block, 'has_custom_completion', False):
+                BlockCompletion.objects.submit_completion(
+                    user=user,
+                    course_key=course_id,
+                    block_key=block.scope_ids.usage_id,
+                    completion=1.0,
+                )
 
     def rebind_noauth_module_to_user(module, real_user):
         """
@@ -499,7 +582,7 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
         Returns:
             nothing (but the side effect is that module is re-bound to real_user)
         """
-        if user.is_authenticated():
+        if user.is_authenticated:
             err_msg = ("rebind_noauth_module_to_user can only be called from a module bound to "
                        "an anonymous user")
             log.error(err_msg)
@@ -562,8 +645,8 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
         block_wrappers.append(partial(
             wrap_xblock,
             'LmsRuntime',
-            extra_data={'course-id': course_id.to_deprecated_string()},
-            usage_id_serializer=lambda usage_id: quote_slashes(usage_id.to_deprecated_string()),
+            extra_data={'course-id': text_type(course_id)},
+            usage_id_serializer=lambda usage_id: quote_slashes(text_type(usage_id)),
             request_token=request_token,
         ))
 
@@ -591,7 +674,7 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
     block_wrappers.append(partial(
         replace_jump_to_id_urls,
         course_id,
-        reverse('jump_to_id', kwargs={'course_id': course_id.to_deprecated_string(), 'module_id': ''}),
+        reverse('jump_to_id', kwargs={'course_id': text_type(course_id), 'module_id': ''}),
     ))
 
     if settings.FEATURES.get('DISPLAY_DEBUG_INFO_TO_STAFF'):
@@ -605,13 +688,11 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
             # the result would always be "False".
             masquerade_settings = user.real_user.masquerade_settings
             del user.real_user.masquerade_settings
-            instructor_access = bool(has_access(user.real_user, 'instructor', descriptor, course_id))
             user.real_user.masquerade_settings = masquerade_settings
         else:
             staff_access = has_access(user, 'staff', descriptor, course_id)
-            instructor_access = bool(has_access(user, 'instructor', descriptor, course_id))
         if staff_access:
-            block_wrappers.append(partial(add_staff_markup, user, instructor_access, disable_staff_debug_info))
+            block_wrappers.append(partial(add_staff_markup, user, disable_staff_debug_info))
 
     # These modules store data using the anonymous_student_id as a key.
     # To prevent loss of data, we will continue to provide old modules with
@@ -658,7 +739,7 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
         replace_jump_to_id_urls=partial(
             static_replace.replace_jump_to_id_urls,
             course_id=course_id,
-            jump_to_id_base_url=reverse('jump_to_id', kwargs={'course_id': course_id.to_deprecated_string(), 'module_id': ''})
+            jump_to_id_base_url=reverse('jump_to_id', kwargs={'course_id': text_type(course_id), 'module_id': ''})
         ),
         node_path=settings.NODE_PATH,
         publish=publish,
@@ -675,11 +756,12 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
             'fs': FSService(),
             'field-data': field_data,
             'user': DjangoXBlockUserService(user, user_is_staff=user_is_staff),
-            'verification': VerificationService(),
+            'verification': XBlockVerificationService(),
             'proctoring': ProctoringService(),
             'milestones': milestones_helpers.get_service(),
             'credit': CreditService(),
             'bookmarks': BookmarksService(user=user),
+            'gating': GatingService(),
         },
         get_user_role=lambda: get_user_role(user, course_id),
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
@@ -850,29 +932,32 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     Generic view for extensions. This is where AJAX calls go.
 
     Arguments:
+        request (Request): Django request.
+        course_id (str): Course containing the block
+        usage_id (str)
+        handler (str)
+        suffix (str)
 
-      - request -- the django request.
-      - location -- the module location. Used to look up the XModule instance
-      - course_id -- defines the course context for this request.
-
-    Return 403 error if the user is not logged in. Raises Http404 if
-    the location and course_id do not identify a valid module, the module is
-    not accessible by the user, or the module raises NotFoundError. If the
-    module raises any other error, it will escape this function.
+    Raises:
+        Http404: If the course is not found in the modulestore.
     """
-    if not request.user.is_authenticated():
-        return HttpResponse('Unauthenticated', status=403)
+    # NOTE (CCB): Allow anonymous GET calls (e.g. for transcripts). Modifying this view is simpler than updating
+    # the XBlocks to use `handle_xblock_callback_noauth`...which is practically identical to this view.
+    if request.method != 'GET' and not request.user.is_authenticated:
+        return HttpResponseForbidden()
+
+    request.user.known = request.user.is_authenticated
 
     try:
         course_key = CourseKey.from_string(course_id)
     except InvalidKeyError:
-        raise Http404("Invalid location")
+        raise Http404('{} is not a valid course key'.format(course_id))
 
     with modulestore().bulk_operations(course_key):
         try:
             course = modulestore().get_course(course_key)
         except ItemNotFoundError:
-            raise Http404("invalid location")
+            raise Http404('{} does not exist in the modulestore'.format(course_id))
 
         return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course=course)
 
@@ -886,8 +971,8 @@ def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_inf
     user = request.user
 
     try:
-        course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-        usage_key = course_id.make_usage_key_from_deprecated_string(unquote_slashes(usage_id))
+        course_id = CourseKey.from_string(course_id)
+        usage_key = UsageKey.from_string(unquote_slashes(usage_id)).map_into_course(course_id)
     except InvalidKeyError:
         raise Http404("Invalid location")
 
@@ -1012,7 +1097,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
 
 def hash_resource(resource):
     """
-    Hash a :class:`xblock.fragment.FragmentResource
+    Hash a :class:`web_fragments.fragment.FragmentResource
     """
     md5 = hashlib.md5()
     for data in resource:
@@ -1034,11 +1119,11 @@ def xblock_view(request, course_id, usage_id, view_name):
                  " see FEATURES['ENABLE_XBLOCK_VIEW_ENDPOINT']")
         raise Http404
 
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         raise PermissionDenied
 
     try:
-        course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        course_key = CourseKey.from_string(course_id)
     except InvalidKeyError:
         raise Http404("Invalid location")
 

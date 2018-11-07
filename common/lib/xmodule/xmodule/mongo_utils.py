@@ -4,6 +4,7 @@ Common MongoDB connection functions.
 import logging
 
 import pymongo
+from pymongo import ReadPreference
 from mongodb_proxy import MongoProxy
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
@@ -32,6 +33,13 @@ def connect_to_mongodb(
     else:
         # No 'replicaSet' in kwargs - so no secondary reads.
         mongo_client_class = pymongo.MongoClient
+
+    # If read_preference is given as a name of a valid ReadPreference.<NAME> constant
+    # such as "SECONDARY_PREFERRED", convert it. Otherwise pass it through unchanged.
+    if 'read_preference' in kwargs:
+        read_preference = getattr(ReadPreference, kwargs['read_preference'], None)
+        if read_preference is not None:
+            kwargs['read_preference'] = read_preference
 
     mongo_conn = pymongo.database.Database(
         mongo_client_class(

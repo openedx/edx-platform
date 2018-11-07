@@ -78,7 +78,7 @@
 
             Content.prototype.addComment = function(comment, options) {
                 var comments_count, model, thread;
-                options = (options) ? options : {};
+                options = (options) || {};
                 if (!options.silent) {
                     thread = this.get('thread');
                     comments_count = parseInt(thread.get('comments_count'));
@@ -122,7 +122,7 @@
                 userId = this.get('user_id');
                 if (userId) {
                     this.set('staff_authored', DiscussionUtil.isStaff(userId));
-                    this.set('community_ta_authored', DiscussionUtil.isTA(userId));
+                    this.set('community_ta_authored', DiscussionUtil.isTA(userId) || DiscussionUtil.isGroupTA(userId));
                 } else {
                     this.set('staff_authored', false);
                     this.set('community_ta_authored', false);
@@ -221,7 +221,7 @@
             };
 
             return Content;
-        })(Backbone.Model);
+        }(Backbone.Model));
         this.Thread = (function(_super) {
             __extends(Thread, _super);
 
@@ -230,46 +230,46 @@
             }
 
             Thread.prototype.urlMappers = {
-                'retrieve': function() {
+                retrieve: function() {
                     return DiscussionUtil.urlFor('retrieve_single_thread', this.get('commentable_id'), this.id);
                 },
-                'reply': function() {
+                reply: function() {
                     return DiscussionUtil.urlFor('create_comment', this.id);
                 },
-                'unvote': function() {
+                unvote: function() {
                     return DiscussionUtil.urlFor('undo_vote_for_' + (this.get('type')), this.id);
                 },
-                'upvote': function() {
+                upvote: function() {
                     return DiscussionUtil.urlFor('upvote_' + (this.get('type')), this.id);
                 },
-                'downvote': function() {
+                downvote: function() {
                     return DiscussionUtil.urlFor('downvote_' + (this.get('type')), this.id);
                 },
-                'close': function() {
+                close: function() {
                     return DiscussionUtil.urlFor('openclose_thread', this.id);
                 },
-                'update': function() {
+                update: function() {
                     return DiscussionUtil.urlFor('update_thread', this.id);
                 },
-                '_delete': function() {
+                _delete: function() {
                     return DiscussionUtil.urlFor('delete_thread', this.id);
                 },
-                'follow': function() {
+                follow: function() {
                     return DiscussionUtil.urlFor('follow_thread', this.id);
                 },
-                'unfollow': function() {
+                unfollow: function() {
                     return DiscussionUtil.urlFor('unfollow_thread', this.id);
                 },
-                'flagAbuse': function() {
+                flagAbuse: function() {
                     return DiscussionUtil.urlFor('flagAbuse_' + (this.get('type')), this.id);
                 },
-                'unFlagAbuse': function() {
+                unFlagAbuse: function() {
                     return DiscussionUtil.urlFor('unFlagAbuse_' + (this.get('type')), this.id);
                 },
-                'pinThread': function() {
+                pinThread: function() {
                     return DiscussionUtil.urlFor('pin_thread', this.id);
                 },
-                'unPinThread': function() {
+                unPinThread: function() {
                     return DiscussionUtil.urlFor('un_pin_thread', this.id);
                 }
             };
@@ -333,7 +333,7 @@
             };
 
             return Thread;
-        })(this.Content);
+        }(this.Content));
         this.Comment = (function(_super) {
             __extends(Comment, _super);
 
@@ -346,31 +346,31 @@
             }
 
             Comment.prototype.urlMappers = {
-                'reply': function() {
+                reply: function() {
                     return DiscussionUtil.urlFor('create_sub_comment', this.id);
                 },
-                'unvote': function() {
+                unvote: function() {
                     return DiscussionUtil.urlFor('undo_vote_for_' + (this.get('type')), this.id);
                 },
-                'upvote': function() {
+                upvote: function() {
                     return DiscussionUtil.urlFor('upvote_' + (this.get('type')), this.id);
                 },
-                'downvote': function() {
+                downvote: function() {
                     return DiscussionUtil.urlFor('downvote_' + (this.get('type')), this.id);
                 },
-                'endorse': function() {
+                endorse: function() {
                     return DiscussionUtil.urlFor('endorse_comment', this.id);
                 },
-                'update': function() {
+                update: function() {
                     return DiscussionUtil.urlFor('update_comment', this.id);
                 },
-                '_delete': function() {
+                _delete: function() {
                     return DiscussionUtil.urlFor('delete_comment', this.id);
                 },
-                'flagAbuse': function() {
+                flagAbuse: function() {
                     return DiscussionUtil.urlFor('flagAbuse_' + (this.get('type')), this.id);
                 },
-                'unFlagAbuse': function() {
+                unFlagAbuse: function() {
                     return DiscussionUtil.urlFor('unFlagAbuse_' + (this.get('type')), this.id);
                 }
             };
@@ -397,7 +397,7 @@
             };
 
             return Comment;
-        })(this.Content);
+        }(this.Content));
 
         this.Comments = (function(_super) {
             __extends(Comments, _super);
@@ -422,6 +422,6 @@
             };
 
             return Comments;
-        })(Backbone.Collection);
+        }(Backbone.Collection));
     }
 }).call(window);

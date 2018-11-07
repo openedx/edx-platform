@@ -17,14 +17,14 @@ Example usage:
 
 """
 import logging
-from optparse import make_option
 
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from six import text_type
 
-from certificates import api as certs_api
-from certificates.models import CertificateStatuses, GeneratedCertificate
+from lms.djangoapps.certificates import api as certs_api
+from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from xmodule.modulestore.django import modulestore
 
 LOGGER = logging.getLogger(__name__)
@@ -33,16 +33,15 @@ LOGGER = logging.getLogger(__name__)
 class Command(BaseCommand):
     """Resubmit certificates with error status. """
 
-    option_list = BaseCommand.option_list + (
-        make_option(
+    def add_arguments(self, parser):
+        parser.add_argument(
             '-c', '--course',
             metavar='COURSE_KEY',
             dest='course_key_list',
             action='append',
             default=[],
             help='Only re-submit certificates for these courses.'
-        ),
-    )
+        )
 
     def handle(self, *args, **options):
         """Resubmit certificates with status 'error'.
@@ -58,7 +57,7 @@ class Command(BaseCommand):
 
         """
         only_course_keys = []
-        for course_key_str in options.get('course_key_list', []):
+        for course_key_str in options['course_key_list']:
             try:
                 only_course_keys.append(CourseKey.from_string(course_key_str))
             except InvalidKeyError:
@@ -73,7 +72,7 @@ class Command(BaseCommand):
                 (
                     u'Starting to re-submit certificates with status "error" '
                     u'in these courses: %s'
-                ), ", ".join([unicode(key) for key in only_course_keys])
+                ), ", ".join([text_type(key) for key in only_course_keys])
             )
         else:
             LOGGER.info(u'Starting to re-submit certificates with status "error".')

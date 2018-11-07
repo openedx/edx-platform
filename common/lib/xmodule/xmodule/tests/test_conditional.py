@@ -4,11 +4,13 @@ import unittest
 from fs.memoryfs import MemoryFS
 from lxml import etree
 from mock import Mock, patch
+from six import text_type
 
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from xmodule.error_module import NonStaffErrorDescriptor
-from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore, CourseLocationManager
 from xmodule.conditional_module import ConditionalDescriptor
 from xmodule.tests import DATA_DIR, get_test_system, get_test_descriptor_system
@@ -29,7 +31,7 @@ class DummySystem(ImportSystem):
 
         super(DummySystem, self).__init__(
             xmlstore=xmlstore,
-            course_id=SlashSeparatedCourseKey(ORG, COURSE, 'test_run'),
+            course_id=CourseKey.from_string('/'.join([ORG, COURSE, 'test_run'])),
             course_dir='test_dir',
             error_tracker=Mock(),
             load_error_modules=load_error_modules,
@@ -62,7 +64,8 @@ class ConditionalFactory(object):
         descriptor_system = get_test_descriptor_system()
 
         # construct source descriptor and module:
-        source_location = Location("edX", "conditional_test", "test_run", "problem", "SampleProblem", None)
+        source_location = BlockUsageLocator(CourseLocator("edX", "conditional_test", "test_run", deprecated=True),
+                                            "problem", "SampleProblem", deprecated=True)
         if source_is_error_module:
             # Make an error descriptor and module
             source_descriptor = NonStaffErrorDescriptor.from_xml(
@@ -108,7 +111,8 @@ class ConditionalFactory(object):
         system.descriptor_runtime = descriptor_system
 
         # construct conditional module:
-        cond_location = Location("edX", "conditional_test", "test_run", "conditional", "SampleConditional", None)
+        cond_location = BlockUsageLocator(CourseLocator("edX", "conditional_test", "test_run", deprecated=True),
+                                          "conditional", "SampleConditional", deprecated=True)
         field_data = DictFieldData({
             'data': '<conditional/>',
             'conditional_attr': 'attempted',
@@ -141,6 +145,7 @@ class ConditionalModuleBasicTest(unittest.TestCase):
     Make sure that conditional module works, using mocks for
     other modules.
     """
+    shard = 1
 
     def setUp(self):
         super(ConditionalModuleBasicTest, self).setUp()
@@ -213,6 +218,8 @@ class ConditionalModuleXmlTest(unittest.TestCase):
     """
     Make sure ConditionalModule works, by loading data in from an XML-defined course.
     """
+    shard = 1
+
     @staticmethod
     def get_system(load_error_modules=True):
         '''Get a dummy system'''
@@ -242,7 +249,7 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         print "id: ", course.id
 
         def inner_get_module(descriptor):
-            if isinstance(descriptor, Location):
+            if isinstance(descriptor, BlockUsageLocator):
                 location = descriptor
                 descriptor = self.modulestore.get_item(location, depth=None)
             descriptor.xmodule_runtime = get_test_system()
@@ -252,7 +259,8 @@ class ConditionalModuleXmlTest(unittest.TestCase):
 
         # edx - HarvardX
         # cond_test - ER22x
-        location = Location("HarvardX", "ER22x", "2013_Spring", "conditional", "condone")
+        location = BlockUsageLocator(CourseLocator("HarvardX", "ER22x", "2013_Spring", deprecated=True),
+                                     "conditional", "condone", deprecated=True)
 
         def replace_urls(text, staticfiles_prefix=None, replace_prefix='/static/', course_namespace=None):
             return text
@@ -271,7 +279,7 @@ class ConditionalModuleXmlTest(unittest.TestCase):
             'conditional_ajax.html',
             {
                 # Test ajax url is just usage-id / handler_name
-                'ajax_url': '{}/xmodule_handler'.format(location.to_deprecated_string()),
+                'ajax_url': '{}/xmodule_handler'.format(text_type(location)),
                 'element_id': u'i4x-HarvardX-ER22x-conditional-condone',
                 'depends': u'i4x-HarvardX-ER22x-problem-choiceprob'
             }
@@ -305,7 +313,8 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         via generating UsageKeys from the values in xml_attributes['sources']
         """
         dummy_system = Mock()
-        dummy_location = Location("edX", "conditional_test", "test_run", "conditional", "SampleConditional", None)
+        dummy_location = BlockUsageLocator(CourseLocator("edX", "conditional_test", "test_run"),
+                                           "conditional", "SampleConditional")
         dummy_scope_ids = ScopeIds(None, None, dummy_location, dummy_location)
         dummy_field_data = DictFieldData({
             'data': '<conditional/>',
@@ -317,14 +326,17 @@ class ConditionalModuleXmlTest(unittest.TestCase):
             dummy_field_data,
             dummy_scope_ids,
         )
+        new_run = conditional.location.course_key.run
         self.assertEqual(
             conditional.sources_list[0],
-            conditional.location.course_key.make_usage_key_from_deprecated_string(conditional.xml_attributes['sources'])
+            # Matching what is in ConditionalDescriptor.__init__.
+            BlockUsageLocator.from_string(conditional.xml_attributes['sources']).replace(run=new_run)
         )
 
     def test_conditional_module_parse_sources(self):
         dummy_system = Mock()
-        dummy_location = Location("edX", "conditional_test", "test_run", "conditional", "SampleConditional", None)
+        dummy_location = BlockUsageLocator(CourseLocator("edX", "conditional_test", "test_run"),
+                                           "conditional", "SampleConditional")
         dummy_scope_ids = ScopeIds(None, None, dummy_location, dummy_location)
         dummy_field_data = DictFieldData({
             'data': '<conditional/>',
@@ -370,6 +382,7 @@ class ConditionalModuleStudioTest(XModuleXmlImportTest):
     """
     Unit tests for how conditional test interacts with Studio.
     """
+    shard = 1
 
     def setUp(self):
         super(ConditionalModuleStudioTest, self).setUp()

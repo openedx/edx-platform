@@ -26,6 +26,8 @@ class RefundTests(ModuleStoreTestCase):
     """
     Tests for the manual refund page
     """
+    shard = 4
+
     def setUp(self):
         super(RefundTests, self).setUp()
 
@@ -67,7 +69,7 @@ class RefundTests(ModuleStoreTestCase):
             self.order = Order.get_cart_for_user(self.student)
             CertificateItem.add_to_order(self.order, self.course_id, 1, self.course_mode.mode_slug)
             self.order.purchase()
-        self.course_mode.expiration_datetime = datetime.datetime(1983, 4, 6)
+        self.course_mode.expiration_datetime = datetime.datetime(1983, 4, 6, tzinfo=pytz.UTC)
         self.course_mode.save()
 
     def test_support_access(self):
@@ -87,7 +89,7 @@ class RefundTests(ModuleStoreTestCase):
 
     def test_bad_courseid(self):
         response = self.client.post('/support/refund/', {'course_id': 'foo', 'user': self.student.email})
-        self.assertContains(response, 'Invalid course id')
+        self.assertContains(response, 'Course id invalid')
 
     def test_bad_user(self):
         response = self.client.post('/support/refund/', {'course_id': str(self.course_id), 'user': 'unknown@foo.com'})
@@ -96,7 +98,7 @@ class RefundTests(ModuleStoreTestCase):
     @patch('student.models.CourseEnrollment.refund_cutoff_date')
     def test_not_refundable(self, cutoff_date):
         self._enroll()
-        self.course_mode.expiration_datetime = datetime.datetime(2033, 4, 6)
+        self.course_mode.expiration_datetime = datetime.datetime(2033, 4, 6, tzinfo=pytz.UTC)
         self.course_mode.save()
         cutoff_date.return_value = datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=1)
         response = self.client.post('/support/refund/', self.form_pars)

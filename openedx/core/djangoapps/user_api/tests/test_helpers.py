@@ -9,6 +9,8 @@ from django import forms
 from django.http import HttpRequest, HttpResponse
 from django.test import TestCase
 from nose.tools import raises
+from six import text_type
+
 from ..helpers import (
     intercept_errors, shim_student_view,
     FormDescription, InvalidFieldError
@@ -66,7 +68,7 @@ class InterceptErrorsTest(TestCase):
         try:
             intercepted_function(raise_error=FakeInputException)
         except FakeOutputException as ex:
-            actual_message = re.sub(r'line \d+', 'line XXX', ex.message, flags=re.MULTILINE)
+            actual_message = re.sub(r'line \d+', 'line XXX', text_type(ex), flags=re.MULTILINE)
             self.assertEqual(actual_message, expected_log_msg)
 
         # Verify that the error logger is called

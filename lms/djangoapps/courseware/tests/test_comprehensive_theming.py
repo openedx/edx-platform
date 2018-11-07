@@ -3,7 +3,7 @@
 from django.conf import settings
 from django.contrib import staticfiles
 from django.test import TestCase
-from path import path  # pylint: disable=no-name-in-module
+from path import Path
 
 import edxmako
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
@@ -12,6 +12,7 @@ from openedx.core.lib.tempdir import create_symlink, delete_symlink, mkdtemp_cle
 
 class TestComprehensiveTheming(TestCase):
     """Test comprehensive theming."""
+    shard = 4
 
     def setUp(self):
         super(TestComprehensiveTheming, self).setUp()
@@ -30,8 +31,6 @@ class TestComprehensiveTheming(TestCase):
         self.assertEqual(resp.status_code, 200)
         # This string comes from footer.html
         self.assertContains(resp, "super-ugly")
-        # This string comes from header.html
-        self.assertContains(resp, "This file is only for demonstration, and is horrendous!")
 
     def test_theme_outside_repo(self):
         # Need to create a temporary theme, and defer decorating the function
@@ -39,14 +38,14 @@ class TestComprehensiveTheming(TestCase):
         # of test.
 
         # Make a temp directory as a theme.
-        themes_dir = path(mkdtemp_clean())
+        themes_dir = Path(mkdtemp_clean())
         tmp_theme = "temp_theme"
         template_dir = themes_dir / tmp_theme / "lms/templates"
         template_dir.makedirs()
         with open(template_dir / "footer.html", "w") as footer:
             footer.write("<footer>TEMPORARY THEME</footer>")
 
-        dest_path = path(settings.COMPREHENSIVE_THEME_DIRS[0]) / tmp_theme
+        dest_path = Path(settings.COMPREHENSIVE_THEME_DIRS[0]) / tmp_theme
         create_symlink(themes_dir / tmp_theme, dest_path)
 
         edxmako.paths.add_lookup('main', themes_dir, prepend=True)

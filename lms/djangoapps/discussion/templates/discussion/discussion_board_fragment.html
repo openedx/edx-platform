@@ -8,14 +8,14 @@
 import json
 from django.utils.translation import ugettext as _
 from django.template.defaultfilters import escapejs
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from django_comment_client.permissions import has_permission
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 from openedx.core.djangolib.markup import HTML
 %>
 
-<section class="discussion discussion-board container" id="discussion-container"
+<section class="discussion discussion-board page-content-container" id="discussion-container"
          data-course-id="${course.id}"
          data-user-create-comment="${json.dumps(can_create_comment)}"
          data-user-create-subcomment="${json.dumps(can_create_subcomment)}"
@@ -33,8 +33,8 @@ from openedx.core.djangolib.markup import HTML
         <div class="page-header-secondary">
             ## Add Post button
             % if has_permission(user, 'create_thread', course.id):
-            <div class="form-actions">
-                <button class="btn btn-small new-post-btn">${_("Add a Post")}</button>
+            <div class="forum-actions">
+                <button class="btn btn-outline-primary btn-small new-post-btn">${_("Add a Post")}</button>
             </div>
             % endif
             ## Search box
@@ -46,16 +46,15 @@ from openedx.core.djangolib.markup import HTML
         lang="${course.language}"
       % endif
     >
-        <div class="discussion-body layout layout-1t2t">
-            <aside class="forum-nav layout-col layout-col-a" role="complementary" aria-label="${_("Discussion thread list")}">
-                <%include file="_filter_dropdown.html" />
-                <div class="discussion-thread-list-container"></div>
-            </aside>
-
-            <main id="main" aria-label="Content" tabindex="-1" class="discussion-column layout-col layout-col-b">
+        <div class="discussion-body">
+            <main id="main" class="discussion-column" aria-label="Content" tabindex="-1">
                 <article class="new-post-article is-hidden" style="display: none" tabindex="-1" aria-label="${_("New topic form")}"></article>
                 <div class="forum-content"></div>
             </main>
+            <aside class="forum-nav" role="complementary" aria-label="${_("Discussion thread list")}">
+                <%include file="_filter_dropdown.html" />
+                <div class="discussion-thread-list-container"></div>
+            </aside>
         </div>
     </div>
 </section>

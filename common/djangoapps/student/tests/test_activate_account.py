@@ -3,12 +3,13 @@ import unittest
 from uuid import uuid4
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase, override_settings
 from mock import patch
 
 from edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from student.models import Registration
 from student.tests.factories import UserFactory
 
@@ -111,7 +112,6 @@ class TestActivateAccount(TestCase):
     def test_activation_without_keys(self, mock_segment_identify):
         self.assert_no_tracking(mock_segment_identify)
 
-    @override_settings(FEATURES=dict(settings.FEATURES, DISPLAY_ACCOUNT_ACTIVATION_MESSAGE_ON_SIDEBAR=True))
     def test_account_activation_message(self):
         """
         Verify that account correct activation message is displayed.
@@ -121,59 +121,29 @@ class TestActivateAccount(TestCase):
         """
         # Log in with test user.
         self.login()
-        expected_message = render_to_string(
-            'registration/account_activation_sidebar_notice.html',
-            {
-                'email': self.user.email,
-                'platform_name': self.platform_name,
-                'activation_email_support_link': self.activation_email_support_link
-            }
+        expected_message = (
+            u"Check your {email_start}{email}{email_end} inbox for an account activation link from "
+            u"{platform_name}. If you need help, contact {link_start}{platform_name} Support{link_end}."
+        ).format(
+            platform_name=self.platform_name,
+            email_start="<strong>",
+            email_end="</strong>",
+            email=self.user.email,
+            link_start="<a target='_blank' href='{activation_email_support_link}'>".format(
+                activation_email_support_link=self.activation_email_support_link,
+            ),
+            link_end="</a>",
         )
 
         response = self.client.get(reverse('dashboard'))
-        self.assertContains(response, expected_message, html=True)
+        self.assertContains(response, expected_message)
 
         # Now make sure account activation message goes away when user activated the account
         self.user.is_active = True
         self.user.save()
         self.login()
-        expected_message = render_to_string(
-            'registration/account_activation_sidebar_notice.html',
-            {
-                'email': self.user.email,
-                'platform_name': self.platform_name,
-                'activation_email_support_link': self.activation_email_support_link
-            }
-        )
         response = self.client.get(reverse('dashboard'))
-        self.assertNotContains(response, expected_message, html=True)
-
-    @override_settings(FEATURES=dict(settings.FEATURES, DISPLAY_ACCOUNT_ACTIVATION_MESSAGE_ON_SIDEBAR=False))
-    def test_account_activation_message_disabled(self):
-        """
-        Verify that old account activation message is displayed when
-        DISPLAY_ACCOUNT_ACTIVATION_MESSAGE_ON_SIDEBAR is disabled.
-        """
-        # Log in with test user.
-        self.login()
-        expected_message = render_to_string(
-            'registration/activate_account_notice.html',
-            {'email': self.user.email}
-        )
-
-        response = self.client.get(reverse('dashboard'))
-        self.assertContains(response, expected_message, html=True)
-
-        # Now make sure account activation message goes away when user activated the account
-        self.user.is_active = True
-        self.user.save()
-        self.login()
-        expected_message = render_to_string(
-            'registration/activate_account_notice.html',
-            {'email': self.user.email}
-        )
-        response = self.client.get(reverse('dashboard'))
-        self.assertNotContains(response, expected_message, html=True)
+        self.assertNotContains(response, expected_message)
 
     def test_account_activation_notification_on_logistration(self):
         """
@@ -199,3 +169,14 @@ class TestActivateAccount(TestCase):
         response = self.client.get(reverse('activate', args=[uuid4().hex]), follow=True)
         self.assertRedirects(response, login_page_url)
         self.assertContains(response, 'Your account could not be activated')
+
+    def test_account_activation_prevent_auth_user_writes(self):
+        login_page_url = "{login_url}?next={redirect_url}".format(
+            login_url=reverse('signin_user'),
+            redirect_url=reverse('dashboard'),
+        )
+        with waffle().override(PREVENT_AUTH_USER_WRITES, True):
+            response = self.client.get(reverse('activate', args=[self.registration.activation_key]), follow=True)
+            self.assertRedirects(response, login_page_url)
+            self.assertContains(response, SYSTEM_MAINTENANCE_MSG)
+            assert not self.user.is_active

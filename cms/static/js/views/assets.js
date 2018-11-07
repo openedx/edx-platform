@@ -132,8 +132,8 @@ define([
             handleDestroy: function(model) {
                 this.collection.fetch({reset: true}); // reload the collection to get a fresh page full of items
                 analytics.track('Deleted Asset', {
-                    'course': course_location_analytics,
-                    'id': model.get('url')
+                    course: course_location_analytics,
+                    id: model.get('url')
                 });
             },
 
@@ -145,8 +145,8 @@ define([
                 this.pagingView.setPage(1);
 
                 analytics.track('Uploaded a File', {
-                    'course': course_location_analytics,
-                    'asset_url': model.get('url')
+                    course: course_location_analytics,
+                    asset_url: model.get('url')
                 });
             },
 
@@ -207,13 +207,13 @@ define([
                         }
 
                         self.largeFileErrorMsg = new NotificationView.Error({
-                            'title': gettext('Your file could not be uploaded'),
-                            'message': error
+                            title: gettext('Your file could not be uploaded'),
+                            message: error
                         });
                         self.largeFileErrorMsg.show();
 
                         self.displayFailedUpload({
-                            'msg': gettext('Max file size exceeded')
+                            msg: gettext('Max file size exceeded')
                         });
                     },
                     processdone: function(event, data) {
@@ -281,8 +281,7 @@ define([
                 if (assettype) {
                     if (assettype === this.allLabel) {
                         titleText.text(titleText.data('alllabel'));
-                    }
-                    else {
+                    } else {
                         titleText.text(assettype);
                     }
                 }

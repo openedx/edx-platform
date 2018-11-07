@@ -6,20 +6,36 @@ import copy
 import functools
 import os
 from contextlib import contextmanager
+from enum import Enum
 
 from courseware.field_overrides import OverrideFieldData  # pylint: disable=import-error
+from courseware.tests.factories import StaffFactory
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AnonymousUser, User
 from django.test import TestCase
 from django.test.utils import override_settings
 from mock import patch
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin, CacheIsolationTestCase, FilteredQueryCountMixin
 from openedx.core.lib.tempdir import mkdtemp_clean
+from student.models import CourseEnrollment
+from student.tests.factories import UserFactory
 from xmodule.contentstore.django import _CONTENTSTORE
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import SignalHandler, clear_existing_modulestores, modulestore
 from xmodule.modulestore.tests.factories import XMODULE_FACTORY_LOCK
 from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
+
+
+class CourseUserType(Enum):
+    """
+    Types of users to be used when testing a course.
+    """
+    ANONYMOUS = 'anonymous'
+    COURSE_STAFF = 'course_staff'
+    ENROLLED = 'enrolled'
+    GLOBAL_STAFF = 'global_staff'
+    UNENROLLED = 'unenrolled'
+    UNENROLLED_STAFF = 'unenrolled_staff'
 
 
 class StoreConstructors(object):
@@ -308,7 +324,36 @@ class ModuleStoreIsolationMixin(CacheIsolationMixin, SignalIsolationMixin):
         cls.enable_all_signals()
 
 
-class SharedModuleStoreTestCase(FilteredQueryCountMixin, ModuleStoreIsolationMixin, CacheIsolationTestCase):
+class ModuleStoreTestUsersMixin():
+    """
+    A mixin to help manage test users.
+    """
+    TEST_PASSWORD = 'test'
+
+    def create_user_for_course(self, course, user_type=CourseUserType.ENROLLED):
+        """
+        Create a test user for a course.
+        """
+        if user_type is CourseUserType.ANONYMOUS:
+            return AnonymousUser()
+
+        is_enrolled = user_type is CourseUserType.ENROLLED
+        is_unenrolled_staff = user_type is CourseUserType.UNENROLLED_STAFF
+
+        # Set up the test user
+        if is_unenrolled_staff:
+            user = StaffFactory(course_key=course.id, password=self.TEST_PASSWORD)
+        else:
+            user = UserFactory(password=self.TEST_PASSWORD)
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
+        if is_enrolled:
+            CourseEnrollment.enroll(user, course.id)
+        return user
+
+
+class SharedModuleStoreTestCase(
+    ModuleStoreTestUsersMixin, FilteredQueryCountMixin, ModuleStoreIsolationMixin, CacheIsolationTestCase
+):
     """
     Subclass for any test case that uses a ModuleStore that can be shared
     between individual tests. This class ensures that the ModuleStore is cleaned
@@ -391,7 +436,9 @@ class SharedModuleStoreTestCase(FilteredQueryCountMixin, ModuleStoreIsolationMix
         super(SharedModuleStoreTestCase, self).setUp()
 
 
-class ModuleStoreTestCase(FilteredQueryCountMixin, ModuleStoreIsolationMixin, TestCase):
+class ModuleStoreTestCase(
+    ModuleStoreTestUsersMixin, FilteredQueryCountMixin, ModuleStoreIsolationMixin, TestCase
+):
     """
     Subclass for any test case that uses a ModuleStore.
     Ensures that the ModuleStore is cleaned before/after each test.

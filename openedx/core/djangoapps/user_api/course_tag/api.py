@@ -8,7 +8,7 @@ UserCourseTag model.
 """
 
 from collections import defaultdict
-from request_cache import get_cache
+from openedx.core.djangoapps.request_cache import get_cache
 from ..models import UserCourseTag
 
 # Scopes
@@ -36,7 +36,7 @@ class BulkCourseTags(object):
                 and the secondary key is the course tag's key
         """
         course_tags = defaultdict(dict)
-        for tag in UserCourseTag.objects.filter(user__in=users, course_id=course_id).select_related('user__id'):
+        for tag in UserCourseTag.objects.filter(user__in=users, course_id=course_id).select_related('user'):
             course_tags[tag.user.id][tag.key] = tag.value
         get_cache(cls.CACHE_NAMESPACE)[cls._cache_key(course_id)] = course_tags
 

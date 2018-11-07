@@ -2,15 +2,19 @@
 
 import unittest
 
+import datetime
 import mock
+import pytz
 import ddt
 from django import test
-from django.conf import settings
 from django.contrib.auth import models
+from django.core import mail
 from social_django import models as social_models
 
+from student.tests.factories import UserFactory
 from third_party_auth import pipeline, provider
 from third_party_auth.tests import testutil
+from lms.djangoapps.verify_student.models import SSOVerification
 
 # Get Django User model by reference from python-social-auth. Not a type
 # constant, pylint.
@@ -304,9 +308,6 @@ class TestPipelineUtilityFunctions(TestCase, test.TestCase):
 class EnsureUserInformationTestCase(testutil.TestCase, test.TestCase):
     """Tests ensuring that we have the necessary user information to proceed with the pipeline."""
 
-    def setUp(self):
-        super(EnsureUserInformationTestCase, self).setUp()
-
     @ddt.data(
         (True, '/register'),
         (False, '/login')
@@ -336,3 +337,207 @@ class EnsureUserInformationTestCase(testutil.TestCase, test.TestCase):
                 )
                 assert response.status_code == 302
                 assert response.url == expected_redirect_url
+
+
+@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
+class UserDetailsForceSyncTestCase(testutil.TestCase, test.TestCase):
+    """Tests to ensure learner profile data is properly synced if the provider requires it."""
+
+    def setUp(self):
+        super(UserDetailsForceSyncTestCase, self).setUp()
+        # pylint: disable=attribute-defined-outside-init
+        self.user = UserFactory.create()
+        self.old_email = self.user.email
+        self.old_username = self.user.username
+        self.old_fullname = self.user.profile.name
+        self.details = {
+            'email': 'new+{}'.format(self.user.email),
+            'username': 'new_{}'.format(self.user.username),
+            'fullname': 'Grown Up {}'.format(self.user.profile.name),
+            'country': 'PK',
+            'non_existing_field': 'value',
+        }
+
+        # Mocks
+        self.strategy = mock.MagicMock()
+        self.strategy.storage.user.changed.side_effect = lambda user: user.save()
+
+        get_from_pipeline = mock.patch('third_party_auth.pipeline.provider.Registry.get_from_pipeline')
+        self.get_from_pipeline = get_from_pipeline.start()
+        self.get_from_pipeline.return_value = mock.MagicMock(sync_learner_profile_data=True)
+        self.addCleanup(get_from_pipeline.stop)
+
+    def test_user_details_force_sync(self):
+        """
+        The user details are synced properly and an email is sent when the email is changed.
+        """
+        # Begin the pipeline.
+        pipeline.user_details_force_sync(
+            auth_entry=pipeline.AUTH_ENTRY_LOGIN,
+            strategy=self.strategy,
+            details=self.details,
+            user=self.user,
+        )
+
+        # User now has updated information in the DB.
+        user = User.objects.get()
+        assert user.email == 'new+{}'.format(self.old_email)
+        assert user.profile.name == 'Grown Up {}'.format(self.old_fullname)
+        assert user.profile.country == 'PK'
+
+        # Now verify that username field is not updated
+        assert user.username == self.old_username
+
+        assert len(mail.outbox) == 1
+
+    def test_user_details_force_sync_email_conflict(self):
+        """
+        The user details were attempted to be synced but the incoming email already exists for another account.
+        """
+        # Create a user with an email that conflicts with the incoming value.
+        UserFactory.create(email='new+{}'.format(self.old_email))
+
+        # Begin the pipeline.
+        pipeline.user_details_force_sync(
+            auth_entry=pipeline.AUTH_ENTRY_LOGIN,
+            strategy=self.strategy,
+            details=self.details,
+            user=self.user,
+        )
+
+        # The email is not changed, but everything else is.
+        user = User.objects.get(pk=self.user.pk)
+        assert user.email == self.old_email
+        assert user.profile.name == 'Grown Up {}'.format(self.old_fullname)
+        assert user.profile.country == 'PK'
+
+        # Now verify that username field is not updated
+        assert user.username == self.old_username
+
+        # No email should be sent for an email change.
+        assert len(mail.outbox) == 0
+
+    def test_user_details_force_sync_username_conflict(self):
+        """
+        The user details were attempted to be synced but the incoming username already exists for another account.
+
+        An email should still be sent in this case.
+        """
+        # Create a user with an email that conflicts with the incoming value.
+        UserFactory.create(username='new_{}'.format(self.old_username))
+
+        # Begin the pipeline.
+        pipeline.user_details_force_sync(
+            auth_entry=pipeline.AUTH_ENTRY_LOGIN,
+            strategy=self.strategy,
+            details=self.details,
+            user=self.user,
+        )
+
+        # The username is not changed, but everything else is.
+        user = User.objects.get(pk=self.user.pk)
+        assert user.email == 'new+{}'.format(self.old_email)
+        assert user.username == self.old_username
+        assert user.profile.name == 'Grown Up {}'.format(self.old_fullname)
+        assert user.profile.country == 'PK'
+
+        # An email should still be sent because the email changed.
+        assert len(mail.outbox) == 1
+
+
+@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
+class SetIDVerificationStatusTestCase(testutil.TestCase, test.TestCase):
+    """Tests to ensure SSO ID Verification for the user is set if the provider requires it."""
+
+    def setUp(self):
+        super(SetIDVerificationStatusTestCase, self).setUp()
+        self.user = UserFactory.create()
+        self.provider_class_name = 'third_party_auth.models.SAMLProviderConfig'
+        self.provider_slug = 'default'
+        self.details = {}
+
+        # Mocks
+        self.strategy = mock.MagicMock()
+        self.strategy.storage.user.changed.side_effect = lambda user: user.save()
+
+        get_from_pipeline = mock.patch('third_party_auth.pipeline.provider.Registry.get_from_pipeline')
+        self.get_from_pipeline = get_from_pipeline.start()
+        self.get_from_pipeline.return_value = mock.MagicMock(
+            enable_sso_id_verification=True,
+            full_class_name=self.provider_class_name,
+            slug=self.provider_slug,
+        )
+        self.addCleanup(get_from_pipeline.stop)
+
+    def test_set_id_verification_status_new_user(self):
+        """
+        The user details are synced properly and an email is sent when the email is changed.
+        """
+        # Begin the pipeline.
+        pipeline.set_id_verification_status(
+            auth_entry=pipeline.AUTH_ENTRY_LOGIN,
+            strategy=self.strategy,
+            details=self.details,
+            user=self.user,
+        )
+
+        verification = SSOVerification.objects.get(user=self.user)
+
+        assert verification.identity_provider_type == self.provider_class_name
+        assert verification.identity_provider_slug == self.provider_slug
+        assert verification.status == 'approved'
+        assert verification.name == self.user.profile.name
+
+    def test_set_id_verification_status_returning_user(self):
+        """
+        The user details are synced properly and an email is sent when the email is changed.
+        """
+
+        SSOVerification.objects.create(
+            user=self.user,
+            status="approved",
+            name=self.user.profile.name,
+            identity_provider_type=self.provider_class_name,
+            identity_provider_slug=self.provider_slug,
+        )
+
+        # Begin the pipeline.
+        pipeline.set_id_verification_status(
+            auth_entry=pipeline.AUTH_ENTRY_LOGIN,
+            strategy=self.strategy,
+            details=self.details,
+            user=self.user,
+        )
+
+        assert SSOVerification.objects.filter(user=self.user).count() == 1
+
+    def test_set_id_verification_status_expired(self):
+        """
+        The user details are synced properly and an email is sent when the email is changed.
+        """
+
+        SSOVerification.objects.create(
+            user=self.user,
+            status="approved",
+            name=self.user.profile.name,
+            identity_provider_type=self.provider_class_name,
+            identity_provider_slug=self.provider_slug,
+        )
+
+        with mock.patch('third_party_auth.pipeline.earliest_allowed_verification_date') as earliest_date:
+            earliest_date.return_value = datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=1)
+            # Begin the pipeline.
+            pipeline.set_id_verification_status(
+                auth_entry=pipeline.AUTH_ENTRY_LOGIN,
+                strategy=self.strategy,
+                details=self.details,
+                user=self.user,
+            )
+
+            assert SSOVerification.objects.filter(
+                user=self.user,
+                status="approved",
+                name=self.user.profile.name,
+                identity_provider_type=self.provider_class_name,
+                identity_provider_slug=self.provider_slug,
+            ).count() == 2

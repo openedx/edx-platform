@@ -66,15 +66,15 @@
             };
 
             ThreadResponseView.prototype.renderTemplate = function() {
-                var container, templateData, _ref;
+                var $container, templateData, _ref;
                 this.template = _.template($('#thread-response-template').html());
-                container = $('#discussion-container');
-                if (!container.length) {
-                    container = $('.discussion-module');
+                $container = $('#discussion-container');
+                if (!$container.length) {
+                    $container = $('.discussion-module');
                 }
                 templateData = _.extend(this.model.toJSON(), {
                     wmdId: typeof(this.model.id) !== 'undefined' ? this.model.id : (new Date()).getTime(),
-                    create_sub_comment: container.data('user-create-subcomment'),
+                    create_sub_comment: $container.data('user-create-subcomment'),
                     readOnly: this.readOnly
                 });
                 return this.template(templateData);
@@ -347,6 +347,6 @@
             };
 
             return ThreadResponseView;
-        })(DiscussionContentView);
+        }(DiscussionContentView));
     }
 }).call(window);

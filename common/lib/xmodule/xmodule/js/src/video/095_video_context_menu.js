@@ -44,7 +44,8 @@ function(Component) {
             return this.element;
         },
         addChild: function(child) {
-            var firstChild = null, lastChild = null;
+            var firstChild = null,
+                lastChild = null;
             if (this.hasChildren()) {
                 lastChild = this.getLastChild();
                 lastChild.next = child;
@@ -188,9 +189,9 @@ function(Component) {
 
         createElement: function() {
             return $('<ol />', {
-                'class': ['contextmenu', this.options.prefix + 'contextmenu'].join(' '),
-                'role': 'menu',
-                'tabindex': -1
+                class: ['contextmenu', this.options.prefix + 'contextmenu'].join(' '),
+                role: 'menu',
+                tabindex: -1
             });
         },
 
@@ -325,14 +326,14 @@ function(Component) {
             }
 
             return false;
-                                                }
+        }
     });
 
     Overlay = Component.extend({
         ns: '.overlay',
         initialize: function(clickHandler, contextmenuHandler) {
             this.element = $('<div />', {
-                'class': 'overlay'
+                class: 'overlay'
             });
             this.clickHandler = clickHandler;
             this.contextmenuHandler = contextmenuHandler;
@@ -389,26 +390,26 @@ function(Component) {
         },
 
         createElement: function() {
-            var element = $('<li />', {
-                'class': ['submenu-item', 'menu-item', this.options.prefix + 'submenu-item'].join(' '),
+            var $element = $('<li />', {
+                class: ['submenu-item', 'menu-item', this.options.prefix + 'submenu-item'].join(' '),
                 'aria-expanded': 'false',
                 'aria-haspopup': 'true',
                 'aria-labelledby': 'submenu-item-label-' + this.id,
-                'role': 'menuitem',
-                'tabindex': -1
+                role: 'menuitem',
+                tabindex: -1
             });
 
             this.label = $('<span />', {
-                'id': 'submenu-item-label-' + this.id,
-                'text': this.options.label
-            }).appendTo(element);
+                id: 'submenu-item-label-' + this.id,
+                text: this.options.label
+            }).appendTo($element);
 
             this.list = $('<ol />', {
-                'class': ['submenu', this.options.prefix + 'submenu'].join(' '),
-                'role': 'menu'
-            }).appendTo(element);
+                class: ['submenu', this.options.prefix + 'submenu'].join(' '),
+                role: 'menu'
+            }).appendTo($element);
 
-            return element;
+            return $element;
         },
 
         appendContent: function(content) {
@@ -447,7 +448,7 @@ function(Component) {
             }
 
             return false;
-                                                },
+        },
 
         open: function() {
             AbstractMenu.prototype.open.call(this);
@@ -494,11 +495,11 @@ function(Component) {
             ].join(' ');
 
             return $('<li />', {
-                'class': classNames,
+                class: classNames,
                 'aria-selected': this.options.isSelected ? 'true' : 'false',
-                'role': 'menuitem',
-                'tabindex': -1,
-                'text': this.options.label
+                role: 'menuitem',
+                tabindex: -1,
+                text: this.options.label
             });
         },
 
@@ -567,7 +568,7 @@ function(Component) {
             }
 
             return false;
-                                                }
+        }
     });
 
     // VideoContextMenu() function - what this module 'exports'.
@@ -584,10 +585,10 @@ function(Component) {
                     },
                     initialize: function(menuitem) {
                         state.el.on({
-                            'play': function() {
+                            play: function() {
                                 menuitem.setLabel(i18n.Pause);
                             },
-                            'pause': function() {
+                            pause: function() {
                                 menuitem.setLabel(i18n.Play);
                             }
                         });
@@ -599,7 +600,7 @@ function(Component) {
                     },
                     initialize: function(menuitem) {
                         state.el.on({
-                            'volumechange': function() {
+                            volumechange: function() {
                                 if (state.videoVolumeControl.getMuteStatus()) {
                                     menuitem.setLabel(i18n.Unmute);
                                 } else {
@@ -615,7 +616,7 @@ function(Component) {
                     },
                     initialize: function(menuitem) {
                         state.el.on({
-                            'fullscreen': function(event, isFullscreen) {
+                            fullscreen: function(event, isFullscreen) {
                                 if (isFullscreen) {
                                     menuitem.setLabel(i18n['Exit full browser']);
                                 } else {
@@ -632,7 +633,7 @@ function(Component) {
                     }),
                     initialize: function(menuitem) {
                         state.el.on({
-                            'speedchange': function(event, speed) {
+                            speedchange: function(event, speed) {
                                 var item = menuitem.getChildren().filter(function(item) {
                                     return item.options.speed === speed;
                                 })[0];
@@ -643,7 +644,7 @@ function(Component) {
                         });
                     }
                 }
-            ]
+                ]
             };
 
         $.fn.contextmenu = function(container, options) {

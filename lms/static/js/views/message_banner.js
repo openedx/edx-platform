@@ -1,4 +1,4 @@
-(function(define, undefined) {
+(function(define) {
     'use strict';
     define([
         'gettext', 'jquery', 'underscore', 'backbone', 'text!templates/fields/message_banner.underscore'

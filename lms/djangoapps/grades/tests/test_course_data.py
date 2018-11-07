@@ -1,22 +1,22 @@
 """
 Tests for CourseData utility class.
 """
-from mock import patch
-
 from lms.djangoapps.course_blocks.api import get_course_blocks
+from mock import patch
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..new.course_data import CourseData
+from ..course_data import CourseData
 
 
 class CourseDataTest(ModuleStoreTestCase):
     """
     Simple tests to ensure CourseData works as advertised.
     """
+    shard = 4
 
     def setUp(self):
         super(CourseDataTest, self).setUp()
@@ -37,7 +37,7 @@ class CourseDataTest(ModuleStoreTestCase):
             'location': self.course.location,
         }
 
-    @patch('lms.djangoapps.grades.new.course_data.get_course_blocks')
+    @patch('lms.djangoapps.grades.course_data.get_course_blocks')
     def test_fill_course_data(self, mock_get_blocks):
         """
         Tests to ensure that course data is fully filled with just a single input.

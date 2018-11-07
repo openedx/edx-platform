@@ -5,16 +5,13 @@ import random
 
 from contextlib import contextmanager, nested
 from importlib import import_module
-from opaque_keys.edx.keys import UsageKey
 from path import Path as path
 from shutil import rmtree
 from tempfile import mkdtemp
 from unittest import TestCase
 
-from xblock.fields import XBlockMixin
 from xmodule.x_module import XModuleMixin
 from xmodule.contentstore.mongo import MongoContentStore
-from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished
 from xmodule.modulestore.edit_info import EditInfoMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
@@ -25,6 +22,7 @@ from xmodule.modulestore.split_mongo.split_draft import DraftVersioningModuleSto
 from xmodule.modulestore.tests.factories import ItemFactory
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from xmodule.modulestore.xml import XMLModuleStore
+from xmodule.modulestore.xml_importer import LocationMixin
 from xmodule.tests import DATA_DIR
 
 
@@ -72,27 +70,6 @@ def mock_tab_from_json(tab_dict):
     with plugin errors.
     """
     return tab_dict
-
-
-class LocationMixin(XBlockMixin):
-    """
-    Adds a `location` property to an :class:`XBlock` so it is more compatible
-    with old-style :class:`XModule` API. This is a simplified version of
-    :class:`XModuleMixin`.
-    """
-    @property
-    def location(self):
-        """ Get the UsageKey of this block. """
-        return self.scope_ids.usage_id
-
-    @location.setter
-    def location(self, value):
-        """ Set the UsageKey of this block. """
-        assert isinstance(value, UsageKey)
-        self.scope_ids = self.scope_ids._replace(
-            def_id=value,
-            usage_id=value,
-        )
 
 
 class MixedSplitTestCase(TestCase):

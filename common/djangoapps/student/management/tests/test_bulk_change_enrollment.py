@@ -1,10 +1,13 @@
 """Tests for the bulk_change_enrollment command."""
 import ddt
+from six import text_type
+
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from mock import patch, call
 
-from student.tests.factories import UserFactory, CourseModeFactory, CourseEnrollmentFactory
+from course_modes.tests.factories import CourseModeFactory
+from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from student.models import CourseEnrollment, EVENT_NAME_ENROLLMENT_MODE_CHANGED
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -34,12 +37,15 @@ class BulkChangeEnrollmentTests(SharedModuleStoreTestCase):
         # Verify that no users are in the `from` mode yet.
         self.assertEqual(len(CourseEnrollment.objects.filter(mode=to_mode, course_id=self.course.id)), 0)
 
+        args = '--course {course} --from_mode {from_mode} --to_mode {to_mode} --commit'.format(
+            course=text_type(self.course.id),
+            from_mode=from_mode,
+            to_mode=to_mode
+        )
+
         call_command(
             'bulk_change_enrollment',
-            course=unicode(self.course.id),
-            from_mode=from_mode,
-            to_mode=to_mode,
-            commit=True,
+            *args.split(' ')
         )
 
         # Verify that all users have been moved -- if not, this will
@@ -66,12 +72,15 @@ class BulkChangeEnrollmentTests(SharedModuleStoreTestCase):
         self.assertEqual(len(CourseEnrollment.objects.filter(mode=to_mode, course_id=self.course.id)), 0)
         self.assertEqual(len(CourseEnrollment.objects.filter(mode=to_mode, course_id=course_2.id)), 0)
 
-        call_command(
-            'bulk_change_enrollment',
+        args = '--org {org} --from_mode {from_mode} --to_mode {to_mode} --commit'.format(
             org=self.org,
             from_mode=from_mode,
-            to_mode=to_mode,
-            commit=True,
+            to_mode=to_mode
+        )
+
+        call_command(
+            'bulk_change_enrollment',
+            *args.split(' ')
         )
 
         # Verify that all users have been moved -- if not, this will
@@ -90,7 +99,7 @@ class BulkChangeEnrollmentTests(SharedModuleStoreTestCase):
             call_command(
                 'bulk_change_enrollment',
                 org=self.org,
-                course=unicode(self.course.id),
+                course=text_type(self.course.id),
                 from_mode='audit',
                 to_mode='no-id-professional',
                 commit=True,
@@ -113,12 +122,15 @@ class BulkChangeEnrollmentTests(SharedModuleStoreTestCase):
         self.assertEqual(len(CourseEnrollment.objects.filter(mode=to_mode, course_id=self.course.id)), 0)
         self.assertEqual(len(CourseEnrollment.objects.filter(mode=to_mode, course_id=course_2.id)), 0)
 
-        call_command(
-            'bulk_change_enrollment',
+        args = '--org {org} --from_mode {from_mode} --to_mode {to_mode} --commit'.format(
             org=self.org,
             from_mode=from_mode,
-            to_mode=to_mode,
-            commit=True,
+            to_mode=to_mode
+        )
+
+        call_command(
+            'bulk_change_enrollment',
+            *args.split(' ')
         )
 
         # Verify that users were not moved for the invalid course/mode combination
@@ -138,12 +150,15 @@ class BulkChangeEnrollmentTests(SharedModuleStoreTestCase):
         CourseModeFactory(course_id=self.course.id, mode_slug='no-id-professional')
 
         with self.assertRaises(CommandError):
-            call_command(
-                'bulk_change_enrollment',
+            args = '--org {org} --from_mode {from_mode} --to_mode {to_mode} --commit'.format(
                 org='fakeX',
                 from_mode='audit',
                 to_mode='no-id-professional',
-                commit=True,
+            )
+
+            call_command(
+                'bulk_change_enrollment',
+                *args.split(' ')
             )
 
     def test_without_commit(self):
@@ -151,11 +166,15 @@ class BulkChangeEnrollmentTests(SharedModuleStoreTestCase):
         self._enroll_users(self.course, self.users, 'audit')
         CourseModeFactory(course_id=self.course.id, mode_slug='honor')
 
+        args = '--course {course} --from_mode {from_mode} --to_mode {to_mode}'.format(
+            course=text_type(self.course.id),
+            from_mode='audit',
+            to_mode='honor'
+        )
+
         call_command(
             'bulk_change_enrollment',
-            course=unicode(self.course.id),
-            from_mode='audit',
-            to_mode='honor',
+            *args.split(' ')
         )
 
         # Verify that no users are in the honor mode.
@@ -169,7 +188,7 @@ class BulkChangeEnrollmentTests(SharedModuleStoreTestCase):
         with self.assertRaises(CommandError):
             call_command(
                 'bulk_change_enrollment',
-                course=unicode(self.course.id),
+                course=text_type(self.course.id),
                 from_mode='audit',
             )
 
@@ -179,7 +198,7 @@ class BulkChangeEnrollmentTests(SharedModuleStoreTestCase):
         command_options = {
             'from_mode': 'audit',
             'to_mode': 'honor',
-            'course': unicode(self.course.id),
+            'course': text_type(self.course.id),
         }
         command_options.pop(option)
 
@@ -208,7 +227,7 @@ class BulkChangeEnrollmentTests(SharedModuleStoreTestCase):
             [
                 call(
                     EVENT_NAME_ENROLLMENT_MODE_CHANGED,
-                    {'course_id': unicode(course.id), 'user_id': user.id, 'mode': to_mode}
+                    {'course_id': text_type(course.id), 'user_id': user.id, 'mode': to_mode}
                 ),
             ]
         )

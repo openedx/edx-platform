@@ -183,6 +183,9 @@ class MockTransformer(BlockStructureTransformer):
     def transform(self, usage_info, block_structure):
         pass
 
+    def __repr__(self):
+        return self.name()
+
 
 class MockFilteringTransformer(FilteringTransformerMixin, BlockStructureTransformer):
     """

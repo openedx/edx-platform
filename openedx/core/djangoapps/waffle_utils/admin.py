@@ -3,7 +3,7 @@ Django admin page for waffle utils models
 """
 from django.contrib import admin
 
-from config_models.admin import ConfigurationModelAdmin, KeyedConfigurationModelAdmin
+from config_models.admin import KeyedConfigurationModelAdmin
 
 
 from .forms import WaffleFlagCourseOverrideAdminForm

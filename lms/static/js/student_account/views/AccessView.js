@@ -75,6 +75,8 @@
                     this.passwordResetSupportUrl = options.password_reset_support_link;
                     this.createAccountOption = options.account_creation_allowed;
                     this.hideAuthWarnings = options.hide_auth_warnings || false;
+                    this.pipelineUserDetails = options.third_party_auth.pipeline_user_details;
+                    this.enterpriseName = options.enterprise_name || '';
 
                 // The login view listens for 'sync' events from the reset model
                     this.resetModel = new PasswordResetModel({}, {
@@ -133,7 +135,9 @@
                             supportURL: this.supportURL,
                             passwordResetSupportUrl: this.passwordResetSupportUrl,
                             createAccountOption: this.createAccountOption,
-                            hideAuthWarnings: this.hideAuthWarnings
+                            hideAuthWarnings: this.hideAuthWarnings,
+                            pipelineUserDetails: this.pipelineUserDetails,
+                            enterpriseName: this.enterpriseName
                         });
 
                     // Listen for 'password-help' event to toggle sub-views

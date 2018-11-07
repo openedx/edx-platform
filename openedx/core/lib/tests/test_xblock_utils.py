@@ -8,7 +8,7 @@ import uuid
 import ddt
 from django.test.client import RequestFactory
 from nose.plugins.attrib import attr
-from xblock.fragment import Fragment
+from web_fragments.fragment import Fragment
 
 from openedx.core.lib.url_utils import quote_slashes
 from openedx.core.lib.xblock_builtin import get_css_dependencies, get_js_dependencies
@@ -100,7 +100,7 @@ class TestXblockUtils(SharedModuleStoreTestCase):
             block=course,
             view='baseview',
             frag=fragment,
-            context=None,
+            context={"wrap_xblock_data": {"custom-attribute": "custom-value"}},
             usage_id_serializer=lambda usage_id: quote_slashes(unicode(usage_id)),
             request_token=uuid.uuid1().get_hex()
         )
@@ -109,6 +109,7 @@ class TestXblockUtils(SharedModuleStoreTestCase):
         self.assertIn('data-runtime-class="TestRuntime"', test_wrap_output.content)
         self.assertIn(data_usage_id, test_wrap_output.content)
         self.assertIn('<h1>Test!</h1>', test_wrap_output.content)
+        self.assertIn('data-custom-attribute="custom-value"', test_wrap_output.content)
         self.assertEqual(test_wrap_output.resources[0].data, u'body {background-color:red;}')
         self.assertEqual(test_wrap_output.resources[1].data, 'alert("Hi!");')
 

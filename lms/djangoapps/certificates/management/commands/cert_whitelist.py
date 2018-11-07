@@ -4,15 +4,11 @@ user/course
 """
 from __future__ import print_function
 
-from optparse import make_option
-
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
-from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from certificates.models import CertificateWhitelist
+from lms.djangoapps.certificates.models import CertificateWhitelist
 
 
 def get_user_from_identifier(identifier):
@@ -55,25 +51,28 @@ class Command(BaseCommand):
 
     """
 
-    option_list = BaseCommand.option_list + (
-        make_option('-a', '--add',
-                    metavar='USER',
-                    dest='add',
-                    default=False,
-                    help='user or list of users to add to the certificate whitelist'),
-
-        make_option('-d', '--del',
-                    metavar='USER',
-                    dest='del',
-                    default=False,
-                    help='user or list of users to remove from the certificate whitelist'),
-
-        make_option('-c', '--course-id',
-                    metavar='COURSE_ID',
-                    dest='course_id',
-                    default=False,
-                    help="course id to query"),
-    )
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '-a', '--add',
+            metavar='USER',
+            dest='add',
+            default=False,
+            help='user or list of users to add to the certificate whitelist'
+        )
+        parser.add_argument(
+            '-d', '--del',
+            metavar='USER',
+            dest='del',
+            default=False,
+            help='user or list of users to remove from the certificate whitelist'
+        )
+        parser.add_argument(
+            '-c', '--course-id',
+            metavar='COURSE_ID',
+            dest='course_id',
+            default=False,
+            help="course id to query"
+        )
 
     def handle(self, *args, **options):
         course_id = options['course_id']
@@ -92,12 +91,7 @@ class Command(BaseCommand):
             cert_whitelist.save()
 
         # try to parse the serialized course key into a CourseKey
-        try:
-            course = CourseKey.from_string(course_id)
-        except InvalidKeyError:
-            print(("Course id {} could not be parsed as a CourseKey; "
-                   "falling back to SSCK.from_dep_str").format(course_id))
-            course = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        course = CourseKey.from_string(course_id)
 
         if options['add'] and options['del']:
             raise CommandError("Either remove or add a user, not both")

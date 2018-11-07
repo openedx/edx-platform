@@ -12,6 +12,7 @@ class XBlockAcidBase(AcceptanceTest):
     """
     Base class for tests that verify that XBlock integration is working correctly
     """
+    shard = 21
     __test__ = False
 
     def setUp(self):

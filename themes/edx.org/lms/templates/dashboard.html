@@ -3,15 +3,27 @@
 <%def name="online_help_token()"><% return "learnerdashboard" %></%def>
 <%namespace name='static' file='static_content.html'/>
 <%!
+import json
+import pytz
+from courseware.context_processor import user_timezone_locale_prefs
+from datetime import datetime, timedelta
+from django.utils import timezone
 from django.utils.translation import ugettext as _
 from django.template import RequestContext
-import third_party_auth
 from third_party_auth import pipeline
-from django.core.urlresolvers import reverse
-import json
+from django.urls import reverse
+from util.date_utils import strftime_localized
+from opaque_keys.edx.keys import CourseKey
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 from openedx.core.djangolib.markup import HTML, Text
-from openedx.core.djangoapps.theming import helpers as theming_helpers
+
+from openedx.features.learner_analytics import INCLUDE_UPSELL_MODAL
+from openedx.features.portfolio_project import INCLUDE_PORTFOLIO_UPSELL_MODAL
+
+from entitlements.models import CourseEntitlement
+from student.models import CourseEnrollment
 %>
 
 <%
@@ -28,6 +40,7 @@ from openedx.core.djangoapps.theming import helpers as theming_helpers
 <script type="text/template" id="${template_name}-tpl">
   <%static:include path="dashboard/${template_name}.underscore" />
 </script>
+<link rel="stylesheet" type="text/css" href="${static.url('paragon/static/paragon.min.css')}" />
 % endfor
 </%block>
 
@@ -43,6 +56,29 @@ from openedx.core.djangoapps.theming import helpers as theming_helpers
       });
     });
   </script>
+  <%static:webpack entry="UnenrollmentFactory">
+    UnenrollmentFactory({
+      urls: {
+        dashboard: "${reverse('dashboard') | n, js_escaped_string}",
+        signInUser: "${reverse('signin_user') | n, js_escaped_string}",
+        changeEmailSettings: "${reverse('change_email_settings') | n, js_escaped_string}",
+        browseCourses: "${marketing_link('COURSES') | n, js_escaped_string}"
+      },
+      isEdx: true
+    });
+  </%static:webpack>
+  <%static:webpack entry="EntitlementUnenrollmentFactory">
+    ## Wait until the document is fully loaded before initializing the EntitlementUnenrollmentView
+    ## to ensure events are setup correctly.
+    $(document).ready(function() {
+      EntitlementUnenrollmentFactory({
+        dashboardPath: "${reverse('dashboard') | n, js_escaped_string}",
+        signInPath: "${reverse('signin_user') | n, js_escaped_string}",
+        browseCourses: "${marketing_link('COURSES') | n, js_escaped_string}",
+        isEdx: true
+      });
+    });
+  </%static:webpack>
   % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
     <%static:require_module module_name="course_search/js/dashboard_search_factory" class_name="DashboardSearchFactory">
         DashboardSearchFactory();
@@ -91,40 +127,93 @@ from openedx.core.djangoapps.theming import helpers as theming_helpers
 
 </div>
 
-<section class="container dashboard" id="dashboard-main">
-<main id="main" aria-label="Content" tabindex="-1">
+<section class="dashboard" id="dashboard-main">
+<main class="main-container" id="main" aria-label="Content" tabindex="-1">
+  % if INCLUDE_UPSELL_MODAL.is_enabled():
+      ${static.renderReact(
+        component="UpsellExperimentModal",
+        id="upsell-modal",
+        props={},
+      )}
+  % endif
+
+  % if INCLUDE_PORTFOLIO_UPSELL_MODAL.is_enabled():
+    ${static.renderReact(
+      component="PortfolioExperimentUpsellModal",
+      id="portfolio-experiment-upsell-modal",
+      props={},
+    )}
+  % endif
   <section class="my-courses" id="my-courses">
     <header class="wrapper-header-courses">
       <h2 class="header-courses">${_("My Courses")}</h2>
     </header>
+    % if len(course_entitlements + course_enrollments) > 0:
+        <ul class="listing-courses" data-programs='${json.dumps(programs_data)}'>
+        <% share_settings = getattr(settings, 'SOCIAL_SHARING_SETTINGS', {}) %>
+        % for dashboard_index, enrollment in enumerate(course_entitlements + course_enrollments):
+          <%
+            # Check if the course run is an entitlement and if it has an associated session
+            entitlement = enrollment if isinstance(enrollment, CourseEntitlement) else None
+            entitlement_session = entitlement.enrollment_course_run if entitlement else None
+            entitlement_days_until_expiration = entitlement.get_days_until_expiration() if entitlement else None
+            entitlement_expiration = datetime.now(tz=pytz.UTC) + timedelta(days=entitlement_days_until_expiration) if (entitlement and entitlement_days_until_expiration < settings.ENTITLEMENT_EXPIRED_ALERT_PERIOD) else None
+            entitlement_expiration_date = strftime_localized(entitlement_expiration, 'SHORT_DATE') if entitlement and entitlement_expiration else None
+            entitlement_expired_at = strftime_localized(entitlement.expired_at_datetime, 'SHORT_DATE') if entitlement and entitlement.expired_at_datetime else None
 
+            is_fulfilled_entitlement = True if entitlement and entitlement_session else False
+            is_unfulfilled_entitlement = True if entitlement and not entitlement_session else False
 
-    % if len(course_enrollments) > 0:
-      <ul class="listing-courses">
-      <% share_settings = getattr(settings, 'SOCIAL_SHARING_SETTINGS', {}) %>
-      % for dashboard_index, enrollment in enumerate(course_enrollments):
-        <% show_courseware_link = (enrollment.course_id in show_courseware_links_for) %>
-        <% cert_status = cert_statuses.get(enrollment.course_id) %>
-        <% can_unenroll = (not cert_status) or cert_status.get('can_unenroll') %>
-        <% credit_status = credit_statuses.get(enrollment.course_id) %>
-        <% show_email_settings = (enrollment.course_id in show_email_settings_for) %>
-        <% course_mode_info = all_course_modes.get(enrollment.course_id) %>
-        <% show_refund_option = (enrollment.course_id in show_refund_option_for) %>
-        <% is_paid_course = (enrollment.course_id in enrolled_courses_either_paid) %>
-        <% is_course_blocked = (enrollment.course_id in block_courses) %>
-        <% course_verification_status = verification_status_by_course.get(enrollment.course_id, {}) %>
-        <% course_requirements = courses_requirements_not_met.get(enrollment.course_id) %>
-        <% related_programs = inverted_programs.get(unicode(enrollment.course_id)) %>
-        <%include file = 'dashboard/_dashboard_course_listing.html' args="course_overview=enrollment.course_overview, enrollment=enrollment, show_courseware_link=show_courseware_link, cert_status=cert_status, can_unenroll=can_unenroll, credit_status=credit_status, show_email_settings=show_email_settings, course_mode_info=course_mode_info, show_refund_option=show_refund_option, is_paid_course=is_paid_course, is_course_blocked=is_course_blocked, verification_status=course_verification_status, course_requirements=course_requirements, dashboard_index=dashboard_index, share_settings=share_settings, user=user, related_programs=related_programs" />
-      % endfor
+            entitlement_available_sessions = []
+            if entitlement:
+              # Grab the available, enrollable sessions for a given entitlement and scrape them for relevant attributes
+              entitlement_available_sessions = [{
+                'session_id': course['key'],
+                'enrollment_end': course['enrollment_end'],
+                'pacing_type': course['pacing_type'],
+                'advertised_start': CourseOverview.get_from_id(CourseKey.from_string(course['key'])).advertised_start,
+                'start': CourseOverview.get_from_id(CourseKey.from_string(course['key'])).start,
+                'end': CourseOverview.get_from_id(CourseKey.from_string(course['key'])).end,
+                } for course in course_entitlement_available_sessions[str(entitlement.uuid)]]
+              if is_fulfilled_entitlement:
+                # If the user has a fulfilled entitlement, pass through the entitlements CourseEnrollment object
+                enrollment = entitlement_session
+              else:
+                # If the user has an unfulfilled entitlement, pass through a bare CourseEnrollment object to populate card with metadata
+                pseudo_session = unfulfilled_entitlement_pseudo_sessions[str(entitlement.uuid)]
+                if not pseudo_session:
+                    continue
+                enrollment = CourseEnrollment(user=user, course_id=pseudo_session['key'], mode=pseudo_session['type'])
+              # We only show email settings for entitlement cards if the entitlement has an associated enrollment
+              show_email_settings = is_fulfilled_entitlement and (entitlement_session.course_id in show_email_settings_for)
+            else:
+              show_email_settings = (enrollment.course_id in show_email_settings_for)
 
-      </ul>
+            session_id = enrollment.course_id
+            show_courseware_link = (session_id in show_courseware_links_for)
+            cert_status = cert_statuses.get(session_id)
+            can_refund_entitlement = entitlement and entitlement.is_entitlement_refundable()
+            can_unenroll = (not cert_status) or cert_status.get('can_unenroll') if not unfulfilled_entitlement else False
+            credit_status = credit_statuses.get(session_id)
+            course_mode_info = all_course_modes.get(session_id)
+            is_paid_course = True if entitlement else (session_id in enrolled_courses_either_paid)
+            is_course_blocked = (session_id in block_courses)
+            course_verification_status = verification_status_by_course.get(session_id, {})
+            course_requirements = courses_requirements_not_met.get(session_id)
+            related_programs = inverted_programs.get(unicode(entitlement.course_uuid if is_unfulfilled_entitlement else session_id))
+            show_consent_link = (session_id in consent_required_courses)
+            course_overview = enrollment.course_overview
+            resume_button_url = resume_button_urls[dashboard_index]
+          %>
+          <%include file='dashboard/_dashboard_course_listing.html' args='course_overview=course_overview, course_card_index=dashboard_index, enrollment=enrollment, is_unfulfilled_entitlement=is_unfulfilled_entitlement, is_fulfilled_entitlement=is_fulfilled_entitlement, entitlement=entitlement, entitlement_session=entitlement_session, entitlement_available_sessions=entitlement_available_sessions, entitlement_expiration_date=entitlement_expiration_date, entitlement_expired_at=entitlement_expired_at, show_courseware_link=show_courseware_link, cert_status=cert_status, can_refund_entitlement=can_refund_entitlement, can_unenroll=can_unenroll, credit_status=credit_status, show_email_settings=show_email_settings, course_mode_info=course_mode_info, is_paid_course=is_paid_course, is_course_blocked=is_course_blocked, verification_status=course_verification_status, course_requirements=course_requirements, dashboard_index=dashboard_index, share_settings=share_settings, user=user, related_programs=related_programs, display_course_modes_on_dashboard=display_course_modes_on_dashboard, show_consent_link=show_consent_link, enterprise_customer_name=enterprise_customer_name, resume_button_url=resume_button_url' />
+        % endfor
+        </ul>
     % else:
       <section class="empty-dashboard-message">
         <p>${_("You are not enrolled in any courses yet.")}</p>
 
         % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
-          <a href="${marketing_link('COURSES')}">
+          <a class="btn btn-primary" href="${marketing_link('COURSES')}">
             ${_("Explore courses")}
           </a>
         %endif
@@ -149,7 +238,7 @@ from openedx.core.djangoapps.theming import helpers as theming_helpers
     % endif
   </section>
 </main>
-
+<div class="side-container">
   %if sidebar_account_activation_message:
     <div class="sidebar-notification">
       ${sidebar_account_activation_message | n, decode.utf8}
@@ -171,9 +260,6 @@ from openedx.core.djangoapps.theming import helpers as theming_helpers
         </div>
       </form>
     </div>
-  % endif
-
-  % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
     <section id="dashboard-search-results" class="search-results dashboard-search-results"></section>
   % endif
 
@@ -216,6 +302,7 @@ from openedx.core.djangoapps.theming import helpers as theming_helpers
       </section>
     </section>
   % endif
+</div>
 </section>
 
 <section id="email-settings-modal" class="modal" aria-hidden="true">
@@ -250,7 +337,7 @@ from openedx.core.djangoapps.theming import helpers as theming_helpers
 </section>
 
 <section id="unenroll-modal" class="modal unenroll-modal" aria-hidden="true">
-  <div class="inner-wrapper" role="dialog" aria-labelledby="unenrollment-modal-title">
+  <div class="inner-wrapper" role="dialog" aria-labelledby="unenrollment-modal-title" aria-live="polite">
     <button class="close-modal">
       <span class="icon fa fa-remove" aria-hidden="true"></span>
       <span class="sr">
@@ -259,7 +346,7 @@ from openedx.core.djangoapps.theming import helpers as theming_helpers
       </span>
     </button>
 
-    <header>
+    <header class="unenroll-header">
       <h2 id="unenrollment-modal-title">
         <span id='track-info'></span>
         <span id='refund-info'></span>
@@ -275,8 +362,11 @@ from openedx.core.djangoapps.theming import helpers as theming_helpers
       <input name="course_id" id="unenroll_course_id" type="hidden" />
       <input name="enrollment_action" type="hidden" value="unenroll" />
       <div class="submit">
-        <input name="submit" type="submit" value="${_("Unenroll")}" />
+        <input class="submit-button" name="submit" type="submit" value="${_("Unenroll")}" />
       </div>
     </form>
+    <%include file='dashboard/_reason_survey.html' />
   </div>
 </section>
+
+<%include file="dashboard/_dashboard_entitlement_unenrollment_modal.html"/>

@@ -2,7 +2,7 @@
 
 from django.test import TestCase
 from nose.tools import raises
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
 
 from instructor_analytics.distributions import AVAILABLE_PROFILE_FEATURES, profile_distribution
 from student.models import CourseEnrollment
@@ -11,10 +11,11 @@ from student.tests.factories import UserFactory
 
 class TestAnalyticsDistributions(TestCase):
     '''Test analytics distribution gathering.'''
+    shard = 4
 
     def setUp(self):
         super(TestAnalyticsDistributions, self).setUp()
-        self.course_id = SlashSeparatedCourseKey('robot', 'course', 'id')
+        self.course_id = CourseLocator('robot', 'course', 'id')
 
         self.users = [UserFactory(
             profile__gender=['m', 'f', 'o'][i % 3],
@@ -74,10 +75,11 @@ class TestAnalyticsDistributions(TestCase):
 
 class TestAnalyticsDistributionsNoData(TestCase):
     '''Test analytics distribution gathering.'''
+    shard = 4
 
     def setUp(self):
         super(TestAnalyticsDistributionsNoData, self).setUp()
-        self.course_id = SlashSeparatedCourseKey('robot', 'course', 'id')
+        self.course_id = CourseLocator('robot', 'course', 'id')
 
         self.users = [UserFactory(
             profile__year_of_birth=i + 1930,

@@ -36,8 +36,7 @@ define(['jquery'], function($) {
                         $(this).attr('src', ifr_source + '?' + wmode);
                     }
                 }
-            }
-            else {
+            } else {
                 $(this).attr('wmode', 'transparent');
             }
         });

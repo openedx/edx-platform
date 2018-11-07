@@ -14,8 +14,8 @@ function($, _, Squire) {
             ),
             modelStub = {
                 default_value: {
-                    'en': 'en.srt',
-                    'ru': 'ru.srt'
+                    en: 'en.srt',
+                    ru: 'ru.srt'
                 },
                 display_name: 'Transcript Translation',
                 explicitly_set: false,
@@ -30,10 +30,10 @@ function($, _, Squire) {
                     {code: 'uk', label: 'Ukrainian'}
                 ],
                 value: {
-                    'en': 'en.srt',
-                    'ru': 'ru.srt',
-                    'uk': 'uk.srt',
-                    'fr': 'fr.srt'
+                    en: 'en.srt',
+                    ru: 'ru.srt',
+                    uk: 'uk.srt',
+                    fr: 'fr.srt'
                 }
             },
             self, injector;
@@ -210,10 +210,10 @@ function($, _, Squire) {
 
         it('returns the initial value upon initialization', function() {
             expect(this.view).assertValueInView({
-                'en': 'en.srt',
-                'ru': 'ru.srt',
-                'uk': 'uk.srt',
-                'fr': 'fr.srt'
+                en: 'en.srt',
+                ru: 'ru.srt',
+                uk: 'uk.srt',
+                fr: 'fr.srt'
             });
 
             expect(this.view).verifyButtons(true, true, true);
@@ -221,9 +221,9 @@ function($, _, Squire) {
 
         it('updates its value correctly', function() {
             expect(this.view).assertCanUpdateView({
-                'ru': 'ru.srt',
-                'uk': 'uk.srt',
-                'fr': 'fr.srt'
+                ru: 'ru.srt',
+                uk: 'uk.srt',
+                fr: 'fr.srt'
             });
         });
 
@@ -231,11 +231,11 @@ function($, _, Squire) {
             var options;
 
             setValue(this.view, {
-                'en': 'en.srt',
-                'ru': 'ru.srt',
-                'uk': 'uk.srt',
-                'fr': 'fr.srt',
-                'zh': ''
+                en: 'en.srt',
+                ru: 'ru.srt',
+                uk: 'uk.srt',
+                fr: 'fr.srt',
+                zh: ''
             });
 
             expect(this.view).verifyButtons(true, false, true);
@@ -246,23 +246,23 @@ function($, _, Squire) {
             expect(this.uploadSpies.show).toHaveBeenCalled();
 
             options = this.uploadSpies.constructor.calls.mostRecent().args[0];
-            options.onSuccess({'filename': 'zh.srt'});
+            options.onSuccess({filename: 'zh.srt'});
 
             expect(this.view).verifyButtons(true, true, true);
 
             expect(this.view.getValueFromEditor()).toEqual({
-                'en': 'en.srt',
-                'ru': 'ru.srt',
-                'uk': 'uk.srt',
-                'fr': 'fr.srt',
-                'zh': 'zh.srt'
+                en: 'en.srt',
+                ru: 'ru.srt',
+                uk: 'uk.srt',
+                fr: 'fr.srt',
+                zh: 'zh.srt'
             });
         });
 
         it('has a clear method to revert to the model default', function() {
             setValue(this.view, {
-                'fr': 'en.srt',
-                'uk': 'ru.srt'
+                fr: 'en.srt',
+                uk: 'ru.srt'
             });
 
             this.view.$el.find('.create-setting').click();
@@ -270,15 +270,15 @@ function($, _, Squire) {
             this.view.clear();
 
             expect(this.view).assertClear({
-                'en': 'en.srt',
-                'ru': 'ru.srt'
+                en: 'en.srt',
+                ru: 'ru.srt'
             });
 
             expect(this.view.$el.find('.create-setting')).not.toHaveClass('is-disabled');
         });
 
         it('has an update model method', function() {
-            expect(this.view).assertUpdateModel(null, {'fr': 'fr.srt'});
+            expect(this.view).assertUpdateModel(null, {fr: 'fr.srt'});
         });
 
         it('can add an entry', function() {
@@ -289,9 +289,9 @@ function($, _, Squire) {
 
         it('can remove an entry', function() {
             setValue(this.view, {
-                'en': 'en.srt',
-                'ru': 'ru.srt',
-                'fr': ''
+                en: 'en.srt',
+                ru: 'ru.srt',
+                fr: ''
             });
             expect(_.keys(this.view.model.get('value')).length).toEqual(3);
             this.view.$el.find('.remove-setting').last().click();
@@ -307,15 +307,15 @@ function($, _, Squire) {
 
         it('only allows unique keys', function() {
             expect(this.view).verifyKeysUnique(
-                {'ru': 'ru.srt'}, {'ru': 'ru.srt'}, {'key': 'ru', 'value': ''}
+                {ru: 'ru.srt'}, {ru: 'ru.srt'}, {key: 'ru', value: ''}
             );
 
             expect(this.view).verifyKeysUnique(
-                {'ru': 'en.srt'}, {'ru': 'ru.srt'}, {'key': 'ru', 'value': 'ru.srt'}
+                {ru: 'en.srt'}, {ru: 'ru.srt'}, {key: 'ru', value: 'ru.srt'}
             );
 
             expect(this.view).verifyKeysUnique(
-                {'ru': 'ru.srt'}, {'ru': 'ru.srt'}, {'key': '', 'value': ''}
+                {ru: 'ru.srt'}, {ru: 'ru.srt'}, {key: '', value: ''}
             );
         });
 

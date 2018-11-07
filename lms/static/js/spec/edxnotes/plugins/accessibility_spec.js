@@ -66,7 +66,7 @@ define([
         });
 
         describe('a11y attributes', function() {
-            var highlight, annotation, note;
+            var highlight, annotation, $note;
 
             beforeEach(function() {
                 highlight = $('<span class="annotator-hl" tabindex="0"/>').appendTo(this.annotator.element);
@@ -79,11 +79,11 @@ define([
 
             it('should be added to highlighted text and associated note', function() {
                 this.annotator.viewer.load([annotation]);
-                note = $('.annotator-note');
-                expect(note).toExist();
-                expect(note).toHaveAttr('tabindex', '-1');
-                expect(note).toHaveAttr('role', 'note');
-                expect(note).toHaveAttr('class', 'annotator-note');
+                $note = $('.annotator-note');
+                expect($note).toExist();
+                expect($note).toHaveAttr('tabindex', '-1');
+                expect($note).toHaveAttr('role', 'note');
+                expect($note).toHaveAttr('class', 'annotator-note');
             });
 
             it('should create aria-descriptions when annotations are loaded', function() {
@@ -235,7 +235,7 @@ define([
                     highlights: [highlight.get(0)]
                 };
                 highlight.data('annotation', annotation);
-                this.annotator.editor.show(annotation, {'left': 0, 'top': 0});
+                this.annotator.editor.show(annotation, {left: 0, top: 0});
                 form = this.annotator.element.find('form.annotator-widget');
                 annotatorItems = this.annotator.element.find('.annotator-item');
                 textArea = annotatorItems.first().children('textarea');

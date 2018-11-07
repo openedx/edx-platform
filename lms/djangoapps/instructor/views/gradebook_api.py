@@ -5,14 +5,14 @@ which is currently use by ccx and instructor apps.
 import math
 
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import transaction
 from django.views.decorators.cache import cache_control
 from opaque_keys.edx.keys import CourseKey
 
 from courseware.courses import get_course_with_access
 from edxmako.shortcuts import render_to_response
-from lms.djangoapps.grades.new.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.instructor.views.api import require_level
 from xmodule.modulestore.django import modulestore
 
@@ -89,7 +89,7 @@ def get_grade_book_page(request, course, course_key):
                 'username': student.username,
                 'id': student.id,
                 'email': student.email,
-                'grade_summary': CourseGradeFactory().create(student, course).summary
+                'grade_summary': CourseGradeFactory().read(student, course).summary
             }
             for student in enrolled_students
         ]

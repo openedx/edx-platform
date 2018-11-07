@@ -35,7 +35,7 @@
             var options = this.options,
                 get_option_with_default = function(option, default_value) {
                     var optionVal = options[option];
-                    return optionVal ? optionVal : default_value;
+                    return optionVal || default_value;
                 },
                 submitButton, resultNotification;
 
@@ -78,8 +78,7 @@
             var notificationModel;
             if (this.options.successNotification) {
                 notificationModel = this.options.successNotification(file, event, data);
-            }
-            else {
+            } else {
                 notificationModel = new NotificationModel({
                     type: 'confirmation',
                     title: interpolate_text(gettext("Your upload of '{file}' succeeded."), {file: file})
@@ -93,17 +92,17 @@
         },
 
         errorHandler: function(event, data) {
-            var file = data.files[0].name, message = null, jqXHR = data.response().jqXHR;
+            var file = data.files[0].name,
+                message = null,
+                jqXHR = data.response().jqXHR;
             var notificationModel;
             if (this.options.errorNotification) {
                 notificationModel = this.options.errorNotification(file, event, data);
-            }
-            else {
+            } else {
                 if (jqXHR.responseText) {
                     try {
                         message = JSON.parse(jqXHR.responseText).error;
-                    }
-                    catch (err) {
+                    } catch (err) {
                     }
                 }
                 if (!message) {

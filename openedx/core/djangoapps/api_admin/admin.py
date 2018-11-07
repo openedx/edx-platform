@@ -1,7 +1,8 @@
 """Admin views for API managment."""
+from __future__ import absolute_import
 from config_models.admin import ConfigurationModelAdmin
 from django.contrib import admin
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from openedx.core.djangoapps.api_admin.models import ApiAccessConfig, ApiAccessRequest

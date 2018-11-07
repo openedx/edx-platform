@@ -18,8 +18,8 @@ define([
         it('can save an enrollment to the server and updates itself on success', function() {
             var requests = AjaxHelpers.requests(this),
                 manual_enrollment = {
-                    'enrolled_by': 'staff@edx.org',
-                    'reason': 'Financial Assistance'
+                    enrolled_by: 'staff@edx.org',
+                    reason: 'Financial Assistance'
                 };
             enrollment.updateEnrollment('verified', 'Financial Assistance');
             AjaxHelpers.expectJsonRequest(requests, 'POST', '/support/enrollment/test-user', {

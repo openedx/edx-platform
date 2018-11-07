@@ -1,41 +1,34 @@
-(function(define) {
-    'use strict';
+import Backbone from 'backbone';
 
-    define(['backbone',
-            'jquery',
-            'underscore',
-            'gettext',
-            'js/learner_dashboard/views/explore_new_programs_view',
-            'text!../../../templates/learner_dashboard/sidebar.underscore'
-           ],
-         function(
-             Backbone,
-             $,
-             _,
-             gettext,
-             NewProgramsView,
-             sidebarTpl
-         ) {
-             return Backbone.View.extend({
-                 el: '.sidebar',
+import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
 
-                 tpl: _.template(sidebarTpl),
+import NewProgramsView from './explore_new_programs_view';
 
-                 initialize: function(data) {
-                     this.context = data.context;
-                 },
+import sidebarTpl from '../../../templates/learner_dashboard/sidebar.underscore';
 
-                 render: function() {
-                     this.$el.html(this.tpl(this.context));
-                     this.postRender();
-                 },
+class SidebarView extends Backbone.View {
+  constructor(options) {
+    const defaults = {
+      el: '.sidebar',
+    };
+    super(Object.assign({}, defaults, options));
+  }
 
-                 postRender: function() {
-                     this.newProgramsView = new NewProgramsView({
-                         context: this.context
-                     });
-                 }
-             });
-         }
-    );
-}).call(this, define || RequireJS.define);
+  initialize(data) {
+    this.tpl = HtmlUtils.template(sidebarTpl);
+    this.context = data.context;
+  }
+
+  render() {
+    HtmlUtils.setHtml(this.$el, this.tpl(this.context));
+    this.postRender();
+  }
+
+  postRender() {
+    this.newProgramsView = new NewProgramsView({
+      context: this.context,
+    });
+  }
+}
+
+export default SidebarView;

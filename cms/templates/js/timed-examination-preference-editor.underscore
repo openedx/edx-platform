@@ -42,7 +42,22 @@
                     <textarea cols="50" maxlength="255" aria-describedby="review-rules-description"
                         class="review-rules input input-text" autocomplete="off" />
                 </label>
-                <p class='field-message' id='review-rules-description'><%- gettext('Specify any additional rules or rule exceptions that the proctoring review team should enforce when reviewing the videos. For example, you could specify that calculators are allowed.') %></p>
+                <% var online_proctoring_rules = xblockInfo.get('online_proctoring_rules'); %>
+                <p class='field-message' id='review-rules-description'>
+                <% if (online_proctoring_rules) { %>
+                    <%= edx.HtmlUtils.interpolateHtml(
+                        gettext('Specify any rules or rule exceptions that the proctoring review team should enforce when reviewing the videos. For example, you could specify that calculators are allowed. These specified rules are visible to learners before the learners start the exam, along with the {linkStart}general proctored exam rules{linkEnd}.'),
+                        {
+                            linkStart: edx.HtmlUtils.interpolateHtml(
+                                edx.HtmlUtils.HTML('<a href="{onlineProctoringUrl}" title="{onlineProctoringTitle}">'),
+                                { onlineProctoringUrl: online_proctoring_rules, onlineProctoringTitle: gettext('General Proctored Exam Rules')}),
+                            linkEnd: edx.HtmlUtils.HTML('</a>')
+                        })
+                    %>
+                <% } else { %>
+                    <%- gettext('Specify any rules or rule exceptions that the proctoring review team should enforce when reviewing the videos. For example, you could specify that calculators are allowed. These specified rules are visible to learners before the learners start the exam.') %>
+                <% } %>
+                </p>
             </div>
         </div>
     </div>

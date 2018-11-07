@@ -89,7 +89,7 @@ class ResponseXMLFactory(object):
             # Add input elements
             for __ in range(int(num_inputs)):
                 input_element = self.create_input_element(**kwargs)
-                if not None == input_element:
+                if input_element is not None:
                     response_element.append(input_element)
 
             # The problem has an explanation of the solution

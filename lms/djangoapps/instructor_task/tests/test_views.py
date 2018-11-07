@@ -21,6 +21,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
     """
     Tests view methods that involve the reporting of status for background tasks.
     """
+    shard = 4
 
     def _get_instructor_task_status(self, task_id):
         """Returns status corresponding to task_id via api method."""

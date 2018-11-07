@@ -128,7 +128,7 @@ class LoncapaProblem(object):
     Main class for capa Problems.
     """
     def __init__(self, problem_text, id, capa_system, capa_module,  # pylint: disable=redefined-builtin
-                 state=None, seed=None, minimal_init=False):
+                 state=None, seed=None, minimal_init=False, extract_tree=True):
         """
         Initializes capa Problem.
 
@@ -147,6 +147,8 @@ class LoncapaProblem(object):
                 - `done` (bool) indicates whether or not this problem is considered done
                 - `input_state` (dict) maps input_id to a dictionary that holds the state for that input
             seed (int): random number generator seed.
+            minimal_init (bool): whether to skip pre-processing student answers
+            extract_tree (bool): whether to parse the problem XML and store the HTML
 
         """
 
@@ -212,7 +214,8 @@ class LoncapaProblem(object):
                 if hasattr(response, 'late_transforms'):
                     response.late_transforms(self)
 
-            self.extracted_tree = self._extract_html(self.tree)
+            if extract_tree:
+                self.extracted_tree = self._extract_html(self.tree)
 
     def make_xml_compatible(self, tree):
         """
@@ -492,6 +495,145 @@ class LoncapaProblem(object):
             answer_ids.append(results.keys())
         return answer_ids
 
+    def find_correct_answer_text(self, answer_id):
+        """
+        Returns the correct answer(s) for the provided answer_id as a single string.
+
+        Arguments::
+            answer_id (str): a string like "98e6a8e915904d5389821a94e48babcf_13_1"
+
+        Returns:
+            str: A string containing the answer or multiple answers separated by commas.
+        """
+        xml_elements = self.tree.xpath('//*[@id="' + answer_id + '"]')
+        if not xml_elements:
+            return
+        xml_element = xml_elements[0]
+        answer_text = xml_element.xpath('@answer')
+        if answer_text:
+            return answer_id[0]
+        if xml_element.tag == 'optioninput':
+            return xml_element.xpath('@correct')[0]
+        return ', '.join(xml_element.xpath('*[@correct="true"]/text()'))
+
+    def find_question_label(self, answer_id):
+        """
+        Obtain the most relevant question text for a particular answer.
+
+        E.g. in a problem like "How much is 2+2?" "Two"/"Three"/"More than three",
+        this function returns the "How much is 2+2?" text.
+
+        It uses, in order:
+        - the question prompt, if the question has one
+        - the <p> or <label> element which precedes the choices (skipping descriptive elements)
+        - a text like "Question 5" if no other name could be found
+
+        Arguments::
+            answer_id: a string like "98e6a8e915904d5389821a94e48babcf_13_1"
+
+        Returns:
+            a string with the question text
+        """
+        _ = self.capa_system.i18n.ugettext
+        # Some questions define a prompt with this format:   >>This is a prompt<<
+        prompt = self.problem_data[answer_id].get('label')
+
+        if prompt:
+            question_text = prompt.striptags()
+        else:
+            # If no prompt, then we must look for something resembling a question ourselves
+            #
+            # We have a structure like:
+            #
+            # <p />
+            # <optionresponse id="a0effb954cca4759994f1ac9e9434bf4_2">
+            #   <optioninput id="a0effb954cca4759994f1ac9e9434bf4_3_1" />
+            # <optionresponse>
+            #
+            # Starting from  answer (the optioninput in this example) we go up and backwards
+            xml_elems = self.tree.xpath('//*[@id="' + answer_id + '"]')
+            assert len(xml_elems) == 1
+            xml_elem = xml_elems[0].getparent()
+
+            # Get the element that probably contains the question text
+            questiontext_elem = xml_elem.getprevious()
+
+            # Go backwards looking for a <p> or <label>, but skip <description> because it doesn't
+            # contain the question text.
+            #
+            # E.g if we have this:
+            #   <p /> <description /> <optionresponse /> <optionresponse />
+            #
+            # then from the first optionresponse we'll end with the <p>.
+            # If we start in the second optionresponse, we'll find another response in the way,
+            # stop early, and instead of a question we'll report "Question 2".
+            SKIP_ELEMS = ['description']
+            LABEL_ELEMS = ['p', 'label']
+            while questiontext_elem is not None and questiontext_elem.tag in SKIP_ELEMS:
+                questiontext_elem = questiontext_elem.getprevious()
+
+            if questiontext_elem is not None and questiontext_elem.tag in LABEL_ELEMS:
+                question_text = questiontext_elem.text
+            else:
+                # For instance 'd2e35c1d294b4ba0b3b1048615605d2a_2_1' contains 2,
+                # which is used in question number 1 (see example XML in comment above)
+                # There's no question 0 (question IDs start at 1, answer IDs at 2)
+                question_nr = int(answer_id.split('_')[-2]) - 1
+                question_text = _("Question {0}").format(question_nr)
+
+        return question_text
+
+    def find_answer_text(self, answer_id, current_answer):
+        """
+        Process a raw answer text to make it more meaningful.
+
+        E.g. in a choice problem like "How much is 2+2?" "Two"/"Three"/"More than three",
+        this function will transform "choice_1" (which is the internal response given by
+        many capa methods) to the human version, e.g. "More than three".
+
+        If the answers are multiple (e.g. because they're from a multiple choice problem),
+        this will join them with a comma.
+
+        If passed a normal string which is already the answer, it doesn't change it.
+
+        TODO merge with response_a11y_data?
+
+        Arguments:
+            answer_id: a string like "98e6a8e915904d5389821a94e48babcf_13_1"
+            current_answer: a data structure as found in `LoncapaProblem.student_answers`
+                which represents the best response we have until now
+
+        Returns:
+            a string with the human version of the response
+        """
+        if isinstance(current_answer, list):
+            # Multiple answers. This case happens e.g. in multiple choice problems
+            answer_text = ", ".join(
+                self.find_answer_text(answer_id, answer) for answer in current_answer
+            )
+
+        elif isinstance(current_answer, basestring) and current_answer.startswith('choice_'):
+            # Many problem (e.g. checkbox) report "choice_0" "choice_1" etc.
+            # Here we transform it
+            elems = self.tree.xpath('//*[@id="{answer_id}"]//*[@name="{choice_number}"]'.format(
+                answer_id=answer_id,
+                choice_number=current_answer
+            ))
+            assert len(elems) == 1
+            choicegroup = elems[0].getparent()
+            input_cls = inputtypes.registry.get_class_for_tag(choicegroup.tag)
+            choices_map = dict(input_cls.extract_choices(choicegroup, self.capa_system.i18n, text_only=True))
+            answer_text = choices_map[current_answer]
+
+        elif isinstance(current_answer, basestring):
+            # Already a string with the answer
+            answer_text = current_answer
+
+        else:
+            raise NotImplementedError()
+
+        return answer_text
+
     def do_targeted_feedback(self, tree):
         """
         Implements targeted-feedback in-place on  <multiplechoiceresponse> --
@@ -611,7 +753,7 @@ class LoncapaProblem(object):
         """
         includes = self.tree.findall('.//include')
         for inc in includes:
-            filename = inc.get('file')
+            filename = inc.get('file').decode('utf-8')
             if filename is not None:
                 try:
                     # open using LoncapaSystem OSFS filestore

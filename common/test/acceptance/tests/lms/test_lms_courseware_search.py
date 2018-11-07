@@ -3,7 +3,6 @@ Test courseware search
 """
 import json
 
-from flaky import flaky
 from nose.plugins.attrib import attr
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
@@ -198,32 +197,3 @@ class CoursewareSearchTest(UniqueCourseTest):
 
         # Do the search again in the legacy sidebar, this time we expect results.
         self.assertTrue(self._search_for_content_in_sidebar(self.SEARCH_STRING, False))
-
-    @flaky  # TNL-5771
-    def test_reindex(self):
-        """
-        Make sure new content gets reindexed on button press.
-        """
-
-        # Create content in studio without publishing.
-        self._studio_add_content(1)
-
-        # Do a search, there should be no results shown.
-        self.assertFalse(self._search_for_content(self.EDITED_SEARCH_STRING))
-
-        # Publish in studio to trigger indexing, and edit chapter name afterwards.
-        self._studio_publish_content(1)
-
-        # Do a ReIndex from studio to ensure that our stuff is updated before the next stage of the test
-        self._studio_reindex()
-
-        # Search after publish, there should still be no results shown.
-        self.assertFalse(self._search_for_content(self.EDITED_SEARCH_STRING))
-
-        self._studio_edit_chapter_name(1)
-
-        # Do a ReIndex from studio to ensure that our stuff is updated before the next stage of the test
-        self._studio_reindex()
-
-        # Do the search again, this time we expect results.
-        self.assertTrue(self._search_for_content(self.EDITED_SEARCH_STRING))

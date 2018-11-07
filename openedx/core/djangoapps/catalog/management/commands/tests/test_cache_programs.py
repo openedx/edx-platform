@@ -1,13 +1,11 @@
 import json
 
 import httpretty
-import waffle
 from django.core.cache import cache
 from django.core.management import call_command
 
 from openedx.core.djangoapps.catalog.cache import (
     PROGRAM_CACHE_KEY_TPL,
-    PROGRAM_UUIDS_CACHE_KEY,
     SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
 )
 from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
@@ -24,6 +22,8 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
 
     def setUp(self):
         super(TestCachePrograms, self).setUp()
+
+        httpretty.httpretty.reset()
 
         self.catalog_integration = self.create_catalog_integration()
         self.site_domain = 'testsite.com'
@@ -74,7 +74,6 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
             content_type='application/json'
         )
 
-    @waffle.testutils.override_switch('populate-multitenant-programs', True)
     def test_handle(self):
         """
         Verify that the command requests and caches program UUIDs and details.
@@ -118,7 +117,6 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
         for key, program in cached_programs.items():
             self.assertEqual(program, programs[key])
 
-    @waffle.testutils.override_switch('populate-multitenant-programs', True)
     def test_handle_missing_service_user(self):
         """
         Verify that the command raises an exception when run without a service
@@ -130,7 +128,6 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
         cached_uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=self.site_domain))
         self.assertEqual(cached_uuids, None)
 
-    @waffle.testutils.override_switch('populate-multitenant-programs', True)
     def test_handle_missing_uuids(self):
         """
         Verify that the command raises an exception when it fails to retrieve
@@ -140,12 +137,11 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
 
         with self.assertRaises(SystemExit) as context:
             call_command('cache_programs')
-            self.assertEqual(context.exception.code, 1)
+        self.assertEqual(context.exception.code, 1)
 
         cached_uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=self.site_domain))
         self.assertEqual(cached_uuids, [])
 
-    @waffle.testutils.override_switch('populate-multitenant-programs', True)
     def test_handle_missing_programs(self):
         """
         Verify that a problem retrieving a program doesn't prevent the command
@@ -170,7 +166,7 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
         with self.assertRaises(SystemExit) as context:
             call_command('cache_programs')
 
-            self.assertEqual(context.exception.code, 1)
+        self.assertEqual(context.exception.code, 1)
 
         cached_uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=self.site_domain))
         self.assertEqual(

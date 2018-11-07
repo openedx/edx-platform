@@ -2,9 +2,9 @@
 from factory.django import DjangoModelFactory
 from factory import SubFactory
 from student.tests.factories import UserFactory
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
 
-from ..models import UserPreference, UserCourseTag, UserOrgTag
+from ..models import UserCourseTag, UserOrgTag, UserPreference
 
 
 # Factories are self documenting
@@ -23,7 +23,7 @@ class UserCourseTagFactory(DjangoModelFactory):
         model = UserCourseTag
 
     user = SubFactory(UserFactory)
-    course_id = SlashSeparatedCourseKey('org', 'course', 'run')
+    course_id = CourseLocator('org', 'course', 'run')
     key = None
     value = None
 

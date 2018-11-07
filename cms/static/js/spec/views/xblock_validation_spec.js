@@ -32,14 +32,15 @@ define(['jquery', 'js/models/xblock_validation', 'js/views/xblock_validation', '
             });
 
             it('can add additional classes', function() {
-                var noContainerContent = 'no-container-content', notConfiguredModel, nonRootView, rootView;
+                var noContainerContent = 'no-container-content',
+                    notConfiguredModel, nonRootView, rootView;
 
                 expect(view.getAdditionalClasses()).toBe('');
                 expect(view.$('.validation')).not.toHaveClass(noContainerContent);
 
                 notConfiguredModel = new XBlockValidationModel({
-                    'empty': false, 'summary': {'text': 'Not configured', 'type': model.NOT_CONFIGURED},
-                    'xblock_id': 'id'
+                    empty: false, summary: {text: 'Not configured', type: model.NOT_CONFIGURED},
+                    xblock_id: 'id'
                 },
                     {parse: true}
                 );
@@ -60,19 +61,19 @@ define(['jquery', 'js/models/xblock_validation', 'js/views/xblock_validation', '
 
             beforeEach(function() {
                 model = new XBlockValidationModel({
-                    'empty': false,
-                    'summary': {
-                        'text': 'Summary message', 'type': 'error',
-                        'action_label': 'Summary Action', 'action_class': 'edit-button'
+                    empty: false,
+                    summary: {
+                        text: 'Summary message', type: 'error',
+                        action_label: 'Summary Action', action_class: 'edit-button'
                     },
-                    'messages': [
+                    messages: [
                         {
-                            'text': 'First message', 'type': 'warning',
-                            'action_label': 'First Message Action', 'action_runtime_event': 'fix-up'
+                            text: 'First message', type: 'warning',
+                            action_label: 'First Message Action', action_runtime_event: 'fix-up'
                         },
-                         {'text': 'Second message', 'type': 'error'}
+                         {text: 'Second message', type: 'error'}
                     ],
-                    'xblock_id': 'id'
+                    xblock_id: 'id'
                 });
                 view = new XBlockValidationView({model: model});
                 view.render();
@@ -111,10 +112,11 @@ define(['jquery', 'js/models/xblock_validation', 'js/views/xblock_validation', '
 
             it('renders a summary only', function() {
                 var summaryOnlyModel = new XBlockValidationModel({
-                        'empty': false,
-                        'summary': {'text': 'Summary message', 'type': 'warning'},
-                        'xblock_id': 'id'
-                    }), summaryOnlyView, details;
+                        empty: false,
+                        summary: {text: 'Summary message', type: 'warning'},
+                        xblock_id: 'id'
+                    }),
+                    summaryOnlyView, details;
 
                 summaryOnlyView = new XBlockValidationView({model: summaryOnlyModel});
                 summaryOnlyView.render();

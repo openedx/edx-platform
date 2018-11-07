@@ -3,6 +3,6 @@
 from config_models.admin import ConfigurationModelAdmin
 from django.contrib import admin
 
-from commerce.models import CommerceConfiguration
+from .models import CommerceConfiguration
 
 admin.site.register(CommerceConfiguration, ConfigurationModelAdmin)

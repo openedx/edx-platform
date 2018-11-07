@@ -427,8 +427,7 @@ def assert_opened_help_link_is_correct(test, url):
         url (str): url to verify.
     """
     test.browser.switch_to_window(test.browser.window_handles[-1])
-    # Assert that url in the browser is the same.
-    test.assertEqual(url, test.browser.current_url)
+    WebDriverWait(test.browser, 10).until(lambda driver: driver.current_url == url)
     # Check that the URL loads. Can't do this in the browser because it might
     # be loading a "Maze Found" missing content page.
     response = requests.get(url)
@@ -462,7 +461,8 @@ class EventsTestMixin(TestCase):
     """
     def setUp(self):
         super(EventsTestMixin, self).setUp()
-        self.event_collection = MongoClient()["test"]["events"]
+        mongo_host = 'edx.devstack.mongo' if 'BOK_CHOY_HOSTNAME' in os.environ else 'localhost'
+        self.event_collection = MongoClient(mongo_host)["test"]["events"]
         self.start_time = datetime.now()
 
     def reset_event_tracking(self):
@@ -735,12 +735,43 @@ class AcceptanceTest(WebAppTest):
     """
 
     def __init__(self, *args, **kwargs):
-        # Hack until we upgrade Firefox and install geckodriver in devstack and Jenkins
-        DesiredCapabilities.FIREFOX['marionette'] = False
         super(AcceptanceTest, self).__init__(*args, **kwargs)
 
         # Use long messages so that failures show actual and expected values
         self.longMessage = True  # pylint: disable=invalid-name
+
+    def tearDown(self):
+        try:
+            self.browser.get('http://{}:{}'.format(
+                os.environ.get('BOK_CHOY_HOSTNAME', '127.0.0.1'),
+                os.environ.get('BOK_CHOY_LMS_PORT', 8003),
+            ))
+        except:  # pylint: disable=bare-except
+            self.browser.get('http://{}:{}'.format(
+                os.environ.get('BOK_CHOY_HOSTNAME', '127.0.0.1'),
+                os.environ.get('BOK_CHOY_CMS_PORT', 8031),
+            ))
+        logs = self.browser.execute_script("return window.localStorage.getItem('console_log_capture');")
+        if not logs:
+            return
+        logs = json.loads(logs)
+
+        log_dir = path('test_root') / 'log'
+        if 'shard' in os.environ:
+            log_dir /= "shard_{}".format(os.environ["SHARD"])
+        log_dir.mkdir_p()
+
+        with (log_dir / '{}.browser.log'.format(self.id()[:60])).open('w') as browser_log:
+            for (message, url, line_no, col_no, stack) in logs:
+                browser_log.write(u"{}:{}:{}: {}\n    {}\n".format(
+                    url,
+                    line_no,
+                    col_no,
+                    message,
+                    (stack or "").replace('\n', '\n    ')
+                ))
+
+        super(AcceptanceTest, self).tearDown()
 
 
 class UniqueCourseTest(AcceptanceTest):
@@ -786,8 +817,9 @@ class YouTubeStubConfig(object):
     Configure YouTube Stub Server.
     """
 
+    YOUTUBE_HOSTNAME = os.environ.get('BOK_CHOY_HOSTNAME', '127.0.0.1')
     PORT = 9080
-    URL = 'http://127.0.0.1:{}/'.format(PORT)
+    URL = 'http://{}:{}/'.format(YOUTUBE_HOSTNAME, PORT)
 
     @classmethod
     def configure(cls, config):
@@ -846,6 +878,23 @@ class YouTubeStubConfig(object):
             return json.loads(response.content)
         else:
             return {}
+
+
+def click_and_wait_for_window(page, element):
+    """
+    To avoid a race condition, click an element that launces a new window, and
+    wait for that window to launch.
+    To check this, make sure the number of window_handles increases by one.
+
+    Arguments:
+    page (PageObject): Page object to perform method on
+    element (WebElement): Clickable element that triggers the new window to open
+    """
+    num_windows = len(page.browser.window_handles)
+    element.click()
+    WebDriverWait(page.browser, 10).until(
+        lambda driver: len(driver.window_handles) > num_windows
+    )
 
 
 def create_user_partition_json(partition_id, name, description, groups, scheme="random"):

@@ -18,9 +18,9 @@ log = logging.getLogger(__name__)
 def evaluate_prerequisite(course, subsection_grade, user):
     """
     Evaluates any gating milestone relationships attached to the given
-    subsection. If the subsection_grade meets the minimum score required
-    by dependent subsections, the related milestone will be marked
-    fulfilled for the user.
+    subsection. If the subsection_grade and subsection_completion meets
+    the minimum score required by dependent subsections, the related
+    milestone will be marked fulfilled for the user.
     """
     prereq_milestone = gating_api.get_gating_milestone(course.id, subsection_grade.location, 'fulfills')
     if prereq_milestone:
@@ -30,45 +30,13 @@ def evaluate_prerequisite(course, subsection_grade, user):
 
         gated_content = gated_content_milestones.get(prereq_milestone['id'])
         if gated_content:
+            grade_percentage = subsection_grade.percent_graded * 100.0 \
+                if hasattr(subsection_grade, 'percent_graded') else None
+
             for milestone in gated_content:
-                min_percentage = _get_minimum_required_percentage(milestone)
-                subsection_percentage = _get_subsection_percentage(subsection_grade)
-                if subsection_percentage >= min_percentage:
-                    milestones_helpers.add_user_milestone({'id': user.id}, prereq_milestone)
-                else:
-                    milestones_helpers.remove_user_milestone({'id': user.id}, prereq_milestone)
-
-
-def _get_minimum_required_percentage(milestone):
-    """
-    Returns the minimum percentage requirement for the given milestone.
-    """
-    # Default minimum score to 100
-    min_score = 100
-    requirements = milestone.get('requirements')
-    if requirements:
-        try:
-            min_score = int(requirements.get('min_score'))
-        except (ValueError, TypeError):
-            log.warning(
-                u'Gating: Failed to find minimum score for gating milestone %s, defaulting to 100',
-                json.dumps(milestone)
-            )
-    return min_score
-
-
-def _get_subsection_percentage(subsection_grade):
-    """
-    Returns the percentage value of the given subsection_grade.
-    """
-    return _calculate_ratio(subsection_grade.graded_total.earned, subsection_grade.graded_total.possible) * 100.0
-
-
-def _calculate_ratio(earned, possible):
-    """
-    Returns the percentage of the given earned and possible values.
-    """
-    return float(earned) / float(possible) if possible else 0.0
+                gating_api.update_milestone(
+                    milestone, subsection_grade.location, prereq_milestone, user, grade_percentage
+                )
 
 
 def evaluate_entrance_exam(course_grade, user):
@@ -109,8 +77,8 @@ def get_entrance_exam_score_ratio(course_grade, exam_chapter_key):
     decimal value less than 1.
     """
     try:
-        earned, possible = course_grade.score_for_chapter(exam_chapter_key)
+        entrance_exam_score_ratio = course_grade.chapter_percentage(exam_chapter_key)
     except KeyError:
-        earned, possible = 0.0, 0.0
+        entrance_exam_score_ratio = 0.0, 0.0
         log.warning(u'Gating: Unexpectedly failed to find chapter_grade for %s.', exam_chapter_key)
-    return _calculate_ratio(earned, possible)
+    return entrance_exam_score_ratio

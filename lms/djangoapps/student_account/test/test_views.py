@@ -8,18 +8,24 @@ from urllib import urlencode
 
 import ddt
 import mock
+import pytest
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AnonymousUser
 from django.contrib.messages.middleware import MessageMiddleware
+from django.contrib.sessions.middleware import SessionMiddleware
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpRequest
 from django.test import TestCase
+from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from django.utils.translation import ugettext as _
 from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory, RefreshTokenFactory
 from edx_rest_api_client import exceptions
+from http.cookies import SimpleCookie
 from nose.plugins.attrib import attr
 from oauth2_provider.models import AccessToken as dot_access_token
 from oauth2_provider.models import RefreshToken as dot_refresh_token
@@ -27,27 +33,32 @@ from provider.oauth2.models import AccessToken as dop_access_token
 from provider.oauth2.models import RefreshToken as dop_refresh_token
 from testfixtures import LogCapture
 
-from commerce.models import CommerceConfiguration
-from commerce.tests import factories
-from commerce.tests.mocks import mock_get_orders
 from course_modes.models import CourseMode
-from edxmako.shortcuts import render_to_response
+from lms.djangoapps.commerce.models import CommerceConfiguration
+from lms.djangoapps.commerce.tests import factories
+from lms.djangoapps.commerce.tests.mocks import mock_get_orders
+from lms.djangoapps.student_account.views import login_and_registration_form
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme_context
-from openedx.core.djangoapps.user_api.accounts import EMAIL_MAX_LENGTH
 from openedx.core.djangoapps.user_api.accounts.api import activate_account, create_account
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
+from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory
 from student_account.views import account_settings_context, get_user_orders
 from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from openedx.core.djangoapps.user_api.errors import UserAPIInternalError
 
 LOGGER_NAME = 'audit'
 User = get_user_model()  # pylint:disable=invalid-name
+
+FEATURES_WITH_FAILED_PASSWORD_RESET_EMAIL = settings.FEATURES.copy()
+FEATURES_WITH_FAILED_PASSWORD_RESET_EMAIL['ENABLE_PASSWORD_RESET_FAILURE_EMAIL'] = True
 
 
 @ddt.ddt
@@ -62,24 +73,6 @@ class StudentAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
     NEW_EMAIL = u"walt@savewalterwhite.com"
 
     INVALID_ATTEMPTS = 100
-
-    INVALID_EMAILS = [
-        None,
-        u"",
-        u"a",
-        "no_domain",
-        "no+domain",
-        "@",
-        "@domain.com",
-        "test@no_extension",
-
-        # Long email -- subtract the length of the @domain
-        # except for one character (so we exceed the max length limit)
-        u"{user}@example.com".format(
-            user=(u'e' * (EMAIL_MAX_LENGTH - 11))
-        )
-    ]
-
     INVALID_KEY = u"123abc"
 
     URLCONF_MODULES = ['student_accounts.urls']
@@ -149,6 +142,39 @@ class StudentAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
         # Verify that the new password continues to be valid
         result = self.client.login(username=self.USERNAME, password=self.NEW_PASSWORD)
         self.assertTrue(result)
+
+    def test_password_change_failure(self):
+        with mock.patch('openedx.core.djangoapps.user_api.accounts.api.request_password_change',
+                        side_effect=UserAPIInternalError):
+            self._change_password()
+            self.assertRaises(UserAPIInternalError)
+
+    @override_settings(FEATURES=FEATURES_WITH_FAILED_PASSWORD_RESET_EMAIL)
+    def test_password_reset_failure_email(self):
+        """Test that a password reset failure email notification is sent, when enabled."""
+        # Log the user out
+        self.client.logout()
+
+        bad_email = 'doesnotexist@example.com'
+        response = self._change_password(email=bad_email)
+        self.assertEqual(response.status_code, 200)
+
+        # Check that an email was sent
+        self.assertEqual(len(mail.outbox), 1)
+
+        # Verify that the body contains the failed password reset message
+        sent_message = mail.outbox[0]
+        text_body = sent_message.body
+        html_body = sent_message.alternatives[0][0]
+
+        for email_body in [text_body, html_body]:
+            msg = 'However, there is currently no user account associated with your email address: {email}'.format(
+                email=bad_email
+            )
+
+            assert u'reset for your user account at {}'.format(settings.PLATFORM_NAME) in email_body
+            assert 'password_reset_confirm' not in email_body, 'The link should not be added if user was not found'
+            assert msg in email_body
 
     @ddt.data(True, False)
     def test_password_change_logged_out(self, send_email):
@@ -269,7 +295,7 @@ class StudentAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
         self.assertFalse(dop_refresh_token.objects.filter(user=user).exists())
 
 
-@attr(shard=3)
+@attr(shard=7)
 @ddt.ddt
 class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleStoreTestCase):
     """ Tests for the student account views that update the user's account information. """
@@ -365,15 +391,16 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         self._assert_third_party_auth_data(response, None, None, [], None)
 
     @mock.patch('student_account.views.enterprise_customer_for_request')
+    @mock.patch('openedx.core.djangoapps.user_api.api.enterprise_customer_for_request')
     @ddt.data(
-        ("signin_user", None, None, None),
-        ("register_user", None, None, None),
-        ("signin_user", "google-oauth2", "Google", None),
-        ("register_user", "google-oauth2", "Google", None),
-        ("signin_user", "facebook", "Facebook", None),
-        ("register_user", "facebook", "Facebook", None),
-        ("signin_user", "dummy", "Dummy", None),
-        ("register_user", "dummy", "Dummy", None),
+        ("signin_user", None, None, None, False),
+        ("register_user", None, None, None, False),
+        ("signin_user", "google-oauth2", "Google", None, False),
+        ("register_user", "google-oauth2", "Google", None, False),
+        ("signin_user", "facebook", "Facebook", None, False),
+        ("register_user", "facebook", "Facebook", None, False),
+        ("signin_user", "dummy", "Dummy", None, False),
+        ("register_user", "dummy", "Dummy", None, False),
         (
             "signin_user",
             "google-oauth2",
@@ -382,7 +409,8 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
                 'name': 'FakeName',
                 'logo': 'https://host.com/logo.jpg',
                 'welcome_msg': 'No message'
-            }
+            },
+            True
         )
     )
     @ddt.unpack
@@ -392,7 +420,9 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
             current_backend,
             current_provider,
             expected_enterprise_customer_mock_attrs,
-            enterprise_customer_mock
+            add_user_details,
+            enterprise_customer_mock_1,
+            enterprise_customer_mock_2
     ):
         params = [
             ('course_id', 'course-v1:Org+Course+Run'),
@@ -403,24 +433,26 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         ]
 
         if expected_enterprise_customer_mock_attrs:
-            expected_ec = mock.MagicMock(
-                branding_configuration=mock.MagicMock(
-                    logo=mock.MagicMock(
-                        url=expected_enterprise_customer_mock_attrs['logo']
-                    ),
-                    welcome_message=expected_enterprise_customer_mock_attrs['welcome_msg']
-                )
-            )
-            expected_ec.name = expected_enterprise_customer_mock_attrs['name']
+            expected_ec = {
+                'name': expected_enterprise_customer_mock_attrs['name'],
+                'branding_configuration': {
+                    'logo': 'https://host.com/logo.jpg',
+                    'welcome_message': expected_enterprise_customer_mock_attrs['welcome_msg']
+                }
+            }
         else:
             expected_ec = None
 
-        enterprise_customer_mock.return_value = expected_ec
+        email = None
+        if add_user_details:
+            email = 'test@test.com'
+        enterprise_customer_mock_1.return_value = expected_ec
+        enterprise_customer_mock_2.return_value = expected_ec
 
         # Simulate a running pipeline
         if current_backend is not None:
             pipeline_target = "student_account.views.third_party_auth.pipeline"
-            with simulate_running_pipeline(pipeline_target, current_backend):
+            with simulate_running_pipeline(pipeline_target, current_backend, email=email):
                 response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
 
         # Do NOT simulate a running pipeline
@@ -459,7 +491,90 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
             current_backend,
             current_provider,
             expected_providers,
-            expected_ec
+            expected_ec,
+            add_user_details
+        )
+
+    def _configure_testshib_provider(self, provider_name, idp_slug):
+        """
+        Enable and configure the TestShib SAML IdP as a third_party_auth provider.
+        """
+        kwargs = {}
+        kwargs.setdefault('name', provider_name)
+        kwargs.setdefault('enabled', True)
+        kwargs.setdefault('visible', True)
+        kwargs.setdefault('slug', idp_slug)
+        kwargs.setdefault('entity_id', 'https://idp.testshib.org/idp/shibboleth')
+        kwargs.setdefault('metadata_source', 'https://mock.testshib.org/metadata/testshib-providers.xml')
+        kwargs.setdefault('icon_class', 'fa-university')
+        kwargs.setdefault('attr_email', 'dummy-email-attr')
+        kwargs.setdefault('max_session_length', None)
+        self.configure_saml_provider(**kwargs)
+
+    @mock.patch('django.conf.settings.MESSAGE_STORAGE', 'django.contrib.messages.storage.cookie.CookieStorage')
+    @mock.patch('lms.djangoapps.student_account.views.enterprise_customer_for_request')
+    @ddt.data(
+        (
+            'signin_user',
+            'tpa-saml',
+            'TestShib',
+        )
+    )
+    @ddt.unpack
+    def test_saml_auth_with_error(
+            self,
+            url_name,
+            current_backend,
+            current_provider,
+            enterprise_customer_mock,
+    ):
+        params = []
+        request = RequestFactory().get(reverse(url_name), params, HTTP_ACCEPT='text/html')
+        SessionMiddleware().process_request(request)
+        request.user = AnonymousUser()
+
+        self.enable_saml()
+        dummy_idp = 'testshib'
+        self._configure_testshib_provider(current_provider, dummy_idp)
+        enterprise_customer_data = {
+            'uuid': '72416e52-8c77-4860-9584-15e5b06220fb',
+            'name': 'Dummy Enterprise',
+            'identity_provider': dummy_idp,
+        }
+        enterprise_customer_mock.return_value = enterprise_customer_data
+        dummy_error_message = 'Authentication failed: SAML login failed ' \
+                              '["invalid_response"] [SAML Response must contain 1 assertion]'
+
+        # Add error message for error in auth pipeline
+        MessageMiddleware().process_request(request)
+        messages.error(request, dummy_error_message, extra_tags='social-auth')
+
+        # Simulate a running pipeline
+        pipeline_response = {
+            'response': {
+                'idp_name': dummy_idp
+            }
+        }
+        pipeline_target = 'student_account.views.third_party_auth.pipeline'
+        with simulate_running_pipeline(pipeline_target, current_backend, **pipeline_response):
+            with mock.patch('edxmako.request_context.get_current_request', return_value=request):
+                response = login_and_registration_form(request)
+
+        expected_error_message = Text(_(
+            u'We are sorry, you are not authorized to access {platform_name} via this channel. '
+            u'Please contact your learning administrator or manager in order to access {platform_name}.'
+            u'{line_break}{line_break}'
+            u'Error Details:{line_break}{error_message}')
+        ).format(
+            platform_name=settings.PLATFORM_NAME,
+            error_message=dummy_error_message,
+            line_break=HTML('<br/>')
+        )
+        self._assert_saml_auth_data_with_error(
+            response,
+            current_backend,
+            current_provider,
+            expected_error_message
         )
 
     def test_hinted_login(self):
@@ -488,9 +603,11 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         self.google_provider.save()
         params = [("next", "/courses/something/?tpa_hint=oa2-google-oauth2")]
         response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
+        expected_url = '/auth/login/google-oauth2/?auth_entry={}&next=%2Fcourses'\
+                       '%2Fsomething%2F%3Ftpa_hint%3Doa2-google-oauth2'.format(auth_entry)
         self.assertRedirects(
             response,
-            'auth/login/google-oauth2/?auth_entry={}&next=%2Fcourses%2Fsomething%2F%3Ftpa_hint%3Doa2-google-oauth2'.format(auth_entry),
+            expected_url,
             target_status_code=302
         )
 
@@ -531,42 +648,34 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         self.google_provider.save()
         params = [("next", "/courses/something/")]
         response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
+        expected_url = '/auth/login/google-oauth2/?auth_entry={}&next=%2Fcourses'\
+                       '%2Fsomething%2F%3Ftpa_hint%3Doa2-google-oauth2'.format(auth_entry)
         self.assertRedirects(
             response,
-            'auth/login/google-oauth2/?auth_entry={}&next=%2Fcourses%2Fsomething%2F%3Ftpa_hint%3Doa2-google-oauth2'.format(auth_entry),
+            expected_url,
             target_status_code=302
         )
 
     @mock.patch('student_account.views.enterprise_customer_for_request')
     @ddt.data(
-        ('signin_user', False, None, None, None),
-        ('register_user', False, None, None, None),
-        ('signin_user', True, 'Fake EC', 'http://logo.com/logo.jpg', u'{enterprise_name} - {platform_name}'),
-        ('register_user', True, 'Fake EC', 'http://logo.com/logo.jpg', u'{enterprise_name} - {platform_name}'),
-        ('signin_user', True, 'Fake EC', None, u'{enterprise_name} - {platform_name}'),
-        ('register_user', True, 'Fake EC', None, u'{enterprise_name} - {platform_name}'),
-        ('signin_user', True, 'Fake EC', 'http://logo.com/logo.jpg', None),
-        ('register_user', True, 'Fake EC', 'http://logo.com/logo.jpg', None),
-        ('signin_user', True, 'Fake EC', None, None),
-        ('register_user', True, 'Fake EC', None, None),
+        ('signin_user', False, None, None),
+        ('register_user', False, None, None),
+        ('signin_user', True, 'Fake EC', 'http://logo.com/logo.jpg'),
+        ('register_user', True, 'Fake EC', 'http://logo.com/logo.jpg'),
+        ('signin_user', True, 'Fake EC', None),
+        ('register_user', True, 'Fake EC', None),
     )
     @ddt.unpack
-    def test_enterprise_register(self, url_name, ec_present, ec_name, logo_url, welcome_message, mock_get_ec):
+    def test_enterprise_register(self, url_name, ec_present, ec_name, logo_url, mock_get_ec):
         """
         Verify that when an EnterpriseCustomer is received on the login and register views,
         the appropriate sidebar is rendered.
         """
         if ec_present:
-            mock_ec = mock_get_ec.return_value
-            mock_ec.name = ec_name
-            if logo_url:
-                mock_ec.branding_configuration.logo.url = logo_url
-            else:
-                mock_ec.branding_configuration.logo = None
-            if welcome_message:
-                mock_ec.branding_configuration.welcome_message = welcome_message
-            else:
-                del mock_ec.branding_configuration.welcome_message
+            mock_get_ec.return_value = {
+                'name': ec_name,
+                'branding_configuration': {'logo': logo_url}
+            }
         else:
             mock_get_ec.return_value = None
 
@@ -578,17 +687,38 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
             self.assertNotContains(response, text=enterprise_sidebar_div_id)
         else:
             self.assertContains(response, text=enterprise_sidebar_div_id)
-            if not welcome_message:
-                welcome_message = settings.ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE
-            expected_message = welcome_message.format(
-                start_bold=u'<b>',
-                end_bold=u'</b>',
+            welcome_message = settings.ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE
+            expected_message = Text(welcome_message).format(
+                start_bold=HTML('<b>'),
+                end_bold=HTML('</b>'),
+                line_break=HTML('<br/>'),
                 enterprise_name=ec_name,
-                platform_name=settings.PLATFORM_NAME
+                platform_name=settings.PLATFORM_NAME,
+                privacy_policy_link_start=HTML("<a href='{pp_url}' target='_blank'>").format(
+                    pp_url=settings.MKTG_URLS.get('PRIVACY', 'https://www.edx.org/edx-privacy-policy')
+                ),
+                privacy_policy_link_end=HTML("</a>"),
             )
             self.assertContains(response, expected_message)
             if logo_url:
                 self.assertContains(response, logo_url)
+
+    def test_enterprise_cookie_delete(self):
+        """
+        Test that enterprise cookies are deleted in login/registration views.
+
+        Cookies must be deleted in login/registration views so that *default* login/registration branding
+        is displayed to subsequent requests from non-enterprise customers.
+        """
+        cookies = SimpleCookie()
+        cookies[settings.ENTERPRISE_CUSTOMER_COOKIE_NAME] = 'test-enterprise-customer'
+        response = self.client.get(reverse('signin_user'), HTTP_ACCEPT="text/html", cookies=cookies)
+
+        self.assertIn(settings.ENTERPRISE_CUSTOMER_COOKIE_NAME, response.cookies)  # pylint:disable=no-member
+        enterprise_cookie = response.cookies[settings.ENTERPRISE_CUSTOMER_COOKIE_NAME]  # pylint:disable=no-member
+
+        self.assertEqual(enterprise_cookie['domain'], settings.BASE_COOKIE_DOMAIN)
+        self.assertEqual(enterprise_cookie.value, '')
 
     @override_settings(SITE_NAME=settings.MICROSITE_TEST_HOSTNAME)
     def test_microsite_uses_old_login_page(self):
@@ -629,7 +759,8 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
 
         self.assertEqual(resp['X-Frame-Options'], 'ALLOW')
 
-    def _assert_third_party_auth_data(self, response, current_backend, current_provider, providers, expected_ec):
+    def _assert_third_party_auth_data(self, response, current_backend, current_provider, providers, expected_ec,
+                                      add_user_details=False):
         """Verify that third party auth info is rendered correctly in a DOM data attribute. """
         finish_auth_url = None
         if current_backend:
@@ -641,6 +772,9 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
             "secondaryProviders": [],
             "finishAuthUrl": finish_auth_url,
             "errorMessage": None,
+            "registerFormSubmitButtonText": "Create Account",
+            "syncLearnerProfileData": False,
+            "pipeline_user_details": {"email": "test@test.com"} if add_user_details else {}
         }
         if expected_ec is not None:
             # If we set an EnterpriseCustomer, third-party auth providers ought to be hidden.
@@ -650,7 +784,33 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         expected_data = '"third_party_auth": {auth_info}'.format(
             auth_info=auth_info
         )
+        self.assertContains(response, expected_data)
 
+    def _assert_saml_auth_data_with_error(
+            self, response, current_backend, current_provider, expected_error_message
+    ):
+        """
+        Verify that third party auth info is rendered correctly in a DOM data attribute.
+        """
+        finish_auth_url = None
+        if current_backend:
+            finish_auth_url = reverse('social:complete', kwargs={'backend': current_backend}) + '?'
+
+        auth_info = {
+            'currentProvider': current_provider,
+            'providers': [],
+            'secondaryProviders': [],
+            'finishAuthUrl': finish_auth_url,
+            'errorMessage': expected_error_message,
+            'registerFormSubmitButtonText': 'Create Account',
+            'syncLearnerProfileData': False,
+            'pipeline_user_details': {'response': {'idp_name': 'testshib'}}
+        }
+        auth_info = dump_js_escaped_json(auth_info)
+
+        expected_data = '"third_party_auth": {auth_info}'.format(
+            auth_info=auth_info
+        )
         self.assertContains(response, expected_data)
 
     def _third_party_login_url(self, backend_name, auth_entry, login_params):
@@ -729,8 +889,10 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConf
         MessageMiddleware().process_request(self.request)
         messages.error(self.request, 'Facebook is already in use.', extra_tags='Auth facebook')
 
-    def test_context(self):
-
+    @mock.patch('openedx.features.enterprise_support.api.get_enterprise_customer_for_learner')
+    def test_context(self, mock_get_enterprise_customer_for_learner):
+        self.request.site = SiteFactory.create()
+        mock_get_enterprise_customer_for_learner.return_value = {}
         context = account_settings_context(self.request)
 
         user_accounts_api_url = reverse("accounts_api", kwargs={'username': self.user.username})
@@ -753,6 +915,57 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConf
         self.assertEqual(context['auth']['providers'][0]['name'], 'Facebook')
         self.assertEqual(context['auth']['providers'][1]['name'], 'Google')
 
+        self.assertEqual(context['sync_learner_profile_data'], False)
+        self.assertEqual(context['edx_support_url'], settings.SUPPORT_SITE_LINK)
+        self.assertEqual(context['enterprise_name'], None)
+        self.assertEqual(
+            context['enterprise_readonly_account_fields'], {'fields': settings.ENTERPRISE_READONLY_ACCOUNT_FIELDS}
+        )
+
+    @mock.patch('student_account.views.get_enterprise_customer_for_learner')
+    @mock.patch('openedx.features.enterprise_support.utils.third_party_auth.provider.Registry.get')
+    def test_context_for_enterprise_learner(
+            self, mock_get_auth_provider, mock_get_enterprise_customer_for_learner
+    ):
+        dummy_enterprise_customer = {
+            'uuid': 'real-ent-uuid',
+            'name': 'Dummy Enterprise',
+            'identity_provider': 'saml-ubc'
+        }
+        mock_get_enterprise_customer_for_learner.return_value = dummy_enterprise_customer
+        self.request.site = SiteFactory.create()
+        mock_get_auth_provider.return_value.sync_learner_profile_data = True
+        context = account_settings_context(self.request)
+
+        user_accounts_api_url = reverse("accounts_api", kwargs={'username': self.user.username})
+        self.assertEqual(context['user_accounts_api_url'], user_accounts_api_url)
+
+        user_preferences_api_url = reverse('preferences_api', kwargs={'username': self.user.username})
+        self.assertEqual(context['user_preferences_api_url'], user_preferences_api_url)
+
+        for attribute in self.FIELDS:
+            self.assertIn(attribute, context['fields'])
+
+        self.assertEqual(
+            context['user_accounts_api_url'], reverse("accounts_api", kwargs={'username': self.user.username})
+        )
+        self.assertEqual(
+            context['user_preferences_api_url'], reverse('preferences_api', kwargs={'username': self.user.username})
+        )
+
+        self.assertEqual(context['duplicate_provider'], 'facebook')
+        self.assertEqual(context['auth']['providers'][0]['name'], 'Facebook')
+        self.assertEqual(context['auth']['providers'][1]['name'], 'Google')
+
+        self.assertEqual(
+            context['sync_learner_profile_data'], mock_get_auth_provider.return_value.sync_learner_profile_data
+        )
+        self.assertEqual(context['edx_support_url'], settings.SUPPORT_SITE_LINK)
+        self.assertEqual(context['enterprise_name'], dummy_enterprise_customer['name'])
+        self.assertEqual(
+            context['enterprise_readonly_account_fields'], {'fields': settings.ENTERPRISE_READONLY_ACCOUNT_FIELDS}
+        )
+
     def test_view(self):
         """
         Test that all fields are  visible
@@ -771,7 +984,7 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConf
         view_path = reverse('account_settings')
         response = self.client.get(path=view_path)
 
-        self.assertContains(response, '<li class="tab-nav-item">')
+        self.assertContains(response, 'global-header')
 
     def test_header_with_programs_listing_disabled(self):
         """
@@ -781,7 +994,7 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConf
         view_path = reverse('account_settings')
         response = self.client.get(path=view_path)
 
-        self.assertContains(response, '<li class="item nav-global-01">')
+        self.assertContains(response, 'global-header')
 
     def test_commerce_order_detail(self):
         """

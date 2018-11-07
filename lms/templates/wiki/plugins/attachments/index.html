@@ -87,7 +87,7 @@
               <td class="attachment-actions">
                 {% if attachment|can_write:user %}
                   {% if not attachment.current_revision.deleted %}
-                    {% if attachment.article = article %}
+                {% if attachment.article == article %}
                       <a href="{% url 'wiki:attachments_delete' path=urlpath.path article_id=article.id attachment_id=attachment.id %}" class="btn btn-danger">{% trans "Delete" %}</a>
                     {% else %}
                       <a href="{% url 'wiki:attachments_delete' path=urlpath.path article_id=article.id attachment_id=attachment.id %}" class="btn">{% trans "Detach" %}</a>

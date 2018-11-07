@@ -1,8 +1,8 @@
 """Tests for user API middleware"""
 from mock import Mock, patch
-from unittest import TestCase
 
 from django.http import HttpResponse
+from django.test import TestCase
 from django.test.client import RequestFactory
 
 from student.tests.factories import UserFactory, AnonymousUserFactory

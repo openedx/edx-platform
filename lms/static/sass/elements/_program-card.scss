@@ -1,5 +1,6 @@
 %hide-until-focus {
   @include left(0);
+
   display: inline-block;
   position: absolute;
   top: -999999px;
@@ -8,17 +9,19 @@
 
 .program-card {
   @include span(12);
+
   border: 1px solid $border-color-l3;
   border-bottom: none;
   margin-bottom: $baseline;
   position: relative;
 
-  @media(min-width: $bp-screen-md) {
+  @media (min-width: $bp-screen-md) {
     @include span(6);
 
     &:nth-child(2n) {
       @include span(6, before);
     }
+
     &:nth-child(2n+1) {
       @include span(6, after);
     }
@@ -27,6 +30,7 @@
   .card-link {
     @include left(0);
     @include right(0);
+
     position: absolute;
     top: 0;
     bottom: 0;
@@ -45,12 +49,15 @@
       overflow: hidden;
       height: 166px;
 
-      @media(min-width: $bp-screen-sm) { height: 242px; }
-      @media(min-width: $bp-screen-md) { height: 116px; }
-      @media(min-width: $bp-screen-lg) { height: 145px; }
+      @media (min-width: $bp-screen-sm) { height: 242px; }
+
+      @media (min-width: $bp-screen-md) { height: 116px; }
+
+      @media (min-width: $bp-screen-lg) { height: 145px; }
 
       .banner-image {
         @include left(50%);
+
         position: absolute;
         top: 0;
         z-index: 0;
@@ -65,9 +72,11 @@
     position: relative;
     margin-top: 156px;
 
-    @media(min-width: $bp-screen-sm) { margin-top: 232px; }
-    @media(min-width: $bp-screen-md) { margin-top: 106px; }
-    @media(min-width: $bp-screen-lg) { margin-top: 135px; }
+    @media (min-width: $bp-screen-sm) { margin-top: 232px; }
+
+    @media (min-width: $bp-screen-md) { margin-top: 106px; }
+
+    @media (min-width: $bp-screen-lg) { margin-top: 135px; }
   }
 
   .meta-info {
@@ -80,6 +89,7 @@
 
   .organization {
     @include span(6, none);
+
     white-space: nowrap;
     overflow: hidden;
   }
@@ -95,6 +105,7 @@
     .category-icon {
       @include float(right);
       @include margin-right($baseline*0.25);
+
       background-color: transparent;
       background-size: 100%;
       width: ($baseline*0.7);
@@ -121,9 +132,10 @@
         right: 5px;
         bottom: 8px;
       }
+
       margin-top: -8px;
       font-size: 1em;
-      font-family: $f-sans-serif;
+      font-family: $font-family-sans-serif;
     }
 
     .number-circle {
@@ -136,7 +148,7 @@
       color: white;
       text-align: center;
       font-size: 0.9375em;
-      font-family: $f-sans-serif;
+      font-family: $font-family-sans-serif;
       font-weight: bold;
     }
 
@@ -169,12 +181,15 @@
         &.completed {
           background: $blue;
         }
+
         &.enrolled {
           background: $green;
         }
+
         &.not-enrolled {
           background: lightgray;
         }
+
         &.not-enrolled:last-of-type {
           margin-right: 0;
         }

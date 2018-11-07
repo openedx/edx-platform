@@ -351,23 +351,18 @@ define([
         describe('SearchResultsView', function() {
             function showsLoadingMessage() {
                 this.resultsView.showLoadingMessage();
-                expect(this.resultsView.$contentElement).toBeHidden();
                 expect(this.resultsView.$el).toBeVisible();
                 expect(this.resultsView.$el).not.toBeEmpty();
             }
 
             function showsErrorMessage() {
                 this.resultsView.showErrorMessage();
-                expect(this.resultsView.$contentElement).toBeHidden();
                 expect(this.resultsView.$el).toBeVisible();
                 expect(this.resultsView.$el).not.toBeEmpty();
             }
 
             function returnsToContent() {
                 this.resultsView.clear();
-                expect(this.resultsView.$contentElement).toHaveCss({
-                    display: this.contentElementDisplayValue
-                });
                 expect(this.resultsView.$el).toBeHidden();
                 expect(this.resultsView.$el).toBeEmpty();
             }
@@ -484,16 +479,6 @@ define([
                 it('shows a link to load more results', showsMoreResultsLink);
                 it('triggers an event for next page', triggersNextPageEvent);
                 it('shows a spinner when loading more results', showsLoadMoreSpinner);
-                it('returns back to courses', function() {
-                    var onReset = jasmine.createSpy('onReset');
-                    this.resultsView.on('reset', onReset);
-                    this.resultsView.render();
-                    expect(this.resultsView.$el.find('a.search-back-to-courses')).toExist();
-                    this.resultsView.$el.find('.search-back-to-courses').click();
-                    expect(onReset).toHaveBeenCalled();
-                    expect(this.resultsView.$contentElement).toBeVisible();
-                    expect(this.resultsView.$el).toBeHidden();
-                });
             });
         });
 
@@ -502,9 +487,6 @@ define([
             function showsLoadingMessage() {
                 $('.search-field').val('search string');
                 $('.search-button').trigger('click');
-                if (this.$contentElement) {
-                    expect(this.$contentElement).toBeHidden();
-                }
                 expect(this.$searchResults).toBeVisible();
                 expect(this.$searchResults).not.toBeEmpty();
             }
@@ -556,13 +538,11 @@ define([
                 $('.cancel-button').trigger('click');
                 AjaxHelpers.skipResetRequest(requests);
                 // there should be no results
-                expect(this.$contentElement).toHaveCss({display: this.contentElementDisplayValue});
                 expect(this.$searchResults).toBeHidden();
             }
 
             function clearsResults() {
                 $('.cancel-button').trigger('click');
-                expect(this.$contentElement).toHaveCss({display: this.contentElementDisplayValue});
                 expect(this.$searchResults).toBeHidden();
             }
 
@@ -636,7 +616,6 @@ define([
                     DashboardSearchFactory();
 
                     spyOn(Backbone.history, 'navigate');
-                    this.$contentElement = $('#my-courses');
                     this.contentElementDisplayValue = 'block';
                     this.$searchResults = $('.search-results');
                 });
@@ -670,9 +649,7 @@ define([
                             }
                         }]
                     });
-                    expect($('.search-back-to-courses')).toExist();
-                    $('.search-back-to-courses').trigger('click');
-                    expect(this.$contentElement).toBeVisible();
+                    $('.search-form .cancel-button').trigger('click');
                     expect(this.$searchResults).toBeHidden();
                     expect(this.$searchResults).toBeEmpty();
                 });

@@ -54,7 +54,7 @@ describe('Formula Equation Preview', function() {
         window.MathJax.Hub.getAllJax = jasmine.createSpy('MathJax.Hub.getAllJax')
             .and.returnValue([this.jax]);
         window.MathJax.Hub.Queue = function(callback) {
-            if (typeof (callback) == 'function') {
+            if (typeof (callback) === 'function') {
                 callback();
             }
         };
@@ -73,11 +73,11 @@ describe('Formula Equation Preview', function() {
         var legitInput = this.$fixture[0].getElementsByTagName('input')[0];
 
         // Use the (modified) jQuery.
-        var jqueryInput = $('.formulaequationinput input');
-        var byIdInput = $('#input_THE_ID');
+        var $jqueryInput = $('.formulaequationinput input');
+        var $byIdInput = $('#input_THE_ID');
 
-        expect(jqueryInput[0]).toEqual(legitInput);
-        expect(byIdInput[0]).toEqual(legitInput);
+        expect($jqueryInput[0]).toEqual(legitInput);
+        expect($byIdInput[0]).toEqual(legitInput);
     });
 
     describe('Ajax requests', function() {
@@ -101,7 +101,7 @@ describe('Formula Equation Preview', function() {
                 'THE_ID',
                 'preview_formcalc',
                 {formula: 'PREFILLED_VALUE',
-                 request_start: jasmine.any(Number)},
+                    request_start: jasmine.any(Number)},
                 jasmine.any(Function)
             ]);
         });

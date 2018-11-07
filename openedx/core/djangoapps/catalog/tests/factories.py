@@ -8,6 +8,7 @@ from faker import Faker
 
 
 fake = Faker()
+VERIFIED_MODE = 'verified'
 
 
 def generate_instances(factory_class, count=3):
@@ -81,6 +82,11 @@ class StdImageFactory(ImageFactoryBase):
     url = factory.Faker('image_url')
 
 
+class VideoFactory(DictFactoryBase):
+    src = factory.Faker('url')
+    description = factory.Faker('sentence')
+
+
 def generate_sized_stdimage():
     return {
         size: StdImageFactory() for size in ['large', 'medium', 'small', 'x-small']
@@ -98,8 +104,16 @@ class SeatFactory(DictFactoryBase):
     currency = 'USD'
     price = factory.Faker('random_int')
     sku = factory.LazyFunction(generate_seat_sku)
-    type = 'verified'
+    type = VERIFIED_MODE
     upgrade_deadline = factory.LazyFunction(generate_zulu_datetime)
+
+
+class EntitlementFactory(DictFactoryBase):
+    currency = 'USD'
+    price = factory.Faker('random_int')
+    sku = factory.LazyFunction(generate_seat_sku)
+    mode = VERIFIED_MODE
+    expires = None
 
 
 class CourseRunFactory(DictFactoryBase):
@@ -116,12 +130,16 @@ class CourseRunFactory(DictFactoryBase):
     start = factory.LazyFunction(generate_zulu_datetime)
     status = 'published'
     title = factory.Faker('catch_phrase')
-    type = 'verified'
+    type = VERIFIED_MODE
     uuid = factory.Faker('uuid4')
+    content_language = 'en'
+    max_effort = 4
+    weeks_to_complete = 10
 
 
 class CourseFactory(DictFactoryBase):
     course_runs = factory.LazyFunction(partial(generate_instances, CourseRunFactory))
+    entitlements = factory.LazyFunction(partial(generate_instances, EntitlementFactory))
     image = ImageFactory()
     key = factory.LazyFunction(generate_course_key)
     owners = factory.LazyFunction(partial(generate_instances, OrganizationFactory, count=1))
@@ -142,7 +160,7 @@ class PersonFactory(DictFactoryBase):
 
 
 class EndorserFactory(DictFactoryBase):
-    person = PersonFactory()
+    endorser = PersonFactory()
     quote = factory.Faker('sentence')
 
 
@@ -155,16 +173,23 @@ class FAQFactory(DictFactoryBase):
     question = factory.Faker('sentence')
 
 
+class CorporateEndorsementFactory(DictFactoryBase):
+    corporation_name = factory.Faker('company')
+    image = ImageFactory()
+    individual_endorsements = factory.LazyFunction(partial(generate_instances, EndorserFactory))
+
+
 class ProgramFactory(DictFactoryBase):
     authoring_organizations = factory.LazyFunction(partial(generate_instances, OrganizationFactory, count=1))
     applicable_seat_types = []
     banner_image = factory.LazyFunction(generate_sized_stdimage)
     card_image_url = factory.Faker('image_url')
+    corporate_endorsements = factory.LazyFunction(partial(generate_instances, CorporateEndorsementFactory))
     courses = factory.LazyFunction(partial(generate_instances, CourseFactory))
     expected_learning_items = factory.LazyFunction(partial(generate_instances, CourseFactory))
     faq = factory.LazyFunction(partial(generate_instances, FAQFactory))
     hidden = False
-    individual_endorsements = factory.LazyFunction(partial(generate_instances, EndorserFactory))
+    instructor_ordering = factory.LazyFunction(partial(generate_instances, PersonFactory))
     is_program_eligible_for_one_click_purchase = True
     job_outlook_items = factory.LazyFunction(partial(generate_instances, JobOutlookItemFactory))
     marketing_slug = factory.Faker('slug')
@@ -179,6 +204,7 @@ class ProgramFactory(DictFactoryBase):
     title = factory.Faker('catch_phrase')
     type = factory.Faker('word')
     uuid = factory.Faker('uuid4')
+    video = VideoFactory()
     weeks_to_complete = fake.random_int(1, 45)
 
 

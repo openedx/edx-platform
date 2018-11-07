@@ -12,6 +12,7 @@ from celery.result import AsyncResult
 from celery.states import FAILURE, READY_STATES, REVOKED, SUCCESS
 from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import UsageKey
+from six import text_type
 
 from courseware.courses import get_problems_in_section
 from courseware.module_render import get_xqueue_callback_url_prefix
@@ -24,7 +25,26 @@ log = logging.getLogger(__name__)
 
 class AlreadyRunningError(Exception):
     """Exception indicating that a background task is already running"""
-    pass
+
+    message = _('Requested task is already running')
+
+    def __init__(self, message=None):
+
+        if not message:
+            message = self.message
+        super(AlreadyRunningError, self).__init__(message)
+
+
+class QueueConnectionError(Exception):
+    """
+    Exception indicating that celery task was not created successfully.
+    """
+    message = _('Error occured. Please try again later.')
+
+    def __init__(self, message=None):
+        if not message:
+            message = self.message
+        super(QueueConnectionError, self).__init__(message)
 
 
 def _task_is_running(course_id, task_type, task_key):
@@ -56,7 +76,8 @@ def _reserve_task(course_id, task_type, task_key, task_input, requester):
 
     if _task_is_running(course_id, task_type, task_key):
         log.warning("Duplicate task found for task_type %s and task_key %s", task_type, task_key)
-        raise AlreadyRunningError("requested task is already running")
+        error_message = generate_already_running_error_message(task_type)
+        raise AlreadyRunningError(error_message)
 
     try:
         most_recent_id = InstructorTask.objects.latest('id').id
@@ -72,6 +93,37 @@ def _reserve_task(course_id, task_type, task_key, task_input, requester):
 
     # Create log entry now, so that future requests will know it's running.
     return InstructorTask.create(course_id, task_type, task_key, task_input, requester)
+
+
+def generate_already_running_error_message(task_type):
+    """
+    Returns already running error message for given task type.
+    """
+
+    message = ''
+    report_types = {
+        'grade_problems': _('problem grade'),
+        'problem_responses_csv': _('problem responses'),
+        'profile_info_csv': _('enrolled learner profile'),
+        'may_enroll_info_csv': _('enrollment'),
+        'detailed_enrollment_report': _('detailed enrollment'),
+        'exec_summary_report': _('executive summary'),
+        'course_survey_report': _('survey'),
+        'proctored_exam_results_report': _('proctored exam results'),
+        'export_ora2_data': _('ORA data'),
+        'grade_course': _('grade'),
+
+    }
+
+    if report_types.get(task_type):
+
+        message = _(
+            "The {report_type} report is being created. "
+            "To view the status of the report, see Pending Tasks below. "
+            "You will be able to download the report when it is complete."
+        ).format(report_type=report_types.get(task_type))
+
+    return message
 
 
 def _get_xmodule_instance_args(request, task_id):
@@ -189,6 +241,27 @@ def _update_instructor_task(instructor_task, task_result):
             instructor_task.save()
 
 
+def _update_instructor_task_state(instructor_task, task_state, message=None):
+    """
+    Update state and output of InstructorTask object.
+    """
+    instructor_task.task_state = task_state
+    if message:
+        instructor_task.task_output = message
+
+    instructor_task.save()
+
+
+def _handle_instructor_task_failure(instructor_task, error):
+    """
+    Do required operations if task creation was not complete.
+    """
+    log.info("instructor task (%s) failed, result: %s", instructor_task.task_id, text_type(error))
+    _update_instructor_task_state(instructor_task, FAILURE, text_type(error))
+
+    raise QueueConnectionError()
+
+
 def get_updated_instructor_task(task_id):
     """
     Returns InstructorTask object corresponding to a given `task_id`.
@@ -263,6 +336,25 @@ def check_arguments_for_rescoring(usage_key):
         raise NotImplementedError(msg)
 
 
+def check_arguments_for_overriding(usage_key, score):
+    """
+    Do simple checks on the descriptor to confirm that it supports overriding
+    the problem score and the score passed in is not greater than the value of
+    the problem or less than 0.
+    """
+    descriptor = modulestore().get_item(usage_key)
+    score = float(score)
+
+    # some weirdness around initializing the descriptor requires this
+    if not hasattr(descriptor.__class__, 'set_score'):
+        msg = _("This component does not support score override.")
+        raise NotImplementedError(msg)
+
+    if score < 0 or score > descriptor.max_score():
+        msg = _("Scores must be between 0 and the value of the problem.")
+        raise ValueError(msg)
+
+
 def check_entrance_exam_problems_for_rescoring(exam_key):  # pylint: disable=invalid-name
     """
     Grabs all problem descriptors in exam and checks each descriptor to
@@ -289,11 +381,11 @@ def encode_problem_and_student_input(usage_key, student=None):  # pylint: disabl
 
     assert isinstance(usage_key, UsageKey)
     if student is not None:
-        task_input = {'problem_url': usage_key.to_deprecated_string(), 'student': student.username}
-        task_key_stub = "{student}_{problem}".format(student=student.id, problem=usage_key.to_deprecated_string())
+        task_input = {'problem_url': text_type(usage_key), 'student': student.username}
+        task_key_stub = "{student}_{problem}".format(student=student.id, problem=text_type(usage_key))
     else:
-        task_input = {'problem_url': usage_key.to_deprecated_string()}
-        task_key_stub = "_{problem}".format(problem=usage_key.to_deprecated_string())
+        task_input = {'problem_url': text_type(usage_key)}
+        task_key_stub = "_{problem}".format(problem=text_type(usage_key))
 
     # create the key value by using MD5 hash:
     task_key = hashlib.md5(task_key_stub).hexdigest()
@@ -311,11 +403,11 @@ def encode_entrance_exam_and_student_input(usage_key, student=None):  # pylint: 
     """
     assert isinstance(usage_key, UsageKey)
     if student is not None:
-        task_input = {'entrance_exam_url': unicode(usage_key), 'student': student.username}
-        task_key_stub = "{student}_{entranceexam}".format(student=student.id, entranceexam=unicode(usage_key))
+        task_input = {'entrance_exam_url': text_type(usage_key), 'student': student.username}
+        task_key_stub = "{student}_{entranceexam}".format(student=student.id, entranceexam=text_type(usage_key))
     else:
-        task_input = {'entrance_exam_url': unicode(usage_key)}
-        task_key_stub = "_{entranceexam}".format(entranceexam=unicode(usage_key))
+        task_input = {'entrance_exam_url': text_type(usage_key)}
+        task_key_stub = "_{entranceexam}".format(entranceexam=text_type(usage_key))
 
     # create the key value by using MD5 hash:
     task_key = hashlib.md5(task_key_stub).hexdigest()
@@ -345,6 +437,10 @@ def submit_task(request, task_type, task_class, course_key, task_input, task_key
 
     task_id = instructor_task.task_id
     task_args = [instructor_task.id, _get_xmodule_instance_args(request, task_id)]
-    task_class.apply_async(task_args, task_id=task_id)
+    try:
+        task_class.apply_async(task_args, task_id=task_id)
+
+    except Exception as error:
+        _handle_instructor_task_failure(instructor_task, error)
 
     return instructor_task

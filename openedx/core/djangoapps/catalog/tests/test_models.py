@@ -1,7 +1,6 @@
 """Catalog model tests."""
 import ddt
 import mock
-import waffle
 from django.test import TestCase, override_settings
 
 from openedx.core.djangoapps.catalog.tests import mixins
@@ -32,7 +31,6 @@ class TestCatalogIntegration(mixins.CatalogIntegrationMixin, TestCase):
         self.assertEqual(catalog_integration.is_cache_enabled, is_cache_enabled)
 
     @override_settings(COURSE_CATALOG_API_URL=COURSE_CATALOG_API_URL)
-    @waffle.testutils.override_switch("populate-multitenant-programs", True)
     def test_get_internal_api_url(self, _mock_cache):
         """ Requests made without a microsite should return the value from settings. """
         self.assert_get_internal_api_url_value(COURSE_CATALOG_API_URL)
@@ -41,7 +39,6 @@ class TestCatalogIntegration(mixins.CatalogIntegrationMixin, TestCase):
 
     @override_settings(COURSE_CATALOG_API_URL=COURSE_CATALOG_API_URL)
     @with_site_configuration(configuration={})
-    @waffle.testutils.override_switch("populate-multitenant-programs", True)
     def test_get_internal_api_url_without_microsite_override(self, _mock_cache):
         """ Requests made to microsites that do not have COURSE_CATALOG_API_URL overridden should
         return the default value from settings. """
@@ -49,7 +46,6 @@ class TestCatalogIntegration(mixins.CatalogIntegrationMixin, TestCase):
 
     @override_settings(COURSE_CATALOG_API_URL=COURSE_CATALOG_API_URL)
     @with_site_configuration(configuration={'COURSE_CATALOG_API_URL': 'foo'})
-    @waffle.testutils.override_switch("populate-multitenant-programs", True)
     def test_get_internal_api_url_with_microsite_override(self, _mock_cache):
         """ If a microsite has overridden the value of COURSE_CATALOG_API_URL, the overridden
         value should be returned. """
