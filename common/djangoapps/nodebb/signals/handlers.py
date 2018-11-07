@@ -169,7 +169,18 @@ def create_category_on_nodebb(instance, **kwargs):
     Create a community on NodeBB if it's already not exists
     """
     community_exists = DiscussionCommunity.objects.filter(course_id=instance.id).first()
-    if not community_exists:
+
+    """
+    Following code is to block the double community creation.
+    When ever a course created CourseOverviews's post_save triggered twice
+    On the base of function call trace we blocked one of those whose 5th function
+    in trace is '_listen_for_course_publish'
+    """
+    import inspect
+    curframe = inspect.currentframe()
+    main_triggerer_function = inspect.getouterframes(curframe)[5][3]
+
+    if not community_exists and main_triggerer_function is not '_listen_for_course_publish':
         community_name = '%s-%s-%s-%s' % (instance.display_name,
                                           instance.id.org, instance.id.course, instance.id.run)
         status_code, response_body = NodeBBClient().categories.create(
