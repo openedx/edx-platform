@@ -11,7 +11,6 @@ import json
 import ddt
 from fs.memoryfs import MemoryFS
 from mock import Mock, patch
-import six
 
 from . import get_test_system
 from .helpers import StubUserService

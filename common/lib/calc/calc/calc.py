@@ -9,7 +9,6 @@ import numbers
 import operator
 
 import numpy
-import scipy.constants
 from pyparsing import (
     CaselessLiteral,
     Combine,

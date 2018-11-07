@@ -20,8 +20,6 @@ from xmodule.util.xmodule_django import add_webpack_to_fragment
 from xmodule.x_module import STUDENT_VIEW, XModuleFields
 from xmodule.xml_module import XmlParserMixin
 
-import webpack_loader.utils
-
 log = logging.getLogger(__name__)
 
 # HACK: This shouldn't be hard-coded to two types

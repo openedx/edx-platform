@@ -30,7 +30,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.core.cache import cache
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
-from django.db import IntegrityError, models, transaction
+from django.db import IntegrityError, models
 from django.db.models import Count, Q
 from django.db.models.signals import post_save, pre_save
 from django.db.utils import ProgrammingError

@@ -8,8 +8,6 @@ from uuid import uuid4
 
 from pymongo import ReadPreference
 
-from django.conf import settings
-
 from xmodule.mongo_utils import connect_to_mongodb
 
 
