@@ -27,11 +27,13 @@ from openedx.features.course_duration_limits.config import CONTENT_TYPE_GATING_F
 from openedx.features.course_experience import (
     SHOW_REVIEWS_TOOL_FLAG,
     SHOW_UPGRADE_MSG_ON_COURSE_HOME,
-    UNIFIED_COURSE_TAB_FLAG
+    UNIFIED_COURSE_TAB_FLAG,
+    COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
 )
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from util.date_utils import strftime_localized
+from xmodule.course_module import COURSE_VISIBILITY_PRIVATE, COURSE_VISIBILITY_PUBLIC_OUTLINE, COURSE_VISIBILITY_PUBLIC
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import CourseUserType, ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
@@ -222,37 +224,56 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
 
     @override_waffle_flag(SHOW_REVIEWS_TOOL_FLAG, active=True)
     @ddt.data(
-        [CourseUserType.ANONYMOUS, 'To see course content'],
-        [CourseUserType.ENROLLED, None],
-        [CourseUserType.UNENROLLED, 'You must be enrolled in the course to see course content.'],
-        [CourseUserType.UNENROLLED_STAFF, 'You must be enrolled in the course to see course content.'],
+        [False, COURSE_VISIBILITY_PRIVATE, CourseUserType.ANONYMOUS, True],
+        [False, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.ANONYMOUS, True],
+        [False, COURSE_VISIBILITY_PUBLIC, CourseUserType.ANONYMOUS, True],
+        [False, COURSE_VISIBILITY_PRIVATE, CourseUserType.ENROLLED, False],
+        [False, COURSE_VISIBILITY_PRIVATE, CourseUserType.UNENROLLED, True],
+        [False, COURSE_VISIBILITY_PRIVATE, CourseUserType.UNENROLLED_STAFF, True],
+        [True, COURSE_VISIBILITY_PRIVATE, CourseUserType.ANONYMOUS, True],
+        [True, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.ANONYMOUS, True],
+        [True, COURSE_VISIBILITY_PUBLIC, CourseUserType.ANONYMOUS, True],
+        [True, COURSE_VISIBILITY_PRIVATE, CourseUserType.UNENROLLED, True],
+        [True, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.UNENROLLED, True],
+        [True, COURSE_VISIBILITY_PUBLIC, CourseUserType.UNENROLLED, True],
     )
     @ddt.unpack
-    def test_home_page(self, user_type, expected_message):
+    def test_home_page(self, enable_unenrolled_access, course_visibility, user_type, expected_message):
         self.create_user_for_course(self.course, user_type)
 
         # Render the course home page
-        url = course_home_url(self.course)
-        response = self.client.get(url)
+        with mock.patch('xmodule.course_module.CourseDescriptor.course_visibility', course_visibility):
+            # Test access with anonymous flag and course visibility
+            with override_waffle_flag(COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, enable_unenrolled_access):
+                url = course_home_url(self.course)
+                response = self.client.get(url)
 
         # Verify that the course tools and dates are always shown
         self.assertContains(response, 'Course Tools')
         self.assertContains(response, 'Today is')
 
-        # Verify that the outline, start button, course sock, and welcome message
+        # Verify that start button, course sock, and welcome message
         # are only shown to enrolled users.
         is_enrolled = user_type is CourseUserType.ENROLLED
         is_unenrolled_staff = user_type is CourseUserType.UNENROLLED_STAFF
-        expected_count = 1 if (is_enrolled or is_unenrolled_staff) else 0
-        self.assertContains(response, TEST_CHAPTER_NAME, count=expected_count)
-        self.assertContains(response, 'Start Course', count=expected_count)
+        expected_welcome = 1 if (is_enrolled or is_unenrolled_staff) else 0
+        self.assertContains(response, 'Start Course', count=expected_welcome)
         self.assertContains(response, 'Learn About Verified Certificate', count=(1 if is_enrolled else 0))
-        self.assertContains(response, TEST_WELCOME_MESSAGE, count=expected_count)
+        self.assertContains(response, TEST_WELCOME_MESSAGE, count=expected_welcome)
+
+        # Verify the outline is shown to enrolled users, unenrolled_staff and anonymous users if allowed
+        is_public = course_visibility == COURSE_VISIBILITY_PUBLIC and enable_unenrolled_access
+        is_public_outline = course_visibility == COURSE_VISIBILITY_PUBLIC_OUTLINE and enable_unenrolled_access
+        expected_chapter = 1 if (is_public or is_public_outline) else expected_welcome
+        self.assertContains(response, TEST_CHAPTER_NAME, count=expected_chapter)
 
         # Verify that the expected message is shown to the user
+        self.assertContains(
+            response, 'To see course content', count=1 if user_type is CourseUserType.ANONYMOUS else 0
+        )
         self.assertContains(response, '<div class="user-messages">', count=1 if expected_message else 0)
         if expected_message:
-            self.assertContains(response, expected_message)
+            self.assertContains(response, 'You must be enrolled in the course to see course content.')
 
     @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
     @override_waffle_flag(SHOW_REVIEWS_TOOL_FLAG, active=True)

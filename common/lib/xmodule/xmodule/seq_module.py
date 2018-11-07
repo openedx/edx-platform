@@ -22,7 +22,7 @@ from .exceptions import NotFoundError
 from .fields import Date
 from .mako_module import MakoModuleDescriptor
 from .progress import Progress
-from .x_module import STUDENT_VIEW, XModule
+from .x_module import STUDENT_VIEW, PUBLIC_VIEW, XModule
 from .xml_module import XmlDescriptor
 
 log = logging.getLogger(__name__)
@@ -247,7 +247,13 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             banner_text, special_html = special_html_view
             if special_html and not masquerading_as_specific_student:
                 return Fragment(special_html)
-        return self._student_view(context, banner_text)
+        return self._student_or_public_view(context, banner_text)
+
+    def public_view(self, context):
+        """
+        Renders the preview view of the block in the LMS.
+        """
+        return self._student_or_public_view(context or {}, None, PUBLIC_VIEW)
 
     def _special_exam_student_view(self):
         """
@@ -299,7 +305,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         # NOTE (CCB): We default to true to maintain the behavior in place prior to allowing anonymous access access.
         return context.get('user_authenticated', True)
 
-    def _student_view(self, context, banner_text=None):
+    def _student_or_public_view(self, context, banner_text=None, view=STUDENT_VIEW):
         """
         Returns the rendered student view of the content of this
         sequential.  If banner_text is given, it is added to the
@@ -320,8 +326,9 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             banner_text = _('This section is a prerequisite. You must complete this section in order to unlock additional content.')
 
         fragment = Fragment()
+        items = self._render_student_view_for_items(context, display_items, fragment, view) if prereq_met else []
         params = {
-            'items': self._render_student_view_for_items(context, display_items, fragment) if prereq_met else [],
+            'items': items,
             'element_id': self.location.html_id(),
             'item_id': text_type(self.location),
             'position': self.position,
@@ -330,8 +337,8 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             'next_url': context.get('next_url'),
             'prev_url': context.get('prev_url'),
             'banner_text': banner_text,
-            'save_position': self.is_user_authenticated(context),
-            'show_completion': self.is_user_authenticated(context),
+            'save_position': view != PUBLIC_VIEW,
+            'show_completion': view != PUBLIC_VIEW,
             'gated_content': self._get_gated_content_info(prereq_met, prereq_meta_info)
         }
         fragment.add_content(self.system.render_template("seq_module.html", params))
@@ -423,7 +430,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         elif self.position is None or self.position > number_of_display_items:
             self.position = 1
 
-    def _render_student_view_for_items(self, context, display_items, fragment):
+    def _render_student_view_for_items(self, context, display_items, fragment, view=STUDENT_VIEW):
         """
         Updates the given fragment with rendered student views of the given
         display_items.  Returns a list of dict objects with information about
@@ -461,7 +468,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             context['show_bookmark_button'] = show_bookmark_button
             context['bookmarked'] = is_bookmarked
 
-            rendered_item = item.render(STUDENT_VIEW, context)
+            rendered_item = item.render(view, context)
             fragment.add_fragment_resources(rendered_item)
 
             iteminfo = {

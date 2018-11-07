@@ -8,6 +8,7 @@ from django.conf import settings
 from edx_proctoring.api import get_attempt_status_summary
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
 
+from student.models import CourseEnrollment
 from openedx.core.djangoapps.content.block_structure.transformer import (
     BlockStructureTransformer,
 )
@@ -144,7 +145,11 @@ class MilestonesAndSpecialExamsTransformer(BlockStructureTransformer):
 
         """
         course_key = block_structure.root_block_usage_key.course_key
-        user_can_skip_entrance_exam = EntranceExamConfiguration.user_can_skip_entrance_exam(usage_info.user, course_key)
+        user_can_skip_entrance_exam = False
+        is_enrolled = CourseEnrollment.is_enrolled(usage_info.user, course_key)
+        if is_enrolled:
+            user_can_skip_entrance_exam = EntranceExamConfiguration.user_can_skip_entrance_exam(
+                usage_info.user, course_key)
         required_content = milestones_helpers.get_required_content(course_key, usage_info.user)
 
         if not required_content:
