@@ -198,7 +198,7 @@ class UserViewAPITests(TpaAPITestCase):
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['account_activate'], False)
+        self.assertEqual(response.data['account_active'], False)
 
 
 @override_settings(EDX_API_KEY=VALID_API_KEY)
