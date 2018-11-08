@@ -193,7 +193,7 @@ class UserViewAPITests(TpaAPITestCase):
         self.assertGreater(len(response.data['active']), 0)
 
     def test_get_inactive_user(self):
-        self.client.login(username=STAFF_USERNAME, password=PASSWORD)
+        self.client.login(username=ADMIN_USERNAME, password=PASSWORD)
         url = reverse('third_party_auth_users_api', kwargs={'username': INACTIVE_USERNAME})
 
         response = self.client.get(url)
