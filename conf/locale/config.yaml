@@ -77,7 +77,7 @@ locales:
     # - ta  # Tamil
     # - te  # Telugu
     # - th  # Thai
-    # - tr_TR  # Turkish (Turkey)
+    - tr_TR  # Turkish (Turkey)
     # - uk  # Ukranian
     # - ur  # Urdu
     # - uz  # Uzbek
