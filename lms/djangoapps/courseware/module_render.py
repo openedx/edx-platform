@@ -14,6 +14,7 @@ from completion import waffle as completion_waffle
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
+from django.middleware.csrf import CsrfViewMiddleware
 from django.template.context_processors import csrf
 from django.urls import reverse
 from django.http import Http404, HttpResponse, HttpResponseForbidden
@@ -23,10 +24,12 @@ from django.views.decorators.csrf import csrf_exempt
 from edx_django_utils.cache import RequestCache
 from edx_django_utils.monitoring import set_custom_metrics_for_course_key, set_monitoring_transaction_name
 from edx_proctoring.services import ProctoringService
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from requests.auth import HTTPBasicAuth
 from rest_framework.decorators import api_view
+from rest_framework.exceptions import APIException
 from six import text_type
 from xblock.core import XBlock
 from xblock.django.request import django_to_webob_request, webob_to_django_response
@@ -58,6 +61,7 @@ from openedx.core.djangoapps.bookmarks.services import BookmarksService
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.services import CreditService
 from openedx.core.djangoapps.util.user_utils import SystemUser
+from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.djangolib.markup import HTML
 from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.lib.gating.services import GatingService
@@ -990,6 +994,7 @@ def handle_xblock_callback_noauth(request, course_id, usage_id, handler, suffix=
         return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course=course)
 
 
+@csrf_exempt
 @xframe_options_exempt
 def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     """
@@ -1003,11 +1008,37 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
         suffix (str)
 
     Raises:
+        HttpResponseForbidden: If the request method is not `GET` and user is not authenticated.
         Http404: If the course is not found in the modulestore.
     """
+    # In this case, we are using Session based authentication, so we need to check CSRF token.
+    if request.user.is_authenticated:
+        error = CsrfViewMiddleware().process_view(request, None, (), {})
+        if error:
+            return error
+
+    # We are reusing DRF logic to provide support for JWT and Oauth2. We abandoned the idea of using DRF view here
+    # to avoid introducing backwards-incompatible changes.
+    # You can see https://github.com/edx/XBlock/pull/383 for more details.
+    else:
+        authentication_classes = (JwtAuthentication, OAuth2AuthenticationAllowInactiveUser)
+        authenticators = [auth() for auth in authentication_classes]
+
+        for authenticator in authenticators:
+            try:
+                user_auth_tuple = authenticator.authenticate(request)
+            except APIException:
+                log.exception(
+                    "XBlock handler %r failed to authenticate with %s", handler, authenticator.__class__.__name__
+                )
+            else:
+                if user_auth_tuple is not None:
+                    request.user, _ = user_auth_tuple
+                    break
+
     # NOTE (CCB): Allow anonymous GET calls (e.g. for transcripts). Modifying this view is simpler than updating
-    # the XBlocks to use `handle_xblock_callback_noauth`...which is practically identical to this view.
-    if request.method != 'GET' and not request.user.is_authenticated:
+    # the XBlocks to use `handle_xblock_callback_noauth`, which is practically identical to this view.
+    if request.method != 'GET' and not (request.user and request.user.is_authenticated):
         return HttpResponseForbidden()
 
     request.user.known = request.user.is_authenticated
