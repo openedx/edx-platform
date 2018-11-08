@@ -1,0 +1,48 @@
+
+//头部
+.window-wrap .global-header{
+  border-bottom: none;
+  overflow: inherit;
+  // height: 63px;
+  .main-header{
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .header-logo{ 
+    a{  
+      margin-left: 0px;
+    }
+  }
+}
+@media (max-width: 991px){  
+  .window-wrap .global-header .header-logo a{ 
+    margin-left: 50%;
+  }
+}
+
+
+@media screen and (min-width: 992px){ 
+  .global-header{ 
+    .nav-links{
+      .main .nav-tab a {  
+        // padding-top: 0px;
+      }
+      .secondary{
+        margin-right: 0px;
+        .nav-item.nav-item-dropdown {
+          position: relative;
+        }
+      }
+    }
+  } 
+}
+
+//查看课程的导航
+.content-wrapper .course-tabs{  
+  max-width: 1200px;
+  margin: 0 auto;
+}
+//内容
+.page-content-container{  
+  max-width: 1200px;
+}
