@@ -6,8 +6,6 @@ consist primarily of authentication, request validation, and serialization.
 import logging
 
 from course_modes.models import CourseMode
-from django.db import transaction
-from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.decorators import method_decorator
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication

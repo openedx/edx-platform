@@ -3,7 +3,6 @@ import logging
 from django.db import IntegrityError, transaction
 from django.db.models import Q
 from django.http import HttpResponseBadRequest
-from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.paginators import DefaultPagination

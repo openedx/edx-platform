@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 """Tests for util.password_policy_validators module."""
-import mock
+
 import unittest
 
 from ddt import data, ddt, unpack
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.test.utils import override_settings

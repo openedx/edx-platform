@@ -13,7 +13,6 @@ from course_modes.tests.factories import CourseModeFactory
 from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from student.models import (
     CourseEnrollment,
-    CourseEnrollmentAllowed,
     CourseFullError,
     EnrollmentClosedError,
     SCORE_RECALCULATION_DELAY_ON_ENROLLMENT_UPDATE,

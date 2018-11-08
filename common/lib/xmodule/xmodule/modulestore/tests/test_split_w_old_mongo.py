@@ -1,7 +1,6 @@
 import datetime
 import random
 import unittest
-import uuid
 import os
 import mock
 import pytest
