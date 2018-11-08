@@ -4,6 +4,7 @@ Course Discussion XBlock
 """
 import logging
 
+from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
 from xblock.fields import Scope, String
 from xblock.fragment import Fragment
@@ -20,7 +21,12 @@ def _(text):
 
 
 class DiscussionCourseXBlock(XBlock):
-    """ Provides functionality similar to discussion XModule in tab mode """
+    """
+    Provides functionality similar to discussion XModule in tab mode.
+    """
+
+    completion_mode = XBlockCompletionMode.EXCLUDED
+
     display_name = String(
         display_name=_("Display Name"),
         help=_("Display name for this module"),
