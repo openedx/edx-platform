@@ -173,7 +173,7 @@ def create_category_on_nodebb(instance, **kwargs):
     """
     Following code is to block the double community creation.
     When ever a course created CourseOverviews's post_save triggered twice
-    On the base of function call trace we blocked one of those whose 5th function
+    On the base of function call trace we allow one of those whose 5th function
     in trace is '_listen_for_course_publish'
     """
     import inspect
