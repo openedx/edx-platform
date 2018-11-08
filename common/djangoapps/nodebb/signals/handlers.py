@@ -180,7 +180,7 @@ def create_category_on_nodebb(instance, **kwargs):
     curframe = inspect.currentframe()
     main_triggerer_function = inspect.getouterframes(curframe)[5][3]
 
-    if not community_exists and main_triggerer_function is not '_listen_for_course_publish':
+    if not community_exists and main_triggerer_function is '_listen_for_course_publish':
         community_name = '%s-%s-%s-%s' % (instance.display_name,
                                           instance.id.org, instance.id.course, instance.id.run)
         status_code, response_body = NodeBBClient().categories.create(
