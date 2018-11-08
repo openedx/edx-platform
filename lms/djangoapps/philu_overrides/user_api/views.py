@@ -469,6 +469,7 @@ class RegistrationViewCustom(RegistrationView):
 
         try:
             user = create_account_with_params_custom(request, data, is_alquity_user)
+            self.save_user_utm_info(user)
         except ValidationError as err:
             # Should only get non-field errors from this function
             assert NON_FIELD_ERRORS not in err.message_dict
@@ -482,6 +483,32 @@ class RegistrationViewCustom(RegistrationView):
         response = JsonResponse({"success": True})
         set_logged_in_cookies(request, response, user)
         return response
+
+    def save_user_utm_info(self, user):
+
+        """
+        :param user:
+            user for which utm params are being saved + request to get all utm related params
+        :return:
+        """
+        try:
+            utm_source = self.request.POST.get("utm_source", None)
+            utm_medium = self.request.POST.get("utm_medium", None)
+            utm_campaign = self.request.POST.get("utm_campaign", None)
+            utm_content = self.request.POST.get("utm_content", None)
+            utm_term = self.request.POST.get("utm_term", None)
+
+            from openedx.features.user_leads.models import UserLeads
+            UserLeads.objects.create(
+                utm_source=utm_source,
+                utm_medium=utm_medium,
+                utm_campaign=utm_campaign,
+                utm_content=utm_content,
+                utm_term=utm_term,
+                user=user
+            )
+        except Exception as ex:
+            log.error("There is some error saving UTM {}".format(str(ex)))
 
 
 class LoginSessionViewCustom(LoginSessionView):
