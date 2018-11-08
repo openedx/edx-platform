@@ -198,7 +198,6 @@ class UserViewAPITests(TpaAPITestCase):
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertGreater(len(response.data['active']), 0)
         self.assertEqual(response.data['account_activated'], False)
 
 
