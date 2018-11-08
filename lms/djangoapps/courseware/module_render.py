@@ -5,6 +5,7 @@ Module rendering
 import hashlib
 import json
 import logging
+import textwrap
 from collections import OrderedDict
 from functools import partial
 
@@ -17,8 +18,10 @@ from django.template.context_processors import csrf
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.http import Http404, HttpResponse, HttpResponseForbidden
+from django.utils.text import slugify
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
+from edx_django_utils.cache import RequestCache
 from edx_django_utils.monitoring import set_custom_metrics_for_course_key, set_monitoring_transaction_name
 from edx_proctoring.services import ProctoringService
 from opaque_keys import InvalidKeyError
@@ -34,6 +37,7 @@ from xblock.runtime import KvsFieldData
 import static_replace
 from capa.xqueue_interface import XQueueInterface
 from courseware.access import get_user_role, has_access
+from courseware.access_response import IncorrectPartitionGroupError
 from courseware.entrance_exams import user_can_skip_entrance_exam, user_has_passed_entrance_exam
 from courseware.masquerade import (
     MasqueradingKeyValueStore,
@@ -54,6 +58,7 @@ from openedx.core.djangoapps.bookmarks.services import BookmarksService
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.services import CreditService
 from openedx.core.djangoapps.util.user_utils import SystemUser
+from openedx.core.djangolib.markup import HTML
 from openedx.core.lib.gating.services import GatingService
 from openedx.core.lib.license import wrap_with_license
 from openedx.core.lib.url_utils import quote_slashes, unquote_slashes
@@ -70,7 +75,7 @@ from student.roles import CourseBetaTesterRole
 from track import contexts
 from util import milestones_helpers
 from util.json_request import JsonResponse
-from django.utils.text import slugify
+from web_fragments.fragment import Fragment
 from xmodule.util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from xblock_django.user_service import DjangoXBlockUserService
 from xmodule.contentstore.django import contentstore
@@ -174,6 +179,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
         for chapter in chapters:
             # Only show required content, if there is required content
             # chapter.hide_from_toc is read-only (bool)
+            # xss-lint: disable=python-deprecated-display-name
             display_id = slugify(chapter.display_name_with_default_escaped)
             local_hide_from_toc = False
             if required_content:
@@ -195,6 +201,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                     found_active_section = True
 
                 section_context = {
+                    # xss-lint: disable=python-deprecated-display-name
                     'display_name': section.display_name_with_default_escaped,
                     'url_name': section.url_name,
                     'format': section.format if section.format is not None else '',
@@ -218,6 +225,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                 last_processed_chapter = chapter
 
             toc_chapters.append({
+                # xss-lint: disable=python-deprecated-display-name
                 'display_name': chapter.display_name_with_default_escaped,
                 'display_id': display_id,
                 'url_name': chapter.url_name,
@@ -329,10 +337,46 @@ def get_module(user, request, usage_key, field_data_cache,
             log.debug("Error in get_module: ItemNotFoundError")
         return None
 
-    except:
+    except:  # pylint: disable=W0702
         # Something has gone terribly wrong, but still not letting it turn into a 500.
         log.exception("Error in get_module")
         return None
+
+
+def display_access_messages(user, block, view, frag, context):  # pylint: disable=W0613
+    """
+    An XBlock wrapper that replaces the content fragment with a fragment or message determined by
+    the has_access check.
+    """
+    blocked_prior_sibling = RequestCache('display_access_messages_prior_sibling')
+
+    load_access = has_access(user, 'load', block, block.scope_ids.usage_id.course_key)
+    if load_access:
+        blocked_prior_sibling.delete(block.parent)
+        return frag
+
+    prior_sibling = blocked_prior_sibling.get_cached_response(block.parent)
+
+    if prior_sibling.is_found and prior_sibling.value.error_code == load_access.error_code:
+        return Fragment(u"")
+    else:
+        blocked_prior_sibling.set(block.parent, load_access)
+
+    if load_access.user_fragment:
+        msg_fragment = load_access.user_fragment
+    elif load_access.user_message:
+        msg_fragment = Fragment(textwrap.dedent(HTML(u"""\
+            <div>{}</div>
+        """).format(load_access.user_message)))
+    else:
+        msg_fragment = Fragment(u"")
+
+    if load_access.developer_message and has_access(user, 'staff', block, block.scope_ids.usage_id.course_key):
+        msg_fragment.content += textwrap.dedent(HTML(u"""\
+            <div>{}</div>
+        """).format(load_access.developer_message))
+
+    return msg_fragment
 
 
 def get_xqueue_callback_url_prefix(request):
@@ -350,6 +394,7 @@ def get_xqueue_callback_url_prefix(request):
     return settings.XQUEUE_INTERFACE.get('callback_url', prefix)
 
 
+# pylint: disable=too-many-statements
 def get_module_for_descriptor(user, request, descriptor, field_data_cache, course_key,
                               position=None, wrap_xmodule_display=True, grade_bucket_type=None,
                               static_asset_path='', disable_staff_debug_info=False,
@@ -474,7 +519,8 @@ def get_module_system_for_user(
             static_asset_path=static_asset_path,
             user_location=user_location,
             request_token=request_token,
-            course=course
+            course=course,
+            will_recheck_access=True,
         )
 
     def get_event_handler(event_type):
@@ -679,6 +725,8 @@ def get_module_system_for_user(
         reverse('jump_to_id', kwargs={'course_id': text_type(course_id), 'module_id': ''}),
     ))
 
+    block_wrappers.append(partial(display_access_messages, user))
+
     if settings.FEATURES.get('DISPLAY_DEBUG_INFO_TO_STAFF'):
         if is_masquerading_as_specific_student(user, course_id):
             # When masquerading as a specific student, we want to show the debug button
@@ -802,7 +850,7 @@ def get_module_for_descriptor_internal(user, descriptor, student_data, course_id
                                        track_function, xqueue_callback_url_prefix, request_token,
                                        position=None, wrap_xmodule_display=True, grade_bucket_type=None,
                                        static_asset_path='', user_location=None, disable_staff_debug_info=False,
-                                       course=None):
+                                       course=None, will_recheck_access=False):
     """
     Actually implement get_module, without requiring a request.
 
@@ -846,8 +894,19 @@ def get_module_for_descriptor_internal(user, descriptor, student_data, course_id
     # that affects xblock visibility.
     user_needs_access_check = getattr(user, 'known', True) and not isinstance(user, SystemUser)
     if user_needs_access_check:
-        if not has_access(user, 'load', descriptor, course_id):
-            return None
+        access = has_access(user, 'load', descriptor, course_id)
+        # A descriptor should only be returned if either the user has access, or the user doesn't have access, but
+        # the failed access has a message for the user and the caller of this function specifies it will check access
+        # again. This allows blocks to show specific error message or upsells when access is denied.
+        caller_will_handle_access_error = (
+            not access
+            and will_recheck_access
+            and (access.user_message or access.user_fragment)
+            and isinstance(access, IncorrectPartitionGroupError)
+        )
+        if access or caller_will_handle_access_error:
+            return descriptor
+        return None
     return descriptor
 
 
@@ -993,6 +1052,7 @@ def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_inf
 
     tracking_context = {
         'module': {
+            # xss-lint: disable=python-deprecated-display-name
             'display_name': descriptor.display_name_with_default_escaped,
             'usage_key': unicode(descriptor.location),
         }

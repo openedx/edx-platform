@@ -9,15 +9,20 @@ import logging
 
 from course_modes.models import CourseMode
 
+import crum
+from django.apps import apps
+from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 
-from django.apps import apps
+from web_fragments.fragment import Fragment
+from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.masquerade import (
     get_course_masquerade,
     is_masquerading_as_specific_student,
     get_masquerading_user_group,
 )
 from xmodule.partitions.partitions import Group, UserPartition, UserPartitionError
+from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 from openedx.features.course_duration_limits.config import (
     CONTENT_TYPE_GATING_FLAG,
     CONTENT_TYPE_GATING_STUDIO_UI_FLAG,
@@ -74,7 +79,33 @@ def create_content_gating_partition(course):
 
 
 class ContentTypeGatingPartition(UserPartition):
-    pass
+    """
+    A custom UserPartition which allows us to override the access denied messaging in regards
+    to gated content.
+    """
+    def access_denied_fragment(self, block, user, user_group, allowed_groups):
+        modes = CourseMode.modes_for_course_dict(block.scope_ids.usage_id.course_key)
+        verified_mode = modes.get(CourseMode.VERIFIED)
+        if verified_mode is None:
+            return None
+        ecommerce_checkout_link = self._get_checkout_link(user, verified_mode.sku)
+
+        request = crum.get_current_request()
+        frag = Fragment(render_to_string('content_type_gating/access_denied_message.html', {
+            'mobile_app': is_request_from_mobile_app(request),
+            'ecommerce_checkout_link': ecommerce_checkout_link,
+            'min_price': str(verified_mode.min_price)
+        }))
+        return frag
+
+    def access_denied_message(self, block, user, user_group, allowed_groups):
+        return "Graded assessments are available to Verified Track learners. Upgrade to Unlock."
+
+    def _get_checkout_link(self, user, sku):
+        ecomm_service = EcommerceService()
+        ecommerce_checkout = ecomm_service.is_enabled(user)
+        if ecommerce_checkout and sku:
+            return ecomm_service.get_checkout_page_url(sku) or ''
 
 
 class ContentTypeGatingPartitionScheme(object):
