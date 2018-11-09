@@ -985,6 +985,8 @@ def _progress(request, course_key, student_id):
     # checking certificate generation configuration
     enrollment_mode, _ = CourseEnrollment.enrollment_mode_for_user(student, course_key)
 
+    register_course_expired_message(request, course)
+
     context = {
         'course': course,
         'courseware_summary': courseware_summary,

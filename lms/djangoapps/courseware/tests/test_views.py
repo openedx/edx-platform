@@ -1438,8 +1438,8 @@ class ProgressPageTests(ProgressPageBaseTests):
 
     @override_waffle_flag(CONTENT_TYPE_GATING_FLAG, True)
     @ddt.data(
-        (True, 39),
-        (False, 38)
+        (True, 40),
+        (False, 39)
     )
     @ddt.unpack
     def test_progress_queries_paced_courses(self, self_paced, query_count):
@@ -1451,8 +1451,8 @@ class ProgressPageTests(ProgressPageBaseTests):
     @override_waffle_flag(CONTENT_TYPE_GATING_FLAG, True)
     @patch.dict(settings.FEATURES, {'ASSUME_ZERO_GRADE_IF_ABSENT_FOR_ALL_TESTS': False})
     @ddt.data(
-        (False, 46, 29),
-        (True, 38, 25)
+        (False, 47, 30),
+        (True, 39, 26)
     )
     @ddt.unpack
     def test_progress_queries(self, enable_waffle, initial, subsequent):
@@ -1647,6 +1647,64 @@ class ProgressPageTests(ProgressPageBaseTests):
                 response,
                 u'You are enrolled in the audit track for this course. The audit track does not include a certificate.'
             )
+
+    @override_waffle_flag(CONTENT_TYPE_GATING_FLAG, True)
+    @ddt.data(
+        *itertools.product(
+            (
+                CourseMode.AUDIT,
+                CourseMode.HONOR,
+                CourseMode.VERIFIED,
+                CourseMode.PROFESSIONAL,
+                CourseMode.NO_ID_PROFESSIONAL_MODE,
+                CourseMode.CREDIT_MODE
+            )
+        )
+    )
+    @ddt.unpack
+    def test_progress_with_course_duration_limits(self, course_mode):
+        """
+        Verify that expired banner message appears on progress page, if learner is enrolled
+        in audit mode.
+        """
+        user = UserFactory.create()
+        self.assertTrue(self.client.login(username=user.username, password='test'))
+        CourseEnrollmentFactory(user=user, course_id=self.course.id, mode=course_mode)
+
+        response = self._get_progress_page()
+        bannerText = get_expiration_banner_text(user, self.course)
+
+        if course_mode == CourseMode.AUDIT:
+            self.assertContains(response, bannerText, html=True)
+        else:
+            self.assertNotContains(response, bannerText, html=True)
+
+    @override_waffle_flag(CONTENT_TYPE_GATING_FLAG, False)
+    @ddt.data(
+        *itertools.product(
+            (
+                CourseMode.AUDIT,
+                CourseMode.HONOR,
+                CourseMode.VERIFIED,
+                CourseMode.PROFESSIONAL,
+                CourseMode.NO_ID_PROFESSIONAL_MODE,
+                CourseMode.CREDIT_MODE
+            )
+        )
+    )
+    @ddt.unpack
+    def test_progress_without_course_duration_limits(self, course_mode):
+        """
+        Verify that expired banner message never appears on progress page, regardless
+        of course_mode
+        """
+        user = UserFactory.create()
+        self.assertTrue(self.client.login(username=user.username, password='test'))
+        CourseEnrollmentFactory(user=user, course_id=self.course.id, mode=course_mode)
+
+        response = self._get_progress_page()
+        bannerText = get_expiration_banner_text(user, self.course)
+        self.assertNotContains(response, bannerText, html=True)
 
     @patch('courseware.views.views.is_course_passed', PropertyMock(return_value=True))
     @patch('lms.djangoapps.certificates.api.get_active_web_certificate', PropertyMock(return_value=True))
