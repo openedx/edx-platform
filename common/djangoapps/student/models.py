@@ -2168,7 +2168,7 @@ class ManualEnrollmentAudit(models.Model):
     @classmethod
     def get_manual_enrollment(cls, enrollment):
         """
-        if matches returns the most recent entry in the table filtered by enrollment else returns None,
+        Returns the most recent entry for the given enrollment, or None if there are no matches
         """
         try:
             manual_enrollment = cls.objects.filter(enrollment=enrollment).latest('time_stamp')
@@ -2177,12 +2177,17 @@ class ManualEnrollmentAudit(models.Model):
         return manual_enrollment
 
     @classmethod
-    def retire_manual_enrollments(cls, enrollments, retired_email):
+    def retire_manual_enrollments(cls, user, retired_email):
         """
-        Removes PII (enrolled_email and reason) from any rows corresponding to
-        the enrollment passed in. Bubbles up any exceptions.
+        Removes PII (enrolled_email and reason) associated with the User passed in. Bubbles up any exceptions.
         """
-        return cls.objects.filter(enrollment__in=enrollments).update(reason="", enrolled_email=retired_email)
+        # This bit of ugliness is to fix a perfmance issue with Django using a slow
+        # sub-select that caused the original query to take several seconds (PLAT-2371).
+        # It is possible that this could also be bad if a user has thousands of manual
+        # enrollments, but currently that number tends to be very low.
+        manual_enrollment_ids = list(cls.objects.filter(enrollment__user=user).values_list('id', flat=True))
+
+        return cls.objects.filter(id__in=manual_enrollment_ids).update(reason="", enrolled_email=retired_email)
 
 
 class CourseEnrollmentAllowed(DeletableByUserValue, models.Model):
