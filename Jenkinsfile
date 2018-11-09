@@ -21,7 +21,7 @@ def pythonTestCleanup() {
 }
 
 pipeline {
-    agent { label "coverage-worker" }
+    agent { label "jenkins-worker" }
     options {
         timestamps()
         timeout(60)
