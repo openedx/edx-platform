@@ -8,6 +8,7 @@
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from django.conf import settings
 %>
 
 <%
@@ -64,6 +65,13 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
         ## Translators: This is short for "System administration".
         <a class="tab-nav-link" href="${reverse('sysadmin')}">${_("Sysadmin")}</a>
       </div>
+    % endif
+    % if settings.FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION'):
+        <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
+          <a class="${'active ' if reverse('membership') in request.path else ''}tab-nav-link" href="${reverse('membership')}">
+            ${_("Membership")}
+          </a>
+        </div>
     % endif
   </div>
   <div class="secondary">
