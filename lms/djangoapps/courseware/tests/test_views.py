@@ -59,24 +59,20 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.api import set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNamespace
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.tests import attr
 from openedx.core.lib.url_utils import quote_slashes
 from openedx.features.course_duration_limits.config import CONTENT_TYPE_GATING_FLAG
-from openedx.features.course_experience import (
-    COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
-    COURSE_OUTLINE_PAGE_FLAG,
-    UNIFIED_COURSE_TAB_FLAG,
-)
+from openedx.features.course_experience import COURSE_OUTLINE_PAGE_FLAG, UNIFIED_COURSE_TAB_FLAG
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from student.models import CourseEnrollment
 from student.tests.factories import TEST_PASSWORD, AdminFactory, CourseEnrollmentFactory, UserFactory
 from util.tests.test_date_utils import fake_pgettext, fake_ugettext
 from util.url import reload_django_url_config
 from util.views import ensure_valid_course_key
-from xmodule.course_module import COURSE_VISIBILITY_PRIVATE, COURSE_VISIBILITY_PUBLIC_OUTLINE, COURSE_VISIBILITY_PUBLIC
 from xmodule.graders import ShowCorrectness
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -2274,6 +2270,7 @@ class TestIndexView(ModuleStoreTestCase):
     """
     Tests of the courseware.views.index view.
     """
+    SEO_WAFFLE_FLAG = CourseWaffleFlag(WaffleFlagNamespace(name='seo'), 'enable_anonymous_courseware_access')
 
     @XBlock.register_temp_plugin(ViewCheckerBlock, 'view_checker')
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
@@ -2343,23 +2340,12 @@ class TestIndexView(ModuleStoreTestCase):
         )
         self.assertIn("Activate Block ID: test_block_id", response.content)
 
-    @ddt.data(
-        [False, COURSE_VISIBILITY_PRIVATE, 302],
-        [False, COURSE_VISIBILITY_PUBLIC_OUTLINE, 302],
-        [False, COURSE_VISIBILITY_PUBLIC, 302],
-        [True, COURSE_VISIBILITY_PRIVATE, 302],
-        [True, COURSE_VISIBILITY_PUBLIC_OUTLINE, 302],
-        [True, COURSE_VISIBILITY_PUBLIC, 200],
-    )
-    @ddt.unpack
-    def test_unenrolled_access(self, waffle_override, course_visibility, expected_status):
-        course = CourseFactory(course_visibility=course_visibility)
+    def test_anonymous_access(self):
+        course = CourseFactory()
         with self.store.bulk_operations(course.id):
             chapter = ItemFactory(parent=course, category='chapter')
             section = ItemFactory(parent=chapter, category='sequential')
-            vertical = ItemFactory.create(parent=section, category='vertical', display_name="Vertical")
-            ItemFactory.create(parent=vertical, category='html', display_name='HTML block')
-            ItemFactory.create(parent=vertical, category='video', display_name='Video')
+            ItemFactory.create(parent=section, category='vertical', display_name="Vertical")
 
         url = reverse(
             'courseware_section',
@@ -2369,29 +2355,23 @@ class TestIndexView(ModuleStoreTestCase):
                 'section': section.url_name,
             }
         )
+        response = self.client.get(url, follow=False)
+        assert response.status_code == 302
 
-        with override_waffle_flag(COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, active=waffle_override):
-            response = self.client.get(url, follow=False)
-            assert response.status_code == expected_status
-            if expected_status == 200:  # Public access is available
-                self.assertIn('data-save-position="false"', response.content)
-                self.assertIn('data-show-completion="false"', response.content)
-                self.assertIn('xblock-public_view-sequential', response.content)
-                self.assertIn('xblock-public_view-vertical', response.content)
-                self.assertIn('xblock-public_view-html', response.content)
-                self.assertIn('xblock-public_view-video', response.content)
-
-            user = UserFactory()
-            self.assertTrue(self.client.login(username=user.username, password='test'))
-            response = self.client.get(url, follow=False)
-            # Logged in but unenrolled learners get the same behaviour as anonymous learners.
-            assert response.status_code == expected_status
-
-            CourseEnrollmentFactory(user=user, course_id=course.id)
+        waffle_flag = CourseWaffleFlag(WaffleFlagNamespace(name='seo'), 'enable_anonymous_courseware_access')
+        with override_waffle_flag(waffle_flag, active=True):
             response = self.client.get(url, follow=False)
             assert response.status_code == 200
-            self.assertIn('data-save-position="true"', response.content)
-            self.assertIn('data-show-completion="true"', response.content)
+            self.assertIn('data-save-position="false"', response.content)
+            self.assertIn('data-show-completion="false"', response.content)
+
+        user = UserFactory()
+        CourseEnrollmentFactory(user=user, course_id=course.id)
+        self.assertTrue(self.client.login(username=user.username, password='test'))
+        response = self.client.get(url, follow=False)
+        assert response.status_code == 200
+        self.assertIn('data-save-position="true"', response.content)
+        self.assertIn('data-show-completion="true"', response.content)
 
 
 @attr(shard=5)
