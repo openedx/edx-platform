@@ -86,7 +86,7 @@ class ContentTypeGatingPartition(UserPartition):
     def access_denied_fragment(self, block, user, user_group, allowed_groups):
         modes = CourseMode.modes_for_course_dict(block.scope_ids.usage_id.course_key)
         verified_mode = modes.get(CourseMode.VERIFIED)
-        if verified_mode is None:
+        if verified_mode is None or not self._is_audit_enrollment(user, block):
             return None
         ecommerce_checkout_link = self._get_checkout_link(user, verified_mode.sku)
 
@@ -99,7 +99,14 @@ class ContentTypeGatingPartition(UserPartition):
         return frag
 
     def access_denied_message(self, block, user, user_group, allowed_groups):
-        return "Graded assessments are available to Verified Track learners. Upgrade to Unlock."
+        if self._is_audit_enrollment(user, block):
+            return "Graded assessments are available to Verified Track learners. Upgrade to Unlock."
+        return None
+
+    def _is_audit_enrollment(self, user, block):
+        course_enrollment = apps.get_model('student.CourseEnrollment')
+        mode_slug, is_active = course_enrollment.enrollment_mode_for_user(user, block.scope_ids.usage_id.course_key)
+        return mode_slug == CourseMode.AUDIT and is_active
 
     def _get_checkout_link(self, user, sku):
         ecomm_service = EcommerceService()
