@@ -78,7 +78,8 @@ module.exports = Merge.smart({
         ReactRenderer: './common/static/js/src/ReactRenderer.jsx',
         XModuleShim: 'xmodule/js/src/xmodule.js',
 
-        VerticalStudentView: './common/lib/xmodule/xmodule/assets/vertical/public/js/vertical_student_view.js'
+        VerticalStudentView: './common/lib/xmodule/xmodule/assets/vertical/public/js/vertical_student_view.js',
+        commons : 'babel-polyfill',
     },
 
     output: {
