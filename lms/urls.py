@@ -514,6 +514,9 @@ urlpatterns += [
         name='course_discussions_settings',
     ),
 
+    # Cohorts management API
+    url(r'^api/cohorts/', include('openedx.core.djangoapps.course_groups.urls', namespace='api_cohorts')),
+
     # Cohorts management
     url(
         r'^courses/{}/cohorts/settings$'.format(
