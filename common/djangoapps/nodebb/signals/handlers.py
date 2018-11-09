@@ -200,19 +200,21 @@ def create_category_on_nodebb(instance, **kwargs):
             log.info('Success: Community created for course %s' % instance.id)
 
 
-@receiver(ENROLL_STATUS_CHANGE)
-def join_group_on_nodebb(sender, event=None, user=None, **kwargs):  # pylint: disable=unused-argument
+@receiver(post_save, sender=CourseEnrollment)
+def join_group_on_nodebb(instance, **kwargs):  # pylint: disable=unused-argument
     """
     Automatically join a group on NodeBB [related to that course] on student enrollment
+    Why we can't listen ENROLL_STATUS_CHANGE here?
+    Because that triggered before completion 'create_category_on_nodebb' so this fails to
+    join the course author in the category
     """
-    if event == EnrollStatusChange.enroll:
-        username = user.username
-        course = modulestore().get_course(kwargs.get('course_id'))
-        community_id = get_community_id(course.id)
+    if instance.is_active:
+        course_id = instance.course_id
+        username = instance.user.username
+        community_id = get_community_id(course_id)
 
         task_join_group_on_nodebb.delay(
             category_id=community_id, username=username)
-
 
 
 @receiver(post_save, sender=CourseTeam, dispatch_uid="nodebb.signals.handlers.create_update_groupchat_on_nodebb")
