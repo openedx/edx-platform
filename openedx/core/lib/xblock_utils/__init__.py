@@ -309,6 +309,9 @@ def add_staff_markup(user, disable_staff_debug_info, block, view, frag, context)
 
     Does nothing if module is a SequenceModule.
     """
+    if context and context.get('hide_staff_markup', False):
+        # If hide_staff_markup is passed, don't add the markup
+        return frag
     # TODO: make this more general, eg use an XModule attribute instead
     if isinstance(block, VerticalBlock) and (not context or not context.get('child_of_vertical', False)):
         # check that the course is a mongo backed Studio course before doing work

@@ -743,21 +743,33 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         with self.assertRaises(BlockCompletion.DoesNotExist):
             BlockCompletion.objects.get(block_key=block.scope_ids.usage_id)
 
-    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_XBLOCK_VIEW_ENDPOINT': True})
-    def test_xblock_view_handler(self):
-        args = [
-            'edX/toy/2012_Fall',
-            quote_slashes('i4x://edX/toy/videosequence/Toy_Videos'),
-            'student_view'
-        ]
-        xblock_view_url = reverse(
-            'xblock_view',
-            args=args
-        )
 
-        request = self.request_factory.get(xblock_view_url)
-        request.user = self.mock_user
-        response = render.xblock_view(request, *args)
+@attr(shard=1)
+@ddt.ddt
+@patch.dict('django.conf.settings.FEATURES', {'ENABLE_XBLOCK_VIEW_ENDPOINT': True})
+class TestXBlockView(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
+    """
+    Test the handle_xblock_callback function
+    """
+    @classmethod
+    def setUpClass(cls):
+        super(TestXBlockView, cls).setUpClass()
+        cls.course_key = ToyCourseFactory.create().id
+        cls.toy_course = modulestore().get_course(cls.course_key)
+
+    def setUp(self):
+        super(TestXBlockView, self).setUp()
+
+        self.location = unicode(self.course_key.make_usage_key('html', 'toyhtml'))
+        self.request_factory = RequestFactory()
+
+        self.view_args = [unicode(self.course_key), quote_slashes(self.location), 'student_view']
+        self.xblock_view_url = reverse('xblock_view', args=self.view_args)
+
+    def test_xblock_view_handler(self):
+        request = self.request_factory.get(self.xblock_view_url)
+        request.user = UserFactory.create()
+        response = render.xblock_view(request, *self.view_args)
         self.assertEquals(200, response.status_code)
 
         expected = ['csrf_token', 'html', 'resources']
@@ -765,7 +777,30 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         for section in expected:
             self.assertIn(section, content)
         doc = PyQuery(content['html'])
-        self.assertEquals(len(doc('div.xblock-student_view-videosequence')), 1)
+        self.assertEquals(len(doc('div.xblock-student_view-html')), 1)
+
+    @ddt.data(True, False)
+    def test_hide_staff_markup(self, hide):
+        """
+        When xblock_view gets 'hide_staff_markup' in its context, the staff markup
+        should not be included. See 'add_staff_markup' in xblock_utils/__init__.py
+        """
+        request = self.request_factory.get(self.xblock_view_url)
+        request.user = GlobalStaffFactory.create()
+        request.session = {}
+        if hide:
+            request.GET = {'hide_staff_markup': 'true'}
+        response = render.xblock_view(request, *self.view_args)
+        self.assertEquals(200, response.status_code)
+
+        html = json.loads(response.content)['html']
+        self.assertEqual('Staff Debug Info' in html, not hide)
+
+    def test_xblock_view_handler_not_authenticated(self):
+        request = self.request_factory.get(self.xblock_view_url)
+        request.user = AnonymousUser()
+        response = render.xblock_view(request, *self.view_args)
+        self.assertEquals(401, response.status_code)
 
 
 @attr(shard=1)
