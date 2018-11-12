@@ -1,0 +1,26 @@
+//登录之后的
+#main{  
+  max-width:100%;
+  margin:0 auto;
+}
+.home>header .outer-wrapper{  
+  max-width: 1200px;
+}
+.dashboard{ 
+  width: 1200px;
+  margin: 0 auto;
+}
+.home>header{ 
+  background: url("../images/index_bg.png") no-repeat center top;
+}
+.home>header .title{  
+  box-shadow:0 4px 5px 0 rgba(0,0,0,0.2);
+}
+//头像样式
+@media screen and (min-width: 768px){ 
+
+  .global-header .nav-links .secondary .dropdown-user-menu{ 
+    right:8px;
+    top: 49px;
+  }
+}

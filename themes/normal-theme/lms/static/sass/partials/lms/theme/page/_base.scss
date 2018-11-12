@@ -1,0 +1,28 @@
+*{  
+  box-sizing: content-box;
+}
+.content-wrapper{ 
+  margin: 0 auto;
+  max-width: none;
+  width: 100%;
+  flex: 1;
+}
+@media screen and (min-width: 768px) {
+  .content-wrapper {
+    padding: 0;
+  }
+}
+
+//flex布局
+.window-wrap{  
+  display: -webkit-flex;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+.wrapper-preview-menu{  
+  width: 100%;
+}
+body.view-in-course .container .course-wrapper, body.view-in-course .profile-wrapper, body.view-in-course .instructor-dashboard-wrapper-2, body.view-in-course .wiki-wrapper, body.view-in-course .teams-wrapper, body.view-in-course .static_tab_wrapper{ 
+  max-width: 1200px;
+}

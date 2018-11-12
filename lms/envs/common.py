@@ -425,6 +425,7 @@ COURSE_MESSAGE_ALERT_DURATION_IN_DAYS = 14
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/lms
 REPO_ROOT = PROJECT_ROOT.dirname()
 COMMON_ROOT = REPO_ROOT / "common"
+MEMBERSHIP_ROOT = REPO_ROOT / "../edx-membership"
 OPENEDX_ROOT = REPO_ROOT / "openedx"
 ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /edx-platform is in
 COURSES_ROOT = ENV_ROOT / "data"
@@ -436,6 +437,7 @@ DATA_DIR = COURSES_ROOT
 sys.path.append(REPO_ROOT)
 sys.path.append(PROJECT_ROOT / 'djangoapps')
 sys.path.append(COMMON_ROOT / 'djangoapps')
+sys.path.append(MEMBERSHIP_ROOT)
 
 # For Node.js
 
@@ -534,6 +536,7 @@ MAKO_TEMPLATE_DIRS_BASE = [
     COMMON_ROOT / 'templates',
     COMMON_ROOT / 'lib' / 'capa' / 'capa' / 'templates',
     COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
+    MEMBERSHIP_ROOT / 'membership' / 'templates',
     OPENEDX_ROOT / 'core' / 'djangoapps' / 'cors_csrf' / 'templates',
     OPENEDX_ROOT / 'core' / 'djangoapps' / 'dark_lang' / 'templates',
     OPENEDX_ROOT / 'core' / 'lib' / 'license' / 'templates',
@@ -603,6 +606,7 @@ TEMPLATES = [
             COMMON_ROOT / 'lib' / 'capa' / 'capa' / 'templates',
             COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
             COMMON_ROOT / 'static',  # required to statically include common Underscore templates
+            MEMBERSHIP_ROOT / 'membership' / 'templates',
         ],
         # Options specific to this backend.
         'OPTIONS': {
@@ -954,6 +958,7 @@ STATICFILES_DIRS = [
     COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
     NODE_MODULES_ROOT / "@edx",
+    MEMBERSHIP_ROOT / "membership" / "static",
 ]
 
 FAVICON_PATH = 'images/favicon.ico'
@@ -3498,3 +3503,6 @@ USER_STATE_BATCH_SIZE = 5000
 from openedx.core.djangoapps.plugins import plugin_apps, plugin_settings, constants as plugin_constants
 INSTALLED_APPS.extend(plugin_apps.get_apps(plugin_constants.ProjectType.LMS))
 plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_constants.SettingsType.COMMON)
+
+if FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION', False):
+    INSTALLED_APPS.append('membership')

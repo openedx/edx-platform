@@ -25,6 +25,9 @@
     display: inline-block;
     width: 13%;
     vertical-align: text-top;
+    h3{ 
+      text-align: center;
+    }
   }
 
   // 2. 中间链接
@@ -135,4 +138,14 @@
       margin-top: 0;
     }
   }
+}
+
+//尾部
+.wrapper-footer footer#footer-openedx{  
+  max-width: 1200px;
+}
+
+.wrapper-footer{  
+  box-shadow: none;
+  border-top: 1px solid #ccd1d9;
 }
