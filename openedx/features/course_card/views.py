@@ -49,7 +49,7 @@ def get_course_cards(request):
 
     for course in courses_list:
 
-        if course.invitation_only and not CourseEnrollment.is_enrolled(request.user, course.id) :
+        if course.invitation_only and not CourseEnrollment.is_enrolled(request.user, course.id):
             continue
 
         course.start_date = None
