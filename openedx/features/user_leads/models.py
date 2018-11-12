@@ -9,11 +9,11 @@ class UserLeads(models.Model):
     you where searchers came from as well as what campaign directed them to you.
     """
     user = models.ForeignKey(User, db_index=True)
-    utm_source = models.CharField(max_length=255, default=None)
-    utm_medium = models.CharField(max_length=255, default=None)
-    utm_campaign = models.CharField(max_length=255, default=None)
-    utm_content = models.CharField(max_length=255, default=None)
-    utm_term = models.CharField(max_length=255, default=None)
+    utm_source = models.CharField(max_length=255, default=None, null=True)
+    utm_medium = models.CharField(max_length=255, default=None, null=True)
+    utm_campaign = models.CharField(max_length=255, default=None, null=True)
+    utm_content = models.CharField(max_length=255, default=None, null=True)
+    utm_term = models.CharField(max_length=255, default=None, null=True)
     date_created = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):

@@ -509,6 +509,7 @@ class RegistrationViewCustom(RegistrationView):
             )
         except Exception as ex:
             log.error("There is some error saving UTM {}".format(str(ex)))
+            pass
 
 
 class LoginSessionViewCustom(LoginSessionView):
