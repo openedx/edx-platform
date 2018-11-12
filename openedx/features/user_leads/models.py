@@ -18,3 +18,7 @@ class UserLeads(models.Model):
 
     def __unicode__(self):
         return '{}'.format(self.user.username)
+
+    class Meta:
+        verbose_name = "User Lead"
+        verbose_name_plural = "User Leads"
