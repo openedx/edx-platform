@@ -48,14 +48,6 @@ class CourseOverview(TimeStampedModel):
     # IMPORTANT: Bump this whenever you modify this model and/or add a migration.
     VERSION = 6
 
-    NORMAL = 0
-    SUBSCRIBE = 1
-
-    SUBSCRIBE_TYPE_CHOICES = (
-        (NORMAL, u'normal'),
-        (SUBSCRIBE, u'subscribe'),
-    )
-
     # Cache entry versioning.
     version = IntegerField()
 
@@ -113,7 +105,6 @@ class CourseOverview(TimeStampedModel):
     eligible_for_financial_aid = BooleanField(default=True)
 
     language = TextField(null=True)
-    subscribe = IntegerField(default=NORMAL, choices=SUBSCRIBE_TYPE_CHOICES)
 
     @classmethod
     def _create_or_update(cls, course):

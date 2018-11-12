@@ -392,6 +392,9 @@ FEATURES = {
 
     # Whether to display the account deletion section the account settings page
     'ENABLE_ACCOUNT_DELETION': True,
+
+    # Whether to enable membership
+    'ENABLE_MEMBERSHIP_INTEGRATION': False,
 }
 
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews
