@@ -101,36 +101,13 @@ def perform_request(method, url, data_or_params=None, raw=False,
 
     dog_stats_api.increment('comment_client.request.count', tags=metric_tags)
 
-    log.info(
-        u"comment_client_response_log: url={url}, response text='{text}', "
-        u"status_code={status_code}".format(
-            url=url,
-            status_code=response.status_code,
-            text=response.text
-        )
-    )
-
     if 200 < response.status_code < 500:
-        log.error(u"Comment Client Request Error on url={url} with error message='{text}' and "
-                  u"status_code={status_code}".format(url=url, status_code=response.status_code,
-                                                      text=response.text))
         raise CommentClientRequestError(response.text, response.status_code)
     # Heroku returns a 503 when an application is in maintenance mode
     elif response.status_code == 503:
-        log.error(u"Comment Client Maintenance Error on url={url} with error message='{text}' and "
-                  u"status_code={status_code}".format(url=url, status_code=response.status_code,
-                                                      text=response.text))
-        raise CommentClientMaintenanceError(response.text, response.status_code)
+        raise CommentClientMaintenanceError(response.text)
     elif response.status_code == 500:
-        log.error(
-            u"Comment Client 500 Error on url={url} with error message='{text}' and "
-            u"status_code={status_code}".format(
-                url=url,
-                status_code=response.status_code,
-                text=response.text
-            )
-        )
-        raise CommentClient500Error("Internal Server Error: {}".format(response.text), response.status_code)
+        raise CommentClient500Error(response.text)
     else:
         if raw:
             return response.text
@@ -178,15 +155,11 @@ class CommentClientRequestError(CommentClientError):
 
 
 class CommentClient500Error(CommentClientError):
-    def __init__(self, msg, status_code=500):
-        super(CommentClient500Error, self).__init__(msg)
-        self.status_code = status_code
+    pass
 
 
 class CommentClientMaintenanceError(CommentClientError):
-    def __init__(self, msg, status_code=503):
-        super(CommentClientMaintenanceError, self).__init__(msg)
-        self.status_code = status_code
+    pass
 
 
 class CommentClientPaginatedResult(object):
