@@ -1,9 +1,12 @@
 """ User model wrapper for comment service"""
 import settings
+import logging
 
 import models
 
 from .utils import CommentClientPaginatedResult, CommentClientRequestError, merge_dict, perform_request
+
+log = logging.getLogger(__name__)
 
 
 class User(models.Model):
@@ -172,6 +175,14 @@ class User(models.Model):
                     metric_tags=self._metric_tags,
                 )
             else:
+                log.error(
+                    u"Comment Client Error on retrieving information. Request url={url}, error message='{text}', and"
+                    u" status_code={status_code}".format(
+                        url=url,
+                        status_code=e.status_code,
+                        text=e.message
+                    )
+                )
                 raise
         self._update_from_response(response)
 
