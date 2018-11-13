@@ -76,12 +76,12 @@ class NodeBBUserCreationTestCase(TestCase):
 
     def test_user_join_on_nodebb(self):
         username = "testuser"
-        groupname = "testgroup"
+        category_id = "test_id"
         try:
             with mock.patch('common.lib.nodebb_client.users.ForumUser.join', side_effect=ConnectionError):
                 with self.assertRaises(ConnectionError):
                     NodeBBClient().users.join(
-                        group_name=groupname,
+                        category_id=category_id,
                         username=username,
                         kwargs={}
                     )

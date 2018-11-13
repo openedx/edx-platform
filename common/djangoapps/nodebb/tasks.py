@@ -80,12 +80,12 @@ def task_activate_user_on_nodebb(username, active):
 
 
 @task(default_retry_delay=RETRY_DELAY, max_retries=None)
-def task_join_group_on_nodebb(group_name, username):
+def task_join_group_on_nodebb(category_id, username):
     """
     Celery task to join user to a community on NodeBB
     """
-    status_code, response = NodeBBClient().users.join(group_name=group_name, username=username)
-    handle_response(task_join_group_on_nodebb, 'Join user in {}'.format(group_name), status_code, response, username)
+    status_code, response = NodeBBClient().users.join(category_id=category_id, username=username)
+    handle_response(task_join_group_on_nodebb, 'Join user in category with id {}'.format(category_id), status_code, response, username)
 
 
 @task(default_retry_delay=RETRY_DELAY, max_retries=None)

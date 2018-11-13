@@ -17,6 +17,7 @@ from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from mailchimp_pipeline.signals.handlers import send_user_info_to_mailchimp, \
      send_user_course_completions_to_mailchimp
 from nodebb.models import DiscussionCommunity, TeamGroupChat
+from common.djangoapps.nodebb.helpers import get_community_id
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED
 
@@ -156,11 +157,23 @@ def activate_deactivate_user_on_nodebb(sender, instance, **kwargs):
 
 
 @receiver(post_save, sender=CourseOverview, dispatch_uid="nodebb.signals.handlers.create_category_on_nodebb")
-def create_category_on_nodebb(sender, instance, created, **kwargs):
+def create_category_on_nodebb(instance, **kwargs):
     """
-    Create a community on NodeBB whenever a new course is created
+    Create a community on NodeBB if it's already not exists
     """
-    if created:
+    community_exists = DiscussionCommunity.objects.filter(course_id=instance.id).first()
+
+    """
+    Following code is to block the double community creation.
+    When ever a course created CourseOverviews's post_save triggered twice
+    On the base of function call trace we allow one of those whose 5th function
+    in trace is '_listen_for_course_publish'
+    """
+    import inspect
+    curframe = inspect.currentframe()
+    main_triggerer_function = inspect.getouterframes(curframe)[5][3]
+
+    if not community_exists and main_triggerer_function is '_listen_for_course_publish':
         community_name = '%s-%s-%s-%s' % (instance.display_name,
                                           instance.id.org, instance.id.course, instance.id.run)
         status_code, response_body = NodeBBClient().categories.create(
@@ -180,21 +193,21 @@ def create_category_on_nodebb(sender, instance, created, **kwargs):
             log.info('Success: Community created for course %s' % instance.id)
 
 
-@receiver(ENROLL_STATUS_CHANGE)
-def join_group_on_nodebb(sender, event=None, user=None, **kwargs):  # pylint: disable=unused-argument
+@receiver(post_save, sender=CourseEnrollment)
+def join_group_on_nodebb(instance, **kwargs):  # pylint: disable=unused-argument
     """
     Automatically join a group on NodeBB [related to that course] on student enrollment
+    Why we can't listen ENROLL_STATUS_CHANGE here?
+    Because that triggered before completion 'create_category_on_nodebb' so this fails to
+    join the course author in the category
     """
-    if event == EnrollStatusChange.enroll:
-        username = user.username
-        course = modulestore().get_course(kwargs.get('course_id'))
-
-        community_name = '%s-%s-%s-%s' % (course.display_name,
-                                          course.id.org, course.id.course, course.id.run)
+    if instance.is_active:
+        course_id = instance.course_id
+        username = instance.user.username
+        community_id = get_community_id(course_id)
 
         task_join_group_on_nodebb.delay(
-            group_name=community_name, username=username)
-
+            category_id=community_id, username=username)
 
 
 @receiver(post_save, sender=CourseTeam, dispatch_uid="nodebb.signals.handlers.create_update_groupchat_on_nodebb")
