@@ -25,6 +25,7 @@ from courseware.access_response import MobileAvailabilityError, StartDateError, 
 from courseware.tests.factories import UserFactory
 from mobile_api.models import IgnoreMobileAvailableFlagConfig
 from mobile_api.tests.test_milestones import MobileAPIMilestonesMixin
+from mobile_api.utils import API_V1
 from student import auth
 from student.models import CourseEnrollment
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -49,6 +50,7 @@ class MobileAPITestCase(ModuleStoreTestCase, APITestCase):
         self.user = UserFactory.create()
         self.password = 'test'
         self.username = self.user.username
+        self.api_version = API_V1
         IgnoreMobileAvailableFlagConfig(enabled=False).save()
 
     def tearDown(self):
@@ -94,6 +96,8 @@ class MobileAPITestCase(ModuleStoreTestCase, APITestCase):
             reverse_args.update({'course_id': unicode(kwargs.get('course_id', self.course.id))})
         if 'username' in self.REVERSE_INFO['params']:
             reverse_args.update({'username': kwargs.get('username', self.user.username)})
+        if 'api_version' in self.REVERSE_INFO['params']:
+            reverse_args.update({'api_version': kwargs.get('api_version', self.api_version)})
         return reverse(self.REVERSE_INFO['name'], kwargs=reverse_args)
 
     def url_method(self, url, data=None, **kwargs):  # pylint: disable=unused-argument
