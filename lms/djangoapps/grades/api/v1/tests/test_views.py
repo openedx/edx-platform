@@ -859,15 +859,18 @@ class GradebookViewTest(GradebookViewTestBase):
                 )
                 self._assert_empty_response(resp)
 
-    def test_filter_cohort_id(self):
+    def test_filter_cohort_id_and_enrollment_mode(self):
         with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
             mock_grade.return_value = self.mock_course_grade(self.student, passed=True, letter_grade='A', percent=0.85)
 
             cohort = CohortFactory(course_id=self.course.id, name="TestCohort", users=[self.student])
             with override_waffle_flag(self.waffle_flag, active=True):
                 self.login_staff()
+                # both of our test users are in the audit track, so this is functionally equivalent
+                # to just `?cohort_id=cohort.id`.
+                query = '?cohort_id={}&enrollment_mode={}'.format(cohort.id, CourseMode.AUDIT)
                 resp = self.client.get(
-                    self.get_url(course_key=self.course.id) + '?cohort_id={}'.format(cohort.id)
+                    self.get_url(course_key=self.course.id) + query
                 )
 
                 expected_results = [

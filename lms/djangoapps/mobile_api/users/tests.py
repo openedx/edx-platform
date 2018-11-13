@@ -16,9 +16,9 @@ from mock import patch
 from lms.djangoapps.certificates.api import generate_user_certificates
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
+from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from course_modes.models import CourseMode
 from courseware.access_response import MilestoneAccessError, StartDateError, VisibilityError
-from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from mobile_api.testutils import (
     MobileAPITestCase,
     MobileAuthTestMixin,
@@ -277,9 +277,9 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
 
         if api_version == API_V05:
             if num_courses_returned:
-                self.assertFalse('audit_access_expires' in courses[0])
+                self.assertNotIn('audit_access_expires', courses[0])
         else:
-            self.assertTrue('audit_access_expires' in courses[0])
+            self.assertIn('audit_access_expires', courses[0])
             self.assertIsNotNone(courses[0].get('audit_access_expires'))
 
     @ddt.data(
@@ -452,7 +452,7 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,
     """
     Tests for PATCH of /api/mobile/v0.5/users/<user_name>/course_status_info/{course_id}
     """
-    def url_method(self, url, **kwargs):
+    def url_method(self, url, **kwargs):  # pylint: disable=arguments-differ
         # override implementation to use PATCH method.
         return self.client.patch(url, data=kwargs.get('data', None))
 
@@ -586,10 +586,10 @@ class TestCourseEnrollmentSerializer(MobileAPITestCase, MilestonesTestCaseMixin)
         based on version of api being used
         '''
         if api_version != API_V05:
-            self.assertTrue('audit_access_expires' in response)
+            self.assertIn('audit_access_expires', response)
             self.assertIsNotNone(response.get('audit_access_expires'))
         else:
-            self.assertFalse('audit_access_expires' in response)
+            self.assertNotIn('audit_access_expires', response)
 
     @ddt.data(API_V05, API_V1)
     def test_success(self, api_version):

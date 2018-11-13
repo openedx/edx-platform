@@ -633,16 +633,16 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
             filter_kwargs = {}
             related_models = []
             if request.GET.get('username_contains'):
-                filter_kwargs = {'user__username__icontains': request.GET.get('username_contains')}
+                filter_kwargs['user__username__icontains'] = request.GET.get('username_contains')
                 related_models.append('user')
-            elif request.GET.get('cohort_id'):
+            if request.GET.get('cohort_id'):
                 cohort = cohorts.get_cohort_by_id(course_key, request.GET.get('cohort_id'))
                 if cohort:
-                    filter_kwargs = {'user__in': cohort.users.all()}
+                    filter_kwargs['user__in'] = cohort.users.all()
                 else:
-                    filter_kwargs = {'user__in': []}
-            elif request.GET.get('enrollment_mode'):
-                filter_kwargs = {'mode': request.GET.get('enrollment_mode')}
+                    filter_kwargs['user__in'] = []
+            if request.GET.get('enrollment_mode'):
+                filter_kwargs['mode'] = request.GET.get('enrollment_mode')
 
             user_grades = self._iter_user_grades(course_key, filter_kwargs, related_models)
 
