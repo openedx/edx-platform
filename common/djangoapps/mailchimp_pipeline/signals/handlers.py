@@ -131,17 +131,26 @@ def task_send_user_info_to_mailchimp(data):
     send_user_info_to_mailchimp(None, user, created, {})
 
 
-@task()
-def send_user_enrollments_to_mailchimp(data):
-    user = User.objects.get(id=data['user_id'])
+# @task()
+def send_user_enrollments_to_mailchimp(user):
+    # user = User.objects.get(id=data['user_id'])
+
+    log.info("-------------------------\n fetching enrollments \n ------------------------------\n")
+
+    enrollment_titles = get_user_active_enrollements(user.username)
+    enrollment_short_ids = get_enrollements_course_short_ids(user.username)
+
+    log.info(enrollment_titles)
+    log.info(enrollment_short_ids)
+
     user_json = {
         "merge_fields": {
-            "ENROLLS": get_user_active_enrollements(user.username),
-            "ENROLL_IDS": get_enrollements_course_short_ids(user.username)
+            "ENROLLS": enrollment_titles,
+            "ENROLL_IDS": enrollment_short_ids
         }
     }
 
-    update_mailchimp(instance.user.email, user_json)
+    update_mailchimp(user.email, user_json)
 
 
 @task()
