@@ -5,10 +5,7 @@ def runPythonTests() {
             noTags: true, shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'jenkins-worker',
             refspec: '+refs/heads/master:refs/remotes/origin/master +refs/pull/${ghprbPullId}/*:refs/remotes/origin/pr/${ghprbPullId}/*',
             url: 'git@github.com:edx/edx-platform.git']]]
-        console_output = sh(returnStdout: true, script: 'bash scripts/all-tests.sh').trim()
-        dir('stdout') {
-            writeFile file: "${TEST_SUITE}-stdout.log", text: console_output
-        }
+        sh(script: 'bash scripts/all-tests.sh')
         stash includes: 'reports/**/*coverage*', name: "${TEST_SUITE}-reports"
     }
 }
