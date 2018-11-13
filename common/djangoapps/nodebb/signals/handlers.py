@@ -36,14 +36,6 @@ def log_action_response(user, status_code, response_body):
                  user.username)
 
 
-# @receiver(post_save, sender=CourseEnrollment)
-# def sync_enrolments_to_mailchimp(sender, instance, created, **kwargs):
-#     data = {"user_id": instance.user.id}
-#     # log.info("\n\n\n-----------------------------\n" + instance.is_active +"\n-------------------------\n\n\n")
-#     if instance.is_active:
-#         send_user_enrollments_to_mailchimp.delay(data)
-
-
 @receiver(COURSE_CERT_AWARDED, sender=GeneratedCertificate)
 def handle_course_cert_awarded(sender, user, course_key, **kwargs):  # pylint: disable=unused-argument
     data = {"user_id": user.id}
