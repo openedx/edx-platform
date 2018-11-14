@@ -36,7 +36,7 @@ pipeline {
                     agent { label "jenkins-worker-big" }
                     environment {
                         TEST_SUITE = "lms-unit"
-                        XDIST_NUM_TASKS = 20
+                        XDIST_NUM_TASKS = 12
                         XDIST_REMOTE_NUM_PROCESSES = 2
                     }
                     steps {
@@ -77,7 +77,7 @@ pipeline {
                     environment {
                         TEST_SUITE = "commonlib-unit"
                         XDIST_NUM_TASKS = 20
-                        XDIST_REMOTE_NUM_PROCESSES = 2
+                        XDIST_REMOTE_NUM_PROCESSES = 10
                     }
                     steps {
                         script {
