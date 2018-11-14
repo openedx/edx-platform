@@ -2,8 +2,9 @@ import logging
 from certificates import api as certs_api
 from django.conf import settings
 from django.db import transaction
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest, Http404
 from django.views.decorators.http import require_POST
+from django.contrib.auth.models import User
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 from django.utils.translation import ugettext as _
@@ -47,7 +48,15 @@ def generate_user_cert(request, course_id):
             )
         )
 
+    student_id = request.POST.get('student_id')
     student = request.user
+
+    if request.user.is_staff and student_id:
+        try:
+            student = User.objects.get(id=student_id)
+        except User.DoesNotExist:
+            raise Http404
+
     course_key = CourseKey.from_string(course_id)
 
     course = modulestore().get_course(course_key, depth=2)

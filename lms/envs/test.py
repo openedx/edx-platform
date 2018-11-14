@@ -19,6 +19,7 @@ sessions. Assumes structure:
 # pylint: disable=invalid-name
 
 from .common import *
+import json
 import os
 from path import Path as path
 from uuid import uuid4
@@ -186,11 +187,22 @@ CONTENTSTORE = {
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'edxtest',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
         'ATOMIC_REQUESTS': True,
     },
     'student_module_history': {
-        'ENGINE': 'django.db.backends.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'edxtest',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
+        'ATOMIC_REQUESTS': True,
     },
 }
 
@@ -587,4 +599,20 @@ COURSE_CATALOG_API_URL = 'https://catalog.example.com/api/v1'
 COMPREHENSIVE_THEME_DIRS = [REPO_ROOT / "themes", REPO_ROOT / "common/test"]
 COMPREHENSIVE_THEME_LOCALE_PATHS = [REPO_ROOT / "themes/conf/locale", ]
 
-LMS_ROOT_URL = "http://localhost:8000"
+SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', None)
+
+CONFIG_ROOT = path(os.environ.get('CONFIG_ROOT', ENV_ROOT))
+
+CONFIG_PREFIX = SERVICE_VARIANT + "." if SERVICE_VARIANT else ""
+
+with open(CONFIG_ROOT / CONFIG_PREFIX + "auth.json") as auth_file:
+    AUTH_TOKENS = json.load(auth_file)
+
+LMS_ROOT_URL = "http://local.philanthropyu.org:8000"
+NODEBB_RETRY_DELAY = 60
+NODEBB_ENDPOINT = "http://local.philanthropyu.org:4567"
+# replace NODEBB_MASTER_TOKEN with value from your setup
+NODEBB_MASTER_TOKEN = AUTH_TOKENS.get("NODEBB_MASTER_TOKEN")
+MANDRILL_API_KEY = AUTH_TOKENS.get("MANDRILL_API_KEY")
+MAILCHIMP_API_KEY = AUTH_TOKENS.get("MAILCHIMP_API_KEY")
+MAILCHIMP_LEARNERS_LIST_ID = ""

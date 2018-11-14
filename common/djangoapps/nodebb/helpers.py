@@ -1,11 +1,13 @@
 import collections
 
 from django.core.urlresolvers import reverse
+from requests.exceptions import ConnectionError
 
 from courseware.tabs import get_course_tab_list
 from common.lib.nodebb_client.client import NodeBBClient
 from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
 from nodebb.models import DiscussionCommunity, TeamGroupChat
+from nodebb.tasks import task_update_onboarding_surveys_status
 
 from logging import getLogger
 log = getLogger(__name__)
@@ -67,6 +69,12 @@ def get_community_url(course_id):
         return discussion_community.community_url
 
 
+def get_community_id(course_id):
+    discussion_community = DiscussionCommunity.objects.filter(course_id=course_id).first()
+    if discussion_community:
+        return discussion_community.community_url.split('/')[0]
+
+
 def get_room_id(user_info):
     """
     Get room_id for MyTeam of a user
@@ -87,8 +95,4 @@ def update_nodebb_for_user_status(username):
     """
     Call nodebb client to update NodeBB for survey status update
     """
-    status_code, response_body = NodeBBClient().users.update_onboarding_surveys_status(username)
-    if status_code != 200:
-        log.error('Surveys completion status sending failed')
-    else:
-        log.info('Surveys completion status sent for %s' % username)
+    task_update_onboarding_surveys_status.delay(username=username)

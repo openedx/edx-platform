@@ -3,7 +3,7 @@ The urls for on-boarding app.
 """
 from django.conf.urls import url
 
-from onboarding import views
+from lms.djangoapps.onboarding import views
 
 
 urlpatterns = [

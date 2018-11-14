@@ -5,6 +5,8 @@ import logging
 import analytics
 import dogstats_wrapper as dog_stats_api
 import third_party_auth
+from celery.task import task
+from common.djangoapps.util.request import safe_get_host
 from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
@@ -20,7 +22,7 @@ from notification_prefs.views import enable_notifications
 from pytz import UTC
 from requests import HTTPError
 from social.exceptions import AuthException, AuthAlreadyAssociated
-from philu_overrides.helpers import send_account_activation_email
+from mailchimp_pipeline.signals.handlers import task_send_account_activation_email
 from student.cookies import set_logged_in_cookies
 from openedx.core.djangoapps.user_api.helpers import shim_student_view, require_post_params
 from student.forms import AccountCreationForm, get_registration_extension_form
@@ -344,10 +346,12 @@ def create_account_with_params_custom(request, params, is_alquity_user):
         )
     )
     if send_email:
-        send_account_activation_email(request, registration, user)
+        data = get_params_for_activation_email(request, registration, user)
+        task_send_account_activation_email.delay(data)
     else:
         registration.activate()
-        _enroll_user_in_pending_courses(user)  # Enroll student in any pending courses
+        data = {'user_id': user.id}
+        task_enroll_user_in_pending_courses.delay(data)  # Enroll student in any pending courses
 
     # Immediately after a user creates an account, we log them in. They are only
     # logged in until they close the browser. They can't log in again until they click
@@ -381,6 +385,27 @@ def create_account_with_params_custom(request, params, is_alquity_user):
             AUDIT_LOG.info(u"Login activated on extauth account - {0} ({1})".format(new_user.username, new_user.email))
 
     return new_user
+
+
+def get_params_for_activation_email(request, registration, user):
+    activation_link = '{protocol}://{site}/activate/{key}'.format(
+        protocol='https' if request.is_secure() else 'http',
+        site=safe_get_host(request),
+        key=registration.activation_key
+    )
+    data = {
+        "activation_link": activation_link,
+        "user_email": user.email,
+        'first_name': user.first_name,
+    }
+
+    return data
+
+
+@task()
+def task_enroll_user_in_pending_courses(data):
+    user = User.objects.get(id=data['user_id'])
+    _enroll_user_in_pending_courses(user)
 
 
 class RegistrationViewCustom(RegistrationView):

@@ -184,8 +184,10 @@
              * our calls to renderFormFeedback are for rendering error messages.
              */
                 renderErrors: function(title, errorMessages) {
-                    this.clearFormErrors();
+                    // Remove loader icon from button
+                    $('.ladda-button').removeClass('has-spinner');
 
+                    this.clearFormErrors();
                     this.renderFormFeedback(this.formErrorsTpl, {
                         jsHook: this.formErrorsJsHook,
                         title: title,

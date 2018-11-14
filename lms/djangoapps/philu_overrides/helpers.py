@@ -1,5 +1,7 @@
 import pytz
 from datetime import datetime
+
+from celery.task import task
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from lms.djangoapps.courseware.courses import get_course_by_id
 from student.models import Registration

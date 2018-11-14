@@ -35,7 +35,7 @@ from lms.djangoapps.onboarding.models import UserExtendedProfile
 from lms.djangoapps.onboarding.signals import save_interests
 from lms.djangoapps.student_dashboard.views import get_recommended_xmodule_courses, get_joined_communities
 from nodebb.helpers import update_nodebb_for_user_status
-from onboarding import forms
+from lms.djangoapps.onboarding import forms
 
 log = logging.getLogger("edx.onboarding")
 
@@ -89,7 +89,7 @@ def user_info(request):
 
     if year_of_birth:
         years = calculate_age_years(int(year_of_birth))
-        if years < 13:
+        if years < 16:
             is_under_age = True
 
     if request.method == 'POST':
