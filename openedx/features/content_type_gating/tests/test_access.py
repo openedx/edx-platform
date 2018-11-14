@@ -6,14 +6,16 @@ import ddt
 from django.http import Http404
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from mock import Mock, patch
+from django.urls import reverse
+from mock import patch
 
 from course_modes.tests.factories import CourseModeFactory
 from courseware.access_response import IncorrectPartitionGroupError
 from lms.djangoapps.courseware.module_render import load_single_xblock
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
+from openedx.core.lib.url_utils import quote_slashes
 from openedx.features.course_duration_limits.config import CONTENT_TYPE_GATING_FLAG
-from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+from student.tests.factories import TEST_PASSWORD, AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -92,6 +94,20 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
             category='lti_consumer',
             display_name='lti_consumer_2',
             has_score=False,
+        )
+
+        # add ungraded problem for xblock_handler test
+        cls.graded_problem = ItemFactory.create(
+            parent=cls.blocks_dict['vertical'],
+            category='problem',
+            display_name='graded_problem',
+            graded=True,
+        )
+        cls.ungraded_problem = ItemFactory.create(
+            parent=cls.blocks_dict['vertical'],
+            category='problem',
+            display_name='ungraded_problem',
+            graded=False,
         )
 
         # audit_only course only has an audit track available
@@ -324,5 +340,33 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
             block=self.courses[course]['blocks'][component_type],
             user_id=self.users[user_track].id,
             course_id=self.courses[course]['course'].id,
-            is_gated=is_gated
+            is_gated=is_gated,
         )
+
+    @ddt.data(
+        ('problem', 'graded_problem', 'audit', 404),
+        ('problem', 'graded_problem', 'verified', 200),
+        ('problem', 'ungraded_problem', 'audit', 200),
+        ('problem', 'ungraded_problem', 'verified', 200),
+    )
+    @ddt.unpack
+    def test_xblock_handlers(self, xblock_type, xblock_name, user, status_code):
+        """
+        Test the ajax calls to the problem xblock to ensure the LMS is sending back
+        the expected response codes on requests when content is gated for audit users
+        (404) and when it is available to audit users (200). Content is always available
+        to verified users.
+        """
+        problem_location = self.course.id.make_usage_key(xblock_type, xblock_name)
+        url = reverse(
+            'xblock_handler',
+            kwargs={
+                'course_id': unicode(self.course.id),
+                'usage_id': quote_slashes(unicode(problem_location)),
+                'handler': 'xmodule_handler',
+                'suffix': 'problem_show',
+            }
+        )
+        self.client.login(username=self.users[user].username, password=TEST_PASSWORD)
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status_code)
