@@ -866,8 +866,7 @@ class LMSAccountRetirementView(ViewSet):
             ArticleRevision.retire_user(retirement.user)
             PendingNameChange.delete_by_user_value(retirement.user, field='user')
             PasswordHistory.retire_user(retirement.user.id)
-            course_enrollments = CourseEnrollment.objects.filter(user=retirement.user)
-            ManualEnrollmentAudit.retire_manual_enrollments(course_enrollments, retirement.retired_email)
+            ManualEnrollmentAudit.retire_manual_enrollments(retirement.user, retirement.retired_email)
 
             CreditRequest.retire_user(retirement)
             ApiAccessRequest.retire_user(retirement.user)
