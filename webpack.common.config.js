@@ -27,6 +27,7 @@ var defineFooter = new RegExp('(' + defineCallFooter.source + ')|('
                              + defineFancyFooter.source + ')', 'm');
 
 module.exports = Merge.smart({
+  web: {
     context: __dirname,
 
     entry: {
@@ -384,4 +385,29 @@ module.exports = Merge.smart({
         fs: 'empty'
     }
 
-}, xmoduleJS);
+  },
+  webworker: {
+      target: "webworker",
+      context: __dirname,
+      entry: {
+          mockprock: './node_modules/edx-proctoring/edx_proctoring/static/proctoring/js/plugin/mockprock-provider.js',
+      },
+      output: {
+          filename: '[name].js',
+          path: path.resolve(__dirname, 'common/static/bundles'),
+      },
+      plugins: [
+          new BundleTracker({
+              path: process.env.STATIC_ROOT_LMS,
+              filename: 'webpack-worker-stats.json'
+          })
+      ],
+      resolve: {
+          extensions: ['.js'],
+          modules: [
+              'node_modules',
+              'node_modules/edx-proctoring/node_modules'
+          ]
+      }
+  }}, {web: xmoduleJS});
+
