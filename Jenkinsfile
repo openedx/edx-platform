@@ -33,10 +33,10 @@ pipeline {
         stage('Run Tests') {
             parallel {
                 stage("lms-unit") {
-                    agent { label "jenkins-worker-big" }
+                    agent { label "jenkins-worker" }
                     environment {
                         TEST_SUITE = "lms-unit"
-                        XDIST_NUM_TASKS = 20
+                        XDIST_NUM_TASKS = 10
                         XDIST_REMOTE_NUM_PROCESSES = 1
                     }
                     steps {
@@ -53,10 +53,10 @@ pipeline {
                     }
                 }
                 stage("cms-unit") {
-                    agent { label "jenkins-worker-big" }
+                    agent { label "jenkins-worker" }
                     environment {
                         TEST_SUITE = "cms-unit"
-                        XDIST_NUM_TASKS = 8
+                        XDIST_NUM_TASKS = 4
                         XDIST_REMOTE_NUM_PROCESSES = 1
                     }
                     steps {
@@ -73,10 +73,10 @@ pipeline {
                     }
                 }
                 stage("commonlib-unit") {
-                    agent { label "jenkins-worker-big" }
+                    agent { label "jenkins-worker" }
                     environment {
                         TEST_SUITE = "commonlib-unit"
-                        XDIST_NUM_TASKS = 10
+                        XDIST_NUM_TASKS = 3
                         XDIST_REMOTE_NUM_PROCESSES = 1
                     }
                     steps {
