@@ -14,6 +14,8 @@
     }
   }
 }
+
+
 @media (max-width: 991px){  
   .window-wrap .global-header .header-logo a{ 
     margin-left: 50%;
@@ -22,6 +24,9 @@
 
 
 @media screen and (min-width: 992px){ 
+  .global-header .nav-links .secondary .user-image-frame{
+    border: none;
+  }
   .global-header{ 
     .nav-links{
       .main .nav-tab a {  

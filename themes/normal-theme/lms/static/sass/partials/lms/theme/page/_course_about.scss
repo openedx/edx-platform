@@ -7,8 +7,9 @@
     height: 320px;
     box-sizing: border-box;
     padding-top: 45px;
-    background: #f5f5f5;
     border-bottom: none;
+    background: url('/static/normal-theme/images/course_dec.png');
+    background-size: cover;
 
     .intro-inner-wrapper{
       height: 240px;

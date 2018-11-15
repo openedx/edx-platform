@@ -4,7 +4,6 @@
 }
 
 
-
 //课程详情页
 .course-info header.course-profile .intro-inner-wrapper{  
   max-width: 1200px;
@@ -44,10 +43,6 @@
   border-color: #ccd1d9;
   margin-top: 0;
 }
-//课程卡片
-.courses-container{ 
-  max-width: 1200px;
-}
 //登录后的课程
 .dashboard .main-container{ 
   padding-left: 0px;
@@ -57,9 +52,7 @@
   padding-top: 30px;
 }
 
-.dashboard .main-container .my-courses .listing-courses .course-item .course-container{
-  background: #fff;
-}
+
 
 // 详情页面
 .wrapper-preview-menu .preview-menu {
@@ -71,4 +64,61 @@
 .verification-process.step-select-track .container{ 
   max-width: 1200px;
   padding:30px 0;
+}
+
+
+/* 新加样式 */
+.dashboard .main-container .my-courses .wrapper-header-courses .header-courses{
+  color: $title;
+  font-size: 14px;
+}
+.view-dashboard .window-wrap .content-wrapper{
+  background-image: linear-gradient(to bottom, #fff, #f2f9ff);
+}
+
+.dashboard .main-container .my-courses .listing-courses .course-item .course-container{
+  background: #fff;
+  max-width: 1200px;
+  box-shadow: 0px 1px 4px 0px #b6dcfe;
+  border-radius: 3px;
+  border: none;
+
+  /* 课程卡片 */
+  .course > .details{
+    height: 160px;
+    position: relative;
+
+    .wrapper-course-image{
+      width: 30%;
+      padding: 20px 15px;
+      margin-right: 10px;
+    }
+    .wrapper-course-details .course-title a{
+      font-size: 18px;
+      color: $title;
+      margin: 8px 0 0 0;
+    }
+    .wrapper-course-details .course-info .info-date-block-container{
+      position: absolute;
+      bottom: 10px;
+    }
+    .course-actions .wrapper-action-more{
+      display: none;
+    }
+    .wrapper-course-details .wrapper-course-actions{
+      position: absolute;
+      bottom: 8px;
+      right: 5px;
+    }
+    .wrapper-course-details .wrapper-course-actions .enter-course{
+      border: none;
+      background: #4788c7;
+      color: #fff;
+      font-size: 14px;
+    }
+  }
+
+  .course-info{
+    background-image: none;
+  }
 }
