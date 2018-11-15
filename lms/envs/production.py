@@ -112,6 +112,7 @@ STATIC_ROOT_BASE = ENV_TOKENS.get('STATIC_ROOT_BASE', None)
 if STATIC_ROOT_BASE:
     STATIC_ROOT = path(STATIC_ROOT_BASE)
     WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = STATIC_ROOT / "webpack-stats.json"
+    WEBPACK_LOADER['WORKERS']['STATS_FILE'] = STATIC_ROOT / "webpack-worker-stats.json"
 
 
 # STATIC_URL_BASE specifies the base url to use for static files
