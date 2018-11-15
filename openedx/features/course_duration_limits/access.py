@@ -89,6 +89,9 @@ def check_course_expired(user, course):
     """
     Check if the course expired for the user.
     """
+    if not CourseDurationLimitConfig.enabled_for_enrollment(user=user, course_key=course.id):
+        return ACCESS_GRANTED
+
     expiration_date = get_user_course_expiration_date(user, course)
     if expiration_date and timezone.now() > expiration_date:
         return AuditExpiredError(user, course, expiration_date)

@@ -66,6 +66,7 @@ from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.tests import attr
 from openedx.core.lib.url_utils import quote_slashes
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
+from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from openedx.features.course_experience import (
     COURSE_OUTLINE_PAGE_FLAG,
@@ -1647,7 +1648,6 @@ class ProgressPageTests(ProgressPageBaseTests):
                 u'You are enrolled in the audit track for this course. The audit track does not include a certificate.'
             )
 
-    @override_waffle_flag(CONTENT_TYPE_GATING_FLAG, True)
     @ddt.data(
         *itertools.product(
             (
@@ -1666,6 +1666,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         Verify that expired banner message appears on progress page, if learner is enrolled
         in audit mode.
         """
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=date(2018, 1, 1))
         user = UserFactory.create()
         self.assertTrue(self.client.login(username=user.username, password='test'))
         CourseEnrollmentFactory(user=user, course_id=self.course.id, mode=course_mode)
@@ -1678,7 +1679,6 @@ class ProgressPageTests(ProgressPageBaseTests):
         else:
             self.assertNotContains(response, bannerText, html=True)
 
-    @override_waffle_flag(CONTENT_TYPE_GATING_FLAG, False)
     @ddt.data(
         *itertools.product(
             (
@@ -1697,6 +1697,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         Verify that expired banner message never appears on progress page, regardless
         of course_mode
         """
+        CourseDurationLimitConfig.objects.create(enabled=False)
         user = UserFactory.create()
         self.assertTrue(self.client.login(username=user.username, password='test'))
         CourseEnrollmentFactory(user=user, course_id=self.course.id, mode=course_mode)
@@ -2711,7 +2712,7 @@ class TestIndexViewWithCourseDurationLimits(ModuleStoreTestCase):
         Test that the courseware contains the course expiration banner
         when course_duration_limits are enabled.
         """
-        CourseDurationLimitConfig.objects.create(enabled=True)
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=date(2018, 1, 1))
         self.assertTrue(self.client.login(username=self.user.username, password='test'))
         response = self.client.get(
             reverse(

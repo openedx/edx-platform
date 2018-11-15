@@ -346,23 +346,29 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
         ).order_by('created').reverse()
         org = self.request.query_params.get('org', None)
 
+        same_org = (
+            enrollment for enrollment in enrollments
+            if enrollment.course_overview and self.is_org(org, enrollment.course_overview.org)
+        )
+        mobile_available = (
+            enrollment for enrollment in same_org
+            if is_mobile_available_for_user(self.request.user, enrollment.course_overview)
+        )
+        not_hidden_for_experiments = (
+            enrollment for enrollment in mobile_available
+            if not self.hide_course_for_enrollment_fee_experiment(self.request.user, enrollment)
+        )
+        not_duration_limited = (
+            enrollment for enrollment in not_hidden_for_experiments
+            if check_course_expired(self.request.user, enrollment.course) == ACCESS_GRANTED
+        )
+
         if api_version == API_V05:
             # for v0.5 don't return expired courses
-            return [
-                enrollment for enrollment in enrollments
-                if enrollment.course_overview and self.is_org(org, enrollment.course_overview.org) and
-                is_mobile_available_for_user(self.request.user, enrollment.course_overview) and
-                not self.hide_course_for_enrollment_fee_experiment(self.request.user, enrollment) and
-                (not CONTENT_TYPE_GATING_FLAG.is_enabled() or
-                    check_course_expired(self.request.user, enrollment.course) == ACCESS_GRANTED)
-            ]
+            return list(not_duration_limited)
         else:
             # return all courses, with associated expiration
-            return [
-                enrollment for enrollment in enrollments
-                if enrollment.course_overview and self.is_org(org, enrollment.course_overview.org) and
-                is_mobile_available_for_user(self.request.user, enrollment.course_overview)
-            ]
+            return list(mobile_available)
 
 
 @api_view(["GET"])

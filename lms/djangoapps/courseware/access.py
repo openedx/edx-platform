@@ -360,14 +360,13 @@ def _has_access_course(user, action, courselike):
             else:
                 return view_with_prereqs
 
-        if CourseDurationLimitConfig.enabled_for_enrollment(user=user, course_key=courselike.id):
-            has_not_expired = check_course_expired(user, courselike)
-            if not has_not_expired:
-                staff_access = _has_staff_access_to_descriptor(user, courselike, courselike.id)
-                if staff_access:
-                    return staff_access
-                else:
-                    return has_not_expired
+        has_not_expired = check_course_expired(user, courselike)
+        if not has_not_expired:
+            staff_access = _has_staff_access_to_descriptor(user, courselike, courselike.id)
+            if staff_access:
+                return staff_access
+            else:
+                return has_not_expired
 
         return ACCESS_GRANTED
 

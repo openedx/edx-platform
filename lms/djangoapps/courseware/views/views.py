@@ -577,7 +577,7 @@ class CourseTabView(EdxFragmentView):
             request.path,
             getattr(user, 'real_user', user),
             user,
-            text_type(course.id),
+            None if course is None else text_type(course.id),
         )
         try:
             return render_to_response(
