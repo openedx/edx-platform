@@ -407,8 +407,15 @@ def change_enrollment(request, check_access=True):
             try:
                 enroll_mode = CourseMode.auto_enroll_mode(course_id, available_modes)
                 if enroll_mode:
-                    CourseEnrollment.enroll(user, course_id, check_access=check_access, mode=enroll_mode)
-            except Exception:  # pylint: disable=broad-except
+                    course_enrollment_model = CourseEnrollment.enroll(user, course_id, check_access=check_access, mode=enroll_mode)
+
+                    # ENABLE_MEMBERSHIP_INTEGRATION (ELITEU ADD)
+                    if settings.FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION', False):
+                        from membership.models import VIPCourseEnrollment
+                        if course_enrollment_model:
+                            VIPCourseEnrollment.enroll(user, course_id)
+            except Exception as ex:  # pylint: disable=broad-except
+                log.error(ex)
                 return HttpResponseBadRequest(_("Could not enroll"))
 
         # If we have more than one course mode or professional ed is enabled,
