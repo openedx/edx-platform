@@ -357,6 +357,18 @@ class UserExtendedProfile(TimeStampedModel):
         "3=goal_relation_with_other": "Build relationships with other nonprofit leaders"
     }
 
+    HEAR_ABOUT_PHILANTHROPY_LABELS = {
+        "0=hear_about_philanthropy_partner": "A Philanthropy University Partner (Global Giving, GirlSPARKS, +Acumen, "
+                                             "or another)",
+        "1=hear_about_colleague_same_organization": "A Colleague From My Organization",
+        "2=hear_about_friend_new_organization": "A Friend Or Colleague (Not From My Organization)",
+        "3=hear_about_interest_search": "An Internet Search",
+        "4=hear_about_linkedIn_advertisement": "A LinkedIn Advertisement",
+        "5=hear_about_facebook_advertisement": "A Facebook Advertisement",
+        "6=hear_about_twitter_not_colleague": "Twitter (Not From A Colleague)",
+        "7=hear_about_other": "Other ____________"
+    }
+
     user = models.OneToOneField(User, unique=True, db_index=True, related_name='extended_profile')
     organization = models.ForeignKey(Organization, related_name='extended_profile', blank=True, null=True,
                                      on_delete=models.SET_NULL)
@@ -368,6 +380,8 @@ class UserExtendedProfile(TimeStampedModel):
     role_in_org = models.CharField(max_length=10, null=True)
     hours_per_week = models.PositiveIntegerField("Typical Number of Hours Worked per Week*", default=0,
                                                  validators=[MaxValueValidator(168)])
+    hear_about_philanthropy = models.CharField(max_length=255, null=True, blank=True)
+    hear_about_philanthropy_other = models.CharField(max_length=255, default=None, null=True)
 
     # User functions related fields
     function_strategy_planning = models.SmallIntegerField(FUNCTIONS_LABELS["0=function_strategy_planning"], default=0)
@@ -471,6 +485,21 @@ class UserExtendedProfile(TimeStampedModel):
         else:
             return [field_name for field_name, label in self.GOALS_LABELS.items() if
                     getattr(self, field_name.split("=")[1]) == 1]
+
+    def get_user_hear_about_philanthropy(self, _type="labels"):
+        """
+        :return: Users selected personal goals
+        :param _type: labels / fields
+        :return: list of labels / names of fields
+        """
+
+        if _type == "labels":
+            return [label for field_name, label in self.HEAR_ABOUT_PHILANTHROPY_LABELS.items()]
+        else:
+            return [field_name for field_name, label in self.HEAR_ABOUT_PHILANTHROPY_LABELS.items()]
+
+    def get_user_hear_about_philanthropy_result(self, _option):
+        return [_option for _option in self.HEAR_ABOUT_PHILANTHROPY_LABELS.items()]
 
     def save_user_function_areas(self, selected_values):
         """
