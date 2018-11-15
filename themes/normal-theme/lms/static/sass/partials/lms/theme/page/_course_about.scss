@@ -1,0 +1,242 @@
+// 课程详情
+.course-info{ 
+  background-image: linear-gradient(to bottom, #fff 0%, #fff 30%, #f2f9ff 100%);
+
+  /* 课程header */
+  header.course-profile{
+    height: 320px;
+    box-sizing: border-box;
+    padding-top: 45px;
+    background: #f5f5f5;
+    border-bottom: none;
+
+    .intro-inner-wrapper{
+      height: 240px;
+      background: rgba(255,255,255,0.7);
+      box-shadow: 0px 2px 4px 0px #aab2bd;
+    }
+
+    
+    /* header 左侧 */
+    .intro-inner-wrapper .intro{
+      border: none; 
+      box-shadow: none;
+      padding: 25px 40px;
+
+      >.heading-group{
+        border-bottom: none;
+        box-shadow: none;
+      }
+
+      >.heading-group h1{
+        font-size: 18px;
+        line-height: 2;
+      }
+
+      >.heading-group span{
+        font-size: 14px;
+        color: #4788c7
+      }
+
+      .main-cta span.register{
+        width: auto;
+        padding: 0 20px;
+        border: none;
+        font-size: 14px;
+        letter-spacing: 0.3px;
+        margin-right: 20px;
+        height: 40px;
+        line-height: 40px;
+      }
+
+      .main-cta strong{
+        width: auto;
+        font-size: 14px;
+        padding: 0 20px;
+        letter-spacing: 0.3px;
+        height: 40px;
+        line-height: 40px;
+      }
+    }
+
+    /* header 右侧 */
+
+    .intro-inner-wrapper .media .hero{
+      border: none;
+    }
+
+    
+  }
+
+
+  /* 右侧侧栏 */
+  .course-sidebar{
+    font-size: 14px;
+
+    > div{
+      box-shadow: 0px 0px 2px 0px #b6dcfe;
+      background: #fff;
+      border-radius: $border-radius;
+    }
+
+    header{
+      padding: 10px 0 0 0;
+      margin: 0;
+    }
+
+    header::after{
+      height: 0;
+    }
+
+    .important-dates li{
+      border-bottom: none;
+      padding: 15px 10px;
+      margin: 0;
+
+      .icon{
+        margin: 0 10px 0 0 ;
+      }
+      .important-dates-item-title{
+        width: 40%;
+        color: $font;
+      }
+      .important-dates-item-text{
+        font-weight: normal;
+        color: $title;
+        float: none;
+      }
+    }
+    
+  }
+  
+
+  /* 左侧内容 */
+  .details{
+    box-shadow: 0px 0px 2px 0px #b6dcfe;
+    background: #fff;
+    border-radius: $border-radius;
+
+    .wrap-instructor-info{
+      display: none;
+    }
+  }
+}
+
+
+// 1. 课程详情页
+.course-info .details .my-theme-vip{
+  height: 60px;
+  line-height: 60px;
+  font-size: 14px;
+  background: #b6dcfe;
+  color: #346ca3;
+  padding: 0 25px;
+  position: relative;
+
+  a {
+    padding: 0 15px;
+    background: #fff;
+    border: 1px solid #346ca3;
+    border-radius: 3px;
+    position: absolute;
+    right: 25px;
+    top: 11px;
+    height: 38px;
+    line-height: 38px;
+
+  }
+
+}
+
+.course-info .details .my-theme-course-about{
+  font-family: $font-family-sans-serif;
+  font-size: 14px;
+  color: $font;
+  line-height: 1.8;
+  padding: 10px 25px;
+
+  p{
+    margin-bottom: 20px;
+  }
+
+  h3{
+    color:$title;
+    font-size: 14px;
+    margin-top: 30px;
+    font-weight: bold;
+    margin-bottom: 3px;
+  }
+
+  .about-info div, .about-staff div{
+    margin-top: 20px;
+  }
+
+
+  // 1.1 课程详情页 tab
+  .about-tabs{
+    border-bottom:1px solid $border;
+  }
+  .about-tab{
+    display: inline-block;
+    line-height: 38px;
+    margin-right: 20px;
+    color: $title;
+    cursor: pointer;
+  }
+  .about-tab-active {
+    border-bottom: 2px solid $bule;
+  }
+  .about-tabs{ 
+    margin-bottom: 30px;
+  }
+  
+
+  // 1.1 课程详情页 课程简介
+  .about-info ul{
+    padding: 0 0 0 20px;
+    margin: 0;
+  }
+
+  // 1.2 课程性情页 授课老师 
+  .about-staff ul{
+    list-style: none;
+    padding: 0;
+    margin:0;
+  }
+  .about-staff-block{
+    position: relative;
+    padding-left: 150px;
+    height: 140px;
+  }
+  .about-staff-img{  
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    border: 3px solid #e6e9ed;
+    margin-right: 25px;
+  }
+  .about-staff-name{ 
+    color: $bule;
+    font-size: 18px;
+    font-weight: bold;
+    padding-top:30px;
+    display: block;
+  }
+  .about-outline-indent{
+    padding-left: 20px;
+  }
+
+  // 1.3 课程详情页 大纲
+  .about-outline{
+    padding-left: 20px;
+  }
+
+  .about-outline h3{
+    position: relative;
+    left: -20px;
+  }
+}
+  
