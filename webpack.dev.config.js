@@ -5,10 +5,12 @@
 var Merge = require('webpack-merge');
 var path = require('path');
 var webpack = require('webpack');
+// TODO: remove once common worker settings moved into common
+var BundleTracker = require('webpack-bundle-tracker');
 
 var commonConfig = require('./webpack.common.config.js');
 
-module.exports = Merge.smart(commonConfig, {
+module.exports = [Merge.smart(commonConfig, {
     output: {
         filename: '[name].js'
     },
@@ -57,4 +59,28 @@ module.exports = Merge.smart(commonConfig, {
     watchOptions: {
         ignored: [/node_modules/, /\.git/]
     }
-});
+}),
+{
+  target: "webworker",
+  context: __dirname,
+  entry: {
+    mockprock: './node_modules/edx-proctoring/edx_proctoring/static/proctoring/js/plugin/mockprock-provider.js',
+  },
+  output: {
+    filename: '[name].js',
+    path: path.resolve(__dirname, 'common/static/bundles'),
+  },
+  plugins: [
+    new BundleTracker({
+      path: process.env.STATIC_ROOT_LMS,
+      filename: 'webpack-worker-stats.json'
+    })
+  ],
+  resolve: {
+    extensions: ['.js'],
+    modules: [
+      'node_modules',
+      'node_modules/edx-proctoring/node_modules'
+    ]
+  }
+}];
