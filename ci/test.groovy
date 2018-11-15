@@ -1,3 +1,11 @@
+
+@NonCPS
+
+def prevBuild = currentBuild.previousBuild
+if (prevBuild)
+    prevBuild.rawBuild._this().doTerm();
+
+
 pipeline {
     agent { node { label 'master' } }
     stages {
@@ -6,9 +14,7 @@ pipeline {
                 sh "make -f ci/ci.mk ci_up"
                 sh "make -f ci/ci.mk ci_test"
                 junit "unittest_reports/nosetests/*.xml"
-                cobertura coberturaReportFile: "unittest_reports/coverage/lmscoverage.xml"
-                cobertura coberturaReportFile: "unittest_reports/coverage/cmscoverage.xml"
-                cobertura coberturaReportFile: "unittest_reports/coverage/commoncoverage.xml"
+
             }
             post {
                 always {
