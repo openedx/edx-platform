@@ -658,13 +658,7 @@ class LoginSessionViewTest(UserAPITestCase):
         response = self.client.get(reverse("dashboard"))
         self.assertHttpOK(response)
 
-    @ddt.data(
-        (json.dumps(True), False),
-        (json.dumps(False), True),
-        (None, True),
-    )
-    @ddt.unpack
-    def test_login_remember_me(self, remember_value, expire_at_browser_close):
+    def test_session_cookie_expiry(self):
         # Create a test user
         UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
 
@@ -674,17 +668,13 @@ class LoginSessionViewTest(UserAPITestCase):
             "password": self.PASSWORD,
         }
 
-        if remember_value is not None:
-            data["remember"] = remember_value
-
         response = self.client.post(self.url, data)
         self.assertHttpOK(response)
 
         # Verify that the session expiration was set correctly
-        self.assertEqual(
-            self.client.session.get_expire_at_browser_close(),
-            expire_at_browser_close
-        )
+        cookie = self.client.cookies[settings.SESSION_COOKIE_NAME]
+        expected_expiry = datetime.datetime.now() + datetime.timedelta(weeks=4)
+        self.assertIn(expected_expiry.strftime('%d-%b-%Y'), cookie.get('expires'))
 
     def test_invalid_credentials(self):
         # Create a test user
