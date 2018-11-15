@@ -8,7 +8,6 @@ import json
 import logging
 import urllib
 
-import analytics
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -49,6 +48,7 @@ from openedx.core.lib.log_utils import audit_log
 from shoppingcart.models import CertificateItem, Order
 from shoppingcart.processors import get_purchase_endpoint, get_signed_purchase_params
 from student.models import CourseEnrollment
+from track import segment
 from util.db import outer_atomic
 from util.json_request import JsonResponse
 from xmodule.modulestore.django import modulestore
@@ -913,7 +913,7 @@ class SubmitPhotosView(View):
             return response
 
         # Submit the attempt
-        attempt = self._submit_attempt(request.user, face_image, photo_id_image, initial_verification)
+        self._submit_attempt(request.user, face_image, photo_id_image, initial_verification)
 
         self._fire_event(request.user, "edx.bi.verify.submitted", {"category": "verification"})
         self._send_confirmation_email(request.user)
@@ -1096,15 +1096,7 @@ class SubmitPhotosView(View):
         Returns: None
 
         """
-        if settings.LMS_SEGMENT_KEY:
-            tracking_context = tracker.get_tracker().resolve_context()
-            context = {
-                'ip': tracking_context.get('ip'),
-                'Google Analytics': {
-                    'clientId': tracking_context.get('client_id')
-                }
-            }
-            analytics.track(user.id, event_name, parameters, context=context)
+        segment.track(user.id, event_name, parameters)
 
 
 @require_POST

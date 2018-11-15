@@ -21,7 +21,6 @@ from functools import total_ordering
 from importlib import import_module
 from urllib import urlencode
 
-import analytics
 from config_models.models import ConfigurationModel
 from django.apps import apps
 from django.conf import settings
@@ -66,7 +65,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
-from track import contexts
+from track import contexts, segment
 from util.milestones_helpers import is_entrance_exams_enabled
 from util.model_utils import emit_field_changed_events, get_changed_fields_dict
 from util.query import use_read_replica_if_available
@@ -739,7 +738,7 @@ class Registration(models.Model):
         has_segment_key = getattr(settings, 'LMS_SEGMENT_KEY', None)
         has_mailchimp_id = hasattr(settings, 'MAILCHIMP_NEW_USER_LIST_ID')
         if has_segment_key and has_mailchimp_id:
-            identity_args = [
+            segment.identify(
                 self.user.id,  # pylint: disable=no-member
                 {
                     'email': self.user.email,
@@ -751,8 +750,7 @@ class Registration(models.Model):
                         "listId": settings.MAILCHIMP_NEW_USER_LIST_ID
                     }
                 }
-            ]
-            analytics.identify(*identity_args)
+            )
 
 
 class PendingNameChange(DeletableByUserValue, models.Model):
@@ -1429,25 +1427,17 @@ class CourseEnrollment(models.Model):
                 'course_id': text_type(self.course_id),
                 'mode': self.mode,
             }
-
+            segment_properties = {
+                'category': 'conversion',
+                'label': text_type(self.course_id),
+                'org': self.course_id.org,
+                'course': self.course_id.course,
+                'run': self.course_id.run,
+                'mode': self.mode,
+            }
             with tracker.get_tracker().context(event_name, context):
                 tracker.emit(event_name, data)
-
-                if hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
-                    tracking_context = tracker.get_tracker().resolve_context()
-                    analytics.track(self.user_id, event_name, {
-                        'category': 'conversion',
-                        'label': text_type(self.course_id),
-                        'org': self.course_id.org,
-                        'course': self.course_id.course,
-                        'run': self.course_id.run,
-                        'mode': self.mode,
-                    }, context={
-                        'ip': tracking_context.get('ip'),
-                        'Google Analytics': {
-                            'clientId': tracking_context.get('client_id')
-                        }
-                    })
+                segment.track(self.user_id, event_name, segment_properties)
 
         except:  # pylint: disable=bare-except
             if event_name and self.course_id:

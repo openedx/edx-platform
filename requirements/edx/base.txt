@@ -40,7 +40,7 @@ git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.1.6#egg=xblock-d
 git+https://github.com/open-craft/xblock-poll@add89e14558c30f3c8dc7431e5cd6536fff6d941#egg=xblock-poll==1.5.1
 -e common/lib/xmodule
 amqp==1.4.9               # via kombu
-analytics-python==1.1.0
+analytics-python==1.2.9
 aniso8601==4.0.1          # via tincan
 anyjson==0.3.3            # via kombu
 appdirs==1.4.3            # via fs

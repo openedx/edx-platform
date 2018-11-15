@@ -44,7 +44,7 @@ git+https://github.com/open-craft/xblock-poll@add89e14558c30f3c8dc7431e5cd6536ff
 -e common/lib/xmodule
 alabaster==0.7.12         # via sphinx
 amqp==1.4.9
-analytics-python==1.1.0
+analytics-python==1.2.9
 aniso8601==4.0.1
 anyjson==0.3.3
 apipkg==1.5
