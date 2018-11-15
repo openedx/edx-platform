@@ -186,7 +186,7 @@ from pipeline_mako import render_require_js_path_overrides
 
     <div class="marketing-hero"><%block name="marketing_hero"></%block></div>
 
-    <div class="content-wrapper main-container" id="content">
+    <div class="content-wrapper main-container" id="content" dir="${static.dir_rtl()}">
       ${self.body()}
       <%block name="bodyextra"/>
     </div>
