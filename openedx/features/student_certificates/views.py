@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.core.exceptions import ObjectDoesNotExist
@@ -75,22 +77,11 @@ def student_certificates(request):
             continue
 
         course_name = course.display_name
-        completion_date = None
 
         try:
-            grade = PersistentCourseGrade.read_course_grade(user.id, course_id)
-        except ObjectDoesNotExist:
-            grade = None
-
-        if grade:
-            completion_date = grade.passed_timestamp
-
-        if not completion_date:
-            if course.has_ended():
-                completion_date = course.end
-
-        if not completion_date:
-            completion_date = certificate.created_date
+            completion_date = course.end
+        except Exception as ex:
+            completion_date = datetime.now()
 
         user_certificates.append({
             'completion_date': completion_date.strftime('%b %d, %Y') if completion_date else None,
