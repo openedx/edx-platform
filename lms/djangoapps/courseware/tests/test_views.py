@@ -208,8 +208,8 @@ class IndexQueryTestCase(ModuleStoreTestCase):
 
     @override_waffle_flag(CONTENT_TYPE_GATING_FLAG, True)
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 10, 160),
-        (ModuleStoreEnum.Type.split, 4, 156),
+        (ModuleStoreEnum.Type.mongo, 10, 162),
+        (ModuleStoreEnum.Type.split, 4, 158),
     )
     @ddt.unpack
     def test_index_query_counts(self, store_type, expected_mongo_query_count, expected_mysql_query_count):

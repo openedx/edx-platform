@@ -6,7 +6,7 @@ from openedx.core.djangoapps.content.block_structure.transformer import (
     BlockStructureTransformer,
     FilteringTransformerMixin
 )
-from xmodule.partitions.partitions_service import get_user_partition_groups
+from xmodule.partitions.partitions_service import get_user_partition_groups, get_all_partitions_for_course
 
 from .split_test import SplitTestTransformer
 from .utils import get_field_on_block
@@ -78,8 +78,7 @@ class UserPartitionTransformer(FilteringTransformerMixin, BlockStructureTransfor
         if not user_partitions:
             return [block_structure.create_universal_filter()]
 
-        user_groups = get_user_partition_groups(usage_info.course_key, user_partitions, user)
-
+        user_groups = get_user_partition_groups(usage_info.course_key, user_partitions, user, 'id')
         group_access_filter = block_structure.create_removal_filter(
             lambda block_key: not (
                 has_access(user, 'staff', block_key) or

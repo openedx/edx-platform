@@ -41,32 +41,33 @@ def get_all_partitions_for_course(course, active_only=False):
         all_partitions = [partition for partition in all_partitions if partition.active]
     return all_partitions
 
-def get_user_partition_groups(course_key, user):
-        """
-        Collect group ID for each partition in this course for this user.
 
-        Arguments:
-            course_key (CourseKey)
-            user_partitions (list[UserPartition])
-            user (User)
+def get_user_partition_groups(course_key, user_partitions, user, partition_dict_key='name'):
+    """
+    Collect group ID for each partition in this course for this user.
+     Arguments:
+        course_key (CourseKey)
+        user_partitions (list[UserPartition])
+        user (User)
+        partition_dict_key - i.e. 'id', 'name' depending on which partition attribute you want as a key.
+     Returns:
+        dict[partition_dict_key: Group]: Mapping from user partitions to the group to
+            which the user belongs in each partition. If the user isn't
+            in a group for a particular partition, then that partition's
+            ID will not be in the dict.
+    """
 
-        Returns:
-            dict[int: Group]: Mapping from user partitions to the group to
-                which the user belongs in each partition. If the user isn't
-                in a group for a particular partition, then that partition's
-                ID will not be in the dict.
-        """
-        user_partitions = get_all_partitions_for_course(course)
-        partition_groups = {}
-        for partition in user_partitions:
-            group = partition.scheme.get_group_for_user(
-                course_key,
-                user,
-                partition,
-            )
-            if group is not None:
-                partition_groups[partition.id] = group
-        return partition_groups
+    partition_groups = {}
+    for partition in user_partitions:
+        group = partition.scheme.get_group_for_user(
+            course_key,
+            user,
+            partition,
+        )
+
+        if group is not None:
+            partition_groups[getattr(partition, partition_dict_key)] = group
+    return partition_groups
 
 
 def _get_dynamic_partitions(course):
