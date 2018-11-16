@@ -25,6 +25,10 @@ from .utils.envs import Env
 from .utils.process import run_background_process
 from .utils.timer import timed
 
+from pwd import getpwnam
+from django.core.wsgi import get_wsgi_application
+from django.conf import settings as django_settings
+
 # setup baseline paths
 
 ALL_SYSTEMS = ['lms', 'studio']
@@ -90,6 +94,10 @@ COLLECTSTATIC_LOG_DIR_ARG = 'collect_log_dir'
 
 # Webpack command
 WEBPACK_COMMAND = 'STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} $(npm bin)/webpack {options}'
+
+
+def get_static_collector_root():
+    return os.environ.get('STATIC_COLLECTOR_ROOT', '/edx/var/edxapp/static_collector')
 
 
 def get_sass_directories(system, theme_dir=None):
@@ -704,6 +712,7 @@ def collect_assets(systems, settings, **kwargs):
             ignore_args=ignore_args,
             logfile_str=collectstatic_stdout_str
         )))
+
         print("\t\tFinished collecting {} assets.".format(sys))
 
 
@@ -727,13 +736,13 @@ def _collect_assets_cmd(system, **kwargs):
     return collectstatic_stdout_str
 
 
-def execute_compile_sass(args):
+def execute_compile_sass(args, system=None):
     """
     Construct django management command compile_sass (defined in theming app) and execute it.
     Args:
         args: command line argument passed via update_assets command
     """
-    for sys in args.system:
+    for sys in (system or args.system):
         options = ""
         options += " --theme-dirs " + " ".join(args.theme_dirs) if args.theme_dirs else ""
         options += " --themes " + " ".join(args.themes) if args.themes else ""
@@ -930,25 +939,19 @@ def update_assets(args):
         help="How long to pause between filesystem scans"
     )
     args = parser.parse_args(args)
-    collect_log_args = {}
+    if args.settings == 'aws':
+        args.settings = 'static_collector'
 
-    process_xmodule_assets()
-    process_npm_assets()
+    for sys in args.system:
+        _update_assets(sys, args)
 
-    # Build Webpack
-    call_task('pavelib.assets.webpack', options={'settings': args.settings})
+    STATIC_ROOT_BASE = django_settings.STATIC_ROOT_BASE if django_settings and hasattr(django_settings, 'STATIC_ROOT_BASE') else Env.get_django_setting("STATIC_ROOT_BASE", "lms", settings=args.settings)
+    EDX_PLATFORM_STATIC_ROOT_BASE = django_settings.EDX_PLATFORM_STATIC_ROOT_BASE if django_settings and hasattr(django_settings, 'EDX_PLATFORM_STATIC_ROOT_BASE') else Env.get_django_setting("EDX_PLATFORM_STATIC_ROOT_BASE", "lms", settings=args.settings)
 
-    # Compile sass for themes and system
-    execute_compile_sass(args)
-
-    if args.collect:
-        if args.debug:
-            collect_log_args.update({COLLECTSTATIC_LOG_DIR_ARG: None})
-
-        if args.collect_log_dir:
-            collect_log_args.update({COLLECTSTATIC_LOG_DIR_ARG: args.collect_log_dir})
-
-        collect_assets(args.system, args.settings, **collect_log_args)
+    os.system("rsync -av {static_collector_dir}/* {platform_static_dir}/ ".format(
+        static_collector_dir=STATIC_ROOT_BASE,
+        platform_static_dir=EDX_PLATFORM_STATIC_ROOT_BASE
+    ))
 
     if args.watch:
         call_task(
@@ -960,3 +963,42 @@ def update_assets(args):
                 'wait': [float(args.wait)]
             },
         )
+
+
+def _update_assets(sys, args):
+    collect_log_args = {}
+
+    if sys == 'studio':
+        sys = 'cms'
+
+    os.environ.setdefault("SERVICE_VARIANT","{sys}".format(sys=sys))
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "{sys}.envs.static_collector".format(sys=sys))
+
+    application = get_wsgi_application()  # pylint: disable=invalid-name
+
+    if hasattr(django_settings, 'STATIC_COLLECTOR_ROOT'):
+        STATIC_COLLECTOR_ROOT = django_settings.STATIC_COLLECTOR_ROOT
+    else:
+        STATIC_COLLECTOR_ROOT = get_static_collector_root()
+
+    if not os.path.isdir(STATIC_COLLECTOR_ROOT):
+        os.mkdir(STATIC_COLLECTOR_ROOT)
+        print('\t\tDirectory "STATIC_COLLECTOR_ROOT" has been created to store static files.')
+
+    process_xmodule_assets()
+    process_npm_assets()
+
+    # Build Webpack
+    call_task('pavelib.assets.webpack', options={'settings': args.settings})
+
+    # Compile sass for themes and system
+    execute_compile_sass(args, [sys])
+
+    if args.collect:
+        if args.debug:
+            collect_log_args.update({COLLECTSTATIC_LOG_DIR_ARG: None})
+
+        if args.collect_log_dir:
+            collect_log_args.update({COLLECTSTATIC_LOG_DIR_ARG: args.collect_log_dir})
+
+        collect_assets([sys], args.settings, **collect_log_args)
