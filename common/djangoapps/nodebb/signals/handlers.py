@@ -7,7 +7,7 @@ from django.dispatch import receiver
 
 from common.djangoapps.nodebb.tasks import (task_create_user_on_nodebb, task_update_user_profile_on_nodebb,
                                             task_delete_user_on_nodebb, task_activate_user_on_nodebb,
-                                            task_join_group_on_nodebb)
+                                            task_join_group_on_nodebb, task_un_join_group_on_nodebb)
 from common.lib.nodebb_client.client import NodeBBClient
 from lms.djangoapps.onboarding.helpers import COUNTRIES
 from certificates.models import GeneratedCertificate
@@ -15,7 +15,7 @@ from lms.djangoapps.onboarding.models import (
     UserExtendedProfile, Organization, FocusArea, EmailPreference, )
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from mailchimp_pipeline.signals.handlers import send_user_info_to_mailchimp, \
-     send_user_course_completions_to_mailchimp
+     send_user_course_completions_to_mailchimp, send_user_enrollments_to_mailchimp
 from nodebb.models import DiscussionCommunity, TeamGroupChat
 from common.djangoapps.nodebb.helpers import get_community_id
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -201,13 +201,20 @@ def join_group_on_nodebb(instance, **kwargs):  # pylint: disable=unused-argument
     Because that triggered before completion 'create_category_on_nodebb' so this fails to
     join the course author in the category
     """
-    if instance.is_active:
-        course_id = instance.course_id
-        username = instance.user.username
-        community_id = get_community_id(course_id)
 
+    course_id = instance.course_id
+    username = instance.user.username
+    community_id = get_community_id(course_id)
+
+    if instance.is_active is True:
         task_join_group_on_nodebb.delay(
             category_id=community_id, username=username)
+    elif instance.is_active is False:
+        task_un_join_group_on_nodebb.delay(
+            category_id=community_id, username=username)
+        # We have to sync user enrollments only in case of
+        # un-enroll because
+        send_user_enrollments_to_mailchimp(instance.user)
 
 
 @receiver(post_save, sender=CourseTeam, dispatch_uid="nodebb.signals.handlers.create_update_groupchat_on_nodebb")
