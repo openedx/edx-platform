@@ -22,11 +22,11 @@
 -e git+https://github.com/mckinseyacademy/xblock-diagnosticfeedback.git@v0.2.4#egg=xblock-diagnostic-feedback==0.2.4
 -e git+https://github.com/open-craft/xblock-group-project-v2.git@0.4.10#egg=xblock-group-project-v2==0.4.10
 -e git+https://github.com/open-craft/xblock-virtualreality.git@v0.1.1#egg=xblock-virtualreality==0.1.1
-git+https://github.com/edx-solutions/api-integration.git@v2.2.2#egg=api-integration==2.2.2
+git+https://github.com/edx-solutions/api-integration.git@v2.2.4#egg=api-integration==2.2.4
 git+https://github.com/edx-solutions/organizations-edx-platform-extensions.git@v1.2.6#egg=organizations-edx-platform-extensions==1.2.6
 git+https://github.com/edx-solutions/gradebook-edx-platform-extensions.git@1.1.12#egg=gradebook-edx-platform-extensions==1.1.12
 git+https://github.com/edx-solutions/projects-edx-platform-extensions.git@v1.1.6#egg=projects-edx-platform-extensions==1.1.6
-git+https://github.com/edx-solutions/discussion-edx-platform-extensions.git@v1.2.5#egg=discussion-edx-platform-extensions==1.2.5
+git+https://github.com/edx-solutions/discussion-edx-platform-extensions.git@v1.2.6#egg=discussion-edx-platform-extensions==1.2.6
 git+https://github.com/edx-solutions/course-edx-platform-extensions.git@v1.1.1#egg=course-edx-platform-extensions==1.1.1
 git+https://github.com/edx-solutions/mobileapps-edx-platform-extensions.git@v1.2.2#egg=mobileapps-edx-platform-extensions==1.2.2
 git+https://github.com/edx-solutions/progress-edx-platform-extensions.git@1.0.8#egg=progress-edx-platform-extensions==1.0.8
