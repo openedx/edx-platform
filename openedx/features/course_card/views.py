@@ -13,8 +13,9 @@ utc = pytz.UTC
 
 
 def get_course_start_date(course):
+
     """
-    this function takes course and returns start date of the project
+    this function takes course and returns start date of the course
     if start and end dates are set and start date is in future
     :param course:
     :return Course start date:
@@ -33,6 +34,7 @@ def get_course_start_date(course):
 
 @csrf_exempt
 def get_course_cards(request):
+
     """
     :param request:
     :return: list of active cards
@@ -43,8 +45,6 @@ def get_course_cards(request):
     courses_list = sorted(courses_list, key=lambda _course: _course.number)
     current_time = datetime.now()
 
-    date_time_format = '%b %-d, %Y'
-
     filtered_courses = []
 
     for course in courses_list:
@@ -52,33 +52,16 @@ def get_course_cards(request):
         if course.invitation_only and not CourseEnrollment.is_enrolled(request.user, course.id):
             continue
 
-        course.start_date = None
         course_rerun_states = [crs.course_key for crs in CourseRerunState.objects.filter(
             source_course_key=course.id, action="rerun", state="succeeded")]
 
         course_rerun_object = CourseOverview.objects.select_related('image_set').filter(
             id__in=course_rerun_states, start__gte=current_time).order_by('start').first()
 
-        course_start_time = get_course_start_date(course)
-        rerun_start_time = get_course_start_date(course_rerun_object)
-
-        if course_start_time and rerun_start_time:
-            if course_start_time < rerun_start_time:
-                course.start_date = course_start_time.strftime(date_time_format)
-            else:
-                course.start_date = rerun_start_time.strftime(date_time_format)
-
-        elif course_start_time:
-            course.start_date = course_start_time.strftime(date_time_format)
-
-        elif rerun_start_time:
-            course.start_date = rerun_start_time.strftime(date_time_format)
-
         current_class, user_current_enrolled_class, current_enrolled_class_target = get_user_current_enrolled_class(
             request, course)
 
-        if current_class:
-            course.start_date = current_class.start.strftime(date_time_format)
+        course.start_date = get_course_start_date(course, course_rerun_object, current_class)
 
         if user_current_enrolled_class:
             course.is_enrolled = True
@@ -92,4 +75,32 @@ def get_course_cards(request):
             'courses': filtered_courses
         }
     )
+
+
+def get_course_start_date(course, course_rerun_object, current_class):
+
+    date_time_format = '%b %-d, %Y'
+    current_time = datetime.utcnow().replace(tzinfo=utc)
+
+    if current_class:
+        if current_class.enrollment_end.replace(tzinfo=utc) > current_time:
+            return current_class.start.strftime(date_time_format)
+
+    course_start_time = get_course_start_date(course)
+    rerun_start_time = get_course_start_date(course_rerun_object)
+
+    if course.enrollment_end:
+        _enrollment_end_date = course.enrollment_end.replace(tzinfo=utc)
+        if _enrollment_end_date > current_time:
+            return course_start_time
+
+    if course_rerun_object.enrollment_end:
+        _enrollment_end_date = course_rerun_object.enrollment_end.replace(tzinfo=utc)
+        if _enrollment_end_date > current_time:
+            return rerun_start_time
+
+    return None
+
+
+
 
