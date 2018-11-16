@@ -1055,4 +1055,10 @@ if settings.FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION', False):
         url(r'', include('membership.urls')),
     ]
 
+# payments
+if settings.FEATURES.get('ENABLE_PAYMENTS_INTEGRATION', False):
+    urlpatterns += [
+        url(r'', include('payments.urls')),
+    ]
+
 urlpatterns.extend(plugin_urls.get_patterns(plugin_constants.ProjectType.LMS))

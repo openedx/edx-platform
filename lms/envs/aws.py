@@ -1112,3 +1112,6 @@ plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_c
 derive_settings(__name__)
 
 logging.warn('DEPRECATION WARNING: aws.py has been deprecated, you should use production.py instead.')
+
+if FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION', False):
+    INSTALLED_APPS.append('membership')
