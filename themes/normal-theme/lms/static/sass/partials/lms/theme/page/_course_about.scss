@@ -36,10 +36,13 @@
 
       >.heading-group span{
         font-size: 14px;
-        color: #4788c7
+        color: $blue
       }
 
-      .main-cta span.register{
+      .main-cta{
+        width: auto;
+      }
+      .main-cta span.register, .main-cta a.register, .main-cta strong{
         width: auto;
         padding: 0 20px;
         border: none;
@@ -49,19 +52,9 @@
         height: 40px;
         line-height: 40px;
       }
-
-      .main-cta strong{
-        width: auto;
-        font-size: 14px;
-        padding: 0 20px;
-        letter-spacing: 0.3px;
-        height: 40px;
-        line-height: 40px;
-      }
     }
 
     /* header 右侧 */
-
     .intro-inner-wrapper .media .hero{
       border: none;
     }
@@ -75,7 +68,7 @@
     font-size: 14px;
 
     > div{
-      box-shadow: 0px 0px 2px 0px #b6dcfe;
+      box-shadow: 0px 0px 2px 0px $border;
       background: #fff;
       border-radius: $border-radius;
     }
@@ -113,7 +106,7 @@
 
   /* 左侧内容 */
   .details{
-    box-shadow: 0px 0px 2px 0px #b6dcfe;
+    box-shadow: 0px 0px 2px 0px $border;
     background: #fff;
     border-radius: $border-radius;
 
@@ -129,15 +122,15 @@
   height: 60px;
   line-height: 60px;
   font-size: 14px;
-  background: #b6dcfe;
-  color: #346ca3;
+  background: #e2f1ff;
+  color: $blue;
   padding: 0 25px;
   position: relative;
 
   a {
     padding: 0 15px;
     background: #fff;
-    border: 1px solid #346ca3;
+    border: 1px solid $blue;
     border-radius: 3px;
     position: absolute;
     right: 25px;
@@ -175,7 +168,7 @@
 
   // 1.1 课程详情页 tab
   .about-tabs{
-    border-bottom:1px solid $border;
+    border-bottom:1px solid #eeeeee;
   }
   .about-tab{
     display: inline-block;

@@ -3,15 +3,21 @@
 .window-wrap .global-header{
   border-bottom: none;
   overflow: inherit;
-  // height: 63px;
+  z-index: 100;
+  height: 60px;
+
   .main-header{
     max-width: 1200px;
     margin: 0 auto;
   }
-  .header-logo{ 
-    a{  
-      margin-left: 0px;
-    }
+  .header-logo a{ 
+    margin-left: 0px;
+  }
+  .header-logo a .logo{
+    height: 34px;
+  }
+  .course-header{
+    display: none;
   }
 }
 
@@ -20,26 +26,50 @@
   .window-wrap .global-header .header-logo a{ 
     margin-left: 50%;
   }
+  .global-header .nav-links .secondary .dropdown-user-menu{
+    border: 1px solid #eeeeee;
+  }
+  .global-header .hamburger-menu .line{
+    height: 3px;
+  }
 }
 
 
+
 @media screen and (min-width: 992px){ 
-  .global-header .nav-links .secondary .user-image-frame{
-    border: none;
-  }
-  .global-header{ 
-    .nav-links{
-      .main .nav-tab a {  
-        // padding-top: 0px;
-      }
-      .secondary{
-        margin-right: 0px;
-        .nav-item.nav-item-dropdown {
-          position: relative;
-        }
-      }
+  .global-header .nav-links .secondary{ 
+    margin: 8px 0 0;
+
+    .user-image-frame{
+      border: none;
+    }
+
+    .nav-item.nav-item-dropdown {
+      position: relative;
     }
   } 
+
+  .global-header .nav-links .main .nav-tab{
+    a{
+      padding: 0 25px;
+      border: none;
+    }
+    a:active, a:hover, a.active{
+      border-bottom: none;
+      color: $blue;
+    }
+  } 
+  .global-header .nav-links .secondary .dropdown-user-menu{
+    border: 1px solid #e7e7e7;
+  }
+  .wrapper-messages-primary .message.message-upsell .action-upgrade{
+    background: $green;
+    box-shadow: none;
+  }
+
+  .global-header .nav-links .secondary .toggle-user-dropdown{
+    outline: none;
+  }
 }
 
 //查看课程的导航

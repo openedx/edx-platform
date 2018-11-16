@@ -3,7 +3,7 @@
   width: 100%;
   color: $font;
   font-size: 14px;
-  border-top: 1px solid $border;
+  box-shadow: 0 2px 2px 2px $border;
   line-height: 1.8;
   padding: 40px 0;
 
@@ -12,12 +12,16 @@
     width: 96%;
     max-width: 1200px;
     margin: 0 auto;
+    position: relative;
   }
 
   .footer-app{
     display: inline-block;
-    width: 25%;
+    width: 20%;
+    margin-right: 5%;
     vertical-align: text-top;
+    height: 138px;
+    border-right: 2px dashed $border;
   }
 
   .footer-wechat{
@@ -25,6 +29,7 @@
     display: inline-block;
     width: 13%;
     vertical-align: text-top;
+    border-left: 2px dashed $border;
     h3{ 
       text-align: center;
     }
@@ -43,10 +48,11 @@
   ul{
     list-style: none;
     padding: 0;
-    margin: 20px 0 0 0;
+    margin: 15px 0 0 0;
   }
   li{
     cursor: pointer;
+    line-height: 2;
   }
   a,a:not(.btn){
     color: $font;
@@ -58,6 +64,15 @@
   h3{
     font-size: 14px;
     color: $title;
+    padding: 1px 0 20px;
+  }
+  .footer-line{
+    width: 66%;
+    height: 1px;
+    border-bottom: 2px dashed $border;
+    position: absolute;
+    left: 20%;
+    top: 39px;
   }
 
   // 3. 左侧app按钮
@@ -65,7 +80,7 @@
     width: 120px;
   }
   .slogan{
-    margin: 10px 0;
+    margin: 10px 0 25px;
   }
   .footer-btn{
     display: inline-block;
@@ -75,6 +90,7 @@
     margin-right: 5px;
     padding: 4px 10px 2px;
     cursor: pointer;
+    background: #f7fbfe;
   }
   .footer-icon{
     font-size: 16px;
@@ -95,9 +111,15 @@
   .footer-qrcode{
     width: 60px;
     margin: 10px 0;
+    border: 2px solid $border;
   }
   .footer-wechat div{
     font-size: 12px;
+  }
+
+  .footer-wechat h3{
+    border-bottom: none;
+    padding: 0;
   }
   // 备案信息
   .footer-text{
@@ -136,6 +158,12 @@
     }
     .footer-text{
       margin-top: 0;
+    }
+    .footer-line{
+      display: none;
+    }
+    h3{
+      padding: 0;
     }
   }
 }

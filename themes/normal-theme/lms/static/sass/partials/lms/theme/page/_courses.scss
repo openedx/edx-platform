@@ -76,10 +76,13 @@
   background-image: linear-gradient(to bottom, #fff, #f2f9ff);
 }
 
+.content-wrapper .courses-container{
+  max-width: 1200px;
+}
 .dashboard .main-container .my-courses .listing-courses .course-item .course-container{
   background: #fff;
   max-width: 1200px;
-  box-shadow: 0px 1px 4px 0px #b6dcfe;
+  box-shadow: 0px 1px 4px 0px $border;
   border-radius: 3px;
   border: none;
 
@@ -112,9 +115,19 @@
     }
     .wrapper-course-details .wrapper-course-actions .enter-course{
       border: none;
-      background: #4788c7;
+      background: $blue;
       color: #fff;
       font-size: 14px;
+      font-weight: normal;
+    }
+
+    .wrapper-messages-primary .messages-list{
+      background-color: #f7f7f7;
+      .wrapper-messages-primary .message.message-upsell .action-upgrade{
+        box-shadow: none;
+        background: $green;
+      }
+
     }
   }
 
