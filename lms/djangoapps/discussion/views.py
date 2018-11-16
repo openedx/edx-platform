@@ -581,6 +581,10 @@ def user_profile(request, course_key, user_id):
             })
         else:
             tab_view = CourseTabView()
+            # To avoid mathjax loading from 'mathjax_include.html' file
+            # as that file causes multiple loadings of Mathjax on the
+            # 'user_profile' page
+            context['load_mathjax'] = False
             return tab_view.get(request, unicode(course_key), 'discussion', profile_page_context=context)
     except User.DoesNotExist:
         raise Http404

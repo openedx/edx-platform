@@ -1426,12 +1426,18 @@ dashboard_js = (
     sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/dashboard/**/*.js'))
 )
 discussion_js = (
-    rooted_glob(COMMON_ROOT / 'static', 'common/js/discussion/mathjax_include.js') +
     rooted_glob(PROJECT_ROOT / 'static', 'js/customwmd.js') +
     rooted_glob(PROJECT_ROOT / 'static', 'js/mathjax_accessible.js') +
     rooted_glob(PROJECT_ROOT / 'static', 'js/mathjax_delay_renderer.js') +
     sorted(rooted_glob(COMMON_ROOT / 'static', 'common/js/discussion/**/*.js'))
 )
+
+
+if 'common/js/discussion/mathjax_include.js' not in discussion_js:
+    discussion_js += (
+        rooted_glob(COMMON_ROOT / 'static', 'common/js/discussion/mathjax_include.js')
+    )
+
 
 discussion_vendor_js = [
     'js/Markdown.Converter.js',
