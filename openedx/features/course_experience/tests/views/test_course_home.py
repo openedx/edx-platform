@@ -18,6 +18,7 @@ from waffle.testutils import override_flag
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.tests.helpers import get_expiration_banner_text
+from experiments.models import ExperimentKeyValue
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.course_goals.api import add_course_goal, remove_course_goal
@@ -32,6 +33,7 @@ from lms.djangoapps.courseware.tests.factories import (
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
+from openedx.features.course_duration_limits.config import EXPERIMENT_ID
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience import (
     SHOW_REVIEWS_TOOL_FLAG,
@@ -192,7 +194,7 @@ class TestCourseHomePage(CourseHomePageTestCase):
         course_home_url(self.course)
 
         # Fetch the view and verify the query counts
-        with self.assertNumQueries(68, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+        with self.assertNumQueries(76, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
             with check_mongo_calls(4):
                 url = course_home_url(self.course)
                 self.client.get(url)
@@ -474,6 +476,37 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         self.assertContains(response, TEST_COURSE_TOOLS)
         self.assertContains(response, TEST_COURSE_TODAY)
         self.assertNotContains(response, TEST_BANNER_CLASS)
+
+    @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
+    def test_expired_course_in_holdback(self):
+        """
+        Ensure that a user accessing an expired course that is in the holdback
+        does not get redirected to the student dashboard, not a 404.
+        """
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=date(2010, 1, 1))
+
+        course = CourseFactory.create(start=THREE_YEARS_AGO)
+        url = course_home_url(course)
+
+        for mode in [CourseMode.AUDIT, CourseMode.VERIFIED]:
+            CourseModeFactory.create(course_id=course.id, mode_slug=mode)
+
+        ExperimentKeyValue.objects.create(
+            experiment_id=EXPERIMENT_ID,
+            key="content_type_gating_holdback_percentage",
+            value="100"
+        )
+
+        # assert that an if an expired audit user in the holdback tries to access the course
+        # they are not redirected to the dashboard
+        audit_user = UserFactory(password=self.TEST_PASSWORD)
+        self.client.login(username=audit_user.username, password=self.TEST_PASSWORD)
+        audit_enrollment = CourseEnrollment.enroll(audit_user, course.id, mode=CourseMode.AUDIT)
+        ScheduleFactory(start=THREE_YEARS_AGO, enrollment=audit_enrollment)
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
 
     @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
     @mock.patch("util.date_utils.strftime_localized")

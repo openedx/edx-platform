@@ -11,19 +11,8 @@ from django.urls import reverse
 from mock import patch
 
 from course_modes.tests.factories import CourseModeFactory
+from experiments.models import ExperimentKeyValue
 from lms.djangoapps.courseware.module_render import load_single_xblock
-from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
-from openedx.core.djangoapps.util.testing import TestConditionalContent
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
-from openedx.core.lib.url_utils import quote_slashes
-from openedx.features.content_type_gating.partitions import CONTENT_GATING_PARTITION_ID
-from openedx.features.content_type_gating.models import ContentTypeGatingConfig
-from student.roles import CourseBetaTesterRole, CourseInstructorRole, CourseStaffRole
-from student.tests.factories import (
-    CourseEnrollmentFactory,
-    UserFactory,
-    TEST_PASSWORD
-)
 from lms.djangoapps.courseware.tests.factories import (
     InstructorFactory,
     StaffFactory,
@@ -31,6 +20,23 @@ from lms.djangoapps.courseware.tests.factories import (
     OrgStaffFactory,
     OrgInstructorFactory,
     GlobalStaffFactory,
+)
+from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
+from openedx.core.djangoapps.util.testing import TestConditionalContent
+from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
+from openedx.core.lib.url_utils import quote_slashes
+from openedx.features.content_type_gating.partitions import CONTENT_GATING_PARTITION_ID
+from openedx.features.content_type_gating.models import ContentTypeGatingConfig
+from openedx.features.course_duration_limits.config import (
+    EXPERIMENT_DATA_HOLDBACK_KEY,
+    EXPERIMENT_ID,
+)
+from student.models import CourseEnrollment
+from student.roles import CourseBetaTesterRole, CourseInstructorRole, CourseStaffRole
+from student.tests.factories import (
+    CourseEnrollmentFactory,
+    UserFactory,
+    TEST_PASSWORD
 )
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -430,8 +436,36 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
             request_factory=self.factory,
         )
 
+    @ddt.data(
+        (False, True),
+        (True, False),
+    )
+    @ddt.unpack
+    def test_content_gating_holdback(self, put_user_in_holdback, is_gated):
+        """
+        Test that putting a user in the content gating holdback disables content gating.
+        """
+        if put_user_in_holdback:
+            ExperimentKeyValue.objects.create(
+                experiment_id=EXPERIMENT_ID,
+                key="content_type_gating_holdback_percentage",
+                value="100"
+            ).value
 
-@ddt.ddt
+        user = UserFactory.create()
+        CourseEnrollment.enroll(user, self.course.id)
+
+        graded, has_score, weight = True, True, 1
+        block = self.graded_score_weight_blocks[(graded, has_score, weight)]
+        _assert_block_is_gated(
+            block=block,
+            user_id=user.id,
+            course=self.course,
+            is_gated=is_gated,
+            request_factory=self.factory,
+        )
+
+
 @override_settings(FIELD_OVERRIDE_PROVIDERS=(
     'openedx.features.content_type_gating.field_override.ContentTypeGatingFieldOverride',
 ))

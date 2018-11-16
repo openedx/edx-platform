@@ -431,18 +431,18 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         # course is outside the context manager that is verifying the number of queries,
         # and with split mongo, that method ends up querying disabled_xblocks (which is then
         # cached and hence not queried as part of call_single_thread).
-        (ModuleStoreEnum.Type.mongo, False, 1, 5, 2, 21, 6),
-        (ModuleStoreEnum.Type.mongo, False, 50, 5, 2, 21, 6),
+        (ModuleStoreEnum.Type.mongo, False, 1, 5, 2, 22, 7),
+        (ModuleStoreEnum.Type.mongo, False, 50, 5, 2, 22, 7),
         # split mongo: 3 queries, regardless of thread response size.
-        (ModuleStoreEnum.Type.split, False, 1, 3, 3, 21, 6),
-        (ModuleStoreEnum.Type.split, False, 50, 3, 3, 21, 6),
+        (ModuleStoreEnum.Type.split, False, 1, 3, 3, 22, 7),
+        (ModuleStoreEnum.Type.split, False, 50, 3, 3, 22, 7),
 
         # Enabling Enterprise integration should have no effect on the number of mongo queries made.
-        (ModuleStoreEnum.Type.mongo, True, 1, 5, 2, 21, 6),
-        (ModuleStoreEnum.Type.mongo, True, 50, 5, 2, 21, 6),
+        (ModuleStoreEnum.Type.mongo, True, 1, 5, 2, 22, 7),
+        (ModuleStoreEnum.Type.mongo, True, 50, 5, 2, 22, 7),
         # split mongo: 3 queries, regardless of thread response size.
-        (ModuleStoreEnum.Type.split, True, 1, 3, 3, 21, 6),
-        (ModuleStoreEnum.Type.split, True, 50, 3, 3, 21, 6),
+        (ModuleStoreEnum.Type.split, True, 1, 3, 3, 22, 7),
+        (ModuleStoreEnum.Type.split, True, 50, 3, 3, 22, 7),
     )
     @ddt.unpack
     def test_number_of_mongo_queries(
