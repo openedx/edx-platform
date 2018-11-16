@@ -1099,3 +1099,6 @@ plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_c
 ########################## Derive Any Derived Settings  #######################
 
 derive_settings(__name__)
+
+ALIPAY_INFO = AUTH_TOKENS['ALIPAY_INFO']
+WECHAT_PAY_INFO = AUTH_TOKENS['WECHAT_PAY_INFO']
