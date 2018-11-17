@@ -179,13 +179,21 @@ def index(request, extra_context=None, user=AnonymousUser()):
     context['courses_list'] = theming_helpers.get_template_path('courses_list.html')
 
     # Insert additional context for use in the template
-    context.update(extra_context)
 
     # Add marketable programs to the context.
     context['programs_list'] = get_programs_with_type(request.site, include_hidden=False)
 
     # TODO: Course Listing Plugin required
     context['journal_info'] = get_journals_context(request)
+
+    # eliteu membership
+    context['vip_course_price_data'] = {1:2}
+    # if settings.FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION', False):
+    #     from membership.models import VIPCoursePrice
+    #     context['vip_course_price_data'] = VIPCoursePrice.get_vip_course_price_data()
+    print '#' * 100
+    print context['vip_course_price_data']
+    print '#' * 100
 
     return render_to_response('index.html', context)
 
