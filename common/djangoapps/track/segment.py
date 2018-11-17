@@ -8,9 +8,9 @@ required by server-side events.
 To use, call "from track import segment", then call segment.track() or segment.identify().
 
 """
+from urlparse import urljoin
 
 import analytics
-
 from django.conf import settings
 from eventtracking import tracker
 
@@ -37,6 +37,13 @@ def track(user_id, event_name, properties=None, context=None):
         path = tracking_context.get('path')
         referer = tracking_context.get('referer')
         page = tracking_context.get('page')
+
+        if path and not page:
+            # Try to put together a url from host and path:
+            host = tracking_context.get('host')
+            if host:
+                page = urljoin("//{host}".format(host=host), path)
+
         if path is not None or referer is not None or page is not None:
             if 'page' not in segment_context:
                 segment_context['page'] = {}

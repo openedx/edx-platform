@@ -148,7 +148,7 @@ edx-user-state-client==1.0.4
 edxval==0.1.22
 elasticsearch==1.9.0
 enum34==1.1.6
-event-tracking==0.2.5
+event-tracking==0.2.6
 execnet==1.5.0            # via pytest-xdist
 extras==1.0.0             # via python-subunit, testtools
 factory_boy==2.8.1

@@ -79,15 +79,16 @@ class SegmentTrackTestCase(TestCase):
     @override_settings(LMS_SEGMENT_KEY="testkey")
     def test_track_with_standard_context(self):
 
+        # Note that 'host' and 'path' will be urlparsed, so must be strings.
         tracking_context = {
             'accept_language': sentinel.accept_language,
             'referer': sentinel.referer,
             'username': sentinel.username,
             'session': sentinel.session,
             'ip': sentinel.ip,
-            'host': sentinel.host,
+            'host': 'hostname',
             'agent': sentinel.agent,
-            'path': sentinel.path,
+            'path': '/this/is/a/path',
             'user_id': sentinel.user_id,
             'course_id': sentinel.course_id,
             'org_id': sentinel.org_id,
@@ -106,9 +107,9 @@ class SegmentTrackTestCase(TestCase):
             },
             'userAgent': sentinel.agent,
             'page': {
-                'path': sentinel.path,
+                'path': '/this/is/a/path',
                 'referrer': sentinel.referer,
-                # No URL value.
+                'url': '//hostname/this/is/a/path'  # Synthesized URL value.
             }
         }
         self.assertEqual((sentinel.user_id, sentinel.name, self.properties, expected_segment_context), args)
