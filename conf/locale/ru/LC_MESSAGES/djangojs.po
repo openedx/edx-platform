@@ -1233,8 +1233,8 @@ msgstr "Вы отправили файл {filename}; разрешены толь
 #: common/static/bundles/CapaModule.js
 msgid "Your file {filename} is too large (max size: {maxSize}MB)."
 msgstr ""
-"Файл «{filename}» слишком велик (максимально допустимый размер: {maxSize} "
-"Мб)."
+"Файл «{filename}» слишком велик (максимально допустимый размер: "
+"{maxSize} Мб)."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/static/bundles/CapaModule.js
