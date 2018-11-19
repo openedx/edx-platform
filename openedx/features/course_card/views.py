@@ -53,7 +53,7 @@ def get_course_cards(request):
         course_rerun_object = CourseOverview.objects.select_related('image_set').filter(
             id__in=course_rerun_states, enrollment_end__gte=current_time).order_by('start').first()
 
-        course = get_course_with_and_start_date(course, course_rerun_object, request)
+        course = get_course_with_link_and_start_date(course, course_rerun_object, request)
         
         filtered_courses.append(course)
 
@@ -65,7 +65,7 @@ def get_course_cards(request):
     )
 
 
-def get_course_with_and_start_date(course, course_rerun_object, request):
+def get_course_with_link_and_start_date(course, course_rerun_object, request):
 
     date_time_format = '%b %-d, %Y'
     current_time = datetime.utcnow().replace(tzinfo=utc)
