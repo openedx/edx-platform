@@ -488,18 +488,28 @@ class UserExtendedProfile(TimeStampedModel):
 
     def get_user_hear_about_philanthropy(self, _type="labels"):
         """
-        :return: Users selected personal goals
+        :return: Users selected here about philanthropy university
         :param _type: labels / fields
         :return: list of labels / names of fields
         """
-
         if _type == "labels":
-            return [label for field_name, label in self.HEAR_ABOUT_PHILANTHROPY_LABELS.items()]
+            _field_label_data = [label for field_name, label in self.GOALS_LABELS.items() if
+                                 getattr(self, 'hear_about_philanthropy') ==
+                                 self.HEAR_ABOUT_PHILANTHROPY_LABELS.get(field_name)]
         else:
-            return [field_name for field_name, label in self.HEAR_ABOUT_PHILANTHROPY_LABELS.items()]
+            _field_label_data = [field_name for field_name, label in self.HEAR_ABOUT_PHILANTHROPY_LABELS.items() if
+                                 getattr(self, 'hear_about_philanthropy') ==
+                                 self.HEAR_ABOUT_PHILANTHROPY_LABELS.get(field_name)]
+        return _field_label_data if not _field_label_data else _field_label_data[0]
 
-    def get_user_hear_about_philanthropy_result(self, _option):
-        return [_option for _option in self.HEAR_ABOUT_PHILANTHROPY_LABELS.items()]
+    def save_user_hear_about_philanthropy_result(self, selected_values):
+        _updated_value = None
+        for function_area_field, label in self.HEAR_ABOUT_PHILANTHROPY_LABELS.items():
+            _function_area_field = function_area_field.split("=")[1]
+            if _function_area_field in selected_values:
+                _updated_value = self.HEAR_ABOUT_PHILANTHROPY_LABELS.get(function_area_field)
+
+        self.__setattr__('hear_about_philanthropy', _updated_value)
 
     def save_user_function_areas(self, selected_values):
         """

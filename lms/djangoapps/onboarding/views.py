@@ -181,7 +181,6 @@ def interests(request):
 
     else:
         form = forms.InterestsForm(initial=initial)
-
     context = {'form': form, 'are_forms_complete': are_forms_complete}
 
     user = request.user

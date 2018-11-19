@@ -287,7 +287,7 @@ class InterestsForm(BaseOnboardingForm):
 
     def __init__(self,  *args, **kwargs):
         super(InterestsForm, self).__init__( *args, **kwargs)
-
+        print(self)
         interest_choices = get_sorted_choices_from_dict(UserExtendedProfile.INTERESTS_LABELS)
         interest_choices = sorted(interest_choices, key=lambda interest_choices: interest_choices[0])
         self.fields['interests'] = forms.ChoiceField(
@@ -314,7 +314,8 @@ class InterestsForm(BaseOnboardingForm):
             choices=personal_goal_choices, widget=forms.CheckboxSelectMultiple,
             required=False)
 
-        hear_about_philanthropy_choices = get_sorted_choices_from_dict(UserExtendedProfile.HEAR_ABOUT_PHILANTHROPY_LABELS)
+        hear_about_philanthropy_choices = get_sorted_choices_from_dict(UserExtendedProfile
+                                                                       .HEAR_ABOUT_PHILANTHROPY_LABELS)
         hear_about_philanthropy_choices = sorted(hear_about_philanthropy_choices,
                                        key=lambda hear_about_philanthropy_choices: hear_about_philanthropy_choices[0])
         self.fields['hear_about_philanthropy'] = forms.ChoiceField(
@@ -330,14 +331,6 @@ class InterestsForm(BaseOnboardingForm):
         """
         return True
 
-    def clean_hear_about_philanthropy(self):
-        hear_about_philanthropy = self.cleaned_data['hear_about_philanthropy']
-
-        if hear_about_philanthropy == 'other':
-            raise forms.ValidationError('Please specify Gender.')
-
-        return hear_about_philanthropy
-
     def save(self, request, user_extended_profile):
         """
         save form selected choices without any validation
@@ -345,13 +338,12 @@ class InterestsForm(BaseOnboardingForm):
         selected_interests = get_actual_field_names(request.POST.getlist('interests'))
         selected_interested_learners = get_actual_field_names(request.POST.getlist('interested_learners'))
         selected_personal_goals = get_actual_field_names(request.POST.getlist('personal_goals'))
-        hear_about_philanthropy_option = request.POST.getlist('hear_about_philanthropy')
-        selected_hear_about_philanthropy = user_extended_profile.get_user_hear_about_philanthropy_result(hear_about_philanthropy_option)
+        selected_hear_about_philanthropy = get_actual_field_names(request.POST.getlist('hear_about_philanthropy'))
 
         user_extended_profile.save_user_interests(selected_interests)
         user_extended_profile.save_user_interested_learners(selected_interested_learners)
         user_extended_profile.save_user_personal_goals(selected_personal_goals)
-        user_extended_profile.hear_about_philanthropy = selected_hear_about_philanthropy
+        user_extended_profile.save_user_hear_about_philanthropy_result(selected_hear_about_philanthropy)
 
         user_extended_profile.is_interests_data_submitted = True
         user_extended_profile.save()
