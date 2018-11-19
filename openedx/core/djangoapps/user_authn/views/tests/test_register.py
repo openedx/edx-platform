@@ -181,8 +181,8 @@ class TestCreateAccount(SiteMixin, TestCase):
         "Microsites not implemented in this environment"
     )
     @override_settings(LMS_SEGMENT_KEY="testkey")
-    @mock.patch('openedx.core.djangoapps.user_authn.views.register.analytics.track')
-    @mock.patch('openedx.core.djangoapps.user_authn.views.register.analytics.identify')
+    @mock.patch('openedx.core.djangoapps.user_authn.views.register.segment.track')
+    @mock.patch('openedx.core.djangoapps.user_authn.views.register.segment.identify')
     def test_segment_tracking(self, mock_segment_identify, _):
         year = datetime.now().year
         year_of_birth = year - 14

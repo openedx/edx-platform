@@ -2191,9 +2191,9 @@ class GenerateUserCertTests(ModuleStoreTestCase):
     def test_user_with_passing_grade(self, mock_is_course_passed):
         # If user has above passing grading then json will return cert generating message and
         # status valid code
-        # mocking xqueue and analytics
+        # mocking xqueue and Segment analytics
 
-        analytics_patcher = patch('courseware.views.views.analytics')
+        analytics_patcher = patch('courseware.views.views.segment')
         mock_tracker = analytics_patcher.start()
         self.addCleanup(analytics_patcher.stop)
 
@@ -2211,11 +2211,6 @@ class GenerateUserCertTests(ModuleStoreTestCase):
                     'category': 'certificates',
                     'label': unicode(self.course.id)
                 },
-
-                context={
-                    'ip': '127.0.0.1',
-                    'Google Analytics': {'clientId': None}
-                }
             )
             mock_tracker.reset_mock()
 

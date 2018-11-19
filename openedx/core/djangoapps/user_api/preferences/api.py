@@ -2,8 +2,6 @@
 API for managing user preferences.
 """
 import logging
-import analytics
-from eventtracking import tracker
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
@@ -17,6 +15,7 @@ from pytz import common_timezones, common_timezones_set, country_timezones
 from six import text_type
 
 from student.models import User, UserProfile
+from track import segment
 from ..errors import (
     UserAPIInternalError, UserAPIRequestError, UserNotFound, UserNotAuthorized,
     PreferenceValidationError, PreferenceUpdateError, CountryCodeError
@@ -284,21 +283,13 @@ def _track_update_email_opt_in(user_id, organization, opt_in):
 
     """
     event_name = 'edx.bi.user.org_email.opted_in' if opt_in else 'edx.bi.user.org_email.opted_out'
-    tracking_context = tracker.get_tracker().resolve_context()
-
-    analytics.track(
+    segment.track(
         user_id,
         event_name,
         {
             'category': 'communication',
             'label': organization
         },
-        context={
-            'ip': tracking_context.get('ip'),
-            'Google Analytics': {
-                'clientId': tracking_context.get('client_id')
-            }
-        }
     )
 
 

@@ -522,13 +522,13 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
     def test_canceling_authentication_redirects_to_root_when_auth_entry_not_set(self):
         self.assert_exception_redirect_looks_correct('/')
 
-    def test_full_pipeline_succeeds_for_linking_account(self):
+    @mock.patch('third_party_auth.pipeline.segment.track')
+    def test_full_pipeline_succeeds_for_linking_account(self, _mock_segment_track):
         # First, create, the request and strategy that store pipeline state,
         # configure the backend, and mock out wire traffic.
         request, strategy = self.get_request_and_strategy(
             auth_entry=pipeline.AUTH_ENTRY_LOGIN, redirect_uri='social:complete')
         request.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
-        pipeline.analytics.track = mock.MagicMock()
         request.user = self.create_user_models_for_existing_account(
             strategy, 'user@example.com', 'password', self.get_username(), skip_social_auth=True)
 
@@ -677,13 +677,13 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         self.assert_account_settings_context_looks_correct(
             account_settings_context(request), duplicate=True, linked=True)
 
-    def test_full_pipeline_succeeds_for_signing_in_to_existing_active_account(self):
+    @mock.patch('third_party_auth.pipeline.segment.track')
+    def test_full_pipeline_succeeds_for_signing_in_to_existing_active_account(self, _mock_segment_track):
         # First, create, the request and strategy that store pipeline state,
         # configure the backend, and mock out wire traffic.
         request, strategy = self.get_request_and_strategy(
             auth_entry=pipeline.AUTH_ENTRY_LOGIN, redirect_uri='social:complete')
         strategy.request.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
-        pipeline.analytics.track = mock.MagicMock()
         user = self.create_user_models_for_existing_account(
             strategy, 'user@example.com', 'password', self.get_username())
         self.assert_social_auth_exists_for_user(user, strategy)
