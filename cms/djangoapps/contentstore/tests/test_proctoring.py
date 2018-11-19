@@ -13,9 +13,6 @@ from contentstore.signals.handlers import listen_for_course_publish
 from django.conf import settings
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from waffle.testutils import override_flag
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
-from cms.djangoapps.contentstore.config.waffle import ENABLE_PROCTORING_PROVIDER_OVERRIDES
 
 
 @ddt.ddt
@@ -89,7 +86,7 @@ class TestProctoredExams(ModuleStoreTestCase):
         a proctored exam, it will also put an entry into the exam tables
         """
         default_time_limit_minutes = 10
-        
+
         chapter = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
         sequence = ItemFactory.create(
             parent=chapter,

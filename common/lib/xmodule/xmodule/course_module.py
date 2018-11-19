@@ -179,6 +179,10 @@ class TextbookList(List):
 
 class ProctoringConfiguration(Dict):
     def from_json(self, value):
+        """
+        Return ProctoringConfiguration as full featured Python type. Perform validation on the backend
+        and the rules and include any inherited values from the platform default.
+        """
         errors = []
         value = super(ProctoringConfiguration, self).from_json(value)
         proctoring_backend_settings = getattr(
@@ -201,6 +205,10 @@ class ProctoringConfiguration(Dict):
         return value
 
     def _get_proctoring_value(self, value, proctoring_backend_settings):
+        """
+        Return a proctoring value that includes any inherited attributes from the platform defaults
+        for the backend or rules.
+        """
         proctoring_provider = value.get('backend', None)
         proctoring_provider_rules = value.get('rules', None)
 
@@ -279,6 +287,9 @@ class ProctoringConfiguration(Dict):
 
     @property
     def default(self):
+        """
+        Return default value for ProctoringConfiguration.
+        """
         default = super(ProctoringConfiguration, self).default
 
         proctoring_backend_settings = getattr(

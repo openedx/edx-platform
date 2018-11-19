@@ -11,7 +11,6 @@ from xmodule.modulestore.django import modulestore
 from pprint import pprint
 
 from cms.djangoapps.contentstore.config.waffle import ENABLE_PROCTORING_PROVIDER_OVERRIDES
-from opaque_keys.edx.keys import CourseKey
 
 
 class CourseMetadata(object):
@@ -69,8 +68,8 @@ class CourseMetadata(object):
     @classmethod
     def get_blacklist_of_fields(cls, course_key):
         """
-        Returns a list of fields to not include in Studio Advanced settings based on a 
-        feature flag (i.e. enabled or disabled). 
+        Returns a list of fields to not include in Studio Advanced settings based on a
+        feature flag (i.e. enabled or disabled).
         """
         # Copy the filtered list to avoid permanently changing the class attribute.
         black_list = list(cls.FIELDS_BLACK_LIST)
@@ -245,7 +244,7 @@ class CourseMetadata(object):
         for key, value in key_values.iteritems():
             setattr(descriptor, key, value)
 
-        if save and len(key_values):
+        if save and key_values:
             modulestore().update_item(descriptor, user.id)
 
         return cls.fetch(descriptor)

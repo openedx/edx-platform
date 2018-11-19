@@ -111,7 +111,9 @@ def register_special_exams(course_key):
             try:
                 update_review_policy(**exam_review_policy_metadata)
             except ProctoredExamReviewPolicyNotFoundException:
-                if timed_exam.exam_review_rules or exam_review_policy_metadata.get('rules', None):  # won't save an empty rule.
+                review_policy_has_rules = exam_review_policy_metadata.get('rules', None)
+
+                if timed_exam.exam_review_rules or review_policy_has_rules:  # won't save an empty rule.
                     create_exam_review_policy(**exam_review_policy_metadata)
                     msg = 'Created new exam review policy with exam_id {exam_id}'.format(exam_id=exam_id)
                     log.info(msg)

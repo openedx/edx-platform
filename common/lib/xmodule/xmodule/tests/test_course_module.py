@@ -424,6 +424,9 @@ class CourseDescriptorTestCase(unittest.TestCase):
 
 
 class ProctoringConfigurationTestCase(unittest.TestCase):
+    """
+    Tests for ProctoringConfiguration, including the default value, validation, and inheritance behavior.
+    """
     shard = 1
 
     def setUp(self):
@@ -615,7 +618,7 @@ class ProctoringConfigurationTestCase(unittest.TestCase):
         }
 
         self.assertEqual(self.proctoring_configuration.default, expected_default)
-    
+
     @override_settings(PROCTORING_BACKENDS={
     'DEFAULT': 'mock_proctoring_without_rules',
     'mock': {
@@ -636,7 +639,7 @@ class ProctoringConfigurationTestCase(unittest.TestCase):
         }
 
         self.assertEqual(self.proctoring_configuration.default, expected_default)
-        
+
     @override_settings(PROCTORING_BACKENDS=None)
     def test_default_default_with_no_platform_default(self):
         default = self.proctoring_configuration.default
