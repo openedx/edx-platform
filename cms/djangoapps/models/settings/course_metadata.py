@@ -168,6 +168,35 @@ class CourseMetadata(object):
         return result
 
     @classmethod
+    def update_from_json(cls, descriptor, jsondict, user, filter_tabs=True):
+        """
+        Decode the json into CourseMetadata and save any changed attrs to the db.
+
+        Ensures none of the fields are in the blacklist.
+        """
+        filtered_list = cls.filtered_list()
+        # Don't filter on the tab attribute if filter_tabs is False.
+        if not filter_tabs:
+            filtered_list.remove("tabs")
+
+        # Validate the values before actually setting them.
+        key_values = {}
+
+        for key, model in jsondict.iteritems():
+            # should it be an error if one of the filtered list items is in the payload?
+            if key in filtered_list:
+                continue
+            try:
+                val = model['value']
+                if hasattr(descriptor, key) and getattr(descriptor, key) != val:
+                    key_values[key] = descriptor.fields[key].from_json(val)
+            except (TypeError, ValueError) as err:
+                raise ValueError(_("Incorrect format for field '{name}'. {detailed_message}").format(
+                    name=model['display_name'], detailed_message=text_type(err)))
+
+        return cls.update_from_dict(key_values, descriptor, user)
+
+    @classmethod
     def validate_and_update_from_json(cls, descriptor, jsondict, user, filter_tabs=True):
         """
         Validate the values in the json dict (validated by xblock fields from_json method)
