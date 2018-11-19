@@ -390,7 +390,7 @@ module.exports = Merge.smart({
       target: "webworker",
       context: __dirname,
       entry: {
-          mockprock: './node_modules/edx-proctoring/edx_proctoring/static/proctoring/js/plugin/mockprock-provider.js',
+          mockprock: './node_modules/@edx/mockprock/static/index.js'
       },
       output: {
           filename: '[name].js',
@@ -402,12 +402,20 @@ module.exports = Merge.smart({
               filename: 'webpack-worker-stats.json'
           })
       ],
+      module: {
+          rules: [
+              {
+                  test: /\.(js|jsx)$/,
+                  include: [
+                      /node_modules\/@edx/,
+                  ],
+                  use: 'babel-loader'
+              }
+          ]
+      },
       resolve: {
           extensions: ['.js'],
-          modules: [
-              'node_modules',
-              'node_modules/edx-proctoring/node_modules'
-          ]
+          symlinks: false
       }
   }}, {web: xmoduleJS});
 

@@ -4,6 +4,8 @@
   "dependencies": {
     "@edx/cookie-policy-banner": "1.1.10",
     "@edx/edx-bootstrap": "0.4.3",
+    "@edx/edx-proctoring": "file:../../../src/edx-proctoring",
+    "@edx/mockprock": "file:../../../src/mockprock",
     "@edx/paragon": "2.6.4",
     "@edx/studio-frontend": "1.16.12",
     "babel-core": "6.26.0",
@@ -24,7 +26,6 @@
     "datatables": "1.10.18",
     "datatables.net-fixedcolumns": "3.2.6",
     "edx-pattern-library": "0.18.1",
-    "edx-proctoring": "file:../../../src/edx-proctoring",
     "edx-ui-toolkit": "1.5.2",
     "exports-loader": "0.6.4",
     "extract-text-webpack-plugin": "2.1.2",
@@ -63,8 +64,7 @@
     "webpack-bundle-tracker": "0.2.1",
     "webpack-merge": "4.1.1",
     "whatwg-fetch": "2.0.3",
-    "which-country": "1.0.0",
-    "worker-loader": "^2.0.0"
+    "which-country": "1.0.0"
   },
   "devDependencies": {
     "@edx/stylelint-config-edx": "1.1.0",
