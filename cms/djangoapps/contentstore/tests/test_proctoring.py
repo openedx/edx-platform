@@ -44,7 +44,7 @@ class TestProctoredExams(ModuleStoreTestCase):
             }
         )
 
-    def _verify_exam_data(self, sequence, expected_active, is_enable_proctoring_provider_overrides_flag_on):
+    def _verify_exam_data(self, sequence, expected_active):
         """
         Helper method to compare the sequence with the stored exam,
         which should just be a single one
@@ -71,97 +71,84 @@ class TestProctoredExams(ModuleStoreTestCase):
         self.assertEqual(exam['is_proctored'], sequence.is_proctored_exam)
         self.assertEqual(exam['is_practice_exam'], sequence.is_practice_exam)
         self.assertEqual(exam['is_active'], expected_active)
-
-        if is_enable_proctoring_provider_overrides_flag_on:
-            self.assertEqual(exam['backend'], self.course.proctoring_configuration.backend)
+        self.assertEqual(exam['backend'], self.course.proctoring_configuration.backend)
 
 
     @ddt.data(
-        (True, 10, True, False, True, False, False, True),
-        (True, 10, True, False, True, False, False, False),
-        (True, 10, False, False, True, False, False, True),
-        (True, 10, False, False, True, False, False, False),
-        (True, 10, False, False, True, False, True, True),
-        (True, 10, False, False, True, False, True, False),
-        (True, 10, True, True, True, True, False, True),
-        (True, 10, True, True, True, True, False, False),
+        (True, False, True, False, False),
+        (False, False, True, False, False),
+        (False, False, True, False, True),
+        (True, True, True, True, False),
     )
     @ddt.unpack
-    def test_publishing_exam(self, is_time_limited, default_time_limit_minutes, is_proctored_exam,
-                             is_practice_exam, expected_active, republish, hide_after_due,
-                             is_enable_proctoring_provider_overrides_flag_on):
+    def test_publishing_exam(self, is_proctored_exam,
+                             is_practice_exam, expected_active, republish, hide_after_due):
         """
         Happy path testing to see that when a course is published which contains
         a proctored exam, it will also put an entry into the exam tables
         """
-        with override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES,
-                active=is_enable_proctoring_provider_overrides_flag_on):
-            chapter = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
-            sequence = ItemFactory.create(
-                parent=chapter,
-                category='sequential',
-                display_name='Test Proctored Exam',
-                graded=True,
-                is_time_limited=is_time_limited,
-                default_time_limit_minutes=default_time_limit_minutes,
-                is_proctored_exam=is_proctored_exam,
-                is_practice_exam=is_practice_exam,
-                due=datetime.now(UTC) + timedelta(minutes=default_time_limit_minutes + 1),
-                exam_review_rules="allow_use_of_paper",
-                hide_after_due=hide_after_due,
-            )
+        default_time_limit_minutes = 10
+        
+        chapter = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
+        sequence = ItemFactory.create(
+            parent=chapter,
+            category='sequential',
+            display_name='Test Proctored Exam',
+            graded=True,
+            is_time_limited=True,
+            default_time_limit_minutes=default_time_limit_minutes,
+            is_proctored_exam=is_proctored_exam,
+            is_practice_exam=is_practice_exam,
+            due=datetime.now(UTC) + timedelta(minutes=default_time_limit_minutes + 1),
+            exam_review_rules="allow_use_of_paper",
+            hide_after_due=hide_after_due,
+        )
 
+        listen_for_course_publish(self, self.course.id)
+
+        self._verify_exam_data(sequence, expected_active)
+
+        if republish:
+            # update the sequence
+            sequence.default_time_limit_minutes += sequence.default_time_limit_minutes
+            self.store.update_item(sequence, self.user.id)
+
+            # simulate a publish
             listen_for_course_publish(self, self.course.id)
 
-            self._verify_exam_data(sequence, expected_active, is_enable_proctoring_provider_overrides_flag_on)
+            # reverify
+            self._verify_exam_data(sequence, expected_active,)
 
-            if republish:
-                # update the sequence
-                sequence.default_time_limit_minutes += sequence.default_time_limit_minutes
-                self.store.update_item(sequence, self.user.id)
-
-                # simulate a publish
-                listen_for_course_publish(self, self.course.id)
-
-                # reverify
-                self._verify_exam_data(sequence, expected_active, is_enable_proctoring_provider_overrides_flag_on)
-
-    @ddt.data(
-        True,
-        False
-    )
-    def test_unpublishing_proctored_exam(self, is_enable_proctoring_provider_overrides_flag_on):
+    def test_unpublishing_proctored_exam(self):
         """
         Make sure that if we publish and then unpublish a proctored exam,
         the exam record stays, but is marked as is_active=False
         """
-        with override_waffle_flag(ENABLE_PROCTORING_PROVIDER_OVERRIDES,
-        active=is_enable_proctoring_provider_overrides_flag_on):
-            chapter = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
-            sequence = ItemFactory.create(
-                parent=chapter,
-                category='sequential',
-                display_name='Test Proctored Exam',
-                graded=True,
-                is_time_limited=True,
-                default_time_limit_minutes=10,
-                is_proctored_exam=True,
-                hide_after_due=False,
-            )
+        chapter = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
+        sequence = ItemFactory.create(
+            parent=chapter,
+            category='sequential',
+            display_name='Test Proctored Exam',
+            graded=True,
+            is_time_limited=True,
+            default_time_limit_minutes=10,
+            is_proctored_exam=True,
+            hide_after_due=False,
+        )
 
-            listen_for_course_publish(self, self.course.id)
+        listen_for_course_publish(self, self.course.id)
 
-            exams = get_all_exams_for_course(unicode(self.course.id))
-            self.assertEqual(len(exams), 1)
+        exams = get_all_exams_for_course(unicode(self.course.id))
+        self.assertEqual(len(exams), 1)
 
-            sequence.is_time_limited = False
-            sequence.is_proctored_exam = False
+        sequence.is_time_limited = False
+        sequence.is_proctored_exam = False
 
-            self.store.update_item(sequence, self.user.id)
+        self.store.update_item(sequence, self.user.id)
 
-            listen_for_course_publish(self, self.course.id)
+        listen_for_course_publish(self, self.course.id)
 
-            self._verify_exam_data(sequence, False, is_enable_proctoring_provider_overrides_flag_on)
+        self._verify_exam_data(sequence, False)
 
     # def test_dangling_exam(self):
     #     """
