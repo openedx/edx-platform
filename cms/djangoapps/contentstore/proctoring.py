@@ -79,7 +79,7 @@ def register_special_exams(course_key):
             'is_practice_exam':timed_exam.is_practice_exam,
             'is_active':True,
             'hide_after_due':timed_exam.hide_after_due,
-            'backend' = course.proctoring_configuration.get('backend', None),
+            'backend': course.proctoring_configuration.get('backend', None),
         }
 
         try:
@@ -111,7 +111,7 @@ def register_special_exams(course_key):
             try:
                 update_review_policy(**exam_review_policy_metadata)
             except ProctoredExamReviewPolicyNotFoundException:
-                if timed_exam.exam_review_rules or exam_review_policy_metadata.get('rules', None)):  # won't save an empty rule.
+                if timed_exam.exam_review_rules or exam_review_policy_metadata.get('rules', None):  # won't save an empty rule.
                     create_exam_review_policy(**exam_review_policy_metadata)
                     msg = 'Created new exam review policy with exam_id {exam_id}'.format(exam_id=exam_id)
                     log.info(msg)

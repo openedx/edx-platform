@@ -32,6 +32,10 @@ log = logging.getLogger(__name__)
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
 
+CATALOG_VISIBILITY_CATALOG_AND_ABOUT = "both"
+CATALOG_VISIBILITY_ABOUT = "about"
+CATALOG_VISIBILITY_NONE = "none"
+
 DEFAULT_COURSE_VISIBILITY_IN_CATALOG = getattr(
     settings,
     'DEFAULT_COURSE_VISIBILITY_IN_CATALOG',
@@ -175,7 +179,6 @@ class TextbookList(List):
 
 class ProctoringConfiguration(Dict):
     def from_json(self, value):
-        import pudb; pu.db
         errors = []
         value = super(ProctoringConfiguration, self).from_json(value)
         proctoring_backend_settings = getattr(
@@ -235,6 +238,7 @@ class ProctoringConfiguration(Dict):
         errors = []
 
         proctoring_provider_whitelist = [provider for provider in proctoring_backend_settings if provider != 'DEFAULT']
+        proctoring_provider_whitelist.sort()
         proctoring_provider = value.get('backend', None)
 
         if proctoring_provider and proctoring_provider not in proctoring_provider_whitelist:

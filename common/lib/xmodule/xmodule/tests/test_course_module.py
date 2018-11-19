@@ -475,7 +475,7 @@ class ProctoringConfigurationTestCase(unittest.TestCase):
         throws a ValueError with the correct error message.
         """
         provider = 'invalid-provider'
-        proctoring_provider_whitelist = ['mock_proctoring_with_rules', 'mock_proctoring_without_rules']
+        proctoring_provider_whitelist = ['mock', 'mock_proctoring_without_rules']
 
         value = {
             'backend': provider,
@@ -495,7 +495,7 @@ class ProctoringConfigurationTestCase(unittest.TestCase):
         Test that an invalid rule (i.e. not one configured at the platform level) for a
         valid provider throws a ValueError with the correct error message.
         """
-        provider = 'mock_proctoring_with_rules'
+        provider = 'mock'
         rules = settings.PROCTORING_BACKENDS[provider]['default_config'].copy()
         rules['allow_foo'] = True
 
@@ -517,7 +517,7 @@ class ProctoringConfigurationTestCase(unittest.TestCase):
         Test that an invalid rule value (i.e. not a boolean) for a valid rule for a
         valid provider throws a ValueError with the correct error message.
         """
-        provider = 'mock_proctoring_with_rules'
+        provider = 'mock'
         rules = settings.PROCTORING_BACKENDS[provider]['default_config'].copy()
         rules['allow_grok'] = 'yes'
 
@@ -539,7 +539,7 @@ class ProctoringConfigurationTestCase(unittest.TestCase):
         Test that a value with no provider will inherit the default provider
         from the platform defaults.
         """
-        provider = 'mock_proctoring_with_rules'
+        provider = 'mock'
 
         value = {
             'rules': {}
@@ -555,7 +555,7 @@ class ProctoringConfigurationTestCase(unittest.TestCase):
         Test that a value with no rules will inherit the default rules for
         that provider from the platform defaults.
         """
-        provider = 'mock_proctoring_with_rules'
+        provider = 'mock'
 
         value = {
             'backend': provider
@@ -589,18 +589,14 @@ class ProctoringConfigurationTestCase(unittest.TestCase):
         return
 
     @override_settings(PROCTORING_BACKENDS={
-    'mock_proctoring_with_rules': {
-        'client_id': 'secret_id',
-        'client_secret': 'secret_key',
+    'mock': {
         'default_config': {
             'allow_snarfing': True,
             'allow_grok': False
         }
     },
-    'mock_proctoring_without_rules': {
-        'client_id': 'secret_id',
-        'client_secret': 'secret_key',
-    }})
+    'mock_proctoring_without_rules': {}
+    })
     def test_default_with_no_platform_default(self):
         expected_default = {
             'backend': None,
@@ -622,18 +618,14 @@ class ProctoringConfigurationTestCase(unittest.TestCase):
     
     @override_settings(PROCTORING_BACKENDS={
     'DEFAULT': 'mock_proctoring_without_rules',
-    'mock_proctoring_with_rules': {
-        'client_id': 'secret_id',
-        'client_secret': 'secret_key',
+    'mock': {
         'default_config': {
             'allow_snarfing': True,
             'allow_grok': False
         }
     },
-    'mock_proctoring_without_rules': {
-        'client_id': 'secret_id',
-        'client_secret': 'secret_key',
-    }})
+    'mock_proctoring_without_rules': {}
+    })
     def test_default_with_platform_default_without_rules(self):
         default_provider = 'mock_proctoring_without_rules'
         default_rules = {}

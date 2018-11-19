@@ -125,19 +125,14 @@ MOCK_STAFF_GRADING = True
 MOCK_PEER_GRADING = True
 
 PROCTORING_BACKENDS = {
-    'DEFAULT': 'mock_proctoring_with_rules',
-    'mock_proctoring_with_rules': {
-        'client_id': 'secret_id',
-        'client_secret': 'secret_key',
+    'DEFAULT': 'mock',
+    'mock': {
         'default_config': {
             'allow_snarfing': True,
             'allow_grok': False
         }
     },
-    'mock_proctoring_without_rules': {
-        'client_id': 'secret_id',
-        'client_secret': 'secret_key',
-    }
+    'mock_proctoring_without_rules': {}
 }
 
 ############################ STATIC FILES #############################
