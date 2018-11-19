@@ -21,7 +21,7 @@ from lms.djangoapps.grades.api.v1.views import CourseGradesView
 from lms.djangoapps.grades.config.waffle import waffle_flags, WRITABLE_GRADEBOOK
 from lms.djangoapps.grades.course_data import CourseData
 from lms.djangoapps.grades.course_grade import CourseGrade
-from lms.djangoapps.grades.models import PersistentSubsectionGrade
+from lms.djangoapps.grades.models import PersistentSubsectionGrade, PersistentSubsectionGradeOverrideHistory
 from lms.djangoapps.grades.subsection_grade import ReadSubsectionGrade
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
@@ -1308,3 +1308,11 @@ class GradebookBulkUpdateViewTest(GradebookViewTestBase):
                     expected_value = getattr(expected_grades, field_name)
                     self.assertEqual(expected_value, getattr(grade, field_name))
                     self.assertEqual(expected_value, getattr(grade.override, field_name + '_override'))
+
+            update_records = PersistentSubsectionGradeOverrideHistory.objects.filter(user=self.global_staff)
+            self.assertEqual(update_records.count(), 3)
+            for audit_item in update_records:
+                self.assertEqual(audit_item.user, self.global_staff)
+                self.assertIsNotNone(audit_item.created)
+                self.assertEqual(audit_item.feature, PersistentSubsectionGradeOverrideHistory.GRADEBOOK)
+                self.assertEqual(audit_item.action, PersistentSubsectionGradeOverrideHistory.CREATE_OR_UPDATE)
