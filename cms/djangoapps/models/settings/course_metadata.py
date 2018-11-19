@@ -8,7 +8,6 @@ from xblock.fields import Scope
 
 from xblock_django.models import XBlockStudioConfigurationFlag
 from xmodule.modulestore.django import modulestore
-from pprint import pprint
 
 from cms.djangoapps.contentstore.config.waffle import ENABLE_PROCTORING_PROVIDER_OVERRIDES
 
@@ -174,17 +173,17 @@ class CourseMetadata(object):
 
         Ensures none of the fields are in the blacklist.
         """
-        filtered_list = cls.filtered_list()
+        blacklist_of_fields = cls.get_blacklist_of_fields(descriptor.id)
         # Don't filter on the tab attribute if filter_tabs is False.
         if not filter_tabs:
-            filtered_list.remove("tabs")
+            blacklist_of_fields.remove("tabs")
 
         # Validate the values before actually setting them.
         key_values = {}
 
         for key, model in jsondict.iteritems():
             # should it be an error if one of the filtered list items is in the payload?
-            if key in filtered_list:
+            if key in blacklist_of_fields:
                 continue
             try:
                 val = model['value']
@@ -210,12 +209,12 @@ class CourseMetadata(object):
             errors: list of error objects
             result: the updated course metadata or None if error
         """
-        filtered_list = cls.get_blacklist_of_fields(descriptor.id)
+        blacklist_of_fields = cls.get_blacklist_of_fields(descriptor.id)
 
         if not filter_tabs:
-            filtered_list.remove("tabs")
+            blacklist_of_fields.remove("tabs")
 
-        filtered_dict = dict((k, v) for k, v in jsondict.iteritems() if k not in filtered_list)
+        filtered_dict = dict((k, v) for k, v in jsondict.iteritems() if k not in blacklist_of_fields)
         did_validate = True
         errors = []
         key_values = {}
