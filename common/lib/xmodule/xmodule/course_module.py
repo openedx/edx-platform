@@ -773,6 +773,21 @@ class CourseFields(object):
         deprecated=True
     )
 
+    catalog_visibility = String(	
+        display_name=_("Course Visibility In Catalog"),	
+        help=_(	
+            "Defines the access permissions for showing the course in the course catalog. This can be set to one "	
+            "of three values: 'both' (show in catalog and allow access to about page), 'about' (only allow access "	
+            "to about page), 'none' (do not show in catalog and do not allow access to an about page)."	
+        ),	
+        default=DEFAULT_COURSE_VISIBILITY_IN_CATALOG,	
+        scope=Scope.settings,	
+        values=[	
+            {"display_name": _("Both"), "value": CATALOG_VISIBILITY_CATALOG_AND_ABOUT},	
+            {"display_name": _("About"), "value": CATALOG_VISIBILITY_ABOUT},	
+            {"display_name": _("None"), "value": CATALOG_VISIBILITY_NONE}]	
+    )
+
     entrance_exam_enabled = Boolean(
         display_name=_("Entrance Exam Enabled"),
         help=_(
