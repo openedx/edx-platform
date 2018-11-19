@@ -40,6 +40,7 @@ from track.event_transaction_utils import (
     get_event_transaction_type,
     set_event_transaction_type
 )
+from xmodule.util.misc import get_default_short_labeler
 
 log = logging.getLogger(__name__)
 USER_MODEL = get_user_model()
@@ -529,7 +530,7 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
 
     required_scopes = ['grades:read']
 
-    def _section_breakdown(self, course_grade):
+    def _section_breakdown(self, course, course_grade):
         """
         Given a course_grade, returns a list of grade data broken down by subsection
         and a dictionary containing aggregate grade data by subsection format for the course.
@@ -548,10 +549,11 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
         # 'grade_description' should be 'description_ratio'
 
         label_finder = SubsectionLabelFinder(course_grade)
+        default_labeler = get_default_short_labeler(course)
 
-        for chapter_index, (chapter_location, section_data) in enumerate(course_grade.chapter_grades.items(), start=1):
-            for subsection_index, subsection_grade in enumerate(section_data['sections'], start=1):
-                default_label = 'Ch. {:02d}-{:02d}'.format(chapter_index, subsection_index)
+        for chapter_location, section_data in course_grade.chapter_grades.items():
+            for subsection_grade in section_data['sections']:
+                default_short_label = default_labeler(subsection_grade.format)
                 breakdown.append({
                     'are_grades_published': True,
                     'auto_grade': False,
@@ -568,7 +570,7 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
                     'is_ag': False,
                     'is_average': False,
                     'is_manually_graded': False,
-                    'label': label_finder.get_label(subsection_grade.display_name) or default_label,
+                    'label': label_finder.get_label(subsection_grade.display_name) or default_short_label,
                     'letter_grade': course_grade.letter_grade,
                     'module_id': text_type(subsection_grade.location),
                     'percent': subsection_grade.percent_graded,
@@ -594,7 +596,7 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
             course_grade: A CourseGrade object.
         """
         user_entry = self._serialize_user_grade(user, course.id, course_grade)
-        breakdown, aggregates = self._section_breakdown(course_grade)
+        breakdown, aggregates = self._section_breakdown(course, course_grade)
 
         user_entry['section_breakdown'] = breakdown
         user_entry['aggregates'] = aggregates
