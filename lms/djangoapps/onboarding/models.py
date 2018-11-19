@@ -502,14 +502,19 @@ class UserExtendedProfile(TimeStampedModel):
                                  self.HEAR_ABOUT_PHILANTHROPY_LABELS.get(field_name)]
         return _field_label_data if not _field_label_data else _field_label_data[0]
 
-    def save_user_hear_about_philanthropy_result(self, selected_values):
-        _updated_value = None
+    def save_user_hear_about_philanthropy_result(self, selected_values, _other_field):
+        _updated_value_about_philanthropy = None
+        _updated_value_about_philanthropy_other = None
+
         for function_area_field, label in self.HEAR_ABOUT_PHILANTHROPY_LABELS.items():
             _function_area_field = function_area_field.split("=")[1]
             if _function_area_field in selected_values:
-                _updated_value = self.HEAR_ABOUT_PHILANTHROPY_LABELS.get(function_area_field)
+                _updated_value_about_philanthropy = self.HEAR_ABOUT_PHILANTHROPY_LABELS.get(function_area_field)
+            if _function_area_field == 'hear_about_other' and _other_field:
+                _updated_value_about_philanthropy_other = str(_other_field[0])
 
-        self.__setattr__('hear_about_philanthropy', _updated_value)
+        self.__setattr__('hear_about_philanthropy', _updated_value_about_philanthropy)
+        self.__setattr__('hear_about_philanthropy_other', _updated_value_about_philanthropy_other)
 
     def save_user_function_areas(self, selected_values):
         """

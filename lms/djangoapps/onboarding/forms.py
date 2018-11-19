@@ -325,6 +325,14 @@ class InterestsForm(BaseOnboardingForm):
             choices=hear_about_philanthropy_choices, widget=forms.RadioSelect,
             required=False)
 
+        self.fields['hear_about_philanthropy_other'] = forms.CharField(
+            max_length=255,
+            label_suffix="*",
+            required=False,
+            widget=forms.TextInput(
+                attrs={'placeholder': ugettext_noop('Other Reason')}
+            ))
+
     def _clean_fields(self):
         """
         Override to prevent 'valid choice options' validations
@@ -343,7 +351,9 @@ class InterestsForm(BaseOnboardingForm):
         user_extended_profile.save_user_interests(selected_interests)
         user_extended_profile.save_user_interested_learners(selected_interested_learners)
         user_extended_profile.save_user_personal_goals(selected_personal_goals)
-        user_extended_profile.save_user_hear_about_philanthropy_result(selected_hear_about_philanthropy)
+        user_extended_profile.save_user_hear_about_philanthropy_result(selected_hear_about_philanthropy,
+                                                                       request.POST.getlist('hear_about_'
+                                                                                            'philanthropy_other'))
 
         user_extended_profile.is_interests_data_submitted = True
         user_extended_profile.save()
