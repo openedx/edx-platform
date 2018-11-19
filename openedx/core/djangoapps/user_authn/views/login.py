@@ -27,6 +27,7 @@ from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
+from openedx.core.djangolib.markup import HTML, Text
 from student.models import (
     LoginFailures,
     PasswordHistory,
@@ -77,11 +78,14 @@ def _do_third_party_auth(request):
             provider_name=requested_provider.name,
         )
         message += "<br/><br/>"
-        message += _(
+        message += Text(_(
             "If you don't have an {platform_name} account yet, "
-            "click <strong>Register</strong> at the top of the page."
-        ).format(
-            platform_name=platform_name
+            "click {register_label_strong} at the top of the page."
+        )).format(
+            platform_name=platform_name,
+            register_label_strong=HTML('<strong>{register_text}</strong>').format(
+                register_text=_('Register')
+            )
         )
 
         raise AuthFailedError(message)
@@ -257,11 +261,8 @@ def _handle_successful_authentication_and_login(user, request):
 
     try:
         django_login(request, user)
-        if request.POST.get('remember') == 'true':
-            request.session.set_expiry(604800)
-            log.debug("Setting user session to never expire")
-        else:
-            request.session.set_expiry(0)
+        request.session.set_expiry(604800 * 4)
+        log.debug("Setting user session expiry to 4 weeks")
     except Exception as exc:
         AUDIT_LOG.critical("Login failed - Could not create session. Is memcached running?")
         log.critical("Login failed - Could not create session. Is memcached running?")
