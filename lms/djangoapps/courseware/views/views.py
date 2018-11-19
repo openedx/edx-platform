@@ -41,7 +41,7 @@ from web_fragments.fragment import Fragment
 import shoppingcart
 import survey.views
 from lms.djangoapps.certificates import api as certs_api
-from lms.djangoapps.certificates.models import CertificateStatuses
+from lms.djangoapps.certificates.models import CertificateStatuses, GeneratedCertificate
 from course_modes.models import CourseMode, get_course_prices
 from courseware.access import has_access, has_ccx_coach_role
 from courseware.access_utils import check_course_open_for_learner
@@ -227,11 +227,17 @@ def courses(request):
 
     # Add marketable programs to the context.
     programs_list = get_programs_with_type(request.site, include_hidden=False)
+    # eliteu membership
+    vip_course_price_data = {}
+    if settings.FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION', False):
+        from membership.models import VIPCoursePrice
+        vip_course_price_data = VIPCoursePrice.get_vip_course_price_data()
 
     return render_to_response(
         "courseware/courses.html",
         {
             'courses': courses_list,
+            'vip_course_price_data': vip_course_price_data,
             'course_discovery_meanings': course_discovery_meanings,
             'programs_list': programs_list,
             'journal_info': get_journals_context(request),  # TODO: Course Listing Plugin required
@@ -881,6 +887,37 @@ def course_about(request, course_id):
             'reviews_fragment_view': reviews_fragment_view,
             'sidebar_html_enabled': sidebar_html_enabled,
         }
+
+        # ENABLE_MEMBERSHIP_INTEGRATION (ELITEU ADD)
+        if settings.FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION', False):
+            # generated_certifate
+            user = request.user
+            generated_certifate = False
+            if user.is_authenticated():
+                if GeneratedCertificate.certificate_for_student(user, course_key):
+                    generated_certifate = True
+            context['generated_certifate'] = generated_certifate
+
+            # Whether to subscribe during the membership period
+            from membership.models import VIPCourseEnrollment, VIPInfo, VIPCoursePrice
+            is_subscribe_course = False
+            is_vip = False
+            is_subscribe_pay = False
+            vip_expired_at = None
+            if user.is_authenticated():
+                is_vip = VIPInfo.is_vip(user)
+                vip_info = VIPInfo.get_vipinfo_for_user(user)
+                if vip_info:
+                    vip_expired_at = vip_info.expired_at
+                is_subscribe_pay = VIPCoursePrice.is_subscribe_pay(course_id=course_key)
+                if registered:
+                    vip_course_enrollment = VIPCourseEnrollment.objects.filter(user=user, course_id=course_key).first()
+                    if vip_course_enrollment:
+                        is_subscribe_course = True
+            context['is_vip'] = is_vip
+            context['is_subscribe_course'] = is_subscribe_course
+            context['is_subscribe_pay'] = is_subscribe_pay
+            context['vip_expire_at'] = vip_expired_at
 
         return render_to_response('courseware/course_about.html', context)
 

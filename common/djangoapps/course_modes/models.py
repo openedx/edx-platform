@@ -611,6 +611,12 @@ class CourseMode(models.Model):
             bool
 
         """
+        if settings.FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION', False):
+            from membership.models import VIPCoursePrice
+            is_subscribe_pay = VIPCoursePrice.is_subscribe_pay(course_id=course_id)
+
+            return not is_subscribe_pay
+
         if modes_dict is None:
             modes_dict = cls.modes_for_course_dict(course_id)
 

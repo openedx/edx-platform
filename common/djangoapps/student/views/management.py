@@ -179,7 +179,6 @@ def index(request, extra_context=None, user=AnonymousUser()):
     context['courses_list'] = theming_helpers.get_template_path('courses_list.html')
 
     # Insert additional context for use in the template
-    context.update(extra_context)
 
     # Add marketable programs to the context.
     context['programs_list'] = get_programs_with_type(request.site, include_hidden=False)
@@ -363,7 +362,6 @@ def change_enrollment(request, check_access=True):
     # Allow us to monitor performance of this transaction on a per-course basis since we often roll-out features
     # on a per-course basis.
     monitoring_utils.set_custom_metric('course_id', text_type(course_id))
-
     if action == "enroll":
         # Make sure the course exists
         # We don't do this check on unenroll, or a bad course id can't be unenrolled from
@@ -406,23 +404,44 @@ def change_enrollment(request, check_access=True):
             # to "audit".
             try:
                 enroll_mode = CourseMode.auto_enroll_mode(course_id, available_modes)
+                course_enrollment_model = None
                 if enroll_mode:
                     course_enrollment_model = CourseEnrollment.enroll(user, course_id, check_access=check_access, mode=enroll_mode)
 
-                    # ENABLE_MEMBERSHIP_INTEGRATION (ELITEU ADD)
+                else:
                     if settings.FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION', False):
-                        from membership.models import VIPCourseEnrollment
-                        if course_enrollment_model:
-                            VIPCourseEnrollment.enroll(user, course_id)
+                        from membership.models import VIPCoursePrice, VIPInfo
+                        if user.is_authenticated():
+                            is_vip = VIPInfo.is_vip(user)
+                            is_subscribe_pay = VIPCoursePrice.is_subscribe_pay(course_id=course_id)
+
+                            if is_vip and not is_subscribe_pay:
+                                course_enrollment_model = CourseEnrollment.enroll(user, course_id,
+                                                                                  check_access=check_access,
+                                                                                  mode=enroll_mode)
+
+                # ENABLE_MEMBERSHIP_INTEGRATION (ELITEU ADD)
+                if settings.FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION', False):
+                    from membership.models import VIPCourseEnrollment
+                    if course_enrollment_model:
+                        VIPCourseEnrollment.enroll(user, course_id)
             except Exception as ex:  # pylint: disable=broad-except
                 log.error(ex)
                 return HttpResponseBadRequest(_("Could not enroll"))
-
         # If we have more than one course mode or professional ed is enabled,
         # then send the user to the choose your track page.
         # (In the case of no-id-professional/professional ed, this will redirect to a page that
         # funnels users directly into the verification / payment flow)
         if CourseMode.has_verified_mode(available_modes) or CourseMode.has_professional_mode(available_modes):
+
+            if settings.FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION', False):
+                from membership.models import VIPCoursePrice, VIPInfo
+                if user.is_authenticated():
+                    is_vip = VIPInfo.is_vip(user)
+                    is_subscribe_pay = VIPCoursePrice.is_subscribe_pay(course_id=course_id)
+
+                    if is_vip and not is_subscribe_pay:
+                        return HttpResponse()
             return HttpResponse(
                 reverse("course_modes_choose", kwargs={'course_id': text_type(course_id)})
             )
