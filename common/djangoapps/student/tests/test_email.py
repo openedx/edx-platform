@@ -1,4 +1,5 @@
 # coding=utf-8
+import ddt
 import json
 import unittest
 
@@ -13,7 +14,7 @@ from django.test.client import RequestFactory
 from mock import Mock, patch
 from six import text_type
 
-from edxmako.shortcuts import render_to_string
+from edxmako.shortcuts import render_to_string, marketing_link
 from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
@@ -408,10 +409,10 @@ class EmailChangeRequestTests(EventTestMixin, EmailTemplateTagMixin, CacheIsolat
                 assert fragment in body
 
 
-@patch('django.contrib.auth.models.User.email_user')
+@ddt.ddt
 @patch('student.views.management.render_to_response', Mock(side_effect=mock_render_to_response, autospec=True))
 @patch('student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
-class EmailChangeConfirmationTests(EmailTestMixin, CacheIsolationMixin, TransactionTestCase):
+class EmailChangeConfirmationTests(EmailTestMixin, EmailTemplateTagMixin, CacheIsolationMixin, TransactionTestCase):
     """
     Test that confirmation of email change requests function even in the face of exceptions thrown while sending email
     """
@@ -424,9 +425,25 @@ class EmailChangeConfirmationTests(EmailTestMixin, CacheIsolationMixin, Transact
         self.req_factory = RequestFactory()
         self.request = self.req_factory.get('unused_url')
         self.request.user = self.user
-        self.user.email_user = Mock()
         self.pending_change_request = PendingEmailChangeFactory.create(user=self.user)
         self.key = self.pending_change_request.activation_key
+
+        # Expected subject of the email
+        self.email_subject = u"Email Change Confirmation for {platform_name}".format(
+            platform_name=settings.PLATFORM_NAME
+        )
+
+        # Text fragments we expect in the body of the confirmation email
+        self.email_fragments = [
+            u"This is to confirm that you changed the e-mail associated with {platform_name}"
+            u" from {old_email} to {new_email}. If you did not make this request, please contact us immediately."
+            u" Contact information is listed at:".format(
+                platform_name=settings.PLATFORM_NAME,
+                old_email=self.user.email,
+                new_email=PendingEmailChange.objects.get(activation_key=self.key).new_email
+            ),
+            u"We keep a log of old e-mails, so if this request was unintentional, we can investigate."
+        ]
 
     @classmethod
     def setUpClass(cls):
@@ -446,12 +463,12 @@ class EmailChangeConfirmationTests(EmailTestMixin, CacheIsolationMixin, Transact
         self.assertEquals(self.profile.meta, UserProfile.objects.get(user=self.user).meta)
         self.assertEquals(1, PendingEmailChange.objects.count())
 
-    def assertFailedBeforeEmailing(self, email_user):
+    def assertFailedBeforeEmailing(self):
         """
         Assert that the function failed before emailing a user
         """
         self.assertRolledBack()
-        self.assertFalse(email_user.called)
+        self.assertEqual(len(mail.outbox), 0)
 
     def check_confirm_email_change(self, expected_template, expected_context):
         """
@@ -463,74 +480,94 @@ class EmailChangeConfirmationTests(EmailTestMixin, CacheIsolationMixin, Transact
             generate the content
         """
         response = confirm_email_change(self.request, self.key)
+        self.assertEqual(response.status_code, 200)
         self.assertEquals(
             mock_render_to_response(expected_template, expected_context).content,
             response.content
         )
 
-    def assertChangeEmailSent(self, email_user):
+    def assertChangeEmailSent(self, test_body_type):
         """
-        Assert that the correct email was sent to confirm an email change
+        Assert that the correct email was sent to confirm an email change, the same
+        email contents should be sent to both old and new addresses
         """
-        context = {
-            'old_email': self.user.email,
-            'new_email': self.pending_change_request.new_email,
-        }
-        self.assertEmailUser(
-            email_user,
-            'emails/email_change_subject.txt',
-            context,
-            'emails/confirm_email_change.txt',
-            context
-        )
-
-        # Thorough tests for safe_get_host are elsewhere; here we just want a quick URL sanity check
-        request = RequestFactory().post('unused_url')
-        request.user = self.user
-        request.META['HTTP_HOST'] = "aGenericValidHostName"
-        self.append_allowed_hosts("aGenericValidHostName")
-
-        with patch('edxmako.request_context.get_current_request', return_value=request):
-            body = render_to_string('emails/confirm_email_change.txt', context)
-            url = safe_get_host(request)
-
-        self.assertIn(url, body)
-
-    def test_not_pending(self, email_user):
-        self.key = 'not_a_key'
-        self.check_confirm_email_change('invalid_email_key.html', {})
-        self.assertFailedBeforeEmailing(email_user)
-
-    def test_duplicate_email(self, email_user):
-        UserFactory.create(email=self.pending_change_request.new_email)
-        self.check_confirm_email_change('email_exists.html', {})
-        self.assertFailedBeforeEmailing(email_user)
-
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
-    def test_old_email_fails(self, email_user):
-        email_user.side_effect = [Exception, None]
-        self.check_confirm_email_change('email_change_failed.html', {
-            'email': self.user.email,
-        })
-        self.assertRolledBack()
-        self.assertChangeEmailSent(email_user)
-
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
-    def test_new_email_fails(self, email_user):
-        email_user.side_effect = [None, Exception]
-        self.check_confirm_email_change('email_change_failed.html', {
-            'email': self.pending_change_request.new_email
-        })
-        self.assertRolledBack()
-        self.assertChangeEmailSent(email_user)
-
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
-    def test_successful_email_change(self, email_user):
         self.check_confirm_email_change('email_change_successful.html', {
             'old_email': self.user.email,
             'new_email': self.pending_change_request.new_email
         })
-        self.assertChangeEmailSent(email_user)
+
+        # Must have two items in outbox: one for old email, another for new email
+        self.assertEqual(len(mail.outbox), 2)
+
+        use_https = self.request.is_secure()
+        if settings.FEATURES['ENABLE_MKTG_SITE']:
+            contact_link = marketing_link('CONTACT')
+        else:
+            contact_link = '{protocol}://{site}{link}'.format(
+                protocol='https' if use_https else 'http',
+                site=settings.SITE_NAME,
+                link=reverse('contact'),
+            )
+
+        # Verifying contents
+        for msg in mail.outbox:
+            self.assertEqual(msg.subject, self.email_subject)
+
+            body_text = {
+                'plain_text': msg.body,
+                'html': msg.alternatives[0][0]
+            }
+            assert test_body_type in body_text
+
+            body_to_be_tested = body_text[test_body_type]
+            for fragment in self.email_fragments:
+                self.assertIn(fragment, body_to_be_tested)
+
+            self.assertIn(contact_link, body_to_be_tested)
+
+    def test_not_pending(self):
+        self.key = 'not_a_key'
+        self.check_confirm_email_change('invalid_email_key.html', {})
+        self.assertFailedBeforeEmailing()
+
+    def test_duplicate_email(self):
+        UserFactory.create(email=self.pending_change_request.new_email)
+        self.check_confirm_email_change('email_exists.html', {})
+        self.assertFailedBeforeEmailing()
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
+    @patch('student.views.management.ace')
+    def test_old_email_fails(self, ace_mail):
+        ace_mail.send.side_effect = [Exception, None]
+        self.check_confirm_email_change('email_change_failed.html', {
+            'email': self.user.email,
+        })
+        self.assertEqual(ace_mail.send.call_count, 1)
+        self.assertRolledBack()
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
+    @patch('student.views.management.ace')
+    def test_new_email_fails(self, ace_mail):
+        ace_mail.send.side_effect = [None, Exception]
+        self.check_confirm_email_change('email_change_failed.html', {
+            'email': self.pending_change_request.new_email
+        })
+        self.assertEqual(ace_mail.send.call_count, 2)
+        self.assertRolledBack()
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
+    @override_settings(MKTG_URLS={'ROOT': 'https://dummy-root', 'CONTACT': '/help/contact-us'})
+    @ddt.data(
+        ('plain_text', False),
+        ('plain_text', True),
+        ('html', False),
+        ('html', True)
+    )
+    @ddt.unpack
+    def test_successful_email_change(self, test_body_type, test_marketing_enabled):
+        with patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': test_marketing_enabled}):
+            self.assertChangeEmailSent(test_body_type)
+
         meta = json.loads(UserProfile.objects.get(user=self.user).meta)
         self.assertIn('old_emails', meta)
         self.assertEquals(self.user.email, meta['old_emails'][0][0])
@@ -541,34 +578,15 @@ class EmailChangeConfirmationTests(EmailTestMixin, CacheIsolationMixin, Transact
         self.assertEquals(0, PendingEmailChange.objects.count())
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
-    def test_prevent_auth_user_writes(self, email_user):  # pylint: disable=unused-argument
+    def test_prevent_auth_user_writes(self):
         with waffle().override(PREVENT_AUTH_USER_WRITES, True):
             self.check_confirm_email_change('email_change_failed.html', {
                 'err_msg': SYSTEM_MAINTENANCE_MSG
             })
             self.assertRolledBack()
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
-    @override_settings(MKTG_URLS={'ROOT': 'https://dummy-root', 'CONTACT': '/help/contact-us'})
-    def test_marketing_contact_link(self, _email_user):
-        context = {
-            'site': 'edx.org',
-            'old_email': 'old@example.com',
-            'new_email': 'new@example.com',
-        }
-
-        confirm_email_body = render_to_string('emails/confirm_email_change.txt', context)
-        # With marketing site disabled, should link to the LMS contact static page.
-        # The http(s) part was omitted keep the test focused.
-        self.assertIn('://edx.org/contact', confirm_email_body)
-
-        with patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True}):
-            # Marketing site enabled, should link to the marketing site contact page.
-            confirm_email_body = render_to_string('emails/confirm_email_change.txt', context)
-            self.assertIn('https://dummy-root/help/contact-us', confirm_email_body)
-
     @patch('student.views.PendingEmailChange.objects.get', Mock(side_effect=TestException))
-    def test_always_rollback(self, _email_user):
+    def test_always_rollback(self):
         connection = transaction.get_connection()
         with patch.object(connection, 'rollback', wraps=connection.rollback) as mock_rollback:
             with self.assertRaises(TestException):
