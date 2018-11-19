@@ -1001,7 +1001,7 @@ class GradebookViewTest(GradebookViewTestBase):
                     ('is_ag', False),
                     ('is_average', False),
                     ('is_manually_graded', False),
-                    ('label', 'Ch. 02-03'),
+                    ('label', 'HW 03'),
                     ('letter_grade', 'A'),
                     ('module_id', text_type(ungraded_subsection.location)),
                     ('percent', 0.0),
