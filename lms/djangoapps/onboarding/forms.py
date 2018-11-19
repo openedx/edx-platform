@@ -287,7 +287,7 @@ class InterestsForm(BaseOnboardingForm):
 
     def __init__(self,  *args, **kwargs):
         super(InterestsForm, self).__init__( *args, **kwargs)
-        print(self)
+
         interest_choices = get_sorted_choices_from_dict(UserExtendedProfile.INTERESTS_LABELS)
         interest_choices = sorted(interest_choices, key=lambda interest_choices: interest_choices[0])
         self.fields['interests'] = forms.ChoiceField(
@@ -327,7 +327,6 @@ class InterestsForm(BaseOnboardingForm):
 
         self.fields['hear_about_philanthropy_other'] = forms.CharField(
             max_length=255,
-            label_suffix="*",
             required=False,
             widget=forms.TextInput(
                 attrs={'placeholder': ugettext_noop('Other Reason')}
