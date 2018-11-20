@@ -32,7 +32,7 @@ class SiteConfiguration(models.Model):
     )
 
     def __unicode__(self):
-        return u"<SiteConfiguration: {site} >".format(site=self.site)
+        return u"<SiteConfiguration: {site} >".format(site=self.site)  # xss-lint: disable=python-wrap-html
 
     def __repr__(self):
         return self.__unicode__()
@@ -154,7 +154,8 @@ class SiteConfigurationHistory(TimeStampedModel):
         ordering = ('-modified', '-created',)
 
     def __unicode__(self):
-        return u"<SiteConfigurationHistory: {site}, Last Modified: {modified} >".format(
+        # pylint: disable=line-too-long
+        return u"<SiteConfigurationHistory: {site}, Last Modified: {modified} >".format(  # xss-lint: disable=python-wrap-html
             modified=self.modified,
             site=self.site,
         )
