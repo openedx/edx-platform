@@ -256,9 +256,10 @@ class ProctoringConfiguration(Dict):
             errors.append(
                 _('The selected proctoring backend, {proctoring_backend}, is not a valid backend. '
                     'Please select from one of {available_backends}.')
-            ).format(
-                proctoring_backend=proctoring_provider,
-                available_backends=proctoring_provider_whitelist
+                .format(
+                    proctoring_backend=proctoring_provider,
+                    available_backends=proctoring_provider_whitelist
+                )
             )
 
         return errors
@@ -284,13 +285,18 @@ class ProctoringConfiguration(Dict):
             for rule, is_enabled in iteritems(proctoring_provider_rules):
                 if not isinstance(is_enabled, bool):
                     errors.append(
-                        'The value for proctoring configuration rule {} '
-                        'should be either true or false.'.format(rule)
+                        _('The value for proctoring configuration rule {rule} '
+                            'should be either true or false.')
+                        .format(rule=rule)
                     )
                 if not proctoring_provider_rules_set or rule not in proctoring_provider_rules_set:
                     errors.append(
-                        'The proctoring configuration rule {} '
-                        'is not a valid rule for provider {}.'.format(rule, proctoring_provider)
+                        _('The proctoring configuration rule {rule} '
+                            'is not a valid rule for provider {provider}.')
+                        .format(
+                            rule=rule,
+                            provider=proctoring_provider
+                        )
                     )
 
         return errors
