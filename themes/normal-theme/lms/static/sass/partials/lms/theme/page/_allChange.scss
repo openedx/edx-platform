@@ -1,11 +1,18 @@
 @charset 'utf-8';
 
 @import './base';
-@import './login';
-@import './register';
 @import './header';
 @import './footer';
-@import './courses';
+@import './iconfont';
+
+@import './home';
+@import './dashboard';
+@import './course_about';
+
+
+@import './register';
+
 @import './programs';
 @import './profile';
-@import './course_about'
+
+

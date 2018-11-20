@@ -1,4 +1,6 @@
-//courses
+// http://0.0.0.0:18000/dashboard
+// 登录后的首页 - 显示用户的课程列表
+
 .find-courses .courses-container .courses .courses-listing .courses-listing-item, .university-profile .courses-container .courses .courses-listing .courses-listing-item{
   margin-top: 0;
 }
@@ -76,9 +78,7 @@
   background-image: linear-gradient(to bottom, #fff, #f2f9ff);
 }
 
-.content-wrapper .courses-container{
-  max-width: 1200px;
-}
+
 .dashboard .main-container .my-courses .listing-courses .course-item .course-container{
   background: #fff;
   max-width: 1200px;

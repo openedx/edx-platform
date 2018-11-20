@@ -81,3 +81,12 @@
 .page-content-container{  
   max-width: 1200px;
 }
+
+
+//头像样式
+@media screen and (min-width: 768px){ 
+  .global-header .nav-links .secondary .dropdown-user-menu{ 
+    right:8px;
+    top: 49px;
+  }
+}
