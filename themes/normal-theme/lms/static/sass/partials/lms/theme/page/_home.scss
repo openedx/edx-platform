@@ -1,0 +1,113 @@
+// 0.0.0.0:18000 lms首页
+// 未登录时首页，显示可选课程列表
+
+#main{  
+  max-width:100%;
+  margin:0 auto;
+}
+
+// home header
+.home > header{
+  height: 320px;
+  background: url("/static/normal-theme/images/course_dec.png");
+  background-size: cover;
+
+  .outer-wrapper{  
+    max-width: 1200px;
+  }
+  .title{
+    background-color: rgba(255,255,255,0.7);
+    box-shadow: 0px 2px 4px 0px #aab2bd;
+    border-radius: 3px;
+    height: 230px;
+    width: 100%;
+    margin: 0;
+    padding: 40px 30px;
+  }
+  .title > .heading-group{
+    width: 100%;
+    text-align: center;
+  }
+  .title > .heading-group h1{
+    text-align: center;
+    color: $blue;
+    font-size: 36px;
+  }
+  .title > .heading-group p{
+    font-style: static;
+    font-size: 18px;
+    color: $title;
+  }
+}
+
+// home course
+.home .highlighted-courses{
+  margin: 0;
+}
+
+.home .highlighted-courses .courses .course{
+  border: 1px solid #e6e9ed;
+  box-shadow: 0px 0px 2px 0px $border;
+  margin-bottom: 0;
+
+  .course-image{
+    overflow: hidden;
+  }
+  
+  .course-image .cover-image{
+    height: 150px;
+  }
+  .course-info{
+    height: 140px;
+    background-image:none;
+  }
+  .course-info .course-title{
+    margin: 5px 0 0;
+    height: 60px;
+    font-size: 16px;
+  }
+  .course-organization{
+    display: inline-block;
+    padding-top: 12px;
+  }
+  .course-code{
+    display: inline-block;
+    padding-top: 8px;
+    float: right;
+  }
+  .course-organization, .course-code, .course-date{
+    color: $font;
+  }
+
+
+  /* 课程卡片 hover*/
+  &:hover{
+    background: none;
+    border: 1px solid $border;
+    box-shadow: 0px 1px 5px 0px $blue;
+
+    .course-image .cover-image{
+      transform: scale(1.3)
+    }
+  }
+  .course-image .cover-image{
+    transition: all 0.6s;
+  }
+
+
+  .course-image .cover-image::before{
+    background: none;
+  }
+}
+
+
+
+
+
+
+// unknown
+.dashboard{ 
+  width: 1200px;
+  margin: 0 auto;
+}
+

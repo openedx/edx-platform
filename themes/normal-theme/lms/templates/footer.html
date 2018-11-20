@@ -14,7 +14,7 @@ from openedx.core.djangoapps.lang_pref.api import footer_language_selector_is_en
 <div class="my-footer">
   <div class="footer-content">
     <div class="footer-app">
-      <img class="logo" src="${static.url('images/logo.png')}" />
+      <img class="logo" src="${static.url('images/logo_footer.png')}" />
       <p class="slogan">变革 • 创新 • 未来</p>
       <div class="footer-btn">
         <i class="footer-icon">
@@ -34,7 +34,8 @@ from openedx.core.djangoapps.lang_pref.api import footer_language_selector_is_en
         Android
       </div>
     </div>
-
+    
+    <div class="footer-line"></div>
     <div class="footer-links">
       <div class="footer-list">
         <h3>英荔教育</h3>
@@ -74,7 +75,7 @@ from openedx.core.djangoapps.lang_pref.api import footer_language_selector_is_en
 
     <div class="footer-wechat">
       <h3>英荔商学院</h3>
-      <img src="https://www.eliteu.cn/media/email_images/eliteu_wechat.jpg" class="footer-qrcode" />
+      <img src="${static.url('images/qrcode.png')}" class="footer-qrcode" />
       <div>微信扫一扫<br />获取课程优惠券</div>
     </div>
   </div>

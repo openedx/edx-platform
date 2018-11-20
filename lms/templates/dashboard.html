@@ -128,7 +128,7 @@ from student.models import CourseEnrollment
           <%include file="learner_dashboard/_dashboard_navigation_courses.html"/>
           % endif
 
-          % if len(course_entitlements + course_enrollments) > 0:
+          % if len(course_entitlements + course_enrollments + vip_course_enrollments) > 0:
             <ul class="listing-courses">
             <%
                 share_settings = configuration_helpers.get_value(
@@ -136,7 +136,7 @@ from student.models import CourseEnrollment
                     getattr(settings, 'SOCIAL_SHARING_SETTINGS', {})
                 )
             %>
-            % for dashboard_index, enrollment in enumerate(course_entitlements + course_enrollments):
+              % for dashboard_index, enrollment in enumerate(set(course_entitlements + course_enrollments + vip_course_enrollments)):
               <%
                 # Check if the course run is an entitlement and if it has an associated session
                 entitlement = enrollment if isinstance(enrollment, CourseEntitlement) else None
@@ -190,7 +190,44 @@ from student.models import CourseEnrollment
                 course_overview = enrollment.course_overview
                 resume_button_url = resume_button_urls[dashboard_index]
               %>
-              <%include file='dashboard/_dashboard_course_listing.html' args='course_overview=course_overview, course_card_index=dashboard_index, enrollment=enrollment, is_unfulfilled_entitlement=is_unfulfilled_entitlement, is_fulfilled_entitlement=is_fulfilled_entitlement, entitlement=entitlement, entitlement_session=entitlement_session, entitlement_available_sessions=entitlement_available_sessions, entitlement_expiration_date=entitlement_expiration_date, entitlement_expired_at=entitlement_expired_at, show_courseware_link=show_courseware_link, cert_status=cert_status, can_refund_entitlement=can_refund_entitlement, can_unenroll=can_unenroll, credit_status=credit_status, show_email_settings=show_email_settings, course_mode_info=course_mode_info, is_paid_course=is_paid_course, is_course_blocked=is_course_blocked, verification_status=course_verification_status, course_requirements=course_requirements, dashboard_index=dashboard_index, share_settings=share_settings, user=user, related_programs=related_programs, display_course_modes_on_dashboard=display_course_modes_on_dashboard, show_consent_link=show_consent_link, enterprise_customer_name=enterprise_customer_name, resume_button_url=resume_button_url' />
+              <%include file='dashboard/_dashboard_course_listing.html'
+                args='is_vip=is_vip,
+                can_refund_entitlement=can_refund_entitlement,
+                can_unenroll=can_unenroll,
+                credit_status=credit_status,
+                cert_status=cert_status,
+                course_overview=course_overview,
+                course_card_index=dashboard_index,
+                course_mode_info=course_mode_info,
+                course_requirements=course_requirements,
+
+                enrollment=enrollment,
+
+                is_unfulfilled_entitlement=is_unfulfilled_entitlement,
+                is_fulfilled_entitlement=is_fulfilled_entitlement,
+                entitlement=entitlement,
+                entitlement_session=entitlement_session,
+                entitlement_available_sessions=entitlement_available_sessions,
+                entitlement_expiration_date=entitlement_expiration_date,
+                entitlement_expired_at=entitlement_expired_at,
+
+                enterprise_customer_name=enterprise_customer_name,
+
+                show_courseware_link=show_courseware_link,
+                show_consent_link=show_consent_link,
+                show_email_settings=show_email_settings,
+
+                is_paid_course=is_paid_course,
+                is_course_blocked=is_course_blocked,
+
+                dashboard_index=dashboard_index,
+                display_course_modes_on_dashboard=display_course_modes_on_dashboard,
+                share_settings=share_settings,
+                user=user,
+                verification_status=course_verification_status,
+                related_programs=related_programs,
+                resume_button_url=resume_button_url'
+              />
             % endfor
 
             </ul>
@@ -277,6 +314,28 @@ from student.models import CourseEnrollment
 
               </ul>
             </div>
+            % if is_vip:
+              <div class="user-info">
+                <ul>
+                  <li class="status status-verification">
+                    <span class="title status-title"></span>
+                    <p class="status-note">会员截止日期至 ${vip_expired_at}</p>
+                  </li>
+                </ul>
+              </div>
+            % else:
+              <div class="user-info">
+                <ul>
+                  <li class="status status-verification">
+                    <span class="title status-title">订阅期满，请及时充值</span>
+                    <p class="status-note">您好，您购买的英荔商学院 VIP 会员已到期，为了不影响您的学习进度，请及时充值</p>
+                      <a href="${vip_purchase_url}">
+                        <span>会员续费</span>
+                      </a>
+                  </li>
+                </ul>
+              </div>
+            % endif
           </div>
         % endif
       </div>

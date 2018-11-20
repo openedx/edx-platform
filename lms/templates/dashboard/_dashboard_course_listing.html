@@ -21,6 +21,7 @@ from student.helpers import (
   DISABLE_UNENROLL_CERT_STATES,
 )
 from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_params
+from membership.models import VIPCourseEnrollment
 %>
 
 <%
@@ -35,6 +36,7 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
   billing_email = settings.PAYMENT_SUPPORT_EMAIL
 
   is_course_expired = hasattr(show_courseware_link, 'error_code') and show_courseware_link.error_code == 'audit_expired'
+  is_vip_enrollment = isinstance(enrollment, VIPCourseEnrollment)
 %>
 
 <%namespace name='static' file='../static_content.html'/>
@@ -175,13 +177,31 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
         <div class="wrapper-course-actions">
           <div class="course-actions">
             % if (show_courseware_link or is_unfulfilled_entitlement) and not is_course_expired:
+              <!--如果课程已经结束-->
               % if course_overview.has_ended():
-                % if not is_course_blocked:
-                  <a href="${course_target}" class="enter-course archived course-target-link" data-course-key="${enrollment.course_id}">${_('View Archived Course')}<span class="sr">&nbsp;${course_overview.display_name_with_default}</span></a>
+                <!--如果是会员订阅课程-->
+                % if is_vip_enrollment:
+                  <!--用户还在会员订阅期内 或者已经拿到证书-->
+                  % if is_vip or cert_status and cert_status['status'] == 'downloadable':
+                    <!--如果课程没有被屏蔽-->
+                    % if not is_course_blocked:
+                      <a href="${course_target}" class="enter-course archived course-target-link" data-course-key="${enrollment.course_id}">${_('View Archived Course')}<span class="sr">&nbsp;${course_overview.display_name_with_default}</span></a>
+                    % else:
+                      <a class="enter-course-blocked archived course-target-link" data-course-key="${enrollment.course_id}">${_('View Archived Course')}<span class="sr">&nbsp;${course_overview.display_name_with_default}</span></a>
+                    % endif
+                  % else:
+                    <a class="enter-course-blocked course-target-link"
+                       data-course-key="${enrollment.course_id}">
+                      ${_(u'订阅期满')}<span class="sr">&nbsp;${course_overview.display_name_with_default}</span>
+                    </a>
+                  % endif
                 % else:
-                  <a class="enter-course-blocked archived course-target-link" data-course-key="${enrollment.course_id}">${_('View Archived Course')}<span class="sr">&nbsp;${course_overview.display_name_with_default}</span></a>
+                  % if not is_course_blocked:
+                    <a href="${course_target}" class="enter-course archived course-target-link" data-course-key="${enrollment.course_id}">${_('View Archived Course')}<span class="sr">&nbsp;${course_overview.display_name_with_default}</span></a>
+                  % else:
+                    <a class="enter-course-blocked archived course-target-link" data-course-key="${enrollment.course_id}">${_('View Archived Course')}<span class="sr">&nbsp;${course_overview.display_name_with_default}</span></a>
+                  % endif
                 % endif
-
               % else:
                 % if resume_button_url != '':
                   <a href="${resume_button_url}"
@@ -193,14 +213,33 @@ from util.course import get_link_for_about_page, get_encoded_course_sharing_utm_
                     </span>
                   </a>
                 % elif not is_course_blocked:
-                  <a href="${course_target}"
-                     class="course-target-link enter-course ${'hidden' if is_unfulfilled_entitlement else ''}"
-                     data-course-key="${enrollment.course_id}">
-                    ${_('View Course')}
-                    <span class="sr">
-                      &nbsp;${course_overview.display_name_with_default}
-                    </span>
-                  </a>
+                  % if is_vip_enrollment:
+                    <!--用户还在会员订阅期内 或者已经拿到证书-->
+                    % if is_vip or cert_status and cert_status['status'] == 'downloadable':
+                      <a href="${course_target}"
+                         class="course-target-link enter-course ${'hidden' if is_unfulfilled_entitlement else ''}"
+                         data-course-key="${enrollment.course_id}">
+                        ${_('View Course')}
+                        <span class="sr">
+                          &nbsp;${course_overview.display_name_with_default}
+                        </span>
+                      </a>
+                    % else:
+                      <a class="enter-course-blocked course-target-link"
+                         data-course-key="${enrollment.course_id}">
+                        ${_(u'订阅期满')}
+                      </a>
+                    % endif
+                  % else:
+                    <a href="${course_target}"
+                       class="course-target-link enter-course ${'hidden' if is_unfulfilled_entitlement else ''}"
+                       data-course-key="${enrollment.course_id}">
+                      ${_('View Course')}
+                      <span class="sr">
+                        &nbsp;${course_overview.display_name_with_default}
+                      </span>
+                    </a>
+                  % endif
                 % else:
                   <a class="enter-course-blocked"
                      data-course-key="${enrollment.course_id}">
