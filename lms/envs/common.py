@@ -611,6 +611,7 @@ USERNAME_PATTERN = r'(?P<username>[\w.@+-]+)'
 
 ############################## EVENT TRACKING #################################
 LMS_SEGMENT_KEY = None
+LMS_SEGMENT_SITE = False
 
 # FIXME: Should we be doing this truncation?
 TRACK_MAX_EVENT = 50000

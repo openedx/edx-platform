@@ -123,6 +123,9 @@ FEATURES = {
     # Segment - must explicitly turn it on for production
     'CMS_SEGMENT_KEY': None,
 
+    # Segment Site - must explicitly turn it on for production
+    'CMS_SEGMENT_SITE': False,
+
     # Enable URL that shows information about the status of various services
     'ENABLE_SERVICE_STATUS': False,
 

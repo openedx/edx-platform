@@ -1,6 +1,21 @@
 <%page expression_filter="h"/>
 <%! from openedx.core.djangolib.js_utils import js_escaped_string %>
 
+
+% if settings.LMS_SEGMENT_KEY and settings.LMS_SEGMENT_SITE:
+<!-- begin Segment Site -->
+<script>
+!function(){
+    var realOpen = XMLHttpRequest.prototype.open;
+    XMLHttpRequest.prototype.open = function() {
+        arguments[1] = arguments[1].replace(/^https:\/\/api.segment.io\/v1/, '/segmentio/send');
+        return realOpen.apply(this, arguments);
+    };
+}();
+</script>
+<!-- end Segment Site -->
+% endif
+
 % if settings.LMS_SEGMENT_KEY:
 <!-- begin Segment -->
 <script type="text/javascript">
