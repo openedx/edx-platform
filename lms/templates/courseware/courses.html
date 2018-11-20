@@ -73,7 +73,7 @@
           <ul class="courses-listing courses-list">
             %for course in courses:
             <li class="courses-listing-item">
-              <%include file="../course.html" args="course=course" />
+              <%include file="../course.html" args="course=course, vip_course_price=vip_course_price_data.get(course.id, 0)" />
             </li>
             %endfor
           </ul>
@@ -87,7 +87,7 @@
           </section>
         </aside>
         % endif
-
+        <input type="hidden" value="${vip_course_price_data}">
       </section>
     </section>
 </main>
