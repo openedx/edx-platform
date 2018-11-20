@@ -1115,3 +1115,5 @@ logging.warn('DEPRECATION WARNING: aws.py has been deprecated, you should use pr
 
 if FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION', False):
     INSTALLED_APPS.append('membership')
+    REST_FRAMEWORK.update({'EXCEPTION_HANDLER': 'membership.utils.customer_exception_handler'})
+

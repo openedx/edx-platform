@@ -233,12 +233,6 @@ def courses(request):
         from membership.models import VIPCoursePrice
         vip_course_price_data = VIPCoursePrice.get_vip_course_price_data()
 
-    # eliteu membership
-    vip_course_price = {}
-    if settings.FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION', False):
-        from membership.models import VIPCoursePrice
-        vip_course_price_data = VIPCoursePrice.get_vip_course_price_data()
-
     return render_to_response(
         "courseware/courses.html",
         {
@@ -247,7 +241,6 @@ def courses(request):
             'course_discovery_meanings': course_discovery_meanings,
             'programs_list': programs_list,
             'journal_info': get_journals_context(request),  # TODO: Course Listing Plugin required
-            'vip_course_price': vip_course_price_data,
         }
     )
 

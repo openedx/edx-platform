@@ -2339,7 +2339,6 @@ REST_FRAMEWORK = {
         'service_user': '120/minute',
         'registration_validation': '30/minute',
     },
-    'EXCEPTION_HANDLER': 'membership.utils.customer_exception_handler',
 }
 
 
