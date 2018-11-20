@@ -868,7 +868,7 @@ def student_dashboard(request):
         context.update({
             'vip_course_price': vip_course_price,
             'is_vip': VIPInfo.is_vip(user),
-            'vip_expired_at': vip_info.expired_at,
+            'vip_expired_at': vip_info and vip_info.expired_at or None,
             'vip_purchase_url': reverse('membership_card'),
             'vip_course_enrollments': vip_course_enrollments,
         })
