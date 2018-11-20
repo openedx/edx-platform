@@ -94,7 +94,7 @@ def task_un_join_group_on_nodebb(category_id, username):
     Celery task to join user to a community on NodeBB
     """
     status_code, response = NodeBBClient().users.un_join(category_id=category_id, username=username)
-    handle_response(task_join_group_on_nodebb, 'Removed user from category with id {}'.format(category_id), status_code, response, username)
+    handle_response(task_un_join_group_on_nodebb, 'Removed user from category with id {}'.format(category_id), status_code, response, username)
 
 
 
