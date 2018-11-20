@@ -21,7 +21,7 @@
     margin-right: 5%;
     vertical-align: text-top;
     height: 138px;
-    border-right: 2px dashed $border;
+    border-right: 1px dashed $border;
   }
 
   .footer-wechat{
@@ -29,7 +29,7 @@
     display: inline-block;
     width: 13%;
     vertical-align: text-top;
-    border-left: 2px dashed $border;
+    border-left: 1px dashed $border;
     h3{ 
       text-align: center;
     }
@@ -67,9 +67,9 @@
     padding: 1px 0 20px;
   }
   .footer-line{
-    width: 66%;
+    width: 65.5%;
     height: 1px;
-    border-bottom: 2px dashed $border;
+    border-bottom: 1px dashed $border;
     position: absolute;
     left: 20%;
     top: 39px;
