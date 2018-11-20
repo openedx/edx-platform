@@ -23,7 +23,7 @@ from course_modes.tests.factories import CourseModeFactory
 from courseware.access_utils import is_course_open_for_learner
 from courseware.model_data import FieldDataCache, set_score
 from courseware.module_render import get_module
-from courseware.tests.factories import GlobalStaffFactory, StudentModuleFactory
+from courseware.tests.factories import GlobalStaffFactory, StudentModuleFactory, RequestFactoryNoCsrf
 from courseware.testutils import RenderXBlockTestMixin
 from courseware.url_helpers import get_redirect_url
 from courseware.user_state_client import DjangoXBlockUserStateClient
@@ -32,7 +32,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseBadRequest
 from django.test import TestCase
-from django.test.client import Client, RequestFactory
+from django.test.client import Client
 from django.test.utils import override_settings
 from freezegun import freeze_time
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
@@ -1993,7 +1993,7 @@ class VerifyCourseKeyDecoratorTests(TestCase):
     def setUp(self):
         super(VerifyCourseKeyDecoratorTests, self).setUp()
 
-        self.request = RequestFactory().get("foo")
+        self.request = RequestFactoryNoCsrf().get("foo")
         self.valid_course_id = "edX/test/1"
         self.invalid_course_id = "edX/"
 
@@ -2028,7 +2028,7 @@ class IsCoursePassedTests(ModuleStoreTestCase):
             display_name='Verified Course',
             grade_cutoffs={'cutoff': 0.75, 'Pass': self.SUCCESS_CUTOFF}
         )
-        self.request = RequestFactory()
+        self.request = RequestFactoryNoCsrf()
         self.request.user = self.student
 
     def test_user_fails_if_not_clear_exam(self):

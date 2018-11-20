@@ -1,20 +1,9 @@
 """
 Tests use cases related to LMS Entrance Exam behavior, such as gated content access (TOC)
 """
-from mock import patch, Mock
-
-from django.core.urlresolvers import reverse
-from django.test.client import RequestFactory
-from rest_framework.test import APIRequestFactory
-from nose.plugins.attrib import attr
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from courseware.model_data import FieldDataCache
-from courseware.module_render import toc_for_course, get_module, XblockCallbackView
-from courseware.tests.factories import UserFactory, InstructorFactory, StaffFactory
-from courseware.tests.helpers import (
-    LoginEnrollmentTestCase,
-)
+
 from courseware.entrance_exams import (
     course_has_entrance_exam,
     get_entrance_exam_content,
@@ -22,8 +11,8 @@ from courseware.entrance_exams import (
     user_has_passed_entrance_exam
 )
 from courseware.model_data import FieldDataCache
-from courseware.module_render import get_module, toc_for_course
-from courseware.tests.factories import InstructorFactory, StaffFactory, UserFactory
+from courseware.module_render import get_module, handle_xblock_callback, toc_for_course
+from courseware.tests.factories import InstructorFactory, StaffFactory, UserFactory, RequestFactoryNoCsrf
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from django.core.urlresolvers import reverse
 from milestones.tests.utils import MilestonesTestCaseMixin
@@ -544,15 +533,14 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         """
         Tests entrance exam xblock has `entrance_exam_passed` key in json response.
         """
-        request_factory = APIRequestFactory()
+        request_factory = RequestFactoryNoCsrf()
         data = {'input_{}_2_1'.format(unicode(self.problem_1.location.html_id())): 'choice_2'}
         request = request_factory.post(
             'problem_check',
             data=data
         )
         request.user = self.user
-        view = XblockCallbackView.as_view()
-        response = view(
+        response = handle_xblock_callback(
             request,
             unicode(self.course.id),
             unicode(self.problem_1.location),
