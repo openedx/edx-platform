@@ -72,13 +72,13 @@ def register_special_exams(course_key):
         log.info(msg)
 
         exam_metadata = {
-            'exam_name':timed_exam.display_name,
-            'time_limit_mins':timed_exam.default_time_limit_minutes,
-            'due_date':timed_exam.due,
-            'is_proctored':timed_exam.is_proctored_exam,
-            'is_practice_exam':timed_exam.is_practice_exam,
-            'is_active':True,
-            'hide_after_due':timed_exam.hide_after_due,
+            'exam_name': timed_exam.display_name,
+            'time_limit_mins': timed_exam.default_time_limit_minutes,
+            'due_date': timed_exam.due,
+            'is_proctored': timed_exam.is_proctored_exam,
+            'is_practice_exam': timed_exam.is_practice_exam,
+            'is_active': True,
+            'hide_after_due': timed_exam.hide_after_due,
             'backend': course.proctoring_configuration.get('backend', None),
         }
 
@@ -100,9 +100,9 @@ def register_special_exams(course_key):
             log.info(msg)
 
         exam_review_policy_metadata = {
-            'exam_id':exam_id,
-            'set_by_user_id':timed_exam.edited_by,
-            'review_policy':timed_exam.exam_review_rules,
+            'exam_id': exam_id,
+            'set_by_user_id': timed_exam.edited_by,
+            'review_policy': timed_exam.exam_review_rules,
             'rules': course.proctoring_configuration.get('rules', None)
         }
 

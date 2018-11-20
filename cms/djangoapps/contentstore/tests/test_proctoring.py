@@ -71,7 +71,6 @@ class TestProctoredExams(ModuleStoreTestCase):
         self.assertEqual(exam['is_active'], expected_active)
         self.assertEqual(exam['backend'], self.course.proctoring_configuration['backend'])
 
-
     @ddt.data(
         (True, False, True, False, False),
         (False, False, True, False, False),

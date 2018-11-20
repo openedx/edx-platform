@@ -434,7 +434,6 @@ class ProctoringConfigurationTestCase(unittest.TestCase):
         Initialize dummy testing course.
         """
         super(ProctoringConfigurationTestCase, self).setUp()
-        # self.course = get_dummy_course(start=_TODAY, end=_NEXT_WEEK)
         self.proctoring_configuration = xmodule.course_module.ProctoringConfiguration()
 
     def test_from_json_with_platform_default(self):
@@ -591,15 +590,17 @@ class ProctoringConfigurationTestCase(unittest.TestCase):
     def test_from_json_adds_missing_rules_from_platform_default(self):
         return
 
-    @override_settings(PROCTORING_BACKENDS={
-    'mock': {
-        'default_config': {
-            'allow_snarfing': True,
-            'allow_grok': False
+    @override_settings(
+        PROCTORING_BACKENDS={
+            'mock': {
+                'default_config': {
+                    'allow_snarfing': True,
+                    'allow_grok': False
+                }
+            },
+            'mock_proctoring_without_rules': {}
         }
-    },
-    'mock_proctoring_without_rules': {}
-    })
+    )
     def test_default_with_no_platform_default(self):
         expected_default = {
             'backend': None,
@@ -619,16 +620,18 @@ class ProctoringConfigurationTestCase(unittest.TestCase):
 
         self.assertEqual(self.proctoring_configuration.default, expected_default)
 
-    @override_settings(PROCTORING_BACKENDS={
-    'DEFAULT': 'mock_proctoring_without_rules',
-    'mock': {
-        'default_config': {
-            'allow_snarfing': True,
-            'allow_grok': False
+    @override_settings(
+        PROCTORING_BACKENDS={
+            'DEFAULT': 'mock_proctoring_without_rules',
+            'mock': {
+                'default_config': {
+                    'allow_snarfing': True,
+                    'allow_grok': False
+                }
+            },
+            'mock_proctoring_without_rules': {}
         }
-    },
-    'mock_proctoring_without_rules': {}
-    })
+    )
     def test_default_with_platform_default_without_rules(self):
         default_provider = 'mock_proctoring_without_rules'
         default_rules = {}

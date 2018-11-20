@@ -44,6 +44,7 @@ DEFAULT_COURSE_VISIBILITY_IN_CATALOG = getattr(
 
 DEFAULT_MOBILE_AVAILABLE = getattr(settings, 'DEFAULT_MOBILE_AVAILABLE', False)
 
+
 class StringOrDate(Date):
     def from_json(self, value):
         """
@@ -177,6 +178,7 @@ class TextbookList(List):
                 continue
         return json_data
 
+
 class ProctoringConfiguration(Dict):
     def from_json(self, value):
         """
@@ -225,7 +227,8 @@ class ProctoringConfiguration(Dict):
         if proctoring_provider is not None and proctoring_provider_rules is None:
             value['rules'] = proctoring_backend_settings.get(value['backend'], {}).get('default_config', {})
 
-        proctoring_provider_rules_set = (proctoring_backend_settings
+        proctoring_provider_rules_set = (
+            proctoring_backend_settings
             .get(proctoring_provider, {})
             .get('default_config', {})
         )
@@ -251,8 +254,8 @@ class ProctoringConfiguration(Dict):
 
         if proctoring_provider and proctoring_provider not in proctoring_provider_whitelist:
             errors.append('The selected proctoring backend, {}, is not a valid backend. Please select from one of {}.'.
-                format(proctoring_provider, proctoring_provider_whitelist)
-            )
+                        format(proctoring_provider, proctoring_provider_whitelist)
+                        )
 
         return errors
 
@@ -267,21 +270,22 @@ class ProctoringConfiguration(Dict):
 
         proctoring_provider = value.get('backend', None)
         proctoring_provider_rules = value.get('rules', None)
-        proctoring_provider_rules_set = proctoring_backend_settings.get(
-            proctoring_provider, {}).get('default_config',
-            None
+        proctoring_provider_rules_set = (
+            proctoring_backend_settings
+            .get(proctoring_provider, {})
+            .get('default_config', None)
         )
 
         if proctoring_provider_rules:
             for rule, is_enabled in iteritems(proctoring_provider_rules):
                 if not isinstance(is_enabled, bool):
                     errors.append('The value for proctoring configuration rule {} should be either true or false.'.
-                        format(rule)
-                    )
+                                format(rule)
+                                )
                 if not proctoring_provider_rules_set or rule not in proctoring_provider_rules_set:
                     errors.append('The proctoring configuration rule {} is not a valid rule for provider {}.'.
-                        format(rule, proctoring_provider)
-                    )
+                                format(rule, proctoring_provider)
+                                )
 
         return errors
 
@@ -773,19 +777,19 @@ class CourseFields(object):
         deprecated=True
     )
 
-    catalog_visibility = String(	
-        display_name=_("Course Visibility In Catalog"),	
-        help=_(	
-            "Defines the access permissions for showing the course in the course catalog. This can be set to one "	
-            "of three values: 'both' (show in catalog and allow access to about page), 'about' (only allow access "	
-            "to about page), 'none' (do not show in catalog and do not allow access to an about page)."	
-        ),	
-        default=DEFAULT_COURSE_VISIBILITY_IN_CATALOG,	
-        scope=Scope.settings,	
-        values=[	
-            {"display_name": _("Both"), "value": CATALOG_VISIBILITY_CATALOG_AND_ABOUT},	
-            {"display_name": _("About"), "value": CATALOG_VISIBILITY_ABOUT},	
-            {"display_name": _("None"), "value": CATALOG_VISIBILITY_NONE}]	
+    catalog_visibility = String(
+        display_name=_("Course Visibility In Catalog"),
+        help=_(
+            "Defines the access permissions for showing the course in the course catalog. This can be set to one "
+            "of three values: 'both' (show in catalog and allow access to about page), 'about' (only allow access "
+            "to about page), 'none' (do not show in catalog and do not allow access to an about page)."
+        ),
+        default=DEFAULT_COURSE_VISIBILITY_IN_CATALOG,
+        scope=Scope.settings,
+        values=[
+            {"display_name": _("Both"), "value": CATALOG_VISIBILITY_CATALOG_AND_ABOUT},
+            {"display_name": _("About"), "value": CATALOG_VISIBILITY_ABOUT},
+            {"display_name": _("None"), "value": CATALOG_VISIBILITY_NONE}]
     )
 
     entrance_exam_enabled = Boolean(
