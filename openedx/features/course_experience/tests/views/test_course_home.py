@@ -45,6 +45,9 @@ from .test_course_updates import create_course_update, remove_course_updates
 
 TEST_PASSWORD = 'test'
 TEST_CHAPTER_NAME = 'Test Chapter'
+TEST_COURSE_TOOLS = 'Course Tools'
+TEST_COURSE_TODAY = 'Today is'
+TEST_BANNER_CLASS = '<div class="page-banner">'
 TEST_WELCOME_MESSAGE = '<h2>Welcome!</h2>'
 TEST_UPDATE_MESSAGE = '<h2>Test Update!</h2>'
 TEST_COURSE_UPDATES_TOOL = '/course/updates">'
@@ -183,7 +186,7 @@ class TestCourseHomePage(CourseHomePageTestCase):
         course_home_url(self.course)
 
         # Fetch the view and verify the query counts
-        with self.assertNumQueries(84, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+        with self.assertNumQueries(68, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
             with check_mongo_calls(4):
                 url = course_home_url(self.course)
                 self.client.get(url)
@@ -241,8 +244,8 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         response = self.client.get(url)
 
         # Verify that the course tools and dates are always shown
-        self.assertContains(response, 'Course Tools')
-        self.assertContains(response, 'Today is')
+        self.assertContains(response, TEST_COURSE_TOOLS)
+        self.assertContains(response, TEST_COURSE_TODAY)
 
         # Verify that the outline, start button, course sock, and welcome message
         # are only shown to enrolled users.
@@ -279,8 +282,8 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         response = self.client.get(url)
 
         # Verify that the course tools and dates are always shown
-        self.assertContains(response, 'Course Tools')
-        self.assertContains(response, 'Today is')
+        self.assertContains(response, TEST_COURSE_TOOLS)
+        self.assertContains(response, TEST_COURSE_TODAY)
 
         # Verify that welcome messages are never shown
         self.assertNotContains(response, TEST_WELCOME_MESSAGE)
@@ -377,7 +380,6 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         the student dashboard, not a 404.
         """
         CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=date(2010, 1, 1))
-
         course = CourseFactory.create(start=THREE_YEARS_AGO)
         url = course_home_url(course)
 
@@ -404,6 +406,20 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
             params=expected_params.urlencode()
         )
         self.assertRedirects(response, expected_url)
+
+    def test_audit_only_not_expired(self):
+        """
+        Verify that enrolled users are NOT shown the course expiration banner and can
+        access the course home page if course audit only
+        """
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=date(2010, 1, 1))
+        audit_only_course = CourseFactory.create()
+        self.create_user_for_course(audit_only_course, CourseUserType.ENROLLED)
+        response = self.client.get(course_home_url(audit_only_course))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, TEST_COURSE_TOOLS)
+        self.assertContains(response, TEST_COURSE_TODAY)
+        self.assertNotContains(response, TEST_BANNER_CLASS)
 
     @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
     @mock.patch("util.date_utils.strftime_localized")
@@ -489,6 +505,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         response = self.client.get(url)
         bannerText = get_expiration_banner_text(user, self.course)
         self.assertContains(response, bannerText, html=True)
+        self.assertContains(response, TEST_BANNER_CLASS)
 
         # Verify that enrolled users are not shown the course expiration banner if content gating is disabled
         config.enabled = False

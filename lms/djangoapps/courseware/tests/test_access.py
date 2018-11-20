@@ -851,6 +851,11 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
             else:
                 # checks staff role and enrollment data
                 num_queries = 2
+        elif user_attr_name == 'user_anonymous' and action == 'see_exists':
+            if course_attr_name == 'course_started':
+                num_queries = 3
+            else:
+                num_queries = 0
         else:
             # if the course has started, check the duration configuration
             if action == 'see_exists' and course_attr_name == 'course_started':

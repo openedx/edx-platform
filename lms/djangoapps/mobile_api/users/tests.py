@@ -30,6 +30,7 @@ from openedx.core.lib.courses import course_image_url
 from openedx.core.lib.tests import attr
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
+from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from student.models import CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory
 from util.milestones_helpers import set_prerequisite_courses
@@ -255,6 +256,9 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
             self.assertEqual(entry['course']['org'], 'edX')
 
     def create_enrollment(self, expired):
+        """
+        Create an enrollment
+        """
         if expired:
             course = CourseFactory.create(start=self.THREE_YEARS_AGO, mobile_available=True)
             enrollment = CourseEnrollmentFactory.create(
@@ -265,6 +269,8 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         else:
             course = CourseFactory.create(start=self.LAST_WEEK, mobile_available=True)
             self.enroll(course.id)
+
+        add_course_mode(course, upgrade_deadline_expired=False)
 
     def _get_enrollment_data(self, api_version, expired):
         self.login()
@@ -586,7 +592,6 @@ class TestCourseEnrollmentSerializer(MobileAPITestCase, MilestonesTestCaseMixin)
         '''
         if api_version != API_V05:
             self.assertIn('audit_access_expires', response)
-            self.assertIsNotNone(response.get('audit_access_expires'))
         else:
             self.assertNotIn('audit_access_expires', response)
 
