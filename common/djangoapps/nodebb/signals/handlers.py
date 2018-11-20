@@ -194,9 +194,9 @@ def create_category_on_nodebb(instance, **kwargs):
 
 
 @receiver(post_save, sender=CourseEnrollment)
-def join_group_on_nodebb(instance, **kwargs):  # pylint: disable=unused-argument
+def manage_membership_on_nodebb_group(instance, **kwargs):  # pylint: disable=unused-argument
     """
-    Automatically join a group on NodeBB [related to that course] on student enrollment
+    Automatically join or unjoin a group on NodeBB [related to that course] on student enrollment
     Why we can't listen ENROLL_STATUS_CHANGE here?
     Because that triggered before completion 'create_category_on_nodebb' so this fails to
     join the course author in the category
