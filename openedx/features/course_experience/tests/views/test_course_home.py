@@ -16,6 +16,7 @@ from waffle.models import Flag
 from waffle.testutils import override_flag
 
 from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from courseware.tests.factories import StaffFactory
 from courseware.tests.helpers import get_expiration_banner_text
 from lms.djangoapps.commerce.models import CommerceConfiguration
@@ -31,6 +32,7 @@ from openedx.features.course_experience import (
     UNIFIED_COURSE_TAB_FLAG
 )
 from student.models import CourseEnrollment
+from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import UserFactory
 from util.date_utils import strftime_localized
 from xmodule.modulestore import ModuleStoreEnum
@@ -54,6 +56,7 @@ TEST_COURSE_GOAL_OPTIONS = 'goal-options-container'
 TEST_COURSE_GOAL_UPDATE_FIELD = 'section-goals'
 TEST_COURSE_GOAL_UPDATE_FIELD_HIDDEN = 'section-goals hidden'
 COURSE_GOAL_DISMISS_OPTION = 'unsure'
+THREE_YEARS_AGO = now() - timedelta(days=(365 * 3))
 
 QUERY_COUNT_TABLE_BLACKLIST = WAFFLE_TABLES
 
@@ -94,7 +97,7 @@ class CourseHomePageTestCase(SharedModuleStoreTestCase):
         Set up a course to be used for testing.
         """
         # pylint: disable=super-method-not-called
-        with super(CourseHomePageTestCase, cls).setUpClassAndTestData():
+        with cls.setUpClassAndTestData():
             with cls.store.default_store(ModuleStoreEnum.Type.split):
                 cls.course = CourseFactory.create(
                     org='edX',
@@ -116,6 +119,7 @@ class CourseHomePageTestCase(SharedModuleStoreTestCase):
     @classmethod
     def setUpTestData(cls):
         """Set up and enroll our fake user in the course."""
+        super(CourseHomePageTestCase, cls).setUpTestData()
         cls.staff_user = StaffFactory(course_key=cls.course.id, password=TEST_PASSWORD)
         cls.user = UserFactory(password=TEST_PASSWORD)
         CourseEnrollment.enroll(cls.user, cls.course.id)
@@ -325,18 +329,68 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
 
     @override_waffle_flag(CONTENT_TYPE_GATING_FLAG, True)
     @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
+    def test_course_does_not_expire_for_different_roles(self):
+        """
+        There are a number of different roles/users that should not lose access after the expiration date.
+        Ensure that users who should not lose access get a 200 (ok) response
+        when attempting to visit the course after their would be expiration date.
+        """
+        course = CourseFactory.create(start=THREE_YEARS_AGO)
+        url = course_home_url(course)
+
+        # create a list of those users who should not lose their access,
+        # then assert that their access persists past the 'expiration date'
+        users_no_expired_access = []
+
+        verified_user = UserFactory(password=self.TEST_PASSWORD)
+        verified_enrollment = CourseEnrollment.enroll(verified_user, course.id, mode=CourseMode.VERIFIED)
+        ScheduleFactory(start=THREE_YEARS_AGO, enrollment=verified_enrollment)
+        users_no_expired_access.append((verified_user, 'Verified Learner'))
+
+        # There are two types of course team members: instructor and staff
+        # they have different privileges, but for the purpose of this test the important thing is that they should
+        # retain their access to the course after the access would expire for a normal audit learner
+        instructor = UserFactory.create(password=self.TEST_PASSWORD)
+        enrollment = CourseEnrollment.enroll(instructor, course.id, mode=CourseMode.AUDIT)
+        CourseInstructorRole(course.id).add_users(instructor)
+        ScheduleFactory(start=THREE_YEARS_AGO, enrollment=enrollment)
+        users_no_expired_access.append((instructor, 'Course Instructor'))
+
+        staff = UserFactory.create(password=self.TEST_PASSWORD)
+        enrollment = CourseEnrollment.enroll(staff, course.id, mode=CourseMode.AUDIT)
+        CourseStaffRole(course.id).add_users(staff)
+        ScheduleFactory(start=THREE_YEARS_AGO, enrollment=enrollment)
+        users_no_expired_access.append((staff, 'Course Staff'))
+
+        for user, user_description in users_no_expired_access:
+            self.client.login(username=user.username, password=self.TEST_PASSWORD)
+            response = self.client.get(url)
+            self.assertEqual(
+                response.status_code,
+                200,
+                "Should not expire access for user [{}]".format(user_description)
+            )
+
+    @override_waffle_flag(CONTENT_TYPE_GATING_FLAG, True)
+    @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
     def test_expired_course(self):
         """
         Ensure that a user accessing an expired course sees a redirect to
         the student dashboard, not a 404.
-        """
-        three_years_ago = now() - timedelta(days=(365 * 3))
-        course = CourseFactory.create(start=three_years_ago)
-        user = self.create_user_for_course(course, CourseUserType.ENROLLED)
-        enrollment = CourseEnrollment.get_enrollment(user, course.id)
-        ScheduleFactory(start=three_years_ago, enrollment=enrollment)
 
+        """
+        course = CourseFactory.create(start=THREE_YEARS_AGO)
         url = course_home_url(course)
+
+        for mode in [CourseMode.AUDIT, CourseMode.VERIFIED]:
+            CourseModeFactory.create(course_id=course.id, mode_slug=mode)
+
+        # assert that an if an expired audit user tries to access the course they are redirected to the dashboard
+        audit_user = UserFactory(password=self.TEST_PASSWORD)
+        self.client.login(username=audit_user.username, password=self.TEST_PASSWORD)
+        audit_enrollment = CourseEnrollment.enroll(audit_user, course.id, mode=CourseMode.AUDIT)
+        ScheduleFactory(start=THREE_YEARS_AGO, enrollment=audit_enrollment)
+
         response = self.client.get(url)
 
         expiration_date = strftime_localized(course.start + timedelta(weeks=4), 'SHORT_DATE')
@@ -525,6 +579,9 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
 
 
 class CourseHomeFragmentViewTests(ModuleStoreTestCase):
+    """
+    Test Messages Displayed on the Course Home
+    """
     CREATE_USER = False
 
     def setUp(self):

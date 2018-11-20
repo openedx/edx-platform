@@ -15,7 +15,14 @@ from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.lib.url_utils import quote_slashes
 from openedx.features.content_type_gating.partitions import CONTENT_GATING_PARTITION_ID
 from openedx.features.course_duration_limits.config import CONTENT_TYPE_GATING_FLAG
-from student.tests.factories import TEST_PASSWORD, AdminFactory, CourseEnrollmentFactory, UserFactory
+from student.roles import CourseInstructorRole, CourseStaffRole
+from student.tests.factories import (
+    AdminFactory,
+    CourseAccessRoleFactory,
+    CourseEnrollmentFactory,
+    UserFactory,
+    TEST_PASSWORD
+)
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -240,8 +247,9 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
         Arguments:
             block: some sort of xblock descriptor, must implement .scope_ids.usage_id
             is_gated (bool): if True, this user is expected to be gated from this block
-            user_id (int): id of user, if not set will be set to self.audit_user.id
-            course_id (CourseLocator): id of course, if not set will be set to self.course.id
+            user_id (int): id of user
+            course_id (CourseLocator): id of course
+            view_name (str): type of view for the block, if not set will default to 'student_view'
         """
         fake_request = self.factory.get('')
         mock_get_current_request.return_value = fake_request
@@ -254,7 +262,6 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
             usage_key_string=unicode(self.blocks_dict['vertical'].scope_ids.usage_id),
             course=None
         )
-
         runtime = vertical_xblock.runtime
 
         # This method of fetching the block from the descriptor bypassess access checks
@@ -368,3 +375,24 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
         self.client.login(username=self.users[user].username, password=TEST_PASSWORD)
         response = self.client.post(url)
         self.assertEqual(response.status_code, status_code)
+
+    def test_access_course_team_users(self):
+        """
+        Test that members of the course team do not lose access to graded content
+        """
+        # There are two types of course team members: instructor and staff
+        # they have different privileges, but for the purpose of this test the important thing is that they should both
+        # have access to all graded content
+        instructor = UserFactory.create()
+        CourseInstructorRole(self.course.id).add_users(instructor)
+        staff = UserFactory.create()
+        CourseStaffRole(self.course.id).add_users(staff)
+
+        # assert that all course team members have access to graded content
+        for course_team_member in [instructor, staff]:
+            self._assert_block_is_gated(
+                block=self.blocks_dict['problem'],
+                user_id=course_team_member.id,
+                course_id=self.course.id,
+                is_gated=False
+            )
