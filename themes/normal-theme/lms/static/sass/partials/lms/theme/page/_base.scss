@@ -6,6 +6,10 @@
   max-width: none;
   width: 100%;
   flex: 1;
+  padding: 0;
+}
+.content-wrapper .courses-container{
+  max-width: 1200px;
 }
 @media screen and (min-width: 768px) {
   .content-wrapper {
