@@ -16,7 +16,7 @@ from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.lib.url_utils import quote_slashes
 from openedx.features.content_type_gating.partitions import CONTENT_GATING_PARTITION_ID
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
-from student.roles import CourseInstructorRole, CourseStaffRole
+from student.roles import CourseBetaTesterRole, CourseInstructorRole, CourseStaffRole
 from student.tests.factories import (
     AdminFactory,
     CourseAccessRoleFactory,
@@ -384,13 +384,21 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
         # There are two types of course team members: instructor and staff
         # they have different privileges, but for the purpose of this test the important thing is that they should both
         # have access to all graded content
+        course_team = []
         instructor = UserFactory.create()
         CourseInstructorRole(self.course.id).add_users(instructor)
+        course_team.append(instructor)
+
         staff = UserFactory.create()
         CourseStaffRole(self.course.id).add_users(staff)
+        course_team.append(staff)
+
+        beta_tester = UserFactory.create()
+        CourseBetaTesterRole(self.course.id).add_users(beta_tester)
+        course_team.append(beta_tester)
 
         # assert that all course team members have access to graded content
-        for course_team_member in [instructor, staff]:
+        for course_team_member in course_team:
             self._assert_block_is_gated(
                 block=self.blocks_dict['problem'],
                 user_id=course_team_member.id,
