@@ -888,6 +888,10 @@ def course_about(request, course_id):
             'sidebar_html_enabled': sidebar_html_enabled,
         }
 
+        is_subscribe_course = False
+        is_vip = False
+        is_subscribe_pay = False
+        vip_expired_at = None
         # ENABLE_MEMBERSHIP_INTEGRATION (ELITEU ADD)
         if settings.FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION', False):
             # generated_certifate
@@ -900,10 +904,7 @@ def course_about(request, course_id):
 
             # Whether to subscribe during the membership period
             from membership.models import VIPCourseEnrollment, VIPInfo, VIPCoursePrice
-            is_subscribe_course = False
-            is_vip = False
-            is_subscribe_pay = False
-            vip_expired_at = None
+
             if user.is_authenticated():
                 is_vip = VIPInfo.is_vip(user)
                 vip_info = VIPInfo.get_vipinfo_for_user(user)
@@ -914,10 +915,10 @@ def course_about(request, course_id):
                     vip_course_enrollment = VIPCourseEnrollment.objects.filter(user=user, course_id=course_key).first()
                     if vip_course_enrollment:
                         is_subscribe_course = True
-            context['is_vip'] = is_vip
-            context['is_subscribe_course'] = is_subscribe_course
-            context['is_subscribe_pay'] = is_subscribe_pay
-            context['vip_expire_at'] = vip_expired_at
+        context['is_vip'] = is_vip
+        context['is_subscribe_course'] = is_subscribe_course
+        context['is_subscribe_pay'] = is_subscribe_pay
+        context['vip_expire_at'] = vip_expired_at
 
         return render_to_response('courseware/course_about.html', context)
 
