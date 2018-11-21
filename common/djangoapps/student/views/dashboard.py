@@ -55,7 +55,6 @@ from student.models import (
 from util.milestones_helpers import get_pre_requisite_courses_not_completed
 from xmodule.modulestore.django import modulestore
 
-from membership.models import VIPCourseEnrollment, VIPInfo
 
 log = logging.getLogger("edx.student")
 
@@ -230,11 +229,6 @@ def get_course_enrollments(user, org_whitelist, org_blacklist):
         # Else, include the enrollment.
         else:
             yield enrollment
-
-
-def get_vip_course_enrollment_ids(user):
-    vces = VIPCourseEnrollment.objects.filter(user=user, is_active=True)
-    return [v.course_id.html_id() for v in vces]
 
 
 def get_filtered_course_entitlements(user, org_whitelist, org_blacklist):
@@ -854,8 +848,11 @@ def student_dashboard(request):
 
     # eliteu membership
     if settings.FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION', False):
+        from membership.models import VIPCourseEnrollment, VIPInfo
         vip_info = VIPInfo.objects.filter(user=user).order_by('-id').first()
-        vip_course_enrollment_ids = get_vip_course_enrollment_ids(user)
+
+        vces = VIPCourseEnrollment.objects.filter(user=user, is_active=True)
+        vip_course_enrollment_ids = [v.course_id.html_id() for v in vces]
 
         context.update({
             'is_vip': VIPInfo.is_vip(user),
