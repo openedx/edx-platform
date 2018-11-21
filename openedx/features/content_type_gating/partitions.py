@@ -24,6 +24,7 @@ from lms.djangoapps.courseware.masquerade import (
 from xmodule.partitions.partitions import Group, UserPartition, UserPartitionError
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
+from student.roles import CourseBetaTesterRole
 
 LOG = logging.getLogger(__name__)
 
@@ -153,6 +154,10 @@ class ContentTypeGatingPartitionScheme(object):
 
         # If there is no verified mode, all users are granted FULL_ACCESS
         if not course_mode.has_verified_mode(modes_dict):
+            return cls.FULL_ACCESS
+
+        # If the user is a beta tester for this course they are granted FULL_ACCESS
+        if CourseBetaTesterRole(course_key).has_user(user):
             return cls.FULL_ACCESS
 
         course_enrollment = apps.get_model('student.CourseEnrollment')
