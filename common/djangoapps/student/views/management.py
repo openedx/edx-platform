@@ -405,6 +405,7 @@ def change_enrollment(request, check_access=True):
             try:
                 enroll_mode = CourseMode.auto_enroll_mode(course_id, available_modes)
                 course_enrollment_model = None
+                is_vip = False
                 if enroll_mode:
                     course_enrollment_model = CourseEnrollment.enroll(user, course_id, check_access=check_access, mode=enroll_mode)
 
@@ -423,7 +424,7 @@ def change_enrollment(request, check_access=True):
                 # ENABLE_MEMBERSHIP_INTEGRATION (ELITEU ADD)
                 if settings.FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION', False):
                     from membership.models import VIPCourseEnrollment
-                    if course_enrollment_model:
+                    if is_vip and course_enrollment_model:
                         VIPCourseEnrollment.enroll(user, course_id)
             except Exception as ex:  # pylint: disable=broad-except
                 log.error(ex)

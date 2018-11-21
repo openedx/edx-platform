@@ -36,7 +36,7 @@ from membership.models import VIPCourseEnrollment
   billing_email = settings.PAYMENT_SUPPORT_EMAIL
 
   is_course_expired = hasattr(show_courseware_link, 'error_code') and show_courseware_link.error_code == 'audit_expired'
-  is_vip_enrollment = isinstance(enrollment, VIPCourseEnrollment)
+  is_vip_enrollment = enrollment.course_id.html_id() in vip_course_enrollment_ids or False
 %>
 
 <%namespace name='static' file='../static_content.html'/>
