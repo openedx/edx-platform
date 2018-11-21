@@ -142,7 +142,8 @@ edx-lint==0.5.5
 edx-milestones==0.1.13
 edx-oauth2-provider==1.2.2
 edx-opaque-keys[django]==0.4.4
-edx-organizations==0.4.10
+# edx-organizations==0.4.10
+git+https://github.com/appsembler/edx-organizations.git@0.4.12-appsembler1
 edx-proctoring==1.4.0
 edx-rest-api-client==1.7.1
 edx-search==1.2.1

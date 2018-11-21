@@ -40,6 +40,10 @@ def get_initial_sass_variables():
 
 def get_branding_values_from_file():
     from openedx.core.djangoapps.theming.helpers import get_theme_base_dir, Theme
+
+    if not settings.ENABLE_COMPREHENSIVE_THEMING:
+        return {}
+
     site_theme = SiteTheme(site=Site.objects.get(id=settings.SITE_ID), theme_dir_name=settings.DEFAULT_SITE_THEME)
     theme = Theme(
         name=site_theme.theme_dir_name,
@@ -58,6 +62,10 @@ def get_branding_values_from_file():
 
 
 def get_branding_labels_from_file(custom_branding=None):
+
+    if not settings.ENABLE_COMPREHENSIVE_THEMING:
+        return []
+    
     css_output = compile_sass('_brand.scss', custom_branding)
     css_rules = cssutils.parseString(css_output, validate=False).cssRules
     labels = []
