@@ -862,6 +862,7 @@ def student_dashboard(request):
             'vip_expired_at': vip_info and vip_info.expired_at or None,
             'vip_purchase_url': reverse('membership_card'),
             'vip_course_enrollment_ids': vip_course_enrollment_ids,
+            'display_sidebar_on_dashboard': True
         })
 
     # There must be enough urls for dashboard.html. Template creates course
