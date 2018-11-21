@@ -75,6 +75,8 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.content.block_structure.apps.BlockStructureConfig',
     'openedx.core.djangoapps.catalog',
     'openedx.core.djangoapps.self_paced',
+    'openedx.features.content_type_gating',
+    'openedx.features.course_duration_limits',
     'milestones',
     'celery_utils',
     'waffle',
@@ -91,6 +93,7 @@ MICROSITE_BACKEND = 'microsite_configuration.backends.filebased.FilebasedMicrosi
 MICROSITE_TEMPLATE_BACKEND = 'microsite_configuration.backends.filebased.FilebasedMicrositeTemplateBackend'
 
 SECRET_KEY = 'insecure-secret-key'
+SITE_ID = 1
 
 TRACK_MAX_EVENT = 50000
 

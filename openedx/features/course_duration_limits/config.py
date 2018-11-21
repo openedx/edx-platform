@@ -11,9 +11,3 @@ CONTENT_TYPE_GATING_FLAG = WaffleFlag(
     flag_name=u'debug',
     flag_undefined_default=False
 )
-
-CONTENT_TYPE_GATING_STUDIO_UI_FLAG = WaffleFlag(
-    waffle_namespace=WAFFLE_FLAG_NAMESPACE,
-    flag_name=u'studio_ui',
-    flag_undefined_default=False
-)

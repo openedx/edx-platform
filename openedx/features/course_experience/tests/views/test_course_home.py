@@ -2,7 +2,7 @@
 """
 Tests for the course home page.
 """
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 import ddt
 import mock
@@ -25,7 +25,7 @@ from lms.djangoapps.course_goals.api import add_course_goal, remove_course_goal
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
-from openedx.features.course_duration_limits.config import CONTENT_TYPE_GATING_FLAG
+from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience import (
     SHOW_REVIEWS_TOOL_FLAG,
     SHOW_UPGRADE_MSG_ON_COURSE_HOME,
@@ -174,16 +174,16 @@ class TestCourseHomePage(CourseHomePageTestCase):
         response = self.client.get(url)
         self.assertContains(response, TEST_COURSE_UPDATES_TOOL, status_code=200)
 
-    @override_waffle_flag(CONTENT_TYPE_GATING_FLAG, True)
     def test_queries(self):
         """
         Verify that the view's query count doesn't regress.
         """
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=date(2018, 1, 1))
         # Pre-fetch the view to populate any caches
         course_home_url(self.course)
 
         # Fetch the view and verify the query counts
-        with self.assertNumQueries(70, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+        with self.assertNumQueries(84, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
             with check_mongo_calls(4):
                 url = course_home_url(self.course)
                 self.client.get(url)
@@ -327,7 +327,6 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         )
         self.assertRedirects(response, expected_url)
 
-    @override_waffle_flag(CONTENT_TYPE_GATING_FLAG, True)
     @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
     def test_course_does_not_expire_for_different_roles(self):
         """
@@ -371,14 +370,14 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
                 "Should not expire access for user [{}]".format(user_description)
             )
 
-    @override_waffle_flag(CONTENT_TYPE_GATING_FLAG, True)
     @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
     def test_expired_course(self):
         """
         Ensure that a user accessing an expired course sees a redirect to
         the student dashboard, not a 404.
-
         """
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=date(2010, 1, 1))
+
         course = CourseFactory.create(start=THREE_YEARS_AGO)
         url = course_home_url(course)
 
@@ -476,18 +475,28 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         self.assertNotContains(response, TEST_COURSE_HOME_MESSAGE_PRE_START)
 
         # Verify that enrolled users are shown the course expiration banner if content gating is enabled
-        with override_waffle_flag(CONTENT_TYPE_GATING_FLAG, True):
-            url = course_home_url(self.course)
-            response = self.client.get(url)
-            bannerText = get_expiration_banner_text(user, self.course)
-            self.assertContains(response, bannerText, html=True)
+
+        # We use .save() explicitly here (rather than .objects.create) in order to force the
+        # cache to refresh.
+        config = CourseDurationLimitConfig(
+            course=CourseOverview.get_from_id(self.course.id),
+            enabled=True,
+            enabled_as_of=date(2018, 1, 1)
+        )
+        config.save()
+
+        url = course_home_url(self.course)
+        response = self.client.get(url)
+        bannerText = get_expiration_banner_text(user, self.course)
+        self.assertContains(response, bannerText, html=True)
 
         # Verify that enrolled users are not shown the course expiration banner if content gating is disabled
-        with override_waffle_flag(CONTENT_TYPE_GATING_FLAG, False):
-            url = course_home_url(self.course)
-            response = self.client.get(url)
-            bannerText = get_expiration_banner_text(user, self.course)
-            self.assertNotContains(response, bannerText, html=True)
+        config.enabled = False
+        config.save()
+        url = course_home_url(self.course)
+        response = self.client.get(url)
+        bannerText = get_expiration_banner_text(user, self.course)
+        self.assertNotContains(response, bannerText, html=True)
 
         # Verify that enrolled users are shown 'days until start' message before start date
         future_course = self.create_future_course()

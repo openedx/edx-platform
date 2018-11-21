@@ -45,7 +45,6 @@ from mobile_api.models import IgnoreMobileAvailableFlagConfig
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.features.course_duration_limits.access import check_course_expired
-from openedx.features.course_duration_limits.config import CONTENT_TYPE_GATING_FLAG
 from student import auth
 from student.models import CourseEnrollmentAllowed
 from student.roles import (
@@ -361,14 +360,13 @@ def _has_access_course(user, action, courselike):
             else:
                 return view_with_prereqs
 
-        if CONTENT_TYPE_GATING_FLAG.is_enabled():
-            has_not_expired = check_course_expired(user, courselike)
-            if not has_not_expired:
-                staff_access = _has_staff_access_to_descriptor(user, courselike, courselike.id)
-                if staff_access:
-                    return staff_access
-                else:
-                    return has_not_expired
+        has_not_expired = check_course_expired(user, courselike)
+        if not has_not_expired:
+            staff_access = _has_staff_access_to_descriptor(user, courselike, courselike.id)
+            if staff_access:
+                return staff_access
+            else:
+                return has_not_expired
 
         return ACCESS_GRANTED
 

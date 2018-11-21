@@ -29,8 +29,7 @@ from mobile_api.utils import API_V05, API_V1
 from openedx.core.lib.courses import course_image_url
 from openedx.core.lib.tests import attr
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
-from openedx.features.course_duration_limits.config import CONTENT_TYPE_GATING_FLAG
+from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from student.models import CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory
 from util.milestones_helpers import set_prerequisite_courses
@@ -289,12 +288,12 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         (API_V1, False, 1),
     )
     @ddt.unpack
-    @override_waffle_flag(CONTENT_TYPE_GATING_FLAG, True)
     def test_enrollment_with_gating(self, api_version, expired, num_courses_returned):
         '''
         Test that expired courses are only returned in v1 of API
         when waffle flag enabled, and un-expired courses always returned
         '''
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime.date(2018, 1, 1))
         courses = self._get_enrollment_data(api_version, expired)
         self._assert_enrollment_results(api_version, courses, num_courses_returned)
 
@@ -305,12 +304,12 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         (API_V1, False, 1),
     )
     @ddt.unpack
-    @override_waffle_flag(CONTENT_TYPE_GATING_FLAG, False)
     def test_enrollment_no_gating(self, api_version, expired, num_courses_returned):
         '''
         Test that expired and non-expired courses returned if waffle flag is disabled
         regarless of version of API
         '''
+        CourseDurationLimitConfig.objects.create(enabled=False)
         courses = self._get_enrollment_data(api_version, expired)
         self._assert_enrollment_results(api_version, courses, num_courses_returned)
 

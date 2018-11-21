@@ -11,13 +11,14 @@ from collections import namedtuple
 
 from django.conf import settings
 from django.db import models
+from django.db.models import Q, F
 from django.contrib.sites.models import Site
 from django.contrib.sites.requests import RequestSite
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 import crum
 
-from config_models.models import ConfigurationModel
+from config_models.models import ConfigurationModel, cache
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 
@@ -34,43 +35,17 @@ class StackedConfigurationModel(ConfigurationModel):
     STACKABLE_FIELDS = ('enabled',)
 
     enabled = models.NullBooleanField(default=None, verbose_name=_("Enabled"))
-    site = models.ForeignKey(Site, on_delete=models.CASCADE, null=True)
-    org = models.CharField(max_length=255, db_index=True, null=True)
+    site = models.ForeignKey(Site, on_delete=models.CASCADE, null=True, blank=True)
+    org = models.CharField(max_length=255, db_index=True, null=True, blank=True)
     course = models.ForeignKey(
         CourseOverview,
         on_delete=models.DO_NOTHING,
         null=True,
+        blank=True,
     )
 
     @classmethod
-    def attribute_tuple(cls):
-        """
-        Returns a namedtuple with all attributes that can be overridden on this config model.
-
-        For example, if MyStackedConfig.STACKABLE_FIELDS = ('enabled', 'enabled_as_of', 'studio_enabled'),
-        then:
-
-            # These lines are the same
-            MyStackedConfig.attribute_tuple()
-            namedtuple('MyStackedConfigValues', ('enabled', 'enabled_as_of', 'studio_enabled'))
-
-            # attribute_tuple() behavior
-            MyStackedConfigValues = MyStackedConfig.attribute_tuple()
-            MyStackedConfigValues(True, '10/1/18', False).enabled  # True
-            MyStackedConfigValues(True, '10/1/18', False).enabled_as_of  # '10/1/18'
-            MyStackedConfigValues(True, '10/1/18', False).studio_enabled  # False
-        """
-        if hasattr(cls, '_attribute_tuple'):
-            return cls._attribute_tuple
-
-        cls._attribute_tuple = namedtuple(
-            '{}Values'.format(cls.__name__),
-            cls.STACKABLE_FIELDS
-        )
-        return cls._attribute_tuple
-
-    @classmethod
-    def current(cls, site=None, org=None, course=None):  # pylint: disable=arguments-differ
+    def current(cls, site=None, org=None, course_key=None):  # pylint: disable=arguments-differ
         """
         Return the current overridden configuration at the specified level.
 
@@ -112,12 +87,18 @@ class StackedConfigurationModel(ConfigurationModel):
             specified down to the level of the supplied argument (or global values if
             no arguments are supplied).
         """
+        cache_key_name = cls.cache_key_name(site, org, course_key=course_key)
+        cached = cache.get(cache_key_name)
+
+        if cached is not None:
+            return cached
+
         # Raise an error if more than one of site/org/course are specified simultaneously.
-        if len([arg for arg in [site, org, course] if arg is not None]) > 1:
+        if len([arg for arg in [site, org, course_key] if arg is not None]) > 1:
             raise ValueError("Only one of site, org, and course can be specified")
 
-        if org is None and course is not None:
-            org = cls._org_from_course(course)
+        if org is None and course_key is not None:
+            org = cls._org_from_course_key(course_key)
 
         if site is None and org is not None:
             site = cls._site_from_org(org)
@@ -130,40 +111,62 @@ class StackedConfigurationModel(ConfigurationModel):
 
         values = field_defaults.copy()
 
-        global_current = super(StackedConfigurationModel, cls).current(None, None, None)
-        for field in stackable_fields:
-            values[field.name] = field.value_from_object(global_current)
+        global_override_q = Q(site=None, org=None, course_id=None)
+        site_override_q = Q(site=site, org=None, course_id=None)
+        org_override_q = Q(site=None, org=org, course_id=None)
+        course_override_q = Q(site=None, org=None, course_id=course_key)
 
-        def _override_fields_with_level(level_config):
+        overrides = cls.objects.current_set().filter(
+            global_override_q |
+            site_override_q |
+            org_override_q |
+            course_override_q
+        ).order_by(
+            # Sort nulls first, and in reverse specificity order
+            # so that the overrides are in the order of general to specific.
+            #
+            # Site | Org  | Course
+            # --------------------
+            # Null | Null | Null
+            # site | Null | Null
+            # Null | org  | Null
+            # Null | Null | Course
+            F('course').desc(nulls_first=True),
+            F('org').desc(nulls_first=True),
+            F('site').desc(nulls_first=True),
+        )
+
+        for override in overrides:
             for field in stackable_fields:
-                value = field.value_from_object(level_config)
+                value = field.value_from_object(override)
                 if value != field_defaults[field.name]:
                     values[field.name] = value
 
-        if site is not None:
-            _override_fields_with_level(
-                super(StackedConfigurationModel, cls).current(site, None, None)
-            )
-
-        if org is not None:
-            _override_fields_with_level(
-                super(StackedConfigurationModel, cls).current(None, org, None)
-            )
-
-        if course is not None:
-            _override_fields_with_level(
-                super(StackedConfigurationModel, cls).current(None, None, course)
-            )
-
-        return cls.attribute_tuple()(**values)
+        current = cls(**values)
+        cache.set(cache_key_name, current, cls.cache_timeout)
+        return current
 
     @classmethod
-    def _org_from_course(cls, course_key):
+    def cache_key_name(cls, site, org, course=None, course_key=None):  # pylint: disable=arguments-differ
+        if course is not None and course_key is not None:
+            raise ValueError("Only one of course and course_key can be specified at a time")
+        if course is not None:
+            course_key = course
+
+        if site is None:
+            site_id = None
+        else:
+            site_id = site.id
+
+        return super(StackedConfigurationModel, cls).cache_key_name(site_id, org, course_key)
+
+    @classmethod
+    def _org_from_course_key(cls, course_key):
         return course_key.org
 
     @classmethod
     def _site_from_org(cls, org):
-        configuration = SiteConfiguration.get_configuration_for_org(org)
+        configuration = SiteConfiguration.get_configuration_for_org(org, select_related=['site'])
         if configuration is None:
             try:
                 return Site.objects.get(id=settings.SITE_ID)

@@ -1309,7 +1309,7 @@ class CourseEnrollment(models.Model):
         return enrollment
 
     @classmethod
-    def get_enrollment(cls, user, course_key):
+    def get_enrollment(cls, user, course_key, select_related=None):
         """Returns a CourseEnrollment object.
 
         Args:
@@ -1324,7 +1324,10 @@ class CourseEnrollment(models.Model):
         if user.is_anonymous:
             return None
         try:
-            return cls.objects.get(
+            query = cls.objects
+            if select_related is not None:
+                query = query.select_related(*select_related)
+            return query.get(
                 user=user,
                 course_id=course_key
             )

@@ -5,7 +5,7 @@ import itertools
 import json
 import re
 import unittest
-from datetime import timedelta
+from datetime import timedelta, date
 
 import ddt
 from completion.test_utils import submit_completions_for_testing, CompletionWaffleTestMixin
@@ -31,7 +31,7 @@ from openedx.core.djangoapps.schedules.config import COURSE_UPDATE_WAFFLE_FLAG
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangoapps.user_authn.cookies import _get_user_info_cookie_data
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
-from openedx.features.course_duration_limits.config import CONTENT_TYPE_GATING_FLAG
+from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from student.helpers import DISABLE_UNENROLL_CERT_STATES
 from student.models import CourseEnrollment, UserProfile
 from student.signals import REFUND_ORDER
@@ -723,13 +723,13 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         )
 
     @override_waffle_flag(COURSE_UPDATE_WAFFLE_FLAG, True)
-    @override_waffle_flag(CONTENT_TYPE_GATING_FLAG, True)
     def test_content_gating_course_card_changes(self):
         """
         When a course is expired, the links on the course card should be removed.
         Links will be removed from the course title, course image and button (View Course/Resume Course).
         The course card should have an access expired message.
         """
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=date(2018, 1, 1))
         self.override_waffle_switch(True)
 
         course = CourseFactory.create(start=self.THREE_YEARS_AGO)
