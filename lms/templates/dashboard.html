@@ -128,7 +128,7 @@ from student.models import CourseEnrollment
           <%include file="learner_dashboard/_dashboard_navigation_courses.html"/>
           % endif
 
-          % if len(course_entitlements + course_enrollments + vip_course_enrollments) > 0:
+          % if len(course_entitlements + course_enrollments) > 0:
             <ul class="listing-courses">
             <%
                 share_settings = configuration_helpers.get_value(
@@ -136,7 +136,7 @@ from student.models import CourseEnrollment
                     getattr(settings, 'SOCIAL_SHARING_SETTINGS', {})
                 )
             %>
-              % for dashboard_index, enrollment in enumerate(set(course_entitlements + course_enrollments + vip_course_enrollments)):
+              % for dashboard_index, enrollment in enumerate(set(course_entitlements + course_enrollments)):
               <%
                 # Check if the course run is an entitlement and if it has an associated session
                 entitlement = enrollment if isinstance(enrollment, CourseEntitlement) else None
@@ -192,6 +192,7 @@ from student.models import CourseEnrollment
               %>
               <%include file='dashboard/_dashboard_course_listing.html'
                 args='is_vip=is_vip,
+                vip_course_enrollment_ids=vip_course_enrollment_ids,
                 can_refund_entitlement=can_refund_entitlement,
                 can_unenroll=can_unenroll,
                 credit_status=credit_status,

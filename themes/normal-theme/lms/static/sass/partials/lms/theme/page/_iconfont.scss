@@ -1,4 +1,4 @@
-// 替换原有font awesome 
+// 1. 替换原有font awesome 
 .course-info .course-sidebar .important-dates li .icon{
   opacity: 1;
 }
@@ -21,7 +21,7 @@
 
 
 
-// 课程详情页的新icon
+// 2. 课程详情页的新icon
 // http://0.0.0.0:18000/courses/course-v1:edX+E2E-101+course/about
 .about-staff-content .fa-my{
   display: block;
@@ -52,4 +52,6 @@
 .fa-my-article{
   background-position: -120px -20px;
 }
-
+.fa-my-manage{
+  background-position: -60px -20px;
+}
