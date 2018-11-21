@@ -55,6 +55,8 @@ from student.models import (
 from util.milestones_helpers import get_pre_requisite_courses_not_completed
 from xmodule.modulestore.django import modulestore
 
+from membership.models import VIPCourseEnrollment, VIPInfo
+
 log = logging.getLogger("edx.student")
 
 
@@ -228,6 +230,10 @@ def get_course_enrollments(user, org_whitelist, org_blacklist):
         # Else, include the enrollment.
         else:
             yield enrollment
+
+
+def get_vip_course_enrollment(user):
+    return list(VIPCourseEnrollment.objects.filter(user=user, is_active=True))
 
 
 def get_filtered_course_entitlements(user, org_whitelist, org_blacklist):
@@ -844,6 +850,31 @@ def student_dashboard(request):
     resume_button_urls = ['' for entitlement in course_entitlements]
     for url in _get_urls_for_resume_buttons(user, course_enrollments):
         resume_button_urls.append(url)
+
+    # eliteu membership
+    if settings.FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION', False):
+        from membership.models import VIPCoursePrice
+        vip_course_price = VIPCoursePrice.get_vip_course_price_data()
+        vip_info = VIPInfo.objects.filter(user=user).order_by('-id').first()
+
+        vip_course_enrollments = get_vip_course_enrollment(user)
+        show_courseware_links_for_vip = {
+            enrollment.course_id: has_access(request.user, 'load', enrollment.course_overview)
+            for enrollment in vip_course_enrollments
+        }
+
+        show_courseware_links_for.update(show_courseware_links_for_vip)
+
+        context.update({
+            'vip_course_price': vip_course_price,
+            'is_vip': VIPInfo.is_vip(user),
+            'vip_expired_at': vip_info and vip_info.expired_at or None,
+            'vip_purchase_url': reverse('membership_card'),
+            'vip_course_enrollments': vip_course_enrollments,
+        })
+
+        resume_button_urls += ['' for vip_course_enrollment in vip_course_enrollments]
+
     # There must be enough urls for dashboard.html. Template creates course
     # cards for "enrollments + entitlements".
     context.update({

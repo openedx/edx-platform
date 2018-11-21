@@ -79,3 +79,5 @@ COURSE_CATALOG_API_URL = 'http://edx.devstack.discovery:18381/api/v1/'
 
 if FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION', False):
     INSTALLED_APPS.append('membership')
+    REST_FRAMEWORK.update({'EXCEPTION_HANDLER': 'membership.utils.customer_exception_handler'})
+
