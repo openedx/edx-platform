@@ -105,9 +105,11 @@
       position: absolute;
       bottom: 10px;
     }
+    /*
     .course-actions .wrapper-action-more{
       display: none;
     }
+    */
     .wrapper-course-details .wrapper-course-actions{
       position: absolute;
       bottom: 8px;
@@ -121,6 +123,17 @@
       font-weight: normal;
     }
 
+    a.enter-course-blocked.course-target-link{
+      height: 34px;
+      background-color: #f5f7fa;
+      border-radius: 3px;
+      border: 1px solid #e6e9ed;
+      color: #aab2bd;
+      font-size: 14px;
+      line-height: 19px;
+      cursor: not-allowed; 
+    }
+
     .wrapper-messages-primary .messages-list{
       background-color: #f7f7f7;
       .wrapper-messages-primary .message.message-upsell .action-upgrade{
@@ -129,9 +142,56 @@
       }
 
     }
+
+    
   }
 
   .course-info{
     background-image: none;
+  }
+}
+
+
+/* 右侧sidebar框 */
+.dashboard .side-container{
+  padding: 40px 0 20px 0;
+  max-width: 500px;
+  min-width: none;
+
+  .profile-sidebar ul{
+    border: none;
+  }
+  .status-verification{
+    background: #fffaf6;
+    padding: 25px 20px;
+    box-shadow: 0px 1px 4px 0px #ffe4d1;
+    border: 1px solid #ffe4d1;
+    margin-top: 30px;
+    text-align: right;
+  }
+  .status-verification .status-title{
+    margin: 0 0 15px 0;
+    color: #fa7f2b;
+    font-size: 16px;
+    display: block;
+    text-align: left;
+  }
+  .status-verification .status-note{
+    font-size: 14px;
+    color: $font;
+    line-height: 1.5;
+    margin-bottom: 30px;
+    display: block;
+    text-align: left;
+  }
+  .status-verification a span{
+    display: inline-block;
+    padding: 8px 15px;
+    background-color: rgba(255,228,209,0.3);
+    border-radius: 3px;
+    border: 1px solid #fc801a;
+    color: #fa7f2b;
+    font-size: 14px;
+    cursor: pointer;
   }
 }
