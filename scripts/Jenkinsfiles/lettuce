@@ -1,0 +1,68 @@
+def runLettuceTests() {
+    sshagent(credentials: ['jenkins-worker', 'jenkins-worker-pem'], ignoreMissing: true) {
+        checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '${ghprbActualCommit}']],
+            doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', honorRefspec: true,
+            noTags: true, shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'jenkins-worker',
+            refspec: '+refs/heads/master:refs/remotes/origin/master +refs/pull/${ghprbPullId}/*:refs/remotes/origin/pr/${ghprbPullId}/*',
+            url: 'git@github.com:edx/edx-platform.git']]]
+        console_output = sh(returnStdout: true, script: 'bash scripts/all-tests.sh').trim()
+        dir('stdout') {
+            writeFile file: "${TEST_SUITE}-stdout.log", text: console_output
+        }
+    }
+}
+
+def lettuceTestCleanup() {
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'test_root/log/**/*.log,stdout/*.log,*.log'
+    junit '**/reports/acceptance/*.xml'
+}
+
+pipeline {
+    agent none
+    options {
+        timestamps()
+        timeout(60)
+    }
+    stages {
+        stage('Run Tests') {
+            parallel {
+                stage("lms-acceptance") {
+                    agent { label "jenkins-worker" }
+                    environment {
+                        TEST_SUITE = "lms-acceptance"
+                    }
+                    steps {
+                        script {
+                            runLettuceTests()
+                        }
+                    }
+                    post {
+                        always {
+                            script {
+                                lettuceTestCleanup()
+                            }
+                        }
+                    }
+                }
+                stage("cms-acceptance") {
+                    agent { label "jenkins-worker" }
+                    environment {
+                        TEST_SUITE = "cms-acceptance"
+                    }
+                    steps {
+                        script {
+                            runLettuceTests()
+                        }
+                    }
+                    post {
+                        always {
+                            script {
+                                lettuceTestCleanup()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
