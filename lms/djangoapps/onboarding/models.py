@@ -358,15 +358,14 @@ class UserExtendedProfile(TimeStampedModel):
     }
 
     HEAR_ABOUT_PHILANTHROPY_LABELS = {
-        "0=hear_about_philanthropy_partner": "A Philanthropy University Partner (Global Giving, GirlSPARKS, +Acumen, "
-                                             "or another)",
+        "0=hear_about_philanthropy_partner": "A Philanthropy University Partner (Global Giving, +Acumen or another)",
         "1=hear_about_colleague_same_organization": "A Colleague From My Organization",
         "2=hear_about_friend_new_organization": "A Friend Or Colleague (Not From My Organization)",
         "3=hear_about_interest_search": "An Internet Search",
         "4=hear_about_linkedIn_advertisement": "A LinkedIn Advertisement",
         "5=hear_about_facebook_advertisement": "A Facebook Advertisement",
         "6=hear_about_twitter_not_colleague": "Twitter (Not From A Colleague)",
-        "7=hear_about_other": "Other ____________"
+        "7=hear_about_other": "Other"
     }
 
     user = models.OneToOneField(User, unique=True, db_index=True, related_name='extended_profile')

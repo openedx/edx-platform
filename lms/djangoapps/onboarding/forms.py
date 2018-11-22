@@ -320,7 +320,7 @@ class InterestsForm(BaseOnboardingForm):
                                        key=lambda hear_about_philanthropy_choices: hear_about_philanthropy_choices[0])
         self.fields['hear_about_philanthropy'] = forms.ChoiceField(
             label=ugettext_noop('How did you hear about Philanthropy University?'
-                                '(Choose one. If more than one applies, please choose the source that most strongly '
+                                ' (Choose one. If more than one applies, please choose the source that most strongly '
                                 'influenced you to visit the website.)'),
             choices=hear_about_philanthropy_choices, widget=forms.RadioSelect,
             required=False)
