@@ -43,10 +43,6 @@
     .user-image-frame{
       border: none;
     }
-
-    .nav-item.nav-item-dropdown {
-      position: relative;
-    }
   } 
 
   .global-header .nav-links .main .nav-tab{
@@ -89,4 +85,8 @@
     right:8px;
     top: 49px;
   }
+}
+
+.global-header .nav-links .secondary{ 
+  position: relative; 
 }
