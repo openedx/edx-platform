@@ -28,7 +28,6 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from requests.auth import HTTPBasicAuth
 from rest_framework.views import APIView
 from rest_framework.authentication import SessionAuthentication
-from rest_framework_oauth.authentication import OAuth2Authentication
 from rest_framework.permissions import IsAuthenticated
 from xblock.core import XBlock
 from xblock.django.request import django_to_webob_request, webob_to_django_response
@@ -59,6 +58,7 @@ from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.services import CreditService
 from openedx.core.djangoapps.monitoring_utils import set_custom_metrics_for_course_key, set_monitoring_transaction_name
 from openedx.core.djangoapps.util.user_utils import SystemUser
+from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.license import wrap_with_license
 from openedx.core.lib.url_utils import quote_slashes, unquote_slashes
 from openedx.core.lib.xblock_utils import request_token as xblock_request_token
@@ -980,7 +980,7 @@ class XblockCallbackView(APIView):
     not accessible by the user, or the module raises NotFoundError. If the
     module raises any other error, it will escape this function.
     """
-    authentication_classes = (SessionAuthentication, OAuth2Authentication,)
+    authentication_classes = (SessionAuthentication, OAuth2AuthenticationAllowInactiveUser)
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, course_id, usage_id, handler, suffix=None):
