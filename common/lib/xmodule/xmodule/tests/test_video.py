@@ -34,10 +34,10 @@ from opaque_keys.edx.keys import CourseKey
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
+from xblock_video import VideoDescriptor, create_youtube_string, EXPORT_IMPORT_STATIC_DIR
+from xblock_video.transcripts_utils import download_youtube_subs, save_to_store, save_subs_to_store
 from xmodule.tests import get_test_descriptor_system
 from xmodule.validation import StudioValidationMessage
-from xmodule.video_module import VideoDescriptor, create_youtube_string, EXPORT_IMPORT_STATIC_DIR
-from xmodule.video_module.transcripts_utils import download_youtube_subs, save_to_store, save_subs_to_store
 from . import LogicTest
 from .test_import import DummySystem
 
@@ -106,7 +106,7 @@ def instantiate_descriptor(**field_data):
     )
 
 
-# Because of the way xmodule.video_module.video_module imports edxval.api, we
+# Because of the way xblock_video imports edxval.api, we
 # must mock the entire module, which requires making mock exception classes.
 
 class _MockValVideoNotFoundError(Exception):
@@ -119,8 +119,8 @@ class _MockValCannotCreateError(Exception):
     pass
 
 
-class VideoModuleTest(LogicTest):
-    """Logic tests for Video Xmodule."""
+class VideoXBlockTest(LogicTest):
+    """Logic tests for Video XBlock."""
     descriptor_class = VideoDescriptor
 
     raw_field_data = {
@@ -543,7 +543,7 @@ class VideoDescriptorImportTestCase(TestCase):
 
     def test_old_video_format(self):
         """
-        Test backwards compatibility with VideoModule's XML format.
+        Test backwards compatibility with VideoXBlock's XML format.
         """
         module_system = DummySystem(load_error_modules=True)
         xml_data = """
@@ -574,7 +574,7 @@ class VideoDescriptorImportTestCase(TestCase):
 
     def test_old_video_data(self):
         """
-        Ensure that Video is able to read VideoModule's model data.
+        Ensure that Video is able to read VideoXBlock's model data.
         """
         module_system = DummySystem(load_error_modules=True)
         xml_data = """
@@ -604,7 +604,7 @@ class VideoDescriptorImportTestCase(TestCase):
 
     def test_import_with_float_times(self):
         """
-        Ensure that Video is able to read VideoModule's model data.
+        Ensure that Video is able to read VideoXBlock's model data.
         """
         module_system = DummySystem(load_error_modules=True)
         xml_data = """
@@ -632,7 +632,7 @@ class VideoDescriptorImportTestCase(TestCase):
             'data': ''
         })
 
-    @patch('xmodule.video_module.video_module.edxval_api')
+    @patch('xblock_video.xblock_video.video_module.edxval_api')
     def test_import_val_data(self, mock_val_api):
         """
         Test that `from_xml` works method works as expected.
@@ -677,7 +677,7 @@ class VideoDescriptorImportTestCase(TestCase):
             course_id='test_course_id'
         )
 
-    @patch('xmodule.video_module.video_module.edxval_api')
+    @patch('xblock_video.xblock_video.video_module.edxval_api')
     def test_import_val_data_invalid(self, mock_val_api):
         mock_val_api.ValCannotCreateError = _MockValCannotCreateError
         mock_val_api.import_from_xml = Mock(side_effect=mock_val_api.ValCannotCreateError)
@@ -704,7 +704,7 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         self.file_system = OSFS(self.temp_dir)
         self.addCleanup(shutil.rmtree, self.temp_dir)
 
-    @patch('xmodule.video_module.video_module.edxval_api')
+    @patch('xblock_video.xblock_video.video_module.edxval_api')
     def test_export_to_xml(self, mock_val_api):
         """
         Test that we write the correct XML on export.
@@ -763,7 +763,7 @@ class VideoExportTestCase(VideoDescriptorTestBase):
             course_id=unicode(self.descriptor.runtime.course_id.for_branch(None)),
         )
 
-    @patch('xmodule.video_module.video_module.edxval_api')
+    @patch('xblock_video.xblock_video.video_module.edxval_api')
     def test_export_to_xml_val_error(self, mock_val_api):
         # Export should succeed without VAL data if video does not exist
         mock_val_api.ValVideoNotFoundError = _MockValVideoNotFoundError
@@ -777,7 +777,7 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         expected = etree.XML(xml_string, parser=parser)
         self.assertXmlEqual(expected, xml)
 
-    @patch('xmodule.video_module.video_module.edxval_api', None)
+    @patch('xblock_video.xblock_video.video_module.edxval_api', None)
     def test_export_to_xml_empty_end_time(self):
         """
         Test that we write the correct XML on export.
@@ -806,7 +806,7 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         expected = etree.XML(xml_string, parser=parser)
         self.assertXmlEqual(expected, xml)
 
-    @patch('xmodule.video_module.video_module.edxval_api', None)
+    @patch('xblock_video.xblock_video.video_module.edxval_api', None)
     def test_export_to_xml_empty_parameters(self):
         """
         Test XML export with defaults.
@@ -816,7 +816,7 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         expected = '<video url_name="SampleProblem" download_video="false"/>\n'
         self.assertEquals(expected, etree.tostring(xml, pretty_print=True))
 
-    @patch('xmodule.video_module.video_module.edxval_api', None)
+    @patch('xblock_video.xblock_video.video_module.edxval_api', None)
     def test_export_to_xml_with_transcripts_as_none(self):
         """
         Test XML export with transcripts being overridden to None.
@@ -826,7 +826,7 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         expected = '<video url_name="SampleProblem" download_video="false"/>\n'
         self.assertEquals(expected, etree.tostring(xml, pretty_print=True))
 
-    @patch('xmodule.video_module.video_module.edxval_api', None)
+    @patch('xblock_video.xblock_video.video_module.edxval_api', None)
     def test_export_to_xml_invalid_characters_in_attributes(self):
         """
         Test XML export will *not* raise TypeError by lxml library if contains illegal characters.
@@ -836,7 +836,7 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         xml = self.descriptor.definition_to_xml(self.file_system)
         self.assertEqual(xml.get('display_name'), 'DisplayName')
 
-    @patch('xmodule.video_module.video_module.edxval_api', None)
+    @patch('xblock_video.xblock_video.video_module.edxval_api', None)
     def test_export_to_xml_unicode_characters(self):
         """
         Test XML export handles the unicode characters.
@@ -929,10 +929,10 @@ class VideoDescriptorStudentViewDataTestCase(unittest.TestCase):
         student_view_data = descriptor.student_view_data()
         self.assertEquals(student_view_data, expected_student_view_data)
 
-    @patch('xmodule.video_module.video_module.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
-    @patch('xmodule.video_module.transcripts_utils.get_available_transcript_languages', Mock(return_value=['es']))
+    @patch('xblock_video.xblock_video.video_module.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
+    @patch('xblock_video.transcripts_utils.get_available_transcript_languages', Mock(return_value=['es']))
     @patch('edxval.api.get_video_info_for_course_and_profiles', Mock(return_value={}))
-    @patch('xmodule.video_module.transcripts_utils.get_video_transcript_content')
+    @patch('xblock_video.transcripts_utils.get_video_transcript_content')
     @patch('edxval.api.get_video_info')
     def test_student_view_data_with_hls_flag(self, mock_get_video_info, mock_get_video_transcript_content):
         mock_get_video_info.return_value = {

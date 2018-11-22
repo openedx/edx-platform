@@ -44,6 +44,12 @@ from course_action_state.models import CourseRerunState
 from models.settings.course_metadata import CourseMetadata
 from openedx.core.djangoapps.embargo.models import CountryAccessRule, RestrictedCourse
 from openedx.core.lib.extract_tar import safetar_extractall
+from xblock_video.transcripts_utils import (
+    Transcript,
+    clean_video_id,
+    get_transcript_from_contentstore,
+    TranscriptsGenerationException
+)
 from student.auth import has_course_author_access
 from xmodule.contentstore.django import contentstore
 from xmodule.course_module import CourseFields
@@ -53,12 +59,6 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundError
 from xmodule.modulestore.xml_exporter import export_course_to_xml, export_library_to_xml
 from xmodule.modulestore.xml_importer import import_course_from_xml, import_library_from_xml
-from xmodule.video_module.transcripts_utils import (
-    Transcript,
-    clean_video_id,
-    get_transcript_from_contentstore,
-    TranscriptsGenerationException
-)
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.exceptions import NotFoundError
 from edxval.api import (

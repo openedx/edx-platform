@@ -35,7 +35,6 @@ from edxval.api import (
     get_available_transcript_languages
 )
 from opaque_keys.edx.keys import CourseKey
-from xmodule.video_module.transcripts_utils import Transcript
 
 from contentstore.models import VideoUploadConfig
 from contentstore.utils import reverse_course_url
@@ -44,6 +43,8 @@ from edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
 from openedx.core.djangoapps.video_pipeline.config.waffle import waffle_flags, DEPRECATE_YOUTUBE
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleSwitchNamespace, WaffleFlagNamespace
+from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
+from xblock_video.transcripts_utils import Transcript
 from util.json_request import JsonResponse, expect_json
 
 from .course import get_course_and_check_access

@@ -148,6 +148,11 @@ def get_common_sass_directories():
         "css_destination_dir": path("common/static/css"),
         "lookup_paths": COMMON_LOOKUP_PATHS,
     })
+    applicable_directories.append({
+        "sass_source_dir": path("common/static/common/sass"),
+        "css_destination_dir": path("common/static/common/css"),
+        "lookup_paths": COMMON_LOOKUP_PATHS,
+    })
 
     return applicable_directories
 

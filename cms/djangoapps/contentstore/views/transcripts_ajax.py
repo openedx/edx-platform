@@ -21,14 +21,8 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
 from six import text_type
 from edxval.api import create_or_update_video_transcript, create_external_video
-from student.auth import has_course_author_access
-from util.json_request import JsonResponse
-from xmodule.contentstore.content import StaticContent
-from xmodule.contentstore.django import contentstore
-from xmodule.exceptions import NotFoundError
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.video_module.transcripts_utils import (
+
+from xblock_video.transcripts_utils import (
     clean_video_id,
     download_youtube_subs,
     GetTranscriptsFromYouTubeException,
@@ -41,6 +35,13 @@ from xmodule.video_module.transcripts_utils import (
     get_transcript,
     get_transcript_from_val,
 )
+from student.auth import has_course_author_access
+from util.json_request import JsonResponse
+from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.django import contentstore
+from xmodule.exceptions import NotFoundError
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from cms.djangoapps.contentstore.views.videos import TranscriptProvider
 

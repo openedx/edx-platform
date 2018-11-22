@@ -17,16 +17,16 @@ from opaque_keys.edx.keys import UsageKey
 
 from contentstore.tests.utils import CourseTestCase, mock_requests_get
 from openedx.core.djangoapps.contentserver.caching import del_cached_content
-from xmodule.contentstore.content import StaticContent
-from xmodule.contentstore.django import contentstore
-from xmodule.exceptions import NotFoundError
-from xmodule.modulestore.django import modulestore
-from xmodule.video_module.transcripts_utils import (
+from xblock_video.transcripts_utils import (
     GetTranscriptsFromYouTubeException,
     Transcript,
     get_video_transcript_content,
     remove_subs_from_store,
 )
+from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.django import contentstore
+from xmodule.exceptions import NotFoundError
+from xmodule.modulestore.django import modulestore
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
@@ -926,7 +926,7 @@ class TestCheckTranscripts(BaseTranscripts):
             }
         )
 
-    @patch('xmodule.video_module.transcripts_utils.requests.get', side_effect=mock_requests_get)
+    @patch('xblock_video.transcripts_utils.requests.get', side_effect=mock_requests_get)
     def test_check_youtube_with_transcript_name(self, mock_get):
         """
         Test that the transcripts are fetched correctly when the the transcript name is set
@@ -1063,7 +1063,7 @@ class TestCheckTranscripts(BaseTranscripts):
         self.assertEqual(resp.status_code, 400)
         self.assertEqual(json.loads(resp.content).get('status'), 'Transcripts are supported only for "video" modules.')
 
-    @patch('xmodule.video_module.transcripts_utils.get_video_transcript_content')
+    @patch('xblock_video.transcripts_utils.get_video_transcript_content')
     def test_command_for_fallback_transcript(self, mock_get_video_transcript_content):
         """
         Verify the command if a transcript is there in edx-val.

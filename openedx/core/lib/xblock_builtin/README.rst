@@ -15,3 +15,9 @@ edx-platform into its own repo at some point.  From discussions, it's not too
 difficult to move the server-side code , but the client-side code is used by
 the discussion board tab and the team discussion, so for now, must remain in
 edx-platform.
+
+Video XBlock
+============
+
+This XBlock was converted from an XModule, and will hopefully be pulled out of
+edx-platform into its own repo at some point.

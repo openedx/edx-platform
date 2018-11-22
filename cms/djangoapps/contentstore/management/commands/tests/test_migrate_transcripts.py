@@ -15,10 +15,10 @@ from mock import patch
 from openedx.core.djangoapps.video_config.models import (
     TranscriptMigrationSetting, MigrationEnqueuedCourse
 )
+from xblock_video.transcripts_utils import save_to_store
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.video_module.transcripts_utils import save_to_store
 from edxval import api as api
 from testfixtures import LogCapture
 

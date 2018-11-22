@@ -551,7 +551,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         check_xblock_fields()
         check_mongo_fields()
 
-    @patch('xmodule.video_module.video_module.edxval_api', None)
+    @patch('xblock_video.video_module.edxval_api', None)
     @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     def test_export_course_image(self, _from_json):
         """
@@ -570,7 +570,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         self.assertTrue(path(root_dir / 'test_export/static/images/course_image.jpg').isfile())
         self.assertTrue(path(root_dir / 'test_export/static/images_course_image.jpg').isfile())
 
-    @patch('xmodule.video_module.video_module.edxval_api', None)
+    @patch('xblock_video.video_module.edxval_api', None)
     @patch('xmodule.tabs.CourseTab.from_json', side_effect=mock_tab_from_json)
     def test_export_course_image_nondefault(self, _from_json):
         """
@@ -586,7 +586,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         self.assertTrue(path(root_dir / 'test_export/static/just_a_test.jpg').isfile())
         self.assertFalse(path(root_dir / 'test_export/static/images/course_image.jpg').isfile())
 
-    @patch('xmodule.video_module.video_module.edxval_api', None)
+    @patch('xblock_video.video_module.edxval_api', None)
     def test_course_without_image(self):
         """
         Make sure we elegantly passover our code when there isn't a static

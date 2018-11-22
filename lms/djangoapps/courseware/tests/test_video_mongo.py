@@ -37,6 +37,12 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
 from openedx.core.djangoapps.video_pipeline.config.waffle import waffle_flags, DEPRECATE_YOUTUBE
 from waffle.testutils import override_flag
+from xblock_video import VideoDescriptor, bumper_utils, video_utils
+from xblock_video.transcripts_utils import Transcript, save_to_store, subs_filename
+from xblock_video.video_module import (
+    EXPORT_IMPORT_COURSE_DIR,
+    EXPORT_IMPORT_STATIC_DIR,
+)
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore import ModuleStoreEnum
@@ -44,9 +50,10 @@ from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE, TEST_DATA_SPLIT_MODULESTORE
 from xmodule.tests.test_import import DummySystem
 from xmodule.tests.test_video import VideoDescriptorTestBase, instantiate_descriptor
-from xmodule.video_module import VideoDescriptor, bumper_utils, video_utils
-from xmodule.video_module.transcripts_utils import Transcript, save_to_store, subs_filename
-from xmodule.video_module.video_module import (
+from xblock_video import bumper_utils, video_utils
+from xblock_video.transcripts_utils import Transcript, save_to_store, subs_filename
+from xblock_video.video_module import (
+    VideoDescriptor,
     EXPORT_IMPORT_COURSE_DIR,
     EXPORT_IMPORT_STATIC_DIR,
 )
@@ -498,7 +505,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
 
     def test_get_html_with_non_existent_edx_video_id(self):
         """
-        Tests the VideoModule get_html where a edx_video_id is given but a video is not found
+        Tests the VideoXBlock get_html where a edx_video_id is given but a video is not found
         """
         SOURCE_XML = u"""
             <video show_captions="true"
@@ -636,7 +643,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
 
     def test_get_html_with_existing_edx_video_id(self):
         """
-        Tests the `VideoModule` `get_html` where `edx_video_id` is given and related video is found
+        Tests the `VideoXBlock` `get_html` where `edx_video_id` is given and related video is found
         """
         edx_video_id = 'thundercats'
         # create video with provided edx_video_id and return encoded_videos
@@ -665,7 +672,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
 
     def test_get_html_with_existing_unstripped_edx_video_id(self):
         """
-        Tests the `VideoModule` `get_html` where `edx_video_id` with some unwanted tab(\t)
+        Tests the `VideoXBlock` `get_html` where `edx_video_id` with some unwanted tab(\t)
         is given and related video is found
         """
         edx_video_id = 'thundercats'
@@ -790,8 +797,8 @@ class TestGetHtmlMethod(BaseTestXmodule):
         return context, expected_context
 
     # pylint: disable=invalid-name
-    @patch('xmodule.video_module.video_module.BrandingInfoConfig')
-    @patch('xmodule.video_module.video_module.rewrite_video_url')
+    @patch('xblock_video.video_module.BrandingInfoConfig')
+    @patch('xblock_video.video_module.rewrite_video_url')
     def test_get_html_cdn_source(self, mocked_get_video, mock_BrandingInfoConfig):
         """
         Test if sources got from CDN
@@ -912,14 +919,14 @@ class TestGetHtmlMethod(BaseTestXmodule):
         """
         Verify val profiles on toggling HLS Playback feature.
         """
-        with patch('xmodule.video_module.video_module.edxval_api.get_urls_for_profiles') as get_urls_for_profiles:
+        with patch('xblock_video.video_module.edxval_api.get_urls_for_profiles') as get_urls_for_profiles:
             get_urls_for_profiles.return_value = {
                 'desktop_webm': 'https://webm.com/dw.webm',
                 'hls': 'https://hls.com/hls.m3u8',
                 'youtube': 'https://yt.com/?v=v0TFmdO4ZP0',
                 'desktop_mp4': 'https://mp4.com/dm.mp4'
             }
-            with patch('xmodule.video_module.video_module.HLSPlaybackEnabledFlag.feature_enabled') as feature_enabled:
+            with patch('xblock_video.video_module.HLSPlaybackEnabledFlag.feature_enabled') as feature_enabled:
                 feature_enabled.return_value = hls_feature_enabled
                 video_xml = '<video display_name="Video" download_video="true" edx_video_id="12345-67890">[]</video>'
                 self.initialize_module(data=video_xml)
@@ -929,8 +936,8 @@ class TestGetHtmlMethod(BaseTestXmodule):
                     expected_val_profiles,
                 )
 
-    @patch('xmodule.video_module.video_module.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
-    @patch('xmodule.video_module.video_module.edxval_api.get_urls_for_profiles')
+    @patch('xblock_video.video_module.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
+    @patch('xblock_video.video_module.edxval_api.get_urls_for_profiles')
     def test_get_html_hls(self, get_urls_for_profiles):
         """
         Verify that hls profile functionality works as expected.
@@ -986,7 +993,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         context = self.item_descriptor.render(PUBLIC_VIEW).content
         self.assertIn('"saveStateEnabled": false', context)
 
-    @patch('xmodule.video_module.video_module.edxval_api.get_course_video_image_url')
+    @patch('xblock_video.video_module.edxval_api.get_course_video_image_url')
     def test_poster_image(self, get_course_video_image_url):
         """
         Verify that poster image functionality works as expected.
@@ -999,7 +1006,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
 
         self.assertIn('"poster": "/media/video-images/poster.png"', context)
 
-    @patch('xmodule.video_module.video_module.edxval_api.get_course_video_image_url')
+    @patch('xblock_video.video_module.edxval_api.get_course_video_image_url')
     def test_poster_image_without_edx_video_id(self, get_course_video_image_url):
         """
         Verify that poster image is set to None and there is no crash when no edx_video_id.
@@ -1012,7 +1019,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
 
         self.assertIn("\'poster\': \'null\'", context)
 
-    @patch('xmodule.video_module.video_module.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=False))
+    @patch('xblock_video.video_module.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=False))
     def test_hls_primary_playback_on_toggling_hls_feature(self):
         """
         Verify that `prioritize_hls` is set to `False` if `HLSPlaybackEnabledFlag` is disabled.
@@ -1059,7 +1066,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'result': 'false'
         },
     )
-    @patch('xmodule.video_module.video_module.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
+    @patch('xblock_video.video_module.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
     def test_deprecate_youtube_course_waffle_flag(self, data):
         """
         Tests various combinations of a `prioritize_hls` flag being set in waffle and overridden for a course.
@@ -1178,7 +1185,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         ),
     )
     @ddt.unpack
-    @patch('xmodule.video_module.video_module.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
+    @patch('xblock_video.video_module.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
     def test_val_encoding_in_context(self, val_video_encodings, video_url):
         """
         Tests that the val encodings correctly override the video url when the edx video id is set and
@@ -1190,7 +1197,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         a video component is initialized. Current implementation considers this youtube source as a valid
         external youtube source.
         """
-        with patch('xmodule.video_module.video_module.edxval_api.get_urls_for_profiles') as get_urls_for_profiles:
+        with patch('xblock_video.video_module.edxval_api.get_urls_for_profiles') as get_urls_for_profiles:
             get_urls_for_profiles.return_value = val_video_encodings
             self.initialize_module(
                 data='<video display_name="Video" download_video="true" edx_video_id="12345-67890">[]</video>'
@@ -1219,7 +1226,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         ),
     )
     @ddt.unpack
-    @patch('xmodule.video_module.video_module.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
+    @patch('xblock_video.video_module.HLSPlaybackEnabledFlag.feature_enabled', Mock(return_value=True))
     def test_val_encoding_in_context_without_external_youtube_source(self, val_video_encodings, video_url):
         """
         Tests that the val encodings correctly override the video url when the edx video id is set and
@@ -1227,7 +1234,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         Accepted order of source priority is:
             VAL's youtube source > external youtube source > hls > mp4 > webm.
         """
-        with patch('xmodule.video_module.video_module.edxval_api.get_urls_for_profiles') as get_urls_for_profiles:
+        with patch('xblock_video.video_module.edxval_api.get_urls_for_profiles') as get_urls_for_profiles:
             get_urls_for_profiles.return_value = val_video_encodings
             self.initialize_module(
                 data='<video display_name="Video" youtube_id_1_0="" download_video="true" edx_video_id="12345-67890">[]</video>'
@@ -1296,7 +1303,7 @@ class TestEditorSavedMethod(BaseTestXmodule):
         self.assertIsInstance(Transcript.get_asset(item.location, self.file_name), StaticContent)
         self.assertIsInstance(Transcript.get_asset(item.location, 'subs_video.srt.sjson'), StaticContent)
         old_metadata = own_metadata(item)
-        with patch('xmodule.video_module.video_module.manage_video_subtitles_save') as manage_video_subtitles_save:
+        with patch('xblock_video.video_module.manage_video_subtitles_save') as manage_video_subtitles_save:
             item.editor_saved(self.user, old_metadata, None)
             self.assertFalse(manage_video_subtitles_save.called)
 
@@ -1322,7 +1329,7 @@ class TestEditorSavedMethod(BaseTestXmodule):
         self.assertEqual(item.edx_video_id, stripped_video_id)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    @patch('xmodule.video_module.video_module.edxval_api.get_url_for_profile', Mock(return_value='test_yt_id'))
+    @patch('xblock_video.video_module.edxval_api.get_url_for_profile', Mock(return_value='test_yt_id'))
     def test_editor_saved_with_yt_val_profile(self, default_store):
         """
         Verify editor saved overrides `youtube_id_1_0` when a youtube val profile is there
@@ -1522,7 +1529,7 @@ class TestVideoDescriptorStudentViewJson(CacheIsolationTestCase):
         ({'uk': 1, 'de': 1}, 'en-subs', ['de', 'en'], ['en', 'uk', 'de']),
     )
     @ddt.unpack
-    @patch('xmodule.video_module.transcripts_utils.edxval_api.get_available_transcript_languages')
+    @patch('xblock_video.transcripts_utils.edxval_api.get_available_transcript_languages')
     def test_student_view_with_val_transcripts_enabled(self, transcripts, english_sub, val_transcripts,
                                                        expected_transcripts, mock_get_transcript_languages):
         """
@@ -1718,7 +1725,7 @@ class VideoDescriptorTest(TestCase, VideoDescriptorTestBase):
         expected = etree.XML(expected_str, parser=parser)
         self.assertXmlEqual(expected, actual)
 
-    @patch('xmodule.video_module.transcripts_utils.get_video_ids_info')
+    @patch('xblock_video.transcripts_utils.get_video_ids_info')
     def test_export_no_video_ids(self, mock_get_video_ids_info):
         """
         Tests export when there is no video id. `export_to_xml` only works in case of video id.
@@ -2073,7 +2080,7 @@ class TestVideoWithBumper(TestVideo):
     # Use temporary FEATURES in this test without affecting the original
     FEATURES = dict(settings.FEATURES)
 
-    @patch('xmodule.video_module.bumper_utils.get_bumper_settings')
+    @patch('xblock_video.bumper_utils.get_bumper_settings')
     def test_is_bumper_enabled(self, get_bumper_settings):
         """
         Check that bumper is (not)shown if ENABLE_VIDEO_BUMPER is (False)True
@@ -2097,8 +2104,8 @@ class TestVideoWithBumper(TestVideo):
         with override_settings(FEATURES=self.FEATURES):
             self.assertFalse(bumper_utils.is_bumper_enabled(self.item_descriptor))
 
-    @patch('xmodule.video_module.bumper_utils.is_bumper_enabled')
-    @patch('xmodule.video_module.bumper_utils.get_bumper_settings')
+    @patch('xblock_video.bumper_utils.is_bumper_enabled')
+    @patch('xblock_video.bumper_utils.get_bumper_settings')
     @patch('edxval.api.get_urls_for_profiles')
     def test_bumper_metadata(self, get_url_for_profiles, get_bumper_settings, is_bumper_enabled):
         """

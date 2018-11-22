@@ -13,10 +13,10 @@ from opaque_keys.edx.locator import BlockUsageLocator
 from rest_framework import generics
 from rest_framework.response import Response
 
+from xblock_video.transcripts_utils import get_transcript
 from mobile_api.models import MobileApiConfig
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
-from xmodule.video_module.transcripts_utils import get_transcript
 
 from ..decorators import mobile_course_access, mobile_view
 from .serializers import BlockOutline, video_summary

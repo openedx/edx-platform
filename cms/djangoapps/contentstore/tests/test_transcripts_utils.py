@@ -16,13 +16,13 @@ from mock import Mock, patch
 from six import text_type
 
 from contentstore.tests.utils import mock_requests_get
+from xblock_video import transcripts_utils
 from student.tests.factories import UserFactory
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.video_module import transcripts_utils
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
@@ -233,7 +233,7 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
         good_youtube_sub = 'good_id_2'
         self.clear_sub_content(good_youtube_sub)
 
-        with patch('xmodule.video_module.transcripts_utils.requests.get') as mock_get:
+        with patch('xblock_video.transcripts_utils.requests.get') as mock_get:
             mock_get.return_value = Mock(status_code=200, text=response, content=response)
             # Check transcripts_utils.GetTranscriptsFromYouTubeException not thrown
             transcripts_utils.download_youtube_subs(good_youtube_sub, self.course, settings)
@@ -253,7 +253,7 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
         self.assertEqual(html5_ids[2], 'baz.1.4')
         self.assertEqual(html5_ids[3], 'foo')
 
-    @patch('xmodule.video_module.transcripts_utils.requests.get')
+    @patch('xblock_video.transcripts_utils.requests.get')
     def test_fail_downloading_subs(self, mock_get):
 
         mock_get.return_value = Mock(status_code=404, text='Error 404')
@@ -287,7 +287,7 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
 
         self.clear_sub_content(good_youtube_sub)
 
-    @patch('xmodule.video_module.transcripts_utils.requests.get')
+    @patch('xblock_video.transcripts_utils.requests.get')
     def test_get_transcript_name_youtube_server_success(self, mock_get):
         """
         Get transcript name from transcript_list fetch from youtube server api
@@ -306,7 +306,7 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
         transcript_name = transcripts_utils.youtube_video_transcript_name(youtube_text_api)
         self.assertEqual(transcript_name, 'Custom')
 
-    @patch('xmodule.video_module.transcripts_utils.requests.get')
+    @patch('xblock_video.transcripts_utils.requests.get')
     def test_get_transcript_name_youtube_server_no_transcripts(self, mock_get):
         """
         When there are no transcripts of video transcript name will be None
@@ -319,7 +319,7 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
         transcript_name = transcripts_utils.youtube_video_transcript_name(youtube_text_api)
         self.assertIsNone(transcript_name)
 
-    @patch('xmodule.video_module.transcripts_utils.requests.get')
+    @patch('xblock_video.transcripts_utils.requests.get')
     def test_get_transcript_name_youtube_server_language_not_exist(self, mock_get):
         """
         When the language does not exist in transcript_list transcript name will be None
@@ -338,7 +338,7 @@ class TestDownloadYoutubeSubs(TestYoutubeSubsBase):
         transcript_name = transcripts_utils.youtube_video_transcript_name(youtube_text_api)
         self.assertIsNone(transcript_name)
 
-    @patch('xmodule.video_module.transcripts_utils.requests.get', side_effect=mock_requests_get)
+    @patch('xblock_video.transcripts_utils.requests.get', side_effect=mock_requests_get)
     def test_downloading_subs_using_transcript_name(self, mock_get):
         """
         Download transcript using transcript name in url
@@ -518,14 +518,14 @@ class TestYoutubeTranscripts(unittest.TestCase):
     """
     Tests for checking right datastructure returning when using youtube api.
     """
-    @patch('xmodule.video_module.transcripts_utils.requests.get')
+    @patch('xblock_video.transcripts_utils.requests.get')
     def test_youtube_bad_status_code(self, mock_get):
         mock_get.return_value = Mock(status_code=404, text='test')
         youtube_id = 'bad_youtube_id'
         with self.assertRaises(transcripts_utils.GetTranscriptsFromYouTubeException):
             transcripts_utils.get_transcripts_from_youtube(youtube_id, settings, translation)
 
-    @patch('xmodule.video_module.transcripts_utils.requests.get')
+    @patch('xblock_video.transcripts_utils.requests.get')
     def test_youtube_empty_text(self, mock_get):
         mock_get.return_value = Mock(status_code=200, text='')
         youtube_id = 'bad_youtube_id'
@@ -547,7 +547,7 @@ class TestYoutubeTranscripts(unittest.TestCase):
             'text': ['Test text 1.', 'Test text 2.', 'Test text 3.']
         }
         youtube_id = 'good_youtube_id'
-        with patch('xmodule.video_module.transcripts_utils.requests.get') as mock_get:
+        with patch('xblock_video.transcripts_utils.requests.get') as mock_get:
             mock_get.return_value = Mock(status_code=200, text=response, content=response)
             transcripts = transcripts_utils.get_transcripts_from_youtube(youtube_id, settings, translation)
         self.assertEqual(transcripts, expected_transcripts)
@@ -898,7 +898,7 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         self.assertEqual(filename, 'ur_video_101.sjson')
         self.assertEqual(mimetype, self.sjson_mime_type)
 
-    @patch('xmodule.video_module.transcripts_utils.get_video_transcript_content')
+    @patch('xblock_video.transcripts_utils.get_video_transcript_content')
     def test_get_transcript_from_val(self, mock_get_video_transcript_content):
         """
         Verify that `get_transcript` function returns correct data when transcript is in val.
@@ -964,7 +964,7 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         transcripts_utils.TranscriptsGenerationException,
         UnicodeDecodeError('aliencodec', b'\x02\x01', 1, 2, 'alien codec found!')
     )
-    @patch('xmodule.video_module.transcripts_utils.Transcript')
+    @patch('xblock_video.transcripts_utils.Transcript')
     def test_get_transcript_val_exceptions(self, exception_to_raise, mock_Transcript):
         """
         Verify that `get_transcript_from_val` function raises `NotFoundError` when specified exceptions raised.
@@ -984,7 +984,7 @@ class TestGetTranscript(SharedModuleStoreTestCase):
         transcripts_utils.TranscriptsGenerationException,
         UnicodeDecodeError('aliencodec', b'\x02\x01', 1, 2, 'alien codec found!')
     )
-    @patch('xmodule.video_module.transcripts_utils.Transcript')
+    @patch('xblock_video.transcripts_utils.Transcript')
     def test_get_transcript_content_store_exceptions(self, exception_to_raise, mock_Transcript):
         """
         Verify that `get_transcript_from_contentstore` function raises `NotFoundError` when specified exceptions raised.

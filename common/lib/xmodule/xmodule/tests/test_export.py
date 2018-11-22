@@ -72,7 +72,7 @@ class RoundTripTestCase(unittest.TestCase):
         self.temp_dir = mkdtemp()
         self.addCleanup(shutil.rmtree, self.temp_dir)
 
-    @mock.patch('xmodule.video_module.video_module.edxval_api', None)
+    @mock.patch('xblock_video.xblock_video.video_module.edxval_api', None)
     @mock.patch('xmodule.course_module.requests.get')
     @ddt.data(
         u"toy",

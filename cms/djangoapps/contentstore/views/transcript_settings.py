@@ -21,11 +21,11 @@ from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
 from openedx.core.djangoapps.video_pipeline.api import update_3rd_party_transcription_service_credentials
+from xblock_video.transcripts_utils import Transcript, TranscriptsGenerationException
 from student.auth import has_studio_write_access
 from util.json_request import JsonResponse, expect_json
 
 from contentstore.views.videos import TranscriptProvider
-from xmodule.video_module.transcripts_utils import Transcript, TranscriptsGenerationException
 
 __all__ = [
     'transcript_credentials_handler',

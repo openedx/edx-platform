@@ -1425,6 +1425,44 @@ discussion_vendor_js = [
     'js/split.js'
 ]
 
+video_js = (
+    rooted_glob(COMMON_ROOT / 'static', 'js/video/time.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'js/video/00_component.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'js/video/00_video_storage.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'js/video/00_resizer.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'js/video/00_async_process.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'js/video/00_i18n.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'js/video/00_sjson.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'js/video/00_iterator.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'js/video/01_initialize.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'js/video/025_focus_grabber.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'js/video/02_html5_video.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'js/video/02_html5_hls_video.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'js/video/03_video_player.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'js/video/035_video_accessible_menu.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'js/video/04_video_control.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'js/video/04_video_full_screen.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'js/video/05_video_quality_control.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'js/video/06_video_progress_slider.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'js/video/07_video_volume_control.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'js/video/08_video_speed_control.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'js/video/08_video_auto_advance_control.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'js/video/09_video_caption.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'js/video/09_play_placeholder.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'js/video/09_play_pause_control.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'js/video/09_play_skip_control.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'js/video/09_skip_control.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'js/video/09_bumper.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'js/video/09_save_state_plugin.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'js/video/09_events_plugin.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'js/video/09_events_bumper_plugin.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'js/video/09_poster.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'js/video/09_completion.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'js/video/095_video_context_menu.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'js/video/10_commands.js') +
+    rooted_glob(COMMON_ROOT / 'static', 'js/video/10_main.js')
+)
+
 notes_js = ['js/notes.js']
 instructor_dash_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/instructor_dashboard/**/*.js'))
 
@@ -1581,6 +1619,13 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/discussion/inline-discussion-rtl.css',
     },
+    'style-video': {
+        'source_filenames': [
+            'common/css/video/display.css',
+            'common/css/video/accessible_menu.css',
+        ],
+        'output_filename': 'common/css/video.css',
+    },
     FOOTER_CSS['openedx']['ltr']: {
         'source_filenames': [
             'css/lms-footer.css',
@@ -1705,6 +1750,10 @@ PIPELINE_JS = {
     'discussion_vendor': {
         'source_filenames': discussion_vendor_js,
         'output_filename': 'js/discussion_vendor.js',
+    },
+    'video': {
+        'source_filenames': video_js,
+        'output_filename': 'js/video.js',
     },
     'notes': {
         'source_filenames': notes_js,
