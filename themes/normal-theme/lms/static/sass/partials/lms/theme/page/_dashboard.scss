@@ -170,19 +170,19 @@
     text-align: right;
   }
   .status-verification .status-title{
-    margin: 0 0 15px 0;
     color: #fa7f2b;
     font-size: 16px;
     display: block;
     text-align: left;
+    margin: 0 0 25px 0;
   }
   .status-verification .status-note{
     font-size: 14px;
     color: $font;
     line-height: 1.5;
-    margin-bottom: 30px;
     display: block;
     text-align: left;
+    padding: 0;
   }
   .status-verification a span{
     display: inline-block;
@@ -192,6 +192,12 @@
     border: 1px solid #fc801a;
     color: #fa7f2b;
     font-size: 14px;
+    margin-top: 30px;
     cursor: pointer;
+  }
+  .status-is-vip{
+    background: #f8fff6;
+    border: none;
+    box-shadow: 0px 1px 4px 0px #a2f5ad;
   }
 }
