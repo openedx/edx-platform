@@ -5,8 +5,11 @@
 ## MathJax configuration for Studio lives in
 ## cms/js/require-config.js.
 
+<%page args="disable_fast_preview=True" expression_filter="h"/>
 
-<%page args="disable_fast_preview=True"/>
+## Avoid loading mathjax if already loaded on the page
+
+%if context.get('load_mathjax', True):
 
 %if disable_fast_preview:
 <script type="text/javascript">
@@ -77,3 +80,4 @@
      It can't be run through static.url because MathJax uses crazy url introspection to do lazy loading of
      MathJax extension libraries -->
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_SVG"></script>
+%endif

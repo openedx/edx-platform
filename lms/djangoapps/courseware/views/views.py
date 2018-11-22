@@ -629,6 +629,10 @@ class CourseTabView(EdxFragmentView):
             'uses_pattern_library': not uses_bootstrap,
             'disable_courseware_js': True,
         }
+        # Avoid Multiple Mathjax loading on the 'user_profile'
+        if 'profile_page_context' in kwargs:
+            context['load_mathjax'] = kwargs['profile_page_context'].get('load_mathjax', True)
+
         context.update(
             get_experiment_user_metadata_context(
                 course,
