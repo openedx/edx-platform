@@ -45,7 +45,7 @@
   margin: 0;
 }
 
-.home .highlighted-courses .courses .course{
+.home .highlighted-courses .courses .course, .find-courses .courses-container .courses .course{
   border: 1px solid #e6e9ed;
   box-shadow: 0px 0px 2px 0px $border;
   margin-bottom: 0;
@@ -99,8 +99,6 @@
     background: none;
   }
 }
-
-
 
 
 
