@@ -774,6 +774,13 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/studio-main-v2-rtl.css',
     },
+    'style-video': {
+        'source_filenames': [
+            'common/css/video/display.css',
+            'common/css/video/accessible_menu.css',
+        ],
+        'output_filename': 'common/css/video.css',
+    },
     'style-xmodule-annotations': {
         'source_filenames': [
             'css/vendor/ova/annotator.css',
@@ -833,6 +840,10 @@ PIPELINE_JS = {
         ),
         'output_filename': 'js/cms-modules.js',
         'test_order': 1
+    },
+    'video': {
+        'source_filenames': lms.envs.common.video_js,
+        'output_filename': 'js/video.js',
     },
 }
 
