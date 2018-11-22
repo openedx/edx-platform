@@ -7119,7 +7119,7 @@ msgstr "选课数据现已可通过{dashboard_link}查看。"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Membership"
-msgstr "会员资格"
+msgstr "VIP会员"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Cohorts"
