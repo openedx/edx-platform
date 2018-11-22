@@ -319,16 +319,15 @@ from student.models import CourseEnrollment
               % if is_vip:
                 <div class="user-info">
                   <ul>
-                    <li class="status status-verification">
-                      <span class="title status-title"></span>
-                      <p class="status-note">会员截止日期至 ${vip_expired_at}</p>
+                    <li class="status status-verification status-is-vip">
+                      <p class="status-note">会员有效期到 ${vip_expired_at.strftime('%Y-%m-%d %H:%M')}</p>
                     </li>
                   </ul>
                 </div>
               % else:
                 <div class="user-info">
                   <ul>
-                    <li class="status status-verification">
+                    <li class="status status-verification status-is-vip">
                       <span class="title status-title">订阅期满，请及时充值</span>
                       <p class="status-note">您好，您购买的英荔商学院 VIP 会员已到期，为了不影响您的学习进度，请及时充值</p>
                         <a href="${vip_purchase_url}">

@@ -67,8 +67,11 @@ from django.conf import settings
       </div>
     % endif
     % if settings.FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION'):
+        <%
+        from membership.models import VIPInfo
+        %>
         <div class="mobile-nav-item hidden-mobile nav-item nav-tab">
-          <a class="${'active ' if reverse('membership') in request.path else ''}tab-nav-link" href="${reverse('membership')}">
+          <a class="${'active ' if reverse('membership') in request.path else ''}tab-nav-link" href="${reverse('membership_card') if VIPInfo.get_vipinfo_for_user(request.user) else reverse('membership')}">
             ${_("Membership")}
           </a>
         </div>
