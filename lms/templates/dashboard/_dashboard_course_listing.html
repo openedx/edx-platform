@@ -6,6 +6,7 @@ import urllib
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
 from django.urls import reverse
+from django.conf import settings
 from course_modes.models import CourseMode
 from course_modes.helpers import enrollment_mode_display
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
@@ -311,7 +312,7 @@ from membership.models import VIPCourseEnrollment
             ## as these are the only actions currently available
             % if entitlement and (can_refund_entitlement or show_email_settings):
                 <%include file='_dashboard_entitlement_actions.html' args='course_overview=course_overview,entitlement=entitlement,dashboard_index=dashboard_index, can_refund_entitlement=can_refund_entitlement, show_email_settings=show_email_settings'/>
-            % elif not entitlement:
+            % elif not entitlement and not settings.FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION', False):
                 <div class="wrapper-action-more" data-course-key="${enrollment.course_id}">
                   <button type="button" class="action action-more" id="actions-dropdown-link-${dashboard_index}" aria-haspopup="true" aria-expanded="false" aria-controls="actions-dropdown-${dashboard_index}" data-course-number="${course_overview.number}" data-course-name="${course_overview.display_name_with_default}" data-dashboard-index="${dashboard_index}">
                     <span class="sr">${_('Course options for')}</span>
