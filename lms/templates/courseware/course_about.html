@@ -111,6 +111,8 @@ from six import string_types
 
   <%block name="course_about_header">
   <header class="course-profile">
+    <input type="hidden" id="is_vip" value="${is_vip}"/>
+    <input type="hidden" id="vip_expire_at" value="${vip_expire_at}"/>
     <div class="intro-inner-wrapper">
       <div class="table">
       <section class="intro">
@@ -202,7 +204,7 @@ from six import string_types
               href_class = "register"
             %>
             <a href="${reg_href}" class="${href_class}" data-is-subscribe-pay="${is_subscribe_pay}">
-              ${_("Enroll in {course_name} free buy").format(course_name=course.display_number_with_default) | h}
+              ${_("VIP会员免费加入{course_name}").format(course_name=course.display_number_with_default) | h}
             </a>
           %else:
             <%

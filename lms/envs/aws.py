@@ -1113,6 +1113,9 @@ derive_settings(__name__)
 
 logging.warn('DEPRECATION WARNING: aws.py has been deprecated, you should use production.py instead.')
 
+ALIPAY_INFO = AUTH_TOKENS['ALIPAY_INFO']
+WECHAT_PAY_INFO = AUTH_TOKENS['WECHAT_PAY_INFO']
+
 if FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION', False):
     INSTALLED_APPS.append('membership')
     REST_FRAMEWORK.update({'EXCEPTION_HANDLER': 'membership.utils.customer_exception_handler'})

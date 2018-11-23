@@ -8,6 +8,7 @@ from django.template.loader import render_to_string
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.conf import settings
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from web_fragments.fragment import Fragment
 
@@ -21,7 +22,6 @@ from lms.djangoapps.course_goals.api import (
     get_goal_api_url,
     has_course_goal_permission
 )
-from membership.models import VIPInfo
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.courseware.views.views import CourseTabView
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
@@ -116,7 +116,10 @@ class CourseHomeFragmentView(EdxFragmentView):
         # Render the full content to enrolled users, as well as to course and global staff.
         # Unenrolled users who are not course or global staff are given only a subset.
         enrollment = CourseEnrollment.get_enrollment(request.user, course_key)
-        can_view_course = VIPInfo.can_view_course(request.user, course_key)
+        can_view_course = True
+        if settings.FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION', False):
+            from membership.models import VIPInfo
+            can_view_course = VIPInfo.can_view_course(request.user, course_key)
         user_access = {
             'is_anonymous': request.user.is_anonymous,
             'is_enrolled': enrollment and can_view_course,
