@@ -23,7 +23,6 @@ class VideoXBlock(
         VideoFields,
         VideoMixin,
         VideoDescriptor,
-        # TODO TabsEditingDescriptor, EmptyDataRawDescriptor
         VideoTranscriptsMixin,
         VideoStudentViewHandlers,
         VideoStudioViewHandlers,
