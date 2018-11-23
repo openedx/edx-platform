@@ -51,7 +51,7 @@ def get_course_cards(request):
             source_course_key=course.id, action="rerun", state="succeeded")]
 
         course_rerun_object = CourseOverview.objects.select_related('image_set').filter(
-            id__in=course_rerun_states, enrollment_end__gte=current_time).order_by('start').first()
+            id__in=course_rerun_states, enrollment_end__gte=current_time).order_by('enrollment_start').first()
 
         course = get_course_with_link_and_start_date(course, course_rerun_object, request)
         
@@ -76,7 +76,7 @@ def get_course_with_link_and_start_date(course, course_rerun_object, request):
     if user_current_enrolled_class:
         course.is_enrolled = True
         course.course_target = current_enrolled_class_target
-        course.start_date = course.start.strftime(date_time_format)
+        course.start_date = current_class.start.strftime(date_time_format)
         return course
 
     course_start_time = get_course_start_date(course)
@@ -95,7 +95,7 @@ def get_course_with_link_and_start_date(course, course_rerun_object, request):
             return course
 
     if current_class:
-        course.start_date = course.start.strftime(date_time_format)
+        course.start_date = current_class.start.strftime(date_time_format)
         return course
 
     course.start_date = None
