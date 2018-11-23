@@ -1466,7 +1466,7 @@ class JsonInitDataTest(ModuleStoreTestCase):
 
     @ddt.data(
         ({'a': 17}, '''{"a": 17}'''),
-        ({'xss': '</script>alert("XSS")'}, r'''{"xss": "<\/script>alert(\"XSS\")"}'''),
+        ({'xss': '</script>alert("XSS")'}, r'''{"xss": "\u003c/script\u003ealert(\"XSS\")"}'''),
     )
     @ddt.unpack
     @XBlock.register_temp_plugin(XBlockWithJsonInitData, identifier='withjson')
