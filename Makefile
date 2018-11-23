@@ -34,6 +34,9 @@ pull_translations: ## pull translations from Transifex
 	git clean -fdX conf/locale/eo
 	i18n_tool validate
 
+detect_changed_source_translations: ## check if translation files are up-to-date
+	i18n_tool changed
+
 requirements: ## install development environment requirements
 	pip install -qr requirements/edx/development.txt --exists-action w
 
