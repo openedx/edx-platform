@@ -1621,8 +1621,7 @@ PIPELINE_CSS = {
     },
     'style-video': {
         'source_filenames': [
-            'common/css/video/display.css',
-            'common/css/video/accessible_menu.css',
+            'common/css/video.css',
         ],
         'output_filename': 'common/css/video.css',
     },
