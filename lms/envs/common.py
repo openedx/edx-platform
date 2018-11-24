@@ -399,6 +399,9 @@ FEATURES = {
 
     # Whether to enable payments
     'ENABLE_PAYMENTS_INTEGRATION': False,
+
+    # Whether to enable course unenroll
+    'ENABLE_COURSE_UNENROLL': False
 }
 
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews
