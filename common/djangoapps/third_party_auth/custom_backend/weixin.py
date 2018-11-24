@@ -7,8 +7,8 @@ Weixin OAuth2 backend
 import urllib
 from requests import HTTPError
 
-from .oauth import BaseOAuth2
-from ..exceptions import AuthCanceled, AuthUnknownError
+from social_core.backends.oauth import BaseOAuth2
+from social_core.exceptions import AuthCanceled, AuthUnknownError
 
 
 class WeixinOAuth2(BaseOAuth2):
