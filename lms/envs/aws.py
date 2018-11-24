@@ -1120,3 +1120,6 @@ if FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION', False):
     INSTALLED_APPS.append('membership')
     REST_FRAMEWORK.update({'EXCEPTION_HANDLER': 'membership.utils.customer_exception_handler'})
 
+############## Settings for python-social-auth ######################
+SOCIAL_AUTH_TRAILING_SLASH = ENV_TOKENS.get('SOCIAL_AUTH_TRAILING_SLASH', False)
+
