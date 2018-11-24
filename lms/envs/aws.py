@@ -1122,3 +1122,4 @@ if FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION', False):
 
 ############## Settings for python-social-auth ######################
 SOCIAL_AUTH_TRAILING_SLASH = ENV_TOKENS.get('SOCIAL_AUTH_TRAILING_SLASH', False)
+
