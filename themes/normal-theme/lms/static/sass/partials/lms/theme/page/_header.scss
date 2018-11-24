@@ -16,9 +16,6 @@
   .header-logo a .logo{
     height: 34px;
   }
-  .course-header{
-    display: none;
-  }
 }
 
 
@@ -37,15 +34,31 @@
 
 
 @media screen and (min-width: 992px){ 
-  .global-header .nav-links .secondary{ 
+  .window-wrap .global-header .nav-links .secondary{ 
     margin: 8px 0 0;
 
     .user-image-frame{
       border: none;
     }
+    .nav-item{
+      padding: 5px 0 0 0;
+    }
 
     .nav-item.nav-item-dropdown {
       position: relative;
+    }
+
+    a.register-btn{
+      @extend %btn-my-white;
+    }
+    a.register-btn:hover{
+      @extend %btn-my-white;
+    }
+    a.sign-in-btn{
+      @extend %btn-my-primary;
+    }
+    a.sign-in-btn:hover{
+      @extend %btn-my-primary-hover;
     }
   } 
 
@@ -70,6 +83,7 @@
   .global-header .nav-links .secondary .toggle-user-dropdown{
     outline: none;
   }
+
 }
 
 //查看课程的导航

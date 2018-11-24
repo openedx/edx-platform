@@ -1,0 +1,66 @@
+// button样式
+// 底色蓝，字体白按钮
+%btn-my-primary{
+  display: inline-block;
+  width: auto;
+  padding: 0 20px;
+  font-size: 14px;
+  letter-spacing: 0.3px;
+  height: 38px;
+  line-height: 38px;
+  border-radius: 3px;
+  font-weight: normal;
+  cursor: pointer;
+
+  border: none;
+  background: $blue;
+  color: #fff;
+}
+
+%btn-my-primary-hover{
+  background: $blue;
+  text-decoration: none;
+  opacity: 0.95;
+}
+
+// 底色白，字体蓝
+%btn-my-white{
+  display: inline-block;
+  width: auto;
+  padding: 0 20px;
+  font-size: 14px;
+  letter-spacing: 0.3px;
+  height: 38px;
+  line-height: 38px;
+  border-radius: 3px;
+  cursor: pointer;
+
+  background: #fff;
+  color: $blue;
+  border: 1px solid $blue;
+}
+
+%btn-my-white-hover{
+  background: #f7fbfe;
+  color: $blue;
+  text-decoration: none;
+}
+
+// 底色灰，字体深灰，不可点击按钮
+%btn-my-disable{
+  display: inline-block;
+  width: auto;
+  padding: 0 20px;
+  font-size: 14px;
+  letter-spacing: 0.3px;
+  height: 38px;
+  line-height: 38px;
+  border-radius: 3px;
+
+  border: none;
+  background: #f5f7fa;
+  color: #aab2bd;
+  border: 1px solid #e6e9ed;
+  cursor: not-allowed;
+}
+
