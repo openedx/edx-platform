@@ -34,7 +34,7 @@ except ImportError:
 
 # HACK: This shouldn't be hard-coded to two types
 # OBSOLETE: This obsoletes 'type'
-class_priority = ['video', 'problem']
+class_priority = ['interactive', 'wistia', 'video', 'problem']
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
@@ -492,7 +492,8 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                 'id': text_type(usage_id),
                 'bookmarked': is_bookmarked,
                 'path': " > ".join(display_names + [item.display_name_with_default]),
-                'graded': item.graded
+                'graded': item.graded,
+                'icon': item.icon,
             }
 
             if is_user_authenticated:

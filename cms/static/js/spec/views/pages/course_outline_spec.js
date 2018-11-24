@@ -270,7 +270,7 @@ describe('CourseOutlinePage', function() {
             'staff-lock-editor', 'unit-access-editor', 'content-visibility-editor',
             'settings-modal-tabs', 'timed-examination-preference-editor', 'access-editor',
             'show-correctness-editor', 'highlights-editor', 'highlights-enable-editor',
-            'course-highlights-enable'
+            'course-highlights-enable', 'icon-editor'
         ]);
         appendSetFixtures(mockOutlinePage);
         mockCourseJSON = createMockCourseJSON({}, [
