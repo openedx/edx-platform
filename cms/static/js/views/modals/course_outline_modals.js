@@ -15,7 +15,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
     'use strict';
     var CourseOutlineXBlockModal, SettingsXBlockModal, PublishXBlockModal, HighlightsXBlockModal,
         AbstractEditor, BaseDateEditor,
-        ReleaseDateEditor, DueDateEditor, GradingEditor, PublishEditor, AbstractVisibilityEditor,
+        ReleaseDateEditor, DueDateEditor, IconEditor, GradingEditor, PublishEditor, AbstractVisibilityEditor,
         StaffLockEditor, UnitAccessEditor, ContentVisibilityEditor, TimedExaminationPreferenceEditor,
         AccessEditor, ShowCorrectnessEditor, HighlightsEditor, HighlightsEnableXBlockModal, HighlightsEnableEditor;
 
@@ -370,6 +370,29 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             };
         }
     });
+
+    IconEditor = BaseDateEditor.extend({
+        fieldName: 'icon',
+        templateName: 'icon-editor',
+
+        hasChanges: function() {
+            return this.model.get("icon") != parseInt(this.$('#icon').val());
+        },
+
+        getValue: function () {
+            return (parseInt(this.$('#icon').val()));
+        },
+
+        getRequestData: function () {
+            return this.hasChanges() ? {
+                publish: 'republish',
+                metadata: {
+                    'icon': this.getValue()
+                }
+            } : {};
+        }
+    });
+
 
     ReleaseDateEditor = BaseDateEditor.extend({
         fieldName: 'start',
@@ -1049,9 +1072,23 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 displayName: gettext('Advanced'),
                 editors: []
             };
-            if (xblockInfo.isVertical()) {
-                editors = [StaffLockEditor, UnitAccessEditor];
-            } else {
+
+		    var special_exam_editors = [];
+            if (xblockInfo.isChapter()) {
+                editors = [ReleaseDateEditor, StaffLockEditor];
+            } else if (xblockInfo.isSequential()) {
+                editors = [ReleaseDateEditor, GradingEditor, DueDateEditor];
+
+                var enable_special_exams = (options.enable_proctored_exams || options.enable_timed_exams);
+                if (enable_special_exams) {
+                    special_exam_editors.push(TimedExaminationPreferenceEditor);
+                }
+
+                editors.push(StaffLockEditor);
+
+            } else if (xblockInfo.isVertical()) {
+                editors = [StaffLockEditor, UnitAccessEditor, IconEditor];
+		    } else {
                 tabs = [
                     {
                         name: 'basic',

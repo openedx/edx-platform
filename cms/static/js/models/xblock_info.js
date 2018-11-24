@@ -54,6 +54,10 @@ function(Backbone, _, str, ModuleUtils) {
              */
             has_children: null,
             /**
+             * Meta icon of the unit.
+             */
+            icons: null,
+            /**
              * True if the xblock has changes.
              * Note: this is not always provided as a performance optimization. It is only provided for
              * verticals functioning as units.
