@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-11-18 20:37+0000\n"
-"PO-Revision-Date: 2018-11-18 20:37:46.103730\n"
+"POT-Creation-Date: 2018-11-25 20:37+0000\n"
+"PO-Revision-Date: 2018-11-25 20:37:03.590754\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -73,7 +73,6 @@ msgstr ""
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: cms/templates/course_outline.html lms/templates/seq_module.html
 #: lms/templates/ccx/schedule.html
-#: lms/templates/courseware/writable_gradebook.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Section"
 msgstr ""
@@ -5125,7 +5124,6 @@ msgid "Grade"
 msgstr ""
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/templates/courseware/writable_gradebook.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Percent"
 msgstr ""
@@ -10646,6 +10644,54 @@ msgid ""
 "{register_link}, and enroll in this course."
 msgstr ""
 
+#: openedx/features/content_type_gating/admin.py
+#: openedx/features/course_duration_limits/admin.py
+msgid ""
+"These define the context to enable course duration limits on. If no values "
+"are set, then the configuration applies globally. If a single value is set, "
+"then the configuration applies to all courses within that context. At most "
+"one value can be set at a time.<br>If multiple contexts apply to a course "
+"(for example, if configuration is specified for the course specifically, and"
+" for the org that the course is in, then the more specific context overrides"
+" the more general context."
+msgstr ""
+
+#: openedx/features/content_type_gating/admin.py
+#: openedx/features/course_duration_limits/admin.py
+msgid ""
+"If any of these values is left empty or \"Unknown\", then their value at "
+"runtime will be retrieved from the next most specific context that applies. "
+"For example, if \"Enabled\" is left as \"Unknown\" in the course context, "
+"then that course will be Enabled only if the org that it is in is Enabled."
+msgstr ""
+
+#: openedx/features/content_type_gating/models.py
+#: openedx/features/course_duration_limits/models.py
+msgid "Enabled As Of"
+msgstr ""
+
+#: openedx/features/content_type_gating/models.py
+#: openedx/features/course_duration_limits/models.py
+msgid ""
+"If the configuration is Enabled, then all enrollments created after this "
+"date (UTC) will be affected."
+msgstr ""
+
+#: openedx/features/content_type_gating/models.py
+msgid "Studio Override Enabled"
+msgstr ""
+
+#: openedx/features/content_type_gating/models.py
+msgid ""
+"Allow Feature Based Enrollment visibility to be overriden on a per-component"
+" basis in Studio."
+msgstr ""
+
+#: openedx/features/content_type_gating/models.py
+#: openedx/features/course_duration_limits/models.py
+msgid "enabled_as_of must be set when enabled is True"
+msgstr ""
+
 #: openedx/features/content_type_gating/partitions.py
 msgid "Feature-based Enrollments"
 msgstr ""
@@ -13994,7 +14040,6 @@ msgstr ""
 
 #: lms/templates/ccx/coach_dashboard.html
 #: lms/templates/ccx/grading_policy.html
-#: lms/templates/courseware/writable_gradebook.html
 msgid "Grading Policy"
 msgstr ""
 
@@ -14684,7 +14729,6 @@ msgid "Your score is {current_score}%. You have passed the entrance exam."
 msgstr ""
 
 #: lms/templates/courseware/gradebook.html
-#: lms/templates/courseware/writable_gradebook.html
 msgid "Gradebook"
 msgstr ""
 
@@ -15003,30 +15047,6 @@ msgstr ""
 msgid ""
 "You were most recently in {section_link}.  If you're done with that, choose "
 "another section on the left."
-msgstr ""
-
-#: lms/templates/courseware/writable_gradebook.html
-msgid "Score View:"
-msgstr ""
-
-#: lms/templates/courseware/writable_gradebook.html
-msgid "Absolute"
-msgstr ""
-
-#: lms/templates/courseware/writable_gradebook.html
-msgid "Download Grade Report"
-msgstr ""
-
-#: lms/templates/courseware/writable_gradebook.html
-msgid "Fetching gradebook data"
-msgstr ""
-
-#: lms/templates/courseware/writable_gradebook.html
-msgid "No matching records found"
-msgstr ""
-
-#: lms/templates/courseware/writable_gradebook.html
-msgid "There are no students enrolled in this course."
 msgstr ""
 
 #: lms/templates/credit_notifications/credit_eligibility_email.html
