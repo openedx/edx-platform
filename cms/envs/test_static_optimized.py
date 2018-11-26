@@ -23,6 +23,18 @@ DATABASES = {
 
 }
 
+PROCTORING_BACKENDS = {
+    'DEFAULT': 'mock',
+    'mock': {
+        'default_config': {
+            'allow_snarfing': True,
+            'allow_grok': False,
+        }
+    },
+    'mock_proctoring_without_rules': {},
+}
+
+
 ######################### PIPELINE ####################################
 
 # Use RequireJS optimized storage

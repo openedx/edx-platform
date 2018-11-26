@@ -35,6 +35,16 @@ XQUEUE_INTERFACE = {
     "basic_auth": ('anant', 'agarwal'),
 }
 
+PROCTORING_BACKENDS = {
+    'DEFAULT': 'mock',
+    'mock': {
+        'default_config': {
+            'allow_snarfing': True,
+            'allow_grok': False,
+        }
+    },
+    'mock_proctoring_without_rules': {},
+}
 
 ######################### PIPELINE ####################################
 
