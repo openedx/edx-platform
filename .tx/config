@@ -1,55 +1,55 @@
 [main]
 host = https://www.transifex.com
 
-[edx-platform.django-partial]
+[elitemba.django-partial]
 file_filter = conf/locale/<lang>/LC_MESSAGES/django-partial.po
 source_file = conf/locale/en/LC_MESSAGES/django-partial.po
 source_lang = en
 type = PO
 
-[edx-platform.django-studio]
+[elitemba.django-studio]
 file_filter = conf/locale/<lang>/LC_MESSAGES/django-studio.po
 source_file = conf/locale/en/LC_MESSAGES/django-studio.po
 source_lang = en
 type = PO
 
-[edx-platform.djangojs-partial]
+[elitemba.djangojs-partial]
 file_filter = conf/locale/<lang>/LC_MESSAGES/djangojs-partial.po
 source_file = conf/locale/en/LC_MESSAGES/djangojs-partial.po
 source_lang = en
 type = PO
 
-[edx-platform.djangojs-studio]
+[elitemba.djangojs-studio]
 file_filter = conf/locale/<lang>/LC_MESSAGES/djangojs-studio.po
 source_file = conf/locale/en/LC_MESSAGES/djangojs-studio.po
 source_lang = en
 type = PO
 
-[edx-platform.mako]
+[elitemba.mako]
 file_filter = conf/locale/<lang>/LC_MESSAGES/mako.po
 source_file = conf/locale/en/LC_MESSAGES/mako.po
 source_lang = en
 type = PO
 
-[edx-platform.mako-studio]
+[elitemba.mako-studio]
 file_filter = conf/locale/<lang>/LC_MESSAGES/mako-studio.po
 source_file = conf/locale/en/LC_MESSAGES/mako-studio.po
 source_lang = en
 type = PO
 
-[edx-platform.underscore]
+[elitemba.underscore]
 file_filter = conf/locale/<lang>/LC_MESSAGES/underscore.po
 source_file = conf/locale/en/LC_MESSAGES/underscore.po
 source_lang = en
 type = PO
 
-[edx-platform.underscore-studio]
+[elitemba.underscore-studio]
 file_filter = conf/locale/<lang>/LC_MESSAGES/underscore-studio.po
 source_file = conf/locale/en/LC_MESSAGES/underscore-studio.po
 source_lang = en
 type = PO
 
-[edx-platform.wiki]
+[elitemba.wiki]
 file_filter = conf/locale/<lang>/LC_MESSAGES/wiki.po
 source_file = conf/locale/en/LC_MESSAGES/wiki.po
 source_lang = en
