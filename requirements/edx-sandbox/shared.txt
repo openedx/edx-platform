@@ -10,7 +10,11 @@
 -e file:///edx/app/edxapp/edx-platform/common/lib/symmath
 asn1crypto==0.24.0        # via cryptography
 cffi==1.11.5              # via cryptography
+<<<<<<< HEAD
 cryptography==2.4.1
+=======
+cryptography==2.4.2
+>>>>>>> make upgrade
 enum34==1.1.6             # via cryptography
 idna==2.7                 # via cryptography
 ipaddress==1.0.22         # via cryptography

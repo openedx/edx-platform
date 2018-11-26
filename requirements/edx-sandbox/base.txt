@@ -4,14 +4,18 @@
 #
 #    make upgrade
 #
--e file:///edx/app/edxapp/edx-platform/common/lib/calc
--e file:///edx/app/edxapp/edx-platform/common/lib/chem
--e file:///edx/app/edxapp/edx-platform/common/lib/sandbox-packages
--e file:///edx/app/edxapp/edx-platform/common/lib/symmath
+common/lib/calc
+common/lib/chem
+common/lib/sandbox-packages
+common/lib/symmath
 asn1crypto==0.24.0
 backports-abc==0.5        # via tornado
 cffi==1.11.5
+<<<<<<< HEAD
 cryptography==2.4.1
+=======
+cryptography==2.4.2
+>>>>>>> make upgrade
 enum34==1.1.6
 futures==3.2.0            # via tornado
 idna==2.7
