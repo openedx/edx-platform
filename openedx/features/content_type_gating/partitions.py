@@ -98,7 +98,7 @@ class ContentTypeGatingPartition(UserPartition):
 
     def access_denied_message(self, block, user, user_group, allowed_groups):
         if self._is_audit_enrollment(user, block):
-            return "Graded assessments are available to Verified Track learners. Upgrade to Unlock."
+            return _(u"Graded assessments are available to Verified Track learners. Upgrade to Unlock.")
         return None
 
     def _is_audit_enrollment(self, user, block):
