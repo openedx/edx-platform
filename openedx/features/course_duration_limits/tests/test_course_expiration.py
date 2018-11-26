@@ -9,6 +9,7 @@ import mock
 
 from course_modes.models import CourseMode
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date, MIN_DURATION, MAX_DURATION
+from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -24,6 +25,9 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
             start=now() - timedelta(weeks=10),
         )
         self.user = UserFactory()
+
+        # Make this a verified course so we can test expiration date
+        add_course_mode(self.course, upgrade_deadline_expired=False)
 
     def tearDown(self):
         CourseEnrollment.unenroll(self.user, self.course.id)
@@ -79,6 +83,10 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         past_course = CourseFactory(start=start_date)
         enrollment = CourseEnrollment.enroll(self.user, past_course.id, CourseMode.AUDIT)
         result = get_user_course_expiration_date(self.user, past_course)
+        self.assertEqual(result, None)
+
+        add_course_mode(past_course, upgrade_deadline_expired=False)
+        result = get_user_course_expiration_date(self.user, past_course)
         content_availability_date = enrollment.created
         self.assertEqual(result, content_availability_date + access_duration)
 
@@ -86,6 +94,10 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         start_date = now() + timedelta(weeks=10)
         future_course = CourseFactory(start=start_date)
         enrollment = CourseEnrollment.enroll(self.user, future_course.id, CourseMode.AUDIT)
+        result = get_user_course_expiration_date(self.user, future_course)
+        self.assertEqual(result, None)
+
+        add_course_mode(future_course, upgrade_deadline_expired=False)
         result = get_user_course_expiration_date(self.user, future_course)
         content_availability_date = start_date
         self.assertEqual(result, content_availability_date + access_duration)

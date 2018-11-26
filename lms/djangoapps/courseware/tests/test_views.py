@@ -60,6 +60,7 @@ from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.api import set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNamespace
+
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
 from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.gating import api as gating_api
@@ -67,6 +68,7 @@ from openedx.core.lib.tests import attr
 from openedx.core.lib.url_utils import quote_slashes
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
+from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from openedx.features.course_experience import (
     COURSE_OUTLINE_PAGE_FLAG,
@@ -1669,6 +1671,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=date(2018, 1, 1))
         user = UserFactory.create()
         self.assertTrue(self.client.login(username=user.username, password='test'))
+        add_course_mode(self.course, upgrade_deadline_expired=False)
         CourseEnrollmentFactory(user=user, course_id=self.course.id, mode=course_mode)
 
         response = self._get_progress_page()
@@ -2714,6 +2717,7 @@ class TestIndexViewWithCourseDurationLimits(ModuleStoreTestCase):
         """
         CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=date(2018, 1, 1))
         self.assertTrue(self.client.login(username=self.user.username, password='test'))
+        add_course_mode(self.course, upgrade_deadline_expired=False)
         response = self.client.get(
             reverse(
                 'courseware_section',
@@ -2734,6 +2738,7 @@ class TestIndexViewWithCourseDurationLimits(ModuleStoreTestCase):
         """
         CourseDurationLimitConfig.objects.create(enabled=False)
         self.assertTrue(self.client.login(username=self.user.username, password='test'))
+        add_course_mode(self.course, upgrade_deadline_expired=False)
         response = self.client.get(
             reverse(
                 'courseware_section',

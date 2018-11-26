@@ -9,6 +9,7 @@ from django.apps import apps
 from django.utils import timezone
 from django.utils.translation import ugettext as _
 
+from course_modes.models import CourseMode
 from util.date_utils import DEFAULT_SHORT_DATE_FORMAT, strftime_localized
 from lms.djangoapps.courseware.access_response import AccessError
 from lms.djangoapps.courseware.access_utils import ACCESS_GRANTED
@@ -59,6 +60,9 @@ def get_user_course_expiration_date(user, course):
     """
 
     access_duration = MIN_DURATION
+
+    if not CourseMode.verified_mode_for_course(course.id):
+        return None
 
     CourseEnrollment = apps.get_model('student.CourseEnrollment')
     enrollment = CourseEnrollment.get_enrollment(user, course.id)

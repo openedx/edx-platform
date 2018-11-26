@@ -32,6 +32,7 @@ from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangoapps.user_authn.cookies import _get_user_info_cookie_data
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
+from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from student.helpers import DISABLE_UNENROLL_CERT_STATES
 from student.models import CourseEnrollment, UserProfile
 from student.signals import REFUND_ORDER
@@ -733,6 +734,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         self.override_waffle_switch(True)
 
         course = CourseFactory.create(start=self.THREE_YEARS_AGO)
+        add_course_mode(course, upgrade_deadline_expired=False)
         enrollment = CourseEnrollmentFactory.create(
             user=self.user,
             course_id=course.id
