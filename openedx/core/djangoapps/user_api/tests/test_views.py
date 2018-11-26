@@ -673,7 +673,7 @@ class LoginSessionViewTest(UserAPITestCase):
 
         # Verify that the session expiration was set correctly
         cookie = self.client.cookies[settings.SESSION_COOKIE_NAME]
-        expected_expiry = datetime.datetime.now() + datetime.timedelta(weeks=4)
+        expected_expiry = datetime.datetime.utcnow() + datetime.timedelta(weeks=4)
         self.assertIn(expected_expiry.strftime('%d-%b-%Y'), cookie.get('expires'))
 
     def test_invalid_credentials(self):

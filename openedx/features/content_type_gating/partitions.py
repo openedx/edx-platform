@@ -124,6 +124,8 @@ class ContentTypeGatingPartitionScheme(object):
     LIMITED_ACCESS = Group(CONTENT_TYPE_GATE_GROUP_IDS['limited_access'], 'Limited-access Users')
     FULL_ACCESS = Group(CONTENT_TYPE_GATE_GROUP_IDS['full_access'], 'Full-access Users')
 
+    read_only = True
+
     @classmethod
     def get_group_for_user(cls, course_key, user, user_partition, **kwargs):  # pylint: disable=unused-argument
         """

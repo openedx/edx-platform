@@ -49,21 +49,13 @@ class EnrollmentTrackUserPartition(UserPartition):
             for mode in CourseMode.modes_for_course(course_key, include_expired=True)
         ]
 
-    def from_json(self):
-        """
-        Because this partition is dynamic, `from_json` is not supported.
-        `to_json` is supported, but shouldn't be used to persist this partition
-        within the course itself (used by Studio for sending data to front-end code)
-
-        Calling this method will raise a TypeError.
-        """
-        raise TypeError("Because EnrollmentTrackUserPartition is a dynamic partition, 'from_json' is not supported.")
-
 
 class EnrollmentTrackPartitionScheme(object):
     """
     This scheme uses learner enrollment tracks to map learners into partition groups.
     """
+
+    read_only = True
 
     @classmethod
     def get_group_for_user(cls, course_key, user, user_partition, **kwargs):  # pylint: disable=unused-argument
