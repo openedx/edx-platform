@@ -11,8 +11,24 @@ import ddt
 import mock
 
 from course_modes.models import CourseMode
+from django_comment_client.tests.factories import RoleFactory
+from django_comment_common.models import (
+    FORUM_ROLE_ADMINISTRATOR,
+    FORUM_ROLE_MODERATOR,
+    FORUM_ROLE_GROUP_MODERATOR,
+    FORUM_ROLE_COMMUNITY_TA
+)
 from experiments.models import ExperimentData
+from lms.djangoapps.courseware.tests.factories import (
+    InstructorFactory,
+    StaffFactory,
+    BetaTesterFactory,
+    OrgStaffFactory,
+    OrgInstructorFactory,
+    GlobalStaffFactory,
+)
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.features.content_type_gating.partitions import CONTENT_GATING_PARTITION_ID, CONTENT_TYPE_GATE_GROUP_IDS
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date, MIN_DURATION, MAX_DURATION
 from openedx.features.course_duration_limits.config import EXPERIMENT_ID, EXPERIMENT_DATA_HOLDBACK_KEY
@@ -20,7 +36,7 @@ from openedx.features.course_experience.tests.views.helpers import add_course_mo
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from student.models import CourseEnrollment
 from student.roles import CourseInstructorRole
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from student.tests.factories import UserFactory, CourseEnrollmentFactory, TEST_PASSWORD
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -35,6 +51,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
             start=now() - timedelta(weeks=10),
         )
         self.user = UserFactory()
+        self.THREE_YEARS_AGO = now() - timedelta(days=(365 * 3))
 
         # Make this a verified course so we can test expiration date
         add_course_mode(self.course, upgrade_deadline_expired=False)
@@ -264,5 +281,105 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         response = self.client.get(course_home_url, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertItemsEqual(response.redirect_chain, [])
-        banner_text = 'This learner would not have access to this course. Their access expired on'
+        banner_text = 'This learner does not have access to this course. Their access expired on'
         self.assertIn(banner_text, response.content)
+
+    @mock.patch("openedx.features.course_duration_limits.access.get_course_run_details")
+    @ddt.data(
+        InstructorFactory,
+        StaffFactory,
+        BetaTesterFactory,
+        OrgStaffFactory,
+        OrgInstructorFactory,
+        GlobalStaffFactory,
+    )
+    def test_no_banner_when_masquerading_as_staff(self, role_factory, mock_get_course_run_details):
+        """
+        When masquerading as a specific expired user, if that user has a staff role
+        the expired course banner will not show up.
+        """
+        mock_get_course_run_details.return_value = {'weeks_to_complete': 1}
+
+        if role_factory == GlobalStaffFactory:
+            expired_staff = role_factory.create(password=TEST_PASSWORD)
+        else:
+            expired_staff = role_factory.create(password=TEST_PASSWORD, course_key=self.course.id)
+
+        ScheduleFactory(
+            start=self.THREE_YEARS_AGO,
+            enrollment__mode=CourseMode.AUDIT,
+            enrollment__course_id=self.course.id,
+            enrollment__user=expired_staff
+        )
+        CourseDurationLimitConfig.objects.create(
+            enabled=True,
+            course=CourseOverview.get_from_id(self.course.id),
+            enabled_as_of=self.course.start,
+        )
+
+        staff_user = StaffFactory.create(password=TEST_PASSWORD, course_key=self.course.id)
+        CourseEnrollmentFactory.create(
+            user=staff_user,
+            course_id=self.course.id,
+            mode='audit'
+        )
+
+        self.client.login(username=staff_user.username, password='test')
+
+        self.update_masquerade(username=expired_staff.username)
+
+        course_home_url = reverse('openedx.course_experience.course_home', args=[unicode(self.course.id)])
+        response = self.client.get(course_home_url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertItemsEqual(response.redirect_chain, [])
+        banner_text = 'This learner does not have access to this course. Their access expired on'
+        self.assertNotIn(banner_text, response.content)
+
+    @mock.patch("openedx.features.course_duration_limits.access.get_course_run_details")
+    @ddt.data(
+        FORUM_ROLE_COMMUNITY_TA,
+        FORUM_ROLE_GROUP_MODERATOR,
+        FORUM_ROLE_MODERATOR,
+        FORUM_ROLE_ADMINISTRATOR,
+    )
+    def test_no_banner_when_masquerading_as_forum_staff(self, role_name, mock_get_course_run_details):
+        """
+        When masquerading as a specific expired user, if that user has a forum staff role
+        the expired course banner will not show up.
+        """
+        mock_get_course_run_details.return_value = {'weeks_to_complete': 1}
+
+        expired_staff = UserFactory.create()
+        role = RoleFactory(name=role_name, course_id=self.course.id)
+        role.users.add(expired_staff)
+
+        ScheduleFactory(
+            start=self.THREE_YEARS_AGO,
+            enrollment__mode=CourseMode.AUDIT,
+            enrollment__course_id=self.course.id,
+            enrollment__user=expired_staff
+        )
+
+        CourseDurationLimitConfig.objects.create(
+            enabled=True,
+            course=CourseOverview.get_from_id(self.course.id),
+            enabled_as_of=self.course.start,
+        )
+
+        staff_user = StaffFactory.create(password=TEST_PASSWORD, course_key=self.course.id)
+        CourseEnrollmentFactory.create(
+            user=staff_user,
+            course_id=self.course.id,
+            mode='audit'
+        )
+
+        self.client.login(username=staff_user.username, password='test')
+
+        self.update_masquerade(username=expired_staff.username)
+
+        course_home_url = reverse('openedx.course_experience.course_home', args=[unicode(self.course.id)])
+        response = self.client.get(course_home_url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertItemsEqual(response.redirect_chain, [])
+        banner_text = 'This learner does not have access to this course. Their access expired on'
+        self.assertNotIn(banner_text, response.content)

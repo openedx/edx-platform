@@ -240,7 +240,7 @@ class TestFieldOverrideMongoPerformance(FieldOverridePerformanceTestCase):
     __test__ = True
 
     # TODO: decrease query count as part of REVO-28
-    QUERY_COUNT = 33
+    QUERY_COUNT = 38
     TEST_DATA = {
         # (providers, course_width, enable_ccx, view_as_ccx): (
         #     # of sql queries to default,
@@ -269,7 +269,7 @@ class TestFieldOverrideSplitPerformance(FieldOverridePerformanceTestCase):
     __test__ = True
 
     # TODO: decrease query count as part of REVO-28
-    QUERY_COUNT = 33
+    QUERY_COUNT = 38
     TEST_DATA = {
         ('no_overrides', 1, True, False): (QUERY_COUNT, 3),
         ('no_overrides', 2, True, False): (QUERY_COUNT, 3),
@@ -277,9 +277,9 @@ class TestFieldOverrideSplitPerformance(FieldOverridePerformanceTestCase):
         ('ccx', 1, True, False): (QUERY_COUNT, 3),
         ('ccx', 2, True, False): (QUERY_COUNT, 3),
         ('ccx', 3, True, False): (QUERY_COUNT, 3),
-        ('ccx', 1, True, True): (34, 3),
-        ('ccx', 2, True, True): (34, 3),
-        ('ccx', 3, True, True): (34, 3),
+        ('ccx', 1, True, True): (QUERY_COUNT + 1, 3),
+        ('ccx', 2, True, True): (QUERY_COUNT + 1, 3),
+        ('ccx', 3, True, True): (QUERY_COUNT + 1, 3),
         ('no_overrides', 1, False, False): (QUERY_COUNT, 3),
         ('no_overrides', 2, False, False): (QUERY_COUNT, 3),
         ('no_overrides', 3, False, False): (QUERY_COUNT, 3),
