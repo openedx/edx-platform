@@ -3488,6 +3488,11 @@ RETIREMENT_STATES = [
     'COMPLETE',
 ]
 
+############## Settings for Writable Gradebook  #########################
+# If running a Gradebook container locally,
+# modify lms/envs/private.py to give it a non-null value
+WRITABLE_GRADEBOOK_URL = None
+
 ############### Settings for django-fernet-fields ##################
 FERNET_KEYS = [
     'DUMMY KEY CHANGE BEFORE GOING TO PRODUCTION',
