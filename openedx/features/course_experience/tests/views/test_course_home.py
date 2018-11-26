@@ -17,11 +17,18 @@ from waffle.testutils import override_flag
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from courseware.tests.factories import StaffFactory
 from courseware.tests.helpers import get_expiration_banner_text
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.course_goals.api import add_course_goal, remove_course_goal
+from lms.djangoapps.courseware.tests.factories import (
+    InstructorFactory,
+    StaffFactory,
+    BetaTesterFactory,
+    OrgStaffFactory,
+    OrgInstructorFactory,
+    GlobalStaffFactory,
+)
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
@@ -32,7 +39,6 @@ from openedx.features.course_experience import (
     UNIFIED_COURSE_TAB_FLAG
 )
 from student.models import CourseEnrollment
-from student.roles import CourseBetaTesterRole, CourseInstructorRole, CourseStaffRole
 from student.tests.factories import UserFactory
 from util.date_utils import strftime_localized
 from xmodule.modulestore import ModuleStoreEnum
@@ -331,7 +337,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         self.assertRedirects(response, expected_url)
 
     @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
-    def test_course_does_not_expire_for_different_roles(self):
+    def test_course_does_not_expire_for_verified_user(self):
         """
         There are a number of different roles/users that should not lose access after the expiration date.
         Ensure that users who should not lose access get a 200 (ok) response
@@ -340,54 +346,86 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         course = CourseFactory.create(start=THREE_YEARS_AGO)
         url = course_home_url(course)
 
-        # create a list of those users who should not lose their access,
-        # then assert that their access persists past the 'expiration date'
-        users = []
+        user = UserFactory.create(password=self.TEST_PASSWORD)
+        ScheduleFactory(
+            start=THREE_YEARS_AGO,
+            enrollment__mode=CourseMode.VERIFIED,
+            enrollment__course_id=course.id,
+            enrollment__user=user
+        )
 
-        verified_user = UserFactory(password=self.TEST_PASSWORD)
-        verified_enrollment = CourseEnrollment.enroll(verified_user, course.id, mode=CourseMode.VERIFIED)
-        ScheduleFactory(start=THREE_YEARS_AGO, enrollment=verified_enrollment)
-        users.append({
-            'user': verified_user,
-            'description': 'Verified Learner'
-        })
+        # ensure that the user who has indefinite access
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
+        response = self.client.get(url)
+        self.assertEqual(
+            response.status_code,
+            200,
+            "Should not expire access for user",
+        )
 
-        # There are a number of roles that make up the 'course team' and none of them should lose
-        # access to the course
-        course_team = [
-            {
-                'description': 'Course Instructor',
-                'course_role': CourseInstructorRole,
-            },
-            {
-                'description': 'Course Staff',
-                'course_role': CourseStaffRole,
-            },
-            {
-                'description': 'Beta Tester',
-                'course_role': CourseBetaTesterRole,
-            }
-        ]
+    @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
+    @ddt.data(
+        InstructorFactory,
+        StaffFactory,
+        BetaTesterFactory,
+        OrgStaffFactory,
+        OrgInstructorFactory,
+    )
+    def test_course_does_not_expire_for_course_roles(self, role_factory):
+        """
+        There are a number of different roles/users that should not lose access after the expiration date.
+        Ensure that users who should not lose access get a 200 (ok) response
+        when attempting to visit the course after their would be expiration date.
+        """
+        course = CourseFactory.create(start=THREE_YEARS_AGO)
+        url = course_home_url(course)
 
-        for course_team_member in course_team:
-            user = UserFactory.create(password=self.TEST_PASSWORD)
-            enrollment = CourseEnrollment.enroll(user, course.id, mode=CourseMode.AUDIT)
-            course_team_member['course_role'](course.id).add_users(user)
-            ScheduleFactory(start=THREE_YEARS_AGO, enrollment=enrollment)
-            users.append({
-                'user': user,
-                'description': course_team_member['description'],
-            })
+        user = role_factory.create(password=self.TEST_PASSWORD, course_key=course.id)
+        ScheduleFactory(
+            start=THREE_YEARS_AGO,
+            enrollment__mode=CourseMode.AUDIT,
+            enrollment__course_id=course.id,
+            enrollment__user=user
+        )
 
-        # ensure that all users who should have access indefinitely do
-        for user in users:
-            self.client.login(username=user['user'].username, password=self.TEST_PASSWORD)
-            response = self.client.get(url)
-            self.assertEqual(
-                response.status_code,
-                200,
-                "Should not expire access for user [{}]".format(user['description'])
-            )
+        # ensure that the user who has indefinite access
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
+        response = self.client.get(url)
+        self.assertEqual(
+            response.status_code,
+            200,
+            "Should not expire access for user",
+        )
+
+    @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
+    @ddt.data(
+        GlobalStaffFactory,
+    )
+    def test_course_does_not_expire_for_global_users(self, role_factory):
+        """
+        There are a number of different roles/users that should not lose access after the expiration date.
+        Ensure that users who should not lose access get a 200 (ok) response
+        when attempting to visit the course after their would be expiration date.
+        """
+        course = CourseFactory.create(start=THREE_YEARS_AGO)
+        url = course_home_url(course)
+
+        user = role_factory.create(password=self.TEST_PASSWORD)
+        ScheduleFactory(
+            start=THREE_YEARS_AGO,
+            enrollment__mode=CourseMode.AUDIT,
+            enrollment__course_id=course.id,
+            enrollment__user=user
+        )
+
+        # ensure that the user who has indefinite access
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
+        response = self.client.get(url)
+        self.assertEqual(
+            response.status_code,
+            200,
+            "Should not expire access for user",
+        )
 
     @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
     def test_expired_course(self):
