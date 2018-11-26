@@ -32,7 +32,7 @@ from openedx.features.course_experience import (
     UNIFIED_COURSE_TAB_FLAG
 )
 from student.models import CourseEnrollment
-from student.roles import CourseInstructorRole, CourseStaffRole
+from student.roles import CourseBetaTesterRole, CourseInstructorRole, CourseStaffRole
 from student.tests.factories import UserFactory
 from util.date_utils import strftime_localized
 from xmodule.modulestore import ModuleStoreEnum
@@ -339,35 +339,51 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
 
         # create a list of those users who should not lose their access,
         # then assert that their access persists past the 'expiration date'
-        users_no_expired_access = []
+        users = []
 
         verified_user = UserFactory(password=self.TEST_PASSWORD)
         verified_enrollment = CourseEnrollment.enroll(verified_user, course.id, mode=CourseMode.VERIFIED)
         ScheduleFactory(start=THREE_YEARS_AGO, enrollment=verified_enrollment)
-        users_no_expired_access.append((verified_user, 'Verified Learner'))
+        users.append({
+            'user': verified_user,
+            'description': 'Verified Learner'
+        })
 
-        # There are two types of course team members: instructor and staff
-        # they have different privileges, but for the purpose of this test the important thing is that they should
-        # retain their access to the course after the access would expire for a normal audit learner
-        instructor = UserFactory.create(password=self.TEST_PASSWORD)
-        enrollment = CourseEnrollment.enroll(instructor, course.id, mode=CourseMode.AUDIT)
-        CourseInstructorRole(course.id).add_users(instructor)
-        ScheduleFactory(start=THREE_YEARS_AGO, enrollment=enrollment)
-        users_no_expired_access.append((instructor, 'Course Instructor'))
+        # There are a number of roles that make up the 'course team' and none of them should lose
+        # access to the course
+        course_team = [
+            {
+                'description': 'Course Instructor',
+                'course_role': CourseInstructorRole,
+            },
+            {
+                'description': 'Course Staff',
+                'course_role': CourseStaffRole,
+            },
+            {
+                'description': 'Beta Tester',
+                'course_role': CourseBetaTesterRole,
+            }
+        ]
 
-        staff = UserFactory.create(password=self.TEST_PASSWORD)
-        enrollment = CourseEnrollment.enroll(staff, course.id, mode=CourseMode.AUDIT)
-        CourseStaffRole(course.id).add_users(staff)
-        ScheduleFactory(start=THREE_YEARS_AGO, enrollment=enrollment)
-        users_no_expired_access.append((staff, 'Course Staff'))
+        for course_team_member in course_team:
+            user = UserFactory.create(password=self.TEST_PASSWORD)
+            enrollment = CourseEnrollment.enroll(user, course.id, mode=CourseMode.AUDIT)
+            course_team_member['course_role'](course.id).add_users(user)
+            ScheduleFactory(start=THREE_YEARS_AGO, enrollment=enrollment)
+            users.append({
+                'user': user,
+                'description': course_team_member['description'],
+            })
 
-        for user, user_description in users_no_expired_access:
-            self.client.login(username=user.username, password=self.TEST_PASSWORD)
+        # ensure that all users who should have access indefinitely do
+        for user in users:
+            self.client.login(username=user['user'].username, password=self.TEST_PASSWORD)
             response = self.client.get(url)
             self.assertEqual(
                 response.status_code,
                 200,
-                "Should not expire access for user [{}]".format(user_description)
+                "Should not expire access for user [{}]".format(user['description'])
             )
 
     @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})

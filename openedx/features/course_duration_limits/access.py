@@ -18,6 +18,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangolib.markup import HTML
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
+from student.roles import CourseBetaTesterRole
 
 MIN_DURATION = timedelta(weeks=4)
 MAX_DURATION = timedelta(weeks=12)
@@ -62,6 +63,10 @@ def get_user_course_expiration_date(user, course):
     CourseEnrollment = apps.get_model('student.CourseEnrollment')
     enrollment = CourseEnrollment.get_enrollment(user, course.id)
     if enrollment is None or enrollment.mode != 'audit':
+        return None
+
+    # if the user is a beta tester their access should not expire
+    if CourseBetaTesterRole(course.id).has_user(user):
         return None
 
     try:
