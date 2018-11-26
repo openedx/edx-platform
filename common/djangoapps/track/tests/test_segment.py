@@ -109,7 +109,7 @@ class SegmentTrackTestCase(TestCase):
             'page': {
                 'path': '/this/is/a/path',
                 'referrer': sentinel.referer,
-                'url': '//hostname/this/is/a/path'  # Synthesized URL value.
+                'url': 'https://hostname/this/is/a/path'  # Synthesized URL value.
             }
         }
         self.assertEqual((sentinel.user_id, sentinel.name, self.properties, expected_segment_context), args)
