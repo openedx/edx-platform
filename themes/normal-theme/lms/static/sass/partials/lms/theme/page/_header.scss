@@ -47,19 +47,6 @@
     .nav-item.nav-item-dropdown {
       position: relative;
     }
-
-    a.register-btn{
-      @extend %btn-my-white;
-    }
-    a.register-btn:hover{
-      @extend %btn-my-white;
-    }
-    a.sign-in-btn{
-      @extend %btn-my-primary;
-    }
-    a.sign-in-btn:hover{
-      @extend %btn-my-primary-hover;
-    }
   } 
 
   .global-header .nav-links .main .nav-tab{
