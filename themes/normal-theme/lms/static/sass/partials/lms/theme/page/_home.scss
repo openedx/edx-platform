@@ -100,7 +100,11 @@
   }
 }
 
-
+@media screen and (max-width:760px){
+  .home>header .title>.heading-group h1{
+    font-size: 18px;
+  }
+}
 
 
 // unknown
