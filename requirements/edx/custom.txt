@@ -5,19 +5,19 @@
 -e git+https://github.com/edx-solutions/xblock-image-explorer.git@v1.0.1#egg=xblock-image-explorer==1.0.1
 -e git+https://github.com/edx-solutions/xblock-drag-and-drop.git@92ee2055a16899090a073e1df81e35d5293ad767#egg=xblock-drag-and-drop
 # FIXME: temp hash, until a proper solution is findout (ref ticket: https://edx-wiki.atlassian.net/browse/MCKIN-8249)
--e git+https://github.com/edx-solutions/xblock-drag-and-drop-v2.git@a4dee0689863533948735b4b389493c42b5110f0#egg=xblock-drag-and-drop-v2==2.2.0
+-e git+https://github.com/edx-solutions/xblock-drag-and-drop-v2.git@7c95f906af2f16eb23352b155c77a16466602631#egg=xblock-drag-and-drop-v2==2.2.1
 # This is required for A2E courses that were created with the temporary (xblock-drag-and-drop-v2-new) DnDv2 branch to continue to work.
 # FIXME: bump version to 2.1.6 when https://github.com/edx-solutions/xblock-drag-and-drop-v2/pull/154 merged and tagged
 -e git+https://github.com/open-craft/xblock-drag-and-drop-v2.git@82c9dc5e16d10793e8b79e60661e1a78893fce25#egg=xblock-drag-and-drop-v2-new
--e git+https://github.com/edx-solutions/xblock-ooyala.git@v2.0.16#egg=xblock-ooyala==2.0.16
--e git+https://github.com/edx-solutions/xblock-group-project.git@6a68ea09478e49e796ee4c0a985018ec4257b7d7#egg=xblock-group-project
+-e git+https://github.com/edx-solutions/xblock-ooyala.git@v2.0.18#egg=xblock-ooyala==2.0.18
+git+https://github.com/edx-solutions/xblock-group-project.git@0.1.1#egg=xblock-group-project==0.1.1
 -e git+https://github.com/edx-solutions/xblock-adventure.git@7bdeb62b1055377dc04a7b503f7eea8264f5847b#egg=xblock-adventure
--e git+https://github.com/open-craft/xblock-poll.git@1.5.1#egg=xblock-poll==1.5.1
--e git+https://github.com/edx/edx-notifications.git@0.6.5#egg=edx-notifications==0.6.5
--e git+https://github.com/open-craft/problem-builder.git@2.11.1#egg=xblock-problem-builder==2.11.1
+-e git+https://github.com/open-craft/xblock-poll.git@1.6.1#egg=xblock-poll==1.6.1
+-e git+https://github.com/edx/edx-notifications.git@0.6.8#egg=edx-notifications==0.6.8
+-e git+https://github.com/open-craft/problem-builder.git@v2.11.3#egg=xblock-problem-builder==2.11.3
 -e git+https://github.com/OfficeDev/xblock-officemix.git@86238f5968a08db005717dbddc346808f1ed3716#egg=xblock-officemix
 -e git+https://github.com/open-craft/xblock-chat.git@v0.2.3#egg=xblock-chat==0.2.3
--e git+https://github.com/open-craft/xblock-eoc-journal.git@2490351747eb9cc72b01cacfe0c9cc383c3fd6db#egg=xblock-eoc-journal
+-e git+https://github.com/open-craft/xblock-eoc-journal.git@53c6b6e4e8764627ed352e30fe2c60755e91d262#egg=xblock-eoc-journal
 -e git+https://github.com/mckinseyacademy/xblock-scorm.git@v2.0.11#egg=xblock-scorm==2.0.11
 -e git+https://github.com/mckinseyacademy/xblock-diagnosticfeedback.git@v0.2.4#egg=xblock-diagnostic-feedback==0.2.4
 -e git+https://github.com/open-craft/xblock-group-project-v2.git@0.4.10#egg=xblock-group-project-v2==0.4.10
@@ -30,6 +30,6 @@ git+https://github.com/edx-solutions/discussion-edx-platform-extensions.git@v1.2
 git+https://github.com/edx-solutions/course-edx-platform-extensions.git@v1.1.1#egg=course-edx-platform-extensions==1.1.1
 git+https://github.com/edx-solutions/mobileapps-edx-platform-extensions.git@v1.2.2#egg=mobileapps-edx-platform-extensions==1.2.2
 git+https://github.com/edx-solutions/progress-edx-platform-extensions.git@1.0.8#egg=progress-edx-platform-extensions==1.0.8
-openedx-completion-aggregator==1.5.15
+openedx-completion-aggregator==1.5.16
 
 git+https://github.com/mckinseyacademy/openedx-user-manager-api@v1.0.1#egg=openedx-user-manager-api==1.0.1
