@@ -6,22 +6,21 @@
 
   /* 课程header */
   header.course-profile{
-    height: 320px;
+    height: auto;
     box-sizing: border-box;
-    padding-top: 45px;
+    padding: 45px 20px;
     border-bottom: none;
     background: url('/static/normal-theme/images/course_dec.png');
     background-size: cover;
 
     .intro-inner-wrapper{
-      height: 240px;
       background: rgba(255,255,255,0.7);
       box-shadow: 0px 2px 4px 0px #aab2bd;
     }
 
     
     /* header 左侧 */
-    .intro-inner-wrapper .intro{
+    .intro-inner-wrapper .table .intro{
       border: none; 
       box-shadow: none;
       padding: 50px 40px;
@@ -29,6 +28,7 @@
       >.heading-group{
         border-bottom: none;
         box-shadow: none;
+        padding-bottom: 30px;
       }
 
       >.heading-group h1{
@@ -41,18 +41,20 @@
         color: $blue
       }
 
-      .main-cta{
-        width: auto;
-      }
-      .main-cta span.register, .main-cta a.register, .main-cta strong, .main-cta a.add-to-cart{
-        width: auto;
-        padding: 0 20px;
-        border: none;
-        font-size: 14px;
-        letter-spacing: 0.3px;
+      .main-cta strong, 
+      .main-cta a.add-to-cart{
+        @extend %btn-my-primary;
         margin-right: 20px;
-        height: 40px;
-        line-height: 40px;
+      }
+      .main-cta strong:hover, 
+      .main-cta a.add-to-cart:hover{
+        @extend %btn-my-primary-hover;
+      }
+
+      .main-cta span.register, 
+      .main-cta a.register{
+        @extend %btn-my-disable;
+        margin-right: 20px;
       }
     }
 
@@ -130,17 +132,34 @@
   position: relative;
 
   a {
-    padding: 0 15px;
-    background: #fff;
-    border: 1px solid $blue;
-    border-radius: 3px;
+    @extend %btn-my-white;
     position: absolute;
     right: 25px;
     top: 11px;
-    height: 38px;
-    line-height: 38px;
+  }
+  a:hover{
+    @extend %btn-my-white-hover;
   }
 
+}
+
+// tab
+.course-info .details .about-tabs{
+  border-bottom:1px solid #e6e9ed;
+  margin: 10px 25px;
+  font-size: 14px;
+
+  .about-tab{
+    display: inline-block;
+    line-height: 38px;
+    margin-right: 20px;
+    color: $title;
+    cursor: pointer;
+  }
+  .about-tab-active {
+    border-bottom: 2px solid $bule;
+    color: $blue;
+  }
 }
 
 .course-info .details .my-theme-course-about{
@@ -164,26 +183,6 @@
 
   .about-info div, .about-staff div{
     margin-top: 20px;
-  }
-
-
-  // 1.1 课程详情页 tab
-  .about-tabs{
-    border-bottom:1px solid #e6e9ed;
-  }
-  .about-tab{
-    display: inline-block;
-    line-height: 38px;
-    margin-right: 20px;
-    color: $title;
-    cursor: pointer;
-  }
-  .about-tab-active {
-    border-bottom: 2px solid $bule;
-    color: $blue;
-  }
-  .about-tabs{ 
-    margin-bottom: 20px;
   }
   
 
@@ -243,6 +242,7 @@
     font-size: 15px;
     border-top: 2px dashed #eeeeee;
     margin: 30px 0 10px 0;
+    line-height: 2;
   }
   .about-outline h3:first-child{
     border-top: none;
@@ -273,6 +273,7 @@
   }
   .about-outline-indent p{
     border-left: none;
+    line-height: 1.5;
   }
 }
   
