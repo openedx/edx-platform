@@ -75,7 +75,6 @@ from .signals import (
     USER_RETIRE_LMS_CRITICAL,
     USER_RETIRE_LMS_MISC,
     USER_RETIRE_MAILINGS,
-    USER_RETIRE_THIRD_PARTY_MAILINGS
 )
 from ..message_types import DeletionNotificationMessage
 
@@ -333,45 +332,6 @@ class AccountDeactivationView(APIView):
         """
         _set_unusable_password(User.objects.get(username=username))
         return Response(get_account_settings(request, [username])[0])
-
-
-class AccountRetireMailingsView(APIView):
-    """
-    Part of the retirement API, accepts POSTs to unsubscribe a user
-    from all EXTERNAL email lists (ex: Sailthru). LMS email subscriptions
-    are handled in the LMS retirement endpoints.
-    """
-    authentication_classes = (JwtAuthentication, )
-    permission_classes = (permissions.IsAuthenticated, CanRetireUser)
-
-    def post(self, request):
-        """
-        POST /api/user/v1/accounts/{username}/retire_mailings/
-
-        Fires the USER_RETIRE_THIRD_PARTY_MAILINGS signal, currently the
-        only receiver is email_marketing to force opt-out the user from
-        externally managed email lists.
-        """
-        username = request.data['username']
-
-        try:
-            retirement = UserRetirementStatus.get_retirement_for_retirement_action(username)
-
-            with transaction.atomic():
-                # This signal allows lms' email_marketing and other 3rd party email
-                # providers to unsubscribe the user
-                USER_RETIRE_THIRD_PARTY_MAILINGS.send(
-                    sender=self.__class__,
-                    email=retirement.original_email,
-                    new_email=retirement.retired_email,
-                    user=retirement.user
-                )
-
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        except UserRetirementStatus.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        except Exception as exc:  # pylint: disable=broad-except
-            return Response(text_type(exc), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class DeactivateLogoutView(APIView):
