@@ -243,11 +243,15 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
         Enforce valid email addresses.
         """
         # import is placed here to avoid cyclic import
-        from openedx.core.djangoapps.user_api.accounts.api import get_email_validation_error
+        from openedx.core.djangoapps.user_api.accounts.api import get_email_validation_error, \
+            _validate_email_doesnt_exist
 
-        email_validation_error = get_email_validation_error(value)
-        if email_validation_error:
+        if get_email_validation_error(value):
             raise serializers.ValidationError("Valid e-mail address required.")
+
+        if _validate_email_doesnt_exist(value):
+            raise serializers.ValidationError("Email address you entered already exists.")
+
         return value
 
     def transform_gender(self, user_profile, value):  # pylint: disable=unused-argument
