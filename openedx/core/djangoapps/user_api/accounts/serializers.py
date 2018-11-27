@@ -14,7 +14,7 @@ from six import text_type
 from lms.djangoapps.badges.utils import badges_enabled
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import errors
-from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_active
+from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
 from openedx.core.djangoapps.user_api.models import (
     RetirementState,
     UserPreference,
@@ -159,7 +159,7 @@ class UserReadOnlySerializer(serializers.Serializer):
         else:
             fields = self.configuration.get('public_fields')
 
-        if not is_secondary_email_feature_active() and 'secondary_email' in fields:
+        if not is_secondary_email_feature_enabled() and 'secondary_email' in fields:
             fields.remove('secondary_email')
 
         return self._filter_fields(
@@ -203,7 +203,8 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
         model = UserProfile
         fields = (
             "name", "gender", "goals", "year_of_birth", "level_of_education", "country", "social_links",
-            "mailing_address", "bio", "profile_image", "requires_parental_consent", "language_proficiencies"
+            "mailing_address", "bio", "profile_image", "requires_parental_consent", "language_proficiencies",
+            "secondary_email"
         )
         # Currently no read-only field, but keep this so view code doesn't need to know.
         read_only_fields = ()
@@ -235,6 +236,18 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
         unique_social_links = set(social_link["platform"] for social_link in social_links)
         if len(social_links) != len(unique_social_links):
             raise serializers.ValidationError("The social_links field must consist of unique social platforms.")
+        return value
+
+    def validate_secondary_email(self, value):
+        """
+        Enforce valid email addresses.
+        """
+        # import is placed here to avoid cyclic import
+        from openedx.core.djangoapps.user_api.accounts.api import get_email_validation_error
+
+        email_validation_error = get_email_validation_error(value)
+        if email_validation_error:
+            raise serializers.ValidationError("Valid e-mail address required.")
         return value
 
     def transform_gender(self, user_profile, value):  # pylint: disable=unused-argument

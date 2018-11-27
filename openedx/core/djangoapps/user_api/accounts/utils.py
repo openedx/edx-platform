@@ -194,7 +194,7 @@ def generate_password(length=12, chars=string.letters + string.digits):
     return password
 
 
-def is_secondary_email_feature_active():
+def is_secondary_email_feature_enabled():
     """
     Checks to see if the django-waffle switch for enabling the secondary email feature is active
 

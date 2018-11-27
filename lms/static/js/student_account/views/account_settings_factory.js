@@ -27,14 +27,16 @@
             enterpriseReadonlyAccountFields,
             edxSupportUrl,
             extendedProfileFields,
-            displayAccountDeletion
+            displayAccountDeletion,
+            isSecondaryEmailFeatureEnabled
         ) {
             var $accountSettingsElement, userAccountModel, userPreferencesModel, aboutSectionsData,
                 accountsSectionData, ordersSectionData, accountSettingsView, showAccountSettingsPage,
                 showLoadingError, orderNumber, getUserField, userFields, timeZoneDropdownField, countryDropdownField,
-                emailFieldView, socialFields, accountDeletionFields, platformData,
+                emailFieldView, secondaryEmailFieldView, socialFields, accountDeletionFields, platformData,
                 aboutSectionMessageType, aboutSectionMessage, fullnameFieldView, countryFieldView,
-                fullNameFieldData, emailFieldData, countryFieldData, additionalFields, fieldItem;
+                fullNameFieldData, emailFieldData, secondaryEmailFieldData, countryFieldData, additionalFields,
+                fieldItem;
 
             $accountSettingsElement = $('.wrapper-account-settings');
 
@@ -82,13 +84,19 @@
                 };
             }
 
-//            secondaryEmailFieldData = {
-//                model: userAccountModel,
-//                title: gettext('Secondary Email Address'),
-//                valueAttribute: 'secondary_email',
-//                helpMessage: gettext('You may access your account when single-sign on is not available.'),
-//                persistChanges: true
-//            };
+            secondaryEmailFieldData = {
+                model: userAccountModel,
+                title: gettext('Secondary Email Address'),
+                valueAttribute: 'secondary_email',
+                helpMessage: gettext('You may access your account when single-sign on is not available.'),
+                persistChanges: true
+            };
+
+            if (isSecondaryEmailFeatureEnabled) {
+            	secondaryEmailFieldView = {
+                    view: new AccountSettingsFieldViews.EmailFieldView(secondaryEmailFieldData)
+                };
+            }
 
             fullNameFieldData = {
                 model: userAccountModel,
@@ -151,6 +159,7 @@
                         },
                         fullnameFieldView,
                         emailFieldView,
+                        secondaryEmailFieldView,
                         {
                             view: new AccountSettingsFieldViews.PasswordFieldView({
                                 model: userAccountModel,
