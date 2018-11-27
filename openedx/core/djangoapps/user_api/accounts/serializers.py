@@ -14,6 +14,7 @@ from six import text_type
 from lms.djangoapps.badges.utils import badges_enabled
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import errors
+from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_active
 from openedx.core.djangoapps.user_api.models import (
     RetirementState,
     UserPreference,
@@ -147,6 +148,7 @@ class UserReadOnlySerializer(serializers.Serializer):
                         user_profile.social_links.all(), many=True
                     ).data,
                     "extended_profile": get_extended_profile(user_profile),
+                    "secondary_email": user_profile.secondary_email,
                 }
             )
 
@@ -156,6 +158,9 @@ class UserReadOnlySerializer(serializers.Serializer):
             fields = _visible_fields(user_profile, user, self.configuration)
         else:
             fields = self.configuration.get('public_fields')
+
+        if not is_secondary_email_feature_active() and 'secondary_email' in fields:
+            fields.remove('secondary_email')
 
         return self._filter_fields(
             fields,

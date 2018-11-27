@@ -82,6 +82,14 @@
                 };
             }
 
+//            secondaryEmailFieldData = {
+//                model: userAccountModel,
+//                title: gettext('Secondary Email Address'),
+//                valueAttribute: 'secondary_email',
+//                helpMessage: gettext('You may access your account when single-sign on is not available.'),
+//                persistChanges: true
+//            };
+
             fullNameFieldData = {
                 model: userAccountModel,
                 title: gettext('Full Name'),
