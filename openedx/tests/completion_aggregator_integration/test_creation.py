@@ -45,10 +45,12 @@ class _BaseTestCase(CompletionWaffleTestMixin, SharedModuleStoreTestCase):
             block_key=item.location,
             completion=completion,
         )
-        updater = AggregationUpdater(user=user, course_key=self.course_key, modulestore=self.store)
-        updater.update(changed_blocks={item.location})
+        self.aggregate_course(user, self.course_key)
         return bc
 
+    def aggregate_course(self, user, course_key):
+        updater = AggregationUpdater(user=user, course_key=course_key, modulestore=self.store)
+        updater.update(force=True)
 
     def submit_completion_for(self, item, completion):
         return self.submit_completion_with_user(self.user, item, completion)
@@ -370,6 +372,9 @@ class EnrollmentTrackTestCase(_BaseTestCase):
     def test_user_upgrades(self):
         self.submit_completion_with_user(self.audit_user, self.problem2, 1.0)
         self.audit_enrollment.update_enrollment(mode='verified')
+        # Enrollment track updates do not emit a signal in ginkgo, so we
+        # aggregate manually to see the updates.
+        self.aggregate_course(self.audit_user, self.course_key)
         self.assert_expected_values({
             self.vertical2: (1.0, 2.0),
             self.chapter: (1.0, 3.0),
@@ -381,6 +386,9 @@ class EnrollmentTrackTestCase(_BaseTestCase):
         self.submit_completion_with_user(self.user, self.problem2, 0.5)
         self.submit_completion_with_user(self.user, self.problem3, 0.25)
         self.verified_enrollment.update_enrollment(mode='audit')
+        # Enrollment track updates do not emit a signal in ginkgo, so we
+        # aggregate manually to see the updates.
+        self.aggregate_course(self.user, self.course_key)
         self.assert_expected_values({
             self.vertical2: (0.5, 1.0),
             self.chapter: (0.5, 1.0),
