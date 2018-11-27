@@ -1,17 +1,20 @@
 """
 Test audit user's access to various content based on content-gating features.
 """
-
-from datetime import datetime
+import json
+from datetime import datetime, timedelta
 import ddt
 from django.conf import settings
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
+from django.utils import timezone
 from mock import patch
 
 from course_modes.tests.factories import CourseModeFactory
 from experiments.models import ExperimentKeyValue
+from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
+
 from lms.djangoapps.courseware.module_render import load_single_xblock
 from lms.djangoapps.courseware.tests.factories import (
     InstructorFactory,
@@ -23,16 +26,14 @@ from lms.djangoapps.courseware.tests.factories import (
 )
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 from openedx.core.djangoapps.util.testing import TestConditionalContent
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.lib.url_utils import quote_slashes
-from openedx.features.content_type_gating.partitions import CONTENT_GATING_PARTITION_ID
+from openedx.features.content_type_gating.partitions import CONTENT_GATING_PARTITION_ID, CONTENT_TYPE_GATE_GROUP_IDS
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.config import (
-    EXPERIMENT_DATA_HOLDBACK_KEY,
     EXPERIMENT_ID,
 )
 from student.models import CourseEnrollment
-from student.roles import CourseBetaTesterRole, CourseInstructorRole, CourseStaffRole
+from student.roles import CourseInstructorRole
 from student.tests.factories import (
     CourseEnrollmentFactory,
     UserFactory,
@@ -201,7 +202,7 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
         # enroll all users into the all track types course
         self.users = {}
         for mode_type in self.MODE_TYPES:
-            self.users[mode_type] = UserFactory.create()
+            self.users[mode_type] = UserFactory.create(username=mode_type)
             CourseEnrollmentFactory.create(
                 user=self.users[mode_type],
                 course_id=self.courses['all_track_types']['course'].id,
@@ -245,7 +246,8 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
                     ....
              }
         """
-        course = CourseFactory.create(run=run, display_name=display_name)
+        start_date = timezone.now() - timedelta(weeks=1)
+        course = CourseFactory.create(run=run, display_name=display_name, start=start_date)
 
         for mode in modes:
             CourseModeFactory.create(course_id=course.id, mode_slug=mode)
@@ -464,6 +466,64 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
             is_gated=is_gated,
             request_factory=self.factory,
         )
+
+    @ddt.data(
+        ({'user_partition_id': CONTENT_GATING_PARTITION_ID,
+          'group_id': CONTENT_TYPE_GATE_GROUP_IDS['limited_access']}, True),
+        ({'user_partition_id': CONTENT_GATING_PARTITION_ID,
+          'group_id': CONTENT_TYPE_GATE_GROUP_IDS['full_access']}, False),
+        ({'user_partition_id': ENROLLMENT_TRACK_PARTITION_ID,
+          'group_id': settings.COURSE_ENROLLMENT_MODES['audit']['id']}, True),
+        ({'user_partition_id': ENROLLMENT_TRACK_PARTITION_ID,
+          'group_id': settings.COURSE_ENROLLMENT_MODES['verified']['id']}, False),
+        ({'role': 'staff'}, False),
+        ({'role': 'student'}, True),
+        ({'username': 'audit'}, True),
+        ({'username': 'verified'}, False),
+    )
+    @ddt.unpack
+    def test_masquerade(self, masquerade_config, is_gated):
+        instructor = UserFactory.create()
+        CourseEnrollmentFactory.create(
+            user=instructor,
+            course_id=self.course.id,
+            mode='audit'
+        )
+        CourseInstructorRole(self.course.id).add_users(instructor)
+        self.client.login(username=instructor.username, password=TEST_PASSWORD)
+
+        self.update_masquerade(**masquerade_config)
+
+        block = self.blocks_dict['problem']
+        block_view_url = reverse('render_xblock', kwargs={'usage_key_string': unicode(block.scope_ids.usage_id)})
+        response = self.client.get(block_view_url)
+        if is_gated:
+            self.assertEquals(response.status_code, 404)
+        else:
+            self.assertEquals(response.status_code, 200)
+
+    def update_masquerade(self, role='student', group_id=None, username=None, user_partition_id=None):
+        """
+        Toggle masquerade state.
+        """
+        masquerade_url = reverse(
+            'masquerade_update',
+            kwargs={
+                'course_key_string': unicode(self.course.id),
+            }
+        )
+        response = self.client.post(
+            masquerade_url,
+            json.dumps({
+                'role': role,
+                'group_id': group_id,
+                'user_name': username,
+                'user_partition_id': user_partition_id,
+            }),
+            'application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+        return response
 
 
 @override_settings(FIELD_OVERRIDE_PROVIDERS=(

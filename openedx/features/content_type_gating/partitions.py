@@ -11,6 +11,7 @@ from course_modes.models import CourseMode
 
 import crum
 from django.apps import apps
+from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 
@@ -21,7 +22,7 @@ from lms.djangoapps.courseware.masquerade import (
     is_masquerading_as_specific_student,
     get_masquerading_user_group,
 )
-from xmodule.partitions.partitions import Group, UserPartition, UserPartitionError
+from xmodule.partitions.partitions import Group, UserPartition, UserPartitionError, ENROLLMENT_TRACK_PARTITION_ID
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from student.roles import CourseBetaTesterRole
@@ -140,8 +141,18 @@ class ContentTypeGatingPartitionScheme(object):
         # same logic as normal to return that student's group. If the current
         # user is masquerading as a generic student in a specific group, then
         # return that group.
-        if get_course_masquerade(user, course_key) and not is_masquerading_as_specific_student(user, course_key):
-            return get_masquerading_user_group(course_key, user, user_partition)
+        course_masquerade = get_course_masquerade(user, course_key)
+        if course_masquerade and not is_masquerading_as_specific_student(user, course_key):
+            masquerade_group = get_masquerading_user_group(course_key, user, user_partition)
+            if masquerade_group is not None:
+                return masquerade_group
+            else:
+                audit_mode_id = settings.COURSE_ENROLLMENT_MODES.get(CourseMode.AUDIT, {}).get('id')
+                if course_masquerade.user_partition_id == ENROLLMENT_TRACK_PARTITION_ID:
+                    if course_masquerade.group_id != audit_mode_id:
+                        return cls.FULL_ACCESS
+                    else:
+                        return cls.LIMITED_ACCESS
 
         # For now, treat everyone as a Full-access user, until we have the rest of the
         # feature gating logic in place.
