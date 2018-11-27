@@ -749,7 +749,15 @@ def storage_service_bucket():
     # set since behind the scenes it fires a HEAD request that is equivalent to get_all_keys()
     # meaning it would need ListObjects on the whole bucket, not just the path used in each
     # environment (since we share a single bucket for multiple deployments in some configurations)
-    return conn.get_bucket(settings.VIDEO_UPLOAD_PIPELINE["BUCKET"], validate=False)
+    bucket =  conn.get_bucket(settings.VIDEO_UPLOAD_PIPELINE["BUCKET"], validate=False)
+
+    # connect to bucket's region, and get bucket from there
+    # https://github.com/boto/boto/issues/2207#issuecomment-60682869
+    bucket_location = bucket.get_location()
+    if bucket_location:
+        conn = s3.connect_to_region(bucket_location)
+        bucket = conn.get_bucket(settings.VIDEO_UPLOAD_PIPELINE["BUCKET"])
+    return bucket
 
 
 def storage_service_key(bucket, file_name):
