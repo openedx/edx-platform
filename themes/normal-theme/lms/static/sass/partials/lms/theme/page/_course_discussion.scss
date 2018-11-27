@@ -1,0 +1,124 @@
+// http://0.0.0.0:18000/courses/course-v1:edX+E2E-101+course/discussion/forum/ 课程讨论 discussion
+
+
+.content-wrapper .discussion-board{
+  box-shadow: 0px 1px 4px 0px $border;
+  border: none;
+  margin-bottom: 30px;
+}
+
+// header
+.content-wrapper .discussion-board >.page-header{
+  padding: 10px 15px;
+  border-bottom: 1px solid $border;
+
+  .has-breadcrumbs .breadcrumbs{
+    margin-bottom: 0;
+  }
+
+  .has-breadcrumbs .breadcrumbs .all-topics{
+    border: none;
+    font-size: 16px;
+  }
+
+  .forum-search{
+    order: -1;
+  }
+  .forum-search .search-input{
+    height: 38px;
+    line-height: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    font-size: 14px;
+  }
+  .forum-search .search-button{
+    @extend %btn-my-primary;
+    line-height: 0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    margin-left: 0;
+  }
+
+  .btn-outline-primary{
+    @extend %btn-my-primary;
+    line-height: 0;
+    margin-left: 10px;
+  }
+  .forum-search .search-button:hover, .btn-outline-primary:hover{
+    @extend %btn-my-primary-hover;
+  }
+
+}
+
+
+.content-wrapper .discussion-board .page-content{
+  padding: 0;
+
+  // aside
+  .forum-nav-browse-menu-wrapper{
+    border: none; 
+    background: none;
+    padding: 10px;
+  }
+  .forum-nav{
+    background: rgba(182, 220, 254, 0.1);
+    border-right: 1px solid $border;
+  }
+  .forum-nav-browse-title{
+    border-bottom: none;
+  }
+  .fa-star:before{
+    color: #98ccfd;
+  }
+
+  .forum-nav-browse-filter{
+    border: none;
+    padding: 5px;
+  }
+  .forum-nav-browse-filter-input{
+    border: 1px solid $border;
+    padding: 8px 10px;
+  }
+  .forum-nav-browse-filter .icon{
+    right: 20px;
+  }
+
+  // 介绍 how to use
+  .view-discussion-home section{
+    border-bottom: 1px solid #e6e9ed;
+  }
+  .discussion-body .discussion-article{
+    padding: 35px 30px;
+    color: $font;
+  }
+  .view-discussion-home .label{
+    line-height: 2;
+    font-size: 14px;
+  }
+  .view-discussion-home .home-title{
+    margin-bottom: 10px;
+    color: $title;
+  }
+
+  .view-discussion-home .home-helpgrid{
+    border-bottom: 1px solid #e6e9ed;
+    box-shadow: none;
+  }
+  .view-discussion-home .helpgrid-row .row-title{
+    background: none;
+    border-right: 1px solid #e6e9ed;
+    color: $title;
+    font-size: 14px;
+  }
+  .view-discussion-home .helpgrid-row .row-item{
+    font-size: 14px;
+  }
+  
+  label{
+    margin-bottom: 0;
+  }
+  .view-discussion-home .helpgrid-row .row-item-full .notification-checkbox{
+    border: none;
+  }
+}
+

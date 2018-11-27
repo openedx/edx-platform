@@ -115,24 +115,6 @@
       bottom: 8px;
       right: 5px;
     }
-    .wrapper-course-details .wrapper-course-actions .enter-course{
-      border: none;
-      background: $blue;
-      color: #fff;
-      font-size: 14px;
-      font-weight: normal;
-    }
-
-    a.enter-course-blocked.course-target-link{
-      height: 34px;
-      background-color: #f5f7fa;
-      border-radius: 3px;
-      border: 1px solid #e6e9ed;
-      color: #aab2bd;
-      font-size: 14px;
-      line-height: 19px;
-      cursor: not-allowed; 
-    }
 
     .wrapper-messages-primary .messages-list{
       background-color: #f7f7f7;
@@ -142,8 +124,17 @@
       }
 
     }
-
     
+    .wrapper-course-details .wrapper-course-actions .enter-course{
+      @extend %btn-my-primary;
+    }
+    .wrapper-course-details .wrapper-course-actions .enter-course:hover{
+      @extend %btn-my-primary-hover;
+    }
+
+    a.enter-course-blocked.course-target-link{
+      @extend %btn-my-disable;
+    }
   }
 
   .course-info{
