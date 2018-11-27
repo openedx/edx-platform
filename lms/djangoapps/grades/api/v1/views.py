@@ -111,8 +111,8 @@ class CourseEnrollmentPagination(CursorPagination):
     """
     Paginates over CourseEnrollment objects.
     """
-    page_size = 25
-    ordering = 'created'
+    page_size = 50
+    ordering = 'id'
 
 
 class PaginatedAPIView(APIView):
