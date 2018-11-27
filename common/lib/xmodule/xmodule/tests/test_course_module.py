@@ -477,7 +477,7 @@ class ProctoringConfigurationTestCase(unittest.TestCase):
         throws a ValueError with the correct error message.
         """
         provider = 'invalid-provider'
-        proctoring_provider_whitelist = ['mock', 'mock_proctoring_without_rules']
+        proctoring_provider_whitelist = [u'mock', u'mock_proctoring_without_rules']
 
         value = {
             'backend': provider,
