@@ -1,0 +1,52 @@
+// 0.0.0.0:18000/courses/course-v1:EliteU+1234567890+2019-01-02/progress 课程进度
+
+body.view-in-course .profile-wrapper{
+  border: none;
+  margin-bottom: 30px;
+}
+.profile-wrapper .course-info{
+  background-image: none;
+  box-shadow: 0px 1px 4px 0px $border;
+  padding: 0;
+  
+  .hd-2{
+    font-size: 18px;
+    color: $title;
+    border-bottom: 1px solid #eeeeee;
+    padding: 3px 25px 13px;
+    font-weight: normal;
+  }
+
+  >.chapters {
+    border:none;
+    width: 95%;
+    margin: 0 auto;
+    padding: 25px 0;
+  }
+
+  >.chapters >section:first-child{
+    border-top: 1px solid $border;
+    border-bottom: none;
+  }
+
+  >.chapters >section{
+    border-top: 1px dashed $border;
+    border-bottom: none;
+  }
+  .chapters>section .sections>div .hd{
+    font-weight: normal;
+  }
+  .chapters>section .sections>div .scores{
+    margin: 0;
+    color: $font;
+    font-size: 14px;
+  }
+  .chapters>section .sections>div .hd-3{
+    color: $note;
+    padding-left: 20px;
+  }
+  .chapters>section .sections>div .hd-4 a{
+    color: $title;
+    font-size: 16px;
+  }
+}

@@ -6,6 +6,7 @@
   box-shadow: 0 2px 2px 2px $border;
   line-height: 1.8;
   padding: 40px 0;
+  box-sizing: border-box;
 
   // 1. 布局
   .footer-content{
@@ -131,6 +132,10 @@
 
 @media screen and (max-width: 996px){
   .my-footer{
+    padding: 40px 30px;
+    h3{
+      padding: 0;
+    }
     .footer-app, .footer-wechat{
       display: none;
     }
@@ -139,6 +144,9 @@
     }
     .footer-list{
       min-width: 160px;
+    }
+    .footer-line{
+      display: none;
     }
   }
   
@@ -158,9 +166,6 @@
     }
     .footer-text{
       margin-top: 0;
-    }
-    .footer-line{
-      display: none;
     }
     h3{
       padding: 0;
