@@ -37,7 +37,7 @@ from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMe
 from lms.lib.comment_client import Thread
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
-from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
+from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.core.lib.tests import attr
 from student.roles import CourseStaffRole, UserBasedRole
 from student.tests.factories import CourseAccessRoleFactory, CourseEnrollmentFactory, UserFactory

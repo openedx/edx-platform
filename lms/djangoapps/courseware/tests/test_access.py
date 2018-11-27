@@ -29,7 +29,7 @@ from courseware.tests.factories import (
 from courseware.tests.helpers import LoginEnrollmentTestCase, masquerade_as_group_member
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES, override_waffle_flag
+from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.core.lib.tests import attr
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from student.models import CourseEnrollment

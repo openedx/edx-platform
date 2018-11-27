@@ -7,8 +7,6 @@ StackedConfigurationModel: A ConfigurationModel that can be overridden at site, 
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from collections import namedtuple
-
 from django.conf import settings
 from django.db import models
 from django.db.models import Q, F
