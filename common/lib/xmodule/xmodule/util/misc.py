@@ -90,6 +90,8 @@ def get_default_short_labeler(course):
         for that assignment type, this function would return "Ex 02", assuming
         that "Ex" is the short_label assigned to a grader for Homework subsections.
         """
+        if assignment_type not in default_labelers:
+            return None
         labeler = default_labelers[assignment_type]['labeler']
         index = default_labelers[assignment_type]['index']
         default_labelers[assignment_type]['index'] += 1
