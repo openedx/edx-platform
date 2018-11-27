@@ -1,12 +1,13 @@
 *{  
   box-sizing: content-box;
 }
-.content-wrapper{ 
+.window-wrap .content-wrapper{ 
   margin: 0 auto;
   max-width: none;
   width: 100%;
   flex: 1;
   padding: 0;
+  background-image: linear-gradient(to bottom, #fff 0%, #fff 45%, #f2f9ff 100%);
 }
 .content-wrapper .courses-container{
   max-width: 1200px;
@@ -16,6 +17,16 @@
   .content-wrapper {
     padding: 0;
   }
+}
+.dashboard{ 
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.content-wrapper > #main{  
+  max-width:100%;
+  margin:0 auto;
+  padding: 0;
+  background-image: linear-gradient(to bottom, #fff 0%, #fff 45%, #f2f9ff 100%);
 }
 
 //flex布局

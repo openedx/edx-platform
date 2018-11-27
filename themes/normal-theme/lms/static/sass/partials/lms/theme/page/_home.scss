@@ -1,11 +1,6 @@
 // 0.0.0.0:18000 lms首页
 // 未登录时首页，显示可选课程列表
 
-#main{  
-  max-width:100%;
-  margin:0 auto;
-}
-
 // home header
 .home > header{
   height: 320px;
@@ -57,9 +52,13 @@
   .course-image .cover-image{
     height: 150px;
   }
+  .course-image .cover-image .learn-more{
+    display: none;
+  }
   .course-info{
     height: 140px;
     background-image:none;
+    background: #fff;
   }
   .course-info .course-title{
     margin: 5px 0 0;
@@ -100,16 +99,17 @@
   }
 }
 
+// find-courses
+.find-courses{
+  background: none;
+}
+
+
+
+
+
 @media screen and (max-width:760px){
   .home>header .title>.heading-group h1{
     font-size: 18px;
   }
 }
-
-
-// unknown
-.dashboard{ 
-  width: 1200px;
-  margin: 0 auto;
-}
-
