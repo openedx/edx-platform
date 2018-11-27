@@ -233,7 +233,6 @@ def parse_iso8601_timestamp(timestamp):
 
 
 @require_POST
-@csrf_exempt
 def send_event(request, method, **params):
     """
     Send event to the main and site segment account.

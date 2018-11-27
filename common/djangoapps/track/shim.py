@@ -139,10 +139,10 @@ class DefaultMultipleSegmentClient(object):
             site_client = self._create_client(site_segment_key)
 
         def proxy(*args, **kwargs):
-            getattr(self._main_client, name)(*args, **kwargs)
+            result = getattr(self._main_client, name)(*args, **kwargs)
 
             if not site_client:
-                return
+                return result
 
             # Replace the message id with a new one if it was set.
             if 'message_id' in kwargs:
@@ -153,10 +153,11 @@ class DefaultMultipleSegmentClient(object):
                 gati = helpers.get_value('GOOGLE_ANALYTICS_TRACKING_ID')
                 kwargs['context'] = copy.deepcopy(kwargs['context'] or {})
                 if gati:
-                    kwargs['context']['Google Analytics']['clientId'] = \
-                        gati
+                    kwargs['context']['Google Analytics']['clientId'] = gati
                 else:
                     kwargs['context'].pop('Google Analytics', None)
 
             getattr(site_client, name)(*args, **kwargs)
+            return result
+
         return proxy

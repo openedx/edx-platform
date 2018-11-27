@@ -88,6 +88,10 @@ from lms.envs.common import (
     # File upload defaults
     FILE_UPLOAD_STORAGE_BUCKET_NAME,
     FILE_UPLOAD_STORAGE_PREFIX,
+
+    # Segment support for site
+    SEGMENT_ORIGINAL_API,
+    SEGMENT_REPLICATE_API,
 )
 from path import Path as path
 from warnings import simplefilter

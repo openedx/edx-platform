@@ -8,17 +8,27 @@
 % endif
 
 % if settings.CMS_SEGMENT_KEY and settings.CMS_SEGMENT_SITE:
+## begin Copy from edx-platform/cms/templates/widgets/segment-io.html
 ## Appsembler: begin Segment Site
 <script>
 !function(){
     var realOpen = XMLHttpRequest.prototype.open;
+    var originalAPI = '${settings.SEGMENT_ORIGINAL_API}';
+    var replicateAPI = '${settings.SEGMENT_REPLICATE_API}';
+    var csrfToken = '${csrf_token}';
     XMLHttpRequest.prototype.open = function() {
-        arguments[1] = arguments[1].replace(/^https:\/\/api.segment.io\/v1/, '/segmentio/send');
+        if (arguments[1].substr(0, originalAPI.length) === originalAPI) {
+            arguments[1] = replicateAPI + arguments[1].substr(originalAPI.length);
+            var result = realOpen.apply(this, arguments);
+            this.setRequestHeader('X-CSRFToken', csrfToken);
+            return result;
+        }
         return realOpen.apply(this, arguments);
     };
 }();
 </script>
 ## Appsembler: end Segment Site
+## end Copy
 % endif
 
 % if settings.CMS_SEGMENT_KEY:
