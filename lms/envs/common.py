@@ -1361,7 +1361,8 @@ proctoring_js = (
         'proctoring/js/views/proctored_exam_add_allowance_view.js',
         'proctoring/js/views/proctored_exam_allowance_view.js',
         'proctoring/js/views/proctored_exam_attempt_view.js',
-        'proctoring/js/views/proctored_exam_view.js'
+        'proctoring/js/views/proctored_exam_view.js',
+        'proctoring/js/views/proctored_exam_instructor_launch.js',
     ] +
     [
         'proctoring/js/proctored_app.js'
