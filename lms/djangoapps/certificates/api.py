@@ -53,25 +53,28 @@ def format_certificate_for_user(username, cert):
 
     Returns: dict
     """
-    return {
-        "username": username,
-        "course_key": cert.course_id,
-        "type": cert.mode,
-        "status": cert.status,
-        "grade": cert.grade,
-        "created": cert.created_date,
-        "modified": cert.modified_date,
-        "is_passing": is_passing_status(cert.status),
+    try:
+        return {
+            "username": username,
+            "course_key": cert.course_id,
+            "type": cert.mode,
+            "status": cert.status,
+            "grade": cert.grade,
+            "created": cert.created_date,
+            "modified": cert.modified_date,
+            "is_passing": is_passing_status(cert.status),
 
-        # NOTE: the download URL is not currently being set for webview certificates.
-        # In the future, we can update this to construct a URL to the webview certificate
-        # for courses that have this feature enabled.
-        "download_url": (
-            cert.download_url or get_certificate_url(cert.user.id, cert.course_id)
-            if cert.status == CertificateStatuses.downloadable
-            else None
-        ),
-    }
+            # NOTE: the download URL is not currently being set for webview certificates.
+            # In the future, we can update this to construct a URL to the webview certificate
+            # for courses that have this feature enabled.
+            "download_url": (
+                cert.download_url or get_certificate_url(cert.user.id, cert.course_id)
+                if cert.status == CertificateStatuses.downloadable
+                else None
+            ),
+        }
+    except CourseOverview.DoesNotExist:
+        return None
 
 
 def get_certificates_for_user(username):
@@ -99,10 +102,13 @@ def get_certificates_for_user(username):
     ]
 
     """
-    return [
-        format_certificate_for_user(username, cert)
-        for cert in GeneratedCertificate.eligible_certificates.filter(user__username=username).order_by("course_id")
-    ]
+    certs = []
+    # Checks if certificates are not None before adding them to list
+    for cert in GeneratedCertificate.eligible_certificates.filter(user__username=username).order_by("course_id"):
+        formatted_cert = format_certificate_for_user(username, cert)
+        if formatted_cert:
+            certs.append(formatted_cert)
+    return certs
 
 
 def get_certificate_for_user(username, course_key):
