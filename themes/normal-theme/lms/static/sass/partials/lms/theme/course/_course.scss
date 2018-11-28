@@ -35,9 +35,9 @@
 .page-content{  
   padding: 20px;
 }
-#main{  
-  padding-left:28px;
-} 
+.course-outline{ 
+  padding-left: 28px;
+}
 
 //开始学习按钮
 .action-resume-course{ 
@@ -146,6 +146,58 @@ button.accordion-trigger{
   border: 0px;
 }
 
+//手机课程学习页面
+
+@include media-breakpoint-down(sm){ 
+  #course-container{  
+    margin-top: 0;
+    width:90%;
+  }
+  .page-content{  
+    padding: 20px 0;
+  }
+  .page-header{ 
+    display: block;
+    overflow: hidden;
+    .page-header-main{ 
+      float: left;
+    }
+    .form-actions{  
+      margin-top: 0;
+    }
+    .page-header-secondary{ 
+      float: right;
+    }
+  }
+  #expand-collapse-outline-all-button{  
+    margin-right:20px;
+  }
+  .page-header .page-header-main{ 
+    width:60%;
+    overflow: hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .wrapper-preview-menu{  
+    padding-left:5%;
+    .preview-actions .action-preview .action-preview-label{ 
+      float: left;
+    }
+    .preview-actions .action-preview .action-preview-select{  
+      float:left;
+      width: 50%;
+      background: #fff;
+    }
+  }
+  .content-wrapper .course-tabs{ 
+    .navbar-nav{  
+      padding-left:5%;
+    }
+    .nav-item .nav-link{  
+      padding-right: 20px;
+    }
+  }
+}
 
 
 

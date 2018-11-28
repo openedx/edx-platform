@@ -3,7 +3,7 @@
   width: 100%;
   color: $font;
   font-size: 14px;
-  box-shadow: 0 2px 2px 2px $border;
+  //box-shadow: 0 2px 2px 2px $border;
   line-height: 1.8;
   padding: 40px 0;
   box-sizing: border-box;
@@ -130,7 +130,7 @@
   }
 }
 
-@media screen and (max-width: 996px){
+@media screen and (max-width: 991px){
   .my-footer{
     padding: 40px 30px;
     h3{
@@ -154,18 +154,40 @@
 
 @media screen and (max-width:767px){
   .my-footer{
+    padding: 15px 5%;
     .footer-content{
-      width: 80%;
+      width: 100%;
     }
     .footer-list{
-      width: 49%;
+      width: 47.5%;
+      min-width: 80px;
       margin-bottom: 30px;
+      float: left;
+      li{ 
+        &:hover { 
+          color: $bule;
+        }
+      }
+    }
+    .footer-list:nth-child(odd){  
+      text-align: left;
+      h3{ 
+        text-align: left;
+      }
+    }
+    .footer-list:nth-child(even){  
+      text-align: right;
+      h3{ 
+        text-align: right;
+      }
     }
     ul{
       margin: 10px 0 0 0;
     }
     .footer-text{
       margin-top: 0;
+      padding: 0px;
+
     }
     h3{
       padding: 0;
