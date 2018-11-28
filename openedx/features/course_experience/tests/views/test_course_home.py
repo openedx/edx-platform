@@ -2,7 +2,7 @@
 """
 Tests for the course home page.
 """
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
 
 import ddt
 import mock
@@ -189,7 +189,7 @@ class TestCourseHomePage(CourseHomePageTestCase):
         """
         Verify that the view's query count doesn't regress.
         """
-        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=date(2018, 1, 1))
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         # Pre-fetch the view to populate any caches
         course_home_url(self.course)
 
@@ -435,7 +435,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         Ensure that a user accessing an expired course sees a redirect to
         the student dashboard, not a 404.
         """
-        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=date(2010, 1, 1))
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2010, 1, 1))
         course = CourseFactory.create(start=THREE_YEARS_AGO)
         url = course_home_url(course)
 
@@ -468,7 +468,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         Verify that enrolled users are NOT shown the course expiration banner and can
         access the course home page if course audit only
         """
-        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=date(2010, 1, 1))
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2010, 1, 1))
         audit_only_course = CourseFactory.create()
         self.create_user_for_course(audit_only_course, CourseUserType.ENROLLED)
         response = self.client.get(course_home_url(audit_only_course))
@@ -483,7 +483,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         Ensure that a user accessing an expired course that is in the holdback
         does not get redirected to the student dashboard, not a 404.
         """
-        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=date(2010, 1, 1))
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2010, 1, 1))
 
         course = CourseFactory.create(start=THREE_YEARS_AGO)
         url = course_home_url(course)
@@ -584,7 +584,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         config = CourseDurationLimitConfig(
             course=CourseOverview.get_from_id(self.course.id),
             enabled=True,
-            enabled_as_of=date(2018, 1, 1)
+            enabled_as_of=datetime(2018, 1, 1)
         )
         config.save()
 

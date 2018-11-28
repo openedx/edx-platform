@@ -1,6 +1,6 @@
 import json
 import logging
-from datetime import datetime, date
+from datetime import datetime
 
 import ddt
 from django.urls import reverse
@@ -456,7 +456,7 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
             num_cached_sql_queries,
             mock_request
     ):
-        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=date(2018, 1, 1))
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         with modulestore().default_store(default_store):
             course = CourseFactory.create(discussion_topics={'dummy discussion': {'id': 'dummy_discussion_id'}})
 

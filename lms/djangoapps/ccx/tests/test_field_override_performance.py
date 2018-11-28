@@ -3,7 +3,7 @@
 Performance tests for field overrides.
 """
 import itertools
-from datetime import datetime, date
+from datetime import datetime
 
 import ddt
 import mock
@@ -204,7 +204,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
         """
         ContentTypeGatingConfig.objects.create(
             enabled=True,
-            enabled_as_of=date(2018, 1, 1),
+            enabled_as_of=datetime(2018, 1, 1),
         )
 
         providers = {

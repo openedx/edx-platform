@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import datetime
 from mock import Mock, patch
 
 from opaque_keys.edx.keys import CourseKey
@@ -15,7 +15,7 @@ class TestContentTypeGatingPartition(CacheIsolationTestCase):
     def test_create_content_gating_partition_happy_path(self):
 
         mock_course = Mock(id=self.course_key, user_partitions={})
-        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=date(2018, 1, 1))
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
 
         with patch('openedx.features.content_type_gating.partitions.ContentTypeGatingPartitionScheme.create_user_partition') as mock_create:
             partition = create_content_gating_partition(mock_course)
@@ -37,7 +37,7 @@ class TestContentTypeGatingPartition(CacheIsolationTestCase):
 
     def test_create_content_gating_partition_no_scheme_installed(self):
         mock_course = Mock(id=self.course_key, user_partitions={})
-        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=date(2018, 1, 1))
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
 
         with patch('openedx.features.content_type_gating.partitions.UserPartition.get_scheme', side_effect=UserPartitionError):
             partition = create_content_gating_partition(mock_course)
@@ -46,7 +46,7 @@ class TestContentTypeGatingPartition(CacheIsolationTestCase):
 
     def test_create_content_gating_partition_partition_id_used(self):
         mock_course = Mock(id=self.course_key, user_partitions={Mock(name='partition', id=CONTENT_GATING_PARTITION_ID): object()})
-        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=date(2018, 1, 1))
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
 
         with patch('openedx.features.content_type_gating.partitions.LOG') as mock_log:
             partition = create_content_gating_partition(mock_course)

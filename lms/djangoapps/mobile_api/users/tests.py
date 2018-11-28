@@ -299,7 +299,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         Test that expired courses are only returned in v1 of API
         when waffle flag enabled, and un-expired courses always returned
         '''
-        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime.date(2018, 1, 1))
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime.datetime(2018, 1, 1))
         courses = self._get_enrollment_data(api_version, expired)
         self._assert_enrollment_results(api_version, courses, num_courses_returned)
 

@@ -2,7 +2,7 @@
 """
 Test the course_info xblock
 """
-from datetime import date
+from datetime import datetime
 import ddt
 import mock
 from django.conf import settings
@@ -418,7 +418,7 @@ class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
 
     def setUp(self):
         super(SelfPacedCourseInfoTestCase, self).setUp()
-        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=date(2018, 1, 1))
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
 
         self.setup_user()
 
