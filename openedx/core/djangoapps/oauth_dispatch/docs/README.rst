@@ -7,6 +7,7 @@ functionality. See decisions_ for its historical journey.
 .. _OAuth2: https://tools.ietf.org/html/rfc6749
 .. _decisions: decisions/
 
+
 Background
 ----------
 
