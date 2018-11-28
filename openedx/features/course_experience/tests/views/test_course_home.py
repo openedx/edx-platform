@@ -610,6 +610,23 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         self.assertContains(response, TEST_COURSE_HOME_MESSAGE)
         self.assertContains(response, TEST_COURSE_HOME_MESSAGE_PRE_START)
 
+    def test_course_messaging_for_staff(self):
+        """
+        Staff users will not see the expiration banner when course duration limits
+        are on for the course.
+        """
+        config = CourseDurationLimitConfig(
+            course=CourseOverview.get_from_id(self.course.id),
+            enabled=True,
+            enabled_as_of=date(2018, 1, 1)
+        )
+        config.save()
+        url = course_home_url(self.course)
+        CourseEnrollment.enroll(self.staff_user, self.course.id)
+        response = self.client.get(url)
+        bannerText = get_expiration_banner_text(self.staff_user, self.course)
+        self.assertNotContains(response, bannerText, html=True)
+
     @override_waffle_flag(COURSE_PRE_START_ACCESS_FLAG, active=True)
     @override_waffle_flag(ENABLE_COURSE_GOALS, active=True)
     def test_course_goals(self):
