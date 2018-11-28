@@ -120,4 +120,7 @@ class CourseDurationLimitConfig(StackedConfigurationModel):
         return bool(self.enabled and self.enabled_as_of <= target_date)
 
     def __str__(self):
-        return "CourseDurationLimits(enabled={!r}, enabled_as_of={!r})"
+        return "CourseDurationLimits(enabled={!r}, enabled_as_of={!r})".format(
+            self.enabled,
+            self.enabled_as_of,
+        )
