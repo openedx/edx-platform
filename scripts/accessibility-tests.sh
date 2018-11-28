@@ -37,4 +37,5 @@ SELENIUM_BROWSER=chrome BOKCHOY_HEADLESS=true $TOX paver test_a11y
 export SCRAPY_SETTINGS_MODULE='pa11ycrawler.settings'
 
 echo "Running pa11ycrawler against test course..."
+echo "hi"
 $TOX paver pa11ycrawler --fasttest --skip-clean --fetch-course --with-html
