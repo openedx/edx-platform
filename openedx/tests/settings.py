@@ -75,6 +75,7 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.content.block_structure.apps.BlockStructureConfig',
     'openedx.core.djangoapps.catalog',
     'openedx.core.djangoapps.self_paced',
+    'experiments',
     'openedx.features.content_type_gating',
     'openedx.features.course_duration_limits',
     'milestones',
