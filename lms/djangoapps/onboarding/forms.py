@@ -314,6 +314,24 @@ class InterestsForm(BaseOnboardingForm):
             choices=personal_goal_choices, widget=forms.CheckboxSelectMultiple,
             required=False)
 
+        hear_about_philanthropy_choices = get_sorted_choices_from_dict(UserExtendedProfile
+                                                                       .HEAR_ABOUT_PHILANTHROPY_LABELS)
+        hear_about_philanthropy_choices = sorted(hear_about_philanthropy_choices,
+                                       key=lambda hear_about_philanthropy_choices: hear_about_philanthropy_choices[0])
+        self.fields['hear_about_philanthropy'] = forms.ChoiceField(
+            label=ugettext_noop('How did you hear about Philanthropy University?'
+                                ' (Choose one. If more than one applies, please choose the source that most strongly '
+                                'influenced you to visit the website.)'),
+            choices=hear_about_philanthropy_choices, widget=forms.RadioSelect,
+            required=False)
+
+        self.fields['hear_about_philanthropy_other'] = forms.CharField(
+            max_length=255,
+            required=False,
+            widget=forms.TextInput(
+                attrs={'placeholder': ugettext_noop('Other Reason')}
+            ))
+
     def _clean_fields(self):
         """
         Override to prevent 'valid choice options' validations
@@ -327,10 +345,15 @@ class InterestsForm(BaseOnboardingForm):
         selected_interests = get_actual_field_names(request.POST.getlist('interests'))
         selected_interested_learners = get_actual_field_names(request.POST.getlist('interested_learners'))
         selected_personal_goals = get_actual_field_names(request.POST.getlist('personal_goals'))
+        selected_hear_about_philanthropy = get_actual_field_names(request.POST.getlist('hear_about_philanthropy'))
 
         user_extended_profile.save_user_interests(selected_interests)
         user_extended_profile.save_user_interested_learners(selected_interested_learners)
         user_extended_profile.save_user_personal_goals(selected_personal_goals)
+        user_extended_profile.save_user_hear_about_philanthropy_result(selected_hear_about_philanthropy,
+                                                                       request.POST.getlist('hear_about_'
+                                                                                            'philanthropy_other'))
+
         user_extended_profile.is_interests_data_submitted = True
         user_extended_profile.save()
 
