@@ -52,12 +52,6 @@
 
             profileImageUrl: function() {
                 return this.get('profile_image').image_url_large;
-            },
-
-            isAboveMinimumAge: function() {
-                var yearOfBirth = this.get('year_of_birth');
-                var isBirthDefined = !(_.isUndefined(yearOfBirth) || _.isNull(yearOfBirth));
-                return isBirthDefined && !(this.get('requires_parental_consent'));
             }
         });
         return UserAccountModel;

@@ -58,7 +58,7 @@
             },
 
             updateFieldValue: function() {
-                if (!this.isAboveMinimumAge) {
+                if (this.requiresParentalConsent) {
                     this.$('.u-field-value select').val('private');
                     this.disableField(true);
                 }
@@ -121,7 +121,7 @@
             },
 
             isEditingAllowed: function() {
-                return this.model.isAboveMinimumAge();
+                return !this.model.get('requires_parental_consent');
             },
 
             isShowingPlaceholder: function() {
