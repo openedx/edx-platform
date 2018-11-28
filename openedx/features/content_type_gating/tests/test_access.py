@@ -20,11 +20,17 @@ from openedx.features.content_type_gating.partitions import CONTENT_GATING_PARTI
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from student.roles import CourseBetaTesterRole, CourseInstructorRole, CourseStaffRole
 from student.tests.factories import (
-    AdminFactory,
-    CourseAccessRoleFactory,
     CourseEnrollmentFactory,
     UserFactory,
     TEST_PASSWORD
+)
+from lms.djangoapps.courseware.tests.factories import (
+    InstructorFactory,
+    StaffFactory,
+    BetaTesterFactory,
+    OrgStaffFactory,
+    OrgInstructorFactory,
+    GlobalStaffFactory,
 )
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -380,35 +386,49 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
         response = self.client.post(url)
         self.assertEqual(response.status_code, status_code)
 
-    def test_access_course_team_users(self):
+    @ddt.data(
+        InstructorFactory,
+        StaffFactory,
+        BetaTesterFactory,
+        OrgStaffFactory,
+        OrgInstructorFactory,
+    )
+    def test_access_course_team_users(self, role_factory):
         """
         Test that members of the course team do not lose access to graded content
         """
         # There are two types of course team members: instructor and staff
         # they have different privileges, but for the purpose of this test the important thing is that they should both
         # have access to all graded content
-        course_team = []
-        instructor = UserFactory.create()
-        CourseInstructorRole(self.course.id).add_users(instructor)
-        course_team.append(instructor)
+        user = role_factory.create(course_key=self.course.id)
+        # assert that course team members have access to graded content
+        _assert_block_is_gated(
+            block=self.blocks_dict['problem'],
+            user_id=user.id,
+            course=self.course,
+            is_gated=False,
+            request_factory=self.factory,
+        )
 
-        staff = UserFactory.create()
-        CourseStaffRole(self.course.id).add_users(staff)
-        course_team.append(staff)
-
-        beta_tester = UserFactory.create()
-        CourseBetaTesterRole(self.course.id).add_users(beta_tester)
-        course_team.append(beta_tester)
-
-        # assert that all course team members have access to graded content
-        for course_team_member in course_team:
-            _assert_block_is_gated(
-                block=self.blocks_dict['problem'],
-                user_id=course_team_member.id,
-                course=self.course,
-                is_gated=False,
-                request_factory=self.factory,
-            )
+    @ddt.data(
+        GlobalStaffFactory,
+    )
+    def test_access_global_users(self, role_factory):
+        """
+        Test that members of the course team do not lose access to graded content
+        """
+        # There are two types of course team members: instructor and staff
+        # they have different privileges, but for the purpose of this test the important thing is that they should both
+        # have access to all graded content
+        user = role_factory.create()
+        # assert that course team members have access to graded content
+        _assert_block_is_gated(
+            block=self.blocks_dict['problem'],
+            user_id=user.id,
+            course=self.course,
+            is_gated=False,
+            request_factory=self.factory,
+        )
 
 
 @ddt.ddt
