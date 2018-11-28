@@ -15,7 +15,6 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.template.context_processors import csrf
-from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.utils.text import slugify
@@ -27,6 +26,7 @@ from edx_proctoring.services import ProctoringService
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from requests.auth import HTTPBasicAuth
+from rest_framework.decorators import api_view
 from six import text_type
 from xblock.core import XBlock
 from xblock.django.request import django_to_webob_request, webob_to_django_response
@@ -59,6 +59,7 @@ from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.services import CreditService
 from openedx.core.djangoapps.util.user_utils import SystemUser
 from openedx.core.djangolib.markup import HTML
+from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.lib.gating.services import GatingService
 from openedx.core.lib.license import wrap_with_license
 from openedx.core.lib.url_utils import quote_slashes, unquote_slashes
@@ -1169,6 +1170,8 @@ def hash_resource(resource):
     return md5.hexdigest()
 
 
+@api_view(['GET'])
+@view_auth_classes(is_authenticated=True)
 def xblock_view(request, course_id, usage_id, view_name):
     """
     Returns the rendered view of a given XBlock, with related resources
@@ -1182,9 +1185,6 @@ def xblock_view(request, course_id, usage_id, view_name):
         log.warn("Attempt to use deactivated XBlock view endpoint -"
                  " see FEATURES['ENABLE_XBLOCK_VIEW_ENDPOINT']")
         raise Http404
-
-    if not request.user.is_authenticated:
-        raise PermissionDenied
 
     try:
         course_key = CourseKey.from_string(course_id)
