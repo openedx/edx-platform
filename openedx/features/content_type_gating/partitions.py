@@ -44,7 +44,9 @@ def create_content_gating_partition(course):
     Create and return the Content Gating user partition.
     """
 
-    if not ContentTypeGatingConfig.enabled_for_course(course_key=course.id):
+    enabled_for_course = ContentTypeGatingConfig.enabled_for_course(course_key=course.id)
+    studio_override_for_course = ContentTypeGatingConfig.current(course_key=course.id).studio_override_enabled
+    if not (enabled_for_course or studio_override_for_course):
         return None
 
     try:
