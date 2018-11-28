@@ -756,7 +756,8 @@ def storage_service_bucket():
     bucket_location = bucket.get_location()
     if bucket_location:
         conn = s3.connect_to_region(bucket_location)
-        bucket = conn.get_bucket(settings.VIDEO_UPLOAD_PIPELINE["BUCKET"])
+        if conn:
+            bucket = conn.get_bucket(settings.VIDEO_UPLOAD_PIPELINE["BUCKET"])
     return bucket
 
 
