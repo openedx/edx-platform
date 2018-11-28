@@ -46,7 +46,6 @@ from openedx.core.djangoapps.credit.models import (
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup, UnregisteredLearnerCohortAssignments
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
-from openedx.core.djangoapps.user_api.accounts.signals import USER_RETIRE_THIRD_PARTY_MAILINGS
 from openedx.core.djangoapps.user_api.models import (
     RetirementState,
     UserRetirementStatus,
@@ -246,75 +245,6 @@ class TestDeactivateLogout(RetirementTestCase):
         headers = build_jwt_headers(self.test_user)
         response = self.client.post(self.url, self.build_post(self.test_password), **headers)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
-
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
-class TestAccountRetireMailings(RetirementTestCase):
-    """
-    Tests the account retire mailings endpoint.
-    """
-    def setUp(self):
-        super(TestAccountRetireMailings, self).setUp()
-        self.test_superuser = SuperuserFactory()
-        self.test_service_user = UserFactory()
-
-        # Should be created in parent setUpClass
-        retiring_email_lists = RetirementState.objects.get(state_name='RETIRING_EMAIL_LISTS')
-        self.retirement = create_retirement_status(UserFactory(), state=retiring_email_lists)
-        self.test_user = self.retirement.user
-
-        self.url = reverse('accounts_retire_mailings')
-
-    def build_post(self, user):
-        return {'username': user.username}
-
-    def assert_status(self, headers, expected_status=status.HTTP_204_NO_CONTENT, expected_content=None):
-        """
-        Helper function for making a request to the retire subscriptions endpoint, and asserting the status.
-        """
-        response = self.client.post(self.url, self.build_post(self.test_user), **headers)
-
-        self.assertEqual(response.status_code, expected_status)
-
-        if expected_content:
-            self.assertEqual(response.content.strip('"'), expected_content)
-
-    def test_superuser_retires_user_subscriptions(self):
-        """
-        Verify a user's subscriptions are retired when a superuser posts to the retire subscriptions endpoint.
-        """
-        headers = build_jwt_headers(self.test_superuser)
-        self.assert_status(headers)
-
-    def test_unauthorized_rejection(self):
-        """
-        Verify unauthorized users cannot retire subscriptions.
-        """
-        headers = build_jwt_headers(self.test_user)
-
-        # User should still have 2 "True" subscriptions.
-        self.assert_status(headers, expected_status=status.HTTP_403_FORBIDDEN)
-
-    def test_signal_failure(self):
-        """
-        Verify that if a signal fails the transaction is rolled back and a proper error message is returned.
-        """
-        headers = build_jwt_headers(self.test_superuser)
-
-        mock_handler = mock.MagicMock()
-        mock_handler.side_effect = Exception("Tango")
-
-        try:
-            USER_RETIRE_THIRD_PARTY_MAILINGS.connect(mock_handler)
-
-            # User should still have 2 "True" subscriptions.
-            self.assert_status(
-                headers,
-                expected_status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                expected_content="Tango"
-            )
-        finally:
-            USER_RETIRE_THIRD_PARTY_MAILINGS.disconnect(mock_handler)
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
