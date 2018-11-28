@@ -468,7 +468,7 @@ XQUEUE_INTERFACE = {
 ################################# Middleware ###################################
 
 MIDDLEWARE_CLASSES = [
-    'x_forwarded_for.middleware.XForwardedForMiddleware',
+    'openedx.core.lib.x_forwarded_for.middleware.XForwardedForMiddleware',
 
     'crum.CurrentRequestUserMiddleware',
 

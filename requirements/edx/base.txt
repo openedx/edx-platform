@@ -101,7 +101,6 @@ django-storages==1.4.1
 django-user-tasks==0.1.5
 django-waffle==0.12.0
 django-webpack-loader==0.6.0
-django-xforwardedfor-middleware==2.0
 django==1.11.16
 djangorestframework-jwt==1.11.0
 djangorestframework-xml==1.3.0  # via edx-enterprise
@@ -126,7 +125,7 @@ edx-oauth2-provider==1.2.2
 edx-opaque-keys[django]==0.4.4
 edx-organizations==1.0.0
 edx-proctoring==1.4.0
-edx-rest-api-client==1.9
+edx-rest-api-client==1.9.1
 edx-search==1.2.1
 edx-submissions==2.0.12
 edx-user-state-client==1.0.4
@@ -141,7 +140,7 @@ fs==2.0.18
 future==0.17.1            # via pyjwkest
 futures==3.2.0 ; python_version == "2.7"
 glob2==0.3
-gunicorn==17.5
+gunicorn==19.0
 hash-ring==1.3.1          # via django-memcached-hashring
 help-tokens==1.0.3
 html5lib==1.0.1
@@ -165,7 +164,7 @@ mailsnake==1.6.2
 mako==1.0.2
 markdown==2.6.11
 markey==0.8               # via django-babel-underscore
-markupsafe==1.0
+markupsafe==1.1.0
 mock==1.0.1
 mongoengine==0.10.0
 mysql-python==1.2.5
@@ -180,7 +179,7 @@ openapi-codec==1.3.2      # via django-rest-swagger
 path.py==8.2.1
 pathtools==0.1.2
 paver==1.3.4
-pbr==5.1.0
+pbr==5.1.1
 pdfminer==20140328
 piexif==1.0.2
 pillow==5.3.0

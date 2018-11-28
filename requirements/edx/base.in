@@ -62,7 +62,6 @@ django-user-tasks
 django-waffle==0.12.0
 django-webpack-loader               # Used to wire webpack bundles into the django asset pipeline
 djangorestframework-jwt
-django-xforwardedfor-middleware==2.0 # Middleware to use the X-Forwarded-For header as the request IP
 dogapi==1.2.1                       # Python bindings to Datadog's API, for metrics gathering
 edx-ace==0.1.10
 edx-analytics-data-api-client
@@ -92,7 +91,7 @@ fs==2.0.18
 fs-s3fs==0.1.8
 futures ; python_version == "2.7"   # via django-pipeline, python-swift-client, s3transfer
 glob2==0.3                          # Enhanced glob module, used in openedx.core.lib.rooted_paths
-gunicorn==17.5
+gunicorn==19.0
 help-tokens
 html5lib                            # HTML parser, used for capa problems
 ipaddr==2.1.11                      # Ip network support for Embargo feature

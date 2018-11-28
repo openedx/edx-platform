@@ -12,12 +12,12 @@ edx-opaque-keys==0.4.4
 idna==2.7                 # via requests
 lazy==1.1
 libsass==0.10.0
-markupsafe==1.0
+markupsafe==1.1.0
 mock==1.0.1
 path.py==8.2.1
 pathtools==0.1.2          # via watchdog
 paver==1.3.4
-pbr==5.1.0                # via stevedore
+pbr==5.1.1                # via stevedore
 psutil==1.2.1
 pymongo==2.9.1
 python-memcached==1.48
