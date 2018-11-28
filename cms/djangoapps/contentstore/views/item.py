@@ -584,6 +584,7 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
 
                         field.write_to(xblock, value)
 
+        validate_and_update_xblock_due_date(xblock)
         # update the xblock and call any xblock callbacks
         xblock = _update_with_callback(xblock, user, old_metadata, old_content)
 
@@ -1451,6 +1452,14 @@ def _get_release_date(xblock, user=None):
 
     # Treat DEFAULT_START_DATE as a magic number that means the release date has not been set
     return get_default_time_display(xblock.start) if xblock.start != DEFAULT_START_DATE else None
+
+
+def validate_and_update_xblock_due_date(xblock):
+    """
+    Validates the due date for the xblock, and set to None if pre-1900 due date provided
+    """
+    if xblock.due and xblock.due.year < 1900:
+        xblock.due = None
 
 
 def _get_release_date_from(xblock):
