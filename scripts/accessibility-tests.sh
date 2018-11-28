@@ -36,6 +36,8 @@ SELENIUM_BROWSER=chrome BOKCHOY_HEADLESS=true $TOX paver test_a11y
 # The settings that we use are installed with the pa11ycrawler module
 export SCRAPY_SETTINGS_MODULE='pa11ycrawler.settings'
 
+echo "Resetting database based on cache files for pa11ycrawler"
+bash scripts/reset_test_db --use-existing-db
+
 echo "Running pa11ycrawler against test course..."
-git checkout -- common/test/db_cache
 $TOX paver pa11ycrawler --fasttest --skip-clean --fetch-course --with-html
