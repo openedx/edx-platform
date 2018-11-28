@@ -63,6 +63,7 @@ class AccessTokenMixin(object):
             'scopes': scopes,
             'version': settings.JWT_AUTH['JWT_SUPPORTED_VERSION'],
             'sub': anonymous_id_for_user(user, None),
+            'email_verified': user.is_active,
         }
 
         if 'email' in scopes:
