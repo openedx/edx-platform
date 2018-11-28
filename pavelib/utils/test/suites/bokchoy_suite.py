@@ -287,6 +287,7 @@ class BokChoyTestSuite(TestSuite):
             msg = colorize('green', "Cleaning up databases...")
             print msg
             sh("./manage.py lms --settings {settings} flush --traceback --noinput".format(settings=Env.SETTINGS))
+            sh("./manage.py cms --settings {settings} flush --traceback --noinput".format(settings=Env.SETTINGS))
             clear_mongo()
 
     @property
