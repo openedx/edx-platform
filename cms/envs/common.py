@@ -1451,11 +1451,12 @@ MICROSITE_TEMPLATE_BACKEND = 'microsite_configuration.backends.filebased.Filebas
 MICROSITE_DATABASE_TEMPLATE_CACHE_TTL = 5 * 60
 
 ############################### PROCTORING CONFIGURATION DEFAULTS ##############
-PROCTORING_BACKEND_PROVIDER = {
-    'class': 'edx_proctoring.backends.null.NullBackendProvider',
-    'options': {},
-}
 PROCTORING_SETTINGS = {}
+PROCTORING_BACKENDS = {
+    'DEFAULT': 'null',
+    'null': {},
+}
+
 
 ############################ Global Database Configuration #####################
 
