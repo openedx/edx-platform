@@ -9,7 +9,7 @@ $trophy-gold: #f39c12;
 
 .content-wrapper {
   .learner-analytics-header {
-      border-bottom: none;
+    border-bottom: none;
 
     .title {
       margin-bottom: 0;
@@ -93,6 +93,7 @@ $trophy-gold: #f39c12;
     flex-flow: row wrap;
     border-bottom: 1px solid $table-border;
     margin-bottom: 25px;
+
     .chart-wrapper {
       width: 90px;
       height: 90px;
@@ -101,18 +102,23 @@ $trophy-gold: #f39c12;
       .slice-1 {
         fill: nth($slices, 1);
       }
+
       .slice-2 {
         fill: nth($slices, 2);
       }
+
       .slice-3 {
         fill: nth($slices, 3);
       }
+
       .slice-4 {
         fill: nth($slices, 4);
       }
+
       .slice-5 {
         fill: nth($slices, 5);
       }
+
       .slice-6 {
         fill: nth($slices, 6);
       }
@@ -145,18 +151,23 @@ $trophy-gold: #f39c12;
         &.swatch-1 {
           background-color: nth($slices, 1);
         }
+
         &.swatch-2 {
           background-color: nth($slices, 2);
         }
+
         &.swatch-3 {
           background-color: nth($slices, 3);
         }
+
         &.swatch-4 {
           background-color: nth($slices, 4);
         }
+
         &.swatch-5 {
           background-color: nth($slices, 5);
         }
+
         &.swatch-6 {
           background-color: nth($slices, 6);
         }
@@ -309,6 +320,7 @@ $trophy-gold: #f39c12;
   .discussions-wrapper {
     display: flex;
     flex-flow: column wrap;
+
     .group-heading {
       width: 100%;
     }

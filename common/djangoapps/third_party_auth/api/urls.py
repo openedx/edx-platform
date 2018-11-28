@@ -3,7 +3,7 @@
 from django.conf import settings
 from django.conf.urls import url
 
-from .views import UserMappingView, UserView
+from .views import UserMappingView, UserView, UserViewV2
 
 
 PROVIDER_PATTERN = r'(?P<provider_id>[\w.+-]+)(?:\:(?P<idp_slug>[\w.+-]+))?'
@@ -14,6 +14,7 @@ urlpatterns = [
         UserView.as_view(),
         name='third_party_auth_users_api',
     ),
+    url(r'^v0/users/', UserViewV2.as_view(), name='third_party_auth_users_api_v2'),
     url(
         r'^v0/providers/{provider_pattern}/users$'.format(provider_pattern=PROVIDER_PATTERN),
         UserMappingView.as_view(),

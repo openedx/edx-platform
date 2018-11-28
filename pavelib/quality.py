@@ -612,6 +612,15 @@ def run_xsscommitlint():
     _write_metric(violations_count_str, metrics_report)
     # Output report to console.
     sh("cat {metrics_report}".format(metrics_report=metrics_report), ignore_error=True)
+    if num_violations:
+        fail_quality(
+            'xsscommitlint',
+            "FAILURE: XSSCommitLinter Failed.\n{error_message}\n"
+            "See {xsscommitlint_report} or run the following command to hone in on the problem:\n"
+            "  ./scripts/xss-commit-linter.sh -h".format(
+                error_message=violations_count_str, xsscommitlint_report=xsscommitlint_report
+            )
+        )
     write_junit_xml("xsscommitlint")
 
 

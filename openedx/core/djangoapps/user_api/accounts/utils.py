@@ -1,13 +1,14 @@
 """
 Utility methods for the account settings.
 """
+from __future__ import unicode_literals
+
 import random
 import re
 import string
 from urlparse import urlparse
 
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 from six import text_type
 
@@ -80,7 +81,7 @@ def _get_username_from_social_link(platform_name, new_social_link):
     parse_result = urlparse(new_social_link)
     url_domain_and_path = parse_result[1] + parse_result[2]
     url_stub = re.escape(settings.SOCIAL_PLATFORMS[platform_name]['url_stub'])
-    username_match = re.search('(www\.)?' + url_stub + '(?P<username>.*?)[/]?$', url_domain_and_path, re.IGNORECASE)
+    username_match = re.search(r'(www\.)?' + url_stub + r'(?P<username>.*?)[/]?$', url_domain_and_path, re.IGNORECASE)
     if username_match:
         username = username_match.group('username')
     else:

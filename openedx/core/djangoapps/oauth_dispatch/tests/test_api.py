@@ -45,7 +45,7 @@ class TestOAuthDispatchAPI(TestCase):
             {
                 u'token_type': u'Bearer',
                 u'expires_in': EXPECTED_DEFAULT_EXPIRES_IN,
-                u'scope': u'default',
+                u'scope': u'',
             },
             token,
         )
@@ -58,7 +58,9 @@ class TestOAuthDispatchAPI(TestCase):
 
     def test_create_token_overrides(self):
         expires_in = 4800
-        token = api.create_dot_access_token(HttpRequest(), self.user, self.client, expires_in=expires_in, scope=2)
+        token = api.create_dot_access_token(
+            HttpRequest(), self.user, self.client, expires_in=expires_in, scopes=['profile'],
+        )
         self.assertDictContainsSubset({u'scope': u'profile'}, token)
         self.assertDictContainsSubset({u'expires_in': expires_in}, token)
 
@@ -69,7 +71,7 @@ class TestOAuthDispatchAPI(TestCase):
             {
                 u'token_type': u'Bearer',
                 u'expires_in': EXPECTED_DEFAULT_EXPIRES_IN,
-                u'scope': u'default',
+                u'scope': u'',
             },
             new_token,
         )

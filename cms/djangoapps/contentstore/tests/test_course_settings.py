@@ -496,11 +496,13 @@ class CourseGradingTest(CourseTestCase):
 
         # one for each of the calls to update_from_json()
         send_signal.assert_has_calls([
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id),
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id),
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id),
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id),
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id),
+            # pylint: disable=line-too-long
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_1),
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_2),
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_3),
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_4),
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_4),
+            # pylint: enable=line-too-long
         ])
 
         # one for each of the calls to update_from_json(); the last update doesn't actually change the parts of the
@@ -546,9 +548,11 @@ class CourseGradingTest(CourseTestCase):
 
         # one for each of the calls to update_grader_from_json()
         send_signal.assert_has_calls([
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id),
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id),
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id),
+            # pylint: disable=line-too-long
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_1),
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_2),
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_3),
+            # pylint: enable=line-too-long
         ])
 
         # one for each of the calls to update_grader_from_json()
@@ -661,8 +665,10 @@ class CourseGradingTest(CourseTestCase):
 
         # one for each call to update_section_grader_type()
         send_signal.assert_has_calls([
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id),
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id),
+            # pylint: disable=line-too-long
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_1),
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_2),
+            # pylint: enable=line-too-long
         ])
 
         tracker.emit.assert_has_calls([
@@ -723,7 +729,7 @@ class CourseGradingTest(CourseTestCase):
             '{}/{}'.format(grader_type_url_base, len(original_model['graders'])),
             new_grader
         )
-
+        grading_policy_hash1 = self._grading_policy_hash_for_course()
         self.assertEqual(200, response.status_code)
         grader_sample = json.loads(response.content)
         new_grader['id'] = len(original_model['graders'])
@@ -731,7 +737,7 @@ class CourseGradingTest(CourseTestCase):
 
         # test deleting the original grader
         response = self.client.delete(grader_type_url_base + '/1', HTTP_ACCEPT="application/json")
-
+        grading_policy_hash2 = self._grading_policy_hash_for_course()
         self.assertEqual(204, response.status_code)
         updated_model = self._model_from_url(grader_type_url_base)
         new_grader['id'] -= 1  # one fewer and the id mutates
@@ -739,9 +745,11 @@ class CourseGradingTest(CourseTestCase):
         self.assertNotIn(original_model['graders'][1], updated_model['graders'])
         send_signal.assert_has_calls([
             # once for the POST
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id),
+            # pylint: disable=line-too-long
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_hash1),
             # once for the DELETE
-            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id),
+            mock.call(sender=CourseGradingModel, user_id=self.user.id, course_key=self.course.id, grading_policy_hash=grading_policy_hash2),
+            # pylint: enable=line-too-long
         ])
 
     def setup_test_set_get_section_grader_ajax(self):
@@ -1018,7 +1026,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         fresh = modulestore().get_course(self.course.id)
         test_model = CourseMetadata.fetch(fresh)
 
-        self.assertNotEqual(test_model['advertised_start']['value'], 1, 'advertised_start should not be updated to a wrong value')
+        self.assertNotEqual(test_model['advertised_start']['value'], 1, 'advertised_start should not be updated to a wrong value')  # pylint: disable=line-too-long
         self.assertNotEqual(test_model['days_early_for_beta']['value'], "supposed to be an integer",
                             'days_early_for beta should not be updated to a wrong value')
 

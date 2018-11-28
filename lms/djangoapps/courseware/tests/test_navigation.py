@@ -28,6 +28,7 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
     @classmethod
     def setUpClass(cls):
+        # pylint: disable=super-method-not-called
         with super(TestNavigation, cls).setUpClassAndTestData():
             cls.test_course = CourseFactory.create()
             cls.test_course_proctored = CourseFactory.create()

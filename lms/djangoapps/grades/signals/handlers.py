@@ -227,6 +227,7 @@ def enqueue_subsection_update(sender, **kwargs):  # pylint: disable=unused-argum
             event_transaction_id=unicode(get_event_transaction_id()),
             event_transaction_type=unicode(get_event_transaction_type()),
             score_db_table=kwargs['score_db_table'],
+            force_update_subsections=kwargs.get('force_update_subsections', False),
         ),
         countdown=RECALCULATE_GRADE_DELAY_SECONDS,
     )

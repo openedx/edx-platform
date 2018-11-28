@@ -91,7 +91,7 @@
         padding: 0;
         text-shadow: none;
         -webkit-appearance: none;
-        width: flex-grid(.5) + flex-gutter();
+        width: flex-grid(0.5) + flex-gutter();
 
         &:hover, &:focus {
           background: $blue-d2;

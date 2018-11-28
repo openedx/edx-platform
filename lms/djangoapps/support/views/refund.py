@@ -19,8 +19,6 @@ from django.http import HttpResponseRedirect
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.generic.edit import FormView
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.lib.courses import clean_course_id
 from student.models import CourseEnrollment

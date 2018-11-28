@@ -6,7 +6,6 @@ Much of this file was broken out from views.py, previous history can be found th
 
 import logging
 
-import analytics
 from django.conf import settings
 from django.contrib.auth import authenticate, login as django_login
 from django.contrib.auth.decorators import login_required
@@ -19,7 +18,6 @@ from django.views.decorators.http import require_http_methods
 from ratelimitbackend.exceptions import RateLimitException
 
 from edxmako.shortcuts import render_to_response
-from eventtracking import tracker
 from openedx.core.djangoapps.user_authn.cookies import set_logged_in_cookies, refresh_jwt_cookies
 from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
 import openedx.core.djangoapps.external_auth.views
@@ -27,13 +25,14 @@ from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
-from openedx.core.djangoapps.user_api.config.waffle import PASSWORD_UNICODE_NORMALIZE_FLAG
+from openedx.core.djangolib.markup import HTML, Text
 from student.models import (
     LoginFailures,
     PasswordHistory,
 )
 from student.views import send_reactivation_email_for_user
 from student.forms import send_password_reset_email_for_user
+from track import segment
 import third_party_auth
 from third_party_auth import pipeline, provider
 from util.json_request import JsonResponse
@@ -78,11 +77,14 @@ def _do_third_party_auth(request):
             provider_name=requested_provider.name,
         )
         message += "<br/><br/>"
-        message += _(
+        message += Text(_(
             "If you don't have an {platform_name} account yet, "
-            "click <strong>Register</strong> at the top of the page."
-        ).format(
-            platform_name=platform_name
+            "click {register_label_strong} at the top of the page."
+        )).format(
+            platform_name=platform_name,
+            register_label_strong=HTML('<strong>{register_text}</strong>').format(
+                register_text=_('Register')
+            )
         )
 
         raise AuthFailedError(message)
@@ -213,9 +215,7 @@ def _authenticate_first_party(request, unauthenticated_user):
     username = unauthenticated_user.username if unauthenticated_user else ""
 
     try:
-        password = request.POST['password']
-        if PASSWORD_UNICODE_NORMALIZE_FLAG.is_enabled():
-            password = normalize_password(password)
+        password = normalize_password(request.POST['password'])
         return authenticate(
             username=username,
             password=password,
@@ -260,11 +260,8 @@ def _handle_successful_authentication_and_login(user, request):
 
     try:
         django_login(request, user)
-        if request.POST.get('remember') == 'true':
-            request.session.set_expiry(604800)
-            log.debug("Setting user session to never expire")
-        else:
-            request.session.set_expiry(0)
+        request.session.set_expiry(604800 * 4)
+        log.debug("Setting user session expiry to 4 weeks")
     except Exception as exc:
         AUDIT_LOG.critical("Login failed - Could not create session. Is memcached running?")
         log.critical("Login failed - Could not create session. Is memcached running?")
@@ -276,37 +273,28 @@ def _track_user_login(user, request):
     """
     Sends a tracking event for a successful login.
     """
-    if hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
-        tracking_context = tracker.get_tracker().resolve_context()
-        analytics.identify(
-            user.id,
-            {
-                'email': request.POST['email'],
-                'username': user.username
-            },
-            {
-                # Disable MailChimp because we don't want to update the user's email
-                # and username in MailChimp on every page load. We only need to capture
-                # this data on registration/activation.
-                'MailChimp': False
-            }
-        )
-
-        analytics.track(
-            user.id,
-            "edx.bi.user.account.authenticated",
-            {
-                'category': "conversion",
-                'label': request.POST.get('course_id'),
-                'provider': None
-            },
-            context={
-                'ip': tracking_context.get('ip'),
-                'Google Analytics': {
-                    'clientId': tracking_context.get('client_id')
-                }
-            }
-        )
+    segment.identify(
+        user.id,
+        {
+            'email': request.POST.get('email'),
+            'username': user.username
+        },
+        {
+            # Disable MailChimp because we don't want to update the user's email
+            # and username in MailChimp on every page load. We only need to capture
+            # this data on registration/activation.
+            'MailChimp': False
+        }
+    )
+    segment.track(
+        user.id,
+        "edx.bi.user.account.authenticated",
+        {
+            'category': "conversion",
+            'label': request.POST.get('course_id'),
+            'provider': None
+        },
+    )
 
 
 @login_required

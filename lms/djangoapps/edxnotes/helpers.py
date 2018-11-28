@@ -126,7 +126,7 @@ def delete_all_notes_for_user(user):
     Raises:
         EdxNotesServiceUnavailable - when notes api is not found/misconfigured.
     """
-    url = get_internal_endpoint('annotations')
+    url = get_internal_endpoint('retire_annotations')
     headers = {
         "x-annotator-auth-token": get_edxnotes_id_token(user),
     }
@@ -134,7 +134,7 @@ def delete_all_notes_for_user(user):
         "user": anonymous_id_for_user(user, None)
     }
     try:
-        response = requests.delete(
+        response = requests.post(
             url=url,
             headers=headers,
             data=data,

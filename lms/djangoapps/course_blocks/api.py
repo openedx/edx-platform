@@ -6,8 +6,15 @@ from django.conf import settings
 
 from openedx.core.djangoapps.content.block_structure.api import get_block_structure_manager
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
+from openedx.features.content_type_gating.block_transformers import ContentTypeGateTransformer
 
-from .transformers import library_content, start_date, user_partitions, visibility, load_override_data
+from .transformers import (
+    library_content,
+    start_date,
+    user_partitions,
+    visibility,
+    load_override_data,
+)
 from .usage_info import CourseUsageInfo
 
 INDIVIDUAL_STUDENT_OVERRIDE_PROVIDER = (
@@ -36,9 +43,11 @@ def get_course_block_access_transformers(user):
     course_block_access_transformers = [
         library_content.ContentLibraryTransformer(),
         start_date.StartDateTransformer(),
+        ContentTypeGateTransformer(),
         user_partitions.UserPartitionTransformer(),
         visibility.VisibilityTransformer(),
     ]
+
     if has_individual_student_override_provider():
         course_block_access_transformers += [load_override_data.OverrideDataTransformer(user)]
 

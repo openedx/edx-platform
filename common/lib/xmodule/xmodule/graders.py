@@ -16,6 +16,9 @@ from contracts import contract
 from pytz import UTC
 from django.utils.translation import ugettext_lazy as _
 
+from xmodule.util.misc import get_short_labeler
+
+
 log = logging.getLogger("edx.courseware")
 
 
@@ -378,6 +381,7 @@ class AssignmentFormatGrader(CourseGrader):
     def grade(self, grade_sheet, generate_random_scores=False):
         scores = grade_sheet.get(self.type, {}).values()
         breakdown = []
+        labeler = get_short_labeler(self.short_label)
         for i in range(max(self.min_count, len(scores))):
             if i < len(scores) or generate_random_scores:
                 if generate_random_scores:  	# for debugging!
@@ -407,10 +411,7 @@ class AssignmentFormatGrader(CourseGrader):
                     index=i + self.starting_index,
                     section_type=self.section_type
                 )
-            short_label = u"{short_label} {index:02d}".format(
-                index=i + self.starting_index,
-                short_label=self.short_label
-            )
+            short_label = labeler(i + self.starting_index)
 
             breakdown.append({'percent': percentage, 'label': short_label,
                               'detail': summary, 'category': self.category})

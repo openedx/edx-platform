@@ -7,7 +7,6 @@ from django.urls import reverse
 from django.test import TestCase, override_settings
 from mock import patch
 
-from edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from student.models import Registration
@@ -73,7 +72,7 @@ class TestActivateAccount(TestCase):
         LMS_SEGMENT_KEY="testkey",
         MAILCHIMP_NEW_USER_LIST_ID="listid"
     )
-    @patch('student.models.analytics.identify')
+    @patch('student.models.segment.identify')
     def test_activation_with_keys(self, mock_segment_identify):
         expected_segment_payload = {
             'email': self.email,
@@ -99,16 +98,16 @@ class TestActivateAccount(TestCase):
         )
 
     @override_settings(LMS_SEGMENT_KEY="testkey")
-    @patch('student.models.analytics.identify')
+    @patch('student.models.segment.identify')
     def test_activation_without_mailchimp_key(self, mock_segment_identify):
         self.assert_no_tracking(mock_segment_identify)
 
     @override_settings(MAILCHIMP_NEW_USER_LIST_ID="listid")
-    @patch('student.models.analytics.identify')
+    @patch('student.models.segment.identify')
     def test_activation_without_segment_key(self, mock_segment_identify):
         self.assert_no_tracking(mock_segment_identify)
 
-    @patch('student.models.analytics.identify')
+    @patch('student.models.segment.identify')
     def test_activation_without_keys(self, mock_segment_identify):
         self.assert_no_tracking(mock_segment_identify)
 

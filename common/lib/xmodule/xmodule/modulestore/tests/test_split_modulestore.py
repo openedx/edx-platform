@@ -9,7 +9,6 @@ import random
 import re
 import unittest
 import os
-import uuid
 
 import ddt
 from contracts import contract

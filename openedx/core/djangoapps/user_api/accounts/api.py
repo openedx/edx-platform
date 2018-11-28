@@ -23,7 +23,6 @@ from util.password_policy_validators import validate_password, normalize_passwor
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import errors, accounts, forms, helpers
 from openedx.core.djangoapps.user_api.config.waffle import (
-    PASSWORD_UNICODE_NORMALIZE_FLAG,
     PREVENT_AUTH_USER_WRITES,
     SYSTEM_MAINTENANCE_MSG,
     waffle,
@@ -336,8 +335,7 @@ def create_account(username, password, email):
 
     # Create the user account, setting them to "inactive" until they activate their account.
     user = User(username=username, email=email, is_active=False)
-    if PASSWORD_UNICODE_NORMALIZE_FLAG.is_enabled():
-        password = normalize_password(password)
+    password = normalize_password(password)
     user.set_password(password)
 
     try:

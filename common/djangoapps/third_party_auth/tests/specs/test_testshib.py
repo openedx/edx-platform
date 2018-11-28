@@ -4,6 +4,7 @@ Third_party_auth integration tests using a mock version of the TestShib provider
 import datetime
 import json
 import logging
+import os
 import unittest
 from unittest import skip
 
@@ -25,7 +26,7 @@ from openedx.features.enterprise_support.tests.factories import EnterpriseCustom
 from third_party_auth import pipeline
 from third_party_auth.saml import SapSuccessFactorsIdentityProvider, log as saml_log
 from third_party_auth.tasks import fetch_saml_metadata
-from third_party_auth.tests import testutil
+from third_party_auth.tests import testutil, utils
 
 from .base import IntegrationTestMixin
 
@@ -124,10 +125,15 @@ class SamlIntegrationTestUtilities(object):
         """ Mocked: the user logs in to TestShib and then gets redirected back """
         # The SAML provider (TestShib) will authenticate the user, then get the browser to POST a response:
         self.assertTrue(provider_redirect_url.startswith(TESTSHIB_SSO_URL))
+
+        saml_response_xml = utils.read_and_pre_process_xml(
+            os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'testshib_saml_response.xml')
+        )
+
         return self.client.post(
             self.complete_url,
             content_type='application/x-www-form-urlencoded',
-            data=self.read_data_file('testshib_response.txt'),
+            data=utils.prepare_saml_response_from_xml(saml_response_xml),
         )
 
 
@@ -487,6 +493,57 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
             other_settings=json.dumps(provider_settings)
         )
         self._test_register(country=expected_country)
+
+    def test_register_sapsf_with_value_default(self):
+        """
+        Configure the provider such that it can talk to a mocked-out version of the SAP SuccessFactors
+        API, and ensure that the data it gets that way gets passed to the registration form.
+
+        Check that value mappings overrides work in cases where we override a value other than
+        what we're looking for, and when an empty override is provided it should use the default value
+        provided by the configuration.
+        """
+        # Mock the call to the SAP SuccessFactors OData user endpoint
+        ODATA_USER_URL = (
+            'http://api.successfactors.com/odata/v2/User(userId=\'myself\')'
+            '?$select=username,firstName,country,lastName,defaultFullName,email'
+        )
+
+        def user_callback(request, _uri, headers):
+            auth_header = request.headers.get('Authorization')
+            self.assertEqual(auth_header, 'Bearer faketoken')
+            return (
+                200,
+                headers,
+                json.dumps({
+                    'd': {
+                        'username': 'jsmith',
+                        'firstName': 'John',
+                        'lastName': 'Smith',
+                        'defaultFullName': 'John Smith',
+                        'country': 'Australia'
+                    }
+                })
+            )
+
+        httpretty.register_uri(httpretty.GET, ODATA_USER_URL, content_type='application/json', body=user_callback)
+
+        provider_settings = {
+            'sapsf_oauth_root_url': 'http://successfactors.com/oauth/',
+            'sapsf_private_key': 'fake_private_key_here',
+            'odata_api_root_url': 'http://api.successfactors.com/odata/v2/',
+            'odata_company_id': 'NCC1701D',
+            'odata_client_id': 'TatVotSEiCMteSNWtSOnLanCtBGwNhGB',
+        }
+
+        self._configure_testshib_provider(
+            identity_provider_type='sap_success_factors',
+            metadata_source=TESTSHIB_METADATA_URL,
+            other_settings=json.dumps(provider_settings),
+            default_email='default@testshib.org'
+        )
+        self.USER_EMAIL = 'default@testshib.org'
+        self._test_register()
 
     @patch.dict('django.conf.settings.REGISTRATION_EXTRA_FIELDS', country='optional')
     def test_register_sapsf_metadata_present_override_relevant_value(self):

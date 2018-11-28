@@ -58,7 +58,7 @@ class UserAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
     USERNAME = u"heisenberg"
     ALTERNATE_USERNAME = u"walt"
     OLD_PASSWORD = u"ḅḷüëṡḳÿ"
-    NEW_PASSWORD = u"🄱🄸🄶🄱🄻🅄🄴"
+    NEW_PASSWORD = u"B🄸🄶B🄻🅄🄴"
     OLD_EMAIL = u"walter@graymattertech.com"
     NEW_EMAIL = u"walt@savewalterwhite.com"
 
@@ -292,7 +292,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
     shard = 7
     USERNAME = "bob"
     EMAIL = "bob@example.com"
-    PASSWORD = "password"
+    PASSWORD = u"password"
 
     URLCONF_MODULES = ['openedx.core.djangoapps.embargo']
 
@@ -710,27 +710,6 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         self.assertEqual(enterprise_cookie['domain'], settings.BASE_COOKIE_DOMAIN)
         self.assertEqual(enterprise_cookie.value, '')
 
-    @override_settings(SITE_NAME=settings.MICROSITE_TEST_HOSTNAME)
-    def test_microsite_uses_old_login_page(self):
-        # Retrieve the login page from a microsite domain
-        # and verify that we're served the old page.
-        resp = self.client.get(
-            reverse("signin_user"),
-            HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME
-        )
-        self.assertContains(resp, "Log into your Test Site Account")
-        self.assertContains(resp, "login-form")
-
-    def test_microsite_uses_old_register_page(self):
-        # Retrieve the register page from a microsite domain
-        # and verify that we're served the old page.
-        resp = self.client.get(
-            reverse("register_user"),
-            HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME
-        )
-        self.assertContains(resp, "Register for Test Site")
-        self.assertContains(resp, "register-form")
-
     def test_login_registration_xframe_protected(self):
         resp = self.client.get(
             reverse("register_user"),
@@ -841,64 +820,6 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         response = self.client.get(reverse('signin_user'), [], HTTP_ACCEPT="text/html", HTTP_ACCEPT_LANGUAGE="es-es")
 
         self.assertEqual(response['Content-Language'], 'es-es')
-
-
-@skip_unless_lms
-@override_settings(SITE_NAME=settings.MICROSITE_LOGISTRATION_HOSTNAME)
-class MicrositeLogistrationTests(TestCase):
-    """
-    Test to validate that microsites can display the logistration page
-    """
-
-    def test_login_page(self):
-        """
-        Make sure that we get the expected logistration page on our specialized
-        microsite
-        """
-
-        resp = self.client.get(
-            reverse('signin_user'),
-            HTTP_HOST=settings.MICROSITE_LOGISTRATION_HOSTNAME
-        )
-        self.assertEqual(resp.status_code, 200)
-
-        self.assertIn('<div id="login-and-registration-container"', resp.content)
-
-    def test_registration_page(self):
-        """
-        Make sure that we get the expected logistration page on our specialized
-        microsite
-        """
-
-        resp = self.client.get(
-            reverse('register_user'),
-            HTTP_HOST=settings.MICROSITE_LOGISTRATION_HOSTNAME
-        )
-        self.assertEqual(resp.status_code, 200)
-
-        self.assertIn('<div id="login-and-registration-container"', resp.content)
-
-    @override_settings(SITE_NAME=settings.MICROSITE_TEST_HOSTNAME)
-    def test_no_override(self):
-        """
-        Make sure we get the old style login/registration if we don't override
-        """
-
-        resp = self.client.get(
-            reverse('signin_user'),
-            HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME
-        )
-        self.assertEqual(resp.status_code, 200)
-
-        self.assertNotIn('<div id="login-and-registration-container"', resp.content)
-
-        resp = self.client.get(
-            reverse('register_user'),
-            HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME
-        )
-        self.assertEqual(resp.status_code, 200)
-
-        self.assertNotIn('<div id="login-and-registration-container"', resp.content)
 
 
 @skip_unless_lms

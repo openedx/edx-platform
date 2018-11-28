@@ -42,10 +42,10 @@ class Command(BaseCommand):
                             help='name of the modulestore')
         parser.add_argument('--inherited',
                             action='store_true',
-                            help='include inherited metadata'),
+                            help='include inherited metadata')
         parser.add_argument('--inherited_defaults',
                             action='store_true',
-                            help='include default values of inherited metadata'),
+                            help='include default values of inherited metadata')
 
     def handle(self, *args, **options):
 

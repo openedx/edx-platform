@@ -44,7 +44,7 @@ from openedx.features.enterprise_support.api import get_dashboard_consent_notifi
 from openedx.features.journals.api import journals_enabled
 from shoppingcart.api import order_history
 from shoppingcart.models import CourseRegistrationCode, DonationConfiguration
-from openedx.core.djangoapps.user_authn.cookies import _set_deprecated_user_info_cookie
+from openedx.core.djangoapps.user_authn.cookies import set_deprecated_user_info_cookie
 from student.helpers import cert_info, check_verify_status_by_course
 from student.models import (
     CourseEnrollment,
@@ -767,6 +767,9 @@ def student_dashboard(request):
         redirect_message = _("The course you are looking for is closed for enrollment as of {date}.").format(
             date=request.GET['course_closed']
         )
+    elif 'access_response_error' in request.GET:
+        # This can be populated in a generalized way with fields from access response errors
+        redirect_message = request.GET['access_response_error']
     else:
         redirect_message = ''
 
@@ -848,5 +851,5 @@ def student_dashboard(request):
     })
 
     response = render_to_response('dashboard.html', context)
-    _set_deprecated_user_info_cookie(response, request, user)  # pylint: disable=protected-access
+    set_deprecated_user_info_cookie(response, request, user)  # pylint: disable=protected-access
     return response

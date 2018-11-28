@@ -108,7 +108,7 @@
       font-family: $font-family-sans-serif;
       font-size: 12px;
 
-      @include transition(border-color .1s linear 0s);
+      @include transition(border-color 0.1s linear 0s);
 
       &:-webkit-input-placholder {
         font-style: italic;
@@ -237,7 +237,7 @@
   .article-functions {
     float: left;
     width: flex-grid(3);
-    padding: 40px 40px;
+    padding: 40px;
 
     @include box-sizing(border-box);
 
@@ -772,7 +772,7 @@
   .filter-clear {
     margin-left: ($baseline/2);
     margin-top: ($baseline/2);
-    font-size: .9em;
+    font-size: 0.9em;
   }
 
   .table.table-striped {
@@ -980,7 +980,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, .4);
+  background: rgba(0, 0, 0, 0.4);
 }
 
 .modal-preview {

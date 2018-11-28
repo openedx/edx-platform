@@ -7,7 +7,7 @@ from django.db.utils import IntegrityError
 from django.test import TestCase
 from django_countries.fields import Country
 
-from student.models import CourseEnrollmentAllowed, PasswordHistory
+from student.models import CourseEnrollmentAllowed
 from student.tests.factories import UserFactory, CourseEnrollmentAllowedFactory
 from student.tests.tests import UserSettingsEventTestMixin
 

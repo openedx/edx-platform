@@ -30,7 +30,7 @@ class CourseOutlineFragmentView(EdxFragmentView):
     Course outline fragment to be shown in the unified course view.
     """
 
-    def render_to_fragment(self, request, course_id=None, page_context=None, **kwargs):
+    def render_to_fragment(self, request, course_id=None, **kwargs):  # pylint: disable=arguments-differ
         """
         Renders the course outline as a fragment.
         """

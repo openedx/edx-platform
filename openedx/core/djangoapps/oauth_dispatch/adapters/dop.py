@@ -69,12 +69,6 @@ class DOPAdapter(object):
             expires=expires,
         )
 
-    def normalize_scopes(self, scopes):
-        """
-        Given a list of scopes, return a space-separated list of those scopes.
-        """
-        return ' '.join(scopes)
-
     def get_token_scope_names(self, token):
         """
         Given an access token object, return its scopes.

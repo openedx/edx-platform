@@ -342,6 +342,14 @@ Note: More on the ``--failed`` functionality:
   failing tests for lms or cms, use the ``paver test_system -s lms --failed``
   or ``paver test_system -s cms --failed`` commands.
 
+Debugging Unittest Flakiness
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As we move over to running our unittests with Jenkins Pipelines and pytest-xdist,
+there are new ways for tests to flake, which can sometimes be difficult to debug.
+If you run into flakiness, check (and feel free to contribute to) this
+`confluence document <https://openedx.atlassian.net/wiki/spaces/TE/pages/884998163/Debugging+test+failures+with+pytest-xdist>`__ for help.
+
 Running Javascript Unit Tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

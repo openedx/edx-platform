@@ -120,7 +120,7 @@ class HelperMixin(object):
         """Asserts failure on /login for missing social auth looks right."""
         self.assertEqual(403, response.status_code)
         self.assertIn(
-            "successfully logged into your %s account, but this account isn't linked" % self.provider.name,
+            "successfully logged into your %s account, but this account isn&#39;t linked" % self.provider.name,
             response.content
         )
 
@@ -522,13 +522,13 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
     def test_canceling_authentication_redirects_to_root_when_auth_entry_not_set(self):
         self.assert_exception_redirect_looks_correct('/')
 
-    def test_full_pipeline_succeeds_for_linking_account(self):
+    @mock.patch('third_party_auth.pipeline.segment.track')
+    def test_full_pipeline_succeeds_for_linking_account(self, _mock_segment_track):
         # First, create, the request and strategy that store pipeline state,
         # configure the backend, and mock out wire traffic.
         request, strategy = self.get_request_and_strategy(
             auth_entry=pipeline.AUTH_ENTRY_LOGIN, redirect_uri='social:complete')
         request.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
-        pipeline.analytics.track = mock.MagicMock()
         request.user = self.create_user_models_for_existing_account(
             strategy, 'user@example.com', 'password', self.get_username(), skip_social_auth=True)
 
@@ -677,13 +677,13 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         self.assert_account_settings_context_looks_correct(
             account_settings_context(request), duplicate=True, linked=True)
 
-    def test_full_pipeline_succeeds_for_signing_in_to_existing_active_account(self):
+    @mock.patch('third_party_auth.pipeline.segment.track')
+    def test_full_pipeline_succeeds_for_signing_in_to_existing_active_account(self, _mock_segment_track):
         # First, create, the request and strategy that store pipeline state,
         # configure the backend, and mock out wire traffic.
         request, strategy = self.get_request_and_strategy(
             auth_entry=pipeline.AUTH_ENTRY_LOGIN, redirect_uri='social:complete')
         strategy.request.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
-        pipeline.analytics.track = mock.MagicMock()
         user = self.create_user_models_for_existing_account(
             strategy, 'user@example.com', 'password', self.get_username())
         self.assert_social_auth_exists_for_user(user, strategy)
@@ -759,11 +759,11 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
 
     def test_first_party_auth_trumps_third_party_auth_and_fails_when_credentials_bad(self):
         self.assert_first_party_auth_trumps_third_party_auth(
-            email='user@example.com', password='password', success=False)
+            email='user@example.com', password=u'password', success=False)
 
     def test_first_party_auth_trumps_third_party_auth_and_succeeds_when_credentials_good(self):
         self.assert_first_party_auth_trumps_third_party_auth(
-            email='user@example.com', password='password', success=True)
+            email='user@example.com', password=u'password', success=True)
 
     def test_full_pipeline_succeeds_registering_new_account(self):
         # First, create, the request and strategy that store pipeline state.

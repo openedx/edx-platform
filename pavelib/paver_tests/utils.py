@@ -3,7 +3,6 @@
 import os
 from unittest import TestCase
 
-import paver.easy
 from paver import tasks
 from paver.easy import BuildFailure
 

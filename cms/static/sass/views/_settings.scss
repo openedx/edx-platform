@@ -1038,7 +1038,7 @@
         .wrapper-deprecated-setting {
           @include transition(opacity $tmg-f2 ease-in-out 0s);
 
-          opacity: .5;
+          opacity: 0.5;
           position: relative;
           display: inline-block;
           border-radius: 3px;
@@ -1187,7 +1187,7 @@
           }
 
           pre {
-            line-height: 2.0rem;
+            line-height: 2rem;
           }
         }
       }

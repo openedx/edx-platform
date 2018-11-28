@@ -5,13 +5,9 @@ import logging
 
 from django import forms
 from django.core.exceptions import ValidationError
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
-from six import text_type
 
 from bulk_email.models import COURSE_EMAIL_MESSAGE_BODY_TAG, CourseAuthorization, CourseEmailTemplate
 from openedx.core.lib.courses import clean_course_id
-from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 

@@ -13,7 +13,6 @@ from django.conf import settings
 from django.urls import reverse
 from django.test.client import RequestFactory
 from opaque_keys.edx.locator import CourseLocator
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.features.learner_profile.views.learner_profile import learner_profile_context
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin

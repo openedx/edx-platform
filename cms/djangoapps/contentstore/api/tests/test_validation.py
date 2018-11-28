@@ -33,6 +33,9 @@ class CourseValidationViewTest(SharedModuleStoreTestCase, APITestCase):
 
     @classmethod
     def initialize_course(cls, course):
+        """
+        Sets up test course structure.
+        """
         course.start = datetime.now()
         course.self_paced = True
         cls.store.update_item(course, cls.staff.id)

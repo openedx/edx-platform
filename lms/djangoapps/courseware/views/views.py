@@ -7,7 +7,6 @@ import urllib
 from collections import OrderedDict, namedtuple
 from datetime import datetime
 
-import analytics
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AnonymousUser, User
@@ -88,6 +87,7 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.features.course_duration_limits.access import register_course_expired_message
 from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, course_home_url_name
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from openedx.features.course_experience.views.course_dates import CourseDatesFragmentView
@@ -97,6 +97,7 @@ from openedx.features.enterprise_support.api import data_sharing_consent_require
 from openedx.features.journals.api import get_journals_context
 from shoppingcart.utils import is_shopping_cart_enabled
 from student.models import CourseEnrollment, UserTestGroup
+from track import segment
 from util.cache import cache, cache_if_anonymous
 from util.db import outer_atomic
 from util.milestones_helpers import get_prerequisite_courses_display
@@ -504,6 +505,7 @@ class CourseTabView(EdxFragmentView):
                 # Show warnings if the user has limited access
                 # Must come after masquerading on creation of page context
                 self.register_user_access_warning_messages(request, course_key)
+                register_course_expired_message(request, course)
 
                 set_custom_metrics_for_course_key(course_key)
                 return super(CourseTabView, self).get(request, course=course, page_context=page_context, **kwargs)
@@ -575,7 +577,7 @@ class CourseTabView(EdxFragmentView):
             request.path,
             getattr(user, 'real_user', user),
             user,
-            text_type(course.id),
+            None if course is None else text_type(course.id),
         )
         try:
             return render_to_response(
@@ -627,6 +629,10 @@ class CourseTabView(EdxFragmentView):
             'uses_pattern_library': not uses_bootstrap,
             'disable_courseware_js': True,
         }
+        # Avoid Multiple Mathjax loading on the 'user_profile'
+        if 'profile_page_context' in kwargs:
+            context['load_mathjax'] = kwargs['profile_page_context'].get('load_mathjax', True)
+
         context.update(
             get_experiment_user_metadata_context(
                 course,
@@ -982,6 +988,8 @@ def _progress(request, course_key, student_id):
     studio_url = get_studio_url(course, 'settings/grading')
     # checking certificate generation configuration
     enrollment_mode, _ = CourseEnrollment.enrollment_mode_for_user(student, course_key)
+
+    register_course_expired_message(request, course)
 
     context = {
         'course': course,
@@ -1425,24 +1433,11 @@ def _track_successful_certificate_generation(user_id, course_id):
         None
 
     """
-    if settings.LMS_SEGMENT_KEY:
-        event_name = 'edx.bi.user.certificate.generate'
-        tracking_context = tracker.get_tracker().resolve_context()
-
-        analytics.track(
-            user_id,
-            event_name,
-            {
-                'category': 'certificates',
-                'label': text_type(course_id)
-            },
-            context={
-                'ip': tracking_context.get('ip'),
-                'Google Analytics': {
-                    'clientId': tracking_context.get('client_id')
-                }
-            }
-        )
+    event_name = 'edx.bi.user.certificate.generate'
+    segment.track(user_id, event_name, {
+        'category': 'certificates',
+        'label': text_type(course_id)
+    })
 
 
 @require_http_methods(["GET", "POST"])

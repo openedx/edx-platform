@@ -1,9 +1,9 @@
 def runPythonTests() {
     sshagent(credentials: ['jenkins-worker', 'jenkins-worker-pem'], ignoreMissing: true) {
         checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '${ghprbActualCommit}']],
-            doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [],
-            userRemoteConfigs: [[credentialsId: 'jenkins-worker',
-            refspec: '+refs/heads/*:refs/remotes/origin/* +refs/pull/*:refs/remotes/origin/pr/*',
+            doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', honorRefspec: true,
+            noTags: true, shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'jenkins-worker',
+            refspec: '+refs/heads/master:refs/remotes/origin/master +refs/pull/${ghprbPullId}/*:refs/remotes/origin/pr/${ghprbPullId}/*',
             url: 'git@github.com:edx/edx-platform.git']]]
         console_output = sh(returnStdout: true, script: 'bash scripts/all-tests.sh').trim()
         dir('stdout') {
@@ -21,7 +21,7 @@ def pythonTestCleanup() {
 }
 
 pipeline {
-    agent { label "coverage-worker" }
+    agent { label "jenkins-worker" }
     options {
         timestamps()
         timeout(60)
@@ -40,7 +40,7 @@ pipeline {
                     environment {
                         TEST_SUITE = "lms-unit"
                         XDIST_NUM_TASKS = 10
-                        XDIST_REMOTE_NUM_PROCESSES = 2
+                        XDIST_REMOTE_NUM_PROCESSES = 1
                     }
                     steps {
                         script {
@@ -59,8 +59,8 @@ pipeline {
                     agent { label "jenkins-worker" }
                     environment {
                         TEST_SUITE = "cms-unit"
-                        XDIST_NUM_TASKS = 4
-                        XDIST_REMOTE_NUM_PROCESSES = 2
+                        XDIST_NUM_TASKS = 3
+                        XDIST_REMOTE_NUM_PROCESSES = 1
                     }
                     steps {
                         script {
@@ -80,7 +80,7 @@ pipeline {
                     environment {
                         TEST_SUITE = "commonlib-unit"
                         XDIST_NUM_TASKS = 3
-                        XDIST_REMOTE_NUM_PROCESSES = 2
+                        XDIST_REMOTE_NUM_PROCESSES = 1
                     }
                     steps {
                         script {
@@ -107,9 +107,10 @@ pipeline {
             steps {
                 sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
                     checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '${ghprbActualCommit}']],
-                        doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [],
+                        doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption',
+                        honorRefspec: true, noTags: true, shallow: true]], submoduleCfg: [],
                         userRemoteConfigs: [[credentialsId: 'jenkins-worker',
-                        refspec: '+refs/heads/*:refs/remotes/origin/* +refs/pull/*:refs/remotes/origin/pr/*',
+                        refspec: '+refs/heads/master:refs/remotes/origin/master +refs/pull/${ghprbPullId}/*:refs/remotes/origin/pr/${ghprbPullId}/*',
                         url: 'git@github.com:edx/edx-platform.git']]]
                     unstash 'lms-unit-reports'
                     unstash 'cms-unit-reports'

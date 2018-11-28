@@ -3,6 +3,8 @@ Specific overrides to the base prod settings to make development easier.
 """
 from os.path import abspath, dirname, join
 
+from corsheaders.defaults import default_headers as corsheaders_default_headers
+
 from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
 # Don't use S3 in devstack, fall back to filesystem
@@ -223,6 +225,9 @@ FEATURES['ENABLE_CORS_HEADERS'] = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = ()
 CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_HEADERS = corsheaders_default_headers + (
+    'use-jwt-cookie',
+)
 
 LOGIN_REDIRECT_WHITELIST = []
 
@@ -230,9 +235,8 @@ LOGIN_REDIRECT_WHITELIST = []
 JWT_AUTH.update({
     'JWT_ISSUER': OAUTH_OIDC_ISSUER,
     'JWT_AUDIENCE': 'lms-key',
-
     'JWT_SECRET_KEY': 'lms-secret',
-
+    'JWT_SIGNING_ALGORITHM': 'RS512',
     'JWT_PRIVATE_SIGNING_JWK': (
         '{"e": "AQAB", "d": "RQ6k4NpRU3RB2lhwCbQ452W86bMMQiPsa7EJiFJUg-qBJthN0FMNQVbArtrCQ0xA1BdnQHThFiUnHcXfsTZUwmwvTu'
         'iqEGR_MI6aI7h5D8vRj_5x-pxOz-0MCB8TY8dcuK9FkljmgtYvV9flVzCk_uUb3ZJIBVyIW8En7n7nV7JXpS9zey1yVLld2AbRG6W5--Pgqr9J'

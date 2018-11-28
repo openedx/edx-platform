@@ -2,7 +2,6 @@
 Tests for the Certificate REST APIs.
 """
 # pylint: disable=missing-docstring
-from itertools import product
 import ddt
 
 from django.urls import reverse
@@ -15,7 +14,6 @@ from course_modes.models import CourseMode
 from lms.djangoapps.certificates.apis.v0.views import CertificatesDetailView
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
-from openedx.core.djangoapps.oauth_dispatch.toggles import ENFORCE_JWT_SCOPES
 from openedx.core.djangoapps.user_authn.tests.utils import AuthType, AuthAndScopesTestMixin
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase

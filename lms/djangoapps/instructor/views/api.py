@@ -30,13 +30,19 @@ from django.core.validators import validate_email
 from django.db import IntegrityError, transaction
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound
 from django.shortcuts import redirect
+from django.utils.decorators import method_decorator
 from django.utils.html import strip_tags
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods, require_POST
+from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from rest_framework import permissions, status
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from six import text_type
 
 import instructor_analytics.basic
@@ -85,6 +91,8 @@ from openedx.core.djangoapps.course_groups.cohorts import is_course_cohorted
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference, set_user_preference
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from shoppingcart.models import (
     Coupon,
     CourseMode,
@@ -104,6 +112,7 @@ from student.models import (
     UNENROLLED_TO_ENROLLED,
     UNENROLLED_TO_UNENROLLED,
     CourseEnrollment,
+    CourseEnrollmentAllowed,
     EntranceExamConfiguration,
     ManualEnrollmentAudit,
     Registration,
@@ -346,7 +355,8 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=too-man
             else:
                 general_errors.append({
                     'username': '', 'email': '',
-                    'response': _('Make sure that the file you upload is in CSV format with no extraneous characters or rows.')
+                    'response': _(
+                        'Make sure that the file you upload is in CSV format with no extraneous characters or rows.')
                 })
 
         except Exception:  # pylint: disable=broad-except
@@ -1341,6 +1351,25 @@ def get_students_who_may_enroll(request, course_id):
     return JsonResponse({"status": success_status})
 
 
+def _cohorts_csv_validator(file_storage, file_to_validate):
+    """
+    Verifies that the expected columns are present in the CSV used to add users to cohorts.
+    """
+    with file_storage.open(file_to_validate) as f:
+        reader = unicodecsv.reader(UniversalNewlineIterator(f), encoding='utf-8')
+        try:
+            fieldnames = next(reader)
+        except StopIteration:
+            fieldnames = []
+        msg = None
+        if "cohort" not in fieldnames:
+            msg = _("The file must contain a 'cohort' column containing cohort names.")
+        elif "email" not in fieldnames and "username" not in fieldnames:
+            msg = _("The file must contain a 'username' column, an 'email' column, or both.")
+        if msg:
+            raise FileValidationException(msg)
+
+
 @transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -1356,29 +1385,11 @@ def add_users_to_cohorts(request, course_id):
     course_key = CourseKey.from_string(course_id)
 
     try:
-        def validator(file_storage, file_to_validate):
-            """
-            Verifies that the expected columns are present.
-            """
-            with file_storage.open(file_to_validate) as f:
-                reader = unicodecsv.reader(UniversalNewlineIterator(f), encoding='utf-8')
-                try:
-                    fieldnames = next(reader)
-                except StopIteration:
-                    fieldnames = []
-                msg = None
-                if "cohort" not in fieldnames:
-                    msg = _("The file must contain a 'cohort' column containing cohort names.")
-                elif "email" not in fieldnames and "username" not in fieldnames:
-                    msg = _("The file must contain a 'username' column, an 'email' column, or both.")
-                if msg:
-                    raise FileValidationException(msg)
-
         __, filename = store_uploaded_file(
             request, 'uploaded-file', ['.csv'],
             course_and_time_based_filename_generator(course_key, "cohorts"),
             max_file_size=2000000,  # limit to 2 MB
-            validator=validator
+            validator=_cohorts_csv_validator
         )
         # The task will assume the default file storage.
         lms.djangoapps.instructor_task.api.submit_cohort_students(request, course_key, filename)
@@ -1386,6 +1397,49 @@ def add_users_to_cohorts(request, course_id):
         return JsonResponse({"error": unicode(err)}, status=400)
 
     return JsonResponse()
+
+
+# The non-atomic decorator is required because this view calls a celery
+# task which uses the 'outer_atomic' context manager.
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class CohortCSV(DeveloperErrorViewMixin, APIView):
+    """
+    **Use Cases**
+
+        Submit a CSV file to assign users to cohorts
+
+    **Example Requests**:
+
+        POST /api/cohorts/v1/courses/{course_id}/users/
+
+    **Response Values**
+        * Empty as this is executed asynchronously.
+    """
+    authentication_classes = (
+        JwtAuthentication,
+        OAuth2AuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (permissions.IsAuthenticated, permissions.IsAdminUser)
+
+    def post(self, request, course_key_string):
+        """
+        View method that accepts an uploaded file (using key "uploaded-file")
+        containing cohort assignments for users. This method spawns a celery task
+        to do the assignments, and a CSV file with results is provided via data downloads.
+        """
+        course_key = CourseKey.from_string(course_key_string)
+        try:
+            __, file_name = store_uploaded_file(
+                request, 'uploaded-file', ['.csv'],
+                course_and_time_based_filename_generator(course_key, 'cohorts'),
+                max_file_size=2000000,  # limit to 2 MB
+                validator=_cohorts_csv_validator
+            )
+            lms.djangoapps.instructor_task.api.submit_cohort_students(request, course_key, file_name)
+        except (FileValidationException, ValueError) as e:
+            raise self.api_error(status.HTTP_400_BAD_REQUEST, str(e), 'failed-validation')
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @ensure_csrf_cookie
@@ -1869,6 +1923,63 @@ def get_anon_ids(request, course_id):  # pylint: disable=unused-argument
 @require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@require_post_params(
+    unique_student_identifier="email or username of student for whom to get enrollment status"
+)
+def get_student_enrollment_status(request, course_id):
+    """
+    Get the enrollment status of a student.
+    Limited to staff access.
+
+    Takes query parameter unique_student_identifier
+    """
+
+    error = ''
+    user = None
+    mode = None
+    is_active = None
+
+    course_id = CourseKey.from_string(course_id)
+    unique_student_identifier = request.POST.get('unique_student_identifier')
+
+    try:
+        user = get_student_from_identifier(unique_student_identifier)
+        mode, is_active = CourseEnrollment.enrollment_mode_for_user(user, course_id)
+    except User.DoesNotExist:
+        # The student could have been invited to enroll without having
+        # registered. We'll also look at CourseEnrollmentAllowed
+        # records, so let the lack of a User slide.
+        pass
+
+    enrollment_status = _('Enrollment status for {student}: unknown').format(student=unique_student_identifier)
+
+    if user and mode:
+        if is_active:
+            enrollment_status = _('Enrollment status for {student}: active').format(student=user)
+        else:
+            enrollment_status = _('Enrollment status for {student}: inactive').format(student=user)
+    else:
+        email = user.email if user else unique_student_identifier
+        allowed = CourseEnrollmentAllowed.may_enroll_and_unenrolled(course_id)
+        if allowed and email in [cea.email for cea in allowed]:
+            enrollment_status = _('Enrollment status for {student}: pending').format(student=email)
+        else:
+            enrollment_status = _('Enrollment status for {student}: never enrolled').format(student=email)
+
+    response_payload = {
+        'course_id': course_id.to_deprecated_string(),
+        'error': error,
+        'enrollment_status': enrollment_status
+    }
+
+    return JsonResponse(response_payload)
+
+
+@require_POST
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@common_exceptions_400
 @require_level('staff')
 @require_post_params(
     unique_student_identifier="email or username of student for whom to get progress url"

@@ -84,12 +84,8 @@ def login_and_registration_form(request, initial_mode="login"):
         except (KeyError, ValueError, IndexError) as ex:
             log.exception("Unknown tpa_hint provider: %s", ex)
 
-    # If this is a themed site, revert to the old login/registration pages.
-    # We need to do this for now to support existing themes.
-    # Themed sites can use the new logistration page by setting
-    # 'ENABLE_COMBINED_LOGIN_REGISTRATION' in their
-    # configuration settings.
-    if is_request_in_themed_site() and not configuration_helpers.get_value('ENABLE_COMBINED_LOGIN_REGISTRATION', False):
+    # We are defaulting to true because all themes should now be using the newer page.
+    if is_request_in_themed_site() and not configuration_helpers.get_value('ENABLE_COMBINED_LOGIN_REGISTRATION', True):
         if initial_mode == "login":
             return old_login_view(request)
         elif initial_mode == "register":

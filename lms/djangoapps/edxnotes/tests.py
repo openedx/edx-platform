@@ -533,16 +533,16 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
     @override_settings(EDXNOTES_INTERNAL_API="http://example.com")
     @patch("edxnotes.helpers.anonymous_id_for_user", autospec=True)
     @patch("edxnotes.helpers.get_edxnotes_id_token", autospec=True)
-    @patch("edxnotes.helpers.requests.delete")
-    def test_delete_all_notes_for_user(self, mock_delete, mock_get_id_token, mock_anonymous_id_for_user):
+    @patch("edxnotes.helpers.requests.post")
+    def test_delete_all_notes_for_user(self, mock_post, mock_get_id_token, mock_anonymous_id_for_user):
         """
         Test GDPR data deletion for Notes user_id
         """
         mock_anonymous_id_for_user.return_value = "anonymous_id"
         mock_get_id_token.return_value = "test_token"
         helpers.delete_all_notes_for_user(self.user)
-        mock_delete.assert_called_with(
-            url='http://example.com/annotations/',
+        mock_post.assert_called_with(
+            url='http://example.com/retire_annotations/',
             headers={
                 'x-annotator-auth-token': 'test_token'
             },
@@ -1189,13 +1189,13 @@ class EdxNotesRetireAPITest(ModuleStoreTestCase):
         headers = {'HTTP_AUTHORIZATION': 'JWT ' + token}
         return headers
 
-    @patch("edxnotes.helpers.requests.delete", autospec=True)
-    def test_retire_user_success(self, mock_get):
+    @patch("edxnotes.helpers.requests.post", autospec=True)
+    def test_retire_user_success(self, mock_post):
         """
         Tests that 204 response is received on success.
         """
-        mock_get.return_value.content = ''
-        mock_get.return_value.status_code = 204
+        mock_post.return_value.content = ''
+        mock_post.return_value.status_code = 204
         headers = self._build_jwt_headers(self.superuser)
         response = self.client.post(
             self.retire_user_url,

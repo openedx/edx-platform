@@ -17,14 +17,12 @@ from edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
-from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, CacheIsolationMixin
 from student.models import (
     PendingEmailChange,
     Registration,
     UserProfile,
-    get_retired_email_by_email
 )
 from openedx.core.lib.request_utils import safe_get_host
 from student.tests.factories import PendingEmailChangeFactory, RegistrationFactory, UserFactory

@@ -102,8 +102,9 @@ class FieldOverrideProvider(object):
     """
     __metaclass__ = ABCMeta
 
-    def __init__(self, user):
+    def __init__(self, user, fallback_field_data):
         self.user = user
+        self.fallback_field_data = fallback_field_data
 
     @abstractmethod
     def get(self, block, name, default):  # pragma no cover
@@ -196,7 +197,7 @@ class OverrideFieldData(FieldData):
 
     def __init__(self, user, fallback, providers):
         self.fallback = fallback
-        self.providers = tuple(provider(user) for provider in providers)
+        self.providers = tuple(provider(user, fallback) for provider in providers)
 
     def get_override(self, block, name):
         """

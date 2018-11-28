@@ -171,7 +171,7 @@
 
           .add-admin-role {
             @include blue-button;
-            @include transition(all .15s);
+            @include transition(all 0.15s);
 
             @extend %t-action2;
             @extend %t-strong;
@@ -182,7 +182,7 @@
 
           .remove-admin-role {
             @include grey-button;
-            @include transition(all .15s);
+            @include transition(all 0.15s);
 
             @extend %t-action2;
             @extend %t-strong;

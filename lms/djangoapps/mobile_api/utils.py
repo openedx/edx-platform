@@ -1,6 +1,8 @@
 """
 Common utility methods for Mobile APIs.
 """
+API_V05 = 'v0.5'
+API_V1 = 'v1'
 
 
 def parsed_version(version):

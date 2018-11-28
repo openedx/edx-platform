@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Test the Studio help links.
 """
@@ -189,7 +190,7 @@ class HomeHelpTest(StudioCourseTest):
             test=self,
             page=self.home_page,
             href=expected_url,
-            help_text='Getting Started with Your Platform Studio',
+            help_text=u'Getting Started with Your Platform 𝓢𝓽𝓾𝓭𝓲𝓸',
             as_list_item=True
         )
 
@@ -242,7 +243,7 @@ class NewCourseHelpTest(AcceptanceTest):
             test=self,
             page=self.dashboard_page,
             href=expected_url,
-            help_text='Getting Started with Your Platform Studio',
+            help_text=u'Getting Started with Your Platform 𝓢𝓽𝓾𝓭𝓲𝓸',
             as_list_item=True
         )
 
@@ -295,7 +296,7 @@ class NewLibraryHelpTest(AcceptanceTest):
             test=self,
             page=self.dashboard_page,
             href=expected_url,
-            help_text='Getting Started with Your Platform Studio',
+            help_text=u'Getting Started with Your Platform 𝓢𝓽𝓾𝓭𝓲𝓸',
             as_list_item=True
         )
 

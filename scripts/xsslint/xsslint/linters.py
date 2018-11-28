@@ -173,7 +173,7 @@ class BaseLinter(object):
         """
         if self.LINE_COMMENT_DELIM is not None:
             line_start_index = StringLines(template).index_to_line_start_index(start_index)
-            uncommented_line_start_index_regex = re.compile("^(?!\s*{})".format(self.LINE_COMMENT_DELIM), re.MULTILINE)
+            uncommented_line_start_index_regex = re.compile(r"^(?!\s*{})".format(self.LINE_COMMENT_DELIM), re.MULTILINE)
             # Finds the line start index of the first uncommented line, including the current line.
             match = uncommented_line_start_index_regex.search(template, line_start_index)
             if match is None:
@@ -1160,8 +1160,8 @@ class MakoTemplateLinter(BaseLinter):
         # Dedent expression internals so it is parseable.
         # Note that the final columns reported could be off somewhat.
         adjusted_python_code = textwrap.dedent(python_code)
-        first_letter_match = re.search('\w', python_code)
-        adjusted_first_letter_match = re.search('\w', adjusted_python_code)
+        first_letter_match = re.search(r'\w', python_code)
+        adjusted_first_letter_match = re.search(r'\w', adjusted_python_code)
         if first_letter_match is not None and adjusted_first_letter_match is not None:
             start_offset += (first_letter_match.start() - adjusted_first_letter_match.start())
         python_code = adjusted_python_code

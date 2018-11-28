@@ -99,6 +99,7 @@ ignore_dirs:
     - common/static/xmodule/descriptors
     # Directories with no user-facing code.
     - '*/migrations'
+    - '*/envs'
     # Directories that are not our code.
     - node_modules
     # Directories containing files that can't have strings in them.

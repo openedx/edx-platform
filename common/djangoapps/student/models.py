@@ -21,7 +21,6 @@ from functools import total_ordering
 from importlib import import_module
 from urllib import urlencode
 
-import analytics
 from config_models.models import ConfigurationModel
 from django.apps import apps
 from django.conf import settings
@@ -30,7 +29,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.core.cache import cache
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
-from django.db import IntegrityError, models, transaction
+from django.db import IntegrityError, models
 from django.db.models import Count, Q
 from django.db.models.signals import post_save, pre_save
 from django.db.utils import ProgrammingError
@@ -66,7 +65,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
-from track import contexts
+from track import contexts, segment
 from util.milestones_helpers import is_entrance_exams_enabled
 from util.model_utils import emit_field_changed_events, get_changed_fields_dict
 from util.query import use_read_replica_if_available
@@ -739,7 +738,7 @@ class Registration(models.Model):
         has_segment_key = getattr(settings, 'LMS_SEGMENT_KEY', None)
         has_mailchimp_id = hasattr(settings, 'MAILCHIMP_NEW_USER_LIST_ID')
         if has_segment_key and has_mailchimp_id:
-            identity_args = [
+            segment.identify(
                 self.user.id,  # pylint: disable=no-member
                 {
                     'email': self.user.email,
@@ -751,8 +750,7 @@ class Registration(models.Model):
                         "listId": settings.MAILCHIMP_NEW_USER_LIST_ID
                     }
                 }
-            ]
-            analytics.identify(*identity_args)
+            )
 
 
 class PendingNameChange(DeletableByUserValue, models.Model):
@@ -1311,7 +1309,7 @@ class CourseEnrollment(models.Model):
         return enrollment
 
     @classmethod
-    def get_enrollment(cls, user, course_key):
+    def get_enrollment(cls, user, course_key, select_related=None):
         """Returns a CourseEnrollment object.
 
         Args:
@@ -1326,7 +1324,10 @@ class CourseEnrollment(models.Model):
         if user.is_anonymous:
             return None
         try:
-            return cls.objects.get(
+            query = cls.objects
+            if select_related is not None:
+                query = query.select_related(*select_related)
+            return query.get(
                 user=user,
                 course_id=course_key
             )
@@ -1429,25 +1430,17 @@ class CourseEnrollment(models.Model):
                 'course_id': text_type(self.course_id),
                 'mode': self.mode,
             }
-
+            segment_properties = {
+                'category': 'conversion',
+                'label': text_type(self.course_id),
+                'org': self.course_id.org,
+                'course': self.course_id.course,
+                'run': self.course_id.run,
+                'mode': self.mode,
+            }
             with tracker.get_tracker().context(event_name, context):
                 tracker.emit(event_name, data)
-
-                if hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
-                    tracking_context = tracker.get_tracker().resolve_context()
-                    analytics.track(self.user_id, event_name, {
-                        'category': 'conversion',
-                        'label': text_type(self.course_id),
-                        'org': self.course_id.org,
-                        'course': self.course_id.course,
-                        'run': self.course_id.run,
-                        'mode': self.mode,
-                    }, context={
-                        'ip': tracking_context.get('ip'),
-                        'Google Analytics': {
-                            'clientId': tracking_context.get('client_id')
-                        }
-                    })
+                segment.track(self.user_id, event_name, segment_properties)
 
         except:  # pylint: disable=bare-except
             if event_name and self.course_id:
@@ -2168,7 +2161,7 @@ class ManualEnrollmentAudit(models.Model):
     @classmethod
     def get_manual_enrollment(cls, enrollment):
         """
-        if matches returns the most recent entry in the table filtered by enrollment else returns None,
+        Returns the most recent entry for the given enrollment, or None if there are no matches
         """
         try:
             manual_enrollment = cls.objects.filter(enrollment=enrollment).latest('time_stamp')
@@ -2177,12 +2170,17 @@ class ManualEnrollmentAudit(models.Model):
         return manual_enrollment
 
     @classmethod
-    def retire_manual_enrollments(cls, enrollments, retired_email):
+    def retire_manual_enrollments(cls, user, retired_email):
         """
-        Removes PII (enrolled_email and reason) from any rows corresponding to
-        the enrollment passed in. Bubbles up any exceptions.
+        Removes PII (enrolled_email and reason) associated with the User passed in. Bubbles up any exceptions.
         """
-        return cls.objects.filter(enrollment__in=enrollments).update(reason="", enrolled_email=retired_email)
+        # This bit of ugliness is to fix a perfmance issue with Django using a slow
+        # sub-select that caused the original query to take several seconds (PLAT-2371).
+        # It is possible that this could also be bad if a user has thousands of manual
+        # enrollments, but currently that number tends to be very low.
+        manual_enrollment_ids = list(cls.objects.filter(enrollment__user=user).values_list('id', flat=True))
+
+        return cls.objects.filter(id__in=manual_enrollment_ids).update(reason="", enrolled_email=retired_email)
 
 
 class CourseEnrollmentAllowed(DeletableByUserValue, models.Model):

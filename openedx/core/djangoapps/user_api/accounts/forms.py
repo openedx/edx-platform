@@ -4,6 +4,7 @@ Django forms for accounts
 
 from django import forms
 from django.core.exceptions import ValidationError
+from openedx.core.djangoapps.user_api.accounts.utils import generate_password
 
 
 class RetirementQueueDeletionForm(forms.Form):
@@ -33,6 +34,8 @@ class RetirementQueueDeletionForm(forms.Form):
 
         # Load the user record using the retired email address -and- change the email address back.
         retirement.user.email = retirement.original_email
+        # Reset users password so they can request a password reset and log in again.
+        retirement.user.set_password(generate_password(length=25))
         retirement.user.save()
 
         # Delete the user retirement status record.

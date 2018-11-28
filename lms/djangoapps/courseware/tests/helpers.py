@@ -1,18 +1,21 @@
 """
 Helpers for courseware tests.
 """
+from datetime import timedelta
 import json
 
 from django.contrib import messages
 from django.contrib.auth.models import User
-from django.urls import reverse
 from django.test import TestCase
 from django.test.client import Client, RequestFactory
+from django.urls import reverse
+from django.utils.timezone import now
 from six import text_type
 
 from courseware.access import has_access
 from courseware.masquerade import handle_ajax, setup_masquerade
 from edxmako.shortcuts import render_to_string
+from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.url_utils import quote_slashes
@@ -348,3 +351,18 @@ def _create_mock_json_request(user, data, method='POST'):
     request.user = user
     request.session = {}
     return request
+
+
+def get_expiration_banner_text(user, course):
+    """
+    Get text for banner that messages user course expiration date
+    for different tests that depend on it.
+    """
+    expiration_date = (now() + timedelta(weeks=4)).strftime('%b %-d')
+    upgrade_link = verified_upgrade_deadline_link(user=user, course=course)
+    bannerText = 'Your access to this course expires on {expiration_date}. \
+        <a href="{upgrade_link}">Upgrade now</a> for unlimited access.'.format(
+        expiration_date=expiration_date,
+        upgrade_link=upgrade_link
+    )
+    return bannerText

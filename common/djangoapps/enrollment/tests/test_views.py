@@ -40,11 +40,7 @@ from openedx.core.djangoapps.user_api.models import (
 from openedx.core.lib.django_test_client_utils import get_absolute_url
 from openedx.features.enterprise_support.tests import FAKE_ENTERPRISE_CUSTOMER
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
-from student.models import (
-    CourseEnrollment,
-    get_retired_username_by_username,
-    get_retired_email_by_email,
-)
+from student.models import CourseEnrollment
 from student.roles import CourseStaffRole
 from student.tests.factories import AdminFactory, UserFactory, SuperuserFactory
 from util.models import RateLimitConfiguration

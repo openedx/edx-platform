@@ -402,6 +402,7 @@ class SharedModuleStoreTestCase(
         Use it like so:
         @classmethod
         def setUpClass(cls):
+            # pylint: disable=super-method-not-called
             with super(MyTestClass, cls).setUpClassAndTestData():
                 <all the cls.setUpClass() setup code that performs modulestore setup...>
         @classmethod

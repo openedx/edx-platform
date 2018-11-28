@@ -376,6 +376,7 @@ class XModuleMixin(XModuleFields, XBlock):
         migrate and test switching to display_name_with_default, which is no
         longer escaped.
         """
+        # xss-lint: disable=python-deprecated-display-name
         return block_metadata_utils.display_name_with_default_escaped(self)
 
     @property
@@ -481,6 +482,7 @@ class XModuleMixin(XModuleFields, XBlock):
         if self.has_children:
             return sum((child.get_content_titles() for child in self.get_children()), [])
         else:
+            # xss-lint: disable=python-deprecated-display-name
             return [self.display_name_with_default_escaped]
 
     def get_children(self, usage_id_filter=None, usage_key_filter=None):  # pylint: disable=arguments-differ
@@ -852,6 +854,7 @@ class XModule(HTMLSnippet, XModuleMixin):
         self._runtime = value
 
     def __unicode__(self):
+        # xss-lint: disable=python-wrap-html
         return u'<x_module(id={0})>'.format(self.id)
 
     def handle_ajax(self, _dispatch, _data):

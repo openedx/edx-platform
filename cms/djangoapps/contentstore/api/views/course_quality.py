@@ -1,5 +1,6 @@
 # pylint: disable=missing-docstring
 import logging
+import time
 import numpy as np
 from scipy import stats
 from rest_framework.generics import GenericAPIView
@@ -7,6 +8,9 @@ from rest_framework.response import Response
 
 from contentstore.views.item import highlights_setting
 from edxval.api import get_videos_for_course
+from openedx.core.djangoapps.waffle_utils import (
+    CourseWaffleFlag, WaffleFlagNamespace
+)
 from openedx.core.lib.cache_utils import request_cached
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from openedx.core.lib.graph_traversals import traverse_pre_order
@@ -15,6 +19,13 @@ from xmodule.modulestore.django import modulestore
 from .utils import get_bool_param, course_author_access_required
 
 log = logging.getLogger(__name__)
+
+WAFFLE_FLAG_NAMESPACE = WaffleFlagNamespace(name=u'checklist')
+DISABLE_COURSE_CHECKLIST_QUALITY = CourseWaffleFlag(
+    waffle_namespace=WAFFLE_FLAG_NAMESPACE,
+    flag_name=u'course_checklist',
+    flag_undefined_default=False
+)
 
 
 @view_auth_classes()
@@ -81,31 +92,49 @@ class CourseQualityView(DeveloperErrorViewMixin, GenericAPIView):
         """
         Returns validation information for the given course.
         """
+        def _execute_method_and_log_time(log_time, func, *args):
+            """
+            Call func passed in method with logging the time it took to complete.
+            Logging is temporary, we will remove this once we get required information.
+            """
+            if log_time:
+                start_time = time.time()
+                output = func(*args)
+                log.info('[%s] completed in [%f]', func.__name__, (time.time() - start_time))
+            else:
+                output = func(*args)
+            return output
+
         all_requested = get_bool_param(request, 'all', False)
 
         store = modulestore()
         with store.bulk_operations(course_key):
             course = store.get_course(course_key, depth=self._required_course_depth(request, all_requested))
+            # Added for EDUCATOR-3660
+            course_key_harvard = str(course_key) == 'course-v1:HarvardX+SW12.1x+2016'
 
             response = dict(
                 is_self_paced=course.self_paced,
             )
-            if get_bool_param(request, 'sections', all_requested):
-                response.update(
-                    sections=self._sections_quality(course)
-                )
-            if get_bool_param(request, 'subsections', all_requested):
-                response.update(
-                    subsections=self._subsections_quality(course, request)
-                )
-            if get_bool_param(request, 'units', all_requested):
-                response.update(
-                    units=self._units_quality(course, request)
-                )
-            if get_bool_param(request, 'videos', all_requested):
-                response.update(
-                    videos=self._videos_quality(course)
-                )
+            if not DISABLE_COURSE_CHECKLIST_QUALITY.is_enabled(course_key):
+                if get_bool_param(request, 'sections', all_requested):
+                    response.update(
+                        sections=_execute_method_and_log_time(course_key_harvard, self._sections_quality, course)
+                    )
+                if get_bool_param(request, 'subsections', all_requested):
+                    response.update(
+                        subsections=_execute_method_and_log_time(
+                            course_key_harvard, self._subsections_quality, course, request
+                        )
+                    )
+                if get_bool_param(request, 'units', all_requested):
+                    response.update(
+                        units=_execute_method_and_log_time(course_key_harvard, self._units_quality, course, request)
+                    )
+                if get_bool_param(request, 'videos', all_requested):
+                    response.update(
+                        videos=_execute_method_and_log_time(course_key_harvard, self._videos_quality, course)
+                    )
 
         return Response(response)
 

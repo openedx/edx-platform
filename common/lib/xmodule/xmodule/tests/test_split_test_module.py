@@ -127,6 +127,15 @@ class SplitTestModuleLMSTest(SplitTestModuleTest):
     """
     shard = 1
 
+    def setUp(self):
+        super(SplitTestModuleLMSTest, self).setUp()
+
+        content_gating_flag_patcher = patch(
+            'openedx.features.content_type_gating.partitions.ContentTypeGatingConfig.current',
+            return_value=Mock(enabled=False, studio_override_enabled=False),
+        ).start()
+        self.addCleanup(content_gating_flag_patcher.stop)
+
     @ddt.data((0, 'split_test_cond0'), (1, 'split_test_cond1'))
     @ddt.unpack
     def test_child(self, user_tag, child_url_name):

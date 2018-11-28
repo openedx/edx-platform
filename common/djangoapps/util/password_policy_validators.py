@@ -14,7 +14,6 @@ from django.contrib.auth.password_validation import (
 )
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _, ungettext
-from openedx.core.djangoapps.user_api.config.waffle import PASSWORD_UNICODE_NORMALIZE_FLAG
 from six import text_type
 
 log = logging.getLogger(__name__)
@@ -91,9 +90,17 @@ def password_validators_restrictions():
 
 def normalize_password(password):
     """
+    Converts the password to utf-8 if it is not unicode already.
     Normalize all passwords to 'NFKC' across the platform to prevent mismatched hash strings when comparing entered
     passwords on login. See LEARNER-4283 for more context.
     """
+    if not isinstance(password, text_type):
+        try:
+            # some checks rely on unicode semantics (e.g. length)
+            password = text_type(password, encoding='utf8')
+        except UnicodeDecodeError:
+            # no reason to get into weeds
+            raise ValidationError([_('Invalid password.')])
     return unicodedata.normalize('NFKC', password)
 
 
@@ -101,7 +108,7 @@ def validate_password(password, user=None):
     """
     EdX's custom password validator for passwords. This function performs the
     following functions:
-        1) Converts the password to unicode if it is not already
+        1) Normalizes the password according to NFKC unicode standard
         2) Calls Django's validate_password method. This calls the validate function
             in all validators specified in AUTH_PASSWORD_VALIDATORS configuration.
 
@@ -114,19 +121,9 @@ def validate_password(password, user=None):
         None
 
     Raises:
-        ValidationError if unable to convert password to utf8 or if any of the
-        password validators fail.
+        ValidationError if any of the password validators fail.
     """
-    if not isinstance(password, text_type):
-        try:
-            # some checks rely on unicode semantics (e.g. length)
-            password = text_type(password, encoding='utf8')
-        except UnicodeDecodeError:
-            # no reason to get into weeds
-            raise ValidationError([_('Invalid password.')])
-
-    if PASSWORD_UNICODE_NORMALIZE_FLAG.is_enabled():
-        password = normalize_password(password)
+    password = normalize_password(password)
     django_validate_password(password, user)
 
 

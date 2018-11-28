@@ -2,9 +2,8 @@
 Tests that check that we ignore the appropriate files when importing courses.
 """
 import unittest
-import ddt
 from mock import Mock
-import os
+
 from xmodule.modulestore.xml_importer import StaticContentImporter
 from opaque_keys.edx.locator import CourseLocator
 from xmodule.tests import DATA_DIR

@@ -21,27 +21,8 @@ from openedx.core.djangoapps.user_api.accounts import ACCOUNT_VISIBILITY_PREF_KE
 from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
-from student.models import (
-    CourseEnrollment,
-    CourseEnrollmentAllowed,
-    ManualEnrollmentAudit,
-    PasswordHistory,
-    PendingEmailChange,
-    PendingNameChange,
-    Registration,
-    SocialLink,
-    UserProfile,
-    get_retired_username_by_username,
-)
-from student.tests.factories import (
-    TEST_PASSWORD,
-    ContentTypeFactory,
-    CourseEnrollmentAllowedFactory,
-    PendingEmailChangeFactory,
-    PermissionFactory,
-    SuperuserFactory,
-    UserFactory
-)
+from student.models import PendingEmailChange, UserProfile
+from student.tests.factories import TEST_PASSWORD, UserFactory
 
 from .. import ALL_USERS_VISIBILITY, PRIVATE_VISIBILITY
 

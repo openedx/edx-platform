@@ -71,8 +71,8 @@ username = get_enterprise_learner_generic_name(request) or student.username
                         <div class="has-actions">
                             <% post_url = reverse('generate_user_cert', args=[unicode(course.id)]) %>
                             <div class="msg-content">
-                                <h4 class="hd hd-4 title">${certificate_data.title}</h4>
-                                <p class="copy">${certificate_data.msg}</p>
+                                <h4 class="hd hd-4 title">${_(certificate_data.title)}</h4>
+                                <p class="copy">${_(certificate_data.msg)}</p>
                             </div>
                             <div class="msg-actions">
                                 %if certificate_data.cert_web_view_url:

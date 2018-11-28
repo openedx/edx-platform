@@ -773,7 +773,6 @@
   margin: 0 auto;
   width: flex-grid(12);
   max-width: $fg-max-width;
-  min-width: $fg-min-width;
   color: $white;
 
   strong {
@@ -1102,7 +1101,7 @@ body.uxdesign.alerts {
     .alert-message {
       @include float(left);
 
-      margin: 4px 0 0 0;
+      margin: 4px 0 0;
       color: $gray-d3;
     }
 

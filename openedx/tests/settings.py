@@ -25,6 +25,8 @@ BLOCK_STRUCTURES_SETTINGS = dict(
 
 COURSE_KEY_PATTERN = r'(?P<course_key_string>[^/+]+(/|\+)[^/+]+(/|\+)[^/?]+)'
 COURSE_ID_PATTERN = COURSE_KEY_PATTERN.replace('course_key_string', 'course_id')
+USAGE_KEY_PATTERN = r'(?P<usage_key_string>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
+
 
 COURSE_MODE_DEFAULTS = {
     'bulk_sku': None,
@@ -73,8 +75,12 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.content.block_structure.apps.BlockStructureConfig',
     'openedx.core.djangoapps.catalog',
     'openedx.core.djangoapps.self_paced',
+    'experiments',
+    'openedx.features.content_type_gating',
+    'openedx.features.course_duration_limits',
     'milestones',
     'celery_utils',
+    'waffle',
 
     # Django 1.11 demands to have imported models supported by installed apps.
     'completion',
@@ -88,6 +94,7 @@ MICROSITE_BACKEND = 'microsite_configuration.backends.filebased.FilebasedMicrosi
 MICROSITE_TEMPLATE_BACKEND = 'microsite_configuration.backends.filebased.FilebasedMicrositeTemplateBackend'
 
 SECRET_KEY = 'insecure-secret-key'
+SITE_ID = 1
 
 TRACK_MAX_EVENT = 50000
 
