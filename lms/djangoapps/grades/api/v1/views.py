@@ -25,6 +25,7 @@ from lms.djangoapps.grades.course_data import CourseData
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.events import SUBSECTION_GRADE_CALCULATED, subsection_grade_calculated
 from lms.djangoapps.grades.models import (
+    PersistentCourseGrade,
     PersistentSubsectionGrade,
     PersistentSubsectionGradeOverride,
     PersistentSubsectionGradeOverrideHistory
@@ -38,6 +39,7 @@ from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from student.models import CourseEnrollment
+from student.roles import BulkRoleCache
 from track.event_transaction_utils import (
     create_new_event_transaction_id,
     get_event_transaction_id,
@@ -109,6 +111,35 @@ def verify_writable_gradebook_enabled(view_func):
             )
         return view_func(self, request, **kwargs)
     return wrapped_function
+
+
+@contextmanager
+def bulk_course_grade_context(course_key, users):
+    """
+    Prefetches grades for the given users in the given course
+    within a context, storing in a RequestCache and deleting
+    on context exit.
+    """
+    PersistentCourseGrade.prefetch(course_key, users)
+    yield
+    PersistentCourseGrade.clear_prefetched_data(course_key)
+
+
+@contextmanager
+def bulk_gradebook_view_context(course_key, users):
+    """
+    Prefetches all course and subsection grades in the given course for the given
+    list of users, also, fetch all the score relavant data,
+    storing the result in a RequestCache and deleting grades on context exit.
+    """
+    PersistentSubsectionGrade.prefetch(course_key, users)
+    PersistentCourseGrade.prefetch(course_key, users)
+    CourseEnrollment.bulk_fetch_enrollment_states(users, course_key)
+    cohorts.bulk_cache_cohorts(course_key, users)
+    BulkRoleCache.prefetch(users)
+    yield
+    PersistentSubsectionGrade.clear_prefetched_data(course_key)
+    PersistentCourseGrade.clear_prefetched_data(course_key)
 
 
 class CourseEnrollmentPagination(CursorPagination):
@@ -227,7 +258,7 @@ class GradeViewMixin(DeveloperErrorViewMixin):
         course_grade = CourseGradeFactory().read(grade_user, course_key=course_key)
         return Response([self._serialize_user_grade(grade_user, course_key, course_grade)])
 
-    def _iter_user_grades(self, course_key, course_enrollment_filter=None, related_models=None):
+    def _paginate_users(self, course_key, course_enrollment_filter=None, related_models=None):
         """
         Args:
             course_key (CourseLocator): The course to retrieve grades for.
@@ -236,7 +267,7 @@ class GradeViewMixin(DeveloperErrorViewMixin):
             related_models: Optional list of related models to join to the CourseEnrollment table.
 
         Returns:
-            An iterator of CourseGrade objects for users enrolled in the given course.
+            A list of users, pulled from a paginated queryset of enrollments, who are enrolled in the given course.
         """
         filter_kwargs = {
             'course_id': course_key,
@@ -248,11 +279,7 @@ class GradeViewMixin(DeveloperErrorViewMixin):
             enrollments_in_course = enrollments_in_course.select_related(*related_models)
 
         paged_enrollments = self.paginate_queryset(enrollments_in_course)
-        users = (enrollment.user for enrollment in paged_enrollments)
-        grades = CourseGradeFactory().iter(users, course_key=course_key)
-
-        for user, course_grade, exc in grades:
-            yield user, course_grade, exc
+        return [enrollment.user for enrollment in paged_enrollments]
 
     def _serialize_user_grade(self, user, course_key, course_grade):
         """
@@ -409,9 +436,12 @@ class CourseGradesView(GradeViewMixin, PaginatedAPIView):
             A serializable list of grade responses
         """
         user_grades = []
-        for user, course_grade, exc in self._iter_user_grades(course_key):
-            if not exc:
-                user_grades.append(self._serialize_user_grade(user, course_key, course_grade))
+        users = self._paginate_users(course_key)
+
+        with bulk_course_grade_context(course_key, users):
+            for user, course_grade, exc in CourseGradeFactory().iter(users, course_key=course_key):
+                if not exc:
+                    user_grades.append(self._serialize_user_grade(user, course_key, course_grade))
 
         return self.get_paginated_response(user_grades)
 
@@ -650,12 +680,14 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
             if request.GET.get('enrollment_mode'):
                 filter_kwargs['mode'] = request.GET.get('enrollment_mode')
 
-            user_grades = self._iter_user_grades(course_key, filter_kwargs, related_models)
-
             entries = []
-            for user, course_grade, exc in user_grades:
-                if not exc:
-                    entries.append(self._gradebook_entry(user, course, course_grade))
+            users = self._paginate_users(course_key, filter_kwargs, related_models)
+
+            with bulk_gradebook_view_context(course_key, users):
+                for user, course_grade, exc in CourseGradeFactory().iter(users, course_key=course_key):
+                    if not exc:
+                        entries.append(self._gradebook_entry(user, course, course_grade))
+
             serializer = StudentGradebookEntrySerializer(entries, many=True)
             return self.get_paginated_response(serializer.data)
 

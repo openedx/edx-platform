@@ -22,7 +22,7 @@ from instructor_analytics.basic import list_problem_responses
 from instructor_analytics.csvs import format_dictlist
 from lms.djangoapps.certificates.models import CertificateWhitelist, GeneratedCertificate, certificate_info_for_user
 from lms.djangoapps.grades.context import grading_context, grading_context_for_course
-from lms.djangoapps.grades.models import PersistentCourseGrade
+from lms.djangoapps.grades.models import PersistentCourseGrade, PersistentSubsectionGrade
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.teams.models import CourseTeamMembership
 from lms.djangoapps.verify_student.services import IDVerificationService
@@ -190,6 +190,7 @@ class _CourseGradeBulkContext(object):
         bulk_cache_cohorts(context.course_id, users)
         BulkRoleCache.prefetch(users)
         PersistentCourseGrade.prefetch(context.course_id, users)
+        PersistentSubsectionGrade.prefetch(context.course_id, users)
         BulkCourseTags.prefetch(context.course_id, users)
 
 
