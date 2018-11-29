@@ -14,6 +14,7 @@ from base64 import b64encode
 from collections import namedtuple
 from hashlib import sha1
 
+from django.contrib.auth.models import User
 from django.db import models
 from django.utils.timezone import now
 from lazy import lazy
@@ -636,3 +637,55 @@ class PersistentSubsectionGradeOverride(models.Model):
 def prefetch(user, course_key):
     PersistentSubsectionGradeOverride.prefetch(user.id, course_key)
     VisibleBlocks.bulk_read(user.id, course_key)
+
+
+class PersistentSubsectionGradeOverrideHistory(models.Model):
+    """
+    A django model tracking persistent grades override audit records.
+    """
+    PROCTORING = 'PROCTORING'
+    GRADEBOOK = 'GRADEBOOK'
+    OVERRIDE_FEATURES = (
+        (PROCTORING, 'proctoring'),
+        (GRADEBOOK, 'gradebook'),
+    )
+
+    CREATE_OR_UPDATE = 'CREATEORUPDATE'
+    DELETE = 'DELETE'
+    OVERRIDE_ACTIONS = (
+        (CREATE_OR_UPDATE, 'create_or_update'),
+        (DELETE, 'delete')
+    )
+
+    class Meta(object):
+        app_label = "grades"
+
+    override_id = models.IntegerField(db_index=True)
+    feature = models.CharField(
+        max_length=32,
+        choices=OVERRIDE_FEATURES,
+        default=PROCTORING
+    )
+    action = models.CharField(
+        max_length=32,
+        choices=OVERRIDE_ACTIONS,
+        default=CREATE_OR_UPDATE
+    )
+    user = models.ForeignKey(User, blank=True, null=True)
+    comments = models.CharField(max_length=300, blank=True, null=True)
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    def __unicode__(self):
+        """
+        String representation of this model.
+        """
+        return (
+            u"{} override_id: {}, user_id: {}, feature: {}, action: {}, created: {}"
+        ).format(
+            type(self).__name__,
+            self.override_id,
+            self.user,
+            self.feature,
+            self.action,
+            self.created
+        )
