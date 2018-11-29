@@ -15,13 +15,9 @@
     var realOpen = XMLHttpRequest.prototype.open;
     var originalAPI = '${settings.SEGMENT_ORIGINAL_API}';
     var replicateAPI = '${settings.SEGMENT_REPLICATE_API}';
-    var csrfToken = '${csrf_token}';
     XMLHttpRequest.prototype.open = function() {
         if (arguments[1].substr(0, originalAPI.length) === originalAPI) {
             arguments[1] = replicateAPI + arguments[1].substr(originalAPI.length);
-            var result = realOpen.apply(this, arguments);
-            this.setRequestHeader('X-CSRFToken', csrfToken);
-            return result;
         }
         return realOpen.apply(this, arguments);
     };

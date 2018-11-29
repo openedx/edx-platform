@@ -233,6 +233,7 @@ def parse_iso8601_timestamp(timestamp):
 
 
 @require_POST
+@csrf_exempt
 def send_event(request, method, **params):
     """
     Send event to the main and site segment account.
@@ -253,4 +254,3 @@ def send_event(request, method, **params):
         status=main_response.status_code,
         content_type=main_response.headers['Content-Type']
     )
-
