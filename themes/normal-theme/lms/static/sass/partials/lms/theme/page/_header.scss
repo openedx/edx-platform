@@ -19,18 +19,37 @@
 }
 
 
-@media (max-width: 991px){  
+@include media-breakpoint-down(md) {  
   .window-wrap .global-header .header-logo a{ 
     margin-left: 50%;
   }
   .global-header .nav-links .secondary .dropdown-user-menu{
     border: 1px solid #eeeeee;
   }
-  .global-header .hamburger-menu .line{
-    height: 3px;
-  }
+  .global-header .hamburger-menu{
+    outline: none;
+    .line{
+      height: 3px;
+    }
+  } 
+  
+  .mobile-menu{ 
+    margin-top: 21px;
+    .mobile-nav-link{  
+      outline: none;
+      a{  
+        padding:8px 20px;
+        font-size: $mobileFont14;
+        box-sizing: border-box;
+        &:hover{  
+          background-color:$blue;
+        }
+      }
+    }
+  } 
+  
+   
 }
-
 
 
 @media screen and (min-width: 992px){ 

@@ -1,0 +1,140 @@
+.wrapper-account-settings .wrapper-header{
+    max-width: 1200px;
+    border: none;
+    height: auto;
+}
+.wrapper-account-settings .account-settings-container {
+    max-width: 1200px;
+    // padding: 10px;
+    margin: 0 auto;
+}
+.wrapper-account-settings .wrapper-header .header-title{
+    margin-bottom: 20px;
+    padding-top: 20px;
+    font-size: 16px;
+    color: #2e313c;
+}
+.account-settings-sections .account-nav{
+    padding: 12px 22px;
+    border-bottom: 1px solid  #f5f7fa;
+}
+.account-settings-sections .account-nav .account-nav-link{
+    background: #fff;
+    border: none;
+    font-size: 14px;
+}
+.account-settings-sections .account-nav {
+    .account-nav-link:active,.account-nav-link:hover,.account-nav-link:focus{
+        color: $bule;
+        background: #fff;
+        box-shadow: none;
+        border: none;
+        outline: none;
+    }
+
+} 
+.account-settings-sections{
+    box-shadow: 0px 1px 4px 0px $border;
+    border-radius: 3px;
+    border: none;
+
+    .tab-header{
+        padding: 12px 22px;
+        border-bottom: solid 1px #f5f7fa;
+    }
+}
+.account-settings-sections .section{
+    margin: 0 22px;
+}
+.account-settings-sections .section-header{
+    font-size: 14px;
+    color: $title;
+    padding-top: 22px;
+}
+.account-settings-header-subtitle{
+    color: $note;
+}
+.account-settings-sections .section .account-settings-header-subtitle, .account-settings-sections .section .account-settings-header-subtitle-warning{
+    color: $note;
+}
+.account-settings-sections .section .account-settings-section-body .u-field{
+    padding: 10px 0;
+    border: none;
+}
+.account-settings-sections .section .account-settings-section-body .u-field .field .field-label{
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+.account-settings-sections .section .account-settings-section-body .u-field .field{
+    margin-bottom: 0;
+}
+.account-settings-sections .section .account-settings-section-body .u-field-readonly .u-field-value{
+    font-size: 14px;
+    color: $note;
+    padding: 0;
+    line-height: 22px;
+}
+.account-settings-sections .section .account-settings-section-body .u-field .field .field-input{
+    height: 34px;
+}
+.account-settings-sections .u-field-message-help-password{
+    background-color: #b6dcfe;
+	border-radius: 2px;
+    border: solid 0px #4788c7;
+    font-size: 14px;
+    /* font-weight: normal; */
+    /* font-stretch: normal; */
+    /* letter-spacing: 0.1px; */
+    color: #346ca3;
+}
+.account-settings-sections .u-field-value.field select{
+    box-sizing: border-box;
+    height: 34px;
+}
+.account-settings-sections .section .account-settings-section-body .u-field .field .u-field-link{
+    background-color: #b6dcfe;
+	border-radius: 2px;
+    border: solid 1px #4788c7;
+    font-size: 14px;
+    color: #346ca3;
+}
+.account-settings-sections .section .account-settings-section-body .u-field .field select{
+    padding: 0 30px 0 15px;
+}
+.account-settings-sections .section .account-settings-section-body .u-field .field select ~ .icon-caret-down::after{
+
+}
+.account-settings-sections .u-field-message-help{
+    color: $font;
+}
+#accountsTabSections-tabpanel{
+    .u-field-title.field-label{
+        font-size: 16px;
+        text-align: center;
+        font-weight: bold;
+    }
+}
+.account-settings-sections .u-field-value.field{
+    // margin: 0;
+    // box-shadow: 0px 1px 4px 0px #b6dcfe;
+    // background-color: rgba(182, 220, 254, 0.1);
+    // text-align: center;
+    
+    .u-field-social-help{
+        color: $font;
+        font-size: 14px;
+    }
+    .u-field-link{
+        color: #346ca3;
+        text-align: center;
+    }
+    .social-field-unlinked .u-field-link{
+        background-color: #ffffff;
+        border-radius: 3px;
+        border: solid 1px #4788c7;
+    }
+}
+#accountsTabSections-tabpanel .section-header{
+    padding-top: 22px;
+    color: #2e313c;
+}
