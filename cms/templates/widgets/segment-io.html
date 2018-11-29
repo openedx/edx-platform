@@ -7,6 +7,26 @@
 %>
 % endif
 
+% if settings.CMS_SEGMENT_KEY and settings.CMS_SEGMENT_SITE:
+## begin Copy from edx-platform/cms/templates/widgets/segment-io.html
+## Appsembler: begin Segment Site
+<script>
+!function(){
+    var realOpen = XMLHttpRequest.prototype.open;
+    var originalAPI = '${settings.SEGMENT_ORIGINAL_API}';
+    var replicateAPI = '${settings.SEGMENT_REPLICATE_API}';
+    XMLHttpRequest.prototype.open = function() {
+        if (arguments[1].substr(0, originalAPI.length) === originalAPI) {
+            arguments[1] = replicateAPI + arguments[1].substr(originalAPI.length);
+        }
+        return realOpen.apply(this, arguments);
+    };
+}();
+</script>
+## Appsembler: end Segment Site
+## end Copy
+% endif
+
 % if settings.CMS_SEGMENT_KEY:
 <!-- begin Segment -->
 <script type="text/javascript">

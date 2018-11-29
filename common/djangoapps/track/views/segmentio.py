@@ -1,9 +1,11 @@
 """Handle events that were forwarded from the Segment webhook integration"""
 
+import uuid
 import datetime
 import json
 import logging
 
+import requests
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import HttpResponse
@@ -14,6 +16,7 @@ from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
 from util.json_request import expect_json
+from openedx.core.djangoapps.site_configuration import helpers
 
 log = logging.getLogger(__name__)
 
@@ -227,3 +230,27 @@ def track_segmentio_event(request):  # pylint: disable=too-many-statements
 def parse_iso8601_timestamp(timestamp):
     """Parse a particular type of ISO8601 formatted timestamp"""
     return datetime.datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%fZ")
+
+
+@require_POST
+@csrf_exempt
+def send_event(request, method, **params):
+    """
+    Send event to the main and site segment account.
+
+    """
+    data = json.loads(request.body)
+    # Using the 'browser' api to avoid convert the event to the
+    # analytics library format.
+    url = 'https://api.segment.io/v1/{0}'.format(method)
+    main_response = requests.post(url, json=data)
+    segment_key = helpers.get_value('SEGMENT_KEY', None)
+    if segment_key:
+        data['writeKey'] = segment_key
+        data['messageId'] = 'ajs-' + uuid.uuid4().hex
+        site_response = requests.post(url, json=data)
+    return HttpResponse(
+        main_response.content,
+        status=main_response.status_code,
+        content_type=main_response.headers['Content-Type']
+    )

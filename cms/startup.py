@@ -9,6 +9,7 @@ from django.conf import settings
 settings.INSTALLED_APPS  # pylint: disable=pointless-statement
 
 from openedx.core.lib.django_startup import autostartup
+import analytics
 import django
 from openedx.core.djangoapps.monkey_patch import (
     third_party_auth,
@@ -22,6 +23,7 @@ import cms.lib.xblock.runtime
 from startup_configurations.validate_config import validate_cms_config
 from openedx.core.djangoapps.theming.core import enable_theming
 from openedx.core.djangoapps.theming.helpers import is_comprehensive_theming_enabled
+from track.shim import DefaultMultipleSegmentClient
 
 
 def run():
@@ -41,6 +43,12 @@ def run():
     autostartup()
 
     add_mimetypes()
+
+    # Initialize Segment analytics module by setting the write_key.
+    if settings.CMS_SEGMENT_KEY:
+        analytics.write_key = settings.CMS_SEGMENT_KEY
+        if settings.CMS_SEGMENT_SITE:
+            analytics.default_client = DefaultMultipleSegmentClient()
 
     # In order to allow descriptors to use a handler url, we need to
     # monkey-patch the x_module library.

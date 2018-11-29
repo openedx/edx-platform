@@ -243,6 +243,7 @@ ANALYTICS_API_KEY = ""
 
 # If there's an environment variable set, grab it
 LMS_SEGMENT_KEY = os.environ.get('SEGMENT_KEY')
+LMS_SEGMENT_SITE = os.environ.get('SEGMENT_SITE')
 
 ###################### Payment ######################
 

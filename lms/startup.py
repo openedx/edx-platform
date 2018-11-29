@@ -23,6 +23,7 @@ import lms_xblock.runtime
 from startup_configurations.validate_config import validate_lms_config
 from openedx.core.djangoapps.theming.core import enable_theming
 from openedx.core.djangoapps.theming.helpers import is_comprehensive_theming_enabled
+from track.shim import DefaultMultipleSegmentClient
 
 from microsite_configuration import microsite
 
@@ -62,6 +63,8 @@ def run():
     # Initialize Segment analytics module by setting the write_key.
     if settings.LMS_SEGMENT_KEY:
         analytics.write_key = settings.LMS_SEGMENT_KEY
+        if settings.LMS_SEGMENT_SITE:
+            analytics.default_client = DefaultMultipleSegmentClient()
 
     # register any dependency injections that we need to support in edx_proctoring
     # right now edx_proctoring is dependent on the openedx.core.djangoapps.credit

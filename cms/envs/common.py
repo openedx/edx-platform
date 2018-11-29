@@ -88,6 +88,10 @@ from lms.envs.common import (
     # File upload defaults
     FILE_UPLOAD_STORAGE_BUCKET_NAME,
     FILE_UPLOAD_STORAGE_PREFIX,
+
+    # Segment support for site
+    SEGMENT_ORIGINAL_API,
+    SEGMENT_REPLICATE_API,
 )
 from path import Path as path
 from warnings import simplefilter
@@ -122,6 +126,9 @@ FEATURES = {
 
     # Segment - must explicitly turn it on for production
     'CMS_SEGMENT_KEY': None,
+
+    # Segment Site - must explicitly turn it on for production
+    'CMS_SEGMENT_SITE': False,
 
     # Enable URL that shows information about the status of various services
     'ENABLE_SERVICE_STATUS': False,
