@@ -914,7 +914,8 @@ SURVEY_GIZMO_TOKEN_SECRET = AUTH_TOKENS.get('SURVEY_GIZMO_TOKEN_SECRET', None)
 	# Django channels settings
 CELERY_BROKER_HOSTNAME = ENV_TOKENS.get('CELERY_BROKER_HOSTNAME', None)
 
-# django channels settings
+# django channel/sockets settings
+# Notifications plus chats
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "asgi_redis.RedisChannelLayer",
