@@ -343,7 +343,7 @@ CREATE TABLE `auth_permission` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `content_type_id` (`content_type_id`,`codename`),
   CONSTRAINT `auth__content_type_id_508cf46651277a81_fk_django_content_type_id` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1122 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1125 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `auth_registration`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2156,7 +2156,7 @@ CREATE TABLE `django_content_type` (
   `model` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `django_content_type_app_label_45f3b1d93ec8c61c_uniq` (`app_label`,`model`)
-) ENGINE=InnoDB AUTO_INCREMENT=373 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=374 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_migrations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -2167,7 +2167,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=494 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=495 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `django_openid_auth_association`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -3132,6 +3132,24 @@ CREATE TABLE `grades_persistentsubsectiongradeoverride` (
   KEY `grades_persistentsubsectiongradeoverride_e2fa5388` (`created`),
   KEY `grades_persistentsubsectiongradeoverride_9ae73c65` (`modified`),
   CONSTRAINT `D843af3bd266b7666e4f166216719659` FOREIGN KEY (`grade_id`) REFERENCES `grades_persistentsubsectiongrade` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `grades_persistentsubsectiongradeoverridehistory`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `grades_persistentsubsectiongradeoverridehistory` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `feature` varchar(10) NOT NULL,
+  `comments` varchar(300) DEFAULT NULL,
+  `created` datetime(6) NOT NULL,
+  `override_id` int(11) NOT NULL,
+  `user_id_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `grades_persistentsub_override_id_f41bf7c1_fk_grades_pe` (`override_id`),
+  KEY `grades_persistentsub_user_id_id_550ca17e_fk_auth_user` (`user_id_id`),
+  KEY `grades_persistentsubsectiongradeoverridehistory_created_d903656e` (`created`),
+  CONSTRAINT `grades_persistentsub_override_id_f41bf7c1_fk_grades_pe` FOREIGN KEY (`override_id`) REFERENCES `grades_persistentsubsectiongradeoverride` (`id`),
+  CONSTRAINT `grades_persistentsub_user_id_id_550ca17e_fk_auth_user` FOREIGN KEY (`user_id_id`) REFERENCES `auth_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `grades_visibleblocks`;
