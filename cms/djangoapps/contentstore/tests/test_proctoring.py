@@ -10,6 +10,7 @@ from mock import patch
 from pytz import UTC
 
 from contentstore.signals.handlers import listen_for_course_publish
+from django.conf import settings
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -27,11 +28,17 @@ class TestProctoredExams(ModuleStoreTestCase):
         """
         super(TestProctoredExams, self).setUp()
 
+        default_proctoring_provider = settings.PROCTORING_BACKENDS['DEFAULT']
+
         self.course = CourseFactory.create(
             org='edX',
             course='900',
             run='test_run',
-            enable_proctored_exams=True
+            enable_proctored_exams=True,
+            proctoring_configuration={
+                'backend': default_proctoring_provider,
+                'rules': settings.PROCTORING_BACKENDS[default_proctoring_provider]['default_rules'],
+            }
         )
 
     def _verify_exam_data(self, sequence, expected_active):
@@ -49,6 +56,7 @@ class TestProctoredExams(ModuleStoreTestCase):
             # get the review policy object
             exam_review_policy = get_review_policy_by_exam_id(exam['id'])
             self.assertEqual(exam_review_policy['review_policy'], sequence.exam_review_rules)
+            self.assertEqual(exam_review_policy['rules'], self.course.proctoring_configuration['rules'])
 
         if not exam['is_proctored'] and not exam['is_practice_exam']:
             # the hide after due value only applies to timed exams
@@ -61,20 +69,22 @@ class TestProctoredExams(ModuleStoreTestCase):
         self.assertEqual(exam['is_proctored'], sequence.is_proctored_exam)
         self.assertEqual(exam['is_practice_exam'], sequence.is_practice_exam)
         self.assertEqual(exam['is_active'], expected_active)
+        self.assertEqual(exam['backend'], self.course.proctoring_configuration['backend'])
 
     @ddt.data(
-        (True, 10, True, False, True, False, False),
-        (True, 10, False, False, True, False, False),
-        (True, 10, False, False, True, False, True),
-        (True, 10, True, True, True, True, False),
+        (True, False, True, False, False),
+        (False, False, True, False, False),
+        (False, False, True, False, True),
+        (True, True, True, True, False),
     )
     @ddt.unpack
-    def test_publishing_exam(self, is_time_limited, default_time_limit_minutes, is_proctored_exam,
+    def test_publishing_exam(self, is_proctored_exam,
                              is_practice_exam, expected_active, republish, hide_after_due):
         """
         Happy path testing to see that when a course is published which contains
         a proctored exam, it will also put an entry into the exam tables
         """
+        default_time_limit_minutes = 10
 
         chapter = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
         sequence = ItemFactory.create(
@@ -82,7 +92,7 @@ class TestProctoredExams(ModuleStoreTestCase):
             category='sequential',
             display_name='Test Proctored Exam',
             graded=True,
-            is_time_limited=is_time_limited,
+            is_time_limited=True,
             default_time_limit_minutes=default_time_limit_minutes,
             is_proctored_exam=is_proctored_exam,
             is_practice_exam=is_practice_exam,
@@ -104,14 +114,13 @@ class TestProctoredExams(ModuleStoreTestCase):
             listen_for_course_publish(self, self.course.id)
 
             # reverify
-            self._verify_exam_data(sequence, expected_active)
+            self._verify_exam_data(sequence, expected_active,)
 
     def test_unpublishing_proctored_exam(self):
         """
         Make sure that if we publish and then unpublish a proctored exam,
         the exam record stays, but is marked as is_active=False
         """
-
         chapter = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
         sequence = ItemFactory.create(
             parent=chapter,
@@ -178,7 +187,6 @@ class TestProctoredExams(ModuleStoreTestCase):
         """
         Make sure the feature flag is honored
         """
-
         chapter = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
         ItemFactory.create(
             parent=chapter,
