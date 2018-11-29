@@ -5,7 +5,7 @@ import datetime
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.timezone import now
-
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from student.models import UserProfile
 from student.tests.factories import UserFactory
 
@@ -35,6 +35,18 @@ class ProfileParentalControlsTest(TestCase):
 
     @override_settings(PARENTAL_CONSENT_AGE_LIMIT=None)
     def test_no_parental_controls(self):
+        """Verify the behavior for all users when parental controls are not enabled."""
+        self.assertFalse(self.profile.requires_parental_consent())
+        self.assertFalse(self.profile.requires_parental_consent(default_requires_consent=True))
+        self.assertFalse(self.profile.requires_parental_consent(default_requires_consent=False))
+
+        # Verify that even a child does not require parental consent
+        current_year = now().year
+        self.set_year_of_birth(current_year - 10)
+        self.assertFalse(self.profile.requires_parental_consent())
+
+    @with_site_configuration(configuration={'PARENTAL_CONSENT_AGE_LIMIT': None})
+    def test_no_parental_controls_site_configuration(self):
         """Verify the behavior for all users when parental controls are not enabled."""
         self.assertFalse(self.profile.requires_parental_consent())
         self.assertFalse(self.profile.requires_parental_consent(default_requires_consent=True))

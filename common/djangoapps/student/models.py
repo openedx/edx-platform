@@ -530,7 +530,7 @@ class UserProfile(models.Model):
              True if the user requires parental consent.
         """
         if age_limit is None:
-            age_limit = getattr(settings, 'PARENTAL_CONSENT_AGE_LIMIT', None)
+            age_limit = configuration_helpers.get_value('PARENTAL_CONSENT_AGE_LIMIT', settings.PARENTAL_CONSENT_AGE_LIMIT)
             if age_limit is None:
                 return False
 
