@@ -245,11 +245,14 @@
 
 			// Secondary email address
             if (isSecondaryEmailFeatureEnabled) {
-            	var emailFieldViewIndex = aboutSectionsData[1].fields.indexOf(emailFieldView);
+				secondaryEmailFieldView = {
+					view: new AccountSettingsFieldViews.EmailFieldView(secondaryEmailFieldData)
+				};
+            	var emailFieldViewIndex = aboutSectionsData[0].fields.indexOf(emailFieldView);
 
             	// Insert secondary email address after email address field.
-            	aboutSectionsData[1].fields.splice(
-            		emailFieldViewIndex+1, 0, new AccountSettingsFieldViews.EmailFieldView(secondaryEmailFieldData)
+            	aboutSectionsData[0].fields.splice(
+            		emailFieldViewIndex + 1, 0, secondaryEmailFieldView
             	)
             }
 
