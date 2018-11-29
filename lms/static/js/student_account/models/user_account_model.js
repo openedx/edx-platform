@@ -52,6 +52,11 @@
 
             profileImageUrl: function() {
                 return this.get('profile_image').image_url_large;
+            },
+
+            isBirthYearDefined: function() {
+                var yearOfBirth = this.get('year_of_birth');
+                return !(_.isUndefined(yearOfBirth) || _.isNull(yearOfBirth));
             }
         });
         return UserAccountModel;

@@ -50,7 +50,8 @@ define(
                         ['private', 'Limited Profile']
                     ],
                     helpMessage: '',
-                    accountSettingsPageUrl: '/account/settings/'
+                    accountSettingsPageUrl: '/account/settings/',
+                    parentalConsentAgeLimit: 13
                 });
 
                 var messageView = new MessageBannerView({

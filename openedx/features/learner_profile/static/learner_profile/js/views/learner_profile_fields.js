@@ -39,19 +39,24 @@
                     HtmlUtils.HTML('</a>')
                 );
                 if (this.profileIsPrivate) {
-                    this._super(
-                        HtmlUtils.interpolateHtml(
-                            gettext('You must specify your birth year before you can share your full profile. To specify your birth year, go to the {account_settings_page_link}'),  // eslint-disable-line max-len
-                            {account_settings_page_link: accountSettingsLink}
-                        )
-                    );
-                } else if (this.requiresParentalConsent) {
-                    this._super(
-                        HtmlUtils.interpolateHtml(
-                            gettext('You must be over 13 to share a full profile. If you are over 13, make sure that you have specified a birth year on the {account_settings_page_link}'),  // eslint-disable-line max-len
-                            {account_settings_page_link: accountSettingsLink}
-                        )
-                    );
+                    if (this.isBirthYearDefined) {
+                        this._super(
+                            HtmlUtils.interpolateHtml(
+                                gettext('You must be over {parental_consent_age_limit} to share a full profile. If you are over {parental_consent_age_limit}, make sure that you have specified a birth year on the {account_settings_page_link}'),  // eslint-disable-line max-len
+                                {
+                                    parental_consent_age_limit: this.options.parentalConsentAgeLimit,
+                                    account_settings_page_link: accountSettingsLink
+                                }
+                            )
+                        );
+                    } else {
+                        this._super(
+                            HtmlUtils.interpolateHtml(
+                                gettext('You must specify your birth year before you can share your full profile. To specify your birth year, go to the {account_settings_page_link}'),  // eslint-disable-line max-len
+                                {account_settings_page_link: accountSettingsLink}
+                            )
+                        );
+                    }
                 } else {
                     this._super('');
                 }

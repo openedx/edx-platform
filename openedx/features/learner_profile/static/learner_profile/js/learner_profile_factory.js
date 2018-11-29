@@ -79,6 +79,7 @@
                 ],
                 helpMessage: '',
                 accountSettingsPageUrl: options.account_settings_page_url,
+                parentalConsentAgeLimit: options.parental_consent_age_limit,
                 persistChanges: true
             });
 

@@ -34,6 +34,7 @@ define(
                     badges_api_url: Helpers.BADGES_API_URL,
                     own_profile: ownProfile,
                     account_settings_page_url: Helpers.USER_ACCOUNTS_API_URL,
+                    parental_consent_age_limit: 13,
                     country_options: Helpers.FIELD_OPTIONS,
                     language_options: Helpers.FIELD_OPTIONS,
                     has_preferences_access: true,
@@ -66,6 +67,13 @@ define(
                     learnerProfileView = context.learnerProfileView;
 
                 LearnerProfileHelpers.expectLimitedProfileSectionsAndFieldsToBeRendered(learnerProfileView);
+            });
+
+            it("renders the full profile for undefined 'year_of_birth' with disabled parental consent", function() {
+                var context = createProfilePage(true, {year_of_birth: '', requires_parental_consent: false}),
+                    learnerProfileView = context.learnerProfileView;
+
+                LearnerProfileHelpers.expectProfileSectionsAndFieldsToBeRendered(learnerProfileView, false);
             });
 
             it("doesn't show the mode toggle if badges are disabled", function() {

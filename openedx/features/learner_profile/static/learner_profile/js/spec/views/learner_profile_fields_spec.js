@@ -18,11 +18,15 @@ define(
             var MOCK_YEAR_OF_BIRTH = 1989;
             var MOCK_IMAGE_MAX_BYTES = 64;
             var MOCK_IMAGE_MIN_BYTES = 16;
+            var MOCK_REQUIRES_PARENTAL_CONSENT = false;
 
             var createImageView = function(options) {
                 var yearOfBirth = _.isUndefined(options.yearOfBirth) ? MOCK_YEAR_OF_BIRTH : options.yearOfBirth;
                 var imageMaxBytes = _.isUndefined(options.imageMaxBytes) ? MOCK_IMAGE_MAX_BYTES : options.imageMaxBytes;
                 var imageMinBytes = _.isUndefined(options.imageMinBytes) ? MOCK_IMAGE_MIN_BYTES : options.imageMinBytes;
+                var requiresParentalConsent = _.isUndefined(options.requiresParentalConsent) ?
+                                                MOCK_REQUIRES_PARENTAL_CONSENT :
+                                                options.requiresParentalConsent;
                 var messageView;
 
                 var imageData = {
@@ -33,7 +37,7 @@ define(
                 var accountSettingsModel = new UserAccountModel();
                 accountSettingsModel.set({profile_image: imageData});
                 accountSettingsModel.set({year_of_birth: yearOfBirth});
-                accountSettingsModel.set({requires_parental_consent: !!_.isEmpty(yearOfBirth)});
+                accountSettingsModel.set({requires_parental_consent: requiresParentalConsent});
 
                 accountSettingsModel.url = Helpers.USER_ACCOUNTS_API_URL;
 
@@ -230,7 +234,12 @@ define(
                 });
 
                 it("can't upload and remove image if parental consent required", function() {
-                    var imageView = createImageView({ownProfile: true, hasImage: false, yearOfBirth: ''});
+                    var imageView = createImageView({
+                        ownProfile: true,
+                        hasImage: false,
+                        yearOfBirth: '',
+                        requiresParentalConsent: true
+                    });
                     imageView.render();
 
                     spyOn(imageView, 'clickedUploadButton');
@@ -244,6 +253,28 @@ define(
 
                     expect(imageView.clickedUploadButton).not.toHaveBeenCalled();
                     expect(imageView.clickedRemoveButton).not.toHaveBeenCalled();
+                });
+
+                it('can upload and remove image if parental consent not required and not yearOfBirth', function() {
+                    var imageView = createImageView({
+                        ownProfile: true,
+                        hasImage: false,
+                        yearOfBirth: '',
+                        requiresParentalConsent: false
+                    });
+                    imageView.render();
+
+                    spyOn(imageView, 'clickedUploadButton');
+                    spyOn(imageView, 'clickedRemoveButton');
+
+                    expect(imageView.$('.u-field-upload-button').css('display') === 'none').toBeFalsy();
+                    expect(imageView.$('.u-field-remove-button').css('display') === 'none').toBeFalsy();
+
+                    imageView.$('.u-field-upload-button').click();
+                    imageView.$('.u-field-remove-button').click();
+
+                    expect(imageView.clickedUploadButton).toHaveBeenCalled();
+                    expect(imageView.clickedRemoveButton).toHaveBeenCalled();
                 });
 
                 it("can't upload and remove image on others profile", function() {

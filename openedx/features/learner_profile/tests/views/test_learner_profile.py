@@ -39,6 +39,7 @@ class LearnerProfileViewTest(UrlResetMixin, ModuleStoreTestCase):
         'language_options',
         'account_settings_data',
         'preferences_data',
+        'parental_consent_age_limit',
     ]
 
     def setUp(self):
@@ -97,6 +98,8 @@ class LearnerProfileViewTest(UrlResetMixin, ModuleStoreTestCase):
         )
 
         self.assertEqual(context['data']['account_settings_page_url'], reverse('account_settings'))
+
+        self.assertEqual(context['data']['parental_consent_age_limit'], settings.PARENTAL_CONSENT_AGE_LIMIT)
 
         for attribute in self.CONTEXT_DATA:
             self.assertIn(attribute, context['data'])

@@ -122,8 +122,9 @@
                     if (this.options.ownProfile) {
                         fieldView = this.options.accountPrivacyFieldView;
                         settings = this.options.accountSettingsModel;
-                        fieldView.profileIsPrivate = !settings.get('year_of_birth');
+                        fieldView.profileIsPrivate = settings.get('requires_parental_consent');
                         fieldView.requiresParentalConsent = settings.get('requires_parental_consent');
+                        fieldView.isBirthYearDefined = settings.isBirthYearDefined();
                         fieldView.undelegateEvents();
                         this.$('.wrapper-profile-field-account-privacy').prepend(fieldView.render().el);
                         fieldView.delegateEvents();
