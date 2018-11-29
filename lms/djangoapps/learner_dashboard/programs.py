@@ -3,6 +3,7 @@ Fragments for rendering programs.
 """
 import json
 
+from django.conf import settings
 from django.http import Http404
 from django.template.loader import render_to_string
 from django.utils.translation import get_language_bidi
@@ -140,6 +141,10 @@ class ProgramDetailsFragmentView(EdxFragmentView):
             'certificate_data': certificate_data,
             'industry_pathways': industry_pathways,
             'credit_pathways': credit_pathways,
+            'course_currency': {
+                'code': settings.PAID_COURSE_REGISTRATION_CURRENCY[0],
+                'symbol': settings.PAID_COURSE_REGISTRATION_CURRENCY[1]
+            }
         }
 
         html = render_to_string('learner_dashboard/program_details_fragment.html', context)
