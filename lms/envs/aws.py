@@ -913,3 +913,14 @@ SURVEY_GIZMO_TOKEN = AUTH_TOKENS.get('SURVEY_GIZMO_TOKEN', None)
 SURVEY_GIZMO_TOKEN_SECRET = AUTH_TOKENS.get('SURVEY_GIZMO_TOKEN_SECRET', None)
 	# Django channels settings
 CELERY_BROKER_HOSTNAME = ENV_TOKENS.get('CELERY_BROKER_HOSTNAME', None)
+
+# django channels settings
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "asgi_redis.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [(ENV_TOKENS.get('REDIS_HOST', None), ENV_TOKENS.get('REDIS_PORT', None))],
+        },
+        "ROUTING": "edx_notifications.server.socket.routing.channel_routing",
+    }
+}

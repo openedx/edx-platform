@@ -2245,16 +2245,6 @@ INSTALLED_APPS = (
     'channels'
 )
 
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "asgi_redis.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [("localhost", 6379)],
-        },
-        "ROUTING": "edx_notifications.server.socket.routing.channel_routing",
-    },
-}
-
 ######################### CSRF #########################################
 
 # Forwards-compatibility with Django 1.7
