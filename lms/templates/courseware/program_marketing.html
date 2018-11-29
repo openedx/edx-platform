@@ -247,13 +247,16 @@ endorser_org = endorser_position.get('organization_name') or corporate_endorseme
           <li class="row">
             <div class="label col col-6">
               <span class="fa fa-tag fa-lg" aria-hidden="true"></span>
-              <span>${_('Price (')}${course_currency.get('code')})</span>
+              <span>
+                ${Text(_('Price ({currencyCode})')).format(currencyCode=course_currency.get('code'))}
+              </span>
             </div>
             <div class="description col col-6">
               % if program.get('discount_data') and program['discount_data']['is_discounted']:
                 <span class="price">
                   <span aria-label="${_('Original Price')}" class="original-price">
-                    ${Text(_('${oldPrice}')).format(
+                    ${Text(_('{currencySymbol}{oldPrice}')).format(
+                      currencySymbol=course_currency.get('symbol'),
                       oldPrice=full_program_price_format.format(program['discount_data']['total_incl_tax_excl_discounts'])
                     )}
                   </span>
