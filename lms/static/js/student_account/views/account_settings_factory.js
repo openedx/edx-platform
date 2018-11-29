@@ -92,12 +92,6 @@
                 persistChanges: true
             };
 
-            if (isSecondaryEmailFeatureEnabled) {
-            	secondaryEmailFieldView = {
-                    view: new AccountSettingsFieldViews.EmailFieldView(secondaryEmailFieldData)
-                };
-            }
-
             fullNameFieldData = {
                 model: userAccountModel,
                 title: gettext('Full Name'),
@@ -159,7 +153,6 @@
                         },
                         fullnameFieldView,
                         emailFieldView,
-                        secondaryEmailFieldView,
                         {
                             view: new AccountSettingsFieldViews.PasswordFieldView({
                                 model: userAccountModel,
@@ -249,6 +242,16 @@
                     ]
                 }
             ];
+
+			// Secondary email address
+            if (isSecondaryEmailFeatureEnabled) {
+            	var emailFieldViewIndex = aboutSectionsData[1].fields.indexOf(emailFieldView);
+
+            	// Insert secondary email address after email address field.
+            	aboutSectionsData[1].fields.splice(
+            		emailFieldViewIndex+1, 0, new AccountSettingsFieldViews.EmailFieldView(secondaryEmailFieldData)
+            	)
+            }
 
             // Add the extended profile fields
             additionalFields = aboutSectionsData[1];
