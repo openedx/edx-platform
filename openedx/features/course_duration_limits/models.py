@@ -12,13 +12,14 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from experiments.models import ExperimentData
-from student.models import CourseEnrollment
 from openedx.core.djangoapps.config_model_utils.models import StackedConfigurationModel
 from openedx.features.course_duration_limits.config import (
     CONTENT_TYPE_GATING_FLAG,
     EXPERIMENT_ID,
     EXPERIMENT_DATA_HOLDBACK_KEY
 )
+from student.models import CourseEnrollment
+from student.roles import CourseBetaTesterRole, CourseInstructorRole, CourseStaffRole
 
 
 @python_2_unicode_compatible
@@ -74,6 +75,17 @@ class CourseDurationLimitConfig(StackedConfigurationModel):
 
         if enrollment is None:
             enrollment = CourseEnrollment.get_enrollment(user, course_key)
+
+        # if the user is has a role of staff, instructor or beta tester their access should not expire
+        if user is None and enrollment is not None:
+            user = enrollment.user
+        if user:
+            staff_role = CourseStaffRole(course_key).has_user(user)
+            instructor_role = CourseInstructorRole(course_key).has_user(user)
+            beta_tester_role = CourseBetaTesterRole(course_key).has_user(user)
+
+            if staff_role or instructor_role or beta_tester_role:
+                return False
 
         # enrollment might be None if the user isn't enrolled. In that case,
         # return enablement as if the user enrolled today
