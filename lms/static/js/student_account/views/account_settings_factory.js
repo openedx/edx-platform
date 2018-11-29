@@ -27,7 +27,8 @@
             enterpriseReadonlyAccountFields,
             edxSupportUrl,
             extendedProfileFields,
-            displayAccountDeletion
+            displayAccountDeletion,
+            currency,
         ) {
             var $accountSettingsElement, userAccountModel, userPreferencesModel, aboutSectionsData,
                 accountsSectionData, ordersSectionData, accountSettingsView, showAccountSettingsPage,
@@ -369,7 +370,8 @@
                                 orderDate: order.order_date,
                                 receiptUrl: order.receipt_url,
                                 valueAttribute: 'order-' + orderNumber,
-                                lines: order.lines
+                                lines: order.lines,
+                                currency: currency
                             })
                         };
                     })

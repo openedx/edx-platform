@@ -66,6 +66,8 @@ class ProgramDetailsView extends Backbone.View {
       remainingCount,
       completedCount,
       completeProgramURL: buyButtonUrl,
+      currencyCode: this.options.courseCurrency.code,
+      currencySymbol: this.options.courseCurrency.symbol
     };
     data = $.extend(data, this.programModel.toJSON());
     HtmlUtils.setHtml(this.$el, this.tpl(data));

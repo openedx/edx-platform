@@ -89,27 +89,28 @@ endorser_org = endorser_position.get('organization_name') or corporate_endorseme
               ## Note: Weird formatting to fix the inline spacing issue.
               % if program.get('is_learner_eligible_for_one_click_purchase'):
                 <a href="${buy_button_href}" class="btn btn-success">
-                <span>${_('Purchase the Program (')}</span
-                % if program.get('discount_data') and program['discount_data']['is_discounted']:
-                  ><span aria-label="${_('Original Price')}" class="original-price"
-                  >${Text(_('${oldPrice}')).format(
-                      oldPrice=full_program_price_format.format(program['discount_data']['total_incl_tax_excl_discounts'])
-                    )}</span
-                  ><span aria-label="${_('Discounted Price')}" class="discount">
-                      ${Text(_('${newPrice}')).format(
-                        newPrice=full_program_price,
+                  <span>
+                    ${_('Purchase the Program (')}
+                  </span>
+                  % if program.get('discount_data') and program['discount_data']['is_discounted']:
+                    <span aria-label="${_('Original Price')}" class="original-price">
+                      ${Text(_('${oldPrice}')).format(oldPrice=full_program_price_format.format(program['discount_data']['total_incl_tax_excl_discounts']))}
+                    </span>
+                    <span aria-label="${_('Discounted Price')}" class="discount">
+                        ${Text(_('${newPrice}')).format(newPrice=full_program_price,)}
+                    </span>
+                    <span class="savings">
+                      ${Text(_('{currency})')).format(
+                        discount_value=full_program_price_format.format(program['discount_data']['discount_value']),
+                        currency=program['discount_data']['currency']
                       )}
-                  </span
-                  ><span class="savings">
-                    ${Text(_('{currency})')).format(
-                      discount_value=full_program_price_format.format(program['discount_data']['discount_value']),
-                      currency=program['discount_data']['currency']
-                    )}
-                  </span>
-                % else:
-                ><span>${"${price})".format(price=full_program_price)}
-                  </span>
-                % endif
+                    </span>
+                  % else:
+                    <span>
+                      ${course_currency.get('symbol')}
+                      ${"{price})".format(price=full_program_price)}
+                    </span>
+                  % endif
                 </a>
               % else:
                 <a href="#courses" class="btn btn-success">
@@ -246,7 +247,7 @@ endorser_org = endorser_position.get('organization_name') or corporate_endorseme
           <li class="row">
             <div class="label col col-6">
               <span class="fa fa-tag fa-lg" aria-hidden="true"></span>
-              <span>${_('Price (USD)')}</span>
+              <span>${_('Price (')}${course_currency.get('code')})</span>
             </div>
             <div class="description col col-6">
               % if program.get('discount_data') and program['discount_data']['is_discounted']:
@@ -257,12 +258,15 @@ endorser_org = endorser_position.get('organization_name') or corporate_endorseme
                     )}
                   </span>
                   <span aria-label="${_('Discounted Price')}" class="discount green-highlight">
-                    ${Text(_('${newPrice}{htmlEnd} for entire program')).format(
+                    ${course_currency.get('symbol')}
+                    ${Text(_('{newPrice}{htmlEnd} for entire program')).format(
                       newPrice=full_program_price,
                       htmlEnd=HTML('</span>')
                     )}
                   <span class="savings green-highlight">
-                    ${Text(_('You save ${discount_value} {currency}')).format(
+                    ${_('You save ')}
+                    ${course_currency.get('symbol')}
+                    ${Text(_('{discount_value} {currency}')).format(
                       discount_value=full_program_price_format.format(program['discount_data']['discount_value']),
                       currency=program['discount_data']['currency']
                     )}
@@ -270,7 +274,8 @@ endorser_org = endorser_position.get('organization_name') or corporate_endorseme
                 </span>
               % else:
                 <span>
-                  ${Text(_('${full_program_price} for entire program')).format(
+                  ${course_currency.get('symbol')}
+                  ${Text(_('{full_program_price} for entire program')).format(
                     full_program_price=full_program_price
                   )}
                 </span>
