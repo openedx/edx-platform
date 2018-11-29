@@ -4,6 +4,7 @@ import json
 from functools import partial
 
 import factory
+from django.test.client import RequestFactory
 from factory.django import DjangoModelFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
@@ -161,3 +162,13 @@ class StudentInfoFactory(DjangoModelFactory):
     field_name = 'existing_field'
     value = json.dumps('old_value')
     student = factory.SubFactory(UserFactory)
+
+
+class RequestFactoryNoCsrf(RequestFactory):
+    """
+    RequestFactory, which disables csrf checks.
+    """
+    def request(self, **kwargs):
+        request = super(RequestFactoryNoCsrf, self).request(**kwargs)
+        setattr(request, '_dont_enforce_csrf_checks', True)
+        return request
