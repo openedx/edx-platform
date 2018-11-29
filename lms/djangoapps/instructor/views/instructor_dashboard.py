@@ -41,6 +41,7 @@ from django_comment_client.utils import available_division_schemes, has_forum_ac
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, CourseDiscussionSettings
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.courseware.module_render import get_module_by_usage_id
+from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from openedx.core.djangoapps.course_groups.cohorts import DEFAULT_COHORT_NAME, get_course_cohorts, is_course_cohorted
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.verified_track_content.models import VerifiedTrackCohortedCourse
@@ -54,6 +55,8 @@ from util.json_request import JsonResponse
 from xmodule.html_module import HtmlDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTab
+
+from rapid_response_xblock.utils import get_run_data_for_course
 
 from .tools import get_units_with_due_date, title_or_url
 
@@ -226,6 +229,10 @@ def instructor_dashboard_2(request, course_id):
     )
 
     certificate_invalidations = CertificateInvalidation.get_certificate_invalidations(course_key)
+
+    # x block asides enabled, included rapid response tab
+    if XBlockAsidesConfig.current().enabled:
+        sections.append(_section_rapid_response(course_key))
 
     context = {
         'course': course,
@@ -783,3 +790,16 @@ def is_ecommerce_course(course_key):
     """
     sku_count = len([mode.sku for mode in CourseMode.modes_for_course(course_key) if mode.sku])
     return sku_count > 0
+
+
+def _section_rapid_response(course_key):
+    """Provide data for the rapid response dashboard section """
+
+    section_data = {
+        'section_key': 'rapid_response',
+        'section_display_name': _('Rapid Responses'),
+        'problem_runs': get_run_data_for_course(course_key=course_key),
+        'course_key': course_key,
+        'download_url': 'get_rapid_response_report'
+    }
+    return section_data

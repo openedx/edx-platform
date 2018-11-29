@@ -1,0 +1,28 @@
+<%page args="section_data" expression_filter="h"/>
+<%!
+from itertools import groupby
+
+from django.utils.translation import ugettext as _
+from django.urls import reverse
+
+from instructor.views.tools import get_display_name_from_usage_key
+%>
+
+
+<div>
+    % for date,runs in groupby(section_data['problem_runs'],key=lambda x:x['created'].date()):
+    <ul>
+        <li>${date.strftime('%Y/%m/%d')}</li>
+        <ul>
+            % for run in runs:
+            <li>${get_display_name_from_usage_key(run['problem_usage_key'])} - ${run['created'].strftime('%I:%M:%S %p')}:
+                <a type="button" class="btn-link"
+                   href="${reverse('get_rapid_response_report', kwargs={'course_id': section_data['course_key'], 'run_id': run['id']})}">
+                    ${_("Download")}
+                </a>
+            </li>
+            % endfor
+        </ul>
+    </ul>
+    % endfor
+</div>

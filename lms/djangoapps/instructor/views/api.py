@@ -125,6 +125,7 @@ from util.json_request import JsonResponse, JsonResponseBadRequest
 from util.views import require_global_staff
 from xmodule.modulestore.django import modulestore
 
+from rapid_response_xblock.utils import get_run_submission_data
 from .tools import (
     dump_module_extensions,
     dump_student_extensions,
@@ -1844,26 +1845,12 @@ def get_anon_ids(request, course_id):  # pylint: disable=unused-argument
     # has similar functionality but not quite what's needed.
     course_id = CourseKey.from_string(course_id)
 
-    def csv_response(filename, header, rows):
-        """Returns a CSV http response for the given header and rows (excel/utf-8)."""
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename={0}'.format(text_type(filename).encode('utf-8'))
-        writer = csv.writer(response, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
-        # In practice, there should not be non-ascii data in this query,
-        # but trying to do the right thing anyway.
-        encoded = [text_type(s).encode('utf-8') for s in header]
-        writer.writerow(encoded)
-        for row in rows:
-            encoded = [text_type(s).encode('utf-8') for s in row]
-            writer.writerow(encoded)
-        return response
-
     students = User.objects.filter(
         courseenrollment__course_id=course_id,
     ).order_by('id')
     header = ['User ID', 'Anonymized User ID', 'Course Specific Anonymized User ID']
     rows = [[s.id, unique_id_for_user(s, save=False), anonymous_id_for_user(s, course_id, save=False)] for s in students]
-    return csv_response(text_type(course_id).replace('/', '-') + '-anon-ids.csv', header, rows)
+    return _return_csv_response(text_type(course_id).replace('/', '-') + '-anon-ids.csv', header, rows)
 
 
 @require_POST
@@ -3432,3 +3419,28 @@ def _create_error_response(request, msg):
     in JSON form.
     """
     return JsonResponse({"error": _(msg)}, 400)
+
+
+def _return_csv_response(filename, header, rows):
+    """Returns a CSV http response for the given header and rows (excel/utf-8)."""
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename={0}'.format(text_type(filename).encode('utf-8'))
+    writer = csv.writer(response, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
+    # In practice, there should not be non-ascii data in this query,
+    # but trying to do the right thing anyway.
+    encoded = [text_type(s).encode('utf-8') for s in header]
+    writer.writerow(encoded)
+    for row in rows:
+        encoded = [text_type(s).encode('utf-8') for s in row]
+        writer.writerow(encoded)
+    return response
+
+
+@ensure_csrf_cookie
+@require_level('staff')
+def get_rapid_response_report(request, course_id, run_id):  # pylint: disable=unused-argument
+    """
+    Return csv file corresponding to given run_id
+    """
+    header = ['Date', 'Submitted Answer', 'Username', 'User Email', 'Correct']
+    return _return_csv_response('rapid_response_submissions.csv', header, get_run_submission_data(run_id))
