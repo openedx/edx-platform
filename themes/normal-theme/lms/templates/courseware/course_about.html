@@ -20,6 +20,7 @@ from six import string_types
   <meta property="og:description" content="${get_course_about_section(request, course, 'short_description')}" />
 </%block>
 
+
 <%block name="js_extra">
   <script type="text/javascript">
   (function() {
@@ -247,7 +248,6 @@ from six import string_types
   </%block>
 
   <div class="container">
-
     <%block name="course_about_details">
     <div class="details">
       % if staff_access and studio_url is not None:
@@ -258,10 +258,7 @@ from six import string_types
 
       <div class="inner-wrapper">
         <!-- add vip adver -->
-        <div class="my-theme-vip" style="display: none;">
-          一个学分的价格， 学习完整的MBA课程
-          <a class="my-theme-vip-enter" href="/vip/card">加入会员</a>
-        </div>
+        <div id="vip" style="display: none"></div>
         <div class="about-tabs">
           <span class="about-tab about-tab-active" onClick="showTab('about-info', 0)">课程简介</span>
           <span class="about-tab" onClick="showTab('about-staff', 1)">授课老师</span>
@@ -272,7 +269,7 @@ from six import string_types
       <!-- add course_about tab -->
       <script>
         if (!document.getElementById('is_vip').value || document.getElementById('is_vip').value === 'None' ||  document.getElementById('is_vip').value === 'False'){
-          document.getElementsByClassName('my-theme-vip')[0].style.display = 'block';
+          document.getElementById('vip').style.display = 'block';
         }
         function showTab(tab, index) {
           document.getElementsByClassName('about-info')[0].style.display = 'none';
@@ -286,6 +283,13 @@ from six import string_types
           document.getElementsByClassName(tab)[0].style.display = 'block';
         }
       </script>
+      <!-- Google Tag Manager -->
+      <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementById('vip'),
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl+'&gtm_debug=';f.appendChild(j,f);
+        })(window,document,'script','dataLayer','GTM-5K55R8X');</script>
+      <!-- End Google Tag Manager -->
     </div>
     </%block>
 

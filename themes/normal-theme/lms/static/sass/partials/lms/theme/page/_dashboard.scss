@@ -1,54 +1,15 @@
 // http://0.0.0.0:18000/dashboard
 // 登录后的首页 - 显示用户的课程列表
-/*
-.find-courses .courses-container .courses .courses-listing .courses-listing-item, .university-profile .courses-container .courses .courses-listing .courses-listing-item{
-  margin-top: 0;
-}
 
-
-//课程详情页
-
-.find-courses .courses-container, .university-profile .courses-container{
-  padding: 0;
-}
-
-.highlighted-courses .courses, .find-courses .courses{
-  padding: 30px 0 15px;
-}
-.wrapper-course-material .course-tabs .tab a, .wrapper-course-material .course-tabs .tab a:visited {
-  padding: 20px 15px 13px 15px;
-}
-// course card border
-.highlighted-courses .courses .course, .find-courses .courses .course{
-  border-radius: 3px;
-  border: none;
-}
-
-//登录后的课程
-
-
-
-
-// 详情页面
-.wrapper-preview-menu .preview-menu {
-  width: auto;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-//选择课程
-.verification-process.step-select-track .container{ 
-  max-width: 1200px;
-  padding:30px 0;
-}
-*/
-
-/* 新加样式 */
 .dashboard .main-container{
   padding: 30px 20px 20px 0;
 }
 .dashboard .main-container .my-courses .wrapper-header-courses .header-courses{
   color: $title;
   font-size: 14px;
+}
+.dashboard .main-container .my-courses .listing-courses .course-item{
+  padding-bottom: 0;
 }
 
 .dashboard .main-container .my-courses .listing-courses .course-item .course-container{
@@ -60,12 +21,15 @@
 
   /* 课程卡片 */
   .course > .details{
-    height: 160px;
+    height: auto;
     position: relative;
+    padding-left: 0;
+    min-height: 150px;
+    padding-left: 20px;
 
     .wrapper-course-image{
       width: 30%;
-      padding: 20px 15px;
+      padding: 20px 15px 20px 0;
       margin-right: 10px;
     }
     .wrapper-course-details .course-title a{
@@ -75,7 +39,7 @@
     }
     .wrapper-course-details .course-info .info-date-block-container{
       position: absolute;
-      bottom: 10px;
+      bottom: 17px;
     }
     /*
     .course-actions .wrapper-action-more{
@@ -84,8 +48,8 @@
     */
     .wrapper-course-details .wrapper-course-actions{
       position: absolute;
-      bottom: 8px;
-      right: 5px;
+      bottom: 15px;
+      right: 0;
     }
 
     /*
@@ -120,9 +84,9 @@
 /* 右侧sidebar框 */
 .dashboard .side-container{
   padding: 40px 0 20px 0;
-  display: none;
-  //影响手机端页面
-  // min-width: 360px;
+  flex: 0 0 30%;
+  max-width: none;
+  min-width: 0;
 
   .profile-sidebar ul{
     border: none;
@@ -161,6 +125,10 @@
     margin-top: 30px;
     cursor: pointer;
   }
+
+  .status-verification a span:hover{
+    background: rgba(255, 218, 191, 0.46);
+  }
   .status-is-vip{
     background: #f8fff6;
     border: none;
@@ -169,13 +137,16 @@
 }
 
 
-@media screen and (max-width: 996px){
+@media screen and (max-width: 992px){
   .dashboard .main-container{
-    padding: 20px 20px 10px 20px;
+    padding: 20px 0 0;
   }
   .dashboard .side-container{
     padding: 0;
-    margin: 0 20px;
+    margin: -10px 0 0;
+  }
+  .wrapper-messages-primary .message{
+    padding: 10px 20px;
   }
   
 }

@@ -6,14 +6,15 @@
   padding: 0 20px;
   font-size: 14px;
   letter-spacing: 0.3px;
-  height: 38px;
-  line-height: 38px;
+  height: 36px;
+  line-height: 36px;
   border-radius: 3px;
   font-weight: normal;
   cursor: pointer;
 
   border: none;
   background: $blue;
+  border: 1px solid $blue;
   color: #fff;
 }
 
@@ -30,8 +31,8 @@
   padding: 0 20px;
   font-size: 14px;
   letter-spacing: 0.3px;
-  height: 38px;
-  line-height: 38px;
+  height: 36px;
+  line-height: 36px;
   border-radius: 3px;
   cursor: pointer;
 
@@ -53,8 +54,8 @@
   padding: 0 20px;
   font-size: 14px;
   letter-spacing: 0.3px;
-  height: 38px;
-  line-height: 38px;
+  height: 36px;
+  line-height: 36px;
   border-radius: 3px;
 
   border: none;
@@ -62,5 +63,6 @@
   color: #aab2bd;
   border: 1px solid #e6e9ed;
   cursor: not-allowed;
+  text-decoration: none;
 }
 

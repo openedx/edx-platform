@@ -9,6 +9,7 @@
   .main-header{
     max-width: 1200px;
     margin: 0 auto;
+    box-sizing: border-box;
   }
   .header-logo a{ 
     margin-left: 0px;
@@ -18,10 +19,25 @@
   }
 }
 
+.window-wrap .global-header .nav-links .secondary{
+  a.sign-in-btn, .nav-item a.shopping-cart{
+    @extend %btn-my-primary;
+  }
+  a.sign-in-btn:hover, .nav-item a.shopping-cart:hover{
+    @extend %btn-my-primary-hover;
+  }
+  a.register-btn{
+    @extend %btn-my-white;
+  }
+  a.register-btn:hover{
+    @extend %btn-my-white-hover;
+  }
+}
 
 @include media-breakpoint-down(md) {  
   .window-wrap .global-header .header-logo a{ 
-    margin-left: 50%;
+    position: relative;
+    left: 50%;
   }
   .global-header .nav-links .secondary .dropdown-user-menu{
     border: 1px solid #eeeeee;
@@ -61,11 +77,14 @@
     }
     .nav-item{
       padding: 5px 0 0 0;
+      margin: 4px 0 0 5px;
     }
 
     .nav-item.nav-item-dropdown {
       position: relative;
     }
+
+    
   } 
 
   .global-header .nav-links .main .nav-tab{
