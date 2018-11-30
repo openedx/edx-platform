@@ -6,7 +6,7 @@
 #
 argh==0.26.2              # via watchdog
 argparse==1.4.0           # via stevedore
-certifi==2018.10.15       # via requests
+certifi==2018.11.29       # via requests
 chardet==3.0.4            # via requests
 edx-opaque-keys==0.4.4
 idna==2.7                 # via requests
