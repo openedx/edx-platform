@@ -414,8 +414,7 @@ module.exports = Merge.smart({
           ]
       },
       resolve: {
-          extensions: ['.js'],
-          symlinks: false
+          extensions: ['.js']
       }
   }}, {web: xmoduleJS});
 
