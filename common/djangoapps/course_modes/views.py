@@ -8,6 +8,7 @@ import urllib
 
 import waffle
 from babel.dates import format_datetime
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import HttpResponse, HttpResponseBadRequest
@@ -219,7 +220,8 @@ class ChooseModeView(View):
                 context["sku"] = verified_mode.sku
                 context["bulk_sku"] = verified_mode.bulk_sku
 
-        context['currency_data'] = []
+        context['currency_code'] = settings.PAID_COURSE_REGISTRATION_CURRENCY[0]
+        context['currency_symbol'] = settings.PAID_COURSE_REGISTRATION_CURRENCY[1]
         if waffle.switch_is_active('local_currency'):
             if 'edx-price-l10n' not in request.COOKIES:
                 currency_data = get_currency_data()
