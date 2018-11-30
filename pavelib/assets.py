@@ -939,19 +939,23 @@ def update_assets(args):
         help="How long to pause between filesystem scans"
     )
     args = parser.parse_args(args)
-    if args.settings == 'aws':
+
+    is_devstack = True
+    if args.settings in ('aws', 'static_collector'):
         args.settings = 'static_collector'
+        is_devstack = False
 
     for sys in args.system:
-        _update_assets(sys, args)
+        _update_assets(sys, args, is_devstack=is_devstack)
 
-    STATIC_ROOT_BASE = django_settings.STATIC_ROOT_BASE if django_settings and hasattr(django_settings, 'STATIC_ROOT_BASE') else Env.get_django_setting("STATIC_ROOT_BASE", "lms", settings=args.settings)
-    EDX_PLATFORM_STATIC_ROOT_BASE = django_settings.EDX_PLATFORM_STATIC_ROOT_BASE if django_settings and hasattr(django_settings, 'EDX_PLATFORM_STATIC_ROOT_BASE') else Env.get_django_setting("EDX_PLATFORM_STATIC_ROOT_BASE", "lms", settings=args.settings)
+    if not is_devstack:
+        STATIC_ROOT_BASE = django_settings.STATIC_ROOT_BASE if django_settings and hasattr(django_settings, 'STATIC_ROOT_BASE') else Env.get_django_setting("STATIC_ROOT_BASE", "lms", settings=args.settings)
+        EDX_PLATFORM_STATIC_ROOT_BASE = django_settings.EDX_PLATFORM_STATIC_ROOT_BASE if django_settings and hasattr(django_settings, 'EDX_PLATFORM_STATIC_ROOT_BASE') else Env.get_django_setting("EDX_PLATFORM_STATIC_ROOT_BASE", "lms", settings=args.settings)
 
-    os.system("rsync -av {static_collector_dir}/* {platform_static_dir}/ ".format(
-        static_collector_dir=STATIC_ROOT_BASE,
-        platform_static_dir=EDX_PLATFORM_STATIC_ROOT_BASE
-    ))
+        os.system("rsync -av {static_collector_dir}/* {platform_static_dir}/ ".format(
+            static_collector_dir=STATIC_ROOT_BASE,
+            platform_static_dir=EDX_PLATFORM_STATIC_ROOT_BASE
+        ))
 
     if args.watch:
         call_task(
@@ -965,25 +969,26 @@ def update_assets(args):
         )
 
 
-def _update_assets(sys, args):
+def _update_assets(sys, args, is_devstack=True):
     collect_log_args = {}
 
     if sys == 'studio':
         sys = 'cms'
 
-    os.environ.setdefault("SERVICE_VARIANT","{sys}".format(sys=sys))
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "{sys}.envs.static_collector".format(sys=sys))
+    if not is_devstack:
+        os.environ.setdefault("SERVICE_VARIANT","{sys}".format(sys=sys))
+        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "{sys}.envs.static_collector".format(sys=sys))
 
-    application = get_wsgi_application()  # pylint: disable=invalid-name
+        application = get_wsgi_application()  # pylint: disable=invalid-name
 
-    if hasattr(django_settings, 'STATIC_COLLECTOR_ROOT'):
-        STATIC_COLLECTOR_ROOT = django_settings.STATIC_COLLECTOR_ROOT
-    else:
-        STATIC_COLLECTOR_ROOT = get_static_collector_root()
+        if hasattr(django_settings, 'STATIC_COLLECTOR_ROOT'):
+            STATIC_COLLECTOR_ROOT = django_settings.STATIC_COLLECTOR_ROOT
+        else:
+            STATIC_COLLECTOR_ROOT = get_static_collector_root()
 
-    if not os.path.isdir(STATIC_COLLECTOR_ROOT):
-        os.mkdir(STATIC_COLLECTOR_ROOT)
-        print('\t\tDirectory "STATIC_COLLECTOR_ROOT" has been created to store static files.')
+        if not os.path.isdir(STATIC_COLLECTOR_ROOT):
+            os.mkdir(STATIC_COLLECTOR_ROOT)
+            print('\t\tDirectory "STATIC_COLLECTOR_ROOT" has been created to store static files.')
 
     process_xmodule_assets()
     process_npm_assets()
