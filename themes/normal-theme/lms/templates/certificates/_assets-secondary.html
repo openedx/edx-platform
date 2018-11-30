@@ -1,0 +1,16 @@
+<style media="print">
+        @page {
+            margin: 0mm;
+            
+        }       
+</style>
+
+<script type="text/javascript">
+    
+    document.getElementById("action-print-view").addEventListener("click", printView);
+
+    function printView(event) {
+       event.preventDefault();
+       window.print();
+    }
+</script>

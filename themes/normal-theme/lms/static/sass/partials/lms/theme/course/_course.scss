@@ -151,6 +151,9 @@ button.accordion-trigger{
 //手机课程学习页面
 
 @include media-breakpoint-down(sm){ 
+  .course-outline{  
+    padding-left: 0;
+  }
   #course-container{  
     margin-top: 0;
     width:90%;
@@ -182,13 +185,16 @@ button.accordion-trigger{
   }
   .wrapper-preview-menu{  
     padding-left:5%;
+    height: 50px;
     .preview-actions .action-preview .action-preview-label{ 
       float: left;
+      font-size: 0.875%;
     }
     .preview-actions .action-preview .action-preview-select{  
       float:left;
       width: 50%;
       background: #fff;
+      margin-right: 0;
     }
   }
   .content-wrapper .course-tabs{ 
@@ -196,7 +202,8 @@ button.accordion-trigger{
       padding-left:5%;
     }
     .nav-item .nav-link{  
-      padding-right: 20px;
+      padding-right: 10px;
+      font-size: 12px;
     }
   }
 }

@@ -37,6 +37,9 @@
 }
 
 @include media-breakpoint-down(md) {  
+  .global-header .hamburger-menu{ 
+    left: 5%;
+  }
   .window-wrap .global-header .header-logo a{ 
     position: relative;
     left: 50%;
@@ -134,4 +137,8 @@
 
 .global-header .nav-links .secondary{ 
   position: relative; 
+}
+
+.home>header .title .course-search .search-button{  
+  box-sizing: border-box;
 }

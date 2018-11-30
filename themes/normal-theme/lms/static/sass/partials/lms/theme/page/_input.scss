@@ -1,0 +1,11 @@
+textarea:focus, input[type="text"]:focus, input[type="url"]:focus, input[type="email"]:focus, input[type="password"]:focus, input[type="tel"]:focus{  
+  box-shadow: none;
+  outline-color:rgba(59, 153, 252,0.5);
+}
+
+@include media-breakpoint-down(sm){   
+  textarea:focus, input[type="text"]:focus, input[type="url"]:focus, input[type="email"]:focus, input[type="password"]:focus, input[type="tel"]:focus{  
+    box-shadow: none;
+    outline-color:rgba(59, 153, 252,0.5);
+  }
+}
