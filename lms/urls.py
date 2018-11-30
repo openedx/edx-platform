@@ -40,6 +40,9 @@ urlpatterns = (
     url(r'^dashboard$', 'student.views.dashboard', name="dashboard"),
     url(r'^change_enrollment$', 'student.views.change_enrollment', name='change_enrollment'),
 
+    # philu features
+    url(r'', include('openedx.features.student_certificates.urls')),
+
     # Event tracking endpoints
     url(r'', include('track.urls')),
 

@@ -2228,6 +2228,9 @@ INSTALLED_APPS = (
     # Philu Overrides
     'lms.djangoapps.philu_overrides',
 
+    # Philu Features
+    'openedx.features.student_certificates',
+
     #third party surveys
     'lms.djangoapps.third_party_surveys',
 
@@ -2242,6 +2245,10 @@ INSTALLED_APPS = (
 
     # Course cards app
     'openedx.features.course_card',
+
+    # User Leads app
+    'openedx.features.user_leads',
+
     'channels'
 )
 
