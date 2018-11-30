@@ -28,7 +28,7 @@
             edxSupportUrl,
             extendedProfileFields,
             displayAccountDeletion,
-            currency,
+            currency
         ) {
             var $accountSettingsElement, userAccountModel, userPreferencesModel, aboutSectionsData,
                 accountsSectionData, ordersSectionData, accountSettingsView, showAccountSettingsPage,
