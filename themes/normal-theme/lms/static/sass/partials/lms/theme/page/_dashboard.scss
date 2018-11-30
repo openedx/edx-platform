@@ -32,7 +32,7 @@
       padding: 20px 15px 20px 0;
       margin-right: 10px;
     }
-    .wrapper-course-details .course-title a{
+    .wrapper-course-details .course-title a,.wrapper-course-details .course-title span{
       font-size: 18px;
       color: $title;
       margin: 8px 0 0 0;
@@ -48,7 +48,7 @@
     */
     .wrapper-course-details .wrapper-course-actions{
       position: absolute;
-      bottom: 15px;
+      bottom: 10px;
       right: 0;
     }
 
@@ -72,6 +72,7 @@
 
     a.enter-course-blocked.course-target-link{
       @extend %btn-my-disable;
+      margin-bottom: 5px;
     }
   }
 

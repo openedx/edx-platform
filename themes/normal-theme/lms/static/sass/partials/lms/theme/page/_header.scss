@@ -22,12 +22,14 @@
 .window-wrap .global-header .nav-links .secondary{
   a.sign-in-btn, .nav-item a.shopping-cart{
     @extend %btn-my-primary;
+    margin-top: 2px;
   }
   a.sign-in-btn:hover, .nav-item a.shopping-cart:hover{
     @extend %btn-my-primary-hover;
   }
   a.register-btn{
     @extend %btn-my-white;
+    margin-top: 2px;
   }
   a.register-btn:hover{
     @extend %btn-my-white-hover;
@@ -70,7 +72,7 @@
 
 @media screen and (min-width: 992px){ 
   .window-wrap .global-header .nav-links .secondary{ 
-    margin: 3px 0 0;
+    margin: 0;
 
     .user-image-frame{
       border: none;
