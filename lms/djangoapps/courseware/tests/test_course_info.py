@@ -435,7 +435,9 @@ class SelfPacedCourseInfoTestCase(LoginEnrollmentTestCase, SharedModuleStoreTest
         self.assertEqual(resp.status_code, 200)
 
     def test_num_queries_instructor_paced(self):
-        self.fetch_course_info_with_queries(self.instructor_paced_course, 38, 3)
+        # TODO: decrease query count as part of REVO-28
+        self.fetch_course_info_with_queries(self.instructor_paced_course, 40, 3)
 
     def test_num_queries_self_paced(self):
-        self.fetch_course_info_with_queries(self.self_paced_course, 38, 3)
+        # TODO: decrease query count as part of REVO-28
+        self.fetch_course_info_with_queries(self.self_paced_course, 40, 3)

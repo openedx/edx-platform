@@ -50,7 +50,15 @@ def get_experiment_user_metadata_context(course, user):
     enrollment_mode = None
     enrollment_time = None
     enrollment = None
+    # TODO: clean up as part of REVO-28 (START)
+    has_non_audit_enrollments = None
+    # TODO: clean up as part of REVO-28 (END)
     try:
+        # TODO: clean up as part of REVO-28 (START)
+        user_enrollments = CourseEnrollment.objects.select_related('course').filter(user_id=user.id)
+        audit_enrollments = user_enrollments.filter(mode='audit')
+        has_non_audit_enrollments = (len(audit_enrollments) != len(user_enrollments))
+        # TODO: clean up as part of REVO-28 (END)
         enrollment = CourseEnrollment.objects.select_related(
             'course'
         ).get(user_id=user.id, course_id=course.id)
@@ -83,4 +91,7 @@ def get_experiment_user_metadata_context(course, user):
         'has_staff_access': has_staff_access,
         'forum_roles': forum_roles,
         'partition_groups': user_partitions,
+        # TODO: clean up as part of REVO-28 (START)
+        'has_non_audit_enrollments': has_non_audit_enrollments,
+        # TODO: clean up as part of REVO-28 (END)
     }
