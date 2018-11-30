@@ -140,10 +140,14 @@ edx-oauth2-provider==1.2.2
 edx-opaque-keys[django]==0.4.4
 edx-organizations==1.0.0
 <<<<<<< HEAD
+<<<<<<< HEAD
 edx-proctoring==1.4.0
 =======
 edx-proctoring==1.5.0b1
 >>>>>>> Enable course run level overrides for proctoring configuration.
+=======
+edx-proctoring==1.5.0b3
+>>>>>>> Updated edx-proctoring pre-release
 edx-rest-api-client==1.9.2
 edx-search==1.2.1
 edx-submissions==2.0.12
@@ -285,11 +289,15 @@ queuelib==1.5.0           # via scrapy
 radon==2.4.0
 redis==2.10.6
 <<<<<<< HEAD
+<<<<<<< HEAD
 reportlab==3.5.12
 requests-oauthlib==1.0.0
 requests==2.21.0
 =======
 reportlab==3.5.11
+=======
+reportlab==3.5.12
+>>>>>>> Updated edx-proctoring pre-release
 requests-oauthlib==1.0.0
 requests==2.20.1
 >>>>>>> Enable course run level overrides for proctoring configuration.
