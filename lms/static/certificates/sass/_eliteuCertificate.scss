@@ -13,12 +13,126 @@
   background: #fff url('../images/grey-logo.png') center center no-repeat;
 }
 
+.layout-accomplishment .accomplishment-rendering .accomplishment-type{ 
+  position: absolute;
+  left: 70px;
+  top: 68px;
+  width: 100%;
+  height: auto;
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-left: 0;
+}
+.accomplishment-rendering .accomplishment-type-symbol{  
+  width:19.63rem;
+  margin-left: 0;
+}
+p.prove,p.pro-name,p.accomplishment-success{   
+  text-align: left;
+  color: #434a54;
+  margin-bottom: 0;
+}
+p.prove{  
+  font-size: 20px;
+  margin-bottom: 25px;
+}
+p.pro-name{    
+  font-size: 36px;
+  margin-bottom: 22px;
+}
+p.accomplishment-success{ 
+  font-size: 20px;
+  margin-bottom: 40px;
+}
+.span-accomplishment-course-name{   
+    color: #205179;
+    font-size: 34px;
+    width:auto;
+    display: inline-block;
+    text-align: left;
+    float:left;
+}
+.span-accomplishment-course-id{ 
+    margin-top: 5px;
+    font-size: 18px;
+    color: #205179;
+    float:left;
+}
+.course-name-line{   
+    height: 3px;
+    width: auto;
+    background: #205179;
+}
+.eliteu-support{ 
+    color: #b0b0b0;
+    font-size: 18px;
+    text-align: left;
+    margin-top: 146px;
+}
+.accomplishment-box-right{   
+    position: absolute; 
+    right: 70px;
+    top: 68px;
+    height:100%;
+}
+.verified-end-box{   
+    width: 320px;
+    height: 242px;
+
+}
+.verified-end-box img{  
+    display: block;
+    float: right;
+    width: 193px;
+    height: auto;
+}
+.underwrite{ 
+    position: absolute;
+    bottom: 70px;
+    right: 0px;
+
+}
+.underwrite ul{ 
+    list-style: none;
+    margin-left:  0;
+
+}
+.pro-img{   
+    width: 144px;
+    height: 50px;
+    display: inline-block;
+    border-bottom: 2px solid #ededed;
+}
+
 @media print {  
-  .layout-accomplishment.certificate-verified .accomplishment-rendering{  
-    background: none;
-    height:40rem;
-  }
+.layout-accomplishment.certificate-verified .accomplishment-rendering{  
+  background: none;
+  height:40rem;
+}
+.certificate-content-box{  
+  height: 50%;
+}
+.wrapper-accomplishment-metadata{   
+  display: none;
+}
+      
+      
+.layout-accomplishment.certificate-verified .accomplishment-rendering{  
+  background: none;
+  height:40rem;
+        
+}
+         
   .certificate-content-box{  
-    height: 50%;
+    position: static;
+    margin: 0 auto;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .accomplishment-box-right{      
+    right: 0px;
+    top: 0px;  
   }
 }
+
