@@ -1,0 +1,28 @@
+# Scorm xblock
+-e git+https://github.com/raccoongang/edx_xblock_scorm.git@v1.0.1#egg=xblock-scorm==1.0.1
+
+# Video xblock
+-e git+https://github.com/raccoongang/pycaption.git@1.0.1#egg=pycaption==1.0.1
+-e git+https://github.com/raccoongang/xblock-video.git@v0.10.3#egg=xblock-video==0.10.3
+
+# Firepad xblock
+-e git+https://github.com/raccoongang/edx_xblock_firepad.git@v0.0.1#egg=xblock-firepad==0.0.1
+
+# Firechat xblock
+-e git+https://github.com/raccoongang/edx_xblock_firechat.git@v0.0.2#egg=xblock-firechat==0.0.2
+
+# Charts xblock
+-e git+https://github.com/TinMarkovic/ChartsXBlock.git@1.0.0#egg=xblock-charts==1.0.0
+
+# Flash xblock
+-e git+https://github.com/MarCnu/flashXBlock.git@master#egg=xblock-flash==master
+
+# Problem Builder xblock
+# Run migrations required
+-e git+https://github.com/open-craft/problem-builder.git@v3.1.5#egg=xblock-problem-builder==3.1.5
+
+# Hangouts xblock
+-e git+https://github.com/raccoongang/edx_xblock_hangouts.git@master#egg=xblock-hangouts==master
+
+# Flow Control xblock
+-e git+https://github.com/eduNEXT/flow-control-xblock.git@v0.2.0#egg=xblock-flow-control==0.2.0

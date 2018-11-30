@@ -12,6 +12,8 @@
 -r local.in               # Packages in edx-platform which have their own setup.py
 -r paver.txt              # Requirements for running paver commands
 
+-r raccoongang.in
+
 # Please follow these guidelines whenever you change this file:
 #
 # 1. When adding a new dependency, add a comment to the end of the line
