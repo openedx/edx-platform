@@ -113,14 +113,16 @@ define(
                     expect(view.$('.remove-button-title').text().trim()).toBe(message);
                 };
 
-                it('can upload profile image', function() {
+                var verifyProfileImageUpload = function(imageView) {
                     var requests = AjaxHelpers.requests(this);
                     var imageName = 'profile_image.jpg';
-                    var imageView = createImageView({ownProfile: true, hasImage: false});
                     var data;
                     imageView.render();
 
                     initializeUploader(imageView);
+
+                    // Upload button should be present for default image
+                    expect(imageView.$('.u-field-upload-button').css('display') === 'none').toBeFalsy();
 
                     // Remove button should not be present for default image
                     expect(imageView.$('.u-field-remove-button').css('display') === 'none').toBeTruthy();
@@ -129,7 +131,7 @@ define(
                     verifyImageUploadButtonMessage(imageView, false);
 
                     // Add image to upload queue. Validate the image size and send POST request to upload image
-                    imageView.$('.upload-button-input').fileupload('add', {files: [createFakeImageFile(60)]});
+                    imageView.$('.upload-button-input').fileupload('add', { files: [createFakeImageFile(60)] });
 
                     // Verify image upload progress message
                     verifyImageUploadButtonMessage(imageView, true);
@@ -142,10 +144,12 @@ define(
 
                     // Upon successful image upload, account settings model will be fetched to
                     // get the url for newly uploaded image, So we need to send the response for that GET
-                    data = {profile_image: {
-                        image_url_large: '/media/profile-images/' + imageName,
-                        has_image: true
-                    }};
+                    data = {
+                        profile_image: {
+                            image_url_large: '/media/profile-images/' + imageName,
+                            has_image: true
+                        }
+                    };
                     AjaxHelpers.respondWithJson(requests, data);
 
                     // Verify uploaded image name
@@ -156,6 +160,21 @@ define(
 
                     // After image upload, image title should be `Change image`
                     verifyImageUploadButtonMessage(imageView, false);
+                }
+
+                it('can upload profile image', function() {
+                    var imageView = createImageView({ownProfile: true, hasImage: false});
+                    verifyProfileImageUpload(imageView);
+                });
+
+                it('can upload and remove image if parental consent not required and not yearOfBirth', function () {
+                    var imageView = createImageView({
+                        ownProfile: true,
+                        hasImage: false,
+                        yearOfBirth: '',
+                        requiresParentalConsent: false
+                    });
+                    verifyProfileImageUpload(imageView);
                 });
 
                 it('can remove profile image', function() {
@@ -253,28 +272,6 @@ define(
 
                     expect(imageView.clickedUploadButton).not.toHaveBeenCalled();
                     expect(imageView.clickedRemoveButton).not.toHaveBeenCalled();
-                });
-
-                it('can upload and remove image if parental consent not required and not yearOfBirth', function() {
-                    var imageView = createImageView({
-                        ownProfile: true,
-                        hasImage: false,
-                        yearOfBirth: '',
-                        requiresParentalConsent: false
-                    });
-                    imageView.render();
-
-                    spyOn(imageView, 'clickedUploadButton');
-                    spyOn(imageView, 'clickedRemoveButton');
-
-                    expect(imageView.$('.u-field-upload-button').css('display') === 'none').toBeFalsy();
-                    expect(imageView.$('.u-field-remove-button').css('display') === 'none').toBeFalsy();
-
-                    imageView.$('.u-field-upload-button').click();
-                    imageView.$('.u-field-remove-button').click();
-
-                    expect(imageView.clickedUploadButton).toHaveBeenCalled();
-                    expect(imageView.clickedRemoveButton).toHaveBeenCalled();
                 });
 
                 it("can't upload and remove image on others profile", function() {
