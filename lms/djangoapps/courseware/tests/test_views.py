@@ -5,7 +5,7 @@ Tests courseware views.py
 import itertools
 import json
 import unittest
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
 from HTMLParser import HTMLParser
 from urllib import quote, urlencode
 from uuid import uuid4
@@ -218,7 +218,7 @@ class IndexQueryTestCase(ModuleStoreTestCase):
     )
     @ddt.unpack
     def test_index_query_counts(self, store_type, expected_mongo_query_count, expected_mysql_query_count):
-        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=date(2018, 1, 1))
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         with self.store.default_store(store_type):
             course = CourseFactory.create()
             with self.store.bulk_operations(course.id):
@@ -1445,7 +1445,7 @@ class ProgressPageTests(ProgressPageBaseTests):
     @ddt.unpack
     def test_progress_queries_paced_courses(self, self_paced, query_count):
         """Test that query counts remain the same for self-paced and instructor-paced courses."""
-        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=date(2018, 1, 1))
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         self.setup_course(self_paced=self_paced)
         with self.assertNumQueries(query_count, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST), check_mongo_calls(1):
             self._get_progress_page()
@@ -1457,7 +1457,7 @@ class ProgressPageTests(ProgressPageBaseTests):
     )
     @ddt.unpack
     def test_progress_queries(self, enable_waffle, initial, subsequent):
-        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=date(2018, 1, 1))
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         self.setup_course()
         with grades_waffle().override(ASSUME_ZERO_GRADE_IF_ABSENT, active=enable_waffle):
             with self.assertNumQueries(
@@ -1668,7 +1668,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         Verify that expired banner message appears on progress page, if learner is enrolled
         in audit mode.
         """
-        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=date(2018, 1, 1))
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         user = UserFactory.create()
         self.assertTrue(self.client.login(username=user.username, password='test'))
         add_course_mode(self.course, upgrade_deadline_expired=False)
@@ -2715,7 +2715,7 @@ class TestIndexViewWithCourseDurationLimits(ModuleStoreTestCase):
         Test that the courseware contains the course expiration banner
         when course_duration_limits are enabled.
         """
-        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=date(2018, 1, 1))
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         self.assertTrue(self.client.login(username=self.user.username, password='test'))
         add_course_mode(self.course, upgrade_deadline_expired=False)
         response = self.client.get(

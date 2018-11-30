@@ -2,7 +2,7 @@
 Test audit user's access to various content based on content-gating features.
 """
 
-from datetime import date
+from datetime import datetime
 import ddt
 from django.conf import settings
 from django.test.client import RequestFactory
@@ -225,7 +225,7 @@ class TestProblemTypeAccess(SharedModuleStoreTestCase):
             course_id=self.courses['audit_only']['course'].id,
             mode='audit'
         )
-        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=date(2018, 1, 1))
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
 
     @classmethod
     def _create_course(cls, run, display_name, modes, component_types):
@@ -478,7 +478,7 @@ class TestConditionalContentAccess(TestConditionalContent):
     def setUpClass(cls):
         super(TestConditionalContentAccess, cls).setUpClass()
         cls.factory = RequestFactory()
-        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=date(2018, 1, 1))
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
 
     def setUp(self):
         super(TestConditionalContentAccess, self).setUp()

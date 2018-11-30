@@ -5,7 +5,7 @@ import itertools
 import json
 import re
 import unittest
-from datetime import timedelta, date
+from datetime import timedelta, datetime
 
 import ddt
 from completion.test_utils import submit_completions_for_testing, CompletionWaffleTestMixin
@@ -730,7 +730,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         Links will be removed from the course title, course image and button (View Course/Resume Course).
         The course card should have an access expired message.
         """
-        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=date(2018, 1, 1))
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         self.override_waffle_switch(True)
 
         course = CourseFactory.create(start=self.THREE_YEARS_AGO)

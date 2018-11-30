@@ -5,11 +5,11 @@ Course Duration Limit Configuration Models
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from datetime import datetime
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
+from django.utils import timezone
 
 from experiments.models import ExperimentData
 from openedx.core.djangoapps.config_model_utils.models import StackedConfigurationModel
@@ -30,14 +30,14 @@ class CourseDurationLimitConfig(StackedConfigurationModel):
 
     STACKABLE_FIELDS = ('enabled', 'enabled_as_of')
 
-    enabled_as_of = models.DateField(
+    enabled_as_of = models.DateTimeField(
         default=None,
         null=True,
         verbose_name=_('Enabled As Of'),
         blank=True,
         help_text=_(
             'If the configuration is Enabled, then all enrollments '
-            'created after this date (UTC) will be affected.'
+            'created after this date and time (UTC) will be affected.'
         )
     )
 
@@ -90,7 +90,7 @@ class CourseDurationLimitConfig(StackedConfigurationModel):
         # enrollment might be None if the user isn't enrolled. In that case,
         # return enablement as if the user enrolled today
         if enrollment is None:
-            return cls.enabled_for_course(course_key=course_key, target_date=datetime.utcnow().date())
+            return cls.enabled_for_course(course_key=course_key, target_datetime=timezone.now())
         else:
             # TODO: clean up as part of REV-100
             experiment_data_holdback_key = EXPERIMENT_DATA_HOLDBACK_KEY.format(user)
@@ -107,48 +107,48 @@ class CourseDurationLimitConfig(StackedConfigurationModel):
             if is_in_holdback:
                 return False
             current_config = cls.current(course_key=enrollment.course_id)
-            return current_config.enabled_as_of_date(target_date=enrollment.created.date())
+            return current_config.enabled_as_of_datetime(target_datetime=enrollment.created)
 
     @classmethod
-    def enabled_for_course(cls, course_key, target_date=None):
+    def enabled_for_course(cls, course_key, target_datetime=None):
         """
         Return whether Course Duration Limits are enabled for this course as of a particular date.
 
         Course Duration Limits are enabled for a course on a date if they are enabled either specifically,
         or via a containing context, such as the org, site, or globally, and if the configuration
-        is specified to be ``enabled_as_of`` before ``target_date``.
+        is specified to be ``enabled_as_of`` before ``target_datetime``.
 
         Only one of enrollment and (user, course_key) may be specified at a time.
 
         Arguments:
             course_key: The CourseKey of the course being queried.
-            target_date: The date to checked enablement as of. Defaults to the current date.
+            target_datetime: The datetime to checked enablement as of. Defaults to the current date and time.
         """
         if CONTENT_TYPE_GATING_FLAG.is_enabled():
             return True
 
-        if target_date is None:
-            target_date = datetime.utcnow().date()
+        if target_datetime is None:
+            target_datetime = timezone.now()
 
         current_config = cls.current(course_key=course_key)
-        return current_config.enabled_as_of_date(target_date=target_date)
+        return current_config.enabled_as_of_datetime(target_datetime=target_datetime)
 
     def clean(self):
         if self.enabled and self.enabled_as_of is None:
             raise ValidationError({'enabled_as_of': _('enabled_as_of must be set when enabled is True')})
 
-    def enabled_as_of_date(self, target_date):
+    def enabled_as_of_datetime(self, target_datetime):
         """
-        Return whether this Course Duration Limit configuration context is enabled as of a date.
+        Return whether this Course Duration Limit configuration context is enabled as of a date and time.
 
         Arguments:
-            target_date (:class:`datetime.date`): The date that ``enabled_as_of`` must be equal to or before
+            target_datetime (:class:`datetime.datetime`): The datetime that ``enabled_as_of`` must be equal to or before
         """
         if CONTENT_TYPE_GATING_FLAG.is_enabled():
             return True
 
         # Explicitly cast this to bool, so that when self.enabled is None the method doesn't return None
-        return bool(self.enabled and self.enabled_as_of <= target_date)
+        return bool(self.enabled and self.enabled_as_of <= target_datetime)
 
     def __str__(self):
         return "CourseDurationLimits(enabled={!r}, enabled_as_of={!r})".format(

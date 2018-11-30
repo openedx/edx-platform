@@ -1,7 +1,7 @@
 """
 Tests for the course updates page.
 """
-from datetime import date
+from datetime import datetime
 
 from courseware.courses import get_course_info_usage_key
 from django.urls import reverse
@@ -122,7 +122,7 @@ class TestCourseUpdatesPage(SharedModuleStoreTestCase):
         self.assertContains(response, 'Second Message')
 
     def test_queries(self):
-        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=date(2018, 1, 1))
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         create_course_update(self.course, self.user, 'First Message')
 
         # Pre-fetch the view to populate any caches
