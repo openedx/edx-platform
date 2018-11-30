@@ -886,6 +886,8 @@ def course_about(request, course_id):
             'course_image_urls': overview.image_urls,
             'reviews_fragment_view': reviews_fragment_view,
             'sidebar_html_enabled': sidebar_html_enabled,
+            'currency_code': settings.PAID_COURSE_REGISTRATION_CURRENCY[0],
+            'currency_symbol': settings.PAID_COURSE_REGISTRATION_CURRENCY[1]
         }
 
         is_subscribe_course = False
