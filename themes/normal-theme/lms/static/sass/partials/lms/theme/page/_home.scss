@@ -9,6 +9,7 @@
 
   .outer-wrapper{  
     max-width: 1200px;
+    padding: 60px 20px;
   }
   .title{
     background-color: rgba(255,255,255,0.7);
@@ -32,6 +33,31 @@
     font-style: static;
     font-size: 18px;
     color: $title;
+  }
+
+  // search
+  .title .course-search{
+    width: 90%;
+    margin: 0 auto;
+    max-width: 780px;
+    position: relative;
+  }
+  .title .course-search .search-input{
+    border: 1px solid $blue;
+    height: 48px;
+    font-size: 14px;
+    padding: 10px 150px 10px 20px;
+  }
+  .title .course-search .search-button{
+    right: 0;
+    height: 48px;
+    border: none;
+    width: 100px;
+    background: $blue;
+  }
+  .title .course-search .search-button:hover{
+    background: $blue;
+    opacity: 0.9;
   }
 }
 
@@ -108,8 +134,23 @@
 
 
 
-@media screen and (max-width:760px){
+@media screen and (max-width:576px){
+  .highlighted-courses .courses{
+    padding: 20px 0 15px;
+  }
+  .home>header, .home>header .title{
+    height: auto;
+  }
+  .home>header .outer-wrapper{
+    padding: 20px;
+  }
   .home>header .title>.heading-group h1{
     font-size: 18px;
+  }
+  .home>header .title>.heading-group p{
+    font-size: 14px;
+  }
+  .courses-container .courses .courses-listing .courses-listing-item{
+    margin: 0 0 20px 0;
   }
 }

@@ -17,20 +17,22 @@
   border-radius: 3px;
   box-shadow:0 0 1px 1px #b6dcfe;
   margin-bottom:20px;
-}
-.page-header{ 
-  line-height: 54px;
-  padding: 0 20px;
-  .page-header-main{  
-    .page-title{  
-      font-size: 18px;
-      margin-top: 0;
-      margin-bottom: 0;
-      line-height: 54px;
-      color:$title;
+  border:none;
+  .page-header{ 
+    line-height: 54px;
+    padding: 0 20px;
+    .page-header-main{  
+      .page-title{  
+        font-size: 18px;
+        margin-top: 0;
+        margin-bottom: 0;
+        line-height: 54px;
+        color:$title;
+      }
     }
   }
 }
+
 
 .page-content{  
   padding: 20px;
