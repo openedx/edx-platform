@@ -1,0 +1,24 @@
+.layout-accomplishment.certificate-verified .accomplishment-rendering{  
+  background-size: 1170px 100%;
+  position: relative; 
+  height:51.625rem;
+  border-top:none; 
+}
+.certificate-content-box{  
+  position: absolute;
+  left: 67px;
+  top: 67px;
+  width: 88.55%;
+  height: 83.55%;
+  background: #fff url('../images/grey-logo.png') center center no-repeat;
+}
+
+@media print {  
+  .layout-accomplishment.certificate-verified .accomplishment-rendering{  
+    background: none;
+    height:40rem;
+  }
+  .certificate-content-box{  
+    height: 50%;
+  }
+}
