@@ -56,7 +56,7 @@
         % endif
 
         <div class="courses${'' if course_discovery_enabled else ' no-course-discovery'}" role="region" aria-label="${_('List of Courses')}">
-          <ul class="courses-listing journal-list">
+          <!-- <ul class="courses-listing journal-list">
             % for bundle in journal_info.get('journal_bundles'):
             <li class="courses-listing-item">
               <%include file="../journals/bundle_card.html" args="bundle=bundle" />
@@ -69,7 +69,7 @@
               <%include file="../journals/journal_card.html" args="journal=journal" />
             </li>
             %endfor
-          </ul>
+          </ul> -->
           <ul class="courses-listing courses-list">
             %for course in courses:
             <li class="courses-listing-item">
