@@ -238,22 +238,6 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
             raise serializers.ValidationError("The social_links field must consist of unique social platforms.")
         return value
 
-    def validate_secondary_email(self, value):
-        """
-        Enforce valid email addresses.
-        """
-        # import is placed here to avoid cyclic import
-        from openedx.core.djangoapps.user_api.accounts.api import get_email_validation_error, \
-            _validate_email_doesnt_exist
-
-        if get_email_validation_error(value):
-            raise serializers.ValidationError("Valid e-mail address required.")
-
-        if _validate_email_doesnt_exist(value):
-            raise serializers.ValidationError("Email address you entered already exists.")
-
-        return value
-
     def transform_gender(self, user_profile, value):  # pylint: disable=unused-argument
         """
         Converts empty string to None, to indicate not set. Replaced by to_representation in version 3.

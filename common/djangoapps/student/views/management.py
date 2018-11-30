@@ -912,6 +912,28 @@ def validate_new_email(user, new_email):
         raise ValueError(_('Old email is the same as the new email.'))
 
 
+def validate_secondary_email(user_profile, new_email):
+    """
+    Enforce valid email addresses.
+    """
+    from openedx.core.djangoapps.user_api.accounts.api import get_email_validation_error, \
+        get_email_existence_validation_error, get_secondary_email_validation_error
+
+    if get_email_validation_error(new_email):
+        raise ValueError(_('Valid e-mail address required.'))
+
+    if user_profile.secondary_email and new_email == user_profile.secondary_email:
+        raise ValueError(_('Old email is the same as the new email.'))
+
+    message = get_email_existence_validation_error(new_email)
+    if message:
+        raise ValueError(message)
+
+    message = get_secondary_email_validation_error(new_email)
+    if message:
+        raise ValueError(message)
+
+
 def do_email_change_request(user, new_email, activation_key=None):
     """
     Given a new email for a user, does some basic verification of the new address and sends an activation message
