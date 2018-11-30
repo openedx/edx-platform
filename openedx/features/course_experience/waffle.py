@@ -8,6 +8,7 @@ WAFFLE_NAMESPACE = u'course_experience'
 
 # Switches
 ENABLE_COURSE_ABOUT_SIDEBAR_HTML = u'enable_about_sidebar_html'
+ENABLE_COURSE_ABOUT_MARKETING = u'enable_about_marketing'
 
 
 def waffle():

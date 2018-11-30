@@ -92,7 +92,7 @@ from openedx.features.course_experience import UNIFIED_COURSE_TAB_FLAG, course_h
 from openedx.features.course_experience.course_tools import CourseToolsPluginManager
 from openedx.features.course_experience.views.course_dates import CourseDatesFragmentView
 from openedx.features.course_experience.waffle import waffle as course_experience_waffle
-from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
+from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML, ENABLE_COURSE_ABOUT_MARKETING
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 from openedx.features.journals.api import get_journals_context
 from shoppingcart.utils import is_shopping_cart_enabled
@@ -771,7 +771,8 @@ def course_about(request, course_id):
         course_details = CourseDetails.populate(course)
         modes = CourseMode.modes_for_course_dict(course_key)
 
-        if configuration_helpers.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
+        if configuration_helpers.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)) and \
+                not course_experience_waffle().is_enabled(ENABLE_COURSE_ABOUT_MARKETING):
             return redirect(reverse(course_home_url_name(course.id), args=[text_type(course.id)]))
 
         registered = registered_for_course(course, request.user)
