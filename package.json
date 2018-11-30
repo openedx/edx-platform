@@ -4,8 +4,8 @@
   "dependencies": {
     "@edx/cookie-policy-banner": "1.1.10",
     "@edx/edx-bootstrap": "1.0.3",
-    "@edx/edx-proctoring": "file:../../../src/edx-proctoring",
-    "@edx/mockprock": "file:../../../src/mockprock",
+    "@edx/edx-proctoring": "git+https://git@github.com/edx/edx-proctoring.git#dahlia/proctoring-master",
+    "@edx/mockprock": "git+https://git@github.com/edx/mockprock.git#matthugs/proctoring-js-arch-proof-of-concept",
     "@edx/paragon": "2.6.4",
     "@edx/studio-frontend": "1.16.12",
     "babel-core": "6.26.0",
