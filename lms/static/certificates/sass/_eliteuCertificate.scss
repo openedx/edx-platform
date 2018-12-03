@@ -2,7 +2,7 @@
   background-size: 1170px 100%;
   position: relative; 
   height:51.625rem;
-  border-top:none; 
+  border:none; 
 }
 .certificate-content-box{  
   position: absolute;
@@ -10,7 +10,8 @@
   top: 67px;
   width: 88.55%;
   height: 83.55%;
-  background: #fff url('../images/grey-logo.png') center center no-repeat;
+  background: #fff url('../images/grey-logo.png') center 105px no-repeat;
+  background-size: 50%;
 }
 
 .layout-accomplishment .accomplishment-rendering .accomplishment-type{ 
@@ -65,9 +66,10 @@ p.accomplishment-success{
 }
 .eliteu-support{ 
     color: #b0b0b0;
-    font-size: 18px;
+    font-size: 16px;
     text-align: left;
     margin-top: 146px;
+    margin-bottom: 40px;
 }
 .accomplishment-box-right{   
     position: absolute; 
@@ -88,7 +90,7 @@ p.accomplishment-success{
 }
 .underwrite{ 
     position: absolute;
-    bottom: 70px;
+    bottom: 131px;
     right: 0px;
 
 }
@@ -105,26 +107,25 @@ p.accomplishment-success{
 }
 
 @media print {  
-.layout-accomplishment.certificate-verified .accomplishment-rendering{  
-  background: none;
-  height:40rem;
-}
-.certificate-content-box{  
-  height: 50%;
-}
-.wrapper-accomplishment-metadata{   
-  display: none;
-}
+  .layout-accomplishment.certificate-verified .accomplishment-rendering{  
+    background: none;
+    height:40rem;
+  }
+  .certificate-content-box{  
+    height: 50%;
+  }
+  .wrapper-accomplishment-metadata{   
+    display: none;
+  }
       
       
-.layout-accomplishment.certificate-verified .accomplishment-rendering{  
-  background: none;
-  height:40rem;
-        
-}
+  .layout-accomplishment.certificate-verified .accomplishment-rendering{  
+    background: none;
+    height:40rem;
+          
+  }
          
   .certificate-content-box{  
-    position: static;
     margin: 0 auto;
     display: block;
     width: 100%;
@@ -133,6 +134,44 @@ p.accomplishment-success{
   .accomplishment-box-right{      
     right: 0px;
     top: 0px;  
+  }
+
+  .layout-accomplishment .accomplishment-rendering .accomplishment-type{  
+    left: 140px;  
+    /* top值根据实际打印情况进行调整，也要相应的调整背景图片的位置 */
+    top: 90px;
+  }  
+  .accomplishment-box-right{  
+    right: 140px;  
+    /* top值根据实际打印情况进行调整，也要相应的调整背景图片的位置 */  
+    top: 90px;
+  }  
+  .certificate-content-box{   
+    /*调整背景图片的位置 */
+    background-position: center 116px;
+    background-size: 45%;
+  }
+  .layout-accomplishment.certificate-verified .accomplishment-rendering{   
+    height:700px;
+  }
+  .accomplishment-box-right{   
+    height: 630px;
+  }
+  #test{  
+    position: relative; 
+
+  }
+  #test .certificates-mes{    
+    position: absolute; 
+    left: 90px;
+  }
+  #test .certificates-mes p{    
+    text-align: left;
+    font-size: 12px;
+    margin-bottom: 3px;
+  }
+  #test .certificates-mes p:nth-of-type(3),#test .certificates-mes p:nth-of-type(4){  
+    color:#b0b0b0;
   }
 }
 
