@@ -146,8 +146,21 @@ class CourseEnrollmentPagination(CursorPagination):
     """
     Paginates over CourseEnrollment objects.
     """
-    page_size = 50
     ordering = 'id'
+    page_size = 50
+    page_size_query_param = 'page_size'
+
+    def get_page_size(self, request):
+        """
+        Get the page size based on the defined page size parameter if defined.
+        """
+        try:
+            page_size_string = request.query_params[self.page_size_query_param]
+            return int(page_size_string)
+        except (KeyError, ValueError):
+            pass
+
+        return self.page_size
 
 
 class PaginatedAPIView(APIView):
