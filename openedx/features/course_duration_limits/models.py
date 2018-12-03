@@ -5,14 +5,21 @@ Course Duration Limit Configuration Models
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
+
+from course_modes.models import CourseMode
+from lms.djangoapps.courseware.masquerade import get_masquerade_role, get_course_masquerade, \
+    is_masquerading_as_specific_student
 
 from experiments.models import ExperimentData
 from openedx.core.djangoapps.config_model_utils.models import StackedConfigurationModel
+from openedx.features.content_type_gating.partitions import CONTENT_GATING_PARTITION_ID, CONTENT_TYPE_GATE_GROUP_IDS
 from openedx.features.course_duration_limits.config import (
     CONTENT_TYPE_GATING_FLAG,
     EXPERIMENT_ID,
@@ -79,13 +86,25 @@ class CourseDurationLimitConfig(StackedConfigurationModel):
         # if the user is has a role of staff, instructor or beta tester their access should not expire
         if user is None and enrollment is not None:
             user = enrollment.user
-        if user:
-            staff_role = CourseStaffRole(course_key).has_user(user)
-            instructor_role = CourseInstructorRole(course_key).has_user(user)
-            beta_tester_role = CourseBetaTesterRole(course_key).has_user(user)
 
-            if staff_role or instructor_role or beta_tester_role:
-                return False
+        if user:
+            course_masquerade = get_course_masquerade(user, course_key)
+            if course_masquerade:
+                verified_mode_id = settings.COURSE_ENROLLMENT_MODES.get(CourseMode.VERIFIED, {}).get('id')
+                is_verified = (course_masquerade.user_partition_id == ENROLLMENT_TRACK_PARTITION_ID
+                               and course_masquerade.group_id == verified_mode_id)
+                is_full_access = (course_masquerade.user_partition_id == CONTENT_GATING_PARTITION_ID
+                                  and course_masquerade.group_id == CONTENT_TYPE_GATE_GROUP_IDS['full_access'])
+                is_staff = get_masquerade_role(user, course_key) == 'staff'
+                if is_verified or is_full_access or is_staff:
+                    return False
+            else:
+                staff_role = CourseStaffRole(course_key).has_user(user)
+                instructor_role = CourseInstructorRole(course_key).has_user(user)
+                beta_tester_role = CourseBetaTesterRole(course_key).has_user(user)
+
+                if staff_role or instructor_role or beta_tester_role:
+                    return False
 
         # enrollment might be None if the user isn't enrolled. In that case,
         # return enablement as if the user enrolled today
@@ -95,15 +114,18 @@ class CourseDurationLimitConfig(StackedConfigurationModel):
             # TODO: clean up as part of REV-100
             experiment_data_holdback_key = EXPERIMENT_DATA_HOLDBACK_KEY.format(user)
             is_in_holdback = False
-            try:
-                holdback_value = ExperimentData.objects.get(
-                    user=user,
-                    experiment_id=EXPERIMENT_ID,
-                    key=experiment_data_holdback_key,
-                ).value
-                is_in_holdback = holdback_value == 'True'
-            except ExperimentData.DoesNotExist:
-                pass
+            no_masquerade = get_course_masquerade(user, course_key) is None
+            student_masquerade = is_masquerading_as_specific_student(user, course_key)
+            if user and (no_masquerade or student_masquerade):
+                try:
+                    holdback_value = ExperimentData.objects.get(
+                        user=user,
+                        experiment_id=EXPERIMENT_ID,
+                        key=experiment_data_holdback_key,
+                    ).value
+                    is_in_holdback = holdback_value == 'True'
+                except ExperimentData.DoesNotExist:
+                    pass
             if is_in_holdback:
                 return False
             current_config = cls.current(course_key=enrollment.course_id)

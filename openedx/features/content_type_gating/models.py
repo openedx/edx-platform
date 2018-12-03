@@ -10,6 +10,7 @@ from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+from lms.djangoapps.courseware.masquerade import get_course_masquerade, is_masquerading_as_specific_student
 
 from experiments.models import ExperimentData
 from student.models import CourseEnrollment
@@ -92,15 +93,18 @@ class ContentTypeGatingConfig(StackedConfigurationModel):
             # TODO: clean up as part of REV-100
             experiment_data_holdback_key = EXPERIMENT_DATA_HOLDBACK_KEY.format(user)
             is_in_holdback = False
-            try:
-                holdback_value = ExperimentData.objects.get(
-                    user=user,
-                    experiment_id=EXPERIMENT_ID,
-                    key=experiment_data_holdback_key,
-                ).value
-                is_in_holdback = holdback_value == 'True'
-            except ExperimentData.DoesNotExist:
-                pass
+            no_masquerade = get_course_masquerade(user, course_key) is None
+            student_masquerade = is_masquerading_as_specific_student(user, course_key)
+            if user and (no_masquerade or student_masquerade):
+                try:
+                    holdback_value = ExperimentData.objects.get(
+                        user=user,
+                        experiment_id=EXPERIMENT_ID,
+                        key=experiment_data_holdback_key,
+                    ).value
+                    is_in_holdback = holdback_value == 'True'
+                except ExperimentData.DoesNotExist:
+                    pass
             if is_in_holdback:
                 return False
             current_config = cls.current(course_key=enrollment.course_id)
