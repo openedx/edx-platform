@@ -618,7 +618,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         config = CourseDurationLimitConfig(
             course=CourseOverview.get_from_id(self.course.id),
             enabled=True,
-            enabled_as_of=date(2018, 1, 1)
+            enabled_as_of=datetime(2018, 1, 1)
         )
         config.save()
         url = course_home_url(self.course)
