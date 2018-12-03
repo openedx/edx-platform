@@ -20,7 +20,7 @@ from lms.djangoapps.courseware.masquerade import get_course_masquerade, is_masqu
 from openedx.core.djangoapps.catalog.utils import get_course_run_details
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
-from openedx.core.djangolib.markup import HTML
+from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 
 MIN_DURATION = timedelta(weeks=4)
@@ -132,11 +132,18 @@ def register_course_expired_message(request, course):
         )
     else:
         upgrade_message = _('Your access to this course expires on {expiration_date}. \
-                <a href="{upgrade_link}">Upgrade now</a> for unlimited access.')
+                    {a_open}Upgrade now {sronly_span_open}to retain access past {expiration_date}.\
+                    {span_close}{a_close}{sighted_only_span_open}for unlimited access.{span_close}')
         PageLevelMessages.register_info_message(
             request,
-            HTML(upgrade_message).format(
+            Text(upgrade_message).format(
+                a_open=HTML('<a href="{upgrade_link}">').format(
+                    upgrade_link=verified_upgrade_deadline_link(user=request.user, course=course)
+                ),
+                sronly_span_open=HTML('<span class="sr-only">'),
+                sighted_only_span_open=HTML('<span aria-hidden="true">'),
+                span_close=HTML('</span>'),
+                a_close=HTML('</a>'),
                 expiration_date=expiration_date.strftime('%b %-d'),
-                upgrade_link=verified_upgrade_deadline_link(user=request.user, course=course)
             )
         )

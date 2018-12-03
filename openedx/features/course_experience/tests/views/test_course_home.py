@@ -266,7 +266,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         self.assertContains(response, TEST_WELCOME_MESSAGE, count=expected_count)
 
         # Verify that the expected message is shown to the user
-        self.assertContains(response, '<div class="user-messages">', count=1 if expected_message else 0)
+        self.assertContains(response, '<div class="user-messages"', count=1 if expected_message else 0)
         if expected_message:
             self.assertContains(response, expected_message)
 
@@ -306,7 +306,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         self.assertContains(response, 'Learn About Verified Certificate', count=(1 if is_enrolled else 0))
 
         # Verify that the expected message is shown to the user
-        self.assertContains(response, '<div class="user-messages">', count=1 if expected_message else 0)
+        self.assertContains(response, '<div class="user-messages"', count=1 if expected_message else 0)
         if expected_message:
             self.assertContains(response, expected_message)
 
