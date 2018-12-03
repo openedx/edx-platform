@@ -245,15 +245,15 @@
 
 			// Secondary email address
             if (isSecondaryEmailFeatureEnabled) {
-				secondaryEmailFieldView = {
-					view: new AccountSettingsFieldViews.EmailFieldView(secondaryEmailFieldData)
-				};
-            	emailFieldViewIndex = aboutSectionsData[0].fields.indexOf(emailFieldView);
+                secondaryEmailFieldView = {
+                    view: new AccountSettingsFieldViews.EmailFieldView(secondaryEmailFieldData)
+                };
+                emailFieldViewIndex = aboutSectionsData[0].fields.indexOf(emailFieldView);
 
-            	// Insert secondary email address after email address field.
-            	aboutSectionsData[0].fields.splice(
-            		emailFieldViewIndex + 1, 0, secondaryEmailFieldView
-            	)
+                // Insert secondary email address after email address field.
+                aboutSectionsData[0].fields.splice(
+                emailFieldViewIndex + 1, 0, secondaryEmailFieldView
+                )
             }
 
             // Add the extended profile fields
