@@ -46,6 +46,7 @@ from webpack_loader.templatetags.webpack_loader import render_bundle
         edxSupportUrl = '${ edx_support_url | n, js_escaped_string }',
         extendedProfileFields = ${ extended_profile_fields | n, dump_js_escaped_json },
         displayAccountDeletion = ${ enable_account_deletion | n, dump_js_escaped_json};
+        currency = ${ currency | n, dump_js_escaped_json};
 
     AccountSettingsFactory(
         fieldsData,
@@ -65,7 +66,8 @@ from webpack_loader.templatetags.webpack_loader import render_bundle
         enterpriseReadonlyAccountFields,
         edxSupportUrl,
         extendedProfileFields,
-        displayAccountDeletion
+        displayAccountDeletion,
+        currency
     );
 </%static:require_module>
 

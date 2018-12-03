@@ -111,6 +111,10 @@ def account_settings_context(request):
             'ENABLE_ACCOUNT_DELETION', settings.FEATURES.get('ENABLE_ACCOUNT_DELETION', False)
         ),
         'extended_profile_fields': _get_extended_profile_fields(),
+        'currency': {
+            'code': settings.PAID_COURSE_REGISTRATION_CURRENCY[0],
+            'symbol': settings.PAID_COURSE_REGISTRATION_CURRENCY[1]
+        }
     }
 
     enterprise_customer = get_enterprise_customer_for_learner(site=request.site, user=request.user)

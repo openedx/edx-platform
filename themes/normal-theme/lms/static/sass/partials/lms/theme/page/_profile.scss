@@ -11,3 +11,59 @@
   max-width: 1200px;
   margin: 0 auto;
 }
+
+//mobile页面
+@include media-breakpoint-down(sm){ 
+  .view-profile {
+    .wrapper-profile-sections{  
+      padding:30px 5% 14px 5%;
+    }
+    .profile-self {
+      .wrapper-profile-field-account-privacy{ 
+        background: $bgColor;
+        .u-field-title{  
+          font-size: $mobileFont14;
+          color:$title;
+        }
+        .wrapper-profile-records button{  
+          color:#fff;
+          font-weight: normal;
+          font-size: $mobileFont14;
+          border-radius: 3px;
+          padding: 6px 12px;
+        }  
+      }
+    }
+    .profile-header{  
+      .header{  
+        font-size: $mobileFont16;
+        color: $title;
+      }
+      .subheader{  
+        font-size: $mobileFont14;
+        color: $font;
+      }
+    }
+    .profile-image-field .image-wrapper{  
+      width: 100px;
+      .image-frame{ 
+        width: 100px;
+        height: 100px;
+        border-radius: 50px;
+      }
+    } 
+  } 
+  .u-field-value select{  
+    background: #fff;
+    color: $font;
+  }
+  .wrapper-profile-section-container-one .wrapper-profile-section-one .profile-section-one-fields .u-field .u-field-value-readonly{ 
+    color:$font;
+    font-size: $mobileFont14;
+    text-align: center;
+    width: 100%;
+  }
+  .wrapper-profile-section-container-one .wrapper-profile-section-one{  
+    padding-bottom: 10px;
+  }
+}

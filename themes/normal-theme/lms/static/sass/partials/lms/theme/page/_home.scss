@@ -1,11 +1,6 @@
 // 0.0.0.0:18000 lms首页
 // 未登录时首页，显示可选课程列表
 
-#main{  
-  max-width:100%;
-  margin:0 auto;
-}
-
 // home header
 .home > header{
   height: 320px;
@@ -14,6 +9,7 @@
 
   .outer-wrapper{  
     max-width: 1200px;
+    padding: 60px 20px;
   }
   .title{
     background-color: rgba(255,255,255,0.7);
@@ -38,6 +34,31 @@
     font-size: 18px;
     color: $title;
   }
+
+  // search
+  .title .course-search{
+    width: 90%;
+    margin: 0 auto;
+    max-width: 780px;
+    position: relative;
+  }
+  .title .course-search .search-input{
+    border: 1px solid $blue;
+    height: 48px;
+    font-size: 14px;
+    padding: 10px 150px 10px 20px;
+  }
+  .title .course-search .search-button{
+    right: 0;
+    height: 48px;
+    border: none;
+    width: 100px;
+    background: $blue;
+  }
+  .title .course-search .search-button:hover{
+    background: $blue;
+    opacity: 0.9;
+  }
 }
 
 // home course
@@ -57,9 +78,13 @@
   .course-image .cover-image{
     height: 150px;
   }
+  .course-image .cover-image .learn-more{
+    display: none;
+  }
   .course-info{
     height: 140px;
     background-image:none;
+    background: #fff;
   }
   .course-info .course-title{
     margin: 5px 0 0;
@@ -100,12 +125,32 @@
   }
 }
 
-
-
-
-// unknown
-.dashboard{ 
-  width: 1200px;
-  margin: 0 auto;
+// find-courses
+.find-courses{
+  background: none;
 }
 
+
+
+
+
+@media screen and (max-width:576px){
+  .highlighted-courses .courses{
+    padding: 20px 0 15px;
+  }
+  .home>header, .home>header .title{
+    height: auto;
+  }
+  .home>header .outer-wrapper{
+    padding: 20px;
+  }
+  .home>header .title>.heading-group h1{
+    font-size: 18px;
+  }
+  .home>header .title>.heading-group p{
+    font-size: 14px;
+  }
+  .courses-container .courses .courses-listing .courses-listing-item{
+    margin: 0 0 20px 0;
+  }
+}

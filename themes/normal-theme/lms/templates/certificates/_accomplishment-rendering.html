@@ -1,0 +1,99 @@
+<%page expression_filter="h"/>
+<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='../static_content.html'/>
+<%
+course_mode_class = course_mode if course_mode else ''
+%>
+
+<main class="accomplishment accomplishment-main">
+
+    <div class="wrapper-accomplishment-rendering">
+        <div class="accomplishment-rendering">
+            
+            <div class="certificate-content-box">
+                <div class="accomplishment-type">
+
+                    <span class="accomplishment-type-symbol">
+                        <img class="src" src="/static/certificates/images/ico-${course_mode_class}.png" alt="Image for course mode of type ${course_mode_class}">
+                    </span>
+                    <p class="prove">兹证明</p>
+
+                    % if certificate_data:
+                            % for signatory in certificate_data.get('signatories', []):
+                                <p class="pro-name">${signatory['name']}</p>
+                      % endfor
+                    % endif
+
+                    <p class="accomplishment-success">顺利完成并通过</p>
+                    
+                    
+                    <sapn class="span-accomplishment-course-name">${accomplishment_copy_course_name}
+                        <div class="course-name-line"></div>
+                        <span class="span-accomplishment-course-id">${course_number}</span>
+                    </sapn>
+                    
+
+                    <p class="eliteu-support">该课程由英荔教育提供并授权</p>
+                    
+                    
+                    <!-- <span class="accomplishment-type-label hd-3">${document_title}</span> -->
+                </div>
+
+                <div class="accomplishment-box-right">
+                    <div class="verified-end-box">
+                        <img src="/static/certificates/images/verified-end.png" alt="">
+                    </div>
+
+                    <div class="underwrite">
+                        <ul>
+
+                            % if certificate_data:
+                                % for signatory in certificate_data.get('signatories', []):
+                                    <li>
+                                        <span>${signatory['name']}</span>
+                                        <!-- <img class="" src="${static.url(signatory['signature_image_path'])}" alt="${signatory['name']}"> -->
+                                        <img class="pro-img" src="/static/certificates/images/dome-sif1.png" alt="${signatory['name']}">
+                                        
+                                    </li>
+                                % endfor
+                            % endif
+
+                            
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="wrapper-accomplishment-metadata">
+        <div class="accomplishment-metadata">
+            <h2 class="accomplishment-metadata-title hd-6">${accomplishment_copy_more_about}</h2>
+
+            <div class="wrapper-metadata">
+                <dl class="metadata accomplishment-recipient">
+                    <dt class="label sr-only">${_("Awarded to:")}</dt>
+                    <dd class="value copy copy-meta">
+                        <span class="recipient-img">
+                            <img class="src" src="/static/certificates/images/demo-user-profile.png" alt="Recipient Image">
+                        </span>
+                        <div class="recipient-details">
+                            <h3 class="recipient-name">${accomplishment_copy_name}</h3>
+                            <p class="recipient-username">${accomplishment_copy_username} @ ${platform_name}</p>
+                        </div>
+                    </dd>
+                </dl>
+                <dl class="metadata accomplishment-id">
+                    <dt class="label copy copy-meta">${certificate_id_number_title}:</dt>
+                    <dd class="value copy copy-base">${certificate_id_number}</dd>
+                </dl>
+                <dl class="metadata accomplishment-date">
+                    <dt class="label copy copy-meta">${certificate_date_issued_title}</dt>
+                    <dd class="value copy copy-base">${certificate_date_issued}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+</main>

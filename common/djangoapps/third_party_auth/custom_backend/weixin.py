@@ -41,7 +41,7 @@ class WeixinOAuth2(BaseOAuth2):
     def user_data(self, access_token, *args, **kwargs):
         data = self.get_json('https://api.weixin.qq.com/sns/userinfo', params={
             'access_token': access_token,
-            'openid': kwargs.get('response', {}).get('openid') or 'null'
+            'openid': kwargs.get('response', {}).get('openid') or kwargs.get('openid', 'null')
         })
 
         nickname = data.get('nickname')

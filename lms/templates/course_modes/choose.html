@@ -118,7 +118,8 @@ from openedx.core.djangolib.markup import HTML, Text
                                                     <ul class="list-actions">
                                                         <li class="action action-select">
                                                             <input type="hidden" name="contribution" value="${min_price}" />
-                                                            <input type="submit" name="verified_mode" value="${_('Pursue a Verified Certificate')} ($${min_price} USD)" />
+                                                            <input type="submit" name="verified_mode"
+                                                                   value="${_('Pursue a Verified Certificate')} (${currency_symbol}${min_price} ${currency_code})" />
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -159,9 +160,9 @@ from openedx.core.djangolib.markup import HTML, Text
                                                         <li class="action action-select">
                                                             <input type="hidden" name="contribution" value="${min_price}" />
                                                             % if content_gating_enabled:
-                                                                <input type="submit" name="verified_mode" value="${_('Pursue the Verified Track')} ($${min_price} USD)" />
+                                                                <input type="submit" name="verified_mode" value="${_('Pursue the Verified Track')} (${currency_symbol}${min_price} ${currency_code})" />
                                                             % else:
-                                                                <input type="submit" name="verified_mode" value="${_('Pursue a Verified Certificate')} ($${min_price} USD)" />
+                                                                <input type="submit" name="verified_mode" value="${_('Pursue a Verified Certificate')} (${currency_symbol}${min_price} ${currency_code})" />
                                                             % endif
                                                         </li>
                                                     </ul>

@@ -6,6 +6,7 @@
   box-shadow: 0 2px 2px 2px $border;
   line-height: 1.8;
   padding: 40px 0;
+  box-sizing: border-box;
 
   // 1. 布局
   .footer-content{
@@ -129,38 +130,46 @@
   }
 }
 
-@media screen and (max-width: 996px){
+@media screen and (max-width: 992px){
   .my-footer{
+    padding: 40px 30px;
+    h3{
+      padding: 0;
+    }
     .footer-app, .footer-wechat{
       display: none;
     }
     .footer-links{
       width: 100%;
+      padding: 0 0 0 50px;
+      box-sizing: border-box;
     }
     .footer-list{
       min-width: 160px;
+    }
+    .footer-line{
+      display: none;
     }
   }
   
 }
 
-@media screen and (max-width:767px){
+@media screen and (max-width:768px){
   .my-footer{
-    .footer-content{
-      width: 80%;
-    }
+    border-top: 1px solid $border;
+    box-shadow: none;
+    padding: 40px 0 20px 0;
+
     .footer-list{
       width: 49%;
       margin-bottom: 30px;
+      min-width: 0;
     }
     ul{
       margin: 10px 0 0 0;
     }
     .footer-text{
       margin-top: 0;
-    }
-    .footer-line{
-      display: none;
     }
     h3{
       padding: 0;

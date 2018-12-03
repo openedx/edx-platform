@@ -9,6 +9,7 @@
   .main-header{
     max-width: 1200px;
     margin: 0 auto;
+    box-sizing: border-box;
   }
   .header-logo a{ 
     margin-left: 0px;
@@ -16,33 +17,79 @@
   .header-logo a .logo{
     height: 34px;
   }
-  .course-header{
-    display: none;
+}
+
+.window-wrap .global-header .nav-links .secondary{
+  a.sign-in-btn, .nav-item a.shopping-cart{
+    @extend %btn-my-primary;
+    margin-top: 2px;
+  }
+  a.sign-in-btn:hover, .nav-item a.shopping-cart:hover{
+    @extend %btn-my-primary-hover;
+  }
+  a.register-btn{
+    @extend %btn-my-white;
+    margin-top: 2px;
+  }
+  a.register-btn:hover{
+    @extend %btn-my-white-hover;
   }
 }
 
-
-@media (max-width: 991px){  
+@include media-breakpoint-down(md) {  
+  .global-header .hamburger-menu{ 
+    left: 5%;
+  }
   .window-wrap .global-header .header-logo a{ 
-    margin-left: 50%;
+    position: relative;
+    left: 50%;
   }
   .global-header .nav-links .secondary .dropdown-user-menu{
     border: 1px solid #eeeeee;
   }
-  .global-header .hamburger-menu .line{
-    height: 3px;
-  }
+  .global-header .hamburger-menu{
+    outline: none;
+    .line{
+      height: 3px;
+    }
+  } 
+  
+  .mobile-menu{ 
+    margin-top: 21px;
+    .mobile-nav-link{  
+      outline: none;
+      a{  
+        padding:8px 20px;
+        font-size: $mobileFont14;
+        box-sizing: border-box;
+        &:hover{  
+          background-color:$blue;
+        }
+      }
+    }
+  } 
+  
+   
 }
 
 
-
 @media screen and (min-width: 992px){ 
-  .global-header .nav-links .secondary{ 
-    margin: 8px 0 0;
+  .window-wrap .global-header .nav-links .secondary{ 
+    margin: 0;
 
     .user-image-frame{
       border: none;
     }
+    .nav-item{
+      padding: 5px 0 0 0;
+      margin: 4px 0 0 5px;
+    }
+
+    .nav-item.nav-item-dropdown {
+      position: relative;
+    }
+
+    
   } 
 
   .global-header .nav-links .main .nav-tab{
@@ -66,6 +113,7 @@
   .global-header .nav-links .secondary .toggle-user-dropdown{
     outline: none;
   }
+
 }
 
 //查看课程的导航
@@ -89,4 +137,8 @@
 
 .global-header .nav-links .secondary{ 
   position: relative; 
+}
+
+.home>header .title .course-search .search-button{  
+  box-sizing: border-box;
 }
