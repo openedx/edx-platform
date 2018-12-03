@@ -17,7 +17,7 @@ from six import text_type
 
 from course_modes.models import CourseMode
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
-from lms.djangoapps.grades.api.v1.views import CourseGradesView
+from lms.djangoapps.grades.api.v1.views import CourseGradesView, CourseEnrollmentPagination
 from lms.djangoapps.grades.config.waffle import waffle_flags, WRITABLE_GRADEBOOK
 from lms.djangoapps.grades.course_data import CourseData
 from lms.djangoapps.grades.course_grade import CourseGrade
@@ -457,6 +457,7 @@ class GradebookViewTestBase(GradeViewTestMixin, APITestCase):
         self.client.login(username=self.global_staff.username, password=self.password)
 
 
+@ddt.ddt
 class GradebookViewTest(GradebookViewTestBase):
     """
     Tests for the gradebook view.
@@ -1040,6 +1041,35 @@ class GradebookViewTest(GradebookViewTestBase):
                 self.assertEqual(status.HTTP_200_OK, resp.status_code)
                 actual_data = dict(resp.data)
                 self.assertEqual(expected_results, actual_data)
+
+    @ddt.data(None, 2, 3, 10, 60, 80)
+    def test_page_size_parameter(self, page_size):
+        user_size = 60
+        with patch(
+            'lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read'
+        ) as mock_grade:
+            users = UserFactory.create_batch(user_size)
+            mocked_course_grades = []
+            for user in users:
+                self._create_user_enrollments(user)
+                mocked_course_grades.append(self.mock_course_grade(user, passed=True, letter_grade='A', percent=0.85))
+
+            mock_grade.side_effect = mocked_course_grades
+
+            with override_waffle_flag(self.waffle_flag, active=True):
+                self.login_staff()
+                query = ''
+                if page_size:
+                    query = '?page_size={}'.format(page_size)
+                resp = self.client.get(
+                    self.get_url(course_key=self.course.id) + query
+                )
+                self.assertEqual(status.HTTP_200_OK, resp.status_code)
+                actual_data = dict(resp.data)
+                expected_page_size = page_size or CourseEnrollmentPagination.page_size
+                if expected_page_size > user_size:
+                    expected_page_size = user_size
+                self.assertEqual(len(actual_data['results']), expected_page_size)
 
 
 class GradebookBulkUpdateViewTest(GradebookViewTestBase):
