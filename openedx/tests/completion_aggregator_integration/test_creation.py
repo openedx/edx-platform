@@ -11,6 +11,8 @@ from completion.models import BlockCompletion
 from completion.test_utils import CompletionWaffleTestMixin
 from completion_aggregator.models import Aggregator
 from completion_aggregator.tasks.aggregation_tasks import AggregationUpdater
+import ddt
+from django.test.utils import override_settings
 from django.utils import timezone
 import pytest
 
@@ -72,6 +74,52 @@ class _BaseTestCase(CompletionWaffleTestMixin, SharedModuleStoreTestCase):
             else:
                 with pytest.raises(Aggregator.DoesNotExist):
                     self.aggregator_for(item, user=user)
+
+
+@ddt.ddt
+class ConfigurationTestCase(_BaseTestCase):
+    """
+    Test that configuration and waffle flags have the expected effects.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        super(ConfigurationTestCase, cls).setUpClass()
+        cls.course = CourseFactory.create()
+        cls.course_key = cls.course.id
+        with cls.store.bulk_operations(cls.course_key):
+            cls.chapter = ItemFactory.create(
+                parent=cls.course,
+                category="chapter"
+            )
+            cls.item = ItemFactory.create(parent=cls.chapter, category="html")
+
+    def test_completion_tracking_disabled(self):
+        """
+        When completion tracking is disabled, calling BlockCompletion.objects.submit_completion()
+        is an error.
+        """
+        self.override_waffle_switch(override=False)
+        with self.assertRaises(RuntimeError):
+            self.submit_completion_for(self.item, 1.0)
+
+    @ddt.data(True, False)
+    def test_async_aggregation(self, async_agg_setting):
+        """
+        When COMPLETION_AGGREGATOR_ASYNC_AGGREGATION is True, aggregation does not
+        get calculated until the AggregationUpdater is called.
+        """
+        with override_settings(COMPLETION_AGGREGATOR_ASYNC_AGGREGATION=async_agg_setting):
+            BlockCompletion.objects.submit_completion(
+                user=self.user,
+                course_key=self.course_key,
+                block_key=self.item.location,
+                completion=1.0
+            )
+        if async_agg_setting:
+            self.assertFalse(Aggregator.objects.filter(block_key=self.item.location))
+            self.aggregate_course(self.user, self.course_key)
+        self.assertEqual(Aggregator.objects.get(aggregation_name="course").earned, 1.0)
 
 
 class DAGTestCase(_BaseTestCase):
