@@ -1368,7 +1368,8 @@ proctoring_js = (
         'proctoring/js/views/proctored_exam_instructor_launch.js',
     ] +
     [
-        'proctoring/js/proctored_app.js'
+        'proctoring/js/proctored_app.js',
+        'proctoring/js/exam_action_handler.js'
     ]
 )
 
@@ -1845,6 +1846,10 @@ WEBPACK_LOADER = {
     'DEFAULT': {
         'BUNDLE_DIR_NAME': 'bundles/',
         'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-stats.json')
+    },
+    'WORKERS': {
+        'BUNDLE_DIR_NAME': 'bundles/',
+        'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-worker-stats.json')
     }
 }
 WEBPACK_CONFIG_PATH = 'webpack.prod.config.js'

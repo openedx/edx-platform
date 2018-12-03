@@ -4,6 +4,8 @@
   "dependencies": {
     "@edx/cookie-policy-banner": "1.1.10",
     "@edx/edx-bootstrap": "0.4.3",
+    "@edx/edx-proctoring": "git+https://git@github.com/edx/edx-proctoring.git",
+    "@edx/mockprock": "git+https://git@github.com/edx/mockprock.git",
     "@edx/paragon": "2.6.4",
     "@edx/studio-frontend": "1.16.12",
     "babel-core": "6.26.0",
@@ -21,6 +23,8 @@
     "camelize": "1.0.0",
     "classnames": "2.2.5",
     "css-loader": "0.28.8",
+    "datatables": "1.10.18",
+    "datatables.net-fixedcolumns": "3.2.6",
     "edx-pattern-library": "0.18.1",
     "edx-ui-toolkit": "1.5.2",
     "exports-loader": "0.6.4",
