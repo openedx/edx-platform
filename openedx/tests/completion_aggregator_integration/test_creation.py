@@ -94,6 +94,7 @@ class ConfigurationTestCase(_BaseTestCase):
             )
             cls.item = ItemFactory.create(parent=cls.chapter, category="html")
 
+    @skip_unless_lms
     def test_completion_tracking_disabled(self):
         """
         When completion tracking is disabled, calling BlockCompletion.objects.submit_completion()
@@ -104,6 +105,7 @@ class ConfigurationTestCase(_BaseTestCase):
             self.submit_completion_for(self.item, 1.0)
 
     @ddt.data(True, False)
+    @skip_unless_lms
     def test_async_aggregation(self, async_agg_setting):
         """
         When COMPLETION_AGGREGATOR_ASYNC_AGGREGATION is True, aggregation does not
