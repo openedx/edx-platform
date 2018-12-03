@@ -151,7 +151,7 @@ def update_account_settings(requesting_user, update, username=None):
         changing_full_name = True
         old_name = existing_user_profile.name
 
-    changing_secondary_email= False
+    changing_secondary_email = False
     if "secondary_email" in update:
         changing_secondary_email = True
 

@@ -36,7 +36,7 @@
                 emailFieldView, secondaryEmailFieldView, socialFields, accountDeletionFields, platformData,
                 aboutSectionMessageType, aboutSectionMessage, fullnameFieldView, countryFieldView,
                 fullNameFieldData, emailFieldData, secondaryEmailFieldData, countryFieldData, additionalFields,
-                fieldItem;
+                fieldItem, emailFieldViewIndex;
 
             $accountSettingsElement = $('.wrapper-account-settings');
 
@@ -248,7 +248,7 @@
 				secondaryEmailFieldView = {
 					view: new AccountSettingsFieldViews.EmailFieldView(secondaryEmailFieldData)
 				};
-            	var emailFieldViewIndex = aboutSectionsData[0].fields.indexOf(emailFieldView);
+            	emailFieldViewIndex = aboutSectionsData[0].fields.indexOf(emailFieldView);
 
             	// Insert secondary email address after email address field.
             	aboutSectionsData[0].fields.splice(
