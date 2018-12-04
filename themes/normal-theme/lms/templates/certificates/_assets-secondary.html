@@ -15,7 +15,7 @@
     }
 
     //二维码扫码
-    var test = document.getElementById("test");
+    var code = document.getElementById("code");
     var url = $.trim($('#url').text());
     url = location.host+url;   
     var data = {    
@@ -26,7 +26,7 @@
         colorLight : "#ffffff",
         correctLevel : QRCode.CorrectLevel.H
     }
-    var qrcode = new QRCode("test", data);
+    var qrcode = new QRCode("code", data);
 
     $("#test div .code-url").text(url);
 </script>
