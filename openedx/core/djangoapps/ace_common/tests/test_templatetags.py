@@ -102,7 +102,8 @@ class TestGoogleAnalyticsPixelTag(QueryStringAssertionMixin, EmailTemplateTagMix
             dp='/email/test_app_label/test_name/{send_uuid}/{uuid}'.format(
                 send_uuid=self.message.send_uuid,
                 uuid=self.message.uuid,
-            )
+            ),
+            dh=self.fake_request.site.domain,
         )
 
     def test_missing_request(self):
