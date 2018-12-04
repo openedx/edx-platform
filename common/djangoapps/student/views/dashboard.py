@@ -634,8 +634,8 @@ def student_dashboard(request):
 
     # Update the tag info with 'enterprise_learner' if the user belongs to an enterprise customer.
     enterprise_learner_data = get_enterprise_learner_data(user=request.user)
-    is_secondary_email_exist = UserProfile.objects.filter(secondary_email=user.email).exists()
-    if enterprise_learner_data and is_secondary_email_feature_enabled and not is_secondary_email_exist:
+    does_secondary_email_exist = bool(user.profile and user.profile.secondary_email)
+    if enterprise_learner_data and is_secondary_email_feature_enabled() and not does_secondary_email_exist:
         recovery_email_message = Text(_("Add a recovery email to retain access when single-sign on is not available. "
                                         "Go to {link_start}your Profile{link_end}.")).format(
             link_start=HTML("<a target='_blank' href='{account_setting_page}'>").format(
