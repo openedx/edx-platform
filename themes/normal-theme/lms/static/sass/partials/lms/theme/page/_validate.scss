@@ -1,0 +1,88 @@
+.validate{ 
+    max-width: 1200px;
+    box-sizing:border-box;
+    height: 650px;
+    border: 1px solid #b6dcfe;
+    border-radius:4px; 
+    margin: 30px auto; 
+    >img{  
+      width: 78px;
+      height: 61px;
+      display: block; 
+      margin: 0 auto;
+      margin-top: 50px;
+    } 
+    .right{ 
+      text-align: center;
+      margin-top: 10px;
+      margin-bottom: 20px;
+      span{  
+        display: inline-block;
+      }
+      span:nth-of-type(1){ 
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        background-image: url("/static/normal-theme/images/iconfont.png");
+        background-position: -62px -82px;
+        background-size:300px;
+        margin-right:  10px;
+      }
+    }
+   
+}
+
+.validate-dec-line{ 
+  max-width: 600px;
+  padding: 18px;
+  height: 3px;
+  margin: 0 auto;
+    div:nth-of-type(1),.validate-dec-line div:nth-of-type(3){ 
+      max-width: 600px;
+      height: 1px;
+      background: #b6dcfe;
+    }
+    div:nth-of-type(2){  
+      max-width: 600px;
+      height: 1px;
+      background: #4788c7;
+    }
+}
+
+.validate-dec{ 
+    max-width: 600px;
+    height: 405px;
+    list-style: none;
+    margin: 0 auto; 
+    padding-left: 0px;
+  }
+  .validate-dec li{ 
+    line-height: 54px;
+    border-bottom:1px dashed #b6dcfe;
+    width:100%;
+    overflow: hidden;
+    padding: 0 18px;
+    box-sizing: border-box;
+  } 
+  .validate-dec li:last-child{  
+    border-bottom:1px solid #b6dcfe; 
+  } 
+  .validate-dec li span{  
+    display: inline;
+    float: left;
+    color:$title;
+  }
+  .validate-dec li span:nth-of-type(2){ 
+     float: right;
+     color:$font;
+  }  
+
+
+  @media (max-width: 767px){  
+    .validate{  
+      border: none;
+    }
+    .validate-dec-line{ 
+      box-sizing: border-box;
+    }
+  }

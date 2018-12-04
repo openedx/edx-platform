@@ -1,3 +1,45 @@
-<div>
-  some course verify stuff
+<%inherit file="../main.html" />
+
+<div class="validate">
+  <img src="/static/certificates/images/validate.png">
+  <div class="right"><span></span><span>该证书真实有效</span></div>
+  <div class="validate-dec-line">
+    <div> </div>
+    <div> </div>
+    <div> </div>
+  </div>
+  <ul class="validate-dec">
+    <li>
+      <span>持证学员</span>
+      <span>${learner}</span>
+    </li>
+    <li>
+      <span>证书编号</span>
+      <span>${verify_id}</span>
+    </li>
+    <li>
+      <span>所属机构</span>
+      <span>${org}</span>
+    </li>
+    <li>
+      <span>课程名称</span>
+      <span>${name}</span>
+    </li>
+    <li>
+      <span>学习时间</span>
+      <span>${start_date}-${end_date}</span>
+    </li>
+    <li>
+      <span>学习类型</span>
+      <span>${mode}</span>
+    </li>
+    <li>
+      <span>发证时间</span>
+      <span>${issue_date}</span>
+    </li>
+    <li>
+      <span>电子证书</span>
+      <span><a href=${cert_web_url}>点击查看</a></span>
+    </li>
+  </ul>
 </div>
