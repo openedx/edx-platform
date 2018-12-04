@@ -1418,6 +1418,7 @@ class TestEditItemSetup(ItemTest):
         self.course_update_url = reverse_usage_url("xblock_handler", self.usage_key)
 
 
+@ddt.ddt
 class TestEditItem(TestEditItemSetup):
     """
     Test xblock update.
@@ -1473,6 +1474,32 @@ class TestEditItem(TestEditItemSetup):
         sequential = self.get_item_from_modulestore(self.seq_usage_key)
         self.assertEqual(sequential.due, datetime(2010, 11, 22, 4, 0, tzinfo=UTC))
         self.assertEqual(sequential.start, datetime(2010, 9, 12, 14, 0, tzinfo=UTC))
+
+    @ddt.data(
+        '1000-01-01T00:00Z',
+        '0150-11-21T14:45Z',
+        '1899-12-31T23:59Z',
+        '1789-06-06T22:10Z',
+        '1001-01-15T19:32Z',
+    )
+    def test_xblock_due_date_validity(self, date):
+        """
+        Test due date for the subsection is not pre-1900
+        """
+        self.client.ajax_post(
+            self.seq_update_url,
+            data={'metadata': {'due': date}}
+        )
+        sequential = self.get_item_from_modulestore(self.seq_usage_key)
+        xblock_info = create_xblock_info(
+            sequential,
+            include_child_info=True,
+            include_children_predicate=ALWAYS,
+            user=self.user
+        )
+        # Both display and actual value should be None
+        self.assertEquals(xblock_info['due_date'], u'')
+        self.assertIsNone(xblock_info['due'])
 
     def test_update_generic_fields(self):
         new_display_name = 'New Display Name'
