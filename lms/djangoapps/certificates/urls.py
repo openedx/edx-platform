@@ -28,4 +28,5 @@ urlpatterns = [
     url(r'search', views.search_certificates, name="search"),
     url(r'regenerate', views.regenerate_certificate_for_user, name="regenerate_certificate_for_user"),
     url(r'generate', views.generate_certificate_for_user, name="generate_certificate_for_user"),
+    url(r'verify/(?P<certificate_uuid>[0-9a-f]{32})', views.verify_certificates, name="verify_cert"),
 ]
