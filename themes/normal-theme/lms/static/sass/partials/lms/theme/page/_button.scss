@@ -11,17 +11,19 @@
   border-radius: 3px;
   font-weight: normal;
   cursor: pointer;
-
   border: none;
   background: $blue;
   border: 1px solid $blue;
   color: #fff;
+  text-shadow: none;
+  font-family: $font-family-sans-serif;
 }
 
 %btn-my-primary-hover{
   background: $blue;
   text-decoration: none;
   opacity: 0.95;
+  box-shadow: none;
 }
 
 // 底色白，字体蓝
@@ -39,6 +41,8 @@
   background: #fff;
   color: $blue;
   border: 1px solid $blue;
+  text-shadow: none;
+  font-family: $font-family-sans-serif;
 }
 
 %btn-my-white-hover{
@@ -64,5 +68,7 @@
   border: 1px solid #e6e9ed;
   cursor: not-allowed;
   text-decoration: none;
+  text-shadow: none;
+  font-family: $font-family-sans-serif;
 }
 
