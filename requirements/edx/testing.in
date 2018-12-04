@@ -43,7 +43,7 @@ pytest-xdist              # Parallel execution of tests on multiple CPU cores or
 radon                     # Calculates cyclomatic complexity of Python code (code quality utility)
 selenium                  # Browser automation library, used for acceptance tests
 singledispatch            # Backport of functools.singledispatch from Python 3.4+, used in tests of XBlock rendering
-splinter                  # Browser driver used by lettuce
+splinter==0.9.0           # Browser driver used by lettuce - pinned because splinter==0.10.0 breaks lettuce tests.  EDUCATOR-3795
 testfixtures              # Provides a LogCapture utility used by several tests
 tox                       # virtualenv management for tests
 tox-battery               # Makes tox aware of requirements file changes
