@@ -166,7 +166,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
             )
             self.assertIn("seq_module.html", html)
             self.assertIn(
-                "'banner_text': 'Because the due date has passed, "
+                "'banner_text': u'Because the due date has passed, "
                 "this assignment is hidden from the learner.'",
                 html
             )
@@ -208,7 +208,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         """
         self.assertIn("seq_module.html", html)
         self.assertIn(
-            "'banner_text': 'This section is a prerequisite. "
+            "'banner_text': u'This section is a prerequisite. "
             "You must complete this section in order to unlock additional content.'",
             html
         )
