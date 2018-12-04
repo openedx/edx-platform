@@ -42,6 +42,14 @@ if (typeof MathJax === 'undefined') {
             });
         };
     };
-    vendorScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_SVG';
+    // Automatic loading of Mathjax accessibility files
+    window.MathJax = {
+        menuSettings: {
+            collapsible: true,
+            autocollapse: true,
+            explorer: true
+        }
+    };
+    vendorScript.src = 'https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_SVG';
     document.body.appendChild(vendorScript);
 }
