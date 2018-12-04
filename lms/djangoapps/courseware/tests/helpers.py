@@ -361,7 +361,8 @@ def get_expiration_banner_text(user, course):
     expiration_date = (now() + timedelta(weeks=4)).strftime('%b %-d')
     upgrade_link = verified_upgrade_deadline_link(user=user, course=course)
     bannerText = 'Your access to this course expires on {expiration_date}. \
-        <a href="{upgrade_link}">Upgrade now</a> for unlimited access.'.format(
+        <a href="{upgrade_link}">Upgrade now <span class="sr-only">to retain access past {expiration_date}.\
+        </span></a><span aria-hidden="true">for unlimited access.</span>'.format(
         expiration_date=expiration_date,
         upgrade_link=upgrade_link
     )
