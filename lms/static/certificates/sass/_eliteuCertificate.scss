@@ -106,6 +106,22 @@ p.accomplishment-success{
     border-bottom: 2px solid #ededed;
 }
 
+#test{  
+  position: relative; 
+}
+#test .certificates-mes{    
+  position: absolute; 
+  left: 90px;
+}
+#test .certificates-mes p{    
+  text-align: left;
+  font-size: 12px;
+  margin-bottom: 3px;
+}
+#test .certificates-mes p:nth-of-type(3),#test .certificates-mes p:nth-of-type(4){  
+  color:#b0b0b0;
+}
+
 @media print {  
   .layout-accomplishment.certificate-verified .accomplishment-rendering{  
     background: none;
@@ -117,14 +133,10 @@ p.accomplishment-success{
   .wrapper-accomplishment-metadata{   
     display: none;
   }
-      
-      
   .layout-accomplishment.certificate-verified .accomplishment-rendering{  
     background: none;
-    height:40rem;
-          
-  }
-         
+    height:40rem;      
+  }     
   .certificate-content-box{  
     margin: 0 auto;
     display: block;
@@ -156,22 +168,6 @@ p.accomplishment-success{
   }
   .accomplishment-box-right{   
     height: 630px;
-  }
-  #test{  
-    position: relative; 
-
-  }
-  #test .certificates-mes{    
-    position: absolute; 
-    left: 90px;
-  }
-  #test .certificates-mes p{    
-    text-align: left;
-    font-size: 12px;
-    margin-bottom: 3px;
-  }
-  #test .certificates-mes p:nth-of-type(3),#test .certificates-mes p:nth-of-type(4){  
-    color:#b0b0b0;
   }
 }
 
