@@ -10,14 +10,15 @@ from functools import wraps
 
 from django.db import transaction
 from django.db.models import Q
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseServerError
+from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseServerError
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_GET, require_POST
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
+from edxmako.shortcuts import render_to_response
 from lms.djangoapps.certificates import api
-from lms.djangoapps.certificates.models import CertificateInvalidation
+from lms.djangoapps.certificates.models import CertificateInvalidation, GeneratedCertificate, CertificateStatuses
 from courseware.access import has_access
 from lms.djangoapps.instructor_task.api import generate_certificates_for_students
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -115,6 +116,31 @@ def search_certificates(request):
                 return HttpResponseBadRequest(msg)
 
     return JsonResponse(certificates)
+
+
+@require_GET
+def verify_certificates(request, certificate_uuid):
+    certificate = GeneratedCertificate.eligible_certificates.get(
+        verify_uuid=certificate_uuid,
+        status=CertificateStatuses.downloadable
+    )
+
+    try:
+        co = CourseOverview.objects.get(id=certificate.course_id)
+    except CourseOverview.DoesNotExist:
+        raise Http404("Course not found.")
+
+    context = {
+        'verify_id': certificate.verify_uuid,
+        'mode': certificate.mode,
+        'issue_date': certificate.modified_date,
+        'learner': certificate.name,
+        'org': co.org,
+        'start_date': co.start,
+        'end_date': co.end,
+        'name': co.display_name
+    }
+    return render_to_response("certificates/verify.html", context)
 
 
 def _validate_post_params(params):
