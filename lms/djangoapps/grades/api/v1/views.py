@@ -1,6 +1,6 @@
 """ API v0 views. """
 import logging
-from collections import defaultdict, namedtuple
+from collections import namedtuple
 from contextlib import contextmanager
 from functools import wraps
 
@@ -316,42 +316,6 @@ class GradeViewMixin(DeveloperErrorViewMixin):
             raise AuthenticationFailed
 
 
-class SubsectionLabelFinder(object):
-    """
-    Finds the grader label (a short string identifying the section) of a graded section.
-    """
-    def __init__(self, course_grade):
-        """
-        Args:
-            course_grade: A CourseGrade object.
-        """
-        self.section_summaries = [section for section in course_grade.summary.get('section_breakdown', [])]
-
-    def _get_subsection_summary(self, display_name):
-        """
-        Given a subsection's display_name and a breakdown of section grades from CourseGrade.summary,
-        return the summary data corresponding to the subsection with this display_name.
-        """
-        for index, section in enumerate(self.section_summaries):
-            if display_name.lower() in section['detail'].lower():
-                return index, section
-        return -1, None
-
-    def get_label(self, display_name):
-        """
-        Returns the grader short label corresponding to the display_name, or None
-        if no match was found.
-        """
-        section_index, summary = self._get_subsection_summary(display_name)
-        if summary:
-            # It's possible that two subsections/assignments would have the same display name.
-            # since the grade summary and chapter_grades data are presumably in a sorted order,
-            # we'll take the first matching section summary and remove it from the pool of
-            # section_summaries.
-            self.section_summaries.pop(section_index)
-            return summary['label']
-
-
 class CourseGradesView(GradeViewMixin, PaginatedAPIView):
     """
     **Use Case**
@@ -495,8 +459,6 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
         * letter_grade: A letter grade as defined in grading policy (e.g. 'A' 'B' 'C' for 6.002x) or None
         * progress_page_url: A link to the user's progress page.
         * section_breakdown: A list of subsection grade details, as specified below.
-        * aggregates: A dict containing earned and possible scores (floats), broken down by subsection type
-                      (e.g. "Exam", "Homework", "Lab").
 
         A response for all user's grades in the course is paginated, and contains "count", "next" and "previous"
         keys, along with the actual data contained in a "results" list.
@@ -544,16 +506,6 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
                     "subsection_name": "Demo Course Overview"
                 },
             ],
-            "aggregates": {
-                "Exam": {
-                  "score_possible": 6.0,
-                  "score_earned": 0.0
-                },
-                "Homework": {
-                  "score_possible": 16.0,
-                  "score_earned": 10.0
-                }
-            }
         }
     **Paginated GET response**
         When requesting gradebook entries for all users, the response is paginated and contains the following values:
@@ -577,62 +529,62 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
 
     required_scopes = ['grades:read']
 
-    def _section_breakdown(self, course, course_grade):
+    def _section_breakdown(self, course, graded_subsections, course_grade):
         """
-        Given a course_grade, returns a list of grade data broken down by subsection
-        and a dictionary containing aggregate grade data by subsection format for the course.
+        Given a course_grade and a list of graded subsections for a given course,
+        returns a list of grade data broken down by subsection.
 
         Args:
+            course: A Course Descriptor object
+            graded_subsections: A list of graded subsection objects in the given course.
             course_grade: A CourseGrade object.
         """
         breakdown = []
-        aggregates = defaultdict(lambda: defaultdict(float))
-
-        # TODO: https://openedx.atlassian.net/browse/EDUCATOR-3559
-        # Fields we may not need:
-        # ['are_grades_published', 'auto_grade', 'comment', 'detail', 'is_ag', 'is_average', 'is_manually_graded']
-        # Some fields should be renamed:
-        # 'displayed_value' should maybe be 'description_percent'
-        # 'grade_description' should be 'description_ratio'
-
-        label_finder = SubsectionLabelFinder(course_grade)
         default_labeler = get_default_short_labeler(course)
 
-        for chapter_location, section_data in course_grade.chapter_grades.items():
-            for subsection_grade in section_data['sections']:
-                default_short_label = default_labeler(subsection_grade.format)
-                breakdown.append({
-                    'are_grades_published': True,
-                    'auto_grade': False,
-                    'category': subsection_grade.format,
-                    'chapter_name': section_data['display_name'],
-                    'comment': '',
-                    'detail': '',
-                    'displayed_value': '{:.2f}'.format(subsection_grade.percent_graded),
-                    'is_graded': subsection_grade.graded,
-                    'grade_description': '({earned:.2f}/{possible:.2f})'.format(
-                        earned=subsection_grade.graded_total.earned,
-                        possible=subsection_grade.graded_total.possible,
-                    ),
-                    'is_ag': False,
-                    'is_average': False,
-                    'is_manually_graded': False,
-                    'label': label_finder.get_label(subsection_grade.display_name) or default_short_label,
-                    'letter_grade': course_grade.letter_grade,
-                    'module_id': text_type(subsection_grade.location),
-                    'percent': subsection_grade.percent_graded,
-                    'score_earned': subsection_grade.graded_total.earned,
-                    'score_possible': subsection_grade.graded_total.possible,
-                    'section_block_id': text_type(chapter_location),
-                    'subsection_name': subsection_grade.display_name,
-                })
-                if subsection_grade.graded and subsection_grade.graded_total.possible > 0:
-                    aggregates[subsection_grade.format]['score_earned'] += subsection_grade.graded_total.earned
-                    aggregates[subsection_grade.format]['score_possible'] += subsection_grade.graded_total.possible
+        for subsection in graded_subsections:
+            subsection_grade = course_grade.subsection_grade(subsection.location)
+            short_label = default_labeler(subsection_grade.format)
 
-        return breakdown, aggregates
+            graded_description = 'Not Attempted'
+            score_earned = 0
+            score_possible = 0
 
-    def _gradebook_entry(self, user, course, course_grade):
+            # For ZeroSubsectionGrades, we don't want to crawl the subsection's
+            # subtree to find the problem scores specific to this user
+            # (ZeroSubsectionGrade.attempted_graded is always False).
+            # We've already fetched the whole course structure in a non-specific way
+            # when creating `graded_subsections`.  Looking at the problem scores
+            # specific to this user (the user in `course_grade.user`) would require
+            # us to re-fetch the user-specific course structure from the modulestore,
+            # which is a costly operation.
+            if subsection_grade.attempted_graded:
+                graded_description = '({earned:.2f}/{possible:.2f})'.format(
+                    earned=subsection_grade.graded_total.earned,
+                    possible=subsection_grade.graded_total.possible,
+                )
+                score_earned = subsection_grade.graded_total.earned
+                score_possible = subsection_grade.graded_total.possible
+
+            # TODO: https://openedx.atlassian.net/browse/EDUCATOR-3559 -- Some fields should be renamed, others removed:
+            # 'displayed_value' should maybe be 'description_percent'
+            # 'grade_description' should be 'description_ratio'
+            breakdown.append({
+                'category': subsection_grade.format,
+                'displayed_value': '{:.2f}'.format(subsection_grade.percent_graded),
+                'is_graded': subsection_grade.graded,
+                'grade_description': graded_description,
+                'label': short_label,
+                'letter_grade': course_grade.letter_grade,
+                'module_id': text_type(subsection_grade.location),
+                'percent': subsection_grade.percent_graded,
+                'score_earned': score_earned,
+                'score_possible': score_possible,
+                'subsection_name': subsection_grade.display_name,
+            })
+        return breakdown
+
+    def _gradebook_entry(self, user, course, graded_subsections, course_grade):
         """
         Returns a dictionary of course- and subsection-level grade data for
         a given user in a given course.
@@ -640,13 +592,13 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
         Args:
             user: A User object.
             course: A Course Descriptor object.
+            graded_subsections: A list of graded subsections in the given course.
             course_grade: A CourseGrade object.
         """
         user_entry = self._serialize_user_grade(user, course.id, course_grade)
-        breakdown, aggregates = self._section_breakdown(course, course_grade)
+        breakdown = self._section_breakdown(course, graded_subsections, course_grade)
 
         user_entry['section_breakdown'] = breakdown
-        user_entry['aggregates'] = aggregates
         user_entry['progress_page_url'] = reverse(
             'student_progress',
             kwargs=dict(course_id=text_type(course.id), student_id=user.id)
@@ -671,11 +623,17 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
         course_key = get_course_key(request, course_id)
         course = get_course_with_access(request.user, 'staff', course_key, depth=None)
 
+        # We fetch the entire course structure up-front, and use this when iterating
+        # over users to determine their subsection grades.  We purposely avoid fetching
+        # the user-specific course structure for each user, because that is very expensive.
+        course_data = CourseData(user=None, course=course)
+        graded_subsections = list(graded_subsections_for_course(course_data.collected_structure))
+
         if request.GET.get('username'):
             with self._get_user_or_raise(request, course_key) as grade_user:
                 course_grade = CourseGradeFactory().read(grade_user, course)
 
-            entry = self._gradebook_entry(grade_user, course, course_grade)
+            entry = self._gradebook_entry(grade_user, course, graded_subsections, course_grade)
             serializer = StudentGradebookEntrySerializer(entry)
             return Response(serializer.data)
         else:
@@ -697,12 +655,27 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
             users = self._paginate_users(course_key, filter_kwargs, related_models)
 
             with bulk_gradebook_view_context(course_key, users):
-                for user, course_grade, exc in CourseGradeFactory().iter(users, course_key=course_key):
+                for user, course_grade, exc in CourseGradeFactory().iter(
+                    users, course_key=course_key, collected_block_structure=course_data.collected_structure
+                ):
                     if not exc:
-                        entries.append(self._gradebook_entry(user, course, course_grade))
+                        entries.append(self._gradebook_entry(user, course, graded_subsections, course_grade))
 
             serializer = StudentGradebookEntrySerializer(entries, many=True)
             return self.get_paginated_response(serializer.data)
+
+
+def graded_subsections_for_course(course_structure):
+    """
+    Given a course block structure, yields the subsections of the course that are graded.
+    Args:
+        course_structure: A course structure object.  Not user-specific.
+    """
+    for chapter_key in course_structure.get_children(course_structure.root_block_usage_key):
+        for subsection_key in course_structure.get_children(chapter_key):
+            subsection = course_structure[subsection_key]
+            if subsection.graded:
+                yield subsection
 
 
 GradebookUpdateResponseItem = namedtuple('GradebookUpdateResponseItem', ['user_id', 'usage_id', 'success', 'reason'])

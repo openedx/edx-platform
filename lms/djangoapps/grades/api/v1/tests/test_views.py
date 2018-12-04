@@ -437,6 +437,10 @@ class GradebookViewTestBase(GradeViewTestMixin, APITestCase):
                 ),
             ],
         }
+        cls.course_data = CourseData(None, course=cls.course)
+        # we have to force the collection of course data from the block_structure API
+        # so that CourseGrade.course_data objects can later have a non-null effective_structure
+        _ = cls.course_data.collected_structure
 
     def get_url(self, course_key=None):
         """
@@ -462,6 +466,40 @@ class GradebookViewTest(GradebookViewTestBase):
     """
     Tests for the gradebook view.
     """
+    @classmethod
+    def setUpClass(cls):
+        super(GradebookViewTest, cls).setUpClass()
+        cls.mock_subsection_grades = {
+            cls.subsections[cls.chapter_1.location][0].location: cls.mock_subsection_grade(
+                cls.subsections[cls.chapter_1.location][0],
+                earned_all=1.0,
+                possible_all=2.0,
+                earned_graded=1.0,
+                possible_graded=2.0,
+            ),
+            cls.subsections[cls.chapter_1.location][1].location: cls.mock_subsection_grade(
+                cls.subsections[cls.chapter_1.location][1],
+                earned_all=1.0,
+                possible_all=2.0,
+                earned_graded=1.0,
+                possible_graded=2.0,
+            ),
+            cls.subsections[cls.chapter_2.location][0].location: cls.mock_subsection_grade(
+                cls.subsections[cls.chapter_2.location][0],
+                earned_all=1.0,
+                possible_all=2.0,
+                earned_graded=1.0,
+                possible_graded=2.0,
+            ),
+            cls.subsections[cls.chapter_2.location][1].location: cls.mock_subsection_grade(
+                cls.subsections[cls.chapter_2.location][1],
+                earned_all=1.0,
+                possible_all=2.0,
+                earned_graded=1.0,
+                possible_graded=2.0,
+            ),
+        }
+
     def get_url(self, course_key=None, username=None, username_contains=None):  # pylint: disable=arguments-differ
         """
         Helper function to create the course gradebook API read url.
@@ -473,7 +511,8 @@ class GradebookViewTest(GradebookViewTestBase):
             return "{0}?username_contains={1}".format(base_url, username_contains)
         return base_url
 
-    def mock_subsection_grade(self, subsection, **kwargs):
+    @staticmethod
+    def mock_subsection_grade(subsection, **kwargs):
         """
         Helper function to mock a subsection grade.
         """
@@ -485,48 +524,8 @@ class GradebookViewTest(GradebookViewTestBase):
         """
         Helper function to return a mock CourseGrade object.
         """
-        course_data = CourseData(user, course=self.course)
-        course_grade = CourseGrade(user=user, course_data=course_data, **kwargs)
-        course_grade.chapter_grades = OrderedDict([
-            (self.chapter_1.location, {
-                'sections': [
-                    self.mock_subsection_grade(
-                        self.subsections[self.chapter_1.location][0],
-                        earned_all=1.0,
-                        possible_all=2.0,
-                        earned_graded=1.0,
-                        possible_graded=2.0,
-                    ),
-                    self.mock_subsection_grade(
-                        self.subsections[self.chapter_1.location][1],
-                        earned_all=1.0,
-                        possible_all=2.0,
-                        earned_graded=1.0,
-                        possible_graded=2.0,
-                    ),
-                ],
-                'display_name': 'Chapter 1',
-            }),
-            (self.chapter_2.location, {
-                'sections': [
-                    self.mock_subsection_grade(
-                        self.subsections[self.chapter_2.location][0],
-                        earned_all=1.0,
-                        possible_all=2.0,
-                        earned_graded=1.0,
-                        possible_graded=2.0,
-                    ),
-                    self.mock_subsection_grade(
-                        self.subsections[self.chapter_2.location][1],
-                        earned_all=1.0,
-                        possible_all=2.0,
-                        earned_graded=1.0,
-                        possible_graded=2.0,
-                    ),
-                ],
-                'display_name': 'Chapter 2',
-            }),
-        ])
+        course_grade = CourseGrade(user=user, course_data=self.course_data, **kwargs)
+        course_grade.subsection_grade = lambda key: self.mock_subsection_grades[key]
         return course_grade
 
     def expected_subsection_grades(self, letter_grade=None):
@@ -535,91 +534,55 @@ class GradebookViewTest(GradebookViewTestBase):
         """
         return [
             OrderedDict([
-                ('are_grades_published', True),
-                ('auto_grade', False),
                 ('category', 'Homework'),
-                ('chapter_name', 'Chapter 1'),
-                ('comment', ''),
-                ('detail', ''),
                 ('displayed_value', '0.50'),
                 ('is_graded', True),
                 ('grade_description', '(1.00/2.00)'),
-                ('is_ag', False),
-                ('is_average', False),
-                ('is_manually_graded', False),
                 ('label', 'HW 01'),
                 ('letter_grade', letter_grade),
                 ('module_id', text_type(self.subsections[self.chapter_1.location][0].location)),
                 ('percent', 0.5),
                 ('score_earned', 1.0),
                 ('score_possible', 2.0),
-                ('section_block_id', text_type(self.chapter_1.location)),
                 ('subsection_name', 'HW 1')
             ]),
             OrderedDict([
-                ('are_grades_published', True),
-                ('auto_grade', False),
                 ('category', 'Lab'),
-                ('chapter_name', 'Chapter 1'),
-                ('comment', ''),
-                ('detail', ''),
                 ('displayed_value', '0.50'),
                 ('is_graded', True),
                 ('grade_description', '(1.00/2.00)'),
-                ('is_ag', False),
-                ('is_average', False),
-                ('is_manually_graded', False),
                 ('label', 'Lab 01'),
                 ('letter_grade', letter_grade),
                 ('module_id', text_type(self.subsections[self.chapter_1.location][1].location)),
                 ('percent', 0.5),
                 ('score_earned', 1.0),
                 ('score_possible', 2.0),
-                ('section_block_id', text_type(self.chapter_1.location)),
                 ('subsection_name', 'Lab 1')
             ]),
             OrderedDict([
-                ('are_grades_published', True),
-                ('auto_grade', False),
                 ('category', 'Homework'),
-                ('chapter_name', 'Chapter 2'),
-                ('comment', ''),
-                ('detail', ''),
                 ('displayed_value', '0.50'),
                 ('is_graded', True),
                 ('grade_description', '(1.00/2.00)'),
-                ('is_ag', False),
-                ('is_average', False),
-                ('is_manually_graded', False),
                 ('label', 'HW 02'),
                 ('letter_grade', letter_grade),
                 ('module_id', text_type(self.subsections[self.chapter_2.location][0].location)),
                 ('percent', 0.5),
                 ('score_earned', 1.0),
                 ('score_possible', 2.0),
-                ('section_block_id', text_type(self.chapter_2.location)),
                 ('subsection_name', 'HW 2')
             ]),
             OrderedDict([
-                ('are_grades_published', True),
-                ('auto_grade', False),
                 ('category', 'Lab'),
-                ('chapter_name', 'Chapter 2'),
-                ('comment', ''),
-                ('detail', ''),
                 ('displayed_value', '0.50'),
                 ('is_graded', True),
                 ('grade_description', '(1.00/2.00)'),
-                ('is_ag', False),
-                ('is_average', False),
-                ('is_manually_graded', False),
                 ('label', 'Lab 02'),
                 ('letter_grade', letter_grade),
                 ('module_id', text_type(self.subsections[self.chapter_2.location][1].location)),
                 ('percent', 0.5),
                 ('score_earned', 1.0),
                 ('score_possible', 2.0),
-                ('section_block_id', text_type(self.chapter_2.location)),
                 ('subsection_name', 'Lab 2')
             ]),
         ]
@@ -644,16 +607,6 @@ class GradebookViewTest(GradebookViewTestBase):
                     kwargs=dict(course_id=text_type(self.course.id), student_id=self.student.id)
                 )),
                 ('section_breakdown', self.expected_subsection_grades(letter_grade='A')),
-                ('aggregates', {
-                    'Lab': {
-                        'score_earned': 2.0,
-                        'score_possible': 4.0,
-                    },
-                    'Homework': {
-                        'score_earned': 2.0,
-                        'score_possible': 4.0,
-                    },
-                }),
             ]),
             OrderedDict([
                 ('course_id', text_type(self.course.id)),
@@ -669,16 +622,6 @@ class GradebookViewTest(GradebookViewTestBase):
                     kwargs=dict(course_id=text_type(self.course.id), student_id=self.other_student.id)
                 )),
                 ('section_breakdown', self.expected_subsection_grades()),
-                ('aggregates', {
-                    'Lab': {
-                        'score_earned': 2.0,
-                        'score_possible': 4.0,
-                    },
-                    'Homework': {
-                        'score_earned': 2.0,
-                        'score_possible': 4.0,
-                    },
-                }),
             ]),
         ]
 
@@ -786,16 +729,6 @@ class GradebookViewTest(GradebookViewTestBase):
                         kwargs=dict(course_id=text_type(self.course.id), student_id=self.student.id)
                     )),
                     ('section_breakdown', self.expected_subsection_grades(letter_grade='A')),
-                    ('aggregates', {
-                        'Lab': {
-                            'score_earned': 2.0,
-                            'score_possible': 4.0,
-                        },
-                        'Homework': {
-                            'score_earned': 2.0,
-                            'score_possible': 4.0,
-                        },
-                    }),
                 ])
 
                 self.assertEqual(status.HTTP_200_OK, resp.status_code)
@@ -828,16 +761,6 @@ class GradebookViewTest(GradebookViewTestBase):
                             kwargs=dict(course_id=text_type(self.course.id), student_id=self.other_student.id)
                         )),
                         ('section_breakdown', self.expected_subsection_grades(letter_grade='A')),
-                        ('aggregates', {
-                            'Lab': {
-                                'score_earned': 2.0,
-                                'score_possible': 4.0,
-                            },
-                            'Homework': {
-                                'score_earned': 2.0,
-                                'score_possible': 4.0,
-                            },
-                        }),
                     ]),
                 ]
 
@@ -889,16 +812,6 @@ class GradebookViewTest(GradebookViewTestBase):
                             kwargs=dict(course_id=text_type(self.course.id), student_id=self.student.id)
                         )),
                         ('section_breakdown', self.expected_subsection_grades(letter_grade='A')),
-                        ('aggregates', {
-                            'Lab': {
-                                'score_earned': 2.0,
-                                'score_possible': 4.0,
-                            },
-                            'Homework': {
-                                'score_earned': 2.0,
-                                'score_possible': 4.0,
-                            },
-                        }),
                     ]),
                 ]
 
@@ -956,91 +869,6 @@ class GradebookViewTest(GradebookViewTestBase):
                     self.get_url(course_key=self.course.id) + '?enrollment_mode={}'.format(CourseMode.VERIFIED)
                 )
                 self._assert_empty_response(resp)
-
-    def test_ungraded_subsection(self):
-        """
-        Tests that an ungraded subsection is returned with the response data, and that the default
-        subsection label is returned (since no short label is generated for ungraded content).
-        """
-        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
-            course_grade = self.mock_course_grade(self.student, passed=True, letter_grade='A', percent=0.85)
-            ungraded_subsection = ItemFactory.create(
-                category='sequential',
-                parent_location=self.chapter_2.location,
-                due=datetime(2017, 12, 18, 11, 30, 00),
-                display_name='HW 3',
-                format='Homework',
-                graded=False,
-            )
-            subsection_grade = self.mock_subsection_grade(
-                ungraded_subsection,
-                earned_all=0.0,
-                possible_all=1.0,
-                earned_graded=0.0,
-                possible_graded=0.0,
-            )
-            course_grade.chapter_grades[self.chapter_2.location]['sections'].append(subsection_grade)
-            mock_grade.return_value = course_grade
-
-            with override_waffle_flag(self.waffle_flag, active=True):
-                self.login_staff()
-                resp = self.client.get(
-                    self.get_url(course_key=self.course.id, username=self.student.username)
-                )
-
-                expected_subsection_breakdown = self.expected_subsection_grades(letter_grade='A')
-                expected_subsection_breakdown.append(OrderedDict([
-                    ('are_grades_published', True),
-                    ('auto_grade', False),
-                    ('category', 'Homework'),
-                    ('chapter_name', 'Chapter 2'),
-                    ('comment', ''),
-                    ('detail', ''),
-                    ('displayed_value', '0.00'),
-                    ('is_graded', False),
-                    ('grade_description', '(0.00/0.00)'),
-                    ('is_ag', False),
-                    ('is_average', False),
-                    ('is_manually_graded', False),
-                    ('label', 'HW 03'),
-                    ('letter_grade', 'A'),
-                    ('module_id', text_type(ungraded_subsection.location)),
-                    ('percent', 0.0),
-                    ('score_earned', 0.0),
-                    ('score_possible', 0.0),
-                    ('section_block_id', text_type(self.chapter_2.location)),
-                    ('subsection_name', 'HW 3')
-                ]))
-
-                expected_results = OrderedDict([
-                    ('course_id', text_type(self.course.id)),
-                    ('email', self.student.email),
-                    ('user_id', self.student.id),
-                    ('username', self.student.username),
-                    ('full_name', self.student.get_full_name()),
-                    ('passed', True),
-                    ('percent', 0.85),
-                    ('letter_grade', 'A'),
-                    ('progress_page_url', reverse(
-                        'student_progress',
-                        kwargs=dict(course_id=text_type(self.course.id), student_id=self.student.id)
-                    )),
-                    ('section_breakdown', expected_subsection_breakdown),
-                    ('aggregates', {
-                        'Lab': {
-                            'score_earned': 2.0,
-                            'score_possible': 4.0,
-                        },
-                        'Homework': {
-                            'score_earned': 2.0,
-                            'score_possible': 4.0,
-                        },
-                    }),
-                ])
-
-                self.assertEqual(status.HTTP_200_OK, resp.status_code)
-                actual_data = dict(resp.data)
-                self.assertEqual(expected_results, actual_data)
 
     @ddt.data(None, 2, 3, 10, 60, 80)
     def test_page_size_parameter(self, page_size):
