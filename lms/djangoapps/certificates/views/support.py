@@ -11,6 +11,7 @@ from functools import wraps
 from django.db import transaction
 from django.db.models import Q
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseServerError
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_GET, require_POST
 from opaque_keys import InvalidKeyError
@@ -120,27 +121,32 @@ def search_certificates(request):
 
 @require_GET
 def verify_certificates(request, certificate_uuid):
-    certificate = GeneratedCertificate.eligible_certificates.get(
-        verify_uuid=certificate_uuid,
-        status=CertificateStatuses.downloadable
-    )
 
     try:
+        certificate = GeneratedCertificate.eligible_certificates.get(
+            verify_uuid=certificate_uuid,
+            status=CertificateStatuses.downloadable
+        )
         co = CourseOverview.objects.get(id=certificate.course_id)
+        context = {
+            'verify_id': certificate.verify_uuid,
+            'mode': certificate.mode,
+            'issue_date': certificate.modified_date,
+            'learner': certificate.name,
+            'org': co.org,
+            'start_date': co.start,
+            'end_date': co.end,
+            'name': co.display_name,
+            'cert_web_url': reverse('certificates:render_cert_by_uuid',
+                                    kwargs={'certificate_uuid': certificate.verify_uuid})
+        }
+
+        return render_to_response("certificates/verify.html", context)
+    except GeneratedCertificate.DoesNotExist:
+        raise Http404("Certificate not found.")
+
     except CourseOverview.DoesNotExist:
         raise Http404("Course not found.")
-
-    context = {
-        'verify_id': certificate.verify_uuid,
-        'mode': certificate.mode,
-        'issue_date': certificate.modified_date,
-        'learner': certificate.name,
-        'org': co.org,
-        'start_date': co.start,
-        'end_date': co.end,
-        'name': co.display_name
-    }
-    return render_to_response("certificates/verify.html", context)
 
 
 def _validate_post_params(params):

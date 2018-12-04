@@ -24,8 +24,12 @@
   max-width:100%;
   margin:0 auto;
   padding: 0;
-  background-image: linear-gradient(to bottom, #fff 0%, #fff 45%, #f2f9ff 100%);
+  background-image: none;
 }
+.content-wrapper .main-container{
+  padding: 0 20px 30px;
+}
+
 
 //flex布局
 .window-wrap{  
@@ -34,11 +38,14 @@
   flex-direction: column;
   min-height: 100vh;
 }
+/*
 .wrapper-preview-menu{  
   width: 100%;
 }
+*/
 body.view-in-course .container .course-wrapper, body.view-in-course .profile-wrapper, body.view-in-course .instructor-dashboard-wrapper-2, body.view-in-course .wiki-wrapper, body.view-in-course .teams-wrapper, body.view-in-course .static_tab_wrapper{ 
   max-width: 1200px;
+  margin: 0 auto 50px;
 }
 
 @media screen and (max-width: 576px) {

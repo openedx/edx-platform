@@ -1,0 +1,131 @@
+// http://0.0.0.0:18000/courses/course-v1:EliteU+1234567890+2019-01-02/courseware/562b29597cff46ac908d9d7ee2532c5c/5dfcfe5827674dac86d2b7dd156cc459/1?activate_block_id=block-v1%3AEliteU%2B1234567890%2B2019-01-02%2Btype%40vertical%2Bblock%4082c7e9d72010432dae66f544ff834449
+// 课程内容 问答题
+.wrap-instructor-info.studio-view, .wrap-instructor-info{
+  display: none;
+}
+.course-wrapper .course-content .vert-mod .vert{
+  border-bottom: 1px dashed $border;
+  margin-bottom: 30px;
+  padding: 0 0 30px;
+}
+
+// nav
+.xmodule_display.xmodule_SequenceModule{
+  .sequence-nav ol li{
+    border: 1px solid $border;
+  }
+  .sequence-nav-button{
+    border: 1px solid $border;
+  }
+  .button-previous span:last-child{
+    display: none;
+  }
+  .button-next span:first-child{
+    display: none;
+  }
+} 
+
+
+// 题目标题，分数
+.hd-1, .hd-2, .hd-3, .hd-4, .hd-5, .hd-6, .hd-7, .hd-8{
+  color: $title;
+}
+.hd-3{
+  font-size: 16px;
+  line-height: 1;
+  margin: 20px 0;
+  font-weight: bold;
+}
+.xmodule_display.xmodule_CapaModule div.problem-progress{
+  font-size: 14px;
+  color: $note;
+}
+
+
+.xblock .xmodule_display.xmodule_CapaModule div.problem{
+  // 按钮
+  // submit
+  .action .submit-attempt-container .submit{
+    @extend %btn-my-primary;
+  }
+  .action .submit-attempt-container .submit:hover{
+    @extend %btn-my-primary-hover;
+  }
+
+
+  // notification
+  .notification{
+    margin-top: 0;
+    padding: 0;
+    border: none;
+    .general{
+      border-top: none;
+      font-size: 14px;
+    }
+  }
+  
+  .notification.success .icon, .notification.error .icon{
+    margin-right: 10px;
+  }
+  .notification .notification-message{
+    font-size: 14px;
+  }
+  .choicegroup .indicator-container{
+    display: none;
+  }
+  .action{
+    align-items: end;
+  }
+  .action .problem-action-btn{
+    margin-right: 0;
+    height: 20px;
+  }
+  .action .problem-action-btn .icon{
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 3px;
+  }
+  .capa_inputtype.textline .status{
+    margin-top: 3px;
+  }
+  
+
+
+  // 多选
+  p{
+    font-size: 14px;
+  }
+  .choicegroup label{
+    background: rgba(245, 247, 250, 0.4);
+    border: none;
+    border: 1px solid transparent;
+    font-size: 14px;
+  }
+  .choicegroup label:hover{
+    border: 1px solid $blue;
+  }
+  .choicegroup legend{
+    font-size: 14px;
+  }
+  .choicegroup .status .status-icon{
+    position: absolute;
+    margin-left: 5px;
+    margin-top: -1px;
+  }
+  
+  // 填空题
+  .capa_inputtype.textline input{
+    height: 34px;
+    font-size: 14px;
+    border: 1px solid #f3f5f7;
+    min-width: 260px;
+    box-shadow: none;
+  }
+  .capa_inputtype.textline .status{
+    margin-top: 6px;
+  }
+  div p.answer{
+    position: relative;
+    top: -5px;
+  }
+}

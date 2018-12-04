@@ -1,0 +1,133 @@
+// http://0.0.0.0:18000/courses/course-v1:EliteU+1234567890+2019-01-02/wiki/EliteU.1234567890.2019-01-02/
+// 课程维基 wiki
+
+
+body.view-in-course .wiki-wrapper{
+  box-shadow: 0px 1px 4px 0px $border;
+  border: none;
+  max-width: 1200px;
+}
+
+// header
+.container .wiki-wrapper section.wiki .breadcrumbs-header{
+  padding: 10px 25px;
+  border-bottom: 1px solid $border-gray;
+
+  .breadcrumb{
+    margin: 0;
+  }
+  .breadcrumb li a{
+    font-size: 14px;
+  }
+  .breadcrumb li:after{
+    line-height: 30px;
+    font-size: 20px;
+    font-size: 20px;
+    color: #ccd1d9;
+    line-height: 30px;
+  }
+  .breadcrumb .active a{
+    color: $font;
+  }
+}
+.wiki-wrapper section.wiki .global-functions{
+  margin:0;
+}
+.container .wiki-wrapper #main section.wiki a.add-article-btn{
+  @extend %btn-my-primary;
+  margin: 0;
+  border: none;
+  height: auto;
+  line-height: 1.5;
+  text-shadow: none;
+}
+.container .wiki-wrapper #main section.wiki a.add-article-btn:hover{
+  @extend %btn-my-primary-hover;
+  color: #fff;
+}
+
+
+// sidebar
+.container .wiki-wrapper section.wiki{
+  .nav-tabs{
+    height: auto;
+  }
+  .nav-tabs li{
+    float: none;
+    display: inline-block;
+    margin: 5px 0;
+    min-width: 100px;
+  }
+  .nav-tabs li.active a{
+    color: $blue;
+    border: none;
+    background: #f7fbfe;
+  }
+  .nav-tabs a{
+    padding: 3px 0;
+  }
+  .nav-tabs a .icon{
+    margin: 2px 0 0 0;
+    padding: 0 2px 0 5px;
+  }
+  .article-functions{
+    padding: 20px 0 20px 20px;
+  }
+  .article-functions .timestamp{
+    border-top: none;
+  }
+  .article-functions .timestamp .date{
+    font-size: 14px;
+    border-top: none;
+  }
+  .article-functions .see-children a{
+    font-size: 16px;
+  }
+}
+
+// content
+.wiki-wrapper section.wiki.view .main-article{
+  padding: 25px 0 40px 25px;
+  h3{
+    margin: 10px 0;
+    border: none;
+    font-weight: normal;
+    font-size: 16px;
+    color: $title;
+  }
+  .wiki-article{
+    font-size: 14px;
+    color: $font;
+  }
+}
+
+
+// add a wiki 
+.wiki-wrapper section.wiki .main-article{
+  padding: 0;
+  width: 100%;
+  padding: 10px 30px;
+
+  h1{
+    line-height: 35px;
+    font-weight: normal;
+  }
+  #hint_id_slug, #hint_id_summary{
+    font-size: 14px;
+  }
+  .form-horizontal{
+    padding: 0 30px 40px;
+  }
+  .btn.btn-primary{
+    @extend %btn-my-primary;
+  }
+  .btn.btn-primary-hover{
+    @extend %btn-my-primary-hover;
+  }
+  .btn{
+    @extend %btn-my-white;
+  }
+  .btn:hover{
+    @extend %btn-my-white-hover;
+  }
+}
