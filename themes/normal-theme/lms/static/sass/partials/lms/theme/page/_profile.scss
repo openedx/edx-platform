@@ -1,16 +1,6 @@
-/* Profile
-.content-wrapper{ 
-  padding-bottom: 20px;
-}
-*/
-.view-profile .content-wrapper{ 
-  // margin-top: 20px;
-  margin-bottom: 20px;
-}
-.profile.profile-self{ 
-  max-width: 1200px;
-  margin: 0 auto;
-}
+// http://0.0.0.0:18000/u/edx profile页
+/*
+
 
 //mobile页面
 @include media-breakpoint-down(sm){ 
@@ -65,5 +55,171 @@
   }
   .wrapper-profile-section-container-one .wrapper-profile-section-one{  
     padding-bottom: 10px;
+  }
+}
+*/
+.view-profile .content-wrapper{
+  margin-bottom: 0;
+}
+.view-profile .wrapper-profile{
+  background: none;
+  padding-bottom: 40px;
+  min-height: 0;
+}
+.profile.profile-self{ 
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.u-field.editable-toggle.mode-display:hover{
+  background: rgba(182,220,254,0.1);
+}
+
+// profile visibility
+.view-profile .profile-self .wrapper-profile-field-account-privacy{
+  border: 1px solid $border;
+  background: rgba(182, 220, 254, 0.1);
+  margin-top: 20px;
+  box-sizing: border-box;
+  padding: 8px 20px;
+
+  .wrapper-profile-records button,.u-field-account_privacy .btn-change-privacy{
+    @extend %btn-my-primary;
+  }
+  .wrapper-profile-records button:hover,.u-field-account_privacy .btn-change-privacy:hover{
+    @extend %btn-my-primary-hover;
+  }
+  .u-field-title{
+    color: $blue;
+    font-weight: normal;
+    vertical-align: inherit;
+  }
+  .u-field-value{
+    vertical-align: inherit;
+  }
+}
+
+
+// profile header
+.view-profile .profile-header{
+  max-width: 1200px;
+  padding: 30px 0 15px;
+
+  .header{
+    color: $title;
+    font-size: 16px;
+    margin: 0;
+    font-weight: normal;
+  }
+  .subheader{
+    color: $font;
+    font-size: 14px;
+  }
+}
+
+
+// profile container
+.view-profile{
+  .wrapper-profile-sections{
+    padding: 0;
+  }
+
+  .wrapper-profile-section-container-one .wrapper-profile-section-one{
+    border: 1px solid $border;
+    text-align: center;
+
+    .profile-section-one-fields .u-field .u-field-title{
+      text-align: center;
+      color: $title;
+    }
+    .profile-section-one-fields .u-field{
+      padding: 10px 0;
+    }
+    .profile-section-one-fields>.u-field:first-child{
+      padding: 0;
+      font-size: 16px;
+      color: $title;
+      font-weight: bold;
+    }
+    .profile-section-one-fields .u-field:not(.u-field-readonly):not(:last-child){
+      padding-bottom: 15px;
+    }
+
+    .profile-section-one-fields .u-field.u-field-dropdown:not(.editable-never){
+      margin-top: 0;
+    }
+
+    // image
+    .profile-image-field .image-wrapper{
+      width: 80px;
+    }
+    .profile-image-field .image-wrapper .image-frame{
+      width: 80px;
+      height: 80px;
+      margin-top: 15px;
+    }
+    .profile-image-field .image-wrapper .u-field-upload-button{
+      width: 80px;
+      height: 80px;
+      top: 1px;
+      left: 1px;
+    }
+    .profile-image-field .image-wrapper .upload-button-title{
+      font-size: 12px;
+      transform: translateY(15px);
+    }
+    .profile-image-field .image-wrapper .upload-button-icon{
+      transform: translateY(15px)
+    }
+  }
+
+
+  .wrapper-profile-section-container-two{
+    padding-left: 30px;
+
+    .wrapper-u-field .u-field-header .u-field-title,.u-field-title{
+      font-size: 16px;
+      color: $title;
+      font-weight: normal;
+    }
+    .u-field-value{
+      color: $font;
+      font-size: 14px;
+    }
+    .learner-achievements .learner-message{
+      border: 1px solid #e6e9ed;
+      background: #fff;
+      box-shadow: none;
+    }
+    .learner-achievements .learner-message .message-header{
+      font-size: 16px;
+      color: $font;
+    }
+    .learner-achievements .learner-message .message-actions .btn-brand{
+      @extend %btn-my-primary;
+    }
+    .learner-achievements .learner-message .message-actions .btn-brand:hover{
+      @extend %btn-my-primary-hover;
+    }
+    .u-field-value textarea{
+      border: 1px solid #e6e9ed;
+      background: #fff;
+      padding: 10px;
+      border-radius: 0;
+    }
+    .wrapper-u-field {
+      color: $font;
+      font-size: 14px;
+    }
+    .u-field.mode-placeholder{
+      border: 1px solid #e6e9ed;
+      margin: 0 0 25px 0;
+    }
+    .u-field.mode-placeholder span{
+      margin-right: 8px;
+    }
+    .u-field.mode-placeholder:hover{
+      border: 1px solid $border;
+    }
+    
   }
 }

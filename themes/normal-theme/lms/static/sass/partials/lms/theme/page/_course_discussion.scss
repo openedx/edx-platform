@@ -10,9 +10,6 @@
 
 // header
 .content-wrapper .discussion-board >.page-header{
-  padding: 10px 15px;
-  border-bottom: 1px solid $border;
-
   .has-breadcrumbs .breadcrumbs{
     margin-bottom: 0;
   }
@@ -26,7 +23,7 @@
     order: -1;
   }
   .forum-search .search-input{
-    height: 38px;
+    height: 36px;
     line-height: 0;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
@@ -85,6 +82,9 @@
   }
 
   // 介绍 how to use
+  .view-discussion-home{
+    display: block;
+  }
   .view-discussion-home section{
     border-bottom: 1px solid #e6e9ed;
   }
