@@ -1,8 +1,7 @@
 <style media="print">
         @page {
-            margin: 0mm;
-            
-        }       
+            margin: 0mm;    
+        }  
 </style>
 
 <script type="text/javascript">
@@ -13,4 +12,17 @@
        event.preventDefault();
        window.print();
     }
+</script>
+<script src="/static/normal-theme/js/certificates/qrcode.js"></script>
+<script>
+    var test = document.getElementById("test");
+    var data = {    
+        text: "http://www.baidu.com",
+        width: 78,
+        height: 78,
+        colorDark : "#000000",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
+    }
+    var qrcode = new QRCode("test", data);
 </script>
