@@ -34,7 +34,7 @@
 
 .validate-dec-line{ 
   max-width: 600px;
-  padding: 18px;
+  padding: 0 18px;
   height: 3px;
   margin: 0 auto;
     div:nth-of-type(1),.validate-dec-line div:nth-of-type(3){ 
@@ -63,6 +63,7 @@
     overflow: hidden;
     padding: 0 18px;
     box-sizing: border-box;
+    font-size: 14px;
   } 
   .validate-dec li:last-child{  
     border-bottom:1px solid #b6dcfe; 
