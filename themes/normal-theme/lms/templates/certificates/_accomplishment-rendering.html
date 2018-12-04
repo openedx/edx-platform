@@ -59,8 +59,7 @@ course_mode_class = course_mode if course_mode else ''
                                 % for signatory in certificate_data.get('signatories', []):
                                     <li>
                                         <span>${signatory['name']}</span>
-                                        <!-- <img class="" src="${static.url(signatory['signature_image_path'])}" alt="${signatory['name']}"> -->
-                                        <img class="pro-img" src="/static/certificates/images/dome-sif1.png" alt="${signatory['name']}">
+                                        <img class="pro-img" src="${signatory['signature_image_path']}" alt="${signatory['name']}">
                                         
                                     </li>
                                 % endfor
