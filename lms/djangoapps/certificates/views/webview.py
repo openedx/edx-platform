@@ -340,8 +340,7 @@ def _get_user_certificate(request, user, course_key, course, preview_mode=None):
     user_certificate = None
     if preview_mode:
         # certificate is being previewed from studio
-        # if has_access(request.user, 'instructor', course) or has_access(request.user, 'staff', course):
-        if True:
+        if has_access(request.user, 'instructor', course) or has_access(request.user, 'staff', course):
             if course.certificate_available_date and not course.self_paced:
                 modified_date = course.certificate_available_date
             else:
