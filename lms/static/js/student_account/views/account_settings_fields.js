@@ -429,7 +429,8 @@
                         orderDate: this.options.orderDate,
                         receiptUrl: this.options.receiptUrl,
                         valueAttribute: this.options.valueAttribute,
-                        lines: this.options.lines
+                        lines: this.options.lines,
+                        currency: this.options.currency
                     }));
                     this.delegateEvents();
                     return this;

@@ -18,6 +18,9 @@
     padding: 12px 22px;
     border-bottom: 1px solid  #f5f7fa;
 }
+.account-settings-sections .account-nav .account-nav-link.active{
+    color: #346ca3;
+}
 .account-settings-sections .account-nav .account-nav-link{
     background: #fff;
     border: none;
@@ -91,12 +94,21 @@
     box-sizing: border-box;
     height: 34px;
 }
+.account-settings-sections .section .account-settings-section-body .u-field.u-field-dropdown .u-field-value, .account-settings-sections .section .account-settings-section-body .u-field.editable-never .account-settings-sections .section .account-settings-section-body .u-field.mode-display .u-field-value{
+    margin-bottom: 0;
+}
+.account-settings-sections .section .account-settings-section-body .u-field.u-field-dropdown .u-field-value .u-field-title, .account-settings-sections .section .account-settings-section-body .u-field.editable-never .account-settings-sections .section .account-settings-section-body .u-field.mode-display .u-field-value .u-field-title{
+    margin-bottom: 15px;
+}
+
+
 .account-settings-sections .section .account-settings-section-body .u-field .field .u-field-link{
     background-color: #b6dcfe;
 	border-radius: 2px;
     border: solid 1px #4788c7;
     font-size: 14px;
     color: #346ca3;
+    padding: 7.5px 14px;
 }
 .account-settings-sections .section .account-settings-section-body .u-field .field select{
     padding: 0 30px 0 15px;
@@ -114,27 +126,81 @@
         font-weight: bold;
     }
 }
-.account-settings-sections .u-field-value.field{
-    // margin: 0;
-    // box-shadow: 0px 1px 4px 0px #b6dcfe;
-    // background-color: rgba(182, 220, 254, 0.1);
-    // text-align: center;
+.account-settings-sections #accountsTabSections-tabpanel .u-field-value.field{
+    margin: 0;
+    box-shadow: 0px 1px 4px 0px #b6dcfe;
+    background-color: rgba(182, 220, 254, 0.1);
+    text-align: center;
     
     .u-field-social-help{
         color: $font;
         font-size: 14px;
+        min-height: 70px;
+        display: inline-block;
     }
     .u-field-link{
         color: #346ca3;
         text-align: center;
     }
-    .social-field-unlinked .u-field-link{
-        background-color: #ffffff;
-        border-radius: 3px;
-        border: solid 1px #4788c7;
+   
+}
+.account-settings-sections #accountsTabSections-tabpanel{
+    .social-field-unlinked {
+        padding: 35px 30px;
+        .u-field-link{
+            background-color: #ffffff;
+            border-radius: 3px;
+            border: solid 1px #4788c7;
+        }
     }
 }
 #accountsTabSections-tabpanel .section-header{
     padding-top: 22px;
     color: #2e313c;
+}
+.account-settings-sections #ordersTabSections-tabpanel  span.u-field-order-link{
+    position: absolute;
+    right: 20px;
+    cursor: pointer;
+    a.u-field-link {
+        @extend %btn-my-primary;
+        height: 20px;
+        line-height: 20px;
+        box-sizing: content-box;
+        padding: 8px 15px;
+        width: 100%;
+    }
+    a.u-field-link:hover{
+        @extend %btn-my-primary-hover;
+    }
+}
+.account-settings-sections #ordersTabSections-tabpanel .section .account-settings-section-body .u-field .u-field-order span{
+    padding: 0 20px;
+    color: #2e313c;
+}
+
+.account-settings-sections #ordersTabSections-tabpanel .section .account-settings-section-body .u-field .u-field-order .u-field-order-lines span{
+    padding: 0 20px;
+    color: #656d78
+}
+.account-settings-sections #ordersTabSections-tabpanel .section .account-settings-section-body .u-field .u-field-order-lines .u-field-order-number{
+    padding: 10px 20px 20px 20px;
+}
+
+.account-settings-sections #ordersTabSections-tabpanel .section .account-settings-section-body .u-field.u-field-order-orderId{
+    border: none;
+    padding-bottom: 18px;
+}
+ .account-settings-sections #ordersTabSections-tabpanel .section .account-settings-section-body .u-field{
+    border: solid 1px #e6e9ed;
+    padding: 0;
+    font-size: 14px;
+    border-radius: 4px;
+}
+.account-settings-sections #ordersTabSections-tabpanel .u-field-order{
+    position: relative;
+    // padding: 12px 0 0 0;
+}
+.account-settings-sections #ordersTabSections-tabpanel .section{
+    padding-bottom: 20px;
 }

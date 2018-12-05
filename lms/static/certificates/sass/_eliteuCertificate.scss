@@ -1,0 +1,173 @@
+.layout-accomplishment.certificate-verified .accomplishment-rendering{  
+  background-size: 1170px 100%;
+  position: relative; 
+  height:51.625rem;
+  border:none; 
+}
+.certificate-content-box{  
+  position: absolute;
+  left: 67px;
+  top: 67px;
+  width: 88.55%;
+  height: 83.55%;
+  background: #fff url('../images/grey-logo.png') center 105px no-repeat;
+  background-size: 50%;
+}
+
+.layout-accomplishment .accomplishment-rendering .accomplishment-type{ 
+  position: absolute;
+  left: 70px;
+  top: 68px;
+  width: 100%;
+  height: auto;
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-left: 0;
+}
+.accomplishment-rendering .accomplishment-type-symbol{  
+  width:19.63rem;
+  margin-left: 0;
+}
+p.prove,p.pro-name,p.accomplishment-success{   
+  text-align: left;
+  color: #434a54;
+  margin-bottom: 0;
+}
+p.prove{  
+  font-size: 20px;
+  margin-bottom: 25px;
+}
+p.pro-name{    
+  font-size: 36px;
+  margin-bottom: 22px;
+}
+p.accomplishment-success{ 
+  font-size: 20px;
+  margin-bottom: 40px;
+}
+.span-accomplishment-course-name{   
+    color: #205179;
+    font-size: 34px;
+    width:auto;
+    display: inline-block;
+    text-align: left;
+    float:left;
+}
+.span-accomplishment-course-id{ 
+    margin-top: 5px;
+    font-size: 18px;
+    color: #205179;
+    float:left;
+}
+.course-name-line{   
+    height: 3px;
+    width: auto;
+    background: #205179;
+}
+.eliteu-support{ 
+    color: #b0b0b0;
+    font-size: 16px;
+    text-align: left;
+    margin-top: 146px;
+    margin-bottom: 40px;
+}
+.accomplishment-box-right{   
+    position: absolute; 
+    right: 70px;
+    top: 68px;
+    height:100%;
+}
+.verified-end-box{   
+    width: 320px;
+    height: 242px;
+
+}
+.verified-end-box img{  
+    display: block;
+    float: right;
+    width: 193px;
+    height: auto;
+}
+.underwrite{ 
+    position: absolute;
+    bottom: 131px;
+    right: 0px;
+
+}
+.underwrite ul{ 
+    list-style: none;
+    margin-left:  0;
+
+}
+.pro-img{   
+    width: 144px;
+    height: 50px;
+    display: inline-block;
+    border-bottom: 2px solid #ededed;
+}
+
+#code{  
+  position: relative; 
+}
+#code .certificates-mes{    
+  position: absolute; 
+  left: 90px;
+}
+#code .certificates-mes p{    
+  text-align: left;
+  font-size: 12px;
+  margin-bottom: 3px;
+}
+#code .certificates-mes p:nth-of-type(3),#code .certificates-mes p:nth-of-type(4){  
+  color:#b0b0b0;
+}
+
+@media print {  
+  .layout-accomplishment.certificate-verified .accomplishment-rendering{  
+    background: none;
+    height:40rem;
+  }
+  .certificate-content-box{  
+    height: 50%;
+  }
+  .wrapper-accomplishment-metadata{   
+    display: none;
+  }
+  .layout-accomplishment.certificate-verified .accomplishment-rendering{  
+    background: none;
+    height:40rem;      
+  }     
+  .certificate-content-box{  
+    margin: 0 auto;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .accomplishment-box-right{      
+    right: 0px;
+    top: 0px;  
+  }
+
+  .layout-accomplishment .accomplishment-rendering .accomplishment-type{  
+    left: 140px;  
+    /* top值根据实际打印情况进行调整，也要相应的调整背景图片的位置 */
+    top: 90px;
+  }  
+  .accomplishment-box-right{  
+    right: 140px;  
+    /* top值根据实际打印情况进行调整，也要相应的调整背景图片的位置 */  
+    top: 90px;
+  }  
+  .certificate-content-box{   
+    /*调整背景图片的位置 */
+    background-position: center 116px;
+    background-size: 45%;
+  }
+  .layout-accomplishment.certificate-verified .accomplishment-rendering{   
+    height:700px;
+  }
+  .accomplishment-box-right{   
+    height: 630px;
+  }
+}
+
