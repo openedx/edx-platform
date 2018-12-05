@@ -205,7 +205,7 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
     # and enable self-generated certificates for a course.
     # Note: This is hidden for all CCXs
     certs_enabled = CertificateGenerationConfiguration.current().enabled and not hasattr(course_key, 'ccx')
-    if certs_enabled and access['admin']:
+    if certs_enabled and access['instructor']:
         sections.append(_section_certificates(course))
 
     openassessment_blocks = modulestore().get_items(

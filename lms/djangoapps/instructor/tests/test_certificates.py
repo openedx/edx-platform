@@ -14,6 +14,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test.utils import override_settings
 from django.urls import reverse
+from rest_framework import status
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import GlobalStaffFactory
@@ -63,9 +64,9 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
         CertificateGenerationConfiguration.objects.create(enabled=True)
 
     def test_visible_only_to_global_staff(self):
-        # Instructors don't see the certificates section
+        # Instructors see see the certificates section
         self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
-        self._assert_certificates_visible(False)
+        self._assert_certificates_visible(True)
 
         # Global staff can see the certificates section
         self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
@@ -232,15 +233,15 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
     def test_allow_only_global_staff(self, url_name):
         url = reverse(url_name, kwargs={'course_id': self.course.id})
 
-        # Instructors do not have access
+        # Instructors have access
         self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
         response = self.client.post(url)
-        assert response.status_code == 403
+        assert response.status_code == status.HTTP_302_FOUND
 
         # Global staff have access
         self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
         response = self.client.post(url)
-        assert response.status_code == 302
+        assert response.status_code == status.HTTP_302_FOUND
 
     @ddt.data(True, False)
     def test_enable_certificate_generation(self, is_enabled):
@@ -281,11 +282,11 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         )
 
         response = self.client.post(url)
-        assert response.status_code == 403
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
         self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
         response = self.client.post(url)
-        assert response.status_code == 403
+        assert response.status_code == status.HTTP_200_OK
 
     def test_certificate_generation_api_with_global_staff(self):
         """
