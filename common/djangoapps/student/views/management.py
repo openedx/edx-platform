@@ -125,8 +125,8 @@ def csrf_token(context):
     token = context.get('csrf_token', '')
     if token == 'NOTPROVIDED':
         return ''
-    return (u'<div style="display:none"><input type="hidden"'
-            ' name="csrfmiddlewaretoken" value="{}" /></div>'.format(token))
+    return (HTML(u'<div style="display:none"><input type="hidden"'
+            ' name="csrfmiddlewaretoken" value="{}" /></div>').format(token))
 
 
 # NOTE: This view is not linked to directly--it is called from
@@ -910,6 +910,33 @@ def validate_new_email(user, new_email):
 
     if new_email == user.email:
         raise ValueError(_('Old email is the same as the new email.'))
+
+
+def validate_secondary_email(user_profile, new_email):
+    """
+    Enforce valid email addresses.
+    """
+    from openedx.core.djangoapps.user_api.accounts.api import get_email_validation_error, \
+        get_email_existence_validation_error, get_secondary_email_validation_error
+
+    if get_email_validation_error(new_email):
+        raise ValueError(_('Valid e-mail address required.'))
+
+    if user_profile.secondary_email and new_email == user_profile.secondary_email:
+        raise ValueError(_('Old email is the same as the new email.'))
+
+    # Make sure that secondary email address is not same as user's primary email.
+    if new_email == user_profile.user.email:
+        raise ValueError(_('Cannot be same as your sign in email address.'))
+
+    # Make sure that secondary email address is not same as any of the primary emails.
+    message = get_email_existence_validation_error(new_email)
+    if message:
+        raise ValueError(message)
+
+    message = get_secondary_email_validation_error(new_email)
+    if message:
+        raise ValueError(message)
 
 
 def do_email_change_request(user, new_email, activation_key=None):
