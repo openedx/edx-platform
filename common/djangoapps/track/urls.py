@@ -10,6 +10,7 @@ urlpatterns = (
 
     url(r'^event$', 'user_track'),
     url(r'^segmentio/event$', 'segmentio.segmentio_event'),
+    url(r'^segmentio/send/(?P<method>[a-z]+)$', 'segmentio.send_event'),
 )
 
 if settings.FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):

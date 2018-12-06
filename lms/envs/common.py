@@ -611,6 +611,10 @@ USERNAME_PATTERN = r'(?P<username>[\w.@+-]+)'
 
 ############################## EVENT TRACKING #################################
 LMS_SEGMENT_KEY = None
+LMS_SEGMENT_SITE = None
+
+SEGMENT_ORIGINAL_API = 'https://api.segment.io/v1'
+SEGMENT_REPLICATE_API = '/segmentio/send'
 
 # FIXME: Should we be doing this truncation?
 TRACK_MAX_EVENT = 50000

@@ -288,6 +288,7 @@ AWS_SES_REGION_ENDPOINT = ENV_TOKENS.get('AWS_SES_REGION_ENDPOINT', 'email.us-ea
 
 # Note that this is the Studio key for Segment. There is a separate key for the LMS.
 CMS_SEGMENT_KEY = AUTH_TOKENS.get('SEGMENT_KEY')
+CMS_SEGMENT_SITE = AUTH_TOKENS.get('SEGMENT_SITE')
 
 SECRET_KEY = AUTH_TOKENS['SECRET_KEY']
 

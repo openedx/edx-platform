@@ -1,6 +1,13 @@
 """Map new event context values to old top-level field values. Ensures events can be parsed by legacy parsers."""
 
 import json
+import uuid
+import copy
+
+import analytics
+from analytics.client import Client
+
+from openedx.core.djangoapps.site_configuration import helpers
 
 from .transformers import EventTransformerRegistry
 
@@ -108,3 +115,49 @@ class PrefixedEventProcessor(object):
             return
         event.transform()
         return event
+
+
+class DefaultMultipleSegmentClient(object):
+    """
+    Proxy client to call original segment account and site account
+    """
+
+    def __init__(self):
+        self._main_client = self._create_client(analytics.write_key)
+
+    def _create_client(self, write_key):
+        params = {}
+        for param in ['host', 'debug', 'on_error', 'send']:
+            if hasattr(analytics, param):
+                params[param] = getattr(analytics, param)
+        return Client(write_key, **params)
+
+    def __getattr__(self, name, *args, **kwargs):
+        site_client = None
+        site_segment_key = helpers.get_value('SEGMENT_KEY')
+        if site_segment_key:
+            site_client = self._create_client(site_segment_key)
+
+        def proxy(*args, **kwargs):
+            result = getattr(self._main_client, name)(*args, **kwargs)
+
+            if not site_client:
+                return result
+
+            # Replace the message id with a new one if it was set.
+            if 'message_id' in kwargs:
+                kwargs['message_id'] = uuid.uuid4().hex
+
+            # Use site GATI instead of main GATI if it was set.
+            if kwargs.get('context', {}).get('Google Analytics', None):
+                gati = helpers.get_value('GOOGLE_ANALYTICS_TRACKING_ID')
+                kwargs['context'] = copy.deepcopy(kwargs['context'] or {})
+                if gati:
+                    kwargs['context']['Google Analytics']['clientId'] = gati
+                else:
+                    kwargs['context'].pop('Google Analytics', None)
+
+            getattr(site_client, name)(*args, **kwargs)
+            return result
+
+        return proxy
