@@ -14,7 +14,6 @@ from six import text_type
 from lms.djangoapps.badges.utils import badges_enabled
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import errors
-from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled_for_user
 from openedx.core.djangoapps.user_api.models import (
     RetirementState,
     UserPreference,
@@ -148,7 +147,6 @@ class UserReadOnlySerializer(serializers.Serializer):
                         user_profile.social_links.all(), many=True
                     ).data,
                     "extended_profile": get_extended_profile(user_profile),
-                    "secondary_email": user_profile.secondary_email,
                 }
             )
 
@@ -158,10 +156,6 @@ class UserReadOnlySerializer(serializers.Serializer):
             fields = _visible_fields(user_profile, user, self.configuration)
         else:
             fields = self.configuration.get('public_fields')
-
-        # Do not display secondary email input field, if secondary email feature is not enabled for the current user.
-        if 'secondary_email' in fields and not is_secondary_email_feature_enabled_for_user(user):
-            fields.remove('secondary_email')
 
         return self._filter_fields(
             fields,
@@ -204,8 +198,7 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
         model = UserProfile
         fields = (
             "name", "gender", "goals", "year_of_birth", "level_of_education", "country", "social_links",
-            "mailing_address", "bio", "profile_image", "requires_parental_consent", "language_proficiencies",
-            "secondary_email"
+            "mailing_address", "bio", "profile_image", "requires_parental_consent", "language_proficiencies"
         )
         # Currently no read-only field, but keep this so view code doesn't need to know.
         read_only_fields = ()

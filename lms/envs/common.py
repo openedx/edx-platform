@@ -3034,7 +3034,6 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
         "account_privacy",
         "accomplishments_shared",
         "extended_profile",
-        "secondary_email",
     ]
 }
 
