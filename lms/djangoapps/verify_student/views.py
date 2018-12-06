@@ -917,6 +917,7 @@ class SubmitPhotosView(View):
 
         self._fire_event(request.user, "edx.bi.verify.submitted", {"category": "verification"})
         self._send_confirmation_email(request.user)
+        self._send_review_email(request.user, attempt)
         return JsonResponse({})
 
     def _validate_parameters(self, request, has_initial_verification):
@@ -1083,6 +1084,27 @@ class SubmitPhotosView(View):
             # It would be much, much worse to roll back the transaction due to an uncaught
             # exception than to skip sending the notification email.
             log.exception("Could not send notification email for initial verification for user %s", user.id)
+
+    def _send_review_email(self, user, attempt):
+        """
+        Send an email reviewing that the user submitted photos
+        for initial verification.
+        """
+        context = {
+            'platform_name': configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
+            'review_url': '{ROOT_URL}/admin/verify_student/softwaresecurephotoverification/{id}/change/'.format(
+                ROOT_URL=settings.LMS_ROOT_URL, id=attempt.id)
+        }
+
+        subject = _("Review ID Verification Photos For {username}".format(username=user.username))
+        message = render_to_string('emails/photo_submission_review.txt', context)
+        from_address = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
+        to_address = settings.VERIFY_STUDENT.get('SOFTWARE_SECURE', {}).get('REVIEWING_USER_EMAIL', [])
+
+        try:
+            send_mail(subject, message, from_address, to_address, fail_silently=False)
+        except:
+            log.exception("Could not send notification email for reviewing verification")
 
     def _fire_event(self, user, event_name, parameters):
         """

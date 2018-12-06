@@ -1100,5 +1100,15 @@ plugin_settings.add_plugins(__name__, plugin_constants.ProjectType.LMS, plugin_c
 
 derive_settings(__name__)
 
+# Payment
 ALIPAY_INFO = AUTH_TOKENS['ALIPAY_INFO']
 WECHAT_PAY_INFO = AUTH_TOKENS['WECHAT_PAY_INFO']
+
+# Aliyun oss
+ALIYUN_OSS = AUTH_TOKENS.get('ALIYUN_OSS', {})
+
+ACCESS_KEY_ID = ALIYUN_OSS.get("ACCESS_KEY_ID", "")
+ACCESS_KEY_SECRET = ALIYUN_OSS.get("ACCESS_KEY_SECRET", "")
+END_POINT = ALIYUN_OSS.get("END_POINT", "")
+BUCKET_NAME = ALIYUN_OSS.get("BUCKET_NAME", "")
+BUCKET_ACL_TYPE = ALIYUN_OSS.get("BUCKET_ACL_TYPE", "")
