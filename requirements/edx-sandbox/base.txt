@@ -14,7 +14,7 @@ cffi==1.11.5
 cryptography==2.4.2
 enum34==1.1.6
 futures==3.2.0            # via tornado
-idna==2.7
+idna==2.8
 ipaddress==1.0.22
 lxml==3.8.0
 markupsafe==1.1.0

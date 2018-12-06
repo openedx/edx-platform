@@ -7,6 +7,9 @@
 #   * confirm that it has no system requirements beyond what we already install
 #   * run "make upgrade" to update the detailed requirements files
 #
+
+-c ../constraints.txt
+
 edx-opaque-keys                     # Create and introspect course and xblock identities
 lazy==1.1                           # Lazily-evaluated attributes for Python objects
 libsass==0.10.0                     # Python bindings for the LibSass CSS compiler
@@ -22,3 +25,5 @@ urllib3<1.24                        # transifex-client 0.13.5 requires urllib3<1
 stevedore==1.10.0                   # via edx-opaque-keys
 watchdog                            # Used in paver watch_assets
 wrapt==1.10.5                       # Decorator utilities used in the @timed paver task decorator
+
+six==1.11.0                         # Pinned because a few things here need it, but later transifex-client says ==1.11.0
