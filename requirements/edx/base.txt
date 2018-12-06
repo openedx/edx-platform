@@ -126,6 +126,7 @@ edx-opaque-keys[django]==0.4.4
 edx-organizations==1.0.0
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 edx-proctoring==1.4.0
 =======
 edx-proctoring==1.5.0b1
@@ -133,6 +134,9 @@ edx-proctoring==1.5.0b1
 =======
 edx-proctoring==1.5.0b3
 >>>>>>> Updated edx-proctoring pre-release
+=======
+edx-proctoring==1.5.0rc1
+>>>>>>> Set NPM dependencies more stably
 edx-rest-api-client==1.9.2
 edx-search==1.2.1
 edx-submissions==2.0.12
