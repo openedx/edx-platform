@@ -125,8 +125,8 @@ def csrf_token(context):
     token = context.get('csrf_token', '')
     if token == 'NOTPROVIDED':
         return ''
-    return (u'<div style="display:none"><input type="hidden"'
-            ' name="csrfmiddlewaretoken" value="{}" /></div>'.format(token))
+    return (HTML(u'<div style="display:none"><input type="hidden"'
+            ' name="csrfmiddlewaretoken" value="{}" /></div>').format(token))
 
 
 # NOTE: This view is not linked to directly--it is called from
