@@ -35,14 +35,14 @@
                 'handleKeypress', 'handleKeypressLink', 'openLanguageMenu', 'closeLanguageMenu',
                 'previousLanguageMenuItem', 'nextLanguageMenuItem', 'handleCaptionToggle',
                 'showClosedCaptions', 'hideClosedCaptions', 'toggleClosedCaptions',
-                'updateCaptioningCookie', 'handleCaptioningCookie', 'handleTranscriptToggle',
-                'listenForDragDrop'
+                'updateCaptioningCookie', 'handleCaptioningCookie', 'handleTranscriptToggle'
+                // 'listenForDragDrop'
             );
             this.state = state;
             this.state.videoCaption = this;
             this.renderElements();
             this.handleCaptioningCookie();
-            this.listenForDragDrop();
+            // this.listenForDragDrop();
 
             return $.Deferred().resolve().promise();
         };
