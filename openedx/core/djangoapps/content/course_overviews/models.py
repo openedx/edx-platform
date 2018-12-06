@@ -576,7 +576,7 @@ class CourseOverview(TimeStampedModel):
             # In rare cases, courses belonging to the same org may be accidentally assigned
             # an org code with a different casing (e.g., Harvardx as opposed to HarvardX).
             # Case-insensitive matching allows us to deal with this kind of dirty data.
-            course_overviews = course_overviews.filter(org__iregex=r'(' + '|'.join(orgs) + ')')
+            course_overviews = course_overviews.filter(org__iregex=r'(^' + '$|^'.join(orgs) + '$)')
 
         if filter_:
             course_overviews = course_overviews.filter(**filter_)
