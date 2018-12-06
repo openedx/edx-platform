@@ -53,12 +53,7 @@ DATABASES = {
 
 PROCTORING_BACKENDS = {
     'DEFAULT': 'mock',
-    'mock': {
-        'default_rules': {
-            'allow_snarfing': True,
-            'allow_grok': False,
-        }
-    },
+    'mock': {},
     'mock_proctoring_without_rules': {},
 }
 

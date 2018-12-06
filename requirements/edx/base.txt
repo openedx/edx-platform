@@ -119,19 +119,29 @@ edx-django-sites-extensions==2.3.1
 edx-django-utils==1.0.3
 edx-drf-extensions==2.0.1
 <<<<<<< HEAD
+<<<<<<< HEAD
 edx-enterprise==1.2.0
 =======
+=======
+>>>>>>> Removed course-run exam rule configuration
 <<<<<<< HEAD
 edx-enterprise==1.1.2
 =======
 edx-enterprise==1.1.0
 >>>>>>> make upgrade
+<<<<<<< HEAD
 >>>>>>> make upgrade
+=======
+=======
+edx-enterprise==1.1.2
+>>>>>>> Removed course-run exam rule configuration
+>>>>>>> Removed course-run exam rule configuration
 edx-i18n-tools==0.4.6
 edx-milestones==0.1.13
 edx-oauth2-provider==1.2.2
 edx-opaque-keys[django]==0.4.4
 edx-organizations==1.0.0
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -145,6 +155,9 @@ edx-proctoring==1.5.0b3
 =======
 edx-proctoring==1.5.0rc1
 >>>>>>> Set NPM dependencies more stably
+=======
+edx-proctoring==1.5.0rc2
+>>>>>>> Removed course-run exam rule configuration
 edx-rest-api-client==1.9.2
 edx-search==1.2.1
 edx-submissions==2.0.12
@@ -166,10 +179,14 @@ help-tokens==1.0.3
 html5lib==1.0.1
 httplib2==0.12.0          # via oauth2, zendesk
 <<<<<<< HEAD
+<<<<<<< HEAD
 idna==2.8
 =======
 idna==2.7
 >>>>>>> Enable course run level overrides for proctoring configuration.
+=======
+idna==2.8
+>>>>>>> Removed course-run exam rule configuration
 ipaddr==2.1.11
 ipaddress==1.0.22
 isodate==0.6.0            # via python-saml
@@ -251,8 +268,12 @@ reportlab==3.5.11
 reportlab==3.5.12
 >>>>>>> Updated edx-proctoring pre-release
 requests-oauthlib==1.0.0
+<<<<<<< HEAD
 requests==2.20.1
 >>>>>>> Enable course run level overrides for proctoring configuration.
+=======
+requests==2.21.0
+>>>>>>> Removed course-run exam rule configuration
 rest-condition==1.0.3
 rfc6266-parser==0.0.5.post2
 rules==2.0.1
