@@ -18,6 +18,7 @@ from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from student.models import CourseEnrollment
+from util.query import use_read_replica_if_available
 
 USER_MODEL = get_user_model()
 
@@ -205,7 +206,9 @@ class GradeViewMixin(DeveloperErrorViewMixin):
             'is_active': True,
         }
         filter_kwargs.update(course_enrollment_filter or {})
-        enrollments_in_course = CourseEnrollment.objects.filter(**filter_kwargs)
+        enrollments_in_course = use_read_replica_if_available(
+            CourseEnrollment.objects.filter(**filter_kwargs)
+        )
         if related_models:
             enrollments_in_course = enrollments_in_course.select_related(*related_models)
 
