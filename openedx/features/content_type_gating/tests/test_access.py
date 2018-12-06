@@ -666,7 +666,7 @@ class TestMessageDeduplication(ModuleStoreTestCase):
 
         self.user = UserFactory.create()
         self.request_factory = RequestFactory()
-        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=date(2018, 1, 1))
 
     def _create_course(self):
         course = CourseFactory.create(run='test', display_name='test')
