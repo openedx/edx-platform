@@ -7,4 +7,7 @@
 #   * confirm that it has no system requirements beyond what we already install
 #   * run "make upgrade" to update the detailed requirements files
 
+-c ../constraints.txt
+
 pip-tools                 # Contains pip-compile, used to generate pip requirements files
+six==1.11.0             # Pinned because pip-tools needs it, but later transifex-client says ==1.11.0

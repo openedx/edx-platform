@@ -28,17 +28,12 @@ class TestProctoredExams(ModuleStoreTestCase):
         """
         super(TestProctoredExams, self).setUp()
 
-        default_proctoring_provider = settings.PROCTORING_BACKENDS['DEFAULT']
-
         self.course = CourseFactory.create(
             org='edX',
             course='900',
             run='test_run',
             enable_proctored_exams=True,
-            proctoring_configuration={
-                'backend': default_proctoring_provider,
-                'rules': settings.PROCTORING_BACKENDS[default_proctoring_provider]['default_rules'],
-            }
+            proctoring_provider=settings.PROCTORING_BACKENDS['DEFAULT'],
         )
 
     def _verify_exam_data(self, sequence, expected_active):
@@ -56,7 +51,6 @@ class TestProctoredExams(ModuleStoreTestCase):
             # get the review policy object
             exam_review_policy = get_review_policy_by_exam_id(exam['id'])
             self.assertEqual(exam_review_policy['review_policy'], sequence.exam_review_rules)
-            self.assertEqual(exam_review_policy['rules'], self.course.proctoring_configuration['rules'])
 
         if not exam['is_proctored'] and not exam['is_practice_exam']:
             # the hide after due value only applies to timed exams
@@ -69,7 +63,7 @@ class TestProctoredExams(ModuleStoreTestCase):
         self.assertEqual(exam['is_proctored'], sequence.is_proctored_exam)
         self.assertEqual(exam['is_practice_exam'], sequence.is_practice_exam)
         self.assertEqual(exam['is_active'], expected_active)
-        self.assertEqual(exam['backend'], self.course.proctoring_configuration['backend'])
+        self.assertEqual(exam['backend'], self.course.proctoring_provider)
 
     @ddt.data(
         (True, False, True, False, False),
