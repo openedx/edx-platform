@@ -6,4 +6,32 @@
 // partials directly into this file so that you can break your
 // rules into modular pieces.
 @import 'certificates';
-@import './page/allChange';
+
+@charset 'utf-8';
+
+@import './page/base';
+@import './page/iconfont';
+
+@import './page/login';
+@import './page/register';
+
+@import './page/header';
+@import './page/footer';
+
+@import './page/home';
+@import './page/search';
+@import './page/dashboard';
+@import './page/profile';
+@import './page/account_setting';
+@import './page/validate';
+
+@import './course/course';
+@import './course/about';
+@import './course/discussion';
+@import './course/progress';
+@import './course/wiki';
+@import './course/test';
+@import './course/courseVideo';
+
+
+@import './page/wiki';

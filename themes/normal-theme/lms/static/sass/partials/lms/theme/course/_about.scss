@@ -58,10 +58,6 @@
         @extend %btn-my-primary;
         margin-right: 20px;
       }
-      .main-cta strong:hover, 
-      .main-cta a.add-to-cart:hover{
-        @extend %btn-my-primary-hover;
-      }
 
       .main-cta span.register, 
       .main-cta a.register{

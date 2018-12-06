@@ -1,4 +1,5 @@
 
+
 .wiki-wrapper section.wiki .breadcrumbs-header{
     height: 33px;
     padding: 16px 0;
@@ -15,9 +16,6 @@
             @extend %btn-my-white;
             height: 20px;
             line-height: 20px;
-        }
-        a.add-article-btn:hover{
-            @extend %btn-my-white-hover;
         }
     }
 }
