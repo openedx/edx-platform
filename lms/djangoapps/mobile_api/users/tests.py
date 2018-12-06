@@ -277,7 +277,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.create_enrollment(expired)
         return self.api_response(api_version=api_version).data
 
-    def _assert_enrollment_results(self, api_version, courses, num_courses_returned):
+    def _assert_enrollment_results(self, api_version, courses, num_courses_returned, gating_enabled=True):
         self.assertEqual(len(courses), num_courses_returned)
 
         if api_version == API_V05:
@@ -285,7 +285,8 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
                 self.assertNotIn('audit_access_expires', courses[0])
         else:
             self.assertIn('audit_access_expires', courses[0])
-            self.assertIsNotNone(courses[0].get('audit_access_expires'))
+            if gating_enabled:
+                self.assertIsNotNone(courses[0].get('audit_access_expires'))
 
     @ddt.data(
         (API_V05, True, 0),
@@ -301,7 +302,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         '''
         CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime.datetime(2018, 1, 1))
         courses = self._get_enrollment_data(api_version, expired)
-        self._assert_enrollment_results(api_version, courses, num_courses_returned)
+        self._assert_enrollment_results(api_version, courses, num_courses_returned, True)
 
     @ddt.data(
         (API_V05, True, 1),
@@ -317,7 +318,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         '''
         CourseDurationLimitConfig.objects.create(enabled=False)
         courses = self._get_enrollment_data(api_version, expired)
-        self._assert_enrollment_results(api_version, courses, num_courses_returned)
+        self._assert_enrollment_results(api_version, courses, num_courses_returned, False)
 
 
 @attr(shard=9)
