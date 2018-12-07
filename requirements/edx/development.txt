@@ -137,7 +137,11 @@ edx-django-release-util==0.3.1
 edx-django-sites-extensions==2.3.1
 edx-django-utils==1.0.1
 edx-drf-extensions==2.0.1
+<<<<<<< HEAD
 edx-enterprise==1.1.2
+=======
+edx-enterprise==1.1.0
+>>>>>>> make upgrade
 edx-i18n-tools==0.4.6
 edx-lint==0.6.0
 edx-milestones==0.1.13
@@ -230,10 +234,14 @@ moto==0.3.1
 mysql-python==1.2.5
 networkx==1.7
 <<<<<<< HEAD
+<<<<<<< HEAD
 newrelic==4.8.0.110
 =======
 newrelic==4.6.0.106
 >>>>>>> Enable course run level overrides for proctoring configuration.
+=======
+newrelic==4.8.0.110
+>>>>>>> make upgrade
 nltk==3.4
 nodeenv==1.1.1
 numpy==1.6.2
