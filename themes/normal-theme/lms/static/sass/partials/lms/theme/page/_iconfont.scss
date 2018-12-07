@@ -12,13 +12,18 @@
 .fa-info-circle:before,
 .fa-remove:before, .fa-close:before,.fa-times:before,
 .xmodule_display.xmodule_CapaModule div.problem .choicegroup label.choicegroup_correct .status-icon::after, .xmodule_display.xmodule_CapaModule div.problem .choicetextgroup label.choicegroup_correct .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicegroup label.choicegroup_correct .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicetextgroup label.choicegroup_correct .status-icon::after, .xmodule_display.xmodule_CapaModule div.problem .choicetextgroup label.choicetextgroup_correct .status-icon::after, .xmodule_display.xmodule_CapaModule div.problem .choicetextgroup section.choicetextgroup_correct .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .choicetextgroup .xmodule_display.xmodule_CapaModule .choicegroup label.choicetextgroup_correct .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicetextgroup label.choicetextgroup_correct .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .choicetextgroup .xmodule_display.xmodule_CapaModule .choicegroup section.choicetextgroup_correct .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicetextgroup section.choicetextgroup_correct .status-icon::after,
-.xmodule_display.xmodule_CapaModule div.problem .choicegroup label.choicegroup_incorrect .status-icon::after, .xmodule_display.xmodule_CapaModule div.problem .choicetextgroup label.choicegroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicegroup label.choicegroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicetextgroup label.choicegroup_incorrect .status-icon::after, .xmodule_display.xmodule_CapaModule div.problem .choicetextgroup label.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_CapaModule div.problem .choicetextgroup section.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .choicetextgroup .xmodule_display.xmodule_CapaModule .choicegroup label.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicetextgroup label.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .choicetextgroup .xmodule_display.xmodule_CapaModule .choicegroup section.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicetextgroup section.choicetextgroup_incorrect .status-icon::after,
+.xmodule_display.xmodule_CapaModule div.problem .choicegroup label.choicegroup_incorrect .status-icon::after, .xmodule_display.xmodule_CapaModule div.problem .choicetextgroup label.choicegroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicegroup label.choicegroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicetextgroup label.choicegroup_incorrect .status-icon::after, .xmodule_display.xmodule_CapaModule div.problem .choicetextgroup label.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_CapaModule div.problem .choicetextgroup section.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .choicetextgroup .xmodule_display.xmodule_CapaModule .choicegroup label.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicetextgroup label.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .choicetextgroup .xmodule_display.xmodule_CapaModule .choicegroup section.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicetextgroup section.choicetextgroup_incorrect .status-icon::after,.xmodule_display.xmodule_CapaModule div.problem .indicator-container .status.incorrect .status-icon::after,
 .fa-check:before,
 .xmodule_display.xmodule_CapaModule .problem .capa_inputtype.textline>.incorrect .status .status-icon::after, .xmodule_display.xmodule_CapaModule .problem .inputtype.formulaequationinput>.incorrect .status .status-icon::after,
 .fa-chevron-prev::before,
 .fa-chevron-next::before,
 .fa-bookmark:before,
-.find-courses .search-facets .facet-option.selected .count::before, .find-courses .search-facets .facet-option.selected:hover .count::before, .find-courses .search-facets .facet-option.selected:focus .count::before
+.find-courses .search-facets .facet-option.selected .count::before, .find-courses .search-facets .facet-option.selected:hover .count::before, .find-courses .search-facets .facet-option.selected:focus .count::before,
+.fa-recorder:before,
+.fa-sort:before,
+.xmodule_display.xmodule_SequenceModule .sequence-nav ol li button.seq_other .icon::before,
+.xmodule_display.xmodule_SequenceModule .sequence-nav ol li button.seq_video .icon::before,
+.xmodule_display.xmodule_SequenceModule .sequence-nav ol li button.seq_problem .icon::before,
 {
   content: '';
   display: inline-block;
@@ -51,7 +56,7 @@
 }
 .fa-remove:before, .fa-close:before, .fa-times:before, 
 .xmodule_display.xmodule_CapaModule .problem .capa_inputtype.textline>.incorrect .status .status-icon::after, .xmodule_display.xmodule_CapaModule .problem .inputtype.formulaequationinput>.incorrect .status .status-icon::after,
-.xmodule_display.xmodule_CapaModule div.problem .choicegroup label.choicegroup_incorrect .status-icon::after, .xmodule_display.xmodule_CapaModule div.problem .choicetextgroup label.choicegroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicegroup label.choicegroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicetextgroup label.choicegroup_incorrect .status-icon::after, .xmodule_display.xmodule_CapaModule div.problem .choicetextgroup label.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_CapaModule div.problem .choicetextgroup section.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .choicetextgroup .xmodule_display.xmodule_CapaModule .choicegroup label.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicetextgroup label.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .choicetextgroup .xmodule_display.xmodule_CapaModule .choicegroup section.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicetextgroup section.choicetextgroup_incorrect .status-icon::after{
+.xmodule_display.xmodule_CapaModule div.problem .choicegroup label.choicegroup_incorrect .status-icon::after, .xmodule_display.xmodule_CapaModule div.problem .choicetextgroup label.choicegroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicegroup label.choicegroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicetextgroup label.choicegroup_incorrect .status-icon::after, .xmodule_display.xmodule_CapaModule div.problem .choicetextgroup label.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_CapaModule div.problem .choicetextgroup section.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .choicetextgroup .xmodule_display.xmodule_CapaModule .choicegroup label.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicetextgroup label.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .choicetextgroup .xmodule_display.xmodule_CapaModule .choicegroup section.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicetextgroup section.choicetextgroup_incorrect .status-icon::after,.xmodule_display.xmodule_CapaModule div.problem .indicator-container .status.incorrect .status-icon::after{
   background-position: -20px -80px;
 }
 .fa-check:before,
@@ -71,6 +76,21 @@
 .fa-times,
 .find-courses .search-facets .facet-option.selected .count::before, .find-courses .search-facets .facet-option.selected:hover .count::before, .find-courses .search-facets .facet-option.selected:focus .count::before{
   background-position: -20px -80px;
+}
+.fa-recorder:before{
+  background-position: -100px 0;
+}
+.fa-sort:before{
+  background-position: -160px -120px;
+}
+.xmodule_display.xmodule_SequenceModule .sequence-nav ol li button.seq_other .icon::before{
+  background-position: -180px -100px;
+}
+.xmodule_display.xmodule_SequenceModule .sequence-nav ol li button.seq_video .icon::before{
+  background-position: -200px -100px;
+}
+.xmodule_display.xmodule_SequenceModule .sequence-nav ol li button.seq_problem .icon::before{
+  background-position: -40px -100px;
 }
 
 
@@ -98,9 +118,6 @@
 }
 .fa-my-other{
   background-position: -60px -20px;
-}
-.fa-my-search{
-  background-position: -220px 0;
 }
 .fa-my-article{
   background-position: -120px -20px;

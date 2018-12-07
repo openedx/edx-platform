@@ -17,9 +17,14 @@
   .header-logo a .logo{
     height: 34px;
   }
+  a.help-link{
+    display: none;
+  }
 }
 
 .window-wrap .global-header .nav-links .secondary{
+  position: relative; 
+
   a.sign-in-btn, .nav-item a.shopping-cart{
     @extend %btn-my-primary;
     margin-top: 2px;
@@ -135,9 +140,6 @@
   
 }
 
-.global-header .nav-links .secondary{ 
-  position: relative; 
-}
 
 .home>header .title .course-search .search-button{  
   box-sizing: border-box;

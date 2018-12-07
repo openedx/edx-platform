@@ -65,11 +65,11 @@ body.view-in-course .container .course-wrapper, body.view-in-course .profile-wra
 
 // select
 select{
-  width: 180px;
+  width: 230px;
 	height: 36px;
 	background-color: #ffffff;
 	border-radius: 2px;
-  border: solid 1px $border;
+  border: solid 1px #eeeeee;
   font-size: 14px;
   color: $font;
   padding: 0 10px;
@@ -86,13 +86,12 @@ ol, ul, dl{
 // input
 textarea:focus, input[type="text"]:focus, input[type="url"]:focus, input[type="email"]:focus, input[type="password"]:focus, input[type="tel"]:focus{  
   box-shadow: none;
-  outline-color:rgba(59, 153, 252,0.5);
-}
-
-@include media-breakpoint-down(sm){   
-  textarea:focus, input[type="text"]:focus, input[type="url"]:focus, input[type="email"]:focus, input[type="password"]:focus, input[type="tel"]:focus{  
-    box-shadow: none;
-    outline-color:rgba(59, 153, 252,0.5);
+  border: 1px solid $blue;
+  @include media-breakpoint-down(sm){
+    &{
+      box-shadow: none;
+      border: 1px solid $blue;
+    }
   }
 }
 
@@ -172,3 +171,24 @@ textarea:focus, input[type="text"]:focus, input[type="url"]:focus, input[type="e
   font-family: $font-family-sans-serif;
 }
 
+// alert-warning
+.page-banner{
+  padding: 0 10px;
+}
+.alert-warning{
+  background: #fffaf6;
+  border: 1px solid #ffe4d1;
+  box-shadow: 0px 1px 4px 0px	#ffe4d1;
+  font-size: 14px;
+  color: $font;
+  
+  .icon-alert{
+    margin-top: 5px;
+    margin-right: 10px;
+    color: #ffe4d1;
+  }
+  .btn-link{
+    border: 0;
+    cursor: pointer;
+  }
+}
