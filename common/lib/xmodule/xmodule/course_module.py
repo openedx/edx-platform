@@ -249,6 +249,7 @@ class ProctoringProvider(String):
 
         return default
 
+
 def get_available_providers():
     proctoring_backend_settings = getattr(
         settings,
@@ -1181,7 +1182,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
 
     @raw_grader.setter
     def raw_grader(self, value):
-        # NOTE WELL: this change will not update the processed graders. 
+        # NOTE WELL: this change will not update the processed graders.
         # If we need that, this needs to call grader_from_conf.
         self._grading_policy['RAW_GRADER'] = value
         self.grading_policy['GRADER'] = value

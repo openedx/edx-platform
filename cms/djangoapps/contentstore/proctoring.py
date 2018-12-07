@@ -79,7 +79,7 @@ def register_special_exams(course_key):
             'is_practice_exam': timed_exam.is_practice_exam,
             'is_active': True,
             'hide_after_due': timed_exam.hide_after_due,
-            'backend': course.proctoring_configuration.get('backend', None),
+            'backend': course.proctoring_provider,
         }
 
         try:
