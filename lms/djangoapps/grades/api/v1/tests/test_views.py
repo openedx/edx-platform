@@ -16,7 +16,11 @@ from rest_framework.test import APITestCase
 from six import text_type
 
 from course_modes.models import CourseMode
-from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
+from lms.djangoapps.courseware.tests.factories import (
+    GlobalStaffFactory,
+    InstructorFactory,
+    StaffFactory
+)
 from lms.djangoapps.grades.api.v1.views import CourseGradesView, CourseEnrollmentPagination
 from lms.djangoapps.grades.config.waffle import waffle_flags, WRITABLE_GRADEBOOK
 from lms.djangoapps.grades.course_data import CourseData
@@ -459,6 +463,27 @@ class GradebookViewTestBase(GradeViewTestMixin, APITestCase):
         Gradebook API.
         """
         self.client.login(username=self.global_staff.username, password=self.password)
+        return self.global_staff
+
+    def login_course_staff(self):
+        """
+        Helper function to login the course staff user, who has permissions to read from the
+        Gradebook API.
+        """
+        course_staff = StaffFactory.create(course_key=self.course_key)
+        self._create_user_enrollments(course_staff)
+        self.client.login(username=course_staff.username, password=self.password)
+        return course_staff
+
+    def login_course_admin(self):
+        """
+        Helper function to login the course admin user, who has permissions to read from the
+        Gradebook API.
+        """
+        course_admin = InstructorFactory.create(course_key=self.course_key)
+        self._create_user_enrollments(course_admin)
+        self.client.login(username=course_admin.username, password=self.password)
+        return course_admin
 
 
 @ddt.ddt
@@ -692,7 +717,12 @@ class GradebookViewTest(GradebookViewTestBase):
             )
             self._assert_empty_response(resp)
 
-    def test_gradebook_data_for_course(self):
+    @ddt.data(
+        'login_staff',
+        'login_course_admin',
+        'login_course_staff',
+    )
+    def test_gradebook_data_for_course(self, login_method):
         with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
             mock_grade.side_effect = [
                 self.mock_course_grade(self.student, passed=True, letter_grade='A', percent=0.85),
@@ -700,7 +730,7 @@ class GradebookViewTest(GradebookViewTestBase):
             ]
 
             with override_waffle_flag(self.waffle_flag, active=True):
-                self.login_staff()
+                getattr(self, login_method)()
                 resp = self.client.get(
                     self.get_url(course_key=self.course.id)
                 )
@@ -900,6 +930,7 @@ class GradebookViewTest(GradebookViewTestBase):
                 self.assertEqual(len(actual_data['results']), expected_page_size)
 
 
+@ddt.ddt
 class GradebookBulkUpdateViewTest(GradebookViewTestBase):
     """
     Tests for the gradebook bulk-update view.
@@ -1076,13 +1107,14 @@ class GradebookBulkUpdateViewTest(GradebookViewTestBase):
             self.assertEqual(status.HTTP_422_UNPROCESSABLE_ENTITY, resp.status_code)
             self.assertEqual(expected_data, resp.data)
 
-    def test_override_is_created(self):
+    @ddt.data('login_staff', 'login_course_staff', 'login_course_admin')
+    def test_override_is_created(self, login_method):
         """
         Test that when we make multiple requests to update grades for the same user/subsection,
         the score from the most recent request is recorded.
         """
         with override_waffle_flag(self.waffle_flag, active=True):
-            self.login_staff()
+            request_user = getattr(self, login_method)()
             post_data = [
                 {
                     'user_id': self.student.id,
@@ -1167,10 +1199,10 @@ class GradebookBulkUpdateViewTest(GradebookViewTestBase):
                     self.assertEqual(expected_value, getattr(grade, field_name))
                     self.assertEqual(expected_value, getattr(grade.override, field_name + '_override'))
 
-            update_records = PersistentSubsectionGradeOverrideHistory.objects.filter(user=self.global_staff)
+            update_records = PersistentSubsectionGradeOverrideHistory.objects.filter(user=request_user)
             self.assertEqual(update_records.count(), 3)
             for audit_item in update_records:
-                self.assertEqual(audit_item.user, self.global_staff)
+                self.assertEqual(audit_item.user, request_user)
                 self.assertIsNotNone(audit_item.created)
                 self.assertEqual(audit_item.feature, PersistentSubsectionGradeOverrideHistory.GRADEBOOK)
                 self.assertEqual(audit_item.action, PersistentSubsectionGradeOverrideHistory.CREATE_OR_UPDATE)

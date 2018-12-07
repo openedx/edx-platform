@@ -9,12 +9,14 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.pagination import CursorPagination
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from six import text_type
 from util.date_utils import to_timestamp
 
-from courseware.courses import get_course_with_access
+from courseware.access import has_access
+from courseware.courses import get_course_by_id
 from edx_rest_framework_extensions import permissions
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
@@ -47,6 +49,7 @@ from track.event_transaction_utils import (
     set_event_transaction_type
 )
 from xmodule.util.misc import get_default_short_labeler
+from openedx.core.lib.api import permissions as core_lib_permissions
 
 log = logging.getLogger(__name__)
 USER_MODEL = get_user_model()
@@ -315,6 +318,13 @@ class GradeViewMixin(DeveloperErrorViewMixin):
         if request.user.is_anonymous:
             raise AuthenticationFailed
 
+    def has_course_team_access(self, user, course):
+        """
+        Ensures that the user has course team access to the course
+        """
+        return has_access(user, 'staff', course, course.id) or \
+            has_access(user, 'instructor', course, course.id)
+
 
 class CourseGradesView(GradeViewMixin, PaginatedAPIView):
     """
@@ -523,11 +533,9 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
         SessionAuthenticationAllowInactiveUser,
     )
 
-    permission_classes = (permissions.JWT_RESTRICTED_APPLICATION_OR_USER_ACCESS,)
+    permission_classes = (IsAuthenticated, core_lib_permissions.IsCourseStaffInstructor)
 
     pagination_class = CourseEnrollmentPagination
-
-    required_scopes = ['grades:read']
 
     def _section_breakdown(self, course, graded_subsections, course_grade):
         """
@@ -621,8 +629,13 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
             course_id: A string representation of a CourseKey object.
         """
         course_key = get_course_key(request, course_id)
-        course = get_course_with_access(request.user, 'staff', course_key, depth=None)
-
+        course = get_course_by_id(course_key, depth=None)
+        if not self.has_course_team_access(request.user, course):
+            raise self.api_error(
+                status_code=status.HTTP_403_FORBIDDEN,
+                developer_message='The writable gradebook feature is not availble for students',
+                error_code='course_role_violation'
+            )
         # We fetch the entire course structure up-front, and use this when iterating
         # over users to determine their subsection grades.  We purposely avoid fetching
         # the user-specific course structure for each user, because that is very expensive.
@@ -765,9 +778,7 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
         SessionAuthenticationAllowInactiveUser,
     )
 
-    permission_classes = (permissions.JWT_RESTRICTED_APPLICATION_OR_USER_ACCESS,)
-
-    required_scopes = ['grades:write']
+    permission_classes = (IsAuthenticated, core_lib_permissions.IsCourseStaffInstructor)
 
     @verify_course_exists
     @verify_writable_gradebook_enabled
@@ -786,7 +797,13 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
                 error_code='grades_frozen'
             )
 
-        course = get_course_with_access(request.user, 'staff', course_key, depth=None)
+        course = get_course_by_id(course_key, depth=None)
+        if not self.has_course_team_access(request.user, course):
+            raise self.api_error(
+                status_code=status.HTTP_403_FORBIDDEN,
+                developer_message='The writable gradebook feature is not availble for students',
+                error_code='course_role_violation'
+            )
 
         result = []
 
