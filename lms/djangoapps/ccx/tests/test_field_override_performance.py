@@ -239,23 +239,25 @@ class TestFieldOverrideMongoPerformance(FieldOverridePerformanceTestCase):
     MODULESTORE = TEST_DATA_MONGO_MODULESTORE
     __test__ = True
 
+    # TODO: decrease query count as part of REVO-28
+    QUERY_COUNT = 33
     TEST_DATA = {
         # (providers, course_width, enable_ccx, view_as_ccx): (
         #     # of sql queries to default,
         #     # of mongo queries,
         # )
-        ('no_overrides', 1, True, False): (31, 1),
-        ('no_overrides', 2, True, False): (31, 1),
-        ('no_overrides', 3, True, False): (31, 1),
-        ('ccx', 1, True, False): (31, 1),
-        ('ccx', 2, True, False): (31, 1),
-        ('ccx', 3, True, False): (31, 1),
-        ('no_overrides', 1, False, False): (31, 1),
-        ('no_overrides', 2, False, False): (31, 1),
-        ('no_overrides', 3, False, False): (31, 1),
-        ('ccx', 1, False, False): (31, 1),
-        ('ccx', 2, False, False): (31, 1),
-        ('ccx', 3, False, False): (31, 1),
+        ('no_overrides', 1, True, False): (QUERY_COUNT, 1),
+        ('no_overrides', 2, True, False): (QUERY_COUNT, 1),
+        ('no_overrides', 3, True, False): (QUERY_COUNT, 1),
+        ('ccx', 1, True, False): (QUERY_COUNT, 1),
+        ('ccx', 2, True, False): (QUERY_COUNT, 1),
+        ('ccx', 3, True, False): (QUERY_COUNT, 1),
+        ('no_overrides', 1, False, False): (QUERY_COUNT, 1),
+        ('no_overrides', 2, False, False): (QUERY_COUNT, 1),
+        ('no_overrides', 3, False, False): (QUERY_COUNT, 1),
+        ('ccx', 1, False, False): (QUERY_COUNT, 1),
+        ('ccx', 2, False, False): (QUERY_COUNT, 1),
+        ('ccx', 3, False, False): (QUERY_COUNT, 1),
     }
 
 
@@ -266,20 +268,22 @@ class TestFieldOverrideSplitPerformance(FieldOverridePerformanceTestCase):
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
     __test__ = True
 
+    # TODO: decrease query count as part of REVO-28
+    QUERY_COUNT = 33
     TEST_DATA = {
-        ('no_overrides', 1, True, False): (31, 3),
-        ('no_overrides', 2, True, False): (31, 3),
-        ('no_overrides', 3, True, False): (31, 3),
-        ('ccx', 1, True, False): (31, 3),
-        ('ccx', 2, True, False): (31, 3),
-        ('ccx', 3, True, False): (31, 3),
-        ('ccx', 1, True, True): (32, 3),
-        ('ccx', 2, True, True): (32, 3),
-        ('ccx', 3, True, True): (32, 3),
-        ('no_overrides', 1, False, False): (31, 3),
-        ('no_overrides', 2, False, False): (31, 3),
-        ('no_overrides', 3, False, False): (31, 3),
-        ('ccx', 1, False, False): (31, 3),
-        ('ccx', 2, False, False): (31, 3),
-        ('ccx', 3, False, False): (31, 3),
+        ('no_overrides', 1, True, False): (QUERY_COUNT, 3),
+        ('no_overrides', 2, True, False): (QUERY_COUNT, 3),
+        ('no_overrides', 3, True, False): (QUERY_COUNT, 3),
+        ('ccx', 1, True, False): (QUERY_COUNT, 3),
+        ('ccx', 2, True, False): (QUERY_COUNT, 3),
+        ('ccx', 3, True, False): (QUERY_COUNT, 3),
+        ('ccx', 1, True, True): (34, 3),
+        ('ccx', 2, True, True): (34, 3),
+        ('ccx', 3, True, True): (34, 3),
+        ('no_overrides', 1, False, False): (QUERY_COUNT, 3),
+        ('no_overrides', 2, False, False): (QUERY_COUNT, 3),
+        ('no_overrides', 3, False, False): (QUERY_COUNT, 3),
+        ('ccx', 1, False, False): (QUERY_COUNT, 3),
+        ('ccx', 2, False, False): (QUERY_COUNT, 3),
+        ('ccx', 3, False, False): (QUERY_COUNT, 3),
     }
