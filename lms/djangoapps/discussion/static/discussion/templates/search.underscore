@@ -1,4 +1,3 @@
-<label class="field-label sr-only" for="search" id="search-hint"><%- gettext("Search all posts") %></label>
 <input
     class="field-input form-control input-text search-input"
     type="search"
@@ -6,4 +5,5 @@
     id="search"
     placeholder="<%- gettext("Search all posts") %>"
 />
+<label class="field-label" for="search" id="search-hint" aria-label='<%- gettext("Search all posts") %>'><%- gettext("Search all posts") %></label>
 <button class="btn btn-outline-primary btn-small search-button" type="button"><%- gettext("Search") %></button>
