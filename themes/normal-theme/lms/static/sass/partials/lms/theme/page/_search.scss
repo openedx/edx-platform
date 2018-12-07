@@ -1,0 +1,162 @@
+// http://0.0.0.0:18000/courses 发现课程
+
+// search-bar
+#discovery-form{
+  margin-top: 20px;
+}
+.find-courses .courses-container{
+  position: relative;
+  padding: 0;
+}
+
+// search 
+.find-courses .wrapper-search-context{
+  .wrapper-search-input{
+    width: 25%;
+  }
+  .search-status-label{
+    font-size: 18px;
+    color: $title;
+    width: 75%;
+    margin-right: 0;
+    line-height: 32px;
+    min-height: 0;
+    margin-bottom: 23px;
+  }
+  .discovery-input{
+    border: 1px solid $blue;
+    height: 36px;
+    font-weight: normal;
+  }
+  .discovery-submit{
+    @extend %btn-my-primary;
+    height: 36px;
+    border: none;
+  }
+  .loading-spinner{
+    top: 0;
+  }
+}
+
+// filters
+.find-courses .filters{
+  margin-top: 0;
+
+  .clear-filters{
+    margin: 0;
+    line-height: 46px;
+    color: $blue;
+    font-size: 14px;
+    letter-spacing: 0;
+    &:hover{
+      opacity: 0.9;
+      background: none;
+    }
+  }
+  .filters-inner{
+    width: 73%;
+    margin-bottom: 20px;
+    border-top: 1px solid #e6e9ed;
+    border-bottom: 1px solid #e6e9ed;
+  }
+  li{
+    padding: 2px 0;
+    margin: 10px 10px 9px 0;
+    background: #f5f7fa;
+    border-radius: 17px;
+    .facet-option{
+      letter-spacing: 0;
+      font-size: 14px;
+      font-weight: normal;
+    }
+  }
+  .fa-times{
+    vertical-align: sub;
+  }
+} 
+
+
+
+// content
+.find-courses .courses-container{
+  .courses:not(.no-course-discovery){
+    width: 75%;
+    margin: 0;
+    padding: 0 20px 0 0;
+    box-sizing: border-box;
+    margin-top: 0;
+  }
+  .courses .courses-listing .courses-listing-item{
+    margin-top: 0;
+  }
+}
+
+
+// aside
+.find-courses .search-facets.phone-menu{
+  width: 25%;
+  margin: 10px 0 0;
+  padding: 0;
+  border: 1px solid #e6e9ed;
+  box-shadow: none;
+  border-radius: $border-radius;
+  position: absolute;
+  top: 45px;
+  right: 0;
+
+  .header-search-facets{
+    padding: 12px 10px;
+    letter-spacing: 0;
+    font-size: 14px;
+  }
+  .header-facet{
+    padding: 8px 10px;
+    font-size: 14px;
+    border-top: 1px dashed $border;
+    &:first-child{
+      border-top: 1px solid $border;
+    }
+  }
+  .facet-option{
+    padding: 5px 10px;
+    letter-spacing: 0;
+    &:hover{
+      background: rgba(182, 220, 254, 0.5);
+      color: $blue;
+      .count{
+        color: $blue;
+      }
+    }
+    &.selected{
+      background: rgba(182, 220, 254, 0.5);
+      color: $blue;
+      .count{
+        color: $blue;
+      }
+    }
+  }
+}
+
+@media screen and (max-width:576px){
+  .find-courses{
+    .search-facets.phone-menu{
+      display: none;
+    }
+    .filters .filters-inner{
+      width: 100%;
+    }
+    .courses-container .courses:not(.no-course-discovery){
+      width: 100%;
+      padding: 0;
+    }
+    .wrapper-search-context .search-status-label{
+      width: 100%;
+      font-size: 14px;
+      line-height: 1;
+    }
+    .wrapper-search-context .wrapper-search-input{
+      width: 100%;
+      margin-bottom: 15px;
+    }
+  } 
+}

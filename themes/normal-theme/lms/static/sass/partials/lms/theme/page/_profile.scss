@@ -1,63 +1,10 @@
 // http://0.0.0.0:18000/u/edx profile页
-/*
-
-
-//mobile页面
-@include media-breakpoint-down(sm){ 
-  .view-profile {
-    .wrapper-profile-sections{  
-      padding:30px 5% 14px 5%;
-    }
-    .profile-self {
-      .wrapper-profile-field-account-privacy{ 
-        background: $bgColor;
-        .u-field-title{  
-          font-size: $mobileFont14;
-          color:$title;
-        }
-        .wrapper-profile-records button{  
-          color:#fff;
-          font-weight: normal;
-          font-size: $mobileFont14;
-          border-radius: 3px;
-          padding: 6px 12px;
-        }  
-      }
-    }
-    .profile-header{  
-      .header{  
-        font-size: $mobileFont16;
-        color: $title;
-      }
-      .subheader{  
-        font-size: $mobileFont14;
-        color: $font;
-      }
-    }
-    .profile-image-field .image-wrapper{  
-      width: 100px;
-      .image-frame{ 
-        width: 100px;
-        height: 100px;
-        border-radius: 50px;
-      }
-    } 
-  } 
-  .u-field-value select{  
-    background: #fff;
-    color: $font;
-  }
-  .wrapper-profile-section-container-one .wrapper-profile-section-one .profile-section-one-fields .u-field .u-field-value-readonly{ 
-    color:$font;
-    font-size: $mobileFont14;
-    text-align: center;
-    width: 100%;
-  }
-  .wrapper-profile-section-container-one .wrapper-profile-section-one{  
-    padding-bottom: 10px;
-  }
+.profile.profile-self{ 
+  max-width: 1220px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  padding: 0 20px;
 }
-*/
 .view-profile .content-wrapper{
   margin-bottom: 0;
 }
@@ -65,10 +12,6 @@
   background: none;
   padding-bottom: 40px;
   min-height: 0;
-}
-.profile.profile-self{ 
-  max-width: 1200px;
-  margin: 0 auto;
 }
 .u-field.editable-toggle.mode-display:hover{
   background: rgba(182,220,254,0.1);
@@ -81,12 +24,15 @@
   margin-top: 20px;
   box-sizing: border-box;
   padding: 8px 20px;
+  display: block;
 
+  .u-field-account_privacy{
+    min-width: 0;
+  }
   .wrapper-profile-records button,.u-field-account_privacy .btn-change-privacy{
     @extend %btn-my-primary;
-  }
-  .wrapper-profile-records button:hover,.u-field-account_privacy .btn-change-privacy:hover{
-    @extend %btn-my-primary-hover;
+    vertical-align: inherit;
+    margin-left: 5px;
   }
   .u-field-title{
     color: $blue;
@@ -127,48 +73,49 @@
     border: 1px solid $border;
     text-align: center;
 
-    .profile-section-one-fields .u-field .u-field-title{
-      text-align: center;
-      color: $title;
-    }
-    .profile-section-one-fields .u-field{
+    .profile-section-one-fields>.u-field{
       padding: 10px 0;
-    }
-    .profile-section-one-fields>.u-field:first-child{
-      padding: 0;
-      font-size: 16px;
-      color: $title;
-      font-weight: bold;
-    }
-    .profile-section-one-fields .u-field:not(.u-field-readonly):not(:last-child){
-      padding-bottom: 15px;
-    }
 
-    .profile-section-one-fields .u-field.u-field-dropdown:not(.editable-never){
-      margin-top: 0;
-    }
+      .u-field-title{
+        text-align: center;
+        color: $title;
+      }
+      &:first-child{
+        padding: 0;
+        font-size: 16px;
+        color: $title;
+        font-weight: bold;
+      }
+      &:not(.u-field-readonly):not(:last-child){
+        padding-bottom: 15px;
+      }
+      .u-field-dropdown:not(.editable-never){
+        margin-top: 0;
+      }
+    } 
+
 
     // image
     .profile-image-field .image-wrapper{
       width: 80px;
-    }
-    .profile-image-field .image-wrapper .image-frame{
-      width: 80px;
-      height: 80px;
-      margin-top: 15px;
-    }
-    .profile-image-field .image-wrapper .u-field-upload-button{
-      width: 80px;
-      height: 80px;
-      top: 1px;
-      left: 1px;
-    }
-    .profile-image-field .image-wrapper .upload-button-title{
-      font-size: 12px;
-      transform: translateY(15px);
-    }
-    .profile-image-field .image-wrapper .upload-button-icon{
-      transform: translateY(15px)
+      .image-frame{
+        width: 80px;
+        height: 80px;
+        margin-top: 15px;
+      }
+      .u-field-upload-button{
+        width: 80px;
+        height: 80px;
+        top: 1px;
+        left: 1px;
+      }
+      .upload-button-title{
+        font-size: 12px;
+        transform: translateY(15px);
+      }
+      .upload-button-icon{
+        transform: translateY(15px)
+      }
     }
   }
 
@@ -185,26 +132,31 @@
       color: $font;
       font-size: 14px;
     }
+    .u-field-textarea{
+      padding-left: 0;
+      margin-top: 15px;
+    }
     .learner-achievements .learner-message{
       border: 1px solid #e6e9ed;
       background: #fff;
       box-shadow: none;
+
+      .message-header{
+        font-size: 16px;
+        color: $font;
+      }
+
+      .message-actions .btn-brand{
+        @extend %btn-my-primary;
+      }
     }
-    .learner-achievements .learner-message .message-header{
-      font-size: 16px;
-      color: $font;
-    }
-    .learner-achievements .learner-message .message-actions .btn-brand{
-      @extend %btn-my-primary;
-    }
-    .learner-achievements .learner-message .message-actions .btn-brand:hover{
-      @extend %btn-my-primary-hover;
-    }
+
     .u-field-value textarea{
       border: 1px solid #e6e9ed;
       background: #fff;
       padding: 10px;
       border-radius: 0;
+      padding: 0;
     }
     .wrapper-u-field {
       color: $font;
@@ -221,5 +173,30 @@
       border: 1px solid $border;
     }
     
+  }
+}
+
+
+@media screen and (max-width:768px){
+  .profile.profile-self{
+    padding: 0;
+  }
+  .view-profile .wrapper-profile-section-container-two{
+    padding-left: 0;
+  }
+}
+
+@media screen and (max-width:576px){
+  .view-profile .profile-self .wrapper-profile-field-account-privacy {
+    padding: 5px;
+
+    .wrapper-profile-records button{
+      margin-top: 5px;
+      margin-left: 0;
+    }
+    .u-field-account_privacy .btn-change-privacy{
+      margin-top: 0;
+      margin-left: 0;
+    }
   }
 }

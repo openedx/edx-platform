@@ -24,15 +24,9 @@
     @extend %btn-my-primary;
     margin-top: 2px;
   }
-  a.sign-in-btn:hover, .nav-item a.shopping-cart:hover{
-    @extend %btn-my-primary-hover;
-  }
   a.register-btn{
     @extend %btn-my-white;
     margin-top: 2px;
-  }
-  a.register-btn:hover{
-    @extend %btn-my-white-hover;
   }
 }
 
@@ -111,15 +105,25 @@
 
 }
 
-//查看课程的导航
-.content-wrapper .course-tabs{  
-  max-width: 1200px;
-  margin: 0 auto;
+@media screen and (max-width: 576px){
+  .window-wrap .global-header .header-logo{
+    display: block;
+    text-align: center;
+    a{
+      left: inherit;
+      display: inline-block;
+      float: none;
+      margin: 0 auto;
+      padding-top: 13px;
+      position: static;
+    }
+    a img{
+      vertical-align: middle;
+      margin-left: 0;
+    }
+  }
 }
-//内容
-.page-content-container{  
-  max-width: 1200px;
-}
+
 
 
 //头像样式
@@ -128,6 +132,7 @@
     right:8px;
     top: 49px;
   }
+  
 }
 
 .global-header .nav-links .secondary{ 

@@ -1,13 +1,21 @@
 *{  
   box-sizing: content-box;
 }
+.window-wrap{  
+  display: -webkit-flex;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
 .window-wrap .content-wrapper{ 
   margin: 0 auto;
   max-width: none;
   width: 100%;
   flex: 1;
-  padding: 0;
+  padding: 0 10px;
+  box-sizing: border-box;
   background-image: linear-gradient(to bottom, #fff 0%, #fff 45%, #f2f9ff 100%);
+  font-size: 14px;
 }
 .content-wrapper .courses-container{
   max-width: 1200px;
@@ -31,13 +39,6 @@
 }
 
 
-//flex布局
-.window-wrap{  
-  display: -webkit-flex;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
 /*
 .wrapper-preview-menu{  
   width: 100%;
@@ -59,3 +60,115 @@ body.view-in-course .container .course-wrapper, body.view-in-course .profile-wra
     padding: 0 10px;
   }
 }
+
+
+
+// select
+select{
+  width: 180px;
+	height: 36px;
+	background-color: #ffffff;
+	border-radius: 2px;
+  border: solid 1px $border;
+  font-size: 14px;
+  color: $font;
+  padding: 0 10px;
+  box-sizing: border-box;
+  outline: none;
+}
+
+// ul
+ol, ul, dl{
+  list-style: none;
+  padding: 0;
+}
+
+// input
+textarea:focus, input[type="text"]:focus, input[type="url"]:focus, input[type="email"]:focus, input[type="password"]:focus, input[type="tel"]:focus{  
+  box-shadow: none;
+  outline-color:rgba(59, 153, 252,0.5);
+}
+
+@include media-breakpoint-down(sm){   
+  textarea:focus, input[type="text"]:focus, input[type="url"]:focus, input[type="email"]:focus, input[type="password"]:focus, input[type="tel"]:focus{  
+    box-shadow: none;
+    outline-color:rgba(59, 153, 252,0.5);
+  }
+}
+
+// button
+// button样式
+// 底色蓝，字体白按钮
+%btn-my-primary{
+  display: inline-block;
+  width: auto;
+  padding: 0 20px;
+  font-size: 14px;
+  letter-spacing: 0.3px;
+  height: 36px;
+  line-height: 36px;
+  border-radius: 3px;
+  font-weight: normal;
+  cursor: pointer;
+  border: none;
+  background: $blue;
+  border: 1px solid $blue;
+  color: #fff;
+  text-shadow: none;
+  font-family: $font-family-sans-serif;
+
+  &:hover,&:focus{
+    background: $blue;
+    text-decoration: none;
+    opacity: 0.95;
+    box-shadow: none;
+  }
+}
+
+
+// 底色白，字体蓝
+%btn-my-white{
+  display: inline-block;
+  width: auto;
+  padding: 0 20px;
+  font-size: 14px;
+  letter-spacing: 0.3px;
+  height: 36px;
+  line-height: 36px;
+  border-radius: 3px;
+  cursor: pointer;
+  background: #fff;
+  color: $blue;
+  border: 1px solid $blue;
+  text-shadow: none;
+  font-family: $font-family-sans-serif;
+
+  &:hover, &:hover{
+    background: #f7fbfe;
+    color: $blue;
+    text-decoration: none;
+  }
+}
+
+
+// 底色灰，字体深灰，不可点击按钮
+%btn-my-disable{
+  display: inline-block;
+  width: auto;
+  padding: 0 20px;
+  font-size: 14px;
+  letter-spacing: 0.3px;
+  height: 36px;
+  line-height: 36px;
+  border-radius: 3px;
+
+  border: none;
+  background: #f5f7fa;
+  color: #aab2bd;
+  border: 1px solid #e6e9ed;
+  cursor: not-allowed;
+  text-decoration: none;
+  text-shadow: none;
+  font-family: $font-family-sans-serif;
+}
+

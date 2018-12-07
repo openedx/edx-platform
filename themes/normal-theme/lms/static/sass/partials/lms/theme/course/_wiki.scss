@@ -41,10 +41,6 @@ body.view-in-course .wiki-wrapper{
   line-height: 1.5;
   text-shadow: none;
 }
-.container .wiki-wrapper #main section.wiki a.add-article-btn:hover{
-  @extend %btn-my-primary-hover;
-  color: #fff;
-}
 
 
 // sidebar
@@ -121,13 +117,7 @@ body.view-in-course .wiki-wrapper{
   .btn.btn-primary{
     @extend %btn-my-primary;
   }
-  .btn.btn-primary-hover{
-    @extend %btn-my-primary-hover;
-  }
   .btn{
     @extend %btn-my-white;
-  }
-  .btn:hover{
-    @extend %btn-my-white-hover;
   }
 }

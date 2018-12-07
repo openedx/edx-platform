@@ -10,14 +10,15 @@
 .fa-clock-o:before,
 .fa-cog:before,
 .fa-info-circle:before,
-.fa-remove:before, .fa-close:before, .fa-times:before,
+.fa-remove:before, .fa-close:before,.fa-times:before,
 .xmodule_display.xmodule_CapaModule div.problem .choicegroup label.choicegroup_correct .status-icon::after, .xmodule_display.xmodule_CapaModule div.problem .choicetextgroup label.choicegroup_correct .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicegroup label.choicegroup_correct .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicetextgroup label.choicegroup_correct .status-icon::after, .xmodule_display.xmodule_CapaModule div.problem .choicetextgroup label.choicetextgroup_correct .status-icon::after, .xmodule_display.xmodule_CapaModule div.problem .choicetextgroup section.choicetextgroup_correct .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .choicetextgroup .xmodule_display.xmodule_CapaModule .choicegroup label.choicetextgroup_correct .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicetextgroup label.choicetextgroup_correct .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .choicetextgroup .xmodule_display.xmodule_CapaModule .choicegroup section.choicetextgroup_correct .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicetextgroup section.choicetextgroup_correct .status-icon::after,
 .xmodule_display.xmodule_CapaModule div.problem .choicegroup label.choicegroup_incorrect .status-icon::after, .xmodule_display.xmodule_CapaModule div.problem .choicetextgroup label.choicegroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicegroup label.choicegroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicetextgroup label.choicegroup_incorrect .status-icon::after, .xmodule_display.xmodule_CapaModule div.problem .choicetextgroup label.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_CapaModule div.problem .choicetextgroup section.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .choicetextgroup .xmodule_display.xmodule_CapaModule .choicegroup label.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicetextgroup label.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .choicetextgroup .xmodule_display.xmodule_CapaModule .choicegroup section.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicetextgroup section.choicetextgroup_incorrect .status-icon::after,
 .fa-check:before,
 .xmodule_display.xmodule_CapaModule .problem .capa_inputtype.textline>.incorrect .status .status-icon::after, .xmodule_display.xmodule_CapaModule .problem .inputtype.formulaequationinput>.incorrect .status .status-icon::after,
 .fa-chevron-prev::before,
 .fa-chevron-next::before,
-.fa-bookmark:before
+.fa-bookmark:before,
+.find-courses .search-facets .facet-option.selected .count::before, .find-courses .search-facets .facet-option.selected:hover .count::before, .find-courses .search-facets .facet-option.selected:focus .count::before
 {
   content: '';
   display: inline-block;
@@ -66,6 +67,10 @@
 }
 .fa-bookmark:before{
   background-position: -240px -100px;
+}
+.fa-times,
+.find-courses .search-facets .facet-option.selected .count::before, .find-courses .search-facets .facet-option.selected:hover .count::before, .find-courses .search-facets .facet-option.selected:focus .count::before{
+  background-position: -20px -80px;
 }
 
 

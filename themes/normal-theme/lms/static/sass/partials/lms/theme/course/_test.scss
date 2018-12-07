@@ -8,6 +8,9 @@
   margin-bottom: 30px;
   padding: 0 0 30px;
 }
+.course-wrapper .course-content .xblock{
+  font-size: 14px;
+}
 
 // nav
 .xmodule_display.xmodule_SequenceModule{
@@ -47,9 +50,6 @@
   // submit
   .action .submit-attempt-container .submit{
     @extend %btn-my-primary;
-  }
-  .action .submit-attempt-container .submit:hover{
-    @extend %btn-my-primary-hover;
   }
 
 
