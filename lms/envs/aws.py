@@ -1114,6 +1114,7 @@ derive_settings(__name__)
 logging.warn('DEPRECATION WARNING: aws.py has been deprecated, you should use production.py instead.')
 
 ALIPAY_INFO = AUTH_TOKENS['ALIPAY_INFO']
+ALIPAY_APP_INFO = AUTH_TOKENS.get('ALIPAY_APP_INFO')
 WECHAT_PAY_INFO = AUTH_TOKENS['WECHAT_PAY_INFO']
 
 if FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION', False):
