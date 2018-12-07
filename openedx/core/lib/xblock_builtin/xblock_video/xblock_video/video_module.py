@@ -197,6 +197,7 @@ class VideoMixin(object):
         default_cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get('default')
         cdn_url = default_cdn_url
         request = self.runtime.service(self, 'request')
+        user_location = None
         if request:
             user_location = getattr(request, 'session', {}).get('country_code')
             cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get(user_location, default_cdn_url)
@@ -251,9 +252,8 @@ class VideoMixin(object):
         # 'CN' is China ISO 3166-1 country code.
         # Video caching is disabled for Studio. User_location is always None in Studio.
         # CountryMiddleware disabled for Studio.
-        if getattr(self, 'video_speed_optimizations', True) and cdn_url:
-            # FIXME JV: self.system.user_location needs to be pulled from self.runtime
-            branding_info = BrandingInfoConfig.get_config().get(self.system.user_location)
+        if getattr(self, 'video_speed_optimizations', True) and cdn_url and user_location:
+            branding_info = BrandingInfoConfig.get_config().get(user_location)
 
             for index, source_url in enumerate(sources):
                 new_url = rewrite_video_url(cdn_url, source_url)
