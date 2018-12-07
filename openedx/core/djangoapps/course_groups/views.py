@@ -21,6 +21,7 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework import status, permissions
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
+from rest_framework.serializers import Serializer
 from six import text_type
 
 from courseware.courses import get_course_with_access
@@ -426,6 +427,7 @@ class APIPermissions(GenericAPIView):
         SessionAuthenticationAllowInactiveUser,
     )
     permission_classes = (permissions.IsAuthenticated, permissions.IsAdminUser)
+    serializer_class = Serializer
 
 
 class CohortSettings(DeveloperErrorViewMixin, APIPermissions):
@@ -494,7 +496,6 @@ class CohortHandler(DeveloperErrorViewMixin, APIPermissions):
             * user_partition_id: The integer identified of the UserPartition.
             * group_id: The integer identified of the specific group in the partition.
     """
-
     def get(self, request, course_key_string, cohort_id=None):
         """
         Endpoint to get either one or all cohorts.
