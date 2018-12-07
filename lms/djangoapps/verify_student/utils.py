@@ -3,6 +3,7 @@
 Common Utilities for the verify_student application.
 """
 
+import os
 import datetime
 import logging
 import pytz
@@ -105,3 +106,26 @@ def most_recent_verification(photo_id_verifications, sso_id_verifications, manua
     }
 
     return max(verifications_map, key=lambda k: verifications_map[k]) if verifications_map else None
+
+
+def aliyun_oss_storage_path(func):
+    """
+    set aliyun oss storage path
+    """
+    def wrapper(obj, prefix, override_receipt_id=None):
+        path = func(obj, prefix, override_receipt_id)
+        if settings.VERIFY_STUDENT["SOFTWARE_SECURE"].get("ALIYUN_OSS_STORAGE_PATH"):
+            path = os.path.join(settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["ALIYUN_OSS_STORAGE_PATH"], str(obj.user.id), path)
+        return path
+    return wrapper
+
+
+def submit_verification_photo(func):
+    """
+    submit verification photo
+    """
+    def wrapper(obj, copy_id_photo_from=None):
+        obj.status = "submitted"
+        obj.submitted_at = datetime.datetime.now(pytz.UTC)
+        obj.save()
+    return wrapper

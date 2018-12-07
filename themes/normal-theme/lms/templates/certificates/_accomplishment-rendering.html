@@ -35,7 +35,15 @@ course_mode_class = course_mode if course_mode else ''
 
                     <p class="eliteu-support">该课程由英荔教育提供并授权</p>
                     
-                    
+                    <div id="code">
+                        <div class="certificates-mes">
+                            <p>签发日期</p>
+                            <p>${certificate_date_issued}</p>
+                            <p>验证地址</p>
+                            <p class="code-url"></p>
+                        </div>   
+                        
+                    </div>
                     <!-- <span class="accomplishment-type-label hd-3">${document_title}</span> -->
                 </div>
 
@@ -51,8 +59,7 @@ course_mode_class = course_mode if course_mode else ''
                                 % for signatory in certificate_data.get('signatories', []):
                                     <li>
                                         <span>${signatory['name']}</span>
-                                        <!-- <img class="" src="${static.url(signatory['signature_image_path'])}" alt="${signatory['name']}"> -->
-                                        <img class="pro-img" src="/static/certificates/images/dome-sif1.png" alt="${signatory['name']}">
+                                        <img class="pro-img" src="${signatory['signature_image_path']}" alt="${signatory['name']}">
                                         
                                     </li>
                                 % endfor
