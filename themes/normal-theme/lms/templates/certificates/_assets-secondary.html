@@ -1,16 +1,33 @@
+<div id="url" style="display: none">${verify_url}</div>
 <style media="print">
         @page {
-            margin: 0mm;
-            
-        }       
+            margin: 0mm;    
+        }  
 </style>
-
+<script src="/static/normal-theme/js/certificates/qrcode.js"></script>
 <script type="text/javascript">
-    
+
     document.getElementById("action-print-view").addEventListener("click", printView);
 
     function printView(event) {
        event.preventDefault();
        window.print();
     }
+
+    //二维码扫码
+    var code = document.getElementById("code");
+    var url = $.trim($('#url').text());
+    url = location.host+url;   
+    var data = {    
+        text: url,
+        width: 78,
+        height: 78,
+        colorDark : "#000000",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
+    }
+    var qrcode = new QRCode("code", data);
+
+    $("#code div .code-url").text(url);
 </script>
+

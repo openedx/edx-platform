@@ -41,33 +41,14 @@
       position: absolute;
       bottom: 17px;
     }
-    /*
-    .course-actions .wrapper-action-more{
-      display: none;
-    }
-    */
     .wrapper-course-details .wrapper-course-actions{
       position: absolute;
       bottom: 10px;
       right: 0;
     }
-
-    /*
-    .wrapper-messages-primary .messages-list{
-      background-color: #f7f7f7;
-      .wrapper-messages-primary .message.message-upsell .action-upgrade{
-        box-shadow: none;
-        background: $green;
-      }
-
-    }
-    */
     
     .wrapper-course-details .wrapper-course-actions .enter-course{
       @extend %btn-my-primary;
-    }
-    .wrapper-course-details .wrapper-course-actions .enter-course:hover{
-      @extend %btn-my-primary-hover;
     }
 
     a.enter-course-blocked.course-target-link{
@@ -137,6 +118,35 @@
   }
 }
 
+// no courses
+.empty-dashboard-message{
+	background-color: rgba(245, 247, 250, 0.4);
+	border-radius: 4px;
+  border: 1px solid $border;
+  padding: 30px 0;
+  
+  p{
+    font-size: 14px;
+    color: $font;
+    margin-bottom: 10px;
+  }
+  p:before{
+    content: '';
+    width: 80px;
+    height: 70px;
+    display: block;
+    position: relative;
+    left: 50%;
+    margin-left: -40px;
+    margin-bottom: 20px;
+    background: url('/static/normal-theme/images/profiles/default_50.png');
+    background-size: cover;
+  }
+  a.btn{
+    @extend %btn-my-primary;
+    margin: 0;
+  }
+}
 
 @media screen and (max-width: 992px){
   .dashboard .main-container{

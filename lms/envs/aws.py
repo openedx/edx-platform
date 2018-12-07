@@ -1114,6 +1114,7 @@ derive_settings(__name__)
 logging.warn('DEPRECATION WARNING: aws.py has been deprecated, you should use production.py instead.')
 
 ALIPAY_INFO = AUTH_TOKENS['ALIPAY_INFO']
+ALIPAY_APP_INFO = AUTH_TOKENS.get('ALIPAY_APP_INFO')
 WECHAT_PAY_INFO = AUTH_TOKENS['WECHAT_PAY_INFO']
 
 if FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION', False):
@@ -1123,3 +1124,10 @@ if FEATURES.get('ENABLE_MEMBERSHIP_INTEGRATION', False):
 ############## Settings for python-social-auth ######################
 SOCIAL_AUTH_TRAILING_SLASH = ENV_TOKENS.get('SOCIAL_AUTH_TRAILING_SLASH', False)
 
+# Aliyun oss
+ALIYUN_OSS = AUTH_TOKENS.get('ALIYUN_OSS', {})
+
+OSS_ACCESS_KEY_ID = ALIYUN_OSS.get("OSS_ACCESS_KEY_ID", "")
+OSS_ACCESS_KEY_SECRET = ALIYUN_OSS.get("OSS_ACCESS_KEY_SECRET", "")
+OSS_ENDPOINT = ALIYUN_OSS.get("OSS_ENDPOINT", "")
+OSS_BUCKET_NAME = ALIYUN_OSS.get("OSS_BUCKET_NAME", "")
