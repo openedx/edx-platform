@@ -4,6 +4,8 @@ XFields for video module.
 import datetime
 
 from xblock.fields import Scope, String, Float, Boolean, List, Dict, DateTime
+
+# TODO JV: Move to XBlock if only used by Video?
 from xmodule.fields import RelativeTime
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of

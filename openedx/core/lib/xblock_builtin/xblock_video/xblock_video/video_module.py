@@ -27,8 +27,6 @@ from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag
 from openedx.core.djangoapps.video_pipeline.config.waffle import waffle_flags, DEPRECATE_YOUTUBE
 from openedx.core.lib.cache_utils import request_cached
 from openedx.core.lib.license import LicenseMixin
-from xblock.completable import XBlockCompletionMode
-from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import KvsFieldData
 from xmodule.contentstore.content import StaticContent
@@ -254,6 +252,7 @@ class VideoMixin(object):
         # Video caching is disabled for Studio. User_location is always None in Studio.
         # CountryMiddleware disabled for Studio.
         if getattr(self, 'video_speed_optimizations', True) and cdn_url:
+            # FIXME JV: self.system.user_location needs to be pulled from self.runtime
             branding_info = BrandingInfoConfig.get_config().get(self.system.user_location)
 
             for index, source_url in enumerate(sources):
@@ -393,10 +392,13 @@ class VideoMixin(object):
         return self.runtime.render_template('video.html', context)
 
 
-class VideoDescriptor(TabsEditingDescriptor, EmptyDataRawDescriptor):
+class VideoDescriptor(LicenseMixin):
+    # FIXME re-add base class functionality: TabsEditingDescriptor, EmptyDataRawDescriptor
+    # Use XmlParserMixin to deal with legacy OLX
     """
     Descriptor for `VideoModule`.
     """
+    # FIXME: module attributes not found?
     transcript = module_attr('transcript')
     publish_completion = module_attr('publish_completion')
     has_custom_completion = module_attr('has_custom_completion')
@@ -430,7 +432,7 @@ class VideoDescriptor(TabsEditingDescriptor, EmptyDataRawDescriptor):
 
         # For backwards compatibility -- if we've got XML data, parse it out and set the metadata fields
         # TODO JV: test this
-        if hasattr(self, 'data'):
+        if hasattr(self, 'data') and self.data:
             field_data = self._parse_video_xml(etree.fromstring(self.data))
             self._field_data.set_many(self, field_data)
             del self.data

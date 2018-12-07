@@ -5,6 +5,7 @@ Container for video module and its utils.
 from django.contrib.staticfiles.storage import staticfiles_storage
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
+from xblock.completable import XBlockCompletionMode
 
 from openedx.core.lib.xblock_builtin import get_css_dependencies, get_js_dependencies
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
@@ -26,7 +27,6 @@ class VideoXBlock(
         VideoTranscriptsMixin,
         VideoStudentViewHandlers,
         VideoStudioViewHandlers,
-        LicenseMixin,
         XBlock):
     """
     Video XBlock
