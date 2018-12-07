@@ -310,3 +310,17 @@
 
   }
 }
+
+.xmodule_display.xmodule_VideoModule .video .video-wrapper .closed-captions.is-visible{
+  top: unset;
+  bottom: 90px;
+  cursor: pointer;
+  padding: 8px 10px 8px 8px;
+}
+.xmodule_display.xmodule_VideoModule .video .video-wrapper .closed-captions.is-visible::before{
+  content: '',
+}
+.xmodule_display.xmodule_VideoModule .video .video-wrapper .closed-captions.is-visible:hover{
+  cursor: pointer;
+  background: rgba(0,0,0,0.75);
+}
