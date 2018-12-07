@@ -275,12 +275,100 @@ class VideoStudentViewHandlers(object):
         return response
 
     @XBlock.handler
-    def transcript(self, request, dispatch):
+    def translation(self, request, suffix=None):
         """
-        Entry point for transcript handlers for student_view.
+        Handler for fetching translations for student_view.
 
         Request GET contains:
-            (optional) `videoId` for `translation` dispatch.
+            (optional) `videoId`
+            `is_bumper=1` flag for bumper case.
+
+        Dispatches, (HTTP GET):
+            /translation/[language_id]
+
+        Returns:
+            Provide translation for requested language, SJSON format is sent back on success,
+            Proper language_id should be in url.
+        """
+        language = suffix
+
+        if not language:
+            log.info("Invalid /translation request: no language.")
+            return Response(status=400)
+
+        is_bumper = request.GET.get('is_bumper', False)
+        transcripts = self.get_transcripts_info(is_bumper)
+
+        if language not in ['en'] + transcripts["transcripts"].keys():
+            log.info("Video: transcript facilities are not available for given language.")
+            return Response(status=404)
+
+        if language != self.transcript_language:
+            self.transcript_language = language
+
+        try:
+            if is_bumper:
+                content, filename, mimetype = get_transcript_from_contentstore(
+                    self,
+                    self.transcript_language,
+                    Transcript.SJSON,
+                    transcripts
+                )
+            else:
+                content, filename, mimetype = get_transcript(
+                    self,
+                    lang=self.transcript_language,
+                    output_format=Transcript.SJSON,
+                    youtube_id=request.GET.get('videoId'),
+                )
+
+            response = self.make_transcript_http_response(
+                content,
+                filename,
+                self.transcript_language,
+                mimetype,
+                add_attachment_header=False
+            )
+        except NotFoundError:
+            log.exception('[Translation Dispatch] %s', self.location)
+            response = self.get_static_transcript(request, transcripts)
+
+        return response
+
+    @XBlock.handler
+    def download(self, request, suffix=None):
+        """
+        Handler for dowloading transcripts for student_view.
+
+        Request GET contains:
+            `lang` to specify which language transcript to return.
+
+        Dispatches, (HTTP GET):
+            /download
+
+        Returns:
+            SRT or TXT file.
+        """
+        lang = request.GET.get('lang', None)
+
+        try:
+            content, filename, mimetype = get_transcript(self, lang, output_format=self.transcript_download_format)
+        except NotFoundError:
+            return Response(status=404)
+
+        return self.make_transcript_http_response(
+            content,
+            filename,
+            self.transcript_language,
+            mimetype
+        )
+
+    @XBlock.handler
+    def available_translations(self, request, suffix=None):
+        """
+        Handler which returns the available transcript translations for the student_view.
+
+        Request GET contains:
             `is_bumper=1` flag for bumper case.
 
         Dispatches, (HTTP GET):
@@ -299,75 +387,15 @@ class VideoStudentViewHandlers(object):
         """
         is_bumper = request.GET.get('is_bumper', False)
         transcripts = self.get_transcripts_info(is_bumper)
-
-        if dispatch.startswith('translation'):
-            language = dispatch.replace('translation', '').strip('/')
-
-            if not language:
-                log.info("Invalid /translation request: no language.")
-                return Response(status=400)
-
-            if language not in ['en'] + transcripts["transcripts"].keys():
-                log.info("Video: transcript facilities are not available for given language.")
-                return Response(status=404)
-
-            if language != self.transcript_language:
-                self.transcript_language = language
-
-            try:
-                if is_bumper:
-                    content, filename, mimetype = get_transcript_from_contentstore(
-                        self,
-                        self.transcript_language,
-                        Transcript.SJSON,
-                        transcripts
-                    )
-                else:
-                    content, filename, mimetype = get_transcript(
-                        self,
-                        lang=self.transcript_language,
-                        output_format=Transcript.SJSON,
-                        youtube_id=request.GET.get('videoId'),
-                    )
-
-                response = self.make_transcript_http_response(
-                    content,
-                    filename,
-                    self.transcript_language,
-                    mimetype,
-                    add_attachment_header=False
-                )
-            except NotFoundError:
-                log.exception('[Translation Dispatch] %s', self.location)
-                response = self.get_static_transcript(request, transcripts)
-
-        elif dispatch == 'download':
-            lang = request.GET.get('lang', None)
-
-            try:
-                content, filename, mimetype = get_transcript(self, lang, output_format=self.transcript_download_format)
-            except NotFoundError:
-                return Response(status=404)
-
-            response = self.make_transcript_http_response(
-                content,
-                filename,
-                self.transcript_language,
-                mimetype
-            )
-        elif dispatch.startswith('available_translations'):
-            available_translations = self.available_translations(
-                transcripts,
-                verify_assets=True,
-                is_bumper=is_bumper
-            )
-            if available_translations:
-                response = Response(json.dumps(available_translations))
-                response.content_type = 'application/json'
-            else:
-                response = Response(status=404)
-        else:  # unknown dispatch
-            log.debug("Dispatch is not allowed")
+        available_translations = self.available_translations(
+            transcripts,
+            verify_assets=True,
+            is_bumper=is_bumper
+        )
+        if available_translations:
+            response = Response(json.dumps(available_translations))
+            response.content_type = 'application/json'
+        else:
             response = Response(status=404)
 
         return response

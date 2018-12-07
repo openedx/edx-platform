@@ -127,7 +127,7 @@ class VideoMixin(object):
             if self.track:
                 track_url = self.track
             elif sub or other_lang:
-                track_url = self.runtime.handler_url(self, 'transcript', 'download').rstrip('/?')
+                track_url = self.runtime.handler_url(self, 'download')
 
         transcript_language = self.get_default_transcript_language(transcripts)
         native_languages = {lang: label for lang, label in settings.LANGUAGES if len(lang) == 2}
@@ -343,11 +343,11 @@ class VideoMixin(object):
             'ytKey': yt_api_key,
 
             'transcriptTranslationUrl': self.runtime.handler_url(
-                self, 'transcript', 'translation/__lang__'
-            ).rstrip('/?'),
+                self, 'translation', '__lang__',
+            ),
             'transcriptAvailableTranslationsUrl': self.runtime.handler_url(
-                self, 'transcript', 'available_translations'
-            ).rstrip('/?'),
+                self, 'available_translations',
+            ),
             'publishCompletionUrl': self.runtime.handler_url(self, 'publish_completion', '').rstrip('?'),
 
             # For now, the option "data-autohide-html5" is hard coded. This option
@@ -1115,7 +1115,7 @@ class VideoDescriptor(LicenseMixin):
 
         available_translations = self.available_translations(self.get_transcripts_info())
         transcripts = {
-            lang: self.runtime.handler_url(self, 'transcript', 'download', query="lang=" + lang, thirdparty=True)
+            lang: self.runtime.handler_url(self, 'download', query="lang=" + lang, thirdparty=True)
             for lang in available_translations
         }
 
