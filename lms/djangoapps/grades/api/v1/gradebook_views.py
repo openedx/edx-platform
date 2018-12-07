@@ -1,20 +1,97 @@
 """
-Defines an endpoint for retrieving assignment type and subsection info for a course.
+Defines an endpoint for gradebook data related to a course.
 """
+from collections import namedtuple
 from contextlib import contextmanager
+from functools import wraps
 
-from opaque_keys.edx.keys import CourseKey
+from django.urls import reverse
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from six import text_type
+from util.date_utils import to_timestamp
 
+from courseware.courses import get_course_by_id
+from lms.djangoapps.grades.api.serializers import StudentGradebookEntrySerializer
+from lms.djangoapps.grades.api.v1.utils import (
+    USER_MODEL,
+    CourseEnrollmentPagination,
+    GradeViewMixin,
+    PaginatedAPIView,
+    get_course_key,
+    verify_course_exists
+)
+from lms.djangoapps.grades.config.waffle import WRITABLE_GRADEBOOK, waffle_flags
+from lms.djangoapps.grades.constants import ScoreDatabaseTableEnum
+from lms.djangoapps.grades.course_data import CourseData
+from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
+from lms.djangoapps.grades.events import SUBSECTION_GRADE_CALCULATED, subsection_grade_calculated
+from lms.djangoapps.grades.models import (
+    PersistentCourseGrade,
+    PersistentSubsectionGrade,
+    PersistentSubsectionGradeOverride,
+    PersistentSubsectionGradeOverrideHistory
+)
+from lms.djangoapps.grades.subsection_grade import CreateSubsectionGrade
+from lms.djangoapps.grades.tasks import are_grades_frozen, recalculate_subsection_grade_v3
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey, UsageKey
+from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.util.forms import to_bool
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from openedx.core.lib.cache_utils import request_cached
 from student.auth import has_course_author_access
+from student.models import CourseEnrollment
+from student.roles import BulkRoleCache
+from track.event_transaction_utils import (
+    create_new_event_transaction_id,
+    get_event_transaction_id,
+    get_event_transaction_type,
+    set_event_transaction_type
+)
 from xmodule.modulestore.django import modulestore
 from xmodule.util.misc import get_default_short_labeler
+
+
+@contextmanager
+def bulk_gradebook_view_context(course_key, users):
+    """
+    Prefetches all course and subsection grades in the given course for the given
+    list of users, also, fetch all the score relavant data,
+    storing the result in a RequestCache and deleting grades on context exit.
+    """
+    PersistentSubsectionGrade.prefetch(course_key, users)
+    PersistentCourseGrade.prefetch(course_key, users)
+    CourseEnrollment.bulk_fetch_enrollment_states(users, course_key)
+    cohorts.bulk_cache_cohorts(course_key, users)
+    BulkRoleCache.prefetch(users)
+    yield
+    PersistentSubsectionGrade.clear_prefetched_data(course_key)
+    PersistentCourseGrade.clear_prefetched_data(course_key)
+
+
+def verify_writable_gradebook_enabled(view_func):
+    """
+    A decorator to wrap a view function that takes `course_key` as a parameter.
+
+    Raises:
+        A 403 API error if the writable gradebook feature is not enabled for the given course.
+    """
+    @wraps(view_func)
+    def wrapped_function(self, request, **kwargs):
+        """
+        Wraps the given view function.
+        """
+        course_key = get_course_key(request, kwargs.get('course_id'))
+        if not waffle_flags()[WRITABLE_GRADEBOOK].is_enabled(course_key):
+            raise self.api_error(
+                status_code=status.HTTP_403_FORBIDDEN,
+                developer_message='The writable gradebook feature is not enabled for this course.',
+                error_code='feature_not_enabled'
+            )
+        return view_func(self, request, **kwargs)
+    return wrapped_function
 
 
 @view_auth_classes()
@@ -230,3 +307,468 @@ class CourseGradingView(BaseCourseView):
                 'display_name': subsection.display_name,
             })
         return subsections
+
+
+@view_auth_classes()
+class GradebookView(GradeViewMixin, PaginatedAPIView):
+    """
+    **Use Case**
+        * Get course gradebook entries of a single user in a course,
+        or of all users who are actively enrolled in a course.  The currently logged-in user may request
+        all enrolled user's grades information if they are allowed.
+    **Example Request**
+        GET /api/grades/v1/gradebook/{course_id}/                       - Get gradebook entries for all users in course
+        GET /api/grades/v1/gradebook/{course_id}/?username={username}   - Get grades for specific user in course
+        GET /api/grades/v1/gradebook/{course_id}/?username_contains={username_contains}
+        GET /api/grades/v1/gradebook/{course_id}/?cohort_id={cohort_id}
+        GET /api/grades/v1/gradebook/{course_id}/?enrollment_mode={enrollment_mode}
+    **GET Parameters**
+        A GET request may include the following query parameters.
+        * username:  (optional) A string representation of a user's username.
+        * username_contains: (optional) A substring against which a case-insensitive substring filter will be performed
+          on the USER_MODEL.username field.
+        * cohort_id: (optional) The id of a cohort in this course.  If present, will return grades
+          only for course enrollees who belong to that cohort.
+        * enrollment_mode: (optional) The slug of an enrollment mode (e.g. "verified").  If present, will return grades
+          only for course enrollees with the given enrollment mode.
+    **GET Response Values**
+        If the request for gradebook data is successful,
+        an HTTP 200 "OK" response is returned.
+        The HTTP 200 response for a single has the following values:
+        * course_id: A string representation of a Course ID.
+        * email: A string representation of a user's email.
+        * user_id: The user's integer id.
+        * username: A string representation of a user's username passed in the request.
+        * full_name: A string representation of the user's full name.
+        * passed: Boolean representing whether the course has been
+                  passed according to the course's grading policy.
+        * percent: A float representing the overall grade for the course
+        * letter_grade: A letter grade as defined in grading policy (e.g. 'A' 'B' 'C' for 6.002x) or None
+        * progress_page_url: A link to the user's progress page.
+        * section_breakdown: A list of subsection grade details, as specified below.
+
+        A response for all user's grades in the course is paginated, and contains "count", "next" and "previous"
+        keys, along with the actual data contained in a "results" list.
+
+        An HTTP 404 may be returned for the following reasons:
+            * The requested course_key is invalid.
+            * No course corresponding to the requested key exists.
+            * No user corresponding to the requested username exists.
+            * The requested user is not enrolled in the requested course.
+
+        An HTTP 403 may be returned if the `writable_gradebook` feature is not
+        enabled for this course.
+    **Example GET Response**
+        {
+            "course_id": "course-v1:edX+DemoX+Demo_Course",
+            "email": "staff@example.com",
+            "user_id": 9,
+            "username": "staff",
+            "full_name": "",
+            "passed": false,
+            "percent": 0.36,
+            "letter_grade": null,
+            "progress_page_url": "/courses/course-v1:edX+DemoX+Demo_Course/progress/9/",
+            "section_breakdown": [
+                {
+                    "are_grades_published": true,
+                    "auto_grade": false,
+                    "category": null,
+                    "chapter_name": "Introduction",
+                    "comment": "",
+                    "detail": "",
+                    "displayed_value": "0.00",
+                    "is_graded": false,
+                    "grade_description": "(0.00/0.00)",
+                    "is_ag": false,
+                    "is_average": false,
+                    "is_manually_graded": false,
+                    "label": null,
+                    "letter_grade": null,
+                    "module_id": "block-v1:edX+DemoX+Demo_Course+type@sequential+block@edx_introduction",
+                    "percent": 0.0,
+                    "score_earned": 0.0,
+                    "score_possible": 0.0,
+                    "section_block_id": "block-v1:edX+DemoX+Demo_Course+type@chapter+block@abcdefgh123",
+                    "subsection_name": "Demo Course Overview"
+                },
+            ],
+        }
+    **Paginated GET response**
+        When requesting gradebook entries for all users, the response is paginated and contains the following values:
+        * count: The total number of user gradebook entries for this course.
+        * next: The URL containing the next page of data.
+        * previous: The URL containing the previous page of data.
+        * results: A list of user gradebook entries, structured as above.
+
+    Note: It's important that `GradeViewMixin` is the first inherited class here, so that
+    self.api_error returns error responses as expected.
+    """
+
+    pagination_class = CourseEnrollmentPagination
+
+    def _section_breakdown(self, course, graded_subsections, course_grade):
+        """
+        Given a course_grade and a list of graded subsections for a given course,
+        returns a list of grade data broken down by subsection.
+
+        Args:
+            course: A Course Descriptor object
+            graded_subsections: A list of graded subsection objects in the given course.
+            course_grade: A CourseGrade object.
+        """
+        breakdown = []
+        default_labeler = get_default_short_labeler(course)
+
+        for subsection in graded_subsections:
+            subsection_grade = course_grade.subsection_grade(subsection.location)
+            short_label = default_labeler(subsection_grade.format)
+
+            graded_description = 'Not Attempted'
+            score_earned = 0
+            score_possible = 0
+
+            # For ZeroSubsectionGrades, we don't want to crawl the subsection's
+            # subtree to find the problem scores specific to this user
+            # (ZeroSubsectionGrade.attempted_graded is always False).
+            # We've already fetched the whole course structure in a non-specific way
+            # when creating `graded_subsections`.  Looking at the problem scores
+            # specific to this user (the user in `course_grade.user`) would require
+            # us to re-fetch the user-specific course structure from the modulestore,
+            # which is a costly operation.
+            if subsection_grade.attempted_graded:
+                graded_description = '({earned:.2f}/{possible:.2f})'.format(
+                    earned=subsection_grade.graded_total.earned,
+                    possible=subsection_grade.graded_total.possible,
+                )
+                score_earned = subsection_grade.graded_total.earned
+                score_possible = subsection_grade.graded_total.possible
+
+            # TODO: https://openedx.atlassian.net/browse/EDUCATOR-3559 -- Some fields should be renamed, others removed:
+            # 'displayed_value' should maybe be 'description_percent'
+            # 'grade_description' should be 'description_ratio'
+            breakdown.append({
+                'category': subsection_grade.format,
+                'displayed_value': '{:.2f}'.format(subsection_grade.percent_graded),
+                'is_graded': subsection_grade.graded,
+                'grade_description': graded_description,
+                'label': short_label,
+                'letter_grade': course_grade.letter_grade,
+                'module_id': text_type(subsection_grade.location),
+                'percent': subsection_grade.percent_graded,
+                'score_earned': score_earned,
+                'score_possible': score_possible,
+                'subsection_name': subsection_grade.display_name,
+            })
+        return breakdown
+
+    def _gradebook_entry(self, user, course, graded_subsections, course_grade):
+        """
+        Returns a dictionary of course- and subsection-level grade data for
+        a given user in a given course.
+
+        Args:
+            user: A User object.
+            course: A Course Descriptor object.
+            graded_subsections: A list of graded subsections in the given course.
+            course_grade: A CourseGrade object.
+        """
+        user_entry = self._serialize_user_grade(user, course.id, course_grade)
+        breakdown = self._section_breakdown(course, graded_subsections, course_grade)
+
+        user_entry['section_breakdown'] = breakdown
+        user_entry['progress_page_url'] = reverse(
+            'student_progress',
+            kwargs=dict(course_id=text_type(course.id), student_id=user.id)
+        )
+        user_entry['user_id'] = user.id
+        user_entry['full_name'] = user.get_full_name()
+
+        return user_entry
+
+    @verify_course_exists
+    @verify_writable_gradebook_enabled
+    @course_author_access_required
+    def get(self, request, course_key):
+        """
+        Returns a gradebook entry/entries (i.e. both course and subsection-level grade data)
+        for all users enrolled in a course, or a single user enrolled in a course
+        if a `username` parameter is provided.
+
+        Args:
+            request: A Django request object.
+            course_key: The edx course opaque key of a course object.
+        """
+        course = get_course_by_id(course_key, depth=None)
+
+        # We fetch the entire course structure up-front, and use this when iterating
+        # over users to determine their subsection grades.  We purposely avoid fetching
+        # the user-specific course structure for each user, because that is very expensive.
+        course_data = CourseData(user=None, course=course)
+        graded_subsections = list(graded_subsections_for_course(course_data.collected_structure))
+
+        if request.GET.get('username'):
+            with self._get_user_or_raise(request, course_key) as grade_user:
+                course_grade = CourseGradeFactory().read(grade_user, course)
+
+            entry = self._gradebook_entry(grade_user, course, graded_subsections, course_grade)
+            serializer = StudentGradebookEntrySerializer(entry)
+            return Response(serializer.data)
+        else:
+            filter_kwargs = {}
+            related_models = []
+            if request.GET.get('username_contains'):
+                filter_kwargs['user__username__icontains'] = request.GET.get('username_contains')
+                related_models.append('user')
+            if request.GET.get('cohort_id'):
+                cohort = cohorts.get_cohort_by_id(course_key, request.GET.get('cohort_id'))
+                if cohort:
+                    filter_kwargs['user__in'] = cohort.users.all()
+                else:
+                    filter_kwargs['user__in'] = []
+            if request.GET.get('enrollment_mode'):
+                filter_kwargs['mode'] = request.GET.get('enrollment_mode')
+
+            entries = []
+            users = self._paginate_users(course_key, filter_kwargs, related_models)
+
+            with bulk_gradebook_view_context(course_key, users):
+                for user, course_grade, exc in CourseGradeFactory().iter(
+                    users, course_key=course_key, collected_block_structure=course_data.collected_structure
+                ):
+                    if not exc:
+                        entries.append(self._gradebook_entry(user, course, graded_subsections, course_grade))
+
+            serializer = StudentGradebookEntrySerializer(entries, many=True)
+            return self.get_paginated_response(serializer.data)
+
+
+def graded_subsections_for_course(course_structure):
+    """
+    Given a course block structure, yields the subsections of the course that are graded.
+    Args:
+        course_structure: A course structure object.  Not user-specific.
+    """
+    for chapter_key in course_structure.get_children(course_structure.root_block_usage_key):
+        for subsection_key in course_structure.get_children(chapter_key):
+            subsection = course_structure[subsection_key]
+            if subsection.graded:
+                yield subsection
+
+
+GradebookUpdateResponseItem = namedtuple('GradebookUpdateResponseItem', ['user_id', 'usage_id', 'success', 'reason'])
+
+
+@view_auth_classes()
+class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
+    """
+    **Use Case**
+        Creates `PersistentSubsectionGradeOverride` objects for multiple (user_id, usage_id)
+        pairs in a given course, and invokes a Django signal to update subsection grades in
+        an asynchronous celery task.
+
+    **Example Request**
+        POST /api/grades/v1/gradebook/{course_id}/bulk-update
+
+    **POST Parameters**
+        This endpoint does not accept any URL parameters.
+
+    **Example POST Data**
+        [
+          {
+            "user_id": 9,
+            "usage_id": "block-v1:edX+DemoX+Demo_Course+type@sequential+block@basic_questions",
+            "grade": {
+              "earned_all_override": 11,
+              "possible_all_override": 11,
+              "earned_graded_override": 11,
+              "possible_graded_override": 11
+            }
+          },
+          {
+            "user_id": 9,
+            "usage_id": "block-v1:edX+DemoX+Demo_Course+type@sequential+block@advanced_questions",
+            "grade": {
+              "earned_all_override": 10,
+              "possible_all_override": 15,
+              "earned_graded_override": 9,
+              "possible_graded_override": 12
+            }
+          }
+        ]
+
+    **POST Response Values**
+        An HTTP 202 may be returned if a grade override was created for each of the requested (user_id, usage_id)
+        pairs in the request data.
+        An HTTP 403 may be returned if the `writable_gradebook` feature is not
+        enabled for this course.
+        An HTTP 404 may be returned for the following reasons:
+            * The requested course_key is invalid.
+            * No course corresponding to the requested key exists.
+            * The requesting user is not enrolled in the requested course.
+        An HTTP 422 may be returned if any of the requested (user_id, usage_id) pairs
+        did not have a grade override created due to some exception.  A `reason` detailing the exception
+        is provided with each response item.
+
+    **Example successful POST Response**
+        [
+          {
+            "user_id": 9,
+            "usage_id": "some-requested-usage-id",
+            "success": true,
+            "reason": null
+          },
+          {
+            "user_id": 9,
+            "usage_id": "an-invalid-usage-id",
+            "success": false,
+            "reason": "<class 'opaque_keys.edx.locator.BlockUsageLocator'>: not-a-valid-usage-key"
+          },
+          {
+            "user_id": 9,
+            "usage_id": "a-valid-usage-key-that-doesn't-exist",
+            "success": false,
+            "reason": "a-valid-usage-key-that-doesn't-exist does not exist in this course"
+          },
+          {
+            "user_id": 1234-I-DO-NOT-EXIST,
+            "usage_id": "a-valid-usage-key",
+            "success": false,
+            "reason": "User matching query does not exist."
+          }
+        ]
+    """
+
+    @verify_course_exists
+    @verify_writable_gradebook_enabled
+    @course_author_access_required
+    def post(self, request, course_key):
+        """
+        Creates or updates `PersistentSubsectionGradeOverrides` for the (user_id, usage_key)
+        specified in the request data.  The `SUBSECTION_OVERRIDE_CHANGED` signal is invoked
+        after the grade override is created, which triggers a celery task to update the
+        course and subsection grades for the specified user.
+        """
+        if are_grades_frozen(course_key):
+            raise self.api_error(
+                status_code=status.HTTP_403_FORBIDDEN,
+                developer_message='Grades are frozen for this course.',
+                error_code='grades_frozen'
+            )
+
+        course = get_course_by_id(course_key, depth=None)
+
+        result = []
+
+        for user_data in request.data:
+            requested_user_id = user_data['user_id']
+            requested_usage_id = user_data['usage_id']
+            try:
+                user = self._get_single_user(request, course_key, requested_user_id)
+                usage_key = UsageKey.from_string(requested_usage_id)
+            except (USER_MODEL.DoesNotExist, InvalidKeyError, CourseEnrollment.DoesNotExist) as exc:
+                result.append(GradebookUpdateResponseItem(
+                    user_id=requested_user_id,
+                    usage_id=requested_usage_id,
+                    success=False,
+                    reason=text_type(exc)
+                ))
+                continue
+
+            try:
+                subsection_grade_model = PersistentSubsectionGrade.objects.get(
+                    user_id=user.id,
+                    course_id=course_key,
+                    usage_key=usage_key
+                )
+            except PersistentSubsectionGrade.DoesNotExist:
+                subsection = course.get_child(usage_key)
+                if subsection:
+                    subsection_grade_model = self._create_subsection_grade(user, course, subsection)
+                else:
+                    result.append(GradebookUpdateResponseItem(
+                        user_id=requested_user_id,
+                        usage_id=requested_usage_id,
+                        success=False,
+                        reason='usage_key {} does not exist in this course.'.format(usage_key)
+                    ))
+                    continue
+
+            if subsection_grade_model:
+                self._create_override(request.user, subsection_grade_model, **user_data['grade'])
+                result.append(GradebookUpdateResponseItem(
+                    user_id=user.id,
+                    usage_id=text_type(usage_key),
+                    success=True,
+                    reason=None
+                ))
+
+        status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+        if all((item.success for item in result)):
+            status_code = status.HTTP_202_ACCEPTED
+
+        return Response(
+            [item._asdict() for item in result],
+            status=status_code,
+            content_type='application/json'
+        )
+
+    def _create_subsection_grade(self, user, course, subsection):
+        course_data = CourseData(user, course=course)
+        subsection_grade = CreateSubsectionGrade(subsection, course_data.structure, {}, {})
+        return subsection_grade.update_or_create_model(user, force_update_subsections=True)
+
+    def _create_override(self, request_user, subsection_grade_model, **override_data):
+        """
+        Helper method to create a `PersistentSubsectionGradeOverride` object
+        and send a `SUBSECTION_OVERRIDE_CHANGED` signal.
+        """
+        override, _ = PersistentSubsectionGradeOverride.objects.update_or_create(
+            grade=subsection_grade_model,
+            defaults=self._clean_override_data(override_data),
+        )
+
+        _ = PersistentSubsectionGradeOverrideHistory.objects.create(
+            override_id=override.id,
+            user=request_user,
+            feature=PersistentSubsectionGradeOverrideHistory.GRADEBOOK,
+            action=PersistentSubsectionGradeOverrideHistory.CREATE_OR_UPDATE,
+        )
+
+        set_event_transaction_type(SUBSECTION_GRADE_CALCULATED)
+        create_new_event_transaction_id()
+
+        recalculate_subsection_grade_v3.apply(
+            kwargs=dict(
+                user_id=subsection_grade_model.user_id,
+                anonymous_user_id=None,
+                course_id=text_type(subsection_grade_model.course_id),
+                usage_id=text_type(subsection_grade_model.usage_key),
+                only_if_higher=False,
+                expected_modified_time=to_timestamp(override.modified),
+                score_deleted=False,
+                event_transaction_id=unicode(get_event_transaction_id()),
+                event_transaction_type=unicode(get_event_transaction_type()),
+                score_db_table=ScoreDatabaseTableEnum.overrides,
+                force_update_subsections=True,
+            )
+        )
+        # Emit events to let our tracking system to know we updated subsection grade
+        subsection_grade_calculated(subsection_grade_model)
+
+    def _clean_override_data(self, override_data):
+        """
+        Helper method to strip any grade override field names that won't work
+        as defaults when calling PersistentSubsectionGradeOverride.update_or_create().
+        """
+        allowed_fields = {
+            'earned_all_override',
+            'possible_all_override',
+            'earned_graded_override',
+            'possible_graded_override',
+        }
+        stripped_data = {}
+        for field in override_data.keys():
+            if field in allowed_fields:
+                stripped_data[field] = override_data[field]
+        return stripped_data
