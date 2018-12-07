@@ -18,8 +18,6 @@ import logging
 from collections import defaultdict, OrderedDict
 from operator import itemgetter
 
-from pkg_resources import resource_string
-
 from django.conf import settings
 from lxml import etree
 from opaque_keys.edx.locator import AssetLocator
@@ -99,8 +97,6 @@ EXPORT_IMPORT_STATIC_DIR = u'static'
 
 
 class VideoMixin(object):
-    # To make sure that js files are called in proper order we use numerical
-    # index. We do that to avoid issues that occurs in tests.
 
     def validate(self):
         """
@@ -549,6 +545,15 @@ class VideoDescriptor(LicenseMixin):
         """
         self.save()
         self.runtime.modulestore.update_item(self, user.id)
+
+    @property
+    def location(self):
+        """
+        Return this XBlock's usage_id
+
+        Convenience method to reduce code changes when converting from XModule.
+        """
+        return self.scope_ids.usage_id
 
     @property
     def editable_metadata_fields(self):
