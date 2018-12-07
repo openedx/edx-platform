@@ -3,22 +3,77 @@
 .wrap-instructor-info.studio-view, .wrap-instructor-info{
   display: none;
 }
-.course-wrapper .course-content .vert-mod .vert{
-  border-bottom: 1px dashed $border;
-  margin-bottom: 30px;
-  padding: 0 0 30px;
-}
-.course-wrapper .course-content .xblock{
-  font-size: 14px;
-}
+
+.course-wrapper .course-content{
+  main{
+    padding: 20px 30px;
+  }
+  .vert-mod .vert{
+    border-bottom: 1px dashed $border;
+    margin-bottom: 30px;
+    padding: 0 0 30px;
+  }
+  .xblock{
+    font-size: 14px;
+    &.xblock-student_view-vertical{
+      margin: 0;
+      max-width: 1200px;
+    }
+    .hd-2, .hd-3{
+      color: $title;
+      font-size: 16px;
+      line-height: 1;
+      margin: 20px 0;
+      font-weight: bold;
+    }
+  }
+} 
 
 // nav
-.xmodule_display.xmodule_SequenceModule{
-  .sequence-nav ol li{
-    border: 1px solid $border;
+.xmodule_display.xmodule_SequenceModule {
+  .sequence-nav .sequence-list-wrapper{
+    overflow-y: hidden;
+
+    ol li{
+      border: 0;
+      &:not(:last-child){
+        border-right: 1px solid $border;
+      }
+      button{
+        height: 42px;
+        border: 1px solid $border;
+        border-left: 0;
+        &.active{
+          border-bottom: 3px solid $blue;
+          background: none;
+        }
+        &:last-child{
+          border-right: 0;
+        }
+      }
+    }
   }
+  
   .sequence-nav-button{
     border: 1px solid $border;
+    &.button-next{
+      height: 43px;
+      box-sizing: border-box;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      &:focus{
+        outline: none;
+      }
+    }
+    &.button-previous{
+      height: 43px;
+      box-sizing: border-box;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+    &:hover{
+      border-bottom: 3px solid $blue;
+    }
   }
   .button-previous span:last-child{
     display: none;
@@ -29,16 +84,7 @@
 } 
 
 
-// 题目标题，分数
-.hd-1, .hd-2, .hd-3, .hd-4, .hd-5, .hd-6, .hd-7, .hd-8{
-  color: $title;
-}
-.hd-3{
-  font-size: 16px;
-  line-height: 1;
-  margin: 20px 0;
-  font-weight: bold;
-}
+
 .xmodule_display.xmodule_CapaModule div.problem-progress{
   font-size: 14px;
   color: $note;
@@ -69,6 +115,7 @@
   }
   .notification .notification-message{
     font-size: 14px;
+    margin-top: 3px;
   }
   .choicegroup .indicator-container{
     display: none;
@@ -88,6 +135,9 @@
   .capa_inputtype.textline .status{
     margin-top: 3px;
   }
+  .feedback-hint-incorrect,.feedback-hint-partially-correct, .feedback-hint-correct{
+    margin-top: 15px;
+  }
   
 
 
@@ -100,32 +150,60 @@
     border: none;
     border: 1px solid transparent;
     font-size: 14px;
-  }
-  .choicegroup label:hover{
-    border: 1px solid $blue;
-  }
-  .choicegroup legend{
-    font-size: 14px;
+    &:hover{
+      border: 1px solid $blue;
+    }
+    &.choicegroup_correct{
+      border: 1px solid #57aa01;
+    }
+    &.choicegroup_incorrect{
+      border: 1px solid #ff6d7a;
+    }
   }
   .choicegroup .status .status-icon{
     position: absolute;
     margin-left: 5px;
     margin-top: -1px;
   }
+
   
   // 填空题
-  .capa_inputtype.textline input{
-    height: 34px;
-    font-size: 14px;
-    border: 1px solid #f3f5f7;
-    min-width: 260px;
-    box-shadow: none;
+  .capa_inputtype.textline{
+    input{
+      height: 34px;
+      font-size: 14px;
+      border: 1px solid #eeeeee;
+      min-width: 230px;
+      box-shadow: none;
+      outline: none;
+    }
+    >.correct input{
+      border: 1px solid #57aa01;
+    }
+    >.incorrect input{
+      border: 1px solid #ff6d7a;
+    }
+    .status{
+      margin-top: 6px;
+    }
   }
-  .capa_inputtype.textline .status{
-    margin-top: 6px;
-  }
+
   div p.answer{
     position: relative;
     top: -5px;
   }
+
+  // 下拉选择
+  .indicator-container .status{
+    position: relative;
+    top: 5px;
+  }
+}
+
+@media screen and (max-width:576px){
+  .course-wrapper{
+    .course-content main{
+      padding: 20px 15px;
+    }
+  } 
 }

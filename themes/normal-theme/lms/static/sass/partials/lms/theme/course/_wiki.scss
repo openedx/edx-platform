@@ -12,6 +12,7 @@ body.view-in-course .wiki-wrapper{
 .container .wiki-wrapper section.wiki .breadcrumbs-header{
   padding: 10px 25px;
   border-bottom: 1px solid $border-gray;
+  background: #fff;
 
   .breadcrumb{
     margin: 0;
@@ -47,6 +48,8 @@ body.view-in-course .wiki-wrapper{
 .container .wiki-wrapper section.wiki{
   .nav-tabs{
     height: auto;
+    border: 1px solid #ddd;
+    padding: 10px;
   }
   .nav-tabs li{
     float: none;
@@ -101,7 +104,6 @@ body.view-in-course .wiki-wrapper{
 // add a wiki 
 .wiki-wrapper section.wiki .main-article{
   padding: 0;
-  width: 100%;
   padding: 10px 30px;
 
   h1{

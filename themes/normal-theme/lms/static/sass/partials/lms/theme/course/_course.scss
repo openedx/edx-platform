@@ -9,7 +9,7 @@
   margin: 0 auto;
 
   .nav-item .nav-link{
-    padding: 20px 30px 20px 5px;
+    padding: 20px 15px 20px 10px;
     border: none;
   }
   .nav-item.active .nav-link{
@@ -17,6 +17,18 @@
   }
   .nav-item:hover .nav-link{
     border: none;
+  }
+}
+body.view-in-course .wrapper-course-material .course-tabs{
+  .tab a{ 
+    padding: 20px 15px 20px 10px;
+    &:hover{
+      border: 0;
+    }
+    &.active{
+      border: 0;
+      color: $blue;
+    }
   }
 }
 
@@ -30,7 +42,8 @@
   line-height: 36px;
 
   .breadcrumbs{
-    line-height: 36px;
+    line-height: 1.5;
+    margin: 5px 0;
   }
   @media(max-width:767px){
     .form-actions{
@@ -56,11 +69,25 @@
     .page-header-main .page-title{  
       font-size: 18px;
       margin: 0;
-      line-height: 36px;
+      line-height: 38px;
       color:$title;
       font-weight: normal;
     }
     .action-resume-course{ 
+      @extend %btn-my-primary;
+    }
+    .page-header-search{
+      margin-right: 10px;
+    }
+    .input-group .field-input{
+      height: 16px;
+      font-size: 14px;
+      color: $font;
+      border: 1px solid $blue;
+      border-top-left-radius: 3px;
+      border-bottom-left-radius: 3px;
+    }
+    .btn{
       @extend %btn-my-primary;
     }
   } 
@@ -119,13 +146,15 @@
       font-size: 14px;
       margin: 0 0 0 30px;
       &:hover{
-        text-decoration: none;
         color: $blue;
       }
     }
     .subsection-text .details{  
       color:$font;
       font-size: 14px;
+      margin-left: 25px;
+      position: relative;
+      top: 6px;
     }
   }
 }
@@ -180,7 +209,6 @@
   ul li a{
     color: $font;
     &:hover{ 
-      text-decoration: none; 
       color: $blue;
     }
   }
@@ -189,9 +217,16 @@
 // welcome message
 .welcome-message{
   border-radius: 3px;
+  border: none;
+  background: rgba(182, 220, 254, 0.1);
+
   p{
     margin: 0;
     line-height: 2;
+    color: $font;
+  }
+  .dismiss-message{
+    display: none;
   }
 } 
 
@@ -205,9 +240,17 @@
 
 @media screen and (max-width:767px){
   .course-sidebar{
-    padding-top: 40px;
-    margin-top: 40px;
-    border-top: 1px solid $border;
+    padding-top: 30px;
+    margin-top: 30px;
+  }
+  .content-wrapper .page-header .form-actions{
+    margin-top: 10px;
+  }
+  .page-header .page-header-search .search-form{
+    margin-top: 5px;
+  }
+  .course-outline .block-tree .section{
+    margin: 0 0 0 10px;
   }
   #course-container{
     .page-content{
