@@ -46,7 +46,7 @@ class SoftwareSecurePhotoVerificationAdmin(admin.ModelAdmin):
         """
         decrypt image
         """
-        resp = requests.get(self._storage.url(file_name))
+        resp = requests.get(self._storage.url(file_name, 5))
         image = decode_and_decrypt(resp.content, aes_key)
         return mark_safe(u'<img src="data:image/png;base64,{data}" width="500px" />'.format(
             data=base64.b64encode(image)))
@@ -55,9 +55,13 @@ class SoftwareSecurePhotoVerificationAdmin(admin.ModelAdmin):
         """
         show face image
         """
-        aes_key = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["FACE_IMAGE_AES_KEY"].decode("hex")
-        file_name = self._get_path(obj, 'face')
-        return self.get_image(file_name, aes_key)
+        try:
+            aes_key = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["FACE_IMAGE_AES_KEY"].decode("hex")
+            file_name = self._get_path(obj, 'face')
+            return self.get_image(file_name, aes_key)
+        except Exception, e:
+            log.exception(e)
+        return None
 
     face_image.short_description = u'Face Image'
 
@@ -65,10 +69,14 @@ class SoftwareSecurePhotoVerificationAdmin(admin.ModelAdmin):
         """
         show photo id image
         """
-        rsa_private_key = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["RSA_PRIVATE_KEY"]
-        aes_key = rsa_decrypt(obj.photo_id_key.decode('base64'), rsa_private_key)
-        file_name = self._get_path(obj, 'photo_id')
-        return self.get_image(file_name, aes_key)
+        try:
+            rsa_private_key = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["RSA_PRIVATE_KEY"]
+            aes_key = rsa_decrypt(obj.photo_id_key.decode('base64'), rsa_private_key)
+            file_name = self._get_path(obj, 'photo_id')
+            return self.get_image(file_name, aes_key)
+        except Exception, e:
+            log.exception(e)
+        return None
 
     photo_id_image.short_description = u'PhotoID Image'
 
