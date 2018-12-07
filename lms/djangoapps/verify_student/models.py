@@ -44,7 +44,7 @@ from lms.djangoapps.verify_student.ssencrypt import (
 from openedx.core.djangoapps.signals.signals import LEARNER_NOW_VERIFIED
 from openedx.core.storage import get_storage
 
-from .utils import earliest_allowed_verification_date
+from .utils import earliest_allowed_verification_date, aliyun_oss_storage_path, submit_verification_photo
 
 log = logging.getLogger(__name__)
 
@@ -621,6 +621,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         self.save()
 
     @status_before_must_be("must_retry", "ready", "submitted")
+    @submit_verification_photo
     def submit(self, copy_id_photo_from=None):
         """
         Submit our verification attempt to Software Secure for validation. This
@@ -740,6 +741,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
 
         return get_storage(storage_class, **storage_kwargs)
 
+    @aliyun_oss_storage_path
     def _get_path(self, prefix, override_receipt_id=None):
         """
         Returns the path to a resource with this instance's `receipt_id`.
