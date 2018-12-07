@@ -4,6 +4,7 @@ URLs for mobile API
 
 from django.conf.urls import include, url
 
+from mobile_api.views import APPLastVersionView
 from .users.views import my_user_info
 
 urlpatterns = [
@@ -11,4 +12,5 @@ urlpatterns = [
     url(r'^my_user_info', my_user_info),
     url(r'^video_outlines/', include('mobile_api.video_outlines.urls')),
     url(r'^course_info/', include('mobile_api.course_info.urls')),
+    url(r'^app_version/last/$', APPLastVersionView.as_view()),
 ]
