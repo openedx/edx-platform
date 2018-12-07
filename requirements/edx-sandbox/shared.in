@@ -8,6 +8,7 @@
 #   * run "make upgrade" to update the detailed requirements files
 
 cryptography                        # Implementations of assorted cryptography algorithms
+idna==2.7                           # Pinning this to be inline with other req file
 lxml==3.8.0                         # XML parser
 networkx==1.7                       # Utilities for creating, manipulating, and studying network graphs
 nltk                                # Natural language processing; used by the chem package
