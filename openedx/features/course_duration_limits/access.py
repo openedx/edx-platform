@@ -12,7 +12,6 @@ from django.utils.translation import ugettext as _
 from util.date_utils import DEFAULT_SHORT_DATE_FORMAT, strftime_localized
 
 from course_modes.models import CourseMode
-
 from lms.djangoapps.courseware.access_response import AccessError
 from lms.djangoapps.courseware.access_utils import ACCESS_GRANTED
 from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
@@ -122,7 +121,7 @@ def register_course_expired_message(request, course):
         return
 
     if is_masquerading_as_student(request.user, course.id) and timezone.now() > expiration_date:
-        upgrade_message = _('This learner would not have access to this course. '
+        upgrade_message = _('This learner does not have access to this course. '
                             'Their access expired on {expiration_date}.')
         PageLevelMessages.register_warning_message(
             request,

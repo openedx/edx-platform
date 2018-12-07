@@ -10,16 +10,17 @@ from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
-from lms.djangoapps.courseware.masquerade import get_course_masquerade, is_masquerading_as_specific_student
 
+from lms.djangoapps.courseware.masquerade import get_course_masquerade, is_masquerading_as_specific_student
 from experiments.models import ExperimentData
-from student.models import CourseEnrollment
 from openedx.core.djangoapps.config_model_utils.models import StackedConfigurationModel
+from openedx.features.content_type_gating.helpers import has_staff_roles
 from openedx.features.course_duration_limits.config import (
     CONTENT_TYPE_GATING_FLAG,
     EXPERIMENT_ID,
     EXPERIMENT_DATA_HOLDBACK_KEY
 )
+from student.models import CourseEnrollment
 
 
 @python_2_unicode_compatible
@@ -85,6 +86,24 @@ class ContentTypeGatingConfig(StackedConfigurationModel):
         if enrollment is None:
             enrollment = CourseEnrollment.get_enrollment(user, course_key)
 
+        if user is None and enrollment is not None:
+            user = enrollment.user
+
+        no_masquerade = get_course_masquerade(user, course_key) is None
+        student_masquerade = is_masquerading_as_specific_student(user, course_key)
+        # We can only use the user variable for the code below when the request is not in a masquerade state
+        # or is masquerading as a specific user.
+        # When a request is not in a masquerade state the user variable represents the correct user.
+        # When a request is in a masquerade state and not masquerading as a specific user,
+        # then then user variable will be the incorrect (original) user, not the masquerade user.
+        # If a request is masquerading as a specific user, the user variable will represent the correct user.
+        user_variable_represents_correct_user = (no_masquerade or student_masquerade)
+        if user and user.id:
+            # TODO: Move masquerade checks to enabled_for_enrollment from content_type_gating/partitions.py
+            # TODO: Consolidate masquerade checks into shared function like has_staff_roles below
+            if user_variable_represents_correct_user and has_staff_roles(user, course_key):
+                return False
+
         # enrollment might be None if the user isn't enrolled. In that case,
         # return enablement as if the user enrolled today
         if enrollment is None:
@@ -93,9 +112,7 @@ class ContentTypeGatingConfig(StackedConfigurationModel):
             # TODO: clean up as part of REV-100
             experiment_data_holdback_key = EXPERIMENT_DATA_HOLDBACK_KEY.format(user)
             is_in_holdback = False
-            no_masquerade = get_course_masquerade(user, course_key) is None
-            student_masquerade = is_masquerading_as_specific_student(user, course_key)
-            if user and (no_masquerade or student_masquerade):
+            if user and (user_variable_represents_correct_user):
                 try:
                     holdback_value = ExperimentData.objects.get(
                         user=user,
