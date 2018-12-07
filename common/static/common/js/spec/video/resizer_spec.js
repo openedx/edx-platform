@@ -1,7 +1,7 @@
 (function(require) {
     'use strict';
     require(
-['video/00_resizer.js', 'underscore'],
+['js/video/00_resizer.js', 'underscore'],
 function(Resizer, _) {
     describe('Resizer', function() {
         var html = [
