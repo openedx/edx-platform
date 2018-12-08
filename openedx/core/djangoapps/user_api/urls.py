@@ -14,7 +14,8 @@ from .accounts.views import (
     AccountRetirementView,
     AccountViewSet,
     DeactivateLogoutView,
-    LMSAccountRetirementView
+    LMSAccountRetirementView,
+    PhoneBindingViewSet
 )
 from .preferences.views import PreferencesDetailView, PreferencesView
 from .verification_api.views import IDVerificationStatusView
@@ -67,6 +68,11 @@ RETIREMENT_POST = AccountRetirementView.as_view({
 })
 
 RETIREMENT_LMS_POST = LMSAccountRetirementView.as_view({
+    'post': 'post',
+})
+
+SEND_AND_VERIFY_CODE_FOR_BINDING = PhoneBindingViewSet.as_view({
+    'get': 'get',
     'post': 'post',
 })
 
