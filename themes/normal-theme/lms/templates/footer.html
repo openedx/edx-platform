@@ -39,27 +39,27 @@ from openedx.core.djangoapps.lang_pref.api import footer_language_selector_is_en
       <div class="footer-list">
         <h3>英荔教育</h3>
         <ul>
-          <li><a href="">关于我们</a></li>
-          <li><a href="">联系我们</a></li>
-          <li><a href="">加入我们</a></li>
+          <li><a href="/about/">关于我们</a></li>
+          <li><a href="${reverse('contact')}">联系我们</a></li>
+          <li><a href="${reverse('join_us')}">加入我们</a></li>
         </ul>
       </div>
 
       <div class="footer-list">
         <h3>关于平台</h3>
         <ul>
-          <li><a href="">使用手册</a></li>
-          <li><a href="">充值与支付</a></li>
-          <li><a href="">帮助与投诉</a></li>
+          <li><a href="${reverse('manual')}">使用手册</a></li>
+          <!--<li><a href="">充值与支付</a></li>-->
+          <li><a href="${reverse('help_edx')}">帮助与投诉</a></li>
         </ul>
       </div>
 
       <div class="footer-list">
         <h3>条款说明</h3>
         <ul>
-          <li><a href="">用户协议</a></li>
-          <li><a href="">隐私政策</a></li>
-          <li><a href="">免责声明</a></li>
+          <li><a href="${reverse('user_agreement')}">用户协议</a></li>
+          <li><a href="${reverse('privacy_policy')}">隐私政策</a></li>
+          <li><a href="${reverse('disclaimer')}">免责声明</a></li>
         </ul>
       </div>
 
