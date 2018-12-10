@@ -16,6 +16,13 @@ pyparsing                           # Python parsing library; used by the calc p
 sympy==0.7.1                        # Symbolic math library; used by the calc package
 scipy==0.14.0                       # Math, science, and engineering library; used by the calc package
 
+# Pinned early:
+#   edx-sandbox/shared.in has cryptography, which wants idna, and finds 2.8
+#   paver.in has requests, which wants idna<2.8
+#       but paver.in includes edx-sandbox/shared.txt which now pins idna==2.8
+#       *conflict*
+idna<2.8
+
 # Install these packages from the edx-platform working tree
 # NOTE: if you change code in these packages, you MUST change the version
 # number in its setup.py or the code WILL NOT be installed during deploy.
