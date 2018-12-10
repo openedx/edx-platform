@@ -690,27 +690,6 @@ class LogoutDuringAnswering(ProblemsTest):
         problem_page.click_submit()
         self.assertTrue(problem_page.simpleprob_is_correct())
 
-    def test_logout_cancel_no_redirect(self):
-        """
-        1) User goes to a problem page.
-        2) User fills out an answer to the problem.
-        3) User is logged out because their session id is invalidated or removed.
-        4) User clicks "check", and sees a confirmation modal asking them to
-           re-authenticate, since they've just been logged out.
-        5) User clicks "cancel".
-        6) User is not redirected to the login page.
-        """
-        self.courseware_page.visit()
-        problem_page = ProblemPage(self.browser)
-        self.assertEqual(problem_page.problem_name, 'TEST PROBLEM')
-        problem_page.fill_answer_numerical('1')
-        self.log_user_out()
-        with problem_page.handle_alert(confirm=False):
-            problem_page.click_submit()
-
-        problem_page.wait_for_page()
-        self.assertEqual(problem_page.problem_name, 'TEST PROBLEM')
-
 
 @attr(shard=9)
 class ProblemQuestionDescriptionTest(ProblemsTest):
