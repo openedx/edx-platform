@@ -59,5 +59,10 @@ module.exports = _.values(Merge.smart(commonConfig, {
         watchOptions: {
             ignored: [/node_modules/, /\.git/]
         }
+    },
+    webworker: {
+        entry: {
+            mockprock: './node_modules/@edx/mockprock/static/index.js',
+        }
     }
 }));
