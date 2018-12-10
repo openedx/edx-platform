@@ -114,6 +114,7 @@
   }
 
   .hd-3 {
+    font: -apple-system-short-headline !important;
     color: palette(grayscale, dark);
     min-height: ($baseline*3);
     line-height: 1.15;
@@ -124,6 +125,7 @@
     margin-bottom: 5px;
 
     .number-status {
+      font: -apple-system-short-caption1 !important;
       text-align: center;
       width: 100%;
       float: left;
