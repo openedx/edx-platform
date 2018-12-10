@@ -431,12 +431,14 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
             # For ZeroSubsectionGrades, we don't want to crawl the subsection's
             # subtree to find the problem scores specific to this user
             # (ZeroSubsectionGrade.attempted_graded is always False).
-            # We've already fetched the whole course structure in a non-specific way
+            # We've already fetched the whole course structure in a non-user-specific way
             # when creating `graded_subsections`.  Looking at the problem scores
             # specific to this user (the user in `course_grade.user`) would require
             # us to re-fetch the user-specific course structure from the modulestore,
-            # which is a costly operation.
-            if subsection_grade.attempted_graded:
+            # which is a costly operation.  So we only drill into the `graded_total`
+            # attribute if the user has attempted this graded subsection, or if there
+            # has been a grade override applied.
+            if subsection_grade.attempted_graded or subsection_grade.override:
                 graded_description = '({earned:.2f}/{possible:.2f})'.format(
                     earned=subsection_grade.graded_total.earned,
                     possible=subsection_grade.graded_total.possible,
