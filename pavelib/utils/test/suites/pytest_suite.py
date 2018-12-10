@@ -60,6 +60,7 @@ class PytestSuite(TestSuite):
         if self.run_under_coverage:
             cmd.append('--cov')
             cmd.append('--cov-report=')
+            cmd.append(self.cov_args)
 
         return cmd
 
@@ -252,5 +253,6 @@ class LibTestSuite(PytestSuite):
             if self.append_coverage:
                 cmd.append('--cov-append')
             cmd.append('--cov-report=')
+            cmd.append(self.cov_args)
 
         return cmd

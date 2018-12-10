@@ -12,6 +12,9 @@ source =
     pavelib
 
 omit =
+    */urls.py
+    */*test*/*
+    */*test*.py
     cms/envs/*
     cms/manage.py
     cms/djangoapps/contentstore/views/dev.py

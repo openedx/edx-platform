@@ -4,7 +4,7 @@ Required in Django 1.9+ due to imports of models in stock Django apps.
 """
 
 from __future__ import absolute_import, unicode_literals
-
+import os
 import sys
 import tempfile
 
@@ -95,3 +95,5 @@ USE_TZ = True
 
 RETIREMENT_SERVICE_WORKER_USERNAME = 'RETIREMENT_SERVICE_USER'
 RETIRED_USERNAME_PREFIX = 'retired__user_'
+
+MONGO_HOST = os.environ.get('EDXAPP_TEST_MONGO_HOST', 'localhost')

@@ -76,6 +76,8 @@ jscover.log.*
 .pytest_cache/
 .tddium*
 common/test/data/test_unicode/static/
+common/test/data/badges/good_*
+common/test/data/badges/unbalanced_*
 test_root/courses/
 test_root/data/test_bare.git/
 test_root/export_course_repos/
@@ -141,3 +143,5 @@ dist
 .vscode
 
 .autoenv*
+
+ci/docker-compose.yml

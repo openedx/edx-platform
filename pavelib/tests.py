@@ -235,6 +235,7 @@ def test_python(options, passthrough_options):
 @needs(
     'pavelib.prereqs.install_prereqs',
     'pavelib.utils.test.utils.clean_reports_dir',
+    'pavelib.assets.process_xmodule_assets',
 )
 @cmdopts([
     ("suites", "s", "List of unit test suites to run. (js, lib, cms, lms)"),
@@ -258,7 +259,7 @@ def test(options, passthrough_options):
         passthrough_options=passthrough_options,
         **options.test
     )
-    js_suite = suites.JsTestSuite('JS Tests', mode='run', with_coverage=True)
+    js_suite = suites.JsTestSuite('JS Tests', suites='all', mode='run', with_coverage=True)
 
     # Main suite to be run
     all_unittests_suite = suites.TestSuite('All Tests', subsuites=[js_suite, python_suite])

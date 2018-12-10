@@ -263,6 +263,7 @@ class ShibSPTest(CacheIsolationTestCase):
         """
         self._test_auto_activate_user_with_flag(log_user_string="inactive@stanford.edu")
 
+    @pytest.mark.skip()
     @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     @patch.dict(settings.FEATURES, {'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': True, 'SQUELCH_PII_IN_LOGS': True})
     def test_extauth_auto_activate_user_with_flag_squelch(self):

@@ -32,6 +32,7 @@ class TestExpireOldEntitlementsTask(TestCase):
     """
     Tests for the 'expire_old_entitlements' method.
     """
+    
     def test_checks_expiration(self, mock_datetime):
         """
         Test that we actually do check expiration on each entitlement (happy path)

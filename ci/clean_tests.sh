@@ -1,12 +1,10 @@
-#!/bin/bash -x
+#!/bin/bash -e
 . /edx/app/edxapp/edxapp_env
-
 . /edx/app/edxapp/nodeenvs/edxapp/bin/activate
 . /edx/app/edxapp/venvs/edxapp/bin/activate
 
 cd /edx/app/edxapp/edx-platform
 
-paver test_system -C -c "--cov-append" -p 4 --fasttest
-paver test_lib -C -c "--cov-append"
-paver coverage
-
+paver i18n_clean
+make clean
+git clean -fdx > /dev/null 2>&1

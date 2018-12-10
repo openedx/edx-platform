@@ -1,24 +1,30 @@
-
-@NonCPS
-
-def prevBuild = currentBuild.previousBuild
-if (prevBuild)
-    prevBuild.rawBuild._this().doTerm();
-
-
 pipeline {
-    agent { node { label 'master' } }
+    agent any
+    options {
+        timestamps()
+    }
+    environment {
+        BUILD_TAG = "${env.BUILD_TAG.toLowerCase()}"
+    }
     stages {
-        stage('Test') {
+        stage("Stop Old Build") {
             steps {
-                sh "make -f ci/ci.mk ci_up"
-                sh "make -f ci/ci.mk ci_test"
-                junit "unittest_reports/nosetests/*.xml"
-
+                milestone label: "", ordinal:  Integer.parseInt(env.BUILD_ID) - 1
+                milestone label: "", ordinal:  Integer.parseInt(env.BUILD_ID)
+            }
+        }
+        stage("Test") {
+            steps {
+                sh "BUILD_TAG=${BUILD_TAG} make ci_up"
+                sh "BUILD_TAG=${BUILD_TAG} make ci_test"
+                junit "reports/**/nosetests.xml"
+                cobertura coberturaReportFile: "reports/coverage.xml", failUnstable: false, maxNumberOfBuilds: 20, onlyStable: false, zoomCoverageChart: false
             }
             post {
                 always {
-                    sh "make -f ci/ci.mk ci_down"
+
+                    sh "BUILD_TAG=${BUILD_TAG} make ci_clean || true"
+                    sh "BUILD_TAG=${BUILD_TAG} make ci_down || true"
                 }
             }
         }

@@ -111,6 +111,7 @@ class TestSites(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         # assert that the edX partners tag line is not in the HTML
         self.assertNotContains(resp, 'Explore free courses from')
 
+    @pytest.mark.skip('TODO invalid test from edx')
     def test_no_configuration_anonymous_homepage_content(self):
         """
         Make sure we see the right content on the homepage if there is no site configuration defined.

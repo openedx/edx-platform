@@ -995,7 +995,7 @@ class VideoDescriptorStudentViewDataTestCase(unittest.TestCase):
 @patch.object(settings, 'CONTENTSTORE', create=True, new={
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
     'DOC_STORE_CONFIG': {
-        'host': 'edx.devstack.mongo' if 'BOK_CHOY_HOSTNAME' in os.environ else 'localhost',
+        'host': settings.MONGO_HOST,
         'db': 'test_xcontent_%s' % uuid4().hex,
     },
     # allow for additional options that can be keyed on a name, e.g. 'trashcan'
