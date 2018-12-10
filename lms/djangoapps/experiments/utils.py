@@ -75,8 +75,11 @@ def get_experiment_user_metadata_context(course, user):
         forum_roles = list(Role.objects.filter(users=user, course_id=course.id).values_list('name').distinct())
 
     # get user partition data
-    partition_groups = get_all_partitions_for_course(course)
-    user_partitions = get_user_partition_groups(course.id, partition_groups, user, 'name')
+    if user.is_authenticated():
+        partition_groups = get_all_partitions_for_course(course)
+        user_partitions = get_user_partition_groups(course.id, partition_groups, user, 'name')
+    else:
+        user_partitions = {}
 
     return {
         'upgrade_link': upgrade_link,
