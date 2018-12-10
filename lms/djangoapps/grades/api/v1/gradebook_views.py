@@ -261,6 +261,7 @@ class CourseGradingView(BaseCourseView):
             results = {
                 'assignment_types': self._get_assignment_types(course),
                 'subsections': self._get_subsections(course, graded_only),
+                'grades_frozen': are_grades_frozen(course_key),
             }
             return Response(results)
 

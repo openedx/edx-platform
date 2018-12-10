@@ -366,3 +366,4 @@ def are_grades_frozen(course_key):
             freeze_grade_date = course.end + timedelta(30)
             now = timezone.now()
             return now > freeze_grade_date
+    return False
