@@ -12,7 +12,7 @@
   max-width: none;
   width: 100%;
   flex: 1;
-  padding: 0 10px;
+  padding: 0;
   box-sizing: border-box;
   background-image: linear-gradient(to bottom, #fff 0%, #fff 45%, #f2f9ff 100%);
   font-size: 14px;
@@ -62,6 +62,11 @@ body.view-in-course .container .course-wrapper, body.view-in-course .profile-wra
 }
 
 
+// a
+a:not(.btn):hover, a:not(.btn):focus, a:visited:not(.btn):hover, a:visited:not(.btn):focus{
+  color: $blue;
+  opacity: 0.95;
+}
 
 // select
 select{
@@ -87,6 +92,7 @@ ol, ul, dl{
 textarea:focus, input[type="text"]:focus, input[type="url"]:focus, input[type="email"]:focus, input[type="password"]:focus, input[type="tel"]:focus{  
   box-shadow: none;
   border: 1px solid $blue;
+  outline: none;
   @include media-breakpoint-down(sm){
     &{
       box-shadow: none;
@@ -114,9 +120,11 @@ textarea:focus, input[type="text"]:focus, input[type="url"]:focus, input[type="e
   border: 1px solid $blue;
   color: #fff;
   text-shadow: none;
+  box-shadow: none;
   font-family: $font-family-sans-serif;
+  outline: none;
 
-  &:hover,&:focus{
+  &:hover,&:focus, &:active, &:visited{
     background: $blue;
     text-decoration: none;
     opacity: 0.95;
@@ -141,8 +149,9 @@ textarea:focus, input[type="text"]:focus, input[type="url"]:focus, input[type="e
   border: 1px solid $blue;
   text-shadow: none;
   font-family: $font-family-sans-serif;
+  outline: none;
 
-  &:hover, &:hover{
+  &:hover, &:focus &:active, &:visited{
     background: #f7fbfe;
     color: $blue;
     text-decoration: none;
