@@ -682,7 +682,7 @@ class RegModelForm(BaseOnboardingModelForm):
         organization_name = self.cleaned_data['organization_name']
 
         if self.data.get('is_currently_employed') == 'false' and not organization_name:
-            raise forms.ValidationError(ugettext_noop('Please enter organization name'))
+            raise forms.ValidationError(ugettext_noop('Please enter Organization Name.'))
 
         return organization_name
 
