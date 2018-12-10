@@ -1158,22 +1158,6 @@ class HLSVideoTest(VideoBaseTest):
         # Verify that the video download url is not shown
         self.assertEqual(self.video.video_download_url, None)
 
-    def test_hls_video_with_youtube_blocked(self):
-        """
-        Scenario: HLS video is rendered when the YouTube API is blocked
-        Given the YouTube API is blocked
-        And the course has a Video component with Youtube, HTML5 and HLS sources available
-        Then the HLS video is rendered
-        """
-        # configure youtube server
-        self.youtube_configuration.update({
-            'youtube_api_blocked': True,
-        })
-
-        self.metadata = self.metadata_for_mode('html5_and_hls', additional_data={'youtube_id_1_0': 'b7xgknqkQk8'})
-        self.navigate_to_video()
-        self.assertTrue(self.video.is_video_rendered('hls'))
-
     def test_hls_video_with_youtube_delayed_response_time(self):
         """
         Scenario: HLS video is rendered when the YouTube API response time is slow
