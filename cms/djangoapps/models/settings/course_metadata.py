@@ -9,6 +9,8 @@ from xblock.fields import Scope
 from xblock_django.models import XBlockStudioConfigurationFlag
 from xmodule.modulestore.django import modulestore
 
+from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
+
 
 class CourseMetadata(object):
     '''
@@ -63,7 +65,7 @@ class CourseMetadata(object):
     ]
 
     @classmethod
-    def filtered_list(cls):
+    def filtered_list(cls, course_key=None):
         """
         Filter fields based on feature flag, i.e. enabled, disabled.
         """
@@ -117,6 +119,10 @@ class CourseMetadata(object):
         if not XBlockStudioConfigurationFlag.is_enabled():
             filtered_list.append('allow_unsupported_xblocks')
 
+        # Do not show "Course Visibility For Unenrolled Learners" in Studio Advanced Settings
+        # if the enable_anonymous_access flag is not enabled
+        if not COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.is_enabled(course_key=course_key):
+            filtered_list.append('course_visibility')
         return filtered_list
 
     @classmethod
@@ -128,7 +134,7 @@ class CourseMetadata(object):
         result = {}
         metadata = cls.fetch_all(descriptor)
         for key, value in metadata.iteritems():
-            if key in cls.filtered_list():
+            if key in cls.filtered_list(descriptor.id):
                 continue
             result[key] = value
         return result
@@ -163,7 +169,7 @@ class CourseMetadata(object):
 
         Ensures none of the fields are in the blacklist.
         """
-        filtered_list = cls.filtered_list()
+        filtered_list = cls.filtered_list(descriptor.id)
         # Don't filter on the tab attribute if filter_tabs is False.
         if not filter_tabs:
             filtered_list.remove("tabs")
@@ -199,7 +205,7 @@ class CourseMetadata(object):
             errors: list of error objects
             result: the updated course metadata or None if error
         """
-        filtered_list = cls.filtered_list()
+        filtered_list = cls.filtered_list(descriptor.id)
         if not filter_tabs:
             filtered_list.remove("tabs")
 
