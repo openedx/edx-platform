@@ -26,12 +26,12 @@ urlpatterns = [
     ),
     url(
         r'^gradebook/{course_id}/$'.format(course_id=settings.COURSE_ID_PATTERN),
-        views.GradebookView.as_view(),
+        gradebook_views.GradebookView.as_view(),
         name='course_gradebook'
     ),
     url(
         r'^gradebook/{course_id}/bulk-update$'.format(course_id=settings.COURSE_ID_PATTERN),
-        views.GradebookBulkUpdateView.as_view(),
+        gradebook_views.GradebookBulkUpdateView.as_view(),
         name='course_gradebook_bulk_update'
     ),
     url(
