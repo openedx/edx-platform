@@ -652,6 +652,86 @@ class GradebookViewTest(GradebookViewTestBase):
         'login_course_admin',
         'login_course_staff',
     )
+    def test_gradebook_data_for_single_learner_override(self, login_method):
+        """
+        Tests that, when a subsection grade that was created from an override, and thus
+        does not have a truthy `first_attempted` attribute, is the only grade for a
+        user's subsection, we still get data including a non-zero possible score.
+        """
+        with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
+            course_grade = self.mock_course_grade(self.student, passed=True, letter_grade='A', percent=0.85)
+
+            mock_subsection_grades = {
+                self.subsections[self.chapter_1.location][0].location: self.mock_subsection_grade(
+                    self.subsections[self.chapter_1.location][0],
+                    earned_all=1.0,
+                    possible_all=2.0,
+                    earned_graded=1.0,
+                    possible_graded=2.0,
+                    first_attempted=None,
+                    override=MagicMock(),
+                ),
+                self.subsections[self.chapter_1.location][1].location: self.mock_subsection_grade(
+                    self.subsections[self.chapter_1.location][1],
+                    earned_all=1.0,
+                    possible_all=2.0,
+                    earned_graded=1.0,
+                    possible_graded=2.0,
+                    first_attempted=None,
+                    override=MagicMock(),
+                ),
+                self.subsections[self.chapter_2.location][0].location: self.mock_subsection_grade(
+                    self.subsections[self.chapter_2.location][0],
+                    earned_all=1.0,
+                    possible_all=2.0,
+                    earned_graded=1.0,
+                    possible_graded=2.0,
+                    first_attempted=None,
+                    override=MagicMock(),
+                ),
+                self.subsections[self.chapter_2.location][1].location: self.mock_subsection_grade(
+                    self.subsections[self.chapter_2.location][1],
+                    earned_all=1.0,
+                    possible_all=2.0,
+                    earned_graded=1.0,
+                    possible_graded=2.0,
+                    first_attempted=None,
+                    override=MagicMock(),
+                ),
+            }
+            course_grade.subsection_grade = lambda key: mock_subsection_grades[key]
+            mock_grade.return_value = course_grade
+
+            with override_waffle_flag(self.waffle_flag, active=True):
+                getattr(self, login_method)()
+                resp = self.client.get(
+                    self.get_url(course_key=self.course.id, username=self.student.username)
+                )
+                expected_results = OrderedDict([
+                    ('course_id', text_type(self.course.id)),
+                    ('email', self.student.email),
+                    ('user_id', self.student.id),
+                    ('username', self.student.username),
+                    ('full_name', self.student.get_full_name()),
+                    ('passed', True),
+                    ('percent', 0.85),
+                    ('letter_grade', 'A'),
+                    ('progress_page_url', reverse(
+                        'student_progress',
+                        kwargs=dict(course_id=text_type(self.course.id), student_id=self.student.id)
+                    )),
+                    ('section_breakdown', self.expected_subsection_grades(letter_grade='A')),
+                ])
+
+                self.assertEqual(status.HTTP_200_OK, resp.status_code)
+                actual_data = dict(resp.data)
+                self.assertEqual(expected_results, actual_data)
+
+    @ddt.data(
+        'login_staff',
+        'login_course_admin',
+        'login_course_staff',
+    )
     def test_gradebook_data_filter_username_contains(self, login_method):
         with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
             mock_grade.return_value = self.mock_course_grade(
