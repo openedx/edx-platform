@@ -14,7 +14,14 @@ from django.http import HttpResponseForbidden
 from openedx.core.djangoapps.theming.helpers import get_current_request
 from six import text_type
 
-from student.models import User, UserProfile, Registration, email_exists_or_retired, username_exists_or_retired
+from student.models import (
+    AccountRecovery,
+    User,
+    UserProfile,
+    Registration,
+    email_exists_or_retired,
+    username_exists_or_retired
+)
 from student import forms as student_forms
 from student import views as student_views
 from util.model_utils import emit_setting_changed_event
@@ -131,6 +138,7 @@ def update_account_settings(requesting_user, update, username=None):
         username = requesting_user.username
 
     existing_user, existing_user_profile = _get_user_and_profile(username)
+    account_recovery = _get_account_recovery(existing_user)
 
     if requesting_user.username != username:
         raise errors.UserNotAuthorized()
@@ -150,6 +158,10 @@ def update_account_settings(requesting_user, update, username=None):
     if "name" in update:
         changing_full_name = True
         old_name = existing_user_profile.name
+
+    changing_secondary_email = False
+    if "secondary_email" in update:
+        changing_secondary_email = True
 
     # Check for fields that are not editable. Marking them read-only causes them to be ignored, but we wish to 400.
     read_only_fields = set(update.keys()).intersection(
@@ -187,6 +199,18 @@ def update_account_settings(requesting_user, update, username=None):
         # an account. User must see same success message with no error.
         # This is so that this endpoint cannot be used to determine if an email is valid or not.
         changing_email = new_email and not email_exists_or_retired(new_email)
+
+    if changing_secondary_email:
+        try:
+            student_views.validate_secondary_email(account_recovery, update["secondary_email"])
+        except ValueError as err:
+            field_errors["secondary_email"] = {
+                "developer_message": u"Error thrown from validate_secondary_email: '{}'".format(text_type(err)),
+                "user_message": text_type(err)
+            }
+        else:
+            account_recovery.secondary_email = update["secondary_email"]
+            account_recovery.save()
 
     # If the user asked to change full name, validate it
     if changing_full_name:
@@ -485,6 +509,19 @@ def get_email_validation_error(email):
     return _validate(_validate_email, errors.AccountEmailInvalid, email)
 
 
+def get_secondary_email_validation_error(email):
+    """
+    Get the built-in validation error message for when the email is invalid in some way.
+
+    Arguments:
+        email (str): The proposed email (unicode).
+    Returns:
+        (str): Validation error message.
+
+    """
+    return _validate(_validate_secondary_email_doesnt_exist, errors.AccountEmailAlreadyExists, email)
+
+
 def get_confirm_email_validation_error(confirm_email, email):
     """Get the built-in validation error message for when
     the confirmation email is invalid in some way.
@@ -558,6 +595,18 @@ def _get_user_and_profile(username):
     existing_user_profile, _ = UserProfile.objects.get_or_create(user=existing_user)
 
     return existing_user, existing_user_profile
+
+
+def _get_account_recovery(user):
+    """
+    helper method to return the account recovery object based on user.
+    """
+    try:
+        account_recovery = user.account_recovery
+    except ObjectDoesNotExist:
+        account_recovery = AccountRecovery(user=user)
+
+    return account_recovery
 
 
 def _validate(validation_func, err, *args):
@@ -707,6 +756,25 @@ def _validate_email_doesnt_exist(email):
     """
     if email is not None and email_exists_or_retired(email):
         raise errors.AccountEmailAlreadyExists(_(accounts.EMAIL_CONFLICT_MSG).format(email_address=email))
+
+
+def _validate_secondary_email_doesnt_exist(email):
+    """
+    Validate that the email is not associated as a secondary email of an existing user.
+
+    Arguments:
+        email (unicode): The proposed email.
+
+    Returns:
+        None
+
+    Raises:
+        errors.AccountEmailAlreadyExists: Raised if given email address is already associated as another
+            user's secondary email.
+    """
+    if email is not None and AccountRecovery.objects.filter(secondary_email=email).exists():
+        # pylint: disable=no-member
+        raise errors.AccountEmailAlreadyExists(accounts.EMAIL_CONFLICT_MSG.format(email_address=email))
 
 
 def _validate_password_works_with_username(password, username=None):

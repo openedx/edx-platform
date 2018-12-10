@@ -2879,3 +2879,20 @@ class LogoutViewConfiguration(ConfigurationModel):
     def __unicode__(self):
         """Unicode representation of the instance. """
         return u'Logout view configuration: {enabled}'.format(enabled=self.enabled)
+
+
+class AccountRecovery(models.Model):
+    """
+    Model for storing information for user's account recovery in case of access loss.
+    """
+    user = models.OneToOneField(User, related_name='account_recovery', on_delete=models.CASCADE)
+    secondary_email = models.EmailField(
+        verbose_name=_('Secondary email address'),
+        help_text=_('Secondary email address to recover linked account.'),
+        unique=True,
+        null=False,
+        blank=False,
+    )
+
+    class Meta(object):
+        db_table = "auth_accountrecovery"
