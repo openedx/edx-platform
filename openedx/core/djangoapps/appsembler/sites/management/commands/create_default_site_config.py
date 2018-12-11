@@ -14,7 +14,7 @@ from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 class Command(BaseCommand):
     help = 'Create default SiteConfiguration for the default SITE_ID.'
 
-    def handle_noargs(self, **options):
+    def handle(self, *args, **options):
         s = Site.objects.get(id=settings.SITE_ID)
 
         try:
