@@ -39,7 +39,6 @@ from openedx.core.djangoapps.theming.helpers import get_themes
 from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
 from student.models import (
     LinkedInAddToProfileConfiguration,
-    PasswordHistory,
     Registration,
     UserAttribute,
     UserProfile,
@@ -644,11 +643,6 @@ def do_create_account(form, custom_form=None):
             )
         else:
             raise
-
-    # add this account creation to password history
-    # NOTE, this will be a NOP unless the feature has been turned on in configuration
-    password_history_entry = PasswordHistory()
-    password_history_entry.create(user)
 
     registration.register(user)
 

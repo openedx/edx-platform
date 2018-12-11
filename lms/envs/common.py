@@ -238,9 +238,6 @@ FEATURES = {
     # Prevent concurrent logins per user
     'PREVENT_CONCURRENT_LOGINS': True,
 
-    # Turn on Advanced Security by default
-    'ADVANCED_SECURITY': True,
-
     # When a logged in user goes to the homepage ('/') should the user be
     # redirected to the dashboard - this is default Open edX behavior. Set to
     # False to not redirect the user
@@ -2918,10 +2915,6 @@ for app_name, insert_before in OPTIONAL_APPS:
         INSTALLED_APPS.insert(INSTALLED_APPS.index(insert_before), app_name)
     except (IndexError, ValueError):
         INSTALLED_APPS.append(app_name)
-
-### ADVANCED_SECURITY_CONFIG
-# Empty by default
-ADVANCED_SECURITY_CONFIG = {}
 
 ### External auth usage -- prefixes for ENROLLMENT_DOMAIN
 SHIBBOLETH_DOMAIN_PREFIX = 'shib:'

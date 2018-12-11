@@ -77,7 +77,6 @@ from student.helpers import (
 from student.message_types import EmailChange, PasswordReset
 from student.models import (
     CourseEnrollment,
-    PasswordHistory,
     PendingEmailChange,
     Registration,
     RegistrationCookieConfiguration,
@@ -879,11 +878,6 @@ def password_reset_confirm_wrapper(request, uidb36=None, token=None):
 
         # get the updated user
         updated_user = User.objects.get(id=uid_int)
-
-        # did the password hash change, if so record it in the PasswordHistory
-        if updated_user.password != old_password_hash:
-            entry = PasswordHistory()
-            entry.create(updated_user)
 
     else:
         response = password_reset_confirm(

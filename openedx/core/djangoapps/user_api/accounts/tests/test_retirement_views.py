@@ -57,7 +57,6 @@ from student.models import (
     CourseEnrollment,
     CourseEnrollmentAllowed,
     ManualEnrollmentAudit,
-    PasswordHistory,
     PendingEmailChange,
     PendingNameChange,
     Registration,
@@ -1533,7 +1532,6 @@ class TestLMSAccountRetirementPost(RetirementTestCase, ModuleStoreTestCase):
 
         # other setup
         PendingNameChange.objects.create(user=self.test_user, new_name=self.pii_standin, rationale=self.pii_standin)
-        PasswordHistory.objects.create(user=self.test_user, password=self.pii_standin)
 
         # setup for doing POST from test client
         self.headers = build_jwt_headers(self.test_superuser)
@@ -1563,7 +1561,6 @@ class TestLMSAccountRetirementPost(RetirementTestCase, ModuleStoreTestCase):
         self.assertEqual(RevisionPluginRevision.objects.get(user=self.test_user).ip_address, None)
         self.assertEqual(ArticleRevision.objects.get(user=self.test_user).ip_address, None)
         self.assertFalse(PendingNameChange.objects.filter(user=self.test_user).exists())
-        self.assertEqual(PasswordHistory.objects.get(user=self.test_user).password, '')
 
         self.assertEqual(
             ManualEnrollmentAudit.objects.get(
