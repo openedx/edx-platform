@@ -9,5 +9,8 @@
 #   * confirm that it has no system requirements beyond what we already install
 #   * run "make upgrade" to update the detailed requirements files
 #
+
+-c ../constraints.txt
+
 coverage==4.4                       # Code coverage testing for Python
 diff-cover==0.9.8                   # Automatically find diff lines that need test coverage

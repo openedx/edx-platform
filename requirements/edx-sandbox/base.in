@@ -7,5 +7,7 @@
 #   * confirm that it has no system requirements beyond what we already install
 #   * run "make upgrade" to update the detailed requirements files
 
+-c ../constraints.txt
+
 -r shared.txt                       # Dependencies in common with LMS and Studio
 matplotlib==1.3.1                   # 2D plotting library
