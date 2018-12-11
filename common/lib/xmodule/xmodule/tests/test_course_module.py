@@ -459,7 +459,7 @@ class ProctoringProviderTestCase(unittest.TestCase):
             self.proctoring_provider.from_json(provider)
         self.assertEqual(
             context_manager.exception.args[0],
-            ['The selected proctoring backend, {}, is not a valid backend. Please select from one of {}.'
+            ['The selected proctoring provider, {}, is not a valid provider. Please select from one of {}.'
                 .format(provider, proctoring_provider_whitelist)]
         )
 
