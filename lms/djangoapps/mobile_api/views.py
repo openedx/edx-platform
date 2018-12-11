@@ -28,12 +28,8 @@ class APPLastVersionView(APIView):
             return Response({
                 "last_version": {
                     "platform": latest_version_config.platform,
-                    "version": latest_version_config.version,
-                    "created_at": latest_version_config.created_at,
-                    "download_url": latest_version_config.download_url,
-                    "release_notes": latest_version_config.release_notes,
-                    "version_code": latest_version_config.version_code,
-                    "is_audited_passed": latest_version_config.is_audited_passed
+                    "last_version": latest_version_config.last_version,
+                    "enabled": latest_version_config.enabled
                 }
             })
         else:
