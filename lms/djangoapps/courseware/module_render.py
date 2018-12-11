@@ -69,7 +69,9 @@ from openedx.core.lib.xblock_utils import (
     replace_course_urls,
     replace_jump_to_id_urls,
     replace_static_urls,
-    wrap_xblock
+    wrap_xblock,
+    is_xblock_aside,
+    get_aside_from_xblock,
 )
 from student.models import anonymous_id_for_user, user_by_anonymous_id
 from student.roles import CourseBetaTesterRole
@@ -1116,7 +1118,18 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
     set_custom_metrics_for_course_key(course_key)
 
     with modulestore().bulk_operations(course_key):
-        instance, tracking_context = get_module_by_usage_id(request, course_id, usage_id, course=course)
+        try:
+            usage_key = UsageKey.from_string(unquote_slashes(usage_id))
+        except InvalidKeyError:
+            raise Http404
+        if is_xblock_aside(usage_key):
+            # Get the usage key for the block being wrapped by the aside (not the aside itself)
+            block_usage_key = usage_key.usage_key
+        else:
+            block_usage_key = usage_key
+        instance, tracking_context = get_module_by_usage_id(
+            request, course_id, unicode(block_usage_key), course=course
+        )
 
         # Name the transaction so that we can view XBlock handlers separately in
         # New Relic. The suffix is necessary for XModule handlers because the
@@ -1129,7 +1142,14 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
         req = django_to_webob_request(request)
         try:
             with tracker.get_tracker().context(tracking_context_name, tracking_context):
-                resp = instance.handle(handler, req, suffix)
+                if is_xblock_aside(usage_key):
+                    # In this case, 'instance' is the XBlock being wrapped by the aside, so
+                    # the actual aside instance needs to be retrieved in order to invoke its
+                    # handler method.
+                    handler_instance = get_aside_from_xblock(instance, usage_key.aside_type)
+                else:
+                    handler_instance = instance
+                resp = handler_instance.handle(handler, req, suffix)
                 if suffix == 'problem_check' \
                         and course \
                         and getattr(course, 'entrance_exam_enabled', False) \
