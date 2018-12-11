@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 """
 An API for retrieving user account information.
 
@@ -81,6 +82,8 @@ from .signals import (
     USER_RETIRE_THIRD_PARTY_MAILINGS
 )
 from ..message_types import DeletionNotificationMessage
+
+from membership.utils import xresult
 
 log = logging.getLogger(__name__)
 
@@ -523,43 +526,48 @@ def _set_unusable_password(user):
 
 
 class PhoneBindingViewSet(ViewSet):
-    # authentication_classes = (
-    #     OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser, JwtAuthentication
-    # )
-    # permission_classes = (permissions.IsAuthenticated,)
+    authentication_classes = (SessionAuthentication, JwtAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
 
     verify_code_key = 'phone_binding_verifycode_{username}_{name}'
     verify_code_timeout = 10 * 60
 
     def get(self, request):
-        phone = request.data['phone']
         try:
-            language_version = str(request.session._session['_language'])
-            if not language_version:
+            phone = request.GET['phone']
+            try:
+                language_version = str(request.session._session['_language'])
+                if not language_version:
+                    language_version = "zh-cn"
+            except Exception as e:
                 language_version = "zh-cn"
+            self.send_mobile_code(request.user.username, phone, language_version)
+            return Response(xresult(data={'status': True}))
         except Exception as e:
-            language_version = "zh-cn"
-        self.send_mobile_code(request.user.username, phone, language_version)
-        return Response({'username': request.user.username})
+            return Response(xresult(data={'status': False}))
 
     def post(self, request):
         if self.verify_code(request):
-            return Response({'username': request.user.username})
-
+            request.user.profile.phone=request.data['phone']
+            request.user.profile.save()
+            return Response(xresult(data={'status': True}))
+        else:
+            return Response(xresult(data={'status': False}))
     def send_mobile_code(self, username, mobile, language='en'):
         '''
         发送手机验证码通知
         '''
         if not (mobile and ValidateDataForEducation().is_mobile(mobile)):
-            raise self.LiveException(_(u"Please check mobile number format;"))
+            raise Exception(_(u"Please check mobile number format;"))
 
         code = self.set_verify_code({'username': username, 'name': mobile})
         if language == 'en':
-            user_msg = 'Your Verification Code for signing up is {}, expiring in 10 minutes. In case of information leakage, please do not disclose your verification code.'.format(
+            user_msg = 'Your Verification Code for binding is {}, expiring in 10 minutes. In case of information leakage, please do not disclose your verification code.'.format(
                 code)
         else:
-            user_msg = '验证码{}，用于登录校验，10分钟内有效。请勿将验证码泄露，谨防被盗。'.format(code)
+            user_msg = '验证码{}，用于绑定校验，10分钟内有效。请勿将验证码泄露，谨防被盗。'.format(code)
         status, msg = send_short_message_by_linkgroup(mobile, user_msg, '', channel=1)
+        print user_msg
         return status, msg
 
     def set_verify_code(self, key):
@@ -569,13 +577,18 @@ class PhoneBindingViewSet(ViewSet):
         code_key = self.verify_code_key.format(**key)
         code = cache.get(code_key) or random.randint(100000, 999999)  # 6位验证码
         cache.set(code_key, str(code), self.verify_code_timeout)
+        return code
 
     def verify_code(self, request):
         try:
             code = request.data['code']
             phone = request.data['phone']
-            code_key = self.verify_code_key.format({'username': request.user.username, 'name': phone})
-            return cache.get(code_key) == code
+            code_key = self.verify_code_key.format(**{'username': request.user.username, 'name': phone})
+            if cache.get(code_key) == code:
+                cache.delete(code_key)
+                return True
+            else:
+                return False
         except Exception as e:
             return False
 

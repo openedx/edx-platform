@@ -177,4 +177,9 @@ urlpatterns = [
         PreferencesDetailView.as_view(),
         name='preferences_detail_api'
     ),
+    url(
+        r'^v1/accounts/binding_phone/$',
+        SEND_AND_VERIFY_CODE_FOR_BINDING,
+        name='binding_phone'
+    ),
 ]
