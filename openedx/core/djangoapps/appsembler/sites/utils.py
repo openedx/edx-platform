@@ -33,9 +33,15 @@ def get_initial_sass_variables():
     This method loads the SASS variables file from the currently active theme. It is used as a default value
     for the sass_variables field on new Microsite objects.
     """
-    values = get_branding_values_from_file()
-    labels = get_branding_labels_from_file()
-    return [(val[0], (val[1], lab[1])) for val, lab in izip(values, labels)]
+    try:
+        values = get_branding_values_from_file()
+        labels = get_branding_labels_from_file()
+        return [(val[0], (val[1], lab[1])) for val, lab in izip(values, labels)]
+    except Exception as e:
+        # most likely, `edx-theme-codebase` just isn't installed
+        # this is a temporary fix for the hawthorn deploy. once we have
+        # themes back in, this should be removed
+        return []
 
 
 def get_branding_values_from_file():
