@@ -138,18 +138,35 @@
   .highlighted-courses .courses{
     padding: 20px 0 15px;
   }
-  .home>header, .home>header .title{
+  .home>header{
     height: auto;
+    .title{
+      height: auto;
+      padding: 15px 10px;
+
+      .course-search{
+        .search-button{
+          width: 50px;
+        }
+        .search-input{
+          padding: 10px 60px 10px 10px;
+        }
+      } 
+
+      >.heading-group{
+        h1{
+          font-size: 18px;
+        }
+        .heading-group p{
+          font-size: 14px;
+        }
+      } 
+    }
+    .outer-wrapper{
+      padding: 20px;
+    }
   }
-  .home>header .outer-wrapper{
-    padding: 20px;
-  }
-  .home>header .title>.heading-group h1{
-    font-size: 18px;
-  }
-  .home>header .title>.heading-group p{
-    font-size: 14px;
-  }
+
   .courses-container .courses .courses-listing .courses-listing-item{
     margin: 0 0 20px 0;
   }
