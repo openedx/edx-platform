@@ -221,7 +221,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         ExperimentData.objects.create(
             user=audit_student,
             experiment_id=EXPERIMENT_ID,
-            key=EXPERIMENT_DATA_HOLDBACK_KEY.format(audit_student),
+            key=EXPERIMENT_DATA_HOLDBACK_KEY,
             value='True'
         )
         CourseDurationLimitConfig.objects.create(
