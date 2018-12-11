@@ -1,0 +1,43 @@
+.eliteu-join{  
+  width: 100%;
+  height: 322px;
+  background: url('/static/images/abouts/join_us.png') no-repeat center center;
+  background-size: cover;
+  overflow: hidden;
+}
+.eliteu-join-img{   
+  width: 238px;
+  height: 238px;
+  border-radius: 50%;
+  background: url('/static/images/abouts/join_us_dec.png') no-repeat center center;
+  background-size: cover;
+  margin: 0 auto;
+  margin-top: 42px;
+}
+
+.join-dec{   
+    box-sizing: border-box;
+    max-width: 754px;
+    height: auto;
+    padding: 25px 50px;
+    box-shadow: 0px 0px 2px 0px #b6dcfe;
+    margin: 0 auto;
+    border-radius: 3px;   
+    margin-top: 38px;
+}
+.join-dec p{ 
+    margin-top: 0;
+    font-size: 14px;
+    color: #656D78;
+    line-height: 20px;
+}
+.join-dec p:nth-of-type(1){ 
+    text-align: center;
+    font-size: 20px;
+    color: #2E313C;
+    line-height: 50px;
+}
+.join-dec p:nth-of-type(2),.join-dec p:nth-of-type(3){  
+    text-align: left;
+    font-size: 14px;
+}

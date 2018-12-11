@@ -14,4 +14,12 @@ body.view-in-course .container .course-wrapper{
   .sequence-nav ol li button{ 
     height: 43px;
   }
+  .sequence-nav-button:hover{ 
+    padding-top: 0px;
+  }
+}
+
+// 去除光标焦点
+.xmodule_display.xmodule_VideoModule .video .video-wrapper .video-controls .control{  
+  outline: none;
 }

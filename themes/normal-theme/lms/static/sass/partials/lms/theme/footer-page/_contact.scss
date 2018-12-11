@@ -1,0 +1,57 @@
+.eliteu-contact{  
+  width: 100%;
+  height: 322px;
+  background: url('/static/images/abouts/contact.png') no-repeat center center;
+  background-size: cover;
+  overflow: hidden;
+}
+.eliteu-contact-img{   
+  width: 238px;
+  height: 238px;
+  border-radius: 50%;
+  background: url('/static/images/abouts/contact_dec.png') no-repeat center center;
+  background-size: cover;
+  margin: 0 auto;
+  margin-top: 42px;
+}
+.contact-dec{ 
+  max-width: 1140px;
+  overflow: hidden;
+  height: auto;
+  margin: 0 auto;
+  margin-top: 60px;
+}
+.contact-dec ul{  
+  padding-left: 0;
+}
+.contact-dec li{  
+  width: 490px;
+  border-bottom: 1px solid #cecece;
+  height: 116px;
+  color: #656D78;
+}
+.contact-dec li div strong{   
+  display: block;
+  line-height: 40px;
+  color: #2E313C;
+  font-size: 20px;
+  margin-top: 12px;
+}
+.contact-dec li:nth-child(odd){ 
+  float: left;   
+}
+.contact-dec li:nth-child(even){ 
+  float: right;   
+}
+.contact-dec li p:nth-of-type(1){ 
+    margin-bottom: 10px; 
+}
+.contact-dec li p:nth-of-type(2){ 
+  margin-top: 0px;
+}
+.contact-dec li p:nth-of-type(7){ 
+  border-bottom: none;
+}
+.contact-dec li p:nth-of-type(8){ 
+  border-bottom: none;
+}
