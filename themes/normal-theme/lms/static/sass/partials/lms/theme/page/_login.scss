@@ -1,8 +1,168 @@
-
-@include media-breakpoint-down(sm){ 
-
-  .login-register, .financial-assistance-wrapper .financial-assistance-form{  
-    padding: 0 5%;
+// login
+.login-register-content{
+  background: none;
+}
+.login-register{
+  background: none;
+  .form-wrapper{
+    padding-bottom: 100px;
+  }
+  .toggle-form{
+    font-size: 14px;
+    color: $font;
   }
 
+
+  h2{
+    font-size: 18px;
+    color: $title;
+    margin: 5px 0 0;
+  }
+  .action-label{
+    font-size: 14px;
+    color: $font;
+  }
+
+  .form-field{
+    margin: 20px 0 0 0;
+    
+    label{
+      font-size: 14px;
+      color: $title;
+      margin-top: 5px;
+      &.focus-out{
+        padding-top: 1px;
+        padding-left: 12px;
+        columns: $note;
+      }
+    }
+    input, select, textarea{
+      font-size: 14px;
+      border: 1px solid #e6e9ed;
+      background: #fff;
+      outline: none;
+      box-shadow: none;
+      border-radius: 3px;
+      &:focus{
+        border: 1px solid $blue;
+        box-shadow: 0px 1px 2px 0px $border;
+        outline: none;
+      }
+    }
+    .fa-check{
+      position: relative;
+      top: 4px;
+    }
+    &.checkbox-remember{
+      margin: 0;
+    }
+    &.select-gender{
+      width: 49.5%;
+      padding-right: 10px;
+      box-sizing: border-box;
+    }
+    &.select-year_of_birth{
+      width: 49.5%;
+    }
+    .tip, .plaintext-field{
+      color: $font;
+      font-weight: normal;
+    }
+
+    .field-link{
+      font-size: 14px;
+      &:hover{
+        opacity: 0.95;
+      }
+    }
+  }
+
+  .action-primary{
+    @extend %btn-my-primary;
+    margin-top: 20px;
+    &:disabled{
+      @extend %btn-my-disable;
+    }
+  }
+
+  // notification
+  .status{
+    margin: 0 0 20px;
+    padding: 15px;
+    .message-title{
+      font-size: 14px;
+      margin: 0;
+    }
+    .message-copy{
+      padding-left: 20px;
+      list-style: disc;
+      li{
+        margin: 0;
+        font-size: 14px;
+      }
+      p{
+        font-size: 14px;
+      }
+    }
+  }
+  .submission-error{
+    background-color: #fff6f6;
+    box-shadow: 0px 1px 4px 0px	#ffd2d1;
+    border-bottom: none;
+  }
+  .submission-success{
+    background: #f6fffc;
+    box-shadow: 0px 1px 4px 0px #d4f8af;
+    border: none;
+  }
+
+  // sign in other ways
+  .section-title.lines{
+    margin: 30px 0 0;
+    .text{
+      font-size: 16px;
+      color: $title;
+    }
+    &::after{
+      background: none;
+      height: 0;
+      border-bottom: 1px dashed $blue;
+    }
+  } 
+
+  .login-provider{
+    width: 50px;
+    height: 50px;
+    border: none;
+    padding: 0;
+    margin: 20px 10px 0;
+    .icon{
+      background: none;
+      .icon-image{
+        width: 50px;
+        height: 50px;
+        max-width: 50px;
+        max-height: 50px;
+    
+      }
+    }
+    span{
+      display: none;
+    }
+    &:hover, &:focus, &:active{
+      background: none;
+      border: none;
+      opacity: 0.8;
+      box-shadow: none;
+    }
+  }
+}
+
+@media screen and (max-width:576px){
+  .login-register .form-field{
+    &.select-year_of_birth, &.select-gender{
+      width: 100%;
+      padding-right: 0;
+    }
+  }
 }

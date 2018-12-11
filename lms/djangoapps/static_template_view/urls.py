@@ -24,7 +24,11 @@ urlpatterns = [
     url(r'^press$', views.render, {'template': 'press.html'}, name="press"),
     url(r'^media-kit$', views.render, {'template': 'media-kit.html'}, name="media-kit"),
     url(r'^copyright$', views.render, {'template': 'copyright.html'}, name="copyright"),
-
+    url(r'^join_us$', views.render, {'template': 'join_us.html'}, name="join_us"),
+    url(r'^manual$', views.render, {'template': 'manual.html'}, name="manual"),
+    url(r'^user_agreement$', views.render, {'template': 'user_agreement.html'}, name="user_agreement"),
+    url(r'^privacy_policy$', views.render, {'template': 'privacy_policy.html'}, name="privacy_policy"),
+    url(r'^disclaimer$', views.render, {'template': 'disclaimer.html'}, name="disclaimer"),
     # Press releases
     url(r'^press/([_a-zA-Z0-9-]+)$', views.render_press_release, name='press_release'),
 ]
