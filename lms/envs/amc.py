@@ -141,3 +141,9 @@ DEFAULT_MODE_NAME_FROM_SLUG = _(DEFAULT_COURSE_MODE_SLUG.capitalize())
 
 CUSTOM_DOMAINS_REDIRECT_CACHE_TIMEOUT = None  # The length of time we cache Redirect model data
 CUSTOM_DOMAINS_REDIRECT_CACHE_KEY_PREFIX = 'custom_domains_redirects'
+
+
+#
+# Settings for Tahoe API
+#
+INSTALLED_APPS += ('openedx.core.djangoapps.appsembler.api',)
