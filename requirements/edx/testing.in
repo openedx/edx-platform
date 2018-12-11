@@ -12,6 +12,8 @@
 #   * run "make upgrade" to update the detailed requirements files
 #   * add an appropriate pattern to scripts/dependencies/testing.py
 
+-c ../constraints.txt
+
 -r base.txt               # Core edx-platform production dependencies
 -r coverage.txt           # Utilities for calculating test coverage
 

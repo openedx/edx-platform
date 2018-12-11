@@ -7,6 +7,9 @@
 #   * confirm that it has no system requirements beyond what we already install
 #   * run "make upgrade" to update the detailed requirements files
 #
+
+-c ../constraints.txt
+
 -r ../edx-sandbox/shared.txt  # Dependencies which are also used by code sandboxes
 -r github.in              # Forks and other dependencies not yet on PyPI
 -r local.in               # Packages in edx-platform which have their own setup.py
