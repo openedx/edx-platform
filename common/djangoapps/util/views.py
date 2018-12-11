@@ -18,7 +18,6 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
 import calc
-import dogstats_wrapper as dog_stats_api
 import track.views
 from edxmako.shortcuts import render_to_response, render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -368,11 +367,6 @@ def _record_feedback_in_zendesk(
     return True
 
 
-def _record_feedback_in_datadog(tags):
-    datadog_tags = [u"{k}:{v}".format(k=k, v=v) for k, v in tags.items()]
-    dog_stats_api.increment(DATADOG_FEEDBACK_METRIC, tags=datadog_tags)
-
-
 def get_feedback_form_context(request):
     """
     Extract the submitted form fields to be used as a context for
@@ -494,8 +488,6 @@ def submit_feedback(request):
             support_email=context["support_email"],
             custom_fields=custom_fields
         )
-
-    _record_feedback_in_datadog(context["tags"])
 
     return HttpResponse(status=(200 if success else 500))
 

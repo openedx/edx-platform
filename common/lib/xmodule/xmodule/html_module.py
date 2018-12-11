@@ -15,7 +15,6 @@ from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Boolean, List, Scope, String
 
-import dogstats_wrapper as dog_stats_api
 from xmodule.contentstore.content import StaticContent
 from xmodule.editing_module import EditingDescriptor
 from xmodule.edxnotes_utils import edxnotes
@@ -155,12 +154,6 @@ class HtmlDescriptor(HtmlBlock, XmlDescriptor, EditingDescriptor):  # pylint: di
         """
         Get paths for html and xml files.
         """
-
-        dog_stats_api.increment(
-            DEPRECATION_VSCOMPAT_EVENT,
-            tags=["location:html_descriptor_backcompat_paths"]
-        )
-
         if filepath.endswith('.html.xml'):
             filepath = filepath[:-9] + '.html'  # backcompat--look for html instead of xml
         if filepath.endswith('.html.html'):
@@ -250,11 +243,6 @@ class HtmlDescriptor(HtmlBlock, XmlDescriptor, EditingDescriptor):  # pylint: di
             # again in the correct format.  This should go away once the CMS is
             # online and has imported all current (fall 2012) courses from xml
             if not system.resources_fs.exists(filepath):
-
-                dog_stats_api.increment(
-                    DEPRECATION_VSCOMPAT_EVENT,
-                    tags=["location:html_descriptor_load_definition"]
-                )
 
                 candidates = cls.backcompat_paths(filepath)
                 # log.debug("candidates = {0}".format(candidates))

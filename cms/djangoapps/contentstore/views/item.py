@@ -23,7 +23,6 @@ from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Scope
 
-import dogstats_wrapper as dog_stats_api
 from cms.lib.xblock.authoring_mixin import VISIBILITY_VIEW
 from contentstore.utils import (
     ancestor_has_staff_lock,
@@ -934,15 +933,6 @@ def _delete_item(usage_key, user):
         # if we add one then we need to also add it to the policy information (i.e. metadata)
         # we should remove this once we can break this reference from the course to static tabs
         if usage_key.block_type == 'static_tab':
-
-            dog_stats_api.increment(
-                DEPRECATION_VSCOMPAT_EVENT,
-                tags=(
-                    "location:_delete_item_static_tab",
-                    u"course:{}".format(unicode(usage_key.course_key)),
-                )
-            )
-
             course = store.get_course(usage_key.course_key)
             existing_tabs = course.tabs or []
             course.tabs = [tab for tab in existing_tabs if tab.get('url_slug') != usage_key.block_id]

@@ -8,7 +8,6 @@ from time import time
 from django.utils.translation import ugettext_noop
 from opaque_keys.edx.keys import UsageKey
 
-import dogstats_wrapper as dog_stats_api
 from capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
 from courseware.courses import get_course_by_id, get_problems_in_section
 from courseware.model_data import DjangoKeyValueStore, FieldDataCache
@@ -92,18 +91,17 @@ def perform_module_state_update(update_fcn, filter_fcn, _entry_id, course_id, ta
         module_descriptor = problems[unicode(module_to_update.module_state_key)]
         # There is no try here:  if there's an error, we let it throw, and the task will
         # be marked as FAILED, with a stack trace.
-        with dog_stats_api.timer('instructor_tasks.module.time.step', tags=[u'action:{name}'.format(name=action_name)]):
-            update_status = update_fcn(module_descriptor, module_to_update, task_input)
-            if update_status == UPDATE_STATUS_SUCCEEDED:
-                # If the update_fcn returns true, then it performed some kind of work.
-                # Logging of failures is left to the update_fcn itself.
-                task_progress.succeeded += 1
-            elif update_status == UPDATE_STATUS_FAILED:
-                task_progress.failed += 1
-            elif update_status == UPDATE_STATUS_SKIPPED:
-                task_progress.skipped += 1
-            else:
-                raise UpdateProblemModuleStateError("Unexpected update_status returned: {}".format(update_status))
+        update_status = update_fcn(module_descriptor, module_to_update, task_input)
+        if update_status == UPDATE_STATUS_SUCCEEDED:
+            # If the update_fcn returns true, then it performed some kind of work.
+            # Logging of failures is left to the update_fcn itself.
+            task_progress.succeeded += 1
+        elif update_status == UPDATE_STATUS_FAILED:
+            task_progress.failed += 1
+        elif update_status == UPDATE_STATUS_SKIPPED:
+            task_progress.skipped += 1
+        else:
+            raise UpdateProblemModuleStateError("Unexpected update_status returned: {}".format(update_status))
 
     return task_progress.update_task_state()
 

@@ -15,7 +15,6 @@ from uuid import uuid4
 from factory import Factory, Sequence, lazy_attribute_sequence, lazy_attribute
 from factory.errors import CyclicDefinitionError
 from mock import patch
-import dogstats_wrapper as dog_stats_api
 
 from opaque_keys.edx.locator import BlockUsageLocator
 from opaque_keys.edx.keys import UsageKey
@@ -392,14 +391,6 @@ class ItemFactory(XModuleFactory):
             # if we add one then we need to also add it to the policy information (i.e. metadata)
             # we should remove this once we can break this reference from the course to static tabs
             if category == 'static_tab':
-                dog_stats_api.increment(
-                    DEPRECATION_VSCOMPAT_EVENT,
-                    tags=(
-                        "location:itemfactory_create_static_tab",
-                        u"block:{}".format(location.block_type),
-                    )
-                )
-
                 course = store.get_course(location.course_key)
                 course.tabs.append(
                     CourseTab.load('static_tab', name='Static Tab', url_slug=location.block_id)

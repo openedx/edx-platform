@@ -22,7 +22,7 @@ HTTPS = 'off'
 import logging
 
 # Disable noisy loggers
-for pkg_name in ['track.contexts', 'track.middleware', 'dd.dogapi']:
+for pkg_name in ['track.contexts', 'track.middleware']:
     logging.getLogger(pkg_name).setLevel(logging.CRITICAL)
 
 

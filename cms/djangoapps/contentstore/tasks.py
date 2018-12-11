@@ -36,7 +36,6 @@ from six import iteritems, text_type
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from user_tasks.tasks import UserTask
 
-import dogstats_wrapper as dog_stats_api
 from contentstore.courseware_index import CoursewareSearchIndexer, LibrarySearchIndexer, SearchIndexingError
 from contentstore.storage import course_import_export_storage
 from contentstore.utils import initialize_permissions, reverse_usage_url
@@ -865,17 +864,13 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
         self.status.set_state(u'Updating')
         self.status.increment_completed_steps()
 
-        with dog_stats_api.timer(
-            u'courselike_import.time',
-            tags=[u"courselike:{}".format(courselike_key)]
-        ):
-            courselike_items = import_func(
-                modulestore(), user.id,
-                settings.GITHUB_REPO_ROOT, [dirpath],
-                load_error_modules=False,
-                static_content_store=contentstore(),
-                target_id=courselike_key
-            )
+        courselike_items = import_func(
+            modulestore(), user.id,
+            settings.GITHUB_REPO_ROOT, [dirpath],
+            load_error_modules=False,
+            static_content_store=contentstore(),
+            target_id=courselike_key
+        )
 
         new_location = courselike_items[0].location
         LOGGER.debug(u'new course at %s', new_location)

@@ -1030,9 +1030,6 @@ INSTALLED_APPS = [
     'track',
     'eventtracking.django.apps.EventTrackingConfig',
 
-    # Monitoring
-    'openedx.core.djangoapps.datadog.apps.DatadogConfig',
-
     # For asset pipelining
     'edxmako.apps.EdxMakoConfig',
     'pipeline',
