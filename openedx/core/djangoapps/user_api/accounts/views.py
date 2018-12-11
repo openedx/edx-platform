@@ -513,6 +513,15 @@ class DeactivateLogoutView(APIView):
         raise AuthFailedError(_('Email or password is incorrect.'))
 
 
+def _set_unusable_password(user):
+    """
+    Helper method for the shared functionality of setting a user's
+    password to the unusable password, thus deactivating the account.
+    """
+    user.set_unusable_password()
+    user.save()
+
+
 class PhoneBindingViewSet(ViewSet):
     # authentication_classes = (
     #     OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser, JwtAuthentication
