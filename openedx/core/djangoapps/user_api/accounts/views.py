@@ -83,7 +83,6 @@ from .signals import (
 )
 from ..message_types import DeletionNotificationMessage
 
-from membership.utils import xresult
 
 log = logging.getLogger(__name__)
 
@@ -542,17 +541,17 @@ class PhoneBindingViewSet(ViewSet):
             except Exception as e:
                 language_version = "zh-cn"
             self.send_mobile_code(request.user.username, phone, language_version)
-            return Response(xresult(data={'status': True}))
+            return Response(status=status.HTTP_204_NO_CONTENT)
         except Exception as e:
-            return Response(xresult(data={'status': False}))
+            return Response(status.HTTP_400_BAD_REQUEST)
 
     def post(self, request):
         if self.verify_code(request):
             request.user.profile.phone=request.data['phone']
             request.user.profile.save()
-            return Response(xresult(data={'status': True}))
+            return Response(status=status.HTTP_204_NO_CONTENT)
         else:
-            return Response(xresult(data={'status': False}))
+            return Response(status.HTTP_400_BAD_REQUEST)
     def send_mobile_code(self, username, mobile, language='en'):
         '''
         发送手机验证码通知
