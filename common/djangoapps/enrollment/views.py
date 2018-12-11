@@ -205,6 +205,55 @@ class EnrollmentView(APIView, ApiKeyPermissionMixIn):
             )
 
 
+class EnrollmentUserRolesView(APIView):
+    """
+    **Use Case**
+
+        Get the roles for the current logged-in user.
+
+    **Example Requests**
+
+        GET /api/enrollment/v1/roles/
+
+    **Response Values**
+
+        If the request is successful, an HTTP 200 "OK" response is
+        returned along with a collection of user roles for the
+        logged-in user
+
+    """
+    authentication_classes = (JwtAuthentication,
+                              OAuth2AuthenticationAllowInactiveUser,
+                              EnrollmentCrossDomainSessionAuth)
+    permission_classes = ApiKeyHeaderPermissionIsAuthenticated,
+    throttle_classes = EnrollmentUserThrottle,
+
+    @method_decorator(ensure_csrf_cookie_cross_domain)
+    def get(self, request):
+        """
+        Gets a list of all roles for the currently logged-in user
+        """
+        try:
+            roles_data = api.get_user_roles(request.user.username)
+        except Exception:
+            return Response(
+                status=status.HTTP_400_BAD_REQUEST,
+                data={
+                    "message": (
+                        u"An error occurred while retrieving roles for user '{username}"
+                    ).format(username=request.user.username)
+                }
+            )
+        return Response([
+            {
+                "org": role.org,
+                "course_id": text_type(role.course_id),
+                "role": role.role
+            }
+            for role in roles_data
+        ])
+
+
 @can_disable_rate_limit
 class EnrollmentCourseDetailView(APIView):
     """
