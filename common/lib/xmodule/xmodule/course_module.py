@@ -254,7 +254,7 @@ def get_available_providers():
     proctoring_backend_settings = getattr(
         settings,
         'PROCTORING_BACKENDS',
-        None
+        {}
     )
 
     available_providers = [provider for provider in proctoring_backend_settings if provider != 'DEFAULT']
