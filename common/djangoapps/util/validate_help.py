@@ -200,30 +200,3 @@ class ValidateDataForEducation(object):
             return False
 
 
-def mobile_check(s):
-    """
-    # 号码前缀，如果运营商启用新的号段，只需要在此列表将新的号段加上即可。
-    :param s:
-    :return:
-    """
-    mobile_prefix = ['134', '135', '136', '137', '138', '139', '147', '150', '151', '152', '157', '158', '159', '170',
-                     '171', '178', '182', '183', '184', '187', '188']
-    union_prefix = ['130', '131', '132', '156', '155', '186', '185', '145', '176']
-
-    tel_prefix = ['133', '153', '189', '180', '181', '177', '173']
-
-    phone_prefix = mobile_prefix + union_prefix + tel_prefix
-
-    # 检测号码是否长度是否合法。
-    if len(s) != 11:
-        return False, '手机号码格式有误'
-    else:
-        # 检测输入的号码是否全部是数字。
-        if s.isdigit():
-            # 检测前缀是否是正确。
-            if s[:3] in phone_prefix:
-                return True, '手机号码格式正确！'
-            else:
-                return False, '手机号码格式有误'
-        else:
-            return False, '手机号码格式有误'

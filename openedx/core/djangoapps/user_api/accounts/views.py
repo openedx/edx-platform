@@ -543,7 +543,7 @@ class PhoneBindingViewSet(ViewSet):
             self.send_mobile_code(request.user.username, phone, language_version)
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Exception as e:
-            return Response(status.HTTP_400_BAD_REQUEST)
+            return Response(getattr(e, 'message', str(e)),status.HTTP_400_BAD_REQUEST)
 
     def post(self, request):
         if self.verify_code(request):
