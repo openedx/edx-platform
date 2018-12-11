@@ -7,7 +7,9 @@ from datetime import datetime
 from django.conf import settings
 import pytz
 from cms.djangoapps.contentstore.config.waffle import waffle, ENABLE_ACCESSIBILITY_POLICY_PAGE
+from openedx.core.djangoapps.lang_pref.api import released_languages
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.djangolib.js_utils import js_escaped_string
 %>
 
 <div class="wrapper-footer wrapper">
@@ -53,6 +55,34 @@ from openedx.core.djangolib.markup import HTML, Text
           )}
         </p>
       </div>
+
+      <div class="footer-language-selector">
+          <label for="footer-language-select">
+              <span class="icon fa fa-globe" aria-hidden="true"></span>
+              <span class="sr">Choose Language</span>
+          </label>
+          <select id="footer-language-select" name="language">
+            <% languages = released_languages() %>
+            % for language in languages:
+              % if language[0] == LANGUAGE_CODE:
+                <option value="${language[0]}" selected="selected">${language[1]}</option>
+              % else:
+                <option value="${language[0]}" >${language[1]}</option>
+              % endif
+            % endfor
+          </select>
+      </div>
+       <script type="text/javascript">
+          (function() {
+            function handleLangSelection(event) {
+                var $select = $(this);
+                var lang = $select.val();
+                $.cookie('${ settings.LANGUAGE_COOKIE | n, js_escaped_string }', lang, { expires: '', path: '/' });
+                window.document.location.reload();
+            }
+            $("#footer-language-select").change(handleLangSelection);
+          }());
+      </script>
 
       <div class="footer-about-openedx">
         <a href="https://open.edx.org" title="${_("Powered by Open edX")}">
