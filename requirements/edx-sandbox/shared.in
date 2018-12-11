@@ -16,8 +16,6 @@ pyparsing                           # Python parsing library; used by the calc p
 sympy==0.7.1                        # Symbolic math library; used by the calc package
 scipy==0.14.0                       # Math, science, and engineering library; used by the calc package
 
-six==1.11.0     # Pinned because transifex-client says ==1.11.0
-
 # Install these packages from the edx-platform working tree
 # NOTE: if you change code in these packages, you MUST change the version
 # number in its setup.py or the code WILL NOT be installed during deploy.
