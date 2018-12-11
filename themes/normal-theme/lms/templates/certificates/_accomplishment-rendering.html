@@ -18,11 +18,7 @@ course_mode_class = course_mode if course_mode else ''
                     </span>
                     <p class="prove">兹证明</p>
 
-                    % if certificate_data:
-                            % for signatory in certificate_data.get('signatories', []):
-                                <p class="pro-name">${signatory['name']}</p>
-                      % endfor
-                    % endif
+                    <p class="pro-name">${accomplishment_copy_name}</p>
 
                     <p class="accomplishment-success">顺利完成并通过</p>
                     
