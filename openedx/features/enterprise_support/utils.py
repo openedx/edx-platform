@@ -267,12 +267,12 @@ def remind_users_to_bind_phones(request):
     try:
         if not request.user.profile.phone:
             from datetime import datetime
-            if request.session.get('Phone_binding_reminder','') != datetime.now().date():
+            if request.session.get('Phone_binding_reminder', '') != datetime.now().date():
                 request.session['Phone_binding_reminder'] = datetime.now().date()
                 return True
             else:
                 return False
         else:
-            return True
+            return False
     except Exception as err:
         return False
