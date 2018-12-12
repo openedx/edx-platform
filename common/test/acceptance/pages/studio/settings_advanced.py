@@ -266,8 +266,6 @@ class AdvancedSettingsPage(CoursePage):
             'enable_subsection_gating',
             'learning_info',
             'instructor_info',
-            'create_zendesk_tickets',
             'ccx_connector',
             'enable_ccx',
-            'proctoring_provider',
         ]

@@ -5,9 +5,11 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from six import text_type
 from xblock.fields import Scope
+from crum import get_current_user
 
 from xblock_django.models import XBlockStudioConfigurationFlag
 from xmodule.modulestore.django import modulestore
+from student.roles import GlobalStaff
 
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from cms.djangoapps.contentstore.config.waffle import ENABLE_PROCTORING_PROVIDER_OVERRIDES
@@ -124,12 +126,18 @@ class CourseMetadata(object):
         # If the ENABLE_PROCTORING_PROVIDER_OVERRIDES waffle flag is not enabled,
         # do not show "Proctoring Configuration" in Studio Advanced Settings.
         if not ENABLE_PROCTORING_PROVIDER_OVERRIDES.is_enabled(course_key):
-            black_list.append('proctoring_configuration')
+            black_list.append('proctoring_provider')
 
         # Do not show "Course Visibility For Unenrolled Learners" in Studio Advanced Settings
         # if the enable_anonymous_access flag is not enabled
         if not COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.is_enabled(course_key=course_key):
             black_list.append('course_visibility')
+
+        # Do not show "Create Zendesk Tickets For Suspicious Proctored Exam Attempts" in
+        # Studio Advanced Settings if the user is not edX staff.
+        if not GlobalStaff().has_user(get_current_user()):
+            black_list.append('create_zendesk_tickets')
+
         return black_list
 
     @classmethod
