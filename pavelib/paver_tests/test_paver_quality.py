@@ -323,9 +323,10 @@ class TestPaverRunQuality(PaverTestCase):
 
         # Test that pylint is called
         _mock_pylint_violations.assert_called_once_with(clean=False)
-        # Assert that sh was called twice- once for diff quality with pylint
+        # Assert that sh was called four times - once to get the comparison commit hash,
+        # once to get the current commit hash, once for diff quality with pylint,
         # and once for diff quality with eslint
-        self.assertEqual(self._mock_paver_sh.call_count, 2)
+        self.assertEqual(self._mock_paver_sh.call_count, 4)
 
     @patch('__builtin__.open', mock_open())
     def test_other_exception(self):
