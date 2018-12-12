@@ -59,7 +59,7 @@ class AppVersionConfig(models.Model):
         unique_together = ('platform', 'version',)
         ordering = ['-major_version', '-minor_version', '-patch_version']
 
-    def __unicode__(ContentTypeGatingConfigself):
+    def __unicode__(self):
         return "{}_{}".format(self.platform, self.version)
 
     @classmethod
