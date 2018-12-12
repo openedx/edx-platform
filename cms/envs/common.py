@@ -1097,9 +1097,6 @@ INSTALLED_APPS = [
 
     'xblock_django',
 
-    # edX Proctoring
-    'edx_proctoring',
-
     # Catalog integration
     'openedx.core.djangoapps.catalog',
 
@@ -1448,13 +1445,6 @@ MICROSITE_BACKEND = 'microsite_configuration.backends.filebased.FilebasedMicrosi
 MICROSITE_TEMPLATE_BACKEND = 'microsite_configuration.backends.filebased.FilebasedMicrositeTemplateBackend'
 # TTL for microsite database template cache
 MICROSITE_DATABASE_TEMPLATE_CACHE_TTL = 5 * 60
-
-############################### PROCTORING CONFIGURATION DEFAULTS ##############
-PROCTORING_SETTINGS = {}
-PROCTORING_BACKENDS = {
-    'DEFAULT': 'null',
-    'null': {},
-}
 
 
 ############################ Global Database Configuration #####################
