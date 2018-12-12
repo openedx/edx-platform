@@ -60,7 +60,7 @@ class IOS(MobilePlatform):
 
 class Android(MobilePlatform):
     """ Android platform """
-    USER_AGENT_REGEX = (r'Dalvik/[.0-9]+ \(Linux; U; Android [.0-9]+; (.*) Build/[0-9a-zA-Z]*\) '
+    USER_AGENT_REGEX = (r'Dalvik/[.0-9]+ \(Linux; U; Android [.0-9]+; (.*) Build/(.*)\) '
                         r'(.*)/(?P<version>[0-9]+.[0-9]+.[0-9]+(.[0-9a-zA-Z]*)?)')
     NAME = "Android"
 

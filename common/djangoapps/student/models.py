@@ -463,6 +463,8 @@ class UserProfile(models.Model):
     bio = models.CharField(blank=True, null=True, max_length=3000, db_index=False)
     profile_image_uploaded_at = models.DateTimeField(null=True, blank=True)
 
+    phone = models.CharField(_(u"Phone"), max_length=32, null=True)
+
     @property
     def has_profile_image(self):
         """

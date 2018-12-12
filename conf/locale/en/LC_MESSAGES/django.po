@@ -28,12 +28,25 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2018.
 #
+# #-#-#-#-#  membership.po (0.1a)  #-#-#-#-#
+# #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2018 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2018.
+#
+# #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
+# edX translation file
+# Copyright (C) 2018 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2018.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-10-28 20:37+0000\n"
-"PO-Revision-Date: 2018-10-28 20:37:28.196547\n"
+"POT-Creation-Date: 2018-12-11 15:42+0800\n"
+"PO-Revision-Date: 2018-12-11 07:42:07.453454\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -251,6 +264,7 @@ msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 #: lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "Price"
 msgstr ""
 
@@ -2603,13 +2617,13 @@ msgstr ""
 msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
-"example, one discussion category may be \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each "
-"category must be unique. In \"id\" values, the only special characters that "
-"are supported are underscore, hyphen, and period. You can also specify a "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each category "
+"must be unique. In \"id\" values, the only special characters that are "
+"supported are underscore, hyphen, and period. You can also specify a "
 "category as the default for new posts in the Discussion page by setting its "
-"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": "
-"\"i4x-UniversityX-MUS101-course-2015_T1\", \"default\": true}."
+"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -3059,6 +3073,11 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py lms/djangoapps/branding/api.py
 #: lms/templates/footer.html lms/templates/static_templates/about.html
+#: themes/normal-theme/lms/templates/static_templates/about.html
+#: themes/normal-theme/lms/templates/static_templates/contact.html
+#: themes/normal-theme/lms/templates/static_templates/disclaimer.html
+#: themes/normal-theme/lms/templates/static_templates/join_us.html
+#: themes/normal-theme/lms/templates/static_templates/privacy_policy.html
 #: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/about.html
@@ -4643,6 +4662,7 @@ msgstr ""
 #: lms/djangoapps/branding/api.py lms/djangoapps/certificates/views/webview.py
 #: cms/templates/widgets/footer.html
 #: lms/templates/static_templates/privacy.html
+#: lms/templates/static_templates/privacy_policy.html
 #: themes/edx.org/lms/templates/certificates/_accomplishment-footer.html
 #: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
@@ -4953,6 +4973,7 @@ msgstr ""
 #. protect published content
 #: lms/djangoapps/certificates/views/webview.py
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "All rights reserved"
 msgstr ""
@@ -6782,6 +6803,8 @@ msgid "Enrollment data is now available in {dashboard_link}."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
+#: lms/templates/header/navbar-authenticated.html
+#: lms/templates/header/navbar-not-authenticated.html
 msgid "Membership"
 msgstr ""
 
@@ -7338,6 +7361,14 @@ msgid ""
 "the block is visible_to_staff_only."
 msgstr ""
 
+#: lms/djangoapps/mobile_api/views.py
+msgid "Missing requested parameter {}."
+msgstr ""
+
+#: lms/djangoapps/mobile_api/views.py
+msgid "Unable to find information about the latest version of the platform"
+msgstr ""
+
 #: lms/djangoapps/notes/views.py lms/templates/notes.html
 msgid "My Notes"
 msgstr ""
@@ -7530,7 +7561,7 @@ msgstr ""
 msgid "Payment Received"
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/pdf.py
+#: lms/djangoapps/shoppingcart/pdf.py membership/models.py
 msgid "Balance"
 msgstr ""
 
@@ -7539,6 +7570,7 @@ msgid "Billing Address"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/pdf.py
+#: lms/templates/static_templates/disclaimer.html
 msgid "Disclaimer"
 msgstr ""
 
@@ -8245,6 +8277,18 @@ msgid ""
 "The user {username} is not enrolled in the course associated with this team."
 msgstr ""
 
+#: lms/djangoapps/verify_student/admin.py
+#: lms/djangoapps/verify_student/views.py
+#, python-brace-format
+msgid "Your {platform_name} ID Verification Approved"
+msgstr ""
+
+#: lms/djangoapps/verify_student/admin.py
+#: lms/djangoapps/verify_student/views.py
+#, python-brace-format
+msgid "Your {platform_name} Verification Has Been Denied"
+msgstr ""
+
 #: lms/djangoapps/verify_student/models.py
 msgid "The course for which this deadline applies"
 msgstr ""
@@ -8334,12 +8378,7 @@ msgstr ""
 
 #: lms/djangoapps/verify_student/views.py
 #, python-brace-format
-msgid "Your {platform_name} ID Verification Approved"
-msgstr ""
-
-#: lms/djangoapps/verify_student/views.py
-#, python-brace-format
-msgid "Your {platform_name} Verification Has Been Denied"
+msgid "Review ID Verification Photos For {username}"
 msgstr ""
 
 #: lms/envs/common.py
@@ -9104,6 +9143,7 @@ msgid "Create new merged version"
 msgstr ""
 
 #: lms/templates/wiki/includes/anonymous_blocked.html
+#: wiki/templates/wiki/includes/anonymous_blocked.html
 #, python-format
 msgid ""
 "You need to <a href=\"%(login_url)s\">log in</a> or <a "
@@ -9371,12 +9411,14 @@ msgid "ACE Common"
 msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #, python-format
 msgid "Go to %(platform_name)s Home Page"
 msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #: cms/templates/login.html cms/templates/widgets/header.html
 #: themes/red-theme/cms/templates/login.html
@@ -9384,46 +9426,54 @@ msgid "Sign In"
 msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on LinkedIn"
 msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Twitter"
 msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Facebook"
 msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Google Plus"
 msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #, python-format
 msgid "%(platform_name)s on Reddit"
 msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Download the iOS app on the Apple Store"
 msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Download the Android app on the Google Play Store"
 msgstr ""
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
+#: themes/normal-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
 msgid "Our mailing address is"
 msgstr ""
@@ -10101,6 +10151,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
+#: themes/normal-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 msgid "Start learning now"
 msgstr ""
@@ -10788,6 +10839,14 @@ msgid ""
 "{register_link}, and enroll in this course."
 msgstr ""
 
+#: openedx/features/content_type_gating/partitions.py
+msgid "Feature-based Enrollments"
+msgstr ""
+
+#: openedx/features/content_type_gating/partitions.py
+msgid "Partition for segmenting users by access to gated content types"
+msgstr ""
+
 #: openedx/features/course_duration_limits/access.py
 #, python-brace-format
 msgid "Access expired on {expiration_date}"
@@ -10901,6 +10960,7 @@ msgid ""
 "profile. {learn_more_link_start}Learn more{learn_more_link_end}"
 msgstr ""
 
+#: themes/normal-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
 msgid ""
@@ -10908,6 +10968,7 @@ msgid ""
 " We do, and we’re glad to have you! Come see what everyone is learning."
 msgstr ""
 
+#: themes/normal-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #: themes/red-theme/lms/templates/schedules/edx_ace/recurringnudge_day3/email/body.txt
 #, python-format
 msgid ""
@@ -11441,9 +11502,10 @@ msgstr ""
 msgid "Failed"
 msgstr ""
 
+#. #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
 #. Translators: This is the status for a video that is cancelled during upload
 #. by user
-#: cms/djangoapps/contentstore/views/videos.py
+#: cms/djangoapps/contentstore/views/videos.py membership/models.py
 msgid "Cancelled"
 msgstr ""
 
@@ -11642,6 +11704,7 @@ msgstr ""
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/settings.html lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "Course Number"
 msgstr ""
 
@@ -11746,6 +11809,7 @@ msgid "Instructors"
 msgstr ""
 
 #: cms/templates/settings.html lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "Requirements"
 msgstr ""
 
@@ -12116,6 +12180,7 @@ msgid "You should Register before trying to access the Unit"
 msgstr ""
 
 #: lms/templates/enroll_staff.html lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgctxt "self"
 msgid "Enroll"
 msgstr ""
@@ -14367,6 +14432,7 @@ msgid "Supported by the following organizations"
 msgstr ""
 
 #: lms/templates/certificates/_accomplishment-rendering.html
+#: themes/normal-theme/lms/templates/certificates/_accomplishment-rendering.html
 msgid "Awarded to:"
 msgstr ""
 
@@ -14464,6 +14530,11 @@ msgstr ""
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
+msgid "Pursue Academic Credit with the Verified Track"
+msgstr ""
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
 msgid "Pursue Academic Credit with a Verified Certificate"
 msgstr ""
 
@@ -14478,7 +14549,7 @@ msgstr ""
 
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
-msgid "Benefits of a Verified Certificate"
+msgid "Benefits of the Verified Track"
 msgstr ""
 
 #: lms/templates/course_modes/choose.html
@@ -14486,6 +14557,32 @@ msgstr ""
 msgid ""
 "{b_start}Eligible for credit:{b_end} Receive academic credit after "
 "successfully completing the course"
+msgstr ""
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"{b_start}Unlimited Course Access: {b_end}Learn at your own pace, and access "
+"materials anytime to brush up on what you've learned."
+msgstr ""
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"{b_start}Graded Assignments: {b_end}Build your skills through graded "
+"assignments and projects."
+msgstr ""
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"{b_start}Easily Sharable: {b_end}Add the certificate to your CV or resume, "
+"or post it directly on LinkedIn."
+msgstr ""
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid "Benefits of a Verified Certificate"
 msgstr ""
 
 #: lms/templates/course_modes/choose.html
@@ -14505,6 +14602,11 @@ msgstr ""
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid "Pursue a Verified Certificate"
+msgstr ""
+
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid "Pursue the Verified Track"
 msgstr ""
 
 #: lms/templates/course_modes/choose.html
@@ -14553,8 +14655,14 @@ msgstr ""
 msgid "Audit This Course (No Certificate)"
 msgstr ""
 
-#. Translators: b_start notes the beginning of a section of text bolded for
-#. emphasis, and b_end marks the end of the bolded text.
+#: lms/templates/course_modes/choose.html
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
+"Audit this course for free and have access to course materials and "
+"discussions forums. {b_start}This track does not include graded assignments,"
+" or unlimited course access.{b_end}"
+msgstr ""
+
 #: lms/templates/course_modes/choose.html
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
@@ -14588,10 +14696,12 @@ msgid "This content is graded"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "An error occurred. Please try again later."
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid ""
 "The currently logged-in user account does not have permission to enroll in "
 "this course. You may need to {start_logout_tag}log out{end_tag} then try the"
@@ -14600,6 +14710,12 @@ msgid ""
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
+msgid "Enroll in {course_name}"
+msgstr ""
+
+#: lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "You are enrolled in this course"
 msgstr ""
 
@@ -14607,65 +14723,79 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/shoppingcart/registration_code_receipt.html
 #: openedx/features/journals/templates/journals/bundle_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "View Course"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "This course is in your <a href=\"{cart_link}\">cart</a>."
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "Course is full"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "Enrollment in this course is by invitation only"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "Enrollment is Closed"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
-msgid "Add {course_name} to Cart <span>({price} USD)</span>"
+msgid "Add {course_name} to Cart <span>({price} {currency_code})</span>"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
-msgid "Enroll in {course_name}"
+#: themes/normal-theme/lms/templates/courseware/course_about.html
+msgid "VIP\\u4f1a\\u5458\\u514d\\u8d39\\u52a0\\u5165{course_name}"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "View About Page in studio"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "Classes Start"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "Classes End"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "Estimated Effort"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "Prerequisites"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid ""
 "You must successfully complete {link_start}{prc_display}{link_end} before "
 "you begin this course."
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "Additional Resources"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgctxt "self"
 msgid "enroll"
 msgstr ""
@@ -14936,19 +15066,27 @@ msgid "{number_of_courses} courses in program"
 msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
-msgid "Price (USD)"
+msgid "Price ({currencyCode})"
 msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
-msgid "${newPrice}{htmlEnd} for entire program"
+msgid "{currencySymbol}{oldPrice}"
 msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
-msgid "You save ${discount_value} {currency}"
+msgid "{newPrice}{htmlEnd} for entire program"
 msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
-msgid "${full_program_price} for entire program"
+msgid "You save "
+msgstr ""
+
+#: lms/templates/courseware/program_marketing.html
+msgid "{discount_value} {currency}"
+msgstr ""
+
+#: lms/templates/courseware/program_marketing.html
+msgid "{full_program_price} for entire program"
 msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
@@ -15341,6 +15479,10 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Archived Course"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "订阅期满"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -16059,18 +16201,6 @@ msgid "The photo(s) of you:"
 msgstr ""
 
 #: lms/templates/emails/failed_verification_email.txt
-msgid "The photo of you:"
-msgstr ""
-
-#: lms/templates/emails/failed_verification_email.txt
-msgid "The photo of your ID:"
-msgstr ""
-
-#: lms/templates/emails/failed_verification_email.txt
-msgid "Other Reasons:"
-msgstr ""
-
-#: lms/templates/emails/failed_verification_email.txt
 msgid "Resubmit Verification: {reverify_url}"
 msgstr ""
 
@@ -16082,12 +16212,14 @@ msgstr ""
 #: lms/templates/emails/order_confirmation_email.txt
 #: lms/templates/emails/passed_verification_email.txt
 #: lms/templates/emails/photo_submission_confirmation.txt
+#: lms/templates/emails/photo_submission_review.txt
 msgid "Thank you,"
 msgstr ""
 
 #: lms/templates/emails/failed_verification_email.txt
 #: lms/templates/emails/passed_verification_email.txt
 #: lms/templates/emails/photo_submission_confirmation.txt
+#: lms/templates/emails/photo_submission_review.txt
 #: lms/templates/emails/reverification_processed.txt
 msgid "The {platform_name} team"
 msgstr ""
@@ -16129,6 +16261,10 @@ msgid ""
 "begun.Check for an email from us in the next few days to confirm whether "
 "your verification was successful.You can also check the status of the "
 "verification process on your dashboard."
+msgstr ""
+
+#: lms/templates/emails/photo_submission_review.txt
+msgid "Review ID Verification Photos"
 msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_email.txt
@@ -18111,6 +18247,7 @@ msgid ""
 msgstr ""
 
 #: lms/templates/navigation/navbar-not-authenticated.html
+#: membership/templates/membership/index.html
 msgid "Explore Courses"
 msgstr ""
 
@@ -18739,16 +18876,21 @@ msgstr ""
 #: lms/templates/static_templates/about.html
 #: lms/templates/static_templates/blog.html
 #: lms/templates/static_templates/contact.html
+#: lms/templates/static_templates/disclaimer.html
 #: lms/templates/static_templates/donate.html
 #: lms/templates/static_templates/faq.html
 #: lms/templates/static_templates/help.html
 #: lms/templates/static_templates/honor.html
 #: lms/templates/static_templates/jobs.html
+#: lms/templates/static_templates/join_us.html
+#: lms/templates/static_templates/manual.html
 #: lms/templates/static_templates/media-kit.html
 #: lms/templates/static_templates/news.html
 #: lms/templates/static_templates/press.html
 #: lms/templates/static_templates/privacy.html
+#: lms/templates/static_templates/privacy_policy.html
 #: lms/templates/static_templates/tos.html
+#: lms/templates/static_templates/user_agreement.html
 msgid "This page left intentionally blank. Feel free to add your own content."
 msgstr ""
 
@@ -18768,6 +18910,14 @@ msgstr ""
 #: lms/templates/static_templates/jobs.html
 #: themes/red-theme/lms/templates/footer.html
 msgid "Jobs"
+msgstr ""
+
+#: lms/templates/static_templates/join_us.html
+msgid "Join Us"
+msgstr ""
+
+#: lms/templates/static_templates/manual.html
+msgid "Manual"
 msgstr ""
 
 #: lms/templates/static_templates/news.html
@@ -18798,6 +18948,11 @@ msgstr ""
 
 #: lms/templates/static_templates/server-overloaded.html
 msgid "Currently the {platform_name} servers are overloaded"
+msgstr ""
+
+#: lms/templates/static_templates/user_agreement.html
+#: themes/normal-theme/lms/templates/static_templates/user_agreement.html
+msgid "User Agreement"
 msgstr ""
 
 #: lms/templates/student_account/account_settings.html
@@ -19460,6 +19615,12 @@ msgstr ""
 
 #: themes/edx.org/lms/templates/course_modes/choose.html
 msgid ""
+"{b_start}Support our Mission: {b_end}EdX, a non-profit, relies on verified "
+"certificates to help fund affordable education to everyone globally."
+msgstr ""
+
+#: themes/edx.org/lms/templates/course_modes/choose.html
+msgid ""
 "{b_start}Support our Mission: {b_end} EdX, a non-profit, relies on verified "
 "certificates to help fund free education for everyone globally"
 msgstr ""
@@ -19470,6 +19631,10 @@ msgstr ""
 
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Schools & Partners"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/courseware/course_about.html
+msgid "Add {course_name} to Cart <span>({price} USD)</span>"
 msgstr ""
 
 #. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
@@ -23109,9 +23274,9 @@ msgstr ""
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid ""
-"\n"
-"    The file may be referenced on other articles. Deleting it means that they will loose their references to this file. The following articles reference this file:\n"
-"    "
+"The file may be referenced on other articles. Deleting it means that they "
+"will loose their references to this file. The following articles reference "
+"this file:"
 msgstr ""
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
@@ -23120,9 +23285,8 @@ msgstr ""
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
 msgid ""
-"\n"
-"    You can remove a reference to a file, but it will retain its references on other articles.\n"
-"    "
+"You can remove a reference to a file, but it will retain its references on "
+"other articles."
 msgstr ""
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/delete.html
@@ -23164,9 +23328,13 @@ msgstr ""
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 #, python-format
 msgid ""
-"\n"
-"  Replacing an attachment means adding a new file that will be used in its place. All references to the file will be replaced by the one you upload and the file will be downloaded as <strong>%(filename)s</strong>. Please note that this attachment is in use on other articles, you may distort contents. However, do not hestitate to take advantage of this and make replacements for the listed articles where necessary. This way of working is more efficient....\n"
-"  "
+"Replacing an attachment means adding a new file that will be used in its "
+"place. All references to the file will be replaced by the one you upload and"
+" the file will be downloaded as <strong>%(filename)s</strong>. Please note "
+"that this attachment is in use on other articles, you may distort contents. "
+"However, do not hestitate to take advantage of this and make replacements "
+"for the listed articles where necessary. This way of working is more "
+"efficient...."
 msgstr ""
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
@@ -23176,9 +23344,9 @@ msgstr ""
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
 #, python-format
 msgid ""
-"\n"
-"  Replacing an attachment means adding a new file that will be used in its place. All references to the file will be replaced by the one you upload and the file will be downloaded as <strong>%(filename)s</strong>.\n"
-"  "
+"Replacing an attachment means adding a new file that will be used in its "
+"place. All references to the file will be replaced by the one you upload and"
+" the file will be downloaded as <strong>%(filename)s</strong>."
 msgstr ""
 
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/replace.html
@@ -23536,10 +23704,7 @@ msgstr ""
 
 #: wiki/templates/wiki/dir.html
 #, python-format
-msgid ""
-"\n"
-"        %(cnt)s %(articles_plur)s in this level %(match_plur)s your search.\n"
-"      "
+msgid "%(cnt)s %(articles_plur)s in this level %(match_plur)s your search."
 msgstr ""
 
 #: wiki/templates/wiki/dir.html
@@ -23548,10 +23713,7 @@ msgstr ""
 
 #: wiki/templates/wiki/dir.html
 #, python-format
-msgid ""
-"\n"
-"        There %(articles_plur_verb)s %(cnt)s %(articles_plur)s in this level.\n"
-"      "
+msgid "There %(articles_plur_verb)s %(cnt)s %(articles_plur)s in this level."
 msgstr ""
 
 #: wiki/templates/wiki/dir.html
@@ -23619,14 +23781,6 @@ msgstr ""
 
 #: wiki/templates/wiki/article/create_root.html
 msgid "Create root"
-msgstr ""
-
-#: wiki/templates/wiki/includes/anonymous_blocked.html
-#, python-format
-msgid ""
-"\n"
-"  You need to <a href=\"%(login_url)s\">log in</a> or <a href=\"%(signup_url)s\">sign up</a> to use this function.\n"
-"  "
 msgstr ""
 
 #: wiki/templates/wiki/includes/anonymous_blocked.html
@@ -23753,4 +23907,451 @@ msgstr ""
 msgid ""
 "A new revision was created: Merge between Revision #%(r1)d and Revision "
 "#%(r2)d"
+msgstr ""
+
+#: membership/models.py
+msgid "Awaiting for payment"
+msgstr ""
+
+#: membership/models.py
+msgid "Paid"
+msgstr ""
+
+#: membership/models.py
+msgid "Refunded"
+msgstr ""
+
+#: membership/models.py
+msgid "Offline"
+msgstr ""
+
+#: membership/models.py membership/templates/membership/card.html
+#: membership/templates/membership/result.html
+#: membership/templates/membership/wechat_paying.html
+msgid "WeChat"
+msgstr ""
+
+#: membership/models.py membership/templates/membership/card.html
+msgid "Alipay"
+msgstr ""
+
+#: membership/models.py
+msgid "Union pay"
+msgstr ""
+
+#: membership/models.py
+msgid "Apple Pay"
+msgstr ""
+
+#: membership/models.py
+msgid "subscribe normal"
+msgstr ""
+
+#: membership/models.py
+msgid "subscribe pay"
+msgstr ""
+
+#: membership/templates/membership/card.html
+msgid "VIP membership"
+msgstr ""
+
+#: membership/templates/membership/card.html
+msgid "Elite Education"
+msgstr ""
+
+#: membership/templates/membership/card.html
+msgid "Elite MBA VIP membership"
+msgstr ""
+
+#: membership/templates/membership/card.html
+msgid "View Introduction"
+msgstr ""
+
+#: membership/templates/membership/card.html
+msgid "Choose a payment method"
+msgstr ""
+
+#: membership/templates/membership/card.html
+msgid "Membership Subscription Period"
+msgstr ""
+
+#: membership/templates/membership/card.html
+msgid "Tuition:"
+msgstr ""
+
+#: membership/templates/membership/card.html
+msgid "Go to payment"
+msgstr ""
+
+#: membership/templates/membership/card.html
+msgid "Complete payment in a new page"
+msgstr ""
+
+#: membership/templates/membership/card.html
+msgid ""
+"{span_start}Please do not close the page {span_end}. Please click the button"
+" below accordingly after completing the payment."
+msgstr ""
+
+#: membership/templates/membership/card.html
+msgid "Choose another payment method"
+msgstr ""
+
+#: membership/templates/membership/card.html
+msgid "payment completed"
+msgstr ""
+
+#: membership/templates/membership/card.html
+msgid "Encounter a problem？"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "EliteMBA"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Prestige EMBA courses in America"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Six Course Specializations of Elite MBA School"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Activate your all-round business gene, you alone are a team!"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Business Administration"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Innovation and Entrepreneurship"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Statistic Analysis"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Information Technology"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Marketing and Sales"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Retail Management"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "More courses coming soon"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "International Business Law"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Dr. Ling Zhu"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "PhD in Management Information Systems, the University of Arizona, USA"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "J.D., Fordham University"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Marketing Management and Applications"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Dr. Tung-lung Steven Chang"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid ""
+"PhD. in International Business/Marketing, the George Washington University, "
+"USA"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "PhD. in Management, National Chengchi University, Taiwan"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Macroeconomics"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "(Davidson College)"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Dr. Clark Ross"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "PhD. in Economics, Boston College, USA"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid ""
+"*All course updates reserved to Eliteu and Eliteu has the final "
+"interpretation."
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Become Eliteu Member"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Choose appropriate learning duration according to your needs,"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid ""
+"During the study period, you will enjoy the learning of all the courses of "
+"Elite MBA School. You can join the new class online now!"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Full-Year Membership"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "average per month"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Full-stack workplace practice"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Half-Year Membership"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Improve Ability Efficiently"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Three-Month Membership"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "A series of courses for learning"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "One-Month Membership"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Multiple-Course Experience"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid ""
+"*Now sign up to enjoy the above offers. Please go to the purchase page for "
+"details."
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Best faculties ---- Elite Education"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Professor of American Famous Business Schools"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid ""
+"To build the all-around business knowledge matrix, and systematic learning "
+"from zero to one"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Dr. Bochun Xiao"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid ""
+"Lifetime Professor and Dean of Management Major in School of Business, Long "
+"Island University - C. W. Post, USA"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Dr. Lloyd E. Shefsky"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid ""
+"Clinical Professor, Founder and Co-director of the Center for Family "
+"Enterprises in Kellogg School of Management at Northwestern University, USA"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Prof. Tim Smithe"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid ""
+"Vice President & Chief Management Officer of International Finance Education"
+" Association (IFEA)"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Dr. Wei Yang"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid ""
+"Lifetime Professor in School of Business,  Long Island University - C. W. "
+"Post, USA"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Dr. Weichun Zhu"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid ""
+"Assistant Professor of School of Labor and Employment Relations, Penn State "
+"University Park, USA"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Dr. Jiamin Wang"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid ""
+"Lifetime Professor in Management, Long Island University-C. W. Post, USA"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid ""
+"Lifetime Professor of Information Management & Technology, Long Island "
+"University - C. W. Post, USA"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Dr. Tianning Li"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Associate Professor of Finance and Finance, Hood College, USA"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Dr. Jianjun Shi"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid ""
+"Prior President and Professor of the University of International Business "
+"and Economics"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Professor of Economics in Davidson College"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "View More"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid ""
+"Enjoy learning all courses in the Eliteu MBA school during the study period"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "You can join the new class once online!"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "One Year"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Learning Feature"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Video Lesson"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Interaction within Groups"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Live Lecture"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Exercise Test"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Certificate"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Become a Member"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid ""
+"There is a gap called self-discipline outside of 8 hours. Start with the "
+"Eliteu and become a self-disciplined full-stack workplace!"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid "Eliteu Theory"
+msgstr ""
+
+#: membership/templates/membership/result.html
+#: membership/templates/membership/wechat_paying.html
+msgid "Eliteu MBA school cashier"
+msgstr ""
+
+#: membership/templates/membership/result.html
+msgid "Eliteu MBA school cashier payment success"
+msgstr ""
+
+#: membership/templates/membership/result.html
+#: membership/templates/membership/wechat_paying.html
+msgid "Return to Eliteu MBA school in 3 seconds"
+msgstr ""
+
+#: membership/templates/membership/result.html
+#: membership/templates/membership/wechat_paying.html
+msgid "Return Now"
+msgstr ""
+
+#: membership/templates/membership/wechat_paying.html
+msgid "Amount paid: "
+msgstr ""
+
+#: membership/templates/membership/wechat_paying.html
+msgid "Please complete the  payment within 2 hours, or the purchase may fail"
+msgstr ""
+
+#: membership/templates/membership/wechat_paying.html
+msgid "Scan QR code with WeChat"
+msgstr ""
+
+#: membership/templates/membership/wechat_paying.html
+msgid "to complete payment"
+msgstr ""
+
+#: membership/templates/membership/wechat_paying.html
+msgid "Payment Success"
 msgstr ""

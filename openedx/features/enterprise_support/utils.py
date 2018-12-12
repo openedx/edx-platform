@@ -257,3 +257,22 @@ def get_enterprise_learner_generic_name(request):
         if enterprise_customer and enterprise_customer['replace_sensitive_sso_username']
         else ''
     )
+
+
+def remind_users_to_bind_phones(request):
+    """
+    The purpose of this function is to determine if the user is bound to the phone.
+    If the user does not bind the phone, the user is prompted to bind the phone (frequency once a day).
+    """
+    try:
+        if not request.user.profile.phone:
+            from datetime import datetime
+            if request.session.get('Phone_binding_reminder', '') != datetime.now().date():
+                request.session['Phone_binding_reminder'] = datetime.now().date()
+                return True
+            else:
+                return False
+        else:
+            return False
+    except Exception as err:
+        return False

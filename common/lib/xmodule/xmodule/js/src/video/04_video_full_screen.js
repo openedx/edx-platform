@@ -141,10 +141,10 @@
 
             this.el.trigger('fullscreen', [this.isFullScreen]);
 
-            $(closedCaptionsEl).css({
-                top: '70%',
-                left: '5%'
-            });
+            // $(closedCaptionsEl).css({
+            //     top: '70%',
+            //     left: '5%'
+            // });
         }
 
         function enter() {
@@ -163,10 +163,10 @@
 
             this.el.trigger('fullscreen', [this.isFullScreen]);
 
-            $(closedCaptionsEl).css({
-                top: '70%',
-                left: '5%'
-            });
+            // $(closedCaptionsEl).css({
+            //     top: '70%',
+            //     left: '5%'
+            // });
         }
 
     /** Toggle fullscreen mode. */

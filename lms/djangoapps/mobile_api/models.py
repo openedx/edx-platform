@@ -52,6 +52,7 @@ class AppVersionConfig(models.Model):
     enabled = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    is_audited = models.BooleanField(default=False)
 
     class Meta:
         app_label = "mobile_api"

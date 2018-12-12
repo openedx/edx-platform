@@ -14,7 +14,8 @@ from .accounts.views import (
     AccountRetirementView,
     AccountViewSet,
     DeactivateLogoutView,
-    LMSAccountRetirementView
+    LMSAccountRetirementView,
+    PhoneBindingViewSet
 )
 from .preferences.views import PreferencesDetailView, PreferencesView
 from .verification_api.views import IDVerificationStatusView
@@ -67,6 +68,13 @@ RETIREMENT_POST = AccountRetirementView.as_view({
 })
 
 RETIREMENT_LMS_POST = LMSAccountRetirementView.as_view({
+    'post': 'post',
+})
+
+SEND_CODE_FOR_BINDING = PhoneBindingViewSet.as_view({
+    'post': 'send',
+})
+VERIFY_CODE_FOR_BINDING = PhoneBindingViewSet.as_view({
     'post': 'post',
 })
 
@@ -170,5 +178,15 @@ urlpatterns = [
         r'^v1/preferences/{}/(?P<preference_key>[a-zA-Z0-9_]+)$'.format(settings.USERNAME_PATTERN),
         PreferencesDetailView.as_view(),
         name='preferences_detail_api'
+    ),
+    url(
+        r'^v1/accounts/send_code_binding_phone/$',
+        SEND_CODE_FOR_BINDING,
+        name='send_code_binding_phone'
+    ),
+    url(
+        r'^v1/accounts/binding_phone/$',
+        VERIFY_CODE_FOR_BINDING,
+        name='binding_phone'
     ),
 ]
