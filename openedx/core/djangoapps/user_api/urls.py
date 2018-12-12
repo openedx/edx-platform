@@ -71,8 +71,10 @@ RETIREMENT_LMS_POST = LMSAccountRetirementView.as_view({
     'post': 'post',
 })
 
-SEND_AND_VERIFY_CODE_FOR_BINDING = PhoneBindingViewSet.as_view({
-    'get': 'get',
+SEND_CODE_FOR_BINDING = PhoneBindingViewSet.as_view({
+    'post': 'send',
+})
+VERIFY_CODE_FOR_BINDING = PhoneBindingViewSet.as_view({
     'post': 'post',
 })
 
@@ -178,8 +180,13 @@ urlpatterns = [
         name='preferences_detail_api'
     ),
     url(
+        r'^v1/accounts/send_code_binding_phone/$',
+        SEND_CODE_FOR_BINDING,
+        name='send_code_binding_phone'
+    ),
+    url(
         r'^v1/accounts/binding_phone/$',
-        SEND_AND_VERIFY_CODE_FOR_BINDING,
+        VERIFY_CODE_FOR_BINDING,
         name='binding_phone'
     ),
 ]
