@@ -23,5 +23,5 @@ pycparser==2.19           # via cffi
 pyparsing==2.2.0
 scipy==0.14.0
 singledispatch==3.4.0.3   # via nltk
-six==1.11.0
+six==1.11.0               # via cryptography, nltk, singledispatch
 sympy==0.7.1
