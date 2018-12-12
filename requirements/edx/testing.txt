@@ -174,7 +174,7 @@ help-tokens==1.0.3
 html5lib==1.0.1
 httplib2==0.12.0
 httpretty==0.9.6
-idna==2.7
+idna==2.8
 incremental==17.5.0       # via twisted
 inflect==2.1.0
 ipaddr==2.1.11
@@ -278,7 +278,7 @@ radon==2.4.0
 redis==2.10.6
 reportlab==3.5.12
 requests-oauthlib==1.0.0
-requests==2.20.1
+requests==2.21.0
 rest-condition==1.0.3
 rfc6266-parser==0.0.5.post2
 rules==2.0.1
