@@ -1,63 +1,53 @@
 *{  
   box-sizing: content-box;
 }
+// 页面padding-left & padding-right只在.window-wrap .content-wrapper添加
 .window-wrap{  
   display: -webkit-flex;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+
+  .content-wrapper{ 
+    margin: 0 auto;
+    max-width: none;
+    width: 100%;
+    flex: 1;
+    padding: 0;
+    box-sizing: border-box;
+    background-image: linear-gradient(to bottom, #fff 0%, #fff 45%, #f2f9ff 100%);
+    font-size: 14px;
+    padding: 0 10px 40px;
+    position: relative;
+    
+    
+    .courses-container,
+    .dashboard,
+    .course-view,
+    .container
+    {
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .home .courses-container{
+      margin-top: 320px;
+    }
+  }
 }
-.window-wrap .content-wrapper{ 
+.wrapper-preview-menu{
+  max-width: 1200px;
   margin: 0 auto;
-  max-width: none;
-  width: 100%;
-  flex: 1;
-  padding: 0;
+  width: 98%;
   box-sizing: border-box;
-  background-image: linear-gradient(to bottom, #fff 0%, #fff 45%, #f2f9ff 100%);
-  font-size: 14px;
-}
-.content-wrapper .courses-container{
-  max-width: 1200px;
-  padding: 0 20px;
-}
-.dashboard{ 
-  max-width: 1200px;
-  margin: 0 auto 40px;
-  width: 100%;
-  padding: 0 20px;
-  box-sizing: border-box;
-}
-.content-wrapper > #main{  
-  max-width:100%;
-  margin:0 auto;
-  padding: 0;
-  background-image: none;
-}
-.content-wrapper .main-container{
-  padding: 0 20px 30px;
+
 }
 
-
-/*
-.wrapper-preview-menu{  
-  width: 100%;
-}
-*/
-body.view-in-course .container .course-wrapper, body.view-in-course .profile-wrapper, body.view-in-course .instructor-dashboard-wrapper-2, body.view-in-course .wiki-wrapper, body.view-in-course .teams-wrapper, body.view-in-course .static_tab_wrapper{ 
-  max-width: 1200px;
-  margin: 0 auto 50px;
-}
 
 @media screen and (max-width: 576px) {
-  .dashboard{
-    padding: 0 10px;
-  }
-  .content-wrapper {
-    padding: 0;
-  }
-  .content-wrapper .courses-container{
-    padding: 0 10px;
+  .window-wrap .content-wrapper .home .courses-container{
+    margin-top: 250px;
   }
 }
 
@@ -89,6 +79,15 @@ ol, ul, dl{
 }
 
 // input
+%input-my{
+  height: 34px;
+  border: 1px solid #eeeeee;
+  border-radius: 3px;
+  padding: 0 10px;
+  font-size: 14px;
+  width: 230px;
+  box-sizing: border-box;
+}
 textarea:focus, input[type="text"]:focus, input[type="url"]:focus, input[type="email"]:focus, input[type="password"]:focus, input[type="tel"]:focus{  
   box-shadow: none;
   border: 1px solid $blue;
@@ -107,11 +106,11 @@ textarea:focus, input[type="text"]:focus, input[type="url"]:focus, input[type="e
 %btn-my-primary{
   display: inline-block;
   width: auto;
-  padding: 0 20px;
+  padding: 0 20px !important;
   font-size: 14px;
   letter-spacing: 0.3px;
   height: 36px;
-  line-height: 36px;
+  line-height: 34px;
   border-radius: 3px;
   font-weight: normal;
   cursor: pointer;
@@ -129,6 +128,7 @@ textarea:focus, input[type="text"]:focus, input[type="url"]:focus, input[type="e
     text-decoration: none;
     opacity: 0.95;
     box-shadow: none;
+    color: #fff;
   }
 }
 
@@ -137,11 +137,11 @@ textarea:focus, input[type="text"]:focus, input[type="url"]:focus, input[type="e
 %btn-my-white{
   display: inline-block;
   width: auto;
-  padding: 0 20px;
+  padding: 0 20px !important;
   font-size: 14px;
   letter-spacing: 0.3px;
   height: 36px;
-  line-height: 36px;
+  line-height: 34px;
   border-radius: 3px;
   cursor: pointer;
   background: #fff;
@@ -167,7 +167,7 @@ textarea:focus, input[type="text"]:focus, input[type="url"]:focus, input[type="e
   font-size: 14px;
   letter-spacing: 0.3px;
   height: 36px;
-  line-height: 36px;
+  line-height: 34px;
   border-radius: 3px;
 
   border: none;

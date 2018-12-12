@@ -65,7 +65,7 @@
 
 /* 右侧sidebar框 */
 .dashboard .side-container{
-  padding: 40px 0 20px 0;
+  padding: 25px 0 20px 0;
   flex: 0 0 30%;
   max-width: none;
   min-width: 0;
@@ -78,7 +78,7 @@
     padding: 25px 20px;
     box-shadow: 0px 1px 4px 0px #ffe4d1;
     border: 1px solid #ffe4d1;
-    margin-top: 30px;
+    margin-top: 20px;
     text-align: right;
   }
   .status-verification .status-title{
@@ -118,6 +118,60 @@
   }
 }
 
+// search-bar
+.dashboard-search-bar{
+  margin: 0 0 10px;
+  label{
+    display: none;
+  }
+  .search-field{
+    font-size: 14px;
+    border: 1px solid $blue;
+  }
+}
+
+.dashboard-search-results{
+  .search-info{
+    border-bottom: 2px solid $border;
+    margin-bottom: 0;
+    padding: 0 8px 30px;
+
+    h2, .search-count{
+      font-size: 14px;
+      color: $title;
+      font-weight: normal;
+    }
+    .search-count{
+      position: relative;
+      top: 4px;
+    }
+  }
+  
+  .search-results .search-results-item{
+    border-bottom: 1px solid $border;
+    padding: 15px;
+
+    .result-excerpt{
+      margin-bottom: 10px;
+    }
+    .result-location, .result-course-name{
+      color: $font;
+    }
+  }
+
+  .search-load-next{
+    border: none;
+    color: $blue;
+    text-decoration: underline;
+  }
+
+  >p{
+    margin-top: 10px;
+    color: $font;
+    padding: 0 8px;
+  }
+}
+
 // no courses
 .empty-dashboard-message{
 	background-color: rgba(245, 247, 250, 0.4);
@@ -132,20 +186,24 @@
   }
   p:before{
     content: '';
+    height: 80px;
     width: 80px;
-    height: 70px;
     display: block;
     position: relative;
     left: 50%;
     margin-left: -40px;
-    margin-bottom: 20px;
-    background: url('/static/normal-theme/images/profiles/default_50.png');
-    background-size: cover;
+    margin-bottom: 5px;
+    background-size: 1200px;
+    background-image: url("/static/normal-theme/images/iconfont.png");
+    background-position: -480px -80px;
   }
   a.btn{
     @extend %btn-my-primary;
     margin: 0;
   }
+}
+.dashboard .main-container .my-courses .course .details .course-actions .action{
+  display: none;
 }
 
 @media screen and (max-width: 992px){
@@ -154,7 +212,7 @@
   }
   .dashboard .side-container{
     padding: 0;
-    margin: -10px 0 0;
+    margin: 20px 0 0;
   }
   .wrapper-messages-primary .message{
     padding: 10px 20px;

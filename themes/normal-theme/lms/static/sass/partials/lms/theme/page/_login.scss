@@ -4,12 +4,20 @@
 }
 .login-register{
   background: none;
+  max-width: 500px;
+  min-width: 460px;
   .form-wrapper{
     padding-bottom: 100px;
+  }
+  .form-type{
+    min-width: 360px;
   }
   .toggle-form{
     font-size: 14px;
     color: $font;
+  }
+  .login-provider.button-oa2-google-oauth2 .icon{
+    background: none;
   }
 
 
@@ -29,7 +37,7 @@
     label{
       font-size: 14px;
       color: $title;
-      margin-top: 5px;
+      margin: 5px 0;
       &.focus-out{
         padding-top: 1px;
         padding-left: 12px;
@@ -159,10 +167,15 @@
 }
 
 @media screen and (max-width:576px){
-  .login-register .form-field{
-    &.select-year_of_birth, &.select-gender{
-      width: 100%;
-      padding-right: 0;
+  .login-register{
+    min-width: 300px;
+
+    .form-field{
+      &.select-year_of_birth, &.select-gender{
+        width: 100%;
+        padding-right: 0;
+        margin: 0;
+      }
     }
-  }
+  } 
 }
