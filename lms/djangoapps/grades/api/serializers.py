@@ -34,10 +34,9 @@ class SectionBreakdownSerializer(serializers.Serializer):
     """
     Serializer for the `section_breakdown` portion of a gradebook entry.
     """
+    attempted = serializers.BooleanField()
     category = serializers.CharField()
-    displayed_value = serializers.CharField()
     is_graded = serializers.BooleanField()
-    grade_description = serializers.CharField()
     label = serializers.CharField()
     letter_grade = serializers.CharField()
     module_id = serializers.CharField()

@@ -425,7 +425,7 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
             subsection_grade = course_grade.subsection_grade(subsection.location)
             short_label = default_labeler(subsection_grade.format)
 
-            graded_description = 'Not Attempted'
+            attempted = False
             score_earned = 0
             score_possible = 0
 
@@ -440,10 +440,7 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
             # attribute if the user has attempted this graded subsection, or if there
             # has been a grade override applied.
             if subsection_grade.attempted_graded or subsection_grade.override:
-                graded_description = '({earned:.2f}/{possible:.2f})'.format(
-                    earned=subsection_grade.graded_total.earned,
-                    possible=subsection_grade.graded_total.possible,
-                )
+                attempted = True
                 score_earned = subsection_grade.graded_total.earned
                 score_possible = subsection_grade.graded_total.possible
 
@@ -451,10 +448,9 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
             # 'displayed_value' should maybe be 'description_percent'
             # 'grade_description' should be 'description_ratio'
             breakdown.append({
+                'attempted': attempted,
                 'category': subsection_grade.format,
-                'displayed_value': '{:.2f}'.format(subsection_grade.percent_graded),
                 'is_graded': subsection_grade.graded,
-                'grade_description': graded_description,
                 'label': short_label,
                 'letter_grade': course_grade.letter_grade,
                 'module_id': text_type(subsection_grade.location),

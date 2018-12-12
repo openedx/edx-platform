@@ -402,10 +402,9 @@ class GradebookViewTest(GradebookViewTestBase):
         """
         return [
             OrderedDict([
+                ('attempted', True),
                 ('category', 'Homework'),
-                ('displayed_value', '0.50'),
                 ('is_graded', True),
-                ('grade_description', '(1.00/2.00)'),
                 ('label', 'HW 01'),
                 ('letter_grade', letter_grade),
                 ('module_id', text_type(self.subsections[self.chapter_1.location][0].location)),
@@ -415,10 +414,9 @@ class GradebookViewTest(GradebookViewTestBase):
                 ('subsection_name', 'HW 1')
             ]),
             OrderedDict([
+                ('attempted', True),
                 ('category', 'Lab'),
-                ('displayed_value', '0.50'),
                 ('is_graded', True),
-                ('grade_description', '(1.00/2.00)'),
                 ('label', 'Lab 01'),
                 ('letter_grade', letter_grade),
                 ('module_id', text_type(self.subsections[self.chapter_1.location][1].location)),
@@ -428,10 +426,9 @@ class GradebookViewTest(GradebookViewTestBase):
                 ('subsection_name', 'Lab 1')
             ]),
             OrderedDict([
+                ('attempted', True),
                 ('category', 'Homework'),
-                ('displayed_value', '0.50'),
                 ('is_graded', True),
-                ('grade_description', '(1.00/2.00)'),
                 ('label', 'HW 02'),
                 ('letter_grade', letter_grade),
                 ('module_id', text_type(self.subsections[self.chapter_2.location][0].location)),
@@ -441,10 +438,9 @@ class GradebookViewTest(GradebookViewTestBase):
                 ('subsection_name', 'HW 2')
             ]),
             OrderedDict([
+                ('attempted', True),
                 ('category', 'Lab'),
-                ('displayed_value', '0.50'),
                 ('is_graded', True),
-                ('grade_description', '(1.00/2.00)'),
                 ('label', 'Lab 02'),
                 ('letter_grade', letter_grade),
                 ('module_id', text_type(self.subsections[self.chapter_2.location][1].location)),
