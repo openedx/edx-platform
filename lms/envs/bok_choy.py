@@ -200,6 +200,22 @@ FEATURES['ENABLE_DISCUSSION_HOME_PANEL'] = True
 # Enable support for OpenBadges accomplishments
 FEATURES['ENABLE_OPENBADGES'] = True
 
+FEATURES['ENABLE_LTI_PROVIDER'] = True
+INSTALLED_APPS.append('lti_provider.apps.LtiProviderConfig')
+AUTHENTICATION_BACKENDS.append('lti_provider.users.LtiBackend')
+
+FEATURES['ENABLE_THIRD_PARTY_AUTH'] = True
+THIRD_PARTY_AUTH = {
+    "Google": {
+        "SOCIAL_AUTH_GOOGLE_OAUTH2_KEY": "test",
+        "SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET": "test"
+    },
+    "Facebook": {
+        "SOCIAL_AUTH_FACEBOOK_KEY": "test",
+        "SOCIAL_AUTH_FACEBOOK_SECRET": "test"
+    }
+}
+
 # Use MockSearchEngine as the search engine for test scenario
 SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
 # Path at which to store the mock index
