@@ -129,7 +129,7 @@ edx-rest-api-client==1.9.2
 edx-search==1.2.1
 edx-submissions==2.0.12
 edx-user-state-client==1.0.4
-edxval==0.1.22
+edxval==0.1.23
 elasticsearch==1.9.0      # via edx-search
 enum34==1.1.6
 event-tracking==0.2.7
