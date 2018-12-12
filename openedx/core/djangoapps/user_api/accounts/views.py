@@ -531,9 +531,9 @@ class PhoneBindingViewSet(ViewSet):
     verify_code_key = 'phone_binding_verifycode_{username}_{name}'
     verify_code_timeout = 10 * 60
 
-    def get(self, request):
+    def send(self, request):
         try:
-            phone = request.GET['phone']
+            phone = request.data['phone']
             try:
                 language_version = str(request.session._session['_language'])
                 if not language_version:
