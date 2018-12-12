@@ -551,7 +551,7 @@ class PhoneBindingViewSet(ViewSet):
             request.user.profile.save()
             return Response(status=status.HTTP_204_NO_CONTENT)
         else:
-            return Response(status.HTTP_400_BAD_REQUEST)
+            return Response(_('Verification failed'),status.HTTP_400_BAD_REQUEST)
     def send_mobile_code(self, username, mobile, language='en'):
         '''
         发送手机验证码通知
