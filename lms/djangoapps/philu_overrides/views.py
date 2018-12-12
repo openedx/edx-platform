@@ -19,13 +19,12 @@ from edxmako.shortcuts import render_to_response, render_to_string
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from openedx.core.djangoapps.catalog.utils import get_programs_data
 from philu_overrides.helpers import reactivation_email_for_user_custom, get_course_next_classes, \
-    get_user_current_enrolled_class
+    get_user_current_enrolled_class, get_next_url_for_login_page_override
 from lms.djangoapps.courseware.views.views import add_tag_to_enrolled_courses
 from student.views import (
     signin_user as old_login_view,
     register_user as old_register_view
 )
-from student.helpers import get_next_url_for_login_page
 from third_party_auth.decorators import xframe_allow_whitelisted
 from util.cache import cache_if_anonymous
 from util.enterprise_helpers import set_enterprise_branding_filter_param
@@ -82,7 +81,7 @@ def login_and_registration_form(request, initial_mode="login", org_name=None, ad
     """
     # Determine the URL to redirect to following login/registration/third_party_auth
     _local_server_get('/user_api/v1/account/registration/', request.session)
-    redirect_to = get_next_url_for_login_page(request)
+    redirect_to = get_next_url_for_login_page_override(request)
     # If we're already logged in, redirect to the dashboard
     if request.user.is_authenticated():
         return redirect(redirect_to)
