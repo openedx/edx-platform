@@ -56,6 +56,7 @@ class ProblemComponentEditor(ContainerBase):
             'Problem Weight': u'',
             'Randomization': u'Never',
             'Show Answer': u'Finished',
+            'Show Answer: Number of Attempts': u'0',
             'Show Reset Button': u'False',
             'Timer Between Attempts': u'0'
         }
