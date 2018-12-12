@@ -34,6 +34,7 @@
 .alert.alert-info a {
   // Need to have sufficient contrast for blue links on blue background
   // Based this on some existing css for this use case
-  color: #245269;
+  color: #0075b4;
+  text-decoration: underline;
   font-weight: bold;
 }
