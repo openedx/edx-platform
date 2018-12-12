@@ -11,9 +11,6 @@
 # six is at 1.12.0, but transifex-client requires ==1.11.0
 # https://github.com/transifex/transifex-client/issues/252
 six==1.11.0
-<<<<<<< HEAD
-
-
 
 # Convert text markup to HTML; used in capa problems, forums, and course wikis; pin Markdown version as tests failed for its upgrade to latest release
 Markdown==2.6.11
@@ -33,7 +30,3 @@ splinter==0.9.0
 
 # transifex-client 0.13.5 requires urllib3<1.24, but requests will pull in urllib3==1.24 (https://github.com/transifex/transifex-client/pull/241/files)
 urllib3<1.24
-=======
-# version 2.6.0 changes the data model, which results in a failure in common.djangoapps.util.tests.test_db.MigrationTests.test_migrations_are_in_sync
-django-simple-history==2.5.1
->>>>>>> Pin django-simple-history until someone verifies that the new version works
