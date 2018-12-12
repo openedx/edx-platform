@@ -34,12 +34,21 @@
 # Translators:
 # li ying <code@eliteu.cn>, 2018
 #
+# #-#-#-#-#  membership-js.po (0.1a)  #-#-#-#-#
+# edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/).
+# Copyright (C) 2018 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2018.
+#
+# Translators:
+# li ying <code@eliteu.cn>, 2018
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-11-26 07:54+0000\n"
-"PO-Revision-Date: 2018-11-26 07:56+0000\n"
+"POT-Creation-Date: 2018-12-11 15:42+0800\n"
+"PO-Revision-Date: 2018-12-07 12:23+0000\n"
 "Last-Translator: li ying <code@eliteu.cn>, 2018\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)\n"
 "Language: zh_CN\n"
@@ -48,6 +57,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 1.3\n"
+"#-#-#-#-#  membership-js.po (0.1a)  #-#-#-#-#\n"
 
 #: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
 #: cms/static/js/views/video_transcripts.js common/static/bundles/commons.js
@@ -10899,3 +10909,51 @@ msgstr "您变更了视频的 URL，但没有变更字幕文件。您希望继�
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 msgid "Use Current Transcript"
 msgstr "使用当前字幕"
+
+#: membership/static/membership/js/card.js
+msgid "Open membership"
+msgstr "开通"
+
+#: membership/static/membership/js/card.js
+msgid "Become a VIP member and watch all EliteMBA courses for free"
+msgstr "开通VIP会员，可免费观看英荔商学院全部课程"
+
+#: membership/static/membership/js/card.js
+msgid "DD/MM/YYYY"
+msgstr "YYYY年MM月DD日"
+
+#: membership/static/membership/js/card.js
+msgid "Membership opened"
+msgstr "已开通"
+
+#: membership/static/membership/js/card.js
+msgid "day"
+msgstr "天"
+
+#: membership/static/membership/js/card.js
+msgid "Remaining days"
+msgstr "剩余"
+
+#: membership/static/membership/js/card.js
+msgid "Date:"
+msgstr "日期:"
+
+#: membership/static/membership/js/card.js
+msgid "Opened on:"
+msgstr "开通日期:"
+
+#: membership/static/membership/js/card.js
+msgid "Expire on:"
+msgstr "到期日期:"
+
+#: membership/static/membership/js/card.js
+msgid "Membership expired"
+msgstr "会员已过期"
+
+#: membership/static/membership/js/index.js
+msgid "Average per month"
+msgstr "月均"
+
+#: membership/static/membership/js/pay.js
+msgid "Return to EliteMBA in _ seconds"
+msgstr "秒后返回英荔商学院"

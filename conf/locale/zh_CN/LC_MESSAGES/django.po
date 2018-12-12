@@ -43,12 +43,30 @@
 # Translators:
 # li ying <code@eliteu.cn>, 2018
 #
+# #-#-#-#-#  membership.po (0.1a)  #-#-#-#-#
+# #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
+# edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/).
+# Copyright (C) 2018 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2018.
+#
+# #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
+# edX community translations have been downloaded from Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)
+# Copyright (C) 2018 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2018.
+#
+# Translators:
+# 微 李 <w.li@eliteu.com.cn>, 2018
+# 嘉杰 李 <jj.li@eliteu.com.cn>, 2018
+# li ying <code@eliteu.cn>, 2018
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-11-26 07:55+0000\n"
-"PO-Revision-Date: 2018-11-26 07:56+0000\n"
+"POT-Creation-Date: 2018-12-11 15:42+0800\n"
+"PO-Revision-Date: 2018-12-07 12:23+0000\n"
 "Last-Translator: li ying <code@eliteu.cn>, 2018\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)\n"
 "Language: zh_CN\n"
@@ -7633,7 +7651,7 @@ msgstr "总计"
 msgid "Payment Received"
 msgstr "付款已收到"
 
-#: lms/djangoapps/shoppingcart/pdf.py
+#: lms/djangoapps/shoppingcart/pdf.py membership/models.py
 msgid "Balance"
 msgstr "金额"
 
@@ -11676,9 +11694,10 @@ msgstr "上传完成"
 msgid "Failed"
 msgstr "已失败"
 
+#. #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
 #. Translators: This is the status for a video that is cancelled during upload
 #. by user
-#: cms/djangoapps/contentstore/views/videos.py
+#: cms/djangoapps/contentstore/views/videos.py membership/models.py
 msgid "Cancelled"
 msgstr "已取消"
 
@@ -18517,6 +18536,7 @@ msgid ""
 msgstr "没找到您的常用语言？{link_start}欢迎成为一个翻译志愿者！{link_end}"
 
 #: lms/templates/navigation/navbar-not-authenticated.html
+#: membership/templates/membership/index.html
 msgid "Explore Courses"
 msgstr "探索课程"
 
@@ -24262,3 +24282,450 @@ msgid ""
 "A new revision was created: Merge between Revision #%(r1)d and Revision "
 "#%(r2)d"
 msgstr "产生新的修订版本：合并修订版本#%(r1)d与#%(r2)d"
+
+#: membership/models.py
+msgid "Awaiting for payment"
+msgstr "等待付款"
+
+#: membership/models.py
+msgid "Paid"
+msgstr "已付款"
+
+#: membership/models.py
+msgid "Refunded"
+msgstr "已退款"
+
+#: membership/models.py
+msgid "Offline"
+msgstr "线下"
+
+#: membership/models.py membership/templates/membership/card.html
+#: membership/templates/membership/result.html
+#: membership/templates/membership/wechat_paying.html
+msgid "WeChat"
+msgstr "微信"
+
+#: membership/models.py membership/templates/membership/card.html
+msgid "Alipay"
+msgstr "支付宝"
+
+#: membership/models.py
+msgid "Union pay"
+msgstr "银联"
+
+#: membership/models.py
+msgid "Apple Pay"
+msgstr "Apple Pay"
+
+#: membership/models.py
+msgid "subscribe normal"
+msgstr "常规订阅"
+
+#: membership/models.py
+msgid "subscribe pay"
+msgstr "收费订阅"
+
+#: membership/templates/membership/card.html
+msgid "VIP membership"
+msgstr "VIP会员"
+
+#: membership/templates/membership/card.html
+msgid "Elite Education"
+msgstr "英荔教育"
+
+#: membership/templates/membership/card.html
+msgid "Elite MBA VIP membership"
+msgstr "英荔商学院VIP会员"
+
+#: membership/templates/membership/card.html
+msgid "View Introduction"
+msgstr "查看介绍"
+
+#: membership/templates/membership/card.html
+msgid "Choose a payment method"
+msgstr "选择支付方式"
+
+#: membership/templates/membership/card.html
+msgid "Membership Subscription Period"
+msgstr "订阅会员有效期"
+
+#: membership/templates/membership/card.html
+msgid "Tuition:"
+msgstr "学费："
+
+#: membership/templates/membership/card.html
+msgid "Go to payment"
+msgstr "去支付"
+
+#: membership/templates/membership/card.html
+msgid "Complete payment in a new page"
+msgstr "请在新页面完成支付"
+
+#: membership/templates/membership/card.html
+msgid ""
+"{span_start}Please do not close the page {span_end}. Please click the button"
+" below accordingly after completing the payment."
+msgstr "{span_start}请不要关闭页面{span_end}，完成支付后请根据情况点击下面按钮"
+
+#: membership/templates/membership/card.html
+msgid "Choose another payment method"
+msgstr "重选支付方式"
+
+#: membership/templates/membership/card.html
+msgid "payment completed"
+msgstr "支付完成"
+
+#: membership/templates/membership/card.html
+msgid "Encounter a problem？"
+msgstr "遇到问题?"
+
+#: membership/templates/membership/index.html
+msgid "EliteMBA"
+msgstr "英荔商学院"
+
+#: membership/templates/membership/index.html
+msgid "Prestige EMBA courses in America"
+msgstr "美国名校EMAB精华课程"
+
+#: membership/templates/membership/index.html
+msgid "Six Course Specializations of Elite MBA School"
+msgstr "英荔商学院六大课程方向"
+
+#: membership/templates/membership/index.html
+msgid "Activate your all-round business gene, you alone are a team!"
+msgstr "激活全能商业基因，你就是一个团队！"
+
+#: membership/templates/membership/index.html
+msgid "Business Administration"
+msgstr "商业管理"
+
+#: membership/templates/membership/index.html
+msgid "Innovation and Entrepreneurship"
+msgstr "创新创业"
+
+#: membership/templates/membership/index.html
+msgid "Statistic Analysis"
+msgstr "统计分析"
+
+#: membership/templates/membership/index.html
+msgid "Information Technology"
+msgstr "信息技术"
+
+#: membership/templates/membership/index.html
+msgid "Marketing and Sales"
+msgstr "市场销售"
+
+#: membership/templates/membership/index.html
+msgid "Retail Management"
+msgstr "零售管理"
+
+#: membership/templates/membership/index.html
+msgid "More courses coming soon"
+msgstr "更多重磅课程即将上线"
+
+#: membership/templates/membership/index.html
+msgid "International Business Law"
+msgstr "国际商法"
+
+#: membership/templates/membership/index.html
+msgid "Dr. Ling Zhu"
+msgstr "朱灵 博士"
+
+#: membership/templates/membership/index.html
+msgid "PhD in Management Information Systems, the University of Arizona, USA"
+msgstr "美国亚利桑那大学管理信息系统博士"
+
+#: membership/templates/membership/index.html
+msgid "J.D., Fordham University"
+msgstr "美国福特汉姆大学法律博士"
+
+#: membership/templates/membership/index.html
+msgid "Marketing Management and Applications"
+msgstr "营销管理与应用"
+
+#: membership/templates/membership/index.html
+msgid "Dr. Tung-lung Steven Chang"
+msgstr "张东隆 博士"
+
+#: membership/templates/membership/index.html
+msgid ""
+"PhD. in International Business/Marketing, the George Washington University, "
+"USA"
+msgstr "美国乔治·华盛顿大学国际商务/市场营销博士"
+
+#: membership/templates/membership/index.html
+msgid "PhD. in Management, National Chengchi University, Taiwan"
+msgstr "台湾政治大学管理学博士"
+
+#: membership/templates/membership/index.html
+msgid "Macroeconomics"
+msgstr "宏观经济学"
+
+#: membership/templates/membership/index.html
+msgid "(Davidson College)"
+msgstr "（美国戴维森学院）"
+
+#: membership/templates/membership/index.html
+msgid "Dr. Clark Ross"
+msgstr "克拉克·罗斯 博士"
+
+#: membership/templates/membership/index.html
+msgid "PhD. in Economics, Boston College, USA"
+msgstr "美国波士顿学院经济学博士"
+
+#: membership/templates/membership/index.html
+msgid ""
+"*All course updates reserved to Eliteu and Eliteu has the final "
+"interpretation."
+msgstr "*英荔教育保留所有课程的更新和最终解释权。"
+
+#: membership/templates/membership/index.html
+msgid "Become Eliteu Member"
+msgstr "成为英荔会员"
+
+#: membership/templates/membership/index.html
+msgid "Choose appropriate learning duration according to your needs,"
+msgstr "根据您的需求选择合适的学习时长，"
+
+#: membership/templates/membership/index.html
+msgid ""
+"During the study period, you will enjoy the learning of all the courses of "
+"Elite MBA School. You can join the new class online now!"
+msgstr "学习期内享有英荔商学院所有课程的学习权益，新课上线亦可马上加入学习！"
+
+#: membership/templates/membership/index.html
+msgid "Full-Year Membership"
+msgstr "全年会员"
+
+#: membership/templates/membership/index.html
+msgid "average per month"
+msgstr "月均"
+
+#: membership/templates/membership/index.html
+msgid "Full-stack workplace practice"
+msgstr "全栈职场修炼"
+
+#: membership/templates/membership/index.html
+msgid "Half-Year Membership"
+msgstr "半年会员"
+
+#: membership/templates/membership/index.html
+msgid "Improve Ability Efficiently"
+msgstr "能力高效提升"
+
+#: membership/templates/membership/index.html
+msgid "Three-Month Membership"
+msgstr "三个月会员"
+
+#: membership/templates/membership/index.html
+msgid "A series of courses for learning"
+msgstr "系列课程畅学"
+
+#: membership/templates/membership/index.html
+msgid "One-Month Membership"
+msgstr "一个月会员"
+
+#: membership/templates/membership/index.html
+msgid "Multiple-Course Experience"
+msgstr "多门课程体验"
+
+#: membership/templates/membership/index.html
+msgid ""
+"*Now sign up to enjoy the above offers. Please go to the purchase page for "
+"details."
+msgstr "*现在报名可享以上优惠，具体详情请前往购买页。"
+
+#: membership/templates/membership/index.html
+msgid "Best faculties ---- Elite Education"
+msgstr "超强师资——精英式教学"
+
+#: membership/templates/membership/index.html
+msgid "Professor of American Famous Business Schools"
+msgstr "美国名校商学院教授"
+
+#: membership/templates/membership/index.html
+msgid ""
+"To build the all-around business knowledge matrix, and systematic learning "
+"from zero to one"
+msgstr "构建全方位的商科知识矩阵，从0到1，系统学习 "
+
+#: membership/templates/membership/index.html
+msgid "Dr. Bochun Xiao"
+msgstr "萧柏春 博士"
+
+#: membership/templates/membership/index.html
+msgid ""
+"Lifetime Professor and Dean of Management Major in School of Business, Long "
+"Island University - C. W. Post, USA"
+msgstr "美国长岛大学Post分校商学院管理系终身教授、系主任"
+
+#: membership/templates/membership/index.html
+msgid "Dr. Lloyd E. Shefsky"
+msgstr "谢洛德 博士"
+
+#: membership/templates/membership/index.html
+msgid ""
+"Clinical Professor, Founder and Co-director of the Center for Family "
+"Enterprises in Kellogg School of Management at Northwestern University, USA"
+msgstr "原美国西北大学凯洛格商学院家族企业中心创始人，创业专业教授"
+
+#: membership/templates/membership/index.html
+msgid "Prof. Tim Smithe"
+msgstr "蒂姆·塞米特 教授"
+
+#: membership/templates/membership/index.html
+msgid ""
+"Vice President & Chief Management Officer of International Finance Education"
+" Association (IFEA)"
+msgstr "国际金融教育协会副会长及  首席营销官"
+
+#: membership/templates/membership/index.html
+msgid "Dr. Wei Yang"
+msgstr "杨威 博士"
+
+#: membership/templates/membership/index.html
+msgid ""
+"Lifetime Professor in School of Business,  Long Island University - C. W. "
+"Post, USA"
+msgstr "美国长岛大学Post分校商学院终身教授"
+
+#: membership/templates/membership/index.html
+msgid "Dr. Weichun Zhu"
+msgstr "朱伟春 博士"
+
+#: membership/templates/membership/index.html
+msgid ""
+"Assistant Professor of School of Labor and Employment Relations, Penn State "
+"University Park, USA"
+msgstr "宾夕法尼亚州立大学劳动力研究与雇佣关系学院助理教授"
+
+#: membership/templates/membership/index.html
+msgid "Dr. Jiamin Wang"
+msgstr "汪嘉旻 博士"
+
+#: membership/templates/membership/index.html
+msgid ""
+"Lifetime Professor in Management, Long Island University-C. W. Post, USA"
+msgstr "美国长岛大学Post分校管理系终身教授"
+
+#: membership/templates/membership/index.html
+msgid ""
+"Lifetime Professor of Information Management & Technology, Long Island "
+"University - C. W. Post, USA"
+msgstr "美国长岛大学Post分校管理信息系统专业终身教授"
+
+#: membership/templates/membership/index.html
+msgid "Dr. Tianning Li"
+msgstr "李天宁 博士"
+
+#: membership/templates/membership/index.html
+msgid "Associate Professor of Finance and Finance, Hood College, USA"
+msgstr "美国胡德学院金融财务副教授"
+
+#: membership/templates/membership/index.html
+msgid "Dr. Jianjun Shi"
+msgstr "施建军 博士"
+
+#: membership/templates/membership/index.html
+msgid ""
+"Prior President and Professor of the University of International Business "
+"and Economics"
+msgstr "原对外经济贸易大学校长、  教授"
+
+#: membership/templates/membership/index.html
+msgid "Professor of Economics in Davidson College"
+msgstr "美国戴维森学院经济学教授"
+
+#: membership/templates/membership/index.html
+msgid "View More"
+msgstr "查看更多"
+
+#: membership/templates/membership/index.html
+msgid ""
+"Enjoy learning all courses in the Eliteu MBA school during the study period"
+msgstr "学习期内享有英荔商学院所有课程的学习权益"
+
+#: membership/templates/membership/index.html
+msgid "You can join the new class once online!"
+msgstr "新课上线亦可马上加入学习！"
+
+#: membership/templates/membership/index.html
+msgid "One Year"
+msgstr "一年"
+
+#: membership/templates/membership/index.html
+msgid "Learning Feature"
+msgstr "学习特色"
+
+#: membership/templates/membership/index.html
+msgid "Video Lesson"
+msgstr "视频学习"
+
+#: membership/templates/membership/index.html
+msgid "Interaction within Groups"
+msgstr "群内互动"
+
+#: membership/templates/membership/index.html
+msgid "Live Lecture"
+msgstr "直播讲座"
+
+#: membership/templates/membership/index.html
+msgid "Exercise Test"
+msgstr "习题测试"
+
+#: membership/templates/membership/index.html
+msgid "Certificate"
+msgstr "结课证书"
+
+#: membership/templates/membership/index.html
+msgid "Become a Member"
+msgstr "加入会员"
+
+#: membership/templates/membership/index.html
+msgid ""
+"There is a gap called self-discipline outside of 8 hours. Start with the "
+"Eliteu and become a self-disciplined full-stack workplace!"
+msgstr "有一种差距，叫8小时以外的自律，和英荔一起出发，成为自律的全栈职场人！"
+
+#: membership/templates/membership/index.html
+msgid "Eliteu Theory"
+msgstr "英荔说"
+
+#: membership/templates/membership/result.html
+#: membership/templates/membership/wechat_paying.html
+msgid "Eliteu MBA school cashier"
+msgstr "英荔商学院收银台"
+
+#: membership/templates/membership/result.html
+msgid "Eliteu MBA school cashier payment success"
+msgstr "英荔商学院收银台支付成功"
+
+#: membership/templates/membership/result.html
+#: membership/templates/membership/wechat_paying.html
+msgid "Return to Eliteu MBA school in 3 seconds"
+msgstr "3秒后返回英荔商学院"
+
+#: membership/templates/membership/result.html
+#: membership/templates/membership/wechat_paying.html
+msgid "Return Now"
+msgstr "立即返回"
+
+#: membership/templates/membership/wechat_paying.html
+msgid "Amount paid: "
+msgstr "实付金额："
+
+#: membership/templates/membership/wechat_paying.html
+msgid "Please complete the  payment within 2 hours, or the purchase may fail"
+msgstr "请在2小时内完成支付，否则可能导致购买失败"
+
+#: membership/templates/membership/wechat_paying.html
+msgid "Scan QR code with WeChat"
+msgstr "请使用微信扫描二维码"
+
+#: membership/templates/membership/wechat_paying.html
+msgid "to complete payment"
+msgstr "以完成支付"
+
+#: membership/templates/membership/wechat_paying.html
+msgid "Payment Success"
+msgstr "支付成功"

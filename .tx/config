@@ -54,3 +54,15 @@ file_filter = conf/locale/<lang>/LC_MESSAGES/wiki.po
 source_file = conf/locale/en/LC_MESSAGES/wiki.po
 source_lang = en
 type = PO
+
+[elitemba.membership]
+file_filter = conf/locale/<lang>/LC_MESSAGES/membership.po
+source_file = conf/locale/en/LC_MESSAGES/membership.po
+source_lang = en
+type = PO
+
+[elitemba.membership-js]
+file_filter = conf/locale/<lang>/LC_MESSAGES/membership-js.po
+source_file = conf/locale/en/LC_MESSAGES/membership-js.po
+source_lang = en
+type = PO

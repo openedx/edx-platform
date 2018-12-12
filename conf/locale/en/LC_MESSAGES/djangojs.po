@@ -22,20 +22,27 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2018.
 #
+# #-#-#-#-#  membership-js.po (0.1a)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2018 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# EdX Team <info@edx.org>, 2018.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-11-26 09:45+0000\n"
-"PO-Revision-Date: 2018-11-26 09:45:55.519974\n"
+"POT-Creation-Date: 2018-12-11 15:42+0800\n"
+"PO-Revision-Date: 2018-12-11 07:42:07.463753\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 1.3\n"
+"#-#-#-#-#  membership-js.po (0.1a)  #-#-#-#-#\n"
 
 #: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
 #: cms/static/js/views/video_transcripts.js common/static/bundles/commons.js
@@ -8487,11 +8494,11 @@ msgid "Upgrade All Remaining Courses ("
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_view.underscore
-msgid "${listPrice}"
+msgid "{listPrice}"
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_view.underscore
-msgid " ${price} {currency} )"
+msgid " {price} {currency} )"
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_view.underscore
@@ -10870,4 +10877,52 @@ msgstr ""
 
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 msgid "Use Current Transcript"
+msgstr ""
+
+#: membership/static/membership/js/card.js
+msgid "Open membership"
+msgstr ""
+
+#: membership/static/membership/js/card.js
+msgid "Become a VIP member and watch all EliteMBA courses for free"
+msgstr ""
+
+#: membership/static/membership/js/card.js
+msgid "DD/MM/YYYY"
+msgstr ""
+
+#: membership/static/membership/js/card.js
+msgid "Membership opened"
+msgstr ""
+
+#: membership/static/membership/js/card.js
+msgid "day"
+msgstr ""
+
+#: membership/static/membership/js/card.js
+msgid "Remaining days"
+msgstr ""
+
+#: membership/static/membership/js/card.js
+msgid "Date:"
+msgstr ""
+
+#: membership/static/membership/js/card.js
+msgid "Opened on:"
+msgstr ""
+
+#: membership/static/membership/js/card.js
+msgid "Expire on:"
+msgstr ""
+
+#: membership/static/membership/js/card.js
+msgid "Membership expired"
+msgstr ""
+
+#: membership/static/membership/js/index.js
+msgid "Average per month"
+msgstr ""
+
+#: membership/static/membership/js/pay.js
+msgid "Return to EliteMBA in _ seconds"
 msgstr ""
