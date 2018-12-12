@@ -2247,7 +2247,9 @@ INSTALLED_APPS = (
     'openedx.features.course_card',
 
     # User Leads app
-    'openedx.features.user_leads'
+    'openedx.features.user_leads',
+
+    'channels'
 )
 
 ######################### CSRF #########################################
