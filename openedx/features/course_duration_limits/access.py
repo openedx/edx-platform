@@ -9,17 +9,18 @@ from django.apps import apps
 from django.utils import timezone
 from django.utils.translation import ugettext as _
 
-from course_modes.models import CourseMode
 from util.date_utils import DEFAULT_SHORT_DATE_FORMAT, strftime_localized
+
+from course_modes.models import CourseMode
 from lms.djangoapps.courseware.access_response import AccessError
 from lms.djangoapps.courseware.access_utils import ACCESS_GRANTED
 from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
+from lms.djangoapps.courseware.masquerade import get_course_masquerade, is_masquerading_as_student
 from openedx.core.djangoapps.catalog.utils import get_course_run_details
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
-from openedx.core.djangolib.markup import HTML
+from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
-from student.roles import CourseBetaTesterRole
 
 MIN_DURATION = timedelta(weeks=4)
 MAX_DURATION = timedelta(weeks=12)
@@ -69,10 +70,6 @@ def get_user_course_expiration_date(user, course):
     if enrollment is None or enrollment.mode != 'audit':
         return None
 
-    # if the user is a beta tester their access should not expire
-    if CourseBetaTesterRole(course.id).has_user(user):
-        return None
-
     try:
         # Content availability date is equivalent to max(enrollment date, course start date)
         # for most people. Using the schedule date will provide flexibility to deal with
@@ -98,6 +95,10 @@ def check_course_expired(user, course):
     """
     Check if the course expired for the user.
     """
+    # masquerading course staff should always have access
+    if get_course_masquerade(user, course.id):
+        return ACCESS_GRANTED
+
     if not CourseDurationLimitConfig.enabled_for_enrollment(user=user, course_key=course.id):
         return ACCESS_GRANTED
 
@@ -112,15 +113,36 @@ def register_course_expired_message(request, course):
     """
     Add a banner notifying the user of the user course expiration date if it exists.
     """
-    if CourseDurationLimitConfig.enabled_for_enrollment(user=request.user, course_key=course.id):
-        expiration_date = get_user_course_expiration_date(request.user, course)
-        if expiration_date:
-            upgrade_message = _('Your access to this course expires on {expiration_date}. \
-                    <a href="{upgrade_link}">Upgrade now</a> for unlimited access.')
-            PageLevelMessages.register_info_message(
-                request,
-                HTML(upgrade_message).format(
-                    expiration_date=expiration_date.strftime('%b %-d'),
-                    upgrade_link=verified_upgrade_deadline_link(user=request.user, course=course)
-                )
+    if not CourseDurationLimitConfig.enabled_for_enrollment(user=request.user, course_key=course.id):
+        return
+
+    expiration_date = get_user_course_expiration_date(request.user, course)
+    if not expiration_date:
+        return
+
+    if is_masquerading_as_student(request.user, course.id) and timezone.now() > expiration_date:
+        upgrade_message = _('This learner does not have access to this course. '
+                            'Their access expired on {expiration_date}.')
+        PageLevelMessages.register_warning_message(
+            request,
+            HTML(upgrade_message).format(
+                expiration_date=expiration_date.strftime('%b %-d')
             )
+        )
+    else:
+        upgrade_message = _('Your access to this course expires on {expiration_date}. \
+                    {a_open}Upgrade now {sronly_span_open}to retain access past {expiration_date}.\
+                    {span_close}{a_close}{sighted_only_span_open}for unlimited access.{span_close}')
+        PageLevelMessages.register_info_message(
+            request,
+            Text(upgrade_message).format(
+                a_open=HTML('<a href="{upgrade_link}">').format(
+                    upgrade_link=verified_upgrade_deadline_link(user=request.user, course=course)
+                ),
+                sronly_span_open=HTML('<span class="sr-only">'),
+                sighted_only_span_open=HTML('<span aria-hidden="true">'),
+                span_close=HTML('</span>'),
+                a_close=HTML('</a>'),
+                expiration_date=expiration_date.strftime('%b %-d'),
+            )
+        )

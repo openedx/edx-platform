@@ -2,7 +2,7 @@
 """
 Tests for the course home page.
 """
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
 
 import ddt
 import mock
@@ -15,6 +15,13 @@ from pytz import UTC
 from waffle.models import Flag
 from waffle.testutils import override_flag
 
+from django_comment_common.models import (
+    FORUM_ROLE_ADMINISTRATOR,
+    FORUM_ROLE_MODERATOR,
+    FORUM_ROLE_GROUP_MODERATOR,
+    FORUM_ROLE_COMMUNITY_TA
+)
+from django_comment_client.tests.factories import RoleFactory
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
 from courseware.tests.helpers import get_expiration_banner_text
@@ -38,11 +45,13 @@ from openedx.features.course_duration_limits.models import CourseDurationLimitCo
 from openedx.features.course_experience import (
     SHOW_REVIEWS_TOOL_FLAG,
     SHOW_UPGRADE_MSG_ON_COURSE_HOME,
-    UNIFIED_COURSE_TAB_FLAG
+    UNIFIED_COURSE_TAB_FLAG,
+    COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
 )
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from util.date_utils import strftime_localized
+from xmodule.course_module import COURSE_VISIBILITY_PRIVATE, COURSE_VISIBILITY_PUBLIC_OUTLINE, COURSE_VISIBILITY_PUBLIC
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import CourseUserType, ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
@@ -189,12 +198,13 @@ class TestCourseHomePage(CourseHomePageTestCase):
         """
         Verify that the view's query count doesn't regress.
         """
-        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=date(2018, 1, 1))
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         # Pre-fetch the view to populate any caches
         course_home_url(self.course)
 
         # Fetch the view and verify the query counts
-        with self.assertNumQueries(76, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
+        # TODO: decrease query count as part of REVO-28
+        with self.assertNumQueries(86, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
             with check_mongo_calls(4):
                 url = course_home_url(self.course)
                 self.client.get(url)
@@ -238,37 +248,76 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
 
     @override_waffle_flag(SHOW_REVIEWS_TOOL_FLAG, active=True)
     @ddt.data(
-        [CourseUserType.ANONYMOUS, 'To see course content'],
-        [CourseUserType.ENROLLED, None],
-        [CourseUserType.UNENROLLED, 'You must be enrolled in the course to see course content.'],
-        [CourseUserType.UNENROLLED_STAFF, 'You must be enrolled in the course to see course content.'],
+        [False, COURSE_VISIBILITY_PRIVATE, CourseUserType.ANONYMOUS, True, False],
+        [False, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.ANONYMOUS, True, False],
+        [False, COURSE_VISIBILITY_PUBLIC, CourseUserType.ANONYMOUS, True, False],
+        [True, COURSE_VISIBILITY_PRIVATE, CourseUserType.ANONYMOUS, True, False],
+        [True, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.ANONYMOUS, True, True],
+        [True, COURSE_VISIBILITY_PUBLIC, CourseUserType.ANONYMOUS, True, True],
+
+        [False, COURSE_VISIBILITY_PRIVATE, CourseUserType.UNENROLLED, True, False],
+        [False, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.UNENROLLED, True, False],
+        [False, COURSE_VISIBILITY_PUBLIC, CourseUserType.UNENROLLED, True, False],
+        [True, COURSE_VISIBILITY_PRIVATE, CourseUserType.UNENROLLED, True, False],
+        [True, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.UNENROLLED, True, True],
+        [True, COURSE_VISIBILITY_PUBLIC, CourseUserType.UNENROLLED, True, True],
+
+        [False, COURSE_VISIBILITY_PRIVATE, CourseUserType.ENROLLED, False, True],
+        [True, COURSE_VISIBILITY_PRIVATE, CourseUserType.ENROLLED, False, True],
+        [True, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.ENROLLED, False, True],
+        [True, COURSE_VISIBILITY_PUBLIC, CourseUserType.ENROLLED, False, True],
+
+        [False, COURSE_VISIBILITY_PRIVATE, CourseUserType.UNENROLLED_STAFF, True, True],
+        [True, COURSE_VISIBILITY_PRIVATE, CourseUserType.UNENROLLED_STAFF, True, True],
+        [True, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.UNENROLLED_STAFF, True, True],
+        [True, COURSE_VISIBILITY_PUBLIC, CourseUserType.UNENROLLED_STAFF, True, True],
+
+        [False, COURSE_VISIBILITY_PRIVATE, CourseUserType.GLOBAL_STAFF, True, True],
+        [True, COURSE_VISIBILITY_PRIVATE, CourseUserType.GLOBAL_STAFF, True, True],
+        [True, COURSE_VISIBILITY_PUBLIC_OUTLINE, CourseUserType.GLOBAL_STAFF, True, True],
+        [True, COURSE_VISIBILITY_PUBLIC, CourseUserType.GLOBAL_STAFF, True, True],
     )
     @ddt.unpack
-    def test_home_page(self, user_type, expected_message):
+    def test_home_page(
+            self, enable_unenrolled_access, course_visibility, user_type,
+            expected_enroll_message, expected_course_outline,
+    ):
         self.create_user_for_course(self.course, user_type)
 
         # Render the course home page
-        url = course_home_url(self.course)
-        response = self.client.get(url)
+        with mock.patch('xmodule.course_module.CourseDescriptor.course_visibility', course_visibility):
+            # Test access with anonymous flag and course visibility
+            with override_waffle_flag(COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, enable_unenrolled_access):
+                url = course_home_url(self.course)
+                response = self.client.get(url)
 
         # Verify that the course tools and dates are always shown
         self.assertContains(response, TEST_COURSE_TOOLS)
         self.assertContains(response, TEST_COURSE_TODAY)
 
-        # Verify that the outline, start button, course sock, and welcome message
-        # are only shown to enrolled users.
+        is_anonymous = user_type is CourseUserType.ANONYMOUS
         is_enrolled = user_type is CourseUserType.ENROLLED
-        is_unenrolled_staff = user_type is CourseUserType.UNENROLLED_STAFF
-        expected_count = 1 if (is_enrolled or is_unenrolled_staff) else 0
-        self.assertContains(response, TEST_CHAPTER_NAME, count=expected_count)
-        self.assertContains(response, 'Start Course', count=expected_count)
+        is_enrolled_or_staff = is_enrolled or user_type in (
+            CourseUserType.UNENROLLED_STAFF, CourseUserType.GLOBAL_STAFF
+        )
+
         self.assertContains(response, 'Learn About Verified Certificate', count=(1 if is_enrolled else 0))
-        self.assertContains(response, TEST_WELCOME_MESSAGE, count=expected_count)
+
+        # Verify that start button, course sock, and welcome message
+        # are only shown to enrolled users or staff.
+        self.assertContains(response, 'Start Course', count=(1 if is_enrolled_or_staff else 0))
+        self.assertContains(response, TEST_WELCOME_MESSAGE, count=(1 if is_enrolled_or_staff else 0))
+
+        # Verify the outline is shown to enrolled users, unenrolled_staff and anonymous users if allowed
+        self.assertContains(response, TEST_CHAPTER_NAME, count=(1 if expected_course_outline else 0))
 
         # Verify that the expected message is shown to the user
-        self.assertContains(response, '<div class="user-messages">', count=1 if expected_message else 0)
-        if expected_message:
-            self.assertContains(response, expected_message)
+        self.assertContains(
+            response, 'To see course content', count=(1 if is_anonymous else 0)
+        )
+        self.assertContains(response, '<div class="user-messages"', count=(1 if expected_enroll_message else 0))
+        if expected_enroll_message:
+            self.assertContains(response, 'You must be enrolled in the course to see course content.')
 
     @override_waffle_flag(UNIFIED_COURSE_TAB_FLAG, active=False)
     @override_waffle_flag(SHOW_REVIEWS_TOOL_FLAG, active=True)
@@ -306,7 +355,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         self.assertContains(response, 'Learn About Verified Certificate', count=(1 if is_enrolled else 0))
 
         # Verify that the expected message is shown to the user
-        self.assertContains(response, '<div class="user-messages">', count=1 if expected_message else 0)
+        self.assertContains(response, '<div class="user-messages"', count=1 if expected_message else 0)
         if expected_message:
             self.assertContains(response, expected_message)
 
@@ -373,7 +422,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         OrgStaffFactory,
         OrgInstructorFactory,
     )
-    def test_course_does_not_expire_for_course_roles(self, role_factory):
+    def test_course_does_not_expire_for_course_staff(self, role_factory):
         """
         There are a number of different roles/users that should not lose access after the expiration date.
         Ensure that users who should not lose access get a 200 (ok) response
@@ -390,13 +439,39 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
             enrollment__user=user
         )
 
-        # ensure that the user who has indefinite access
+        # ensure that the user has indefinite access
         self.client.login(username=user.username, password=self.TEST_PASSWORD)
         response = self.client.get(url)
         self.assertEqual(
             response.status_code,
             200,
             "Should not expire access for user",
+        )
+
+    @ddt.data(
+        FORUM_ROLE_COMMUNITY_TA,
+        FORUM_ROLE_GROUP_MODERATOR,
+        FORUM_ROLE_MODERATOR,
+        FORUM_ROLE_ADMINISTRATOR
+    )
+    def test_course_does_not_expire_for_user_with_course_role(self, role_name):
+        """
+        Test that users with the above roles for a course do not lose access
+        """
+        course = CourseFactory.create(start=THREE_YEARS_AGO)
+        url = course_home_url(course)
+
+        user = UserFactory.create()
+        role = RoleFactory(name=role_name, course_id=course.id)
+        role.users.add(user)
+
+        # ensure the user has indefinite access
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
+        response = self.client.get(url)
+        self.assertEqual(
+            response.status_code,
+            200,
+            "Should not expire access for user"
         )
 
     @mock.patch.dict(settings.FEATURES, {'DISABLE_START_DATES': False})
@@ -435,7 +510,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         Ensure that a user accessing an expired course sees a redirect to
         the student dashboard, not a 404.
         """
-        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=date(2010, 1, 1))
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2010, 1, 1))
         course = CourseFactory.create(start=THREE_YEARS_AGO)
         url = course_home_url(course)
 
@@ -468,7 +543,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         Verify that enrolled users are NOT shown the course expiration banner and can
         access the course home page if course audit only
         """
-        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=date(2010, 1, 1))
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2010, 1, 1))
         audit_only_course = CourseFactory.create()
         self.create_user_for_course(audit_only_course, CourseUserType.ENROLLED)
         response = self.client.get(course_home_url(audit_only_course))
@@ -483,7 +558,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         Ensure that a user accessing an expired course that is in the holdback
         does not get redirected to the student dashboard, not a 404.
         """
-        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=date(2010, 1, 1))
+        CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2010, 1, 1))
 
         course = CourseFactory.create(start=THREE_YEARS_AGO)
         url = course_home_url(course)
@@ -584,7 +659,7 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         config = CourseDurationLimitConfig(
             course=CourseOverview.get_from_id(self.course.id),
             enabled=True,
-            enabled_as_of=date(2018, 1, 1)
+            enabled_as_of=datetime(2018, 1, 1)
         )
         config.save()
 
@@ -609,6 +684,23 @@ class TestCourseHomePageAccess(CourseHomePageTestCase):
         response = self.client.get(url)
         self.assertContains(response, TEST_COURSE_HOME_MESSAGE)
         self.assertContains(response, TEST_COURSE_HOME_MESSAGE_PRE_START)
+
+    def test_course_messaging_for_staff(self):
+        """
+        Staff users will not see the expiration banner when course duration limits
+        are on for the course.
+        """
+        config = CourseDurationLimitConfig(
+            course=CourseOverview.get_from_id(self.course.id),
+            enabled=True,
+            enabled_as_of=datetime(2018, 1, 1)
+        )
+        config.save()
+        url = course_home_url(self.course)
+        CourseEnrollment.enroll(self.staff_user, self.course.id)
+        response = self.client.get(url)
+        bannerText = get_expiration_banner_text(self.staff_user, self.course)
+        self.assertNotContains(response, bannerText, html=True)
 
     @override_waffle_flag(COURSE_PRE_START_ACCESS_FLAG, active=True)
     @override_waffle_flag(ENABLE_COURSE_GOALS, active=True)

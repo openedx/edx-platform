@@ -60,6 +60,7 @@ PROCTORING_BACKENDS = {
 FEATURES = {}
 
 INSTALLED_APPS = (
+    'django_comment_common',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',

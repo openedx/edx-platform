@@ -8,6 +8,7 @@ import re
 import string
 from urlparse import urlparse
 
+import waffle
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from six import text_type
@@ -18,6 +19,8 @@ from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.theming.helpers import get_config_value_from_site_or_settings, get_current_site
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+
+ENABLE_SECONDARY_EMAIL_FEATURE_SWITCH = 'enable_secondary_email_feature'
 
 
 def validate_social_link(platform_name, new_social_link):
@@ -189,3 +192,25 @@ def generate_password(length=12, chars=string.letters + string.digits):
     password += choice(string.letters)
     password += ''.join([choice(chars) for _i in xrange(length - 2)])
     return password
+
+
+def is_secondary_email_feature_enabled():
+    """
+    Checks to see if the django-waffle switch for enabling the secondary email feature is active
+
+    Returns:
+        Boolean value representing switch status
+    """
+    return waffle.switch_is_active(ENABLE_SECONDARY_EMAIL_FEATURE_SWITCH)
+
+
+def is_secondary_email_feature_enabled_for_user(user):
+    """
+    Checks to see if secondary email feature is enabled for the given user.
+
+    Returns:
+        Boolean value representing the status of secondary email feature.
+    """
+    # import is placed here to avoid cyclic import.
+    from openedx.features.enterprise_support.utils import is_enterprise_learner
+    return is_secondary_email_feature_enabled() and is_enterprise_learner(user)

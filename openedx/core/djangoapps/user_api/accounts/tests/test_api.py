@@ -357,6 +357,7 @@ class AccountSettingsOnCreationTest(TestCase):
             'account_privacy': PRIVATE_VISIBILITY,
             'accomplishments_shared': False,
             'extended_profile': [],
+            'secondary_email': None
         })
 
     def test_normalize_password(self):

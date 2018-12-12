@@ -120,7 +120,7 @@ class CourseGradeFactory(object):
                 'user': user,
                 'course': course_data.course,
                 'collected_block_structure': course_data.collected_structure,
-                'course_key': course_data.course_key
+                'course_key': course_data.course_key,
             }
             if force_update:
                 kwargs['force_update_subsections'] = True

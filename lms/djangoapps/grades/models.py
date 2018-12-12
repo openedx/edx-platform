@@ -11,9 +11,10 @@ persisted, course grades are also immune to changes in course content.
 import json
 import logging
 from base64 import b64encode
-from collections import namedtuple
+from collections import defaultdict, namedtuple
 from hashlib import sha1
 
+from django.contrib.auth.models import User
 from django.db import models
 from django.utils.timezone import now
 from lazy import lazy
@@ -22,9 +23,8 @@ from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from coursewarehistoryextended.fields import UnsignedBigIntAutoField, UnsignedBigIntOneToOneField
+from lms.djangoapps.grades import events
 from openedx.core.lib.cache_utils import get_cache
-
-import events
 
 
 log = logging.getLogger(__name__)
@@ -309,12 +309,15 @@ class PersistentSubsectionGrade(TimeStampedModel):
     visible_blocks = models.ForeignKey(VisibleBlocks, db_column='visible_blocks_hash', to_field='hashed',
                                        on_delete=models.CASCADE)
 
+    _CACHE_NAMESPACE = u'grades.models.PersistentSubsectionGrade'
+
     @property
     def full_usage_key(self):
         """
         Returns the "correct" usage key value with the run filled in.
         """
         if self.usage_key.run is None:
+            # pylint: disable=unexpected-keyword-arg,no-value-for-parameter
             return self.usage_key.replace(course_key=self.course_id)
         else:
             return self.usage_key
@@ -337,6 +340,28 @@ class PersistentSubsectionGrade(TimeStampedModel):
             self.possible_all,
             self.first_attempted,
         )
+
+    @classmethod
+    def prefetch(cls, course_key, users):
+        """
+        Prefetches grades for the given users in the given course.
+        """
+        cache_key = cls._cache_key(course_key)
+        get_cache(cls._CACHE_NAMESPACE)[cache_key] = defaultdict(list)
+        cached_grades = get_cache(cls._CACHE_NAMESPACE)[cache_key]
+        queryset = cls.objects.select_related('visible_blocks', 'override').filter(
+            user_id__in=[user.id for user in users],
+            course_id=course_key,
+        )
+        for record in queryset:
+            cached_grades[record.user_id].append(record)
+
+    @classmethod
+    def clear_prefetched_data(cls, course_key):
+        """
+        Clears prefetched grades for this course from the RequestCache.
+        """
+        get_cache(cls._CACHE_NAMESPACE).pop(cls._cache_key(course_key), None)
 
     @classmethod
     def read_grade(cls, user_id, usage_key):
@@ -364,10 +389,20 @@ class PersistentSubsectionGrade(TimeStampedModel):
             user_id: The user associated with the desired grades
             course_key: The course identifier for the desired grades
         """
-        return cls.objects.select_related('visible_blocks', 'override').filter(
-            user_id=user_id,
-            course_id=course_key,
-        )
+        try:
+            prefetched_grades = get_cache(cls._CACHE_NAMESPACE)[cls._cache_key(course_key)]
+            try:
+                return prefetched_grades[user_id]
+            except KeyError:
+                # The user's grade is not in the cached dict of subsection grades,
+                # so return an empty list.
+                return []
+        except KeyError:
+            # subsection grades were not prefetched for the course, so get them from the DB
+            return cls.objects.select_related('visible_blocks', 'override').filter(
+                user_id=user_id,
+                course_id=course_key,
+            )
 
     @classmethod
     def update_or_create_grade(cls, **params):
@@ -460,6 +495,10 @@ class PersistentSubsectionGrade(TimeStampedModel):
     def _emit_grade_calculated_event(grade):
         events.subsection_grade_calculated(grade)
 
+    @classmethod
+    def _cache_key(cls, course_id):
+        return u"subsection_grades_cache.{}".format(course_id)
+
 
 class PersistentCourseGrade(TimeStampedModel):
     """
@@ -527,6 +566,13 @@ class PersistentCourseGrade(TimeStampedModel):
         }
 
     @classmethod
+    def clear_prefetched_data(cls, course_key):
+        """
+        Clears prefetched grades for this course from the RequestCache.
+        """
+        get_cache(cls._CACHE_NAMESPACE).pop(cls._cache_key(course_key), None)
+
+    @classmethod
     def read(cls, user_id, course_id):
         """
         Reads a grade from database
@@ -542,7 +588,7 @@ class PersistentCourseGrade(TimeStampedModel):
             try:
                 return prefetched_grades[user_id]
             except KeyError:
-                # user's grade is not in the prefetched list, so
+                # user's grade is not in the prefetched dict, so
                 # assume they have no grade
                 raise cls.DoesNotExist
         except KeyError:
@@ -610,6 +656,15 @@ class PersistentSubsectionGradeOverride(models.Model):
 
     _CACHE_NAMESPACE = u"grades.models.PersistentSubsectionGradeOverride"
 
+    def __unicode__(self):
+        return u', '.join([
+            u"{}".format(type(self).__name__),
+            u"earned_all_override: {}".format(self.earned_all_override),
+            u"possible_all_override: {}".format(self.possible_all_override),
+            u"earned_graded_override: {}".format(self.earned_graded_override),
+            u"possible_graded_override: {}".format(self.possible_graded_override),
+        ])
+
     @classmethod
     def prefetch(cls, user_id, course_key):
         get_cache(cls._CACHE_NAMESPACE)[(user_id, str(course_key))] = {
@@ -631,6 +686,58 @@ class PersistentSubsectionGradeOverride(models.Model):
             )
         except PersistentSubsectionGradeOverride.DoesNotExist:
             pass
+
+
+class PersistentSubsectionGradeOverrideHistory(models.Model):
+    """
+    A django model tracking persistent grades override audit records.
+    """
+    PROCTORING = 'PROCTORING'
+    GRADEBOOK = 'GRADEBOOK'
+    OVERRIDE_FEATURES = (
+        (PROCTORING, 'proctoring'),
+        (GRADEBOOK, 'gradebook'),
+    )
+
+    CREATE_OR_UPDATE = 'CREATEORUPDATE'
+    DELETE = 'DELETE'
+    OVERRIDE_ACTIONS = (
+        (CREATE_OR_UPDATE, 'create_or_update'),
+        (DELETE, 'delete')
+    )
+
+    class Meta(object):
+        app_label = "grades"
+
+    override_id = models.IntegerField(db_index=True)
+    feature = models.CharField(
+        max_length=32,
+        choices=OVERRIDE_FEATURES,
+        default=PROCTORING
+    )
+    action = models.CharField(
+        max_length=32,
+        choices=OVERRIDE_ACTIONS,
+        default=CREATE_OR_UPDATE
+    )
+    user = models.ForeignKey(User, blank=True, null=True)
+    comments = models.CharField(max_length=300, blank=True, null=True)
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    def __unicode__(self):
+        """
+        String representation of this model.
+        """
+        return (
+            u"{} override_id: {}, user_id: {}, feature: {}, action: {}, created: {}"
+        ).format(
+            type(self).__name__,
+            self.override_id,
+            self.user,
+            self.feature,
+            self.action,
+            self.created
+        )
 
 
 def prefetch(user, course_key):

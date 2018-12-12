@@ -10,6 +10,7 @@ from xblock_django.models import XBlockStudioConfigurationFlag
 from xmodule.modulestore.django import modulestore
 
 from cms.djangoapps.contentstore.config.waffle import ENABLE_PROCTORING_PROVIDER_OVERRIDES
+from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 
 
 class CourseMetadata(object):
@@ -65,7 +66,7 @@ class CourseMetadata(object):
     ]
 
     @classmethod
-    def get_blacklist_of_fields(cls, course_key):
+    def get_blacklist_of_fields(cls, course_key=None):
         """
         Returns a list of fields to not include in Studio Advanced settings based on a
         feature flag (i.e. enabled or disabled).
@@ -125,6 +126,10 @@ class CourseMetadata(object):
         if not ENABLE_PROCTORING_PROVIDER_OVERRIDES.is_enabled(course_key):
             black_list.append('proctoring_configuration')
 
+        # Do not show "Course Visibility For Unenrolled Learners" in Studio Advanced Settings
+        # if the enable_anonymous_access flag is not enabled
+        if not COURSE_ENABLE_UNENROLLED_ACCESS_FLAG.is_enabled(course_key=course_key):
+            black_list.append('course_visibility')
         return black_list
 
     @classmethod

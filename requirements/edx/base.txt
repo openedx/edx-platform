@@ -94,7 +94,7 @@ django-require==1.0.11
 django-rest-swagger==2.2.0
 django-sekizai==0.10.0
 django-ses==0.8.4
-django-simple-history==2.5.1
+django-simple-history==2.6.0
 django-splash==0.2.2
 django-statici18n==1.4.0
 django-storages==1.4.1

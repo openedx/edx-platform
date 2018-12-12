@@ -32,13 +32,14 @@
     <% } %>
     <div class="post-field group-visibility" id="wrapper-visibility-message"></div>
     <div class="post-field">
-        <label class="field-label">
+        <label class="field-label" for='discussion-forum-title'>
             <span class="field-label-text"><%- gettext("Title") %></span>
+
             <div class="field-help" id="field_help_title">
                 <%- gettext("Add a clear and descriptive title to encourage participation. (Required)") %>
             </div>
             <div>
-                <input aria-describedby="field_help_title" type="text" class="js-post-title field-input" name="title">
+                <input id='discussion-forum-title' aria-describedby="field_help_title" type="text" class="js-post-title field-input" name="title">
             </div>
         </label>
     </div>

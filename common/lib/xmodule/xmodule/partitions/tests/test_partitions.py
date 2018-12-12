@@ -3,7 +3,7 @@ Test the partitions and partitions service
 
 """
 
-from datetime import date
+from datetime import datetime
 from django.test import TestCase
 from mock import Mock, patch
 
@@ -439,7 +439,7 @@ class PartitionServiceBaseClass(PartitionTestCase):
 
         ContentTypeGatingConfig.objects.create(
             enabled=True,
-            enabled_as_of=date(2018, 1, 1),
+            enabled_as_of=datetime(2018, 1, 1),
             studio_override_enabled=True
         )
         self.course = Mock(id=CourseLocator('org_0', 'course_0', 'run_0'))

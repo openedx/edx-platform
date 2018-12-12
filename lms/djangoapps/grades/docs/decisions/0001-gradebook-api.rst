@@ -12,8 +12,7 @@ Context
 We are implementing a "Writable Gradebook" feature from the instructor dashboard.
 This feature supports both the reading of subsection grades (e.g. for HW assignments, Labs, Exams)
 and the creation/modification of subsection grades from a user interface.  This document captures
-decisions related to the design of the Django APIs that support this feature.  This feature is heavily
-inspired by an implementation provided by Extension Engine (EE).
+decisions related to the design of the Django APIs that support this feature.
 
 Decisions
 =========
@@ -33,22 +32,31 @@ Decisions
       we do a case-insensitive substring query for a user, or fetching a paginated result of
       subsection grade data for all enrollees in the requested course.
 
-   b. We will use the data schema required by the EE's front-end implementation.  This will allow us to port
-      over much of EE's front-end code with only minor modifications.  Note that there are some fields specified
-      in EE's schema that will not be needed in the edX implementation, and we may remove those fields in future
-      versions of this API.
+   b. The schema of results includes information about the overall course grade as well as a "breakdown"
+      of user grades for each graded subsection in the course.  The schema provides data needed by the client-side
+      code; the client-side code is in charge of determining how to display that data (e.g. how many decimal
+      places to round a percentage to).
 
    c. We will use the Django Rest Framework `CursorPagination` class as the base pagination class for all students' data
       in a course.  The query set that we paginate is the set of active enrollees for the requested course.  As a result
       of using this pagination class, paginated responses will not contain a `count` key, and the pagination query
-      parameter `cursor` will have very opaque values.  Furthermore, due to the version of DRF installed in edx-platform,
-      there is no available page size parameter available to clients of this API (although this can easily be added
-      to our pagination class).
+      parameter `cursor` will have very opaque values.  We have added a ``get_page_size`` method to this
+      class to allow clients to specify how many user results they would like in one page of data.
 
    d. The same pagination class as above is used as the pagination class for the `CourseGradesView` API.  This is for
       consistency, and also so that responses from this endpoint will be properly paginated (they previously contained
       only the paginated data, and relied on the client "knowing" that further pages were available by using the
       `?page=N` query parameter).
+
+   e. We follow the approach of instructor Grade Reports for determining user subsection grade data.
+      We collect the entire course structure once at the begining of course grade iteration and use that structure
+      for reading subsection grades of all users.  We do this for performance reasons; we explicitly avoid
+      fetching user-specific course structures, which is a costly operation.  One implication of this is that,
+      for a user with no persisted subsection grade, we cannot determine the true possible number of points
+      in that subsection as it relates to that user; it's possible the subsection is not visible to the user, or
+      that certain problem blocks within the subsection are not visible to the user.  Since we cannot determine
+      this possible number of points, all subsection grades where no attempt has been made by the user
+      are assigned an earned/possible ratio of ``0/0``.
 
 #. **The write (POST) API**
 
@@ -80,9 +88,10 @@ Decisions
       data available exists in the grade override record, and the subsection ``update()`` call should be forced
       to read from this record.
 
-   f. We have to synchronously update each grade record for each user in this endpoint. This means the request
-      will be left open for longer period than we wanted. The reason is: the primary consumer gradebook UI
-      would need to display the updated grade result for all users, after update is complete. If we do update
-      asynchronously, the gradebook UI do not know how to update the table with new values, including agregations
-      for the user's course grade. This is the lowest effort change to address the UI display problem. We will
+   f. We have to synchronously update each grade record for each user in this endpoint. This means POST requests
+      will be open long enough for the override to be created and for all course/subsection grades
+      to be updated for each user. The primary consumer gradebook UI needs to display the updated grade
+      result for all users, after update is complete. If we do update asynchronously, the gradebook UI
+      won't know how to update the table with new values for affected users' grades.
+      This is the lowest effort change to address the UI display problem. We will
       need to improve this mechanism as we continue to develop.

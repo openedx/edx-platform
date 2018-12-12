@@ -1,6 +1,8 @@
-import ddt
-from datetime import timedelta, date, datetime, time
+from datetime import timedelta, datetime
 import itertools
+
+import ddt
+from django.utils import timezone
 from mock import Mock
 
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
@@ -38,12 +40,12 @@ class TestContentTypeGatingConfig(CacheIsolationTestCase):
         enrolled_before_enabled,
     ):
 
-        # Tweak the day to enable the config so that it is either before
-        # or after today (which is when the enrollment will be created)
+        # Tweak the datetime to enable the config so that it is either before
+        # or after now (which is when the enrollment will be created)
         if enrolled_before_enabled:
-            enabled_as_of = date.today() + timedelta(days=1)
+            enabled_as_of = datetime.now() + timedelta(days=1)
         else:
-            enabled_as_of = date.today() - timedelta(days=1)
+            enabled_as_of = datetime.now() - timedelta(days=1)
 
         config = ContentTypeGatingConfig.objects.create(
             enabled=True,
@@ -68,9 +70,12 @@ class TestContentTypeGatingConfig(CacheIsolationTestCase):
             user = self.user
             course_key = self.course_overview.id
 
-        query_count = 5
-        if not pass_enrollment and already_enrolled:
-            query_count = 6
+        if already_enrolled and pass_enrollment:
+            query_count = 7
+        elif not pass_enrollment and already_enrolled:
+            query_count = 8
+        else:
+            query_count = 7
 
         with self.assertNumQueries(query_count):
             enabled = ContentTypeGatingConfig.enabled_for_enrollment(
@@ -102,15 +107,15 @@ class TestContentTypeGatingConfig(CacheIsolationTestCase):
         config = ContentTypeGatingConfig.objects.create(
             enabled=True,
             course=self.course_overview,
-            enabled_as_of=date(2018, 1, 1),
+            enabled_as_of=timezone.now(),
         )
 
-        # Tweak the day to check for course enablement so it is either
+        # Tweak the datetime to check for course enablement so it is either
         # before or after when the configuration was enabled
         if before_enabled:
-            target_date = config.enabled_as_of - timedelta(days=1)
+            target_datetime = config.enabled_as_of - timedelta(days=1)
         else:
-            target_date = config.enabled_as_of + timedelta(days=1)
+            target_datetime = config.enabled_as_of + timedelta(days=1)
 
         course_key = self.course_overview.id
 
@@ -118,7 +123,7 @@ class TestContentTypeGatingConfig(CacheIsolationTestCase):
             not before_enabled,
             ContentTypeGatingConfig.enabled_for_course(
                 course_key=course_key,
-                target_date=target_date,
+                target_datetime=target_datetime,
             )
         )
 
@@ -141,21 +146,21 @@ class TestContentTypeGatingConfig(CacheIsolationTestCase):
         non_test_site_cfg_enabled = SiteConfigurationFactory.create(values={'course_org_filter': non_test_course_enabled.org})
         non_test_site_cfg_disabled = SiteConfigurationFactory.create(values={'course_org_filter': non_test_course_disabled.org})
 
-        ContentTypeGatingConfig.objects.create(course=non_test_course_enabled, enabled=True, enabled_as_of=date(2018, 1, 1))
+        ContentTypeGatingConfig.objects.create(course=non_test_course_enabled, enabled=True, enabled_as_of=datetime(2018, 1, 1))
         ContentTypeGatingConfig.objects.create(course=non_test_course_disabled, enabled=False)
-        ContentTypeGatingConfig.objects.create(org=non_test_course_enabled.org, enabled=True, enabled_as_of=date(2018, 1, 1))
+        ContentTypeGatingConfig.objects.create(org=non_test_course_enabled.org, enabled=True, enabled_as_of=datetime(2018, 1, 1))
         ContentTypeGatingConfig.objects.create(org=non_test_course_disabled.org, enabled=False)
-        ContentTypeGatingConfig.objects.create(site=non_test_site_cfg_enabled.site, enabled=True, enabled_as_of=date(2018, 1, 1))
+        ContentTypeGatingConfig.objects.create(site=non_test_site_cfg_enabled.site, enabled=True, enabled_as_of=datetime(2018, 1, 1))
         ContentTypeGatingConfig.objects.create(site=non_test_site_cfg_disabled.site, enabled=False)
 
         # Set up test objects
         test_course = CourseOverviewFactory.create(org='test-org')
         test_site_cfg = SiteConfigurationFactory.create(values={'course_org_filter': test_course.org})
 
-        ContentTypeGatingConfig.objects.create(enabled=global_setting, enabled_as_of=date(2018, 1, 1))
-        ContentTypeGatingConfig.objects.create(course=test_course, enabled=course_setting, enabled_as_of=date(2018, 1, 1))
-        ContentTypeGatingConfig.objects.create(org=test_course.org, enabled=org_setting, enabled_as_of=date(2018, 1, 1))
-        ContentTypeGatingConfig.objects.create(site=test_site_cfg.site, enabled=site_setting, enabled_as_of=date(2018, 1, 1))
+        ContentTypeGatingConfig.objects.create(enabled=global_setting, enabled_as_of=datetime(2018, 1, 1))
+        ContentTypeGatingConfig.objects.create(course=test_course, enabled=course_setting, enabled_as_of=datetime(2018, 1, 1))
+        ContentTypeGatingConfig.objects.create(org=test_course.org, enabled=org_setting, enabled_as_of=datetime(2018, 1, 1))
+        ContentTypeGatingConfig.objects.create(site=test_site_cfg.site, enabled=site_setting, enabled_as_of=datetime(2018, 1, 1))
 
         all_settings = [global_setting, site_setting, org_setting, course_setting]
         expected_global_setting = self._resolve_settings([global_setting])
@@ -169,7 +174,7 @@ class TestContentTypeGatingConfig(CacheIsolationTestCase):
         self.assertEqual(expected_course_setting, ContentTypeGatingConfig.current(course_key=test_course.id).enabled)
 
     def test_caching_global(self):
-        global_config = ContentTypeGatingConfig(enabled=True, enabled_as_of=date(2018, 1, 1))
+        global_config = ContentTypeGatingConfig(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         global_config.save()
 
         # Check that the global value is not retrieved from cache after save
@@ -189,7 +194,7 @@ class TestContentTypeGatingConfig(CacheIsolationTestCase):
 
     def test_caching_site(self):
         site_cfg = SiteConfigurationFactory()
-        site_config = ContentTypeGatingConfig(site=site_cfg.site, enabled=True, enabled_as_of=date(2018, 1, 1))
+        site_config = ContentTypeGatingConfig(site=site_cfg.site, enabled=True, enabled_as_of=datetime(2018, 1, 1))
         site_config.save()
 
         # Check that the site value is not retrieved from cache after save
@@ -207,7 +212,7 @@ class TestContentTypeGatingConfig(CacheIsolationTestCase):
         with self.assertNumQueries(1):
             self.assertFalse(ContentTypeGatingConfig.current(site=site_cfg.site).enabled)
 
-        global_config = ContentTypeGatingConfig(enabled=True, enabled_as_of=date(2018, 1, 1))
+        global_config = ContentTypeGatingConfig(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         global_config.save()
 
         # Check that the site value is not updated in cache by changing the global value
@@ -217,7 +222,7 @@ class TestContentTypeGatingConfig(CacheIsolationTestCase):
     def test_caching_org(self):
         course = CourseOverviewFactory.create(org='test-org')
         site_cfg = SiteConfigurationFactory.create(values={'course_org_filter': course.org})
-        org_config = ContentTypeGatingConfig(org=course.org, enabled=True, enabled_as_of=date(2018, 1, 1))
+        org_config = ContentTypeGatingConfig(org=course.org, enabled=True, enabled_as_of=datetime(2018, 1, 1))
         org_config.save()
 
         # Check that the org value is not retrieved from cache after save
@@ -235,14 +240,14 @@ class TestContentTypeGatingConfig(CacheIsolationTestCase):
         with self.assertNumQueries(2):
             self.assertFalse(ContentTypeGatingConfig.current(org=course.org).enabled)
 
-        global_config = ContentTypeGatingConfig(enabled=True, enabled_as_of=date(2018, 1, 1))
+        global_config = ContentTypeGatingConfig(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         global_config.save()
 
         # Check that the org value is not updated in cache by changing the global value
         with self.assertNumQueries(0):
             self.assertFalse(ContentTypeGatingConfig.current(org=course.org).enabled)
 
-        site_config = ContentTypeGatingConfig(site=site_cfg.site, enabled=True, enabled_as_of=date(2018, 1, 1))
+        site_config = ContentTypeGatingConfig(site=site_cfg.site, enabled=True, enabled_as_of=datetime(2018, 1, 1))
         site_config.save()
 
         # Check that the org value is not updated in cache by changing the site value
@@ -252,7 +257,7 @@ class TestContentTypeGatingConfig(CacheIsolationTestCase):
     def test_caching_course(self):
         course = CourseOverviewFactory.create(org='test-org')
         site_cfg = SiteConfigurationFactory.create(values={'course_org_filter': course.org})
-        course_config = ContentTypeGatingConfig(course=course, enabled=True, enabled_as_of=date(2018, 1, 1))
+        course_config = ContentTypeGatingConfig(course=course, enabled=True, enabled_as_of=datetime(2018, 1, 1))
         course_config.save()
 
         # Check that the org value is not retrieved from cache after save
@@ -270,21 +275,21 @@ class TestContentTypeGatingConfig(CacheIsolationTestCase):
         with self.assertNumQueries(2):
             self.assertFalse(ContentTypeGatingConfig.current(course_key=course.id).enabled)
 
-        global_config = ContentTypeGatingConfig(enabled=True, enabled_as_of=date(2018, 1, 1))
+        global_config = ContentTypeGatingConfig(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         global_config.save()
 
         # Check that the org value is not updated in cache by changing the global value
         with self.assertNumQueries(0):
             self.assertFalse(ContentTypeGatingConfig.current(course_key=course.id).enabled)
 
-        site_config = ContentTypeGatingConfig(site=site_cfg.site, enabled=True, enabled_as_of=date(2018, 1, 1))
+        site_config = ContentTypeGatingConfig(site=site_cfg.site, enabled=True, enabled_as_of=datetime(2018, 1, 1))
         site_config.save()
 
         # Check that the org value is not updated in cache by changing the site value
         with self.assertNumQueries(0):
             self.assertFalse(ContentTypeGatingConfig.current(course_key=course.id).enabled)
 
-        org_config = ContentTypeGatingConfig(org=course.org, enabled=True, enabled_as_of=date(2018, 1, 1))
+        org_config = ContentTypeGatingConfig(org=course.org, enabled=True, enabled_as_of=datetime(2018, 1, 1))
         org_config.save()
 
         # Check that the org value is not updated in cache by changing the site value

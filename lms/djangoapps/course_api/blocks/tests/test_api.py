@@ -162,7 +162,7 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
             self._get_blocks(
                 course,
                 expected_mongo_queries=0,
-                expected_sql_queries=7 if with_storage_backing else 6,
+                expected_sql_queries=8 if with_storage_backing else 7,
             )
 
     @ddt.data(
@@ -179,9 +179,9 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
             clear_course_from_cache(course.id)
 
             if with_storage_backing:
-                num_sql_queries = 17
+                num_sql_queries = 18
             else:
-                num_sql_queries = 7
+                num_sql_queries = 8
 
             self._get_blocks(
                 course,
@@ -211,7 +211,7 @@ class TestQueryCountsWithIndividualOverrideProvider(TestGetBlocksQueryCountsBase
             self._get_blocks(
                 course,
                 expected_mongo_queries=0,
-                expected_sql_queries=8 if with_storage_backing else 7,
+                expected_sql_queries=9 if with_storage_backing else 8,
             )
 
     @ddt.data(
@@ -228,9 +228,9 @@ class TestQueryCountsWithIndividualOverrideProvider(TestGetBlocksQueryCountsBase
             clear_course_from_cache(course.id)
 
             if with_storage_backing:
-                num_sql_queries = 18
+                num_sql_queries = 19
             else:
-                num_sql_queries = 8
+                num_sql_queries = 9
 
             self._get_blocks(
                 course,

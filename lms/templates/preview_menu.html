@@ -22,6 +22,7 @@ show_preview_menu = course and staff_access and supports_preview_menu
     course_partitions = get_all_partitions_for_course(course)
     masquerade_user_name = masquerade.user_name if masquerade else None
     masquerade_group_id = masquerade.group_id if masquerade else None
+    masquerade_user_partition_id = masquerade.user_partition_id if masquerade else None
     staff_selected = selected(not masquerade or masquerade.role != "student")
     specific_student_selected = selected(not staff_selected and masquerade.user_name)
     student_selected = selected(not staff_selected and not specific_student_selected and not masquerade_group_id)
@@ -39,7 +40,7 @@ show_preview_menu = course and staff_access and supports_preview_menu
                             % if course_partitions:
                                 % for course_partition in course_partitions:
                                     % for group in sorted(course_partition.groups, key=lambda group: group.name):
-                                    <option value="group.id" data-group-id="${group.id}" data-partition-id="${course_partition.id}" ${selected(masquerade_group_id == group.id)}>
+                                    <option value="group.id" data-group-id="${group.id}" data-partition-id="${course_partition.id}" ${selected(masquerade_user_partition_id == course_partition.id and masquerade_group_id == group.id)}>
                                         ${_("Learner in {content_group}").format(content_group=group.name)}
                                     </option>
                                     % endfor

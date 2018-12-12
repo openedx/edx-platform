@@ -828,7 +828,7 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
     @ddt.unpack
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_course_catalog_access_num_queries(self, user_attr_name, action, course_attr_name):
-        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime.date(2018, 1, 1))
+        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime.datetime(2018, 1, 1))
 
         course = getattr(self, course_attr_name)
 
@@ -842,12 +842,12 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
         if user_attr_name == 'user_staff' and action == 'see_exists':
             # always checks staff role, and if the course has started, check the duration configuration
             if course_attr_name == 'course_started':
-                num_queries = 4
+                num_queries = 3
             else:
                 num_queries = 1
         elif user_attr_name == 'user_normal' and action == 'see_exists':
             if course_attr_name == 'course_started':
-                num_queries = 4
+                num_queries = 6
             else:
                 # checks staff role and enrollment data
                 num_queries = 2

@@ -12,7 +12,11 @@ from track.event_transaction_utils import create_new_event_transaction_id, set_e
 from .config.waffle import waffle_flags, REJECTED_EXAM_OVERRIDES_GRADE
 from .constants import ScoreDatabaseTableEnum
 from .events import SUBSECTION_OVERRIDE_EVENT_TYPE
-from .models import PersistentSubsectionGrade, PersistentSubsectionGradeOverride
+from .models import (
+    PersistentSubsectionGrade,
+    PersistentSubsectionGradeOverride,
+    PersistentSubsectionGradeOverrideHistory
+)
 from .signals.signals import SUBSECTION_OVERRIDE_CHANGED
 
 
@@ -78,6 +82,12 @@ class GradesService(object):
             earned_graded_override=earned_graded
         )
 
+        _ = PersistentSubsectionGradeOverrideHistory.objects.create(
+            override_id=override.id,
+            feature=PersistentSubsectionGradeOverrideHistory.PROCTORING,
+            action=PersistentSubsectionGradeOverrideHistory.CREATE_OR_UPDATE
+        )
+
         # Cache a new event id and event type which the signal handler will use to emit a tracking log event.
         create_new_event_transaction_id()
         set_event_transaction_type(SUBSECTION_OVERRIDE_EVENT_TYPE)
@@ -112,6 +122,11 @@ class GradesService(object):
 
         # Older rejected exam attempts that transition to verified might not have an override created
         if override is not None:
+            _ = PersistentSubsectionGradeOverrideHistory.objects.create(
+                override_id=override.id,
+                feature=PersistentSubsectionGradeOverrideHistory.PROCTORING,
+                action=PersistentSubsectionGradeOverrideHistory.DELETE
+            )
             override.delete()
 
         # Cache a new event id and event type which the signal handler will use to emit a tracking log event.

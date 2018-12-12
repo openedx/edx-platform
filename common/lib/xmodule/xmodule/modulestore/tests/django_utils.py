@@ -18,7 +18,7 @@ from mock import patch
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin, CacheIsolationTestCase, FilteredQueryCountMixin
 from openedx.core.lib.tempdir import mkdtemp_clean
 from student.models import CourseEnrollment
-from student.tests.factories import UserFactory
+from student.tests.factories import AdminFactory, UserFactory
 from xmodule.contentstore.django import _CONTENTSTORE
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import SignalHandler, clear_existing_modulestores, modulestore
@@ -343,6 +343,8 @@ class ModuleStoreTestUsersMixin():
         # Set up the test user
         if is_unenrolled_staff:
             user = StaffFactory(course_key=course.id, password=self.TEST_PASSWORD)
+        elif user_type is CourseUserType.GLOBAL_STAFF:
+            user = AdminFactory(password=self.TEST_PASSWORD)
         else:
             user = UserFactory(password=self.TEST_PASSWORD)
         self.client.login(username=user.username, password=self.TEST_PASSWORD)
