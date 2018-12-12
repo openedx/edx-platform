@@ -6,6 +6,10 @@
   height: 320px;
   background: url("/static/normal-theme/images/course_dec.png");
   background-size: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+  
 
   .outer-wrapper{  
     max-width: 1200px;
@@ -157,7 +161,7 @@
         h1{
           font-size: 18px;
         }
-        .heading-group p{
+        p{
           font-size: 14px;
         }
       } 

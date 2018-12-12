@@ -21,26 +21,27 @@
 
   .forum-search{
     order: -1;
-  }
-  .forum-search .search-input{
-    height: 36px;
-    line-height: 0;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    font-size: 14px;
-  }
-  .forum-search .search-button{
-    @extend %btn-my-primary;
-    line-height: 0;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    margin-left: 0;
+    .search-input{
+      height: 36px;
+      line-height: 0;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      font-size: 14px;
+    }
+    .search-button{
+      @extend %btn-my-primary;
+      line-height: 0;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      margin-left: 0;
+    }
   }
 
   .btn-outline-primary{
     @extend %btn-my-primary;
     line-height: 0;
     margin-left: 10px;
+    vertical-align: inherit;
   }
 
 }
@@ -79,44 +80,107 @@
   }
 
   // 介绍 how to use
-  .view-discussion-home{
-    display: block;
-  }
-  .view-discussion-home section{
-    border-bottom: 1px solid #e6e9ed;
-  }
   .discussion-body .discussion-article{
     padding: 35px 30px;
     color: $font;
   }
-  .view-discussion-home .label{
-    line-height: 2;
-    font-size: 14px;
-  }
-  .view-discussion-home .home-title{
-    margin-bottom: 10px;
-    color: $title;
+
+  .view-discussion-home{
+    display: block;
+
+    section{
+      border-bottom: 1px solid #e6e9ed;
+    }
+    .label{
+      line-height: 2;
+      font-size: 14px;
+      margin-bottom: 0;
+    }
+    .home-title{
+      margin-bottom: 10px;
+      color: $title;
+    }
+    .home-helpgrid{
+      border-bottom: 1px solid #e6e9ed;
+      box-shadow: none;
+      line-height: 1.4;
+      .row-title{
+        background: none;
+        border-right: 1px solid #e6e9ed;
+        color: $title;
+        font-size: 14px;
+      }
+      .row-item{
+        font-size: 14px;
+      }
+      .row-item-full{
+        .notification-checkbox{
+          border: none;
+        }
+        .row-description{
+          font-size: 14px;
+        }
+        label{
+          margin-bottom: 0;
+        }
+      } 
+    }
+
+    
   }
 
-  .view-discussion-home .home-helpgrid{
-    border-bottom: 1px solid #e6e9ed;
-    box-shadow: none;
-  }
-  .view-discussion-home .helpgrid-row .row-title{
-    background: none;
-    border-right: 1px solid #e6e9ed;
-    color: $title;
-    font-size: 14px;
-  }
-  .view-discussion-home .helpgrid-row .row-item{
-    font-size: 14px;
-  }
   
-  label{
-    margin-bottom: 0;
+  
+}
+
+@media screen and (max-width:768px){
+  .discussion-column{
+    margin-left: 0;
   }
-  .view-discussion-home .helpgrid-row .row-item-full .notification-checkbox{
-    border: none;
+  .content-wrapper .discussion-board .page-content .discussion-body .discussion-article{
+    padding: 20px;
   }
 }
 
+@media screen and (max-width:576px){
+  .content-wrapper{
+    .discussion-board{
+      .page-content .view-discussion-home{
+        display: none;
+      }
+      .forum-search{
+        margin: 10px 10px 0 0;
+      }
+      .forum-actions{
+        margin: 10px 0 0 -10px;
+      }
+    } 
+    .page-header{
+      padding: 10px;
+    }
+  } 
+}
+
+
+
+// discussion other page 
+.discussion-board{
+  .forum-nav-sort{
+    width: 50%;
+  }
+  .btn-primary{
+    @extend %btn-my-primary;
+  }
+  .btn-outline-primary{
+    @extend %btn-my-white;
+  }
+  .actions-dropdown .action-list-item{
+    border: none;
+  }
+  .new-post-article{
+    margin-top: 0;
+  }
+  .discussion-column{
+    margin-top: 20px;
+  }
+}

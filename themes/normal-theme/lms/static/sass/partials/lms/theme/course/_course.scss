@@ -45,6 +45,12 @@ body.view-in-course .wrapper-course-material .course-tabs{
     .form-actions{
       margin-top: 0;
     }
+    .page-header-main .page-title{
+      font-size: 16px;
+    }
+    .page-header-secondary{
+      display: none;
+    }
   }
 }
 
@@ -58,7 +64,6 @@ body.view-in-course .wrapper-course-material .course-tabs{
   box-shadow:0px 1px 4px 0px $border;
   margin-bottom:40px;
   border:none;
-  max-width: 1180px;
 
   // course_course_header
   .page-header{
@@ -233,7 +238,27 @@ body.view-in-course .wrapper-course-material .course-tabs{
   .message-header{ color: $title; }
 } 
 
-
+// view this course as 
+body.view-in-course .wrapper-preview-menu, .wrapper-preview-menu{
+  background-color: rgba(182, 220, 254, 0.1);
+  border: solid 1px $border;
+  margin-top: 20px;
+  padding: 10px 15px;
+  .preview-menu{
+    padding: 0;
+  }
+  .preview-actions .action-preview{
+    .action-preview-label{
+      color: $blue;
+      font-size: 14px;
+    }
+    .action-preview-username-container .action-preview-username{
+      @extend %input-my;
+    }
+  }
+  
+  
+}
 @media screen and (max-width:767px){
   .course-sidebar{
     padding-top: 30px;
@@ -256,4 +281,7 @@ body.view-in-course .wrapper-course-material .course-tabs{
       padding-left: 0;
     }
   } 
+}
+
+@media screen and (max-width:576px){
 }

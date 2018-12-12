@@ -12,7 +12,7 @@ body.view-in-course .profile-wrapper{
     font-size: 18px;
     color: $title;
     border-bottom: 1px solid #eeeeee;
-    padding: 13px 25px 13px;
+    padding: 13px 20px;
     font-weight: normal;
   }
 
@@ -23,29 +23,80 @@ body.view-in-course .profile-wrapper{
     padding: 25px 0;
   }
 
-  >.chapters >section:first-child{
-    border-top: 1px solid $border;
-    border-bottom: none;
-  }
-
   >.chapters >section{
     border-top: 1px dashed $border;
     border-bottom: none;
+    padding: 30px 0;
+
+    &:nth-of-type(1){
+      border-top: 1px solid $border;
+    }
+    .hd{
+      color: #aab2bd;
+    }
+    .sections>div{
+      .hd{
+        font-weight: normal;
+      }
+      .scores{
+        margin: 0;
+        color: $font;
+        font-size: 14px;
+      }
+      .hd-3{
+        padding-left: 20px;
+      }
+      .hd-4 a{
+        color: $title;
+        font-size: 16px;
+      }
+    }
   }
-  .chapters>section .sections>div .hd{
-    font-weight: normal;
+
+  .grade-detail-graph{
+    transform: scale(0.95);
   }
-  .chapters>section .sections>div .scores{
-    margin: 0;
-    color: $font;
-    font-size: 14px;
+}
+
+@media screen and (max-width:1200px){
+  .grade-detail-graph{
+    display: none;
   }
-  .chapters>section .sections>div .hd-3{
-    color: $note;
-    padding-left: 20px;
+  .profile-wrapper .course-info{
+    padding-top: 0;
+    >.chapters{
+      padding: 10px 0 25px;
+
+      >section:nth-of-type(1){
+        border-top: none;
+        padding-top: 0;
+      }
+    }
   }
-  .chapters>section .sections>div .hd-4 a{
-    color: $title;
-    font-size: 16px;
+}
+
+@media screen and (max-width:576px){
+  .profile-wrapper .course-info{
+    .hd-2{
+      padding: 12px 10px;
+      font-size: 14px;
+    }
+
+    >.chapters{
+      padding: 0 10px;
+      >section{
+        padding-bottom: 10px;
+  
+        .hd{
+          width: 100%;
+          display: block;
+          margin-bottom: 5px;
+        }
+        .sections{
+          width: 100%;
+          display: block;
+        }
+      } 
+    }
   }
 }

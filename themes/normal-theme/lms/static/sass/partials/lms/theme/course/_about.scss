@@ -6,7 +6,7 @@
 
   .container{
     max-width: 1200px;
-    padding: 40px 20px;
+    padding: 360px 0 30px;
   }
 
   /* 课程header */
@@ -17,6 +17,8 @@
     border-bottom: none;
     background: url('/static/normal-theme/images/course_dec.png');
     background-size: cover;
+    position: absolute;
+    left: 0;
 
     .intro-inner-wrapper>div.table{
       position: relative;
@@ -25,7 +27,7 @@
     .intro-inner-wrapper{
       background: rgba(255,255,255,0.7);
       box-shadow: 0px 2px 4px 0px #aab2bd;
-      max-width: 1165px;
+      max-width: 1200px;
       border: none;
     }
 
@@ -53,17 +55,22 @@
         color: $blue
       }
 
+    
       .main-cta strong, 
-      .main-cta a.add-to-cart{
+      .main-cta a.add-to-cart,
+      .main-cta span.register, 
+      .main-cta a.register{
         @extend %btn-my-primary;
         margin-right: 20px;
       }
 
-      .main-cta span.register, 
-      .main-cta a.register{
+      .main-cta span.disabled, 
+      .main-cta a.disabled{
         @extend %btn-my-disable;
         margin-right: 20px;
       }
+
+      
     }
 
     /* header 右侧 */
@@ -87,37 +94,68 @@
   .course-sidebar{
     font-size: 14px;
 
-    > div{
+    header{
+      padding: 20px 20px 15px;
+      margin: 0 0 20px 0;
       box-shadow: 0px 0px 2px 0px $border;
       background: #fff;
       border-radius: $border-radius;
-    }
-
-    header{
-      padding: 10px 0 0 0;
-      margin: 0;
-    }
-
-    header::after{
-      height: 0;
-    }
-
-    .important-dates li{
-      border-bottom: none;
-      padding: 15px 10px;
-      margin: 0;
-
-      .icon{
-        margin: 0 10px 0 0 ;
+      &:after{
+        height: 0;
       }
-      .important-dates-item-title{
-        width: 40%;
-        color: $font;
-      }
-      .important-dates-item-text{
-        font-weight: normal;
-        color: $title;
-        float: none;
+
+      .social-sharing{
+        text-align: left;
+        height: 55px;
+
+        .share{
+          opacity: 1;
+          margin: 12px 0;
+        }
+        .sharing-message{
+          opacity: 1;
+          position: static;
+          background-image: none;
+          box-shadow: none;
+          font-size: 14px;
+          border-radius: 0;
+          border: 0;
+          font-style: normal;
+          color: $title;
+          margin-bottom: 10px;
+          text-align: left;
+          float: none;
+          margin: 0;
+          padding: 0;
+        }
+      } 
+    }
+
+    .important-dates{
+      box-shadow: 0px 0px 2px 0px $border;
+      background: #fff;
+      border-radius: $border-radius;
+      padding: 15px 10px 10px;
+
+      li{
+        border-bottom: none;
+        padding: 12px 10px;
+        margin: 0;
+  
+        .icon{
+          margin: 0 10px 0 0 ;
+          position: relative;
+          top: -2px;
+        }
+        .important-dates-item-title{
+          width: 40%;
+          color: $font;
+        }
+        .important-dates-item-text{
+          font-weight: normal;
+          color: $title;
+          float: none;
+        }
       }
     }
     
@@ -255,7 +293,7 @@
     position: relative;
     top: 4px;
     left: -10px;
-
+    transform: scale(0.8);
   }
   .about-outline p {
     padding-left: 15px;
@@ -268,7 +306,6 @@
   }
   .about-outline-indent p{
     border-left: none;
-    line-height: 1.5;
   }
 }
 
@@ -277,24 +314,30 @@
 
 // h5
 @media screen and (max-width:990px){
-  .course-info header.course-profile{
-    padding: 20px;
-
-    .intro-inner-wrapper .media{
-      display: none;
+  .course-info{
+    .container{
+      padding-top: 230px;
     }
 
-    .intro-inner-wrapper .table .intro{
-      padding: 20px;
+    header.course-profile{
+      padding: 15px 10px;
+  
+      .intro-inner-wrapper .media{
+        display: none;
+      }
+  
+      .intro-inner-wrapper .table .intro{
+        padding: 20px 15px;
+      }
+  
     }
-
-  }
-  .course-info .details{
-    width: 100%;
-  }
-  .course-info .course-sidebar{
-    width: 100%;
-    margin-top: 20px;
+    .details{
+      width: 100%;
+    }
+    .course-sidebar{
+      width: 100%;
+      margin-top: 20px;
+    }
   }
 }
 
@@ -308,6 +351,9 @@
       margin-top: 15px;
     }
 
+  }
+  .course-info .container{
+    padding-top: 290px;
   }
 }
 

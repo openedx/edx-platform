@@ -39,7 +39,6 @@ body.view-in-course .wiki-wrapper{
   margin: 0;
   border: none;
   height: auto;
-  line-height: 1.5;
   text-shadow: none;
 }
 
@@ -100,7 +99,16 @@ body.view-in-course .wiki-wrapper{
   }
 }
 
+@media screen and (max-width:576px){
+  .wiki-wrapper section.wiki.view{
+    .main-article, .article-functions{
+      width: 100%;
+      padding: 20px;
+    }
+  } 
+}
 
+// other wiki page
 // add a wiki 
 .wiki-wrapper section.wiki .new-article{
   padding: 0;
@@ -109,6 +117,7 @@ body.view-in-course .wiki-wrapper{
   h1{
     line-height: 35px;
     font-weight: normal;
+    font-size: 18px;
   }
   #hint_id_slug, #hint_id_summary{
     font-size: 14px;
@@ -116,10 +125,37 @@ body.view-in-course .wiki-wrapper{
   .form-horizontal{
     padding: 0 30px 40px;
   }
+}
+
+// edit a wiki page
+.wiki-wrapper section.wiki{
   .btn.btn-primary{
     @extend %btn-my-primary;
   }
-  .btn{
+  a.btn{
     @extend %btn-my-white;
+    vertical-align: top;
+  }
+  .btn.btn-danger{
+    @extend %btn-my-white;
+    box-shadow: none;
+    span:before{
+      vertical-align: sub;
+    }
+  }
+} 
+
+// settings
+.wiki-wrapper .settings{
+  .help-block{
+    margin-left: 3px;
+    display: inline-block;
+  }
+  label{
+    width: 200px;
+    display: inline-block;
+  }
+  .controls{
+    display: inline-block;
   }
 }

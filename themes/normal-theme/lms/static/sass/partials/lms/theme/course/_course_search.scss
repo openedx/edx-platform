@@ -1,0 +1,49 @@
+// search a course
+#course-container .page-content{
+  padding: 30px;
+}
+.search-results{
+  .search-results-item{
+    padding: 15px;
+    margin-bottom: 0;
+    border-top: 0;
+    border-bottom: 1px solid #eeeeee;
+  }
+
+  .result-link{
+    display: inline-block;
+  }
+  .result-location{
+    display: inline-block;
+    padding-top: 0;
+  }
+
+  .search-info{
+    margin-bottom: 10px;
+  }
+  .search-results-title{
+    margin: 0;
+    font-size: 16px;
+  }
+  .search-count{
+    display: inline-block;
+    margin-left: 10px;
+    color: $note;
+  }
+} 
+.field-input{
+  padding: 0 10px;
+  height: 34px;
+  font-size: 14px;
+  position: relative;
+  top: -1px;
+  border: 1px solid $blue;
+}
+
+// tab 
+.content-wrapper .course-tabs{
+  margin: 0 auto 10px;
+}
+.tabs .tab a{
+  border-width: 0;
+}
