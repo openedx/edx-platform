@@ -170,4 +170,6 @@ p.accomplishment-success{
     height: 630px;
   }
 }
-
+.layout-accomplishment.certificate-verified .accomplishment-rendering,.layout-accomplishment.certificate-no-id-professional .accomplishment-rendering,.layout-accomplishment.certificate-professional .accomplishment-rendering,.layout-accomplishment.certificate-honor .accomplishment-rendering,.layout-accomplishment.certificate-audit .accomplishment-rendering {
+  background: $white url('../images/bg-verified.png') center no-repeat;
+}
