@@ -1,9 +1,9 @@
 """Handle events that were forwarded from the Segment webhook integration"""
 
-import datetime
 import json
 import logging
 
+from dateutil import parser
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import HttpResponse
@@ -266,4 +266,4 @@ def _get_segmentio_event_name(event_properties):
 
 def parse_iso8601_timestamp(timestamp):
     """Parse a particular type of ISO8601 formatted timestamp"""
-    return datetime.datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%fZ")
+    return parser.parse(timestamp)
