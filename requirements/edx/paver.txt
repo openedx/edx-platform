@@ -22,17 +22,8 @@ psutil==1.2.1
 pymongo==2.9.1
 python-memcached==1.48
 pyyaml==3.13              # via watchdog
-<<<<<<< HEAD
-<<<<<<< HEAD
-requests==2.21.0
-=======
-requests==2.20.1
->>>>>>> Enable course run level overrides for proctoring configuration.
-six==1.11.0               # via edx-opaque-keys, libsass, paver, stevedore
-=======
 requests==2.21.0
 six==1.11.0
->>>>>>> Removed course-run exam rule configuration
 stevedore==1.10.0
 urllib3==1.23             # via requests
 watchdog==0.9.0
