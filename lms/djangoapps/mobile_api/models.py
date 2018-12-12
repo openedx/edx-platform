@@ -52,13 +52,14 @@ class AppVersionConfig(models.Model):
     enabled = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    is_audited = models.BooleanField(default=False)
 
     class Meta:
         app_label = "mobile_api"
         unique_together = ('platform', 'version',)
         ordering = ['-major_version', '-minor_version', '-patch_version']
 
-    def __unicode__(self):
+    def __unicode__(ContentTypeGatingConfigself):
         return "{}_{}".format(self.platform, self.version)
 
     @classmethod
