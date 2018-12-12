@@ -22,6 +22,7 @@ urlpatterns = [
 
     # password reset in views (see below for password reset django views)
     url(r'^account/password$', views.password_change_request_handler, name='password_change_request'),
+    url(r'^account/account_recovery', views.account_recovery_request_handler, name='account_recovery'),
     url(r'^password_reset/$', views.password_reset, name='password_reset'),
     url(
         r'^password_reset_confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',

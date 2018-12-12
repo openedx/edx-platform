@@ -9,15 +9,19 @@
         'js/student_account/models/LoginModel',
         'js/student_account/models/PasswordResetModel',
         'js/student_account/models/RegisterModel',
+        'js/student_account/models/AccountRecoveryModel',
         'js/student_account/views/LoginView',
         'js/student_account/views/PasswordResetView',
         'js/student_account/views/RegisterView',
         'js/student_account/views/InstitutionLoginView',
         'js/student_account/views/HintedLoginView',
+        'js/student_account/views/AccountRecoveryView',
+        'edx-ui-toolkit/js/utils/html-utils',
         'js/vendor/history'
     ],
-        function($, utility, _, _s, Backbone, LoginModel, PasswordResetModel, RegisterModel, LoginView,
-                 PasswordResetView, RegisterView, InstitutionLoginView, HintedLoginView) {
+        function($, utility, _, _s, Backbone, LoginModel, PasswordResetModel, RegisterModel, AccountRecoveryModel,
+                 LoginView, PasswordResetView, RegisterView, InstitutionLoginView, HintedLoginView, AccountRecoveryView,
+                 HtmlUtils) {
             return Backbone.View.extend({
                 tpl: '#access-tpl',
                 events: {
@@ -27,6 +31,7 @@
                     login: {},
                     register: {},
                     passwordHelp: {},
+                    accountRecoveryHelp: {},
                     institutionLogin: {},
                     hintedLogin: {}
                 },
@@ -63,6 +68,7 @@
                         login: options.login_form_desc,
                         register: options.registration_form_desc,
                         reset: options.password_reset_form_desc,
+                        account_recovery: options.account_recovery_form_desc,
                         institution_login: null,
                         hinted_login: null
                     };
@@ -74,9 +80,15 @@
                     this.hideAuthWarnings = options.hide_auth_warnings || false;
                     this.pipelineUserDetails = options.third_party_auth.pipeline_user_details;
                     this.enterpriseName = options.enterprise_name || '';
+                    this.isAccountRecoveryFeatureEnabled = options.is_account_recovery_feature_enabled || false;
 
                 // The login view listens for 'sync' events from the reset model
                     this.resetModel = new PasswordResetModel({}, {
+                        method: 'GET',
+                        url: '#'
+                    });
+
+                    this.accountRecoveryModel = new AccountRecoveryModel({}, {
                         method: 'GET',
                         url: '#'
                     });
@@ -93,10 +105,14 @@
                 },
 
                 render: function() {
-                    $(this.el).html(_.template(this.tpl)({
-                        mode: this.activeForm
-                    }));
-
+                    HtmlUtils.setHtml(
+                        $(this.el),
+                        HtmlUtils.HTML(
+                            _.template(this.tpl)({
+                                mode: this.activeForm
+                            })
+                        )
+                    )
                     this.postRender();
 
                     return this;
@@ -106,6 +122,9 @@
                 // get & check current url hash part & load form accordingly
                     if (Backbone.history.getHash() === 'forgot-password-modal') {
                         this.resetPassword();
+                    }
+                    else if (Backbone.history.getHash() === 'account-recovery-modal') {
+                        this.accountRecovery();
                     }
                     this.loadForm(this.activeForm);
                 },
@@ -126,6 +145,7 @@
                             fields: data.fields,
                             model: model,
                             resetModel: this.resetModel,
+                            accountRecoveryModel: this.accountRecoveryModel,
                             thirdPartyAuth: this.thirdPartyAuth,
                             accountActivationMessages: this.accountActivationMessages,
                             platformName: this.platformName,
@@ -139,6 +159,9 @@
 
                     // Listen for 'password-help' event to toggle sub-views
                         this.listenTo(this.subview.login, 'password-help', this.resetPassword);
+
+                    // Listen for 'account-recovery-help' event to toggle sub-views
+                        this.listenTo(this.subview.login, 'account-recovery-help', this.accountRecovery);
 
                     // Listen for 'auth-complete' event so we can enroll/redirect the user appropriately.
                         this.listenTo(this.subview.login, 'auth-complete', this.authComplete);
@@ -155,6 +178,24 @@
 
                     // Listen for 'password-email-sent' event to toggle sub-views
                         this.listenTo(this.subview.passwordHelp, 'password-email-sent', this.passwordEmailSent);
+
+                    // Focus on the form
+                        $('.password-reset-form').focus();
+                    },
+
+                    account_recovery: function(data) {
+                        this.accountRecoveryModel.ajaxType = data.method;
+                        this.accountRecoveryModel.urlRoot = data.submit_url;
+
+                        this.subview.accountRecoveryHelp = new AccountRecoveryView({
+                            fields: data.fields,
+                            model: this.accountRecoveryModel
+                        });
+
+                    // Listen for 'account-recovery-email-sent' event to toggle sub-views
+                        this.listenTo(
+                            this.subview.accountRecoveryHelp, 'account-recovery-email-sent', this.passwordEmailSent
+                        );
 
                     // Focus on the form
                         $('.password-reset-form').focus();
@@ -214,6 +255,19 @@
                     this.element.hide($(this.el).find('#login-anchor'));
                     this.loadForm('reset');
                     this.element.scrollTop($('#password-reset-anchor'));
+                },
+
+                accountRecovery: function() {
+                    if (this.isAccountRecoveryFeatureEnabled) {
+                        window.analytics.track('edx.bi.account_recovery.viewed', {
+                            category: 'user-engagement'
+                        });
+
+                        this.element.hide($(this.el).find('#login-anchor'));
+                        this.loadForm('account_recovery');
+                        this.element.scrollTop($('#password-reset-anchor'));
+                    }
+
                 },
 
                 toggleForm: function(e) {

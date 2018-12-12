@@ -57,6 +57,7 @@ from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.theming.helpers import get_current_site
+from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
 from openedx.core.djangoapps.user_api.config.waffle import PREVENT_AUTH_USER_WRITES, SYSTEM_MAINTENANCE_MSG, waffle
 from openedx.core.djangoapps.user_api.errors import UserNotFound, UserAPIInternalError
 from openedx.core.djangoapps.user_api.models import UserRetirementRequest
@@ -76,6 +77,7 @@ from student.helpers import (
 )
 from student.message_types import EmailChange, PasswordReset
 from student.models import (
+    AccountRecovery,
     CourseEnrollment,
     PasswordHistory,
     PendingEmailChange,
@@ -717,6 +719,59 @@ def password_change_request_handler(request):
             log.exception('Error occured during password change for user {email}: {error}'
                           .format(email=email, error=err))
             return HttpResponse(_("Some error occured during password change. Please try again"), status=500)
+
+        return HttpResponse(status=200)
+    else:
+        return HttpResponseBadRequest(_("No email address provided."))
+
+
+@require_http_methods(['POST'])
+def account_recovery_request_handler(request):
+    """
+    Handle account recovery requests.
+
+    Arguments:
+        request (HttpRequest)
+
+    Returns:
+        HttpResponse: 200 if the email was sent successfully
+        HttpResponse: 400 if there is no 'email' POST parameter
+        HttpResponse: 403 if the client has been rate limited
+        HttpResponse: 405 if using an unsupported HTTP method
+        HttpResponse: 404 if account recovery feature is not enabled
+
+    Example:
+
+        POST /account/account_recovery
+
+    """
+    if not is_secondary_email_feature_enabled():
+        raise Http404
+
+    limiter = BadRequestRateLimiter()
+    if limiter.is_rate_limit_exceeded(request):
+        AUDIT_LOG.warning("Account recovery rate limit exceeded")
+        return HttpResponseForbidden()
+
+    user = request.user
+    # Prefer logged-in user's email
+    email = request.POST.get('email')
+
+    if email:
+        try:
+            # Send an email with a link to direct user towards account recovery.
+            from openedx.core.djangoapps.user_api.accounts.api import request_account_recovery
+            request_account_recovery(email, request.is_secure())
+
+            # Check if a user exists with the given secondary email, if so then invalidate the existing oauth tokens.
+            user = user if user.is_authenticated else User.objects.get(
+                id=AccountRecovery.objects.get(secondary_email__iexact=email).user.id
+            )
+            destroy_oauth_tokens(user)
+        except UserNotFound:
+            AUDIT_LOG.warning(
+                "Account recovery attempt via invalid secondary email '{email}'.".format(email=email)
+            )
 
         return HttpResponse(status=200)
     else:

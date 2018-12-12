@@ -23,6 +23,7 @@
             events: {
                 'click .js-login': 'submitForm',
                 'click .forgot-password': 'forgotPassword',
+                'click .account-recovery': 'accountRecovery',
                 'click .login-provider': 'thirdPartyAuth'
             },
             formType: 'login',
@@ -45,6 +46,7 @@
                 this.errorMessage = data.thirdPartyAuth.errorMessage || '';
                 this.platformName = data.platformName;
                 this.resetModel = data.resetModel;
+                this.accountRecoveryModel = data.accountRecoveryModel;
                 this.supportURL = data.supportURL;
                 this.passwordResetSupportUrl = data.passwordResetSupportUrl;
                 this.createAccountOption = data.createAccountOption;
@@ -55,27 +57,32 @@
 
                 this.listenTo(this.model, 'sync', this.saveSuccess);
                 this.listenTo(this.resetModel, 'sync', this.resetEmail);
+                this.listenTo(this.accountRecoveryModel, 'sync', this.resetEmail);
             },
 
             render: function(html) {
                 var fields = html || '';
 
-                $(this.el).html(_.template(this.tpl)({
-                // We pass the context object to the template so that
-                // we can perform variable interpolation using sprintf
-                    context: {
-                        fields: fields,
-                        currentProvider: this.currentProvider,
-                        syncLearnerProfileData: this.syncLearnerProfileData,
-                        providers: this.providers,
-                        hasSecondaryProviders: this.hasSecondaryProviders,
-                        platformName: this.platformName,
-                        createAccountOption: this.createAccountOption,
-                        pipelineUserDetails: this.pipelineUserDetails,
-                        enterpriseName: this.enterpriseName
-                    }
-                }));
-
+                HtmlUtils.setHtml(
+                    $(this.el),
+                    HtmlUtils.HTML(
+                        _.template(this.tpl)({
+                            // We pass the context object to the template so that
+                            // we can perform variable interpolation using sprintf
+                            context: {
+                                fields: fields,
+                                currentProvider: this.currentProvider,
+                                syncLearnerProfileData: this.syncLearnerProfileData,
+                                providers: this.providers,
+                                hasSecondaryProviders: this.hasSecondaryProviders,
+                                platformName: this.platformName,
+                                createAccountOption: this.createAccountOption,
+                                pipelineUserDetails: this.pipelineUserDetails,
+                                enterpriseName: this.enterpriseName
+                            }
+                        })
+                    )
+                )
                 this.postRender();
 
                 return this;
@@ -121,6 +128,13 @@
                 event.preventDefault();
 
                 this.trigger('password-help');
+                this.clearPasswordResetSuccess();
+            },
+
+            accountRecovery: function(event) {
+                event.preventDefault();
+
+                this.trigger('account-recovery-help');
                 this.clearPasswordResetSuccess();
             },
 

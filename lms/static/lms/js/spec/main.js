@@ -787,6 +787,7 @@
         'js/spec/student_account/login_spec.js',
         'js/spec/student_account/logistration_factory_spec.js',
         'js/spec/student_account/password_reset_spec.js',
+        'js/spec/student_account/account_recovery_spec.js',
         'js/spec/student_account/register_spec.js',
         'js/spec/student_account/shoppingcart_spec.js',
         'js/spec/verify_student/image_input_spec.js',
