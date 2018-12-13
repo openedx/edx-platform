@@ -7,15 +7,17 @@ from django.conf import settings
 
 from datetime import datetime
 import pytz
-
 from openedx.core.djangoapps.lang_pref.api import footer_language_selector_is_enabled
+from openedx.features.enterprise_support.utils import remind_users_to_bind_phones
 %>
-
+<%
+binding = remind_users_to_bind_phones(request)
+%>
 <div class="my-footer">
   <div class="footer-content">
     <div class="footer-app">
       <img class="logo" src="${static.url('images/logo_footer.png')}" />
-      <p class="slogan">变革 • 创新 • 未来</p>
+      <p class="slogan">${_(u"变革 • 创新 • 未来")}</p>
       <div class="footer-btn">
         <i class="footer-icon">
           <svg viewBox="64 64 896 896" class="" width="1em" height="1em" aria-hidden="true">
@@ -35,46 +37,92 @@ from openedx.core.djangoapps.lang_pref.api import footer_language_selector_is_en
     <div class="footer-line"></div>
     <div class="footer-links">
       <div class="footer-list">
-        <h3>英荔教育</h3>
+        <h3>${_(u"英荔教育")}</h3>
         <ul>
-          <li><a href="/about/">关于我们</a></li>
-          <li><a href="${reverse('contact')}">联系我们</a></li>
-          <li><a href="${reverse('join_us')}">加入我们</a></li>
+          <li><a href="/about/">${_(u"关于我们")}</a></li>
+          <li><a href="${reverse('contact')}">${_(u"联系我们")}</a></li>
+          <li><a href="${reverse('join_us')}">${_(u"加入我们")}</a></li>
         </ul>
       </div>
 
       <div class="footer-list">
-        <h3>关于平台</h3>
+        <h3>${_(u"关于平台")}</h3>
         <ul>
-          <li><a href="${reverse('manual')}">使用手册</a></li>
+          <li><a href="${reverse('manual')}">${_(u"使用手册")}</a></li>
           <!--<li><a href="">充值与支付</a></li>-->
-          <li><a href="${reverse('help_edx')}">帮助与投诉</a></li>
+          <li><a href="${reverse('help_edx')}">${_(u"帮助与投诉")}</a></li>
         </ul>
       </div>
 
       <div class="footer-list">
-        <h3>条款说明</h3>
+        <h3>${_(u"条款说明")}</h3>
         <ul>
-          <li><a href="${reverse('user_agreement')}">用户协议</a></li>
-          <li><a href="${reverse('privacy_policy')}">隐私政策</a></li>
-          <li><a href="${reverse('disclaimer')}">免责声明</a></li>
+          <li><a href="${reverse('user_agreement')}">${_(u"用户协议")}</a></li>
+          <li><a href="${reverse('privacy_policy')}">${_(u"隐私政策")}</a></li>
+          <li><a href="${reverse('disclaimer')}">${_(u"免责声明")}</a></li>
         </ul>
       </div>
 
       <div class="footer-list">
-        <h3>合作机构</h3>
+        <h3>${_(u"合作机构")}</h3>
         <ul>
-          <li><a href="">网易云课堂</a></li>
-          <li><a href="">腾讯课堂</a></li>
+          <li><a href="">${_(u"网易云课堂")}</a></li>
+          <li><a href="">${_(u"腾讯课堂")}</a></li>
         </ul>
       </div>
     </div>
 
     <div class="footer-wechat">
-      <h3>英荔商学院</h3>
+      <h3>${_(u"英荔商学院")}</h3>
       <img src="${static.url('images/qrcode.png')}" class="footer-qrcode" />
-      <div>微信扫一扫<br />获取课程优惠券</div>
+      <div>${_(u"微信扫一扫")}<br />${_(u"获取课程优惠券")}</div>
     </div>
   </div>
   <div class="footer-text">© 2018 广州英荔教育科技有限公司 版权所有 <a href="http://www.miitbeian.gov.cn" target="_blank">粤ICP备13044168号-5</a></div>
 </div>
+<div class="phone-dialog" style="display:none;">
+  <div class="dialog-mask">
+    <div class="dialog-container">
+      <div class="dialog-title">${_(u"绑定手机号")}</div>
+      <div class="row phone-number clearfix"><span class="phone-code">+86</span><input class="phone-input-box" type="text" /></div>
+      <div class="row clearfix">
+        <input class="qrcode-input-box" type="text" /><span class="get-qrcode-btn active">${_(u"获取验证码")}</span>
+      </div>
+      <div class="errot-text">${_(u"手机号码格式不正确")}</div>
+      <div class="submit-btn">${_(u"提交")}</div>
+      <span class="fa-dialog-close fa-close-newicon"></span>
+    </div>
+  </div>
+</div>
+<input id="phone-binding" type="hidden" value="${binding}"/>
+<div class="eliteu-message-box" style="display:none;">
+  <div class="mesassge-mask">
+    <div class="meassage-container">
+      <div class="message-title">${_(u"提示")}</div>
+      <p class="message-content">${_(u"应国家法规对于账号实名的要求，请您在进行下一步操作前，先完成手机绑定。")}</p>
+      <div class="meassage-op">
+        <span class="binding-btn">${_(u"去绑定手机")}</span> <a class="more" href="http://www.cac.gov.cn/2017-08/25/c_1121541842.htm">${_(u"了解更多")}</a>
+      </div>
+      <span class="fa-message-close fa-close-newicon"></span>
+    </div>
+  </div>
+</div>
+<script src="/static/normal-theme/js/binding.js"></script>
+<script type="text/javascript">
+  window.onload = function(){
+    var checkPhone = $('#phone-binding').val();
+    if (checkPhone == 'True'){
+      $('.eliteu-message-box').show();
+      $('.fa-message-close').click(function(){
+        $('.eliteu-message-box').hide();
+      });
+      
+      $('.binding-btn').click(function(){
+        $('.eliteu-message-box').hide();
+        $('.phone-dialog').show();
+        phoneDialog();
+  
+      });
+    }
+  }
+</script>

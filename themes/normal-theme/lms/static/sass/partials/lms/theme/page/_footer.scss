@@ -188,3 +188,234 @@
   box-shadow: none;
   border-top: 1px solid #ccd1d9;
 }
+.phone-dialog{
+  height: 100vh;
+  width: 100vw;
+  position: fixed;
+  z-index: 1000;
+}
+.dialog-mask{
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  background-color: rgba(0,0,0,0.6);
+}
+.dialog-container{
+  width: 500px;
+  height: 250px;
+  position: absolute;
+  left: 50%;
+  top:50%;
+  margin-left: -250px;
+  margin-top: -125px;
+  background-color: #ffffff;
+	box-shadow: 0px 3px 6px 0px 
+		rgba(46, 49, 60, 0.41);
+  border-radius: 3px;
+  box-sizing: border-box;
+  padding: 30px 120px;
+  .row{
+    margin-bottom: 10px;
+  }
+  .phone-number.error{
+    border: 1px solid #fe8c97;
+    .phone-code{
+      border: 1px solid transparent;
+      border-right: 1px solid #e6e9ed;
+    }
+    .phone-input-box{
+      border: 1px solid transparent;
+    }
+  }
+  .phone-code{
+    display: block;
+    width: 61px;
+    height: 34px;
+    background-color: #f5f7fa;
+    border: 1px solid #e6e9ed;
+    /* border-right: none; */
+    float: left;
+    outline: none;
+    margin: 0;
+    border-radius: 0;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+    line-height: 34px;
+    text-align: center;
+  }
+  .dialog-title{
+    font-size: 16px;
+    letter-spacing: 0px;
+    color: #2e313c;
+    text-align: center;
+    padding-bottom: 18px;
+    
+  }
+  .phone-input-box{
+    width: 195px;
+    height: 34px;
+    border: 1px solid #e6e9ed;
+    height: 36px;
+    float: left;
+    border-left: none;
+    display: block;
+    border-radius: 0;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+    &:focus{
+      border: 1px solid #e6e9ed;
+    }
+  }
+  .qrcode-input-box{
+    width: 150px;
+    height: 34px;
+    border: 1px solid #e6e9ed;
+    float: left;
+    margin-right: 10px;
+    &.error{
+      border: 1px solid #fe8c97;
+    }
+    &:focus{
+      border: 1px solid #e6e9ed;
+    }
+  }
+  .qrcode-input-box,.phone-input-box{
+    font-style: normal;
+  }
+  .get-qrcode-btn{
+    width: 98px;
+    height: 34px;
+    
+    border-radius: 2px;
+    float: left;
+    line-height: 34px;
+    width: 98px;
+    text-align: center;
+    font-size: 14px;
+    background-color: #f5f7fa;
+    border: solid 0px #ccd1d9;
+    color: #ccd1d9;
+    &.active{
+      background-color: #4788c7;
+      color: #fff;
+      cursor: pointer;
+    }
+  }
+  .qrcode{
+    width: 150px;
+    height: 34px;
+
+  }
+  .errot-text{
+    height: 20px;
+    line-height: 20px;
+    margin-bottom: 10px;
+    text-align: center;
+    color: #d8353e;
+    font-weight: normal;
+    visibility: hidden;
+    &.active{
+      visibility:visible;
+    }
+  }
+  .submit-btn{
+    width: 98px;
+    height: 34px;
+    background-color: #f5f7fa;
+    border-radius: 2px;
+    border: solid 1px #ccd1d9;
+    line-height: 34px;
+    text-align: center;
+    color: #ccd1d9;
+    margin: 0 auto;
+    &.active{
+      cursor: pointer;
+      background-color: #4788c7;
+      color: #fff;
+    }
+  }
+}
+.fa-dialog-close{
+  position: absolute;
+  top: 14px;
+  right: 17px;
+  cursor: pointer;
+}
+.fa-close-newicon{
+  display: block;
+  height: 20px;
+  width: 20px;
+  background-size: 300px;
+  background-image: url("/static/normal-theme/images/iconfont.png");
+  background-position: -140px -60px;
+}
+.eliteu-message-box{
+  height: 100vh;
+  width: 100vw;
+  position: fixed;
+  z-index: 1000;
+  .mesassge-mask{
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    background-color: rgba(0,0,0,0.6);
+  }
+  .meassage-container{
+    width: 500px;
+    height: 220px;
+    position: absolute;
+    left: 50%;
+    top:50%;
+    margin-left: -250px;
+    margin-top: -110px;
+    background-color: #ffffff;
+    box-shadow: 0px 3px 6px 0px 
+      rgba(46, 49, 60, 0.41);
+    border-radius: 3px;
+    box-sizing: border-box;
+    padding: 30px 60px;
+  }
+  .message-title{
+    font-size: 16px;
+    letter-spacing: 0px;
+    color: #2e313c;
+    text-align: center;
+    padding-bottom: 18px;
+    
+  }
+  .message-content{
+    font-size: 14px;
+    color: #656d78;
+    text-align: center;
+    line-height: 24px;
+    margin-bottom: 30px;
+  }
+  .meassage-op{
+    text-align: center;
+    .binding-btn{
+      width: 98px;
+	    height: 34px;
+      display: inline-block;
+      margin-right: 10px;
+      background-color: #4788c7;
+      border-radius: 2px;
+      color: #fff;
+      line-height: 34px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: normal;
+      cursor: pointer;
+    }
+    .more{
+      line-height: 34px;
+      font-size: 14px;
+      color: #346ca3;
+    }
+  }
+}
+.fa-message-close{
+  position: absolute;
+  top: 14px;
+  right: 17px;
+  cursor: pointer;
+}
