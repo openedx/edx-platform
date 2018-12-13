@@ -826,41 +826,41 @@ def run_quality(options):
         failure_reasons.append('Too many total violations.')
 
     # ----- Set up for diff-quality pylint call -----
-    # Set the string, if needed, to be used for the diff-quality --compare-branch switch.
-    compare_branch = getattr(options, 'compare_branch', None)
-    compare_branch_string = u''
-    if compare_branch:
-        compare_branch_string = u'--compare-branch={0}'.format(compare_branch)
+    # Set the string to be used for the diff-quality --compare-branch switch.
+    compare_branch = getattr(options, 'compare_branch', u'origin/master')
+    compare_commit = sh('git merge-base HEAD {}'.format(compare_branch), capture=True).strip()
+    if sh('git rev-parse HEAD', capture=True).strip() != compare_commit:
+        compare_branch_string = u'--compare-branch={0}'.format(compare_commit)
 
-    # Set the string, if needed, to be used for the diff-quality --fail-under switch.
-    diff_threshold = int(getattr(options, 'percentage', -1))
-    percentage_string = u''
-    if diff_threshold > -1:
-        percentage_string = u'--fail-under={0}'.format(diff_threshold)
+        # Set the string, if needed, to be used for the diff-quality --fail-under switch.
+        diff_threshold = int(getattr(options, 'percentage', -1))
+        percentage_string = u''
+        if diff_threshold > -1:
+            percentage_string = u'--fail-under={0}'.format(diff_threshold)
 
-    pylint_files = get_violations_reports("pylint")
-    pylint_reports = u' '.join(pylint_files)
-    if not run_diff_quality(
-        violations_type="pylint",
-        reports=pylint_reports,
-        percentage_string=percentage_string,
-        branch_string=compare_branch_string,
-        dquality_dir=dquality_dir
-    ):
-        diff_quality_pass = False
-        failure_reasons.append('Pylint violation(s) were found in the lines of code that were added or changed.')
-
-    eslint_files = get_violations_reports("eslint")
-    eslint_reports = u' '.join(eslint_files)
-    if not run_diff_quality(
-            violations_type="eslint",
-            reports=eslint_reports,
+        pylint_files = get_violations_reports("pylint")
+        pylint_reports = u' '.join(pylint_files)
+        if not run_diff_quality(
+            violations_type="pylint",
+            reports=pylint_reports,
             percentage_string=percentage_string,
             branch_string=compare_branch_string,
             dquality_dir=dquality_dir
-    ):
-        diff_quality_pass = False
-        failure_reasons.append('Eslint violation(s) were found in the lines of code that were added or changed.')
+        ):
+            diff_quality_pass = False
+            failure_reasons.append('Pylint violation(s) were found in the lines of code that were added or changed.')
+
+        eslint_files = get_violations_reports("eslint")
+        eslint_reports = u' '.join(eslint_files)
+        if not run_diff_quality(
+                violations_type="eslint",
+                reports=eslint_reports,
+                percentage_string=percentage_string,
+                branch_string=compare_branch_string,
+                dquality_dir=dquality_dir
+        ):
+            diff_quality_pass = False
+            failure_reasons.append('Eslint violation(s) were found in the lines of code that were added or changed.')
 
     # If one of the quality runs fails, then paver exits with an error when it is finished
     if not diff_quality_pass:
