@@ -147,9 +147,10 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         """
         requester_name = "edx-proctoring"
         email = "edx-proctoring@edx.org"
-        subject = "Proctored Exam Review: {review_status}".format(review_status="Suspicious")
+        subject = u"Proctored Exam Review: {review_status}".format(review_status="Suspicious")
         body = "A proctored exam attempt for {exam_name} in {course_name} by username: {student_username} was " \
-               "reviewed as {review_status} by the proctored exam review provider."
+               "reviewed as {review_status} by the proctored exam review provider.\n" \
+               "Review link: not available"
         body = body.format(
             exam_name="test_exam", course_name=self.course.display_name, student_username="test_student",
             review_status="Suspicious"
