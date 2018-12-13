@@ -30,6 +30,11 @@ SITE_CONFIGURATION_CLASS = ('openedx.core.djangoapps.site_configuration'
 
 
 def get_api_classes():
+    """
+    This method retrieves all classes from the views module. This means only
+    view classes should be in the views module OR the API permissions tests
+    need to be refactored
+    """
     api_classes = []
 
     for member_name in dir(api_views):
@@ -44,7 +49,9 @@ def get_api_classes():
 
 @ddt.ddt
 class AppsemblerAPIPermissionsTests(TestCase):
-
+    """
+    See the comments in the ``get_api_classes`` function above
+    """
     def test_api_classes_are_being_found(self):
         self.assertTrue(get_api_classes())  # Ensure the API classes are filtered correctly
 

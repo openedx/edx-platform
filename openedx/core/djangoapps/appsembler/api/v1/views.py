@@ -1,5 +1,7 @@
 """Tahoe version 1 API views
 
+Only include view classes here. See the tests/test_permissions.py:get_api_classes()
+method.
 """
 
 import logging
@@ -19,7 +21,7 @@ from openedx.core.djangoapps.user_api.accounts.api import check_account_exists
 from student.forms import PasswordResetFormNoActive
 from student.views import create_account_with_params
 
-from ..permissions import IsSiteAdminUser
+from ..permissions import IsSiteAdminUser, TahoeAPIUserThrottle
 
 
 log = logging.getLogger(__name__)
@@ -76,7 +78,12 @@ class TahoeAuthMixin(object):
 
 
 class RegistrationViewSet(TahoeAuthMixin, viewsets.ViewSet):
+    """
+    Allows remote clients to register new users via API
 
+    This API has a rate limit of 60 requets per minutes
+    """
+    throttle_classes = (TahoeAPIUserThrottle,)
     http_method_names = ['post', 'head']
 
     def create(self, request):

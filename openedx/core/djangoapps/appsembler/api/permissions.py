@@ -3,9 +3,10 @@
 Code adapted from Figures
 
 """
-from rest_framework.permissions import BasePermission
-
 import django.contrib.sites.shortcuts
+
+from rest_framework.permissions import BasePermission
+from rest_framework.throttling import UserRateThrottle
 
 from organizations.models import (
     Organization,
@@ -44,3 +45,10 @@ class IsSiteAdminUser(BasePermission):
     """
     def has_permission(self, request, view):
         return is_site_admin_user(request)
+
+
+class TahoeAPIUserThrottle(UserRateThrottle):
+    """
+    Limit the rate of requests users can make to the Tahoe API
+    """
+    rate = '60/minute'
