@@ -66,8 +66,6 @@ from util.html import strip_tags
 import lms.lib.comment_client as cc
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 
-from social_engagement.engagement import update_user_engagement_score
-
 
 log = logging.getLogger(__name__)
 
