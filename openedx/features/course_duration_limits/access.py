@@ -9,6 +9,7 @@ from django.apps import apps
 from django.utils import timezone
 from django.utils.translation import ugettext as _
 
+from student.models import CourseEnrollment
 from util.date_utils import DEFAULT_SHORT_DATE_FORMAT, strftime_localized
 
 from course_modes.models import CourseMode
@@ -43,7 +44,7 @@ class AuditExpiredError(AccessError):
             )
         except CourseOverview.DoesNotExist:
             additional_context_user_message = _("Access to the course you were looking"
-                                                "for expired on {expiration_date}").format(
+                                                " for expired on {expiration_date}").format(
                 expiration_date=expiration_date
             )
         super(AuditExpiredError, self).__init__(error_code, developer_message, user_message,
@@ -130,12 +131,30 @@ def register_course_expired_message(request, course):
             )
         )
     else:
-        upgrade_message = _('Your access to this course expires on {expiration_date}. \
-                    {a_open}Upgrade now {sronly_span_open}to retain access past {expiration_date}.\
-                    {span_close}{a_close}{sighted_only_span_open}for unlimited access.{span_close}')
+        enrollment = CourseEnrollment.get_enrollment(request.user, course.id)
+        if enrollment is None:
+            return
+
+        upgrade_deadline = enrollment.upgrade_deadline
+        if upgrade_deadline is None:
+            return
+        now = timezone.now()
+        if now < upgrade_deadline:
+            upgrade_deadline = enrollment.course_upgrade_deadline
+
+        expiration_message = _('{strong_open}Audit Access Expires {expiration_date}{strong_close}'
+                               '{line_break}You lose all access to this course, including your progress, on '
+                               '{expiration_date}.')
+        upgrade_deadline_message = _('{line_break}Upgrade by {upgrade_deadline} to get unlimited access to the course '
+                                     'as long as it exists on the site. {a_open}Upgrade now{sronly_span_open} to '
+                                     'retain access past {expiration_date}{span_close}{a_close}')
+        full_message = expiration_message
+        if now < upgrade_deadline:
+            full_message += upgrade_deadline_message
+
         PageLevelMessages.register_info_message(
             request,
-            Text(upgrade_message).format(
+            Text(full_message).format(
                 a_open=HTML('<a href="{upgrade_link}">').format(
                     upgrade_link=verified_upgrade_deadline_link(user=request.user, course=course)
                 ),
@@ -143,6 +162,10 @@ def register_course_expired_message(request, course):
                 sighted_only_span_open=HTML('<span aria-hidden="true">'),
                 span_close=HTML('</span>'),
                 a_close=HTML('</a>'),
-                expiration_date=expiration_date.strftime('%b %-d'),
+                expiration_date=expiration_date.strftime('%b. %-d, %Y'),
+                strong_open=HTML('<strong>'),
+                strong_close=HTML('</strong>'),
+                line_break=HTML('<br>'),
+                upgrade_deadline=upgrade_deadline.strftime('%b. %-d, %Y')
             )
         )

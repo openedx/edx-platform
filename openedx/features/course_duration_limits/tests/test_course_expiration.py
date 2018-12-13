@@ -180,7 +180,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         response = self.client.get(course_home_url, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertItemsEqual(response.redirect_chain, [])
-        banner_text = 'Your access to this course expires on'
+        banner_text = 'You lose all access to this course, including your progress,'
         if show_expiration_banner:
             self.assertIn(banner_text, response.content)
         else:
@@ -245,7 +245,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         response = self.client.get(course_home_url, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertItemsEqual(response.redirect_chain, [])
-        banner_text = 'Your access to this course expires on'
+        banner_text = 'You lose all access to this course, including your progress,'
         self.assertNotIn(banner_text, response.content)
 
     @mock.patch("openedx.features.course_duration_limits.access.get_course_run_details")
