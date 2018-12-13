@@ -52,8 +52,10 @@
     margin: 15px 0 0 0;
   }
   li{
-    cursor: pointer;
     line-height: 2;
+    a{
+      cursor: pointer;
+    }
   }
   a,a:not(.btn){
     color: $font;
