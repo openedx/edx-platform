@@ -4,7 +4,7 @@
   "dependencies": {
     "@edx/cookie-policy-banner": "1.1.10",
     "@edx/edx-bootstrap": "1.0.3",
-    "@edx/edx-proctoring": "^1.5.0-rc.1",
+    "@edx/edx-proctoring": "^1.5.0-rc.5",
     "@edx/paragon": "2.6.4",
     "@edx/studio-frontend": "1.16.12",
     "babel-core": "6.26.0",
@@ -27,6 +27,7 @@
     "edx-pattern-library": "0.18.1",
     "edx-proctoring-proctortrack": "git+https://git@github.com/joshivj/edx-proctoring-proctortrack.git",
     "edx-ui-toolkit": "1.5.2",
+    "eslint": "^5.10.0",
     "exports-loader": "0.6.4",
     "extract-text-webpack-plugin": "2.1.2",
     "file-loader": "1.1.6",
