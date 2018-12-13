@@ -155,6 +155,54 @@
             }
         };
 
+        Sequence.prototype.getUrlParts = function() {
+            /**
+            * Get and return the current URL in parts
+            */
+            var origin = window.location.origin,
+                pathName = window.location.pathname;
+            return [origin, pathName];
+        };
+
+        Sequence.prototype.determineBrowserUrl = function(origin, pathName, position) {
+            /**
+            * Determine what the new URL should be.
+            */
+            var lastCharacter = pathName[pathName.length - 1],
+                lastUrlElementPosition = pathName.lastIndexOf('/'),
+                urlEnd = pathName.substring(lastUrlElementPosition + 1),
+                urlEndIsNumerical = !isNaN(parseInt(urlEnd));
+
+            if (urlEndIsNumerical) {
+                pathName = pathName.substring(0, lastUrlElementPosition);
+            }
+            if (lastCharacter === '/') {
+                pathName = pathName.substring(0, pathName.length - 1);
+            }
+
+            return origin + pathName + '/' + position;
+        };
+
+        Sequence.prototype.pushBrowserUrl = function(newUrl) {
+            /**
+            * Push the new URL to the browser.
+            */
+            window.history.pushState(null, null, newUrl);
+        };
+
+        Sequence.prototype.updateBrowserUrl = function(position) {
+            /**
+            * Incorporate all the previous subfunctions.
+            * (This is split into subfunctions both for legibility and testing purposes.)
+            */
+            var urlParts = this.getUrlParts();
+            position = position || this.position;
+
+            var newUrl = this.determineBrowserUrl(urlParts[0], urlParts[1], position);
+
+            this.pushBrowserUrl(newUrl);
+        };
+
         Sequence.prototype.hookUpContentStateChangeEvent = function() {
             var self = this;
 
@@ -280,6 +328,7 @@
                 this.toggleArrows();
                 this.hookUpContentStateChangeEvent();
                 this.updatePageTitle();
+                this.updateBrowserUrl();
                 sequenceLinks = this.content_container.find('a.seqnav');
                 sequenceLinks.click(this.goto);
 
