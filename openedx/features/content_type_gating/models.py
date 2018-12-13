@@ -110,14 +110,13 @@ class ContentTypeGatingConfig(StackedConfigurationModel):
             return cls.enabled_for_course(course_key=course_key, target_datetime=timezone.now())
         else:
             # TODO: clean up as part of REV-100
-            experiment_data_holdback_key = EXPERIMENT_DATA_HOLDBACK_KEY.format(user)
             is_in_holdback = False
             if user and (user_variable_represents_correct_user):
                 try:
                     holdback_value = ExperimentData.objects.get(
                         user=user,
                         experiment_id=EXPERIMENT_ID,
-                        key=experiment_data_holdback_key,
+                        key=EXPERIMENT_DATA_HOLDBACK_KEY,
                     ).value
                     is_in_holdback = holdback_value == 'True'
                 except ExperimentData.DoesNotExist:

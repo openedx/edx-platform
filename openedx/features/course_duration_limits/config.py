@@ -20,17 +20,16 @@ CONTENT_TYPE_GATING_FLAG = WaffleFlag(
 )
 
 EXPERIMENT_ID = 11
-EXPERIMENT_DATA_HOLDBACK_KEY = 'holdback_{0}'
+EXPERIMENT_DATA_HOLDBACK_KEY = 'holdback'
 
 
 @receiver(ENROLL_STATUS_CHANGE)
 def set_value_for_content_type_gating_holdback(sender, event=None, user=None, **kwargs):  # pylint: disable=unused-argument
-    experiment_data_holdback_key = EXPERIMENT_DATA_HOLDBACK_KEY.format(user)
     if event == EnrollStatusChange.enroll:
         user_holdback_data = ExperimentData.objects.filter(
             user=user,
             experiment_id=EXPERIMENT_ID,
-            key=experiment_data_holdback_key,
+            key=EXPERIMENT_DATA_HOLDBACK_KEY,
         )
         user_holdback_data_already_set = user_holdback_data.exists()
         if not user_holdback_data_already_set:
@@ -45,7 +44,7 @@ def set_value_for_content_type_gating_holdback(sender, event=None, user=None, **
                 ExperimentData.objects.create(
                     user=user,
                     experiment_id=EXPERIMENT_ID,
-                    key=experiment_data_holdback_key,
+                    key=EXPERIMENT_DATA_HOLDBACK_KEY,
                     value=is_in_holdback
                 )
             except (ExperimentKeyValue.DoesNotExist, AttributeError):
