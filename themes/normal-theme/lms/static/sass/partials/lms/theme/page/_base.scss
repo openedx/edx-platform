@@ -110,7 +110,7 @@ textarea:focus, input[type="text"]:focus, input[type="url"]:focus, input[type="e
   font-size: 14px;
   letter-spacing: 0.3px;
   height: 36px;
-  line-height: 34px;
+  line-height: 36px;
   border-radius: 3px;
   font-weight: normal;
   cursor: pointer;
@@ -141,7 +141,7 @@ textarea:focus, input[type="text"]:focus, input[type="url"]:focus, input[type="e
   font-size: 14px;
   letter-spacing: 0.3px;
   height: 36px;
-  line-height: 34px;
+  line-height: 36px;
   border-radius: 3px;
   cursor: pointer;
   background: #fff;
@@ -167,7 +167,7 @@ textarea:focus, input[type="text"]:focus, input[type="url"]:focus, input[type="e
   font-size: 14px;
   letter-spacing: 0.3px;
   height: 36px;
-  line-height: 34px;
+  line-height: 36px;
   border-radius: 3px;
 
   border: none;
@@ -178,6 +178,11 @@ textarea:focus, input[type="text"]:focus, input[type="url"]:focus, input[type="e
   text-decoration: none;
   text-shadow: none;
   font-family: $font-family-sans-serif;
+
+  &:hover,&:focus, &:active, &:visited{
+    background: #f5f7fa;
+    color: #aab2bd;
+  }
 }
 
 // alert-warning

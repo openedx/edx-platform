@@ -61,13 +61,14 @@
       .main-cta span.register, 
       .main-cta a.register{
         @extend %btn-my-primary;
-        margin-right: 20px;
+        margin-right: 10px;
       }
 
       .main-cta span.disabled, 
       .main-cta a.disabled{
         @extend %btn-my-disable;
-        margin-right: 20px;
+        margin-right: 10px;
+        margin-top: 0;
       }
 
       
@@ -96,7 +97,7 @@
 
     header{
       padding: 20px 20px 15px;
-      margin: 0 0 20px 0;
+      margin: 20px 0 0 0;
       box-shadow: 0px 0px 2px 0px $border;
       background: #fff;
       border-radius: $border-radius;
@@ -223,6 +224,7 @@
   .about-info ul{
     padding: 0 0 0 20px;
     margin: 0;
+    list-style: disc;
   }
 
   // 1.2 课程性情页 授课老师 
@@ -316,7 +318,7 @@
 @media screen and (max-width:990px){
   .course-info{
     .container{
-      padding-top: 230px;
+      padding-top: 220px;
     }
 
     header.course-profile{
@@ -336,7 +338,11 @@
     }
     .course-sidebar{
       width: 100%;
-      margin-top: 20px;
+      margin-top: 10px;
+      padding-top: 0;
+      header{
+        margin-top: 10px;
+      }
     }
   }
 }
@@ -348,25 +354,15 @@
     .main-cta span.register, 
     .main-cta a.register{
       width: 100%;
-      margin-top: 15px;
+      margin-top: 0;
     }
 
   }
   .course-info .container{
-    padding-top: 290px;
+    padding-top: 220px;
+  }
+  .course-container{
+    padding-top: 10px;
   }
 }
 
-.xmodule_display.xmodule_VideoModule .video .video-wrapper .closed-captions.is-visible{
-  top: unset;
-  bottom: 50px;
-  cursor: pointer;
-  padding: 8px 10px 8px 8px;
-}
-.xmodule_display.xmodule_VideoModule .video .video-wrapper .closed-captions.is-visible::before{
-  content: '',
-}
-.xmodule_display.xmodule_VideoModule .video .video-wrapper .closed-captions.is-visible:hover{
-  cursor: pointer;
-  background: rgba(0,0,0,0.75);
-}

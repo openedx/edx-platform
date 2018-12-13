@@ -1,4 +1,9 @@
 // 1. 替换原有font awesome 
+$icon-width: 18px;
+@function calcP($x, $y){
+  @return ($icon-width * ( 1 - $x )) ( $icon-width * ( 1 - $y )) ;
+}
+
 .course-info .course-sidebar .important-dates li .icon{
   opacity: 1;
 }
@@ -11,7 +16,7 @@
 .fa-clock-o:before,
 .fa-cog:before,
 .fa-info-circle:before,
-.fa-remove:before, .fa-close:before,.fa-times:before,
+.fa-remove:before, .fa-close:before,
 .xmodule_display.xmodule_CapaModule div.problem .choicegroup label.choicegroup_correct .status-icon::after, .xmodule_display.xmodule_CapaModule div.problem .choicetextgroup label.choicegroup_correct .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicegroup label.choicegroup_correct .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicetextgroup label.choicegroup_correct .status-icon::after, .xmodule_display.xmodule_CapaModule div.problem .choicetextgroup label.choicetextgroup_correct .status-icon::after, .xmodule_display.xmodule_CapaModule div.problem .choicetextgroup section.choicetextgroup_correct .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .choicetextgroup .xmodule_display.xmodule_CapaModule .choicegroup label.choicetextgroup_correct .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicetextgroup label.choicetextgroup_correct .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .choicetextgroup .xmodule_display.xmodule_CapaModule .choicegroup section.choicetextgroup_correct .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicetextgroup section.choicetextgroup_correct .status-icon::after,
 .xmodule_display.xmodule_CapaModule div.problem .choicegroup label.choicegroup_incorrect .status-icon::after, .xmodule_display.xmodule_CapaModule div.problem .choicetextgroup label.choicegroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicegroup label.choicegroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicetextgroup label.choicegroup_incorrect .status-icon::after, .xmodule_display.xmodule_CapaModule div.problem .choicetextgroup label.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_CapaModule div.problem .choicetextgroup section.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .choicetextgroup .xmodule_display.xmodule_CapaModule .choicegroup label.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicetextgroup label.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .choicetextgroup .xmodule_display.xmodule_CapaModule .choicegroup section.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicetextgroup section.choicetextgroup_incorrect .status-icon::after,.xmodule_display.xmodule_CapaModule div.problem .indicator-container .status.incorrect .status-icon::after,
 .fa-check:before,
@@ -31,96 +36,92 @@
 .fa-star:before,
 .fa-flag:before,
 .fa-search:before,
-.fa-plus:before
+.fa-plus:before,
+.fa-times:before,
+.find-courses .search-facets .facet-option.selected .count::before, .find-courses .search-facets .facet-option.selected:hover .count::before, .find-courses .search-facets .facet-option.selected:focus .count::before
 {
   content: '';
   display: inline-block;
-  height: 20px;
-  width: 20px;
-  background-size: 300px;
+  height: $icon-width;
+  width: $icon-width;
+  background-size: (600 / 40) * $icon-width;
   background-image: url("/static/normal-theme/images/iconfont.png");
 }
 
 .fa-money:before{
-  background-position: 0px 0px;
+  background-position: calcP(1, 1)
 }
 .fa-twitter:before{
-  background-position: -20px -60px;
+  background-position: calcP(2, 4);
 }
 .fa-eye:before{
-  background-position: -20px -100px;
+  background-position: calcP(2, 6);
 }
 .fa-pencil:before{
-  background-position: -40px -100px;
+  background-position: calcP(3, 6);
 }
 .fa-clock-o:before{
-  background-position: -60px -100px;
+  background-position: calcP(4, 6);
 }
 .fa-cog:before{
-  background-position: -80px -100px;
+  background-position: calcP(5, 6);
 }
 .fa-info-circle:before{
-  background-position: -120px -20px;
+  background-position: calcP(7, 2);
 }
-.fa-remove:before, .fa-close:before, .fa-times:before, 
+.fa-close:before,
 .xmodule_display.xmodule_CapaModule .problem .capa_inputtype.textline>.incorrect .status .status-icon::after, .xmodule_display.xmodule_CapaModule .problem .inputtype.formulaequationinput>.incorrect .status .status-icon::after,
 .xmodule_display.xmodule_CapaModule div.problem .choicegroup label.choicegroup_incorrect .status-icon::after, .xmodule_display.xmodule_CapaModule div.problem .choicetextgroup label.choicegroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicegroup label.choicegroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicetextgroup label.choicegroup_incorrect .status-icon::after, .xmodule_display.xmodule_CapaModule div.problem .choicetextgroup label.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_CapaModule div.problem .choicetextgroup section.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .choicetextgroup .xmodule_display.xmodule_CapaModule .choicegroup label.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicetextgroup label.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .choicetextgroup .xmodule_display.xmodule_CapaModule .choicegroup section.choicetextgroup_incorrect .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicetextgroup section.choicetextgroup_incorrect .status-icon::after,.xmodule_display.xmodule_CapaModule div.problem .indicator-container .status.incorrect .status-icon::after{
-  background-position: -20px -80px;
-  transform: scale(0.7);
+  background-position: calcP(2, 5)
 }
 .fa-check:before,
 .xmodule_display.xmodule_CapaModule div.problem .choicegroup label.choicegroup_correct .status-icon::after, .xmodule_display.xmodule_CapaModule div.problem .choicetextgroup label.choicegroup_correct .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicegroup label.choicegroup_correct .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicetextgroup label.choicegroup_correct .status-icon::after, .xmodule_display.xmodule_CapaModule div.problem .choicetextgroup label.choicetextgroup_correct .status-icon::after, .xmodule_display.xmodule_CapaModule div.problem .choicetextgroup section.choicetextgroup_correct .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .choicetextgroup .xmodule_display.xmodule_CapaModule .choicegroup label.choicetextgroup_correct .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicetextgroup label.choicetextgroup_correct .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .choicetextgroup .xmodule_display.xmodule_CapaModule .choicegroup section.choicetextgroup_correct .status-icon::after, .xmodule_display.xmodule_ConditionalModule div.problem .xmodule_display.xmodule_CapaModule .choicetextgroup section.choicetextgroup_correct .status-icon::after{
-  background-position: -60px -80px;
+  background-position: calcP(4, 5)
 }
 
 .fa-chevron-prev::before{
-  background-position: -140px -100px;
+  background-position: calcP(8, 6)
 }
 .fa-chevron-next::before{
-  background-position: -160px -100px;
+  background-position: calcP(9, 6)
 }
 .fa-bookmark:before{
-  background-position: -240px -100px;
+  background-position: calcP(13, 6)
 }
-.fa-times{
-  background-position: -20px -80px;
-}
-/*
-.count::after{
-  background-position: -140px -60px;
-  transform: scale(0.6);
-}
-*/
 .fa-recorder:before{
-  background-position: -100px 0;
+  background-position: calcP(6, 1)
 }
 .fa-sort:before{
-  background-position: -160px -120px;
+  background-position: calcP(9, 7)
 }
 .xmodule_display.xmodule_SequenceModule .sequence-nav ol li button.seq_other .icon::before{
-  background-position: -180px -100px;
+  background-position: calcP(10, 6)
 }
 .xmodule_display.xmodule_SequenceModule .sequence-nav ol li button.seq_video .icon::before{
-  background-position: -200px -100px;
+  background-position: calcP(11, 6)
 }
 .xmodule_display.xmodule_SequenceModule .sequence-nav ol li button.seq_problem .icon::before{
-  background-position: -40px -100px;
+  background-position: calcP(3, 6)
 }
 .fa-thumbs-up:before{
-  background-position: 0 -60px;
+  background-position: calcP(1, 4)
 }
 .fa-calendar:before{
-  background-position: -100px -20px;
+  background-position: calcP(9, 1);
+}
+.important-dates{
+  .fa-pencil:before{
+    background-position: calcP(8, 2);
+  }
 }
 .fa-envelope:before{
-  background-position: -160px -60px;
+  background-position: calcP(9, 4)
 }
 .fa-reorder:before{
-  background-position: 0 -100px;
-  transform: scale(0.85)
+  background-position: calcP(1, 6)
 }
 .fa-star:before{
-  background-position: -180px -120px;
+  background-position: calcP(10, 7)
 }
 .forum-nav-browse-menu-item:before{
   .fa-star:before{
@@ -131,17 +132,17 @@
   }
 }
 .fa-flag:before{
-  background-position: -80px -160px;
+  background-position: calcP(5, 9)
 }
 .fa-search:before{
-  background-position: -100px -60px;
+  background-position: calcP(6, 4);
 }
 .discussion-board{
   .fa-search:before{
-    background-position: -120px -60px;
+    background-position: calcP(7, 4);
   }
   .fa-plus:before{
-    background-position: -20px -160px;
+    background-position: calcP(2, 9)
   }
 }
 .wiki .fa-plus{
@@ -156,15 +157,34 @@
     top: 3px;
   }
 }
+.fa-times:before{
+  background-position: calcP(8, 4);
+  transform: scale(0.7);
+  position: relative;
+  top: 1px;
+}
+.find-courses .search-facets .facet-option.selected .count::before, .find-courses .search-facets .facet-option.selected:hover .count::before, .find-courses .search-facets .facet-option.selected:focus .count::before{
+  background-position: calcP(8, 4);
+  transform: scale(0.7);
+  position: relative;
+  top: 1px;
+  left: 6px;
+}
+.fa-remove:before{
+  background-position: calcP(6, 5);
+  transform: scale(0.8);
+  position: relative;
+  top: 1px;
+}
 
 
 // 2. 课程详情页的新icon
 // http://0.0.0.0:18000/courses/course-v1:edX+E2E-101+course/about
-.about-staff-content .fa-my{
+.fa-my{
   display: block;
-  height: 20px;
-  width: 20px;
-  background-size: 300px;
+  height: $icon-width;
+  width: $icon-width;
+  background-size: (600 / 40) * $icon-width;
   background-image: url("/static/normal-theme/images/iconfont.png");
   position: absolute;
   left: -33px;
@@ -172,20 +192,24 @@
 }
 
 .fa-my-professor{
-  background-position: -100px 0;
+  background-position: calcP(6, 1);
 }
 .fa-my-achieve{
-  background-position: -60px 0;
+  background-position: calcP(4, 1);
 }
 .fa-my-education{
-  background-position: -80px 0;
+  background-position: calcP(5, 1);
 }
 .fa-my-other{
-  background-position: -60px -20px;
+  background-position: calcP(4, 2);
 }
 .fa-my-article{
-  background-position: -120px -20px;
+  background-position: calcP(7, 2);
 }
 .fa-my-manage{
-  background-position: -60px -20px;
+  background-position: calcP(4, 2);
 }
+.fa-my-search{
+  background: calcP(9, 1)
+}
+

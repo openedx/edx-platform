@@ -1,8 +1,8 @@
 // course tabs
 .content-wrapper .course-tabs{  
-  overflow-x:auto;
   max-width: 1200px;
   margin: 0 auto;
+  overflow-x:hidden;
 
   .nav-item .nav-link{
     padding: 20px 15px 20px 10px;
@@ -284,4 +284,11 @@ body.view-in-course .wrapper-preview-menu, .wrapper-preview-menu{
 }
 
 @media screen and (max-width:576px){
+  #course-container.page-content{
+    padding: 10px;
+  }
+  #course-container .page-header .page-header-main .page-title{
+    font-size: 16px;
+    line-height: 1.8;
+  }
 }
