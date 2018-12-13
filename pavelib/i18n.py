@@ -283,6 +283,7 @@ def i18n_release_pull():
 
 
 @task
+@needs("pavelib.i18n.i18n_clean")
 def i18n_membership():
     sh("cp ../edx-membership/conf/locale/en/LC_MESSAGES/django.po ../edx-membership/conf/locale/en/LC_MESSAGES/django-saved.po")
     sh("cp ../edx-membership/conf/locale/en/LC_MESSAGES/djangojs.po ../edx-membership/conf/locale/en/LC_MESSAGES/djangojs-saved.po")
