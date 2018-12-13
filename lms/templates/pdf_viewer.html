@@ -32,23 +32,23 @@ http://sourceforge.net/adobe/cmap/wiki/License/
     <meta name="path_prefix" content="${EDX_ROOT_URL}">
     <title>${current_chapter['title'] if current_chapter else ''}</title>
 
-    <link rel="stylesheet" href="${static.url('/static/css/vendor/pdfjs/viewer.css')}"/>
+    <link rel="stylesheet" href="${static.url('css/vendor/pdfjs/viewer.css')}"/>
 
-    <script type="text/javascript" src="${static.url('/static/js/vendor/pdfjs/compatibility.js')}"></script>
+    <script type="text/javascript" src="${static.url('js/vendor/pdfjs/compatibility.js')}"></script>
 
     <!-- This snippet is used in production (included from viewer.html) -->
-    <link rel="resource" type="application/l10n" href="${static.url('/static/js/vendor/pdfjs/locale/locale.properties')}"/>
-    <script type="text/javascript" src="${static.url('/static/js/vendor/pdfjs/l10n.js')}"></script>
-    <script type="text/javascript" src="${static.url('/static/js/vendor/pdfjs/pdf.js')}"></script>
+    <link rel="resource" type="application/l10n" href="${static.url('js/vendor/pdfjs/locale/locale.properties')}"/>
+    <script type="text/javascript" src="${static.url('js/vendor/pdfjs/l10n.js')}"></script>
+    <script type="text/javascript" src="${static.url('js/vendor/pdfjs/pdf.js')}"></script>
 
     <script type="text/javascript">
-        PDFJS.imageResourcesPath = "${static.url('/static/css/vendor/pdfjs/images/') | n, js_escaped_string}";
-        PDFJS.workerSrc = "${static.url('/static/js/vendor/pdfjs/pdf.worker.js') | n, js_escaped_string}";
-        PDFJS.cMapUrl = "${static.url('/static/css/vendor/pdfjs/cmaps/') | n, js_escaped_string}";
+        PDFJS.imageResourcesPath = "${static.url('css/vendor/pdfjs/images/') | n, js_escaped_string}";
+        PDFJS.workerSrc = "${static.url('js/vendor/pdfjs/pdf.worker.js') | n, js_escaped_string}";
+        PDFJS.cMapUrl = "${static.url('css/vendor/pdfjs/cmaps/') | n, js_escaped_string}";
         PDF_URL = '${current_url | n, js_escaped_string}';
     </script>
 
-    <script ${static.url('/static/js/vendor/pdfjs/debugger.js')}></script>
+    <script ${static.url('js/vendor/pdfjs/debugger.js')}></script>
     
     <%static:js group='main_vendor'/>
     <%static:js group='application'/>
@@ -417,7 +417,7 @@ http://sourceforge.net/adobe/cmap/wiki/License/
     </div>
   </div>
 </div>
-    <script type="text/javascript" src="${static.url('/static/js/vendor/pdfjs/viewer.js')}"></script>
-    <script type="text/javascript" src="${static.url('/static/js/pdf-analytics.js')}"></script>
+    <script type="text/javascript" src="${static.url('js/vendor/pdfjs/viewer.js')}"></script>
+    <script type="text/javascript" src="${static.url('js/pdf-analytics.js')}"></script>
   </body>
 </html>
