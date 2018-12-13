@@ -101,15 +101,6 @@ def perform_request(method, url, data_or_params=None, raw=False,
 
     dog_stats_api.increment('comment_client.request.count', tags=metric_tags)
 
-    log.info(
-        u"comment_client_response_log: url={url}, response text (first 100 characters)='{text}', "
-        u"status_code={status_code}".format(
-            url=url,
-            status_code=response.status_code,
-            text=str(response.text)[:100]
-        )
-    )
-
     if 200 < response.status_code < 500:
         log.error(u"Comment Client Request Error on url={url} with error message='{text}' and "
                   u"status_code={status_code}".format(url=url, status_code=response.status_code,
