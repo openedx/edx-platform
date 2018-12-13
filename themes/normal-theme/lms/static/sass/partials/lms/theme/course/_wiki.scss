@@ -10,26 +10,30 @@ body.view-in-course .wiki-wrapper{
 
 // header
 .container .wiki-wrapper section.wiki .breadcrumbs-header{
-  padding: 10px 25px;
+  padding: 10px 20px;
   border-bottom: 1px solid $border-gray;
   background: #fff;
 
   .breadcrumb{
     margin: 0;
+    li a{
+      font-size: 14px;
+    }
+    li:after{
+      line-height: 30px;
+      font-size: 20px;
+      font-size: 20px;
+      color: #ccd1d9;
+      line-height: 30px;
+    }
+    .active a{
+      color: $font;
+    }
+    .active:after{
+      display: none;
+    }
   }
-  .breadcrumb li a{
-    font-size: 14px;
-  }
-  .breadcrumb li:after{
-    line-height: 30px;
-    font-size: 20px;
-    font-size: 20px;
-    color: #ccd1d9;
-    line-height: 30px;
-  }
-  .breadcrumb .active a{
-    color: $font;
-  }
+
 }
 .wiki-wrapper section.wiki .global-functions{
   margin:0;
@@ -85,7 +89,7 @@ body.view-in-course .wiki-wrapper{
 
 // content
 .wiki-wrapper section.wiki.view .main-article{
-  padding: 25px 0 40px 25px;
+  padding: 20px;
   h3{
     margin: 10px 0;
     border: none;
@@ -96,11 +100,27 @@ body.view-in-course .wiki-wrapper{
   .wiki-article{
     font-size: 14px;
     color: $font;
+    line-height: 1.8;
+
+    h1, h2, h3, h4, h5{
+      margin: 25px 0 15px;
+      padding: 0;
+      font-size: 16px;
+      color: $title;
+      border: none;
+      font-weight: bold;
+    }
+    h3,h4,h5{
+      font-size: 14px;
+    }
   }
 }
 
 @media screen and (max-width:576px){
   .wiki-wrapper section.wiki.view{
+    .global-functions{
+      display: none;
+    }
     .main-article, .article-functions{
       width: 100%;
       padding: 20px;
@@ -127,21 +147,30 @@ body.view-in-course .wiki-wrapper{
   }
 }
 
+.wiki-wrapper{
+  .paragon__alert-dismissible .paragon__close{
+    padding: 8px 12px;
+    background: none;
+    &:hover{
+      background: none;
+    }
+  }
+}
 // edit a wiki page
 .wiki-wrapper section.wiki{
   .btn.btn-primary{
     @extend %btn-my-primary;
+    span{ display: none; }
   }
   a.btn{
     @extend %btn-my-white;
     vertical-align: top;
+    span{ display: none; }
   }
   .btn.btn-danger{
     @extend %btn-my-white;
     box-shadow: none;
-    span:before{
-      vertical-align: sub;
-    }
+    span{ display: none;}
   }
 } 
 
@@ -159,3 +188,6 @@ body.view-in-course .wiki-wrapper{
     display: inline-block;
   }
 }
+
+// wiki page
+
