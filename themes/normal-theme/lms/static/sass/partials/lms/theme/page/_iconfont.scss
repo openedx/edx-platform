@@ -198,7 +198,10 @@ $icon-width: 18px;
   left: 3px;
 }
 .fa-newspaper-o:before{
-  background-position: 0px 0px;
+  background-position: calcP(9, 3);
+  position: relative;
+  top: 4px;
+  transform: scale(0.95);
 }
 
 

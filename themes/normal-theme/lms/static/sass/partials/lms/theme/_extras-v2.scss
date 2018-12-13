@@ -5,6 +5,11 @@
 // to add any custom rules that you need. You can also import
 // partials directly into this file so that you can break your
 // rules into modular pieces.
-@import './page/footer';
 
+
+@import './variables';
+@import './page/footer';
+body{
+  font-family: $font-family-sans-serif;
+}
 @import './course/course_search';
