@@ -19,6 +19,12 @@ CONTENT_TYPE_GATING_FLAG = WaffleFlag(
     flag_undefined_default=False
 )
 
+FEATURE_BASED_ENROLLMENT_GLOBAL_KILL_FLAG = WaffleFlag(
+    waffle_namespace=WAFFLE_FLAG_NAMESPACE,
+    flag_name=u'global_kill_switch',
+    flag_undefined_default=False
+)
+
 EXPERIMENT_ID = 11
 EXPERIMENT_DATA_HOLDBACK_KEY = 'holdback'
 

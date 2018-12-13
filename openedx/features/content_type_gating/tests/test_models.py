@@ -73,12 +73,9 @@ class TestContentTypeGatingConfig(CacheIsolationTestCase):
             user = self.user
             course_key = self.course_overview.id
 
-        if already_enrolled and pass_enrollment:
-            query_count = 7
-        elif not pass_enrollment and already_enrolled:
-            query_count = 8
-        else:
-            query_count = 7
+        query_count = 8
+        if not pass_enrollment and already_enrolled:
+            query_count = 9
 
         with self.assertNumQueries(query_count):
             enabled = ContentTypeGatingConfig.enabled_for_enrollment(
