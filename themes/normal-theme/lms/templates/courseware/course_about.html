@@ -296,8 +296,6 @@ from six import string_types
     <div class="course-sidebar">
       <div class="course-summary">
 
-        <%include file="course_about_sidebar_header.html" />
-
         <%block name="course_about_important_dates">
         <ol class="important-dates">
           <li class="important-dates-item"><span class="icon fa fa-info-circle" aria-hidden="true"></span><p class="important-dates-item-title">${_("Course Number")}</p><span class="important-dates-item-text course-number">${course.display_number_with_default | h}</span></li>
@@ -375,6 +373,8 @@ from six import string_types
           % endif
         </ol>
         </%block>
+        
+        <%include file="course_about_sidebar_header.html" />
     </div>
 
       <%block name="course_about_reviews_tool">

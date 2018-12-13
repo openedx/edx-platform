@@ -49,11 +49,21 @@
     
     .wrapper-course-details .wrapper-course-actions .enter-course{
       @extend %btn-my-primary;
+      line-height: 34px;
     }
 
     a.enter-course-blocked.course-target-link{
       @extend %btn-my-disable;
       margin-bottom: 5px;
+    }
+    .wrapper-messages-primary .message.message-upsell .action-upgrade-container,
+    .wrapper-messages-primary .message.message-upsell .action-upgrade{
+      @extend $btn-my-primary;
+      background: #40A24D;
+      padding: 8px 15px;
+      .copy{
+        margin-right: 0;
+      }
     }
   }
 
@@ -80,6 +90,9 @@
     border: 1px solid #ffe4d1;
     margin-top: 20px;
     text-align: right;
+    background-image: url("/static/normal-theme/images/crown2.png");
+    background-repeat: no-repeat;
+    background-position: right 10px;
   }
   .status-verification .status-title{
     color: #fa7f2b;
@@ -119,7 +132,7 @@
 }
 
 // search-bar
-.dashboard-search-bar{
+.search-bar{
   margin: 0 0 10px;
   label{
     display: none;
@@ -127,7 +140,16 @@
   .search-field{
     font-size: 14px;
     border: 1px solid $blue;
+
+    .search-button{
+      &:hover, &:focus, &:active, &:hover:hover, &:hover:focus, &:hover:active{
+        background: $blue;
+        opacity: 0.95;
+        outline: none;
+      }
+    }
   }
+  
 }
 
 .dashboard-search-results{
@@ -147,13 +169,15 @@
     }
   }
   
+  .search-results-item .result-excerpt{
+    margin-bottom: 5px;
+  }
+
   .search-results .search-results-item{
     border-bottom: 1px solid $border;
     padding: 15px;
 
-    .result-excerpt{
-      margin-bottom: 10px;
-    }
+    
     .result-location, .result-course-name{
       color: $font;
     }
@@ -206,6 +230,9 @@
   display: none;
 }
 
+.wrapper-messages-primary .message.message-upsell .action-upgrade .action-upgrade-icon{
+  display: none;
+}
 @media screen and (max-width: 992px){
   .dashboard .main-container{
     padding: 20px 0 0;
@@ -217,5 +244,7 @@
   .wrapper-messages-primary .message{
     padding: 10px 20px;
   }
-  
+  .search-results .search-results-item .result-type{
+    bottom: 40px;
+  }
 }

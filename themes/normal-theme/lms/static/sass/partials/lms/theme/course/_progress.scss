@@ -86,11 +86,21 @@ body.view-in-course .profile-wrapper{
       padding: 0 10px;
       >section{
         padding-bottom: 10px;
-  
+        
+        > .hd-3{
+          font-size: 16px;
+          margin-left: 10px;
+          margin-bottom: 10px;
+        }
+
+        >div .hd-4 a{
+          font-size: 14px;
+        }
         .hd{
           width: 100%;
           display: block;
           margin-bottom: 5px;
+          font-size: 14px;
         }
         .sections{
           width: 100%;
