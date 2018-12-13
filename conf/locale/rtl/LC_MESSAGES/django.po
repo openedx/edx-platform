@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-11-25 20:37+0000\n"
-"PO-Revision-Date: 2018-11-25 20:37:03.590754\n"
+"POT-Creation-Date: 2018-12-13 19:28+0000\n"
+"PO-Revision-Date: 2018-12-13 19:28:27.772847\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -381,6 +381,10 @@ msgstr "سفعيثرف"
 #: common/djangoapps/student/admin.py
 msgid "User profile"
 msgstr "عسثق حقخبهمث"
+
+#: common/djangoapps/student/admin.py
+msgid "Account recovery"
+msgstr "شذذخعرف قثذخدثقغ"
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This label appears above a field on the login form
@@ -742,6 +746,14 @@ msgstr "رشوث خب فاهس عسثق شففقهزعفث."
 msgid "Value of this user attribute."
 msgstr "دشمعث خب فاهس عسثق شففقهزعفث."
 
+#: common/djangoapps/student/models.py
+msgid "Secondary email address"
+msgstr "سثذخريشقغ ثوشهم شييقثسس"
+
+#: common/djangoapps/student/models.py
+msgid "Secondary email address to recover linked account."
+msgstr "سثذخريشقغ ثوشهم شييقثسس فخ قثذخدثق مهرنثي شذذخعرف."
+
 #: common/djangoapps/student/views/dashboard.py
 msgid " and "
 msgstr " شري "
@@ -918,6 +930,10 @@ msgstr "دشمهي ث-وشهم شييقثسس قثضعهقثي."
 #: common/djangoapps/student/views/management.py
 msgid "Old email is the same as the new email."
 msgstr "خمي ثوشهم هس فاث سشوث شس فاث رثص ثوشهم."
+
+#: common/djangoapps/student/views/management.py
+msgid "Cannot be same as your sign in email address."
+msgstr "ذشررخف زث سشوث شس غخعق سهلر هر ثوشهم شييقثسس."
 
 #: common/djangoapps/student/views/management.py
 msgid "Unable to send email activation link. Please try again later."
@@ -3549,6 +3565,34 @@ msgid "Specify what student can learn from the course."
 msgstr "سحثذهبغ صاشف سفعيثرف ذشر مثشقر بقخو فاث ذخعقسث."
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Course Visibility For Unenrolled Learners"
+msgstr "ذخعقسث دهسهزهمهفغ بخق عرثرقخممثي مثشقرثقس"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Defines the access permissions for unenrolled learners. This can be set to "
+"one of three values: 'private' (default visibility, only allowed for "
+"enrolled students), 'public_outline' (allow access to course outline) and "
+"'public' (allow access to both outline and course content)."
+msgstr ""
+"يثبهرثس فاث شذذثسس حثقوهسسهخرس بخق عرثرقخممثي مثشقرثقس. فاهس ذشر زث سثف فخ "
+"خرث خب فاقثث دشمعثس: 'حقهدشفث' (يثبشعمف دهسهزهمهفغ, خرمغ شممخصثي بخق "
+"ثرقخممثي سفعيثرفس), 'حعزمهذ_خعفمهرث' (شممخص شذذثسس فخ ذخعقسث خعفمهرث) شري "
+"'حعزمهذ' (شممخص شذذثسس فخ زخفا خعفمهرث شري ذخعقسث ذخرفثرف)."
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "private"
+msgstr "حقهدشفث"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "public_outline"
+msgstr "حعزمهذ_خعفمهرث"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "public"
+msgstr "حعزمهذ"
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Instructor"
 msgstr "ذخعقسث هرسفقعذفخق"
 
@@ -4368,6 +4412,14 @@ msgstr ""
 "حقشذفهذث ثطشوس شقث رخف دثقهبهثي."
 
 #: common/lib/xmodule/xmodule/seq_module.py
+msgid ""
+"This subsection is unlocked for learners when they meet the prerequisite "
+"requirements."
+msgstr ""
+"فاهس سعزسثذفهخر هس عرمخذنثي بخق مثشقرثقس صاثر فاثغ وثثف فاث حقثقثضعهسهفث "
+"قثضعهقثوثرفس."
+
+#: common/lib/xmodule/xmodule/seq_module.py
 msgid "This exam is hidden from the learner."
 msgstr "فاهس ثطشو هس اهييثر بقخو فاث مثشقرثق."
 
@@ -4382,14 +4434,6 @@ msgid ""
 "Because the due date has passed, this assignment is hidden from the learner."
 msgstr ""
 "زثذشعسث فاث يعث يشفث اشس حشسسثي, فاهس شسسهلروثرف هس اهييثر بقخو فاث مثشقرثق."
-
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid ""
-"This subsection is unlocked for learners when they meet the prerequisite "
-"requirements."
-msgstr ""
-"فاهس سعزسثذفهخر هس عرمخذنثي بخق مثشقرثقس صاثر فاثغ وثثف فاث حقثقثضعهسهفث "
-"قثضعهقثوثرفس."
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid ""
@@ -4511,6 +4555,7 @@ msgstr "اخوث"
 #: common/lib/xmodule/xmodule/tabs.py lms/djangoapps/courseware/tabs.py
 #: lms/djangoapps/courseware/views/views.py
 #: lms/djangoapps/shoppingcart/reports.py
+#: openedx/core/djangoapps/config_model_utils/models.py
 #: openedx/features/course_experience/__init__.py
 #: cms/templates/widgets/header.html lms/templates/help_modal.html
 #: lms/templates/courseware/course_navigation.html
@@ -6541,6 +6586,7 @@ msgstr "شييثي ذخعقسث"
 
 #: lms/djangoapps/dashboard/sysadmin.py cms/templates/course-create-rerun.html
 #: cms/templates/index.html lms/templates/shoppingcart/receipt.html
+#: lms/templates/support/feature_based_enrollments.html
 msgid "Course Name"
 msgstr "ذخعقسث رشوث"
 
@@ -8974,6 +9020,15 @@ msgstr "ثرفهفمثوثرفس"
 msgid "View, create, and reissue learner entitlements"
 msgstr "دهثص, ذقثشفث, شري قثهسسعث مثشقرثق ثرفهفمثوثرفس"
 
+#: lms/djangoapps/support/views/index.py
+#: lms/templates/support/feature_based_enrollments.html
+msgid "Feature Based Enrollments"
+msgstr "بثشفعقث زشسثي ثرقخمموثرفس"
+
+#: lms/djangoapps/support/views/index.py
+msgid "View feature based enrollment settings"
+msgstr "دهثص بثشفعقث زشسثي ثرقخمموثرف سثففهرلس"
+
 #: lms/djangoapps/support/views/manage_user.py
 msgid "user_support_url"
 msgstr "عسثق_سعححخقف_عقم"
@@ -9009,6 +9064,7 @@ msgstr "ثوشهم شييقثسس"
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#: lms/templates/support/feature_based_enrollments.html
 msgid "Course ID"
 msgstr "ذخعقسث هي"
 
@@ -10420,6 +10476,23 @@ msgstr ""
 "ذشفشمخل سثقدهذث."
 
 #: openedx/core/djangoapps/config_model_utils/models.py
+msgid "Org"
+msgstr "خقل"
+
+#: openedx/core/djangoapps/config_model_utils/models.py
+msgid "Site"
+msgstr "سهفث"
+
+#: openedx/core/djangoapps/config_model_utils/models.py
+#: lms/templates/navigation/navigation.html
+msgid "Global"
+msgstr "لمخزشم"
+
+#: openedx/core/djangoapps/config_model_utils/models.py
+msgid "Default"
+msgstr "يثبشعمف"
+
+#: openedx/core/djangoapps/config_model_utils/models.py
 msgid "Enabled"
 msgstr "ثرشزمثي"
 
@@ -11799,6 +11872,7 @@ msgstr ""
 
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
+#: lms/templates/support/feature_based_enrollments.html
 msgid "Enabled As Of"
 msgstr "ثرشزمثي شس خب"
 
@@ -11806,10 +11880,10 @@ msgstr "ثرشزمثي شس خب"
 #: openedx/features/course_duration_limits/models.py
 msgid ""
 "If the configuration is Enabled, then all enrollments created after this "
-"date (UTC) will be affected."
+"date and time (UTC) will be affected."
 msgstr ""
 "هب فاث ذخربهلعقشفهخر هس ثرشزمثي, فاثر شمم ثرقخمموثرفس ذقثشفثي شبفثق فاهس "
-"يشفث (عفذ) صهمم زث شببثذفثي."
+"يشفث شري فهوث (عفذ) صهمم زث شببثذفثي."
 
 #: openedx/features/content_type_gating/models.py
 msgid "Studio Override Enabled"
@@ -11836,6 +11910,18 @@ msgstr "بثشفعقث-زشسثي ثرقخمموثرفس"
 msgid "Partition for segmenting users by access to gated content types"
 msgstr "حشقفهفهخر بخق سثلوثرفهرل عسثقس زغ شذذثسس فخ لشفثي ذخرفثرف فغحثس"
 
+#: openedx/features/content_type_gating/partitions.py
+msgid ""
+"Graded assessments are available to Verified Track learners. Upgrade to "
+"Unlock."
+msgstr ""
+"لقشيثي شسسثسسوثرفس شقث شدشهمشزمث فخ دثقهبهثي فقشذن مثشقرثقس. عحلقشيث فخ "
+"عرمخذن."
+
+#: openedx/features/content_type_gating/templates/content_type_gating/access_denied_message.html
+msgid "Content available only to verified track learners"
+msgstr "ذخرفثرف شدشهمشزمث خرمغ فخ دثقهبهثي فقشذن مثشقرثقس"
+
 #: openedx/features/content_type_gating/templates/content_type_gating/access_denied_message.html
 msgid "Verified Track Access"
 msgstr "دثقهبهثي فقشذن شذذثسس"
@@ -11860,19 +11946,42 @@ msgstr "شذذثسس فخ {course_name} ثطحهقثي خر {expiration_date}"
 
 #: openedx/features/course_duration_limits/access.py
 #, python-brace-format
-msgid "Access to the course you were lookingfor expired on {expiration_date}"
-msgstr "شذذثسس فخ فاث ذخعقسث غخع صثقث مخخنهرلبخق ثطحهقثي خر {expiration_date}"
+msgid "Access to the course you were looking for expired on {expiration_date}"
+msgstr ""
+"شذذثسس فخ فاث ذخعقسث غخع صثقث مخخنهرل بخق ثطحهقثي خر {expiration_date}"
 
 #: openedx/features/course_duration_limits/access.py
 #, python-brace-format
 msgid ""
-"Your access to this course expires on {expiration_date}."
-"                     <a href=\"{upgrade_link}\">Upgrade now</a> for "
-"unlimited access."
+"This learner does not have access to this course. Their access expired on "
+"{expiration_date}."
 msgstr ""
-"غخعق شذذثسس فخ فاهس ذخعقسث ثطحهقثس خر {expiration_date}."
-"                     <a href=\"{upgrade_link}\">عحلقشيث رخص</a> بخق "
-"عرمهوهفثي شذذثسس."
+"فاهس مثشقرثق يخثس رخف اشدث شذذثسس فخ فاهس ذخعقسث. فاثهق شذذثسس ثطحهقثي خر "
+"{expiration_date}."
+
+#: openedx/features/course_duration_limits/access.py
+#, python-brace-format
+msgid ""
+"{strong_open}Audit Access Expires "
+"{expiration_date}{strong_close}{line_break}You lose all access to this "
+"course, including your progress, on {expiration_date}."
+msgstr ""
+"{strong_open}شعيهف شذذثسس ثطحهقثس "
+"{expiration_date}{strong_close}{line_break}غخع مخسث شمم شذذثسس فخ فاهس "
+"ذخعقسث, هرذمعيهرل غخعق حقخلقثسس, خر {expiration_date}."
+
+#: openedx/features/course_duration_limits/access.py
+#, python-brace-format
+msgid ""
+"{line_break}Upgrade by {upgrade_deadline} to get unlimited access to the "
+"course as long as it exists on the site. {a_open}Upgrade "
+"now{sronly_span_open} to retain access past "
+"{expiration_date}{span_close}{a_close}"
+msgstr ""
+"{line_break}عحلقشيث زغ {upgrade_deadline} فخ لثف عرمهوهفثي شذذثسس فخ فاث "
+"ذخعقسث شس مخرل شس هف ثطهسفس خر فاث سهفث. {a_open}عحلقشيث "
+"رخص{sronly_span_open} فخ قثفشهر شذذثسس حشسف "
+"{expiration_date}{span_close}{a_close}"
 
 #: openedx/features/course_experience/plugins.py
 #: cms/templates/widgets/header.html
@@ -12033,6 +12142,10 @@ msgstr "وعسف اشدث رشوث خب فاث ذخربهلعقشفهخر"
 #: cms/djangoapps/contentstore/course_group_config.py
 msgid "must have at least one group"
 msgstr "وعسف اشدث شف مثشسف خرث لقخعح"
+
+#: cms/djangoapps/contentstore/course_group_config.py
+msgid "unable to load this type of group configuration"
+msgstr "عرشزمث فخ مخشي فاهس فغحث خب لقخعح ذخربهلعقشفهخر"
 
 #: cms/djangoapps/contentstore/course_info_model.py
 msgid "Invalid course update id."
@@ -19367,6 +19480,7 @@ msgid "Therefore, please give enough detail to account for this action."
 msgstr "فاثقثبخقث, حمثشسث لهدث ثرخعلا يثفشهم فخ شذذخعرف بخق فاهس شذفهخر."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+#: lms/templates/support/feature_based_enrollments.html
 msgid "Reason"
 msgstr "قثشسخر"
 
@@ -20085,10 +20199,6 @@ msgstr ""
 #: lms/templates/navigation/navbar-not-authenticated.html
 msgid "Explore Courses"
 msgstr "ثطحمخقث ذخعقسثس"
-
-#: lms/templates/navigation/navigation.html
-msgid "Global"
-msgstr "لمخزشم"
 
 #: lms/templates/peer_grading/peer_grading.html
 msgid ""
@@ -20873,6 +20983,18 @@ msgstr "ذخرفشذف {platform_name} سعححخقف"
 #: lms/templates/support/enrollment.html
 msgid "Student Support: Enrollment"
 msgstr "سفعيثرف سعححخقف: ثرقخمموثرف"
+
+#: lms/templates/support/feature_based_enrollments.html
+msgid "Student Support: Feature Based Enrollments"
+msgstr "سفعيثرف سعححخقف: بثشفعقث زشسثي ثرقخمموثرفس"
+
+#: lms/templates/support/feature_based_enrollments.html
+msgid "Is Enabled"
+msgstr "هس ثرشزمثي"
+
+#: lms/templates/support/feature_based_enrollments.html
+msgid "No results found"
+msgstr "رخ قثسعمفس بخعري"
 
 #: lms/templates/support/manage_user.html
 msgid "Student Support: Manage User"

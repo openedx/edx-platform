@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-11-25 20:36+0000\n"
-"PO-Revision-Date: 2018-11-25 20:37:03.145083\n"
+"POT-Creation-Date: 2018-12-13 19:28+0000\n"
+"PO-Revision-Date: 2018-12-13 19:28:28.152220\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -4834,6 +4834,14 @@ msgstr ""
 "غخع قثذثهدث وثسسشلثس بقخو {platform_name} شري ذخعقسث فثشوس شف فاهس شييقثسس."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Secondary Email Address"
+msgstr "سثذخريشقغ ثوشهم شييقثسس"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "You may access your account when single-sign on is not available."
+msgstr "غخع وشغ شذذثسس غخعق شذذخعرف صاثر سهرلمث-سهلر خر هس رخف شدشهمشزمث."
+
+#: lms/static/js/student_account/views/account_settings_factory.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Full Name"
 msgstr "بعمم رشوث"
@@ -6247,8 +6255,12 @@ msgid "Visibility"
 msgstr "دهسهزهمهفغ"
 
 #: cms/static/js/views/modals/edit_xblock.js
-msgid "Editing: %(title)s"
-msgstr "ثيهفهرل: %(title)s"
+msgid "Editing: {title}"
+msgstr "ثيهفهرل: {title}"
+
+#: cms/static/js/views/modals/edit_xblock.js
+msgid "Plugins"
+msgstr "حمعلهرس"
 
 #: cms/static/js/views/modals/edit_xblock.js
 #: lms/templates/ccx/schedule.underscore
@@ -10485,6 +10497,10 @@ msgid ""
 msgstr ""
 "هب فاث سعزسثذفهخر يخثس رخف اشدث ش يعث يشفث, مثشقرثقس شمصشغس سثث فاثهق سذخقثس"
 " صاثر فاثغ سعزوهف شرسصثقس فخ شسسثسسوثرفس."
+
+#: cms/templates/js/show-textbook.underscore
+msgid "PDF Chapters"
+msgstr "حيب ذاشحفثقس"
 
 #: cms/templates/js/show-textbook.underscore
 msgid "View Live"

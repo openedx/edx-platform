@@ -46,7 +46,7 @@
 # UAbierta Universidad de Chile <uabierta@u.uchile.cl>, 2015
 # Valeria Freire <valtodopds@hotmail.com>, 2014-2015
 # Yovany Alexander Álvarez Correa <yalvarez@innovapues.com>, 2018
-# José Luis Sandoval Alaguna <alagunajs@gmail.com>, 2016
+# José Luis <alagunajs@gmail.com>, 2016
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/).
 # Copyright (C) 2018 EdX
@@ -73,6 +73,7 @@
 # Juan <juan.marrero@utec.edu.uy>, 2015
 # Laura Silva <lingison@edx.org>, 2015-2016
 # Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013
+# Marina Pastor <mpastor@edx.org>, 2018
 # Natalia, 2013
 # Natalia, 2014,2018
 # Ned Batchelder <ned@edx.org>, 2017
@@ -144,9 +145,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-11-18 20:42+0000\n"
-"PO-Revision-Date: 2018-08-02 22:07+0000\n"
-"Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>\n"
+"POT-Creation-Date: 2018-12-13 16:59+0000\n"
+"PO-Revision-Date: 2018-12-09 20:43+0000\n"
+"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
@@ -206,7 +207,7 @@ msgstr "Borrar"
 #: cms/static/js/views/validation.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/common/js/components/utils/view_utils.js
-#: lms/static/js/Markdown.Editor.js lms/static/js/writable_gradebook.js
+#: lms/static/js/Markdown.Editor.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 #: cms/templates/js/add-xblock-component-menu.underscore
 #: cms/templates/js/certificate-editor.underscore
@@ -333,7 +334,6 @@ msgstr "Subir archivo"
 #: cms/static/js/views/modals/base_modal.js
 #: cms/static/js/views/modals/course_outline_modals.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: lms/static/js/writable_gradebook.js
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/content-group-editor.underscore
 #: cms/templates/js/course_info_handouts.underscore
@@ -2722,6 +2722,7 @@ msgstr "Enviar"
 msgid "Sign in to {platform} so we can help you better."
 msgstr "Ingrese a  {platform} para que podamos ayudarle mejor."
 
+#: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 #: lms/templates/student_account/hinted_login.underscore
 #: lms/templates/student_account/login.underscore
 msgid "Sign in"
@@ -2729,7 +2730,7 @@ msgstr "Iniciar sesión"
 
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Create an {platform} account"
-msgstr ""
+msgstr "Crear una cuenta en {platform}"
 
 #: lms/djangoapps/support/static/support/jsx/single_support_form.jsx
 msgid ""
@@ -3997,7 +3998,6 @@ msgstr "Marcar código de inscripción como no utilizado"
 
 #: lms/static/js/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
-#: lms/static/js/writable_gradebook.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 #: cms/templates/js/transcript-organization-credentials.underscore
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
@@ -4292,10 +4292,13 @@ msgid ""
 "Error getting enrollment status for '<%- student_id %>'. Make sure that the "
 "student identifier is spelled correctly."
 msgstr ""
+"Error al intentar recibir el estatus de registro de '<%- student_id %>'. "
+"Asegúrate de que el identificador del estudiante está correctamente escrito."
+" "
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Retrieving enrollment status..."
-msgstr ""
+msgstr "Recuperando el estatus de registro..."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4840,6 +4843,8 @@ msgstr "Antes de continuar, por favor {htmlStart} active su cuenta {htmlEnd}."
 msgid ""
 "{htmlStart}Want to change your email, name, or password instead?{htmlEnd}"
 msgstr ""
+"{htmlStart}En lugar de eso, ¿quieres cambiar tu correo electrónico, nombre o"
+" contraseña?{htmlEnd}"
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
@@ -4848,6 +4853,10 @@ msgid ""
 "{strongStart}you will no longer be able to use the same email on "
 "edX.{strongEnd}"
 msgstr ""
+"{strongStart}Warning: La eliminación de la cuenta es permanente.{strongEnd} "
+"Por favor lee la información de más arriba con atención antes de proceder. "
+"Esta es una acción irreversible, y {strongStart}no podrás volver a usar el "
+"mismo correo electrónico en edX.{strongEnd}"
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid "We’re sorry to see you go!"
@@ -5056,6 +5065,14 @@ msgid ""
 "You receive messages from {platform_name} and course teams at this address."
 msgstr ""
 "Recibe mensajes de {platform_name} y equipos del curso en esta dirección."
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Secondary Email Address"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "You may access your account when single-sign on is not available."
+msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
@@ -5498,32 +5515,6 @@ msgstr "KB"
 msgid "MB"
 msgstr "MB"
 
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Total"
-msgstr "Total"
-
-#: lms/static/js/writable_gradebook.js
-msgid "The Assignment name is:"
-msgstr ""
-
-#: lms/static/js/writable_gradebook.js
-msgid "Publish grades"
-msgstr ""
-
-#: lms/static/js/writable_gradebook.js
-msgid "No matching records found"
-msgstr ""
-
-#: lms/static/js/writable_gradebook.js
-msgid "Student Name"
-msgstr ""
-
-#: lms/static/js/writable_gradebook.js
-msgid "Update in progress, please wait..."
-msgstr ""
-
 #: lms/static/lms/js/preview/preview_factory.js
 msgid "Course is not yet visible to students."
 msgstr "El curso aún no está visible para los estudiantes."
@@ -5681,10 +5672,13 @@ msgid ""
 "This may be happening because of an error with our server or your internet "
 "connection. Try refreshing the page or making sure you are online."
 msgstr ""
+"Esto puede estar sucediendo debido a un error con nuestros servidores o con "
+"tu conexión a Internet. Intenta refrescar la página o verifica tu acceso a "
+"Internet."
 
 #: cms/static/cms/js/main.js
 msgid "Studio's having trouble saving your work"
-msgstr ""
+msgstr "Studio tiene problemas para guardar tu trabajo"
 
 #: cms/static/cms/js/xblock/cms.runtime.v1.js
 msgid "OpenAssessment Save Error"
@@ -5692,11 +5686,11 @@ msgstr ""
 
 #: cms/static/js/base.js
 msgid "This link will open in a new browser window/tab"
-msgstr ""
+msgstr "Este enlace se abrirá en una nueva ventana o pestaña del navegador"
 
 #: cms/static/js/base.js
 msgid "This link will open in a modal window"
-msgstr ""
+msgstr "Este enlace se abrirá en una ventana modal"
 
 #: cms/static/js/certificates/collections/certificates.js
 msgid "Could not parse certificate JSON. %(message)s"
@@ -5753,7 +5747,7 @@ msgstr "Esta acción no se puede deshacer."
 #: cms/static/js/views/show_textbook.js cms/static/js/views/tabs.js
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Deleting"
-msgstr ""
+msgstr "Borrando"
 
 #: cms/static/js/certificates/views/signatory_editor.js
 msgid "Upload signature image."
@@ -5832,56 +5826,62 @@ msgstr "Tiene cambios no guardados. ¿Realmente desea abandonar esta página?"
 
 #: cms/static/js/features/import/factories/import.js
 msgid "There was an error during the upload process."
-msgstr ""
+msgstr "Hubo un error durante el proceso de carga."
 
 #: cms/static/js/features/import/factories/import.js
 msgid "There was an error while unpacking the file."
-msgstr ""
+msgstr "Ha habido un error descomprimiendo el archivo"
 
 #: cms/static/js/features/import/factories/import.js
 msgid "There was an error while verifying the file you submitted."
-msgstr ""
+msgstr "Ha ocurrido un error al verificar el archivo que has enviado."
 
 #: cms/static/js/features/import/factories/import.js
 msgid "Choose new file"
-msgstr ""
+msgstr "Selecciona un nuevo archivo"
 
 #: cms/static/js/features/import/factories/import.js
 msgid ""
 "File format not supported. Please upload a file with a {ext} extension."
 msgstr ""
+"Formato de archivo no admitido. Debes cargar un archivo con la extensión "
+"{ext}"
 
 #: cms/static/js/features/import/factories/import.js
 msgid "There was an error while importing the new library to our database."
 msgstr ""
+"Ha habido un error mientras importábamos la nueva librería a nuestra base de"
+" datos."
 
 #: cms/static/js/features/import/factories/import.js
 msgid "There was an error while importing the new course to our database."
-msgstr ""
+msgstr "Ha habido un error importando el nuevo curso a nuestra base de datos."
 
 #: cms/static/js/features/import/factories/import.js
 msgid "Your import has failed."
-msgstr ""
+msgstr "Tu importación ha fallado."
 
 #: cms/static/js/features/import/views/import.js
 msgid "Your import is in progress; navigating away will abort it."
 msgstr ""
+"Tu importación está en progreso. Si abandonas esta página, dicha importación"
+" se cancelará."
 
 #: cms/static/js/features/import/views/import.js
 msgid "Error importing course"
-msgstr ""
+msgstr "Error al importar el curso"
 
 #: cms/static/js/features/import/views/import.js
 msgid "There was an error with the upload"
-msgstr ""
+msgstr "Ha habido un error con la subida del archivo"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Course Number:"
-msgstr ""
+msgstr "Número del curso:"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "(Read-only)"
-msgstr ""
+msgstr "(Solo-lectura)"
 
 #: cms/static/js/maintenance/force_publish_course.js
 msgid "Internal Server Error."
@@ -5901,19 +5901,19 @@ msgstr "Carga fallída"
 
 #: cms/static/js/models/chapter.js
 msgid "Chapter name and asset_path are both required"
-msgstr ""
+msgstr "Se requiere tanto el nombre del capítulo como la ruta_del_recurso"
 
 #: cms/static/js/models/chapter.js
 msgid "Chapter name is required"
-msgstr ""
+msgstr "Se requiere el nombre del capítulo"
 
 #: cms/static/js/models/chapter.js
 msgid "asset_path is required"
-msgstr ""
+msgstr "Se requiere la ruta_del_recurso"
 
 #: cms/static/js/models/course.js cms/static/js/models/section.js
 msgid "You must specify a name"
-msgstr ""
+msgstr "Debes especificar un nombre"
 
 #: cms/static/js/models/course_update.js
 msgid "Action required: Enter a valid date."
@@ -6025,22 +6025,25 @@ msgstr ""
 
 #: cms/static/js/models/textbook.js
 msgid "Textbook name is required"
-msgstr ""
+msgstr "Se requiere el nombre del libro de texto"
 
 #: cms/static/js/models/textbook.js
 msgid "Please add at least one chapter"
-msgstr ""
+msgstr "Por favor añade al menos un capítulo"
 
 #: cms/static/js/models/textbook.js
 msgid "All chapters must have a name and asset"
-msgstr ""
+msgstr "Todos los capítulos deben tener un nombre y un recurso"
 
 #: cms/static/js/models/uploads.js
 msgid ""
 "Only <%= fileTypes %> files can be uploaded. Please select a file ending in "
 "<%= fileExtensions %> to upload."
 msgstr ""
+"Sólo pueden cargarse archivos de tipo <%= fileTypes %>. Por favor selecciona"
+" un archivo que termine en <%= fileExtensions %> para ser cargado."
 
+#: cms/static/js/models/uploads.js
 #: lms/templates/student_account/hinted_login.underscore
 #: lms/templates/student_account/institution_login.underscore
 #: lms/templates/student_account/institution_register.underscore
@@ -6049,11 +6052,11 @@ msgstr "o"
 
 #: cms/static/js/models/xblock_validation.js
 msgid "This unit has validation issues."
-msgstr ""
+msgstr "Esta unidad tiene errores de validación"
 
 #: cms/static/js/models/xblock_validation.js
 msgid "This component has validation issues."
-msgstr ""
+msgstr "Este componente tiene errores de validación."
 
 #: cms/static/js/views/active_video_upload.js cms/static/js/views/assets.js
 msgid "Your file could not be uploaded"
@@ -6165,7 +6168,7 @@ msgstr "Cargar otro archivo"
 #: cms/static/js/views/components/add_xblock.js
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Adding"
-msgstr ""
+msgstr "Añadiendo"
 
 #: cms/static/js/views/course_info_update.js
 msgid "Are you sure you want to delete this update?"
@@ -6222,11 +6225,11 @@ msgstr "{selectedProvider} credenciales guardadas"
 
 #: cms/static/js/views/edit_chapter.js
 msgid "Upload a new PDF to “<%= name %>”"
-msgstr ""
+msgstr "Subir un nuevo PDF a “<%= name %>”"
 
 #: cms/static/js/views/edit_chapter.js
 msgid "Please select a PDF file to upload."
-msgstr ""
+msgstr "Por favor selecciona un archivo PDF para subir."
 
 #: cms/static/js/views/export.js
 msgid "There has been an error while exporting."
@@ -6336,29 +6339,31 @@ msgstr "Subir imagen del instructor."
 msgid "Files must be in JPEG or PNG format."
 msgstr "Los archivos deben estar en formato JPEG o PNG."
 
-#: cms/templates/js/license-selector.underscore
+#: cms/static/js/views/license.js cms/templates/js/license-selector.underscore
 msgid "All Rights Reserved"
-msgstr "Todos los Derechos Reservados"
+msgstr "Todos los derechos reservados"
 
 #: cms/static/js/views/license.js
 msgid "You reserve all rights for your work"
-msgstr ""
+msgstr "Te reservas todos los derechos por tu trabajo"
 
 #: cms/static/js/views/license.js
 msgid "Creative Commons"
-msgstr ""
+msgstr "Creative Commons"
 
 #: cms/static/js/views/license.js
 msgid "You waive some rights for your work, such that others can use it too"
 msgstr ""
+"Renuncias a algunos derechos de tu trabajo para que otros puedan usarlo "
+"también. "
 
 #: cms/static/js/views/license.js
 msgid "Version"
-msgstr ""
+msgstr "Versión"
 
 #: cms/static/js/views/license.js
 msgid "Attribution"
-msgstr ""
+msgstr "Atribución"
 
 #: cms/static/js/views/license.js
 msgid ""
@@ -6366,20 +6371,26 @@ msgid ""
 "but only if they give credit the way you request. Currently, this option is "
 "required."
 msgstr ""
+"Permitir que otros copien, distribuyan, muestren y represente tu trabajo con"
+" derechos de autor siempre y cuando se reconozca el crédito correspondiente "
+"de la forma que tú especifiques. Actualmente esta opción es necesaria."
 
 #: cms/static/js/views/license.js
 msgid "Noncommercial"
-msgstr ""
+msgstr "No comercial"
 
 #: cms/static/js/views/license.js
 msgid ""
 "Allow others to copy, distribute, display and perform your work - and "
 "derivative works based upon it - but for noncommercial purposes only."
 msgstr ""
+"Permitir que otros copien, distribuyan, muestren y representen tu trabajo – "
+"y otros trabajos derivados basados en este – pero solamente para fines no "
+"comerciales."
 
 #: cms/static/js/views/license.js
 msgid "No Derivatives"
-msgstr ""
+msgstr "No derivados"
 
 #: cms/static/js/views/license.js
 msgid ""
@@ -6387,6 +6398,9 @@ msgid ""
 "of your work, not derivative works based upon it. This option is "
 "incompatible with \"Share Alike\"."
 msgstr ""
+"Permitir que otros copien, distribuyan, muestren y representen solamente "
+"copias literales de tu trabajo, pero no trabajos derivados basados en este. "
+"Esta opción es incompatible con “Compartir igual”"
 
 #: cms/static/js/views/license.js
 msgid "Share Alike"
@@ -6398,6 +6412,9 @@ msgid ""
 "to the license that governs your work. This option is incompatible with \"No"
 " Derivatives\"."
 msgstr ""
+"Permitir la distribución de obras derivadas solamente bajo una licencia "
+"idéntica a la licencia que regula la obra original. Esta opción es "
+"incompatible con “No Derivadas”. "
 
 #: cms/static/js/views/list_item.js
 msgid "Delete this %(item_display_name)s?"
@@ -6501,20 +6518,25 @@ msgid "Visibility"
 msgstr "Visibilidad"
 
 #: cms/static/js/views/modals/edit_xblock.js
-msgid "Editing: %(title)s"
+msgid "Editing: {title}"
 msgstr ""
 
+#: cms/static/js/views/modals/edit_xblock.js
+msgid "Plugins"
+msgstr ""
+
+#: cms/static/js/views/modals/edit_xblock.js
 #: lms/templates/ccx/schedule.underscore
 msgid "Unit"
 msgstr "Unidad"
 
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Component"
-msgstr ""
+msgstr "Componente"
 
 #: cms/static/js/views/modals/move_xblock_modal.js
 msgid "Move"
-msgstr ""
+msgstr "Mover"
 
 #: cms/static/js/views/modals/move_xblock_modal.js
 msgid "Choose a location to move your component to"
@@ -6522,7 +6544,7 @@ msgstr ""
 
 #: cms/static/js/views/modals/move_xblock_modal.js
 msgid "Move: {displayName}"
-msgstr ""
+msgstr "Mover: {displayName}"
 
 #: cms/static/js/views/modals/validation_error_modal.js
 msgid "Validation Error While Saving"
@@ -6538,28 +6560,30 @@ msgstr "Cambiar Manualmente"
 
 #: cms/static/js/views/move_xblock_list.js
 msgid "Sections"
-msgstr ""
+msgstr "Secciones"
 
 #: cms/static/js/views/move_xblock_list.js
 msgid "Subsections"
-msgstr ""
+msgstr "Subsecciones"
 
 #: cms/static/js/views/move_xblock_list.js
 msgid "Units"
-msgstr ""
+msgstr "Unidades"
 
 #: cms/static/js/views/move_xblock_list.js
 msgid "Components"
-msgstr ""
+msgstr "Componentes"
 
+#: cms/static/js/views/move_xblock_list.js
 #: cms/templates/js/group-configuration-editor.underscore
 msgid "Groups"
 msgstr "Grupos"
 
 #: cms/static/js/views/move_xblock_list.js
 msgid "This {parentCategory} has no {childCategory}"
-msgstr ""
+msgstr "Esta {parentCategory} no tiene {childCategory}"
 
+#: cms/static/js/views/move_xblock_list.js
 #: cms/templates/js/group-configuration-details.underscore
 #: cms/templates/js/partition-group-details.underscore
 msgid "Course Outline"
@@ -6567,16 +6591,17 @@ msgstr "Estructura del curso"
 
 #: cms/static/js/views/paged_container.js
 msgid "Date added"
-msgstr ""
+msgstr "Fecha de adición"
 
 #: cms/static/js/views/pages/container.js
 msgid "Editing access for: %(title)s"
-msgstr ""
+msgstr "Editando el acceso para: %(title)s"
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Publishing"
-msgstr ""
+msgstr "Publicando"
 
+#: cms/static/js/views/pages/container_subviews.js
 #: cms/templates/js/course-video-settings-update-org-credentials-footer.underscore
 #: cms/templates/js/course-video-settings-update-settings-footer.underscore
 #: cms/templates/js/publish-xblock.underscore
@@ -6588,18 +6613,20 @@ msgid ""
 "Are you sure you want to revert to the last published version of the unit? "
 "You cannot undo this action."
 msgstr ""
+"¿Estás seguro de que deseas revertir el contenido de esta unidad a la ultima"
+" versión publicada? Esta acción no se puede deshacer."
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Discarding Changes"
-msgstr ""
+msgstr "Descartando cambios"
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Hiding from Students"
-msgstr ""
+msgstr "Oculto a los estudiantes"
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Explicitly Hiding from Students"
-msgstr ""
+msgstr "Ocultar solo a los estudiantes"
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Inheriting Student Visibility"
@@ -6607,7 +6634,7 @@ msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Make Visible to Students"
-msgstr ""
+msgstr "Hacer visible a los estudiantes"
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid ""
@@ -6615,10 +6642,13 @@ msgid ""
 "you made to the unit when it was hidden will now be visible to students. Do "
 "you want to proceed?"
 msgstr ""
+"Si la unidad fue publicada anteriormente y liberada a los estudiantes, "
+"cualquier cambio realizado cuando estaba oculta será ahora visible para los "
+"estudiantes. ¿Deseas proceder?"
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Making Visible to Students"
-msgstr ""
+msgstr "Haciendo visible a los estudiantes"
 
 #: cms/static/js/views/pages/course_outline.js
 msgid "Course Index"
@@ -6630,39 +6660,47 @@ msgstr "Hubo errores al reindexar el curso."
 
 #: cms/static/js/views/pages/paged_container.js
 msgid "Hide Previews"
-msgstr ""
+msgstr "Ocultar vistas previas"
 
 #: cms/static/js/views/pages/paged_container.js
 msgid "Show Previews"
-msgstr ""
+msgstr "Mostrar vistas previas"
 
 #: cms/static/js/views/paging_header.js
 msgid ""
 "Showing {currentItemRange} out of {totalItemsCount}, filtered by "
 "{assetType}, sorted by {sortName} ascending"
 msgstr ""
+"Mostrando {currentItemRange} de {totalItemsCount}, filtrado por {assetType},"
+" ordenado por {sortName} ascendente"
 
 #: cms/static/js/views/paging_header.js
 msgid ""
 "Showing {currentItemRange} out of {totalItemsCount}, filtered by "
 "{assetType}, sorted by {sortName} descending"
 msgstr ""
+"Mostrando {currentItemRange} de {totalItemsCount}, filtrado por {assetType},"
+" ordenado por {sortName} descendiente"
 
 #: cms/static/js/views/paging_header.js
 msgid ""
 "Showing {currentItemRange} out of {totalItemsCount}, sorted by {sortName} "
 "ascending"
 msgstr ""
+"Mostrando {currentItemRange} de {totalItemsCount}, ordenado por {sortName} "
+"ascendiente"
 
 #: cms/static/js/views/paging_header.js
 msgid ""
 "Showing {currentItemRange} out of {totalItemsCount}, sorted by {sortName} "
 "descending"
 msgstr ""
+"Mostrando {currentItemRange} de {totalItemsCount}, ordenado por {sortName} "
+"descendiente"
 
 #: cms/static/js/views/paging_header.js
 msgid "{totalItems} total"
-msgstr ""
+msgstr "{totalItems} total"
 
 #: cms/static/js/views/partition_group_item.js
 #: cms/static/js/views/partition_group_list.js
@@ -6751,23 +6789,28 @@ msgstr "Subir tu miniatura de la imagen del video"
 
 #: cms/static/js/views/show_textbook.js
 msgid "Delete “<%= name %>”?"
-msgstr ""
+msgstr "¿Borrar “<%= name %>”?"
 
 #: cms/static/js/views/show_textbook.js
 msgid ""
 "Deleting a textbook cannot be undone and once deleted any reference to it in"
 " your courseware's navigation will also be removed."
 msgstr ""
+"El borrado de un libro de texto no se puede deshacer y una vez borrado, "
+"cualquier referencia al mismo en la navegación del curso será eliminada."
 
 #: cms/static/js/views/tabs.js
 msgid "Delete Page Confirmation"
-msgstr ""
+msgstr "Confirmación de eliminación de página"
 
 #: cms/static/js/views/tabs.js
 msgid ""
 "Are you sure you want to delete this page? This action cannot be undone."
 msgstr ""
+"¿Estás seguro de que deseas borrar esta página? Esta acción no se puede "
+"deshacer."
 
+#: cms/static/js/views/uploads.js
 #: cms/templates/js/metadata-file-uploader-item.underscore
 #: cms/templates/js/video/metadata-translations-item.underscore
 msgid "Upload"
@@ -6775,7 +6818,7 @@ msgstr "Subir"
 
 #: cms/static/js/views/uploads.js
 msgid "We're sorry, there was an error"
-msgstr ""
+msgstr "Lo sentimos, ha habido un error"
 
 #: cms/static/js/views/utils/create_course_utils.js
 msgid ""
@@ -6795,7 +6838,7 @@ msgstr ""
 
 #: cms/static/js/views/utils/move_xblock_utils.js
 msgid "Success! \"{displayName}\" has been moved."
-msgstr ""
+msgstr "¡Éxito! \"{displayName}\" se ha movido."
 
 #: cms/static/js/views/utils/move_xblock_utils.js
 msgid ""
@@ -7894,6 +7937,12 @@ msgstr "Orden Num."
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Amount"
 msgstr "Cantidad"
+
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Total"
+msgstr "Total"
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -10772,6 +10821,10 @@ msgid ""
 msgstr ""
 "Si la subsección no tiene fecha de caducidad, los estudiantes siempre pueden"
 " ver sus puntajes cuando envían las respuestas a la evaluación."
+
+#: cms/templates/js/show-textbook.underscore
+msgid "PDF Chapters"
+msgstr ""
 
 #: cms/templates/js/show-textbook.underscore
 msgid "View Live"

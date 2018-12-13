@@ -160,9 +160,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-11-18 20:42+0000\n"
-"PO-Revision-Date: 2018-10-17 17:41+0000\n"
-"Last-Translator: Michael Savin <m.savin.ru@gmail.com>\n"
+"POT-Creation-Date: 2018-12-13 16:59+0000\n"
+"PO-Revision-Date: 2018-12-09 20:43+0000\n"
+"Last-Translator: edx_transifex_bot <i18n-working-group+edx-transifex-bot@edx.org>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -222,7 +222,7 @@ msgstr "Удалить"
 #: cms/static/js/views/validation.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/common/js/components/utils/view_utils.js
-#: lms/static/js/Markdown.Editor.js lms/static/js/writable_gradebook.js
+#: lms/static/js/Markdown.Editor.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 #: cms/templates/js/add-xblock-component-menu.underscore
 #: cms/templates/js/certificate-editor.underscore
@@ -349,7 +349,6 @@ msgstr "Загрузить файл"
 #: cms/static/js/views/modals/base_modal.js
 #: cms/static/js/views/modals/course_outline_modals.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: lms/static/js/writable_gradebook.js
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/content-group-editor.underscore
 #: cms/templates/js/course_info_handouts.underscore
@@ -4019,7 +4018,6 @@ msgstr "Пометить код зачисления как неиспользу
 
 #: lms/static/js/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
-#: lms/static/js/writable_gradebook.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 #: cms/templates/js/transcript-organization-credentials.underscore
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
@@ -5023,6 +5021,14 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Secondary Email Address"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "You may access your account when single-sign on is not available."
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Full Name"
 msgstr "Полное имя"
@@ -5456,32 +5462,6 @@ msgstr "КБ"
 #: lms/static/js/views/image_field.js
 msgid "MB"
 msgstr "МБ"
-
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Total"
-msgstr "Итого"
-
-#: lms/static/js/writable_gradebook.js
-msgid "The Assignment name is:"
-msgstr ""
-
-#: lms/static/js/writable_gradebook.js
-msgid "Publish grades"
-msgstr ""
-
-#: lms/static/js/writable_gradebook.js
-msgid "No matching records found"
-msgstr ""
-
-#: lms/static/js/writable_gradebook.js
-msgid "Student Name"
-msgstr ""
-
-#: lms/static/js/writable_gradebook.js
-msgid "Update in progress, please wait..."
-msgstr ""
 
 #: lms/static/lms/js/preview/preview_factory.js
 msgid "Course is not yet visible to students."
@@ -6466,7 +6446,11 @@ msgid "Visibility"
 msgstr "Видимость"
 
 #: cms/static/js/views/modals/edit_xblock.js
-msgid "Editing: %(title)s"
+msgid "Editing: {title}"
+msgstr ""
+
+#: cms/static/js/views/modals/edit_xblock.js
+msgid "Plugins"
 msgstr ""
 
 #: lms/templates/ccx/schedule.underscore
@@ -7842,6 +7826,12 @@ msgstr "Заказ №"
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Amount"
 msgstr "Сумма"
+
+#: lms/templates/commerce/receipt.underscore
+#: lms/templates/verify_student/make_payment_step_ab_testing.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Total"
+msgstr "Итого"
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -10694,6 +10684,10 @@ msgid ""
 msgstr ""
 "Если у подраздела не задан срок сдачи, слушатели будут видеть свои оценки, "
 "как только отправят ответы на задания."
+
+#: cms/templates/js/show-textbook.underscore
+msgid "PDF Chapters"
+msgstr ""
 
 #: cms/templates/js/show-textbook.underscore
 msgid "View Live"
