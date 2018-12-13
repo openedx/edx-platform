@@ -7,6 +7,9 @@ StackedConfigurationModel: A ConfigurationModel that can be overridden at site, 
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from collections import defaultdict
+from enum import Enum
+
 from django.conf import settings
 from django.db import models
 from django.db.models import Q, F
@@ -19,6 +22,17 @@ import crum
 from config_models.models import ConfigurationModel, cache
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+
+
+class Provenance(Enum):
+    """
+    Provenance enum
+    """
+    course = _('Course')
+    org = _('Org')
+    site = _('Site')
+    global_ = _('Global')
+    default = _('Default')
 
 
 class StackedConfigurationModel(ConfigurationModel):
@@ -134,15 +148,90 @@ class StackedConfigurationModel(ConfigurationModel):
             F('site').desc(nulls_first=True),
         )
 
+        provenances = defaultdict(lambda: Provenance.default)
         for override in overrides:
             for field in stackable_fields:
                 value = field.value_from_object(override)
                 if value != field_defaults[field.name]:
                     values[field.name] = value
+                    if override.course_id is not None:
+                        provenances[field.name] = Provenance.course
+                    elif override.org is not None:
+                        provenances[field.name] = Provenance.org
+                    elif override.site_id is not None:
+                        provenances[field.name] = Provenance.site
+                    else:
+                        provenances[field.name] = Provenance.global_
 
         current = cls(**values)
+        current.provenances = {field.name: provenances[field.name] for field in stackable_fields}  # pylint: disable=attribute-defined-outside-init
         cache.set(cache_key_name, current, cls.cache_timeout)
         return current
+
+    @classmethod
+    def all_current_course_configs(cls):
+        """
+        Return configuration for all courses
+        """
+        all_courses = CourseOverview.objects.all()
+        all_site_configs = SiteConfiguration.objects.filter(
+            values__contains='course_org_filter', enabled=True
+        ).select_related('site')
+
+        try:
+            default_site = Site.objects.get(id=settings.SITE_ID)
+        except Site.DoesNotExist:
+            default_site = RequestSite(crum.get_current_request())
+
+        sites_by_org = defaultdict(lambda: default_site)
+        site_cfg_org_filters = (
+            (site_cfg.site, site_cfg.values['course_org_filter'])
+            for site_cfg in all_site_configs
+        )
+        sites_by_org.update({
+            org: site
+            for (site, orgs) in site_cfg_org_filters
+            for org in (orgs if isinstance(orgs, list) else [orgs])
+        })
+
+        all_overrides = cls.objects.current_set()
+        overrides = {
+            (override.site_id, override.org, override.course_id): override
+            for override in all_overrides
+        }
+
+        stackable_fields = [cls._meta.get_field(field_name) for field_name in cls.STACKABLE_FIELDS]
+        field_defaults = {
+            field.name: field.get_default()
+            for field in stackable_fields
+        }
+
+        def provenance(course, field):
+            """
+            Return provenance for given field
+            """
+            for (config_key, provenance) in [
+                ((None, None, course.id), Provenance.course),
+                ((None, course.id.org, None), Provenance.org),
+                ((sites_by_org[course.id.org].id, None, None), Provenance.site),
+                ((None, None, None), Provenance.global_),
+            ]:
+                config = overrides.get(config_key)
+                if config is None:
+                    continue
+                value = field.value_from_object(config)
+                if value != field_defaults[field.name]:
+                    return (value, provenance)
+
+            return (field_defaults[field.name], Provenance.default)
+
+        return {
+            course.id: {
+                field.name: provenance(course, field)
+                for field in stackable_fields
+            }
+            for course in all_courses
+        }
 
     @classmethod
     def cache_key_name(cls, site, org, course=None, course_key=None):  # pylint: disable=arguments-differ

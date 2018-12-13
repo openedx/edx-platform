@@ -4,9 +4,12 @@ import itertools
 import ddt
 from django.utils import timezone
 from mock import Mock
+import pytz
 
-from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
+from opaque_keys.edx.locator import CourseLocator
+from openedx.core.djangoapps.config_model_utils.models import Provenance
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
@@ -172,6 +175,62 @@ class TestContentTypeGatingConfig(CacheIsolationTestCase):
         self.assertEqual(expected_site_setting, ContentTypeGatingConfig.current(site=test_site_cfg.site).enabled)
         self.assertEqual(expected_org_setting, ContentTypeGatingConfig.current(org=test_course.org).enabled)
         self.assertEqual(expected_course_setting, ContentTypeGatingConfig.current(course_key=test_course.id).enabled)
+
+    def test_all_current_course_configs(self):
+        # Set up test objects
+        for global_setting in (True, False, None):
+            ContentTypeGatingConfig.objects.create(enabled=global_setting, enabled_as_of=datetime(2018, 1, 1))
+            for site_setting in (True, False, None):
+                test_site_cfg = SiteConfigurationFactory.create(values={'course_org_filter': []})
+                ContentTypeGatingConfig.objects.create(site=test_site_cfg.site, enabled=site_setting, enabled_as_of=datetime(2018, 1, 1))
+
+                for org_setting in (True, False, None):
+                    test_org = "{}-{}".format(test_site_cfg.id, org_setting)
+                    test_site_cfg.values['course_org_filter'].append(test_org)
+                    test_site_cfg.save()
+
+                    ContentTypeGatingConfig.objects.create(org=test_org, enabled=org_setting, enabled_as_of=datetime(2018, 1, 1))
+
+                    for course_setting in (True, False, None):
+                        test_course = CourseOverviewFactory.create(
+                            org=test_org,
+                            id=CourseLocator(test_org, 'test_course', 'run-{}'.format(course_setting))
+                        )
+                        ContentTypeGatingConfig.objects.create(course=test_course, enabled=course_setting, enabled_as_of=datetime(2018, 1, 1))
+
+            with self.assertNumQueries(4):
+                all_configs = ContentTypeGatingConfig.all_current_course_configs()
+
+        # Deliberatly using the last all_configs that was checked after the 3rd pass through the global_settings loop
+        # We should be creating 3^4 courses (3 global values * 3 site values * 3 org values * 3 course values)
+        # Plus 1 for the edX/toy/2012_Fall course
+        self.assertEqual(len(all_configs), 3**4 + 1)
+
+        # Point-test some of the final configurations
+        self.assertEqual(
+            all_configs[CourseLocator('7-True', 'test_course', 'run-None')],
+            {
+                'enabled': (True, Provenance.org),
+                'enabled_as_of': (datetime(2018, 1, 1, 5, tzinfo=pytz.UTC), Provenance.course),
+                'studio_override_enabled': (None, Provenance.default),
+            }
+        )
+        self.assertEqual(
+            all_configs[CourseLocator('7-True', 'test_course', 'run-False')],
+            {
+                'enabled': (False, Provenance.course),
+                'enabled_as_of': (datetime(2018, 1, 1, 5, tzinfo=pytz.UTC), Provenance.course),
+                'studio_override_enabled': (None, Provenance.default),
+            }
+        )
+        self.assertEqual(
+            all_configs[CourseLocator('7-None', 'test_course', 'run-None')],
+            {
+                'enabled': (True, Provenance.site),
+                'enabled_as_of': (datetime(2018, 1, 1, 5, tzinfo=pytz.UTC), Provenance.course),
+                'studio_override_enabled': (None, Provenance.default),
+            }
+        )
 
     def test_caching_global(self):
         global_config = ContentTypeGatingConfig(enabled=True, enabled_as_of=datetime(2018, 1, 1))
