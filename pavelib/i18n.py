@@ -318,7 +318,8 @@ def i18n_eliteu_update():
     con = raw_input("Continue with committing these translations (y/n)? ")
 
     if con.lower() == 'y':
-        sh('git add conf/locale')
+        sh('git add conf/locale/zh_CN')
+        sh('git add conf/locale/zh_HANS')
         sh('git add cms/static/js/i18n')
         sh('git add lms/static/js/i18n')
 
