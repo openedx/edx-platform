@@ -76,7 +76,7 @@ def account_settings_context(request):
 
     context = {
         'auth': {},
-        'phone': request.user.profile.phone or '',
+        'phone': request.user.profile.phone or "null",
         'duplicate_provider': None,
         'nav_hidden': True,
         'fields': {
