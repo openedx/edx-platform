@@ -36,11 +36,6 @@ SUPPORT_INDEX_URLS = [
         "name": _("Entitlements"),
         "description": _("View, create, and reissue learner entitlements"),
     },
-    {
-        "url": reverse_lazy("support:feature_based_enrollments"),
-        "name": _("Feature Based Enrollments"),
-        "description": _("View feature based enrollment settings"),
-    },
 ]
 
 
