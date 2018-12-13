@@ -6,6 +6,7 @@ from django.utils.translation import ugettext as _
 from django.urls import reverse
 from django.conf import settings
 from six import text_type
+from third_party_auth.models import OAuth2ProviderConfig
 %>
 
 <header>
@@ -16,6 +17,8 @@ from six import text_type
     ##       or something allowing themes to do whatever they
     ##       want here (and on this whole page, really).
       <%
+        provider_config = OAuth2ProviderConfig.current('weibo')
+        weibo_appkey = provider_config.key
         site_domain = static.get_value('site_domain', settings.SITE_NAME)
         site_protocol = 'https' if settings.HTTPS == 'on' else 'http'
         platform_name = static.get_platform_name()
@@ -34,6 +37,18 @@ from six import text_type
                 )
             )
         ).replace(u" ", u"+")
+        weibo_text = _("I just enrolled in {number} {title} through {account}: {url}").format(
+            number=course.number,
+            title=course.display_name_with_default_escaped,
+            account='',
+            url=u"{protocol}://{domain}{path}".format(
+                protocol=site_protocol,
+                domain=site_domain,
+                path=urllib.quote_plus(
+                    reverse('about_course', args=[text_type(course.id)])
+                )
+            )
+        )
         tweet_action = u"http://twitter.com/intent/tweet?text={tweet_text}".format(tweet_text=tweet_text)
 
         facebook_link = static.get_value('course_about_facebook_link', settings.PLATFORM_FACEBOOK_ACCOUNT)
@@ -63,6 +78,9 @@ from six import text_type
       <a href="${email_subject}" class="share">
         <span class="icon fa fa-envelope" aria-hidden="true"></span><span class="sr">${_("Email someone to say you've enrolled in this course")}</span>
       </a>
+      <html xmlns:wb="http://open.weibo.com/wb">
+      <script src="https://tjs.sjs.sinajs.cn/open/api/js/wb.js" type="text/javascript" charset="utf-8"></script>
+      <wb:share-button appkey="${weibo_appkey}" addition="simple" type="icon" ralateUid="5974026525" default_text="${weibo_text}"></wb:share-button>
   </div>
   % endif
 </header>
