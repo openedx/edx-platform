@@ -65,7 +65,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-11 15:42+0800\n"
+"POT-Creation-Date: 2018-12-13 17:36+0800\n"
 "PO-Revision-Date: 2018-12-07 12:23+0000\n"
 "Last-Translator: li ying <code@eliteu.cn>, 2018\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)\n"
@@ -238,7 +238,7 @@ msgstr "身份证件验证挂起"
 msgid "You're enrolled as a verified student"
 msgstr "你正作为已认证的学生选修"
 
-#: common/djangoapps/course_modes/helpers.py lms/envs/common.py
+#: common/djangoapps/course_modes/helpers.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Verified"
 msgstr "已认证"
@@ -284,6 +284,7 @@ msgstr "显示名称"
 
 #: common/djangoapps/course_modes/models.py
 #: lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "Price"
 msgstr "价格"
 
@@ -311,7 +312,7 @@ msgid ""
 "ecommerce service."
 msgstr "这是此模式在外部电子商务服务中的批量库存单位（SKU）。"
 
-#: common/djangoapps/course_modes/models.py lms/envs/common.py
+#: common/djangoapps/course_modes/models.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Honor"
 msgstr "荣誉"
@@ -665,6 +666,10 @@ msgstr "未受正规教育"
 #: common/djangoapps/student/models.py
 msgid "Other education"
 msgstr "其他教育程度"
+
+#: common/djangoapps/student/models.py
+msgid "Phone"
+msgstr ""
 
 #: common/djangoapps/student/models.py
 #, python-brace-format
@@ -3098,6 +3103,11 @@ msgstr "两者都"
 
 #: common/lib/xmodule/xmodule/course_module.py lms/djangoapps/branding/api.py
 #: lms/templates/footer.html lms/templates/static_templates/about.html
+#: themes/normal-theme/lms/templates/static_templates/about.html
+#: themes/normal-theme/lms/templates/static_templates/contact.html
+#: themes/normal-theme/lms/templates/static_templates/disclaimer.html
+#: themes/normal-theme/lms/templates/static_templates/join_us.html
+#: themes/normal-theme/lms/templates/static_templates/privacy_policy.html
 #: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/about.html
@@ -4735,6 +4745,7 @@ msgstr "服务条款 & 荣誉准则"
 #: lms/djangoapps/branding/api.py lms/djangoapps/certificates/views/webview.py
 #: cms/templates/widgets/footer.html
 #: lms/templates/static_templates/privacy.html
+#: lms/templates/static_templates/privacy_policy.html
 #: themes/edx.org/lms/templates/certificates/_accomplishment-footer.html
 #: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
@@ -7453,6 +7464,14 @@ msgstr ""
 "被字典对映到的群组可以被显示在此区块中。关键字是群组设定id和数值是群组 ID的列表。假如没有关键字给群组设定或者群组 "
 "ID的集合是空的那么区块就会对所有公开。如果该区块是visible_to_staff_only则字段会被忽略。"
 
+#: lms/djangoapps/mobile_api/views.py
+msgid "Missing requested parameter 'platform'"
+msgstr ""
+
+#: lms/djangoapps/mobile_api/views.py
+msgid "Unable to find information about the latest version of the platform"
+msgstr ""
+
 #: lms/djangoapps/notes/views.py lms/templates/notes.html
 msgid "My Notes"
 msgstr "我的笔记"
@@ -8422,6 +8441,18 @@ msgid ""
 "The user {username} is not enrolled in the course associated with this team."
 msgstr "{username}用户未选修与该团队相关的课程。"
 
+#: lms/djangoapps/verify_student/admin.py
+#: lms/djangoapps/verify_student/views.py
+#, python-brace-format
+msgid "Your {platform_name} ID Verification Approved"
+msgstr "您的{platform_name}身份认证已通过"
+
+#: lms/djangoapps/verify_student/admin.py
+#: lms/djangoapps/verify_student/views.py
+#, python-brace-format
+msgid "Your {platform_name} Verification Has Been Denied"
+msgstr "您的{platform_name}身份认证已被拒绝"
+
 #: lms/djangoapps/verify_student/models.py
 msgid "The course for which this deadline applies"
 msgstr "使用该截止日期的课程"
@@ -8511,170 +8542,7 @@ msgstr "已收到{platform_name}身份认证照片"
 
 #: lms/djangoapps/verify_student/views.py
 #, python-brace-format
-msgid "Your {platform_name} ID Verification Approved"
-msgstr "您的{platform_name}身份认证已通过"
-
-#: lms/djangoapps/verify_student/views.py
-#, python-brace-format
-msgid "Your {platform_name} Verification Has Been Denied"
-msgstr "您的{platform_name}身份认证已被拒绝"
-
-#: lms/envs/common.py
-msgid "Your Platform Name Here"
-msgstr ""
-
-#: lms/envs/common.py
-msgid "Your Platform Description Here"
-msgstr ""
-
-#: lms/envs/common.py
-msgid "Read access"
-msgstr ""
-
-#: lms/envs/common.py
-msgid "Write access"
-msgstr ""
-
-#: lms/envs/common.py
-msgid "Know your email address"
-msgstr ""
-
-#: lms/envs/common.py
-msgid "Know your name and username"
-msgstr ""
-
-#: lms/envs/common.py
-msgid "Retrieve your grades for your enrolled courses"
-msgstr ""
-
-#: lms/envs/common.py
-msgid "Retrieve your course certificates"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Audit"
-msgstr "旁听"
-
-#. Translators: This is the website name of www.facebook.com.  Please
-#. translate this the way that Facebook advertises in your language.
-#: lms/envs/common.py
-msgid "Facebook"
-msgstr ""
-
-#: lms/envs/common.py
-#, python-brace-format
-msgid "Like {platform_name} on Facebook"
-msgstr ""
-
-#. Translators: This is the website name of www.twitter.com.  Please
-#. translate this the way that Twitter advertises in your language.
-#: lms/envs/common.py
-msgid "Twitter"
-msgstr ""
-
-#: lms/envs/common.py
-#, python-brace-format
-msgid "Follow {platform_name} on Twitter"
-msgstr ""
-
-#. Translators: This is the website name of www.linkedin.com.  Please
-#. translate this the way that LinkedIn advertises in your language.
-#: lms/envs/common.py
-msgid "LinkedIn"
-msgstr ""
-
-#: lms/envs/common.py
-#, python-brace-format
-msgid "Follow {platform_name} on LinkedIn"
-msgstr ""
-
-#. Translators: This is the website name of plus.google.com.  Please
-#. translate this the way that Google+ advertises in your language.
-#: lms/envs/common.py
-msgid "Google+"
-msgstr ""
-
-#: lms/envs/common.py
-#, python-brace-format
-msgid "Follow {platform_name} on Google+"
-msgstr ""
-
-#. Translators: This is the website name of www.tumblr.com.  Please
-#. translate this the way that Tumblr advertises in your language.
-#: lms/envs/common.py
-msgid "Tumblr"
-msgstr ""
-
-#. Translators: This is the website name of www.meetup.com.  Please
-#. translate this the way that MeetUp advertises in your language.
-#: lms/envs/common.py
-msgid "Meetup"
-msgstr ""
-
-#. Translators: This is the website name of www.reddit.com.  Please
-#. translate this the way that Reddit advertises in your language.
-#: lms/envs/common.py
-msgid "Reddit"
-msgstr ""
-
-#: lms/envs/common.py
-#, python-brace-format
-msgid "Subscribe to the {platform_name} subreddit"
-msgstr ""
-
-#. Translators: This is the website name of https://vk.com.  Please
-#. translate this the way that VK advertises in your language.
-#: lms/envs/common.py
-msgid "VK"
-msgstr ""
-
-#. Translators: This is the website name of http://www.weibo.com.  Please
-#. translate this the way that Weibo advertises in your language.
-#: lms/envs/common.py
-msgid "Weibo"
-msgstr ""
-
-#. Translators: This is the website name of www.youtube.com.  Please
-#. translate this the way that YouTube advertises in your language.
-#: lms/envs/common.py
-msgid "Youtube"
-msgstr ""
-
-#: lms/envs/common.py
-#, python-brace-format
-msgid "Subscribe to the {platform_name} YouTube channel"
-msgstr ""
-
-#: lms/envs/common.py
-msgid "Kosovo"
-msgstr ""
-
-#: lms/envs/common.py
-#, python-brace-format
-msgid "Welcome to {platform_name}."
-msgstr ""
-
-#: lms/envs/common.py
-#, python-brace-format
-msgid ""
-"You have left the {start_bold}{enterprise_name}{end_bold} website and are "
-"now on the {platform_name} site. {enterprise_name} has partnered with "
-"{platform_name} to offer you high-quality, always available learning "
-"programs to help you advance your knowledge and career. {line_break}Please "
-"note that {platform_name} has a different {privacy_policy_link_start}Privacy"
-" Policy{privacy_policy_link_end} from {enterprise_name}."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Professional"
-msgstr "专业的"
-
-#: lms/envs/common.py
-msgid "No-Id-Professional"
-msgstr ""
-
-#: lms/envs/common.py
-msgid "Credit"
+msgid "Review ID Verification Photos For {username}"
 msgstr ""
 
 #: lms/templates/admin/user_api/accounts/cancel_retirement_action.html
@@ -10600,6 +10468,14 @@ msgstr "由于登录失败次数过多，该账户暂时被锁定，请稍后再
 msgid "Email or password is incorrect."
 msgstr "邮箱或密码错误。"
 
+#: openedx/core/djangoapps/user_api/accounts/views.py
+msgid "Verification failed"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/views.py
+msgid "Please check mobile number format;"
+msgstr ""
+
 #: openedx/core/djangoapps/user_api/admin.py
 #: wiki/templates/wiki/permission_denied.html
 msgid "Permission Denied"
@@ -11841,14 +11717,6 @@ msgstr "课程已经是发布状态了。"
 msgid "Incorrect format for field '{name}'. {detailed_message}"
 msgstr "“{name}”字段的格式不正确。{detailed_message}"
 
-#: cms/envs/common.py
-msgid "Your Platform Studio"
-msgstr ""
-
-#: cms/envs/common.py
-msgid "Studio"
-msgstr ""
-
 #: cms/lib/xblock/tagging/tagging.py
 msgid "Dictionary with the available tags"
 msgstr "可使用标签的字典"
@@ -11897,6 +11765,7 @@ msgstr "正在加载"
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/settings.html lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "Course Number"
 msgstr "课程代码"
 
@@ -12001,6 +11870,7 @@ msgid "Instructors"
 msgstr "主讲教师"
 
 #: cms/templates/settings.html lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "Requirements"
 msgstr "修习要求"
 
@@ -12369,6 +12239,7 @@ msgid "You should Register before trying to access the Unit"
 msgstr "您在查看单元前应先注册。"
 
 #: lms/templates/enroll_staff.html lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgctxt "self"
 msgid "Enroll"
 msgstr "选修"
@@ -14691,6 +14562,7 @@ msgid "Supported by the following organizations"
 msgstr "被以下的组织支持"
 
 #: lms/templates/certificates/_accomplishment-rendering.html
+#: themes/normal-theme/lms/templates/certificates/_accomplishment-rendering.html
 msgid "Awarded to:"
 msgstr "授予："
 
@@ -14957,10 +14829,12 @@ msgid "This content is graded"
 msgstr "该内容计入总分。"
 
 #: lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "An error occurred. Please try again later."
 msgstr "出现错误，请稍后再试。"
 
 #: lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid ""
 "The currently logged-in user account does not have permission to enroll in "
 "this course. You may need to {start_logout_tag}log out{end_tag} then try the"
@@ -14970,10 +14844,12 @@ msgstr ""
 "当前登录用户帐号无权限入选此课程。您可能需要在{start_logout_tag}退出登录{end_tag}后重试选课按钮。请访问{start_help_tag}帮助页面{end_tag}了解可能的解决方案。"
 
 #: lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "Enroll in {course_name}"
 msgstr "选修{course_name}"
 
 #: lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "You are enrolled in this course"
 msgstr "您选修了本课程"
 
@@ -14981,65 +14857,79 @@ msgstr "您选修了本课程"
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/shoppingcart/registration_code_receipt.html
 #: openedx/features/journals/templates/journals/bundle_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "View Course"
 msgstr "查看课程"
 
 #: lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "This course is in your <a href=\"{cart_link}\">cart</a>."
 msgstr "这个课程已经进入您的 <a href=\"{cart_link}\">购物车</a>。"
 
 #: lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "Course is full"
 msgstr "该课程已满"
 
 #: lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "Enrollment in this course is by invitation only"
 msgstr "该课程只能通过邀请选修"
 
 #: lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "Enrollment is Closed"
 msgstr "选课已关闭"
 
 #: lms/templates/courseware/course_about.html
-msgid "Add {course_name} to Cart <span>({price} USD)</span>"
-msgstr "添加{course_name}到购物<span>({price} USD)</span>"
+msgid "Add {course_name} to Cart <span>({price} {currency_code})</span>"
+msgstr ""
 
 #: lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "VIP\\u4f1a\\u5458\\u514d\\u8d39\\u52a0\\u5165{course_name}"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "View About Page in studio"
 msgstr "在职员界面查看课程简介页面"
 
 #: lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "Classes Start"
 msgstr "课程开始"
 
 #: lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "Classes End"
 msgstr "课程结束"
 
 #: lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "Estimated Effort"
 msgstr "预期课程目标"
 
 #: lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "Prerequisites"
 msgstr "预备知识"
 
 #: lms/templates/courseware/course_about.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid ""
 "You must successfully complete {link_start}{prc_display}{link_end} before "
 "you begin this course."
 msgstr "您必须先完成{link_start}{prc_display}{link_end}才能开始此课程。"
 
 #: lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "Additional Resources"
 msgstr "额外资源"
 
 #: lms/templates/courseware/course_about.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgctxt "self"
 msgid "enroll"
 msgstr "选课"
@@ -15310,20 +15200,28 @@ msgid "{number_of_courses} courses in program"
 msgstr "{number_of_courses} 专项课"
 
 #: lms/templates/courseware/program_marketing.html
-msgid "Price (USD)"
-msgstr "价格 (USD)"
+msgid "Price ({currencyCode})"
+msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
-msgid "${newPrice}{htmlEnd} for entire program"
-msgstr "${newPrice}{htmlEnd} 全部专项"
+msgid "{currencySymbol}{oldPrice}"
+msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
-msgid "You save ${discount_value} {currency}"
-msgstr "你省了 ${discount_value} {currency}"
+msgid "{newPrice}{htmlEnd} for entire program"
+msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
-msgid "${full_program_price} for entire program"
-msgstr "${full_program_price}  全部专项"
+msgid "You save "
+msgstr ""
+
+#: lms/templates/courseware/program_marketing.html
+msgid "{discount_value} {currency}"
+msgstr ""
+
+#: lms/templates/courseware/program_marketing.html
+msgid "{full_program_price} for entire program"
+msgstr ""
 
 #: lms/templates/courseware/program_marketing.html
 msgid "Courses in the {}"
@@ -16450,18 +16348,6 @@ msgid "The photo(s) of you:"
 msgstr "你的照片(多张)："
 
 #: lms/templates/emails/failed_verification_email.txt
-msgid "The photo of you:"
-msgstr "你的照片："
-
-#: lms/templates/emails/failed_verification_email.txt
-msgid "The photo of your ID:"
-msgstr "你证件ID的图片："
-
-#: lms/templates/emails/failed_verification_email.txt
-msgid "Other Reasons:"
-msgstr "其他原因："
-
-#: lms/templates/emails/failed_verification_email.txt
 msgid "Resubmit Verification: {reverify_url}"
 msgstr "重新认证: {reverify_url}"
 
@@ -16473,12 +16359,14 @@ msgstr "身份ID验证FAQ：{faq_url}"
 #: lms/templates/emails/order_confirmation_email.txt
 #: lms/templates/emails/passed_verification_email.txt
 #: lms/templates/emails/photo_submission_confirmation.txt
+#: lms/templates/emails/photo_submission_review.txt
 msgid "Thank you,"
 msgstr "谢谢，"
 
 #: lms/templates/emails/failed_verification_email.txt
 #: lms/templates/emails/passed_verification_email.txt
 #: lms/templates/emails/photo_submission_confirmation.txt
+#: lms/templates/emails/photo_submission_review.txt
 #: lms/templates/emails/reverification_processed.txt
 msgid "The {platform_name} team"
 msgstr "{platform_name}团队"
@@ -16522,6 +16410,10 @@ msgid ""
 "verification process on your dashboard."
 msgstr ""
 "我们已收到您的信息，并且身份认证流程已开始。请在接下来几天内查看我们给您发的一封邮件，以确认您认证是否成功。您也可以在面板中查看您的认证状态。"
+
+#: lms/templates/emails/photo_submission_review.txt
+msgid "Review ID Verification Photos"
+msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_email.txt
 msgid "Thank you for purchasing enrollments in {course_name}."
@@ -17065,6 +16957,14 @@ msgstr "选课信息"
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Number of enrollees (admins, staff, and students) by track"
 msgstr "总参与人数(包括管理员、员工和学生)"
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Audit"
+msgstr "旁听"
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Professional"
+msgstr "专业的"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Basic Course Information"
@@ -19175,16 +19075,21 @@ msgstr "未能找到您查找的页面。返回到{link_start}主页{link_end}�
 #: lms/templates/static_templates/about.html
 #: lms/templates/static_templates/blog.html
 #: lms/templates/static_templates/contact.html
+#: lms/templates/static_templates/disclaimer.html
 #: lms/templates/static_templates/donate.html
 #: lms/templates/static_templates/faq.html
 #: lms/templates/static_templates/help.html
 #: lms/templates/static_templates/honor.html
 #: lms/templates/static_templates/jobs.html
+#: lms/templates/static_templates/join_us.html
+#: lms/templates/static_templates/manual.html
 #: lms/templates/static_templates/media-kit.html
 #: lms/templates/static_templates/news.html
 #: lms/templates/static_templates/press.html
 #: lms/templates/static_templates/privacy.html
+#: lms/templates/static_templates/privacy_policy.html
 #: lms/templates/static_templates/tos.html
+#: lms/templates/static_templates/user_agreement.html
 msgid "This page left intentionally blank. Feel free to add your own content."
 msgstr "这个页面是有意留空的。欢迎您添加自己的评论。"
 
@@ -19206,6 +19111,14 @@ msgstr "常见问题"
 #: themes/red-theme/lms/templates/footer.html
 msgid "Jobs"
 msgstr "招才纳贤"
+
+#: lms/templates/static_templates/join_us.html
+msgid "Join Us"
+msgstr ""
+
+#: lms/templates/static_templates/manual.html
+msgid "Manual"
+msgstr ""
 
 #: lms/templates/static_templates/news.html
 #: lms/templates/static_templates/press.html
@@ -19237,6 +19150,11 @@ msgstr "请等待几秒钟后再刷新该页面。如果问题照旧，请向{em
 #: lms/templates/static_templates/server-overloaded.html
 msgid "Currently the {platform_name} servers are overloaded"
 msgstr " 目前{platform_name}平台的服务器已经超负荷"
+
+#: lms/templates/static_templates/user_agreement.html
+#: themes/normal-theme/lms/templates/static_templates/user_agreement.html
+msgid "User Agreement"
+msgstr ""
 
 #: lms/templates/student_account/account_settings.html
 msgid "Account Settings"
@@ -19922,6 +19840,114 @@ msgstr "查找课程"
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Schools & Partners"
 msgstr "学校 & 伙伴"
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "变革 • 创新 • 未来"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "英荔教育"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "关于我们"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "联系我们"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "加入我们"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "关于平台"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "使用手册"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "帮助与投诉"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "条款说明"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "用户协议"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "隐私政策"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "免责声明"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "合作机构"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "网易云课堂"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "腾讯课堂"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "英荔商学院"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "微信扫一扫"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "获取课程优惠券"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "绑定手机号"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "获取验证码"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "手机号码格式不正确"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "提交"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "提示"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "应国家法规对于账号实名的要求，请您在进行下一步操作前，先完成手机绑定。"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "去绑定手机"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "了解更多"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/courseware/course_about.html
+msgid "Add {course_name} to Cart <span>({price} USD)</span>"
+msgstr "添加{course_name}到购物<span>({price} USD)</span>"
 
 #. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
 #. Please do not translate any of these trademarks and company names.
@@ -24484,18 +24510,19 @@ msgid "Become Eliteu Member"
 msgstr "成为英荔会员"
 
 #: membership/templates/membership/index.html
-msgid "Choose appropriate learning duration according to your needs,"
-msgstr "根据您的需求选择合适的学习时长，"
+msgid "Choose appropriate learning duration according to your needs"
+msgstr "根据您的需求选择合适的学习时长"
 
 #: membership/templates/membership/index.html
 msgid ""
-"During the study period, you will enjoy the learning of all the courses of "
-"Elite MBA School. You can join the new class online now!"
+"Enjoy learning all courses in the Eliteu MBA school during the study "
+"period，You can join the new class online now!"
 msgstr "学习期内享有英荔商学院所有课程的学习权益，新课上线亦可马上加入学习！"
 
 #: membership/templates/membership/index.html
-msgid "Full-Year Membership"
-msgstr "全年会员"
+msgctxt "Membership"
+msgid "Full Year"
+msgstr "一年"
 
 #: membership/templates/membership/index.html
 msgid "average per month"
@@ -24506,24 +24533,27 @@ msgid "Full-stack workplace practice"
 msgstr "全栈职场修炼"
 
 #: membership/templates/membership/index.html
-msgid "Half-Year Membership"
-msgstr "半年会员"
+msgctxt "Membership"
+msgid "Half-Year"
+msgstr "半年"
 
 #: membership/templates/membership/index.html
 msgid "Improve Ability Efficiently"
 msgstr "能力高效提升"
 
 #: membership/templates/membership/index.html
-msgid "Three-Month Membership"
-msgstr "三个月会员"
+msgctxt "Membership"
+msgid "Three-Month"
+msgstr "三个月"
 
 #: membership/templates/membership/index.html
 msgid "A series of courses for learning"
 msgstr "系列课程畅学"
 
 #: membership/templates/membership/index.html
-msgid "One-Month Membership"
-msgstr "一个月会员"
+msgctxt "Membership"
+msgid "One-Month"
+msgstr "一个月"
 
 #: membership/templates/membership/index.html
 msgid "Multiple-Course Experience"
@@ -24595,18 +24625,13 @@ msgstr "朱伟春 博士"
 
 #: membership/templates/membership/index.html
 msgid ""
-"Assistant Professor of School of Labor and Employment Relations, Penn State "
-"University Park, USA"
-msgstr "宾夕法尼亚州立大学劳动力研究与雇佣关系学院助理教授"
+"Prior Assistant Professor of School of Labor and Employment Relations, Penn "
+"State University Park, USA"
+msgstr "原美国宾夕法尼亚州立大学劳动力研究与雇佣关系学院助理教授"
 
 #: membership/templates/membership/index.html
 msgid "Dr. Jiamin Wang"
 msgstr "汪嘉旻 博士"
-
-#: membership/templates/membership/index.html
-msgid ""
-"Lifetime Professor in Management, Long Island University-C. W. Post, USA"
-msgstr "美国长岛大学Post分校管理系终身教授"
 
 #: membership/templates/membership/index.html
 msgid ""
@@ -24629,12 +24654,18 @@ msgstr "施建军 博士"
 #: membership/templates/membership/index.html
 msgid ""
 "Prior President and Professor of the University of International Business "
-"and Economics"
-msgstr "原对外经济贸易大学校长、  教授"
+"and Economics {br}"
+msgstr "原对外经济贸易大学校长、{br}教授."
 
 #: membership/templates/membership/index.html
 msgid "Professor of Economics in Davidson College"
 msgstr "美国戴维森学院经济学教授"
+
+#: membership/templates/membership/index.html
+msgid ""
+"Prior President and Professor of the University of International Business "
+"and Economics"
+msgstr "原对外经济贸易大学校长、  教授"
 
 #: membership/templates/membership/index.html
 msgid "View More"
@@ -24646,12 +24677,8 @@ msgid ""
 msgstr "学习期内享有英荔商学院所有课程的学习权益"
 
 #: membership/templates/membership/index.html
-msgid "You can join the new class once online!"
-msgstr "新课上线亦可马上加入学习！"
-
-#: membership/templates/membership/index.html
-msgid "One Year"
-msgstr "一年"
+msgid "You can join the new class once online"
+msgstr "新课上线亦可马上加入学习"
 
 #: membership/templates/membership/index.html
 msgid "Learning Feature"

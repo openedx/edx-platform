@@ -20,7 +20,6 @@
   django.catalog = django.catalog || {};
   
   var newcatalog = {
-    " ${price} {currency} )": " ${price} {currency} )", 
     " Link": "\u5173\u8054", 
     " and ": "\u4e0e", 
     " learner does not exist in LMS and not added to the exception list": "\u5b66\u4e60\u8005\u4e0d\u5b58\u5728\u7cfb\u7edf\u4e2d\uff0c\u5c06\u4e0d\u52a0\u5230\u4f8b\u5916\u5217\u8868\u4e2d", 
@@ -33,7 +32,6 @@
     " learners do not exist in LMS and not added to the exception list": "\u5b66\u5458\u8bb0\u5f55\u4e0d\u5b58\u5728LMS\u4e2d\uff0c\u65e0\u6cd5\u6dfb\u52a0\u5230\u4f8b\u5916\u540d\u5355", 
     " record is not in correct format and not added to the exception list": "\u8fd9\u6761\u8bb0\u5f55\u7684\u683c\u5f0f\u4e0d\u6b63\u786e\uff0c\u65e0\u6cd5\u6dfb\u52a0\u5230\u4f8b\u5916\u540d\u5355", 
     " records are not in correct format and not added to the exception list": "\u8fd9\u4e9b\u8bb0\u5f55\u7684\u683c\u5f0f\u4e0d\u6b63\u786e\uff0c\u65e0\u6cd5\u6dfb\u52a0\u5230\u4f8b\u5916\u540d\u5355", 
-    "${listPrice}": "${listPrice}", 
     "%(cohort_name)s (%(user_count)s)": "%(cohort_name)s (%(user_count)s)", 
     "%(comments_count)s %(span_sr_open)scomments %(span_close)s": "%(comments_count)s %(span_sr_open)s\u8bc4\u8bba %(span_close)s", 
     "%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s unread comments)%(span_close)s": "%(comments_count)s %(span_sr_open)s\u8bc4\u8bba (%(unread_comments_count)s \u672a\u8bfb\u8bc4\u8bba)%(span_close)s", 

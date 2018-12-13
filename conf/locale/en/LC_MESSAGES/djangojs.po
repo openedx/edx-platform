@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-11 15:42+0800\n"
-"PO-Revision-Date: 2018-12-11 07:42:07.463753\n"
+"POT-Creation-Date: 2018-12-13 17:36+0800\n"
+"PO-Revision-Date: 2018-12-13 09:36:08.621139\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -6184,6 +6184,22 @@ msgstr ""
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
 msgid "Profile"
+msgstr ""
+
+#: themes/normal-theme/lms/static/js/binding.js
+msgid "获取验证码"
+msgstr ""
+
+#: themes/normal-theme/lms/static/js/binding.js
+msgid "手机号不能为空"
+msgstr ""
+
+#: themes/normal-theme/lms/static/js/binding.js
+msgid "手机号格式不正确"
+msgstr ""
+
+#: themes/normal-theme/lms/static/js/binding.js
+msgid "手机绑定成功"
 msgstr ""
 
 #: cms/static/js/certificates/collections/certificates.js

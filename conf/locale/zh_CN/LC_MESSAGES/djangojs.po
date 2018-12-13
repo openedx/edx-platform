@@ -47,7 +47,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-11 15:42+0800\n"
+"POT-Creation-Date: 2018-12-13 17:36+0800\n"
 "PO-Revision-Date: 2018-12-07 12:23+0000\n"
 "Last-Translator: li ying <code@eliteu.cn>, 2018\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/e-ducation/teams/93939/zh_CN/)\n"
@@ -6191,6 +6191,22 @@ msgstr "成绩"
 msgid "Profile"
 msgstr "个人主页"
 
+#: themes/normal-theme/lms/static/js/binding.js
+msgid "获取验证码"
+msgstr ""
+
+#: themes/normal-theme/lms/static/js/binding.js
+msgid "手机号不能为空"
+msgstr ""
+
+#: themes/normal-theme/lms/static/js/binding.js
+msgid "手机号格式不正确"
+msgstr ""
+
+#: themes/normal-theme/lms/static/js/binding.js
+msgid "手机绑定成功"
+msgstr ""
+
 #: cms/static/js/certificates/collections/certificates.js
 msgid "Could not parse certificate JSON. %(message)s"
 msgstr "无法解析证书JSON. %(message)s"
@@ -8510,12 +8526,12 @@ msgid "Upgrade All Remaining Courses ("
 msgstr "升级所有剩余课程（"
 
 #: lms/templates/learner_dashboard/program_details_view.underscore
-msgid "${listPrice}"
-msgstr "${listPrice}"
+msgid "{listPrice}"
+msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_view.underscore
-msgid " ${price} {currency} )"
-msgstr " ${price} {currency} )"
+msgid " {price} {currency} )"
+msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "COURSES IN PROGRESS"

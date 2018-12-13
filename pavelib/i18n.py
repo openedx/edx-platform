@@ -282,6 +282,47 @@ def i18n_release_pull():
     sh("i18n_tool transifex pull " + " ".join(resources))
 
 
+@task
+def i18n_membership():
+    sh("cp ../edx-membership/conf/locale/en/LC_MESSAGES/django.po ../edx-membership/conf/locale/en/LC_MESSAGES/django-saved.po")
+    sh("cp ../edx-membership/conf/locale/en/LC_MESSAGES/djangojs.po ../edx-membership/conf/locale/en/LC_MESSAGES/djangojs-saved.po")
+    sh("mv ../edx-membership/conf/locale/en/LC_MESSAGES/django-saved.po conf/locale/en/LC_MESSAGES/")
+    sh("mv conf/locale/en/LC_MESSAGES/django-saved.po conf/locale/en/LC_MESSAGES/membership.po")
+    sh("mv ../edx-membership/conf/locale/en/LC_MESSAGES/djangojs-saved.po conf/locale/en/LC_MESSAGES/")
+    sh("mv conf/locale/en/LC_MESSAGES/djangojs-saved.po conf/locale/en/LC_MESSAGES/membership-js.po")    
+
+
+@task
+@needs(
+    "pavelib.i18n.i18n_extract",
+    "pavelib.i18n.i18n_generate_strict",
+    "pavelib.i18n.i18n_transifex_pull",
+    "pavelib.i18n.i18n_transifex_push",
+    "pavelib.i18n.i18n_dummy",
+    "pavelib.i18n.i18n_generate_strict",
+)
+@timed
+def i18n_eliteu_update():
+    """
+    Pull source strings, generate po and mo files, and validate
+    """
+
+    # sh('paver test_i18n')
+    # Tests were removed from repo, but there should still be tests covering the translations
+    # TODO: Validate the recently pulled translations, and give a bail option
+    sh('git clean -fdX conf/locale/rtl')
+    sh('git clean -fdX conf/locale/eo')
+    print "\n\nValidating translations with `i18n_tool validate`..."
+    sh("i18n_tool validate")
+
+    con = raw_input("Continue with committing these translations (y/n)? ")
+
+    if con.lower() == 'y':
+        sh('git add conf/locale')
+        sh('git add cms/static/js/i18n')
+        sh('git add lms/static/js/i18n')
+
+
 def find_release_resources():
     """
     Validate the .tx/config file for release files, returning the resource names.
