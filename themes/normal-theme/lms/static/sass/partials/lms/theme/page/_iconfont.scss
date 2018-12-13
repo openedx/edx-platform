@@ -38,7 +38,9 @@ $icon-width: 18px;
 .fa-search:before,
 .fa-plus:before,
 .fa-times:before,
-.find-courses .search-facets .facet-option.selected .count::before, .find-courses .search-facets .facet-option.selected:hover .count::before, .find-courses .search-facets .facet-option.selected:focus .count::before
+.find-courses .search-facets .facet-option.selected .count::before, .find-courses .search-facets .facet-option.selected:hover .count::before, .find-courses .search-facets .facet-option.selected:focus .count::before,
+.fa-filter:before,
+.fa-newspaper-o:before
 {
   content: '';
   display: inline-block;
@@ -86,8 +88,15 @@ $icon-width: 18px;
   background-position: calcP(9, 6)
 }
 .fa-bookmark:before{
-  background-position: calcP(13, 6)
+  background-position: calcP(12, 6)
 }
+.course-tool{
+  .fa-bookmark:before{
+    position: relative;
+    top: 4px;
+  }
+}
+
 .fa-recorder:before{
   background-position: calcP(6, 1)
 }
@@ -123,7 +132,7 @@ $icon-width: 18px;
 .fa-star:before{
   background-position: calcP(10, 7)
 }
-.forum-nav-browse-menu-item:before{
+.forum-nav{
   .fa-star:before{
     transform: scale(0.8);
     position: relative;
@@ -147,6 +156,11 @@ $icon-width: 18px;
 }
 .wiki .fa-plus{
   display: none;
+}
+.wiki .article-functions{
+  .fa:before{
+    transform: scale(0.85)
+  }
 }
 .find-courses{
   .find-courses .loading-spinner{
@@ -175,6 +189,16 @@ $icon-width: 18px;
   transform: scale(0.8);
   position: relative;
   top: 1px;
+}
+.fa-filter:before{
+  background-position: calcP(7, 6);
+  transform: scale(0.8);
+  position: relative;
+  top: -3px;
+  left: 3px;
+}
+.fa-newspaper-o:before{
+  background-position: 0px 0px;
 }
 
 
