@@ -88,7 +88,7 @@ body.view-in-course .wiki-wrapper{
 }
 
 // content
-.wiki-wrapper section.wiki.view .main-article{
+.wiki-wrapper section.wiki .main-article{
   padding: 20px;
   h3{
     margin: 10px 0;
@@ -161,18 +161,38 @@ body.view-in-course .wiki-wrapper{
   .btn.btn-primary{
     @extend %btn-my-primary;
     span{ display: none; }
+
+    &:hover:not(:disabled){
+      box-shadow: none;
+      background-image: none;
+    }
   }
   a.btn{
     @extend %btn-my-white;
     vertical-align: top;
     span{ display: none; }
+
+    &:hover:not(:disabled){
+      box-shadow: none;
+      background-image: none;
+    }
   }
   .btn.btn-danger{
     @extend %btn-my-white;
     box-shadow: none;
     span{ display: none;}
+
+    &:hover:not(:disabled){
+      box-shadow: none;
+      background-image: none;
+    }
   }
 } 
+textarea, form#wiki_revision .CodeMirror, input[type="text"]{
+  box-shadow: none;
+  border: 1px solid #ddd;
+  background: #fff;
+}
 
 // settings
 .wiki-wrapper .settings{

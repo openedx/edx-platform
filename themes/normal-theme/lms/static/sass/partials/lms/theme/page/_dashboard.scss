@@ -141,7 +141,8 @@
     font-size: 14px;
     border: 1px solid $blue;
 
-    .search-button{
+    .search-field-wrapper .search-button{
+      width: 60px;
       &:hover, &:focus, &:active, &:hover:hover, &:hover:focus, &:hover:active{
         background: $blue;
         opacity: 0.95;

@@ -25,6 +25,7 @@
   box-sizing: border-box;
   padding: 8px 20px;
   display: block;
+  border-radius: 3px;
 
   .u-field-account_privacy{
     min-width: 0;
@@ -72,6 +73,7 @@
   .wrapper-profile-section-container-one .wrapper-profile-section-one{
     border: 1px solid $border;
     text-align: center;
+    border-radius: 3px;
 
     .profile-section-one-fields>.u-field{
       padding: 10px 0;
