@@ -973,3 +973,10 @@ urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += (
     url(r'^hijack/', include('hijack.urls')),
 )
+
+# Tahoe API
+urlpatterns += (
+    url(r'^tahoe/api/',
+        include('openedx.core.djangoapps.appsembler.api.urls',
+        namespace='tahoe-api')),
+)

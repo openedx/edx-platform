@@ -1614,7 +1614,7 @@ def _do_create_account(form, custom_form=None):
     return (user, profile, registration)
 
 
-def create_account_with_params(request, params):
+def create_account_with_params(request, params, send_activation_email_flag=True):
     """
     Given a request and a dict of parameters (which may or may not have come
     from the request), create an account for the requesting user, including
@@ -1856,7 +1856,7 @@ def create_account_with_params(request, params):
         ) and
         "registered_from_amc" not in params  # don't need to activate email if the user already did that on AMC
     )
-    if send_email:
+    if send_email and send_activation_email_flag:
         dest_addr = user.email
         context = {
             'name': profile.name,

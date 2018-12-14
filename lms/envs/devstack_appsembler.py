@@ -20,6 +20,7 @@ INSTALLED_APPS += (
     'openedx.core.djangoapps.appsembler.msft_lp',
     'openedx.core.djangoapps.appsembler.tpa_admin',
     'openedx.core.djangoapps.appsembler.html_certificates',
+    'openedx.core.djangoapps.appsembler.api',
 )
 
 # those are usually hardcoded in devstack.py for some reason

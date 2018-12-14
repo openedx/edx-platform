@@ -170,8 +170,6 @@ FEATURES['ENABLE_SERVICE_STATUS'] = True
 # Note that this is the Studio key. There is a separate key for the LMS.
 import os
 CMS_SEGMENT_KEY = os.environ.get('SEGMENT_KEY')
-CMS_SEGMENT_SITE = os.environ.get('SEGMENT_SITE')
-
 
 #####################################################################
 # Lastly, see if the developer has any local overrides.
