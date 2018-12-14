@@ -13,7 +13,7 @@ from django.contrib.auth.models import AnonymousUser, User
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import prefetch_related_objects, Q
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import redirect
 from django.template.context_processors import csrf
@@ -613,11 +613,6 @@ class CourseTabView(EdxFragmentView):
         else:
             masquerade = None
 
-        if course and not check_course_open_for_learner(request.user, course):
-            # Disable student view button if user is staff and
-            # course is not yet visible to students.
-            supports_preview_menu = False
-
         context = {
             'course': course,
             'tab': tab,
@@ -974,7 +969,7 @@ def _progress(request, course_key, student_id):
 
     # The pre-fetching of groups is done to make auth checks not require an
     # additional DB lookup (this kills the Progress page in particular).
-    student = User.objects.prefetch_related("groups").get(id=student.id)
+    prefetch_related_objects([student], 'groups')
     if request.user.id != student.id:
         # refetch the course as the assumed student
         course = get_course_with_access(student, 'load', course_key, check_if_enrolled=True)

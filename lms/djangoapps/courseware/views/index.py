@@ -49,7 +49,6 @@ from xmodule.course_module import COURSE_VISIBILITY_PUBLIC
 from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 from .views import CourseTabView
 from ..access import has_access
-from ..access_utils import check_course_open_for_learner
 from ..courses import check_course_access, get_course_with_access, get_current_child, get_studio_url
 from ..entrance_exams import (
     course_has_entrance_exam,
@@ -437,13 +436,6 @@ class CoursewareIndex(View):
 
         # entrance exam data
         self._add_entrance_exam_to_context(courseware_context)
-
-        # staff masquerading data
-        if not check_course_open_for_learner(self.effective_user, self.course):
-            # Disable student view button if user is staff and
-            # course is not yet visible to students.
-            courseware_context['disable_student_access'] = True
-            courseware_context['supports_preview_menu'] = False
 
         if self.section:
             # chromeless data
