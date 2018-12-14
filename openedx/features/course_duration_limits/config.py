@@ -4,6 +4,7 @@ Content type gating waffle flag
 import random
 
 from django.dispatch import receiver
+from django.db import IntegrityError
 
 from experiments.models import ExperimentData, ExperimentKeyValue
 from openedx.core.djangoapps.waffle_utils import WaffleFlagNamespace, WaffleFlag
@@ -49,4 +50,9 @@ def set_value_for_content_type_gating_holdback(sender, event=None, user=None, **
                     value=is_in_holdback
                 )
             except (ExperimentKeyValue.DoesNotExist, AttributeError):
+                pass
+            except IntegrityError:
+                # There is a race condition when multiple enrollments happen at the same time where the ExperimentData
+                # row for one enrollment is created between the duplicate check and creation for the other enrollment.
+                # Since we're ignoring skipping duplicate entries anyway, this is safe to ignore.
                 pass
