@@ -27,32 +27,30 @@ def task_course_notifications():
 
         context = {}
         course_name = course.display_name
+        course_discussion_url = "{}/category/{}".format(settings.NODEBB_ENDPOINT, get_community_url(course.id))
 
         # create context when 7 days left to course start
         if course_start_date - timedelta(days=7) == date_now:
-            template = MandrillClient.COURSE_EARLY_WELCOME_TEMPLATE
-            course_url = "{}/category/{}".format(settings.NODEBB_ENDPOINT, get_community_url(course.id))
+            template = 'test-template'
             context = {
                 'course_name': course_name,
-                'course_discussion_URL': course_url
+                'course_discussion_URL': course_discussion_url
             }
 
         # create context when when 2 days left to course start
         elif course_start_date - timedelta(days=2) == date_now:
-            template = MandrillClient.COURSE_START_REMINDER_TEMPLATE
-            course_url = "{}/category/{}".format(settings.NODEBB_ENDPOINT, get_community_url(course.id))
+            template = 'test-template'
             context = {
                 'course_name': course_name,
-                'course_discussion_URL': course_url
+                'course_discussion_URL': course_discussion_url
             }
 
         # create context on the day the course starts
         elif course_start_date == date_now:
             template = MandrillClient.COURSE_WELCOME_TEMPLATE
-            course_url = get_course_first_chapter_link(course)
             context = {
                 'course_name': course_name,
-                'course_url': course_url
+                'course_url': get_course_first_chapter_link(course)
             }
 
         log.info('Setting up email context')
