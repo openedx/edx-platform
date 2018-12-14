@@ -53,7 +53,7 @@ var phoneDialog = function(){
                 error: function(error){
                 console.log(error)
                 $('.errot-text').addClass('active');
-                $('.errot-text').html(error);
+                $('.errot-text').html(error.responseText);
                 }
             });
             }
