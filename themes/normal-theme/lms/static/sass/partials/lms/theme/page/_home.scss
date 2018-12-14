@@ -23,21 +23,27 @@
     width: 100%;
     margin: 0;
     padding: 40px 30px;
+
+    .heading-group{
+      width: 100%;
+      text-align: center;
+      padding-bottom: 0;
+      h1{
+        text-align: center;
+        color: $blue;
+        font-size: 36px;
+      }
+      p{
+        font-style: static;
+        font-size: 18px;
+        color: $title;
+        line-height: 2.5;
+        font-style: normal;
+      }
+    }
   }
-  .title > .heading-group{
-    width: 100%;
-    text-align: center;
-  }
-  .title > .heading-group h1{
-    text-align: center;
-    color: $blue;
-    font-size: 36px;
-  }
-  .title > .heading-group p{
-    font-style: static;
-    font-size: 18px;
-    color: $title;
-  }
+  
+  
 
   // search
   .title .course-search{
@@ -58,6 +64,9 @@
     border: none;
     width: 100px;
     background: $blue;
+    .fa-search:before{
+      transform: scale(1.5);
+    }
   }
   .title .course-search .search-button:hover{
     background: $blue;
@@ -80,7 +89,7 @@
   }
   
   .course-image .cover-image{
-    height: 150px;
+    height: 156px;
     border-radius: 3px;
   }
   .course-image .cover-image .learn-more{
@@ -159,6 +168,7 @@
       } 
 
       >.heading-group{
+        padding: 15px;
         h1{
           font-size: 18px;
         }

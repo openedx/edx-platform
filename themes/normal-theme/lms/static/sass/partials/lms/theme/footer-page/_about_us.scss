@@ -98,3 +98,18 @@
     color:#222;  
     line-height: 40px;
 }
+@media screen and (max-width:576px){
+    .about-dec-img01,.about-dec-img02{
+        float: none;
+        width: 100%;
+    }
+    .about-dec-write,.about-dec-write01{
+        width: 100%;
+    }
+    .about-dec-write{
+        margin-top: 40px;
+    }
+    .about-dec{
+        padding: 10px;
+    }
+}

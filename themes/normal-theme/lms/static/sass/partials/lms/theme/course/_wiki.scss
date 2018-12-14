@@ -90,6 +90,20 @@ body.view-in-course .wiki-wrapper{
 // content
 .wiki-wrapper section.wiki .main-article{
   padding: 20px;
+  .entry-title{
+    margin-top: 10px;
+  }
+  table{
+    width: 100%;
+    border: 1px solid #ddd;
+    margin: 10px 0;
+    border-collapse: collapse;
+  }
+  th,td{
+    border: 1px solid #ddd;
+    padding: 5px 10px;
+    text-align: left;
+  }
   h3{
     margin: 10px 0;
     border: none;

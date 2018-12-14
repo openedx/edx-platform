@@ -42,6 +42,16 @@
   }
   .u-field-value{
     vertical-align: inherit;
+    select{
+      width: 230px;
+      appearance:none;
+      -moz-appearance:none;
+      -webkit-appearance:none;
+      background: url("http://ourjs.github.io/static/2015/arrow.png") no-repeat scroll right center #fff;
+    }
+  }
+  .u-field-message{
+    margin-top: 8px;
   }
 }
 

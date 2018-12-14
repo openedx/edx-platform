@@ -34,6 +34,11 @@
     .home .courses-container{
       margin-top: 320px;
     }
+    @media screen and (max-width:576px){
+      .home .courses-container{
+        margin-top: 210px;
+      }
+    }
   }
 }
 .wrapper-preview-menu{
@@ -62,7 +67,6 @@ a:not(.btn):hover, a:not(.btn):focus, a:visited:not(.btn):hover, a:visited:not(.
 select{
   width: 230px;
 	height: 36px;
-	background-color: #ffffff;
 	border-radius: 2px;
   border: solid 1px #eeeeee;
   font-size: 14px;
@@ -70,6 +74,30 @@ select{
   padding: 0 10px;
   box-sizing: border-box;
   outline: none;
+  appearance:none;
+  -moz-appearance:none;
+  -webkit-appearance:none;
+  background: url("/static/normal-theme/images/select.png") no-repeat scroll right center #fff;
+  background-size: 15px;
+}
+
+// input
+input::-webkit-input-placeholder{
+  color:#ccd1d9;
+}
+input::-moz-placeholder{
+  color:#ccd1d9;
+}
+input:-moz-placeholder{
+  color:#ccd1d9;
+}
+input:-ms-input-placeholder{
+  color:#ccd1d9;
+}
+
+// h1,h2..
+h1,h2,h3,h4,h5,h6{
+  -webkit-font-smoothing: unset;
 }
 
 // ul

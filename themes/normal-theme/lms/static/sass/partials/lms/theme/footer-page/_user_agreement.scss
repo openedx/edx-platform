@@ -16,3 +16,8 @@
 .user-agreement-box p{  
   line-height: 20px;
 }
+@media screen and (max-width:576px){
+  .user-agreement-box{
+    width: 100%;
+  }
+}

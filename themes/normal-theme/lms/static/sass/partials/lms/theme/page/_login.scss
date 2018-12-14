@@ -4,13 +4,12 @@
 }
 .login-register{
   background: none;
-  max-width: 500px;
-  min-width: 460px;
+
   .form-wrapper{
     padding-bottom: 100px;
   }
   .form-type{
-    min-width: 360px;
+    width: 460px;
   }
   .toggle-form{
     font-size: 14px;
@@ -44,18 +43,31 @@
         columns: $note;
       }
     }
+    .focus-out .label-text, .focus-out .label-optional{
+      color: #ccd1d9;
+    }
+    .error .label-text{
+      color: #D8353E;
+    }
     input, select, textarea{
       font-size: 14px;
       border: 1px solid #e6e9ed;
-      background: #fff;
+      background-color: #fff;
       outline: none;
       box-shadow: none;
-      border-radius: 3px;
+      border-radius: 2px;
       &:focus{
         border: 1px solid $blue;
         box-shadow: 0px 1px 2px 0px $border;
         outline: none;
       }
+    }
+    select{
+      background: url("/static/normal-theme/images/select.png") no-repeat scroll right center #fff;
+      background-size: 15px;
+    }
+    textarea{
+      padding: 10px;
     }
     .fa-check{
       position: relative;
@@ -71,6 +83,7 @@
     }
     &.select-year_of_birth{
       width: 49.5%;
+      margin: 0;
     }
     .tip, .plaintext-field{
       color: $font;
@@ -152,6 +165,10 @@
     border: none;
     padding: 0;
     margin: 20px 10px 0;
+
+    &:focus{
+      outline: none;
+    }
     .icon{
       background: none;
       .icon-image{
@@ -176,13 +193,16 @@
 
 @media screen and (max-width:576px){
   .login-register{
-    min-width: 300px;
+    width: 100%;
 
+    .form-type{
+      width: 95%;
+    }
     .form-field{
       &.select-year_of_birth, &.select-gender{
         width: 100%;
         padding-right: 0;
-        margin: 0;
+        margin: 20px 0 0;
       }
     }
   } 
