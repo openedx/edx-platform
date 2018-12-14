@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime, timedelta, date
 from pytz import utc
-from openedx.core.djangoapps.timed_notification.core import send_course_notification_email, get_course_link, get_course_first_chapter_link
+from openedx.core.djangoapps.timed_notification.core import send_course_notification_email, get_course_first_chapter_link
 from lms.djangoapps.branding import get_visible_courses
 from common.lib.mandrill_client.client import MandrillClient
 from nodebb.helpers import get_community_url
