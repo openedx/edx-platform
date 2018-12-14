@@ -98,12 +98,6 @@ EXPORT_IMPORT_STATIC_DIR = u'static'
 
 class VideoMixin(object):
 
-    def validate(self):
-        """
-        Validates the state of this Video Module Instance.
-        """
-        return self.runtime.validate()
-
     def get_transcripts_for_student(self, transcripts):
         """Return transcript information necessary for rendering the XBlock student view.
         This is more or less a direct extraction from `get_html`.
