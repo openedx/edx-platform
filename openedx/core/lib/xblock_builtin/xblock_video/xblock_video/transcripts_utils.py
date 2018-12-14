@@ -122,7 +122,7 @@ def save_subs_to_store(subs, subs_id, item, language='en'):
     """
     filedata = json.dumps(subs, indent=2)
     filename = subs_filename(subs_id, language)
-    return save_to_store(filedata, filename, 'application/json', item.location)
+    return save_to_store(filedata, filename, 'application/json', item.block_id)
 
 
 def youtube_video_transcript_name(youtube_text_api):
@@ -224,7 +224,7 @@ def remove_subs_from_store(subs_id, item, lang='en'):
     Remove from store, if transcripts content exists.
     """
     filename = subs_filename(subs_id, lang)
-    Transcript.delete_asset(item.location, filename)
+    Transcript.delete_asset(item.block_id, filename)
 
 
 def generate_subs_from_source(speed_subs, subs_type, subs_filedata, item, language='en'):
@@ -339,7 +339,7 @@ def copy_or_rename_transcript(new_name, old_name, item, delete_old=False, user=N
     If `delete_old` is True, removes `old_name` files from storage.
     """
     filename = u'subs_{0}.srt.sjson'.format(old_name)
-    content_location = StaticContent.compute_location(item.location.course_key, filename)
+    content_location = StaticContent.compute_location(item.block_id.course_key, filename)
     transcripts = contentstore().find(content_location).data
     save_subs_to_store(json.loads(transcripts), new_name, item)
     item.sub = new_name
@@ -478,7 +478,7 @@ def generate_sjson_for_all_speeds(item, user_filename, result_subs_dict, lang):
     _ = item.runtime.service(item, "i18n").ugettext
 
     try:
-        srt_transcripts = contentstore().find(Transcript.asset_location(item.location, user_filename))
+        srt_transcripts = contentstore().find(Transcript.asset_location(item.block_id, user_filename))
     except NotFoundError as ex:
         raise TranscriptException(_("{exception_message}: Can't find uploaded transcripts: {user_filename}").format(
             exception_message=text_type(ex),
@@ -518,10 +518,10 @@ def get_or_create_sjson(item, transcripts):
     user_subs_id = os.path.splitext(user_filename)[0]
     source_subs_id, result_subs_dict = user_subs_id, {1.0: user_subs_id}
     try:
-        sjson_transcript = Transcript.asset(item.location, source_subs_id, item.transcript_language).data
+        sjson_transcript = Transcript.asset(item.block_id, source_subs_id, item.transcript_language).data
     except NotFoundError:  # generating sjson from srt
         generate_sjson_for_all_speeds(item, user_filename, result_subs_dict, item.transcript_language)
-    sjson_transcript = Transcript.asset(item.location, source_subs_id, item.transcript_language).data
+    sjson_transcript = Transcript.asset(item.block_id, source_subs_id, item.transcript_language).data
     return sjson_transcript
 
 
@@ -679,7 +679,7 @@ class Transcript(object):
         """
         Get asset from contentstore, asset location is built from subs_id and lang.
 
-        `location` is module location.
+        `location` is XBlock block_id.
         """
         # HACK Warning! this is temporary and will be removed once edx-val take over the
         # transcript module and contentstore will only function as fallback until all the
@@ -701,7 +701,7 @@ class Transcript(object):
     @staticmethod
     def asset_location(location, filename):
         """
-        Return asset location. `location` is module location.
+        Return asset location. `location` is XBlock block_id.
         """
         # If user transcript filename is empty, raise `TranscriptException` to avoid `InvalidKeyError`.
         if not filename:
@@ -758,7 +758,7 @@ class VideoTranscriptsMixin(object):
                 try:
                     # for bumper videos, transcripts are stored in content store only
                     if is_bumper:
-                        get_transcript_for_video(self.location, filename, filename, language)
+                        get_transcript_for_video(self.block_id, filename, filename, language)
                     else:
                         get_transcript(self, language)
                 except NotFoundError:
@@ -803,11 +803,11 @@ class VideoTranscriptsMixin(object):
                 log.debug("No subtitles for 'en' language")
                 raise ValueError
 
-            data = Transcript.asset(self.location, transcript_name, lang).data
+            data = Transcript.asset(self.block_id, transcript_name, lang).data
             filename = u'{}.{}'.format(transcript_name, transcript_format)
             content = Transcript.convert(data, 'sjson', transcript_format)
         else:
-            data = Transcript.asset(self.location, None, None, other_lang[lang]).data
+            data = Transcript.asset(self.block_id, None, None, other_lang[lang]).data
             filename = u'{}.{}'.format(os.path.splitext(other_lang[lang])[0], transcript_format)
             content = Transcript.convert(data, 'srt', transcript_format)
 
@@ -957,7 +957,7 @@ def get_transcript_from_contentstore(video, language, output_format, transcripts
         try:
             transcripts[u'en'] = sub_id
             input_format, base_name, transcript_content = get_transcript_for_video(
-                video.location,
+                video.block_id,
                 subs_id=sub_id,
                 file_name=transcripts[language],
                 language=language

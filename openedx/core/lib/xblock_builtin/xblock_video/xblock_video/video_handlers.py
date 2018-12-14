@@ -137,7 +137,7 @@ class VideoStudentViewHandlers(object):
         if youtube_id:
             # Youtube case:
             if self.transcript_language == 'en':
-                return Transcript.asset(self.location, youtube_id).data
+                return Transcript.asset(self.block_id, youtube_id).data
 
             youtube_ids = youtube_speed_dict(self)
             if youtube_id not in youtube_ids:
@@ -145,7 +145,7 @@ class VideoStudentViewHandlers(object):
                 raise NotFoundError
 
             try:
-                sjson_transcript = Transcript.asset(self.location, youtube_id, self.transcript_language).data
+                sjson_transcript = Transcript.asset(self.block_id, youtube_id, self.transcript_language).data
             except NotFoundError:
                 log.info("Can't find content in storage for %s transcript: generating.", youtube_id)
                 generate_sjson_for_all_speeds(
@@ -154,14 +154,14 @@ class VideoStudentViewHandlers(object):
                     {speed: youtube_id for youtube_id, speed in youtube_ids.iteritems()},
                     self.transcript_language
                 )
-                sjson_transcript = Transcript.asset(self.location, youtube_id, self.transcript_language).data
+                sjson_transcript = Transcript.asset(self.block_id, youtube_id, self.transcript_language).data
 
             return sjson_transcript
         else:
             # HTML5 case
             if self.transcript_language == 'en':
                 if '.srt' not in sub:  # not bumper case
-                    return Transcript.asset(self.location, sub).data
+                    return Transcript.asset(self.block_id, sub).data
                 try:
                     return get_or_create_sjson(self, {'en': sub})
                 except TranscriptException:
@@ -330,7 +330,7 @@ class VideoStudentViewHandlers(object):
                 add_attachment_header=False
             )
         except NotFoundError:
-            log.exception('[Translation Dispatch] %s', self.location)
+            log.exception('[Translation Dispatch] %s', self.block_id)
             response = self.get_static_transcript(request, transcripts)
 
         return response

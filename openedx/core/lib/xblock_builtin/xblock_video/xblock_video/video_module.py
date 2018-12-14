@@ -34,7 +34,7 @@ from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metada
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.x_module import module_attr, PUBLIC_VIEW, STUDENT_VIEW
-from xmodule.xml_module import deserialize_field, is_pointer_tag, name_to_pathname
+from xmodule.xml_module import deserialize_field
 
 from .bumper_utils import bumperize
 from .transcripts_utils import (
@@ -148,12 +148,12 @@ class VideoMixin(object):
         Return True if youtube is deprecated and hls as primary playback is enabled else False
         """
         # Return False if `hls` playback feature is disabled.
-        if not HLSPlaybackEnabledFlag.feature_enabled(self.location.course_key):
+        if not HLSPlaybackEnabledFlag.feature_enabled(self.block_id.course_key):
             return False
 
         # check if youtube has been deprecated and hls as primary playback
         # is enabled for this course
-        return waffle_flags()[DEPRECATE_YOUTUBE].is_enabled(self.location.course_key)
+        return waffle_flags()[DEPRECATE_YOUTUBE].is_enabled(self.block_id.course_key)
 
     def prioritize_hls(self, youtube_streams, html5_sources):
         """
@@ -376,7 +376,7 @@ class VideoMixin(object):
             'branding_info': branding_info,
             'cdn_eval': cdn_eval,
             'cdn_exp_group': cdn_exp_group,
-            'id': self.location.html_id(),
+            'id': self.block_id.html_id(),
             'display_name': self.display_name_with_default,
             'handout': self.handout,
             'download_video_link': download_video_link,
@@ -390,7 +390,6 @@ class VideoMixin(object):
 
 class VideoDescriptor(LicenseMixin):
     # FIXME re-add base class functionality: TabsEditingDescriptor, EmptyDataRawDescriptor
-    # Use XmlParserMixin to deal with legacy OLX
     """
     Descriptor for `VideoModule`.
     """
@@ -512,7 +511,7 @@ class VideoDescriptor(LicenseMixin):
             html5_ids = get_html5_ids(self.html5_sources)
             for subs_id in html5_ids:
                 try:
-                    Transcript.asset(self.location, subs_id)
+                    Transcript.asset(self.block_id, subs_id)
                 except NotFoundError:
                     # If a transcript does not not exist with particular html5_id then there is no need to check other
                     # html5_ids because we have to create a new transcript with this missing html5_id by turning on
@@ -545,15 +544,6 @@ class VideoDescriptor(LicenseMixin):
         """
         self.save()
         self.runtime.modulestore.update_item(self, user.id)
-
-    @property
-    def location(self):
-        """
-        Return this XBlock's usage_id
-
-        Convenience method to reduce code changes when converting from XModule.
-        """
-        return self.scope_ids.usage_id
 
     @property
     def editable_metadata_fields(self):
@@ -592,7 +582,7 @@ class VideoDescriptor(LicenseMixin):
         for sub_id in possible_sub_ids:
             try:
                 get_transcript_for_video(
-                    self.location,
+                    self.block_id,
                     subs_id=sub_id,
                     file_name=sub_id,
                     language=u'en'
@@ -611,46 +601,6 @@ class VideoDescriptor(LicenseMixin):
         editable_fields['handout']['type'] = 'FileUploader'
 
         return editable_fields
-
-    @classmethod
-    def from_xml(cls, xml_data, system, id_generator):
-        """
-        Creates an instance of this descriptor from the supplied xml_data.
-        This may be overridden by subclasses
-        xml_data: A string of xml that will be translated into data and children for
-            this module
-        system: A DescriptorSystem for interacting with external resources
-        id_generator is used to generate course-specific urls and identifiers
-        """
-        xml_object = etree.fromstring(xml_data)
-        url_name = xml_object.get('url_name', xml_object.get('slug'))
-        block_type = 'video'
-        definition_id = id_generator.create_definition(block_type, url_name)
-        usage_id = id_generator.create_usage(definition_id)
-        if is_pointer_tag(xml_object):
-            filepath = cls._format_filepath(xml_object.tag, name_to_pathname(url_name))
-            xml_object = cls.load_file(filepath, system.resources_fs, usage_id)
-            system.parse_asides(xml_object, definition_id, usage_id, id_generator)
-        field_data = cls._parse_video_xml(xml_object, id_generator)
-        kvs = InheritanceKeyValueStore(initial_values=field_data)
-        field_data = KvsFieldData(kvs)
-        video = system.construct_xblock_from_class(
-            cls,
-            # We're loading a descriptor, so student_id is meaningless
-            # We also don't have separate notions of definition and usage ids yet,
-            # so we use the location for both
-            ScopeIds(None, block_type, definition_id, usage_id),
-            field_data,
-        )
-
-        # Update VAL with info extracted from `xml_object`
-        video.edx_video_id = video.import_video_info_into_val(
-            xml_object,
-            system.resources_fs,
-            getattr(id_generator, 'target_course_id', None)
-        )
-
-        return video
 
     def definition_to_xml(self, resource_fs):
         """
@@ -680,13 +630,13 @@ class VideoDescriptor(LicenseMixin):
                     try:
                         xml.set(key, unicode(value))
                     except UnicodeDecodeError:
-                        exception_message = format_xml_exception_message(self.location, key, value)
+                        exception_message = format_xml_exception_message(self.block_id, key, value)
                         log.exception(exception_message)
                         # If exception is UnicodeDecodeError set value using unicode 'utf-8' scheme.
                         log.info("Setting xml value using 'utf-8' scheme.")
                         xml.set(key, unicode(value, 'utf-8'))
                     except ValueError:
-                        exception_message = format_xml_exception_message(self.location, key, value)
+                        exception_message = format_xml_exception_message(self.block_id, key, value)
                         log.exception(exception_message)
                         raise
 
@@ -769,6 +719,13 @@ class VideoDescriptor(LicenseMixin):
             return u'https://www.youtube.com/watch?v={0}'.format(youtube_id)
         else:
             return u''
+
+    @property
+    def block_id(self):
+        """
+        Return this XBlock's usage_id
+        """
+        return self.scope_ids.usage_id
 
     def get_context(self):
         """
@@ -1071,14 +1028,14 @@ class VideoDescriptor(LicenseMixin):
         # Check in VAL data first if edx_video_id exists
         if self.edx_video_id:
             video_profile_names = context.get("profiles", ["mobile_low"])
-            if HLSPlaybackEnabledFlag.feature_enabled(self.location.course_key) and 'hls' not in video_profile_names:
+            if HLSPlaybackEnabledFlag.feature_enabled(self.block_id.course_key) and 'hls' not in video_profile_names:
                 video_profile_names.append('hls')
 
             # get and cache bulk VAL data for course
             val_course_data = self.get_cached_val_data_for_course(
                 self.request_cache,
                 video_profile_names,
-                self.location.course_key,
+                self.block_id.course_key,
             )
             val_video_data = val_course_data.get(self.edx_video_id, {})
 
