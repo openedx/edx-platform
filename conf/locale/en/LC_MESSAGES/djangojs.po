@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-11-25 20:36+0000\n"
-"PO-Revision-Date: 2018-11-25 20:37:03.145083\n"
+"POT-Creation-Date: 2018-12-13 19:28+0000\n"
+"PO-Revision-Date: 2018-12-13 19:28:28.152220\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -4558,6 +4558,14 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Secondary Email Address"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "You may access your account when single-sign on is not available."
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Full Name"
 msgstr ""
@@ -5886,7 +5894,11 @@ msgid "Visibility"
 msgstr ""
 
 #: cms/static/js/views/modals/edit_xblock.js
-msgid "Editing: %(title)s"
+msgid "Editing: {title}"
+msgstr ""
+
+#: cms/static/js/views/modals/edit_xblock.js
+msgid "Plugins"
 msgstr ""
 
 #: cms/static/js/views/modals/edit_xblock.js
@@ -9852,6 +9864,10 @@ msgstr ""
 msgid ""
 "If the subsection does not have a due date, learners always see their scores"
 " when they submit answers to assessments."
+msgstr ""
+
+#: cms/templates/js/show-textbook.underscore
+msgid "PDF Chapters"
 msgstr ""
 
 #: cms/templates/js/show-textbook.underscore

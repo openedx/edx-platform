@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-11-25 20:36+0000\n"
-"PO-Revision-Date: 2018-11-25 20:37:03.145083\n"
+"POT-Creation-Date: 2018-12-13 19:28+0000\n"
+"PO-Revision-Date: 2018-12-13 19:28:28.152220\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -5415,6 +5415,16 @@ msgstr ""
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Secondary Email Address"
+msgstr "Séçöndärý Émäïl Àddréss Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "You may access your account when single-sign on is not available."
+msgstr ""
+"Ýöü mäý äççéss ýöür äççöünt whén sïnglé-sïgn ön ïs nöt äväïläßlé. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
 msgid "Full Name"
 msgstr "Füll Nämé Ⱡ'σяєм ιρѕυм ∂σł#"
@@ -7060,8 +7070,12 @@ msgid "Visibility"
 msgstr "Vïsïßïlïtý Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: cms/static/js/views/modals/edit_xblock.js
-msgid "Editing: %(title)s"
-msgstr "Édïtïng: %(title)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+msgid "Editing: {title}"
+msgstr "Édïtïng: {title} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: cms/static/js/views/modals/edit_xblock.js
+msgid "Plugins"
+msgstr "Plügïns Ⱡ'σяєм ιρѕυм #"
 
 #: cms/static/js/views/modals/edit_xblock.js
 #: lms/templates/ccx/schedule.underscore
@@ -11754,6 +11768,10 @@ msgid ""
 msgstr ""
 "Ìf thé süßséçtïön döés nöt hävé ä düé däté, léärnérs älwäýs séé théïr sçörés"
 " whén théý süßmït änswérs tö ässéssménts. Ⱡ'σяєм ιρѕυм ∂#"
+
+#: cms/templates/js/show-textbook.underscore
+msgid "PDF Chapters"
+msgstr "PDF Çhäptérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: cms/templates/js/show-textbook.underscore
 msgid "View Live"

@@ -28,11 +28,11 @@ class Provenance(Enum):
     """
     Provenance enum
     """
-    course = _('Course')
-    org = _('Org')
-    site = _('Site')
-    global_ = _('Global')
-    default = _('Default')
+    course = 'Course'
+    org = 'Org'
+    site = 'Site'
+    global_ = 'Global'
+    default = 'Default'
 
 
 class StackedConfigurationModel(ConfigurationModel):
