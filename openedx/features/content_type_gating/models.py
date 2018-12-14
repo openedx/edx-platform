@@ -17,6 +17,7 @@ from openedx.core.djangoapps.config_model_utils.models import StackedConfigurati
 from openedx.features.content_type_gating.helpers import has_staff_roles
 from openedx.features.course_duration_limits.config import (
     CONTENT_TYPE_GATING_FLAG,
+    FEATURE_BASED_ENROLLMENT_GLOBAL_KILL_FLAG,
     EXPERIMENT_ID,
     EXPERIMENT_DATA_HOLDBACK_KEY
 )
@@ -68,6 +69,9 @@ class ContentTypeGatingConfig(StackedConfigurationModel):
             user: The user being queried.
             course_key: The CourseKey of the course being queried.
         """
+        if FEATURE_BASED_ENROLLMENT_GLOBAL_KILL_FLAG.is_enabled():
+            return False
+
         if CONTENT_TYPE_GATING_FLAG.is_enabled():
             return True
 
@@ -141,6 +145,10 @@ class ContentTypeGatingConfig(StackedConfigurationModel):
             course_key: The CourseKey of the course being queried.
             target_datetime: The datetime to checked enablement as of. Defaults to the current date and time.
         """
+
+        if FEATURE_BASED_ENROLLMENT_GLOBAL_KILL_FLAG.is_enabled():
+            return False
+
         if CONTENT_TYPE_GATING_FLAG.is_enabled():
             return True
 
@@ -161,6 +169,10 @@ class ContentTypeGatingConfig(StackedConfigurationModel):
         Arguments:
             target_datetime (:class:`datetime.datetime`): The datetime that ``enabled_as_of`` must be equal to or before
         """
+
+        if FEATURE_BASED_ENROLLMENT_GLOBAL_KILL_FLAG.is_enabled():
+            return False
+
         if CONTENT_TYPE_GATING_FLAG.is_enabled():
             return True
 
