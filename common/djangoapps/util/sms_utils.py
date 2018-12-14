@@ -157,7 +157,7 @@ def send_short_message_by_linkgroup(destnumbers, msg, sendtime='', channel=1):
         :return: 实际需返回是否发送成功/失败，以及原因
         """
     CorpID = settings.SMS_API_BY_LINKGROUP['normal_auth']['userid']  # 账号
-    Pwd = settings.SMS_API_BY_LINKGROUP['normal_auth']['password']   # 密码
+    Pwd = settings.SMS_API_BY_LINKGROUP['normal_auth']['password']  # 密码
     Mobile = destnumbers
     Content = msg.decode('utf-8').encode('gb2312')
     if sendtime:
@@ -185,7 +185,7 @@ def send_short_message_by_linkgroup(destnumbers, msg, sendtime='', channel=1):
             return_msg_str = '短信已发送'
         else:
             success = False
-            return_msg_str = '短信发送失败'
+            return_msg_str = '短信发送失败' + response.text
     except Exception as e:
         success = False
         return_msg_str = '短信发送失败'
