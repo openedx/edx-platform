@@ -98,8 +98,6 @@ class VideoXBlock(
         If no external data sources are found (file in "video" folder), it is exactly equivalent to base method
         XBlock.parse_xml. Otherwise this method parses file in "video" folder (known as definition_xml) and updates fields accordingly.
         """
-        log.error("VideoXBlock.student_view: has definition_from_xml? %s",
-                  hasattr(cls, 'definition_from_xml'));
         block = super(VideoDescriptor, cls).parse_xml(node, runtime, keys, id_generator)
 
         cls._apply_translations_to_node_attributes(block, node)
@@ -147,4 +145,3 @@ class VideoXBlock(
         for field_name, value in metadata.iteritems():
             if field_name in block.fields:
                 setattr(block, field_name, value)
-
