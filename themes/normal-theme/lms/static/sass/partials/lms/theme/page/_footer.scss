@@ -5,9 +5,9 @@
   font-size: 14px;
   box-shadow: 0 2px 2px 2px $border;
   line-height: 1.8;
-  padding: 40px 0;
+  padding: 14px 0;
   box-sizing: border-box;
-
+  border-top: 1px solid $border;
   // 1. 布局
   .footer-content{
     width: 96%;
@@ -23,6 +23,7 @@
     vertical-align: text-top;
     height: 138px;
     border-right: 1px dashed $border;
+    padding-top: 22px;
   }
 
   .footer-wechat{
@@ -31,6 +32,7 @@
     width: 13%;
     vertical-align: text-top;
     border-left: 1px dashed $border;
+    padding-top: 22px;
     h3{ 
       text-align: center;
     }
@@ -45,6 +47,7 @@
     display: inline-block;
     width: 24.5%;
     vertical-align: text-top;
+    padding-top: 22px;
   }
   ul{
     list-style: none;
@@ -75,7 +78,7 @@
     border-bottom: 1px dashed $border;
     position: absolute;
     left: 20%;
-    top: 39px;
+    top: 58px;
   }
 
   // 3. 左侧app按钮
@@ -127,7 +130,7 @@
   // 备案信息
   .footer-text{
     text-align: center;
-    margin-top: 30px;
+    margin-top: 22px; 
     padding: 0 20px;
   }
 }

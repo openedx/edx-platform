@@ -14,7 +14,7 @@ from openedx.features.enterprise_support.utils import remind_users_to_bind_phone
 binding = remind_users_to_bind_phones(request)
 %>
 <div class="my-footer">
-  <div class="footer-content">
+  <div class="footer-content clearfix">
     <div class="footer-app">
       <img class="logo" src="${static.url('images/logo_footer.png')}" />
       <p class="slogan">${_(u"变革 • 创新 • 未来")}</p>
@@ -39,7 +39,7 @@ binding = remind_users_to_bind_phones(request)
       <div class="footer-list">
         <h3>${_(u"英荔教育")}</h3>
         <ul>
-          <li><a href="/about/">${_(u"关于我们")}</a></li>
+          <li><a href="/about">${_(u"关于我们")}</a></li>
           <li><a href="${reverse('contact')}">${_(u"联系我们")}</a></li>
           <li><a href="${reverse('join_us')}">${_(u"加入我们")}</a></li>
         </ul>

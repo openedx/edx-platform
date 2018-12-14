@@ -23,6 +23,7 @@
 }
 .contact-dec ul{  
   padding-left: 0;
+  margin: 0;
 }
 .contact-dec li{  
   width: 490px;
@@ -35,7 +36,7 @@
   line-height: 40px;
   color: #2E313C;
   font-size: 20px;
-  margin-top: 12px;
+  // margin-top: 12px;
 }
 .contact-dec li:nth-child(odd){ 
   float: left;   
@@ -54,4 +55,9 @@
 }
 .contact-dec li p:nth-of-type(8){ 
   border-bottom: none;
+}
+@media screen and (max-width:576px){
+  .contact-dec li{
+    width: 100%;
+  }
 }
