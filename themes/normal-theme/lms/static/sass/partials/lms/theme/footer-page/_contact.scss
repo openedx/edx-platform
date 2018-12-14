@@ -30,6 +30,12 @@
   border-bottom: 1px solid #cecece;
   height: 116px;
   color: #656D78;
+  padding-top: 28px;
+  box-sizing: border-box;
+}
+.contact-dec li.first{
+  padding-top: 0;
+  box-sizing: border-box;
 }
 .contact-dec li div strong{   
   display: block;

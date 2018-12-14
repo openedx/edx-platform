@@ -30,13 +30,13 @@ var phoneDialog = function(){
             var phone = $('.phone-input-box').val();
             console.log(phone)
             if(checkPhone(phone) !== true){
-                $('.errot-text').addClass('active');
-                $('.errot-text').html(checkPhone(phone));
+                $('.error-text').addClass('active');
+                $('.error-text').html(checkPhone(phone));
                 $('.phone-number').addClass('error');
                 return;
             }
             $('.phone-number').removeClass('error');
-            $('.errot-text').removeClass('active');
+            $('.error-text').removeClass('active');
             $(this).removeClass('active');          
             $.ajax({
                 url: '/api/user/v1/accounts/send_code_binding_phone/',
@@ -52,8 +52,8 @@ var phoneDialog = function(){
                 },
                 error: function(error){
                 console.log(error)
-                $('.errot-text').addClass('active');
-                $('.errot-text').html(error.responseText);
+                $('.error-text').addClass('active');
+                $('.error-text').html(error.responseText);
                 }
             });
             }
@@ -100,8 +100,8 @@ var phoneDialog = function(){
                 },
                 error: function(error){
                 console.log(error)
-                $('.errot-text').addClass('active');
-                $('.errot-text').html(error.responseText);
+                $('.error-text').addClass('active');
+                $('.error-text').html(error.responseText);
                 }
             });
             }
