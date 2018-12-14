@@ -12,6 +12,9 @@
 # https://github.com/transifex/transifex-client/issues/252
 six==1.11.0
 
+# version 2.6.0 changes the data model, which results in a failure in common.djangoapps.util.tests.test_db.MigrationTests.test_migrations_are_in_sync
+django-simple-history==2.5.1
+
 # Convert text markup to HTML; used in capa problems, forums, and course wikis; pin Markdown version as tests failed for its upgrade to latest release
 Markdown==2.6.11
 
