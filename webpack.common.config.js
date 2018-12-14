@@ -26,6 +26,44 @@ var defineFooter = new RegExp('(' + defineCallFooter.source + ')|('
                              + defineDirectFooter.source + ')|('
                              + defineFancyFooter.source + ')', 'm');
 
+var workerConfig = function() {
+    try {
+        return {
+            webworker: {
+                target: 'webworker',
+                context: __dirname,
+                entry: require('../workers.json'),
+                output: {
+                    filename: '[name].js',
+                    path: path.resolve(__dirname, 'common/static/bundles')
+                },
+                plugins: [
+                    new BundleTracker({
+                        path: process.env.STATIC_ROOT_LMS,
+                        filename: 'webpack-worker-stats.json'
+                    })
+                ],
+                module: {
+                    rules: [
+                        {
+                            test: /\.(js|jsx)$/,
+                            include: [
+                                /node_modules\/@edx/
+                            ],
+                            use: 'babel-loader'
+                        }
+                    ]
+                },
+                resolve: {
+                    extensions: ['.js']
+                }
+            }
+        }
+    } catch (err) {
+        return null;
+    }
+};
+
 module.exports = Merge.smart({
     web: {
         context: __dirname,
@@ -388,37 +426,6 @@ module.exports = Merge.smart({
             fs: 'empty'
         }
 
-    },
-    webworker: {
-        target: 'webworker',
-        context: __dirname,
-        entry: {
-            edx_proctoring_proctortrack: './node_modules/edx-proctoring-proctortrack/edx_proctoring_proctortrack/static/proctortrack_custom.js'
-        },
-        output: {
-            filename: '[name].js',
-            path: path.resolve(__dirname, 'common/static/bundles')
-        },
-        plugins: [
-            new BundleTracker({
-                path: process.env.STATIC_ROOT_LMS,
-                filename: 'webpack-worker-stats.json'
-            })
-        ],
-        module: {
-            rules: [
-                {
-                    test: /\.(js|jsx)$/,
-                    include: [
-                        /node_modules\/@edx/
-                    ],
-                    use: 'babel-loader'
-                }
-            ]
-        },
-        resolve: {
-            extensions: ['.js']
-        }
     }
-}, {web: xmoduleJS});
+}, {web: xmoduleJS}, workerConfig());
 
