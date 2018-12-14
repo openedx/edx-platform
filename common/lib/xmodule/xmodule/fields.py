@@ -220,6 +220,9 @@ class RelativeTime(JSONField):
         if not value:
             return "00:00:00"
 
+        if isinstance(value, basestring):
+            value = self.from_json(value)
+
         if isinstance(value, float):  # backward compatibility
             value = min(value, 86400)
             return self.timedelta_to_string(datetime.timedelta(seconds=value))
