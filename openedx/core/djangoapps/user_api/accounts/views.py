@@ -567,6 +567,8 @@ class PhoneBindingViewSet(ViewSet):
             user_msg = '验证码{}，用于绑定校验，10分钟内有效。请勿将验证码泄露，谨防被盗。'.format(code)
         status, msg = send_short_message_by_linkgroup(mobile, user_msg, '', channel=1)
         print user_msg
+        if not status:
+            raise Exception(msg)
         return status, msg
 
     def set_verify_code(self, key):
