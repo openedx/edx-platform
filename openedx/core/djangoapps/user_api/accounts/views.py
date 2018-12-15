@@ -524,7 +524,7 @@ def _set_unusable_password(user):
 
 
 class PhoneBindingViewSet(ViewSet):
-    authentication_classes = (SessionAuthentication, JwtAuthentication,)
+    authentication_classes = (SessionAuthentication, JwtAuthentication, OAuth2AuthenticationAllowInactiveUser)
     permission_classes = (permissions.IsAuthenticated,)
 
     verify_code_key = 'phone_binding_verifycode_{username}_{name}'
