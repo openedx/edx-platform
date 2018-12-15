@@ -39,7 +39,7 @@ binding = remind_users_to_bind_phones(request)
       <div class="footer-list">
         <h3>${_(u"Elite Education")}</h3>
         <ul>
-          <li><a href="/about/">${_(u"About Us")}</a></li>
+          <li><a href="/about">${_(u"About Us")}</a></li>
           <li><a href="${reverse('contact')}">${_(u"Contact Us")}</a></li>
           <li><a href="${reverse('join_us')}">${_(u"Join Us")}</a></li>
         </ul>
@@ -113,17 +113,21 @@ binding = remind_users_to_bind_phones(request)
   window.onload = function(){
     var checkPhone = $('#phone-binding').val();
     if (checkPhone == 'True'){
-      $('.eliteu-message-box').show();
-      $('.fa-message-close').click(function(){
-        $('.eliteu-message-box').hide();
-      });
-      
-      $('.binding-btn').click(function(){
-        $('.eliteu-message-box').hide();
-        $('.phone-dialog').show();
-        phoneDialog();
-  
-      });
+      var device = getQueryString('device');
+      // not in app 
+      if(device == undefined){
+        $('.eliteu-message-box').show();
+        $('.fa-message-close').click(function(){
+          $('.eliteu-message-box').hide();
+        });
+        
+        $('.binding-btn').click(function(){
+          $('.eliteu-message-box').hide();
+          $('.phone-dialog').show();
+          phoneDialog();
+    
+        });
+      }
     }
   }
 </script>
