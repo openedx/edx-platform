@@ -559,6 +559,9 @@ class PhoneBindingViewSet(ViewSet):
         if not (mobile and ValidateDataForEducation().is_mobile(mobile)):
             raise Exception(_(u"Please check mobile number format;"))
 
+        if UserProfile.objects.filter(phone=mobile):
+            raise Exception(_(u"This mobile number is already bound to another account."))
+
         code = self.set_verify_code({'username': username, 'name': mobile})
         if language == 'en':
             user_msg = 'Your Verification Code for binding is {}, expiring in 10 minutes. In case of information leakage, please do not disclose your verification code.'.format(
