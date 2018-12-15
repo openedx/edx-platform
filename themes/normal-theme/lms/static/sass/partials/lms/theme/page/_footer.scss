@@ -97,6 +97,36 @@
     padding: 4px 10px 2px;
     cursor: pointer;
     background: #f7fbfe;
+    position: relative;
+
+    .footer-qr-block{
+      position: absolute;
+      bottom: 42px;
+      left: -20px;
+      box-shadow: 0px 1px 4px 0px $border;
+      padding: 5px;
+      display: none;
+      background: #fff;
+      img{
+        width: 100px;
+      }
+    }
+    .qrcode-icon{
+      position: absolute;
+      bottom: -10px;
+      left: 50px;
+    }
+    &:hover{
+      color: #fff;
+      background: $blue;
+      .footer-icon svg{
+        fill: #fff;
+      }
+      & > .footer-qr-block{
+        display: block;
+      }
+    }
+
   }
   .footer-icon{
     font-size: 16px;
@@ -106,13 +136,6 @@
     fill: $blue;
   }
 
-  .footer-btn:hover{
-    color: #fff;
-    background: $blue;
-    .footer-icon svg{
-      fill: #fff;
-    }
-  }
   // Wechat
   .footer-qrcode{
     width: 60px;
