@@ -87,7 +87,7 @@ INSTALLED_APPS = (
     'completion',
 )
 
-LMS_ROOT_URL = 'http://localhost:8000'
+LMS_ROOT_URL = "http://localhost:8000"
 
 MEDIA_ROOT = tempfile.mkdtemp()
 

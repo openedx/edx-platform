@@ -2519,7 +2519,7 @@ if FEATURES.get('ENABLE_CORS_HEADERS'):
 # to simulate cross-domain requests.
 XDOMAIN_PROXY_CACHE_TIMEOUT = 60 * 15
 
-LOGIN_REDIRECT_WHITELIST = []
+LOGIN_REDIRECT_WHITELIST = [CMS_BASE]
 
 ###################### Registration ##################################
 

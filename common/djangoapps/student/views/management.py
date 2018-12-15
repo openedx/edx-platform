@@ -67,12 +67,8 @@ from openedx.features.journals.api import get_journals_context
 from student.forms import AccountCreationForm, PasswordResetFormNoActive, get_registration_extension_form
 from student.helpers import (
     DISABLE_UNENROLL_CERT_STATES,
-    auth_pipeline_urls,
     cert_info,
-    create_or_set_user_attribute_created_on_site,
-    do_create_account,
     generate_activation_email_context,
-    get_next_url_for_login_page
 )
 from student.message_types import EmailChange, PasswordReset
 from student.models import (

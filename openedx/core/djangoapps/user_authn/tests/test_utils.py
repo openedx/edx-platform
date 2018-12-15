@@ -1,6 +1,8 @@
 """ Test User Authentication utilities """
 
+from collections import namedtuple
 import ddt
+
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
@@ -18,19 +20,27 @@ class TestRedirectUtils(TestCase):
         super(TestRedirectUtils, self).setUp()
         self.request = RequestFactory()
 
+    RedirectCase = namedtuple('RedirectCase', ['url', 'host', 'req_is_secure', 'expected_is_safe'])
+
     @ddt.data(
-        ('/dashboard', 'testserver', True),
-        ('https://edx.org/courses', 'edx.org', True),
-        ('https://test.edx.org/courses', 'edx.org', True),
-        ('https://www.amazon.org', 'edx.org', False),
-        ('http://edx.org/courses', 'edx.org', False),
-        ('http:///edx.org/courses', 'edx.org', False),  # Django's is_safe_url protects against "///"
+        RedirectCase('/dashboard', 'testserver', req_is_secure=True, expected_is_safe=True),
+        RedirectCase('https://test.edx.org/courses', 'edx.org', req_is_secure=True, expected_is_safe=True),
+        RedirectCase('https://www.amazon.org', 'edx.org', req_is_secure=True, expected_is_safe=False),
+
+        # https is required only if the request is_secure
+        RedirectCase('https://edx.org/courses', 'edx.org', req_is_secure=True, expected_is_safe=True),
+        RedirectCase('http://edx.org/courses', 'edx.org', req_is_secure=False, expected_is_safe=True),
+        RedirectCase('http://edx.org/courses', 'edx.org', req_is_secure=True, expected_is_safe=False),
+
+        # Django's is_safe_url protects against "///"
+        RedirectCase('http:///edx.org/courses', 'edx.org', req_is_secure=True, expected_is_safe=False),
     )
     @ddt.unpack
     @override_settings(LOGIN_REDIRECT_WHITELIST=['test.edx.org'])
-    def test_safe_redirect(self, url, host, expected_is_safe):
+    def test_safe_redirect(self, url, host, req_is_secure, expected_is_safe):
         """ Test safe next parameter """
         req = self.request.get('/login', HTTP_HOST=host)
+        req.is_secure = lambda: req_is_secure
         actual_is_safe = is_safe_login_or_logout_redirect(req, url)
         self.assertEqual(actual_is_safe, expected_is_safe)
 

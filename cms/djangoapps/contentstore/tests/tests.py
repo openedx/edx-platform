@@ -309,7 +309,7 @@ class AuthTestCase(ContentStoreTestCase):
         resp = self.client.get_html(course_url)
 
         # re-request, and we should get a redirect to login page
-        self.assertRedirects(resp, settings.LOGIN_REDIRECT_URL + '?next=/home/')
+        self.assertRedirects(resp, settings.LOGIN_URL + '?next=/home/')
 
     @mock.patch.dict(settings.FEATURES, {"ALLOW_PUBLIC_ACCOUNT_CREATION": False})
     def test_signup_button_index_page(self):

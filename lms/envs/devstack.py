@@ -21,7 +21,7 @@ SITE_NAME = 'localhost:8000'
 CELERY_ALWAYS_EAGER = True
 HTTPS = 'off'
 
-LMS_ROOT_URL = 'http://localhost:8000'
+LMS_ROOT_URL = "http://localhost:8000"
 LMS_INTERNAL_ROOT_URL = LMS_ROOT_URL
 ENTERPRISE_API_URL = LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/'
 
@@ -229,7 +229,7 @@ CORS_ALLOW_HEADERS = corsheaders_default_headers + (
     'use-jwt-cookie',
 )
 
-LOGIN_REDIRECT_WHITELIST = []
+LOGIN_REDIRECT_WHITELIST = [CMS_BASE]
 
 ###################### JWTs ######################
 JWT_AUTH.update({

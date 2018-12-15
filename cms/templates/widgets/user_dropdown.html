@@ -39,7 +39,9 @@
     </span>
     <span class="icon fa fa-caret-down ui-toggle-dd" aria-hidden="true"></span>
   </h3>
-
+  <%
+    logout_url = settings.LMS_ROOT_URL + '/logout'
+  %>
   <div class="wrapper wrapper-nav-sub">
     <div class="nav-sub">
       <ul>
@@ -52,7 +54,7 @@
         </li>
         % endif
         <li class="nav-item nav-account-signout">
-          <a class="action action-signout" href="${reverse('logout')}">${_("Sign Out")}</a>
+          <a class="action action-signout" href="${logout_url}?next=${current_site_url}">${_("Sign Out")}</a>
         </li>
       </ul>
     </div>
