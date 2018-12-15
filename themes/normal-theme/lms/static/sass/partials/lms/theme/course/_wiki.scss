@@ -17,7 +17,7 @@ body.view-in-course .wiki-wrapper{
   .breadcrumb{
     margin: 0;
     li a{
-      font-size: 14px;
+      font-size: 18px;
     }
     li:after{
       line-height: 30px;
@@ -27,7 +27,7 @@ body.view-in-course .wiki-wrapper{
       line-height: 30px;
     }
     .active a{
-      color: $font;
+      color: $title;
     }
     .active:after{
       display: none;

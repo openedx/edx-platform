@@ -2,7 +2,7 @@
 .content-wrapper .course-tabs{  
   max-width: 1200px;
   margin: 0 auto;
-  overflow-x:hidden;
+  overflow-x:hidden !important;
 
   .nav-item .nav-link{
     padding: 20px 15px 20px 10px;

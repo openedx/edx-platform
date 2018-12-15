@@ -25,7 +25,7 @@ $icon-width: 18px;
 .fa-chevron-next::before,
 .fa-bookmark:before,
 .course-content .bookmark-button.bookmarked::before,
-.fa-recorder:before,
+.fa-recorder:before,.fa-bars:before,
 .fa-sort:before,
 .xmodule_display.xmodule_SequenceModule .sequence-nav ol li button.seq_other .icon::before,
 .xmodule_display.xmodule_SequenceModule .sequence-nav ol li button.seq_video .icon::before,
@@ -37,7 +37,8 @@ $icon-width: 18px;
 .fa-star:before,
 .fa-flag:before,
 .fa-search:before,
-.fa-plus:before,
+.discussion-board .fa-plus:before,
+.wiki .fa-plus:before,
 .fa-times:before,
 .find-courses .search-facets .facet-option.selected .count::before, .find-courses .search-facets .facet-option.selected:hover .count::before, .find-courses .search-facets .facet-option.selected:focus .count::before,
 .fa-filter:before,
@@ -138,8 +139,11 @@ $icon-width: 18px;
 .fa-envelope:before{
   background-position: calcP(9, 4)
 }
-.fa-reorder:before{
-  background-position: calcP(1, 6)
+.fa-reorder:before, .fa-bars:before{
+  background-position: calcP(1, 6);
+  transform: scale(0.75);
+  position: relative;
+  top: 3px;
 }
 .fa-star:before{
   background-position: calcP(10, 7)

@@ -106,6 +106,10 @@ body.view-in-course .profile-wrapper{
         .sections{
           width: 100%;
           display: block;
+          >div p{
+            color: $font;
+            font-weight: normal;
+          }
         }
       } 
     }
