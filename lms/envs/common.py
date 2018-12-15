@@ -145,6 +145,7 @@ FEATURES = {
     # Staff Debug tool.
     'ENABLE_STUDENT_HISTORY_VIEW': True,
 
+    #enable unicode username
     'ENABLE_UNICODE_USERNAME':True,
 
     # Provide a UI to allow users to submit feedback from the LMS (left-hand help modal)
