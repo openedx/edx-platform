@@ -14,7 +14,8 @@ from branding import api as branding_api
 %>
 
 <h1 class="header-logo">
-  <a href="${branding_api.get_home_url()}">
+  <!--<a href="${branding_api.get_home_url()}">-->
+  <a href="${marketing_link('ROOT')}">
     <%block name="navigation_logo">
     <img  class="logo" src="${branding_api.get_logo_url(is_secure)}" alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}"/>
     </%block>

@@ -25,6 +25,7 @@
   box-sizing: border-box;
   padding: 8px 20px;
   display: block;
+  border-radius: 3px;
 
   .u-field-account_privacy{
     min-width: 0;
@@ -41,6 +42,16 @@
   }
   .u-field-value{
     vertical-align: inherit;
+    select{
+      width: 230px;
+      appearance:none;
+      -moz-appearance:none;
+      -webkit-appearance:none;
+      background: url("http://ourjs.github.io/static/2015/arrow.png") no-repeat scroll right center #fff;
+    }
+  }
+  .u-field-message{
+    margin-top: 8px;
   }
 }
 
@@ -72,6 +83,7 @@
   .wrapper-profile-section-container-one .wrapper-profile-section-one{
     border: 1px solid $border;
     text-align: center;
+    border-radius: 3px;
 
     .profile-section-one-fields>.u-field{
       padding: 10px 0;

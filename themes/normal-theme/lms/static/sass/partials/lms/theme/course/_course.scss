@@ -40,6 +40,18 @@ body.view-in-course .wrapper-course-material .course-tabs{
   .breadcrumbs{
     line-height: 1.5;
     margin: 5px 0;
+    .nav-item{
+      margin-left: 0;
+    }
+  }
+
+  .page-header-search{
+    margin-right: 10px;
+  }
+  
+  .search-button{
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
   }
   @media(max-width:767px){
     .form-actions{
@@ -76,9 +88,6 @@ body.view-in-course .wrapper-course-material .course-tabs{
     }
     .action-resume-course{ 
       @extend %btn-my-primary;
-    }
-    .page-header-search{
-      margin-right: 10px;
     }
     .input-group .field-input{
       height: 16px;
@@ -179,6 +188,7 @@ body.view-in-course .wrapper-course-material .course-tabs{
   border-radius: 4px;
   border: 1px solid #e6e9ed;
   ul{ margin-bottom: 0 }
+  li{ display: inline-block; width: 49%;}
 }
 
 

@@ -5,9 +5,9 @@
   font-size: 14px;
   box-shadow: 0 2px 2px 2px $border;
   line-height: 1.8;
-  padding: 40px 0;
+  padding: 14px 0;
   box-sizing: border-box;
-
+  border-top: 1px solid $border;
   // 1. 布局
   .footer-content{
     width: 96%;
@@ -23,6 +23,7 @@
     vertical-align: text-top;
     height: 138px;
     border-right: 1px dashed $border;
+    padding-top: 22px;
   }
 
   .footer-wechat{
@@ -31,6 +32,7 @@
     width: 13%;
     vertical-align: text-top;
     border-left: 1px dashed $border;
+    padding-top: 22px;
     h3{ 
       text-align: center;
     }
@@ -45,6 +47,7 @@
     display: inline-block;
     width: 24.5%;
     vertical-align: text-top;
+    padding-top: 22px;
   }
   ul{
     list-style: none;
@@ -75,7 +78,7 @@
     border-bottom: 1px dashed $border;
     position: absolute;
     left: 20%;
-    top: 39px;
+    top: 58px;
   }
 
   // 3. 左侧app按钮
@@ -127,7 +130,7 @@
   // 备案信息
   .footer-text{
     text-align: center;
-    margin-top: 30px;
+    margin-top: 22px; 
     padding: 0 20px;
   }
 }
@@ -306,7 +309,7 @@
     height: 34px;
 
   }
-  .errot-text{
+  .error-text{
     height: 20px;
     line-height: 20px;
     margin-bottom: 10px;
@@ -314,6 +317,7 @@
     color: #d8353e;
     font-weight: normal;
     visibility: hidden;
+    font-size: 14px;
     &.active{
       visibility:visible;
     }
@@ -328,6 +332,7 @@
     text-align: center;
     color: #ccd1d9;
     margin: 0 auto;
+    font-size: 14px;
     &.active{
       cursor: pointer;
       background-color: #4788c7;
@@ -348,6 +353,7 @@
   background-size: 300px;
   background-image: url("/static/normal-theme/images/iconfont.png");
   background-position: -140px -60px;
+  transform: scale(0.6);
 }
 .eliteu-message-box{
   height: 100vh;
@@ -418,4 +424,54 @@
   top: 14px;
   right: 17px;
   cursor: pointer;
+}
+@media screen and (max-width: 568px){
+  .eliteu-message-box{
+    .meassage-container{
+      width: 80vw;
+      left: 0;
+      right: 0;
+      padding: 4vw;
+      margin: 0 auto;
+      top: 30%;
+      height: auto;
+    }
+  }
+  .dialog-container{
+    width: 80vw;
+    margin: 0 auto;
+    left: unset;
+    padding: 5vw;
+    left: 0;
+    right: 0;
+    top: 30%;
+    height: auto;
+    .phone-input-box{
+      width: 55vw;
+    }
+    .qrcode-input-box{
+      width: 36vw;
+      margin-right: 4vw；
+    }
+    .get-qrcode-btn{
+      width: 30vw;
+    }
+    .phone-code{
+      width: 15vw;
+      box-sizing: border-box;
+      height: 36px;
+    }
+    .error-text{
+      visibility: visible;
+      display: none;
+      
+      &.active{
+        display: block;
+      }
+    }
+  }
+  .fa-message-close, .fa-dialog-close{
+    right: 7px;
+    top: 4px;
+  }
 }

@@ -38,7 +38,9 @@ $icon-width: 18px;
 .fa-search:before,
 .fa-plus:before,
 .fa-times:before,
-.find-courses .search-facets .facet-option.selected .count::before, .find-courses .search-facets .facet-option.selected:hover .count::before, .find-courses .search-facets .facet-option.selected:focus .count::before
+.find-courses .search-facets .facet-option.selected .count::before, .find-courses .search-facets .facet-option.selected:hover .count::before, .find-courses .search-facets .facet-option.selected:focus .count::before,
+.fa-filter:before,
+.fa-newspaper-o:before
 {
   content: '';
   display: inline-block;
@@ -86,8 +88,15 @@ $icon-width: 18px;
   background-position: calcP(9, 6)
 }
 .fa-bookmark:before{
-  background-position: calcP(13, 6)
+  background-position: calcP(12, 6)
 }
+.course-tool{
+  .fa-bookmark:before{
+    position: relative;
+    top: 4px;
+  }
+}
+
 .fa-recorder:before{
   background-position: calcP(6, 1)
 }
@@ -123,7 +132,7 @@ $icon-width: 18px;
 .fa-star:before{
   background-position: calcP(10, 7)
 }
-.forum-nav-browse-menu-item:before{
+.forum-nav{
   .fa-star:before{
     transform: scale(0.8);
     position: relative;
@@ -147,6 +156,11 @@ $icon-width: 18px;
 }
 .wiki .fa-plus{
   display: none;
+}
+.wiki .article-functions{
+  .fa:before{
+    transform: scale(0.85)
+  }
 }
 .find-courses{
   .find-courses .loading-spinner{
@@ -176,16 +190,31 @@ $icon-width: 18px;
   position: relative;
   top: 1px;
 }
+.fa-filter:before{
+  background-position: calcP(7, 6);
+  transform: scale(0.8);
+  position: relative;
+  top: -3px;
+  left: 3px;
+}
+.fa-newspaper-o:before{
+  background-position: calcP(9, 3);
+  position: relative;
+  top: 4px;
+  transform: scale(0.95);
+}
 
 
 // 2. 课程详情页的新icon
 // http://0.0.0.0:18000/courses/course-v1:edX+E2E-101+course/about
 .fa-my{
-  display: block;
+  display: inline-block;
   height: $icon-width;
   width: $icon-width;
   background-size: (600 / 40) * $icon-width;
   background-image: url("/static/normal-theme/images/iconfont.png");
+}
+.about-staff-content .fa-my{
   position: absolute;
   left: -33px;
   top: 23px;
@@ -210,6 +239,14 @@ $icon-width: 18px;
   background-position: calcP(4, 2);
 }
 .fa-my-search{
-  background: calcP(9, 1)
+  background-position: calcP(9, 1)
 }
-
+.fa-my-weibo{
+  background-position: calcP(1, 3)
+}
+.fa-my-qzone{
+  background-position: calcP(13, 1)
+}
+.fa-my-weixin{
+  background-position: calcP(3, 4)
+}

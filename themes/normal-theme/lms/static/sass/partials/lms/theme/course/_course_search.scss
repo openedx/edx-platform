@@ -1,6 +1,6 @@
 // search a course
 #course-container .page-content{
-  padding: 30px;
+  padding: 20px;
 }
 .search-results{
   .search-results-item{
@@ -13,9 +13,14 @@
   .result-link{
     display: inline-block;
   }
+  .result-type{
+    top: 16px;
+    right: 70px;
+  }
   .result-location{
     display: inline-block;
     padding-top: 0;
+    margin-right: 40px;
   }
 
   .search-info{
@@ -29,6 +34,7 @@
     display: inline-block;
     margin-left: 10px;
     color: $note;
+    float: right;
   }
 } 
 .field-input{
