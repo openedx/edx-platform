@@ -128,6 +128,9 @@
           float: none;
           margin: 0;
           padding: 0;
+          &:hover{
+            opacity: 1;
+          }
         }
       } 
     }
@@ -160,6 +163,49 @@
       }
     }
     
+    .share{
+      position: relative;
+      cursor: pointer;
+    }
+
+    .qrcode-block{
+      width: 190px;
+      background: #fff;
+      box-shadow: 0px -1px 4px 0px $border;
+      position: absolute;
+      bottom: 38px;
+      left: -90px;
+      display: none;
+      p+p{
+        margin-top: 0;
+      }
+      p{
+        font-size: 14px;
+      }
+      .qrcode-text{
+        background: $blue;
+        color: #fff;
+        padding: 15px;
+        line-height: 1.5;
+      }
+      .qrcode-icon{
+        position: absolute;
+        left: 85px;
+        bottom: -20px;
+        font-size: 30px;
+        z-index: 100;
+        stroke: #fff;
+      }
+      #wechat-qrcode{
+        padding: 25px 30px;
+      }
+    }
+
+    .share-weixin:hover{
+      .qrcode-block{
+        display: block;
+      }
+    }
   }
   
 
@@ -233,7 +279,7 @@
   }
   .about-staff-content h3{
     color:$blue;
-    border-top: 2px dashed #e6e9ed;
+    border-top: 1px dashed #e6e9ed;
     position: relative;
   }
   .about-staff ul{
