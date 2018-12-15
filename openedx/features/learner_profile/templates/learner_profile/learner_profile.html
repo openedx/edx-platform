@@ -27,11 +27,11 @@ from openedx.core.djangolib.markup import HTML
         <div class="profile ${'profile-self' if own_profile else 'profile-other'}">
             <div class="wrapper-profile-field-account-privacy">
                 % if own_profile and records_url:
-                    <div class="wrapper-profile-records">
+                    <!--<div class="wrapper-profile-records">
                         <a href="${records_url}">
                             <button class="btn profile-records-button">${_("View My Records")}</button>
                         </a>
-                    </div>
+                    </div>-->
                 % endif
             </div>
             % if own_profile:

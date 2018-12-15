@@ -40,8 +40,8 @@ body.view-in-course .wrapper-course-material .course-tabs{
   .breadcrumbs{
     line-height: 1.5;
     margin: 5px 0;
-    .nav-item{
-      margin-left: 0;
+    .nav-item:not(:first-child){
+      margin-left: 5px;
     }
   }
 

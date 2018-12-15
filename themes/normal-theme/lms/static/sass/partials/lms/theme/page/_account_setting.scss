@@ -1,3 +1,6 @@
+.wrapper-account-settings{
+    background: unset;
+}
 .wrapper-account-settings .wrapper-header{
     max-width: 1200px;
     border: none;
@@ -40,7 +43,7 @@
     box-shadow: 0px 1px 4px 0px $border;
     border-radius: 3px;
     border: none;
-
+    background: #fff;
     .tab-header{
         padding: 12px 22px;
         border-bottom: solid 1px #f5f7fa;
@@ -248,8 +251,9 @@
     padding-bottom: 20px;
 }
 .account-settings-sections .section .account-settings-section-body .u-field .field select ~ .icon-caret-down::after{
+
     content: '';
-    display: block;
+    display: none;
     height: 20px;
     width: 20px;
     bottom: 8px;

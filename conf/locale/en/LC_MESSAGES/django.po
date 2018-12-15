@@ -45,8 +45,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-11 15:42+0800\n"
-"PO-Revision-Date: 2018-12-11 07:42:07.453454\n"
+"POT-Creation-Date: 2018-12-13 17:36+0800\n"
+"PO-Revision-Date: 2018-12-13 09:36:08.605105\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -218,7 +218,7 @@ msgstr ""
 msgid "You're enrolled as a verified student"
 msgstr ""
 
-#: common/djangoapps/course_modes/helpers.py lms/envs/common.py
+#: common/djangoapps/course_modes/helpers.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Verified"
 msgstr ""
@@ -292,7 +292,7 @@ msgid ""
 "ecommerce service."
 msgstr ""
 
-#: common/djangoapps/course_modes/models.py lms/envs/common.py
+#: common/djangoapps/course_modes/models.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Honor"
 msgstr ""
@@ -645,6 +645,10 @@ msgstr ""
 #. Translators: 'Other' refers to the student's level of education
 #: common/djangoapps/student/models.py
 msgid "Other education"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Phone"
 msgstr ""
 
 #: common/djangoapps/student/models.py
@@ -2235,6 +2239,7 @@ msgstr ""
 #: lms/templates/survey/survey.html
 #: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
 #: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
+#: themes/normal-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Submit"
 msgstr ""
@@ -4612,6 +4617,7 @@ msgstr ""
 
 #: lms/djangoapps/branding/api.py cms/templates/widgets/sock_links.html
 #: themes/edx.org/cms/templates/widgets/sock.html
+#: themes/normal-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Contact Us"
 msgstr ""
@@ -4664,6 +4670,7 @@ msgstr ""
 #: lms/templates/static_templates/privacy.html
 #: lms/templates/static_templates/privacy_policy.html
 #: themes/edx.org/lms/templates/certificates/_accomplishment-footer.html
+#: themes/normal-theme/lms/templates/footer.html
 #: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -5484,6 +5491,7 @@ msgstr ""
 #: cms/templates/group_configurations.html
 #: lms/templates/courseware/program_marketing.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+#: themes/normal-theme/lms/templates/footer.html
 msgid "Learn More"
 msgstr ""
 
@@ -7362,7 +7370,7 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/mobile_api/views.py
-msgid "Missing requested parameter {}."
+msgid "Missing requested parameter 'platform'"
 msgstr ""
 
 #: lms/djangoapps/mobile_api/views.py
@@ -7571,6 +7579,7 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/pdf.py
 #: lms/templates/static_templates/disclaimer.html
+#: themes/normal-theme/lms/templates/footer.html
 msgid "Disclaimer"
 msgstr ""
 
@@ -8379,166 +8388,6 @@ msgstr ""
 #: lms/djangoapps/verify_student/views.py
 #, python-brace-format
 msgid "Review ID Verification Photos For {username}"
-msgstr ""
-
-#: lms/envs/common.py
-msgid "Your Platform Name Here"
-msgstr ""
-
-#: lms/envs/common.py
-msgid "Your Platform Description Here"
-msgstr ""
-
-#: lms/envs/common.py
-msgid "Read access"
-msgstr ""
-
-#: lms/envs/common.py
-msgid "Write access"
-msgstr ""
-
-#: lms/envs/common.py
-msgid "Know your email address"
-msgstr ""
-
-#: lms/envs/common.py
-msgid "Know your name and username"
-msgstr ""
-
-#: lms/envs/common.py
-msgid "Retrieve your grades for your enrolled courses"
-msgstr ""
-
-#: lms/envs/common.py
-msgid "Retrieve your course certificates"
-msgstr ""
-
-#: lms/envs/common.py
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Audit"
-msgstr ""
-
-#. Translators: This is the website name of www.facebook.com.  Please
-#. translate this the way that Facebook advertises in your language.
-#: lms/envs/common.py
-msgid "Facebook"
-msgstr ""
-
-#: lms/envs/common.py
-#, python-brace-format
-msgid "Like {platform_name} on Facebook"
-msgstr ""
-
-#. Translators: This is the website name of www.twitter.com.  Please
-#. translate this the way that Twitter advertises in your language.
-#: lms/envs/common.py
-msgid "Twitter"
-msgstr ""
-
-#: lms/envs/common.py
-#, python-brace-format
-msgid "Follow {platform_name} on Twitter"
-msgstr ""
-
-#. Translators: This is the website name of www.linkedin.com.  Please
-#. translate this the way that LinkedIn advertises in your language.
-#: lms/envs/common.py
-msgid "LinkedIn"
-msgstr ""
-
-#: lms/envs/common.py
-#, python-brace-format
-msgid "Follow {platform_name} on LinkedIn"
-msgstr ""
-
-#. Translators: This is the website name of plus.google.com.  Please
-#. translate this the way that Google+ advertises in your language.
-#: lms/envs/common.py
-msgid "Google+"
-msgstr ""
-
-#: lms/envs/common.py
-#, python-brace-format
-msgid "Follow {platform_name} on Google+"
-msgstr ""
-
-#. Translators: This is the website name of www.tumblr.com.  Please
-#. translate this the way that Tumblr advertises in your language.
-#: lms/envs/common.py
-msgid "Tumblr"
-msgstr ""
-
-#. Translators: This is the website name of www.meetup.com.  Please
-#. translate this the way that MeetUp advertises in your language.
-#: lms/envs/common.py
-msgid "Meetup"
-msgstr ""
-
-#. Translators: This is the website name of www.reddit.com.  Please
-#. translate this the way that Reddit advertises in your language.
-#: lms/envs/common.py
-msgid "Reddit"
-msgstr ""
-
-#: lms/envs/common.py
-#, python-brace-format
-msgid "Subscribe to the {platform_name} subreddit"
-msgstr ""
-
-#. Translators: This is the website name of https://vk.com.  Please
-#. translate this the way that VK advertises in your language.
-#: lms/envs/common.py
-msgid "VK"
-msgstr ""
-
-#. Translators: This is the website name of http://www.weibo.com.  Please
-#. translate this the way that Weibo advertises in your language.
-#: lms/envs/common.py
-msgid "Weibo"
-msgstr ""
-
-#. Translators: This is the website name of www.youtube.com.  Please
-#. translate this the way that YouTube advertises in your language.
-#: lms/envs/common.py
-msgid "Youtube"
-msgstr ""
-
-#: lms/envs/common.py
-#, python-brace-format
-msgid "Subscribe to the {platform_name} YouTube channel"
-msgstr ""
-
-#: lms/envs/common.py
-msgid "Kosovo"
-msgstr ""
-
-#: lms/envs/common.py
-#, python-brace-format
-msgid "Welcome to {platform_name}."
-msgstr ""
-
-#: lms/envs/common.py
-#, python-brace-format
-msgid ""
-"You have left the {start_bold}{enterprise_name}{end_bold} website and are "
-"now on the {platform_name} site. {enterprise_name} has partnered with "
-"{platform_name} to offer you high-quality, always available learning "
-"programs to help you advance your knowledge and career. {line_break}Please "
-"note that {platform_name} has a different {privacy_policy_link_start}Privacy"
-" Policy{privacy_policy_link_end} from {enterprise_name}."
-msgstr ""
-
-#: lms/envs/common.py
-#: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Professional"
-msgstr ""
-
-#: lms/envs/common.py
-msgid "No-Id-Professional"
-msgstr ""
-
-#: lms/envs/common.py
-msgid "Credit"
 msgstr ""
 
 #: lms/templates/admin/user_api/accounts/cancel_retirement_action.html
@@ -10429,6 +10278,14 @@ msgstr ""
 msgid "Email or password is incorrect."
 msgstr ""
 
+#: openedx/core/djangoapps/user_api/accounts/views.py
+msgid "Verification failed"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/views.py
+msgid "Please check mobile number format;"
+msgstr ""
+
 #: openedx/core/djangoapps/user_api/admin.py
 #: wiki/templates/wiki/permission_denied.html
 msgid "Permission Denied"
@@ -11646,14 +11503,6 @@ msgstr ""
 #: cms/djangoapps/models/settings/course_metadata.py
 #, python-brace-format
 msgid "Incorrect format for field '{name}'. {detailed_message}"
-msgstr ""
-
-#: cms/envs/common.py
-msgid "Your Platform Studio"
-msgstr ""
-
-#: cms/envs/common.py
-msgid "Studio"
 msgstr ""
 
 #: cms/lib/xblock/tagging/tagging.py
@@ -15482,7 +15331,7 @@ msgid "View Archived Course"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "订阅期满"
+msgid "Subscription Due"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -16790,6 +16639,14 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Number of enrollees (admins, staff, and students) by track"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Audit"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Professional"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -18913,10 +18770,12 @@ msgid "Jobs"
 msgstr ""
 
 #: lms/templates/static_templates/join_us.html
+#: themes/normal-theme/lms/templates/footer.html
 msgid "Join Us"
 msgstr ""
 
 #: lms/templates/static_templates/manual.html
+#: themes/normal-theme/lms/templates/footer.html
 msgid "Manual"
 msgstr ""
 
@@ -18951,6 +18810,7 @@ msgid "Currently the {platform_name} servers are overloaded"
 msgstr ""
 
 #: lms/templates/static_templates/user_agreement.html
+#: themes/normal-theme/lms/templates/footer.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
 msgid "User Agreement"
 msgstr ""
@@ -19631,6 +19491,87 @@ msgstr ""
 
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
 msgid "Schools & Partners"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "Reform·Innovation·Future"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+#: membership/templates/membership/card.html
+msgid "Elite Education"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "About Us"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "About Platform"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "Help and Complaint"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "Terms Description"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "Partners"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "Cloud classroom of Netease"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "Tencent Classroom"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "Elite MBA"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "WeChat Scan Code"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "Get the Coupon"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid ""
+"Guangzhou Elite Education & Technology Co., Ltd.    All Rights Reserved"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "bind your account to your cellphone number"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "get verification code"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "incorrect cellphone number format"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "Reminder"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid ""
+"To meet the requirements of national policies and regulations of using a "
+"real legal name，please bind your account to your cellphone number before "
+"proceeding."
+msgstr ""
+
+#: themes/normal-theme/lms/templates/footer.html
+msgid "bind your account to your cellphone number now"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/courseware/course_about.html
@@ -23956,10 +23897,6 @@ msgid "VIP membership"
 msgstr ""
 
 #: membership/templates/membership/card.html
-msgid "Elite Education"
-msgstr ""
-
-#: membership/templates/membership/card.html
 msgid "Elite MBA VIP membership"
 msgstr ""
 
@@ -24110,17 +24047,18 @@ msgid "Become Eliteu Member"
 msgstr ""
 
 #: membership/templates/membership/index.html
-msgid "Choose appropriate learning duration according to your needs,"
+msgid "Choose appropriate learning duration according to your needs"
 msgstr ""
 
 #: membership/templates/membership/index.html
 msgid ""
-"During the study period, you will enjoy the learning of all the courses of "
-"Elite MBA School. You can join the new class online now!"
+"Enjoy learning all courses in the Eliteu MBA school during the study "
+"period，You can join the new class online now!"
 msgstr ""
 
 #: membership/templates/membership/index.html
-msgid "Full-Year Membership"
+msgctxt "Membership"
+msgid "Full Year"
 msgstr ""
 
 #: membership/templates/membership/index.html
@@ -24132,7 +24070,8 @@ msgid "Full-stack workplace practice"
 msgstr ""
 
 #: membership/templates/membership/index.html
-msgid "Half-Year Membership"
+msgctxt "Membership"
+msgid "Half-Year"
 msgstr ""
 
 #: membership/templates/membership/index.html
@@ -24140,7 +24079,8 @@ msgid "Improve Ability Efficiently"
 msgstr ""
 
 #: membership/templates/membership/index.html
-msgid "Three-Month Membership"
+msgctxt "Membership"
+msgid "Three-Month"
 msgstr ""
 
 #: membership/templates/membership/index.html
@@ -24148,7 +24088,8 @@ msgid "A series of courses for learning"
 msgstr ""
 
 #: membership/templates/membership/index.html
-msgid "One-Month Membership"
+msgctxt "Membership"
+msgid "One-Month"
 msgstr ""
 
 #: membership/templates/membership/index.html
@@ -24221,17 +24162,12 @@ msgstr ""
 
 #: membership/templates/membership/index.html
 msgid ""
-"Assistant Professor of School of Labor and Employment Relations, Penn State "
-"University Park, USA"
+"Prior Assistant Professor of School of Labor and Employment Relations, Penn "
+"State University Park, USA"
 msgstr ""
 
 #: membership/templates/membership/index.html
 msgid "Dr. Jiamin Wang"
-msgstr ""
-
-#: membership/templates/membership/index.html
-msgid ""
-"Lifetime Professor in Management, Long Island University-C. W. Post, USA"
 msgstr ""
 
 #: membership/templates/membership/index.html
@@ -24255,11 +24191,17 @@ msgstr ""
 #: membership/templates/membership/index.html
 msgid ""
 "Prior President and Professor of the University of International Business "
-"and Economics"
+"and Economics {br}"
 msgstr ""
 
 #: membership/templates/membership/index.html
 msgid "Professor of Economics in Davidson College"
+msgstr ""
+
+#: membership/templates/membership/index.html
+msgid ""
+"Prior President and Professor of the University of International Business "
+"and Economics"
 msgstr ""
 
 #: membership/templates/membership/index.html
@@ -24272,11 +24214,7 @@ msgid ""
 msgstr ""
 
 #: membership/templates/membership/index.html
-msgid "You can join the new class once online!"
-msgstr ""
-
-#: membership/templates/membership/index.html
-msgid "One Year"
+msgid "You can join the new class once online"
 msgstr ""
 
 #: membership/templates/membership/index.html

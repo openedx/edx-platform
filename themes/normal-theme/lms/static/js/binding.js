@@ -9,15 +9,15 @@ var phoneDialog = function(){
         } else {
             clearInterval(timer);
             all = 0;
-            $('.get-qrcode-btn').html(gettext('获取验证码'));
+            $('.get-qrcode-btn').html(gettext('Get the verification code'));
             $('.get-qrcode-btn').addClass('active');
         }
         }
         var checkPhone = function(phone){
         if (phone == ''){
-            return gettext('手机号不能为空')
+            return gettext('Cell phone number cannot be blanked')
         } else if(!(/^(13[0-9]|14[56789]|15[0-9]|16[56]|17[0-9]|18[0-9]|19[89])\d{8}$/.test(phone))){
-            return gettext('手机号格式不正确')
+            return gettext('wrong cellphone number format')
         } else{
             return true;
         }
@@ -30,13 +30,13 @@ var phoneDialog = function(){
             var phone = $('.phone-input-box').val();
             console.log(phone)
             if(checkPhone(phone) !== true){
-                $('.errot-text').addClass('active');
-                $('.errot-text').html(checkPhone(phone));
+                $('.error-text').addClass('active');
+                $('.error-text').html(checkPhone(phone));
                 $('.phone-number').addClass('error');
                 return;
             }
             $('.phone-number').removeClass('error');
-            $('.errot-text').removeClass('active');
+            $('.error-text').removeClass('active');
             $(this).removeClass('active');          
             $.ajax({
                 url: '/api/user/v1/accounts/send_code_binding_phone/',
@@ -52,8 +52,8 @@ var phoneDialog = function(){
                 },
                 error: function(error){
                 console.log(error)
-                $('.errot-text').addClass('active');
-                $('.errot-text').html(error.responseText);
+                $('.error-text').addClass('active');
+                $('.error-text').html(error.responseText);
                 }
             });
             }
@@ -94,14 +94,14 @@ var phoneDialog = function(){
                 success: function(){
                 console.log('绑定成功');
                 $('.eliteu-message-box').show();
-                $('.message-content').html(gettext('手机绑定成功'));
+                $('.message-content').html(gettext('Cellphone number binding successfully'));
                 $('.phone-dialog').hide();
                 $('.meassage-op').hide();
                 },
                 error: function(error){
                 console.log(error)
-                $('.errot-text').addClass('active');
-                $('.errot-text').html(error.responseText);
+                $('.error-text').addClass('active');
+                $('.error-text').html(error.responseText);
                 }
             });
             }
