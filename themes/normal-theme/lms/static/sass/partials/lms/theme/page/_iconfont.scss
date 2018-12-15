@@ -208,11 +208,13 @@ $icon-width: 18px;
 // 2. 课程详情页的新icon
 // http://0.0.0.0:18000/courses/course-v1:edX+E2E-101+course/about
 .fa-my{
-  display: block;
+  display: inline-block;
   height: $icon-width;
   width: $icon-width;
   background-size: (600 / 40) * $icon-width;
   background-image: url("/static/normal-theme/images/iconfont.png");
+}
+.about-staff-content .fa-my{
   position: absolute;
   left: -33px;
   top: 23px;
@@ -237,6 +239,14 @@ $icon-width: 18px;
   background-position: calcP(4, 2);
 }
 .fa-my-search{
-  background: calcP(9, 1)
+  background-position: calcP(9, 1)
 }
-
+.fa-my-weibo{
+  background-position: calcP(1, 3)
+}
+.fa-my-qzone{
+  background-position: calcP(13, 1)
+}
+.fa-my-weixin{
+  background-position: calcP(3, 4)
+}

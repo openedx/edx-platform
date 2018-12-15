@@ -1,0 +1,134 @@
+<%namespace name='static' file='../static_content.html'/>
+<%!
+import urllib
+
+from django.utils.translation import ugettext as _
+from django.urls import reverse
+from django.conf import settings
+from six import text_type
+from third_party_auth.models import OAuth2ProviderConfig
+import urllib
+
+%>
+
+<header>
+  % if static.get_value('course_about_show_social_links', True):
+  <div class="social-sharing">
+    <div class="sharing-message">${_("Share with friends and family!")}</div>
+    ## TODO: this should probably be an overrideable block,
+    ##       or something allowing themes to do whatever they
+    ##       want here (and on this whole page, really).
+      <%
+        provider_config = OAuth2ProviderConfig.current('weibo')
+        weibo_appkey = provider_config.key
+        site_domain = static.get_value('site_domain', settings.SITE_NAME)
+        site_protocol = 'https' if settings.HTTPS == 'on' else 'http'
+        platform_name = static.get_platform_name()
+
+        ## Translators: This text will be automatically posted to the student's
+        ## Twitter account. {url} should appear at the end of the text.
+        tweet_text = _("I just enrolled in {number} {title} through {account}: {url}").format(
+            number=course.number,
+            title=course.display_name_with_default_escaped,
+            account=static.get_value('course_about_twitter_account', settings.PLATFORM_TWITTER_ACCOUNT),
+            url=u"{protocol}://{domain}{path}".format(
+                protocol=site_protocol,
+                domain=site_domain,
+                path=urllib.quote_plus(
+                    reverse('about_course', args=[text_type(course.id)])
+                )
+            )
+        ).replace(u" ", u"+")
+
+        course_url =u"{protocol}://{domain}{path}".format(
+                protocol=site_protocol,
+                domain=site_domain,
+                path=urllib.quote_plus(
+                    reverse('about_course', args=[text_type(course.id)])
+                )
+            )
+
+        share_text = _("A wonderful course is rare to find and must be shared! I'm taking {title} on EliteMBA. Check it out! {url}").format(
+            title=course.display_name_with_default_escaped,
+            url=u"{protocol}://{domain}{path}".format(
+                protocol=site_protocol,
+                domain=site_domain,
+                path=urllib.quote_plus(
+                    reverse('about_course', args=[text_type(course.id)])
+                )
+            )
+        )
+
+        weibo_dict = {'url': request.build_absolute_uri(), 'ralateUid': 5974026525,'language': 'zh_cn','title': share_text}
+        weibostr = urllib.urlencode(weibo_dict)
+        weibourl = "http://service.weibo.com/share/share.php?" + weibostr
+
+        qzone_dict = {'url': course_url, 'desc': share_text, 'title': course.display_name_with_default_escaped}
+        qzonestr = urllib.urlencode(qzone_dict)
+        qzoneurl = "https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?" + qzonestr
+
+        weixin_url = course_url
+        tweet_action = u"http://twitter.com/intent/tweet?text={tweet_text}".format(tweet_text=tweet_text)
+
+        facebook_link = static.get_value('course_about_facebook_link', settings.PLATFORM_FACEBOOK_ACCOUNT)
+
+        email_subject = u"mailto:?subject={subject}&body={body}".format(
+            subject=_("Take a course with {platform} online").format(platform=platform_name),
+            body=_("I just enrolled in {number} {title} through {platform} {url}").format(
+                number=course.number,
+                title=course.display_name_with_default_escaped,
+                platform=platform_name,
+                url=u"{protocol}://{domain}{path}".format(
+                    protocol=site_protocol,
+                    domain=site_domain,
+                    path=urllib.quote_plus(
+                        reverse('about_course', args=[text_type(course.id)]),
+                    )
+                )
+            )
+        ).replace(u" ", u"%20")
+      %>
+      <a href="${tweet_action}" class="share">
+        <span class="icon fa fa-twitter" aria-hidden="true"></span><span class="sr">${_("Tweet that you've enrolled in this course")}</span>
+      </a>
+      <a href="${facebook_link}" class="share">
+        <span class="icon fa fa-thumbs-up" aria-hidden="true"></span><span class="sr">${_("Post a Facebook message to say you've enrolled in this course")}</span>
+      </a>
+      <a href="${email_subject}" class="share">
+        <span class="icon fa fa-envelope" aria-hidden="true"></span><span class="sr">${_("Email someone to say you've enrolled in this course")}</span>
+      </a>
+
+      <a href="${weibourl}" class="share">
+        <span class="icon fa-my fa-my-weibo" aria-hidden="true"></span><span class="sr">${_("weibo")}</span>
+      </a>
+
+      <a href="${qzoneurl}" class="share">
+        <span class="icon fa-my fa-my-qzone" aria-hidden="true"></span><span class="sr">${_("qq")}</span>
+      </a>
+
+      <a class="share share-weixin">
+        <span class="icon fa-my fa-my-weixin" aria-hidden="true"></span><span class="sr">${_("weixin")}</span>
+        <div class="qrcode-block">
+            <div class="qrcode-text">
+                <p>微信扫一扫</p>
+                <p>点击屏幕右上角分享按钮</p>
+            </div>
+            <div id="wechat-qrcode"></div>
+            <svg viewBox="0 0 1024 1024" class="qrcode-icon" data-icon="caret-down" width="1em" height="1em" fill="#fff" aria-hidden="true"><path d="M840.4 300H183.6c-19.7 0-30.7 20.8-18.5 35l328.4 380.8c9.4 10.9 27.5 10.9 37 0L858.9 335c12.2-14.2 1.2-35-18.5-35z"></path></svg>
+        </div>
+        
+      </a>
+      
+      
+        
+      <script src="/static/normal-theme/js/certificates/qrcode.js"></script>
+      <script type="text/javascript">
+        new QRCode(document.getElementById("wechat-qrcode"), {
+            text: "${weixin_url}",
+            width: 130,
+            height: 130,
+        });
+      </script>
+  </div>
+  % endif
+</header>
