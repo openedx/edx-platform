@@ -6187,19 +6187,19 @@ msgid "Profile"
 msgstr ""
 
 #: themes/normal-theme/lms/static/js/binding.js
-msgid "获取验证码"
+msgid "Get the verification code"
 msgstr ""
 
 #: themes/normal-theme/lms/static/js/binding.js
-msgid "手机号不能为空"
+msgid "Cell phone number cannot be blanked"
 msgstr ""
 
 #: themes/normal-theme/lms/static/js/binding.js
-msgid "手机号格式不正确"
+msgid "wrong  cellphone number format"
 msgstr ""
 
 #: themes/normal-theme/lms/static/js/binding.js
-msgid "手机绑定成功"
+msgid "Cellphone number binding successfully"
 msgstr ""
 
 #: cms/static/js/certificates/collections/certificates.js

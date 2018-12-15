@@ -2239,6 +2239,7 @@ msgstr ""
 #: lms/templates/survey/survey.html
 #: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
 #: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
+#: themes/normal-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/register-shib.html
 msgid "Submit"
 msgstr ""
@@ -4616,6 +4617,7 @@ msgstr ""
 
 #: lms/djangoapps/branding/api.py cms/templates/widgets/sock_links.html
 #: themes/edx.org/cms/templates/widgets/sock.html
+#: themes/normal-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Contact Us"
 msgstr ""
@@ -4668,6 +4670,7 @@ msgstr ""
 #: lms/templates/static_templates/privacy.html
 #: lms/templates/static_templates/privacy_policy.html
 #: themes/edx.org/lms/templates/certificates/_accomplishment-footer.html
+#: themes/normal-theme/lms/templates/footer.html
 #: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -5488,6 +5491,7 @@ msgstr ""
 #: cms/templates/group_configurations.html
 #: lms/templates/courseware/program_marketing.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+#: themes/normal-theme/lms/templates/footer.html
 msgid "Learn More"
 msgstr ""
 
@@ -7575,6 +7579,7 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/pdf.py
 #: lms/templates/static_templates/disclaimer.html
+#: themes/normal-theme/lms/templates/footer.html
 msgid "Disclaimer"
 msgstr ""
 
@@ -15326,7 +15331,7 @@ msgid "View Archived Course"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "订阅期满"
+msgid "Subscription Due"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -18765,10 +18770,12 @@ msgid "Jobs"
 msgstr ""
 
 #: lms/templates/static_templates/join_us.html
+#: themes/normal-theme/lms/templates/footer.html
 msgid "Join Us"
 msgstr ""
 
 #: lms/templates/static_templates/manual.html
+#: themes/normal-theme/lms/templates/footer.html
 msgid "Manual"
 msgstr ""
 
@@ -18803,6 +18810,7 @@ msgid "Currently the {platform_name} servers are overloaded"
 msgstr ""
 
 #: lms/templates/static_templates/user_agreement.html
+#: themes/normal-theme/lms/templates/footer.html
 #: themes/normal-theme/lms/templates/static_templates/user_agreement.html
 msgid "User Agreement"
 msgstr ""
@@ -19486,107 +19494,84 @@ msgid "Schools & Partners"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid "变革 • 创新 • 未来"
+msgid "Reform·Innovation·Future"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid "英荔教育"
+#: membership/templates/membership/card.html
+msgid "Elite Education"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid "关于我们"
+msgid "About Us"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid "联系我们"
+msgid "About Platform"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid "加入我们"
+msgid "Help and Complaint"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid "关于平台"
+msgid "Terms Description"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid "使用手册"
+msgid "Partners"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid "帮助与投诉"
+msgid "Cloud classroom of Netease"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid "条款说明"
+msgid "Tencent Classroom"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid "用户协议"
+msgid "Elite MBA"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid "隐私政策"
+msgid "WeChat Scan Code"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid "免责声明"
+msgid "Get the Coupon"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid "合作机构"
+msgid ""
+"Guangzhou Elite Education & Technology Co., Ltd.    All Rights Reserved"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid "网易云课堂"
+msgid "bind your account to your cellphone number"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid "腾讯课堂"
+msgid "get verification code"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid "英荔商学院"
+msgid "incorrect cellphone number format"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid "微信扫一扫"
+msgid "Reminder"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid "获取课程优惠券"
+msgid ""
+"To meet the requirements of national policies and regulations of using a "
+"real legal name，please bind your account to your cellphone number before "
+"proceeding."
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
-msgid "绑定手机号"
-msgstr ""
-
-#: themes/normal-theme/lms/templates/footer.html
-msgid "获取验证码"
-msgstr ""
-
-#: themes/normal-theme/lms/templates/footer.html
-msgid "手机号码格式不正确"
-msgstr ""
-
-#: themes/normal-theme/lms/templates/footer.html
-msgid "提交"
-msgstr ""
-
-#: themes/normal-theme/lms/templates/footer.html
-msgid "提示"
-msgstr ""
-
-#: themes/normal-theme/lms/templates/footer.html
-msgid "应国家法规对于账号实名的要求，请您在进行下一步操作前，先完成手机绑定。"
-msgstr ""
-
-#: themes/normal-theme/lms/templates/footer.html
-msgid "去绑定手机"
-msgstr ""
-
-#: themes/normal-theme/lms/templates/footer.html
-msgid "了解更多"
+msgid "bind your account to your cellphone number now"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/courseware/course_about.html
@@ -23909,10 +23894,6 @@ msgstr ""
 
 #: membership/templates/membership/card.html
 msgid "VIP membership"
-msgstr ""
-
-#: membership/templates/membership/card.html
-msgid "Elite Education"
 msgstr ""
 
 #: membership/templates/membership/card.html
