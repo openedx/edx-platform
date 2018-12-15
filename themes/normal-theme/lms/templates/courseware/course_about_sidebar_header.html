@@ -125,7 +125,7 @@ import urllib
       <script src="/static/normal-theme/js/certificates/qrcode.js"></script>
       <script type="text/javascript">
         new QRCode(document.getElementById("wechat-qrcode"), {
-            text: "${weixin_url}",
+            text: decodeURIComponent("${weixin_url}"),
             width: 130,
             height: 130,
         });
