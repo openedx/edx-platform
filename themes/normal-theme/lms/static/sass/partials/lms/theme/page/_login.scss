@@ -28,6 +28,7 @@
   .action-label{
     font-size: 14px;
     color: $font;
+    line-height: 1.8;
   }
 
   .form-field{
@@ -122,12 +123,10 @@
       padding: 0;
       list-style: disc;
       font-size: 14px;
-      ul{
-        padding-left: 20px;
-      }
       li{
         margin: 0;
         font-size: 14px;
+        margin-left: 20px;
       }
       p{
         font-size: 14px;
@@ -191,6 +190,11 @@
   }
 }
 
+@media screen and (max-width:768px){
+  .button-oa2-wechat{
+    display: none;
+  }
+}
 @media screen and (max-width:576px){
   .login-register{
     width: 100%;

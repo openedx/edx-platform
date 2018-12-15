@@ -8,6 +8,9 @@
   main{
     padding: 20px 30px;
   }
+  .fa{
+    transform: scale(0.85);
+  }
   .vert-mod .vert{
     border-bottom: 1px dashed $border;
     margin-bottom: 30px;
@@ -80,6 +83,9 @@
   }
   .button-next span:first-child{
     display: none;
+  }
+  .sequence-bottom .sequence-nav-button{
+    padding-top: 2px;
   }
 } 
 

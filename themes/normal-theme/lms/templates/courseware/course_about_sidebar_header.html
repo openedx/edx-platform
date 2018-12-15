@@ -88,21 +88,21 @@ import urllib
             )
         ).replace(u" ", u"%20")
       %>
-      <a href="${tweet_action}" class="share">
+      <a onclick='window.open("${tweet_action}","","width=800px,height=60px");' class="share">
         <span class="icon fa fa-twitter" aria-hidden="true"></span><span class="sr">${_("Tweet that you've enrolled in this course")}</span>
       </a>
-      <a href="${facebook_link}" class="share">
+      <a onclick='window.open("${facebook_link}","","width=800px,height=60px");' class="share">
         <span class="icon fa fa-thumbs-up" aria-hidden="true"></span><span class="sr">${_("Post a Facebook message to say you've enrolled in this course")}</span>
       </a>
       <a href="${email_subject}" class="share">
         <span class="icon fa fa-envelope" aria-hidden="true"></span><span class="sr">${_("Email someone to say you've enrolled in this course")}</span>
       </a>
 
-      <a href="${weibourl}" class="share">
+      <a onclick='window.open("${weibourl}","","width=800px,height=60px");' class="share">
         <span class="icon fa-my fa-my-weibo" aria-hidden="true"></span><span class="sr">${_("weibo")}</span>
       </a>
-
-      <a href="${qzoneurl}" class="share">
+      
+      <a onclick='window.open("${qzoneurl}","","width=800px,height=600px");' class="share">
         <span class="icon fa-my fa-my-qzone" aria-hidden="true"></span><span class="sr">${_("qq")}</span>
       </a>
 
@@ -110,15 +110,14 @@ import urllib
         <span class="icon fa-my fa-my-weixin" aria-hidden="true"></span><span class="sr">${_("weixin")}</span>
         <div class="qrcode-block">
             <div class="qrcode-text">
-                <p>微信扫一扫</p>
-                <p>点击屏幕右上角分享按钮</p>
+                <p>${_("微信扫一扫")}</p>
+                <p>${_("点击屏幕右上角分享按钮")}</p>
             </div>
             <div id="wechat-qrcode"></div>
             <svg viewBox="0 0 1024 1024" class="qrcode-icon" data-icon="caret-down" width="1em" height="1em" fill="#fff" aria-hidden="true"><path d="M840.4 300H183.6c-19.7 0-30.7 20.8-18.5 35l328.4 380.8c9.4 10.9 27.5 10.9 37 0L858.9 335c12.2-14.2 1.2-35-18.5-35z"></path></svg>
         </div>
         
       </a>
-      
       
         
       <script src="/static/normal-theme/js/certificates/qrcode.js"></script>
