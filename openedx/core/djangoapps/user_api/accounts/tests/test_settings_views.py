@@ -1,8 +1,9 @@
 """ Tests for views related to account settings. """
 # -*- coding: utf-8 -*-
+import unittest
+
 import ddt
 import mock
-import unittest
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.messages.middleware import MessageMiddleware
@@ -140,16 +141,17 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConf
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @ddt.data(
-        ({'ENABLE_SOCIAL_MEDIA_LINKS': True}, settings.SOCIAL_PLATFORMS),
-        ({'ENABLE_SOCIAL_MEDIA_LINKS': False}, {}),
-        ({}, settings.SOCIAL_PLATFORMS)
+        {'ENABLE_SOCIAL_MEDIA_LINKS': True},
+        {'ENABLE_SOCIAL_MEDIA_LINKS': False},
+        {},
     )
-    @ddt.unpack
-    def test_context_social_platforms_site_configuration(self, configuration, expected_value):
+    def test_context_social_platforms_site_configuration(self, configuration):
         """
         Verify that the social media links are not shown if they are disabled.
         """
         self.request.site = SiteFactory.create()
+
+        expected_value = settings.SOCIAL_PLATFORMS if configuration.get('ENABLE_SOCIAL_MEDIA_LINKS', True) else {}
 
         with with_site_configuration_context(configuration=configuration):
             context = account_settings_context(self.request)

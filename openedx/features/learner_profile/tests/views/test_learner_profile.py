@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 """ Tests for student profile views. """
 
+import unittest
+
 import datetime
 import ddt
 import mock
-import unittest
 
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.certificates.api import is_passing_status
@@ -227,15 +228,16 @@ class LearnerProfileViewTest(UrlResetMixin, ModuleStoreTestCase):
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @ddt.data(
-        ({'ENABLE_SOCIAL_MEDIA_LINKS': True}, settings.SOCIAL_PLATFORMS),
-        ({'ENABLE_SOCIAL_MEDIA_LINKS': False}, {}),
-        ({}, settings.SOCIAL_PLATFORMS),
+        {'ENABLE_SOCIAL_MEDIA_LINKS': True},
+        {'ENABLE_SOCIAL_MEDIA_LINKS': False},
+        {},
     )
-    @ddt.unpack
-    def test_context_social_platforms_site_configuration(self, configuration, expected_value):
+    def test_context_social_platforms_site_configuration(self, configuration):
         """
         Verify that the social media links are not shown if they are configured to be hidden
         """
+        expected_value = settings.SOCIAL_PLATFORMS if configuration.get('ENABLE_SOCIAL_MEDIA_LINKS', True) else {}
+
         with with_site_configuration_context(configuration=configuration):
             request = RequestFactory().get('/url')
             request.user = self.user
