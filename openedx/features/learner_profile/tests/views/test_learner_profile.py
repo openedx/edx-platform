@@ -4,6 +4,7 @@
 import datetime
 import ddt
 import mock
+import unittest
 
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.certificates.api import is_passing_status
@@ -224,6 +225,7 @@ class LearnerProfileViewTest(UrlResetMixin, ModuleStoreTestCase):
 
         self.assertNotContains(response, 'card certificate-card mode-{cert_mode}'.format(cert_mode=cert.mode))
 
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @ddt.data(
         ({'ENABLE_SOCIAL_MEDIA_LINKS': True}, settings.SOCIAL_PLATFORMS),
         ({'ENABLE_SOCIAL_MEDIA_LINKS': False}, {}),
