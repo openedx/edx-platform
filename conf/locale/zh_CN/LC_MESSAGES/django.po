@@ -715,7 +715,7 @@ msgstr "用户资料"
 
 #: common/djangoapps/student/admin.py
 msgid "Account recovery"
-msgstr ""
+msgstr "恢复账号"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This label appears above a field on the login form
@@ -1056,11 +1056,11 @@ msgstr "此用户属性值。"
 
 #: common/djangoapps/student/models.py
 msgid "Secondary email address"
-msgstr ""
+msgstr "辅助电子邮件地址"
 
 #: common/djangoapps/student/models.py
 msgid "Secondary email address to recover linked account."
-msgstr ""
+msgstr "辅助电子邮件地址以恢复关联帐户。"
 
 #: common/djangoapps/student/views/dashboard.py
 msgid " and "
@@ -1238,7 +1238,7 @@ msgstr "新邮件地址与旧邮件地址相同。"
 
 #: common/djangoapps/student/views/management.py
 msgid "Cannot be same as your sign in email address."
-msgstr ""
+msgstr "不能与登录邮箱相同"
 
 #: common/djangoapps/student/views/management.py
 msgid "Unable to send email activation link. Please try again later."
@@ -3618,7 +3618,7 @@ msgstr "请描述课程教学细节。"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Visibility For Unenrolled Learners"
-msgstr ""
+msgstr "未选课学员课程可见情况"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -3627,18 +3627,20 @@ msgid ""
 "enrolled students), 'public_outline' (allow access to course outline) and "
 "'public' (allow access to both outline and course content)."
 msgstr ""
+"定义未登记学员的访问权限。这可以设置为三个值之一： “private” （默认可见性，只允许在册学生使用）、“public_outline” "
+"（允许访问课程概述）和 “public”（允许访问概述和课程内容）。"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "private"
-msgstr ""
+msgstr "不公开"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "public_outline"
-msgstr ""
+msgstr "公开概述"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "public"
-msgstr ""
+msgstr "公开"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Instructor"
@@ -11319,7 +11321,7 @@ msgstr "对{course_name}的访问已于 {expiration_date}过期"
 #: openedx/features/course_duration_limits/access.py
 #, python-brace-format
 msgid "Access to the course you were looking for expired on {expiration_date}"
-msgstr ""
+msgstr "您要查看的课程访问已于 {expiration_date} 过期"
 
 #: openedx/features/course_duration_limits/access.py
 #, python-brace-format
@@ -11335,6 +11337,8 @@ msgid ""
 "{expiration_date}{strong_close}{line_break}You lose all access to this "
 "course, including your progress, on {expiration_date}."
 msgstr ""
+"{strong_open} 旁听访问入口过期 {expiration_date}{strong_close}{line_break}. 您已于 "
+"{expiration_date} 失去课程访问权限，包括正在上的课程。"
 
 #: openedx/features/course_duration_limits/access.py
 #, python-brace-format
@@ -11344,6 +11348,9 @@ msgid ""
 "now{sronly_span_open} to retain access past "
 "{expiration_date}{span_close}{a_close}"
 msgstr ""
+"{line_break} 在 {upgrade_deadline} 前升级，获取网站内课程的无限访问权， "
+"{a_open}现在升级{sronly_span_open} 以确保{expiration_date}前保留访问权 "
+"{span_close}{a_close}。"
 
 #: openedx/features/course_experience/plugins.py
 #: cms/templates/widgets/header.html

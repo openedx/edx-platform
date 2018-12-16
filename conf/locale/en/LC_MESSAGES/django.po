@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-13 19:28+0000\n"
-"PO-Revision-Date: 2018-12-13 19:28:27.772847\n"
+"POT-Creation-Date: 2018-12-16 20:37+0000\n"
+"PO-Revision-Date: 2018-12-16 20:37:10.730161\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -4100,7 +4100,6 @@ msgstr ""
 #: common/lib/xmodule/xmodule/tabs.py lms/djangoapps/courseware/tabs.py
 #: lms/djangoapps/courseware/views/views.py
 #: lms/djangoapps/shoppingcart/reports.py
-#: openedx/core/djangoapps/config_model_utils/models.py
 #: openedx/features/course_experience/__init__.py
 #: cms/templates/widgets/header.html lms/templates/help_modal.html
 #: lms/templates/courseware/course_navigation.html
@@ -9497,23 +9496,6 @@ msgstr ""
 msgid ""
 "Maximum number of records in paginated response of a single request to "
 "catalog service."
-msgstr ""
-
-#: openedx/core/djangoapps/config_model_utils/models.py
-msgid "Org"
-msgstr ""
-
-#: openedx/core/djangoapps/config_model_utils/models.py
-msgid "Site"
-msgstr ""
-
-#: openedx/core/djangoapps/config_model_utils/models.py
-#: lms/templates/navigation/navigation.html
-msgid "Global"
-msgstr ""
-
-#: openedx/core/djangoapps/config_model_utils/models.py
-msgid "Default"
 msgstr ""
 
 #: openedx/core/djangoapps/config_model_utils/models.py
@@ -18153,6 +18135,10 @@ msgstr ""
 
 #: lms/templates/navigation/navbar-not-authenticated.html
 msgid "Explore Courses"
+msgstr ""
+
+#: lms/templates/navigation/navigation.html
+msgid "Global"
 msgstr ""
 
 #: lms/templates/peer_grading/peer_grading.html
