@@ -111,6 +111,9 @@ def account_settings_context(request):
             'ENABLE_ACCOUNT_DELETION', settings.FEATURES.get('ENABLE_ACCOUNT_DELETION', False)
         ),
         'extended_profile_fields': _get_extended_profile_fields(),
+        'social_platforms': settings.SOCIAL_PLATFORMS if configuration_helpers.get_value(
+            'ENABLE_SOCIAL_MEDIA_LINKS', True
+        ) else {}
     }
 
     enterprise_customer = get_enterprise_customer_for_learner(site=request.site, user=request.user)

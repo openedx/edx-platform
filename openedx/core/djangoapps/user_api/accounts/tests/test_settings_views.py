@@ -1,5 +1,6 @@
 """ Tests for views related to account settings. """
 # -*- coding: utf-8 -*-
+import ddt
 import mock
 from django.conf import settings
 from django.contrib import messages
@@ -14,12 +15,14 @@ from lms.djangoapps.commerce.tests import factories
 from lms.djangoapps.commerce.tests.mocks import mock_get_orders
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.core.djangoapps.user_api.accounts.settings_views import account_settings_context, get_user_orders
 from student.tests.factories import UserFactory
 from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin
 
 
+@ddt.ddt
 @skip_unless_lms
 class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConfigMixin):
     """ Tests for the account settings view. """
@@ -133,6 +136,22 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConf
         self.assertEqual(
             context['enterprise_readonly_account_fields'], {'fields': settings.ENTERPRISE_READONLY_ACCOUNT_FIELDS}
         )
+
+    @ddt.data(
+        ({'ENABLE_SOCIAL_MEDIA_LINKS': True}, settings.SOCIAL_PLATFORMS),
+        ({'ENABLE_SOCIAL_MEDIA_LINKS': False}, {}),
+        ({}, settings.SOCIAL_PLATFORMS)
+    )
+    @ddt.unpack
+    def test_context_social_platforms_site_configuration(self, configuration, expected_value):
+        """
+        Verify that the social media links are not shown if they are disabled.
+        """
+        self.request.site = SiteFactory.create()
+
+        with with_site_configuration_context(configuration=configuration):
+            context = account_settings_context(self.request)
+            self.assertEqual(context['social_platforms'], expected_value)
 
     def test_view(self):
         """

@@ -13,6 +13,7 @@ from django.conf import settings
 from django.urls import reverse
 from django.test.client import RequestFactory
 from opaque_keys.edx.locator import CourseLocator
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 from openedx.features.learner_profile.views.learner_profile import learner_profile_context
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
@@ -222,3 +223,20 @@ class LearnerProfileViewTest(UrlResetMixin, ModuleStoreTestCase):
         response = self.client.get('/u/{username}'.format(username=self.user.username))
 
         self.assertNotContains(response, 'card certificate-card mode-{cert_mode}'.format(cert_mode=cert.mode))
+
+    @ddt.data(
+        ({'ENABLE_SOCIAL_MEDIA_LINKS': True}, settings.SOCIAL_PLATFORMS),
+        ({'ENABLE_SOCIAL_MEDIA_LINKS': False}, {}),
+        ({}, settings.SOCIAL_PLATFORMS),
+    )
+    @ddt.unpack
+    def test_context_social_platforms_site_configuration(self, configuration, expected_value):
+        """
+        Verify that the social media links are not shown if they are configured to be hidden
+        """
+        with with_site_configuration_context(configuration=configuration):
+            request = RequestFactory().get('/url')
+            request.user = self.user
+
+            context = learner_profile_context(request, self.USERNAME, self.user.is_staff)
+            self.assertEqual(context['data']['social_platforms'], expected_value)
