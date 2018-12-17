@@ -1,9 +1,9 @@
 def runBokchoyTests() {
-    sshagent(credentials: ['jenkins-worker', 'jenkins-worker-pem'], ignoreMissing: true) {
+    sshagent(credentials: ['jenkins-worker'], ignoreMissing: true) {
         checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '${ghprbActualCommit}']],
             doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', honorRefspec: true,
             noTags: true, shallow: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'jenkins-worker',
-            refspec: '+refs/heads/master:refs/remotes/origin/master +refs/pull/${ghprbPullId}/*:refs/remotes/origin/pr/${ghprbPullId}/*',
+            refspec: '+refs/pull/${ghprbPullId}/*:refs/remotes/origin/pr/${ghprbPullId}/*',
             url: 'git@github.com:edx/edx-platform.git']]]
         console_output = sh(returnStdout: true, script: 'bash scripts/all-tests.sh').trim()
         dir('stdout') {
@@ -14,7 +14,7 @@ def runBokchoyTests() {
 
 def bokchoyTestCleanup() {
     archiveArtifacts allowEmptyArchive: true, artifacts: 'test_root/log/**/*.log,stdout/*.log,*.log'
-    junit '**/reports/acceptance/*.xml'
+    junit '**/reports/bok_choy/**/xunit.xml'
 }
 
 pipeline {
@@ -24,7 +24,7 @@ pipeline {
         timeout(60)
     }
     stages {
-        stage("Initialize") {
+        stage("Run tests") {
             steps {
                 script {
                     def parallel_stages = [:]
@@ -33,9 +33,13 @@ pipeline {
                         parallel_stages["${index}"] = {
                             node('jenkins-worker') {
                                 withEnv(['SHARD=${index}','TEST_SUITE=bok-choy']) {
+                                    try {
                                         stage("Bokchoy shard: ${index}") {
-                                            echo "$SHARD"
+                                            runBokchoyTests()
                                         }
+                                    } finally {
+                                        bokchoyTestSuite()
+                                    }
                                 }
                             }
                         }
