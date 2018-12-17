@@ -245,6 +245,5 @@ wrapt==1.10.5
 xblock-utils==1.2.0
 # FIXME: see https://github.com/edx/XBlock/pull/419
 git+https://github.com/open-craft/XBlock.git@jill/video-xblock-fields#egg=xblock==1.2.3
-xblock==1.2.2
 xmlsec==1.3.3             # via python3-saml
 zendesk==1.1.1
