@@ -6195,7 +6195,7 @@ msgid "Cell phone number cannot be blanked"
 msgstr ""
 
 #: themes/normal-theme/lms/static/js/binding.js
-msgid "wrong cellphone number format"
+msgid "incorrect cellphone number format"
 msgstr ""
 
 #: themes/normal-theme/lms/static/js/binding.js

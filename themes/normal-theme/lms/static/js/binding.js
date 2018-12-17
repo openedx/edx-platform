@@ -23,7 +23,7 @@ var phoneDialog = function(){
         if (phone == ''){
             return gettext('Cell phone number cannot be blanked')
         } else if(!(/^(13[0-9]|14[56789]|15[0-9]|16[56]|17[0-9]|18[0-9]|19[89])\d{8}$/.test(phone))){
-            return gettext('wrong cellphone number format')
+            return gettext('incorrect cellphone number format')
         } else{
             return true;
         }

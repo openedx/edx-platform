@@ -19583,6 +19583,7 @@ msgid "Elite MBA"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/footer.html
+#: themes/normal-theme/lms/templates/courseware/course_about_sidebar_header.html
 msgid "WeChat Scan Code"
 msgstr ""
 
@@ -19625,13 +19626,15 @@ msgstr ""
 #. Translators: 'Open edX' is a registered trademark, please keep this
 #. untranslated. See http://open.edx.org for more information.
 #: themes/normal-theme/lms/templates/index_overlay.html
-msgid "学则变·变则进 —— 英荔商学院"
+msgid "Learn and Change · Change and Progress - Elite MBA."
 msgstr ""
 
 #. Translators: 'Open edX' is a registered trademark, please keep this
 #. untranslated. See http://open.edx.org for more information.
 #: themes/normal-theme/lms/templates/index_overlay.html
-msgid "价值数十万的MBA课程体系，最低月均99.9元全年畅学"
+msgid ""
+"Worth hundreds of thousands of MBA curriculum system. Minimum ￥99.9 per "
+"month for the whole year."
 msgstr ""
 
 #: themes/normal-theme/lms/templates/courseware/course_about.html
@@ -19639,15 +19642,26 @@ msgid "Add {course_name} to Cart <span>({price} USD)</span>"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/courseware/course_about_sidebar_header.html
-msgid "微信扫一扫"
-msgstr ""
-
-#: themes/normal-theme/lms/templates/courseware/course_about_sidebar_header.html
-msgid "点击屏幕右上角分享按钮"
+msgid ""
+"Share your experience by clicking the button on the above right corner of "
+"the screen"
 msgstr ""
 
 #: themes/normal-theme/lms/templates/static_templates/join_us.html
-msgid "join-us"
+msgid "Join us"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/static_templates/join_us.html
+msgid "成为更有价值的自己"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/static_templates/join_us.html
+msgid ""
+"英荔关注员工发展，重视交流的力量。作为一个整体，我们不断学习，相互启发，在工作中不断发现行业灵感，大开眼界。在这里，工作是享受与拼搏的有机结合。"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/static_templates/join_us.html
+msgid "职位信息整理中，我们将尽快发布，敬请期待。当然，这并不意味着我们愿意错过任何一位未来的成员，欢迎直接邮件联系"
 msgstr ""
 
 #. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.

@@ -391,6 +391,9 @@ def create(fpath, rules):
 
     source = polib.pofile(fpath)
     target = polib.pofile(name)
+    target.header = source.header
+    target.metadata = source.metadata
+
     for msg in source:
         if valid(msg.msgid, rules) is False:
             target.append(msg)
@@ -405,7 +408,7 @@ def find_specific_resources(lang):
     
     resource = []
     for i in f_list:
-        if os.path.splitext(i)[1] == '.po' and not i.startswith('invalid'):
+        if os.path.splitext(i)[1] == '.po':
             resource.append(i)
     
     return resource
@@ -467,6 +470,7 @@ def exchange_position(fpath):
     :return:
     """
     source_file_path = os.path.join('conf/locale/zh_CN/LC_MESSAGES', fpath)
+    
     source = polib.pofile(source_file_path)
 
     fh, target_file_path = mkstemp()
@@ -474,6 +478,9 @@ def exchange_position(fpath):
     target.close()
     target = polib.pofile(target_file_path)
     zhPattern = re.compile(u'[\u4e00-\u9fa5]+')
+
+    target.header = source.header
+    target.metadata = source.metadata
 
     for s in source:
         if valid(s.msgid, CONFIG['rules']) is False:
@@ -484,6 +491,7 @@ def exchange_position(fpath):
     target.save()
     remove(source_file_path)
     move(target_file_path, source_file_path)  
+
 
 
 @task
@@ -516,6 +524,9 @@ def i18n_third_party():
 
 
 @task
+@needs(
+    "pavelib.i18n.i18n_transifex_pull",
+)
 @timed
 def i18n_replace():
     """ replace en msgstr in pofile to responsed position. """
@@ -530,11 +541,18 @@ def i18n_replace():
 
     # remove invalid file
     invalid = [os.path.join('conf/locale/zh_CN/LC_MESSAGES', s) for s in source]
-    map(os.remove(i) for i in invalid)
+    map(os.remove, invalid)
 
     # process cn invalid-file
+    print(resource)
     map(exchange_position, resource)
+
+    # check duplicate here, if failed exit sys.
     sh("i18n_tool extract")
+    sh("i18n_tool generate")
+    sh("i18n_tool validate")
+
+    # push translations if validate success.
     sh("tx push -s -t -l zh_CN")
 
     # pull again
