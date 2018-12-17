@@ -200,6 +200,7 @@ class VideoStudentViewHandlers(object):
         if transcript_name:
             # Get the asset path for course
             asset_path = None
+            # FIXME: XBlocks shouldn't have any modulestore references.
             course = self.runtime.modulestore.get_course(self.course_id)
             if course.static_asset_path:
                 asset_path = course.static_asset_path
@@ -372,8 +373,6 @@ class VideoStudentViewHandlers(object):
             `is_bumper=1` flag for bumper case.
 
         Dispatches, (HTTP GET):
-            /translation/[language_id]
-            /download
             /available_translations/
 
         Explanations:

@@ -29,7 +29,8 @@ class VideoXBlock(
         VideoStudentViewHandlers,
         VideoStudioViewHandlers,
         XBlock,
-        XmlParserMixin):
+        XmlParserMixin,
+    ):
     """
     Video XBlock
 
@@ -55,35 +56,13 @@ class VideoXBlock(
         Makes no use of the context parameter
         """
         fragment = Fragment()
-        self.add_resource_urls(fragment)
+        for css_file in get_css_dependencies('style-video'):
+            fragment.add_css_url(staticfiles_storage.url(css_file))
+        for js_file in get_js_dependencies('video'):
+            fragment.add_javascript_url(staticfiles_storage.url(js_file))
         fragment.add_content(self.get_html())
         fragment.initialize_js('VideoXBlock')
         return fragment
-
-    @staticmethod
-    def css_dependencies():
-        """
-        Returns list of CSS files that this XBlock depends on.
-        """
-        return get_css_dependencies('style-video')
-
-    @staticmethod
-    def js_dependencies():
-        """
-        Returns list of JS files that this XBlock depends on.
-        """
-        return get_js_dependencies('video')
-
-    def add_resource_urls(self, fragment):
-        """
-        Adds URLs for static resources that this XBlock depends on to `fragment`.
-        """
-        for css_file in self.css_dependencies():
-            fragment.add_css_url(staticfiles_storage.url(css_file))
-
-        # Body dependencies
-        for js_file in self.js_dependencies():
-            fragment.add_javascript_url(staticfiles_storage.url(js_file))
 
     @classmethod
     def parse_xml(cls, node, runtime, keys, id_generator):

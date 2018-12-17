@@ -384,6 +384,7 @@ class VideoMixin(object):
 
 class VideoEditingMixins(LicenseMixin):
     # FIXME re-add base class functionality: TabsEditingDescriptor, EmptyDataRawDescriptor
+    # see https://github.com/edx/xblock-utils/pull/52
     """
     Studio editing functionality for `VideoXBlock`.
     """
