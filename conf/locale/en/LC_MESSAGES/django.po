@@ -234,6 +234,7 @@ msgstr ""
 #: common/djangoapps/course_modes/helpers.py lms/djangoapps/branding/api.py
 #: openedx/core/djangoapps/user_api/api.py
 #: lms/templates/static_templates/honor.html
+#: themes/normal-theme/lms/templates/static_templates/honor.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Honor Code"
@@ -3081,8 +3082,6 @@ msgstr ""
 #: themes/normal-theme/lms/templates/static_templates/about.html
 #: themes/normal-theme/lms/templates/static_templates/contact.html
 #: themes/normal-theme/lms/templates/static_templates/disclaimer.html
-#: themes/normal-theme/lms/templates/static_templates/join_us.html
-#: themes/normal-theme/lms/templates/static_templates/privacy_policy.html
 #: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/about.html
@@ -3256,6 +3255,7 @@ msgid "Specify what student can learn from the course."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "Course Instructor"
 msgstr ""
 
@@ -4671,6 +4671,8 @@ msgstr ""
 #: lms/templates/static_templates/privacy_policy.html
 #: themes/edx.org/lms/templates/certificates/_accomplishment-footer.html
 #: themes/normal-theme/lms/templates/footer.html
+#: themes/normal-theme/lms/templates/static_templates/privacy.html
+#: themes/normal-theme/lms/templates/static_templates/privacy_policy.html
 #: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -10286,6 +10288,10 @@ msgstr ""
 msgid "Please check mobile number format;"
 msgstr ""
 
+#: openedx/core/djangoapps/user_api/accounts/views.py
+msgid "This mobile number is already bound to another account."
+msgstr ""
+
 #: openedx/core/djangoapps/user_api/admin.py
 #: wiki/templates/wiki/permission_denied.html
 msgid "Permission Denied"
@@ -11530,6 +11536,11 @@ msgstr ""
 msgid "Content"
 msgstr ""
 
+#: cms/templates/certificates.html
+#: openedx/features/learner_profile/templates/learner_profile/learner-achievements-fragment.html
+msgid "Course Certificates"
+msgstr ""
+
 #: cms/templates/certificates.html cms/templates/group_configurations.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: cms/templates/settings.html cms/templates/settings_advanced.html
@@ -11559,6 +11570,7 @@ msgstr ""
 
 #: cms/templates/course_outline.html
 #: openedx/features/course_experience/templates/course_experience/course-home-fragment.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "Course Outline"
 msgstr ""
 
@@ -11653,6 +11665,11 @@ msgstr ""
 msgid "Course End Date"
 msgstr ""
 
+#: cms/templates/settings.html
+#: themes/normal-theme/lms/templates/courseware/course_about.html
+msgid "Course Short Description"
+msgstr ""
+
 #: cms/templates/settings.html lms/templates/courseware/program_marketing.html
 msgid "Instructors"
 msgstr ""
@@ -11705,6 +11722,7 @@ msgstr ""
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/static_templates/help.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
+#: themes/normal-theme/lms/templates/static_templates/help.html
 #: wiki/plugins/help/wiki_plugin.py
 msgid "Help"
 msgstr ""
@@ -14650,34 +14668,63 @@ msgid "enroll"
 msgstr ""
 
 #: lms/templates/courseware/course_about_sidebar_header.html
+#: themes/normal-theme/lms/templates/courseware/course_about_sidebar_header.html
 #: themes/stanford-style/lms/templates/courseware/course_about_sidebar_header.html
 msgid "Share with friends and family!"
 msgstr ""
 
 #: lms/templates/courseware/course_about_sidebar_header.html
+#: themes/normal-theme/lms/templates/courseware/course_about_sidebar_header.html
 msgid "I just enrolled in {number} {title} through {account}: {url}"
 msgstr ""
 
 #: lms/templates/courseware/course_about_sidebar_header.html
+#: themes/normal-theme/lms/templates/courseware/course_about_sidebar_header.html
+msgid ""
+"A wonderful course is rare to find and must be shared! I'm taking {title} on"
+" EliteMBA. Check it out! {url}"
+msgstr ""
+
+#: lms/templates/courseware/course_about_sidebar_header.html
+#: themes/normal-theme/lms/templates/courseware/course_about_sidebar_header.html
 msgid "Take a course with {platform} online"
 msgstr ""
 
 #: lms/templates/courseware/course_about_sidebar_header.html
+#: themes/normal-theme/lms/templates/courseware/course_about_sidebar_header.html
 msgid "I just enrolled in {number} {title} through {platform} {url}"
 msgstr ""
 
 #: lms/templates/courseware/course_about_sidebar_header.html
+#: themes/normal-theme/lms/templates/courseware/course_about_sidebar_header.html
 #: themes/stanford-style/lms/templates/courseware/course_about_sidebar_header.html
 msgid "Tweet that you've enrolled in this course"
 msgstr ""
 
 #: lms/templates/courseware/course_about_sidebar_header.html
+#: themes/normal-theme/lms/templates/courseware/course_about_sidebar_header.html
 msgid "Post a Facebook message to say you've enrolled in this course"
 msgstr ""
 
 #: lms/templates/courseware/course_about_sidebar_header.html
+#: themes/normal-theme/lms/templates/courseware/course_about_sidebar_header.html
 #: themes/stanford-style/lms/templates/courseware/course_about_sidebar_header.html
 msgid "Email someone to say you've enrolled in this course"
+msgstr ""
+
+#: lms/templates/courseware/course_about_sidebar_header.html
+#: themes/normal-theme/lms/templates/courseware/course_about_sidebar_header.html
+msgid "weibo"
+msgstr ""
+
+#: lms/templates/courseware/course_about_sidebar_header.html
+#: themes/normal-theme/lms/templates/courseware/course_about_sidebar_header.html
+msgid "weixin"
+msgstr ""
+
+#: lms/templates/courseware/course_about_sidebar_header.html
+#: themes/normal-theme/lms/templates/courseware/course_about_sidebar_header.html
+msgid "qq"
 msgstr ""
 
 #: lms/templates/courseware/course_navigation.html
@@ -18776,6 +18823,7 @@ msgstr ""
 
 #: lms/templates/static_templates/manual.html
 #: themes/normal-theme/lms/templates/footer.html
+#: themes/normal-theme/lms/templates/static_templates/manual.html
 msgid "Manual"
 msgstr ""
 
@@ -19574,8 +19622,32 @@ msgstr ""
 msgid "bind your account to your cellphone number now"
 msgstr ""
 
+#. Translators: 'Open edX' is a registered trademark, please keep this
+#. untranslated. See http://open.edx.org for more information.
+#: themes/normal-theme/lms/templates/index_overlay.html
+msgid "学则变·变则进 —— 英荔商学院"
+msgstr ""
+
+#. Translators: 'Open edX' is a registered trademark, please keep this
+#. untranslated. See http://open.edx.org for more information.
+#: themes/normal-theme/lms/templates/index_overlay.html
+msgid "价值数十万的MBA课程体系，最低月均99.9元全年畅学"
+msgstr ""
+
 #: themes/normal-theme/lms/templates/courseware/course_about.html
 msgid "Add {course_name} to Cart <span>({price} USD)</span>"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/courseware/course_about_sidebar_header.html
+msgid "微信扫一扫"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/courseware/course_about_sidebar_header.html
+msgid "点击屏幕右上角分享按钮"
+msgstr ""
+
+#: themes/normal-theme/lms/templates/static_templates/join_us.html
+msgid "join-us"
 msgstr ""
 
 #. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
@@ -19765,10 +19837,6 @@ msgstr ""
 
 #: cms/templates/asset_index.html cms/templates/widgets/header.html
 msgid "Files & Uploads"
-msgstr ""
-
-#: cms/templates/certificates.html
-msgid "Course Certificates"
 msgstr ""
 
 #: cms/templates/certificates.html
@@ -22024,10 +22092,6 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid "Displayed on the course details page. Limit to 1000 characters."
-msgstr ""
-
-#: cms/templates/settings.html
-msgid "Course Short Description"
 msgstr ""
 
 #: cms/templates/settings.html

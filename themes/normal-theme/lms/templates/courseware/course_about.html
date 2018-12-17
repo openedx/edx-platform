@@ -260,9 +260,9 @@ from six import string_types
         <!-- add vip adver -->
         <div id="vip" style="display: none"></div>
         <div class="about-tabs">
-          <span class="about-tab about-tab-active" onClick="showTab('about-info', 0)">${_("课程简介")}</span>
-          <span class="about-tab" onClick="showTab('about-staff', 1)">${_("授课老师")}</span>
-          <span class="about-tab" onClick="showTab('about-outline', 2)">${_("课程大纲")}</span>
+          <span class="about-tab about-tab-active" onClick="showTab('about-info', 0)">${_(u"Course Short Description")}</span>
+          <span class="about-tab" onClick="showTab('about-staff', 1)">${_(u"Course Instructor")}</span>
+          <span class="about-tab" onClick="showTab('about-outline', 2)">${_(u"Course Outline")}</span>
         </div>
         ${get_course_about_section(request, course, "overview")}
       </div>
