@@ -26,3 +26,18 @@
 
 # Flow Control xblock
 -e git+https://github.com/eduNEXT/flow-control-xblock.git@v0.2.0#egg=xblock-flow-control==0.2.0
+
+# Pdf xblock
+-e git+https://github.com/MarCnu/pdfXBlock.git#egg=pdfXBlock
+
+# Crowdsourcehinter xblock
+-e git+https://github.com/solashirai/crowdsourcehinter.git#egg=crowdsourcehinter
+
+# Feedback xblock
+-e git+https://github.com/pmitros/FeedbackXBlock.git#egg=FeedbackXBlock
+
+# Image Explorer xblock
+-e git+https://github.com/edx-solutions/xblock-image-explorer.git#egg=xblock-image-explorer
+
+# InvideoQuiz xblock
+-e git+https://github.com/raccoongang/xblock-in-video-quiz.git@invquiz-rg#egg=xblock-in-video-quiz

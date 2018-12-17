@@ -51,6 +51,11 @@ git+https://github.com/edx/xblock-utils.git@v1.1.1#egg=xblock-utils==1.1.1
 -e git+https://github.com/open-craft/problem-builder.git@v3.1.5#egg=xblock-problem-builder==3.1.5
 -e git+https://github.com/raccoongang/edx_xblock_hangouts.git@master#egg=xblock-hangouts==master
 -e git+https://github.com/eduNEXT/flow-control-xblock.git@v0.2.0#egg=xblock-flow-control==0.2.0
+-e git+https://github.com/MarCnu/pdfXBlock.git#egg=pdfXBlock
+-e git+https://github.com/solashirai/crowdsourcehinter.git#egg=crowdsourcehinter
+-e git+https://github.com/pmitros/FeedbackXBlock.git#egg=FeedbackXBlock
+-e git+https://github.com/edx-solutions/xblock-image-explorer.git#egg=xblock-image-explorer
+-e git+https://github.com/raccoongang/xblock-in-video-quiz.git@invquiz-rg#egg=xblock-in-video-quiz
 -e common/lib/xmodule
 amqp==1.4.9               # via kombu
 analytics-python==1.1.0
