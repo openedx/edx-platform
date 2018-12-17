@@ -31,8 +31,8 @@ pipeline {
                     for (int i = 1; i <= 22; i++) {
                         parallel_stages["${i}"] = {
                             node('jenkins-worker') {
-                                stage("Bokchoy shard: ${f}") {
-                                    echo '${f}'
+                                stage("Bokchoy shard: ${i}") {
+                                    echo '${i}'
                                 }
                             }
                         }
