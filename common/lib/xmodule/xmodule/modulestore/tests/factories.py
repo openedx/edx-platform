@@ -149,6 +149,7 @@ class SampleCourseFactory(CourseFactory):
         block_info_tree = kwargs.pop('block_info_tree', default_block_info_tree)
         store = kwargs.get('modulestore')
         user_id = kwargs.get('user_id', ModuleStoreEnum.UserID.test)
+
         with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, None):
             course = super(SampleCourseFactory, cls)._create(target_class, **kwargs)
 
