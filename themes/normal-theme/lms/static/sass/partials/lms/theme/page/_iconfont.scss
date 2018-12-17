@@ -95,9 +95,9 @@ $icon-width: 18px;
 .fa-bookmark:before,
 .course-content .bookmark-button.bookmarked::before,
 .course-content .bookmark-button::before{
-  background-position: calcP(12, 6)
+  background-position: calcP(12, 6);
 }
-.course-content .bookmark-button.bookmarked::before{
+.course-content .bookmark-button::before{
   position: relative;
   top: 2px;
   padding: 0;
