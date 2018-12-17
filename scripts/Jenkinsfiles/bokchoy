@@ -35,11 +35,11 @@ pipeline {
                                 withEnv(["SHARD=${index}","TEST_SUITE=bok-choy"]) {
                                     try {
                                         stage("Bokchoy shard: ${index}") {
-                                            sh "echo $TEST_SUITE $SHARD"
-                                            runBokchoyTests()
+                                            sh "echo $BUILD_URL"
+                                            //runBokchoyTests()
                                         }
                                     } finally {
-                                        bokchoyTestCleanup()
+                                        //bokchoyTestCleanup()
                                     }
                                 }
                             }
