@@ -27,15 +27,17 @@ pipeline {
         stage("Initialize") {
             steps {
                 script {
-                    stage("Run tests") {
-                        parallel {
-                            for (int i = 1; i <= 22; i++) {
-                                stage("Bokchoy shard: ${i}") {
-                                    sh 'echo hey'
+                    def parallel_stages = [:]
+                    for (int i = 1; i <= 22; i++) {
+                        parallel_stages["${i}"] = {
+                            node('jenkins-worker') {
+                                stage("Bokchoy shard: ${f}") {
+                                    echo '${f}'
                                 }
                             }
                         }
                     }
+                    parallel parallel_stages
                 }
             }
         }
