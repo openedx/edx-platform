@@ -188,7 +188,10 @@ class ChooseModeView(View):
             "error": error,
             "responsive": True,
             "nav_hidden": True,
-            "content_gating_enabled": ContentTypeGatingConfig.enabled_for_course(course_key=course_key),
+            "content_gating_enabled": ContentTypeGatingConfig.enabled_for_enrollment(
+                user=request.user,
+                course_key=course_key
+            ),
         }
         context.update(
             get_experiment_user_metadata_context(
