@@ -18,6 +18,7 @@
 body.view-in-course .wrapper-course-material .course-tabs{
   .tab a{ 
     padding: 20px 15px 20px 10px;
+    color: $blue;
     &:hover, &:focus, &.active{
       border: 0;
       outline: none;

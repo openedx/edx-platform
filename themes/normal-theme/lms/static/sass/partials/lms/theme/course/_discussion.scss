@@ -42,6 +42,7 @@
       border-top-right-radius: 0;
       border-bottom-right-radius: 0;
       font-size: 14px;
+      border: 1px solid $blue;
     }
     .search-button{
       @extend %btn-my-primary;
