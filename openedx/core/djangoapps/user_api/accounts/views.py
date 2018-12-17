@@ -524,7 +524,7 @@ def _set_unusable_password(user):
 
 
 class PhoneBindingViewSet(ViewSet):
-    authentication_classes = (SessionAuthentication, JwtAuthentication,)
+    authentication_classes = (SessionAuthentication, JwtAuthentication, OAuth2AuthenticationAllowInactiveUser)
     permission_classes = (permissions.IsAuthenticated,)
 
     verify_code_key = 'phone_binding_verifycode_{username}_{name}'
@@ -558,6 +558,9 @@ class PhoneBindingViewSet(ViewSet):
         '''
         if not (mobile and ValidateDataForEducation().is_mobile(mobile)):
             raise Exception(_(u"Please check mobile number format;"))
+
+        if UserProfile.objects.filter(phone=mobile):
+            raise Exception(_(u"This mobile number is already bound to another account."))
 
         code = self.set_verify_code({'username': username, 'name': mobile})
         if language == 'en':

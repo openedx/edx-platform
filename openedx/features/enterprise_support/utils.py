@@ -4,6 +4,7 @@ import hashlib
 import json
 
 import six
+from django.core.cache import cache
 from django.conf import settings
 from django.utils.translation import ugettext as _
 
@@ -266,9 +267,11 @@ def remind_users_to_bind_phones(request):
     """
     try:
         if not request.user.profile.phone:
+            cache_key = 'bindphone_{uid}'.format(uid=request.user.id)
+            cache_value = cache.get(cache_key)
             from datetime import datetime
-            if request.session.get('Phone_binding_reminder', '') != datetime.now().date():
-                request.session['Phone_binding_reminder'] = datetime.now().date()
+            if (not cache_value) or (cache_value != datetime.now().date()):
+                cache.set(cache_key, datetime.now().date(), 60 * 60 * 24)
                 return True
             else:
                 return False

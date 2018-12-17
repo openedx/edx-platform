@@ -134,8 +134,7 @@ class SoftwareSecurePhotoVerificationAdmin(admin.ModelAdmin):
             context = {
                 'subject': subject,
                 'template': template_name,
-                # 'email': user.email,
-                'email': 'yl.zhang@eliteu.com.cn',
+                'email': user.email,
                 'email_vars': verification_status_email_vars
             }
             send_verification_status_email.delay(context)
