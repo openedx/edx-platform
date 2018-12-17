@@ -632,7 +632,7 @@ def set_logged_in_cookies(backend=None, user=None, strategy=None, auth_entry=Non
             # Check that the cookie isn't already set.
             # This ensures that we allow the user to continue to the next
             # pipeline step once he/she has the cookie set by this step.
-            has_cookie = user_authn_cookies.is_logged_in_cookie_set(request)
+            has_cookie = user_authn_cookies.are_logged_in_cookies_set(request)
             if not has_cookie:
                 try:
                     redirect_url = get_complete_url(current_partial.backend)

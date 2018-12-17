@@ -327,9 +327,19 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
 
     @ddt.data("signin_user", "register_user")
     def test_login_and_registration_form_already_authenticated(self, url_name):
-        # Create/activate a new account and log in
-        activation_key = create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
-        activate_account(activation_key)
+        # call the account registration api that sets the login cookies
+        url = reverse('user_api_registration')
+        request_data = {
+            'username': self.USERNAME,
+            'password': self.PASSWORD,
+            'email': self.EMAIL,
+            'name': self.USERNAME,
+            'terms_of_service': 'true',
+            'honor_code': 'true',
+        }
+        result = self.client.post(url, data=request_data)
+        self.assertEqual(result.status_code, 200)
+
         result = self.client.login(username=self.USERNAME, password=self.PASSWORD)
         self.assertTrue(result)
 
