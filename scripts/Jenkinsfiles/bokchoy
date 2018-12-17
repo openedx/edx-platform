@@ -32,8 +32,11 @@ pipeline {
                         int index = i
                         parallel_stages["${index}"] = {
                             node('jenkins-worker') {
-                                stage("Bokchoy shard: ${index}") {
-                                    echo "${index}"
+                                withEnv(['SHARD=${index}','TEST_SUITE=bok-choy']) {
+                                        stage("Bokchoy shard: ${index}") {
+                                            echo "$SHARD"
+                                        }
+                                    }
                                 }
                             }
                         }
