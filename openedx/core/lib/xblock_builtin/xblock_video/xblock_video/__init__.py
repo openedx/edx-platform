@@ -77,6 +77,8 @@ class VideoXBlock(
         If no external data sources are found (file in "video" folder), it is exactly equivalent to base method
         XBlock.parse_xml. Otherwise this method parses file in "video" folder (known as definition_xml) and updates fields accordingly.
         """
+        # FIXME: Figure out why this isn't already being handled by XmlParserMixin.parse_xml:
+        #  https://github.com/edx/edx-platform/blob/master/common/lib/xmodule/xmodule/xml_module.py#L351
         block = super(VideoXBlock, cls).parse_xml(node, runtime, keys, id_generator)
 
         cls._apply_translations_to_node_attributes(block, node)
