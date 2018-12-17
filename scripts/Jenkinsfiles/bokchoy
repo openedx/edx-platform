@@ -38,7 +38,7 @@ pipeline {
                                             runBokchoyTests()
                                         }
                                     } finally {
-                                        bokchoyTestSuite()
+                                        bokchoyTestCleanup()
                                     }
                                 }
                             }
