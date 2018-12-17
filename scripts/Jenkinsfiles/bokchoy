@@ -28,7 +28,7 @@ pipeline {
             steps {
                 script {
                     for (int i = 1; i <= 22; i++) {
-                        stage("Bokchoy shard: ${tests[i]}") {
+                        stage("Bokchoy shard: ${i}") {
                             sh '....'
                         }
                     }
