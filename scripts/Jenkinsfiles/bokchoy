@@ -24,12 +24,16 @@ pipeline {
         timeout(60)
     }
     stages {
-        stage('Initialize') {
+        stage("Initialize") {
             steps {
                 script {
-                    for (int i = 1; i <= 22; i++) {
-                        stage("Bokchoy shard: ${i}") {
-                            sh 'echo hey'
+                    stage("Run tests") {
+                        parallel {
+                            for (int i = 1; i <= 22; i++) {
+                                stage("Bokchoy shard: ${i}") {
+                                    sh 'echo hey'
+                                }
+                            }
                         }
                     }
                 }
