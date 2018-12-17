@@ -13,7 +13,7 @@ def runBokchoyTests() {
 }
 
 def bokchoyTestCleanup() {
-    archiveArtifacts allowEmptyArchive: true, artifacts: 'test_root/log/**/*.log,stdout/*.log,*.log'
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'test_root/log/**/*.log,stdout/*.log'
     junit '**/reports/bok_choy/**/xunit.xml'
 }
 
@@ -24,6 +24,23 @@ pipeline {
         timeout(60)
     }
     stages {
+        stage('Mark build as pending on Github') {
+            when {
+                 // Only run github-build-status for master builds
+                 expression { env.ghprbActualCommit == null }
+            }
+            steps {
+                script {
+                    commit_sha = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+                    build job: 'github-build-status', parameters: [string(name: 'GIT_SHA', value: commit_sha),
+                        string(name: 'GITHUB_ORG', value: 'edx'), string(name: 'GITHUB_REPO', value: 'edx-platform'),
+                        string(name: 'TARGET_URL', value: "${BUILD_URL}"),
+                        string(name: 'DESCRIPTION', value: 'Pending'), string(name: 'CONTEXT', value: 'jenkins/bokchoy-pipeline-master'),
+                        string(name: 'CREATE_DEPLOYMENT', value: 'false'), string(name: 'BUILD_STATUS', value: 'pending')],
+                        propagate: false, wait: false
+                }
+            }
+        }
         stage("Run tests") {
             steps {
                 script {
@@ -45,6 +62,39 @@ pipeline {
                         }
                     }
                     parallel parallel_stages
+                }
+            }
+        }
+    }
+    post {
+        always {
+            script{
+                if (env.ghprbPullId != null) {
+                    // For PR jobs, run the edx-platform-test-notifier for PR reporting
+                    build job: 'edx-platform-test-notifier', parameters: [string(name: 'PR_NUMBER', value: "${ghprbPullId}")], wait: false
+                } else {
+                    // For master jobs run github-build-status and report to slack when necessary
+                    if (currentBuild.currentResult == "SUCCESS") {
+                        create_deployment = "true"
+                        build_status = "success"
+                        build_description = "Build Passed"
+                    }
+                    else {
+                        create_deployment = "false"
+                        build_status = "failure"
+                        build_description = "Build Failed"
+                    }
+
+                    commit_sha = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+                    build job: 'github-build-status', parameters: [string(name: 'GIT_SHA', value: commit_sha),
+                        string(name: 'GITHUB_ORG', value: 'edx'), string(name: 'GITHUB_REPO', value: 'edx-platform'),
+                        string(name: 'TARGET_URL', value: "${BUILD_URL}"),
+                        string(name: 'DESCRIPTION', value: build_description), string(name: 'CONTEXT', value: 'jenkins/bokchoy-pipeline-master'),
+                        string(name: 'CREATE_DEPLOYMENT', value: create_deployment), string(name: 'BUILD_STATUS', value: build_status)],
+                        propagate: false, wait: false
+                    if (currentBuild.currentResult != "SUCCESS"){
+                        slackSend "${currentBuild.currentResult}: `${JOB_NAME}` #${BUILD_NUMBER}:\n${BUILD_URL}"
+                    }
                 }
             }
         }
