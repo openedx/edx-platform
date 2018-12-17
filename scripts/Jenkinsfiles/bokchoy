@@ -32,9 +32,10 @@ pipeline {
                         int index = i
                         parallel_stages["${index}"] = {
                             node('jenkins-worker') {
-                                withEnv(['SHARD=${index}','TEST_SUITE=bok-choy']) {
+                                withEnv(["SHARD=${index}","TEST_SUITE=bok-choy"]) {
                                     try {
                                         stage("Bokchoy shard: ${index}") {
+                                            sh "echo $TEST_SUITE $SHARD"
                                             runBokchoyTests()
                                         }
                                     } finally {
