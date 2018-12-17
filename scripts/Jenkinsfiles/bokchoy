@@ -7,7 +7,7 @@ def runBokchoyTests() {
             url: 'git@github.com:edx/edx-platform.git']]]
         console_output = sh(returnStdout: true, script: 'bash scripts/all-tests.sh').trim()
         dir('stdout') {
-            writeFile file: "${TEST_SUITE}-stdout.log", text: console_output
+            writeFile file: "${TEST_SUITE}-${SHARD}-stdout.log", text: console_output
         }
     }
 }
@@ -35,11 +35,10 @@ pipeline {
                                 withEnv(["SHARD=${index}","TEST_SUITE=bok-choy"]) {
                                     try {
                                         stage("Bokchoy shard: ${index}") {
-                                            sh "echo $BUILD_URL"
-                                            //runBokchoyTests()
+                                            runBokchoyTests()
                                         }
                                     } finally {
-                                        //bokchoyTestCleanup()
+                                        bokchoyTestCleanup()
                                     }
                                 }
                             }
