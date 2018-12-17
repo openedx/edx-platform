@@ -32,7 +32,7 @@ pipeline {
                         parallel_stages["${i}"] = {
                             node('jenkins-worker') {
                                 stage("Bokchoy shard: ${i}") {
-                                    echo '${i}'
+                                    echo "${i}"
                                 }
                             }
                         }
