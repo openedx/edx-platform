@@ -29,10 +29,11 @@ pipeline {
                 script {
                     def parallel_stages = [:]
                     for (int i = 1; i <= 22; i++) {
-                        parallel_stages["${i}"] = {
+                        int index = i
+                        parallel_stages["${index}"] = {
                             node('jenkins-worker') {
-                                stage("Bokchoy shard: ${i}") {
-                                    echo "${i}"
+                                stage("Bokchoy shard: ${index}") {
+                                    echo "${index}"
                                 }
                             }
                         }
