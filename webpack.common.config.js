@@ -48,7 +48,7 @@ var workerConfig = function() {
                         {
                             test: /\.(js|jsx)$/,
                             include: [
-                                /node_modules\/@edx/
+                                /node_modules\//
                             ],
                             use: 'babel-loader'
                         }
