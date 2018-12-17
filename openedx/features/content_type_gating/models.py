@@ -108,25 +108,26 @@ class ContentTypeGatingConfig(StackedConfigurationModel):
             if user_variable_represents_correct_user and has_staff_roles(user, course_key):
                 return False
 
+        # check if user is in holdback
+        is_in_holdback = False
+        if user and user.is_authenticated and (user_variable_represents_correct_user):
+            try:
+                holdback_value = ExperimentData.objects.get(
+                    user=user,
+                    experiment_id=EXPERIMENT_ID,
+                    key=EXPERIMENT_DATA_HOLDBACK_KEY,
+                ).value
+                is_in_holdback = holdback_value == 'True'
+            except ExperimentData.DoesNotExist:
+                pass
+        if is_in_holdback:
+            return False
+
         # enrollment might be None if the user isn't enrolled. In that case,
         # return enablement as if the user enrolled today
         if enrollment is None:
             return cls.enabled_for_course(course_key=course_key, target_datetime=timezone.now())
         else:
-            # TODO: clean up as part of REV-100
-            is_in_holdback = False
-            if user and (user_variable_represents_correct_user):
-                try:
-                    holdback_value = ExperimentData.objects.get(
-                        user=user,
-                        experiment_id=EXPERIMENT_ID,
-                        key=EXPERIMENT_DATA_HOLDBACK_KEY,
-                    ).value
-                    is_in_holdback = holdback_value == 'True'
-                except ExperimentData.DoesNotExist:
-                    pass
-            if is_in_holdback:
-                return False
             current_config = cls.current(course_key=enrollment.course_id)
             return current_config.enabled_as_of_datetime(target_datetime=enrollment.created)
 
