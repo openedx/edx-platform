@@ -17,7 +17,7 @@
     box-sizing: border-box;
     background-image: linear-gradient(to bottom, #fff 0%, #fff 45%, #f2f9ff 100%);
     font-size: 14px;
-    padding: 0 10px 40px;
+    padding: 0 0 40px;
     position: relative;
     
     
@@ -26,18 +26,11 @@
     .course-view,
     .container
     {
-      max-width: 1200px;
+      max-width: 1220px;
       margin: 0 auto;
       width: 100%;
       box-sizing: border-box;
-    }
-    .home .courses-container{
-      margin-top: 320px;
-    }
-    @media screen and (max-width:576px){
-      .home .courses-container{
-        margin-top: 210px;
-      }
+      padding: 0 10px;
     }
   }
 }
