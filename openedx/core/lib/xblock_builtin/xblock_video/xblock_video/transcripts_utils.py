@@ -722,10 +722,7 @@ class Transcript(object):
 
 
 class VideoTranscriptsMixin(object):
-    """Mixin class for transcript functionality.
-
-    This is necessary for both VideoModule and VideoDescriptor.
-    """
+    """Mixin class for transcript functionality."""
 
     def available_translations(self, transcripts, verify_assets=None, is_bumper=False):
         """
@@ -734,7 +731,7 @@ class VideoTranscriptsMixin(object):
         Arguments:
             verify_assets (boolean): If True, checks to ensure that the transcripts
                 really exist in the contentstore. If False, we just look at the
-                VideoDescriptor fields and do not query the contentstore. One reason
+                VideoEditingMixins fields and do not query the contentstore. One reason
                 we might do this is to avoid slamming contentstore() with queries
                 when trying to make a listing of videos and their languages.
 
@@ -935,7 +932,7 @@ def get_transcript_from_contentstore(video, language, output_format, transcripts
     Get video transcript from content store.
 
     Arguments:
-        video (Video Descriptor): Video descriptor
+        video (Video XBlock): Video block
         language (unicode): transcript language
         output_format (unicode): transcript output format
         transcripts_info (dict): transcript info for a video
@@ -992,7 +989,7 @@ def get_transcript(video, lang=None, output_format=Transcript.SRT, youtube_id=No
     Get video transcript from edx-val or content store.
 
     Arguments:
-        video (Video Descriptor): Video Descriptor
+        video (Video XBlock): Video block
         lang (unicode): transcript language
         output_format (unicode): transcript output format
         youtube_id (unicode): youtube video id

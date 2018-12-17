@@ -207,7 +207,7 @@ def video_summary(video_profiles, course_id, video_descriptor, request, local_ca
 
     if default_encoded_video:
         video_url = default_encoded_video['url']
-    # Then fall back to VideoDescriptor fields for video URLs
+    # Then fall back to VideoXBlock fields for video URLs
     elif video_descriptor.html5_sources:
         video_url = video_descriptor.html5_sources[0]
         all_sources = video_descriptor.html5_sources

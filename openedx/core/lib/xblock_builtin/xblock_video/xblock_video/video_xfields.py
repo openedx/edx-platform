@@ -14,7 +14,7 @@ _ = lambda text: text
 
 
 class VideoFields(object):
-    """Fields for `VideoModule` and `VideoDescriptor`."""
+    """Fields for `VideoXBlock`."""
     display_name = String(
         help=_("The display name for this component."),
         display_name=_("Component Display Name"),

@@ -24,7 +24,7 @@ from .bumper_utils import *
 class VideoXBlock(
         VideoFields,
         VideoMixin,
-        VideoDescriptor,
+        VideoEditingMixins,
         VideoTranscriptsMixin,
         VideoStudentViewHandlers,
         VideoStudioViewHandlers,
@@ -98,7 +98,7 @@ class VideoXBlock(
         If no external data sources are found (file in "video" folder), it is exactly equivalent to base method
         XBlock.parse_xml. Otherwise this method parses file in "video" folder (known as definition_xml) and updates fields accordingly.
         """
-        block = super(VideoDescriptor, cls).parse_xml(node, runtime, keys, id_generator)
+        block = super(VideoXBlock, cls).parse_xml(node, runtime, keys, id_generator)
 
         cls._apply_translations_to_node_attributes(block, node)
         cls._apply_metadata_and_policy(block, node, runtime)

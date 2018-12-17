@@ -100,7 +100,7 @@ def get_poster(video):
 
 def format_xml_exception_message(location, key, value):
     """
-    Generate exception message for VideoDescriptor class which will use for ValueError and UnicodeDecodeError
+    Generate exception message for VideoXBlock class which will use for ValueError and UnicodeDecodeError
     when setting xml attributes.
     """
     exception_message = "Block-location:{location}, Key:{key}, Value:{value}".format(

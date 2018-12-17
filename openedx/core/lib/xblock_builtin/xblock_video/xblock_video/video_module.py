@@ -235,7 +235,7 @@ class VideoMixin(object):
             except (edxval_api.ValInternalError, edxval_api.ValVideoNotFoundError):
                 # VAL raises this exception if it can't find data for the edx video ID. This can happen if the
                 # course data is ported to a machine that does not have the VAL data. So for now, pass on this
-                # exception and fallback to whatever we find in the VideoDescriptor.
+                # exception and fallback to whatever we find in the VideoXBlock.
                 log.warning("Could not retrieve information from VAL for edx Video ID: %s.", self.edx_video_id)
 
         # If the user comes from China use China CDN for html5 videos.
@@ -251,7 +251,7 @@ class VideoMixin(object):
                     sources[index] = new_url
 
         # If there was no edx_video_id, or if there was no download specified
-        # for it, we fall back on whatever we find in the VideoDescriptor
+        # for it, we fall back on whatever we find in the VideoXBlock.
         if not download_video_link and self.download_video:
             if self.source:
                 download_video_link = self.source
@@ -382,10 +382,10 @@ class VideoMixin(object):
         return self.runtime.render_template('video.html', context)
 
 
-class VideoDescriptor(LicenseMixin):
+class VideoEditingMixins(LicenseMixin):
     # FIXME re-add base class functionality: TabsEditingDescriptor, EmptyDataRawDescriptor
     """
-    Descriptor for `VideoModule`.
+    Studio editing functionality for `VideoXBlock`.
     """
     # FIXME: module attributes not found?
     transcript = module_attr('transcript')
@@ -417,7 +417,7 @@ class VideoDescriptor(LicenseMixin):
         c) If `source` exists and `source` in `html5_sources`, do not show `source`
             field. `download_video` field has value True.
         """
-        super(VideoDescriptor, self).__init__(*args, **kwargs)
+        super(VideoEditingMixins, self).__init__(*args, **kwargs)
 
         # For backwards compatibility -- if we've got XML data, parse it out and set the metadata fields
         # TODO JV: test this
@@ -455,7 +455,7 @@ class VideoDescriptor(LicenseMixin):
         is the override of the general XBlock method, and it will also ask
         its superclass to validate.
         """
-        validation = super(VideoDescriptor, self).validate()
+        validation = super(VideoEditingMixins, self).validate()
         if not isinstance(validation, StudioValidation):
             validation = StudioValidation.copy(validation)
 
@@ -541,7 +541,7 @@ class VideoDescriptor(LicenseMixin):
 
     @property
     def editable_metadata_fields(self):
-        editable_fields = super(VideoDescriptor, self).editable_metadata_fields
+        editable_fields = super(VideoEditingMixins, self).editable_metadata_fields
 
         settings_service = self.runtime.service(self, 'settings')
         if settings_service:
@@ -725,7 +725,7 @@ class VideoDescriptor(LicenseMixin):
         """
         Extend context by data for transcript basic tab.
         """
-        _context = super(VideoDescriptor, self).get_context()
+        _context = super(VideoEditingMixins, self).get_context()
 
         metadata_fields = copy.deepcopy(self.editable_metadata_fields)
 
@@ -949,7 +949,7 @@ class VideoDescriptor(LicenseMixin):
         return edx_video_id
 
     def index_dictionary(self):
-        xblock_body = super(VideoDescriptor, self).index_dictionary()
+        xblock_body = super(VideoEditingMixins, self).index_dictionary()
         video_body = {
             "display_name": self.display_name,
         }
