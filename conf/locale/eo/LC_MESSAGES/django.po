@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-13 19:28+0000\n"
-"PO-Revision-Date: 2018-12-13 19:28:27.772847\n"
+"POT-Creation-Date: 2018-12-16 20:37+0000\n"
+"PO-Revision-Date: 2018-12-16 20:37:10.730161\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -5291,7 +5291,6 @@ msgstr "Hömé Ⱡ'σяєм ι#"
 #: common/lib/xmodule/xmodule/tabs.py lms/djangoapps/courseware/tabs.py
 #: lms/djangoapps/courseware/views/views.py
 #: lms/djangoapps/shoppingcart/reports.py
-#: openedx/core/djangoapps/config_model_utils/models.py
 #: openedx/features/course_experience/__init__.py
 #: cms/templates/widgets/header.html lms/templates/help_modal.html
 #: lms/templates/courseware/course_navigation.html
@@ -12079,23 +12078,6 @@ msgid ""
 msgstr ""
 "Mäxïmüm nümßér öf réçörds ïn pägïnätéd réspönsé öf ä sïnglé réqüést tö "
 "çätälög sérvïçé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
-
-#: openedx/core/djangoapps/config_model_utils/models.py
-msgid "Org"
-msgstr "Örg Ⱡ'σяєм#"
-
-#: openedx/core/djangoapps/config_model_utils/models.py
-msgid "Site"
-msgstr "Sïté Ⱡ'σяєм ι#"
-
-#: openedx/core/djangoapps/config_model_utils/models.py
-#: lms/templates/navigation/navigation.html
-msgid "Global"
-msgstr "Glößäl Ⱡ'σяєм ιρѕυ#"
-
-#: openedx/core/djangoapps/config_model_utils/models.py
-msgid "Default"
-msgstr "Défäült Ⱡ'σяєм ιρѕυм #"
 
 #: openedx/core/djangoapps/config_model_utils/models.py
 msgid "Enabled"
@@ -23206,6 +23188,10 @@ msgstr ""
 #: lms/templates/navigation/navbar-not-authenticated.html
 msgid "Explore Courses"
 msgstr "Éxplöré Çöürsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: lms/templates/navigation/navigation.html
+msgid "Global"
+msgstr "Glößäl Ⱡ'σяєм ιρѕυ#"
 
 #: lms/templates/peer_grading/peer_grading.html
 msgid ""

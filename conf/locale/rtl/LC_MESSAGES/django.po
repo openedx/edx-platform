@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2018-12-13 19:28+0000\n"
-"PO-Revision-Date: 2018-12-13 19:28:27.772847\n"
+"POT-Creation-Date: 2018-12-16 20:37+0000\n"
+"PO-Revision-Date: 2018-12-16 20:37:10.730161\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -4555,7 +4555,6 @@ msgstr "اخوث"
 #: common/lib/xmodule/xmodule/tabs.py lms/djangoapps/courseware/tabs.py
 #: lms/djangoapps/courseware/views/views.py
 #: lms/djangoapps/shoppingcart/reports.py
-#: openedx/core/djangoapps/config_model_utils/models.py
 #: openedx/features/course_experience/__init__.py
 #: cms/templates/widgets/header.html lms/templates/help_modal.html
 #: lms/templates/courseware/course_navigation.html
@@ -10474,23 +10473,6 @@ msgid ""
 msgstr ""
 "وشطهوعو رعوزثق خب قثذخقيس هر حشلهرشفثي قثسحخرسث خب ش سهرلمث قثضعثسف فخ "
 "ذشفشمخل سثقدهذث."
-
-#: openedx/core/djangoapps/config_model_utils/models.py
-msgid "Org"
-msgstr "خقل"
-
-#: openedx/core/djangoapps/config_model_utils/models.py
-msgid "Site"
-msgstr "سهفث"
-
-#: openedx/core/djangoapps/config_model_utils/models.py
-#: lms/templates/navigation/navigation.html
-msgid "Global"
-msgstr "لمخزشم"
-
-#: openedx/core/djangoapps/config_model_utils/models.py
-msgid "Default"
-msgstr "يثبشعمف"
 
 #: openedx/core/djangoapps/config_model_utils/models.py
 msgid "Enabled"
@@ -20199,6 +20181,10 @@ msgstr ""
 #: lms/templates/navigation/navbar-not-authenticated.html
 msgid "Explore Courses"
 msgstr "ثطحمخقث ذخعقسثس"
+
+#: lms/templates/navigation/navigation.html
+msgid "Global"
+msgstr "لمخزشم"
 
 #: lms/templates/peer_grading/peer_grading.html
 msgid ""

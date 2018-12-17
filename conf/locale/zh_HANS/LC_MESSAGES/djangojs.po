@@ -69,6 +69,7 @@
 # 周歆荷 <zhxh401@126.com>, 2015
 # 周歆荷 <zhxh401@126.com>, 2015
 # 张太红 <zth@xjau.edu.cn>, 2014,2017
+# 微 李 <w.li@eliteu.com.cn>, 2018
 # 汤和果 <hgtang93@163.com>, 2015,2017
 # 沈世奇 <vicapple22@gmail.com>, 2013
 # 熊冬升 <xdsnet@gmail.com>, 2013
@@ -133,6 +134,7 @@
 # 嘉杰 李 <jj.li@eliteu.com.cn>, 2018
 # 张太红 <zth@xjau.edu.cn>, 2014,2017
 # 张 山 <496733089@qq.com>, 2016
+# 微 李 <w.li@eliteu.com.cn>, 2018
 # 沈世奇 <vicapple22@gmail.com>, 2013
 # 熊冬升 <xdsnet@gmail.com>, 2013
 # 竹轩 <fmyzjs@gmail.com>, 2014
@@ -4746,11 +4748,11 @@ msgstr "此邮箱地址用于接收来自{platform_name}和课程团队的信息
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Secondary Email Address"
-msgstr ""
+msgstr "备选邮箱地址"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "You may access your account when single-sign on is not available."
-msgstr ""
+msgstr "如果单点登录不可用，您可以访问自己的帐户。"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: openedx/features/learner_profile/static/learner_profile/js/learner_profile_factory.js
@@ -6084,11 +6086,11 @@ msgstr "可见性"
 
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Editing: {title}"
-msgstr ""
+msgstr "正在编辑：{title}"
 
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Plugins"
-msgstr ""
+msgstr "插件"
 
 #: cms/static/js/views/modals/edit_xblock.js
 #: lms/templates/ccx/schedule.underscore
