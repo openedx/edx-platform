@@ -33,7 +33,9 @@ $secondary-dark: rgb(142, 62, 99); // UXPL secondary dark
 $secondary-base: rgb(203, 89, 141); // UXPL secondary base
 $secondary-light: rgb(219, 139, 175); // UXPL secondary light
 $cool-dark: rgb(79, 89, 93); // UXPL cool dark
+$gray-l2:   tint($gray, 40%) !default;
 
+@import 'mixins';
 
 .is-hidden {
   display: none;
