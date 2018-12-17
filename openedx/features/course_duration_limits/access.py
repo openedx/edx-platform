@@ -126,7 +126,7 @@ def register_course_expired_message(request, course):
         PageLevelMessages.register_warning_message(
             request,
             HTML(upgrade_message).format(
-                expiration_date=expiration_date.strftime('%b %-d')
+                expiration_date=strftime_localized(expiration_date, '%b. %-d, %Y')
             )
         )
     else:
@@ -162,10 +162,10 @@ def register_course_expired_message(request, course):
                 sighted_only_span_open=HTML('<span aria-hidden="true">'),
                 span_close=HTML('</span>'),
                 a_close=HTML('</a>'),
-                expiration_date=expiration_date.strftime('%b. %-d, %Y'),
+                expiration_date=strftime_localized(expiration_date, '%b. %-d, %Y'),
                 strong_open=HTML('<strong>'),
                 strong_close=HTML('</strong>'),
                 line_break=HTML('<br>'),
-                upgrade_deadline=upgrade_deadline.strftime('%b. %-d, %Y')
+                upgrade_deadline=strftime_localized(upgrade_deadline, '%b. %-d, %Y')
             )
         )
