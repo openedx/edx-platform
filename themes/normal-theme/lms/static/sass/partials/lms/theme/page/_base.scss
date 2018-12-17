@@ -42,14 +42,6 @@
 
 }
 
-
-@media screen and (max-width: 576px) {
-  .window-wrap .content-wrapper .home .courses-container{
-    margin-top: 250px;
-  }
-}
-
-
 // a
 a:not(.btn):hover, a:not(.btn):focus, a:visited:not(.btn):hover, a:visited:not(.btn):focus{
   color: $blue;
